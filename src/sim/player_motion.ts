@@ -32,7 +32,13 @@ import {
   moveCharacter,
 } from './physics';
 import { PLATFORM_CARRY_CLEARANCE } from './physics/character';
-import { isSubmergedAt, rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
+import {
+  isSubmergedAt,
+  rideHeight,
+  rideSteepnessAt,
+  shoreStepOut,
+  stepWaterLevel,
+} from './ride_height';
 import { GHOST_RUN_MULT } from './spirit';
 import {
   DT,
@@ -46,6 +52,7 @@ import {
 import {
   groundHeight,
   terrainDownhill,
+  terrainHeight,
   terrainSteepnessAt,
   terrainWallStandoff,
   waterLevelAt,
@@ -193,9 +200,14 @@ export function swimSurfaceY(x: number, z: number, seed: number): number {
 
 /** Swimmable depth at a point, sampling the terrain ONCE (the mount water-walls
  *  ask about a destination they have no height for yet). */
-function isDeepFor(x: number, z: number, seed: number): boolean {
-  const ground = groundHeight(x, z, seed);
-  return ground < waterLevelAt(x, z, seed) - SWIM_DEPTH;
+function isDeepFor(x: number, z: number, seed: number, feetY: number): boolean {
+  const wl = waterLevelAt(x, z, seed);
+  if (groundHeight(x, z, seed) >= wl - SWIM_DEPTH) return false;
+  // A standable deck within a step of the hooves is dry footing, not deep
+  // water: the strait bridge crosses the deep channel on plates well above
+  // the waterline, and gating the ride on the DROWNED seabed under them
+  // walled every mounted crossing at the bridge mouth.
+  return floorHeightAt(seed, x, z, BODY_RADIUS, feetY + MAX_STEP_HEIGHT) < wl - SWIM_DEPTH;
 }
 
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
@@ -332,17 +344,28 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // EXACT position (terrainDownhill): genuinely steep ground still strips
   // control and slides, but a flat shoulder the cell memo over-reads keeps
   // control, and the wall/contour gate below still refuses the climb.
-  // A body CARRIED BY A STANDABLE PLATFORM (feet well above the raw ground:
-  // a fortress floor plate, a stair tread, a pier deck) is not walking the
-  // ground the memo read at all, so the strip never fires for the terrain
-  // buried under its deck: stripping there froze players on the Forgefather
-  // plates whose under-floor ground the stamps had carved steep, with no
-  // slide to escape by because the platform holds the body in place.
+  // A body CARRIED ABOVE THE RAW GROUND (feet well over the terrain the memo
+  // read: a fortress floor plate, a stair tread, a pier deck, or a walk-lift
+  // stair band) is not walking the ground the memo read at all, so the strip
+  // never fires for terrain buried beneath it: stripping there froze players
+  // on the Forgefather plates whose under-floor ground the stamps had carved
+  // steep, and later froze the Last Keep stair DESCENTS, where a band-carried
+  // walker's feet equal lift-inclusive groundHeight exactly, so comparing
+  // against that surface never exempted them even though the memo's steep
+  // read came from the raw rim carved yards below the flight. The reference
+  // surface is therefore the RAW ridden height, the same surface the dry-land
+  // steepness memo and the downhill sampler describe; without lifts it equals
+  // groundHeight, so plain ground walking is untouched. The memo is read
+  // FIRST: the raw height is a fresh heightfield sample per player per tick
+  // on the authoritative server, so it is taken only on the cells the memo
+  // already calls steep (a rare read on any ground a player can walk).
   const steepFlagged =
     p.onGround &&
     !swimming &&
-    p.pos.y <= swimGround + PLATFORM_CARRY_CLEARANCE &&
-    rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
+    rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE &&
+    p.pos.y <=
+      rideHeight(p.pos.x, p.pos.z, terrainHeight(p.pos.x, p.pos.z, deps.seed), deps.seed) +
+        PLATFORM_CARRY_CLEARANCE;
   const steepSlide = steepFlagged ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
   const steepGround = steepSlide !== null;
   // Move-to-cancel: any movement input during a summon channel cancels the cast.
@@ -463,7 +486,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       // into the water; horizontal velocity dies with it while airborne,
       // matching the steep-wall airborne gate.
       const mountBlockedByWater =
-        !!p.mountKey && !swimming && isDeepFor(moveOut.x, moveOut.z, deps.seed);
+        !!p.mountKey && !swimming && isDeepFor(moveOut.x, moveOut.z, deps.seed, p.pos.y);
       if (mountBlockedByWater) {
         if (!p.onGround) {
           p.vx = 0;
@@ -576,7 +599,7 @@ function stepInstancedRegion(
     // from land. Reset the candidate to the current pose (and kill horizontal
     // velocity when airborne, matching the steep-wall airborne gate) so the body
     // stops at the shore instead of clipping into the water.
-    if (p.mountKey && !swimming && isDeepFor(nx, nz, deps.seed)) {
+    if (p.mountKey && !swimming && isDeepFor(nx, nz, deps.seed, p.pos.y)) {
       nx = p.pos.x;
       nz = p.pos.z;
       if (!p.onGround) {
@@ -730,7 +753,13 @@ function verticalPass(
       BODY_RADIUS,
       p.pos.y,
     );
-    if (glue > -Infinity && Math.abs(glue - p.pos.y) <= MAX_STEP_HEIGHT) {
+    // The terrain is always the floor. A glued top that has dipped BELOW the
+    // ground (a bridge deck or a rock whose far end the hillside buries)
+    // hands the body back to the support path, which maxes the terrain in:
+    // following it would seat the player under the ground, walled in by the
+    // terrain gate on every side (the "fell through the ground on a slope"
+    // trap only a teleport could escape).
+    if (glue >= ground && Math.abs(glue - p.pos.y) <= MAX_STEP_HEIGHT) {
       p.pos.y = glue;
       p.fallStartY = glue;
       return;
@@ -926,7 +955,7 @@ function standoffPass(
       // for this tick rather than silently dismounting them into the pit.
       const standSteep = rideSteepnessAt(standX, standZ, deps.seed);
       if (
-        !(p.mountKey && isDeepFor(standX, standZ, deps.seed)) &&
+        !(p.mountKey && isDeepFor(standX, standZ, deps.seed, p.pos.y)) &&
         (standSteep <= MAX_CLIMB_SLOPE ||
           standSteep <= rideSteepnessAt(p.pos.x, p.pos.z, deps.seed))
       ) {

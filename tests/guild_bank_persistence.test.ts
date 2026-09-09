@@ -92,6 +92,7 @@ import {
   type GuildBankOpDelta,
   type GuildBankState,
 } from '../src/sim/guild_bank';
+import { captureMaterialStackSelection } from '../src/sim/material_stack_selection';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -322,7 +323,12 @@ describe('loadGuildBanksIntoSim (the boot load, against a REAL Sim)', () => {
     // Every loaded guild is verified live in the map (the acceptance line).
     expect(sim.guildBanks.has(7)).toBe(true);
     expect(sim.guildBanks.has(8)).toBe(true);
-    expect(sim.guildBanks.get(7)).toEqual(book);
+    // The boot load sanitizes (normalizeLoadedMaterialSlot), so the unsigned
+    // legacy wolf_fang stack picks up its exact provenance on the way in.
+    expect(sim.guildBanks.get(7)).toEqual({
+      ...book,
+      inventory: [{ itemId: 'wolf_fang', count: 2, materialSources: [{ count: 2, source: {} }] }],
+    });
     expect(sim.guildBanks.get(8)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
   });
 
@@ -530,6 +536,7 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
         count: null,
         instance: null,
         craftedRecipeId: null,
+        materialSources: null,
         copperDelta: -90_000,
         // ABSOLUTE, never relative: "this op moved the ladder 0 -> 24". A
         // relative "+24" replayed onto a base that already opened would grant
@@ -656,6 +663,7 @@ describe('the escrow save arm (GameServer.saveCharacter)', () => {
             count: null,
             instance: null,
             craftedRecipeId: null,
+            materialSources: null,
             copperDelta: 2_000,
             purchasedSlotsBefore: 24,
             purchasedSlotsAfter: 24,
@@ -2628,6 +2636,57 @@ describe('the unsettled gate (server/guild_bank_settle_gate.ts) at the real disp
     expect(durableBook()).toEqual(expect.objectContaining({ purchasedSlots: 30 }));
   });
 
+  it('refuses selected unsettled material sources at dispatch and flushes their depositor', async () => {
+    const server = new GameServer();
+    const aJoin = joinServer(server, 1, 'Buyer');
+    const a = aJoin.session;
+    const b = joinServer(server, 2, 'Gatherer').session;
+    officerSetup(server, a, 0);
+    secondOfficer(server, b);
+    server.sim.addItem('copper_ore', 5, a.pid);
+    dispatch(server, a, { cmd: 'guild_bank_deposit', slot: bagIndex(server, a.pid, 'copper_ore') });
+    expect(await priv(server).saveCharacter(a)).toBe(true);
+    restamp(server, a, b);
+    const meta = server.sim.players.get(b.pid);
+    if (!meta) throw new Error('missing gatherer');
+    meta.inventory.push({
+      itemId: 'copper_ore',
+      count: 5,
+      materialSources: [
+        { source: { gatherer: { kind: 'character', id: 2, name: 'Gatherer' } }, count: 5 },
+      ],
+    });
+    dispatch(server, b, { cmd: 'guild_bank_deposit', slot: bagIndex(server, b.pid, 'copper_ore') });
+    const inventory = liveBook(server).inventory;
+    const slot = bookIndex(server, 'copper_ore');
+    const target = captureMaterialStackSelection(inventory, 'copper_ore', slot);
+    if (!target) throw new Error('missing material selection');
+    const sourceIndex = inventory[slot].materialSources?.findIndex(
+      (bucket) => bucket.source.gatherer?.id === 2,
+    );
+    if (sourceIndex === undefined || sourceIndex < 0) throw new Error('missing gathered source');
+    dispatch(server, a, {
+      cmd: 'guild_bank_withdraw',
+      slot,
+      count: 5,
+      selection: { itemId: 'copper_ore', target, quantities: [{ sourceIndex, count: 5 }] },
+    });
+    expect(notices(aJoin.sent)).toContain(NOTICE);
+    expect(bookCount(server, 'copper_ore')).toBe(10);
+    expect(a.dirtyGuildBanks.size).toBe(0);
+    await vi.waitFor(() => expect(b.dirtyGuildBanks.size).toBe(0));
+    restamp(server, a, b);
+    dispatch(server, a, {
+      cmd: 'guild_bank_withdraw',
+      slot,
+      count: 5,
+      selection: { itemId: 'copper_ore', target, quantities: [{ sourceIndex, count: 5 }] },
+    });
+    expect(bookCount(server, 'copper_ore')).toBe(5);
+    expect(await priv(server).saveCharacter(a)).toBe(true);
+    expect(a.escrowQuarantined).toBe(false);
+  });
+
   it('a session may take back its OWN unsettled deposit while another officer is dirty on the book', async () => {
     const server = new GameServer();
     const aJoin = joinServer(server, 1, 'Own');
@@ -3195,6 +3254,16 @@ describe('guild bank incident counters at their real emission sites', () => {
 // A copy the pipe refuses in both directions, seated directly in the book the
 // way a content change would leave one behind.
 const DORMANT_SLOT = { itemId: 'wolf_fang', count: 2, instance: { boundTo: 424242 } };
+// The same slot after it has ridden the material-source-aware load or
+// delta/revert machinery at least once (normalizeMaterialStack /
+// applyGuildBankDeltasTo's composition-aware merge): the unrecorded-gatherer
+// bucket is now explicit. seatBook (loadGuildBank) stamps it on the way in;
+// seatDormant's direct push does not, until a purge-then-revert cycle rebuilds
+// the slot through the same composition algebra.
+const NORMALIZED_DORMANT_SLOT = {
+  ...DORMANT_SLOT,
+  materialSources: [{ count: 2, source: {} }],
+};
 
 // Seat the copy in the LIVE book AND in durable truth, which is what a stranded
 // dormant slot actually is: a row that has been durable since long before the
@@ -3274,6 +3343,9 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
             copperDelta: 0,
             purchasedSlotsBefore: 24,
             purchasedSlotsAfter: 24,
+            // The exact per-source legs the differ read off the book, signed
+            // negative for a removal (guild_bank_op_coordinator.ts).
+            materialSources: [{ count: -2, source: {} }],
           },
         ],
       },
@@ -3385,7 +3457,7 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     await expect(
       server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR),
     ).resolves.toEqual({ ok: false, reason: 'no_carrier' });
-    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([NORMALIZED_DORMANT_SLOT]);
     expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
   });
 
@@ -3408,7 +3480,7 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     releaseLookup();
 
     await expect(purging).resolves.toEqual({ ok: false, reason: 'no_carrier' });
-    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([NORMALIZED_DORMANT_SLOT]);
     expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
   });
 
@@ -3454,8 +3526,9 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     errSpy.mockRestore();
     expect(result).toEqual({ ok: false, reason: 'save_failed' });
     // Reverted, not left removed: the admin_purge delta replays backward
-    // exactly like a player withdraw would.
-    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
+    // exactly like a player withdraw would, through the same composition-aware
+    // merge that stamps the unrecorded-gatherer bucket back on.
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([NORMALIZED_DORMANT_SLOT]);
     // And the refusal rolled the CHARACTER half back with it, so the carrier is
     // quarantined and holds no leftover book work.
     expect(session.escrowQuarantined).toBe(true);
@@ -3500,7 +3573,7 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     warnSpy.mockRestore();
     // The copy is back on the book, so the honest answer is save_failed even
     // though the book now holds FEWER items than it did before the purge.
-    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toContainEqual(DORMANT_SLOT);
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toContainEqual(NORMALIZED_DORMANT_SLOT);
     expect(result).toEqual({ ok: false, reason: 'save_failed' });
   });
 
@@ -3611,7 +3684,7 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     errSpy.mockRestore();
     expect(result).toEqual({ ok: false, reason: 'save_failed' });
     // Surgically restored, with B's legitimate op intact and no reload.
-    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([NORMALIZED_DORMANT_SLOT]);
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(101_000);
   });
 

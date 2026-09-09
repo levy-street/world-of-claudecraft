@@ -21,6 +21,9 @@ const {
 // player already configured) fall out of the same predicates main.cjs uses.
 function linuxPrimeDevConfig() {
   if (process.platform !== 'linux') return { env: {}, args: [] };
+  // The same rescue main.cjs honours: no GPU lever at all for this launch (a
+  // desktop the hybrid predicate misreads, a backend experiment without PRIME).
+  if (process.env.WOC_DISABLE_GPU_FORCE === '1') return { env: {}, args: [] };
   if (!isLinuxHybridGpu()) return { env: {}, args: [] };
   if (!shouldRelaunchForLinuxPrime(process.env, [])) return { env: {}, args: [] };
   return {

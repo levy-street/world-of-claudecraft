@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.vi_VN.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Mọi instance cũng chạy được ở **Heroic**: kẻ thù cấp cao hơn, c
 
 ### Delve
 
-Delve là một chế độ nhóm nhỏ có thể scale riêng biệt cho một hoặc hai người chơi, được dựng lại từ các phòng ngẫu nhiên ở mỗi lượt chơi và kết thúc tại một rương thánh tích bị khóa, mở ra qua một minigame cạy khóa chứ không phải một lượt roll loot. **The Collapsed Reliquary** (cấp 7 trở lên) kết thúc tại Deacon Varric, với một bạn đồng hành AI, Tessa, chiến đấu bên cạnh bạn nếu bạn đi một mình. **The Drowned Litany** (cấp 12 trở lên) lần theo dấu vết vào một ngôi đền ngập nước ở rìa Mirefen Marsh. Một bảng delve đặt bậc chơi: Heroic nâng cấp độ kẻ thù và thêm một affix ngẫu nhiên để có phần thưởng hậu hĩnh hơn.
+Delve là một chế độ nhóm nhỏ có thể scale riêng biệt cho một hoặc hai người chơi, được dựng lại từ các phòng ngẫu nhiên ở mỗi lượt chơi và kết thúc tại một rương thánh tích bị khóa, mở ra qua một minigame cạy khóa chứ không phải một lượt roll loot. **The Collapsed Reliquary** (cấp 7 trở lên) kết thúc tại Deacon Vandric, với một bạn đồng hành AI, Tessa, chiến đấu bên cạnh bạn nếu bạn đi một mình. **The Drowned Litany** (cấp 12 trở lên) lần theo dấu vết vào một ngôi đền ngập nước ở rìa Mirefen Marsh. Một bảng delve đặt bậc chơi: Heroic nâng cấp độ kẻ thù và thêm một affix ngẫu nhiên để có phần thưởng hậu hĩnh hơn.
 
 ### PvP xếp hạng (the Ashen Coliseum)
 

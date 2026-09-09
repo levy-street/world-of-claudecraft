@@ -11,6 +11,7 @@
 import type { Pool as PgPool } from 'pg';
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { materialSourceConnection } from '../server/material_source_connection';
 import { type CharacterState, type MailSave, type MarketSave, Sim } from '../src/sim/sim';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
@@ -52,7 +53,7 @@ describeDb('mail custody overlay (REAL Postgres)', () => {
     // ensureSchema, not just the DDL string.
     await db.ensureSchema();
 
-    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 4 });
+    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 4 });
   }, 120_000);
 
   afterAll(async () => {

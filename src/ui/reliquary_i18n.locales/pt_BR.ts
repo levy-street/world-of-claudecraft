@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Heroico: The Inner Crucible',
     desc: 'Escudos e armas exclusivos do modo heroico de Varkhul, Forgefather of the Last Flame.',
   },
+  conquerors_set_bramblehide: {
+    name: 'Couro de Sarça de Roots',
+    desc: 'A família completa de couro Bramblehide.',
+  },
 };

@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { buildDoorBody, doorArchAuthoredElsewhere } from '../src/render/door_portal';
 import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resource';
+import { DUNGEONS } from '../src/sim/data';
 
 const meshes = (body: THREE.Group): THREE.Mesh[] =>
   body.children.filter((c): c is THREE.Mesh => (c as THREE.Mesh).isMesh);
@@ -49,6 +50,26 @@ describe('buildDoorBody: Nythraxis crypt click-box', () => {
     const { body, portal } = buildDoorBody(false, 'nythraxis_crypt', false);
     expect(meshes(body).length).toBe(5);
     expect(portal).toBeDefined();
+  });
+
+  it('the rebuilt Last Keep yields its arch only to a castle_door standing AT the keep door', () => {
+    const door = DUNGEONS.the_last_keep.doorPos;
+    // no facade: the generic arch keeps the keep door visible
+    expect(doorArchAuthoredElsewhere('the_last_keep', [{ key: 'stone_floor' }])).toBe(false);
+    // the placed facade a row in front of doorPos IS the door
+    expect(
+      doorArchAuthoredElsewhere('the_last_keep', [
+        { key: 'castle_door', x: door.x + 1.3, z: door.z },
+      ]),
+    ).toBe(true);
+    // a castle_door placed at another site (a town gate) never claims the keep's arch,
+    // and a row without coordinates cannot be located, so it never does either
+    expect(
+      doorArchAuthoredElsewhere('the_last_keep', [{ key: 'castle_door', x: 400, z: 1900 }]),
+    ).toBe(false);
+    expect(doorArchAuthoredElsewhere('the_last_keep', [{ key: 'castle_door' }])).toBe(false);
+    // the shipped table carries the keep facade on the temple court
+    expect(doorArchAuthoredElsewhere('the_last_keep')).toBe(true);
   });
 
   it('the Forgefather raid door yields to the facade only once one is baked', () => {

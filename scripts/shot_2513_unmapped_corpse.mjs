@@ -34,7 +34,11 @@ const MOBILE = process.env.SHOT_MOBILE === '1';
 // fen_troll's families out from under the old default here).
 const TEMPLATE = process.env.SHOT_TEMPLATE ?? 'warlock_imp';
 const TEMPLATE_NAME = process.env.SHOT_TEMPLATE_NAME ?? 'Fen Horror';
-const TAGS = (process.env.SHOT_TAGS ?? 'gills,horn').split(',').filter(Boolean);
+// The default pair is the synthetic never-mapped families the test suites
+// retag with (tests/helpers/unmapped_family.ts): gills and horn played that
+// part until Masterwrought Phase 11m mapped both, the same drift #2905 caused
+// with fen_troll's claw and tusk.
+const TAGS = (process.env.SHOT_TAGS ?? 'antler,fleece').split(',').filter(Boolean);
 const EXPECT_PICKER = process.env.SHOT_EXPECT_PICKER === '1';
 const BOOT_VIEW = { width: 1600, height: 900, deviceScaleFactor: 2 };
 const SHOT_VIEW = MOBILE ? { width: 844, height: 390, deviceScaleFactor: 2 } : BOOT_VIEW;

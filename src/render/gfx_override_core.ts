@@ -13,13 +13,21 @@ export const GFX_OVERRIDE_VALUE_KINDS = {
   surfaceDetail: 'boolean',
   surfaceDetailTaps: 'number',
   surfaceDetailClampK: 'number',
+  anisotropy: 'number',
+  normalAnisotropy: 'number',
   terrainRelief: 'number',
   bladeCarpetRadius: 'number',
   cliffScree: 'boolean',
   canopyDetail: 'boolean',
+  // The tap count rides beside its on/off flag for the same reason
+  // surfaceDetailTaps rides beside surfaceDetail: overriding one alone leaves
+  // the pair disagreeing, and canopy_detail.ts consults BOTH, so
+  // `?gfxo=canopyDetail:1` on a tier with zero taps would silently do nothing.
+  canopyDetailTaps: 'number',
   pixelRatioCap: 'number',
   grassRadius: 'number',
   grassStep: 'number',
+  grassCardsPerTuft: 'number',
   leanFoliage: 'boolean',
   standardMaterials: 'boolean',
   terrainSplat: 'boolean',

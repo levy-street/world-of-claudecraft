@@ -35,7 +35,7 @@ function makePool(): { pool: SpiritApparitions; probe: PuppetProbe } {
 }
 
 // warmForClass resolves its models from the authored spec table; the shaman's
-// Ghost Wolf is the stable single-model case.
+// Shadewolf is the stable single-model case.
 const WOLF = 'wolf';
 
 beforeEach(() => {

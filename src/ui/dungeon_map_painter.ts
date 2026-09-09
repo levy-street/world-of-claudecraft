@@ -10,6 +10,7 @@ import {
   type DungeonMapPolygon,
   type DungeonMapStaticGeometry,
   DungeonMapViewCore,
+  type MapAnchor,
 } from './dungeon_map_view';
 import { dungeonDisplayName } from './entity_i18n';
 import type { PainterHostWriters } from './painter_host';
@@ -313,9 +314,10 @@ export class DungeonMapPainter {
     ctx: CanvasRenderingContext2D,
     world: IWorld,
     size: number,
+    anchor?: MapAnchor,
   ): PaintedDungeonWorldMap | null {
     const pad = Math.round(size * WORLD_MAP_PAD_RATIO);
-    const model = this.view.worldMap(world, size, pad);
+    const model = this.view.worldMap(world, size, pad, anchor);
     if (!model) return null;
     const colors = this.resolveColors();
     const title = dungeonDisplayName(model.dungeonId);

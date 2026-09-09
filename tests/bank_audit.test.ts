@@ -515,6 +515,233 @@ describe('auditBank (vault container)', () => {
     ).toEqual([]);
   });
 
+  // -------------------------------------------------------------------------
+  // The per-unit-provenance representation change. The vault stores
+  // attribution-bearing material in `special` even when the units are ordinary,
+  // and a deposit that opens or joins such a block FOLDS the compact row into
+  // it. The audit's state projection must therefore key by SOURCE BUCKET
+  // (effective payload = row payload + that bucket's legacy signer, gatherer
+  // never), and it must keep reading the one historical wrapper older rows
+  // carry for a payload-free special row.
+  // -------------------------------------------------------------------------
+  const ANA = { kind: 'character', id: 11, name: 'Ana' };
+
+  it('reconciles a deposit that FOLDED pooled units into a new identity block', () => {
+    // Ten pooled units, then one gathered unit whose deposit pulls them into a
+    // block. The ledger correctly booked 1 for the second op; a row-shaped state
+    // projection would look for eleven units under a block identity nothing ever
+    // deposited AND ten pooled units that are no longer in `stock`, reporting a
+    // mismatch in both directions at once.
+    expect(
+      auditBank({
+        ledgerRows: [
+          V({
+            id: 1,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 10,
+            purchased_slots_after: 1,
+          }),
+          V({
+            id: 2,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 1,
+            purchased_slots_after: 1,
+          }),
+        ],
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: {
+              vault: {
+                stock: {},
+                special: [
+                  {
+                    itemId: 'copper_ore',
+                    count: 11,
+                    materialSources: [
+                      { source: {}, count: 10 },
+                      { source: { gatherer: ANA }, count: 1 },
+                    ],
+                  },
+                ],
+                upgrades: 1,
+              },
+            },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('reads the HISTORICAL all-null special wrapper as the pooled identity it now projects to', () => {
+    // Rows written before the per-bucket rule gave a payload-free special row
+    // `{vaultSpecial:1,instance:null,craftedRecipeId:null}`. Those units are
+    // pooled stock under the current rule, so the historical row has to fold
+    // onto the pooled key or it reconciles against nothing forever. Both shapes
+    // of surviving state are exercised, because a character may hold either.
+    const legacyRow = V({
+      id: 1,
+      character_id: 1,
+      op: 'deposit',
+      item_id: 'copper_ore',
+      count: 2,
+      instance: { vaultSpecial: 1, instance: null, craftedRecipeId: null },
+      purchased_slots_after: 1,
+    });
+    expect(
+      auditBank({
+        ledgerRows: [legacyRow],
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: { vault: { stock: { copper_ore: 2 }, upgrades: 1 } },
+          },
+        ],
+      }),
+    ).toEqual([]);
+    expect(
+      auditBank({
+        ledgerRows: [legacyRow],
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: {
+              vault: {
+                stock: {},
+                special: [
+                  {
+                    itemId: 'copper_ore',
+                    count: 2,
+                    materialSources: [{ source: {}, count: 2 }],
+                  },
+                ],
+                upgrades: 1,
+              },
+            },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('accepts a source-bearing snapshot whose signature moved from the payload into a bucket', () => {
+    // The pre-change row recorded the signature as a payload; the character's
+    // vault now carries it in a source bucket. Healthy new data must audit
+    // clean against old history, which is the whole point of keying on the
+    // EFFECTIVE payload.
+    expect(
+      auditBank({
+        ledgerRows: [
+          V({
+            id: 1,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 3,
+            instance: { vaultSpecial: 1, instance: { signer: 'Ana' }, craftedRecipeId: null },
+            purchased_slots_after: 1,
+          }),
+          V({
+            id: 2,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 2,
+            purchased_slots_after: 1,
+          }),
+        ],
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: {
+              vault: {
+                stock: {},
+                special: [
+                  {
+                    itemId: 'copper_ore',
+                    count: 5,
+                    materialSources: [
+                      { source: {}, count: 2 },
+                      { source: { signer: 'Ana' }, count: 3 },
+                    ],
+                  },
+                ],
+                upgrades: 1,
+              },
+            },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('will not let a POOLED withdraw be satisfied out of a signer bucket', () => {
+    // The laundering case the per-bucket key exists to refuse. Two pooled units
+    // and three signed ones were deposited; a withdraw of four POOLED units has
+    // only two to take, and the signed bucket must not cover the rest.
+    const findings = auditBank({
+      ledgerRows: [
+        V({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 3,
+          instance: { vaultSpecial: 1, instance: { signer: 'Ana' }, craftedRecipeId: null },
+          purchased_slots_after: 1,
+        }),
+        V({
+          id: 2,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 2,
+          purchased_slots_after: 1,
+        }),
+        V({
+          id: 3,
+          character_id: 1,
+          op: 'withdraw',
+          item_id: 'copper_ore',
+          count: 4,
+          purchased_slots_after: 1,
+        }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: {
+            vault: {
+              stock: {},
+              special: [
+                {
+                  itemId: 'copper_ore',
+                  count: 3,
+                  materialSources: [{ source: { signer: 'Ana' }, count: 3 }],
+                },
+              ],
+              upgrades: 1,
+            },
+          },
+        },
+      ],
+    });
+    // Decisive on the SIGNED side too: the three signed units reconcile exactly,
+    // so the only complaint is the pooled overdraw. A key space that let the
+    // signer bucket cover it would report nothing at all here.
+    expect(findings.map((f) => f.kind)).toContain('negative_net');
+    expect(findings.some((f) => f.detail.includes('copper_ore'))).toBe(true);
+  });
+
   it('flags a tampered state.vault stock as a ledger_state_mismatch', () => {
     const findings = auditBank({
       ledgerRows: [

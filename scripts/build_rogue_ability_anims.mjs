@@ -43,7 +43,7 @@
 //
 // Ghostfoot (evasion) points straight at rogue.glb's own already-baked
 // 'Block' clip (a defensive guard, no bake needed): the same no-bake pattern
-// player_warrior's raised_guard already uses. Cutthroat Tempo, Smokestep,
+// player_warrior's raised_guard already uses. Cutthroat Tempo, Smokefade,
 // Quickened Blood, and Duskveil are all self-buff/stealth toggles with no
 // combat swing to author, so they point at rogue.glb's own already-baked
 // 'Spellcast_Raise' clip, the pattern player_warrior's sanguine_aura and the

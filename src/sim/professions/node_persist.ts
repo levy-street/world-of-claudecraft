@@ -89,6 +89,17 @@ export function serializeNodeReadiness(
   return any ? out : undefined;
 }
 
+/** The sparse CharacterState fragment for one save (the sim.ts
+ *  serializeCharacter shape every optional field follows): absent when
+ *  serializeNodeReadiness has no running timer to write. */
+export function nodeReadinessSaveFragment(
+  nodeHarvestReadyAt: Readonly<Record<string, number>>,
+  now: number,
+): { nodeHarvestCooldowns?: Record<string, number> } {
+  const cooldowns = serializeNodeReadiness(nodeHarvestReadyAt, now);
+  return cooldowns ? { nodeHarvestCooldowns: cooldowns } : {};
+}
+
 /** Rebuild a saved remaining-deltas record into a fresh readiness map anchored
  *  at the current clock. Only LIVE node ids survive (a retired id self-heals
  *  out of the save on the next round trip), non-finite and non-positive

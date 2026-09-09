@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Sunpetal Grimoire item icon source</title>
+  <defs>
+    <radialGradient id="bg" cx="0.42" cy="0.36" r="0.95">
+      <stop offset="0" stop-color="#1d2740"/>
+      <stop offset="0.55" stop-color="#101627"/>
+      <stop offset="1" stop-color="#060810"/>
+    </radialGradient>
+    <radialGradient id="key" cx="0.27" cy="0.2" r="0.6">
+      <stop offset="0" stop-color="#cfe0ff" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#cfe0ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cover" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3d5f9e"/>
+      <stop offset="0.45" stop-color="#28406e"/>
+      <stop offset="1" stop-color="#14213c"/>
+    </linearGradient>
+    <linearGradient id="pages" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e6dcb2"/>
+      <stop offset="1" stop-color="#9c8a5e"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dfe6ee"/>
+      <stop offset="0.5" stop-color="#9fadbe"/>
+      <stop offset="1" stop-color="#5a6878"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd75e" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#ffb843" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffb843" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="petal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe291"/>
+      <stop offset="1" stop-color="#d98f2b"/>
+    </linearGradient>
+    <radialGradient id="sunCore" cx="0.4" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#ffefb5"/>
+      <stop offset="0.55" stop-color="#f2b64a"/>
+      <stop offset="1" stop-color="#a86a1b"/>
+    </radialGradient>
+    <linearGradient id="spine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0e1729"/>
+      <stop offset="1" stop-color="#33507f"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#bg)"/>
+  <rect width="128" height="128" fill="url(#key)"/>
+  <ellipse cx="64" cy="108" rx="37" ry="8" fill="#000000" opacity="0.55"/>
+  <g transform="rotate(-3 64 64)">
+    <rect x="38" y="29" width="57" height="75" rx="3" fill="url(#pages)"/>
+    <path d="M93 33 L93 101" stroke="#b3a273" stroke-width="1.4" fill="none"/>
+    <rect x="32" y="25" width="58" height="75" rx="4" fill="url(#cover)" stroke="#0a1322" stroke-width="1.6"/>
+    <rect x="32" y="25" width="9" height="75" rx="3" fill="url(#spine)"/>
+    <rect x="45" y="31" width="40" height="63" rx="2" fill="none" stroke="url(#steel)" stroke-width="1.6" opacity="0.85"/>
+    <path d="M45 31 l5 5 M85 31 l-5 5 M45 94 l5 -5 M85 94 l-5 -5" stroke="url(#steel)" stroke-width="1.4" opacity="0.85"/>
+    <circle cx="65" cy="62" r="26" fill="url(#sunGlow)"/>
+    <g stroke="#8a5a14" stroke-width="0.9" fill="url(#petal)">
+      <ellipse cx="65" cy="47.5" rx="4.4" ry="9"/>
+      <ellipse cx="65" cy="76.5" rx="4.4" ry="9"/>
+      <ellipse cx="50.5" cy="62" rx="4.4" ry="9" transform="rotate(90 50.5 62)"/>
+      <ellipse cx="79.5" cy="62" rx="4.4" ry="9" transform="rotate(90 79.5 62)"/>
+      <ellipse cx="54.8" cy="51.8" rx="4.2" ry="8.4" transform="rotate(-45 54.8 51.8)"/>
+      <ellipse cx="75.2" cy="72.2" rx="4.2" ry="8.4" transform="rotate(-45 75.2 72.2)"/>
+      <ellipse cx="75.2" cy="51.8" rx="4.2" ry="8.4" transform="rotate(45 75.2 51.8)"/>
+      <ellipse cx="54.8" cy="72.2" rx="4.2" ry="8.4" transform="rotate(45 54.8 72.2)"/>
+    </g>
+    <circle cx="65" cy="62" r="8.6" fill="url(#sunCore)" stroke="#7c4d10" stroke-width="1.1"/>
+    <circle cx="62.5" cy="59.5" r="2.6" fill="#fff3cd" opacity="0.9"/>
+    <path d="M90 55 h6 v14 h-6" fill="url(#steel)" stroke="#3d4a59" stroke-width="1"/>
+    <path d="M37 29 C52 26 74 25 87 27" stroke="#9db9e8" stroke-width="1.6" fill="none" opacity="0.65"/>
+  </g>
+</svg>

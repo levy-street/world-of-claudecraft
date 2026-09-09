@@ -352,31 +352,38 @@ describe('Smolderstrike 4pc: the Lights Out refund proc', () => {
 });
 
 describe("Ashveil 2pc: the Lurker's Strike damage row", () => {
-  it('resolves ambush to bonus 42 and weaponMult 3.725 for wearers (35 and 3.1 base)', () => {
-    // Delivered arithmetic (the additive accumulator): the set row 0.25 folds
-    // beside the subtlety baseline's 0.16 ambush row and the 0.08 global,
-    // 1.49 vs the control's 1.24, so the DELIVERED lift is 1.49 / 1.24 =
-    // ~+20 percent, not +25 (stated by the set doc). On the authored numbers:
-    // bonus round(28 x 1.49) = 42 (control round(28 x 1.24) = 35) and
-    // weaponMult 2.5 x 1.49 (control 2.5 x 1.24); the in-veil Veiled Edge
-    // multiplier lands on the scaled weapon component afterward.
+  it('resolves ambush to bonus 36 and weaponMult 3.225 for wearers (29 and 2.6 base)', () => {
+    // Delivered arithmetic (the additive accumulator): v0.42.0 Skulduggery
+    // (docs/design/class-balance-v042.md) dropped subtlety's baseline global
+    // meleeDmgPct 0.08 -> 0.04 AND retired ambush's own baseline dmgPct row
+    // (0.16 -> 0, its true-stealth opener reward moved to a separate
+    // gameplay-slice mechanic; spec_baselines.ts). So the control mult is
+    // now bare global-only: 1.04. The set row 0.25 folds beside that same
+    // 0.04 global, 1.29 vs the control's 1.04, so the DELIVERED lift is
+    // 1.29 / 1.04 = ~+24 percent, close to the authored +25 (little baseline
+    // dilution left to eat the row). On the authored numbers: bonus
+    // round(28 x 1.29) = 36 (control round(28 x 1.04) = 29) and weaponMult
+    // 2.5 x 1.29 (control 2.5 x 1.04); the in-veil Veiled Edge multiplier
+    // lands on the scaled weapon component afterward.
     const base = abilitiesKnownAt('rogue', 25, rogueMods('subtlety', {}));
     const setw = abilitiesKnownAt('rogue', 25, rogueMods('subtlety', worn('ashveil', 2)));
     const baseStrike = weaponStrikeOf(expectDefined(base.find((k) => k.def.id === 'ambush')));
     const wornStrike = weaponStrikeOf(expectDefined(setw.find((k) => k.def.id === 'ambush')));
-    expect(baseStrike.bonus).toBe(35);
-    expect(baseStrike.weaponMult).toBeCloseTo(2.5 * 1.24, 6);
-    expect(wornStrike.bonus).toBe(42);
-    expect(wornStrike.weaponMult).toBeCloseTo(2.5 * 1.49, 6);
+    expect(baseStrike.bonus).toBe(29);
+    expect(baseStrike.weaponMult).toBeCloseTo(2.5 * 1.04, 6);
+    expect(wornStrike.bonus).toBe(36);
+    expect(wornStrike.weaponMult).toBeCloseTo(2.5 * 1.29, 6);
   });
 });
 
 describe('Ashveil 4pc: the Veiled Edge value bake and dynamic consume', () => {
-  it('the detonation bakes 2 into the edge aura for wearers, 1 for everyone else', () => {
+  it('the detonation bakes 1 into the edge aura for wearers, 0.5 for everyone else', () => {
     // The REAL ctx (live worn mods): rogueGloamDetonation arms the veil from
     // a synthetic full bank, and the aura VALUE carries the wearer bake.
-    // consumeVeiledEdge returns 1 + value, the dynamic read the set doc
-    // verifies: 3 for wearers, the base 2 for everyone else.
+    // v0.42.0 Skulduggery halved both edge bonuses (+200% -> +100% wearer,
+    // +100% -> +50% base; see the live cast pair test below). consumeVeiledEdge
+    // returns 1 + value, the dynamic read the set doc verifies: 2 for
+    // wearers, the base 1.5 for everyone else.
     function detonate(pieces: number): TestSim {
       const sim = rogueSim('subtlety', 5141);
       if (pieces > 0) equipSet(sim, 'ashveil', pieces);
@@ -398,13 +405,14 @@ describe('Ashveil 4pc: the Veiled Edge value bake and dynamic consume', () => {
     expect(consumeVeiledEdge(control.ctx, control.player, 'ambush')).toBe(1 + VEILED_EDGE_BONUS);
   });
 
-  it('live cast pair: the wearer edge strikes past DOUBLE, the control double stays under it', () => {
-    // The set doc's same-change note "the :407 threshold rises": the base
-    // (non-wearer) pin in tests/rogue_engines.test.ts:407 holds its edged
-    // strike above 1.3x the plain one; the wearer-scoped mirror here holds
-    // the tripled strike above 2x, a bar the control's double can NEVER
-    // reach (the flat bonus term keeps (2mW + b) / (mW + b) strictly under
-    // 2). The whole stream is pinned via an rng spy (hit-table roll 0.5
+  it('live cast pair: the wearer edge strikes past 1.3x, both stay under DOUBLE', () => {
+    // v0.42 Skulduggery pass (docs/design/class-balance-v042.md): the
+    // repeatable veil-window Edge is halved (+200% -> +100% for Ashveil 4pc,
+    // +100% -> +50% for everyone else), so the wearer's edged strike now
+    // shares the SAME algebraic shape the control already had (edged =
+    // (2mW + b), plain = (mW + b): the flat bonus term keeps that ratio
+    // strictly under 2 for both). The whole stream is pinned via an rng spy
+    // (hit-table roll 0.5
     // lands past the 5 percent dodge slot, crit 0.5 < critChance fails, and
     // the weapon roll sits at its midpoint), so both runs are deterministic
     // with byte-identical draw handling: no probed seed to re-mint.
@@ -442,9 +450,12 @@ describe('Ashveil 4pc: the Veiled Edge value bake and dynamic consume', () => {
     }
 
     const wearer = veilRun(4);
-    expect(wearer.edged).toBeGreaterThan(wearer.plain * 2);
+    expect(wearer.edged).toBeGreaterThan(wearer.plain * 1.3);
+    expect(wearer.edged).toBeLessThan(wearer.plain * 2);
     const control = veilRun(0);
-    expect(control.edged).toBeGreaterThan(control.plain * 1.3);
-    expect(control.edged).toBeLessThan(control.plain * 2);
+    // Halved base bonus (+100% -> +50%): the theoretical ceiling is 1.5x, the
+    // flat bonus term dilutes it a little below that.
+    expect(control.edged).toBeGreaterThan(control.plain * 1.2);
+    expect(control.edged).toBeLessThan(control.plain * 1.5);
   });
 });

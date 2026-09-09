@@ -42,6 +42,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import type { CopperFlowSource, HarvestBand, HarvestTier } from '../server/economy_telemetry';
+import { FISHING_BANDS } from '../server/fishing_telemetry';
 import { type ClientSession, GameServer } from '../server/game';
 import { type GameStateSource, registerGameStateMetrics } from '../server/http/game_metrics';
 import {
@@ -55,6 +56,7 @@ import {
   MSG_LANE_CHAT_BURST,
   MSG_LANE_COMMAND_BURST,
   MSG_LANE_MOVEMENT_BURST,
+  MSG_LANE_NAME_SCREEN_BURST,
 } from '../server/msg_lanes';
 import {
   MSG_ABUSE_SECOND_DROP_FLOOR,
@@ -64,6 +66,7 @@ import {
   MSG_SEQ_GAP_SANITY,
 } from '../server/msg_rate_limit';
 import { ITEMS } from '../src/sim/data';
+import type { FishingCatchBand } from '../src/sim/professions/fishing_bands';
 import type { PlayerClass, SimEvent } from '../src/sim/types';
 
 interface FakeClient {
@@ -97,6 +100,9 @@ function join(
  *  session count; the exporter unit test pins its independent mapping. */
 function sourceOver(server: GameServer): GameStateSource {
   return {
+    usernameBanlistLoaded: () => true,
+    characterBlobBytesHighWater: () => 0,
+    characterBlobBytesP99: () => 0,
     playersOnline: () => server.clients.size,
     accountsOnline: () => server.liveAccountIds().size,
     wsConnections: () => server.clients.size,
@@ -146,6 +152,7 @@ function sourceOver(server: GameServer): GameStateSource {
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     dbBackendCancels: () => ({ requested: 0, failed: 0 }),
     bankLedgerTail: () => ({ depth: 0, rows: 0, droppedRows: 0 }),
+    soldVolumeTail: () => ({ depth: 0, coalescedSales: 0, droppedSales: 0 }),
     generalChatQuotaDbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     generalChatQuotaInFlight: () => server.generalChatQuotaInFlight(),
     generalChatQuotaCachedAccounts: () => server.generalChatQuotaCachedAccounts(),
@@ -710,6 +717,62 @@ describe('inbound drop, kick, and seq-gap counters at their emission sites', () 
     server.stop();
   });
 
+  it('emits cause lane name screen for a named-frame lane drop', () => {
+    // The phase 13 QA hot-path review: the two handlers that run the
+    // obscenity matcher (pet_rename, and perfect_item carrying a name) ride
+    // their own lane, so a flood of them is shed with its own cause before
+    // the screen runs; one past the burst at one instant is the lane's drop.
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+
+    const renameFrame = JSON.stringify({ t: 'cmd', cmd: 'pet_rename', name: 'Rex' });
+    const renamed = vi.spyOn(server.sim, 'renamePet');
+    for (let i = 0; i < MSG_LANE_NAME_SCREEN_BURST + 1; i++) {
+      server.handleMessage(session, renameFrame);
+    }
+    expect(rec.dropped).toEqual(['lane_name_screen']);
+    // The burst's worth reached the handler (the lane shed the last frame
+    // only, not the whole run), so the drop is the lane's, not a refusal.
+    // (The burst's literal value is pinned in tests/msg_lanes.test.ts; this
+    // compares against the constant the lane itself reads.)
+    expect(renamed).toHaveBeenCalledTimes(MSG_LANE_NAME_SCREEN_BURST);
+    expect(rec.rateKicks()).toBe(0);
+    renamed.mockRestore();
+    server.stop();
+  });
+
+  it('screens a pet name shape-first: a shape-invalid raw name skips the matcher and rides to the sim', () => {
+    // The phase 13 QA hot-path review, pinned by the one input that tells the
+    // arms apart: 'Hitler2' matches the built-in banned term once the digit is
+    // stripped (server/auth.ts normalizedUsernameForCensorship), so the OLD
+    // raw screen refused it and never called the sim, while cleanPetName
+    // refuses the digit outright (src/sim/pet/pet_commands.ts PET_NAME_RE), so
+    // the matcher never runs and the sim answers its own shape line. Beside
+    // it: a shape-VALID spelling of the same term ('  Hitler  ' cleans to
+    // 'Hitler') is screened and never reaches the sim, and a clean padded name
+    // reaches it as the ONE normalized value the screen priced.
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const renamed = vi.spyOn(server.sim, 'renamePet');
+    const rename = (name: string) =>
+      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'pet_rename', name }));
+    rename('Hitler2');
+    expect(renamed).toHaveBeenCalledTimes(1);
+    expect(renamed).toHaveBeenLastCalledWith('Hitler2', session.pid);
+    rename('  Hitler  ');
+    expect(renamed).toHaveBeenCalledTimes(1);
+    rename('  Rex   Two ');
+    expect(renamed).toHaveBeenCalledTimes(2);
+    expect(renamed).toHaveBeenLastCalledWith('Rex Two', session.pid);
+    expect(rec.dropped).toEqual([]);
+    renamed.mockRestore();
+    server.stop();
+  });
+
   it('emits cause list read for a guarded readout refusal', () => {
     const server = new GameServer();
     const rec = recordingSink();
@@ -1089,8 +1152,14 @@ function castStartEvent(entityId: number, ability: string): SimEvent {
   return event;
 }
 
+// The BAND TYPE, not the literal union these four factories used to write. A
+// local `0 | 1 | 2` here meant no arm in this file could construct a band 3, 4
+// or 5 outcome event, so the widened vocabulary the exporter publishes had no
+// emission-site coverage at all: the labels were pinned, the events that carry
+// them were not. Importing the shipped type is also what makes a SEVENTH band
+// red here rather than silently leaving these factories a band behind.
 type FishingResultEvent = Extract<SimEvent, { type: 'fishingResult' }>;
-function fishingResultEvent(zoneId: string, band: 0 | 1 | 2, itemId: string): SimEvent {
+function fishingResultEvent(zoneId: string, band: FishingCatchBand, itemId: string): SimEvent {
   const event: FishingResultEvent = {
     type: 'fishingResult',
     pid: 999,
@@ -1103,19 +1172,19 @@ function fishingResultEvent(zoneId: string, band: 0 | 1 | 2, itemId: string): Si
 }
 
 type FishingGotAwayEvent = Extract<SimEvent, { type: 'fishingGotAway' }>;
-function fishingGotAwayEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
+function fishingGotAwayEvent(zoneId: string, band: FishingCatchBand): SimEvent {
   const event: FishingGotAwayEvent = { type: 'fishingGotAway', pid: 999, zoneId, band };
   return event;
 }
 
 type FishingEarlyReelEvent = Extract<SimEvent, { type: 'fishingEarlyReel' }>;
-function fishingEarlyReelEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
+function fishingEarlyReelEvent(zoneId: string, band: FishingCatchBand): SimEvent {
   const event: FishingEarlyReelEvent = { type: 'fishingEarlyReel', pid: 999, zoneId, band };
   return event;
 }
 
 type FishingEmptyHookEvent = Extract<SimEvent, { type: 'fishingEmptyHook' }>;
-function fishingEmptyHookEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
+function fishingEmptyHookEvent(zoneId: string, band: FishingCatchBand): SimEvent {
   const event: FishingEmptyHookEvent = { type: 'fishingEmptyHook', pid: 999, zoneId, band };
   return event;
 }
@@ -1158,7 +1227,7 @@ describe('fishing telemetry counters at their emission sites', () => {
     if (!entity) throw new Error('no entity for the joined session');
     const meta = server.sim.meta(session.pid) as unknown as Record<string, any>;
     entity.fishCastZoneId = 'mirefen_marsh';
-    // Band 2 needs BOTH halves of effectiveFishingBand: the proficiency rung
+    // Band 4 needs BOTH halves of effectiveFishingBand: the proficiency rung
     // and a rod whose tier covers it. Raise one at a time so a counter that
     // read only one of them still fails here.
     meta.gatheringProficiency.fishing = 200;
@@ -1168,9 +1237,13 @@ describe('fishing telemetry counters at their emission sites', () => {
 
     server.sim.addItem('tidewrought_fishing_rod', 1, session.pid);
     observe(server, [castStartEvent(session.pid, 'fishing')]);
+    // Band 4, not 2, since masterwrought Phase 11i: the tidewrought is tier 5
+    // and the ladder now runs to six bands, so at proficiency 200 the rod is
+    // the only axis left and a tier-5 rod reaches band 4. That the number MOVED
+    // with the rod is the property this arm is about.
     expect(rec.fishingCasts).toEqual([
       ['mirefen_marsh', '0'],
-      ['mirefen_marsh', '2'],
+      ['mirefen_marsh', '4'],
     ]);
     server.stop();
   });
@@ -1256,6 +1329,38 @@ describe('fishing telemetry counters at their emission sites', () => {
     // A catch is not a got-away and not an empty hook.
     expect(rec.fishingGotAways).toEqual([]);
     expect(rec.fishingEmptyHooks).toEqual([]);
+    server.stop();
+  });
+
+  it('carries EVERY band the ladder defines, not just the three that predate 11i', () => {
+    // THE EMISSION-SITE HALF of the widened vocabulary, added by the Phase 11i
+    // QA. tests/fishing_telemetry.test.ts pins the LABEL set at six, but until
+    // this arm the four event factories in this file wrote the literal union
+    // `0 | 1 | 2`, so nothing here could construct a band 3, 4 or 5 outcome and
+    // the three bands the phase ADDED had no emission coverage at all. A label
+    // list is a claim about what the exporter may publish; this is the claim
+    // that the events carrying those labels actually reach it.
+    //
+    // Driven off FISHING_BANDS rather than a second literal, so a seventh band
+    // widens this walk in the same edit that widens the vocabulary.
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    observe(
+      server,
+      FISHING_BANDS.map((label) =>
+        fishingResultEvent('eastbrook_vale', Number(label) as FishingCatchBand, 'raw_mirror_trout'),
+      ),
+    );
+
+    expect(rec.fishingCatches).toEqual(
+      FISHING_BANDS.map((label) => ['eastbrook_vale', label, false]),
+    );
+    // Non-vacuity: the walk really covered the deep bands, which is the half
+    // that did not exist before.
+    expect(rec.fishingCatches.map((row) => row[1])).toContain('5');
+    expect(rec.fishingCatches).toHaveLength(6);
     server.stop();
   });
 
@@ -1350,9 +1455,18 @@ describe('fishing telemetry counters at their emission sites', () => {
     // would overstate the copper the fees took. A non-rod recipe trains
     // successfully and charges a fee, but it is not a ROD fee, and letting it
     // through would put an unbounded recipe vocabulary on the label.
+    //
+    // The apex rod is the THIRD control and the one the filter was actually
+    // introduced for (masterwrought Phase 11i). It IS a rod recipe and it does
+    // train successfully, so neither reason above reaches it: it is excluded
+    // because it is DROP-taught, learned from a schematic, and a trainer never
+    // quotes a fee for it. Booking one here would invent copper nobody paid.
+    // Without this line the whole ROD_FEE_RECIPE_IDS filter can be deleted and
+    // this suite stays green (rv-tests proved it by mutation).
     observe(server, [
       trainResultEvent('recipe_stormreel_fishing_rod', false),
       trainResultEvent('recipe_tidewrought_fishing_rod', false),
+      trainResultEvent('recipe_clockreel_fishing_rod', true),
       trainResultEvent('recipe_bronze_sickle', true),
       trainResultEvent('', true),
       trainResultEvent('toString', true),

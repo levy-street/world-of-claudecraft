@@ -36,7 +36,7 @@ export interface RaidBossGuideWindowDeps {
   modelTouchQueue?(): LinkedProgramTouchQueue | null;
 }
 
-const BOSSES: readonly RaidBossGuideBoss[] = ['ignivar', 'varkhul'];
+const BOSSES: readonly RaidBossGuideBoss[] = ['ignivar', 'varkhul', 'nythraxis'];
 const DIFFICULTIES: readonly RaidBossGuideDifficulty[] = ['normal', 'heroic'];
 
 const ROLE_PRESENTATION: Readonly<Record<RaidBossGuideRole, [RaidBossGuideTextKey, UiIconName]>> = {

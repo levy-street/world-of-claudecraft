@@ -72,12 +72,13 @@ plausibly covers means the table needs a new row in the same change.
 |--------|------|
 | `combat/damage.ts` | `dealDamage`, `handleDeath`, `grantXp` (+ lifetime-XP; milestone unlocks absorbed into `deeds.ts`) |
 | `combat/heal.ts` | `applyHeal`, healing threat/taken-mult, hex/crit-vuln mults, heal-absorb |
+| `combat/threat_modifiers.ts` | aura, talent, and known-passive threat multipliers through `SimContext` |
 | `combat/engaged_combat.ts` | the per-tick player combat flag (`collectEngagedPids`): the classic hate-table rule (anyone a live mob still carries on its table stays in combat, pets flag their owner), the hate-table reach (an attacker beyond `THREAT_DROP_RANGE` is dropped off the table on the same walk), and the boss "zone in combat" rule (an engaged boss holds its attackers' nearby group members); called from the coordinator's engaged pass, draws no rng |
 | `combat/auras.ts` + `combat/cc.ts` | per-tick auras/regen/timers, NPC aura cleanse; CC predicates (stun/root/silence/disarm/lockout/blind/tongues) |
 | `combat/casting_lifecycle.ts` | `updateCasting`, `castAbility(BySlot)`, `cancelCast`, `pushbackCast`, GCD/cost/cooldown |
 | `combat/effect_dispatch.ts` | `runEffects` (the per-effect switch) |
 | `combat/auto_attack.ts` | start/stop/update auto-attack, `meleeSwing`, `rangedSwing` |
-| `combat/equip_procs.ts` + `combat/set_procs.ts` | legendary weapon on-action procs; item-set bonus procs |
+| `combat/equip_procs.ts` + `combat/set_procs.ts` + `combat/crafted_collection_effects.ts` | legendary weapon and per-hand enchant procs; item-set bonus procs; shared crafted-collection damage windows, tank wards, and overheal protection |
 | `combat/empower_next.ts` + `combat/thorns_charge.ts` | next-cast empower/free aura consumption; charge-limited thorns |
 | the per-class combat suites | EVERY class has one: flat `combat/<class>_*.ts` prefixed siblings (the `paladin_*` family, `warrior_stances.ts`, `rogue_engines.ts`, `druid_engines.ts`, the `shaman_*` and `hunter_*` sets, the mage `fire_mage.ts`/`frost_mage.ts`/`chronomancy.ts` modules, the warlock `necromancy*` set beside the shared class-talent state in `warlock_talents.ts`) or a per-class subdirectory once the family earns one (`combat/priest/` is the precedent: the class's suite behind one directory; `ls` it for the module set). A new class mechanic lands as a new sibling in its class's suite, never inside a shared dispatcher |
 | `projectile_travel.ts` | in-flight homing projectiles: `pendingProjectiles` + the prologue `advancePendingProjectiles` phase |
@@ -90,6 +91,7 @@ plausibly covers means the table needs a new row in the same change.
 | `mob/` behavior siblings | a new mob behavior is another sibling the dispatcher routes to, never a branch inside `locomotion.ts`: `ambient.ts` (decorative wanderers, e.g. the Highwatch stable horses: never hostile, never combat), `charge.ts` (the heroic anti-kite gap closer, stamped only on HEROIC spawns, zero rng), `healer_channel.ts` (scripted interruptible mob channels), `dragonkin_brood.ts` + `egg_hatchling.ts`, `idle_rng.ts`, `chain_pull_transit.ts` (with `instances/boss_chain_pull.ts`) |
 | `mob/mob_swing.ts` | the mob on-hit affix cascade (`runMobSwingAffixes`); the base hit-table shell stays on `Sim` |
 | `mob/lifecycle.ts` | `respawnMob`, despawn summoned adds, frenzy packmates, death-throes, corpse detonate |
+| `mob/boss_mechanics.ts` | the boss support kit (M5): `updateBossMechanics` (summon-add thresholds, enrage, desperate heal, the Mend/Ward/Rally/War Cadence support pulses, the channeled escalating heal) + `spawnBossAdds` (the add-wave spawner the delve boss scripts also reach via ctx); draws rng at exactly two sites (the mend heal roll, the add level-band roll); thresholds fire once per pull and reset on evade/respawn |
 | `mob/social_aggro.ts` + `mob/yells.ts` | flee-for-help rally pull (`rallyFleeingAllies`) and the same-template social pull on a fresh aggro (`socialPullSameTemplate`, per-family radius table); boss bark broadcast (`MobTemplate.yells`) |
 | `mob/dungeon_pack_aggro.ts` | authored dungeon-pack unit pull (`aggroDungeonPackmates`): mobs sharing a placement-claimed `dungeonPackId` engage together on any player or pet pull, including the non-social taunt path |
 | `encounters/nythraxis.ts` | the whole Nythraxis raid encounter (per-tick driver, reset/wipe/init, dialogue scheduler, adds + boss mechanics, the Aldric transition + wardstones, the relic/grave-vision quest chain, the encounter CC-immunity predicates) |
@@ -98,11 +100,13 @@ plausibly covers means the table needs a new row in the same change.
 | `pet/` | the pet system: `pet_ai.ts` (`updatePet`, follow, ranged attack, target pick), `pet_commands.ts` (the command surface + `petOf`/`summonPet`/tame/despawn/`syncPetLevel`/`serializePet`/`restorePet` and the delve pet-park round-trip), `pet_scaling.ts` (owner-to-pet stat inheritance for hunter beasts + the heel-speed floor), `pet_selection.ts` (pure owner/pet identity shared with the HUD mirrors), `pet_taunt_gate.ts` (the shared force-taunt eligibility gate), `warlock_pet_skills.ts` + `warlock_pet_growth.ts` (signature warlock-pet utility; authored per-level visual scale) |
 | `pet/pet_return.ts` + `pet_match_return.ts` + `pet_owner_revive.ts` + `pet_corpse_hold.ts` | THE shared pet round trip (snapshot / unravel-note / restore) and its two consumers: arena-shaped matches and the owner's own death. Keying doctrine: snapshot LIVING pets only (nothing is owed a pet it did not lose); a hunter beast / mage elemental keeps its corpse and revives IN PLACE by entity id, a warlock demon unravels and is REBUILT keyed on the UNRAVEL, never the death, so a deliberate dismissal or re-summon is never overwritten; return hp is the carried hp, or a FRACTION of the pool it returns to. The match half lives on the `ArenaMatch` beside `preMatchPools` (issue #1600); the owner half on `PlayerMeta.deathPet` (session-only, rewritten on EVERY death, restored at the end of `spirit.ts` `reviveAt` at `PET_REVIVE_HP_FRACTION`). The `pet_corpse_hold.ts` sibling freezes an owed demon corpse's decay window while its dead owner awaits an ACTIVE battleground respawn wave, so the wave takes the revive-in-place arm (same entity id, no per-wave client rebuild); decay resumes the moment the hold lifts. All four draw NO rng |
 | `items.ts` | equip/use/discard + vendor buy/sell/buyback command bodies (W2 move out of `sim.ts`) |
+| `wellfed.ts` | the ONE Well Fed mint (`applyWellFedOnMealComplete` over the carried `Consuming.wellFed` payload, `WELL_FED_AURA_ID`), called from the updateRegen completion site after the slot clears; the pure meal builder is the `consuming.ts` leaf (Masterwrought 11c) |
+| `mech_chroma_ownership.ts` | mech-chroma cosmetic ownership: the worn-chroma readers plus the mutation verbs `unlockMechChromaFromItem`/`unequipWornMechChroma`, extracted from `sim.ts` behind the bespoke structural `MechChromaOwnershipHost` interface (the `player_motion.ts` `PlayerMotionDeps` seam shape, not `SimContext`: the module names only the host members it touches and `sim.ts` forwards the live `Sim` as the host). `ItemUseResult` no longer lives here: it is `useItem`'s result shape, not a chroma one, so masterwrought Phase 18 moved it to `types.ts` with the other shared item types (`sim.ts` keeps the public re-export, so no call site moved) |
 | `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate (its body is the dependency-free `transfer_lock.ts` leaf, re-exported here; `exchange_eligibility.ts` imports the leaf directly), the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
 | `broker_custody.ts` | the broker-side custody moves for the server's marketplace, both kept as thin `Sim` delegates the server resolves on the facade: `extractTradableCopyImpl` (one exact copy into escrow through the `inventory_extract.ts` leaf, plus the dismount when a seller escrows the mount they are riding) and `grantTradableCopyImpl` (the copy back into the bags through the shared `canGrantCopies` / `grantCopies` pair, in one call); draws NO rng |
 | `interaction.ts` | `lootCorpse`/`pickUpObject`/`interact` + corpse harvest and party auto-loot (W3); `corpse_interaction.ts` is its shared availability predicate (`corpseInteractionAvailability`: loot rights vs harvestability on a dead lootable mob) |
 | `bags.ts` | pooled bag capacity over TWO pools (phase 05): the backpack plus unrestricted bags feed the general pool, `materialsOnly` bags feed a materials-only pool; every fit gate takes the `PoolCapacity` split from `bag_pools.ts` (`bagPools`), while `bagCapacity` stays the summed total for the shrink guards, the grid, and the IWorld readout |
-| `quests/quest_credit.ts` | kill/collect quest credit + turn-in readiness; siblings `quests/interact_object_credit.ts` (the per-object credit ledger for multi-count interact objectives, since interact deliberately does not consume the object) and `quests/profession_quest_effects.ts` (the profession-quest effect arms over `professions/archetype.ts`) |
+| `quests/quest_credit.ts` | kill/collect/craft/gather quest credit + turn-in readiness, plus the farm ACTION arm `onCropFarmedForQuests`, a `SimContext` callback since masterwrought Phase 18 (bound in `buildSimContext` beside its sibling crediters) that `professions/farming.ts` calls through `ctx` after every committed plant and harvest (every harvest outcome, withered included; never from a deny arm; it never reads bags); siblings `quests/interact_object_credit.ts` (the per-object credit ledger for multi-count interact objectives, since interact deliberately does not consume the object) and `quests/profession_quest_effects.ts` (the profession-quest effect arms over `professions/archetype.ts`) |
 | `quests/quest_commands.ts` | accept/abandon/turn-in verbs + `queueQuestLetter` (W4; dev arm in `quests/dev_quest_commands.ts`) |
 | `quests/quest_item_presence.ts` | `playerHoldsQuestItem`: the accept-time re-grant predicate over bags/bank/mail/market escrow |
 | `quests/quest_marker_kind.ts` | `QuestMarkerKind` + `questMarkerKind`/`npcQuestMarkerKind`/`strongerQuestMarker`/`questMarkerRank`: the ONE quest-indicator classification rule the four presentation surfaces consume (nameplate, minimap, world map, gossip list); a pure leaf like `quest_targets.ts`, no SimContext, no rng, no clock |
@@ -143,9 +147,11 @@ plausibly covers means the table needs a new row in the same change.
 | `materials_vault.ts` | the Materials Vault: the per-character, per-material stockpile beside the slot bank at the same bursars. State on `PlayerMeta.vault` (persisted inside the character save), capacity math over the five-rung gold ladder whose rung 0 IS the unlock (`vaultCapacityPerMaterial`, `VAULT_UPGRADE_PRICES`), the four command bodies `vaultDeposit`/`vaultWithdraw`/`vaultDepositAll`/`vaultBuyUpgrade` (banker-gated via `bank.ts` `nearBanker`; `vaultDepositAll` is the Phase 03 batched sweep: one command, vaultDeposit's exact per-slot rules, silent skips), `vaultInfoFor` (boundary-clones), `sanitizeVaultState` (the one load path: keeps every row that holds something, floors/clamps counts, and drops only a wrong-SHAPED stock, always with an operator trace via its owner/droppedSink params), and `vaultMaterialIds()` delegating to the shared `material_ids.ts` EAGER registry (NEVER `material_taxonomy.ts`: the sim-side scope rule in both headers); identity-preserving stacks ride `vault.special` (instanced rows kept whole, matched by `specialRefMatches`/`resolveVaultSpecialIndex`, persisted sparsely via `savedVaultState`/`SavedMaterialsVaultState`); the owner snapshot is revision-gated (`vaultWireRev` bumped by every mutation through `consumePlayerVaultStock` and the command bodies, read by `vaultInfoWireRevFor`/`vaultWireRevFor`, null away from a banker); plus the two-pool crafting read/apply pair `drawableVaultCount` (the ONE drawable rule: a row that is not a positive integer inside float precision stays dormant, never counted, never spent, never deleted) / `consumeVaultStock` (applies a PLANNED draw, all-or-nothing, deletes the key at zero, rung-ungated like `vaultWithdraw`) / `craftVaultStockFor` (the boundary-cloning drawable read the batch simulation and any display consumer take, built on `vault_craft_gate.ts` `vaultDrawStock`); draws NO rng |
 | `vault_craft_gate.ts` | the place gate for two-pool crafting: `vaultDrawBlocked` (may this player draw vault reagents from where they stand: the OPEN WORLD is the only allowed context) and `vaultDrawStock` (the live stock a draw may spend, or null). Fail closed in both directions, and NEW INSTANCED CONTENT MUST BE ADDED HERE: per-pid membership arms (`bgMatches`, `arenaMatches`, `delveRunForPlayer`) cover logical presence across the teleport gaps a position read misses, position arms (`instanceInfoAt` for dungeon AND raid, `riftInstanceAtPos`) cover live claims, and one `DUNGEON_X_THRESHOLD` geometry backstop covers every instanced band plus the far-east void (each band predicate in `data.ts` is provably subsumed; the constants are stated in the module); a DERIVED west fast path (computed per call over the live dungeon defs and the rift band bounds, deliberately unmemoized: DUNGEONS is not frozen, so a memo would be hidden sim state) skips the pool scans for open-world positions and disables itself the moment any def's claim footprint or the rift band can sit west of the threshold, so the layout-independence pin stays data-derived. NEVER built on `colliders.ts` `isInstancedRegion` (a physics-solver dispatch predicate that deliberately excludes the battleground band). Draws NO rng, mutates nothing |
 | `loot/loot_roll.ts` + `loot/loot_ffa.ts` | loot rolls, corpse loot, party-loot strategy, `rollLoot`; the tap-lock FFA timeout |
+| `loot/awarded_loot_hold.ts` | the full-bags award hold: `grantAwardedLootItem` (the ONE loot-award grant, BoP party-trade window included) and `grantOrHoldAwardedLoot` (the async award paths, need/greed win, master-loot assign, round-robin: a winner with no bag room gets a winner-only `personalFor` corpse slot and the corpse keeps at least `HELD_LOOT_CORPSE_SECONDS`, never a force-add past capacity; the item decays with the corpse if they never make room, deliberately with NO mailbox fallback); draws NO rng |
+| `loot/loot_difficulty_gate.ts` | `lootEntryRollsOnClaim`: the ONE predicate for `LootEntry.normalOnly` (a Normal-only row, skipped whole on a heroic claim so the boss's `HEROIC_BOSS_LOOT` append can replace the slot); shared by `rollLoot` and the Dungeon Finder preview; draws NO rng |
 | `deeds.ts` | the Book of Deeds evaluator (`updateDeeds`): runs at the very end of the tick tail (grant evaluation over dirty players only via `markDeedsDirty`, plus a 1 Hz proximity sweep for visit marks), draws NO rng, grants into `PlayerMeta.deedsEarned` + maintains `deedStats`/`renown`, emits id-based `deedUnlocked` (retro on join); plus the bespoke `manual`-deed grant sites, the session-only `DeedRuntime` encounter tracking, and the two worn-cosmetic validators `setActiveTitle` / `setActiveBorder` (the ONE earned-plus-reward-KIND check both worlds reach, the server dispatch included; invalid input is a silent no-op, and each stores the DEED ID, never the reward slug or text). Authoring contract: `docs/design/deeds.md` |
 | `reliquary.ts` | Reliquary catalog state: first-find provenance + the capped recent ring (`noteRelicItemFind`/`noteReliquaryMark`), the per-relic obtain tally (`noteRelicObtain`, bumped by the grant hub for WORLD-SOURCED acquisitions only; every `movement: true` grant, trade/mail/market/enchant re-mint/unbind peel/returned commission, is skipped), the sparse blob round-trip (`serializeReliquaryState` plus THREE load entry points, so `server/character_sheet.ts` can restore two public-sheet surfaces without paying a full restore, all sharing one filter implementation), and the pure completion/rank readouts. Its `WeakMap` memos (wire json, catalog index, scoring pages, each with an exported test probe seam) are the sanctioned module-global exemplars: see Adding a mechanic, step 1. Cosmetic only, draws NO rng |
-| `dead_gate.ts` | `refusedWhileDead`: the shared while-dead refusal for the profession-action wrappers on `Sim` (craft/train/salvage/disenchant/enchant-apply/unbind), mobile-station placement, the tool-effect slot/recharge arms, and the rift forge; emits the matcher-covered error line and suppresses any result event, draws NO rng |
+| `dead_gate.ts` | `refusedWhileDead`: the shared while-dead refusal for the profession-action wrappers on `Sim` (craft/train/salvage/disenchant/enchant-apply/unbind), mobile-station placement, the tool-effect slot/recharge arms, the rift forge, and the Perfecting deny head (belt-and-braces: the two Sim wrappers gate first AND `professions/perfecting.ts` repeats it as arm 1, covering direct headless callers; the header names the three call-site shapes); emits the matcher-covered error line and suppresses any result event, draws NO rng |
 | `mob/rift_escape_window.ts` | the rift boss escape-window seam: `riftEscapeWindowActive` (is a telegraph in flight), the stomp/aoePulse windup constants + `resetRiftMechanicWindups`, and `impairedZoneFuseMult` (impairment-scaled death-zone fuses); consumed by the `mob/locomotion.ts` drivers, the anti-kite snare hold, and the `mob/mob_swing.ts` control-proc suppression; draws NO rng |
 | `professions/` | gathering/crafting/enchanting/salvage/archetypes; governed by its own `CLAUDE.md` (hooks `drainGatheringGrants` into the per-player tick) |
 | `pvp/` | WARFARE honor currency + combat-rating rules (`honor.ts` behind the seam; pure rating math in `power.ts`; the Highwatch quartermaster spawn); governed by its own `CLAUDE.md` |
@@ -175,8 +181,14 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
 - `resurrection.ts`: both sicknesses (The Keeper's Toll and the shorter Unstuck one),
   shared by every death site, PLUS the two "which auras survive this wipe" predicates
   every wipe site routes through so the rule cannot drift: `aurasSurvivingDeath` (death
-  and every respawn/resurrect path) and `aurasSurvivingCleanSlate` (the harsher arena
-  entry and Fiesta down wipes, which shed even the sicknesses).
+  and every respawn/resurrect path) and `aurasSurvivingCleanSlate` (the harsher
+  clean-slate wipe, which sheds even the sicknesses: called directly only inside
+  `readyArenaFighter`'s `clearPrep` arm and by a Fiesta down, and reached from every
+  `readyArenaFighter(..., { clearPrep: true })` site and every call of its
+  `resetForArena` wrapper, so every instanced match's seat and end wipes: arena,
+  Fiesta, Protect Yumi, Thornhollow Fields (the Vale Cup's seat and teardown were
+  the fifth until it retired with release/v0.41.0); the three caller sets are
+  pinned in `tests/resurrection.test.ts`).
 - `ride_height.ts`: the waterline ride height slope gating reads for wading and
   swimming bodies (gating on the RAW lakebed height reads an uneven bed as a wall of
   cliffs and sticks waders in shore pockets).
@@ -196,6 +208,27 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
   `freePoolSlots`/`poolOccupancyOf`/`totalPoolCapacity`/`generalOnlyPools`. The material
   predicate arrives INJECTED (bind `isMaterialItemId` the way `bags.ts` does); phase 06
   reuses the module for the bank.
+- `vault_material_sources.ts` + `vault_slot_ops.ts`: the Materials Vault's SOURCE-AWARE
+  half, split rules-from-bodies so `materials_vault.ts` stays the state, the capacity math
+  and the four command shells. The first is a pure leaf with everything injected (the
+  compact count record, the identity collection, the material set), shared by
+  `materials_vault.ts` AND `vault_craft_gate.ts` so neither invents a second definition:
+  the deposit ROUTING rule (`needsSourceRow`, re-exported as the vault's
+  `isVaultSpecialSlot`; a count map has nowhere to put a gatherer, so a stack carrying
+  recorded provenance joins the identity collection), the migrate-on-touch fold predicate
+  (`absorbsCompactStock`), the automatic-draw ELIGIBILITY rule (`autoDrawableRow` /
+  `autoDrawableUnits`: unchanged from before per-unit provenance, premium buckets and rows
+  keeping per-copy identity excluded, a mixed row exposing its eligible count rather than
+  refusing whole), and the one per-id drawable total BOTH the read
+  (`drawableVaultProjection`) and the spend (`planVaultDraw`, which refuses anything past
+  it) compute the same way, so they agree by construction. The second holds the three
+  per-slot BODIES as inert decisions `materials_vault.ts` applies (`planVaultDeposit`,
+  `planVaultRowWithdraw` with the bag fit injected, `loadVaultSpecialRow`), which is what
+  keeps every store mutation in one file for the cvault wire's rev-bump enumeration.
+  NEITHER owns a load policy: `material_slot_load.ts` is the shared
+  pre-validate/coerce/normalize triple every container runs, and an unreadable row refuses
+  the whole character load. The vault has NO separation feature: `materialSeparated` is a
+  bank and bags owner flag, stripped on deposit and never persisted here. Both draw NO rng.
 - `material_ids.ts` + `material_derivation.ts`: the ONE material-set derive both sides
   share. `material_derivation.ts` is runtime-import-free by contract (every content
   table arrives as a parameter); `material_ids.ts` derives ONE frozen registry EAGERLY
@@ -271,6 +304,23 @@ remove the declaration AND its binding in the same change, then re-run the parit
   ticks; the enchant-apply refusal skips ZERO draws (the streams never diverge) and
   forks persisted state only. If that pin fails, the divergence widened or narrowed:
   change this paragraph and the pin together, in the same change.
+  A SECOND host input of the same shape exists since the masterwrought daily gates:
+  `resetDay` (fed by the host calendar seam) gates `craftDailyLimitReached` FIRST in
+  `evaluateCraftAdmission`, so a oncePerDay refusal skips the resolve's one to two
+  output draws exactly like the vault refusal above. Any harness replaying a command
+  stream against a seed must capture `resetDay` beside the seed (recorded at the
+  Phase 12 QA ledger's replay note). The host input is CLAMPED at the seam since
+  masterwrought Phase 18: `Sim.resetDay` is a setter that keeps the highest key
+  ever fed (monotone non-decreasing; `''` never lowers it, closing the
+  `''`-bounce), so a backwards realm-calendar read cannot re-open a spent daily
+  gate and only a Sim that was NEVER fed a day observes `''`. A harness that
+  wants the no-calendar arm builds a fresh Sim rather than assigning `''`.
+  This carve-out is PINNED too:
+  `tests/quickening_catalyst_gate.test.ts` covers both gate crossings,
+  `tests/delves.test.ts` the `''` default, and `tests/reset_day_guard.test.ts`
+  the clamp (a backwards read held, a spent gate staying spent); change this
+  paragraph and those pins together, in the same change, like the vault
+  paragraph above.
 
 ## sim.ts coordinator map (what `tick()` does, in order)
 `tick()` reads as a linear registry of system calls routed through `this.ctx`, in phase

@@ -13,6 +13,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { addRimGlow, GFX } from '../src/render/gfx';
 import { materialProgramSignature } from '../src/render/prewarm_policy';
 import { isSharedTexture } from '../src/render/shared_resource';
 import {
@@ -33,6 +34,7 @@ import {
   weaponVfxPrewarmSkinUnitKey,
   weaponVfxPrewarmUnits,
 } from '../src/render/weapon_vfx_prewarm';
+import { WEAPON_VFX_TUNING } from '../src/render/weapon_vfx_tuning';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 interface StubCanvas {
@@ -257,10 +259,12 @@ describe('createWeaponVfx point-light visibility ownership', () => {
       grounded: false,
       budgetedLight: true,
     });
-    expect(handle.light.visible).toBe(false);
+    const light = handle.light;
+    expect(light).not.toBeNull();
+    expect(light?.visible).toBe(false);
     // Still a real, budget-rankable light: only `visible` is deferred.
-    expect(handle.light.userData.budgetDynamic).toBe(true);
-    expect(handle.light.intensity).toBeGreaterThan(0);
+    expect(light?.userData.budgetDynamic).toBe(true);
+    expect(light?.intensity).toBeGreaterThan(0);
     handle.dispose();
   });
 
@@ -268,12 +272,39 @@ describe('createWeaponVfx point-light visibility ownership', () => {
     // The armoury preview owns its own renderer and scene, so nothing there
     // ever sets `visible` for it.
     const preview = createWeaponVfx(weaponRoot(), EPIC_SPEC, { grounded: true });
-    expect(preview.light.visible).toBe(true);
+    expect(preview.light?.visible).toBe(true);
     preview.dispose();
 
     const worldDefault = createWeaponVfx(weaponRoot(), EPIC_SPEC, { grounded: false });
-    expect(worldDefault.light.visible).toBe(true);
+    expect(worldDefault.light?.visible).toBe(true);
     worldDefault.dispose();
+  });
+
+  it('builds no light at all for a skin whose tuning mutes it', () => {
+    // A muted light still held one of the fixed counted point-light slots and
+    // paid a per-frame ancestor walk, while every update() drove its intensity
+    // straight back to zero. withLight: false is the world path's answer.
+    const muted = createWeaponVfx(weaponRoot(), EPIC_SPEC, {
+      grounded: false,
+      budgetedLight: true,
+      withLight: false,
+    });
+    expect(muted.light).toBeNull();
+    let pointLights = 0;
+    muted.group.traverse((object) => {
+      if ((object as THREE.PointLight).isPointLight) pointLights++;
+    });
+    expect(pointLights).toBe(0);
+    // ... and the light is the ONLY thing missing: the lit rig carries exactly
+    // one more child, so nothing else about the skin's draw set changed.
+    const lit = createWeaponVfx(weaponRoot(), EPIC_SPEC, {
+      grounded: false,
+      budgetedLight: true,
+    });
+    expect(lit.group.children.length).toBe(muted.group.children.length + 1);
+    muted.update(0.016);
+    muted.dispose();
+    lit.dispose();
   });
 
   it('wires the world path to ask for the budgeted light', () => {
@@ -303,6 +334,39 @@ describe('createWeaponVfx point-light visibility ownership', () => {
       readFileSync(new URL('../src/render/characters/visual.ts', import.meta.url), 'utf8'),
     );
     expect(visual).toContain('budgetedLight: this.budgetedWeaponLight,');
+  });
+
+  it('wires the world path to mute the light a skin tuned to zero', () => {
+    // The unit case above pins the withLight arm; this pins that the world
+    // factory reads the skin's own hand-tuned row for it. Unreachable from a
+    // unit test (buildWeaponVfx runs off a preloaded GLB attach).
+    const visual = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/characters/visual.ts', import.meta.url), 'utf8'),
+    );
+    expect(visual).toContain('const withLight = (this.weaponVfxAuthored.light ?? 1) > 0;');
+    expect(visual).toContain('withLight,');
+    // ... and at least one shipped skin really is tuned to zero, so the arm is
+    // reachable rather than dead code.
+    const muted = Object.values(WEAPON_VFX_TUNING).filter((row) => row.light === 0);
+    expect(muted.length).toBeGreaterThan(0);
+  });
+
+  it('wires the world path to clone weapon-skin materials WITH their hooks', () => {
+    // A bare Material.clone() drops onBeforeCompile, so the isolated weapon
+    // rendered without the rig's silhouette rim AND linked a second program for
+    // a shader the source had already linked (material_clone_hooks.ts). The
+    // isolation pass is unreachable from a unit test (it runs inside
+    // finishWeaponAttach off a preloaded GLB), so pin the call.
+    const visual = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/characters/visual.ts', import.meta.url), 'utf8'),
+    );
+    const isolation = visual.indexOf('mesh.userData.weaponSkinIsolated = true;');
+    expect(isolation, 'the weapon-skin isolation pass moved; re-anchor').toBeGreaterThan(-1);
+    const block = visual.slice(Math.max(0, isolation - 600), isolation);
+    expect(block).toContain('cloneMaterialWithHooks(');
+    // The bare form must be gone from that block, or the hook-dropping clone is
+    // still there beside the fixed one.
+    expect(block).not.toContain('.map((m) => m.clone())');
   });
 });
 
@@ -652,16 +716,22 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     return new THREE.CanvasTexture(canvas);
   }
 
+  /** The shape a WORN skin material really has when the rig hands it to
+   *  createWeaponVfx: a painted GLB map set, plus the silhouette rim glow
+   *  characters/assets.ts buildTintedClone applies on the GFX.standardMaterials
+   *  arm, which characters/visual.ts then carries into its isolated clone
+   *  through cloneMaterialWithHooks. The hook is part of three's program cache
+   *  key, so a fixture without it would pin the host against a variant no live
+   *  sighting asks for. */
   function liveSkinMesh(): THREE.Mesh {
-    return new THREE.Mesh(
-      new THREE.BoxGeometry(0.1, 1, 0.1),
-      new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        map: paintedMap(),
-        metalnessMap: paintedMap(),
-        roughnessMap: paintedMap(),
-      }),
-    );
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      map: paintedMap(),
+      metalnessMap: paintedMap(),
+      roughnessMap: paintedMap(),
+    });
+    if (GFX.standardMaterials) addRimGlow(material);
+    return new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.1), material);
   }
 
   it('hosts the LIVE program variant, not the mapless flat-tint twin', () => {

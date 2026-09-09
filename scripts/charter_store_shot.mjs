@@ -503,13 +503,13 @@ async function capturePromptEvidence(page, key, mobile) {
     if (!(buy instanceof HTMLElement)) throw new Error('charter buy missing');
     buy.click();
   });
-  await page.waitForSelector('body > .woc-store-prompt', { visible: true });
+  await page.waitForSelector('#prompt-stack .woc-store-prompt', { visible: true });
   const confirmFocus = await focusForEvidence(page, '[data-store-prompt-confirm]');
   assertVisibleFocus(confirmFocus, 'Store decision confirm', mobile);
 
   const decision = await page.evaluate(() => {
     const root = document.getElementById('daily-rewards-window');
-    const prompt = document.querySelector('body > .woc-store-prompt');
+    const prompt = document.querySelector('#prompt-stack .woc-store-prompt');
     const confirm = prompt?.querySelector('[data-store-prompt-confirm]');
     const bodyId = prompt?.getAttribute('aria-describedby');
     const body = bodyId ? document.getElementById(bodyId) : null;

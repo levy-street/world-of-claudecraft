@@ -46,9 +46,9 @@ import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
+import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/hud/professions/profession_art';
 import { t } from '../src/ui/i18n';
 import { QUALITY_COLOR } from '../src/ui/icons';
-import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
 import { runCraft } from './helpers/enchant_family_cast';
 
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';

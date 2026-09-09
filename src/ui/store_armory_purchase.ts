@@ -186,6 +186,6 @@ export class StoreArmoryPurchase {
   }
 }
 
-function usableCost(cost: number | null): number | null {
+export function usableCost(cost: number | null): number | null {
   return cost !== null && Number.isFinite(cost) && cost > 0 ? cost : null;
 }

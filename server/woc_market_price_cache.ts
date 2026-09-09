@@ -28,6 +28,12 @@
 // The refresh NEVER throws (the proxy's graceful-degradation contract): it
 // resolves an unavailable value instead, and this module distinguishes
 // success from failure with an injected predicate so it stays value-agnostic.
+// The proxy's predicate counts an UNHEALTHY answer as a failure too, so a
+// price-gate blip shorter than the stale-serve bound never pauses the market
+// (the bound is the one health-staleness ceiling for both arms). Past the
+// bound a sustained pause is served from the failure memo, whose length the
+// proxy prices per answer: the reader that crosses a memo boundary pays (or
+// joins) the single-flight refresh, one blocking read per memo period.
 // Worst-case read latency: a read past staleServeMaxMs (or a cold one)
 // blocks on the single-flight refresh, i.e. up to the proxy's 5s service
 // timeout; every concurrent reader joins that one flight. Inside the bound,
@@ -44,8 +50,12 @@ export interface WocPriceCacheOptions<T> {
    *  ceiling: guardEnabledHealthy can act on a price at most this old. */
   staleServeMaxMs?: number;
   /** How long a failure answer short-circuits new refreshes once there is no
-   *  servable success: bounds outage probe rate, not outage visibility. */
-  failureTtlMs?: number;
+   *  servable success: bounds outage probe rate, not outage visibility. A
+   *  function form prices the memo per answer (the proxy keeps a reachable
+   *  service's unhealthy answer for the success TTL, so a sustained pause
+   *  costs no more probes than it did as a success, while a transport
+   *  failure keeps the short memo that makes recovery visible in seconds). */
+  failureTtlMs?: number | ((value: T) => number);
   /** Injected clock for tests; production callers omit it (Date.now). */
   now?: () => number;
 }
@@ -67,7 +77,10 @@ export function createWocPriceCache<T>(
   const now = opts.now ?? Date.now;
   const ttlMs = opts.ttlMs ?? WOC_PRICE_CACHE_TTL_MS;
   const staleServeMaxMs = opts.staleServeMaxMs ?? WOC_PRICE_STALE_SERVE_MAX_MS;
-  const failureTtlMs = opts.failureTtlMs ?? WOC_PRICE_FAILURE_TTL_MS;
+  const failureTtlOf = (value: T): number =>
+    typeof opts.failureTtlMs === 'function'
+      ? opts.failureTtlMs(value)
+      : (opts.failureTtlMs ?? WOC_PRICE_FAILURE_TTL_MS);
 
   let success: { at: number; value: T } | null = null;
   let failure: { at: number; value: T } | null = null;
@@ -113,7 +126,7 @@ export function createWocPriceCache<T>(
           // single-flight. The catch keeps a thrown refresh bug from
           // surfacing as an unhandled rejection; the next read retries
           // through the cleared flight slot.
-          if (failure === null || at - failure.at >= failureTtlMs) {
+          if (failure === null || at - failure.at >= failureTtlOf(failure.value)) {
             refreshShared().catch(() => {});
           }
           return success.value;
@@ -121,7 +134,7 @@ export function createWocPriceCache<T>(
       }
       // No servable success. A recent failure memo answers without a new
       // probe; otherwise this read pays (or joins) the refresh.
-      if (failure !== null && at - failure.at < failureTtlMs) return failure.value;
+      if (failure !== null && at - failure.at < failureTtlOf(failure.value)) return failure.value;
       const value = await refreshShared();
       // Stale-on-error BELT, unreachable under the current interleavings: a
       // cold-path reader implies no in-bound success existed at read time,

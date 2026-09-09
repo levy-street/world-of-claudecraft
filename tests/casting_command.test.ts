@@ -8,6 +8,7 @@ import {
   GATHER_CAST_ID,
   SALVAGE_CAST_ID,
   type SimEvent,
+  SUNDER_CAST_ID,
   TOOL_RECHARGE_CAST_ID,
 } from '../src/sim/types';
 
@@ -139,6 +140,20 @@ describe('/casting command', () => {
     e.castRemaining = 1.2;
     e.channeling = false;
     expect(casting(sim, a)).toBe('You are salvaging: 1.2s of 2.0s remaining.');
+  });
+
+  it('names the sundering sentinel with its countdown (never the raw cast id)', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('mage', 'Aleph');
+    sim.tick();
+    const e = sim.entities.get(a)!;
+    e.castingAbility = SUNDER_CAST_ID;
+    e.castTotal = 1.5;
+    e.castRemaining = 0.8;
+    e.channeling = false;
+    // A dropped arm would surface the id itself through the generic fallback
+    // tail (the enchant-apply case's documented failure mode).
+    expect(casting(sim, a)).toBe('You are sundering: 0.8s of 1.5s remaining.');
   });
 
   it('names the tool-recharge sentinel by what it is recharging', () => {

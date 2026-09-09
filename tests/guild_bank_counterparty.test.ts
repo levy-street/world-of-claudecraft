@@ -591,7 +591,19 @@ describe('the counterparty side, end to end through the dispatch observer', () =
     priv(server).runGuildBankOp(session, { pid: session.pid }, 'withdraw', () => {
       const book = server.sim.guildBanks.get(GUILD_ID);
       if (!book) throw new Error('missing book');
+      // loadGuildBank normalized the raw stack to carry its exact (unrecorded)
+      // composition; a direct count edit must keep it in lockstep or the
+      // material-source algebra refuses the now-inconsistent slot.
       book.inventory[0].count -= 1; // the book lost one ...
+      const sources = book.inventory[0].materialSources;
+      // MaterialSourceCount.count is readonly: rebuild the bucket rather than
+      // mutate it in place.
+      if (sources) {
+        book.inventory[0].materialSources = [
+          { ...sources[0], count: sources[0].count - 1 },
+          ...sources.slice(1),
+        ];
+      }
       server.sim.addItem('wolf_fang', 3, session.pid, { silent: true }); // ... bags gained three
     });
     await commitQueuedGuildLedger(server, session);
@@ -658,7 +670,18 @@ describe('the counterparty side, end to end through the dispatch observer', () =
     priv(server).runGuildBankOp(session, { pid: session.pid }, 'withdraw', () => {
       const book = server.sim.guildBanks.get(GUILD_ID);
       if (!book) throw new Error('missing book');
+      // Keep the normalized composition in lockstep with the manual count edit
+      // (see the item-mint test above for why).
       book.inventory[0].count -= 1;
+      const sources = book.inventory[0].materialSources;
+      // MaterialSourceCount.count is readonly: rebuild the bucket rather than
+      // mutate it in place.
+      if (sources) {
+        book.inventory[0].materialSources = [
+          { ...sources[0], count: sources[0].count - 1 },
+          ...sources.slice(1),
+        ];
+      }
       server.sim.addItem('wolf_fang', 1, session.pid, { silent: true }); // the honest half
       server.sim.addItem('copper_ore', 8, session.pid, { silent: true }); // the mint
     });

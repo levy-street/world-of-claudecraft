@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Heroisk: The Inner Crucible',
     desc: 'Sköldar och vapen enbart från heroiskt läge, från Varkhul, Forgefather of the Last Flame.',
   },
+  conquerors_set_bramblehide: {
+    name: "Roots' Törnehud",
+    desc: 'Hela Bramblehide-familjen i läder.',
+  },
 };

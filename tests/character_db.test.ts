@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // db.ts builds a pg Pool and requires DATABASE_URL at import time; stub both so
@@ -40,6 +41,7 @@ import {
   createCharacterCapped,
   deleteCharacter,
   grantAccountMechChroma,
+  grantAccountMountSkins,
   grantAccountWeaponSkins,
   loadAccountCosmetics,
   markAccountQuestComplete,
@@ -1199,6 +1201,7 @@ describe('account cosmetics', () => {
       mechChromaIds: ['amber_crimson', 'onyx_gold'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
 
     expect(dbMock.query.mock.calls[0][0]).toContain('cosmetics');
@@ -1222,6 +1225,7 @@ describe('account cosmetics', () => {
       mechChromaIds: ['onyx_gold'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
 
     expect(dbMock.query).toHaveBeenCalledTimes(1);
@@ -1249,6 +1253,7 @@ describe('account cosmetics', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
 
     const [sql, params] = dbMock.query.mock.calls[0];
@@ -1272,6 +1277,7 @@ describe('account weapon skin cosmetics', () => {
             // A stale legacy copy must not override the dedicated paid state.
             weaponSkinIds: ['guildmark_arming_sword'],
             weaponSkinLoadout: { sword: 'guildmark_arming_sword' },
+            mountSkinIds: [],
           },
           weapon_skin_ids: ['ice_fang_sword'],
           weapon_skin_loadout: { sword: 'ice_fang_sword' },
@@ -1284,6 +1290,7 @@ describe('account weapon skin cosmetics', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: ['ice_fang_sword'],
       weaponSkinLoadout: { sword: 'ice_fang_sword' },
+      mountSkinIds: [],
     });
 
     const [sql, params] = dbMock.query.mock.calls[0];
@@ -1311,6 +1318,7 @@ describe('account weapon skin cosmetics', () => {
       mechChromaIds: [],
       weaponSkinIds: ['ice_fang_sword'],
       weaponSkinLoadout: { sword: 'ice_fang_sword' },
+      mountSkinIds: [],
     });
 
     expect(dbMock.query).toHaveBeenCalledTimes(1);
@@ -1348,6 +1356,7 @@ describe('account weapon skin cosmetics', () => {
       mechChromaIds: [],
       weaponSkinIds: ['ice_fang_sword'],
       weaponSkinLoadout: { sword: 'ice_fang_sword' },
+      mountSkinIds: [],
     });
 
     expect(dbMock.query).toHaveBeenCalledTimes(1);
@@ -1358,12 +1367,13 @@ describe('account weapon skin cosmetics', () => {
     expect(params).toEqual([7, JSON.stringify({ sword: 'ice_fang_sword' })]);
   });
 
-  it('normalizes a malformed RETURNING (no row) into the 4-field default shape', async () => {
+  it('normalizes a malformed RETURNING (no row) into the 5-field default shape', async () => {
     const defaults = {
       completedQuestIds: [],
       mechChromaIds: [],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     };
 
     dbMock.query.mockResolvedValueOnce({ rows: [] } as any);
@@ -1386,7 +1396,6 @@ describe('bankBonusFactsForAccount', () => {
           discord_linked: false,
           wallet_linked: true,
           qualified_referrals: 3,
-          character_count: 2,
         },
       ],
     } as any);
@@ -1420,7 +1429,6 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: false,
       walletLinked: true,
       qualifiedReferrals: 3,
-      characterCount: 2,
     });
   });
 
@@ -1431,7 +1439,6 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: false,
       walletLinked: false,
       qualifiedReferrals: 0,
-      characterCount: 0,
     });
   });
 
@@ -1451,7 +1458,6 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: true,
       walletLinked: false,
       qualifiedReferrals: 0,
-      characterCount: 0,
     });
   });
 });
@@ -1531,6 +1537,62 @@ describe('createCharacterCapped', () => {
     expect(client.query.mock.calls.map((c) => c[0])).toContain('ROLLBACK');
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('omits the level column entirely when no level is asked for (the schema default)', async () => {
+    // Every caller but the PBE boost creates at level 1 and lets the DDL
+    // default say so; the INSERT must not name the column at all, or the
+    // default would be duplicated in two places to drift apart.
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 0 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ id: 51, level: 1 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
+
+    const row = await createCharacterCapped(7, 'Defaulted', 'mage', 10, null, null);
+
+    const insert = client.query.mock.calls[3];
+    expect(String(insert[0])).toContain(
+      'INSERT INTO characters (account_id, name, class, realm, state, appearance) VALUES ($1, $2, $3, $4, $5, $6)',
+    );
+    expect(insert[1]).toHaveLength(6);
+    expect(String(insert[0])).toContain(
+      'RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance',
+    );
+    expect(row?.level).toBe(1);
+  });
+
+  it('carries an asked-for level in the SAME insert (the boost roster write amplification)', async () => {
+    // The Phase 18 database review's B3: the PBE boost created the row with
+    // its whole ~38 KB blob and then REWROTE the whole blob a second time
+    // only to set the level column, nine times per boosted registration. The
+    // create takes the level now, so the second write has nothing left to do.
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 0 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ id: 52, level: 20 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
+
+    const state = { level: 20 } as any;
+    const row = await createCharacterCapped(7, 'Boosted', 'mage', 10, state, null, 20);
+
+    const insert = client.query.mock.calls[3];
+    expect(String(insert[0])).toContain(
+      'INSERT INTO characters (account_id, name, class, realm, state, appearance, level) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+    );
+    // Parameterized, never interpolated, and the blob rides the same insert.
+    expect(insert[1]).toEqual([7, 'Boosted', 'mage', REALM, JSON.stringify(state), null, 20]);
+    // The RETURNING row reports the level that actually landed, which is what
+    // lets the boost prove its second write is unnecessary rather than assume it.
+    expect(row?.level).toBe(20);
   });
 });
 
@@ -1658,5 +1720,94 @@ describe('save-backend cancel wiring (db.ts and character_delete_db.ts source pi
     expect(dbSrc).toContain(
       '{ connect: () => pool.connect(), cancelBackend: cancelDetachedBackend }',
     );
+  });
+});
+
+describe('account mount skin cosmetics', () => {
+  it('keeps paid mount skins in their own rollback-safe table with an array check', () => {
+    expect(SCHEMA).toMatch(/CREATE TABLE IF NOT EXISTS account_mount_cosmetics/);
+    expect(SCHEMA).toMatch(/account_mount_cosmetics_skin_ids_array/);
+    // No legacy backfill: nothing ever stored a mount skin in accounts.cosmetics.
+    expect(SCHEMA).not.toMatch(/INSERT INTO account_mount_cosmetics/);
+  });
+
+  it('loads mount skin ownership from the dedicated row through the same one-query read', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          cosmetics: { completedQuestIds: [], mechChromaIds: [] },
+          weapon_skin_ids: ['ice_fang_sword'],
+          weapon_skin_loadout: { sword: 'ice_fang_sword' },
+          mount_skin_ids: ['mech_bird', 'mech_bird', 7, ''],
+        },
+      ],
+    });
+
+    const cosmetics = await loadAccountCosmetics(7);
+
+    expect(cosmetics).toEqual({
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: ['ice_fang_sword'],
+      weaponSkinLoadout: { sword: 'ice_fang_sword' },
+      mountSkinIds: ['mech_bird'],
+    });
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toMatch(/LEFT JOIN account_weapon_cosmetics/);
+    expect(sql).toMatch(/LEFT JOIN account_mount_cosmetics/);
+    expect(sql).toMatch(/amc\.skin_ids AS mount_skin_ids/);
+    expect(params).toEqual([7]);
+  });
+
+  it('grants mount skins atomically in the dedicated table and returns the merged row', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          cosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: [] },
+          weapon_skin_ids: ['ice_fang_sword'],
+          weapon_skin_loadout: { sword: 'ice_fang_sword' },
+          mount_skin_ids: ['chimeglass_tortoise', 'mech_bird'],
+        },
+      ],
+    });
+
+    const cosmetics = await grantAccountMountSkins(7, ['mech_bird', '']);
+
+    expect(cosmetics).toEqual({
+      completedQuestIds: ['q_aldrics_fallen_star'],
+      mechChromaIds: [],
+      weaponSkinIds: ['ice_fang_sword'],
+      weaponSkinLoadout: { sword: 'ice_fang_sword' },
+      mountSkinIds: ['chimeglass_tortoise', 'mech_bird'],
+    });
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toMatch(/INSERT INTO account_mount_cosmetics/);
+    expect(sql).toMatch(/ON CONFLICT \(account_id\) DO UPDATE/);
+    expect(sql).toMatch(/RETURNING account_id, skin_ids/);
+    // The weapon row rides along so the returned view is the whole account state.
+    expect(sql).toMatch(/LEFT JOIN account_weapon_cosmetics/);
+    // Empty ids are dropped before they reach the union.
+    expect(params).toEqual([7, ['mech_bird']]);
+  });
+});
+
+// The account cosmetics persistence module is re-exported by db.ts and imports
+// `pool` back from it (a deliberate cycle). That is safe only while `pool` is
+// read inside function bodies at call time: a module-scope read would hit the
+// hoisted re-export's temporal dead zone and break boot. Pin the shape.
+describe('account_cosmetics_db.ts import cycle discipline', () => {
+  it('reads pool only inside function bodies, never at module scope', () => {
+    const source = readFileSync(
+      new URL('../server/account_cosmetics_db.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain("import { pool } from './db';");
+    const moduleScopeReads = source
+      .split('\n')
+      .filter(
+        (line) => /^(export\s+)?(const|let|var)\b.*\bpool\b/.test(line) || /^pool\./.test(line),
+      );
+    expect(moduleScopeReads).toEqual([]);
   });
 });

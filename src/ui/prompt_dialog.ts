@@ -34,22 +34,6 @@ export interface PromptDialogHandle {
   dismissAndReturn: () => void;
 }
 
-/** True while an aria-modal prompt of this family owns the keyboard, wherever
- *  it mounts: the bank/bags/vendor prompts are #prompt-stack children, and the
- *  Store decision mounts directly on document.body (it must clear the
- *  body-level armory inspect overlay; see store_decision_prompt.ts). Game
- *  keybinds consult this through Hud.promptModalOpen(); a selector scoped to
- *  the stack alone left the body-level Store decision ungated, so Tab inside
- *  it fired the target-nearest bind instead of cycling the trap. Called from
- *  keydown paths only, never per frame. */
-export function modalPromptOpen(): boolean {
-  return (
-    document.querySelector(
-      '#prompt-stack .prompt[aria-modal="true"], body > .prompt[aria-modal="true"]',
-    ) !== null
-  );
-}
-
 export function installPromptDialog(
   prompt: HTMLElement,
   opener: HTMLElement | null,

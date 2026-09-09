@@ -62,14 +62,14 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r5_double_blink',
           name: 'Double Blink',
-          description: 'Flickerstep stores 2 charges, but each recharges 30% more slowly.',
+          description: 'Flitstep stores 2 charges, but each recharges 30% more slowly.',
           icon: 'double_blink',
           effect: { ability: [{ ability: 'blink', bonusCharges: 1, cooldownPct: 0.3 }] },
         },
         {
           id: 'mag_r5_blink_cast',
           name: 'Blink While Casting',
-          description: 'You can use Flickerstep in the middle of a cast without interrupting it.',
+          description: 'You can use Flitstep in the middle of a cast without interrupting it.',
           icon: 'blink_while_casting',
           effect: { global: { blinkCast: 1 } },
         },
@@ -200,7 +200,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r17_cold_snap',
           name: "Winter's Recall",
           description:
-            "Grants Winter's Recall: instantly finishes the cooldown of Flickerstep, Frostveil and Greater Invisibility.",
+            "Grants Winter's Recall: instantly finishes the cooldown of Flitstep, Frostveil and Greater Invisibility.",
           icon: 'cold_snap',
           effect: { grant: { ability: 'cold_snap' } },
         },
@@ -390,7 +390,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 17,
       theme: 'dawn',
-      decision: 'more Ascension charges vs longer Avenging Wrath vs crit and haste during it',
+      decision: 'more Ascension charges vs longer Zealwing vs crit and haste during it',
       options: [
         {
           id: 'pal_r17_extended_dawn',
@@ -403,7 +403,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pal_r17_radiant_wrath',
           name: 'Radiant Wrath',
           description:
-            'Avenging Wrath lasts 5 sec longer (20 sec total) and its cooldown is reduced to 100 sec.',
+            'Zealwing lasts 5 sec longer (20 sec total) and its cooldown is reduced to 100 sec.',
           icon: 'pal_r17_radiant_wrath',
           effect: {
             ability: [{ ability: 'avenging_wrath', cooldownFlat: -20, durationFlat: 5 }],
@@ -412,7 +412,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pal_r17_sanctified_fervor',
           name: 'Sanctified Fervor',
-          description: 'Avenging Wrath also grants 15% critical strike chance and 15% haste.',
+          description: 'Zealwing also grants 15% critical strike chance and 15% haste.',
           icon: 'pal_r17_sanctified_fervor',
           effect: {
             ability: [
@@ -1043,7 +1043,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r20_kill_chain',
           name: 'Kill Chain',
-          description: 'Killing blows refresh Smokestep and grant 5 combo points.',
+          description: 'Killing blows refresh Smokefade and grant 5 combo points.',
           icon: 'vanish',
           effect: { global: { onKillCombo: 5, onKillVanishReset: 1 } },
         },
@@ -1469,7 +1469,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r17_earthbind',
           name: 'Primal Exaltation',
           description:
-            'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. 120 sec cooldown.',
+            'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritcall adds 50% more healing to Mending Current. 120 sec cooldown.',
           icon: 'elemental_mastery',
           effect: { grant: { ability: 'primal_exaltation' } },
         },

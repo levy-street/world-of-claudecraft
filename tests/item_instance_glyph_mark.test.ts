@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { bagCornerMark } from '../src/ui/bag_corner_mark_view';
 import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
+import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/hud/professions/profession_art';
 import {
   cornerMarkHtml,
   fineSealMarkHtml,
@@ -13,7 +14,6 @@ import {
   instanceGlyphMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from '../src/ui/item_instance_glyph_mark';
-import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
 
 describe('item_instance_glyph_mark', () => {
   it('returns empty HTML for a plain fungible stack', () => {

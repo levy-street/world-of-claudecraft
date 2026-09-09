@@ -21,6 +21,7 @@ import { ktx2SiblingUrl } from './assets/ktx2_sibling';
 import { loadKtx2Texture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX, type GfxSettings } from './gfx';
+import { applyTextureAnisotropy } from './texture_anisotropy';
 
 /** Subtle by design: the grain must read as surface response, not noise. */
 export const STONE_DETAIL_NORMAL_SCALE = 0.3;
@@ -41,7 +42,7 @@ export function prepareStoneDetailProfileAssets(target: Readonly<GfxSettings>): 
       detail.wrapS = THREE.RepeatWrapping;
       detail.wrapT = THREE.RepeatWrapping;
       detail.repeat.set(STONE_DETAIL_REPEAT, STONE_DETAIL_REPEAT);
-      detail.anisotropy = 4;
+      applyTextureAnisotropy(detail, 'normal');
       detail.needsUpdate = true;
       stoneNormal = detail;
     })

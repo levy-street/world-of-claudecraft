@@ -11,6 +11,10 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  professions_crucible: {
+    name: '熔爐匠藝',
+    desc: '十一套團隊副本製作套裝，每套均包含胸甲、腰帶和鞋靴。圖樣與配方屬於知識，不列為藏品。',
+  },
   // Dungeon, delve and world-boss pages: entities.* names verbatim.
   conquerors_hollow_crypt: {
     name: '空洞墓穴',
@@ -190,5 +194,13 @@ export const table: ReliquaryLocaleTable = {
   conquerors_varkhul_heroic: {
     name: '英雄：內環熔爐',
     desc: '末焰鍛父瓦爾庫爾身上僅限英雄難度掉落的盾牌與武器。',
+  },
+  professions_forgebreaker: {
+    name: '碎爐者',
+    desc: '末泉的聲音從鍛爐中解放，寄宿在你親手打造的戰鎚中。',
+  },
+  conquerors_set_bramblehide: {
+    name: '魯茨的荊棘皮甲',
+    desc: '完整的荊棘皮甲系列。',
   },
 };

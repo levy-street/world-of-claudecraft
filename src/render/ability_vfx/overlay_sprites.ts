@@ -19,6 +19,10 @@ export class OverlaySprites {
   private alpha = new Float32Array(CAPACITY);
   private count = 0;
   private wasEmpty = true;
+  // Until the cloud has been submitted once, an empty frame keeps it visible so
+  // the zero-count submit still links its program where the ability-primitives
+  // prewarm entry was skipped (../vfx.ts's cloudWarmed).
+  private warmed = false;
   private tmpColor = new THREE.Color();
   private disposed = false;
 
@@ -43,6 +47,9 @@ export class OverlaySprites {
       'aAlpha',
       new THREE.BufferAttribute(this.alpha, 1).setUsage(THREE.DynamicDrawUsage),
     );
+    // Explicit, like ../vfx.ts: the default range is Infinity, which would make
+    // the first submit (before any commit) draw the whole zeroed point buffer.
+    this.geo.setDrawRange(0, 0);
     this.geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(450, 0, 0), 2400);
     const mat = new THREE.ShaderMaterial({
       transparent: true,
@@ -86,6 +93,14 @@ export class OverlaySprites {
     this.points.frustumCulled = false;
     this.points.renderOrder = 7;
     this.points.userData.renderCategory = 'vfx';
+    // An idle cloud is NOT free: three does not early-out on a zero draw count,
+    // so a drawRange of 0 still pays setProgram, the VAO bind and a zero-count
+    // draw every frame. Hide when empty, show on the first push: the toggle
+    // idiom ../vfx.ts uses around its own point cloud.
+    this.points.onAfterRender = () => {
+      this.warmed = true;
+      if (this.geo.drawRange.count === 0) this.points.visible = false;
+    };
     scene.add(this.points);
   }
 
@@ -128,10 +143,12 @@ export class OverlaySprites {
       if (!this.wasEmpty) {
         this.wasEmpty = true;
         this.geo.setDrawRange(0, 0);
+        this.points.visible = !this.warmed;
       }
       return;
     }
     this.wasEmpty = false;
+    this.points.visible = true;
     // Upload only the prefix this frame wrote (the pooled cloud's idiom,
     // ../vfx.ts packRenderCloud): a frame showing two windup orbs re-uploaded
     // all CAPACITY points otherwise. Points past the prefix are stale by

@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.ru_RU.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ World of ClaudeCraft является web3-native вокруг **$WOC**, наш�
 
 ### Delves
 
-Delves — это отдельный масштабируемый режим для малых групп на одного или двух игроков, заново собираемый из случайных залов на каждом заходе и заканчивающийся запертым сундуком-реликварием, который открывается через мини-игру со взломом замка, а не через розыгрыш добычи. **The Collapsed Reliquary** (уровень 7 и выше) заканчивается на Deacon Varric, а если вы идёте в одиночку, рядом с вами сражается ИИ-спутник Tessa. **The Drowned Litany** (уровень 12 и выше) уводит по следу в затопленное святилище на краю Mirefen Marsh. Доска delve задаёт уровень сложности: Heroic повышает уровни врагов и добавляет случайный аффикс ради более богатых наград.
+Delves — это отдельный масштабируемый режим для малых групп на одного или двух игроков, заново собираемый из случайных залов на каждом заходе и заканчивающийся запертым сундуком-реликварием, который открывается через мини-игру со взломом замка, а не через розыгрыш добычи. **The Collapsed Reliquary** (уровень 7 и выше) заканчивается на Deacon Vandric, а если вы идёте в одиночку, рядом с вами сражается ИИ-спутник Tessa. **The Drowned Litany** (уровень 12 и выше) уводит по следу в затопленное святилище на краю Mirefen Marsh. Доска delve задаёт уровень сложности: Heroic повышает уровни врагов и добавляет случайный аффикс ради более богатых наград.
 
 ### Рейтинговый PvP (the Ashen Coliseum)
 

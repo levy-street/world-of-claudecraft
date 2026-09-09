@@ -1,8 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PerfMonitor } from '../src/game/perf';
 import type { NetPipelineSummary } from '../src/net/net_pipeline_stats';
+import {
+  armLiveProgramWatch,
+  resetLiveProgramWatchForTest,
+  setLiveProgramWatchClockForTest,
+} from '../src/render/live_program_watch';
 import type { Renderer } from '../src/render/renderer';
 import type { SceneCensusReport } from '../src/render/scene_census_core';
+import { resetShaderWarmForTest, shaderWarmSnapshot } from '../src/render/shader_warm_client';
 
 const MB = 1024 * 1024;
 
@@ -480,5 +486,64 @@ describe('perf monitor scene census wiring', () => {
     const snap = perf.snapshot(1000);
     expect(snap.census).toBeUndefined();
     expect(snap.hitches).toBeUndefined();
+  });
+});
+
+describe('post-reveal links in the snapshot', () => {
+  afterEach(() => resetLiveProgramWatchForTest());
+
+  it('carries the module window always-on: null before the reveal, the block after it', () => {
+    resetLiveProgramWatchForTest();
+    setLiveProgramWatchClockForTest(() => 1000);
+    const perf = new PerfMonitor(null);
+    expect(perf.snapshot(1000).postRevealLinks).toBeNull();
+
+    armLiveProgramWatch({ info: { programs: [{ id: 1 }, { id: 2 }], memory: { textures: 0 } } });
+    expect(perf.snapshot(2000).postRevealLinks).toMatchObject({
+      reveals: 1,
+      programsAtReveal: 2,
+      programsGained: 0,
+      closed: false,
+    });
+    // reset() runs at curtain-fade END, after the reveal armed the window: it
+    // must not disarm what the beacon is about to read.
+    perf.reset();
+    expect(perf.snapshot(3000).postRevealLinks).toMatchObject({ programsAtReveal: 2 });
+  });
+});
+
+describe('the shader warm pause signal the frame reading drives', () => {
+  afterEach(() => resetShaderWarmForTest());
+
+  it('feeds every sampled frame to the warm client average', () => {
+    // The worker's pause rides the perf monitor's own reading rather than a
+    // second clock: a frame() that stopped feeding it would leave the worker
+    // linking through frames that are already late, with nothing to say so.
+    resetShaderWarmForTest();
+    const perf = new PerfMonitor(null);
+    const before = shaderWarmSnapshot().frameEmaMs;
+
+    for (let frame = 0; frame < 20; frame++) perf.frame(0.05, 1000 + frame * 50);
+
+    const after = shaderWarmSnapshot();
+    expect(after.frameEmaMs).toBeGreaterThan(before);
+    expect(after.frameEmaMs).toBeCloseTo(50, 0);
+    expect(after.paused).toBe(true);
+
+    for (let frame = 0; frame < 20; frame++) perf.frame(0.016, 2000 + frame * 16);
+    expect(shaderWarmSnapshot().paused).toBe(false);
+  });
+
+  it('carries the warm readout in the snapshot it hands the reporter', () => {
+    // Opt-in until a cell shows the win: a session that named no mode reads
+    // out as off, with the counters a capture divides.
+    const perf = new PerfMonitor(null);
+    expect(perf.snapshot(1000).shaderWarm).toMatchObject({
+      mode: 'off',
+      worker: 'idle',
+      held: 0,
+      dryAssembleMs: 0,
+      links: { count: 0, sumMs: 0, maxMs: 0 },
+    });
   });
 });

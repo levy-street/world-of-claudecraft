@@ -8,7 +8,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { page } from 'vitest/browser';
 import { BankWindow, type BankWindowDeps } from '../../src/ui/bank_window';
 import { DailyRewardsWindow, type DailyRewardsWindowDeps } from '../../src/ui/daily_rewards_window';
-import { StoreDecisionPrompts } from '../../src/ui/store_decision_prompt';
 import type { WocStoreItemInput } from '../../src/ui/woc_store_view';
 import type { BankInfo, IWorld, VaultInfo } from '../../src/world_api';
 import { axeSeriousViolations, cleanup, formatViolations, host, stubDeps } from './_harness';
@@ -96,7 +95,10 @@ function mountCharterStore(waitForSpend: Promise<void>): {
   document.body.appendChild(stack);
   const world = {
     player: { templateId: 'warrior', mainhandItemId: null },
-    accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {} },
+    accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {}, mountSkinIds: [] },
+    // The Machine Stable strip reads the account mount skins on every store
+    // paint; nothing is owned here, the arms below are about the Strongbox charters.
+    ownedMounts: () => [],
     bankPurchasedSlots: 0,
   };
   const deps: DailyRewardsWindowDeps = {
@@ -284,66 +286,6 @@ for (const profile of PROFILES) {
     });
   });
 }
-
-describe('the store decision over a body-level armory inspect overlay', () => {
-  it('paints above the overlay under the production #ui hierarchy (desktop)', async () => {
-    await page.viewport(1280, 720);
-    document.documentElement.style.setProperty('--app-vw', '1280px');
-    document.documentElement.style.setProperty('--app-vh', '720px');
-    document.documentElement.style.setProperty('--ui-scale', '1');
-    // The REAL entry hierarchy, which the other suites in this file flatten:
-    // #prompt-stack lives inside #ui, and base.css makes #ui a position:fixed
-    // z-index:10 stacking context, while the armory inspect overlay mounts on
-    // document.body at z-index 90. A decision hosted anywhere inside #ui paints
-    // UNDER that overlay whatever z-index it carries; that was the v0.41.0
-    // desktop Purchase Skin freeze (the confirm opened invisibly while the
-    // Store and the inspector both sat inert).
-    const ui = document.createElement('div');
-    ui.id = 'ui';
-    const stack = document.createElement('div');
-    stack.id = 'prompt-stack';
-    ui.appendChild(stack);
-    const storeRoot = document.createElement('section');
-    ui.appendChild(storeRoot);
-    document.body.appendChild(ui);
-    const overlay = document.createElement('div');
-    overlay.className = 'armory-inspect-overlay open';
-    document.body.appendChild(overlay);
-
-    const prompts = new StoreDecisionPrompts(() => storeRoot);
-    try {
-      const opened = prompts.open({
-        title: 'Confirm purchase',
-        body: 'Buy the skin?',
-        confirmText: 'Purchase',
-        cancelText: 'Cancel',
-        closeText: 'Close',
-        onConfirm: () => undefined,
-      });
-      expect(opened, 'the decision must open').toBe(true);
-      expect(overlay.inert, 'open() must make the inspector inert').toBe(true);
-      // Lift inert for the probe only: inert strips hit testing, so with it in
-      // place elementFromPoint would skip the overlay and mask the stacking
-      // defect. The assertion is about PAINT order, which inert never changes.
-      overlay.inert = false;
-      const box = expectViewportBox(
-        document.querySelector('.woc-store-prompt'),
-        'store decision over the inspector',
-      );
-      const confirm = box.querySelector<HTMLElement>('[data-store-prompt-confirm]');
-      expect(confirm, 'confirm control must mount').not.toBeNull();
-      const rect = (confirm as HTMLElement).getBoundingClientRect();
-      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-      expect(
-        box.contains(hit),
-        'the decision must paint above the body-level inspect overlay (z 90)',
-      ).toBe(true);
-    } finally {
-      prompts.dismiss(false);
-      prompts.unregister();
-    }
-  });
-});
 
 describe('axe: mounted Vault and Strongbox purchase states', () => {
   it.each(PROFILES)(

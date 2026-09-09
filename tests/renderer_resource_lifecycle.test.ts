@@ -1,5 +1,65 @@
-import { describe, expect, it, vi } from 'vitest';
-import { disposeRendererPrewarmAndGroundFx } from '../src/render/renderer_resource_lifecycle';
+import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  type CompileArmHost,
+  linkColorPrograms,
+  setCompileArmObserver,
+} from '../src/render/compile_arms';
+import type { DryProgramSource } from '../src/render/program_sources';
+import {
+  disposeRendererPrewarmAndGroundFx,
+  disposeRendererWorldViews,
+} from '../src/render/renderer_resource_lifecycle';
+import {
+  expectRootProgramSources,
+  resetShaderWarmAuditForTest,
+  shaderWarmAuditSnapshot,
+} from '../src/render/shader_warm_audit';
+import {
+  resetShaderWarmForTest,
+  shaderWarmDecide,
+  shaderWarmSnapshot,
+} from '../src/render/shader_warm_client';
+import type { ShaderWarmWorkerMessage } from '../src/render/shader_warm_protocol';
+import { stripComments } from './helpers/strip_comments';
+
+afterEach(() => {
+  resetShaderWarmAuditForTest();
+  resetShaderWarmForTest();
+  setCompileArmObserver(null);
+});
+
+/** A minimal arms host the shader warm audit can announce and link through. */
+function auditArmHost(sources: DryProgramSource[]): CompileArmHost {
+  let current: THREE.WebGLRenderTarget | null = null;
+  const scene = new THREE.Scene();
+  const webgl = {
+    getRenderTarget: () => current,
+    setRenderTarget: (target: THREE.WebGLRenderTarget | null) => {
+      current = target;
+    },
+    compileAsync: () => Promise.resolve(scene),
+    collectProgramSources: () => sources,
+  };
+  return {
+    webgl: () => webgl,
+    camera: () => new THREE.PerspectiveCamera(),
+    scene: () => scene,
+    shadowCamera: () => new THREE.OrthographicCamera(),
+    offscreen: () => false,
+    offscreenTarget: () => ({}) as THREE.WebGLRenderTarget,
+    depthMaterials: () => new Map(),
+    shadowArm: () => false,
+  };
+}
+
+function auditRoot(name: string): THREE.Group {
+  const group = new THREE.Group();
+  group.name = name;
+  group.add(new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial()));
+  return group;
+}
 
 describe('renderer resource lifecycle', () => {
   it('keeps every renderer-owned VFX owner independent at the lifecycle seam', () => {
@@ -16,6 +76,17 @@ describe('renderer resource lifecycle', () => {
     const warlockMeteorFx = { dispose: vi.fn() };
     const abilityVfxFx = { dispose: vi.fn() };
     const vfx = { dispose: vi.fn() };
+    // The farm patch visuals joined the seam at the Phase 17 render review:
+    // their dispose() had no production caller before this arm existed.
+    const farmPatchVisuals = { dispose: vi.fn() };
+    // The two release-side FX joined at the Phase 18 sweep for the same
+    // reason; the portal one throws here so its failure is proved independent.
+    const frozenOrbFx = { dispose: vi.fn() };
+    const necromancyArmyPortalFx = {
+      dispose: vi.fn(() => {
+        throw new Error('portal');
+      }),
+    };
     const prewarmDepthMaterials = new Map([['depth', depthMaterial]]);
     const errors: unknown[] = [];
     const bestEffort = (cleanup: () => void): void => {
@@ -27,7 +98,16 @@ describe('renderer resource lifecycle', () => {
     };
 
     disposeRendererPrewarmAndGroundFx(
-      { prewarmDepthMaterials, mageGroundFx, warlockMeteorFx, abilityVfxFx, vfx },
+      {
+        prewarmDepthMaterials,
+        mageGroundFx,
+        warlockMeteorFx,
+        abilityVfxFx,
+        vfx,
+        farmPatchVisuals,
+        frozenOrbFx,
+        necromancyArmyPortalFx,
+      },
       bestEffort,
     );
 
@@ -36,8 +116,89 @@ describe('renderer resource lifecycle', () => {
     expect(warlockMeteorFx.dispose).toHaveBeenCalledOnce();
     expect(abilityVfxFx.dispose).toHaveBeenCalledOnce();
     expect(vfx.dispose).toHaveBeenCalledOnce();
+    expect(farmPatchVisuals.dispose).toHaveBeenCalledOnce();
+    expect(frozenOrbFx.dispose).toHaveBeenCalledOnce();
+    expect(necromancyArmyPortalFx.dispose).toHaveBeenCalledOnce();
     expect(prewarmDepthMaterials.size).toBe(0);
-    expect(errors).toHaveLength(2);
+    expect(errors).toHaveLength(3);
+  });
+
+  it('the renderer teardown reaches both release FX through this seam (source pin)', () => {
+    // The seam reads the owner's fields by name, so the renderer's own field
+    // names are the contract: a rename there silently drops the dispose.
+    const renderer = stripComments(
+      readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+    );
+    expect(renderer).toContain('private frozenOrbFx!: FrozenOrbFx;');
+    expect(renderer).toContain('private necromancyArmyPortalFx!: NecromancyArmyPortalFx;');
+    expect(renderer).toContain('private farmPatchVisuals: FarmPatchVisuals | null = null;');
+    expect(renderer).toContain('disposeRendererPrewarmAndGroundFx(this, bestEffort);');
+    // ...and both classes really carry the terminal owner the seam calls.
+    expect(
+      stripComments(
+        readFileSync(new URL('../src/render/frozen_orb_fx.ts', import.meta.url), 'utf8'),
+      ),
+    ).toContain('dispose(): void {');
+    expect(
+      stripComments(
+        readFileSync(
+          new URL('../src/render/necromancy_army_portal_fx.ts', import.meta.url),
+          'utf8',
+        ),
+      ),
+    ).toContain('dispose(): void {');
+  });
+
+  it('drains the battleground copies the teardown catches standing', () => {
+    // Each copy owns a field's terrain, its paint array texture, the placement
+    // instances, the decals and its share of the point-light budget; the map
+    // outlives nothing, so the terminal teardown is what releases whatever the
+    // session had not already resolved.
+    const played = { dispose: vi.fn() };
+    const prebuilt = { dispose: vi.fn() };
+    const bgViews = new Map([
+      [0, prebuilt],
+      [1, played],
+    ]);
+
+    disposeRendererPrewarmAndGroundFx({ prewarmDepthMaterials: new Map(), bgViews }, (cleanup) =>
+      cleanup(),
+    );
+
+    expect(prebuilt.dispose).toHaveBeenCalledOnce();
+    expect(played.dispose).toHaveBeenCalledOnce();
+    expect(bgViews.size).toBe(0);
+  });
+
+  it('drains every battleground copy when one of them fails to release', () => {
+    // The map is drained at teardown whatever one copy does: a throw inside
+    // one field's release must not strand the next one's terrain, textures
+    // and point lights for the life of the page.
+    const failing = {
+      dispose: vi.fn(() => {
+        throw new Error('field');
+      }),
+    };
+    const played = { dispose: vi.fn() };
+    const bgViews = new Map([
+      [0, failing],
+      [1, played],
+    ]);
+    const errors: unknown[] = [];
+    const bestEffort = (cleanup: () => void): void => {
+      try {
+        cleanup();
+      } catch (error) {
+        errors.push(error);
+      }
+    };
+
+    disposeRendererPrewarmAndGroundFx({ prewarmDepthMaterials: new Map(), bgViews }, bestEffort);
+
+    expect(failing.dispose).toHaveBeenCalledOnce();
+    expect(played.dispose).toHaveBeenCalledOnce();
+    expect(bgViews.size).toBe(0);
+    expect(errors).toHaveLength(1);
   });
 
   it('runs generic VFX cleanup even when a ground owner fails', () => {
@@ -66,5 +227,154 @@ describe('renderer resource lifecycle', () => {
     expect(vfx.dispose).toHaveBeenCalledOnce();
     expect(abilityVfxFx.dispose).toHaveBeenCalledOnce();
     expect(errors).toHaveLength(1);
+  });
+
+  // Regression for the graphics-rebuild heap leak (GitHub issue #3750):
+  // disposeRendererResources() never called these views' own dispose()
+  // methods, so a renderer swap permanently retained the previous
+  // terrain/far-terrain/water/underwater GPU resources on the JS heap.
+  describe('disposeRendererWorldViews', () => {
+    it('disposes terrain, far terrain, water, and underwater independently, each other failing', () => {
+      const terrainView = {
+        dispose: vi.fn(() => {
+          throw new Error('terrain');
+        }),
+      };
+      const farTerrainView = {
+        dispose: vi.fn(() => {
+          throw new Error('far terrain');
+        }),
+      };
+      const waterView = { dispose: vi.fn() };
+      const underwaterView = {
+        dispose: vi.fn(() => {
+          throw new Error('underwater');
+        }),
+      };
+      const errors: unknown[] = [];
+      const bestEffort = (cleanup: () => void): void => {
+        try {
+          cleanup();
+        } catch (error) {
+          errors.push(error);
+        }
+      };
+
+      disposeRendererWorldViews(terrainView, farTerrainView, waterView, underwaterView, bestEffort);
+
+      expect(terrainView.dispose).toHaveBeenCalledOnce();
+      expect(farTerrainView.dispose).toHaveBeenCalledOnce();
+      expect(waterView.dispose).toHaveBeenCalledOnce();
+      expect(underwaterView.dispose).toHaveBeenCalledOnce();
+      expect(errors).toHaveLength(3);
+    });
+
+    it('tolerates a view that has not been constructed yet', () => {
+      const waterView = { dispose: vi.fn() };
+      const errors: unknown[] = [];
+      const bestEffort = (cleanup: () => void): void => {
+        try {
+          cleanup();
+        } catch (error) {
+          errors.push(error);
+        }
+      };
+
+      expect(() =>
+        disposeRendererWorldViews(undefined, undefined, waterView, undefined, bestEffort),
+      ).not.toThrow();
+
+      expect(waterView.dispose).toHaveBeenCalledOnce();
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  it('lets the shader warm worker go with the renderer whose contract it mirrors', () => {
+    // The worker's context contract (attributes, extension set) was THIS
+    // renderer's; kept alive across a rebuild it would warm keys the new
+    // context never asks for. Read through the client's own readout: a
+    // lifecycle that forgets the release leaves it ready, not idle.
+    const posted: Record<string, unknown>[] = [];
+    let terminations = 0;
+    const worker = {
+      posted,
+      postMessage(message: unknown) {
+        posted.push(message as Record<string, unknown>);
+      },
+      terminate() {
+        terminations++;
+      },
+      onmessage: null as ((event: MessageEvent<ShaderWarmWorkerMessage>) => void) | null,
+      onerror: null as ((event: unknown) => void) | null,
+    };
+    resetShaderWarmForTest({
+      search: '?shaderwarm=reveal',
+      mobile: false,
+      spawn: () => worker,
+      schedule: () => () => {},
+    });
+    shaderWarmDecide({ getContextAttributes: () => ({}), getExtension: () => null }, 0, false);
+    const ready: ShaderWarmWorkerMessage = {
+      kind: 'ready',
+      ok: true,
+      reason: null,
+      extensions: [],
+      adapter: 'test',
+    };
+    worker.onmessage?.({ data: ready } as MessageEvent<ShaderWarmWorkerMessage>);
+    expect(shaderWarmSnapshot().worker).toBe('ready');
+
+    const errors: unknown[] = [];
+    disposeRendererPrewarmAndGroundFx({ prewarmDepthMaterials: new Map() }, (cleanup) => {
+      try {
+        cleanup();
+      } catch (error) {
+        errors.push(error);
+      }
+    });
+
+    expect(errors).toEqual([]);
+    expect(shaderWarmSnapshot().worker).toBe('idle');
+    // Terminated without a word: a dispose message could not run before the
+    // terminate that follows it, and the browser reclaims the worker's
+    // context with the worker itself.
+    expect(posted.map((message) => message.kind)).toEqual(['init']);
+    expect(terminations).toBe(1);
+  });
+
+  it('lets the shader warm audit go with the renderer it was listening to', async () => {
+    // Observed through the audit's own readout rather than a spy: the audit
+    // holds THIS renderer's compile arms and listens to its links, so a
+    // lifecycle that forgets to release it would keep re-checking a dead
+    // renderer and keep naming its roots.
+    resetShaderWarmAuditForTest('?perf');
+    const host = auditArmHost([
+      {
+        cacheKey: 'k',
+        name: 'physical',
+        vertexGlsl: 'v',
+        fragmentGlsl: 'f',
+        index0Attribute: 'position',
+      },
+    ]);
+    const first = auditRoot('kit');
+    const second = auditRoot('kit-two');
+    expectRootProgramSources(host, first);
+    expectRootProgramSources(host, second);
+    await linkColorPrograms(host, first, false);
+    expect(shaderWarmAuditSnapshot().linkedLabels).toEqual(['kit']);
+
+    const errors: unknown[] = [];
+    disposeRendererPrewarmAndGroundFx({ prewarmDepthMaterials: new Map() }, (cleanup) => {
+      try {
+        cleanup();
+      } catch (error) {
+        errors.push(error);
+      }
+    });
+    expect(errors).toEqual([]);
+
+    await linkColorPrograms(host, second, false);
+    expect(shaderWarmAuditSnapshot().linkedLabels).toEqual(['kit']);
   });
 });

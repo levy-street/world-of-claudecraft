@@ -30,9 +30,10 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
+import type { WebSocket } from 'ws';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type PlayerClass } from '../src/sim/types';
+import { dist2d, type Entity, type PlayerClass } from '../src/sim/types';
 import { drawWeapon, toggleWeaponStow } from '../src/sim/weapon_stow';
 import { terrainHeight } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
@@ -43,7 +44,7 @@ function makeSim(cls: 'warrior' | 'mage' = 'warrior', seed = 42) {
 
 function nearestMob(sim: Sim, templateId?: string) {
   const p = sim.player;
-  let best: any = null;
+  let best: Entity | null = null;
   let bestD = Infinity;
   for (const e of sim.entities.values()) {
     if (e.kind !== 'mob' || e.dead) continue;
@@ -108,6 +109,7 @@ describe('IWorld toggle + combat auto-unsheathe', () => {
   it('engaging auto-attack draws the weapon', () => {
     const sim = makeSim('warrior');
     const wolf = nearestMob(sim, 'forest_wolf');
+    if (!wolf) throw new Error('forest wolf missing');
     teleportTo(sim, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.toggleWeaponStow();
@@ -119,6 +121,7 @@ describe('IWorld toggle + combat auto-unsheathe', () => {
   it('casting an ability draws the weapon', () => {
     const sim = makeSim('mage');
     const wolf = nearestMob(sim);
+    if (!wolf) throw new Error('mob missing');
     teleportTo(sim, wolf.pos.x + 8, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.toggleWeaponStow();
@@ -159,20 +162,34 @@ describe('persistence (JSONB back-compat)', () => {
 // --- entity wire: the `ws` bit -------------------------------------------------
 
 interface FakeClient {
-  sent: any[];
-  ws: any;
+  sent: FakeMessage[];
+  ws: FakeSocket;
+}
+
+interface FakeSocket {
+  readyState: number;
+  send(payload: string): void;
+}
+
+interface FakeMessage {
+  t?: string;
+  cmd?: string;
+  self?: Record<string, unknown>;
 }
 
 function fakeWs(): FakeClient {
-  const sent: any[] = [];
-  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
+  const sent: FakeMessage[] = [];
+  return {
+    sent,
+    ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload) as FakeMessage) },
+  };
 }
 
-function lastSnap(sent: any[]): any {
+function lastSnap(sent: FakeMessage[]): FakeMessage {
   for (let i = sent.length - 1; i >= 0; i--) {
     if (sent[i].t === 'snap') return sent[i];
   }
-  return null;
+  throw new Error('snapshot missing');
 }
 
 function joinServer(
@@ -182,7 +199,14 @@ function joinServer(
   name: string,
   cls: PlayerClass = 'warrior',
 ): ClientSession {
-  const session = server.join(fc.ws, characterId, characterId, name, cls, null);
+  const session = server.join(
+    fc.ws as unknown as WebSocket,
+    characterId,
+    characterId,
+    name,
+    cls,
+    null,
+  );
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
   return session;
@@ -190,10 +214,13 @@ function joinServer(
 
 describe('ClientWorld optimistic nudge', () => {
   it('respects the dead-gate locally and sends the stow_weapon token when alive', () => {
-    (globalThis as any).WebSocket = { OPEN: 1 };
+    (globalThis as unknown as { WebSocket: { OPEN: number } }).WebSocket = { OPEN: 1 };
     const client = bareClient(7);
-    const sent: any[] = [];
-    (client as any).ws = { readyState: 1, send: (p: string) => sent.push(JSON.parse(p)) };
+    const sent: FakeMessage[] = [];
+    (client as unknown as { ws: FakeSocket }).ws = {
+      readyState: 1,
+      send: (p: string) => sent.push(JSON.parse(p) as FakeMessage),
+    };
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
     const self = (extra: Record<string, unknown>) => ({
       id: 7,
@@ -239,20 +266,20 @@ describe('weaponStowed over the wire', () => {
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Sheather');
     server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'stow_weapon' }));
-    (server as any).broadcastSnapshots();
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
     const snap = lastSnap(fc.sent);
-    expect(snap.self.ws).toBe(1);
+    expect(snap.self?.ws).toBe(1);
 
     const client = bareClient(session.pid);
-    (client as any).applySnapshot(snap);
+    (client as unknown as { applySnapshot(snapshot: unknown): void }).applySnapshot(snap);
     expect(client.player.weaponStowed).toBe(true);
 
     // Toggle back: the next snapshot omits the bit and the client re-draws.
     server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'stow_weapon' }));
-    (server as any).broadcastSnapshots();
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
     const snap2 = lastSnap(fc.sent);
-    expect('ws' in snap2.self).toBe(false);
-    (client as any).applySnapshot(snap2);
+    expect('ws' in (snap2.self ?? {})).toBe(false);
+    (client as unknown as { applySnapshot(snapshot: unknown): void }).applySnapshot(snap2);
     expect(client.player.weaponStowed).toBe(false);
   });
 });

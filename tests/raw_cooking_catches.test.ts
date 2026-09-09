@@ -22,6 +22,13 @@ const RAW_CATCH_IDS = [
   'raw_frostgill_trout',
   'raw_stonescale_carp',
   'glimmerfin_koi',
+  // The three high-band catches (masterwrought Phase 11i). Every arm in this
+  // file walks this literal, so a catch added to the shipped set without
+  // joining it here reds the locked-set arm below rather than silently
+  // escaping the refuse-to-eat, honest-material and non-edible sweeps.
+  'raw_deepbarb_catfish',
+  'raw_hollowgill_sturgeon',
+  'raw_stillmere_salmon',
 ] as const;
 
 const REFUSE = 'That is raw. Cook it first.';

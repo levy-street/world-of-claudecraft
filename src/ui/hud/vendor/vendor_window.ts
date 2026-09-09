@@ -14,10 +14,11 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
-import { gatheringProfessionNameKey } from '../../gathering_profession_name';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
+import { wornItemCellParts } from '../../worn_item_cell_view';
+import { gatheringProfessionNameKey } from '../professions/gathering_profession_name';
 import { showBuyQuantityPrompt } from './buy_quantity_prompt_window';
 import {
   VENDOR_MULTIPLES,
@@ -367,9 +368,13 @@ export function renderVendorWindow(
     row.type = 'button';
     row.className = 'vendor-item';
     const price = formatLocalizedMoney(priceCopper);
-    const itemName = itemDisplayName(item);
+    // A vendored promoted copy sits here under its chosen name and its own
+    // rim (the cell authority; a bound copy CAN be vendored, so this row is
+    // reachable, the phase 13 QA round-2 frontend finding).
+    const parts = wornItemCellParts(item, instance);
+    const itemName = parts.name;
     row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: itemName, price }));
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
+    row.innerHTML = `${deps.itemIcon(item, parts.quality)}<span class="vi-name">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
     // POSITIONAL by design, unlike the identity-keyed goods rows: after a
     // buyback the list shifts and focus stays at the same SLOT (the next
     // item to reclaim), which is the useful landing for repeated buybacks.

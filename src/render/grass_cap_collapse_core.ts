@@ -20,6 +20,22 @@ export function grassCapCollapseBand(radius: number): GrassCapCollapseBand | nul
   };
 }
 
+/**
+ * The band a grass build actually installs. TWO inputs, and both must hold:
+ * a carpet to fold the cap INTO, and a cap card to fold. The whole layer (the
+ * `aCap` vertex attribute and the collapse term the grass program compiles)
+ * moves exactly one card, so a tier that ships no cap card carries none of
+ * it: keyed off the carpet radius alone, the tiers that dropped the cap kept
+ * paying a per-vertex distance() and smoothstep over an attribute that was
+ * universally zero, on a program key of their own.
+ */
+export function grassCollapseBandFor(
+  radius: number,
+  hasCapCard: boolean,
+): GrassCapCollapseBand | null {
+  return hasCapCard ? grassCapCollapseBand(radius) : null;
+}
+
 export function grassCapCollapseShaderPatch(band: GrassCapCollapseBand | null): string {
   if (!band) return '';
   return `

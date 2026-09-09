@@ -34,6 +34,7 @@
 // to a color, never the resolved color.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
+import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { GATHER_NODES, isBgPos, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
@@ -50,7 +51,7 @@ import {
 } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { dungeonMapActive } from './dungeon_map_view';
-import { viewerUsableToolTier } from './gathering_view';
+import { viewerUsableToolTier } from './hud/professions/gathering_view';
 import {
   MAP_MARKER_SIZES,
   mapMarkerSizeForSemantic,
@@ -78,6 +79,7 @@ type DynamicClearanceKind =
   | 'object-loot'
   | 'mob'
   | 'mob-loot'
+  | 'mob-harvest'
   | 'neutral-npc'
   | 'semantic-fallback'
   | 'corpse'
@@ -94,6 +96,14 @@ function diamondMiterClearance(radius: number, outlineWidth: number): number {
  * half-angle is defined by its shoulder and the tip-to-shoulder run. */
 function lootSparkMiterClearance(radius: number, shoulder: number, outlineWidth: number): number {
   return radius + (outlineWidth * Math.hypot(shoulder, radius - shoulder)) / (shoulder * 2);
+}
+
+/** The pelt's bottom miter corners reach farther from its center than its
+ * top apex. Match the painter's vertices (0,-r), (+/-r,0.7r), including stroke. */
+function peltMiterClearance(radius: number, outlineWidth: number): number {
+  const halfStroke = outlineWidth / 2;
+  const cornerX = radius + halfStroke * ((Math.hypot(1, 1.7) + 1) / 1.7);
+  return Math.hypot(cornerX, radius * 0.7 + halfStroke);
 }
 
 /** Radial tip envelope for the rotated party triangle. Its tip always points
@@ -115,6 +125,7 @@ const DYNAMIC_CLEARANCE = Object.freeze({
     'object-loot': lootSparkMiterClearance(4, 1, 1.25),
     mob: diamondMiterClearance(3.5, 1.25),
     'mob-loot': Math.SQRT2 * 3.125,
+    'mob-harvest': peltMiterClearance(3.5, 1.25),
     'neutral-npc': 4.5,
     'semantic-fallback': 5,
     corpse: 6,
@@ -126,6 +137,7 @@ const DYNAMIC_CLEARANCE = Object.freeze({
     'object-loot': lootSparkMiterClearance(6, 1.5, 1.75),
     mob: diamondMiterClearance(5.25, 1.75),
     'mob-loot': Math.SQRT2 * 4.625,
+    'mob-harvest': peltMiterClearance(5.25, 1.75),
     'neutral-npc': 6.5,
     'semantic-fallback': 7,
     corpse: 9,
@@ -139,6 +151,15 @@ const DYNAMIC_CLEARANCE = Object.freeze({
 export function minimapPaintedMarkerClearance(size: number): number {
   return Math.max(0, size) * SQRT_HALF;
 }
+
+/** Painted footprint of a farm-patch pin, in canvas px, standard and compact.
+ * These are local constants rather than MAP_MARKER_SIZES rows because the pin
+ * is PROCEDURAL this phase: it has no MapMarkerArtId, and every size row in
+ * that table belongs to a marker-art family that caches a sprite at exactly
+ * that pixel size. The values match the station family so the two static
+ * landmark pins keep the same clearance from the minimap rim. */
+export const FARM_PATCH_MARKER_SIZE = 16;
+export const FARM_PATCH_MARKER_SIZE_COMPACT = 22;
 
 export function minimapSafeCenterRadius(canvasSize: number, clearance: number): number {
   return Math.max(0, canvasSize / 2 - MINIMAP_CLIP_INSET - Math.max(0, clearance));
@@ -207,8 +228,16 @@ export type MinimapMarker =
   | { kind: 'object-loot'; mx: number; my: number }
   // A live hostile mob (aggro = it is targeting the player).
   | { kind: 'mob'; mx: number; my: number; aggro: boolean }
-  // A lootable corpse (mob).
+  // A corpse holding ORDINARY loot this viewer may take (the loot square).
+  // Keyed on what the viewer can collect (corpseIndicatorFor), never on the
+  // bare lootable flag, which a harvest-only body keeps true through its
+  // grace window and a stranger's owner-locked kill keeps true for someone
+  // else. Actionable info on every graphics tier: never preset-gated.
   | { kind: 'mob-loot'; mx: number; my: number }
+  // A corpse with no ordinary loot for this viewer but an open harvest claim
+  // (the pelt triangle): a distinct silhouette so the two states never share
+  // a glyph. Same fairness rule as mob-loot.
+  | { kind: 'mob-harvest'; mx: number; my: number }
   // The local player's own body while a ghost (the corpse run target), a skull marker.
   | { kind: 'corpse'; mx: number; my: number }
   // An on-map party member: a proximity-scaled disc, class-colored, with an inner pip
@@ -247,7 +276,13 @@ export type MinimapMarker =
   // A crafting station (Professions 2.0): STATIC content positions (never
   // entities, no per-viewer state), so both IWorld hosts produce the same
   // marker. Tier-identical by the fairness invariant: never preset-gated.
-  | { kind: 'station'; mx: number; my: number; stationId: string; type: StationType };
+  | { kind: 'station'; mx: number; my: number; stationId: string; type: StationType }
+  // A farming garden-bed site (the fifth gathering profession): STATIC content
+  // positions on the crafting-station doctrine above, never entities and never
+  // per-viewer state, so both IWorld hosts produce the same marker. The plot
+  // state a player owns on those beds is a separate per-player read and does
+  // not reach this pin. Tier-identical by the fairness invariant.
+  | { kind: 'farm-patch'; mx: number; my: number; patchId: string };
 
 /** Everything the painter draws for one overworld minimap frame: the marker list (in
  *  draw order) plus the committed zone id (the painter localizes the #zone-label). */
@@ -289,7 +324,7 @@ export function createMinimapMarkers(): MinimapMarkers {
   const markers: MinimapMarker[] = [];
   const dynamicMarkers: Extract<
     MinimapMarker,
-    { kind: 'ally' | 'object-loot' | 'mob' | 'mob-loot' }
+    { kind: 'ally' | 'object-loot' | 'mob' | 'mob-loot' | 'mob-harvest' }
   >[] = [];
   const mechanicMarkers: Extract<MinimapMarker, { kind: 'semantic-object' }>[] = [];
   const rewardMarkers: Extract<MinimapMarker, { kind: 'semantic-object' }>[] = [];
@@ -333,6 +368,10 @@ export function createMinimapMarkers(): MinimapMarkers {
         : null;
       const guildNames = social?.guild ? new Set(social.guild.members.map((m) => m.name)) : null;
       const partyPids = world.partyInfo ? new Set(world.partyInfo.members.map((m) => m.pid)) : null;
+      // The same roster as a list, the shape the corpse indicator's rights
+      // check consumes (the VIEWER's party, handed over as the tapper's only
+      // when the tapper is on it). A per-call temporary like the Sets above.
+      const viewerPartyIds = world.partyInfo ? world.partyInfo.members.map((m) => m.pid) : null;
       // Thornhollow Fields fairness: inside a live match the friend/guild dot is a
       // through-wall tracker, so a guildmate seated on the ENEMY roster would hand one
       // side a live position feed the other side cannot have. Suppress every marker
@@ -479,13 +518,17 @@ export function createMinimapMarkers(): MinimapMarkers {
           centerFits(dist2, S, clearance.mob)
         ) {
           dynamicMarkers.push({ kind: 'mob', mx, my, aggro: e.aggroTargetId === p.id });
-        } else if (
-          e.kind === 'mob' &&
-          e.hostile &&
-          e.lootable &&
-          centerFits(dist2, S, clearance['mob-loot'])
-        ) {
-          dynamicMarkers.push({ kind: 'mob-loot', mx, my });
+        } else if (e.kind === 'mob' && e.hostile && e.lootable) {
+          // Ordinary loot for THIS viewer wins the square; a body that only
+          // has an open harvest left draws the pelt; a body offering neither
+          // (a claimed harvest in its grace window, a stranger's owner-locked
+          // pool, an expired corpse) draws nothing, lootable or not.
+          const indicator = corpseIndicatorFor(e, p.id, viewerPartyIds);
+          if (indicator === 'loot' && centerFits(dist2, S, clearance['mob-loot'])) {
+            dynamicMarkers.push({ kind: 'mob-loot', mx, my });
+          } else if (indicator === 'harvest' && centerFits(dist2, S, clearance['mob-harvest'])) {
+            dynamicMarkers.push({ kind: 'mob-harvest', mx, my });
+          }
         }
       }
 
@@ -558,6 +601,24 @@ export function createMinimapMarkers(): MinimapMarkers {
           my: half + dz,
           stationId: station.id,
           type: station.type,
+        });
+      }
+
+      // Farming garden beds: the same static-content read as the stations
+      // above, through IWorld so a custom map inherits no built-in patch. The
+      // pin marks the SITE (the patch anchor, its bed grid's centroid), never
+      // an individual bed and never this viewer's plot state, so it is one
+      // marker per patch in range on every host.
+      for (const patch of world.farmPatches) {
+        const dx = -(patch.x - p.pos.x) * pxPerYard;
+        const dz = -(patch.z - p.pos.z) * pxPerYard;
+        const size = compact ? FARM_PATCH_MARKER_SIZE_COMPACT : FARM_PATCH_MARKER_SIZE;
+        if (!centerFits(dx * dx + dz * dz, S, minimapPaintedMarkerClearance(size))) continue;
+        markers.push({
+          kind: 'farm-patch',
+          mx: half + dx,
+          my: half + dz,
+          patchId: patch.id,
         });
       }
 

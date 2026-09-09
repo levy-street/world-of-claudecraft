@@ -20,7 +20,11 @@ import {
 } from '../bot/outbox_consumer';
 import type { BreakerState } from '../bot/rate_governor';
 import { LoopScheduler, type SchedulerTimerHandle, type SchedulerTimers } from '../bot/scheduler';
-import type { OutboxEnvelope, OutboxLinkChangeItem } from '../bot/server_client';
+import type {
+  OutboxEnvelope,
+  OutboxLinkChangeItem,
+  OutboxQueuePopItem,
+} from '../bot/server_client';
 import { type SyntheticClock, syntheticClock } from './helpers/synthetic_clock';
 
 function relayItem(commandId: string, characterName = 'Annthar'): RelayItem {
@@ -90,7 +94,24 @@ function envelope(streams: Partial<OutboxEnvelope> = {}): OutboxEnvelope {
     activity: { items: [] },
     winners: { days: [] },
     linkChanges: { items: [] },
+    queuePops: { items: [], watching: false },
     ...streams,
+  };
+}
+
+/** The recorder's clock: every deadline in these cases is written against it. */
+const NOW = 1_700_000_000_000;
+
+function queuePop(discordUserId: string, expiresAtMs = NOW + 30_000): OutboxQueuePopItem {
+  return {
+    accountId: 9,
+    discordUserId,
+    characterName: 'Annthar',
+    kind: 'bg',
+    format: null,
+    seconds: 30,
+    expiresAtMs,
+    realm: 'Claudemoon',
   };
 }
 
@@ -103,6 +124,7 @@ interface Recorder {
   winners: DailyRewardWinnersDay[];
   marks: string[];
   links: OutboxLinkChangeItem[][];
+  pops: OutboxQueuePopItem[];
   errors: { where: string; message: string }[];
 }
 
@@ -119,7 +141,9 @@ function recorder(
     failRelay?: (item: RelayItem) => boolean;
     failActivity?: (item: ActivityItem) => boolean;
     failWinners?: (day: DailyRewardWinnersDay) => boolean;
+    failQueuePop?: (item: OutboxQueuePopItem) => boolean;
     markResult?: (day: string) => unknown;
+    now?: () => number;
   } = {},
 ): Recorder {
   const calls: string[] = [];
@@ -130,8 +154,15 @@ function recorder(
     winners: [],
     marks: [],
     links: [],
+    pops: [],
     errors: [],
     io: {
+      now: options.now ?? (() => NOW),
+      postQueuePop: async (item) => {
+        calls.push(`pop:${item.discordUserId}`);
+        rec.pops.push(item);
+        if (options.failQueuePop?.(item)) throw new Error(`pop ${item.discordUserId} refused`);
+      },
       breakerState: () => options.breaker ?? 'closed',
       drain: async () => {
         calls.push('drain');
@@ -274,6 +305,72 @@ describe('outbox poll fan-out', () => {
     expect(await runOutboxPoll(rec.io)).toBe(true);
     expect(rec.links).toEqual([[linkChange('u9')]]);
     expect(rec.errors.map((e) => e.where)).toEqual(['relay', 'activity']);
+  });
+});
+
+describe('outbox queue-pop DMs', () => {
+  it('DMs the pops FIRST, ahead of every channel post', async () => {
+    // The one stream with a deadline in seconds goes before the loops that can
+    // run for minutes on a backlog; the link changes (pure, instant) still
+    // apply before anything is sent.
+    const rec = recorder({
+      envelope: envelope({
+        relay: { items: [relayItem('c1')] },
+        activity: { items: [activityItem()] },
+        linkChanges: { items: [linkChange('u9')] },
+        queuePops: { items: [queuePop('u1'), queuePop('u2')], watching: false },
+      }),
+    });
+
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.calls).toEqual([
+      'drain',
+      'links:1',
+      'pop:u1',
+      'pop:u2',
+      'relay:c1',
+      'activity:levelup',
+    ]);
+  });
+
+  it('skips a pop whose deadline passed, silently, and still DMs the live ones', async () => {
+    // Re-checked at SEND time against the consumer's clock: the governor can
+    // hold a DM past an Accept window, and a DM about a lapsed offer is worse
+    // than none. Not an error (nothing failed), and still counted as work
+    // (the drain carried it).
+    const rec = recorder({
+      envelope: envelope({
+        queuePops: {
+          items: [queuePop('late', NOW), queuePop('live', NOW + 1), queuePop('lapsed', NOW - 5000)],
+          watching: false,
+        },
+      }),
+    });
+
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.pops.map((p) => p.discordUserId)).toEqual(['live']);
+    expect(rec.errors).toEqual([]);
+  });
+
+  it('keeps one refused DM from costing the rest, and reports it as queue-pop', async () => {
+    const rec = recorder({
+      envelope: envelope({
+        queuePops: { items: [queuePop('u1'), queuePop('u2'), queuePop('u3')], watching: false },
+      }),
+      failQueuePop: (item) => item.discordUserId === 'u2',
+    });
+
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.pops.map((p) => p.discordUserId)).toEqual(['u1', 'u2', 'u3']);
+    expect(rec.errors).toEqual([{ where: 'queue-pop', message: 'pop u2 refused' }]);
+  });
+
+  it('tolerates an older server that sends no queuePops stream at all', async () => {
+    const legacy = envelope() as Partial<OutboxEnvelope>;
+    delete legacy.queuePops;
+    const rec = recorder({ envelope: legacy as OutboxEnvelope });
+    expect(await runOutboxPoll(rec.io)).toBe(false);
+    expect(rec.pops).toEqual([]);
   });
 });
 
@@ -473,6 +570,11 @@ describe('outbox poll didWork signal', () => {
       { name: 'activity', streams: { activity: { items: [activityItem()] } } },
       { name: 'winners', streams: { winners: { days: [winnersDay('2026-07-31')] } } },
       { name: 'linkChanges', streams: { linkChanges: { items: [linkChange('u9')] } } },
+      { name: 'queuePops', streams: { queuePops: { items: [queuePop('u9')], watching: false } } },
+      // The watch signal alone, with NOTHING drained: an opted-in player is
+      // waiting in a queue, and the pop that ends the wait has a 30 s window,
+      // so the loop must hold the fast cadence rather than decay to idle.
+      { name: 'queuePops.watching', streams: { queuePops: { items: [], watching: true } } },
     ];
     for (const oneCase of cases) {
       const rec = recorder({ envelope: envelope(oneCase.streams) });
@@ -579,17 +681,22 @@ describe('outbox channel routing', () => {
   ): {
     io: OutboxIo;
     sent: Sent[];
+    dms: { userId: string; payload: Record<string, unknown> }[];
     marks: string[];
     missing: string[];
     errors: string[];
   } {
     const sent: Sent[] = [];
+    const dms: { userId: string; payload: Record<string, unknown> }[] = [];
     const marks: string[] = [];
     const missing: string[] = [];
     const errors: string[] = [];
     const io = outboxIoFor({
       createMessage: async (channelId, payload) => {
         sent.push({ channelId, payload });
+      },
+      sendDirectMessage: async (userId, payload) => {
+        dms.push({ userId, payload });
       },
       markDailyRewardWinners: async (day) => {
         marks.push(day);
@@ -600,10 +707,11 @@ describe('outbox channel routing', () => {
       breakerState: () => 'closed',
       drain: async () => drained,
       applyLinkChanges: () => {},
+      now: () => NOW,
       onError: (_error, where) => errors.push(where),
       onMissingChannel: (channel) => missing.push(channel),
     });
-    return { io, sent, marks, missing, errors };
+    return { io, sent, dms, marks, missing, errors };
   }
 
   const CHANNELS = { relay: 'relay-1', activity: 'activity-1', dailyRewards: 'daily-1' };
@@ -676,6 +784,29 @@ describe('outbox channel routing', () => {
     expect(unset.sent).toEqual([]);
     expect(unset.missing).toEqual([]);
     expect(unset.errors).toEqual([]);
+  });
+
+  it('DMs a queue pop to its user through the DM seam, shaped by the pop builder, needing no channel', async () => {
+    // Every channel id UNSET: the DM stream has no channel to route, so the
+    // unset-channel machinery must not touch it, and the payload is the one
+    // only buildQueuePopMessage produces (the game-URL button, the live
+    // deadline stamp).
+    const wired = factoryIo(
+      { relay: '', activity: '', dailyRewards: '' },
+      envelope({ queuePops: { items: [queuePop('u1')], watching: false } }),
+    );
+
+    expect(await runOutboxPoll(wired.io)).toBe(true);
+    expect(wired.sent).toEqual([]);
+    expect(wired.missing).toEqual([]);
+    expect(wired.errors).toEqual([]);
+    expect(wired.dms).toHaveLength(1);
+    expect(wired.dms[0].userId).toBe('u1');
+    const embed = (wired.dms[0].payload.embeds as Record<string, any>[])[0];
+    expect(embed.title).toBe('Your battleground queue popped!');
+    expect(embed.description).toContain(`<t:${Math.floor((NOW + 30_000) / 1000)}:R>`);
+    const button = (wired.dms[0].payload.components as Record<string, any>[])[0].components[0];
+    expect(button.url).toBe('https://game.test');
   });
 
   it('marks the announced day through the server client, by day string', async () => {
@@ -752,6 +883,7 @@ describe('outbox factory pass-through seams', () => {
     let drains = 0;
     const io = outboxIoFor({
       createMessage: async () => {},
+      sendDirectMessage: async () => {},
       markDailyRewardWinners: async () => ({ ok: true }),
       channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
       gameUrl: 'https://game.test',
@@ -773,6 +905,7 @@ describe('outbox factory pass-through seams', () => {
     const applied: OutboxLinkChangeItem[][] = [];
     const io = outboxIoFor({
       createMessage: async () => {},
+      sendDirectMessage: async () => {},
       markDailyRewardWinners: async () => ({ ok: true }),
       channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
       gameUrl: 'https://game.test',
@@ -791,6 +924,7 @@ describe('outbox factory pass-through seams', () => {
       createMessage: async () => {
         throw new Error('post refused');
       },
+      sendDirectMessage: async () => {},
       markDailyRewardWinners: async () => ({ ok: true }),
       channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
       gameUrl: 'https://game.test',

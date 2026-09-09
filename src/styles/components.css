@@ -898,6 +898,8 @@
 
   #loot-window {
     width: 230px;
+    /* Keep another window's text from showing through the corpse choice. */
+    background: var(--panel-base);
   }
   .loot-item {
     display: flex;
@@ -921,92 +923,36 @@
     font-size: 12px;
     margin-bottom: 2px;
   }
+  /* Dynamic content (the resolved material/reservation name, or the
+     denial/benefit sentence) is interpolated player-facing text, so a single
+     long localized token wraps inside the fixed-width popup instead of
+     forcing a horizontal scrollbar (the .window shell clamps width, not
+     unbroken text runs). */
+  .corpse-harvest-title,
+  .corpse-harvest-hint {
+    overflow-wrap: anywhere;
+  }
   .corpse-harvest-hint {
     font-size: 11px;
     opacity: 0.75;
     margin-bottom: 6px;
   }
-  /* #2514: the current selection earns a tier the widest pick on this corpse
-     would not, so the rule the hint states is live right now. Lifting it out of
-     the muted default is the whole cue: it adds information the player can act
-     on (keep the boxes as they are) and takes none away, and it is what makes
-     the view model's `concentrated` a rendered decision rather than a field
-     nothing reads.
-     Opacity ONLY, and that is load-bearing rather than timid. This hint sits
-     ABOVE the checkbox list and the Harvest button, and it re-renders on every
-     toggle, so any metric-changing emphasis (a heavier weight, a border, a
-     padding) can flip a long locale from two wrapped lines to three and shove
-     the controls down at the exact moment the player is reaching for them. That
-     is the hazard corpse_harvest_window.ts already argues for the reason line,
-     and it is worse here because this block precedes the controls. Opacity
-     changes no box. The cue is supplementary in any case: the rule it
-     emphasizes is the sentence itself, which is always present and always
-     legible. */
-  .corpse-harvest.is-concentrated .corpse-harvest-hint {
-    opacity: 1;
-  }
-  .corpse-harvest-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  /* Change sits between the preference title and the live status line: a
+     block of its own row (like Harvest below) rather than the default
+     inline-block .btn sizing, so its >=40px touch target is never squeezed
+     by neighboring inline content and the status line beneath it never
+     visually crowds it. */
+  .corpse-harvest-change-btn {
+    display: block;
     margin-bottom: 6px;
-  }
-  .corpse-harvest-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  /* The name and the mark wrap instead of widening the fixed-width popup: the
-     longest localized pair ("Venom Sac" beside id_ID "belum ada hasil") would
-     otherwise push the row past the 230px window and turn .window's
-     overflow-y:auto into a horizontal scrollbar. */
-  .corpse-harvest-row > span {
-    min-width: 0;
-  }
-  /* #2514: a component family with no harvest item behind it yet. The row is
-     still offered and still CHECKABLE (the sim ignores it either way), so the
-     mark is the muted name plus the .corpse-harvest-note text beside it, never
-     colour alone.
-     Scoped to the row's text, deliberately: dimming the whole label would dim
-     the checkbox too, and a greyed checkbox is this HUD's disabled idiom
-     (.btn:disabled above), so a live control would read as a dead one in the
-     one place this change exists to make honest.
-     A themed token rather than an opacity, and the reason is measurement, not
-     taste: a stacked opacity composited the mark to 2.97:1 on the parchment
-     preset, and tests/theme.test.ts structurally cannot see a loss that happens
-     in a stylesheet rather than in a token. --color-text-muted is the house
-     treatment for muted 10-11px chrome (78 sibling rules across this file,
-     hud.css and shell.css) and theme.ts repairs it to the 3:1 large-text tier
-     against the panel base, which is a floor the composite did not have; it is
-     an improvement on every preset and it moves with the theme. It is NOT a
-     4.5:1 guarantee, and on parchment it measures 4.92:1 at the panel top and
-     3.60:1 in the gradient's edge band. That gap is systemic to the token
-     rather than introduced here, and it is not what carries the row's meaning:
-     the mark is the .corpse-harvest-note TEXT, whose sentence is also in the
-     checkbox's accessible name, so nothing is conveyed by contrast alone. */
-  .corpse-harvest-row-no-yield > span {
-    color: var(--color-text-muted);
-  }
-  .corpse-harvest-note {
-    font-size: 10px;
-    font-style: italic;
-    color: var(--color-text-muted);
   }
   .corpse-harvest-btn {
     width: 100%;
   }
-  /* #2509: why Harvest is refused, stated in place. A disabled button takes no
-     pointer events and leaves the tab order, so its tooltip is unreachable.
-     Sits BELOW the button (see corpse_harvest_window.ts) so showing it never
-     moves the control the player is reaching for. */
-  .corpse-harvest-warning {
-    font-size: 11px;
-    color: var(--color-text-error);
-    margin-top: 6px;
-  }
+  /* Background harvest-status polls retain the last admitted appearance.
+     aria-disabled still blocks activation and preserves keyboard focus; styling
+     each half-second poll as disabled would make the button flash. Actual
+     denials and command waits keep the shared native .btn:disabled treatment. */
 
   /* ---------- town-focus ---------- */
   /* town focus (#1143): persistent town-set component harvest focus */
@@ -1103,6 +1049,122 @@
     opacity: 0.4;
     cursor: default;
   }
+
+  /* ---------- harvest-preference ---------- */
+  /* The shared corpse-harvest preference picker (Intentional Gathering PR3):
+     the same small cold-settings shape as town-focus above, reused by the
+     Field Kit use, Professions, and corpse Change entrances. Apply/Cancel
+     reuse the existing .btn/.btn-secondary family; only this content's own
+     rows need rules. */
+  #harvest-preference-window {
+    width: 340px;
+  }
+  /* Dynamic content (the resolved material name in the title, the retired
+     stored-material notice, the pick hint) is interpolated player-facing
+     text; wrap it rather than forcing the fixed-width popup to scroll
+     horizontally. */
+  .harvest-preference-title,
+  .harvest-preference-current-unavailable,
+  .harvest-preference-hint {
+    overflow-wrap: anywhere;
+  }
+  .harvest-preference-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .harvest-preference-current-unavailable {
+    font-size: 12px;
+    color: var(--color-text-error);
+    margin-bottom: 6px;
+  }
+  .harvest-preference-hint {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-bottom: 6px;
+  }
+  .harvest-preference-rows {
+    list-style: none;
+    margin: 0 0 8px;
+    padding: 0;
+  }
+  /* Each row IS the radio button (role="radio"), full-width and left-aligned
+     so the whole row is the >=40px touch target, not just its text. */
+  .harvest-preference-row {
+    display: block;
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  /* Each row is the SOLE child of its own `<li>` (role="none"), so
+     `.harvest-preference-row:not(:last-child)` never matched; the list items,
+     not the buttons, are the siblings. */
+  .harvest-preference-rows li:not(:last-child) {
+    margin-bottom: 2px;
+  }
+  /* A custom control (role=radio on a plain button, not .btn), so it needs its
+     own steady, tokenized ring rather than relying on the UA default (the
+     .tal-row-opt idiom for a house radio/option-row family). */
+  .harvest-preference-row:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* The non-colour selected indicator: a left accent bar plus bold weight, so
+     the checked row reads without relying on colour alone. */
+  .harvest-preference-row[aria-checked="true"] {
+    border-left-color: var(--color-accent);
+    font-weight: 600;
+  }
+  .harvest-preference-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .harvest-preference-actions .btn {
+    flex: 1;
+  }
+  /* Source-info detail (Intentional Gathering PR5): the GENERAL picker only
+     (Field Kit use, Professions), shown for the drafted material row.
+     Reuses the same fixed-width popup; every line wraps rather than
+     overflowing. */
+  .harvest-preference-source-container:empty {
+    display: none;
+  }
+  .harvest-preference-source {
+    margin-bottom: 8px;
+    padding: 8px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    font-size: 11px;
+  }
+  .harvest-preference-source-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    overflow-wrap: anywhere;
+  }
+  .harvest-preference-source-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .harvest-preference-source-list li {
+    overflow-wrap: anywhere;
+    margin-bottom: 2px;
+  }
+  .harvest-preference-source-premium,
+  .harvest-preference-source-note {
+    margin-top: 4px;
+    opacity: 0.85;
+    overflow-wrap: anywhere;
+  }
+
   #loot-rolls {
     position: fixed;
     right: max(14px, env(safe-area-inset-right));
@@ -1393,6 +1455,23 @@
     text-transform: uppercase;
     letter-spacing: 0.09em;
     color: var(--color-text-muted);
+  }
+  /* The worn Masterwrought mark (phase 14): a small gold diamond beside the
+     slot name (a CSS-drawn rotated square; the aria-label carries the word).
+     Sized to the slot-name cap height so it reads as part of the label. */
+  .equip-mw-chip {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    background: var(--gold-dim);
+    box-shadow: inset 0 0 0 1px var(--gold);
+    vertical-align: baseline;
+  }
+  @media (forced-colors: active) {
+    .equip-mw-chip {
+      border: 1px solid CanvasText;
+    }
   }
   /* Item names WRAP (never ellipsized) so a full name always reads. */
   .equip-slot .slot-item {
@@ -1810,6 +1889,23 @@
     color: #7c7256;
     font-style: italic;
   }
+  /* The Masterwrought slots readout (phase 14): the char-playtime slim-row
+     shape (muted label, parchment tabular value) seated under the paperdoll
+     whose worn diamonds it counts. */
+  .char-mw-slots {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .char-mw-slots .cp-title {
+    margin-bottom: 0;
+  }
+  .char-mw-slots-value {
+    font-size: 13px;
+    color: var(--color-text-light);
+    font-weight: normal;
+    font-variant-numeric: tabular-nums;
+  }
   /* The lifetime "Time Played" line footing the character sheet: the shared
      inset-card treatment laid out as one slim row (label, value, then the
      reveal/conceal eye pushed to the far edge). */
@@ -1927,6 +2023,7 @@
   /* lifetime-XP leaderboard panel (modeled on the quest-log window) */
   #leaderboard-window,
   #guild-board-window,
+  #rift-forge-window,
   #daily-rewards-window {
     width: 480px;
   }
@@ -1937,8 +2034,105 @@
      unconditional because the inline display:flex is; with the shell default (row)
      the header, tabs and board would lay out side by side. */
   #leaderboard-window,
-  #guild-board-window {
+  #guild-board-window,
+  #rift-forge-window {
     flex-direction: column;
+  }
+
+  /* ---------- rift forge ---------- */
+  /* The Riftwright's window (src/ui/hud/rift_forge/): a wallet strip, one
+     card per Riftbound band with its two forge lines, and a status line.
+     Rides the leaderboard family's column shell and lb-* empty state. */
+  #rift-forge-window .rf-greeting {
+    padding: 4px 2px 2px;
+    font-size: 12px;
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-wallet {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    padding: 6px 2px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-currency {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  #rift-forge-window .rf-icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+  }
+  #rift-forge-window .rf-body {
+    overflow-y: auto;
+    max-height: 56vh;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  #rift-forge-window .rf-ring {
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #rift-forge-window .rf-ring-worn {
+    opacity: 0.75;
+  }
+  #rift-forge-window .rf-ring-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #rift-forge-window .rf-ring-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 14px;
+  }
+  #rift-forge-window .rf-ring-tier {
+    margin-left: auto;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  #rift-forge-window .rf-line-label {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  #rift-forge-window .rf-gems {
+    display: inline-flex;
+    gap: 2px;
+    vertical-align: middle;
+  }
+  #rift-forge-window .rf-select {
+    max-width: 150px;
+  }
+  #rift-forge-window .rf-max,
+  #rift-forge-window .rf-hint {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-status {
+    min-height: 18px;
+    padding: 6px 2px 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-status-error {
+    color: var(--color-text-error);
   }
   /* The signpost guild board's own chrome: the roster drill-in's back/header
      row and the rank chips; everything else rides the lb-* family. */
@@ -5160,33 +5354,18 @@
     }
   }
 
-  /* Store-owned decision prompt: mounted on document.body, above the Armory
-     inspector, while the Store root is inert. Body-level ON PURPOSE: the
-     #prompt-stack host lives inside #ui, a position:fixed z-index:10 stacking
-     context (base.css), so no z-index inside the stack can clear the
-     body-level .armory-inspect-overlay (z 90), and a stack-hosted decision
-     opened invisibly under an open inspector (the v0.41.0 Purchase Skin
-     freeze). The generic #confirm-dialog rule above centers a body-level
-     window but brings no position of its own (the HUD confirm gets that from
-     .window) and its z-index 60 sits under the inspector, so this rule pins
-     the full fixed geometry itself, above the inspector (90) and level with
-     the HUD confirm floor (95, src/ui/hud.ts). */
-  #confirm-dialog.woc-store-prompt {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 96;
-    /* Clamp against the JS-synced app viewport (the layout.css .window rule),
-       never raw viewport units; body-level, outside the zoomed #ui, so no
-       --window-scale division. The max-height + scroll keep a verbose locale's
-       body reachable on a short landscape phone. */
-    width: min(380px, calc(var(--app-vw, 100vw) - 32px));
+  /* Store-owned decision prompt: mounted in #prompt-stack, above the Armory
+     inspector, while the Store root is inert. The generic #confirm-dialog
+     geometry assumes a body-level window, so this scoped rule resets it to a
+     normal stack child. */
+  #prompt-stack .woc-store-prompt {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: min(380px, calc(100vw - 32px));
     min-width: 0;
-    max-height: calc(var(--app-vh, 100vh) - 24px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
     padding: 18px;
+    transform: none;
     box-sizing: border-box;
     text-align: left;
   }
@@ -6042,7 +6221,7 @@
     padding: 10px 12px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
-    background: rgba(0, 0, 0, 0.24);
+    background: var(--color-card-inset);
   }
   .profession-identity-main {
     flex: 1 1 0;
@@ -6229,6 +6408,15 @@
     display: block;
     margin-top: 2px;
   }
+  /* One reagent entry never breaks between its name and its have/required
+     count (a wrapped count reads as a stray number on the next line): an
+     inline-block with nowrap wraps the reagent LIST between entries instead,
+     mirroring the wiki twin .guide-prof-mat (src/guide/styles.css) so the
+     two surfaces read a bill the same way. */
+  .crafting-reagent {
+    display: inline-block;
+    white-space: nowrap;
+  }
   /* Unsatisfied reagents tint toward the error red; the have/required counts
      in the text are the actual signal (the tint is a redundant hint). */
   .crafting-reagent.unsat {
@@ -6286,6 +6474,38 @@
     font-variant-numeric: tabular-nums;
     color: var(--color-text-muted);
     white-space: nowrap;
+  }
+  /* The apex treatment (Masterwrought phase 14): restrained per DESIGN.md,
+     gold stays structural. The chip rides the duration-chip base rule with a
+     fine gold edge; the socket ring is one inset line; the provenance line
+     and the Perfecting link carry the same information as text. */
+  .crafting-apex-chip {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+  .crafting-recipe-socket.apex {
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
+    border-radius: 3px;
+  }
+  .crafting-apex-line {
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
+  .crafting-perfecting-link {
+    margin-left: auto;
+    min-height: 28px;
+    padding: 2px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: none;
+    color: var(--gold-dim);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .crafting-perfecting-link:hover {
+    border-color: var(--gold);
+    color: var(--gold);
   }
   /* Polite live region: off-screen, announces cast start/complete/cancel. */
   /* In-window craft-cast strip (Craft Cast System Phase 2): the SINGLE
@@ -6559,15 +6779,15 @@
     color: var(--gold);
   }
 
-  /* ---------- profession first-tier tutorial ---------- */
+  /* ---------- tutorial and ferry notes ---------- */
   /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
      confirm-dialog modal family (.window.panel shell, .cd-body/.cd-actions). A
      bounded, centered modal; body-appended (see the layout.css --window-scale:1
      group), and the JS floors its z-index above the mobile sheet (the
      scoped-popup 96 rule). Sized from existing tokens, no new ones. */
-  /* #tutorial-greeting (the tutorial island spawn greeting,
-     tutorial_greeting_window.ts) shares every rule: the same once-ever modal
-     shape, reusing the same confirm-dialog family chrome. */
+  /* #tutorial-greeting (the live ferry-note dialog,
+     tutorial_greeting_window.ts) shares every rule: the same single-button
+     modal shape, reusing the same confirm-dialog family chrome. */
   #profession-tutorial,
   #tutorial-greeting {
     left: 50%;
@@ -6791,8 +7011,12 @@
       min-height: 40px;
     }
   }
+  /* The column-flex shell the professions windows share (#professions-window
+     below): the painter opens the board with display:flex, so the title,
+     intro, form and sections stack as a column. */
   #commission-board-window {
     width: 460px;
+    flex-direction: column;
   }
   .commission-board-intro {
     display: block;
@@ -6839,7 +7063,10 @@
     border: 1px solid #5a4a2a;
     border-radius: 6px;
     color: #ffe6a8;
-    font-family: Georgia, serif;
+    /* The serif face by its token (the literal Georgia stack predated
+       --font-serif); the warm input hexes above stay with their mail-form
+       siblings until that family gets its own token pass. */
+    font-family: var(--font-serif);
   }
   .commission-field input[type="text"]:focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -6893,6 +7120,16 @@
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+  }
+  /* The crafter's-record quality signal on accepted rows (Masterwrought
+     phase 14): muted label, parchment values, tabular numerals so a list of
+     records ranks at a glance. */
+  .commission-crafter-record .ccr-label {
+    color: var(--color-text-muted);
+  }
+  .commission-crafter-record .ccr-values {
+    color: var(--color-text-light);
+    font-variant-numeric: tabular-nums;
   }
   .commission-order-actions {
     display: flex;
@@ -7309,12 +7546,30 @@
     border-color: #2f281a;
     box-shadow: inset 0 2px 6px #000d;
   }
+  /* A free square only a MATERIAL may take (a materials-only satchel's pool,
+     issue #3795): a cool hatched tint so the player can tell the item room
+     from the materials room at a glance. */
+  .bag-item.empty.materials-only {
+    background: repeating-linear-gradient(135deg, #12201c 0 4px, #0b0f0d 4px 8px);
+    border-color: #2b4a3f;
+  }
+  .bag-capacity.general-full {
+    color: var(--color-text-warning, #d9a441);
+  }
   /* The bag bar: backpack + the 4 equip sockets + the used/total counter. */
   .bag-bar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 4px;
     margin: 4px 0 2px;
+  }
+  /* The pooled counter (a materials-only satchel equipped, issue #3795) names
+     both pools inline, which does not fit beside five sockets: it takes its
+     own row under them, right-aligned like the summed counter. */
+  .bag-capacity.pools {
+    flex-basis: 100%;
+    text-align: right;
   }
   .bag-socket {
     position: relative;
@@ -8178,35 +8433,133 @@
     color: var(--color-text-muted);
     margin: 0 0 4px;
   }
-  .gbank-log-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  /* The history's search row: one `.bag-search` input (the bank's shared
+     search styling and focus-carry), full width above the scope line. */
+  .gbank-log-tools {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    gap: 6px;
+    margin: 0 0 4px;
+    flex: none;
   }
-  .gbank-log-row {
+  .gbank-log-search {
+    width: 100%;
+  }
+  /* The history's filter chips (All / Items / Money): a labelled group of
+     toggle buttons; the pressed one is carried by aria-pressed and styled from
+     it, so state is never colour-only. Sized like the bank's small gold
+     buttons so the strip reads as one row of chrome above the list. */
+  .gbank-log-filters {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
-    padding: 4px 6px;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 2px 0 4px;
+    flex: none;
+  }
+  .gbank-log-filter {
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+    color: var(--gold-dim);
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
+    padding: 2px 8px;
+  }
+  .gbank-log-filter:hover,
+  .gbank-log-filter:focus-visible {
+    color: var(--gold);
+  }
+  .gbank-log-filter[aria-pressed="true"] {
+    color: var(--gold);
+    border-color: var(--color-border-focus);
+    background: #221c14;
+  }
+  /* The list's tail: the show-older button, its in-flight line, or the
+     start-of-history line. Inside the scroller, after the rows, so it is met
+     exactly where a reader runs out of history. */
+  .gbank-log-foot {
+    flex: none;
+    margin: 6px 0 2px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  .gbank-log-older {
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+    color: var(--gold-dim);
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    padding: 4px 12px;
+  }
+  .gbank-log-older:hover,
+  .gbank-log-older:focus-visible {
+    color: var(--gold);
+  }
+  /* The history TABLE. Four columns under a header row that STAYS PINNED to
+     the top of the .bank-scroll scroller (position: sticky needs the header's
+     own opaque background, or the rows show through it as they pass under).
+     border-spacing 0 rather than border-collapse: a collapsed border on a
+     sticky header does not travel with it in every engine. Each row is
+     separated by its own rule and the zebra stripe, so a long list reads as
+     lines rather than as a slab of text. */
+  .gbank-log-list {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+  }
+  .gbank-log-list th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    text-align: left;
+    font-family: var(--title-font);
+    font-weight: normal;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    background: #1a1410;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--color-border-showcase);
+  }
+  .gbank-log-list td {
+    padding: 5px 8px;
+    vertical-align: top;
+    border-bottom: 1px solid #2a2118;
     background: #17120e;
   }
-  .gbank-log-row:nth-child(even) {
+  .gbank-log-row:nth-child(even) td {
     background: #1c1611;
   }
   .gbank-log-time {
-    flex: none;
     font-size: 10px;
     color: var(--color-text-muted);
     white-space: nowrap;
   }
+  /* Names are player text of unbounded width: wrap rather than clip. */
+  .gbank-log-member {
+    color: var(--gold-dim);
+    overflow-wrap: anywhere;
+  }
+  .gbank-log-action {
+    white-space: nowrap;
+  }
+  /* Direction is a TINT on top of the Action word, never the only signal:
+     something coming in reads a little brighter, something going out a
+     little redder. */
+  .gbank-log-in .gbank-log-action {
+    color: var(--color-text-success);
+  }
+  .gbank-log-out .gbank-log-action {
+    color: var(--color-text-error);
+  }
   .gbank-log-text {
-    font-size: 12px;
-    /* Names and item names are player/content text of unbounded width: wrap
-       rather than clipping a sentence a player is meant to be able to read. */
+    /* Item names are content text of unbounded width: wrap rather than
+       clipping a detail a player is meant to be able to read. */
     overflow-wrap: anywhere;
   }
   /* Loading / refused / empty all share the .bank-empty look; the refusal is
@@ -9520,6 +9873,196 @@
     font-family: var(--title-font);
     margin-top: -2px;
   }
+  /* ---------- cosmetics ---------- */
+  /* The Cosmetics window (src/ui/hud/cosmetics/): a cold window with the shared
+     WAI-ARIA tab strip and a card grid per tab. Cards are rebuilt on every
+     action (no per-frame writes). Colours are tokens throughout; the rarity chip
+     reuses the classic .q-* quality family and the scope badges read as plain
+     chips so the account/character split stays legible on every preset. */
+  #cosmetics-window {
+    width: 720px;
+    max-height: calc(var(--app-vh, 100vh) * 0.82 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #cosmetics-window.open {
+    display: flex;
+  }
+  #cosmetics-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  #cosmetics-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .cos-legend {
+    flex: none;
+    margin: 0 0 var(--spacing-sm);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .cos-tabs {
+    flex: none;
+    display: flex;
+    gap: 2px;
+    height: 32px;
+    border-bottom: 1px solid var(--color-border-default);
+    margin-bottom: var(--spacing-sm);
+  }
+  .cos-tab {
+    flex: 0 0 auto;
+    min-width: 72px;
+    padding: 0 var(--spacing-md);
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    color: var(--color-text-muted);
+    font: inherit;
+    cursor: pointer;
+  }
+  .cos-tab:hover {
+    color: var(--color-text-light);
+  }
+  .cos-tab.on {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+  .cos-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  .cos-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .cos-intro,
+  .cos-hint,
+  .cos-empty {
+    margin: 0 0 var(--spacing-sm);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .cos-hint {
+    color: var(--color-text-muted);
+  }
+  .cos-group {
+    margin-bottom: var(--spacing-md);
+  }
+  .cos-group-title {
+    margin: 0 0 var(--spacing-xs);
+    font-size: 13px;
+    color: var(--color-accent);
+  }
+  .cos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+  }
+  .cos-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.25);
+  }
+  .cos-card:hover,
+  .cos-card:focus-within {
+    border-color: var(--gold);
+  }
+  .cos-card.worn {
+    border-color: var(--color-accent);
+    background: rgba(120, 90, 30, 0.28);
+  }
+  .cos-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 11px;
+  }
+  .cos-scope {
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 10px;
+  }
+  .cos-scope-worn {
+    color: var(--gold);
+    border-color: var(--color-accent);
+  }
+  .cos-rarity {
+    margin-left: auto;
+    font-size: 11px;
+  }
+  .cos-card-name {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-text-light);
+  }
+  .cos-card-desc,
+  .cos-card-hint {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .cos-mech-swatch {
+    height: 24px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-default);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .cos-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    margin-top: auto;
+  }
+  .cos-state {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .cos-state.worn {
+    color: var(--gold);
+  }
+  .cos-action {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 0 var(--spacing-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-light);
+    font: inherit;
+    cursor: pointer;
+  }
+  .cos-action:hover {
+    border-color: var(--gold);
+  }
+  .cos-action:active {
+    transform: translateY(1px);
+  }
+  .cos-action:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .cos-action:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+  .char-cosmetics-btn {
+    margin-top: var(--spacing-xs);
+    min-height: 40px;
+  }
   /* ---------- reliquary ---------- */
   /* The Reliquary: cold collection browser (summary strip, shelf rail,
      Overview recent/nearly, shelf page rows, page grids, search + filter).
@@ -10383,23 +10926,100 @@
      positions are build-time inline writes; ring strokes carry
      vector-effect="non-scaling-stroke" so these pixel widths survive the
      unit-circle viewBox. Semantic colours come from tokens; the showcase
-     hairline is the shared --color-border-showcase token, and the remaining
-     inset-card cosmetics (rgba card fills, the ring stage haze) are
-     deliberate literals shared with the char-window showcase family. */
+     hairline is the shared --color-border-showcase token and the card fills
+     its --color-card-inset companion (phase 14); the ring stage haze stays a
+     deliberate literal shared with the char-window showcase family, and so
+     does the .prof-track-step.filled inset bevel (the same 0.28 white bevel
+     .prof-bar-fill in this section already spells; both await the DESIGN.md
+     foundation-phase token pass with the recorded wash/scrim literals). */
   #professions-window {
     width: 720px;
     max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);
     flex-direction: column;
   }
-  #professions-window .panel-title {
+  /* ONE title treatment for the column-flex professions windows (phase 14:
+     four byte-identical copies collapsed; the crafting window keeps its own
+     relative-positioned title because its close button pins differently). */
+  #professions-window .panel-title,
+  #harvest-journal-window .panel-title,
+  #plant-sheet-window .panel-title,
+  #perfecting-window .panel-title {
     flex: none;
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  #professions-window .panel-title > span {
+  #professions-window .panel-title > span,
+  #harvest-journal-window .panel-title > span,
+  #plant-sheet-window .panel-title > span,
+  #perfecting-window .panel-title > span {
     flex: 1 1 auto;
     min-width: 0;
+  }
+  /* ONE empty-state family for the professions windows (phase 14: the
+     harvest journal's shape, the best of the four the family had grown, now
+     the only one): a centered quiet block, optional small-caps title over a
+     muted body line. Whole-window empties carry both; a section or list
+     empty carries the body alone. */
+  .prof-empty {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    text-align: center;
+  }
+  .prof-empty h3 {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+    color: var(--gold);
+  }
+  .prof-empty p {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  /* ONE progress/track family for the professions windows (phase 14,
+     DESIGN.md 10.5): a stepped rank or growth track plus its status text.
+     Consumers: the Perfecting rank track (perfecting_window.ts) and the
+     Harvest Journal's growth stages and countdown (harvest_journal_window.ts).
+     Dark cells on the one-pixel dark keyline (--panel-edge, the panel's own
+     keyline shade), colored fill with a one-pixel top highlight, tabular
+     status text so ticking digits do not jitter their row. */
+  .prof-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .prof-track-steps {
+    display: inline-flex;
+    gap: 4px;
+  }
+  .prof-track-step {
+    width: 22px;
+    height: 8px;
+    border: 1px solid var(--panel-edge);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+  }
+  .prof-track-step.filled {
+    background: var(--gold-dim);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+  /* The compact variant for dense rows (the journal's per-row growth
+     stages): same anatomy, smaller cells; two sizes, one primitive. */
+  .prof-track-steps.compact .prof-track-step {
+    width: 12px;
+    height: 6px;
+    border-radius: 3px;
+  }
+  .prof-track-text {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
   }
   .prof-scroll {
     flex: 1 1 auto;
@@ -10434,7 +11054,7 @@
     padding: 10px 14px 12px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
-    background: rgba(0, 0, 0, 0.24);
+    background: var(--color-card-inset);
   }
   /* The hero band: the identity card beside the wheel on its stage. */
   .prof-hero {
@@ -10711,6 +11331,14 @@
      Padding narrows on fine pointers; coarse pointers get the explicit
      40px target floor the sibling window buttons set (the delve board
      idiom), since .btn itself carries no floor. */
+  .prof-harvest-body {
+    margin-bottom: 12px;
+  }
+  .prof-harvest-body-hint {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+  }
   .prof-effect-actions {
     display: flex;
     flex-wrap: wrap;
@@ -10722,6 +11350,14 @@
     margin-right: 0;
     padding: 2px 10px;
     font-size: 11px;
+  }
+  /* The Harvest Preference entry's remembered-choice subtitle: opacity, not
+     colour, distinguishes it from the button's own label text. */
+  .prof-harvest-preference-current {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    opacity: 0.75;
   }
   /* The R40 prompt-mode chip on a live slot line: words, not hue, per the
      color-independence rule (the chip IS the second signal). */
@@ -10775,6 +11411,554 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
+  /* ---------- harvest journal ---------- */
+  /* The Harvest Journal: a cold, read-only list of the caller's own planted
+     garden beds over IWorldFarming. One row per plot (crop name, bed location,
+     state, plant-time care), with a 1 Hz countdown that rewrites only the
+     .hj-time text. IDENTICAL ON EVERY GRAPHICS PRESET AND FPS TIER: a crop
+     timer is actionable information, so nothing here is preset- or tier-gated.
+     The rows ride the showcase inset-card idiom the professions sections use;
+     the two state hues are the shared success/error text tokens and never the
+     only signal (each state also says its word). */
+  #harvest-journal-window {
+    width: 520px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  .hj-body {
+    flex: 1 1 auto;
+    min-height: 120px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .hj-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Two columns: what and where on the left, when and how tended on the
+     right. Both columns wrap rather than truncate, so a long localized crop
+     or zone name stays readable. */
+  .hj-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    gap: 2px 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: var(--color-card-inset);
+  }
+  .hj-crop {
+    grid-column: 1;
+    min-width: 0;
+    font-weight: 600;
+    color: var(--color-text-light);
+  }
+  .hj-bed {
+    grid-column: 1;
+    min-width: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .hj-state {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+  }
+  /* The growth-stage step track (the shared .prof-track family): the cells
+     are blocks, so they center in the baseline-aligned state row instead of
+     hanging from the text baseline. */
+  .hj-state .prof-track-steps {
+    align-self: center;
+  }
+  /* .hj-time rides the shared .prof-track-text style (the family above);
+     only the settled-state tints live here, and each is never the only
+     signal (the cell also says its word). */
+  .hj-ready .hj-time {
+    color: var(--color-text-success);
+  }
+  .hj-withered .hj-time {
+    color: var(--color-text-error);
+  }
+  .hj-stage {
+    font-size: 11px;
+    font-variant: small-caps;
+    letter-spacing: 0.04em;
+    color: var(--gold-dim);
+  }
+  .hj-care {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  .hj-care-chip {
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: var(--color-bg-input);
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .hj-care-none {
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  /* The journal's repaint wrapper: the whole title + body re-renders inside
+     it while the status line beside it persists (a live region must never be
+     destroyed and re-inserted). display: contents keeps the title and body
+     laying out as the root's own flex children, exactly as before. */
+  .hj-content {
+    display: contents;
+  }
+  /* The in-dialog ready announcement. The empty role=status node stays in
+     the accessibility tree before its first content mutation; collapsing it
+     with display:none would make that first announcement unreliable. */
+  .hj-live-status {
+    margin: 6px 14px 10px;
+    font-size: 11px;
+    color: var(--gold);
+  }
+  .hj-live-status:empty {
+    margin: 0;
+  }
+
+  /* ---------- plant sheet ---------- */
+  /* The plant sheet (#plant-sheet-window, the bed verbs): the window a press
+     on a free garden bed opens. Seed rows are single-select RADIOS in a
+     radiogroup (aria-checked carries the pick, the Phase 14 a11y batch) and
+     the three care knobs are aria-pressed toggles, all on the 40px touch
+     floor; hue is never the only signal (a short knob also says its reason).
+     Reuses the journal's inset-card idiom and the shared window chrome. */
+  #plant-sheet-window {
+    width: 440px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  .ps-body {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-y: auto;
+    padding-right: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ps-seed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    /* The input-surface token its sibling .ps-knob already rides (Phase 14
+       style batch): the raw 24%-black scrim read a shade apart from the knobs
+       in the same sheet and drifted from the tokens the theme presets drive. */
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  /* The seed rows are radios since the Phase 14 a11y batch (single-select),
+     so the picked state rides aria-checked, never aria-pressed. */
+  .ps-seed[aria-checked="true"] {
+    border-color: var(--gold);
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .ps-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 600;
+  }
+  .ps-count {
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .ps-locked {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    padding: 8px 10px;
+    border: 1px dashed var(--color-border-showcase);
+    border-radius: 7px;
+    color: var(--color-text-muted);
+  }
+  .ps-locked .ps-name {
+    flex: none;
+  }
+  .ps-reason {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .ps-knobs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ps-knob {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--color-text-muted);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .ps-knob[aria-pressed="true"] {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .ps-knob:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .ps-knob-name {
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .ps-knob-leg {
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .ps-leg-count {
+    font-variant-numeric: tabular-nums;
+    padding-left: 3px;
+  }
+  .ps-knob-short {
+    font-size: 10px;
+    color: var(--color-text-error);
+  }
+  .ps-plant {
+    align-self: flex-end;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--gold);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  /* ---------- perfecting window ---------- */
+  /* The Perfecting window (#perfecting-window, Masterwrought phase 14): the
+     apex rank track and the orange promotion. Candidate rows are single-select
+     RADIOS in a radiogroup (aria-checked carries the pick, the plant-sheet
+     shape) on the 40px touch floor; every state pairs its tint with text
+     (rank label, warning sentences), never color alone. Column-flex window
+     family; .pf-body is the ONE scroller (the capped-flex rule). */
+  /* The repaint targets .pf-shell so the sibling role=status region is a
+     persistent node (the harvest journal's structural trick); display:
+     contents keeps the column-flex layout reading the shell's children as
+     the window's own. The status line is aria-only here (the rank track and
+     the Perfected lead already SHOW the state; the region announces it), so
+     it is clipped off-screen rather than painted, unlike .hj-live-status
+     whose text is the journal's visible status line. */
+  .pf-shell {
+    display: contents;
+  }
+  .pf-live-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  #perfecting-window {
+    width: 460px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  .pf-body {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-y: auto;
+    padding-right: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-cand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .pf-cand[aria-checked="true"] {
+    border-color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .pf-cand-socket {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+  }
+  .pf-cand-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pf-cand-names {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .pf-cand-sub {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    line-height: 1.2;
+    color: var(--color-text-muted);
+  }
+  .pf-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  /* The promoted legend's name tint: the WCAG-lifted legendary quality-name
+     token in tokens.css (--mkt-name-legendary is #ffab5e, NOT the icon
+     palette's QUALITY_COLOR.legendary #ff8000, which fails AA on the panel
+     ground; the token block documents the lift and this window is its
+     second consumer family beside the market name); the adjacent state TEXT
+     stays the signal. */
+  .pf-name.q-legendary,
+  .pf-detail-name.q-legendary {
+    border: none;
+    box-shadow: none;
+    color: var(--mkt-name-legendary);
+  }
+  .pf-chip {
+    flex: none;
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .pf-cand-state {
+    flex: none;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+  .pf-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+  }
+  .pf-detail-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pf-detail-names {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .pf-detail-name {
+    font-weight: 600;
+  }
+  .pf-detail-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  /* The rank track rides the shared .prof-track family (the professions
+     section above): the steps are aria-hidden decoration, .pf-track-label is
+     the accessible text. Only the settled-state fills live here; the keyline
+     stays the family's constant dark one (DESIGN.md 10.5), and each tint is
+     never the only signal (the label says the state's word). */
+  .pf-track[data-state="perfected"] .pf-step.filled {
+    background: var(--gold);
+  }
+  .pf-track[data-state="promoted"] .pf-step.filled {
+    background: var(--mkt-name-legendary);
+  }
+  .pf-track[data-state="promoted"] .pf-track-label {
+    color: var(--mkt-name-legendary);
+  }
+  .pf-lead {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .pf-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .pf-warning .ui-icon {
+    flex: none;
+    color: var(--gold);
+  }
+  .pf-mats-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .pf-mats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-mat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pf-mat-count {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+  }
+  .pf-mat.short .pf-mat-count {
+    color: var(--color-text-error);
+  }
+  .pf-skill {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .pf-skill.unmet .pf-skill-state {
+    color: var(--color-text-error);
+  }
+  .pf-action {
+    align-self: flex-end;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--gold);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .pf-action:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .pf-swap-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid var(--color-border-showcase);
+    padding-top: 12px;
+  }
+  .pf-swap-section h3,
+  .pf-swap-section p {
+    margin: 0;
+  }
+  .pf-swap-preview {
+    padding-left: 20px;
+    overflow-wrap: anywhere;
+  }
+  .pf-swap-preview li + li {
+    margin-top: 8px;
+  }
+  /* The naming prompt (#prompt-stack tenant) and the bind confirm: the shared
+     .prompt panel chrome plus the name form's own rows. The 16px mobile input
+     floor is base.css's coarse-pointer rule; nothing here undercuts it. */
+  .pf-name-label {
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .pf-name-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .pf-name-count {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+    text-align: right;
+  }
+  .pf-name-hint {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .pf-name-hint[data-invalid="true"] {
+    color: var(--color-text-error);
+  }
+  .pf-name-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
   /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */
   /* The quest log, mailbox, social panel, and spellbook adopt the shared
      window-frame grammar (src/ui/window_frame.ts; spec 6.1 + 8). Each mounts the
@@ -13308,6 +14492,25 @@
       0 0 3px #000;
     pointer-events: none;
   }
+  /* Pattern mark: the third corner of the same family, BOTTOM-LEFT. The heroic
+     star holds top-left and the armor pips bottom-right, and bottom-left is the
+     corner that cannot collide with either: an armor pattern is not itself
+     armor so it draws no pips, while a pattern CAN be heroic, and both must
+     stay readable at once. Parchment-toned rather than gold, so the two marks
+     never read as one repeated cue; the lozenge glyph is distinguishable from
+     the star in silhouette alone, which is what carries it in grayscale. */
+  .mkt-pattern-mark {
+    position: absolute;
+    left: -3px;
+    bottom: -3px;
+    font-size: 10px;
+    line-height: 1;
+    color: var(--color-text-light);
+    text-shadow:
+      0 1px 2px var(--text-outline-color),
+      0 0 3px var(--text-outline-color);
+    pointer-events: none;
+  }
   /* Price is the number a shopper is actually comparing, so give it real weight.
      The market paints a gold-dominant, coinless, copper-trimmed block
      (market_price_view.ts): the largest denomination is the big headline, the
@@ -13756,6 +14959,258 @@
     width: min(880px, calc(100vw - 32px));
     --kb-btn-w: 96px;
   }
+  /* Key Bindings panel: the keyboard overview (src/ui/keyboard_map.ts). Keys sit
+     on a quarter-unit grid so the 1.25 / 1.5 / 2.25-wide caps line up; a key in
+     use takes its category colour, a dot marks bindings in other modifier
+     layers, and the detail line under the board spells the hovered key out. */
+  .kbm {
+    margin: 4px 0 10px;
+    --kbm-u: 34px;
+    /* Cap colours and the five category tints (shared by the caps and the
+       legend swatches); a new category adds one token here and one rule pair. */
+    --kbm-key-bg: #1a150e;
+    --kbm-key-fg: #b9ac82;
+    --kbm-key-fg-active: #f4ead0;
+    --kbm-text: #e8dcb8;
+    --kbm-cat-movement: #2f5a34;
+    --kbm-cat-targeting: #6a3a2a;
+    --kbm-cat-interface: #2d4a66;
+    --kbm-cat-pet: #5a4a7a;
+    --kbm-cat-action-bar: #7a5a1e;
+  }
+  .kbm-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .kbm-title {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  /* The option rows under the board: modifier layer, keyboard size and (when
+     the OS layout is not QWERTY) which legends to print. */
+  .kbm-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .kbm-opt-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+  .kbm-opt-label {
+    min-width: 96px;
+    font-size: 11px;
+    color: var(--kbm-key-fg);
+  }
+  .kbm-layers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .kbm-popout {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+  /* Bindings on keys the chosen keyboard size does not draw. */
+  .kbm-hidden {
+    margin-top: 4px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--kbm-key-fg);
+  }
+  .kbm-layer {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+  .kbm-layer[aria-pressed="true"] {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  .kbm-board {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .kbm-block {
+    display: grid;
+    grid-template-columns: repeat(var(--kbm-cols), calc(var(--kbm-u) / 4));
+    grid-auto-rows: var(--kbm-u);
+    flex: none;
+  }
+  .kbm-key {
+    position: relative;
+    grid-column: span var(--kbm-w);
+    grid-row: span var(--kbm-h);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    margin: 1.5px;
+    padding: 0 2px;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--kbm-key-bg);
+    color: var(--kbm-key-fg);
+    font: inherit;
+    font-size: 10px;
+    line-height: 1.1;
+    cursor: var(--cursor-point);
+  }
+  .kbm-key:hover {
+    border-color: var(--gold);
+  }
+  /* The same steady token ring every .btn carries (the caps are not .btn). */
+  .kbm-key:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .kbm-key.in-use {
+    color: var(--kbm-key-fg-active);
+  }
+  .kbm-key.capturing {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold);
+  }
+  /* A cap that can never take a binding (Escape, the modifier keys) reads as
+     a plain key, not a control. */
+  .kbm-key.kbm-fixed,
+  .kbm-key:disabled {
+    cursor: default;
+    opacity: 1;
+  }
+  .kbm-key:disabled:hover {
+    border-color: var(--border);
+  }
+  .kbm-spacer {
+    visibility: hidden;
+  }
+  .kbm-legend {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .kbm-action {
+    max-width: 100%;
+    font-size: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.95;
+  }
+  .kbm-dot {
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .kbm-cat-movement.in-use,
+  .kbm-swatch.kbm-cat-movement {
+    background: var(--kbm-cat-movement);
+  }
+  .kbm-cat-targeting.in-use,
+  .kbm-swatch.kbm-cat-targeting {
+    background: var(--kbm-cat-targeting);
+  }
+  .kbm-cat-interface.in-use,
+  .kbm-swatch.kbm-cat-interface {
+    background: var(--kbm-cat-interface);
+  }
+  .kbm-cat-pet.in-use,
+  .kbm-swatch.kbm-cat-pet {
+    background: var(--kbm-cat-pet);
+  }
+  .kbm-cat-action-bar.in-use,
+  .kbm-swatch.kbm-cat-action-bar {
+    background: var(--kbm-cat-action-bar);
+  }
+  /* forced-colors strips the category fills and the layer dot, so an in-use
+     cap and an empty one would read identically (the #tf-name.hostile class of
+     failure): a redundant non-colour cue on the cap and the capturing ring. */
+  @media (forced-colors: active) {
+    .kbm-key.in-use {
+      border-width: 2px;
+      border-color: Highlight;
+      text-decoration: underline;
+    }
+    .kbm-key.capturing {
+      outline: 2px dashed Highlight;
+    }
+  }
+  .kbm-legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--kbm-key-fg);
+  }
+  .kbm-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .kbm-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+  .kbm-swatch-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: none;
+    background: var(--gold);
+    margin: 0 2px;
+  }
+  .kbm-detail {
+    min-height: 14px;
+    margin-top: 4px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--kbm-text);
+  }
+  /* Unbind / Cancel while a capture is armed, or the assign picker for an
+     empty key; sits under the detail line. */
+  .kbm-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  /* The pop-out window (src/ui/keyboard_map_window.ts): the same board in a
+     movable panel that can stay up while playing. Desktop only. */
+  #keyboard-map-window {
+    width: min(900px, calc(100vw - 48px));
+    padding: 0 10px 10px;
+  }
+  #keyboard-map-window .kbm {
+    margin-top: 6px;
+  }
+  #keyboard-map-window .kbm-title {
+    display: none;
+  }
   .kb-cols {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -13957,6 +15412,15 @@
   .transfer-pane[hidden] {
     display: none;
   }
+  /* The Key Bindings panel's hotkey-setup Export/Import row: sits between the
+     binding columns and the Reset/Back buttons, with the same expando. */
+  .kb-transfer {
+    margin: 0 0 8px;
+  }
+  /* The Import / Export sub-panel's body around the Full Settings row. */
+  .transfer-body {
+    margin: 8px 0;
+  }
   .transfer-code {
     width: 100%;
     min-height: 72px;
@@ -14012,6 +15476,35 @@
   .graphics-apply-btn {
     min-width: 132px;
     margin: 0;
+  }
+  /* The restart strip (restart_strip_painter.ts): a next-launch setting changed, so
+     the panel offers "Restart game" where Apply cannot help. Same row shape
+     as .gfx-footer, boxed so it reads as its own notice above the action row. */
+  .restart-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.25);
+  }
+  .restart-strip .btn {
+    margin: 0;
+    min-width: 132px;
+  }
+  .restart-strip-status {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: var(--color-text-muted);
+    font-size: 11.5px;
+    line-height: 1.4;
+  }
+  .restart-strip-status[role="alert"] {
+    color: var(--color-text-error);
+    font-weight: 700;
   }
   .set-seg {
     display: flex;
@@ -14072,6 +15565,14 @@
   }
   .gfx-card .set-row:has(.set-choice) > .set-choice {
     grid-column: auto;
+  }
+  /* A live reading inside a control row (the graphics backend's "currently
+     using X"), under its buttons rather than beside the row: the wide cards
+     below flow their children two-up, so a note of its own would shift every
+     row after it by a cell. Tighter above than a standalone note, which
+     separates two rows; this one belongs to the buttons over it. */
+  .set-note-inline {
+    margin: 2px 0 0;
   }
   /* Full-width cards (Display / System / Touch) span both columns below the
      dial cards; their single-height rows flow two-up so the closing band
@@ -17023,7 +18524,7 @@
      borrowing the store's palette. */
   #woc-market-window .wm-banner-wallet {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(160px, 220px);
+    grid-template-columns: minmax(0, 1fr) auto minmax(160px, 220px) auto;
     grid-template-rows: auto auto;
     gap: 4px var(--spacing-md);
     align-items: start;
@@ -17048,6 +18549,17 @@
     align-self: center;
     width: 100%;
     white-space: nowrap;
+  }
+  /* The dismiss glyph: the window-chrome .x-btn family in the card's own
+     corner column, top-aligned like a title-bar close. It is one selector more
+     specific than the action-button rule above so the grid placement wins. */
+  #woc-market-window .wm-banner-wallet button.wm-banner-dismiss {
+    grid-column: 4;
+    grid-row: 1;
+    align-self: start;
+    width: auto;
+    min-height: 0;
+    line-height: 1;
   }
   #woc-market-window .wm-wallet-balance {
     grid-column: 2;
@@ -17937,4 +19449,359 @@
   font-size: 12px;
   line-height: 1.25;
   font-weight: 600;
+}
+
+@layer components {
+  /* ---------- material sources ---------- */
+  .material-source-item {
+    min-width: 0;
+  }
+  .material-source-item-cell {
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: 4px;
+    align-items: stretch;
+  }
+  .material-source-item-cell > :is(.bag-item, .bank-item) {
+    width: 100%;
+    min-width: 40px;
+  }
+  .material-source-item-cell > .material-sources-action {
+    width: 100%;
+    padding-inline: 2px;
+    font-size: 10px;
+  }
+  .material-source-item-market,
+  .material-source-item-trade {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px;
+    align-items: stretch;
+  }
+  .material-source-item-market > .mkt-row,
+  .material-source-item-trade > .trade-item {
+    min-width: 0;
+    width: 100%;
+  }
+  .material-source-item-mail {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 4px;
+    min-width: 0;
+  }
+  .material-sources-action {
+    overflow-wrap: anywhere;
+    margin: 0;
+    box-sizing: border-box;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 3px 6px;
+    font-size: 10.5px;
+    line-height: 1.1;
+    white-space: normal;
+  }
+  .material-sources-action:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .material-sources-dialog {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: min(460px, calc(100vw - 24px));
+    max-height: min(calc(66vh - 12px), 620px);
+    text-align: left;
+  }
+  .material-sources-dialog .panel-title {
+    flex: none;
+  }
+  .material-sources-summary {
+    margin: 2px 0 8px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+  .material-sources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .material-sources-row {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 4px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--panel-base) 88%, var(--panel-edge));
+  }
+  .material-sources-label,
+  .material-sources-row-label {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .material-sources-label {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+  }
+  .material-sources-quantity {
+    display: grid;
+    grid-template-columns: 40px 64px 40px;
+    gap: 4px;
+    align-items: stretch;
+    flex: none;
+  }
+  .material-sources-step {
+    margin: 0;
+    box-sizing: border-box;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 2px;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .material-sources-row input {
+    box-sizing: border-box;
+    width: 64px;
+    min-height: 40px;
+    padding: 5px 7px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font: 12px var(--ui-font);
+    text-align: center;
+  }
+  .material-sources-row input:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .material-sources-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex: none;
+    padding-top: 10px;
+  }
+  .material-sources-footer .btn {
+    margin: 0;
+    min-height: 40px;
+  }
+  @media (pointer: coarse) {
+    .material-sources-action,
+    .material-sources-row,
+    .material-sources-row input,
+    .material-sources-step,
+    .material-sources-footer .btn {
+      min-height: 44px;
+    }
+    .material-sources-action,
+    .material-sources-step {
+      min-width: 44px;
+    }
+    .material-sources-quantity {
+      grid-template-columns: 44px 64px 44px;
+    }
+  }
+  @media (forced-colors: active) {
+    .material-sources-action:focus-visible,
+    .material-sources-row input:focus-visible {
+      outline-color: Highlight;
+    }
+  }
+}
+
+/* ---------- Loot Explorer ---------- */
+/* Cold window (src/ui/hud/loot_explorer/loot_explorer_window.ts): a
+     searchable, filterable catalog of every item and where to get it. Reuses
+     the shared .item-icon quality frame above and the .soc-tabs/.soc-tab
+     WAI-ARIA strip look under its own class names (the reliquary-search
+     precedent for the search field). Rows and encounter cards share one
+     card look (border/radius/fill); the 16px search font is the iOS
+     anti-zoom floor (.reliquary-search / .deed-search), not a taste call.
+     Wrapped in @layer components (like every other section in this file):
+     unlayered rules here would outrank the layered body.mobile-touch
+     #loot-explorer-window overrides in hud.mobile.css (@layer hud-mobile),
+     silently defeating the mobile sizing/scrolling rules for this window. */
+@layer components {
+  #loot-explorer-window {
+    width: min(90vw, 760px);
+    height: min(85vh, 760px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .loot-explorer-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    padding: 4px 0 8px;
+    flex: none;
+  }
+  .loot-explorer-search,
+  .loot-explorer-filter {
+    font-family: var(--ui-font);
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid #5a4a2e;
+    background: #14110b;
+    color: inherit;
+  }
+  .loot-explorer-search {
+    flex: 1 1 180px;
+    min-width: 120px;
+    font-size: 16px;
+  }
+  .loot-explorer-filter {
+    flex: 1 1 120px;
+    min-width: 100px;
+    font-size: 13px;
+  }
+  .loot-explorer-search:focus-visible,
+  .loot-explorer-filter:focus-visible,
+  .loot-explorer-tab:focus-visible,
+  .loot-explorer-row:focus-visible,
+  .loot-explorer-drop:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .loot-explorer-search,
+  body.mobile-touch .loot-explorer-filter {
+    min-height: 40px;
+  }
+  .loot-explorer-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 0 0 8px;
+    flex: none;
+  }
+  .loot-explorer-tab {
+    flex: 1;
+    padding: 7px 0;
+    font-size: 13px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .loot-explorer-tab:hover {
+    color: var(--gold);
+  }
+  .loot-explorer-tab.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+    background: linear-gradient(#2a2436, #161220);
+  }
+  .loot-explorer-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .loot-explorer-empty {
+    padding: 24px 8px;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 13px;
+  }
+  .loot-explorer-row,
+  .loot-explorer-encounter {
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border-showcase);
+    background: #14110b;
+  }
+  .loot-explorer-row {
+    display: flex;
+    gap: 8px;
+  }
+  .loot-explorer-row-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .loot-explorer-item-name {
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .loot-explorer-sources {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .loot-explorer-source {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .loot-explorer-source-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .loot-explorer-source-detail {
+    flex: none;
+    color: var(--gold-dim);
+  }
+  .loot-explorer-encounter-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .loot-explorer-cat-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: #2a2436;
+    color: var(--gold-dim);
+    flex: none;
+  }
+  .loot-explorer-diff {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-left: auto;
+  }
+  .loot-explorer-drop-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .loot-explorer-drop {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: #1a1410;
+    font-size: 11px;
+    max-width: 220px;
+  }
+  .loot-explorer-drop span:first-of-type {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

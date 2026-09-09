@@ -23,8 +23,12 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_client_pe
 import type { PoolClient, QueryResult } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { clientPerfSummary } from '../../server/admin_db';
-import type { ClientPerfSummaryRow } from '../../server/client_perf_summary_shape';
+import type {
+  ClientPerfModelRow,
+  ClientPerfSummaryRow,
+} from '../../server/client_perf_summary_shape';
 import { ensureSchema, pool } from '../../server/db';
+import { GL_MODEL_OTHER } from '../../server/gpu_model_bucket';
 
 // ---------------------------------------------------------------------------
 // Layer 1: always-run statement-count + text + mapping pins (mocked pool).
@@ -63,12 +67,17 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     vi.restoreAllMocks();
   });
 
-  it('issues exactly TWO real statements, the roll-up then the suggestion counts', async () => {
+  it('issues exactly THREE real statements: the roll-up, the GPU models, the suggestion counts', async () => {
     const spy = vi.spyOn(pool, 'query').mockResolvedValue(queryResult([]) as never);
     const out = await clientPerfSummary(24);
-    // Grew from one DELIBERATELY in phase 05 (ruling R14): any third statement
-    // here is a regression toward the old seven-read serialization.
-    expect(spy).toHaveBeenCalledTimes(2);
+    // Each growth here is DELIBERATE and each buys something a grouping set in
+    // the first statement cannot express: phase 05 (ruling R14) added the
+    // unnest over the suggestion_ids ARRAY, and the GPU model statement adds a
+    // PAIR-keyed set plus a per-set row filter (gpu_hp_adapter <> '') that the
+    // shared statement would have applied to every other set too. A FOURTH
+    // statement, or any of these split into per-bucket reads, is a regression
+    // toward the old seven-read serialization.
+    expect(spy).toHaveBeenCalledTimes(3);
     // Both ride ONE raised-timeout transaction: a second runWithStatementTimeout
     // would check out a second pooled client.
     expect(pool.connect).toHaveBeenCalledTimes(1);
@@ -78,13 +87,13 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     // The one statement computes the totals row and every bucket grouping.
     expect(sql).toContain('GROUP BY GROUPING SETS');
     expect(sql).toContain(
-      '((), (graphics_preset), (gfx_tier), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario), (crowd_bucket))',
+      '((), (graphics_preset), (gfx_tier), (gl_renderer_bucket), (gl_backend), (browser_family), (os_family), (zone_or_scenario), (crowd_bucket))',
     );
     expect(sql).toContain("WHERE created_at > now() - ($1 || ' hours')::interval");
     // Both orderings live in Postgres as window ranks (collation-proof: the
     // key ASC tie-break must never move into a JS string sort).
     expect(sql).toContain(
-      'ORDER BY sample_count DESC, COALESCE(graphics_preset, gfx_tier, gl_renderer_bucket, browser_family, os_family, zone_or_scenario, crowd_bucket) ASC',
+      'ORDER BY sample_count DESC, COALESCE(graphics_preset, gfx_tier, gl_renderer_bucket, gl_backend, browser_family, os_family, zone_or_scenario, crowd_bucket) ASC',
     );
     expect(sql).toContain('ORDER BY p95_frame_ms DESC, sample_count DESC');
     // The deliberate quirk: p99_frame_ms is percentile 0.99 over frame_p95_ms.
@@ -96,23 +105,78 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     // any bucket arm would empty that admin list, with only the env-gated
     // differential (skipped in normal CI) left to notice.
     expect(sql).toContain(
-      '(g_preset + g_gfxtier + g_gpu + g_browser + g_os + g_scenario + g_crowd = 7)',
+      '(g_preset + g_gfxtier + g_gpu + g_backend + g_browser + g_os + g_scenario + g_crowd = 8)',
     );
     // The per-set caps bound what crosses to Node; the gpu set keeps candidates
     // for BOTH orderings so a low-volume worst-p95 bucket still surfaces.
     expect(sql).toContain('(g_preset = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_gfxtier = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_gpu = 0 AND (vol_rank <= 50 OR worst_rank <= 20))');
+    expect(sql).toContain('(g_backend = 0 AND vol_rank <= 10)');
     expect(sql).toContain('(g_browser = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_os = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_scenario = 0 AND vol_rank <= 30)');
     expect(sql).toContain('(g_crowd = 0 AND vol_rank <= 8)');
 
-    // The SECOND statement: a bounded unnest aggregate over suggestion_ids
+    // The SECOND statement: the GPU model dimensions, ONE pass with two
+    // grouping sets over the same window.
+    const modelSql = String(spy.mock.calls[1][0]);
+    expect(spy.mock.calls[1][1]).toEqual(['24']);
+    expect(modelSql).toContain(
+      'GROUP BY GROUPING SETS ((os_family, gl_model), (os_family, gl_model, gpu_hp_adapter))',
+    );
+    expect(modelSql).toContain("WHERE created_at > now() - ($1 || ' hours')::interval");
+    // Everything that bounds this statement is in the HAVING, which prunes at
+    // AGGREGATION time: the rank caps below bound only what crosses to Node,
+    // never what Postgres materializes and sorts, and gl_model's key COUNT is
+    // client-influenced. Move either predicate to the outer SELECT and the
+    // server still sorts every junk group to return the same 100 rows.
+    expect(modelSql).toContain('HAVING count(*) >= 5');
+    // Every mismatch arm, each guarding a different way the list lies:
+    // adapter-less rows taking the slots, a report with an adapter but NO
+    // renderer string reading as a mismatch against nothing, an UNPARSED
+    // renderer ('other') reading as a disagreement when it is an absence of
+    // evidence, and agreeing rows taking the slots.
+    //
+    // The comparison is on the leading VENDOR segment of the two family keys,
+    // never the whole key: Chrome hands a normal page {vendor, architecture}
+    // and leaves device and description empty, so gpu_hp_adapter is usually
+    // vendor-level ('apple') beside a model-level gl_model ('apple-m4-pro'),
+    // and a whole-key comparison files every single-GPU Chrome client as a
+    // mismatch. tests/server/gpu_model_bucket.test.ts pins the vendor segment
+    // this leans on.
+    expect(modelSql).toContain(`gpu_hp_adapter NOT IN ('', '${GL_MODEL_OTHER}')`);
+    expect(modelSql).toContain(`gl_model NOT IN ('', '${GL_MODEL_OTHER}')`);
+    expect(modelSql).toContain(
+      "split_part(gpu_hp_adapter, '-', 1) <> split_part(gl_model, '-', 1)",
+    );
+    // The whole-key comparison is the defect this replaced; it must not return.
+    expect(modelSql).not.toContain('gpu_hp_adapter <> gl_model');
+    // 'other' is the only key excluded on top of the empty string: 'software'
+    // beside a real adapter is the most actionable mismatch there is.
+    expect(modelSql).not.toContain('software');
+    // Scoped to the triple set: the pair set must keep every model, mismatch
+    // or not, because it is the denominator the mismatch list is read against.
+    expect(modelSql).toContain('GROUPING(gpu_hp_adapter) = 1');
+    // The ranked CTE ranks; it must not also re-filter (a filter there would
+    // read correctly while leaving the intermediate unbounded).
+    expect(modelSql).not.toContain("WHERE g_hp = 1 OR gpu_hp_adapter <> ''");
+    expect(modelSql).toContain(
+      "ORDER BY sample_count DESC, os_family ASC, gl_model ASC, COALESCE(gpu_hp_adapter, '') ASC",
+    );
+    // Both sets capped in SQL, so only rows the response can show cross to Node.
+    expect(modelSql).toContain('(g_hp = 1 AND vol_rank <= 50)');
+    expect(modelSql).toContain('(g_hp = 0 AND vol_rank <= 50)');
+    // The vendor-level roll-up is untouched: the model dimensions ride their
+    // own statement precisely so its pinned grouping list cannot drift.
+    expect(sql).not.toContain('gl_model');
+    expect(sql).not.toContain('gpu_hp_adapter');
+
+    // The THIRD statement: a bounded unnest aggregate over suggestion_ids
     // (ruling R14), same hours window, deterministic ordering, capped in SQL
     // so only rows the response can show cross to Node.
-    const suggestionSql = String(spy.mock.calls[1][0]);
-    expect(spy.mock.calls[1][1]).toEqual(['24']);
+    const suggestionSql = String(spy.mock.calls[2][0]);
+    expect(spy.mock.calls[2][1]).toEqual(['24']);
     expect(suggestionSql).toContain('CROSS JOIN LATERAL unnest(suggestion_ids) AS s(id)');
     expect(suggestionSql).toContain("WHERE created_at > now() - ($1 || ' hours')::interval");
     expect(suggestionSql).toContain('GROUP BY s.id');
@@ -125,17 +189,22 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     expect(out.byGpu).toEqual([]);
     expect(out.byCrowd).toEqual([]);
     expect(out.suggestionCounts).toEqual([]);
+    expect(out.byModel).toEqual([]);
+    expect(out.byHpMismatch).toEqual([]);
   });
 
   it('clamps the hours window before it reaches SQL', async () => {
     const spy = vi.spyOn(pool, 'query').mockResolvedValue(queryResult([]) as never);
     await clientPerfSummary(0);
-    // Two statements per call now; both carry the clamped window.
+    // Three statements per call now; every one carries the clamped window, so
+    // a caller cannot widen the scan through the statement the pins forgot.
     expect(spy.mock.calls[0][1]).toEqual(['1']);
     expect(spy.mock.calls[1][1]).toEqual(['1']);
+    expect(spy.mock.calls[2][1]).toEqual(['1']);
     await clientPerfSummary(1000);
-    expect(spy.mock.calls[2][1]).toEqual(['168']);
     expect(spy.mock.calls[3][1]).toEqual(['168']);
+    expect(spy.mock.calls[4][1]).toEqual(['168']);
+    expect(spy.mock.calls[5][1]).toEqual(['168']);
   });
 
   it('maps canned GROUPING SETS rows through the ranks into the response arrays', async () => {
@@ -145,6 +214,7 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
       graphics_preset: null,
       gfx_tier: null,
       gl_renderer_bucket: null,
+      gl_backend: null,
       browser_family: null,
       os_family: null,
       zone_or_scenario: null,
@@ -152,6 +222,7 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
       g_preset: 1,
       g_gfxtier: 1,
       g_gpu: 1,
+      g_backend: 1,
       g_browser: 1,
       g_os: 1,
       g_scenario: 1,
@@ -166,6 +237,35 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
       avg_render_scale: 0.9,
       avg_effective_render_scale: 0.85,
     };
+    // The model statement's two grouping sets, told apart ONLY by g_hp: the
+    // pair rows roll gpu_hp_adapter up to NULL, the triple rows carry a value.
+    const modelBase: ClientPerfModelRow = {
+      os_family: 'windows',
+      gl_model: 'nvidia-rtx-4070',
+      gpu_hp_adapter: null,
+      g_hp: 1,
+      vol_rank: 1,
+      sample_count: 11,
+      median_fps: 55,
+      p95_frame_ms: 25,
+      p99_frame_ms: 33,
+      context_loss_count: 0,
+      avg_render_scale: 1,
+      avg_effective_render_scale: 1,
+    };
+    const modelRows: ClientPerfModelRow[] = [
+      { ...modelBase, vol_rank: 2, gl_model: 'intel-iris-xe', sample_count: 4 },
+      modelBase,
+      // The mismatch row: rendering on the iGPU with a 4070 available.
+      {
+        ...modelBase,
+        g_hp: 0,
+        gl_model: 'intel-iris-xe',
+        gpu_hp_adapter: 'nvidia-rtx-4070',
+        vol_rank: 1,
+        sample_count: 3,
+      },
+    ];
     vi.spyOn(pool, 'query')
       .mockResolvedValueOnce(
         queryResult([
@@ -196,6 +296,7 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
           { ...base, g_crowd: 0, crowd_bucket: '', vol_rank: 2, worst_rank: 2, sample_count: 2 },
         ]) as never,
       )
+      .mockResolvedValueOnce(queryResult(modelRows) as never)
       .mockResolvedValueOnce(
         queryResult([
           { suggestion_id: 'hardware-acceleration', sample_count: 4 },
@@ -215,6 +316,20 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     expect(out.suggestionCounts).toEqual([
       { id: 'hardware-acceleration', sampleCount: 4 },
       { id: 'integrated-gpu', sampleCount: 2 },
+    ]);
+    // Classified by the g_hp bit and ordered by the statement's rank, never by
+    // whether gpu_hp_adapter happens to be set on the row.
+    expect(out.byModel.map((b) => [b.osFamily, b.glModel])).toEqual([
+      ['windows', 'nvidia-rtx-4070'],
+      ['windows', 'intel-iris-xe'],
+    ]);
+    expect(out.byHpMismatch).toEqual([
+      expect.objectContaining({
+        osFamily: 'windows',
+        glModel: 'intel-iris-xe',
+        gpuHpAdapter: 'nvidia-rtx-4070',
+        sampleCount: 3,
+      }),
     ]);
   });
 });

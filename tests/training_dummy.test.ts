@@ -19,9 +19,15 @@ type RebucketSim = Sim & {
 // noPlayer+devCommands, spawned unconditionally regardless of cfg.world). No other
 // camp, npc, or ground object is ever targeted or asserted on, so the full built-in
 // world was pure Sim-construction overhead here.
+// Two `training_dummy` camps exist (the Highwatch hill and the Eastbrook hub,
+// content/practice_dummies.ts HUB_PRACTICE_DUMMY_CAMPS); this world keeps only
+// the Highwatch one so dummyOf() cannot pick up the hub's.
+const HIGHWATCH_DUMMY_Z = 648;
 const TRAINING_DUMMY_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
-  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'training_dummy'),
+  camps: BUILTIN_WORLD.camps.filter(
+    (camp) => camp.mobId === 'training_dummy' && camp.center.z === HIGHWATCH_DUMMY_Z,
+  ),
   npcs: {},
   groundObjects: [],
 };
@@ -170,7 +176,7 @@ describe('Highwatch training dummy', () => {
     expect(d.threat.size).toBe(0);
   });
 
-  it('lets Smokestep escape dummy combat without keeping target pressure', () => {
+  it('lets Smokefade escape dummy combat without keeping target pressure', () => {
     const sim = makeWorld();
     const d = dummyOf(sim);
     const pid = roguePlayerAt(sim, d.pos.x + 1, d.pos.z);
@@ -187,7 +193,7 @@ describe('Highwatch training dummy', () => {
 
     sim.castAbility('vanish', pid);
 
-    expect(rogue.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+    expect(rogue.auras.some((a) => a.name === 'Smokefade' && a.kind === 'stealth')).toBe(true);
     expect(rogue.cooldowns.has('vanish')).toBe(true);
     expect(rogue.inCombat).toBe(false);
     expect(rogue.autoAttack).toBe(false);
@@ -197,7 +203,7 @@ describe('Highwatch training dummy', () => {
 
     sim.tick();
 
-    expect(rogue.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+    expect(rogue.auras.some((a) => a.name === 'Smokefade' && a.kind === 'stealth')).toBe(true);
     expect(rogue.inCombat).toBe(false);
     expect(rogue.autoAttack).toBe(false);
   });

@@ -112,6 +112,20 @@ describe('admin permission vocabulary', () => {
     expect(permissionsForRoles([...ASSIGNABLE_ADMIN_ROLES]).has('guildbank.purge')).toBe(false);
   });
 
+  it('keeps moderation.clearItemName SUPERADMIN-only: no dashboard-grantable role reaches it', () => {
+    // The legendary-name strip destroys a player-authored name with no
+    // in-game undo, the guildbank.purge doctrine verbatim: outside every
+    // assignable role, `admin` and `moderator` included.
+    expect(SUPERADMIN_ONLY_PERMISSIONS).toContain('moderation.clearItemName');
+    for (const role of ADMIN_ROLES) {
+      const grants = new Set(ROLE_PERMISSIONS[role]).has('moderation.clearItemName');
+      expect(grants, `${role} grants moderation.clearItemName`).toBe(role === SUPERADMIN_ROLE);
+    }
+    expect(permissionsForRoles([...ASSIGNABLE_ADMIN_ROLES]).has('moderation.clearItemName')).toBe(
+      false,
+    );
+  });
+
   it('keeps the client permission mirror byte-identical to the server vocabulary', () => {
     expect([...CLIENT_ADMIN_PERMISSIONS]).toEqual([...ADMIN_PERMISSIONS]);
   });

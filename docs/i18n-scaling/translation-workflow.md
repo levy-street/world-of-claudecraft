@@ -40,14 +40,21 @@ one.
    - `index.html` / `admin.html` static text uses `data-i18n` / `data-i18n-title` /
      `data-i18n-aria` attributes pointing at a key; the boot localizer fills them.
 2. **`src/sim/` emit.** sim stays language-agnostic. Emit stable English, then in
-   `src/ui/sim_i18n.ts` add the English to `baseEnTable` + all 22 `BASE_DICT` blocks
-   and an `EXACT`/`RULES` matcher so `localizeSimText` re-renders it. `BASE_DICT` is
-   `Record<SupportedLanguage, ...>` so `tsc` forces all 22 locales; fill dialects
-   inline as **es_ES = es, fr_CA = fr_FR, en_CA = English**. The 8 newest locales
+   `src/ui/sim_i18n.ts` add the English to `baseEnTable` ONLY, plus an
+   `EXACT`/`RULES` matcher so `localizeSimText` re-renders it. Do NOT copy the
+   English into the locale `BASE_DICT` blocks: the assembled `DICT` spreads
+   `baseEnTable` under every locale, so the runtime already renders English for
+   an unfilled key, and the status registry reads each locale's OWN source block
+   (`simDictProvidedKeys`) so the unfilled row lands `pending` for the release
+   fill exactly like a main-scope key (Masterwrought Phase 19F, ruling
+   qr-19-sim-scope-pending-is-unreachable; before it the registry read the
+   assembled table and could never see a sim-scope row). A locale block carries a
+   key only when it carries a real translation; fill dialects inline as
+   **es_ES = es, fr_CA = fr_FR** (the sim DICT has no dialect inheritance) and
+   never en_CA (the English dialect inherits `en`). The 8 newest locales
    (cs_CZ, nl_NL, pl_PL, id_ID, tr_TR, sv_SE, vi_VN, da_DK) are spread in via
-   `...BASE_NEW`/`...PET_NEW` from the generated `sim_i18n.newlocales.ts` (regenerated
-   by the new-locale fill pipeline), so a new key must be English-filled in those
-   blocks too or `tsc` red-fails on the missing locale. Broad `(.+)` RULES go
+   `...BASE_NEW`/`...PET_NEW` from `sim_i18n.newlocales.ts` (hand-maintained since
+   the Drowned Litany fill; its GENERATED banner is historical). Broad `(.+)` RULES go
    AFTER every more-specific form that could also match them; the catch-all
    `unleashes` rule is the reference example, and anything a broad rule could
    swallow must be registered above it.

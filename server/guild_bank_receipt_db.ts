@@ -1,14 +1,30 @@
 // Receipt-gated guild-bank replay for character saves. The character fence
 // and bank-ledger command classifier run first; this module touches only the
 // newly claimed command sidecars, in ascending guild-row lock order.
+//
+// SOURCE CUSTODY. Each replayed sidecar carries the exact per-source legs its
+// command moved, so the book this transaction writes holds the units it really
+// moved rather than a whole-stack rewrite. The durable audit of that is the
+// container journal, and it is written HERE, in this same transaction, from the
+// two states this module actually has: the locked persisted BEFORE row (through
+// the one load path) and the POST-MERGE book it just wrote, so the journal can
+// never describe a book the receipt gate refused. One batched statement covers
+// every guild the save moved, after every guild row is written and in the same
+// ascending guild-id order the row locks were taken in; a save that moved no
+// material stock, and an empty receipt retry that queries no guild at all, pay
+// no source query either. A refusal from the journal core THROWS, which aborts
+// the caller's whole transaction: book, character, ledger rows and audit commit
+// together or not at all.
 
-import type { GuildBankOpDelta } from '../src/sim/guild_bank';
+import { type GuildBankOpDelta, sanitizeGuildBankState } from '../src/sim/guild_bank';
+import type { InvSlot } from '../src/sim/types';
 import type { BankLedgerBatchWriteResult } from './bank_ledger_batch_db';
 import {
   type BankLedgerCommandBatch,
   type SerializedBankLedgerGuildDelta,
   serializeBankLedgerGuildEffect,
 } from './bank_ledger_outbox';
+import { type GuildBookSourceChange, journalGuildBookSources } from './guild_bank_source_journal';
 import {
   GuildBankEscrowRefused,
   type GuildBankSave,
@@ -114,6 +130,9 @@ export function prepareGuildBankReceiptReplay(
 function replayDelta(delta: SerializedBankLedgerGuildDelta): GuildBankOpDelta {
   return {
     op: delta.op,
+    // JSON.parse, never a structured copy: it is what mints an OWN '__proto__'
+    // key back, so a payload that carried one survives the round trip whole and
+    // keeps the same identity the book grouped it under.
     itemId: delta.itemId,
     count: delta.count,
     instance: delta.instanceJson === null ? null : JSON.parse(delta.instanceJson),
@@ -121,6 +140,10 @@ function replayDelta(delta: SerializedBankLedgerGuildDelta): GuildBankOpDelta {
     copperDelta: delta.copperDelta,
     purchasedSlotsBefore: delta.purchasedSlotsBefore,
     purchasedSlotsAfter: delta.purchasedSlotsAfter,
+    // The receipt's own canonical legs, carried through verbatim: they are what
+    // makes this replay move the exact units the command moved, including a
+    // count-0 re-attribution whose unit total nets to nothing.
+    materialSources: delta.materialSources,
   };
 }
 
@@ -169,14 +192,34 @@ export async function writeClaimedGuildBankEffectsOnClient(
     }
   }
   const written: GuildBankWriteResult[] = [];
-  for (const save of saves) written.push(await writeGuildBankRow(client, save));
+  // Ascending guild id (guildBankSavesForNewClaims sorts), so the anchor upsert
+  // below takes its rows in the same order the guild_banks rows were locked in.
+  const sourceChanges: GuildBookSourceChange[] = [];
+  for (const save of saves) {
+    written.push(await writeGuildBankRow(client, save, sourceChanges));
+  }
   results?.push(...written);
+  // A refused book aborts the whole transaction, so its audit is never written:
+  // journalling first would only send a statement into a doomed transaction.
   if (written.some((result) => !result.written)) throw new GuildBankEscrowRefused(written);
+  await journalGuildBookSources(client, sourceChanges);
 }
 
+/** The persisted BEFORE state through the ONE load path, which is exactly the
+ *  base mergeGuildBankRow replayed onto. Reached only on a row the merge
+ *  accepted, so an oversized or malformed row never gets here (its write is
+ *  refused and the transaction aborts before anything is journalled). */
+function beforeInventory(durable: unknown): readonly InvSlot[] {
+  return sanitizeGuildBankState(durable).inventory;
+}
+
+/** Write one guild's book and record what the journal needs about it. `changes`
+ *  collects the locked persisted BEFORE state and the POST-MERGE book for every
+ *  row this transaction actually wrote; a refused row contributes nothing. */
 async function writeGuildBankRow(
   client: Queryable,
   save: GuildBankSave,
+  changes: GuildBookSourceChange[],
 ): Promise<GuildBankWriteResult> {
   const lockedRead = async () =>
     client.query(
@@ -198,8 +241,17 @@ async function writeGuildBankRow(
   }
   const row = read.rows?.[0];
   const oversized = row ? Number(row.data_bytes) > GUILD_BANK_ROW_MAX_BYTES : false;
-  const merged = mergeGuildBankRow(row ? (row.data ?? null) : null, save.deltas, { oversized });
+  const durable = row ? (row.data ?? null) : null;
+  const merged = mergeGuildBankRow(durable, save.deltas, { oversized });
   if (merged.data === null) return { guildId: save.guildId, ...merged.result };
+  // The journal's before-state is the SAME normalized reading of the SAME locked
+  // row the merge replayed onto, taken from the row already in hand: no extra
+  // query, and no chance of describing a state this transaction did not see.
+  changes.push({
+    guildId: save.guildId,
+    before: beforeInventory(durable),
+    after: merged.data.inventory,
+  });
   await client.query(
     `INSERT INTO guild_banks (guild_id, realm, data, updated_at) VALUES ($1, $2, $3, now())
      ON CONFLICT (guild_id) DO UPDATE SET realm = EXCLUDED.realm, data = EXCLUDED.data,

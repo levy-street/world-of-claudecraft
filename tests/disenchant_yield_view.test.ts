@@ -14,7 +14,10 @@ import {
   maxDisenchantYield,
 } from '../src/sim/professions/enchanting';
 import type { ItemDef } from '../src/sim/types';
-import { disenchantYieldLines, disenchantYieldPreview } from '../src/ui/disenchant_yield_view';
+import {
+  disenchantYieldLines,
+  disenchantYieldPreview,
+} from '../src/ui/hud/professions/disenchant_yield_view';
 
 /** A live disenchantable def of the requested quality and kind, so every arm is
  *  exercised against real content rather than a fixture. */

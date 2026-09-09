@@ -60,7 +60,29 @@ export type IgnivarEnvPropKey =
   | 'tower_base'
   | 'tower_middle'
   | 'tower_pillar'
-  | 'tower_top';
+  | 'tower_top'
+  // the Drakelands rebuild kit (the owner's town and keep pieces for the
+  // placer's custom kit; scripts/assets/build_drakelands_kit.mjs)
+  | 'barracks'
+  | 'building_1'
+  | 'building_2'
+  | 'building_base'
+  | 'building_base_roof'
+  | 'castle_door'
+  | 'church'
+  | 'dragon_statue'
+  | 'dummy'
+  | 'fence'
+  | 'gravestone_2'
+  | 'gravestone_3'
+  | 'horse_head'
+  | 'notice_board'
+  | 'shield_rack'
+  | 'signpost'
+  | 'stables'
+  | 'tavern_sign'
+  | 'weapon_rack'
+  | 'well_pump';
 
 export interface IgnivarPropPlacement {
   key: IgnivarEnvPropKey;
@@ -140,6 +162,27 @@ export const IGNIVAR_PROP_NATIVE: Record<
   tower_middle: { len: 0.7, hei: 1.0, dep: 0.63 },
   tower_pillar: { len: 0.53, hei: 1.0, dep: 0.52 },
   tower_top: { len: 0.66, hei: 1.0, dep: 0.39 },
+  // the Drakelands rebuild kit (build_drakelands_kit.mjs prints these rows)
+  barracks: { len: 1.0, hei: 0.67, dep: 0.75 },
+  building_1: { len: 1.0, hei: 0.84, dep: 0.82 },
+  building_2: { len: 0.74, hei: 1.0, dep: 0.73 },
+  building_base: { len: 1.0, hei: 0.55, dep: 0.82 },
+  building_base_roof: { len: 1.0, hei: 0.45, dep: 0.9 },
+  castle_door: { len: 0.88, hei: 1.0, dep: 0.27 },
+  church: { len: 0.74, hei: 1.0, dep: 0.55 },
+  dragon_statue: { len: 0.61, hei: 1.0, dep: 0.54 },
+  dummy: { len: 0.59, hei: 1.0, dep: 0.4 },
+  fence: { len: 1.0, hei: 0.46, dep: 0.14 },
+  gravestone_2: { len: 0.86, hei: 1.0, dep: 0.33 },
+  gravestone_3: { len: 1.0, hei: 0.85, dep: 0.3 },
+  horse_head: { len: 0.75, hei: 1.0, dep: 0.66 },
+  notice_board: { len: 0.85, hei: 1.0, dep: 0.36 },
+  shield_rack: { len: 1.0, hei: 0.81, dep: 0.38 },
+  signpost: { len: 0.5, hei: 1.0, dep: 0.35 },
+  stables: { len: 1.0, hei: 0.69, dep: 0.73 },
+  tavern_sign: { len: 0.65, hei: 1.0, dep: 0.16 },
+  weapon_rack: { len: 0.95, hei: 1.0, dep: 0.28 },
+  well_pump: { len: 0.86, hei: 1.0, dep: 0.73 },
 };
 
 /** The raid rooms build at the double-height wall course. */
@@ -482,15 +525,17 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   // The entrance facade frames a doorway players walk THROUGH: never a
   // blocker, or its own arch would seal the raid door it dresses.
   'dungeon_entrance',
-  // The forge-lift car kit's pass-through and overhead pieces: the arch and
-  // beams span overhead, the frame and sliding door dress the gate line a
-  // body must cross once the lift arrives, and the handle and hanging
-  // weight are brush-past furniture in a car twelve riders share. Only the
-  // vertical beam (a structural post) and the winch (a machinery block)
-  // stand solid.
-  'lift_arch_beam',
+  // The Last Keep's placed door facade, the same rule: the keep dungeon's
+  // walk-in trigger owns entry (content/dungeons.ts the_last_keep), so the
+  // facade must never wall off the doorway it dresses.
+  'castle_door',
+  // The forge-lift car kit's overhead and brush-past pieces: the beam
+  // courses span overhead, and the handle and hanging weight are furniture
+  // in a car twelve riders share. The door frames and arch beams are
+  // deliberately NOT here: they are the car's side walls, a yard inside the
+  // room shell, and pass-through they let a rider walk out through the
+  // timber and wedge beside a corner pylon (tests/ignivar_lift_car_walls.test.ts).
   'lift_beam',
-  'lift_frame',
   'lift_handle',
   'lift_weight',
   // The spool rides INSIDE its mount's cradle: the mount is the one solid
@@ -505,6 +550,9 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
  *  hugging the wall pillars stay clear). */
 export const IGNIVAR_PROP_COLLIDER_FOOTPRINT: Partial<Record<IgnivarEnvPropKey, number>> = {
   pillar_slim: 0.68,
+  // the statue's spread wings widen the AABB well past the plinth a body
+  // actually brushes
+  dragon_statue: 0.75,
   // The water pumps are the conduit soak stations: only the central pump body
   // blocks, so a body can wade into the surrounding water pool (the cleanse
   // footprint) to be cleansed while the boss's frontal is up.

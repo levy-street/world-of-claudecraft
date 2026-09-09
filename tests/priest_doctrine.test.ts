@@ -37,6 +37,11 @@ function addAlly(sim: Sim, name: string, distance: number): Entity {
   if (!ally) throw new Error('ally missing');
   ally.pos.x = sim.player.pos.x + distance;
   ally.pos.z = sim.player.pos.z;
+  // v0.42.0 targeting correction (doctrine.ts isCurrentGroupMember): Doctrine
+  // conversion/fallback only pays a living CURRENT GROUP member, so every
+  // ally this suite builds must actually be partied with the priest.
+  sim.partyInvite(id, sim.player.id);
+  sim.partyAccept(id);
   return ally;
 }
 
@@ -157,10 +162,6 @@ describe('Doctrine baseline loop', () => {
     const { sim, priest } = doctrinePriest();
     const first = addAlly(sim, 'Fallback One', 4);
     const second = addAlly(sim, 'Fallback Two', 6);
-    sim.partyInvite(first.id, priest.id);
-    sim.partyAccept(first.id);
-    sim.partyInvite(second.id, priest.id);
-    sim.partyAccept(second.id);
     first.hp = Math.floor(first.maxHp * 0.7);
     second.hp = Math.floor(second.maxHp * 0.4);
     const firstBefore = first.hp;
@@ -186,6 +187,49 @@ describe('Doctrine baseline loop', () => {
 
     expect(first.hp).toBe(firstBefore);
     expect(second.hp - secondBefore).toBe(15);
+  });
+
+  it('pays no fallback when a valid injured link is present but its conversion heal is fully absorbed', () => {
+    const { sim, priest } = doctrinePriest();
+    const linked = addAlly(sim, 'Absorbed Link', 4);
+    const otherInjured = addAlly(sim, 'Other Injured', 6);
+    const dummy = addDummy(sim);
+    castOn(sim, priest, linked, 'power_word_shield');
+    linked.hp = Math.floor(linked.maxHp * 0.5);
+    linked.auras.push({
+      id: 'test_heal_absorb',
+      name: 'Necrotic Blight',
+      kind: 'heal_absorb',
+      remaining: 30,
+      duration: 30,
+      value: 10000, // absorbs the entire conversion heal
+      sourceId: 999,
+      school: 'shadow',
+    });
+    otherInjured.hp = Math.floor(otherInjured.maxHp * 0.4);
+    const linkedBefore = linked.hp;
+    const otherBefore = otherInjured.hp;
+
+    deal(
+      sim,
+      priest,
+      dummy,
+      100,
+      false,
+      'holy',
+      'Scouring Hymn',
+      'hit',
+      false,
+      undefined,
+      true,
+      false,
+      true,
+      'smite',
+      false,
+    );
+
+    expect(linked.hp).toBe(linkedBefore); // fully absorbed, no net heal
+    expect(otherInjured.hp).toBe(otherBefore); // no fallback paid either
   });
 
   it('emits one readable damage event and one non-recursive Doctrine heal', () => {

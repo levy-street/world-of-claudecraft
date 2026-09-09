@@ -1,4 +1,4 @@
-// The shared craft display-name table (src/ui/craft_name_view.ts): every
+// The shared craft display-name table (src/ui/hud/professions/craft_name_view.ts): every
 // craft id on the ring resolves to a real hudChrome.craftName.* key, so no
 // surface that names a craft (char_window skill rows, the Used-by tooltip
 // line) can ever leak a raw snake_case id into player-visible text. A new
@@ -6,7 +6,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
-import { CRAFT_NAME_KEYS, craftNameKey, craftNameText } from '../src/ui/craft_name_view';
+import {
+  CRAFT_NAME_KEYS,
+  craftNameKey,
+  craftNameText,
+} from '../src/ui/hud/professions/craft_name_view';
 
 describe('craft_name_view', () => {
   it('covers every CRAFT_RING id, with no stale extras', () => {

@@ -1,19 +1,21 @@
-// Pure view-core for the LOG view of the Bank window's Guild pane: the
-// officer-visible history of guild bank actions, read off the IWorld
+// Pure view-core for the HISTORY view of the Bank window's Guild pane: the
+// guild-visible transaction history of guild bank actions, read off the IWorld
 // guildBankLog() mirror. DOM/Three/i18n-free, so every rule below is unit
 // tested in Node (tests/guild_bank_log_view.test.ts).
 //
-// WHY THE LOG EXISTS AT ALL: the guild bank is officer-only, so any officer can
-// quietly drain shared property. The server has always recorded every op; this
-// view is what lets the guild SEE it, which is the social check that makes
-// officer-only withdrawals defensible.
+// WHY THE HISTORY EXISTS AT ALL: the guild bank is officer-only, so any officer
+// can quietly drain shared property. The server has always recorded every op;
+// this view is what lets the guild SEE it, which is the social check that
+// makes officer-only withdrawals defensible.
 //
 // The core decides the pane STATE (loading / refused / empty / rows), which
-// SENTENCE each row is, and the raw values that sentence needs. It does NOT
-// decide wording, money formatting, or timestamps: those cross the i18n
-// boundary in the painter (guild_bank_log_window.ts), the
-// guild_bank_view.ts + guild_bank_window.ts split this file mirrors. Money
-// stays RAW COPPER here and times stay epoch milliseconds.
+// SENTENCE each row is, the raw values that sentence needs, which filter chip
+// is pressed, and what the FOOTER offers (older rows to fetch, an older page
+// loading, or the start of the history reached). It does NOT decide wording,
+// money formatting, or timestamps: those cross the i18n boundary in the
+// painter (guild_bank_log_window.ts), the guild_bank_view.ts +
+// guild_bank_window.ts split this file mirrors. Money stays RAW COPPER here
+// and times stay epoch milliseconds.
 //
 // THREE STATES THAT ARE NOT THE SAME THING, and conflating any two of them is
 // the bug this shape exists to prevent:
@@ -22,11 +24,19 @@
 //     Says so; never an empty list, because "you may not see this" and "nobody
 //     has done anything" are opposite facts and a drained bank must never be
 //     able to look like an untouched one.
-//   - EMPTY: an answer arrived and the guild genuinely has no visible history.
+//   - EMPTY: an answer arrived and the guild genuinely has no visible history
+//     (under this filter: an empty Items slice is not an untouched bank, and
+//     the model says which so the painter can word it).
 // A background refresh (state 'loading' while rows are already installed) keeps
 // showing the installed rows rather than blinking back to the loading line.
 
-import type { GuildBankLogEntry, GuildBankLogOp, GuildBankLogView } from '../world_api';
+import {
+  GUILD_BANK_LOG_KINDS,
+  type GuildBankLogEntry,
+  type GuildBankLogKind,
+  type GuildBankLogOp,
+  type GuildBankLogView,
+} from '../world_api';
 
 /** Which SENTENCE a row renders. A stable discriminator, not a translation key:
  *  the painter owns the key mapping so this core stays i18n-free. */
@@ -98,11 +108,70 @@ export interface GuildBankLogRowModel {
   copper: number;
 }
 
-export type GuildBankLogPaneModel =
+/** One filter chip of the strip: its kind and whether it is the pressed one. */
+export interface GuildBankLogFilterModel {
+  kind: GuildBankLogKind;
+  selected: boolean;
+}
+
+/** What the list's FOOTER offers. `older`: the server holds rows older than
+ *  the last one shown and a click fetches the next page. `loading`: that
+ *  page is in flight. `end`: the rows shown reach the start of the history,
+ *  said in words so an absent row reads as "it did not happen" and not as
+ *  "the list stopped here". */
+export type GuildBankLogFooter = 'older' | 'loading' | 'end';
+
+/** The pane's search, over the LOADED rows only (the server pages by cursor;
+ *  a search never reaches it). `textOf` is the painter's localized text for a
+ *  row (member, action, details), so the core stays i18n-free while a player
+ *  can type what they actually see on screen. */
+export interface GuildBankLogSearch {
+  query: string;
+  textOf: (row: GuildBankLogRowModel) => string;
+}
+
+/** The comparable form of a search query: trimmed and case-folded. Empty
+ *  means "no search". */
+export function normalizeGuildBankLogQuery(query: string): string {
+  return query.trim().toLowerCase();
+}
+
+/** The rows whose text contains the query (case-insensitive substring);
+ *  every row when the query is empty. Order is preserved. */
+export function filterGuildBankLogRows(
+  rows: readonly GuildBankLogRowModel[],
+  search: GuildBankLogSearch | undefined,
+): GuildBankLogRowModel[] {
+  const query = normalizeGuildBankLogQuery(search?.query ?? '');
+  if (query === '' || search === undefined) return [...rows];
+  return rows.filter((row) => search.textOf(row).toLowerCase().includes(query));
+}
+
+export type GuildBankLogPaneModel = {
+  /** The chip strip renders on EVERY pane state, so a viewer can leave an
+   *  empty filter slice and a refusal repaints under the chip that was
+   *  pressed when it landed. */
+  filters: GuildBankLogFilterModel[];
+} & (
   | { kind: 'loading' }
   | { kind: 'refused' }
-  | { kind: 'empty' }
-  | { kind: 'rows'; rows: GuildBankLogRowModel[] };
+  /** `filtered` is true when a narrower slice than `all` is empty: the
+   *  painter words that as "nothing matches this filter" rather than "the
+   *  bank was never touched", which under a filter would be false. */
+  | { kind: 'empty'; filtered: boolean }
+  /** `rows` are the rows to DRAW (the search's matches; every loaded row when
+   *  the query is empty), `total` how many are loaded, `query` the raw text
+   *  the search box shows. `rows` can be EMPTY here: a search that matched
+   *  nothing is still a loaded history, and the footer still offers older
+   *  rows to widen it. */
+  | {
+      kind: 'rows';
+      rows: GuildBankLogRowModel[];
+      footer: GuildBankLogFooter;
+      total: number;
+      query: string;
+    }
+);
 
 /**
  * Turn one wire entry into a row, or null when it cannot render honestly. A
@@ -131,14 +200,29 @@ export function guildBankLogRow(entry: GuildBankLogEntry): GuildBankLogRowModel 
   };
 }
 
+/** The chip strip for a view: every kind in display order, the view's own
+ *  kind pressed. */
+export function guildBankLogFilters(kind: GuildBankLogKind): GuildBankLogFilterModel[] {
+  return GUILD_BANK_LOG_KINDS.map((k) => ({ kind: k, selected: k === kind }));
+}
+
 /**
- * Map the whole log read to the pane model. Rows come back NEWEST FIRST, sorted
- * here rather than trusted from the frame: the ledger id is monotonic, so this
- * is a total order that cannot tie, and it means a reordered or merged response
- * still reads chronologically.
+ * Map the whole history read to the pane model. Rows come back NEWEST FIRST,
+ * sorted here rather than trusted from the frame: the ledger id is monotonic,
+ * so this is a total order that cannot tie, and it means a reordered or merged
+ * response still reads chronologically.
  */
-export function buildGuildBankLogView(view: GuildBankLogView): GuildBankLogPaneModel {
-  if (view.state === 'refused') return { kind: 'refused' };
+export function buildGuildBankLogView(
+  view: GuildBankLogView,
+  // The pressed chip is the VIEWER'S choice, which the pane owns; it defaults
+  // to the kind the view was read under (the online mirror echoes it) but a
+  // caller that remembers the selection passes it, so a stale or offline
+  // answer can never un-press the chip somebody just pressed.
+  selected: GuildBankLogKind = view.kind,
+  search?: GuildBankLogSearch,
+): GuildBankLogPaneModel {
+  const filters = guildBankLogFilters(selected);
+  if (view.state === 'refused') return { filters, kind: 'refused' };
   const rows: GuildBankLogRowModel[] = [];
   for (const entry of view.entries) {
     const row = guildBankLogRow(entry);
@@ -146,28 +230,46 @@ export function buildGuildBankLogView(view: GuildBankLogView): GuildBankLogPaneM
   }
   if (rows.length === 0) {
     // No rows AND still in flight is the only true loading state; no rows with
-    // an answer in hand is a genuinely empty history.
-    return view.state === 'loading' ? { kind: 'loading' } : { kind: 'empty' };
+    // an answer in hand is a genuinely empty history (of this slice).
+    return view.state === 'loading'
+      ? { filters, kind: 'loading' }
+      : { filters, kind: 'empty', filtered: selected !== 'all' };
   }
   rows.sort((a, b) => b.id - a.id);
-  return { kind: 'rows', rows };
+  // The footer is the server's word (`more`), never inferred from a full page:
+  // a history that happens to be exactly one window long ends in "end", and a
+  // window with older rows behind it offers them even when it is short (a
+  // filtered slice can be sparse).
+  const footer: GuildBankLogFooter = view.olderPending ? 'loading' : view.more ? 'older' : 'end';
+  return {
+    filters,
+    kind: 'rows',
+    rows: filterGuildBankLogRows(rows, search),
+    footer,
+    total: rows.length,
+    query: search?.query ?? '',
+  };
 }
 
 /**
- * A compact signature of the log read, for the window's repaint gate. Changes
- * exactly when the pane would draw something different (the state flipped, rows
- * arrived, or the newest row moved), so a repaint is driven by data rather than
- * by a timer. Never includes player names: it is compared, not rendered, and
- * ids plus a count are enough to detect every change the window cares about.
+ * A compact signature of the history read, for the window's repaint gate.
+ * Changes exactly when the pane would draw something different (the state
+ * flipped, rows arrived, the newest or oldest row moved, the filter changed,
+ * the footer changed), so a repaint is driven by data rather than by a timer.
+ * Never includes player names: it is compared, not rendered, and ids plus a
+ * count are enough to detect every change the window cares about.
  */
 export function guildBankLogSignature(view: GuildBankLogView): string {
   // A reduce, not Math.max(...map(...)): this core is a public export any
-  // future caller can hand a view wider than the wire's 50-row cap, and a
-  // spread of an unbounded array is both an allocation and an arity risk on a
-  // function that runs on the slow band while the log is open.
+  // future caller can hand a view wider than one wire page, and a spread of an
+  // unbounded array is both an allocation and an arity risk on a function that
+  // runs on the slow band while the log is open.
   let newest = 0;
+  let oldest = 0;
   for (const entry of view.entries) {
     if (entry.id > newest) newest = entry.id;
+    if (oldest === 0 || entry.id < oldest) oldest = entry.id;
   }
-  return `${view.state}:${view.entries.length}:${newest}`;
+  const foot = view.olderPending ? 'p' : view.more ? 'm' : 'e';
+  return `${view.state}:${view.kind}:${view.entries.length}:${newest}:${oldest}:${foot}`;
 }

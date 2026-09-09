@@ -284,7 +284,14 @@ import {
   guildBankRungsBought,
   sanitizeGuildBankState,
 } from '../src/sim/guild_bank';
+// Data only (the material catalog), never the transfer/normalization logic
+// under test: the fine-key observer below is deliberately its OWN from-scratch
+// projection, so it cannot share a defect with the code it is auditing.
+import { materialItemIds } from '../src/sim/material_ids';
+import type { MaterialStackSlot } from '../src/sim/material_stack';
 import type { InvSlot, WorldContent } from '../src/sim/types';
+
+const MATERIAL_IDS: ReadonlySet<string> = materialItemIds();
 
 // Wire the fake durable table to the REAL escrow merge (see store.merge).
 store.merge.fn = (durable, deltas) => mergeGuildBankRow(durable, deltas);
@@ -438,8 +445,15 @@ interface Totals {
   /** By item id only (the stated invariant), summing stack counts. */
   items: Map<string, number>;
   /** By id + canonical instance payload + craft provenance (a strictly finer
-   *  multiset: catches provenance laundering that the id-only sum hides). */
+   *  multiset: catches provenance laundering that the id-only sum hides). For
+   *  a MATERIAL item id, the unit is further split per source bucket (see
+   *  `fineBucketsFor`), so a re-signed or re-gathered unit is caught too. */
   fine: Map<string, number>;
+  /** Slot shapes this observer refuses to price: an ambiguous composition (a
+   *  legacy signer sitting beside an explicit `materialSources`) or one whose
+   *  buckets do not sum to `count`. Non-empty findings are themselves a
+   *  conservation violation (see `totalsEqual`), never a silently-dropped unit. */
+  findings: string[];
 }
 
 function canonical(value: unknown): string {
@@ -451,8 +465,272 @@ function canonical(value: unknown): string {
     .join(',')}}`;
 }
 
+/** True for an ordinary object literal / JSON.parse result / null-prototype
+ *  bag: excludes Date/Map/array/class instances, which would otherwise read
+ *  as an empty descriptor through a bare `typeof === 'object'` test.
+ *  Independently written for this oracle; never calls into
+ *  src/sim/material_sources.ts's own such check. */
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+/** The instance payload with any legacy `signer` field removed and any
+ *  explicitly `undefined`-valued key dropped (matching every other
+ *  structural-equality reading in this file), canonically ordered. An ABSENT
+ *  instance and a PRESENT instance that reduces to nothing once `signer` is
+ *  stripped are the SAME identity, keyed here as the literal marker `'none'`
+ *  (a value `canonical()` can never itself produce, so it cannot collide with
+ *  a real payload): that equivalence is exactly what lines up a slot's
+ *  identity across its pre-transfer legacy shape (signer riding an
+ *  otherwise-empty instance) and its post-transfer canonical shape (signer
+ *  folded into `materialSources`, instance dropped to `undefined` entirely).
+ *  Nested arrays, unrelated unknown fields, and an own `__proto__` data
+ *  property all ride along unchanged (only `signer` is stripped).
+ *
+ *  Takes ONLY the two legitimate shapes, `undefined` or an already-validated
+ *  plain record: a slot's own top-level shape is the caller's job
+ *  (`fineBucketsFor` gates it before ever reaching here), because this
+ *  function silently reducing a non-plain-record payload to `'none'` is
+ *  exactly the defect that let a corrupted instance (`null`, an array, a
+ *  primitive, a `Date`, a class instance) price as true absence.
+ *
+ *  Built with `Object.fromEntries` rather than plain `rest[k] = value`
+ *  assignment: assigning into a key literally named `__proto__` on an object
+ *  LITERAL sets the object's prototype instead of creating a data property,
+ *  which would silently drop a persisted own `__proto__` field. JSON.parse
+ *  creates a genuine OWN data property of that name (never touching the
+ *  actual prototype), and `Object.fromEntries` defines properties the same
+ *  safe way, so the field survives here too. */
+function instanceSansSignerKey(instance: Record<string, unknown> | undefined): string {
+  if (instance === undefined) return 'none';
+  const rest = Object.fromEntries(
+    Object.keys(instance)
+      .filter((k) => k !== 'signer' && instance[k] !== undefined)
+      .map((k) => [k, instance[k]] as const),
+  );
+  return Object.keys(rest).length === 0 ? 'none' : canonical(rest);
+}
+
+const KNOWN_GATHERER_KINDS: ReadonlySet<string> = new Set(['character', 'offline', 'headless']);
+
+/** Printable ASCII (codes 32..126) within an inclusive length bound: the one
+ *  shape rule the signer/gatherer-name/gatherer-id fields all share, at
+ *  their own bounds (signer 0..16, gatherer name 1..16, offline/headless id
+ *  1..64). Independent of, and never calling, src/sim's own such checks;
+ *  punctuation and the empty string (bound 0) are both legal. */
+function isBoundedPrintableAscii(value: string, minLength: number, maxLength: number): boolean {
+  if (value.length < minLength || value.length > maxLength) return false;
+  for (let i = 0; i < value.length; i++) {
+    const code = value.charCodeAt(i);
+    if (code < 32 || code > 126) return false;
+  }
+  return true;
+}
+
+/** One gatherer descriptor's shape, validated independently against the
+ *  CONTRACT stated in src/sim/material_sources.ts (readGatherer, roughly
+ *  lines 172-202): only `kind`/`id`/`name`, `kind` one of the three known
+ *  namespaces, `name` bounded printable ASCII of length 1..16, and `id`
+ *  shaped the way that namespace requires (a positive safe integer for
+ *  `character`, bounded printable ASCII of length 1..64 for
+ *  `offline`/`headless`). Never calls that production reader; this is an
+ *  independent re-derivation of the same shape rule, so a defect in the real
+ *  reader cannot reproduce itself here. Returns the normalized fields on
+ *  success, undefined on any malformed shape. */
+function validGathererFields(
+  value: unknown,
+): { kind: string; id: string | number; name: string } | undefined {
+  if (!isPlainRecord(value)) return undefined;
+  for (const k of Object.keys(value)) {
+    if (k !== 'kind' && k !== 'id' && k !== 'name') return undefined;
+  }
+  const { kind, id, name } = value;
+  if (typeof kind !== 'string' || !KNOWN_GATHERER_KINDS.has(kind)) return undefined;
+  if (typeof name !== 'string' || !isBoundedPrintableAscii(name, 1, 16)) return undefined;
+  if (kind === 'character') {
+    if (typeof id !== 'number' || !Number.isSafeInteger(id) || id <= 0) return undefined;
+  } else if (typeof id !== 'string' || !isBoundedPrintableAscii(id, 1, 64)) {
+    return undefined;
+  }
+  return { kind, id, name };
+}
+
+/**
+ * The canonical identity of ONE source descriptor, validated independently
+ * against the contract in src/sim/material_sources.ts (readSource, roughly
+ * lines 204-222): only `gatherer`/`signer` fields, an optional gatherer
+ * shaped per `validGathererFields`, an optional `signer` that is bounded
+ * printable ASCII of length 0..16 (the empty string is a legal legacy value
+ * and keeps its own identity, distinct from no signer at all). An explicitly
+ * `undefined`-valued field reads as absent.
+ *
+ * Returns undefined, never a default `{}`, when the shape itself is a
+ * corruption: `null`, a non-object, an unknown field, a malformed gatherer,
+ * or a signer outside the length/charset bound. A missing/malformed
+ * descriptor must never be silently read as anonymous, or a reassignment
+ * that replaces a real gatherer with garbage would price as "nobody
+ * recorded one" instead of as the corruption it is.
+ */
+function validSourceKey(value: unknown): string | undefined {
+  if (!isPlainRecord(value)) return undefined;
+  for (const k of Object.keys(value)) {
+    if (k !== 'gatherer' && k !== 'signer') return undefined;
+  }
+  const out: { gatherer?: { kind: string; id: string | number; name: string }; signer?: string } =
+    {};
+  if (value.signer !== undefined) {
+    if (typeof value.signer !== 'string' || !isBoundedPrintableAscii(value.signer, 0, 16)) {
+      return undefined;
+    }
+    out.signer = value.signer;
+  }
+  if (value.gatherer !== undefined) {
+    const gatherer = validGathererFields(value.gatherer);
+    if (!gatherer) return undefined;
+    out.gatherer = gatherer;
+  }
+  return canonical(out);
+}
+
+interface FineBucket {
+  readonly key: string;
+  readonly count: number;
+}
+
+/**
+ * Independently projects one slot into its fine conservation buckets.
+ *
+ * Deliberately reimplemented from scratch rather than calling src/sim's
+ * material transfer/normalization/identity code (`normalizeMaterialStack`,
+ * `legacyMaterialComposition`, `materialPayloadKey`, `readSource`,
+ * `readGatherer`, ...): reusing that exact logic to build the ORACLE would
+ * let the very defect under test, a legacy stack's identity shifting the
+ * moment it crosses that code, hide on both sides of the comparison and
+ * never show up as a mismatch.
+ *
+ * A non-material item id keeps the original coarse fine key (item + instance
+ * + craft marker, one bucket; unaffected by any of this). A MATERIAL item is
+ * decomposed per source bucket: a slot still carrying its legacy
+ * `instance.signer` (untouched by any transfer) is projected the exact way a
+ * real transfer would (folded into the descriptor, dropped from the instance
+ * payload), so it lands on the SAME key as the post-transfer slot with the
+ * equivalent `materialSources` entry. Any shape this function cannot
+ * validate on its own terms is a corruption it refuses to price: a
+ * non-positive/unsafe slot count, a PRESENT top-level instance that is not a
+ * plain record (null, an array, a primitive, a Date, a class instance), an
+ * ambiguous slot (a legacy signer sitting beside an explicit composition), a
+ * non-array/malformed composition, an entry with an unknown field or a
+ * non-positive/unsafe count, a malformed source descriptor (including one
+ * outside the signer/gatherer length/charset bound), or an aggregate total
+ * that overflows or does not equal `slot.count`. Any one of these reports
+ * into `findings` and the WHOLE slot contributes NO fine units, so the
+ * totals can never balance around it.
+ * Valid DUPLICATE descriptors inside one composition are not an error: they
+ * are separate buckets sharing one key, and the caller (`addSlots`) coalesces
+ * same-key buckets by ordinary summation, exactly as it does for any other
+ * container.
+ */
+function fineBucketsFor(
+  slot: InvSlot,
+  materialIds: ReadonlySet<string>,
+  findings: string[],
+): FineBucket[] {
+  if (!materialIds.has(slot.itemId)) {
+    const n = Number(slot.count) || 0;
+    const key = `${slot.itemId}|${canonical(slot.instance ?? null)}|${slot.craftedRecipeId ?? ''}`;
+    return [{ key, count: n }];
+  }
+
+  if (!Number.isSafeInteger(slot.count) || slot.count <= 0) {
+    findings.push(`non-positive or unsafe slot.count on ${slot.itemId}: ${canonical(slot.count)}`);
+    return [];
+  }
+  const n = slot.count;
+
+  // A PRESENT top-level instance must be a plain record: `undefined` (true
+  // absence) and a validated plain record are the only two legitimate
+  // shapes `instanceSansSignerKey` accepts. Explicit `null`, an array, a
+  // primitive, a `Date`, or a class instance is a corruption, refused here
+  // rather than silently read as absence.
+  if (slot.instance !== undefined && !isPlainRecord(slot.instance)) {
+    findings.push(
+      `non-plain-record instance payload on ${slot.itemId}: ${canonical(slot.instance)}`,
+    );
+    return [];
+  }
+  const instance = slot.instance as Record<string, unknown> | undefined;
+
+  const base = `${slot.itemId}|${slot.craftedRecipeId ?? ''}|${instanceSansSignerKey(instance)}`;
+  const legacySigner = instance?.signer;
+  const sources = (slot as MaterialStackSlot).materialSources;
+
+  if (sources === undefined) {
+    const descriptor = legacySigner === undefined ? {} : { signer: legacySigner };
+    const sourceKey = validSourceKey(descriptor);
+    if (sourceKey === undefined) {
+      findings.push(`invalid legacy signer on ${slot.itemId}: ${canonical(legacySigner)}`);
+      return [];
+    }
+    return [{ key: `${base}|${sourceKey}`, count: n }];
+  }
+
+  if (legacySigner !== undefined) {
+    findings.push(
+      `ambiguous composition on ${slot.itemId}: a legacy instance.signer sits beside an explicit materialSources`,
+    );
+    return [];
+  }
+
+  if (!Array.isArray(sources)) {
+    findings.push(`materialSources is not an array on ${slot.itemId}: ${canonical(sources)}`);
+    return [];
+  }
+
+  let sum = 0;
+  const buckets: FineBucket[] = [];
+  for (const entry of sources) {
+    if (!isPlainRecord(entry)) {
+      findings.push(
+        `malformed materialSources entry on ${slot.itemId}: ${canonical(entry ?? null)}`,
+      );
+      return [];
+    }
+    for (const k of Object.keys(entry)) {
+      if (k !== 'source' && k !== 'count') {
+        findings.push(`unknown field "${k}" on a materialSources entry for ${slot.itemId}`);
+        return [];
+      }
+    }
+    const count = entry.count;
+    if (typeof count !== 'number' || !Number.isSafeInteger(count) || count <= 0) {
+      findings.push(`malformed materialSources entry count on ${slot.itemId}: ${canonical(count)}`);
+      return [];
+    }
+    const sourceKey = validSourceKey(entry.source);
+    if (sourceKey === undefined) {
+      findings.push(
+        `malformed source descriptor on ${slot.itemId}: ${canonical(entry.source ?? null)}`,
+      );
+      return [];
+    }
+    sum += count;
+    if (!Number.isSafeInteger(sum)) {
+      findings.push(`materialSources aggregate total overflowed on ${slot.itemId}`);
+      return [];
+    }
+    buckets.push({ key: `${base}|${sourceKey}`, count });
+  }
+  if (sum !== n) {
+    findings.push(`materialSources sum ${sum} does not equal slot.count ${n} for ${slot.itemId}`);
+    return [];
+  }
+  return buckets;
+}
+
 function emptyTotals(): Totals {
-  return { copper: 0, items: new Map(), fine: new Map() };
+  return { copper: 0, items: new Map(), fine: new Map(), findings: [] };
 }
 
 function addSlots(t: Totals, slots: readonly InvSlot[] | undefined): void {
@@ -460,8 +738,9 @@ function addSlots(t: Totals, slots: readonly InvSlot[] | undefined): void {
     if (!s || typeof s !== 'object' || typeof s.itemId !== 'string') continue;
     const n = Number(s.count) || 0;
     t.items.set(s.itemId, (t.items.get(s.itemId) ?? 0) + n);
-    const key = `${s.itemId}|${canonical(s.instance ?? null)}|${s.craftedRecipeId ?? ''}`;
-    t.fine.set(key, (t.fine.get(key) ?? 0) + n);
+    for (const bucket of fineBucketsFor(s, MATERIAL_IDS, t.findings)) {
+      t.fine.set(bucket.key, (t.fine.get(bucket.key) ?? 0) + bucket.count);
+    }
   }
 }
 
@@ -503,16 +782,23 @@ const DORMANT_SEED: InvSlot[] = [
 function addPurgeBurn(t: Totals, book: GuildBankState | null | undefined): void {
   const inv = book?.inventory ?? [];
   for (const seed of DORMANT_SEED) {
-    const key = `${seed.itemId}|${canonical(seed.instance ?? null)}|${seed.craftedRecipeId ?? ''}`;
+    // The identical observer every ordinary container uses (see addSlots):
+    // a dormant seed is always a whole, untransferred legacy stack, so it
+    // projects to exactly one bucket. Findings are discarded here (addSlots
+    // above already reported them for the same live slots); this pass only
+    // needs the matching key.
+    const [seedBucket] = fineBucketsFor(seed, MATERIAL_IDS, []);
+    if (!seedBucket) continue;
     let present = 0;
     for (const slot of inv) {
-      const slotKey = `${slot.itemId}|${canonical(slot.instance ?? null)}|${slot.craftedRecipeId ?? ''}`;
-      if (slotKey === key) present += Number(slot.count) || 0;
+      for (const bucket of fineBucketsFor(slot, MATERIAL_IDS, [])) {
+        if (bucket.key === seedBucket.key) present += bucket.count;
+      }
     }
     const destroyed = seed.count - present;
     if (destroyed === 0) continue;
     t.items.set(seed.itemId, (t.items.get(seed.itemId) ?? 0) + destroyed);
-    t.fine.set(key, (t.fine.get(key) ?? 0) + destroyed);
+    t.fine.set(seedBucket.key, (t.fine.get(seedBucket.key) ?? 0) + destroyed);
   }
 }
 
@@ -525,6 +811,9 @@ function addBook(t: Totals, book: GuildBankState | null | undefined): void {
 }
 
 function totalsEqual(a: Totals, b: Totals): boolean {
+  // A slot this observer could not price (ambiguous or corrupted) is itself a
+  // violation: it must never be able to hide behind an otherwise-balanced sum.
+  if (a.findings.length > 0 || b.findings.length > 0) return false;
   if (a.copper !== b.copper) return false;
   const keys = new Set([...a.items.keys(), ...b.items.keys()]);
   for (const k of keys) if ((a.items.get(k) ?? 0) !== (b.items.get(k) ?? 0)) return false;
@@ -557,6 +846,8 @@ function diffTotals(expected: Totals, actual: Totals): string {
     const a = actual.fine.get(k) ?? 0;
     if (e !== a) lines.push(`FINE ${k}: expected ${e}, got ${a} (delta ${a - e})`);
   }
+  for (const f of expected.findings) lines.push(`EXPECTED-SIDE FINDING: ${f}`);
+  for (const f of actual.findings) lines.push(`ACTUAL-SIDE FINDING: ${f}`);
   return lines.join('\n');
 }
 
@@ -1381,6 +1672,459 @@ describe('the conservation oracle (mutation check: it can actually fail)', () =>
     expect(totalsEqual(base, laundered)).toBe(false);
 
     expect(totalsEqual(base, base)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// P0b: the material fine-key observer (fineBucketsFor) is itself under test.
+// It must treat a legacy signed/unsigned stack and its post-transfer
+// `materialSources` projection of the SAME units as identical (the approved
+// provenance migration this file used to falsely flag), while still catching
+// a source reassignment, a forged gatherer identity, and a per-source count
+// that does not sum to the slot's own count. Exercised directly against the
+// totals helpers, the same mutation-check idiom as P0 above, so a regression
+// in the observer itself is caught even when no sweep happens to hit it.
+// ---------------------------------------------------------------------------
+/** Shared by both fine-key observer describe blocks below (migration/mutation
+ *  checks and the descriptor validation table). */
+const totalsFor = (slots: MaterialStackSlot[]): Totals => {
+  const t = emptyTotals();
+  addSlots(t, slots);
+  return t;
+};
+
+describe('the material fine-key observer (mutation check: migration accepted, corruption caught)', () => {
+  it('accepts a legacy signed stack and its post-transfer materialSources projection as one unit', () => {
+    const legacy = totalsFor([{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }]);
+    const migrated = totalsFor([
+      { itemId: 'wolf_fang', count: 3, materialSources: [{ source: { signer: 'Ana' }, count: 3 }] },
+    ]);
+    expect(diffTotals(legacy, migrated)).toBe('');
+    expect(totalsEqual(legacy, migrated)).toBe(true);
+  });
+
+  it('accepts a legacy unsigned (anonymous) stack and its materialSources projection as one unit', () => {
+    const legacy = totalsFor([{ itemId: 'wolf_fang', count: 5 }]);
+    const migrated = totalsFor([
+      { itemId: 'wolf_fang', count: 5, materialSources: [{ source: {}, count: 5 }] },
+    ]);
+    expect(diffTotals(legacy, migrated)).toBe('');
+    expect(totalsEqual(legacy, migrated)).toBe(true);
+  });
+
+  it('accepts an empty-string legacy signer projected the same way, kept apart from anonymous', () => {
+    const legacy = totalsFor([{ itemId: 'wolf_fang', count: 2, instance: { signer: '' } }]);
+    const migrated = totalsFor([
+      { itemId: 'wolf_fang', count: 2, materialSources: [{ source: { signer: '' }, count: 2 }] },
+    ]);
+    expect(totalsEqual(legacy, migrated)).toBe(true);
+    const anonymous = totalsFor([{ itemId: 'wolf_fang', count: 2 }]);
+    expect(totalsEqual(legacy, anonymous)).toBe(false);
+  });
+
+  it('preserves an own "__proto__" data field from JSON.parse rather than silently dropping it', () => {
+    // JSON.parse creates a genuine OWN data property named "__proto__" (never
+    // touching the real prototype); a naive `rest[k] = value` build would lose
+    // it the moment `k === '__proto__'`, since that assigns the PROTOTYPE on
+    // an object literal instead of defining a data property.
+    const withField = JSON.parse('{"boundTo":1,"__proto__":{"marker":1}}');
+    const withoutField = JSON.parse('{"boundTo":1}');
+    const a = totalsFor([{ itemId: 'wolf_fang', count: 1, instance: withField }]);
+    const b = totalsFor([{ itemId: 'wolf_fang', count: 1, instance: withoutField }]);
+    expect(a.findings).toEqual([]);
+    expect(totalsEqual(a, b)).toBe(false);
+    // And it round-trips: two identically-shaped JSON.parse results agree.
+    const repeat = JSON.parse('{"boundTo":1,"__proto__":{"marker":1}}');
+    const c = totalsFor([{ itemId: 'wolf_fang', count: 1, instance: repeat }]);
+    expect(totalsEqual(a, c)).toBe(true);
+  });
+
+  it('preserves a nonempty unknown instance field across the legacy/canonical boundary', () => {
+    // Only `signer` is stripped on migration; any OTHER field (an unrelated
+    // per-copy payload marker) rides along and stays part of the identity.
+    const legacy = totalsFor([
+      { itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana', charges: { zap: 2 } } },
+    ]);
+    const migrated = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 2,
+        instance: { charges: { zap: 2 } },
+        materialSources: [{ source: { signer: 'Ana' }, count: 2 }],
+      },
+    ]);
+    expect(totalsEqual(legacy, migrated)).toBe(true);
+    const different = totalsFor([
+      { itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana', charges: { zap: 3 } } },
+    ]);
+    expect(totalsEqual(legacy, different)).toBe(false);
+  });
+
+  it('treats an explicit undefined instance field as absent', () => {
+    const withUndefined = totalsFor([
+      { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana', charges: undefined } },
+    ]);
+    const withoutField = totalsFor([
+      { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } },
+    ]);
+    expect(totalsEqual(withUndefined, withoutField)).toBe(true);
+  });
+
+  it('catches a source REASSIGNMENT: the same count under a different signer does not conserve', () => {
+    const before = totalsFor([{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }]);
+    const reassigned = totalsFor([{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Bob' } }]);
+    expect(totalsEqual(before, reassigned)).toBe(false);
+  });
+
+  it('catches a FORGED gatherer identity: swapping the gatherer id or name changes the unit', () => {
+    const real = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 4,
+        materialSources: [
+          { source: { gatherer: { kind: 'character', id: 7, name: 'Reuben' } }, count: 4 },
+        ],
+      },
+    ]);
+    const forgedId = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 4,
+        materialSources: [
+          { source: { gatherer: { kind: 'character', id: 8, name: 'Reuben' } }, count: 4 },
+        ],
+      },
+    ]);
+    const forgedName = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 4,
+        materialSources: [
+          { source: { gatherer: { kind: 'character', id: 7, name: 'Impostor' } }, count: 4 },
+        ],
+      },
+    ]);
+    expect(totalsEqual(real, forgedId)).toBe(false);
+    expect(totalsEqual(real, forgedName)).toBe(false);
+  });
+
+  it('catches SOURCE-COUNT corruption: materialSources buckets that do not sum to slot.count', () => {
+    const corrupted = totalsFor([
+      { itemId: 'wolf_fang', count: 3, materialSources: [{ source: { signer: 'Ana' }, count: 2 }] },
+    ]);
+    expect(corrupted.findings.length).toBeGreaterThan(0);
+    const clean = totalsFor([{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }]);
+    expect(totalsEqual(clean, corrupted)).toBe(false);
+  });
+
+  it('catches an AMBIGUOUS slot: a legacy instance.signer sitting beside an explicit composition', () => {
+    const ambiguous = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: { signer: 'Ana' },
+        materialSources: [{ source: { signer: 'Ana' }, count: 3 }],
+      },
+    ]);
+    expect(ambiguous.findings.length).toBeGreaterThan(0);
+    expect(totalsEqual(ambiguous, ambiguous)).toBe(false);
+  });
+
+  it('leaves an ordinary non-material item on the original coarse fine key, untouched', () => {
+    const a = totalsFor([{ itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } }]);
+    const b = totalsFor([{ itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } }]);
+    expect(totalsEqual(a, b)).toBe(true);
+    const reassigned = totalsFor([{ itemId: 'worn_sword', count: 1, instance: { signer: 'Bob' } }]);
+    expect(totalsEqual(a, reassigned)).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// P0c: `validSourceKey`/`validGathererFields` shape validation, table-driven.
+// Each row is a `materialSources` shape that is NOT a legitimate composition
+// per the contract in src/sim/material_sources.ts (readEntry/readSource/
+// readGatherer): the oracle must refuse to price it (a finding), and a
+// corrupted total must never compare equal even to an EXACT COPY of itself,
+// so balanced corruption on both sides of a comparison cannot hide.
+// ---------------------------------------------------------------------------
+describe('materialSources descriptor/count validation (independent shape checks)', () => {
+  const cases: { name: string; slot: MaterialStackSlot }[] = [
+    {
+      name: 'null source',
+      slot: {
+        itemId: 'wolf_fang',
+        count: 3,
+        materialSources: [{ source: null, count: 3 } as never],
+      },
+    },
+    {
+      name: 'missing source field',
+      slot: { itemId: 'wolf_fang', count: 3, materialSources: [{ count: 3 } as never] },
+    },
+    {
+      name: 'non-array materialSources',
+      slot: { itemId: 'wolf_fang', count: 3, materialSources: {} as never },
+    },
+    {
+      name: 'non-object entry',
+      slot: { itemId: 'wolf_fang', count: 3, materialSources: ['nope' as never] },
+    },
+    {
+      name: 'unknown field on source descriptor',
+      slot: {
+        itemId: 'wolf_fang',
+        count: 3,
+        materialSources: [{ source: { signer: 'Ana', extra: 1 } as never, count: 3 }],
+      },
+    },
+    {
+      name: 'unknown field on entry',
+      slot: {
+        itemId: 'wolf_fang',
+        count: 3,
+        materialSources: [{ source: {}, count: 3, extra: 1 } as never],
+      },
+    },
+    {
+      name: 'gatherer missing name',
+      slot: {
+        itemId: 'wolf_fang',
+        count: 3,
+        materialSources: [
+          { source: { gatherer: { kind: 'character', id: 1 } as never }, count: 3 },
+        ],
+      },
+    },
+    {
+      name: 'gatherer id/kind shape mismatch (string id for a character)',
+      slot: {
+        itemId: 'wolf_fang',
+        count: 3,
+        materialSources: [
+          { source: { gatherer: { kind: 'character', id: '1', name: 'X' } as never }, count: 3 },
+        ],
+      },
+    },
+    {
+      name: 'unknown gatherer namespace',
+      slot: {
+        itemId: 'wolf_fang',
+        count: 3,
+        materialSources: [
+          { source: { gatherer: { kind: 'npc', id: 1, name: 'X' } as never }, count: 3 },
+        ],
+      },
+    },
+    {
+      name: 'non-string signer',
+      slot: {
+        itemId: 'wolf_fang',
+        count: 3,
+        materialSources: [{ source: { signer: 7 as never }, count: 3 }],
+      },
+    },
+    {
+      name: 'zero entry count',
+      slot: { itemId: 'wolf_fang', count: 3, materialSources: [{ source: {}, count: 0 }] },
+    },
+    {
+      name: 'negative entry count',
+      slot: { itemId: 'wolf_fang', count: 3, materialSources: [{ source: {}, count: -1 }] },
+    },
+    {
+      name: 'non-integer entry count',
+      slot: { itemId: 'wolf_fang', count: 3, materialSources: [{ source: {}, count: 1.5 }] },
+    },
+    {
+      name: 'aggregate total overflow',
+      slot: {
+        itemId: 'wolf_fang',
+        count: Number.MAX_SAFE_INTEGER,
+        materialSources: [
+          { source: {}, count: Number.MAX_SAFE_INTEGER },
+          { source: { signer: 'Ana' }, count: 10 },
+        ],
+      },
+    },
+  ];
+
+  it.each(cases)('$name is a finding, and never hides even against itself', ({ slot }) => {
+    const t = totalsFor([slot]);
+    expect(t.findings.length).toBeGreaterThan(0);
+    // A fresh, independently-built total over the IDENTICAL shape: proves the
+    // corruption never balances out by pairing with its own mirror image.
+    const mirror = totalsFor([slot]);
+    expect(totalsEqual(t, mirror)).toBe(false);
+  });
+
+  it('coalesces valid DUPLICATE descriptors in one composition rather than rejecting them', () => {
+    const split = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 5,
+        materialSources: [
+          { source: { signer: 'Ana' }, count: 2 },
+          { source: { signer: 'Ana' }, count: 3 },
+        ],
+      },
+    ]);
+    expect(split.findings).toEqual([]);
+    const single = totalsFor([
+      { itemId: 'wolf_fang', count: 5, materialSources: [{ source: { signer: 'Ana' }, count: 5 }] },
+    ]);
+    expect(totalsEqual(split, single)).toBe(true);
+  });
+
+  it('treats an explicit undefined field on a source descriptor as absent', () => {
+    const withUndefinedSigner = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 2,
+        materialSources: [{ source: { signer: undefined }, count: 2 }],
+      },
+    ]);
+    expect(withUndefinedSigner.findings).toEqual([]);
+    const anonymous = totalsFor([
+      { itemId: 'wolf_fang', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
+    expect(totalsEqual(withUndefinedSigner, anonymous)).toBe(true);
+  });
+
+  it('accepts the exact character-gatherer fixture shape used by the forged-identity control', () => {
+    const real = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 4,
+        materialSources: [
+          { source: { gatherer: { kind: 'character', id: 7, name: 'Reuben' } }, count: 4 },
+        ],
+      },
+    ]);
+    expect(real.findings).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// P0d/P0e: the descriptor length/charset contract and the top-level instance
+// shape gate, table-driven. Both are enforced by validSourceKey/
+// validGathererFields/isBoundedPrintableAscii and by fineBucketsFor's
+// pre-base-key instance check (see their headers); these tables pin the
+// boundary and the corruption shapes so a regression shows up here first.
+// ---------------------------------------------------------------------------
+
+// The descriptor length/charset contract: signer length 0..16 (empty valid),
+// gatherer name 1..16, offline/headless id 1..64, all printable ASCII
+// (32..126). Overlength, control-character and non-ASCII values are refused.
+describe('source descriptor length/charset contract', () => {
+  const long17 = 'a'.repeat(17);
+  const long65 = 'a'.repeat(65);
+  const control = `a${String.fromCharCode(0)}b`; // NUL: outside 32..126
+  const nonAscii = 'Anaé'; // e-acute: outside 32..126
+  const del = `a${String.fromCharCode(127)}b`; // DEL (127): outside 32..126
+
+  const signerRows: { name: string; valid: boolean; signer: string }[] = [
+    { name: 'empty signer (min length 0)', valid: true, signer: '' },
+    { name: 'signer at max length (16)', valid: true, signer: 'a'.repeat(16) },
+    { name: 'signer with punctuation', valid: true, signer: "O'Brien-Ana!" },
+    { name: 'signer over max length (17)', valid: false, signer: long17 },
+    { name: 'signer with a control character', valid: false, signer: control },
+    { name: 'signer with non-ASCII', valid: false, signer: nonAscii },
+    { name: 'signer with DEL (127)', valid: false, signer: del },
+  ];
+  it.each(signerRows)('$name', ({ valid, signer }) => {
+    const t = totalsFor([
+      { itemId: 'wolf_fang', count: 1, materialSources: [{ source: { signer }, count: 1 }] },
+    ]);
+    expect(t.findings.length > 0).toBe(!valid);
+  });
+
+  const nameRows: { name: string; valid: boolean; value: string }[] = [
+    { name: 'gatherer name at min length (1)', valid: true, value: 'A' },
+    { name: 'gatherer name at max length (16)', valid: true, value: 'a'.repeat(16) },
+    { name: 'gatherer name over max length (17)', valid: false, value: long17 },
+    { name: 'gatherer name with a control character', valid: false, value: control },
+    { name: 'gatherer name with non-ASCII', valid: false, value: nonAscii },
+  ];
+  it.each(nameRows)('$name', ({ valid, value }) => {
+    const t = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        materialSources: [
+          { source: { gatherer: { kind: 'character', id: 1, name: value } }, count: 1 },
+        ],
+      },
+    ]);
+    expect(t.findings.length > 0).toBe(!valid);
+  });
+
+  const idRows: { name: string; valid: boolean; value: string }[] = [
+    { name: 'offline id at min length (1)', valid: true, value: 'x' },
+    { name: 'offline id at max length (64)', valid: true, value: 'x'.repeat(64) },
+    { name: 'offline id over max length (65)', valid: false, value: long65 },
+    { name: 'offline id with a control character', valid: false, value: control },
+    { name: 'offline id with non-ASCII', valid: false, value: nonAscii },
+  ];
+  it.each(idRows)('$name', ({ valid, value }) => {
+    const t = totalsFor([
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        materialSources: [
+          { source: { gatherer: { kind: 'offline', id: value, name: 'X' } }, count: 1 },
+        ],
+      },
+    ]);
+    expect(t.findings.length > 0).toBe(!valid);
+  });
+});
+
+// The top-level instance shape gate: fineBucketsFor refuses a PRESENT
+// non-plain-record instance (null, array, string, number, Date, class)
+// before it ever reaches instanceSansSignerKey, so a malformed payload is a
+// finding rather than matching either true absence or its own mirror.
+describe('top-level instance payload contract', () => {
+  class Custom {
+    x = 1;
+  }
+  const rows: { name: string; instance: unknown }[] = [
+    { name: 'explicit null instance', instance: null },
+    { name: 'array instance', instance: [1, 2] },
+    { name: 'string instance', instance: 'nope' },
+    { name: 'number instance', instance: 42 },
+    { name: 'Date instance', instance: new Date() },
+    { name: 'class instance', instance: new Custom() },
+  ];
+
+  it.each(rows)('$name is a finding, matching neither absence nor its mirror', ({ instance }) => {
+    const malformed = totalsFor([{ itemId: 'wolf_fang', count: 1, instance: instance as never }]);
+    expect(malformed.findings.length).toBeGreaterThan(0);
+    const absent = totalsFor([{ itemId: 'wolf_fang', count: 1 }]);
+    expect(totalsEqual(malformed, absent)).toBe(false);
+    const mirror = totalsFor([{ itemId: 'wolf_fang', count: 1, instance: instance as never }]);
+    expect(totalsEqual(malformed, mirror)).toBe(false);
+  });
+
+  it('undefined instance remains valid (true absence)', () => {
+    expect(totalsFor([{ itemId: 'wolf_fang', count: 1 }]).findings).toEqual([]);
+  });
+
+  it('empty plain-object instance remains valid, same identity as absence', () => {
+    const t = totalsFor([{ itemId: 'wolf_fang', count: 1, instance: {} }]);
+    expect(t.findings).toEqual([]);
+    const absent = totalsFor([{ itemId: 'wolf_fang', count: 1 }]);
+    expect(totalsEqual(t, absent)).toBe(true);
+  });
+
+  it('preserves a nested array inside a valid instance payload', () => {
+    // Persisted unknown fields must retain their identity in the independent observer.
+    const payload = (tags: string[]) => ({ tags }) as unknown as InvSlot['instance'];
+    const a = totalsFor([{ itemId: 'wolf_fang', count: 1, instance: payload(['a', 'b']) }]);
+    const b = totalsFor([{ itemId: 'wolf_fang', count: 1, instance: payload(['a', 'b']) }]);
+    expect(a.findings).toEqual([]);
+    expect(totalsEqual(a, b)).toBe(true);
+    const different = totalsFor([{ itemId: 'wolf_fang', count: 1, instance: payload(['a', 'c']) }]);
+    expect(totalsEqual(a, different)).toBe(false);
   });
 });
 

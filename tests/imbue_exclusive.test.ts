@@ -48,8 +48,19 @@ describe('weapon imbues are a mutually-exclusive single slot (H2-1)', () => {
     cast(sim, p, 'deadly_poison');
     expect(imbues(p)).toHaveLength(1);
     expect(imbues(p)[0].id).toBe('deadly_poison');
-    // and the surviving bonus is the single enchant's value, never the +22 sum
-    expect(imbues(p)[0].value).toBe(14);
+    // and the surviving bonus is the single enchant's value, never a sum:
+    // Festering Venom's damage lives in its stacking coat rider, so its flat
+    // per-swing bonus is 0 and Adder's Bite's 14 must not survive with it.
+    expect(imbues(p)[0].value).toBe(0);
+
+    // The mirror case, so the pin cannot pass on a zero that means "nothing
+    // applied": coat last and the surviving bonus is Adder's Bite's own 14.
+    const other = makePlayer('rogue', 20);
+    cast(other.sim, other.p, 'deadly_poison');
+    cast(other.sim, other.p, 'instant_poison');
+    expect(imbues(other.p)).toHaveLength(1);
+    expect(imbues(other.p)[0].id).toBe('instant_poison');
+    expect(imbues(other.p)[0].value).toBe(14);
   });
 
   it('emits an aura-lost event for the displaced imbue so the old buff icon clears', () => {

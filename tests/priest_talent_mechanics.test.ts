@@ -42,6 +42,11 @@ function addAlly(sim: Sim, name: string, distance = 4): Entity {
   if (!ally) throw new Error('ally missing');
   ally.pos.x = sim.player.pos.x + distance;
   ally.pos.z = sim.player.pos.z;
+  // v0.42.0 targeting correction (doctrine.ts isCurrentGroupMember): Doctrine
+  // conversion/fallback only pays a living CURRENT GROUP member, so every
+  // ally this suite builds must actually be partied with the priest.
+  sim.partyInvite(id, sim.player.id);
+  sim.partyAccept(id);
   return ally;
 }
 

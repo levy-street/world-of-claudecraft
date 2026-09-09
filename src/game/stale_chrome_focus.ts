@@ -16,9 +16,11 @@
 // any dialog root is stale by definition while input is blocked. The pin in
 // tests/pointer_blur.test.ts keeps the two explicit marks from regressing. Non-modal panel
 // buttons (bags, bank, map) keep their deliberate Space activation either way: a
-// focused panel button's keydown never reaches the window handler (the hud.ts
-// panel guard stops propagation), whether or not its panel is dialog-rooted (the
-// bags and bank windows are; the map window is a plain .window.panel).
+// focused panel button's keydown never reaches the window handler (the shared
+// chrome key guard stops propagation on the panel_key_guard.ts rule; the one
+// exception is a bag ITEM row, which cancels its own activation and lets Space
+// through as the jump), whether or not its panel is dialog-rooted (the bags and
+// bank windows are; the map window is a plain .window.panel).
 //
 // The guard SUPPRESSES the activation and leaves focus where it is: at keydown
 // time it cannot tell stale pointer focus from the place a keyboard user just

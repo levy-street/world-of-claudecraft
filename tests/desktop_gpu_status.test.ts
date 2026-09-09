@@ -123,6 +123,7 @@ describe('mergeShellGpuVerdict', () => {
       softwareRendering: true,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
     expect(
       status.mergeShellGpuVerdict({
@@ -134,6 +135,7 @@ describe('mergeShellGpuVerdict', () => {
       softwareRendering: false,
       discreteInactive: true,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
     expect(
       status.mergeShellGpuVerdict({
@@ -141,7 +143,12 @@ describe('mergeShellGpuVerdict', () => {
         localHybridGpuLikely: false,
         shell: { softwareRendering: true, discreteInactive: false, adapter: 'SwiftShader' },
       }),
-    ).toEqual({ softwareRendering: true, discreteInactive: false, hybridGpuLikely: false });
+    ).toEqual({
+      softwareRendering: true,
+      discreteInactive: false,
+      hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
+    });
     expect(
       status.mergeShellGpuVerdict({
         localSoftwareRendering: false,
@@ -152,6 +159,7 @@ describe('mergeShellGpuVerdict', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
   });
 
@@ -166,14 +174,24 @@ describe('mergeShellGpuVerdict', () => {
         localHybridGpuLikely: true,
         shell: null,
       }),
-    ).toEqual({ softwareRendering: false, discreteInactive: false, hybridGpuLikely: true });
+    ).toEqual({
+      softwareRendering: false,
+      discreteInactive: false,
+      hybridGpuLikely: true,
+      requestedBackendUnavailable: false,
+    });
     expect(
       status.mergeShellGpuVerdict({
         localSoftwareRendering: false,
         localHybridGpuLikely: true,
         shell: DISCRETE,
       }),
-    ).toEqual({ softwareRendering: false, discreteInactive: true, hybridGpuLikely: true });
+    ).toEqual({
+      softwareRendering: false,
+      discreteInactive: true,
+      hybridGpuLikely: true,
+      requestedBackendUnavailable: false,
+    });
   });
 });
 
@@ -234,6 +252,7 @@ describe('the shell verdict / notice init race', () => {
       softwareRendering: false,
       discreteInactive: true,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
   });
 
@@ -251,6 +270,7 @@ describe('the shell verdict / notice init race', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
 
     push(DISCRETE);
@@ -264,6 +284,7 @@ describe('the shell verdict / notice init race', () => {
       softwareRendering: false,
       discreteInactive: true,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
   });
 
@@ -282,6 +303,7 @@ describe('the shell verdict / notice init race', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
   });
 });
@@ -319,6 +341,7 @@ describe('the persisted dismissal across shell verdicts', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
 
     // The session degrades further (software rendering too): that component was
@@ -330,6 +353,7 @@ describe('the persisted dismissal across shell verdicts', () => {
       softwareRendering: true,
       discreteInactive: true,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
   });
 

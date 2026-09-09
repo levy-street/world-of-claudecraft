@@ -30,15 +30,15 @@ export const EMBER_LAND_LOBES = [
   { x: 404, z: 1858, r: 52 }, // the Wyrmgate shore and Wyrmwatch
   { x: 360, z: 1900, r: 70 }, // the Gatewood
   { x: 450, z: 1920, r: 55 }, // eastern gatewood shore
-  { x: 455, z: 1995, r: 55 }, // the Last Spring headland
+  { x: 455, z: 1995, r: 55 }, // the Last Spring headland (LAST_SPRING below)
   { x: 290, z: 1940, r: 60 }, // western gatewood shore
   { x: 380, z: 2030, r: 90 }, // the drying midlands
   { x: 280, z: 2080, r: 65 }, // Mirage Hollow's dune shelf
   { x: 262, z: 2020, r: 46 }, // ...its southern shoulder under the dune road
   { x: 274, z: 2170, r: 48 }, // ...and the shelf road's western shoulder
   { x: 470, z: 2070, r: 70 }, // eastern dunes
-  { x: 465, z: 2150, r: 60 }, // Trollmoot's rise
-  { x: 405, z: 2170, r: 55 }, // the dune saddle carrying the Trollmoot fork
+  { x: 465, z: 2150, r: 60 }, // the Last Keep's rise (the old Trollmoot's)
+  { x: 405, z: 2170, r: 55 }, // the dune saddle carrying the keep-site fork
   { x: 340, z: 2160, r: 85 }, // the Cinder Dunes' heart
   { x: 420, z: 2260, r: 80 }, // approach to the Drakemaw
   { x: 360, z: 2238, r: 45 }, // the saddle carrying the Snowline road
@@ -58,7 +58,7 @@ export const EMBER_LAND_LOBES = [
   { x: 264, z: 1908, r: 44 }, // ...so no channel runs behind it to the sound
   { x: 492, z: 2390, r: 48 }, // the Goldmelt Water's east cap, waste side
   // The Forgefather's Isle: the Ignivar raid entrance rises off the
-  // Trollmoot coast (high x renders WEST on the world map), a terraced
+  // keep-site coast (high x renders WEST on the world map), a terraced
   // volcanic islet the owner's bridge asset will span from the mainland
   // (docs/design/ignivar-entrance/plan.md). The fortress tier plateaus
   // are stamped by FORGEFATHER_ISLE_TERRAIN_EDITS below; the isle rows
@@ -87,13 +87,19 @@ export function forgefatherIsleRockWeight(x: number, z: number): number {
   return w < 0 ? 0 : w > 1 ? 1 : w;
 }
 
+// The Last Spring, the pool at the forest's edge on its headland lobe
+// (the zone lake in drakelands.ts pois beside it). Lived in castle_layout
+// while the castle stood over its west shore; the castle is gone and the
+// spring is coast furniture, so the landmark lives with the coast tables.
+export const LAST_SPRING = { x: 456, z: 1988 } as const;
+
 export const EMBER_BAYS = [
   { x: 195, z: 1980, r: 50 }, // the west bight
   // the east reach, drawn north of its old eye so its suppression frees
   // the Forgefather's Isle water while still carving the coast above
   { x: 538, z: 2162, r: 46 },
   { x: 205, z: 2230, r: 40 }, // a western cove under the spur
-  // the Forgefather's Strait, widened for the grand isle: the Trollmoot
+  // the Forgefather's Strait, widened for the grand isle: the keep-site
   // coast pulls further inland (the two eyes) so open water rings every
   // face and the owner's bridge earns its length
   { x: 478, z: 2210, r: 24 },
@@ -109,8 +115,8 @@ export const EMBER_BAYS = [
 export const STAIR_LANDING_START = 0.875; // the landing begins at this length fraction
 const RAMP_STEP = 0.75; // stamp spacing along the climb
 
-/** The Forgefather stair ramps: the Last Keep castle's walkable-lift idiom
- *  (castle_layout.ts CASTLE_RAMPS) under the six placed staircases. Each
+/** The Forgefather stair ramps: the walkable-lift idiom the retired Last
+ *  Keep castle introduced (its CASTLE_RAMPS), under the placed staircases. Each
  *  row is an axis-aligned band carrying an ABSOLUTE walk surface: a linear
  *  flight from the lower court's RAW ground level at the stair's bottom
  *  end up to the upper court's at the landing start, then level across the
@@ -176,6 +182,51 @@ export const FORGEFATHER_STAIR_RAMPS: readonly StairRampBand[] = [
   { axis: 'x', b0: 2196.23, b1: 2204.67, a0: 492.55, a1: 500.0, h0: -1.86, h1: 2.64 },
   { axis: 'x', b0: 2196.23, b1: 2204.67, a0: 500.0, a1: 501.55, h0: 2.64, h1: 2.64 },
   { link: true, axis: 'x', b0: 2196.23, b1: 2204.67, a0: 501.55, a1: 502.95, h0: 2.64, h1: 2.0 },
+  // the temple stair (the Last Keep rebuild): plaza plates (2.3) up to the
+  // temple court decks (5.76). The upper deck row starts INSIDE the flight
+  // span, so the flight runs its full model length and the plates take the
+  // hand-off mid-band (band = plate top there); the closing link tapers
+  // down to the court's stamped raw ground so groundHeight never cliffs
+  // under a plate-carried walker.
+  { link: true, axis: 'x', b0: 2165.4, b1: 2171.89, a0: 463.55, a1: 464.95, h0: 2.0, h1: 2.3 },
+  { axis: 'x', b0: 2165.4, b1: 2171.89, a0: 464.95, a1: 471.95, h0: 2.3, h1: 5.76 },
+  { axis: 'x', b0: 2165.4, b1: 2171.89, a0: 471.95, a1: 472.95, h0: 5.76, h1: 5.76 },
+  { link: true, axis: 'x', b0: 2165.4, b1: 2171.89, a0: 472.95, a1: 476.5, h0: 5.76, h1: 5.1 },
+  // the rampart climb (the third pass): plaza plates (2.3) up the west
+  // flight to the mid landing (its plate top 5.5), then the north flight
+  // onto the rampart walk decks (7.75) over the training yard wall
+  { link: true, axis: 'x', b0: 2161.3, b1: 2165.9, a0: 458.9, a1: 457.5, h0: 2.0, h1: 2.3 },
+  { axis: 'x', b0: 2161.3, b1: 2165.9, a0: 457.5, a1: 453.13, h0: 2.3, h1: 5.5 },
+  { axis: 'x', b0: 2161.3, b1: 2165.9, a0: 453.13, a1: 452.5, h0: 5.5, h1: 5.5 },
+  { axis: 'z', b0: 448.43, b1: 452.07, a0: 2162.35, a1: 2158.85, h0: 5.5, h1: 7.75 },
+  { axis: 'z', b0: 448.43, b1: 452.07, a0: 2158.85, a1: 2158.35, h0: 7.75, h1: 7.75 },
+  // the north strand stair: the strait-bridge decks (-1.13) up to the
+  // gate-mouth ground behind the fence line
+  { axis: 'z', b0: 440.11, b1: 447.59, a0: 2189.9, a1: 2182.9, h0: -1.13, h1: 2.0 },
+  { axis: 'z', b0: 440.11, b1: 447.59, a0: 2182.9, a1: 2181.9, h0: 2.0, h1: 2.0 },
+  // the west plaza stair (the fourth pass): the paved plaza plates (2.3) up
+  // to the west gate bridge decks (3.4) inside the triple-gate mouth. The
+  // level run continues INTO the deck span (the plate cropped around it) so
+  // the walked surface never cliffs at the hand-off: a band ending AT the
+  // plate edge leaves raw ground right past its end, and the exact-gradient
+  // steepness read at that seam walled the climb (the sixth-pass fix).
+  { axis: 'z', b0: 439.07, b1: 444.83, a0: 2160.15, a1: 2155.35, h0: 2.3, h1: 3.4 },
+  { axis: 'z', b0: 439.07, b1: 444.83, a0: 2155.35, a1: 2154, h0: 3.4, h1: 3.4 },
+  // the outer yard stair (the sixth pass): the south plaza pavers (2.3) up
+  // through the fence-flanked gate onto the training yard bridge decks
+  // (3.26); the level run continues into the deck span for the seam rule
+  { axis: 'z', b0: 471.44, b1: 477.96, a0: 2141.15, a1: 2146.9, h0: 2.3, h1: 3.26 },
+  { axis: 'z', b0: 471.44, b1: 477.96, a0: 2146.9, a1: 2148.15, h0: 3.26, h1: 3.26 },
+  // the training yard stair (the fifth pass): the yard bridge decks (3.26)
+  // up between the drum posts to the keep court decks (5.76), the closing
+  // link tapering to the court's stamped raw ground
+  { axis: 'z', b0: 479.34, b1: 485.86, a0: 2149, a1: 2156, h0: 3.26, h1: 5.76 },
+  { link: true, axis: 'z', b0: 479.34, b1: 485.86, a0: 2156, a1: 2157.4, h0: 5.76, h1: 5.1 },
+  // the west approach stair (the fifth pass): the dune hollow outside the
+  // triple gate up onto the approach plaza pavers (2.54); the level run
+  // hands off to the gate bridge decks with one stride at the gate line
+  { axis: 'x', b0: 2150.68, b1: 2159.12, a0: 418.9, a1: 423.4, h0: 1.77, h1: 2.54 },
+  { axis: 'x', b0: 2150.68, b1: 2159.12, a0: 423.4, a1: 427.45, h0: 2.54, h1: 2.54 },
 ];
 
 /** No wild scatter on the fortress's graded grounds (the Last Keep rule):
@@ -256,6 +307,17 @@ function stairRampStamps(spec: StairRampSpec): HeightStamp[] {
   }
   return out;
 }
+
+/** The sea-pool ring's parapet height: the owner's five fortress_wall rows
+ *  at y -7.25, scale 12 (src/sim/forgefather_fortress.ts) top out here.
+ *  (Both consts must stay ABOVE FORGEFATHER_ISLE_TERRAIN_EDITS: its
+ *  initializer spreads northwestSlotStamps(), which reads them at module
+ *  load; below the table they would be a temporal-dead-zone error.)
+ *  tests/forgefather_fortress.test.ts pins it to the derived wall tops. */
+export const SEA_RING_PARAPET_Y = 3.91;
+/** The balcony shelf's level: a full yard under the parapet, so the wall
+ *  stands proud of the ground along its whole clear run. */
+export const NORTHWEST_SLOT_SHELF_Y = 2.9;
 
 /** The Forgefather's Isle fortress tiers: flat build plateaus with smooth
  *  approach ramps (the quay-pad idiom, stacked). Each tier's centre drifts
@@ -436,13 +498,79 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 513, z: 2249.4, radius: 2.2, delta: -1.0, falloff: 'smooth', mode: 'level' },
   // ...and the northwest slot between the west ring wall and the flank
   // fills to a dead-end balcony shelf (a 12 yd deep two-cell slot has no
-  // walkable ladder; terrain is the answer): FLAT stamps hold the shelf
-  // sag-free between the walls, the smooth ladder grades its south
-  // approach down from the rim, and the only way out is the way in.
-  { x: 496, z: 2247, radius: 3, delta: 6.7, falloff: 'flat', mode: 'level' },
-  { x: 496, z: 2251.5, radius: 3, delta: 6.5, falloff: 'flat', mode: 'level' },
-  { x: 496, z: 2242.5, radius: 3, delta: 7.1, falloff: 'flat', mode: 'level' },
-  { x: 496, z: 2237, radius: 2.4, delta: 8.3, falloff: 'smooth', mode: 'level' },
-  { x: 496, z: 2238.5, radius: 2.4, delta: 7.9, falloff: 'smooth', mode: 'level' },
-  { x: 496, z: 2240, radius: 2.4, delta: 7.5, falloff: 'smooth', mode: 'level' },
+  // walkable ladder; terrain is the answer): the smooth ladder grades its
+  // south approach down from the rim, FLAT stamps hold the shelf sag-free
+  // between the walls, and the only way out is the way in. The whole
+  // shelf sits UNDER the ring wall's parapet (SEA_RING_PARAPET_Y, the
+  // owner's sea-level fortress_wall tops): the first bake held it at 6.5
+  // to 7.1, three yards over the wall top, so the ground plane cut clean
+  // through the west and northwest wall panels and the ring read as a
+  // bald rock hill from the strait (the Drakelands terrain-clipping
+  // report). Pinned by tests/forgefather_fortress.test.ts.
+  ...northwestSlotStamps(),
+  // -----------------------------------------------------------------------
+  // The Last Keep rebuild's grounds (the second placer pass): the raised
+  // temple court's RAW ground comes up to 5.1, a 0.66 hand-off step under
+  // its deck tops (the isle-court rule above: the movement gates read the
+  // raw heightfield even under a platform-stander, and the keep door
+  // object seats near this ground), with smooth rims falling to the
+  // training yard south and the plazas west. The keep-site pad YIELDS
+  // inside this court (keep_site.ts templeCourtWeight) or its own late
+  // grading would flatten these stamps back to the pad floor.
+  { x: 482.5, z: 2162.5, radius: 11, delta: 5.1, falloff: 'smooth', mode: 'level' },
+  { x: 482.5, z: 2174, radius: 11, delta: 5.1, falloff: 'smooth', mode: 'level' },
+  { x: 490, z: 2162.5, radius: 11, delta: 5.1, falloff: 'smooth', mode: 'level' },
+  { x: 490, z: 2174, radius: 11, delta: 5.1, falloff: 'smooth', mode: 'level' },
+  { x: 481.5, z: 2162.5, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 481.5, z: 2174, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 489, z: 2162.5, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 489, z: 2174, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
+  // ...and the court's west rank, so no hollow ring survives between the
+  // flats and the pad cutout's edge (a restore inside the court must land
+  // near the deck bases, never in a hidden 2.0 dip under the plates)
+  { x: 477, z: 2161.5, radius: 6.5, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 477, z: 2168, radius: 6.5, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 477, z: 2174.5, radius: 6.5, delta: 5.1, falloff: 'flat', mode: 'level' },
+  // ...and the western boardwalk sliver outside the pad's own grading,
+  // leveled to the deck bases so the gate-mouth road climbs a ramp, not a
+  // lip. (The temple stair needs no under-bank of its own: the keep-site
+  // pad keeps the raw ground beneath its whole flight at a calm 2.0, and
+  // inside the court cutout the discs above hold it at or under 4.5, both
+  // below the band's walking line.)
+  { x: 429, z: 2152, radius: 5, delta: 2.0, falloff: 'smooth', mode: 'level' },
+  { x: 429, z: 2166, radius: 5, delta: 2.0, falloff: 'smooth', mode: 'level' },
+  { x: 429, z: 2178, radius: 5, delta: 2.0, falloff: 'smooth', mode: 'level' },
 ];
+
+/** The northwest wall-slot fill: a three-lane smooth ladder marching from
+ *  the flank rim (8.0, the raw rock at z 2236) down the slot to the shelf
+ *  level, then three flat discs holding the shelf itself. Three lanes across
+ *  the slot's width (the stair-bank idiom) keep the ladder level between
+ *  the west wall's inner face and the keep plinth instead of sagging into
+ *  a trough along the wall. Lane radii stop short of the wall's centre
+ *  line, so the drop outside the ladder hides inside the wall's own
+ *  thickness. */
+function northwestSlotStamps(): HeightStamp[] {
+  const out: HeightStamp[] = [];
+  const rimY = 8.0;
+  // Four 1.5 yd rows, z 2236 (the rim) to z 2240.5: the ladder is done
+  // descending BEFORE the west wall's clear run begins (raw ground drops
+  // under the parapet from z 2241 north), so no ladder row ever stands
+  // over the parapet at the wall's inner face. The grade is 1.1 per yard,
+  // inside the movement kernel's PLAYER_MAX_CLIMB_SLOPE of 1.5.
+  const rows = 3;
+  const footY = NORTHWEST_SLOT_SHELF_Y + 0.1;
+  for (let i = 0; i <= rows; i++) {
+    const z = 2236 + 1.5 * i;
+    const delta = Math.round((rimY + (footY - rimY) * (i / rows)) * 100) / 100;
+    for (const x of [494.9, 496, 497.1])
+      out.push({ x, z, radius: 2.2, delta, falloff: 'smooth', mode: 'level' });
+  }
+  for (const disc of [
+    { x: 496, z: 2244.5, radius: 2.6 },
+    { x: 496, z: 2248.8, radius: 2.6 },
+    { x: 496.3, z: 2251.4, radius: 2.4 },
+  ])
+    out.push({ ...disc, delta: NORTHWEST_SLOT_SHELF_Y, falloff: 'flat', mode: 'level' });
+  return out;
+}

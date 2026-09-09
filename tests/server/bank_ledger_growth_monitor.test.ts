@@ -1,12 +1,18 @@
 import { EventEmitter } from 'node:events';
 import type { QueryResult, QueryResultRow } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
-import { bankLedgerGrowthBudgetReadout } from '../../server/bank_ledger_growth_budget';
+import { AUDIT_GROWTH_BYTE_TABLES } from '../../server/audit_growth_sources';
+import {
+  bankLedgerGrowthBudgetReadout,
+  observeBankLedgerGrowthBudget,
+  observeBankLedgerGrowthBytes,
+} from '../../server/bank_ledger_growth_budget';
 import {
   BANK_LEDGER_GROWTH_MONITOR_INTERVAL_MS,
   BANK_LEDGER_GROWTH_MONITOR_STATEMENT_TIMEOUT_MS,
   BANK_LEDGER_GROWTH_MONITOR_WALL_TIMEOUT_MS,
   BANK_LEDGER_GROWTH_WARN_FRACTION,
+  type BankLedgerGrowthBudgetRow,
   type BankLedgerGrowthMonitorClient,
   type BankLedgerGrowthMonitorPool,
   BankLedgerGrowthMonitorPoolBusy,
@@ -55,7 +61,9 @@ describe('bank-ledger growth monitor', () => {
     const release = vi.fn();
     const queryMock = vi.fn(async (text: string) => {
       if (text.includes('SELECT committed_rows')) {
-        return result([{ committed_rows: '123', hard_limit_rows: '10000000' }]);
+        return result([
+          { committed_rows: '123', hard_limit_rows: '10000000', total_bytes: '8192' },
+        ]);
       }
       return result([]);
     });
@@ -64,7 +72,11 @@ describe('bank-ledger growth monitor', () => {
 
     await expect(
       readBankLedgerGrowthBudget(availablePool(vi.fn(async () => client))),
-    ).resolves.toEqual({ committedRows: '123', hardLimitRows: '10000000' });
+    ).resolves.toEqual({
+      committedRows: '123',
+      hardLimitRows: '10000000',
+      totalBytes: '8192',
+    });
     expect(queryMock.mock.calls.map(([text]) => text)).toEqual([
       'SET statement_timeout = 1000',
       expect.stringContaining('WHERE singleton = TRUE'),
@@ -75,6 +87,41 @@ describe('bank-ledger growth monitor', () => {
     expect(selectSql).toMatch(/FROM\s+public\.bank_ledger_growth_budget/);
     expect(release).toHaveBeenCalledTimes(1);
     expect(release).toHaveBeenCalledWith();
+  });
+
+  it('rides the aggregate byte measure on that same one statement', async () => {
+    // The whole audit surface, in the read that was already happening: no
+    // second statement, no second session, no shorter interval. Anything that
+    // needed its own query would have to justify a new database cadence.
+    const release = vi.fn();
+    const queryMock = vi.fn(async (text: string) => {
+      if (text.includes('SELECT committed_rows')) {
+        return result([{ committed_rows: 5, hard_limit_rows: 10_000_000, total_bytes: null }]);
+      }
+      return result([]);
+    });
+    const client = clientWithQuery(queryMock as BankLedgerGrowthMonitorClient['query'], release);
+
+    const row = await readBankLedgerGrowthBudget(availablePool(vi.fn(async () => client)));
+    // A database that has not applied the source-journal DDL yet answers a
+    // reading over the tables it does have, or null, and the read still
+    // resolves: the ceiling is a ROW budget.
+    expect(row).toEqual({ committedRows: 5, hardLimitRows: 10_000_000, totalBytes: null });
+
+    const selectSql = String(queryMock.mock.calls[1]?.[0]);
+    const foldedSql = selectSql.replace(/\s+/g, ' ');
+    expect(foldedSql).toContain(
+      'pg_catalog.sum(pg_catalog.pg_total_relation_size(audit_table.oid))::bigint',
+    );
+    for (const table of AUDIT_GROWTH_BYTE_TABLES) {
+      expect(foldedSql).toContain(`pg_catalog.to_regclass('public.${table}')`);
+    }
+    expect(foldedSql).toContain('AS total_bytes');
+    // Exactly one statement carries the whole readout.
+    expect(queryMock.mock.calls.filter(([text]) => String(text).includes('SELECT '))).toHaveLength(
+      1,
+    );
+    expect(selectSql.split(';')).toHaveLength(1);
   });
 
   it.each([0, 2])('rejects a singleton query that returns %i rows', async (rowCount) => {
@@ -421,8 +468,144 @@ describe('bank-ledger growth monitor', () => {
     resolveRead({ committedRows: 456, hardLimitRows: 10_000_000 });
     await Promise.all([first, second]);
 
-    expect(observe).toHaveBeenCalledWith(456, 10_000_000);
+    expect(observe).toHaveBeenCalledWith(456, 10_000_000, expect.any(Number), expect.any(Number));
     expect(release).toHaveBeenCalledTimes(1);
+  });
+
+  it('claims its ordering ticket and timestamp BEFORE the read, not after', async () => {
+    // Both are properties of when the DATABASE was asked: the timestamp so the
+    // exported age describes the snapshot, the ticket so anything that observes
+    // the database later outranks this poll's late answer.
+    vi.useFakeTimers();
+    try {
+      const observe = vi.fn(() => true);
+      const observeBytes = vi.fn(() => true);
+      const order: string[] = [];
+      const monitor = createBankLedgerGrowthMonitor({
+        pool: availablePool(),
+        tryAcquireBackgroundPermit: () => ({ release: vi.fn() }),
+        beginObservation: () => {
+          order.push('ticket');
+          return 77;
+        },
+        read: async () => {
+          order.push('read');
+          return new Promise<{ committedRows: number; hardLimitRows: number }>((resolve) => {
+            setTimeout(() => resolve({ committedRows: 11, hardLimitRows: 10_000_000 }), 1_000);
+          });
+        },
+        observe,
+        observeBytes,
+      });
+
+      const startedAtMs = Date.now();
+      const refresh = monitor.refresh();
+      await vi.advanceTimersByTimeAsync(1_000);
+      await refresh;
+
+      expect(order).toEqual(['ticket', 'read']);
+      expect(observe).toHaveBeenCalledTimes(1);
+      expect(observe).toHaveBeenCalledWith(11, 10_000_000, startedAtMs, 77);
+      // The byte reading rides the SAME ticket, so a stale poll cannot land
+      // half of its readout.
+      expect(observeBytes).toHaveBeenCalledWith(undefined, 77);
+      expect(Date.now()).toBeGreaterThan(startedAtMs);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('drops a slow poll that lands after a refusal observed the database later', async () => {
+    // The decisive deferred-poll case, against the REAL observer: the counter
+    // falls on owner cascades, so value cannot order these two readings. Only
+    // the claimed ticket can.
+    const release = vi.fn();
+    let finishRead: ((row: BankLedgerGrowthBudgetRow) => void) | null = null;
+    const monitor = createBankLedgerGrowthMonitor({
+      pool: availablePool(),
+      tryAcquireBackgroundPermit: () => ({ release }),
+      read: async () =>
+        new Promise<BankLedgerGrowthBudgetRow>((resolve) => {
+          finishRead = resolve;
+        }),
+      onError: () => {},
+    });
+
+    const refresh = monitor.refresh();
+    await vi.waitFor(() => expect(finishRead).not.toBeNull());
+
+    // A hard-limit refusal observes the database while that poll is in flight.
+    expect(observeBankLedgerGrowthBudget(4_000_000, 10_000_000, 20_000)).toBe(true);
+    expect(observeBankLedgerGrowthBytes('1024')).toBe(true);
+    expect(bankLedgerGrowthBudgetReadout()).toMatchObject({
+      committedRows: 4_000_000,
+      observedBytes: 1024,
+      observedAtMs: 20_000,
+    });
+
+    // The poll's older snapshot arrives with a HIGHER row count and a
+    // different byte figure. It is a healthy read, so it is not an error, but
+    // it must not move either measure.
+    (finishRead as unknown as (row: BankLedgerGrowthBudgetRow) => void)({
+      committedRows: 9_000_000,
+      hardLimitRows: 10_000_000,
+      totalBytes: '4096',
+    });
+    await refresh;
+    expect(bankLedgerGrowthBudgetReadout()).toMatchObject({
+      committedRows: 4_000_000,
+      observedBytes: 1024,
+      observedAtMs: 20_000,
+    });
+
+    // Not a permanent lock-out: the NEXT poll claims a fresh ticket and lands,
+    // including a value BELOW the refusal's.
+    const next = createBankLedgerGrowthMonitor({
+      pool: availablePool(),
+      tryAcquireBackgroundPermit: () => ({ release }),
+      read: async () => ({
+        committedRows: 3_000_000,
+        hardLimitRows: 10_000_000,
+        totalBytes: '2048',
+      }),
+    });
+    await next.refresh();
+    expect(bankLedgerGrowthBudgetReadout()).toMatchObject({
+      committedRows: 3_000_000,
+      observedBytes: 2048,
+    });
+  });
+
+  it('takes the byte reading best effort and never fails a healthy refresh on it', async () => {
+    const observeBytes = vi.fn(() => false);
+    const onError = vi.fn();
+    const warn = vi.fn<(message: string) => void>();
+    const release = vi.fn();
+    const monitor = createBankLedgerGrowthMonitor({
+      pool: availablePool(),
+      tryAcquireBackgroundPermit: () => ({ release }),
+      read: async () => ({
+        committedRows: 9_000_000,
+        hardLimitRows: 10_000_000,
+        totalBytes: '65536',
+      }),
+      observe: () => true,
+      observeBytes,
+      warn,
+      onError,
+    });
+
+    await monitor.refresh();
+
+    expect(observeBytes).toHaveBeenCalledWith('65536', expect.any(Number));
+    // A refused byte reading is not a monitor failure: the ceiling is a ROW
+    // budget and the byte measure is its sizing companion.
+    expect(onError).not.toHaveBeenCalled();
+    expect(release).toHaveBeenCalledTimes(1);
+    // The crossing line carries both figures, because capacity work needs both.
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0]?.[0]).toContain('9000000 of 10000000');
+    expect(warn.mock.calls[0]?.[0]).toContain('65536 bytes of audit storage');
   });
 
   it.each([

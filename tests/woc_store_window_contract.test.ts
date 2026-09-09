@@ -84,9 +84,14 @@ const storeFocusPolicy = readSource('../src/ui/store_focus_policy.ts');
 const storeDecisionPrompt = readSource('../src/ui/store_decision_prompt.ts');
 const storeSurfaceRuntime = readSource('../src/ui/store_surface_runtime.ts');
 const storeArmoryPurchase = readSource('../src/ui/store_armory_purchase.ts');
+const storeSpendControllers = readSource('../src/ui/store_spend_controllers.ts');
 const dailyRewardsChrome = readSource('../src/ui/daily_rewards_chrome_view.ts');
 const claudiumWindow = readSource('../src/ui/claudium_window.ts');
 const hud = readSource('../src/ui/hud.ts');
+// The body-class scan moved whole to window_open_state.ts (Phase 14); the
+// stack-sync pins below read it there, while the per-window dep pins stay
+// over hud.ts (the composition sites did not move).
+const windowOpenState = readSource('../src/ui/window_open_state.ts');
 // The Claudium spend seam moved OUT of the hud deps literal in Bank Storage
 // phase 13 (a second window now spends), so the pins that used to hunt those
 // closures in hud.ts follow them here. The BEHAVIOUR they describe is now
@@ -265,13 +270,20 @@ describe('WOC Store window contract', () => {
     expect(containment).not.toBeNull();
     expect(containment?.[1]).toContain('contain: paint;');
     expect(containment?.[1]).toContain('isolation: isolate;');
-    const stackSync = hud.slice(
-      hud.indexOf("const storeWindow = document.getElementById('daily-rewards-window')"),
-      hud.indexOf("document.body.classList.toggle(\n      'mobile-map-quest-open'"),
+    const stackStart = windowOpenState.indexOf(
+      "const storeWindow = document.getElementById('daily-rewards-window')",
     );
+    const stackEnd = windowOpenState.indexOf(
+      "document.body.classList.toggle(\n    'mobile-map-quest-open'",
+    );
+    // Guarded anchors: an unfound end anchor would widen the slice to the
+    // rest of the module and let the pins go vacuously green.
+    expect(stackStart, 'stack-sync start anchor found').toBeGreaterThan(-1);
+    expect(stackEnd, 'stack-sync end anchor past start').toBeGreaterThan(stackStart);
+    const stackSync = windowOpenState.slice(stackStart, stackEnd);
     expect(stackSync).toContain('stackedWindowsVisible(');
-    expect(stackSync).toContain('!!storeWindow && this.isWindowVisible(storeWindow)');
-    expect(stackSync).toContain('!!claudiumWindow && this.isWindowVisible(claudiumWindow)');
+    expect(stackSync).toContain('!!storeWindow && isWindowVisible(storeWindow)');
+    expect(stackSync).toContain('!!claudiumWindow && isWindowVisible(claudiumWindow)');
     expect(stackSync).toContain("document.body.classList.toggle('store-stack-open'");
     expect(stackSync).toContain('recordStoreStackSample(');
     expect(hud).toContain('isWindowDragPreviewMutation(m.attributeName, m.target)');
@@ -652,9 +664,13 @@ describe('WOC Store window contract', () => {
     expect(skinPurchase).toContain('result = await this.deps.spend(row.skin.id, cost)');
     expect(skinPurchase).not.toContain('idempotencyKey');
     expect(skinPurchase).not.toContain('charterIntents');
+    // The window's one spend seam carries (itemId, kind, cost) and nothing else;
+    // the grant-family factory is where 'skin' is chosen, still with no key.
     expect(storeWindow).toContain(
-      "spend: async (itemId, cost) => this.deps.spendStoreItem?.(itemId, 'skin', cost)",
+      'spend: async (itemId, kind, cost) => this.deps.spendStoreItem?.(itemId, kind, cost)',
     );
+    expect(storeSpendControllers).toContain("spend: (itemId, cost) => spend(itemId, 'skin', cost)");
+    expect(storeSpendControllers).not.toContain('idempotencyKey');
   });
 
   it('carries keyboard focus across its own rebuild through the shared seam', () => {
@@ -829,18 +845,10 @@ describe('WOC Store window contract', () => {
     expect(request).toContain('if (this.charterInFlight.has(itemId)) return;');
   });
 
-  it('owns Store decisions on a body-level modal instead of the HUD confirm dialog', () => {
+  it('owns Store decisions in the prompt stack instead of the HUD confirm dialog', () => {
     expect(storeWindow).not.toContain('this.deps.confirmDialog?.(');
     expect(storeWindow).toContain('private readonly storeRuntime = new StoreSurfaceRuntime');
     expect(storeSurfaceRuntime).toContain('this.prompts = new StoreDecisionPrompts(root)');
-    // The DECISION mounts on document.body, never in #prompt-stack: the stack
-    // lives inside #ui, a fixed z-index 10 stacking context, so no z-index
-    // inside it can clear the body-level armory inspect overlay (z 90) and a
-    // stack-hosted decision opened invisibly under an open inspector while
-    // both surfaces sat inert (the v0.41.0 desktop Purchase Skin freeze). The
-    // nonmodal RESULT stays a stack child (it must survive the Store's close).
-    expect(storeDecisionPrompt).toContain('document.body.appendChild(prompt)');
-    expect(storeDecisionPrompt).not.toContain('stack.appendChild(prompt)');
     expect(storeDecisionPrompt).toContain("document.getElementById('prompt-stack')");
     expect(storeDecisionPrompt).toContain("prompt.id = 'confirm-dialog'");
     expect(storeDecisionPrompt).toContain('installPromptDialog(prompt, opener, close');

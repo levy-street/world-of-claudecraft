@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "intentional-gathering-field-kit-2026-09-06",
+    "acceptedDate": "2026-09-06",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "useCase": "stylized-concept",
+    "attempts": 1,
+    "retries": 0,
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "acceptedAuditAssets": 1,
+    "itemPaintings": 1,
+    "addedItemPaintings": 1,
+    "replacedItemPaintings": 0,
+    "supersessions": 0
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "styleContracts": {
+    "item": {
+      "id": "woc-item-icon-v1",
+      "document": "docs/design/item-icon-art-style.md"
+    }
+  },
+  "targetSets": {
+    "items": ["field_kit"]
+  },
+  "prompt": "Use case: stylized-concept.\nAsset type: one opaque square fantasy MMORPG inventory item icon, World of ClaudeCraft item style contract woc-item-icon-v1.\nPrimary request: paint a new Field Kit (field_kit), a reusable ordinary gathering tool kit. It lets an adventurer deliberately harvest creature materials; it is not a weapon or an extra inventory bag.\nSubject and identity: a compact, partially opened worn brown leather tool roll, with three stout stitched pockets holding a short broad steel skinning knife, a rounded steel scraper, and small blunt brass tongs. A small folded unmarked cream cloth is tucked into the roll. All tools are secured together as ONE cohesive portable kit, no scattered objects. The short blade and broad leather roll should give a clear tool-kit silhouette even at tiny size. Practical low-fantasy materials, no magic, no luxury ornament.\nComposition: readable three-quarter view, complete centered silhouette, compact approximately oval mass, tools angled slightly upward, 68 to 76 percent of the square with safe padding on all sides.\nScene and backdrop: fully opaque deep charcoal and umber painted vignette with subtle atmosphere and contact shadow.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile leather grain, warm worn edges, simple stitching, controlled broad reflected steel values, crisp focal edges and softer peripheral brushwork. Warm top-left key light and cool deep bottom-right shadow.\nHouse-style references reviewed: arcanite_mining_pick.webp for readable functional tool ends; linen_pouch.webp for compact three-quarter soft-goods volume and tactile materials; eastbrook_buckler.webp for controlled steel highlights and dark painted ground. These are style roles only; do not depict a pickaxe, backpack, shield, star emblem, glowing gem, or potion.\nFraming: square, borderless, centered complete silhouette, readable at 22px, 28px, 40px and inside a 64px circular action-slot crop.\nConstraints: exactly one inventory icon; opaque full-square painted ground; no text, letters, numbers, pseudo-writing, label, UI border, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, person, mannequin, hands holding it, cropped tips, flat vector treatment, or raw 3D product render.",
+  "references": [
+    {
+      "path": "public/ui/items/arcanite_mining_pick.webp",
+      "bytes": 1820,
+      "sha256": "1f68e6bfbc521b2eb7c67cf7931bad05d1c68d68b132b7cf328d6c0d135f43b6",
+      "role": "Parent-viewed house-style anchor for readable functional tool ends, described in the prompt text; not supplied as an image-edit input"
+    },
+    {
+      "path": "public/ui/items/linen_pouch.webp",
+      "bytes": 3534,
+      "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937",
+      "role": "Parent-viewed house-style anchor for compact three-quarter soft-goods volume, described in the prompt text; not supplied as an image-edit input"
+    },
+    {
+      "path": "public/ui/items/eastbrook_buckler.webp",
+      "bytes": 3286,
+      "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156",
+      "role": "Parent-viewed house-style anchor for controlled steel highlights and dark painted ground, described in the prompt text; not supplied as an image-edit input"
+    }
+  ],
+  "processing": [
+    "Retained the generated original byte for byte",
+    "Sharp rotate; exact 512x512 fit fill Lanczos3; sRGB; PNG compression 9, adaptive filtering true, producing the 512px master",
+    "npm run assets:items (scripts/convert_item_icons_webp.mjs): canonical 128px WebP, quality 82, 2914 bytes, exit 0"
+  ],
+  "review": {
+    "reviewer": "parent",
+    "sizesInspected": [512, 128, 40, 28, 22, "28-grayscale", "64-circle"],
+    "sheetPath": "tmp/imagegen/intentional-gathering-field-kit-2026-09-06/review/size-review.png",
+    "sheetRetention": "Local only; tmp/ is gitignored and not part of this commit. Regenerate from the retained original/master if a fresh review sheet is needed.",
+    "verdict": "Accepted. Cohesive leather roll with an identifiable knife, scraper, and tongs; safe padding; opaque dark ground; no text or frame."
+  },
+  "status": {
+    "canonicalConverterPass": true,
+    "catalogAudit": "passed: node scripts/item_art_audit.mjs --verify-only; 1210 icons, 1225 definitions, machineChecksPassed true. Current catalog tests: 25 passed across 3 files. Historical Masterwrought verdict unchanged; no new global visual verdict claimed.",
+    "iconAssetMachineAudit": "passed: 1 asset, 0 issues, 0 duplicates, 0 perceptual candidates; parent run logged in /tmp/intentional-gathering-pr3-field-kit-art-audit.log",
+    "runtimeIntegrationScreenshots": "pending",
+    "gameplayDefinition": "Owned by the separate PR3 implementation (reusable Field Kit item, buy 20c / sell 4c, opens the shared preference picker on use). This record covers only the accepted art; art existence is not runtime completion."
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "field_kit",
+      "batchId": "intentional-gathering-field-kit-2026-09-06",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/field_kit.webp",
+      "acceptedSha256": "603d3b5da0f2aeee5773b7ca755c76ee5cc60b18a926abb0e81790f83d734d9d",
+      "acceptedBytes": 2914,
+      "accepted": {
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colourspace": "srgb",
+        "hasAlpha": false,
+        "alphaMode": "opaque",
+        "geometry": {
+          "alphaThreshold": 8,
+          "min": 255,
+          "max": 255,
+          "transparentPixels": 0,
+          "translucentPixels": 0,
+          "opaquePixels": 16384,
+          "visiblePixels": 16384,
+          "coverage": 1,
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
+        }
+      },
+      "master": {
+        "path": "tmp/imagegen/intentional-gathering-field-kit-2026-09-06/masters/field_kit.png",
+        "sha256": "b20406c4de3b0fc226f0883e42988f7a421f4cba92367c28a4de2fe19444c917",
+        "bytes": 389511,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": false,
+        "alphaMode": "opaque"
+      },
+      "source": {
+        "path": "tmp/imagegen/intentional-gathering-field-kit-2026-09-06/originals/field_kit.png",
+        "sha256": "f3e10e86decb331e68432809271f5e7e6dbe495b7ad0de6a745381adde71e412",
+        "bytes": 2277229,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": false,
+        "alphaMode": "opaque"
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "batchId": "nythraxis-gap-weapon-renders-2026-09-04",
+  "note": "Jobs table for scripts/render_weapon_still_icons.mjs: the three Nythraxis gap-fill one-handers, each rendered from the held model its ITEM_WEAPON_VARIANTS entry equips. Poses are XYZ eulers into the shared framing rig; all three take the catalog diagonal the Forgebreaker maul uses. Re-rendered 2026-09-08 on the violet-gem KayKit set after review: the plain starter models read as training weapons beside the painted catalog, and the violet gems carry the Deathless Court palette of the painted gap-fill pieces.",
+  "jobs": [
+    {
+      "itemId": "courtiers_bonefang",
+      "glb": "models/weapons/purple_dagger.glb",
+      "pose": [0.18, -0.5, -0.42]
+    },
+    {
+      "itemId": "thornpeak_wardblade",
+      "glb": "models/weapons/purple_sword.glb",
+      "pose": [0.18, -0.5, -0.42]
+    },
+    {
+      "itemId": "gravecourt_hewer",
+      "glb": "models/weapons/purple_axe.glb",
+      "pose": [0.18, -0.5, -0.42]
+    }
+  ]
+}

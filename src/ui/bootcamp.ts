@@ -35,6 +35,10 @@ import {
 import type { GamepadKind } from '../game/gamepad_map';
 import { currentInputHintMode } from '../game/input_hint_mode';
 import type { Keybinds } from '../game/keybinds';
+import {
+  type TutorialBagControllerStep,
+  tutorialBagControllerStep,
+} from '../game/tutorial_bag_controller_step';
 import { voice } from '../game/voice';
 import { coachTrailPlan, distanceToTrail } from '../render/coach_trail_core';
 import type { Renderer } from '../render/renderer';
@@ -47,26 +51,19 @@ import type { IWorld } from '../world_api';
 import { bagsWindowShown } from './bags_view';
 import {
   BELL_STEP_TARGET,
-  type BootcampParam,
   type BootcampStep,
-  bellCardPlan,
-  bootcampBodyPlan,
   bootcampKeycaps,
-  bootcampTitleKey,
   CAMERA_LESSON_TRAVEL_RAD,
   type CoachFocus,
-  type CoachParam,
   type CoachState,
   coachCardPlan,
   coachFocus,
-  coachKeycaps,
   computeBootcampStep,
   DEATH_LESSON_QUEST_ID,
   type DeathLessonPhase,
   RING_LESSON_ITEM_ID,
   RING_LESSON_QUEST_ID,
   type RingLessonPhase,
-  ringCardPlan,
   ringLessonPhase,
 } from './bootcamp_view';
 import {
@@ -76,7 +73,6 @@ import {
   coachGlowButtonId,
   coachGlowQuestId,
   coachGlowVendorItemId,
-  coachPromptChip,
   coachPromptChips,
   coachPromptInRange,
   coachPromptPlan,
@@ -92,7 +88,7 @@ import {
   VEER_OFF_YD,
 } from './coach_prompt_view';
 import { tEntity } from './entity_i18n';
-import { formatNumber, type TranslationKey, t } from './i18n';
+import { type TranslationKey, t } from './i18n';
 import { iconDataUrl } from './icons';
 import {
   type ObjectiveGlowPlan,
@@ -239,25 +235,19 @@ export class BootcampOverlay {
     // one-shot arrival caption never fires) then no-ops every instruction
     // bubble and edge glow for the whole session. Idempotent.
     this.ensureDom();
-    const mode = currentInputHintMode();
-    let nextRenderKey: string;
     if (this.bellPhase) {
       this.step = null;
-      nextRenderKey = `bell:${mode}`;
     } else if (this.ringPhase !== null) {
       this.step = null;
-      nextRenderKey = `ring:${this.ringPhase}:${mode}`;
-    } else if (isGauntlet) {
+    } else if (isGauntlet && focus) {
       const next = computeBootcampStep({
-        questActive: focus!.state !== 'available',
+        questActive: focus.state !== 'available',
         checkpointsReached: this.lastCounts,
         cameraTurned,
       });
       this.step = next;
-      nextRenderKey = `gauntlet:${next}:${mode}`;
     } else {
       this.step = null;
-      nextRenderKey = `${focus!.questId}:${focus!.state}:${mode}`;
     }
 
     this.ensureDom();
@@ -531,13 +521,6 @@ export class BootcampOverlay {
 
   // ---- internals --------------------------------------------------------
 
-  private courseProgress(): string {
-    return t('hudChrome.bootcamp.courseProgress', {
-      current: formatNumber(Math.min(this.lastCounts + 1, BOOTCAMP_COURSE_CHECKPOINTS.length)),
-      total: formatNumber(BOOTCAMP_COURSE_CHECKPOINTS.length),
-    });
-  }
-
   private ensureDom(): void {
     if (this.prompt) return;
     const ui = document.getElementById('ui');
@@ -671,20 +654,45 @@ export class BootcampOverlay {
     keybinds: Keybinds,
     mode: ReturnType<typeof currentInputHintMode>,
     gamepadBindings: CoachGamepadBindings | null,
-  ): { caps: readonly string[]; verbKey: TranslationKey } | null {
+  ): { caps: readonly string[]; verb: string } | null {
     const key = (id: string): string[] =>
       mode === 'keyboard' ? [keybinds.primaryLabel(id) || ''].filter(Boolean) : [];
     const padSource = mode === 'pad' ? gamepadHintSource(gamepadBindings) : null;
     const control = (id: string): readonly string[] =>
       padSource ? gamepadControlHint(padSource, { type: 'action', action: id }) : key(id);
+    const targetBagItem =
+      this.ringPhase === 'equip'
+        ? RING_LESSON_ITEM_ID
+        : coachGlowBagItemId(this.lastFocus, world.bags);
+    const bagItem = (finalVerbKey: TranslationKey): { caps: readonly string[]; verb: string } => {
+      if (!padSource) {
+        return { caps: key('bags'), verb: t('hudChrome.bootcamp.promptOpenBags') };
+      }
+      const guidance = liveTutorialBagControllerGuidance(targetBagItem);
+      return {
+        caps: gamepadControlHint(padSource, {
+          type: 'bagItem',
+          step: guidance.step,
+        }),
+        verb: tutorialBagControllerVerb(
+          guidance.step,
+          targetBagItem,
+          finalVerbKey,
+          guidance.blockingWindowCloseLabel,
+        ),
+      };
+    };
     if (this.ringPhase === 'equip') {
-      return { caps: control('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return bagItem('hudChrome.itemMenu.equip');
     }
     if (this.ringPhase === 'admire') {
-      return { caps: control('char'), verbKey: 'hudChrome.bootcamp.promptCharacterSheet' };
+      return {
+        caps: control('char'),
+        verb: t('hudChrome.bootcamp.promptCharacterSheet'),
+      };
     }
     if (pouchLessonActive(this.lastFocus, world.bags)) {
-      return { caps: control('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return bagItem('hudChrome.itemMenu.equip');
     }
     // The death lesson's first beat: the stone is in the bags.
     if (
@@ -692,12 +700,12 @@ export class BootcampOverlay {
       this.lastFocus?.questId === DEATH_LESSON_QUEST_ID &&
       this.lastFocus.state === 'active'
     ) {
-      return { caps: control('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return bagItem('hudChrome.bootcamp.promptKneel');
     }
     // The Gauntlet's closing camera lesson teaches the VIEW itself, so it
     // has never had a world anchor and had only the card to carry it.
     if (this.step === 'camera') {
-      return { caps: [], verbKey: 'hudChrome.bootcamp.promptLookAround' };
+      return { caps: [], verb: t('hudChrome.bootcamp.promptLookAround') };
     }
     return null;
   }
@@ -750,11 +758,11 @@ export class BootcampOverlay {
       : this.centeredAsk(world, keybinds, mode, gamepadBindings);
     if (centered) {
       this.promptButtonGlow = null;
-      const contentKey = `centered:${centered.verbKey}:${centered.caps.join(',')}`;
+      const contentKey = `centered:${centered.verb}:${centered.caps.join(',')}`;
       if (this.promptContentKey !== contentKey) {
         this.promptContentKey = contentKey;
         this.paintPromptChips(centered.caps.map((cap) => ({ cap })));
-        this.promptVerbEl.textContent = t(centered.verbKey);
+        this.promptVerbEl.textContent = centered.verb;
       }
       this.prompt.classList.add('tut-prompt-center');
       if (!this.promptPainted.visible) {
@@ -840,10 +848,31 @@ export class BootcampOverlay {
     // plan says which press it wants; the chip follows it.
     const abilityAsk = plan.verbKey === 'hudChrome.bootcamp.promptUseAbility';
     const padSource = mode === 'pad' ? gamepadHintSource(gamepadBindings) : null;
+    const targetBagItem = coachGlowBagItemId(this.lastFocus, world.bags);
+    const bagGuidance =
+      plan.kind === 'use'
+        ? liveTutorialBagControllerGuidance(targetBagItem)
+        : { step: 'enterHud' as const, blockingWindowCloseLabel: null };
+    const bagStep = bagGuidance.step;
+    const promptVerb =
+      padSource && plan.kind === 'use'
+        ? tutorialBagControllerVerb(
+            bagStep,
+            targetBagItem,
+            plan.verbKey,
+            bagGuidance.blockingWindowCloseLabel,
+          )
+        : t(plan.verbKey);
     const padControlCaps = padSource
       ? gamepadControlHint(
           padSource,
-          coachGamepadIntent(plan.kind, abilityAsk, this.casterClass, this.taughtAbilityId),
+          coachGamepadIntent(
+            plan.kind,
+            abilityAsk,
+            this.casterClass,
+            this.taughtAbilityId,
+            bagStep,
+          ),
         )
       : [];
     const chips = coachPromptChips(plan.kind, mode, {
@@ -862,11 +891,11 @@ export class BootcampOverlay {
       abilityAsk,
       caster: this.casterClass,
     });
-    const contentKey = `${plan.verbKey}:${chips.map(chipKey).join(',')}:${mode}`;
+    const contentKey = `${promptVerb}:${chips.map(chipKey).join(',')}:${mode}`;
     if (this.promptContentKey !== contentKey) {
       this.promptContentKey = contentKey;
       this.paintPromptChips(chips);
-      this.promptVerbEl.textContent = t(plan.verbKey);
+      this.promptVerbEl.textContent = promptVerb;
     }
 
     const groundKey = `${plan.x},${plan.z}`;
@@ -902,15 +931,6 @@ export class BootcampOverlay {
     this.promptChipEl.replaceChildren();
     paintPromptChipSequence(this.promptChipEl, chips);
     this.promptChipEl.style.display = chips.length > 0 ? '' : 'none';
-  }
-
-  /** The localized name of the attack this class was taught, for the ability
-   *  drill's card. Falls back to the Attack toggle's own label for a class
-   *  the kit leaves with nothing but a swing. */
-  private taughtAbilityName(): string {
-    const abilityId = this.taughtAbilityId;
-    if (!abilityId) return t('hudChrome.bootcamp.promptAttack');
-    return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
   }
 
   /** Which action-bar icon the touch combat bubble shows: the Attack toggle
@@ -1005,10 +1025,11 @@ function coachGamepadIntent(
   abilityAsk: boolean,
   caster: boolean,
   taughtAbilityId: string | null,
+  bagStep: TutorialBagControllerStep,
 ): GamepadControlHintIntent {
   if (kind === 'select') return { type: 'target' };
   if (kind === 'jump') return { type: 'action', action: 'jump' };
-  if (kind === 'use') return { type: 'action', action: 'bags' };
+  if (kind === 'use') return { type: 'bagItem', step: bagStep };
   if (kind !== 'kill') return { type: 'interact' };
   const usesAbility = abilityAsk || caster;
   return {
@@ -1016,6 +1037,55 @@ function coachGamepadIntent(
     action: { type: 'ability', id: usesAbility && taughtAbilityId ? taughtAbilityId : 'attack' },
     fallback: usesAbility ? 'slot1' : 'slot0',
   };
+}
+
+function liveTutorialBagControllerGuidance(targetItemId: string | null): {
+  step: TutorialBagControllerStep;
+  blockingWindowCloseLabel: string | null;
+} {
+  const active = document.activeElement as HTMLElement | null;
+  const bagsEl = document.getElementById('bags');
+  const bagsOpen = bagsEl !== null && bagsWindowShown(bagsEl.style.display);
+  const activeWindow = active?.closest<HTMLElement>('[role="dialog"], .window.panel') ?? null;
+  const blockingWindow = activeWindow !== bagsEl ? activeWindow : null;
+  const closeButton = blockingWindow?.querySelector<HTMLElement>('[data-close]') ?? null;
+  return {
+    step: tutorialBagControllerStep({
+      bagsOpen,
+      blockingWindowOpen: blockingWindow !== null,
+      blockingWindowCloseFocused: active === closeButton,
+      padFocusActive: active?.classList.contains('pad-focus') ?? false,
+      bagsButtonFocused: active?.id === 'mm-bag',
+      itemFocused: bagsOpen && targetItemId !== null && active?.dataset.coachItem === targetItemId,
+    }),
+    blockingWindowCloseLabel: closeButton?.getAttribute('aria-label') ?? null,
+  };
+}
+
+function tutorialBagControllerVerb(
+  step: TutorialBagControllerStep,
+  targetItemId: string | null,
+  finalVerbKey: TranslationKey,
+  blockingWindowCloseLabel: string | null,
+): string {
+  if (step === 'enterHud') return t('hudChrome.bootcamp.promptAccessInterface');
+  if (step === 'navigateToBlockingWindowClose' || step === 'closeBlockingWindow') {
+    const closeWindow = blockingWindowCloseLabel ?? t('itemUi.vendor.close');
+    return step === 'navigateToBlockingWindowClose'
+      ? t('hudChrome.bootcamp.promptMoveToTarget', { target: closeWindow })
+      : closeWindow;
+  }
+  if (step === 'navigateToBags') {
+    return t('hudChrome.bootcamp.promptMoveToTarget', { target: t('itemUi.bags.title') });
+  }
+  if (step === 'openBags') return t('hudChrome.bootcamp.promptOpenBags');
+  if (step === 'navigateToItem') {
+    if (!targetItemId) return t('hudChrome.bootcamp.promptSelect');
+    return t('hudChrome.bootcamp.promptSelectItem', {
+      item: tEntity({ kind: 'item', id: targetItemId, field: 'name' }),
+    });
+  }
+  return t(finalVerbKey);
 }
 
 /** One rail quest's coach state, or null when it is not moving (locked
@@ -1026,16 +1096,6 @@ function railQuestState(world: IWorld, questId: string): CoachState | null {
   if (state === 'available') return 'available';
   if (state === 'ready') return 'ready';
   return null;
-}
-
-/** Keycap chips with a localized "then" between them: every multi-key row
- *  on the island is a press SEQUENCE (D then W, B then F), and the playtest
- *  showed the order must be explicit. */
-function paintChipSequence(host: HTMLElement, caps: readonly string[]): void {
-  paintPromptChipSequence(
-    host,
-    caps.map((cap) => ({ cap })),
-  );
 }
 
 /** Repaint identity for a chip row (the memo key). */

@@ -77,8 +77,17 @@ describe('PROBE E1: crafted provenance on an instanced slot', () => {
       craftedRecipeId: 'jerky',
     });
     sim.guildBankDepositFor(sim.playerId, 0);
+    // The approved provenance migration: the legacy signer rides the instance
+    // payload going in, and comes out folded into materialSources (the
+    // instance payload is then empty, so it is dropped rather than kept as
+    // `{}`). Same units, canonical representation.
     expect(book(sim).inventory).toEqual([
-      { itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' }, craftedRecipeId: 'jerky' },
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        craftedRecipeId: 'jerky',
+        materialSources: [{ count: 3, source: { signer: 'Ana' } }],
+      },
     ]);
   });
 
@@ -107,8 +116,15 @@ describe('PROBE E1: crafted provenance on an instanced slot', () => {
       craftedRecipeId: 'jerky',
     });
     bankDeposit(sim.ctx, 0, undefined, sim.playerId);
+    // Same migration as E1a, through the personal bank's shared
+    // moveBetweenContainers arm.
     expect(meta(sim).bank.inventory).toEqual([
-      { itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' }, craftedRecipeId: 'jerky' },
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        craftedRecipeId: 'jerky',
+        materialSources: [{ count: 3, source: { signer: 'Ana' } }],
+      },
     ]);
   });
 
@@ -123,11 +139,14 @@ describe('PROBE E1: crafted provenance on an instanced slot', () => {
     });
     sim.guildBankDepositFor(sim.playerId, 0);
     sim.guildBankWithdrawFor(sim.playerId, 0);
+    // The round trip returns to the canonical (post-migration) shape, not the
+    // original legacy instance shape: once a unit's provenance is folded into
+    // materialSources it stays there, deposit or withdraw.
     expect(meta(sim).inventory[0]).toEqual({
       itemId: 'wolf_fang',
       count: 3,
-      instance: { signer: 'Ana' },
       craftedRecipeId: 'jerky',
+      materialSources: [{ count: 3, source: { signer: 'Ana' } }],
     });
   });
 
@@ -136,8 +155,16 @@ describe('PROBE E1: crafted provenance on an instanced slot', () => {
     meta(sim).inventory.length = 0;
     meta(sim).inventory.push({ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'jerky' });
     sim.guildBankDepositFor(sim.playerId, 0);
+    // Unsigned legacy stock migrates too: the lossless projection of "nobody
+    // recorded a signer" is the anonymous bucket `source: {}`, not an absent
+    // materialSources field.
     expect(book(sim).inventory).toEqual([
-      { itemId: 'wolf_fang', count: 3, craftedRecipeId: 'jerky' },
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        craftedRecipeId: 'jerky',
+        materialSources: [{ count: 3, source: {} }],
+      },
     ]);
   });
 });
@@ -413,11 +440,14 @@ describe('PROBE E2: revert path grants', () => {
     });
     meta(sim).inventory.length = 0;
     bankWithdraw(sim.ctx, 0, undefined, sim.playerId);
+    // Same migration as E1d: the withdraw goes through the shared
+    // moveBetweenContainers arm too, so the legacy signer folds into
+    // materialSources on the way out of the personal bank.
     expect(meta(sim).inventory[0]).toEqual({
       itemId: 'wolf_fang',
       count: 3,
-      instance: { signer: 'Ana' },
       craftedRecipeId: 'jerky',
+      materialSources: [{ count: 3, source: { signer: 'Ana' } }],
     });
   });
 });

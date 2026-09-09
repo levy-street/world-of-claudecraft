@@ -195,7 +195,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '초원의 달인', desc: '약초 채집 숙련도 100을 달성하십시오.' },
   prog_master_gatherer: {
     name: '채집의 대가',
-    desc: '채광, 벌목, 약초 채집, 낚시 중 세 가지 이상에서 숙련도 100을 달성하십시오.',
   },
   prog_first_craft: { name: '손수 만든 물건', desc: '첫 제작을 성공적으로 완료하십시오.' },
   prog_craft_specialist: {
@@ -306,7 +305,7 @@ export const table: DeedLocaleTable = {
     title: '고룡을 쓰러뜨린 자',
   },
   dgn_sanctum_speed: {
-    name: '성소 질주',
+    name: '성소 경주',
     desc: '파티가 무덤고룡 성소를 차지한 뒤 15분 안에 무덤고룡 코르줄을 처치하십시오.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -369,7 +368,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: '종은 침묵한다',
-    desc: '부제 바릭이 일으킨 장례 종지기를 모두 처치한 상태로 그를 물리치십시오.',
+    desc: '부제 반드릭이 일으킨 장례 종지기를 모두 처치한 상태로 그를 물리치십시오.',
   },
   dlv_nhalia_bells: {
     name: '종을 재우는 자',
@@ -382,7 +381,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: '골짜기 연대기, 제2장',
-    desc: '사울의 연대기 제2장을 끝마치십시오: 도적과 멀록과 광산의 해로운 짐승들을 처치하고, 소우필드에서 경기를 뛰고, 성물실에 도전하십시오.',
   },
   chr_vale_chapter_iii: {
     name: '골짜기의 연대기',
@@ -400,7 +398,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: '무리를 흩는 자', desc: '10초 안에 숲늑대 3마리를 처치하십시오.' },
   chr_vale_cup_debut: {
     name: '구리 양동이 도전자',
-    desc: '소우필드에서 열리는 골짜기 컵 경기에 나서서 공을 만져 보십시오.',
   },
   chr_vale_rares: {
     name: '골짜기의 공포',
@@ -445,12 +442,12 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: '쏜피크의 연대기',
-    desc: '산의 이야기를 끝까지 지켜보십시오: 고룡교단을 무너뜨리고, 성소를 침묵시키고, 깨어나는 봉우리를 쓰러뜨리고, 바위산의 이름난 공포를 모두 처치하십시오.',
+    desc: '산의 이야기를 끝까지 지켜보십시오: 용서약단을 무너뜨리고, 성소를 침묵시키고, 깨어나는 봉우리를 쓰러뜨리고, 바위산의 이름난 공포를 모두 처치하십시오.',
     title: '쏜피크의 증인',
   },
   chr_peaks_sparring: {
     name: '성벽 훈련',
-    desc: '하이워치 위쪽의 훈련용 허수아비에게 총 1,000의 피해를 입히십시오.',
+    desc: '훈련용 허수아비에게 총 1,000의 피해를 입히십시오.',
   },
   chr_peaks_glimmer_cast: {
     name: '찬 물, 더 찬 빛',
@@ -534,7 +531,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: '단골 손님',
-    desc: '병참장교 벡스의 취급 물품 열 가지를 모두 발견하십시오.',
+    desc: '병참장교 벡스의 취급 장비 열 가지를 모두 발견하십시오.',
   },
   col_glimmerfin: {
     name: '희망의 반짝임',
@@ -585,63 +582,49 @@ export const table: DeedLocaleTable = {
   pvp_duel_grace: { name: '겸손의 가르침', desc: '결투에서 지되, 체면은 그럭저럭 지켜 내십시오.' },
   pvp_vcup_first_match: {
     name: '그라운드에 선 첫발',
-    desc: '소우필드에서 골짜기 컵 경기 한 판을 승패에 관계없이 끝까지 치르십시오.',
   },
-  pvp_vcup_first_win: { name: '첫 우승컵', desc: '등급전 골짜기 컵 경기에서 승리하십시오.' },
+  pvp_vcup_first_win: { name: '첫 우승컵' },
   pvp_vcup_wins_10: {
     name: '노련한 멧돼지공 선수',
-    desc: '등급전 골짜기 컵 경기에서 10회 승리하십시오.',
   },
   pvp_vcup_wins_25: {
     name: '멧돼지공의 전설',
-    desc: '등급전 골짜기 컵 경기에서 25회 승리하십시오.',
     title: '멧돼지공의 전설',
   },
-  pvp_vcup_first_goal: { name: '마수걸이 골', desc: '등급전 골짜기 컵 경기에서 골을 넣으십시오.' },
+  pvp_vcup_first_goal: { name: '마수걸이 골' },
   pvp_vcup_hat_trick: {
     name: '해트트릭의 주인공',
-    desc: '3대3 이상 부문의 등급전 골짜기 컵 경기 한 판에서 세 골을 넣으십시오.',
   },
   pvp_vcup_golden_goal: {
     name: '황금의 순간',
-    desc: '등급전 골짜기 컵 경기의 승부를 가르는 골든골을 넣으십시오.',
   },
   pvp_vcup_first_save: {
     name: '든든한 두 손',
-    desc: '등급전 골짜기 컵 경기에서 골키퍼로 선방에 성공하십시오.',
   },
   pvp_vcup_clean_sheet: {
     name: '철벽 수문장',
-    desc: '골키퍼로 한 골도 내주지 않고 등급전 골짜기 컵 경기에서 승리하십시오.',
   },
   pvp_vcup_guild_win: {
     name: '깃발을 위하여',
-    desc: '길드의 깃발 아래 출전한 등급전 골짜기 컵 경기에서 승리하십시오.',
   },
   pvp_fiesta_first_bout: {
     name: '잔치의 불청객',
-    desc: '2대2 피에스타 한 판을 승패에 관계없이 끝까지 싸우십시오.',
   },
   pvp_fiesta_first_win: {
     name: '피에스타의 주인공',
-    desc: '2대2 피에스타 한 판에서 승리하십시오.',
   },
-  pvp_fiesta_double: { name: '연달아 둘', desc: '4초 안에 피에스타 처치 2회를 기록하십시오.' },
+  pvp_fiesta_double: { name: '연달아 둘' },
   pvp_fiesta_shutdown: {
     name: '흥을 깨는 자',
-    desc: '연속 처치 3회 이상을 이어 가던 피에스타 상대를 쓰러뜨리십시오.',
   },
   pvp_fiesta_full_build: {
     name: '완벽한 채비',
-    desc: '세 웨이브 모두에서 증강을 확정한 채 피에스타 한 판에서 승리하십시오.',
   },
   pvp_fiesta_powerups: {
     name: '하나씩 전부',
-    desc: '링의 파워업 네 가지를 각각 한 번 이상 획득하십시오: 질주광, 거상, 달 장화, 광전사.',
   },
   pvp_fiesta_five_kills: {
     name: '잔치를 짊어지다',
-    desc: '피에스타 한 판에서 처치 5회를 기록하십시오.',
   },
   soc_first_party: { name: '함께라면 더 멀리', desc: '다른 플레이어와 함께 파티에 들어가십시오.' },
   soc_full_house: { name: '풀 하우스', desc: '다섯 명이 꽉 찬 파티로 던전을 끝까지 공략하십시오.' },
@@ -956,6 +939,32 @@ export const table: DeedLocaleTable = {
     name: '완벽을 향한 판금',
     desc: '방어구 제작에서 처음으로 희귀 등급 아이템을 제작하십시오.',
   },
+  prog_jewelcrafting_rare: {
+    name: '광채를 향한 연마',
+    desc: '보석세공에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
+  prog_jewelcrafting_50: {
+    name: '깎은 면과 세공',
+    desc: '보석세공 기술 50을 달성하십시오.',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: '보석세공 대가',
+    desc: '보석세공 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '보석세공 대가',
+  },
+  prog_inscription_rare: {
+    name: '고운 먹으로 쓰다',
+    desc: '각인에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
+  prog_inscription_50: {
+    name: '깃펜과 안료',
+    desc: '각인 기술 50을 달성하십시오.',
+  },
+  prog_grandmaster_inscription: {
+    name: '각인 대가',
+    desc: '각인 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '각인 대가',
+  },
   prog_ready_for_an_adventure: {
     name: '모험을 떠날 준비',
     desc: '수련의 해안을 졸업하십시오. 섬의 모든 수업을 마친 뒤, 나룻배 종을 울려 이스트브룩으로 돌아가십시오.',
@@ -988,5 +997,13 @@ export const table: DeedLocaleTable = {
     name: '꺼지지 않은 불씨',
     desc: '공격대원이 단 한 명도 죽지 않고 영웅 난이도에서 마지막 불꽃의 대장장이 발쿨을 처치하십시오.',
     title: '그을리지 않은 자',
+  },
+  hid_forgebreaker: {
+    name: '풀려난 샘',
+    desc: '화로파괴자를 직접 벼리고 완성된 망치를 가지고 메일린에게 돌아가세요.',
+  },
+  col_set_bramblehide: {
+    name: '루츠의 가시덤불가죽',
+    desc: '루츠의 가시덤불가죽의 모든 부위를 발견하십시오.',
   },
 };

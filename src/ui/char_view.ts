@@ -14,12 +14,23 @@
 // The skin-event preview randomness lives in the painter / the separate skin-event
 // overlay, never here.
 
-import type { EquipSlot, ItemDef } from '../sim/types';
+import type { EquipSlot, ItemDef, ItemInstancePayload } from '../sim/types';
+import { wornTooltipInstance } from './item_instance_tooltip';
 
-/** One paperdoll cell: a slot and the item equipped there (null when empty). */
+/** One paperdoll cell: a slot, the item equipped there (null when empty), and
+ *  the worn copy's per-copy payload (null when absent or when the caller has
+ *  none, e.g. inspect). The payload rides the cell so the row's name and
+ *  quality color can describe the COPY (a promoted legendary), the same
+ *  instance-effective rule the tooltip reads. PROJECTED through
+ *  wornTooltipInstance (signer/enchant/rolled/name plus the self-only
+ *  perfected, the eqi worn-identity trim), so the one worn-copy handle the
+ *  view hands out carries only the cosmetic projection: a future reader of a
+ *  non-cosmetic field (bindOnTrade, boundTo) cannot reintroduce the
+ *  offline-vs-online host divergence the trim exists to prevent. */
 export interface PaperdollSlot {
   slot: EquipSlot;
   item: ItemDef | null;
+  instance: ItemInstancePayload | null;
 }
 
 /** The two equipment columns that flank the character model. */
@@ -54,17 +65,24 @@ export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
 /**
  * Build the paperdoll view from the player's equipment and the item table. A
  * slot resolves to its item only when the id is present AND the item still
- * exists in the table; otherwise the cell is empty.
+ * exists in the table; otherwise the cell is empty. `instances` is the worn
+ * per-copy payloads (IWorld equipmentInstances for the sheet, the entity eqi
+ * mirror for the inspect card); a caller without them omits it and every cell
+ * reads def-only, byte for byte the old behavior.
  */
 export function buildPaperdollView(
   equipment: Partial<Record<EquipSlot, string>>,
   items: Record<string, ItemDef>,
+  instances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
 ): PaperdollView {
   const column = (slots: readonly EquipSlot[]): PaperdollSlot[] =>
     slots.map((slot) => {
       const itemId = equipment[slot];
       const item = itemId ? (items[itemId] ?? null) : null;
-      return { slot, item };
+      // The worn-identity projection (see PaperdollSlot): the eqi cosmetic
+      // set plus the self-only perfected, never a gameplay field.
+      const instance = item ? wornTooltipInstance(instances?.[slot]) : undefined;
+      return { slot, item, instance: instance ?? null };
     });
   return { left: column(PAPERDOLL_LEFT_SLOTS), right: column(PAPERDOLL_RIGHT_SLOTS) };
 }

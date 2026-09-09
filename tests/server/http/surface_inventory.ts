@@ -1164,6 +1164,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: 'publicReadRateLimited',
     requireOwnedExpected: null,
   },
+  // Realm Builder of the Month: the public roll the Eastbrook Vale monument
+  // reads while a client loads the world. Registry-only RouteDef born after the
+  // migration (server/http/CLAUDE.md), so no legacy ladder arm. Anonymous and
+  // db-backed, so it takes the shared per-IP public-read budget in-handler.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/realm-builder',
+    handler: 'server/realm_builder.ts publicRollHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
   // The signpost guild board's roster drill-in: registry-only RouteDef born
   // after the migration, no legacy ladder arm (server/http/CLAUDE.md).
   {
@@ -1191,6 +1205,28 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'POST',
     path: '/api/deeds/broadcasts',
     handler: 'server/deeds.ts broadcastsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // The queue-pop Discord DM opt-in toggle (server/discord_queue_pings.ts):
+  // the deeds broadcasts pair's shape exactly (read-tier GET, full-scope POST).
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/discord/queue-pings',
+    handler: 'server/discord_queue_pings.ts queuePingsReadHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/discord/queue-pings',
+    handler: 'server/discord_queue_pings.ts queuePingsHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
     limiter: null,
@@ -1805,6 +1841,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: REQUIRE_OWNED.operator404,
   },
+  // The admin-panel kick (server/admin_kick_api.ts): registry-only like the
+  // Cheater mark pair, same shape, same REGISTRY_ONLY_PARAM_PATHS listing.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/kick',
+    handler: 'server/admin.ts adminKickHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+  },
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
@@ -1893,6 +1941,19 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
   },
+  // The phase 13 legendary-name strip: registry-only like the cheater-mark
+  // pair (no legacy *Match regex; the RouteDef path template is its one
+  // dispatch source, listed in REGISTRY_ONLY_PARAM_PATHS).
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/clear-item-name',
+    handler: 'server/admin.ts clearItemNameHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+  },
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
@@ -1958,6 +2019,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.admin,
     limiter: 'adminOversightReadRateLimited',
+    requireOwnedExpected: null,
+  },
+  // Live market listing metrics (Masterwrought supply oversight): registry-only
+  // like the clear-item-name route (no legacy ladder arm; the RouteDef path is
+  // the one dispatch source). No limiter: a warm in-memory cached read with
+  // zero DB cost, the overview precedent.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/market/metrics',
+    handler: 'server/admin.ts marketMetricsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
     requireOwnedExpected: null,
   },
   {
@@ -2168,6 +2243,40 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'POST',
     path: '/admin/api/ad-spend/delete',
     handler: 'server/ad_spend.ts deleteHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // Realm Builder of the Month roll: registry-only RouteDefs born AFTER the
+  // migration (the new-route rule, server/http/CLAUDE.md), so no legacy ladder
+  // arm and the legacy rollback answers 404 for them by design. Both arms carry
+  // content.moderate (server/admin_routes.ts).
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/realm-builders',
+    handler: 'server/realm_builder.ts adminListHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/realm-builders',
+    handler: 'server/realm_builder.ts adminUpsertHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/realm-builders/delete',
+    handler: 'server/realm_builder.ts adminDeleteHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.admin,
     limiter: null,

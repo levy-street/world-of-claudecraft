@@ -268,6 +268,13 @@ original bench tank (2452 hp / 3367 armor) came from armor-heavy stat weights
 that traded 310 base HP away. The harness now uses the max-EHP pick and
 applies both buff layers to every bench tank (`applyTankRaidBuffs`).
 
+Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a PINNED constant, not a live
+measurement of the catalog. The committed max-armour kit pins at 4085
+(`tests/heroic_difficulty_floors.test.ts`), and whether 2861 was ever the raw kit armour or a
+prot-mastery-folded reading is UNSETTLED, so it is not re-based here and rides the packet's R5
+re-measure. The pairing above is a max-EHP (stamina-first) pick, not the max-armour one the
+floor suites name, which is a third basis for the same number.
+
 Re-measured on the corrected 3072-HP tank (charged Gravebreaker, live heal
 scaling; old-tank artifacts preserved as `*_tank2452.json`):
 
@@ -340,6 +347,12 @@ counts double for heals, so int/SP itemization is the interim lever).
 Full sweep of all four heroic dungeons (every spawn-list mob, summon chains,
 and the fire-path code for each mechanic). Armor profiles: tank 2861 /
 mail 1500 / cloth 700; BiS non-tank pools run 557-1800.
+
+Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): the tank 2861 profile above is a PINNED constant, not a live
+measurement of the catalog. The committed max-armour kit pins at 4085
+(`tests/heroic_difficulty_floors.test.ts`), and whether 2861 was ever the raw kit armour or a
+prot-mastery-folded reading is UNSETTLED, so it is not re-based here and rides the packet's R5
+re-measure.
 
 1. SUMMONED-ADD MISSILES ARE SYSTEMIC (three bosses, not one). Vael: 2x
    drowned_thrall per wave at 32.5x (two waves). Ysolei: 2x moonspawn at
@@ -424,6 +437,10 @@ comps. i18n release debt: the reworded bear_form description (+90% -> +130%).
 - The bench tank (statScore pick: 3367 armor / 2452 HP) trades HP for armor vs
   the floors-test reference warrior (2861 armor / 2762 HP); net mitigation is
   comparable.
+  Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): the 2861 side of that comparison is
+  a PINNED constant, not a live catalog read; the committed max-armour kit pins at 4085
+  (`tests/heroic_difficulty_floors.test.ts`) and the constant's basis (raw kit or
+  prot-mastery-folded) is UNSETTLED, so it rides the packet's R5 re-measure.
 - No dungeon-finder party DPS was simulated in benches A-C; kill-window
   estimates there use party DPS of 135-195. Bench D measures real raid DPS
   (mage filler, ~120-150 each at BiS).

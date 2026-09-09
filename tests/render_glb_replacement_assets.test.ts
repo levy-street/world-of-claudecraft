@@ -30,6 +30,7 @@ import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_
 import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
 import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
 import { eastbrookGrandArmouryInternalsForTest } from '../src/render/eastbrook_grand_armoury';
+import { farmPatchesPreloadInternalsForTest } from '../src/render/farm_patches';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features';
 import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
@@ -73,7 +74,7 @@ const armouryFinalPipelineEnabled =
     item.src?.endsWith('eastbrook_grand_armoury-final.glb'),
   ) ?? false;
 const ARMOURY_SHIPPING_BYTE_CEILING = 160 * 1024;
-const ARMOURY_SHIPPING_SHA256 = 'd7c056c90862ef3684ac33008ff8b748cb04b784f1629fe6f7c4cc36f669401e';
+const ARMOURY_SHIPPING_SHA256 = '2c322b1730ffba53bf9c1cb61468de0569e167c947f53911ceeb8d4b5a1b76ad';
 const MANIFEST_HASH_LENGTH = 12;
 
 function expectAssetExistsAndManifested(url: string): void {
@@ -502,6 +503,20 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('mailbox pillar asset', () => {
     expectAssetExistsAndManifested(mailboxPreloadInternalsForTest.mailboxAssetUrl);
+  });
+
+  // The farm patch set: garden beds, the compost bin, and the per-family crop
+  // stage and withered meshes. The renderer's own url list is the source here,
+  // so a family or stage added to the core without an export reds this.
+  it('farm patch assets', () => {
+    const urls = farmPatchesPreloadInternalsForTest.modelUrls;
+    // The full committed set: bed + bin + shared sprout + 3 families x
+    // (stage2, stage3, stage4, withered), plus BOTH harvest feast tables (the
+    // Phase 12 party trestle table and the Phase 18 apex pedestal banquet the
+    // three role feasts wear). A new family, stage or table moves this count
+    // deliberately, in the same change that commits its GLB.
+    expect(urls.length).toBe(17);
+    for (const url of urls) expectAssetExistsAndManifested(url);
   });
 
   // Thornhollow Fields rune pads: all three defs are filled in now, so this

@@ -1,4 +1,4 @@
-// The Wyrmcult Zealot's "Wyrmward Sigil" is a school-specific counterspell: a
+// The Broodsworn Zealot's "Wyrmward Sigil" is a school-specific counterspell: a
 // landed melee hit can lock the victim out of ONE spell school (fire) for a few
 // seconds. Unlike a full silence, every other school — and physical abilities —
 // stays usable, and an in-progress cast only breaks if it matches the locked school.
@@ -12,7 +12,7 @@ function makeSim(playerClass: 'warrior' | 'mage' = 'mage') {
   return new Sim({ seed: 7, playerClass, autoEquip: true });
 }
 
-// Spawn a Wyrmcult Zealot adjacent to the player, at the player's level for an
+// Spawn a Broodsworn Zealot adjacent to the player, at the player's level for an
 // even hit table, engaged and ready to swing.
 function spawnZealot(sim: Sim, target: Entity): Entity {
   const template = MOBS['wyrmcult_zealot'];
@@ -49,7 +49,7 @@ function swing(sim: Sim, mob: Entity, target: Entity) {
 }
 
 describe('mob school lockout ("Wyrmward Sigil")', () => {
-  it('seeds the lockout mechanic on the Wyrmcult Zealot', () => {
+  it('seeds the lockout mechanic on the Broodsworn Zealot', () => {
     expect(MOBS['wyrmcult_zealot'].lockout).toEqual({
       chance: 0.25,
       duration: 6,

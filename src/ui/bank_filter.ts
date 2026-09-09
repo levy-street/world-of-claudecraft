@@ -24,10 +24,18 @@ import {
 } from './bag_filter';
 import type { BankSlotModel } from './bank_view';
 
-// Resolve an item id to its localized display name (itemDisplayName in the painter).
-// Injected so the pure core never imports the i18n/entity layer; the bank matches
-// and sorts on this string so search and the name-sort agree with what the player sees.
-export type BankNameResolver = (itemId: string) => string;
+// Resolve one bank SLOT to the name its cell shows (the painter's
+// worn_item_cell_view rule: a copy's own chosen name when it has one, else the
+// def's localized display name). Injected so the pure core never imports the
+// i18n/entity layer; the bank matches and sorts on this string so search and the
+// name-sort agree with what the player sees.
+//
+// It takes the SLOT, not the item id, because a chosen name belongs to a COPY:
+// two cells of one id can show different names, and an id-keyed resolver could
+// answer only one of them. That was the gap this closed (a legendary the player
+// named "Dawn Oath" was findable in the bank only by its def name, which the
+// cell no longer shows anywhere).
+export type BankNameResolver = (slot: BankSlotModel) => string;
 
 // Filter, then sort a bank grid model. Returns a NEW array; never mutates the input.
 // slotIndex is preserved verbatim through both filter and sort (it is the exact
@@ -52,7 +60,7 @@ export function filterBankSlots(
     const item = lookup(m.itemId);
     if (!item) return state.category === 'all' && !query;
     if (!matchesCategory(item, state.category)) return false;
-    if (query && !nameOf(m.itemId).toLowerCase().includes(query)) return false;
+    if (query && !nameOf(m).toLowerCase().includes(query)) return false;
     return true;
   });
   if (state.sort === 'quality') {
@@ -66,9 +74,7 @@ export function filterBankSlots(
     // whole shape the comparator reads, and slotIndex rides through untouched.
     filtered.sort((a, b) => rank(a) - rank(b) || compareBagStacks(a, b, lookup));
   } else if (state.sort === 'name') {
-    filtered.sort(
-      (a, b) => nameOf(a.itemId).localeCompare(nameOf(b.itemId)) || compareBagStacks(a, b, lookup),
-    );
+    filtered.sort((a, b) => nameOf(a).localeCompare(nameOf(b)) || compareBagStacks(a, b, lookup));
   }
   return filtered;
 }

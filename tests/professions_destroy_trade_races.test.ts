@@ -359,6 +359,76 @@ describe('race: salvage vs concurrent trade of the same copy', () => {
 });
 
 // ---------------------------------------------------------------------------
+// 2b. Sundering (extract_essence) racing the same trade: the fourth destroy
+//     command on this surface (Masterwrought phase 04). Sunder has no result
+//     event; refusals ride error lines and success rides the sunder log line,
+//     so the pins read inventory conservation plus those texts.
+// ---------------------------------------------------------------------------
+describe('race: extract_essence vs concurrent trade of the same copy', () => {
+  const RAID_EPIC = 'crownforged_dreadhelm';
+  const ESSENCE_ID = 'sundered_essence';
+
+  it('sunder-before-confirm (same tick): trade invalidated, one destruction, no dupe', () => {
+    const p = pairUp(731);
+    p.server.sim.addItem(RAID_EPIC, 1, p.a.pid);
+    openTrade(p);
+    cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: RAID_EPIC, count: 1 }] });
+    cmd(p.server, p.a, { cmd: 'trade_confirm' });
+    cmd(p.server, p.a, { cmd: 'extract_essence', item: RAID_EPIC });
+    routeTick(p.server);
+    cmd(p.server, p.b, { cmd: 'trade_confirm' });
+    routeTick(p.server);
+
+    // Exactly one destruction: the essence minted once, the copy gone
+    // everywhere, and the trade told both parties it failed.
+    expect(p.server.sim.countItem(ESSENCE_ID, p.a.pid)).toBe(1);
+    expect(errTexts(p.fcA.sent)).toContain(TRADE_FAILED);
+    expect(errTexts(p.fcB.sent)).toContain(TRADE_FAILED);
+    expect(totalOf(p.server, RAID_EPIC, [p.a.pid, p.b.pid])).toBe(0);
+  });
+
+  it('confirm-before-sunder: the queued sunder denies, B keeps the copy, no essence', () => {
+    const p = pairUp(733);
+    p.server.sim.addItem(RAID_EPIC, 1, p.a.pid);
+    openTrade(p);
+    cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: RAID_EPIC, count: 1 }] });
+    cmd(p.server, p.a, { cmd: 'trade_confirm' });
+    cmd(p.server, p.b, { cmd: 'trade_confirm' });
+    cmd(p.server, p.a, { cmd: 'extract_essence', item: RAID_EPIC });
+    routeTick(p.server);
+
+    expect(errTexts(p.fcA.sent)).toContain('You are not holding that item.');
+    expect(p.server.sim.countItem(ESSENCE_ID, p.a.pid)).toBe(0);
+    expect(p.server.sim.countItem(RAID_EPIC, p.b.pid)).toBe(1);
+    expect(totalOf(p.server, RAID_EPIC, [p.a.pid, p.b.pid])).toBe(1);
+  });
+
+  it('the trade lands WHILE the sunder cast runs: the completion denies, no dupe', () => {
+    const p = pairUp(735);
+    p.server.sim.addItem(RAID_EPIC, 1, p.a.pid);
+    openTrade(p);
+    cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: RAID_EPIC, count: 1 }] });
+    cmd(p.server, p.a, { cmd: 'trade_confirm' });
+    cmd(p.server, p.a, { cmd: 'extract_essence', item: RAID_EPIC });
+    tickCastLive(p.server);
+    expect(castingAbilityOf(p.server, p.a.pid)).toBe('sundering');
+    expect(p.server.sim.countItem(RAID_EPIC, p.a.pid)).toBe(1);
+
+    cmd(p.server, p.b, { cmd: 'trade_confirm' });
+    tickCastLive(p.server);
+    expect(p.server.sim.countItem(RAID_EPIC, p.b.pid)).toBe(1);
+
+    completeEnchantFamilyCast(p.server.sim as never, p.a.pid);
+    tickCastLive(p.server);
+
+    expect(errTexts(p.fcA.sent)).toContain('You are not holding that item.');
+    expect(p.server.sim.countItem(ESSENCE_ID, p.a.pid)).toBe(0);
+    expect(p.server.sim.countItem(RAID_EPIC, p.a.pid)).toBe(0);
+    expect(totalOf(p.server, RAID_EPIC, [p.a.pid, p.b.pid])).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // 3. Destroy racing concurrent inv_move reorders (the only move surface on the
 //    wire; there is no bank command). Commands are id-based, so the probe is
 //    that the destroy consumes the CORRECT copy (never the enchanted one for

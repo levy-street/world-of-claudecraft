@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ The elite instances and the raid also run on **Heroic**: higher-level enemies, s
 
 ### Delves
 
-Delves are a separate, scalable small-group mode for one or two players, rebuilt from randomized chambers on every run and ending on a locked reliquary chest that opens through a lockpicking minigame rather than a loot roll. **The Collapsed Reliquary** (level 7 and up) ends at Deacon Varric, with an AI companion, Tessa, fighting at your side if you go alone. **The Drowned Litany** (level 12 and up) follows the trail into a flooded shrine at the edge of Mirefen Marsh. A delve board sets the tier: Heroic raises enemy levels and adds a random affix for richer rewards.
+Delves are a separate, scalable small-group mode for one or two players, rebuilt from randomized chambers on every run and ending on a locked reliquary chest that opens through a lockpicking minigame rather than a loot roll. **The Collapsed Reliquary** (level 7 and up) ends at Deacon Vandric, with an AI companion, Tessa, fighting at your side if you go alone. **The Drowned Litany** (level 12 and up) follows the trail into a flooded shrine at the edge of Mirefen Marsh. A delve board sets the tier: Heroic raises enemy levels and adds a random affix for richer rewards.
 
 ### Ranked PvP (the Ashen Coliseum)
 

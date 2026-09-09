@@ -158,9 +158,9 @@ export interface DawnholdWallLedge {
   /** absolute shelf height */
   top: number;
 }
-// The wall-walk's OUTER parapet, the twin of the Last Keep's (see
-// castle_layout castleParapetSegments for why the curtain gives a body no
-// standoff at a down edge, and why this is the outer lip only). Gaps at both
+// The wall-walk's OUTER parapet (the idiom the retired Last Keep castle
+// shared): the curtain is lift terrain, so it gives a body no standoff at a
+// down edge, and the lip is the outer edge only. Gaps at both
 // gates, and across the north climbing shelves: fitsOn vetoes a ledge grab
 // landing inside anything with a movement top, standable or not, so a parapet
 // over their approach would kill the outside climb.

@@ -377,6 +377,67 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
     expect(view.tick(world()).slots[0].kind).toBe('attack');
   });
 
+  it('a freed-slot ability the active build does not currently grant stays visible, dimmed and unusable, instead of painting empty', () => {
+    // The freed Attack slot (barSlot 0, "Show Attack Button" off) is deliberately
+    // not scoped to any one talent build (ActionBarController.loadAttackAction), so
+    // its assignment can outlive a build switch. Before this fix, hud.ts's
+    // abilityForSlot() only resolved against the live known-ability list, so the
+    // slot fell into the ability===null/item===null branch and rendered fully
+    // 'empty' the instant the granting build went inactive: from the player's
+    // perspective the ability looked deleted even though it survives in storage.
+    const view = createActionBarView(
+      descriptor(slot(0, { attack: false, ability: { ...ability('stormstrike'), known: false } })),
+      fakeDeps(),
+    );
+    const s = view.tick(world()).slots[0];
+    expect(s.kind).toBe('ability');
+    expect(s.iconKey).toBe(`${ABILITY_ICON_PREFIX}stormstrike`);
+    expect(s.abilityId).toBe('stormstrike');
+    expect(s.usable).toBe(false);
+    expect(s.cooldownPercent).toBe(0);
+    expect(s.procGlow).toBe(false);
+    expect(s.ariaDescription).toBe('abilityUi.tooltip.unavailable');
+  });
+
+  it('transitions cleanly between a live ability and its freed-slot known:false stub across ticks (no stale field, no new slot object)', () => {
+    // The reused per-slot state object (not the returned array) is what a build
+    // switch mutates in place every frame; a forgotten field reset in either
+    // direction would leak a stale cooldown/proc/usable value across the switch.
+    let live = true;
+    const s0: ActionBarSlotDescriptor = {
+      slotIndex: 0,
+      isAttack: () => false,
+      hasAction: () => true,
+      ability: () =>
+        live
+          ? ability('stormstrike', { cooldown: 10 })
+          : { ...ability('stormstrike', { cooldown: 10 }), known: false },
+      item: () => null,
+      keybindLabel: () => 'K0',
+    };
+    const view = createActionBarView(descriptor(s0), fakeDeps());
+
+    const cooldowns = new Map([['stormstrike', 8]]);
+    const knownSlot = view.tick(world({ cooldowns })).slots[0];
+    expect(knownSlot.usable).toBe(true);
+    expect(knownSlot.cooldownPercent).toBeGreaterThan(0);
+    expect(knownSlot.cdText).not.toBe('');
+
+    live = false;
+    const stubSlot = view.tick(world({ cooldowns })).slots[0];
+    expect(stubSlot).toBe(knownSlot); // same reused object, per-slot state is mutated in place
+    expect(stubSlot.usable).toBe(false);
+    expect(stubSlot.cooldownPercent).toBe(0);
+    expect(stubSlot.cdText).toBe('');
+    expect(stubSlot.ariaDescription).toBe('abilityUi.tooltip.unavailable');
+
+    live = true;
+    const backToKnown = view.tick(world({ cooldowns })).slots[0];
+    expect(backToKnown.usable).toBe(true);
+    expect(backToKnown.cooldownPercent).toBeGreaterThan(0);
+    expect(backToKnown.ariaDescription).toBe('');
+  });
+
   it('an item slot wins over a stale ability binding (item-first precedence)', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('fireball'), item: item('potion') })),

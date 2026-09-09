@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 
 const source = readFileSync('scripts/nythraxis_matrix.ts', 'utf8');
 
@@ -54,6 +55,9 @@ describe('Nythraxis matrix DPS rotations', () => {
         }>;
       };
       expect(report.run).toBe(4);
+      expect(report.sharedTankGear).toHaveLength(12);
+      expect(report.sharedTankGear.filter((id) => ITEMS[id]?.masterwrought)).toHaveLength(2);
+      expect(report.sharedTankGear.some((id) => ITEMS[id]?.slot === 'feet')).toBe(true);
       expect(report.runs.map((run) => run.seed)).toEqual([1, 1, 1, 1]);
 
       const expectedRows = {
@@ -286,7 +290,9 @@ describe('Nythraxis matrix DPS rotations', () => {
   // this manual analysis tool; the spec-table source pins above are the
   // remaining catalog-drift tripwire.
 
-  it('models enhancement as Flametongue prepull, then auto-attacks, Stormstrike on cooldown, and Flame/Earth shock weave', () => {
+  // Shipped display names (src/ui/i18n.catalog/abilities.ts); the pinned source
+  // literals below are ability IDS, which the rename wave left untouched.
+  it('models enhancement as Pyrebrand Weapon prepull, then auto-attacks, Ancestral Strike on cooldown, and Cinder/Earthen Jolt weave', () => {
     expect(source).toContain("prepull: ['flametongue_weapon']");
     expect(source).toContain("rotation: ['stormstrike', 'flame_shock', 'earth_shock']");
     expect(source).toContain('sim.startAutoAttack(pid)');

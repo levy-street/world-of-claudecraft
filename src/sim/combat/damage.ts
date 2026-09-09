@@ -23,18 +23,27 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { computeTalentModifiers } from '../content/talents';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
-import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
+import {
+  claimedInstanceForMob,
+  lockNormalDungeonResetOnBossKill,
+  spawnBossExitPortal,
+} from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
+import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
+import { isEvadingWildMob } from '../mob/evade_immunity';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
+import {
+  recordCorpseHarvestDeath,
+  releaseCorpseHarvest,
+} from '../professions/corpse_harvest_session';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -42,6 +51,7 @@ import { computeCharacterModifiers } from '../set_bonus_mods';
 import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
 import { addThreat, clearThreat, petCanSeeStealthedTarget } from '../threat';
+import { creditDummyDrill } from '../tutorial/dummy_drill';
 import type { DamageEventKind, Entity } from '../types';
 import {
   berserkerCritDamage,
@@ -72,6 +82,12 @@ import {
 import { isUnbreakableControlAura } from './cc';
 import { stopChannelVisual } from './channel_visuals';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
+import {
+  cleanupCraftedCollectionAuras,
+  craftedPetDamageMultiplier,
+  isCraftedCollectionAura,
+  onCraftedCollectionDamage,
+} from './crafted_collection_effects';
 import { recordDamageTaken } from './damage_history';
 import { destructionOnDeath } from './destruction';
 import {
@@ -242,13 +258,10 @@ export function dealDamage(
   // reflect ticks stay silent so a dotted evader does not spam a word per tick.
   // The early return keeps every downstream effect off: no threat, no combat
   // entry, no stealth break, no tap. A mob holding in place inside an instance
-  // (instances/instance_combat_hold.ts: stuck out of reach of its target, aggro
-  // intact) evades the same way while it is stuck, so a pinned mob cannot be
-  // chipped down; once it phases toward its target it can be hit on the way in.
+  // is immune while stuck, then becomes attackable once it phases to its target.
   if (
-    target.kind === 'mob' &&
-    (target.aiState === 'evade' || isImmuneInPlace(target)) &&
-    target.ownerId === null
+    isEvadingWildMob(target) ||
+    (target.kind === 'mob' && target.ownerId === null && isImmuneInPlace(target))
   ) {
     if (direct && source) {
       ctx.emit({
@@ -379,6 +392,7 @@ export function dealDamage(
   }
 
   if (!alreadyFinal && source && source.id !== target.id && amount > 0) {
+    cleanupCraftedCollectionAuras(ctx, source);
     let damageDone = 0;
     for (const aura of source.auras) {
       if (
@@ -392,6 +406,7 @@ export function dealDamage(
         damageDone += aura.value2 ?? 0;
       }
     }
+    damageDone += craftedPetDamageMultiplier(ctx, source) - 1;
     if (damageDone !== 0) amount = Math.round(amount * Math.max(0, 1 + damageDone));
   }
 
@@ -567,6 +582,7 @@ export function dealDamage(
   // is ALREADY an exact landed-HP-loss copy (the Ruinous Brand echo) has passed
   // through the target's absorbs once and must not be soaked a second time.
   if (!resolvedHpLoss && amount > 0) {
+    cleanupCraftedCollectionAuras(ctx, target);
     for (let i = target.auras.length - 1; i >= 0 && amount > 0; i--) {
       const a = target.auras[i];
       if (a.kind !== 'absorb') continue;
@@ -583,7 +599,12 @@ export function dealDamage(
         ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
         // Talent procs listening for a fully consumed shield (deterministic).
         const shielder = ctx.entities.get(a.sourceId);
-        if (shielder && !shielder.dead && shielder.kind === 'player') {
+        if (
+          shielder &&
+          !shielder.dead &&
+          shielder.kind === 'player' &&
+          !isCraftedCollectionAura(a.id)
+        ) {
           onShieldConsumed(ctx, shielder, a.id, target);
           priestOnShieldConsumed(ctx, shielder, a, target, source);
         }
@@ -926,6 +947,8 @@ export function dealDamage(
 
   const preHp = target.hp;
   target.hp = guardianWardRestore || Math.max(0, target.hp - amount);
+  // Snapshot before reactive heals can restore health or nested damage can add loss.
+  const craftedHpLoss = Math.max(0, preHp - target.hp);
   if (resolution) resolution.landedHpLoss = Math.max(0, preHp - target.hp);
   // Chronomancy Rewind (combat/damage_history.ts): log the REAL HP loss this player
   // just took, tagged by sim tick, so Rewind can restore a fraction of recent damage.
@@ -956,7 +979,7 @@ export function dealDamage(
   // and non-player sources are filtered inside. The PvP-context early returns
   // above (duel/fiesta/arena) intentionally skip conversion (PRD 13.9 defers PvP
   // tuning to a later phase).
-  chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe);
+  chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe, abilityId);
   doctrineConvertDamage(ctx, source, preHp - target.hp, school, abilityId ?? null);
   vespersEchoDamage(ctx, source, target, preHp - target.hp, abilityId ?? null);
   onAfflictionDamage(ctx, source, target, preHp - target.hp);
@@ -1039,6 +1062,7 @@ export function dealDamage(
   }
 
   if (source && source.id !== target.id) ctx.enterCombat(source, target);
+  onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, alreadyFinal);
   if (direct) ctx.refreshMobLeashFromAction(source, target);
 
   // classic threat: damage (and the ability's flat bonus) lands on the mob's
@@ -1102,6 +1126,9 @@ export function dealDamage(
   // persisted lifetime damage counters beside the session RewardCounters
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+  // The hub dummy lesson (tutorial/dummy_drill.ts): one credit per blow that
+  // actually lands on a training dummy. Zero rng.
+  if (source && amount > 0) creditDummyDrill(ctx, source, target);
 
   // Thornhollow Fields assists: remember who softened a player before the blow
   // that finishes them. Only real damage on a live player counts, and the
@@ -1350,6 +1377,11 @@ export function handleDeath(
   e.ccDr.clear();
   stopChannelVisual(ctx, e);
   emitRainOfFireStop(ctx, e);
+  // Death is a cast cancel (see the comment below), and this hub bypasses
+  // cancelCast's own teardown entirely, so the corpse-harvest release must be
+  // called explicitly here too, before the field it reads is cleared.
+  // Idempotent: a no-op for every death that was never mid-harvest.
+  releaseCorpseHarvest(ctx, e.id);
   e.castingAbility = null;
   e.castTargetId = null;
   // Death is a cast cancel: mirror cancelCast's teardown of the channel and
@@ -1586,6 +1618,14 @@ export function handleDeath(
       e.respawnTimer = Infinity;
       ctx.despawnSummonedAdds(e);
     }
+    // Instance bosses hold their lootable corpse for BOSS_CORPSE_HOLD_SECONDS:
+    // corpseTimer is the loot window, and an instance boss that never respawns
+    // in place went unlootable and invisible on the 60s trash decay while its
+    // loot still sat on the entity. Only ever raises the timer; a fixed
+    // respawnSeconds caps it like the decay above, and an open-world boss, a
+    // world boss, or a per-player summon is left on the classic window
+    // (mob/boss_corpse_hold.ts). Draws no rng.
+    applyBossCorpseHold(e, template);
     e.aggroTargetId = null;
     clearThreat(e);
     if (e.ownerId !== null) {
@@ -1621,9 +1661,9 @@ export function handleDeath(
           : null;
     const meta = creditId !== null ? ctx.players.get(creditId) : null;
     const creditEntity = creditId !== null ? ctx.entities.get(creditId) : null;
-    const rewardInstance = ctx.instances.find(
-      (inst) => inst.partyKey !== null && inst.mobIds.includes(e.id),
-    );
+    // Resolve the owning claim once for corpse participation and both reward
+    // awarders below; the slot remains stable throughout this death path.
+    const claimedInst = claimedInstanceForMob(ctx, e.id);
     let heroicRewardRecipients: PlayerMeta[] = [];
     if (meta && creditEntity && !meta.leaving) {
       const tmpl = MOBS[e.templateId];
@@ -1648,7 +1688,7 @@ export function handleDeath(
           const matchingInstanceCorpse =
             mE?.ghost &&
             mE.corpsePos &&
-            (!rewardInstance || mE.corpseInstanceId === rewardInstance.exitId)
+            (!claimedInst || mE.corpseInstanceId === claimedInst.exitId)
               ? mE.corpsePos
               : null;
           const participationPos = matchingInstanceCorpse ?? mE?.pos;
@@ -1683,7 +1723,7 @@ export function handleDeath(
           });
         }
         // Kill Chain (rogue row, docs/design/rogue-v029-class-design.md):
-        // killing blows refresh Smokestep and refill combo points. Refreshes,
+        // killing blows refresh Smokefade and refill combo points. Refreshes,
         // never banks past the combo cap; draws no rng.
         if (killMods.onKillCombo > 0) {
           creditEntity.comboPoints = Math.min(
@@ -1727,7 +1767,7 @@ export function handleDeath(
       ) {
         ctx.applyAura(creditEntity, {
           id: 'victory_rush',
-          name: 'Victory Rush',
+          name: "Victor's Surge",
           kind: 'victory_rush',
           value: 0,
           remaining: VICTORY_RUSH_WINDOW,
@@ -1766,7 +1806,12 @@ export function handleDeath(
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
-    ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
+    // Intentional Gathering PR3: the kill-credit priority snapshot for a
+    // future corpse-harvest cast, taken from the exact same eligible list the
+    // heroic-reward award above uses (empty means the corpse is public at
+    // once). Owned pets return earlier in this function and never reach here.
+    recordCorpseHarvestDeath(ctx, e, heroicRewardRecipients);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).
     spawnBossExitPortal(ctx, e);
@@ -1781,6 +1826,15 @@ export function handleDeath(
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
     }
+    // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
+    // check for the same participation snapshot. Deliberately BELOW every loot
+    // roll on this path (rollLoot above, rollWorldBossLoot for a world boss),
+    // so its single count draw always appends to the tick's rng sequence and
+    // can never reorder a loot roll, whatever kind of kill this is. Draw-order
+    // neutral to move here from above the world-boss block: an instance kill
+    // has no worldBossContribs and a world boss is never hosted in an instance
+    // slot, so no kill reaches both a wyrmfall draw and a world-boss roll.
+    ctx.awardWyrmfallCores(e, heroicRewardRecipients, claimedInst);
   }
 }
 

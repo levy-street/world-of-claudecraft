@@ -39,6 +39,7 @@ import {
   guildBankRungsBought,
 } from '../sim/guild_bank';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import type { MaterialComposition } from '../sim/material_sources';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { GuildBankInfo } from '../world_api';
 import { bagQualityKey } from './bags_view';
@@ -84,7 +85,7 @@ export interface GuildBankSlotModel {
   known: boolean;
   count: number;
   showCount: boolean; // count > 1 (a lone item hides its "1")
-  qualityKey: string; // item quality ?? 'common' (bagQualityKey semantics)
+  qualityKey: string; // instance-effective quality ?? 'common' (bagQualityKey semantics)
   /** Pipe-refused (unwithdrawable) slot: renders visibly distinct, never hidden. */
   dormant: boolean;
   /** Per-copy payload passthrough for the tooltip's instance lines. Dormant
@@ -93,6 +94,8 @@ export interface GuildBankSlotModel {
   /** Plain-stack crafting provenance, part of semantic focus identity even
    *  when no per-instance payload exists. */
   craftedRecipeId?: string;
+  /** Per-unit material provenance carried by the guild slot snapshot. */
+  materialSources?: MaterialComposition;
 }
 
 /** The header counter: occupied slots over the total budget. */
@@ -231,10 +234,11 @@ export function buildGuildBankView(
       known: item !== undefined,
       count: slot.count,
       showCount: slot.count > 1,
-      qualityKey: bagQualityKey(item ?? {}),
+      qualityKey: bagQualityKey(item ?? {}, slot.instance),
       dormant: guildBankSlotDormant(slot, item),
       instance: slot.instance,
       craftedRecipeId: slot.craftedRecipeId,
+      ...(slot.materialSources === undefined ? {} : { materialSources: slot.materialSources }),
     };
   });
   const used = slots.length;

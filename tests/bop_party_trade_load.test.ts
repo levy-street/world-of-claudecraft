@@ -16,7 +16,7 @@ import type { ItemInstancePayload } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
-const HELM = 'furyforged_warhelm'; // soulbound epic helmet (a real equippable id)
+const HELM = 'slagbreaker_helmet'; // soulbound epic helmet (a real equippable id)
 const VALID_UNTIL_MS = 7_200_000;
 
 function makeSim() {

@@ -17,8 +17,11 @@
 // `src/sim`-pure: no DOM/render/ui/game/net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Draws no rng.
 
+import type { ItemCopyAnchor } from './item_copy_anchor';
 import { selectedInventorySlot } from './item_copy_ref';
 import { isItemLocked } from './item_lock_flag';
+import { isMaterialItemId } from './material_ids';
+import { takeMaterialInventoryForHub } from './material_inventory_hub';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { InvSlot, ItemInstancePayload } from './types';
@@ -61,6 +64,27 @@ export function countUnlockedInSlots(inventory: readonly InvSlot[], itemId: stri
   return n;
 }
 
+/** Raw copies of `itemId` across every slot, locked INCLUDED: the walk
+ *  `Sim.countItem` runs, shared so every mirror counts exactly what the sim
+ *  counts. The raw-vs-unlocked pair is what splits a locked-copy shortfall
+ *  (denied 'locked') from a plain shortage in every deny site, so the raw
+ *  twin lives beside `countUnlockedInSlots` rather than as another private
+ *  copy (Phase 14 collapsed five src/ui copies onto this one export). The
+ *  parameter is structurally narrow on purpose: hot-path callers (the action
+ *  bar) hold `{ itemId, count }` slices, not full `InvSlot`s, and the walk
+ *  reads nothing else. A for-loop, not reduce: no per-frame closure
+ *  allocation on the hot path. */
+export function countRawInSlots(
+  inventory: readonly Pick<InvSlot, 'itemId' | 'count'>[],
+  itemId: string,
+): number {
+  let total = 0;
+  for (const slot of inventory) {
+    if (slot.itemId === itemId) total += slot.count;
+  }
+  return total;
+}
+
 /** Lock-aware removal mirroring the Sim inventory hub's removeItem walk
  *  (highest bag index first) but SKIPPING any locked slot entirely: a locked
  *  copy is never a valid removal victim, so unlike removePreferFungible's
@@ -70,6 +94,11 @@ export function countUnlockedInSlots(inventory: readonly InvSlot[], itemId: stri
  *  the #2350 capacity scratch simulation share this one walk so the two can
  *  never disagree about which slots free up. */
 export function removeUnlockedFromSlots(inventory: InvSlot[], itemId: string, count: number): void {
+  if (isMaterialItemId(itemId) && count > 0) {
+    takeMaterialInventoryForHub(inventory, itemId, count);
+    return;
+  }
+
   let remaining = count;
   for (let i = inventory.length - 1; i >= 0 && remaining > 0; i--) {
     const s = inventory[i];
@@ -103,6 +132,7 @@ export function setItemLocked(
   locked: boolean,
   pid?: number,
   slotIndex?: number,
+  anchor?: ItemCopyAnchor,
 ): SetItemLockedResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, locked, reason: 'not_held' };
@@ -112,7 +142,11 @@ export function setItemLocked(
   // bank-container arm is ever added here, it must call bank.ts
   // bumpBankWireRev in the same change (bankInfoFor clones the mutated slot,
   // and the server's `bank` wire gate elides on that revision).
-  const selected = selectedInventorySlot(meta.inventory, itemId, slotIndex);
+  // The anchor rides with the selection: the index proves the cell still holds
+  // this ITEM, the anchor that it still holds this COPY. A mismatch answers the
+  // same not_held the bad-index arm already answered, so a stale toggle never
+  // flips the lock on an id-mate the player never clicked.
+  const selected = selectedInventorySlot(meta.inventory, itemId, slotIndex, anchor);
   if (!selected) return { ok: false, itemId, locked, reason: 'not_held' };
   if (isItemLocked(selected.instance) === locked) return { ok: true, itemId, locked };
   if (!locked && selected.instance) {

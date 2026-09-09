@@ -50,10 +50,16 @@
 // the guild-only partial one. server/main.ts states the same story at the
 // retention sweep's table list, which is where an operator looks first.
 
+import { isMaterialItemId, materialItemIds } from '../src/sim/material_ids';
+import type { MaterialSourceDelta } from '../src/sim/material_sources';
+import { normalizeMaterialStack } from '../src/sim/material_stack';
+import type { ItemInstancePayload } from '../src/sim/types';
 import type { BankInfo, GuildBankInfo, VaultInfo } from '../src/world_api';
 import { BankLedgerGrowthLimitExceeded } from './bank_ledger_growth_budget';
 import { type BankLedgerRow, insertBankLedgerRow, insertBankLedgerRows } from './db';
+import { guildBookMaterialMovements } from './guild_bank_source_journal';
 import { gameMetricsCounters } from './http/game_signals';
+import type { MaterialMovementRow } from './material_source_ledger';
 import { REALM } from './realm';
 
 // The socket trio (Bank Storage phase 07) joins the personal vocabulary:
@@ -100,6 +106,14 @@ export interface BankOpDelta {
   // both absent, and absent means NOT RECORDED, never zero.
   counterpartyCopperDelta?: number | null;
   counterpartyCount?: number | null;
+  // The EXACT per-source legs a MATERIAL guild move carried, signed as the book
+  // moved them and derived from the before/after book through the shared source
+  // ledger. Not persisted to bank_ledger (its columns are picked explicitly, and
+  // the command/count audit deliberately keeps its own key space): this rides
+  // only the guild sidecar, where it is what makes a receipt-new delta replay
+  // the units it really moved instead of a whole after-stack. Absent on personal
+  // and vault rows, on copper-only rows, and on every non-material item.
+  materialSources?: readonly MaterialSourceDelta[] | null;
 }
 
 type BankSlot = BankInfo['slots'][number];
@@ -615,7 +629,21 @@ export const BANK_LEDGER_SHUTDOWN_DRAIN_MS = 10_000;
 //
 // Two shape differences from the bank, both structural rather than stylistic:
 //   - ordinary pooled stock keys on [itemId, null], while identity-preserving
-//     material keys on [itemId, {vaultSpecial:1,instance,craftedRecipeId}];
+//     material keys on [itemId, {vaultSpecial:1,instance,craftedRecipeId}].
+//     WHICH of the two a holding gets is decided per SOURCE BUCKET now, not per
+//     row: a row's canonical payload plus that bucket's legacy `signer` is the
+//     EFFECTIVE payload, and a holding with no payload, no crafted marker and no
+//     signer is pooled stock whichever store it physically sits in. That is what
+//     keeps this ledger's meaning fixed across the representation change: a
+//     signed material that used to sit as `instance:{signer}` and now sits as a
+//     payload-free row with a signer BUCKET projects onto the identical key, and
+//     the deposit-time fold of compact units into an identity block writes no
+//     row at all, because it moves units between representations and changes no
+//     total. A GATHERER never reaches this ledger: it is new information with no
+//     historical identity here, and folding it in would split one old identity
+//     into many. Gatherer and signature deltas are the material_source_journal's
+//     job (server/material_source_ledger.ts); this table stays a COUNT ledger
+//     whose old rows keep meaning what they meant;
 //   - `purchased_slots_after` carries the vault's UPGRADE RUNG (VaultInfo
 //     .upgrades), the monotonic ladder analogue of the bank's purchasedSlots.
 //     The column is NOT NULL and pass B scans it for regressions, so the rung
@@ -629,19 +657,122 @@ export const BANK_LEDGER_SHUTDOWN_DRAIN_MS = 10_000;
 // even while its only readers live in this module.
 export type VaultLedgerOp = 'deposit' | 'withdraw' | 'buy_slots';
 
-/** Versioned ledger identity for a full-payload Materials Vault row. The
- *  wrapper distinguishes even a sanitizer-demoted special row (both markers
- *  null) from ordinary pooled stock. */
-export function vaultSpecialLedgerIdentity(slot: VaultInfo['special'][number]): {
+export type VaultLedgerIdentity = {
   vaultSpecial: 1;
-  instance: VaultInfo['special'][number]['instance'] | null;
+  instance: ItemInstancePayload | null;
   craftedRecipeId: string | null;
-} {
+};
+
+/** Versioned ledger identity wrapper for a Materials Vault holding that carries
+ *  real per-copy identity. Takes the EFFECTIVE payload (see
+ *  `vaultCountLedgerIdentity`), so a caller cannot accidentally hand it a
+ *  normalized row's payload with the signer still sitting in a source bucket. */
+export function vaultSpecialLedgerIdentity(identity: {
+  itemId?: string;
+  instance?: ItemInstancePayload | null;
+  craftedRecipeId?: string | null;
+}): VaultLedgerIdentity {
   return {
     vaultSpecial: 1,
-    instance: slot.instance ?? null,
-    craftedRecipeId: slot.craftedRecipeId ?? null,
+    instance: identity.instance ?? null,
+    craftedRecipeId: identity.craftedRecipeId ?? null,
   };
+}
+
+/**
+ * The EFFECTIVE payload one holding presents to the COUNT ledger: the row's
+ * canonical payload with the bucket's legacy `signer` put back on it.
+ *
+ * This is the whole compatibility hinge. Before per-unit provenance a signed
+ * material sat in the vault as `instance: { signer }`; it now sits as a
+ * payload-free row whose SOURCE BUCKET carries that signer. The count ledger
+ * has recorded the first shape for the life of the table, so the second must
+ * project onto exactly the same identity or every pre-change row stops matching
+ * the state it produced.
+ *
+ * Signer PRESENCE decides, never premium-ness: an empty-string signer is a
+ * legacy value that really did sit on the payload, so it keeps a payload here
+ * too. A GATHERER never appears at all: it is new information the count ledger
+ * has no historical identity for, and folding it in would split one old
+ * identity into many. The source journal is what records gatherers; this
+ * ledger's job is that its old rows keep meaning what they meant.
+ *
+ * Keys are sorted so the two shapes serialize identically in the multiset key
+ * below. Postgres normalizes jsonb key order on both sides in production, so
+ * this only matters for the in-memory diff and for fixtures, which is exactly
+ * where the legacy and normalized shapes meet.
+ */
+function effectiveCountPayload(
+  payload: ItemInstancePayload | undefined,
+  signer: string | undefined,
+): ItemInstancePayload | null {
+  const merged: Record<string, unknown> = { ...(payload ?? {}) };
+  if (signer !== undefined) merged.signer = signer;
+  const keys = Object.keys(merged)
+    .filter((key) => merged[key] !== undefined)
+    .sort();
+  if (keys.length === 0) return null;
+  const out: Record<string, unknown> = {};
+  for (const key of keys) out[key] = merged[key];
+  return out as ItemInstancePayload;
+}
+
+/** The count ledger's identity for one effective payload: `null` (ordinary
+ *  pooled stock) when nothing per-copy survives, else the versioned wrapper.
+ *
+ *  A payload-free, marker-free, signer-free holding IS pooled stock as far as
+ *  custody is concerned, whichever of the vault's two stores it physically sits
+ *  in. That is what makes the deposit-time fold of compact units into an
+ *  identity block ledger-INVISIBLE: it moves units between representations and
+ *  changes no total, so it must produce no row. (Rows written before this rule
+ *  carry the all-null wrapper for such a holding; scripts/bank_audit.mjs folds
+ *  that historical shape onto this same key rather than rewriting history.) */
+export function vaultCountLedgerIdentity(
+  instance: ItemInstancePayload | null,
+  craftedRecipeId: string | null,
+): VaultLedgerIdentity | null {
+  if (instance === null && craftedRecipeId === null) return null;
+  return vaultSpecialLedgerIdentity({ instance, craftedRecipeId });
+}
+
+interface VaultCountGroup {
+  readonly identity: VaultLedgerIdentity | null;
+  readonly count: number;
+}
+
+/**
+ * Split one vault row into the count-ledger identities it holds, by SOURCE
+ * BUCKET: the shared material model's normalized composition, read through
+ * `normalizeMaterialStack` rather than re-derived, so a legacy signer-on-payload
+ * row and a normalized signer-in-buckets row walk the same path.
+ *
+ * A row the model cannot read (or an id it does not own) keeps the whole-row
+ * legacy projection. That is the safe direction for an OBSERVER: it never
+ * throws into the dispatch path, and an unreadable row keeps whatever identity
+ * the pre-provenance ledger already gave it.
+ */
+function vaultCountGroups(slot: VaultInfo['special'][number]): VaultCountGroup[] {
+  const crafted = slot.craftedRecipeId ?? null;
+  const normalized = isMaterialItemId(slot.itemId)
+    ? normalizeMaterialStack(slot, materialItemIds())
+    : null;
+  if (normalized === null || !normalized.ok) {
+    const payload = effectiveCountPayload(slot.instance, undefined);
+    return [{ identity: vaultCountLedgerIdentity(payload, crafted), count: slot.count }];
+  }
+  const stack = normalized.value;
+  const buckets = stack.materialSources ?? [];
+  if (buckets.length === 0) {
+    const payload = effectiveCountPayload(stack.instance, undefined);
+    return [{ identity: vaultCountLedgerIdentity(payload, crafted), count: stack.count }];
+  }
+  return buckets.map((bucket) => ({
+    identity: vaultCountLedgerIdentity(
+      effectiveCountPayload(stack.instance, bucket.source.signer),
+      crafted,
+    ),
+    count: bucket.count,
+  }));
 }
 
 interface VaultMultisetRow {
@@ -652,18 +783,18 @@ interface VaultMultisetRow {
 
 function vaultMultiset(info: VaultInfo): Map<string, VaultMultisetRow> {
   const rows = new Map<string, VaultMultisetRow>();
+  const add = (itemId: string, instance: VaultLedgerIdentity | null, count: number): void => {
+    const key = JSON.stringify([itemId, instance]);
+    const prior = rows.get(key);
+    if (prior) prior.count += count;
+    else rows.set(key, { itemId, instance, count });
+  };
   for (const itemId of Object.keys(info.stock)) {
     const held = Number(info.stock[itemId]);
-    const count = Number.isFinite(held) ? held : 0;
-    const key = JSON.stringify([itemId, null]);
-    rows.set(key, { itemId, instance: null, count });
+    add(itemId, null, Number.isFinite(held) ? held : 0);
   }
   for (const slot of info.special) {
-    const instance = vaultSpecialLedgerIdentity(slot);
-    const key = JSON.stringify([slot.itemId, instance]);
-    const prior = rows.get(key);
-    if (prior) prior.count += slot.count;
-    else rows.set(key, { itemId: slot.itemId, instance, count: slot.count });
+    for (const group of vaultCountGroups(slot)) add(slot.itemId, group.identity, group.count);
   }
   return rows;
 }
@@ -1008,8 +1139,18 @@ export function diffGuildBankOp(
   const beforeCounts = countByGuildKey(before.slots);
   const afterCounts = countByGuildKey(after.slots);
   const keys = new Set<string>([...beforeCounts.keys(), ...afterCounts.keys()]);
+  // MATERIAL stock is owned by the source arm below, never by this multiset.
+  // The two do not agree and cannot be made to: this key is the RAW payload, so
+  // a legacy signed stack and the normalized stack it merges with are two keys
+  // here and one payload identity there, and reading a merge through this key
+  // would report the whole after-stack as the movement. Null means the shared
+  // model could not read the book, and then NO material delta is emitted at all
+  // (see guildMaterialDeltas).
+  const movements = guildBookMaterialMovements(before.slots, after.slots);
   const out: BankOpDelta[] = [];
   for (const key of keys) {
+    const representative = (afterCounts.get(key) ?? beforeCounts.get(key))?.slot;
+    if (representative !== undefined && isMaterialItemId(representative.itemId)) continue;
     const b = beforeCounts.get(key)?.count ?? 0;
     const a = afterCounts.get(key)?.count ?? 0;
     const delta = a - b;
@@ -1039,6 +1180,80 @@ export function diffGuildBankOp(
         purchasedSlotsAfter: after.purchasedSlots,
       });
     }
+  }
+  out.push(...guildMaterialDeltas(op, movements, before, after));
+  return out;
+}
+
+// A refusal here is a book the shared source model cannot read at all, which the
+// guild load path is built to prevent. It is bounded-logged rather than counted:
+// the fixed guildBankIncident vocabulary is owned elsewhere, and adding to it is
+// a separate change (recorded as an owed follow-up).
+const GUILD_SOURCE_LOG_LIMIT = 5;
+let guildSourceUnreadableLogged = 0;
+
+function logGuildSourceAnomaly(detail: string): void {
+  if (guildSourceUnreadableLogged >= GUILD_SOURCE_LOG_LIMIT) return;
+  guildSourceUnreadableLogged += 1;
+  console.error(
+    `bank_ledger guild material source diff: ${detail}${
+      guildSourceUnreadableLogged === GUILD_SOURCE_LOG_LIMIT
+        ? ' (further occurrences are suppressed)'
+        : ''
+    }`,
+  );
+}
+
+/**
+ * The material half of a guild item op, read from the movement rows the shared
+ * source ledger derived from the before/after book.
+ *
+ * One delta per moved payload identity, carrying BOTH the unit count and the
+ * exact signed legs behind it, so a one-unit deposit into a mixed stack records
+ * one unit and a pure re-attribution records as a count-0 delta whose legs still
+ * name both sides of the swap. The identity is the NORMALIZED payload (a legacy
+ * `signer` has moved into its own bucket by then), which is exactly the identity
+ * the escrow replay groups the book under.
+ *
+ * A row whose direction contradicts the op is a defect, not a move this shape
+ * can express (`count` is a magnitude and the op carries the sign), so it is
+ * logged and dropped rather than recorded with the wrong sign. A null movement
+ * read emits nothing: the multiset arm's answer for a normalized book would
+ * report a whole merged stack as the movement, and replaying that would MINT the
+ * units already in the book. Losing an audit line beats minting copies.
+ */
+function guildMaterialDeltas(
+  op: GuildBankLedgerOp,
+  movements: readonly MaterialMovementRow[] | null,
+  before: GuildBankInfo,
+  after: GuildBankInfo,
+): BankOpDelta[] {
+  if (op !== 'deposit' && op !== 'withdraw' && op !== 'admin_purge') return [];
+  if (movements === null) {
+    logGuildSourceAnomaly(
+      `${op} could not read the book's material stock; no source delta emitted`,
+    );
+    return [];
+  }
+  const sign = op === 'deposit' ? 1 : -1;
+  const out: BankOpDelta[] = [];
+  for (const row of movements) {
+    if (row.count !== 0 && Math.sign(row.count) !== sign) {
+      logGuildSourceAnomaly(
+        `${op} moved ${row.count} of ${row.itemId} in the opposite direction; row dropped`,
+      );
+      continue;
+    }
+    out.push({
+      itemId: row.itemId,
+      count: Math.abs(row.count),
+      instance: row.instance ?? null,
+      craftedRecipeId: row.craftedRecipeId ?? null,
+      materialSources: row.sourceDeltas,
+      copperDelta: 0,
+      purchasedSlotsBefore: before.purchasedSlots,
+      purchasedSlotsAfter: after.purchasedSlots,
+    });
   }
   return out;
 }

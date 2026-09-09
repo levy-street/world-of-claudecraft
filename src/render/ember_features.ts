@@ -6,7 +6,6 @@
 // contract as realm_flora: build once, update(time) animates, lights join
 // the renderer's rank-culled fireLights budget.
 import * as THREE from 'three';
-import { CASTLE_CRYSTALS } from '../sim/castle_layout';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -54,7 +53,7 @@ interface PropPlacement {
 
 // Meshopt-quantized attributes are normalized ints; bake them to plain
 // floats BEFORE applying a world matrix, or setXYZ clamps every vertex
-// back into the normalized [-1, 1] domain (the castle_features guard).
+// back into the normalized [-1, 1] domain (the castle-assembly guard).
 function attributeToFloat(geo: THREE.BufferGeometry, name: string): void {
   const attr = geo.getAttribute(name);
   if (!attr || (attr.array instanceof Float32Array && !attr.normalized)) return;
@@ -306,18 +305,6 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
         });
       }
     }
-    // ember crystals of varying sizes around the Last Keep: the castle plan
-    // authors these directly (they sit INSIDE the grounds the wild scatter
-    // clears), seated on the graded pad
-    for (const c of CASTLE_CRYSTALS) {
-      crystalSpots.push({
-        x: c.x,
-        z: c.z,
-        y: terrainHeight(c.x, c.z, seed) - 0.1,
-        fp: c.fp,
-        rot: hash2(c.x, c.z, seed + 843) * Math.PI * 2,
-      });
-    }
     // a dense crystal garden on the Bloodglass Fields
     for (let k = 0; k < 14; k++) {
       const ang = hash2(k, 3, seed + 871) * Math.PI * 2;
@@ -426,7 +413,10 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
     const FIELDS = [
       { x: 354, z: 2092, r: 22 },
       { x: 300, z: 2176, r: 24 },
-      { x: 452, z: 2112, r: 20 },
+      // the keep-side churchyard: the graveyard moved with the rebuild (the
+      // Pale Keeper's seat south of the placed chapel), and a tight field
+      // keeps the bones on that lawn, off the keep's plazas and plates
+      { x: 451, z: 2134, r: 8 },
       { x: 419, z: 2266, r: 9 },
       { x: 302, z: 2258, r: 9 },
     ];

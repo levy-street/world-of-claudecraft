@@ -10,6 +10,7 @@
 // Deliberately driven through the real Sim and the real content tables: the
 // point is to exercise every shipped escort, not a fixture.
 import { describe, expect, it } from 'vitest';
+import { HUB_HEALING_DUMMY_ID, HUB_TRAINING_DUMMY_ID } from '../src/sim/content/practice_dummies';
 import { CAMPS, DUNGEON_X_THRESHOLD, ESCORTS, MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -59,14 +60,29 @@ function idleEscorteeAllowance(): Map<string, number> {
   return out;
 }
 
+/** The Eastbrook hub practice yard (hub_practice.ts) stands one training
+ *  dummy and one healing dummy permanently, spawned by sim.ts rather than
+ *  CAMPS (see that file's header for why); authored the same as an idle
+ *  escortee, never a leak. */
+function hubPracticeAllowance(): Map<string, number> {
+  return new Map([
+    [HUB_TRAINING_DUMMY_ID, 1],
+    [HUB_HEALING_DUMMY_ID, 1],
+  ]);
+}
+
 function assertPopulationSane(sim: Sim, label: string): void {
   const authored = authoredCounts();
   const wave = activeWaveAllowance(sim);
   const idle = idleEscorteeAllowance();
+  const hubPractice = hubPracticeAllowance();
   const over: string[] = [];
   for (const [templateId, live] of liveCounts(sim)) {
     const budget =
-      (authored.get(templateId) ?? 0) + (wave.get(templateId) ?? 0) + (idle.get(templateId) ?? 0);
+      (authored.get(templateId) ?? 0) +
+      (wave.get(templateId) ?? 0) +
+      (idle.get(templateId) ?? 0) +
+      (hubPractice.get(templateId) ?? 0);
     if (live > budget) over.push(`${templateId}: ${live} live vs ${budget} allowed`);
   }
   expect(over, label).toEqual([]);

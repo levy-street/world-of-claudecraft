@@ -9,6 +9,13 @@
 // 2861 armor, in Defensive Stance (takes 10% less). Against a level-22 rift mob
 // the armor step passes ~44.2% and the stance cut leaves ~39.8%; at S rank
 // (level 23) ~45.2% and ~40.6%.
+// Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+// PINNED constant, not a live measurement of the catalog. The committed
+// max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+// whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+// UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+// On the 4085 kit the level-22 pair reads about 35.7% and about 32.1%, and the
+// level-23 pair about 36.6% and about 32.9%.
 //
 // The ladder these floors encode, decided 2026-07-26:
 //   C  a NORMAL dungeon, on normal Gravewyrm Sanctum's own line

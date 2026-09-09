@@ -11,6 +11,10 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  professions_crucible: {
+    name: '坩堝の匠技',
+    desc: 'レイド素材で作る11種のセット。各セットに胴、腰、足の装備がある。型紙と製法書は知識であり、収集品には含まれない。',
+  },
   // Dungeon, delve and world-boss pages: entities.* names verbatim.
   conquerors_hollow_crypt: {
     name: '虚ろの墓所',
@@ -191,5 +195,13 @@ export const table: ReliquaryLocaleTable = {
   conquerors_varkhul_heroic: {
     name: '英雄: 内部るつぼ',
     desc: '最後の炎の鍛造父、ヴァルクルからヒロイックでのみ得られる盾と武器。',
+  },
+  professions_forgebreaker: {
+    name: 'フォージブレイカー',
+    desc: '鍛冶場から解き放たれ、自ら作った槌に宿る最後の泉の声。',
+  },
+  conquerors_set_bramblehide: {
+    name: 'ルーツのブランブルハイド',
+    desc: 'ブランブルハイドのレザー一式。',
   },
 };

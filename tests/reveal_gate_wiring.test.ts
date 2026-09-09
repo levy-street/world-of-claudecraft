@@ -12,10 +12,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { prewarmResumeIsDebt } from '../src/render/prewarm_policy';
-
-function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-}
+import { stripComments } from './helpers/strip_comments';
 
 const read = (path: string): string =>
   stripComments(readFileSync(new URL(path, import.meta.url), 'utf8'));
@@ -71,11 +68,13 @@ describe('reveal gate wiring (source pins)', () => {
     // The link is cut into one queue unit per material group of the root
     // (compile_gate_pieces.ts), each running the colour arm, the shadow arm,
     // then the variant settle on that group's representative node, each under
-    // its own deadline.
+    // its own deadline. The shader warm audit is told in the warm gate's
+    // assembly unit, not here: the host carries no announcement arm.
     const colourAt = anchor(
       host,
       'const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow, deps.settle);',
     );
+    expect(host).not.toContain('deps.expect');
     // Uploads sit BETWEEN the link and the touch: the touch's driver round trip
     // flushes behind everything already queued, so an upload paid after it is
     // measured by it instead of being its own budgeted piece. Both ride the
@@ -179,7 +178,7 @@ describe('reveal gate wiring (source pins)', () => {
   });
 
   it('covers graphics rebuild prewarm and bounds the entry-only first-paint barrier', () => {
-    const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
     const rebuild = main.slice(
       anchor(main, 'prewarmRenderer: async (next) => {'),
       anchor(main, 'validateRenderer: (next) => {'),

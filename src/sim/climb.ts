@@ -1,7 +1,7 @@
 // The ledge climb: the scripted pull-up that ends a jump on top of something
 // the body could not simply vault.
 //
-// It is a MOVEMENT MODE, in the same family as Heroic Leap's flight and the
+// It is a MOVEMENT MODE, in the same family as Vaulting Charge's flight and the
 // warrior's charge: while it runs it owns the body's position outright, so the
 // path cannot be fought by input, gravity, or collision (the destination was
 // validated before the climb started). It is short, it always completes on a

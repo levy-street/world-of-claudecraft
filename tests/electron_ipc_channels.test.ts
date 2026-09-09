@@ -41,12 +41,16 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-app-quit',
         'desktop-gamepad-activity',
         'desktop-get-display-mode',
+        'desktop-get-gpu-backend',
         'desktop-get-gpu-force-opt-out',
+        'desktop-get-launch-settings',
         'desktop-login-open-browser',
+        'desktop-restart-app',
         'desktop-login-take-code',
         'desktop-set-discord-activity',
         'desktop-set-discord-presence-enabled',
         'desktop-set-display-mode',
+        'desktop-set-gpu-backend',
         'desktop-set-gpu-force-opt-out',
         'desktop-set-strings',
         'desktop-show-notification',
@@ -68,6 +72,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const sent = matches(preload, /ipcRenderer\.send\('([^']+)'/g);
     const listened = matches(mainSide, /ipcMain\.on\('([^']+)'/g);
     expect([...sent]).toContain('desktop-renderer-error');
+    expect([...sent]).toContain('desktop-report-gpu-renderer');
     for (const channel of sent) {
       expect(listened, `no ipcMain.on for sent channel ${channel}`).toContain(channel);
     }
@@ -78,6 +83,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const pushed = matches(mainSide, /webContents\.send\('([^']+)'/g);
     expect([...subscribed].sort()).toEqual([
       'desktop-display-changed',
+      'desktop-gpu-backend-state',
       'desktop-gpu-status',
       'desktop-login-code',
       'desktop-presentation-changed',
@@ -110,7 +116,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // The channel existing is not enough: the settle signal exists ONLY so the
     // shell CancelAuthTickets the live handle promptly (Valve's contract), so
     // the handler body must actually reach steamShell.cancelLinkTicket.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-steam-link-settled'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('});', start));
@@ -120,7 +126,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   it('the epic-link-settled handler body cancels the live proof handle', () => {
     // Mirror of the Steam settle contract: the channel exists so the shell can
     // release any cancelable EOS adapter handle promptly after the link POST.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-epic-link-settled'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('});', start));
@@ -128,7 +134,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   });
 
   it('reports whether the external wallet authorization page actually opened', () => {
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-wallet-open-browser'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('});', start));
@@ -140,7 +146,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // PRIME) and writes a Windows per-app preference, so a junk value must not
     // reach the file, and the renderer must learn when the write failed rather
     // than showing a toggle the next launch will not honor.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-set-gpu-force-opt-out'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
@@ -172,12 +178,80 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     );
   });
 
+  it('the gpu-backend setter takes only a listed setting, persists, then commits', () => {
+    // The stored setting decides which GL backend the next launch forces on
+    // Linux, and 'auto' re-arms one Vulkan trial by resetting the verdict, so
+    // a junk value must not reach the file and the mirror must follow the
+    // write, never lead it.
+    const main = stripComments(read('electron/main.cjs'));
+    const start = main.indexOf("ipcMain.handle('desktop-set-gpu-backend'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('\n});', start));
+    expect(body).toContain('if (!GPU_BACKEND_SETTINGS.includes(value)) return false;');
+    // The WHOLE record, spread from the live module-scope object (the
+    // anti-clobber contract with the other savers), plus the memory reset that
+    // only a real switch back to 'auto' triggers: the game re-pushes its stored
+    // value at every boot, and a same-value write must not start detection over.
+    const save = body.replace(/\s+/g, ' ');
+    expect(save).toContain(
+      "const backToAuto = value === 'auto' && desktopPrefs.gpuBackend !== 'auto';",
+    );
+    expect(save).toContain('const next = { ...desktopPrefs, gpuBackend: value };');
+    // The GUESS is cleared and the PROOF is not: a session that ran healthy here
+    // still ran healthy here, whatever the player did with the setting since.
+    expect(save).toContain('next.gpuBackendToAttempt = undefined;');
+    expect(save).toContain('next.consecutiveGpuLaunchCrashes = 0;');
+    expect(save).toContain('next.launchesSinceBackendReprobe = 0;');
+    expect(save).not.toContain('next.gpuBackendProof');
+    const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
+    // Idempotence, like the display-mode and Discord setters: the world-entry apply-all
+    // loop re-sends the stored setting, and a same-value send must not cost an fsynced
+    // prefs write per launch. After validation, before the save.
+    const sameAt = body.indexOf('if (value === desktopPrefs.gpuBackend) return true;');
+    expect(sameAt).toBeGreaterThan(body.indexOf('GPU_BACKEND_SETTINGS.includes(value)'));
+    expect(sameAt).toBeLessThan(saveAt);
+    const commitAt = body.indexOf('desktopPrefs.gpuBackend = value;');
+    const verdictAt = body.indexOf('desktopPrefs.gpuBackendToAttempt = undefined;');
+    expect(commitAt).toBeGreaterThan(saveAt);
+    expect(verdictAt).toBeGreaterThan(saveAt);
+    expect(body.slice(commitAt)).toContain('return true;');
+
+    // The getter and the push answer from ONE builder, so the row cannot read
+    // one shape on open and another on the push that follows.
+    const getterAt = main.indexOf("ipcMain.handle('desktop-get-gpu-backend'");
+    expect(getterAt).toBeGreaterThan(-1);
+    const getter = main.slice(getterAt, main.indexOf('\n});', getterAt)).replace(/\s+/g, ' ');
+    expect(getter, 'the getter must answer through the shared builder').toContain(
+      'return gpuBackendState();',
+    );
+    const stateAt = main.indexOf('function gpuBackendState() {');
+    expect(stateAt).toBeGreaterThan(-1);
+    const state = main.slice(stateAt, main.indexOf('\n}', stateAt)).replace(/\s+/g, ' ');
+    // The stored setting is what the NEXT launch does; `active` is what THIS one
+    // is really running, which is the whole point of the row: a player who
+    // picked Vulkan on a machine that cannot run it must not read "Vulkan".
+    expect(state).toContain('setting: desktopPrefs.gpuBackend,');
+    // Empty until the launch is judged: `boundRung` starts as the rung that was
+    // ASKED for, and reporting that as active is the lie the row exists to stop.
+    expect(state).toContain("active: gpuBackendJudged ? boundRung : '',");
+    // Off the SETTING, never this launch's rung: a rescue chain ends on a
+    // process whose own launch succeeded, so comparing against the launch would
+    // go quiet on exactly the machine the message exists for.
+    expect(state).toContain(
+      'requestedUnavailable: requestedBackendUnavailable({ setting: desktopPrefs.gpuBackend, judged: gpuBackendJudged, boundRung, }),',
+    );
+    expect(state, 'the reading must not be derived from this launch').not.toContain(
+      'gpuBackendLaunch.rung',
+    );
+    expect(state).toContain("supported: process.platform === 'linux',");
+  });
+
   it('the display-mode setter takes only the two literals, persists, then applies live', () => {
     // The stored mode decides how the NEXT launch reveals the window and the
     // live apply is what the player sees under the click, so a junk value must
     // reach neither, and a failed write must not leave the window in a mode the
     // next launch would not reproduce.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-set-display-mode'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
@@ -227,7 +301,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   it('the gamepad-activity handler feeds the display-sleep lease', () => {
     // The channel existing proves nothing: it exists ONLY so controller input
     // keeps the display awake, and nothing else in the shell pings the lease.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-gamepad-activity'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
@@ -288,7 +362,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // unknown kind, an unbounded string, a focused window, and a repeat inside
     // the floor each have to be answered by value rather than by a call some
     // later line could ignore.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-show-notification'");
     expect(start).toBeGreaterThan(-1);
     const end = main.indexOf('\n});', start);
@@ -584,7 +658,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   });
 
   it('activates the macOS app when the browser returns a wallet handoff', () => {
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf('function deliverWalletHandoffCode');
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n}', start));
@@ -606,6 +680,10 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'onDisplayChanged',
       'getGpuForceOptOut',
       'setGpuForceOptOut',
+      'getGpuBackend',
+      'setGpuBackend',
+      'hasGpuBackendChoice',
+      'reportGpuRenderer',
       'getDisplayMode',
       'setDisplayMode',
       'notifyGamepadActivity',
@@ -626,6 +704,52 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     ]) {
       expect(preload, `preload is missing bridge method ${method}`).toContain(`${method}:`);
     }
+  });
+
+  it('the gpu-renderer report is a gated, string-only feed into the trial settle', () => {
+    // A send, not an invoke: nothing is answered. The body is pinned because the
+    // trusted-sender gate scan above covers ipcMain.handle registrations only,
+    // and a report from a stray frame could otherwise judge this launch.
+    const main = stripComments(read('electron/main.cjs'));
+    const start = main.indexOf("ipcMain.on('desktop-report-gpu-renderer'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('\n});', start)).replace(/\s+/g, ' ');
+    expect(body).toContain('if (!trustedSender(event)) return;');
+    expect(body.indexOf('trustedSender(event)')).toBeLessThan(body.indexOf('judgeThisLaunch('));
+    // Strings only, never empty (no evidence, like an empty getGPUInfo reading),
+    // and the game's own report is by definition not Chromium's software flag.
+    expect(body).toContain("if (typeof renderer !== 'string' || renderer === '') return;");
+    // The extension flag is a strict boolean or unknown, never a truthy payload.
+    expect(body).toContain(
+      'const parallel = parallelCompile === true ? true : parallelCompile === false ? false : undefined;',
+    );
+    expect(body).toContain('judgeThisLaunch(renderer.slice(0, 256), false, parallel);');
+    expect(body).not.toContain('event.reply');
+    expect(body).not.toContain('return true');
+  });
+
+  it('the preload exposes the gpu-backend pair with the shapes the client calls', () => {
+    // The game side calls exactly these two names on window.wocDesktop; the
+    // setter stringifies so a non-string never crosses the bridge, and main
+    // does the whitelist check.
+    expect(preload).toContain(
+      "getGpuBackend: () => ipcRenderer.invoke('desktop-get-gpu-backend'),",
+    );
+    expect(preload).toContain(
+      "setGpuBackend: (value) => ipcRenderer.invoke('desktop-set-gpu-backend', String(value)),",
+    );
+    // The renderer report: a capped string over a send, so a hostile page can
+    // neither ship an unbounded payload nor learn anything back.
+    expect(preload).toContain('reportGpuRenderer: (renderer, parallelCompile) => {');
+    expect(preload).toContain(
+      'const flag = parallelCompile === true ? true : parallelCompile === false ? false : undefined;',
+    );
+    expect(preload).toContain(
+      "ipcRenderer.send('desktop-report-gpu-renderer', String(renderer).slice(0, 256), flag);",
+    );
+    // The platform answer is a synchronous VALUE, not a round trip: the
+    // options row is gated on it when the window opens.
+    expect(preload).toContain("hasGpuBackendChoice: process.platform === 'linux',");
   });
 
   it('exposes app quit as an argument-free capability', () => {

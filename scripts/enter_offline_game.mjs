@@ -12,10 +12,11 @@
 // body.mobile-touch in headless, dismissing the mobile preflight, opening a window, the
 // screenshot itself) stay in each script.
 //
-// Before returning, this also dismisses the three overlays that must never appear in a
+// Before returning, this also dismisses the overlays that must never appear in a
 // captured screenshot (repo-wide rule): the first-spawn intro cinematic/logo, the
-// new-adventurer tutorial overlay, and the camera-mode-choice prompt. Every screenshot
-// script that calls enterOfflineGame gets this for free.
+// new-adventurer tutorial overlay, the camera-mode-choice prompt, and the spawn
+// greeting one-shot (#tutorial-greeting). Every screenshot script that calls
+// enterOfflineGame gets this for free.
 //
 // opts:
 //   charClass  data-class of the class card to pick (default 'warrior')
@@ -99,17 +100,52 @@ export async function dismissEntryOverlays(page) {
         const visible = (el) => !!el && getComputedStyle(el).display !== 'none';
         const introLogo = document.getElementById('intro-logo');
         const skipBtn = [...document.querySelectorAll('button.tut-skip')][0];
+        // The tutorial-island greeting (Ferryman Odo) rides the sim's 1 Hz
+        // sweep and pops a beat after the Proving Shore spawn
+        // (release/v0.41.0 moved fresh entries there), so it can surface
+        // AFTER a single poll would have returned; dismiss it through its
+        // own confirm like the other overlays, and the loop below holds a
+        // minimum number of polls so a not-yet-spawned greeting is still
+        // caught.
+        let greetingUp = false;
+        for (const id of ['tutorial-greeting', 'profession-tutorial']) {
+          const popup = document.getElementById(id);
+          if (popup && visible(popup)) {
+            greetingUp = true;
+            popup.querySelector('button')?.click();
+          }
+        }
         return {
           introUp: visible(introLogo) || document.getElementById('ui')?.style.display === 'none',
           tutorialUp: visible(skipBtn),
           cameraPromptUp: visible(document.querySelector('.camera-prompt-backdrop')),
+          greetingUp,
         };
       })
-      .catch(() => ({ introUp: false, tutorialUp: false, cameraPromptUp: false }));
-    if (!state.introUp && !state.tutorialUp && !state.cameraPromptUp) return;
+      .catch(() => ({
+        introUp: false,
+        tutorialUp: false,
+        cameraPromptUp: false,
+        greetingUp: false,
+      }));
+    // Hold at least three polls (~1.2s): the spawn greeting arrives on the
+    // sim's own timer and a first quiet poll proves nothing about it.
+    if (i >= 2 && !state.introUp && !state.tutorialUp && !state.cameraPromptUp && !state.greetingUp)
+      return;
     if (state.introUp) await page.keyboard.press('Escape').catch(() => {});
     if (state.tutorialUp) {
       await page.evaluate(() => document.querySelector('button.tut-skip')?.click()).catch(() => {});
+    }
+    // The spawn greeting one-shot (#tutorial-greeting): close the note variant,
+    // else decline the play/skip variant, so no capture carries the modal.
+    if (state.greetingUp) {
+      await page
+        .evaluate(() => {
+          const root = document.getElementById('tutorial-greeting');
+          const btn = root?.querySelector('[data-close]') ?? root?.querySelector('[data-skip]');
+          if (btn) btn.click();
+        })
+        .catch(() => {});
     }
     if (state.cameraPromptUp) {
       await page

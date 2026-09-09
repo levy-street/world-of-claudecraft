@@ -25,10 +25,15 @@
 // player already dismissed, but a verdict that grows a NEW component re-arms it
 // (the same shape as the perf nudge's keyed dismissal, perf_nudge_view.ts).
 
-export type GpuNoticeComponent = 'discrete-inactive' | 'hybrid' | 'software';
+export type GpuNoticeComponent = 'discrete-inactive' | 'hybrid' | 'requested-backend' | 'software';
 
 /** Every component id, in the sorted order a signature stores them in. */
-export const GPU_NOTICE_COMPONENTS = ['discrete-inactive', 'hybrid', 'software'] as const;
+export const GPU_NOTICE_COMPONENTS = [
+  'discrete-inactive',
+  'hybrid',
+  'requested-backend',
+  'software',
+] as const;
 
 /** The value shipped installs stored before signatures existed: a software dismissal. */
 export const LEGACY_DISMISSED_VALUE = '1';
@@ -37,6 +42,11 @@ export interface GpuNoticeVerdict {
   softwareRendering: boolean;
   discreteInactive: boolean;
   hybridGpuLikely: boolean;
+  /** The Linux shell could not start on the backend the player picked, and
+   *  rescued the session onto a lower one. Unlike the other three this is not
+   *  about the hardware being wrong: it is a setting that did not take, and the
+   *  player would otherwise only learn it by opening the options. */
+  requestedBackendUnavailable: boolean;
 }
 
 export interface GpuNoticeState {
@@ -61,13 +71,15 @@ export type GpuNoticeBodyKey =
   | 'gpuNotice.bodyDiscreteInactive'
   | 'gpuNotice.hybridBodyWindows'
   | 'gpuNotice.hybridBodyLinux'
-  | 'gpuNotice.hybridBodyOther';
+  | 'gpuNotice.hybridBodyOther'
+  | 'gpuNotice.bodyRequestedBackend';
 
 /** The active components of a verdict, built in sorted (signature) order. */
 export function gpuNoticeComponents(verdict: GpuNoticeVerdict): GpuNoticeComponent[] {
   const components: GpuNoticeComponent[] = [];
   if (verdict.discreteInactive) components.push('discrete-inactive');
   if (verdict.hybridGpuLikely) components.push('hybrid');
+  if (verdict.requestedBackendUnavailable) components.push('requested-backend');
   if (verdict.softwareRendering) components.push('software');
   return components;
 }
@@ -78,6 +90,7 @@ export function mergeGpuNoticeVerdicts(a: GpuNoticeVerdict, b: GpuNoticeVerdict)
     softwareRendering: a.softwareRendering || b.softwareRendering,
     discreteInactive: a.discreteInactive || b.discreteInactive,
     hybridGpuLikely: a.hybridGpuLikely || b.hybridGpuLikely,
+    requestedBackendUnavailable: a.requestedBackendUnavailable || b.requestedBackendUnavailable,
   };
 }
 
@@ -86,7 +99,8 @@ export function gpuNoticeVerdictsEqual(a: GpuNoticeVerdict, b: GpuNoticeVerdict)
   return (
     a.softwareRendering === b.softwareRendering &&
     a.discreteInactive === b.discreteInactive &&
-    a.hybridGpuLikely === b.hybridGpuLikely
+    a.hybridGpuLikely === b.hybridGpuLikely &&
+    a.requestedBackendUnavailable === b.requestedBackendUnavailable
   );
 }
 
@@ -133,6 +147,7 @@ export function resolveGpuNotice(input: {
   softwareRendering: boolean;
   discreteInactive: boolean;
   hybridGpuLikely: boolean;
+  requestedBackendUnavailable: boolean;
   dismissedSignature: string;
   legacyHybridDismissed: boolean;
 }): GpuNoticeState {
@@ -172,6 +187,18 @@ export function gpuNoticeBodyKey(input: {
     return input.desktopShell ? 'gpuNotice.bodyDesktop' : 'gpuNotice.bodyWeb';
   }
   if (input.verdict.discreteInactive) return 'gpuNotice.bodyDiscreteInactive';
+  // Last of the four, deliberately: the other three say the hardware is not
+  // being used properly, which is the more urgent read when both fire. This one
+  // is a setting that did not take on a session that is otherwise fine.
+  // The consequence, stated rather than left to the reader: on a hybrid laptop
+  // both fire together, the hybrid copy wins, and that player learns their
+  // Vulkan pick did not take from the options row instead (src/ui/options_view.ts
+  // arms gpuBackendActiveUnavailable there, with its alert), never from this
+  // toast. The component is still in the verdict, so the notice does show and
+  // its dismissal signature covers both.
+  if (!input.verdict.hybridGpuLikely && input.verdict.requestedBackendUnavailable) {
+    return 'gpuNotice.bodyRequestedBackend';
+  }
   if (input.desktopPlatform === 'win') return 'gpuNotice.hybridBodyWindows';
   if (input.desktopPlatform === 'linux') return 'gpuNotice.hybridBodyLinux';
   return 'gpuNotice.hybridBodyOther';

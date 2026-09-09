@@ -13,13 +13,22 @@ This framework defines how class power is measured. The complexity and talent ru
 | `scripts/balance_report.mjs` | Analytical caster spell comparison | It does not model a specialization rotation, melee, rage, pets, or raid buffs |
 | `scripts/dummy_sim.mjs` | Empirical direct-cast checks against the real simulation | It does not select a specialization and resets resources, so it is not a Fury or finite-mana authority |
 | `tests/spell_balance.test.ts` | Proportionality and no-strict-dominance regression checks | It does not enforce the cross-spec DPS band |
+| `scripts/rogue_dps_probe.ts` | Gear-aware deterministic Rogue sustained-DPS probe over the real spec engines (equips the frozen reference epic kit) | Rogue rotations only |
+| `scripts/owned_class_balance_probe.ts` | Gear-aware cross-class probe behind the owned-lane DPS and healer suites (`tests/owned_class_balance_dps_probes.test.ts`, `tests/owned_class_balance_healer_probes.test.ts`) | Measures the owned lanes it models, not every spec |
+| `scripts/warlock_balance_probe.ts` | Gear-aware warlock spec probe (affliction, destruction, demonology) | Warlock only |
+| `scripts/fury_dps_probe.ts` | Gear-aware sustained Fury DPS probe with the real kit and a competent priority rotation | Fury only, anchored to the live meter fight it was built against |
+| `scripts/r5_envelope_probe.ts` | The Masterwrought R5 envelope probe: full-kit versus pre-packet raid BiS throughput tables feeding `docs/design/power-verification.md` | Measures the R5 kit model, not general spec balance |
 
 Run the direct comparisons with `npx tsx scripts/balance_report.mjs` and
 `npx tsx scripts/dummy_sim.mjs`; pass a class such as `mage` to the latter to limit its output.
+Each probe runs via `npx tsx scripts/<probe>.ts` (see its header for lane arguments).
 
-The existing scripts remain useful for identifying a direct spell that is strictly dominated by
-another direct spell. Their class-rotation rows must not be cited as Frost, Fury, or nine-class
-balance proof until the missing specialization and resource behavior is implemented.
+`balance_report.mjs` and `dummy_sim.mjs` remain useful for identifying a direct spell that is
+strictly dominated by another direct spell. Their class-rotation rows must not be cited as
+Frost, Fury, or nine-class balance proof until the missing specialization and resource behavior
+is implemented. The probe family is the gear-aware half of the toolset: each equips a real kit
+and drives the live rotation engines, so a measurement over a GEAR KIT (the Masterwrought R5
+gate is the exemplar) cites a probe, never the three analytical tools above.
 
 ## Required empirical profiles
 

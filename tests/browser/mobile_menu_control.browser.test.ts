@@ -171,6 +171,44 @@ function mountLeftColumn(memberCount: number) {
   return { ui, target, party, rows };
 }
 
+/** The shipped #player-frame, mirroring index.html rather than a hand-shortened
+ *  copy of it. The heraldry-era frame is what the seat under test is measured
+ *  against: the name row is a `uf-name-header deed-heraldry-plaque` carrying the
+ *  pattern motif (not a bare `uf-name`), the portrait carries the heraldry seal
+ *  beside its level chip, and the bars carry the combo row plus the absorb and
+ *  text layers. Every one of those contributes to the rendered HEIGHT this
+ *  fixture then scales, which is exactly what a pre-heraldry copy got wrong.
+ *  The combat and rest markers are `display: none` until their state class
+ *  lands (hud.css), so they cost no height here and are present for shape. */
+const PLAYER_FRAME_MARKUP = `
+      <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" aria-label="Your Hero">
+        <div class="portrait-wrap" id="pf-portrait-wrap">
+          <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
+          <span class="deed-heraldry-seal" aria-hidden="true">
+            <svg class="deed-heraldry-seal-art" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path id="pf-heraldry-seal-motif"></path>
+            </svg>
+          </span>
+          <div class="level-chip" id="pf-level">1</div>
+          <div class="combat-flash" id="pf-combat" role="status" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" alt="" aria-hidden="true" /></div>
+          <div class="rest-indicator" id="pf-rest" role="status" aria-label="Resting">z</div>
+        </div>
+        <div class="uf-bars">
+          <div class="uf-name-header deed-heraldry-plaque" id="pf-name-header">
+            <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path id="pf-heraldry-pattern-motif"></path>
+            </svg>
+            <div class="uf-name" id="pf-name">Hero</div>
+          </div>
+          <!-- Painted display, not markup default: Hud.update sets the combo row to
+               flex only for an ENERGY user and to none otherwise, and both fixtures
+               model a stance-bearing warrior. -->
+          <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-hidden="true" style="display: none"></div>
+          <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
+          <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
+        </div>
+      </div>`;
+
 /** The bottom-centre column, in its shipped nesting: #player-frame and #stancebar
  *  both live inside #bottom-bar's stack under #ui, which is the stacking context
  *  the strip has to clear. Real content, because the frame's rendered height is
@@ -186,17 +224,7 @@ function mountBottomColumn() {
           <button type="button" class="stance-btn"></button>
         </div></div>
       </div>
-      <div id="player-frame" class="unitframe" role="group" tabindex="0">
-        <div class="portrait-wrap" id="pf-portrait-wrap">
-          <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
-          <div class="level-chip" id="pf-level">1</div>
-        </div>
-        <div class="uf-bars">
-          <div class="uf-name" id="pf-name">Hero</div>
-          <div class="bar hp"><div class="bar-fill" id="pf-hp"></div></div>
-          <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div></div>
-        </div>
-      </div>
+      ${PLAYER_FRAME_MARKUP}
       <div id="stancebar"><div class="stancebar-group">
         <button type="button" class="stance-btn"></button>
         <button type="button" class="stance-btn"></button>

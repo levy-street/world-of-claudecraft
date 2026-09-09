@@ -187,6 +187,131 @@ describe('progressive terrain build', () => {
     expect(terrain.isZoneLoaded(zone.id)).toBe(false);
   });
 
+  // Regression for the graphics-rebuild heap leak (GitHub issue #3750): a
+  // renderer swap tore the old TerrainView down without ever releasing its
+  // resident chunk geometries or shared material, so every rebuild
+  // permanently retained the whole previous zone's terrain on the JS heap.
+  // dispose() is the terminal teardown disposeRendererResources() now calls.
+  it('dispose releases every resident chunk regardless of zone, plus the shared material', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+
+    const terrain = buildTerrain(20061);
+    const zone = zoneAt(0, 0);
+    const neighbor = zoneAt(0, 300);
+    const firstTask = terrain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await firstTask;
+    const neighborTask = terrain.ensureZone(neighbor);
+    await vi.runAllTimersAsync();
+    await neighborTask;
+
+    expect(terrain.group.children.length).toBeGreaterThan(0);
+    const meshes = terrain.group.children as THREE.Mesh[];
+    const geometrySpies = meshes.map((mesh) => vi.spyOn(mesh.geometry, 'dispose'));
+    // Every chunk mesh shares the ONE material buildTerrain built (see
+    // terrain.ts's `new THREE.Mesh(geo, mat)`), so dispose() must release it
+    // exactly once, not per chunk.
+    const sharedMaterial = meshes[0].material as THREE.Material;
+    expect(meshes.every((mesh) => mesh.material === sharedMaterial)).toBe(true);
+    const materialSpy = vi.spyOn(sharedMaterial, 'dispose');
+
+    terrain.dispose();
+
+    for (const spy of geometrySpies) expect(spy).toHaveBeenCalledOnce();
+    expect(materialSpy).toHaveBeenCalledOnce();
+    expect(terrain.group.children).toHaveLength(0);
+  });
+
+  it('dispose on a view with nothing built does not throw', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+
+    const terrain = buildTerrain(20061);
+    expect(() => terrain.dispose()).not.toThrow();
+    expect(terrain.group.children).toHaveLength(0);
+  });
+
+  // The macro normal DataTexture only exists on the splat tier
+  // (hasTerrainSplatAssets() true), which mockEmptyAssetLoads() can never
+  // reach: its loader promises never resolve. Regression for the same
+  // issue #3750 gap on the resource the doc comment argues hardest for:
+  // buildSplatMaterial binds this texture as normalMap, so releasing the
+  // chunk geometries and the shared material is not enough on its own.
+  describe('macro normal-map lifecycle (splat tier)', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.doUnmock('../src/render/assets/loader');
+      vi.doUnmock('../src/render/textures');
+    });
+
+    it('dispose releases the macro normal-map DataTexture when the splat tier built one', async () => {
+      vi.resetModules();
+      // buildSplatAlbedoArray fails soft (neutral-grey fill per layer) with
+      // no 2D context, so a real canvas is not needed to prove the
+      // DataTexture it creates gets released.
+      vi.stubGlobal('document', {
+        createElement: (tag: string) => {
+          if (tag !== 'canvas') throw new Error(`unexpected document.createElement(${tag})`);
+          return { getContext: () => null };
+        },
+      });
+      vi.doMock('../src/render/assets/loader', () => ({
+        loadGltf: vi.fn(() => new Promise(() => {})),
+        loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+        loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+        releaseGltf: vi.fn(),
+      }));
+      const texture = (): THREE.DataTexture => {
+        const data = new Uint8Array([255, 255, 255, 255]);
+        const tex = new THREE.DataTexture(data, 1, 1, THREE.RGBAFormat);
+        tex.needsUpdate = true;
+        return tex;
+      };
+      vi.doMock('../src/render/textures', () => ({
+        groundDetailTexture: vi.fn(texture),
+        groundSplatMaps: vi.fn(() => ({
+          grass: texture(),
+          dirt: texture(),
+          rock: texture(),
+          sand: texture(),
+          mud: texture(),
+          snow: texture(),
+        })),
+        macroNoiseTexture: vi.fn(texture),
+        skyTexture: vi.fn(texture),
+        waterNormalish: vi.fn(texture),
+        waterNormalMaps: vi.fn(() => [texture(), texture()]),
+      }));
+
+      const gfx = await import('../src/render/gfx');
+      gfx.activateGfxProfile({
+        settings: { ...gfx.GFX, terrainSplat: true },
+        fingerprint: '',
+        forcedTier: null,
+        softwareRendering: false,
+        epoch: 0,
+      });
+
+      const { buildTerrain, hasTerrainSplatAssets, prepareTerrainProfileAssets } = await import(
+        '../src/render/terrain'
+      );
+      await prepareTerrainProfileAssets(gfx.GFX);
+      expect(hasTerrainSplatAssets()).toBe(true);
+
+      const disposeSpy = vi.spyOn(THREE.DataTexture.prototype, 'dispose');
+      const terrain = buildTerrain(20061);
+      expect(disposeSpy).not.toHaveBeenCalled();
+
+      terrain.dispose();
+
+      expect(disposeSpy).toHaveBeenCalledOnce();
+    });
+  });
+
   it('cancelStreaming stops an in-flight zone build from ever completing', async () => {
     vi.resetModules();
     mockEmptyAssetLoads();

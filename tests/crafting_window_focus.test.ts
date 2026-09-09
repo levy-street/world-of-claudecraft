@@ -16,9 +16,12 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
-import { buildCraftingView, type RecipeDefLike } from '../src/ui/crafting_view';
-import { type CraftingWindowDeps, renderCraftingWindow } from '../src/ui/crafting_window';
 import { FocusManager } from '../src/ui/focus_manager';
+import { buildCraftingView, type RecipeDefLike } from '../src/ui/hud/professions/crafting_view';
+import {
+  type CraftingWindowDeps,
+  renderCraftingWindow,
+} from '../src/ui/hud/professions/crafting_window';
 import { makeWindowFocus } from '../src/ui/window_focus';
 
 function item(id: string): ItemDef {

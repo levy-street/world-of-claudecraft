@@ -91,6 +91,55 @@ describe('spatial grid', () => {
     }
   });
 
+  it('predicate queries match a filtered brute-force scan across the whole world', () => {
+    const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
+    for (let i = 0; i < 200; i++) sim.tick();
+    const isNpc = (e: Entity) => e.kind === 'npc';
+    const probes: Array<[number, number, number]> = [];
+    for (let z = -1200; z <= 1200; z += 300) {
+      probes.push([60, z, 120], [200, z, 25]);
+    }
+    for (const [x, z, r] of probes) {
+      const bruteForce = [...sim.entities.values()].some(
+        (e) => isNpc(e) && dist2d({ x, y: 0, z }, e.pos) <= r,
+      );
+      expect(sim.grid.someInRadius(x, z, r, isNpc)).toBe(bruteForce);
+      // The always-true predicate degenerates to the existence answer.
+      expect(sim.grid.someInRadius(x, z, r, () => true)).toBe(sim.grid.hasInRadius(x, z, r));
+    }
+  });
+
+  it('stops a predicate query at the first accepted entity, after rejecting non-matches', () => {
+    const grid = new SpatialGrid();
+    const decoy = { id: 1, kind: 'mob', pos: { x: 0, y: 0, z: 0 } } as Entity;
+    const match = { id: 2, kind: 'npc', pos: { x: 1, y: 0, z: 0 } } as Entity;
+    const unread = { id: 3, kind: 'npc', pos: { x: 2, y: 0, z: 0 } } as Entity;
+    grid.insert(decoy);
+    grid.insert(match);
+    grid.insert(unread);
+    const seen: number[] = [];
+    Object.defineProperty(unread, 'pos', {
+      configurable: true,
+      get() {
+        throw new Error('predicate query did not stop after its first accepted entity');
+      },
+    });
+    expect(
+      grid.someInRadius(0, 0, 5, (e) => {
+        seen.push(e.id);
+        return e.kind === 'npc';
+      }),
+    ).toBe(true);
+    // The in-range non-match was genuinely visited and rejected first, so the
+    // early exit is about the ANSWER, not about skipping the walk.
+    expect(seen).toEqual([1, 2]);
+    // Inclusive boundary, the hasInRadius contract.
+    const edge = new SpatialGrid();
+    edge.insert({ id: 9, kind: 'npc', pos: { x: 3, y: 0, z: 4 } } as Entity);
+    expect(edge.someInRadius(0, 0, 5, (e) => e.kind === 'npc')).toBe(true);
+    expect(edge.someInRadius(0, 0, 4.999, (e) => e.kind === 'npc')).toBe(false);
+  });
+
   it('limits direct entity walks to small grids before switching to cell lookups', () => {
     type InspectableGrid = { cells: Map<number, Entity[]> };
 

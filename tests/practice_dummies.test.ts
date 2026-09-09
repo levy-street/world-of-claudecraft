@@ -21,7 +21,8 @@ import {
   PRACTICE_ROW_X,
 } from '../src/sim/content/practice_dummies';
 import { BUILTIN_WORLD, MOBS, PROPS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
+import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
+import { characterDerivedStats, createMob } from '../src/sim/entity';
 import { mobTemplateForDungeonDifficulty } from '../src/sim/instances/difficulty';
 import {
   PLAYER_DUMMY_REST_HP_FRACTION,
@@ -40,7 +41,12 @@ const NYTHRAXIS_ARENA = 'nythraxis_boss_arena';
 // Sim-construction overhead (same trimming as tests/training_dummy.test.ts).
 const PRACTICE_ROW_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
-  camps: BUILTIN_WORLD.camps.filter((camp) => PRACTICE_ROW_ORDER.includes(camp.mobId)),
+  // Filtered by the row's own x too: the Eastbrook hub dummy is a second
+  // `training_dummy` camp (content/practice_dummies.ts HUB_PRACTICE_DUMMY_CAMPS)
+  // and must not stand in for the row's slot 1.
+  camps: BUILTIN_WORLD.camps.filter(
+    (camp) => PRACTICE_ROW_ORDER.includes(camp.mobId) && camp.center.x === PRACTICE_ROW_X,
+  ),
   npcs: {},
   groundObjects: [],
 };
@@ -204,11 +210,29 @@ describe('the Highwatch practice row', () => {
     const sim = makeWorld();
     const d = dummyOf(sim, FRIENDLY_PLAYER_DUMMY_ID);
     const vitals = playerDummyVitals();
+    const intendedKit = bestEpicGearFor('warrior', 'prot');
+    expect(intendedKit.chest).toBe('crucible_tank_mail_chest');
+    const intendedBody = characterDerivedStats('warrior', 20, intendedKit);
+    expect(vitals).toEqual({ maxHp: intendedBody.maxHp, armor: intendedBody.stats.armor });
 
     expect(d.level).toBe(20);
     expect(d.maxHp).toBe(vitals.maxHp);
     expect(d.stats.armor).toBe(vitals.armor);
     expect(d.hp).toBe(playerDummyRestHp(vitals.maxHp));
+    // THE DERIVED BODY AS LITERALS, added at Phase 15. Every assertion above
+    // compares the entity to playerDummyVitals(), which is the same function
+    // the entity was built from: both sides move together, so a catalog change
+    // that moves this SHIPPED body (it is applied at every world construction,
+    // production included) passes silently. The vitals derive from
+    // bestEpicGearFor, so any new epic entering a slot moves them. Pinned here
+    // so the move reds with a named cause and a reviewer decides whether the
+    // reference player body should have changed.
+    // The raid-collection integration replaces only the reference tank's chest
+    // with crucible_tank_mail_chest and uses the canonical warrior spec 'prot'.
+    // Reviewed result: 150 more HP, unchanged total armor. Other reference
+    // slots and the difficulty-floor calibration are not retuned here.
+    expect(vitals.maxHp, 'the derived reference-player pool').toBe(1382);
+    expect(vitals.armor, 'and its armor').toBe(3265);
     // A player-sized pool, not the practice targets near-immortal one: heals
     // have to read as a real fraction of the bar.
     expect(d.maxHp).toBeGreaterThan(1000);
@@ -279,7 +303,13 @@ describe('playerDummyShedHp', () => {
   const rest = playerDummyRestHp(maxHp);
 
   it('rests at the resting fraction of the pool', () => {
-    expect(rest).toBe(Math.round(maxHp * PLAYER_DUMMY_REST_HP_FRACTION));
+    // Literal pins, not rest === round(maxHp * FRACTION): that form re-derives
+    // the expectation from the same constant the function reads, so no edit to
+    // the fraction could ever red it (the constant-self-comparison trap). The
+    // 0.35 is the shipped design value (practice_dummies.ts documents why);
+    // moving it is a deliberate retune that updates both literals here.
+    expect(PLAYER_DUMMY_REST_HP_FRACTION).toBe(0.35);
+    expect(rest).toBe(1400);
     expect(rest).toBeLessThan(maxHp);
   });
 

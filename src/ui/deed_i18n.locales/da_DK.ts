@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Host en malmare, en traestand og et urtebed i Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'En ring pa manebronden',
     desc: 'Fang en fisk i Nightblooms vande.',
   },
   chr_wraithwood_gatherer: {
@@ -168,7 +167,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Engens Mester', desc: 'Nå 100 i færdigheden Urtekundskab.' },
   prog_master_gatherer: {
     name: 'Mestersamler',
-    desc: 'Nå 100 i færdighed i tre af fagene Minedrift, Skovhugst, Urtekundskab og Fiskeri.',
   },
   prog_first_craft: { name: 'Håndlavet', desc: 'Fuldfør din første vellykkede fremstilling.' },
   prog_craft_specialist: {
@@ -279,7 +277,6 @@ export const table: DeedLocaleTable = {
     title: 'Ormefælder',
   },
   dgn_sanctum_speed: {
-    name: 'Helligdomsspurt',
     desc: 'Besejr Korzul Gravormen inden for 15 minutter efter, at din gruppe har gjort krav på Gravormens Helligdom.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -342,7 +339,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Klokkerne Forstummer',
-    desc: 'Fæld hver Ligklokkeringer, Diakon Varric genopvækker, før han selv falder.',
+    desc: 'Fæld hver Ligklokkeringer, Diakon Vandric genopvækker, før han selv falder.',
   },
   dlv_nhalia_bells: {
     name: 'Klokkestiller',
@@ -355,7 +352,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Dalens Krønike, Kapitel II',
-    desc: 'Afslut andet kapitel af Sauls krønike: banditter, mudfinne-snigerne og minens skadedyr nedkæmpet, Somarken spillet og Relikvariet trodset.',
   },
   chr_vale_chapter_iii: {
     name: 'Krøniken om Dalen',
@@ -370,7 +366,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Flokbryder', desc: 'Dræb 3 Skovulve inden for 10 sekunder.' },
   chr_vale_cup_debut: {
     name: 'Kobberspandens Kandidat',
-    desc: 'Gå på banen og rør bolden i en Dalpokal-kamp på Somarken.',
   },
   chr_vale_rares: {
     name: 'Dalens Rædsler',
@@ -415,12 +410,11 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Krøniken om Tornetop',
-    desc: 'Følg bjergets fulde fortælling til ende: Ormekulten knust, Helligdommen bragt til tavshed, den Vågnende Tinde styrtet og hver navngiven rædsel i klipperne fældet.',
     title: 'af Tornetop',
   },
   chr_peaks_sparring: {
     name: 'Øvelser på Muren',
-    desc: 'Tilføj træningsdukken over Højvagten 1.000 skade i alt.',
+    desc: 'Tilføj en træningsdukke 1.000 skade i alt.',
   },
   chr_peaks_glimmer_cast: { name: 'Koldt Vand, Koldere Lys', desc: 'Fang en fisk i Glimmersøen.' },
   chr_peaks_moongate: {
@@ -492,7 +486,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stamkunde',
-    desc: 'Opdag alle ti dele af den Heroiske Kvartermesters lager.',
+    desc: 'Opdag alle ti udstyrsdele fra den Heroiske Kvartermesters lager.',
   },
   col_glimmerfin: {
     name: 'Et Glimt af Håb',
@@ -531,63 +525,49 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Støvler på Banen',
-    desc: 'Spil en hel Dalpokal-kamp til ende på Somarken, uanset sejr eller nederlag.',
   },
-  pvp_vcup_first_win: { name: 'Det Første Sølvtøj', desc: 'Vind en ranglistekamp i Dalpokalen.' },
+  pvp_vcup_first_win: { name: 'Det Første Sølvtøj' },
   pvp_vcup_wins_10: {
     name: 'Garvet Vildsvineboldspiller',
-    desc: 'Vind 10 ranglistekampe i Dalpokalen.',
   },
   pvp_vcup_wins_25: {
     name: 'Vildsvinebold-Legende',
-    desc: 'Vind 25 ranglistekampe i Dalpokalen.',
     title: 'Vildsvinebold-Legende',
   },
-  pvp_vcup_first_goal: { name: 'På Måltavlen', desc: 'Scor et mål i en Dalpokal-ranglistekamp.' },
+  pvp_vcup_first_goal: { name: 'På Måltavlen' },
   pvp_vcup_hat_trick: {
     name: 'Hattrick-Helt',
-    desc: 'Scor tre mål i en enkelt Dalpokal-ranglistekamp, i 3v3-rækken eller større.',
   },
   pvp_vcup_golden_goal: {
     name: 'Gyldent Øjeblik',
-    desc: 'Scor det gyldne mål, der afgør en Dalpokal-ranglistekamp.',
   },
   pvp_vcup_first_save: {
     name: 'Sikre Hænder',
-    desc: 'Red et skud som målmand i en Dalpokal-ranglistekamp.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Intet Slipper Forbi Mig',
-    desc: 'Vind en Dalpokal-ranglistekamp som målmand uden at lukke et mål ind.',
   },
   pvp_vcup_guild_win: {
     name: 'For Banneret',
-    desc: 'Vind en Dalpokal-ranglistekamp, hvor holdet stillede op under dit gildes banner.',
   },
   pvp_fiesta_first_bout: {
     name: 'Ubuden Gæst',
-    desc: 'Kæmp en fuld 2v2 Fiesta-dyst, uanset sejr eller nederlag.',
   },
-  pvp_fiesta_first_win: { name: 'Festens Midtpunkt', desc: 'Vind en 2v2 Fiesta-dyst.' },
+  pvp_fiesta_first_win: { name: 'Festens Midtpunkt' },
   pvp_fiesta_double: {
     name: 'Dobbelt Ballade',
-    desc: 'Lav to Fiesta-nedlæggelser inden for fire sekunder.',
   },
   pvp_fiesta_shutdown: {
     name: 'Lyseslukker',
-    desc: 'Nedlæg en Fiesta-modstander, der er på en stime på tre eller mere.',
   },
   pvp_fiesta_full_build: {
     name: 'Klædt på til Lejligheden',
-    desc: 'Vind en Fiesta-dyst med en forstærkning låst fast fra alle tre bølger.',
   },
   pvp_fiesta_powerups: {
     name: 'En af Hver',
-    desc: 'Snup hver af de fire power-ups i ringen mindst én gang: Fartdjævel, Kolos, Månestøvler og Bersærk.',
   },
   pvp_fiesta_five_kills: {
     name: 'Bærer Hele Festen',
-    desc: 'Lav fem nedlæggelser i en enkelt Fiesta-dyst.',
   },
   soc_first_party: { name: 'Bedre Sammen', desc: 'Slut dig til en gruppe med en anden spiller.' },
   soc_full_house: {
@@ -1004,5 +984,9 @@ export const table: DeedLocaleTable = {
     name: 'Ingen Glød Gik Tabt',
     desc: 'Besejr Varkhul, Sidste Flammes Smedefader, på heroisk sværhedsgrad, uden at en eneste raider dør.',
     title: 'den Uskadte',
+  },
+  col_set_bramblehide: {
+    name: "Roots' Tornehud",
+    desc: "Opdag hver del af Roots' Tornehud.",
   },
 };

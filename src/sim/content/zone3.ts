@@ -1,7 +1,7 @@
 // Zone 3 — Thornpeak Heights (levels 13-20). The Gravecallers serve Korzul
 // the Gravewyrm, an ancient dragon sealed beneath the peaks. Highwatch holds
 // the wall against ogres, waking elementals, and the open chanting of the
-// Wyrmcult at the Gravewyrm Sanctum gates.
+// Broodsworn at the Gravewyrm Sanctum gates.
 
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
@@ -37,7 +37,7 @@ export const ZONE3_ZONE: ZoneDef = {
     { x: -130, z: 740, label: "Drogmar's War-Camp", id: 'drogmars_war_camp' },
     { x: 110, z: 760, label: 'Stormcrag', id: 'stormcrag' },
     { x: -70, z: 770, label: 'The Glimmermere', id: 'the_glimmermere' },
-    { x: 55, z: 820, label: 'Wyrmcult Tents', id: 'wyrmcult_tents' },
+    { x: 55, z: 820, label: 'Broodsworn Tents', id: 'wyrmcult_tents' },
     { x: -40, z: 830, label: 'Revenant Fields', id: 'revenant_fields' },
     { x: 0, z: 880, label: 'Gravewyrm Sanctum', id: 'gravewyrm_sanctum' },
   ],
@@ -308,6 +308,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.3,
     color: 0x9e7b53,
+    // Ogres are tusked (the game ships cracked_ogre_tusk), so the corpse gives
+    // up a tusk. Phase 11m added the tag: the band-2 open-world tusk source.
+    componentTags: ['tusk'],
   },
   brakka_wallbreaker: {
     id: 'brakka_wallbreaker',
@@ -365,6 +368,8 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.35,
     color: 0x7e5c3e,
+    // Same tusked ogre stock as the Thornpeak Ogre. Phase 11m added the tag.
+    componentTags: ['tusk'],
   },
   warlord_drogmar: {
     id: 'warlord_drogmar',
@@ -525,7 +530,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       perTick: 6,
       interval: 3,
       duration: 12,
-      name: 'Winterbite',
+      name: 'Wintergnaw',
       school: 'frost',
     },
     scale: 1.3,
@@ -533,7 +538,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
   },
   wyrmcult_zealot: {
     id: 'wyrmcult_zealot',
-    name: 'Wyrmcult Zealot',
+    name: 'Broodsworn Zealot',
     minLevel: 17,
     maxLevel: 19,
     family: 'humanoid',
@@ -554,7 +559,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     // The zealot's fevered chanting claws at a caster's mind, draining Intellect
     // and shrinking their mana pool for a while.
     enfeeble: { chance: 0.3, int: 12, duration: 12, name: 'Maddening Whisper', school: 'shadow' },
-    // The Wyrmcult hoards their master's flame: a branding strike seals away the
+    // The Broodsworn hoards their master's flame: a branding strike seals away the
     // victim's fire magic so it can never rival the wyrm's, while leaving every
     // other school free (a single-school counterspell, distinct from a full silence).
     lockout: { chance: 0.25, duration: 6, name: 'Wyrmward Sigil', school: 'fire' },
@@ -564,7 +569,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
   },
   wyrmcult_necromancer: {
     id: 'wyrmcult_necromancer',
-    name: 'Wyrmcult Necromancer',
+    name: 'Broodsworn Necromancer',
     minLevel: 18,
     maxLevel: 19,
     family: 'humanoid',
@@ -906,7 +911,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     scale: 1.0,
     color: 0xc9c2b5,
   },
-  // Voskar the Emberwing — a young drake the Wyrmcult chained above the Sanctum
+  // Voskar the Emberwing, a young drake the Broodsworn chained above the Sanctum
   // and starved into a weapon. The only dragonkin rare on the peaks: it breathes
   // fire in a wide cone, and its searing bite leaves wounds that refuse to close.
   voskar_emberwing: {
@@ -1171,7 +1176,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'q_revenant_vanguard',
     ],
     greeting:
-      'Two hundred years this wall has held, $C. It will not break on my watch — but it groans.',
+      'Two hundred years this wall has held, $C. It will not break on my watch, but it groans.',
   },
   brother_aldric_highwatch: {
     id: 'brother_aldric_highwatch',
@@ -1268,6 +1273,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       // its own. Trader Wilkes keeps the whole rod ladder as the one place you
       // can buy ahead; this row is so you never have to.
       'silverstream_fishing_rod',
+      'field_kit',
       // Tier 4/5 station-recipe reagents (items.ts): Bree is the Highwatch
       // trade-goods vendor, but she carries only arcanite_bar, the one premium
       // reagent that is refined rather than gathered (no node anywhere yields
@@ -1277,7 +1283,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'arcanite_bar',
     ],
     greeting:
-      'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',
+      'Wool, hardtack, and steel-shod boots: Highwatch runs on all three, and I am short of everything.',
   },
   armorer_hode: {
     id: 'armorer_hode',
@@ -1439,16 +1445,55 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     // Professions 2.0: the Highwatch apothecary master runs the
     // repeatable alchemy work order.
     questIds: ['q_prof_workorder_apothecary'],
+    // 11n-BOTH pulled the bear elixir stock row from this list: it exactly
+    // equalled elixir_of_the_serpent (the alchemy-50 crafted top elixir) at
+    // buff_sta 12 for 900s, a zero percent margin, R23's purest competitor,
+    // and the one vendor-sold buff in the catalog; the item, its Mirefen
+    // drop, its recipe and its buyValue stay.
     vendorItems: [
       'minor_healing_potion',
       'minor_mana_potion',
       'lesser_healing_potion',
       'lesser_mana_potion',
-      'elixir_of_the_bear',
       'glass_vial',
     ],
     greeting:
       'Measure twice and pour once, $C. The apothecary has no patience for spilled reagents.',
+  },
+  // The farming go-live: the tier-3 farmer on the terraces below Highwatch
+  // (content/farm_patches.ts patch_thornpeak), north of the beds on the flat
+  // of the shelf, facing south across them (facing PI looks along -z). Stock:
+  // compost PLUS all four tier-3 seeds, each at buyValue 32. GATE 1 (Phase
+  // 11e) put them there; before it this header read "compost only ... seed-back
+  // and market only (D11)", and a reader trusting that would strip the faucet
+  // and re-park prog_farming_100 and col_farm_roster. His counter is the husk
+  // trade's anchor, the compost restock, AND the tier-3 seed bootstrap.
+  // tests/farmer_npc_placement.test.ts pins the seat beside the beds.
+  farmer_hollis: {
+    id: 'farmer_hollis',
+    name: 'Farmer Hollis',
+    title: 'Highwatch Terrace Farmer',
+    pos: { x: -18, z: 695.5 },
+    facing: Math.PI,
+    color: 0x8c6a4a,
+    questIds: [],
+    // GATE 1, the tier-3 seed faucet (Phase 11e). Before this the tier-3 seeds
+    // had NO vendor anywhere, which left three trainer-visible recipes
+    // uncompletable and two deeds parked: a farmer could see the crops and
+    // never plant a first one. Every row carries a positive buyValue on its
+    // item def (32 at this tier, masterwrought DECISION D), because a stocked
+    // row without one renders and then refuses, which is farming's D11 trap.
+    vendorItems: [
+      'compost',
+      'highland_barley_seed',
+      'frost_gourd_seed',
+      'thornpeak_cabbage_seed',
+      'frost_lentils_seed',
+      'field_kit',
+    ],
+    farmer: true,
+    greeting:
+      'The terraces give what the mountain allows, $C. I sell seed and compost, and if a crop of yours comes up withered I will work the husks back into good soil for you.',
   },
 };
 
@@ -1462,7 +1507,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Watch on the Peaks',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'captain_thessaly',
-    text: "Vael's last words have not left me, $N: the Wyrm stirs beneath the peaks. Captain Thessaly commands the wall at Highwatch, at the head of the mountain road north. A summons stands posted at her gate — take it up, and tell her Brother Aldric is climbing the mountain behind you.",
+    text: "Vael's last words have not left me, $N: the Wyrm stirs beneath the peaks. Captain Thessaly commands the wall at Highwatch, at the head of the mountain road north. A summons stands posted at her gate: take it up, and tell her Brother Aldric is climbing the mountain behind you.",
     completionText:
       "Aldric's word reaches far. If the priest of the Vale is climbing the mountain himself, then it is as bad as I feared. Welcome to Highwatch, $N.",
     objectives: [
@@ -1478,7 +1523,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Stalkers on the Ridge',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: 'The ridge cats have come down from the high snows hungry, and my patrols bleed for it. Every stalker you put down is a soldier I keep on the wall. Thin them, $N — twelve, to start.',
+    text: 'The ridge cats have come down from the high snows hungry, and my patrols bleed for it. Every stalker you put down is a soldier I keep on the wall. Thin them, $N: twelve, to start.',
     completionText: 'Twelve fewer shadows on the ridge. The patrols will breathe easier tonight.',
     objectives: [
       { type: 'kill', targetMobId: 'ridge_stalker', count: 12, label: 'Ridge Stalker slain' },
@@ -1492,9 +1537,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'First Frost at Highwatch',
     giverNpcId: 'quartermaster_bree',
     turnInNpcId: 'quartermaster_bree',
-    text: 'Winter on this mountain does not knock, $N — it kicks the door in. Eight ridge stalker pelts will line enough cloaks to see the wall through the first snows. The beasts prowl the ridges flanking the road south.',
+    text: 'Winter on this mountain does not knock, $N. It kicks the door in. Eight ridge stalker pelts will line enough cloaks to see the wall through the first snows. The beasts prowl the ridges flanking the road south.',
     completionText:
-      'Thick as my arm, these. The watch will not freeze this year — take these treads for your trouble.',
+      'Thick as my arm, these. The watch will not freeze this year: take these treads for your trouble.',
     objectives: [
       { type: 'collect', itemId: 'ridge_stalker_pelt', count: 8, label: 'Ridge Stalker Pelt' },
     ],
@@ -1562,9 +1607,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Deeprock Trouble',
     giverNpcId: 'loremaster_caddis',
     turnInNpcId: 'loremaster_caddis',
-    text: 'The tunnelers at Deeprock Burrows are digging deeper than any pit-rat has business digging — straight down, as if something were calling them. Their tunnels run beneath our wall, $N. Collapse the matter: kill twelve Deeprock Tunnelers.',
+    text: 'The tunnelers at Deeprock Burrows are digging deeper than any pit-rat has business digging: straight down, as if something were calling them. Their tunnels run beneath our wall, $N. Collapse the matter: kill twelve Deeprock Tunnelers.',
     completionText:
-      'Straight down, every shaft of it — burrowers do not dig like that on their own. I must consult my books.',
+      'Straight down, every shaft of it: burrowers do not dig like that on their own. I must consult my books.',
     objectives: [
       { type: 'kill', targetMobId: 'deeprock_kobold', count: 12, label: 'Deeprock Tunneler slain' },
     ],
@@ -1578,7 +1623,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Strange Wax',
     giverNpcId: 'quartermaster_bree',
     turnInNpcId: 'quartermaster_bree',
-    text: 'Caddis showed me a lump of wax taken off one of those tunnelers — it glows, $N, and it is warm as a heartbeat. He wants more for study, and I want it off my requisition list. Bring back six lumps of the glowing wax.',
+    text: 'Caddis showed me a lump of wax taken off one of those tunnelers: it glows, $N, and it is warm as a heartbeat. He wants more for study, and I want it off my requisition list. Bring back six lumps of the glowing wax.',
     completionText:
       'Still warm. The Loremaster says the glow matches no flame he knows of. I say it is mountain trouble, and I say it kindly.',
     objectives: [{ type: 'collect', itemId: 'glowing_wax', count: 6, label: 'Glowing Wax' }],
@@ -1592,7 +1637,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Ogres at the Foothills',
     giverNpcId: 'scout_maren_highwatch',
     turnInNpcId: 'scout_maren_highwatch',
-    text: 'The Thornpeak clans never come this far east — yet here they are, camped in the eastern foothills with war paint on. Somebody is paying them, $N, and ogres do not take promises. Cut twelve of them down while I find out who holds the purse.',
+    text: 'The Thornpeak clans never come this far east, yet here they are, camped in the eastern foothills with war paint on. Somebody is paying them, $N, and ogres do not take promises. Cut twelve of them down while I find out who holds the purse.',
     completionText:
       'Twelve down, and still they are not pulling back. Whoever bought them paid in something heavier than gold.',
     objectives: [
@@ -1608,9 +1653,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Totems of War',
     giverNpcId: 'scout_maren_highwatch',
     turnInNpcId: 'scout_maren_highwatch',
-    text: 'Around the war-camp the ogres have raised totems — crude things of hide and skull, but they mark a muster, not a raid. Tear down six of them and bring them to me. Mind the crushers on the perimeter, $N.',
+    text: 'Around the war-camp the ogres have raised totems, crude things of hide and skull, but they mark a muster, not a raid. Tear down six of them and bring them to me. Mind the crushers on the perimeter, $N.',
     completionText:
-      'Skull, hide... and look here — wyrm-scale bindings. These totems were gifts, $N. The cult is arming the clans.',
+      'Skull, hide... and look here: wyrm-scale bindings. These totems were gifts, $N. The cult is arming the clans.',
     objectives: [{ type: 'collect', itemId: 'ogre_war_totem', count: 6, label: 'Ogre War Totem' }],
     xpReward: 2800,
     copperReward: 1400,
@@ -1625,7 +1670,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'captain_thessaly',
     text: "Maren's totems name the hand that bought the clans: an ogre they call Brakka the Wallbreaker, and he is mustering the rest against my gate. Cut off the head and the clans scatter. Bring me Brakka, $N, and Highwatch will pay a captain's bounty.",
     completionText:
-      'Bounty paid in full. The foothills are quieter — now we deal with the ones doing the buying.',
+      'Bounty paid in full. The foothills are quieter. Now we deal with the ones doing the buying.',
     objectives: [
       {
         type: 'kill',
@@ -1644,9 +1689,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Break the War-Camp',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: "Drogmar's war-camp squats in the eastern crags, and his crushers are the spine of it — each one worth three of my soldiers. Take companions; this is no errand for one blade. Break ten crushers and the warlord's muster breaks with them.",
+    text: "Drogmar's war-camp squats in the eastern crags, and his crushers are the spine of it, each one worth three of my soldiers. Take companions; this is no errand for one blade. Break ten crushers and the warlord's muster breaks with them.",
     completionText:
-      'Ten crushers down. The war-camp is a body without a spine — time to take the head.',
+      'Ten crushers down. The war-camp is a body without a spine. Time to take the head.',
     objectives: [
       { type: 'kill', targetMobId: 'ogre_crusher', count: 10, label: 'Thornpeak Crusher slain' },
     ],
@@ -1661,9 +1706,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Warlord Drogmar',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: "Warlord Drogmar took the Wyrmcult's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall — and when he slams the ground, $N, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
+    text: "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, $N, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
     completionText:
-      'Drogmar, dead in his own camp. The clans will scatter to the high passes — you have bought my wall a winter, $N.',
+      'Drogmar, dead in his own camp. The clans will scatter to the high passes: you have bought my wall a winter, $N.',
     objectives: [
       { type: 'kill', targetMobId: 'warlord_drogmar', count: 1, label: 'Warlord Drogmar slain' },
     ],
@@ -1682,7 +1727,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Mountain Wakes',
     giverNpcId: 'loremaster_caddis',
     turnInNpcId: 'loremaster_caddis',
-    text: 'Stormcrag has stood silent a thousand years, and now the very stones of it get up and walk. Elementals do not simply wake, $N — something beneath this mountain is turning in its sleep. Put twelve of them down so I may study what remains.',
+    text: 'Stormcrag has stood silent a thousand years, and now the very stones of it get up and walk. Elementals do not simply wake, $N. Something beneath this mountain is turning in its sleep. Put twelve of them down so I may study what remains.',
     completionText:
       'The fragments hum like struck bells. The mountain is not angry, $N... it is being disturbed.',
     objectives: [
@@ -1703,7 +1748,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Cores of the Storm',
     giverNpcId: 'loremaster_caddis',
     turnInNpcId: 'loremaster_caddis',
-    text: "At each elemental's heart sits a storm core — a knot of lightning bound in stone. Six of them, set side by side, will tell me where the disturbance is centered. I suspect I already know, $N, and I dearly hope that I am wrong.",
+    text: "At each elemental's heart sits a storm core, a knot of lightning bound in stone. Six of them, set side by side, will tell me where the disturbance is centered. I suspect I already know, $N, and I dearly hope that I am wrong.",
     completionText:
       'Each core leans the same way, like iron filings to a lodestone. They point south, $N. To the Sanctum.',
     objectives: [{ type: 'collect', itemId: 'storm_core', count: 6, label: 'Storm Core' }],
@@ -1717,9 +1762,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Shardlord',
     giverNpcId: 'loremaster_caddis',
     turnInNpcId: 'loremaster_caddis',
-    text: 'Among the elementals one burns brighter than the rest: Shardlord Kazzix, a storm given shoulders. Its heartshard would anchor every reading I have taken — if you can wrench it from the thing. It walks the far crags west of Stormcrag, beyond the second camp.',
+    text: 'Among the elementals one burns brighter than the rest: Shardlord Kazzix, a storm given shoulders. Its heartshard would anchor every reading I have taken, if you can wrench it from the thing. It walks the far crags west of Stormcrag, beyond the second camp.',
     completionText:
-      'The heartshard! Still crackling — magnificent. Take these leggings; I sized them off a guess and a prayer.',
+      'The heartshard! Still crackling. Magnificent. Take these leggings; I sized them off a guess and a prayer.',
     objectives: [
       { type: 'collect', itemId: 'kazzix_heartshard', count: 1, label: "Kazzix's Heartshard" },
     ],
@@ -1737,11 +1782,11 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Chants on the Wind',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'When the wind comes off the southern peaks, $N, it carries chanting. The Wyrmcult no longer hides — they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.',
+    text: 'When the wind comes off the southern peaks, $N, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.',
     completionText:
-      'The wind is quieter. But what troubles me is not the chanting, $N — it is that something may be chanting back.',
+      'The wind is quieter. But what troubles me is not the chanting, $N. It is that something may be chanting back.',
     objectives: [
-      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 12, label: 'Wyrmcult Zealot slain' },
+      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 12, label: 'Broodsworn Zealot slain' },
     ],
     xpReward: 4000,
     copperReward: 2000,
@@ -1773,7 +1818,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'brother_aldric_highwatch',
     text: 'The orders speak of a "ring of phylacteries", soul-vessels, $N, set about the Sanctum to feed it. The cult\'s necromancers carry them like holy relics. Take five phylacteries from them, unbroken, and bring them to me. I must know what souls they hold.',
     completionText:
-      'Light forgive us. These hold the dead of the Vale and the fen — every corpse the Gravecallers ever raised, harvested. They were never building an army, $N. They were gathering a tithe.',
+      'Light forgive us. These hold the dead of the Vale and the fen, every corpse the Gravecallers ever raised, harvested. They were never building an army, $N. They were gathering a tithe.',
     objectives: [
       { type: 'collect', itemId: 'ritual_phylactery', count: 5, label: 'Ritual Phylactery' },
     ],
@@ -1788,9 +1833,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Revenant Fields',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: 'East of the Sanctum road lies an old battlefield — the vanguard of the last army that tried to take this mountain, two hundred years buried. The cult has called them up, bones in rusted plate. Put twelve revenants back in the ground, $N.',
+    text: 'East of the Sanctum road lies an old battlefield, the vanguard of the last army that tried to take this mountain, two hundred years buried. The cult has called them up, bones in rusted plate. Put twelve revenants back in the ground, $N.',
     completionText:
-      'They were soldiers once, like mine. Whatever called them up has no respect for the dead — or a use for them I do not care to learn.',
+      'They were soldiers once, like mine. Whatever called them up has no respect for the dead, or a use for them I do not care to learn.',
     objectives: [
       {
         type: 'kill',
@@ -1812,7 +1857,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'captain_thessaly',
     text: 'The revenants are forming ranks, $N, true ranks, shield-lines and columns, drilling with no drummer. Break their vanguard and bring me ten of their bones, so the smiths can read how they were bound. Do it before the march begins, and Highwatch will owe you its best steel.',
     completionText:
-      'The fields lie still again. Take this — it was made for the defenders of the wall, and no one has earned it more.',
+      'The fields lie still again. Take this: it was made for the defenders of the wall, and no one has earned it more.',
     objectives: [
       {
         type: 'collect',
@@ -1835,7 +1880,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Sigils of the Wyrm',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'It is time you knew the whole of it, $N. The Gravecallers serve Korzul the Gravewyrm — an ancient dragon sealed beneath this mountain — and every soul they have stolen since Eastbrook is a tithe poured into its waking. On the Sanctum Approach the cult has laid sigils to thin the seal. Bring me three; I would read the rite they are working.',
+    text: 'It is time you knew the whole of it, $N. The Gravecallers serve Korzul the Gravewyrm (an ancient dragon sealed beneath this mountain), and every soul they have stolen since Eastbrook is a tithe poured into its waking. On the Sanctum Approach the cult has laid sigils to thin the seal. Bring me three; I would read the rite they are working.',
     completionText:
       'Yes... a waking-litany, generations in the writing. They are close, $N. Closer than I dared fear.',
     objectives: [
@@ -1852,9 +1897,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Breaking the Seal',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'The seal on the Sanctum was wrought with mountain-fire, and only mountain-fire will let us pass without tearing it wide open. The stormcrag elementals carry embers of that first forging in their cores. Bring me five Blessed Embers, $N — for if the cult opens that gate first, they will not be careful, and the Wyrm will not wake gently.',
+    text: 'The seal on the Sanctum was wrought with mountain-fire, and only mountain-fire will let us pass without tearing it wide open. The stormcrag elementals carry embers of that first forging in their cores. Bring me five Blessed Embers, $N, for if the cult opens that gate first, they will not be careful, and the Wyrm will not wake gently.',
     completionText:
-      'They burn blue and clean — the mountain remembers its old oath. With these I can unbind the gate for us alone.',
+      'They burn blue and clean: the mountain remembers its old oath. With these I can unbind the gate for us alone.',
     objectives: [{ type: 'collect', itemId: 'blessed_embers', count: 5, label: 'Blessed Embers' }],
     xpReward: 4200,
     copperReward: 2200,
@@ -1881,7 +1926,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
         type: 'kill',
         targetMobId: 'wyrmcult_necromancer',
         count: 6,
-        label: 'Wyrmcult Necromancer slain',
+        label: 'Broodsworn Necromancer slain',
       },
     ],
     xpReward: 4400,
@@ -1894,9 +1939,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Sanctum Gate',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'This is the last threshold, $N. The gate of the Gravewyrm Sanctum was locked with a keystone, and the cult shattered it into shards rather than see it turned against them. The shards lie scattered in the gate plaza, under the eyes of the boneclad dead. Bring me three, and I will open the way the Light intended — quietly.',
+    text: 'This is the last threshold, $N. The gate of the Gravewyrm Sanctum was locked with a keystone, and the cult shattered it into shards rather than see it turned against them. The shards lie scattered in the gate plaza, under the eyes of the boneclad dead. Bring me three, and I will open the way the Light intended, quietly.',
     completionText:
-      'The shards sit true... and the gate knows its key. The way below stands open, $N. Gather the strongest companions you can find — what comes next, no one should face alone.',
+      'The shards sit true... and the gate knows its key. The way below stands open, $N. Gather the strongest companions you can find: what comes next, no one should face alone.',
     objectives: [
       { type: 'collect', itemId: 'sanctum_key_shard', count: 3, label: 'Sanctum Key Shard' },
     ],
@@ -1910,9 +1955,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Bound Guardian',
     giverNpcId: 'scout_maren_highwatch',
     turnInNpcId: 'scout_maren_highwatch',
-    text: "My last sweep of the Sanctum's mouth found chains, $N — chains thick as a ship's mast, and something ogre-shaped straining inside them. The cult bound a champion at the threshold: Korgath, fed on rage for longer than either of us has been alive. Take four companions and put him down — and when the chains come off, do not let him corner you.",
+    text: "My last sweep of the Sanctum's mouth found chains, $N, chains thick as a ship's mast, and something ogre-shaped straining inside them. The cult bound a champion at the threshold: Korgath, fed on rage for longer than either of us has been alive. Take four companions and put him down, and when the chains come off, do not let him corner you.",
     completionText:
-      'Korgath, broken at last. Even his chains deserved a kinder end than that. The wraps are yours — wear them past the threshold he kept.',
+      'Korgath, broken at last. Even his chains deserved a kinder end than that. The wraps are yours: wear them past the threshold he kept.',
     objectives: [
       {
         type: 'kill',
@@ -1937,9 +1982,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Grand Necromancer',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: "Every thread we have followed — Morthen, Vael, the phylacteries — was spun by one hand: Grand Necromancer Velkhar, first of the Gravecallers, keeper of the waking rite. He stands in the ritual vault below, pouring two lands' worth of stolen souls into the Wyrm. End him, $N, and the tithe ends with him.",
+    text: "Every thread we have followed (Morthen, Vael, the phylacteries) was spun by one hand: Grand Necromancer Velkhar, first of the Gravecallers, keeper of the waking rite. He stands in the ritual vault below, pouring two lands' worth of stolen souls into the Wyrm. End him, $N, and the tithe ends with him.",
     completionText:
-      'Velkhar is dead, and the rite is headless. But you felt it down there, did you not? The souls are already spent — the Wyrm is no longer asleep.',
+      'Velkhar is dead, and the rite is headless. But you felt it down there, did you not? The souls are already spent: the Wyrm is no longer asleep.',
     objectives: [
       {
         type: 'kill',
@@ -1964,9 +2009,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Korzul the Gravewyrm',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: "There is no rite left to stop, $N — only the Wyrm itself, half-woken in its hollow, gorged on the dead of the Vale and the fen. If it rises, the wall, the marsh, Eastbrook — everything we have defended falls in a single night. Take your companions into the Wyrm's Hollow and finish what we began in a chapel yard so long ago. The Light has carried you this far; carry it the rest of the way.",
+    text: "There is no rite left to stop, $N: only the Wyrm itself, half-woken in its hollow, gorged on the dead of the Vale and the fen. If it rises, the wall, the marsh, Eastbrook, everything we have defended falls in a single night. Take your companions into the Wyrm's Hollow and finish what we began in a chapel yard so long ago. The Light has carried you this far; carry it the rest of the way.",
     completionText:
-      'It is over. The dead of three lands may rest, the mountain sleeps unhaunted — and it is your name, $N, that every bell from here to Eastbrook rings tonight.',
+      'It is over. The dead of three lands may rest, the mountain sleeps unhaunted, and it is your name, $N, that every bell from here to Eastbrook rings tonight.',
     objectives: [
       {
         type: 'kill',
@@ -2234,7 +2279,7 @@ export const ZONE3_CAMPS: CampDef[] = [
   { mobId: 'stormcrag_elemental', center: { x: 110, z: 760 }, radius: 20, count: 8 },
   { mobId: 'stormcrag_elemental', center: { x: 135, z: 795 }, radius: 16, count: 6 },
   { mobId: 'shardlord_kazzix', center: { x: 145, z: 815 }, radius: 8, count: 1 },
-  // Wyrmcult: tents below the Sanctum. The (25, 845) pack's radius clipped the
+  // Broodsworn: tents below the Sanctum. The (25, 845) pack's radius clipped the
   // x=0 approach road, so it is nudged east to keep the central path clear; the
   // tents still flank the gate.
   { mobId: 'wyrmcult_zealot', center: { x: 55, z: 820 }, radius: 20, count: 8 },
@@ -2412,7 +2457,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmcult_orders: {
     id: 'wyrmcult_orders',
-    name: 'Wyrmcult Orders',
+    name: 'Broodsworn Orders',
     kind: 'quest',
     sellValue: 0,
     questId: 'q_cult_orders',
@@ -2544,8 +2589,12 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   // --- Old Cragmaw drops ---
   // Old Cragmaw's signature trophy, guaranteed to the slayer of the rare elite.
-  // Pure vendor value, no quest tie, so it always feels like a boss-kill reward
-  // and never blocks a turn-in.
+  // A leatherworking reagent (recipe_wildgrove_cinch) and still no quest tie,
+  // so it feels like a boss-kill reward, vendors at its 300 or tans into the
+  // cinch his own Ridge Stalker pack drops, and never blocks a turn-in.
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
+  // already common, sellValue unchanged.
   old_cragmaws_pelt: {
     id: 'old_cragmaws_pelt',
     name: "Old Cragmaw's Pelt",
@@ -2721,6 +2770,13 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 1050,
   },
   // Voskar the Emberwing drops (rare elite dragonkin)
+  // Voskar's signature trophy, guaranteed to the slayer of the rare elite.
+  // A leatherworking reagent (recipe_cragprowl_belt) and no quest tie, so it
+  // feels like a boss-kill reward, vendors at its 320 or plates into the
+  // Thornpeak Ogres' belt, and never blocks a turn-in.
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
+  // already common, sellValue unchanged.
   emberwing_cinderscale: {
     id: 'emberwing_cinderscale',
     name: 'Emberwing Cinderscale',
@@ -2884,7 +2940,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmcult_grand_robe: {
     id: 'wyrmcult_grand_robe',
-    name: 'Wyrmcult Grand Robe',
+    name: 'Broodsworn Grand Robe',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'chest',
@@ -2928,7 +2984,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmcult_soulsteps: {
     id: 'wyrmcult_soulsteps',
-    name: 'Wyrmcult Soulsteps',
+    name: 'Broodsworn Soulsteps',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'feet',
@@ -3570,12 +3626,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     requiredClass: HUNTER_ONLY,
   },
   // --- vendor food & drink (Quartermaster Bree) ---
+  // Vendor food nerf (11n-D-13): crafted 552 tier / 1.15, middle tercile;
+  // 480 * 1.15 = 552 exactly, so the crafted margin is +15.0 percent.
   trail_hardtack: {
     id: 'trail_hardtack',
     name: 'Highwatch Trail Hardtack',
     kind: 'food',
     quality: 'common',
-    foodHp: 552,
+    foodHp: 480,
     sellValue: 75,
     buyValue: 1200,
   },
@@ -3588,12 +3646,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 75,
     buyValue: 1200,
   },
+  // Vendor food nerf (11n-D-13): marlows_grand_roast 980 / 1.20, the top
+  // tercile's 20 percent margin, floored; crafted margin +20.1 percent.
   roast_mountain_goat: {
     id: 'roast_mountain_goat',
     name: 'Roast Mountain Goat',
     kind: 'food',
     quality: 'common',
-    foodHp: 874,
+    foodHp: 816,
     sellValue: 150,
     buyValue: 2500,
   },
@@ -3718,7 +3778,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 450,
     buyValue: 4500,
   },
-  // --- junk (gray) ---
+  // --- junk-kind drops: gray trash, plus the two 11l trophy reagents (common) ---
   ogre_toe_ring: {
     id: 'ogre_toe_ring',
     name: 'Ogre Toe Ring',
@@ -3726,11 +3786,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 25,
   },
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
+  // sellValue unchanged.
   cracked_ogre_tusk: {
     id: 'cracked_ogre_tusk',
     name: 'Cracked Ogre Tusk',
     kind: 'junk',
-    quality: 'poor',
+    quality: 'common',
     sellValue: 42,
   },
   inert_storm_shard: {
@@ -3747,11 +3810,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 30,
   },
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
+  // sellValue unchanged.
   cracked_wyrm_scale: {
     id: 'cracked_wyrm_scale',
     name: 'Cracked Wyrm Scale',
     kind: 'junk',
-    quality: 'poor',
+    quality: 'common',
     sellValue: 35,
   },
   // --- Class/spec gap fill: the 17-22 band plus endgame caster pieces ---
@@ -3897,18 +3963,18 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    // Wyrmcult Zealots (level 19) -> item level 22, shoulder budget 9.
+    // Broodsworn Zealots (level 19) -> item level 22, shoulder budget 9.
     stats: { armor: 32, int: 5, spi: 4 },
     sellValue: 1900,
   },
   wyrmcult_spellgrips: {
     id: 'wyrmcult_spellgrips',
-    name: 'Wyrmcult Spellgrips',
+    name: 'Broodsworn Spellgrips',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'gloves',
     quality: 'rare',
-    // Wyrmcult Necromancers (level 19) -> item level 22, gloves budget 9.
+    // Broodsworn Necromancers (level 19) -> item level 22, gloves budget 9.
     stats: { armor: 36, int: 5, spi: 4 },
     sellValue: 1850,
   },
@@ -3936,7 +4002,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   cryptbloom_shoulderguards: {
     id: 'cryptbloom_shoulderguards',
-    name: 'Cryptbloom Shoulderguards',
+    name: 'Tombpetal Shoulderguards',
     kind: 'armor',
     armorType: 'leather',
     slot: 'shoulder',
@@ -4012,6 +4078,246 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 14000,
     requiredClass: FERAL,
   },
+  // --- Roots' Bramblehide: the Strength leather family on the Nythraxis raid
+  // table, the feral druid's tier-2 armor beside the Maul above. Named for
+  // Roots, the druid. Feral swings pay 2 attack power per Strength
+  // (entity.ts apFromStats), so the family is str/sta rather than the
+  // Direfang agi line. It carries the FERAL tag the bear-form weapon ladder
+  // uses, but on ARMOR that tag is advisory: canEquipItem (equipment_rules.ts)
+  // gates armor by weight alone, so every leather-or-better wearer can equip a
+  // piece (only dev_kit and pbe_boost re-check the list), and the str/sta
+  // shape is what keeps it off the rogue/hunter agility wish lists. Every piece is item level 29 (level-20 raid boss + epic 6
+  // + raid 3) on the exact primaryStatBudget(29, epic, slot) sum, and carries
+  // exactly ONE rating at 20 like every ilvl-29 raid epic (the ladder pin in
+  // tests/combat_rating.test.ts): Hit on the big pieces (the Heroic +3 answer),
+  // crit on the small ones. The heroic-claim swap mints heroic_<id> raid-tier
+  // variants (item level 33, dual rating) from these bases automatically
+  // because they sit on the raid boss's normal loot table. Seven wearable
+  // slots, so the family alone reaches the Strength lineage's 6-piece
+  // capstone (content/item_sets.ts). Armor scales the Direfang crown/
+  // shoulder line (190/165) through the ilvl-26 Nightfang chest/legs/feet
+  // by the raid tier's 1.265 helm ratio.
+  bramblehide_crown: {
+    id: 'bramblehide_crown',
+    set: 'bramblehide',
+    name: "Roots' Bramblehide Crown",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'helmet',
+    quality: 'epic',
+    // helmet budget round(29 x 0.7 x 0.85) = 17
+    stats: { armor: 190, str: 10, sta: 7 },
+    hitRating: 20,
+    sellValue: 12000,
+    requiredClass: FERAL,
+  },
+  bramblehide_mantle: {
+    id: 'bramblehide_mantle',
+    set: 'bramblehide',
+    name: "Roots' Bramblehide Mantle",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'shoulder',
+    quality: 'epic',
+    // shoulder budget round(29 x 0.7 x 0.75) = 15
+    stats: { armor: 165, str: 9, sta: 6 },
+    critRating: 20,
+    sellValue: 12000,
+    requiredClass: FERAL,
+  },
+  bramblehide_harness: {
+    id: 'bramblehide_harness',
+    set: 'bramblehide',
+    name: "Roots' Bramblehide Harness",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    // chest budget round(29 x 0.7 x 1.0) = 20
+    stats: { armor: 215, str: 12, sta: 8 },
+    hitRating: 20,
+    sellValue: 12000,
+    requiredClass: FERAL,
+  },
+  bramblehide_cinch: {
+    id: 'bramblehide_cinch',
+    set: 'bramblehide',
+    name: "Roots' Bramblehide Cinch",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'waist',
+    quality: 'epic',
+    // waist budget round(29 x 0.7 x 0.7) = 14
+    stats: { armor: 120, str: 8, sta: 6 },
+    critRating: 20,
+    sellValue: 12000,
+    requiredClass: FERAL,
+  },
+  bramblehide_legguards: {
+    id: 'bramblehide_legguards',
+    set: 'bramblehide',
+    name: "Roots' Bramblehide Legguards",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'legs',
+    quality: 'epic',
+    // legs budget round(29 x 0.7 x 0.9) = 18
+    stats: { armor: 195, str: 11, sta: 7 },
+    hitRating: 20,
+    sellValue: 12000,
+    requiredClass: FERAL,
+  },
+  bramblehide_grips: {
+    id: 'bramblehide_grips',
+    set: 'bramblehide',
+    name: "Roots' Bramblehide Grips",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'gloves',
+    quality: 'epic',
+    // gloves budget round(29 x 0.7 x 0.7) = 14
+    stats: { armor: 140, str: 8, sta: 6 },
+    hitRating: 20,
+    sellValue: 12000,
+    requiredClass: FERAL,
+  },
+  bramblehide_treads: {
+    id: 'bramblehide_treads',
+    set: 'bramblehide',
+    name: "Roots' Bramblehide Treads",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'feet',
+    quality: 'epic',
+    // feet budget round(29 x 0.7 x 0.65) = 13
+    stats: { armor: 175, str: 8, sta: 5 },
+    critRating: 20,
+    sellValue: 12000,
+    requiredClass: FERAL,
+  },
+  // --- Nythraxis gap-fill drops (owner request, 2026-09-04): the seven lanes the
+  // top-parse gear review found empty at the raid tier. Every piece is item
+  // level 29 on the exact primaryStatBudget(29, epic, slot) sum with exactly one
+  // rating at 20 (the ilvl-29 ladder pin in tests/combat_rating.test.ts); the
+  // heroic-claim swap mints their item level 33 dual-rating variants because
+  // they sit on the raid boss's normal loot table. One-handers ride
+  // weaponDpsBudget(29) = 15.4 with the plus-or-minus 20 percent spread.
+  // Rogue one-hander: the raid's first dagger (rogues run two Heroic
+  // Duskwhispers from a five-man mid-boss today). Rogue-archetype lock, and
+  // the dagger flag the positional rogue strikes gate on.
+  courtiers_bonefang: {
+    id: 'courtiers_bonefang',
+    name: "Courtier's Bonefang",
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'onehand',
+    quality: 'epic',
+    // 15.4 dps at a fast 1.8 swing: (22 + 34) / 2 / 1.8 = 15.6.
+    weapon: { min: 22, max: 34, speed: 1.8, dagger: true },
+    stats: { agi: 13, sta: 7 },
+    hitRating: 20,
+    sellValue: 14000,
+    requiredClass: ['rogue', 'hunter'],
+  },
+  // Tank one-hander: the sta-led threat blade prot warriors and paladins lacked
+  // (they ran the Kingsbane legendary or a five-man cleaver). Hit for threat,
+  // like the Bonewrought Bulwark beside it.
+  thornpeak_wardblade: {
+    id: 'thornpeak_wardblade',
+    name: 'Thornpeak Wardblade',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'onehand',
+    quality: 'epic',
+    // (32 + 49) / 2 / 2.6 = 15.6 dps.
+    weapon: { min: 32, max: 49, speed: 2.6 },
+    stats: { sta: 12, str: 8 },
+    hitRating: 20,
+    sellValue: 14000,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
+  // Dual-wield Strength one-hander: fury and enhancement paired two five-man
+  // Gravewyrm Cleavers because the raid offered only two-handers. Crit, so the
+  // pair with a Hit weapon covers both ratings.
+  gravecourt_hewer: {
+    id: 'gravecourt_hewer',
+    name: 'Gravecourt Hewer',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'onehand',
+    quality: 'epic',
+    // (30 + 45) / 2 / 2.4 = 15.6 dps.
+    weapon: { min: 30, max: 45, speed: 2.4 },
+    stats: { str: 13, sta: 7 },
+    critRating: 20,
+    sellValue: 14000,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
+  // Healer shield: holy paladins and restoration shamans held the caster orb
+  // because the Bulwark is Strength-shaped. Same 680 armor / 30 block frame as
+  // the Bulwark, an int/spi line on the offhand budget (15), haste (healer
+  // pieces never take Hit).
+  votive_ward_of_the_deathless_court: {
+    id: 'votive_ward_of_the_deathless_court',
+    name: 'Votive Ward of the Deathless Court',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'offhand',
+    shield: true,
+    quality: 'epic',
+    blockValue: 30,
+    stats: { armor: 680, int: 8, spi: 7 },
+    hasteRating: 20,
+    sellValue: 12000,
+    requiredClass: ['paladin', 'shaman'],
+  },
+  // Leather caster helm: no leather int/spi helmet existed above the level 20
+  // band, so balance and restoration druids wore the cloth Wraithfire Cowl.
+  // Armor matches the Direfang Crown; the leather armorType is the only equip
+  // gate (every non-cloth class can wear it), no class list is claimed.
+  thornpeak_moonhide_cowl: {
+    id: 'thornpeak_moonhide_cowl',
+    name: 'Thornpeak Moonhide Cowl',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'helmet',
+    quality: 'epic',
+    // helmet budget round(29 x 0.7 x 0.85) = 17
+    stats: { armor: 190, int: 10, spi: 7 },
+    hasteRating: 20,
+    sellValue: 12000,
+  },
+  // Mail caster gloves and feet: the mail int/spi line had no gloves between
+  // the Galecall Handguards (26) and the heroic Wyrmchoir pair (31), and no
+  // feet at all above the level 11 band. Armor scales the Galecall gloves by
+  // the raid tier's 1.265 ratio; feet sit between the Barrowlord Sabatons and
+  // the heroic Tideworn Warboots.
+  stormhymn_chain_grips: {
+    id: 'stormhymn_chain_grips',
+    name: 'Stormhymn Chain Grips',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'gloves',
+    quality: 'epic',
+    // gloves budget round(29 x 0.7 x 0.7) = 14
+    stats: { armor: 165, int: 8, spi: 6 },
+    hasteRating: 20,
+    sellValue: 12000,
+    requiredClass: ['paladin', 'shaman'],
+  },
+  stormhymn_chain_treads: {
+    id: 'stormhymn_chain_treads',
+    name: 'Stormhymn Chain Treads',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'feet',
+    quality: 'epic',
+    // feet budget round(29 x 0.7 x 0.65) = 13
+    stats: { armor: 190, int: 8, spi: 5 },
+    critRating: 20,
+    sellValue: 12000,
+    requiredClass: ['paladin', 'shaman'],
+  },
   // --- Endgame leather caster line (int/spi, druid-only via armorType). These
   // fill the ilvl-26 dungeon tier on Korzul the Gravewyrm's table so balance
   // druids have on-weight options in every slot above the level-22 band. The
@@ -4059,6 +4365,51 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
 // sits on a high plateau (~9 elevation); the lake at (-70,760) stays clear.
 // ---------------------------------------------------------------------------
 
+// Roots' Bramblehide, the Strength leather family (see the ZONE3_ITEMS block
+// above). Base ids in slot order; the item-set, Reliquary, and Book of Deeds
+// tables each pin their own copy against ITEMS, so this list is a convenience
+// for the art ledger below rather than a fourth source of truth.
+export const BRAMBLEHIDE_SET_ITEM_IDS: readonly string[] = [
+  'bramblehide_crown',
+  'bramblehide_mantle',
+  'bramblehide_harness',
+  'bramblehide_cinch',
+  'bramblehide_legguards',
+  'bramblehide_grips',
+  'bramblehide_treads',
+];
+
+// The art-pending ledger for the family: the seven bases plus their generated
+// heroic-claim variants (heroicVariantId prefixes `heroic_`; spelled out here
+// rather than imported so this content module stays a leaf). ITEM_ART_PENDING
+// (src/ui/icons.ts) serves the procedural icon for every id listed here and
+// the item-art audit CLI excludes them from the every-live-item-has-art
+// sweep, exactly as the Crucible wave staged before its paintings landed.
+// Commission per docs/design/item-icon-art-style.md, then EMPTY this list
+// (tests/item_icons.test.ts A2 reds on a stale entry once art is committed).
+// EMPTY since the roots-bramblehide-icons-2026-09-07 wave painted all fourteen (seven bases and their
+// heroic variants); see docs/achievements/roots-bramblehide-icons-2026-09-07/generation-report.json.
+export const BRAMBLEHIDE_ART_PENDING_ITEM_IDS: readonly string[] = [];
+
+// The Nythraxis gap-fill drops (see the ZONE3_ITEMS block above), in loot
+// table order. The three weapons ship in-engine rendered icons
+// (scripts/render_weapon_still_icons.mjs, jobs table under
+// docs/achievements/nythraxis-gap-weapon-renders-2026-09-04/); the shield and
+// the three armor pieces were painted in the roots-bramblehide-icons-2026-09-07
+// wave with their generated heroic variants (heroicVariantId prefixes `heroic_`).
+export const NYTHRAXIS_GAP_ITEM_IDS: readonly string[] = [
+  'courtiers_bonefang',
+  'thornpeak_wardblade',
+  'gravecourt_hewer',
+  'votive_ward_of_the_deathless_court',
+  'thornpeak_moonhide_cowl',
+  'stormhymn_chain_grips',
+  'stormhymn_chain_treads',
+];
+// EMPTY since the roots-bramblehide-icons-2026-09-07 wave painted the shield and the three armor pieces
+// with their heroic variants; the three weapons ship in-engine renders.
+export const NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS: readonly string[] = [];
+
 export const ZONE3_PROPS: ZonePropsDef = {
   buildings: [
     { kind: 'house', x: 14, z: 671, w: 7, d: 6, rot: -0.5 },
@@ -4097,7 +4448,7 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { x: -120, z: 733, rot: 0.5, scale: 1.3 },
     { x: -128, z: 744, rot: 2.0, scale: 1.3 },
     { x: -136, z: 752, rot: 1.0, scale: 1.5 },
-    // Wyrmcult tents below the Sanctum
+    // Broodsworn tents below the Sanctum
     { x: 50, z: 815, rot: 0.8, scale: 1 },
     { x: 58, z: 823, rot: -0.5, scale: 1 },
     { x: 60, z: 812, rot: 2.2, scale: 1 },

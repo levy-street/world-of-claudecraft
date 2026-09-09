@@ -48,6 +48,9 @@
 // the refusal has to happen EARLIER than the consume, so the composed helper was
 // removed rather than left as documented-but-unused advice.
 
+import { anchorMatchesSelection, type ItemCopyAnchor } from './item_copy_anchor';
+import { isMaterialItemId } from './material_ids';
+import { takeMaterialUnit, takeMaterialUnitFromSlot } from './material_item_custody';
 import { cloneItemInstancePayload, type InventoryUnit, type InvSlot } from './types';
 
 /** Stable, order-independent JSON, so a pin does not depend on key insertion
@@ -79,6 +82,17 @@ export function itemCopyPin(slot: InvSlot | undefined): string {
     c: slot.craftedRecipeId ?? null,
     i: slot.itemId,
     p: slot.instance ?? null,
+    // The material composition joins the pin because it is the one part of a
+    // copy's identity that can change while the id, the payload AND the count
+    // all stay put: spend two of a stack's premium units and re-grant two plain
+    // ones and every other field reads unchanged. Kept as the ORDERED list it
+    // is (sortedJson sorts object keys, never array positions), so a canonical
+    // re-ordering is the only thing that could move it, and that is a change.
+    //
+    // Passed RAW, never `?? null`: sortedJson drops an undefined-valued key, so
+    // a slot with no composition pins byte-identically to what it always did.
+    // Only a real composition extends the pin.
+    s: slot.materialSources,
   });
 }
 
@@ -97,16 +111,32 @@ export function itemCopyPin(slot: InvSlot | undefined): string {
  * Validates the index itself (integer, in range) rather than trusting it: the
  * index arrives from a client, and the server re-resolves against its own
  * inventory. Moved verbatim from `consumeSelectedInventorySlot`.
+ *
+ * `anchor` is the OPTIONAL ordinal-plus-count description of the same copy
+ * (item_copy_anchor.ts). The index check above proves the cell still holds this
+ * ITEM; the anchor is what proves it still holds this COPY, which an index
+ * cannot say once a splice has moved every slot above it. Absent, nothing
+ * changes: the resolution, the refusals and the rng draw order are exactly what
+ * they were, which is what keeps the golden traces still and an older client
+ * working. Present and mismatched, this answers `null`, the caller's existing
+ * refusal, so a stale selection reads like every other one.
  */
 export function consumeSelectedInventorySlot(
   inventory: InvSlot[],
   itemId: string,
   slotIndex: number | undefined,
+  anchor?: ItemCopyAnchor,
 ): InventoryUnit | undefined | null {
   if (slotIndex === undefined) return undefined;
   if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= inventory.length) return null;
   const slot = inventory[slotIndex];
   if (slot.itemId !== itemId || slot.count < 1) return null;
+  if (!anchorMatchesSelection(inventory, itemId, slotIndex, anchor)) return null;
+  // A MATERIAL leaves through the shared take instead of a raw decrement: the
+  // unit carries its exact source and the stack keeps the canonical remainder,
+  // which a `count -= 1` cannot express. A named stack that cannot give a unit
+  // (a locked copy) refuses like any other invalid selection.
+  if (isMaterialItemId(itemId)) return takeMaterialUnitFromSlot(inventory, itemId, slotIndex);
   const instance =
     slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
   const craftedRecipeId = slot.craftedRecipeId;
@@ -129,6 +159,17 @@ export function consumeSelectedInventorySlot(
  * walk above and needs no meta in a test.
  */
 export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string): InventoryUnit {
+  // A MATERIAL does NOT take the newest-first walk below. Its automatic order
+  // is global (unrecorded and other nonpremium first, premium last, across
+  // every stack), so choosing the newest stack first could spend a premium unit
+  // while plain units sat in an earlier one. The newest bias survives only as
+  // the planner's tie-break between stacks holding the same descriptor.
+  // Nothing matched still answers the empty unit this has always returned.
+  if (isMaterialItemId(itemId)) {
+    return (
+      takeMaterialUnit(inventory, itemId) ?? { instance: undefined, craftedRecipeId: undefined }
+    );
+  }
   for (let i = inventory.length - 1; i >= 0; i--) {
     const slot = inventory[i];
     if (slot.itemId !== itemId) continue;
@@ -179,22 +220,34 @@ export function newestMatchingSlot(inventory: InvSlot[], itemId: string): InvSlo
  * Kept separate from the consuming version rather than folded into it, because a
  * mutating caller that accidentally consumed its target would destroy the item it
  * was asked to improve.
+ *
+ * `anchor` behaves exactly as it does on the consuming twin above.
  */
 export function selectedInventorySlot(
   inventory: InvSlot[],
   itemId: string,
   slotIndex: number | undefined,
+  anchor?: ItemCopyAnchor,
 ): InvSlot | undefined | null {
   if (slotIndex === undefined) return undefined;
   if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= inventory.length) return null;
   const slot = inventory[slotIndex];
   if (slot.itemId !== itemId || slot.count < 1) return null;
+  if (!anchorMatchesSelection(inventory, itemId, slotIndex, anchor)) return null;
   return slot;
+}
+
+/** The IWorld side of a per-copy selection: WHICH cell, plus the optional
+ *  ordinal-plus-count anchor that says which COPY that cell held when the
+ *  player picked it (item_copy_anchor.ts). */
+export interface NamedSlotTarget {
+  slotIndex: number;
+  anchor?: ItemCopyAnchor;
 }
 
 /**
  * Fold the shared entry points' overloaded trailing pair into (pid, named
- * slot). Sim's public item commands accept `pidOrTarget` as EITHER a host pid
+ * slot, anchor). Sim's public item commands accept `pidOrTarget` as EITHER a host pid
  * (server/RL callers) OR the IWorld `{ slotIndex }` target (the UI naming the
  * exact copy, this module's whole subject), with a trailing `slotIndex` for
  * the pid arity. Extracted from the fifteen per-delegate copies in sim.ts
@@ -207,11 +260,19 @@ export function selectedInventorySlot(
  * guard is defense in depth, now uniform instead of per-site.
  */
 export function foldNamedSlotTarget(
-  pidOrTarget: number | { slotIndex: number } | undefined,
+  pidOrTarget: number | NamedSlotTarget | undefined,
   slotIndex: number | undefined,
-): { pid: number | undefined; named: number | undefined } {
+  anchor?: ItemCopyAnchor,
+): { pid: number | undefined; named: number | undefined; anchor: ItemCopyAnchor | undefined } {
   const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-  const named =
-    pidOrTarget !== null && typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
-  return { pid, named };
+  const target = pidOrTarget !== null && typeof pidOrTarget === 'object' ? pidOrTarget : null;
+  // The anchor rides WITH the selection it describes: on the target object for
+  // the IWorld arity (the UI names a copy), and as the trailing argument for
+  // the pid arity (the server dispatch, which parses both off one frame). The
+  // two can never disagree, because only one of them is ever populated.
+  return {
+    pid,
+    named: target ? target.slotIndex : slotIndex,
+    anchor: target ? target.anchor : anchor,
+  };
 }

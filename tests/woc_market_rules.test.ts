@@ -617,6 +617,17 @@ describe('listingEligibility', () => {
     });
   });
 
+  it('an unknown-tier rolled quality ranks as itself (0) under the floor, the client twin', () => {
+    // The same effectiveQuality read the client sell pre-filter makes
+    // (tests/woc_market_view.test.ts): a legacy rolled tier QUALITY_RANK does
+    // not know ranks 0 and refuses, on both sides, never the def's tier.
+    const instance = { rolled: { quality: 'mythic' } } as unknown as ItemInstancePayload;
+    expect(listingEligibility(equipDef(), instance, policy)).toEqual({
+      ok: false,
+      reason: 'below_quality_floor',
+    });
+  });
+
   it('lets a rolled rare quality drop an epic def below the floor', () => {
     const instance: ItemInstancePayload = { rolled: { quality: 'rare' } };
     expect(listingEligibility(equipDef(), instance, policy)).toEqual({

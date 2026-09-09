@@ -201,7 +201,9 @@ Diff shape (client):
 Diff shape (server):
 - server/perf_report.ts: sanitizers for the five fields (choiceIn over the fixed crowd
   labels; clamps per scout).
-- server/db.ts: five ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS lines
+- server/client_perf_schema.ts: the ALTER TABLE client_perf_reports ADD COLUMN IF NOT
+  EXISTS lines (the whole client_perf_reports DDL now lives there, applied by
+  ensureSchema in server/db.ts)
   (crowd_bucket TEXT NOT NULL DEFAULT '' preserving the GROUPING-bits contract);
   ClientPerfReportInsert + insertClientPerfReport renumbered carefully; the worst-10s
   index constants exported and appended to CONCURRENT_INDEX_MIGRATIONS (R7).

@@ -74,3 +74,33 @@ export function marketHeroicStar(item: ItemDef, label: string): string {
     `<span aria-hidden="true">★</span></span>`
   );
 }
+
+// A PATTERN is the recipe kind, the same rule the Browse row's own 'pattern'
+// type chip filters on (src/sim/market_query.ts). Sharing the predicate rather
+// than re-deriving it is what keeps the mark and the chip from ever disagreeing
+// about which listings are patterns.
+export function isPatternItem(item: ItemDef): boolean {
+  return item.kind === 'recipe';
+}
+
+// The pattern mark for a Browse row: the third member of the icon-corner mark
+// family, on the BOTTOM-LEFT corner. The other two corners are taken (the heroic
+// star rides top-left, the armor pips bottom-right), and bottom-left is the one
+// that can never collide with either: an armor pattern is not itself armor, so
+// it draws no pips, but a pattern CAN be heroic, and those two must be readable
+// at once.
+//
+// The glyph is a lozenge rather than a star or a letter: at 10px it is
+// distinguishable from ★ in silhouette alone, which is what the color-blind and
+// grayscale cases need (WCAG 1.4.1, the reason the armor cue counts pips instead
+// of tinting one dot). `label` MUST be the caller's already-localized AND
+// escaped word (this module stays i18n-runtime-free), and the glyph itself is
+// aria-hidden so a reader announces the word once. NO native `title`, the same
+// reason as the two marks above.
+export function marketPatternMark(item: ItemDef, label: string): string {
+  if (!isPatternItem(item)) return '';
+  return (
+    `<span class="mkt-pattern-mark" role="img" aria-label="${label}">` +
+    `<span aria-hidden="true">❖</span></span>`
+  );
+}

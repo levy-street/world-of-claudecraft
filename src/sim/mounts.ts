@@ -26,6 +26,7 @@
 //
 // `src/sim`-pure and rng-free.
 
+import { normalizeMountSkinId } from './content/mount_skins';
 import { MOUNT_KEYS, type MountKey, mountDef, TRAINING_MOUNT_KEY } from './content/mounts';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
@@ -166,10 +167,16 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
 const IN_BATTLEGROUND_MSG = "You can't ride in a battleground.";
 const RIDING_UNTRAINED_MSG = 'You must learn to ride first. Find a riding trainer.';
 
-/** Strip all active form auras (FORM_AURA_KINDS) and ghost_wolf from the entity,
- *  emitting aura-removal events for each one removed. Called before a mount summon
- *  starts so the player is never simultaneously shapeshifted and mounting. Calls
- *  recalcFor if any aura was removed so stat effects (speed, etc.) clear immediately. */
+/** Strip all active form auras (FORM_AURA_KINDS), ghost_wolf, and stealth from the
+ *  entity, emitting aura-removal events for each one removed. Called before a mount
+ *  summon starts so the player is never simultaneously shapeshifted/stealthed and
+ *  mounting. Stealth is routed through the single `ctx.breakStealth` funnel (not
+ *  spliced inline like the forms) until no stealth aura remains, so each aura's
+ *  linger/aftereffect side effects fire exactly as they do for every other way
+ *  stealth ends. Without this, a stealthed rider keeps the aura's shrunk detection
+ *  radius while moving at full mount speed: invisible AND fast, the "stealth horse"
+ *  duel exploit. Calls recalcFor if any aura was removed so stat effects (speed,
+ *  etc.) clear immediately. */
 function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
   let stripped = false;
   for (let i = e.auras.length - 1; i >= 0; i--) {
@@ -179,6 +186,10 @@ function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
       ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
       stripped = true;
     }
+  }
+  while (e.auras.some((a) => a.kind === 'stealth')) {
+    ctx.breakStealth(e);
+    stripped = true;
   }
   if (stripped) {
     const meta = ctx.players.get(e.id);
@@ -203,6 +214,23 @@ function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
  *
  *  Already riding something else: swap INSTANTLY, no dismount channel and no new
  *  summon channel. Clicking the reins you are already riding dismounts. */
+/** Wear (skinId) or take off (null) a mount SKIN (content/mount_skins.ts) on a
+ *  player: the persisted meta field plus the entity mirror the identity wire
+ *  (`msk`) reads. Cosmetic only: the ridden mount keeps its own key, so speed,
+ *  the melee block and crit are untouched. The account-ownership gate is the
+ *  caller's (the server's session cosmetics; Sim.changeMountSkin offline).
+ *  An id outside the catalog is refused. */
+export function setMountSkin(ctx: SimContext, pid: number, skinId: string | null): boolean {
+  const meta = ctx.players.get(pid);
+  const e = ctx.entities.get(pid);
+  if (!meta || e?.kind !== 'player') return false;
+  const next = skinId === null ? null : normalizeMountSkinId(skinId);
+  if (skinId !== null && next === null) return false;
+  meta.mountSkinId = next;
+  e.mountSkinId = next;
+  return true;
+}
+
 export function summonMountItem(ctx: SimContext, pid: number, key: string): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);

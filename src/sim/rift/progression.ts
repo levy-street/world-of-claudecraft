@@ -1,6 +1,7 @@
 // Long-term Rift itemization: personal Rift gear drops plus deterministic forge
-// operations (upgrade, enchant, gems). Static ItemDefs remain the combat-safe
-// shell; all per-copy progression lives in ItemInstancePayload.
+// operations (essence upgrades and gem sockets). Static ItemDefs are stat-free
+// shells; everything a band grants lives in ItemInstancePayload.rift, and the
+// ladder that prices it is rift/band_ladder.ts.
 
 import {
   RIFT_ESSENCE_ITEM_ID,
@@ -14,24 +15,27 @@ import { selectedInventorySlot } from '../item_copy_ref';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload, PlayerClass, RiftTier } from '../types';
+import {
+  RIFT_BAND_GEM_SLOTS,
+  RIFT_BAND_MAX_UPGRADE,
+  type RiftBandShell,
+  riftBandRolledStats,
+} from './band_ladder';
+import { nearRiftForge, RIFT_FORGE_TOO_FAR_TEXT } from './forge_gate';
 import { riftHeroicClearPool, riftNormalClearPool } from './loot_pools';
 import { riftRankForBaseLevel } from './ranks';
-
-export const RIFT_ENCHANT_STATS = [
-  'str',
-  'agi',
-  'sta',
-  'int',
-  'spi',
-  'critRating',
-  'hasteRating',
-] as const;
 
 const TIER_POWER: Record<RiftTier, number> = { C: 1, B: 2, A: 3, S: 4 };
 const MELEE_CLASSES = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
 const AGILITY_CLASSES = new Set<PlayerClass>(['rogue', 'hunter', 'druid']);
 
-export type RiftForgeAction = 'upgrade' | 'enchant' | 'socket';
+/** Essence an upgrade from `upgradeLevel` costs: 2, 4, 6, 8, 10 across the
+ *  five steps. Exported so the forge window quotes the same ladder. */
+export function riftUpgradeCost(upgradeLevel: number): number {
+  return 2 + upgradeLevel * 2;
+}
+
+export type RiftForgeAction = 'upgrade' | 'socket';
 export interface RiftForgeResult {
   ok: boolean;
   action: RiftForgeAction;
@@ -41,59 +45,60 @@ export interface RiftForgeResult {
     | 'not_rift_gear'
     | 'max_upgrade'
     | 'insufficient_essence'
-    | 'invalid_stat'
     | 'invalid_gem'
-    | 'sockets_full'
     // The while-dead refusal (dead_gate.ts): returned to callers (tests and
     // the offline probes) but NEVER emitted as a riftForgeResult event; the
     // shared "You can't do that while dead." error line is its only
     // player-facing surface, like the unresolvable-player arm above it.
-    | 'dead';
+    | 'dead'
+    // The place refusal (forge_gate.ts): the player is not standing at a
+    // riftForge NPC. Same single-surface contract as 'dead': returned, never
+    // emitted; the "too far from the Rift Forge" error line is its surface.
+    | 'too_far';
   upgradeLevel?: number;
   essenceSpent?: number;
+  /** The gem a socket action destroyed to make room (sockets are replaceable:
+   *  a full band takes the new gem in place of its oldest one). */
+  replacedGem?: string;
 }
 
-function shellForClass(cls: PlayerClass): {
-  itemId: string;
-  primary: 'str' | 'agi' | 'int';
-  secondary: 'sta' | 'spi';
-} {
-  if (MELEE_CLASSES.has(cls)) {
-    return { itemId: 'riftbound_band_of_might', primary: 'str', secondary: 'sta' };
-  }
-  if (AGILITY_CLASSES.has(cls)) {
-    return { itemId: 'riftbound_band_of_guile', primary: 'agi', secondary: 'sta' };
-  }
-  return { itemId: 'riftbound_band_of_insight', primary: 'int', secondary: 'spi' };
-}
-
-function rebuildRolledStats(instance: ItemInstancePayload): void {
-  const rift = instance.rift;
-  if (!rift) return;
-  const stats: Record<string, number> = { ...rift.baseStats };
-  const primary = Object.keys(rift.baseStats)[0];
-  if (primary) stats[primary] = (stats[primary] ?? 0) + rift.upgradeLevel;
-  stats.sta = (stats.sta ?? 0) + Math.floor(rift.upgradeLevel / 2);
-  if (rift.enchant) stats[rift.enchant.stat] = (stats[rift.enchant.stat] ?? 0) + rift.enchant.value;
-  for (const gem of rift.gems) {
-    if (gem === 'rift_gem_crimson') stats.str = (stats.str ?? 0) + 2;
-    else if (gem === 'rift_gem_azure') stats.int = (stats.int ?? 0) + 2;
-    else if (gem === 'rift_gem_verdant') stats.sta = (stats.sta ?? 0) + 2;
-  }
-  instance.rolled = { ...(instance.rolled ?? {}), quality: 'epic', stats };
-}
-
-const SHELL_STATS: Readonly<
-  Record<string, { primary: 'str' | 'agi' | 'int'; secondary: 'sta' | 'spi' }>
-> = {
+/** The three class shells, each a stat-free ItemDef; the copy's rift record
+ *  prices the ring (band_ladder.ts). Bands are forge-only: the enchanting
+ *  profession refuses them by id (professions/enchanting.ts). */
+const SHELL_STATS: Readonly<Record<string, RiftBandShell>> = {
   riftbound_band_of_might: { primary: 'str', secondary: 'sta' },
   riftbound_band_of_insight: { primary: 'int', secondary: 'spi' },
   riftbound_band_of_guile: { primary: 'agi', secondary: 'sta' },
 };
 
-/** Rebuild a persisted copy from bounded progression inputs; rolled stats and
- * baseStats are never trusted from JSONB. Null downgrades a malformed copy to
- * its harmless static ItemDef shell at the load boundary. */
+function shellItemIdForClass(cls: PlayerClass): string {
+  if (MELEE_CLASSES.has(cls)) return 'riftbound_band_of_might';
+  if (AGILITY_CLASSES.has(cls)) return 'riftbound_band_of_guile';
+  return 'riftbound_band_of_insight';
+}
+
+/** Rebuild the copy's rolled aggregate from its bounded progression inputs
+ *  (tier, upgradeLevel, gems). The rolled block is never trusted from JSONB or
+ *  the wire; this is the ONLY writer, so a band's stats can never drift from
+ *  what the ladder prices for its item level. */
+function rebuildRolledStats(itemId: string, instance: ItemInstancePayload): void {
+  const rift = instance.rift;
+  const shell = SHELL_STATS[itemId];
+  if (!rift || !shell) return;
+  const stats = riftBandRolledStats(shell, rift.tier, rift.upgradeLevel, rift.gems);
+  instance.rolled = { ...(instance.rolled ?? {}), quality: 'epic', stats };
+}
+
+const RIFT_TIERS: readonly RiftTier[] = ['C', 'B', 'A', 'S'];
+
+/** Rebuild a persisted copy from bounded progression inputs; rolled stats are
+ *  never trusted from JSONB. Every band a player has ever been handed loads
+ *  (tier, upgrade level, and socketed gems are all that is read; the legacy
+ *  `baseStats` and `enchant` fields of the pre-ladder payload are ignored and
+ *  dropped, and an over-socketed gem list is truncated to the rank's sockets),
+ *  so a ladder retune resizes existing bands at load instead of voiding them.
+ *  Null is reserved for a copy that is not a band at all: an unknown shell id,
+ *  a tier or upgrade level outside the ladder, or no source event. */
 export function sanitizeRiftGearInstance(
   itemId: string,
   input: ItemInstancePayload,
@@ -101,79 +106,70 @@ export function sanitizeRiftGearInstance(
 ): ItemInstancePayload | null {
   const source = input.rift;
   const shell = SHELL_STATS[itemId];
-  if (!source || !shell || !['C', 'B', 'A', 'S'].includes(source.tier)) return null;
-  const power = TIER_POWER[source.tier];
+  if (!source || !shell || !RIFT_TIERS.includes(source.tier)) return null;
   if (
     !Number.isInteger(source.upgradeLevel) ||
     source.upgradeLevel < 0 ||
-    source.upgradeLevel > 5 ||
+    source.upgradeLevel > RIFT_BAND_MAX_UPGRADE ||
     typeof source.sourceEventId !== 'string' ||
     source.sourceEventId.length < 1 ||
     source.sourceEventId.length > 128
   ) {
     return null;
   }
-  const gemSlots = source.tier === 'S' ? 2 : 1;
-  const gems = Array.isArray(source.gems)
-    ? source.gems.filter((gem): gem is RiftGemId =>
-        (RIFT_GEM_IDS as readonly string[]).includes(gem),
-      )
-    : [];
-  if (gems.length > gemSlots) return null;
-  const enchant = source.enchant;
-  if (
-    enchant &&
-    (!(RIFT_ENCHANT_STATS as readonly string[]).includes(enchant.stat) ||
-      enchant.value !== Math.max(1, Math.ceil(power / 2)))
-  ) {
-    return null;
-  }
+  const gemSlots = RIFT_BAND_GEM_SLOTS[source.tier];
+  // Newest gems win, the same eviction order socketRiftGem applies on a full band.
+  const gems = (Array.isArray(source.gems) ? source.gems : [])
+    .filter((gem): gem is RiftGemId => (RIFT_GEM_IDS as readonly string[]).includes(gem))
+    .slice(-gemSlots);
   const clean: ItemInstancePayload = {
     boundTo: ownerId,
+    // The player item lock (item_lock.ts) is the owner's own safety mark and
+    // rides the rebuild; every other per-copy field is re-derived below.
+    ...(input.locked === true && { locked: true }),
     rolled: { quality: 'epic', stats: {} },
     rift: {
       sourceEventId: source.sourceEventId,
       tier: source.tier,
-      power,
+      power: TIER_POWER[source.tier],
       upgradeLevel: source.upgradeLevel,
-      maxUpgradeLevel: 5,
-      baseStats: {
-        [shell.primary]: power,
-        [shell.secondary]: Math.max(1, Math.ceil(power / 2)),
-      },
-      ...(enchant && { enchant: { ...enchant } }),
+      maxUpgradeLevel: RIFT_BAND_MAX_UPGRADE,
       gemSlots,
-      gems: [...gems],
+      gems,
     },
   };
-  rebuildRolledStats(clean);
+  rebuildRolledStats(itemId, clean);
   return clean;
 }
 
+/** Mint a band for `cls`. `upgradeLevel` and `gems` exist for the dev kit
+ *  and tests (a first clear always mints +0 with empty sockets); gems beyond
+ *  the rank's sockets are dropped, newest kept. */
 export function createRiftGearInstance(
   eventId: string,
   tier: RiftTier,
   cls: PlayerClass,
   boundTo: number,
+  upgradeLevel = 0,
+  gems: readonly RiftGemId[] = [],
 ): { itemId: string; instance: ItemInstancePayload } {
-  const shell = shellForClass(cls);
-  const power = TIER_POWER[tier];
+  const itemId = shellItemIdForClass(cls);
+  const gemSlots = RIFT_BAND_GEM_SLOTS[tier];
   const instance: ItemInstancePayload = {
     boundTo,
     rolled: { quality: 'epic', stats: {} },
     rift: {
       sourceEventId: eventId,
       tier,
-      power,
-      upgradeLevel: 0,
-      maxUpgradeLevel: 5,
-      baseStats: { [shell.primary]: power, [shell.secondary]: Math.max(1, Math.ceil(power / 2)) },
-      gemSlots: tier === 'S' ? 2 : 1,
-      gems: [],
+      power: TIER_POWER[tier],
+      upgradeLevel: Math.max(0, Math.min(RIFT_BAND_MAX_UPGRADE, Math.floor(upgradeLevel))),
+      maxUpgradeLevel: RIFT_BAND_MAX_UPGRADE,
+      gemSlots,
+      gems: gems.slice(-gemSlots),
     },
   };
-  rebuildRolledStats(instance);
-  return { itemId: shell.itemId, instance };
+  rebuildRolledStats(itemId, instance);
+  return { itemId, instance };
 }
 
 // Clear-time epic/legendary odds per rank. Economy rationale: these land ONLY
@@ -238,6 +234,55 @@ export const RIFT_EPIC_MOUNT_REINS = [
 ] as const;
 export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
 
+/** Masterwrought apex ARMOR patterns (Phase 11, R8 channel doctrine): the rift
+ *  pillar carries the ten armorcrafting/leatherworking/tailoring patterns
+ *  (content/apex_patterns.ts) as the final appended draw on every winning
+ *  B/A/S clear. SORTED, and exported for tests: the rng.int pick below indexes
+ *  it, so the order is part of the draw contract. */
+export const RIFT_PATTERN_ITEM_IDS = [
+  'pattern_barksong_handguards',
+  'pattern_briarstep_jerkin',
+  'pattern_fenbloom_breeches',
+  'pattern_forgefold_legguards',
+  'pattern_spiritweld_girdle',
+  'pattern_sunspun_handwraps',
+  'pattern_sunspun_haversack',
+  'pattern_sunspun_leggings',
+  'pattern_sunspun_vestments',
+  'pattern_wardspeaker_sabatons',
+] as const;
+export const RIFT_PATTERN_CHANCE = 0.08; // one draw per winning B/A/S clear
+
+/** Farming's RIFT channel (Phase 11f, masterwrought R8): the three rung-100
+ *  farm patterns the raid does not carry, plus every tier-3 and tier-4 seed, as
+ *  the appended draw AFTER the apex-pattern roll on winning B/A/S clears.
+ *
+ *  SORTED, and exported for tests, for exactly the reason RIFT_PATTERN_ITEM_IDS
+ *  above is: the rng.int pick below indexes this array, so its ORDER is part of
+ *  the draw contract and a re-sort is a determinism change, not a tidy-up.
+ *
+ *  One list rather than two (patterns and seeds) because it must cost ONE
+ *  appended draw, not two: a rift clear either sheds a farming reward or it does
+ *  not, and which kind it is comes out of the same pick. That also keeps the
+ *  repeatable pillar from becoming the fastest route to a pattern, since a
+ *  pattern is 3 of the 11 slots behind an 8% gate. */
+export const FARM_RIFT_DROP_ITEM_IDS = [
+  'evergarden_greens_seed',
+  'evergarden_pumpkin_seed',
+  'frost_gourd_seed',
+  'frost_lentils_seed',
+  'gilded_sunmelon_seed',
+  'gilded_yam_seed',
+  'highland_barley_seed',
+  'pattern_evergarden_braised_greens',
+  'pattern_evergarden_harvest_platter',
+  'pattern_evergarden_sunmelon_tart',
+  'thornpeak_cabbage_seed',
+] as const;
+/** The SHIPPED rift pattern rate, reused rather than re-derived: farming's
+ *  appended draw is the same 8% gate the apex patterns ride. */
+export const FARM_RIFT_DROP_CHANCE = RIFT_PATTERN_CHANCE;
+
 /** Rank-gated gear payout on the winning clear: pushed onto the final boss's
  * corpse as PLAIN drops, so the normal party loot rules (rolls) decide who
  * takes them. Runs for every winning clear, ranked race or dev portal, with
@@ -253,6 +298,15 @@ export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
  *         in array order (RIFT_LEGENDARY_CHANCE_S each)
  *   5. B/A/S: exactly one mount roll, for the rank's own tier only
  *         (green/blue/epic chance + rng.int pick)
+ *   6. B/A/S: one apex-pattern roll (RIFT_PATTERN_CHANCE, then an rng.int
+ *         pick over the sorted RIFT_PATTERN_ITEM_IDS). C never reaches this
+ *         draw BY DESIGN: the C arm returns after draw 0, so the pattern
+ *         channel stays a winning ranked-clear reward (the R8 channel split).
+ *   7. B/A/S: one FARMING roll (FARM_RIFT_DROP_CHANCE, then an rng.int pick
+ *         over the sorted FARM_RIFT_DROP_ITEM_IDS: three rung-100 farm
+ *         patterns plus every tier-3 and tier-4 seed). Appended by
+ *         masterwrought Phase 11f under the same append-only rule, and C
+ *         never reaches it either.
  *
  * B/A/S draws are unaffected by the new C draw (C returns after draw 0).
  */
@@ -304,6 +358,29 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
   if (ctx.rng.chance(mount.chance)) {
     loot.items.push({
       itemId: mount.reins[ctx.rng.int(0, mount.reins.length - 1)],
+      count: 1,
+    });
+  }
+
+  // --- Draw 6: the apex armor pattern roll (see RIFT_PATTERN_ITEM_IDS) ---
+  // Appended AFTER the mount roll so every existing draw keeps its stream
+  // position; a plain tradable drop like the draws above, so party loot rules
+  // decide who takes it.
+  if (ctx.rng.chance(RIFT_PATTERN_CHANCE)) {
+    loot.items.push({
+      itemId: RIFT_PATTERN_ITEM_IDS[ctx.rng.int(0, RIFT_PATTERN_ITEM_IDS.length - 1)],
+      count: 1,
+    });
+  }
+
+  // --- Draw 7: the farming roll (see FARM_RIFT_DROP_ITEM_IDS) ---
+  // Appended AFTER draw 6 for the same reason draw 6 sits after the mount roll:
+  // every existing draw keeps its stream position, and only the goldens that
+  // reach this far move. C never arrives here, since its arm returned after
+  // draw 0, which is the same designed split the pattern channel already has.
+  if (ctx.rng.chance(FARM_RIFT_DROP_CHANCE)) {
+    loot.items.push({
+      itemId: FARM_RIFT_DROP_ITEM_IDS[ctx.rng.int(0, FARM_RIFT_DROP_ITEM_IDS.length - 1)],
       count: 1,
     });
   }
@@ -364,14 +441,18 @@ export function addRiftProgressionLoot(
   boss.lootable = true;
 }
 
-/** The forge's target copy. One choke point for all three actions (upgrade,
- *  enchant, socket), so the selection is threaded once here.
+/** The forge's target copy. One choke point for both actions (upgrade,
+ *  socket), so the selection is threaded once here.
  *
  *  A named slot must still BE a rift piece: the index says which copy, never
  *  what it is, so a selection pointing at a plain copy refuses like any other
  *  ineligible target rather than sliding onto a different one. Without a
  *  selection this stays the legacy newest-rift-copy walk. */
 function riftInventorySlot(meta: PlayerMeta, itemId: string, slotIndex?: number) {
+  // A forge target is a band shell carrying a rift record; a rift record on
+  // any other id (never minted, but the wire cannot prove that) is refused
+  // here so an upgrade can never charge essence for a stat line it cannot price.
+  if (!SHELL_STATS[itemId]) return null;
   if (slotIndex !== undefined) {
     const named = selectedInventorySlot(meta.inventory, itemId, slotIndex);
     if (!named?.instance?.rift) return null;
@@ -384,15 +465,29 @@ function riftInventorySlot(meta: PlayerMeta, itemId: string, slotIndex?: number)
   return null;
 }
 
+/** The shared place gate for the forge pair: true (and the error line
+ *  emitted) when the resolved player is out of reach of the Riftwright. */
+function refusedAwayFromForge(ctx: SimContext, r: { e: Entity; meta: PlayerMeta }): boolean {
+  if (nearRiftForge(ctx, r.e)) return false;
+  ctx.error(r.meta.entityId, RIFT_FORGE_TOO_FAR_TEXT);
+  return true;
+}
+
 function emitResult(ctx: SimContext, pid: number, result: RiftForgeResult): RiftForgeResult {
   ctx.emit({ type: 'riftForgeResult', pid, ...result });
   if (result.ok) {
     const name = ITEMS[result.itemId]?.name ?? result.itemId;
+    const replaced =
+      result.replacedGem === undefined
+        ? undefined
+        : (ITEMS[result.replacedGem]?.name ?? result.replacedGem);
+    // English here, re-localized by the client matcher (src/ui/sim_i18n.ts,
+    // the sim.rift.forge* keys). A replacement names the gem it destroyed.
     const line =
       result.action === 'upgrade'
         ? `Rift upgrade completed for ${name}.`
-        : result.action === 'enchant'
-          ? `Rift enchant completed for ${name}.`
+        : replaced !== undefined
+          ? `Rift gem replaced for ${name}: ${replaced} destroyed.`
           : `Rift gem socketed for ${name}.`;
     ctx.emit({
       type: 'log',
@@ -415,6 +510,8 @@ export function upgradeRiftItem(
   if (refusedWhileDead(ctx, pid)) return { ok: false, action: 'upgrade', itemId, reason: 'dead' };
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, action: 'upgrade', itemId, reason: 'not_found' };
+  if (refusedAwayFromForge(ctx, r))
+    return { ok: false, action: 'upgrade', itemId, reason: 'too_far' };
   const slot = riftInventorySlot(r.meta, itemId, slotIndex);
   if (!slot?.instance?.rift) {
     return emitResult(ctx, r.meta.entityId, {
@@ -433,7 +530,7 @@ export function upgradeRiftItem(
       reason: 'max_upgrade',
     });
   }
-  const cost = 2 + gear.upgradeLevel * 2;
+  const cost = riftUpgradeCost(gear.upgradeLevel);
   if (ctx.countItem(RIFT_ESSENCE_ITEM_ID, r.meta.entityId) < cost) {
     return emitResult(ctx, r.meta.entityId, {
       ok: false,
@@ -444,7 +541,7 @@ export function upgradeRiftItem(
   }
   ctx.removeItem(RIFT_ESSENCE_ITEM_ID, cost, r.meta.entityId);
   gear.upgradeLevel += 1;
-  rebuildRolledStats(slot.instance);
+  rebuildRolledStats(slot.itemId, slot.instance);
   r.meta.wireRev++;
   return emitResult(ctx, r.meta.entityId, {
     ok: true,
@@ -455,58 +552,11 @@ export function upgradeRiftItem(
   });
 }
 
-export function enchantRiftItem(
-  ctx: SimContext,
-  itemId: string,
-  stat: string,
-  pid?: number,
-  slotIndex?: number,
-): RiftForgeResult {
-  // Same dead gate as upgradeRiftItem, for the same single-surface reason.
-  if (refusedWhileDead(ctx, pid)) return { ok: false, action: 'enchant', itemId, reason: 'dead' };
-  const r = ctx.resolve(pid);
-  if (!r) return { ok: false, action: 'enchant', itemId, reason: 'not_found' };
-  const slot = riftInventorySlot(r.meta, itemId, slotIndex);
-  if (!slot?.instance?.rift) {
-    return emitResult(ctx, r.meta.entityId, {
-      ok: false,
-      action: 'enchant',
-      itemId,
-      reason: 'not_rift_gear',
-    });
-  }
-  if (!(RIFT_ENCHANT_STATS as readonly string[]).includes(stat)) {
-    return emitResult(ctx, r.meta.entityId, {
-      ok: false,
-      action: 'enchant',
-      itemId,
-      reason: 'invalid_stat',
-    });
-  }
-  const cost = 4;
-  if (ctx.countItem(RIFT_ESSENCE_ITEM_ID, r.meta.entityId) < cost) {
-    return emitResult(ctx, r.meta.entityId, {
-      ok: false,
-      action: 'enchant',
-      itemId,
-      reason: 'insufficient_essence',
-    });
-  }
-  ctx.removeItem(RIFT_ESSENCE_ITEM_ID, cost, r.meta.entityId);
-  slot.instance.rift.enchant = {
-    stat,
-    value: Math.max(1, Math.ceil(slot.instance.rift.power / 2)),
-  };
-  rebuildRolledStats(slot.instance);
-  r.meta.wireRev++;
-  return emitResult(ctx, r.meta.entityId, {
-    ok: true,
-    action: 'enchant',
-    itemId,
-    essenceSpent: cost,
-  });
-}
-
+/** Socket a gem. Sockets are replaceable: a band with every socket filled
+ *  takes the new gem in place of its OLDEST one, which is destroyed (the
+ *  result names it in `replacedGem`). The gem's colour decides which rating
+ *  the band gains (band_ladder.ts RIFT_GEM_RATING_STAT), so a player retunes
+ *  hit against crit or haste by socketing again, never by discarding the band. */
 export function socketRiftGem(
   ctx: SimContext,
   itemId: string,
@@ -518,6 +568,8 @@ export function socketRiftGem(
   if (refusedWhileDead(ctx, pid)) return { ok: false, action: 'socket', itemId, reason: 'dead' };
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, action: 'socket', itemId, reason: 'not_found' };
+  if (refusedAwayFromForge(ctx, r))
+    return { ok: false, action: 'socket', itemId, reason: 'too_far' };
   const slot = riftInventorySlot(r.meta, itemId, slotIndex);
   if (!slot?.instance?.rift) {
     return emitResult(ctx, r.meta.entityId, {
@@ -538,19 +590,18 @@ export function socketRiftGem(
       reason: 'invalid_gem',
     });
   }
-  if (slot.instance.rift.gems.length >= slot.instance.rift.gemSlots) {
-    return emitResult(ctx, r.meta.entityId, {
-      ok: false,
-      action: 'socket',
-      itemId,
-      reason: 'sockets_full',
-    });
-  }
   ctx.removeItem(gemId, 1, r.meta.entityId);
-  slot.instance.rift.gems.push(gemId as RiftGemId);
-  rebuildRolledStats(slot.instance);
+  const gear = slot.instance.rift;
+  const replacedGem = gear.gems.length >= gear.gemSlots ? gear.gems.shift() : undefined;
+  gear.gems.push(gemId as RiftGemId);
+  rebuildRolledStats(slot.itemId, slot.instance);
   r.meta.wireRev++;
-  return emitResult(ctx, r.meta.entityId, { ok: true, action: 'socket', itemId });
+  return emitResult(ctx, r.meta.entityId, {
+    ok: true,
+    action: 'socket',
+    itemId,
+    ...(replacedGem !== undefined && { replacedGem }),
+  });
 }
 
 export function riftSalvageYield(instance: ItemInstancePayload): number {

@@ -65,6 +65,11 @@ services:
       # Empty (unset) yields the built-in default of 10; accepted range is 1 to
       # 97 and anything else falls back to the default with an error at boot.
       DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}
+      # Runtime: the Rift Forge kill switch (server/rift_forge_gate.ts). The
+      # forge wire is open by default; 0 (or false/off/no) pauses it on this
+      # realm. Forwarded so the switch actually reaches the server: a variable
+      # set only in the host .env never does unless it is listed here.
+      RIFT_FORGE_ENABLED: ${RIFT_FORGE_ENABLED:-}
       # Runtime: storage price override (server/storage_prices.ts), one JSON object
       # of copper price lists, e.g. {"bankSockets":[4 ints]} (bankExpansions and
       # vaultUpgrades too), kept on ONE line in a .env file. Empty (unset) keeps the

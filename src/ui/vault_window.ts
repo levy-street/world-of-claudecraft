@@ -23,6 +23,7 @@
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
 import { isItemLocked } from '../sim/item_lock';
+import type { MaterialComposition } from '../sim/material_sources';
 import { resolveVaultSpecialIndex, vaultMaterialIds } from '../sim/materials_vault';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld, VaultSpecialRef } from '../world_api';
@@ -32,6 +33,7 @@ import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { appendBankStatusLine, type BankStatusAnnouncementState } from './bank_status_line';
 import { formatCount } from './count_format';
+import { depositAllNotableParams } from './deposit_all_status_text';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR, findFocusKey, restoreFirstEnabled } from './focus_restore';
@@ -44,6 +46,13 @@ import {
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
+import { vaultMaterialWithdrawSelection } from './material_source_storage_actions';
+import {
+  appendMaterialSourcesActionAfter,
+  attachMaterialSourcesContextMenu,
+  type MaterialSourcesDialogOptions,
+} from './material_sources_dialog';
+import { materialSourcesForDisplay } from './material_sources_view';
 import { StorageRungEchoLatch } from './storage_rung_echo_core';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
@@ -108,8 +117,13 @@ export interface VaultTabDeps {
   world(): IWorld;
   itemIcon(item: ItemDef): string;
   moneyHtml(copper: number): string;
-  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
+  itemTooltip(
+    item: ItemDef,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string;
   attachTooltip(el: HTMLElement, html: () => string): void;
+  openMaterialSources?(options: MaterialSourcesDialogOptions): void;
   hideTooltip(): void;
   /** True when this click released a long-press tooltip peek (suppress the
    *  withdraw, the bank grid rule). */
@@ -385,16 +399,42 @@ export class VaultTab {
       }
       this.onRowClick(model, ev.shiftKey);
     });
+    const displayedSources =
+      model.kind === 'special' ? materialSourcesForDisplay({ ...model, itemId }) : undefined;
     this.deps.attachTooltip(row, () => {
+      // A vault row is owned material stock, so it carries provenance too. A
+      // 'special' row keeps per-copy identity (payload AND composition); a
+      // COMPACT row is a plain count with nowhere to record a gatherer, which
+      // is exactly what the vault's own routing rule guarantees, so it shows no
+      // source lines rather than an invented one.
       const body = item
-        ? this.deps.itemTooltip(item, model.kind === 'special' ? model.instance : undefined)
+        ? this.deps.itemTooltip(
+            item,
+            model.kind === 'special' ? model.instance : undefined,
+            displayedSources,
+          )
         : `<div class="tt-title">${esc(itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`;
       const partial = model.canChooseQuantity
         ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
         : '';
       return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
     });
+    attachMaterialSourcesContextMenu(row, name, displayedSources, this.deps.openMaterialSources);
+    if (displayedSources) wrap.classList.add('material-source-item');
     wrap.appendChild(row);
+    appendMaterialSourcesActionAfter(
+      row,
+      name,
+      displayedSources,
+      this.deps.openMaterialSources,
+      model.kind === 'special'
+        ? vaultMaterialWithdrawSelection(this.deps.world(), itemId, model.specialRef.index, () => {
+            this.deps.hideTooltip();
+            this.deps.onInventoryChanged();
+            this.deps.requestRender();
+          })
+        : undefined,
+    );
     if (model.canChooseQuantity && model.partialMax !== null) {
       // A visible sibling action gives touch and switch users the same partial
       // withdraw path desktop users have through Shift-click. It is a sibling,
@@ -649,7 +689,9 @@ export class VaultTab {
     // pending guard, and the bags repaint with it). Online the mirror lags a
     // tick either way. The dead flag is captured on the same snapshot.
     const dead = world.player.dead;
-    const prediction = predictVaultDepositAll(world.inventory, info, vaultMaterialIds());
+    const prediction = predictVaultDepositAll(world.inventory, info, vaultMaterialIds(), (id) =>
+      knownItemDef(ITEMS, id),
+    );
     world.vaultDepositAll();
     // While dead the sim silently no-ops the sweep (the town-service idiom):
     // the command still goes (server decides), but the predicted "Materials
@@ -670,9 +712,14 @@ export class VaultTab {
       this.deps.onInventoryChanged();
     }
     const key = vaultDepositAllSummaryKey(prediction);
+    const notableDef = prediction.notableItemId
+      ? knownItemDef(ITEMS, prediction.notableItemId)
+      : undefined;
     this.setStatus(
       key,
-      prediction.items === 0 ? undefined : { count: formatCount(prediction.items) },
+      prediction.items === 0
+        ? undefined
+        : depositAllNotableParams(formatCount(prediction.items), notableDef),
     );
     this.deps.requestRender();
   }

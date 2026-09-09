@@ -7,6 +7,7 @@ import type { AdminPermission } from '../permissions';
 // presentation.
 export type AdminPage =
   | 'overview'
+  | 'market-metrics'
   | 'usage'
   | 'tick-perf'
   | 'accounts'
@@ -22,6 +23,7 @@ export type AdminPage =
   | 'antibot-config'
   | 'shared-ips'
   | 'chat-filter'
+  | 'realm-builders'
   | 'blocked-ips'
   | 'bug-reports'
   | 'unstuck-reports'
@@ -44,7 +46,12 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
   {
     id: 'dashboard',
     defaultPage: 'overview',
-    items: [{ id: 'overview', labelKey: 'nav.overview', permission: 'analytics.read' }],
+    items: [
+      { id: 'overview', labelKey: 'nav.overview', permission: 'analytics.read' },
+      // Live World Market listing metrics: realm-wide aggregates, so it rides
+      // analytics.read like the overview (matches the endpoint permission).
+      { id: 'market-metrics', labelKey: 'nav.marketMetrics', permission: 'analytics.read' },
+    ],
   },
   {
     id: 'operations',
@@ -102,6 +109,17 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
         labelKey: 'nav.antibotConfig',
         permission: 'botdetector.configure',
       },
+    ],
+  },
+  // The realm's own public content: things operators decide and every player
+  // sees. One page for now, its own section because the Realm Builder roll is
+  // not moderation (nobody is in trouble) and not bot detection.
+  {
+    id: 'realm-content',
+    labelKey: 'nav.realmContent',
+    defaultPage: 'realm-builders',
+    items: [
+      { id: 'realm-builders', labelKey: 'nav.realmBuilders', permission: 'content.moderate' },
     ],
   },
   {

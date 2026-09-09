@@ -23,7 +23,9 @@
 import type { Pool as PgPool, PoolClient } from 'pg';
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { materialSourceConnection } from '../server/material_source_connection';
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
+import { checkRelationUsesPartialIndex, rootPlanFromExplainRow } from './helpers/pg_plan';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
 const VERIFY_DB = 'wocc_guild_bank_verify';
@@ -76,6 +78,7 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
   let pool: PgPool;
   let db: typeof import('../server/db');
   let rawDb: typeof import('../server/db');
+  let logDb: typeof import('../server/guild_bank_log_db');
   let outbox: typeof import('../server/bank_ledger_outbox');
   let bankState: typeof import('../server/guild_bank_state');
   let social: typeof import('../server/social');
@@ -184,6 +187,7 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
 
     rawDb = await import('../server/db');
     db = rawDb;
+    logDb = await import('../server/guild_bank_log_db');
     outbox = await import('../server/bank_ledger_outbox');
     bankState = await import('../server/guild_bank_state');
     social = await import('../server/social');
@@ -195,7 +199,7 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
     await rawDb.ensureSchema();
     await rawDb.runConcurrentIndexMigrations();
 
-    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 12 });
+    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 12 });
 
     // Most cases predate command receipts but intentionally exercise the live
     // save API. Give each nonempty guild save its production-shaped immutable
@@ -291,7 +295,7 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
       const book = await bookOf(guildId);
       expect(book).toMatchObject({ treasury: 500 });
       expect((book as { inventory: { itemId: string; count: number }[] }).inventory).toEqual([
-        { itemId: 'wolf_fang', count: 3 },
+        { itemId: 'wolf_fang', count: 3, materialSources: [{ count: 3, source: {} }] },
       ]);
     });
 
@@ -972,7 +976,7 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
       await write('buy_slots', guildId);
       await write('deposit_gold', otherGuild); // another guild's row
 
-      const rows = await db.loadGuildBankLogRows(guildId, 2, [
+      const rows = await logDb.loadGuildBankLogRows(guildId, 2, [
         'deposit_gold',
         'withdraw_gold',
         'buy_slots',
@@ -980,7 +984,7 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
       expect(rows.map((r) => r.op)).toEqual(['buy_slots', 'withdraw_gold']);
       expect(rows[0].characterName).toBe(name);
 
-      const all = await db.loadGuildBankLogRows(guildId, 50, [
+      const all = await logDb.loadGuildBankLogRows(guildId, 50, [
         'deposit_gold',
         'withdraw_gold',
         'buy_slots',
@@ -990,23 +994,64 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
       expect(all.some((r) => r.op === 'escrow_deficit' || r.op === 'counterparty_orphan')).toBe(
         false,
       );
+
+      // PAGING: a window of 2 reports `more`; the cursor page starts strictly
+      // below the oldest id of the window and the last page reports the end.
+      const ops = ['deposit_gold', 'withdraw_gold', 'buy_slots'];
+      const first = await logDb.loadGuildBankLogPage(guildId, 2, ops, null);
+      expect(first.rows.map((r) => r.op)).toEqual(['buy_slots', 'withdraw_gold']);
+      expect(first.more).toBe(true);
+      const oldest = first.rows[first.rows.length - 1].id;
+      const second = await logDb.loadGuildBankLogPage(guildId, 2, ops, oldest);
+      expect(second.rows.map((r) => r.op)).toEqual(['deposit_gold']);
+      expect(second.rows.every((r) => r.id < oldest)).toBe(true);
+      expect(second.more).toBe(false);
     });
 
-    it('uses the partial index and never a sequential scan', async () => {
-      const plan = await pool.query(
-        `EXPLAIN (FORMAT JSON)
-         SELECT bl.id, bl.created_at, bl.op, bl.item_id, bl.count, bl.copper_delta,
-                c.name AS character_name
-           FROM bank_ledger bl
-           LEFT JOIN characters c ON c.id = bl.character_id
-          WHERE bl.container = 'guild' AND bl.container_id = $1
-            AND bl.op = ANY($2::text[])
-          ORDER BY bl.id DESC
-          LIMIT $3`,
-        [1, ['deposit_gold'], 50],
-      );
-      const text = JSON.stringify(plan.rows[0]);
-      expect(text).toContain('bank_ledger_container_recent');
+    it('every statement arm walks its partial index, never a sequential scan', async () => {
+      // EXPLAIN exactly what ships (guildBankLogPageSql), never a hand-copied
+      // statement: the two-text split exists because of plan shape, so the
+      // cursor arm and the money arm are the ones that want the pin. The money
+      // arm must land on its own partial index (bank_ledger_container_money_recent),
+      // the others on the container index. The check is per-relation
+      // (checkRelationUsesPartialIndex), not a flat "no Seq Scan anywhere":
+      // the joined `characters` row set is tiny enough that the planner is
+      // right to Seq Scan IT, and a whole-plan guard would reject that.
+      await db.runConcurrentIndexMigrations();
+      const explain = async (sql: string, params: unknown[]) =>
+        rootPlanFromExplainRow((await pool.query(`EXPLAIN (FORMAT JSON) ${sql}`, params)).rows[0]);
+      const ops = ['deposit', 'withdraw', 'deposit_gold'];
+      const moneyOps = ['deposit_gold', 'withdraw_gold', 'buy_slots', 'open_bank', 'create_fee'];
+      const head = await explain(logDb.guildBankLogPageSql({ cursor: false, money: false }), [
+        1,
+        ops,
+        51,
+        realm,
+      ]);
+      expect(
+        checkRelationUsesPartialIndex(head, 'bank_ledger', 'bank_ledger_container_recent'),
+      ).toEqual({ ok: true });
+      const older = await explain(logDb.guildBankLogPageSql({ cursor: true, money: false }), [
+        1,
+        ops,
+        51,
+        realm,
+        400,
+      ]);
+      expect(
+        checkRelationUsesPartialIndex(older, 'bank_ledger', 'bank_ledger_container_recent'),
+      ).toEqual({ ok: true });
+      const money = await explain(logDb.guildBankLogPageSql({ cursor: true, money: true }), [
+        1,
+        51,
+        realm,
+        400,
+      ]);
+      expect(
+        checkRelationUsesPartialIndex(money, 'bank_ledger', 'bank_ledger_container_money_recent'),
+      ).toEqual({ ok: true });
+      // And the reader really takes the money arm for the money slice.
+      expect(logDb.isGuildBankMoneySlice(moneyOps)).toBe(true);
     });
   });
 

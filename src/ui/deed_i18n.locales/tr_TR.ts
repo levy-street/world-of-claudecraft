@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Nightbloom da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Ay Kuyusunda Bir Halka',
     desc: 'Nightbloom sularindan bir balik yakala.',
   },
   chr_wraithwood_gatherer: {
@@ -187,7 +186,6 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Usta Toplayıcı',
-    desc: "Madencilik, Odun Kesimi, Şifalı Otçuluk ve Balık Tutma'nın herhangi üçünde 100 yetkinliğe ulaş.",
   },
   prog_first_craft: { name: 'El Emeği Göz Nuru', desc: 'İlk başarılı üretimini tamamla.' },
   prog_craft_specialist: {
@@ -292,7 +290,6 @@ export const table: DeedLocaleTable = {
     title: 'Ejderdeviren',
   },
   dgn_sanctum_speed: {
-    name: 'Mabet Koşusu',
     desc: "Grubunun Mezarejderi Mabedi'ni almasından itibaren 15 dakika içinde Mezarejderi Korzul'u alt et.",
   },
   dgn_nythraxis_gravebreaker: {
@@ -358,7 +355,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Çanlar Susar',
-    desc: "Diyakoz Varric'i, dirilttiği her Cenaze Çancısı çoktan öldürülmüşken yen.",
+    desc: "Diyakoz Vandric'i, dirilttiği her Cenaze Çancısı çoktan öldürülmüşken yen.",
   },
   dlv_nhalia_bells: {
     name: 'Çan Susturan',
@@ -371,7 +368,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Vadi Vakayinamesi, II. Bölüm',
-    desc: "Saul'un vakayinamesinin ikinci bölümünü bitir: haydutları, murlocları ve maden haşaratını hakla, Domuz Tarlası'nda sahaya çık ve Emanetlik'e göğüs ger.",
   },
   chr_vale_chapter_iii: {
     name: "Vadi'nin Vakayinamesi",
@@ -389,7 +385,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Sürü Kıran', desc: '10 saniye içinde 3 Orman Kurdu öldür.' },
   chr_vale_cup_debut: {
     name: 'Bakır Kova Adayı',
-    desc: "Domuz Tarlası'ndaki bir Vadi Kupası maçında sahaya çık ve topa dokun.",
   },
   chr_vale_rares: {
     name: "Vadi'nin Dehşetleri",
@@ -434,12 +429,11 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: "Dikenzirve'nin Vakayinamesi",
-    desc: "Dağın hikâyesini sonuna dek götür: Ejder Tarikatı'nı çökert, Mabet'i sustur, Uyanan Zirve'yi devir ve kayalıkların adı bilinen her dehşetini yere ser.",
     title: 'Dikenzirveli',
   },
   chr_peaks_sparring: {
     name: 'Sur Talimi',
-    desc: "Yüksek Gözcü'nün üstündeki antrenman kuklasına toplam 1.000 hasar ver.",
+    desc: 'Bir antrenman kuklasına toplam 1.000 hasar ver.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Soğuk Su, Daha Soğuk Işık',
@@ -519,7 +513,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Gedikli Müşteri',
-    desc: "Kahramanca Levazımcısı'nın tezgâhındaki on parçanın tamamını keşfet.",
+    desc: "Kahramanca Levazımcısı'nın tezgâhındaki on teçhizat parçasının tamamını keşfet.",
   },
   col_glimmerfin: {
     name: 'Umut Pırıltısı',
@@ -555,63 +549,49 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Sahaya İlk Adım',
-    desc: "Kazan ya da kaybet, Domuz Tarlası'nda bir Vadi Kupası maçını sonuna kadar oyna.",
   },
-  pvp_vcup_first_win: { name: 'İlk Kupa', desc: 'Dereceli bir Vadi Kupası maçı kazan.' },
+  pvp_vcup_first_win: { name: 'İlk Kupa' },
   pvp_vcup_wins_10: {
     name: 'Domuztopunun Eski Kurdu',
-    desc: '10 dereceli Vadi Kupası maçı kazan.',
   },
   pvp_vcup_wins_25: {
     name: 'Domuztopu Efsanesi',
-    desc: '25 dereceli Vadi Kupası maçı kazan.',
     title: 'Domuztopu Efsanesi',
   },
-  pvp_vcup_first_goal: { name: 'Siftah', desc: 'Dereceli bir Vadi Kupası maçında gol at.' },
+  pvp_vcup_first_goal: { name: 'Siftah' },
   pvp_vcup_hat_trick: {
     name: 'Hat-Trick Kahramanı',
-    desc: '3v3 ya da daha büyük ligde, tek bir dereceli Vadi Kupası maçında üç gol at.',
   },
   pvp_vcup_golden_goal: {
     name: 'Altın An',
-    desc: 'Dereceli bir Vadi Kupası maçının kaderini belirleyen altın golü at.',
   },
   pvp_vcup_first_save: {
     name: 'Güvenli Eller',
-    desc: 'Dereceli bir Vadi Kupası maçında kaleci olarak bir kurtarış yap.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Bu Kaleden Geçilmez',
-    desc: 'Dereceli bir Vadi Kupası maçını kaleci olarak gol yemeden kazan.',
   },
   pvp_vcup_guild_win: {
     name: 'Sancak İçin',
-    desc: 'Loncanın sancağı altında katıldığın dereceli bir Vadi Kupası maçını kazan.',
   },
   pvp_fiesta_first_bout: {
     name: 'Davetsiz Misafir',
-    desc: 'Kazan ya da kaybet, eksiksiz bir 2v2 Fiesta müsabakasında dövüş.',
   },
-  pvp_fiesta_first_win: { name: "Fiesta'nın Neşesi", desc: 'Bir 2v2 Fiesta müsabakası kazan.' },
+  pvp_fiesta_first_win: { name: "Fiesta'nın Neşesi" },
   pvp_fiesta_double: {
     name: 'Çifte Bela',
-    desc: "Fiesta'da dört saniye içinde rakiplerini iki kez yere ser.",
   },
   pvp_fiesta_shutdown: {
     name: 'Oyunbozan',
-    desc: "Fiesta'da, serisi üçe ya da daha fazlasına ulaşmış bir rakibi yere ser.",
   },
   pvp_fiesta_full_build: {
     name: 'Tepeden Tırnağa Hazır',
-    desc: 'Üç dalganın her birinden birer takviye kilitlenmiş halde bir Fiesta müsabakası kazan.',
   },
   pvp_fiesta_powerups: {
     name: 'Her Şeyden Bir Tane',
-    desc: 'Dört ring güçlendirmesinin her birini en az bir kez kap: Hız Şeytanı, Kolos, Ay Botları ve Cinnet.',
   },
   pvp_fiesta_five_kills: {
     name: 'Partiyi Sırtlayan',
-    desc: 'Tek bir Fiesta müsabakasında rakiplerini beş kez yere ser.',
   },
   soc_first_party: {
     name: 'Birlikten Kuvvet Doğar',
@@ -1028,5 +1008,9 @@ export const table: DeedLocaleTable = {
     name: 'Tek Bir Kor Bile Sönmedi',
     desc: "Tek bir akıncı bile ölmeden Varkhul, Forgefather of the Last Flame'yi Kahramanca zorlukta alt et.",
     title: 'Yanmaz',
+  },
+  col_set_bramblehide: {
+    name: "Roots'un Dikenli Postu",
+    desc: "Roots'un Dikenli Postu'nun her parçasını keşfet.",
   },
 };

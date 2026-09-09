@@ -1,8 +1,11 @@
 import { stoneboundThreatMultiplier } from '../src/sim/combat/shaman_warspirit';
+import { RIFT_GEAR_ITEM_ID_SET } from '../src/sim/content/rift/items';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { updateMobTarget } from '../src/sim/mob/targeting';
+import { RIFT_BAND_GEM_SLOTS, RIFT_BAND_MAX_UPGRADE } from '../src/sim/rift/band_ladder';
+import { sanitizeRiftGearInstance } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -479,7 +482,30 @@ function equipPbeLoadout(sim: Sim, spec: OwnedDpsSpec): void {
 function equipExactLoadout(sim: Sim, loadout: PbeLoadout): void {
   for (const [slot, itemId] of Object.entries(loadout) as [EquipSlot, string][]) {
     if (!ITEMS[itemId]) throw new Error(`missing PBE fixture item ${itemId}`);
-    sim.addItem(itemId, 1);
+    if (RIFT_GEAR_ITEM_ID_SET.has(itemId)) {
+      // A Riftbound band is priced by its copy (src/sim/rift/band_ladder.ts);
+      // the shell alone is an empty ring. The BiS fixture wears the maxed S
+      // band on the shell the loadout names, both sockets on the DPS ratings.
+      const maxed = sanitizeRiftGearInstance(
+        itemId,
+        {
+          rift: {
+            sourceEventId: 'probe-bis',
+            tier: 'S',
+            power: 4, // re-derived by the sanitizer from the tier
+            upgradeLevel: RIFT_BAND_MAX_UPGRADE,
+            maxUpgradeLevel: RIFT_BAND_MAX_UPGRADE,
+            gemSlots: RIFT_BAND_GEM_SLOTS.S,
+            gems: ['rift_gem_verdant', 'rift_gem_crimson'],
+          },
+        },
+        sim.playerId,
+      );
+      if (!maxed) throw new Error(`could not mint the PBE fixture band ${itemId}`);
+      sim.addItemInstance(itemId, maxed);
+    } else {
+      sim.addItem(itemId, 1);
+    }
     sim.equipItemToSlot(itemId, slot);
   }
   const equipment = sim.players.get(sim.playerId)?.equipment;
@@ -814,6 +840,7 @@ export function runOwnedClassDpsProbe(
   // isolates un-geared spec parity, the same low-gear axis a leveling or
   // fresh-alt player experiences.
   gear: 'pbe' | 'naked' = 'pbe',
+  setupEquipment?: (sim: Sim) => void,
 ): OwnedClassBalanceResult {
   const fixture = FIXTURES[spec];
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
@@ -827,6 +854,7 @@ export function runOwnedClassDpsProbe(
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
   if (gear === 'pbe') equipPbeLoadout(sim, spec);
+  setupEquipment?.(sim);
   // Keep all three targets in one unobstructed cluster. The starter-world origin
   // has a static collider just left of the player, so a negative offset turns the
   // third target into a line-of-sight fixture instead of an area-damage fixture.
@@ -1099,6 +1127,7 @@ export function runOwnedHealerProbe(
   head = 'working-tree',
   talentRows?: Record<number, string>,
   seconds = 60,
+  setupEquipment?: (sim: Sim) => void,
 ): OwnedHealerBalanceResult {
   const fixture = healerFixture(spec);
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
@@ -1110,6 +1139,7 @@ export function runOwnedHealerProbe(
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
   equipExactLoadout(sim, fixture.loadout);
+  setupEquipment?.(sim);
   const healer = sim.player;
   placeEntity(sim, healer, 720, 0);
   const allies: Entity[] = [];

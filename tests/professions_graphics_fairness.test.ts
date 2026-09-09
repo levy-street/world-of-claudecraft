@@ -13,21 +13,36 @@
 //   - The node props' TIER differentiation (nodeTierScale): tier is the
 //     access gate's number, so the scale ladder is static content -> size,
 //     identical everywhere.
+//   - The farm beds and the crop GROWTH STAGE meshes: a player walks to a bed
+//     because it looks ready, so which mesh a plot shows is actionable. Both
+//     farm_patches.ts and its core are profile-free, and the core's stage
+//     resolver takes no quality input at all.
 //
 // COSMETIC, and allowed to vary: the low preset's shorter fog (LOW_FOG in
 // renderer.ts) sheds distant SCENERY, node props included, because the
 // actionable spotting surface at range is the minimap above, which does not
-// shorten; and the water surface's splash richness around a bite, because
-// the bite itself is carried by the bobber state, the cue, and the log line.
+// shorten; the water surface's splash richness around a bite, because the bite
+// itself is carried by the bobber state, the cue, and the log line; and the
+// farm plant/harvest/wither flourishes, which emit through the shared Vfx
+// emitters, so the adaptive budget's scaledCount is their whole shed (the
+// harvest FACT is the item, the log line and the bed going bare, none of
+// which is a particle).
 
 import { readFileSync } from 'node:fs';
 import type * as THREE from 'three';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
+import { auraVisibleCap } from '../src/game/ui_tier_knobs';
+import { resolveFarmPlotVisual } from '../src/render/farm_patches_core';
 import { buildGatherNodes } from '../src/render/gather_nodes';
 import { NODE_TIER_SCALE_STEP, nodeTierScale } from '../src/render/gather_nodes_lookup';
-import { GATHER_NODES } from '../src/sim/data';
+import { GATHER_NODES, ITEMS } from '../src/sim/data';
+import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
 import { terrainHeight } from '../src/sim/world';
+import { ALWAYS_VISIBLE_AURA_IDS, selectShedSlots } from '../src/ui/aura_overflow_priority';
+import { type AuraSlotState, isShortDurationBuff } from '../src/ui/auras_view';
+import { HARVEST_JOURNAL_TICK_MS } from '../src/ui/hud/professions/harvest_journal_window';
+import type { FarmPlotView } from '../src/world_api/farming';
 
 // Comments stripped before scanning (the architecture-test rule): prose that
 // NAMES the invariant ("nothing here reads ui_effects_profile") must never
@@ -154,6 +169,105 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     expect(baseAboveTerrain(i2, t2)).toBeCloseTo(baseAboveTerrain(i1, t1), 3);
   });
 
+  it('the farm patch renderer and its core read no profile and no governor', () => {
+    expectProfileFree('src/render/farm_patches.ts');
+    expectProfileFree('src/render/farm_patches_core.ts');
+    // The shared instanced-prop kernel is on the same actionable path since
+    // the Phase 7 QA extraction.
+    expectProfileFree('src/render/glb_instanced_props.ts');
+  });
+
+  it('the Harvest Journal reads no profile and no governor, and its clock is wall-clock', () => {
+    // A crop's remaining time is the number a farmer plans their session
+    // around, so the journal is ACTIONABLE end to end: the pure core, the
+    // window that paints it, and above all the CADENCE of the countdown.
+    expectProfileFree('src/ui/hud/professions/harvest_journal_view.ts');
+    expectProfileFree('src/ui/hud/professions/harvest_journal_window.ts');
+    // The tick interval is a literal wall-clock second, not a tier knob: a
+    // preset that slowed it would make a low-preset player's timer lag a
+    // high-preset player's, which is exactly the shed the invariant forbids.
+    expect(HARVEST_JOURNAL_TICK_MS).toBe(1000);
+    const window = read('src/ui/hud/professions/harvest_journal_window.ts');
+    expect(
+      window.includes(`, ${HARVEST_JOURNAL_TICK_MS})`) ||
+        window.includes('HARVEST_JOURNAL_TICK_MS)'),
+      'the countdown interval must be armed with the fixed constant, not a derived cadence',
+    ).toBe(true);
+  });
+
+  it('the farm-patch pin surfaces read no profile and no governor', () => {
+    // The map and minimap pins are the "where" half of the journal's promise,
+    // so the marker build and both view models are actionable the same way
+    // the countdown is: drawn on every tier, never preset-gated.
+    expectProfileFree('src/ui/minimap_markers.ts');
+    expectProfileFree('src/ui/map_window_view.ts');
+    // The two PAINTERS that draw the sprout as well, so this row is complete
+    // on its own: a preset gate wrapped around either draw block would keep
+    // the model rows green while the pin vanished on LOW. (Both painters are
+    // also pinned wholesale by the gather-marker rows above; the farm row
+    // names them so the pin's own contract is provable in one place.)
+    expectProfileFree('src/ui/map_window_painter.ts');
+    expectProfileFree('src/ui/minimap_painter.ts');
+  });
+
+  it('the farm modules reach ./gfx ONLY for the sanctioned fallback material', () => {
+    // The PROFILE_TOKENS scan cannot see the OTHER static preset surface: the
+    // GFX object in src/render/gfx.ts. farm_patches.ts legitimately imports
+    // surfaceMat alone (the pre-load fallback box material: presence, geometry
+    // and stage are preset-identical, only material richness varies, the
+    // sanctioned cosmetic arm), so the allowance is pinned as an exact
+    // single-name import: widening it (a GFX branch on a stage mesh or the
+    // sync cadence) edits this line and answers to review.
+    const adapter = read('src/render/farm_patches.ts');
+    expect(adapter).toMatch(/import \{ surfaceMat \} from '\.\/gfx';/);
+    expect(adapter.includes('GFX'), 'farm_patches.ts must not read the GFX preset object').toBe(
+      false,
+    );
+    const core = read('src/render/farm_patches_core.ts');
+    expect(core.includes("from './gfx'")).toBe(false);
+    expect(core.includes('GFX')).toBe(false);
+    const kernel = read('src/render/glb_instanced_props.ts');
+    expect(kernel.includes("from './gfx'")).toBe(false);
+    expect(kernel.includes('GFX')).toBe(false);
+  });
+
+  it('the growth stage is APPLIED from (plot, nowMs) alone: no quality input exists', () => {
+    // The arity is the type-level half of the claim (a quality parameter would
+    // move it)...
+    expect(resolveFarmPlotVisual.length).toBe(2);
+    // ...and this is the behavioural half: the SAME plot at the SAME instant
+    // resolves to one stage, whatever else is going on, and the stage really
+    // does advance with the growth window rather than being a constant.
+    const hour = 60 * 60 * 1000;
+    const plot: FarmPlotView = {
+      bedId: 'bed_eastbrook_1',
+      cropId: 'vale_wheat',
+      plantedAtMs: 0,
+      readyAtMs: hour,
+      compost: false,
+      watch: false,
+      tonic: false,
+      notified: false,
+      status: 'growing',
+    };
+    const stages = [0, hour / 3, (2 * hour) / 3, hour].map(
+      (t) => resolveFarmPlotVisual(plot, t).stageMesh,
+    );
+    expect(stages).toEqual(['sprout', 'stage2', 'stage3', 'stage4']);
+    expect(resolveFarmPlotVisual(plot, hour / 3).stageMesh).toBe(stages[1]);
+  });
+
+  it('the farm flourishes ride the shared Vfx emitters (the one sanctioned shed)', () => {
+    const source = read('src/render/farm_patches.ts');
+    // Cosmetic, so it MUST go through the pooled emitters whose scaledCount
+    // the adaptive budget drives; a bespoke particle path here would escape
+    // the shed entirely.
+    expect(source).toMatch(/this\.vfx\.groundPuff\(/);
+    expect(source).toMatch(/this\.vfx\.burst\(/);
+    // ...and the shed stays in vfx.ts: no local count knob of its own.
+    expect(source.includes('scaledCount')).toBe(false);
+  });
+
   it('the cosmetic side is the one that varies: LOW_FOG exists and the bobber does not read it', () => {
     // The low preset's fog trade is real (the constant exists in the
     // renderer)...
@@ -163,5 +277,137 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // surfaces above never import the renderer's fog state either.
     expect(read('src/render/fishing_bobber.ts').includes('LOW_FOG')).toBe(false);
     expect(read('src/ui/minimap_markers.ts').includes('LOW_FOG')).toBe(false);
+  });
+
+  // The LOW preset's buff-icon cap (AURA_VISIBLE_CAP_LOW) and Well Fed.
+  // RULED (qr-19-aura-visible-cap-low-fairness, 2026-09-01, under
+  // qr-19-best-for-project): a Well Fed icon shed by the cap is COSMETIC
+  // upkeep, never actionable information. The buff runs whether or not its
+  // icon is on screen, the honest plus-N overflow badge names the shed instead
+  // of hiding it, and Always Show All Buffs opts out of the cap entirely.
+  // The Phase 11 QA's complaint was that NOTHING PINNED THE CONTRACT either
+  // way, which was true; these arms pin the SHIPPED behaviour rather than
+  // exempting the aura, because an exemption would spend one of the low
+  // preset's eight slots permanently and set a precedent every flask and raid
+  // buff could claim.
+
+  // DERIVED from the shipped catalog, never hand-copied: a hand-typed 900
+  // would leave this whole block silently true if the apex plates were ever
+  // retuned SHORT, at which point Well Fed would no longer be in the bucket
+  // the cap sheds first and the arms below would be pinning a hypothetical.
+  // wellFed lives on the FOOD arm of the ItemDef union by design (types.ts), so
+  // the narrowing is the kind check rather than a cast.
+  const WELL_FED_DURATIONS_SEC = Object.values(ITEMS)
+    .map((item) => (item.kind === 'food' ? item.wellFed?.duration : undefined))
+    .filter((d): d is number => d !== undefined);
+  const WELL_FED_APEX_DURATION_SEC = Math.max(...WELL_FED_DURATIONS_SEC);
+
+  /** A plain slot fixture; only the fields selectShedSlots reads ever vary. */
+  const auraSlot = (over: Partial<AuraSlotState> & { key: string }): AuraSlotState => ({
+    iconKey: over.key,
+    isDebuff: false,
+    school: '',
+    durationText: '',
+    stacksText: '',
+    name: over.key,
+    remaining: 0,
+    cancelable: false,
+    effectHtml: '',
+    own: false,
+    expiring: false,
+    toggle: false,
+    alwaysRender: false,
+    shortDuration: false,
+    ...over,
+  });
+
+  it('COSMETIC: a 900 second Well Fed sheds under the cap; a debuff and an exempt id never do', () => {
+    // BOTH sides derived, the threshold and the duration, so this reds if
+    // either moves: a longer short-buff bar, or a shorter apex plate.
+    expect(WELL_FED_DURATIONS_SEC.length).toBeGreaterThanOrEqual(7);
+    expect(isShortDurationBuff(WELL_FED_APEX_DURATION_SEC)).toBe(false);
+    // Every well-fed food, not only the longest, sits in the shed bucket.
+    for (const d of WELL_FED_DURATIONS_SEC) expect(isShortDurationBuff(d)).toBe(false);
+    expect(ALWAYS_VISIBLE_AURA_IDS.has(WELL_FED_AURA_ID)).toBe(false);
+    const exemptId = [...ALWAYS_VISIBLE_AURA_IDS][0];
+    const slots: AuraSlotState[] = [
+      auraSlot({ key: 'boss_curse', isDebuff: true }),
+      auraSlot({ key: exemptId }),
+      auraSlot({ key: 'bg_carried_flag', alwaysRender: true }),
+      auraSlot({ key: 'raid_buff' }),
+      auraSlot({
+        key: WELL_FED_AURA_ID,
+        name: 'Well Fed',
+        duration: WELL_FED_APEX_DURATION_SEC,
+        shortDuration: isShortDurationBuff(WELL_FED_APEX_DURATION_SEC),
+      }),
+    ];
+    const shed: boolean[] = [];
+    // A budget of ONE ordinary buff. The three exempt slots do not spend it
+    // (the fairness rule), so the raid buff takes it on application order and
+    // Well Fed is the shed: exactly the behaviour the QA note worried about,
+    // pinned as intended rather than fixed.
+    expect(selectShedSlots(slots, slots.length, 1, shed)).toBe(1);
+    expect(slots.filter((_, i) => shed[i]).map((s) => s.key)).toEqual([WELL_FED_AURA_ID]);
+  });
+
+  it('every exemption kind still renders with the cap at ZERO', () => {
+    // The sibling claim, driven separately so it cannot pass on the arm above:
+    // exemption is checked BEFORE the budget, so a cap of zero sheds every
+    // ordinary buff and still renders all three exempt kinds.
+    //
+    // Note what this arm does NOT prove, since the two claims are easy to
+    // conflate: at cap zero there is no budget to spend, so "exempt slots do
+    // not SPEND the budget" is not testable here. That claim is the arm above,
+    // where a budget of one survives three exempt slots and still funds the
+    // raid buff; if exempt slots spent it, the raid buff would shed too.
+    const slots: AuraSlotState[] = [
+      auraSlot({ key: 'boss_curse', isDebuff: true }),
+      auraSlot({ key: [...ALWAYS_VISIBLE_AURA_IDS][0] }),
+      auraSlot({ key: 'bg_carried_flag', alwaysRender: true }),
+      auraSlot({ key: WELL_FED_AURA_ID, duration: WELL_FED_APEX_DURATION_SEC }),
+    ];
+    const shed: boolean[] = [];
+    expect(selectShedSlots(slots, slots.length, 0, shed)).toBe(1);
+    expect(slots.filter((_, i) => shed[i]).map((s) => s.key)).toEqual([WELL_FED_AURA_ID]);
+  });
+
+  it('the Always Show All Buffs opt-out makes the cap never bite, whatever the preset', () => {
+    // Hud.buffBarFxTier() reports 'ultra' to auraVisibleCap when the setting is
+    // on, scoped to that one painter instance, so a player who would rather pay
+    // the per-frame cost never loses an icon at all. That opt-out plus the
+    // honest plus-N badge are why the shed is upkeep rather than a hidden fact.
+    // SHAPE, not self. `auraVisibleCap` RETURNS these constants, so comparing
+    // its result to them (or to AURA_VISIBLE_CAP_FULL, which is Infinity and
+    // swallows any finite value under toBeLessThan) asserts nothing. The cap's
+    // VALUE is pinned once, in tests/ui_tier_knobs.test.ts; what this arm owns
+    // is that low is finite enough to bite while ultra is not capped at all,
+    // and the two selectShedSlots calls below are its real content.
+    expect(Number.isFinite(auraVisibleCap('low'))).toBe(true);
+    expect(auraVisibleCap('ultra')).toBe(Number.POSITIVE_INFINITY);
+    // The override is Hud's, so the setting-to-tier link is source-pinned: a
+    // behavioural arm here drives auraVisibleCap directly and would stay green
+    // if buffBarFxTier stopped reporting 'ultra', which is the whole mechanism
+    // the ruling leans on.
+    const hud = read('src/ui/hud.ts');
+    expect(hud).toContain("return this.alwaysShowAllBuffs ? 'ultra' : this.fxTier();");
+    // The BUFF BAR's tier argument specifically, not merely that the name occurs:
+    // a bare occurrence pin stays green if this call site is rewired to fxTier()
+    // while some other reference survives, which is exactly the link the ruling
+    // leans on. `buffBarPainter` is the one instance the overflow badge rides.
+    // SLICED, not windowed: a fixed-width regex window reached past this
+    // declaration into the sibling debuffBarPainter's arguments and passed on
+    // the mutant that moved the call there (proven, then fixed).
+    const buffBarDecl = hud.slice(hud.indexOf('buffBarPainter = new AurasPainter('));
+    const buffBarArgs = buffBarDecl.slice(0, buffBarDecl.indexOf('\n  );'));
+    expect(buffBarArgs).toContain('() => this.buffBarFxTier()');
+    const slots: AuraSlotState[] = Array.from({ length: 20 }, (_, i) => auraSlot({ key: `b${i}` }));
+    const shed: boolean[] = [];
+    expect(selectShedSlots(slots, slots.length, auraVisibleCap('ultra'), shed)).toBe(0);
+    // EXACT, not a floor: the low cap leaves exactly `cap` ordinary buffs
+    // standing, so this pins selectShedSlots' budget arithmetic rather than
+    // merely that something was shed.
+    const shedLow = selectShedSlots(slots, slots.length, auraVisibleCap('low'), shed);
+    expect(slots.length - shedLow).toBe(auraVisibleCap('low'));
   });
 });

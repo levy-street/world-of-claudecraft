@@ -86,6 +86,8 @@ export class BatchShipper {
   }
 
   async flush(): Promise<void> {
+    // Queued callbacks must leave the buffer to stop() once shutdown begins.
+    if (this.stopped) return;
     if (this.timer !== null) {
       clearTimeout(this.timer);
       this.timer = null;

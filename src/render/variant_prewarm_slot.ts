@@ -121,6 +121,10 @@ export function createPrewarmGroupSlot<T>(
     get group() {
       return groupNow();
     },
+    // The link unit names its root for the lane that warms a root ahead of
+    // its link (prewarm_resume_runner.ts): read when the unit runs, since the
+    // group exists only once the stage unit before it has run. Without it the
+    // resumed link was the one link in the lane the worker never saw.
     resumeUnits: () =>
       options.units
         ? [
@@ -129,7 +133,14 @@ export function createPrewarmGroupSlot<T>(
           ]
         : [
             { id: `${stageId}:group`, run: stageHidden },
-            { id: `${stageId}:compile`, run: link },
+            {
+              id: `${stageId}:compile`,
+              run: link,
+              get roots() {
+                const group = groupNow();
+                return group ? [group] : [];
+              },
+            },
           ],
     run: () => {
       stage();

@@ -151,6 +151,34 @@ export function actionForAttackSlot(showAttackButton: boolean, action: HotbarAct
   return showAttackButton ? null : action;
 }
 
+// The freed Attack slot's (barSlot 0, "Show Attack Button" off) DISPLAY fallback
+// for an ability the ACTIVE build does not currently grant. The assignment is
+// deliberately not scoped to any one talent build (ActionBarController keeps it
+// across a reload/build switch instead of treating "not granted right now" as
+// garbage, see isAttackSlotStoredAbilityEligible), so the bar must still paint
+// SOMETHING for it: resolving only against the live known-ability list painted
+// the slot fully empty the moment the granting build went inactive, which looked
+// exactly like the assignment being cleared even though it survives in storage.
+// Returns a display-only stub (no talent resolution, since the granting build is
+// not the active one), typed to satisfy ActionBarAbility with known:false, which
+// action_bar_view.ts renders dimmed and unusable without the live cost/cooldown/
+// proc math (none of it applies to an ability the player cannot currently cast).
+export type FreedAttackSlotAbility = { def: AbilityDef; cost: number; known: false };
+
+export function freedAttackSlotDisplayAbility(
+  action: HotbarAction,
+  abilityDef: (id: string) => AbilityDef | undefined,
+): FreedAttackSlotAbility | null {
+  if (action?.type !== 'ability') return null;
+  const def = abilityDef(action.id);
+  // Defense in depth: the stored action is already filtered to a real,
+  // non-passive/non-hidden ability by ActionBarController on every write path
+  // (isAttackSlotStoredAbilityEligible / isAbilityPlacementAllowed both apply
+  // isAbilityActionBarEligible), but this display path re-derives straight from
+  // the static table, so it re-checks the module's own rule rather than trust it.
+  return def && isAbilityActionBarEligible(def) ? { def, cost: 0, known: false } : null;
+}
+
 export function assignAttackSlotAction(
   action: Exclude<HotbarAction, null>,
   sourceIndex: number | null | undefined,

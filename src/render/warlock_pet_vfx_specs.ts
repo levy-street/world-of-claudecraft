@@ -50,7 +50,7 @@ export const EMBERKIN_FELBOLT_VFX_FULL_SPEC = {
   },
 } satisfies AbilityVfxFullSpec;
 
-// Gloomshade's pull pairs a live shadow ribbon (the beam event) with this
+// Duskmurk's pull pairs a live shadow ribbon (the beam event) with this
 // target-side chain/implosion beat (the tick event). It is forceful without
 // looking like a player capstone or obscuring the enemy being repositioned.
 export const GLOOMSHADE_ABYSSAL_CHAIN_VFX_SPEC = {

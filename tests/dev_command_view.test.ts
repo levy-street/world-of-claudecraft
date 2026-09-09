@@ -16,6 +16,20 @@ describe('developer command view', () => {
     expect(buildDevCommand('biskit', { bisSpec: 'prot; /dev gold 999' })).toBe('/dev bis');
   });
 
+  it('builds farmgrow with the optional bed id and refuses to splice a crafted one', () => {
+    // The all-plots form is what an EMPTY field means, not a refusal: the
+    // command already accepts both shapes, so the row degrades to the wider
+    // one instead of going dead (the biskit optional-spec contract).
+    expect(buildDevCommand('farmgrow', {})).toBe('/dev farmgrow');
+    expect(buildDevCommand('farmgrow', { bed: '' })).toBe('/dev farmgrow');
+    expect(buildDevCommand('farmgrow', { bed: 'bed_eastbrook_1' })).toBe(
+      '/dev farmgrow bed_eastbrook_1',
+    );
+    // Token-gated like every other field: an injection-shaped value never
+    // reaches the command line, and the fallback is the harmless wide form.
+    expect(buildDevCommand('farmgrow', { bed: 'bed_1; /dev gold 999' })).toBe('/dev farmgrow');
+  });
+
   it('shows the Spawns tab only to admin accounts', () => {
     expect(devCategoryVisible('spawns', true)).toBe(true);
     expect(devCategoryVisible('spawns', false)).toBe(false);

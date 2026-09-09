@@ -12,14 +12,14 @@ import { computeTalentModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import type { Entity } from '../src/sim/types';
 
 describe('mastery does not corrupt utility rate buffs (F1)', () => {
-  it("an Elemental shaman's spell-damage mastery leaves Ghost Wolf's 1.4x speed intact", () => {
+  it("an Elemental shaman's spell-damage mastery leaves Shadewolf's 1.4x speed intact", () => {
     const sim = new Sim({ seed: 1, playerClass: 'shaman', autoEquip: true });
     sim.setPlayerLevel(20);
     expect(sim.setSpec('elemental')).toBe(true); // mastery = +15% spell damage
-    // Ghost Wolf is a nature-school selfBuff whose value (1.4) is a movement-speed
+    // Shadewolf (ability id ghost_wolf) is a nature-school selfBuff whose value (1.4) is a movement-speed
     // MULTIPLIER, not a magnitude. The old `value < 1` guard scaled it by the spell
     // mastery mult and rounded 1.4 -> 2; it must now pass through untouched.
     const gw = sim.resolvedAbility('ghost_wolf', sim.playerId);
@@ -100,6 +100,7 @@ describe('Gloamveil Form amplifies Shadow damage by 15%', () => {
     const p = sim.entities.get(sim.playerId) as Entity;
     if (inForm) {
       p.auras.push({
+        id: 'test_shadow_form',
         kind: 'form_shadow',
         name: 'Gloamveil Form',
         value: 15,
@@ -107,7 +108,7 @@ describe('Gloamveil Form amplifies Shadow damage by 15%', () => {
         duration: 3600,
         sourceId: p.id,
         school: 'shadow',
-      } as Aura);
+      });
     }
     const dummy = createMob(
       (sim as unknown as { nextId: number }).nextId++,
@@ -153,6 +154,7 @@ describe('Gloamveil Form amplifies Shadow damage by 15%', () => {
       p.resource = p.maxResource;
       if (inForm) {
         p.auras.push({
+          id: 'test_shadow_form',
           kind: 'form_shadow',
           name: 'Gloamveil Form',
           value: 15,
@@ -160,7 +162,7 @@ describe('Gloamveil Form amplifies Shadow damage by 15%', () => {
           duration: 3600,
           sourceId: p.id,
           school: 'shadow',
-        } as Aura);
+        });
       }
       const dummy = createMob(
         (sim as unknown as { nextId: number }).nextId++,
@@ -195,6 +197,7 @@ describe('Gloamveil Form amplifies Shadow damage by 15%', () => {
     p.facing = 0;
     p.resource = p.maxResource;
     p.auras.push({
+      id: 'test_shadow_form',
       kind: 'form_shadow',
       name: 'Gloamveil Form',
       value: 15,
@@ -202,7 +205,7 @@ describe('Gloamveil Form amplifies Shadow damage by 15%', () => {
       duration: 3600,
       sourceId: p.id,
       school: 'shadow',
-    } as Aura);
+    });
     // Cast a heal (Lesser Heal, a ~2 s cast). When it resolves, the form must drop.
     sim.castAbility('lesser_heal', sim.playerId);
     for (let i = 0; i < 60 && p.auras.some((a) => a.kind === 'form_shadow'); i++) sim.tick();
@@ -240,6 +243,7 @@ describe('channeled spell crits take the spell crit-damage mastery', () => {
       // Force every tick to crit via an aura (survives the recalc-on-cast that would
       // reset a raw stat override). spellCrit reads this bonus live, so >1 = always crit.
       p.auras.push({
+        id: 'test_forced_crit',
         kind: 'buff_spellcrit',
         name: 'test-forced-crit',
         value: 5,
@@ -247,7 +251,7 @@ describe('channeled spell crits take the spell crit-damage mastery', () => {
         duration: 60,
         sourceId: p.id,
         school: 'arcane',
-      } as Aura);
+      });
       const dummy = createMob(
         (sim as unknown as { nextId: number }).nextId++,
         MOBS.ridge_stalker,
@@ -283,7 +287,7 @@ describe('crit-damage masteries are scoped to their channel (F4)', () => {
     expect(sim.setSpec('holy')).toBe(true);
     const p = sim.entities.get(sim.playerId) as Entity;
     // Holy mastery boosts HEAL crits only; the spell and physical crit channels stay 0,
-    // so the paladin's Holy Shock / Crusader Strike crits are not amplified.
+    // so the paladin's Lightjolt / Oathstrike crits are not amplified.
     expect(p.critDmgHealBonus).toBeCloseTo(0.5);
     expect(p.critDmgSpellBonus).toBe(0);
     expect(p.critDmgPhysBonus).toBe(0);
@@ -316,7 +320,16 @@ describe('Necromancy Graveguard redirect is not double-modified (F7)', () => {
         z: wl.pos.z + 3,
       },
     );
-    source.auras.push({ kind: 'defensive_stance', value: 0, remaining: 60, duration: 60 } as Aura);
+    source.auras.push({
+      id: 'test_defensive_stance',
+      name: 'Defensive Stance',
+      kind: 'defensive_stance',
+      value: 0,
+      remaining: 60,
+      duration: 60,
+      sourceId: source.id,
+      school: 'physical',
+    });
     (sim as unknown as { addEntity(e: Entity): void }).addEntity(source);
 
     const wl0 = wl.hp;

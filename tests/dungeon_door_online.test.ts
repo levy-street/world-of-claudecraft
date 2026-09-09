@@ -3,6 +3,13 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  // The lease exports GameServer imports (heartbeat on autosave, release on
+  // leave): never reached here, carried so the mock keeps the canonical shape
+  // (tests/character_lease_game.test.ts) and cannot go stale on the merged tree
+  // (releaseCharacterLease was already present below).
+  acquireCharacterLease: vi.fn(async () => true),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
+  releaseAllCharacterLeases: vi.fn(async () => {}),
   saveCharacterAndMarketState: vi.fn(async () => {}),
   saveMarketState: vi.fn(async () => {}),
   saveMailState: vi.fn(async () => {}),

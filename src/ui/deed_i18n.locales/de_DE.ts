@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Ein Ring auf dem Mondbrunnen',
     desc: 'Fange einen Fisch in den Gewassern von Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -185,7 +184,6 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Meistersammler',
-    desc: 'Erreiche eine Fertigkeit von 100 in beliebigen drei von Bergbau, Holzfällen, Kräuterkunde und Angeln.',
   },
   prog_first_craft: {
     name: 'Handarbeit',
@@ -299,7 +297,6 @@ export const table: DeedLocaleTable = {
     title: 'Wyrmfäller',
   },
   dgn_sanctum_speed: {
-    name: 'Sprint durchs Heiligtum',
     desc: 'Besiege Korzul den Gravewyrm binnen 15 Minuten, nachdem deine Gruppe das Gravewyrm-Heiligtum beansprucht hat.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -365,7 +362,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Das Geläut verklingt',
-    desc: 'Besiege Diakon Varric, während jeder Begräbnisläuter, den er erweckt, bereits erschlagen ist.',
+    desc: 'Besiege Diakon Vandric, während jeder Begräbnisläuter, den er erweckt, bereits erschlagen ist.',
   },
   dlv_nhalia_bells: {
     name: 'Glockenstiller',
@@ -378,7 +375,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Talchronik, Kapitel II',
-    desc: 'Schließe das zweite Kapitel von Sauls Chronik ab: Banditen, Schlammflossen und Minengeziefer erledigt, auf dem Saufeld gespielt und den Abstieg ins Reliquiar gewagt.',
   },
   chr_vale_chapter_iii: {
     name: 'Die Chronik des Tals',
@@ -399,7 +395,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Anwärter auf den Kupfereimer',
-    desc: 'Betritt das Feld und berühre den Ball in einem Vale-Cup-Match auf dem Saufeld.',
   },
   chr_vale_rares: {
     name: 'Die Schrecken des Tals',
@@ -444,12 +439,11 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Die Chronik von Thornpeak',
-    desc: 'Führe die ganze Geschichte des Berges zu Ende: der Wyrmkult zerschlagen, das Heiligtum zum Schweigen gebracht, der Erwachende Gipfel gefällt und jeder namhafte Schrecken der Felsen niedergestreckt.',
     title: 'von Thornpeak',
   },
   chr_peaks_sparring: {
     name: 'Drill an der Mauer',
-    desc: 'Verursache insgesamt 1.000 Schaden an der Trainingspuppe über Highwatch.',
+    desc: 'Verursache insgesamt 1.000 Schaden an einer Trainingspuppe.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Kaltes Wasser, kälteres Licht',
@@ -542,7 +536,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stammkunde',
-    desc: 'Entdecke alle zehn Stücke aus dem Vorrat des Heroischen Quartiermeisters.',
+    desc: 'Entdecke alle zehn Ausrüstungsstücke aus dem Vorrat des Heroischen Quartiermeisters.',
   },
   col_glimmerfin: {
     name: 'Ein Schimmer Hoffnung',
@@ -596,66 +590,51 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Stiefel auf dem Rasen',
-    desc: 'Bestreite ein Talpokal-Match auf dem Saufeld bis zum Schlusspfiff, ob Sieg oder Niederlage.',
   },
-  pvp_vcup_first_win: { name: 'Der erste Pott', desc: 'Gewinne ein gewertetes Talpokal-Match.' },
+  pvp_vcup_first_win: { name: 'Der erste Pott' },
   pvp_vcup_wins_10: {
     name: 'Keilerball-Routinier',
-    desc: 'Gewinne 10 gewertete Talpokal-Matches.',
   },
   pvp_vcup_wins_25: {
     name: 'Keilerball-Legende',
-    desc: 'Gewinne 25 gewertete Talpokal-Matches.',
     title: 'Keilerball-Legende',
   },
   pvp_vcup_first_goal: {
     name: 'Der Bann ist gebrochen',
-    desc: 'Erziele ein Tor in einem gewerteten Talpokal-Match.',
   },
   pvp_vcup_hat_trick: {
     name: 'Hattrick-Held',
-    desc: 'Erziele drei Tore in einem einzigen gewerteten Talpokal-Match, im 3v3-Modus oder größer.',
   },
   pvp_vcup_golden_goal: {
     name: 'Goldener Moment',
-    desc: 'Erziele das Golden Goal, das ein gewertetes Talpokal-Match entscheidet.',
   },
   pvp_vcup_first_save: {
     name: 'Sichere Hände',
-    desc: 'Pariere als Torhüter einen Ball in einem gewerteten Talpokal-Match.',
   },
   pvp_vcup_clean_sheet: {
     name: 'An mir kommt keiner vorbei',
-    desc: 'Gewinne ein gewertetes Talpokal-Match als Torhüter, ohne ein Tor zu kassieren.',
   },
   pvp_vcup_guild_win: {
     name: 'Für das Banner',
-    desc: 'Gewinne ein gewertetes Talpokal-Match, zu dem du unter dem Banner deiner Gilde angetreten bist.',
   },
   pvp_fiesta_first_bout: {
     name: 'Partycrasher',
-    desc: 'Bestreite eine volle 2v2-Fiesta-Runde, ob Sieg oder Niederlage.',
   },
-  pvp_fiesta_first_win: { name: 'Die Seele der Fiesta', desc: 'Gewinne eine 2v2-Fiesta-Runde.' },
+  pvp_fiesta_first_win: { name: 'Die Seele der Fiesta' },
   pvp_fiesta_double: {
     name: 'Doppelter Ärger',
-    desc: 'Erziele zwei Fiesta-Niederschläge innerhalb von vier Sekunden.',
   },
   pvp_fiesta_shutdown: {
     name: 'Spielverderber',
-    desc: 'Schalte einen Fiesta-Gegner aus, der auf einer Serie von drei oder mehr steht.',
   },
   pvp_fiesta_full_build: {
     name: 'Passend gekleidet',
-    desc: 'Gewinne eine Fiesta-Runde mit einer gesicherten Verstärkung aus jeder der drei Wellen.',
   },
   pvp_fiesta_powerups: {
     name: 'Von jedem eins',
-    desc: 'Schnapp dir jedes der vier Ring-Power-ups mindestens einmal: Tempoteufel, Koloss, Mondstiefel und Berserker.',
   },
   pvp_fiesta_five_kills: {
     name: 'Partyträger',
-    desc: 'Erziele fünf Niederschläge in einer einzigen Fiesta-Runde.',
   },
   soc_first_party: {
     name: 'Gemeinsam stärker',
@@ -1069,5 +1048,9 @@ export const table: DeedLocaleTable = {
     name: 'Keine Glut geht verloren',
     desc: 'Besiege Varkhul, Schmiedevater der Letzten Flamme, auf heroischem Schwierigkeitsgrad, ohne dass ein einziges Schlachtzugsmitglied stirbt.',
     title: 'Unversengt',
+  },
+  col_set_bramblehide: {
+    name: "Roots' Dornenhaut",
+    desc: "Entdecke jedes Teil von Roots' Dornenhaut.",
   },
 };

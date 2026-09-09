@@ -16,14 +16,27 @@
 // no Sim/SimContext/rng. A Vitest imports it directly.
 
 import type { TalentModifiers } from './content/talents';
+import { offensiveAbilityBonus } from './spec_output_tuning';
 import type { AbilityDef } from './types';
 
 export interface TalentHitMult {
-  // The base multiplier for one-shot damage (directDamage/aoeDamage/
-  // chainDamage/weaponDamage/finisherDamage/aoeRoot/consumeAura's deal).
+  // The combined multiplier for one-shot damage (directDamage/aoeDamage/
+  // chainDamage/weaponDamage/finisherDamage/aoeRoot/consumeAura's deal): the
+  // legacy global/ability bonus PLUS the v0.42.0 offense-only spec tuning
+  // (spec_output_tuning.ts). Every existing dmgMult reader (a combat site
+  // scaling a runtime SP/AP/weapon rider) picks up the offense-only bonus
+  // automatically, since none of them ever apply dmgMult to a buff.
   dmgMult: number;
   // The base multiplier for healing (heal/chainHeal/aoeHeal/consumeAura's heal).
+  // Never carries the offense-only bonus: damage and healing are tuned
+  // through separate v0.42.0 seams (see spec_output_tuning.primaryHealingMultiplier).
   healMult: number;
+  // dmgMult WITHOUT the offense-only bonus. content/classes.ts's scaleEffect
+  // uses this (never dmgMult) to scale flat-magnitude buff effects
+  // (buff_ap/buff_armor/buff_spellpower/thorns), so the new offense-only
+  // component can never inflate an armor/stat buff riding the same ability
+  // (the documented Fiendhide-on-spellDmgPct collateral must not grow).
+  legacyDmgMult: number;
 }
 
 // Mirrors the physical/ranged school split `applyTalentMods` uses to pick
@@ -34,8 +47,10 @@ export function resolveTalentHitMult(ability: AbilityDef, mods: TalentModifiers)
   const am = mods.abilities[ability.id];
   const physical = ability.school === 'physical' || ability.scalesWith === 'ranged';
   const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
+  const legacyDmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
   return {
-    dmgMult: 1 + globalDmg + (am?.dmgPct ?? 0),
+    dmgMult: legacyDmgMult + offensiveAbilityBonus(ability, mods),
     healMult: 1 + mods.global.healPct + (am?.dmgPct ?? 0),
+    legacyDmgMult,
   };
 }

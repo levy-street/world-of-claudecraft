@@ -95,6 +95,9 @@ function setup() {
     beginChatModerationHydration: vi.fn((accountId: number) =>
       chatModerationLiveState.beginHydration(accountId),
     ),
+    // The fresh-join arm asks the action-bar store for a still-queued document
+    // before its post-lease reload; this file has nothing queued.
+    hotbarLayouts: { pending: () => null },
   };
   const deps: WsAuthDeps = {
     game: game as unknown as WsAuthDeps['game'],
@@ -119,6 +122,7 @@ function setup() {
       mechChromaIds: [],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     })),
     // Character-lease deps: the happy path holds the lease so every existing case
     // reaches game.join unchanged; the lease branches themselves are covered by
@@ -128,7 +132,7 @@ function setup() {
     // Bank bonus deps: the fresh-join arm recomputes the bank bonus and stamps it into the join
     // meta. The default returns an empty grant so every existing case reaches game.join
     // unchanged; the stamp/resume branches are pinned in the bank-bonus block below.
-    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [], characterCount: 1 })),
+    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [] })),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),
@@ -249,13 +253,13 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it('2c. rejects an auth-world-24 client on the auth-world-25 server before all admission work', async () => {
+  it('2c-25. rejects an auth-world-25 client before all admission work', async () => {
     const fixture = setup();
     const { ws, deps, req } = fixture;
 
     await createWsAuth(deps).authenticateWebSocket(
       asWs(ws),
-      JSON.stringify({ t: 'auth-world-24', token: 'tok', character: 7 }),
+      JSON.stringify({ t: 'auth-world-25', token: 'tok', character: 7 }),
       req,
     );
 
@@ -266,7 +270,67 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it.each(['auth-world', 'auth-world-26', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
+  it('2c. rejects a source-unaware auth-world-26 client before all admission work', async () => {
+    const fixture = setup();
+    const { ws, deps, req } = fixture;
+
+    await createWsAuth(deps).authenticateWebSocket(
+      asWs(ws),
+      JSON.stringify({ t: 'auth-world-26', token: 'tok', character: 7 }),
+      req,
+    );
+
+    expectSendThenClose(
+      ws,
+      errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
+    );
+    expectNoAdmissionWork(fixture);
+  });
+
+  it('2c-harvest. rejects a pre-Field-Kit auth-world-27 client before all admission work', async () => {
+    const fixture = setup();
+    const { ws, deps, req } = fixture;
+
+    await createWsAuth(deps).authenticateWebSocket(
+      asWs(ws),
+      JSON.stringify({ t: 'auth-world-27', token: 'tok', character: 7 }),
+      req,
+    );
+
+    expectSendThenClose(
+      ws,
+      errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
+    );
+    expectNoAdmissionWork(fixture);
+  });
+
+  it('2c-28. rejects a prior-release auth-world-28 client (profession client without current hazards/layout) before all admission work', async () => {
+    const fixture = setup();
+    const { ws, deps, req } = fixture;
+
+    await createWsAuth(deps).authenticateWebSocket(
+      asWs(ws),
+      JSON.stringify({ t: 'auth-world-28', token: 'tok', character: 7 }),
+      req,
+    );
+
+    expectSendThenClose(
+      ws,
+      errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
+    );
+    expectNoAdmissionWork(fixture);
+  });
+
+  it.each([
+    'auth-world',
+    // one epoch AHEAD of the live discriminator, derived so a layout-version
+    // bump can never turn this row into the current epoch by accident (the
+    // hardcoded 'auth-world-21' row did exactly that when 20 became 21)
+    ONLINE_WORLD_AUTH_TYPE.replace(/\d+$/, (n) => String(Number(n) + 1)),
+    'auth-world-next',
+    'auth-world-01',
+    'auth-world-1.0',
+  ])(
     '2d. rejects the non-current world auth discriminator %s before all admission work',
     async (authType) => {
       const fixture = setup();
@@ -804,7 +868,7 @@ describe('createWsAuth: realm admission cap', () => {
     // createWsAuth destructures the deps at construction, so the three joins'
     // behaviors are queued up front: join 1 has its lease refused (a live foreign
     // lease), join 2 throws on the bank-bonus DB read, join 3 is clean.
-    const bankOk = { bonusSlots: 0, sources: [], characterCount: 1 };
+    const bankOk = { bonusSlots: 0, sources: [] };
     deps.bankBonusForAccount = vi
       .fn(async () => bankOk)
       .mockResolvedValueOnce(bankOk)
@@ -881,6 +945,7 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
           mechChromaIds: [],
           weaponSkinIds: [],
           weaponSkinLoadout: {},
+          mountSkinIds: [],
         },
         isAdmin: false,
         // Not staff: the snapshotted permission set is EMPTY (fail closed), never
@@ -1154,6 +1219,7 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
       mechChromaIds: [],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
     await authenticating;
 
@@ -1191,7 +1257,6 @@ describe('createWsAuth: bank bonus stamp', () => {
     const { ws, game, deps, req } = setup();
     const grant = {
       bonusSlots: 6,
-      characterCount: 1,
       sources: [
         { id: 'email', slots: 2, maxSlots: 2 },
         { id: 'referral', slots: 4, maxSlots: 10, count: 2, cap: 5 },
@@ -1224,49 +1289,6 @@ describe('createWsAuth: bank bonus stamp', () => {
     expect(deps.bankBonusForAccount).not.toHaveBeenCalled();
     const joinMeta = (game.join as any).mock.calls[0][7] as { bankBonus?: unknown };
     expect(joinMeta.bankBonus).toBeUndefined();
-  });
-});
-
-describe('createWsAuth: firstCharacter stamp (the tutorial greeting account fact)', () => {
-  it('stamps firstCharacter true when the account-wide count is at most 1', async () => {
-    const { ws, game, deps, req } = setup();
-    deps.bankBonusForAccount = vi.fn(async () => ({
-      bonusSlots: 0,
-      sources: [],
-      characterCount: 1,
-    }));
-    const { authenticateWebSocket } = createWsAuth(deps);
-    await authenticateWebSocket(asWs(ws), authRaw(), req);
-
-    expect(deps.bankBonusForAccount).toHaveBeenCalledTimes(1);
-    expect(deps.bankBonusForAccount).toHaveBeenCalledWith(1);
-    const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
-    expect(joinMeta.firstCharacter).toBe(true);
-  });
-
-  it('stamps firstCharacter false for an account with other characters', async () => {
-    const { ws, game, deps, req } = setup();
-    deps.bankBonusForAccount = vi.fn(async () => ({
-      bonusSlots: 0,
-      sources: [],
-      characterCount: 3,
-    }));
-    const { authenticateWebSocket } = createWsAuth(deps);
-    await authenticateWebSocket(asWs(ws), authRaw(), req);
-
-    const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
-    expect(joinMeta.firstCharacter).toBe(false);
-  });
-
-  it('never recomputes on the resume arm, like bankBonus (locked policy)', async () => {
-    const { ws, game, deps, req } = setup();
-    game.hasSessionForCharacter = vi.fn(() => true);
-    const { authenticateWebSocket } = createWsAuth(deps);
-    await authenticateWebSocket(asWs(ws), authRaw(), req);
-
-    expect(deps.bankBonusForAccount).not.toHaveBeenCalled();
-    const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
-    expect(joinMeta.firstCharacter).toBeUndefined();
   });
 });
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { Sim } from '../src/sim/sim';
+import type { Aura } from '../src/sim/types';
 
 function shaman(level: number) {
   const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -51,7 +52,12 @@ describe('Flametongue Weapon (shaman fire imbue)', () => {
     sim.tick();
     const imbue = p.auras.find((a) => a.kind === 'imbue' && a.id === 'flametongue_weapon');
     expect(imbue).toBeDefined();
-    expect(imbue?.value).toBe(9); // Elemental mastery scales the rank-1 imbue.
+    // v0.42.0 re-pin: Flametongue's per-swing bonus is real per-hit damage
+    // (docs/design/class-balance-v042.md), so it correctly picks up the
+    // Thundercall offense-only spec bonus (+0.13 spell, spec_output_tuning.ts)
+    // on top of the pre-existing Elemental Mastery scaling: legacyDmgMult 1.125
+    // -> dmgMult 1.255. Rank 1: 8 * 1.255 = 10.04 -> 10 (was 8 * 1.125 = 9).
+    expect(imbue?.value).toBe(10);
     // a pure damage weapon imbue
     expect(imbue?.value2).toBeUndefined();
   });
@@ -63,6 +69,24 @@ describe('Flametongue Weapon (shaman fire imbue)', () => {
     const imbue = sim.entities
       .get(pid)
       ?.auras.find((a) => a.kind === 'imbue' && a.id === 'flametongue_weapon');
-    expect(imbue?.value).toBe(15); // Elemental mastery scales the rank-2 imbue.
+    // Rank 2: 13 * 1.255 = 16.315 -> 16 (was 13 * 1.125 = 14.625 -> 15).
+    expect(imbue?.value).toBe(16);
+  });
+
+  it('isolation: Thundercall never touches a sibling flat-magnitude buff on the same spec', () => {
+    // Lightning Shield ("Thunder Ward") is a shaman selfBuff of kind 'thorns',
+    // the SCALABLE_BUFF_KINDS family classes.ts's scaleEffect deliberately
+    // routes through legacyDmgMult (never dmgMult), so the +0.13 Thundercall
+    // offense-only bonus that correctly inflates Flametongue's real per-swing
+    // damage above must NOT also inflate this stat-style buff on the very same
+    // elemental-spec character.
+    const { sim, pid } = shaman(18);
+    sim.castAbility('lightning_shield', pid);
+    sim.tick();
+    const p = sim.entities.get(pid);
+    const shield = p?.auras.find((a: Aura) => a.id === 'lightning_shield');
+    // Rank 3 (level 18) base value 29, scaled ONLY by Elemental Mastery's
+    // 1.125 legacyDmgMult: round(29 * 1.125) = 33, not round(29 * 1.255) = 36.
+    expect(shield?.value).toBe(33);
   });
 });

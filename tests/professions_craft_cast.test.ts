@@ -35,9 +35,11 @@ import {
   DISENCHANT_CAST_ID,
   ENCHANT_CAST_ID,
   type Entity,
+  FARMING_CAST_ID,
   isNonSpellCast,
   SALVAGE_CAST_ID,
   type SimEvent,
+  SUNDER_CAST_ID,
   TOOL_RECHARGE_CAST_ID,
 } from '../src/sim/types';
 
@@ -103,13 +105,23 @@ describe('profession cast sentinels', () => {
     expect(DISENCHANT_CAST_ID).toBe('disenchanting');
     expect(ENCHANT_CAST_ID).toBe('enchanting_apply');
     expect(SALVAGE_CAST_ID).toBe('salvaging');
+    expect(SUNDER_CAST_ID).toBe('sundering');
     expect(TOOL_RECHARGE_CAST_ID).toBe('tool_recharge');
+    // The farming plant cast joins the same family: it is an activity marker,
+    // never an ability id, and its membership is what buys it the shared
+    // bundle (damage cancels instead of pushing back, no spell queue, item
+    // use blocked). Its completion arm dispatches nothing, because a plant
+    // resolves at command time, which is exactly why membership rather than
+    // routing is the load-bearing part here.
+    expect(FARMING_CAST_ID).toBe('farming');
     for (const id of [
       CRAFT_CAST_ID,
       DISENCHANT_CAST_ID,
       ENCHANT_CAST_ID,
       SALVAGE_CAST_ID,
+      SUNDER_CAST_ID,
       TOOL_RECHARGE_CAST_ID,
+      FARMING_CAST_ID,
     ]) {
       expect(isNonSpellCast(id), id).toBe(true);
     }
@@ -720,10 +732,12 @@ describe('craft cast determinism', () => {
 
 describe('maxCraftCountForRecipe with a self-signed reagent', () => {
   // The #1145 discount is HOLD-keyed, so it survives only while a signed copy
-  // is still in the bags. planGradeRemoval drains the base grade first and
-  // removeStacked walks the inventory END-BACKWARD, so the signed copy
-  // (appended last by addItemInstance) is among the first units spent: the
-  // discount expires on craft 1 and every later craft pays the full count.
+  // is still in the bags. A material grant is materialSources-tracked
+  // (material_sources.ts), and takeMaterialCount's default spend order is
+  // premium-LAST: unrecorded units drain first, so the signed unit is the
+  // very last thing spent out of the stack. That is the opposite of a bare
+  // slot-order removal, and it is what lets the discount survive every craft
+  // but the one that finally exhausts the stack.
   const signedRecipe: ProfessionRecipeRecord = {
     id: '__craft_cast_signed_batch',
     professionId: 'cooking',
@@ -746,24 +760,59 @@ describe('maxCraftCountForRecipe with a self-signed reagent', () => {
     ).toBe(3);
   });
 
-  it('spends the signed copy on craft 1, so the ceiling is 3 and not the one-shot 4', () => {
+  it('spends anonymous material first (premium-last order), so the discount survives to the final craft: ceiling 4, not the naive 3', () => {
     const sim = makeSim();
     const { meta, pid } = playerOf(sim);
     meta.inventory = [];
-    sim.addItem('copper_ore', 7, pid);
     sim.addItemInstance('copper_ore', { signer: meta.name }, pid, 1);
+    sim.addItem('copper_ore', 7, pid);
     expect(sim.countItem('copper_ore', pid)).toBe(8);
 
-    // By hand: craft 1 costs 2 (discounted) and takes the signed copy with it,
-    // crafts 2 and 3 cost 3 each (8 - 2 - 3 - 3 = 0), craft 4 cannot be paid.
-    // A one-shot floor(8 / 2) division would have promised 4.
-    expect(maxCraftCountForRecipe(sim.ctx, signedRecipe, pid)).toBe(3);
+    // The grant folds into ONE materialSources-tracked stack (a signed unit
+    // and plain units are compatible in the same slot); provenance lives in
+    // the composition, never at slot.instance.signer.
+    const granted = meta.inventory.find((s) => s.itemId === 'copper_ore');
+    expect(granted?.instance).toBeUndefined();
+    expect(granted?.materialSources).toEqual([
+      { source: {}, count: 7 },
+      { source: { signer: meta.name }, count: 1 },
+    ]);
 
-    // The walk-order premise, proved on the real consumption: one craft eats
-    // the signed copy, leaving six plain units and no signed copy at all.
+    // By hand: takeMaterialCount spends unrecorded units first and the
+    // signed (premium) unit last, so the discount (self-signed hold) survives
+    // until the signed unit is finally spent. Craft 1 costs 2 (discounted),
+    // taken entirely from the 7 anonymous units (5 anonymous + 1 signed
+    // remain); crafts 2 and 3 spend 2 more anonymous each (3 remain, then 1);
+    // craft 4 spends the last anonymous unit plus the signed unit itself
+    // (8 - 2 - 2 - 2 - 2 = 0), and nothing is left for a fifth craft. A
+    // one-shot floor(8 / 2) division would also have promised 4, but for the
+    // wrong reason (assuming the discount holds for the WHOLE batch rather
+    // than proving it survives every craft but the last).
+    expect(maxCraftCountForRecipe(sim.ctx, signedRecipe, pid)).toBe(4);
+    // A preview never mutates: the full slot is unchanged.
+    expect(meta.inventory).toEqual([
+      {
+        itemId: 'copper_ore',
+        count: 8,
+        materialSources: [
+          { source: {}, count: 7 },
+          { source: { signer: meta.name }, count: 1 },
+        ],
+      },
+    ]);
+
+    // The real craft proves the same spend order on the actual consumption:
+    // after craft 1, exactly 5 anonymous units plus the still-signed unit
+    // remain (count 6), never asserted via a top-level instance.signer since
+    // the composition, not the payload, now carries provenance.
     expect(resolveCraftForRecipe(sim.ctx, pid, signedRecipe).ok).toBe(true);
     expect(sim.countItem('copper_ore', pid)).toBe(6);
-    expect(meta.inventory.some((s) => s.itemId === 'copper_ore' && s.instance?.signer)).toBe(false);
+    const afterCraft1 = meta.inventory.find((s) => s.itemId === 'copper_ore');
+    expect(afterCraft1?.instance).toBeUndefined();
+    expect(afterCraft1?.materialSources).toEqual([
+      { source: {}, count: 5 },
+      { source: { signer: meta.name }, count: 1 },
+    ]);
   });
 
   it('the all-plain inverse arm is the plain floor(total / count) division', () => {
@@ -774,6 +823,43 @@ describe('maxCraftCountForRecipe with a self-signed reagent', () => {
     expect(sim.countItem('copper_ore', pid)).toBe(8);
     // No signed copy, so no discount ever applies: floor(8 / 3).
     expect(maxCraftCountForRecipe(sim.ctx, signedRecipe, pid)).toBe(2);
+  });
+
+  // The cross-grade arm: the signed unit sits ALONE on the BASE grade
+  // (copper_ore, a one-unit stack, so it holds no anonymous unit to spend
+  // first) while the rest of the stock is the FINE grade (fine_copper_ore,
+  // verified against MATERIAL_GRADES above). planGradeRemoval drains
+  // materialGradeIds in order (material_grades.ts): base first, then fine,
+  // so craft 1 empties the one-unit base stack (the signed copy, its only
+  // occupant) before touching fine stock at all. Unlike the same-grade case
+  // above, there is no anonymous unit sharing the base grade's own stack to
+  // spend ahead of it, so the discount expires on craft 1 here instead of
+  // surviving to the last craft.
+  it('a cross-grade signed base unit expires the discount mid-batch: base-first drains the signed unit into craft 1, fine covers the rest', () => {
+    const sim = makeSim();
+    const { meta, pid } = playerOf(sim);
+    meta.inventory = [];
+    sim.addItemInstance('copper_ore', { signer: meta.name }, pid, 1);
+    sim.addItem('fine_copper_ore', 7, pid);
+    expect(sim.countItem('copper_ore', pid)).toBe(1);
+    expect(sim.countItem('fine_copper_ore', pid)).toBe(7);
+
+    // By hand: craft 1 costs 2 (discounted), taking the lone base-grade
+    // signed unit whole plus 1 fine unit (base drains first, then fine picks
+    // up the remainder); crafts 2 and 3 then cost 3 each from fine alone
+    // (7 - 1 - 3 - 3 = 0), craft 4 cannot be paid.
+    expect(maxCraftCountForRecipe(sim.ctx, signedRecipe, pid)).toBe(3);
+    // A preview never mutates: nothing spent by merely asking.
+    expect(sim.countItem('copper_ore', pid)).toBe(1);
+    expect(sim.countItem('fine_copper_ore', pid)).toBe(7);
+
+    // The real craft proves the same base-first order on the actual
+    // consumption, not just the scratch simulation: it eats the signed base
+    // unit whole and exactly 1 fine unit, never 2 fine units.
+    expect(resolveCraftForRecipe(sim.ctx, pid, signedRecipe).ok).toBe(true);
+    expect(sim.countItem('copper_ore', pid)).toBe(0);
+    expect(sim.countItem('fine_copper_ore', pid)).toBe(6);
+    expect(meta.inventory.some((s) => s.itemId === 'copper_ore')).toBe(false);
   });
 });
 

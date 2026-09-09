@@ -16,7 +16,12 @@ import { DeedsWindow, type DeedsWindowDeps, refocusSelector } from '../src/ui/de
 
 // jsdom ships no 2D canvas, so the procedural crest compositor cannot run
 // here; the painter only ever uses the returned string as an <img src>.
-vi.mock('../src/ui/icons', () => ({
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  // Additive, never bare: a bare factory lists exactly the exports the file
+  // uses today, so the icons module gaining a consumer of another export
+  // silently invalidates this mock from a file the change never touches
+  // (the reliquary_window_behavior lesson).
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
   iconDataUrl: () => 'data:,',
 }));
 

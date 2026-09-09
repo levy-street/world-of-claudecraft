@@ -499,7 +499,7 @@ describe('chat channels', () => {
     let delivered = 0;
     let throttled = false;
     for (let i = 0; i < 40; i++) {
-      sim.chat('/g spam ' + i, a);
+      sim.chat(`/g spam ${i}`, a);
       const events = sim.tick(); // ~0.05s of refill per tick
       if (events.some((e) => e.type === 'chat')) delivered++;
       if (events.some((e) => e.type === 'error' && /too quickly/i.test(e.text))) throttled = true;
@@ -1235,7 +1235,8 @@ describe('chat module (direct, no Sim)', () => {
     // the only level that still matters in the mount flow (mounts themselves have
     // no per-mount level gate).
     expect(sim.entities.get(pid)?.level).toBe(20);
-    // 9 since the Drakemaw Raptor joined the catalog. Spelled as a literal on
+    // 15 since both release-line and candidate mount reins joined the
+    // catalog. Spelled as a literal on
     // purpose rather than derived from MOUNT_KEYS.length: the row above already
     // proves ownership against the catalog, so deriving this one too would let a
     // catalog that silently lost a mount pass both.

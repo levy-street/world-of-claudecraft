@@ -24,6 +24,7 @@
 // admission preserves the fire-and-forget recorder for isolated callers until
 // every host supplies a character-owned outbox.
 import { bankPurchasedSlotsFor } from '../src/sim/bank';
+import type { MaterialSourceTransferSelection } from '../src/sim/material_source_transfer_selection';
 import type { BankInfo } from '../src/world_api';
 import {
   buildBankSocketLedgerRows,
@@ -33,6 +34,7 @@ import {
 } from './bank_ledger';
 import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
 import { bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
+import { readMaterialSourceTransferWire } from './material_source_transfer_wire';
 import { storagePurchaseInFlight } from './storage_purchases';
 import { nextRungClaudiumPriceFor } from './storage_store_cache';
 
@@ -49,8 +51,18 @@ export interface BankSim {
     error(id: number, text: string): void;
   };
   bankInfoFor(pid: number): BankInfo | null;
-  bankDeposit(slot: number, count?: number, pid?: number): void;
-  bankWithdraw(slot: number, count?: number, pid?: number): void;
+  bankDeposit(
+    slot: number,
+    count?: number,
+    pidOrSelection?: number | MaterialSourceTransferSelection,
+    pid?: number,
+  ): void;
+  bankWithdraw(
+    slot: number,
+    count?: number,
+    pidOrSelection?: number | MaterialSourceTransferSelection,
+    pid?: number,
+  ): void;
   bankBuySlots(pid?: number): void;
   bankUnlockSocket(pid?: number): void;
   bankSocketBag(itemId: string, socket?: number, pid?: number, slotIndex?: number): void;
@@ -134,13 +146,15 @@ export function dispatchBankCommand(
     case 'bank_deposit':
       if (typeof msg.slot === 'number') {
         const slot = msg.slot;
-        const count = typeof msg.count === 'number' ? msg.count : undefined;
+        const transfer = readMaterialSourceTransferWire(msg, slot);
+        if (transfer === null) break;
+        const { count, selection } = transfer;
         const reservation = reserveLedgerRows(admission, sim, pid, 'bank_deposit');
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
           () => sim.bankInfoFor(pid),
-          () => sim.bankDeposit(slot, count, pid),
+          () => sim.bankDeposit(slot, count, selection, pid),
         );
         finishReservedSimCall(reservation, () => {
           const after = sim.bankInfoFor(pid);
@@ -153,13 +167,15 @@ export function dispatchBankCommand(
     case 'bank_withdraw':
       if (typeof msg.slot === 'number') {
         const slot = msg.slot;
-        const count = typeof msg.count === 'number' ? msg.count : undefined;
+        const transfer = readMaterialSourceTransferWire(msg, slot);
+        if (transfer === null) break;
+        const { count, selection } = transfer;
         const reservation = reserveLedgerRows(admission, sim, pid, 'bank_withdraw');
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
           () => sim.bankInfoFor(pid),
-          () => sim.bankWithdraw(slot, count, pid),
+          () => sim.bankWithdraw(slot, count, selection, pid),
         );
         finishReservedSimCall(reservation, () => {
           const after = sim.bankInfoFor(pid);

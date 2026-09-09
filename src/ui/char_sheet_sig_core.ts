@@ -10,7 +10,7 @@
 // write) left an already-open sheet showing the previous wearer state until the
 // player closed and reopened it. This signature is what the HUD latches on to
 // notice the change and call charWindow.renderIfOpen(), the same shape
-// professionSurfaceRefreshSig (src/ui/profession_identity_view.ts) gives the
+// professionSurfaceRefreshSig (src/ui/hud/professions/profession_identity_view.ts) gives the
 // profession surfaces.
 //
 // It covers the DEEDS and RELIQUARY rows of the progression block, not only the

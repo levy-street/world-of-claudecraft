@@ -8,10 +8,26 @@ import type { PainterHostWriters } from './painter_host';
 import type { ProcOverlayState } from './proc_overlay_view';
 
 export class ProcOverlayPainter {
+  /** True while the Unlock Interface mode is on. The mover's corner button
+   *  and resize grip live INSIDE this root, so the inactive states must stop
+   *  asserting aria-hidden then: focusable chrome inside an aria-hidden
+   *  subtree is an axe violation, and the buttons are the frame's only
+   *  keyboard path. Routed through the same elided per-frame writes so the
+   *  painter and the unlock hook never fight over the attribute. */
+  private editing = false;
+
   constructor(
     private readonly writers: PainterHostWriters,
     private readonly root: HTMLElement, // #proc-overlay
   ) {}
+
+  setEditing(on: boolean): void {
+    this.editing = on;
+  }
+
+  private inactiveHidden(): string {
+    return this.editing ? 'false' : 'true';
+  }
 
   private clearDestruction(): void {
     this.writers.toggleClass(this.root, 'destruction', false);
@@ -23,7 +39,7 @@ export class ProcOverlayPainter {
   }
 
   paint(state: ProcOverlayState, combustion = false): void {
-    this.writers.setAttr(this.root, 'aria-hidden', 'true');
+    this.writers.setAttr(this.root, 'aria-hidden', this.inactiveHidden());
     this.writers.setAttr(this.root, 'tabindex', '-1');
     // Fire path: clear any Chronomancy theme/charge classes so a spec swap never
     // leaves the violet bird behind (all writes elided when unchanged).
@@ -55,7 +71,7 @@ export class ProcOverlayPainter {
   // Aether Surge charge (n = 0..4); n === 4 whitens the core and beats the wings
   // like the fire streak; n === 0 (Aether Darts spent them) fades it out.
   paintChronoCharges(n: number): void {
-    this.writers.setAttr(this.root, 'aria-hidden', 'true');
+    this.writers.setAttr(this.root, 'aria-hidden', this.inactiveHidden());
     this.writers.setAttr(this.root, 'tabindex', '-1');
     this.writers.toggleClass(this.root, 'heating', false);
     this.writers.toggleClass(this.root, 'hot', false);
@@ -83,9 +99,9 @@ export class ProcOverlayPainter {
 
   // Frost variant: the two tail feathers, left wing, right wing, and body form
   // over stacks one to four. The fifth Icicle overlays the crystalline ready
-  // flare, making Glacial Spike readiness unmistakable without a number label.
+  // flare, making Rimeneedle readiness unmistakable without a number label.
   paintFrostCharges(n: number): void {
-    this.writers.setAttr(this.root, 'aria-hidden', 'true');
+    this.writers.setAttr(this.root, 'aria-hidden', this.inactiveHidden());
     this.writers.setAttr(this.root, 'tabindex', '-1');
     this.writers.toggleClass(this.root, 'heating', false);
     this.writers.toggleClass(this.root, 'hot', false);
@@ -118,7 +134,10 @@ export class ProcOverlayPainter {
   // aria-valuetext (that masked aria-valuenow for screen-reader users).
   paintNecromancyCharges(n: number, label: string, status: string): void {
     this.writers.setAttr(this.root, 'aria-hidden', 'false');
-    this.writers.setAttr(this.root, 'tabindex', '0');
+    // -1 like every other state: the mover chrome owns the keyboard path now,
+    // so an always-on bank as a focus stop would sit one tab from the corner
+    // button that actually does something (the devotion frame's rule).
+    this.writers.setAttr(this.root, 'tabindex', '-1');
     this.writers.setAttr(this.root, 'aria-valuenow', String(n));
     this.writers.setAttr(this.root, 'aria-valuetext', status);
     this.writers.setAttr(this.root, 'aria-label', label);
@@ -150,7 +169,8 @@ export class ProcOverlayPainter {
   // bank, then ignite one at a time as the caster gathers Ruin.
   paintDestructionMarks(n: number, label: string, status: string): void {
     this.writers.setAttr(this.root, 'aria-hidden', 'false');
-    this.writers.setAttr(this.root, 'tabindex', '0');
+    // -1: see paintNecromancyCharges above.
+    this.writers.setAttr(this.root, 'tabindex', '-1');
     this.writers.setAttr(this.root, 'aria-valuenow', String(n));
     this.writers.setAttr(this.root, 'aria-valuetext', status);
     this.writers.setAttr(this.root, 'aria-label', label);

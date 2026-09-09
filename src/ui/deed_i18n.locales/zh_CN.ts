@@ -128,7 +128,7 @@ export const table: DeedLocaleTable = {
     desc: '在Nightbloom采集一处矿脉、一片木料和一块草药地。',
   },
   chr_nightbloom_first_cast: {
-    name: '月井涟漪',
+    name: '月泉涟漪',
     desc: '在Nightbloom水域钓上一条鱼。',
   },
   chr_wraithwood_gatherer: {
@@ -186,7 +186,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '草甸之主', desc: '草药学熟练度达到100点。' },
   prog_master_gatherer: {
     name: '采集大师',
-    desc: '在采矿、伐木、草药学、钓鱼中，任意三门的熟练度达到100点。',
   },
   prog_first_craft: { name: '亲手所制', desc: '完成你的第一次成功制造。' },
   prog_craft_specialist: {
@@ -300,7 +299,7 @@ export const table: DeedLocaleTable = {
   dlv_rite_flawless: { name: '一字不差', desc: '完成溺亡圣物库仪式，全程没有一处失误。' },
   dlv_varric_ringers: {
     name: '钟声止息',
-    desc: '击败执事瓦里克时，他唤起的每一个丧葬鸣钟者都已先行伏诛。',
+    desc: '击败执事万德里克时，他唤起的每一个丧葬鸣钟者都已先行伏诛。',
   },
   dlv_nhalia_bells: {
     name: '止钟人',
@@ -313,7 +312,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: '溪谷编年史·第二章',
-    desc: '完成绍尔编年史的第二章：剿平强盗、鱼人与矿坑害虫，在母猪场上赛过一场，并闯过圣物库。',
   },
   chr_vale_chapter_iii: {
     name: '溪谷编年史·全卷',
@@ -323,7 +321,7 @@ export const table: DeedLocaleTable = {
   chr_vale_gatherer: { name: '靠山吃山', desc: '在东溪谷采集一处矿脉、一片林木与一丛草药。' },
   chr_vale_first_cast: { name: '镜湖有物', desc: '在东溪谷的水域钓起一条鱼。' },
   chr_vale_packbreaker: { name: '破群者', desc: '在 10 秒内斩杀 3 只森林狼。' },
-  chr_vale_cup_debut: { name: '铜桶新秀', desc: '在母猪场进行的溪谷杯比赛中登场并触到球。' },
+  chr_vale_cup_debut: { name: '铜桶新秀' },
   chr_vale_rares: {
     name: '溪谷群凶',
     desc: '斩杀东溪谷的五大恶名之敌：老灰颚、莫格、隧道之王格里克斯、维尔兰队长与缚魂者玛尔德雷克。',
@@ -364,10 +362,10 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: '荆峰编年史·全卷',
-    desc: '见证高山故事的始末：击溃龙教，肃清墓龙圣所，扳倒觉醒之峰，将峭壁间每一个恶名之敌尽数讨灭。',
+    desc: '见证高山故事的始末：击溃龙誓，肃清墓龙圣所，扳倒觉醒之峰，将峭壁间每一个恶名之敌尽数讨灭。',
     title: '荆峰之子',
   },
-  chr_peaks_sparring: { name: '城墙操练', desc: '对高望上方的训练假人造成总计 1,000 点伤害。' },
+  chr_peaks_sparring: { name: '城墙操练', desc: '对训练假人造成总计 1,000 点伤害。' },
   chr_peaks_glimmer_cast: { name: '水冷，光更冷', desc: '在微光湖钓起一条鱼。' },
   chr_peaks_moongate: { name: '穿过冰冷之门', desc: '踏入微光湖岸边的月门。' },
   chr_peaks_waking_witness: {
@@ -405,7 +403,7 @@ export const table: DeedLocaleTable = {
   },
   col_true_colors: { name: '真我本色', desc: '穿着你职业默认之外的任意外观登场。' },
   col_all_slots: { name: '十一分讲究', desc: '让全部十一个装备栏位同时都有装备。' },
-  col_quartermaster_buyout: { name: '老主顾', desc: '发现军需官维克斯所售的全部十件货品。' },
+  col_quartermaster_buyout: { name: '老主顾', desc: '发现军需官维克斯所售的全部十件装备。' },
   col_glimmerfin: {
     name: '一线微光',
     desc: '钓起一条日辉锦鲤。',
@@ -426,32 +424,29 @@ export const table: DeedLocaleTable = {
   pvp_arena_2v2_1900: { name: '天作之合', desc: '在竞技场2v2组别中将评级提升至1900。' },
   pvp_duel_first_win: { name: '门外了断', desc: '赢得一场决斗。' },
   pvp_duel_grace: { name: '谦逊一课', desc: '输掉一场决斗，体面大致还在。' },
-  pvp_vcup_first_match: { name: '踏上赛场', desc: '在母猪场完整打完一场溪谷杯比赛，无论胜负。' },
-  pvp_vcup_first_win: { name: '首座奖杯', desc: '赢得一场溪谷杯评级赛。' },
-  pvp_vcup_wins_10: { name: '野猪球老手', desc: '赢得10场溪谷杯评级赛。' },
-  pvp_vcup_wins_25: { name: '野猪球传奇', desc: '赢得25场溪谷杯评级赛。', title: '野猪球传奇' },
-  pvp_vcup_first_goal: { name: '首开纪录', desc: '在溪谷杯评级赛中攻入一球。' },
-  pvp_vcup_hat_trick: { name: '帽子戏法', desc: '在3v3或更大组别的单场溪谷杯评级赛中攻入3球。' },
-  pvp_vcup_golden_goal: { name: '黄金一刻', desc: '射入决定一场溪谷杯评级赛胜负的金球。' },
-  pvp_vcup_first_save: { name: '一双稳手', desc: '在溪谷杯评级赛中担任守门员并完成一次扑救。' },
-  pvp_vcup_clean_sheet: { name: '此路不通', desc: '担任守门员赢下一场溪谷杯评级赛，且一球不失。' },
-  pvp_vcup_guild_win: { name: '为了旗帜', desc: '以你所在公会的旗帜出战，赢得一场溪谷杯评级赛。' },
-  pvp_fiesta_first_bout: { name: '不请自来', desc: '完整打完一场2v2狂欢乱斗，无论胜负。' },
-  pvp_fiesta_first_win: { name: '狂欢之魂', desc: '赢得一场2v2狂欢乱斗。' },
-  pvp_fiesta_double: { name: '祸不单行', desc: '在4秒内于狂欢乱斗中完成两次击倒。' },
+  pvp_vcup_first_match: { name: '踏上赛场' },
+  pvp_vcup_first_win: { name: '首座奖杯' },
+  pvp_vcup_wins_10: { name: '野猪球老手' },
+  pvp_vcup_wins_25: { name: '野猪球传奇', title: '野猪球传奇' },
+  pvp_vcup_first_goal: { name: '首开纪录' },
+  pvp_vcup_hat_trick: { name: '帽子戏法' },
+  pvp_vcup_golden_goal: { name: '黄金一刻' },
+  pvp_vcup_first_save: { name: '一双稳手' },
+  pvp_vcup_clean_sheet: { name: '此路不通' },
+  pvp_vcup_guild_win: { name: '为了旗帜' },
+  pvp_fiesta_first_bout: { name: '不请自来' },
+  pvp_fiesta_first_win: { name: '狂欢之魂' },
+  pvp_fiesta_double: { name: '祸不单行' },
   pvp_fiesta_shutdown: {
     name: '扫兴大师',
-    desc: '在狂欢乱斗中击倒一名连续击倒数已达3次或更多的对手。',
   },
   pvp_fiesta_full_build: {
     name: '盛装出席',
-    desc: '在全部三波增益中各锁定一项，随后赢下一场狂欢乱斗。',
   },
   pvp_fiesta_powerups: {
     name: '样样来一份',
-    desc: '将擂台上的四种强化道具各拾取至少一次：极速恶魔、巨像、月靴与狂战士。',
   },
-  pvp_fiesta_five_kills: { name: '全场我来扛', desc: '在单场狂欢乱斗中完成5次击倒。' },
+  pvp_fiesta_five_kills: { name: '全场我来扛' },
   soc_first_party: { name: '结伴同行', desc: '与另一名玩家组成队伍。' },
   soc_full_house: { name: '满堂彩', desc: '以五人满编队伍通关一座地下城。' },
   soc_guild_joined: { name: '同旗之下', desc: '成为一个公会的成员。' },
@@ -713,6 +708,32 @@ export const table: DeedLocaleTable = {
     name: '锻造至完美',
     desc: '在护甲锻造中制作你的第一件稀有品质物品。',
   },
+  prog_jewelcrafting_rare: {
+    name: '打磨至璀璨',
+    desc: '在珠宝加工中制作你的第一件稀有品质物品。',
+  },
+  prog_jewelcrafting_50: {
+    name: '琢面与花丝',
+    desc: '珠宝加工技能达到50点。',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: '珠宝加工宗师',
+    desc: '珠宝加工技能达到125点，登顶此门技艺的至高境界。',
+    title: '珠宝加工宗师',
+  },
+  prog_inscription_rare: {
+    name: '笔精墨妙',
+    desc: '在铭文中制作你的第一件稀有品质物品。',
+  },
+  prog_inscription_50: {
+    name: '羽笔与颜料',
+    desc: '铭文技能达到50点。',
+  },
+  prog_grandmaster_inscription: {
+    name: '铭文宗师',
+    desc: '铭文技能达到125点，登顶此门技艺的至高境界。',
+    title: '铭文宗师',
+  },
   prog_ready_for_an_adventure: {
     name: '整装待发',
     desc: '从试炼之滨毕业：完成岛上的每一堂课，然后敲响渡船铃回到东溪镇。',
@@ -745,5 +766,13 @@ export const table: DeedLocaleTable = {
     name: '余烬不灭',
     desc: '在英雄难度下击败"末焰锻父瓦尔库尔"，全程无一名团队成员死亡。',
     title: '未焚者',
+  },
+  hid_forgebreaker: {
+    name: '解放之泉',
+    desc: '亲手锻造碎炉者，携带完成的战锤回到梅琳身边。',
+  },
+  col_set_bramblehide: {
+    name: '鲁茨的荆棘皮甲',
+    desc: '发现鲁茨的荆棘皮甲的每一个部件。',
   },
 };

@@ -49,9 +49,12 @@ describe('#1608: eating stacks with natural hp regen', () => {
     };
   }
 
-  // The exact foodHp tiers named in the issue (61 = baked_bread/tier 1, 117 =
-  // the best vendor/fished tier) plus the mid fished tiers and the conjured
-  // ladder, so every content/items.ts foodHp value this fix touches is covered.
+  // Representative foodHp magnitudes spanning the ladder: the issue's own tiers
+  // (61 = baked_bread/tier 1; 117, the best vendor tier when the issue was
+  // filed, is the best CRAFTED zone-1 tier since the 11n vendor food nerf moved
+  // the vendor line to 61/81/106/220/375/480/816) plus mid fished tiers and the
+  // conjured ladder. The stacks-with-regen property is magnitude-generic, so
+  // these generic rungs cover the live foodHp values without enumerating them.
   const FOOD_TIERS = [45, 61, 90, 117, 243, 552, 980];
 
   it.each(FOOD_TIERS)(
@@ -66,9 +69,9 @@ describe('#1608: eating stacks with natural hp regen', () => {
   );
 
   // The issue's own reproduction numbers: tier-1 food (61 foodHp, ~7 hp/2s) used
-  // to lose to natural regen from ~16 stamina, and the best vendor/fished tier
-  // (117 foodHp, ~13 hp/2s) from ~37 stamina. Both crossover points, and well
-  // past them, must now favor eating.
+  // to lose to natural regen from ~16 stamina, and the then-best vendor/fished
+  // tier (117 foodHp, ~13 hp/2s) from ~37 stamina. Both crossover points, and
+  // well past them, must now favor eating.
   it('the issue-reported crossover stamina values no longer favor standing idle', () => {
     for (const sta of [16, 37, 200]) {
       const idle = healOverOneTick(makeSim(), sta, null);
@@ -137,7 +140,8 @@ describe('#1608: eating stacks with natural hp regen', () => {
 describe('#1608: potionHp/potionMana ladder', () => {
   // The reference class per resource type is the one with the SMALLEST base
   // (no-gear) pool at that resource, per the design comment above
-  // minor_healing_potion in content/items.ts: priest for hp, hunter for mana.
+  // minor_healing_potion in content/items.ts: priest for hp, paladin for mana
+  // (hunters run on focus since the hunter overhaul).
   function basePoolAt(
     cls: 'priest' | 'paladin',
     level: number,
@@ -180,25 +184,37 @@ describe('#1608: potionHp/potionMana ladder', () => {
     ['mana_potion', ZONE3_ZONE.levelRange[1]],
   ];
 
+  // Measured fractions after the 11n vendor floor: 0.894/0.792/0.721 by rung.
+  // The band brackets the items.ts header's stated "72-90%" (floor 0.70, not
+  // 0.72, because the lowest live fraction clears 0.72 by only 0.0009; the
+  // ceiling 0.92 leaves the top fraction real slack so an unrelated
+  // one-point priest base-hp retune does not red a potion suite; the golden
+  // pin below is the change detector for the values themselves, this band
+  // guards against pool drift).
   it.each(HP_TIERS)(
-    "%s restores a meaningful, documented fraction (0.60-1.00) of a priest's base hp pool at its bracket top",
+    "%s restores a meaningful, documented fraction (0.70-0.92) of a priest's base hp pool at its bracket top",
     (itemId, topLevel) => {
       const { maxHp } = basePoolAt('priest', topLevel);
       const fraction = potionHp(itemId) / maxHp;
-      expect(fraction).toBeGreaterThanOrEqual(0.6);
-      expect(fraction).toBeLessThanOrEqual(1.0);
+      expect(fraction).toBeGreaterThanOrEqual(0.7);
+      expect(fraction).toBeLessThanOrEqual(0.92);
     },
   );
 
+  // 11n re-derivation: the vendor mana rungs moved to 226 and 354, so the
+  // measured fractions are 0.662/0.545/0.536 by rung. The band brackets the
+  // items.ts header's stated "53-66%" (that prose rounds: the live top is
+  // 0.6621, so the ceiling sits at 0.68), same division of labor as the hp
+  // band above.
   it.each(MANA_TIERS)(
     // Hunters run on focus on this line (the hunter overhaul), so the potion
     // floor's subject is the smallest MANA pool: the paladin.
-    "%s restores a meaningful, documented fraction (0.55-0.85) of a paladin's base mana pool at its bracket top",
+    "%s restores a meaningful, documented fraction (0.52-0.68) of a paladin's base mana pool at its bracket top",
     (itemId, topLevel) => {
       const { maxResource } = basePoolAt('paladin', topLevel);
       const fraction = potionMana(itemId) / maxResource;
-      expect(fraction).toBeGreaterThanOrEqual(0.55);
-      expect(fraction).toBeLessThanOrEqual(0.85);
+      expect(fraction).toBeGreaterThanOrEqual(0.52);
+      expect(fraction).toBeLessThanOrEqual(0.68);
     },
   );
 
@@ -211,13 +227,15 @@ describe('#1608: potionHp/potionMana ladder', () => {
 
   // Golden pin: catches an accidental future edit to the tuned ladder without a
   // deliberate matching change to this test's target-fraction assertions above.
+  // The 11n vendor floor moved healing_potion to 279 and the two upper mana
+  // rungs to 226/354; the minor and lesser hp rungs stayed put (qr-11n-NINE).
   it('pins the exact retuned values', () => {
     expect(potionHp('minor_healing_potion')).toBe(110);
     expect(potionHp('lesser_healing_potion')).toBe(190);
-    expect(potionHp('healing_potion')).toBe(320);
+    expect(potionHp('healing_potion')).toBe(279);
     expect(potionMana('minor_mana_potion')).toBe(145);
-    expect(potionMana('lesser_mana_potion')).toBe(250);
-    expect(potionMana('mana_potion')).toBe(410);
+    expect(potionMana('lesser_mana_potion')).toBe(226);
+    expect(potionMana('mana_potion')).toBe(354);
   });
 
   // The crafted alchemy ladder (profession_items.ts) documents itself as a

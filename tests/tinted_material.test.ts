@@ -147,6 +147,127 @@ describe('tinted character materials', () => {
     }
   });
 
+  it('keeps an authored held model as shipped and still polishes every other weapon', () => {
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
+    try {
+      const derive = (authoredSurface: boolean): THREE.MeshStandardMaterial => {
+        // The Varkhul Forgebreaker shape: an authored atlas, matte, no metal.
+        const src = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          roughness: 0.9,
+          metalness: 0,
+          map: new THREE.Texture(),
+        });
+        src.name = 'Material.001';
+        const mesh = new THREE.Mesh(new THREE.BufferGeometry(), src);
+        mesh.userData.weaponMesh = true;
+        // the tag attachProp sets for an AUTHORED_HELD_MODELS prop
+        if (authoredSurface) mesh.userData.authoredSurface = true;
+        const root = new THREE.Group();
+        root.add(mesh);
+        applyMaterials(root, {} as VisualDef, 0xffffff);
+        const out = mesh.material as THREE.MeshStandardMaterial;
+        expect(out).not.toBe(src);
+        return out;
+      };
+
+      // Untagged: the whole polish, exactly as before (cream lift, gloss
+      // clamp, metalness floor, emissive floor). Every other held model,
+      // KayKit or not, stays on this arm.
+      const polished = derive(false);
+      expect(polished.roughness).toBeCloseTo(0.55, 5);
+      expect(polished.metalness).toBeCloseTo(0.12, 5);
+      expect(polished.emissive.getHex()).not.toBe(0x000000);
+      expect(polished.color.getHex()).not.toBe(0xffffff);
+
+      // Tagged: the shipped response, untouched. The polish's emissive floor
+      // and gloss are the grey film over a dark baked atlas.
+      const authored = derive(true);
+      expect(authored.roughness).toBeCloseTo(0.9, 5);
+      expect(authored.metalness).toBe(0);
+      expect(authored.emissive.getHex()).toBe(0x000000);
+      expect(authored.color.getHex()).toBe(0xffffff);
+      // and the two never share a cache entry
+      expect(authored).not.toBe(polished);
+    } finally {
+      restoreGfx();
+    }
+  });
+
+  it('scales the low-tier readability floor by the atlas only for an authoredAtlas def', () => {
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
+    try {
+      const derive = (def: VisualDef, tag: 'body' | 'authoredWeapon' | 'weapon') => {
+        const atlas = new THREE.Texture();
+        const src = new THREE.MeshStandardMaterial({ color: 0xffffff, map: atlas });
+        const mesh = new THREE.Mesh(new THREE.BufferGeometry(), src);
+        if (tag !== 'body') mesh.userData.weaponMesh = true;
+        if (tag === 'authoredWeapon') mesh.userData.authoredSurface = true;
+        const root = new THREE.Group();
+        root.add(mesh);
+        applyMaterials(root, def, 0xffffff);
+        const out = mesh.material as unknown as THREE.MeshLambertMaterial;
+        expect(out.isMeshLambertMaterial).toBe(true);
+        expect(out.map).toBe(atlas);
+        return { out, atlas };
+      };
+
+      // An authored creature atlas: the floor rides the map, so a black texel
+      // stays black instead of lifting to the same grey as every other one,
+      // and the lift amount itself is unchanged (lifted colour x body factor).
+      const creature = derive({ authoredAtlas: true } as VisualDef, 'body');
+      expect(creature.out.emissiveMap).toBe(creature.atlas);
+      const expected = creature.out.color.clone().multiplyScalar(0.045);
+      expect(creature.out.emissive.r).toBeCloseTo(expected.r, 6);
+      expect(creature.out.emissive.g).toBeCloseTo(expected.g, 6);
+      expect(creature.out.emissive.b).toBeCloseTo(expected.b, 6);
+
+      // A player body or any other rig: the uniform floor it always had.
+      const player = derive({} as VisualDef, 'body');
+      expect(player.out.emissiveMap).toBeNull();
+      expect(player.out.emissive.getHex()).not.toBe(0x000000);
+
+      // Held props follow their own tag, never the body def.
+      const drop = derive({} as VisualDef, 'authoredWeapon');
+      expect(drop.out.emissiveMap).toBe(drop.atlas);
+      const dropExpected = drop.out.color.clone().multiplyScalar(0.075);
+      expect(drop.out.emissive.r).toBeCloseTo(dropExpected.r, 6);
+      const kitWeapon = derive({ authoredAtlas: true } as VisualDef, 'weapon');
+      expect(kitWeapon.out.emissiveMap).toBeNull();
+    } finally {
+      restoreGfx();
+    }
+  });
+
+  it('partitions the cache so a flagged def never hands its clone to a player form on the same GLB', () => {
+    // mob_wolf (authoredAtlas) and the druid form_cat share wolf_basic.glb, so
+    // both reach tintedMaterial with the SAME source material. The flag must
+    // partition the cache key: the flagged clone carries the atlas-scaled
+    // floor, the form keeps the uniform one, and neither borrows the other.
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
+    try {
+      const atlas = new THREE.Texture();
+      const shared = new THREE.MeshStandardMaterial({ color: 0xffffff, map: atlas });
+      const derive = (def: VisualDef) => {
+        const mesh = new THREE.Mesh(new THREE.BufferGeometry(), shared);
+        const root = new THREE.Group();
+        root.add(mesh);
+        applyMaterials(root, def, 0xffffff);
+        return mesh.material as unknown as THREE.MeshLambertMaterial;
+      };
+      const wolf = derive({ authoredAtlas: true } as VisualDef);
+      const form = derive({} as VisualDef);
+      const wolfAgain = derive({ authoredAtlas: true } as VisualDef);
+      expect(wolf).not.toBe(form);
+      expect(wolfAgain).toBe(wolf); // same inputs still share one clone
+      expect(wolf.emissiveMap).toBe(atlas);
+      expect(form.emissiveMap).toBeNull();
+      expect(form.emissive.getHex()).not.toBe(0x000000);
+    } finally {
+      restoreGfx();
+    }
+  });
+
   it('returns a colorless shader material as-is and continues the material traversal', () => {
     const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
     try {

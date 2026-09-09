@@ -266,7 +266,8 @@ export const DEFAULT_GAMEPAD_BINDINGS: Record<number, GamepadActionId> = {
   // hotbar off and wants them back.
   // The d-pad carries no bare action: it is four cross-hotbar cells, and a bare
   // press opens UI navigation instead.
-  // View/Share/Minus is the inventory shortcut used by controller tutorials.
+  // View/Share/Minus remains an optional inventory shortcut. Mandatory controller
+  // guidance enters HUD navigation instead because platforms may reserve this button.
   // The right stick click takes the HUD walk, while friendly/NPC selection stays
   // on the bare d-pad, so every interface remains reachable without a pointer.
   [GP.BACK]: 'bags',

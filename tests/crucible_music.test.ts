@@ -32,6 +32,7 @@ function input(
     playerPos: room ? instanceOrigin(DUNGEONS[room].index, 0) : zone.hub,
     zone,
     inDungeon: room !== null,
+    inCombat: false,
     entities: [],
     riftFloor: null,
     ...overrides,

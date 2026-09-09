@@ -1,4 +1,6 @@
+import { scalePrimaryHealing } from '../primary_healing';
 import type { SimContext } from '../sim_context';
+import { primaryHealingMultiplier } from '../spec_output_tuning';
 import { dist2d, type Entity } from '../types';
 import { catFlatSwingAdderMult } from './form_swing';
 
@@ -103,12 +105,18 @@ export function unleashPerpetualSun(ctx: SimContext, caster: Entity): void {
     );
   }
 
+  // Perpetual Sun's flat heal is class-wide (a paladin choice row), but the
+  // Sunmender-only primary-healing factor must still apply only when the
+  // caster has actually committed to holy; its flat damage stays unchanged.
+  const meta = caster.kind === 'player' ? ctx.players.get(caster.id) : undefined;
+  const healMultiplier = meta ? primaryHealingMultiplier(meta.cls, ctx.playerMods(meta).spec) : 1;
+  const healAmount = scalePrimaryHealing(150, healMultiplier);
   const party = ctx.partyOf(caster.id);
   const allyIds = party?.members ?? [caster.id];
   for (const id of [...allyIds].sort((a, b) => a - b)) {
     const ally = ctx.entities.get(id);
     if (!ally || ally.dead || dist2d(caster.pos, ally.pos) > 20) continue;
-    ctx.applyHeal(caster, ally, 150, 'Perpetual Sun', null, false, false, false);
+    ctx.applyHeal(caster, ally, healAmount, 'Perpetual Sun', null, false, false, false);
   }
 
   ctx.applyAura(caster, {

@@ -20,6 +20,7 @@
 // may drift across Postgres versions, index reachability must not.
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { materialSourceConnection } from '../server/material_source_connection';
 import type { PgWocMarketDb } from '../server/woc_market_db';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
@@ -63,7 +64,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     // The REAL boot path, so every index under test is the one production gets.
     await db.ensureSchema();
     await db.runConcurrentIndexMigrations();
-    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 12 });
+    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 12 });
     // The recording wrapper: statements pass through to the real pool, and the
     // capture is what gets EXPLAINed, so the pin can never drift from the
     // shipped SQL. connect() forwards so transaction paths still work (their

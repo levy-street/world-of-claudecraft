@@ -19,6 +19,7 @@ import {
   type WocMarketViewModel,
   type WocSaleView,
   type WocSettlementView,
+  wocMarketScrollKeys,
   wocMarketViewSig,
   wocQuoteCountdownSig,
 } from '../src/ui/woc_market_view';
@@ -353,6 +354,19 @@ describe('sellableRows: the sell-tab pre-filter over real ITEMS', () => {
     expect(sellableRows(unlocked, 'epic', BOTH_ON)).toEqual([
       { index: 0, itemId: epicEquipId, quality: 'epic', instance: { locked: false } },
     ]);
+  });
+
+  it('an unknown-tier rolled quality ranks as ITSELF under the floor, never as the def (the server twin)', () => {
+    // The sell pre-filter reads the sim's effectiveQuality, the same call
+    // server/woc_market_rules.ts makes: a legacy rolled 'mythic' on an epic
+    // def ranks 0 (QUALITY_RANK has no such tier) and is refused, exactly as
+    // the server refuses it. The tooltip's tier-narrowing wrapper read it as
+    // the def's epic and offered a listing the server rejects (the phase 13 QA
+    // fresh-reader finding on the first fix).
+    const instance = { rolled: { quality: 'mythic' as never } };
+    expect(sellableRows([{ itemId: epicEquipId, count: 1, instance }], 'epic', BOTH_ON)).toEqual(
+      [],
+    );
   });
 
   it('lets a rolled epic quality lift a rare def over an epic floor', () => {
@@ -877,5 +891,22 @@ describe('wocQuoteCountdownSig: the pending quote repaint key', () => {
     expect(wocQuoteCountdownSig(500, 1_000)).toBe('0');
     expect(wocQuoteCountdownSig(null, 1_000)).toBe('');
     expect(wocQuoteCountdownSig(undefined, 1_000)).toBe('');
+  });
+});
+
+describe('wocMarketScrollKeys: what a kept scroll offset refers to', () => {
+  it('keys the body on the tab and the detail on tab plus listing', () => {
+    expect(wocMarketScrollKeys('browse', undefined)).toEqual({
+      body: 'browse',
+      detail: 'browse:',
+    });
+    expect(wocMarketScrollKeys('browse', 7)).toEqual({ body: 'browse', detail: 'browse:7' });
+    // A tab change moves BOTH keys, so both panes honestly restart at the top;
+    // a listing change moves only the detail key, so the browse list holds.
+    expect(wocMarketScrollKeys('activity', 7).body).not.toBe(wocMarketScrollKeys('browse', 7).body);
+    expect(wocMarketScrollKeys('browse', 8).body).toBe(wocMarketScrollKeys('browse', 7).body);
+    expect(wocMarketScrollKeys('browse', 8).detail).not.toBe(
+      wocMarketScrollKeys('browse', 7).detail,
+    );
   });
 });

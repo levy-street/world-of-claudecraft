@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Une ride sur le puits lunaire',
     desc: 'Pechez un poisson dans les eaux de Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -202,7 +201,6 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Maître récolteur',
-    desc: 'Atteignez 100 points de maîtrise dans trois quelconques des métiers Minage, Bûcheronnage, Herboristerie et Pêche.',
   },
   prog_first_craft: { name: 'Fait main', desc: 'Réussissez votre première fabrication.' },
   prog_craft_specialist: {
@@ -316,7 +314,6 @@ export const table: DeedLocaleTable = {
     title: 'Terrasse-wyrm',
   },
   dgn_sanctum_speed: {
-    name: 'Sprint du Sanctuaire',
     desc: 'Vainquez Korzul le Gravewyrm dans les 15 minutes suivant la prise du Sanctuaire du Gravewyrm par votre groupe.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -382,7 +379,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Les cloches se taisent',
-    desc: "Vaincre le Diacre Varric alors que chaque Sonneur funéraire qu'il relève a déjà été abattu.",
+    desc: "Vaincre le Diacre Vandric alors que chaque Sonneur funéraire qu'il relève a déjà été abattu.",
   },
   dlv_nhalia_bells: {
     name: 'Étouffe-cloches',
@@ -395,7 +392,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Chronique du Val, chapitre II',
-    desc: 'Terminer le deuxième chapitre de la chronique de Saul : bandits, murlocs et vermine de la mine abattus, un match disputé au Pré de la Truie et le Reliquaire bravé.',
   },
   chr_vale_chapter_iii: {
     name: 'Chronique du Val',
@@ -416,7 +412,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Prétendant au Seau de cuivre',
-    desc: "Entrer sur le terrain et toucher le ballon lors d'un match de Coupe du Val au Pré de la Truie.",
   },
   chr_vale_rares: {
     name: 'Les terreurs du Val',
@@ -461,12 +456,11 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Chronique de Thornpeak',
-    desc: "Mener l'histoire de la montagne à son terme : le Culte du Wyrm brisé, le Sanctuaire réduit au silence, le Pic Éveillé abattu et toutes les terreurs nommées des falaises terrassées.",
     title: 'de Thornpeak',
   },
   chr_peaks_sparring: {
     name: 'Exercices de rempart',
-    desc: "Infliger 1 000 points de dégâts au total au Mannequin d'entraînement qui surplombe Highwatch.",
+    desc: "Infliger 1 000 points de dégâts au total à un mannequin d'entraînement.",
   },
   chr_peaks_glimmer_cast: {
     name: 'Eau froide, lumière plus froide encore',
@@ -562,7 +556,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Client privilégié',
-    desc: "Découvrir les dix pièces du stock de l'Intendant Vex.",
+    desc: "Découvrir les dix pièces d'équipement du stock de l'Intendant Vex.",
   },
   col_glimmerfin: {
     name: "Une lueur d'espoir",
@@ -616,69 +610,53 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Crampons sur le pré',
-    desc: "Disputez un match de la Coupe du Val jusqu'à son terme au Pré de la Truie, victoire ou défaite.",
   },
   pvp_vcup_first_win: {
     name: 'Premier trophée',
-    desc: 'Remportez un match classé de la Coupe du Val.',
   },
   pvp_vcup_wins_10: {
     name: 'Briscard de la balle au sanglier',
-    desc: 'Remportez 10 matchs classés de la Coupe du Val.',
   },
   pvp_vcup_wins_25: {
     name: 'Légende de la balle au sanglier',
-    desc: 'Remportez 25 matchs classés de la Coupe du Val.',
     title: 'Légende de la balle au sanglier',
   },
   pvp_vcup_first_goal: {
     name: 'Compteur débloqué',
-    desc: "Marquez un but lors d'un match classé de la Coupe du Val.",
   },
   pvp_vcup_hat_trick: {
     name: 'Coup du chapeau',
-    desc: 'Marquez trois buts dans un même match classé de la Coupe du Val, en catégorie 3v3 ou plus.',
   },
   pvp_vcup_golden_goal: {
     name: 'Instant en or',
-    desc: "Marquez le but en or qui décide d'un match classé de la Coupe du Val.",
   },
   pvp_vcup_first_save: {
     name: 'Des mains sûres',
-    desc: "Réalisez un arrêt en tant que gardien lors d'un match classé de la Coupe du Val.",
   },
   pvp_vcup_clean_sheet: {
     name: 'Rien ne passe',
-    desc: 'Remportez un match classé de la Coupe du Val en tant que gardien sans encaisser de but.',
   },
   pvp_vcup_guild_win: {
     name: 'Pour la bannière',
-    desc: 'Remportez un match classé de la Coupe du Val disputé sous la bannière de votre guilde.',
   },
   pvp_fiesta_first_bout: {
     name: "Taper l'incruste",
-    desc: "Disputez un combat de Fiesta 2v2 jusqu'au bout, victoire ou défaite.",
   },
-  pvp_fiesta_first_win: { name: "L'âme de la Fiesta", desc: 'Remportez un combat de Fiesta 2v2.' },
+  pvp_fiesta_first_win: { name: "L'âme de la Fiesta" },
   pvp_fiesta_double: {
     name: 'Coup double',
-    desc: "Réussissez deux mises au tapis en Fiesta en l'espace de quatre secondes.",
   },
   pvp_fiesta_shutdown: {
     name: 'Trouble-fête',
-    desc: 'Mettez au tapis un adversaire de Fiesta en pleine série de trois ou plus.',
   },
   pvp_fiesta_full_build: {
     name: 'Sur son trente-et-un',
-    desc: 'Remportez un combat de Fiesta avec une amélioration verrouillée à chacune des trois vagues.',
   },
   pvp_fiesta_powerups: {
     name: 'Un de chaque',
-    desc: 'Ramassez au moins une fois chacun des quatre bonus du ring : Démon de vitesse, Colosse, Bottes lunaires et Berserker.',
   },
   pvp_fiesta_five_kills: {
     name: 'Toute la fête sur le dos',
-    desc: 'Réussissez cinq mises au tapis en un seul combat de Fiesta.',
   },
   soc_first_party: {
     name: "L'union fait la force",
@@ -1107,6 +1085,10 @@ export const table: DeedLocaleTable = {
     name: 'Pas une braise perdue',
     desc: "Vainquez Varkhul, Père de la Forge de la Dernière Flamme, en difficulté héroïque sans qu'un seul membre du raid ne meure.",
     title: "l'Indemne",
+  },
+  col_set_bramblehide: {
+    name: 'Peau de Ronces de Roots',
+    desc: 'Découvrir chaque pièce de la Peau de Ronces de Roots.',
   },
 };
 

@@ -17,6 +17,8 @@
   } from '../flag_workflow';
   import { fmtCopper, fmtDate, fmtNumber, fmtRelative } from '../format';
   import { localizeAdminError, t } from '../i18n';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import type { AccountFlagsData, FlagListData, SuspicionFlagEventRow } from '../types';
 
@@ -36,7 +38,7 @@
   ];
 
   let data = $state<FlagListData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let filter = $state<StatusFilter>('active');
   let page = $state(1);
   let expandedFlagId = $state<number | null>(null);
@@ -67,10 +69,10 @@
       const result = await apiGet<FlagListData>(`/admin/api/flags?${params}`);
       if (currentRequest !== requestId) return;
       data = result;
-      failed = false;
+      failed = 'none';
     } catch (err) {
       if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -181,7 +183,9 @@
       </button>
     {/each}
   </div>
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('flags.loadFailed')}</div>
   {:else if data === null}
     <div class="empty">{t('flags.loading')}</div>

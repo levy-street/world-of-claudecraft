@@ -5,11 +5,9 @@
 // the game broadcasts to the whole realm in chat. NO rank multipliers, mob levels, drop
 // rates, loot tables, coin amounts, or boss scripts. Modeled on delves.ts.
 //
-// Deliberately absent: the "Rift Forge". The upgrade/enchant/socket seam exists in the
-// sim and on the wire but has no client caller, and the server refuses the wire
-// commands behind RIFT_FORGE_ENABLED (server/rift_forge_gate.ts). "No client caller"
-// alone never made it unreachable (a crafted frame reaches the wire fine); the server
-// gate is what does. The wiki must not name it until the feature intentionally ships.
+// The Rift Forge section names the service and where the Riftwright stands (the
+// forge shipped with its window, src/ui/hud/rift_forge/, and the sim place gate,
+// src/sim/rift/forge_gate.ts) and nothing about its cost ladder or stat gains.
 
 import { esc } from '../../ui/esc';
 import { formatNumber, t } from '../../ui/i18n';
@@ -45,6 +43,7 @@ export const rifts: GuidePage = {
         ${section('guide.riftsPage.boundHeading', p('guide.riftsPage.boundBody'))}
         ${section('guide.riftsPage.raceHeading', p('guide.riftsPage.raceBody'))}
         ${section('guide.riftsPage.rewardsHeading', p('guide.riftsPage.rewardsBody'))}
+        ${section('guide.riftsPage.forgeHeading', p('guide.riftsPage.forgeBody'))}
         ${section('guide.riftsPage.trackerHeading', p('guide.riftsPage.trackerBody'))}
         ${related([
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },

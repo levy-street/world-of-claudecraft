@@ -1,8 +1,4 @@
-import {
-  IGNIVAR_FORGE_APPROACH_ID,
-  IGNIVAR_LIFT_ROOM_ID,
-  IGNIVAR_MOLTEN_ASSEMBLY_ID,
-} from '../ignivar_raid_ids';
+import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_MOLTEN_ASSEMBLY_ID } from '../ignivar_raid_ids';
 import type { DungeonDifficulty } from '../types';
 
 // The participation token awarded directly to every eligible player when a
@@ -76,14 +72,22 @@ export type HeroicMobTuning = Omit<HeroicDungeonTuning, 'finalBossId' | 'marksPe
 // dungeon-wide multiplier and land their natural premium above trash.
 // Exceptions via damageMultiplierByMob: the three Sanctum bosses are lifted
 // so heroic Sanctum out-hits its retuned NORMAL mode (which floors bosses at
-// 600), and the Nythraxis raid boss floors at 1200 with its add waves held to
-// the 500 line per mob. Mechanic damage lands RAW (no armor step; see
+// 600), and the Nythraxis raid boss instead rides its own calibration (see
+// the per-mob comment on nythraxis_boss_arena below) with its add waves held
+// to the 500 line per mob. Mechanic damage lands RAW (no armor step; see
 // aoePulse/stomp in ../mob/locomotion.ts) and scales with the mob's own
 // multiplier via mechanicDamageMult; support heals scale with
 // mechanicHealMult (= healthMultiplier); both wired in
 // ../instances/difficulty.ts. Gravebreaker (the raid boss frontal) derives
 // from boss.weapon, so it scales through the template transform on its own.
 // Floors are pinned by tests/heroic_difficulty_floors.test.ts.
+// Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+// PINNED constant, not a live measurement of the catalog. The committed
+// max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+// whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+// UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+// The ~39.8% above reads about 32.1% on the 4085 kit.
+//
 // NORMAL-difficulty retunes. Normal spawns default to the raw base templates;
 // a dungeon appears here only when its normal mode needs its own calibration.
 // Unlike the heroic table this one is PER MOB, because the floor-style targets
@@ -97,6 +101,10 @@ export interface NormalDungeonTuning {
   id: string;
   difficulty: Extract<DungeonDifficulty, 'normal'>;
   healthMultiplier: number;
+  // Optional per-mob health override (the heroic table has the same field): a
+  // boss whose health pool is set on its own while the adds keep the shared
+  // multiplier (Nythraxis, 2026-09-04).
+  healthMultiplierByMob?: Record<string, number>;
   damageMultiplierByMob: Record<string, number>;
   // Optional per-mob override for mechanicDamageMult only (aoePulse, stomp,
   // infernoChannel); a mob absent here falls back to its damageMultiplierByMob
@@ -150,6 +158,12 @@ export interface NormalDungeonTuning {
 // spawns from the arena spawn list and the waves through spawnNythraxisAdds,
 // both of which pass this seam. Pinned by
 // tests/heroic_difficulty_floors.test.ts.
+// Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+// PINNED constant, not a live measurement of the catalog. The committed
+// max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+// whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+// UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+// The 100 and 200 lines above are measured on 2861, not on the 4085 kit.
 export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
   [IGNIVAR_FORGE_APPROACH_ID]: {
     id: IGNIVAR_FORGE_APPROACH_ID,
@@ -201,8 +215,17 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     id: 'nythraxis_boss_arena',
     difficulty: 'normal',
     healthMultiplier: 2.0,
+    // The boss alone: 160,000 on the 60,000 template (owner call for the
+    // mechanics redo, 2026-09-04; was the shared 2.0 for 120,000). Adds and
+    // the Bone Spikes keep the shared multiplier.
+    healthMultiplierByMob: {
+      // 120,000 after the first playtest (2026-09-04; the redo tried 160,000).
+      nythraxis_scourge_of_thornpeak: 120_000 / 60_000,
+    },
+    // Boss-only melee retune (2026-09-07): raw swing 257..402, ~90% of
+    // normal Ignivar's own boss (286..446, unmultiplied). Skeletons untouched.
     damageMultiplierByMob: {
-      nythraxis_scourge_of_thornpeak: 5,
+      nythraxis_scourge_of_thornpeak: 1.132,
       nythraxis_skeleton_warrior: 5,
     },
   },
@@ -214,6 +237,12 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
   // normal Wildheart on the SANCTUM NORMAL calibration: the same DOUBLED health
   // and the same reference warrior (level-20 prot, 2861 armor, Defensive
   // Stance), floored per band at trash 100 / boss 200.
+  // Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+  // PINNED constant, not a live measurement of the catalog. The committed
+  // max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+  // whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+  // UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+  // The trash 100 / boss 200 bands above are measured on 2861.
   //
   // Two Wildheart-specific departures from the Sanctum table, both forced by
   // the roster rather than chosen:
@@ -260,21 +289,7 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
 // they must not carry final-boss rewards or lockouts. Keeping them outside
 // HEROIC_DUNGEON_TUNING scopes the pressure pass to the two preboss spawn
 // lists and prevents Varkhul's encounter summons from inheriting it.
-// The forge lift rides here too, for ELIGIBILITY only: it is the raid
-// chain's first room and its only overworld door, so it must sit in
-// HEROIC_DUNGEON_IDS or claimDifficultyForDungeon clamps a heroic
-// selection to normal at the keep door and every deeper room inherits
-// that clamped claim. The lift spawns nothing, so its factors stay 1.
 export const HEROIC_MOB_TUNING: Record<string, HeroicMobTuning> = {
-  [IGNIVAR_LIFT_ROOM_ID]: {
-    id: IGNIVAR_LIFT_ROOM_ID,
-    difficulty: 'heroic',
-    level: 22,
-    healthMultiplier: 1,
-    damageMultiplier: 1,
-    addDamageMultiplier: 1,
-    armorMultiplier: 1,
-  },
   [IGNIVAR_FORGE_APPROACH_ID]: {
     id: IGNIVAR_FORGE_APPROACH_ID,
     difficulty: 'heroic',
@@ -328,6 +343,12 @@ export const HEROIC_MOB_TUNING: Record<string, HeroicMobTuning> = {
     armorMultiplier: 1.2,
   },
 };
+
+// Heroic Varkhul, Master's Assembly (the 50% add intermission): the factor on
+// the three summoned add pools, on top of the per-role progression below.
+// 1 restores the 2026-08-24 tuning that no live raid has cleared; 0.7 is the
+// 2026-09 "very difficult, not impossible" line (rationale on the record).
+export const VARKHUL_HEROIC_ADD_HEALTH_RETUNE = 0.7;
 
 export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   hollow_crypt: {
@@ -409,29 +430,28 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     finalBossId: 'wildheart_high_priest',
     marksPerParticipant: 1,
   },
-  // The 10-player raid arena. The boss floors at 1200 post-mitigation on the
-  // reference warrior (roughly 43% of his hp per 2.6s swing; a raid brings
-  // two or three healers) via the dungeon-wide multiplier; the encounter-
-  // script add waves are held to the five-man 500 line through the per-mob
-  // map, because their base weapon damage spans a 2x spread (the priest add
-  // swings less than half as hard as a Royal Guard). The percentage
-  // mechanics scale on heroic in the encounter script (Soul Rend 1.5x,
-  // Deathless Rage lethal on a failed wardstone channel; see
-  // encounters/nythraxis.ts), and Gravebreaker derives from boss.weapon, so
-  // both track this table without extra wiring. The attunement dungeon
-  // nythraxis_crypt is story content and deliberately has NO heroic record.
-  // The daily raid lockout is difficulty-scoped (the :heroic key beside the
-  // plain dungeon id): one normal AND one heroic Nythraxis kill per day.
+  // The 10-player raid arena. The encounter-script add waves are held to the
+  // five-man 500 line through the per-mob map, because their base weapon
+  // damage spans a 2x spread (the priest add swings less than half as hard as
+  // a Royal Guard). The percentage mechanics scale on heroic in the
+  // encounter script (Soul Rend 1.5x, Deathless Rage lethal on a failed
+  // wardstone channel; see encounters/nythraxis.ts), and Gravebreaker derives
+  // from boss.weapon, so both track this table without extra wiring. The
+  // attunement dungeon nythraxis_crypt is story content and deliberately has
+  // NO heroic record. The daily raid lockout is difficulty-scoped (the
+  // :heroic key beside the plain dungeon id): one normal AND one heroic
+  // Nythraxis kill per day.
+  //
+  // Boss-only melee retune (2026-09-07): raw swing 367..573 via its own
+  // damageMultiplierByMob entry below, ~90% of heroic Varkhul's own boss
+  // (407..637). damageMultiplier (7.25) is no longer read by the boss;
+  // percentage mechanics (Dread Curse, Soul Rend, fire patches) stay
+  // unchanged. Gravebreaker's splash follows the reduced swing.
   nythraxis_boss_arena: {
     id: 'nythraxis_boss_arena',
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 3.2,
-    // 2026-07-24 nerf: 7.25 lands the boss floor at ~1016 (was 8.75 / 1227).
-    // The launch calibration one-shot tanks through the whole progression;
-    // at 1000 the bench raid reaches phase 2 at 46-60% boss with worst-case
-    // scripted play. Further nerfs, if live raids still cannot clear, come
-    // as a morning hotfix from HERE, not from 1200.
     damageMultiplier: 7.25,
     // The raid's add waves spawn through the encounter script
     // (encounters/nythraxis.ts), never spawnBossAdds, so this field is inert
@@ -441,6 +461,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // the summoned 250 floor; their mechanics (Malric's ramping boss heal,
     // Aldren's cleave, Voss's taunt immunity) stay the real threat.
     damageMultiplierByMob: {
+      nythraxis_scourge_of_thornpeak: 1.488,
       nythraxis_skeleton_warrior: 3.75,
       nythraxis_heroic_warrior_add: 3.75,
       nythraxis_heroic_priest_add: 8,
@@ -453,6 +474,13 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // and its respawn gate (only after the previous court dies) self-limits.
     healthMultiplierByMob: {
       nythraxis_skeleton_warrior: 2.22,
+      // Bone Spikes are a DPS target-switch check, not a health sponge: 1.5x
+      // their normal pool (1,500 vs 1,000) so three spikes still shatter inside
+      // the impale drain window when the raid splits onto them.
+      nythraxis_bone_spike: 3.0,
+      // The boss alone: 192,000 on the 60,000 template (owner call after the
+      // first playtest, 2026-09-04; the redo tried 230,000).
+      nythraxis_scourge_of_thornpeak: 192_000 / 60_000,
     },
     armorMultiplier: 1.2,
     finalBossId: 'nythraxis_scourge_of_thornpeak',
@@ -482,13 +510,29 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 5 / 3,
-    // Boss: 120k -> 200k. Add overrides pin the requested per-role Heroic
-    // progression after the shared level transform: Sentinel +20%, Warden
-    // +25%, Artificer +30%.
+    // Boss: 120k -> 200k. Add overrides pin the per-role Heroic progression
+    // after the shared level transform (Sentinel +20%, Warden +25%, Artificer
+    // +30% over their level-22 pools), then apply the 2026-09 adds-phase retune.
+    // The 1200 / 1395 / 2170 figures are pre-elite: createMob multiplies every
+    // elite pool by 2.3, so the spawned Heroic adds were 3,312 / 4,011 / 6,488
+    // (88,500 HP across the 20 wave adds and 3 Artificers of the Master's
+    // Assembly, 1,264 raid DPS with zero downtime inside the 70 s cap).
+    // Live raids realize a median 696 DPS on those adds (best pull 865), and
+    // no Heroic Varkhul pull has finished the intermission; a Monte Carlo of
+    // the shipped encounter (tmp study, 2026-09-06) needed about 1,240 realized
+    // add DPS for a coin flip even with perfect beam soaks and interrupts.
+    // VARKHUL_HEROIC_ADD_HEALTH_RETUNE scales the three intermission adds to
+    // 0.7x (2,318 / 2,807 / 4,542, 61,950 HP, 885 zero-downtime DPS, still
+    // above Normal's 824 and still a hard check where Normal's meltdown is
+    // survivable). Measured with perfect execution: the raid wiping today
+    // clears about one pull in eight, a raid at its Heroic Ignivar output
+    // about four in five. Timers, wave count, heat and the meltdown are
+    // deliberately untouched: a longer cap alone spawns more Artificers and
+    // more heat, and did not help. Pinned by tests/ignivar_varkhul_health.test.ts.
     healthMultiplierByMob: {
-      ignivar_ember_sentinel: (1200 * 1.2) / 1300,
-      ignivar_crucible_warden: (1395 * 1.25) / 1505,
-      ignivar_cinder_artificer: (2170 * 1.3) / 2330,
+      ignivar_ember_sentinel: ((1200 * 1.2) / 1300) * VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
+      ignivar_crucible_warden: ((1395 * 1.25) / 1505) * VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
+      ignivar_cinder_artificer: ((2170 * 1.3) / 2330) * VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
     },
     damageMultiplier: (251.5 * 1.35) / 272.5,
     addDamageMultiplier: 1,

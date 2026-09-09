@@ -113,6 +113,61 @@ describe('Talents V2 dispel and steal primitives', () => {
     expect(stolen?.sourceId).toBe(sim.player.id);
   });
 
+  it('cannot take a flask: the undispellable stamp shields it and no marker reaches the thief', () => {
+    // The phase 10 QA STK-2 ruling (2026-08-16): the flask mint stamps
+    // `undispellable` beside the flask marker (src/sim/items.ts useItem), and
+    // the steal copies the WHOLE aura, marker included, so an unshielded
+    // stolen flask would ride the thief's own singleton, downward-refusal, and
+    // death-persistence rules. The worn fixture is re-sourced from a GENUINE
+    // mint (the mage quaffs the real flask and the captured aura seeds the
+    // enemy), so a mint that loses the stamp reaches BOTH arms. The dispel
+    // executor walks the aura array from the END (effect_dispatch.ts), so
+    // the flask is seated LAST: the walk examines it FIRST, and only the
+    // stamp's skip moves the steal on to the blessing. With the stamp
+    // reverted the steal takes the flask here, and arm 2 below (a
+    // flask-only target) reds independently.
+    const mintFlaskAura = (sim: Sim, itemId: string, familyId: string): Aura => {
+      sim.addItem(itemId, 1, sim.playerId);
+      sim.useItem(itemId, sim.playerId);
+      const idx = sim.player.auras.findIndex((entry) => entry.id === familyId);
+      if (idx < 0) throw new Error(`${itemId} did not mint ${familyId}`);
+      const [minted] = sim.player.auras.splice(idx, 1);
+      return minted;
+    };
+    const sim = new Sim({
+      seed: 24,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    const enemy = addHostile(sim);
+    const minted = mintFlaskAura(sim, 'ironhusk_flask', 'elixir_buff_sta');
+    expect(minted.flask, 'sanity: the mint carries the marker').toBe(true);
+    enemy.auras.push(aura(enemy, 'magic_blessing', 'buff_spellpower', 40, 'holy'));
+    enemy.auras.push({ ...minted, sourceId: enemy.id });
+
+    runAbilityEffect(sim, enemy, 'spellsteal');
+
+    expect(enemy.auras.some((entry) => entry.id === 'elixir_buff_sta')).toBe(true);
+    expect(enemy.auras.some((entry) => entry.id === 'magic_blessing')).toBe(false);
+    expect(sim.player.auras.some((entry) => entry.id === 'elixir_buff_sta')).toBe(false);
+
+    // With ONLY the flask worn, the steal has nothing to take: no flask marker
+    // ever lands on the thief.
+    const sim2 = new Sim({
+      seed: 25,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    const enemy2 = addHostile(sim2);
+    const minted2 = mintFlaskAura(sim2, 'warboar_flask', 'elixir_buff_ap');
+    enemy2.auras.push({ ...minted2, sourceId: enemy2.id });
+    runAbilityEffect(sim2, enemy2, 'spellsteal');
+    expect(enemy2.auras.some((entry) => entry.id === 'elixir_buff_ap')).toBe(true);
+    expect(sim2.player.auras.some((entry) => entry.flask === true)).toBe(false);
+  });
+
   it('does not steal permanent stance-style magic auras', () => {
     const sim = new Sim({ seed: 21, playerClass: 'mage', autoEquip: true });
     const enemy = addHostile(sim);
@@ -131,7 +186,7 @@ describe('Talents V2 dispel and steal primitives', () => {
   it.each([
     ['buff_sta', 10],
     ['buff_sta_pct', 20],
-  ] as const)('reverses non-player %s stat folds when Spellsteal removes them', (kind, value) => {
+  ] as const)('reverses non-player %s stat folds when Spellplunder removes them', (kind, value) => {
     const sim = new Sim({
       seed: 22,
       playerClass: 'mage',
@@ -151,7 +206,7 @@ describe('Talents V2 dispel and steal primitives', () => {
     expect(enemy.hp).toBe(Math.round(baseMaxHp * 0.5));
   });
 
-  it('starts Greater Invisibility damage reduction when Spellsteal ends the vanish', () => {
+  it('starts Greater Invisibility damage reduction when Spellplunder ends the vanish', () => {
     const sim = new Sim({
       seed: 23,
       playerClass: 'mage',
@@ -451,7 +506,12 @@ describe('Talents V2 stasis and resource-sap primitives', () => {
     // v0.29 druid tree moved the Lifesap unlock to the row 17 pick.
     const sapGain = (control: boolean): number => {
       const run = (withSap: boolean): number => {
-        const sim = new Sim({ seed: 10, playerClass: 'druid', autoEquip: true, world: EMPTY_TEST_WORLD });
+        const sim = new Sim({
+          seed: 10,
+          playerClass: 'druid',
+          autoEquip: true,
+          world: EMPTY_TEST_WORLD,
+        });
         sim.setPlayerLevel(20);
         expect(
           sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } }),

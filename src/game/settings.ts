@@ -44,10 +44,18 @@ export const SETTING_RANGES = {
   // still means Low and a stored 1 still means High.
   terrainDetail: { min: 0, max: 2, def: 1 },
   foliageDensity: { min: 0, max: 2, def: 1 },
+  // The shader warm-up worker (src/game/shader_warm_setting.ts): 0 auto
+  // (follows the GPU backend), 1 off, 2 on. Read at the next start.
+  shaderWarm: { min: 0, max: 2, def: 0 },
+  // The desktop shell's graphics backend on Linux
+  // (src/game/desktop_gpu_backend_sync.ts): 0 auto (one Vulkan trial),
+  // 1 Vulkan, 2 OpenGL. Mirrors the shell prefs store; next launch.
+  gpuBackend: { min: 0, max: 2, def: 0 },
   effectsQuality: { min: 0, max: 1, def: 1 },
-  // Capped at High (the 4096 map): the retired Insane rung's 8192x8192 shadow
-  // target was a ~256 MB-class GPU allocation redrawn every frame. A stored
-  // historical 2 clamps to 1 on load, and gfx.ts maps it to the High base too.
+  // Capped at High (the 4096 map, above the High tier's own 2560 base): the
+  // retired Insane rung's 8192x8192 shadow target was a ~256 MB-class GPU
+  // allocation redrawn every frame. A stored historical 2 clamps to 1 on
+  // load, and gfx.ts maps it to the same top rung.
   shadowQuality: { min: 0, max: 1, def: 1 },
   // The worn-surface triplanar layer dial (0 Off, 0.5 Basic, 1 Full, 2
   // Insane), new in round 10: the town-street frame-cost dial.
@@ -145,14 +153,25 @@ export const SETTING_RANGES = {
   // Scales the hover tooltip's text so small-screen / low-vision players can
   // read item & ability tooltips without squinting.
   tooltipScale: { min: 0.85, max: 1.5, def: 1 },
-  // Scales the combat-log / chat text independently of tooltips.
-  chatFontScale: { min: 0.85, max: 1.4, def: 1 },
+  // Scales the combat-log / chat text independently of tooltips. The ceiling
+  // is 2.5 (not the 1.4 the other comfort scales stop near) because chat is
+  // 11px at stock: on a 4K display at 100% OS scaling, 1.4 still leaves it
+  // unreadable, and 2.0 is what restores 1080p-equivalent size. 2.5 leaves
+  // headroom for low-vision players and TV distances.
+  chatFontScale: { min: 0.85, max: 2.5, def: 1 },
   // Dims the chat frame's backdrop so it obscures less of the world (1 = the
   // classic opaque frame, lower = more see-through).
   chatOpacity: { min: 0.3, max: 1, def: 1 },
   // Scales floating combat text (the damage/heal numbers over units). Bigger
   // for readability on a TV; smaller to declutter a busy fight.
   fctScale: { min: 0.7, max: 1.8, def: 1 },
+  // How large the nameplate dot row draws, 100% to 300% of the plate-native
+  // size. Plate space is small and the row's countdown is a number a player
+  // reads mid-fight, so 100% is deliberately the FLOOR rather than the middle:
+  // the slider only ever makes it bigger. Defaults to 150% because the native
+  // size measured too small to read at a glance (owner feedback). The renderer
+  // sees this multiplied by the showNameplateDots toggle, so 0 means off.
+  nameplateDotScale: { min: 1, max: 3, def: 1.5 },
   // Fades the HUD panels & windows as a whole; lets players see more of the
   // world behind their frames without hiding them entirely.
   hudOpacity: { min: 0.5, max: 1, def: 1 },
@@ -181,10 +200,16 @@ export const SETTING_RANGES = {
   playerFrameHeight: { min: 8, max: 30, def: 15 },
   targetFrameWidth: { min: 100, max: 320, def: 190 },
   targetFrameHeight: { min: 8, max: 30, def: 15 },
+  // Health text on the player frame and on the target (plus target-of-target)
+  // frame, same mode table as partyFrameHealthText below; both default to the
+  // historical always-on "current / max".
+  playerFrameHealthText: { min: 0, max: 4, def: 3 },
+  targetFrameHealthText: { min: 0, max: 4, def: 3 },
   // WoW-style party/raid frame profile. Width/height are CSS pixels before the
   // independent scale; columns and spacing let raids grow across rather than
   // covering the whole left edge. style: 0 automatic, 1 classic, 2 raid frames.
-  // healthTextMode: 0 none, 1 percent, 2 current, 3 current/max.
+  // healthTextMode (party, player and target frames alike): 0 none, 1 percent,
+  // 2 current, 3 current/max, 4 current/max (percent).
   // partyFrameSort: 0 group, 1 role, 2 name.
   partyFrameStyle: { min: 0, max: 2, def: 0 },
   partyFrameScale: { min: 0.7, max: 1.4, def: 1 },
@@ -192,7 +217,7 @@ export const SETTING_RANGES = {
   partyFrameHeight: { min: 20, max: 72, def: 42 },
   partyFrameSpacing: { min: 0, max: 12, def: 4 },
   partyFrameColumns: { min: 1, max: 5, def: 1 },
-  partyFrameHealthText: { min: 0, max: 3, def: 1 },
+  partyFrameHealthText: { min: 0, max: 4, def: 1 },
   partyFrameSort: { min: 0, max: 2, def: 0 },
 } as const;
 
@@ -310,12 +335,20 @@ export const BOOL_SETTINGS = {
   groundReticle: { def: true },
   // off by default: anchor the player's own BUFF row to the movable player
   // frame instead of the classic top-right corner. hud.ts reparents the buff
-  // bar into #player-frame (above it while docked over the action bars, below
-  // it once the frame is moved), so it follows the frame's spot and scale; the
+  // bar into #player-frame, where it sits above the frame by default; the
   // debuff row stays put in the DOM and slides up beside the minimap (the
   // vacated top spot) so incoming debuffs keep one glanceable classic corner.
   // Desktop only; the mobile layout keeps its own aura placement.
   aurasOnPlayerFrame: { def: false },
+  // off by default (buffs sit above the frame): flips the anchored buff row to
+  // below the frame instead. Only visible when aurasOnPlayerFrame is on. Purely
+  // presentational (main.ts toggles body.auras-below-frame; hud.css keys off
+  // it), so it is a deliberate player choice, independent of whether the frame
+  // has been moved: the row used to flip above/below based on the frame's
+  // dragged (pf-detached) state, which meant moving the frame even once
+  // silently and permanently relocated the buffs with no way back short of a
+  // full frame reset. See hud.css #player-frame > #buff-bar.
+  auraBarBelowFrame: { def: false },
   // off by default: bypass the low graphics preset's buff-icon cap
   // (AURA_VISIBLE_CAP_LOW, src/game/ui_tier_knobs.ts) so every active buff
   // always renders in #buff-bar, at the cap's per-frame cost. The cap itself
@@ -387,6 +420,36 @@ export const BOOL_SETTINGS = {
   // decluttering crowded hubs on short mobile viewports. Purely a local display
   // preference; mob nameplates and unit frames are unaffected.
   showPlayerNameplates: { def: true },
+  // on by default: draw the LOCAL player's own debuffs as a small icon row on an
+  // enemy's overhead nameplate, between the name row and the health bar, each with
+  // a cooldown swipe and a countdown. Only YOUR debuffs, on mobs only; the group's
+  // stay on the target frame strip, which is the clutter this row exists to avoid.
+  // Class-agnostic (ownership plus isDebuffAura, never an ability list) and never
+  // graphics-tier gated: these are timers a player acts on.
+  showNameplateDots: { def: true },
+  // on by default: the Target dots frame (#target-dots), the multi-target tracker
+  // listing every debuff YOU have out across every enemy in interest range, one
+  // bar row each with a live countdown. Hidden entirely while you have no dots
+  // out, so the default costs a player who never uses it nothing.
+  showTargetDots: { def: true },
+  // The six aura tracks (src/ui/hud/aura_tracks/): bars listing the player's OWN
+  // beneficial auras, one frame per question. ALL OFF BY DEFAULT and opted into
+  // individually: six frames on at once would put roughly twenty rows on screen
+  // for a healer in a raid, on a first login, for a player who asked for none of
+  // it. The options panel is the discovery surface. None is graphics-tier gated:
+  // these are timers a player acts on, so the setting is the only switch.
+  showDefensivesTrack: { def: false },
+  showSelfBuffTrack: { def: false },
+  showOffensiveTrack: { def: false },
+  showUtilityTrack: { def: false },
+  showFriendlyTrack: { def: false },
+  showShieldTrack: { def: false },
+  // A sub-option of the Movement and Stealth track, the only track that carries
+  // MODE rows: the utility modes (stealth, travel form, Ghost Wolf) are steady
+  // chips rather than timers, so a player who wants Dash timed may not want a
+  // permanent stealth row parked in the bar. It is a plain row in the Combat
+  // tab (not nested); it simply has no effect while that track is off.
+  showUtilityModes: { def: true },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },
@@ -635,6 +698,16 @@ export class Settings {
 
   all(): GameSettings {
     return { ...this.values };
+  }
+
+  /**
+   * The nameplate dot row's drawn SIZE for the renderer: the scale slider gated
+   * by the show toggle, so 0 means "draw no row at all". The two settings fold
+   * here rather than at each of main.ts's three apply sites, so the toggle and
+   * the slider can never disagree about whether the row is on.
+   */
+  nameplateDotRenderScale(): number {
+    return this.values.showNameplateDots ? this.values.nameplateDotScale : 0;
   }
 
   /** Validate every value, apply the whole patch, then persist the settings blob once. */

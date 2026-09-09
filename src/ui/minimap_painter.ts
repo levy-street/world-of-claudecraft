@@ -82,6 +82,11 @@ const MOB_DOT_RADIUS = 2.25;
 const MOB_AGGRO_DIAMOND_RADIUS = 3.5;
 const MOB_LOOT_SIZE = 5;
 const MOB_LOOT_CORE_SIZE = 1.5;
+// Harvest-only corpse: an upright pelt triangle (apex one radius above the
+// point, base one radius wide each side at PELT_BASE_RATIO below it), so it
+// reads apart from the axis-aligned loot square by silhouette, not hue.
+const MOB_HARVEST_RADIUS = 3.5;
+const MOB_HARVEST_BASE_RATIO = 0.7;
 const PIP_RADIUS_RATIO = 0.35; // inner pip radius = max(PIP_MIN, disc radius * ratio)
 const PIP_MIN_RADIUS = 1;
 const PARTY_DEAD_CROSS_RATIO = 0.55;
@@ -114,6 +119,14 @@ const GATHER_FALLBACK_LOCK_SHACKLE_TOP_WIDTH = 1.4;
 // apart from the round gather dots and the axis-aligned loot/mob squares at
 // minimap scale. Half-diagonal in px.
 const STATION_DIAMOND_RADIUS = 3;
+// Farm-patch sprout, a shade larger than the station diamond so its two leaves
+// stay separable at minimap scale. The ratios below place the crown (where the
+// leaves and stem meet) and each leaf's inner heel; map_window_painter.ts
+// repeats them at its own radius so the two surfaces draw one silhouette.
+const FARM_SPROUT_RADIUS = 3.5;
+const FARM_SPROUT_CROWN = 0.2;
+const FARM_SPROUT_HEEL_X = 0.15;
+const FARM_SPROUT_HEEL_Y = 0.25;
 
 // Party / player arrow triangle geometry (canvas-local, drawn under a rotation).
 const PARTY_ARROW_TIP_X = 6;
@@ -167,6 +180,7 @@ interface MinimapPaintGeometry {
   readonly mobAggroDiamondRadius: number;
   readonly mobLootSize: number;
   readonly mobLootCoreSize: number;
+  readonly mobHarvestRadius: number;
   readonly pipMinRadius: number;
   readonly partyDiscScale: number;
   readonly partyDeadCrossWidth: number;
@@ -179,6 +193,7 @@ interface MinimapPaintGeometry {
   readonly playerArrowBaseY: number;
   readonly playerArrowOutlineWidth: number;
   readonly stationDiamondRadius: number;
+  readonly farmSproutRadius: number;
   readonly neutralNpcRadius: number;
   readonly neutralNpcOutlineWidth: number;
   readonly neutralNpcInkWidth: number;
@@ -209,6 +224,7 @@ const MINIMAP_PAINT_GEOMETRY = Object.freeze({
     mobAggroDiamondRadius: MOB_AGGRO_DIAMOND_RADIUS,
     mobLootSize: MOB_LOOT_SIZE,
     mobLootCoreSize: MOB_LOOT_CORE_SIZE,
+    mobHarvestRadius: MOB_HARVEST_RADIUS,
     pipMinRadius: PIP_MIN_RADIUS,
     partyDiscScale: 1,
     partyDeadCrossWidth: PARTY_DEAD_CROSS_WIDTH,
@@ -221,6 +237,7 @@ const MINIMAP_PAINT_GEOMETRY = Object.freeze({
     playerArrowBaseY: PLAYER_ARROW_BASE_Y,
     playerArrowOutlineWidth: PLAYER_ARROW_OUTLINE_WIDTH,
     stationDiamondRadius: STATION_DIAMOND_RADIUS,
+    farmSproutRadius: FARM_SPROUT_RADIUS,
     neutralNpcRadius: QUEST_NEUTRAL_RADIUS,
     neutralNpcOutlineWidth: QUEST_FALLBACK_OUTLINE_WIDTH,
     neutralNpcInkWidth: QUEST_FALLBACK_INK_WIDTH,
@@ -246,6 +263,7 @@ const MINIMAP_PAINT_GEOMETRY = Object.freeze({
     mobAggroDiamondRadius: MOB_AGGRO_DIAMOND_RADIUS * 1.5,
     mobLootSize: MOB_LOOT_SIZE * 1.5,
     mobLootCoreSize: MOB_LOOT_CORE_SIZE * 1.5,
+    mobHarvestRadius: MOB_HARVEST_RADIUS * 1.5,
     pipMinRadius: PIP_MIN_RADIUS * 1.5,
     partyDiscScale: 1.45,
     partyDeadCrossWidth: 1.75,
@@ -258,6 +276,7 @@ const MINIMAP_PAINT_GEOMETRY = Object.freeze({
     playerArrowBaseY: PLAYER_ARROW_BASE_Y * 1.5,
     playerArrowOutlineWidth: 1.5,
     stationDiamondRadius: STATION_DIAMOND_RADIUS * 1.5,
+    farmSproutRadius: FARM_SPROUT_RADIUS * 1.5,
     neutralNpcRadius: QUEST_NEUTRAL_RADIUS * 1.5,
     neutralNpcOutlineWidth: 4,
     neutralNpcInkWidth: 1.75,
@@ -277,6 +296,16 @@ function beginDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, radiu
   ctx.lineTo(x + radius, y);
   ctx.lineTo(x, y + radius);
   ctx.lineTo(x - radius, y);
+  ctx.closePath();
+}
+
+/** Begin the upright pelt triangle for a harvest-only corpse. */
+function beginPelt(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number): void {
+  const baseY = y + radius * MOB_HARVEST_BASE_RATIO;
+  ctx.beginPath();
+  ctx.moveTo(x, y - radius);
+  ctx.lineTo(x + radius, baseY);
+  ctx.lineTo(x - radius, baseY);
   ctx.closePath();
 }
 
@@ -1512,6 +1541,16 @@ export class MinimapPainter {
             geometry.mobLootCoreSize,
           );
           break;
+        case 'mob-harvest':
+          // A body with only its harvest left: the pelt triangle in the same
+          // corpse-loot paint, told apart from the loot square by shape.
+          ctx.fillStyle = colors.mobLoot;
+          ctx.strokeStyle = colors.outline;
+          ctx.lineWidth = geometry.dynamicOutlineWidth;
+          beginPelt(ctx, m.mx, m.my, geometry.mobHarvestRadius);
+          ctx.fill();
+          ctx.stroke();
+          break;
         case 'corpse':
           // The local player's body during a ghost run: a procedural skull.
           drawCorpseSkull(ctx, m.mx, m.my, colors.corpse, colors.outline, geometry);
@@ -1612,6 +1651,42 @@ export class MinimapPainter {
             ctx.fill();
             ctx.stroke();
           }
+          break;
+        }
+        case 'farm-patch': {
+          // A farm patch shares the station painted-size family because it is
+          // a static service site. Keep the procedural sprout as the deliberate
+          // fallback if the committed sprite is unavailable. Tier-identical
+          // (fairness invariant): never preset- or governor-gated.
+          const sizeId = profile === 'compact' ? 'minimapStationCompact' : 'minimapStation';
+          const sprite = this.markerArt.sprite('farm-patch', sizeId);
+          if (sprite) {
+            const size = MAP_MARKER_SIZES[sizeId];
+            ctx.drawImage(sprite, Math.round(m.mx - size / 2), Math.round(m.my - size / 2));
+            break;
+          }
+          const radius = geometry.farmSproutRadius;
+          const crownY = m.my - radius * FARM_SPROUT_CROWN;
+          const heelX = radius * FARM_SPROUT_HEEL_X;
+          const heelY = m.my + radius * FARM_SPROUT_HEEL_Y;
+          ctx.fillStyle = colors.station;
+          ctx.strokeStyle = colors.outline;
+          ctx.lineWidth = geometry.markerOutlineWidth;
+          ctx.beginPath();
+          ctx.moveTo(m.mx, crownY);
+          ctx.lineTo(m.mx - radius, m.my - radius);
+          ctx.lineTo(m.mx - heelX, heelY);
+          ctx.closePath();
+          ctx.moveTo(m.mx, crownY);
+          ctx.lineTo(m.mx + radius, m.my - radius);
+          ctx.lineTo(m.mx + heelX, heelY);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(m.mx, crownY);
+          ctx.lineTo(m.mx, m.my + radius);
+          ctx.stroke();
           break;
         }
         case 'gather-node': {

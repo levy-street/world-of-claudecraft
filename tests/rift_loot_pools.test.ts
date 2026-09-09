@@ -74,6 +74,10 @@ describe('rift clear-loot pools', () => {
       for (const entry of entries) {
         const item = entry.itemId ? ITEMS[entry.itemId] : undefined;
         if (!item?.slot || item.quality !== 'epic') continue;
+        if (entry.preserveSourceTier) {
+          expect(pool).not.toContain(entry.itemId);
+          continue;
+        }
         expect(pool, `${entry.itemId} from ${bossId}`).toContain(entry.itemId);
       }
     }

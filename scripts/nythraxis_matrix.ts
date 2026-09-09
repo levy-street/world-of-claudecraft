@@ -5,6 +5,7 @@ import {
   validateAllocation,
 } from '../src/sim/content/talents';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
+import { collectionFitsRole, selectLegalGear } from '../src/sim/dev/gear_selection';
 import { canEquipItem, weaponHand } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import {
@@ -874,6 +875,7 @@ function tankCandidates(slot: ItemDef['slot'], cls?: PlayerClass): ItemDef[] {
     .filter(
       (item) =>
         item.slot === slot &&
+        collectionFitsRole(item, cls ?? 'warrior', 'tank') &&
         !isNythraxisDrop(item) &&
         (item.requiredLevel ?? 1) <= 20 &&
         (cls === undefined
@@ -907,15 +909,17 @@ const SHARED_TANK_SINGLE_SLOTS: ItemDef['slot'][] = [
   'feet',
 ];
 
+function tankGear(cls?: PlayerClass): Partial<Record<EquipSlot, string>> {
+  const rows: [EquipSlot, ItemDef[]][] = SHARED_TANK_SINGLE_SLOTS.map((slot) => [
+    slot as EquipSlot,
+    tankCandidates(slot, cls),
+  ]);
+  rows.push(['ring1', tankCandidates('ring', cls)], ['ring2', tankCandidates('ring', cls)]);
+  return selectLegalGear(cls ?? 'warrior', null, rows, (id) => ITEMS[id]);
+}
+
 function sharedTankGearIds(): string[] {
-  return [
-    ...SHARED_TANK_SINGLE_SLOTS.map((slot) => sharedTankCandidates(slot)[0]?.id).filter(
-      (id): id is string => !!id,
-    ),
-    ...sharedTankCandidates('ring')
-      .slice(0, 2)
-      .map((ring) => ring.id),
-  ];
+  return Object.values(tankGear());
 }
 
 function equipSharedTankGear(sim: Sim, pid: number, cls: PlayerClass): void {
@@ -923,17 +927,14 @@ function equipSharedTankGear(sim: Sim, pid: number, cls: PlayerClass): void {
   // item its own class can wear. The plate and mail tanks converge on one
   // identical kit (they share the armor tier); the druid lands on leather with
   // the same neck and rings, which is the comparison the study wants.
-  for (const slot of SHARED_TANK_SINGLE_SLOTS) {
-    const item = tankCandidates(slot, cls)[0];
-    if (!item) continue;
-    sim.addItem(item.id, 1, pid);
+  for (const [slot, itemId] of Object.entries(tankGear(cls)) as [EquipSlot, string][]) {
+    sim.addItem(itemId, 1, pid);
     // Equip by explicit slot: a dual-wield-capable tank (the Stonebound
     // shaman) would otherwise route its mainhand pick into the empty offhand.
-    sim.equipItemToSlot(item.id, slot as EquipSlot, pid);
-  }
-  for (const [index, ring] of tankCandidates('ring', cls).slice(0, 2).entries()) {
-    sim.addItem(ring.id, 1, pid);
-    sim.equipItemToSlot(ring.id, `ring${index + 1}` as EquipSlot, pid);
+    sim.equipItemToSlot(itemId, slot, pid);
+    if (sim.meta(pid)?.equipment[slot] !== itemId) {
+      throw new Error(`Tank reference kit refused ${cls} ${slot}:${itemId}`);
+    }
   }
 }
 
@@ -955,19 +956,25 @@ function equipBest(sim: Sim, pid: number, spec: Spec) {
     }
     return;
   }
-  for (const slot of SLOTS) {
-    const item = Object.values(ITEMS)
+  const rows: [EquipSlot, ItemDef[]][] = SLOTS.map((slot) => [
+    slot,
+    Object.values(ITEMS)
       .filter(
         (candidate) =>
           !isNythraxisDrop(candidate) &&
+          collectionFitsRole(candidate, spec.cls, spec.kind) &&
           candidate.slot === slot &&
           (candidate.kind === 'weapon' || candidate.kind === 'armor') &&
           canEquipItem(spec.cls, candidate),
       )
-      .sort((a, b) => statScore(b, spec) - statScore(a, spec))[0];
-    if (item) {
-      sim.addItem(item.id, 1, pid);
-      sim.equipItem(item.id, pid);
+      .sort((a, b) => statScore(b, spec) - statScore(a, spec)),
+  ]);
+  const kit = selectLegalGear(spec.cls, spec.talents.spec, rows, (id) => ITEMS[id]);
+  for (const [slot, itemId] of Object.entries(kit) as [EquipSlot, string][]) {
+    sim.addItem(itemId, 1, pid);
+    sim.equipItemToSlot(itemId, slot, pid);
+    if (sim.meta(pid)?.equipment[slot] !== itemId) {
+      throw new Error(`Reference kit refused ${spec.key} ${slot}:${itemId}`);
     }
   }
 }

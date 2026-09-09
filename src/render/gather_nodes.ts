@@ -172,6 +172,12 @@ function copyMeshRenderState(source: THREE.Mesh, target: THREE.InstancedMesh): v
   target.onAfterShadow = source.onAfterShadow;
 }
 
+// DELIBERATELY NOT on the shared glb_instanced_props kernel (stations and
+// farm_patches adopted it at farming Phase 7 QA): this variant composes
+// per-(part, instance) matrices with per-instance tier scale and base
+// anchoring, carries picker userData tables, and mirrors shadow render state,
+// so only the ~8-line InstancedMesh tail would be shared and the adoption
+// would be abstraction for uniformity, not reuse.
 function addInstancedBatch(
   group: THREE.Group,
   batch: GatherNodeBatch,

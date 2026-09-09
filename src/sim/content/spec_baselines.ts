@@ -45,7 +45,12 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // deep-equal pin in spec_baselines.test.ts guards the damage-only
       // shape. Both arms are relatively level-invariant, an accepted
       // remainder for the hunter kit-item pass alongside Marksmanship.
-      stats: { agi: 3, crit: 0.03, dodge: 0.12, apPct: 0.15 },
+      // v0.42.0 Fieldcraft +10% (docs/design/class-balance-v042.md): apPct
+      // 0.15 -> 0.22 lifts the AP feed (autos + pet inheritance); the offense
+      // physical ability bonus 0.30 -> 0.45 delta lives ONLY in
+      // spec_output_tuning.ts (never grown here), so the legacy meleeDmgPct
+      // stays untouched and no buff/utility collateral grows with it.
+      stats: { agi: 3, crit: 0.03, dodge: 0.12, apPct: 0.22 },
       global: { meleeDmgPct: 0.3 },
     },
   },
@@ -59,8 +64,12 @@ export const SPEC_BASELINES: SpecBaselineTable = {
   // per-ability and meleeDmgPct rows never touch; meleeDmgPct tops up the builder
   // and finisher share. The legendary itself is not touched here (separate PR).
   rogue: {
+    // v0.42.0 Knifework +10% (docs/design/class-balance-v042.md): apPct
+    // 0.36 -> 0.57 lifts the auto-heavy AP feed; the offense melee ability
+    // bonus 0.22 -> 0.32 delta lives ONLY in spec_output_tuning.ts (never
+    // grown here), so meleeDmgPct stays at its legacy 0.22.
     assassination: {
-      stats: { crit: 0.12, apPct: 0.36 },
+      stats: { crit: 0.12, apPct: 0.57 },
       global: { meleeDmgPct: 0.22 },
       ability: [
         { ability: 'sinister_strike', costPct: -0.16 },
@@ -72,13 +81,18 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       global: { meleeDmgPct: 0.16 },
       ability: [{ ability: 'sinister_strike', dmgPct: 0.2, costPct: -0.16 }],
     },
+    // v0.42.0 Skulduggery numeric budget: a straight reduction of the
+    // existing legacy fields (no offense-only component involved, since none
+    // of these are collateral-bearing buffs). Trial sustained target: about
+    // -10%. apPct 0.12 -> 0 (no AP floor left), meleeDmgPct 0.08 -> 0.04,
+    // ambush's own dmgPct 0.16 -> 0 (its true-stealth opener reward is a
+    // separate gameplay-slice mechanic, out of this numeric package).
     subtlety: {
-      stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.12 },
-      global: { meleeDmgPct: 0.08 },
+      stats: { agi: 7, crit: 0.1, dodge: 0.05 },
+      global: { meleeDmgPct: 0.04 },
       ability: [
         { ability: 'stealth', cooldownPct: -0.7 },
         { ability: 'backstab', dmgPct: 0.16 },
-        { ability: 'ambush', dmgPct: 0.16 },
       ],
     },
   },
@@ -177,21 +191,36 @@ export const SPEC_BASELINES: SpecBaselineTable = {
         { ability: 'drain_life', costPct: -0.08 },
       ],
     },
+    // v0.42.0 Necromancy +20% (docs/design/class-balance-v042.md): the owner
+    // spell offensive delta (0.10 -> 0.32 total) lives ONLY in
+    // spec_output_tuning.ts (never grown here, so Fiendhide's existing
+    // spellDmgPct-fed armor collateral does not grow with it). petDmgPct
+    // 0.15 -> 0.42 is the paired baseline pet scaling (read directly by
+    // hunterPetDamageMultiplier for every owned undead). soul_harvest's own
+    // dmgPct 0.08 -> 0.096 is the exact damage-only refinement the design doc
+    // works through: (1 + 0.32 + 0.096) / (1 + 0.10 + 0.08) = 1.416 / 1.18,
+    // exactly +20%.
     demonology: {
       // v0.28.x stat-identity pass: trimmed the oversized self-stamina (was Sta
       // +15, Sta +8%, Armor +6%). Demonology stays bulky but gains its damage
       // stat. Pet armour/health is not a modifier the engine exposes (only pet
       // damage), so that direction would be a separate feature, not this pass.
       stats: { sta: 8, armorPct: 0.06, int: 6 },
-      global: { spellDmgPct: 0.1, petDmgPct: 0.15 },
+      global: { spellDmgPct: 0.1, petDmgPct: 0.42 },
       ability: [
-        { ability: 'soul_harvest', costPct: -0.08, dmgPct: 0.08 },
+        { ability: 'soul_harvest', costPct: -0.08, dmgPct: 0.096 },
         { ability: 'bone_armor', costPct: -0.08 },
       ],
     },
+    // v0.42.0 Ruination +10%: the owner spell offensive delta (+0.11) lives
+    // ONLY in spec_output_tuning.ts. petDmgPct 0 -> 0.10 is the paired
+    // ordinary-pet bonus (imp/felhunter/succubus/voidwalker, plus the Pyre
+    // Colossus's normal melee swings, which already route through
+    // hunterPetDamageMultiplier); the Colossus's periodic Pyre Aura nova
+    // bypasses that path and takes the explicit combat/destruction.ts fix.
     destruction: {
       stats: { sta: 6 },
-      global: { spellDmgPct: 0.1 },
+      global: { spellDmgPct: 0.1, petDmgPct: 0.1 },
       ability: [
         { ability: 'shadow_bolt', costPct: -0.23, castPct: -0.03 },
         { ability: 'immolate', costPct: -0.23, castPct: -0.03 },
@@ -215,7 +244,12 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // staPct 0.25 (2026-07 tank parity, with Sloth Form armor 1.9 -> 2.3):
       // leather has no plate tier to grow into, so the form multiplier and
       // the baseline carry the difference (the Dire Bear logic).
-      stats: { armorPct: 0.23, staPct: 0.25 },
+      // v0.42.0 Wildfang +10% (docs/design/class-balance-v042.md): apPct 0.10
+      // feeds the autos in both forms; the paired offensive physical ability
+      // bonus (+0.15, form attacks and bleeds) lives ONLY in
+      // spec_output_tuning.ts, never CAT_FORM_DAMAGE_MULT/Wild Apex/armor/
+      // Marrowbreak's shield.
+      stats: { armorPct: 0.23, staPct: 0.25, apPct: 0.1 },
       global: { threatPct: 0.2 },
       ability: [
         { ability: 'maul', dmgPct: 0.35 },

@@ -1,0 +1,938 @@
+{
+  "harnessVersion": "1.2.0",
+  "generatedAt": "2026-09-07T01:37:26.876Z",
+  "seed": 20260907,
+  "repos": [
+    {
+      "label": "baseline",
+      "path": "/Users/reubenhorne/Documents/code/world-of-claudecraft/wt-intentional-gathering-plan",
+      "commit": "0f53c92ff738ebebb6add787a61caecdf7e8e884",
+      "dirty": true
+    },
+    {
+      "label": "final",
+      "path": "/Users/reubenhorne/Documents/code/world-of-claudecraft/wt-intentional-gathering-sources",
+      "commit": "b2ec9c8fd9254a0bcc1a306b86ec48ce857ed4dc",
+      "dirty": false
+    }
+  ],
+  "measurements": [
+    {
+      "scenarioId": "corpse_ordinary_interact",
+      "family": "corpseHarvesting",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 3,
+      "successfulHarvests": 1,
+      "deniedAttempts": 2,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 1,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 1,
+          "kind": "plain"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 1,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "ordinary interact GATHERED materials via the corpse harvest arm: pre-Field-Kit \"unified F\" behavior (expected only on baseline)",
+        "ordinary loot succeeded on 1 of 3 attempts: the corpse's ordinary loot slot is single-use, so a press after it is spent correctly finds nothing left to interact with, which is not a gather denial",
+        "diagnostic text seen: __nothing_to_interact__",
+        "corpse: forest_wolf (id 90001), tags hide+fang, componentTags real, dead/aiState/corpseTimer/loot set explicitly by this fixture, actor and corpse both placed at groundPos(0, 0)"
+      ]
+    },
+    {
+      "scenarioId": "corpse_intentional_all",
+      "family": "corpseHarvesting",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 1,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 1,
+          "kind": "plain"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 1,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": ["baseline-tree path: instant harvestCorpse with a components override"]
+    },
+    {
+      "scenarioId": "corpse_intentional_focused",
+      "family": "corpseHarvesting",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 2,
+          "kind": "plain"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 1,
+      "slotsAfter": 2,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": ["baseline-tree path: instant harvestCorpse with a components override"]
+    },
+    {
+      "scenarioId": "corpse_full_bag_pressure",
+      "family": "corpseHarvesting",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 0,
+      "deniedAttempts": 1,
+      "harvestedUnits": [],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 16,
+      "slotsAfter": 16,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bags padded to 16 occupied real equipment slots (real bagCapacity ceiling) before the attempt",
+        "command reported started despite full bags (see slot delta and harvested units)",
+        "denial/error text: Your bags are full.",
+        "slots unchanged by the refusal",
+        "no materials granted, as expected"
+      ]
+    },
+    {
+      "scenarioId": "corpse_party_shared_supply",
+      "family": "corpseHarvesting",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 2,
+      "successfulHarvests": 1,
+      "deniedAttempts": 1,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 1,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 1,
+          "kind": "plain"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 4,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "A and B are a REAL formed party (partyInvite + partyAccept)",
+        "player A (first claimant) granted: true",
+        "player B (partied second attempt) reported started: undefined, actually granted anything: false",
+        "player B denial/error text: This corpse has already been harvested.",
+        "the shared corpse must not pay both party members from one death"
+      ]
+    },
+    {
+      "scenarioId": "corpse_live_travel_and_cast",
+      "family": "corpseHarvesting",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 1,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 1,
+          "kind": "plain"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 1,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 1.75,
+      "travelSimSeconds": 1.75,
+      "castSimSeconds": 0,
+      "notes": [
+        "arrived after 35 real movement ticks",
+        "harvest command accepted at arrival",
+        "movement is the real stepPlayerMotion kernel via moveInput; never a teleport"
+      ]
+    },
+    {
+      "scenarioId": "corpse_premium_yield_sample",
+      "family": "corpseHarvesting",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 12,
+      "successfulHarvests": 12,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 16,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 15,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 4,
+          "kind": "signed"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bounded SEEDED premium/canonical yield sample over 12 fresh seeds (20260907..20260918), each a fresh single-use forest_wolf corpse harvested for All materials",
+        "deliberately separate from the live-timing scenarios above: this exists to exercise and report real signed/specimen premium classification, not pacing",
+        "every unit kind here is read from the real harvestResult event, never inferred from whether the pick was focused"
+      ]
+    },
+    {
+      "scenarioId": "node_action_smoke_sample_ore",
+      "family": "mining",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 8,
+      "successfulHarvests": 8,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "copper_ore",
+          "qty": 8,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bounded ACTION-SMOKE sample over 8 fresh seeds (20260907..20260914), teleported to node ore_eastbrook_1",
+        "this is a real Sim.harvestNode action per sample, not a direct pure-yield-function call: 8 samples is a smoke count, not a statistical distribution"
+      ]
+    },
+    {
+      "scenarioId": "node_action_smoke_sample_wood",
+      "family": "logging",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 8,
+      "successfulHarvests": 8,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "ironbark_log",
+          "qty": 8,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bounded ACTION-SMOKE sample over 8 fresh seeds (20260907..20260914), teleported to node wood_eastbrook_1",
+        "this is a real Sim.harvestNode action per sample, not a direct pure-yield-function call: 8 samples is a smoke count, not a statistical distribution"
+      ]
+    },
+    {
+      "scenarioId": "node_action_smoke_sample_herb",
+      "family": "herbalism",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 8,
+      "successfulHarvests": 8,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "silverleaf_herb",
+          "qty": 8,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bounded ACTION-SMOKE sample over 8 fresh seeds (20260907..20260914), teleported to node herb_eastbrook_1",
+        "this is a real Sim.harvestNode action per sample, not a direct pure-yield-function call: 8 samples is a smoke count, not a statistical distribution"
+      ]
+    },
+    {
+      "scenarioId": "node_live_travel_and_cast_ore",
+      "family": "mining",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "copper_ore",
+          "qty": 1,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 4.25,
+      "travelSimSeconds": 1.75,
+      "castSimSeconds": 2.5,
+      "notes": ["node ore_eastbrook_1", "cast started and ran to completion"]
+    },
+    {
+      "scenarioId": "node_live_travel_and_cast_wood",
+      "family": "logging",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "ironbark_log",
+          "qty": 1,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 4.25,
+      "travelSimSeconds": 1.75,
+      "castSimSeconds": 2.5,
+      "notes": ["node wood_eastbrook_1", "cast started and ran to completion"]
+    },
+    {
+      "scenarioId": "node_live_travel_and_cast_herb",
+      "family": "herbalism",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "silverleaf_herb",
+          "qty": 1,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 5,
+      "travelSimSeconds": 2.5,
+      "castSimSeconds": 2.5,
+      "notes": ["node herb_eastbrook_1", "cast started and ran to completion"]
+    },
+    {
+      "scenarioId": "farming_plant_and_harvest",
+      "family": "farming",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "vale_wheat",
+          "qty": 5,
+          "kind": "farm"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 3,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 2700,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "grow interval: 2700s of injected wall-clock, reported separately from the harvest action itself",
+        "the harvest command itself is instantaneous once the plot is ready; the wait is passive, not active play time"
+      ]
+    },
+    {
+      "scenarioId": "fishing_action_lifecycle_sample",
+      "family": "fishing",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 8,
+      "successfulHarvests": 8,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "raw_mirror_trout",
+          "qty": 6,
+          "kind": "fish"
+        },
+        {
+          "itemId": "raw_river_perch",
+          "qty": 2,
+          "kind": "fish"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "ACTION-LIFECYCLE sampling: the tick counter is jumped to the drawn bite deadline",
+        "this is real startFishing/updateCasting code, but NOT a full live-tick travel simulation",
+        "a completed reel that catches an empty hook is a real outcome, counted as success (not a denial)"
+      ]
+    },
+    {
+      "scenarioId": "recipe_required_vs_gathered",
+      "family": "recipeEffort",
+      "repoLabel": "baseline",
+      "seed": 20260907,
+      "attempts": 6,
+      "successfulHarvests": 5,
+      "deniedAttempts": 1,
+      "harvestedUnits": [
+        {
+          "itemId": "wolf_fang",
+          "qty": 2,
+          "kind": "plain"
+        },
+        {
+          "itemId": "evergarden_greens",
+          "qty": 25,
+          "kind": "farm"
+        },
+        {
+          "itemId": "fine_evergarden_greens",
+          "qty": 2,
+          "kind": "farm"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 151208,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 8,
+      "notes": [
+        "a BOUNDED real acquisition example, not a full recipe completion: reports required vs actually-gathered per reagent, never a claim the whole recipe was crafted",
+        "other acquisition sources are named with their real required count and explicitly NOT attempted",
+        "EARLY recipe recipe_eastbrook_arming_sword (skillReq 0), result eastbrook_arming_sword x1:",
+        "wolf_fang (corpseHarvesting): required 2, gathered 2 [MET]",
+        "bone_fragments: required 4, outside gathering families; acquisition not simulated by this harness",
+        "smithing_flux: required 6, outside gathering families; acquisition not simulated by this harness",
+        "LATE recipe recipe_evergarden_hoe (skillReq 125), result evergarden_hoe x1:",
+        "plant refused with only the tier-1 starter hoe (garden_hoe): farmDenied:skill:bed_evergarden_1:evergarden_greens",
+        "cycle 1: properly equipped/skilled harvest SUCCEEDED, granted 9x evergarden_greens, 1x fine_evergarden_greens after the crop's real 37800s grow interval",
+        "cycle 2: properly equipped/skilled harvest SUCCEEDED, granted 3x evergarden_greens after the crop's real 37800s grow interval",
+        "cycle 3: properly equipped/skilled harvest SUCCEEDED, granted 6x evergarden_greens after the crop's real 37800s grow interval",
+        "cycle 4: properly equipped/skilled harvest SUCCEEDED, granted 7x evergarden_greens, 1x fine_evergarden_greens after the crop's real 37800s grow interval",
+        "late farm: 2 of 2 required fine fine_evergarden_greens gathered across every real harvest (normal and fine grants both counted as a real success; fine yield is a per-pick RNG chance, not guaranteed by tier)",
+        "fine_evergarden_greens (farming): required 2, gathered 2 [MET]",
+        "osmium_hoe: required 1, outside gathering families; acquisition not simulated by this harness"
+      ]
+    },
+    {
+      "scenarioId": "corpse_ordinary_interact",
+      "family": "corpseHarvesting",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 3,
+      "successfulHarvests": 1,
+      "deniedAttempts": 2,
+      "harvestedUnits": [],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 1,
+      "slotsAfter": 2,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "ordinary interact granted zero GATHERED units (expected on final): the gather ledger and the ordinary-loot ledger below are counted separately",
+        "ordinary loot succeeded on 1 of 3 attempts: the corpse's ordinary loot slot is single-use, so a press after it is spent correctly finds nothing left to interact with, which is not a gather denial",
+        "diagnostic text seen: __nothing_to_interact__",
+        "corpse: forest_wolf (id 90001), tags hide+fang, componentTags real, dead/aiState/corpseTimer/loot set explicitly by this fixture, actor and corpse both placed at groundPos(0, 0)"
+      ]
+    },
+    {
+      "scenarioId": "corpse_intentional_all",
+      "family": "corpseHarvesting",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 1,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 1,
+          "kind": "plain"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 4,
+      "elapsedSimSeconds": 1.5,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 1.5,
+      "notes": ["final-tree path: Field Kit + preference + timed cast"]
+    },
+    {
+      "scenarioId": "corpse_intentional_focused",
+      "family": "corpseHarvesting",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 2,
+          "kind": "plain"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 1.5,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 1.5,
+      "notes": ["final-tree path: Field Kit + preference + timed cast"]
+    },
+    {
+      "scenarioId": "corpse_full_bag_pressure",
+      "family": "corpseHarvesting",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 0,
+      "deniedAttempts": 1,
+      "harvestedUnits": [],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 16,
+      "slotsAfter": 16,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bags padded to 16 occupied real equipment slots (real bagCapacity ceiling) before the attempt",
+        "refused as expected",
+        "denial/error text: Your bags are full.",
+        "slots unchanged by the refusal",
+        "no materials granted, as expected"
+      ]
+    },
+    {
+      "scenarioId": "corpse_party_shared_supply",
+      "family": "corpseHarvesting",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 2,
+      "successfulHarvests": 1,
+      "deniedAttempts": 1,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 1,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 1,
+          "kind": "plain"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 4,
+      "slotsAfter": 6,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "A and B are a REAL formed party (partyInvite + partyAccept)",
+        "player A (first claimant) granted: true",
+        "player B (partied second attempt) reported started: false, actually granted anything: false",
+        "player B denial/error text: This corpse has already been harvested.",
+        "the shared corpse must not pay both party members from one death"
+      ]
+    },
+    {
+      "scenarioId": "corpse_live_travel_and_cast",
+      "family": "corpseHarvesting",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 1,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 1,
+          "kind": "plain"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 4,
+      "elapsedSimSeconds": 3.25,
+      "travelSimSeconds": 1.75,
+      "castSimSeconds": 1.5,
+      "notes": [
+        "arrived after 35 real movement ticks",
+        "harvest command accepted at arrival",
+        "movement is the real stepPlayerMotion kernel via moveInput; never a teleport"
+      ]
+    },
+    {
+      "scenarioId": "corpse_premium_yield_sample",
+      "family": "corpseHarvesting",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 12,
+      "successfulHarvests": 12,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "rough_hide",
+          "qty": 16,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 15,
+          "kind": "plain"
+        },
+        {
+          "itemId": "wolf_fang",
+          "qty": 4,
+          "kind": "signed"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bounded SEEDED premium/canonical yield sample over 12 fresh seeds (20260907..20260918), each a fresh single-use forest_wolf corpse harvested for All materials",
+        "deliberately separate from the live-timing scenarios above: this exists to exercise and report real signed/specimen premium classification, not pacing",
+        "every unit kind here is read from the real harvestResult event, never inferred from whether the pick was focused"
+      ]
+    },
+    {
+      "scenarioId": "node_action_smoke_sample_ore",
+      "family": "mining",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 8,
+      "successfulHarvests": 8,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "copper_ore",
+          "qty": 8,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bounded ACTION-SMOKE sample over 8 fresh seeds (20260907..20260914), teleported to node ore_eastbrook_1",
+        "this is a real Sim.harvestNode action per sample, not a direct pure-yield-function call: 8 samples is a smoke count, not a statistical distribution"
+      ]
+    },
+    {
+      "scenarioId": "node_action_smoke_sample_wood",
+      "family": "logging",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 8,
+      "successfulHarvests": 8,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "ironbark_log",
+          "qty": 8,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bounded ACTION-SMOKE sample over 8 fresh seeds (20260907..20260914), teleported to node wood_eastbrook_1",
+        "this is a real Sim.harvestNode action per sample, not a direct pure-yield-function call: 8 samples is a smoke count, not a statistical distribution"
+      ]
+    },
+    {
+      "scenarioId": "node_action_smoke_sample_herb",
+      "family": "herbalism",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 8,
+      "successfulHarvests": 8,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "silverleaf_herb",
+          "qty": 8,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "bounded ACTION-SMOKE sample over 8 fresh seeds (20260907..20260914), teleported to node herb_eastbrook_1",
+        "this is a real Sim.harvestNode action per sample, not a direct pure-yield-function call: 8 samples is a smoke count, not a statistical distribution"
+      ]
+    },
+    {
+      "scenarioId": "node_live_travel_and_cast_ore",
+      "family": "mining",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "copper_ore",
+          "qty": 1,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 4.25,
+      "travelSimSeconds": 1.75,
+      "castSimSeconds": 2.5,
+      "notes": ["node ore_eastbrook_1", "cast started and ran to completion"]
+    },
+    {
+      "scenarioId": "node_live_travel_and_cast_wood",
+      "family": "logging",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "ironbark_log",
+          "qty": 1,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 4.25,
+      "travelSimSeconds": 1.75,
+      "castSimSeconds": 2.5,
+      "notes": ["node wood_eastbrook_1", "cast started and ran to completion"]
+    },
+    {
+      "scenarioId": "node_live_travel_and_cast_herb",
+      "family": "herbalism",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "silverleaf_herb",
+          "qty": 1,
+          "kind": "node"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 2,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 5,
+      "travelSimSeconds": 2.5,
+      "castSimSeconds": 2.5,
+      "notes": ["node herb_eastbrook_1", "cast started and ran to completion"]
+    },
+    {
+      "scenarioId": "farming_plant_and_harvest",
+      "family": "farming",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 1,
+      "successfulHarvests": 1,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "vale_wheat",
+          "qty": 5,
+          "kind": "farm"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 3,
+      "slotsAfter": 3,
+      "elapsedSimSeconds": 2700,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "grow interval: 2700s of injected wall-clock, reported separately from the harvest action itself",
+        "the harvest command itself is instantaneous once the plot is ready; the wait is passive, not active play time"
+      ]
+    },
+    {
+      "scenarioId": "fishing_action_lifecycle_sample",
+      "family": "fishing",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 8,
+      "successfulHarvests": 8,
+      "deniedAttempts": 0,
+      "harvestedUnits": [
+        {
+          "itemId": "raw_mirror_trout",
+          "qty": 6,
+          "kind": "fish"
+        },
+        {
+          "itemId": "raw_river_perch",
+          "qty": 2,
+          "kind": "fish"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 0,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 0,
+      "notes": [
+        "ACTION-LIFECYCLE sampling: the tick counter is jumped to the drawn bite deadline",
+        "this is real startFishing/updateCasting code, but NOT a full live-tick travel simulation",
+        "a completed reel that catches an empty hook is a real outcome, counted as success (not a denial)"
+      ]
+    },
+    {
+      "scenarioId": "recipe_required_vs_gathered",
+      "family": "recipeEffort",
+      "repoLabel": "final",
+      "seed": 20260907,
+      "attempts": 6,
+      "successfulHarvests": 5,
+      "deniedAttempts": 1,
+      "harvestedUnits": [
+        {
+          "itemId": "wolf_fang",
+          "qty": 2,
+          "kind": "plain"
+        },
+        {
+          "itemId": "evergarden_greens",
+          "qty": 25,
+          "kind": "farm"
+        },
+        {
+          "itemId": "fine_evergarden_greens",
+          "qty": 2,
+          "kind": "farm"
+        }
+      ],
+      "distinctUnwantedItemIds": [],
+      "slotsBefore": 0,
+      "slotsAfter": 0,
+      "elapsedSimSeconds": 151209.5,
+      "travelSimSeconds": 0,
+      "castSimSeconds": 9.5,
+      "notes": [
+        "a BOUNDED real acquisition example, not a full recipe completion: reports required vs actually-gathered per reagent, never a claim the whole recipe was crafted",
+        "other acquisition sources are named with their real required count and explicitly NOT attempted",
+        "EARLY recipe recipe_eastbrook_arming_sword (skillReq 0), result eastbrook_arming_sword x1:",
+        "wolf_fang (corpseHarvesting): required 2, gathered 2 [MET]",
+        "bone_fragments: required 4, outside gathering families; acquisition not simulated by this harness",
+        "smithing_flux: required 6, outside gathering families; acquisition not simulated by this harness",
+        "LATE recipe recipe_evergarden_hoe (skillReq 125), result evergarden_hoe x1:",
+        "plant refused with only the tier-1 starter hoe (garden_hoe): farmDenied:skill:bed_evergarden_1:evergarden_greens",
+        "cycle 1: properly equipped/skilled harvest SUCCEEDED, granted 9x evergarden_greens, 1x fine_evergarden_greens after the crop's real 37800s grow interval",
+        "cycle 2: properly equipped/skilled harvest SUCCEEDED, granted 3x evergarden_greens after the crop's real 37800s grow interval",
+        "cycle 3: properly equipped/skilled harvest SUCCEEDED, granted 6x evergarden_greens after the crop's real 37800s grow interval",
+        "cycle 4: properly equipped/skilled harvest SUCCEEDED, granted 7x evergarden_greens, 1x fine_evergarden_greens after the crop's real 37800s grow interval",
+        "late farm: 2 of 2 required fine fine_evergarden_greens gathered across every real harvest (normal and fine grants both counted as a real success; fine yield is a per-pick RNG chance, not guaranteed by tier)",
+        "fine_evergarden_greens (farming): required 2, gathered 2 [MET]",
+        "osmium_hoe: required 1, outside gathering families; acquisition not simulated by this harness"
+      ]
+    }
+  ]
+}

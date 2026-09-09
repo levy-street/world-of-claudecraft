@@ -1,0 +1,19 @@
+{
+  "_purpose": "Committed evidence for the eighth v0.41.0 sync's ARM 3 rider (2026-08-30): the CLEAN RELEASE-TIP capture the Phase 16 QA recorded as owed at the next real sync, plus the merged-branch A/B. Release side = origin/release/v0.41.0 3e801dc925 served from a detached scratch worktree on :5177; branch side = feature/masterwrought merge commit 4f72218ed4 on :5173. PERF_GPU=1 headed Chrome, both viewports, two runs per side (the first launch is cold). VERDICT: the 1062 anchor is KEPT and is now grounded in a clean release-tip capture (worst steady capture 1054 desktop on BOTH sides; the branch adds zero writes on either viewport). The release warm run's desktop 1074 was captured under concurrent six-lane vitest load and never reproduced on the branch side; recorded as jitter, not absorbed into the anchor. Both sides carry the same two release-span console errors (character asset not preloaded: models/creatures/training_dummy.glb on desktop, models/weapons/brasscrown_walking_staff.glb on mobile), which are the tour's exit-1 cause and not a HUD elision signal.",
+  "release-3e801dc925-run1": {
+    "desktop": { "hudHotDomWrites": 1054, "frameLong50": 2, "frames": 1449, "fps": 108.78 },
+    "mobile": { "hudHotDomWrites": 573, "frameLong50": 1, "frames": 1569, "fps": 118.49 }
+  },
+  "release-3e801dc925-run2-warm": {
+    "desktop": { "hudHotDomWrites": 1074, "frameLong50": 2, "frames": 1447, "fps": 108.6 },
+    "mobile": { "hudHotDomWrites": 589, "frameLong50": 1, "frames": 1568, "fps": 118.41 }
+  },
+  "branch-4f72218ed4-run1": {
+    "desktop": { "hudHotDomWrites": 1054, "frameLong50": 1, "frames": 1503, "fps": 112.63 },
+    "mobile": { "hudHotDomWrites": 573, "frameLong50": 1, "frames": 1562, "fps": 117.81 }
+  },
+  "branch-4f72218ed4-run2-warm": {
+    "desktop": { "hudHotDomWrites": 1054, "frameLong50": 1, "frames": 1512, "fps": 113.51 },
+    "mobile": { "hudHotDomWrites": 564, "frameLong50": 1, "frames": 1550, "fps": 116.53 }
+  }
+}

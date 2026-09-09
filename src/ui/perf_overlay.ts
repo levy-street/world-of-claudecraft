@@ -14,6 +14,7 @@ import type { PerfOverlayConfig } from './perf_overlay_config';
 import {
   DEFAULT_PERF_BG_RGB,
   DEFAULT_PERF_FG,
+  overlayCssOffset,
   overlayFractionFromPixel,
   overlayPixelPosition,
   PERF_OVERLAY_MARGIN,
@@ -22,6 +23,7 @@ import {
   type PerfValue,
   rgbaFromHex,
 } from './perf_overlay_model';
+import { getUiScale } from './ui_scale';
 
 interface RowEls {
   row: HTMLDivElement;
@@ -51,6 +53,10 @@ export class PerfOverlay {
   private grabDX = 0;
   private grabDY = 0;
   private lastPx = { left: 0, top: 0 };
+  // Read once at grab and reused for the whole gesture: UI Scale never changes
+  // mid-drag, and getUiScale() forces a style flush, which a raw pointermove
+  // stream (well over the ~4Hz reposition() cadence) should not pay per event.
+  private dragScale = 1;
 
   /** Fired when a drag settles, with the new normalized 0..1 position. */
   onPositionChange: ((x: number, y: number) => void) | null = null;
@@ -223,12 +229,23 @@ export class PerfOverlay {
     return { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
   }
 
+  // The overlay's own rendered VISUAL (post-zoom) box size, matching parentRect()'s
+  // space. offsetWidth/offsetHeight are AUTHOR-space under #ui's zoom (unlike
+  // getBoundingClientRect(), which reports the same post-zoom space clientX/clientY
+  // and parentRect() use), so mixing them into this clamp would corrupt the
+  // available-space math whenever UI Scale isn't 1: confirmed live, #perf-overlay at
+  // UI Scale 0.85 measured offsetWidth 116 vs getBoundingClientRect().width 98.4
+  // (116 * 0.85 = 98.6).
+  private visualSize(fallback: { w: number; h: number }): { w: number; h: number } {
+    const r = this.el.getBoundingClientRect();
+    return { w: r.width || fallback.w, h: r.height || fallback.h };
+  }
+
   /** Place the overlay from its normalized position, clamped fully on-screen. */
   reposition(): void {
     if (!this.enabled || !this.cfg) return;
     const parent = this.parentRect();
-    const ow = this.el.offsetWidth || 120;
-    const oh = this.el.offsetHeight || 40;
+    const { w: ow, h: oh } = this.visualSize({ w: 120, h: 40 });
     const { left, top } = overlayPixelPosition(
       this.cfg.posX,
       this.cfg.posY,
@@ -238,14 +255,19 @@ export class PerfOverlay {
       oh,
     );
     this.lastPx = { left, top };
-    this.el.style.left = `${left}px`;
-    this.el.style.top = `${top}px`;
+    // left/top are VISUAL (post-zoom) pixels; #perf-overlay lives inside #ui
+    // (`zoom: var(--ui-scale)`), so the style write divides into AUTHOR space,
+    // which the zoom re-multiplies back to this visual position (ui_scale.ts).
+    const css = overlayCssOffset({ left, top }, getUiScale());
+    this.el.style.left = `${css.left}px`;
+    this.el.style.top = `${css.top}px`;
   }
 
   private onPointerDown(e: PointerEvent): void {
     if (!this.placement) return;
     e.preventDefault();
     this.dragging = true;
+    this.dragScale = getUiScale();
     const rect = this.el.getBoundingClientRect();
     this.grabDX = e.clientX - rect.left;
     this.grabDY = e.clientY - rect.top;
@@ -261,8 +283,7 @@ export class PerfOverlay {
   private onPointerMove(e: PointerEvent): void {
     if (!this.dragging) return;
     const parent = this.parentRect();
-    const ow = this.el.offsetWidth;
-    const oh = this.el.offsetHeight;
+    const { w: ow, h: oh } = this.visualSize({ w: 0, h: 0 });
     const maxL = Math.max(PERF_OVERLAY_MARGIN, parent.width - ow - PERF_OVERLAY_MARGIN);
     const maxT = Math.max(PERF_OVERLAY_MARGIN, parent.height - oh - PERF_OVERLAY_MARGIN);
     const left = Math.min(
@@ -271,8 +292,13 @@ export class PerfOverlay {
     );
     const top = Math.min(maxT, Math.max(PERF_OVERLAY_MARGIN, e.clientY - parent.top - this.grabDY));
     this.lastPx = { left, top };
-    this.el.style.left = `${left}px`;
-    this.el.style.top = `${top}px`;
+    // Same author-space compensation as reposition(): clientX/clientY and the
+    // clamp above are VISUAL, but the write is an author length #ui's zoom
+    // re-multiplies back on screen. dragScale (not a fresh getUiScale() read) is
+    // this gesture's grab-time scale: see the field comment.
+    const css = overlayCssOffset({ left, top }, this.dragScale);
+    this.el.style.left = `${css.left}px`;
+    this.el.style.top = `${css.top}px`;
   }
 
   private onPointerUp(e: PointerEvent): void {
@@ -285,8 +311,7 @@ export class PerfOverlay {
     }
     this.el.classList.remove('dragging');
     const parent = this.parentRect();
-    const ow = this.el.offsetWidth;
-    const oh = this.el.offsetHeight;
+    const { w: ow, h: oh } = this.visualSize({ w: 0, h: 0 });
     const frac = overlayFractionFromPixel(
       this.lastPx.left,
       this.lastPx.top,

@@ -50,9 +50,33 @@
 //
 // THE VAULT CONTAINER reuses the personal op vocabulary ('deposit', 'withdraw',
 // 'buy_slots'), so every shape and replay rule above applies to it unchanged.
-// Ordinary pooled stock keys as [itemId, null]. Identity-preserving rows key as
-// [itemId, {vaultSpecial:1,instance,craftedRecipeId}], so crafted and glyph-bearing
-// copies reconcile without flattening. Its purchased_slots_after column carries
+// Ordinary pooled stock keys as [itemId, null]. Identity-preserving holdings key
+// as [itemId, {vaultSpecial:1,instance,craftedRecipeId}], so crafted and
+// glyph-bearing copies reconcile without flattening.
+//
+// WHICH of the two a holding gets is decided per SOURCE BUCKET, not per row.
+// Since per-unit provenance landed, a material stack carries its signers in
+// source buckets rather than on the payload, and the vault stores an
+// attribution-bearing block in `special` even when it holds ordinary unrecorded
+// units. So a row's canonical payload plus one bucket's legacy `signer` is that
+// bucket's EFFECTIVE payload, and a holding with no payload, no crafted marker
+// and no signer is POOLED STOCK whichever store it physically sits in. Three
+// consequences the replay depends on:
+//   - a signed material that used to sit as `instance:{signer}` and now sits as
+//     a payload-free row with a signer bucket keys IDENTICALLY, so rows written
+//     on either side of the change reconcile against either shape of state;
+//   - the deposit-time fold of compact units into an identity block writes NO
+//     row, because it moves units between representations and changes no total;
+//   - a GATHERER never enters this key space at all. It is new information with
+//     no historical identity here, and folding it in would split one old
+//     identity into many. Gatherer and signature movement is the separate
+//     material_source_journal's business; this table stays a COUNT ledger.
+// The one historical shape that needs reading, not rewriting:
+// `{vaultSpecial:1,instance:null,craftedRecipeId:null}`, which older rows gave
+// a sanitizer-demoted payload-free special row. historicalVaultIdentity folds it
+// onto the pooled key those units now project to, on read.
+//
+// Its purchased_slots_after column carries
 // the upgrade RUNG (state.vault.upgrades), the monotonic ladder analogue of the
 // bank's purchasedSlots. A character with vault rows but no persisted
 // state.vault reconciles against an EMPTY vault, the same corruption signature
@@ -312,21 +336,126 @@ function checkCounterpartyBalance(row, base, findings) {
   }
 }
 
-// A multiset key over an item: its id plus a stable serialization of the
-// per-instance payload (null when absent). Both the ledger `instance` column and
-// characters.state are JSONB, so Postgres normalizes each side's key order the
-// same way; equal payloads therefore serialize identically here. Most bank items
-// are fungible (instance absent) so the key is just [itemId, null].
-function multisetKey(itemId, instance) {
-  return JSON.stringify([itemId ?? null, instance ?? null]);
+/** JSON with every object's keys sorted, recursively: one serialization for one
+ *  value, whatever order its keys arrived in. */
+function canonicalJson(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? 'null';
+  const keys = Object.keys(value)
+    .filter((key) => value[key] !== undefined)
+    .sort();
+  return `{${keys.map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(',')}}`;
 }
 
-function vaultSpecialIdentity(slot) {
-  return {
-    vaultSpecial: 1,
-    instance: slot.instance ?? null,
-    craftedRecipeId: slot.craftedRecipeId ?? null,
-  };
+// A multiset key over an item: its id plus a CANONICAL serialization of the
+// per-instance payload (null when absent). Most bank items are fungible
+// (instance absent) so the key is just [itemId, null].
+//
+// Canonical rather than raw JSON.stringify, because the two sides of every
+// reconciliation do NOT arrive in one key order. A ledger row's `instance`
+// column comes back in Postgres's own jsonb order (length, then bytes), while
+// the state side is REBUILT here (vaultCountGroups, socketStateMultiset) in
+// source-literal order, and a fixture supplies whatever order it was written
+// in. Sorting only ever merges keys that key order had spuriously split; it can
+// never split one that matched, so it strictly widens correct matching.
+function multisetKey(itemId, instance) {
+  return JSON.stringify([itemId ?? null, canonicalJson(instance ?? null)]);
+}
+
+// --- The vault COUNT identity (mirrors server/bank_ledger.ts) ---------------
+//
+// Dependency-free by the same rule as the ladder constants above: this script
+// runs under plain node against a database, so it cannot import the TypeScript
+// material model. tests/bank_audit.test.ts pins this projection against the
+// writer's, row for row, which is what keeps the mirror honest.
+//
+// The rule: a vault holding's identity is its row payload plus the SOURCE
+// BUCKET's legacy `signer` (the EFFECTIVE payload), and a holding with no
+// payload, no crafted marker and no signer is ordinary pooled stock whichever
+// store it sits in. A GATHERER is never part of it. See the writer for why.
+
+/** Row payload + the bucket's signer, keys sorted so the legacy
+ *  signer-on-payload shape and the normalized signer-in-buckets shape
+ *  serialize identically. Null when nothing per-copy survives. */
+function effectiveCountPayload(payload, signer) {
+  const merged = { ...(payload && typeof payload === 'object' ? payload : {}) };
+  if (signer !== undefined) merged.signer = signer;
+  const keys = Object.keys(merged)
+    .filter((key) => merged[key] !== undefined)
+    .sort();
+  if (keys.length === 0) return null;
+  const out = {};
+  for (const key of keys) out[key] = merged[key];
+  return out;
+}
+
+function vaultCountIdentity(instance, craftedRecipeId) {
+  if (instance === null && craftedRecipeId === null) return null;
+  return { vaultSpecial: 1, instance, craftedRecipeId };
+}
+
+/** True when a persisted row's buckets can be read as an exact composition:
+ *  a nonempty array of {source,count} with positive integer counts summing to
+ *  the row's count, and no signer ALSO left on the payload (which would make
+ *  the reading ambiguous). Anything else falls back to the whole-row legacy
+ *  projection, matching the writer's own normalize-or-fall-back arm. */
+function readableSourceBuckets(slot) {
+  const buckets = slot.materialSources;
+  if (!Array.isArray(buckets) || buckets.length === 0) return null;
+  if (slot.instance && typeof slot.instance === 'object' && slot.instance.signer !== undefined) {
+    return null;
+  }
+  let total = 0;
+  for (const bucket of buckets) {
+    if (!bucket || typeof bucket !== 'object') return null;
+    const source = bucket.source;
+    if (!source || typeof source !== 'object' || Array.isArray(source)) return null;
+    if (source.signer !== undefined && typeof source.signer !== 'string') return null;
+    const count = Number(bucket.count);
+    if (!Number.isSafeInteger(count) || count <= 0) return null;
+    total += count;
+  }
+  return total === Number(slot.count) ? buckets : null;
+}
+
+/** One vault row's count-ledger holdings, split by source bucket. */
+function vaultCountGroups(slot) {
+  const crafted = slot.craftedRecipeId ?? null;
+  const buckets = readableSourceBuckets(slot);
+  if (buckets === null) {
+    const payload = effectiveCountPayload(slot.instance, undefined);
+    return [{ identity: vaultCountIdentity(payload, crafted), count: Number(slot.count ?? 0) }];
+  }
+  return buckets.map((bucket) => ({
+    identity: vaultCountIdentity(
+      effectiveCountPayload(slot.instance, bucket.source.signer),
+      crafted,
+    ),
+    count: Number(bucket.count),
+  }));
+}
+
+/**
+ * A LEDGER ROW's stored identity, read compatibly.
+ *
+ * Rows written before the per-bucket rule gave a payload-free, marker-free
+ * special row the all-null wrapper `{vaultSpecial:1,instance:null,
+ * craftedRecipeId:null}` (the sanitizer-demoted case). Under the rule that
+ * holding is pooled stock, so those historical rows must key onto the pooled
+ * identity or they reconcile against nothing forever. Folded HERE, on read,
+ * rather than by rewriting the append-only table.
+ *
+ * Only that exact shape folds; every other wrapper keeps its identity.
+ */
+function historicalVaultIdentity(instance) {
+  if (
+    isExactVaultSpecialIdentity(instance) &&
+    instance.instance === null &&
+    instance.craftedRecipeId === null
+  ) {
+    return null;
+  }
+  return instance;
 }
 
 function isExactVaultSpecialIdentity(value) {
@@ -404,9 +533,12 @@ function vaultStockOf(vault) {
   return stock;
 }
 
-// The item multiset a vault currently holds. Ordinary stock stays pooled under
-// [itemId, null]; each special row carries the exact versioned identity the
-// ledger writer emits. Keys are walked sorted where source order is irrelevant.
+// The item multiset a vault currently holds, in the COUNT ledger's identity
+// space. Ordinary stock keys as [itemId, null]; each special row splits by
+// SOURCE BUCKET into effective payloads, so a payload-free block of unrecorded
+// units keys as pooled stock (it is) while a signed bucket keys exactly the way
+// the same signature keyed when it lived on the payload. Keys are walked sorted
+// where source order is irrelevant.
 function vaultStateMultiset(vault) {
   const m = new Map();
   const stock = vaultStockOf(vault);
@@ -417,8 +549,10 @@ function vaultStateMultiset(vault) {
   const special = Array.isArray(vault?.special) ? vault.special : [];
   for (const slot of special) {
     if (!slot || typeof slot !== 'object' || typeof slot.itemId !== 'string') continue;
-    const key = multisetKey(slot.itemId, vaultSpecialIdentity(slot));
-    m.set(key, (m.get(key) ?? 0) + Number(slot.count ?? 0));
+    for (const group of vaultCountGroups(slot)) {
+      const key = multisetKey(slot.itemId, group.identity);
+      m.set(key, (m.get(key) ?? 0) + group.count);
+    }
   }
   return m;
 }
@@ -1044,7 +1178,11 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
       ) {
         continue;
       }
-      const key = multisetKey(row.item_id, row.instance);
+      // historicalVaultIdentity folds the ONE pre-per-bucket vault wrapper
+      // (payload-free, marker-free) onto the pooled key the same holding now
+      // projects to. Every other identity, and every non-vault row, passes
+      // through untouched.
+      const key = multisetKey(row.item_id, historicalVaultIdentity(row.instance));
       const delta = row.op === 'deposit' ? Number(row.count) : -Number(row.count);
       const next = (net.get(key) ?? 0) + delta;
       net.set(key, next);

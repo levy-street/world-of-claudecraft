@@ -164,15 +164,33 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 13 mount cues, and all 62 UI cues in one 268-key inventory', () => {
+  it('keeps the merged catalog, all 34 mount cues, and all 72 UI cues in one 299-key inventory', () => {
+    // Combine the release farming/crafting cues with the candidate mount cues.
+    // Counts measured from SFX: 299 total, 72 UI, 34 mount. A mount may share
+    // player footfalls or have several cues, so this is not a mount count.
     const keys = new Set(SFX.map((entry) => entry.key));
-    // 268 = the release catalog plus the two gendered player-voice keys from
-    // PR #2320 and the rickshaw mount's summon/loop cues.
-    expect(keys.size).toBe(268);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
+    expect(keys.size).toBe(299);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(72);
+    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(34);
     expect(keys.has('ui_craft_cast')).toBe(true);
+    expect(keys.has('ui_farm_plant')).toBe(true);
+    expect(keys.has('ui_farm_harvest')).toBe(true);
+    expect(keys.has('ui_farm_withered')).toBe(true);
+    expect(keys.has('ui_farm_ready')).toBe(true);
+    expect(keys.has('ui_farm_golden')).toBe(true);
+    expect(keys.has('ui_farm_feast')).toBe(true);
+    expect(keys.has('ui_perfecting_attempt')).toBe(true);
+    expect(keys.has('ui_perfecting_success')).toBe(true);
+    expect(keys.has('ui_legendary_forged')).toBe(true);
+    expect(keys.has('ui_sunder_complete')).toBe(true);
     for (const key of [
       'cast_lightning_bolt',
+      // the Mech Bird, the store mount: the 1-2-1 gait beat plus the game's
+      // first standstill idle hum and mount-specific jump/land takes
+      'mount_run_mech_bird',
+      'mount_idle_mech_bird',
+      'mount_jump_mech_bird',
+      'mount_land_mech_bird',
       'mob_mudfin_attack',
       'mob_burrower_attack',
       'mob_reptile_attack',
@@ -246,7 +264,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(268);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(299);
   });
 });
 
@@ -441,6 +459,17 @@ describe('mob subfamily scanning', () => {
     expect(spatialForSfx('amb_campfire')).toBe(true);
     expect(spatialForSfx('amb_forge')).toBe(true);
     expect(spatialForSfx('amb_water')).toBe(false);
+  });
+});
+
+describe('Mech Bird jump and landing asset binding', () => {
+  it('ships byte-distinct launch and impact recordings', () => {
+    const jump = readFileSync(path.join(realSfxDir, 'mount_jump_mech_bird.mp3'));
+    const land = readFileSync(path.join(realSfxDir, 'mount_land_mech_bird.mp3'));
+    const jumpHash = createHash('sha256').update(jump).digest('hex');
+    const landHash = createHash('sha256').update(land).digest('hex');
+
+    expect(landHash).not.toBe(jumpHash);
   });
 });
 

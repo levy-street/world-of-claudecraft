@@ -43,6 +43,8 @@ const PROFESSIONS_BLOB_FIELDS = [
   'questedHobbies',
   'profTierTutorialSent',
   'guildLetterSent',
+  'craftDaily',
+  'farmPlots',
 ] as const;
 
 const NODE = GATHER_NODES.find((n) => n.type === 'herb' && n.zoneId === 'eastbrook_vale');
@@ -59,8 +61,21 @@ const populatedSim = (): Sim => {
   const sim = makeSim();
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
   // Fractional proficiency on purpose: gather gains move in 0.25 steps, so a
-  // serializer that rounded would pass an integer fixture.
-  meta.gatheringProficiency = { mining: 42.25, logging: 0, herbalism: 7, fishing: 150 };
+  // serializer that rounded would pass an integer fixture. Farming carries a
+  // fractional value too, deliberately NOT the zero the ours-side fixture
+  // shipped with: normalizeGatheringProficiency restores exactly 0 for a
+  // dropped key, so farming: 0 is structurally blind to the drop this sweep
+  // exists to catch (the 11b QA migration finding; farming absorb, Phase 11d).
+  meta.gatheringProficiency = {
+    mining: 42.25,
+    // Non-zero on every column: a zero is exactly what the normalizer
+    // restores for a dropped key, so a zero column proves nothing about the
+    // sweep (the same argument as farming below; 11d DB review, F5).
+    logging: 0.25,
+    herbalism: 7,
+    fishing: 150,
+    farming: 12.5,
+  };
   meta.toolEffectSlots = {
     logging: {
       effectId: 'gatherers_cache',
@@ -126,6 +141,41 @@ const populatedSim = (): Sim => {
   meta.questedHobbies.set('alchemy+cooking', 'enchanting');
   meta.profTierTutorialSent = true;
   meta.guildLetterSent = true;
+  // The daily craft gate stamp (Masterwrought phase 07): a live window with
+  // the one shipped oncePerDay recipe stamped. The id must be a LIVE gated
+  // recipe or the load clamp's anti-tamper filter drops it by design.
+  meta.craftDaily = { date: '2026-08-11', crafted: new Set(['recipe_quickening_catalyst']) };
+  // The other two masterwrought daily writers ride the WHOLE-BLOB fixed
+  // point (layer 2) from here: they are non-professions fields (the growth
+  // suite's complement list owns their classification), but a populated
+  // value in this fixture means the s3-equals-s2 arm pins their composed
+  // round trip too, which the byte-ceiling suite alone cannot (it measures
+  // size, not a load fixed point). The 11d migration review's gap.
+  meta.wyrmfallDaily = { date: '2026-08-11', sources: new Set(['rift']) };
+  meta.emberWeekAnchor = '2026-08-11';
+  // One fully-populated plot on a REAL bed and crop id (the load-side
+  // allowlists are shipped content, so a fixture id would be dropped and
+  // fail the presence pin). The anchor is 1, not a round number, and that is
+  // load-bearing for the FIXED POINT: these arms load at sim.time 0, where
+  // normalizeFarmPlots re-anchors any plant time above its floor of 1 (the
+  // growth phase's one anchor rule, which replaced a zero-clock guard that
+  // used to let a future-dated row through unchanged on this path alone). At
+  // exactly 1 the row is already at rest, so the blob crosses the load bound
+  // byte-faithfully; anything higher would re-anchor on the FIRST load and
+  // only settle on the second. (Farming's fixture, restored whole at the
+  // absorb per the amended 11b count-pin row: the same blob now holds a plot
+  // AND a craftDaily stamp, the merged shape's two newest writers.)
+  meta.farmPlots.set('bed_eastbrook_1', {
+    cropId: 'vale_wheat',
+    plantedAtMs: 1,
+    readyAtMs: 3_001,
+    survivalRoll: 0.25,
+    yieldSeed: 123456,
+    compost: true,
+    watch: false,
+    tonic: true,
+    notified: false,
+  });
   return sim;
 };
 
@@ -142,9 +192,10 @@ describe('the professions blob round-trip sweep', () => {
     // Spot pins on load-bearing values so the sweep is not only structural.
     expect(s1.gatheringProficiency).toEqual({
       mining: 42.25,
-      logging: 0,
+      logging: 0.25,
       herbalism: 7,
       fishing: 150,
+      farming: 12.5,
     });
     expect(s1.professions).toEqual(s1.gatheringProficiency); // legacy dual-write
     // Separate objects, never one aliased through the other (the serializer
@@ -203,6 +254,61 @@ describe('the professions blob round-trip sweep', () => {
     // toEqual ignores a key that is present with an explicit undefined value,
     // so pin the key SETS too: an absent key must stay absent.
     expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
+    // The two non-professions daily writers the fixture populates above ride
+    // the fixed point; spot-pin them so a serializer arm dropping either is
+    // named here instead of surfacing as a whole-blob toEqual diff.
+    expect(s3.wyrmfallDaily).toEqual({ date: '2026-08-11', sources: ['rift'] });
+    expect(s3.emberWeekAnchor).toBe('2026-08-11');
+  });
+
+  it('an either-parent-shaped save settles cleanly on merged code (the absorb load contract)', () => {
+    // The farming absorb (masterwrought Phase 11d migration review): the
+    // merged loader must accept a save written by EITHER parent binary, not
+    // only the both-writers blob the sweep above drives. A THEIRS-shaped
+    // save carries farmPlots and no craftDaily; an OURS-shaped save the
+    // reverse. Both load through their unconditional normalizers
+    // (normalizeFarmPlots returns the no-plots default for an absent field;
+    // sanitizeDailyGateLoad keeps the createPlayer default when the stamp is
+    // absent), and zero-default omission makes each shape its own fixed
+    // point: the deleted key must NOT resurrect on the re-save.
+    // All FOUR contested keys, not just one per side: a real THEIRS save carries
+    // no wyrmfallDaily and no emberWeekAnchor either, so modelling the shape with
+    // craftDaily alone under-states it (Phase 11d QA migration review).
+    for (const missing of [
+      'farmPlots',
+      'craftDaily',
+      'wyrmfallDaily',
+      'emberWeekAnchor',
+    ] as const) {
+      const sim = populatedSim();
+      const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+      expect(s1[missing]).toBeDefined(); // the deletion below deletes something real
+      delete s1[missing];
+
+      const reloaded = makeSim(25);
+      const pid = reloaded.addPlayer('warrior', 'ParentShape', { state: s1 });
+      const s2 = reloaded.serializeCharacter(pid) as CharacterState;
+      expect(s2[missing], `${missing} resurrected from an absent field`).toBeUndefined();
+      // Every OTHER professions field settles byte-faithfully: the absence of one
+      // packet's writer must not perturb the other packet's data. BYTE, not just
+      // value: toEqual is key-order blind and the save is JSON, so a re-ordered
+      // rebuild would pass it while changing the stored bytes (the same reason
+      // arm 1 carries an explicit stringify pin for equipmentInstance).
+      for (const field of PROFESSIONS_BLOB_FIELDS) {
+        if (field === missing) continue;
+        expect(s2[field], `${field} drifted loading a ${missing}-less save`).toEqual(s1[field]);
+        expect(
+          JSON.stringify(s2[field]),
+          `${field} re-ordered loading a ${missing}-less save`,
+        ).toBe(JSON.stringify(s1[field]));
+      }
+      // And the settle is a fixed point: a second load changes nothing.
+      const again = makeSim(26);
+      const pid2 = again.addPlayer('warrior', 'ParentShape2', { state: s2 });
+      const s3 = again.serializeCharacter(pid2) as CharacterState;
+      expect(s3).toEqual(s2);
+      expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
+    }
   });
 
   it('over-cap values clamp DOWN through the documented load normalizers and persist clamped', () => {
@@ -212,7 +318,7 @@ describe('the professions blob round-trip sweep', () => {
     // clamped value. Pinned to the literal shipped caps.
     const sim = populatedSim();
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
-    s1.gatheringProficiency = { mining: 250, logging: 0, herbalism: 7, fishing: 999 };
+    s1.gatheringProficiency = { mining: 250, logging: 0, herbalism: 7, fishing: 999, farming: 999 };
     s1.professions = { ...s1.gatheringProficiency };
     s1.craftSkills = { ...s1.craftSkills, weaponcrafting: 999 };
 
@@ -221,6 +327,7 @@ describe('the professions blob round-trip sweep', () => {
     const meta = reloaded.players.get(pid) as PlayerMeta;
     expect(meta.gatheringProficiency.mining).toBe(100); // gathering cap
     expect(meta.gatheringProficiency.fishing).toBe(200); // fishing cap
+    expect(meta.gatheringProficiency.farming).toBe(100); // farming cap (100, no 200 tier)
     expect(meta.craftSkills.weaponcrafting).toBe(125); // craft ring cap
 
     const resaved = reloaded.serializeCharacter(pid) as CharacterState;
@@ -229,6 +336,7 @@ describe('the professions blob round-trip sweep', () => {
       logging: 0,
       herbalism: 7,
       fishing: 200,
+      farming: 100,
     });
     expect(resaved.craftSkills?.weaponcrafting).toBe(125);
   });

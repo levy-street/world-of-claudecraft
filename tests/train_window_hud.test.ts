@@ -31,19 +31,32 @@ function hudMethod(opener: string): string {
 
 function trainResultArm(): string {
   const start = hudSource.indexOf("case 'trainResult': {");
-  // The unbindResult arm sits between trainResult and
-  // masterwork; the slice ends at the NEXT case so the single-surface pins
-  // below stay scoped to the trainResult arm alone.
-  const end = hudSource.indexOf("case 'unbindResult': {", start);
+  // Stop at the next case label, including a delegated arm without braces.
+  // No neighbouring event may satisfy this event's source pins.
+  const end = hudSource.indexOf("case '", start + "case 'trainResult':".length);
   expect(start, 'trainResult case arm present in handleEvents').toBeGreaterThan(-1);
-  expect(end, 'trainResult arm precedes the unbindResult arm').toBeGreaterThan(start);
+  expect(end, 'trainResult arm has a following case').toBeGreaterThan(start);
   return hudSource.slice(start, end);
 }
 
 describe('hud.ts trainResult event arm (source pins)', () => {
   it('logs the learned line on ok and maps all five deny reasons to training keys', () => {
     const arm = trainResultArm();
-    expect(arm).toContain("t('hudChrome.training.learned'");
+    expect(arm).toContain('this.log(learnedProfessionMessage(ev.recipeId), PROF_LOG_GRANT);');
+    expect(hudSource).toContain(
+      "import { learnedProfessionMessage } from './hud/professions/learned_profession_name';",
+    );
+    // The shared helper covers trainer recipes, collection manuals and enchant
+    // formulas; its runtime branches are exercised by learned_profession_name.
+    const messageSource = stripComments(
+      readFileSync(
+        resolve(__dirname, '../src/ui/hud/professions/learned_profession_name.ts'),
+        'utf8',
+      ),
+    );
+    expect(messageSource).toContain(
+      "return t('hudChrome.training.learned', { recipe: learnedProfessionName(recipeId) });",
+    );
     for (const key of [
       'hudChrome.training.tierUnmet',
       'hudChrome.training.cannotAfford',

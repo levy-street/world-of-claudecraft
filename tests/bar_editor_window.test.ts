@@ -23,7 +23,12 @@ const DEFAULT_TOUCH_SPAN = mobileActionSourceSlotCount({ secondary: false, third
 
 // jsdom ships no 2D canvas, so the procedural icon compositor cannot run here;
 // the window only ever uses the returned string as a CSS background-image.
-vi.mock('../src/ui/icons', () => ({ iconDataUrl: () => 'data:,' }));
+// Additive, never bare (the reliquary_window_behavior lesson): only the
+// canvas-touching iconDataUrl stays stubbed.
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
+  iconDataUrl: () => 'data:,',
+}));
 
 // A jsdom `import.meta.url` is not a file: URL, so the source scans below read
 // through the vitest root instead.

@@ -1,27 +1,25 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { apiGet } from '../api';
-  import {
-    readAutoRefreshPreference,
-    writeAutoRefreshPreference,
-  } from '../auto_refresh_preference';
   import { buildCalibrationExport } from '../calibration_export';
   import AutoRefreshToggle from '../components/AutoRefreshToggle.svelte';
   import BarChart from '../components/BarChart.svelte';
   import Panel from '../components/Panel.svelte';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { estimateQuantile, histogramBarPoints } from '../histogram_stats';
   import { adminLanguageTag, t } from '../i18n';
-  import { auth } from '../state/auth.svelte';
+  import { createAutoRefresh } from '../state/auto_refresh.svelte';
   import { LIVE_REFRESH_MS } from '../state/poll';
   import type { CalibrationHistogram, DetectionCalibrationData } from '../types';
 
   const AUTO_REFRESH_STORAGE_KEY = 'claudecraft_admin_calibration_auto_refresh';
 
-  let data = $state<DetectionCalibrationData | null>(null);
-  let failed = $state(false);
-  let autoRefresh = $state(true);
-  let mounted = $state(false);
-  let requestId = 0;
+  const surface = createAutoRefresh<DetectionCalibrationData>({
+    storageKey: AUTO_REFRESH_STORAGE_KEY,
+    intervalMs: LIVE_REFRESH_MS,
+    load: () => apiGet<DetectionCalibrationData>('/admin/api/detection-calibration'),
+  });
+  let data = $derived(surface.data);
 
   function fmt(value: number | null): string {
     if (value === null) return '-';
@@ -39,25 +37,6 @@
       { labelKey: 'calibration.statMax', value: fmt(h.max) },
       { labelKey: 'calibration.statMean', value: fmt(h.count > 0 ? h.sum / h.count : null) },
     ];
-  }
-
-  async function refresh(): Promise<void> {
-    const currentRequest = ++requestId;
-    try {
-      const result = await apiGet<DetectionCalibrationData>('/admin/api/detection-calibration');
-      if (currentRequest !== requestId) return;
-      data = result;
-      failed = false;
-    } catch (err) {
-      if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
-    }
-  }
-
-  function changeAutoRefresh(enabled: boolean): void {
-    autoRefresh = enabled;
-    writeAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY, enabled);
-    if (enabled) void refresh();
   }
 
   function downloadJson(): void {
@@ -80,20 +59,7 @@
     }
   }
 
-  $effect(() => {
-    if (!mounted || !autoRefresh) return;
-    const id = setInterval(() => void refresh(), LIVE_REFRESH_MS);
-    return () => clearInterval(id);
-  });
-
-  onMount(() => {
-    autoRefresh = readAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY);
-    mounted = true;
-    void refresh();
-    return () => {
-      requestId += 1;
-    };
-  });
+  onMount(() => surface.start());
 </script>
 
 <div class="calibration-page">
@@ -105,14 +71,16 @@
           {t('calibration.downloadJson')}
         </button>
         <AutoRefreshToggle
-          checked={autoRefresh}
+          checked={surface.enabled}
           label={t('calibration.autoRefresh', { seconds: LIVE_REFRESH_MS / 1000 })}
-          onChange={changeAutoRefresh}
+          onChange={(enabled) => surface.setEnabled(enabled)}
         />
       </div>
     </div>
 
-    {#if failed}
+    {#if surface.failure === 'forbidden'}
+      <PermissionDenied />
+    {:else if surface.failure === 'error'}
       <div class="empty">{t('calibration.loadFailed')}</div>
     {:else if data === null}
       <div class="empty">{t('calibration.loading')}</div>

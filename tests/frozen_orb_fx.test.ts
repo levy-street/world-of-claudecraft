@@ -13,7 +13,7 @@ function orbs(fx: FrozenOrbFx): OrbInternals[] {
   return (fx as unknown as { orbs: OrbInternals[] }).orbs;
 }
 
-describe('Frozen Orb visual', () => {
+describe('Frostglobe visual', () => {
   it("reuses a released orb's materials for the next spawn and resets its faded opacity", () => {
     const scene = new THREE.Scene();
     const fx = new FrozenOrbFx(scene, () => 0);
@@ -123,5 +123,73 @@ describe('handleFrozenOrbSpellfxEvent (the renderer orb dispatch, moved verbatim
     expect(fx.spawn).not.toHaveBeenCalled();
     expect(fx.halt).not.toHaveBeenCalled();
     expect(fx.resume).not.toHaveBeenCalled();
+  });
+});
+
+describe('Frostglobe teardown (renderer_resource_lifecycle.ts)', () => {
+  it('dispose() removes every live orb, disposes the pooled materials and the shared geometries, and stays reusable', () => {
+    const scene = new THREE.Scene();
+    const fx = new FrozenOrbFx(scene, () => 0);
+    fx.spawn({ sourceId: 1, x: 0, z: 0, dirX: 1, dirZ: 0, speed: 5, duration: 10 });
+    fx.spawn({ sourceId: 2, x: 4, z: 4, dirX: 0, dirZ: 1, speed: 5, duration: 10 });
+    const [orb1, orb2] = orbs(fx);
+    const materials = [
+      orb1.shellMat,
+      orb1.coreMat,
+      orb1.shardMat,
+      orb1.trailMat,
+      orb2.shellMat,
+      orb2.coreMat,
+      orb2.shardMat,
+      orb2.trailMat,
+    ];
+    const materialSpies = materials.map((mat) => vi.spyOn(mat, 'dispose'));
+    const internals = fx as unknown as {
+      shellGeo: THREE.BufferGeometry | null;
+      coreGeo: THREE.BufferGeometry | null;
+      shardGeo: THREE.BufferGeometry | null;
+      shellPool: unknown[];
+      corePool: unknown[];
+      shardPool: unknown[];
+      trailPool: unknown[];
+    };
+    const geometries = [internals.shellGeo, internals.coreGeo, internals.shardGeo];
+    for (const geo of geometries) expect(geo).not.toBeNull();
+    const geometrySpies = geometries.map((geo) => vi.spyOn(geo as THREE.BufferGeometry, 'dispose'));
+    // Two orbs: a group and a trail each, all in the scene.
+    expect(scene.children).toHaveLength(4);
+
+    fx.dispose();
+
+    expect(orbs(fx)).toHaveLength(0);
+    expect(scene.children).toHaveLength(0);
+    // Every material went through the pool on remove and was then disposed
+    // ONCE by the pool drain (the pool is emptied, so nothing is reacquired).
+    for (const spy of materialSpies) expect(spy).toHaveBeenCalledOnce();
+    for (const spy of geometrySpies) expect(spy).toHaveBeenCalledOnce();
+    for (const pool of [
+      internals.shellPool,
+      internals.corePool,
+      internals.shardPool,
+      internals.trailPool,
+    ]) {
+      expect(pool).toHaveLength(0);
+    }
+    expect(internals.shellGeo).toBeNull();
+    expect(internals.coreGeo).toBeNull();
+    expect(internals.shardGeo).toBeNull();
+
+    // Idempotent: a second dispose neither throws nor double-disposes.
+    fx.dispose();
+    for (const spy of materialSpies) expect(spy).toHaveBeenCalledOnce();
+    for (const spy of geometrySpies) expect(spy).toHaveBeenCalledOnce();
+
+    // ...and a spawn afterwards rebuilds the geometries lazily, exactly like
+    // the first spawn did, with fresh (never the disposed) materials.
+    fx.spawn({ sourceId: 3, x: 1, z: 1, dirX: 1, dirZ: 0, speed: 5, duration: 10 });
+    const [orb3] = orbs(fx);
+    expect(internals.shellGeo).not.toBeNull();
+    expect(materials).not.toContain(orb3.shellMat);
+    expect(scene.children).toHaveLength(2);
   });
 });

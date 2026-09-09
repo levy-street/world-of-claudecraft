@@ -309,7 +309,7 @@ describe('the storybook decor set (decorProps)', () => {
     // The collider radius mirrors the rendered trunk's root flare, so a
     // player walking at the tree stops at the bark instead of wading in.
     const tree = REALM_PROPS.greatTrees?.[0];
-    if (!tree) throw new Error('expected the Eldergleam great tree');
+    if (!tree) throw new Error('expected the Eldershine great tree');
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
     const p = sim.player;
     p.pos.x = tree.x + tree.r + 4; // approach from the east, a clear lane

@@ -362,3 +362,23 @@ describe('submission pacing knobs', () => {
     });
   });
 });
+
+describe('the boot lane keeps its absolute settle bounds', () => {
+  it('pins the prewarm AIMD config, bounds included', () => {
+    // The bounds are optional on the budget now (the shader warm worker
+    // judges its settles relatively); the boot lane still runs on them, and
+    // dropping either would leave its window frozen (a lane with neither
+    // bounds nor a judge reads every settle as mid).
+    expect(ADAPTIVE_PREWARM_LINK_CONFIG).toEqual({
+      initialWindowLinks: 16,
+      minWindowLinks: 8,
+      maxWindowLinks: 32,
+      initialLinkEstimate: 8,
+      increaseLinks: 4,
+      fastSettlementMs: 1_200,
+      slowSettlementMs: 2_000,
+      noProgressMs: 3_000,
+      maxSleepMs: 16,
+    });
+  });
+});

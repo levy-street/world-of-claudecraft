@@ -36,8 +36,14 @@ import {
   guildBankDeltaIdentityKey,
   guildBankRungsBought,
 } from '../src/sim/guild_bank';
+import { isMaterialItemId } from '../src/sim/material_ids';
+import type { MaterialSourceTransferSelection } from '../src/sim/material_source_transfer_selection';
 import type { InvSlot } from '../src/sim/types';
 import type { GuildBankInfo } from '../src/world_api';
+import {
+  guildBankMaterialSourceContribution,
+  guildBankMaterialWithdrawal,
+} from './guild_bank_material_settle_gate';
 
 /** The ops the gate judges. Deposits are never gated: a deposit replays onto
  *  any base. The operator purge is not gated either: it removes only a
@@ -58,6 +64,7 @@ export interface GuildBankOpRequest {
   readonly slot?: number;
   readonly count?: number;
   readonly amount?: number;
+  readonly selection?: MaterialSourceTransferSelection;
 }
 
 /** One holder's contribution to a book's unsettled value: its OWN net per
@@ -75,6 +82,8 @@ export interface GuildBankOpRequest {
 export interface GuildBookContribution {
   /** Per identity key (the escrow replay's three-dimensional key). */
   readonly items: ReadonlyMap<string, number>;
+  /** Positive units per normalized material payload and exact source descriptor. */
+  readonly sourceUnits: ReadonlyMap<string, number>;
   /** Net treasury copper the replay would MOVE. open_bank is excluded (rung 0
    *  is purse-paid and the applier never moves it), buy_slots is included (its
    *  charge left the treasury). */
@@ -88,7 +97,12 @@ export interface GuildBookContribution {
 /** The sum of the OTHER holders' contributions on one guild's book. */
 export type UnsettledGuildBook = GuildBookContribution;
 
-export const SETTLED_BOOK: UnsettledGuildBook = { items: new Map(), copper: 0, ladder: false };
+export const SETTLED_BOOK: UnsettledGuildBook = {
+  items: new Map(),
+  sourceUnits: new Map(),
+  copper: 0,
+  ladder: false,
+};
 
 export function holderContribution(log: readonly GuildBankOpDelta[]): GuildBookContribution {
   const own = new Map<string, number>();
@@ -112,21 +126,28 @@ export function holderContribution(log: readonly GuildBankOpDelta[]): GuildBookC
   }
   const items = new Map<string, number>();
   for (const [key, net] of own) if (net > 0) items.set(key, net);
-  return { items, copper: Math.max(0, copper), ladder };
+  return {
+    items,
+    sourceUnits: guildBankMaterialSourceContribution(log),
+    copper: Math.max(0, copper),
+    ladder,
+  };
 }
 
 export function sumContributions(
   contributions: Iterable<GuildBookContribution>,
 ): UnsettledGuildBook {
   const items = new Map<string, number>();
+  const sourceUnits = new Map<string, number>();
   let copper = 0;
   let ladder = false;
   for (const c of contributions) {
     for (const [key, net] of c.items) items.set(key, (items.get(key) ?? 0) + net);
+    for (const [key, net] of c.sourceUnits) sourceUnits.set(key, (sourceUnits.get(key) ?? 0) + net);
     copper += c.copper;
     ladder = ladder || c.ladder;
   }
-  return { items, copper, ladder };
+  return { items, sourceUnits, copper, ladder };
 }
 
 /** Convenience for callers holding raw logs (tests, the unit pins). */
@@ -144,6 +165,7 @@ export function unsettledGuildBook(
  *  carries an item id and no payload). */
 export type GuildBookDependency =
   | { readonly kind: 'items'; readonly key: string }
+  | { readonly kind: 'source_units'; readonly key: string }
   | { readonly kind: 'items_of'; readonly itemId: string }
   | { readonly kind: 'copper' }
   | { readonly kind: 'ladder' };
@@ -152,9 +174,12 @@ export function contributesTo(c: GuildBookContribution, dep: GuildBookDependency
   switch (dep.kind) {
     case 'items':
       return (c.items.get(dep.key) ?? 0) > 0;
+    case 'source_units':
+      return (c.sourceUnits.get(dep.key) ?? 0) > 0;
     case 'items_of': {
       const prefix = `${dep.itemId}|`;
       for (const [key, net] of c.items) if (net > 0 && key.startsWith(prefix)) return true;
+      for (const [key, net] of c.sourceUnits) if (net > 0 && key.startsWith(prefix)) return true;
       return false;
     }
     case 'copper':
@@ -177,6 +202,9 @@ export function deficitDependency(
       return { kind: 'copper' };
     case 'ladder_behind':
       return { kind: 'ladder' };
+    case 'source_unreadable':
+      // A malformed source journal identifies no trustworthy dependency.
+      return null;
   }
 }
 
@@ -197,7 +225,8 @@ function slotIdentityKey(slot: InvSlot): string {
  *  Every shape the sim refuses on its own passes through unjudged: the same
  *  count and amount rules as src/sim/bank.ts moveBetweenContainers and
  *  src/sim/guild_bank.ts (a plain stack takes a floored count within the
- *  stack, an instanced stack moves whole, an amount is a positive safe
+ *  stack, a non-material instanced stack moves whole, materials use the exact
+ *  source-aware take and selection rules, an amount is a positive safe
  *  integer within the treasury, a rung has a table price the treasury
  *  covers), so the sim's refusal and wording stay authoritative and an
  *  inadmissible request never buys a refusal, an incident, or a flush. */
@@ -210,18 +239,30 @@ export function guildBankUnsettledRefusal(
   if (op === 'withdraw') {
     const slot = Number.isInteger(request.slot) ? live.slots[request.slot as number] : undefined;
     if (!slot) return null;
-    const want = slot.instance
-      ? slot.count
-      : request.count === undefined
+    const material = isMaterialItemId(slot.itemId);
+    const materialTake = material
+      ? guildBankMaterialWithdrawal(request, live.slots, unsettled.sourceUnits)
+      : null;
+    if (material && materialTake === null) return null;
+    if (!material && request.selection !== undefined) return null;
+    const want = materialTake
+      ? materialTake.count
+      : slot.instance
         ? slot.count
-        : Math.floor(request.count);
+        : request.count === undefined
+          ? slot.count
+          : Math.floor(request.count);
     if (!(want > 0) || want > slot.count) return null;
     const key = slotIdentityKey(slot);
     const others = unsettled.items.get(key) ?? 0;
-    if (others <= 0) return null;
-    let held = 0;
-    for (const s of live.slots) if (slotIdentityKey(s) === key) held += s.count;
-    return want > held - others ? { kind: 'items', key } : null;
+    if (others > 0) {
+      let held = 0;
+      for (const s of live.slots) if (slotIdentityKey(s) === key) held += s.count;
+      if (want > held - others) return { kind: 'items', key };
+    }
+    return materialTake?.dependencyKey
+      ? { kind: 'source_units', key: materialTake.dependencyKey }
+      : null;
   }
   if (op === 'withdraw_gold') {
     const amount = request.amount;

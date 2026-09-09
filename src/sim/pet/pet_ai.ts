@@ -19,11 +19,16 @@
 // mobSwing/dealDamage/moveToward/updateRangedPetAttack callees the dispatcher calls)
 // are preserved exactly so the parity gate's full-state trace AND rng draw-order log
 // stay byte-identical. The in-place Entity mutation is intentional (the refactor's
-// immutability waiver). One DELIBERATE post-extraction behavior change rides on
-// top of the verbatim move: petRangedAttack now rolls isMobSpellResisted before
+// immutability waiver). Two DELIBERATE post-extraction behavior changes ride on
+// top of the verbatim move. (1) petRangedAttack now rolls isMobSpellResisted before
 // its crit roll (player pet bolts were resist-immune by omission, unlike every
 // other spell path), with the pet_ai parity golden re-minted for the extra draw
-// in the same PR; every other draw position is still the verbatim move. The shared movement/combat entry points (updateRangedPetAttack,
+// in the same PR. (2) a pet can no longer acquire, or keep attacking, a mob mid-evade
+// (isEvadingWildMob, mob/evade_immunity.ts): the mobSwing draws that used to fire
+// every swing interval against such a target (always voided by dealDamage's own
+// evade-immunity gate downstream) are now skipped outright, with no golden re-mint,
+// because no parity scenario exercises a pet against an evading mob. Every other
+// draw position is still the verbatim move. The shared movement/combat entry points (updateRangedPetAttack,
 // mobSwing, applyTaunt, moveToward), the pet-management helpers (syncPetAspect,
 // despawnPersistentPet), and the stat/predicate helpers (effectiveAttackPower,
 // isHostileTo, isStunned, isRooted, moveSpeedMult, swingIntervalMult, mobCanSwim,
@@ -39,6 +44,7 @@ import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
 import { hunterPetDamageMultiplier } from '../combat/hunter_shared';
 import { isMobSpellResisted } from '../combat/spell_resist';
 import { MOBS } from '../data';
+import { isEvadingWildMob } from '../mob/evade_immunity';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
@@ -130,9 +136,18 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   if (!travelling) pullNearbyMobs(ctx, pet);
 
   let target = pet.aggroTargetId !== null ? (ctx.entities.get(pet.aggroTargetId) ?? null) : null;
+  // isEvadingWildMob (mob/evade_immunity.ts) drops a mob mid-evade (leashed home,
+  // walking back to spawn) exactly like dealDamage already voids any hit on one:
+  // most visibly, a raid boss sets aiState 'evade' the instant a wipe empties the
+  // room (encounters/ignivar.ts), but its aggroTargetId/threat-table entry can
+  // still name a player who has not been pruned from the hate table yet. Before
+  // this guard, the moment that player's pet was restored on revive (with the
+  // owner given no chance to react: the pet comes back already fighting), the
+  // stale match alone made the pet lunge at the "boss" mid-reset.
   if (
     target &&
     (target.dead ||
+      isEvadingWildMob(target) ||
       !ctx.isHostileTo(pet, target) ||
       !petCanSeeTarget(target) ||
       petQuestGateBlocksTarget(ctx, pet, target))
@@ -248,6 +263,7 @@ function updateWaterJetChannel(ctx: SimContext, pet: Entity): boolean {
     ctx.isStunned(pet) ||
     !target ||
     target.dead ||
+    isEvadingWildMob(target) ||
     !ctx.isHostileTo(pet, target) ||
     petQuestGateBlocksTarget(ctx, pet, target) ||
     !petCanSeeTarget(target) ||
@@ -626,7 +642,7 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   // grid visits the pet itself at distance 0). We keep the inner dist2d rather than the
   // callback's squared d2 to avoid a units mismatch silently changing the radius.
   ctx.grid.forEachInRadius(pet.pos.x, pet.pos.z, PET_ASSIST_RANGE, (m) => {
-    if (m.id === pet.id || m.dead || !ctx.isHostileTo(pet, m)) return;
+    if (m.id === pet.id || m.dead || isEvadingWildMob(m) || !ctx.isHostileTo(pet, m)) return;
     if (petQuestGateBlocksTarget(ctx, pet, m)) return;
     if (!petCanSeeTarget(m)) return;
     const engagingUs =

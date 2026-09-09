@@ -9,6 +9,8 @@
 //
 // Pure and I/O free on purpose, so tests can drive every drift shape directly.
 
+import { describeRenderEnvDrift, formatRenderEnvDrift } from './mob_portrait_render_env.mjs';
+
 function rowsById(manifest) {
   return new Map((manifest?.portraits ?? []).map((portrait) => [portrait.id, portrait]));
 }
@@ -57,6 +59,25 @@ export function describeManifestDrift(previous, next) {
     changedTrackedFiles.length === 0 &&
     bundleChanged;
 
+  // The SECOND case worth naming, and the reason mob_portrait_render_env exists:
+  // every row's render INPUT is byte-identical and only the rendered OUTPUT moved,
+  // while the recorded render environment also moved. That is a re-bake on a
+  // different GPU stack, not an art change. Without this it reads as 242 portraits
+  // genuinely changing, and each environment mints the other's bytes back forever.
+  // Deliberately strict: it needs a KNOWN environment on both sides (an absent
+  // record concludes nothing), every changed row output-only, and at least one row
+  // actually moved, so it can never absorb a real content edit.
+  const renderEnv = describeRenderEnvDrift(previous?.renderEnv, next?.renderEnv);
+  const environmentOnly =
+    !schemaChanged &&
+    !portraitCountChanged &&
+    !bootstrapReviewChanged &&
+    changedTrackedFiles.length === 0 &&
+    changedRows.length > 0 &&
+    changedRows.every((row) => row.outputChanged && !row.sourceChanged) &&
+    renderEnv.known &&
+    renderEnv.moved;
+
   return {
     schemaChanged,
     portraitCountChanged,
@@ -66,6 +87,8 @@ export function describeManifestDrift(previous, next) {
     changedTrackedFiles,
     changedRows,
     bookkeepingOnly,
+    renderEnv,
+    environmentOnly,
   };
 }
 
@@ -101,6 +124,19 @@ export function formatManifestDrift(drift) {
     lines.push(`    ${listed.join(', ')}${overflow > 0 ? `, and ${overflow} more` : ''}`);
   }
 
+  if (drift.renderEnv && (drift.renderEnv.moved || !drift.renderEnv.known)) {
+    lines.push(formatRenderEnvDrift(drift.renderEnv));
+  }
+  if (drift.environmentOnly) {
+    lines.push('  Every render INPUT is byte-identical and only the rendered output moved,');
+    lines.push('  while the recorded render environment moved too: this is the same art');
+    lines.push('  re-baked on a different GPU stack, not a content change. Portrait WebPs are');
+    lines.push('  deterministic per machine but not across drivers, which is why the guide');
+    lines.push('  stills are existence-gated rather than diff-gated. Committing this swaps');
+    lines.push('  242 rows to the other environment and the next mint swaps them back, so');
+    lines.push('  re-accept it only deliberately (--allow-environment-remint), and prefer');
+    lines.push('  re-minting from the environment the committed bytes already came from.');
+  }
   if (drift.bookkeepingOnly) {
     lines.push('  No portrait row and no shipped image byte changed: only the browser render');
     lines.push('  bundle moved. Its import graph reaches the world and content modules through');

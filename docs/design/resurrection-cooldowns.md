@@ -22,10 +22,9 @@ it.
 - Every healer resurrection above runs on a five-minute cooldown, and the group
   revives are pinned equal to Collective Reversal's so no mass revive outclasses
   another.
-- The cooldown, not `requiresOutOfCombat`, is the real throttle: a backline
-  healer who never draws aggro drops combat mid-fight once the combat linger
-  passes, so a zero-cooldown revive could be chained repeatedly inside a single
-  encounter.
+- `requiresOutOfCombat` blocks group resurrection while the hate-table or
+  boss-group combat hold remains active. The five-minute cooldown limits
+  repeated resurrection across encounters and after the boss resets.
 - The one deliberate exception: Temporal Reversal keeps its ten-minute
   cooldown. Chronomancy fielded the game's first combat resurrection and its
   longer clock keeps a death costly there; Wildwake's five minutes follows the

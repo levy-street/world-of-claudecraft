@@ -15,7 +15,7 @@ import {
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { AuraKind, Entity } from '../types';
-import { DUSK_ECONOMY_AURA_ID, DUSK_ECONOMY_LINGER_SEC } from './rogue_talents';
+import { DUSK_ECONOMY_AURA_ID } from './rogue_talents';
 
 // The veil-coupled Dusk Economy window. The discount DURING the veil comes
 // from duskCostMultiplier reading the veil aura directly; this marker covers
@@ -75,8 +75,12 @@ export const BODY_BLOW_ID = 'body_blow';
 export const KNOCKOUT_ID = 'knockout_blow';
 // Veilstrike arms one Veiled Edge: the first Lurker's Strike thrown from
 // inside the veil strikes for double (consumed at the weaponStrike case).
+// v0.42 Skulduggery pass (docs/design/class-balance-v042.md): the repeatable
+// veil-window Edge is halved, +100% -> +50%, so the class's sustained Gloam
+// loop pays less; the actual-stealth opener (rogue_stealth_opener.ts) is the
+// new stronger frontload and never stacks with this one.
 export const VEILED_EDGE_ID = 'veiled_edge';
-export const VEILED_EDGE_BONUS = 1;
+export const VEILED_EDGE_BONUS = 0.5;
 // Every second Red Ribbon banks a Gloam stage (true-stealth openers bank one
 // each; veil-window openers never do, see rogueEngineOnCast).
 const GLOAM_RHYTHM_KEY = 'rog_gloam_rhythm';
@@ -118,10 +122,10 @@ function venomStageRefund(ctx: SimContext, p: Entity): number {
 }
 
 // Ashveil 4pc: the Veiled Edge value baked into the aura at arm time
-// (consumeVeiledEdge returns 1 + value, so 2 reads back as triple). The
-// wearer is known at the detonation; a gear swap after arming keeps the
-// armed value until the next veil (the same at-grant snapshot the paladin
-// beacon and Dawn's Wrath bakes use).
+// (consumeVeiledEdge returns 1 + value, so 1 reads back as double, v0.42
+// Skulduggery pass). The wearer is known at the detonation; a gear swap
+// after arming keeps the armed value until the next veil (the same
+// at-grant snapshot the paladin beacon and Dawn's Wrath bakes use).
 function veiledEdgeArmValue(ctx: SimContext, p: Entity): number {
   return wearsSetBonus(ctx, p, 'ashveil', 4) ? ASHVEIL_4PC_VEILED_EDGE_BONUS : VEILED_EDGE_BONUS;
 }
@@ -323,8 +327,8 @@ export function rogueGloamDetonation(ctx: SimContext, p: Entity, abilityId: stri
     kind: 'veiled_edge',
     remaining: 6,
     duration: 6,
-    // Ashveil 4pc bakes 2 here (1 for everyone else); consumeVeiledEdge
-    // reads 1 + value back, so the doubled/tripled strike stays dynamic.
+    // Ashveil 4pc bakes 1 here (0.5 for everyone else); consumeVeiledEdge
+    // reads 1 + value back, so the doubled strike stays dynamic.
     value: veiledEdgeArmValue(ctx, p),
     sourceId: p.id,
     school: 'shadow',

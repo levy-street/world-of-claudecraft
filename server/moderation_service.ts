@@ -272,7 +272,12 @@ export class ModerationService<TSession extends ModerationSession> {
       this.host.notice(actor, `No online player named '${name}'.`);
       return;
     }
-    if (target.pid === actor.pid || target.isAdmin) {
+    // Spectating is read-only observation, never a sanction, so staff may
+    // watch other staff (the sanction commands keep their staff guard in
+    // resolveNamedTarget). Watching your own account stays refused, and the
+    // account check (not the session) also covers a second character of the
+    // actor's account that is online at the same time.
+    if (target.accountId === actor.accountId) {
       this.host.notice(actor, "You can't moderate that player.");
       return;
     }

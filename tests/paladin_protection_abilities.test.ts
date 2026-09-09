@@ -7,6 +7,7 @@ import { activateDivineAscension, grantDevotion } from '../src/sim/paladin_devot
 import { Sim } from '../src/sim/sim';
 import { type Entity, IGNIVAR_BOSS_ID, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { WORLD_WITHOUT_HUB_YARD } from './helpers/hub_yard';
 
 type TestSim = Sim & {
   nextId: number;
@@ -24,7 +25,12 @@ type TestSim = Sim & {
 const OPEN_GROUND = { x: -60, z: -2 } as const;
 
 function makeProtection(): TestSim {
-  const sim = new Sim({ seed: 7176, playerClass: 'paladin', autoEquip: true }) as TestSim;
+  const sim = new Sim({
+    seed: 7176,
+    playerClass: 'paladin',
+    autoEquip: true,
+    world: WORLD_WITHOUT_HUB_YARD,
+  }) as TestSim;
   sim.setPlayerLevel(20);
   expect(sim.setSpec('protection')).toBe(true);
   sim.addItem('eastbrook_buckler', 1);
@@ -674,7 +680,12 @@ describe('Paladin Protection abilities', () => {
     sim.ctx.dealDamage(attacker, sim.player, 100, false, 'holy', 'Test', 'hit');
     expect(insideHp - sim.player.hp).toBe(100);
 
-    const retribution = new Sim({ seed: 7172, playerClass: 'paladin', autoEquip: true }) as TestSim;
+    const retribution = new Sim({
+      seed: 7172,
+      playerClass: 'paladin',
+      autoEquip: true,
+      world: WORLD_WITHOUT_HUB_YARD,
+    }) as TestSim;
     retribution.setPlayerLevel(20);
     retribution.setSpec('retribution');
     const retAttacker = targetAt(retribution, 2);

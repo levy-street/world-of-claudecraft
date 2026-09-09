@@ -1,0 +1,81 @@
+{
+  "date": "2026-09-08",
+  "releaseBase": "6111e6d2066d77505d27b8fba8a9aaaa9da01982",
+  "candidate": "09ffd281f409f47db9b205c68691f758e58cd092",
+  "browser": "Chromium, ANGLE Metal, local offline game",
+  "settings": "graphics preset 1; responsive mobile-touch class for phone viewports",
+  "checks": [
+    {
+      "name": "offline world boot",
+      "pass": true
+    },
+    {
+      "name": "Shift+K opens harvest-journal-window",
+      "pass": true
+    },
+    {
+      "name": "Shift+T opens perfecting-window",
+      "pass": true
+    },
+    {
+      "name": "Shift+O opens loot-explorer-window",
+      "pass": true
+    },
+    {
+      "name": "opening shortcut leaves search empty",
+      "pass": true
+    },
+    {
+      "name": "Rift encounters do not promise guaranteed drops",
+      "pass": true
+    },
+    {
+      "name": "locale refresh preserves Rift category and encounter tab",
+      "pass": true
+    },
+    {
+      "name": "mobile 844x390 sheet fits and scrolls",
+      "pass": true,
+      "shape": {
+        "left": 101.28125,
+        "top": 12,
+        "right": 742.71875,
+        "bottom": 343.5,
+        "width": 641.4375,
+        "height": 331.5,
+        "overflowY": "auto",
+        "scrollHeight": 328,
+        "clientHeight": 328,
+        "font": "16px"
+      }
+    },
+    {
+      "name": "mobile 390x844 sheet fits and scrolls",
+      "pass": true,
+      "shape": {
+        "left": 35,
+        "top": 12,
+        "right": 355,
+        "bottom": 729.390625,
+        "width": 320,
+        "height": 717.390625,
+        "overflowY": "auto",
+        "scrollHeight": 713,
+        "clientHeight": 713,
+        "font": "16px"
+      }
+    },
+    {
+      "name": "forced-colors active in browser",
+      "pass": true
+    }
+  ],
+  "locale": {
+    "title": "Beute-Explorer",
+    "focus": "filter:category",
+    "category": "rift",
+    "tab": "Durch Begegnung",
+    "search": ""
+  },
+  "javascriptErrors": []
+}

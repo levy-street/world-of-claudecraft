@@ -33,6 +33,12 @@ export function applySelfCombatScalars(e: Entity, s: any): void {
   e.critRating = s.crat ?? e.critRating;
   e.hasteRating = s.hrat ?? e.hasteRating;
   e.hitRating = s.hirat ?? e.hitRating;
+  // The authoritative in-combat bit (server/self_scalar_wire.ts `cbt`, 0/1):
+  // the one combat STATE field on this record. Before it, the online SELF
+  // mirror kept blankEntity's false forever and the player frame's crossed
+  // swords rode a recent-personal-event heuristic (hud.ts), so a raider a boss
+  // held who had not yet traded a blow saw no combat state at all.
+  if (s.cbt !== undefined) e.inCombat = s.cbt === 1;
   e.weapon = s.weapon ?? e.weapon;
   // offhandWeapon can legitimately BE null (unequipped), so it needs the
   // explicit presence check the other fields above don't: `?? e.X` would keep

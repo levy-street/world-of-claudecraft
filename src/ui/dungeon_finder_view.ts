@@ -23,6 +23,7 @@ import {
 import { HEROIC_BOSS_LOOT } from '../sim/content/heroic_loot';
 import { FIRST_TALENT_LEVEL, type Role } from '../sim/content/talents';
 import { DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
+import { lootEntryRollsOnClaim } from '../sim/loot/loot_difficulty_gate';
 import { compatibleFinderRoles } from '../sim/social/dungeon_finder';
 import type { DungeonDifficulty, PlayerClass } from '../sim/types';
 
@@ -88,8 +89,9 @@ export interface FinderEncounterViewModel {
   // partition one draw). Singles: independent authored chances.
   groups: FinderLootGroupView[];
   singles: FinderLootItemView[];
-  // Extra heroic-only groups appended on heroic difficulty (final boss only).
+  // Extra heroic-only groups appended on heroic difficulty.
   heroicGroups: FinderLootGroupView[];
+  heroicSingles: FinderLootItemView[];
 }
 
 export interface FinderActivityDetailView {
@@ -273,7 +275,12 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
   for (const enc of activity.encounters) {
     const mob = MOBS[enc.mobId];
     if (!mob) continue;
-    const loot = (mob.loot ?? []).filter((e) => !e.questId);
+    // Mirror the roller's difficulty gate: a heroic activity never previews a
+    // Normal-only row, because the heroic kill never rolls it.
+    const heroicClaim = activity.difficulty === 'heroic';
+    const loot = (mob.loot ?? []).filter(
+      (e) => !e.questId && lootEntryRollsOnClaim(e, heroicClaim),
+    );
     const { groups, singles } = lootGroups(loot);
     let copper = 0;
     // Mirror the roller's money arm: a heroic activity's finale pays the
@@ -283,10 +290,13 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
     for (const e of loot)
       if (e.copper)
         copper += heroicFinale && e.heroicCopper !== undefined ? e.heroicCopper : e.copper;
-    const heroicGroups =
-      activity.difficulty === 'heroic' && enc.final
-        ? lootGroups(HEROIC_BOSS_LOOT[enc.mobId] ?? []).groups
-        : [];
+    const heroicLoot = heroicClaim
+      ? lootGroups(HEROIC_BOSS_LOOT[enc.mobId] ?? [])
+      : { groups: [], singles: [] };
+    // Mirror the roller's heroic-append gate exactly: a heroic claim rolls
+    // HEROIC_BOSS_LOOT for ANY encounter that has a table, finale or not
+    // (loot_roll.ts reads the table by mob id with no finale condition), so
+    // the preview must not hide a non-finale boss's heroic slot.
     out.push({
       mobId: enc.mobId,
       final: enc.final === true,
@@ -296,7 +306,8 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
       copper,
       groups,
       singles,
-      heroicGroups,
+      heroicGroups: heroicLoot.groups,
+      heroicSingles: heroicLoot.singles,
     });
   }
   return out;
@@ -313,7 +324,7 @@ export function finderLootItemIds(): string[] {
       for (const group of [...encounter.groups, ...encounter.heroicGroups]) {
         for (const item of group.items) ids.add(item.itemId);
       }
-      for (const item of encounter.singles) ids.add(item.itemId);
+      for (const item of [...encounter.singles, ...encounter.heroicSingles]) ids.add(item.itemId);
     }
   }
   return [...ids];

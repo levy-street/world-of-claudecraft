@@ -34,6 +34,7 @@ const bossClips: ClipMap = {
 
 export const ROACH_KING_VISUALS: Record<string, VisualDef> = {
   mob_asmon_hermit: {
+    authoredAtlas: true,
     url: 'models/creatures/asmon_hermit.glb',
     height: 2.1,
     clips: bossClips,
@@ -42,6 +43,7 @@ export const ROACH_KING_VISUALS: Record<string, VisualDef> = {
     runRef: 5,
   },
   mob_roach_king: {
+    authoredAtlas: true,
     url: 'models/creatures/roach_king.glb',
     height: 2.4,
     clips: bossClips,
@@ -50,6 +52,7 @@ export const ROACH_KING_VISUALS: Record<string, VisualDef> = {
     runRef: 5,
   },
   mob_roachling: {
+    authoredAtlas: true,
     url: 'models/creatures/roachling.glb',
     height: 0.65,
     clips: creatureClips,
@@ -58,6 +61,7 @@ export const ROACH_KING_VISUALS: Record<string, VisualDef> = {
     runRef: 6,
   },
   mob_garbage_beetle: {
+    authoredAtlas: true,
     url: 'models/creatures/garbage_beetle.glb',
     height: 1.3,
     clips: creatureClips,

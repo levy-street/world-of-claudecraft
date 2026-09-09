@@ -35,11 +35,23 @@ export function exportTransferCode(kind: TransferKind): string {
 export function importTransferCode(kind: TransferKind, text: string): ParsedTransfer {
   const parsed = parseTransferCode(kind, text);
   if (!parsed.ok) return parsed;
+  // All or nothing: a write that fails part-way (storage quota) puts every key
+  // already written back, so the client never runs on a half-imported profile.
+  const previous: [string, string | null][] = [];
   try {
     for (const [key, value] of Object.entries(parsed.entries)) {
+      previous.push([key, localStorage.getItem(key)]);
       localStorage.setItem(key, value);
     }
   } catch {
+    try {
+      for (const [key, old] of previous) {
+        if (old === null) localStorage.removeItem(key);
+        else localStorage.setItem(key, old);
+      }
+    } catch {
+      /* storage is unusable either way */
+    }
     return { ok: false, reason: 'format' };
   }
   return parsed;

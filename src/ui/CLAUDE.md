@@ -296,7 +296,13 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   helper is invisible unless the helper is named as a proxy token (`getUiScale` and
   `getComputedStyle` are; a new one would have to be added), and a BARE-named per-frame module
   (`dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
-  by the module sweep in `tests/architecture.test.ts`.
+  by the module sweep in `tests/architecture.test.ts`. A bare name is the WHOLE of that
+  escape, which is why a modal painter takes an adapter name too: the two bare-named modal
+  modules the Masterwrought phase 14 shipped (`input_dialog.ts`, `legendary_naming_dialog.ts`)
+  sat outside the sweep until 2026-08-31, when they were renamed `input_controller.ts` and
+  `hud/professions/legendary_naming_controller.ts` and joined the cold contract at zero
+  allowances (keeping their `UI_DOM_MODULES` rows, the deliberate double coverage). Name a new
+  dialog `*_controller.ts` from the start.
 - **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
   live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
   (it has to touch the DOM) and is not itself a painter. Register it in `UI_PAINTER_HELPERS`
@@ -319,13 +325,7 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   `prompt_dialog.ts` (`installPromptDialog`: the window behind it goes inert while open, EVERY
   teardown path routes through the returned `dismiss()`, focus returns to the opener), never a
   hand-rolled trap; a caller whose window can be force-closed under an open prompt also clears
-  `inert` in its own teardown as a backstop, so a root is never left inert while hidden. One
-  family member deliberately mounts on `document.body` instead of the stack: the Store decision
-  (`store_decision_prompt.ts`), because `#prompt-stack` sits inside `#ui`'s fixed z-index 10
-  stacking context and could never clear the body-level armory inspect overlay (z 90). The
-  keybind gate's modal matcher (`modalPromptOpen` in `prompt_dialog.ts`, consumed by
-  `Hud.promptModalOpen()`) covers BOTH mounts; a new mount point joins that selector in the
-  same change. **For a hot
+  `inert` in its own teardown as a backstop, so a root is never left inert while hidden. **For a hot
   component:** keep the core allocation-light, pass the perf gate, read the static preset (not
   the governor), and apply the matching canvas hot-path technique.
 - **Reuse a FAMILY before building bespoke:** a unit-style frame is a new `UnitFramePainter`
@@ -449,6 +449,9 @@ per-surface behavior lives in `tests/language_fanout_relocalize.test.ts`.
    a matcher RULE in the table matching the emit's ORIGIN (`sim_i18n.ts` for a `src/sim/` emit,
    `server_i18n.ts` for a `server/` emit) in the SAME change. The S3 guard
    (`tests/localization_fixes.test.ts`) fails if a new emit is recognized by neither.
+   Add the English to `baseEnTable` ONLY and never copy it into a locale block of
+   `sim_i18n.ts`: the status registry reads each locale's own blocks, so a copied English
+   row reads `translated` and ships English (`docs/i18n-scaling/translation-workflow.md`).
 3. Run `npm run i18n:scan` / `i18n:build` and commit the regenerated files. The PR is green
    at the PR-tier gate; the release-tier gate (`I18N_RELEASE_TIER=1`) hard-fails on any
    `pending` row.
@@ -624,6 +627,14 @@ same file), and each module's header carries its own contract.
   helper in `target_frame_pos.ts` (`scaleFromKeyStep`). A frame gesture with no keyboard path is
   a defect: unlocking is the only route to these frames, so a pointer-only affordance leaves a
   keyboard-only player unable to reach what it changes at all.
+  **Every NEW standing HUD surface joins the frames system in the same change** (owner rule,
+  2026-09): any persistent positioned element that is not a `.window`, not a transient
+  banner/toast/tooltip/veil, and not a child of an already-governed frame gets a
+  `HUD_FRAME_SPECS` row, or a reasoned exemption in `tests/hud_frame_coverage.test.ts`, which
+  sweeps the `#ui` subtree of both entries plus the exact file set allowed to mount chrome on
+  the `#ui` root and fails until the question is answered. If the surface's painter rebuilds
+  its own root's HTML, give it an inner body element and paint THAT (the `#qt-body` /
+  `#delve-body` pattern), so the mover chrome survives repaints.
 - **deeds_view.ts** / **deeds_window.ts** (+ the `deed_*` siblings): the Book of Deeds
   window: DOM-free category/entry/unlock model, a cold window painter, and the write-elided
   HUD watch tracker. `deed_i18n.ts` re-localizes deed names/descriptions/titles from ids

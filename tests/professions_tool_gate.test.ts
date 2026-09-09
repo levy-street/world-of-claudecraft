@@ -433,7 +433,10 @@ describe('gate table completeness', () => {
     }
     // Non-vacuity, asserted AFTER the loop so a newly added ungated tool is
     // named by its own arm first rather than reported as a bare count change.
-    expect(tools.length).toBe(9);
+    // 10 since the hoe phase: garden_hoe joined as farming's vendor-priced
+    // tier-1 entry tool (correctly ungated above; rungs 2 to 4 carry no
+    // buyValue at all, so they never enter this sweep).
+    expect(tools.length).toBe(10);
   });
 
   it('no fishing implement is gated: the water paces the rods, not the counter', () => {
@@ -448,7 +451,9 @@ describe('gate table completeness', () => {
     const rods = Object.entries(ITEMS).filter(
       ([, def]) => def.use?.type === 'gatherTool' && def.use.professionId === 'fishing',
     );
-    expect(rods.length).toBe(4);
+    // FIVE since masterwrought Phase 11i's apex rung; none is gated, which is
+    // the claim (rods are R22-exempt and the WATER paces them).
+    expect(rods.length).toBe(5);
     for (const [itemId] of rods) expect(VENDOR_ROW_GATES[itemId], itemId).toBeUndefined();
     expect(VENDOR_ROW_GATES.simple_fishing_pole).toBeUndefined();
     // Split the claim, because the two halves are true for different reasons
@@ -462,6 +467,7 @@ describe('gate table completeness', () => {
       'silverstream_fishing_rod',
     ]);
     expect(crafted.map(([id]) => id).sort()).toEqual([
+      'clockreel_fishing_rod',
       'stormreel_fishing_rod',
       'tidewrought_fishing_rod',
     ]);
@@ -818,9 +824,16 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     // family is tier 1 and bare hands floor the scan there), so the seam is
     // pinned at the source: the corpse harvester must read the wield-aware
     // any-profession scan with the player's counters, not the ownership
-    // scan. Whitespace-normalized so a formatter wrap cannot dodge it;
-    // comments stripped so prose cannot satisfy it.
-    const source = readFileSync(path.resolve(process.cwd(), 'src/sim/interaction.ts'), 'utf8')
+    // scan. PR3 (Intentional Gathering) moved the whole corpse-harvest command
+    // body behind the timed session seam: the admission facts (including the
+    // field-kit gate) are snapshotted in corpse_harvest_grant.ts rather than
+    // interaction.ts, so the source pin follows that file. Whitespace-normalized
+    // so a formatter wrap cannot dodge it; comments stripped so prose cannot
+    // satisfy it.
+    const source = readFileSync(
+      path.resolve(process.cwd(), 'src/sim/professions/corpse_harvest_grant.ts'),
+      'utf8',
+    )
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|\s)\/\/.*$/gm, '$1')
       .replace(/\s+/g, '')

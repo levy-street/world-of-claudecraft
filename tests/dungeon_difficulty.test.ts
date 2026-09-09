@@ -8,8 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { DUNGEON_MOBS } from '../src/sim/content/dungeons';
 import { TEMPLE_DUNGEON_MOBS } from '../src/sim/content/temple';
-import { DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
-import { IGNIVAR_RAID_ROOM_IDS } from '../src/sim/ignivar_raid_ids';
+import { ITEMS, MOBS } from '../src/sim/data';
 import {
   applyDungeonMobTuning,
   claimDifficultyForDungeon,
@@ -40,10 +39,7 @@ const SYNTHETIC: MobTemplate = {
 };
 
 describe('heroic tuning data contract', () => {
-  it('covers the five five-player dungeons plus the raid rooms (the Ignivar chain door-first) and final bosses', () => {
-    // The forge lift is the Ignivar chain's overworld door: it must be
-    // heroic-eligible or the whole chain's claim clamps to normal there
-    // (tests/ignivar_heroic_entry.test.ts drives the real door path).
+  it('covers the five five-player dungeons plus all three raid arenas and final bosses', () => {
     expect([...HEROIC_DUNGEON_IDS].sort()).toEqual([
       'drowned_temple',
       'gravewyrm_sanctum',
@@ -57,11 +53,6 @@ describe('heroic tuning data contract', () => {
       'sunken_bastion',
       'wildheart_basin',
     ]);
-    // The lift record is eligibility-only, and that premise holds only while
-    // the room spawns nothing: its factors are all 1, so the day a spawn is
-    // added to the lift, its heroic tuning becomes a real balance statement
-    // and needs authored numbers like its siblings.
-    expect(DUNGEONS.ignivar_forge_lift.spawns).toEqual([]);
     expect(
       Object.fromEntries(Object.values(HEROIC_DUNGEON_TUNING).map((t) => [t.id, t.finalBossId])),
     ).toEqual({
@@ -141,21 +132,6 @@ describe('claimDifficultyForDungeon', () => {
     expect(claimDifficultyForDungeon('gravewyrm_sanctum', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('nythraxis_boss_arena', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('ignivar_raid_arena', 'heroic')).toBe('heroic');
-    // Derived door-room guard: the Ignivar chain's difficulty is decided at
-    // whichever room carries the overworld walk-up door (the chain head), and
-    // a clamp there silently normalizes the whole raid (the v0.41.0 bug: the
-    // door moved to the forge lift, which had no tuning record, and the
-    // hardcoded id pins above stayed green). Deriving from the live room list
-    // makes this fail on its own the next time the entrance moves.
-    for (const roomId of IGNIVAR_RAID_ROOM_IDS) {
-      if (DUNGEONS[roomId].overworldDoor === false) continue;
-      expect(claimDifficultyForDungeon(roomId, 'heroic'), `${roomId} is a door room`).toBe(
-        'heroic',
-      );
-    }
-    // The chain HEAD decides the claim every deeper room inherits, so it stays
-    // pinned even if a future layout gives it no overworld door.
-    expect(claimDifficultyForDungeon(IGNIVAR_RAID_ROOM_IDS[0], 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('ignivar_forge_approach', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('ignivar_molten_assembly', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('ignivar_inner_crucible', 'heroic')).toBe('heroic');

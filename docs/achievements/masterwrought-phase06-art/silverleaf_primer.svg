@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Sheenleaf Primer item icon source</title>
+  <defs>
+    <radialGradient id="bg" cx="0.42" cy="0.38" r="0.95">
+      <stop offset="0" stop-color="#28301f"/>
+      <stop offset="0.55" stop-color="#151a10"/>
+      <stop offset="1" stop-color="#080a06"/>
+    </radialGradient>
+    <radialGradient id="key" cx="0.28" cy="0.22" r="0.6">
+      <stop offset="0" stop-color="#e8f0d8" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#e8f0d8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cover" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5a8552"/>
+      <stop offset="0.45" stop-color="#3c6238"/>
+      <stop offset="1" stop-color="#22391f"/>
+    </linearGradient>
+    <linearGradient id="pages" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8dcae"/>
+      <stop offset="1" stop-color="#a89468"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2f7f2"/>
+      <stop offset="0.5" stop-color="#c2cfc9"/>
+      <stop offset="1" stop-color="#7e8f88"/>
+    </linearGradient>
+    <linearGradient id="spine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1c3019"/>
+      <stop offset="1" stop-color="#33552f"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#bg)"/>
+  <rect width="128" height="128" fill="url(#key)"/>
+  <ellipse cx="66" cy="107" rx="35" ry="8" fill="#000000" opacity="0.55"/>
+  <g transform="rotate(-4 64 64)">
+    <rect x="40" y="30" width="56" height="74" rx="3" fill="url(#pages)"/>
+    <path d="M92 34 L92 100" stroke="#c7b787" stroke-width="1.4" fill="none"/>
+    <path d="M94 36 L94 101" stroke="#8f7d51" stroke-width="1.2" fill="none"/>
+    <rect x="34" y="26" width="57" height="74" rx="4" fill="url(#cover)" stroke="#14230f" stroke-width="1.6"/>
+    <rect x="34" y="26" width="9" height="74" rx="3" fill="url(#spine)"/>
+    <rect x="47" y="32" width="38" height="62" rx="2" fill="none" stroke="#b9c8b4" stroke-width="1.1" opacity="0.5"/>
+    <path d="M66 43 C79 50 80 62 66 82 C52 62 53 50 66 43 Z" fill="url(#leaf)" stroke="#43584d" stroke-width="1.1"/>
+    <path d="M66 47 L66 77 M66 55 L59 51 M66 55 L73 51 M66 64 L58 59 M66 64 L74 59" stroke="#4c6156" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <path d="M91 56 h6 v12 h-6" fill="#cbd4cd" stroke="#5c6b62" stroke-width="1"/>
+    <path d="M39 30 C52 27 74 26 88 28" stroke="#9dc48e" stroke-width="1.6" fill="none" opacity="0.7"/>
+  </g>
+</svg>

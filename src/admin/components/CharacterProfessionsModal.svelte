@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import type { CharacterProfessionsSheet } from '../types';
   import { apiGet, apiPost } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from './PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { fmtDate, fmtDecimal, fmtDuration, fmtNumber } from '../format';
   import { classLabel, localizeAdminError, t, zoneIdLabel } from '../i18n';
@@ -30,7 +32,7 @@
   } = $props();
 
   let sheet = $state<CharacterProfessionsSheet | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let requestId = 0;
 
   // The pending restore the operator is filling in ('item' | 'slot' | null).
@@ -55,7 +57,7 @@
 
   async function refresh(): Promise<void> {
     const currentRequest = ++requestId;
-    failed = false;
+    failed = 'none';
     try {
       const result = await apiGet<CharacterProfessionsSheet>(
         `/admin/api/characters/${characterId}/professions`,
@@ -64,7 +66,7 @@
       sheet = result;
     } catch (err) {
       if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -182,7 +184,9 @@
   </header>
 
   <div class="prof-inspect-body">
-    {#if failed}
+    {#if failed === 'forbidden'}
+      <PermissionDenied />
+    {:else if failed === 'error'}
       <div class="empty">{t('profInspect.loadFailed')}</div>
     {:else if !sheet}
       <div class="empty">{t('profInspect.loading')}</div>

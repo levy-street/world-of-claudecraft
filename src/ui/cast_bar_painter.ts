@@ -11,8 +11,9 @@
 // PLAYER bar (#castbar) and the TARGET bar (#tf-castbar) from their own element
 // sets. The two differ only in their options, never in a branch on "which bar":
 //   - `resolveCastLabel` localizes the cast id. The player resolves it through
-//     castDisplayName (the ability's localized name); the target shows the raw cast
-//     id, byte-faithful to its inline block, by passing the identity resolver.
+//     castDisplayName (the ability's localized name); the target resolves through
+//     targetCastDisplayLabel (farming localized, every other id raw as its
+//     inline block was; the class-wide localization is a maintainer call).
 //   - the eat/drink overlay is PLAYER-ONLY: the target never eats/drinks, so its
 //     paint input simply omits `consume` and the consume branch is unreachable for
 //     it (the generic-Entity cast path stays the target's whole story).
@@ -69,8 +70,8 @@ export interface CastBarElements {
 /** Per-instance options that are not DOM element refs. */
 export interface CastBarOptions {
   /** Resolve the cast id into the visible label. The player localizes it
-   *  (castDisplayName); the target shows the raw id (the identity resolver),
-   *  byte-faithful to its inline block. */
+   *  (castDisplayName); the target resolves through targetCastDisplayLabel
+   *  (farming localized, every other id raw as its inline block was). */
   resolveCastLabel: (state: CastBarState) => string;
   /** Clear the inner fill/label/timer + channel class when the bar is hidden (the
    *  player's inline block did; the target only set display:none). */

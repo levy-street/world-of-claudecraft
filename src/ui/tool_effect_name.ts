@@ -1,7 +1,7 @@
 // The one map from a tool-effect id to its localized display-name key.
 //
 // The gathering-profession counterpart of GATHERING_PROFESSION_NAME_KEYS
-// (./gathering_profession_name.ts), and it exists for the same reason: the sim
+// (./hud/professions/gathering_profession_name.ts), and it exists for the same reason: the sim
 // and the wire are language-agnostic and carry only a ToolEffectId, so the id
 // has to become a name somewhere on the UI side, once.
 //
@@ -24,6 +24,7 @@ export const TOOL_EFFECT_NAME_KEYS: Record<string, TranslationKey> = {
   gatherers_cache: 'hudChrome.professions.toolEffectName.gatherersCache',
   artisans_eye: 'hudChrome.professions.toolEffectName.artisansEye',
   quickening_charm: 'hudChrome.professions.toolEffectName.quickeningCharm',
+  makers_charm: 'hudChrome.professions.toolEffectName.makersCharm',
 };
 
 /** hasOwn-safe read of the table above, the twin of

@@ -10,14 +10,27 @@
 // lines it actually caused (instanceBonusStatLines), which is the fact a player
 // is reading the tooltip for.
 import { ENCHANTS } from '../sim/content/enchants';
+import { effectiveQuality } from '../sim/equipment_rules';
+import { activeItemInstanceStats, isItemEnchantActive } from '../sim/item_instance_stats';
+import { requiredLevelFor } from '../sim/item_level_req';
+import type { MaterialComposition } from '../sim/material_sources';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
+import { LEGENDARY_PROMOTION_COST, PERFECTING_RANKS } from '../sim/professions/perfecting';
 import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
 import { durationText } from './duration_text';
 import { esc } from './esc';
-import { formatNumber, type TranslationKey, t } from './i18n';
+import { MASTERWORK_SEAL_IMAGE_URL } from './hud/professions/profession_art';
+import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
-import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
+import { ITEM_QUALITY_LABEL_KEYS } from './item_kind_label';
+import { itemNameColor } from './item_name_color';
+import {
+  boundedMaterialSourceRows,
+  materialSourceSummary,
+  suppressesLegacyGatheredLine,
+} from './material_sources_view';
+import { statNameKey } from './stat_tooltip_view';
 import { svgIcon } from './ui_icons';
 
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
@@ -33,9 +46,32 @@ function cap(s: string): string {
   return s ? s[0].toUpperCase() + s.slice(1) : s;
 }
 
+/** The label key for a rating or affix stat: the character-sheet names, with
+ *  Healing Power (no StatId cell) resolved here. Shared by the compare rows
+ *  (hud.ts), the affix lines (item_affix_tooltip.ts), and the per-copy bonus
+ *  lines below, so a stat key spells its label in exactly one place. */
+export function compareStatLabelKey(stat: string): string {
+  return stat === 'healPower'
+    ? 'hudChrome.statInfo.names.healPower'
+    : statNameKey(stat as Parameters<typeof statNameKey>[0]);
+}
+
+/** Per-copy rolled stats can carry rating and affix keys (a Riftbound band's
+ *  gem lines, rift/band_ladder.ts); those label through compareStatLabelKey. */
+const LABELLED_BONUS_KEYS: ReadonlySet<string> = new Set([
+  'critRating',
+  'hasteRating',
+  'hitRating',
+  'spellPower',
+  'healPower',
+  'warfare',
+]);
+
 export function itemStatName(stat: string): string {
   const key = ITEM_STAT_LABEL_KEYS[stat as keyof Stats];
-  return key ? t(key) : cap(stat);
+  if (key) return t(key);
+  if (LABELLED_BONUS_KEYS.has(stat)) return t(compareStatLabelKey(stat) as TranslationKey);
+  return cap(stat);
 }
 
 export function itemNumber(value: number, fractionDigits = 0): string {
@@ -45,15 +81,16 @@ export function itemNumber(value: number, fractionDigits = 0): string {
   });
 }
 
-/** The WORN-slot tooltip payload (Professions 2.0): exactly the
- *  fields the public eqi wire carries (signer/enchant/rolled, the
- *  worn-identity trim), so the offline paperdoll and the online mirror
- *  render identical worn tooltips. Online, equippedInstances is decoded from
- *  the stripped eqi allowlist and never carries bindOnTrade/boundTo/charges;
- *  offline the self entity holds the FULL payload, so without this trim the
- *  Maker's Bond lines would render on worn gear in one host only. The bond
- *  is a bag-surface fact by construction (the eqi data minimization is
- *  deliberate); both hosts now agree by sharing this one projection. */
+/** The WORN-slot tooltip payload (Professions 2.0): the fields
+ *  the public eqi wire carries (signer/enchant/rolled/name/perfected, plus a
+ *  Riftbound band's rift record: the worn-identity trim), so the offline
+ *  paperdoll, the compare block, and the online mirror render identical worn
+ *  tooltips. Online, equippedInstances is decoded from the stripped eqi
+ *  allowlist and never carries bindOnTrade/boundTo/charges; offline the self
+ *  entity holds the FULL payload, so without this trim the Maker's Bond lines
+ *  would render on worn gear in one host only. The bond is a bag-surface fact
+ *  by construction (the eqi data minimization is deliberate); both hosts now
+ *  agree by sharing this one projection. */
 export function wornTooltipInstance(
   instance?: ItemInstancePayload,
 ): ItemInstancePayload | undefined {
@@ -62,7 +99,61 @@ export function wornTooltipInstance(
   if (instance.signer !== undefined) worn.signer = instance.signer;
   if (instance.enchant !== undefined) worn.enchant = instance.enchant;
   if (instance.rolled !== undefined) worn.rolled = instance.rolled;
+  // The player-chosen legendary name (Masterwrought phase 13): the one
+  // cosmetic field to JOIN the eqi allowlist since it was written, so the
+  // offline paperdoll title matches what an online inspector sees.
+  if (instance.name !== undefined) worn.name = instance.name;
+  // Public inspection now carries the Perfected stamp so active enchants and
+  // collection item levels agree in both hosts. Partial ranks, binding and the
+  // immutable Perfecting contribution remain private and are never copied here.
+  if (instance.perfected !== undefined) worn.perfected = instance.perfected;
+  if (instance.rift !== undefined) worn.rift = instance.rift;
   return worn;
+}
+
+/** The tooltip's EFFECTIVE quality for a copy (Masterwrought phase 13): the
+ *  copy's own rolled quality wins over its def's (the equipment_rules.ts
+ *  precedence the equip caps already read), narrowed back to the def's
+ *  quality when the rolled string is not a known tier, so the label lookup
+ *  stays total against a hostile or future-tier wire string (the
+ *  itemNameColor Object.hasOwn doctrine).
+ *  DECIDED 2026-08-27, display vs equip: a LEGACY legendary-rolled copy (an
+ *  old masterwork bump, no `perfected` stamp) reads legendary HERE, its
+ *  honest roll, while isUniqueEquipped (src/sim/equipment_rules.ts) stays
+ *  promotion-scoped and does not count it, for migration safety. The
+ *  disagreement is a decision, not drift; the twin comment lives on
+ *  isUniqueEquipped. */
+export function tooltipEffectiveQuality(
+  def: ItemDef,
+  instance: ItemInstancePayload | undefined,
+): ItemDef['quality'] {
+  const quality = effectiveQuality(def, instance);
+  return quality !== undefined && Object.hasOwn(ITEM_QUALITY_LABEL_KEYS, quality)
+    ? (quality as NonNullable<ItemDef['quality']>)
+    : def.quality;
+}
+
+/** The tooltip TITLE block (Masterwrought phase 13). A promoted copy's
+ *  player-chosen name becomes the title, colored by the EFFECTIVE quality
+ *  (legendary orange for a promoted copy), with the def's own localized name
+ *  on the line below so the item's identity is never lost; an unnamed copy
+ *  keeps the classic one-line title. The chosen name is PLAYER-AUTHORED text:
+ *  esc'd raw (the entity-name path), never through t(). `defName` is the
+ *  caller's already-localized def name (itemDisplayName), passed in so this
+ *  module stays a pure string builder. */
+export function instanceTitleHtml(
+  def: ItemDef,
+  instance: ItemInstancePayload | undefined,
+  defName: string,
+): string {
+  const color = itemNameColor({ kind: def.kind, quality: tooltipEffectiveQuality(def, instance) });
+  if (instance?.name === undefined) {
+    return `<div class="tt-title" style="color:${color}">${esc(defName)}</div>`;
+  }
+  return (
+    `<div class="tt-title" style="color:${color}">${esc(instance.name)}</div>` +
+    `<div class="tt-sub">${esc(defName)}</div>`
+  );
 }
 
 /** The Maker's Bond lines (Professions 2.0), rendered in the def
@@ -79,7 +170,9 @@ export function instanceBindingLines(
   instance?: ItemInstancePayload,
   kind?: ItemDef['kind'],
 ): string {
-  if (!instance || !isCommissionEligibleKind(kind)) return '';
+  // A Riftbound band is owner-bound personal reward gear, not a commission:
+  // its own Soulbound line (rift_band_tooltip.ts) states the bind.
+  if (!instance || instance.rift || !isCommissionEligibleKind(kind)) return '';
   if (instance.boundTo !== undefined) {
     return `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.crafting.commissionBound'))}</div>`;
   }
@@ -96,16 +189,13 @@ export function instanceBindingLines(
  *  IWorld.partyTradeMsRemaining, injected because only the world knows which
  *  clock `untilMs` was stamped from (tick-derived offline, epoch online);
  *  this builder stays a Node-testable pure string function. Renders nothing
- *  for an absent, malformed, or expired window, for a definition that is no
- *  longer soulbound, and never on WORN gear
+ *  for an absent, malformed, or expired window, and never on WORN gear
  *  (equip strips the payload field, and wornTooltipInstance would trim it
  *  anyway). */
 export function instancePartyTradeLine(
   instance: ItemInstancePayload | undefined,
   msRemainingFor: (untilMs: number) => number,
-  soulbound = true,
 ): string {
-  if (!soulbound) return '';
   const untilMs = instance?.partyTrade?.untilMs;
   if (untilMs === undefined || !Number.isFinite(untilMs)) return '';
   const remainingMs = msRemainingFor(untilMs);
@@ -130,11 +220,42 @@ export function instanceLockLine(instance?: ItemInstancePayload): string {
  *  renders nothing here. There is deliberately NO standalone enchanted marker:
  *  a bare "Enchanted" badge told a player their copy was enchanted but not what
  *  the enchant DID or which of the listed bonuses it accounted for, so the fact
- *  now rides the bonus stat lines themselves (instanceBonusStatLines below). */
+ *  now rides the bonus stat lines themselves (instanceBonusStatLines below).
+ *
+ *  Phase 14, the Perfecting badges, both DATA-DRIVEN off the payload alone so
+ *  every trim stays authoritative about what shows where:
+ *   - a `perfected` copy states it in one gold line. The worn projection
+ *     (wornTooltipInstance) and the peer inspect card's public eqi mirror both
+ *     carry `perfected`, so the badge and active enchant facts agree.
+ *   - a HEAD-STARTED copy (rank-walk `perfecting` in [1, PERFECTING_RANKS-1],
+ *     not yet perfected) states its rank on the owner's own full-payload
+ *     surfaces (bags, the market sell staging, returned listings). The
+ *     anonymous browse pipe's display trim drops `perfecting`, so a
+ *     head-started listing stays blind there by the standing decision; this
+ *     renderer never re-derives it. Out-of-range values (a hostile wire, a
+ *     future widening) render nothing rather than a wrong rank. */
 export function instanceBadgeLines(instance?: ItemInstancePayload): string {
   if (!instance) return '';
-  if (!instance.rolled?.masterwork) return '';
-  return `<div class="tt-sub tt-masterwork-seal" style="color:var(--gold)"><img class="tt-masterwork-seal-icon" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false"><span>${esc(t('hudChrome.crafting.masterworkSeal'))}</span></div>`;
+  let html = '';
+  if (instance.rolled?.masterwork) {
+    html += `<div class="tt-sub tt-masterwork-seal" style="color:var(--gold)"><img class="tt-masterwork-seal-icon" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false"><span>${esc(t('hudChrome.crafting.masterworkSeal'))}</span></div>`;
+  }
+  if (instance.perfected === true) {
+    html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemTooltip.perfectedBadge'))}</div>`;
+  } else if (
+    typeof instance.perfecting === 'number' &&
+    Number.isInteger(instance.perfecting) &&
+    instance.perfecting >= 1 &&
+    instance.perfecting < PERFECTING_RANKS
+  ) {
+    html += `<div class="tt-sub" style="color:var(--gold)">${esc(
+      t('hudChrome.itemTooltip.perfectingRank', {
+        rank: itemNumber(instance.perfecting),
+        ranks: itemNumber(PERFECTING_RANKS),
+      }),
+    )}</div>`;
+  }
+  return html;
 }
 
 function statLine(key: TranslationKey, value: number, stat: string): string {
@@ -159,8 +280,10 @@ function statLine(key: TranslationKey, value: number, stat: string): string {
  *  plain line's output. */
 export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
   if (!instance) return '';
-  const bonusStats = instance.rolled?.stats;
-  const enchantShare = instance.enchant ? ENCHANTS[instance.enchant]?.statBonus : undefined;
+  const bonusStats = activeItemInstanceStats(instance);
+  const active = isItemEnchantActive(instance);
+  const enchant = instance.enchant ? ENCHANTS[instance.enchant] : undefined;
+  const enchantShare = active ? enchant?.statBonus : undefined;
   const legacyEnchanted = instance.enchant === undefined && isEnchantedInstance(instance);
   let html = '';
   let attributed = false;
@@ -184,12 +307,16 @@ export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
     const remainder = value - share;
     if (remainder !== 0) html += statLine('itemUi.tooltip.stat', remainder, stat);
   }
-  // Safety net: attribution can only speak through a stat line, so a copy that
-  // IS enchanted but produced none (an enchant id this client cannot resolve, or
-  // a payload carrying the marker without rolled.stats) still states the fact.
-  // Its bag corner already paints the enchant glyph, so silence here would be a
-  // real information loss, not just a missing flourish.
-  if (!attributed && isEnchantedInstance(instance)) {
+  // A weapon proc describes its temporary effect, never a permanent stat gain.
+  // Unknown or incomplete enchanted payloads retain the marker fallback when
+  // no stat could be attributed. A dormant enchant instead states its gate.
+  if (!active) {
+    html += `<div class="tt-sub">${esc(t('hudChrome.perfecting.enchantInactive'))}</div>`;
+  } else if (enchant?.weaponProc) {
+    html += `<div class="tt-green tt-instance-bonus">${esc(
+      t(`hudChrome.enchantDescription.${enchant.id}` as TranslationKey),
+    )}</div>`;
+  } else if (!attributed && isEnchantedInstance(instance)) {
     html += `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
       t('hudChrome.itemTooltip.enchantedFallback'),
     )}</div>`;
@@ -199,27 +326,154 @@ export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
 
 /** Whether a signed copy of this item KIND reads as a gathered material
  *  (Professions 2.0). Every signable gathered item (node materials,
- *  corpse components, Pristine specimens) is kind 'junk', while every crafted
- *  recipe output lands on the equip/consume kinds (weapon, armor, food,
- *  potion, elixir, tool, bag), so the signed universe partitions cleanly on
- *  the kind alone; the partition is pinned in tests/item_instance_tooltip.test.ts.
- *  Raw fishing catches are also kind 'junk' (cooking reagents) but fishing never
- *  signs a catch, so they never reach the provenance line either. */
+ *  corpse components, Pristine specimens) is kind 'junk', while a CRAFTED
+ *  copy gains its signer only through the #1149 def-QUALITY rule
+ *  (isSignableMaterialRarity: rare and up, professions/crafting.ts) or the
+ *  masterwork proc arm, which needs a slot; commission NEVER adds a signer
+ *  (it mints bindOnTrade only). Crafted junk-kind outputs DO exist since
+ *  the Masterwrought phase 07 intermediates, but all ten are quality
+ *  common and slot-less, so neither signing arm can stamp them today, and
+ *  the pinned sweep in tests/item_instance_tooltip.test.ts holds every
+ *  crafted junk-kind output BELOW signable rarity: the day a retune bumps
+ *  one to rare, that sweep reds instead of this kind-only read silently
+ *  calling a crafted copy "Gathered by" (grow a real crafted-provenance
+ *  channel first). Recipe patterns (kind 'recipe') sit outside the signed
+ *  universe entirely, and raw fishing catches (also kind 'junk') are never
+ *  signed either, so neither reaches this line. */
 export function isGatheredProvenanceKind(kind: ItemDef['kind'] | undefined): boolean {
   return kind === 'junk';
 }
 
-/** The classic "Crafted by X" flavor line for a signed copy, or "Gathered by
- *  X" when the item's kind marks it as a gathered material. No
- *  payload change: the same eqi signer field feeds both wordings. Legacy
- *  signed instances (signer without the masterwork flag) render the mark
- *  alone. */
-export function instanceMakersMarkLine(
+/** THE PLACEABLE-FEAST CARVE-OUT (masterwrought Phase 11k), and it fixes a live
+ *  mislabel rather than making room for new content. The kind-only read above
+ *  reasoned that every crafted junk-kind output sits BELOW signable rarity, and
+ *  that stopped being true the day the shared feast shipped: `harvest_feast` is
+ *  kind 'junk' AND quality 'rare', so `mintsSignerPayload` (professions/
+ *  crafting.ts: signable rarity and not a bag) really does stamp a crafted copy,
+ *  and this line has been calling a cook's own feast "Gathered by" ever since.
+ *  The sweep that was supposed to catch it had the feast on an exception list
+ *  whose stated proof covered only the MASTERWORK signing arm, so the rarity arm
+ *  went unexamined. Phase 11k's three apex feasts are the same shape one rung
+ *  up, which is what surfaced it.
+ *
+ *  A feast is never gathered: the ONLY way to hold one is to craft it or to
+ *  take a crafted copy through trade, so its provenance is a craft by
+ *  construction. Keyed on the `feast` payload rather than on an id list, so
+ *  every rung past and future is covered without an edit. */
+function isCraftedPlaceable(def: ItemDef | undefined): boolean {
+  return !!def && 'feast' in def && def.feast !== undefined;
+}
+
+/** THE PROMOTION-BILL CARVE-OUT (masterwrought phase 13), the feast lesson's
+ *  exact sibling one phase on: the Deed of Making is kind 'junk' at quality
+ *  'rare' ON PURPOSE (the tradable-writ arm; rare keeps it out of the Sell
+ *  Junk sweep), so mintsSignerPayload's rarity arm signs a scribed copy, and
+ *  the kind-only read would call an inscriptionist's own writ "Gathered by".
+ *  A promotion-bill consumable is only ever CRAFTED (inscription's 125 rung)
+ *  or traded for, so its provenance is a craft by construction. Keyed on the
+ *  promotion bill itself (perfecting.ts LEGENDARY_PROMOTION_COST), never an
+ *  id list here, so a future bill line is covered without an edit (the
+ *  feast-payload doctrine: derive from the owning mechanic). */
+function isPromotionBillItem(def: ItemDef | undefined): boolean {
+  return !!def && LEGENDARY_PROMOTION_COST.some((c) => c.itemId === def.id);
+}
+
+/** Does this DEF read as gathered provenance? The kind-level rule above, minus
+ *  the crafted placeables and the promotion-bill writs. Prefer this over the
+ *  kind-only predicate at any call site that has the def in hand. */
+export function isGatheredProvenance(def: ItemDef | undefined): boolean {
+  return (
+    isGatheredProvenanceKind(def?.kind) && !isCraftedPlaceable(def) && !isPromotionBillItem(def)
+  );
+}
+
+/** The per-unit provenance rows for a material stack (the model is the pure
+ *  leaf material_sources_view.ts; this only renders it). One line per
+ *  descriptor, in the composition's canonical order, each stating the surviving
+ *  unit count and who is recorded for it. Names are historic display-name
+ *  SNAPSHOTS carried on the stack, esc'd raw like every other player-authored
+ *  string here: nothing is looked up, so no profile read or account data can
+ *  reach a tooltip.
+ *
+ *  A row that also carries a premium signature says so on its own line rather
+ *  than in a separate marker, so the benefit lands on exactly the units that
+ *  hold it. Legacy signer-only stock has no recorded gatherer at all and reads
+ *  that way, naming the signer as the signer: it never claims someone gathered
+ *  those units, and a recorded gatherer never claims the signature's crafting
+ *  benefit.
+ *
+ *  Renders nothing for a stack with no composition, which is every
+ *  non-material item and every legacy stack that predates provenance. */
+export function materialSourceLines(sources?: MaterialComposition): string {
+  const summary = materialSourceSummary(sources);
+  if (summary === null) return '';
+  const bounded = boundedMaterialSourceRows(summary);
+  if (bounded === null) return '';
+  let html = '';
+  for (const row of bounded.rows) {
+    const count = itemNumber(row.count);
+    const key: TranslationKey =
+      row.kind === 'gatherer'
+        ? row.premium
+          ? 'hudChrome.itemTooltip.materialSourceGathererSigned'
+          : 'hudChrome.itemTooltip.materialSourceGatherer'
+        : row.premium
+          ? 'hudChrome.itemTooltip.materialSourceUnrecordedSigned'
+          : 'hudChrome.itemTooltip.materialSourceUnrecorded';
+    html += `<div class="tt-sub tt-material-source" style="color:${QUALITY_COLOR.uncommon}">${esc(
+      t(key, { count, name: row.name, signer: row.signer }),
+    )}</div>`;
+  }
+  if (bounded.hiddenSources > 0) {
+    html += `<div class="tt-sub tt-material-source-more" style="color:${QUALITY_COLOR.uncommon}">${esc(
+      t('hudChrome.itemTooltip.materialSourceMore', {
+        sources: itemNumber(bounded.hiddenSources),
+        units: itemNumber(bounded.hiddenUnits),
+      }),
+    )}</div>`;
+  }
+  return html;
+}
+
+/** Complete material provenance block for the shared item-card painter. */
+export function materialMakersMarkLines(
+  item: ItemDef,
   instance?: ItemInstancePayload,
-  kind?: ItemDef['kind'],
+  sources?: MaterialComposition,
 ): string {
+  const summary = materialSourceSummary(sources);
+  return (
+    materialSourceLines(sources) +
+    (suppressesLegacyGatheredLine(summary) ? '' : instanceMakersMarkLine(instance, item))
+  );
+}
+
+/** The vendor price line only when the live sell command accepts this def. */
+export function vendorSellTooltipLine(item: ItemDef): string {
+  if (item.sellValue <= 0 || item.noVendorSell || item.soulbound) return '';
+  return `<div class="tt-sub">${esc(
+    t('itemUi.tooltip.sellPrice', { money: formatMoney(item.sellValue) }),
+  )}</div>`;
+}
+
+/** The classic weapon/armor level gate line for the shared item card. */
+export function itemRequiredLevelLine(item: ItemDef, playerLevel: number): string {
+  const req = requiredLevelFor(item);
+  if ((item.kind !== 'weapon' && item.kind !== 'armor') || req <= 1) return '';
+  return `<div class="${playerLevel >= req ? 'tt-sub' : 'tt-red'}">${esc(
+    t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }),
+  )}</div>`;
+}
+
+/** The classic "Crafted by X" flavor line for a signed copy, or "Gathered by
+ *  X" when the item reads as a gathered material. No payload change: the same
+ *  eqi signer field feeds both wordings. Legacy signed instances (signer
+ *  without the masterwork flag) render the mark alone. Takes the DEF rather
+ *  than the bare kind since the crafted-placeable carve-out above cannot be
+ *  decided from the kind alone. */
+export function instanceMakersMarkLine(instance?: ItemInstancePayload, def?: ItemDef): string {
   if (!instance?.signer) return '';
-  if (isGatheredProvenanceKind(kind)) {
+  if (isGatheredProvenance(def)) {
     return `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
       t('hudChrome.crafting.gatheredBy', { name: instance.signer }),
     )}</div>`;

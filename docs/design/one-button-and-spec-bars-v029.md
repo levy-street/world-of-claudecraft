@@ -344,7 +344,6 @@ Galeheart and Stonebound stay next to each other. The player always chooses the 
 | 11 | Whispered Prayer |
 | 12 | Litany of Woe |
 | 13 | Litany of Resolve |
-| 14 | Prayer of Returning |
 
 ### Benison
 
@@ -365,7 +364,6 @@ Galeheart and Stonebound stay next to each other. The player always chooses the 
 | 13 | Dirge of Decay |
 | 14 | Litany of Woe |
 | 15 | Litany of Resolve |
-| 16 | Prayer of Returning |
 
 ### Vespers
 

@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Un increspatura sul pozzo lunare',
     desc: 'Pesca un pesce nelle acque di Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -199,7 +198,6 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Maestro Raccoglitore',
-    desc: 'Raggiungi 100 di competenza in almeno tre tra Estrazione, Disboscamento, Erboristeria e Pesca.',
   },
   prog_first_craft: {
     name: 'Fatto a Mano',
@@ -316,7 +314,6 @@ export const table: DeedLocaleTable = {
     title: 'Abbattiwyrm',
   },
   dgn_sanctum_speed: {
-    name: 'Scatto nel Santuario',
     desc: 'Sconfiggi Korzul il Gravewyrm entro 15 minuti da quando il tuo gruppo rivendica il Santuario del Gravewyrm.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -382,7 +379,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Le Campane Tacciono',
-    desc: 'Sconfiggi il Diacono Varric quando ogni Campanaro Funebre che risveglia è già stato ucciso.',
+    desc: 'Sconfiggi il Diacono Vandric quando ogni Campanaro Funebre che risveglia è già stato ucciso.',
   },
   dlv_nhalia_bells: {
     name: 'Fermacampane',
@@ -395,7 +392,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Cronaca della Valle, Capitolo II',
-    desc: 'Concludi il secondo capitolo della cronaca di Saul: banditi, murloc e parassiti della miniera sterminati, una partita giocata al Campo della Scrofa e il Reliquiario affrontato.',
   },
   chr_vale_chapter_iii: {
     name: 'Cronaca della Valle',
@@ -416,7 +412,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Contendente del Secchio di Rame',
-    desc: 'Scendi in campo e tocca la palla in una partita della Coppa della Valle al Campo della Scrofa.',
   },
   chr_vale_rares: {
     name: 'I Terrori della Valle',
@@ -461,12 +456,11 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Cronaca di Thornpeak',
-    desc: "Porta a compimento l'intera storia della montagna: il Culto del Wyrm spezzato, il Santuario ridotto al silenzio, il Picco Risvegliato abbattuto e ogni terrore famigerato delle rupi eliminato.",
     title: 'di Thornpeak',
   },
   chr_peaks_sparring: {
     name: 'Esercitazioni sul Muro',
-    desc: "Infliggi 1.000 danni totali al manichino d'allenamento sopra Highwatch.",
+    desc: "Infliggi 1.000 danni totali a un manichino d'allenamento.",
   },
   chr_peaks_glimmer_cast: {
     name: 'Acqua Fredda, Luce più Fredda',
@@ -556,7 +550,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Cliente di Riguardo',
-    desc: 'Scopri tutti e dieci i pezzi della mercanzia del Quartiermastro Vex.',
+    desc: 'Scopri tutti e dieci i pezzi di equipaggiamento della mercanzia del Quartiermastro Vex.',
   },
   col_glimmerfin: {
     name: 'Un Barlume di Speranza',
@@ -610,69 +604,53 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Scarpini in Campo',
-    desc: "Porta a termine un'intera partita di Coppa della Valle al Campo della Scrofa, vinta o persa che sia.",
   },
   pvp_vcup_first_win: {
     name: 'Primo Trofeo in Bacheca',
-    desc: 'Vinci una partita classificata di Coppa della Valle.',
   },
   pvp_vcup_wins_10: {
     name: 'Vecchia Volpe del Boarball',
-    desc: 'Vinci 10 partite classificate di Coppa della Valle.',
   },
   pvp_vcup_wins_25: {
     name: 'Leggenda del Boarball',
-    desc: 'Vinci 25 partite classificate di Coppa della Valle.',
     title: 'Leggenda del Boarball',
   },
   pvp_vcup_first_goal: {
     name: 'A Segno',
-    desc: 'Segna un gol in una partita classificata di Coppa della Valle.',
   },
   pvp_vcup_hat_trick: {
     name: 'Eroe della Tripletta',
-    desc: 'Segna tre gol in una singola partita classificata di Coppa della Valle, nella categoria 3v3 o superiore.',
   },
   pvp_vcup_golden_goal: {
     name: "Momento d'Oro",
-    desc: "Segna il gol d'oro che decide una partita classificata di Coppa della Valle.",
   },
   pvp_vcup_first_save: {
     name: 'Mani Sicure',
-    desc: 'Effettua una parata da portiere in una partita classificata di Coppa della Valle.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Di Qui Non Si Passa',
-    desc: 'Vinci da portiere una partita classificata di Coppa della Valle senza subire gol.',
   },
   pvp_vcup_guild_win: {
     name: 'Per il Vessillo',
-    desc: 'Vinci una partita classificata di Coppa della Valle disputata sotto il vessillo della tua gilda.',
   },
   pvp_fiesta_first_bout: {
     name: 'Imbucato alla Fiesta',
-    desc: 'Combatti per intero uno scontro Fiesta 2v2, vinto o perso che sia.',
   },
-  pvp_fiesta_first_win: { name: "L'Anima della Fiesta", desc: 'Vinci uno scontro Fiesta 2v2.' },
+  pvp_fiesta_first_win: { name: "L'Anima della Fiesta" },
   pvp_fiesta_double: {
     name: 'Doppio Guaio',
-    desc: 'Metti a segno due abbattimenti nella Fiesta nel giro di quattro secondi.',
   },
   pvp_fiesta_shutdown: {
     name: 'Guastafeste',
-    desc: 'Abbatti un avversario della Fiesta che vanta una serie di tre o più abbattimenti.',
   },
   pvp_fiesta_full_build: {
     name: "In Tiro per l'Occasione",
-    desc: 'Vinci uno scontro della Fiesta avendo fissato un potenziamento in ognuna delle tre ondate.',
   },
   pvp_fiesta_powerups: {
     name: 'Uno per Tipo',
-    desc: 'Raccogli almeno una volta ognuno dei quattro power-up del ring: Demone della Velocità, Colosso, Stivali Lunari e Berserker.',
   },
   pvp_fiesta_five_kills: {
     name: 'Squadra in Spalla',
-    desc: 'Metti a segno cinque abbattimenti in un singolo scontro della Fiesta.',
   },
   soc_first_party: {
     name: 'Meglio in Compagnia',
@@ -1104,5 +1082,9 @@ export const table: DeedLocaleTable = {
     name: 'Nemmeno una Brace Perduta',
     desc: 'Sconfiggi Varkhul, Forgefather of the Last Flame, in difficoltà Eroica senza che un solo membro del raid muoia.',
     title: "l'Incombusto",
+  },
+  col_set_bramblehide: {
+    name: 'Pelle di Rovo di Roots',
+    desc: 'Scopri ogni pezzo della Pelle di Rovo di Roots.',
   },
 };

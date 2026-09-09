@@ -588,8 +588,25 @@ export class SpellbookWindow {
     list.appendChild(el);
   }
 
+  // The spellbook lists every LEARNED spell under its own base identity, never
+  // the live action-bar transform (Redharvest/Overbloom/Venomrend/Pack Rally):
+  // a row is an index entry, not a cast preview. world.resolvedAbility(id) runs
+  // the full display chain and can swap def.id when an action-replacement
+  // engine is currently active, so this keeps only the id-PRESERVING part of
+  // that resolve (the Coldsight window tweaks, Vespers Dirge/Mindfracture) by
+  // falling back to the raw `known` the instant the id would change.
+  private resolvedForDisplay(known: ResolvedAbility): ResolvedAbility {
+    const resolved = this.deps.world().resolvedAbility(known.def.id);
+    return resolved && resolved.def.id === known.def.id ? resolved : known;
+  }
+
   private appendRow(list: HTMLElement, row: SpellbookRow): void {
     const def = ABILITIES[row.abilityId];
+    // The STATIC row summary/rank stay on the raw row.known: tickOpen's
+    // knownChanged gate only diffs raw known (rank/cost/castTime/cooldown),
+    // never an aura-driven resolve, so a build-time live resolve here would
+    // stick after the aura expires with nothing left to trigger a rebuild.
+    // Only the hover tooltip below resolves live, on every open.
     const known = row.known;
     const el = document.createElement('div');
     el.className = `spell-row${known ? '' : ' locked'}`;
@@ -702,7 +719,7 @@ export class SpellbookWindow {
       // passive rows that deliberately have no action-bar controls.
       this.deps.attachTooltip(el, () => {
         const live = this.deps.world().known.find((k) => k.def.id === known.def.id) ?? known;
-        return this.deps.abilityTooltip(live);
+        return this.deps.abilityTooltip(this.resolvedForDisplay(live));
       });
     } else {
       this.deps.attachTooltip(

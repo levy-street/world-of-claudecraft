@@ -24,12 +24,9 @@
 import * as THREE from 'three';
 import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
-import { clusterGeometry, mulberry32 } from './blade_grass';
-import {
-  activateDenseSlot,
-  type DenseSlotState,
-  deactivateDenseSlot,
-} from './blade_grass_dense_core';
+import { clusterGeometry, clusterPlacementPad, mulberry32 } from './blade_grass';
+import { toroidalCell } from './blade_grass_pool_core';
+import { buildBladeSectorPool } from './blade_grass_sector_pool';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
@@ -44,7 +41,7 @@ import {
   MEADOW_BAND_PLACE_BUDGET,
   MEADOW_BAND_RADIUS,
 } from './meadow_tuning';
-import { renderLayerDisabled } from './render_dev_flags';
+import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 
 export interface BladeGrassBandView {
@@ -151,24 +148,20 @@ export function buildBladeGrassBand(
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
   };
 
-  const im = new THREE.InstancedMesh(geo, mat, POOL);
-  im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  im.receiveShadow = true;
-  im.castShadow = false;
-  im.frustumCulled = false; // pool is centred on the player
-  im.count = 0;
-  im.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(POOL * 3), 3);
-  im.instanceColor.setUsage(THREE.DynamicDrawUsage);
-  group.add(im);
+  // the carpet's sector split, verbatim: one mesh per sector of the slot grid,
+  // all on this one geometry and material (blade_grass_sector_pool.ts)
+  const sectorPool = buildBladeSectorPool({
+    gridW: GRID_W,
+    axis: bladeSectorAxis(),
+    geometry: geo,
+    material: mat,
+    clusterPad: clusterPlacementPad(geo),
+  });
+  for (const mesh of sectorPool.meshes) group.add(mesh);
 
+  // per-slot current cell (packed); 0x7fffffff = never placed
   const slotCell = new Int32Array(POOL).fill(0x7fffffff);
-  const denseSlots: DenseSlotState = {
-    count: 0,
-    slotToDense: new Int32Array(POOL).fill(-1),
-    denseToSlot: new Int32Array(POOL).fill(-1),
-  };
   const m = new THREE.Matrix4();
-  const movedMatrix = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const qLean = new THREE.Quaternion();
   const up = new THREE.Vector3(0, 1, 0);
@@ -176,14 +169,6 @@ export function buildBladeGrassBand(
   const v = new THREE.Vector3();
   const sv = new THREE.Vector3();
   const c = new THREE.Color();
-  const movedColor = new THREE.Color();
-  let dirtyLo = POOL;
-  let dirtyHi = -1;
-
-  const markDirty = (dense: number): void => {
-    if (dense < dirtyLo) dirtyLo = dense;
-    if (dense > dirtyHi) dirtyHi = dense;
-  };
 
   const hash = (i: number, j: number, k: number): number => {
     let h = (i * 374761393 + j * 668265263 + k * 2246822519) | 0;
@@ -222,35 +207,23 @@ export function buildBladeGrassBand(
           m.compose(v.set(x, h - 0.02, z), q, sv.set(s, s * (0.85 + lush * 0.5) * hJit, s));
           groundGrassColorAt(x, z, seed, c);
           c.multiplyScalar(1.18);
-          const dense = activateDenseSlot(denseSlots, slot);
-          im.setMatrixAt(dense, m);
-          im.setColorAt(dense, c);
-          markDirty(dense);
+          sectorPool.place(slot, m, c);
           return;
         }
       }
     }
-    const removedDense = denseSlots.slotToDense[slot];
-    if (removedDense < 0) return;
-    const movedSlot = deactivateDenseSlot(denseSlots, slot);
-    if (movedSlot >= 0) {
-      im.getMatrixAt(denseSlots.count, movedMatrix);
-      im.setMatrixAt(removedDense, movedMatrix);
-      im.getColorAt(denseSlots.count, movedColor);
-      im.setColorAt(removedDense, movedColor);
-      markDirty(removedDense);
-    }
+    sectorPool.remove(slot);
   }
 
   const colCi = new Int32Array(GRID_W);
 
   const scanTargetBlock = (baseI: number, baseJ: number, initialBudget: number): boolean => {
     for (let gi = 0; gi < GRID_W; gi++) {
-      colCi[gi] = baseI + ((((gi - baseI) % GRID_W) + GRID_W) % GRID_W);
+      colCi[gi] = toroidalCell(baseI, gi, GRID_W);
     }
     let budget = initialBudget;
     for (let gj = 0; gj < GRID_W && budget > 0; gj++) {
-      const cjj = baseJ + ((((gj - baseJ) % GRID_W) + GRID_W) % GRID_W);
+      const cjj = toroidalCell(baseJ, gj, GRID_W);
       const packedLo = cjj & 0xffff;
       const rowBase = gj * GRID_W;
       for (let gi = 0; gi < GRID_W && budget > 0; gi++) {
@@ -268,9 +241,10 @@ export function buildBladeGrassBand(
   const initialBaseI = Math.floor(initialPx / CELL) - (GRID_W >> 1);
   const initialBaseJ = Math.floor(initialPz / CELL) - (GRID_W >> 1);
   scanTargetBlock(initialBaseI, initialBaseJ, Number.POSITIVE_INFINITY);
-  im.count = denseSlots.count;
-  dirtyLo = POOL;
-  dirtyHi = -1;
+  // Three.js uploads each full attribute on its first draw, so the initial
+  // prefix needs its counts and bounds published but no update ranges.
+  sectorPool.dropUploads();
+  sectorPool.syncSectors();
   let lastBaseI = initialBaseI;
   let lastBaseJ = initialBaseJ;
   let pending = false;
@@ -287,20 +261,12 @@ export function buildBladeGrassBand(
       if (baseI === lastBaseI && baseJ === lastBaseJ && !pending) return;
       lastBaseI = baseI;
       lastBaseJ = baseJ;
-      dirtyLo = POOL;
-      dirtyHi = -1;
-      const previousCount = denseSlots.count;
+      // re-placed slots this frame. Ranges are queued per sector, never
+      // cleared here: the renderer clears them after it actually uploads, so
+      // a skipped frame keeps its pending spans alive.
       pending = scanTargetBlock(baseI, baseJ, MEADOW_BAND_PLACE_BUDGET);
-      if (denseSlots.count !== previousCount) im.count = denseSlots.count;
-      if (dirtyHi >= 0) {
-        const count = dirtyHi - dirtyLo + 1;
-        im.instanceMatrix.addUpdateRange(dirtyLo * 16, count * 16);
-        im.instanceMatrix.needsUpdate = true;
-        if (im.instanceColor) {
-          im.instanceColor.addUpdateRange(dirtyLo * 3, count * 3);
-          im.instanceColor.needsUpdate = true;
-        }
-      }
+      sectorPool.queueUploads();
+      sectorPool.syncSectors();
     },
   };
 }

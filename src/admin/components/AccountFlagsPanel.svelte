@@ -11,6 +11,8 @@
   } from '../flag_workflow';
   import { fmtCopper, fmtDate, fmtNumber } from '../format';
   import { t } from '../i18n';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from './PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import type { AccountFlagsData } from '../types';
   import AccountLink from './AccountLink.svelte';
@@ -23,7 +25,7 @@
   let { accountId }: { accountId: number } = $props();
 
   let data = $state<AccountFlagsData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let requestId = 0;
 
   async function refresh(): Promise<void> {
@@ -32,10 +34,10 @@
       const result = await apiGet<AccountFlagsData>(`/admin/api/accounts/${accountId}/flags`);
       if (currentRequest !== requestId) return;
       data = result;
-      failed = false;
+      failed = 'none';
     } catch (err) {
       if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -49,7 +51,9 @@
 
 <div class="flags-panel">
   <h4>{t('flags.accountHeader')}</h4>
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('flags.loadFailed')}</div>
   {:else if data === null}
     <div class="empty">{t('flags.loading')}</div>

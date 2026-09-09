@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   apiGet: vi.fn(),
+  apiPost: vi.fn(),
 }));
 
 vi.mock('../../src/admin/api', () => ({
@@ -16,14 +17,15 @@ vi.mock('../../src/admin/api', () => ({
     }
   },
   apiGet: mocks.apiGet,
-  apiPost: vi.fn(),
+  apiPost: mocks.apiPost,
   getToken: () => 'tok',
   getAdminName: () => 'admin',
   clearSession: () => {},
 }));
 
 import App from '../../src/admin/App.svelte';
-import { t } from '../../src/admin/i18n';
+import { ApiError } from '../../src/admin/api';
+import { localizeAdminError, t } from '../../src/admin/i18n';
 import OnlinePlayers from '../../src/admin/pages/OnlinePlayers.svelte';
 import { auth } from '../../src/admin/state/auth.svelte';
 import type { LivePlayer } from '../../src/admin/types';
@@ -67,6 +69,7 @@ const roster = {
 
 beforeEach(() => {
   mocks.apiGet.mockReset();
+  mocks.apiPost.mockReset();
   mocks.apiGet.mockImplementation(async (path: string) => {
     if (path === '/admin/api/online') return roster;
     throw new Error(`unexpected path ${path}`);
@@ -187,6 +190,126 @@ describe('Online players page', () => {
     mocks.apiGet.mockRejectedValue(new Error('boom'));
     render(OnlinePlayers);
     expect(await screen.findByText(t('onlinePlayers.loadFailed'))).toBeInTheDocument();
+  });
+
+  it('hides the Kick action from an operator without moderation.act', async () => {
+    grantPermissions(['accounts.read', 'moderation.read']);
+    render(OnlinePlayers);
+    await screen.findByText('Aragorn');
+
+    expect(screen.queryByText(t('online.kick'))).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('columnheader', { name: t('online.colActions') }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('kicks a player after the operator confirms with a reason, then refreshes', async () => {
+    grantPermissions(['accounts.read', 'moderation.act']);
+    mocks.apiPost.mockResolvedValue({ ok: true });
+    render(OnlinePlayers);
+    await screen.findByText('Aragorn');
+
+    const row = screen.getByText('Aragorn').closest('tr');
+    if (!row) throw new Error('player row not found');
+    await fireEvent.click(
+      within(row).getByRole('button', { name: t('online.kickPlayer', { name: 'Aragorn' }) }),
+    );
+
+    // The standard confirm prompt names the character, the account, and the
+    // action, and requires a reason before anything is sent.
+    expect(screen.getByRole('heading', { name: t('dialog.confirmKick') })).toBeInTheDocument();
+    expect(screen.getByText('#77')).toBeInTheDocument();
+    expect(screen.getByText(t('dialog.actionKick'))).toBeInTheDocument();
+    expect(mocks.apiPost).not.toHaveBeenCalled();
+
+    const reason = screen.getByLabelText(t('dialog.reason'));
+    await fireEvent.input(reason, { target: { value: 'AFK for two hours' } });
+    const form = reason.closest('form');
+    if (!form) throw new Error('prompt form not found');
+    await fireEvent.submit(form);
+
+    expect(mocks.apiPost).toHaveBeenCalledWith('/admin/api/moderation/accounts/77/kick', {
+      reason: 'AFK for two hours',
+    });
+    expect(
+      await screen.findByText(t('onlinePlayers.kicked', { name: 'Aragorn' })),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: t('dialog.confirmKick') }),
+    ).not.toBeInTheDocument();
+    // The roster is re-read so the row reflects the server's answer.
+    expect(mocks.apiGet).toHaveBeenCalledTimes(2);
+  });
+
+  it('reports a stale target (the player already left) inline, localized from its code', async () => {
+    grantPermissions(['accounts.read', 'moderation.act']);
+    mocks.apiPost.mockRejectedValue(new ApiError(409, 'kick.target_offline'));
+    render(OnlinePlayers);
+    await screen.findByText('Belegorn');
+
+    const row = screen.getByText('Belegorn').closest('tr');
+    if (!row) throw new Error('player row not found');
+    await fireEvent.click(
+      within(row).getByRole('button', { name: t('online.kickPlayer', { name: 'Belegorn' }) }),
+    );
+    const reason = screen.getByLabelText(t('dialog.reason'));
+    await fireEvent.input(reason, { target: { value: 'AFK' } });
+    const form = reason.closest('form');
+    if (!form) throw new Error('prompt form not found');
+    await fireEvent.submit(form);
+
+    expect(
+      await screen.findByText(
+        t('onlinePlayers.kickFailed', {
+          name: 'Belegorn',
+          error: t('error.kickTargetOffline'),
+        }),
+      ),
+    ).toBeInTheDocument();
+    // A refusal keeps the prompt (and the typed reason) open, and a 409 is never
+    // a session loss: the operator stays signed in.
+    expect(screen.getByRole('heading', { name: t('dialog.confirmKick') })).toBeInTheDocument();
+    expect(auth.token).toBe('tok');
+  });
+
+  it('reports an operator target refusal and a mid-session permission loss inline', async () => {
+    grantPermissions(['accounts.read', 'moderation.act']);
+    mocks.apiPost.mockRejectedValueOnce(new ApiError(400, 'kick.admin_target'));
+    render(OnlinePlayers);
+    await screen.findByText('Aragorn');
+
+    const row = screen.getByText('Aragorn').closest('tr');
+    if (!row) throw new Error('player row not found');
+    const submitKick = async (): Promise<void> => {
+      const reason = screen.getByLabelText(t('dialog.reason'));
+      await fireEvent.input(reason, { target: { value: 'AFK' } });
+      const form = reason.closest('form');
+      if (!form) throw new Error('prompt form not found');
+      await fireEvent.submit(form);
+    };
+    await fireEvent.click(
+      within(row).getByRole('button', { name: t('online.kickPlayer', { name: 'Aragorn' }) }),
+    );
+    await submitKick();
+    expect(
+      await screen.findByText(
+        t('onlinePlayers.kickFailed', { name: 'Aragorn', error: t('error.kickAdminTarget') }),
+      ),
+    ).toBeInTheDocument();
+
+    // A 403 (the permission was revoked since the page loaded) is an inline
+    // error too, never a logout: only a 401 ends the session.
+    mocks.apiPost.mockRejectedValueOnce(new ApiError(403, 'insufficient permissions'));
+    await submitKick();
+    expect(
+      await screen.findByText(
+        t('onlinePlayers.kickFailed', {
+          name: 'Aragorn',
+          error: localizeAdminError('insufficient permissions'),
+        }),
+      ),
+    ).toBeInTheDocument();
+    expect(auth.token).toBe('tok');
   });
 
   it('is reachable from the Players nav with accounts.read', async () => {

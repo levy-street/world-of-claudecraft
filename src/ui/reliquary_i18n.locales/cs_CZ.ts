@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Hrdinský: The Inner Crucible',
     desc: 'Štíty a zbraně dostupné jen hrdinsky od Varkhul, Forgefather of the Last Flame.',
   },
+  conquerors_set_bramblehide: {
+    name: 'Rootsova ostružinová kůže',
+    desc: 'Úplná kožená rodina Bramblehide.',
+  },
 };

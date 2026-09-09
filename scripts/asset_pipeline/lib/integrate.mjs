@@ -79,6 +79,20 @@ export function insertIntoBlock(source, anchor, line) {
 // Weapon registration (--apply capable; gated by tests/held_weapon_models.test.ts)
 // ---------------------------------------------------------------------------
 
+/** The surface decision every generated held model owes (a follow-up action,
+ *  never applied automatically): a Tripo atlas that should keep its shipped
+ *  response goes in manifest.ts AUTHORED_HELD_MODELS; one that reads right
+ *  under the kit polish goes in the LEGACY_POLISHED_HELD_MODELS list of
+ *  tests/authored_surfaces.test.ts. That sweep fails until one of them names
+ *  the key, so this line is the pointer the failure would otherwise lack. */
+export function authoredHeldModelFollowUp(key) {
+  return (
+    `decide the surface for ${key}: AUTHORED_HELD_MODELS (src/render/characters/manifest.ts) ` +
+    'keeps the shipped atlas, LEGACY_POLISHED_HELD_MODELS (tests/authored_surfaces.test.ts) ' +
+    'keeps the kit polish; tests/authored_surfaces.test.ts fails until one names it'
+  );
+}
+
 /** Copy the built GLB + legacy model-preview JPG into public/ and register the variant key.
  *  `itemIds` map existing (or new) item ids to the held-model key; each authored item also needs
  *  bespoke painted inventory art at public/ui/items/<item-id>.webp before the item gate passes. */
@@ -140,6 +154,7 @@ export function registerWeapon({ key, gripFamily, glbPath, iconPath, itemIds = [
     actions.push(`mapped ${itemId} -> ${key} in ITEM_WEAPON_VARIANTS`);
   }
   if (itemIds.length) write(FILES.variants, variants);
+  actions.push(authoredHeldModelFollowUp(key));
   return actions;
 }
 
@@ -444,6 +459,9 @@ export function visualDefSnippet({ name, kind, height, clips, hasCast, hasJump }
     '    },',
     "    tint: 'entity',",
     '    tintStrength: 0.35,',
+    '    // A generated atlas carries its own baked shading: without this the low',
+    '    // tier lays a flat grey readability floor over it (tests/authored_surfaces.test.ts).',
+    '    authoredAtlas: true,',
     '  },',
     '',
     '// Then route a mob template to it in MOB_KEYS (same file):',

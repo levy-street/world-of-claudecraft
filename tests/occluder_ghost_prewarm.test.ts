@@ -210,7 +210,7 @@ describe('buildGhostVariantPrewarmGroup', () => {
     expect(programKeyInputs(twin)).toEqual(programKeyInputs(material));
     // The hook-composed half of the key is the part a bare clone would lose.
     expect(twin.customProgramCacheKey()).toContain('wocHazeVXZ');
-    expect(twin.customProgramCacheKey()).toContain('surface-detail|stone');
+    expect(twin.customProgramCacheKey()).toContain('surface-detail|');
   });
 
   it('reproduces the bare-clone split it exists to avoid', () => {

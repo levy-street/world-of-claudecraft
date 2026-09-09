@@ -1,3 +1,5 @@
+// biome-ignore-all lint/suspicious/noTemplateCurlyInString: this suite pins literal template source text.
+
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { stripComments } from './helpers/strip_comments';
@@ -137,19 +139,70 @@ describe('woc_market_window: cold-window contract', () => {
     expect(read).toBeGreaterThanOrEqual(0);
     expect(wipe).toBeGreaterThan(read);
     expect(write).toBeGreaterThan(inner.indexOf('this.wire(root, model)'));
+    // ...and AFTER the focus restore: restoreFirstEnabled's contract is the
+    // bare focus() (focus_restore.ts states the policy), which scrolls the
+    // focused control into view in real browsers. Written the other way
+    // round, every slow-band rebuild with the filter bar focused yanked the
+    // browse pane back to the top. happy-dom models no scroll-on-focus, so
+    // the rig cannot hold this behaviorally and the order pin is the guard.
+    expect(write).toBeGreaterThan(inner.indexOf('restoreFirstEnabled('));
     // Keyed, so a tab switch or a different listing still starts at the top
     // rather than inheriting an offset into content that no longer exists.
     expect(inner).toContain('if (keys[name] !== this.renderedScrollKey[name]) continue;');
-    expect(painter).toContain("return { body: this.tab, detail: `${this.tab}:${listing ?? ''}` };");
+    // The keying and the keeper table live in the view core (the monolith
+    // ratchet's named seam); the window consumes them by import.
+    const viewCore = readFileSync(new URL('../src/ui/woc_market_view.ts', import.meta.url), 'utf8');
+    expect(viewCore).toContain("return { body: tab, detail: `${tab}:${detailListingId ?? ''}` };");
     // Both containers, named. A table of one would pass every count above.
-    expect(painter).toContain("['body', '.wm-body'],");
-    expect(painter).toContain("['detail', '.wm-detail'],");
+    expect(viewCore).toContain("['body', '.wm-body'],");
+    expect(viewCore).toContain("['detail', '.wm-detail'],");
+  });
+
+  it('background repaints hold while a native dropdown may be open, paint only', () => {
+    // A rebuild replaces a focused <select>, and a replaced select's open
+    // dropdown closes with it out from under the pointer (the reported
+    // Browse-filter bug). native_select_hold.ts owns the open heuristic and
+    // its focus bounding; BOTH background drivers consult it: the slow-band
+    // poll and the wallet fan-out.
+    // betweenCode, not between: a commented-out guard must not satisfy this.
+    const refresh = betweenCode('refreshIfChanged(): void {', 'private pollFromServer');
+    const hold = 'if (this.selectHold?.holdRepaints()) return;';
+    expect(refresh).toContain(hold);
+    // The hold sits AFTER the poll: only the PAINT waits, the data stays
+    // fresh, so releasing the hold repaints current state immediately.
+    expect(refresh.indexOf('this.pollFromServer();')).toBeLessThan(refresh.indexOf(hold));
+    const wallet = betweenCode('onWalletChanged(): void {', 'private buildModel');
+    expect(wallet).toContain('if (this.selectHold?.holdRepaints()) {');
+    // A skipped wallet beat re-arms: the beat is event-driven with no retry,
+    // so without this flag an empty static page strands the card stale.
+    expect(wallet).toContain('this.walletRepaintDue = true;');
+    expect(refresh).toContain('if (sig === this.lastSig && !this.walletRepaintDue) return;');
+    // The hold attaches on the FIRST render, ahead of the window's own delegated
+    // listeners (its change disarm must run while the select is still attached,
+    // before onChange rebuilds the subtree), and never in the constructor: the
+    // deps contract is lazy closures, and hud.ts builds these painters as field
+    // initializers over a bare root cast.
+    const built = betweenCode('if (!this.built) {', 'const model = this.buildModel();');
+    const attach = 'this.selectHold = createNativeSelectHold(root);';
+    expect(built).toContain(attach);
+    // FIRST in the block, not merely ahead of change: ahead of the dialog-root
+    // mark and every listener, so a later insertion cannot slip in front.
+    expect(built.indexOf(attach)).toBeLessThan(built.indexOf('markDialogRoot('));
+    expect(built.indexOf(attach)).toBeLessThan(built.indexOf('root.addEventListener('));
+    expect(betweenCode('constructor(private readonly deps', 'get isOpen()')).not.toContain(
+      'createNativeSelectHold',
+    );
+    // Every read of the hold is null-safe: a wallet beat can reach a
+    // never-rendered window (hud.ts fans it out with no isOpen gate), and a
+    // third call site added with a bare `.holdRepaints()` would throw there.
+    expect(code).not.toMatch(/this\.selectHold(?!\s*[?=:])/);
   });
 
   it('keeps the wocMarketViewSig repaint guard the hud_update_drive registry names', () => {
     // refreshIfChanged() must bail on an unmoved digest, or the slow-band poll
-    // rebuilds the whole subtree every 500 ms.
-    expect(painter).toContain('if (sig === this.lastSig) return;');
+    // rebuilds the whole subtree every 500 ms (walletRepaintDue is the one
+    // override: a wallet beat skipped under the dropdown hold).
+    expect(painter).toContain('if (sig === this.lastSig && !this.walletRepaintDue) return;');
     // BOTH halves. Pinning only the comparison let the assignment be deleted,
     // which leaves lastSig at '' forever so every slow-band poll rebuilds the
     // whole subtree while this guard still reported the signature present.
@@ -820,7 +873,7 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
   });
 
   it('closes on focusout only when focus leaves the whole combobox', () => {
-    const out = between('private onFocusOut(e: FocusEvent): void {', 'private scrollKeys(');
+    const out = between('private onFocusOut(e: FocusEvent): void {', 'private sellMatches(');
     expect(out).toContain('combo.contains(next)');
   });
 
@@ -832,7 +885,7 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
     // as closed and Enter/Escape fell through to dropdownKeyNav's collapsed
     // branch: the widget looked like it had broken state, not a focus problem.
     expect(painter).toContain('private rendering = false');
-    const out = between('private onFocusOut(e: FocusEvent): void {', 'private scrollKeys(');
+    const out = between('private onFocusOut(e: FocusEvent): void {', 'private sellMatches(');
     expect(out).toContain('if (this.rendering');
     // The flag must cover the focus RESTORE too, which is itself a focus move.
     const render = between('render(): void {', 'private renderInner(');
@@ -844,7 +897,7 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
   it('does NOT rely on isConnected to tell a rebuild from a real blur', () => {
     // The first attempt did, and it silently failed: the node is still attached at
     // the moment focusout fires, so the guard passed every time.
-    const out = between('private onFocusOut(e: FocusEvent): void {', 'private scrollKeys(');
+    const out = between('private onFocusOut(e: FocusEvent): void {', 'private sellMatches(');
     expect(out).not.toContain('isConnected');
   });
 
@@ -1837,5 +1890,31 @@ describe('woc_market_window: informed commitment before the first charge (H13/R9
     expect(confirmFields).toContain('hudChrome.wocMarket.termsLink');
     // Still hidden once acceptance is durably recorded.
     expect(confirmFields).toContain('model.activity?.termsAccepted');
+  });
+});
+
+describe('woc_market_window: the wallet card can be hidden (the mobile reconnect prompt)', () => {
+  it('drops the card while the live kind matches the dismissed one, and only then', () => {
+    // render() hands the chrome builder null instead of the view when the pure
+    // core says the card is hidden; paintedWalletSig still latches the LIVE view,
+    // so onWalletChanged() repaints (and the card returns) when the kind moves.
+    expect(painter).toContain(
+      'wallet: walletCardHidden(wallet.kind, this.walletCardDismissed) ? null : wallet,',
+    );
+    expect(painter).toContain('this.paintedWalletSig = wocWalletCardSig(wallet);');
+    expect(painter).toContain('private walletCardDismissed = loadWalletCardDismissal();');
+  });
+
+  it('the dismiss click arm stores the KIND, persists it, and repaints', () => {
+    const arm = painter.slice(
+      painter.indexOf("case 'dismiss-wallet-card': {"),
+      painter.indexOf("case 'connect-wallet':"),
+    );
+    expect(arm).toContain('const kind = walletConnectionView().kind;');
+    // A non-dismissible kind can only reach here through a stale DOM; refuse it.
+    expect(arm).toContain('if (!walletCardDismissible(kind)) break;');
+    expect(arm).toContain('this.walletCardDismissed = kind;');
+    expect(arm).toContain('saveWalletCardDismissal(kind);');
+    expect(arm).toContain('this.render();');
   });
 });

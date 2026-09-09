@@ -92,14 +92,12 @@ describe('Knifework: Venom Ritual', () => {
   });
 
   it('still carries the assassination baseline damage mod through the Venomrend transform', () => {
-    // Assassination's spec baseline (spec_baselines.ts) bakes a real, shipped
-    // global.meleeDmgPct: 0.22 into every physical-school ability. Venomrend
-    // (school: physical) is a wholesale def swap via resolveActionReplacement,
-    // never a member of the rogue's known-ability list, so it only ever gets
-    // this multiplier if resolvedAbility re-applies talent mods to the
-    // swapped-in def. This pins that the ordering refactor in resolvedAbility
-    // did not regress the one real per-ability-swap mod path that already
-    // shipped: dropping it would leave Venomrend at its raw 100/55 base/perCombo.
+    // Assassination bakes global.meleeDmgPct 0.22 (spec_baselines.ts) plus
+    // v0.42.0 Knifework's +0.10 offense-only bonus (spec_output_tuning.ts),
+    // 0.32 total, into every physical-school ability. Venomrend is a wholesale
+    // def swap (resolveActionReplacement), never a known-ability member, so it
+    // only gets this mult if resolvedAbility re-applies talent mods to the
+    // swapped-in def: pins that path didn't regress to the raw 100/55 base.
     const { sim, p } = rig('assassination');
     const mob = addTargetMob(sim);
     for (let i = 0; i < 6; i++) completeCast(sim, 'backstab', mob);
@@ -112,9 +110,9 @@ describe('Knifework: Venom Ritual', () => {
       throw new Error('expected a finisherDamage effect on the resolved Venomrend');
     }
     // Raw Venomrend is base 100 / perCombo 55 (talent_abilities_v2_a.ts); at
-    // 1.22x that is 122 / 67.
-    expect(finisher.base).toBe(122);
-    expect(finisher.perCombo).toBe(67);
+    // 1.32x (0.22 legacy + 0.10 Knifework) that is 132 / 72.6, rounded to 73.
+    expect(finisher.base).toBe(132);
+    expect(finisher.perCombo).toBe(73);
   });
 
   it('the two-beat rhythm: a five-thrust cycle ends in Dirt Nap, the next in Venomrend', () => {
@@ -318,7 +316,7 @@ describe('Skulduggery: the Gloam bank and its detonation', () => {
     expect(p.auras.some((a) => a.id === 'veilstrike')).toBe(false);
   });
 
-  it("the detonating Lurker's Strike is the doubled one, face to face", () => {
+  it("the detonating Lurker's Strike is the empowered (+50%) one, face to face", () => {
     const { sim, p } = rig('subtlety');
     // A training dummy so the banking phase geometry is stable; it is turned
     // to FACE the player before the detonation, the real solo situation.
@@ -374,7 +372,8 @@ describe('Skulduggery: the Gloam bank and its detonation', () => {
     sim.tick();
 
     // The detonation: one press, in the open, face to face. The veil rises
-    // BEFORE the strike resolves, so this very hit is the doubled one.
+    // BEFORE the strike resolves, so this very hit is the empowered (+50%,
+    // non-set Gloam Edge) one.
     sim.events.length = 0;
     p.resource = p.maxResource;
     sim.castAbility('ambush');
@@ -434,9 +433,17 @@ describe('engine aura tooltips teach the interaction', () => {
       key: 'hudChrome.auraEffect.veilstrikeWindow',
       nums: { pct: 10 },
     });
+    // v0.42.0 Skulduggery: Gloam Edge halved (+100% -> +50%, Ashveil 4pc
+    // +200% -> +100%), so the descriptor now reads the armed value live via
+    // veiledEdgeStrike instead of a hardcoded "double". value: 1 = Ashveil
+    // 4pc (100%); the non-set arm arms at 0.5.
     expect(auraEffectDescriptor({ id: 'veiled_edge', kind: 'veiled_edge', value: 1 })).toEqual({
-      key: 'hudChrome.auraEffect.veiledEdge',
-      nums: {},
+      key: 'hudChrome.auraEffect.veiledEdgeStrike',
+      nums: { pct: 100 },
+    });
+    expect(auraEffectDescriptor({ id: 'veiled_edge', kind: 'veiled_edge', value: 0.5 })).toEqual({
+      key: 'hudChrome.auraEffect.veiledEdgeStrike',
+      nums: { pct: 50 },
     });
     expect(auraEffectDescriptor({ id: 'dusk_economy', kind: 'dusk_economy', value: 0.5 })).toEqual({
       key: 'hudChrome.auraEffect.duskEconomy',

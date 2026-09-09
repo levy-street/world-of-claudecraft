@@ -136,7 +136,12 @@ describe('trade window painter wiring (source pins, woc_trade updateTradeWindow)
 
   it('resolves offer rows through buildTradeItemRow and guards the icon', () => {
     expect(body).toContain('buildTradeItemRow(s, ITEMS)');
-    expect(body).toContain('item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)');
+    // The icon guard rides the cell authority since the phase 13 QA: the rim
+    // is the staged copy's effective quality, and the null-parts arm shares
+    // the unknown-id fallback.
+    expect(body).toContain(
+      'item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)',
+    );
   });
 
   it('commits the repaint signature in a finally behind the render try', () => {

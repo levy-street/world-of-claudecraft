@@ -18,8 +18,9 @@ export function buildProcOverlay(
   el.setAttribute('aria-valuemax', '5');
   el.setAttribute('aria-valuenow', '0');
   el.setAttribute('aria-hidden', 'true');
-  el.setAttribute('tabindex', '-1');
-  el.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
+  // No focus stop or key shortcuts of its own: moving the overlay is the
+  // Unlock Interface registry's (the 'procOverlay' frame row), whose corner
+  // button and grip carry the arrow-key paths.
   el.innerHTML = `
 <div class="fire-bird" aria-hidden="true">
   <img class="fire-part fire-embers" src="/ui/procs/fire-phoenix-v2.webp" alt="" draggable="false" />

@@ -22,6 +22,7 @@ import {
 import { activeFarFieldPolicy } from './foliage_impostor';
 import { GFX, type GfxSettings, SUN_DIR } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
+import { applyTextureAnisotropy } from './texture_anisotropy';
 import { waterNormalish, waterNormalMaps } from './textures';
 import {
   bakeSwellGate,
@@ -252,7 +253,7 @@ function prepareWaterTex(key: string, file: string): Promise<void> {
   if (existing) return existing;
   const task = loadTexture(`/textures/water/${file}`, { repeat: true })
     .then((tex) => {
-      tex.anisotropy = 4;
+      applyTextureAnisotropy(tex, 'normal');
       WATER_TEX[key] = tex;
     })
     .catch((err) => {

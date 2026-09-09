@@ -1,7 +1,13 @@
 // Client for the game server's secret-gated /internal/discord/* endpoints. The
 // bot reads flex/role data and pushes presence + reward grants; it authenticates
 // with the shared DISCORD_BOT_SECRET (x-woc-discord-secret), NOT a user bearer.
-import type { ActivityItem, DailyRewardWinnersDay, FlexData, RelayItem } from './logic';
+import type {
+  ActivityItem,
+  DailyRewardWinnersDay,
+  FlexData,
+  QueuePopItem,
+  RelayItem,
+} from './logic';
 import type { PresenceCounters } from './presence_counters';
 
 interface Envelope<T> {
@@ -63,15 +69,26 @@ export interface OutboxLinkChangeItem {
 }
 
 /**
+ * One queue pop to DM: the player's battleground Accept/Decline offer opened
+ * or the arena seated them. The shape is the builder's (logic.ts QueuePopItem);
+ * the consumer re-checks `expiresAtMs` at send time.
+ */
+export type OutboxQueuePopItem = QueuePopItem;
+
+/**
  * Everything one outbox poll carries. The three older streams keep the item
  * shapes their per-endpoint GETs used byte for byte, so the existing handlers
- * consume them unchanged; only `linkChanges` is new.
+ * consume them unchanged; `linkChanges` and `queuePops` were born here.
+ * `queuePops.watching` is the cadence signal: true while an opted-in, linked
+ * player is waiting in a battleground or arena queue, which the poll counts as
+ * work so a pop never lands in an idle-cadence gap.
  */
 export interface OutboxEnvelope {
   relay: { items: RelayItem[] };
   activity: { items: ActivityItem[] };
   winners: { days: DailyRewardWinnersDay[] };
   linkChanges: { items: OutboxLinkChangeItem[] };
+  queuePops: { items: OutboxQueuePopItem[]; watching: boolean };
 }
 
 /** What a members-meta push reports back. */

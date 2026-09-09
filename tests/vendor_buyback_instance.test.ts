@@ -15,7 +15,7 @@ import { groundHeight } from '../src/sim/world';
 
 const BOOTS = 'oiled_boots'; // armor, sellValue 80, stack 1
 const HIDE = 'pristine_hide'; // junk rare material, sellValue 25, stack 20
-const SCALE = 'mudfin_scale'; // poor junk, eviction filler
+const SCALE = 'mudfin_scale'; // junk reagent (common since phase 11l), eviction filler
 
 const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
 
@@ -104,12 +104,17 @@ describe('buyback preserves instance payloads', () => {
     const { sim, pid } = vendorSetup();
     sim.addItemInstance(HIDE, { ...SIGNED }, pid);
     sim.sellItem(HIDE, 1, pid);
+    // A material's legacy `signer` moves into the source-count composition on
+    // normalize: the row carries no top-level `instance` anymore, only the
+    // one-unit descriptor in `materialSources` (source-aware materials, #3907).
     const row = buybackOf(sim, pid).find((s) => s.itemId === HIDE);
-    expect(row?.instance).toEqual(SIGNED);
+    expect(row?.instance).toBeUndefined();
+    expect(row?.materialSources).toEqual([{ source: SIGNED, count: 1 }]);
     sim.buyBackItem(HIDE, undefined, undefined, pid);
     const back = slotsOf(sim, pid, HIDE);
     expect(back).toHaveLength(1);
-    expect(back[0].instance).toEqual(SIGNED);
+    expect(back[0].instance).toBeUndefined();
+    expect(back[0].materialSources).toEqual([{ source: SIGNED, count: 1 }]);
   });
 
   it('an armed (bindOnTrade) copy is not laundered plain by sell + buyback', () => {
@@ -157,37 +162,49 @@ describe('buyback preserves instance payloads', () => {
     const rows = buybackOf(sim, pid).filter((s) => s.itemId === HIDE);
     expect(rows).toHaveLength(1);
     expect(rows[0].count).toBe(2);
-    expect(rows[0].instance).toEqual(SIGNED);
+    expect(rows[0].instance).toBeUndefined();
+    expect(rows[0].materialSources).toEqual([{ source: SIGNED, count: 2 }]);
   });
 
-  it('an instanced sale never merges into a plain row of the same item, nor the reverse', () => {
+  // Materials no longer separate buyback rows by payload identity: the merge
+  // key at the row level is `instance` (recordVendorBuyback), and a material's
+  // legacy signer never survives normalization as an `instance` field, so a
+  // plain sale and a signed sale of the SAME material always land in one row.
+  // The provenance is not lost, it moves into that row's `materialSources`
+  // buckets (source-aware materials, #3907): distinct sources, one shared row.
+  it('a plain sale and a signed sale of the same material coalesce into one bucketed row', () => {
     const { sim, pid } = vendorSetup();
     sim.addItem(HIDE, 1, pid);
     sim.addItemInstance(HIDE, { ...SIGNED }, pid);
     sim.sellItem(HIDE, 2, pid); // consumes the plain copy first, then the signed one
     const rows = buybackOf(sim, pid).filter((s) => s.itemId === HIDE);
-    expect(rows).toHaveLength(2);
-    const plain = rows.find((r) => !r.instance);
-    const signed = rows.find((r) => r.instance);
-    expect(plain?.count).toBe(1);
-    expect(signed?.count).toBe(1);
-    expect(signed?.instance).toEqual(SIGNED);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].count).toBe(2);
+    expect(rows[0].instance).toBeUndefined();
+    expect(rows[0].materialSources).toEqual([
+      { source: {}, count: 1 },
+      { source: SIGNED, count: 1 },
+    ]);
   });
 
+  // Per-payload row separation (and its eviction past the cap) is still real
+  // for a NON-material instanced item: distinct enchants never fold into one
+  // materialSources bucket, so they stay the genuinely distinct residual
+  // payloads this rule needs (materials bucket-merge instead; see above).
   it('limit eviction still holds with per-payload rows: oldest row falls off past 12', () => {
     const { sim, pid } = vendorSetup();
-    // Oldest sale: the signed hide (its own row).
-    sim.addItemInstance(HIDE, { ...SIGNED }, pid);
-    sim.sellItem(HIDE, 1, pid);
-    // 12 further distinct rows: differently-signed hides never merge.
+    // Oldest sale: an enchanted pair of boots (its own row).
+    sim.addItemInstance(BOOTS, { enchant: 'ench_oldest', rolled: { stats: { str: 1 } } }, pid);
+    sim.sellItem(BOOTS, 1, pid);
+    // 12 further distinct rows: differently-enchanted boots never merge.
     for (let i = 0; i < 12; i++) {
-      sim.addItemInstance(HIDE, { signer: `Signer${i}` }, pid);
-      sim.sellItem(HIDE, 1, pid);
+      sim.addItemInstance(BOOTS, { enchant: `ench_${i}`, rolled: { stats: { str: i } } }, pid);
+      sim.sellItem(BOOTS, 1, pid);
     }
     const rows = buybackOf(sim, pid);
     expect(rows).toHaveLength(12);
-    expect(rows.some((r) => r.instance?.signer === 'Seller')).toBe(false);
-    expect(rows[0].instance?.signer).toBe('Signer11');
+    expect(rows.some((r) => r.instance?.enchant === 'ench_oldest')).toBe(false);
+    expect(rows[0].instance?.enchant).toBe('ench_11');
   });
 
   it('plain-path rows stay byte-identical to before: merge by itemId, no instance key', () => {
@@ -196,75 +213,103 @@ describe('buyback preserves instance payloads', () => {
     sim.sellItem(SCALE, 2, pid);
     sim.sellItem(SCALE, 1, pid);
     const rows = buybackOf(sim, pid).filter((s) => s.itemId === SCALE);
-    expect(rows).toEqual([{ itemId: SCALE, count: 3 }]);
+    // A plain material sale still carries no `instance` key, but it now always
+    // carries its exact (unrecorded) source composition too.
+    expect(rows).toEqual([
+      { itemId: SCALE, count: 3, materialSources: [{ source: {}, count: 3 }] },
+    ]);
     sim.buyBackItem(SCALE, undefined, undefined, pid);
     const back = slotsOf(sim, pid, SCALE);
-    expect(back).toEqual([{ itemId: SCALE, count: 1 }]);
+    expect(back).toEqual([
+      { itemId: SCALE, count: 1, materialSources: [{ source: {}, count: 1 }] },
+    ]);
   });
 
-  it('instanced buyback capacity-models the payload: plain-stack room is not instanced room', () => {
+  // The OLD rule ("a plain stack never offers room to a signed unit") is
+  // retired for materials: compatibleMaterialStacks gates a shared stack on
+  // `instance` only, and provenance rides inside it via materialSources, so
+  // any compatible (non-charge, non-locked) hide stack with room now IS room
+  // for a signed sale. What still holds, and what this test pins instead: a
+  // truly full bag (every stack at cap or one-per-slot) still refuses, and
+  // freeing one unit of room in ANY hide stack lets the buyback land there,
+  // bucketing its source into that stack rather than minting a new slot.
+  it('instanced buyback capacity-models the payload: any compatible material stack offers room, but a full bag still refuses', () => {
     const { sim, pid } = vendorSetup();
     const meta = sim.ctx.resolve(pid)!.meta;
     meta.inventory.length = 0; // drop starter rations: this test pins exact slot usage
     sim.addItemInstance(HIDE, { ...SIGNED }, pid);
     sim.sellItem(HIDE, 1, pid);
-    // Fill every slot; leave one PLAIN hide stack with room. A plain add would
-    // fit (top-up), but the signed copy needs its own slot: must refuse.
-    sim.addItem(HIDE, 1, pid);
+    // A hide stack already at its 20-unit cap offers no room, and the rest of
+    // the bag is one-per-slot charge-bearing hides (charges never merge):
+    // nothing anywhere can take the buyback in, so the bag reads full even
+    // though every slot holds the same item.
+    sim.addItem(HIDE, 20, pid);
     while (meta.inventory.length < 16) {
-      sim.addItemInstance(SCALE, { signer: `F${meta.inventory.length}` }, pid);
+      sim.addItemInstance(HIDE, { charges: { zap: meta.inventory.length } }, pid);
     }
     sim.drainEvents();
     sim.buyBackItem(HIDE, undefined, undefined, pid);
     expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
-    expect(buybackOf(sim, pid).find((s) => s.itemId === HIDE)?.instance).toEqual(SIGNED);
-    expect(slotsOf(sim, pid, HIDE).some((s) => s.instance)).toBe(false);
+    expect(buybackOf(sim, pid).find((s) => s.itemId === HIDE)?.materialSources).toEqual([
+      { source: SIGNED, count: 1 },
+    ]);
 
-    // A byte-equal signed stack with room IS instanced room: the buyback lands.
-    const plainIdx = meta.inventory.findIndex((s) => s.itemId === HIDE && !s.instance);
-    meta.inventory[plainIdx] = { itemId: HIDE, count: 1, instance: { ...SIGNED } };
+    // Selling one unit off the full stack opens exactly one unit of room, and
+    // the buyback lands there, bucketing the signed source alongside the
+    // unrecorded one already in that stack.
+    const fullIdx = meta.inventory.findIndex((s) => s.itemId === HIDE && s.count === 20);
+    meta.inventory[fullIdx] = {
+      itemId: HIDE,
+      count: 19,
+      materialSources: [{ source: {}, count: 19 }],
+    };
     sim.drainEvents();
     sim.buyBackItem(HIDE, undefined, undefined, pid);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
-    const merged = slotsOf(sim, pid, HIDE).filter((s) => s.instance);
-    expect(merged).toHaveLength(1);
-    expect(merged[0].count).toBe(2);
-    expect(merged[0].instance).toEqual(SIGNED);
+    const merged = meta.inventory[fullIdx];
+    expect(merged.count).toBe(20);
+    expect(merged.materialSources).toEqual([
+      { source: {}, count: 19 },
+      { source: SIGNED, count: 1 },
+    ]);
   });
 
+  // Row addressing by index + expected payload needs genuinely distinct
+  // residual payloads to prove anything: a non-material instanced item, where
+  // `instance` (never a materialSources bucket) is still the merge key.
   it('index + expected payload address the exact row when rows share an item id', () => {
     const { sim, pid } = vendorSetup();
-    sim.addItem(HIDE, 1, pid);
-    sim.addItemInstance(HIDE, { ...SIGNED }, pid);
-    sim.sellItem(HIDE, 2, pid); // plain row + signed row
+    sim.addItem(BOOTS, 1, pid);
+    sim.addItemInstance(BOOTS, { ...SIGNED }, pid);
+    sim.sellItem(BOOTS, 2, pid); // plain row + signed row
     // Selector-less: the exact-payload fallback matches expectedInstance
     // undefined against PLAIN rows only, so the plain copy returns first.
-    sim.buyBackItem(HIDE, undefined, undefined, pid);
-    expect(slotsOf(sim, pid, HIDE)).toEqual([{ itemId: HIDE, count: 1 }]);
+    sim.buyBackItem(BOOTS, undefined, undefined, pid);
+    expect(slotsOf(sim, pid, BOOTS)).toEqual([{ itemId: BOOTS, count: 1 }]);
     // Then the signed copy, addressed by index + payload.
-    const signedIdx = buybackOf(sim, pid).findIndex((s) => s.itemId === HIDE && s.instance);
-    sim.buyBackItem(HIDE, signedIdx, { ...SIGNED }, pid);
-    const signed = slotsOf(sim, pid, HIDE).find((s) => s.instance);
+    const signedIdx = buybackOf(sim, pid).findIndex((s) => s.itemId === BOOTS && s.instance);
+    sim.buyBackItem(BOOTS, signedIdx, { ...SIGNED }, pid);
+    const signed = slotsOf(sim, pid, BOOTS).find((s) => s.instance);
     expect(signed?.instance).toEqual(SIGNED);
-    expect(buybackOf(sim, pid).filter((s) => s.itemId === HIDE)).toHaveLength(0);
+    expect(buybackOf(sim, pid).filter((s) => s.itemId === BOOTS)).toHaveLength(0);
   });
 
   it('a stale index whose payload no longer matches falls back to the exact-payload scan', () => {
     const { sim, pid } = vendorSetup();
-    sim.addItemInstance(HIDE, { ...SIGNED }, pid);
-    sim.sellItem(HIDE, 1, pid);
+    sim.addItemInstance(BOOTS, { ...SIGNED }, pid);
+    sim.sellItem(BOOTS, 1, pid);
     // A plain sale after the client's snapshot shifts the signed row down.
-    sim.addItem(HIDE, 1, pid);
-    sim.sellItem(HIDE, 1, pid);
+    sim.addItem(BOOTS, 1, pid);
+    sim.sellItem(BOOTS, 1, pid);
     sim.drainEvents();
     // The client still clicks index 0 expecting the signed payload: the new
     // occupant must NOT be redeemed in its place; the scan finds the real row.
-    sim.buyBackItem(HIDE, 0, { ...SIGNED }, pid);
+    sim.buyBackItem(BOOTS, 0, { ...SIGNED }, pid);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
-    const got = slotsOf(sim, pid, HIDE);
+    const got = slotsOf(sim, pid, BOOTS);
     expect(got).toHaveLength(1);
     expect(got[0].instance).toEqual(SIGNED);
-    expect(buybackOf(sim, pid).find((s) => s.itemId === HIDE)?.instance).toBeUndefined();
+    expect(buybackOf(sim, pid).find((s) => s.itemId === BOOTS)?.instance).toBeUndefined();
   });
 
   it('an expected payload the player never sold is refused', () => {
@@ -279,21 +324,58 @@ describe('buyback preserves instance payloads', () => {
 
   it('a tampered charge-bearing buyback count clamps to 1 on load (merge cap rule)', () => {
     const { sim, pid } = vendorSetup();
-    sim.addItemInstance(HIDE, { signer: 'Seller', charges: { zap: 2 } }, pid);
-    sim.sellItem(HIDE, 1, pid);
+    // A LEGACY row (no `materialSources`): the shape a save from before #3907
+    // still carries, so it is the charges-clamp path under test here, not the
+    // explicit-v2 composition validator below.
     const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
-    state.vendorBuyback[0].count = 99; // hand-edited save
+    state.vendorBuyback = [
+      { itemId: HIDE, count: 99, instance: { signer: 'Seller', charges: { zap: 2 } } },
+    ];
     const sim2 = makeWorld();
     const pid2 = sim2.addPlayer('warrior', 'Seller', { state });
     const rows = sim2.ctx.resolve(pid2)!.meta.vendorBuyback;
     expect(rows[0].count).toBe(1);
-    // A byte-equal MERGEABLE row keeps its over-stack count: legitimate
+
+    // A byte-equal MERGEABLE legacy row keeps its over-stack count: legitimate
     // multi-unit sales merge past the stack cap by design.
     const state2 = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
     state2.vendorBuyback = [{ itemId: HIDE, count: 40, instance: { signer: 'Seller' } }];
     const sim3 = makeWorld();
     const pid3 = sim3.addPlayer('warrior', 'Seller', { state: state2 });
     expect(sim3.ctx.resolve(pid3)!.meta.vendorBuyback[0].count).toBe(40);
+  });
+
+  // The EXPLICIT v2 shape (#3907) is validated, never coerced: a real sale
+  // moves ONLY the legacy `signer` into `materialSources` (a MaterialSource
+  // carries `gatherer`/`signer` alone, never `charges`); `charges` stays on
+  // the slot's own top-level `instance`, residual beside the composition.
+  // `validateMaterialSlotSourcesOnLoad` refuses a charge-bearing `instance`
+  // whose slot `count` is not exactly 1, which fires even when the
+  // composition sum is internally VALID (row.count and the source count
+  // tampered together): the charge-count-1 rule is a separate limit from
+  // the sum-mismatch check, not a special case of it.
+  // `validateCharacterMaterialSourcesOnLoad` runs before any entity or meta
+  // exists (sim.ts addPlayer), so the refusal is atomic: the whole join
+  // throws and no partial player is ever registered.
+  it('a malformed v2 charge-bearing count is refused even with a self-consistent composition, never clamped', () => {
+    const { sim, pid } = vendorSetup();
+    sim.addItemInstance(HIDE, { signer: 'Seller', charges: { zap: 2 } }, pid);
+    sim.sellItem(HIDE, 1, pid);
+    const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
+    const row = state.vendorBuyback.find((s: { itemId: string }) => s.itemId === HIDE);
+    expect(row.instance).toEqual({ charges: { zap: 2 } });
+    expect(row.materialSources).toEqual([{ source: { signer: 'Seller' }, count: 1 }]);
+    // Bump both row.count and the source count to 40 together: the
+    // composition still sums correctly (40 === 40), so only the dedicated
+    // charge-count-1 rule can catch this, not the sum-mismatch arm.
+    row.count = 40;
+    row.materialSources[0].count = 40;
+
+    const sim2 = makeWorld();
+    expect(() => sim2.addPlayer('warrior', 'Seller', { state })).toThrow(
+      /material source state is invalid/,
+    );
+    expect(sim2.players.size).toBe(0);
   });
 
   it('buyback rows with payloads round-trip the character save byte-equal', () => {

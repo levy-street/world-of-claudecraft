@@ -85,6 +85,9 @@ export function riftHeroicClearPool(): readonly string[] {
   for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
     if (RAID_BOSS_IDS.has(bossId)) continue;
     for (const entry of entries) {
+      // Moving a base acquisition into the heroic budget does not raise its
+      // tier or make it a new B/A/S rift reward.
+      if (entry.preserveSourceTier) continue;
       const itemId = entry.itemId;
       if (!itemId) continue;
       const item = ITEMS[itemId];

@@ -171,6 +171,14 @@ export function serializeReliquaryState(state: ReliquaryState): SavedReliquarySt
   return out;
 }
 
+/** The sparse CharacterState fragment for one save (the sim.ts
+ *  serializeCharacter shape every optional field follows): absent when
+ *  serializeReliquaryState has nothing to write. */
+export function reliquarySaveFragment(state: ReliquaryState): { reliquary?: SavedReliquaryState } {
+  const reliquary = serializeReliquaryState(state);
+  return reliquary ? { reliquary } : {};
+}
+
 /**
  * Restore from a saved blob. Filters firstFind and marks to catalogued ids
  * only so a hand-edited save cannot grow unbounded membership. The marks and
@@ -1429,13 +1437,8 @@ export const RELIQUARY_ILLUMINATION_DEED_PAGES: Readonly<Record<string, string>>
  * never a score (the pinned doctrine), and no completion read may depend on
  * how many copies the world handed over.
  *
- * col_reliquary_complete is unearnable in production while THREE catalogued
- * slots stay owner-pended: the masterwork:engineering mark (13b QA ruling: no
- * engineering recipe can proc a masterwork, so the slot is catalogued but
- * unwritable) and the two SOURCE_PENDING_RULING mounts (reins_drakemaw_raptor
- * has no acquisition path in content; reins_terrorspark_groundshaker is
- * dev-grant only). All three are owner decisions outside this packet; the
- * capstone becomes earnable with NO code change here once they all land.
+ * col_reliquary_complete remains blocked by source-pending catalog mounts.
+ * See content/reliquary.ts; paid mount skins do not score Curator rank.
  * Tests may still reach owned === total by granting marks and reins directly.
  * The deed carries feat: true so this pending window can never dead-end
  * feat_book_complete (see the record's comment in content/deeds.ts).

@@ -37,6 +37,10 @@ interface FakeEl {
   };
   hasAttribute(name: string): boolean;
   attrs?: Record<string, string>;
+  // Real ancestry, alongside the box containment the scoped queries use: a
+  // z-index only ranks against siblings in the SAME stacking context, so the
+  // module walks parents and the fake has to model that walk.
+  parentElement: FakeEl | null;
 }
 
 let active: FakeEl | null = null;
@@ -48,10 +52,17 @@ function el(
   tag: string,
   x: number,
   y: number,
-  opts: { role?: string; cls?: string[]; visible?: boolean; disabled?: boolean } = {},
+  opts: {
+    role?: string;
+    cls?: string[];
+    visible?: boolean;
+    disabled?: boolean;
+    parent?: FakeEl;
+  } = {},
 ): FakeEl {
   const node: FakeEl = {
     tag,
+    parentElement: opts.parent ?? null,
     role: opts.role,
     cls: opts.cls ?? [],
     rect: { left: x, top: y, right: x + 40, bottom: y + 20 },
@@ -143,6 +154,10 @@ function install(padActive = false): void {
   vi.stubGlobal('getComputedStyle', (n: FakeEl) => ({
     visibility: n.visible ? 'visible' : 'hidden',
     display: n.visible ? 'block' : 'none',
+    zIndex: n.attrs?.['data-test-z'] ?? 'auto',
+    // z-index only applies to a positioned box, so anything carrying one in the
+    // fake is positioned, exactly as every HUD window and layer really is.
+    position: n.attrs?.['data-test-z'] === undefined ? 'static' : 'fixed',
   }));
   // Scoped query: a container's own querySelectorAll.
   for (const node of allEls) {
@@ -290,6 +305,72 @@ describe('moveDpadFocus', () => {
 });
 
 describe('focusFirstInWindow', () => {
+  it('navigates the raised window even when it appears earlier in the document', () => {
+    const front = el('DIV', 0, 0, { role: 'dialog' });
+    front.rect = { left: 0, top: 0, right: 100, bottom: 100 };
+    front.attrs = { 'data-test-z': '60' };
+    const back = el('DIV', 150, 0, { role: 'dialog' });
+    back.rect = { left: 150, top: 0, right: 250, bottom: 100 };
+    back.attrs = { 'data-test-z': '50' };
+    const frontButton = el('BUTTON', 10, 10);
+    const backButton = el('BUTTON', 160, 10);
+    allEls = [front, frontButton, back, backButton];
+    install();
+    expect(focusFirstInWindow()).toBe(true);
+    expect(active).toBe(frontButton);
+    expect(pressDpadFocus()).toBe(true);
+    expect(frontButton.clicks).toBe(1);
+    expect(backButton.clicks).toBe(0);
+  });
+
+  it('ranks a body-level prompt above a sheet whose bigger z-index is local to a lower layer', () => {
+    // The corpse choice sits inside #ui, which is itself a stacking context (a
+    // positioned layer with its own z-index), so its 96 ranks only against its
+    // siblings THERE. The bind confirmation is appended to <body> at 95 and
+    // paints over the whole layer. Comparing the two numbers directly put the
+    // pad on the body underneath the confirmation the player was answering.
+    const layer = el('DIV', 0, 0); // #ui
+    layer.rect = { left: 0, top: 0, right: 400, bottom: 400 };
+    layer.attrs = { 'data-test-z': '90' };
+    const sheet = el('DIV', 0, 0, { role: 'dialog', parent: layer });
+    sheet.rect = { left: 0, top: 0, right: 100, bottom: 100 };
+    sheet.attrs = { 'data-test-z': '96' };
+    const sheetButton = el('BUTTON', 10, 10, { parent: sheet });
+    const prompt = el('DIV', 150, 0, { role: 'dialog' });
+    prompt.rect = { left: 150, top: 0, right: 250, bottom: 100 };
+    prompt.attrs = { 'data-test-z': '95' };
+    const promptButton = el('BUTTON', 160, 10, { parent: prompt });
+    allEls = [layer, sheet, sheetButton, prompt, promptButton];
+    install();
+
+    expect(focusFirstInWindow()).toBe(true);
+    expect(active).toBe(promptButton);
+    expect(pressDpadFocus()).toBe(true);
+    expect(promptButton.clicks).toBe(1);
+    expect(sheetButton.clicks).toBe(0);
+    // and the selection cannot wander down into the covered sheet
+    expect(moveDpadFocus('left')).toBeNull();
+    expect(active).toBe(promptButton);
+  });
+
+  it('honors a safe entry control before a spending action', () => {
+    const dialog = el('DIV', 0, 0, { role: 'dialog' });
+    dialog.rect = { left: 0, top: 0, right: 300, bottom: 300 };
+    const close = el('BUTTON', 10, 10);
+    close.attrs = { 'data-close': '', 'data-pad-initial-focus': '' };
+    const harvest = el('BUTTON', 10, 60);
+    allEls = [dialog, close, harvest];
+    install();
+    expect(focusFirstInWindow()).toBe(true);
+    expect(active).toBe(close);
+    expect(pressDpadFocus()).toBe(true);
+    expect(harvest.clicks).toBe(0);
+    expect(close.clicks).toBe(1);
+    expect(moveDpadFocus('down')).not.toBeNull();
+    expect(pressDpadFocus()).toBe(true);
+    expect(harvest.clicks).toBe(1);
+  });
+
   it('lands on the first control of the open window', () => {
     const dialog = el('DIV', 0, 0, { role: 'dialog' });
     dialog.rect = { left: 0, top: 0, right: 300, bottom: 300 };

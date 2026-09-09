@@ -1,4 +1,4 @@
-// Wire decode for the guild bank activity log's one-shot response frame
+// Wire decode for the guild bank transaction history's one-shot response frame
 // (`{ t: 'gbanklog', ... }`), kept as its own DOM-free, world-free module so
 // the frame contract is unit-testable without standing up a ClientWorld and so
 // online.ts stays a consumer rather than growing another decode block.
@@ -14,7 +14,13 @@
 // allowlist on this side means a server that ever regressed and sent one could
 // still never render it as guild history.
 
-import { GUILD_BANK_LOG_LIMIT, type GuildBankLogEntry, type GuildBankLogOp } from '../world_api';
+import {
+  GUILD_BANK_LOG_LIMIT,
+  type GuildBankLogEntry,
+  type GuildBankLogKind,
+  type GuildBankLogOp,
+  guildBankLogKindOf,
+} from '../world_api';
 
 /** The ops a client will render. Deliberately a second, independent statement
  *  of the server's projection allowlist (server/guild_bank_log.ts). */
@@ -33,13 +39,16 @@ const RENDERABLE_OPS: ReadonlySet<string> = new Set<GuildBankLogOp>([
  * How long an installed answer stays fresh, and equally how long a request that
  * never answered blocks a retry.
  *
- * To be exact about what this is and is not: while the log view is OPEN, this
- * is the refresh interval, which is what makes another officer's deposit show
- * up on a pane somebody is watching. While it is CLOSED, nothing reads the log
- * at all, so nothing is sent (the pane's own visibility gate, see
- * GuildBankTab.readAndRequestLog and the log arm of BankWindow's refresh
- * signature): that is the sense in which the fetch is on demand, and this
- * constant never turns a repaint into a poll on its own.
+ * To be exact about what this is and is not: while the history view is OPEN,
+ * this is the refresh interval of the NEWEST window, which is what makes
+ * another officer's deposit show up on a pane somebody is watching. While it
+ * is CLOSED, nothing reads the log at all, so nothing is sent (the pane's own
+ * visibility gate, see GuildBankTab.readAndRequestLog and the log arm of
+ * BankWindow's refresh signature): that is the sense in which the fetch is on
+ * demand, and this constant never turns a repaint into a poll on its own. An
+ * OLDER page is requested exactly once per click and never refreshed (it is a
+ * cursor into an append-only ledger); the same interval only bounds how long
+ * an older-page request that never answered blocks its retry.
  *
  * Ten seconds is chosen against the SERVER cache (server/guild_bank_log.ts),
  * which busts on every book change: a watcher sees a change within about one
@@ -48,11 +57,11 @@ const RENDERABLE_OPS: ReadonlySet<string> = new Set<GuildBankLogOp>([
  */
 export const GUILD_BANK_LOG_TTL_MS = 10_000;
 
-/** Hard row bound, taken from the ONE seam constant the server window and the
- *  pane's scope line also read (src/world_api/guild_bank.ts): anything past it
- *  is a defect or a hostile frame and is truncated rather than pasted into the
- *  DOM. Re-exported so the decoder's callers and tests can name the bound
- *  without reaching across the seam themselves. */
+/** Hard row bound PER FRAME, taken from the ONE seam constant the server
+ *  window also reads (src/world_api/guild_bank.ts): anything past it is a
+ *  defect or a hostile frame and is truncated rather than pasted into the DOM.
+ *  Re-exported so the decoder's callers and tests can name the bound without
+ *  reaching across the seam themselves. */
 export const GUILD_BANK_LOG_MAX_ROWS = GUILD_BANK_LOG_LIMIT;
 
 /** The longest actor name that can reach a row. Character names are far
@@ -60,13 +69,36 @@ export const GUILD_BANK_LOG_MAX_ROWS = GUILD_BANK_LOG_LIMIT;
  *  layout (the text itself is spliced into a TEXT sink, never HTML). */
 const ACTOR_NAME_MAX = 64;
 
+/** The request the client sends: the slice and, for an older page, the oldest
+ *  id it already holds. Both optional on the wire so an older server that
+ *  knows neither field still answers the newest window. */
+export type GuildBankLogRequest = {
+  cmd: 'guild_bank_log';
+  kind: GuildBankLogKind;
+  before?: number;
+};
+
 /** What the frame said. `refused` is the server declining the read (a member,
  *  a demotion mid-view, a guild that went away); it is NOT the same as an
  *  empty log and must never be rendered as one. Null means the frame was not a
- *  guild bank log frame at all, or was too malformed to interpret. */
+ *  guild bank log frame at all, or was too malformed to interpret.
+ *
+ *  A success frame ECHOES the query it answers (`kind`, `before`) so the
+ *  mirror can drop an answer that no longer matches what the pane is showing,
+ *  and carries `more`, the server's word on whether older rows exist. A frame
+ *  from a server that predates paging carries none of the three: it decodes
+ *  with kind UNSTATED (null), no cursor, and nothing older, which is exactly
+ *  what such a server was answering, and the mirror accepts it under any
+ *  chip. */
 export interface GuildBankLogFrame {
   refused: boolean;
+  /** The slice the frame answers, or null when the frame states none (a
+   *  server that predates paging): unstated, not `all`, so the mirror can
+   *  accept it under any chip instead of dropping it as a mismatch. */
+  kind: GuildBankLogKind | null;
+  before: number | null;
   entries: GuildBankLogEntry[];
+  more: boolean;
 }
 
 function decodeEntry(raw: unknown): GuildBankLogEntry | null {
@@ -109,7 +141,9 @@ export function decodeGuildBankLogFrame(msg: unknown): GuildBankLogFrame | null 
   if (typeof msg !== 'object' || msg === null) return null;
   const frame = msg as Record<string, unknown>;
   if (frame.t !== 'gbanklog') return null;
-  if (frame.ok !== true) return { refused: true, entries: [] };
+  if (frame.ok !== true) {
+    return { refused: true, kind: null, before: null, entries: [], more: false };
+  }
   const rows = Array.isArray(frame.entries) ? frame.entries : [];
   const entries: GuildBankLogEntry[] = [];
   for (const raw of rows) {
@@ -117,5 +151,15 @@ export function decodeGuildBankLogFrame(msg: unknown): GuildBankLogFrame | null 
     const entry = decodeEntry(raw);
     if (entry !== null) entries.push(entry);
   }
-  return { refused: false, entries };
+  const before =
+    Number.isSafeInteger(frame.before) && (frame.before as number) > 0
+      ? (frame.before as number)
+      : null;
+  return {
+    refused: false,
+    kind: frame.kind === undefined ? null : guildBankLogKindOf(frame.kind),
+    before,
+    entries,
+    more: frame.more === true,
+  };
 }

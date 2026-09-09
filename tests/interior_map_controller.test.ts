@@ -80,14 +80,35 @@ describe('InteriorMapController', () => {
       const ctx = {} as CanvasRenderingContext2D;
       const label = {} as HTMLElement;
       expect(controller.paintMinimap(ctx, world, label, 162, 1.25)).toBe(true);
-      expect(controller.paintDungeonWorldMap(ctx, world, 560)).toEqual({
+      expect(controller.paintWorldMap(ctx, world, 560)).toEqual({
         model: { markers: [] },
         title: 'Dungeon title',
       });
       expect(calls.dungeonMinimap).toHaveBeenCalledWith(ctx, world, label, 162, 1.25);
-      expect(calls.dungeonWorld).toHaveBeenCalledWith(ctx, world, 560);
+      // The anchor defaults to the local player's own position.
+      expect(calls.dungeonWorld).toHaveBeenCalledWith(ctx, world, 560, world.player.pos);
     },
   );
+
+  it('draws the dungeon a PARTY MEMBER stands in when the anchor is theirs, not the viewer', () => {
+    const controller = new InteriorMapController({} as never, () => '#fff');
+    const ctx = {} as CanvasRenderingContext2D;
+    const outside = worldIn('hollow_crypt');
+    (outside.player as { pos: { x: number; y: number; z: number } }).pos = { x: 0, y: 0, z: 0 };
+    expect(controller.paintWorldMap(ctx, outside, 560)).toBeNull();
+    const origin = instanceOrigin(DUNGEONS.hollow_crypt.index, 3);
+    const anchor = { x: origin.x + 2, z: origin.z - 1 };
+    expect(controller.paintWorldMap(ctx, outside, 560, anchor)).toEqual({
+      model: { markers: [] },
+      title: 'Dungeon title',
+    });
+    expect(calls.dungeonWorld).toHaveBeenLastCalledWith(ctx, outside, 560, anchor);
+    const keep = instanceOrigin(DUNGEONS.the_last_keep.index, 0);
+    expect(controller.paintWorldMap(ctx, outside, 560, { x: keep.x, z: keep.z })).toEqual({
+      model: null,
+      title: 'Last Keep title',
+    });
+  });
 
   it('preserves the dedicated Last Keep and Dawnhold map painters', () => {
     const controller = new InteriorMapController({} as never, () => '#fff');
@@ -98,13 +119,18 @@ describe('InteriorMapController', () => {
 
     expect(controller.paintMinimap(ctx, lastKeep, label, 162, 1.25)).toBe(true);
     expect(controller.paintMinimap(ctx, dawnhold, label, 162, 1.25)).toBe(true);
-    expect(controller.paintDungeonWorldMap(ctx, lastKeep, 560)).toBeNull();
-    expect(controller.paintDungeonWorldMap(ctx, dawnhold, 560)).toBeNull();
-    expect(controller.paintCastleWorldMap(ctx, lastKeep, 560)).toBe('Last Keep title');
-    expect(controller.paintCastleWorldMap(ctx, dawnhold, 560)).toBe('Dawnhold title');
+    expect(controller.paintWorldMap(ctx, lastKeep, 560)).toEqual({
+      title: 'Last Keep title',
+      model: null,
+    });
+    expect(controller.paintWorldMap(ctx, dawnhold, 560)).toEqual({
+      title: 'Dawnhold title',
+      model: null,
+    });
+    expect(calls.dungeonWorld).not.toHaveBeenCalledWith(ctx, lastKeep, 560, lastKeep.player.pos);
     expect(calls.lastKeepMinimap).toHaveBeenCalledWith(ctx, lastKeep, label, 162, 1.25);
     expect(calls.dawnholdMinimap).toHaveBeenCalledWith(ctx, dawnhold, label, 162, 1.25);
-    expect(calls.lastKeepWorld).toHaveBeenCalledWith(ctx, lastKeep, 560);
-    expect(calls.dawnholdWorld).toHaveBeenCalledWith(ctx, dawnhold, 560);
+    expect(calls.lastKeepWorld).toHaveBeenCalledWith(ctx, lastKeep, 560, lastKeep.player.pos);
+    expect(calls.dawnholdWorld).toHaveBeenCalledWith(ctx, dawnhold, 560, dawnhold.player.pos);
   });
 });

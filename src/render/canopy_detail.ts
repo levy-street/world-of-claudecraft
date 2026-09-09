@@ -21,19 +21,29 @@
 // tiles below they read as 0.3-0.7yd foliage clumps, not noise. Measured over
 // the shipped 1K maps: AO mean 0.474, sd 0.117, row/col isotropy 0.73;
 // NormalGL x/y sd 0.104/0.103 (isotropy 1.00).
-// Cost: alpha-rejected fragments pay zero canopy taps; surviving fragments
-// inside CANOPY_FADE_END pay 6, and fragments past it pay zero (distance fade
-// below). There is no per-frame CPU work. Gated to ULTRA AND UP
-// (GFX.canopyDetail; the Advanced Foliage Density dial can opt in separately).
+// Cost: alpha-rejected fragments pay zero canopy taps; a surviving fragment
+// inside the fade end pays the tier's tap count, and fragments past it pay
+// zero (distance fade below). There is no per-frame CPU work. Gated to ULTRA
+// AND UP (GFX.canopyDetail; the Advanced Foliage Density dial can opt in
+// separately), and the tap count itself is the tier knob GFX.canopyDetailTaps:
+// ultra runs the AO half alone over a tightened band, insane the full six.
+// canopy_detail_tier_core.ts owns that split and the reasoning behind it.
 // High keeps plain leaf materials in the recovery profile. There is
 // intentionally no parallax here, a cutout canopy has no coherent view-ray
 // height field to walk.
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import {
+  type CanopyDetailProfile,
+  canopyDetailProfile,
+  canopyDetailProgramCacheKey,
+  canopyTexturesSatisfy,
+} from './canopy_detail_tier_core';
 import { patchCanopyDetailShaderSource } from './foliage_shader_core';
 import { GFX, type GfxSettings } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
+import { applyTextureAnisotropy } from './texture_anisotropy';
 
 const CANOPY_TEXTURE_DIR = '/textures/foliage/';
 const CANOPY_TEXTURE_PREFIX = 'Moss002';
@@ -47,18 +57,18 @@ const CANOPY_AO_SPAN = 0.62;
  *  points below the horizon by START and saturates at FULL. */
 const CANOPY_CREVICE_DOWN_START = 0.15;
 const CANOPY_CREVICE_DOWN_FULL = 0.7;
-/** Distance fade (perf): the 6 taps per leaf fragment exist to break up NEAR
+/** Distance fade (perf): the taps per leaf fragment exist to break up NEAR
  *  canopies; past ~50yd a 0.3-0.7yd clump projects a handful of pixels and
  *  the break-up is carried by the canopy geometry itself. Across the band
  *  the AO term eases back to 1.0, which IS its value at the measured map
  *  mean (the remap is mean-centered, see MOSS002_AO_MEAN), and the normal
  *  blend eases to identity, so a distant canopy's brightness and silhouette
- *  cannot shift; past the end all 6 taps are branch-skipped. The geometric
+ *  cannot shift; past the end every tap is branch-skipped. The geometric
  *  crevice term (no taps) keeps running at every distance so stacked tiers
- *  never re-merge. Verified by screenshot A/B via the shared ?wornfade dev
- *  override (scripts/round9_fade_shots.mjs). */
-const CANOPY_FADE_START = 34;
-const CANOPY_FADE_END = 55;
+ *  never re-merge. The start and the two ends live in
+ *  canopy_detail_tier_core.ts (the AO-only arm pulls the end in). Verified by
+ *  screenshot A/B via the shared ?wornfade dev override
+ *  (scripts/round9_fade_shots.mjs). */
 const CANOPY_FADE_SCALE = ((): number => {
   if (typeof location === 'undefined') return 1;
   const v = new URLSearchParams(location.search).get('wornfade');
@@ -121,29 +131,62 @@ interface CanopyTextures {
 const TEX: CanopyTextures = { normal: null, ao: null };
 let canopyTextureTask: Promise<void> | null = null;
 
+/** The layer a profile compiles, or null when it ships no canopy detail. */
+export function canopyDetailProfileFor(target: Readonly<GfxSettings>): CanopyDetailProfile | null {
+  return target.canopyDetail ? canopyDetailProfile(target.canopyDetailTaps) : null;
+}
+
+/** The pure readiness rule over this module's live texture channel. */
+function canopyTexturesReady(profile: CanopyDetailProfile): boolean {
+  return canopyTexturesSatisfy(profile, { ao: TEX.ao !== null, normal: TEX.normal !== null });
+}
+
 /** Prepare the canopy texture channel selected by an explicit target profile. */
 export function prepareCanopyDetailProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  if (!target.canopyDetail || (TEX.normal && TEX.ao)) return Promise.resolve();
-  if (canopyTextureTask) return canopyTextureTask;
+  const profile = canopyDetailProfileFor(target);
+  if (!profile || canopyTexturesReady(profile)) return Promise.resolve();
   const prep = (name: string): Promise<THREE.Texture> =>
     loadTexture(`${CANOPY_TEXTURE_DIR}${CANOPY_TEXTURE_PREFIX}_${name}.jpg`, {
       repeat: true,
     }).then((tex) => {
       const t = tex.clone();
-      t.anisotropy = 4;
+      applyTextureAnisotropy(t, 'normal');
       t.needsUpdate = true;
       return t;
     });
-  canopyTextureTask = Promise.all([prep('NormalGL'), prep('AmbientOcclusion')])
-    .then(([n, a]) => {
-      TEX.normal = n;
-      TEX.ao = a;
-    })
-    .catch((err) => {
-      canopyTextureTask = null;
-      throw err;
-    });
-  return canopyTextureTask;
+  // Chained rather than single-flighted on a fixed pair: the AO-only arm
+  // fetches ONE map, and a profile change up to insane then asks for the
+  // NormalGL map that arm never wanted. Chaining lets the second request
+  // re-read what is still missing instead of joining a task that was never
+  // going to fetch it.
+  const task = (canopyTextureTask ?? Promise.resolve()).then(() => {
+    const jobs: Promise<void>[] = [];
+    if (!TEX.ao) {
+      jobs.push(
+        prep('AmbientOcclusion').then((t) => {
+          TEX.ao = t;
+        }),
+      );
+    }
+    if (profile.normalDetail && !TEX.normal) {
+      jobs.push(
+        prep('NormalGL').then((t) => {
+          TEX.normal = t;
+        }),
+      );
+    }
+    // Both maps of the full arm still fetch in parallel; only the CHAIN is
+    // serial, and it exists so a second request re-reads what is missing.
+    return Promise.all(jobs).then(() => undefined);
+  });
+  const chained: Promise<void> = task.catch((err) => {
+    // Drop the poisoned head so the next request starts a fresh chain (the
+    // callback runs long after this binding is initialized).
+    if (canopyTextureTask === chained) canopyTextureTask = null;
+    throw err;
+  });
+  canopyTextureTask = chained;
+  return chained;
 }
 
 registerDeferredPreload(() => prepareCanopyDetailProfileAssets(GFX));
@@ -155,8 +198,12 @@ registerDeferredPreload(() => prepareCanopyDetailProfileAssets(GFX));
  * live canopy draw. Empty before the preload gate resolves.
  */
 export function canopyDetailPrewarmTextures(): THREE.Texture[] {
+  const profile = canopyDetailProfileFor(GFX);
+  if (!profile) return [];
   const out: THREE.Texture[] = [];
-  if (TEX.normal) out.push(TEX.normal);
+  // Only what this arm samples: uploading the NormalGL map on the AO-only
+  // tier would cost the GPU residency of a 1K map no fragment ever reads.
+  if (profile.normalDetail && TEX.normal) out.push(TEX.normal);
   if (TEX.ao) out.push(TEX.ao);
   return out;
 }
@@ -180,6 +227,9 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
   // maps onto the same knob); ?canopy=off is
   // the dev-only perf-attribution kill switch (render_dev_flags.ts).
   if (!GFX.canopyDetail || renderLayerDisabled('canopy')) return;
+  // Which half of the layer this tier compiles, and how far it runs.
+  const profile = canopyDetailProfile(GFX.canopyDetailTaps);
+  if (!profile) return;
   const std = mat as THREE.MeshStandardMaterial;
   if (!std.isMeshStandardMaterial) return;
   if (applied.has(mat)) return;
@@ -195,10 +245,12 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
     prev?.call(mat, shader, renderer);
     // Fail soft before the preload gate resolves: the material simply ships
     // without the layer (the detail_normals null contract).
-    if (!TEX.normal || !TEX.ao) return;
-    shader.uniforms.uCanopyNormalTex = { value: TEX.normal };
+    if (!canopyTexturesReady(profile)) return;
+    if (profile.normalDetail) {
+      shader.uniforms.uCanopyNormalTex = { value: TEX.normal };
+      shader.uniforms.uCanopyStrength = { value: spec.strength };
+    }
     shader.uniforms.uCanopyAoTex = { value: TEX.ao };
-    shader.uniforms.uCanopyStrength = { value: spec.strength };
     shader.uniforms.uCanopyTile = { value: spec.tileScale };
     shader.uniforms.uCanopyAoLo = { value: aoLo };
     shader.uniforms.uCanopyAoSpan = { value: aoSpan };
@@ -207,10 +259,11 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
     // The pure patch keeps the RGB-only AO work after the stock alpha test,
     // while leaving the original visible-fragment operation order intact.
     const patched = patchCanopyDetailShaderSource(shader.vertexShader, shader.fragmentShader, {
-      fadeStart: CANOPY_FADE_START * CANOPY_FADE_SCALE,
-      fadeEnd: CANOPY_FADE_END * CANOPY_FADE_SCALE,
+      fadeStart: profile.fadeStart * CANOPY_FADE_SCALE,
+      fadeEnd: profile.fadeEnd * CANOPY_FADE_SCALE,
       creviceDownStart: CANOPY_CREVICE_DOWN_START,
       creviceDownFull: CANOPY_CREVICE_DOWN_FULL,
+      normalDetail: profile.normalDetail,
     });
     shader.vertexShader = patched.vertexShader;
     shader.fragmentShader = patched.fragmentShader;
@@ -221,5 +274,10 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
   // texture-ready state keys too: before the preload resolves the hook
   // compiles to a plain pass-through.
   mat.customProgramCacheKey = () =>
-    `canopy-detail|${TEX.normal && TEX.ao ? 'on' : 'off'}|f${(CANOPY_FADE_START * CANOPY_FADE_SCALE).toFixed(1)},${(CANOPY_FADE_END * CANOPY_FADE_SCALE).toFixed(1)}|${prevKey ? prevKey() : ''}`;
+    canopyDetailProgramCacheKey(
+      profile,
+      canopyTexturesReady(profile),
+      prevKey ? prevKey() : '',
+      CANOPY_FADE_SCALE,
+    );
 }

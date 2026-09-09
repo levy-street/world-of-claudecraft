@@ -219,7 +219,7 @@ describe('locomotion animation state', () => {
     expect(locomotionTimeScale('walkBack', state)).toBeGreaterThan(0);
   });
 
-  it('reverses forward locomotion for Ghost Wolf-style backpedal', () => {
+  it('reverses forward locomotion for Shadewolf-style backpedal', () => {
     const state = {
       ...BASE_ANIM_STATE,
       moving: true,

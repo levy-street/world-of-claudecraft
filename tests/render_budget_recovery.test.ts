@@ -233,6 +233,8 @@ describe('render budget recovery ladder', () => {
       vfx: HIGH_BASELINE.vfx,
       lighting: HIGH_BASELINE.lighting,
       resolution: 1,
+      detail: 1,
+      post: 1,
     });
   });
 
@@ -287,7 +289,7 @@ describe('render budget recovery ladder', () => {
       );
     }
 
-    expect(state.levels).toEqual({ ...LOW_BASELINE, resolution: 1 });
+    expect(state.levels).toEqual({ ...LOW_BASELINE, resolution: 1, detail: 1, post: 1 });
   });
 
   it('climbs to the low band maxima and stops exactly there when the scene stays sparse', () => {
@@ -306,7 +308,7 @@ describe('render budget recovery ladder', () => {
       );
     }
 
-    expect(state.levels).toEqual({ ...LOW_MAXIMA, resolution: 1 });
+    expect(state.levels).toEqual({ ...LOW_MAXIMA, resolution: 1, detail: 1, post: 1 });
   });
 
   it('holds the climb above baseline while the counters sit inside the gate band', () => {
@@ -324,6 +326,8 @@ describe('render budget recovery ladder', () => {
       vfx: 0.92,
       lighting: 0.9,
       resolution: 1,
+      detail: 1,
+      post: 1,
     });
 
     // Counters parked between 90% and 100% of target: full headroom, nothing to

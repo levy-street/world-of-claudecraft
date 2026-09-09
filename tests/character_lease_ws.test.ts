@@ -77,6 +77,9 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
       resolve: (moderation: unknown) => moderation,
       release: vi.fn(),
     })),
+    // The fresh-join arm asks the action-bar store for a still-queued document
+    // before its post-lease reload; this file has nothing queued.
+    hotbarLayouts: { pending: () => null },
   };
   const deps: any = {
     game,

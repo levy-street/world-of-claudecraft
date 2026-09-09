@@ -23,6 +23,10 @@ const UNIQUE_ERROR = 'You can only equip one of those.';
 // (grant_line_view, combat_rating) and removed after.
 const RING_ID = 'test_unique_band';
 const TWOHAND_ID = 'test_worldsplitter';
+// An EPIC ring for the phase 13 instance-widening load arms: legacy
+// legendary-rolled copies of it must NOT be unique-equipped, promoted
+// (perfected) ones must.
+const EPIC_RING_ID = 'test_legacy_epic_band';
 
 beforeAll(() => {
   ITEMS[RING_ID] = {
@@ -31,6 +35,16 @@ beforeAll(() => {
     kind: 'armor',
     slot: 'ring',
     quality: 'legendary',
+    requiredLevel: 20,
+    stats: { sta: 1 },
+    sellValue: 1,
+  } as ItemDef;
+  ITEMS[EPIC_RING_ID] = {
+    id: EPIC_RING_ID,
+    name: 'Test Legacy Epic Band',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
     requiredLevel: 20,
     stats: { sta: 1 },
     sellValue: 1,
@@ -53,6 +67,7 @@ beforeAll(() => {
 afterAll(() => {
   delete ITEMS[RING_ID];
   delete ITEMS[TWOHAND_ID];
+  delete ITEMS[EPIC_RING_ID];
 });
 
 function addWithoutAutoEquip(sim: Sim, itemId: string, count = 1): void {
@@ -95,6 +110,19 @@ describe('unique-equipped pure rules (equipment_rules)', () => {
     expect(isUniqueEquipped(legendaryRing)).toBe(true);
     expect(isUniqueEquipped(epicRing)).toBe(false);
     expect(isUniqueEquipped({ ...epicRing, quality: undefined } as ItemDef)).toBe(false);
+  });
+
+  it('the instance widening is PROMOTION-SCOPED and add-only (2026-08-27)', () => {
+    // A promoted copy (perfected + legendary-rolled, the orange promotion's
+    // mint) counts; a LEGACY legendary-rolled payload without the perfected
+    // stamp does NOT (old masterwork bumps wrote rolled.quality, and
+    // capturing them retroactively would bench live characters at login);
+    // and a below-def rolled quality never removes def-level uniqueness.
+    expect(isUniqueEquipped(epicRing, { perfected: true, rolled: { quality: 'legendary' } })).toBe(
+      true,
+    );
+    expect(isUniqueEquipped(epicRing, { rolled: { quality: 'legendary' } })).toBe(false);
+    expect(isUniqueEquipped(legendaryRing, { rolled: { quality: 'epic' } })).toBe(true);
   });
 
   it('keys a heroic variant to its base family', () => {
@@ -346,6 +374,63 @@ describe('unique-equipped load-time demotion', () => {
       (s) => s.itemId === 'kingsbane_last_oath' && s.instance?.enchant === 'ench_bench',
     );
     expect(benched).toBeDefined();
+  });
+
+  it('keeps two worn LEGACY legendary-rolled copies of one epic def (no perfected flag)', () => {
+    // The 2026-08-27 scoping correction: the instance-aware unique rule is
+    // PROMOTION-SCOPED, so legacy legendary-rolled payloads (old masterwork
+    // bumps wrote rolled.quality; they never carry `perfected`) are NOT
+    // retroactively captured, and a live character legally wearing two such
+    // copies is not silently benched at the next login.
+    const sim = makeFuryWarrior(9018);
+    const state = sim.serializeCharacter(sim.playerId)!;
+    state.equipment.ring1 = EPIC_RING_ID;
+    state.equipment.ring2 = EPIC_RING_ID;
+    state.equipmentInstance = {
+      ring1: { rolled: { quality: 'legendary' } },
+      ring2: { rolled: { quality: 'legendary' } },
+    };
+
+    const sim2 = new Sim({
+      seed: 9019,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    const pid = sim2.addPlayer('warrior', 'Restored', { state });
+    const meta = sim2.meta(pid)!;
+    expect(meta.equipment.ring1).toBe(EPIC_RING_ID);
+    expect(meta.equipment.ring2, 'the second legacy copy stays worn').toBe(EPIC_RING_ID);
+    expect(meta.equipmentInstance.ring1?.rolled?.quality).toBe('legendary');
+    expect(meta.equipmentInstance.ring2?.rolled?.quality).toBe('legendary');
+    expect(sim2.countItem(EPIC_RING_ID, pid), 'nothing was benched').toBe(0);
+  });
+
+  it('benches a PROMOTED duplicate of one epic def on load (perfected + legendary-rolled)', () => {
+    const sim = makeFuryWarrior(9020);
+    const state = sim.serializeCharacter(sim.playerId)!;
+    state.equipment.ring1 = EPIC_RING_ID;
+    state.equipment.ring2 = EPIC_RING_ID;
+    state.equipmentInstance = {
+      ring1: { perfected: true, rolled: { quality: 'legendary' } },
+      ring2: { perfected: true, rolled: { quality: 'legendary' } },
+    };
+
+    const sim2 = new Sim({
+      seed: 9021,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    const pid = sim2.addPlayer('warrior', 'Restored', { state });
+    const meta = sim2.meta(pid)!;
+    expect(meta.equipment.ring1).toBe(EPIC_RING_ID);
+    expect(meta.equipment.ring2, 'the promoted duplicate is benched').toBeUndefined();
+    const benched = meta.inventory.find(
+      (s) => s.itemId === EPIC_RING_ID && s.instance?.perfected === true,
+    );
+    expect(benched, 'the benched copy keeps its payload').toBeDefined();
+    expect(benched?.instance?.rolled?.quality).toBe('legendary');
   });
 
   it('loads two different persisted legendaries untouched', () => {

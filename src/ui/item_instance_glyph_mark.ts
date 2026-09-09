@@ -19,8 +19,8 @@
 
 import type { BagCornerMark } from './bag_corner_mark_view';
 import type { BagInstanceGlyphKind } from './bag_instance_glyph_view';
+import { MASTERWORK_SEAL_IMAGE_URL } from './hud/professions/profession_art';
 import type { TranslationKey } from './i18n';
-import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { svgIcon, type UiIconName } from './ui_icons';
 
 // Procedural chrome glyph each non-masterwork kind paints. Masterwork keeps its

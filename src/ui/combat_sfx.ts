@@ -8,6 +8,8 @@ type SpellFxEvent = Extract<SimEvent, { type: 'spellfx' }>;
 type AuraEvent = Extract<SimEvent, { type: 'aura' }>;
 type VarkhulCallout = Extract<SimEvent, { type: 'varkhulCallout' }>['call'];
 type VarkhulCalloutEvent = Extract<SimEvent, { type: 'varkhulCallout' }>;
+type NythraxisCallout = Extract<SimEvent, { type: 'nythraxisCallout' }>['call'];
+type NythraxisCalloutEvent = Extract<SimEvent, { type: 'nythraxisCallout' }>;
 type MagicSchool = 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 export type MobVoiceAction = 'aggro' | 'attack' | 'death' | 'hurt' | 'idle';
 
@@ -68,6 +70,93 @@ export function dispatchVarkhulCalloutSfx(
   if (!plan) return false;
   sink(plan);
   return true;
+}
+
+// Nythraxis callouts: the Bone Spike pair share the bone impact (the victim
+// hears only the personal one, the room hears only the raid one), a shattered
+// spike resolves on the raid-milestone chime, and the swap call lands as a
+// shadow impact under the Dread Curse hit it announces.
+const NYTHRAXIS_CALLOUT_CUES = {
+  impaled: 'impact_bone',
+  youAreImpaled: 'impact_bone',
+  spikeBroken: 'ui_achievement',
+  dreadCurseSwap: 'impact_shadow',
+  sigilAppears: 'impact_arcane',
+  sigilBound: 'impact_arcane',
+  sigilUnbound: 'impact_shadow',
+  gravefireTarget: 'impact_shadow',
+  kingsWrath: 'impact_shadow',
+  boneStormBegins: 'impact_bone',
+  boneStormCharge: 'impact_bone',
+  boneStormEnds: 'impact_bone',
+  crownEndures60: 'impact_shadow',
+  crownEndures30: 'impact_shadow',
+  crownEndures10: 'impact_shadow',
+  crownEndures: 'impact_shadow',
+} as const satisfies Record<NythraxisCallout, SfxId>;
+
+export function nythraxisCalloutCue(call: NythraxisCallout): SfxId {
+  return NYTHRAXIS_CALLOUT_CUES[call];
+}
+
+export type NythraxisCalloutSfxPlan = VarkhulCalloutSfxPlan;
+
+export function nythraxisCalloutSfxPlan(
+  event: NythraxisCalloutEvent,
+  entityOf: (entityId: number) => Pick<Entity, 'pos'> | undefined,
+): NythraxisCalloutSfxPlan | null {
+  const source = entityOf(event.sourceId);
+  if (!source) return null;
+  return {
+    cue: nythraxisCalloutCue(event.call),
+    x: source.pos.x,
+    y: source.pos.y,
+    z: source.pos.z,
+    gain: 0.9,
+    cooldown: 0.08,
+    jitter: false,
+  };
+}
+
+export function dispatchNythraxisCalloutSfx(
+  event: NythraxisCalloutEvent,
+  entityOf: (entityId: number) => Pick<Entity, 'pos'> | undefined,
+  sink: (plan: NythraxisCalloutSfxPlan) => void,
+): boolean {
+  const plan = nythraxisCalloutSfxPlan(event, entityOf);
+  if (!plan) return false;
+  sink(plan);
+  return true;
+}
+
+export type RaidCalloutSfxEvent = VarkhulCalloutEvent | NythraxisCalloutEvent;
+export type RaidCalloutSfxPlay = (
+  cue: SfxId,
+  x: number,
+  y: number,
+  z: number,
+  gain: number,
+  opts: { cooldown: number; jitter: false },
+) => void;
+
+/**
+ * The one HUD entry for every structured raid callout: routes the event to its
+ * boss's planner and plays the plan through the HUD's positional combat player.
+ * Returns false when the source entity is out of interest scope (no sound).
+ */
+export function dispatchRaidCalloutSfx(
+  event: RaidCalloutSfxEvent,
+  entityOf: (entityId: number) => Pick<Entity, 'pos'> | undefined,
+  play: RaidCalloutSfxPlay,
+): boolean {
+  const sink = (plan: VarkhulCalloutSfxPlan) =>
+    play(plan.cue, plan.x, plan.y, plan.z, plan.gain, {
+      cooldown: plan.cooldown,
+      jitter: plan.jitter,
+    });
+  return event.type === 'varkhulCallout'
+    ? dispatchVarkhulCalloutSfx(event, entityOf, sink)
+    : dispatchNythraxisCalloutSfx(event, entityOf, sink);
 }
 
 const SILENT_ASCENSION_AURA_IDS: ReadonlySet<string> = new Set([
@@ -436,7 +525,7 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
 // Per-ability overrides for a buff's apply moment: normally every buff plays
 // the shared buff_apply chime, keyed off Aura.id (the ability that applied
 // it). Ice Block (Cold Coffin), Cloak of Shadows (Shadecloak, an absorb
-// aura, same apply path), Vanish (Smokestep, a toggle stealth selfBuff, same
+// aura, same apply path), Vanish (Smokefade, a toggle stealth selfBuff, same
 // apply path too), and Stealth (Duskveil, the opening rogue stealth toggle,
 // identical selfBuff shape) get their own distinct cue instead. Greater
 // Invisibility (mage, kind:'stealth' too, effect_dispatch.ts's

@@ -548,11 +548,10 @@ describe('the listing-id stamp rides the escrow transaction, atomically', () => 
     expect(sql().some((t) => t.includes('woc_market_directed_offers'))).toBe(false);
   });
 
-  it('issues exactly FIVE workload statements on the directed arm, FOUR on the public arm', async () => {
-    // The tunables relation prices ESCROW_STATEMENT_TIMEOUT_MS * 5 against
-    // the autosave period, so the statement count is a pinned input to that
-    // arithmetic, not an implementation detail: a sixth statement silently
-    // stretches the honest occupancy ceiling past what the relation claims.
+  it('without source movement, issues five directed workload statements and four public statements', async () => {
+    // These empty-container fixtures issue no source-journal statement.
+    // The conservative directed bound prices six statements when materials
+    // move; material_source_storage_cost.test.ts measures both arms.
     const workload = (seq: string[]): string[] =>
       seq.filter(
         (t) => t !== 'BEGIN' && t !== 'COMMIT' && t !== 'ROLLBACK' && !t.startsWith('SET LOCAL'),
@@ -579,7 +578,7 @@ describe('the listing-id stamp rides the escrow transaction, atomically', () => 
     expect(workload(publicArm.sql())).toHaveLength(4);
   });
 
-  it('issues twelve workload statements at the ledger plus one-storage-effect maximum', async () => {
+  it('without source movement, issues twelve statements with a ledger and one storage effect', async () => {
     const batch = serializeBankLedgerCommandBatch('woc.max.query.shape', [
       {
         realm: REALM,
@@ -1357,6 +1356,24 @@ function recordingTxPool(
     }
     if (text.includes('FROM woc_market_listings') && text.includes('FOR NO KEY UPDATE')) {
       return { rows: [{ status: 'settling' }], rowCount: 1 };
+    }
+    // The fenced character UPDATE now RETURNS its material-source pre-image
+    // (server/character_save_statement.ts CHARACTER_SAVE_PREIMAGE_SELECT):
+    // an empty answer here is dishonest for a landed row and trips the
+    // journal's own-broken-call-site refusal. Every SAVE fixture in this file
+    // carries no bank/vault, so an honest empty pre-image is also a true one.
+    if (text.includes('RETURNING previous.before_bank')) {
+      return {
+        rows: [
+          {
+            before_bank: null,
+            before_vault: null,
+            personal_anchor_exists: false,
+            vault_anchor_exists: false,
+          },
+        ],
+        rowCount: 1,
+      };
     }
     return { rows: [], rowCount: 1 };
   };
@@ -2414,6 +2431,19 @@ describe('the atomic save-and-book, in SQL', () => {
     const query = vi.fn(async (text: string) => {
       seen.push(text);
       if (text === 'COMMIT') throw raw;
+      if (text.includes('RETURNING previous.before_bank')) {
+        return {
+          rows: [
+            {
+              before_bank: null,
+              before_vault: null,
+              personal_anchor_exists: false,
+              vault_anchor_exists: false,
+            },
+          ],
+          rowCount: 1,
+        };
+      }
       return { rows: [], rowCount: 1 };
     });
     const client = { query, release: vi.fn(), on: () => {}, removeListener: () => {} };
@@ -2479,7 +2509,7 @@ describe('the escrow listing transaction, in SQL', () => {
     // ceiling, and the WIDER save-site idle bound (the character serialize
     // runs between statements, where Postgres sees idle-in-transaction; the
     // 2s guard bound false-fires on an ordinary stall there).
-    expect(seq.some((t) => t.includes('SET LOCAL statement_timeout = 4000'))).toBe(true);
+    expect(seq.some((t) => t.includes('SET LOCAL statement_timeout = 3500'))).toBe(true);
     expect(seq.some((t) => t.includes('SET LOCAL lock_timeout = 2000'))).toBe(true);
     expect(
       seq.some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 10000')),

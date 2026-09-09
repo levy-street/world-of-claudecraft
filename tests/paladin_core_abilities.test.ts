@@ -354,7 +354,7 @@ describe('Paladin core abilities', () => {
     expect(damage.player.paladinDevotion?.value).toBe(1);
   });
 
-  it('doubles Holy healing generation while Avenging Wrath is active', () => {
+  it('doubles Holy healing generation while Zealwing is active', () => {
     const sim = new Sim({ seed: 32, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.setSpec('holy');
@@ -369,7 +369,7 @@ describe('Paladin core abilities', () => {
     expect(sim.player.paladinDevotion?.value).toBe(14);
   });
 
-  it('doubles Protection damage generation while Avenging Wrath is active', () => {
+  it('doubles Protection damage generation while Zealwing is active', () => {
     const sim = new Sim({ seed: 33, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.setSpec('protection');

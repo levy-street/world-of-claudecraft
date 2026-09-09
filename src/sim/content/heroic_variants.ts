@@ -230,12 +230,13 @@ export function buildHeroicVariants(
   // on the Fanglord Beastmaster) registers at HEROIC_LOOT_SOURCE_LEVEL in the
   // item-level source index (item_level.ts applies the same non-raid bossId rule),
   // so the generator must budget it at that tier too or its stats and ratings
-  // undershoot its indexed item level.
+  // undershoot its indexed item level. Migrated base-table paths explicitly
+  // preserve their original source tier instead.
   const fiveManBossVariantIds = new Set<string>();
   for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
     if (bossId === NYTHRAXIS_RAID_BOSS_ID) continue;
     for (const entry of entries) {
-      if (entry.itemId) fiveManBossVariantIds.add(entry.itemId);
+      if (entry.itemId && !entry.preserveSourceTier) fiveManBossVariantIds.add(entry.itemId);
     }
   }
   const out: Record<string, ItemDef> = {};

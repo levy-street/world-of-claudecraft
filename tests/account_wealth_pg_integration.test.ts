@@ -22,6 +22,7 @@ import type { Pool as PgPool } from 'pg';
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { mailRecipientKey } from '../server/mail_partition_backfill';
+import { materialSourceConnection } from '../server/material_source_connection';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
 const VERIFY_DB = 'wocc_account_wealth_verify';
@@ -122,7 +123,7 @@ describeDb('account wealth escrow aggregation (REAL Postgres)', () => {
 
     await db.ensureSchema();
 
-    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 8 });
+    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 8 });
   }, 120_000);
 
   afterAll(async () => {

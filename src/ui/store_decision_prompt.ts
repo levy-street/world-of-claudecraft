@@ -1,17 +1,10 @@
 // Store-owned confirmation and result surfaces. Store decisions must not route
-// through the HUD's confirm dialog (its no-choice cancel policy and window
-// plumbing do not fit a Store purchase), but the modal decision still mounts on
-// document.body the way that dialog does: #prompt-stack lives inside #ui, a
-// position:fixed z-index:10 stacking context (base.css), so no z-index inside
-// the stack can clear the body-level armory inspect overlay (z 90), and a
-// stack-hosted decision opened invisibly under an open inspector while the
-// Store and the inspector both sat inert (the v0.41.0 desktop Purchase Skin
-// freeze). Assistive technology never reaches the blocked surfaces regardless
-// of mount point: this controller makes the Store (and an open inspector)
-// inert, owns every teardown path, and can publish a nonmodal result into
-// #prompt-stack when an async purchase finishes after the Store surface has
-// gone away (the result is a stack child on purpose: it must survive the
-// Store's close, and no overlay outlives that close to cover it).
+// through the HUD's body-level confirm dialog: the Armory inspector sits above
+// the Store window, and a body-owned dialog leaves both Store surfaces reachable
+// to assistive technology. This controller mounts in #prompt-stack, makes the
+// Store (and an open inspector) inert, owns every teardown path, and can publish
+// a nonmodal result when an async purchase finishes after the Store surface has
+// gone away.
 
 import { esc } from './esc';
 import { installPromptDialog, type PromptDialogHandle } from './prompt_dialog';
@@ -125,7 +118,8 @@ export class StoreDecisionPrompts {
 
   open(options: StoreDecisionPromptOptions): boolean {
     this.dismiss(true);
-    if (document.getElementById('confirm-dialog')) return false;
+    const stack = document.getElementById('prompt-stack');
+    if (!stack || document.getElementById('confirm-dialog')) return false;
 
     const root = this.root();
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -144,9 +138,8 @@ export class StoreDecisionPrompts {
       `<button type="button" class="btn woc-store-prompt-confirm" data-store-prompt-confirm>${esc(options.confirmText)}</button>` +
       '</div>';
     prompt.setAttribute('aria-describedby', bodyId);
-    // Body-level, never stack.appendChild: see the module header (a #prompt-stack
-    // child can never paint over the body-level armory inspect overlay).
-    document.body.appendChild(prompt);
+    stack.classList.add('store-decision-active');
+    stack.appendChild(prompt);
     if (inspector) inspector.inert = true;
 
     let settled = false;
@@ -157,6 +150,7 @@ export class StoreDecisionPrompts {
       settled = true;
       if (inspector) inspector.inert = inspectorWasInert;
       prompt.remove();
+      stack.classList.remove('store-decision-active');
       if (this.active?.prompt === prompt) this.active = null;
       if (!confirmed) options.onCancel?.();
     };

@@ -128,7 +128,28 @@ also pushes voice-room membership so the widget shows it even without the iframe
 - Schema is additive idempotent DDL applied at boot (no migrations); see
   `server/discord_db.ts` `DISCORD_SCHEMA`.
 
+## Queue-pop direct messages (game -> bot -> player)
+- Opt-in per account: the Options window row "Send me a Discord direct message when my
+  battleground or arena queue pops" writes `accounts.discord_queue_pings` through
+  `GET`/`POST /api/discord/queue-pings` (`server/discord_queue_pings.ts`). Off by default:
+  a DM is asked for, never assumed, and it needs a linked Discord account.
+- The game loop observes `bgProposed` (the Thornhollow Fields Accept/Decline offer, 30 s)
+  and `arenaFound` (the Ashen Coliseum seats the player) each tick and enqueues one item
+  per opted-in linked player into `server/discord_queue_pops.ts`; the bot drains it as the
+  outbox's fifth stream (`queuePops`) and DMs the player (`bot/logic.ts`
+  `buildQueuePopMessage`: the queue, the character, a live Discord countdown to the
+  deadline, and a button back into the game).
+- Latency: the outbox also reports whether an opted-in linked player is waiting in a queue,
+  and the bot counts that as work, so the poll holds its active cadence for the whole wait
+  instead of decaying to idle and finding the pop half a window late. Items carry their
+  deadline; the drain and the bot both drop a pop that already lapsed.
+- Refusals are cheap: a user whose privacy settings block DMs from server members costs one
+  403 and is then refused locally by the governor's forbidden cache (`dm:<user>` subject)
+  for its TTL.
+
 ## Out of scope / follow-ups
+- Dungeon Finder proposals (`dfProposal`) as a third queue-pop kind; the observer's
+  event arm is the only place that changes.
 - Live "speaking" indicators (needs a voice-gateway connection).
 - Equippable account-wide titles in-world (titles are recorded claims today; the
   in-world flex is the nameplate/inspect status badge + the cosmetic chroma).

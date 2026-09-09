@@ -111,6 +111,9 @@ function setup() {
     beginChatModerationHydration: vi.fn((accountId: number) =>
       new ChatModerationLiveState().beginHydration(accountId),
     ),
+    // The fresh-join arm asks the action-bar store for a still-queued document
+    // before its post-lease reload; this file has nothing queued.
+    hotbarLayouts: { pending: () => null },
   };
   const deps: WsAuthDeps = {
     game: game as unknown as WsAuthDeps['game'],
@@ -146,7 +149,7 @@ function setup() {
     })),
     acquireCharacterLease: vi.fn(async () => true),
     releaseCharacterLease: vi.fn(async () => {}),
-    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [], characterCount: 1 })),
+    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [] })),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),

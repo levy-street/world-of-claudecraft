@@ -11,6 +11,10 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  professions_crucible: {
+    name: '도가니의 장인 정신',
+    desc: '공격대 재료로 만드는 11종의 세트로, 각 세트에는 가슴, 허리, 발 부위가 있습니다. 도안과 공식은 지식이며 수집 유물이 아닙니다.',
+  },
   // Dungeon, delve and world-boss pages: entities.* names verbatim.
   conquerors_hollow_crypt: {
     name: '텅 빈 묘실',
@@ -191,5 +195,13 @@ export const table: ReliquaryLocaleTable = {
   conquerors_varkhul_heroic: {
     name: '영웅: 내부 용광로',
     desc: '마지막 불꽃의 대장장이 발쿨에게서 영웅 난이도에서만 나오는 방패와 무기.',
+  },
+  professions_forgebreaker: {
+    name: '화로파괴자',
+    desc: '대장간에서 풀려나 직접 만든 망치에 깃든 마지막 샘의 목소리.',
+  },
+  conquerors_set_bramblehide: {
+    name: '루츠의 가시덤불가죽',
+    desc: '브램블하이드 가죽 세트 전체.',
   },
 };

@@ -48,6 +48,7 @@ import {
 } from '../../server/admin';
 import { resetAdminGuildListReadsForTests } from '../../server/admin_guilds_read';
 import { characterProfessionsSheet } from '../../server/character_professions';
+import { CHARACTER_SAVE_LEASED_LINE } from '../../server/character_save_statement';
 import { pool } from '../../server/db';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
@@ -3868,11 +3869,13 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
     expect(sheet.knownRecipes).toBe(2);
     // The sheet runs the LOADER'S normalizeArchetypeState, so the stored
     // null hobby renders as the default the next login resolves for the
-    // alchemy+engineering pair (enchanting; inscription has no content).
+    // alchemy+engineering pair (inscription: both candidates carry content
+    // since the Masterwrought phase 06 inscription catalog, so ring order
+    // picks inscription, ring index 5, over enchanting, 6).
     expect(sheet.archetype).toEqual({
       activeArchetype: 'alchemy',
       pairedMajor: 'engineering',
-      hobbyCraft: 'enchanting',
+      hobbyCraft: 'inscription',
     });
     expect(sheet.slots).toEqual([
       {
@@ -3896,7 +3899,12 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
       { nodeId: 'retired_node_xyz', zoneId: null, nodeType: null, remainingSeconds: 30 },
     ]);
     // The server-authored effect vocabulary the restore-slot select renders.
-    expect(sheet.toolEffectIds).toEqual(['gatherers_cache', 'artisans_eye', 'quickening_charm']);
+    expect(sheet.toolEffectIds).toEqual([
+      'gatherers_cache',
+      'artisans_eye',
+      'quickening_charm',
+      'makers_charm',
+    ]);
   });
 
   it('overlays a LIVE serializeCharacter snapshot when the character is online here', async () => {
@@ -4191,6 +4199,144 @@ describe('R35 GM restores: refusal prose arms', () => {
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'unknown tool effect id' });
     expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+});
+
+describe('phase 13 legendary-name strip (clear-item-name)', () => {
+  // The decision matrix lives in clear_item_name.test.ts. This slice drives
+  // the real middleware and binder into the atomic offline operation.
+  it('audits first, then passes the exact target to the atomic offline strip', async () => {
+    const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+    const clearOfflineItemName = vi.fn(async () => ({ ok: true, cleared: 1 }));
+    authedAdminDb({ recordItemNameClear, clearOfflineItemName });
+    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { bag: 0, itemId: 'wyrmfall_pendant', reason: 'reported slur in the stamped name' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true, cleared: 1 }, error: null });
+    expect(recordItemNameClear).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      detail: 'bag 0 wyrmfall_pendant',
+      reason: 'reported slur in the stamped name',
+    });
+    expect(clearOfflineItemName).toHaveBeenCalledExactlyOnceWith(5, {
+      kind: 'bag',
+      bag: 0,
+      itemId: 'wyrmfall_pendant',
+    });
+    expect(recordItemNameClear.mock.invocationCallOrder[0]).toBeLessThan(
+      clearOfflineItemName.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('refuses an online character before any audit or offline strip', async () => {
+    const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+    const clearOfflineItemName = vi.fn(async () => ({ ok: true, cleared: 1 }));
+    authedAdminDb({ recordItemNameClear, clearOfflineItemName });
+    const rt = installAdminRuntime({ adminCharacterOnline: vi.fn(() => true) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { all: true, reason: 'slur' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'character is online on this realm; disconnect them first',
+    });
+    expect(rt.adminCharacterOnline).toHaveBeenCalledWith(5);
+    expect(recordItemNameClear).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
+  });
+
+  it('surfaces a missing reason from the audit and never starts the atomic strip', async () => {
+    const clearOfflineItemName = vi.fn(async () => ({ ok: true, cleared: 1 }));
+    authedAdminDb({
+      recordItemNameClear: vi.fn(async () => {
+        throw new Error('moderation reason is required');
+      }),
+      clearOfflineItemName,
+    });
+    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { bag: 0, itemId: 'wyrmfall_pendant' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'moderation reason is required' });
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
+  });
+
+  it('refuses a moderator-role token at the superadmin-only permission gate', async () => {
+    const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+    const clearOfflineItemName = vi.fn(async () => ({ ok: true, cleared: 1 }));
+    authedAdminDb({
+      recordItemNameClear,
+      clearOfflineItemName,
+      adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
+    });
+    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { all: true, reason: 'slur' },
+    });
+    expect(r.status).toBe(403);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'you do not have permission to do this',
+    });
+    expect(recordItemNameClear).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
+  });
+
+  it.each(['no named copy matched that target', 'character not found', CHARACTER_SAVE_LEASED_LINE])(
+    'returns the atomic strip refusal after recording the attempt: %s',
+    async (error) => {
+      const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+      const clearOfflineItemName = vi.fn(async () => ({ ok: false, error }));
+      authedAdminDb({ recordItemNameClear, clearOfflineItemName });
+      installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+      const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+        headers: { authorization: BEARER },
+        params: { id: '5' },
+        body: { slot: 'neck', reason: 'reported name' },
+      });
+      expect(r.status).toBe(400);
+      expect(r.body).toEqual({ success: false, data: null, error });
+      expect(clearOfflineItemName).toHaveBeenCalledExactlyOnceWith(5, {
+        kind: 'slot',
+        slot: 'neck',
+      });
+      expect(recordItemNameClear.mock.invocationCallOrder[0]).toBeLessThan(
+        clearOfflineItemName.mock.invocationCallOrder[0],
+      );
+    },
+  );
+
+  it('surfaces an atomic database failure without reporting a successful strip', async () => {
+    const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+    const clearOfflineItemName = vi.fn(async () => {
+      throw new Error('database unavailable');
+    });
+    authedAdminDb({ recordItemNameClear, clearOfflineItemName });
+    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { all: true, reason: 'reported name' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'database unavailable' });
+    expect(recordItemNameClear).toHaveBeenCalledTimes(1);
+    expect(clearOfflineItemName).toHaveBeenCalledTimes(1);
   });
 });
 

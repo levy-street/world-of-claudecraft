@@ -200,6 +200,32 @@ describe('minimap model', () => {
 });
 
 describe('world-map model', () => {
+  it('draws the keep for a party member from OUTSIDE via the anchor, with no player arrow', () => {
+    const ally = { pid: 9, x: KEEP_ORIGIN.x + 5, z: KEEP_ORIGIN.z - 5, dead: 0, cls: 'priest' };
+    const stub = {
+      player: { id: 1, pos: { x: 0, y: 0, z: 0 }, facing: 0 },
+      entities: new Map(),
+      partyInfo: { members: [ally] },
+    } as unknown as IWorld;
+    expect(buildLastKeepWorldMapModel(stub, 560, 34)).toBeNull();
+    const model = buildLastKeepWorldMapModel(stub, 560, 34, { x: ally.x, z: ally.z });
+    expect(model).not.toBeNull();
+    expect(model?.markers.map((m) => m.kind)).toEqual(['party']);
+  });
+
+  it('never draws a party member from another instance copy of the keep', () => {
+    const otherCopy = instanceOrigin(DUNGEONS.the_last_keep.index, 1);
+    const here = { pid: 9, x: KEEP_ORIGIN.x + 5, z: KEEP_ORIGIN.z - 5, dead: 0, cls: 'priest' };
+    const elsewhere = { pid: 10, x: otherCopy.x + 5, z: otherCopy.z - 5, dead: 0, cls: 'mage' };
+    const stub = {
+      player: { id: 1, pos: { x: KEEP_ORIGIN.x, y: 0, z: KEEP_ORIGIN.z }, facing: 0 },
+      entities: new Map(),
+      partyInfo: { members: [here, elsewhere] },
+    } as unknown as IWorld;
+    const model = buildLastKeepWorldMapModel(stub, 560, 34);
+    expect(model?.markers.filter((m) => m.kind === 'party')).toHaveLength(1);
+  });
+
   it('frames the whole plan at a uniform scale and projects the player with it', () => {
     const S = 560;
     const pad = 34;

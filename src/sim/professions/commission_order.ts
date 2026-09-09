@@ -53,6 +53,14 @@ export interface CommissionOrder {
   status: CommissionOrderStatus;
   acceptedBy?: number;
   acceptedByName?: string;
+  /** The accepter's lifetime craft record (Masterwrought phase 14, the
+   *  commission quality signal): masterworks crafted and legendaries forged,
+   *  SNAPSHOT from the crafter's deed stat counters at accept time (deeds.ts
+   *  owns the live counters; a snapshot, not a live read, so the number the
+   *  requester weighed the acceptance on is the number the row keeps showing).
+   *  Both absent while the order is open; set together by accept. */
+  crafterMasterworks?: number;
+  crafterLegendaries?: number;
   /** ctx.time the order was opened. */
   openedAt: number;
   /** ctx.time the order reached a terminal status (delivered/cancelled/expired). */
@@ -125,6 +133,10 @@ export interface CommissionOrderRow {
   crafterName?: string;
   status: CommissionOrderStatus;
   acceptedByName?: string;
+  /** The accepter's craft record snapshot (see CommissionOrder); present only
+   *  once a crafter has accepted. */
+  crafterMasterworks?: number;
+  crafterLegendaries?: number;
   mine: boolean;
   mineToCraft: boolean;
 }
@@ -218,6 +230,17 @@ export function acceptCommissionOrder(
   order.status = 'accepted';
   order.acceptedBy = r.meta.entityId;
   order.acceptedByName = r.meta.name;
+  // The quality signal (phase 14): snapshot the accepter's lifetime craft
+  // record off the live deed stat counters, so every viewer of the accepted
+  // row can weigh the crafter without a name lookup. Written even when both
+  // counters are zero: an honest "0 masterworks" is the signal working, and
+  // presence doubling as accepted-ness would make a zero-record crafter's
+  // acceptance indistinguishable from an open row.
+  // Plain reads: DeedStats.counters is a REQUIRED record every deed-stat key
+  // is zero-filled into on create and restore, so a fallback here would be
+  // dead defensive code (the wave-1 architecture review).
+  order.crafterMasterworks = r.meta.deedStats.counters.masterworksCrafted;
+  order.crafterLegendaries = r.meta.deedStats.counters.legendariesForged;
   ctx.bumpCommissionOrderBoardRev();
   return { ok: true, orderId };
 }
@@ -330,6 +353,12 @@ export function commissionOrdersFor(ctx: SimContext, pid: number): CommissionOrd
       crafterName: o.crafterName,
       status: o.status,
       acceptedByName: o.acceptedByName,
+      // Spread-conditional rather than plain-copied: an open row must carry
+      // no record keys at all, so the corder JSON for the common open board
+      // stays byte-identical to the pre-signal wire (undefined would already
+      // stringify away, but the row OBJECT shape is also what tests compare).
+      ...(o.crafterMasterworks !== undefined ? { crafterMasterworks: o.crafterMasterworks } : {}),
+      ...(o.crafterLegendaries !== undefined ? { crafterLegendaries: o.crafterLegendaries } : {}),
       mine,
       mineToCraft: acceptedByMe || (targetedAtMe && o.status === 'open'),
     });

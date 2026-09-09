@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Heroïsch: The Inner Crucible',
     desc: 'Alleen heroïsch verkrijgbare schilden en wapens van Varkhul, Forgefather of the Last Flame.',
   },
+  conquerors_set_bramblehide: {
+    name: "Roots' Doornhuid",
+    desc: 'De volledige Bramblehide-leerfamilie.',
+  },
 };

@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Kahramanca: The Inner Crucible',
     desc: "Varkhul, Forgefather of the Last Flame'den yalnızca kahramanca modda düşen kalkanlar ve silahlar.",
   },
+  conquerors_set_bramblehide: {
+    name: "Roots'un Dikenli Postu",
+    desc: 'Eksiksiz Bramblehide deri ailesi.',
+  },
 };

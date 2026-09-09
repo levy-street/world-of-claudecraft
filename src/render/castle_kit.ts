@@ -1,5 +1,5 @@
 // Shared castle-kit extraction helpers for the walk-in castle assemblies
-// (castle_features, dawnhold_features, bulwark_features). Third copy earned
+// (castle_features, dawnhold_features). Third copy earned
 // the module (rule of three): geometry extraction with the quantized-attribute
 // guard, the placement shape the assemblies instance from, and the banner
 // cloth rule. Render-only leaf: no IWorld, no sim imports.

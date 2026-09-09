@@ -16,6 +16,7 @@ import {
   scanAnimRepair,
   shouldPlayLanding,
   shouldPlayOutCastExit,
+  weaponStowedOverlay,
 } from '../src/render/characters/anim_state';
 
 // A three.js SkinnedMesh renders BIND POSE (arms out, the T-pose) whenever the
@@ -422,6 +423,34 @@ describe('shouldPlayLanding', () => {
 
   it('yields to death: a body killed mid-air collapses, it does not stick a landing', () => {
     expect(shouldPlayLanding(true, false, true, true)).toBe(false);
+  });
+});
+
+describe('weaponStowedOverlay', () => {
+  it('draws normally when the player has it drawn and is neither swimming nor mounted', () => {
+    expect(weaponStowedOverlay(false, false, false)).toBe(false);
+  });
+
+  it("respects the player's own sheathe choice on dry land, unmounted", () => {
+    expect(weaponStowedOverlay(true, false, false)).toBe(true);
+  });
+
+  it('forces the sheathed pose while swimming, regardless of the sim bit', () => {
+    expect(weaponStowedOverlay(false, true, false)).toBe(true);
+    expect(weaponStowedOverlay(true, true, false)).toBe(true);
+  });
+
+  it('forces the sheathed pose while mounted, regardless of the sim bit', () => {
+    expect(weaponStowedOverlay(false, false, true)).toBe(true);
+    expect(weaponStowedOverlay(true, false, true)).toBe(true);
+  });
+
+  it('is only ever an overlay: it never reports drawn when any input says stowed', () => {
+    expect(weaponStowedOverlay(true, true, true)).toBe(true);
+    // Swimming and mounted can never both be true in the live sim (mounting
+    // auto-dismounts on water entry), but the pure overlay still resolves the
+    // combination correctly rather than depending on that sim invariant.
+    expect(weaponStowedOverlay(false, true, true)).toBe(true);
   });
 });
 

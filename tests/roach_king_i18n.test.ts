@@ -2,6 +2,7 @@ import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { ROACH_CROWN_AURA, ROACH_KING_MOBS } from '../src/sim/content/rift/roach_king';
 import { abilityDisplayNameFromSource } from '../src/ui/ability_display_name';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
+import { castDisplayName } from '../src/ui/cast_display_name';
 import { tEntity } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { riftCastDisplayName } from '../src/ui/rift_cast_display_name';
@@ -43,6 +44,7 @@ describe('Roach King player text', () => {
       'rift_asmon_swarm',
     ]) {
       expect(abilityDisplayNameFromSource(id)).toBe(riftCastDisplayName(id));
+      expect(castDisplayName(id)).toBe(riftCastDisplayName(id));
     }
   });
 

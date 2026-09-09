@@ -1,4 +1,5 @@
 import type { PoolClient } from 'pg';
+import { GUILD_ROSTER_MAX_MEMBERS } from '../src/sim/guild_roster';
 import { GUILD_BANK_PURGE_ACTION } from './admin_db';
 import { bustAdminGuildListReads, normalizeAdminGuildSearch } from './admin_guilds_read';
 import type { AdminGuildSort, AdminGuildSortDirection } from './admin_guilds_sort';
@@ -9,7 +10,7 @@ import {
   guildNameLockKey,
 } from './guild_name_db';
 import { REALM } from './realm';
-import { GUILD_MEMBER_LIMIT, validateGuildName } from './social';
+import { validateGuildName } from './social';
 
 const ADMIN_GUILD_HISTORY_LIMIT = 100;
 export const ADMIN_GUILD_REASON_MAX = 500;
@@ -202,7 +203,7 @@ export async function adminGuildDetail(guildId: number): Promise<AdminGuildDetai
       ORDER BY CASE gm.rank WHEN 'leader' THEN 0 WHEN 'officer' THEN 1 ELSE 2 END,
                lower(c.name), c.id
       LIMIT $3`,
-    [guildId, REALM, GUILD_MEMBER_LIMIT],
+    [guildId, REALM, GUILD_ROSTER_MAX_MEMBERS],
   );
   const first = result.rows[0];
   if (!first) return null;
@@ -329,9 +330,9 @@ export async function renameAdminGuild(
         WHERE guild_id = $1
         ORDER BY character_id
         LIMIT $2`,
-      [guildId, GUILD_MEMBER_LIMIT + 1],
+      [guildId, GUILD_ROSTER_MAX_MEMBERS + 1],
     );
-    if (members.rows.length > GUILD_MEMBER_LIMIT) {
+    if (members.rows.length > GUILD_ROSTER_MAX_MEMBERS) {
       await rollback(client);
       return { error: 'member_limit_exceeded' };
     }

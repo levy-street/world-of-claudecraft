@@ -20,6 +20,7 @@ vi.mock('../../../server/db', () => ({
 }));
 
 import { insertClientPerfReport } from '../../../server/db';
+import { GL_BACKEND_LABELS } from '../../../server/gl_backend';
 import {
   CLIENT_PERF_DEVICE_CLASSES,
   CLIENT_PERF_FPS_AVG_BUCKETS,
@@ -31,6 +32,7 @@ import {
   CLIENT_PERF_OS_FAMILIES,
   CLIENT_PERF_RENDER_SCALE_BUCKETS,
   CLIENT_PERF_SCENE_CLASSES,
+  CLIENT_PERF_SHADER_WARM_REFUSALS,
   CLIENT_PERF_SUGGESTION_IDS,
   CLIENT_PERF_WORST10S_BUCKETS_SECONDS,
   type ClientPerfSample,
@@ -40,6 +42,8 @@ import {
   noopClientPerfMetricsSink,
   registerClientPerfMetrics,
   setClientPerfMetricsSink,
+  shaderWarmRefusalLabel,
+  WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
 } from '../../../server/http/client_perf_metrics';
 import { handlePerfReport, perfReportInternalsForTest } from '../../../server/perf_report';
 
@@ -50,6 +54,7 @@ function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
     mobileTouch: false,
     osFamily: 'windows',
     glRendererBucket: 'nvidia',
+    glBackend: 'd3d11',
     zoneOrScenario: 'thornpeak_heights',
     fpsAvg: 48,
     frameP95Ms: 33.4,
@@ -58,6 +63,8 @@ function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
     effectiveRenderScale: 0.85,
     contextLostCount: 0,
     suggestionIds: [],
+    shaderWarmWorkerActive: true,
+    shaderWarmRefusal: '',
     ...overrides,
   };
 }
@@ -152,7 +159,40 @@ describe('vocabulary pins', () => {
       'instance',
       'other',
     ]);
+    expect([...GL_BACKEND_LABELS]).toEqual([
+      'd3d11',
+      'd3d9',
+      'vulkan',
+      'metal',
+      'opengl-es',
+      'opengl',
+      'unknown',
+    ]);
+    expect([...CLIENT_PERF_SHADER_WARM_REFUSALS]).toEqual([
+      'none',
+      'cannot-serve:hold-cap',
+      'context-lost',
+      'extension-drift',
+      'extension-mismatch',
+      'hold-timeouts:expired-share',
+      'hold-timeouts:wedged',
+      'ios-webkit',
+      'no-offscreen-canvas',
+      'no-webgl2',
+      'no-worker',
+      'pagehide',
+      'ready-timeout',
+      'worker-error',
+      'other',
+    ]);
     expect(CLIENT_PERF_JANK_THRESHOLD_MS).toBe(250);
+  });
+
+  it('pins the shader-warm series name as a literal', () => {
+    // It counts the SAME population as woc_client_reports_total, differing
+    // only by labels, so the name has to say which question it answers: a
+    // reader who saw `perf` there would take it for a different population.
+    expect(WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL).toBe('woc_client_shader_warm_reports_total');
   });
 
   it('pins the histogram bucket edges as literals', () => {
@@ -191,7 +231,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop"\} ([\d.]+)$/m,
+        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop",backend="d3d11"\} ([\d.]+)$/m,
       ),
     ).toBeCloseTo(0.0334, 5);
     expect(
@@ -209,7 +249,9 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(text, /^woc_client_effective_render_scale_sum\{gfx_tier="high"\} ([\d.]+)$/m),
     ).toBeCloseTo(0.85, 5);
-    expect(value(text, /^woc_client_context_losses_total\{os="windows"\} (\d+)$/m)).toBe(2);
+    expect(
+      value(text, /^woc_client_context_losses_total\{os="windows",backend="d3d11"\} (\d+)$/m),
+    ).toBe(2);
     expect(
       value(text, /^woc_client_suggestions_total\{suggestion="browser-stalls"\} (\d+)$/m),
     ).toBe(1);
@@ -267,7 +309,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop"\} ([\d.]+)$/m,
+        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop",backend="d3d11"\} ([\d.]+)$/m,
       ),
     ).toBe(0);
     // Neither a NaN nor an Infinity worst-10s satisfies the jank threshold
@@ -276,7 +318,9 @@ describe('registerClientPerfMetrics', () => {
       value(text, /^woc_client_jank_reports_total\{gfx_tier="high",device="desktop"\} (\d+)$/m),
     ).toBe(0);
     // A negative loss count never decrements the primed counter.
-    expect(value(text, /^woc_client_context_losses_total\{os="windows"\} (\d+)$/m)).toBe(0);
+    expect(
+      value(text, /^woc_client_context_losses_total\{os="windows",backend="d3d11"\} (\d+)$/m),
+    ).toBe(0);
   });
 
   it('never throws on a malformed direct-caller sample', () => {
@@ -310,7 +354,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_count\{gfx_tier="ultra",device="desktop"\} (\d+)$/m,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="ultra",device="desktop",backend="vulkan"\} (\d+)$/m,
       ),
     ).toBe(0);
     expect(
@@ -319,7 +363,9 @@ describe('registerClientPerfMetrics', () => {
         /^woc_client_worst10s_frame_p95_seconds_count\{scene="rift",device="mobile"\} (\d+)$/m,
       ),
     ).toBe(0);
-    expect(value(text, /^woc_client_context_losses_total\{os="linux"\} (\d+)$/m)).toBe(0);
+    expect(
+      value(text, /^woc_client_context_losses_total\{os="linux",backend="opengl"\} (\d+)$/m),
+    ).toBe(0);
     expect(value(text, /^woc_client_suggestions_total\{suggestion="context-loss"\} (\d+)$/m)).toBe(
       0,
     );
@@ -342,9 +388,51 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop"\} (\d+)$/m,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop",backend="d3d11"\} (\d+)$/m,
       ),
     ).toBe(0);
+  });
+
+  it('bounds the backend label: the series count is fixed and no report can grow it', async () => {
+    // The whole point of a closed vocabulary. Pre-seeding means every cross
+    // product already exists at registration, so the count below IS the
+    // ceiling, and the second half proves traffic cannot push past it.
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+    const countSeries = (text: string, name: string): number =>
+      text.split('\n').filter((line) => line.startsWith(`${name}{`)).length;
+
+    const atRegistration = await registry.metrics();
+    // 5 tiers x 2 device classes x 7 backends.
+    expect(countSeries(atRegistration, 'woc_client_frame_p95_seconds_count')).toBe(
+      CLIENT_PERF_GFX_TIERS.length * CLIENT_PERF_DEVICE_CLASSES.length * GL_BACKEND_LABELS.length,
+    );
+    expect(countSeries(atRegistration, 'woc_client_frame_p95_seconds_count')).toBe(70);
+    // 6 OS families x 7 backends.
+    expect(countSeries(atRegistration, 'woc_client_context_losses_total')).toBe(
+      CLIENT_PERF_OS_FAMILIES.length * GL_BACKEND_LABELS.length,
+    );
+    expect(countSeries(atRegistration, 'woc_client_context_losses_total')).toBe(42);
+
+    // Every real backend, plus invented ones, plus the shapes a hostile beacon
+    // would try. None of it may add a series to either family.
+    for (const glBackend of [
+      ...GL_BACKEND_LABELS,
+      'directx-42',
+      'D3D11',
+      '',
+      'd3d11 ',
+      'opengl-es-3.2',
+      'x'.repeat(200),
+    ]) {
+      sink.perfReportStored(sample({ glBackend, contextLostCount: 1 }));
+    }
+
+    const afterTraffic = await registry.metrics();
+    expect(countSeries(afterTraffic, 'woc_client_frame_p95_seconds_count')).toBe(70);
+    expect(countSeries(afterTraffic, 'woc_client_context_losses_total')).toBe(42);
+    // The unrecognised spellings all landed on 'unknown', never on a new label.
+    expect(afterTraffic).not.toMatch(/backend="(directx-42|D3D11|d3d11 |opengl-es-3\.2|xxxx|)"/);
   });
 
   it('never mints labels outside the vocabularies for hostile field values', async () => {
@@ -356,6 +444,7 @@ describe('registerClientPerfMetrics', () => {
         gfxTier: 'god-mode',
         osFamily: 'templeos',
         glRendererBucket: 'quantum-9000',
+        glBackend: 'directx-42',
         zoneOrScenario: 'z'.repeat(80),
         mobileTouch: true,
         contextLostCount: 1,
@@ -373,8 +462,14 @@ describe('registerClientPerfMetrics', () => {
         /^woc_client_reports_total\{gfx_tier="low",device="mobile",gpu_family="other"\} (\d+)$/m,
       ),
     ).toBe(1);
-    expect(value(text, /^woc_client_context_losses_total\{os="other"\} (\d+)$/m)).toBe(1);
-    expect(text).not.toMatch(/god-mode|templeos|quantum-9000|zzzz|not-a-real-suggestion/);
+    // An invented backend falls back to 'unknown', the same way the tier and
+    // os fallbacks work, so a direct caller cannot mint a label value.
+    expect(
+      value(text, /^woc_client_context_losses_total\{os="other",backend="unknown"\} (\d+)$/m),
+    ).toBe(1);
+    expect(text).not.toMatch(
+      /god-mode|templeos|quantum-9000|zzzz|not-a-real-suggestion|directx-42/,
+    );
   });
 });
 
@@ -440,5 +535,155 @@ describe('perf-report ingest emission', () => {
   it('holds the no-op sink by default so an unwired ingest never throws', () => {
     expect(clientPerfMetricsSink()).toBe(noopClientPerfMetricsSink);
     expect(() => clientPerfMetricsSink().perfReportStored(sample())).not.toThrow();
+  });
+});
+
+describe('shaderWarmRefusalLabel', () => {
+  it('maps the empty refusal to none and keeps the known causes whole', () => {
+    expect(shaderWarmRefusalLabel('')).toBe('none');
+    for (const cause of [
+      'hold-timeouts:expired-share',
+      'hold-timeouts:wedged',
+      'cannot-serve:hold-cap',
+      'ready-timeout',
+      'ios-webkit',
+      'pagehide',
+      'no-worker',
+      'worker-error',
+      'context-lost',
+      'no-offscreen-canvas',
+      'no-webgl2',
+      'extension-mismatch',
+    ]) {
+      expect(shaderWarmRefusalLabel(cause)).toBe(cause);
+    }
+  });
+
+  it('folds every extension-drift token onto one family and anything unlisted to other', () => {
+    expect(shaderWarmRefusalLabel('extension-drift:ext_color_buffer_float')).toBe(
+      'extension-drift',
+    );
+    expect(shaderWarmRefusalLabel('extension-drift:khr_parallel_shader_compile')).toBe(
+      'extension-drift',
+    );
+    for (const hostile of [
+      'extension-drift',
+      'a'.repeat(40),
+      'invented-cause',
+      'hold-timeouts',
+      'none',
+      'other',
+    ]) {
+      expect(CLIENT_PERF_SHADER_WARM_REFUSALS).toContain(shaderWarmRefusalLabel(hostile));
+    }
+    expect(shaderWarmRefusalLabel('invented-cause')).toBe('other');
+    expect(shaderWarmRefusalLabel('a'.repeat(40))).toBe('other');
+  });
+});
+
+describe('woc_client_shader_warm_reports_total', () => {
+  it('exposes the counter type line and the labelled sample for a refused worker', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(
+      sample({ shaderWarmWorkerActive: false, shaderWarmRefusal: 'hold-timeouts:expired-share' }),
+    );
+
+    const text = await registry.metrics();
+    expect(text).toContain('# TYPE woc_client_shader_warm_reports_total counter');
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="hold-timeouts:expired-share"\} (\d+)$/m,
+      ),
+    ).toBe(1);
+    // The live cohort is the other arm of the same question and stays at zero.
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="none"\} (\d+)$/m,
+      ),
+    ).toBe(0);
+  });
+
+  it('counts a live worker under active=true with no refusal', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(sample());
+
+    expect(
+      value(
+        await registry.metrics(),
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="none"\} (\d+)$/m,
+      ),
+    ).toBe(1);
+  });
+
+  it('folds an unknown refusal to other and an extension drift to its family', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(
+      sample({ shaderWarmWorkerActive: false, shaderWarmRefusal: 'invented-cause' }),
+    );
+    sink.perfReportStored(
+      sample({
+        shaderWarmWorkerActive: false,
+        shaderWarmRefusal: 'extension-drift:ext_color_buffer_float',
+      }),
+    );
+    sink.perfReportStored(
+      sample({
+        shaderWarmWorkerActive: false,
+        shaderWarmRefusal: 'extension-drift:khr_parallel_shader_compile',
+      }),
+    );
+
+    const text = await registry.metrics();
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="other"\} (\d+)$/m,
+      ),
+    ).toBe(1);
+    // Both drifts share one series: the extension name never mints its own.
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="extension-drift"\} (\d+)$/m,
+      ),
+    ).toBe(2);
+    const series = text.match(/^woc_client_shader_warm_reports_total\{[^}]*\}/gm) ?? [];
+    // Two active values times the fixed refusal vocabulary, whatever arrived.
+    expect(series.length).toBe(2 * CLIENT_PERF_SHADER_WARM_REFUSALS.length);
+    expect(text).not.toContain('ext_color_buffer_float');
+  });
+
+  it('zero-backfills the shader-warm cross product and skips benchmark reports', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(
+      sample({ source: 'benchmark', shaderWarmWorkerActive: false, shaderWarmRefusal: 'pagehide' }),
+    );
+
+    const text = await registry.metrics();
+    // The harness is not a player: this counter stays 1:1 with the gameplay
+    // reports woc_client_reports_total counts, so a share of one over the
+    // other is a share over the same denominator.
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="pagehide"\} (\d+)$/m,
+      ),
+    ).toBe(0);
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="ios-webkit"\} (\d+)$/m,
+      ),
+    ).toBe(0);
   });
 });

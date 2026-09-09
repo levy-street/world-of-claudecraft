@@ -1038,7 +1038,13 @@ describe('delve_map_painter: no magic values', () => {
   });
 
   it('uses circular minimap projection and frozen redraw-level compact profiles', () => {
-    expect(code).toContain("t('hudChrome.compass.N'),\n      'circle',");
+    // The minimap arm asks the pure model for the circular fit directly (the
+    // dead compass-label argument between the names and the fit went at the
+    // Phase 18 sweep).
+    expect(code).toContain(
+      "delveDrawModel(world, size, MINIMAP_PAD, delveName, moduleName, 'circle')",
+    );
+    expect(code).not.toContain('hudChrome.compass.N');
     expect(code).toContain('DELVE_DYNAMIC_GEOMETRY.minimap[profile]');
     expect(code).toContain('DELVE_DYNAMIC_GEOMETRY.map[profile]');
     expect(code).toContain('DELVE_MAP_TEXT_STYLE[profile]');

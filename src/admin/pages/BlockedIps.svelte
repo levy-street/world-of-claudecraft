@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import type { BlockedIpsData } from '../types';
   import { apiGet, apiPost } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { localizeAdminError, t } from '../i18n';
   import { fmtDate } from '../format';
@@ -13,7 +15,7 @@
   // Blocked IPs tab: add an IP block (with a shared-IP confirm) and list/unblock the
   // current blocks. Ported from renderBlockedIps + wireBlockedIpsEvents.
   let data = $state<BlockedIpsData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let ip = $state('');
   let reason = $state('');
   let duration = $state('');
@@ -23,9 +25,9 @@
   async function refresh(): Promise<void> {
     try {
       data = await apiGet<BlockedIpsData>('/admin/api/blocked-ips');
-      failed = false;
+      failed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -76,7 +78,9 @@
 
 <section id="blocked-ips">
   <Panel title={t('blockedIps.listTitle')}>
-    {#if failed}
+    {#if failed === 'forbidden'}
+      <PermissionDenied />
+    {:else if failed === 'error'}
       <div class="empty">{t('blockedIps.loadFailed')}</div>
     {:else if data && data.rows.length === 0}
       <div class="empty">{t('blockedIps.empty')}</div>

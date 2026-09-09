@@ -1,7 +1,7 @@
 import { EMBERSCREED_2PC_DOCTRINE_CONVERSION_BONUS } from '../../content/ignivar_set_bonuses';
 import type { PlayerMeta } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import type { Entity } from '../../types';
+import { dist2d, type Entity } from '../../types';
 import { wearsSetBonus } from '../set_bonus_wearer';
 import { DOCTRINE_AURA_ID } from './presentation';
 import { hasPriestTalent, PRIEST_TALENT_IDS } from './talents';
@@ -10,6 +10,8 @@ export { DOCTRINE_AURA_ID } from './presentation';
 export const DOCTRINE_DURATION = 30;
 export const DOCTRINE_CONVERSION = 0.3;
 export const DOCTRINE_FALLBACK_CONVERSION = 0.15;
+// Conversion and fallback use Psalm's reach and current group membership.
+export const DOCTRINE_RANGE = 30;
 
 const DOCTRINE_DAMAGE_ABILITIES = new Set(['smite', 'scouring_mercy']);
 
@@ -85,6 +87,22 @@ export function doctrineAfterAbility(
   }
 }
 
+// Callers add their own range rule; solo counts as a group of one.
+export function isCurrentGroupMember(ctx: SimContext, priest: Entity, candidate: Entity): boolean {
+  if (candidate.dead || !ctx.players.has(candidate.id)) return false;
+  if (!ctx.isFriendlyTo(priest, candidate)) return false;
+  const party = ctx.partyOf(priest.id);
+  const memberIds = party?.members ?? [priest.id];
+  return memberIds.includes(candidate.id);
+}
+
+function isValidDoctrineRecipient(ctx: SimContext, priest: Entity, candidate: Entity): boolean {
+  return (
+    isCurrentGroupMember(ctx, priest, candidate) &&
+    dist2d(priest.pos, candidate.pos) <= DOCTRINE_RANGE
+  );
+}
+
 function lowestHealthGroupAlly(ctx: SimContext, priest: Entity): Entity | null {
   const party = ctx.partyOf(priest.id);
   const ids = party?.members ?? [priest.id];
@@ -92,7 +110,7 @@ function lowestHealthGroupAlly(ctx: SimContext, priest: Entity): Entity | null {
   let bestFraction = Infinity;
   for (const id of ids) {
     const ally = ctx.entities.get(id);
-    if (!ally || ally.dead || !ctx.players.has(id) || !ctx.isFriendlyTo(priest, ally)) continue;
+    if (!ally || !isValidDoctrineRecipient(ctx, priest, ally)) continue;
     if (ally.hp >= ally.maxHp) continue;
     const fraction = ally.maxHp > 0 ? ally.hp / ally.maxHp : 1;
     if (
@@ -129,13 +147,16 @@ export function doctrineConvertDamage(
   const linked: Entity[] = [];
   for (const entity of ctx.entities.values()) {
     if (
-      !entity.dead &&
-      entity.auras.some((aura) => aura.id === DOCTRINE_AURA_ID && aura.sourceId === source.id)
+      entity.auras.some((aura) => aura.id === DOCTRINE_AURA_ID && aura.sourceId === source.id) &&
+      isValidDoctrineRecipient(ctx, source, entity)
     )
       linked.push(entity);
   }
 
-  if (linked.length > 0) {
+  // Fall back only when no eligible link needs healing. An injured linked
+  // ally with a heal absorb still takes conversion and blocks the fallback.
+  const hasInjuredLink = linked.some((ally) => ally.hp < ally.maxHp);
+  if (hasInjuredLink) {
     for (const ally of linked) {
       const link = ally.auras.find(
         (aura) => aura.id === DOCTRINE_AURA_ID && aura.sourceId === source.id,

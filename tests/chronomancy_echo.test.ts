@@ -1,12 +1,18 @@
 // Chronomancy Phase 2 (docs/prd/mage-chronomancy.md section 13): Temporal Echo.
 // The healer marks ONE ally; while the mark rides, a fraction of the mage's
-// EFFECTIVE Arcane damage heals that ally (40% single-target, 15% area). The mark
+// EFFECTIVE Arcane damage heals that ally (40% single-target, 15% area), with
+// Aether Surge and Aether Darts weighted as the offensive-healing drivers. The mark
 // also does a small initial heal, is per-caster (sourceId), moves on re-cast, and
 // is cleared on death and on leaving the spec. The conversion draws no rng, never
 // rolls its own crit, and never recurses. Temporal Mend and Temporal Barrier keep
 // working with no enemy present.
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import {
+  ECHO_CONVERT_AOE,
+  ECHO_CONVERT_SINGLE,
+  ECHO_ROTATION_CONVERSION_MULT,
+} from '../src/sim/combat/chronomancy';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -108,7 +114,17 @@ describe('Temporal Echo: the mark', () => {
     const mark = echoMark(ally, p.id);
     expect(mark).toBeDefined();
     expect(mark?.school).toBe('arcane');
-    expect(mark?.remaining).toBeGreaterThan(0);
+    expect(mark?.duration).toBe(22.5);
+    expect(mark?.remaining).toBeCloseTo(22.45, 5);
+  });
+
+  it('keeps every rank of the individual Echo active for the longer 22.5 second window', () => {
+    const rows = [ABILITIES.temporal_echo, ...(ABILITIES.temporal_echo.ranks ?? [])];
+    const durations = rows.map(
+      (row) => row.effects.find((effect) => effect.type === 'temporalEcho')?.duration,
+    );
+
+    expect(durations).toEqual([22.5, 22.5, 22.5, 22.5]);
   });
 
   it('can be applied to the mage themself', () => {
@@ -126,7 +142,7 @@ describe('Temporal Echo: the mark', () => {
     // Let some of the window elapse, then refresh.
     for (let i = 0; i < 100; i++) sim.tick(); // 5s
     const midway = echoMark(ally, p.id)?.remaining ?? 0;
-    expect(midway).toBeLessThan(15);
+    expect(midway).toBeLessThan(22.5);
     p.resource = p.maxResource;
     (p as unknown as { gcdRemaining: number }).gcdRemaining = 0;
     markEcho(sim, ally);
@@ -150,6 +166,16 @@ describe('Temporal Echo: the mark', () => {
 });
 
 describe('Temporal Echo: the Arcane-damage conversion', () => {
+  it('advertises the exact baseline and offensive-driver conversion', () => {
+    expect(ECHO_ROTATION_CONVERSION_MULT).toBe(4);
+    expect(ECHO_CONVERT_SINGLE).toBe(0.4);
+    expect(ECHO_CONVERT_AOE).toBe(0.15);
+    expect(ABILITIES.temporal_echo.description).toContain('$x%');
+    expect(ABILITIES.temporal_echo.description).toContain('$y%');
+    expect(ABILITIES.temporal_echo.description).toContain('$z%');
+    expect(ABILITIES.temporal_echo.description).toContain('Aether Surge and Aether Darts');
+  });
+
   it('heals the marked ally 40% of single-target Arcane damage', () => {
     const { sim, p } = chronoMage();
     const ally = addAlly(sim, 'Sanado');
@@ -158,7 +184,7 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     ally.hp = Math.floor(ally.maxHp * 0.5);
     const hp0 = ally.hp;
     drain(sim);
-    deal(sim, p, mob, 100, false, 'arcane', 'arcane_missiles', 'hit');
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
     expect(ally.hp - hp0).toBe(40); // round(100 * 0.40)
   });
 
@@ -189,7 +215,53 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     expect(ally.hp - hp0).toBe(15); // round(100 * 0.15)
   });
 
-  it('heals per Arcane impact (Arcane Missiles is many small heals)', () => {
+  it('weights Surge and Darts for the individual Echo without buffing incidental Arcane hits', () => {
+    const { sim, p } = chronoMage();
+    const ally = addAlly(sim, 'Rotacion');
+    const mob = addHostile(sim);
+    markEcho(sim, ally);
+    ally.hp = 1;
+    for (const abilityId of ['arcane_surge', 'arcane_missiles']) {
+      const before = ally.hp;
+      deal(
+        sim,
+        p,
+        mob,
+        100,
+        false,
+        'arcane',
+        abilityId,
+        'hit',
+        false,
+        undefined,
+        true,
+        false,
+        false,
+        abilityId,
+      );
+      expect(ally.hp - before).toBe(160);
+    }
+    const before = ally.hp;
+    deal(
+      sim,
+      p,
+      mob,
+      100,
+      false,
+      'arcane',
+      'Arcane Wand',
+      'hit',
+      false,
+      undefined,
+      true,
+      false,
+      false,
+      'wand_arcane',
+    );
+    expect(ally.hp - before).toBe(40);
+  });
+
+  it('heals per generic Arcane impact without the driver weight', () => {
     const { sim, p } = chronoMage();
     const ally = addAlly(sim, 'Goteo');
     const mob = addHostile(sim);
@@ -197,7 +269,7 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     ally.hp = Math.floor(ally.maxHp * 0.5);
     for (let i = 0; i < 3; i++) {
       const before = ally.hp;
-      deal(sim, p, mob, 20, false, 'arcane', 'arcane_missiles', 'hit');
+      deal(sim, p, mob, 20, false, 'arcane', 'Arcane Bolt', 'hit');
       expect(ally.hp - before).toBe(8); // round(20 * 0.40) EACH hit
     }
   });
@@ -212,7 +284,7 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     drain(sim);
     // crit=true carries an already-crit-inflated 100 (the caller resolved the
     // crit). The conversion uses it verbatim: 40, NOT 40*1.5.
-    deal(sim, p, mob, 100, true, 'arcane', 'arcane_missiles', 'hit');
+    deal(sim, p, mob, 100, true, 'arcane', 'Arcane Bolt', 'hit');
     expect(ally.hp - hp0).toBe(40);
     const heal = drain(sim).find(
       (e): e is Extract<SimEvent, { type: 'heal2' }> =>
@@ -252,7 +324,7 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     markEcho(sim, ally);
     ally.hp = Math.floor(ally.maxHp * 0.5);
     const hp0 = ally.hp;
-    deal(sim, p, mob, 100, false, 'arcane', 'arcane_missiles', 'hit');
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
     expect(ally.hp).toBe(hp0); // nothing landed -> no conversion
   });
 
@@ -263,7 +335,7 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     markEcho(sim, ally);
     ally.hp = Math.floor(ally.maxHp * 0.5);
     const hp0 = ally.hp;
-    deal(sim, p, mob, 100, false, 'arcane', 'arcane_missiles', 'hit');
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
     // Only 20 damage actually landed (the rest is overkill): round(20 * 0.40) = 8.
     expect(ally.hp - hp0).toBe(8);
   });
@@ -277,7 +349,7 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     ally.dead = true; // dead but the mark still on it
     const hp0 = ally.hp;
     drain(sim);
-    deal(sim, p, mob, 100, false, 'arcane', 'arcane_missiles', 'hit');
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
     expect(ally.hp).toBe(hp0); // dead guard: no heal
     // Exactly one damage event, zero conversion heals -> no recursion path.
     const evs = drain(sim);
@@ -311,7 +383,7 @@ describe('Temporal Echo: multiple chronomancers stay independent', () => {
     // untouched (still present).
     ally.hp = Math.floor(ally.maxHp * 0.5);
     const hp0 = ally.hp;
-    deal(sim, p, mob, 100, false, 'arcane', 'arcane_missiles', 'hit');
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
     expect(ally.hp - hp0).toBe(40); // one conversion, not two
     expect(ally.auras.filter((a) => a.kind === 'temporal_echo').length).toBe(2); // both remain
   });
@@ -348,7 +420,7 @@ describe('Temporal Echo: determinism and enemy-free healing', () => {
       markEcho(sim, ally);
       ally.hp = Math.floor(ally.maxHp * 0.5);
       const start = ally.hp;
-      for (let i = 0; i < 5; i++) deal(sim, p, mob, 37, false, 'arcane', 'arcane_missiles', 'hit');
+      for (let i = 0; i < 5; i++) deal(sim, p, mob, 37, false, 'arcane', 'Arcane Bolt', 'hit');
       return ally.hp - start;
     };
     const a = run();

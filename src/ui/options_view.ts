@@ -127,6 +127,20 @@ export interface ChoiceControl {
   options: ChoiceOption[];
   /** True when selecting an option re-renders the panel (preset + interfaceMode). */
   rerender: boolean;
+  /** A live reading rendered INSIDE this row, under its buttons: what the
+   *  setting is actually doing right now, as opposed to what it asks for.
+   *
+   *  A row of its own rather than a NoteControl beside the row, because the
+   *  wide graphics cards flow their children two-up (control, note, control,
+   *  note) and a third child for one control shifts every row after it by a
+   *  cell. Placeholders are KEYS the painter resolves, like NoteControl's. */
+  statusKey?: TranslationKey;
+  statusValueKeys?: Record<string, TranslationKey>;
+  /** Render that line as an ASSERTIVE live region (role="alert") rather than a
+   *  polite one: the reading is a verdict a player has to act on (their choice
+   *  did not take), and it arrives long after the panel was built, so assistive
+   *  technology has to be told rather than left to notice. */
+  statusAlert?: boolean;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -135,6 +149,11 @@ export interface ChoiceControl {
 export interface NoteControl {
   control: 'note';
   textKey: TranslationKey;
+  /** Placeholders for a note whose text carries a live reading, given as KEYS
+   *  the painter resolves: this module stays string-free, and a translator
+   *  keeps the whole sentence including where the value sits (never a
+   *  concatenation). */
+  valueKeys?: Record<string, TranslationKey>;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -202,6 +221,33 @@ export interface OptionsEnv {
    *  shells, and is true for a desktop shell too old to have the preference).
    *  Absent (the web/offline callers) means the row never renders. */
   desktopGpuPref?: boolean;
+  /** desktopGpuBackendSupported() AND the shell's platform answer: reveals
+   *  the Linux graphics backend row (Auto / Vulkan / OpenGL) in the Graphics
+   *  panel's System card, under the shader warm-up worker it feeds. A bridge
+   *  capability plus a platform gate: Windows and macOS shells expose the
+   *  methods but have no choice to make, so they show no row. */
+  desktopGpuBackend?: boolean;
+  /** What the shell answered about THIS launch: the rung it actually bound and
+   *  whether that fell short of the setting. Absent until the shell has judged
+   *  it (and on every non-desktop caller), which is why the status line is
+   *  conditional rather than showing an empty reading. */
+  desktopGpuBackendActive?: {
+    active: string;
+    requestedUnavailable: boolean;
+    /** Auto held at OpenGL by the shell's GPU policy (an excluded card). */
+    autoCapped?: boolean;
+  } | null;
+  /** desktopGpuBackendWriteFailed(): the shell refused the last write of the
+   *  backend choice, so its STORED value is still the old one and the next
+   *  launch keeps it. Outranks the reading above: a player must not leave the
+   *  panel believing a pick took when the shell never stored it. */
+  desktopGpuBackendWriteFailed?: boolean;
+  /** Whether the shader warm-up worker is a real choice on this host. False on
+   *  iOS, where shaderWarmModeFor() forces the worker off whatever the setting
+   *  (a second WebGL2 context is a per-process memory ceiling risk on
+   *  phone-class WebKit), so the row and its note would both be lies. Absent
+   *  means yes, which is what every non-iOS caller wants. */
+  shaderWarmChoice?: boolean;
   /** desktopDisplayModeSupported(): the shell owns the window, so the Display
    *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
    *  toggle (asking the browser for fullscreen inside an already-fullscreen
@@ -258,6 +304,16 @@ export function nearestOptionValue(value: number, options: ChoiceOption[]): numb
   return best;
 }
 
+/** The one health-text mode table the player, target and party frame rows share
+ *  (hud_frames.ts HealthTextMode): the choice values ARE the setting values. */
+const HEALTH_TEXT_CHOICES: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
+  { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
+  { value: 2, labelKey: 'hudChrome.partyFrames.healthCurrent' },
+  { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
+  { value: 4, labelKey: 'hudChrome.partyFrames.healthCurrentMaxPercent' },
+];
+
 const choice = (
   s: OptionsSettingsSource,
   key: string,
@@ -273,7 +329,55 @@ const choice = (
   rerender,
 });
 
-const note = (textKey: TranslationKey): NoteControl => ({ control: 'note', textKey });
+const note = (
+  textKey: TranslationKey,
+  valueKeys?: Record<string, TranslationKey>,
+): NoteControl => ({
+  control: 'note',
+  textKey,
+  ...(valueKeys ? { valueKeys } : {}),
+});
+
+/** What the player calls the rung the shell reports. Both Vulkan rungs read as
+ *  "Vulkan": the parallel-compile feature is an internal distinction, and a
+ *  picker that offered "Vulkan" must not answer with a name it never offered. */
+function gpuBackendActiveNameKey(active: string): TranslationKey {
+  return active.startsWith('vulkan')
+    ? 'hudChrome.options.gpuBackendActiveNameVulkan'
+    : 'hudChrome.options.gpuBackendActiveNameOpenGL';
+}
+
+// The shader warm-up worker: auto follows the GPU backend (on where the
+// compile runs off the presenting thread, off on OpenGL); the stored numbers
+// are src/game/shader_warm_setting.ts SHADER_WARM_SETTING_VALUES.
+const shaderWarmOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.options.shaderWarmAuto' },
+  { value: 1, labelKey: 'hudChrome.options.shaderWarmOff' },
+  { value: 2, labelKey: 'hudChrome.options.shaderWarmOn' },
+];
+
+// The desktop shell's graphics backend on Linux; the stored numbers are
+// src/game/desktop_gpu_backend_sync.ts GPU_BACKEND_SETTING_VALUES.
+const gpuBackendOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.options.gpuBackendAuto' },
+  { value: 1, labelKey: 'hudChrome.options.gpuBackendVulkan' },
+  { value: 2, labelKey: 'hudChrome.options.gpuBackendOpenGL' },
+];
+
+// What the player calls the choice the shell has STORED, for the sentence that
+// says a write did not take, keyed by the same stored numbers. Auto keeps the
+// picker's own label (it is a stored choice, not a rung); the two backends
+// borrow the active-reading names, so the sentence says "OpenGL" rather than
+// the picker's "OpenGL (slow)".
+const gpuBackendStoredNameKeys: Record<number, TranslationKey> = {
+  0: 'hudChrome.options.gpuBackendAuto',
+  1: 'hudChrome.options.gpuBackendActiveNameVulkan',
+  2: 'hudChrome.options.gpuBackendActiveNameOpenGL',
+};
+
+function gpuBackendStoredNameKey(value: number): TranslationKey {
+  return gpuBackendStoredNameKeys[value] ?? 'hudChrome.options.gpuBackendAuto';
+}
 
 // The desktop shell's window modes, in the order a player reads them: the
 // smaller window first, the default (borderless fullscreen) second, matching
@@ -297,7 +401,9 @@ const qualityLadderOptions: ChoiceOption[] = [
 // The High-capped three-step ladder, shared by the dials that stop at High.
 // Effects & Lighting: High is already the full high-tier post stack (the
 // ultra/insane tiers' full-res AO rides the preset, not this dial). Shadow
-// Quality: High is the 4096 map, and the retired Insane rung's single
+// Quality: High is the 4096 map (the High TIER renders 2560; the dial's top
+// rung is the showcase allocation the ultra tiers get), and the retired
+// Insane rung's single
 // 8192x8192 shadow target was a ~256 MB-class GPU allocation redrawn every
 // frame for marginal visible gain. Particle Effects: a three-step band clamp
 // by design (see its gfx.ts mapping).
@@ -329,6 +435,7 @@ export type OptionsPanelId =
   | 'auras'
   | 'audio'
   | 'performance'
+  | 'transfer'
   | 'bugreport';
 
 export type OptionsMenuAction =
@@ -354,6 +461,9 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
     { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
     { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
+    // Full settings export/import: its own sub-panel, since the code it carries
+    // spans every family (the Interface tab's rows carry only their own).
+    { labelKey: 'hudChrome.fullTransfer.menu', action: { kind: 'goto', view: 'transfer' } },
     // The wiki row sits with the help-shaped entries (above Report a Bug /
     // Unstuck); it opens the confirm-first external hop, never a sub-panel.
     { labelKey: 'nav.wiki', action: { kind: 'wiki' } },
@@ -512,6 +622,59 @@ export function buildGraphicsSections(
     ]),
     note('hudChrome.options.browserEffectsNote'),
   ];
+  // iOS forces the worker off whatever the setting says, so the row would be a
+  // control that changes nothing under a note promising On is forced
+  // everywhere. Absent means yes: every other host keeps the pair byte for byte.
+  if (env.shaderWarmChoice !== false) {
+    system.push(
+      choice(s, 'shaderWarm', 'hudChrome.options.shaderWarm', shaderWarmOptions),
+      note('hudChrome.options.shaderWarmNote'),
+    );
+  }
+  // The Linux graphics backend (the Vulkan trial) sits right under the shader
+  // warm-up worker it feeds, where a player looking for it expects it. Behind
+  // its own bridge capability AND the shell's platform answer; its note carries
+  // the next-launch caveat. Not a rebuild key: it writes live, and the shell
+  // reads the stored choice at its next launch.
+  if (env.desktopGpuBackend) {
+    // The rung this launch is ACTUALLY running rides INSIDE the row, under its
+    // buttons: it is the point of the row on a machine where the choice did not
+    // take, since a player who picked Vulkan would otherwise read "Vulkan"
+    // while playing on OpenGL. Absent until the shell has judged the launch.
+    const active = env.desktopGpuBackendActive;
+    // Re-renders on a pick: the restart strip at the panel's foot reads the
+    // live value against the launch snapshot, so the panel must rebuild for
+    // the offer to appear (or withdraw) under the click.
+    const backendRow = choice(
+      s,
+      'gpuBackend',
+      'hudChrome.options.gpuBackend',
+      gpuBackendOptions,
+      true,
+    );
+    if (env.desktopGpuBackendWriteFailed) {
+      // A refused write outranks the rung this launch is on: the player's pick
+      // never reached the store, so what the row owes them is what the NEXT
+      // start will do, named off the value the shell actually holds (the apply
+      // arm has already put the local setting back on it).
+      backendRow.statusKey = 'hudChrome.options.gpuBackendSaveFailed';
+      backendRow.statusValueKeys = { backend: gpuBackendStoredNameKey(backendRow.current) };
+      backendRow.statusAlert = true;
+    } else if (active) {
+      // A choice that fell short wins over a capped Auto: the two cannot both
+      // hold (a cap only ever applies to Auto), and the order is a pin.
+      backendRow.statusKey = active.requestedUnavailable
+        ? 'hudChrome.options.gpuBackendActiveUnavailable'
+        : active.autoCapped
+          ? 'hudChrome.options.gpuBackendActiveAutoCapped'
+          : 'hudChrome.options.gpuBackendActive';
+      backendRow.statusValueKeys = { backend: gpuBackendActiveNameKey(active.active) };
+      // Only the verdict that says the choice did not take is an alert; the
+      // plain reading and the policy cap are information, not a failure.
+      if (active.requestedUnavailable) backendRow.statusAlert = true;
+    }
+    system.push(backendRow, note('hudChrome.options.gpuBackendNote'));
+  }
   // Desktop vs on-screen touch controls. Hidden in the native shell (forces touch).
   if (!env.nativeShell) {
     system.push(
@@ -696,7 +859,9 @@ export function buildInterfaceControls(
   // next-launch caveat (the shell applies the choice at startup, not live).
   if (env?.desktopGpuPref) {
     general.push(
-      boolToggle(s, 'forceHighPerfGpu', 'hudChrome.options.forceHighPerfGpu'),
+      // Re-renders on a flip: the restart strip at the tab's foot reads the
+      // live value against the launch snapshot (same reason as the backend row).
+      boolToggle(s, 'forceHighPerfGpu', 'hudChrome.options.forceHighPerfGpu', { rerender: true }),
       note('hudChrome.options.forceHighPerfGpuNote'),
     );
   }
@@ -728,12 +893,7 @@ export function buildInterfaceControls(
       // partyFrameSpacing moved into the in-editor Frames Settings dropdown
       // beside the other frame knobs; the keys stay live and this tab's
       // Reset to Defaults still clears them.
-      choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', [
-        { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
-        { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
-        { value: 2, labelKey: 'hudChrome.partyFrames.healthCurrent' },
-        { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
-      ]),
+      choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),
       choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
         { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
         { value: 1, labelKey: 'hudChrome.partyFrames.sortRole' },
@@ -744,7 +904,14 @@ export function buildInterfaceControls(
       boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
       boolToggle(s, 'partyFrameShowPets', 'hudChrome.partyFrames.showPets'),
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
-      boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
+      choice(s, 'playerFrameHealthText', 'hudChrome.options.playerHealthText', HEALTH_TEXT_CHOICES),
+      choice(s, 'targetFrameHealthText', 'hudChrome.options.targetHealthText', HEALTH_TEXT_CHOICES),
+      boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame', {
+        rerender: true,
+      }),
+      boolToggle(s, 'auraBarBelowFrame', 'hudChrome.options.auraBarBelowFrame', {
+        disabled: !s.bool('aurasOnPlayerFrame'),
+      }),
       boolToggle(s, 'alwaysShowAllBuffs', 'hudChrome.options.alwaysShowAllBuffs'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
       boolToggle(s, 'showTargetSwingTimer', 'hudChrome.options.showTargetSwingTimer'),
@@ -754,6 +921,8 @@ export function buildInterfaceControls(
       slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
       slider(s, 'chatOpacity', 'hud.options.chatOpacity'),
       boolToggle(s, 'compactChat', 'hud.options.compactChat'),
+      // A chat setting, so its switch sits with the chat rows (hud.ts maskChat reads it).
+      boolToggle(s, 'filterProfanity', 'hud.options.filterProfanity'),
     ]),
     ...tag('combat', [
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
@@ -766,6 +935,24 @@ export function buildInterfaceControls(
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
       boolToggle(s, 'stickyTarget', 'hudChrome.options.stickyTarget'),
+      // The two dot-tracking surfaces, both showing only the LOCAL player's own
+      // debuffs: the icon row on an enemy's nameplate, and the standalone Target
+      // dots frame that tracks them across every enemy at once.
+      boolToggle(s, 'showNameplateDots', 'hudChrome.options.showNameplateDots'),
+      // Directly under its toggle, because it sizes exactly that row: 100% is
+      // the plate-native size and the slider only grows it, to 300%. Percent is
+      // the default slider format, so the readout says "150%".
+      slider(s, 'nameplateDotScale', 'hudChrome.options.nameplateDotScale'),
+      boolToggle(s, 'showTargetDots', 'hudChrome.options.showTargetDots'),
+      // The six aura tracks: bars of the auras YOU have out, each its own
+      // movable frame and each opted into individually (all default off).
+      boolToggle(s, 'showDefensivesTrack', 'hudChrome.options.showDefensivesTrack'),
+      boolToggle(s, 'showSelfBuffTrack', 'hudChrome.options.showSelfBuffTrack'),
+      boolToggle(s, 'showOffensiveTrack', 'hudChrome.options.showOffensiveTrack'),
+      boolToggle(s, 'showUtilityTrack', 'hudChrome.options.showUtilityTrack'),
+      boolToggle(s, 'showUtilityModes', 'hudChrome.options.showUtilityModes'),
+      boolToggle(s, 'showFriendlyTrack', 'hudChrome.options.showFriendlyTrack'),
+      boolToggle(s, 'showShieldTrack', 'hudChrome.options.showShieldTrack'),
       slider(s, 'fctScale', 'hud.options.fctScale'),
       // The secondary/third bar toggles deliberately have NO menu rows: the
       // plus/minus buttons on the primary action bar are the one control for

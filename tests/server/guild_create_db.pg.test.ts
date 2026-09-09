@@ -98,6 +98,9 @@ d('atomic paid guild creation against real PostgreSQL', () => {
     const guildCreate = await import('../../server/guild_create_db');
     const db = await import('../../server/db');
     const { BANK_LEDGER_BATCH_RECEIPTS_SCHEMA } = await import('../../server/bank_ledger_batch_db');
+    const { MATERIAL_SOURCE_JOURNAL_SCHEMA } = await import(
+      '../../server/material_source_journal_db'
+    );
     const growth = await import('../../server/bank_ledger_growth_budget');
     const { ADMIN_GUILDS_SCHEMA } = await import('../../server/admin_guilds_schema');
     const storage = await import('../../server/storage_purchase_db');
@@ -128,6 +131,7 @@ d('atomic paid guild creation against real PostgreSQL', () => {
       id INT PRIMARY KEY,
       account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
       level INT NOT NULL,
+      realm TEXT NOT NULL,
       state JSONB NOT NULL,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`);
@@ -178,6 +182,10 @@ d('atomic paid guild creation against real PostgreSQL', () => {
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`);
     await pool.query(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
+    // The production DDL, applied verbatim: bankLedgerGrowthBudgetSchema audits
+    // material_source_journal alongside bank_ledger and refuses to install
+    // until that table exists.
+    await pool.query(MATERIAL_SOURCE_JOURNAL_SCHEMA);
     await pool.query(growth.bankLedgerGrowthBudgetSchema(SCHEMA));
     await pool.query(storage.storagePurchaseSchema(SCHEMA));
     await pool.query(ADMIN_GUILDS_SCHEMA);
@@ -188,6 +196,8 @@ d('atomic paid guild creation against real PostgreSQL', () => {
       guild_moderation_actions,
       bank_ledger_batch_receipts,
       bank_ledger,
+      material_source_journal,
+      material_source_containers,
       storage_purchase_applied_receipts,
       storage_purchases,
       guild_banks,
@@ -200,8 +210,8 @@ d('atomic paid guild creation against real PostgreSQL', () => {
     await pool.query('UPDATE bank_ledger_growth_budget SET committed_rows = 0');
     await pool.query('INSERT INTO accounts (id) VALUES ($1)', [ACCOUNT_ID]);
     await pool.query(
-      'INSERT INTO characters (id, account_id, level, state) VALUES ($1, $2, $3, $4::jsonb)',
-      [CHARACTER_ID, ACCOUNT_ID, 23, JSON.stringify(characterState(100_000))],
+      'INSERT INTO characters (id, account_id, level, realm, state) VALUES ($1, $2, $3, $4, $5::jsonb)',
+      [CHARACTER_ID, ACCOUNT_ID, 23, realm, JSON.stringify(characterState(100_000))],
     );
     await pool.query(
       `INSERT INTO character_leases

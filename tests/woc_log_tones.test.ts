@@ -4,9 +4,11 @@
 // colour on a span the log owns, so it cannot read a stylesheet rule.
 //
 // The pin is scoped to the $WOC surfaces on purpose. The same three values also
-// appear across src/ui/hud.ts for the pre-existing HUD log calls; that is
-// separate debt this packet does not own, and widening the scan to it would
-// make this guard fail for a reason nobody here can fix.
+// live in src/ui/hud_tones.ts, the HUD coordinator's own vocabulary (hud.ts
+// itself is hex-free since the Masterwrought Phase 18 sweep, held by
+// tests/hud_tones.test.ts); each family spells its register once and retunes
+// on its own, so widening this scan across families would make it fail for a
+// reason nobody here can fix.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { WOC_LOG_BAD, WOC_LOG_GOOD, WOC_LOG_NOTE } from '../src/ui/woc_log_tones';

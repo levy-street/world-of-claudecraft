@@ -16,34 +16,56 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.pages': 'Strony paska akcji',
   'hudChrome.barEditor.picked': 'Dotknij innego slotu, aby zamienić go z {name}.',
   'hudChrome.barEditor.title': 'Edytuj pasek akcji',
-  'hudChrome.bg.doubleHonorLine': 'Weekend Podwójnego Honoru: dziś Honor z Pól Ciernistej Kotliny wypłaca się {mult}x, a rozegrana do końca porażka płaci jak zwycięstwo',
-  'hudChrome.bootcamp.bellBody': 'Twoja przeprawa jest zasłużona. Podejdź do promowego dzwonu przy pomoście i naciśnij {interactKey}, albo kliknij go, aby odpłynąć do Eastbrook.',
-  'hudChrome.bootcamp.bellBodyPad': 'Twoja przeprawa jest zasłużona. Podejdź do promowego dzwonu przy pomoście i naciśnij na nim przycisk interakcji, aby odpłynąć do Eastbrook.',
-  'hudChrome.bootcamp.bellBodyTouch': 'Twoja przeprawa jest zasłużona. Podejdź do promowego dzwonu przy pomoście i dotknij go, aby odpłynąć do Eastbrook.',
+  'hudChrome.bg.doubleHonorLine':
+    'Weekend Podwójnego Honoru: dziś Honor z Pól Ciernistej Kotliny wypłaca się {mult}x, a rozegrana do końca porażka płaci jak zwycięstwo',
+  'hudChrome.bootcamp.bellBody':
+    'Twoja przeprawa jest zasłużona. Podejdź do promowego dzwonu przy pomoście i naciśnij {interactKey}, albo kliknij go, aby odpłynąć do Eastbrook.',
+  'hudChrome.bootcamp.bellBodyPad':
+    'Twoja przeprawa jest zasłużona. Podejdź do promowego dzwonu przy pomoście i naciśnij na nim przycisk interakcji, aby odpłynąć do Eastbrook.',
+  'hudChrome.bootcamp.bellBodyTouch':
+    'Twoja przeprawa jest zasłużona. Podejdź do promowego dzwonu przy pomoście i dotknij go, aby odpłynąć do Eastbrook.',
   'hudChrome.bootcamp.bellTitle': 'Zadzwoń w dzwon',
-  'hudChrome.bootcamp.cameraBody': 'Ostatnia lekcja, zanim oddasz ten bieg: przytrzymaj prawy przycisk myszy i przeciągnij, aby obrócić kamerę dookoła siebie. Wiedza o tym, co stoi za tobą, wygrywa walki.',
-  'hudChrome.bootcamp.cameraBodyPad': 'Ostatnia lekcja, zanim oddasz ten bieg: pchnij prawy drążek, aby obrócić kamerę dookoła siebie. Wiedza o tym, co stoi za tobą, wygrywa walki.',
-  'hudChrome.bootcamp.cameraBodyTouch': 'Ostatnia lekcja, zanim oddasz ten bieg: przeciągnij palcem po ekranie świata, aby obrócić kamerę dookoła siebie. Wiedza o tym, co stoi za tobą, wygrywa walki.',
+  'hudChrome.bootcamp.cameraBody':
+    'Ostatnia lekcja, zanim oddasz ten bieg: przytrzymaj prawy przycisk myszy i przeciągnij, aby obrócić kamerę dookoła siebie. Wiedza o tym, co stoi za tobą, wygrywa walki.',
+  'hudChrome.bootcamp.cameraBodyPad':
+    'Ostatnia lekcja, zanim oddasz ten bieg: pchnij prawy drążek, aby obrócić kamerę dookoła siebie. Wiedza o tym, co stoi za tobą, wygrywa walki.',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    'Ostatnia lekcja, zanim oddasz ten bieg: przeciągnij palcem po ekranie świata, aby obrócić kamerę dookoła siebie. Wiedza o tym, co stoi za tobą, wygrywa walki.',
   'hudChrome.bootcamp.cameraTitle': 'Obróć kamerę',
-  'hudChrome.bootcamp.coachNextBody': 'Podążaj złotym śladem do {npc}. Podejdź, aż pokaże się imię, a potem naciśnij {interactKey}, albo kliknij tę postać, aby wziąć kolejne zadanie.',
-  'hudChrome.bootcamp.coachNextBodyPad': 'Podążaj złotym śladem do {npc}. Podejdź, aż pokaże się imię, a potem naciśnij przycisk interakcji, aby wziąć kolejne zadanie.',
-  'hudChrome.bootcamp.coachNextBodyTouch': 'Podążaj złotym śladem do {npc}. Podejdź, aż pokaże się imię, a potem dotknij tej postaci, albo dotknij przycisku Użyj, aby wziąć kolejne zadanie.',
+  'hudChrome.bootcamp.coachNextBody':
+    'Podążaj złotym śladem do {npc}. Podejdź, aż pokaże się imię, a potem naciśnij {interactKey}, albo kliknij tę postać, aby wziąć kolejne zadanie.',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    'Podążaj złotym śladem do {npc}. Podejdź, aż pokaże się imię, a potem naciśnij przycisk interakcji, aby wziąć kolejne zadanie.',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    'Podążaj złotym śladem do {npc}. Podejdź, aż pokaże się imię, a potem dotknij tej postaci, albo dotknij przycisku Użyj, aby wziąć kolejne zadanie.',
   'hudChrome.bootcamp.coachNextTitle': 'Następne: {npc}',
-  'hudChrome.bootcamp.coachReadyBody': 'Ruszaj do {npc} i naciśnij {interactKey}, albo kliknij tę postać, aby oddać zadanie i odebrać nagrodę.',
-  'hudChrome.bootcamp.coachReadyBodyPad': 'Ruszaj do {npc} i naciśnij przycisk interakcji, aby oddać zadanie i odebrać nagrodę.',
-  'hudChrome.bootcamp.coachReadyBodyTouch': 'Ruszaj do {npc} i dotknij tej postaci, aby oddać zadanie i odebrać nagrodę.',
+  'hudChrome.bootcamp.coachReadyBody':
+    'Ruszaj do {npc} i naciśnij {interactKey}, albo kliknij tę postać, aby oddać zadanie i odebrać nagrodę.',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    'Ruszaj do {npc} i naciśnij przycisk interakcji, aby oddać zadanie i odebrać nagrodę.',
+  'hudChrome.bootcamp.coachReadyBodyTouch':
+    'Ruszaj do {npc} i dotknij tej postaci, aby oddać zadanie i odebrać nagrodę.',
   'hudChrome.bootcamp.coachReadyTitle': 'Zadanie ukończone',
-  'hudChrome.bootcamp.coachTaskBody': 'Podążaj złotym śladem do swojego zadania. Tracker po prawej stronie liczy postępy, a {mapKey} otwiera mapę, jeśli zgubisz drogę.',
-  'hudChrome.bootcamp.coachTaskBodyPad': 'Podążaj złotym śladem do swojego zadania. Tracker po prawej stronie liczy postępy, a przycisk mapy pokazuje drogę, jeśli ją zgubisz.',
-  'hudChrome.bootcamp.coachTaskBodyTouch': 'Podążaj złotym śladem do swojego zadania. Tracker po prawej stronie liczy postępy, a przycisk mapy pokazuje drogę, jeśli ją zgubisz.',
+  'hudChrome.bootcamp.coachTaskBody':
+    'Podążaj złotym śladem do swojego zadania. Tracker po prawej stronie liczy postępy, a {mapKey} otwiera mapę, jeśli zgubisz drogę.',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    'Podążaj złotym śladem do swojego zadania. Tracker po prawej stronie liczy postępy, a przycisk mapy pokazuje drogę, jeśli ją zgubisz.',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    'Podążaj złotym śladem do swojego zadania. Tracker po prawej stronie liczy postępy, a przycisk mapy pokazuje drogę, jeśli ją zgubisz.',
   'hudChrome.bootcamp.courseProgress': 'Flaga {current} z {total}',
-  'hudChrome.bootcamp.doneBody': 'To wszystko, co muszą wiedzieć twoje nogi. Nadzorca Pell stoi przy czerwonej fladze: naciśnij na nim {interactKey}, albo kliknij go, aby oddać swój bieg i odebrać pierwszą nagrodę.',
-  'hudChrome.bootcamp.doneBodyPad': 'To wszystko, co muszą wiedzieć twoje nogi. Nadzorca Pell stoi przy czerwonej fladze: naciśnij na nim przycisk interakcji, aby oddać swój bieg i odebrać pierwszą nagrodę.',
-  'hudChrome.bootcamp.doneBodyTouch': 'To wszystko, co muszą wiedzieć twoje nogi. Nadzorca Pell stoi przy czerwonej fladze: dotknij go, aby oddać swój bieg i odebrać pierwszą nagrodę.',
+  'hudChrome.bootcamp.doneBody':
+    'To wszystko, co muszą wiedzieć twoje nogi. Nadzorca Pell stoi przy czerwonej fladze: naciśnij na nim {interactKey}, albo kliknij go, aby oddać swój bieg i odebrać pierwszą nagrodę.',
+  'hudChrome.bootcamp.doneBodyPad':
+    'To wszystko, co muszą wiedzieć twoje nogi. Nadzorca Pell stoi przy czerwonej fladze: naciśnij na nim przycisk interakcji, aby oddać swój bieg i odebrać pierwszą nagrodę.',
+  'hudChrome.bootcamp.doneBodyTouch':
+    'To wszystko, co muszą wiedzieć twoje nogi. Nadzorca Pell stoi przy czerwonej fladze: dotknij go, aby oddać swój bieg i odebrać pierwszą nagrodę.',
   'hudChrome.bootcamp.doneTitle': 'Bieg ukończony',
-  'hudChrome.bootcamp.forwardBody': 'Wejdź na tor obok Tama i przytrzymaj {forwardKey}, aby przejść nim na zachód, do jego flagi.',
-  'hudChrome.bootcamp.forwardBodyPad': 'Wejdź na tor obok Tama i pchnij lewy drążek do przodu, aby przejść nim na zachód, do jego flagi.',
-  'hudChrome.bootcamp.forwardBodyTouch': 'Wejdź na tor obok Tama i pchnij gałkę ruchu do przodu, aby przejść nim na zachód, do jego flagi.',
+  'hudChrome.bootcamp.forwardBody':
+    'Wejdź na tor obok Tama i przytrzymaj {forwardKey}, aby przejść nim na zachód, do jego flagi.',
+  'hudChrome.bootcamp.forwardBodyPad':
+    'Wejdź na tor obok Tama i pchnij lewy drążek do przodu, aby przejść nim na zachód, do jego flagi.',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    'Wejdź na tor obok Tama i pchnij gałkę ruchu do przodu, aby przejść nim na zachód, do jego flagi.',
   'hudChrome.bootcamp.forwardTitle': 'Przejdź pierwszy tor',
   'hudChrome.bootcamp.keycapThen': 'potem',
   'hudChrome.bootcamp.promptAttack': 'Atakuj',
@@ -51,7 +73,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.promptHold': 'Przytrzymaj',
   'hudChrome.bootcamp.promptJump': 'Skacz',
   'hudChrome.bootcamp.promptKneel': 'Klęknij',
-  'hudChrome.bootcamp.promptLookAround': 'Przytrzymaj prawy przycisk myszy i przeciągnij, aby się rozejrzeć.',
+  'hudChrome.bootcamp.promptLookAround':
+    'Przytrzymaj prawy przycisk myszy i przeciągnij, aby się rozejrzeć.',
   'hudChrome.bootcamp.promptLootPearl': 'Zbierz perłę',
   'hudChrome.bootcamp.promptOpenBags': 'Otwórz torby',
   'hudChrome.bootcamp.promptPickUp': 'Podnieś',
@@ -62,71 +85,129 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.promptTalk': 'Porozmawiaj',
   'hudChrome.bootcamp.promptTurnIn': 'Oddaj zadanie',
   'hudChrome.bootcamp.promptUseAbility': 'Użyj zdolności',
-  'hudChrome.bootcamp.readyPouchBody': 'Sakiewkę kupiono. Naciśnij {bagsKey}, aby otworzyć torby, i kliknij Lnianą sakiewkę, aby przypiąć ją do wolnej pętli na torbę. Potem ruszaj do {npc} i naciśnij {interactKey}, aby się nią pochwalić.',
-  'hudChrome.bootcamp.readyPouchBodyPad': 'Sakiewkę kupiono. Otwórz torby i wybierz Lnianą sakiewkę, aby przypiąć ją do wolnej pętli na torbę. Potem ruszaj do {npc} i naciśnij przycisk interakcji, aby się nią pochwalić.',
-  'hudChrome.bootcamp.readyPouchBodyTouch': 'Sakiewkę kupiono. Otwórz torby i dotknij Lnianej sakiewki, aby przypiąć ją do wolnej pętli na torbę. Potem ruszaj do {npc} i dotknij tej postaci, aby się nią pochwalić.',
-  'hudChrome.bootcamp.ringAdmireBody': 'Krok 2 z 2: naciśnij {charKey}, aby otworzyć kartę postaci. Ten ekran pokazuje wszystko, co masz na sobie, i statystyki, jakie ci to daje, a pierścień jest już na twojej dłoni. Sprawdzaj go za każdym razem, gdy zdobędziesz nowy ekwipunek.',
-  'hudChrome.bootcamp.ringAdmireBodyPad': 'Krok 2 z 2: otwórz kartę postaci z menu. Ten ekran pokazuje wszystko, co masz na sobie, i statystyki, jakie ci to daje, a pierścień jest już na twojej dłoni. Sprawdzaj go za każdym razem, gdy zdobędziesz nowy ekwipunek.',
-  'hudChrome.bootcamp.ringAdmireBodyTouch': 'Krok 2 z 2: otwórz kartę postaci z menu. Ten ekran pokazuje wszystko, co masz na sobie, i statystyki, jakie ci to daje, a pierścień jest już na twojej dłoni. Sprawdzaj go za każdym razem, gdy zdobędziesz nowy ekwipunek.',
+  'hudChrome.bootcamp.readyPouchBody':
+    'Sakiewkę kupiono. Naciśnij {bagsKey}, aby otworzyć torby, i kliknij Lnianą sakiewkę, aby przypiąć ją do wolnej pętli na torbę. Potem ruszaj do {npc} i naciśnij {interactKey}, aby się nią pochwalić.',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    'Sakiewkę kupiono. Otwórz torby i wybierz Lnianą sakiewkę, aby przypiąć ją do wolnej pętli na torbę. Potem ruszaj do {npc} i naciśnij przycisk interakcji, aby się nią pochwalić.',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    'Sakiewkę kupiono. Otwórz torby i dotknij Lnianej sakiewki, aby przypiąć ją do wolnej pętli na torbę. Potem ruszaj do {npc} i dotknij tej postaci, aby się nią pochwalić.',
+  'hudChrome.bootcamp.ringAdmireBody':
+    'Krok 2 z 2: naciśnij {charKey}, aby otworzyć kartę postaci. Ten ekran pokazuje wszystko, co masz na sobie, i statystyki, jakie ci to daje, a pierścień jest już na twojej dłoni. Sprawdzaj go za każdym razem, gdy zdobędziesz nowy ekwipunek.',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    'Krok 2 z 2: otwórz kartę postaci z menu. Ten ekran pokazuje wszystko, co masz na sobie, i statystyki, jakie ci to daje, a pierścień jest już na twojej dłoni. Sprawdzaj go za każdym razem, gdy zdobędziesz nowy ekwipunek.',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    'Krok 2 z 2: otwórz kartę postaci z menu. Ten ekran pokazuje wszystko, co masz na sobie, i statystyki, jakie ci to daje, a pierścień jest już na twojej dłoni. Sprawdzaj go za każdym razem, gdy zdobędziesz nowy ekwipunek.',
   'hudChrome.bootcamp.ringAdmireTitle': 'Spójrz na siebie',
-  'hudChrome.bootcamp.ringEquipBody': 'Otrzymałeś Macicę Perłową, a nagroda nic nie znaczy, gdy leży w torbie. Krok 1 z 2: naciśnij {bagsKey}, aby otworzyć torby, a potem kliknij pierścień, aby go założyć.',
-  'hudChrome.bootcamp.ringEquipBodyPad': 'Otrzymałeś Macicę Perłową, a nagroda nic nie znaczy, gdy leży w torbie. Krok 1 z 2: otwórz torby i wybierz pierścień, aby go założyć.',
-  'hudChrome.bootcamp.ringEquipBodyTouch': 'Otrzymałeś Macicę Perłową, a nagroda nic nie znaczy, gdy leży w torbie. Krok 1 z 2: otwórz torby i dotknij pierścienia, aby go założyć.',
+  'hudChrome.bootcamp.ringEquipBody':
+    'Otrzymałeś Macicę Perłową, a nagroda nic nie znaczy, gdy leży w torbie. Krok 1 z 2: naciśnij {bagsKey}, aby otworzyć torby, a potem kliknij pierścień, aby go założyć.',
+  'hudChrome.bootcamp.ringEquipBodyPad':
+    'Otrzymałeś Macicę Perłową, a nagroda nic nie znaczy, gdy leży w torbie. Krok 1 z 2: otwórz torby i wybierz pierścień, aby go założyć.',
+  'hudChrome.bootcamp.ringEquipBodyTouch':
+    'Otrzymałeś Macicę Perłową, a nagroda nic nie znaczy, gdy leży w torbie. Krok 1 z 2: otwórz torby i dotknij pierścienia, aby go założyć.',
   'hudChrome.bootcamp.ringEquipTitle': 'Załóż swoją nagrodę',
-  'hudChrome.bootcamp.strafeBody': 'Jeszcze jeden zakręt. Przytrzymaj {turnLeftKey}, aby obrócić się w miejscu, aż staniesz przodem do ostatniego toru, a potem znów przytrzymaj {forwardKey} i idź nim, aż czerwona flaga zostanie za tobą.',
-  'hudChrome.bootcamp.strafeBodyPad': 'Jeszcze jeden zakręt. Pchnij prawy drążek, aby obrócić się, aż staniesz przodem do ostatniego toru, a potem pchnij lewy drążek do przodu i idź nim, aż czerwona flaga zostanie za tobą.',
-  'hudChrome.bootcamp.strafeBodyTouch': 'Jeszcze jeden zakręt. Przeciągnij palcem po świecie (nie po gałce ruchu), aby obrócić się, aż staniesz przodem do ostatniego toru, a potem pchnij gałkę do przodu i idź nim, aż czerwona flaga zostanie za tobą.',
+  'hudChrome.bootcamp.strafeBody':
+    'Jeszcze jeden zakręt. Przytrzymaj {turnLeftKey}, aby obrócić się w miejscu, aż staniesz przodem do ostatniego toru, a potem znów przytrzymaj {forwardKey} i idź nim, aż czerwona flaga zostanie za tobą.',
+  'hudChrome.bootcamp.strafeBodyPad':
+    'Jeszcze jeden zakręt. Pchnij prawy drążek, aby obrócić się, aż staniesz przodem do ostatniego toru, a potem pchnij lewy drążek do przodu i idź nim, aż czerwona flaga zostanie za tobą.',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    'Jeszcze jeden zakręt. Przeciągnij palcem po świecie (nie po gałce ruchu), aby obrócić się, aż staniesz przodem do ostatniego toru, a potem pchnij gałkę do przodu i idź nim, aż czerwona flaga zostanie za tobą.',
   'hudChrome.bootcamp.strafeTitle': 'Skręć, a potem idź',
-  'hudChrome.bootcamp.talkBody': 'Strażnik Tam pilnuje bramy Toru Przeszkód tuż przed tobą. Podejdź do niego, aż pokaże się jego imię, a potem naciśnij {interactKey}, albo kliknij go, aby porozmawiać: wyznaczy ci bieg.',
-  'hudChrome.bootcamp.talkBodyPad': 'Strażnik Tam pilnuje bramy Toru Przeszkód tuż przed tobą. Podejdź do niego, aż pokaże się jego imię, a potem naciśnij przycisk interakcji, aby porozmawiać: wyznaczy ci bieg.',
-  'hudChrome.bootcamp.talkBodyTouch': 'Strażnik Tam pilnuje bramy Toru Przeszkód tuż przed tobą. Podejdź do niego, aż pokaże się jego imię, a potem dotknij go, albo dotknij przycisku Użyj, aby porozmawiać: wyznaczy ci bieg.',
+  'hudChrome.bootcamp.talkBody':
+    'Strażnik Tam pilnuje bramy Toru Przeszkód tuż przed tobą. Podejdź do niego, aż pokaże się jego imię, a potem naciśnij {interactKey}, albo kliknij go, aby porozmawiać: wyznaczy ci bieg.',
+  'hudChrome.bootcamp.talkBodyPad':
+    'Strażnik Tam pilnuje bramy Toru Przeszkód tuż przed tobą. Podejdź do niego, aż pokaże się jego imię, a potem naciśnij przycisk interakcji, aby porozmawiać: wyznaczy ci bieg.',
+  'hudChrome.bootcamp.talkBodyTouch':
+    'Strażnik Tam pilnuje bramy Toru Przeszkód tuż przed tobą. Podejdź do niego, aż pokaże się jego imię, a potem dotknij go, albo dotknij przycisku Użyj, aby porozmawiać: wyznaczy ci bieg.',
   'hudChrome.bootcamp.talkTitle': 'Porozmawiaj ze Strażnikiem Tamem',
-  'hudChrome.bootcamp.taskHoneBody': 'Kliknij kukłę, aby ją wycelować, a potem naciśnij {abilityKey}, aby użyć {ability}. To twoja własna zdolność, nie zwykłe uderzenie. Trafij nią trzy razy.',
-  'hudChrome.bootcamp.taskHoneBodyPad': 'Wyceluj kukłę, a potem naciśnij przycisk akcji, na którym leży {ability}. To twoja własna zdolność, nie zwykłe uderzenie. Trafij nią trzy razy.',
-  'hudChrome.bootcamp.taskHoneBodyTouch': 'Dotknij kukły, aby ją wycelować, a potem dotknij {ability} na pasku akcji. To twoja własna zdolność, nie zwykłe uderzenie. Trafij nią trzy razy.',
-  'hudChrome.bootcamp.taskLongWalkBody': 'Naciśnij {bagsKey}, aby otworzyć torby, a potem kliknij Kamień Zejścia. Położy cię tam, gdzie stoisz. Nic tu nie może cię skrzywdzić, a to nic cię nie kosztuje.',
-  'hudChrome.bootcamp.taskLongWalkBodyPad': 'Otwórz torby i wybierz Kamień Zejścia. Położy cię tam, gdzie stoisz. Nic tu nie może cię skrzywdzić, a to nic cię nie kosztuje.',
-  'hudChrome.bootcamp.taskLongWalkBodyTouch': 'Otwórz torby i dotknij Kamienia Zejścia. Położy cię tam, gdzie stoisz. Nic tu nie może cię skrzywdzić, a to nic cię nie kosztuje.',
-  'hudChrome.bootcamp.taskLongWalkDeadBody': 'Zginąłeś i niczego nie straciłeś: żadnych przedmiotów, monet ani doświadczenia. Krok 1 z 2: kliknij przycisk Uwolnij ducha na środku ekranu. Powstaniesz jako duch na cmentarzu za obozem.',
-  'hudChrome.bootcamp.taskLongWalkDeadBodyPad': 'Zginąłeś i niczego nie straciłeś: żadnych przedmiotów, monet ani doświadczenia. Krok 1 z 2: wybierz Uwolnij ducha na środku ekranu. Powstaniesz jako duch na cmentarzu za obozem.',
-  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch': 'Zginąłeś i niczego nie straciłeś: żadnych przedmiotów, monet ani doświadczenia. Krok 1 z 2: dotknij przycisku Uwolnij ducha na środku ekranu. Powstaniesz jako duch na cmentarzu za obozem.',
-  'hudChrome.bootcamp.taskLongWalkGhostBody': 'Krok 2 z 2: jesteś duchem i nic nie może cię dotknąć. Twoje ciało to znacznik na minimapie. Idź do niego. Gdy się zbliżysz, pojawi się przycisk Wskrześ przy zwłokach: kliknij go, a wrócisz do życia bez żadnej kary. Ten marsz jest ZAWSZE darmowy i tak właśnie wracasz za każdym razem, gdy zginiesz.',
-  'hudChrome.bootcamp.taskLongWalkGhostBodyPad': 'Krok 2 z 2: jesteś duchem i nic nie może cię dotknąć. Twoje ciało to znacznik na minimapie. Idź do niego. Gdy się zbliżysz, pojawi się przycisk Wskrześ przy zwłokach: wybierz go, a wrócisz do życia bez żadnej kary. Ten marsz jest ZAWSZE darmowy i tak właśnie wracasz za każdym razem, gdy zginiesz.',
-  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch': 'Krok 2 z 2: jesteś duchem i nic nie może cię dotknąć. Twoje ciało to znacznik na minimapie. Idź do niego. Gdy się zbliżysz, pojawi się przycisk Wskrześ przy zwłokach: dotknij go, a wrócisz do życia bez żadnej kary. Ten marsz jest ZAWSZE darmowy i tak właśnie wracasz za każdym razem, gdy zginiesz.',
-  'hudChrome.bootcamp.taskPearlBody': 'Podążaj złotym śladem do wodnego oczka na zachodnim krańcu plaży. Stojąc przy brzegu wody, naciśnij {bagsKey}, aby otworzyć torby, i kliknij Słoną Przynętę, aby go przywołać. Walcz z nim tak jak z czołgaczami, a gdy padnie, naciśnij {interactKey} na jego skorupie, aby zdobyć Lśniącą Perłę.',
-  'hudChrome.bootcamp.taskPearlBodyPad': 'Podążaj złotym śladem do wodnego oczka na zachodnim krańcu plaży. Stojąc przy brzegu wody, otwórz torby i wybierz Słoną Przynętę, aby go przywołać. Walcz z nim tak jak z czołgaczami, a gdy padnie, naciśnij przycisk interakcji na jego skorupie, aby zdobyć Lśniącą Perłę.',
-  'hudChrome.bootcamp.taskPearlBodyTouch': 'Podążaj złotym śladem do wodnego oczka na zachodnim krańcu plaży. Stojąc przy brzegu wody, otwórz torby i dotknij Słonej Przynęty, aby go przywołać. Walcz z nim tak jak z czołgaczami, a gdy padnie, dotknij jego skorupy, aby zdobyć Lśniącą Perłę.',
-  'hudChrome.bootcamp.taskPouchBody': 'Naciśnij {interactKey} na {npc}, albo kliknij tę postać, aby otworzyć stragan, a potem kliknij Lnianą sakiewkę, aby ją kupić.',
-  'hudChrome.bootcamp.taskPouchBodyPad': 'Naciśnij przycisk interakcji na {npc}, aby otworzyć stragan, a potem wybierz Lnianą sakiewkę, aby ją kupić.',
-  'hudChrome.bootcamp.taskPouchBodyTouch': 'Dotknij {npc}, aby otworzyć stragan, a potem dotknij Lnianej sakiewki, aby ją kupić.',
-  'hudChrome.bootcamp.taskShellBody': 'Czołgacze też szczypią. Kliknij jednego, aby uczynić go celem, a potem naciśnij {abilityKey}, aby użyć {ability}, i atakuj dalej. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
-  'hudChrome.bootcamp.taskShellBodyCaster': 'Czołgacze też szczypią. Kliknij jednego, aby uczynić go celem, a potem naciśnij {abilityKey}, aby użyć {ability}, i rzucaj dalej z dystansu. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
-  'hudChrome.bootcamp.taskShellBodyCasterPad': 'Czołgacze też szczypią. Wyceluj jednego, a potem naciśnij przycisk akcji, na którym leży {ability}, i rzucaj dalej z dystansu. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
-  'hudChrome.bootcamp.taskShellBodyCasterTouch': 'Czołgacze też szczypią. Dotknij jednego, aby go wycelować, a potem dotknij {ability} na pasku akcji, i rzucaj dalej z dystansu. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
-  'hudChrome.bootcamp.taskShellBodyPad': 'Czołgacze też szczypią. Wyceluj jednego, a potem naciśnij przycisk akcji, na którym leży {ability}. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
-  'hudChrome.bootcamp.taskShellBodyTouch': 'Czołgacze też szczypią. Dotknij jednego, aby go wycelować, a potem dotknij {ability} na pasku akcji. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
-  'hudChrome.bootcamp.taskStrikeTrueBody': 'Podejdź do słomianej kukły i kliknij ją, aby uczynić ją celem: jej imię pojawi się na górze ekranu. Potem naciśnij {attackKey}, aby zacząć uderzać. Ten pierwszy przycisk to twój zwykły atak, nie zaklęcie. Uderzaj, aż któraś padnie.',
-  'hudChrome.bootcamp.taskStrikeTrueBodyCaster': 'Podejdź do słomianej kukły i kliknij ją, aby uczynić ją celem: jej imię pojawi się na górze ekranu. Potem naciśnij {attackKey}, albo kliknij drugi przycisk na pasku akcji, aby rzucić zaklęcie. Rzucaj, aż któraś padnie.',
-  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad': 'Podejdź do słomianej kukły i naciśnij przycisk celowania, aby uczynić ją celem. Potem naciśnij swój drugi przycisk akcji, aby rzucić zaklęcie. Rzucaj, aż któraś padnie.',
-  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch': 'Podejdź do słomianej kukły i dotknij jej, aby uczynić ją celem. Potem dotknij drugiego przycisku na pasku akcji, aby rzucić zaklęcie. Rzucaj, aż któraś padnie.',
-  'hudChrome.bootcamp.taskStrikeTrueBodyPad': 'Podejdź do słomianej kukły i naciśnij przycisk celowania, aby uczynić ją celem. Potem naciśnij swój pierwszy przycisk akcji, aby uderzyć. Uderzaj, aż któraś padnie.',
-  'hudChrome.bootcamp.taskStrikeTrueBodyTouch': 'Podejdź do słomianej kukły i dotknij jej, aby uczynić ją celem. Potem dotknij pierwszego przycisku na pasku akcji, aby uderzyć. Uderzaj, aż któraś padnie.',
-  'hudChrome.bootcamp.taskWreckLineBody': 'Skrzynie rozbitków ciągną się wzdłuż ścieżki do Obozu Dawnrest. Podejdź do jednej, aż pokaże się jej nazwa, a potem naciśnij {interactKey}, albo kliknij skrzynię, aby ją podnieść. Sześć wypełni cały ładunek.',
-  'hudChrome.bootcamp.taskWreckLineBodyPad': 'Skrzynie rozbitków ciągną się wzdłuż ścieżki do Obozu Dawnrest. Podejdź do jednej, aż pokaże się jej nazwa, a potem naciśnij przycisk interakcji, aby ją podnieść. Sześć wypełni cały ładunek.',
-  'hudChrome.bootcamp.taskWreckLineBodyTouch': 'Skrzynie rozbitków ciągną się wzdłuż ścieżki do Obozu Dawnrest. Podejdź do jednej, aż pokaże się jej nazwa, a potem dotknij skrzyni, albo dotknij przycisku Użyj, aby ją podnieść. Sześć wypełni cały ładunek.',
+  'hudChrome.bootcamp.taskHoneBody':
+    'Kliknij kukłę, aby ją wycelować, a potem naciśnij {abilityKey}, aby użyć {ability}. To twoja własna zdolność, nie zwykłe uderzenie. Trafij nią trzy razy.',
+  'hudChrome.bootcamp.taskHoneBodyPad':
+    'Wyceluj kukłę, a potem naciśnij przycisk akcji, na którym leży {ability}. To twoja własna zdolność, nie zwykłe uderzenie. Trafij nią trzy razy.',
+  'hudChrome.bootcamp.taskHoneBodyTouch':
+    'Dotknij kukły, aby ją wycelować, a potem dotknij {ability} na pasku akcji. To twoja własna zdolność, nie zwykłe uderzenie. Trafij nią trzy razy.',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    'Naciśnij {bagsKey}, aby otworzyć torby, a potem kliknij Kamień Zejścia. Położy cię tam, gdzie stoisz. Nic tu nie może cię skrzywdzić, a to nic cię nie kosztuje.',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    'Otwórz torby i wybierz Kamień Zejścia. Położy cię tam, gdzie stoisz. Nic tu nie może cię skrzywdzić, a to nic cię nie kosztuje.',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    'Otwórz torby i dotknij Kamienia Zejścia. Położy cię tam, gdzie stoisz. Nic tu nie może cię skrzywdzić, a to nic cię nie kosztuje.',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    'Zginąłeś i niczego nie straciłeś: żadnych przedmiotów, monet ani doświadczenia. Krok 1 z 2: kliknij przycisk Uwolnij ducha na środku ekranu. Powstaniesz jako duch na cmentarzu za obozem.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    'Zginąłeś i niczego nie straciłeś: żadnych przedmiotów, monet ani doświadczenia. Krok 1 z 2: wybierz Uwolnij ducha na środku ekranu. Powstaniesz jako duch na cmentarzu za obozem.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    'Zginąłeś i niczego nie straciłeś: żadnych przedmiotów, monet ani doświadczenia. Krok 1 z 2: dotknij przycisku Uwolnij ducha na środku ekranu. Powstaniesz jako duch na cmentarzu za obozem.',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    'Krok 2 z 2: jesteś duchem i nic nie może cię dotknąć. Twoje ciało to znacznik na minimapie. Idź do niego. Gdy się zbliżysz, pojawi się przycisk Wskrześ przy zwłokach: kliknij go, a wrócisz do życia bez żadnej kary. Ten marsz jest ZAWSZE darmowy i tak właśnie wracasz za każdym razem, gdy zginiesz.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    'Krok 2 z 2: jesteś duchem i nic nie może cię dotknąć. Twoje ciało to znacznik na minimapie. Idź do niego. Gdy się zbliżysz, pojawi się przycisk Wskrześ przy zwłokach: wybierz go, a wrócisz do życia bez żadnej kary. Ten marsz jest ZAWSZE darmowy i tak właśnie wracasz za każdym razem, gdy zginiesz.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    'Krok 2 z 2: jesteś duchem i nic nie może cię dotknąć. Twoje ciało to znacznik na minimapie. Idź do niego. Gdy się zbliżysz, pojawi się przycisk Wskrześ przy zwłokach: dotknij go, a wrócisz do życia bez żadnej kary. Ten marsz jest ZAWSZE darmowy i tak właśnie wracasz za każdym razem, gdy zginiesz.',
+  'hudChrome.bootcamp.taskPearlBody':
+    'Podążaj złotym śladem do wodnego oczka na zachodnim krańcu plaży. Stojąc przy brzegu wody, naciśnij {bagsKey}, aby otworzyć torby, i kliknij Słoną Przynętę, aby go przywołać. Walcz z nim tak jak z czołgaczami, a gdy padnie, naciśnij {interactKey} na jego skorupie, aby zdobyć Lśniącą Perłę.',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    'Podążaj złotym śladem do wodnego oczka na zachodnim krańcu plaży. Stojąc przy brzegu wody, otwórz torby i wybierz Słoną Przynętę, aby go przywołać. Walcz z nim tak jak z czołgaczami, a gdy padnie, naciśnij przycisk interakcji na jego skorupie, aby zdobyć Lśniącą Perłę.',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    'Podążaj złotym śladem do wodnego oczka na zachodnim krańcu plaży. Stojąc przy brzegu wody, otwórz torby i dotknij Słonej Przynęty, aby go przywołać. Walcz z nim tak jak z czołgaczami, a gdy padnie, dotknij jego skorupy, aby zdobyć Lśniącą Perłę.',
+  'hudChrome.bootcamp.taskPouchBody':
+    'Naciśnij {interactKey} na {npc}, albo kliknij tę postać, aby otworzyć stragan, a potem kliknij Lnianą sakiewkę, aby ją kupić.',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    'Naciśnij przycisk interakcji na {npc}, aby otworzyć stragan, a potem wybierz Lnianą sakiewkę, aby ją kupić.',
+  'hudChrome.bootcamp.taskPouchBodyTouch':
+    'Dotknij {npc}, aby otworzyć stragan, a potem dotknij Lnianej sakiewki, aby ją kupić.',
+  'hudChrome.bootcamp.taskShellBody':
+    'Czołgacze też szczypią. Kliknij jednego, aby uczynić go celem, a potem naciśnij {abilityKey}, aby użyć {ability}, i atakuj dalej. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    'Czołgacze też szczypią. Kliknij jednego, aby uczynić go celem, a potem naciśnij {abilityKey}, aby użyć {ability}, i rzucaj dalej z dystansu. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    'Czołgacze też szczypią. Wyceluj jednego, a potem naciśnij przycisk akcji, na którym leży {ability}, i rzucaj dalej z dystansu. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    'Czołgacze też szczypią. Dotknij jednego, aby go wycelować, a potem dotknij {ability} na pasku akcji, i rzucaj dalej z dystansu. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    'Czołgacze też szczypią. Wyceluj jednego, a potem naciśnij przycisk akcji, na którym leży {ability}. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    'Czołgacze też szczypią. Dotknij jednego, aby go wycelować, a potem dotknij {ability} na pasku akcji. Jeśli naraz zaatakuje cię zbyt wielu, wycofaj się ścieżką w górę: szybko przestają gonić, a twoje zdrowie wraca, gdy odpoczywasz.',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    'Podejdź do słomianej kukły i kliknij ją, aby uczynić ją celem: jej imię pojawi się na górze ekranu. Potem naciśnij {attackKey}, aby zacząć uderzać. Ten pierwszy przycisk to twój zwykły atak, nie zaklęcie. Uderzaj, aż któraś padnie.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    'Podejdź do słomianej kukły i kliknij ją, aby uczynić ją celem: jej imię pojawi się na górze ekranu. Potem naciśnij {attackKey}, albo kliknij drugi przycisk na pasku akcji, aby rzucić zaklęcie. Rzucaj, aż któraś padnie.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    'Podejdź do słomianej kukły i naciśnij przycisk celowania, aby uczynić ją celem. Potem naciśnij swój drugi przycisk akcji, aby rzucić zaklęcie. Rzucaj, aż któraś padnie.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    'Podejdź do słomianej kukły i dotknij jej, aby uczynić ją celem. Potem dotknij drugiego przycisku na pasku akcji, aby rzucić zaklęcie. Rzucaj, aż któraś padnie.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    'Podejdź do słomianej kukły i naciśnij przycisk celowania, aby uczynić ją celem. Potem naciśnij swój pierwszy przycisk akcji, aby uderzyć. Uderzaj, aż któraś padnie.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    'Podejdź do słomianej kukły i dotknij jej, aby uczynić ją celem. Potem dotknij pierwszego przycisku na pasku akcji, aby uderzyć. Uderzaj, aż któraś padnie.',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    'Skrzynie rozbitków ciągną się wzdłuż ścieżki do Obozu Dawnrest. Podejdź do jednej, aż pokaże się jej nazwa, a potem naciśnij {interactKey}, albo kliknij skrzynię, aby ją podnieść. Sześć wypełni cały ładunek.',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    'Skrzynie rozbitków ciągną się wzdłuż ścieżki do Obozu Dawnrest. Podejdź do jednej, aż pokaże się jej nazwa, a potem naciśnij przycisk interakcji, aby ją podnieść. Sześć wypełni cały ładunek.',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    'Skrzynie rozbitków ciągną się wzdłuż ścieżki do Obozu Dawnrest. Podejdź do jednej, aż pokaże się jej nazwa, a potem dotknij skrzyni, albo dotknij przycisku Użyj, aby ją podnieść. Sześć wypełni cały ładunek.',
   'hudChrome.bootcamp.title': 'Pierwsze kroki',
-  'hudChrome.bootcamp.turnwalkBody': 'Pierwsza flaga za tobą. Przytrzymaj {turnKey}, aby obrócić się w miejscu, aż staniesz przodem do murowanego toru biegnącego na południe, a potem znów przytrzymaj {forwardKey} i idź nim do drugiej flagi.',
-  'hudChrome.bootcamp.turnwalkBodyPad': 'Pierwsza flaga za tobą. Pchnij prawy drążek, aby obrócić się, aż staniesz przodem do murowanego toru biegnącego na południe, a potem pchnij lewy drążek do przodu i idź nim do drugiej flagi.',
-  'hudChrome.bootcamp.turnwalkBodyTouch': 'Pierwsza flaga za tobą. Przeciągnij palcem po świecie (nie po gałce ruchu), aby obrócić się, aż staniesz przodem do murowanego toru biegnącego na południe, a potem pchnij gałkę do przodu i idź nim do drugiej flagi.',
+  'hudChrome.bootcamp.turnwalkBody':
+    'Pierwsza flaga za tobą. Przytrzymaj {turnKey}, aby obrócić się w miejscu, aż staniesz przodem do murowanego toru biegnącego na południe, a potem znów przytrzymaj {forwardKey} i idź nim do drugiej flagi.',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    'Pierwsza flaga za tobą. Pchnij prawy drążek, aby obrócić się, aż staniesz przodem do murowanego toru biegnącego na południe, a potem pchnij lewy drążek do przodu i idź nim do drugiej flagi.',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    'Pierwsza flaga za tobą. Przeciągnij palcem po świecie (nie po gałce ruchu), aby obrócić się, aż staniesz przodem do murowanego toru biegnącego na południe, a potem pchnij gałkę do przodu i idź nim do drugiej flagi.',
   'hudChrome.bootcamp.turnwalkTitle': 'Skręć, a potem idź',
-  'hudChrome.bootcamp.voiceArrival': 'Spokojnie na brzeg, przyjacielu. Widzisz złotą ścieżkę pod stopami? Zna drogę lepiej niż ja. Podążaj nią.',
-  'hudChrome.bootcamp.voiceFirstFlag': 'Jedna flaga za tobą. Nie przestawaj biec, zostały tylko dwie.',
-  'hudChrome.bootcamp.voiceGraduate': 'Dzwon bije dla ciebie. Eastbrook czeka za wodą, a ty jesteś już gotowy.',
-  'hudChrome.bootcamp.voiceRunDone': 'Czysty bieg, nie ma co. Nadzorca Pell trzyma twoją nagrodę, idź po nią.',
-  'hudChrome.bootcamp.voiceStationDoneA': 'Dobra robota. Ruszaj dalej, ścieżka jest już dla ciebie oświetlona.',
+  'hudChrome.bootcamp.voiceArrival':
+    'Spokojnie na brzeg, przyjacielu. Widzisz złotą ścieżkę pod stopami? Zna drogę lepiej niż ja. Podążaj nią.',
+  'hudChrome.bootcamp.voiceFirstFlag':
+    'Jedna flaga za tobą. Nie przestawaj biec, zostały tylko dwie.',
+  'hudChrome.bootcamp.voiceGraduate':
+    'Dzwon bije dla ciebie. Eastbrook czeka za wodą, a ty jesteś już gotowy.',
+  'hudChrome.bootcamp.voiceRunDone':
+    'Czysty bieg, nie ma co. Nadzorca Pell trzyma twoją nagrodę, idź po nią.',
+  'hudChrome.bootcamp.voiceStationDoneA':
+    'Dobra robota. Ruszaj dalej, ścieżka jest już dla ciebie oświetlona.',
   'hudChrome.bootcamp.voiceStationDoneB': 'Łapiesz, o co chodzi, bez wątpienia.',
-  'hudChrome.bootcamp.voiceVeerOff': 'Zaczekaj, przyjacielu, to zła droga. Złota ścieżka jest za tobą.',
-  'hudChrome.calendar.events.doubleHonor.note': 'Obozy wojenne trąbią na zbiórkę: przez cały weekend Honor z Pól Ciernistej Kotliny wypłaca się podwójnie, a rozegrana do końca porażka płaci jak zwycięstwo.',
+  'hudChrome.bootcamp.voiceVeerOff':
+    'Zaczekaj, przyjacielu, to zła droga. Złota ścieżka jest za tobą.',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Obozy wojenne trąbią na zbiórkę: przez cały weekend Honor z Pól Ciernistej Kotliny wypłaca się podwójnie, a rozegrana do końca porażka płaci jak zwycięstwo.',
   'hudChrome.calendar.events.doubleHonor.title': 'Weekend Podwójnego Honoru',
   'hudChrome.claudium.priceSol': '{amount} SOL',
   'hudChrome.claudium.priceUsdc': '{amount} USDC',
@@ -144,24 +225,31 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.barEditorAria': 'Edytuj układ paska akcji',
   'hudChrome.mobile.consumableSeat': 'Materiały zużywalne',
   'hudChrome.mobile.menuControl': 'Menu',
-  'hudChrome.mobile.menuControlAria': 'Menu. Dotknij, aby otworzyć czat, albo przytrzymaj i przeciągnij w prawo, aby zobaczyć wierzchowce, mapę, torby i więcej.',
-  'hudChrome.mobile.menuControlAriaTap': 'Menu. Dotknij, aby otworzyć rząd menu: wierzchowce, mapę, torby i więcej. Dotknij ponownie, aby otworzyć czat.',
+  'hudChrome.mobile.menuControlAria':
+    'Menu. Dotknij, aby otworzyć czat, albo przytrzymaj i przeciągnij w prawo, aby zobaczyć wierzchowce, mapę, torby i więcej.',
+  'hudChrome.mobile.menuControlAriaTap':
+    'Menu. Dotknij, aby otworzyć rząd menu: wierzchowce, mapę, torby i więcej. Dotknij ponownie, aby otworzyć czat.',
   'hudChrome.mobile.menuLabel': 'Menu',
-  'hudChrome.mobile.questStripAria': 'Śledzone zadanie {position} z {total}: {title}. Aktywuj, aby przejść do następnego zadania.',
+  'hudChrome.mobile.questStripAria':
+    'Śledzone zadanie {position} z {total}: {title}. Aktywuj, aby przejść do następnego zadania.',
   'hudChrome.mobile.questStripAriaSingle': 'Śledzone zadanie: {title}',
   'hudChrome.mobile.questStripCounter': '{position}/{total}',
   'hudChrome.mobile.questStripMore': '+{count} więcej',
   'hudChrome.mobile.quickActions': 'Szybkie akcje',
-  'hudChrome.mobile.quickActionsAria': 'Szybkie akcje. Dotknij, aby otworzyć rząd wierzchowca, czatu, mapy, toreb i więcej, albo przytrzymaj i przeciągnij w prawo, aby wybrać jedną z nich.',
-  'hudChrome.mobile.quickActionsAriaTap': 'Szybkie akcje. Dotknij, aby otworzyć rząd wierzchowca, czatu, mapy, toreb i więcej, a potem dotknij wybranej pozycji. Dotknij przycisku ponownie, aby zamknąć.',
+  'hudChrome.mobile.quickActionsAria':
+    'Szybkie akcje. Dotknij, aby otworzyć rząd wierzchowca, czatu, mapy, toreb i więcej, albo przytrzymaj i przeciągnij w prawo, aby wybrać jedną z nich.',
+  'hudChrome.mobile.quickActionsAriaTap':
+    'Szybkie akcje. Dotknij, aby otworzyć rząd wierzchowca, czatu, mapy, toreb i więcej, a potem dotknij wybranej pozycji. Dotknij przycisku ponownie, aby zamknąć.',
   'hudChrome.mobile.quickActionsLabel': 'Akcje',
   'hudChrome.mobile.radialCenter': 'Środek',
   'hudChrome.mobile.radialDown': 'Dół',
   'hudChrome.mobile.radialLeft': 'Lewo',
   'hudChrome.mobile.radialRight': 'Prawo',
   'hudChrome.mobile.radialUp': 'Góra',
-  'hudChrome.mobile.stanceAnchorAria': 'Postawa: {stance}. Dotknij, aby otworzyć krąg postaw, a następnie wybierz inną postawę.',
-  'hudChrome.mobile.stanceAnchorEmptyAria': 'Brak postawy. Dotknij, aby otworzyć krąg postaw, a następnie wybierz postawę.',
+  'hudChrome.mobile.stanceAnchorAria':
+    'Postawa: {stance}. Dotknij, aby otworzyć krąg postaw, a następnie wybierz inną postawę.',
+  'hudChrome.mobile.stanceAnchorEmptyAria':
+    'Brak postawy. Dotknij, aby otworzyć krąg postaw, a następnie wybierz postawę.',
   'hudChrome.mobile.stanceRadial': 'Postawy',
   'hudChrome.mobile.wocMarket': 'Giełda',
   'hudChrome.nameplate.pledgeTag': 'Ślubowanie: {guild}',
@@ -171,7 +259,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.noticeboard.rosterTitle': 'Zobacz skład gildii {guild}',
   'hudChrome.noticeboard.subtitle': 'Gildie królestwa',
   'hudChrome.options.touchTapMenus': 'Dotykowe menu',
-  'hudChrome.options.touchTapMenusNote': 'Otwieraj kontrolki akcji, materiałów zużywalnych i menu dotknięciem zamiast przeciągnięciem. Dotknij pozycji, aby jej użyć, dotknij kontrolki ponownie, aby wykonać jej zwykłe działanie, albo dotknij poza nią, aby zamknąć.',
+  'hudChrome.options.touchTapMenusNote':
+    'Otwieraj kontrolki akcji, materiałów zużywalnych i menu dotknięciem zamiast przeciągnięciem. Dotknij pozycji, aby jej użyć, dotknij kontrolki ponownie, aby wykonać jej zwykłe działanie, albo dotknij poza nią, aby zamknąć.',
   'hudChrome.pledge.accept': 'Przyjmij',
   'hudChrome.pledge.acceptTitle': 'Przyjmij przysięgę od {name}',
   'hudChrome.pledge.acceptingLabel': 'Przyjmuj przysięgi',
@@ -199,73 +288,107 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.wocMarketSellChoose.many': 'Wybierz spośród {count} przedmiotów',
   'hudChrome.plurals.wocMarketSellChoose.one': 'Wybierz spośród {count} przedmiotu',
   'hudChrome.plurals.wocMarketSellChoose.other': 'Wybierz spośród {count} przedmiotu',
-  'hudChrome.plurals.wocTradeIneligible.few': 'Nie można sprzedać {count} przygotowanych przedmiotów za $WOC.',
-  'hudChrome.plurals.wocTradeIneligible.many': 'Nie można sprzedać {count} przygotowanych przedmiotów za $WOC.',
-  'hudChrome.plurals.wocTradeIneligible.one': 'Nie można sprzedać {count} przygotowanego przedmiotu za $WOC.',
-  'hudChrome.plurals.wocTradeIneligible.other': 'Nie można sprzedać {count} przygotowanego przedmiotu za $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.few':
+    'Nie można sprzedać {count} przygotowanych przedmiotów za $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.many':
+    'Nie można sprzedać {count} przygotowanych przedmiotów za $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.one':
+    'Nie można sprzedać {count} przygotowanego przedmiotu za $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.other':
+    'Nie można sprzedać {count} przygotowanego przedmiotu za $WOC.',
   'hudChrome.spellbook.assignAria': 'Wybierz slot dla {name}',
   'hudChrome.trade.windowClosed': 'Okno wymiany zostało zamknięte.',
   'hudChrome.trade.woc.accept': 'Akceptuj ofertę',
-  'hudChrome.trade.woc.accepted': 'Oferta zaakceptowana. Twój przedmiot pozostaje zatrzymany do czasu zweryfikowania płatności.',
+  'hudChrome.trade.woc.accepted':
+    'Oferta zaakceptowana. Twój przedmiot pozostaje zatrzymany do czasu zweryfikowania płatności.',
   'hudChrome.trade.woc.awaitingPayment': 'Oczekiwanie na potwierdzenie płatności...',
   'hudChrome.trade.woc.blockDisabled': 'Giełda $WOC nie jest dostępna na tym realmie.',
-  'hudChrome.trade.woc.blockNoWallet': 'Powiąż i zweryfikuj portfel, aby sprzedawać przedmioty za $WOC.',
+  'hudChrome.trade.woc.blockNoWallet':
+    'Powiąż i zweryfikuj portfel, aby sprzedawać przedmioty za $WOC.',
   'hudChrome.trade.woc.blockPartnerUnknown': 'Sprawdzanie, czy ten gracz może przyjąć $WOC...',
-  'hudChrome.trade.woc.blockRecipientNoWallet': 'Ten gracz musi podłączyć portfel, aby przyjmować płatności w $WOC.',
-  'hudChrome.trade.woc.cancelPendingSeller': 'Anulowanie zgłoszone. Sprzedaż zakończy się sama, chyba że kupujący zapłaci pierwszy.',
+  'hudChrome.trade.woc.blockRecipientNoWallet':
+    'Ten gracz musi podłączyć portfel, aby przyjmować płatności w $WOC.',
+  'hudChrome.trade.woc.cancelPendingSeller':
+    'Anulowanie zgłoszone. Sprzedaż zakończy się sama, chyba że kupujący zapłaci pierwszy.',
   'hudChrome.trade.woc.cancelSale': 'Anuluj sprzedaż',
-  'hudChrome.trade.woc.closePaymentContinuesBuyer': 'Twoja płatność wciąż jest potwierdzana. Dostawa zakończy się sama.',
-  'hudChrome.trade.woc.closePaymentContinuesSeller': 'Płatność kupującego wciąż jest potwierdzana. Sprzedaż zakończy się sama.',
-  'hudChrome.trade.woc.closeSellerHold': 'Twój przedmiot pozostaje zatrzymany, oczekując na płatność kupującego. Jeśli zmienisz zdanie, anuluj sprzedaż w zakładce Aktywność Giełdy.',
-  'hudChrome.trade.woc.closedCancelled': 'Ta sprzedaż została anulowana. Przedmiot wraca do sprzedającego Kruczą Pocztą.',
-  'hudChrome.trade.woc.closedSuspended': 'Ta sprzedaż została zawieszona przez Mistrza Gry. Przedmiot wraca do sprzedającego Kruczą Pocztą.',
-  'hudChrome.trade.woc.closedUnpaid': 'Ta sprzedaż zakończyła się bez płatności. Przedmiot wraca do sprzedającego Kruczą Pocztą.',
-  'hudChrome.trade.woc.closedUnpaidBuyer': 'Ta sprzedaż zakończyła się bez twojej płatności. Przedmiot wraca do sprzedającego Kruczą Pocztą; brak zapłaty za zaakceptowaną transakcję oznacza punkt karny Giełdy.',
-  'hudChrome.trade.woc.dealAwaitsPayment': 'Twój zakup za $WOC wciąż jest niezapłacony. Wymień się ponownie ze sprzedającym, aby zapłacić; jeśli tego nie zrobisz, transakcja sama wygaśnie, a brak zapłaty oznacza punkt karny Giełdy.',
+  'hudChrome.trade.woc.closePaymentContinuesBuyer':
+    'Twoja płatność wciąż jest potwierdzana. Dostawa zakończy się sama.',
+  'hudChrome.trade.woc.closePaymentContinuesSeller':
+    'Płatność kupującego wciąż jest potwierdzana. Sprzedaż zakończy się sama.',
+  'hudChrome.trade.woc.closeSellerHold':
+    'Twój przedmiot pozostaje zatrzymany, oczekując na płatność kupującego. Jeśli zmienisz zdanie, anuluj sprzedaż w zakładce Aktywność Giełdy.',
+  'hudChrome.trade.woc.closedCancelled':
+    'Ta sprzedaż została anulowana. Przedmiot wraca do sprzedającego Kruczą Pocztą.',
+  'hudChrome.trade.woc.closedSuspended':
+    'Ta sprzedaż została zawieszona przez Mistrza Gry. Przedmiot wraca do sprzedającego Kruczą Pocztą.',
+  'hudChrome.trade.woc.closedUnpaid':
+    'Ta sprzedaż zakończyła się bez płatności. Przedmiot wraca do sprzedającego Kruczą Pocztą.',
+  'hudChrome.trade.woc.closedUnpaidBuyer':
+    'Ta sprzedaż zakończyła się bez twojej płatności. Przedmiot wraca do sprzedającego Kruczą Pocztą; brak zapłaty za zaakceptowaną transakcję oznacza punkt karny Giełdy.',
+  'hudChrome.trade.woc.dealAwaitsPayment':
+    'Twój zakup za $WOC wciąż jest niezapłacony. Wymień się ponownie ze sprzedającym, aby zapłacić; jeśli tego nie zrobisz, transakcja sama wygaśnie, a brak zapłaty oznacza punkt karny Giełdy.',
   'hudChrome.trade.woc.decline': 'Odrzuć',
   'hudChrome.trade.woc.equivalent': 'Około {tokens} $WOC po obecnym kursie',
   'hudChrome.trade.woc.feeLine': 'Opłata Giełdy {fee}, potrącana z ceny.',
-  'hudChrome.trade.woc.hintAcceptLocked': 'Ten przedmiot jest zablokowany. Odblokuj go w torbach, a następnie usuń go z wymiany i dodaj ponownie.',
+  'hudChrome.trade.woc.hintAcceptLocked':
+    'Ten przedmiot jest zablokowany. Odblokuj go w torbach, a następnie usuń go z wymiany i dodaj ponownie.',
   'hudChrome.trade.woc.hintAcceptNeedsItem': 'Dodaj sprzedawany przedmiot, zanim zaakceptujesz.',
-  'hudChrome.trade.woc.hintAwaitTheirItems': 'Oczekiwanie, aż zaoferują coś, co można sprzedać za $WOC.',
+  'hudChrome.trade.woc.hintAwaitTheirItems':
+    'Oczekiwanie, aż zaoferują coś, co można sprzedać za $WOC.',
   'hudChrome.trade.woc.hintBelowMin': 'Minimalna cena na Giełdzie to {usd}.',
-  'hudChrome.trade.woc.hintClearYourItems': 'Usuń swoje własne przedmioty: oferta $WOC kupuje to, co oni sprzedają.',
+  'hudChrome.trade.woc.hintClearYourItems':
+    'Usuń swoje własne przedmioty: oferta $WOC kupuje to, co oni sprzedają.',
   'hudChrome.trade.woc.hintEnterPrice': 'Wpisz cenę w USD.',
-  'hudChrome.trade.woc.hintGoldOffered': 'Najpierw usuń ofertę w złocie: wymiana odbywa się w złocie albo w $WOC, nie w obu naraz.',
-  'hudChrome.trade.woc.hintInsufficientBalance': 'To więcej $WOC, niż posiada twój podłączony portfel.',
-  'hudChrome.trade.woc.hintOneItem': 'Transakcja $WOC obejmuje dokładnie jeden przedmiot. W oknie wymiany może znajdować się tylko sprzedawany przedmiot.',
+  'hudChrome.trade.woc.hintGoldOffered':
+    'Najpierw usuń ofertę w złocie: wymiana odbywa się w złocie albo w $WOC, nie w obu naraz.',
+  'hudChrome.trade.woc.hintInsufficientBalance':
+    'To więcej $WOC, niż posiada twój podłączony portfel.',
+  'hudChrome.trade.woc.hintOneItem':
+    'Transakcja $WOC obejmuje dokładnie jeden przedmiot. W oknie wymiany może znajdować się tylko sprzedawany przedmiot.',
   'hudChrome.trade.woc.incomingAccept': '{name} oferuje {price} za twoje przedmioty.',
   'hudChrome.trade.woc.incomingBody': '{name} oferuje sprzedaż {item} za {price}.',
   'hudChrome.trade.woc.incomingTitle': 'Oferta $WOC od {name}',
-  'hudChrome.trade.woc.ineligibleReason': 'Przedmiotów związanych z duszą, zadaniowych, zablokowanych oraz spoza kategorii Giełdy nie można sprzedać za $WOC.',
+  'hudChrome.trade.woc.ineligibleReason':
+    'Przedmiotów związanych z duszą, zadaniowych, zablokowanych oraz spoza kategorii Giełdy nie można sprzedać za $WOC.',
   'hudChrome.trade.woc.modesLabel': 'Waluta płatności',
   'hudChrome.trade.woc.moneyLine': '{usd} (~ {tokens} $WOC)',
   'hudChrome.trade.woc.moneyUsd': '{usd}',
   'hudChrome.trade.woc.netLine': 'Otrzymujesz {net}',
   'hudChrome.trade.woc.netLineBuyer': 'Sprzedający otrzymuje {net}',
-  'hudChrome.trade.woc.notInstant': 'Sprzedaż za $WOC nie jest natychmiastowa. Przedmiot trafia do depozytu, gdy obie strony zaakceptują, a do kupującego dociera po zweryfikowaniu płatności.',
+  'hudChrome.trade.woc.notInstant':
+    'Sprzedaż za $WOC nie jest natychmiastowa. Przedmiot trafia do depozytu, gdy obie strony zaakceptują, a do kupującego dociera po zweryfikowaniu płatności.',
   'hudChrome.trade.woc.offerDeclined': 'Oferta $WOC została odrzucona.',
   'hudChrome.trade.woc.offerExpired': 'Oferta $WOC wygasła.',
   'hudChrome.trade.woc.offerExpiresAt': 'Oferta wygasa o {time}.',
   'hudChrome.trade.woc.offerNotPending': 'Ta oferta nie jest już oczekująca.',
-  'hudChrome.trade.woc.offerSent': 'Oferta wysłana. Wygaśnie za 10 minut, jeśli {name} jej nie zaakceptuje.',
-  'hudChrome.trade.woc.offerSentUntil': 'Oferta wysłana. Wygaśnie o {time}, jeśli {name} jej nie zaakceptuje.',
-  'hudChrome.trade.woc.offerStandsUntil': 'Twoja oferta $WOC pozostaje ważna do {time}. Wymień się ponownie ze sprzedającym, aby dokończyć transakcję, jeśli ją zaakceptuje.',
+  'hudChrome.trade.woc.offerSent':
+    'Oferta wysłana. Wygaśnie za 10 minut, jeśli {name} jej nie zaakceptuje.',
+  'hudChrome.trade.woc.offerSentUntil':
+    'Oferta wysłana. Wygaśnie o {time}, jeśli {name} jej nie zaakceptuje.',
+  'hudChrome.trade.woc.offerStandsUntil':
+    'Twoja oferta $WOC pozostaje ważna do {time}. Wymień się ponownie ze sprzedającym, aby dokończyć transakcję, jeśli ją zaakceptuje.',
   'hudChrome.trade.woc.offerWithdrawn': 'Oferta $WOC została wycofana.',
-  'hudChrome.trade.woc.p2pBindingNote': 'Gdy obie strony zaakceptują, płatność jest wymagana w ciągu {duration} albo w krótszym oknie, które otwiera się po naciśnięciu Zapłać. Brak zapłaty oznacza punkt karny Giełdy.',
-  'hudChrome.trade.woc.p2pBindingNoteUntimed': 'Gdy obie strony zaakceptują, płatność jest wymagana wkrótce potem albo w krótszym oknie, które otwiera się po naciśnięciu Zapłać. Brak zapłaty oznacza punkt karny Giełdy.',
-  'hudChrome.trade.woc.p2pPaymentDueAt': 'Płatność jest wymagana do {time}. Brak zapłaty oznacza punkt karny Giełdy.',
+  'hudChrome.trade.woc.p2pBindingNote':
+    'Gdy obie strony zaakceptują, płatność jest wymagana w ciągu {duration} albo w krótszym oknie, które otwiera się po naciśnięciu Zapłać. Brak zapłaty oznacza punkt karny Giełdy.',
+  'hudChrome.trade.woc.p2pBindingNoteUntimed':
+    'Gdy obie strony zaakceptują, płatność jest wymagana wkrótce potem albo w krótszym oknie, które otwiera się po naciśnięciu Zapłać. Brak zapłaty oznacza punkt karny Giełdy.',
+  'hudChrome.trade.woc.p2pPaymentDueAt':
+    'Płatność jest wymagana do {time}. Brak zapłaty oznacza punkt karny Giełdy.',
   'hudChrome.trade.woc.paidBuyer': 'Wysłałeś płatność {price} za {item}.',
   'hudChrome.trade.woc.paidSeller': 'Otrzymałeś płatność {price} za swój przedmiot {item}.',
   'hudChrome.trade.woc.payNow': 'Zapłać {usd}',
   'hudChrome.trade.woc.paying': 'Potwierdź płatność w portfelu...',
-  'hudChrome.trade.woc.paymentConfirmed': 'Płatność potwierdzona. Twój przedmiot trafi do toreb, a jeśli są pełne, Kruczą Pocztą, gdy dostawa się zakończy.',
+  'hudChrome.trade.woc.paymentConfirmed':
+    'Płatność potwierdzona. Twój przedmiot trafi do toreb, a jeśli są pełne, Kruczą Pocztą, gdy dostawa się zakończy.',
   'hudChrome.trade.woc.priceLabel': 'Cena w USD',
   'hudChrome.trade.woc.pricePlaceholder': '0.00',
-  'hudChrome.trade.woc.quoteExpiredTrade': 'Wycena wygasła. Naciśnij Nie teraz, a następnie naciśnij Zapłać ponownie, aby uzyskać nową wycenę.',
-  'hudChrome.trade.woc.quoteStaged': 'Wycena płatności gotowa dla {usd}: {tokens} $WOC, ważna do {time}.',
+  'hudChrome.trade.woc.quoteExpiredTrade':
+    'Wycena wygasła. Naciśnij Nie teraz, a następnie naciśnij Zapłać ponownie, aby uzyskać nową wycenę.',
+  'hudChrome.trade.woc.quoteStaged':
+    'Wycena płatności gotowa dla {usd}: {tokens} $WOC, ważna do {time}.',
   'hudChrome.trade.woc.sendOffer': 'Zaoferuj $WOC',
-  'hudChrome.trade.woc.settled': 'Zapłacono. Twój przedmiot jest w torbach, a jeśli były pełne, dotrze Kruczą Pocztą.',
+  'hudChrome.trade.woc.settled':
+    'Zapłacono. Twój przedmiot jest w torbach, a jeśli były pełne, dotrze Kruczą Pocztą.',
   'hudChrome.trade.woc.settledSeller': 'Zapłacono. Przedmiot został dostarczony kupującemu.',
   'hudChrome.trade.woc.statusAwaitingBuyer': 'Oczekiwanie na zapłatę kupującego.',
   'hudChrome.trade.woc.statusConfirmedBuyer': 'Płatność potwierdzona. Dostawa się kończy...',
@@ -276,31 +399,38 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.statusReviewSeller': 'Płatność kupującego jest weryfikowana.',
   'hudChrome.trade.woc.tabGold': 'Złoto',
   'hudChrome.trade.woc.tabWoc': '$WOC',
-  'hudChrome.trade.woc.tabWocHint': 'Płatność w $WOC jest dostępna, gdy twoja strona wymiany jest pusta i nie zaoferowano złota.',
-  'hudChrome.trade.woc.variableWarning': 'Kwota w $WOC to podgląd, nie stała cena. Dokładna liczba jest ustalana przez nową wycenę w chwili zapłaty.',
-  'hudChrome.trade.woc.waitingOther': 'Oferta zaakceptowana. Oczekiwanie na akceptację drugiego gracza.',
+  'hudChrome.trade.woc.tabWocHint':
+    'Płatność w $WOC jest dostępna, gdy twoja strona wymiany jest pusta i nie zaoferowano złota.',
+  'hudChrome.trade.woc.variableWarning':
+    'Kwota w $WOC to podgląd, nie stała cena. Dokładna liczba jest ustalana przez nową wycenę w chwili zapłaty.',
+  'hudChrome.trade.woc.waitingOther':
+    'Oferta zaakceptowana. Oczekiwanie na akceptację drugiego gracza.',
   'hudChrome.trade.woc.withdraw': 'Wycofaj ofertę',
   'hudChrome.trade.woc.youDeclined': 'Odrzuciłeś ofertę.',
   'hudChrome.trade.woc.youWithdrew': 'Wycofałeś swoją ofertę.',
-  'hudChrome.tutorialGreeting.bellHomeNote': 'Już z powrotem z wybrzeża? To był dzwon promowy, w który uderzyłeś. Jego bliźniak wisi właśnie tam, przy skrzynce Kruczej Poczty: uderz w niego, kiedy zechcesz, a przeprawa zaniesie cię z powrotem na Wybrzeże Prób. Tak czy inaczej, nic się nie stało.',
-  'hudChrome.tutorialGreeting.bodyFirst': 'Nie widziałem cię tu wcześniej, przyjacielu. W tych stronach jest tradycją, że ci, którzy zaczynają swoją przygodę, odwiedzają Wybrzeże Prób, spokojną wyspę za cieśniną. Możesz tam wyszlifować swoje umiejętności i oswoić się ze światem, zanim zmierzysz się z jego wyzwaniami. Prom pływa w obie strony i nikt nie pomyśli o tobie gorzej, którąkolwiek drogę wybierzesz.',
-  'hudChrome.tutorialGreeting.bodyRefresher': 'Znowu tu jesteś, z nową twarzą, co? W takim razie wiesz już, jak to wygląda. Mimo to, gdybyś chciał sobie wszystko przypomnieć, zanim wyruszysz, Wybrzeże Prób nigdy nie odprawia powracającego ucznia z niczym, a prom czeka, gdy tylko będziesz gotów.',
-  'hudChrome.tutorialGreeting.declineNote': 'Jak sobie życzysz, przyjacielu. Gdybyś kiedyś zmienił zdanie, dzwon promowy przy skrzynce Kruczej Poczty przeprawi cię na Wybrzeże Prób o każdej porze, w dzień i w nocy. Będzie tu, kiedy wilków już nie będzie.',
-  'hudChrome.tutorialGreeting.islandArrivalNote': 'Witaj na Wybrzeżu Prób. Strażnik Tam czeka kawałek dalej na plaży: idź się z nim zobaczyć.',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    'Już z powrotem z wybrzeża? To był dzwon promowy, w który uderzyłeś. Jego bliźniak wisi właśnie tam, przy skrzynce Kruczej Poczty: uderz w niego, kiedy zechcesz, a przeprawa zaniesie cię z powrotem na Wybrzeże Prób. Tak czy inaczej, nic się nie stało.',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    'Witaj na Wybrzeżu Prób. Strażnik Tam czeka kawałek dalej na plaży: idź się z nim zobaczyć.',
   'hudChrome.tutorialGreeting.noteClose': 'Zrozumiano',
-  'hudChrome.tutorialGreeting.play': 'Rozpocznij samouczek',
-  'hudChrome.tutorialGreeting.skip': 'Pomiń samouczek',
-  'hudChrome.walletBridge.badResponse': 'Twój portfel zwrócił nieczytelną odpowiedź. Spróbuj ponownie.',
-  'hudChrome.walletBridge.cancelled': 'Żądanie portfela zostało anulowane. Nic nie zostało wysłane.',
-  'hudChrome.walletBridge.notConnected': 'Podłącz i zweryfikuj portfel, a następnie spróbuj ponownie.',
-  'hudChrome.walletBridge.timeout': 'Twój portfel nie odpowiedział na czas. Otwórz portfel i spróbuj ponownie.',
-  'hudChrome.walletBridge.unavailable': 'Brak dostępnego tutaj połączenia z portfelem. Podłącz portfel ponownie i spróbuj jeszcze raz.',
-  'hudChrome.walletBridge.unsupported': 'Ten portfel nie może wykonać tej czynności. Podłącz inny portfel.',
+  'hudChrome.walletBridge.badResponse':
+    'Twój portfel zwrócił nieczytelną odpowiedź. Spróbuj ponownie.',
+  'hudChrome.walletBridge.cancelled':
+    'Żądanie portfela zostało anulowane. Nic nie zostało wysłane.',
+  'hudChrome.walletBridge.notConnected':
+    'Podłącz i zweryfikuj portfel, a następnie spróbuj ponownie.',
+  'hudChrome.walletBridge.timeout':
+    'Twój portfel nie odpowiedział na czas. Otwórz portfel i spróbuj ponownie.',
+  'hudChrome.walletBridge.unavailable':
+    'Brak dostępnego tutaj połączenia z portfelem. Podłącz portfel ponownie i spróbuj jeszcze raz.',
+  'hudChrome.walletBridge.unsupported':
+    'Ten portfel nie może wykonać tej czynności. Podłącz inny portfel.',
   'hudChrome.wocMarket.activityBids': 'Moje oferty',
   'hudChrome.wocMarket.activityCancelPending': 'Anuluj oczekującą ofertę',
   'hudChrome.wocMarket.activityDeadline': 'Płatność wymagana za {duration}',
   'hudChrome.wocMarket.activityDirected': 'Sprzedaż bezpośrednia',
-  'hudChrome.wocMarket.activityEmpty': 'Nie masz jeszcze żadnych ofert, wystawień ani rozliczeń. Tutaj pojawi się twoja aktywność na Giełdzie.',
+  'hudChrome.wocMarket.activityEmpty':
+    'Nie masz jeszcze żadnych ofert, wystawień ani rozliczeń. Tutaj pojawi się twoja aktywność na Giełdzie.',
   'hudChrome.wocMarket.activityListings': 'Moje wystawienia',
   'hudChrome.wocMarket.activityNoBids': 'Nie masz żadnych ofert.',
   'hudChrome.wocMarket.activityNoListings': 'Nie masz żadnych wystawień.',
@@ -310,19 +440,26 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.activityPayNowItemAria': 'Zapłać teraz {usd} za {item}',
   'hudChrome.wocMarket.activitySettlements': 'Moje rozliczenia',
   'hudChrome.wocMarket.activityStrikes': 'Punkty karne Giełdy: {count}',
-  'hudChrome.wocMarket.activitySuspended': 'Giełda zawieszona na {duration} po niezapłaconych transakcjach: do tego czasu żadnych ofert, zakupów, wystawień ani transakcji $WOC.',
+  'hudChrome.wocMarket.activitySuspended':
+    'Giełda zawieszona na {duration} po niezapłaconych transakcjach: do tego czasu żadnych ofert, zakupów, wystawień ani transakcji $WOC.',
   'hudChrome.wocMarket.bidAria': 'Złóż ofertę na {item}',
-  'hudChrome.wocMarket.bidBindingNote': 'Oferta jest wiążąca, gdy podpiszesz transakcję jej kaucji: nie można jej wycofać, a jeśli wygrasz i nie zapłacisz, kaucja przepada, a twoje konto otrzymuje punkt karny Giełdy.',
-  'hudChrome.wocMarket.bidBondNote': 'Złożenie oferty blokuje zwrotną kaucję w $WOC ponad samą ofertę: {bond} przy ofercie {bid}, więcej przy wyższej ofercie. Jest zwracana, gdy zostaniesz przelicytowany lub przegrasz, albo po zapłacie, jeśli wygrasz; oferta drugiej szansy blokuje ją ponownie.',
+  'hudChrome.wocMarket.bidBindingNote':
+    'Oferta jest wiążąca, gdy podpiszesz transakcję jej kaucji: nie można jej wycofać, a jeśli wygrasz i nie zapłacisz, kaucja przepada, a twoje konto otrzymuje punkt karny Giełdy.',
+  'hudChrome.wocMarket.bidBondNote':
+    'Złożenie oferty blokuje zwrotną kaucję w $WOC ponad samą ofertę: {bond} przy ofercie {bid}, więcej przy wyższej ofercie. Jest zwracana, gdy zostaniesz przelicytowany lub przegrasz, albo po zapłacie, jeśli wygrasz; oferta drugiej szansy blokuje ją ponownie.',
   'hudChrome.wocMarket.bidBondPay': 'Zapłać kaucję',
   'hudChrome.wocMarket.bidBondPayAria': 'Zapłać kaucję za twoją ofertę na wystawieniu {id}',
   'hudChrome.wocMarket.bidBondPayItemAria': 'Zapłać kaucję {bond} za twoją ofertę na {item}',
-  'hudChrome.wocMarket.bidBondPayWindow': 'Zapłać kaucję w ciągu {duration} od złożenia oferty, inaczej oferta wygaśnie.',
-  'hudChrome.wocMarket.bidBondSchedule': 'Kaucja wynosi {rate} procent twojej oferty, co najmniej {min} i co najwyżej {max}.',
+  'hudChrome.wocMarket.bidBondPayWindow':
+    'Zapłać kaucję w ciągu {duration} od złożenia oferty, inaczej oferta wygaśnie.',
+  'hudChrome.wocMarket.bidBondSchedule':
+    'Kaucja wynosi {rate} procent twojej oferty, co najmniej {min} i co najwyżej {max}.',
   'hudChrome.wocMarket.bidButton': 'Złóż ofertę',
-  'hudChrome.wocMarket.bidCloseNote': 'Oferta, której kaucja potwierdzi się w ostatnich 2 minutach, przedłuża aukcję o 2 minuty od tej oferty, maksymalnie do 30 minut po pierwotnym terminie zakończenia. Kaucja potwierdzona po zamknięciu aukcji nie liczy się i zostaje zwrócona.',
+  'hudChrome.wocMarket.bidCloseNote':
+    'Oferta, której kaucja potwierdzi się w ostatnich 2 minutach, przedłuża aukcję o 2 minuty od tej oferty, maksymalnie do 30 minut po pierwotnym terminie zakończenia. Kaucja potwierdzona po zamknięciu aukcji nie liczy się i zostaje zwrócona.',
   'hudChrome.wocMarket.bidLabel': 'Twoja oferta (USD)',
-  'hudChrome.wocMarket.bidPlacedOutbid': 'Twoja kaucja została potwierdzona, ale wyższa oferta pojawiła się pierwsza.',
+  'hudChrome.wocMarket.bidPlacedOutbid':
+    'Twoja kaucja została potwierdzona, ale wyższa oferta pojawiła się pierwsza.',
   'hudChrome.wocMarket.bidPlacedStanding': 'Twoja oferta obowiązuje. Jesteś najwyższym oferentem.',
   'hudChrome.wocMarket.bidPlaceholder': 'Wpisz kwotę w USD',
   'hudChrome.wocMarket.bidStatusActive': 'Najwyższy oferent',
@@ -333,20 +470,27 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.bidStatusPending': 'Oczekuje na kaucję',
   'hudChrome.wocMarket.bidStatusWon': 'Wygrana',
   'hudChrome.wocMarket.bidTermsToggle': 'Warunki licytacji',
-  'hudChrome.wocMarket.bondNotYetVisible': 'Płatność kaucji nie jest jeszcze widoczna w rejestrze. Pojawienie się może chwilę potrwać.',
-  'hudChrome.wocMarket.bondPendingGeneric': 'Twoja płatność kaucji została wysłana i oczekuje na potwierdzenie.',
-  'hudChrome.wocMarket.bondSeenAwaitingFinality': 'Płatność kaucji widoczna w rejestrze. Oczekiwanie na ostateczne potwierdzenie.',
-  'hudChrome.wocMarket.bondServiceUnreachable': 'Usługa płatności jest niedostępna. Twoja płatność kaucji pozostaje zapisana i zostanie sprawdzona ponownie.',
+  'hudChrome.wocMarket.bondNotYetVisible':
+    'Płatność kaucji nie jest jeszcze widoczna w rejestrze. Pojawienie się może chwilę potrwać.',
+  'hudChrome.wocMarket.bondPendingGeneric':
+    'Twoja płatność kaucji została wysłana i oczekuje na potwierdzenie.',
+  'hudChrome.wocMarket.bondSeenAwaitingFinality':
+    'Płatność kaucji widoczna w rejestrze. Oczekiwanie na ostateczne potwierdzenie.',
+  'hudChrome.wocMarket.bondServiceUnreachable':
+    'Usługa płatności jest niedostępna. Twoja płatność kaucji pozostaje zapisana i zostanie sprawdzona ponownie.',
   'hudChrome.wocMarket.browseEmpty': 'Brak wystawień w tej chwili. Zajrzyj tu ponownie wkrótce.',
   'hudChrome.wocMarket.browseError': 'Nie udało się wczytać wystawień.',
   'hudChrome.wocMarket.buyNowAria': 'Kup teraz {item} za {usd}',
   'hudChrome.wocMarket.buyNowButton': 'Kup teraz za {usd}',
   'hudChrome.wocMarket.buyNowLockedBadge': 'Zakup w toku',
-  'hudChrome.wocMarket.buyNowLockedTip': 'Inny kupujący zarezerwował to wystawienie na czas płatności. Jeśli nie zapłaci na czas, wystawienie zostanie ponownie otwarte.',
-  'hudChrome.wocMarket.buyNowNote': 'Kup teraz rezerwuje to wystawienie dla ciebie na około cztery i pół minuty, żebyś zdążył zapłacić. Jeśli nie zapłacisz na czas, nie będziesz mógł ponownie skorzystać z Kup teraz na tym wystawieniu przez 30 minut, a trzy nieopłacone zakupy Kup teraz w ciągu godziny wstrzymują dla ciebie tę opcję, dopóki najstarszy z nich nie osiągnie godziny.',
+  'hudChrome.wocMarket.buyNowLockedTip':
+    'Inny kupujący zarezerwował to wystawienie na czas płatności. Jeśli nie zapłaci na czas, wystawienie zostanie ponownie otwarte.',
+  'hudChrome.wocMarket.buyNowNote':
+    'Kup teraz rezerwuje to wystawienie dla ciebie na około cztery i pół minuty, żebyś zdążył zapłacić. Jeśli nie zapłacisz na czas, nie będziesz mógł ponownie skorzystać z Kup teraz na tym wystawieniu przez 30 minut, a trzy nieopłacone zakupy Kup teraz w ciągu godziny wstrzymują dla ciebie tę opcję, dopóki najstarszy z nich nie osiągnie godziny.',
   'hudChrome.wocMarket.cancelAria': 'Anuluj swoje wystawienie przedmiotu {item}',
   'hudChrome.wocMarket.cancelButton': 'Anuluj wystawienie',
-  'hudChrome.wocMarket.claimCooldownRetry': 'Niedawno zrezygnowałeś z zakupu przez Kup teraz. Spróbuj ponownie za {duration}.',
+  'hudChrome.wocMarket.claimCooldownRetry':
+    'Niedawno zrezygnowałeś z zakupu przez Kup teraz. Spróbuj ponownie za {duration}.',
   'hudChrome.wocMarket.close': 'Zamknij Giełdę',
   'hudChrome.wocMarket.colBuyNow': 'Kup teraz',
   'hudChrome.wocMarket.colCurrentBid': 'Obecna oferta',
@@ -383,8 +527,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.filterSubcategory': 'Rodzaj',
   'hudChrome.wocMarket.launcherLabel': 'Giełda $WOC',
   'hudChrome.wocMarket.listing': 'Wystawianie twojego przedmiotu...',
-  'hudChrome.wocMarket.listingCancelPending': 'Anulowanie oczekuje: kupujący ma zarezerwowane okno zakupu. Jeśli nie zapłaci, wystawienie zostanie zamknięte, a twój przedmiot wróci Kruczą Pocztą.',
-  'hudChrome.wocMarket.listingCancelled': 'Wystawienie anulowane. Twój przedmiot wraca Kruczą Pocztą.',
+  'hudChrome.wocMarket.listingCancelPending':
+    'Anulowanie oczekuje: kupujący ma zarezerwowane okno zakupu. Jeśli nie zapłaci, wystawienie zostanie zamknięte, a twój przedmiot wróci Kruczą Pocztą.',
+  'hudChrome.wocMarket.listingCancelled':
+    'Wystawienie anulowane. Twój przedmiot wraca Kruczą Pocztą.',
   'hudChrome.wocMarket.listingCreated': 'Twoje wystawienie jest aktywne.',
   'hudChrome.wocMarket.listingStatusActive': 'Aktywne',
   'hudChrome.wocMarket.listingStatusCancelled': 'Anulowane',
@@ -395,17 +541,24 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusUnsold': 'Niesprzedane',
   'hudChrome.wocMarket.loadFailed': 'Nie udało się połączyć z Giełdą. Spróbuj ponownie za chwilę.',
   'hudChrome.wocMarket.loading': 'Wczytywanie Giełdy...',
-  'hudChrome.wocMarket.offerNextNote': 'Jeśli zwycięzca nie zapłaci, możesz stać się kupującym po własnej ofercie: twoja kaucja zostanie ponownie zablokowana (lub zażądana ponownie, jeśli już ją zwrócono), a płatność będzie wymagana w ciągu {duration}.',
+  'hudChrome.wocMarket.offerNextNote':
+    'Jeśli zwycięzca nie zapłaci, możesz stać się kupującym po własnej ofercie: twoja kaucja zostanie ponownie zablokowana (lub zażądana ponownie, jeśli już ją zwrócono), a płatność będzie wymagana w ciągu {duration}.',
   'hudChrome.wocMarket.pageNext': 'Następna strona',
   'hudChrome.wocMarket.pageNumber': 'Strona {current}',
   'hudChrome.wocMarket.pagePrev': 'Poprzednia strona',
-  'hudChrome.wocMarket.pausedBanner': 'Handel jest wstrzymany. Aukcje nadal odliczają czas; nowe wystawienia, oferty, propozycje i płatności czekają do wznowienia handlu, a płatność już wysłana zostanie mimo to rozliczona.',
-  'hudChrome.wocMarket.paymentConfirmedDelivering': 'Płatność potwierdzona. Twój przedmiot dotrze Kruczą Pocztą, gdy dostawa zostanie zakończona.',
+  'hudChrome.wocMarket.pausedBanner':
+    'Handel jest wstrzymany. Aukcje nadal odliczają czas; nowe wystawienia, oferty, propozycje i płatności czekają do wznowienia handlu, a płatność już wysłana zostanie mimo to rozliczona.',
+  'hudChrome.wocMarket.paymentConfirmedDelivering':
+    'Płatność potwierdzona. Twój przedmiot dotrze Kruczą Pocztą, gdy dostawa zostanie zakończona.',
   'hudChrome.wocMarket.paymentDueAt': 'Płatność jest wymagana do {time}.',
-  'hudChrome.wocMarket.paymentNotYetVisible': 'W rejestrze nie widać jeszcze płatności. Jej pojawienie się może chwilę potrwać.',
-  'hudChrome.wocMarket.paymentPendingGeneric': 'Twoja płatność została wysłana i oczekuje na potwierdzenie.',
-  'hudChrome.wocMarket.paymentSeenAwaitingFinality': 'Płatność widoczna w rejestrze. Oczekiwanie na ostateczne potwierdzenie.',
-  'hudChrome.wocMarket.paymentServiceUnreachable': 'Usługa płatności jest niedostępna. Twoja płatność pozostaje zapisana i zostanie sprawdzona ponownie.',
+  'hudChrome.wocMarket.paymentNotYetVisible':
+    'W rejestrze nie widać jeszcze płatności. Jej pojawienie się może chwilę potrwać.',
+  'hudChrome.wocMarket.paymentPendingGeneric':
+    'Twoja płatność została wysłana i oczekuje na potwierdzenie.',
+  'hudChrome.wocMarket.paymentSeenAwaitingFinality':
+    'Płatność widoczna w rejestrze. Oczekiwanie na ostateczne potwierdzenie.',
+  'hudChrome.wocMarket.paymentServiceUnreachable':
+    'Usługa płatności jest niedostępna. Twoja płatność pozostaje zapisana i zostanie sprawdzona ponownie.',
   'hudChrome.wocMarket.purchaseComplete': 'Zakup zakończony. Twój przedmiot dotrze Kruczą Pocztą.',
   'hudChrome.wocMarket.quoteBondFor': 'Zwrotna kaucja za ofertę: {usd}',
   'hudChrome.wocMarket.quoteBondForItem': 'Zwrotna kaucja za ofertę na {item}: {usd}',
@@ -414,7 +567,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteExpired': 'Wycena wygasła. Poproś o nową.',
   'hudChrome.wocMarket.quoteExpires': 'Wycena wygasa za {duration}',
   'hudChrome.wocMarket.quoteExpiresAt': 'Wycena wygasa o {time}.',
-  'hudChrome.wocMarket.quoteFixedNote': 'Ta wycena ustala kwotę $WOC do momentu wygaśnięcia. Nowa wycena może się różnić.',
+  'hudChrome.wocMarket.quoteFixedNote':
+    'Ta wycena ustala kwotę $WOC do momentu wygaśnięcia. Nowa wycena może się różnić.',
   'hudChrome.wocMarket.quoteRefresh': 'Nowa wycena',
   'hudChrome.wocMarket.quoteSeller': 'Sprzedawca otrzymuje: {tokens} $WOC',
   'hudChrome.wocMarket.quoteSettlementFor': 'Rozliczenie za {item}: {usd}',
@@ -423,33 +577,44 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteTotal': 'Razem: {tokens} $WOC',
   'hudChrome.wocMarket.quoteTreasury': 'Do skarbca gry: {tokens} $WOC',
   'hudChrome.wocMarket.rateNote': 'Kurs: około {tokens} $WOC za 1,00 USD, stan na {time}.',
-  'hudChrome.wocMarket.rateNotePaused': 'Ostatni znany kurs: około {tokens} $WOC za 1,00 USD, stan na {time}.',
+  'hudChrome.wocMarket.rateNotePaused':
+    'Ostatni znany kurs: około {tokens} $WOC za 1,00 USD, stan na {time}.',
   'hudChrome.wocMarket.reserveMet': 'Cena minimalna osiągnięta',
-  'hudChrome.wocMarket.reserveMetTip': 'Sprzedawca ustalił ukrytą cenę minimalną, a obecna oferta ją osiąga.',
+  'hudChrome.wocMarket.reserveMetTip':
+    'Sprzedawca ustalił ukrytą cenę minimalną, a obecna oferta ją osiąga.',
   'hudChrome.wocMarket.reserveNotMet': 'Cena minimalna nieosiągnięta',
-  'hudChrome.wocMarket.reserveNotMetTip': 'Sprzedawca ustalił ukrytą cenę minimalną. Jeśli najwyższa oferta w chwili zakończenia jest od niej niższa, przedmiot nie zostaje sprzedany, a każda kaucja zostaje zwrócona.',
+  'hudChrome.wocMarket.reserveNotMetTip':
+    'Sprzedawca ustalił ukrytą cenę minimalną. Jeśli najwyższa oferta w chwili zakończenia jest od niej niższa, przedmiot nie zostaje sprzedany, a każda kaucja zostaje zwrócona.',
   'hudChrome.wocMarket.rowOpenAria': 'Wyświetl wystawienie przedmiotu {item}',
   'hudChrome.wocMarket.sellBuyNowAboveStart': 'Cena Kup teraz musi być wyższa niż cena wywoławcza.',
-  'hudChrome.wocMarket.sellBuyNowAuctionNote': 'Opcjonalne. Ustal cenę, którą kupujący może zapłacić, aby zakończyć aukcję wcześniej; musi być wyższa niż cena wywoławcza i cena minimalna.',
-  'hudChrome.wocMarket.sellBuyNowNote': 'Wymagane. Wystawienie typu Kup teraz sprzedaje się po tej cenie bez licytacji.',
+  'hudChrome.wocMarket.sellBuyNowAuctionNote':
+    'Opcjonalne. Ustal cenę, którą kupujący może zapłacić, aby zakończyć aukcję wcześniej; musi być wyższa niż cena wywoławcza i cena minimalna.',
+  'hudChrome.wocMarket.sellBuyNowNote':
+    'Wymagane. Wystawienie typu Kup teraz sprzedaje się po tej cenie bez licytacji.',
   'hudChrome.wocMarket.sellBuyNowPrice': 'Cena Kup teraz (USD)',
   'hudChrome.wocMarket.sellChoose': 'Przedmiot do wystawienia',
   'hudChrome.wocMarket.sellClear': 'Wyczyść przedmiot {item} i wybierz inny',
-  'hudChrome.wocMarket.sellCollectiblesBoth': 'Wierzchowce i płyty chroma mecha również można wystawić.',
+  'hudChrome.wocMarket.sellCollectiblesBoth':
+    'Wierzchowce i płyty chroma mecha również można wystawić.',
   'hudChrome.wocMarket.sellCollectiblesChromas': 'Płyty chroma mecha również można wystawić.',
   'hudChrome.wocMarket.sellCollectiblesMounts': 'Wierzchowce również można wystawić.',
   'hudChrome.wocMarket.sellDuration': 'Czas trwania',
-  'hudChrome.wocMarket.sellEmptyFloor': 'Brak odpowiednich przedmiotów w twoich torbach. Ten świat przyjmuje niezwiązany ekwipunek o jakości {floor} lub wyższej.',
-  'hudChrome.wocMarket.sellFeeNote': 'Zakończona sprzedaż płaci opłatę Giełdy z ceny: część zostaje spalona, a część trafia do skarbca, resztę otrzymujesz na powiązany portfel w transakcji rozliczeniowej. Opłata dla wpisanej przez ciebie ceny jest pokazana tutaj; w przypadku aukcji zależy ona od ceny końcowej.',
+  'hudChrome.wocMarket.sellEmptyFloor':
+    'Brak odpowiednich przedmiotów w twoich torbach. Ten świat przyjmuje niezwiązany ekwipunek o jakości {floor} lub wyższej.',
+  'hudChrome.wocMarket.sellFeeNote':
+    'Zakończona sprzedaż płaci opłatę Giełdy z ceny: część zostaje spalona, a część trafia do skarbca, resztę otrzymujesz na powiązany portfel w transakcji rozliczeniowej. Opłata dla wpisanej przez ciebie ceny jest pokazana tutaj; w przypadku aukcji zależy ona od ceny końcowej.',
   'hudChrome.wocMarket.sellFormat': 'Format',
   'hudChrome.wocMarket.sellFormatAuction': 'Aukcja',
   'hudChrome.wocMarket.sellFormatAuctionBuyNow': 'Aukcja z opcją Kup teraz',
   'hudChrome.wocMarket.sellFormatBuyNow': 'Tylko Kup teraz',
-  'hudChrome.wocMarket.sellLockedHidden': 'Zablokowane przedmioty nie są tu wyświetlane. Odblokuj je w torbach, aby je sprzedać.',
+  'hudChrome.wocMarket.sellLockedHidden':
+    'Zablokowane przedmioty nie są tu wyświetlane. Odblokuj je w torbach, aby je sprzedać.',
   'hudChrome.wocMarket.sellNoMatches': 'Żaden przedmiot nie pasuje do wyszukiwania',
-  'hudChrome.wocMarket.sellOfferNext': 'Jeśli zwycięzca nie zapłaci, sprzedaj kolejnemu licytującemu z najwyższą ofertą spełniającą cenę minimalną, po jego ofercie, zamiast kończyć jako niesprzedane.',
+  'hudChrome.wocMarket.sellOfferNext':
+    'Jeśli zwycięzca nie zapłaci, sprzedaj kolejnemu licytującemu z najwyższą ofertą spełniającą cenę minimalną, po jego ofercie, zamiast kończyć jako niesprzedane.',
   'hudChrome.wocMarket.sellReserve': 'Cena minimalna (USD, opcjonalnie)',
-  'hudChrome.wocMarket.sellReserveNote': 'Opcjonalne, co najmniej cena wywoławcza. Licytujący widzą tylko, czy jest osiągnięta; jeśli najwyższa oferta w chwili zakończenia jest od niej niższa, przedmiot wraca do ciebie niesprzedany, a każda kaucja zostaje zwrócona.',
+  'hudChrome.wocMarket.sellReserveNote':
+    'Opcjonalne, co najmniej cena wywoławcza. Licytujący widzą tylko, czy jest osiągnięta; jeśli najwyższa oferta w chwili zakończenia jest od niej niższa, przedmiot wraca do ciebie niesprzedany, a każda kaucja zostaje zwrócona.',
   'hudChrome.wocMarket.sellSearchPlaceholder': 'Wpisz, aby przefiltrować torby',
   'hudChrome.wocMarket.sellStart': 'Cena wywoławcza (USD)',
   'hudChrome.wocMarket.sellSubmit': 'Wystaw przedmiot',
@@ -463,31 +628,41 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellerTitle': 'Ostatnie transakcje gracza {name}',
   'hudChrome.wocMarket.settlementConfirmedDelivering': 'Płatność potwierdzona, dostarczanie',
   'hudChrome.wocMarket.settlementConfirming': 'Potwierdzanie',
-  'hudChrome.wocMarket.settlementDeadlineNote': 'Jeśli wygrasz, płatność jest wymagana w ciągu {duration} od zakończenia aukcji.',
+  'hudChrome.wocMarket.settlementDeadlineNote':
+    'Jeśli wygrasz, płatność jest wymagana w ciągu {duration} od zakończenia aukcji.',
   'hudChrome.wocMarket.settlementDelivered': 'Dostarczono',
   'hudChrome.wocMarket.settlementExpired': 'Wygasło bez zapłaty',
-  'hudChrome.wocMarket.settlementFailBurnAuthority': 'Spalenie tokenów pochodziło z portfela, którego ten zakup nie wskazał.',
+  'hudChrome.wocMarket.settlementFailBurnAuthority':
+    'Spalenie tokenów pochodziło z portfela, którego ten zakup nie wskazał.',
   'hudChrome.wocMarket.settlementFailBurnMismatch': 'Płatność spaliła nieprawidłową ilość tokenów.',
-  'hudChrome.wocMarket.settlementFailBurnMissing': 'Płatność nie zawierała wymaganego spalenia tokenów.',
-  'hudChrome.wocMarket.settlementFailConfirmingOverdue': 'Ta płatność potwierdzała się zbyt długo i nie udało się jej zweryfikować.',
+  'hudChrome.wocMarket.settlementFailBurnMissing':
+    'Płatność nie zawierała wymaganego spalenia tokenów.',
+  'hudChrome.wocMarket.settlementFailConfirmingOverdue':
+    'Ta płatność potwierdzała się zbyt długo i nie udało się jej zweryfikować.',
   'hudChrome.wocMarket.settlementFailGeneric': 'Nie udało się zrealizować tej płatności.',
-  'hudChrome.wocMarket.settlementFailQuoteExpired': 'Wycena płatności wygasła, zanim została wykorzystana. Poproś o nową i zapłać ponownie.',
+  'hudChrome.wocMarket.settlementFailQuoteExpired':
+    'Wycena płatności wygasła, zanim została wykorzystana. Poproś o nową i zapłać ponownie.',
   'hudChrome.wocMarket.settlementFailRefunded': 'Ta płatność została zwrócona na twój portfel.',
   'hudChrome.wocMarket.settlementFailSuperseded': 'Ta próba płatności została zastąpiona nowszą.',
-  'hudChrome.wocMarket.settlementFailTransaction': 'Transakcja płatności nie powiodła się w sieci. Poproś o nową wycenę i spróbuj ponownie.',
-  'hudChrome.wocMarket.settlementFailUnexpectedCredit': 'Transakcja opłaciła portfel spoza tego zakupu.',
+  'hudChrome.wocMarket.settlementFailTransaction':
+    'Transakcja płatności nie powiodła się w sieci. Poproś o nową wycenę i spróbuj ponownie.',
+  'hudChrome.wocMarket.settlementFailUnexpectedCredit':
+    'Transakcja opłaciła portfel spoza tego zakupu.',
   'hudChrome.wocMarket.settlementFailed': 'Płatność nie powiodła się',
   'hudChrome.wocMarket.settlementOffered': 'Płatność wymagana',
   'hudChrome.wocMarket.settlementReview': 'Płatność w trakcie sprawdzania',
-  'hudChrome.wocMarket.signFailed': 'Twój portfel nie ukończył płatności. Sprawdź portfel i spróbuj ponownie.',
-  'hudChrome.wocMarket.signFailedConfirm': 'Twój portfel nie podpisał potwierdzenia. Sprawdź portfel i spróbuj ponownie.',
+  'hudChrome.wocMarket.signFailed':
+    'Twój portfel nie ukończył płatności. Sprawdź portfel i spróbuj ponownie.',
+  'hudChrome.wocMarket.signFailedConfirm':
+    'Twój portfel nie podpisał potwierdzenia. Sprawdź portfel i spróbuj ponownie.',
   'hudChrome.wocMarket.signing': 'Oczekiwanie na twój portfel...',
   'hudChrome.wocMarket.sortEnding': 'Kończy się najszybciej',
   'hudChrome.wocMarket.sortLabel': 'Sortuj',
   'hudChrome.wocMarket.sortNewest': 'Najnowsze',
   'hudChrome.wocMarket.sortPriceAsc': 'Cena: od najniższej do najwyższej',
   'hudChrome.wocMarket.sortPriceDesc': 'Cena: od najwyższej do najniższej',
-  'hudChrome.wocMarket.strikesTip': 'Przewinienie naliczane jest za każdym razem, gdy nie dojdzie do zapłaty za ofertę, do której się zobowiązano. Po pierwszym każde kolejne przewinienie zawiesza dostęp do Giełdy na dłużej: 3 dni, potem 14, potem 90, a następnie rok.',
+  'hudChrome.wocMarket.strikesTip':
+    'Przewinienie naliczane jest za każdym razem, gdy nie dojdzie do zapłaty za ofertę, do której się zobowiązano. Po pierwszym każde kolejne przewinienie zawiesza dostęp do Giełdy na dłużej: 3 dni, potem 14, potem 90, a następnie rok.',
   'hudChrome.wocMarket.tabActivity': 'Moja aktywność',
   'hudChrome.wocMarket.tabBrowse': 'Przeglądaj',
   'hudChrome.wocMarket.tabSell': 'Sprzedaj',
@@ -495,29 +670,45 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLabel': 'Akceptuję regulamin Giełdy.',
   'hudChrome.wocMarket.termsLink': 'Wyświetl regulamin Giełdy (otwiera się w nowej karcie)',
   'hudChrome.wocMarket.title': 'Giełda $WOC',
-  'hudChrome.wocMarket.variableTokenWarning': 'Zobowiązujesz się zapłacić równowartość w USD w tokenach $WOC. Dokładna ilość tokenów jest ustalana przez nową wycenę w momencie żądania płatności i może różnić się od szacunku.',
+  'hudChrome.wocMarket.variableTokenWarning':
+    'Zobowiązujesz się zapłacić równowartość w USD w tokenach $WOC. Dokładna ilość tokenów jest ustalana przez nową wycenę w momencie żądania płatności i może różnić się od szacunku.',
   'hudChrome.wocMarket.yourListing': 'Twoje wystawienie',
-  'hudChrome.wocMarket.yourListingTip': 'Wystawiłeś ten przedmiot. Nie możesz licytować własnego wystawienia; dopóki nie ma ono żadnych ofert, możesz je anulować tutaj lub w zakładce Moja aktywność.',
+  'hudChrome.wocMarket.yourListingTip':
+    'Wystawiłeś ten przedmiot. Nie możesz licytować własnego wystawienia; dopóki nie ma ono żadnych ofert, możesz je anulować tutaj lub w zakładce Moja aktywność.',
   'apiError.guilds.invalid_roster_name': 'Nieprawidłowa nazwa gildii.',
   'apiError.guilds.unknown': 'Nie znaleziono gildii o tej nazwie.',
-  'apiError.woc_market.already_pending': 'Najpierw potwierdź lub porzuć swoją oczekującą ofertę na to wystawienie.',
-  'apiError.woc_market.bid_too_low': 'Twoja oferta nie przewyższa obecnej oferty powiększonej o wymagany krok podbicia.',
-  'apiError.woc_market.bond_window_closed': 'Tej oferty nie można już opłacić: jej okno płatności zostało zamknięte. Zalicytuj ponownie, aby otworzyć nowe.',
-  'apiError.woc_market.buy_now_locked': 'Inny kupujący finalizuje ten zakup. Spróbuj ponownie za chwilę.',
+  'apiError.woc_market.already_pending':
+    'Najpierw potwierdź lub porzuć swoją oczekującą ofertę na to wystawienie.',
+  'apiError.woc_market.bid_too_low':
+    'Twoja oferta nie przewyższa obecnej oferty powiększonej o wymagany krok podbicia.',
+  'apiError.woc_market.bond_window_closed':
+    'Tej oferty nie można już opłacić: jej okno płatności zostało zamknięte. Zalicytuj ponownie, aby otworzyć nowe.',
+  'apiError.woc_market.buy_now_locked':
+    'Inny kupujący finalizuje ten zakup. Spróbuj ponownie za chwilę.',
   'apiError.woc_market.cancel_pending': 'Sprzedawca anuluje to wystawienie.',
   'apiError.woc_market.cap_reached': 'Osiągnięto twój limit wystawień na Giełdzie.',
-  'apiError.woc_market.character_invalid': 'Wejdź do gry postacią, z której wystawiasz ten przedmiot, i spróbuj ponownie.',
-  'apiError.woc_market.claim_cooldown': 'Niedawno zrezygnowałeś z zakupu przez Kup teraz. Spróbuj ponownie później.',
-  'apiError.woc_market.confirm_failed': 'Nie udało się potwierdzić transakcji. Poproś o nową wycenę i spróbuj ponownie.',
-  'apiError.woc_market.confirm_in_flight': 'Twoja płatność wciąż się potwierdza. Spróbuj ponownie, gdy się rozstrzygnie.',
-  'apiError.woc_market.contended': 'Giełda jest teraz zajęta tym wystawieniem. Spróbuj ponownie za chwilę.',
+  'apiError.woc_market.character_invalid':
+    'Wejdź do gry postacią, z której wystawiasz ten przedmiot, i spróbuj ponownie.',
+  'apiError.woc_market.claim_cooldown':
+    'Niedawno zrezygnowałeś z zakupu przez Kup teraz. Spróbuj ponownie później.',
+  'apiError.woc_market.confirm_failed':
+    'Nie udało się potwierdzić transakcji. Poproś o nową wycenę i spróbuj ponownie.',
+  'apiError.woc_market.confirm_in_flight':
+    'Twoja płatność wciąż się potwierdza. Spróbuj ponownie, gdy się rozstrzygnie.',
+  'apiError.woc_market.contended':
+    'Giełda jest teraz zajęta tym wystawieniem. Spróbuj ponownie za chwilę.',
   'apiError.woc_market.disabled': 'Giełda $WOC nie jest dostępna na tym realmie.',
-  'apiError.woc_market.has_bids': 'Wystawienia z ofertami nie można wycofać. Skontaktuj się z pomocą techniczną, jeśli musisz je anulować.',
-  'apiError.woc_market.insufficient_balance': 'Twój portfel nie ma wystarczająco dużo $WOC na tę ofertę i jej kaucję.',
+  'apiError.woc_market.has_bids':
+    'Wystawienia z ofertami nie można wycofać. Skontaktuj się z pomocą techniczną, jeśli musisz je anulować.',
+  'apiError.woc_market.insufficient_balance':
+    'Twój portfel nie ma wystarczająco dużo $WOC na tę ofertę i jej kaucję.',
   'apiError.woc_market.invalid_input': 'Nieprawidłowe dane wejściowe.',
-  'apiError.woc_market.invalid_params': 'Sprawdź stawkę początkową, cenę minimalną, cenę natychmiastowego zakupu i czas trwania.',
-  'apiError.woc_market.item_locked': 'Ten przedmiot jest zablokowany. Odblokuj go w torbach, zanim go sprzedasz.',
-  'apiError.woc_market.item_mismatch': 'To nie jest dokładnie ta sama kopia, na którą zgodził się kupujący, albo jej stan się zmienił (blokada też się liczy). Rozpocznij dla niej nową transakcję.',
+  'apiError.woc_market.invalid_params':
+    'Sprawdź stawkę początkową, cenę minimalną, cenę natychmiastowego zakupu i czas trwania.',
+  'apiError.woc_market.item_locked':
+    'Ten przedmiot jest zablokowany. Odblokuj go w torbach, zanim go sprzedasz.',
+  'apiError.woc_market.item_mismatch':
+    'To nie jest dokładnie ta sama kopia, na którą zgodził się kupujący, albo jej stan się zmienił (blokada też się liczy). Rozpocznij dla niej nową transakcję.',
   'apiError.woc_market.no_buy_now': 'To wystawienie nie ma ceny natychmiastowego zakupu.',
   'apiError.woc_market.not_active': 'To wystawienie nie jest już otwarte na tę czynność.',
   'apiError.woc_market.not_eligible': 'Tego przedmiotu nie można wystawić na Giełdzie $WOC.',
@@ -525,113 +716,162 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.not_pending': 'Ta oferta nie czeka już na swoją kaucję.',
   'apiError.woc_market.not_yours': 'Ten wpis Giełdy już nie istnieje.',
   'apiError.woc_market.offer_expired': 'Ta propozycja $WOC wygasła. Poproś o nową.',
-  'apiError.woc_market.offer_pending': 'Masz już otwartą transakcję z tym graczem. Najpierw ją rozstrzygnij.',
+  'apiError.woc_market.offer_pending':
+    'Masz już otwartą transakcję z tym graczem. Najpierw ją rozstrzygnij.',
   'apiError.woc_market.own_listing': 'Nie możesz licytować ani kupować własnego wystawienia.',
   'apiError.woc_market.paused': 'Handel na Giełdzie jest wstrzymany. Aukcje nadal odliczają czas.',
-  'apiError.woc_market.quote_expired': 'Ta wycena wygasła. Poproś o nową; jeśli żadna nie zostanie zaproponowana, to okno się zamknęło.',
-  'apiError.woc_market.quote_unavailable': 'Nie udało się teraz wystawić wyceny. Spróbuj ponownie za chwilę.',
-  'apiError.woc_market.recipient_wallet_required': 'Ten gracz musi połączyć portfel, zanim będzie mógł przyjmować płatności $WOC.',
-  'apiError.woc_market.sale_conflict': 'Dla tego wystawienia istnieje już inny aktywny zapis sprzedaży. Najpierw go wyklucz.',
+  'apiError.woc_market.quote_expired':
+    'Ta wycena wygasła. Poproś o nową; jeśli żadna nie zostanie zaproponowana, to okno się zamknęło.',
+  'apiError.woc_market.quote_unavailable':
+    'Nie udało się teraz wystawić wyceny. Spróbuj ponownie za chwilę.',
+  'apiError.woc_market.recipient_wallet_required':
+    'Ten gracz musi połączyć portfel, zanim będzie mógł przyjmować płatności $WOC.',
+  'apiError.woc_market.sale_conflict':
+    'Dla tego wystawienia istnieje już inny aktywny zapis sprzedaży. Najpierw go wyklucz.',
   'apiError.woc_market.self_offer': 'Nie możesz wysłać propozycji $WOC samemu sobie.',
-  'apiError.woc_market.settlement_in_flight': 'Kupujący właśnie płaci za to wystawienie. Spróbuj ponownie, gdy płatność się rozliczy.',
+  'apiError.woc_market.settlement_in_flight':
+    'Kupujący właśnie płaci za to wystawienie. Spróbuj ponownie, gdy płatność się rozliczy.',
   'apiError.woc_market.signature_reused': 'Ta transakcja została już wysłana.',
-  'apiError.woc_market.stale_item': 'Ten przedmiot zmienił się albo został przeniesiony. Wybierz go ponownie i spróbuj jeszcze raz.',
-  'apiError.woc_market.stepup_binding_mismatch': 'To potwierdzenie portfela nie pasuje do tej sprzedaży. Rozpocznij sprzedaż od nowa.',
-  'apiError.woc_market.stepup_challenge_expired': 'Potwierdzenie portfela wygasło. Rozpocznij sprzedaż od nowa.',
-  'apiError.woc_market.stepup_challenge_invalid': 'To potwierdzenie portfela nie jest już ważne. Rozpocznij sprzedaż od nowa.',
-  'apiError.woc_market.stepup_required': 'Sprzedaż na Giełdzie wymaga podpisu z twojego podłączonego portfela.',
-  'apiError.woc_market.stepup_signature_invalid': 'Podpis portfela nie został zweryfikowany. Rozpocznij sprzedaż od nowa.',
-  'apiError.woc_market.stepup_wallet_mismatch': 'Twój podłączony portfel zmienił się, odkąd wydano to potwierdzenie. Rozpocznij sprzedaż od nowa.',
-  'apiError.woc_market.suspended': 'Twój dostęp do Giełdy jest zawieszony po nieopłaconych transakcjach: żadnych ofert, zakupów, wystawień ani transakcji $WOC.',
+  'apiError.woc_market.stale_item':
+    'Ten przedmiot zmienił się albo został przeniesiony. Wybierz go ponownie i spróbuj jeszcze raz.',
+  'apiError.woc_market.stepup_binding_mismatch':
+    'To potwierdzenie portfela nie pasuje do tej sprzedaży. Rozpocznij sprzedaż od nowa.',
+  'apiError.woc_market.stepup_challenge_expired':
+    'Potwierdzenie portfela wygasło. Rozpocznij sprzedaż od nowa.',
+  'apiError.woc_market.stepup_challenge_invalid':
+    'To potwierdzenie portfela nie jest już ważne. Rozpocznij sprzedaż od nowa.',
+  'apiError.woc_market.stepup_required':
+    'Sprzedaż na Giełdzie wymaga podpisu z twojego podłączonego portfela.',
+  'apiError.woc_market.stepup_signature_invalid':
+    'Podpis portfela nie został zweryfikowany. Rozpocznij sprzedaż od nowa.',
+  'apiError.woc_market.stepup_wallet_mismatch':
+    'Twój podłączony portfel zmienił się, odkąd wydano to potwierdzenie. Rozpocznij sprzedaż od nowa.',
+  'apiError.woc_market.suspended':
+    'Twój dostęp do Giełdy jest zawieszony po nieopłaconych transakcjach: żadnych ofert, zakupów, wystawień ani transakcji $WOC.',
   'apiError.woc_market.terms_required': 'Zaakceptuj regulamin Giełdy, aby kontynuować.',
-  'apiError.woc_market.totp_invalid': 'Ten kod uwierzytelniania dwuskładnikowego nie został zweryfikowany. Spróbuj ponownie.',
-  'apiError.woc_market.totp_required': 'Ta kwota wymaga uwierzytelniania dwuskładnikowego. Włącz je w ustawieniach konta, a potem wpisz swój kod.',
-  'apiError.woc_market.wallet_required': 'Połącz i zweryfikuj portfel, zanim zaczniesz handlować na Giełdzie.',
+  'apiError.woc_market.totp_invalid':
+    'Ten kod uwierzytelniania dwuskładnikowego nie został zweryfikowany. Spróbuj ponownie.',
+  'apiError.woc_market.totp_required':
+    'Ta kwota wymaga uwierzytelniania dwuskładnikowego. Włącz je w ustawieniach konta, a potem wpisz swój kod.',
+  'apiError.woc_market.wallet_required':
+    'Połącz i zweryfikuj portfel, zanim zaczniesz handlować na Giełdzie.',
   'entities.items.mother_of_pearl.name': 'Macica Perłowa',
   'entities.items.ps_briny_lure.name': 'Słona Przynęta',
   'entities.items.ps_castaway_crate.name': 'Skrzynia Rozbitka',
   'entities.items.ps_ferry_bell.name': 'Dzwon Promu',
   'entities.items.ps_lustrous_pearl.name': 'Lśniąca Perła',
   'entities.items.ps_passing_stone.name': 'Kamień Przejścia',
-  'entities.letters.woc_market_delivery.body': 'Sprzedaż jest rozliczona, a towar jest twój. Załączona paczka niesie dokładnie ten przedmiot, za który zapłaciłeś, przechowywany w depozycie od chwili wystawienia aż do zaksięgowania twojej płatności.\n\nZapis tej sprzedaży widnieje w rejestrze Giełdy.\n\n- Makler Giełdy $WOC',
+  'entities.letters.woc_market_delivery.body':
+    'Sprzedaż jest rozliczona, a towar jest twój. Załączona paczka niesie dokładnie ten przedmiot, za który zapłaciłeś, przechowywany w depozycie od chwili wystawienia aż do zaksięgowania twojej płatności.\n\nZapis tej sprzedaży widnieje w rejestrze Giełdy.\n\n- Makler Giełdy $WOC',
   'entities.letters.woc_market_delivery.sender': 'Makler Giełdy $WOC',
   'entities.letters.woc_market_delivery.subject': 'Twój zakup na Giełdzie',
-  'entities.letters.woc_market_return.body': 'Twoje wystawienie zakończyło się bez sfinalizowanej sprzedaży: aukcja nie znalazła kupca, nie osiągnięto ceny minimalnej, wystawienie zostało wycofane, albo zwycięski licytujący nie dokonał rozliczenia. Twój towar wraca do ciebie nienaruszony wraz z tym listem, dokładnie taki, jaki został złożony w depozycie.\n\n- Makler Giełdy $WOC',
+  'entities.letters.woc_market_return.body':
+    'Twoje wystawienie zakończyło się bez sfinalizowanej sprzedaży: aukcja nie znalazła kupca, nie osiągnięto ceny minimalnej, wystawienie zostało wycofane, albo zwycięski licytujący nie dokonał rozliczenia. Twój towar wraca do ciebie nienaruszony wraz z tym listem, dokładnie taki, jaki został złożony w depozycie.\n\n- Makler Giełdy $WOC',
   'entities.letters.woc_market_return.sender': 'Makler Giełdy $WOC',
   'entities.letters.woc_market_return.subject': 'Twoje wystawienie na Giełdzie się zakończyło',
-  'entities.letters.woc_market_sold.body': 'Twoje wystawienie zostało sprzedane, a kupujący rozliczył się w całości. Rejestr Giełdy niesie zapis tej sprzedaży, a twoja aktywność na Giełdzie pokazuje rozliczoną kwotę i jej podział.\n\n- Makler Giełdy $WOC',
+  'entities.letters.woc_market_sold.body':
+    'Twoje wystawienie zostało sprzedane, a kupujący rozliczył się w całości. Rejestr Giełdy niesie zapis tej sprzedaży, a twoja aktywność na Giełdzie pokazuje rozliczoną kwotę i jej podział.\n\n- Makler Giełdy $WOC',
   'entities.letters.woc_market_sold.sender': 'Makler Giełdy $WOC',
   'entities.letters.woc_market_sold.subject': 'Twoje wystawienie na Giełdzie zostało sprzedane',
   'entities.mobs.mister_crabs.name': 'Pan Krab',
   'entities.mobs.shore_scuttler.name': 'Czołgacz Wybrzeża',
   'entities.mobs.training_effigy.name': 'Kukła Treningowa',
-  'entities.npcs.bursar_wick.greeting': 'Złocona Szkatuła ma biurko nawet tutaj, {playerName}. Cokolwiek u mnie zdeponujesz, czeka w tym samym skarbcu, który stoi za każdym skarbnikiem w każdym mieście, bezpieczne przed wilkami, wodą i twoim własnym gorszym osądem.',
+  'entities.npcs.bursar_wick.greeting':
+    'Złocona Szkatuła ma biurko nawet tutaj, {playerName}. Cokolwiek u mnie zdeponujesz, czeka w tym samym skarbcu, który stoi za każdym skarbnikiem w każdym mieście, bezpieczne przed wilkami, wodą i twoim własnym gorszym osądem.',
   'entities.npcs.bursar_wick.name': 'Skarbnik Wick',
   'entities.npcs.bursar_wick.title': 'Złocona Szkatuła',
-  'entities.npcs.drillmaster_rook.greeting': 'Najpierw słoma, potem skorupy, {playerName}. Kukła uczy twoje ramię zamachu; czołgacze w dole, na plaży, uczą go trafiać w coś, co się tym przejmuje.',
+  'entities.npcs.drillmaster_rook.greeting':
+    'Najpierw słoma, potem skorupy, {playerName}. Kukła uczy twoje ramię zamachu; czołgacze w dole, na plaży, uczą go trafiać w coś, co się tym przejmuje.',
   'entities.npcs.drillmaster_rook.name': 'Musztromistrz Rook',
   'entities.npcs.drillmaster_rook.title': 'Mistrz Placu',
-  'entities.npcs.ferryman_odo.greeting': 'Świeżo po przeprawie, {playerName}? Strażnik Tam prowadzi Tor Przeszkód na plaży, tuż na południe od mojego pomostu: przebiegnij najpierw jego tory, a twoje nogi ci podziękują. Każdy stróż na tym wybrzeżu przekazuje cię następnemu, gdy twoja praca jest skończona, a karta na górze ekranu zawsze zna drogę. Gdy dolina wezwie cię z powrotem, uderz w dzwon stojący obok mojego pomostu, a przeprawa postawi cię w mieście Eastbrook.',
+  'entities.npcs.ferryman_odo.greeting':
+    'Świeżo po przeprawie, {playerName}? Strażnik Tam prowadzi Tor Przeszkód na plaży, tuż na południe od mojego pomostu: przebiegnij najpierw jego tory, a twoje nogi ci podziękują. Każdy stróż na tym wybrzeżu przekazuje cię następnemu, gdy twoja praca jest skończona, a karta na górze ekranu zawsze zna drogę. Gdy dolina wezwie cię z powrotem, uderz w dzwon stojący obok mojego pomostu, a przeprawa postawi cię w mieście Eastbrook.',
   'entities.npcs.ferryman_odo.name': 'Przewoźnik Odo',
   'entities.npcs.ferryman_odo.title': 'Stróż Przeprawy',
-  'entities.npcs.instructor_maren.greeting': 'Każdy bohater, jakiemu dolina kiedykolwiek podziękowała, stał tam, gdzie ty stoisz teraz, {className}, i żaden z nich nie wiedział, za który koniec ostrza trzymać. Po to jest to wybrzeże. Pytaj, ćwicz i upadaj tam, gdzie porażka nic nie kosztuje.',
+  'entities.npcs.instructor_maren.greeting':
+    'Każdy bohater, jakiemu dolina kiedykolwiek podziękowała, stał tam, gdzie ty stoisz teraz, {className}, i żaden z nich nie wiedział, za który koniec ostrza trzymać. Po to jest to wybrzeże. Pytaj, ćwicz i upadaj tam, gdzie porażka nic nie kosztuje.',
   'entities.npcs.instructor_maren.name': 'Instruktorka Maren',
   'entities.npcs.instructor_maren.title': 'Mistrzyni Prób',
-  'entities.npcs.overseer_pell.greeting': 'Mierzę czas każdego biegu, który schodzi tymi torami, {playerName}, i widziałem znacznie gorszą pracę nóg. Ścieżka za mną wspina się do placu ćwiczeń: to tam praca nóg zamienia się w pracę mieczem.',
+  'entities.npcs.overseer_pell.greeting':
+    'Mierzę czas każdego biegu, który schodzi tymi torami, {playerName}, i widziałem znacznie gorszą pracę nóg. Ścieżka za mną wspina się do placu ćwiczeń: to tam praca nóg zamienia się w pracę mieczem.',
   'entities.npcs.overseer_pell.name': 'Nadzorca Pell',
   'entities.npcs.overseer_pell.title': 'Nadzorca Toru Przeszkód',
-  'entities.npcs.quartermaster_finch.greeting': 'Mój kontuar trzyma na sprzedaż dokładnie jedną rzecz, {playerName}: zapasową sakwę na to, co zbierzesz po drodze, gdy zażąda tego twoja lekcja. Wszystko inne tutaj to złom przeznaczony do doliny. Moneta kupuje sakwę, a praca zarabia monetę. To cała ta gospodarka i nigdy nie robi się bardziej skomplikowana. Tylko większa.',
+  'entities.npcs.quartermaster_finch.greeting':
+    'Mój kontuar trzyma na sprzedaż dokładnie jedną rzecz, {playerName}: zapasową sakwę na to, co zbierzesz po drodze, gdy zażąda tego twoja lekcja. Wszystko inne tutaj to złom przeznaczony do doliny. Moneta kupuje sakwę, a praca zarabia monetę. To cała ta gospodarka i nigdy nie robi się bardziej skomplikowana. Tylko większa.',
   'entities.npcs.quartermaster_finch.name': 'Kwatermistrzyni Finch',
   'entities.npcs.quartermaster_finch.title': 'Zaopatrzeniowiec Obozu',
-  'entities.npcs.tidewarden_nel.greeting': 'Przypływ zabiera i przypływ płaci, {playerName}. Prowadzę rachunek obu tych rzeczy: tego, co czołgacze wyrywają z wraków, i tego, co uczciwe ręce znoszą z powrotem tą ścieżką.',
+  'entities.npcs.tidewarden_nel.greeting':
+    'Przypływ zabiera i przypływ płaci, {playerName}. Prowadzę rachunek obu tych rzeczy: tego, co czołgacze wyrywają z wraków, i tego, co uczciwe ręce znoszą z powrotem tą ścieżką.',
   'entities.npcs.tidewarden_nel.name': 'Strażniczka Przypływu Nel',
   'entities.npcs.tidewarden_nel.title': 'Strażniczka Wybrzeża',
-  'entities.npcs.warden_tam.greeting': 'Te tory to Tor Przeszkód, {playerName}, i przebiegł je każdy poszukiwacz przygód, którego dolina szanuje. Latarnie na słupach płoną całą noc, więc tory nigdy się nie zamykają.',
+  'entities.npcs.warden_tam.greeting':
+    'Te tory to Tor Przeszkód, {playerName}, i przebiegł je każdy poszukiwacz przygód, którego dolina szanuje. Latarnie na słupach płoną całą noc, więc tory nigdy się nie zamykają.',
   'entities.npcs.warden_tam.name': 'Strażnik Tam',
   'entities.npcs.warden_tam.title': 'Stróż Toru Przeszkód',
-  'entities.npcs.wayfarer_bryn.greeting': 'Eastbrook przyjmuje każdego przybysza, przyjacielu. A dla niepewnych zawsze jest Wybrzeże Prób: dzwon promu przy skrzynce Kruczej Poczty przeprawi cię o każdej porze roku, a jego bliźniak na wyspie odeśle cię z powrotem do domu.',
+  'entities.npcs.wayfarer_bryn.greeting':
+    'Eastbrook przyjmuje każdego przybysza, przyjacielu. A dla niepewnych zawsze jest Wybrzeże Prób: dzwon promu przy skrzynce Kruczej Poczty przeprawi cię o każdej porze roku, a jego bliźniak na wyspie odeśle cię z powrotem do domu.',
   'entities.npcs.wayfarer_bryn.name': 'Wędrowiec Bryn',
   'entities.npcs.wayfarer_bryn.title': 'Przewodnik Portowy',
-  'entities.quests.q_ps_hone_the_edge.completion': 'Teraz walczysz, zamiast wymachiwać rękami na oślep. Ten rząd rośnie z każdym poziomem, który zdobędziesz, {playerName}, a najdłużej żyją ci, którzy potrafią go czytać. Słomie nie zależy, którego przycisku użyłeś. Dolinie będzie zależało.',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    'Teraz walczysz, zamiast wymachiwać rękami na oślep. Ten rząd rośnie z każdym poziomem, który zdobędziesz, {playerName}, a najdłużej żyją ci, którzy potrafią go czytać. Słomie nie zależy, którego przycisku użyłeś. Dolinie będzie zależało.',
   'entities.quests.q_ps_hone_the_edge.objectives.0.label': 'Zdolność trafiona w kukłę',
-  'entities.quests.q_ps_hone_the_edge.text': 'Zamach to zamach, {playerName}, a słoma zniesie go cały dzień. To nie jest to, co ci coś da. Spójrz na rząd przycisków wzdłuż dołu ekranu: ten rząd to twój kunszt, i każdy z nich robi coś, czego samo ramię nie potrafi. Jeden już masz. Wróć do kukieł i go użyj: wybierz cel, a potem naciśnij przycisk, który wskaże ci plac, trzy razy z rzędu. Nie tnij po prostu słomy; spraw, by to, co umiesz, naprawdę się wydarzyło. Potem wróć do mnie.',
+  'entities.quests.q_ps_hone_the_edge.text':
+    'Zamach to zamach, {playerName}, a słoma zniesie go cały dzień. To nie jest to, co ci coś da. Spójrz na rząd przycisków wzdłuż dołu ekranu: ten rząd to twój kunszt, i każdy z nich robi coś, czego samo ramię nie potrafi. Jeden już masz. Wróć do kukieł i go użyj: wybierz cel, a potem naciśnij przycisk, który wskaże ci plac, trzy razy z rzędu. Nie tnij po prostu słomy; spraw, by to, co umiesz, naprawdę się wydarzyło. Potem wróć do mnie.',
   'entities.quests.q_ps_hone_the_edge.title': 'Wyostrz Ostrze',
-  'entities.quests.q_ps_mother_of_pearl.completion': 'Lśniąca Perła, wydarta samemu staremu królowi płycizn. Mój ojciec uchylał przed tym krabem kapelusza każdego ranka swojego pracowitego życia; należy mu się trochę szacunku. Zamrzyj na chwilę... o, właśnie. Nawleczona, oprawiona i twoja, {playerName}: Macica Perłowa. Wciśnij B, by otworzyć torby, i kliknij lewym przyciskiem pierścień, by go założyć, a potem wciśnij C, by otworzyć kartę postaci i zobaczyć go na swojej dłoni. Drobiazg, ale każda część ciebie jest lepsza, gdy go nosisz.',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    'Lśniąca Perła, wydarta samemu staremu królowi płycizn. Mój ojciec uchylał przed tym krabem kapelusza każdego ranka swojego pracowitego życia; należy mu się trochę szacunku. Zamrzyj na chwilę... o, właśnie. Nawleczona, oprawiona i twoja, {playerName}: Macica Perłowa. Wciśnij B, by otworzyć torby, i kliknij lewym przyciskiem pierścień, by go założyć, a potem wciśnij C, by otworzyć kartę postaci i zobaczyć go na swojej dłoni. Drobiazg, ale każda część ciebie jest lepsza, gdy go nosisz.',
   'entities.quests.q_ps_mother_of_pearl.objectives.0.label': 'Pan Krab pokonany',
   'entities.quests.q_ps_mother_of_pearl.objectives.1.label': 'Lśniąca Perła zdobyta',
-  'entities.quests.q_ps_mother_of_pearl.text': 'Trzy skorupy pękły, {playerName}, ale linia wraków ma swojego króla, a on siedzi na skarbie wartym więcej niż wszystkie skrzynie na tej plaży. Zanieś tę Słoną Przynętę do sadzawki pływowej na dalekim zachodnim krańcu plaży, za wrakami. Stań przy krawędzi wody, wciśnij B, by otworzyć torby, i kliknij lewym przyciskiem przynętę, by go obudzić. Pan Krab szczypie znacznie mocniej niż jego mali kuzyni, więc pilnuj paska zdrowia, zadawaj ciosy dalej i cofnij się po piasku, jeśli potrzebujesz odetchnąć. Gdy padnie, podejdź prosto do jego skorupy i wciśnij F, by obłupić z niego Lśniącą Perłę. Przynieś tę perłę z powrotem do mnie.',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    'Trzy skorupy pękły, {playerName}, ale linia wraków ma swojego króla, a on siedzi na skarbie wartym więcej niż wszystkie skrzynie na tej plaży. Zanieś tę Słoną Przynętę do sadzawki pływowej na dalekim zachodnim krańcu plaży, za wrakami. Stań przy krawędzi wody, wciśnij B, by otworzyć torby, i kliknij lewym przyciskiem przynętę, by go obudzić. Pan Krab szczypie znacznie mocniej niż jego mali kuzyni, więc pilnuj paska zdrowia, zadawaj ciosy dalej i cofnij się po piasku, jeśli potrzebujesz odetchnąć. Gdy padnie, podejdź prosto do jego skorupy i wciśnij F, by obłupić z niego Lśniącą Perłę. Przynieś tę perłę z powrotem do mnie.',
   'entities.quests.q_ps_mother_of_pearl.title': 'Macica Perłowa',
-  'entities.quests.q_ps_pouch_and_purse.completion': 'Piękna sakwa. Przypnij ją, jeśli jeszcze tego nie zrobiłeś: wciśnij B, by otworzyć torby, potem kliknij lewym przyciskiem sakwę, by osadzić ją w wolnej pętli, i sześć kolejnych miejsc jest twoich, do wypełnienia kłopotami. Teraz ta połowa lekcji, której żadna torba nie pomieści, {playerName}: to, czego nie możesz nieść, przechowuje Złocona Szkatuła. Skarbnik Wick trzyma swoje biurko skarbnika w górę zachodniej ścieżki i otwiera ten sam skarbiec, który dzieli każdy skarbnik w każdym mieście; więcej miejsca w skarbcu można kupić, gdy twoja sakiewka do niego dorośnie. Trzymaj kosztowności w banku, a torby przestronne. Pełen plecak zakończył więcej przygód niż jakikolwiek wilk.',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    'Piękna sakwa. Przypnij ją, jeśli jeszcze tego nie zrobiłeś: wciśnij B, by otworzyć torby, potem kliknij lewym przyciskiem sakwę, by osadzić ją w wolnej pętli, i sześć kolejnych miejsc jest twoich, do wypełnienia kłopotami. Teraz ta połowa lekcji, której żadna torba nie pomieści, {playerName}: to, czego nie możesz nieść, przechowuje Złocona Szkatuła. Skarbnik Wick trzyma swoje biurko skarbnika w górę zachodniej ścieżki i otwiera ten sam skarbiec, który dzieli każdy skarbnik w każdym mieście; więcej miejsca w skarbcu można kupić, gdy twoja sakiewka do niego dorośnie. Trzymaj kosztowności w banku, a torby przestronne. Pełen plecak zakończył więcej przygód niż jakikolwiek wilk.',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': 'Lniana Sakwa kupiona',
-  'entities.quests.q_ps_pouch_and_purse.text': 'Jeszcze jedna lekcja przed doliną, {playerName}, i to ta, która utrzymuje poszukiwaczy przygód przy życiu: to, co niesiesz. Twój plecak mieści szesnaście miejsc, a obok niego czekają cztery puste pętle na torby; każda torba, którą przypniesz, dokłada swoją przestrzeń do puli. Zatem: wciśnij F na mnie jeszcze raz, by otworzyć mój kramik, kliknij lewym przyciskiem Lnianą Sakwę w moim towarze, by ją kupić, a potem wciśnij B, by otworzyć torby, i kliknij lewym przyciskiem sakwę tam, by przypiąć ją do wolnej pętli. Instruktorka Maren musztruje przy ognisku zbiórki kilka kroków na wschód: pokaż jej sakwę u pasa.',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    'Jeszcze jedna lekcja przed doliną, {playerName}, i to ta, która utrzymuje poszukiwaczy przygód przy życiu: to, co niesiesz. Twój plecak mieści szesnaście miejsc, a obok niego czekają cztery puste pętle na torby; każda torba, którą przypniesz, dokłada swoją przestrzeń do puli. Zatem: wciśnij F na mnie jeszcze raz, by otworzyć mój kramik, kliknij lewym przyciskiem Lnianą Sakwę w moim towarze, by ją kupić, a potem wciśnij B, by otworzyć torby, i kliknij lewym przyciskiem sakwę tam, by przypiąć ją do wolnej pętli. Instruktorka Maren musztruje przy ognisku zbiórki kilka kroków na wschód: pokaż jej sakwę u pasa.',
   'entities.quests.q_ps_pouch_and_purse.title': 'Sakwa i Mieszek',
-  'entities.quests.q_ps_set_sail.completion': 'Maren tak powiedziała, tak? Wysoka pochwała od kobiety, która kiedyś kazała mi ćwiczyć węzły cumownicze przez cały tydzień. Uderz w dzwon stojący obok mojego pomostu, kiedy tylko będziesz gotowy, {playerName}, a przeprawa postawi cię na środku miasta Eastbrook. Uważaj na wilki.',
+  'entities.quests.q_ps_set_sail.completion':
+    'Maren tak powiedziała, tak? Wysoka pochwała od kobiety, która kiedyś kazała mi ćwiczyć węzły cumownicze przez cały tydzień. Uderz w dzwon stojący obok mojego pomostu, kiedy tylko będziesz gotowy, {playerName}, a przeprawa postawi cię na środku miasta Eastbrook. Uważaj na wilki.',
   'entities.quests.q_ps_set_sail.objectives.0.label': 'Zgłoś się do Przewoźnika Odo',
-  'entities.quests.q_ps_set_sail.text': 'Nie zostało na tym wybrzeżu nic, czego jeszcze nie przebiegłeś, nie pokonałeś, nie otworzyłeś albo nie kupiłeś, {playerName}. Jesteś gotowy, a w Eastbrook czeka prawdziwa praca. Zejdź drogą wybrzeża z powrotem do pomostu, wciśnij F na Przewoźniku Odo i powiedz mu, że to ja kazałam, byś zarobił sobie na przeprawę. Wciśnij L, ilekroć zgubisz się w tym, co komu jesteś winien: to twój dziennik zadań.',
+  'entities.quests.q_ps_set_sail.text':
+    'Nie zostało na tym wybrzeżu nic, czego jeszcze nie przebiegłeś, nie pokonałeś, nie otworzyłeś albo nie kupiłeś, {playerName}. Jesteś gotowy, a w Eastbrook czeka prawdziwa praca. Zejdź drogą wybrzeża z powrotem do pomostu, wciśnij F na Przewoźniku Odo i powiedz mu, że to ja kazałam, byś zarobił sobie na przeprawę. Wciśnij L, ilekroć zgubisz się w tym, co komu jesteś winien: to twój dziennik zadań.',
   'entities.quests.q_ps_set_sail.title': 'Podnieś Żagle',
-  'entities.quests.q_ps_shell_and_claw.completion': 'Trzy pęknięte skorupy, a wszystkie twoje palce ocalone: uczciwa pierwsza walka, {playerName}. Czołgacze obrywają z wraków szybciej, niż przypływ znosi na brzeg złom, więc każdy, którego wybijesz, to moneta, którą ktoś zatrzyma.',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    'Trzy pęknięte skorupy, a wszystkie twoje palce ocalone: uczciwa pierwsza walka, {playerName}. Czołgacze obrywają z wraków szybciej, niż przypływ znosi na brzeg złom, więc każdy, którego wybijesz, to moneta, którą ktoś zatrzyma.',
   'entities.quests.q_ps_shell_and_claw.objectives.0.label': 'Czołgacz Wybrzeża wybity',
-  'entities.quests.q_ps_shell_and_claw.text': 'Słomie nigdy nie zależy, {playerName}, więc oto coś, czemu zależy. Czołgacze wybrzeża przetrząsają linię wraków na dalekiej plaży: idź ścieżką na zachód od mojego placu, a zaprowadzi cię prosto do nich. One oddają szczypcami, więc pilnuj paska zdrowia i zadawaj ciosy dalej: kliknij jednego lewym przyciskiem, by uczynić go celem, potem użyj zdolności, której nauczył cię plac (instruktor nazywa ci twój przycisk), i nie przestawaj, aż jego skorupa pęknie. Trzy wystarczą. Potem wspnij się ścieżką na północne wzniesienie: Strażniczka Przypływu Nel prowadzi rachunek plaży i liczy twoje skorupy.',
+  'entities.quests.q_ps_shell_and_claw.text':
+    'Słomie nigdy nie zależy, {playerName}, więc oto coś, czemu zależy. Czołgacze wybrzeża przetrząsają linię wraków na dalekiej plaży: idź ścieżką na zachód od mojego placu, a zaprowadzi cię prosto do nich. One oddają szczypcami, więc pilnuj paska zdrowia i zadawaj ciosy dalej: kliknij jednego lewym przyciskiem, by uczynić go celem, potem użyj zdolności, której nauczył cię plac (instruktor nazywa ci twój przycisk), i nie przestawaj, aż jego skorupa pęknie. Trzy wystarczą. Potem wspnij się ścieżką na północne wzniesienie: Strażniczka Przypływu Nel prowadzi rachunek plaży i liczy twoje skorupy.',
   'entities.quests.q_ps_shell_and_claw.title': 'Skorupa i Szczypce',
-  'entities.quests.q_ps_strike_true.completion': 'Jedno czyste powalenie, a twój chwyt już pewniejszy. Zapamiętaj to uczucie, {playerName}: cel, cios i kolejny cios. Słomie nigdy nie zależy. Następnej rzeczy, w którą uderzysz, będzie.',
+  'entities.quests.q_ps_strike_true.completion':
+    'Jedno czyste powalenie, a twój chwyt już pewniejszy. Zapamiętaj to uczucie, {playerName}: cel, cios i kolejny cios. Słomie nigdy nie zależy. Następnej rzeczy, w którą uderzysz, będzie.',
   'entities.quests.q_ps_strike_true.objectives.0.label': 'Kukła Treningowa powalona',
-  'entities.quests.q_ps_strike_true.text': 'Najpierw praca nóg, teraz ramię, {playerName}. Plac ćwiczeń leży w górę ścieżki za mną, a jego słomiane kukły zbudowano po to, by je bito. Jeśli zgubisz drogę, wciśnij M, by otworzyć mapę: każde zadanie, które niesiesz, jest na niej zaznaczone. Podejdź do kukły i kliknij ją lewym przyciskiem: to uczyni ją twoim celem, a jej nazwa pojawi się na górze ekranu. Dopiero wtedy wciśnij 1, albo kliknij pierwszą ikonę na pasku akcji wzdłuż dołu, by zamachnąć się. Zadawaj ciosy, aż któraś padnie; nie odda ciosu, kukły nigdy tego nie robią. Musztromistrz Rook obserwuje plac z jego zachodniego skraju, gdzie zaczyna się ścieżka na plażę: wciśnij F na nim, by zameldować zwycięstwo.',
+  'entities.quests.q_ps_strike_true.text':
+    'Najpierw praca nóg, teraz ramię, {playerName}. Plac ćwiczeń leży w górę ścieżki za mną, a jego słomiane kukły zbudowano po to, by je bito. Jeśli zgubisz drogę, wciśnij M, by otworzyć mapę: każde zadanie, które niesiesz, jest na niej zaznaczone. Podejdź do kukły i kliknij ją lewym przyciskiem: to uczyni ją twoim celem, a jej nazwa pojawi się na górze ekranu. Dopiero wtedy wciśnij 1, albo kliknij pierwszą ikonę na pasku akcji wzdłuż dołu, by zamachnąć się. Zadawaj ciosy, aż któraś padnie; nie odda ciosu, kukły nigdy tego nie robią. Musztromistrz Rook obserwuje plac z jego zachodniego skraju, gdzie zaczyna się ścieżka na plażę: wciśnij F na nim, by zameldować zwycięstwo.',
   'entities.quests.q_ps_strike_true.title': 'Uderz Celnie',
-  'entities.quests.q_ps_the_gauntlet.completion': 'Zmierzyłem ten bieg, {playerName}, i widziałem szybsze nogi, którym się nie udało. Tor Przeszkód jest twój. Ścieżka za mną wspina się do placu ćwiczeń, gdzie Musztromistrz Rook zamienia pracę nóg w pracę mieczem: on ma dla ciebie następne zadanie.',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    'Zmierzyłem ten bieg, {playerName}, i widziałem szybsze nogi, którym się nie udało. Tor Przeszkód jest twój. Ścieżka za mną wspina się do placu ćwiczeń, gdzie Musztromistrz Rook zamienia pracę nóg w pracę mieczem: on ma dla ciebie następne zadanie.',
   'entities.quests.q_ps_the_gauntlet.objectives.0.label': 'Flaga Toru Przeszkód minięta',
-  'entities.quests.q_ps_the_gauntlet.text': 'Każda para nóg, którą dolina szanuje, przebiegła najpierw te tory, {playerName}. Przejdź pierwszym torem na zachód do jego flagi, zawróć, przejdź południowym torem do drugiej, a potem przejdź bokiem ostatnim torem do czerwonej flagi. Miń flagi po kolei, a karta na górze ekranu pokaże ci każdy przycisk po drodze. Nadzorca Pell mierzy czas każdego biegu z dalekiego końca: gdy czerwona flaga zostanie za tobą, stoi tam właśnie, by to przyjąć.',
+  'entities.quests.q_ps_the_gauntlet.text':
+    'Każda para nóg, którą dolina szanuje, przebiegła najpierw te tory, {playerName}. Przejdź pierwszym torem na zachód do jego flagi, zawróć, przejdź południowym torem do drugiej, a potem przejdź bokiem ostatnim torem do czerwonej flagi. Miń flagi po kolei, a karta na górze ekranu pokaże ci każdy przycisk po drodze. Nadzorca Pell mierzy czas każdego biegu z dalekiego końca: gdy czerwona flaga zostanie za tobą, stoi tam właśnie, by to przyjąć.',
   'entities.quests.q_ps_the_gauntlet.title': 'Przebiegnij Tor Przeszkód',
-  'entities.quests.q_ps_the_long_walk.completion': 'I wracasz, bez szwanku. Zapamiętaj, jakie to było uczucie, {playerName}, bo następnym razem w grę wejdą kły i nikt nie będzie stał obok, by to wytłumaczyć. Twoje ciało czeka, wędrówka jest darmowa, a jedyne, co śmierć naprawdę cię kosztuje, to czas potrzebny, by wrócić.',
+  'entities.quests.q_ps_the_long_walk.completion':
+    'I wracasz, bez szwanku. Zapamiętaj, jakie to było uczucie, {playerName}, bo następnym razem w grę wejdą kły i nikt nie będzie stał obok, by to wytłumaczyć. Twoje ciało czeka, wędrówka jest darmowa, a jedyne, co śmierć naprawdę cię kosztuje, to czas potrzebny, by wrócić.',
   'entities.quests.q_ps_the_long_walk.objectives.0.label': 'Powrót z zaświatów odbyty',
-  'entities.quests.q_ps_the_long_walk.text': 'Została jedna lekcja, {playerName}, i to taka, której nie mogę ci opowiedzieć: musisz przeżyć ją choć raz. Tam, na zewnątrz, zginiesz. Każdy ginie, i to nie jest koniec niczego. Weź ten Kamień Przejścia. Wciśnij B, by otworzyć torby, i kliknij go lewym przyciskiem, a położy cię dokładnie tam, gdzie stoisz. Potem podążaj za instrukcjami na ekranie: uwolnij ducha, wróć do własnego ciała i wstąp w nie. Twoje ciało czeka, wędrówka jest darmowa, i nic nie tracisz, gdy ją odbędziesz.',
+  'entities.quests.q_ps_the_long_walk.text':
+    'Została jedna lekcja, {playerName}, i to taka, której nie mogę ci opowiedzieć: musisz przeżyć ją choć raz. Tam, na zewnątrz, zginiesz. Każdy ginie, i to nie jest koniec niczego. Weź ten Kamień Przejścia. Wciśnij B, by otworzyć torby, i kliknij go lewym przyciskiem, a położy cię dokładnie tam, gdzie stoisz. Potem podążaj za instrukcjami na ekranie: uwolnij ducha, wróć do własnego ciała i wstąp w nie. Twoje ciało czeka, wędrówka jest darmowa, i nic nie tracisz, gdy ją odbędziesz.',
   'entities.quests.q_ps_the_long_walk.title': 'Długa Wędrówka',
-  'entities.quests.q_ps_the_signpost.completion': 'Więc teraz wiesz, jak wieści krążą po dolinie, {playerName}: nie przez posłańców, przez tablice. Sprawdzaj je w każdym mieście, przez które przechodzisz; połowa przygód zaczyna się od trzech linijek atramentu na jednej z nich.',
+  'entities.quests.q_ps_the_signpost.completion':
+    'Więc teraz wiesz, jak wieści krążą po dolinie, {playerName}: nie przez posłańców, przez tablice. Sprawdzaj je w każdym mieście, przez które przechodzisz; połowa przygód zaczyna się od trzech linijek atramentu na jednej z nich.',
   'entities.quests.q_ps_the_signpost.objectives.0.label': 'Drogowskaz gildii przeczytany',
-  'entities.quests.q_ps_the_signpost.text': 'Został jeszcze jeden nawyk do wyuczenia, {playerName}, i nie potrzeba do niego ostrza: czytaj tablice. Drogowskaz gildii stoi przy bramie obozu, kilka kroków na południowy zachód od mojego ogniska, a gildie i wędrowne załogi wywieszają na nim swoje wezwania. Podejdź do jego frontu i wciśnij F, albo kliknij go lewym przyciskiem, by przeczytać, co jest wywieszone, a potem wróć i powiedz mi, co przyniósł wiatr. Taka tablica stoi w każdym mieście, do jakiego kiedykolwiek wejdziesz.',
+  'entities.quests.q_ps_the_signpost.text':
+    'Został jeszcze jeden nawyk do wyuczenia, {playerName}, i nie potrzeba do niego ostrza: czytaj tablice. Drogowskaz gildii stoi przy bramie obozu, kilka kroków na południowy zachód od mojego ogniska, a gildie i wędrowne załogi wywieszają na nim swoje wezwania. Podejdź do jego frontu i wciśnij F, albo kliknij go lewym przyciskiem, by przeczytać, co jest wywieszone, a potem wróć i powiedz mi, co przyniósł wiatr. Taka tablica stoi w każdym mieście, do jakiego kiedykolwiek wejdziesz.',
   'entities.quests.q_ps_the_signpost.title': 'Słowo na Wietrze',
-  'entities.quests.q_ps_the_wreck_line.completion': 'Lina, smoła i pół koła sera, które morze jakimś cudem oszczędziło: wezmę to wszystko, {playerName}. Grzbiet, który niesie to, co znajdzie, jest dla tego obozu wart więcej niż jakiekolwiek ostrze, a twój właśnie oczyścił całą linię w jednym podejściu.',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    'Lina, smoła i pół koła sera, które morze jakimś cudem oszczędziło: wezmę to wszystko, {playerName}. Grzbiet, który niesie to, co znajdzie, jest dla tego obozu wart więcej niż jakiekolwiek ostrze, a twój właśnie oczyścił całą linię w jednym podejściu.',
   'entities.quests.q_ps_the_wreck_line.objectives.0.label': 'Skrzynia Rozbitka otwarta',
-  'entities.quests.q_ps_the_wreck_line.text': 'Moi tragarze znoszą złom ze starych wraków i niosą go w górę zbocza w stronę Obozu Dawnrest, {playerName}, a połowa skrzyń nigdy nie kończy wspinaczki: zostają odstawione wzdłuż ścieżki i zapomniane. Idź moją ścieżką w stronę obozu, a miniesz zabłąkane po drodze. Otwarcie jednej jest proste: podejdź do skrzyni, aż pokaże się jej nazwa, potem wciśnij F, albo kliknij samą skrzynię lewym przyciskiem, a odda to, co zawiera. Sześć z nich oczyści linię, i pamiętaj, że F to ten sam klawisz do każdej skrzyni, złoża i drzwi, jakie kiedykolwiek napotkasz. Kwatermistrzyni Finch trzyma kram obozowy i kupuje każdy kawałek złomu: oddaj jej zdobycz.',
+  'entities.quests.q_ps_the_wreck_line.text':
+    'Moi tragarze znoszą złom ze starych wraków i niosą go w górę zbocza w stronę Obozu Dawnrest, {playerName}, a połowa skrzyń nigdy nie kończy wspinaczki: zostają odstawione wzdłuż ścieżki i zapomniane. Idź moją ścieżką w stronę obozu, a miniesz zabłąkane po drodze. Otwarcie jednej jest proste: podejdź do skrzyni, aż pokaże się jej nazwa, potem wciśnij F, albo kliknij samą skrzynię lewym przyciskiem, a odda to, co zawiera. Sześć z nich oczyści linię, i pamiętaj, że F to ten sam klawisz do każdej skrzyni, złoża i drzwi, jakie kiedykolwiek napotkasz. Kwatermistrzyni Finch trzyma kram obozowy i kupuje każdy kawałek złomu: oddaj jej zdobycz.',
   'entities.quests.q_ps_the_wreck_line.title': 'Linia Wraków',
   'entities.zones.eastbrook_vale.pois.12.label': 'Doki Eastbrook',
   'entities.zones.proving_shore.name': 'Wybrzeże Prób',
@@ -640,21 +880,30 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.proving_shore.pois.2.label': 'Plac Ćwiczeń',
   'entities.zones.proving_shore.pois.3.label': 'Linia Wraków',
   'entities.zones.proving_shore.pois.4.label': 'Tor Przeszkód',
-  'entities.zones.proving_shore.welcome': 'Wybrzeże Prób nie żąda od ciebie niczego prócz czasu. Poznaj obóz, uderzaj w kukły, przejdź linię wraków, a gdy będziesz gotowy, Przewoźnik Odo przeprawi cię do doliny.',
-  'guide.home.world.provingBlurb': 'Spokojna wyspa szkoleniowa po drugiej stronie cieśniny, gdzie nowi poszukiwacze przygód uczą się stać na własnych nogach, zanim dolina zażąda od nich czegokolwiek.',
+  'entities.zones.proving_shore.welcome':
+    'Wybrzeże Prób nie żąda od ciebie niczego prócz czasu. Poznaj obóz, uderzaj w kukły, przejdź linię wraków, a gdy będziesz gotowy, Przewoźnik Odo przeprawi cię do doliny.',
+  'guide.home.world.provingBlurb':
+    'Spokojna wyspa szkoleniowa po drugiej stronie cieśniny, gdzie nowi poszukiwacze przygód uczą się stać na własnych nogach, zanim dolina zażąda od nich czegokolwiek.',
   'guide.home.world.provingName': 'Wybrzeże Prób',
-  'guide.worldPage.provingBlurb': 'Spokojna wyspa po drugiej stronie cieśniny od doliny, utrzymywana jako teren szkoleniowy: obóz, plac ćwiczeń, plaża usiana wrakami i prom kursujący w obie strony.',
+  'guide.worldPage.provingBlurb':
+    'Spokojna wyspa po drugiej stronie cieśniny od doliny, utrzymywana jako teren szkoleniowy: obóz, plac ćwiczeń, plaża usiana wrakami i prom kursujący w obie strony.',
   'guide.worldPage.provingGreeter': 'Instruktorka Maren, Obóz Dawnrest',
-  'guide.worldPage.provingGreeting': 'Każdy bohater, jakiemu dolina kiedykolwiek podziękowała, stał tam, gdzie ty stoisz teraz, i żaden z nich nie wiedział, za który koniec ostrza trzymać.',
-  'guide.worldPage.provingPlaceNotes': 'Obóz Dawnrest to cała osada na wyspie: kilka namiotów, kramik i ognisko zbiórki. Stary Pomost patrzy w stronę doliny, gdzie krąg przeprawy niesie absolwentów przez cieśninę; Plac Ćwiczeń na południe od obozu utrzymuje swoje słomiane kukły w gotowości dla każdego, kto ich potrzebuje; a Linia Wraków to usiana złomem plaża, gdzie przypływ płaci wyspie skrzyniami rozbitków.',
-  'sim.rift.lootRecoveryNotice': 'Wejście do Szczeliny wytrzyma jeszcze chwilę: jeśli twoja drużyna polegnie, wciąż możesz wrócić po to, na co zasłużyłeś.',
-  'guide.classPage.formsAutoUnshift': 'Leczenie lub zaklęcie zadające obrażenia rzucone w formie samo cię z niej wyprowadza. Opuszczenie formy w ten sposób jest darmowe i nie zużywa globalnego czasu odnowienia, więc błyskawiczne zaklęcie odpala się w chwili naciśnięcia. Powrót do formy to zwykła zdolność i nadal kosztuje manę oraz globalny czas odnowienia.',
+  'guide.worldPage.provingGreeting':
+    'Każdy bohater, jakiemu dolina kiedykolwiek podziękowała, stał tam, gdzie ty stoisz teraz, i żaden z nich nie wiedział, za który koniec ostrza trzymać.',
+  'guide.worldPage.provingPlaceNotes':
+    'Obóz Dawnrest to cała osada na wyspie: kilka namiotów, kramik i ognisko zbiórki. Stary Pomost patrzy w stronę doliny, gdzie krąg przeprawy niesie absolwentów przez cieśninę; Plac Ćwiczeń na południe od obozu utrzymuje swoje słomiane kukły w gotowości dla każdego, kto ich potrzebuje; a Linia Wraków to usiana złomem plaża, gdzie przypływ płaci wyspie skrzyniami rozbitków.',
+  'sim.rift.lootRecoveryNotice':
+    'Wejście do Szczeliny wytrzyma jeszcze chwilę: jeśli twoja drużyna polegnie, wciąż możesz wrócić po to, na co zasłużyłeś.',
+  'guide.classPage.formsAutoUnshift':
+    'Leczenie lub zaklęcie zadające obrażenia rzucone w formie samo cię z niej wyprowadza. Opuszczenie formy w ten sposób jest darmowe i nie zużywa globalnego czasu odnowienia, więc błyskawiczne zaklęcie odpala się w chwili naciśnięcia. Powrót do formy to zwykła zdolność i nadal kosztuje manę oraz globalny czas odnowienia.',
   'entities.mobs.heroic_boss_dummy.name': 'Manekin heroicznego bossa',
   'entities.mobs.normal_boss_dummy.name': 'Manekin normalnego bossa',
   'entities.mobs.friendly_player_dummy.name': 'Manekin przyjaznego gracza',
   'entities.items.dawnhold_posy.name': 'Bukiecik z ogrodu zamku Dawnhold',
-  'entities.dungeons.dawnhold_castle.leaveText': 'Wymykasz się z powrotem na skąpany w słońcu ogrodowy trawnik.',
-  'entities.dungeons.dawnhold_castle.enterText': 'Wchodzisz do ciepłych, pachnących kwiatami sal zamku Dawnhold.',
+  'entities.dungeons.dawnhold_castle.leaveText':
+    'Wymykasz się z powrotem na skąpany w słońcu ogrodowy trawnik.',
+  'entities.dungeons.dawnhold_castle.enterText':
+    'Wchodzisz do ciepłych, pachnących kwiatami sal zamku Dawnhold.',
   'entities.dungeons.dawnhold_castle.name': 'Zamek Dawnhold',
   'hudChrome.lastkeepMap.story.tower': 'Wieża strażnicza',
   'hudChrome.lastkeepMap.story.residence': 'Piętro mieszkalne',
@@ -665,85 +914,135 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dawnholdMap.story.ground': 'Parter ogrodowy',
   'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Pole bitwy.',
-  'guide.social.chanBattlegroundBody': 'Rozmawiaj z każdym walczącym na polu bitwy, po obu stronach. Tylko podczas trwania meczu.',
+  'guide.social.chanBattlegroundBody':
+    'Rozmawiaj z każdym walczącym na polu bitwy, po obu stronach. Tylko podczas trwania meczu.',
   'hud.chat.templates.battleground': '[Pole bitwy] {name}: {message}',
   'hud.core.chatChannels.names.battleground': 'Pole bitwy',
-  'apiError.character.invalid_appearance': 'Nie udało się zapisać tego wyglądu. Popraw projekt i spróbuj ponownie.',
-  'apiError.character.reroll_unavailable': 'Ta postać nie ma już dostępnego darmowego przeprojektowania.',
-  'entities.abilities.intervene.description': 'Pędzisz do sojuszniczego gracza, osłaniając go przed {damage} obrażeniami przez 6 sek.',
+  'apiError.character.invalid_appearance':
+    'Nie udało się zapisać tego wyglądu. Popraw projekt i spróbuj ponownie.',
+  'apiError.character.reroll_unavailable':
+    'Ta postać nie ma już dostępnego darmowego przeprojektowania.',
+  'entities.abilities.intervene.description':
+    'Pędzisz do sojuszniczego gracza, osłaniając go przed {damage} obrażeniami przez 6 sek.',
   'entities.abilities.intervene.name': 'Interwencja',
-  'gpuNotice.hybridBodyLinux': 'Ta sesja jest renderowana na zintegrowanej (oszczędnej) karcie graficznej. Jeśli ten komputer ma także dedykowaną kartę graficzną do gier, twoja przeglądarka lub sterownik graficzny mogą udostępniać własne ustawienie wyboru GPU, albo twoja dystrybucja może oferować narzędzie do przełączania GPU (takie jak PRIME lub optimus-manager). Aplikacja desktopowa wybiera dedykowaną kartę automatycznie.',
-  'gpuNotice.hybridBodyOther': 'Ta sesja jest renderowana na zintegrowanej (oszczędnej) karcie graficznej. Jeśli ten komputer ma także dedykowaną kartę graficzną do gier, sprawdź ustawienia grafiki w przeglądarce i systemie operacyjnym, aby ją włączyć. Aplikacja desktopowa wybiera dedykowaną kartę automatycznie.',
-  'gpuNotice.hybridBodyWindows': 'Ta sesja jest renderowana na zintegrowanej (oszczędnej) karcie graficznej. Jeśli ten komputer ma także dedykowaną kartę graficzną do gier, ustaw w przeglądarce Wysoką wydajność w Ustawienia > System > Ekran > Grafika, a następnie ją zrestartuj. Aplikacja desktopowa wybiera dedykowaną kartę automatycznie.',
-  'guide.arenaPage.honorBody': 'Honor to waluta walki z innymi graczami. Zdobywasz go w Koloseum oraz na Polach Ciernistej Kotliny, jest trzymany osobno od twoich monet i nigdy się z nimi nie miesza, a twoja karta postaci pokazuje, ile go posiadasz. Jest dokładnie jedna rzecz, na którą możesz go wydać: ekwipunek działań wojennych.',
-  'guide.arenaPage.honorFinalNote': 'Zakupy za Honor są ostateczne. Zakup za monety można cofnąć z listy odkupu sprzedawcy, lecz zakup za Honor nigdy tam nie trafia, a ekwipunek działań wojennych staje się związany z duszą w chwili zakupu, więc nie da się go już wymienić, wysłać pocztą ani odsprzedać za nic. Dlatego sklep prosi o potwierdzenie: przeczytaj opis danego elementu, zanim go kupisz.',
+  'gpuNotice.hybridBodyLinux':
+    'Ta sesja jest renderowana na zintegrowanej (oszczędnej) karcie graficznej. Jeśli ten komputer ma także dedykowaną kartę graficzną do gier, twoja przeglądarka lub sterownik graficzny mogą udostępniać własne ustawienie wyboru GPU, albo twoja dystrybucja może oferować narzędzie do przełączania GPU (takie jak PRIME lub optimus-manager). Aplikacja desktopowa wybiera dedykowaną kartę automatycznie.',
+  'gpuNotice.hybridBodyOther':
+    'Ta sesja jest renderowana na zintegrowanej (oszczędnej) karcie graficznej. Jeśli ten komputer ma także dedykowaną kartę graficzną do gier, sprawdź ustawienia grafiki w przeglądarce i systemie operacyjnym, aby ją włączyć. Aplikacja desktopowa wybiera dedykowaną kartę automatycznie.',
+  'gpuNotice.hybridBodyWindows':
+    'Ta sesja jest renderowana na zintegrowanej (oszczędnej) karcie graficznej. Jeśli ten komputer ma także dedykowaną kartę graficzną do gier, ustaw w przeglądarce Wysoką wydajność w Ustawienia > System > Ekran > Grafika, a następnie ją zrestartuj. Aplikacja desktopowa wybiera dedykowaną kartę automatycznie.',
+  'guide.arenaPage.honorBody':
+    'Honor to waluta walki z innymi graczami. Zdobywasz go w Koloseum oraz na Polach Ciernistej Kotliny, jest trzymany osobno od twoich monet i nigdy się z nimi nie miesza, a twoja karta postaci pokazuje, ile go posiadasz. Jest dokładnie jedna rzecz, na którą możesz go wydać: ekwipunek działań wojennych.',
+  'guide.arenaPage.honorFinalNote':
+    'Zakupy za Honor są ostateczne. Zakup za monety można cofnąć z listy odkupu sprzedawcy, lecz zakup za Honor nigdy tam nie trafia, a ekwipunek działań wojennych staje się związany z duszą w chwili zakupu, więc nie da się go już wymienić, wysłać pocztą ani odsprzedać za nic. Dlatego sklep prosi o potwierdzenie: przeczytaj opis danego elementu, zanim go kupisz.',
   'guide.arenaPage.honorHeading': 'Honor',
-  'guide.arenaPage.quartermastersBody': 'Dwoje kwatermistrzów prowadzi te same półki, więc handluj z tym, który jest bliżej. FURIA, Honorowy kwatermistrz, stoi w Dolinie Wschodniego Strumienia, a Marszałek Wojenny Draven Kole, Mistrz Zaopatrzenia Działań Wojennych, trzyma ladę w Highwatch. Ich towar to poziom działań wojennych: pięć rodzin pancerza, a do tego naszyjniki, pierścienie i broń wspólne dla wszystkich z nich.',
-  'guide.arenaPage.rewardsBody': 'Rankingowe zwycięstwo płaci Honor, walutę gracz kontra gracz, a porażka kosztuje cię jedynie ranking. Honor ma nagradzać prawdziwe starcia: pokonanie tego samego przeciwnika lub tej samej drużyny ponownie tego samego dnia nie płaci już nic więcej, długi zwycięski dzień płaci coraz mniej za każde kolejne zwycięstwo, a mecz zakończony walkowerem przeciwnika wciąż zmienia twój ranking, lecz nie płaci żadnego Honoru. Ten dzień należy do Honoru i odnawia się według własnego zegara, niezależnie od resetu instancji królestwa.',
+  'guide.arenaPage.quartermastersBody':
+    'Dwoje kwatermistrzów prowadzi te same półki, więc handluj z tym, który jest bliżej. FURIA, Honorowy kwatermistrz, stoi w Dolinie Wschodniego Strumienia, a Marszałek Wojenny Draven Kole, Mistrz Zaopatrzenia Działań Wojennych, trzyma ladę w Highwatch. Ich towar to poziom działań wojennych: pięć rodzin pancerza, a do tego naszyjniki, pierścienie i broń wspólne dla wszystkich z nich.',
+  'guide.arenaPage.rewardsBody':
+    'Rankingowe zwycięstwo płaci Honor, walutę gracz kontra gracz, a porażka kosztuje cię jedynie ranking. Honor ma nagradzać prawdziwe starcia: pokonanie tego samego przeciwnika lub tej samej drużyny ponownie tego samego dnia nie płaci już nic więcej, długi zwycięski dzień płaci coraz mniej za każde kolejne zwycięstwo, a mecz zakończony walkowerem przeciwnika wciąż zmienia twój ranking, lecz nie płaci żadnego Honoru. Ten dzień należy do Honoru i odnawia się według własnego zegara, niezależnie od resetu instancji królestwa.',
   'guide.arenaPage.rewardsHeading': 'Co płaci rozgrywka rankingowa',
-  'guide.arenaPage.warfareBody': 'Każdy element działań wojennych niesie Ocenę Ataku Działań Wojennych i Ocenę Obrony Działań Wojennych, a te dwie oceny nie robią zupełnie nic przeciwko potworom. Działają wyłącznie wtedy, gdy walczysz z innym graczem: w pojedynku, na arenie lub na polu bitwy, gdzie Atak dodaje do zadawanych przez ciebie obrażeń, a Obrona ścina obrażenia, które otrzymujesz, każda do własnego pułapu. Każda rodzina pancerza jest też zestawem, a jej bonusy zestawu to również ocena działań wojennych albo efekty działające wyłącznie przeciwko graczom, więc pełny komplet honorowy jest wart tyle co nic na bossie w lochu.',
+  'guide.arenaPage.warfareBody':
+    'Każdy element działań wojennych niesie Ocenę Ataku Działań Wojennych i Ocenę Obrony Działań Wojennych, a te dwie oceny nie robią zupełnie nic przeciwko potworom. Działają wyłącznie wtedy, gdy walczysz z innym graczem: w pojedynku, na arenie lub na polu bitwy, gdzie Atak dodaje do zadawanych przez ciebie obrażeń, a Obrona ścina obrażenia, które otrzymujesz, każda do własnego pułapu. Każda rodzina pancerza jest też zestawem, a jej bonusy zestawu to również ocena działań wojennych albo efekty działające wyłącznie przeciwko graczom, więc pełny komplet honorowy jest wart tyle co nic na bossie w lochu.',
   'guide.arenaPage.warfareHeading': 'Ekwipunek działań wojennych',
-  'guide.arenaPage.warfareTradeBody': 'To celowy kompromis. Ekwipunek działań wojennych jest stworzony do walki z graczami, a nie jako skrót omijający kolejne poziomy lochów: element działań wojennych nigdy nie niesie takich statystyk bojowych, jakie ma epicki przedmiot z lochu w tym samym slocie, a wszystko, co ze sobą przynosi, jest przeznaczone przeciwko innym graczom. Jeśli chcesz poradzić sobie na arenie, kup go. Jeśli chcesz szybciej przechodzić heroiczne lochy, zdobywaj ekwipunek w lochach.',
-  'guide.classPage.formLine.form_bear': 'Postać do tankowania: gruba skóra, wściekłość zamiast many i dodatkowe zagrożenie, dzięki któremu wrogowie wciąż atakują ciebie.',
-  'guide.classPage.formLine.form_cat': 'Postać do obrażeń w zwarciu: energia i punkty kombinacji, jak u łotrzyka, oraz znacznie mniej zagrożenia.',
-  'guide.classPage.formLine.form_travel': 'Postać do podróżowania: znacznie szybsza po lądzie, ale bez innych zdolności, dopóki z niej nie wyjdziesz.',
+  'guide.arenaPage.warfareTradeBody':
+    'To celowy kompromis. Ekwipunek działań wojennych jest stworzony do walki z graczami, a nie jako skrót omijający kolejne poziomy lochów: element działań wojennych nigdy nie niesie takich statystyk bojowych, jakie ma epicki przedmiot z lochu w tym samym slocie, a wszystko, co ze sobą przynosi, jest przeznaczone przeciwko innym graczom. Jeśli chcesz poradzić sobie na arenie, kup go. Jeśli chcesz szybciej przechodzić heroiczne lochy, zdobywaj ekwipunek w lochach.',
+  'guide.classPage.formLine.form_bear':
+    'Postać do tankowania: gruba skóra, wściekłość zamiast many i dodatkowe zagrożenie, dzięki któremu wrogowie wciąż atakują ciebie.',
+  'guide.classPage.formLine.form_cat':
+    'Postać do obrażeń w zwarciu: energia i punkty kombinacji, jak u łotrzyka, oraz znacznie mniej zagrożenia.',
+  'guide.classPage.formLine.form_travel':
+    'Postać do podróżowania: znacznie szybsza po lądzie, ale bez innych zdolności, dopóki z niej nie wyjdziesz.',
   'guide.classPage.formName.form_bear': 'Postać Bruina',
   'guide.classPage.formName.form_cat': 'Postać wilka',
   'guide.classPage.formName.form_travel': 'Postać Fleet',
   'guide.classPage.formsHeading': 'Zmiana kształtu',
-  'guide.classPage.formsMoonwing': 'Druid o specjalizacji Równowaga zyskuje jeszcze jedną postać, Postać księżycowej sowy, formę rzucającego, w jakiej walczy. To jedyna zwierzęca postać, która zachowuje twoje zaklęcia, a różdżka działa tylko w niej albo w twojej zwykłej postaci rzucającego.',
-  'guide.classPage.formsNote': 'Druid walczy, zmieniając kształt. Większość zdolności druida należy do jednej postaci, więc to, w jakiej formie się znajdujesz, decyduje, co możesz rzucić, a przemiana kosztuje odrobinę many. Możesz przemieniać się w walce i poza nią, tak często, jak chcesz.',
+  'guide.classPage.formsMoonwing':
+    'Druid o specjalizacji Równowaga zyskuje jeszcze jedną postać, Postać księżycowej sowy, formę rzucającego, w jakiej walczy. To jedyna zwierzęca postać, która zachowuje twoje zaklęcia, a różdżka działa tylko w niej albo w twojej zwykłej postaci rzucającego.',
+  'guide.classPage.formsNote':
+    'Druid walczy, zmieniając kształt. Większość zdolności druida należy do jednej postaci, więc to, w jakiej formie się znajdujesz, decyduje, co możesz rzucić, a przemiana kosztuje odrobinę many. Możesz przemieniać się w walce i poza nią, tak często, jak chcesz.',
   'guide.classPage.mageEleHeading': 'Żywiołak wody',
-  'guide.classPage.mageEleJet': 'Strumień wody zajmuje własny przycisk na pasku zwierzęcia: kliknij go, aby zablokować spowalniającą wiązkę na jednym wrogu, albo kliknij go prawym przyciskiem (przytrzymaj dotyk na urządzeniu mobilnym), aby pozwolić żywiołakowi rzucać go samodzielnie, gdy tylko będzie gotowy.',
-  'guide.classPage.mageEleNote': 'Mag Mrozu uczy się przyzywać Żywiołaka wody, dystansowego towarzysza, który sam miota Pociski Wody w twój cel. Odpowiada na pasek zwierzęcia jak bestia łowcy czy demon czarnoksiężnika, choć nie jest stworzony, by utrzymywać cel za ciebie.',
-  'guide.classPage.mageEleSummon': 'Zaklęcie Mrozu, które przyzywa żywiołaka do twojego boku i kieruje go na twój cel.',
-  'guide.classPage.mageLore': 'Magowie władają ogniem i mrozem, by niszczyć wrogów, przyzywają Żywiołaka wody, zamrażają zagrożenia w miejscu, albo panują nad samym czasem, by osłaniać i leczyć sojuszników.',
-  'guide.combat.allyRezBody': 'Nie zawsze musisz wracać na piechotę. Sojusznik ze wskrzeszeniem może podnieść cię z powrotem: dostajesz wtedy prośbę, którą przyjmujesz albo odrzucasz; zostaw ją bez odpowiedzi, a wygaśnie, więc odpowiedz, dopóki jest widoczna. Przyjmij, a powstaniesz obok przyjaciela, który rzucił zaklęcie, z częścią przywróconego zdrowia i many. Niektórzy uzdrowiciele mogą zaoferować to całej powalonej drużynie naraz, choć każdy z was wciąż odpowiada na własną prośbę. Pola Ciernistej Kotliny są wyjątkiem: żadne zaklęcie wskrzeszenia tam nie dociera, więc czekasz na kolejną falę odrodzenia swojej drużyny.',
+  'guide.classPage.mageEleJet':
+    'Strumień wody zajmuje własny przycisk na pasku zwierzęcia: kliknij go, aby zablokować spowalniającą wiązkę na jednym wrogu, albo kliknij go prawym przyciskiem (przytrzymaj dotyk na urządzeniu mobilnym), aby pozwolić żywiołakowi rzucać go samodzielnie, gdy tylko będzie gotowy.',
+  'guide.classPage.mageEleNote':
+    'Mag Mrozu uczy się przyzywać Żywiołaka wody, dystansowego towarzysza, który sam miota Pociski Wody w twój cel. Odpowiada na pasek zwierzęcia jak bestia łowcy czy demon czarnoksiężnika, choć nie jest stworzony, by utrzymywać cel za ciebie.',
+  'guide.classPage.mageEleSummon':
+    'Zaklęcie Mrozu, które przyzywa żywiołaka do twojego boku i kieruje go na twój cel.',
+  'guide.classPage.mageLore':
+    'Magowie władają ogniem i mrozem, by niszczyć wrogów, przyzywają Żywiołaka wody, zamrażają zagrożenia w miejscu, albo panują nad samym czasem, by osłaniać i leczyć sojuszników.',
+  'guide.combat.allyRezBody':
+    'Nie zawsze musisz wracać na piechotę. Sojusznik ze wskrzeszeniem może podnieść cię z powrotem: dostajesz wtedy prośbę, którą przyjmujesz albo odrzucasz; zostaw ją bez odpowiedzi, a wygaśnie, więc odpowiedz, dopóki jest widoczna. Przyjmij, a powstaniesz obok przyjaciela, który rzucił zaklęcie, z częścią przywróconego zdrowia i many. Niektórzy uzdrowiciele mogą zaoferować to całej powalonej drużynie naraz, choć każdy z was wciąż odpowiada na własną prośbę. Pola Ciernistej Kotliny są wyjątkiem: żadne zaklęcie wskrzeszenia tam nie dociera, więc czekasz na kolejną falę odrodzenia swojej drużyny.',
   'guide.combat.allyRezTitle': 'Gdy sojusznik może cię wskrzesić',
-  'guide.combat.breathBody': 'Głęboka woda jest do pływania, a pod jej powierzchnię można nurkować. Gdy twoja głowa jest pod wodą, u góry ekranu pojawia się niebieski pasek Oddechu i się wyczerpuje; wynurz się, a napełni się dużo szybciej, niż się opróżnił. Pozwól mu opróżnić się, gdy wciąż jesteś pod wodą, a zaczniesz tonąć, tracąc kawałek zdrowia co sekundę, aż dotrzesz do powietrza, więc podczas długiego nurkowania miej ten pasek na oku. Śmierć go czyści, więc bieg do zwłok zawsze zaczyna się z pełnymi płucami.',
-  'guide.combat.climbBody': 'Krawędzie nie są ścianami. Skocz w stronę czegoś zbyt wysokiego, by po prostu na to wejść, a twoja postać złapie się krawędzi blisko szczytu skoku i podciągnie się na nią, bez żadnego osobnego klawisza do naciśnięcia. Wszystko, co możesz pokonać samym skokiem, mija bez ceregieli; pełne podciągnięcie jest zarezerwowane dla krawędzi powyżej twojej głowy. Trwa to krótko i przejmuje kontrolę na czas trwania, więc nie da się z niego wysterować w połowie. Ogłuszenie, które dopadnie cię w trakcie podciągania, sprawia, że puszczasz się i spadasz, licząc od miejsca, w którym skok oderwał się od ziemi, a ogłuszenie lub unieruchomienie w ogóle uniemożliwia rozpoczęcie wspinaczki, co warto pamiętać, gdy próbujesz wydostać się z kiepskiego miejsca podczas walki.',
+  'guide.combat.breathBody':
+    'Głęboka woda jest do pływania, a pod jej powierzchnię można nurkować. Gdy twoja głowa jest pod wodą, u góry ekranu pojawia się niebieski pasek Oddechu i się wyczerpuje; wynurz się, a napełni się dużo szybciej, niż się opróżnił. Pozwól mu opróżnić się, gdy wciąż jesteś pod wodą, a zaczniesz tonąć, tracąc kawałek zdrowia co sekundę, aż dotrzesz do powietrza, więc podczas długiego nurkowania miej ten pasek na oku. Śmierć go czyści, więc bieg do zwłok zawsze zaczyna się z pełnymi płucami.',
+  'guide.combat.climbBody':
+    'Krawędzie nie są ścianami. Skocz w stronę czegoś zbyt wysokiego, by po prostu na to wejść, a twoja postać złapie się krawędzi blisko szczytu skoku i podciągnie się na nią, bez żadnego osobnego klawisza do naciśnięcia. Wszystko, co możesz pokonać samym skokiem, mija bez ceregieli; pełne podciągnięcie jest zarezerwowane dla krawędzi powyżej twojej głowy. Trwa to krótko i przejmuje kontrolę na czas trwania, więc nie da się z niego wysterować w połowie. Ogłuszenie, które dopadnie cię w trakcie podciągania, sprawia, że puszczasz się i spadasz, licząc od miejsca, w którym skok oderwał się od ziemi, a ogłuszenie lub unieruchomienie w ogóle uniemożliwia rozpoczęcie wspinaczki, co warto pamiętać, gdy próbujesz wydostać się z kiepskiego miejsca podczas walki.',
   'guide.combat.climbTitle': 'Podciąganie się na krawędź',
-  'guide.combat.fatigueBody': 'Morze nie ma muru. Przeprawy, które świat przewidział do przepłynięcia: cieśniny i rozlewiska między jednym skrawkiem lądu a drugim oraz jeziora śródlądowe, można przemierzać bezpiecznie, bez względu na to, jak długo to trwa. Wypłyń jednak poza brzeg na naprawdę otwarte wody, a woda zacznie wyczerpywać twoje siły: pojawia się ostrzeżenie, dostajesz realną chwilę, by zawrócić, a potem morze zadaje coraz cięższe obrażenia, których nic nie powstrzyma, dopóki nie ruszysz z powrotem ku lądowi. Utoń albo wyczerp się tak daleko od brzegu, a uwolnisz ducha jak przy każdej innej śmierci, więc traktuj horyzont jako krajobraz, a nie cel podróży.',
+  'guide.combat.fatigueBody':
+    'Morze nie ma muru. Przeprawy, które świat przewidział do przepłynięcia: cieśniny i rozlewiska między jednym skrawkiem lądu a drugim oraz jeziora śródlądowe, można przemierzać bezpiecznie, bez względu na to, jak długo to trwa. Wypłyń jednak poza brzeg na naprawdę otwarte wody, a woda zacznie wyczerpywać twoje siły: pojawia się ostrzeżenie, dostajesz realną chwilę, by zawrócić, a potem morze zadaje coraz cięższe obrażenia, których nic nie powstrzyma, dopóki nie ruszysz z powrotem ku lądowi. Utoń albo wyczerp się tak daleko od brzegu, a uwolnisz ducha jak przy każdej innej śmierci, więc traktuj horyzont jako krajobraz, a nie cel podróży.',
   'guide.combat.hazardsTitle': 'Woda może cię zabić',
-  'guide.combat.threatBody': 'Każdy wróg prowadzi własną, prywatną listę tego, kto najbardziej go rozzłościł. Dokładają się do niej obrażenia, podobnie jak leczenie: leczenie nakłada zagrożenie na wrogów już walczących z uleczoną osobą, rozłożone między nimi, więc najbezpieczniejsze leczenie trafia w kogoś, kogo tank już trzyma na sobie. Tankowie włączają czujną postawę albo ochronną postać, która mnoży wszystko, co generują, podczas gdy Postać wilka druida zamiast tego zrzuca zagrożenie, a prowokacja podnosi rzucającego prosto na szczyt listy i przypina do niego wroga na kilka sekund. Wrogowie nie zmieniają celu w chwili, gdy ktoś wyprzedzi tanka: potrzeba wyraźnej przewagi, by go przejąć, i większej przewagi na dystansie niż w zwarciu, więc odrobina cierpliwości na początku starcia utrzymuje walkę tam, gdzie powinna być.',
+  'guide.combat.threatBody':
+    'Każdy wróg prowadzi własną, prywatną listę tego, kto najbardziej go rozzłościł. Dokładają się do niej obrażenia, podobnie jak leczenie: leczenie nakłada zagrożenie na wrogów już walczących z uleczoną osobą, rozłożone między nimi, więc najbezpieczniejsze leczenie trafia w kogoś, kogo tank już trzyma na sobie. Tankowie włączają czujną postawę albo ochronną postać, która mnoży wszystko, co generują, podczas gdy Postać wilka druida zamiast tego zrzuca zagrożenie, a prowokacja podnosi rzucającego prosto na szczyt listy i przypina do niego wroga na kilka sekund. Wrogowie nie zmieniają celu w chwili, gdy ktoś wyprzedzi tanka: potrzeba wyraźnej przewagi, by go przejąć, i większej przewagi na dystansie niż w zwarciu, więc odrobina cierpliwości na początku starcia utrzymuje walkę tam, gdzie powinna być.',
   'guide.combat.threatTitle': 'Kogo atakuje wróg',
-  'guide.combat.unstuckBody': 'Jeśli świat uwięzi cię gdzieś, skąd nie możesz się wydostać, wpisz /unstuck. Musisz być poza walką i stać nieruchomo, nie trzymany przez ogłuszenie ani unieruchomienie, i nie być w pojedynku ani meczu na arenie: rusza krótkie odliczanie, a poruszenie się lub otrzymanie obrażeń je anuluje. Gdy dobiegnie końca, zostajesz postawiony na najbliższym cmentarzu. Nigdy cię nie zabija i nie zostawia zwłok, a jeśli już leżałeś powalony, zamiast tego cię tam wskrzesza. Ceną jest Choroba Wyzwolenia, chwilowe osłabienie wszystkiego, czym jesteś, które zdąży minąć, zanim będziesz mógł ponownie użyć tego polecenia, i tak jak Opłata Strażnika, oszczędza całkiem nowe postacie.',
+  'guide.combat.unstuckBody':
+    'Jeśli świat uwięzi cię gdzieś, skąd nie możesz się wydostać, wpisz /unstuck. Musisz być poza walką i stać nieruchomo, nie trzymany przez ogłuszenie ani unieruchomienie, i nie być w pojedynku ani meczu na arenie: rusza krótkie odliczanie, a poruszenie się lub otrzymanie obrażeń je anuluje. Gdy dobiegnie końca, zostajesz postawiony na najbliższym cmentarzu. Nigdy cię nie zabija i nie zostawia zwłok, a jeśli już leżałeś powalony, zamiast tego cię tam wskrzesza. Ceną jest Choroba Wyzwolenia, chwilowe osłabienie wszystkiego, czym jesteś, które zdąży minąć, zanim będziesz mógł ponownie użyć tego polecenia, i tak jak Opłata Strażnika, oszczędza całkiem nowe postacie.',
   'guide.combat.unstuckTitle': 'Gdy naprawdę utkniesz',
   'guide.commandsPage.abilities': 'Zdolności, których się nauczyłeś.',
-  'guide.commandsPage.afk': 'Oznacz się jako AFK (nieobecny), z opcjonalną wiadomością, którą każdy, kto cię szepnie, otrzyma jako automatyczną odpowiedź. Powtórz polecenie bez wiadomości, aby to wyłączyć; wyłącza to też każda inna wiadomość na czacie.',
-  'guide.commandsPage.aliasBody': 'Większość poleceń ma krótsze formy, a każda forma wymieniona w jednym wierszu robi dokładnie to samo: /w, /t i /tell to jedno i to samo polecenie. Słowa w nawiasach ostrych są wymagane, słowa w nawiasach kwadratowych są opcjonalne, a wielkość liter w samym poleceniu nigdy nie ma znaczenia.',
-  'guide.commandsPage.arena': 'Twoja pozycja w Popielnym Koloseum w obu przedziałach: ranking, zwycięstwa, porażki i wskaźnik zwycięstw dla 1 na 1 i 2 na 2.',
-  'guide.commandsPage.assist': 'Namierz to, co namierzył wskazany gracz. Bez podanego imienia wspomaga gracza, którego masz obecnie za cel. Działa na twoją drużynę i rajd w dowolnym miejscu świata oraz na każdego innego gracza wystarczająco blisko, byś go widział.',
-  'guide.commandsPage.attack': 'Czy automatyczny atak jest włączony, na co, i ile trwa twój zamach.',
+  'guide.commandsPage.afk':
+    'Oznacz się jako AFK (nieobecny), z opcjonalną wiadomością, którą każdy, kto cię szepnie, otrzyma jako automatyczną odpowiedź. Powtórz polecenie bez wiadomości, aby to wyłączyć; wyłącza to też każda inna wiadomość na czacie.',
+  'guide.commandsPage.aliasBody':
+    'Większość poleceń ma krótsze formy, a każda forma wymieniona w jednym wierszu robi dokładnie to samo: /w, /t i /tell to jedno i to samo polecenie. Słowa w nawiasach ostrych są wymagane, słowa w nawiasach kwadratowych są opcjonalne, a wielkość liter w samym poleceniu nigdy nie ma znaczenia.',
+  'guide.commandsPage.arena':
+    'Twoja pozycja w Popielnym Koloseum w obu przedziałach: ranking, zwycięstwa, porażki i wskaźnik zwycięstw dla 1 na 1 i 2 na 2.',
+  'guide.commandsPage.assist':
+    'Namierz to, co namierzył wskazany gracz. Bez podanego imienia wspomaga gracza, którego masz obecnie za cel. Działa na twoją drużynę i rajd w dowolnym miejscu świata oraz na każdego innego gracza wystarczająco blisko, byś go widział.',
+  'guide.commandsPage.attack':
+    'Czy automatyczny atak jest włączony, na co, i ile trwa twój zamach.',
   'guide.commandsPage.bags': 'Co niesiesz, od najlepszej jakości, z twoimi pieniędzmi na końcu.',
-  'guide.commandsPage.bangBody': 'Kilka poleceń zaczyna się od wykrzyknika zamiast ukośnika. Ogłaszają coś całemu królestwu i jednocześnie publikują to na społecznościowym Discordzie, więc widzą to też osoby, które nie są akurat zalogowane. Są częścią gry online.',
+  'guide.commandsPage.bangBody':
+    'Kilka poleceń zaczyna się od wykrzyknika zamiast ukośnika. Ogłaszają coś całemu królestwu i jednocześnie publikują to na społecznościowym Discordzie, więc widzą to też osoby, które nie są akurat zalogowane. Są częścią gry online.',
   'guide.commandsPage.bangHeading': 'Polecenia społeczności',
-  'guide.commandsPage.bangList': 'Zestaw obejmuje !lfg (szukam drużyny), !wts i !wtb (sprzedaż i kupno), !recruit (rekrutacja do gildii), !event (rajd lub spotkanie) oraz !help, gdy utkniesz. Wpisz polecenie, a potem swoją wiadomość.',
-  'guide.commandsPage.block': 'Mocniejsza wersja: dodatkowo blokuje ich szepty, zaproszenia i pocztę, a także ukrywa was wzajemnie w /who. Forma z listą wypisuje, kogo zablokowałeś.',
-  'guide.commandsPage.buffs': 'Wzmocnienia i osłabienia działające na ciebie, wraz z pozostałym czasem każdego z nich.',
+  'guide.commandsPage.bangList':
+    'Zestaw obejmuje !lfg (szukam drużyny), !wts i !wtb (sprzedaż i kupno), !recruit (rekrutacja do gildii), !event (rajd lub spotkanie) oraz !help, gdy utkniesz. Wpisz polecenie, a potem swoją wiadomość.',
+  'guide.commandsPage.block':
+    'Mocniejsza wersja: dodatkowo blokuje ich szepty, zaproszenia i pocztę, a także ukrywa was wzajemnie w /who. Forma z listą wypisuje, kogo zablokowałeś.',
+  'guide.commandsPage.buffs':
+    'Wzmocnienia i osłabienia działające na ciebie, wraz z pozostałym czasem każdego z nich.',
   'guide.commandsPage.buyback': 'Co ostatnio sprzedałeś sprzedawcy i wciąż możesz odkupić.',
   'guide.commandsPage.casting': 'Co rzucasz lub kanalizujesz i ile czasu zostało.',
-  'guide.commandsPage.channelsIntro': 'Ogólny dociera do całego królestwa i jesteś w nim od chwili zalogowania. World i LFG są dobrowolne: najpierw dołącz, a potem możesz w nim czytać i pisać.',
+  'guide.commandsPage.channelsIntro':
+    'Ogólny dociera do całego królestwa i jesteś w nim od chwili zalogowania. World i LFG są dobrowolne: najpierw dołącz, a potem możesz w nim czytać i pisać.',
   'guide.commandsPage.cmdHeader': 'Polecenie',
   'guide.commandsPage.combat': 'Czy jesteś w walce i kiedy powinieneś z niej wypaść.',
   'guide.commandsPage.combo': 'Ile punktów kombinacji obecnie trzymasz.',
-  'guide.commandsPage.completed': 'Zadania, które już oddałeś, w kolejności, w jakiej je ukończyłeś.',
-  'guide.commandsPage.consider': 'Jak groźny, w porównaniu z twoim poziomem, jest poziom twojego celu.',
-  'guide.commandsPage.consumable': 'Jedzenie i picie działające obecnie na ciebie oraz ile czasu zostało każdemu z nich.',
+  'guide.commandsPage.completed':
+    'Zadania, które już oddałeś, w kolejności, w jakiej je ukończyłeś.',
+  'guide.commandsPage.consider':
+    'Jak groźny, w porównaniu z twoim poziomem, jest poziom twojego celu.',
+  'guide.commandsPage.consumable':
+    'Jedzenie i picie działające obecnie na ciebie oraz ile czasu zostało każdemu z nich.',
   'guide.commandsPage.cooldowns': 'Które z twoich zdolności się odnawiają, od najszybciej gotowej.',
-  'guide.commandsPage.dnd': 'Nie przeszkadzać: podobnie jak nieobecność, z tą różnicą, że wysyłane do ciebie szepty są wstrzymywane zamiast dostarczane.',
+  'guide.commandsPage.dnd':
+    'Nie przeszkadzać: podobnie jak nieobecność, z tą różnicą, że wysyłane do ciebie szepty są wstrzymywane zamiast dostarczane.',
   'guide.commandsPage.doesHeader': 'Co robi',
   'guide.commandsPage.dungeonMode': 'Przełącz swoje lochy między trudnością normalną a heroiczną.',
-  'guide.commandsPage.dungeonReset': 'Porzuć swoje własne puste instancje: to właśnie robisz po zmianie trudności.',
-  'guide.commandsPage.dungeons': 'Każdy loch wraz ze strefą, w której znajdują się jego drzwi, rozmiarem drużyny, dla jakiej jest pomyślany, oraz trudnością, na jaką jesteś obecnie ustawiony.',
-  'guide.commandsPage.emotesBody': 'Emotki społecznościowe też są poleceniami: /wave, /bow, /cheer, /dance, /laugh i pozostałe, każda widoczna dla wszystkich w zasięgu mówienia. Dodaj imię, by skierować emotkę do kogoś, jak w "/wave Aleph", a /me obejmuje wszystko, czego nie ma na liście.',
+  'guide.commandsPage.dungeonReset':
+    'Porzuć swoje własne puste instancje: to właśnie robisz po zmianie trudności.',
+  'guide.commandsPage.dungeons':
+    'Każdy loch wraz ze strefą, w której znajdują się jego drzwi, rozmiarem drużyny, dla jakiej jest pomyślany, oraz trudnością, na jaką jesteś obecnie ustawiony.',
+  'guide.commandsPage.emotesBody':
+    'Emotki społecznościowe też są poleceniami: /wave, /bow, /cheer, /dance, /laugh i pozostałe, każda widoczna dla wszystkich w zasięgu mówienia. Dodaj imię, by skierować emotkę do kogoś, jak w "/wave Aleph", a /me obejmuje wszystko, czego nie ma na liście.',
   'guide.commandsPage.emotesHeading': 'Emotki',
   'guide.commandsPage.emotesMore': 'Więcej o emotkach i wspólnej grze',
-  'guide.commandsPage.falling': 'Czy jesteś w powietrzu, jak wysoko nad ziemią się znajdujesz i czy lądowanie będzie bolesne.',
-  'guide.commandsPage.follow': 'Automatycznie podążaj za innym graczem. Bez podanego imienia podąża za twoim obecnym celem. Ruch, rzucanie zaklęć, walka, wybór nowego celu lub oddalenie się drugiego gracza kończą to, a w walce nie da się tego rozpocząć.',
-  'guide.commandsPage.form': 'Postać, w jaką się przemieniłeś, lub postawa bojowa, w jakiej się znajdujesz.',
-  'guide.commandsPage.gAlias': 'Krótka forma o dwóch znaczeniach, więc warto ją znać: offline wysyła na kanał Ogólny, ale online jest twoim kanałem gildii. Wpisz /general albo /1, gdy naprawdę chodzi ci o kanał Ogólny.',
-  'guide.commandsPage.gear': 'Wszystko, co masz założone, slot po slocie, dzięki czemu puste sloty rzucają się w oczy.',
+  'guide.commandsPage.falling':
+    'Czy jesteś w powietrzu, jak wysoko nad ziemią się znajdujesz i czy lądowanie będzie bolesne.',
+  'guide.commandsPage.follow':
+    'Automatycznie podążaj za innym graczem. Bez podanego imienia podąża za twoim obecnym celem. Ruch, rzucanie zaklęć, walka, wybór nowego celu lub oddalenie się drugiego gracza kończą to, a w walce nie da się tego rozpocząć.',
+  'guide.commandsPage.form':
+    'Postać, w jaką się przemieniłeś, lub postawa bojowa, w jakiej się znajdujesz.',
+  'guide.commandsPage.gAlias':
+    'Krótka forma o dwóch znaczeniach, więc warto ją znać: offline wysyła na kanał Ogólny, ale online jest twoim kanałem gildii. Wpisz /general albo /1, gdy naprawdę chodzi ci o kanał Ogólny.',
+  'guide.commandsPage.gear':
+    'Wszystko, co masz założone, slot po slocie, dzięki czemu puste sloty rzucają się w oczy.',
   'guide.commandsPage.general': 'Kanał Ogólny obejmujący całe królestwo.',
   'guide.commandsPage.gold': 'Co masz w sakiewce.',
   'guide.commandsPage.graveyard': 'Dokąd trafi twój duch, jeśli polegniesz w tym miejscu.',
@@ -756,127 +1055,207 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.groupState': 'Twój obecny stan',
   'guide.commandsPage.groupTalking': 'Rozmowa',
   'guide.commandsPage.groupWorld': 'Świat i podróże',
-  'guide.commandsPage.guild': 'Rozmawiaj ze swoją gildią. Tylko w grze online, i musisz należeć do gildii.',
+  'guide.commandsPage.guild':
+    'Rozmawiaj ze swoją gildią. Tylko w grze online, i musisz należeć do gildii.',
   'guide.commandsPage.help': 'Wypisz listę poleceń na czacie.',
-  'guide.commandsPage.helpTipBody': 'Wpisz w grze /help, /commands, albo po prostu /?, a cała lista poleceń pojawi się na twoim czacie. Pomyl się w poleceniu, a gra powie ci, że go nie rozpoznała, i odeśle z powrotem do /help.',
+  'guide.commandsPage.helpTipBody':
+    'Wpisz w grze /help, /commands, albo po prostu /?, a cała lista poleceń pojawi się na twoim czacie. Pomyl się w poleceniu, a gra powie ci, że go nie rozpoznała, i odeśle z powrotem do /help.',
   'guide.commandsPage.helpTipTitle': 'Gra też zna tę listę',
-  'guide.commandsPage.ignore': 'Ukryj przed sobą publiczny czat gracza i jego dymki czatu nad głową. Jego szepty, rzuty, zaproszenia i poczta wciąż do ciebie docierają. Forma z listą wypisuje, kogo ignorujesz.',
+  'guide.commandsPage.ignore':
+    'Ukryj przed sobą publiczny czat gracza i jego dymki czatu nad głową. Jego szepty, rzuty, zaproszenia i poczta wciąż do ciebie docierają. Forma z listą wypisuje, kogo ignorujesz.',
   'guide.commandsPage.inspect': 'Sprawdź poziom, klasę i zdrowie gracza online.',
-  'guide.commandsPage.intro': 'Każde polecenie, jakie możesz wpisać na czacie, pogrupowane według przeznaczenia, wraz z jego krótkimi formami.',
-  'guide.commandsPage.invite': 'Zaproś gracza online do swojej drużyny po imieniu, niezależnie od tego, jak daleko stoi.',
-  'guide.commandsPage.join': 'Dołącz do opcjonalnego kanału albo go opuść. Możesz dołączyć do dwóch: world i lfg, a samo wpisanie /join wyświetla ich listę. Otwarcie zakładki czatu dla jednego z nich dołącza cię do niego automatycznie.',
-  'guide.commandsPage.lfg': 'Rozmawiaj na kanale LFG, gdzie ludzie szukają grup. Najpierw do niego dołącz.',
-  'guide.commandsPage.listings': 'Twoje własne oferty na Rynku Świata, wraz z ceną wywoławczą, pozostałym czasem każdej z nich i tym, ile masz jeszcze miejsca na kolejne.',
-  'guide.commandsPage.manaRegen': 'Dla użytkowników many: czy twoja regeneracja many poza walką znów zaczęła działać.',
-  'guide.commandsPage.me': 'Dowolny tekst czynności w trzeciej osobie, więc "/me zamyśla się nad fontanną" wyświetla się jako twoje imię, po którym następuje ta czynność. Widzi to każdy w pobliżu.',
+  'guide.commandsPage.intro':
+    'Każde polecenie, jakie możesz wpisać na czacie, pogrupowane według przeznaczenia, wraz z jego krótkimi formami.',
+  'guide.commandsPage.invite':
+    'Zaproś gracza online do swojej drużyny po imieniu, niezależnie od tego, jak daleko stoi.',
+  'guide.commandsPage.join':
+    'Dołącz do opcjonalnego kanału albo go opuść. Możesz dołączyć do dwóch: world i lfg, a samo wpisanie /join wyświetla ich listę. Otwarcie zakładki czatu dla jednego z nich dołącza cię do niego automatycznie.',
+  'guide.commandsPage.lfg':
+    'Rozmawiaj na kanale LFG, gdzie ludzie szukają grup. Najpierw do niego dołącz.',
+  'guide.commandsPage.listings':
+    'Twoje własne oferty na Rynku Świata, wraz z ceną wywoławczą, pozostałym czasem każdej z nich i tym, ile masz jeszcze miejsca na kolejne.',
+  'guide.commandsPage.manaRegen':
+    'Dla użytkowników many: czy twoja regeneracja many poza walką znów zaczęła działać.',
+  'guide.commandsPage.me':
+    'Dowolny tekst czynności w trzeciej osobie, więc "/me zamyśla się nad fontanną" wyświetla się jako twoje imię, po którym następuje ta czynność. Widzi to każdy w pobliżu.',
   'guide.commandsPage.nearby': 'Żywe istoty najbliżej ciebie, od najbliższej.',
-  'guide.commandsPage.officer': 'Kanał oficerski twojej gildii, dostępny dla oficerów i Mistrza Gildii. Tylko w grze online.',
-  'guide.commandsPage.overpower': 'Dla wojowników: czy okno Krwawej ręki, otwierane unikiem wroga, jest wciąż dostępne.',
+  'guide.commandsPage.officer':
+    'Kanał oficerski twojej gildii, dostępny dla oficerów i Mistrza Gildii. Tylko w grze online.',
+  'guide.commandsPage.overpower':
+    'Dla wojowników: czy okno Krwawej ręki, otwierane unikiem wroga, jest wciąż dostępne.',
   'guide.commandsPage.partyChat': 'Rozmawiaj z każdym w swojej drużynie lub rajdzie.',
-  'guide.commandsPage.partyRoster': 'Bez wiadomości po nim, wypisuje zamiast tego skład twojej drużyny: każdego członka z poziomem, klasą i zdrowiem, z oznaczonym liderem.',
-  'guide.commandsPage.peopleNote': 'Lista /who oraz twoje listy ignorowanych i zablokowanych są przechowywane przez serwer, więc działają tylko w grze online.',
+  'guide.commandsPage.partyRoster':
+    'Bez wiadomości po nim, wypisuje zamiast tego skład twojej drużyny: każdego członka z poziomem, klasą i zdrowiem, z oznaczonym liderem.',
+  'guide.commandsPage.peopleNote':
+    'Lista /who oraz twoje listy ignorowanych i zablokowanych są przechowywane przez serwer, więc działają tylko w grze online.',
   'guide.commandsPage.pet': 'Imię, poziom, rodzina i zdrowie twojego zwierzęcia.',
-  'guide.commandsPage.petTaunt': 'Czas odnowienia Prowokacji twojego zwierzęcia oraz czy jest ustawione na rzucanie jej samodzielnie.',
+  'guide.commandsPage.petTaunt':
+    'Czas odnowienia Prowokacji twojego zwierzęcia oraz czy jest ustawione na rzucanie jej samodzielnie.',
   'guide.commandsPage.played': 'Jak długo ta postać przebywa w świecie podczas tej sesji.',
   'guide.commandsPage.playtime': 'Jak długo w sumie grano tą postacią, licząc wszystkie sesje.',
-  'guide.commandsPage.pois': 'Punkty orientacyjne twojej obecnej strefy, od najbliższego, wraz z odległością do każdego z nich.',
-  'guide.commandsPage.potion': 'Wspólny czas odnowienia mikstur bojowych, oddzielny od czasów odnowienia twoich zdolności.',
+  'guide.commandsPage.pois':
+    'Punkty orientacyjne twojej obecnej strefy, od najbliższego, wraz z odległością do każdego z nich.',
+  'guide.commandsPage.potion':
+    'Wspólny czas odnowienia mikstur bojowych, oddzielny od czasów odnowienia twoich zdolności.',
   'guide.commandsPage.quests': 'Twój dziennik aktywnych zadań wraz z postępem każdego celu.',
-  'guide.commandsPage.queued': 'Zdolność uzbrojona, by odpalić przy twoim następnym zamachu w zwarciu.',
-  'guide.commandsPage.range': 'Jak daleko znajduje się twój cel i czy mieści się w zasięgu zwarcia.',
-  'guide.commandsPage.ready': 'Lider drużyny lub rajdu rozpoczyna sprawdzenie gotowości, a każdy pozostały dostaje prośbę o odpowiedź tak lub nie.',
-  'guide.commandsPage.reply': 'Odpowiedz temu, kto ostatnio cię szepnął, bez ponownego wpisywania jego imienia.',
-  'guide.commandsPage.roll': 'Wylosuj liczbę, od 1 do 100, chyba że podasz limit lub zakres. Wynik widzi twoja drużyna, a gdy w żadnej nie jesteś, każdy w pobliżu. Losowanie wykonuje serwer, więc nikt nie może go sfałszować.',
-  'guide.commandsPage.savedMana': 'Dla użytkownika many, który jest przemieniony: mana odłożona na czas przemiany, która wraca, gdy z niej wyjdziesz.',
-  'guide.commandsPage.say': 'Mów do graczy stojących w pobliżu. Zwykła linia bez ukośnika trafia na tę zakładkę czatu, którą masz wybraną, a Mów to ta, od której zaczynasz.',
-  'guide.commandsPage.selfIntro': 'Te polecenia wypisują prywatną linię na twoim czacie, której nikt inny nie widzi. Nic nie jest rozgłaszane, więc bezpiecznie jest ich używać w środku walki.',
-  'guide.commandsPage.session': 'Co zrobiłeś od zalogowania: zabójstwa, śmierci, obrażenia i doświadczenie.',
-  'guide.commandsPage.sit': 'Usiądź tam, gdzie stoisz, i wstań z powrotem. Wstajesz automatycznie w chwili, gdy się poruszysz, zaczniesz rzucać zaklęcie albo oberwiesz.',
-  'guide.commandsPage.slashBody': 'Wszystko, co wpiszesz w okno czatu, zaczynając od ukośnika, jest poleceniem, a nie czymś, co mówisz na głos. Naciśnij Enter, a albo coś się wydarzy (podążasz za kimś, zapraszasz go, losujesz), albo wypisze się prywatna linia widoczna tylko dla ciebie.',
-  'guide.commandsPage.speed': 'Jak szybko się poruszasz w porównaniu ze zwykłym biegiem i czy coś cię unieruchomiło.',
-  'guide.commandsPage.stats': 'Jednolinijkowe podsumowanie postaci: poziom, klasa, zdrowie, twój zasób, moc ataku, szansa na trafienie krytyczne i pancerz.',
-  'guide.commandsPage.stickyBody': 'To, którą zakładkę czatu masz wybraną, decyduje, dokąd trafia zwykła linia bez ukośnika. Wybierz zakładkę World, a twoja następna nieoznaczona linia trafi na World, więc rzuć okiem na zakładkę, zanim zaczniesz pisać. Polecenie z ukośnikiem zawsze wygrywa z zakładką, więc /w Bob hi szepcze do Boba niezależnie od tego, jaka zakładka jest otwarta, a na zakładce szeptu zwykła linia odpowiada temu, kto ostatnio cię szepnął.',
-  'guide.commandsPage.talents': 'Twoja specjalizacja oraz to, ile spośród sześciu rzędów talentów wybrałeś do tej pory.',
+  'guide.commandsPage.queued':
+    'Zdolność uzbrojona, by odpalić przy twoim następnym zamachu w zwarciu.',
+  'guide.commandsPage.range':
+    'Jak daleko znajduje się twój cel i czy mieści się w zasięgu zwarcia.',
+  'guide.commandsPage.ready':
+    'Lider drużyny lub rajdu rozpoczyna sprawdzenie gotowości, a każdy pozostały dostaje prośbę o odpowiedź tak lub nie.',
+  'guide.commandsPage.reply':
+    'Odpowiedz temu, kto ostatnio cię szepnął, bez ponownego wpisywania jego imienia.',
+  'guide.commandsPage.roll':
+    'Wylosuj liczbę, od 1 do 100, chyba że podasz limit lub zakres. Wynik widzi twoja drużyna, a gdy w żadnej nie jesteś, każdy w pobliżu. Losowanie wykonuje serwer, więc nikt nie może go sfałszować.',
+  'guide.commandsPage.savedMana':
+    'Dla użytkownika many, który jest przemieniony: mana odłożona na czas przemiany, która wraca, gdy z niej wyjdziesz.',
+  'guide.commandsPage.say':
+    'Mów do graczy stojących w pobliżu. Zwykła linia bez ukośnika trafia na tę zakładkę czatu, którą masz wybraną, a Mów to ta, od której zaczynasz.',
+  'guide.commandsPage.selfIntro':
+    'Te polecenia wypisują prywatną linię na twoim czacie, której nikt inny nie widzi. Nic nie jest rozgłaszane, więc bezpiecznie jest ich używać w środku walki.',
+  'guide.commandsPage.session':
+    'Co zrobiłeś od zalogowania: zabójstwa, śmierci, obrażenia i doświadczenie.',
+  'guide.commandsPage.sit':
+    'Usiądź tam, gdzie stoisz, i wstań z powrotem. Wstajesz automatycznie w chwili, gdy się poruszysz, zaczniesz rzucać zaklęcie albo oberwiesz.',
+  'guide.commandsPage.slashBody':
+    'Wszystko, co wpiszesz w okno czatu, zaczynając od ukośnika, jest poleceniem, a nie czymś, co mówisz na głos. Naciśnij Enter, a albo coś się wydarzy (podążasz za kimś, zapraszasz go, losujesz), albo wypisze się prywatna linia widoczna tylko dla ciebie.',
+  'guide.commandsPage.speed':
+    'Jak szybko się poruszasz w porównaniu ze zwykłym biegiem i czy coś cię unieruchomiło.',
+  'guide.commandsPage.stats':
+    'Jednolinijkowe podsumowanie postaci: poziom, klasa, zdrowie, twój zasób, moc ataku, szansa na trafienie krytyczne i pancerz.',
+  'guide.commandsPage.stickyBody':
+    'To, którą zakładkę czatu masz wybraną, decyduje, dokąd trafia zwykła linia bez ukośnika. Wybierz zakładkę World, a twoja następna nieoznaczona linia trafi na World, więc rzuć okiem na zakładkę, zanim zaczniesz pisać. Polecenie z ukośnikiem zawsze wygrywa z zakładką, więc /w Bob hi szepcze do Boba niezależnie od tego, jaka zakładka jest otwarta, a na zakładce szeptu zwykła linia odpowiada temu, kto ostatnio cię szepnął.',
+  'guide.commandsPage.talents':
+    'Twoja specjalizacja oraz to, ile spośród sześciu rzędów talentów wybrałeś do tej pory.',
   'guide.commandsPage.target': 'Twój obecny cel: imię, poziom, czym jest, oraz zdrowie.',
-  'guide.commandsPage.targetBuffs': 'Aury na twoim celu, każda oznaczona jako wzmocnienie lub osłabienie.',
+  'guide.commandsPage.targetBuffs':
+    'Aury na twoim celu, każda oznaczona jako wzmocnienie lub osłabienie.',
   'guide.commandsPage.threat': 'Na kim obecnie skupieni są wrogowie z tobą walczący.',
   'guide.commandsPage.unfollow': 'Przestań podążać.',
-  'guide.commandsPage.unknownBody': 'Polecenie, którego gra nie rozpoznaje, wraca jako powiadomienie o nieznanym poleceniu, a nic nie zostaje powiedziane na głos, więc literówka nigdy nie trafia na kanał, na którym rozmawiałeś. Polecenia wysyłane zbyt szybko pod rząd są tłumione: zwolnij na chwilę, a znów zaczną działać. Niektóre potrzebują czegoś, na czym mogą zadziałać, więc /follow bez wybranego celu albo /reply, gdy nikt cię nie szepnął, poinformują cię o tym.',
+  'guide.commandsPage.unknownBody':
+    'Polecenie, którego gra nie rozpoznaje, wraca jako powiadomienie o nieznanym poleceniu, a nic nie zostaje powiedziane na głos, więc literówka nigdy nie trafia na kanał, na którym rozmawiałeś. Polecenia wysyłane zbyt szybko pod rząd są tłumione: zwolnij na chwilę, a znów zaczną działać. Niektóre potrzebują czegoś, na czym mogą zadziałać, więc /follow bez wybranego celu albo /reply, gdy nikt cię nie szepnął, poinformują cię o tym.',
   'guide.commandsPage.unknownHeading': 'Jeśli polecenie nie działa',
-  'guide.commandsPage.unstuck': 'Wyjście, gdy świat cię uwięzi. Stój nieruchomo przez krótkie odliczanie, a zostaniesz przeniesiony na najbliższy cmentarz i tam wskrzeszony, jeśli już poległeś. Zostawia cię potem na chwilę osłabionym Chorobą Wyzwolenia, więc to ostateczność, a nie skrót.',
-  'guide.commandsPage.where': 'Strefa, w której stoisz, jej zakres poziomów oraz twoje współrzędne.',
-  'guide.commandsPage.whisper': 'Wyślij prywatną wiadomość do jednego gracza, który jest online. Jego imię dopasowuje się niezależnie od wielkości liter, jakie wpiszesz, o ile może chodzić tylko o jednego gracza.',
-  'guide.commandsPage.who': 'Wypisz graczy online. Dodaj tekst, aby zawęzić listę do imion lub stref zawierających ten tekst.',
+  'guide.commandsPage.unstuck':
+    'Wyjście, gdy świat cię uwięzi. Stój nieruchomo przez krótkie odliczanie, a zostaniesz przeniesiony na najbliższy cmentarz i tam wskrzeszony, jeśli już poległeś. Zostawia cię potem na chwilę osłabionym Chorobą Wyzwolenia, więc to ostateczność, a nie skrót.',
+  'guide.commandsPage.where':
+    'Strefa, w której stoisz, jej zakres poziomów oraz twoje współrzędne.',
+  'guide.commandsPage.whisper':
+    'Wyślij prywatną wiadomość do jednego gracza, który jest online. Jego imię dopasowuje się niezależnie od wielkości liter, jakie wpiszesz, o ile może chodzić tylko o jednego gracza.',
+  'guide.commandsPage.who':
+    'Wypisz graczy online. Dodaj tekst, aby zawęzić listę do imion lub stref zawierających ten tekst.',
   'guide.commandsPage.world': 'Rozmawiaj na kanale World, gdy już do niego dołączysz.',
   'guide.commandsPage.xp': 'Twój poziom i to, jak daleko go przeszedłeś.',
   'guide.commandsPage.yell': 'Krzycz, aby usłyszeli cię gracze znacznie dalej niż zasięg mówienia.',
-  'guide.commandsPage.zones': 'Każda strefa w kolejności podróży wraz z zakresem poziomów, z oznaczoną tą, w której obecnie jesteś.',
+  'guide.commandsPage.zones':
+    'Każda strefa w kolejności podróży wraz z zakresem poziomów, z oznaczoną tą, w której obecnie jesteś.',
   'guide.controls.attackMove': 'Ruch z atakiem (dopiero po włączeniu tej opcji)',
   'guide.controls.bgFlag': 'Zabierz wrogą flagę na Polach Ciernistej Kotliny',
-  'guide.controls.clickMoveNote': 'Ruch kliknięciem jest wyłączony, dopóki go nie włączysz: otwórz panel Przypisań klawiszy w menu gry, włącz Ruch kliknięciem, a następnie w wierszu Przycisk ruchu kliknięciem poniżej wybierz, który przycisk myszy odpowiada za chodzenie (domyślnie Lewy przycisk, albo Prawy przycisk). Gdy jest włączony, kliknięcie punktu na ziemi wysyła cię tam pieszo, ze znacznikiem na ziemi pokazującym cel. Kliknięcie stworzenia lub innego gracza prowadzi cię do niego i zatrzymuje w zasięgu, podczas gdy to samo kliknięcie wciąż wykonuje swoją zwykłą pracę namierzania lub interakcji; jeśli jesteś już wystarczająco blisko tego, co kliknąłeś, po prostu wchodzisz w interakcję i zostajesz na miejscu. Każdy z klawiszy ruchu natychmiast przejmuje kontrolę i kończy podróż, podobnie jak przytrzymanie przycisku myszy, by się rozglądać. Skakanie tego nie robi, więc kontynuujesz podróż przez podskok, a otwarcie menu gry tylko wstrzymuje podróż, która wraca po zamknięciu menu.',
+  'guide.controls.clickMoveNote':
+    'Ruch kliknięciem jest wyłączony, dopóki go nie włączysz: otwórz panel Przypisań klawiszy w menu gry, włącz Ruch kliknięciem, a następnie w wierszu Przycisk ruchu kliknięciem poniżej wybierz, który przycisk myszy odpowiada za chodzenie (domyślnie Lewy przycisk, albo Prawy przycisk). Gdy jest włączony, kliknięcie punktu na ziemi wysyła cię tam pieszo, ze znacznikiem na ziemi pokazującym cel. Kliknięcie stworzenia lub innego gracza prowadzi cię do niego i zatrzymuje w zasięgu, podczas gdy to samo kliknięcie wciąż wykonuje swoją zwykłą pracę namierzania lub interakcji; jeśli jesteś już wystarczająco blisko tego, co kliknąłeś, po prostu wchodzisz w interakcję i zostajesz na miejscu. Każdy z klawiszy ruchu natychmiast przejmuje kontrolę i kończy podróż, podobnie jak przytrzymanie przycisku myszy, by się rozglądać. Skakanie tego nie robi, więc kontynuujesz podróż przez podskok, a otwarcie menu gry tylko wstrzymuje podróż, która wraca po zamknięciu menu.',
   'guide.controls.jumpSwim': 'Skacz, a w wodzie płyń w górę',
   'guide.controls.meters': 'Liczniki obrażeń (obrażenia, leczenie i zagrożenie)',
   'guide.controls.moveAlt': 'Ruch i obrót (te same cztery czynności, na swoim drugim klawiszu)',
-  'guide.controls.onBarBinding': 'Możesz też przypisywać klawisze wprost z paska: wybierz Edytuj klawisze paska akcji w panelu Przypisań klawiszy, a następnie kliknij slot na aktywnym pasku i naciśnij klawisz, którego chcesz użyć. Po zakończeniu kliknij Gotowe. Ta metoda działa tylko na komputerze, ponieważ wymaga fizycznej klawiatury.',
-  'guide.controls.petMark': 'Zwierzę: Zaznacz, wybierz własne zwierzę (to samo co kliknięcie jego ramki)',
+  'guide.controls.onBarBinding':
+    'Możesz też przypisywać klawisze wprost z paska: wybierz Edytuj klawisze paska akcji w panelu Przypisań klawiszy, a następnie kliknij slot na aktywnym pasku i naciśnij klawisz, którego chcesz użyć. Po zakończeniu kliknij Gotowe. Ta metoda działa tylko na komputerze, ponieważ wymaga fizycznej klawiatury.',
+  'guide.controls.petMark':
+    'Zwierzę: Zaznacz, wybierz własne zwierzę (to samo co kliknięcie jego ramki)',
   'guide.controls.swimDown': 'Płyń w dół, gdy jesteś w wodzie (przytrzymaj)',
-  'guide.controls.swimNote': 'Pływanie korzysta z dwóch klawiszy: przytrzymaj Spację, by się unosić, i LCtrl, by opadać. Skierowanie kamery w dół podczas pływania do przodu również powoduje nurkowanie, więc możesz sterować głębokością samym spojrzeniem. LCtrl to jedyny domyślny klawisz, który sam w sobie jest modyfikatorem, a samo naciśnięcie modyfikatora jest ignorowane podczas przypisywania, więc jeśli zmieniasz klawisz dla Płynięcia w dół, wybierz taki, który nie jest modyfikatorem.',
-  'guide.deedsPage.bookBody': 'Księga sortuje każdy czyn do kategorii, między którymi możesz się przełączać, z polem wyszukiwania i filtrami na wszystko: na to, co już zdobyłeś, na to, czego jeszcze nie zdobyłeś, oraz na te, które są prawie ukończone. Pasek Ostatnie przy górze mieści twoje najnowsze odblokowania, a kliknięcie jednego z nich przenosi prosto do jego karty, tak samo jak kliknięcie nazwy czynu wklejonej przez kogoś na czacie. Obok niego Prawie u celu wskazuje garstkę czynów najbliższych ukończenia. W królestwie każdy czyn niesie też swą rzadkość, odsetek poszukiwaczy przygód, którzy go zdobyli, dzięki czemu od razu widać, które są pospolite, a które to prawdziwa wspinaczka; świat offline nie ma populacji do zliczenia, więc nie pokazuje niczego. Na końcu listwy czeka półka Tytuły, gdzie wybierasz ten, który nosisz.',
+  'guide.controls.swimNote':
+    'Pływanie korzysta z dwóch klawiszy: przytrzymaj Spację, by się unosić, i LCtrl, by opadać. Skierowanie kamery w dół podczas pływania do przodu również powoduje nurkowanie, więc możesz sterować głębokością samym spojrzeniem. LCtrl to jedyny domyślny klawisz, który sam w sobie jest modyfikatorem, a samo naciśnięcie modyfikatora jest ignorowane podczas przypisywania, więc jeśli zmieniasz klawisz dla Płynięcia w dół, wybierz taki, który nie jest modyfikatorem.',
+  'guide.deedsPage.bookBody':
+    'Księga sortuje każdy czyn do kategorii, między którymi możesz się przełączać, z polem wyszukiwania i filtrami na wszystko: na to, co już zdobyłeś, na to, czego jeszcze nie zdobyłeś, oraz na te, które są prawie ukończone. Pasek Ostatnie przy górze mieści twoje najnowsze odblokowania, a kliknięcie jednego z nich przenosi prosto do jego karty, tak samo jak kliknięcie nazwy czynu wklejonej przez kogoś na czacie. Obok niego Prawie u celu wskazuje garstkę czynów najbliższych ukończenia. W królestwie każdy czyn niesie też swą rzadkość, odsetek poszukiwaczy przygód, którzy go zdobyli, dzięki czemu od razu widać, które są pospolite, a które to prawdziwa wspinaczka; świat offline nie ma populacji do zliczenia, więc nie pokazuje niczego. Na końcu listwy czeka półka Tytuły, gdzie wybierasz ten, który nosisz.',
   'guide.deedsPage.bookHeading': 'Wewnątrz Księgi',
-  'guide.deedsPage.platformBody': 'Jeśli połączysz konto Steam lub Epic Games z poziomu launchera na komputer, zdobywane przez ciebie czyny są odzwierciedlane na zewnątrz jako osiągnięcia na tym koncie. Świat gry pozostaje najwyższym autorytetem: czyn zdobywasz tutaj, zostaje on zapisany na twojej postaci, a osiągnięcie pojawia się dopiero potem. Nie każdy czyn ma odpowiadające mu osiągnięcie, a jeśli któreś nie pojawi się od razu, dogoni cię przy najbliższym logowaniu. Połączenie konta to zawsze tylko powiązanie, nigdy sposób logowania.',
+  'guide.deedsPage.platformBody':
+    'Jeśli połączysz konto Steam lub Epic Games z poziomu launchera na komputer, zdobywane przez ciebie czyny są odzwierciedlane na zewnątrz jako osiągnięcia na tym koncie. Świat gry pozostaje najwyższym autorytetem: czyn zdobywasz tutaj, zostaje on zapisany na twojej postaci, a osiągnięcie pojawia się dopiero potem. Nie każdy czyn ma odpowiadające mu osiągnięcie, a jeśli któreś nie pojawi się od razu, dogoni cię przy najbliższym logowaniu. Połączenie konta to zawsze tylko powiązanie, nigdy sposób logowania.',
   'guide.deedsPage.platformHeading': 'Osiągnięcia Steam i Epic',
-  'guide.delvesPage.lockpickAnteBody': 'Zanim dotkniesz zamka, ustalasz warunki. Weź trzy wytrychy, a zostawisz sobie margines na potknięcie, lecz kufer wypłaci najskromniejszą nagrodę; weź dwa dla środkowego układu; weź jeden, a czyste rozwiązanie zapłaci najhojniej ze wszystkich. Im mniej wytrychów trzymasz, tym mniej czasu masz na namysł między ruchami, a jeśli ostatni pęknie, zamek zacina się na dobre: ten kufer jest stracony, dopóki nie oczyścisz wyprawy ponownie.',
-  'guide.delvesPage.riteBody': 'Nie każda wyprawa kończy się zamkiem. Utopiona Litania zamyka się rytuałem: gdy jej strażnik padnie, kapliczki wokół relikwiarza zapalają się w pewnej kolejności i proszą, byś odpowiedział tym samym. Zanim rytuał się zacznie, wybierasz, jak trudny ma być, ten sam układ, o jaki proszą wytrychy. Łagodne ustawienie powtarza ci sekwencję więcej niż raz i daje więcej niż jedną próbę, lecz ogranicza to, co wypłaci relikwiarz; najsurowsze pokazuje kolejność tylko raz, daje jedną próbę i jest jedyną drogą do najhojniejszej nagrody.',
+  'guide.delvesPage.lockpickAnteBody':
+    'Zanim dotkniesz zamka, ustalasz warunki. Weź trzy wytrychy, a zostawisz sobie margines na potknięcie, lecz kufer wypłaci najskromniejszą nagrodę; weź dwa dla środkowego układu; weź jeden, a czyste rozwiązanie zapłaci najhojniej ze wszystkich. Im mniej wytrychów trzymasz, tym mniej czasu masz na namysł między ruchami, a jeśli ostatni pęknie, zamek zacina się na dobre: ten kufer jest stracony, dopóki nie oczyścisz wyprawy ponownie.',
+  'guide.delvesPage.riteBody':
+    'Nie każda wyprawa kończy się zamkiem. Utopiona Litania zamyka się rytuałem: gdy jej strażnik padnie, kapliczki wokół relikwiarza zapalają się w pewnej kolejności i proszą, byś odpowiedział tym samym. Zanim rytuał się zacznie, wybierasz, jak trudny ma być, ten sam układ, o jaki proszą wytrychy. Łagodne ustawienie powtarza ci sekwencję więcej niż raz i daje więcej niż jedną próbę, lecz ogranicza to, co wypłaci relikwiarz; najsurowsze pokazuje kolejność tylko raz, daje jedną próbę i jest jedyną drogą do najhojniejszej nagrody.',
   'guide.delvesPage.riteHeading': 'Gdy wyprawa kończy się rytuałem',
-  'guide.dungeonsPage.finderBoardBody': 'Wolisz sam dobrać sobie towarzystwo? Przywódca drużyny może zamiast tego wystawić grupę na tablicy gotowych grup, oznaczoną tym, do czego służy przebieg: pierwszy przebieg, przebieg zadań, pełne czyszczenie, przebieg nauki albo szybki przebieg. Inni gracze zgłaszają się, a przywódca decyduje, kto dołączy. Nie ma dowolnego tekstu ogłoszenia, tylko tagi, a jedna pozycja na liście jest dostępna wyłącznie przez tablicę, oferowana jako ogłoszenie, a nie przez automatyczną kolejkę.',
-  'guide.dungeonsPage.finderBody': 'Nie musisz krzyczeć na czacie, żeby skompletować drużynę. Otwórz Wyszukiwarkę lochów, aby zobaczyć przebiegi, do których kolejkuje, wybierz te, w które chcesz się wybrać, wybierz rolę, którą zagrasz, i dołącz do kolejki. Wyszukiwarka buduje pełną grupę z właściwym zestawem tanka, uzdrowiciela i obrażeń, po czym oferuje ją wszystkim naraz, a ty trafiasz do grupy w chwili, gdy drużyna zaakceptuje. Lista nie ogranicza się do przebiegów dla pięciu graczy: rajd dla dziesięciu graczy też kolejkuje się tutaj, na obu poziomach trudności, choć wyszukiwarka nigdy nie sprawdza, czy wywalczyłeś sobie wstęp, więc same drzwi wciąż mogą cię zawrócić. Nie każdy przebieg w królestwie widnieje na jej liście, więc rzuć na nią okiem, zanim zaczniesz na niej polegać przy konkretnym lochu. Jednego wyszukiwarka nie robi: nie przenosi cię z miejsca. Formuje grupę i wskazuje ci wejście, a każdy wciąż dociera do drzwi na własnych nogach.',
-  'guide.dungeonsPage.finderOfferBody': 'Uformowana grupa jest oferowana przez krótkie okno czasowe, więc odpowiedz szybko. Jeśli pozwolisz, by oferta wygasła, albo ją odrzucisz, wyszukiwarka na chwilę wyłącza cię z kolejki, zanim będziesz mógł dołączyć ponownie, co nie pozwala niedokończonej grupie blokować wszystkich innych.',
-  'guide.dungeonsPage.finderRolesBody': 'Twoje możliwe role wynikają z klasy, zanim się wyspecjalizujesz, a potem z aktywnej specjalizacji, gdy już ją masz, więc uzdrowiciel kolejkuje się jako uzdrowiciel. Po poziomie, na którym otwierają się talenty, wyszukiwarka wymaga, byś wybrał specjalizację, zanim w ogóle przyzna ci rolę. Każdy przebieg na liście niesie też własny przedział poziomów, węższy niż same drzwi, a każdy członek skolejkowanej drużyny musi się w nim mieścić: wyszukiwarka nie posadzi postaci, którą grupa musiałaby dźwigać.',
+  'guide.dungeonsPage.finderBoardBody':
+    'Wolisz sam dobrać sobie towarzystwo? Przywódca drużyny może zamiast tego wystawić grupę na tablicy gotowych grup, oznaczoną tym, do czego służy przebieg: pierwszy przebieg, przebieg zadań, pełne czyszczenie, przebieg nauki albo szybki przebieg. Inni gracze zgłaszają się, a przywódca decyduje, kto dołączy. Nie ma dowolnego tekstu ogłoszenia, tylko tagi, a jedna pozycja na liście jest dostępna wyłącznie przez tablicę, oferowana jako ogłoszenie, a nie przez automatyczną kolejkę.',
+  'guide.dungeonsPage.finderBody':
+    'Nie musisz krzyczeć na czacie, żeby skompletować drużynę. Otwórz Wyszukiwarkę lochów, aby zobaczyć przebiegi, do których kolejkuje, wybierz te, w które chcesz się wybrać, wybierz rolę, którą zagrasz, i dołącz do kolejki. Wyszukiwarka buduje pełną grupę z właściwym zestawem tanka, uzdrowiciela i obrażeń, po czym oferuje ją wszystkim naraz, a ty trafiasz do grupy w chwili, gdy drużyna zaakceptuje. Lista nie ogranicza się do przebiegów dla pięciu graczy: rajd dla dziesięciu graczy też kolejkuje się tutaj, na obu poziomach trudności, choć wyszukiwarka nigdy nie sprawdza, czy wywalczyłeś sobie wstęp, więc same drzwi wciąż mogą cię zawrócić. Nie każdy przebieg w królestwie widnieje na jej liście, więc rzuć na nią okiem, zanim zaczniesz na niej polegać przy konkretnym lochu. Jednego wyszukiwarka nie robi: nie przenosi cię z miejsca. Formuje grupę i wskazuje ci wejście, a każdy wciąż dociera do drzwi na własnych nogach.',
+  'guide.dungeonsPage.finderOfferBody':
+    'Uformowana grupa jest oferowana przez krótkie okno czasowe, więc odpowiedz szybko. Jeśli pozwolisz, by oferta wygasła, albo ją odrzucisz, wyszukiwarka na chwilę wyłącza cię z kolejki, zanim będziesz mógł dołączyć ponownie, co nie pozwala niedokończonej grupie blokować wszystkich innych.',
+  'guide.dungeonsPage.finderRolesBody':
+    'Twoje możliwe role wynikają z klasy, zanim się wyspecjalizujesz, a potem z aktywnej specjalizacji, gdy już ją masz, więc uzdrowiciel kolejkuje się jako uzdrowiciel. Po poziomie, na którym otwierają się talenty, wyszukiwarka wymaga, byś wybrał specjalizację, zanim w ogóle przyzna ci rolę. Każdy przebieg na liście niesie też własny przedział poziomów, węższy niż same drzwi, a każdy członek skolejkowanej drużyny musi się w nim mieścić: wyszukiwarka nie posadzi postaci, którą grupa musiałaby dźwigać.',
   'guide.dungeonsPage.finderTitle': 'Szukanie grupy',
-  'guide.dungeonsPage.formatsNote': 'Lochy i rajd to jeden z trzech formatów instancjonowanych. Wyprawy to krótkie zejścia dla jednego lub dwóch, a Szczeliny to rozdarcia otwierające się w świecie, które wrzucają grupę do lochu budowanego od nowa za każdym razem.',
-  'guide.economy.guildBankNote': 'Twoja gildia utrzymuje własny skarbiec obok twojego osobistego, otwierany u tego samego skarbnika i dostępny z zakładki w tym samym oknie: wspólny skarbiec monet i zbiorczy magazyn dóbr. Każdy członek może do niego zajrzeć, a przenosić rzeczy do środka i na zewnątrz mogą tylko oficerowie. Szczegóły znajdziesz na stronie Społeczność i grupy.',
-  'guide.economy.honorBody': 'Walka z innymi graczami wypłaca trzecią walutę, Honor. Wygrana rankingowa potyczka na arenie go wypłaca, a rozegrany do końca mecz na Polach Ciernistej Kotliny wypłaca go bez względu na wygraną czy przegraną, więc zacięta porażka na Polach nigdy nie jest zmarnowanym meczem. Honor gromadzi się na karcie twojej postaci, nigdy nie mieszając się z twoimi monetami. Wydajesz go u honorowych kwatermistrzów, FURII w Eastbrook i Marszałka Wojennego Draven Kole w Wysokiej Straży, którzy dzielą między sobą jeden zapas: zestawy zbroi, biżuterię i broń Działań Wojennych, które kupuje się wyłącznie za Honor. Te zakupy są ostateczne, a ekwipunek przywiązuje się do ciebie w chwili zakupu, więc przeczytaj opis przedmiotu, zanim potwierdzisz zakup. Strona Areny opisuje, jak zdobywa się Honor.',
-  'guide.editorPage.buildBody': 'Narzędzia znajdziesz na listwie po lewej stronie, każde z jednoliterowym skrótem widocznym na jego przycisku. Wybierz jedno i pracuj wprost na mapie przed sobą. Ctrl+Z cofa, a Ctrl+Y ponawia, więc nic, czego spróbujesz, nie jest nieodwracalne.',
+  'guide.dungeonsPage.formatsNote':
+    'Lochy i rajd to jeden z trzech formatów instancjonowanych. Wyprawy to krótkie zejścia dla jednego lub dwóch, a Szczeliny to rozdarcia otwierające się w świecie, które wrzucają grupę do lochu budowanego od nowa za każdym razem.',
+  'guide.economy.guildBankNote':
+    'Twoja gildia utrzymuje własny skarbiec obok twojego osobistego, otwierany u tego samego skarbnika i dostępny z zakładki w tym samym oknie: wspólny skarbiec monet i zbiorczy magazyn dóbr. Każdy członek może do niego zajrzeć, a przenosić rzeczy do środka i na zewnątrz mogą tylko oficerowie. Szczegóły znajdziesz na stronie Społeczność i grupy.',
+  'guide.economy.honorBody':
+    'Walka z innymi graczami wypłaca trzecią walutę, Honor. Wygrana rankingowa potyczka na arenie go wypłaca, a rozegrany do końca mecz na Polach Ciernistej Kotliny wypłaca go bez względu na wygraną czy przegraną, więc zacięta porażka na Polach nigdy nie jest zmarnowanym meczem. Honor gromadzi się na karcie twojej postaci, nigdy nie mieszając się z twoimi monetami. Wydajesz go u honorowych kwatermistrzów, FURII w Eastbrook i Marszałka Wojennego Draven Kole w Wysokiej Straży, którzy dzielą między sobą jeden zapas: zestawy zbroi, biżuterię i broń Działań Wojennych, które kupuje się wyłącznie za Honor. Te zakupy są ostateczne, a ekwipunek przywiązuje się do ciebie w chwili zakupu, więc przeczytaj opis przedmiotu, zanim potwierdzisz zakup. Strona Areny opisuje, jak zdobywa się Honor.',
+  'guide.editorPage.buildBody':
+    'Narzędzia znajdziesz na listwie po lewej stronie, każde z jednoliterowym skrótem widocznym na jego przycisku. Wybierz jedno i pracuj wprost na mapie przed sobą. Ctrl+Z cofa, a Ctrl+Y ponawia, więc nic, czego spróbujesz, nie jest nieodwracalne.',
   'guide.editorPage.buildTitle': 'Co możesz zbudować',
-  'guide.editorPage.helpBody': 'Pomoc na górnym pasku otwiera opis obejmujący każde narzędzie, skróty klawiszowe i ruchy myszy, a w każdej chwili może też uruchomić ponownie samouczek. Reszta to po prostu dotykanie wszystkiego po kolei: cofnięcie jest zawsze o jedno naciśnięcie klawisza, a Eksportuj daje ci kopię mapy, do której zawsze możesz wrócić.',
+  'guide.editorPage.helpBody':
+    'Pomoc na górnym pasku otwiera opis obejmujący każde narzędzie, skróty klawiszowe i ruchy myszy, a w każdej chwili może też uruchomić ponownie samouczek. Reszta to po prostu dotykanie wszystkiego po kolei: cofnięcie jest zawsze o jedno naciśnięcie klawisza, a Eksportuj daje ci kopię mapy, do której zawsze możesz wrócić.',
   'guide.editorPage.helpTitle': 'Poznawanie narzędzi',
-  'guide.editorPage.intro': 'Twój własny edytor map, prosto w przeglądarce. Ukształtuj teren, rozstaw rekwizyty i obozy, a potem wskocz w efekt i przejdź się po nim.',
-  'guide.editorPage.playtestBody': 'Test gry przenosi mapę do gry i wrzuca cię w nią jako wojownika. Wszystko, co stworzyłeś, jest pod twoimi stopami: obozy generują potwory, ściany blokujące trzymają, a rozmieszczenia z kolizją pchają cię wokół siebie. Gdy zobaczysz już dość, wróć do edytora i pracuj dalej.',
+  'guide.editorPage.intro':
+    'Twój własny edytor map, prosto w przeglądarce. Ukształtuj teren, rozstaw rekwizyty i obozy, a potem wskocz w efekt i przejdź się po nim.',
+  'guide.editorPage.playtestBody':
+    'Test gry przenosi mapę do gry i wrzuca cię w nią jako wojownika. Wszystko, co stworzyłeś, jest pod twoimi stopami: obozy generują potwory, ściany blokujące trzymają, a rozmieszczenia z kolizją pchają cię wokół siebie. Gdy zobaczysz już dość, wróć do edytora i pracuj dalej.',
   'guide.editorPage.playtestTitle': 'Zagraj na swojej mapie',
-  'guide.editorPage.sandboxBody': 'Własne mapy nigdy nie zmieniają gry, w którą grają wszyscy inni. Test gry działa offline, we własnej przeglądarce, i nigdy nie łączy się z serwerem, więc nic, co się w nim wydarzy, nie dotrze do twoich postaci ani do wspólnego świata.',
+  'guide.editorPage.sandboxBody':
+    'Własne mapy nigdy nie zmieniają gry, w którą grają wszyscy inni. Test gry działa offline, we własnej przeglądarce, i nigdy nie łączy się z serwerem, więc nic, co się w nim wydarzy, nie dotrze do twoich postaci ani do wspólnego świata.',
   'guide.editorPage.sandboxTitle': 'Piaskownica, nie żywy świat',
-  'guide.editorPage.saveBody': 'Ctrl+S zapisuje, a dopóki są niezapisane zmiany, obok nazwy mapy widnieje kropka, a przycisk Zapisz domaga się twojej uwagi. Bez konta edytor wciąż działa: mapy są przechowywane w twojej przeglądarce, można włączyć autozapis, a Eksportuj zapisuje mapę jako zwykły plik JSON, który Importuj odczyta z powrotem.\n\nZalogowany na swoje konto gry, zapis trafia też na serwer, więc twoje mapy podążają za tobą na inny komputer. Okno Otwórz ma jedną zakładkę na szkice w tej przeglądarce i drugą na mapy zapisane na twoim koncie. Jeśli edytor pokazuje plakietkę offline, zaloguj się do gry w innej karcie, a potem odśwież edytor.',
+  'guide.editorPage.saveBody':
+    'Ctrl+S zapisuje, a dopóki są niezapisane zmiany, obok nazwy mapy widnieje kropka, a przycisk Zapisz domaga się twojej uwagi. Bez konta edytor wciąż działa: mapy są przechowywane w twojej przeglądarce, można włączyć autozapis, a Eksportuj zapisuje mapę jako zwykły plik JSON, który Importuj odczyta z powrotem.\n\nZalogowany na swoje konto gry, zapis trafia też na serwer, więc twoje mapy podążają za tobą na inny komputer. Okno Otwórz ma jedną zakładkę na szkice w tej przeglądarce i drugą na mapy zapisane na twoim koncie. Jeśli edytor pokazuje plakietkę offline, zaloguj się do gry w innej karcie, a potem odśwież edytor.',
   'guide.editorPage.saveTitle': 'Zapisywanie swojej pracy',
-  'guide.editorPage.shareBody': 'Mapy zapisane na twoim koncie zaczynają jako prywatne. Z okna Otwórz możesz opublikować jedną z nich, dzięki czemu trafia na listę dostępną do przeglądania dla każdego, i w każdej chwili możesz cofnąć publikację. Zakładka Mapy publiczne w tym samym oknie pozwala przeglądać wszystko, co opublikowali inni gracze: Otwórz wczytuje mapę, byś mógł obejrzeć, jak została zrobiona, a Utwórz kopię umieszcza prywatną kopię na twojej własnej liście, byś mógł zmieniać ją, jak zechcesz. Kopia to nowa mapa: edytowanie jej nigdy nie dotyka oryginału.\n\nIstnieje limit tego, ile map może przechowywać jedno konto, więc posprzątaj po eksperymentach, z którymi już skończyłeś.',
+  'guide.editorPage.shareBody':
+    'Mapy zapisane na twoim koncie zaczynają jako prywatne. Z okna Otwórz możesz opublikować jedną z nich, dzięki czemu trafia na listę dostępną do przeglądania dla każdego, i w każdej chwili możesz cofnąć publikację. Zakładka Mapy publiczne w tym samym oknie pozwala przeglądać wszystko, co opublikowali inni gracze: Otwórz wczytuje mapę, byś mógł obejrzeć, jak została zrobiona, a Utwórz kopię umieszcza prywatną kopię na twojej własnej liście, byś mógł zmieniać ją, jak zechcesz. Kopia to nowa mapa: edytowanie jej nigdy nie dotyka oryginału.\n\nIstnieje limit tego, ile map może przechowywać jedno konto, więc posprzątaj po eksperymentach, z którymi już skończyłeś.',
   'guide.editorPage.shareTitle': 'Publikowanie i kopiowanie',
-  'guide.editorPage.toolBlockerBody': 'Przeciągaj ściany blokujące, które zatrzymują ruch, niczego przy tym nie pokazując, dla krawędzi, którą chcesz po cichu zamknąć.',
+  'guide.editorPage.toolBlockerBody':
+    'Przeciągaj ściany blokujące, które zatrzymują ruch, niczego przy tym nie pokazując, dla krawędzi, którą chcesz po cichu zamknąć.',
   'guide.editorPage.toolBlockerTitle': 'Niewidzialne ściany',
-  'guide.editorPage.toolCampBody': 'Rozstaw obozy potworów, które ożywają w teście gry, i ustaw miejsce, w którym test gry umieszcza gracza.',
+  'guide.editorPage.toolCampBody':
+    'Rozstaw obozy potworów, które ożywają w teście gry, i ustaw miejsce, w którym test gry umieszcza gracza.',
   'guide.editorPage.toolCampTitle': 'Obozy i punkt startu',
-  'guide.editorPage.toolLandBody': 'Podnoś, obniżaj, wygładzaj i spłaszczaj teren pod pędzlem, którego rozmiar ustawiasz na bieżąco, z pokrętłem siły przy podnoszeniu, obniżaniu i wygładzaniu.',
+  'guide.editorPage.toolLandBody':
+    'Podnoś, obniżaj, wygładzaj i spłaszczaj teren pod pędzlem, którego rozmiar ustawiasz na bieżąco, z pokrętłem siły przy podnoszeniu, obniżaniu i wygładzaniu.',
   'guide.editorPage.toolLandTitle': 'Ukształtuj teren',
-  'guide.editorPage.toolPlaceBody': 'Umieszczaj na ziemi elementy z wbudowanego katalogu zasobów. Narzędzie Zaznacz, pierwszy przycisk na listwie, podnosi z powrotem umieszczony element, byś mógł go przesunąć, obrócić, przeskalować albo zduplikować, a narzędzie Wymaż zdejmuje go z mapy, gdy zmienisz zdanie. Rozmieszczeniu można nadać kolizję, by gracz obchodził je zamiast przez nie przechodzić. Do szerszych pociągnięć pod tym samym narzędziem kryje się panel proceduralny: rozrzuć jednym ruchem całą kategorię zasobów po obszarze albo wznieś pasmo wzgórz, oba działania oparte na ziarnie mapy, więc te same ustawienia zawsze dają ten sam wynik.',
+  'guide.editorPage.toolPlaceBody':
+    'Umieszczaj na ziemi elementy z wbudowanego katalogu zasobów. Narzędzie Zaznacz, pierwszy przycisk na listwie, podnosi z powrotem umieszczony element, byś mógł go przesunąć, obrócić, przeskalować albo zduplikować, a narzędzie Wymaż zdejmuje go z mapy, gdy zmienisz zdanie. Rozmieszczeniu można nadać kolizję, by gracz obchodził je zamiast przez nie przechodzić. Do szerszych pociągnięć pod tym samym narzędziem kryje się panel proceduralny: rozrzuć jednym ruchem całą kategorię zasobów po obszarze albo wznieś pasmo wzgórz, oba działania oparte na ziarnie mapy, więc te same ustawienia zawsze dają ten sam wynik.',
   'guide.editorPage.toolPlaceTitle': 'Umieszczaj rekwizyty',
-  'guide.editorPage.toolRegionBody': 'Zaznacz prostokątem teren i umieszczone zasoby narzędziem Region, a potem wklej to zaznaczenie gdzie indziej na mapie.',
+  'guide.editorPage.toolRegionBody':
+    'Zaznacz prostokątem teren i umieszczone zasoby narzędziem Region, a potem wklej to zaznaczenie gdzie indziej na mapie.',
   'guide.editorPage.toolRegionTitle': 'Kopiuj cały obszar',
-  'guide.editorPage.toolSurfaceBody': 'Maluj pokrycie terenu biomem ponad domyślne ustawienie strefy i ustaw jeden poziom wody, do którego wznosi się lub opada każde jezioro zadeklarowane na mapie.',
+  'guide.editorPage.toolSurfaceBody':
+    'Maluj pokrycie terenu biomem ponad domyślne ustawienie strefy i ustaw jeden poziom wody, do którego wznosi się lub opada każde jezioro zadeklarowane na mapie.',
   'guide.editorPage.toolSurfaceTitle': 'Maluj i zalewaj',
-  'guide.editorPage.uploadBody': 'Po zalogowaniu przycisk Prześlij zasób przyjmuje twój własny model GLB i dodaje go do przeglądarki zasobów obok wbudowanego katalogu, gotowy do umieszczenia jak każdy inny rekwizyt. Przesłane zasoby są przechowywane na twoim koncie, wliczają się w limit rozmiaru i miejsca, a gdy już ich nie chcesz, można je usunąć z przeglądarki zasobów.',
+  'guide.editorPage.uploadBody':
+    'Po zalogowaniu przycisk Prześlij zasób przyjmuje twój własny model GLB i dodaje go do przeglądarki zasobów obok wbudowanego katalogu, gotowy do umieszczenia jak każdy inny rekwizyt. Przesłane zasoby są przechowywane na twoim koncie, wliczają się w limit rozmiaru i miejsca, a gdy już ich nie chcesz, można je usunąć z przeglądarki zasobów.',
   'guide.editorPage.uploadTitle': 'Wprowadzanie własnych modeli',
-  'guide.editorPage.viewsBody': 'Widok 3D rysuje twoją mapę prawdziwym silnikiem gry, więc to, co widzisz, jest tym, co dostaniesz: przeciągnij, aby orbitować, przewiń, aby przybliżyć. Mapa 2D z góry to widok planu, lepszy do przesuwania znaczników strefy, takich jak osady, cmentarze i punkty orientacyjne, oraz do obramowania dużego obszaru, zanim zaczniesz go rzeźbić. Przełącznik znajduje się na górnym pasku.',
+  'guide.editorPage.viewsBody':
+    'Widok 3D rysuje twoją mapę prawdziwym silnikiem gry, więc to, co widzisz, jest tym, co dostaniesz: przeciągnij, aby orbitować, przewiń, aby przybliżyć. Mapa 2D z góry to widok planu, lepszy do przesuwania znaczników strefy, takich jak osady, cmentarze i punkty orientacyjne, oraz do obramowania dużego obszaru, zanim zaczniesz go rzeźbić. Przełącznik znajduje się na górnym pasku.',
   'guide.editorPage.viewsTitle': 'Dwa widoki tej samej mapy',
-  'guide.editorPage.whereBody': 'Edytor to osobna strona pod adresem /editor, niezależna od gry. Otwiera się na świeżej, bezimiennej mapie zbudowanej ze świata, który już znasz, więc zawsze zaczynasz z prawdziwym gruntem pod stopami. Krótki samouczek uruchamia się przy pierwszej wizycie, a Pomoc na górnym pasku może uruchomić go ponownie.',
+  'guide.editorPage.whereBody':
+    'Edytor to osobna strona pod adresem /editor, niezależna od gry. Otwiera się na świeżej, bezimiennej mapie zbudowanej ze świata, który już znasz, więc zawsze zaczynasz z prawdziwym gruntem pod stopami. Krótki samouczek uruchamia się przy pierwszej wizycie, a Pomoc na górnym pasku może uruchomić go ponownie.',
   'guide.editorPage.whereTitle': 'Gdzie go znaleźć',
-  'guide.faqPage.a12': 'Istnieje opcjonalny sklep kosmetyczny. Sprzedaje wygląd: skórki broni ze Zbrojowni Sezonu 1, kupowane za Claudium, walutę sklepu. Nic w nim nie dodaje statystyk, mocy ani postępu, a skórka nigdy nie zmienia sposobu, w jaki trafia twoja broń, więc każdy liczący się element ekwipunku wciąż pochodzi z grania.',
-  'guide.faqPage.a13': 'Wersja przeglądarkowa nie wymaga niczego: otwórz stronę i graj. Jeśli wolisz mieć aplikację, launcher na komputer dla systemów Windows, macOS i Linux znajdziesz na stronie Pobierz w witrynie gry. Natywne aplikacje na iOS i Android są w przygotowaniu, a do ich premiery telefon lub tablet uruchamia wersję przeglądarkową z pełną obsługą dotyku. Każda wersja loguje się na to samo konto i te same światy, więc twoje postacie podążają za tobą.',
-  'guide.faqPage.a14': 'Aktualna przeglądarka na laptopie, komputerze, telefonie lub tablecie. Przy pierwszym uruchomieniu gra odczytuje twoje urządzenie i dobiera pasujący poziom grafiki, od Niskich po Ultra, a każdy wybór, którego dokonasz sam, zawsze ma pierwszeństwo. Działają mysz i klawiatura, dotyk oraz kontroler do gier. Szczegóły znajdziesz na stronach o ustawieniach i sterowaniu.',
-  'guide.faqPage.a15': 'Tylko do gry online. Świat offline niczego nie wymaga: wybierz Offline na ekranie startowym i naciśnij Graj. Konto online jest darmowe, wymaga nazwy użytkownika, hasła i adresu e-mail do odzyskiwania konta, i przechowuje twoje postacie zapisane na serwerze. Gdy już je masz, możesz włączyć uwierzytelnianie dwuskładnikowe w opcjach.',
-  'guide.faqPage.a16': 'Gra online toczy się na światach, a każdy z nich to pełna kopia gry z własnymi graczami, własnym Targiem Świata i własnym rankingiem. Gdy się logujesz, Lista światów pokazuje, jak bardzo zatłoczony jest każdy świat, od Niskiego po Pełny, więc możesz wybrać spokojny, by mieć więcej przestrzeni, albo tętniący życiem, dla towarzystwa. Twoje postacie żyją na świecie, na którym je stworzyłeś, a możesz mieć postacie na więcej niż jednym.',
-  'guide.faqPage.a17': 'Do dziesięciu postaci na świat na jednym koncie, a możesz mieć postacie na więcej niż jednym świecie. Aby usunąć postać, skasuj ją z listy postaci: postać nie może wtedy przebywać w świecie, a żeby potwierdzić, musisz wpisać jej imię, dlatego przypadkowe stuknięcie klawisza nigdy nie kosztuje cię bohatera. Usunięcie jest nieodwracalne. Dobytek tej postaci znika razem z nią, jej wystawienia na Targu Świata zostają zdjęte z rynku, a jej skrzynka Kruczej Poczty zostaje opróżniona.',
-  'guide.faqPage.a18': 'Nie samodzielnie, więc wybierz takie, które ci się podoba. Imię ma od 2 do 16 liter, zaczyna się literą i dopuszcza spacje, łączniki oraz apostrofy, a każde jest unikatowe na swoim świecie bez względu na wielkość liter. Imiona łamiące zasady postępowania są odrzucane. Jedyny raz, gdy poproszą cię o zmianę imienia, to gdy zażąda tego moderator. Zamknięcie konta może zwolnić jego imiona dla innych graczy, a sama nieaktywność nigdy tego nie robi: nieaktywne konto zachowuje swoje imiona.',
-  'guide.faqPage.a19': 'Twoja postać pozostaje w świecie przez około pięć minut, a gra sama próbuje się połączyć ponownie, więc zerwany sygnał, zamknięty laptop albo odświeżenie strony zwykle stawiają cię z powrotem dokładnie tam, gdzie byłeś, w tej samej sesji. Ponieważ twoja postać naprawdę wciąż tam stoi, rozłączenie się nie jest sposobem na ucieczkę z walki. Wybranie Wyloguj w menu gry opuszcza świat natychmiast, zamiast czekać na upływ tego okna.',
-  'guide.faqPage.a20': 'Będąc w grze online, otwórz menu klawiszem Esc i wybierz Zgłoś błąd. Opisz, co się wydarzyło, i wyślij zgłoszenie: twój świat, twoja postać i miejsce, w którym stałeś, dołączają automatycznie, razem ze szczegółami twojej wersji i urządzenia, a zaznaczając Dołącz zrzut ekranu, możesz załączyć obraz tego, na co patrzyłeś. Jeśli wyślesz kilka zgłoszeń pod rząd, możesz zostać poproszony o chwilę odczekania przed kolejnym.',
-  'guide.faqPage.a6Count': 'Poziom {cap}, osiągany w strefach pełnych zadań, lochów i eksploracji. W sumie jest {zones} stref, od początkowej doliny po krainy zbudowane dla postaci będących już na pułapie.',
+  'guide.faqPage.a12':
+    'Istnieje opcjonalny sklep kosmetyczny. Sprzedaje wygląd: skórki broni ze Zbrojowni Sezonu 1, kupowane za Claudium, walutę sklepu. Nic w nim nie dodaje statystyk, mocy ani postępu, a skórka nigdy nie zmienia sposobu, w jaki trafia twoja broń, więc każdy liczący się element ekwipunku wciąż pochodzi z grania.',
+  'guide.faqPage.a13':
+    'Wersja przeglądarkowa nie wymaga niczego: otwórz stronę i graj. Jeśli wolisz mieć aplikację, launcher na komputer dla systemów Windows, macOS i Linux znajdziesz na stronie Pobierz w witrynie gry. Natywne aplikacje na iOS i Android są w przygotowaniu, a do ich premiery telefon lub tablet uruchamia wersję przeglądarkową z pełną obsługą dotyku. Każda wersja loguje się na to samo konto i te same światy, więc twoje postacie podążają za tobą.',
+  'guide.faqPage.a14':
+    'Aktualna przeglądarka na laptopie, komputerze, telefonie lub tablecie. Przy pierwszym uruchomieniu gra odczytuje twoje urządzenie i dobiera pasujący poziom grafiki, od Niskich po Ultra, a każdy wybór, którego dokonasz sam, zawsze ma pierwszeństwo. Działają mysz i klawiatura, dotyk oraz kontroler do gier. Szczegóły znajdziesz na stronach o ustawieniach i sterowaniu.',
+  'guide.faqPage.a15':
+    'Tylko do gry online. Świat offline niczego nie wymaga: wybierz Offline na ekranie startowym i naciśnij Graj. Konto online jest darmowe, wymaga nazwy użytkownika, hasła i adresu e-mail do odzyskiwania konta, i przechowuje twoje postacie zapisane na serwerze. Gdy już je masz, możesz włączyć uwierzytelnianie dwuskładnikowe w opcjach.',
+  'guide.faqPage.a16':
+    'Gra online toczy się na światach, a każdy z nich to pełna kopia gry z własnymi graczami, własnym Targiem Świata i własnym rankingiem. Gdy się logujesz, Lista światów pokazuje, jak bardzo zatłoczony jest każdy świat, od Niskiego po Pełny, więc możesz wybrać spokojny, by mieć więcej przestrzeni, albo tętniący życiem, dla towarzystwa. Twoje postacie żyją na świecie, na którym je stworzyłeś, a możesz mieć postacie na więcej niż jednym.',
+  'guide.faqPage.a17':
+    'Do dziesięciu postaci na świat na jednym koncie, a możesz mieć postacie na więcej niż jednym świecie. Aby usunąć postać, skasuj ją z listy postaci: postać nie może wtedy przebywać w świecie, a żeby potwierdzić, musisz wpisać jej imię, dlatego przypadkowe stuknięcie klawisza nigdy nie kosztuje cię bohatera. Usunięcie jest nieodwracalne. Dobytek tej postaci znika razem z nią, jej wystawienia na Targu Świata zostają zdjęte z rynku, a jej skrzynka Kruczej Poczty zostaje opróżniona.',
+  'guide.faqPage.a18':
+    'Nie samodzielnie, więc wybierz takie, które ci się podoba. Imię ma od 2 do 16 liter, zaczyna się literą i dopuszcza spacje, łączniki oraz apostrofy, a każde jest unikatowe na swoim świecie bez względu na wielkość liter. Imiona łamiące zasady postępowania są odrzucane. Jedyny raz, gdy poproszą cię o zmianę imienia, to gdy zażąda tego moderator. Zamknięcie konta może zwolnić jego imiona dla innych graczy, a sama nieaktywność nigdy tego nie robi: nieaktywne konto zachowuje swoje imiona.',
+  'guide.faqPage.a19':
+    'Twoja postać pozostaje w świecie przez około pięć minut, a gra sama próbuje się połączyć ponownie, więc zerwany sygnał, zamknięty laptop albo odświeżenie strony zwykle stawiają cię z powrotem dokładnie tam, gdzie byłeś, w tej samej sesji. Ponieważ twoja postać naprawdę wciąż tam stoi, rozłączenie się nie jest sposobem na ucieczkę z walki. Wybranie Wyloguj w menu gry opuszcza świat natychmiast, zamiast czekać na upływ tego okna.',
+  'guide.faqPage.a20':
+    'Będąc w grze online, otwórz menu klawiszem Esc i wybierz Zgłoś błąd. Opisz, co się wydarzyło, i wyślij zgłoszenie: twój świat, twoja postać i miejsce, w którym stałeś, dołączają automatycznie, razem ze szczegółami twojej wersji i urządzenia, a zaznaczając Dołącz zrzut ekranu, możesz załączyć obraz tego, na co patrzyłeś. Jeśli wyślesz kilka zgłoszeń pod rząd, możesz zostać poproszony o chwilę odczekania przed kolejnym.',
+  'guide.faqPage.a6Count':
+    'Poziom {cap}, osiągany w strefach pełnych zadań, lochów i eksploracji. W sumie jest {zones} stref, od początkowej doliny po krainy zbudowane dla postaci będących już na pułapie.',
   'guide.faqPage.q12': 'Czy jest sklep za prawdziwe pieniądze?',
   'guide.faqPage.q13': 'Skąd pobrać aplikację?',
   'guide.faqPage.q14': 'Co jest mi potrzebne, aby uruchomić grę?',
@@ -886,340 +1265,525 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.q18': 'Czy mogę zmienić imię swojej postaci?',
   'guide.faqPage.q19': 'Co się stanie, jeśli zostanę rozłączony?',
   'guide.faqPage.q20': 'Znalazłem błąd. Jak go zgłosić?',
-  'guide.gear.bagsSort': 'Gdy plecak robi się nieuporządkowany, przycisk Sortuj w oknie toreb porządkuje go jednym kliknięciem. Częściowe stosy tej samej rzeczy zostają połączone, a wszystko układa się od nowa w czytelnym porządku: najpierw broń i pancerz, potem torby, materiały zużywalne, narzędzia i wierzchowce, następnie materiały rzemieślnicze, przy czym każda wyborna odmiana leży obok swojej zwykłej wersji, potem przedmioty zadaniowe, a na końcu szary rupieć, byś od razu widział, co sprzedać. Nic nigdy nie zostaje stworzone ani utracone, tylko przełożone, więc naciśnięcie go jest zawsze bezpieczne.',
-  'guide.gear.bindOnTradeBody': 'Istnieje też łagodniejsza wersja tej samej zasady: niektóre rzeczy przywiązują się przy wymianie, co oznacza, że mogą zmienić właściciela dokładnie raz, a potem należą do tego, kto je otrzymał. Wyrób zrobiony na zamówienie przywiązuje się w chwili, gdy rzemieślnik go przekazuje. Kopia objęta tą zasadą nigdy nie trafia na rynek ani na pocztę, które są anonimowe; przechodzi z rąk do rąk twarzą w twarz albo wcale, a gdy już przejdzie, jest przywiązana. Podpowiedź mówi, jakiej zasadzie podlega dany przedmiot, więc sprawdź to, zanim zaplanujesz jego odsprzedaż.',
-  'guide.gear.cosmeticsWeapons': 'Skórki broni to trzecia linia, i zmieniają to, co niesiesz, a nie to, kto to niesie. Skórka przemalowuje typ broni, więc wygląd podąża za tym, jaki miecz, kostur czy łuk masz założone, i nigdy nie dotyka statystyk, zasięgu ani szybkości broni. Skórki odblokowują się dla całego twojego konta, a nie dla jednej postaci, i występują w kolekcjach z poziomami rzadkości jak wszystko inne. Są oferowane w sezonowych kolekcjach Zbrojowni, a nie znajdowane w świecie, i to w Zbrojowni je ustawiasz, jedną na typ broni, a nie z wiersza wyglądu. Każdy, kto stoi w pobliżu, widzi skórkę, którą nosisz.',
-  'guide.gear.offhandBody': 'To, co trzymasz w drugiej ręce, zależy od twojej klasy. Może tam trafić tarcza, podobnie jak trzymany przedmiot pomocniczy, taki jak kula czy tom, albo kołczan u łowcy. Klasy, które potrafią walczyć dwiema broniami, wkładają tam zamiast tego drugą broń, płacąc za to cenę, o której warto wiedzieć: walka z bronią w każdej ręce sprawia, że twoje zwykłe zamachy chybiają zauważalnie częściej, choć nie dotyczy to twoich zdolności. Broń dwuręczna zwykle wymaga obu rąk, więc jej założenie odsuwa na bok cokolwiek trzymała druga ręka, chyba że twoja specjalizacja jest jedną z nielicznych, które potrafią nosić dwie takie bronie naraz.',
-  'guide.gear.requiredLevelBody': 'Niektóre elementy niosą też wymagany poziom, pokazany w podpowiedzi. Taki element możesz zdobyć jako łup, kupić albo otrzymać na dowolnym poziomie, ale nie założysz go, dopóki go nie osiągniesz. Wymóg wynika z tego, skąd pochodzi element, a nie tylko z jego koloru, więc rzadki przedmiot wygrany na twoim własnym poziomie zwykle da się założyć od razu, podczas gdy spadek po kimś dużo wyżej od ciebie czeka w torbach, aż go dogonisz.',
+  'guide.gear.bagsSort':
+    'Gdy plecak robi się nieuporządkowany, przycisk Sortuj w oknie toreb porządkuje go jednym kliknięciem. Częściowe stosy tej samej rzeczy zostają połączone, a wszystko układa się od nowa w czytelnym porządku: najpierw broń i pancerz, potem torby, materiały zużywalne, narzędzia i wierzchowce, następnie materiały rzemieślnicze, przy czym każda wyborna odmiana leży obok swojej zwykłej wersji, potem przedmioty zadaniowe, a na końcu szary rupieć, byś od razu widział, co sprzedać. Nic nigdy nie zostaje stworzone ani utracone, tylko przełożone, więc naciśnięcie go jest zawsze bezpieczne.',
+  'guide.gear.bindOnTradeBody':
+    'Istnieje też łagodniejsza wersja tej samej zasady: niektóre rzeczy przywiązują się przy wymianie, co oznacza, że mogą zmienić właściciela dokładnie raz, a potem należą do tego, kto je otrzymał. Wyrób zrobiony na zamówienie przywiązuje się w chwili, gdy rzemieślnik go przekazuje. Kopia objęta tą zasadą nigdy nie trafia na rynek ani na pocztę, które są anonimowe; przechodzi z rąk do rąk twarzą w twarz albo wcale, a gdy już przejdzie, jest przywiązana. Podpowiedź mówi, jakiej zasadzie podlega dany przedmiot, więc sprawdź to, zanim zaplanujesz jego odsprzedaż.',
+  'guide.gear.cosmeticsWeapons':
+    'Skórki broni to trzecia linia, i zmieniają to, co niesiesz, a nie to, kto to niesie. Skórka przemalowuje typ broni, więc wygląd podąża za tym, jaki miecz, kostur czy łuk masz założone, i nigdy nie dotyka statystyk, zasięgu ani szybkości broni. Skórki odblokowują się dla całego twojego konta, a nie dla jednej postaci, i występują w kolekcjach z poziomami rzadkości jak wszystko inne. Są oferowane w sezonowych kolekcjach Zbrojowni, a nie znajdowane w świecie, i to w Zbrojowni je ustawiasz, jedną na typ broni, a nie z wiersza wyglądu. Każdy, kto stoi w pobliżu, widzi skórkę, którą nosisz.',
+  'guide.gear.offhandBody':
+    'To, co trzymasz w drugiej ręce, zależy od twojej klasy. Może tam trafić tarcza, podobnie jak trzymany przedmiot pomocniczy, taki jak kula czy tom, albo kołczan u łowcy. Klasy, które potrafią walczyć dwiema broniami, wkładają tam zamiast tego drugą broń, płacąc za to cenę, o której warto wiedzieć: walka z bronią w każdej ręce sprawia, że twoje zwykłe zamachy chybiają zauważalnie częściej, choć nie dotyczy to twoich zdolności. Broń dwuręczna zwykle wymaga obu rąk, więc jej założenie odsuwa na bok cokolwiek trzymała druga ręka, chyba że twoja specjalizacja jest jedną z nielicznych, które potrafią nosić dwie takie bronie naraz.',
+  'guide.gear.requiredLevelBody':
+    'Niektóre elementy niosą też wymagany poziom, pokazany w podpowiedzi. Taki element możesz zdobyć jako łup, kupić albo otrzymać na dowolnym poziomie, ale nie założysz go, dopóki go nie osiągniesz. Wymóg wynika z tego, skąd pochodzi element, a nie tylko z jego koloru, więc rzadki przedmiot wygrany na twoim własnym poziomie zwykle da się założyć od razu, podczas gdy spadek po kimś dużo wyżej od ciebie czeka w torbach, aż go dogonisz.',
   'guide.gear.slotOffhand': 'Druga ręka',
-  'guide.gear.soulboundBodyBound': 'Kilka szczególnych nagród jest związanych z duszą, przywiązanych do twojej postaci od chwili, gdy je zdobędziesz. Przedmiotu związanego z duszą nie można wymienić, wysłać pocztą, sprzedać sprzedawcy ani wystawić na targu; należy tylko i wyłącznie do ciebie. Chroni to nagrody-żetony, takie jak Znaki Heroiczne, i obejmuje każdy element ekwipunku Działań Wojennych kupiony za Honor, więc zestaw do walki gracz kontra gracz nosi wyłącznie postać, która go zdobyła. Większość ekwipunku zdobytego w świecie wciąż możesz swobodnie wymieniać, sprzedawać i udostępniać.',
-  'guide.gear.sourcesHonor': 'Honor to nagroda za walkę z innymi graczami, a honorowi kwatermistrzowie, FURIA w Eastbrook i Marszałek Wojenny Draven Kole w Wysokiej Straży, prowadzą sklepy Działań Wojennych, które kupuje się wyłącznie za Honor: całe rodziny zbroi, biżuterię i broń, których nie sprzeda żaden kupiec za monety. Strona Areny opisuje, jak zdobywa się sam Honor.',
-  'guide.gear.sourcesRifts': 'Szczeliny dodają jeszcze jedno źródło, gdy osiągniesz pułap poziomu, a Szczelina to wyścig: grupa, która oczyści ją pierwsza, zgarnia jej nagrody. Pierwsze oczyszczenie wypłaca ekwipunek ponad wszystko inne, co zostawia po sobie przebieg, w tym Obręcz Szczeliny dopasowaną do roli twojej klasy, pierścień, którego nie znajdziesz nigdzie indziej w świecie. Grupa, która skończy druga, wciąż kończy własny przebieg i zachowuje zaliczenie oczyszczenia; to, co traci, to nagrody za pierwsze oczyszczenie. Strona Szczelin opisuje sam wyścig.',
-  'guide.glossary.chronicleDef': 'Własny zbiór czynów danej krainy, podzielony na rozdziały przez miejscowego Kronikarza. Możesz przechodzić przez rozdziały w dowolnej kolejności, jaka ci odpowiada.',
+  'guide.gear.soulboundBodyBound':
+    'Kilka szczególnych nagród jest związanych z duszą, przywiązanych do twojej postaci od chwili, gdy je zdobędziesz. Przedmiotu związanego z duszą nie można wymienić, wysłać pocztą, sprzedać sprzedawcy ani wystawić na targu; należy tylko i wyłącznie do ciebie. Chroni to nagrody-żetony, takie jak Znaki Heroiczne, i obejmuje każdy element ekwipunku Działań Wojennych kupiony za Honor, więc zestaw do walki gracz kontra gracz nosi wyłącznie postać, która go zdobyła. Większość ekwipunku zdobytego w świecie wciąż możesz swobodnie wymieniać, sprzedawać i udostępniać.',
+  'guide.gear.sourcesHonor':
+    'Honor to nagroda za walkę z innymi graczami, a honorowi kwatermistrzowie, FURIA w Eastbrook i Marszałek Wojenny Draven Kole w Wysokiej Straży, prowadzą sklepy Działań Wojennych, które kupuje się wyłącznie za Honor: całe rodziny zbroi, biżuterię i broń, których nie sprzeda żaden kupiec za monety. Strona Areny opisuje, jak zdobywa się sam Honor.',
+  'guide.gear.sourcesRifts':
+    'Szczeliny dodają jeszcze jedno źródło, gdy osiągniesz pułap poziomu, a Szczelina to wyścig: grupa, która oczyści ją pierwsza, zgarnia jej nagrody. Pierwsze oczyszczenie wypłaca ekwipunek ponad wszystko inne, co zostawia po sobie przebieg, w tym Obręcz Szczeliny dopasowaną do roli twojej klasy, pierścień, którego nie znajdziesz nigdzie indziej w świecie. Grupa, która skończy druga, wciąż kończy własny przebieg i zachowuje zaliczenie oczyszczenia; to, co traci, to nagrody za pierwsze oczyszczenie. Strona Szczelin opisuje sam wyścig.',
+  'guide.glossary.chronicleDef':
+    'Własny zbiór czynów danej krainy, podzielony na rozdziały przez miejscowego Kronikarza. Możesz przechodzić przez rozdziały w dowolnej kolejności, jaka ci odpowiada.',
   'guide.glossary.chronicleTerm': 'Kronika',
-  'guide.glossary.claudiumDef': 'Waluta Sklepu WOC, wydawana wyłącznie na kosmetyki i nic więcej. Nigdy nie kupuje mocy ani postępu.',
+  'guide.glossary.claudiumDef':
+    'Waluta Sklepu WOC, wydawana wyłącznie na kosmetyki i nic więcej. Nigdy nie kupuje mocy ani postępu.',
   'guide.glossary.claudiumTerm': 'Claudium',
-  'guide.glossary.commissionDef': 'Wyrób wykonany dla kogoś innego. Rzemieślnik oznacza go jako wyrób na zamówienie, przez co przywiązuje się do tego, kto go otrzyma w wymianie handlowej; mistrz stacji może później odwiązać go ponownie za opłatą.',
+  'guide.glossary.commissionDef':
+    'Wyrób wykonany dla kogoś innego. Rzemieślnik oznacza go jako wyrób na zamówienie, przez co przywiązuje się do tego, kto go otrzyma w wymianie handlowej; mistrz stacji może później odwiązać go ponownie za opłatą.',
   'guide.glossary.commissionTerm': 'Zamówienie i więź twórcy',
-  'guide.glossary.fatigueDef': 'Płyń wystarczająco daleko na otwarte morze, a woda zacznie cię osłabiać: najpierw pojawia się ostrzeżenie, a potem rosnące obrażenia, dopóki nie zawrócisz w stronę lądu.',
+  'guide.glossary.fatigueDef':
+    'Płyń wystarczająco daleko na otwarte morze, a woda zacznie cię osłabiać: najpierw pojawia się ostrzeżenie, a potem rosnące obrażenia, dopóki nie zawrócisz w stronę lądu.',
   'guide.glossary.fatigueTerm': 'Zmęczenie',
-  'guide.glossary.finderDef': 'Okno katalogujące lochy i rajdy, które kolejkuje cię do szybkiego meczu i wyświetla listę gotowych grup szukających chętnych. Domyślnie otwiera je Shift+I.',
+  'guide.glossary.finderDef':
+    'Okno katalogujące lochy i rajdy, które kolejkuje cię do szybkiego meczu i wyświetla listę gotowych grup szukających chętnych. Domyślnie otwiera je Shift+I.',
   'guide.glossary.finderTerm': 'Wyszukiwarka lochów',
-  'guide.glossary.fiveSecondDef': 'Twoja mana odnawia się z pełną prędkością dopiero, gdy minie pięć sekund od ostatniego jej wydania. Do tego czasu wciąż napływa w zmniejszonym tempie, zamiast zatrzymać się zupełnie. Dlatego rzucający zaklęcia rozkładają siły zamiast rzucać bez przerwy.',
+  'guide.glossary.fiveSecondDef':
+    'Twoja mana odnawia się z pełną prędkością dopiero, gdy minie pięć sekund od ostatniego jej wydania. Do tego czasu wciąż napływa w zmniejszonym tempie, zamiast zatrzymać się zupełnie. Dlatego rzucający zaklęcia rozkładają siły zamiast rzucać bez przerwy.',
   'guide.glossary.fiveSecondTerm': 'Reguła pięciu sekund',
-  'guide.glossary.honorDef': 'To, co wypłaca walka z innymi graczami: zwycięstwa na arenie, wygrane na Polach Ciernistej Kotliny i honorowe zabójstwa, wszystkie się na niego składają. Wydajesz go na zestawy Działań Wojennych.',
+  'guide.glossary.honorDef':
+    'To, co wypłaca walka z innymi graczami: zwycięstwa na arenie, wygrane na Polach Ciernistej Kotliny i honorowe zabójstwa, wszystkie się na niego składają. Wydajesz go na zestawy Działań Wojennych.',
   'guide.glossary.honorTerm': 'Honor',
-  'guide.glossary.itemLevelDef': 'Jedna liczba podsumowująca, jak silny jest dany element ekwipunku, przydatna, gdy chcesz szybko porównać dwa przedmioty. Włącz Pokaż poziom przedmiotu w opcjach, aby zobaczyć go w podpowiedziach. Ma go tylko ekwipunek o znanym źródle, więc podstawowe towary sprzedawców i sprzęt startowy niczego nie pokazują, a brak liczby jest normalny, a nie błędem.',
+  'guide.glossary.itemLevelDef':
+    'Jedna liczba podsumowująca, jak silny jest dany element ekwipunku, przydatna, gdy chcesz szybko porównać dwa przedmioty. Włącz Pokaż poziom przedmiotu w opcjach, aby zobaczyć go w podpowiedziach. Ma go tylko ekwipunek o znanym źródle, więc podstawowe towary sprzedawców i sprzęt startowy niczego nie pokazują, a brak liczby jest normalny, a nie błędem.',
   'guide.glossary.itemLevelTerm': 'Poziom przedmiotu',
-  'guide.glossary.marksDef': 'Dwie nagrody, jakie wypłaca powtarzalna zawartość endgame poza łupem. Wyprawy wypłacają Znaki Wypraw, za które kupisz ekwipunek u opiekuna wypraw i ulepszysz swą towarzyszkę; heroiczne lochy wypłacają Znaki Heroiczne, za które kupisz ekwipunek u heroicznego kwatermistrza.',
+  'guide.glossary.marksDef':
+    'Dwie nagrody, jakie wypłaca powtarzalna zawartość endgame poza łupem. Wyprawy wypłacają Znaki Wypraw, za które kupisz ekwipunek u opiekuna wypraw i ulepszysz swą towarzyszkę; heroiczne lochy wypłacają Znaki Heroiczne, za które kupisz ekwipunek u heroicznego kwatermistrza.',
   'guide.glossary.marksTerm': 'Znaki Wypraw i Znaki Heroiczne',
-  'guide.glossary.masterworkDef': 'Najwyborniejsza wersja wyrobu, którą wprawny rzemieślnik od czasu do czasu tworzy zamiast zwykłej kopii. Arcydzieło zawsze niesie imię swojego twórcy.',
+  'guide.glossary.masterworkDef':
+    'Najwyborniejsza wersja wyrobu, którą wprawny rzemieślnik od czasu do czasu tworzy zamiast zwykłej kopii. Arcydzieło zawsze niesie imię swojego twórcy.',
   'guide.glossary.masterworkTerm': 'Arcydzieło',
-  'guide.glossary.mountDef': 'Stworzenie, na którym jeździsz, by szybciej pokonywać teren. Niemal wszystko inne, co robisz, zsadza cię z niego: pływanie, wejście do walki, zbieractwo i rzemiosło stawiają cię z powrotem na własnych nogach.',
+  'guide.glossary.mountDef':
+    'Stworzenie, na którym jeździsz, by szybciej pokonywać teren. Niemal wszystko inne, co robisz, zsadza cię z niego: pływanie, wejście do walki, zbieractwo i rzemiosło stawiają cię z powrotem na własnych nogach.',
   'guide.glossary.mountTerm': 'Wierzchowiec',
-  'guide.glossary.offHandDef': 'Drugi slot na rękę. Mieści tarczę albo trzymany przedmiot, taki jak latarnia czy kołczan, a drugą broń tylko wtedy, gdy twoja klasa i specjalizacja potrafią walczyć dwiema broniami.',
+  'guide.glossary.offHandDef':
+    'Drugi slot na rękę. Mieści tarczę albo trzymany przedmiot, taki jak latarnia czy kołczan, a drugą broń tylko wtedy, gdy twoja klasa i specjalizacja potrafią walczyć dwiema broniami.',
   'guide.glossary.offHandTerm': 'Druga ręka',
-  'guide.glossary.premadeDef': 'Grupa, którą gracz złożył ręcznie i wystawił na tablicy Wyszukiwarki lochów, zamiast tej, którą złożyła za ciebie kolejka szybkiego dobierania.',
+  'guide.glossary.premadeDef':
+    'Grupa, którą gracz złożył ręcznie i wystawił na tablicy Wyszukiwarki lochów, zamiast tej, którą złożyła za ciebie kolejka szybkiego dobierania.',
   'guide.glossary.premadeTerm': 'Gotowa drużyna',
-  'guide.glossary.reinsDef': 'Przedmiot, który jest wierzchowcem. Trzymaj parę w torbach albo w banku, a ten wierzchowiec należy do ciebie; użyj ich, aby jeździć. Wodze można wymieniać, wysyłać pocztą i sprzedawać innym graczom.',
+  'guide.glossary.reinsDef':
+    'Przedmiot, który jest wierzchowcem. Trzymaj parę w torbach albo w banku, a ten wierzchowiec należy do ciebie; użyj ich, aby jeździć. Wodze można wymieniać, wysyłać pocztą i sprzedawać innym graczom.',
   'guide.glossary.reinsTerm': 'Wodze',
-  'guide.glossary.requiredLevelDef': 'Poziom, który musisz osiągnąć, zanim będziesz mógł założyć lub użyć danego elementu ekwipunku. Dymek pokazuje go na czerwono, dopóki go nie osiągniesz.',
+  'guide.glossary.requiredLevelDef':
+    'Poziom, który musisz osiągnąć, zanim będziesz mógł założyć lub użyć danego elementu ekwipunku. Dymek pokazuje go na czerwono, dopóki go nie osiągniesz.',
   'guide.glossary.requiredLevelTerm': 'Wymagany poziom',
-  'guide.glossary.ridingDef': 'Umiejętność, która w ogóle pozwala ci jeździć wierzchem. Kupujesz ją raz, u zarządcy stajni, na poziomie 20, a potem zostaje z twoją postacią na zawsze.',
+  'guide.glossary.ridingDef':
+    'Umiejętność, która w ogóle pozwala ci jeździć wierzchem. Kupujesz ją raz, u zarządcy stajni, na poziomie 20, a potem zostaje z twoją postacią na zawsze.',
   'guide.glossary.ridingTerm': 'Jeździectwo',
-  'guide.glossary.riftDef': 'Rozdarcie, które samo otwiera się w strefach, prowadzące w dół przez piętra instancji zbudowanej od nowa z własnego ziarna tej szczeliny. Szczeliny mają rangę C, B, A lub S. Wejście zamyka się dla nowych drużyn po pewnym czasie, a pieczętuje je tylko pierwsza drużyna w królestwie, która dotrze na dno.',
-  'guide.glossary.riftRankDef': 'Litera na szczelinie, C, B, A lub S, jedyna rzecz decydująca o tym, jak jest trudna. Szczelina nigdy nie skaluje się do wielkości twojej grupy, więc ranga to cała drabina trudności: C jest najłagodniejsza, a S najzajadlejsza, i każda ranga jest pomyślana dla grupy.',
+  'guide.glossary.riftDef':
+    'Rozdarcie, które samo otwiera się w strefach, prowadzące w dół przez piętra instancji zbudowanej od nowa z własnego ziarna tej szczeliny. Szczeliny mają rangę C, B, A lub S. Wejście zamyka się dla nowych drużyn po pewnym czasie, a pieczętuje je tylko pierwsza drużyna w królestwie, która dotrze na dno.',
+  'guide.glossary.riftRankDef':
+    'Litera na szczelinie, C, B, A lub S, jedyna rzecz decydująca o tym, jak jest trudna. Szczelina nigdy nie skaluje się do wielkości twojej grupy, więc ranga to cała drabina trudności: C jest najłagodniejsza, a S najzajadlejsza, i każda ranga jest pomyślana dla grupy.',
   'guide.glossary.riftRankTerm': 'Ranga (szczeliny)',
   'guide.glossary.riftTerm': 'Szczelina',
-  'guide.glossary.setBonusDef': 'Dodatkowa nagroda za noszenie naraz kilku części tej samej rodziny pancerza. Dymek liczy, ile części zestawu masz założonych, a więcej części odblokowuje więcej bonusu.',
+  'guide.glossary.setBonusDef':
+    'Dodatkowa nagroda za noszenie naraz kilku części tej samej rodziny pancerza. Dymek liczy, ile części zestawu masz założonych, a więcej części odblokowuje więcej bonusu.',
   'guide.glossary.setBonusTerm': 'Bonus zestawu',
-  'guide.glossary.talentRowDef': 'Talenty pojawiają się w sześciu rzędach, po jednym na poziomach 5, 8, 11, 14, 17 i 20. Każdy rząd oferuje trzy opcje, z których wybierasz jedną, więc nie ma punktów do odkładania ani wydawania.',
+  'guide.glossary.talentRowDef':
+    'Talenty pojawiają się w sześciu rzędach, po jednym na poziomach 5, 8, 11, 14, 17 i 20. Każdy rząd oferuje trzy opcje, z których wybierasz jedną, więc nie ma punktów do odkładania ani wydawania.',
   'guide.glossary.talentRowTerm': 'Rząd talentów',
-  'guide.glossary.toolCharmDef': 'Wytworzony talizman, który wsuwasz w narzędzie górnicze, drwalskie lub zielarskie z okna Profesji, aby poprawić to, co ono przynosi. Wsunięcie zużywa talizman, a efekt trwa przez ustaloną liczbę ładunków. Gdy się wyczerpią, doładowujesz gniazdo materiałami zamiast wytwarzać nowy talizman.',
+  'guide.glossary.toolCharmDef':
+    'Wytworzony talizman, który wsuwasz w narzędzie górnicze, drwalskie lub zielarskie z okna Profesji, aby poprawić to, co ono przynosi. Wsunięcie zużywa talizman, a efekt trwa przez ustaloną liczbę ładunków. Gdy się wyczerpią, doładowujesz gniazdo materiałami zamiast wytwarzać nowy talizman.',
   'guide.glossary.toolCharmTerm': 'Talizman narzędzia',
-  'guide.glossary.unstuckDef': 'Cena użycia Wyzwolenia z menu gry. Stój nieruchomo przez cały odliczanie, a zostaniesz przeniesiony na najbliższy cmentarz i przez pewien czas będziesz nosić tymczasowe osłabienie.',
+  'guide.glossary.unstuckDef':
+    'Cena użycia Wyzwolenia z menu gry. Stój nieruchomo przez cały odliczanie, a zostaniesz przeniesiony na najbliższy cmentarz i przez pewien czas będziesz nosić tymczasowe osłabienie.',
   'guide.glossary.unstuckTerm': 'Choroba Wyzwolenia',
-  'guide.glossary.warfareDef': 'Ekwipunkowa strona rywalizacji graczy. Kwatermistrz sprzedaje zestawy pancerza Działań Wojennych za Honor, a niesiona przez nie ocena Działań Wojennych liczy się tylko w starciach z innymi graczami.',
+  'guide.glossary.warfareDef':
+    'Ekwipunkowa strona rywalizacji graczy. Kwatermistrz sprzedaje zestawy pancerza Działań Wojennych za Honor, a niesiona przez nie ocena Działań Wojennych liczy się tylko w starciach z innymi graczami.',
   'guide.glossary.warfareTerm': 'Działania wojenne',
-  'guide.glossary.worldDef': 'Jedna współdzielona kopia gry online, z własnymi graczami, rynkiem i rankingiem. Ten poradnik nazywa ją też królestwem, a twoja postać żyje w świecie, w którym ją stworzyłeś.',
+  'guide.glossary.worldDef':
+    'Jedna współdzielona kopia gry online, z własnymi graczami, rynkiem i rankingiem. Ten poradnik nazywa ją też królestwem, a twoja postać żyje w świecie, w którym ją stworzyłeś.',
   'guide.glossary.worldTerm': 'Świat',
   'guide.groups.character': 'Twoja postać',
   'guide.groups.compete': 'Gracz kontra gracz',
   'guide.groups.endgame': 'Zawartość grupowa',
   'guide.groups.world': 'Świat',
-  'guide.home.faq.a4Count': 'Limit to poziom {cap}, osiągany w strefach zadań, lochów i eksploracji. W sumie jest {zones} stref, a najdalsze z nich są zbudowane dla postaci, które już osiągnęły limit.',
-  'guide.home.world.farshoreBlurb': 'Wyspa za mielizną, gdzie niebo rozdziera się nad Polami Szczelin, a Gullhaven bije w dzwon przy każdym wyłomie.',
+  'guide.home.faq.a4Count':
+    'Limit to poziom {cap}, osiągany w strefach zadań, lochów i eksploracji. W sumie jest {zones} stref, a najdalsze z nich są zbudowane dla postaci, które już osiągnęły limit.',
+  'guide.home.world.farshoreBlurb':
+    'Wyspa za mielizną, gdzie niebo rozdziera się nad Polami Szczelin, a Gullhaven bije w dzwon przy każdym wyłomie.',
   'guide.home.world.farshoreName': 'Dalekie Wybrzeże',
-  'guide.home.world.galeBlurb': 'Nadmorskie klify i wyjące wzgórza, gdzie wiatr nigdy nie odpoczywa, a Wickharbor szczelnie zamyka swoje drzwi.',
+  'guide.home.world.galeBlurb':
+    'Nadmorskie klify i wyjące wzgórza, gdzie wiatr nigdy nie odpoczywa, a Wickharbor szczelnie zamyka swoje drzwi.',
   'guide.home.world.galeName': 'Wichrowy Grzbiet',
-  'guide.home.world.gardenBlurb': 'Kraina żywopłotowego labiryntu, wciąż przycinana przez ogrodnika, którego nikt nigdy nie widział, do której wchodzi się przez Hedgewick i jego dziedzińce z fontannami.',
+  'guide.home.world.gardenBlurb':
+    'Kraina żywopłotowego labiryntu, wciąż przycinana przez ogrodnika, którego nikt nigdy nie widział, do której wchodzi się przez Hedgewick i jego dziedzińce z fontannami.',
   'guide.home.world.gardenName': 'Wieczny Ogród',
-  'guide.home.world.hauntBlurb': 'Nawiedzony las pod olbrzymimi koronami drzew, gdzie latarnie Gallowmere są jedynym uczciwym światłem na drodze.',
+  'guide.home.world.hauntBlurb':
+    'Nawiedzony las pod olbrzymimi koronami drzew, gdzie latarnie Gibbetmere są jedynym uczciwym światłem na drodze.',
   'guide.home.world.hauntName': 'Widmowy Bór',
-  'guide.home.world.jungleBlurb': 'Palmy, biały piasek i głośne ptaki, a nadmorskie miasteczko Drifthaven utrzymuje ognisko na plaży.',
+  'guide.home.world.jungleBlurb':
+    'Palmy, biały piasek i głośne ptaki, a nadmorskie miasteczko Drifthaven utrzymuje ognisko na plaży.',
   'guide.home.world.jungleName': 'Palmowe Wybrzeże',
   'guide.home.world.levelsCap': 'Poziom {level}',
-  'guide.home.world.nightBlurb': 'Kraina gwiaździstej północy, gdzie kwiaty oświetlają ścieżki, a Moonrest utrzymuje swoje czuwanie.',
+  'guide.home.world.nightBlurb':
+    'Kraina gwiaździstej północy, gdzie kwiaty oświetlają ścieżki, a Moonrest utrzymuje swoje czuwanie.',
   'guide.home.world.nightName': 'Nocny Kwiat',
-  'guide.home.world.subCount': 'Jedna ciągła kraina z {zones} stref, od cichych dolin i zatopionych mokradeł po popielne pustkowia, zamarznięte szczyty i żywopłotowe ogrody-labirynty.',
-  'guide.howToPlay.charactersBody': 'Jedno konto może utrzymać do dziesięciu postaci na każdym świecie, więc jest miejsce, by wypróbować kilka klas, nic nie tracąc. Usunięcie postaci jest celowe: postać musi znajdować się poza światem, a gra prosi cię o wpisanie jej imienia, zanim zniknie. Usunięta postać przepada na zawsze, a wraz z nią znikają jej ogłoszenia na Targu Świata i listy w Kruczej Poczcie.\n\nGdy wybierzesz klasę, decydujesz, jak wygląda twój bohater. Panel z zakładkami mieści Ciało, Twarz, Włosy i Styl: wybierz płeć męską lub żeńską, dopracuj twarz zestawem suwaków i wyborem oczu, a potem wybierz fryzurę, jej kolor i odcień skóry, spośród nazwanych gotowców albo z koła kolorów kryjącego się za nimi. Przycisk losowania wylosuje cały wygląd, jeśli wolisz się zaskoczyć, a reset przywraca postaci standardową twarz dla wybranego ciała. Nic z tego nie wpływa na to, jak twoja postać gra.',
+  'guide.home.world.subCount':
+    'Jedna ciągła kraina z {zones} stref, od cichych dolin i zatopionych mokradeł po popielne pustkowia, zamarznięte szczyty i żywopłotowe ogrody-labirynty.',
+  'guide.howToPlay.charactersBody':
+    'Jedno konto może utrzymać do dziesięciu postaci na każdym świecie, więc jest miejsce, by wypróbować kilka klas, nic nie tracąc. Usunięcie postaci jest celowe: postać musi znajdować się poza światem, a gra prosi cię o wpisanie jej imienia, zanim zniknie. Usunięta postać przepada na zawsze, a wraz z nią znikają jej ogłoszenia na Targu Świata i listy w Kruczej Poczcie.\n\nGdy wybierzesz klasę, decydujesz, jak wygląda twój bohater. Panel z zakładkami mieści Ciało, Twarz, Włosy i Styl: wybierz płeć męską lub żeńską, dopracuj twarz zestawem suwaków i wyborem oczu, a potem wybierz fryzurę, jej kolor i odcień skóry, spośród nazwanych gotowców albo z koła kolorów kryjącego się za nimi. Przycisk losowania wylosuje cały wygląd, jeśli wolisz się zaskoczyć, a reset przywraca postaci standardową twarz dla wybranego ciała. Nic z tego nie wpływa na to, jak twoja postać gra.',
   'guide.howToPlay.charactersTitle': 'Twoje postacie',
-  'guide.howToPlay.connectionBody': 'Zerwany sygnał, zamknięta pokrywa laptopa czy przeładowanie strony nie wylogowują cię. Twoja postać pozostaje w świecie przez około pięć minut, podczas gdy gra sama próbuje połączyć się ponownie, a ty wracasz w to samo miejsce w tej samej sesji. Oznacza to też, że wypadnięcie z gry nie jest sposobem na ucieczkę z walki: twoja postać wciąż tam stoi. Wylogowanie z menu gry kończy sesję od razu, zamiast czekać, tak samo jak zalogowanie się na inną postać na tym samym koncie.',
+  'guide.howToPlay.connectionBody':
+    'Zerwany sygnał, zamknięta pokrywa laptopa czy przeładowanie strony nie wylogowują cię. Twoja postać pozostaje w świecie przez około pięć minut, podczas gdy gra sama próbuje połączyć się ponownie, a ty wracasz w to samo miejsce w tej samej sesji. Oznacza to też, że wypadnięcie z gry nie jest sposobem na ucieczkę z walki: twoja postać wciąż tam stoi. Wylogowanie z menu gry kończy sesję od razu, zamiast czekać, tak samo jak zalogowanie się na inną postać na tym samym koncie.',
   'guide.howToPlay.connectionTitle': 'Jeśli twoje połączenie się zerwie',
-  'guide.howToPlay.namesBody': 'Imię ma od 2 do 16 liter, zaczyna się od litery i może zawierać spacje, myślniki i apostrofy. Żadne dwie postacie na tym samym świecie nie mogą go dzielić, a wielkość liter nie zwalnia imienia: jeśli Ashwind jest zajęte, ashwind też jest zajęte. Twoja własna pisownia zostaje zachowana dokładnie tak, jak ją wpisałeś. Wybierz imię, z którym będziesz zadowolony, bo zostaje ono z postacią na zawsze.',
+  'guide.howToPlay.namesBody':
+    'Imię ma od 2 do 16 liter, zaczyna się od litery i może zawierać spacje, myślniki i apostrofy. Żadne dwie postacie na tym samym świecie nie mogą go dzielić, a wielkość liter nie zwalnia imienia: jeśli Ashwind jest zajęte, ashwind też jest zajęte. Twoja własna pisownia zostaje zachowana dokładnie tak, jak ją wpisałeś. Wybierz imię, z którym będziesz zadowolony, bo zostaje ono z postacią na zawsze.',
   'guide.howToPlay.namesTitle': 'Nadawanie imienia bohaterowi',
-  'guide.howToPlay.step0Body': 'Gra offline niczego nie wymaga: wybierz Offline na ekranie startowym i naciśnij Zagraj. Aby grać ze wszystkimi innymi, załóż darmowe konto (nazwa użytkownika, hasło i adres e-mail do odzyskiwania) albo zaloguj się na już istniejące, a potem wybierz świat z listy światów.',
+  'guide.howToPlay.step0Body':
+    'Gra offline niczego nie wymaga: wybierz Offline na ekranie startowym i naciśnij Zagraj. Aby grać ze wszystkimi innymi, załóż darmowe konto (nazwa użytkownika, hasło i adres e-mail do odzyskiwania) albo zaloguj się na już istniejące, a potem wybierz świat z listy światów.',
   'guide.howToPlay.step0Title': 'Wejdź do gry',
-  'guide.howToPlay.worldsBody': 'Gra online toczy się na światach, a każdy z nich jest pełną kopią gry, z własnymi graczami, własnym Targiem Świata i własnym rankingiem. Lista światów pokazuje zaludnienie każdego świata, od niskiego po pełne, więc wybierz spokojniejszy, jeśli chcesz mieć więcej miejsca, albo tętniący życiem, jeśli szukasz towarzystwa. Twoje postacie żyją na świecie, na którym je stworzyłeś, i możesz mieć postacie na więcej niż jednym.',
+  'guide.howToPlay.worldsBody':
+    'Gra online toczy się na światach, a każdy z nich jest pełną kopią gry, z własnymi graczami, własnym Targiem Świata i własnym rankingiem. Lista światów pokazuje zaludnienie każdego świata, od niskiego po pełne, więc wybierz spokojniejszy, jeśli chcesz mieć więcej miejsca, albo tętniący życiem, jeśli szukasz towarzystwa. Twoje postacie żyją na świecie, na którym je stworzyłeś, i możesz mieć postacie na więcej niż jednym.',
   'guide.howToPlay.worldsTitle': 'Wybór świata',
-  'guide.interfacePage.actionBarsBody': 'Trzy rzędy po jedenaście slotów umiejętności leżą nad twoim paskiem doświadczenia, z dedykowanym przyciskiem ataku na czele pierwszego rzędu. Na początku widoczny jest tylko pierwszy rząd: drugi i trzeci włączasz w opcjach, gdy potrzebujesz więcej miejsca, a trzeci wymaga włączonego drugiego. Rząd cyfr na górze klawiatury obsługuje pierwszy pasek, a dodatkowe paski domyślnie korzystają z klawiatury numerycznej.\n\nUmiejętności pochodzą z twojej Księgi zaklęć (P): przeciągnij jedną z księgi na slot na pasku albo użyj przełącznika przy jej rzędzie, aby umieścić ją na pierwszym wolnym slocie. Przedmioty działają tak samo, więc stos mikstur czy bandaż też mogą zająć slot i być używane klawiszem.\n\nGdy pasek jest już ułożony tak, jak chcesz, możesz go zablokować. Blokada odrzuca przeciąganie, upuszczanie i czyszczenie, pozostawiając same umiejętności równie użyteczne jak zawsze, więc niezdarne kliknięcie podczas walki nie przestawi ci przycisków.\n\nDwa mniejsze paski dołączają do rzędu, gdy mają zastosowanie: pasek zwierzęcia, z komendami Atak, Stój, Prowokacja, Obronny i Agresywny pod Ctrl plus 1 do 5, oraz pasek postaw dla klas, które zmieniają postawę lub postać.',
+  'guide.interfacePage.actionBarsBody':
+    'Trzy rzędy po jedenaście slotów umiejętności leżą nad twoim paskiem doświadczenia, z dedykowanym przyciskiem ataku na czele pierwszego rzędu. Na początku widoczny jest tylko pierwszy rząd: drugi i trzeci włączasz w opcjach, gdy potrzebujesz więcej miejsca, a trzeci wymaga włączonego drugiego. Rząd cyfr na górze klawiatury obsługuje pierwszy pasek, a dodatkowe paski domyślnie korzystają z klawiatury numerycznej.\n\nUmiejętności pochodzą z twojej Księgi zaklęć (P): przeciągnij jedną z księgi na slot na pasku albo użyj przełącznika przy jej rzędzie, aby umieścić ją na pierwszym wolnym slocie. Przedmioty działają tak samo, więc stos mikstur czy bandaż też mogą zająć slot i być używane klawiszem.\n\nGdy pasek jest już ułożony tak, jak chcesz, możesz go zablokować. Blokada odrzuca przeciąganie, upuszczanie i czyszczenie, pozostawiając same umiejętności równie użyteczne jak zawsze, więc niezdarne kliknięcie podczas walki nie przestawi ci przycisków.\n\nDwa mniejsze paski dołączają do rzędu, gdy mają zastosowanie: pasek zwierzęcia, z komendami Atak, Stój, Prowokacja, Obronny i Agresywny pod Ctrl plus 1 do 5, oraz pasek postaw dla klas, które zmieniają postawę lub postać.',
   'guide.interfacePage.actionBarsTitle': 'Twoje paski akcji',
-  'guide.interfacePage.aurasBody': 'Twoje własne wzmocnienia pokazują się jako rząd małych ikon w prawym górnym rogu obok minimapy, każda odliczająca pozostały czas, a twoje osłabienia widnieją w rzędzie pod nimi. Kliknięcie prawym przyciskiem na jedno z twoich wzmocnień zdejmuje je, o ile wolno ci je zdjąć; osłabień nigdy nie można, a pasek celu jest tylko do odczytu.\n\nWzmocnienia na ramce gracza, opcja domyślnie wyłączona, przenosi twój rząd wzmocnień na twoją własną ramkę jednostki i oddaje cały róg twoim osłabieniom. To ustawienie dostępne na komputerze: układ na telefonie i tablecie sam rozmieszcza twoje aury.\n\nWzmocnienia i osłabienia twojego celu leżą razem w pasku pod jego ramką. Gdy chcesz mieć na nie więcej miejsca, Shift+J otwiera osobne okno Wzmocnienia i osłabienia celu, które możesz przesunąć, zawęzić do samych wzmocnień lub samych osłabień, i zostawić otwarte.',
+  'guide.interfacePage.aurasBody':
+    'Twoje własne wzmocnienia pokazują się jako rząd małych ikon w prawym górnym rogu obok minimapy, każda odliczająca pozostały czas, a twoje osłabienia widnieją w rzędzie pod nimi. Kliknięcie prawym przyciskiem na jedno z twoich wzmocnień zdejmuje je, o ile wolno ci je zdjąć; osłabień nigdy nie można, a pasek celu jest tylko do odczytu.\n\nWzmocnienia na ramce gracza, opcja domyślnie wyłączona, przenosi twój rząd wzmocnień na twoją własną ramkę jednostki i oddaje cały róg twoim osłabieniom. To ustawienie dostępne na komputerze: układ na telefonie i tablecie sam rozmieszcza twoje aury.\n\nWzmocnienia i osłabienia twojego celu leżą razem w pasku pod jego ramką. Gdy chcesz mieć na nie więcej miejsca, Shift+J otwiera osobne okno Wzmocnienia i osłabienia celu, które możesz przesunąć, zawęzić do samych wzmocnień lub samych osłabień, i zostawić otwarte.',
   'guide.interfacePage.aurasTitle': 'Wzmocnienia i osłabienia',
-  'guide.interfacePage.barsBody': 'Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.',
+  'guide.interfacePage.barsBody':
+    'Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.',
   'guide.interfacePage.barsTitle': 'Paski, liczniki i tekst walki',
-  'guide.interfacePage.chatBody': 'Lewy dolny róg. Naciśnij Enter, aby zacząć pisać, i ponownie Enter, aby wysłać.\n\nDwie zakładki są tam zawsze: Czat, połączony zapis wszystkiego, co mówi się wokół ciebie, oraz Walka, pisemny zapis twoich starć. Przycisk plusa dodaje kolejne, po jednej na kanał: Mów, Krzycz, Drużyna, Ogólny, Świat, LFG, Gildia i Oficer, a do tego zakładkę Szept, która zbiera w jednym miejscu każdy szept, który wysyłasz i odbierasz. Pisanie w zakładce kanału wysyła wiadomość na ten kanał bez ponownego wpisywania komendy.\n\nCałe okno można przeciągnąć w inne miejsce i zmienić jego rozmiar, a ono zapamiętuje, gdzie je zostawiłeś.',
+  'guide.interfacePage.chatBody':
+    'Lewy dolny róg. Naciśnij Enter, aby zacząć pisać, i ponownie Enter, aby wysłać.\n\nDwie zakładki są tam zawsze: Czat, połączony zapis wszystkiego, co mówi się wokół ciebie, oraz Walka, pisemny zapis twoich starć. Przycisk plusa dodaje kolejne, po jednej na kanał: Mów, Krzycz, Drużyna, Ogólny, Świat, LFG, Gildia i Oficer, a do tego zakładkę Szept, która zbiera w jednym miejscu każdy szept, który wysyłasz i odbierasz. Pisanie w zakładce kanału wysyła wiadomość na ten kanał bez ponownego wpisywania komendy.\n\nCałe okno można przeciągnąć w inne miejsce i zmienić jego rozmiar, a ono zapamiętuje, gdzie je zostawiłeś.',
   'guide.interfacePage.chatTitle': 'Okno czatu',
-  'guide.interfacePage.framePartyBody': 'Członkowie drużyny układają się pod twoją ramką celu po lewej stronie, po jednym rzędzie na osobę. Rząd przygasa, gdy dany członek wyjdzie poza zasięg, pokazuje efekty, na które warto zareagować, i może pokazywać jego zwierzę obok niego. Ile tekstu o zdrowiu niesie rząd, zależy od ciebie: brak, procent, liczby albo jedno i drugie.',
+  'guide.interfacePage.framePartyBody':
+    'Członkowie drużyny układają się pod twoją ramką celu po lewej stronie, po jednym rzędzie na osobę. Rząd przygasa, gdy dany członek wyjdzie poza zasięg, pokazuje efekty, na które warto zareagować, i może pokazywać jego zwierzę obok niego. Ile tekstu o zdrowiu niesie rząd, zależy od ciebie: brak, procent, liczby albo jedno i drugie.',
   'guide.interfacePage.framePartyTitle': 'Twoja drużyna',
-  'guide.interfacePage.framePetBody': 'Łowcy, czarnoksiężnicy i każdy inny gracz z wezwanym zwierzęciem dostaje dla niego małą ramkę obok własnej, z jego imieniem, poziomem i zdrowiem. Kliknięcie tej ramki wybiera twoje zwierzę, a Ctrl+6 robi to samo z klawiatury.',
+  'guide.interfacePage.framePetBody':
+    'Łowcy, czarnoksiężnicy i każdy inny gracz z wezwanym zwierzęciem dostaje dla niego małą ramkę obok własnej, z jego imieniem, poziomem i zdrowiem. Kliknięcie tej ramki wybiera twoje zwierzę, a Ctrl+6 robi to samo z klawiatury.',
   'guide.interfacePage.framePetTitle': 'Twoje zwierzę',
-  'guide.interfacePage.frameSelfBody': 'Na dole na środku, obok pasków akcji. Portret, poziom, zdrowie i twój zasób, ze znacznikiem podczas walki, znacznikiem odpoczynku podczas odpoczywania i rzędem punktów kombinacji dla klas, które je budują. Kliknięcie ramki wybiera ciebie samego jako cel.',
+  'guide.interfacePage.frameSelfBody':
+    'Na dole na środku, obok pasków akcji. Portret, poziom, zdrowie i twój zasób, ze znacznikiem podczas walki, znacznikiem odpoczynku podczas odpoczywania i rzędem punktów kombinacji dla klas, które je budują. Kliknięcie ramki wybiera ciebie samego jako cel.',
   'guide.interfacePage.frameSelfTitle': 'Twoja własna ramka',
-  'guide.interfacePage.frameTargetBody': 'Lewy górny róg, pojawia się w chwili, gdy coś zaznaczysz, i znika, gdy porzucisz cel. Ten sam portret i te same paski, a do tego oznaczenie Elity przy trudniejszych wrogach, pasek rzucania pokazujący, co rzuca twój cel, oraz pasek efektów, które na nim leżą.',
+  'guide.interfacePage.frameTargetBody':
+    'Lewy górny róg, pojawia się w chwili, gdy coś zaznaczysz, i znika, gdy porzucisz cel. Ten sam portret i te same paski, a do tego oznaczenie Elity przy trudniejszych wrogach, pasek rzucania pokazujący, co rzuca twój cel, oraz pasek efektów, które na nim leżą.',
   'guide.interfacePage.frameTargetTitle': 'Twój cel',
-  'guide.interfacePage.frameTotBody': 'Mała ramka obok twojej ramki celu, pokazująca, na kim obecnie skupia się twój cel. To najszybszy sposób, by sprawdzić, czy potwór walczy z twoim tankiem, czy zmierza po ciebie. Pozostaje ukryta, dopóki nie włączysz jej w opcjach.',
+  'guide.interfacePage.frameTotBody':
+    'Mała ramka obok twojej ramki celu, pokazująca, na kim obecnie skupia się twój cel. To najszybszy sposób, by sprawdzić, czy potwór walczy z twoim tankiem, czy zmierza po ciebie. Pozostaje ukryta, dopóki nie włączysz jej w opcjach.',
   'guide.interfacePage.frameTotTitle': 'Cel celu',
-  'guide.interfacePage.framesBody': 'Ramka jednostki to portret z paskami obok niego: paskiem zdrowia zawsze, paskiem zasobu, gdy jednostka go ma, oraz plakietką z imieniem i poziomem. Tarcza pochłaniająca obrażenia rysuje się jako jaśniejszy odcinek nałożony na pasek zdrowia, więc widzisz, jak tarcza się zużywa, zanim zacznie spadać zdrowie. Pokazuje się na twojej własnej ramce, na twoim celu i w rzędach twojej drużyny; dwie małe ramki, twojego zwierzęcia i celu twojego celu, nie mają nakładki tarczy.',
-  'guide.interfacePage.framesMoveBody': 'Twoją ramkę, ramkę celu i ramki drużyny można przesuwać. Każda ma w rogu mały przycisk przesuwania: odblokuj go, przeciągnij ramkę tam, gdzie chcesz, i zablokuj ją ponownie, aby przypadkowe kliknięcie jej nie przesunęło. Jeśli skończą gdzieś, czego pożałujesz, opcja Zresetuj położenie ramek w opcjach przywraca je wszystkie na miejsce, w którym zaczynały.',
+  'guide.interfacePage.framesBody':
+    'Ramka jednostki to portret z paskami obok niego: paskiem zdrowia zawsze, paskiem zasobu, gdy jednostka go ma, oraz plakietką z imieniem i poziomem. Tarcza pochłaniająca obrażenia rysuje się jako jaśniejszy odcinek nałożony na pasek zdrowia, więc widzisz, jak tarcza się zużywa, zanim zacznie spadać zdrowie. Pokazuje się na twojej własnej ramce, na twoim celu i w rzędach twojej drużyny; dwie małe ramki, twojego zwierzęcia i celu twojego celu, nie mają nakładki tarczy.',
+  'guide.interfacePage.framesMoveBody':
+    'Twoją ramkę, ramkę celu i ramki drużyny można przesuwać. Każda ma w rogu mały przycisk przesuwania: odblokuj go, przeciągnij ramkę tam, gdzie chcesz, i zablokuj ją ponownie, aby przypadkowe kliknięcie jej nie przesunęło. Jeśli skończą gdzieś, czego pożałujesz, opcja Zresetuj położenie ramek w opcjach przywraca je wszystkie na miejsce, w którym zaczynały.',
   'guide.interfacePage.framesTitle': 'Ramki jednostek',
-  'guide.interfacePage.glanceBody': 'Interfejs żyje wzdłuż krawędzi ekranu i zostawia środek wolny dla świata. Twoja własna ramka, paski akcji i pasek doświadczenia leżą na dole. Twój cel i twoja drużyna są w lewym górnym rogu. Minimapa i nazwa strefy są w prawym górnym rogu, a poniżej nich, wzdłuż prawej krawędzi, ciągną się twoje śledzone elementy. Okno czatu jest w lewym dolnym rogu, a szyna małych kwadratowych przycisków w prawym dolnym.\n\nWszystko inne to okno, które otwierasz i zamykasz. Większość okien ma własny klawisz, większość ma też przycisk w tej szynie w prawym dolnym rogu, a każde z nich zamyka się swoim własnym klawiszem albo klawiszem Esc.',
+  'guide.interfacePage.glanceBody':
+    'Interfejs żyje wzdłuż krawędzi ekranu i zostawia środek wolny dla świata. Twoja własna ramka, paski akcji i pasek doświadczenia leżą na dole. Twój cel i twoja drużyna są w lewym górnym rogu. Minimapa i nazwa strefy są w prawym górnym rogu, a poniżej nich, wzdłuż prawej krawędzi, ciągną się twoje śledzone elementy. Okno czatu jest w lewym dolnym rogu, a szyna małych kwadratowych przycisków w prawym dolnym.\n\nWszystko inne to okno, które otwierasz i zamykasz. Większość okien ma własny klawisz, większość ma też przycisk w tej szynie w prawym dolnym rogu, a każde z nich zamyka się swoim własnym klawiszem albo klawiszem Esc.',
   'guide.interfacePage.glanceTitle': 'Ekran w skrócie',
-  'guide.interfacePage.intro': 'Mapa ekranu: co robi każda ramka, pasek i przycisk twojego interfejsu oraz jakie okno otwiera każdy klawisz.',
-  'guide.interfacePage.keyWindowsBody': 'Każde z nich ma domyślny klawisz i przycisk w szynie w prawym dolnym rogu. Naciśnij ten klawisz ponownie albo Esc, aby je zamknąć.',
+  'guide.interfacePage.intro':
+    'Mapa ekranu: co robi każda ramka, pasek i przycisk twojego interfejsu oraz jakie okno otwiera każdy klawisz.',
+  'guide.interfacePage.keyWindowsBody':
+    'Każde z nich ma domyślny klawisz i przycisk w szynie w prawym dolnym rogu. Naciśnij ten klawisz ponownie albo Esc, aby je zamknąć.',
   'guide.interfacePage.keyWindowsTitle': 'Okna otwierane klawiszem',
-  'guide.interfacePage.lootBody': 'Wejdź w interakcję z ciałem, na które zasłużyłeś, a otworzy się okno łupu, wypisujące to, co wypadło. Kliknij wiersz, aby to wziąć.\n\nW grupie dobry łup, podlegający zasadom łupienia grupy, wyświetla zamiast tego na twoim ekranie prośbę o rzut: Potrzebuję, jeśli chcesz go dla siebie, Chciwość, jeśli wziąłbyś go na sprzedaż, albo Pomiń, aby zostawić go komuś innemu. Mały panel pokazuje wtedy, kto już rzucił i co wybrał, podczas gdy odlicza się czas.\n\nSame zasady łupienia mieszkają we własnym, małym oknie. Przywódca grupy może je tam zmienić, a wszyscy pozostali widzą to samo okno tylko do odczytu, więc zasady nigdy nie są tajemnicą.\n\nNiektóre ciała można też oskórować z ich części. Gdy jest to możliwe, na dole okna łupu pojawia się sekcja Zbieranie, z polem do zaznaczenia przy każdym potrzebnym ci składniku.',
+  'guide.interfacePage.lootBody':
+    'Wejdź w interakcję z ciałem, na które zasłużyłeś, a otworzy się okno łupu, wypisujące to, co wypadło. Kliknij wiersz, aby to wziąć.\n\nW grupie dobry łup, podlegający zasadom łupienia grupy, wyświetla zamiast tego na twoim ekranie prośbę o rzut: Potrzebuję, jeśli chcesz go dla siebie, Chciwość, jeśli wziąłbyś go na sprzedaż, albo Pomiń, aby zostawić go komuś innemu. Mały panel pokazuje wtedy, kto już rzucił i co wybrał, podczas gdy odlicza się czas.\n\nSame zasady łupienia mieszkają we własnym, małym oknie. Przywódca grupy może je tam zmienić, a wszyscy pozostali widzą to samo okno tylko do odczytu, więc zasady nigdy nie są tajemnicą.\n\nNiektóre ciała można też oskórować z ich części. Gdy jest to możliwe, na dole okna łupu pojawia się sekcja Zbieranie, z polem do zaznaczenia przy każdym potrzebnym ci składniku.',
   'guide.interfacePage.lootTitle': 'Łup i rzuty',
-  'guide.interfacePage.mapBody': 'M otwiera mapę świata: narysowany kontynent, z twoją własną strzałką na nim, strefami i ich nazwami, punktami zainteresowania wokół ciebie, portalami podróży i znalezionymi przez ciebie węzłami do zbieractwa. Pokazuje się na niej też twoja drużyna. Wewnątrz wyprawy mapa zmienia się w schemat pomieszczeń, które do tej pory zbadałeś.\n\nWzdłuż prawej krawędzi, pod minimapą, stos elementów śledzenia utrzymuje twoje bieżące sprawy w zasięgu wzroku bez otwierania czegokolwiek: śledzone przez ciebie zadania i ich cele, postęp twoich czynów, wyprawę, w której jesteś, oraz szczelinę, w której bierzesz udział. Śledzenie zadań zwija się, gdy chcesz odzyskać miejsce na ekranie.',
+  'guide.interfacePage.mapBody':
+    'M otwiera mapę świata: narysowany kontynent, z twoją własną strzałką na nim, strefami i ich nazwami, punktami zainteresowania wokół ciebie, portalami podróży i znalezionymi przez ciebie węzłami do zbieractwa. Pokazuje się na niej też twoja drużyna. Wewnątrz wyprawy mapa zmienia się w schemat pomieszczeń, które do tej pory zbadałeś.\n\nWzdłuż prawej krawędzi, pod minimapą, stos elementów śledzenia utrzymuje twoje bieżące sprawy w zasięgu wzroku bez otwierania czegokolwiek: śledzone przez ciebie zadania i ich cele, postęp twoich czynów, wyprawę, w której jesteś, oraz szczelinę, w której bierzesz udział. Śledzenie zadań zwija się, gdy chcesz odzyskać miejsce na ekranie.',
   'guide.interfacePage.mapTitle': 'Mapa świata i twoje śledzone elementy',
-  'guide.interfacePage.minimapBody': 'Prawy górny róg: okrągła minimapa z nazwą strefy nad nią i twoimi współrzędnymi pod spodem, otoczona tarczą, która pokazuje porę dnia.\n\nTarcza niesie więcej niż sam teren. Twoja własna strzałka leży w środku, wskazując kierunek, w którym patrzysz, a twoja drużyna otacza cię jako kropki w kolorze klas, ze strzałką na krawędzi dla każdego, kto z niej zszedł. Dawcy zadań noszą na niej te same znaczniki co w świecie, a do tego rozpoznasz na niej węzły do zbieractwa i stacje rzemieślnicze, portale podróży, ciała i pojemniki gotowe do splądrowania, każdego wroga, który się tobą zainteresował, pobliskich znajomych i członków gildii oraz własne ciało, gdy wracasz do niego jako duch.\n\nPojawiają się na niej małe wskaźniki, gdy mają coś do przekazania: koperta, gdy czekają na ciebie nieprzeczytane listy, moneta, gdy u Kupca czeka na ciebie utarg ze sprzedaży lub niesprzedane towary, oraz przycisk wypisujący twoje blokady rajdów.',
+  'guide.interfacePage.minimapBody':
+    'Prawy górny róg: okrągła minimapa z nazwą strefy nad nią i twoimi współrzędnymi pod spodem, otoczona tarczą, która pokazuje porę dnia.\n\nTarcza niesie więcej niż sam teren. Twoja własna strzałka leży w środku, wskazując kierunek, w którym patrzysz, a twoja drużyna otacza cię jako kropki w kolorze klas, ze strzałką na krawędzi dla każdego, kto z niej zszedł. Dawcy zadań noszą na niej te same znaczniki co w świecie, a do tego rozpoznasz na niej węzły do zbieractwa i stacje rzemieślnicze, portale podróży, ciała i pojemniki gotowe do splądrowania, każdego wroga, który się tobą zainteresował, pobliskich znajomych i członków gildii oraz własne ciało, gdy wracasz do niego jako duch.\n\nPojawiają się na niej małe wskaźniki, gdy mają coś do przekazania: koperta, gdy czekają na ciebie nieprzeczytane listy, moneta, gdy u Kupca czeka na ciebie utarg ze sprzedaży lub niesprzedane towary, oraz przycisk wypisujący twoje blokady rajdów.',
   'guide.interfacePage.minimapTitle': 'Minimapa',
-  'guide.interfacePage.mobileBody': 'Sterowanie dotykowe pojawia się samo, a układ dopasowuje się do twojego ekranu: kompaktowe rozmieszczenie na małym telefonie, standardowe na większym telefonie i przestronniejsze na tablecie.\n\nTwoje umiejętności leżą w pierścieniu zamiast w rzędzie cyfr: przycisk ataku z pięcioma przyciskami akcji obok niego oraz przełącznik stron, który przełącza pierścień przez resztę twoich slotów, aż do siedmiu stron, gdy masz włączone wszystkie trzy paski akcji. Wokół nich leżą przyciski, po które gracz dotykowy sięga najczęściej: zmiana celu, użycie tego, co jest przed tobą, i skok, a do tego wysuwany rząd twoich materiałów zużywalnych, który sam wypełnia się tym, co niesiesz.\n\nWzdłuż dolnej krawędzi leżą Czat, Społeczność, Zadania, Ustawienia i Więcej. Więcej otwiera tacę mieszczącą resztę twoich okien, w tym twoją postać, Wyszukiwarkę lochów, PvP, Puchar Doliny, emotki i tę wiki. Okna wypełniają tu cały ekran, zamiast unosić się nad nim.\n\nPrzesuwanie ramek jednostek to funkcja komputerowa: na dotyku układ sam je rozmieszcza.',
+  'guide.interfacePage.mobileBody':
+    'Sterowanie dotykowe pojawia się samo, a układ dopasowuje się do twojego ekranu: kompaktowe rozmieszczenie na małym telefonie, standardowe na większym telefonie i przestronniejsze na tablecie.\n\nTwoje umiejętności leżą w pierścieniu zamiast w rzędzie cyfr: przycisk ataku z pięcioma przyciskami akcji obok niego oraz przełącznik stron, który przełącza pierścień przez resztę twoich slotów, aż do siedmiu stron, gdy masz włączone wszystkie trzy paski akcji. Wokół nich leżą przyciski, po które gracz dotykowy sięga najczęściej: zmiana celu, użycie tego, co jest przed tobą, i skok, a do tego wysuwany rząd twoich materiałów zużywalnych, który sam wypełnia się tym, co niesiesz.\n\nWzdłuż dolnej krawędzi leżą Czat, Społeczność, Zadania, Ustawienia i Więcej. Więcej otwiera tacę mieszczącą resztę twoich okien, w tym twoją postać, Wyszukiwarkę lochów, PvP, Puchar Doliny, emotki i tę wiki. Okna wypełniają tu cały ekran, zamiast unosić się nad nim.\n\nPrzesuwanie ramek jednostek to funkcja komputerowa: na dotyku układ sam je rozmieszcza.',
   'guide.interfacePage.mobileTitle': 'Na telefonie lub tablecie',
-  'guide.interfacePage.playerCardBody': 'Przycisk na ekranie postaci tworzy kartę gracza: obraz z bliskim ujęciem twojej postaci, noszonym przez ciebie ekwipunkiem i twoimi statystykami, gotowy do zapisania lub udostępnienia. To zdjęcie na pokaz nowego zestawu, które niczego w grze nie zmienia.',
+  'guide.interfacePage.playerCardBody':
+    'Przycisk na ekranie postaci tworzy kartę gracza: obraz z bliskim ujęciem twojej postaci, noszonym przez ciebie ekwipunkiem i twoimi statystykami, gotowy do zapisania lub udostępnienia. To zdjęcie na pokaz nowego zestawu, które niczego w grze nie zmienia.',
   'guide.interfacePage.playerCardTitle': 'Twoja karta gracza',
-  'guide.interfacePage.railBody': 'W prawym dolnym rogu ekranu, daleko od minimapy, leży szyna małych kwadratowych przycisków, po jednym na okno, ułożonych w dwie krótkie kolumny obok siebie. Na większości z nich wypisany jest ich domyślny klawisz.\n\nPierwsza kolumna obejmuje twoją postać, Księgę zaklęć, talenty, Dziennik zadań, Księgę Czynów, Profesje, mapę świata, Torby i Wytwarzanie. Druga zaczyna się od Sklepu WOK i biegnie dalej przez PvP, Wyszukiwarkę lochów, Puchar Doliny, Pojedynek Karciany, Tabelę wyników, emotki, muzykę, Znajomych i gildię, tę wiki oraz menu gry. Kilka kolejnych dołącza do nich tylko wtedy, gdy mają zastosowanie.',
+  'guide.interfacePage.railBody':
+    'W prawym dolnym rogu ekranu, daleko od minimapy, leży szyna małych kwadratowych przycisków, po jednym na okno, ułożonych w dwie krótkie kolumny obok siebie. Na większości z nich wypisany jest ich domyślny klawisz.\n\nPierwsza kolumna obejmuje twoją postać, Księgę zaklęć, talenty, Dziennik zadań, Księgę Czynów, Profesje, mapę świata, Torby i Wytwarzanie. Druga zaczyna się od Sklepu WOK i biegnie dalej przez PvP, Wyszukiwarkę lochów, Puchar Doliny, Pojedynek Karciany, Tabelę wyników, emotki, muzykę, Znajomych i gildię, tę wiki oraz menu gry. Kilka kolejnych dołącza do nich tylko wtedy, gdy mają zastosowanie.',
   'guide.interfacePage.railTitle': 'Szyna przycisków',
-  'guide.interfacePage.scopeBody': 'Każdy klawisz wymieniony na tej stronie jest domyślny i każdy z nich można przypisać na nowo. Pełna tabela klawiszy znajduje się na stronie Sterowanie, a opcje zmieniające wygląd i zachowanie interfejsu na stronie Ustawienia. Esc zamyka to okno, które jest na wierzchu, a gdy nic nie jest otwarte, otwiera menu gry.',
+  'guide.interfacePage.scopeBody':
+    'Każdy klawisz wymieniony na tej stronie jest domyślny i każdy z nich można przypisać na nowo. Pełna tabela klawiszy znajduje się na stronie Sterowanie, a opcje zmieniające wygląd i zachowanie interfejsu na stronie Ustawienia. Esc zamyka to okno, które jest na wierzchu, a gdy nic nie jest otwarte, otwiera menu gry.',
   'guide.interfacePage.scopeTitle': 'Klawisze i gdzie je zmienić',
-  'guide.interfacePage.wikiBody': 'Ta wiki jest w grze o jedno kliknięcie. Jej przycisk leży wśród innych w szynie w prawym dolnym rogu, ma swój wiersz w menu gry pod Esc, a na telefonie mieszka w tacy Więcej. Ponieważ jej otwarcie przekazuje cię do przeglądarki, przycisk zawsze najpierw prosi o potwierdzenie, więc przypadkowe stuknięcie podczas walki nigdy nie wyrwie cię z niej. Gra dalej działa w tle.',
+  'guide.interfacePage.wikiBody':
+    'Ta wiki jest w grze o jedno kliknięcie. Jej przycisk leży wśród innych w szynie w prawym dolnym rogu, ma swój wiersz w menu gry pod Esc, a na telefonie mieszka w tacy Więcej. Ponieważ jej otwarcie przekazuje cię do przeglądarki, przycisk zawsze najpierw prosi o potwierdzenie, więc przypadkowe stuknięcie podczas walki nigdy nie wyrwie cię z niej. Gra dalej działa w tle.',
   'guide.interfacePage.wikiTitle': 'Przycisk Wiki',
-  'guide.interfacePage.winBagsBody': 'Wszystko, co niesiesz, w jednym plecaku z czterema gniazdami na torby. Kategorie na górze zawężają widok do broni, pancerza, materiałów zużywalnych, materiałów, narzędzi, przedmiotów zadań albo wierzchowców, a pole wyszukiwania filtruje po nazwie. Lista rozwijana sortowania układa to, na co patrzysz, według najnowszych, jakości lub nazwy, a ten wybór jest zapamiętywany między sesjami. Osobny przycisk Sortuj porządkuje jednym kliknięciem prawdziwe komórki plecaka, czyszcząc kategorie i wyszukiwanie, więc widzisz cały uporządkowany plecak.',
+  'guide.interfacePage.winBagsBody':
+    'Wszystko, co niesiesz, w jednym plecaku z czterema gniazdami na torby. Kategorie na górze zawężają widok do broni, pancerza, materiałów zużywalnych, materiałów, narzędzi, przedmiotów zadań albo wierzchowców, a pole wyszukiwania filtruje po nazwie. Lista rozwijana sortowania układa to, na co patrzysz, według najnowszych, jakości lub nazwy, a ten wybór jest zapamiętywany między sesjami. Osobny przycisk Sortuj porządkuje jednym kliknięciem prawdziwe komórki plecaka, czyszcząc kategorie i wyszukiwanie, więc widzisz cały uporządkowany plecak.',
   'guide.interfacePage.winBagsTitle': 'Torby (B)',
-  'guide.interfacePage.winCharBody': 'Twój założony ekwipunek po jednej stronie, twoje atrybuty i statystyki, które one zasilają, po drugiej, z dymkiem przy każdej wartości, mówiącym, co ona daje twojej klasie. Znajdziesz tam też swój łączny Czas gry, z małym okiem obok, które ukrywa liczbę, gdy wolisz jej nie pokazywać, oraz przycisk, który tworzy twoją kartę gracza.',
+  'guide.interfacePage.winCharBody':
+    'Twój założony ekwipunek po jednej stronie, twoje atrybuty i statystyki, które one zasilają, po drugiej, z dymkiem przy każdej wartości, mówiącym, co ona daje twojej klasie. Znajdziesz tam też swój łączny Czas gry, z małym okiem obok, które ukrywa liczbę, gdy wolisz jej nie pokazywać, oraz przycisk, który tworzy twoją kartę gracza.',
   'guide.interfacePage.winCharTitle': 'Ekran postaci (C)',
-  'guide.interfacePage.winCraftingBody': 'Twoje przepisy, co każdy z nich wymaga i co możesz teraz wytworzyć z tego, co niesiesz.',
+  'guide.interfacePage.winCraftingBody':
+    'Twoje przepisy, co każdy z nich wymaga i co możesz teraz wytworzyć z tego, co niesiesz.',
   'guide.interfacePage.winCraftingTitle': 'Wytwarzanie (T)',
-  'guide.interfacePage.winDeedsBody': 'Zapis tego, czego dokonałeś, tytuły i Renoma, które ci to przyniosło, oraz to, co wciąż jest otwarte.',
+  'guide.interfacePage.winDeedsBody':
+    'Zapis tego, czego dokonałeś, tytuły i Renoma, które ci to przyniosło, oraz to, co wciąż jest otwarte.',
   'guide.interfacePage.winDeedsTitle': 'Księga Czynów (Shift+Z)',
-  'guide.interfacePage.winFinderBody': 'Katalog zawartości grupowej, do której możesz dołączyć przez kolejkę. Zaznacz aktywności, które cię interesują, dołącz do kolejki samodzielnie albo wystaw ogłoszenie dla własnej grupy, i zaakceptuj, gdy grupa się zbierze.',
+  'guide.interfacePage.winFinderBody':
+    'Katalog zawartości grupowej, do której możesz dołączyć przez kolejkę. Zaznacz aktywności, które cię interesują, dołącz do kolejki samodzielnie albo wystaw ogłoszenie dla własnej grupy, i zaakceptuj, gdy grupa się zbierze.',
   'guide.interfacePage.winFinderTitle': 'Wyszukiwarka lochów (Shift+I)',
-  'guide.interfacePage.winMetersBody': 'Obrażenia, leczenie i zagrożenie dla ciebie i wszystkich, którzy są z tobą, podzielone na odcinki, byś mógł spojrzeć wstecz na przedostatnią walkę. Panele leczenia i zagrożenia można wyciągnąć, aby stały osobno.',
+  'guide.interfacePage.winMetersBody':
+    'Obrażenia, leczenie i zagrożenie dla ciebie i wszystkich, którzy są z tobą, podzielone na odcinki, byś mógł spojrzeć wstecz na przedostatnią walkę. Panele leczenia i zagrożenia można wyciągnąć, aby stały osobno.',
   'guide.interfacePage.winMetersTitle': 'Liczniki obrażeń (Shift+H)',
-  'guide.interfacePage.winMoreBody': 'Mapa świata (M), okno PvP (G), Puchar Doliny (Y), Tabela wyników (K), Kalendarz wydarzeń (I) i koło emotek (X) działają tak samo. Tabeli wyników warto poświęcić chwilę przy pierwszej wizycie: ma zakładkę dla graczy, jedną dla gildii, jedną, która klasyfikuje całe konta według Renomy z Księgi Czynów, i jedną dla dziennych wyników.\n\nKliknij prawym przyciskiem innego gracza, na jego plakietce albo na jego imieniu na czacie, a Informacje o graczu otworzą kartę na jego temat: noszony przez niego ekwipunek, z dymkami, oraz publiczne dane jego postaci. To tylko podgląd, nic więcej, i wymaga, aby był wystarczająco blisko, byś go widział.',
+  'guide.interfacePage.winMoreBody':
+    'Mapa świata (M), okno PvP (G), Puchar Doliny (Y), Tabela wyników (K), Kalendarz wydarzeń (I) i koło emotek (X) działają tak samo. Tabeli wyników warto poświęcić chwilę przy pierwszej wizycie: ma zakładkę dla graczy, jedną dla gildii, jedną, która klasyfikuje całe konta według Renomy z Księgi Czynów, i jedną dla dziennych wyników.\n\nKliknij prawym przyciskiem innego gracza, na jego plakietce albo na jego imieniu na czacie, a Informacje o graczu otworzą kartę na jego temat: noszony przez niego ekwipunek, z dymkami, oraz publiczne dane jego postaci. To tylko podgląd, nic więcej, i wymaga, aby był wystarczająco blisko, byś go widział.',
   'guide.interfacePage.winMoreTitle': 'I kilka innych',
-  'guide.interfacePage.winProfessionsBody': 'Czego się nauczyłeś, jak biegły jesteś w każdym z zawodów i jak daleko każdy z nich może jeszcze zajść.',
+  'guide.interfacePage.winProfessionsBody':
+    'Czego się nauczyłeś, jak biegły jesteś w każdym z zawodów i jak daleko każdy z nich może jeszcze zajść.',
   'guide.interfacePage.winProfessionsTitle': 'Profesje (Shift+P)',
-  'guide.interfacePage.winQuestLogBody': 'Każde zadanie, które przyjąłeś, jego historia, cele i twój postęp, z możliwością pokazania dowolnego z nich na mapie oraz wyboru, które zadania ma śledzić panel śledzenia zadań.',
+  'guide.interfacePage.winQuestLogBody':
+    'Każde zadanie, które przyjąłeś, jego historia, cele i twój postęp, z możliwością pokazania dowolnego z nich na mapie oraz wyboru, które zadania ma śledzić panel śledzenia zadań.',
   'guide.interfacePage.winQuestLogTitle': 'Dziennik zadań (L)',
-  'guide.interfacePage.winSocialBody': 'Zakładki dla twoich znajomych, twojej gildii i jej składu, twojego rajdu oraz graczy, których zignorowałeś lub zablokowałeś.',
+  'guide.interfacePage.winSocialBody':
+    'Zakładki dla twoich znajomych, twojej gildii i jej składu, twojego rajdu oraz graczy, których zignorowałeś lub zablokowałeś.',
   'guide.interfacePage.winSocialTitle': 'Znajomi i gildia (O)',
-  'guide.interfacePage.winSpellbookBody': 'Każda umiejętność twojej klasy, nauczona i wciąż przed tobą, w kolejności. To tu przeciągasz umiejętności na swoje paski akcji.',
+  'guide.interfacePage.winSpellbookBody':
+    'Każda umiejętność twojej klasy, nauczona i wciąż przed tobą, w kolejności. To tu przeciągasz umiejętności na swoje paski akcji.',
   'guide.interfacePage.winSpellbookTitle': 'Księga zaklęć (P)',
-  'guide.interfacePage.winTalentsBody': 'Tu wybierasz swoją specjalizację oraz przechodzisz przez sześć rzędów talentów, z trzema opcjami do wyboru w każdym i opisem działania każdej z nich. Rzędy, do których jeszcze nie doszedłeś, widnieją obok tych, które możesz wybrać już teraz.',
+  'guide.interfacePage.winTalentsBody':
+    'Tu wybierasz swoją specjalizację oraz przechodzisz przez sześć rzędów talentów, z trzema opcjami do wyboru w każdym i opisem działania każdej z nich. Rzędy, do których jeszcze nie doszedłeś, widnieją obok tych, które możesz wybrać już teraz.',
   'guide.interfacePage.winTalentsTitle': 'Talenty (N)',
-  'guide.interfacePage.worldWindowsBody': 'Niektórych okien nigdy nie otwierasz klawiszem: pojawiają się, gdy porozmawiasz z odpowiednią osobą albo klikniesz właściwą rzecz.\n\nKupiec otwiera okno sprzedawcy, z jego towarem do kupienia i zakładką Odkup, w której czeka to, co ostatnio sprzedałeś, na wypadek gdybyś zrobił to przez pomyłkę. Przy towarze stoi rząd przycisków ilości, więc stos reagentów kupujesz jednym kliknięciem po pięć albo dziesięć naraz zamiast dziesięciu osobnych kliknięć, a gdy żadna z tych liczb nie pasuje, jest tam też opcja własnej ilości. Trener klasy otwiera listę tego, czego możesz się nauczyć teraz, i tego, co wciąż przed tobą.\n\nBankier otwiera twój skarbiec, schowek z dodatkowymi miejscami, których możesz dokupić więcej. Jeśli twoja gildia otworzyła bank, druga zakładka pokazuje właśnie jego: każdy członek może zajrzeć do środka nawet bez uprawnień do wynoszenia czegokolwiek, więc nikt nie musi pytać, co gildia trzyma, rangi decydują, kto może wpłacać, wypłacać i przenosić złoto gildii, a dziennik zapisuje każdy ruch.\n\nSkrzynka Kruczej Poczty otwiera twoje listy, z tym, co przyszło, na jednej zakładce i formularzem do wysyłki na drugiej, razem z załącznikami. Rynek Świata u Kupca ma własne okno: przeglądanie i kupowanie na jednej zakładce, wystawianie własnego towaru na drugiej, a odbieranie tego, co się sprzedało, na trzeciej. Handel twarzą w twarz z innym graczem otwiera okno wymiany z osobną stroną dla każdego z was.',
+  'guide.interfacePage.worldWindowsBody':
+    'Niektórych okien nigdy nie otwierasz klawiszem: pojawiają się, gdy porozmawiasz z odpowiednią osobą albo klikniesz właściwą rzecz.\n\nKupiec otwiera okno sprzedawcy, z jego towarem do kupienia i zakładką Odkup, w której czeka to, co ostatnio sprzedałeś, na wypadek gdybyś zrobił to przez pomyłkę. Przy towarze stoi rząd przycisków ilości, więc stos reagentów kupujesz jednym kliknięciem po pięć albo dziesięć naraz zamiast dziesięciu osobnych kliknięć, a gdy żadna z tych liczb nie pasuje, jest tam też opcja własnej ilości. Trener klasy otwiera listę tego, czego możesz się nauczyć teraz, i tego, co wciąż przed tobą.\n\nBankier otwiera twój skarbiec, schowek z dodatkowymi miejscami, których możesz dokupić więcej. Jeśli twoja gildia otworzyła bank, druga zakładka pokazuje właśnie jego: każdy członek może zajrzeć do środka nawet bez uprawnień do wynoszenia czegokolwiek, więc nikt nie musi pytać, co gildia trzyma, rangi decydują, kto może wpłacać, wypłacać i przenosić złoto gildii, a dziennik zapisuje każdy ruch.\n\nSkrzynka Kruczej Poczty otwiera twoje listy, z tym, co przyszło, na jednej zakładce i formularzem do wysyłki na drugiej, razem z załącznikami. Rynek Świata u Kupca ma własne okno: przeglądanie i kupowanie na jednej zakładce, wystawianie własnego towaru na drugiej, a odbieranie tego, co się sprzedało, na trzeciej. Handel twarzą w twarz z innym graczem otwiera okno wymiany z osobną stroną dla każdego z was.',
   'guide.interfacePage.worldWindowsTitle': 'Okna, które otwiera dla ciebie świat',
-  'guide.mountsPage.breaksBody': 'Woda zawsze wygrywa. Wjedź w cokolwiek wystarczająco głębokiego, by w tym pływać, a natychmiast spadasz z siodła, bo żaden naziemny wierzchowiec nie pływa, a śmierć zrzuca cię tam, gdzie akurat spadłeś. Nie możesz przywołać wierzchowca podczas walki, gdy jesteś martwy albo wracasz jako duch, ani w żadnym momencie meczu na Polach Ciernistej Kotliny, który toczy się pieszo od zbiórki aż po ostatnią chwilę: jeśli jechałeś wierzchem, czekając na start, wejście do meczu zdejmuje cię z siodła razem z nim. Wejście w walkę albo w wodę w trakcie przywoływania również je anuluje.\n\nPrawie wszystko, co robisz, też cię zsadza. Zamachnięcie się na coś, rozpoczęcie rzucenia, zbieranie z węzła, wędkowanie, wytwarzanie, zaklinanie, odzyskiwanie i ładowanie efektu narzędzia profesji zsadzają cię z siodła w chwili, gdy zaczynasz, więc licz się z zeskakiwaniem przy każdej żyle. Przywołanie wierzchowca zrzuca też każdą przybraną postać zmiennokształtną: nigdy nie jesteś jednocześnie przemieniony i dosiadający wierzchowca.',
+  'guide.mountsPage.breaksBody':
+    'Woda zawsze wygrywa. Wjedź w cokolwiek wystarczająco głębokiego, by w tym pływać, a natychmiast spadasz z siodła, bo żaden naziemny wierzchowiec nie pływa, a śmierć zrzuca cię tam, gdzie akurat spadłeś. Nie możesz przywołać wierzchowca podczas walki, gdy jesteś martwy albo wracasz jako duch, ani w żadnym momencie meczu na Polach Ciernistej Kotliny, który toczy się pieszo od zbiórki aż po ostatnią chwilę: jeśli jechałeś wierzchem, czekając na start, wejście do meczu zdejmuje cię z siodła razem z nim. Wejście w walkę albo w wodę w trakcie przywoływania również je anuluje.\n\nPrawie wszystko, co robisz, też cię zsadza. Zamachnięcie się na coś, rozpoczęcie rzucenia, zbieranie z węzła, wędkowanie, wytwarzanie, zaklinanie, odzyskiwanie i ładowanie efektu narzędzia profesji zsadzają cię z siodła w chwili, gdy zaczynasz, więc licz się z zeskakiwaniem przy każdej żyle. Przywołanie wierzchowca zrzuca też każdą przybraną postać zmiennokształtną: nigdy nie jesteś jednocześnie przemieniony i dosiadający wierzchowca.',
   'guide.mountsPage.breaksHeading': 'Co stawia cię z powrotem na nogi',
-  'guide.mountsPage.collectBody': 'Poza ladą Marli wodze się znajduje, a nie kupuje. Spadają z ostatnich bossów lochów dla pięciu graczy i rajdu w trybie Heroicznym, a także z ukończeń Szczelin, gdzie im trudniejszą Szczelinę zamkniesz, tym rzadsze wodze może zostawić. Są rzadkimi znaleziskami z założenia i żaden przebieg ich nie gwarantuje, więc uczciwym sposobem polowania na wierzchowca jest zabranie tego polowania na wyprawy, które i tak planowałeś. Ta strona nie powie ci, który wierzchowiec wisi na którym bossie: to musisz odkryć sam.',
+  'guide.mountsPage.collectBody':
+    'Poza ladą Marli wodze się znajduje, a nie kupuje. Spadają z ostatnich bossów lochów dla pięciu graczy i rajdu w trybie Heroicznym, a także z ukończeń Szczelin, gdzie im trudniejszą Szczelinę zamkniesz, tym rzadsze wodze może zostawić. Są rzadkimi znaleziskami z założenia i żaden przebieg ich nie gwarantuje, więc uczciwym sposobem polowania na wierzchowca jest zabranie tego polowania na wyprawy, które i tak planowałeś. Ta strona nie powie ci, który wierzchowiec wisi na którym bossie: to musisz odkryć sam.',
   'guide.mountsPage.collectHeading': 'Skąd biorą się rzadsze wierzchowce',
-  'guide.mountsPage.firstBody': 'Valorsteed to jedyny wierzchowiec sprzedawany gdziekolwiek w świecie. Gdy nauczysz się Jeździectwa, Marla sprzeda ci Wodze Valorsteeda za 10 złota, a te wodze zostają twoje na zawsze. Każdego innego wierzchowca zdobywa się w świecie, więc ten koń jest tym, od czego zaczyna niemal każdy jeździec.',
+  'guide.mountsPage.firstBody':
+    'Valorsteed to jedyny wierzchowiec sprzedawany gdziekolwiek w świecie. Gdy nauczysz się Jeździectwa, Marla sprzeda ci Wodze Valorsteeda za 10 złota, a te wodze zostają twoje na zawsze. Każdego innego wierzchowca zdobywa się w świecie, więc ten koń jest tym, od czego zaczyna niemal każdy jeździec.',
   'guide.mountsPage.firstHeading': 'Twój pierwszy wierzchowiec',
-  'guide.mountsPage.goodsBody': 'Wierzchowiec jest przedmiotem, co czyni go czymś, czym może poruszać gospodarka. Posiadasz wierzchowca, dopóki jego wodze leżą w twoich torbach albo w banku, choć wodze trzymane w banku wciąż są twoje, tylko nie pozwalają ci jeździć: żeby przywołać zwierzę, musisz nosić wodze przy sobie. Wodze zdobyte od gracza nie są z nikim związane, więc idą do wymiany, podróżują pocztą i trafiają na Rynek Świata jak każde inne znalezisko, chyba że sam przedmiot mówi inaczej. Zanim się ich pozbędziesz, warto znać dwie rzeczy: żaden kupiec nigdy nie odkupi zestawu wodzy, więc wierzchowiec to zakup, który zatrzymujesz albo przekazujesz dalej, a nie zamieniasz z powrotem na monety, a jeśli wodze znikną jednocześnie z twoich torb i z banku, bo akurat na nich jeździsz, wymieniasz je, wysyłasz pocztą albo sprzedajesz na rynku, wierzchowiec znika razem z nimi, a ty lądujesz tam, gdzie akurat stałeś.',
+  'guide.mountsPage.goodsBody':
+    'Wierzchowiec jest przedmiotem, co czyni go czymś, czym może poruszać gospodarka. Posiadasz wierzchowca, dopóki jego wodze leżą w twoich torbach albo w banku, choć wodze trzymane w banku wciąż są twoje, tylko nie pozwalają ci jeździć: żeby przywołać zwierzę, musisz nosić wodze przy sobie. Wodze zdobyte od gracza nie są z nikim związane, więc idą do wymiany, podróżują pocztą i trafiają na Rynek Świata jak każde inne znalezisko, chyba że sam przedmiot mówi inaczej. Zanim się ich pozbędziesz, warto znać dwie rzeczy: żaden kupiec nigdy nie odkupi zestawu wodzy, więc wierzchowiec to zakup, który zatrzymujesz albo przekazujesz dalej, a nie zamieniasz z powrotem na monety, a jeśli wodze znikną jednocześnie z twoich torb i z banku, bo akurat na nich jeździsz, wymieniasz je, wysyłasz pocztą albo sprzedajesz na rynku, wierzchowiec znika razem z nimi, a ty lądujesz tam, gdzie akurat stałeś.',
   'guide.mountsPage.goodsHeading': 'Wodze to zwykły towar',
   'guide.mountsPage.heading': 'Wierzchowce i jeździectwo',
-  'guide.mountsPage.intro': 'Wierzchowiec to szybszy sposób na pokonywanie świata i tylko tym jest. Jeździectwa uczysz się w stajni, kupujesz swój pierwszy zestaw wodzy, a każda droga od tej pory jest krótsza.',
-  'guide.mountsPage.learnBody': 'Jeździectwo to umiejętność, którą kupujesz raz, a otwiera się na poziomie {level}. Marla Hitchen, zarządczyni stajni, prowadzi Stajnie Wichrowego Grzbietu na wzgórzach, i sprzedaje Trening Jeździecki za 80 złota. Ten jeden zakup jest tym, co w ogóle pozwala ci dosiąść wierzchowca, i zostaje z tobą na zawsze.\n\nGdy już go masz, Marla ma dla ciebie zadanie: Lekcje jazdy konnej. Podejmij je, podążaj za znacznikiem do świecącego kwadratu za łukiem startowym i naciśnij Rozpocznij wyścig. Marla pożycza ci na tę lekcję treningowego Valorsteeda, więc sama lekcja nic cię nie kosztuje. Przejedź trasę, dokończ ją, a potem wróć do niej po swoje złoto i doświadczenie. Pożyczony rumak wraca potem do stajni, więc ta lekcja uczy cię trzymać się w siodle, a nie daje ci konia.',
+  'guide.mountsPage.intro':
+    'Wierzchowiec to szybszy sposób na pokonywanie świata i tylko tym jest. Jeździectwa uczysz się w stajni, kupujesz swój pierwszy zestaw wodzy, a każda droga od tej pory jest krótsza.',
+  'guide.mountsPage.learnBody':
+    'Jeździectwo to umiejętność, którą kupujesz raz, a otwiera się na poziomie {level}. Marla Hitchen, zarządczyni stajni, prowadzi Stajnie Wichrowego Grzbietu na wzgórzach, i sprzedaje Trening Jeździecki za 80 złota. Ten jeden zakup jest tym, co w ogóle pozwala ci dosiąść wierzchowca, i zostaje z tobą na zawsze.\n\nGdy już go masz, Marla ma dla ciebie zadanie: Lekcje jazdy konnej. Podejmij je, podążaj za znacznikiem do świecącego kwadratu za łukiem startowym i naciśnij Rozpocznij wyścig. Marla pożycza ci na tę lekcję treningowego Valorsteeda, więc sama lekcja nic cię nie kosztuje. Przejedź trasę, dokończ ją, a potem wróć do niej po swoje złoto i doświadczenie. Pożyczony rumak wraca potem do stajni, więc ta lekcja uczy cię trzymać się w siodle, a nie daje ci konia.',
   'guide.mountsPage.learnHeading': 'Nauka jazdy konnej',
-  'guide.mountsPage.raceBody': 'Parkur w zagrodzie Marli jest otwarty dla każdego i o każdej porze, nie tylko podczas lekcji. Dosiądź wierzchowca, stań na świecącym kwadracie za łukiem i naciśnij Rozpocznij wyścig. Odliczanie trzyma cię w miejscu, a potem rusza zegar: pokonaj wszystkie siedem przeszkód i wróć przez łuk, zanim czas się skończy.\n\nPrzeszkoda liczy się tylko wtedy, gdy naprawdę jesteś w powietrzu nad poprzeczką, więc zwykłe przejechanie pod spodem nic nie daje. Możesz brać je w dowolnej kolejności i z dowolnej strony, a pominięta przeszkoda to nie koniec świata: zawróć i spróbuj jeszcze raz. Śmierć, zsiadanie albo opuszczenie zagrody kończy próbę, podobnie jak upłynięcie czasu, co zrzuca cię z siodła tam, gdzie akurat jesteś; samodzielne anulowanie po prostu zatrzymuje zegar. Nic nie stoi na przeszkodzie, by zacząć od nowa. Nie ma tu opłaty, czasu odnowienia ani nagrody poza samym czasem, a dowolna liczba jeźdźców może jechać po torze naraz, nie wchodząc sobie w drogę.',
+  'guide.mountsPage.raceBody':
+    'Parkur w zagrodzie Marli jest otwarty dla każdego i o każdej porze, nie tylko podczas lekcji. Dosiądź wierzchowca, stań na świecącym kwadracie za łukiem i naciśnij Rozpocznij wyścig. Odliczanie trzyma cię w miejscu, a potem rusza zegar: pokonaj wszystkie siedem przeszkód i wróć przez łuk, zanim czas się skończy.\n\nPrzeszkoda liczy się tylko wtedy, gdy naprawdę jesteś w powietrzu nad poprzeczką, więc zwykłe przejechanie pod spodem nic nie daje. Możesz brać je w dowolnej kolejności i z dowolnej strony, a pominięta przeszkoda to nie koniec świata: zawróć i spróbuj jeszcze raz. Śmierć, zsiadanie albo opuszczenie zagrody kończy próbę, podobnie jak upłynięcie czasu, co zrzuca cię z siodła tam, gdzie akurat jesteś; samodzielne anulowanie po prostu zatrzymuje zegar. Nic nie stoi na przeszkodzie, by zacząć od nowa. Nie ma tu opłaty, czasu odnowienia ani nagrody poza samym czasem, a dowolna liczba jeźdźców może jechać po torze naraz, nie wchodząc sobie w drogę.',
   'guide.mountsPage.raceHeading': 'Wyścig w stajniach',
-  'guide.mountsPage.rideBody': 'Nie ma okna wierzchowców ani ulubionego do ustawienia, bo to wodze są wierzchowcem. Użyj zestawu wodzy z torby albo z miejsca na pasku akcji, a dosiądziesz tego wierzchowca. Przywołanie trwa chwilę, to krótkie wezwanie, a nie natychmiastowe, więc nie uratuje cię przed nieudanym pociągnięciem. Zsiadanie jest natychmiastowe i nigdy nie jest blokowane.\n\nUżyj wodzy, na których już jedziesz, a odstawisz tego wierzchowca. Użyj innego zestawu, będąc już w siodle, a przesiądziesz się na niego bezpośrednio, bez żadnego przywoływania po drodze. Klawisz Dosiądź/Zsiądź, domyślnie klawisz z grawisem, zawsze tylko cię zsadza: to droga w dół, nie w górę. Jedynym wyjątkiem jest lekcja jazdy konnej, gdzie ten sam klawisz przywołuje rumaka pożyczonego przez Marlę, bo pożyczony koń nie ma wodzy do kliknięcia. Na telefonie albo tablecie przycisk Dosiądź w zasobniku Więcej działa w obie strony, choć przywołuje pierwszy zestaw wodzy leżący w twoich torbach, a nie ten, który wybierzesz, więc dotknij samych wodzy, gdy chcesz konkretnego wierzchowca.',
+  'guide.mountsPage.rideBody':
+    'Nie ma okna wierzchowców ani ulubionego do ustawienia, bo to wodze są wierzchowcem. Użyj zestawu wodzy z torby albo z miejsca na pasku akcji, a dosiądziesz tego wierzchowca. Przywołanie trwa chwilę, to krótkie wezwanie, a nie natychmiastowe, więc nie uratuje cię przed nieudanym pociągnięciem. Zsiadanie jest natychmiastowe i nigdy nie jest blokowane.\n\nUżyj wodzy, na których już jedziesz, a odstawisz tego wierzchowca. Użyj innego zestawu, będąc już w siodle, a przesiądziesz się na niego bezpośrednio, bez żadnego przywoływania po drodze. Klawisz Dosiądź/Zsiądź, domyślnie klawisz z grawisem, zawsze tylko cię zsadza: to droga w dół, nie w górę. Jedynym wyjątkiem jest lekcja jazdy konnej, gdzie ten sam klawisz przywołuje rumaka pożyczonego przez Marlę, bo pożyczony koń nie ma wodzy do kliknięcia. Na telefonie albo tablecie przycisk Dosiądź w zasobniku Więcej działa w obie strony, choć przywołuje pierwszy zestaw wodzy leżący w twoich torbach, a nie ten, który wybierzesz, więc dotknij samych wodzy, gdy chcesz konkretnego wierzchowca.',
   'guide.mountsPage.rideHeading': 'Wsiadanie i zsiadanie',
-  'guide.mountsPage.speedBody': 'Prędkość to jedyna rzecz, która odróżnia jednego wierzchowca od drugiego. Valorsteed, którego kupujesz od Marli, ustala bazowe tempo, a wierzchowce zdobyte w świecie jeżdżą ponad nim: im rzadsze wodze, tym szybsza jazda, w kilku wyraźnych stopniach, a nie płynnym ślizgu. Nie ma drugiego stopnia Jeździectwa do wytrenowania ani ulepszenia do kupienia później. Za Jeździectwo płacisz raz, a od tej pory to wodze, których użyjesz, decydują, jak szybko podróżujesz.',
+  'guide.mountsPage.speedBody':
+    'Prędkość to jedyna rzecz, która odróżnia jednego wierzchowca od drugiego. Valorsteed, którego kupujesz od Marli, ustala bazowe tempo, a wierzchowce zdobyte w świecie jeżdżą ponad nim: im rzadsze wodze, tym szybsza jazda, w kilku wyraźnych stopniach, a nie płynnym ślizgu. Nie ma drugiego stopnia Jeździectwa do wytrenowania ani ulepszenia do kupienia później. Za Jeździectwo płacisz raz, a od tej pory to wodze, których użyjesz, decydują, jak szybko podróżujesz.',
   'guide.mountsPage.speedHeading': 'Prędkość i poziomy',
-  'guide.mountsPage.whatBody': 'Wierzchowiec to bestia, na której jeździsz, a to, co ci daje, to prędkość. Żadnego pancerza, żadnych obrażeń, żadnych statystyk: niesie cię po ziemi szybciej i pozwala skoczyć odrobinę wyżej, i to cała umowa. Każdy wierzchowiec w grze to wierzchowiec naziemny, więc nie ma latania, a żaden z nich nie pływa.',
+  'guide.mountsPage.whatBody':
+    'Wierzchowiec to bestia, na której jeździsz, a to, co ci daje, to prędkość. Żadnego pancerza, żadnych obrażeń, żadnych statystyk: niesie cię po ziemi szybciej i pozwala skoczyć odrobinę wyżej, i to cała umowa. Każdy wierzchowiec w grze to wierzchowiec naziemny, więc nie ma latania, a żaden z nich nie pływa.',
   'guide.mountsPage.whatHeading': 'Czym jest wierzchowiec',
-  'guide.mountsPage.whereBody': 'Stajnie Wichrowego Grzbietu są zaznaczone na mapie Wichrowego Grzbietu, na wzgórzach między Urwiskiem a Polami Wraków. Marla stoi przy stodole, twarzą do placu wyścigowego.',
+  'guide.mountsPage.whereBody':
+    'Stajnie Wichrowego Grzbietu są zaznaczone na mapie Wichrowego Grzbietu, na wzgórzach między Urwiskiem a Polami Wraków. Marla stoi przy stodole, twarzą do placu wyścigowego.',
   'guide.mountsPage.whereHeading': 'Gdzie ją znaleźć',
   'guide.nav.commands': 'Polecenia czatu',
   'guide.nav.editor': 'Edytor świata',
   'guide.nav.interface': 'Interfejs i HUD',
   'guide.nav.mounts': 'Wierzchowce i jeździectwo',
   'guide.nav.rifts': 'Szczeliny',
-  'guide.profPages.econ.commissionsBoardNote': 'Do zamówienia prowadzą dwie drogi: zamówienie wystawione na tablicy powyżej, które trafia do rzemieślnika, oraz rzemieślnik, który sam postanawia wykonać dla ciebie przedmiot. Obie kończą się tą samą Więzią Wytwórcy.',
-  'guide.profPages.econ.orderBoardBody': 'Nie musisz szukać rzemieślnika na czacie. Otwórz okno rzemiosła, a tablica zamówień jest jedno kliknięcie dalej, w jego nagłówku. Każdy może tam wystawić zamówienie: nazwij przepis, który chcesz mieć wykonany, a potem albo zostaw je otwarte dla dowolnego rzemieślnika, albo skieruj je do jednego, wskazanego z imienia rzemieślnika, który wtedy jako jedyny może je podjąć. Rzemieślnik przeglądający tablicę przyjmuje zamówienie, a przyjęcie go zobowiązuje: nad jednym zleceniem pracuje zawsze tylko jedna osoba naraz.\n\nWystawienie niczego nie blokuje: zamówienie nie rezerwuje ani monet, ani materiałów, więc cena i to, kto dostarczy reagenty, zostaje wyłącznie między wami dwoma, uzgodnione tak, jak uzgadnia się każde zamówienie. Możesz anulować własne zamówienie, dopóki jest otwarte, a zamówienie, którego nikt nie przyjmie, wygasa samo po dobie. Gdy rzemieślnik już je przyjmie, to dostawa zamyka sprawę.\n\nDostawa odbywa się twarzą w twarz. Rzemieślnik wykonuje przedmiot jako zamówienie, przychodzi do ciebie i wręcza go, więc trzymaj wolne miejsce w torbie, by go odebrać. To, co dostajesz, podlega zwykłym zasadom zamówień opisanym poniżej i wiąże się z tobą przez Więź Wytwórcy.',
+  'guide.profPages.econ.commissionsBoardNote':
+    'Do zamówienia prowadzą dwie drogi: zamówienie wystawione na tablicy powyżej, które trafia do rzemieślnika, oraz rzemieślnik, który sam postanawia wykonać dla ciebie przedmiot. Obie kończą się tą samą Więzią Wytwórcy.',
+  'guide.profPages.econ.orderBoardBody':
+    'Nie musisz szukać rzemieślnika na czacie. Otwórz okno rzemiosła, a tablica zamówień jest jedno kliknięcie dalej, w jego nagłówku. Każdy może tam wystawić zamówienie: nazwij przepis, który chcesz mieć wykonany, a potem albo zostaw je otwarte dla dowolnego rzemieślnika, albo skieruj je do jednego, wskazanego z imienia rzemieślnika, który wtedy jako jedyny może je podjąć. Rzemieślnik przeglądający tablicę przyjmuje zamówienie, a przyjęcie go zobowiązuje: nad jednym zleceniem pracuje zawsze tylko jedna osoba naraz.\n\nWystawienie niczego nie blokuje: zamówienie nie rezerwuje ani monet, ani materiałów, więc cena i to, kto dostarczy reagenty, zostaje wyłącznie między wami dwoma, uzgodnione tak, jak uzgadnia się każde zamówienie. Możesz anulować własne zamówienie, dopóki jest otwarte, a zamówienie, którego nikt nie przyjmie, wygasa samo po dobie. Gdy rzemieślnik już je przyjmie, to dostawa zamyka sprawę.\n\nDostawa odbywa się twarzą w twarz. Rzemieślnik wykonuje przedmiot jako zamówienie, przychodzi do ciebie i wręcza go, więc trzymaj wolne miejsce w torbie, by go odebrać. To, co dostajesz, podlega zwykłym zasadom zamówień opisanym poniżej i wiąże się z tobą przez Więź Wytwórcy.',
   'guide.profPages.econ.orderBoardHeading': 'Tablica zamówień',
-  'guide.profPages.ench.charmsBody': 'Zaklinanie to też źródło talizmanów dla zbieraczy. Majsterkowicz Gizzel uczy obu w narzędziowni Eastbrook, gdy twoje Zaklinanie osiągnie 25: Skrytki Zbieracza, która dodaje jednostkę do zbioru, oraz Oka Rzemieślnika, które podnosi gatunek tego, co wychodzi. Każdy z nich wytwarza się raz, a potem osadza w kilofie, siekierze lub sierpie, gdzie zużywa ładunek tylko przy zbiorach, które faktycznie poprawia.\n\nTo ładowanie jest tym, na czym rzemiosło wciąż zarabia. Ładunki odnawia właściciel narzędzia, a nie odwiedzający zaklinacz, a ładowanie kosztuje połowę materiałów, gdy tym właścicielem jest zaklinacz, który podpisał talizman, i jeszcze mniej ze specjalizacją w Zaklinaniu. Talizman sprzedany przez ladę to więc jednorazowa sprzedaż, podczas gdy talizmany osadzone na twoich własnych narzędziach są tymi tanimi w utrzymaniu. Pełna drabinka ładunków i materiałów znajduje się na stronie każdej profesji zbierackiej, w części Efekty narzędzi.',
+  'guide.profPages.ench.charmsBody':
+    'Zaklinanie to też źródło talizmanów dla zbieraczy. Majsterkowicz Gizzel uczy obu w narzędziowni Eastbrook, gdy twoje Zaklinanie osiągnie 25: Skrytki Zbieracza, która dodaje jednostkę do zbioru, oraz Oka Rzemieślnika, które podnosi gatunek tego, co wychodzi. Każdy z nich wytwarza się raz, a potem osadza w kilofie, siekierze lub sierpie, gdzie zużywa ładunek tylko przy zbiorach, które faktycznie poprawia.\n\nTo ładowanie jest tym, na czym rzemiosło wciąż zarabia. Ładunki odnawia właściciel narzędzia, a nie odwiedzający zaklinacz, a ładowanie kosztuje połowę materiałów, gdy tym właścicielem jest zaklinacz, który podpisał talizman, i jeszcze mniej ze specjalizacją w Zaklinaniu. Talizman sprzedany przez ladę to więc jednorazowa sprzedaż, podczas gdy talizmany osadzone na twoich własnych narzędziach są tymi tanimi w utrzymaniu. Pełna drabinka ładunków i materiałów znajduje się na stronie każdej profesji zbierackiej, w części Efekty narzędzi.',
   'guide.profPages.ench.charmsHeading': 'Talizmany do narzędzi zbierackich',
-  'guide.profPages.ench.enchantsNoteOffhand': 'Zaklęcia dzielą się na trzy poziomy. Poziom podstawowy działa na Pyle Kuranta (z odrobiną Esencji na górnym końcu) i obejmuje slot broni, dłoń pomocniczą oraz każdy slot pancerza, z taką liczbą osi statystyk, że każdy build znajdzie coś na każdy slot: tarcze i trzymane w dłoni pomocniczej przedmioty zaklinaczy mają własne zaklęcie na Wytrzymałość, więc żaden założony slot nie zostaje bez zaklęcia. Poziom Wyższy kosztuje jeden Odłamek Kuranta plus Esencję: mocniejsze premie na slotach o największym znaczeniu. Odłamki zasilają poza tym dwa dalsze odpływy, dwa przepisy na talizmany po pięć sztuk każdy oraz najwyższy szczebel ładowania efektów narzędzi, więc odłóż kilka do banku, zanim zaczniesz wydawać.\n\nPomiędzy nimi siedzi pięć zaklęć Runicznych, po jednym odbiorcy na każdy typowany surowiec drugorzędny, więc nic, co zmielisz, nie jest nigdy ślepą uliczką: Runiczne Ostrze (broń, Siła, zużywa Rezonującą stal), Runiczny Sygil (broń, Intelekt, Rezonujące drewno), Runiczny Splot (tors, Duch, Rezonująca nić), Runiczna Skóra (nogi, Zręczność, Rezonująca skóra) oraz Runiczne Ogniwa (hełm, Wytrzymałość, Rezonujące ogniwa). Każde bierze też dwie Esencje Kuranta; tam, gdzie slot i statystyka mają zarówno zaklęcie podstawowe, jak i Wyższe, premia Runiczna ląduje między nimi, a Runiczny Splot jest wprost najsilniejszym zaklęciem na Ducha na tors, zaś Runiczna Skóra to jedyne zaklęcie na Zręczność na nogi w ogóle. Dokładne premie znajdziesz w tabeli poniżej.',
-  'guide.profPages.faq.a10': 'Talizman to osadzony efekt narzędzia: dzieło zaklinacza, które siedzi w narzędziu zbierackim i poprawia to, co ono przynosi. Skrytka Zbieracza dodaje jednostkę do zbioru, Oko Rzemieślnika podnosi jego gatunek, a Majsterkowicz Gizzel uczy obu w narzędziowni Eastbrook przy 25 Zaklinania. Ładunek zużywa się tylko wtedy, gdy talizman faktycznie zmienił wynik, więc zbiór, którego nie mógł poprawić, nic cię nie kosztuje, a gniazdo można ustawić tak, by pytało przy każdym użyciu, jeśli wolisz decydować za każdym razem osobno.\n\nŚwieży talizman niesie 20 ładunków na pospolitym narzędziu i 10 więcej za każdy stopień rzadkości ponad nim, więc epickie narzędzie zaczyna z 50. Wyczerpanie nie niszczy talizmanu: właściciel narzędzia ładuje gniazdo od nowa, 10 ładunków za każdy zużyty materiał, a wymagany materiał podąża za lepszym z dwóch narzędzi, tym, które aktualnie nosisz, i najlepszym, jakim to gniazdo było kiedykolwiek napełnione (Pył Kuranta dla narzędzia pospolitego lub niepospolitego, Esencja Kuranta dla rzadkiego, Odłamek Kuranta dla epickiego). Trzymanie dobrego narzędzia w banku przed ładowaniem nigdy nie obniża ceny, tylko zmniejsza ilość przy tej samej cenie, a osadzenie świeżego talizmanu, gdy nosisz gorsze narzędzie, to uczciwy sposób na powrót do tańszego stopnia. Zaklinacz, który podpisał talizman, płaci połowę za naładowanie własnego, i jeszcze mniej ze specjalizacją w Zaklinaniu.',
-  'guide.profPages.faq.a9': 'Wystaw je na tablicy zamówień. Otwórz okno rzemiosła, otwórz tablicę z jego nagłówka i nazwij przepis, który chcesz mieć wykonany: zostaw zamówienie otwarte dla dowolnego rzemieślnika albo skieruj je do konkretnego rzemieślnika, którego już znasz. Przyjęcie zobowiązuje tego rzemieślnika do wykonania zlecenia, a zamówienie zawsze trzyma tylko jedna osoba naraz.\n\nWystawienie nie blokuje ani monet, ani materiałów, więc cenę i to, kto przyniesie reagenty, ustalcie między sobą, tak jak zawsze ustalano zamówienia. Możesz anulować własne zamówienie, dopóki jest otwarte, a zamówienie, którego nikt nie przyjmie, wygasa po dobie. Dostawa odbywa się osobiście: stań blisko swojego rzemieślnika z wolnym miejscem w torbie, gdy przedmiot będzie gotowy. Dociera do ciebie związany Więzią Wytwórcy, którą każdy mistrz stacji zdejmie za zwykłą opłatą.',
+  'guide.profPages.faq.a10':
+    'Talizman to osadzony efekt narzędzia: dzieło zaklinacza, które siedzi w narzędziu zbierackim i poprawia to, co ono przynosi. Skrytka Zbieracza dodaje jednostkę do zbioru, Oko Rzemieślnika podnosi jego gatunek, a Majsterkowicz Gizzel uczy obu w narzędziowni Eastbrook przy 25 Zaklinania. Ładunek zużywa się tylko wtedy, gdy talizman faktycznie zmienił wynik, więc zbiór, którego nie mógł poprawić, nic cię nie kosztuje, a gniazdo można ustawić tak, by pytało przy każdym użyciu, jeśli wolisz decydować za każdym razem osobno.\n\nŚwieży talizman niesie 20 ładunków na pospolitym narzędziu i 10 więcej za każdy stopień rzadkości ponad nim, więc epickie narzędzie zaczyna z 50. Wyczerpanie nie niszczy talizmanu: właściciel narzędzia ładuje gniazdo od nowa, 10 ładunków za każdy zużyty materiał, a wymagany materiał podąża za lepszym z dwóch narzędzi, tym, które aktualnie nosisz, i najlepszym, jakim to gniazdo było kiedykolwiek napełnione (Pył Kuranta dla narzędzia pospolitego lub niepospolitego, Esencja Kuranta dla rzadkiego, Odłamek Kuranta dla epickiego). Trzymanie dobrego narzędzia w banku przed ładowaniem nigdy nie obniża ceny, tylko zmniejsza ilość przy tej samej cenie, a osadzenie świeżego talizmanu, gdy nosisz gorsze narzędzie, to uczciwy sposób na powrót do tańszego stopnia. Zaklinacz, który podpisał talizman, płaci połowę za naładowanie własnego, i jeszcze mniej ze specjalizacją w Zaklinaniu.',
+  'guide.profPages.faq.a9':
+    'Wystaw je na tablicy zamówień. Otwórz okno rzemiosła, otwórz tablicę z jego nagłówka i nazwij przepis, który chcesz mieć wykonany: zostaw zamówienie otwarte dla dowolnego rzemieślnika albo skieruj je do konkretnego rzemieślnika, którego już znasz. Przyjęcie zobowiązuje tego rzemieślnika do wykonania zlecenia, a zamówienie zawsze trzyma tylko jedna osoba naraz.\n\nWystawienie nie blokuje ani monet, ani materiałów, więc cenę i to, kto przyniesie reagenty, ustalcie między sobą, tak jak zawsze ustalano zamówienia. Możesz anulować własne zamówienie, dopóki jest otwarte, a zamówienie, którego nikt nie przyjmie, wygasa po dobie. Dostawa odbywa się osobiście: stań blisko swojego rzemieślnika z wolnym miejscem w torbie, gdy przedmiot będzie gotowy. Dociera do ciebie związany Więzią Wytwórcy, którą każdy mistrz stacji zdejmie za zwykłą opłatą.',
   'guide.profPages.faq.q10': 'Czym jest talizman i co się dzieje, gdy się wyczerpie?',
   'guide.profPages.faq.q9': 'Jak zlecić komuś wykonanie przedmiotu?',
-  'guide.profPages.findingNodesNote': 'Nie musisz szukać ich na oko. Każdy węzeł w strefie jest zaznaczony na mapie strefy wszędzie tam, gdzie mapa pokazuje ten teren, oraz na minimapie, gdy go mijasz, więc trasę zbieracką można zaplanować z ekranu mapy jeszcze przed wyruszeniem. Węzeł, którego twoje narzędzia nie potrafią jeszcze obrobić, jest oznaczony, a nie ukryty: zachowuje swoje miejsce jako przekreślony, przygaszony znacznik, więc widzisz teren, do którego dopiero się wspinasz. Na komputerze najechanie kursorem na żyłę, drzewostan albo łan w świecie nazywa go, mówi ci, jakiego narzędzia wymaga, i, gdy już go obrobisz, odlicza czas do jego odnowienia z dokładnością do sekundy. Na dotyku nie ma czego najeżdżać, więc tę samą historię opowiadają znaczniki na minimapie.',
-  'guide.profPages.specimenBodyFamilies': 'Zachowaj trochę wolnego miejsca w torbie, gdy zbierasz: podpisana gratka potrzebuje własnego miejsca albo pasującego podpisanego stosu, w którym może wylądować, a jeśli nic nie pasuje, plon i tak dociera, ale podpis ginie. Zbieranie ze zwłok ma też swoją własną szansę na trafienie: około {pct}% każdego zebranego komponentu wychodzi w jakości rzadkiej lub lepszej. Rodzina, która ma czym obdarować w postaci doskonałego okazu (skóra, jedwab, jad, pazur, mięso), zostawia swój zwykły plon czysty i wybija obok niego podpisany, doskonały okaz; pozostałe trzy, kieł, tkanina i cios, podpisują sam plon.',
-  'guide.professions.focusBodyTiers': 'Każde miasto centralne prowadzi panel Priorytetów miasta dla odwiedzających je zbieraczy: stań w mieście, otwórz go obok minimapy i rozdziel budżet 10 punktów priorytetu między typy komponentów, na których ci zależy. Każde 5 punktów na komponencie podnosi jego gatunek zbioru o jeden stopień (najwyżej o dwa), a każdy punkt dodaje 10 procent do jego uzysku; komponenty bez priorytetu nigdy nie są gorsze.\n\nTwój przydział podąża za postacią wszędzie i można go przekierować przy każdej kolejnej wizycie w mieście, w tempie, jakie wybierzesz. Nie spiesząc się, nic nie płacisz: przekierowanie trwa 1 minutę za każdy przesunięty punkt. Zapłacenie niewielkiej kwoty przyspiesza to do 15 sekund za punkt plus 5 miedziaków i 1 Pył Kuranta za punkt, a pełna zapłata robi to natychmiast za 25 miedziaków i 5 Pyłu Kuranta za punkt. Liczą się tylko punkty, które faktycznie przesuwasz, więc drobna korekta o jeden punkt jest tania, a panel otwarty i zamknięty bez zmian nic nie kosztuje, niezależnie od wybranego tempa.',
-  'guide.professions.harvestBodyFamilies': 'Zbieractwo nie kończy się na węzłach. Wiele pokonanych bestii można zebrać raz każdą, kto pierwszy, ten lepszy, na skóry, kły, pazury, ciosy, jedwab, jad, tkaninę i mięso, prosto ze zwłok obok zwykłego łupu; jedno naciśnięcie otwiera oba naraz. Gdy bestia niesie więcej niż jeden nadający się do obróbki komponent, wybór należy do ciebie: weź wszystko, co może dać, albo skup się na mniejszej liczbie komponentów i zdobądź wymiernie lepszy gatunek tego, co bierzesz.\n\nRzut zbioru w jakości rzadkiej lub lepszej na rodzinie mającej czym obdarować przyznaje też podpisany doskonały okaz (Nieskazitelną skórę, Nieskazitelny jedwab, Nieskazitelny Gruczoł Jadowy, Nieskazitelny Pazur albo Pierwsze cięcie) ponad zwykły plon i zapisuje w twojej Księdze Czynów czyn Doskonały Okaz. Zbierać może każda postać, bez wymaganego treningu, a do gałęzi premiowej liczy się każde posiadane przez ciebie narzędzie zbierackie, bez względu na to, do którego fachu należy.',
-  'guide.professions.toolEffectsBody': 'Narzędzie zbierackie ma w sobie gniazdo, a to, co się w nim osadza, to talizman zaklinacza. Skrytka Zbieracza dodaje jednostkę do tego, co daje zbiór; Oko Rzemieślnika podnosi gatunek tego, co z niego wychodzi. Majsterkowicz Gizzel, Mistrz narzędziowni w Eastbrook, uczy obu zaklinaczy, którzy osiągnęli 25 punktów w tym fachu, a oba wytwarza się właśnie w jego narzędziowni.\n\nŚwieżo osadzony talizman niesie 20 ładunków na pospolitym narzędziu i 10 więcej za każdy stopień rzadkości ponad pospolitym, więc ten sam talizman osadzony na epickim kilofie zaczyna z 50. Ładunek zużywa się tylko wtedy, gdy talizman faktycznie zmienił wynik, nigdy przy zbiorze, którego nie poprawił, a gniazdo można ustawić tak, by pytało przy każdym użyciu, więc talizman czeka, aż powiesz Zużyj ładunek. Osadzenie świeżego talizmanu ustala pułap gniazda na nowo, wokół narzędzia, które akurat nosisz, więc napełnia się do tego, co to narzędzie potrafi unieść, a nie z powrotem do jakiegoś wcześniejszego rekordu, a ponowne osadzenie, które niczego by nie zmieniło, zostaje odrzucone, zamiast pochłonąć talizman.\n\nWyczerpanie ładunków nie niszczy talizmanu: właściciel narzędzia ładuje gniazdo od nowa, po 10 ładunków za każdy zużyty materiał, a wymagany materiał podąża za lepszym z dwóch narzędzi, tym, które nosisz, i najlepszym, jakim to gniazdo było kiedykolwiek napełnione: Pył Kuranta dla narzędzia pospolitego lub niepospolitego, Esencja Kuranta dla rzadkiego i Odłamek Kuranta dla epickiego. Zostawienie dobrego narzędzia w banku nie kupuje tańszego ładowania, tylko mniejsze przy tej samej cenie; uczciwym sposobem na powrót do tańszego stopnia jest osadzenie świeżego talizmanu, gdy nosisz gorsze narzędzie, co ustala pułap gniazda na nowo właśnie tam. Jeśli pułap gniazda sięga wyżej, niż potrafi wypełnić twoje obecne narzędzie, ładowanie zatrzymuje się tam, gdzie kończy się to narzędzie, i mówi ci, byś nosił lepsze. Ładowanie kosztuje połowę materiałów, gdy jesteś zaklinaczem, który podpisał talizman, i jeszcze mniej, jeśli specjalizujesz się w Zaklinaniu; każdy inny płaci pełną stawkę. Ładowanie to krótkie rzucenie, tak jak reszta działań tego fachu.',
+  'guide.profPages.findingNodesNote':
+    'Nie musisz szukać ich na oko. Każdy węzeł w strefie jest zaznaczony na mapie strefy wszędzie tam, gdzie mapa pokazuje ten teren, oraz na minimapie, gdy go mijasz, więc trasę zbieracką można zaplanować z ekranu mapy jeszcze przed wyruszeniem. Węzeł, którego twoje narzędzia nie potrafią jeszcze obrobić, jest oznaczony, a nie ukryty: zachowuje swoje miejsce jako przekreślony, przygaszony znacznik, więc widzisz teren, do którego dopiero się wspinasz. Na komputerze najechanie kursorem na żyłę, drzewostan albo łan w świecie nazywa go, mówi ci, jakiego narzędzia wymaga, i, gdy już go obrobisz, odlicza czas do jego odnowienia z dokładnością do sekundy. Na dotyku nie ma czego najeżdżać, więc tę samą historię opowiadają znaczniki na minimapie.',
+  'guide.profPages.specimenBodyFamilies':
+    'Zachowaj trochę wolnego miejsca w torbie, gdy zbierasz: podpisana gratka potrzebuje własnego miejsca albo pasującego podpisanego stosu, w którym może wylądować, a jeśli nic nie pasuje, plon i tak dociera, ale podpis ginie. Zbieranie ze zwłok ma też swoją własną szansę na trafienie: około {pct}% każdego zebranego komponentu wychodzi w jakości rzadkiej lub lepszej. Rodzina, która ma czym obdarować w postaci doskonałego okazu (skóra, jedwab, jad, pazur, mięso), zostawia swój zwykły plon czysty i wybija obok niego podpisany, doskonały okaz; pozostałych pięć, kieł, tkanina, cios, róg i skrzela, podpisuje sam plon.',
+  'guide.professions.focusBodyTiers':
+    'Każde miasto centralne prowadzi panel Priorytetów miasta dla odwiedzających je zbieraczy: stań w mieście, otwórz go obok minimapy i rozdziel budżet 10 punktów priorytetu między typy komponentów, na których ci zależy. Każde 5 punktów na komponencie podnosi jego gatunek zbioru o jeden stopień (najwyżej o dwa), a każdy punkt dodaje 10 procent do jego uzysku; komponenty bez priorytetu nigdy nie są gorsze.\n\nTwój przydział podąża za postacią wszędzie i można go przekierować przy każdej kolejnej wizycie w mieście, w tempie, jakie wybierzesz. Nie spiesząc się, nic nie płacisz: przekierowanie trwa 1 minutę za każdy przesunięty punkt. Zapłacenie niewielkiej kwoty przyspiesza to do 15 sekund za punkt plus 5 miedziaków i 1 Pył Kuranta za punkt, a pełna zapłata robi to natychmiast za 25 miedziaków i 5 Pyłu Kuranta za punkt. Liczą się tylko punkty, które faktycznie przesuwasz, więc drobna korekta o jeden punkt jest tania, a panel otwarty i zamknięty bez zmian nic nie kosztuje, niezależnie od wybranego tempa.',
+  'guide.professions.harvestBodyFamilies':
+    'Zbieractwo nie kończy się na węzłach. Wiele pokonanych bestii można zebrać raz każdą, kto pierwszy, ten lepszy, na skóry, kły, pazury, ciosy, rogi, skrzela, jedwab, jad, tkaninę i mięso, prosto ze zwłok obok zwykłego łupu. Klawisz interakcji zabiera tylko łup; zbieranie to osobny wybór, którego dokonujesz w sekcji Zbieranie w oknie łupu. Gdy bestia niesie więcej niż jeden nadający się do obróbki komponent, wybór należy do ciebie: weź wszystko, co może dać, albo skup się na mniejszej liczbie komponentów i zdobądź wymiernie lepszy gatunek tego, co bierzesz.\n\nRzut zbioru w jakości rzadkiej lub lepszej na rodzinie mającej czym obdarować przyznaje też podpisany doskonały okaz (Nieskazitelną skórę, Nieskazitelny jedwab, Nieskazitelny Gruczoł Jadowy, Nieskazitelny Pazur albo Pierwsze cięcie) ponad zwykły plon i zapisuje w twojej Księdze Czynów czyn Doskonały Okaz. Zbierać może każda postać, bez wymaganego treningu, a do gałęzi premiowej liczy się każde posiadane przez ciebie narzędzie zbierackie, bez względu na to, do którego fachu należy.',
   'guide.professions.toolEffectsHeading': 'Efekty narzędzi',
-  'guide.progression.capEndgameBody': 'Szczeliny to jedyna rzecz, która czeka właśnie na limit poziomu. Rozdzierają się w krainach według własnego harmonogramu, rangowane od C do S, a każda grupa w świecie ściga się, by to ona zamknęła każdą z nich. Tablice Wypraw też nie zwalniają, a ich heroiczny poziom trudności zasługuje na kolejne spojrzenie, gdy twój ekwipunek już go dogoni.',
-  'guide.progression.journeyBodyCount': 'Świat to jedna ciągła kraina licząca {zones} stref. Trzy z nich to droga, po której zdobywasz poziomy, ułożona z południa na północ: zaczynasz w zielonej dolinie, przedzierasz się przez trzęsawisko i kończysz na zimnych, wysokich szczytach. Podążaj śladem zadań, a kraina poprowadzi cię od jednej do następnej. Przy wybrzeżu doliny leży wyspa na wczesne poziomy, a reszta krain otwiera się dalej wzdłuż tej samej drogi, zbudowana z myślą o postaciach, które już odbyły tę wspinaczkę.',
-  'guide.progression.ridingBody': 'Jeździectwo to jedna z rzeczy czekających na końcu tej wspinaczki. Na poziomie {level} zarządczyni stajni nauczy cię tej umiejętności za pokaźną sumę złota, a lekcja na torze treningowym da ci twój pierwszy zestaw wodzy. Wierzchowiec nie daje żadnej mocy; po prostu zmniejsza świat, co po długim marszu na północ jest nagrodą samą w sobie.',
+  'guide.progression.capEndgameBody':
+    'Szczeliny to jedyna rzecz, która czeka właśnie na limit poziomu. Rozdzierają się w krainach według własnego harmonogramu, rangowane od C do S, a każda grupa w świecie ściga się, by to ona zamknęła każdą z nich. Tablice Wypraw też nie zwalniają, a ich heroiczny poziom trudności zasługuje na kolejne spojrzenie, gdy twój ekwipunek już go dogoni.',
+  'guide.progression.journeyBodyCount':
+    'Świat to jedna ciągła kraina licząca {zones} stref. Trzy z nich to droga, po której zdobywasz poziomy, ułożona z południa na północ: zaczynasz w zielonej dolinie, przedzierasz się przez trzęsawisko i kończysz na zimnych, wysokich szczytach. Podążaj śladem zadań, a kraina poprowadzi cię od jednej do następnej. Przy wybrzeżu doliny leży wyspa na wczesne poziomy, a reszta krain otwiera się dalej wzdłuż tej samej drogi, zbudowana z myślą o postaciach, które już odbyły tę wspinaczkę.',
+  'guide.progression.ridingBody':
+    'Jeździectwo to jedna z rzeczy czekających na końcu tej wspinaczki. Na poziomie {level} zarządczyni stajni nauczy cię tej umiejętności za pokaźną sumę złota, a lekcja na torze treningowym da ci twój pierwszy zestaw wodzy. Wierzchowiec nie daje żadnej mocy; po prostu zmniejsza świat, co po długim marszu na północ jest nagrodą samą w sobie.',
   'guide.progression.ridingTitle': 'Nauka jazdy konnej',
-  'guide.questsPage.availableBody': 'Zadania układają się w łańcuchy. Większość otwiera się dopiero, gdy oddasz poprzednie w łańcuchu, a wiele wymaga też minimalnego poziomu, więc NPC, który dziś nie ma dla ciebie nic, może mieć mnóstwo zadań po kolejnych kilku poziomach albo gdy zamkniesz zadanie, które już nosisz. Kilka ma własny warunek, jak lekcje jazdy konnej, które otwierają się dopiero, gdy kupisz umiejętność jeździectwa. Zadania grupowe mówią o tym wprost, podając, ilu graczy sugerują zabrać ze sobą. Niektóre zlecenia są powtarzalne: możesz podjąć je ponownie po odczekaniu, a znacznik nad zleceniodawcą mówi ci, kiedy dane zadanie znów jest dostępne.',
+  'guide.questsPage.availableBody':
+    'Zadania układają się w łańcuchy. Większość otwiera się dopiero, gdy oddasz poprzednie w łańcuchu, a wiele wymaga też minimalnego poziomu, więc NPC, który dziś nie ma dla ciebie nic, może mieć mnóstwo zadań po kolejnych kilku poziomach albo gdy zamkniesz zadanie, które już nosisz. Kilka ma własny warunek, jak lekcje jazdy konnej, które otwierają się dopiero, gdy kupisz umiejętność jeździectwa. Zadania grupowe mówią o tym wprost, podając, ilu graczy sugerują zabrać ze sobą. Niektóre zlecenia są powtarzalne: możesz podjąć je ponownie po odczekaniu, a znacznik nad zleceniodawcą mówi ci, kiedy dane zadanie znów jest dostępne.',
   'guide.questsPage.availableTitle': 'Dlaczego NPC nie ma dla ciebie zadania',
-  'guide.questsPage.cardMasterBody': 'Jeden NPC w Eastbrook zajmuje się kartami zamiast zleceń. Porozmawiaj z Mistrzem Kart, wybierz z jego menu Pojedynek Kart, a dołączysz do kolejki, która paruje cię z kolejnym czekającym graczem. Zasiąść może każda klasa, a twój poziom czy ekwipunek nie mają tu żadnego znaczenia. Każde z was gra własną talią dwudziestu kart o wartościach od jednego do dziesięciu, trzymając cztery naraz i dobierając świeżą w każdej rundzie: wyższa karta bierze rundę, a dwie takie same karty to remis, który nie liczy się dla żadnego z was. Kto pierwszy zdobędzie dwie rundy, bierze mecz, więc pojedynek toczy się do dwóch wygranych z trzech. Rundy biegną na zegarze, więc zostaw swoją kartę niezagraną przez dziewięćdziesiąt sekund, a mecz trafia do przeciwnej strony, chyba że żadna runda nie została jeszcze rozstrzygnięta, wtedy po prostu odrzuca się go bez zwycięzcy. To samo dzieje się, jeśli sam odejdziesz od pojedynku. Musisz stać przy Mistrzu Kart, by dołączyć do kolejki, ale gdy już zostaniesz sparowany, plansza otwiera się sama i możesz grać z dowolnego miejsca. Potrzeba dwojga, więc świat offline nigdy tego nie oferuje.',
+  'guide.questsPage.cardMasterBody':
+    'Jeden NPC w Eastbrook zajmuje się kartami zamiast zleceń. Porozmawiaj z Mistrzem Kart, wybierz z jego menu Pojedynek Kart, a dołączysz do kolejki, która paruje cię z kolejnym czekającym graczem. Zasiąść może każda klasa, a twój poziom czy ekwipunek nie mają tu żadnego znaczenia. Każde z was gra własną talią dwudziestu kart o wartościach od jednego do dziesięciu, trzymając cztery naraz i dobierając świeżą w każdej rundzie: wyższa karta bierze rundę, a dwie takie same karty to remis, który nie liczy się dla żadnego z was. Kto pierwszy zdobędzie dwie rundy, bierze mecz, więc pojedynek toczy się do dwóch wygranych z trzech. Rundy biegną na zegarze, więc zostaw swoją kartę niezagraną przez dziewięćdziesiąt sekund, a mecz trafia do przeciwnej strony, chyba że żadna runda nie została jeszcze rozstrzygnięta, wtedy po prostu odrzuca się go bez zwycięzcy. To samo dzieje się, jeśli sam odejdziesz od pojedynku. Musisz stać przy Mistrzu Kart, by dołączyć do kolejki, ale gdy już zostaniesz sparowany, plansza otwiera się sama i możesz grać z dowolnego miejsca. Potrzeba dwojga, więc świat offline nigdy tego nie oferuje.',
   'guide.questsPage.cardMasterTitle': 'Nie każdy NPC ma zadanie: Mistrz Kart',
-  'guide.questsPage.typeEscortBody': 'Ktoś potrzebuje przeprowadzenia w niebezpieczne miejsce. Podejmij zadanie, znajdź osobę czekającą na początku drogi i zagadaj do niej, by ruszyć w drogę. Idzie ona własną ścieżką, podczas gdy ty dotrzymujesz jej kroku, a kłopoty czyhające po drodze przychodzą po nią, nie zawsze po ciebie. Trzymaj się blisko: wrogowie zasadzają się na marsz falami, a wędrówka wznawia się dopiero, gdy fala zostanie pokonana. Nie możesz zaatakować osoby, którą eskortujesz, ale możesz ją leczyć, a jeśli padnie, przebieg po prostu się resetuje, byś mógł spróbować ponownie. Dotrzyj z nią żywą na drugi koniec, ty u jej boku, a zadanie zostanie zaliczone.',
+  'guide.questsPage.typeEscortBody':
+    'Ktoś potrzebuje przeprowadzenia w niebezpieczne miejsce. Podejmij zadanie, znajdź osobę czekającą na początku drogi i zagadaj do niej, by ruszyć w drogę. Idzie ona własną ścieżką, podczas gdy ty dotrzymujesz jej kroku, a kłopoty czyhające po drodze przychodzą po nią, nie zawsze po ciebie. Trzymaj się blisko: wrogowie zasadzają się na marsz falami, a wędrówka wznawia się dopiero, gdy fala zostanie pokonana. Nie możesz zaatakować osoby, którą eskortujesz, ale możesz ją leczyć, a jeśli padnie, przebieg po prostu się resetuje, byś mógł spróbować ponownie. Dotrzyj z nią żywą na drugi koniec, ty u jej boku, a zadanie zostanie zaliczone.',
   'guide.questsPage.typeEscortTitle': 'Eskorta',
   'guide.resourceName.focus': 'Skupienie',
-  'guide.riftsPage.boundBody': 'Pierwsze zabójstwo, jakiego dokona twoja drużyna wewnątrz Szczeliny, przesądza sprawę przebiegu, tak samo jak pierwsza boczna skrytka, którą otworzysz. Od tej chwili jesteś związany z tą konkretną kopią: wyjdź z dowolnego powodu, a powrót wrzuci cię z powrotem w przebieg, który zostawiłeś, nigdy w cudzy i nigdy w świeży, dopóki wejście w świecie wciąż stoi otworem. Przed tym pierwszym zabójstwem i przed tą pierwszą skrytką nic nie jest jeszcze przesądzone, więc grupa, która wciąż się zbiera, może się przegrupować i wejść razem, nie zostawiając za sobą porzuconych w połowie kopii.',
+  'guide.riftsPage.boundBody':
+    'Pierwsze zabójstwo, jakiego dokona twoja drużyna wewnątrz Szczeliny, przesądza sprawę przebiegu, tak samo jak pierwsza boczna skrytka, którą otworzysz. Od tej chwili jesteś związany z tą konkretną kopią: wyjdź z dowolnego powodu, a powrót wrzuci cię z powrotem w przebieg, który zostawiłeś, nigdy w cudzy i nigdy w świeży, dopóki wejście w świecie wciąż stoi otworem. Przed tym pierwszym zabójstwem i przed tą pierwszą skrytką nic nie jest jeszcze przesądzone, więc grupa, która wciąż się zbiera, może się przegrupować i wejść razem, nie zostawiając za sobą porzuconych w połowie kopii.',
   'guide.riftsPage.boundHeading': 'Gdy przelejesz krew',
   'guide.riftsPage.floorsBody':
     'Szczelina prowadzi przez garść pięter, z których każde zbudowano od nowa, a droga w dół nie otwiera się, dopóki piętro nie skończy z tobą: oczyść to, co na nim żyje, rozwiąż to, co zamknęło ci drogę, a zejście rozdziera się przed tobą. Ostatnie piętro kończy się starciem z tym samym władcą, którego siła rośnie wraz ze Szczeliną. Jego robactwo podąża za nim przez różne scenerie, więc w finałowej walce spodziewaj się towarzystwa. Każde piętro ma swój własny charakter, więc jeden przebieg może przeprowadzić cię z mrozu prosto w żar, a twój czat nazywa każde piętro w chwili, gdy na nie wchodzisz. To, ile pięter ma dana Szczelina, poznasz z podglądu na ekranie. Kilka Szczelin, zamiast generowanego zejścia, prowadzi do ręcznie zaprojektowanej areny o swojej własnej, stałej długości.',
   'guide.riftsPage.floorsHeading': 'W dół przez piętra',
-  'guide.riftsPage.groupBody': 'Zabierz ze sobą drużynę. Szczelina nie robi się łagodniejsza dlatego, że weszło w nią mniej osób: nic w środku nie liczy, ilu was tam stoi, więc ranga na portalu to ranga, z którą walczysz, czy jest was pięciu, czy jeden. Wejście wpuści cię nawet samego, i ludzie naprawdę tego próbują, ale Szczelina jest treścią grupową na każdej randze i jest z tym szczera już od pierwszego pomieszczenia. Twoja drużyna dostaje własną kopię Szczeliny, więc żadna inna grupa nie może wtargnąć do twojego przebiegu. Jeśli polegniesz, możesz wrócić do środka jako zjawa i odzyskać swoje ciało, gdy walka w środku ucichnie.',
+  'guide.riftsPage.groupBody':
+    'Zabierz ze sobą drużynę. Szczelina nie robi się łagodniejsza dlatego, że weszło w nią mniej osób: nic w środku nie liczy, ilu was tam stoi, więc ranga na portalu to ranga, z którą walczysz, czy jest was pięciu, czy jeden. Wejście wpuści cię nawet samego, i ludzie naprawdę tego próbują, ale Szczelina jest treścią grupową na każdej randze i jest z tym szczera już od pierwszego pomieszczenia. Twoja drużyna dostaje własną kopię Szczeliny, więc żadna inna grupa nie może wtargnąć do twojego przebiegu. Jeśli polegniesz, możesz wrócić do środka jako zjawa i odzyskać swoje ciało, gdy walka w środku ucichnie.',
   'guide.riftsPage.groupHeading': 'Kto wchodzi',
   'guide.riftsPage.heading': 'Szczeliny',
   'guide.riftsPage.intro':
     'Szczelina to rozdarcie samego świata, a nie drzwi, do których podchodzisz. Wejdź w nią, a czeka cię zejście, którego nikt wcześniej nie przeszedł: piętra i ich mieszkańcy zmieniają się z każdą Szczeliną, lecz ten sam władca czeka w każdym finałowym starciu. Ta sama ranga nadal może więc za każdym razem prowadzić przez inne zejście.',
-  'guide.riftsPage.levelNote': 'Szczeliny to zawartość endgame. Musisz osiągnąć pułap poziomów, poziom {n}, by wejść do którejkolwiek z nich, niezależnie od rangi.',
-  'guide.riftsPage.openBody': 'Szczeliny rozdzierają się w rozleglejszych strefach królestwa, a nie w początkowej dolinie, i słyszy o tym całe królestwo: linijka na twoim czacie nazywa rangę i strefę w chwili, gdy któraś się pojawia. Każda kwalifikująca się strefa dostaje szansę na Szczelinę mniej więcej raz na godzinę, a strefa, w której już jedna stoi, czeka na swoją kolej, zamiast otwierać drugą. Szczelina, której nikt nie zamknie, zapada się sama po paru godzinach, i królestwo słyszy o tym również. Strefa, której Szczelina została zapieczętowana, milczy aż do swojej następnej kolejki, więc warto ruszyć w stronę ogłoszenia, dopóki jest świeże.',
+  'guide.riftsPage.levelNote':
+    'Szczeliny to zawartość endgame. Musisz osiągnąć pułap poziomów, poziom {n}, by wejść do którejkolwiek z nich, niezależnie od rangi.',
+  'guide.riftsPage.openBody':
+    'Szczeliny rozdzierają się w rozleglejszych strefach królestwa, a nie w początkowej dolinie, i słyszy o tym całe królestwo: linijka na twoim czacie nazywa rangę i strefę w chwili, gdy któraś się pojawia. Każda kwalifikująca się strefa dostaje szansę na Szczelinę mniej więcej raz na godzinę, a strefa, w której już jedna stoi, czeka na swoją kolej, zamiast otwierać drugą. Szczelina, której nikt nie zamknie, zapada się sama po paru godzinach, i królestwo słyszy o tym również. Strefa, której Szczelina została zapieczętowana, milczy aż do swojej następnej kolejki, więc warto ruszyć w stronę ogłoszenia, dopóki jest świeże.',
   'guide.riftsPage.openHeading': 'Gdzie otwierają się Szczeliny i jak często',
-  'guide.riftsPage.raceBody': 'Każda drużyna w królestwie może naraz atakować tę samą Szczelinę, każda we własnej kopii, a zapieczętowuje ją tylko ta, która pierwsza powali to, co czeka na dole. Gdy drużyna wygrywa, królestwo słyszy jej imiona i czas, a wejście zamyka się za nią. Przegrana w wyścigu nie kończy twojego przebiegu: twoja kopia zostaje otwarta, to, co czeka na dole, wciąż pada z twojej ręki, i nadal wychodzisz o własnych siłach. Kosztuje cię to dokładnie tyle, ile zapłaciłoby ci zapieczętowanie tej Szczeliny. Boss nie zostawia niczego dla drużyny, która przyszła druga, więc do domu zabierasz tylko to, co spadło z pokonanych po drodze na dół, i nic więcej. Księga Czynów wciąż liczy to oczyszczenie, bo przecież to ty powaliłeś to coś. To jedyny wyścig w grze, który możesz przegrać, nigdy nie widząc na oczy ludzi, którzy cię pokonali.',
+  'guide.riftsPage.raceBody':
+    'Każda drużyna w królestwie może naraz atakować tę samą Szczelinę, każda we własnej kopii, a zapieczętowuje ją tylko ta, która pierwsza powali to, co czeka na dole. Gdy drużyna wygrywa, królestwo słyszy jej imiona i czas, a wejście zamyka się za nią. Przegrana w wyścigu nie kończy twojego przebiegu: twoja kopia zostaje otwarta, to, co czeka na dole, wciąż pada z twojej ręki, i nadal wychodzisz o własnych siłach. Kosztuje cię to dokładnie tyle, ile zapłaciłoby ci zapieczętowanie tej Szczeliny. Boss nie zostawia niczego dla drużyny, która przyszła druga, więc do domu zabierasz tylko to, co spadło z pokonanych po drodze na dół, i nic więcej. Księga Czynów wciąż liczy to oczyszczenie, bo przecież to ty powaliłeś to coś. To jedyny wyścig w grze, który możesz przegrać, nigdy nie widząc na oczy ludzi, którzy cię pokonali.',
   'guide.riftsPage.raceHeading': 'Wyścig o pierwsze oczyszczenie',
   'guide.riftsPage.rankFmt': 'Ranga {rank}',
-  'guide.riftsPage.ranksBody': 'Każda Szczelina ma rangę C, B, A albo S, a ranga jedzie razem z ogłoszeniem, więc wiesz, w co się pakujesz, zanim jeszcze opuścisz miasto. C jest najłagodniejsza, B i A rosną od niej w górę, a S to najtrudniejsza rzecz, jaką Szczelina może być. Ranga to pokrętło decydujące o tym, jak zjadliwe są piętra, a trudniejsze rangi płacą odpowiednio więcej, więc wybierz tę, którą twoja drużyna naprawdę jest w stanie utrzymać.',
+  'guide.riftsPage.ranksBody':
+    'Każda Szczelina ma rangę C, B, A albo S, a ranga jedzie razem z ogłoszeniem, więc wiesz, w co się pakujesz, zanim jeszcze opuścisz miasto. C jest najłagodniejsza, B i A rosną od niej w górę, a S to najtrudniejsza rzecz, jaką Szczelina może być. Ranga to pokrętło decydujące o tym, jak zjadliwe są piętra, a trudniejsze rangi płacą odpowiednio więcej, więc wybierz tę, którą twoja drużyna naprawdę jest w stanie utrzymać.',
   'guide.riftsPage.ranksHeading': 'Cztery rangi',
-  'guide.riftsPage.rewardsBody': 'To zapieczętowanie Szczeliny popłaca, a nie samo jej przetrwanie. Powal Szczelinę jako pierwszy, a zapłaci ona tak, jak instancjowana treść, obok której stoi jej ranga, więc trudniejsze rangi są warte trudniejszego przebiegu. Zapieczętowanie wkłada też w ręce każdego, kto tam był, Obręcz Szczeliny, dobraną do roli twojej klasy i osobistą dla ciebie, a do tego zostawia w twoich torbach Esencję Szczeliny, do której na trudniejszych rangach dochodzą jeszcze klejnoty Szczeliny. Obok drogi do domu to, co czeka na dole, zostawia zapieczętowaną skrytkę, którą twoja drużyna może otworzyć dla dodatkowych łupów, korzystając z tego samego otwierania zamków ze Ścieżki bębenka, które znasz ze skrzyń w wyprawach, więc czysta, cierpliwa robota płaci lepiej niż pospieszna. Nic z tego nie trafia do drużyny, która przyszła druga: przegrany wyścig zostawia ci tylko to, co spadło z pokonanych po drodze na dół. Wyjątkiem jest Księga Czynów, która liczy twoje oczyszczenie tak czy inaczej, z czynem za zamknięcie pierwszej Szczeliny i kolejnym za pokonanie Szczeliny rangi S.',
+  'guide.riftsPage.rewardsBody':
+    'To zapieczętowanie Szczeliny popłaca, a nie samo jej przetrwanie. Powal Szczelinę jako pierwszy, a zapłaci ona tak, jak instancjowana treść, obok której stoi jej ranga, więc trudniejsze rangi są warte trudniejszego przebiegu. Zapieczętowanie wkłada też w ręce każdego, kto tam był, Obręcz Szczeliny, dobraną do roli twojej klasy i osobistą dla ciebie, a do tego zostawia w twoich torbach Esencję Szczeliny, do której na trudniejszych rangach dochodzą jeszcze klejnoty Szczeliny. Obok drogi do domu to, co czeka na dole, zostawia zapieczętowaną skrytkę, którą twoja drużyna może otworzyć dla dodatkowych łupów, korzystając z tego samego otwierania zamków ze Ścieżki bębenka, które znasz ze skrzyń w wyprawach, więc czysta, cierpliwa robota płaci lepiej niż pospieszna. Nic z tego nie trafia do drużyny, która przyszła druga: przegrany wyścig zostawia ci tylko to, co spadło z pokonanych po drodze na dół. Wyjątkiem jest Księga Czynów, która liczy twoje oczyszczenie tak czy inaczej, z czynem za zamknięcie pierwszej Szczeliny i kolejnym za pokonanie Szczeliny rangi S.',
   'guide.riftsPage.rewardsHeading': 'Co wynosisz ze sobą',
-  'guide.riftsPage.trackerBody': 'Gdy jesteś w środku, mały pasek na ekranie utrzymuje twoją orientację: na którym jesteś piętrze z ilu w sumie, oraz żywy odliczający zegar. Czytaj ten zegar uważnie, bo to nie twój przebieg dobiega końca. To wejście z powrotem do świata się zamyka. Gdy już jesteś w środku, twoja drużyna gra Szczelinę we własnym tempie, jakkolwiek długo by to trwało, lecz gdy ten zegar dojdzie do zera, wejście znika dla wszystkich, więc dwa razy się zastanów, zanim wyjdziesz na zewnątrz pod koniec odliczania.',
+  'guide.riftsPage.trackerBody':
+    'Gdy jesteś w środku, mały pasek na ekranie utrzymuje twoją orientację: na którym jesteś piętrze z ilu w sumie, oraz żywy odliczający zegar. Czytaj ten zegar uważnie, bo to nie twój przebieg dobiega końca. To wejście z powrotem do świata się zamyka. Gdy już jesteś w środku, twoja drużyna gra Szczelinę we własnym tempie, jakkolwiek długo by to trwało, lecz gdy ten zegar dojdzie do zera, wejście znika dla wszystkich, więc dwa razy się zastanów, zanim wyjdziesz na zewnątrz pod koniec odliczania.',
   'guide.riftsPage.trackerHeading': 'Podgląd na ekranie',
-  'guide.riftsPage.whatBody': 'Lochy to miejsca. Stoją tam, gdzie zawsze stały, a ty poznajesz je, aż znasz każdy kąt. Wyprawa to krótkie, prywatne zejście, które zaczynasz przy tablicy, skrojone na jedną lub dwie osoby. Szczelina nie jest ani jednym, ani drugim: otwiera się sama, gdzieś w świecie, bez ostrzeżenia, a wszystko w jej wnętrzu generowane jest w chwili, gdy to się dzieje. Nikt nie poda ci trasy, bo nikt jeszcze nie przeszedł tej konkretnej. Jest instancjowana jak te dwa pozostałe rodzaje treści, więc to, co znajdziesz w środku, należy wyłącznie do ciebie i twojej drużyny, ale to jedyna instancjowana treść w grze, która sama cię szuka, zamiast czekać, aż ją znajdziesz.',
+  'guide.riftsPage.whatBody':
+    'Lochy to miejsca. Stoją tam, gdzie zawsze stały, a ty poznajesz je, aż znasz każdy kąt. Wyprawa to krótkie, prywatne zejście, które zaczynasz przy tablicy, skrojone na jedną lub dwie osoby. Szczelina nie jest ani jednym, ani drugim: otwiera się sama, gdzieś w świecie, bez ostrzeżenia, a wszystko w jej wnętrzu generowane jest w chwili, gdy to się dzieje. Nikt nie poda ci trasy, bo nikt jeszcze nie przeszedł tej konkretnej. Jest instancjowana jak te dwa pozostałe rodzaje treści, więc to, co znajdziesz w środku, należy wyłącznie do ciebie i twojej drużyny, ale to jedyna instancjowana treść w grze, która sama cię szuka, zamiast czekać, aż ją znajdziesz.',
   'guide.riftsPage.whatHeading': 'Czym jest Szczelina',
-  'guide.settingsPage.advancedLadder': 'Poruszenie którymkolwiek z nich przełącza zestaw jakości na Zaawansowany, zasiany dokładnie tymi poziomami, na które właśnie patrzyłeś, więc twoja własna mieszanka zaczyna się od tego, co już widziałeś, a nie od zera. Naciśnij Zastosuj, gdy ci się spodoba. Zaawansowany stoi na końcu listy ustawień wstępnych właśnie dlatego: to profil eksperta, w którym mieszka twoja własna mieszanka.',
-  'guide.settingsPage.ifAurasOnPlayerFrame': 'Umieszcza twoje wzmocnienia i osłabienia na własnej ramce gracza, obok paska aur.',
+  'guide.settingsPage.advancedLadder':
+    'Poruszenie którymkolwiek z nich przełącza zestaw jakości na Zaawansowany, zasiany dokładnie tymi poziomami, na które właśnie patrzyłeś, więc twoja własna mieszanka zaczyna się od tego, co już widziałeś, a nie od zera. Naciśnij Zastosuj, gdy ci się spodoba. Zaawansowany stoi na końcu listy ustawień wstępnych właśnie dlatego: to profil eksperta, w którym mieszka twoja własna mieszanka.',
+  'guide.settingsPage.ifAurasOnPlayerFrame':
+    'Umieszcza twoje wzmocnienia i osłabienia na własnej ramce gracza, obok paska aur.',
   'guide.settingsPage.ifChatFontScale': 'Rozmiar tekstu czatu.',
-  'guide.settingsPage.ifChatIntro': 'Jak czyta się okno czatu. Znajdziesz tu też przycisk resetujący same okna czatu.',
+  'guide.settingsPage.ifChatIntro':
+    'Jak czyta się okno czatu. Znajdziesz tu też przycisk resetujący same okna czatu.',
   'guide.settingsPage.ifChatOpacity': 'Jak nieprzezroczyste jest tło czatu.',
-  'guide.settingsPage.ifChatTimestamps': 'Dodaje godzinę do każdej linii czatu, w formacie 12 lub 24-godzinnym.',
-  'guide.settingsPage.ifCombatIntro': 'Jak zachowują się twoje paski i co walka wyświetla na ekranie.',
+  'guide.settingsPage.ifChatTimestamps':
+    'Dodaje godzinę do każdej linii czatu, w formacie 12 lub 24-godzinnym.',
+  'guide.settingsPage.ifCombatIntro':
+    'Jak zachowują się twoje paski i co walka wyświetla na ekranie.',
   'guide.settingsPage.ifCompactChat': 'Ścieśnia linie czatu, więc mieści się ich więcej.',
-  'guide.settingsPage.ifDailyChest': 'Czy skrzynia codziennych nagród znajduje się na twoim HUD-zie.',
-  'guide.settingsPage.ifExtraBars': 'Odsłania drugi rząd paska akcji, a trzeci, gdy włączysz drugi. Pola pozostają dostępne pod swoimi skrótami klawiszowymi, nawet gdy rzędy są ukryte.',
-  'guide.settingsPage.ifFctScale': 'Rozmiar tekstu walki, czyli liczb obrażeń i leczenia unoszących się znad twojego celu.',
-  'guide.settingsPage.ifFramesIntro': 'Twoja własna ramka, ramka celu i cały układ ramek drużyny. Ten ostatni ma też suwaki skali, szerokości, wysokości, odstępów i kolumn, dzięki czemu siatka rajdowa dopasowuje się do twojego ekranu, a przycisk Resetuj na dole zakładki przywraca każdą ramkę do punktu wyjścia.',
-  'guide.settingsPage.ifGeneralIntro': 'Skala, kontrast i to, co interfejs pokazuje o tobie. Na górze tej zakładki znajdziesz też wybór języka i motywu.',
-  'guide.settingsPage.ifGroundReticle': 'Pokazuje celownik naziemny, gdy celujesz zaklęciem rzucanym w wybrany punkt na ziemi.',
-  'guide.settingsPage.ifHideUnused': 'Ukrywa puste pola akcji, więc rysowane są tylko przyciski, których faktycznie używasz.',
-  'guide.settingsPage.ifHighContrastBackground': 'Prostsze tło o wyższym kontraście za ekranem startowym i ekranem postaci.',
-  'guide.settingsPage.ifHighContrastText': 'Grubszy, bardziej kontrastowy tekst interfejsu. Przede wszystkim opcja dostępności, dobra też na jasnym ekranie.',
+  'guide.settingsPage.ifDailyChest':
+    'Czy skrzynia codziennych nagród znajduje się na twoim HUD-zie.',
+  'guide.settingsPage.ifExtraBars':
+    'Odsłania drugi rząd paska akcji, a trzeci, gdy włączysz drugi. Pola pozostają dostępne pod swoimi skrótami klawiszowymi, nawet gdy rzędy są ukryte.',
+  'guide.settingsPage.ifFctScale':
+    'Rozmiar tekstu walki, czyli liczb obrażeń i leczenia unoszących się znad twojego celu.',
+  'guide.settingsPage.ifFramesIntro':
+    'Twoja własna ramka, ramka celu i cały układ ramek drużyny. Ten ostatni ma też suwaki skali, szerokości, wysokości, odstępów i kolumn, dzięki czemu siatka rajdowa dopasowuje się do twojego ekranu, a przycisk Resetuj na dole zakładki przywraca każdą ramkę do punktu wyjścia.',
+  'guide.settingsPage.ifGeneralIntro':
+    'Skala, kontrast i to, co interfejs pokazuje o tobie. Na górze tej zakładki znajdziesz też wybór języka i motywu.',
+  'guide.settingsPage.ifGroundReticle':
+    'Pokazuje celownik naziemny, gdy celujesz zaklęciem rzucanym w wybrany punkt na ziemi.',
+  'guide.settingsPage.ifHideUnused':
+    'Ukrywa puste pola akcji, więc rysowane są tylko przyciski, których faktycznie używasz.',
+  'guide.settingsPage.ifHighContrastBackground':
+    'Prostsze tło o wyższym kontraście za ekranem startowym i ekranem postaci.',
+  'guide.settingsPage.ifHighContrastText':
+    'Grubszy, bardziej kontrastowy tekst interfejsu. Przede wszystkim opcja dostępności, dobra też na jasnym ekranie.',
   'guide.settingsPage.ifHudOpacity': 'Jak nieprzezroczyste są panele HUD-u na tle świata za nimi.',
   'guide.settingsPage.ifInvertLookY': 'Odwraca kierunek góra dół rozglądania się myszą (oś Y).',
-  'guide.settingsPage.ifLockBars': 'Blokuje twoje paski, żebyś przypadkiem nie wyciągnął umiejętności z pola.',
-  'guide.settingsPage.ifMouseoverCast': 'Pozwala, by leczenie lub przyjazne zaklęcie trafiło na ramkę drużyny, nad którą najeżdżasz kursorem, bez zmiany twojego celu.',
-  'guide.settingsPage.ifPartyHealthText': 'Co wypisują paski drużyny: nic, procent, bieżące zdrowie albo bieżące i maksymalne.',
-  'guide.settingsPage.ifPartyShowAuras': 'Czy wzmocnienia i osłabienia pokazują się na ramkach drużyny. Odpowiadające im przełączniki obejmują paski zasobów, tarcze absorpcji, zwierzęta oraz to, czy pojawiasz się na własnej liście drużyny.',
-  'guide.settingsPage.ifPartySort': 'Kolejność, w jakiej wyświetlani są członkowie drużyny: grupa, rola lub nazwa.',
-  'guide.settingsPage.ifPartyStyle': 'Styl ramek drużyny: Automatyczny dopasowuje się do wielkości twojej grupy, Klasyczne ramki grupy to tradycyjny układ w słupku, a Ramki rajdu upychają wszystkich w zwartą siatkę.',
+  'guide.settingsPage.ifLockBars':
+    'Blokuje twoje paski, żebyś przypadkiem nie wyciągnął umiejętności z pola.',
+  'guide.settingsPage.ifMouseoverCast':
+    'Pozwala, by leczenie lub przyjazne zaklęcie trafiło na ramkę drużyny, nad którą najeżdżasz kursorem, bez zmiany twojego celu.',
+  'guide.settingsPage.ifPartyHealthText':
+    'Co wypisują paski drużyny: nic, procent, bieżące zdrowie albo bieżące i maksymalne.',
+  'guide.settingsPage.ifPartyShowAuras':
+    'Czy wzmocnienia i osłabienia pokazują się na ramkach drużyny. Odpowiadające im przełączniki obejmują paski zasobów, tarcze absorpcji, zwierzęta oraz to, czy pojawiasz się na własnej liście drużyny.',
+  'guide.settingsPage.ifPartySort':
+    'Kolejność, w jakiej wyświetlani są członkowie drużyny: grupa, rola lub nazwa.',
+  'guide.settingsPage.ifPartyStyle':
+    'Styl ramek drużyny: Automatyczny dopasowuje się do wielkości twojej grupy, Klasyczne ramki grupy to tradycyjny układ w słupku, a Ramki rajdu upychają wszystkich w zwartą siatkę.',
   'guide.settingsPage.ifPetFrame': 'Pokazuje ramkę dla twojego zwierzęcia.',
   'guide.settingsPage.ifPlayerFrameScale': 'Rozmiar twojej własnej ramki gracza.',
   'guide.settingsPage.ifShowAttackButton': 'Dodaje wyraźny Przycisk Ataku na twoim pasku akcji.',
-  'guide.settingsPage.ifShowItemLevel': 'Dodaje linię poziomu przedmiotu do każdej podpowiedzi przedmiotu. Domyślnie wyłączone, co zachowuje klasyczną podpowiedź ograniczoną do samych statystyk.',
-  'guide.settingsPage.ifShowOwnNameplate': 'Rysuje twoją własną plakietkę nad głową dokładnie tak, jak widzą ją inni gracze, wraz z całą oprawą. Wyłącz ją, aby wrócić do klasycznego widoku.',
-  'guide.settingsPage.ifShowPlayerNameplates': 'Rysuje plakietki innych graczy. Wyłączenie odchudza zatłoczony hub, a twój obecny cel i tak pozostaje czytelny.',
-  'guide.settingsPage.ifShowPlaytime': 'Pokazuje twój łączny czas gry na karcie postaci. Domyślnie włączone, a karta ma przycisk z okiem, który przełącza to osobno na każdym urządzeniu, co przydaje się, gdy streamujesz lub robisz zrzuty ekranu. Licznik i tak liczy dalej niezależnie od tego.',
-  'guide.settingsPage.ifStartAttack': 'Czy użycie umiejętności uruchamia też twój automatyczny atak. Domyślnie włączone i to klasyczne zachowanie, którego oczekuje większość graczy.',
-  'guide.settingsPage.ifStickyTarget': 'Zachowuje twój obecny cel, gdy klikniesz na pustą ziemię, zamiast go czyścić.',
-  'guide.settingsPage.ifStopAutoAttack': 'Czy zmiana celu przerywa twój zamach. Domyślnie wyłączone, więc atak przechodzi na nowy cel.',
+  'guide.settingsPage.ifShowItemLevel':
+    'Dodaje linię poziomu przedmiotu do każdej podpowiedzi przedmiotu. Domyślnie wyłączone, co zachowuje klasyczną podpowiedź ograniczoną do samych statystyk.',
+  'guide.settingsPage.ifShowOwnNameplate':
+    'Rysuje twoją własną plakietkę nad głową dokładnie tak, jak widzą ją inni gracze, wraz z całą oprawą. Wyłącz ją, aby wrócić do klasycznego widoku.',
+  'guide.settingsPage.ifShowPlayerNameplates':
+    'Rysuje plakietki innych graczy. Wyłączenie odchudza zatłoczony hub, a twój obecny cel i tak pozostaje czytelny.',
+  'guide.settingsPage.ifShowPlaytime':
+    'Pokazuje twój łączny czas gry na karcie postaci. Domyślnie włączone, a karta ma przycisk z okiem, który przełącza to osobno na każdym urządzeniu, co przydaje się, gdy streamujesz lub robisz zrzuty ekranu. Licznik i tak liczy dalej niezależnie od tego.',
+  'guide.settingsPage.ifStartAttack':
+    'Czy użycie umiejętności uruchamia też twój automatyczny atak. Domyślnie włączone i to klasyczne zachowanie, którego oczekuje większość graczy.',
+  'guide.settingsPage.ifStickyTarget':
+    'Zachowuje twój obecny cel, gdy klikniesz na pustą ziemię, zamiast go czyścić.',
+  'guide.settingsPage.ifStopAutoAttack':
+    'Czy zmiana celu przerywa twój zamach. Domyślnie wyłączone, więc atak przechodzi na nowy cel.',
   'guide.settingsPage.ifTargetFrameScale': 'Rozmiar twojej ramki celu.',
-  'guide.settingsPage.ifTargetOfTarget': 'Pokazuje, kogo atakuje twój cel, co jest klasycznym sposobem sprawdzenia, czy tank wciąż go trzyma.',
-  'guide.settingsPage.ifTooltipScale': 'Rozmiar tekstu podpowiedzi, przydatny na małym ekranie albo bardzo dużym.',
-  'guide.settingsPage.ifUiScale': 'Skaluje naraz cały interfejs. Zmiana zostaje zastosowana dopiero, gdy puścisz suwak, więc okno pod kursorem nie porusza się, gdy je przeciągasz.',
-  'guide.settingsPage.ifWalkByAutoloot': 'Zgarnia łup z twoich własnych zabójstw, gdy przechodzisz obok nich. Domyślnie wyłączone.',
-  'guide.settingsPage.ifWallet': 'Czy twoja sakiewka jest widoczna na ekranie postaci. Dla karty gracza istnieje osobny, analogiczny przełącznik.',
-  'guide.settingsPage.interfaceFoot': 'To nie wszystkie z nich. Każda zakładka niesie więcej suwaków i przełączników, niż warto tu wypisywać w tabeli, więc otwórz ją raz i przeczytaj listę od góry do dołu. To dobrze wykorzystane pięć minut.',
+  'guide.settingsPage.ifTargetOfTarget':
+    'Pokazuje, kogo atakuje twój cel, co jest klasycznym sposobem sprawdzenia, czy tank wciąż go trzyma.',
+  'guide.settingsPage.ifTooltipScale':
+    'Rozmiar tekstu podpowiedzi, przydatny na małym ekranie albo bardzo dużym.',
+  'guide.settingsPage.ifUiScale':
+    'Skaluje naraz cały interfejs. Zmiana zostaje zastosowana dopiero, gdy puścisz suwak, więc okno pod kursorem nie porusza się, gdy je przeciągasz.',
+  'guide.settingsPage.ifWalkByAutoloot':
+    'Zgarnia łup z twoich własnych zabójstw, gdy przechodzisz obok nich. Domyślnie wyłączone.',
+  'guide.settingsPage.ifWallet':
+    'Czy twoja sakiewka jest widoczna na ekranie postaci. Dla karty gracza istnieje osobny, analogiczny przełącznik.',
+  'guide.settingsPage.interfaceFoot':
+    'To nie wszystkie z nich. Każda zakładka niesie więcej suwaków i przełączników, niż warto tu wypisywać w tabeli, więc otwórz ją raz i przeczytaj listę od góry do dołu. To dobrze wykorzystane pięć minut.',
   'guide.settingsPage.interfaceHeading': 'Panel Interfejsu',
-  'guide.settingsPage.interfaceIntro': 'Interfejs to największy panel w grze, podzielony na cztery zakładki. Nic tutaj nie zmienia tego, co świat może ci zrobić: zmienia to, co widzisz i jak duże to jest. Oto wiersze najbardziej warte poznania.',
-  'guide.settingsPage.keybindsBody': 'Lista klawiszy to tylko połowa tego panelu. Nad nią siedzą przełączniki, które decydują, jak twoja mysz prowadzi grę: kamera myszy, czy kursor blokuje się podczas obracania, ruch kliknięciem i to, który przycisk myszy go wywołuje, ruch z atakiem, układ leworęczny dla sterowania dotykowego oraz filtr wulgaryzmów na czacie.',
+  'guide.settingsPage.interfaceIntro':
+    'Interfejs to największy panel w grze, podzielony na cztery zakładki. Nic tutaj nie zmienia tego, co świat może ci zrobić: zmienia to, co widzisz i jak duże to jest. Oto wiersze najbardziej warte poznania.',
+  'guide.settingsPage.keybindsBody':
+    'Lista klawiszy to tylko połowa tego panelu. Nad nią siedzą przełączniki, które decydują, jak twoja mysz prowadzi grę: kamera myszy, czy kursor blokuje się podczas obracania, ruch kliknięciem i to, który przycisk myszy go wywołuje, ruch z atakiem, układ leworęczny dla sterowania dotykowego oraz filtr wulgaryzmów na czacie.',
   'guide.settingsPage.keybindsHeading': 'Panel Przypisań Klawiszy',
-  'guide.settingsPage.keybindsMouseBody': 'Dwie rzeczy łatwo tam przeoczyć. Przyciski myszy przypisuje się jak klawisze, więc kliknięcie kółkiem i boczne przyciski mogą nosić umiejętności, podczas gdy lewy i prawy przycisk pozostają zarezerwowane dla kamery i klikania w świecie. Możesz też przypisywać klawisze bezpośrednio z paska akcji: włącz tu tryb przypisywania na pasku, kliknij pole i naciśnij klawisz, który chcesz przypisać.',
-  'guide.settingsPage.panelsMoreBody': 'Dwa panele, których ta strona nie wypisuje w tabeli, i tak zasługują na spojrzenie. Aury to miejsce, w którym kształtujesz duże ekranowe alerty pojawiające się, gdy uruchomi się jeden z proców twojej klasy: które się pokazują, jaki mają rozmiar, kolor, krycie i gdzie leżą na ekranie. Nakładka wydajności to odczyt, który włączasz podczas dostrajania tej strony, po czym znów go ukrywasz.',
-  'guide.settingsPage.rowAmbientOcclusion': 'Miękki cień kontaktowy w miejscach styku powierzchni. Wyłączona, w połowie rozdzielczości albo pełna.',
-  'guide.settingsPage.rowAntiAliasing': 'Wygładza postrzępione krawędzie odległej geometrii. Tanie i warte pozostawienia włączonym na większości maszyn.',
-  'guide.settingsPage.rowBloom': 'Delikatna poświata wokół jasnego światła, ognia i efektów zaklęć.',
+  'guide.settingsPage.keybindsMouseBody':
+    'Dwie rzeczy łatwo tam przeoczyć. Przyciski myszy przypisuje się jak klawisze, więc kliknięcie kółkiem i boczne przyciski mogą nosić umiejętności, podczas gdy lewy i prawy przycisk pozostają zarezerwowane dla kamery i klikania w świecie. Możesz też przypisywać klawisze bezpośrednio z paska akcji: włącz tu tryb przypisywania na pasku, kliknij pole i naciśnij klawisz, który chcesz przypisać.',
+  'guide.settingsPage.panelsMoreBody':
+    'Dwa panele, których ta strona nie wypisuje w tabeli, i tak zasługują na spojrzenie. Aury to miejsce, w którym kształtujesz duże ekranowe alerty pojawiające się, gdy uruchomi się jeden z proców twojej klasy: które się pokazują, jaki mają rozmiar, kolor, krycie i gdzie leżą na ekranie. Nakładka wydajności to odczyt, który włączasz podczas dostrajania tej strony, po czym znów go ukrywasz.',
+  'guide.settingsPage.rowAmbientOcclusion':
+    'Miękki cień kontaktowy w miejscach styku powierzchni. Wyłączona, w połowie rozdzielczości albo pełna.',
+  'guide.settingsPage.rowAntiAliasing':
+    'Wygładza postrzępione krawędzie odległej geometrii. Tanie i warte pozostawienia włączonym na większości maszyn.',
+  'guide.settingsPage.rowBloom':
+    'Delikatna poświata wokół jasnego światła, ognia i efektów zaklęć.',
   'guide.settingsPage.rowCameraSpeed': 'Jak szybko obraca się kamera, gdy rozglądasz się myszą.',
-  'guide.settingsPage.rowCharacterDetail': 'Jak daleko inne postacie zachowują pełny, animowany model, zanim spadną do prostszego. Wyżej jest łagodniejsze dla oka w zatłoczonym hubie, ale i cięższe.',
-  'guide.settingsPage.rowDynamicLights': 'Ile pochodni, ognisk i zaklęć rzuca prawdziwe światło na scenę wokół siebie.',
+  'guide.settingsPage.rowCharacterDetail':
+    'Jak daleko inne postacie zachowują pełny, animowany model, zanim spadną do prostszego. Wyżej jest łagodniejsze dla oka w zatłoczonym hubie, ale i cięższe.',
+  'guide.settingsPage.rowDynamicLights':
+    'Ile pochodni, ognisk i zaklęć rzuca prawdziwe światło na scenę wokół siebie.',
   'guide.settingsPage.rowFullscreen': 'Wypełnia grą cały ekran.',
-  'guide.settingsPage.rowInterfaceMode': 'Czy dostajesz interfejs komputerowy, czy ekranowe sterowanie dotykowe. Auto rozpoznaje twoje urządzenie, a możesz wymusić dowolny z trybów: tablet z klawiaturą może przyjąć układ komputerowy, a laptop z ekranem dotykowym może przyjąć sterowanie dotykowe.',
-  'guide.settingsPage.rowOverflowXp': 'Na najwyższym poziomie: czy twój pasek wciąż wypełnia się nadmiarowymi PD (punktami doświadczenia), czy zamiast tego pokazuje klasyczny, statyczny napis maksymalnego poziomu.',
-  'guide.settingsPage.rowParticleEffects': 'Jak gęste mogą być efekty cząsteczek pochodzące z zaklęć, pogody i otoczenia.',
-  'guide.settingsPage.rowSurfaceDetail': 'Warstwa zużytych detali na kamieniu i brukowanych nawierzchniach, od wyłączonej po pełne wykończenie paralaksy. To pokrętło miejskiej ulicy: im więcej z niego zostawisz, tym więcej pracy kosztuje narysowanie brukowanej ulicy.',
-  'guide.settingsPage.rowTouchLookSpeed': 'To samo, ale dla rozglądania się przeciągnięciem palca, i pojawia się tylko na ekranie dotykowym.',
-  'guide.settingsPage.rowViewDistance': 'Jak daleko w dal rysowany jest świat, zanim zniknie we mgle. Każdy zestaw jakości ustawia to za ciebie, dopóki sam tego nie zmienisz.',
-  'guide.settingsPage.rowWaterQuality': 'Jak cieniowane są jeziora, rzeki i otwarte morze, od płaskiego i taniego po w pełni odbijające.',
-  'guide.settingsPage.rowWaterRipples': 'Kilwater i zmarszczki, które rozchodzą się za tobą, gdy pływasz. Domyślnie wyłączone, i to jedyny efekt wody, który kosztuje realne klatki; plusk i bąbelki pozostają niezmienione niezależnie od tej opcji.',
+  'guide.settingsPage.rowInterfaceMode':
+    'Czy dostajesz interfejs komputerowy, czy ekranowe sterowanie dotykowe. Auto rozpoznaje twoje urządzenie, a możesz wymusić dowolny z trybów: tablet z klawiaturą może przyjąć układ komputerowy, a laptop z ekranem dotykowym może przyjąć sterowanie dotykowe.',
+  'guide.settingsPage.rowOverflowXp':
+    'Na najwyższym poziomie: czy twój pasek wciąż wypełnia się nadmiarowymi PD (punktami doświadczenia), czy zamiast tego pokazuje klasyczny, statyczny napis maksymalnego poziomu.',
+  'guide.settingsPage.rowParticleEffects':
+    'Jak gęste mogą być efekty cząsteczek pochodzące z zaklęć, pogody i otoczenia.',
+  'guide.settingsPage.rowSurfaceDetail':
+    'Warstwa zużytych detali na kamieniu i brukowanych nawierzchniach, od wyłączonej po pełne wykończenie paralaksy. To pokrętło miejskiej ulicy: im więcej z niego zostawisz, tym więcej pracy kosztuje narysowanie brukowanej ulicy.',
+  'guide.settingsPage.rowTouchLookSpeed':
+    'To samo, ale dla rozglądania się przeciągnięciem palca, i pojawia się tylko na ekranie dotykowym.',
+  'guide.settingsPage.rowViewDistance':
+    'Jak daleko w dal rysowany jest świat, zanim zniknie we mgle. Każdy zestaw jakości ustawia to za ciebie, dopóki sam tego nie zmienisz.',
+  'guide.settingsPage.rowWaterQuality':
+    'Jak cieniowane są jeziora, rzeki i otwarte morze, od płaskiego i taniego po w pełni odbijające.',
+  'guide.settingsPage.rowWaterRipples':
+    'Kilwater i zmarszczki, które rozchodzą się za tobą, gdy pływasz. Domyślnie wyłączone, i to jedyny efekt wody, który kosztuje realne klatki; plusk i bąbelki pozostają niezmienione niezależnie od tej opcji.',
   'guide.settingsPage.valueUltraOrInsane': 'Ultra, lub Ekstremalne, jeśli chcesz mieć wszystko',
-  'guide.social.blockBody': 'Blokada to cięższe narzędzie, przeznaczone dla gracza, który nie chce dać ci spokoju. Blokada odcina jego zaproszenia, szepty i pocztę, a także czat, sprawia, że oboje stajecie się dla siebie niewidoczni w /who, i usuwa go z twojej listy przyjaciół, jeśli na niej był. Zablokuj z menu pod prawym przyciskiem na jego imieniu albo komendą /block, /unblock znosi blokadę, a /blocklist pokazuje, kto na niej jest.',
+  'guide.social.blockBody':
+    'Blokada to cięższe narzędzie, przeznaczone dla gracza, który nie chce dać ci spokoju. Blokada odcina jego zaproszenia, szepty i pocztę, a także czat, sprawia, że oboje stajecie się dla siebie niewidoczni w /who, i usuwa go z twojej listy przyjaciół, jeśli na niej był. Zablokuj z menu pod prawym przyciskiem na jego imieniu albo komendą /block, /unblock znosi blokadę, a /blocklist pokazuje, kto na niej jest.',
   'guide.social.chatMore': 'Więcej o oknie czatu i reszcie interfejsu',
-  'guide.social.discordLinkBody': 'Panel Discorda w grze działa też w drugą stronę. Połącz z nim swoje konto Discord, a role społeczności, które tam posiadasz, podążają za tobą do świata: kolorowe imię nad głową oraz tag przy liniach czatu ról personelu, więc zawsze rozpoznasz prawdziwego moderatora od kogoś, kto podszywa się pod jego imię. Połączenie śledzi też Status, który rośnie wraz z twoim udziałem. Nic z tego nie daje żadnej przewagi w grze.',
-  'guide.social.finderBoardBody': 'Znajdywacz trzyma też tablicę gotowych grup. Lider publikuje ogłoszenie z tagami mówiącymi, do czego służy przebieg, od pierwszego przebiegu po zwykłe pełne czyszczenie, a ty zgłaszasz się do niego, by lider cię zatwierdził. Automatyczna kolejka wypełnia lochy i rajd końca gry, każdy w wersji normalnej i heroicznej, podczas gdy tablica może nosić też solowy przebieg dostrojenia, którego kolejka nigdy nie wypełni za ciebie; wyprawy i wypady w otwarty świat musisz zorganizować sam. Tak czy inaczej Znajdywacz buduje tylko grupę: dojście do drzwi, ustawienie poziomu trudności i uzgodnienie zasad łupu wciąż należą do ciebie.',
-  'guide.social.finderBody': 'Nie musisz krzyczeć na kanale Szukam grupy, żeby skompletować przebieg. Otwórz Znajdywacza Lochów, wybierz przebieg, którego chcesz, oraz role, które jesteś gotów pełnić, i dołącz do kolejki sam albo ze swoją już istniejącą drużyną. Znajdywacz czeka, aż zbierze pełny komplet ról, po czym oferuje grupę wszystkim naraz: wyskakujące okienko prosi każdego z was o potwierdzenie, a drużyna formuje się w chwili, gdy ostatnia osoba powie tak. Odrzucenie oferty albo pozwolenie, by wygasła, nakłada na ciebie krótkie odnowienie, zanim kolejka zaproponuje ci kolejną, więc kolejka wciąż się posuwa.',
+  'guide.social.discordLinkBody':
+    'Panel Discorda w grze działa też w drugą stronę. Połącz z nim swoje konto Discord, a role społeczności, które tam posiadasz, podążają za tobą do świata: kolorowe imię nad głową oraz tag przy liniach czatu ról personelu, więc zawsze rozpoznasz prawdziwego moderatora od kogoś, kto podszywa się pod jego imię. Połączenie śledzi też Status, który rośnie wraz z twoim udziałem. Nic z tego nie daje żadnej przewagi w grze.',
+  'guide.social.finderBoardBody':
+    'Znajdywacz trzyma też tablicę gotowych grup. Lider publikuje ogłoszenie z tagami mówiącymi, do czego służy przebieg, od pierwszego przebiegu po zwykłe pełne czyszczenie, a ty zgłaszasz się do niego, by lider cię zatwierdził. Automatyczna kolejka wypełnia lochy i rajd końca gry, każdy w wersji normalnej i heroicznej, podczas gdy tablica może nosić też solowy przebieg dostrojenia, którego kolejka nigdy nie wypełni za ciebie; wyprawy i wypady w otwarty świat musisz zorganizować sam. Tak czy inaczej Znajdywacz buduje tylko grupę: dojście do drzwi, ustawienie poziomu trudności i uzgodnienie zasad łupu wciąż należą do ciebie.',
+  'guide.social.finderBody':
+    'Nie musisz krzyczeć na kanale Szukam grupy, żeby skompletować przebieg. Otwórz Znajdywacza Lochów, wybierz przebieg, którego chcesz, oraz role, które jesteś gotów pełnić, i dołącz do kolejki sam albo ze swoją już istniejącą drużyną. Znajdywacz czeka, aż zbierze pełny komplet ról, po czym oferuje grupę wszystkim naraz: wyskakujące okienko prosi każdego z was o potwierdzenie, a drużyna formuje się w chwili, gdy ostatnia osoba powie tak. Odrzucenie oferty albo pozwolenie, by wygasła, nakłada na ciebie krótkie odnowienie, zanim kolejka zaproponuje ci kolejną, więc kolejka wciąż się posuwa.',
   'guide.social.finderHeading': 'Znajdowanie grupy',
   'guide.social.finderMore': 'Zobacz, co kryje się w każdym lochu',
-  'guide.social.guildBankBody': 'Gildia utrzymuje też własny skarbiec. Podejdź do bankiera w jednym z głównych miast, otwórz swój bank i przełącz się na zakładkę Gildia: znajdziesz tam skarbiec gildii oraz wspólną składnicę przedmiotów, które gildia posiada razem. Każdy członek może ją otworzyć i zobaczyć, co jest w środku, a panel jasno mówi, kto może zrobić więcej. Tylko przywódca gildii i oficerowie mogą działać, wkładając monety i dobra oraz je wydając, a każda wpłata i wypłata zapisywana jest w dzienniku, który gildia może odczytać, więc nic nie porusza się bez śladu.',
+  'guide.social.guildBankBody':
+    'Gildia utrzymuje też własny skarbiec. Podejdź do bankiera w jednym z głównych miast, otwórz swój bank i przełącz się na zakładkę Gildia: znajdziesz tam skarbiec gildii oraz wspólną składnicę przedmiotów, które gildia posiada razem. Każdy członek może ją otworzyć i zobaczyć, co jest w środku, a panel jasno mówi, kto może zrobić więcej. Tylko przywódca gildii i oficerowie mogą działać, wkładając monety i dobra oraz je wydając, a każda wpłata i wypłata zapisywana jest w dzienniku, który gildia może odczytać, więc nic nie porusza się bez śladu.',
   'guide.social.guildBankHeading': 'Bank gildii',
-  'guide.social.guildBankRulesBody': 'Składnica przedmiotów zaczyna zamknięta. Oficer otwiera ją z własnej kieszeni, a gildia może później zapłacić ze skarbca, by ją poszerzyć. Przedmioty zadań, wszystko związane z duszą oraz ekwipunek, którego nie przyjmie Targ Świata, zostają poza nią, tak samo jak w przypadku poczty i Targu Świata, więc bank służy dobrom, które wciąż mogą zmieniać właściciela.',
-  'guide.social.guildBoardBody': 'Gildie też mają swój ranking. Okno Tablicy wyników trzyma tablicę Gildii obok tablic graczy, klasyfikując gildie według tego, co razem zdobyli ich członkowie, więc ruchliwa gildia może zobaczyć, gdzie stoi.',
-  'guide.social.jailBody': 'Moderatorzy pilnują porządku, a gracz, który nie pozwala innym cieszyć się grą, może trafić do celi. Wyrok zawsze ma ustalony czas trwania, choć moderator może zakończyć go wcześniej, i biegnie w czasie rzeczywistym bez względu na to, czy pozostajesz zalogowany.',
+  'guide.social.guildBankRulesBody':
+    'Składnica przedmiotów zaczyna zamknięta. Oficer otwiera ją z własnej kieszeni, a gildia może później zapłacić ze skarbca, by ją poszerzyć. Przedmioty zadań, wszystko związane z duszą oraz ekwipunek, którego nie przyjmie Targ Świata, zostają poza nią, tak samo jak w przypadku poczty i Targu Świata, więc bank służy dobrom, które wciąż mogą zmieniać właściciela.',
+  'guide.social.guildBoardBody':
+    'Gildie też mają swój ranking. Okno Tablicy wyników trzyma tablicę Gildii obok tablic graczy, klasyfikując gildie według tego, co razem zdobyli ich członkowie, więc ruchliwa gildia może zobaczyć, gdzie stoi.',
+  'guide.social.jailBody':
+    'Moderatorzy pilnują porządku, a gracz, który nie pozwala innym cieszyć się grą, może trafić do celi. Wyrok zawsze ma ustalony czas trwania, choć moderator może zakończyć go wcześniej, i biegnie w czasie rzeczywistym bez względu na to, czy pozostajesz zalogowany.',
   'guide.social.jailHeading': 'Moderatorzy i cela',
-  'guide.social.moderationBody': 'Jeśli gracz zachowuje się niewłaściwie, kliknij prawym przyciskiem jego imię i wybierz Zgłoś gracza. Wybierz powód, od nękania przez spam po oszustwo, dodaj linijkę o tym, co się stało, i wyślij: zgłoszenie trafia do moderatorów do przeczytania. Zgłoszenie to notatka dla nich, nie kara sama w sobie. Wysłanie go nikogo nie ucisza, nie wyrzuca ani nie wsadza do celi, i nie przychodzi żadna odpowiedź informująca cię, co postanowiono. Zablokowanie danej osoby powstrzymuje dokuczanie, póki czekasz.',
+  'guide.social.moderationBody':
+    'Jeśli gracz zachowuje się niewłaściwie, kliknij prawym przyciskiem jego imię i wybierz Zgłoś gracza. Wybierz powód, od nękania przez spam po oszustwo, dodaj linijkę o tym, co się stało, i wyślij: zgłoszenie trafia do moderatorów do przeczytania. Zgłoszenie to notatka dla nich, nie kara sama w sobie. Wysłanie go nikogo nie ucisza, nie wyrzuca ani nie wsadza do celi, i nie przychodzi żadna odpowiedź informująca cię, co postanowiono. Zablokowanie danej osoby powstrzymuje dokuczanie, póki czekasz.',
   'guide.social.moderationHeading': 'Zgłaszanie gracza',
-  'guide.social.realmsBody': 'Gra online działa na światach, a każdy świat to osobne miejsce z własnymi graczami. Wybierasz jeden z Listy światów przed rozpoczęciem gry, a każdy wiersz pokazuje, jak zatłoczony jest ten świat w danej chwili: od Niskie przez Średnie i Wysokie aż po Pełny, albo Offline dla świata, który akurat nie działa. Niskie oznacza mnóstwo miejsca, Wysokie oznacza mnóstwo towarzystwa, a świat, który osiągnął swój limit, pokazuje Pełny i odrzuca nowe logowania, dopóki ktoś się nie wyloguje, więc wybieraj tam, gdzie są twoi znajomi, albo tam, gdzie jest miejsce.',
+  'guide.social.realmsBody':
+    'Gra online działa na światach, a każdy świat to osobne miejsce z własnymi graczami. Wybierasz jeden z Listy światów przed rozpoczęciem gry, a każdy wiersz pokazuje, jak zatłoczony jest ten świat w danej chwili: od Niskie przez Średnie i Wysokie aż po Pełny, albo Offline dla świata, który akurat nie działa. Niskie oznacza mnóstwo miejsca, Wysokie oznacza mnóstwo towarzystwa, a świat, który osiągnął swój limit, pokazuje Pełny i odrzuca nowe logowania, dopóki ktoś się nie wyloguje, więc wybieraj tam, gdzie są twoi znajomi, albo tam, gdzie jest miejsce.',
   'guide.social.realmsHeading': 'Światy',
-  'guide.social.realmsScopeBody': 'To, co robisz, zostaje na wybranym przez ciebie świecie: twoje postacie, lista przyjaciół, gildia i Targ Świata mieszkają właśnie tam, a tablice gildii i graczy, które otwierasz w grze, klasyfikują wyłącznie ten jeden świat, podczas gdy tablica na stronie internetowej zbiera wszystkie światy razem. Każdy świat utrzymuje też własny dzienny reset rajdu, według swojego lokalnego czasu.',
-  'guide.stats.hitBody': 'Ocena trafienia pochodzi z twojego ekwipunku i jego bonusów zestawów. Sprawia, że twoje ataki chybiają rzadziej, a twoje zaklęcia rzadziej napotykają opór, i najbardziej się opłaca przeciwko wrogom powyżej twojego poziomu, gdzie chybienia narastają najszybciej. Na twojej karcie widnieje jako Ocena Trafienia.',
+  'guide.social.realmsScopeBody':
+    'To, co robisz, zostaje na wybranym przez ciebie świecie: twoje postacie, lista przyjaciół, gildia i Targ Świata mieszkają właśnie tam, a tablice gildii i graczy, które otwierasz w grze, klasyfikują wyłącznie ten jeden świat, podczas gdy tablica na stronie internetowej zbiera wszystkie światy razem. Każdy świat utrzymuje też własny dzienny reset rajdu, według swojego lokalnego czasu.',
+  'guide.stats.hitBody':
+    'Ocena trafienia pochodzi z twojego ekwipunku i jego bonusów zestawów. Sprawia, że twoje ataki chybiają rzadziej, a twoje zaklęcia rzadziej napotykają opór, i najbardziej się opłaca przeciwko wrogom powyżej twojego poziomu, gdzie chybienia narastają najszybciej. Na twojej karcie widnieje jako Ocena Trafienia.',
   'guide.stats.hitTitle': 'Ocena trafienia',
-  'guide.stats.parryBody': 'Parowanie to własna obrona wojownika: szansa, by całkowicie odbić cios wręcz i nie otrzymać żadnych obrażeń, rosnąca wraz z Siłą. Sparować można tylko atak nadchodzący od przodu, co jest kolejnym powodem, by zawsze być zwróconym twarzą do tego, co cię atakuje. U pozostałych klas ten wiersz na karcie postaci stoi na zerze.',
+  'guide.stats.parryBody':
+    'Parowanie to własna obrona wojownika: szansa, by całkowicie odbić cios wręcz i nie otrzymać żadnych obrażeń, rosnąca wraz z Siłą. Sparować można tylko atak nadchodzący od przodu, co jest kolejnym powodem, by zawsze być zwróconym twarzą do tego, co cię atakuje. U pozostałych klas ten wiersz na karcie postaci stoi na zerze.',
   'guide.stats.parryTitle': 'Parowanie',
-  'guide.stats.warfareBody': 'Działania wojenne to jedyna statystyka, która liczy się wyłącznie przeciwko innym graczom: zwiększa obrażenia, jakie im zadajesz, i zmniejsza obrażenia, jakie od nich otrzymujesz, a twoja karta postaci pokazuje obie połowy na jednej linii. Przeciwko stworzeniom nie robi zupełnie nic. Pochodzi z ekwipunku Działań Wojennych, który kupujesz za Honor, więc jest nagrodą za granie w PvP, a nie czymś, do czego warto dążyć podczas zdobywania poziomów.',
+  'guide.stats.warfareBody':
+    'Działania wojenne to jedyna statystyka, która liczy się wyłącznie przeciwko innym graczom: zwiększa obrażenia, jakie im zadajesz, i zmniejsza obrażenia, jakie od nich otrzymujesz, a twoja karta postaci pokazuje obie połowy na jednej linii. Przeciwko stworzeniom nie robi zupełnie nic. Pochodzi z ekwipunku Działań Wojennych, który kupujesz za Honor, więc jest nagrodą za granie w PvP, a nie czymś, do czego warto dążyć podczas zdobywania poziomów.',
   'guide.stats.warfareTitle': 'Działania wojenne',
-  'guide.talentsPage.loadoutNote': 'Nie musisz trzymać się jednego builda. Zapisz nazwany układ w panelu, a on zapamięta zarówno wybrane talenty, jak i twój pasek akcji, dzięki czemu przełączenie się na inny układ to jedno kliknięcie, na tych samych zasadach co reset: poza walką i nie podczas meczu na arenie.',
-  'guide.thornhollowPage.rewardsBody': 'Każdy zakończony mecz wypłaca Honor: więcej za zwycięstwo, pocieszenie za porażkę lub remis, a do tego niewielką kwotę za każdy cios kończący, który zadasz, i za każdy, przy którym asystujesz, więc walka z dala od flag wciąż się opłaca. Twoje pierwsze zwycięstwo każdego dnia wypłaca dodatkowy bonus, a panel informuje cię, dopóki ten bonus wciąż na ciebie czeka. Ten dzień należy tylko do Honoru i toczy się według własnego zegara, niezależnie od resetu instancji królestwa. Spotykanie tej samej drużyny raz za razem płaci mniej za sam mecz po pierwszym starciu, szybko osiadając na poziomie minimalnym zamiast spadać do zera, a mecz zakończony walkowerem nie płaci nic. Wydawaj to, co zarobisz, u dowolnego Honorowego kwatermistrza.',
+  'guide.talentsPage.loadoutNote':
+    'Nie musisz trzymać się jednego builda. Zapisz nazwany układ w panelu, a on zapamięta zarówno wybrane talenty, jak i twój pasek akcji, dzięki czemu przełączenie się na inny układ to jedno kliknięcie, na tych samych zasadach co reset: poza walką i nie podczas meczu na arenie.',
+  'guide.thornhollowPage.rewardsBody':
+    'Każdy zakończony mecz wypłaca Honor: więcej za zwycięstwo, pocieszenie za porażkę lub remis, a do tego niewielką kwotę za każdy cios kończący, który zadasz, i za każdy, przy którym asystujesz, więc walka z dala od flag wciąż się opłaca. Twoje pierwsze zwycięstwo każdego dnia wypłaca dodatkowy bonus, a panel informuje cię, dopóki ten bonus wciąż na ciebie czeka. Ten dzień należy tylko do Honoru i toczy się według własnego zegara, niezależnie od resetu instancji królestwa. Spotykanie tej samej drużyny raz za razem płaci mniej za sam mecz po pierwszym starciu, szybko osiadając na poziomie minimalnym zamiast spadać do zera, a mecz zakończony walkowerem nie płaci nic. Wydawaj to, co zarobisz, u dowolnego Honorowego kwatermistrza.',
   'guide.thornhollowPage.rewardsHeading': 'Nagrody za mecz',
-  'guide.worldPage.farshoreBlurb': 'Wyspa krzyku mew i słonego wiatru u wschodniego wybrzeża Vale, gdzie wyłomy pękają bez ostrzeżenia, a rybackie miasteczko Gullhaven broni swojego wybrzeża.',
+  'guide.worldPage.farshoreBlurb':
+    'Wyspa krzyku mew i słonego wiatru u wschodniego wybrzeża Vale, gdzie wyłomy pękają bez ostrzeżenia, a rybackie miasteczko Gullhaven broni swojego wybrzeża.',
   'guide.worldPage.farshoreGreeter': 'Strażnik Dzwonu Tam, Przystań',
-  'guide.worldPage.farshoreGreeting': 'Przeszedłeś przez Promowy Szlak? W takim razie jesteś pierwszym od tygodnia, a Strażnik będzie chciał cię obejrzeć.',
-  'guide.worldPage.farshorePlaceNotes': 'Gullhaven to jedyne miasto na wyspie i jej redoubt. Przystań to miejsce, gdzie Promowy Szlak dobija do brzegu, z dzwonem strażniczym stojącym nad cyplem; Łąka Straży zajmuje wyżynę na południowy wschód od miasta, gdzie szczelinostrażca nasłuchuje kolejnego wyłomu; Rozłupane Klify pękają na południowym krańcu wyspy; a Pola Szczelin to zniszczone rzędy zboża na wschód od Gullhaven, wciąż roją się od tego, co przeszło przez tamtejszy wyłom.',
-  'guide.worldPage.mountsBody': 'Jazda wierzchem to jedyna rzecz, która sprawia, że świat robi się mniejszy, i jest lekcją, zanim stanie się koniem. Na 20 poziomie Zarządczyni stajni, Marla, weźmie cię pod swoje skrzydła: kupujesz od niej Jeździectwo, a sama lekcja jazdy jest darmowa, parkur, który przejeżdżasz wokół jej zagrody na pożyczonym wierzchowcu. Zalicz go, oddaj lekcję, a twój pierwszy Valorsteed jest twój, i od tej chwili przemierzasz królestwo zauważalnie szybciej konno. Prędkość to jedyne, co daje ci wierzchowiec: rzadsze okazy, pochodzące z najtrudniejszej zawartości, są jeszcze szybsze, ale żaden z nich nie zmienia twojej siły w walce. Dosiadaj i zsiadaj klawiszem przypisanym w twoim sterowaniu. Nie możesz wsiąść na wierzchowca podczas walki, a zamach bronią, rzucenie zaklęcia, wejście do wody lub upadek w boju od razu stawiają cię z powrotem na nogi.',
+  'guide.worldPage.farshoreGreeting':
+    'Przeszedłeś przez Promowy Szlak? W takim razie jesteś pierwszym od tygodnia, a Strażnik będzie chciał cię obejrzeć.',
+  'guide.worldPage.farshorePlaceNotes':
+    'Gullhaven to jedyne miasto na wyspie i jej redoubt. Przystań to miejsce, gdzie Promowy Szlak dobija do brzegu, z dzwonem strażniczym stojącym nad cyplem; Łąka Straży zajmuje wyżynę na południowy wschód od miasta, gdzie szczelinostrażca nasłuchuje kolejnego wyłomu; Rozłupane Klify pękają na południowym krańcu wyspy; a Pola Szczelin to zniszczone rzędy zboża na wschód od Gullhaven, wciąż roją się od tego, co przeszło przez tamtejszy wyłom.',
+  'guide.worldPage.mountsBody':
+    'Jazda wierzchem to jedyna rzecz, która sprawia, że świat robi się mniejszy, i jest lekcją, zanim stanie się koniem. Na 20 poziomie Zarządczyni stajni, Marla, weźmie cię pod swoje skrzydła: kupujesz od niej Jeździectwo, a sama lekcja jazdy jest darmowa, parkur, który przejeżdżasz wokół jej zagrody na pożyczonym wierzchowcu. Zalicz go, oddaj lekcję, a twój pierwszy Valorsteed jest twój, i od tej chwili przemierzasz królestwo zauważalnie szybciej konno. Prędkość to jedyne, co daje ci wierzchowiec: rzadsze okazy, pochodzące z najtrudniejszej zawartości, są jeszcze szybsze, ale żaden z nich nie zmienia twojej siły w walce. Dosiadaj i zsiadaj klawiszem przypisanym w twoim sterowaniu. Nie możesz wsiąść na wierzchowca podczas walki, a zamach bronią, rzucenie zaklęcia, wejście do wody lub upadek w boju od razu stawiają cię z powrotem na nogi.',
   'guide.worldPage.mountsMore': 'Wszystko o wierzchowcach',
   'guide.worldPage.mountsTitle': 'Wierzchowce',
-  'guide.worldPage.riftBody': 'Coś wciąż rozdziera dziury w królestwie. Portale wyłomów otwierają się same z siebie w świecie, nigdy w trzech strefach startowej drogi, ale we wszystkich krainach poza nimi i na Dalekim Wybrzeżu, a całe królestwo słyszy nowinę, gdy któryś się otwiera. Każdy portal niesie rangę, a wyższa ranga oznacza trudniejsze, bogatsze zejście. Portal to wydarzenie współdzielone: dowolna grupa może przez niego wejść i dostaje własny, oddzielny przebieg w środku, ale tylko jedna grupa kiedykolwiek zdobywa pierwsze oczyszczenie, więc warto się spieszyć do świeżego wyłomu. Musisz mieć 20 poziom, by wejść do jednego, a jeśli nikt nie odpowie na czas, wyłom zapada się sam.',
+  'guide.worldPage.riftBody':
+    'Coś wciąż rozdziera dziury w królestwie. Portale wyłomów otwierają się same z siebie w świecie, nigdy w trzech strefach startowej drogi, ale we wszystkich krainach poza nimi i na Dalekim Wybrzeżu, a całe królestwo słyszy nowinę, gdy któryś się otwiera. Każdy portal niesie rangę, a wyższa ranga oznacza trudniejsze, bogatsze zejście. Portal to wydarzenie współdzielone: dowolna grupa może przez niego wejść i dostaje własny, oddzielny przebieg w środku, ale tylko jedna grupa kiedykolwiek zdobywa pierwsze oczyszczenie, więc warto się spieszyć do świeżego wyłomu. Musisz mieć 20 poziom, by wejść do jednego, a jeśli nikt nie odpowie na czas, wyłom zapada się sam.',
   'guide.worldPage.riftMore': 'Wszystko o wyłomach',
   'guide.worldPage.riftTitle': 'Portale wyłomów',
-  'guide.worldPage.travelBody': 'Każdą drogą w królestwie idzie się pieszo albo jedzie wierzchem. Nie ma szlaków lotu, taksówek ani sieci teleportów: mapa to jeden spójny ląd, a każde połączenie to coś, na czym możesz stanąć. Grzbiety dzielą jedną krainę od drugiej, a tam, gdzie dwie krainy dzielą wspólny grzbiet, droga wspina się przez przełęcz. Nie każda granica działa jednak w ten sposób. Na północy długa grobla wyprowadza drogę ponad wodą z Zasłoniętej Kotliny w krainę śniegu za nią, a z powrotem na południu cienka naturalna mielizna zwana Promowym Szlakiem biegnie na wschód od wybrzeża Vale do Przystani na wyspie Dalekiego Wybrzeża, która nie ma żadnej granicy lądowej. I jest dokładnie jedno prawdziwe wejście w całym otwartym świecie: zasłona zmierzchu wysoko na Thornpeak, która otwiera przejście do Zasłoniętej Kotliny. Południowy grzbiet Kotliny jest zapieczętowany, bez żadnej przełęczy, więc ta zasłona jest jedynym sposobem, by dostać się tam po raz pierwszy, i zamyka się za tobą w drodze powrotnej.\n\nGdziekolwiek polegniesz, droga powrotna jest krótka. Każda strefa ma co najmniej jeden cmentarz z Bladym Strażnikiem unoszącym się nad kamieniami, a uwolniony duch powstaje przy najbliższym z nich.\n\nMapa nie kończy się niewidzialną ścianą. Ląd wybiega w plaże i cyple, a potem w otwartą wodę. Przeprawy, które świat chce, byś przepłynął, cieśniny i rozlewiska między jedną krainą a drugą, są spokojne i bezpieczne do przekroczenia. Wypłyń zamiast tego na pełne morze, a sam dystans cię zawróci: zostaniesz ostrzeżony, i ostrzeżony ponownie, a jeśli będziesz płynąć dalej, morze będzie cię wyczerpywać, aż cię zabije. Nurkowanie ma swój własny limit, ponieważ pod powierzchnią kończy ci się oddech, więc wynurz się, by zaczerpnąć powietrza, i zawróć, gdy każe ci to woda.',
+  'guide.worldPage.travelBody':
+    'Każdą drogą w królestwie idzie się pieszo albo jedzie wierzchem. Nie ma szlaków lotu, taksówek ani sieci teleportów: mapa to jeden spójny ląd, a każde połączenie to coś, na czym możesz stanąć. Grzbiety dzielą jedną krainę od drugiej, a tam, gdzie dwie krainy dzielą wspólny grzbiet, droga wspina się przez przełęcz. Nie każda granica działa jednak w ten sposób. Na północy długa grobla wyprowadza drogę ponad wodą z Zasłoniętej Kotliny w krainę śniegu za nią, a z powrotem na południu cienka naturalna mielizna zwana Promowym Szlakiem biegnie na wschód od wybrzeża Vale do Przystani na wyspie Dalekiego Wybrzeża, która nie ma żadnej granicy lądowej. I jest dokładnie jedno prawdziwe wejście w całym otwartym świecie: zasłona zmierzchu wysoko na Thornpeak, która otwiera przejście do Zasłoniętej Kotliny. Południowy grzbiet Kotliny jest zapieczętowany, bez żadnej przełęczy, więc ta zasłona jest jedynym sposobem, by dostać się tam po raz pierwszy, i zamyka się za tobą w drodze powrotnej.\n\nGdziekolwiek polegniesz, droga powrotna jest krótka. Każda strefa ma co najmniej jeden cmentarz z Bladym Strażnikiem unoszącym się nad kamieniami, a uwolniony duch powstaje przy najbliższym z nich.\n\nMapa nie kończy się niewidzialną ścianą. Ląd wybiega w plaże i cyple, a potem w otwartą wodę. Przeprawy, które świat chce, byś przepłynął, cieśniny i rozlewiska między jedną krainą a drugą, są spokojne i bezpieczne do przekroczenia. Wypłyń zamiast tego na pełne morze, a sam dystans cię zawróci: zostaniesz ostrzeżony, i ostrzeżony ponownie, a jeśli będziesz płynąć dalej, morze będzie cię wyczerpywać, aż cię zabije. Nurkowanie ma swój własny limit, ponieważ pod powierzchnią kończy ci się oddech, więc wynurz się, by zaczerpnąć powietrza, i zawróć, gdy każe ci to woda.',
   'guide.worldPage.travelTitle': 'Podróżowanie',
   'hud.errors.mustTargetAlly': 'Musisz obrać sojusznika jako cel.',
   'hud.system.deathRecapCauterized': 'Zginąłeś. Oparzenie Kauteryzacji cię przytłoczyło.',
@@ -1230,7 +1794,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bgOffer.accept': 'Akceptuj',
   'hudChrome.bgOffer.accepted': '{accepted} z {size} gotowych',
   'hudChrome.bgOffer.acceptedWait': 'Oczekiwanie na pozostałych...',
-  'hudChrome.bgOffer.backfillBody': 'Ta bitwa już trwa. Dołączysz do drużyny, której brakuje graczy, a ten mecz nie wpłynie na twój ranking.',
+  'hudChrome.bgOffer.backfillBody':
+    'Ta bitwa już trwa. Dołączysz do drużyny, której brakuje graczy, a ten mecz nie wpłynie na twój ranking.',
   'hudChrome.bgOffer.backfillTitle': 'Pola Ciernistej Kotliny potrzebują wojownika',
   'hudChrome.bgOffer.decline': 'Odrzuć',
   'hudChrome.bgOffer.remaining': '{seconds}s na odpowiedź',
@@ -1241,10 +1806,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.playtimeParts': '{major}, {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': 'Mniej niż minuta',
   'hudChrome.charSheet.showPlaytimeAria': 'Pokaż czas gry',
-  'hudChrome.chatQuota.limitReached': 'Osiągnięto limit czatu Ogólnego. Spróbuj ponownie za {seconds}.',
+  'hudChrome.chatQuota.limitReached':
+    'Osiągnięto limit czatu Ogólnego. Spróbuj ponownie za {seconds}.',
   'hudChrome.chatQuota.pending':
     'Twoja poprzednia wiadomość na czacie Ogólnym wciąż się wysyła. Spróbuj ponownie za chwilę.',
-  'hudChrome.chatQuota.unavailable': 'Czat Ogólny jest tymczasowo niedostępny. Spróbuj ponownie wkrótce.',
+  'hudChrome.chatQuota.unavailable':
+    'Czat Ogólny jest tymczasowo niedostępny. Spróbuj ponownie wkrótce.',
   'hudChrome.comboMeter.label': 'CP',
   'hudChrome.options.showPlaytime': 'Pokaż czas gry na ekranie postaci',
   'hudChrome.perf.diagnostics.aria.findings': 'Uszeregowane ustalenia diagnostyczne',
@@ -1254,88 +1821,153 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.confidence.low': 'niska',
   'hudChrome.perf.diagnostics.confidence.medium': 'średnia',
   'hudChrome.perf.diagnostics.controls.copied': 'Skopiowano',
-  'hudChrome.perf.diagnostics.controls.copyBlocked': 'Kopiowanie zablokowane: raport zapisany w konsoli',
+  'hudChrome.perf.diagnostics.controls.copyBlocked':
+    'Kopiowanie zablokowane: raport zapisany w konsoli',
   'hudChrome.perf.diagnostics.controls.copyReport': 'Kopiuj przejrzysty raport',
   'hudChrome.perf.diagnostics.controls.downloadReport': 'Pobierz raport',
   'hudChrome.perf.diagnostics.controls.expand': 'Rozwiń',
   'hudChrome.perf.diagnostics.controls.minimize': 'Zwiń',
   'hudChrome.perf.diagnostics.controls.refreshCensus': 'Odśwież spis sceny',
   'hudChrome.perf.diagnostics.controls.reportLogged': 'Raport zapisany w konsoli',
-  'hudChrome.perf.diagnostics.controls.retestLowGraphics': 'Przetestuj ponownie przy niskiej grafice',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics':
+    'Przetestuj ponownie przy niskiej grafice',
   'hudChrome.perf.diagnostics.controls.scanAnother': 'Przeskanuj inny obszar',
   'hudChrome.perf.diagnostics.controls.scanning': 'Skanowanie...',
   'hudChrome.perf.diagnostics.controls.start': 'Rozpocznij 15-sekundowe skanowanie',
-  'hudChrome.perf.diagnostics.diagnosis.causes.cpu': 'Zmierzona faza CPU zajmuje na wątku głównym tyle czasu, że przekracza budżet klatki.',
-  'hudChrome.perf.diagnostics.diagnosis.causes.environment': 'Wykryte ustawienie przeglądarki, GPU, pamięci lub urządzenia może ograniczać wydajność, zanim gra wyrenderuje klatkę.',
-  'hudChrome.perf.diagnostics.diagnosis.causes.graphics': 'Zmierzone obciążenie grafiki przekracza aktywny budżet klatki lub sceny dla tego przechwycenia.',
-  'hudChrome.perf.diagnostics.diagnosis.causes.loading': 'Przygotowanie zasobów lub praca przy pierwszym użyciu wystąpiły na widocznej ścieżce rozgrywki lub uruchamiania.',
-  'hudChrome.perf.diagnostics.diagnosis.causes.network': 'Dostarczanie danych sieciowych lub przetwarzanie migawek po stronie klienta opóźnia najnowszy grywalny stan.',
-  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu': 'Sprofiluj wskazaną fazę, usuń powtarzającą się pracę i alokacje, zachowując zachowanie rozgrywki.',
-  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment': 'Utrzymaj wykrytą ścieżkę zapasową w granicach wspólnych budżetów grafiki i pamięci.',
-  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics': 'Wykorzystaj istniejący budżet renderowania, instancjonowanie, współdzielenie materiałów, LOD i pomijanie ukrytej pracy.',
-  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading': 'Wstępnie załaduj, umieść w puli lub rozłóż zidentyfikowaną pracę pierwszego użycia w ramach istniejących budżetów uruchamiania i strumieniowania.',
-  'hudChrome.perf.diagnostics.diagnosis.codeFix.network': 'Zmniejsz koszt dostarczania lub przetwarzania migawek bez osłabiania modelu autorytatywnego serwera.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.assets': 'Brama wstępnego ładowania czekała {wait} na {tasks} zarejestrowanych zadań.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded': 'Odśwież spis sceny, aby zidentyfikować dominującą kategorię renderowania.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase': 'Zmierzona faza {phase} ma p95 równe {p95}.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.environment': 'Reguła środowiska {rule} pasuje do tego urządzenia i przeglądarki.',
+  'hudChrome.perf.diagnostics.diagnosis.causes.cpu':
+    'Zmierzona faza CPU zajmuje na wątku głównym tyle czasu, że przekracza budżet klatki.',
+  'hudChrome.perf.diagnostics.diagnosis.causes.environment':
+    'Wykryte ustawienie przeglądarki, GPU, pamięci lub urządzenia może ograniczać wydajność, zanim gra wyrenderuje klatkę.',
+  'hudChrome.perf.diagnostics.diagnosis.causes.graphics':
+    'Zmierzone obciążenie grafiki przekracza aktywny budżet klatki lub sceny dla tego przechwycenia.',
+  'hudChrome.perf.diagnostics.diagnosis.causes.loading':
+    'Przygotowanie zasobów lub praca przy pierwszym użyciu wystąpiły na widocznej ścieżce rozgrywki lub uruchamiania.',
+  'hudChrome.perf.diagnostics.diagnosis.causes.network':
+    'Dostarczanie danych sieciowych lub przetwarzanie migawek po stronie klienta opóźnia najnowszy grywalny stan.',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu':
+    'Sprofiluj wskazaną fazę, usuń powtarzającą się pracę i alokacje, zachowując zachowanie rozgrywki.',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment':
+    'Utrzymaj wykrytą ścieżkę zapasową w granicach wspólnych budżetów grafiki i pamięci.',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics':
+    'Wykorzystaj istniejący budżet renderowania, instancjonowanie, współdzielenie materiałów, LOD i pomijanie ukrytej pracy.',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading':
+    'Wstępnie załaduj, umieść w puli lub rozłóż zidentyfikowaną pracę pierwszego użycia w ramach istniejących budżetów uruchamiania i strumieniowania.',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.network':
+    'Zmniejsz koszt dostarczania lub przetwarzania migawek bez osłabiania modelu autorytatywnego serwera.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.assets':
+    'Brama wstępnego ładowania czekała {wait} na {tasks} zarejestrowanych zadań.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded':
+    'Odśwież spis sceny, aby zidentyfikować dominującą kategorię renderowania.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase':
+    'Zmierzona faza {phase} ma p95 równe {p95}.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.environment':
+    'Reguła środowiska {rule} pasuje do tego urządzenia i przeglądarki.',
   'hudChrome.perf.diagnostics.diagnosis.evidence.failedAssets': 'Nieudane grupy zasobów: {groups}.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.frame': 'Ostatnie okno pomiarowe wykazało {fps} FPS przy p95 klatki {p95}.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.generic': 'Reguła diagnostyczna {rule} pasuje do tego przechwycenia.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit': 'p95 przesyłania WebGL wynosi {submit}, czyli {share} p95 renderera.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch': '{count} z {total} zarejestrowanych zacięć pasuje do przyczyny {cause}.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks': 'Zmierzono {count} długich zadań, z p95 {p95} i maksimum {max}.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.network': 'Odstęp między migawkami wynosi {interval}, wiek najnowszej to {age}, a p95 echa wejścia wynosi {echo}.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls': 'Scena wykorzystuje {calls} wywołań rysowania przy celu {target}.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory': 'Kategoria sceny {category} odpowiada za {calls} wywołań i {triangles} zmierzonych trójkątów.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles': 'Scena przesyła {triangles} trójkątów przy celu {target}.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow': 'Przebieg cieni przesyła {calls} wywołań, {share} wartości bazowej, oraz {triangles} trójkątów.',
-  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot': 'p95 parsowania i stosowania migawek wynosi {work}; p95 przerwy sieciowej wynosi {gap}.',
-  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle': 'Nie wykryto istotnego problemu z wydajnością',
-  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one': '{findings} ustalenie wymagające działania z ostatnich 10 sekund przy {fps} FPS i p95 klatki {p95}.',
-  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other': '{findings} ustaleń wymagających działania z ostatnich 10 sekund przy {fps} FPS i p95 klatki {p95}.',
-  'hudChrome.perf.diagnostics.diagnosis.summary.healthy': 'Ostatnie 10 sekund utrzymało {fps} FPS przy p95 klatki {p95}. Żaden próg gry, przeglądarki, GPU, pamięci, zasobów ani sieci nie został przekroczony.',
-  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': 'Uruchamianie gry jest opóźniane przez pracę nad zasobami',
-  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls': 'Wykryto zacięcia przeglądarki lub rozszerzenia',
-  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss': 'Kontekst graficzny został zresetowany',
-  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': 'Przetwarzanie zdarzeń pochłania czas klatki',
-  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics': 'Wymuszona wysoka grafika obniża wydajność',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.frame':
+    'Ostatnie okno pomiarowe wykazało {fps} FPS przy p95 klatki {p95}.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.generic':
+    'Reguła diagnostyczna {rule} pasuje do tego przechwycenia.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit':
+    'p95 przesyłania WebGL wynosi {submit}, czyli {share} p95 renderera.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch':
+    '{count} z {total} zarejestrowanych zacięć pasuje do przyczyny {cause}.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks':
+    'Zmierzono {count} długich zadań, z p95 {p95} i maksimum {max}.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.network':
+    'Odstęp między migawkami wynosi {interval}, wiek najnowszej to {age}, a p95 echa wejścia wynosi {echo}.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls':
+    'Scena wykorzystuje {calls} wywołań rysowania przy celu {target}.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory':
+    'Kategoria sceny {category} odpowiada za {calls} wywołań i {triangles} zmierzonych trójkątów.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles':
+    'Scena przesyła {triangles} trójkątów przy celu {target}.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow':
+    'Przebieg cieni przesyła {calls} wywołań, {share} wartości bazowej, oraz {triangles} trójkątów.',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot':
+    'p95 parsowania i stosowania migawek wynosi {work}; p95 przerwy sieciowej wynosi {gap}.',
+  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle':
+    'Nie wykryto istotnego problemu z wydajnością',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one':
+    '{findings} ustalenie wymagające działania z ostatnich 10 sekund przy {fps} FPS i p95 klatki {p95}.',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other':
+    '{findings} ustaleń wymagających działania z ostatnich 10 sekund przy {fps} FPS i p95 klatki {p95}.',
+  'hudChrome.perf.diagnostics.diagnosis.summary.healthy':
+    'Ostatnie 10 sekund utrzymało {fps} FPS przy p95 klatki {p95}. Żaden próg gry, przeglądarki, GPU, pamięci, zasobów ani sieci nie został przekroczony.',
+  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup':
+    'Uruchamianie gry jest opóźniane przez pracę nad zasobami',
+  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls':
+    'Wykryto zacięcia przeglądarki lub rozszerzenia',
+  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss':
+    'Kontekst graficzny został zresetowany',
+  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu':
+    'Przetwarzanie zdarzeń pochłania czas klatki',
+  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics':
+    'Wymuszona wysoka grafika obniża wydajność',
   'hudChrome.perf.diagnostics.diagnosis.titles.generic': 'Reguła wydajności {rule} wymaga uwagi',
-  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit': 'Przesyłanie do GPU jest głównym wąskim gardłem klatki',
-  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration': 'Renderowanie programowe jest aktywne',
-  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure': 'Wykryto presję na pamięć przeglądarki',
-  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi': 'Renderowanie w wysokiej rozdzielczości jest tu kosztowne',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit':
+    'Przesyłanie do GPU jest głównym wąskim gardłem klatki',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration':
+    'Renderowanie programowe jest aktywne',
+  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure':
+    'Wykryto presję na pamięć przeglądarki',
+  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi':
+    'Renderowanie w wysokiej rozdzielczości jest tu kosztowne',
   'hudChrome.perf.diagnostics.diagnosis.titles.hudCpu': 'Aktualizacje HUD pochłaniają czas klatki',
-  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu': 'Gra korzysta ze zintegrowanego układu graficznego',
-  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': 'Długie zadania przeglądarki blokują klatki',
+  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu':
+    'Gra korzysta ze zintegrowanego układu graficznego',
+  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks':
+    'Długie zadania przeglądarki blokują klatki',
   'hudChrome.perf.diagnostics.diagnosis.titles.lowMemory': 'Dostępna pamięć urządzenia jest niska',
-  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency': 'Dostarczanie danych sieciowych opóźnia widoczną reakcję',
-  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': 'Pozostają niezidentyfikowane długie klatki',
-  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities': 'Aktualizacje widoków jednostek są ograniczone przez CPU',
-  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates': 'Rysowanie plakietek jest kosztowne',
-  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld': 'Aktualizacje renderera świata są ograniczone przez CPU',
-  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw': 'Koszt rysowania sceny przekracza aktywny budżet grafiki',
-  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': 'Shadery kompilują się podczas rozgrywki',
-  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass': 'Przebieg cieni zajmuje dużą część wywołań rysowania',
+  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency':
+    'Dostarczanie danych sieciowych opóźnia widoczną reakcję',
+  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch':
+    'Pozostają niezidentyfikowane długie klatki',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities':
+    'Aktualizacje widoków jednostek są ograniczone przez CPU',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates':
+    'Rysowanie plakietek jest kosztowne',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld':
+    'Aktualizacje renderera świata są ograniczone przez CPU',
+  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw':
+    'Koszt rysowania sceny przekracza aktywny budżet grafiki',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile':
+    'Shadery kompilują się podczas rozgrywki',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass':
+    'Przebieg cieni zajmuje dużą część wywołań rysowania',
   'hudChrome.perf.diagnostics.diagnosis.titles.simCpu': 'Praca symulacji pochłania czas klatki',
-  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply': 'Przetwarzanie migawek blokuje klienta',
-  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': 'Przesyłanie tekstur powoduje zacięcia rozgrywki',
-  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': 'Tworzenie widoków jednostek powoduje zacięcia',
-  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu': 'Powtórz skanowanie w bezruchu i podczas ruchu, aby wyodrębnić fazę CPU.',
-  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment': 'Popraw wykryte ustawienie środowiska, uruchom ponownie i powtórz to samo skanowanie.',
-  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics': 'Przetestuj ponownie tę samą trasę kamery przy niskiej grafice, aby potwierdzić obciążenie grafiki.',
-  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading': 'Powtórz tę samą trasę lub czynność pierwszego użycia, aby potwierdzić, kiedy występuje zacięcie.',
-  'hudChrome.perf.diagnostics.diagnosis.tryNow.network': 'Porównaj tryb Graj offline, używając tej samej trasy ruchu i kamery.',
+  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply':
+    'Przetwarzanie migawek blokuje klienta',
+  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload':
+    'Przesyłanie tekstur powoduje zacięcia rozgrywki',
+  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate':
+    'Tworzenie widoków jednostek powoduje zacięcia',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu':
+    'Powtórz skanowanie w bezruchu i podczas ruchu, aby wyodrębnić fazę CPU.',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment':
+    'Popraw wykryte ustawienie środowiska, uruchom ponownie i powtórz to samo skanowanie.',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics':
+    'Przetestuj ponownie tę samą trasę kamery przy niskiej grafice, aby potwierdzić obciążenie grafiki.',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading':
+    'Powtórz tę samą trasę lub czynność pierwszego użycia, aby potwierdzić, kiedy występuje zacięcie.',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.network':
+    'Porównaj tryb Graj offline, używając tej samej trasy ruchu i kamery.',
   'hudChrome.perf.diagnostics.findingMeta': '{severity} | {confidence} pewność',
-  'hudChrome.perf.diagnostics.healthyNoFindings': 'Nie przekroczono żadnego progu wymagającego działania. Jeśli krótkie zacięcie nadal ci przeszkadza, powtórz skanowanie dokładnie na tej trasie ruchu, która je wywołuje.',
-  'hudChrome.perf.diagnostics.instruction': 'Aby uzyskać najlepszy sygnał, wejdź w tryb Graj offline, przejdź przez wolno działający obszar, obróć kamerę i wywołaj efekt, który się zacina, podczas gdy skanowanie trwa.',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    'Nie przekroczono żadnego progu wymagającego działania. Jeśli krótkie zacięcie nadal ci przeszkadza, powtórz skanowanie dokładnie na tej trasie ruchu, która je wywołuje.',
+  'hudChrome.perf.diagnostics.instruction':
+    'Aby uzyskać najlepszy sygnał, wejdź w tryb Graj offline, przejdź przez wolno działający obszar, obróć kamerę i wywołaj efekt, który się zacina, podczas gdy skanowanie trwa.',
   'hudChrome.perf.diagnostics.metrics.gpu': 'GPU: {renderer}',
-  'hudChrome.perf.diagnostics.metrics.hitches': 'zacięcia: {hitches} | shadery: {shaders} | przesłania: {uploads} | widoki: {views}',
-  'hudChrome.perf.diagnostics.metrics.recent': 'ostatnio: {fps} FPS | p95: {p95} ms | >50 ms: {longFrames}',
-  'hudChrome.perf.diagnostics.metrics.render': 'render: przesył {submit} ms | świat {world} ms | jednostki {entities} ms',
-  'hudChrome.perf.diagnostics.metrics.scene': 'scena: {calls} wywołań | {triangles} trójkątów | {views} widoków',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    'zacięcia: {hitches} | shadery: {shaders} | przesłania: {uploads} | widoki: {views}',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    'ostatnio: {fps} FPS | p95: {p95} ms | >50 ms: {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    'render: przesył {submit} ms | świat {world} ms | jednostki {entities} ms',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    'scena: {calls} wywołań | {triangles} trójkątów | {views} widoków',
   'hudChrome.perf.diagnostics.metrics.waitingCensus': 'spis sceny: oczekiwanie',
-  'hudChrome.perf.diagnostics.metrics.waitingHitch': 'przypisanie zacięć: aktywowane po wejściu do świata',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch':
+    'przypisanie zacięć: aktywowane po wejściu do świata',
   'hudChrome.perf.diagnostics.metrics.waitingRenderer': 'renderer: oczekiwanie',
   'hudChrome.perf.diagnostics.metrics.waitingValue': 'oczekiwanie',
   'hudChrome.perf.diagnostics.panelAria': 'Diagnostyka wydajności World of ClaudeCraft',
@@ -1344,10 +1976,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.findingMeta': 'Ważność: {severity}. Pewność: {confidence}.',
   'hudChrome.perf.diagnostics.report.gpuLine': 'GPU: {gpu}',
   'hudChrome.perf.diagnostics.report.graphicsLine': 'Grafika: {tier}, skala renderowania {scale}',
-  'hudChrome.perf.diagnostics.report.noThreshold': 'W tym przechwyceniu nie przekroczono żadnego progu wymagającego działania.',
+  'hudChrome.perf.diagnostics.report.noThreshold':
+    'W tym przechwyceniu nie przekroczono żadnego progu wymagającego działania.',
   'hudChrome.perf.diagnostics.report.notAvailable': 'niedostępne',
   'hudChrome.perf.diagnostics.report.rawSnapshotHeading': 'Surowa migawka',
-  'hudChrome.perf.diagnostics.report.recentLine': 'Ostatnio: {fps} FPS, p95 {p95}, {longFrames} klatek powyżej 50 ms, {frames} zmierzonych klatek',
+  'hudChrome.perf.diagnostics.report.recentLine':
+    'Ostatnio: {fps} FPS, p95 {p95}, {longFrames} klatek powyżej 50 ms, {frames} zmierzonych klatek',
   'hudChrome.perf.diagnostics.report.resultHeading': 'Wynik',
   'hudChrome.perf.diagnostics.report.status.critical': 'krytyczny',
   'hudChrome.perf.diagnostics.report.status.healthy': 'dobry',
@@ -1364,17 +1998,28 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.severity.critical': 'KRYTYCZNE',
   'hudChrome.perf.diagnostics.severity.info': 'INFORMACJA',
   'hudChrome.perf.diagnostics.severity.warning': 'OSTRZEŻENIE',
-  'hudChrome.perf.diagnostics.status.collectingNow': 'Zbieranie danych z aktywnej rozgrywki: przejdź teraz przez problematyczny obszar.',
-  'hudChrome.perf.diagnostics.status.collectingRemaining.one': 'Zbieranie danych z aktywnej rozgrywki: pozostała {seconds} sekunda',
-  'hudChrome.perf.diagnostics.status.collectingRemaining.other': 'Zbieranie danych z aktywnej rozgrywki: pozostało {seconds} sekund',
-  'hudChrome.perf.diagnostics.status.pausedHiddenContinue': 'Skanowanie wstrzymane, dopóki ta karta jest ukryta. Wróć do gry, aby kontynuować.',
-  'hudChrome.perf.diagnostics.status.pausedHiddenRestart': 'Skanowanie wstrzymane, dopóki ta karta jest ukryta. Zostanie wznowione od nowa po powrocie.',
-  'hudChrome.perf.diagnostics.status.ready': 'Gotowe do skanowania. Naciśnij Start i odtwórz spowolnienie.',
-  'hudChrome.perf.diagnostics.status.restoredRestart': 'Karta przywrócona. Rozpoczynanie od nowa czystego 15-sekundowego przechwycenia aktywnej rozgrywki.',
-  'hudChrome.perf.diagnostics.status.waitingFrames': 'Oczekiwanie na reprezentatywne klatki rozgrywki: {current}/{minimum}',
-  'hudChrome.perf.diagnostics.status.waitingWorld': 'Oczekiwanie na świat gry. Wybierz Graj offline lub wejdź postacią online.',
-  'hudChrome.perf.diagnostics.status.worldLoaded': 'Świat załadowany. Oczekiwanie na pierwszą grywalną klatkę.',
-  'hudChrome.perf.diagnostics.subtitle': 'Skanowanie dopasowane do gry, z dowodami i poprawkami na poziomie kodu.',
+  'hudChrome.perf.diagnostics.status.collectingNow':
+    'Zbieranie danych z aktywnej rozgrywki: przejdź teraz przez problematyczny obszar.',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    'Zbieranie danych z aktywnej rozgrywki: pozostała {seconds} sekunda',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    'Zbieranie danych z aktywnej rozgrywki: pozostało {seconds} sekund',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    'Skanowanie wstrzymane, dopóki ta karta jest ukryta. Wróć do gry, aby kontynuować.',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    'Skanowanie wstrzymane, dopóki ta karta jest ukryta. Zostanie wznowione od nowa po powrocie.',
+  'hudChrome.perf.diagnostics.status.ready':
+    'Gotowe do skanowania. Naciśnij Start i odtwórz spowolnienie.',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    'Karta przywrócona. Rozpoczynanie od nowa czystego 15-sekundowego przechwycenia aktywnej rozgrywki.',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    'Oczekiwanie na reprezentatywne klatki rozgrywki: {current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    'Oczekiwanie na świat gry. Wybierz Graj offline lub wejdź postacią online.',
+  'hudChrome.perf.diagnostics.status.worldLoaded':
+    'Świat załadowany. Oczekiwanie na pierwszą grywalną klatkę.',
+  'hudChrome.perf.diagnostics.subtitle':
+    'Skanowanie dopasowane do gry, z dowodami i poprawkami na poziomie kodu.',
   'hudChrome.perf.diagnostics.title': 'ClaudeCraft: Doktor Wydajności',
   'hudChrome.plurals.playtimeDays.few': '{count} dni',
   'hudChrome.plurals.playtimeDays.many': '{count} dni',
@@ -1391,14 +2036,18 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.craftingProgress': 'Wytwarzasz: pozostało {remaining}s z {total}s.',
   'hudChrome.professions.disenchantingProgress': 'Rozbrajasz: pozostało {remaining}s z {total}s.',
   'hudChrome.professions.enchantingProgress': 'Zaklinasz: pozostało {remaining}s z {total}s.',
-  'hudChrome.professions.rechargingToolEffectProgress': 'Ładujesz efekt narzędzia: pozostało {remaining}s z {total}s.',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    'Ładujesz efekt narzędzia: pozostało {remaining}s z {total}s.',
   'hudChrome.professions.salvagingProgress': 'Odzyskujesz: pozostało {remaining}s z {total}s.',
-  'hudChrome.talents.gearCopyGone': '{n} zapisanych części nie było kopią przypiętą do tego builda.',
+  'hudChrome.talents.gearCopyGone':
+    '{n} zapisanych części nie było kopią przypiętą do tego builda.',
   'hudChrome.talents.gearNotHeld': 'Nie masz już {n} zapisanych części tego builda.',
   'hudChrome.talents.gearRestored': 'Przywrócono {n} części ekwipunku z tego builda.',
-  'hudChrome.talents.gearTakenByOtherSlot': '{n} zapisanych części wymaga innej kopii, której nie posiadasz.',
+  'hudChrome.talents.gearTakenByOtherSlot':
+    '{n} zapisanych części wymaga innej kopii, której nie posiadasz.',
   'hudChrome.talents.newBuildWithGear': 'Nowy build (zapisz też ekwipunek)',
-  'hudChrome.wiki.confirmBody': 'To otwiera wiki World of ClaudeCraft w twojej przeglądarce. Gra nadal działa w tle.',
+  'hudChrome.wiki.confirmBody':
+    'To otwiera wiki World of ClaudeCraft w twojej przeglądarce. Gra nadal działa w tle.',
   'hudChrome.wiki.confirmCancel': 'Anuluj',
   'hudChrome.wiki.confirmOpen': 'Otwórz Wiki',
   'hudChrome.wiki.confirmTitle': 'Otworzyć Wiki?',
@@ -1543,24 +2192,34 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Styl',
   'editor.status.campCapReached': 'Osiągnięto limit obozów ({max}). Nowy obóz nie został dodany.',
   'entities.itemSets.warfare_ashstalker.bonus2': 'Zwiększa Obronę wojenną o 40.',
-  'entities.itemSets.warfare_ashstalker.bonus4': 'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
-  'entities.itemSets.warfare_ashstalker.bonus7': 'Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Popielny Krok, który zwiększa szybkość ruchu o 40% na 6 s.',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    'Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Popielny Krok, który zwiększa szybkość ruchu o 40% na 6 s.',
   'entities.itemSets.warfare_ashstalker.name': 'Zestaw Ashstalker',
   'entities.itemSets.warfare_cinderweave.bonus2': 'Zwiększa Obronę wojenną o 40.',
-  'entities.itemSets.warfare_cinderweave.bonus4': 'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
-  'entities.itemSets.warfare_cinderweave.bonus7': 'Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Żarową Straż, która pochłania 120 obrażeń przez 8 s.',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    'Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Żarową Straż, która pochłania 120 obrażeń przez 8 s.',
   'entities.itemSets.warfare_cinderweave.name': 'Regalia Cinderweave',
   'entities.itemSets.warfare_furyforged.bonus2': 'Zwiększa Obronę wojenną o 40.',
-  'entities.itemSets.warfare_furyforged.bonus4': 'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
-  'entities.itemSets.warfare_furyforged.bonus7': 'Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Niezłomną Przysięgę, która pochłania 200 obrażeń przez 10 s.',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    'Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Niezłomną Przysięgę, która pochłania 200 obrażeń przez 10 s.',
   'entities.itemSets.warfare_furyforged.name': 'Rynsztunek bojowy Furyforged',
   'entities.itemSets.warfare_stormbound.bonus2': 'Zwiększa Obronę wojenną o 40.',
-  'entities.itemSets.warfare_stormbound.bonus4': 'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
-  'entities.itemSets.warfare_stormbound.bonus7': 'Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Żarową Straż, która pochłania 120 obrażeń przez 8 s.',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    'Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Żarową Straż, która pochłania 120 obrażeń przez 8 s.',
   'entities.itemSets.warfare_stormbound.name': 'Szaty Stormbound',
   'entities.itemSets.warfare_thornhide.bonus2': 'Zwiększa Obronę wojenną o 40.',
-  'entities.itemSets.warfare_thornhide.bonus4': 'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
-  'entities.itemSets.warfare_thornhide.bonus7': 'Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Cierniową Straż, która zwiększa unik o 15% na 6 s.',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    'Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Cierniową Straż, która zwiększa unik o 15% na 6 s.',
   'entities.itemSets.warfare_thornhide.name': 'Strój Thornhide',
   'entities.items.curved_tusk.name': 'Zakrzywiony Kieł',
   'entities.items.pristine_claw.name': 'Nieskazitelny Pazur',
@@ -1600,7 +2259,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceSkill25': 'Przepisy do umiejętności 25: {seconds} s rzucania',
   'guide.profPages.econ.castPaceSkill50': 'Przepisy do umiejętności 50: {seconds} s rzucania',
   'guide.profPages.econ.castPaceSkill75': 'Przepisy do umiejętności 75: {seconds} s rzucania',
-  'guide.profPages.fish.earlyReelNote': 'Jedno ostrzeżenie dla niecierpliwych kciuków: naciśnij wędkę ponownie, zanim cokolwiek weźmie, a wyciągniesz pustą żyłkę i zakończysz zarzut. Pierwsza sekunda po opadnięciu żyłki jest wybaczana, więc przypadkowe podwójne naciśnięcie nic cię nie kosztuje; potem zbyt wczesne naciśnięcie to zmarnowany zarzut. Cierpliwość to cała gra: poczekaj na branie, a potem zacinaj.',
+  'guide.profPages.fish.earlyReelNote':
+    'Jedno ostrzeżenie dla niecierpliwych kciuków: naciśnij wędkę ponownie, zanim cokolwiek weźmie, a wyciągniesz pustą żyłkę i zakończysz zarzut. Pierwsza sekunda po opadnięciu żyłki jest wybaczana, więc przypadkowe podwójne naciśnięcie nic cię nie kosztuje; potem zbyt wczesne naciśnięcie to zmarnowany zarzut. Cierpliwość to cała gra: poczekaj na branie, a potem zacinaj.',
   'guide.thornhollowPage.carrierBody':
     'Niosący, który zbyt długo trzyma wrogą flagę, staje się coraz bardziej podatny, otrzymując narastające obrażenia, aż flaga zostanie przechwycona, upuszczona lub zwrócona. Ukrywanie się z flagą to plan skazany na porażkę; zaniesienie jej do domu to ten zwycięski.',
   'guide.thornhollowPage.carrierHeading': 'Niesienie flagi',
@@ -1613,11 +2273,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.heading': 'Pola Ciernistej Kotliny',
   'guide.thornhollowPage.intro':
     'Rankingowa bitwa 5 na 5 o przechwycenie flagi, stoczona w otoczonej murem kotlinie w starodrzewiu poniżej Ciernistego Szczytu, gdzie dwie zrujnowane twierdze stają naprzeciw siebie na długości wąwozu, a między nimi leży starszy dziedziniec, którego żadna z nich nigdy nie zdobyła. Dwie drużyny po pięciu, dwie twierdze, jeden cel: ukraść wrogi sztandar i zanieść go do domu, zanim oni zaniosą wasz.',
-  'guide.thornhollowPage.ladderBody': 'Każdy pojedynek porusza trwały ranking pola bitwy przypisany do postaci, przy wygranej i przy przegranej, a tabela wszech czasów szereguje czempionów królestwa.',
+  'guide.thornhollowPage.ladderBody':
+    'Każdy pojedynek porusza trwały ranking pola bitwy przypisany do postaci, przy wygranej i przy przegranej, a tabela wszech czasów szereguje czempionów królestwa.',
   'guide.thornhollowPage.ladderHeading': 'Drabinka rankingowa',
   'guide.thornhollowPage.pickupNote':
     'Podniesienie flagi to zawsze celowe naciśnięcie klawisza akcji pola bitwy: nikt nigdy nie staje się niosącym, po prostu przemykając przez niewłaściwe miejsce.',
-  'guide.thornhollowPage.queueBody': 'Pola Ciernistej Kotliny otwierają się na 20. poziomie i każdy członek drużyny musi go osiągnąć, zanim drużyna będzie mogła się zgłosić. Otwórz przycisk PvP i wybierz zakładkę Pola Ciernistej Kotliny, czyli tę, na której się otwiera, a potem wejdź do kolejki sam albo przyprowadź drużynę do pięciu osób i zgłoście się razem: drużyny zawsze trzymane są w jednej ekipie, a pozostałe miejsca zapełniają samotni czempioni. Gdy dziesięciu jest gotowych, pojedynek sadza obie ekipy przy ich twierdzach na krótką zbiórkę, zanim flagi ruszą. Gdyby drużyna czterech albo pięciu miała inaczej stanąć naprzeciw samych zgłoszonych solo, dobieranie przytrzyma pojedynek na moment, by sprawdzić, czy pojawi się druga drużyna, więc drużyna tej wielkości czasem czeka kilka chwil dłużej, zanim bramy się otworzą. To czekanie jest krótkie i zawsze w końcu ustępuje, więc nikt przez nie nie utknie w kolejce.',
+  'guide.thornhollowPage.queueBody':
+    'Pola Ciernistej Kotliny otwierają się na 20. poziomie i każdy członek drużyny musi go osiągnąć, zanim drużyna będzie mogła się zgłosić. Otwórz przycisk PvP i wybierz zakładkę Pola Ciernistej Kotliny, czyli tę, na której się otwiera, a potem wejdź do kolejki sam albo przyprowadź drużynę do pięciu osób i zgłoście się razem: drużyny zawsze trzymane są w jednej ekipie, a pozostałe miejsca zapełniają samotni czempioni. Gdy dziesięciu jest gotowych, pojedynek sadza obie ekipy przy ich twierdzach na krótką zbiórkę, zanim flagi ruszą. Gdyby drużyna czterech albo pięciu miała inaczej stanąć naprzeciw samych zgłoszonych solo, dobieranie przytrzyma pojedynek na moment, by sprawdzić, czy pojawi się druga drużyna, więc drużyna tej wielkości czasem czeka kilka chwil dłużej, zanim bramy się otworzą. To czekanie jest krótkie i zawsze w końcu ustępuje, więc nikt przez nie nie utknie w kolejce.',
   'guide.thornhollowPage.queueHeading': 'Dołączanie do kolejki',
   'guide.thornhollowPage.respawnBody':
     'Śmierć zachowuje klasyczny rytuał: twoje zwłoki leżą tam, gdzie padły, dopóki TY się nie uwolnisz, a duch powstaje na ogrodzonym cmentarzu obok twojej twierdzy, chroniony tam do następnej fali odrodzenia twojej drużyny. Fala wskrzesza razem każdego czekającego ducha, a obie fale drużyn są celowo przesunięte w czasie, więc walka nigdy nie resetuje się w całości naraz. Nie ma biegu do zwłok ani targu z Uzdrowicielem Duchów: uwolnij się, przeczekaj falę, walcz.',
@@ -1838,7 +2500,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Zaczyna z {base} ładunkami na pospolitym narzędziu (+{bonus} za każdy stopień rzadkości).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Osadź na narzędziu górniczym, drwalskim lub zielarskim w oknie Profesji. Zużywa się przy osadzeniu.',
+    'Osadź na narzędziu górniczym, drwalskim, zielarskim lub rolniczym w oknie Profesji. Zużywa się przy osadzeniu.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Talizman narzędzia',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Nie osadza się na wędkach.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1876,9 +2538,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Kupujący: {buyer}',
   'itemUi.market.saleOlder': 'Plus {count} wcześniejszych sprzedaży, wliczonych w sumę.',
   'itemUi.tooltip.maxStack': 'Maks. stos: {count}',
-  'itemUi.tooltip.useElixir':
-    'Użycie: zwiększa twoje {stat} o {value} na {minutes} min. Można użyć w walce.',
-  'itemUi.tooltip.useElixirAura': 'Użycie: nadaje {aura} na {minutes} min. Można użyć w walce.',
   'hud.system.deathRecapAbility': 'Zginąłeś. Zabity przez {ability}.',
   'hud.system.deathRecapDrowned': 'Zginąłeś. Utonąłeś.',
   'hud.system.deathRecapFalling': 'Zginąłeś. Spadłeś na śmierć.',
@@ -1889,7 +2548,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Brak przedmiotów zadań w twoich torbach.',
   'hudChrome.bank.cannotDepositNow': 'Nie można teraz zdeponować',
   'hudChrome.bank.depositAllTooltip':
-    'Wysyła każdy reagent rzemieślniczy i przedmiot tandetny z twoich toreb do banku za jednym razem. Narzędzia do zbieractwa, założony ekwipunek, przedmioty zadań i przedmioty konsumpcyjne nigdy nie są ruszane.',
+    'Wysyła każdy materiał rzemieślniczy (wszystko, co w opisie ma „Materiał” lub „Wyborny materiał”) z twoich toreb do banku za jednym razem. Cała reszta zostaje w torbach, w tym narzędzia do zbieractwa, przedmioty zadań, przedmioty konsumpcyjne i szare przedmioty.',
   'hudChrome.bank.guildBuyConfirm':
     'Kupić {count} dodatkowych miejsc w banku gildii za {price} ze skarbca gildii?',
   'hudChrome.bank.guildBuyNote': 'Opłacone ze skarbca gildii',
@@ -2088,24 +2747,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'apiError.seeker.current_ownership_required': 'Musisz obecnie posiadać Seeker Genesis Token.',
   'guide.professions.archetypeSwitchBody':
     'Deklaracja to też nie wyrok dożywocia. Para, której nigdy nie miałeś, to po prostu świeże zadanie dostrojenia, natomiast powrót do pary, którą porzuciłeś, wymaga od ciebie najpierw zadośćuczynienia: pięć zadań pojednania za pierwszym razem i trzy kolejne doliczane za każdy powrót, którego już dokonałeś (podjęcie zupełnie nowej pary nigdy nie podnosi tej liczby). Wybór pozostaje znaczący, nie zamykając na zawsze żadnych drzwi.',
-  'guide.professions.whatBody':
-    'Profesje to robocze życie świata: cztery fachy zbierackie, które wyciągają surowiec prosto z ziemi, i pierścień dziesięciu rzemiosł, które zamieniają go w ekwipunek, posiłki, mikstury i narzędzia. Tutaj wszystko karmi coś innego. Ruda, którą wydobywasz, staje się ostrzem, ostrze przyjmuje zaklęcie, a zaklęcie potrzebuje pyłu wyłuskanego ze starego ekwipunku, więc zbieracz, rzemieślnik i majsterkowicz to ogniwa jednego łańcucha.\n\nNie ma limitu profesji, nad którym trzeba by się zamartwiać. Każda postać może rozwijać siedem z ośmiu rzemiosł mających dziś zawartość oraz wszystkie cztery profesje zbierackie równolegle (Inżynieria jest jedynym wyjątkiem: wszystkie jej przepisy zaczynają się powyżej darmowego sufitu, więc jej drabinka czeka na przysięgę Bombardiera); jedynym wyborem na wyłączność jest twój archetyp, tożsamość, której ostatecznie przysięgasz, choć po dostrojeniu rzemiosła, które zapadają za nim w uśpienie, wspinają się już tylko na swoich pospolitych przepisach, a powyżej umiejętności 75 wcale. Umiejętność nigdy nie spada, a nic, czego się nauczysz, nie zostaje ci nigdy odebrane.',
   'guide.professions.archetypesBody':
-    'Dziesięć rzemiosł siedzi na stałym kole, a geografia tego koła ma znaczenie. Każda dwójka sąsiadów tworzy nazwaną parę: Kowal dla Wytwarzania Broni i Wytwarzania Pancerzy, Krawiec-Wytwórca dla Garbarstwa i Krawiectwa, Aptekarz dla Alchemii i Gotowania, Bombardier dla Inżynierii i Alchemii, oraz sześć kolejnych dookoła pierścienia.\n\nDostrojenie do pary to zadanie, a nie kliknięcie w menu. Dziś można przystąpić do czterech par (Kowal, Krawiec-Wytwórca, Aptekarz i Bombardier), a każdą kotwiczy rezydujący mistrz w Eastbrook, którego zadanie przyjęcia przedstawia całą umowę wprost, zanim ją podejmiesz. Dopóki się nie zadeklarujesz, każde rzemiosło rozwija się swobodnie na przepisach aż po rzadki poziom (dowolny przepis wymagający umiejętności 74 lub mniej), więc możesz spróbować niemal wszystkiego, zanim wybierzesz (jedynie Inżynieria nie ma przepisu tak nisko, więc jej liczba czeka).\n\nGdy już się dostroisz, dwa rzemiosła twojej pary stają się twoimi kierunkami głównymi, bez żadnego sufitu poza pułapem. Reszta koła nie gaśnie: jedno rzemiosło naprzeciw twoich kierunków głównych zostaje jako zajęcie dodatkowe, które wspina się dalej przez rzadki poziom (powtarzalne zadanie przy kuźni Kowala Haldrena pozwala zmienić, które to), a każde inne rzemiosło zapada w uśpienie. Uśpione rzemiosło zachowuje swoją umiejętność i swoje pospolite przepisy, które uczą go dalej na normalnej krzywej, dopóki nie zszarzeją przy 75; wszystko powyżej pospolitego przestaje płacić od razu, a uśpione rzemiosło, dopóki odpoczywa, nigdy nie wydaje arcydzieła.',
+    'Dziesięć rzemiosł siedzi na stałym kole, a geografia tego koła ma znaczenie. Każda dwójka sąsiadów tworzy nazwaną parę: Kowal dla Wytwarzania Broni i Wytwarzania Pancerzy, Krawiec-Wytwórca dla Garbarstwa i Krawiectwa, Aptekarz dla Alchemii i Gotowania, Bombardier dla Inżynierii i Alchemii, oraz sześć kolejnych dookoła pierścienia.\n\nDostrojenie do pary to zadanie, a nie kliknięcie w menu. Dziś można przystąpić do czterech par (Kowal, Krawiec-Wytwórca, Aptekarz i Bombardier), a każdą kotwiczy rezydujący mistrz w Eastbrook, którego zadanie przyjęcia przedstawia całą umowę wprost, zanim ją podejmiesz. Dopóki się nie zadeklarujesz, każde rzemiosło rozwija się swobodnie na przepisach aż po rzadki poziom (dowolny przepis wymagający umiejętności 74 lub mniej), więc możesz spróbować wszystkiego, zanim wybierzesz.\n\nGdy już się dostroisz, dwa rzemiosła twojej pary stają się twoimi kierunkami głównymi, bez żadnego sufitu poza pułapem. Reszta koła nie gaśnie: jedno rzemiosło naprzeciw twoich kierunków głównych zostaje jako zajęcie dodatkowe, które wspina się dalej przez rzadki poziom (powtarzalne zadanie przy kuźni Kowala Haldrena pozwala zmienić, które to), a każde inne rzemiosło zapada w uśpienie. Uśpione rzemiosło zachowuje swoją umiejętność i swoje pospolite przepisy, które uczą go dalej na normalnej krzywej, dopóki nie zszarzeją przy 75; wszystko powyżej pospolitego przestaje płacić od razu, a uśpione rzemiosło, dopóki odpoczywa, nigdy nie wydaje arcydzieła.',
   'guide.professions.startBody':
     'Prosto z drogi do Eastbrook? Znajdź Sztygara Odella i weź zadanie Fach dla każdej dłoni: wskaże ci żyły rudy wokół Miedzianego Wykopaliska na północny wschód od miasta i wręczy ci twoje pierwsze odciski. Uważaj na sam wykop: obozujący na nim kopacze z Deeprock stoją kilka poziomów wyżej niż świeży przybysz, więc obrób najpierw żyły na obrzeżach, a serce obozu zostaw na czas, gdy trochę podniesiesz poziom. Od tej pory zbieraj z każdej żyły, każdego drzewostanu i każdego łanu ziół, które mijasz w trakcie zadań; biegłość przychodzi podróżnikom sama.\n\nPo powrocie do miasta wciśnij T, by otworzyć okno wytwarzania, i pracuj na pospolitych przepisach, które każda postać zna od początku. Odwiedź mistrzów przy kuźni, kuchniach, warsztacie tkackim i narzędziowni, by zobaczyć, czego uczą, i bierz ich zlecenia robocze dla stałego dopływu monet. Zanim znajdzie cię list Gildii, będziesz już wiedzieć, która para wydaje ci się domem.',
-  'guide.profPages.craftIntro.engineering':
-    'Inżynieria buduje narzędzia, których prędzej czy później zapragnie każdy poważny zbieracz: kilofy, siekiery, sierpy i wędki poziomu 4 i poziomu 5, których żadna lada nigdy nie sprzeda za monetę, a każde z nich pochłania narzędzie o poziom niższe.',
-  'guide.profPages.craftIntro.enchanting':
-    'Zaklinanie rozbiera ekwipunek i wkłada moc z powrotem: rozłóż niechciane elementy na materiały arkaniczne, a potem wydaj je na stałą premię do statystyk elementu, który zamierzasz zatrzymać. Rozkładanie i zaklinanie nie wymagają ani stacji, ani trenera, i każdy może zacząć pierwszego dnia; więcej wymagają tylko dwa przepisy na talizmany, nauczane w narzędziowni.',
-  'guide.profPages.craftProse.weaponcrafting.materialsBody':
-    'Górnictwo to kręgosłup. Ruda Miedzi schodzi z żył poziomu 1 w Dolinie Wschodniego Strumienia, Ruda żelaza z Trzęsawiska Mokrzawia, a Ruda Thorium z Wyżyn Ciernistego Szczytu, i każdy szczebel drabinki wspina się tak samo. Wyrąb liczy się bardziej, niż mógłbyś przypuszczać: żelazna kora osadza włócznię na dzika, jesion popiołowy dźwiga maczugę, a jedna Kłoda Starodrzewu tworzy kostur bojowy.\n\nReszta pochodzi z łowów i z lady. Szorstką skórę na rękojeści zbiera się prosto ze zwłok wilków i dzików, Odłamki kości schodzą z niespokojnych umarłych albo z odzyskiwania pospolitego ekwipunku, a drabinka kuźni pali Topnik kowalski, po 20 miedzianych za słój od samej Darvy. Jeśli twoje własne górnictwo zostaje w tyle, żadna lada nie uratuje cię przy samej rudzie: thorium schodzi z żył Ciernistego Szczytu, z początkowych żył każdej młodszej strefy poza Dalekim Wybrzeżem (którego żyły kopią żelazo) albo ze stosu innego gracza, przez wymianę lub Rynek Świata. Tylko Sztabkę Arkanitu kupuje się za monetę, u Majsterkowicza Gizzela w narzędziowni albo u Kwatermistrzyni Bree w Highwatch.',
-  'guide.profPages.craftProse.weaponcrafting.routeBody':
-    'Każdy element z prawdziwą linią statystyk, co na tej drabince oznacza szczebel żelazny i wyżej, może zejść z kowadła jako arcydzieło, o ile lepsza jakość mieści się w pułapie twojego poziomu; pospolite miedziane elementy bez statystyk nigdy nie procują, bo nie ma w nich czego poprawiać. Żelazo i thorium liczą się dla premii arcydzieła jako materiały pierwszego poziomu, starodrzew i arkanit jako drugiego, a umiejętność stojąca powyżej własnego poziomu przepisu dokłada własny punkt za każdy poziom, więc wśród trójki z thorium to topór wojenny i kostur bojowy niosą przewagę materiałową, a szczebel procuje coraz lepiej także wtedy, gdy już z niego wyrosłeś.\n\nJedź szczeblem miedzianym do 25, naucz się szczebla żelaznego w dniu, gdy się otwiera, i jedź nim do 50, a potem szczeblem z thorium do 75. Powyżej 75 nic wyższego jeszcze nie wyszło, więc przepisy z thorium zanikają do połowy, a potem do ćwierci przyrostu: zaplanuj mniej więcej 150 dodatkowych wytworzeń, by dobić do pułapu 125, i pamiętaj o wspólnym ograniczniku dziesięciu akcji rzemieślniczych na minutę, gdy siadasz do partii.\n\nFinansuj wspinaczkę na bieżąco: zlecenie robocze kuźni Darvy zdejmuje ci z rąk osiem Rud Miedzi co 30 minut za trochę monety i PD, a szczeble żelazny i z thorium sprzedają się uczciwie awansującym wojownikom walki wręcz. Księga Czynów zaznacza Ostrze i Hartowanie przy umiejętności 50 i wieńczy Arcymistrzostwo Wytwarzania Broni przy 125.',
   'guide.profPages.craftProse.armorcrafting.identityBody':
     'Drabinka Wytwarzania Pancerzy czyta się jak kariera żołnierza: na początek prosty nitowany miedziany pas, sabatony i rękawice, potem kolczuga z żelaznych ogniw, nagolenniki i naramienniki z pierwszymi prawdziwymi liniami statystyk, a na końcu rzadki wielki hełm, kirys i nogawice z łuski thorium, elementy na Siłę i Wytrzymałość, z wartościami pancerza na samym szczycie rzemieślniczej sztuki.\n\nMa też cichszą stronę: Chronione Nogawice ze Wschodniego Strumienia, polowy pospolity element pod statystyki zaklinaczy, oraz Peleryna Poczernionej Łuski, rzadki kolczy naramiennik na Intelekt i Ducha przy umiejętności 75, trzymają na liście klientów tych noszących kolczugę, którzy myślą zaklęciami. Na pierścieniu stoi między Wytwarzaniem Broni a Inżynierią; para Kowala z Wytwarzaniem Broni jest przysięgana przed Mistrzynią Kuźni Darvą, natomiast para Zębatkowca z Inżynierią jest nazwana, ale nie ma jeszcze zadania przysięgi.',
-  'guide.profPages.craftProse.armorcrafting.materialsBody':
-    'Żadne rzemiosło nie pożera rudy szybciej. Sama kolczuga z żelaznych ogniw bierze pięć rud żelaza, a każdy element z łuski thorium chce trzech albo czterech rud thorium plus Sztabkę Arkanitu, więc poważny płatnerz kopie w Trzęsawisku Mokrzawia i Wyżynach Ciernistego Szczytu albo płaci komuś, kto to robi. Miedź zasila pierwszy szczebel, prosto z żył przy Miedzianym Wykopalisku.\n\nWokół metalu idą części miękkie: Szorstka skóra zbierana ze zwłok wilków i dzików, Odłamki kości z niespokojnych umarłych (albo odzyskane ze zwykłego ekwipunku) oraz słoje Topnika kowalskiego (po 20 miedzianych przy kuźni) w niemal każdym przepisie. Żadna lada nie sprzedaje thorium: niecierpliwi kupują je od innych graczy albo wydobywają sami, na Ciernistym Szczycie lub w początkowych żyłach dziesięciu z jedenastu młodszych stref (samo Dalekie Wybrzeże kopie żelazo).',
   'guide.profPages.craftProse.armorcrafting.ladderBody':
     'Dwa polowe pospolite elementy, Kolczy kaftan ze Wschodniego Strumienia i Chronione Nogawice, są znane od początku i wytwarzają się wszędzie. Drabinka mistrza to dziewięć przepisów w trzech szczeblach przy kuźni w Eastbrook: szczebel miedziany jest darmowy przy umiejętności 0, szczebel z żelaznych ogniw kosztuje 25 srebrnych za przepis przy umiejętności 25, a szczebel z łuski thorium 1 złoty za sztukę przy umiejętności 50, przy czym każdego szczebla można się nauczyć w chwili, gdy sięgnie go twój poziom.\n\nPoza drabinką stoją dwa wyjątki. Hełm spętanego kamienia to jeden z dwóch kombinowanych przepisów Kowala (Rękawice Grobowego Żmija są jego rodzeństwem po stronie Wytwarzania Broni), nauczany przez mistrza, niewymagający stacji i możliwy do wykonania tylko przez dostrojonego Kowala z oboma rzemiosłami na umiejętności 25. Peleryna Poczernionej Łuski nie potrzebuje żadnego nauczyciela: wszyscy znają ją od początku, a pracę nad nią bramkują wyłącznie kuźnia i materiały. Podana przy niej umiejętność 75 dotyczy przyrostu, nie pozwolenia: z Wytwarzaniem Pancerzy jako główną specjalizacją płaci pełny przyrost umiejętności od pierwszego uderzenia młota aż do 99, więc Kowal z zapasem thorium może się na niej oprzeć wcześnie. Poniżej pułapu głównej specjalizacji przepis trzeciego poziomu nie uczy niczego, więc niezadeklarowany albo hobbystyczny płatnerz pracuje nad nią dla samego elementu, nie dla punktów.',
   'guide.profPages.craftProse.leatherworking.materialsBody':
@@ -2114,34 +2761,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Oto haczyk: garbarnia stoi w Fenbridge, przy drodze przez Trzęsawisko Mokrzawia, co czyni Garbarstwo jedynym głębokim rzemiosłem szkolonym w terenie, na mokradłach. Garbarz Hesk uczy drabinki przy swoich kadziach: szczebel skór z Fenbridge darmowo przy umiejętności 0, szczebel tropiciela mokradeł po 25 srebrnych za przepis od umiejętności 25, a szczebel strażnika bagien po 1 złotym za sztukę od umiejętności 50, przy czym każdy szczebel otwiera się, gdy sięgnie go twój poziom.\n\nTrzy przepisy omijają trenera: polowe pospolite elementy (Kaftan z garbowanej skóry i Skóra Druida ze Wschodniego Strumienia) wytwarzają się wszędzie od początku, a Owijki ze Zmierzchowej Skóry zna każdy przy umiejętności 50, związane z garbarnią. Zwróć uwagę, że sama przysięga Zaopatrzeniowca składana jest z powrotem w Eastbrook u Ottilie; na mokradłach odbywa się wyłącznie nauka.',
   'guide.profPages.craftProse.leatherworking.routeBody':
     'Każdy element z prawdziwymi statystykami losuje szansę na arcydzieło, o ile lepsza jakość mieści się w pułapie twojego poziomu, wliczając w to Skórę Druida ze Wschodniego Strumienia ze statystykami, a podpisana Nieskazitelna skóra w Kaftanie strażnika bagien daje premię za podpisany reagent automatycznie; thorium liczy się dla proca jako materiał pierwszego poziomu. Pospolite skórzane elementy bez statystyk procować nie mogą.\n\nAwansuj je naturalnie: zbieraj z każdego wilka i dzika, którego zabijesz, od pierwszego poziomu, pozwól dwóm polowym pospolitym elementom donieść cię do 25, gdziekolwiek stoisz, a potem naucz się szczebla skór przy kadziach, gdy zadania i tak wciągną cię na mokradła. Szczebel tropiciela mokradeł niesie cię do 50, a elementy strażnika bagien i Owijki ze Zmierzchowej Skóry niosą rzadki poziom od 50 do 75. Powyżej 75 te przepisy drugiego poziomu dają połowę, a potem ćwiartkę przyrostu, około 150 wytworzeń na ostatnie pięćdziesiąt punktów do pułapu 125; poniżej pułapu głównej specjalizacji wciąż odpowiadają pułapowi wytwarzania rzadkiej jakości, zamiast całkowicie zerować.\n\nRuchoma garbarnia liczy się dla tego rzemiosła bardziej niż dla jakiegokolwiek innego: wyspecjalizuj się przy 75, a juki pełne skór stają się gotowym ekwipunkiem przy ognisku zamiast spaceru z powrotem do Fenbridge. Zlecenie robocze garbarni Heska kupuje osiem Szorstkich skór co 30 minut, ładny zwrot ze skór, które i tak zbierałeś, a Księga Czynów zaznacza Rzemiosło Garbarza przy umiejętności 50, z Arcymistrzostwem Garbarstwa przy pułapie.',
-  'guide.profPages.craftProse.cooking.identityBody':
-    'Zjedz ugotowany posiłek, a leczy cię przez 18 sekund odpoczynku, co między kolejnymi pociągnięciami jest najtańszym leczeniem w grze. Drabinka biegnie od Okonia rzecznego smażonego na patelni za 90 zdrowia aż po Wielką pieczeń Marlowa za 980, leczenie na siedząco, którego nic w grze nie przebija.\n\nNa pierścieniu Gotowanie stoi między Alchemią a Garbarstwem. Jego żywą parą jest Aptekarz, Alchemia i Gotowanie, przysięgany przed Kucharzem Marlowem w kuchniach Eastbrook po upolowaniu czterech dzikich dzików do garnka; para Trapera z Garbarstwem jest nazwana na pierścieniu, ale nie ma jeszcze zadania przysięgi.',
-  'guide.profPages.craftProse.cooking.materialsBody':
-    'Wędkarstwo zaopatruje w charakterystyczne składniki, strefa po strefie: pstrąg lustrzany i okoń rzeczny z wód Doliny Wschodniego Strumienia, szczupak moczarowy i węgorz bagienny z Trzęsawiska Mokrzawia, pstrąg mroźnoskrzelny i karp Slatefin z Wyżyn Ciernistego Szczytu. Szczeble mieszają strefy swobodnie (darmowy szczebel już chce szczupaka moczarowego, środkowy mroźnoskrzelnego z Ciernistego Szczytu, a rzadka kolacja wplata z powrotem pstrąga lustrzanego z Doliny), więc kucharz, który łowi wszędzie tam, dokąd prowadzi droga, nigdy nie zostaje na sucho.\n\nStrona rzeźnicza schodzi ze zbieranych zwłok: Mięso z dziczyzny z dzików i ich krewnych, a przy rzadkim lub lepszym rzucie zbioru podpisane Pierwsze cięcie, centralny element wielkiej pieczeni. Zioła doprawiają lepsze dania, jedna Kłoda Jesionu Popiołowego wędzi węgorza, a Sól kuchenna kosztuje 8 miedzianych za woreczek na własnym straganie Marlowa.',
-  'guide.profPages.craftProse.alchemy.identityBody':
-    'Rzemiosło uprawia się przy stanowisku Aptekarza w Highwatch, siedzibie Alchemik Verane, Mistrzyni Aptekarstwa, która uczy drabinki przepisów, sprzedaje Szklane fiolki po 12 miedzianych i płaci monetą za zioła przez swoje zlecenie robocze.\n\nNa pierścieniu rzemiosł Alchemia stoi wśród fachów prób i błędów, z Inżynierią po jednej stronie i Gotowaniem po drugiej. Daje jej to dwie tożsamości par: Bombardiera (Inżynieria i Alchemia, podejmowanego przed Majsterkowiczem Gizzelem w Eastbrook) oraz Aptekarza (Alchemia i Gotowanie, przysięganego przed Kucharzem Marlowem). Dostrój się do dowolnej z tych par, by uczynić Alchemię główną specjalizacją i pozwolić własnej podpisanej pracy uczyć cię z powrotem; para Bombardiera otwiera też swój kombinowany wywar, Eliksir niedźwiedzia, podczas gdy para Aptekarza nie wydaje jeszcze żadnego przepisu kombinowanego. Sama drabinka nigdy jednak nie każe czekać, bo każdy przepis Alchemii mieści się w rzadkim poziomie, na którym pracują niezadeklarowane rzemiosła, więc cała wspinaczka do pułapu stoi otworem jeszcze przed jakąkolwiek przysięgą.',
-  'guide.profPages.craftProse.alchemy.ladderBody':
-    'Drobną miksturę leczniczą zna każdy od początku i może ją mieszać wszędzie, bez żadnej stacji. Prawdziwa drabinka to dziewięć przepisów nauczanych przez Verane przy stanowisku Aptekarza, po trzy na każdym szczeblu: przepisy umiejętności 0 są darmowe, szczebel umiejętności 25 kosztuje 25 srebrnych za przepis, a szczebel umiejętności 50 kosztuje 1 złoty za przepis. Każdy szczebel to wywar leczniczy, wywar many i eliksir wytrzymałości, wspinający się od pospolitych butelek na srebrnoliście (120 zdrowia, 160 many) przez niepospolity złotolist (200 zdrowia, 260 many) po rzadki słonecznopłatek (280 zdrowia, 360 many).\n\nEliksiry wspinają się tak samo: Eliksir Dzika daje 6 Wytrzymałości na 10 minut, Eliksir Jadoognisty 9 na 15 minut, a Eliksir Węża 12 na 15 minut, przy czym sam Eliksir Węża warzy dwie butelki na jedno wytworzenie. Z boku stoi jeszcze jeden przepis: Eliksir niedźwiedzia, kombinowany wywar, którego Verane uczy za 25 srebrnych, gdy twoja Alchemia osiągnie 25, mieszalny wszędzie, ale tylko przez dostrojonego Bombardiera z Alchemią i Inżynierią na poziomie 25.',
-  'guide.profPages.craftProse.alchemy.routeBody':
-    'Wywary i eliksiry nigdy nie losują arcydzieł; ten proc należy do ekwipunku ze statystykami. Twoje imię i tak jednak podróżuje: rzadkie wywary na słonecznopłatku przychodzą podpisane znakiem wytwórcy, tak samo jak każda butelka podwójnej partii Eliksiru Węża, więc nic rzadkiego w tym rzemiośle nie opuszcza stołu bez podpisu. Przy umiejętności 75 następuje specjalizacja i od tej chwili każdy przepis Alchemii kosztuje 20 procent mniej materiałów.\n\nWeź Zielarstwo wcześnie i zbieraj w trakcie awansowania: srebrnolist jest w Dolinie wszędzie, a gdy dotrzesz do stołu Verane, darmowy szczebel doniesie cię czysto do umiejętności 25 na ziołach, które i tak byś zerwał. Naucz się szczebla 25 w chwili, gdy się włączy, przenieś zbieranie na mokradła po złotolist i pozwól, by zlecenie robocze Verane (sześć Ziół Złotolistnych za 45 miedzianych, powtarzalne co 30 minut) oddawało ci po drodze trochę monety.\n\nOd 50 warz wywary na słonecznopłatku i partie Eliksiru Węża ze słonecznopłatka z Ciernistego Szczytu, wciąż domieszkując trochę zieleni z Doliny i z mokradeł. Ostatni odcinek od 100 do 125 to celowy strumyczek, więc warz to, co naprawdę się sprzedaje, zamiast palić zioła dla samej liczby, i pamiętaj, że materiały jednorazowe to jedyny wyrób rzemieślniczy, który wszyscy kupują ponownie w nieskończoność. Księga Czynów zaznacza Dziwne Wywary przy umiejętności 50, a Arcymistrzostwo Alchemii przy pułapie.',
-  'guide.profPages.craftProse.engineering.identityBody':
-    'Rzemiosło uprawia się w narzędziowni w południowo-zachodnim rogu placu Eastbrook, siedzibie Majsterkowicza Gizzela, Mistrza narzędziowni. Poziomy od 1 do 3 każdej linii narzędzi to zwykły towar sprzedawców; poziomy 4 i 5 schodzą ze stołu inżyniera albo z lady wypraw Utopionej Litanii za Znaki Wypraw, zza bramek jej ukończeń, i nigdy z żadnej kasy za monetę.\n\nNa pierścieniu stoi wśród fachów prób i błędów, obok Alchemii i Wytwarzania Pancerzy, co daje mu dwie tożsamości par: Bombardiera (Inżynieria i Alchemia, podejmowanego przed samym Gizzelem) oraz Zębatkowca (Wytwarzanie Pancerzy i Inżynieria, nazwanego, ale jeszcze nie do przysięgnięcia). Jedno ostrzeżenie liczy się tu bardziej niż gdziekolwiek indziej: każdy ze szczebli przepisów Inżynierii stoi powyżej pułapu rzadkiego poziomu, na którym pracują hobbyści i niezadeklarowani rzemieślnicy, więc liczba umiejętności rusza się tylko u rzemieślnika, którego główne specjalizacje obejmują Inżynierię, co dziś oznacza Bombardiera. Narzędzia lądowe może zbudować każdy; niedostrojony rzemieślnik po prostu niczego się przy tym nie uczy, a dwa przepisy na wędki wymagają w dodatku nauki u Gizzela.',
-  'guide.profPages.craftProse.engineering.materialsBody':
-    'Każdy przepis na narzędzie lądowe pochłania narzędzie o poziom niższe plus materiał WYBORNY, i ta para to cała drabinka lądowa: cztery Wyborne Rudy Żelaza i Mithrilowy Kilof Górniczy stają się Kilofem Górniczym z Thorium, a potem dwie Sztabki Arkanitu, dwie Wyborne Rudy Thorium i ten kilof z thorium stają się Kilofem Górniczym z Arkanitu. Linie siekier i sierpów powtarzają kształt wyborny-plus-poprzednie-narzędzie z Wybornymi Kłodami Jesionu Popiołowego i Starodrzewu oraz Wybornymi Zielami Złotolistnymi i Słonecznego Płatka, choć ich szczeble poziomu 5 nie proszą o żadne Sztabki Arkanitu: kilof to jedyna linia, która drożeje na szczycie. Dwa przepisy na wędki celowo łamią schemat: Wędka z burzowym kołowrotkiem bierze cztery Karpiki Słonecznoblask i wędkę srebrnego strumienia, a Wędka kuta przypływem dwa Karpiki, osiem Surowych karpi Slatefin i tamtą Wędkę z burzowym kołowrotkiem, więc szczyt drabinki wędkarza opłaca się na wodzie, a nie przy żyle.\n\nMateriał wyborny nie jest nigdzie sprzedawany i nie wypada ze zwykłego zbioru: dostajesz go, pracując przy jednej z pełnowartościowych żył strefy narzędziem o randze wyższej niż sam materiał, co w praktyce oznacza narzędzie o szczebel niższe od tego, które próbujesz zbudować (łatwiejsze żyły, które strefa trzyma dla podróżnych, dają zwykły materiał, czymkolwiek machniesz). To jest celowe. Na trasie rzemieślniczej narzędzie poziomu 5 bierze się z faktycznego machania tym poziomu 4, a nie z wyprawy na zakupy; lada za Znaki Wypraw to jedyna droga naokoło. Jedynym wyjątkiem jest Sztabka Arkanitu, rafinowana i dostępna wyłącznie u sprzedawcy, po 1 srebrnym 60 miedzianych za sztabkę u Kwatermistrzyni Bree w Highwatch albo przy własnej ladzie Gizzela, więc sam Kilof Górniczy z Arkanitu niesie wbudowaną w swój koszt stałą podłogę monetową.',
-  'guide.profPages.craftProse.engineering.ladderBody':
-    'Drabinka to osiem przepisów, wszystkie związane ze stanowiskiem narzędziowni. Sześć przepisów na narzędzia lądowe jest znanych automatycznie, nigdy bez żadnej opłaty dla trenera: kilof, siekiera i sierp poziomu 4 przy umiejętności 75 oraz wersje poziomu 5 przy umiejętności 150. Ta druga liczba nie jest literówką i celowo stoi powyżej obecnego pułapu 125: wymagania umiejętności nigdy nie bramkują tu rzemiosła, kształtują wyłącznie przyrost umiejętności, więc narzędzie poziomu 5 możesz zbudować tego dnia, w którym trzymasz jego reagenty i jego poprzednika poziomu 4. Dwie wytwarzane wędki to nauczany wyjątek: Gizzel uczy Wędki z burzowym kołowrotkiem przy umiejętności 75 za 4 złote, a Wędki kutej przypływem przy umiejętności 125 za 16 złotych, każdej w chwili, gdy twój poziom w rzemiośle osiągnie jej własny.\n\nKażde gotowe narzędzie ma jakość rzadką lub epicką i wychodzi podpisane, więc twoje imię jeździ po strefach na pasach z narzędziami innych graczy. Inżynieria dźwiga też połowę jednego przepisu kombinowanego: Eliksiru niedźwiedzia, warzonego przez dostrojonego Bombardiera z Inżynierią i Alchemią na poziomie 25.',
-  'guide.profPages.craftProse.enchanting.identityBody':
-    'Każde zaklęcie jest znane od początku, każdy może rozkładać zaklęcia od pierwszego dnia i żadne z tych dwóch nigdy nie wymaga stacji; umiejętność ma pułap 125 jak każde rzemiosło. Jedynym nauczanym zakątkiem tego fachu jest jego para przepisów na talizmany: Majsterkowicz Gizzel uczy Skrytki Zbieracza i Oka Rzemieślnika w narzędziowni w południowo-zachodnim rogu placu Eastbrook, za zwykłą opłatę zależną od poziomu, gdy twoje Zaklinanie osiągnie 25, a same talizmany wykonuje się przy jego stanowisku.\n\nNa pierścieniu stoi między Kaligrafią a Jubilerstwem, więc jego dwie tożsamości par to Arkanista (Kaligrafia i Zaklinanie) oraz Jubiler (Zaklinanie i Jubilerstwo). Żadnej nie da się jeszcze przysiąc, bo obaj sąsiedzi czekają na swoje pierwsze przepisy, więc dziś Zaklinanie wspina się jako rzemiosło każdego: darmowe aż do rzadkiego poziomu jeszcze przed jakąkolwiek przysięgą i naturalny wybór na hobby dla Bombardiera albo Aptekarza. Zaklinacze utrzymują też przy życiu świat zbieractwa: oba osadzane efekty narzędzi to robota Zaklinacza, a pierwotny wytwórca ładuje własne efekty ze zniżką, tym głębszą po specjalizacji.',
-  'guide.profPages.craftProse.enchanting.levelingBody':
-    'Umiejętność poruszają trzy czynności: rozłożenie elementu, nałożenie zaklęcia i wytworzenie dwóch talizmanów, które wspinają się po zwykłej krzywej wytwarzania. Każdy sukces wart jest najwyżej jeden punkt, skalowany tym, jak poważna jest praca: rzadkością rozbijanego elementu albo poziomem reagentu nakładanego zaklęcia. Pospolite rozkłady i zaklęcia na samym pyle liczą się jako praca pospolita; niepospolite rozkłady i zaklęcia na esencji jako niepospolita; rzadkie rozkłady oraz każde zaklęcie Runiczne lub Wyższe jako rzadka; epickie i legendarne rozkłady stoją w tabeli jeszcze wyżej, choć żadna dzisiejsza tożsamość zaklinacza nie sięga ponad rzadki szczebel, więc w praktyce płacą tyle samo co praca rzadka. Przy stole rozbijania obowiązuje jedna uczciwość: element, który zszedł ze stołu gracza (wytworzony, podpisany lub mistrzowski), wciąż mieli się na materiały, ale niczego nie uczy, więc pętla wytwórz-i-rozbij nikogo nie awansuje, a lekcje kryją się w ekwipunku znalezionym w świecie.\n\nZnane zanikanie mistrzostwa działa na poziomach co 25 punktów, więc praca gatunku pospolitego szarzeje przy umiejętności 75, niepospolita przy 100, a praca rzadkiego poziomu dokładnie przy pułapie 125. Zaklinanie ma też jedną własną uprzejmość: wkład powyżej pułapu twojego archetypu jest zaokrąglany w dół do tego pułapu, zamiast zerowany, więc zanim się dostroisz, epicki rozkład liczy się po prostu jako rzadki, a nie uczy niczego. Jeśli Zaklinanie skończy uśpione za inną tożsamością, rozbijanie i nakładanie liczą się jako praca pospolita, a wspinaczka staje przy 75, natomiast dwa talizmany, jadące po krzywej wytwarzania powyżej pułapu pospolitego, nie uczą uśpionego zaklinacza zupełnie niczego; trzymaj je jako hobby, a praca rzadkiego poziomu wciąż płaci, tyle że wolniej po 75.',
   'guide.profPages.craftProse.enchanting.marketBody':
     'Nałożenie zaklęcia zużywa reagenty i znaczy jedną konkretną kopię przedmiotu. Wskaż kopię z torby, a dostaniesz z powrotem osobną zaklętą kopię; wskaż element, który już nosisz, a zostanie zaklęty na miejscu, dokładnie tam, gdzie siedzi, bez tańca ze zdejmowaniem i zakładaniem z powrotem. Tak czy inaczej premia idzie za tym elementem na zawsze, przez zdejmowanie, wizyty w banku i wymiany. Jedno zaklęcie na element: nałożenie innego zaklęcia na zaklętą kopię prosi o potwierdzenie, a potem zastępuje stare zaklęcie bez reszty, niszcząc je bez zwrotu jego materiałów. Sprzedaż, wyrzucanie i rozkładanie zawsze sięgają najpierw po zwykłe kopie, więc twój gotowy element nie zostanie zjedzony przez przypadek.\n\nMistrzowski ekwipunek i zaklinanie się przyjaźnią: element będący arcydziełem pozostaje w pełni zaklinalny, a zaklęcie dokłada się na wierzch premii arcydzieła, nie naruszając ani jej, ani podpisu wytwórcy. Po zsumowaniu wszystkich źródeł podpisane arcydzieło niosące Wyższe zaklęcie to najlepsze, co może osiągnąć wyrób rzemieślniczy, i z założenia wciąż stoi poniżej łupów rajdowych.\n\nNa rynku zaklęty lub podpisany element wystawia się jak wszystko inne: idzie w górę jako własne wystawienie na jedną kopię, dymek pokazuje zaklęcie i znak wytwórcy, a Krucza Poczta niesie go równie wiernie. Materiały pozostają stabilną połową rzemiosła: Pył, Esencja i Odłamki wystawiają się swobodnie, wystawienie nic nie kosztuje, a Kupiec bierze 5 procent wyłącznie od zakończonej sprzedaży. To sprawia, że dwa klasyczne dochody zaklinacza to sprzedaż materiałów i sprzedaż gotowej pracy: przez rynek, przez kruka albo twarzą w twarz w oknie wymiany.',
-  'guide.profPages.howBody':
-    'Otwórz okno wytwarzania (domyślnie klawisz T), a zobaczysz listę wszystkich znanych ci przepisów wraz z tym, czego wymagają i co masz pod ręką. Przepisy związane ze stacją każą ci stanąć w promieniu 20 jardów od właściwej stacji w mieście, przepisy polowe wytwarza się wszędzie, a rozkładanie i zaklinanie w Zaklinaniu nie wymagają żadnej stacji (tylko jego dwa przepisy na talizmany to praca przy stacji, w narzędziowni). Nie ma rzutu na niepowodzenie: wyrób z materiałami pod ręką zawsze się udaje.\n\nDwa drobne tarcia utrzymują gospodarkę w ryzach. Każdy udany wyrób płaci opłatę 2 miedziaków za punkt budżetu statystyk przedmiotu, a akcje typu rzemieślniczego dzielą jedno tempo: najwyżej 10 wyrobów, rozłożeń, zaklęć, odzysków lub ładowań narzędzi w każdym 60-sekundowym oknie. Żadne z nich nie przeszkodzi w normalnej sesji; oba powstrzymują wyspecjalizowanego rzemieślnika przed zalaniem rynku.',
   'guide.profPages.masterworkBody':
     'Każdy udany wyrób jest dokładnie tym, co obiecuje przepis, a czasem czymś nieco więcej: arcydzieło kończy ten sam przedmiot o jeden poziom jakości lepiej, z premiowymi statystykami wtopionymi w chwili wytworzenia. Działa tylko na plus, nigdy nie obniża, i pozostaje poniżej progu rajdowego, więc wytwarzany ekwipunek może być znakomity, nie zastępując łupu rajdowego.\n\nSzansa jest jawna, nie mistyczna: {base}% podstawy, plus {perTier}% za każdy poziom, o który twoja umiejętność przewyższa przepis, plus {signed}%, gdy w skład wchodzi jakikolwiek podpisany reagent, plus {spec}%, gdy już się wyspecjalizujesz, przy czym materiały wyższego poziomu dodają jeszcze 1 do 2%, a wszystko ograniczone do {cap}%. Poprawić można wyłącznie przedmiot z prawdziwymi statystykami, więc pospolite rzeczy bez statystyk, narzędzia i przedmioty zużywalne nigdy nie procują; uśpione rzemiosło nigdy arcydzieła nie wyda, a rzemiosło dodatkowe nie może stworzyć arcydzieła ponad swój rzadki pułap.\n\nDobra robota niesie ze sobą swojego twórcę. Wyroby rzadkie i lepsze są podpisane, każda kopia (Stworzone przez; zebrane materiały noszą Zebrane przez), a arcydzieło jest podpisane zawsze, niezależnie od jakości. Podpis to proweniencja, nie kłódka: podpisane towary swobodnie przechodzą przez wymianę, pocztę i wystawienia na Rynku Świata.',
-  'guide.profPages.trainingBody':
-    'Przepisy od trenerów pochodzą od rezydujących mistrzów i są nauczane przy ich stacjach. Zasada mieści się w jednym zdaniu: mistrz uczy przepisu, gdy twój poziom w rzemiośle osiągnie własny poziom przepisu, i nic więcej tego nie ogranicza, ani twój poziom postaci, ani twój archetyp. Drabinki ekwipunkowe i konsumpcyjne mają szczeble przy umiejętności 0, 25 i 50; dwie lekcje wędek z Inżynierii przedłużają drabinkę przy 75 i 125, a dwa przepisy na talizmany z Zaklinania siedzą na szczeblu 25, więc świeży szczebel otwiera się w miarę, jak rosną twoje poziomy.\n\nOpłaty są jednorazowe i stałe dla szczebla: szczebel startowy jest darmowy, szczebel umiejętności 25 kosztuje {tier1} za przepis, szczebel umiejętności 50 {tier2}, a lekcje wędek powyżej nich mają własne opłaty, wypisane obok każdego przepisu w tabeli. Żeby się szkolić, musisz stać przy prawdziwej stacji mistrza, a ruchoma stacja nigdy się nie liczy. Pospolite przepisy polowe i sześć przepisów na wytwarzane narzędzia lądowe nie wymagają żadnego szkolenia; każda postać zna je od początku.',
   'guide.profPages.ench.enchantsNote':
     'Zaklęcia dzielą się na trzy poziomy. Poziom podstawowy działa na Pyle Kuranta (z odrobiną Esencji na górnym końcu) i obejmuje slot broni oraz każdy slot pancerza poza dłonią pomocniczą, z taką liczbą osi statystyk, że każdy build znajdzie coś na każdy slot. Poziom Wyższy kosztuje jeden Odłamek Kuranta plus Esencję: mocniejsze premie na slotach o największym znaczeniu. Odłamki zasilają poza tym dwa dalsze odpływy, dwa przepisy na talizmany po pięć sztuk każdy oraz najwyższy szczebel ładowania efektów narzędzi, więc odłóż kilka do banku, zanim zaczniesz wydawać.\n\nPomiędzy nimi siedzi pięć zaklęć Runicznych, po jednym odbiorcy na każdy typowany surowiec drugorzędny, więc nic, co zmielisz, nie jest nigdy ślepą uliczką: Runiczne Ostrze (broń, Siła, zużywa Rezonującą stal), Runiczny Sygil (broń, Intelekt, Rezonujące drewno), Runiczny Splot (tors, Duch, Rezonująca nić), Runiczna Skóra (nogi, Zręczność, Rezonująca skóra) oraz Runiczne Ogniwa (hełm, Wytrzymałość, Rezonujące ogniwa). Każde bierze też dwie Esencje Kuranta; tam, gdzie slot i statystyka mają zarówno zaklęcie podstawowe, jak i Wyższe, premia Runiczna ląduje między nimi, a Runiczny Splot jest wprost najsilniejszym zaklęciem na Ducha na tors, zaś Runiczna Skóra to jedyne zaklęcie na Zręczność na nogi w ogóle. Dokładne premie znajdziesz w tabeli poniżej.',
   'guide.profPages.gatherIntro.mining':
@@ -2156,8 +2779,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zbiór to krótkie, widoczne rzucanie, a nie natychmiastowe chwycenie: {base} sekund podstawy, nigdy poniżej podłogi {floor} sekund. Noszenie narzędzia powyżej poziomu węzła, takiego, które twoja biegłość pozwala ci dzierżyć, przyspiesza cię o {tool} sekund za każdy poziom ponad nim, a każde przekroczone pasmo biegłości ścina kolejne {band} sekund; samo dorównanie poziomowi węzła wpuszcza cię przez drzwi, to poziomy powyżej niego czynią cię szybkim.\n\nPełna torba grzecznie odmawia rzucania, zanim się ono zacznie, więc nic nie marnuje się w połowie zamachu, a każdy zbiór płaci małą porcję PD postaci, skalowaną poziomem węzła względem twojego tak samo, jak skaluje się PD za zabójstwa: banalny szary węzeł nie uczy postaci na pułapie niczego.',
   'guide.profPages.gainBody':
     'Przyrost jest deterministyczny, nigdy nie jest rzutem na podniesienie umiejętności: węzeł na poziomie twojego przyrostu lub wyżej uczy pełnego punktu za zbiór, a każde {step} biegłości to jeden poziom liczony względem węzła. Węzły poziomu 1 płacą w pełni poniżej 25, połowę do 49, ćwierć do 74 i nic od 75 wzwyż; węzły poziomu 2 płacą w pełni do 49; dwa węzły poziomu 3 każdego fachu płacą w pełni do 74 i połowę aż do pułapu {cap}.\n\nZamierzona trasa jest prosta: ucz się na startowych węzłach Doliny, przenieś się na trzęsawisko i dokończ wspinaczkę na wysoczyznach Wyżyn Ciernistego Szczytu. Przy pułapie nauka się kończy, ale plony nie: zbieracz na pułapie na zawsze losuje najlepsze szanse, jakie oferuje jego fach.',
-  'guide.profPages.toolsNote':
-    'Każdy węzeł wymaga narzędzia swojego fachu w twoich torbach, z poziomem 1 włącznie: nie ma kilofa, nie ma rudy; nie ma wędki, nie ma ryby. Drabinka sprzedawców obejmuje poziomy od 1 do 3 w trzech centrach serca królestwa: narzędzie poziomu 1 sprzedaje się we wszystkich trzech, a szczeble powyżej niego tam, gdzie zaczyna się teren, który ich wymaga (Fenbridge dokłada poziom 2, Highwatch poziom 3), natomiast młodsze osady poza nimi nie trzymają narzędzi wcale, więc zaopatrz się przed podróżą. Każda lada sprzedaje swobodnie każdy szczebel, który ma w zapasie, a dowolne narzędzie przechodzi przez bezpośrednią wymianę; każdy szczebel można też wystawić na Rynku i wysłać pocztą, z wyjątkiem trzech lądowych narzędzi startowych za 20 miedziaków: te kupuje się przy ladzie albo przekazuje z rąk do rąk i nigdy nie odsprzedaje, nie wysyła pocztą ani nie wystawia. Ograniczone jest dzierżenie. Narzędzie lądowe powyżej poziomu 1 działa dopiero wtedy, gdy zapracuje na nie twoja biegłość we własnym fachu, {tier2Prof} dla poziomu 2, {tier3Prof} dla poziomu 3 oraz 85 i 100 dla dwóch szczebli wytwarzanych, a wiersz sprzedawcy, podpowiedź i poniższa tabela od razu podają ten wymóg. Do tego czasu narzędzie kupione z wyprzedzeniem po prostu czeka w torbach, nie otwierając terenu, nie kupując szybkości i nie wybijając wybornych gatunków, po czym daje się dzierżyć w chwili, gdy twój licznik dotknie jego liczby. Wędki są jedynym wyjątkiem: żadna wędka nie ma wymogu dzierżenia, a Handlarz Wilkes w Eastbrook celowo trzyma na stanie wędki poziomu 2 i 3 dla wędkarzy kupujących z wyprzedzeniem. Narzędzie nigdy nie zajmuje slotu wyposażenia i nigdy się nie zużywa, więc każde to zakup jednorazowy, a dla progu liczy się wyłącznie poziom: rzadsze narzędzie tego samego poziomu nie otwiera nic dodatkowego. Rzadkość to jednak nie tylko kolor. Sprawia, że osadzony efekt narzędzia trwa dłużej, a na wędce poszerza okno wyciągania.\n\nLepsze narzędzie kupuje trzy rzeczy, nie dwie. Otwiera teren wyższego poziomu, skraca rzucanie i poprawia to, co z niego wychodzi: obrób żyłę narzędziem o randze POWYŻEJ własnego materiału strefy, a zbiór wyda jego wyborny gatunek zamiast zwykłego. Żyła musi być jedną z pełnogatunkowych żył strefy, więc łatwiejsze żyły, które strefa zachowuje dla podróżnych, nadal dają zwykły materiał. To materiały wyborne zużywają przepisy na wytwarzane narzędzia, a wyborny gatunek liczy się jako jego zwykła wersja wszędzie tam, gdzie przepis lub zlecenie robocze o nią prosi, więc ulepszanie nigdy nie zostawia cię na lodzie: oznacza tylko, że twoja ruda miedzi przychodzi jako Wyborna Ruda Miedzi.\n\nPonad drabinką sprzedawców każdy fach ma dwa narzędzia wytwarzane, poziomu 4 i 5, robione w narzędziowni (przepisy lądowe zna każda postać; umiejętnością, która rośnie przy tej pracy, jest Inżynieria), albo kupowane za Znaki Wypraw przy ladzie Utopionej Litanii po spełnieniu jej progów oczyszczeń: poniższa tabela podaje cenę w Znakach i liczbę oczyszczeń, o którą prosi każdy szczebel. Żaden kupiec nigdy nie sprzeda ich za monetę. Wędkarstwo ma własną parę, a tych uczy się u wytwórcy narzędzi, zamiast znać je od początku. Żaden węzeł ani żadna woda nie wymaga dziś więcej niż poziomu 3, więc dwa najwyższe szczeble kupują szybkość, gatunek i łaskawsze okno wyciągania zamiast dostępu, a staną się biletem wstępu, gdy pojawi się teren wyższego poziomu.',
   'guide.profPages.toolCraftedOrMarks':
     'Wytworzony ({craft}) lub {marks} Znaków Wypraw po trzech oczyszczeniach Utopionej Litanii',
   'guide.profPages.toolCraftedOrMarksHeroic':
@@ -2165,34 +2786,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.priceNone': 'Niesprzedawane za monety',
   'guide.profPages.colWield': 'Użycie od',
   'guide.profPages.wieldNone': 'Dowolna',
-  'guide.profPages.bandsBody':
-    'Pasma biegłości to wspólna drabina 0/100/200 rozpięta nad licznikiem każdego zawodu. W zawodach lądowych pasmo przekroczone przy 100 skraca czas rzucania zbioru, a ich pułap sprawia, że pasmo 1 jest sufitem. Pasma wędkarstwa nie skracają niczego: wybierają tabele połowów (przy dopasowanej wędce), tylko wędkarstwo sięga pasma 2, a sama wspinaczka jest tym, co ciągnie wędkarza na głębsze wody, gdzie mieszkają zarówno lepsze tabele, jak i dalsze lekcje.',
   'guide.profPages.specimenBody':
     'Zostawiaj trochę wolnego miejsca w torbach, gdy farmisz: podpisana gratka potrzebuje własnego miejsca albo pasującego podpisanego stosu, w który wpadnie, a jeśli nic nie pasuje, plon i tak przychodzi, lecz podpis przepada. Zbieranie z tusz ma też własne ramię jackpota: około {pct}% każdego pozyskanego składnika wychodzi rzadkie lub lepsze. Rodzina, która ma do dania doskonały okaz (skóra, jedwab, jad, mięso), zostawia swój zwykły plon zwykłym i wybija podpisany okaz obok niego; każda inna rodzina podpisuje sam plon.',
   'guide.profPages.gatherDeeds.fishing':
     'Kamień milowy 100 wpisuje Starego Solonego, a 200 wpisuje Mistrza Wędkarstwa wraz z jego tytułem, absolutny szczyt sztuki wędkarskiej; Wędkarstwo liczy się też do Mistrza Zbieracza, zdobywanego przy 100 w dowolnych trzech fachach zbierackich. Pierwsza ryba z wód każdej z sześciu stref wypełnia własną stronę, trzy strefy serca królestwa oraz Wierzbowe Mokradła, Wichrowy Grzbiet i Dalekie Wybrzeże poza nimi, a Karpik Słonecznoblask zapisuje Przebłysk Nadziei, więc podróżnicy z wędką w plecaku zapełniają swoją księgę szybciej, niż się spodziewają.',
-  'guide.profPages.fish.startBody':
-    'Prosta wędka kosztuje 20 miedziaków u Rybaka Brandta w Eastbrook (szukaj Starego Wilka Morskiego na wschodnim skraju miasta, przy drodze do Jeziora Lustrzanego); wędki mają na stanie także Majsterkowicz Gizzel, Zaopatrzeniowiec Hale w Fenbridge i Kwatermistrzyni Bree w Highwatch. Użyj wędki zwrócony ku wodzie na tyle głębokiej, by mieściła ryby, w odległości do jakichś 24 jardów przed sobą, a twój spławik poszybuje w jej stronę.\n\nNie zarzucisz w walce, wpław ani po śmierci: zamierzoną postawą jest łowienie z brzegu. Woda twardnieje jednak razem z lądem: trzęsawisko wymaga co najmniej Żelaznego Kołowrotka poziomu 2, a szczyty Srebrnego Strumienia poziomu 3, i żyłka zarzucona bez wędki, której dana woda wymaga, nigdy nie opuszcza twojej ręki. Ponad nimi stoją dwie wędki, Burzowy Kołowrotek i Kuta Przypływem: inżynierowie wytwarzają je w narzędziowni z tego, co wyciągnie żyłka, a lada wypraw przy Utopionej Litanii sprzedaje je za Znaki Wypraw po spełnieniu progów oczyszczeń, choć nigdy za monetę. Żadna woda ich nie wymaga, więc kupują krótsze oczekiwanie i szersze okno wyciągania zamiast dostępu, co na najwyższym szczeblu oznacza branie w równe trzy sekundy.',
   'guide.profPages.fish.biteBody':
     'Po zarzuceniu branie przychodzi w ukrytej chwili między {min} a {max} sekundą; opóźnienie rozstrzyga się w momencie, gdy żyłka ląduje w wodzie, więc żadne dwa zarzucenia nie są całkiem takie same. Gdy spławik zanurkuje, masz okno {reel} sekund, by znów wcisnąć wędkę i wyciągnąć: wyciągnij w tym czasie, a połów ląduje w torbie, zawahaj się dłużej, a ryba ucieka i nic po niej nie zostaje. Cała sesja ma pułap {cap} sekund, więc nawet spokojne zarzucenie rozstrzyga się szybko.\n\nLepsze wędki wyostrzają oba końce minigry: każdy poziom wędki powyżej pierwszego ścina {rod} sekund z najdłuższego możliwego oczekiwania, nigdy poniżej trzysekundowej podłogi, której najlepsza wędka już dotyka, i dodaje {reelRod} sekund do okna wyciągania, więc Żelazny Kołowrotek sprowadza najgorsze oczekiwanie do 6,5 sekundy przy oknie 3,25 sekundy, a Srebrny Strumień do 5 przy oknie ponad 4, bo jego rzadkość poszerza wyciąganie nieco ponad to, co płaci sam poziom. Najszybsze brania nie zmieniają się niezależnie od tego, co trzymasz, a wędka musi jedynie leżeć w twoich torbach, by się liczyła.',
-  'guide.profPages.fish.scheduleNote':
-    'Przyrost wędkarski podąża za stałym harmonogramem bez żadnych kostek: pełny punkt za połów poniżej 50 biegłości, pół punktu poniżej 100, dziesiąta część poniżej 150 i powolna strużka 0,02 od 150 do 200. Ten ostatni odcinek to celowo podróż na tysiące połowów: 200 to deklaracja, a nie przystanek w drodze do czegoś innego.\n\nŚmieci przestają uczyć całkowicie przy {cutoff}: od tego miejsca wodorosty i buty to tylko wodorosty i buty. Sama woda też nakłada pułap na naukę: wody poziomu 1 w Dolinie (i każdy młody brzeg poza sercem królestwa) nie uczą niczego powyżej 100, wody trzęsawiska zatrzymują się na 150, i tylko wody Ciernistego Szczytu szkolą wędkarza całą drogę do 200. Każdy wyciągnięty połów daje poza tym przyrost według harmonogramu, więc gdy licznik staje, harmonogram mówi ci, byś poszukał głębszej wody.',
-  'guide.profPages.fish.tablesNote':
-    'Twoja biegłość wybiera jedno z trzech pasm połowów: pasmo 0 od początku, pasmo 1 przy 100, pasmo 2 przy 200, a każde przesuwa wagę ze śmieci i pustych haczyków na prawdziwe ryby, strefa po strefie. Każde pasmo powyżej pierwszego wymaga też wędki: pasmo 1 chce Żelaznego Kołowrotka poziomu 2, pasmo 2 Srebrnego Strumienia poziomu 3. Twoje efektywne pasmo to niższa z dwóch wartości: tego, na co zapracowała twoja umiejętność, i tego, co udźwignie twoja wędka, a ograniczenie jest ciche: gorszą wędką wciąż łowisz, tylko z tabeli niższego pasma, więc jeśli twoje połowy stoją w miejscu, choć umiejętność rośnie, sprawdź najpierw wędkę.\n\nWody każdej strefy kryją własną parę ryb jadalnych, leczących tym mocniej, im głębsza strefa, a wszystkie są składnikami kuchennymi i całkiem dobrym jedzeniem na postój prosto z żyłki. Reszta tabeli to podatek wędkarza: wodorosty, od czasu do czasu but i pusty haczyk, który nigdy nie znika do końca. Ile płacisz, zależy od wody, w której ląduje twój spławik, a nie od tego, gdzie stoisz: zarzucenie sięga do 24 jardów, a wędka, której woda wymaga, tabela, z której losuje, czyn, który zalicza, i to, jak daleko uczy, wszystko odpowiada strefie, do której ta woda należy, rozstrzygnięte w chwili, gdy żyłka ląduje. Woda każdej strefy jest napisana pod własne pasmo, Dolina pod pasmo 0, trzęsawisko pod pasmo 1, szczyty pod pasmo 2, a łowienie o jedno pasmo niżej zamienia mniej więcej jedną trzecią twoich zarzuceń w puste haczyki, dwa pasma niżej ponad połowę. Wędka doprowadza cię do wody; to umiejętność sprawia, że woda płaci, a wspinaczka jest tym, co ciągnie wędkarza głębiej, bo lepsze pasma to nie tylko lepsza zapłata: poza Doliną tylko one wciąż uczą. {rare} to jedyny wiersz, który odpowiada twojemu pasmu połowów i niczemu więcej: te same szanse w każdej strefie i sześć razy większe na paśmie 2 niż na paśmie 0, więc najrzadsza rzecz przy pomoście to ta, w której Mistrz Wędkarstwa naprawdę jest lepszy.',
-  'guide.profPages.fish.koiBody':
-    'Każdy zbiornik wodny w grze kryje tę samą nagrodę: Karpika Słonecznoblask, niepospolity błysk na żyłce wart 75 miedziaków u sprzedawcy i znacznie więcej dla twojej dumy. Jego szanse odpowiadają wyłącznie twojemu pasmu połowów i niczemu więcej, tak samo w każdej strefie: 1 procent wiersza tabeli połowów na paśmie 0, 3 na paśmie 1 i 6 na paśmie 2, losowane przy każdym wyciągniętym zarzuceniu, więc karpik przychodzi do wędkarza, który zapracował na głębokie tabele. Wyciągnięcie go zapisuje Przebłysk Nadziei w twojej Księdze Czynów, znak kolekcjonerski bez Renomy. Gdy się to zdarzy, dziennik zadba o to, byś o tym wiedział.',
   'guide.profPages.econ.trainingNote':
     'Jedna stała opłata za szczebel przepisów, pobierana raz, gdy mistrz go naucza; każdy szczebel z poniższej tabeli jest dziś w żywym użyciu, od darmowych przepisów startowych po lekcje wędek u wytwórcy narzędzi na samej górze.',
-  'guide.profPages.econ.provenanceBody':
-    'Niektóre przedmioty noszą imię. Najedź na taki, a dymek powie Zebrane przez kogoś tam na surowym materiale albo Stworzone przez kogoś tam na gotowym wyrobie: ten sam znak, ubrany w słowa zależnie od tego, jak przedmiot powstał. Podpis jest częścią samego przedmiotu, jedzie z nim przez wymiany, bank, pocztę, Rynek Świata, a nawet odkup u sprzedawcy, i nigdy nie blednie.\n\nZbieractwo podpisuje swoją najlepszą pracę automatycznie: każdy zbiór, który wylosuje rzadki lub lepszy, przychodzi podpisany, a rzadkie znaleziska podpisują cały swój pięciokrotny urobek. Szczęśliwy rzut przy zbiorze ze zwłok podpisuje plon tam, gdzie dana rodzina nie ma okazu do oddania, a tam, gdzie ma, zostawia plon zwykły i wybija obok niego podpisany nieskazitelny okaz. Wytwarzanie podpisuje wedle tej samej linii: każda kopia wyniku rzadkiego lub lepszego wybija się podpisana, a arcydzieło podpisuje się zawsze, niezależnie od swojej jakości, więc najlepsza wersja każdego elementu zawsze wymienia swojego twórcę. Jedyne, co może kosztować cię podpis, to pełna torba: podpisana sztuka potrzebuje własnego miejsca albo pasującego podpisanego stosu, w którym może wylądować.\n\nStos przedmiotów dzieli jedną tożsamość, więc dwie kopie łączą się tylko wtedy, gdy każdy znak zgadza się dokładnie: ten sam przedmiot, ten sam podpisujący, te same statystyki arcydzieła, to samo zaklęcie, ta sama więź. Podpisana kłoda nigdy nie dołącza do zwykłej sterty w żadną stronę (łączenie wymazałoby czyjeś imię), ale identyczne ładunki łączą się chętnie, więc dwadzieścia rud podpisanych przez tego samego zbieracza siedzi w jednym stosie, a urobek nie szatkuje ci toreb.\n\nPodpisy oddają rzemieślnikom z nawiązką: trzymanie przy stole dowolnej podpisanej kopii potrzebnego reagentu, obojętne kto ją podpisał, dodaje 2 punkty procentowe szansy na arcydzieło, a trzymanie reagentu podpisanego twoją własną ręką obniża wymaganą ilość tego reagentu o jeden (nigdy poniżej jednego). Twoja własna podpisana praca rzadka lub lepsza nawet dalej cię uczy, dziś wyłącznie przez butelkę: wypij miksturę, którą podpisałeś, a mały strumyczek umiejętności popłynie z powrotem do rzemiosła, które ją uwarzyło, o ile to rzemiosło jest jedną z twoich aktywnych głównych specjalizacji.',
-  'guide.profPages.faq.a4':
-    'Trafiła ci się gratka. Mniej więcej 1 zbiór na 90 wyzwala rzadkie zdarzenie zbierackie (starożytne twarde drewno na drzewie, pierwotna żyła w rudzie, rozkwitły w blasku księżyca kwiat wśród ziół): mnoży plon pięć razy, podpisuje każdą jednostkę twoim imieniem i ogłasza znalezisko całej strefie. Rzut na rzadką lub lepszą jakość przy zwykłym zbiorze również podpisuje plon.\n\nPodpisane materiały warto zachować albo sprzedać drogo: trzymanie przy warsztacie dowolnej podpisanej kopii potrzebnego reagentu dodaje 2 punkty procentowe do szansy na arcydzieło. Pamiętaj tylko, że łączą się w stos wyłącznie z identycznie podpisanymi kopiami, więc zajmują własny slot w torbie.',
-  'guide.profPages.faq.a6':
-    'Dziewięć pospolitych przepisów polowych i sześć przepisów na wytwarzane narzędzia lądowe zna każdy od początku, podobnie jak trzy przepisy związane ze stacją (Naramiennik Piecołuski, Kaptur z Ochronnej Tkaniny i Owijki ze Zmierzchowej Skóry), które nie wymagają trenera, a jedynie swojej stacji. Wszystkiego innego uczą rezydujący mistrzowie przy swoich stacjach w trzech miastach centralnych: większość stoi w Eastbrook, garbarz prowadzi garbarnię w Fenbridge, a alchemik aptekę w Highwatch.\n\nPrzepisy od trenerów biegną szczeblami: umiejętność 0, 25 i 50 dla rzemiosł ekwipunkowych i konsumpcyjnych, w cenach: za darmo, 25 srebrnych i 1 złoty jako opłaty jednorazowe; dwa przepisy na talizmany z Zaklinania siedzą na szczeblu 25, a wytwórca narzędzi uczy dwóch wytwarzanych wędek przy 75 i 125 za 4 i 16 złotych. Mistrz uczy przepisu, gdy twoje pasmo w danym rzemiośle osiągnie pasmo samego przepisu, a żeby się uczyć, musisz stać przy jego stacji: ruchoma stacja się nie liczy.',
-  'guide.profPages.faq.a7':
-    'Czas zbierania startuje z 2,5 sekundy i skraca się na dwa sposoby: o 0,4 sekundy za każdy poziom narzędzia, które nosisz i potrafisz dzierżyć ponad własny poziom węzła, oraz o 0,15 sekundy, gdy licznik twojego fachu przekroczy pasmo 100, z podłogą na 1,5 sekundy. Przejdź z węzłów poziomu 1 na węzły poziomu 3, a twoja nadwyżka znika, więc ten sam kilof macha znowu wolniej. Trzymanie dokładnie wymaganego poziomu nie kupuje szybkości; otwiera tylko węzeł.\n\nPrzyrost umiejętności zanika tak samo jak przy wytwarzaniu: węzeł szarzeje, gdy twoja biegłość wspina się ponad jego poziom (węzły poziomu 1 niczego nie uczą od biegłości 75 wzwyż), więc odpowiedzią na powolne przyrosty są węzły wyższego poziomu. Te wymagają narzędzia co najmniej ich poziomu w torbach (żadnego węzła nie obrabia się gołymi rękami, z poziomem 1 włącznie), a narzędzie lądowe powyżej poziomu 1 chce najpierw swojego progu dzierżenia: 40/70/85/100 we własnym fachu dla poziomów od 2 do 5. Wędkarstwo ma własne zwężenie: pełny przyrost poniżej 50 biegłości, połowa poniżej 100, strużka 0,1 poniżej 150 i 0,02 poniżej 200, śmieciowe połowy nie uczą już niczego od 100 wzwyż, a sama woda nakłada pułap na naukę (wody poziomu 1 przestają uczyć przy 100, trzęsawisko przy 150), więc zatrzymany licznik może też oznaczać, że wyrosłeś z tej wody.',
-  'guide.profPages.faq.a8':
-    'Częściowo. Dziewięć pospolitych przepisów polowych (startowa broń, pancerz, jedzenie i mikstury) wytwarza się wszędzie i o każdej porze, podobnie jak trzy przepisy kombinowane przysięgniętych par. Wszystko powyżej nich jest związane z typem stacji: kuźnia, kuchnie, apteka, garbarnia, warsztat tkacki lub narzędziownia, a żeby wyrób doszedł do skutku, musisz być w promieniu 20 jardów od stacji.\n\nPrzy 75 umiejętności w rzemiośle specjalizujesz się, a wraz z 20-procentową zniżką na materiały zyskujesz ruchomą stację: rozstaw ją w terenie, a stoi przez 10 minut, obsługując przepisy tego rzemiosła tak, jakbyś stał przy prawdziwej. Ruchoma stacja służy wyłącznie do wytwarzania: nauka przepisów i odwiązywanie zamówień zawsze wymagają prawdziwej stacji w mieście.',
   'wallet.seekerAppHelp':
     'Kontynuuj z Seed Vault Wallet. Przejrzyj żądania połączenia i weryfikacji w Seed Vault, a następnie wróć do gry.',
   'questUi.tracker.unknownQuest': 'Nieznane zadanie ({id})',
@@ -2232,8 +2833,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Wędka kuta przypływem',
   'entities.items.gatherers_cache.name': 'Skrytka Zbieracza',
   'entities.items.artisans_eye.name': 'Oko Rzemieślnika',
-  'entities.items.reins_terrorspark_groundshaker.name':
-    'Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi',
+  'entities.items.reins_lanternback_troll.name': 'Jarzmo latarnika: Grumbol',
   'hud.options.graphicsPresetInsane': 'Ekstremalne',
   'hud.options.surfaceDetail': 'Szczegóły powierzchni',
   'hud.options.surfaceDetailBasic': 'Podstawowe',
@@ -2271,7 +2871,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Wzmocnienie Krwawej ręki',
   'hudChrome.auraOverlay.procs.revenge': 'Odwet!',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Nagła śmierć',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Zryw zwycięstwa',
   'hudChrome.auraOverlay.reposition': 'Ustaw pozycje',
   'hudChrome.auraOverlay.reset': 'Resetuj pozycję',
   'hudChrome.auraOverlay.screenPosition': 'Pozycja na ekranie',
@@ -2290,7 +2889,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.epic.unlink': 'Usuń powiązanie z Epic',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Groziskra, Wstrząsacz Ziemi',
   'hudChrome.targetAuras.all': 'Wszystko',
   'hudChrome.targetAuras.buffs': 'Wzmocnienia',
   'hudChrome.targetAuras.configureRows': 'Skonfiguruj aury celu',
@@ -2308,7 +2906,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.visibleRows': 'Preferowane rzędy aur: {count}',
   'hudChrome.bags.itemAriaMasterwork': '{item}, ilość {count}, arcydzieło',
   'hudChrome.archetypePair.tailoring+inscription': 'Magotkacz',
-  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Zaklinanie broni - Runowe Ognisko',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Podnoś dalej {craft}: {points} więcej punktów do Specjalistycznego, a koszty materiałów spadną.',
   'guide.professions.harvestBodyChoice':
@@ -2321,10 +2918,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Nie musisz tego szukać samodzielnie. Wykonuj swoje rzemiosła, a gdy twoje umiejętności po raz pierwszy wyraźnie skłaniają się ku jednej parze, Gildia Rzemieślnicza to zauważa i wysyła list Kruczą Pocztą, podając imię mistrza do odwiedzenia i zadanie do podjęcia. Przybywa raz na postać i tylko wtedy, gdy nie złożyłeś jeszcze przysięgi parze.',
   'guide.professions.whatHeading': 'Fach obok miecza',
   'guide.professions.ringHeading': 'Pierścień rzemiosł',
-  'guide.professions.ringBody':
-    'Każde rzemiosło z zawartością dziś ma limit 125 umiejętności: Płatnerstwo, Zbrojmistrzostwo, Krawiectwo, Kuśnierstwo, Gotowanie, Alchemia, Inżynieria i Zaklinanie. Po osiągnięciu limitu zawód nadal działa, zbiory nadal przynoszą plony, wytwarzanie nadal rozstrzyga, a arcydzieła nadal mogą się zdarzać; tylko liczba przestaje rosnąć. Wybierz poniżej kartę rzemiosła, by zobaczyć pełne tabele przepisów i liczby.',
-  'guide.professions.ringWaveNote':
-    'Dwa rzemiosła na kole - Jubilerstwo i Inskrypcja - zajmują swoje miejsca, ale nie mają jeszcze przepisów. To celowe, a nie przeoczenie: ich zawartość pojawia się razem z przyszłymi strefami, a limity powyżej rosną tak samo, więc rzemiosło z dziś osiągniętym limitem to zaliczka na tę ekspansję, nie meta.',
   'guide.professions.capFmt': 'Limit {cap}',
   'guide.professions.comingSoon': 'Brak przepisów',
   'guide.professions.gatherHubHeading': 'Zbieranie',
@@ -2333,17 +2926,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypesHeading': 'Koło i jego archetypy',
   'guide.professions.pairFmt': '{a} i {b}',
   'guide.professions.curveHeading': 'Krzywa Mistrzostwa',
-  'guide.professions.curveBody':
-    'Przyrost umiejętności podlega jednej zasadzie wszędzie: czterostanowej Krzywej Mistrzostwa. Każde {step} punktów umiejętności to poziom, a każdy przepis oceniany jest względem twojego: na twoim poziomie lub wyżej daje pełny przyrost, jeden poziom niżej połowę, dwa niżej ćwierć, trzy lub więcej niżej nic.\n\nOkno wytwarzania nakłada to wprost na listę przepisów w klasycznych kolorach: pomarańczowy dla pełnego przyrostu, żółty dla zmniejszonego, zielony dla strumyczka, szary dla zera. Przyrosty są deterministyczne, nigdy rzutem na podniesienie umiejętności, więc to samo rzemiosło na tym samym poziomie zawsze przesuwa twoją umiejętność o dokładnie tę samą wartość, a przepis żółknący to sygnał, by nauczyć się następnego szczebla.\n\nZbieranie działa na tej samej krzywej z tym samym krokiem poziomu, oceniane względem węzła zamiast przepisu: łatwe węzły szarzeją, gdy je mijasz, a bogatsze węzły późniejszych stref finiszują wspinaczkę. Wędkarstwo trzyma się własnego harmonogramu: pełny punkt za połów poniżej 50 biegłości, połowa do 100, dziesiąta do 150 i powolny ogon aż do 200, przy czym śmieciowe połowy niczego nie uczą od 100 wzwyż.',
   'guide.professions.provenanceHeading': 'Proweniencja',
   'guide.professions.provenanceBody':
     'Dobre rzemiosło w tym świecie pamięta swego twórcę: rzadkie lub lepsze zbiory i wyroby pojawiają się podpisane (Zebrany przez, Wytworzony przez), arcydzieło kończy się o jeden poziom jakości wyżej z imieniem twórcy zawsze na nim, a zamówiony przedmiot wiąże się ze swoim odbiorcą przez Więź Twórcy. Strona Ekonomii Wytwarzania zawiera pełne zasady, od podpisów i łączenia w stosy po opłaty za odwiązanie.',
   'guide.professions.stationsHeading': 'Stacje i trzy centra',
-  'guide.professions.stationsBody':
-    'Sześć typowanych stacji obsługuje siedem rzemiosł stacjonarnych, rozłożonych po trzech centrach miejskich. Wschodni Potok mieści kuźnię (Płatnerstwo i Zbrojmistrzostwo dzielą ją), kuchnie, krosnię i warsztat; Fenmost ma garbarnie, a Wysoka Straż aptekarię. Przy każdej stacji stoi rezydujący mistrz, który uczy przepisów, wystawia zlecenia i oferuje usługę odwiązywania.\n\nPromień pracy to 20 jardów, mniej więcej podwórko stacji, więc wytwarza się stojąc przy kowadle, a nie z drugiego końca miasta. Jubilerstwo, Inskrypcja i Zaklinanie nie mają stacji: pierwsze dwa czekają na przepisy, a Zaklinanie działa wszędzie z założenia.',
   'guide.professions.deedsHeading': 'Czyny pamiętające drogę',
-  'guide.professions.deedsBody':
-    'Księga Czynów kroczy obok każdego kroku tej drogi. Pierwsze dostrojenie przynosi czyn Zaprzysiężony Rzemiosłu, a pierwsze arcydzieło - Mistrz Wyrobu, oba do noszenia jako tytuły. Każde z ośmiu rzemiosł możliwych do zdobycia zaznacza kamień milowy przy 50 umiejętności i uwieńcza swój limit tytułem Arcymistrza, podczas gdy wędkarstwo dostaje Starego Solonego przy 100 biegłości i tytuł Mistrza Wędkarstwa przy 200.\n\nSą też spokojniejsze strony: czyny za pierwsze zebranie i pierwsze wytworzenie, za rzadkie znaleziska, które los przynosi w terenie, i za wzięcie się za salvage. Wszystko jest kosmetyczne: tytuły i Renoma wyłącznie. Czyn nie daje mocy; tylko udowadnia, że tam byłeś.',
   'guide.professions.startHeading': 'Od czego zacząć',
   'guide.professions.colStation': 'Stacja',
   'guide.professions.colHub': 'Centrum',
@@ -2388,14 +2975,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Krawiectwo tka materiał na Intelekt i Ducha, w którym żyją zaklęci, od płóciennych podstaw przez zestaw Gildenweave po rzadką robótkę słonecznosplotną, i zszywa Jedwabną Sakwę, dziesięciomiejscowy plecak, którego nikt nigdy nie odmawia.',
   'guide.profPages.craftIntro.leatherworking':
     'Garbarstwo wyprawia ekwipunek na Zręczność i Wytrzymałość dla klas, które unikają zamiast blokować, od fenbryjskich skórzanych podstaw po rzadki zestaw strażnika bajor, i jest jedynym głębokim fachem szkolonym poza Eastbrook.',
-  'guide.profPages.craftIntro.cooking':
-    'Gotowanie zamienia dzienny połów w posiłki, które leczą przez 18 sekund odpoczynku: najtańsze leczenie w grze, od Solonej Soloniny aż po Wielki Pieczeń Marlowa. Wszyscy jedzą, więc żaden fach nie jest bardziej powszechnie mile widziany w grupie.',
-  'guide.profPages.craftIntro.alchemy':
-    'Alchemia zamienia zioła, gruczoły i szkło w butelki, które wygrywają walki: leczące i manowe wywary na chwilę, gdy wszystko idzie nie tak, oraz eliksiry wytrzymałości, które siedzą na pasku wzmocnień przez cały loch.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading':
     'Ostrze, którego szuka każdy wojownik',
-  'guide.profPages.craftProse.weaponcrafting.identityBody':
-    'Ktoś w każdej grupie chce roboty tego fachu, bo sam rzadki szczebel pokrywa wszystkie trzy apetyty: Osmiumowa Klinga Wojenna dla walczących na Siłę, Glifostalowy Topór Wojenny dla myśliwych na Zręczność, oraz Wysokososnowy Kostur Bojowy, laska na Intelekt i Ducha dla tłumu w szatach.\n\nNa pierścieniu rzemiosł stoi między Wytwarzaniem Pancerzy a Jubilerstwem. Jego żywą tożsamością jest Kowal, para Wytwarzania Broni i Wytwarzania Pancerzy, przysięgnięta przed Mistrzynią Kuźni Darvą przy kuźni przez wydobycie trzech żył rudy własnymi rękami; para Mistrzów Ostrzy z Jubilerstwem jest też nazwana na pierścieniu, ale nie można jej jeszcze przysięgnąć, bo Jubilerstwo nie wydaje przepisów aż do późniejszej ekspansji stref.',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'Czym żywi się kuźnia',
   'guide.profPages.craftProse.weaponcrafting.ladderHeading': 'Drabinka szczebel po szczeblu',
   'guide.profPages.craftProse.weaponcrafting.ladderBody':
@@ -2410,8 +2991,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Od szczebla kolczugowego wzwyż każde wytworzenie rzuca szansę na arcydzieło; pospolite miedzianie bez pancerza nie mogą jej procować, bo arcydzieło poprawia statystyki, a te ich nie mają. Żelazo liczy się jako materiał pierwszego poziomu dla procentu, a glifstal jako drugiego.\n\nWspinaczka to standardowa trzyszczeblowa przejażdżka: miedź do 25, kolczuga do 50, osmiumowa łuska do 75, ucząc każdego szczebla w dniu, gdy się otwiera. Wytwarzanie Pancerzy ma szczęście w odcinku po 75: Naramiennik Piecołuski to przepis trzeciego poziomu, więc płaci pełny przyrost do 99 i połowę potem, co oznacza, że ostatnie pięćdziesiąt punktów zajmuje około 75 wytworzeń zamiast 150, których potrzebuje fach bez zwieńczenia. Każdy naramiennik kosztuje siedem rud osmium i pięć Topników Kowalskich, więc zaopatrz się w Thornpeak i przy ladzie kuźni przed rozpoczęciem biegu.\n\nZamówienie robocze Darvy kupuje osiem rud miedzianych co 30 minut za monetę i PD, niezły odpływ dla rudy niskiego poziomu, z której wyrastasz. Księga Czynów zaznacza Młot i Płytę przy umiejętności 50, a Arcymistrzostwo Wytwarzania Pancerzy czeka przy pułapie 125.',
   'guide.profPages.craftProse.tailoring.identityHeading':
     'Tkanina dla zaklinaczy, torby dla wszystkich',
-  'guide.profPages.craftProse.tailoring.identityBody':
-    'Drabinka wspina się od płóciennych podstaw przez zestaw Gildenweave po rzadki szczebel: Szatę Jedwaboprzędnika i elementy słonecznosplotne. Jej drugi fach jest uniwersalny: Jedwabiana Sakwa to dziesięciomiejscowy plecak, i nie ma klasy, specjalizacji ani poziomu, który nie chciałby więcej miejsca w torbach.\n\nNa pierścieniu Krawiectwo siedzi między Garbarstwem a Inskrypcją. Jego żywą parą jest Zaopatrzeniowiec, Garbarstwo i Krawiectwo razem, przysięgnięte przed Tkaczką Ottilie przy krosnach Eastbrook po wytrzebieniu czterech pająków jedwabnikowych dla ich jedwabiu; para Atramentarzy z Inskrypcją jest nazwana na pierścieniu, ale czeka na pierwsze przepisy Inskrypcji przed możliwością przysięgania.',
   'guide.profPages.craftProse.tailoring.materialsHeading': 'Nić, jedwab i, tak, zioła',
   'guide.profPages.craftProse.tailoring.materialsBody':
     'Krosna działają na tym, co spada z łowów i co rosną na polach. Lniane skrawki i grube płótno schodzą z zabójstw humanoidów, pajączy jedwab jest zbierany ze zwłok pająków, a centralny element rzadkiego szczebla, Szata Jedwaboprzędnika, potrzebuje Nieskazitelnego Jedwabiu, sygnowanego okazu, który pojawia się przy szczęśliwym żniwie ze zwłok.\n\nZielarstwo karmi Krawiectwo bardziej niż jakikolwiek inny fach oparty na ekwipunku: lśnolist wykańcza kapcie, złotolist barwi zestaw Gildenweave, a słonecznopłatek szyje przez cały rzadki szczebel, więc krawiec, który zbiera własne zioła, oszczędza stale. Szpula Nici kosztuje 12 miedzianych od Ottilie, a krosna nie wymagają żadnego metalu: nawet zwieńczeniowy Kaptur Odzianowelnowy jest tkany z premium ziół, Nieskazitelnego Jedwabiu, pajączego jedwabiu i nici.',
@@ -2434,8 +3013,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Solona Solonina to przepis polowy: znany od początku, jedna noga pająka, można wytworzyć wszędzie, jedzenie drogi każdego świeżego poszukiwacza przygód. Drabinka mistrza gotuje w kuchniach Eastbrook po wschodniej stronie placu: darmowy szczebel przy umiejętności 0 (okoń, Szaszłyk z Dziczyzny Myśliwego, Ziołowy Szczupak Bagienny), środkowy szczebel przy umiejętności 25 za 25 srebrnych za przepis (Wędzony Węgorz Ashwood, Gulasz z Dziczyzny Złotolistnej, Zupa Lodowata), a rzadki szczebel przy umiejętności 50 za 1 złoty za przepis (Kolacja z Posrebrzanego Karpia, Półmisek Uczty Wędkarskiej, Wielki Pieczeń Marlowa).\n\nPotrawy porcjowe rozciągają składniki: wędzony węgorz i gulasz z dziczyzny obsługują dwie porcje za jedno wytworzenie, a półmisek uczty trzy. Marlow uczy każdego szczebla w chwili, gdy twój poziom w Gotowaniu go osiągnie.',
   'guide.profPages.craftProse.cooking.routeHeading':
     'Specjalizacja, nie arcydzieła, i droga do 125',
-  'guide.profPages.craftProse.cooking.routeBody':
-    'Gotowanie to uczciwy wyjątek od historii arcydzieł: posiłek nie ma linii statystyk do poprawienia, więc potrawy nigdy ich nie procują, i żaden kucharz nie powinien za nimi gonić. Mistrzostwo fachu to specjalizacja przy 75: piąta część mniej każdego składnika, co szybko się kumuluje na potrawach porcjowych, oraz przenośna kuchnia polowa, by uczta była gotowana przy drzwiach do lochu.\n\nGotuj to, co łowisz: para wspinaczki z sesją wędkarską i dwa fachy karmią się nawzajem po całej drodze w górę. Solonina i darmowy szczebel niosą cię do 25 za punkt na wytworzenie, środkowy szczebel do 50, a rzadki do 75; po 75 żadne wyższe danie jeszcze nie zostało wydane, więc rzadkie potrawy zanikają do połowy, a potem ćwierci przyrostu, mniej więcej 150 dodatkowych wytworzeń do pułapu. Traktuj to jako zaopatrywanie, nie harówkę: gildia zjada każdą porcję.\n\nZamówienie robocze kuchni Marlowa kupuje osiem sztuk mięsa dziczyzny co 30 minut za monetę i PD, a Księga Czynów zaznacza Doświadczonego Kucharza przy umiejętności 50 na drodze do tytułu Arcymistrza Gotowania przy 125.',
   'guide.profPages.craftProse.alchemy.identityHeading': 'Butelki, które wygrywają walki',
   'guide.profPages.craftProse.alchemy.materialsHeading': 'Zioła, gruczoły i szkło',
   'guide.profPages.craftProse.alchemy.materialsBody':
@@ -2447,7 +3024,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.engineering.ladderHeading': 'Drabinka narzędzi',
   'guide.profPages.craftProse.engineering.routeHeading': 'Droga inżyniera do 125',
   'guide.profPages.craftProse.engineering.routeBody':
-    'Narzędzia nie mają statystyk bojowych, więc nigdy nie tworzą arcydzieł; ten procent należy do ekwipunku ze statystykami. Specjalizacja wciąż ląduje przy umiejętności 75: 20 procent mniej materiałów za wytworzenie oraz tymczasowe polowe warsztaty, które zamieniają każdą wyprawę zbieracką w warsztat. Matematyka przyrostów prawie nie zanika tu: przepisy umiejętności 75 płacą pełny przyrost do 100 i połowę potem, a przepisy umiejętności 150 płacą pełny przyrost przez cały pułap 125, więc prawdziwym ograniczeniem są reagenty i moneta, nigdy szare przepisy.\n\nWybierz swoją parę najpierw, bo nic bez niej się nie rusza: weź attunement Bombardiera od Konstruktora Gizzela. Potem zasilaj drabinkę: rozwijaj Górnictwo, Drwala lub Zielarstwo samemu albo zaprzyjaźnij się ze zbieraczami, kup narzędzia poziomu 3 od sprzedawców i traktuj zamówienie robocze Gizzela (osiem Kłód Żelazokory za 16 miedzianych, powtarzalne co 30 minut) jako pieniądze na spacer.\n\nInżynieria to prestiżowy fach małej objętości, mniej więcej jeden punkt umiejętności za ukończone narzędzie, więc traktuj każde wytworzenie jako towar do sprzedaży. Tekst sprzedaży do klientów pisze się sam: każdy poziom narzędzia powyżej własnego poziomu węzła skraca czas rzucania zbioru 2,5-sekundowego o 0,4 sekundy (do podłogi 1,5 sekundy), więc narzędzie poziomu 5 to przyspieszenie na każdym węźle w świecie, i tylko ty możesz jedno zrobić. Księga Czynów zaznacza Tryby i Sprężyny przy umiejętności 50 i Arcymistrzostwo Inżynierii przy 125.',
+    'Narzędzia nie mają statystyk bojowych, więc nigdy nie tworzą arcydzieł; ten procent należy do ekwipunku ze statystykami. Specjalizacja wciąż ląduje przy umiejętności 75: 20 procent mniej materiałów za wytworzenie oraz tymczasowe polowe warsztaty, które zamieniają każdą wyprawę zbieracką w warsztat. Matematyka przyrostów prawie nie zanika tu: przepisy umiejętności 75 płacą pełny przyrost do 100 i połowę potem, a przepisy umiejętności 125 płacą pełny przyrost aż do pułapu, więc prawdziwym ograniczeniem są reagenty i moneta, nigdy szare przepisy.\n\nWybierz swoją parę wcześnie, bo drabinka narzędzi bez niej się nie rusza: weź attunement Bombardiera od Konstruktora Gizzela. Potem zasilaj drabinkę: rozwijaj Górnictwo, Drwala lub Zielarstwo samemu albo zaprzyjaźnij się ze zbieraczami, kup narzędzia poziomu 3 od sprzedawców i traktuj zamówienie robocze Gizzela (osiem Kłód Żelazokory za 16 miedzianych, powtarzalne co 30 minut) jako pieniądze na spacer.\n\nInżynieria to prestiżowy fach małej objętości, mniej więcej jeden punkt umiejętności za ukończone narzędzie, więc traktuj każde wytworzenie jako towar do sprzedaży. Tekst sprzedaży do klientów pisze się sam: każdy poziom narzędzia powyżej własnego poziomu węzła skraca czas rzucania zbioru 2,5-sekundowego o 0,4 sekundy (do podłogi 1,5 sekundy), więc narzędzie poziomu 5 to przyspieszenie na każdym węźle w świecie, i tylko ty możesz jedno zrobić. Księga Czynów zaznacza Tryby i Sprężyny przy umiejętności 50 i Arcymistrzostwo Inżynierii przy 125.',
   'guide.profPages.craftProse.enchanting.identityHeading': 'Ekwipunek rozebrany, moc z powrotem',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'Jak Zaklinanie się poziomuje',
   'guide.profPages.craftProse.enchanting.marketHeading': 'Zaczarowane kopie, proweniencja i rynek',
@@ -2546,7 +3123,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rynek Świata to wymiana obejmująca całe królestwo, prowadzona przez Kupca w Eastbrook i Licytatora Vossa w Highwatch. Wystawienie jest bezpłatne: nie ma kaucji, a niesprzedane wystawienie po prostu wraca do ciebie. Dom pobiera swoją prowizję tylko wtedy, gdy coś faktycznie się sprzedaje: 5 procent ceny sprzedaży, a reszta czeka, aż ją odbierzesz.\n\nJedno ważne ograniczenie: Rynek pośredniczy wyłącznie w zwykłych towarach. Podpisanej, mistrzowskiej, zaklinowanej lub związanej kopii nigdy nie wciąga do wystawienia, więc wyjątkowe przedmioty zmieniają właścicieli twarzą w twarz w oknie wymiany, które przenosi pełną tożsamość przedmiotu, z podpisem włącznie. Wyceniaj je samodzielnie; Rynek mówi ci tylko, za ile idzie zwykła wersja.',
   'guide.profPages.econ.workOrdersHeading': 'Zlecenia robocze',
   'guide.profPages.econ.workOrdersNote':
-    'Każdy mistrz stacji wystawia stałe zlecenie robocze: przynieś stos podstawowego materiału ich rzemiosła i zostań opłacony na miejscu, plus trochę doświadczenia z zadania. Zapłata jest celowo ustalona na {pct}% tego, co sprzedawca dałby ci za ten sam stos, zaokrąglona w dół, więc zlecenie robocze nigdy nie jest opłacalnym sposobem sprzedaży materiałów, tylko powodem, by zajrzeć do stacji.\n\nKażde zlecenie działa na własnym zegarze {minutes} minut na postać: oddaj jedno i ten mistrz nic więcej dla ciebie nie ma, dopóki licznik nie przejdzie koła. Traktuj je jako mały bonus do materiałów, które i tak zbierałeś, nie jako biznes.',
+    'Każdy mistrz stacji wystawia stałe zlecenia robocze, po jednym na każdy podstawowy materiał: przynieś stos, o który prosi zlecenie, i zostań opłacony na miejscu, plus trochę doświadczenia z zadania. Zapłata jest celowo ustalona na {pct}% tego, co sprzedawca dałby ci za ten sam stos, zaokrąglona w dół, więc zlecenie robocze nigdy nie jest opłacalnym sposobem sprzedaży materiałów, tylko powodem, by zajrzeć do stacji.\n\nKażde zlecenie działa na własnym zegarze {minutes} minut na postać: oddaj jedno i to zlecenie jest dla ciebie zamknięte, dopóki licznik nie przejdzie koła, a pozostałe zlecenia mistrza pozostają otwarte. Traktuj je jako mały bonus do materiałów, które i tak zbierałeś, nie jako biznes.',
   'guide.profPages.econ.colOrder': 'Zlecenie robocze',
   'guide.profPages.econ.colMaster': 'Mistrz',
   'guide.profPages.econ.colAsks': 'Prosi o',
@@ -2564,22 +3141,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.title': 'FAQ o Profesjach',
   'guide.profPages.faq.intro':
     'Szybkie odpowiedzi na pytania, które rzemieślnicy zadają najczęściej.',
-  'guide.profPages.faq.q1': 'Dlaczego moje podpisane przedmioty nie układają się w stos?',
-  'guide.profPages.faq.a1':
-    'Podpisany przedmiot to przedmiot egzemplarzowy: niesie własny mały zapis (podpisujący, jakakolwiek wylosowana jakość, statystyki arcydzieła, zaklęcie, więź) zamiast bycia anonimową kopią. Dwie kopie scalają się w jeden stos tylko wtedy, gdy te zapisy pasują dokładnie.\n\nW praktyce: rzadka ruda, którą sam zebrałeś, układa się z kolejną rzadką rudą, którą sam zebrałeś, bo obie mówią Zebrane przez ciebie i nic innego się nie różni. Ten sam materiał podpisany przez przyjaciela leży w swoim własnym slocie, a zwykła niepodpisana kopia nigdy nie scala się w podpisany stos. Torby, bank i wymiana podążają za tą jedną zasadą.',
   'guide.profPages.faq.q2': 'Czy pospolite przepisy zawsze podnoszą moją umiejętność?',
-  'guide.profPages.faq.a2':
-    'Nie. Każdy przepis jest oceniany według tego, jak daleko leży poniżej twojego aktualnego pasma biegłości w danym rzemiośle, klasyczny odczyt pomarańczowy, żółty, zielony, szary: pełny zysk na twoim paśmie lub powyżej, połowa jedno pasmo niżej, ćwierć dwa pasma niżej i nic trzy lub więcej niżej. Pasma są co 25 punktów umiejętności, więc darmowe przepisy od umiejętności 0 przestają cię czegokolwiek uczyć przy umiejętności 75.\n\nPułapy są też niższe niż klasyczne 300, których mogłbyś oczekiwać: każde z ośmiu wyrabianych rzemiosł ma pułap 125, Górnictwo, Drwalstwo i Zielarstwo mają pułap 100, a Wędkarstwo biegnie długo do 200. Wspinaczka oznacza przechodzenie do przepisów na własnym paśmie, nie mielenie najtańszego.',
-  'guide.profPages.faq.q3': 'Jaka jest różnica między plądrowaniem a zbieraniem tuszy?',
-  'guide.profPages.faq.a3':
-    'Jedno naciśnięcie obejmuje oba. Wszystko, co tusza zawiera, monety i łupy plus wszelkie zbieralne składniki, otwiera się w tym samym oknie: łupy podążają za normalnymi zasadami łupów, a zbieranie to strona profesji, ściągająca materiały z samej tuszy.\n\nZbieranie odbywa się na zasadzie kto pierwszy, jednorazowe użycie: każda tusza może być zebrana dokładnie raz, przez tego, kto ją pierwszy zgłosi, także online. Twoje Priorytety Miasta kształtują to, co dostaniesz: stojąc w centrum miasta, możesz rozłożyć 10 punktów priorytetu na typy składników, na których ci zależy, a każdy priorytetowy składnik wylosuje lepszy poziom (co 5 punktów podnosi go o krok, co najwyżej dwa kroki) i da więcej (10 procent za punkt). Niepiorytetowane składniki nigdy nie są pogarszane.',
-  'guide.profPages.faq.q4': 'Dlaczego moja Kłoda Żelaznej Kory jest podpisana?',
-  'guide.profPages.faq.q5': 'Jak odwiązać zamówiony przedmiot i ile to kosztuje?',
-  'guide.profPages.faq.a5':
-    'Podejdź do dowolnej stacji rzemieślniczej z przedmiotem w torbie i zapłać mistrzowi. Opłata zależy od jakości przedmiotu: 25 srebrnych za niepospolity, 1 złoty za rzadki, 4 złote za epicki; legendarny płaci stawkę epicką, a pospolity wyrób na zamówienie stawkę niepospolitą. Musi to być prawdziwa stacja: ruchoma stacja nigdy tej usługi nie oferuje.\n\nOpłata kupuje czysty zapis, nie lekarstwo: przedmiot pozostaje zamówieniem, więc wiąże się ponownie z tym, kto go otrzyma w następnej wymianie. Jeśli kilka związanych kopii dzieli stos, jedna kopia jest oddzielana i odwiązywana za każdą płatność.',
-  'guide.profPages.faq.q6': 'Gdzie uczę się przepisów i ile kosztują?',
-  'guide.profPages.faq.q7': 'Dlaczego moje zbieranie nagle zwolniło?',
-  'guide.profPages.faq.q8': 'Czy mogę wytwarzać z dala od miasta?',
   'hud.logs.keptBoundOne': 'Zachowano {count} zawiązaną kopię.',
   'hud.logs.keptBoundMany': 'Zachowano {count} zawiązanych kopii.',
   'hud.pet.waterJet': 'Strumień wody',
@@ -2621,7 +3183,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przepuszcza przez wroga falę surowego eteru, zadając {damage} obrażeń. Każde rzucenie czaru pozostawia Eteryczny Ładunek zwiększający obrażenia i prędkość rzucania kolejnego Aether Surge (o 5% szybciej za każdy), lecz znacznie podnoszący koszt many, maksymalnie do 4; Eteryczne strzały wydają te ładunki. Każde rzucenie może również naładować Eteryczny Pęd, czyniąc następny Aether Surge darmowym i dwukrotnie szybszym w rzucaniu.',
   'entities.abilities.arcane_surge.name': 'Przypływ eteru',
   'entities.abilities.blizzard.description':
-    'Przywołuje burzę lodową nad wybranym obszarem na 6 sek., zadając {damage} obrażeń od Mrozu co sekundę i spowalniając wrogów o 40%. Każdy trafiony wróg skraca odnowienie Frozen Orb o 0,5 sek., maksymalnie 3 sek. na rzucenie. (Mróz)',
+    'Przywołuje burzę lodową nad wybranym obszarem na 6 sek., zadając {damage} obrażeń od Mrozu co sekundę i spowalniając wrogów o 40%. Każdy trafiony wróg skraca odnowienie Frostglobe o 0,5 sek., maksymalnie 3 sek. na rzucenie. (Mróz)',
   'entities.abilities.blizzard.name': 'Zamieć',
   'entities.abilities.brain_freeze.name': 'Zamrożenie mózgu',
   'entities.abilities.dragons_breath.description':
@@ -2634,13 +3196,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przemienia się w płonący żar, zwiększając prędkość ruchu o {buff}%. W tej postaci nie możesz atakować ani rzucać czarów. Ponownie rzuć, aby powrócić do normalnej formy.',
   'entities.abilities.fireball_form.name': 'Postać żaru',
   'entities.abilities.flurry.name': 'Zimowy bicz',
-  'entities.abilities.frozen_orb.name': 'Zmrożona kula',
   'entities.abilities.glacial_front.description':
     'Przytrzymaj, aby zebrać rosnący front lodowy, a następnie go wypuść w stożku. Dłuższe ładowanie sięga dalej i zadaje więcej obrażeń. Wszyscy trafieni wrogowie zostają spowolnieni o 50% na 4 sek.; maksymalny ładunek dodatkowo unieruchamia ich na 1 sek. (Mróz)',
   'entities.abilities.glacial_front.name': 'Front lodowcowy',
   'entities.abilities.glacial_spike.description':
     'Przywołuje masywny sopel lodu, pochłaniając 5 Soplii, aby zadać {damage} obrażeń od Mrozu i zamrozić cel w miejscu na 4 sek. (Mróz)',
-  'entities.abilities.glacial_spike.name': 'Lodowcowy kolec',
   'entities.abilities.ice_lance.description':
     'Ciska odłamkiem lodu, zadając {damage} obrażeń od Mrozu, potrojonych przeciwko zamrożonemu celowi. Wydaje Palce Mrozu lub ładunek Winterowego Chłodu, traktując cel jako zamrożony. (Mróz)',
   'entities.abilities.ice_lance.name': 'Lodowa lanca',
@@ -2655,10 +3215,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przesuwa cel o chwilę poza teraźniejszość, tworząc temporalną powłokę pochłaniającą {damage} obrażeń przez 10 sek., po czym oś czasu powraca do normy.',
   'entities.abilities.temporal_barrier.name': 'Czasowa bariera',
   'entities.abilities.temporal_cascade.description':
-    'Wysyła echo kaskadą przez twoją grupę: cel i do czterech najbliższych sojuszników zostają natychmiast uleczeni i naznaczeni przez {duration} sek., przekierowując część zadawanych przez ciebie obrażeń Arkanów z powrotem przez ich echa, aby ich leczyć. (Chronomancja)',
+    'Wysyła echo kaskadą przez twoją grupę: cel i do czterech najbliższych sojuszników zostają natychmiast uleczeni i naznaczeni przez {duration} sek., przekierowując część zadawanych przez ciebie obrażeń Arkanów z powrotem przez ich echa, aby ich leczyć. Przypływ Eteru i Eteryczne Pociski tworzą z każdego grupowego Echa równą rezerwę leczenia, rozdzielaną według brakującego zdrowia między naznaczonych sojuszników poniżej 60% zdrowia. (Chronomancja)',
   'entities.abilities.temporal_cascade.name': 'Czasowa kaskada',
   'entities.abilities.temporal_echo.description':
-    'Naznacza sojusznika echem zdrowszej chwili, natychmiast lecząc {damage} punktów zdrowia. Przez {duration} sek. część zadawanych przez ciebie obrażeń Arkanów jest przekierowywana przez echo, aby go leczyć.',
+    'Naznacza sojusznika echem zdrowszej chwili, natychmiast lecząc {damage} punktów zdrowia. Przez {duration} sek. leczy go {echoSinglePct}% twoich pozostałych obrażeń Arkanów przeciw jednemu celowi oraz {echoAreaPct}% obszarowych obrażeń Arkanów. Przypływ Eteru i Eteryczne Pociski leczą go zamiast tego za {echoDriverPct}% zadanych obrażeń.',
   'entities.abilities.temporal_echo.name': 'Czasowe echo',
   'entities.abilities.temporal_hourglass.description':
     'Umieszcza temporalną klepsydrę w wybranym miejscu. Pod wrogiem zawiesza go na {hostilePveDuration} sek. w PvE lub {hostilePvpDuration} sek. w PvP, uniemożliwiając wszelkie działania; obrażenia przerywają efekt. U twoich stóp lub pod sojusznikiem z grupy nadaje stazę na {duration} sek., zapobiega obrażeniom i działaniom, przywraca {healing}% maksymalnego zdrowia i przyspiesza regenerację czasu odnowienia o {selfCooldownRecovery}% dla ciebie lub {allyCooldownRecovery}% dla sojusznika. Na pustej ziemi klepsydra czeka {groundDuration} sek. i działa na pierwszą prawidłową postać, która na nią wejdzie. Korzystną aurę można zdjąć ręcznie.',
@@ -2680,14 +3240,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.mithril_mining_pick.name': 'Mithrilowy Kilof Górniczy',
   'entities.items.silverleaf_sickle.name': 'Sierp Srebrnolistny',
   'entities.items.thorium_mining_pick.name': 'Kilof Górniczy z Thorium',
-  'entities.items.arcanite_mining_pick.name': 'Kilof Górniczy z Arkanitu',
   'entities.items.elderwood_axe.name': 'Siekiera ze Starodrzewu',
   'entities.items.thorium_ore.name': 'Ruda Thorium',
-  'entities.items.arcanite_bar.name': 'Sztabka Arkanitu',
   'entities.items.elderwood_log.name': 'Kłoda Starodrzewu',
   'entities.items.silverleaf_herb.name': 'Ziele Srebrnolistne',
   'entities.items.thorium_warblade.name': 'Wojenna Klinga z Thorium',
-  'entities.items.arcanite_war_axe.name': 'Wojenny Topór z Arkanitu',
   'entities.items.elderwood_battle_staff.name': 'Bojowy Kostur ze Starodrzewu',
   'entities.items.thoriumscale_greathelm.name': 'Wielki Hełm z Łuski Thorium',
   'entities.items.thoriumscale_cuirass.name': 'Kirys z Łuski Thorium',
@@ -2823,7 +3380,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Natychmiastowy odłamek do wydawania efektów mrozu, trafia znacznie silniej w zamrożony cel.',
   'guide.abilityHook.shatter':
     'Twoje czary trafiają krytycznie znacznie częściej w zamrożone cele.',
-  'guide.deedsPage.renownBody': 'Renoma to wynik stojący za Księgą. Każdy zdobyty czyn wart jest ustaloną kwotę, a twoja suma tylko rośnie, więc spokojny tydzień nigdy nie kosztuje cię gruntu. Garstka zależy raczej od szczęścia niż od umiejętności, inne czyny kolekcjonerskie są nagrodą same w sobie, a Wyczyny to osobny zaszczyt, więc żaden z nich nie jest wart żadnej Renomy. Czyny bez Renomy nadal liczą się do ukończenia twojej Księgi; po prostu nigdy nie punktują. Wyczyny są jedynym wyjątkiem, trzymanym całkowicie poza liczeniem.',
+  'guide.deedsPage.renownBody':
+    'Renoma to wynik stojący za Księgą. Każdy zdobyty czyn wart jest ustaloną kwotę, a twoja suma tylko rośnie, więc spokojny tydzień nigdy nie kosztuje cię gruntu. Garstka zależy raczej od szczęścia niż od umiejętności, inne czyny kolekcjonerskie są nagrodą same w sobie, a Wyczyny to osobny zaszczyt, więc żaden z nich nie jest wart żadnej Renomy. Czyny bez Renomy nadal liczą się do ukończenia twojej Księgi; po prostu nigdy nie punktują. Wyczyny są jedynym wyjątkiem, trzymanym całkowicie poza liczeniem.',
   'guide.deedsPage.standingsNote':
     'Sfery prowadzą bieżące zestawienie Renomy na każdym koncie: tablica rankinguje całe konta według łącznej Renomy zdobytej przez całe życie, licząc każdy czyn raz dla wszystkich postaci na koncie i pokazując wyłącznie Renomę, więc czyny bez niej nigdy nie ruszają tabeli, choć wliczają się do twojej Księgi. Aby zobaczyć, kto i gdzie stoi, otwórz Tablicę Wyników w grze i przejdź do zakładki Renomy; zestawienie jest tam, nie na wiki.',
   'hudChrome.archetypePair.alchemy+cooking': 'Aptekarz',
@@ -3225,7 +3783,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_leap.description':
     'Skaczesz do wskazanego obszaru, zadając przy lądowaniu pobliskim wrogom {damage} pkt. obrażeń.',
   'entities.abilities.heroic_leap.name': 'Wojenny Skok',
-  'entities.abilities.intimidating_shout.description': 'Przerażający okrzyk, który zmusza do 5 wrogów w promieniu 8 m do ucieczki w strachu na 4 s. Obrażenia mogą przerwać efekt.',
+  'entities.abilities.intimidating_shout.description':
+    'Przerażający okrzyk, który zmusza do 5 wrogów w promieniu 8 m do ucieczki w strachu na 4 s. Obrażenia mogą przerwać efekt.',
   'entities.abilities.intimidating_shout.name': 'Zastraszający okrzyk',
   'entities.abilities.iron_resolve.description':
     'Zaciśnij zęby i zignoruj ból: zużywa do 40 pkt. wściekłości (minimum 20), aby pochłonąć {absorbPerRage} pkt. obrażeń za każdy wydany punkt wściekłości przez maksymalnie 10 sek. (Ochrona)',
@@ -3262,7 +3821,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Zaprawiony żołnierz',
   'entities.abilities.storm_bolt.description':
     'Ciskasz bronią w cel, zadając {damage} obrażeń i ogłuszając go na 3 sek.',
-  'entities.abilities.storm_bolt.name': 'Burzowy pocisk',
   'entities.abilities.sudden_death.description':
     'Twoje ataki automatyczne mają szansę pozwolić ci użyć Przedwczesnego grobu na celu o dowolnym poziomie zdrowia, bez kosztu wściekłości. (specjalizacja Broń)',
   'entities.abilities.sudden_death.name': 'Nagła śmierć',
@@ -3271,7 +3829,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Poszerzony łuk',
   'entities.abilities.victory_rush.description':
     'Uderzasz za obrażenia broni plus {damage} i leczysz się o 20% maksymalnego zdrowia. Można użyć tylko w ciągu 20 sek. od zabicia wroga.',
-  'entities.abilities.victory_rush.name': 'Zryw zwycięstwa',
   'hudChrome.specPanel.complexity': 'Złożoność',
   'hudChrome.specPanel.complexityHigh': 'Wysoka',
   'hudChrome.specPanel.complexityLow': 'Niska',
@@ -3287,7 +3844,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.name': 'Postać Dzikiego Kła',
   'entities.abilities.avenging_wrath.name': 'Mściwy gniew',
   'entities.abilities.berserk.name': 'Czerwona Mgła',
-  'entities.abilities.blink.name': 'Migotliwy Krok',
   'entities.abilities.bloodlust.name': 'Bębny Wojny',
   'entities.abilities.chain_lightning.name': 'Rozgałęziona Błyskawica',
   'entities.abilities.chaos_bolt.name': 'Pocisk Ruiny',
@@ -3343,7 +3899,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.smoke_screen.name': 'Zasłona Dymna',
   'entities.abilities.smoke_screen.description':
     'Znikasz w chmurze dymu, zwiększając szansę na unik o 30% na 8 sek.',
-  'entities.abilities.spellsteal.name': 'Kradzież Zaklęcia',
   'entities.abilities.spellsteal.description':
     'Kradnie korzystny efekt magiczny z wroga i przenosi go na ciebie.',
   'entities.abilities.startle_shot.name': 'Strzał Przestrachu',
@@ -3428,7 +3983,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragprowl_belt.name': 'Pas Skalodrapa',
   'entities.items.cragthorn_greatstaff.name': 'Wielki kostur Skalokolca',
   'entities.items.cragward_pauldrons.name': 'Naramienniki Skalostrażnika',
-  'entities.items.cryptbloom_shoulderguards.name': 'Naramienniki Kryptokwiatu',
   'entities.items.cryptplate_helm.name': 'Hełm z kryptowej płyty',
   'entities.items.deathless_greatblade.name': 'Nieśmiertelne wielkie ostrze',
   'entities.items.deathless_warguard_legmail.name': 'Nieśmiertelne nogawice wojennej straży',
@@ -3451,7 +4005,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.medallion_of_endless_profit.name': 'Medalion niekończącego się zysku',
   'entities.items.mirebloom_treads.name': 'Buty Moczarorozkwitu',
   'entities.items.mistcallers_fang.name': 'Kieł przyzywacza mgły',
-  'entities.items.mistforged_pauldrons.name': 'Naramienniki kute we mgle',
   'entities.items.moonbark_vestments.name': 'Szaty Księżycowej Kory',
   'entities.items.mosshide_vest.name': 'Kaftan z mszystej skóry',
   'entities.items.morthens_cryptforged_hauberk.name': 'Kryptokuta kolczuga Morthena',
@@ -3508,7 +4061,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.greatfang_of_the_basin.name': 'Wielki Kieł Kotliny',
   'entities.items.sunbone_oracles_crown.name': 'Korona Słonecznokościstej Wyroczni',
   'entities.items.bloodmane_war_legguards.name': 'Wojenne Nagolenniki Krwistej Grzywy',
-  'entities.items.wyrmcult_spellgrips.name': 'Czarodziejskie rękawice kultu żmija',
   'entities.items.yumis_keepsake_locket.name': 'Pamiątkowy medalionik Yumi',
   'entities.items.zense_meridian.name': 'Meridian Zense',
   'entities.items.zyzzs_deathless_signet.name': 'Nieśmiertelny sygnet Zyzza',
@@ -4662,24 +5214,24 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': 'Heroiczny',
   'delveUi.board.tier.normal': 'Normalny',
   'delveUi.board.title': 'Tablica Wypraw',
-  'delveUi.boss.varric.bell.emote': 'Diakon Varric chwyta zakopany dzwon obiema rękami!',
+  'delveUi.boss.varric.bell.emote': 'Diakon Vandric chwyta zakopany dzwon obiema rękami!',
   'delveUi.boss.varric.bell.impact': 'Bicie dzwonu pęka posadzkę komnaty!',
   'delveUi.boss.varric.bell.lesson':
     'Bicie Dzwonu: uderzenie w ziemię co dwanaście sekund. Odsuń się, zanim spadnie.',
-  'delveUi.boss.varric.bell.log': 'Diakon Varric zaczyna bić w pogrzebowy dzwon.',
-  'delveUi.boss.varric.bell.warning': 'Odsuń się od Diakona Varrica!',
+  'delveUi.boss.varric.bell.log': 'Diakon Vandric zaczyna bić w pogrzebowy dzwon.',
+  'delveUi.boss.varric.bell.warning': 'Odsuń się od Diakona Vandrica!',
   'delveUi.boss.varric.defeat': 'Nie... miałem te imiona... wszystkie je miałem...',
   'delveUi.boss.varric.intro': 'Żadna dusza nie jest stracona. Jest tylko zagubiona.',
   'delveUi.boss.varric.mid30': 'Pogrzebowy dzwon odpowiada na każde imię, które wymawia.',
-  'delveUi.boss.varric.mid60': 'Diakon Varric odczytuje imiona z rejestru z drżącym triumfem.',
+  'delveUi.boss.varric.mid60': 'Diakon Vandric odczytuje imiona z rejestru z drżącym triumfem.',
   'delveUi.boss.varric.pull':
     'Stąpasz po świętym prochu w nieczystych zamiarach. Uklęknij i daj się policzyć.',
-  'delveUi.boss.varric.raise.emote': 'Diakon Varric przyzywa imiona z rozbitych grobów!',
-  'delveUi.boss.varric.raise.interrupt_fail': 'Umarli odpowiadają na wezwanie Diakona Varrica!',
+  'delveUi.boss.varric.raise.emote': 'Diakon Vandric przyzywa imiona z rozbitych grobów!',
+  'delveUi.boss.varric.raise.interrupt_fail': 'Umarli odpowiadają na wezwanie Diakona Vandrica!',
   'delveUi.boss.varric.raise.interrupt_ok': 'Grobowy obrzęd zawodzi.',
   'delveUi.boss.varric.raise.lesson':
     'Przerwij rytuał przy pękniętym grobie w ciągu pięciu sekund, bo umarli powstaną na jego wezwanie.',
-  'delveUi.boss.varric.raise.log': 'Diakon Varric rozpoczyna Wskrzeszenie Umarłych.',
+  'delveUi.boss.varric.raise.log': 'Diakon Vandric rozpoczyna Wskrzeszenie Umarłych.',
   'delveUi.boss.varric.raise.object': 'Pęknięty grób drży skradzionym oddechem.',
   'delveUi.boss.varric.raise.warning': 'Powstrzymaj grobowy obrzęd!',
   'delveUi.chest.flavor': 'Umarli oddali to, bez czego mogą się obejść.',
@@ -4751,7 +5303,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.adrenaline_rush.description':
     'Twoja krew wrze, natychmiast przywracając 60 energii.',
   'entities.abilities.adrenaline_rush.name': 'Przyspieszona krew',
-  'entities.abilities.aimed_shot.description': 'Strzela w cel za {damage} obrażeń fizycznych. Obrażenia rosną z mocą ataku dystansowego.',
+  'entities.abilities.aimed_shot.description':
+    'Strzela w cel za {damage} obrażeń fizycznych. Obrażenia rosną z mocą ataku dystansowego.',
   'entities.abilities.aimed_shot.name': 'Długie naciągnięcie',
   'entities.abilities.ambush.name': 'Cios czyhacza',
   'entities.abilities.arcane_explosion.description':
@@ -4762,13 +5315,17 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_missiles.description':
     'Wystrzeliwuje eteryczne strzały we wroga, zadając {damage} obrażeń arkanicznych co sekundę przez 3 sek.',
   'entities.abilities.arcane_missiles.name': 'Eteryczne strzały',
-  'entities.abilities.arcane_shot.description': 'Strzela w cel za {damage} obrażeń arkanicznych. Obrażenia rosną z mocą ataku dystansowego.',
+  'entities.abilities.arcane_shot.description':
+    'Strzela w cel za {damage} obrażeń arkanicznych. Obrażenia rosną z mocą ataku dystansowego.',
   'entities.abilities.arcane_shot.name': 'Plugawy strzał',
-  'entities.abilities.aspect_of_the_cheetah.description': 'Przyjmij postać rumaka, zwiększając swoją szybkość ruchu o 30% na 30 min. Gdy jest aktywna, otrzymanie obrażeń oszałamia cię, zmniejszając twoją prędkość ruchu o połowę na 4 sek. (każde trafienie odświeża oszołomienie).',
+  'entities.abilities.aspect_of_the_cheetah.description':
+    'Przyjmij postać rumaka, zwiększając swoją szybkość ruchu o 30% na 30 min. Gdy jest aktywna, otrzymanie obrażeń oszałamia cię, zmniejszając twoją prędkość ruchu o połowę na 4 sek. (każde trafienie odświeża oszołomienie).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Postać rumaka',
-  'entities.abilities.aspect_of_the_hawk.description': 'Przyjmij postać błotniaka, zwiększając swoją moc ataku o {buff} na 30 min.',
+  'entities.abilities.aspect_of_the_hawk.description':
+    'Przyjmij postać błotniaka, zwiększając swoją moc ataku o {buff} na 30 min.',
   'entities.abilities.aspect_of_the_hawk.name': 'Postać błotniaka',
-  'entities.abilities.aspect_of_the_monkey.description': 'Przyjmij postać kuny, zwiększając swoją szansę na unik o 8% na 30 min.',
+  'entities.abilities.aspect_of_the_monkey.description':
+    'Przyjmij postać kuny, zwiększając swoją szansę na unik o 8% na 30 min.',
   'entities.abilities.aspect_of_the_monkey.name': 'Postać kuny',
   'entities.abilities.backstab.name': 'Tchórzliwe pchnięcie',
   'entities.abilities.barkskin.description':
@@ -4799,7 +5356,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.description':
     'Natychmiast atakuj w krwawym szale, zadając 60% obrażeń broni plus {damage}. (Sygnatura furii)',
   'entities.abilities.bloodthirst.name': 'Upust krwi',
-  'entities.abilities.cat_form.description': 'Zmienia cię w wilka: zręczność rośnie z twoim poziomem, moc ataku +8 plus 2 na poziom, twoje ataki używają energii i punktów kombinacji, a ty generujesz o 29% mniejsze zagrożenie. Rzuć ponownie, by wrócić do postaci rzucającego zaklęcia.',
+  'entities.abilities.cat_form.description':
+    'Zmienia cię w wilka: zręczność rośnie z twoim poziomem, moc ataku +8 plus 2 na poziom, twoje ataki używają energii i punktów kombinacji, a ty generujesz o 29% mniejsze zagrożenie. Rzuć ponownie, by wrócić do postaci rzucającego zaklęcia.',
   'entities.abilities.cat_form.name': 'Postać wilka',
   'entities.abilities.charge.description':
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów.',
@@ -4809,7 +5367,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description':
     'Zamaszyste uderzenie, które trafia wszystkich wrogów przed tobą, zadając {damage} obrażeń.',
   'entities.abilities.cleave.name': 'Kosiący łuk',
-  'entities.abilities.concussive_shot.description': 'Strzela w cel za {damage} obrażeń fizycznych i spowalnia go o 50% na 4 s. Obrażenia rosną z mocą ataku dystansowego.',
+  'entities.abilities.concussive_shot.description':
+    'Strzela w cel za {damage} obrażeń fizycznych i spowalnia go o 50% na 4 s. Obrażenia rosną z mocą ataku dystansowego.',
   'entities.abilities.concussive_shot.name': 'Wstrząsający strzał',
   'entities.abilities.conjure_food.description':
     'Przywołuje 2 porcje chleba, które po zjedzeniu przywracają zdrowie. Wyższe rangi przywołują pożywniejsze jadło.',
@@ -4833,7 +5392,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rusza naprzód susem, zwiększając prędkość ruchu o 50% na 15 sek. Tylko w postaci wilka.',
   'entities.abilities.dash.name': 'Sus',
   'entities.abilities.deadly_poison.description':
-    'Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje 14 dodatkowych obrażeń od natury.',
+    'Pokrywa twój oręż na 30 min. Każde uderzenie wręcz dodaje celowi warstwę trucizny, do 5, i odnawia czas trwania 12 sek. Każda warstwa zadaje {damage} obrażeń natury co 2 sek.',
   'entities.abilities.deadly_poison.name': 'Jątrzący jad',
   'entities.abilities.defensive_stance.description':
     'Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć ponownie, aby opuścić postawę.',
@@ -4854,9 +5413,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.divine_protection.description':
     'Święta tarcza pochłania {damage}% twojego maksymalnego zdrowia przez {duration} sek.',
   'entities.abilities.divine_protection.name': 'Osłona wiary',
-  'entities.abilities.drain_life.description': 'Pochłania witalność celu, zadając {damage} obrażeń od cienia co sekundę i przenosząc ci 70% z nich jako zdrowie. Udręka przenosi zamiast tego całość. Kanałowane na twoim głównym Evil Eye zużywa na starcie wszystkie Nici Przeznaczenia, a każda Nić generuje 1 dodatkowe Potępienie na tyknięcie.',
+  'entities.abilities.drain_life.description':
+    'Pochłania witalność celu, zadając {damage} obrażeń od cienia co sekundę i przenosząc ci 70% z nich jako zdrowie. Udręka przenosi zamiast tego całość. Kanałowane na twoim głównym Evil Eye zużywa na starcie wszystkie Nici Przeznaczenia, a każda Nić generuje 1 dodatkowe Potępienie na tyknięcie.',
   'entities.abilities.drain_life.name': 'Pochłonięcie',
-  'entities.abilities.earth_shock.description': 'Zadaje {damage} obrażeń od natury. Obrażenia rosną z mocą zaklęć. Żywioły: przy 5 Gromach zadaje o 125% więcej obrażeń i zużywa cały Grom. Skalne Wiązanie: zmusza cel do atakowania ciebie przez 3 s.',
+  'entities.abilities.earth_shock.description':
+    'Zadaje {damage} obrażeń od natury. Obrażenia rosną z mocą zaklęć. Żywioły: przy 5 Gromach zadaje o 125% więcej obrażeń i zużywa cały Grom. Skalne Wiązanie: zmusza cel do atakowania ciebie przez 3 s.',
   'entities.abilities.earth_shock.name': 'Ziemny wstrząs',
   'entities.abilities.enrage.description':
     'Natychmiast generuje 20 wściekłości. Tylko w postaci Bruina.',
@@ -4885,24 +5446,31 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ciska ognistą kulą, która zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie.',
   'entities.abilities.fireball.name': 'Żarowy pocisk',
   'entities.abilities.rain_of_fire.name': 'Deszcz ognia',
-  'entities.abilities.rain_of_fire.description': 'Wydaje 3 Spustoszenia, by spuścić na obszar celu deszcz ognia zadający {damage} obrażeń od ognia co sekundę przez 4 s, wydłużone do 6 s na randze 2. Ruina sprowadza pierwszą falę natychmiast.',
+  'entities.abilities.rain_of_fire.description':
+    'Wydaje 3 Spustoszenia, by spuścić na obszar celu deszcz ognia zadający {damage} obrażeń od ognia co sekundę przez 4 s, wydłużone do 6 s na randze 2. Ruina sprowadza pierwszą falę natychmiast.',
   'entities.abilities.volley.name': 'Salwa',
-  'entities.abilities.volley.description': 'Spuszcza deszcz strzał na obszar 8 m przez 3 s. Wrogowie w obszarze otrzymują {damage} obrażeń fizycznych co 0.5 s. Obrażenia rosną z mocą ataku dystansowego.',
+  'entities.abilities.volley.description':
+    'Spuszcza deszcz strzał na obszar 8 m przez 3 s. Wrogowie w obszarze otrzymują {damage} obrażeń fizycznych co 0.5 s. Obrażenia rosną z mocą ataku dystansowego.',
   'entities.abilities.hurricane.name': 'Huragan',
   'entities.abilities.hurricane.description':
     'Sprowadza huragan na wybrany obszar przez 6 sek., smagając wrogów i zadając {damage} obrażeń od sił natury co sekundę.',
   'entities.abilities.earthquake.name': 'Przebudzenie uskoku',
-  'entities.abilities.earthquake.description': 'Wstrząsa obszarem 8 m przez 6 s, zadając {damage} obrażeń od natury co 1.5 s. Obrażenia rosną z mocą zaklęć. Żywioły: przy 5 Gromach zadaje o 100% więcej obrażeń i zużywa cały Grom.',
+  'entities.abilities.earthquake.description':
+    'Wstrząsa obszarem 8 m przez 6 s, zadając {damage} obrażeń od natury co 1.5 s. Obrażenia rosną z mocą zaklęć. Żywioły: przy 5 Gromach zadaje o 100% więcej obrażeń i zużywa cały Grom.',
   'entities.abilities.flamestrike.name': 'Ognista nawała',
   'entities.abilities.flamestrike.description':
     'Sprowadza wybuch płomieni na wybrany obszar, zadając {damage} obrażeń od ognia wrogom w zasięgu eksplozji.',
-  'entities.abilities.flame_shock.description': 'Zadaje {damage} obrażeń od ognia, a następnie {overTime} obrażeń od ognia przez 12 s. Pierwsze trafienie rośnie z mocą zaklęć.',
+  'entities.abilities.flame_shock.description':
+    'Zadaje {damage} obrażeń od ognia, a następnie {overTime} obrażeń od ognia przez 12 s. Pierwsze trafienie rośnie z mocą zaklęć.',
   'entities.abilities.flame_shock.name': 'Żarowy wstrząs',
-  'entities.abilities.flametongue_weapon.description': 'Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń od ognia.',
+  'entities.abilities.flametongue_weapon.description':
+    'Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń od ognia.',
   'entities.abilities.flametongue_weapon.name': 'Oręż żarowego piętna',
-  'entities.abilities.flash_heal.description': 'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
+  'entities.abilities.flash_heal.description':
+    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.flash_heal.name': 'Pilna modlitwa',
-  'entities.abilities.flash_of_light.description': 'Szybki, oszczędny błysk Światła, który leczy sprzymierzony cel o {damage}. Przywrócenie zdrowia generuje 1 Oddanie, nawet bez specjalizacji.',
+  'entities.abilities.flash_of_light.description':
+    'Szybki, oszczędny błysk Światła, który leczy sprzymierzony cel o {damage}. Przywrócenie zdrowia generuje 1 Oddanie, nawet bez specjalizacji.',
   'entities.abilities.flash_of_light.name': 'Świetliste ukojenie',
   'entities.abilities.frost_armor.description':
     'Otacza cię szronem, zwiększając pancerz o {buff} na 30 min.',
@@ -4910,7 +5478,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frost_nova.description':
     'Zamraża wszystkich pobliskich wrogów w miejscu na nawet 8 sek, zadając {damage} obrażeń od mrozu. Unieruchomienie zostaje przerwane po otrzymaniu łącznych obrażeń równych 15% maksymalnego zdrowia celu, nie mniej niż 20 i nie więcej niż 60 obrażeń.',
   'entities.abilities.frost_nova.name': 'Lodowe okowy',
-  'entities.abilities.frost_shock.description': 'Zadaje {damage} obrażeń od mrozu i spowalnia cel o 50% na 8 s. Obrażenia rosną z mocą zaklęć.',
+  'entities.abilities.frost_shock.description':
+    'Zadaje {damage} obrażeń od mrozu i spowalnia cel o 50% na 8 s. Obrażenia rosną z mocą zaklęć.',
   'entities.abilities.frost_shock.name': 'Szronowy wstrząs',
   'entities.abilities.frostbolt.description':
     'Wystrzeliwuje pocisk mrozu, zadając {damage} obrażeń od mrozu i spowalniając ruch o 40%.',
@@ -4919,7 +5488,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przepaja twój oręż kąsającym mrozem: każde uderzenie zadaje {damage} dodatkowych obrażeń przez 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Oręż szronowych okowów',
   'entities.abilities.garrote.name': 'Drut na gardło',
-  'entities.abilities.ghost_wolf.description': 'Stajesz się Shadewolfem i poruszasz się o 40% szybciej. Rzuć ponownie, by wrócić do zwykłej postaci.',
+  'entities.abilities.ghost_wolf.description':
+    'Stajesz się Shadewolfem i poruszasz się o 40% szybciej. Rzuć ponownie, by wrócić do zwykłej postaci.',
   'entities.abilities.ghost_wolf.name': 'Cieniowilk',
   'entities.abilities.gouge.description':
     'Uderza w cel, zadając {damage} obrażeń i obezwładniając go na 4 sek. Każde obrażenie przerywa efekt. Przyznaje 1 punkt kombinacji.',
@@ -4932,11 +5502,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     'Okalecza wroga, zadając {damage} obrażeń i spowalniając jego ruch o 50% na 15 sek.',
   'entities.abilities.hamstring.name': 'Kulawiące cięcie',
-  'entities.abilities.heal.description': 'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
+  'entities.abilities.heal.description':
+    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.heal.name': 'Uroczysta modlitwa',
   'entities.abilities.healing_touch.description': 'Leczy sprzymierzony cel o {damage}.',
   'entities.abilities.healing_touch.name': 'Dzikie ukojenie',
-  'entities.abilities.healing_wave.description': 'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć. Odnowienie: zachowuje 50% pełnego leczenia przed przeleczeniem jako Leczniczy Prąd na 12 s, do 30% maksymalnego zdrowia celu.',
+  'entities.abilities.healing_wave.description':
+    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć. Odnowienie: zachowuje 50% pełnego leczenia przed przeleczeniem jako Leczniczy Prąd na 12 s, do 30% maksymalnego zdrowia celu.',
   'entities.abilities.healing_wave.name': 'Kojące wody',
   'entities.abilities.heroic_strike.description':
     'Potężny atak, który zwiększa obrażenia w zwarciu o {damage}. Aktywuje się przy następnym uderzeniu.',
@@ -4944,7 +5516,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hibernate.description':
     'Zmusza cel do głębokiego snu na nawet 8 sek. Każde obrażenie go obudzi.',
   'entities.abilities.hibernate.name': 'Uśpienie',
-  'entities.abilities.holy_light.description': 'Szybko leczy sprzymierzony cel o {damage}. Przywrócenie zdrowia generuje 1 Oddanie, nawet bez specjalizacji. Promienny Rezonans albo Słoneczny Odwet czyni je natychmiastowym.',
+  'entities.abilities.holy_light.description':
+    'Szybko leczy sprzymierzony cel o {damage}. Przywrócenie zdrowia generuje 1 Oddanie, nawet bez specjalizacji. Promienny Rezonans albo Słoneczny Odwet czyni je natychmiastowym.',
   'entities.abilities.holy_light.name': 'Kojące Światło',
   'entities.abilities.ice_barrier.description':
     'Osłania cię lodem, pochłaniając {damage} obrażeń przez 60 sek.',
@@ -4956,7 +5529,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wroga oblepia rój owadów, zadając {damage} obrażeń od natury w ciągu 12 sek.',
   'entities.abilities.insect_swarm.name': 'Żądlący rój',
   'entities.abilities.instant_poison.description':
-    'Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje 8 dodatkowych obrażeń od natury.',
+    'Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje {damage} dodatkowych obrażeń od natury.',
   'entities.abilities.instant_poison.name': 'Ukąszenie żmii',
   'entities.abilities.judgement.description':
     'Uwalnia twoją aktywną pieczęć na wrogu, zużywając ją, by zadać zmagazynowane obrażenia od Świętości.',
@@ -4965,23 +5538,29 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.description':
     'Potężny przypływ uzdrowienia przywraca {damage}% twojego maksymalnego zdrowia. 10 min czasu odnowienia.',
   'entities.abilities.lay_on_hands.name': 'Ostatnie namaszczenie',
-  'entities.abilities.lesser_heal.description': 'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
+  'entities.abilities.lesser_heal.description':
+    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.lesser_heal.name': 'Szeptana modlitwa',
   'entities.abilities.life_tap.description': 'Zamienia {damage} zdrowia na {damage} many.',
   'entities.abilities.life_tap.name': 'Trudny targ',
-  'entities.abilities.lightning_bolt.description': 'Zadaje {damage} obrażeń od natury. Obrażenia rosną z mocą zaklęć. Żywioły: trafienie daje 1 Grom.',
+  'entities.abilities.lightning_bolt.description':
+    'Zadaje {damage} obrażeń od natury. Obrażenia rosną z mocą zaklęć. Żywioły: trafienie daje 1 Grom.',
   'entities.abilities.lightning_bolt.name': 'Łukowy pocisk',
-  'entities.abilities.lightning_shield.description': 'Otacza cię błyskawicami na 10 min. Kolejne 3 ataki wręcz wymierzone w ciebie zadają atakującemu {buff} obrażeń od natury, najwyżej raz na 5 s.',
+  'entities.abilities.lightning_shield.description':
+    'Otacza cię błyskawicami na 10 min. Kolejne 3 ataki wręcz wymierzone w ciebie zadają atakującemu {buff} obrażeń od natury, najwyżej raz na 5 s.',
   'entities.abilities.lightning_shield.name': 'Osłona gromu',
   'entities.abilities.mark_of_the_wild.description':
     'Nakłada Dziką osłonę na sprzymierzony cel, zwiększając pancerz o {buff} na 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Dzika osłona',
   'entities.abilities.maul.name': 'Kruszenie kości',
-  'entities.abilities.mind_blast.description': 'Zadaje {damage} obrażeń od cienia. Obrażenia rosną z mocą zaklęć. Cień wiąże cel twoją Pieśnią rozkładu jako jego Podobizną, daje 1 Mroczną Dziesięcinę i odbija 30% obrażeń na maksymalnie 3 innych wrogów niosących twoją Pieśń.',
+  'entities.abilities.mind_blast.description':
+    'Zadaje {damage} obrażeń od cienia. Obrażenia rosną z mocą zaklęć. Cień wiąże cel twoją Pieśnią rozkładu jako jego Podobizną, daje 1 Mroczną Dziesięcinę i odbija 30% obrażeń na maksymalnie 3 innych wrogów niosących twoją Pieśń.',
   'entities.abilities.mind_blast.name': 'Roztrzaskanie umysłu',
-  'entities.abilities.mind_flay.description': 'Kanałuje przez 3 s, zadając {damage} obrażeń od cienia co sekundę. Obrażenia rosną z mocą zaklęć.',
+  'entities.abilities.mind_flay.description':
+    'Kanałuje przez 3 s, zadając {damage} obrażeń od cienia co sekundę. Obrażenia rosną z mocą zaklęć.',
   'entities.abilities.mind_flay.name': 'Litania niedoli',
-  'entities.abilities.mongoose_bite.description': 'Uderza za 45% obrażeń broni plus {damage}. Jeśli cel nosi twoją Krwawą Ranę Haka, zadaje natychmiast 1 tyknięcie rany i odnawia ranę do 12 s. Obrażenia rosną z mocą ataku poprzez obrażenia broni.',
+  'entities.abilities.mongoose_bite.description':
+    'Uderza za 45% obrażeń broni plus {damage}. Jeśli cel nosi twoją Krwawą Ranę Haka, zadaje natychmiast 1 tyknięcie rany i odnawia ranę do 12 s. Obrażenia rosną z mocą ataku poprzez obrażenia broni.',
   'entities.abilities.mongoose_bite.name': 'Rozdarcie ran',
   'entities.abilities.moonfire.name': 'Księżycowa nawałnica',
   'entities.abilities.mortal_strike.description':
@@ -4996,9 +5575,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pounce.description':
     'Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji. Tylko w postaci wilka.',
   'entities.abilities.pounce.name': 'Skradający cios',
-  'entities.abilities.power_word_fortitude.description': 'Zwiększa Wytrzymałość każdego członka drużyny o {buff}% na 30 min.',
+  'entities.abilities.power_word_fortitude.description':
+    'Zwiększa Wytrzymałość każdego członka drużyny o {buff}% na 30 min.',
   'entities.abilities.power_word_fortitude.name': 'Litania hartu',
-  'entities.abilities.power_word_shield.description': 'Osłania sprzymierzony cel, pochłaniając {damage} obrażeń przez 30 s. Dyscyplina dodatkowo wiąże cel z twoimi obrażeniami świętymi na 30 s.',
+  'entities.abilities.power_word_shield.description':
+    'Osłania sprzymierzony cel, pochłaniając {damage} obrażeń przez 30 s. Dyscyplina dodatkowo wiąże cel z twoimi obrażeniami świętymi na 30 s.',
   'entities.abilities.power_word_shield.name': 'Psalm ochrony',
   'entities.abilities.prowl.description':
     'Wchodzi w skradanie w postaci wilka, poruszając się o 5% wolniej. Nie można użyć w walce.',
@@ -5010,11 +5591,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rapid_fire.description':
     'Podczas ruchu wystrzel sześć szybkich strzałów w ciągu 2,4 sek. Każdy zadaje {damage} obrażeń fizycznych.',
   'entities.abilities.rapid_fire.name': 'Gorączkowy ostrzał',
-  'entities.abilities.raptor_strike.description': 'Uderza za 10% obrażeń broni plus {damage}. Trafienie przywraca 15 Skupienia i daje 1 Rozpęd Łowów. Obrażenia rosną z mocą ataku poprzez obrażenia broni.',
+  'entities.abilities.raptor_strike.description':
+    'Uderza za 10% obrażeń broni plus {damage}. Trafienie przywraca 15 Skupienia i daje 1 Rozpęd Łowów. Obrażenia rosną z mocą ataku poprzez obrażenia broni.',
   'entities.abilities.raptor_strike.name': 'Patroszące uderzenie',
   'entities.abilities.regrowth.name': 'Drugi rozkwit',
   'entities.abilities.rejuvenation.name': 'Dziki rozkwit',
-  'entities.abilities.renew.description': 'Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą zaklęć.',
+  'entities.abilities.renew.description':
+    'Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.renew.name': 'Trwająca łaska',
   'entities.abilities.retribution_aura.description':
     'Otacza ciebie i twoją drużynę świętą energią aż do śmierci lub zastąpienia. Wrogowie, którzy zaatakują wręcz objętego sojusznika, otrzymują {buff} obrażeń od Świętości, a objęci sojusznicy zadają {buff} dodatkowych obrażeń od Świętości atakami automatycznymi.',
@@ -5022,10 +5605,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Opatruje twojego zwierzaka. Jeśli żyje, przywraca mu łącznie {overTime} pkt. zdrowia przez 12 sek., co 3 sek. Jeśli nie żyje, wskrzesza go z 35% zdrowia.',
   'entities.abilities.revive_pet.name': 'Opatrzenie',
-  'entities.abilities.righteous_fury.description': 'Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 30%. Tylko Strażnik wiary.',
+  'entities.abilities.righteous_fury.description':
+    'Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 30%. Tylko Strażnik wiary.',
   'entities.abilities.righteous_fury.name': 'Płonąca przysięga',
   'entities.abilities.rip.name': 'Krwawa szczelina',
-  'entities.abilities.rockbiter_weapon.description': 'Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 40% pancerza i 20% wytrzymałości, otrzymuje o 15% mniej obrażeń i jest odporny na trafienia krytyczne od stworzeń i generuje 2,75 razy większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s.',
+  'entities.abilities.rockbiter_weapon.description':
+    'Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 40% pancerza i 20% wytrzymałości, otrzymuje o 15% mniej obrażeń i jest odporny na trafienia krytyczne od stworzeń i generuje 2,75 razy większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s.',
   'entities.abilities.rockbiter_weapon.name': 'Oręż kamiennych okowów',
   'entities.abilities.rupture.name': 'Wykrwawienie',
   'entities.abilities.sap.description':
@@ -5034,19 +5619,23 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scorch.description':
     'Osmala wroga, zadając {damage} obrażeń od Ognia. Szybkie do rzucenia.',
   'entities.abilities.scorch.name': 'Poparzenie',
-  'entities.abilities.seal_of_righteousness.description': 'Napełnia cię świętą mocą na 30 s, sprawiając, że każdy twój cios wręcz zadaje {damage} dodatkowych obrażeń świętych.',
+  'entities.abilities.seal_of_righteousness.description':
+    'Napełnia cię świętą mocą na 30 s, sprawiając, że każdy twój cios wręcz zadaje {damage} dodatkowych obrażeń świętych.',
   'entities.abilities.seal_of_righteousness.name': 'Piętno przysięgi',
   'entities.abilities.searing_pain.description':
     'Przypieka wroga dręczącym ogniem, zadając {damage} obrażeń od Ognia. Szybkie do rzucenia.',
   'entities.abilities.searing_pain.name': 'Przypalenie',
-  'entities.abilities.serpent_sting.description': 'Zadaje łącznie {damage} obrażeń od natury przez 15 s, raz na 3 s. Obrażenia rosną z mocą ataku dystansowego.',
+  'entities.abilities.serpent_sting.description':
+    'Zadaje łącznie {damage} obrażeń od natury przez 15 s, raz na 3 s. Obrażenia rosną z mocą ataku dystansowego.',
   'entities.abilities.serpent_sting.name': 'Jadowity kolec',
   'entities.abilities.shadow_bolt.description':
     'Wysyła mroczny pocisk w stronę wroga, zadając {damage} obrażeń od Cienia.',
   'entities.abilities.shadow_bolt.name': 'Pocisk mroku',
-  'entities.abilities.shadow_word_pain.description': 'Zadaje łącznie {damage} obrażeń od cienia przez 18 s, raz na 3 s. Obrażenia rosną z mocą zaklęć. Cień: zadaje o 10% więcej obrażeń, a każde tyknięcie na twojej Podobiźnie daje 1 Mroczną Dziesięcinę.',
+  'entities.abilities.shadow_word_pain.description':
+    'Zadaje łącznie {damage} obrażeń od cienia przez 18 s, raz na 3 s. Obrażenia rosną z mocą zaklęć. Cień: zadaje o 10% więcej obrażeń, a każde tyknięcie na twojej Podobiźnie daje 1 Mroczną Dziesięcinę.',
   'entities.abilities.shadow_word_pain.name': 'Pieśń rozkładu',
-  'entities.abilities.shadowburn.description': 'Wydaje 1 Spustoszenie, by dobić wroga poniżej 20% zdrowia za {damage} obrażeń od cienia. Zwraca swoje Spustoszenie, jeśli wskazany cel zginie w ciągu 5 s.',
+  'entities.abilities.shadowburn.description':
+    'Wydaje 1 Spustoszenie, by dobić wroga poniżej 20% zdrowia za {damage} obrażeń od cienia. Zwraca swoje Spustoszenie, jeśli wskazany cel zginie w ciągu 5 s.',
   'entities.abilities.shadowburn.name': 'Ogień zmierzchu',
   'entities.abilities.shield_slam.description':
     'Uderza cel tarczą, zadając 50% obrażeń broni plus {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)',
@@ -5055,14 +5644,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.slam.description': 'Wali przeciwnika, zadając obrażenia broni plus {damage}.',
   'entities.abilities.slam.name': 'Brutalny zamach',
   'entities.abilities.slice_and_dice.name': 'Mordercze tempo',
-  'entities.abilities.smite.description': 'Zadaje {damage} obrażeń świętych. Obrażenia rosną z mocą zaklęć. Dyscyplina: leczy każdego powiązanego sojusznika o 30% obrażeń. Jeśli żaden sojusznik nie jest powiązany, leczy o 15% członka drużyny z najniższym zdrowiem.',
+  'entities.abilities.smite.description':
+    'Zadaje {damage} obrażeń świętych. Obrażenia rosną z mocą zaklęć. Dyscyplina: leczy każdego powiązanego sojusznika o 30% obrażeń. Jeśli żaden sojusznik nie jest powiązany, leczy o 15% członka drużyny z najniższym zdrowiem.',
   'entities.abilities.smite.name': 'Hymn oczyszczenia',
   'entities.abilities.sprint.description':
     'Zwiększa twoją szybkość poruszania się o 70% na 15 sek.',
   'entities.abilities.sprint.name': 'Rącze pięty',
   'entities.abilities.starfire.name': 'Spadające niebo',
   'entities.abilities.stealth.name': 'Zasłona zmierzchu',
-  'entities.abilities.stormstrike.description': 'Uderza za obrażenia broni plus {damage} i przesuwa Kadencję Ducha Wojny o 2 kroki. Obrażenia rosną z mocą ataku poprzez obrażenia broni.',
+  'entities.abilities.stormstrike.description':
+    'Uderza za obrażenia broni plus {damage} i przesuwa Kadencję Ducha Wojny o 2 kroki. Obrażenia rosną z mocą ataku poprzez obrażenia broni.',
   'entities.abilities.stormstrike.name': 'Uderzenie przodków',
   'entities.abilities.summon_doomguard.description':
     'Wiąże Wraithborna z twoją wolą, elitarnego demona, który zsyła z oddali potężne obrażenia od Cienia. Długi czas odnowienia ogranicza jego niszczycielską moc. Przywołanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz.',
@@ -5073,7 +5664,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felhunter.description':
     'Przywołuje Spellhounda pod komendę Czarnoksiężnika. Spellhound nęka wrogów z dystansu Mrocznym Ukąszeniem i znakomicie poluje na rzucających zaklęcia. Przywołanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz.',
   'entities.abilities.summon_felhunter.name': 'Przywołanie Spellhounda',
-  'entities.abilities.summon_imp.description': 'Przyzywa Emberkina pod rozkazy czarnoksiężnika. Emberkin z dystansu rzuca w twoich wrogów Plugawym pociskiem. Przyzwanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz.',
+  'entities.abilities.summon_imp.description':
+    'Przyzywa Emberkina pod rozkazy czarnoksiężnika. Emberkin z dystansu rzuca w twoich wrogów Plugawym pociskiem. Przyzwanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz.',
   'entities.abilities.summon_imp.name': 'Przywołanie Emberkina',
   'entities.abilities.summon_infernal.description':
     'Sprowadza Pyre Colossus na wskazany obszar, zadając przy lądowaniu 64-79 pkt. obrażeń od Ognia. Walczy przez 30 sek. bez zastępowania twojego demona, co 2 sek. podpala pobliskich wrogów i co sekundę generuje 1 pkt. Ruiny.',
@@ -5081,8 +5673,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_succubus.description':
     'Przywołuje Duskborna pod komendę Czarnoksiężnika. Duskborn to kruchy demon, który uderza szybko i mocno bije wręcz. Przywołanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz.',
   'entities.abilities.summon_succubus.name': 'Przywołanie Duskborna',
-  'entities.abilities.summon_voidwalker.description': "Przyzywa Gloomshade'a pod rozkazy czarnoksiężnika. Ten wytrzymały demon drwi z wrogów i używa Otchłannego łańcucha, by ściągnąć odległych zwykłych wrogów z powrotem w zasięg. Bossów nie da się przyciągnąć. Przyzwanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz.",
-  'entities.abilities.summon_voidwalker.name': "Przywołanie Gloomshade'a",
+  'entities.abilities.summon_voidwalker.description':
+    "Przyzywa Duskmurk'a pod rozkazy czarnoksiężnika. Ten wytrzymały demon drwi z wrogów i używa Otchłannego łańcucha, by ściągnąć odległych zwykłych wrogów z powrotem w zasięg. Bossów nie da się przyciągnąć. Przyzwanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz.",
+  'entities.abilities.summon_voidwalker.name': "Przywołanie Duskmurk'a",
   'entities.abilities.sunder_armor.name': 'Rozdarcie pancerza',
   'entities.abilities.swipe.name': 'Zamaszyste pazury',
   'entities.abilities.tame_beast.description':
@@ -5105,23 +5698,24 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.travel_form.name': 'Postać Fleet',
   'entities.abilities.vanish.description':
     'Znikasz z pola widzenia, wchodząc w Duskveil nawet w walce. Ukryty poruszasz się o 50% wolniej. Trwa do 10 sek.',
-  'entities.abilities.vanish.name': 'Dymny krok',
   'entities.abilities.whirlwind.description':
     'Wirujesz w śmiercionośnym łuku, uderzając wszystkich pobliskich wrogów za {damage}. (Talent Furii)',
   'entities.abilities.whirlwind.name': 'Wir ostrzy',
-  'entities.abilities.wing_clip.description': 'Tnie cel za {damage} obrażeń fizycznych i spowalnia go o 40% na 10 s. Obrażenia rosną z mocą ataku.',
+  'entities.abilities.wing_clip.description':
+    'Tnie cel za {damage} obrażeń fizycznych i spowalnia go o 40% na 10 s. Obrażenia rosną z mocą ataku.',
   'entities.abilities.wing_clip.name': 'Pętające cięcie',
   'entities.abilities.wrath.name': 'Dziki pocisk',
-  'entities.abilities.holy_shock.name': 'Święty wstrząs',
   'entities.abilities.holy_shock.description':
     'Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)',
   'entities.abilities.holy_shield.name': 'Święta tarcza',
   'entities.abilities.holy_shield.description':
     'Zwiększa blok o 30% i daje na {duration} sek. tarczę równą {damage}% twojego maksymalnego zdrowia. Wniebowstąpienie wzmacnia obronę.',
   'entities.abilities.bestial_wrath.name': 'Bestialski gniew',
-  'entities.abilities.bestial_wrath.description': 'Daje 3 Zajadłość Watahy. Twoje następne Spuść Bestię w ciągu 20 s zadaje o 50% więcej obrażeń od uderzenia i klepnięcia, a jej szał trwa 12 s zamiast 8. (Znak Władania bestiami)',
+  'entities.abilities.bestial_wrath.description':
+    'Daje 3 Zajadłość Watahy. Twoje następne Spuść Bestię w ciągu 20 s zadaje o 50% więcej obrażeń od uderzenia i klepnięcia, a jej szał trwa 12 s zamiast 8. (Znak Władania bestiami)',
   'entities.abilities.trueshot_aura.name': 'Aura celnego strzału',
-  'entities.abilities.trueshot_aura.description': 'Zwiększa moc ataku sojuszników w promieniu 30 m o 10% na 30 min. (Znak Strzelectwa)',
+  'entities.abilities.trueshot_aura.description':
+    'Zwiększa moc ataku sojuszników w promieniu 30 m o 10% na 30 min. (Znak Strzelectwa)',
   'entities.abilities.wyvern_sting.name': 'Żądło wiwerny',
   'entities.abilities.wyvern_sting.description':
     'Żądli wroga z dystansu, obezwładniając go na maksymalnie 4 sek. Jakiekolwiek obrażenia przerywają efekt. (specjalizacja Przetrwanie)',
@@ -5131,25 +5725,29 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Trans feniksa',
   'entities.abilities.combustion.description':
     'Zwiększa szansę na krytyczny efekt zaklęć o 50% na 15 sek. (specjalizacja Ogień)',
-  'entities.abilities.icy_veins.name': 'Lodowe Żyły',
   'entities.abilities.icy_veins.description':
     'Zwiększa przyspieszenie zaklęć o 30% oraz zapobiega przerwaniu i opóźnieniu rzucania na 10 sek. (specjalizacja Mróz)',
   'entities.abilities.cold_blood.name': 'Zimna krew',
   'entities.abilities.blade_flurry.name': 'Nawałnica ostrzy',
   'entities.abilities.hemorrhage.name': 'Krwotok',
   'entities.abilities.power_infusion.name': 'Infuzja mocy',
-  'entities.abilities.power_infusion.description': 'Namaszcza sprzymierzony cel, zwiększając obrażenia, leczenie i szybkość rzucania o 20% na 15 s.',
+  'entities.abilities.power_infusion.description':
+    'Namaszcza sprzymierzony cel, zwiększając obrażenia, leczenie i szybkość rzucania o 20% na 15 s.',
   'entities.abilities.holy_nova.name': 'Kantyk słoneczny',
-  'entities.abilities.holy_nova.description': 'Leczy sojuszników w promieniu 10 m o {damage} i zadaje od 24 do 30 obrażeń świętych wrogom w tym samym obszarze. Obie wartości rosną z mocą zaklęć. (Podstawa Świętości)',
+  'entities.abilities.holy_nova.description':
+    'Leczy sojuszników w promieniu 10 m o {damage} i zadaje od 24 do 30 obrażeń świętych wrogom w tym samym obszarze. Obie wartości rosną z mocą zaklęć. (Podstawa Świętości)',
   'entities.abilities.shadowform.name': 'Zmierzchowa zasłona',
-  'entities.abilities.shadowform.description': 'Wkraczasz w Zmierzchową zasłonę i zwiększasz swoje obrażenia od cienia o 25%. Rzuć ponownie, by opuścić Zmierzchową zasłonę. (Znak Cienia)',
+  'entities.abilities.shadowform.description':
+    'Wkraczasz w Zmierzchową zasłonę i zwiększasz swoje obrażenia od cienia o 25%. Rzuć ponownie, by opuścić Zmierzchową zasłonę. (Znak Cienia)',
   'entities.abilities.elemental_mastery.name': 'Mistrzostwo żywiołów',
-  'entities.abilities.elemental_mastery.description': 'Przez 12 s Łukowy pocisk daje 2 Gromy. Twój następny Łukowy pocisk albo Rozgałęziona Błyskawica jest natychmiastowy, a twoja następna pełna wypłata Gromu zadaje o 25% więcej obrażeń. (Znak Żywiołów)',
+  'entities.abilities.elemental_mastery.description':
+    'Przez 12 s Łukowy pocisk daje 2 Gromy. Twój następny Łukowy pocisk albo Rozgałęziona Błyskawica jest natychmiastowy, a twoja następna pełna wypłata Gromu zadaje o 25% więcej obrażeń. (Znak Żywiołów)',
   'entities.abilities.siphon_life.name': 'Wyssanie życia',
   'entities.abilities.siphon_life.description':
     'Wysysa życie z wroga, zadając {damage} obrażeń od Cienia przez 30 sek. i lecząc cię za zadane obrażenia. (specjalizacja Udręka)',
   'entities.abilities.conflagrate.name': 'Pożoga',
-  'entities.abilities.conflagrate.description': 'Przyspiesza przyszłe tyknięcie twojego Płonącego paktu, a następnie podpala cel za {damage} obrażeń od ognia. Generuje 1 Spustoszenie i 1 Ruinę. Mieści {charges} ładunki. (Znak Zniszczenia)',
+  'entities.abilities.conflagrate.description':
+    'Przyspiesza przyszłe tyknięcie twojego Płonącego paktu, a następnie podpala cel za {damage} obrażeń od ognia. Generuje 1 Spustoszenie i 1 Ruinę. Mieści {charges} ładunki. (Znak Zniszczenia)',
   'entities.abilities.moonkin_form.name': 'Postać księżycowej sowy',
   'entities.abilities.moonkin_form.description':
     'Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)',
@@ -5157,11 +5755,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Wyzwalasz pierwotny przypływ. W Postaci wilka regeneracja energii wzrasta o 100% na 10 sek. W Postaci Bruina natychmiast zyskujesz 50 pkt. wściekłości. (specjalizacja Dzikość)',
   'entities.abilities.swiftmend.name': 'Szybkie uzdrowienie',
-  'entities.abilities.crusader_strike.name': 'Cios krzyżowca',
   'entities.abilities.crusader_strike.description':
     'Uderza cel za obrażenia broni plus {damage} obrażeń od Świętości. (talent paladyna)',
   'entities.abilities.metamorphosis.name': 'Postać licza',
-  'entities.abilities.metamorphosis.description': 'Stajesz się liczem na 20 s, tworząc 3 Odłamki Duszy i zwiększając swoje obrażenia od zaklęć oraz szybkość rzucania o 20%. Twoje nieumarłe sługi zadają o 50% więcej obrażeń i działają o 20% szybciej, a Soul Lance przebija swój cel i uderza maksymalnie 2 pobliskich wrogów za 50% swoich obrażeń. (Znak Nekromancji)',
+  'entities.abilities.metamorphosis.description':
+    'Stajesz się liczem na 20 s, tworząc 3 Odłamki Duszy i zwiększając swoje obrażenia od zaklęć oraz szybkość rzucania o 20%. Twoje nieumarłe sługi zadają o 50% więcej obrażeń i działają o 20% szybciej, a Soul Lance przebija swój cel i uderza maksymalnie 2 pobliskich wrogów za 50% swoich obrażeń. (Znak Nekromancji)',
   'entities.delves.collapsed_reliquary.enterText': 'Schodzisz do zawalonego relikwiarza.',
   'entities.delves.collapsed_reliquary.leaveText':
     'Wspinasz się z powrotem do Brata Halvena przy ruinie relikwiarza.',
@@ -5541,7 +6139,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.valespun_robe.name': 'Szata przędzona w dolinie',
   'entities.items.vanguard_azure_armor_plate.name': 'Lazur awangardy',
   'entities.items.vanguard_chrome_armor_plate.name': 'Chrom awangardy',
-  'entities.items.varric_shadow_cowl.name': 'Mroczny kaptur Varrica',
+  'entities.items.varric_shadow_cowl.name': 'Mroczny kaptur Vandrica',
   'entities.items.verlans_oathblade.name': 'Ostrze przysięgi Verlana',
   'entities.items.voss_sanctified_mace.name': 'Poświęcony buzdygan Vossa',
   'entities.items.wanderers_chestguard.name': 'Napierśnik wędrowca',
@@ -5560,9 +6158,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistcallers_duffel.name': 'Worek Fogbindera',
   'entities.items.worn_sword.name': 'Wyszczerbiony krótki miecz',
   'entities.items.woven_robe.name': 'Szata tkana w dolinie',
-  'entities.items.wyrmcult_grand_robe.name': 'Wspaniała szata kultu żmija',
-  'entities.items.wyrmcult_orders.name': 'Rozkazy kultu żmija',
-  'entities.items.wyrmcult_soulsteps.name': 'Duszokroki kultu żmija',
   'entities.items.wyrmfang_greatblade.name': 'Wielkie ostrze kła żmija',
   'entities.items.wyrmscale_jerkin.name': 'Kaftan z łuski żmija',
   'entities.items.wyrmshadow_harness.name': 'Uprząż Nightfang',
@@ -5602,7 +6197,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.choirmother_selthe.name': 'Chórmatka Selthe',
   'entities.mobs.corrupted_priest_malric.name': 'Skażony Kapłan Malric',
   'entities.mobs.crypt_shambler.name': 'Kryptowy Wlokący',
-  'entities.mobs.deacon_varric.name': 'Diakon Varric',
+  'entities.mobs.deacon_varric.name': 'Diakon Vandric',
   'entities.mobs.deacon_voss.name': 'Diakon Voss',
   'entities.mobs.deathstalker_voss.name': 'Śmiercioczaj Voss',
   'entities.mobs.deepfen_murloc.name': 'Kąsacz z Deepfen',
@@ -5678,7 +6273,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vision_aldren_warrior.name': 'Zjawa Kapitana Aldrena',
   'entities.mobs.vision_deathstalker_voss.name': 'Zjawa Królewskiego Zabójcy Vossa',
   'entities.mobs.vision_malric_mage.name': 'Zjawa Najwyższego Kapłana Malrica',
-  'entities.mobs.gloomshade.name': 'Gloomshade',
+  'entities.mobs.gloomshade.name': 'Duskmurk',
   'entities.mobs.voskar_emberwing.name': 'Voskar Żaroskrzydły',
   'entities.mobs.warlock_imp.name': 'Ognisty Demon',
   'entities.mobs.warlock_voidwalker.name': 'Demon Pustki',
@@ -5686,8 +6281,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.webwood_spider.name': 'Czyhacz Sableweb',
   'entities.mobs.wild_boar.name': 'Dziki Odyniec',
   'entities.mobs.wraithbinder_maldrec.name': 'Widmowiąż Maldrec',
-  'entities.mobs.wyrmcult_necromancer.name': 'Nekromanta Kultu Żmija',
-  'entities.mobs.wyrmcult_zealot.name': 'Fanatyk Kultu Żmija',
   'entities.mobs.ysolei.name': 'Ysolei, Awatar Utopionego Księżyca',
   'entities.npcs.apothecary_lin.greeting':
     'Uważaj, gdzie stawiasz kroki w północno-wschodnich lasach, przyjacielu.',
@@ -5867,8 +6460,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drogmar.completion':
     'Drogmar, martwy we własnym obozie. Klany rozproszą się ku wysokim przełęczom, kupiłeś mojemu murowi całą zimę, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Zabity wódz Drogmar',
-  'entities.quests.q_drogmar.text':
-    'Wódz Drogmar wziął złoto Kultu Żmija i zaprzysiągł klany przebudzeniu góry. To młot, którym zamierzają uderzyć w mój mur, a gdy walnie w ziemię, {playerName}, nie stój w jego pobliżu. Wprowadź towarzyszy do obozu wojennego i zgładź go, za Highwatch.',
   'entities.quests.q_drogmar.title': 'Wódz Drogmar',
   'entities.quests.q_drowned.completion':
     'Każdy, którego zwalisz, to uwolniona skradziona dusza. Ale ten, kto ich utopił, wciąż leje wodę.',
@@ -6216,7 +6807,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     'Klękanie ustało. Nie uciszyliśmy głosu, {playerName}, jedynie przerzedziliśmy jego chór. To musi wystarczyć.',
   'entities.quests.q_voice_below.objectives.0.label': 'Zabity Fanatyk Kultu Żmija',
-  'entities.quests.q_voice_below.objectives.1.label': 'Zabity Nekromanta Kultu Żmija',
   'entities.quests.q_voice_below.text':
     'Zeszłej nocy cały obóz kultu uklęknął naraz, {playerName}, każdy fanatyk, każdy nekromanta, wszyscy zwróceni ku Sanktuarium. Korzul przemawia teraz do nich we śnie; Vael słyszał ten sam głos na trzęsawisku, a Morthen przed nim. Wytnij to zgromadzenie, dziesięciu fanatyków, sześciu nekromantów, zanim ten głos zyska dość rąk, by samemu rozewrzeć bramę.',
   'entities.quests.q_voice_below.title': 'Głos z głębi',
@@ -6247,9 +6837,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wyrm_sigils.title': 'Sygile Żmija',
   'entities.quests.q_zealots.completion':
     'Wiatr jest cichszy. Lecz to, co mnie niepokoi, to nie śpiewy, {playerName}, to że coś może odśpiewywać w odpowiedzi.',
-  'entities.quests.q_zealots.objectives.0.label': 'Zabity Fanatyk Kultu Żmija',
-  'entities.quests.q_zealots.text':
-    'Gdy wiatr nadciąga od południowych szczytów, {playerName}, niesie śpiewy. Kult Żmija już się nie kryje, rozbili namioty poniżej Sanktuarium i śpiewają do tego, co śpi pod nim. Ucisz dwunastu fanatyków. Każdy uciszony głos kupuje górze kolejną noc snu.',
   'entities.quests.q_zealots.title': 'Pieśni na wietrze',
   'entities.zones.eastbrook_vale.name': 'Dolina Wschodniego Strumienia',
   'entities.zones.eastbrook_vale.pois.0.label': 'Eastbrook',
@@ -6283,7 +6870,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'Obóz Wojenny Drogmara',
   'entities.zones.thornpeak_heights.pois.5.label': 'Burzowa Turnia',
   'entities.zones.thornpeak_heights.pois.6.label': 'Migotliwa Toń',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Namioty Kultu Żmija',
   'entities.zones.thornpeak_heights.pois.8.label': 'Pola Upiorów',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanktuarium Grobowego Żmija',
   'entities.zones.thornpeak_heights.welcome':
@@ -6353,7 +6939,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.nightbloom.name': 'Nocny Kwiat',
   'entities.zones.nightbloom.pois.0.label': 'Moonrest',
   'entities.zones.nightbloom.pois.1.label': 'Nocna Brama',
-  'entities.zones.nightbloom.pois.2.label': 'Księżycowa Studnia',
   'entities.zones.nightbloom.pois.3.label': 'Gloamfield',
   'entities.zones.nightbloom.pois.4.label': 'Wieczne Czuwanie',
   'entities.zones.nightbloom.pois.5.label': 'Bezsenny Kurhan',
@@ -6370,7 +6955,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.palmreach.welcome':
     'Ciepły piasek, głośne ptaki i dżungla, która pochłania horyzont. Drifthaven trzyma dla ciebie zapalone ognisko na plaży.',
   'entities.zones.veiled_hollow.name': 'Zasłonięta Kotlina',
-  'entities.zones.veiled_hollow.pois.0.label': 'Eldergleam',
+  'entities.zones.veiled_hollow.pois.0.label': 'Eldershine',
   'entities.zones.veiled_hollow.pois.1.label': 'Jaskinia Zmierzchu',
   'entities.zones.veiled_hollow.pois.2.label': 'Punkt Widokowy Zmierzchu',
   'entities.zones.veiled_hollow.pois.3.label': 'Prastary Gaj',
@@ -6379,7 +6964,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.veiled_hollow.pois.6.label': 'Krystaliczne Mielizny',
   'entities.zones.veiled_hollow.pois.7.label': 'Lśniąca Głębia',
   'entities.zones.veiled_hollow.welcome':
-    'Powietrze brzęczy od starej magii. Odszukaj Strażniczkę Saelwyn pod wielkim drzewem Eldergleam.',
+    'Powietrze brzęczy od starej magii. Odszukaj Strażniczkę Saelwyn pod wielkim drzewem Eldershine.',
   'entities.zones.willowfen.name': 'Wierzbowe Mokradła',
   'entities.zones.willowfen.pois.0.label': 'Bridgemere',
   'entities.zones.willowfen.pois.1.label': 'Bursztynowe Stopnie',
@@ -6390,14 +6975,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.welcome':
     'Mokradła brzęczą od ważek i pszczół. Przejdź przez most do Bridgemere i odpocznij tam trochę.',
   'entities.zones.wraithwood.name': 'Widmowy Bór',
-  'entities.zones.wraithwood.pois.0.label': 'Gallowmere',
+  'entities.zones.wraithwood.pois.0.label': 'Gibbetmere',
   'entities.zones.wraithwood.pois.1.label': 'Wronia Brama',
   'entities.zones.wraithwood.pois.2.label': 'Gąszcz Wdowy',
   'entities.zones.wraithwood.pois.3.label': 'Polana Wisielców',
   'entities.zones.wraithwood.pois.4.label': 'Kaplica Kamienia Żałoby',
   'entities.zones.wraithwood.pois.5.label': 'Polana Łowczego',
   'entities.zones.wraithwood.welcome':
-    'Korony drzew zamykają się nad drogą jak wieko. Trzymaj się latarni Gallowmere i nie odpowiadaj, jeśli las zawoła cię po imieniu.',
+    'Korony drzew zamykają się nad drogą jak wieko. Trzymaj się latarni Gibbetmere i nie odpowiadaj, jeśli las zawoła cię po imieniu.',
   'errors.api.accountBanned': 'To konto zostało zbanowane.',
   'errors.api.accountSuspended': 'To konto jest zawieszone do {date}.',
   'errors.api.alreadyInWorld': 'Postać jest już w świecie.',
@@ -6740,7 +7325,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Leczenie działające z czasem, dobre do rzucenia i kontynuowania ruchu.',
   'guide.abilityHook.rockbiter_weapon':
     'Nasyca twój oręż tak, że każdy zamach wręcz uderza mocniej.',
-  'guide.abilityHook.seal_of_righteousness': 'Nasyca twoje ciosy wręcz dodatkowymi obrażeniami świętymi.',
+  'guide.abilityHook.seal_of_righteousness':
+    'Nasyca twoje ciosy wręcz dodatkowymi obrażeniami świętymi.',
   'guide.abilityHook.serpent_sting': 'Wstrzykuje jad, który z czasem zadaje obrażenia od natury.',
   'guide.abilityHook.shadow_bolt': 'Pocisk cienia rzucany w cel, twój podstawowy atak.',
   'guide.abilityHook.shadow_word_pain':
@@ -6748,11 +7334,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.sinister_strike':
     'Twój niezawodny cios, który buduje punkty kombinacji do późniejszego wykorzystania.',
   'guide.abilityHook.smite': 'Święty pocisk do osłabiania celu z dystansu.',
-  'guide.abilityHook.summon_imp': 'Przyzywa Emberkina, który z dystansu rzuca w przeciwników Plugawym pociskiem.',
+  'guide.abilityHook.summon_imp':
+    'Przyzywa Emberkina, który z dystansu rzuca w przeciwników Plugawym pociskiem.',
   'guide.abilityHook.thorns': 'Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu.',
   'guide.abilityHook.thunder_clap': 'Uderza we wszystko wokół ciebie i spowalnia ataki wrogów.',
   'guide.abilityHook.wrath': 'Pocisk natury ciskany w cel z dystansu, twój podstawowy atak.',
-  'guide.arenaPage.coliseumBody': 'Koloseum to arena królestwa, gdzie mierzysz się z innymi graczami w rankingowych pojedynkach, jeden na jednego albo dwóch na dwóch. Każda kategoria trzyma własną tabelę, więc zwycięstwo podnosi cię po tej drabinie na oczach całego królestwa. Gra rankingowa otwiera się na 15. poziomie i dotyczy to również twojego partnera: jeśli któreś z was jest poniżej, kolejka pozostaje zamknięta, dopóki oboje nie spełnicie wymogu. Całe gracz kontra gracz mieszka za jednym przyciskiem oznaczonym PvP: otwórz go i wybierz zakładkę, Pola Ciernistej Kotliny, jeden na jednego albo dwóch na dwóch, a potem zgłoś się sam albo ze swoim partnerem. Dopóki jesteś w kolejce albo w pojedynku, pozostałe zakładki są zablokowane, więc nigdy nie możesz stać w dwóch kolejkach naraz.',
+  'guide.arenaPage.coliseumBody':
+    'Koloseum to arena królestwa, gdzie mierzysz się z innymi graczami w rankingowych pojedynkach, jeden na jednego albo dwóch na dwóch. Każda kategoria trzyma własną tabelę, więc zwycięstwo podnosi cię po tej drabinie na oczach całego królestwa. Gra rankingowa otwiera się na 15. poziomie i dotyczy to również twojego partnera: jeśli któreś z was jest poniżej, kolejka pozostaje zamknięta, dopóki oboje nie spełnicie wymogu. Całe gracz kontra gracz mieszka za jednym przyciskiem oznaczonym PvP: otwórz go i wybierz zakładkę, Pola Ciernistej Kotliny, jeden na jednego albo dwóch na dwóch, a potem zgłoś się sam albo ze swoim partnerem. Dopóki jesteś w kolejce albo w pojedynku, pozostałe zakładki są zablokowane, więc nigdy nie możesz stać w dwóch kolejkach naraz.',
   'guide.arenaPage.coliseumHeading': 'Popielne Koloseum',
   'guide.arenaPage.duelsBody':
     'Wyzwij dowolnego napotkanego gracza na przyjacielski pojedynek. Stawką jest tylko duma, więc to najprostszy sposób, by poznać starcie lub rozstrzygnąć przyjacielski spór.',
@@ -6831,16 +7419,19 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.resourceLabel': 'Zasób',
   'guide.classPage.roleLabel': 'Gra jako',
   'guide.classPage.specsHeading': 'Specjalizacje',
-  'guide.combat.ccBody': 'Kontrola tłumu to szczególny rodzaj osłabienia, który ogranicza to, co cel może zrobić: ogłuszenia, unieruchomienia i spowolnienia, uciszenia zatrzymujące rzucanie zaklęć, rozbrojenia, strach i przemiany czyniące przeciwnika na chwilę nieszkodliwym. Wobec innych graczy większość kontroli zużywa się przez powtarzanie: strach, przemiany, unieruchomienia i blokady szkoły nałożone zbyt szybko skracają się, a potem zawodzą zupełnie, więc nikogo nie da się trzymać bezradnym w nieskończoność. Ogłuszenia to zamierzony wyjątek, bo i tak są krótkie i stoją za prawdziwymi czasami odnowienia, więc powtarzanie nigdy ich nie skraca, choć wyposażenie skracające czasy kontroli nadal je przycina. Stworzenia świata nie żywią takiej urazy: wobec nich kontrola nigdy nie słabnie przez powtarzanie, choć wielu najpotężniejszych wrogów, nazwane elity i najsilniejsi bossowie wśród nich, nie da się kontrolować w ogóle.',
+  'guide.combat.ccBody':
+    'Kontrola tłumu to szczególny rodzaj osłabienia, który ogranicza to, co cel może zrobić: ogłuszenia, unieruchomienia i spowolnienia, uciszenia zatrzymujące rzucanie zaklęć, rozbrojenia, strach i przemiany czyniące przeciwnika na chwilę nieszkodliwym. Wobec innych graczy większość kontroli zużywa się przez powtarzanie: strach, przemiany, unieruchomienia i blokady szkoły nałożone zbyt szybko skracają się, a potem zawodzą zupełnie, więc nikogo nie da się trzymać bezradnym w nieskończoność. Ogłuszenia to zamierzony wyjątek, bo i tak są krótkie i stoją za prawdziwymi czasami odnowienia, więc powtarzanie nigdy ich nie skraca, choć wyposażenie skracające czasy kontroli nadal je przycina. Stworzenia świata nie żywią takiej urazy: wobec nich kontrola nigdy nie słabnie przez powtarzanie, choć wielu najpotężniejszych wrogów, nazwane elity i najsilniejsi bossowie wśród nich, nie da się kontrolować w ogóle.',
   'guide.combat.deathBody':
     'Gdy twoje zdrowie spadnie do zera, padasz tam, gdzie stoisz, a twoje ciało zostaje na miejscu. Uwolnij ducha, a powstaniesz jako zjawa na najbliższym cmentarzu: szybszy w nogach niż żywi, poza zasięgiem wrogów, lecz niezdolny do walki, zbierania łupów czy rozmowy z kimkolwiek poza Bladym Strażnikiem unoszącym się nad kamieniami. Stąd wybierasz. Wróć duchem do ciała, a odrodzisz się na miejscu z częścią przywróconego zdrowia i many, bez żadnej kary. Albo skorzystaj z natychmiastowego wskrzeszenia u Bladego Strażnika tam, gdzie stoisz, za cenę Myta Strażnika: chwilowego osłabienia wszystkiego, czym jesteś, które trwa tym dłużej, im bardziej jesteś doświadczony, a zupełnie nowe postacie omija. Polegnij w lochu, a twój duch czeka na cmentarzu na zewnątrz; przejdź zjawą z powrotem przez drzwi, a odrodzisz się przy wejściu. Głębie są wyjątkiem: gdy polegniesz w nich, po prostu stajesz z powrotem na nogi przy wejściu do głębi, choć drugi upadek kończy przebieg. Którąkolwiek drogę wybierzesz, nie tracisz doświadczenia, ekwipunku ani monet. Między walkami usiądź, by zjeść i napić się, byś następną zaczął w pełni sił.',
   'guide.combat.deathTitle': 'Gdy padniesz',
   'guide.combat.effectsBody':
     'Wiele zdolności nakłada utrzymujący się efekt. Korzystne (wzmocnienia) zwiększają twoje cechy, osłaniają cię lub leczą po trochu; szkodliwe (osłabienia) wysysają twoje zdrowie obrażeniami w czasie albo cię osłabiają. Obserwuj małe ikony w górnym rogu ekranu, obok minimapy, by zobaczyć, co na tobie działa i jak długo.',
   'guide.combat.effectsTitle': 'Wzmocnienia, osłabienia i kontrola tłumu',
-  'guide.combat.growBody': 'Każdy poziom czyni cię wytrzymalszym i odblokowuje nowe umiejętności, aż po pułap poziomu {cap}. Zadania to najszybsza droga w górę; łowy, lochy, wyprawy i profesje, które uprawiasz po drodze, dopełniają resztę.',
+  'guide.combat.growBody':
+    'Każdy poziom czyni cię wytrzymalszym i odblokowuje nowe umiejętności, aż po pułap poziomu {cap}. Zadania to najszybsza droga w górę; łowy, lochy, wyprawy i profesje, które uprawiasz po drodze, dopełniają resztę.',
   'guide.combat.growTitle': 'Z każdym poziomem stajesz się silniejszy',
-  'guide.combat.hitBody': 'Ataki mogą chybić i mogą zostać uniknięte, a te wroga tak samo. Dwie kolejne odpowiedzi należą wyłącznie do graczy: wojownik może odbić cios paradą, a wojownik albo paladyn z tarczą może stłumić go w blok, jedno i drugie tylko wobec tego, co nadchodzi z przodu. Stworzenia świata nie robią ani jednego, ani drugiego, więc cios w potwora trafia, chybia albo zostaje uniknięty. Zaklęcia rządzą się własną regułą i nigdy nie chybiają: zamiast tego można im się oprzeć. Walka blisko własnego poziomu jest tym, co utrzymuje twoje trafienia w celu; im większa różnica poziomów, tym częściej tniesz powietrze.',
+  'guide.combat.hitBody':
+    'Ataki mogą chybić i mogą zostać uniknięte, a te wroga tak samo. Dwie kolejne odpowiedzi należą wyłącznie do graczy: wojownik może odbić cios paradą, a wojownik albo paladyn z tarczą może stłumić go w blok, jedno i drugie tylko wobec tego, co nadchodzi z przodu. Stworzenia świata nie robią ani jednego, ani drugiego, więc cios w potwora trafia, chybia albo zostaje uniknięty. Zaklęcia rządzą się własną regułą i nigdy nie chybiają: zamiast tego można im się oprzeć. Walka blisko własnego poziomu jest tym, co utrzymuje twoje trafienia w celu; im większa różnica poziomów, tym częściej tniesz powietrze.',
   'guide.combat.hitTitle': 'Nie każdy cios trafia',
   'guide.combat.intro':
     'Walka rządzi się znajomymi zasadami klasycznych MMO. Nigdy nie musisz tego zgłębiać, by dobrze grać, to tylko zarys tego, jak działają starcia.',
@@ -6864,7 +7455,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCombat': 'Namierzanie i walka',
   'guide.controls.groupInterface': 'Interfejs',
   'guide.controls.groupMovement': 'Poruszanie się',
-  'guide.controls.intro': 'Domyślne klawisze dla komputera. Każde przypisanie tutaj można zmienić w panelu Przypisania klawiszy w menu gry, poza Esc, które zawsze otwiera właśnie to menu. Każda akcja mieści do dwóch klawiszy, głównego i alternatywnego, a przypisanie może być kombinacją z modyfikatorem, jak Shift+Z. Może to być również przycisk myszy: środkowy to M3, a przyciski kciuka to M4 i M5, kolejne liczy się dalej od nich. Lewy i prawy klik pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania rzeczy w świecie.',
+  'guide.controls.intro':
+    'Domyślne klawisze dla komputera. Każde przypisanie tutaj można zmienić w panelu Przypisania klawiszy w menu gry, poza Esc, które zawsze otwiera właśnie to menu. Każda akcja mieści do dwóch klawiszy, głównego i alternatywnego, a przypisanie może być kombinacją z modyfikatorem, jak Shift+Z. Może to być również przycisk myszy: środkowy to M3, a przyciski kciuka to M4 i M5, kolejne liczy się dalej od nich. Lewy i prawy klik pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania rzeczy w świecie.',
   'guide.controls.keyHeader': 'Klawisz',
   'guide.controls.leaderboard': 'Tabela wyników',
   'guide.controls.mobileBody':
@@ -6893,14 +7485,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.delvesPage.lockpickBody':
     'Niektóre drzwi i skrytki są zaryglowane, a ich otwarcie to mała próba nerwów, a nie sprawdzian statystyk: rozwiąż zamek czysto i spokojnie, a zdobędziesz lepszą nagrodę niż za pośpieszną, sfuszerowaną próbę. To opcjonalne, ale ostrożny śmiałek wychodzi z niej bogatszy.',
   'guide.delvesPage.lockpickHeading': 'Zamki i to, co kryją',
-  'guide.delvesPage.marksBody': 'Czyszczenie wypraw przynosi Znaki Wypraw, walutę trzymaną osobno od twoich pieniędzy. Wydaj je u strażnika, by wzmocnić swoją towarzyszkę i zdobyć wyposażenie, którego nie znajdziesz nigdzie indziej.\n\nZnaki nagradzają najbardziej pierwsze przejścia twojego dnia. Trzy pierwsze ukończenia każdego dnia płacą w pełni, a potem wyprawa nadal płaci, tylko mniej pewnie, przy czym trudniejszy stopień trzyma się lepiej niż łatwiejszy. Licznik przewija się codziennie, więc nie ma potrzeby wyciskać wyprawy do cna: wróć jutro, a dobra stawka będzie czekać.',
+  'guide.delvesPage.marksBody':
+    'Czyszczenie wypraw przynosi Znaki Wypraw, walutę trzymaną osobno od twoich pieniędzy. Wydaj je u strażnika, by wzmocnić swoją towarzyszkę i zdobyć wyposażenie, którego nie znajdziesz nigdzie indziej.\n\nZnaki nagradzają najbardziej pierwsze przejścia twojego dnia. Trzy pierwsze ukończenia każdego dnia płacą w pełni, a potem wyprawa nadal płaci, tylko mniej pewnie, przy czym trudniejszy stopień trzyma się lepiej niż łatwiejszy. Licznik przewija się codziennie, więc nie ma potrzeby wyciskać wyprawy do cna: wróć jutro, a dobra stawka będzie czekać.',
   'guide.delvesPage.marksHeading': 'Znaki Wypraw',
   'guide.delvesPage.partyLabel': 'Dla jednego lub dwóch',
   'guide.delvesPage.tiersBody':
     'Wyprawa oferuje więcej niż jeden poziom trudności. Wyższy czyni wrogów silniejszymi i dorzuca modyfikator wyprawy, a w zamian wypłaca więcej. Wymaga też, byś miał za sobą kilka poziomów, nim cię wpuści.',
   'guide.delvesPage.tiersHeading': 'Poziom trudności',
   'guide.delvesPage.tiersLabel': 'Poziomy trudności',
-  'guide.delvesPage.whatBody': 'Wyprawa to mały instancjonowany loch stworzony tylko dla ciebie i najwyżej jednego sojusznika, prywatna kopia, w której nikt ci nie przeszkodzi. Rozpoczynasz ją przy tablicy, którą w świecie prowadzi strażnik wypraw, schodzisz w dół, przebijasz się przez garstkę komnat i kończysz na jednym strażniku. To, co czeka za tym strażnikiem, różni się w zależności od wyprawy: jedna pieczętuje swoje zdobycze za zamkiem, inna żąda od ciebie obrzędu. Przejścia są szybkie i pomyślane do powtarzania, więc wyprawa to pewny kawałek postępu, ilekroć otwarty świat wysycha.',
+  'guide.delvesPage.whatBody':
+    'Wyprawa to mały instancjonowany loch stworzony tylko dla ciebie i najwyżej jednego sojusznika, prywatna kopia, w której nikt ci nie przeszkodzi. Rozpoczynasz ją przy tablicy, którą w świecie prowadzi strażnik wypraw, schodzisz w dół, przebijasz się przez garstkę komnat i kończysz na jednym strażniku. To, co czeka za tym strażnikiem, różni się w zależności od wyprawy: jedna pieczętuje swoje zdobycze za zamkiem, inna żąda od ciebie obrzędu. Przejścia są szybkie i pomyślane do powtarzania, więc wyprawa to pewny kawałek postępu, ilekroć otwarty świat wysycha.',
   'guide.delvesPage.whatHeading': 'Czym jest wyprawa',
   'guide.delvesPage.whereBody':
     'Pierwsza wyprawa, Zawalony Relikwiarz, otwiera się na Relikwiarzowym Wzgórzu w początkowej dolinie, czyli Dolinie Wschodniego Strumienia. Tablicy pilnuje tam Brat Halven, który pośle cię w dół, gdy będziesz gotów. Na tym jego obchód się nie kończy: za Kopcami Trolli, przy północnym krańcu Trzęsawiska Mokrzawia, ten sam opiekun otwiera Utopioną Litanię dla poszukiwaczy, którzy złapali już grunt pod nogami.',
@@ -6921,7 +7515,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.levelAround': 'Około poziomu {n}',
   'guide.dungeonsPage.levelBand': 'Poziomy od {min} do {max}',
   'guide.dungeonsPage.levelExact': 'Poziom {n}',
-  'guide.dungeonsPage.party': 'Lochy są zbudowane dla drużyny pięciu. Końcowy rajd jest dla dziesięciu. Jeśli nie masz pod ręką czterech przyjaciół, Znajdywacz Lochów zbuduje drużynę dla przejść, które kolejkuje. Pasmo poziomów na każdej karcie poniżej to poziom, dla którego przejście napisano, a nie zamek na drzwiach: nic nie powstrzyma cię przed wejściem wcześniej albo powrotem później, choć Znajdywacz Lochów posadzi cię tylko w przejściu, któremu twój poziom odpowiada.',
+  'guide.dungeonsPage.party':
+    'Lochy są zbudowane dla drużyny pięciu. Końcowy rajd jest dla dziesięciu. Jeśli nie masz pod ręką czterech przyjaciół, Znajdywacz Lochów zbuduje drużynę dla przejść, które kolejkuje. Pasmo poziomów na każdej karcie poniżej to poziom, dla którego przejście napisano, a nie zamek na drzwiach: nic nie powstrzyma cię przed wejściem wcześniej albo powrotem później, choć Znajdywacz Lochów posadzi cię tylko w przejściu, któremu twój poziom odpowiada.',
   'guide.dungeonsPage.partySize': '{n} graczy',
   'guide.dungeonsPage.raidBody':
     'Za zapieczętowanymi królewskimi drzwiami czeka próba dla dziesięciu graczy: wielofazowa walka i nieśmiertelna moc, którą cały rajd musi wspólnie powstrzymać. Wywalcz sobie wstęp, a potem przyprowadź dziewięcioro przyjaciół.',
@@ -6930,7 +7525,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody':
     'Mroczne serce Ciernistego Szczytu, gdzie długa praca kultu osiąga swój straszliwy szczyt.',
   'guide.dungeonsPage.sanctumName': 'Sanktuarium Grobowego Żmija',
-  'guide.dungeonsPage.soloLead': 'Popytaj w pobliskich miastach, zanim ruszysz: ich zleceniodawcy rozdają łańcuchy kończące się w tych salach, a wniesienie jednego ze sobą sprawia, że przejście opłaca się podwójnie.',
+  'guide.dungeonsPage.soloLead':
+    'Popytaj w pobliskich miastach, zanim ruszysz: ich zleceniodawcy rozdają łańcuchy kończące się w tych salach, a wniesienie jednego ze sobą sprawia, że przejście opłaca się podwójnie.',
   'guide.dungeonsPage.templeBody':
     'Skąpane w blasku księżyca sanktuarium zatopione pod świetlistym górskim jeziorkiem wysoko w szczytach, do którego dociera się przez bramę zimnego światła. Utopiony kult wciąż śpiewa tam na dole w swych zbutwiałych szatach, a ostrzeżenia wyryte na brzegu mówią, że coś na dole tylko śpi. Samodzielna tajemnica, oddzielona od głównej historii, dla ciekawskich i dobrze przygotowanych.',
   'guide.dungeonsPage.templeLoreBody':
@@ -6952,8 +7548,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Kupiec prowadzi Targ Świata, napędzaną przez graczy giełdę, na której możesz kupować i sprzedawać ludziom, których być może nigdy nie spotkasz. Porozmawiaj z Kupcem w Eastbrook lub z Licytatorem Vossem w Highwatch, aby ją otworzyć: obaj gospodarze obsługują ten jeden wspólny targ. Kupiec utrzymuje tam też stały zapas własnych towarów, więc zawsze jest coś do kupienia, nawet gdy żaden inny gracz nic nie wystawił.',
   'guide.economy.marketBrowse':
     'Przeglądanie: przewijaj ogłoszenia lub wyszukuj po nazwie, aby znaleźć to, co jest na sprzedaż. Każde ogłoszenie pokazuje towar, sprzedawcę i cenę wywoławczą za cały plik.',
-  'guide.economy.marketCollect': 'Odbiór: gdy twój towar się sprzeda, twój zarobek czeka na ciebie u Kupca. Wróć po monety wraz ze wszystkim, co wróciło niesprzedane. Kupiec bierze małą część z każdej zamkniętej sprzedaży. Zakładka Odbierz wypisuje, co czeka, jedna linijka na zamkniętą sprzedaż z towarem, kupującym i tym, ile zarobiłeś, więc widzisz dokładnie, co się sprzedało, zanim weźmiesz monety.',
-  'guide.economy.marketPost': 'Wystawianie: wybierz stos ze swoich toreb, ustal cenę i wystaw go. Towar trzyma Kupiec, dopóki ktoś go nie kupi. Niesprzedane oferty wracają do ciebie po jakimś czasie i możesz odebrać jedną wcześniej, jeśli zmienisz zdanie. Samo wystawienie jest darmowe, więc optymistyczna cena nie kosztuje cię nic poza czasem.',
+  'guide.economy.marketCollect':
+    'Odbiór: gdy twój towar się sprzeda, twój zarobek czeka na ciebie u Kupca. Wróć po monety wraz ze wszystkim, co wróciło niesprzedane. Kupiec bierze małą część z każdej zamkniętej sprzedaży. Zakładka Odbierz wypisuje, co czeka, jedna linijka na zamkniętą sprzedaż z towarem, kupującym i tym, ile zarobiłeś, więc widzisz dokładnie, co się sprzedało, zanim weźmiesz monety.',
+  'guide.economy.marketPost':
+    'Wystawianie: wybierz stos ze swoich toreb, ustal cenę i wystaw go. Towar trzyma Kupiec, dopóki ktoś go nie kupi. Niesprzedane oferty wracają do ciebie po jakimś czasie i możesz odebrać jedną wcześniej, jeśli zmienisz zdanie. Samo wystawienie jest darmowe, więc optymistyczna cena nie kosztuje cię nic poza czasem.',
   'guide.economy.marketPricing':
     'Ustalanie ceny zależy od ciebie. Wystawienie nieco poniżej tego, co inni żądają, zwykle sprzedaje się szybciej, podczas gdy wygórowana cena może leżeć nietknięta. Najpierw przejrzyj ofertę, aby zobaczyć, jak wygląda obowiązująca stawka, zanim wystawisz.',
   'guide.economy.marketTitle': 'Targ Świata',
@@ -7000,12 +7598,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Demony',
   'guide.faqPage.a1':
     'Tak. Cała gra jest darmowa do maksymalnego poziomu, a kod źródłowy jest otwarty na GitHubie.',
-  'guide.faqPage.a10': 'Pułap to poziom {cap}. Stamtąd przemierzasz pięcioosobowe lochy i dziesięcioosobowy rajd, bierzesz je ponownie w trybie heroicznym po ulepszony łup, schodzisz szczelinami piętro po piętrze, mierzysz się ze światowym bossem, gdy powstanie, sprawdzasz się na arenie albo na polu bitwy Pola Ciernistej Kotliny, grasz sezon Pucharu Doliny, nurkujesz w wyprawy z towarzyszem u boku, prowadzisz profesję aż do wytwarzania arcydzieł, zbierasz wierzchowce i ścigasz czyny w Księdze Czynów, by piąć się w rankingach.',
+  'guide.faqPage.a10':
+    'Pułap to poziom {cap}. Stamtąd przemierzasz pięcioosobowe lochy i dziesięcioosobowy rajd, bierzesz je ponownie w trybie heroicznym po ulepszony łup, schodzisz szczelinami piętro po piętrze, mierzysz się ze światowym bossem, gdy powstanie, sprawdzasz się na arenie albo na polu bitwy Pola Ciernistej Kotliny, grasz sezon Pucharu Doliny, nurkujesz w wyprawy z towarzyszem u boku, prowadzisz profesję aż do wytwarzania arcydzieł, zbierasz wierzchowce i ścigasz czyny w Księdze Czynów, by piąć się w rankingach.',
   'guide.faqPage.a11':
     'Zaproś do drużyny każdego, kogo spotkasz, zapytaj na czacie lub połączcie siły przy lochu. Większość świata da się przejść samotnie, więc grupowanie się to wybór, a nie wymóg.',
   'guide.faqPage.a2':
     'Nie. W grę można w pełni grać bez niego. Opcjonalny żeton społeczności dodaje jedynie kosmetyczny akcent i udział w puli dziennych nagród, i nigdy nie wpływa na siłę ani postęp.',
-  'guide.faqPage.a3': 'Tak. Gra działa w każdej nowoczesnej przeglądarce mobilnej ze sterowaniem dotykowym, są też aplikacje: wersje na iOS i Androida oraz aplikacja komputerowa na Windows, macOS i Linux, która sama się aktualizuje.',
+  'guide.faqPage.a3':
+    'Tak. Gra działa w każdej nowoczesnej przeglądarce mobilnej ze sterowaniem dotykowym, są też aplikacje: wersje na iOS i Androida oraz aplikacja komputerowa na Windows, macOS i Linux, która sama się aktualizuje.',
   'guide.faqPage.a4':
     'Tak. Istnieje natychmiastowy tryb offline dla jednego gracza, a świat online da się w pełni przejść samotnie poza lochami, rajdem i bossem świata.',
   'guide.faqPage.a5':
@@ -7037,12 +7637,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.footer.github': 'Źródło na GitHubie',
   'guide.footer.playNow': 'Zagraj teraz',
   'guide.footer.rights': 'World of ClaudeCraft',
-  'guide.gear.consumablesElixirs': 'Eliksiry dają tymczasowe wzmocnienie, gdy jesteś w drodze, małą przewagę, która pomaga, gdy chcesz przycisnąć trochę dalej. Nie dzielą czasu odnowienia mikstur, więc możesz wypić jeden i mimo to trzymać miksturę leczniczą w zapasie. Dwa eliksiry na tę samą cechę nie sumują się, a zostaje ten, który wypiłeś jako ostatni.',
+  'guide.gear.consumablesElixirs':
+    'Eliksiry dają tymczasowe wzmocnienie, gdy jesteś w drodze, małą przewagę, która pomaga, gdy chcesz przycisnąć trochę dalej. Nie dzielą czasu odnowienia mikstur, więc możesz wypić jeden i mimo to trzymać miksturę leczniczą w zapasie. Dwa eliksiry na tę samą cechę nie sumują się, a zostaje ten, który wypiłeś jako ostatni.',
   'guide.gear.consumablesFood':
     'Jedzenie i napoje regenerują cię, gdy siedzisz i odpoczywasz między walkami. Jedzenie przywraca zdrowie, picie przywraca manę, a odpoczynek w ten sposób jest darmowy. Usiądź na kilka sekund po ciężkiej walce, zamiast wbiegać w następną wyleczony tylko do połowy.',
   'guide.gear.consumablesIntro':
     'Niektóre przedmioty zużywa się raz dla szybkiej korzyści. To tania polisa, więc trzymaj kilka pod ręką.',
-  'guide.gear.consumablesPotions': 'Mikstury przywracają zdrowie albo manę w chwili, gdy ich użyjesz, nawet w środku walki, co czyni je ratunkiem w ostatniej chwili, gdy pull pójdzie źle. Wszystkie mikstury dzielą jeden czas odnowienia długi na parę minut, więc masz jedną dobrą chwilę na walkę zamiast ich łańcucha. Przywracają też mniej niż usiąście do jedzenia albo picia, i to jest cena za to, że nie siadasz. Mikstury przychodzą w stopniach skrojonych na każdy odcinek świata, więc noś stopień zrobiony na twój poziom: stara mikstura niskiego stopnia to na dorosłej postaci zaledwie okruch.',
+  'guide.gear.consumablesPotions':
+    'Mikstury przywracają zdrowie albo manę w chwili, gdy ich użyjesz, nawet w środku walki, co czyni je ratunkiem w ostatniej chwili, gdy pull pójdzie źle. Wszystkie mikstury dzielą jeden czas odnowienia długi na parę minut, więc masz jedną dobrą chwilę na walkę zamiast ich łańcucha. Przywracają też mniej niż usiąście do jedzenia albo picia, i to jest cena za to, że nie siadasz. Mikstury przychodzą w stopniach skrojonych na każdy odcinek świata, więc noś stopień zrobiony na twój poziom: stara mikstura niskiego stopnia to na dorosłej postaci zaledwie okruch.',
   'guide.gear.consumablesTitle': 'Materiały zużywalne',
   'guide.gear.cosmeticsApply':
     'Ustaw aktywny wygląd w wierszu wyglądu na ekranie postaci i swobodnie przełączaj się między wszystkim, co odblokowałeś.',
@@ -7052,7 +7654,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Kilka z nich pochodzi z tajemniczej kosmetycznej skrytki, zapieczętowanej nagrody, która przy otwarciu losuje jeden z trzech stopni jakości i przyznaje pasujący do niego wygląd. To czysto dla efektu wizualnego: nic w jej wnętrzu nie czyni cię silniejszym, jedynie piękniejszym dla oka.',
   'guide.gear.cosmeticsRanks':
     'Kosmetyki mają własne poziomy rzadkości, a te rzadsze to przyjemna rzecz do zdobywania. Zdobycie wyższego poziomu odblokowuje też wyglądy poniżej niego.',
-  'guide.gear.cosmeticsSkins': 'Wygląd twojej postaci przychodzi w dwóch liniach. Większość klas ma kilka alternatywnych wyglądów, świeże odczytanie wizerunku klasy, które jest twoje do noszenia. Obok nich stoją chromy: nazwane dwubarwne schematy, które przemalowują wygląd całkowicie, od stonowanych metali po jaskrawe barwy cesarskie.',
+  'guide.gear.cosmeticsSkins':
+    'Wygląd twojej postaci przychodzi w dwóch liniach. Większość klas ma kilka alternatywnych wyglądów, świeże odczytanie wizerunku klasy, które jest twoje do noszenia. Obok nich stoją chromy: nazwane dwubarwne schematy, które przemalowują wygląd całkowicie, od stonowanych metali po jaskrawe barwy cesarskie.',
   'guide.gear.cosmeticsTitle': 'Wyglądy i kosmetyki',
   'guide.gear.fishingBody':
     'Wędkowanie to spokojna odmiana tempa. Wyposaż się w wędkę, zarzuć do otwartej wody i wyciągaj to, co bierze. Najczęściej łowisz ryby, które są jedzeniem gotowym do zjedzenia, od czasu do czasu jakiś rupieć do sprzedania za kilka monet, a raz na jakiś czas cenny rzadki połów. To, co znajdziesz, zależy od wody, w której łowisz.',
@@ -7074,7 +7677,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityRare': 'Rzadki',
   'guide.gear.qualityTitle': 'Jakość na pierwszy rzut oka',
   'guide.gear.qualityUncommon': 'Niepospolity',
-  'guide.gear.setsBody': 'Część pancerza przychodzi w dobranych rodzinach, kilku elementach skrojonych tak, by wyglądać i walczyć jak jedno. Noś naraz dość elementów jednej rodziny, a komplet się budzi i daje premie ponad własne wartości każdego elementu, a im więcej elementów nosisz, tym staje się silniejszy. Kilka takich rodzin pojawia się jako pożądany łup, gdy pniesz się poziomami, a największe pochodzą z najtrudniejszej treści drużynowej blisko maksymalnego poziomu, więc pogoń za pełnym kompletem to klasyczny cel końcowej gry. Walka z innymi graczami ma własne dobrane rodziny, kupowane element po elemencie za Honor; budzą się przy innych liczbach elementów niż rodziny z łupów, a ich premie odpowiadają tylko wtedy, gdy wrogiem jest inny gracz.',
+  'guide.gear.setsBody':
+    'Część pancerza przychodzi w dobranych rodzinach, kilku elementach skrojonych tak, by wyglądać i walczyć jak jedno. Noś naraz dość elementów jednej rodziny, a komplet się budzi i daje premie ponad własne wartości każdego elementu, a im więcej elementów nosisz, tym staje się silniejszy. Kilka takich rodzin pojawia się jako pożądany łup, gdy pniesz się poziomami, a największe pochodzą z najtrudniejszej treści drużynowej blisko maksymalnego poziomu, więc pogoń za pełnym kompletem to klasyczny cel końcowej gry. Walka z innymi graczami ma własne dobrane rodziny, kupowane element po elemencie za Honor; budzą się przy innych liczbach elementów niż rodziny z łupów, a ich premie odpowiadają tylko wtedy, gdy wrogiem jest inny gracz.',
   'guide.gear.setsTitle': 'Zestawy i bonusy zestawów',
   'guide.gear.slotChest': 'Tułów',
   'guide.gear.slotFeet': 'Stopy',
@@ -7084,9 +7688,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotMainhand': 'Broń',
   'guide.gear.slotShoulder': 'Barki',
   'guide.gear.slotWaist': 'Pas',
-  'guide.gear.slotsBody': 'Masz slot na broń główną, slot na drugą rękę, siedem slotów pancerza i trzy sloty biżuterii: szyję i dwa palce. Każda klasa może dzierżyć tylko określone bronie i nosi pancerz do własnej wagi, tkaninę, skórę albo kolczugę, więc ulepszenia, które ci pasują, to te zrobione dla twojej klasy. Biżuteria nie ma żadnej wagi: każda klasa nosi to, na co zapracuje. W tych ramach zapełnij każdy slot najlepszym elementem, jaki znajdziesz.',
+  'guide.gear.slotsBody':
+    'Masz slot na broń główną, slot na drugą rękę, siedem slotów pancerza i trzy sloty biżuterii: szyję i dwa palce. Każda klasa może dzierżyć tylko określone bronie i nosi pancerz do własnej wagi, tkaninę, skórę albo kolczugę, więc ulepszenia, które ci pasują, to te zrobione dla twojej klasy. Biżuteria nie ma żadnej wagi: każda klasa nosi to, na co zapracuje. W tych ramach zapełnij każdy slot najlepszym elementem, jaki znajdziesz.',
   'guide.gear.slotsTitle': 'Co możesz założyć',
-  'guide.gear.sourcesBody': 'Większość twoich wczesnych ulepszeń to nagrody za zadania, więc opłaca się kończyć zadania zamiast grindować. Wrogowie upuszczają wyposażenie, gdy ich pokonasz, kupcy w mieście sprzedają solidne podstawy, rzemieślnicy zamieniają zebrane materiały w noszalne elementy, a rynek graczy pozwala kupować od innych poszukiwaczy przygód. Na samym szczycie wzgórza trzy zapracowane waluty kupują wyposażenie nie do znalezienia nigdzie indziej: Znaki Wypraw u strażnika wypraw, Heroiczne Znaki u heroicznego kwatermistrza i Honor u kwatermistrzów honoru.',
+  'guide.gear.sourcesBody':
+    'Większość twoich wczesnych ulepszeń to nagrody za zadania, więc opłaca się kończyć zadania zamiast grindować. Wrogowie upuszczają wyposażenie, gdy ich pokonasz, kupcy w mieście sprzedają solidne podstawy, rzemieślnicy zamieniają zebrane materiały w noszalne elementy, a rynek graczy pozwala kupować od innych poszukiwaczy przygód. Na samym szczycie wzgórza trzy zapracowane waluty kupują wyposażenie nie do znalezienia nigdzie indziej: Znaki Wypraw u strażnika wypraw, Heroiczne Znaki u heroicznego kwatermistrza i Honor u kwatermistrzów honoru.',
   'guide.gear.sourcesTitle': 'Skąd pochodzi wyposażenie',
   'guide.gear.upgradeBody':
     'Zastąpienie starego elementu świeżym ulepszeniem daje ci więcej niż perfekcyjna gra w wyposażeniu, z którego wyrosłeś. Gdy coś lepszego wypadnie lub zaoferuje to zadanie, weź to. Nie odkładaj dobrych przedmiotów na później.',
@@ -7144,7 +7750,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.rareDef':
     'Niezwykły, nazwany wróg, który wędruje po strefie i upuszcza lepszy łup.',
   'guide.glossary.rareTerm': 'Rzadki',
-  'guide.glossary.specDef': 'Specjalizacja: ścieżka, którą wybierasz dla swojej klasy na 5. poziomie, jak leczenie albo obrażenia. Ustala twoją rolę, daje charakterystyczną umiejętność i trwałe mistrzostwo, i zostaje z tobą nawet wtedy, gdy zresetujesz talenty.',
+  'guide.glossary.specDef':
+    'Specjalizacja: ścieżka, którą wybierasz dla swojej klasy na 5. poziomie, jak leczenie albo obrażenia. Ustala twoją rolę, daje charakterystyczną umiejętność i trwałe mistrzostwo, i zostaje z tobą nawet wtedy, gdy zresetujesz talenty.',
   'guide.glossary.specTerm': 'Specjalizacja',
   'guide.glossary.tankDef':
     'Członek drużyny, który utrzymuje wrogą agresję i pochłania obrażenia, by inni mogli walczyć bezpiecznie.',
@@ -7204,7 +7811,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.home.what.pillarOpenBody':
     'Darmowa gra aż do maksymalnego poziomu, z całą grą o otwartym kodzie. Żadnego pay to win, nigdy.',
   'guide.home.what.pillarOpenTitle': 'Darmowa i o otwartym kodzie',
-  'guide.home.what.pillarPlayBody': 'Bez pobierania, bez launchera. Stwórz postać, a w kilka sekund jesteś w świecie, na komputerze albo na telefonie. Są też natywne aplikacje, jeśli chcesz którąś mieć.',
+  'guide.home.what.pillarPlayBody':
+    'Bez pobierania, bez launchera. Stwórz postać, a w kilka sekund jesteś w świecie, na komputerze albo na telefonie. Są też natywne aplikacje, jeśli chcesz którąś mieć.',
   'guide.home.what.pillarPlayTitle': 'Otwórz stronę i graj',
   'guide.home.world.cta': 'Zobacz świat',
   'guide.home.world.heading': 'Odkrywaj świat',
@@ -7236,7 +7844,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.frostName': 'Szronowa Kraina',
   'guide.howToPlay.basicsHeading': 'Podstawy',
   'guide.howToPlay.controlsLink': 'Zobacz pełne odniesienie sterowania',
-  'guide.howToPlay.deathBody': 'Jeśli padniesz, twoje ciało zostaje tam, gdzie upadło, a ty powstajesz jako duch na najbliższym cmentarzu. Doprowadź ducha z powrotem do ciała, aby ożyć na miejscu bez żadnej kary, albo przyjmij Bladego Strażnika na cmentarzu, by wskrzesił cię natychmiast kosztem przemijającego osłabienia. Zupełnie nowi bohaterowie są całkowicie oszczędzeni od osłabienia i nigdy nie tracisz nic z tego, co masz albo na co zapracowałeś. Gra powie ci też, co to było: linijka na czacie nazywa tego, kto zadał śmiertelny cios, co zwykle jest najszybszym sposobem, by zrozumieć, co poszło źle.',
+  'guide.howToPlay.deathBody':
+    'Jeśli padniesz, twoje ciało zostaje tam, gdzie upadło, a ty powstajesz jako duch na najbliższym cmentarzu. Doprowadź ducha z powrotem do ciała, aby ożyć na miejscu bez żadnej kary, albo przyjmij Bladego Strażnika na cmentarzu, by wskrzesił cię natychmiast kosztem przemijającego osłabienia. Zupełnie nowi bohaterowie są całkowicie oszczędzeni od osłabienia i nigdy nie tracisz nic z tego, co masz albo na co zapracowałeś. Gra powie ci też, co to było: linijka na czacie nazywa tego, kto zadał śmiertelny cios, co zwykle jest najszybszym sposobem, by zrozumieć, co poszło źle.',
   'guide.howToPlay.deathTitle': 'Śmierć to nie koniec',
   'guide.howToPlay.firstHeading': 'Twoje pierwsze 15 minut',
   'guide.howToPlay.groupingBody':
@@ -7250,7 +7859,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.questsBody':
     'Przyjmuj zadania od osób z oznaczeniem nad głową, wykonaj cel i oddaj je za doświadczenie, monety i ekwipunek. Tracker na ekranie utrzymuje twoje cele w zasięgu wzroku.',
   'guide.howToPlay.questsTitle': 'Zadania',
-  'guide.howToPlay.reassure': 'Talenty zaczynają się na 5. poziomie, a rzędów jest w sumie sześć, po jednym na poziomach 5, 8, 11, 14, 17 i 20. Każdy rząd to jeden wybór spośród trzech, a zresetować możesz zawsze, gdy jesteś poza walką i nie na arenie, więc twoje wczesne decyzje nigdy nie są ostateczne. Eksperymentuj śmiało.',
+  'guide.howToPlay.reassure':
+    'Talenty zaczynają się na 5. poziomie, a rzędów jest w sumie sześć, po jednym na poziomach 5, 8, 11, 14, 17 i 20. Każdy rząd to jeden wybór spośród trzech, a zresetować możesz zawsze, gdy jesteś poza walką i nie na arenie, więc twoje wczesne decyzje nigdy nie są ostateczne. Eksperymentuj śmiało.',
   'guide.howToPlay.resourcesBody':
     'Zaklęcia i umiejętności kosztują zasób. Wojownicy gromadzą Wściekłość, walcząc, łotrzykowie wydają Energię, która sama się uzupełnia, a wszyscy pozostali czarują z puli Many.',
   'guide.howToPlay.resourcesTitle': 'Zasoby',
@@ -7331,10 +7941,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Strona, której szukasz, nie istnieje lub mogła zostać przeniesiona.',
   'guide.notFound.home': 'Powrót do przeglądu',
   'guide.notFound.title': 'Nie udało nam się znaleźć tej strony',
-  'guide.petHook.emberkin': 'Dystansowy demon, którego charakterystyczny Plugawy pocisk podgryza wrogów z bezpiecznej odległości.',
+  'guide.petHook.emberkin':
+    'Dystansowy demon, którego charakterystyczny Plugawy pocisk podgryza wrogów z bezpiecznej odległości.',
   'guide.petHook.pyre_colossus':
     'Potężny kolos miażdżący wrogów w zwarciu, przyzywany dla czystej siły.',
-  'guide.petHook.gloomshade': 'Wytrzymały demon tank, który drwi i Otchłannym łańcuchem ściąga uciekających zwykłych wrogów z powrotem w zasięg; bossowie opierają się szarpnięciu.',
+  'guide.petHook.gloomshade':
+    'Wytrzymały demon tank, który drwi i Otchłannym łańcuchem ściąga uciekających zwykłych wrogów z powrotem w zasięg; bossowie opierają się szarpnięciu.',
   'guide.placeholder.note': 'Ta część przewodnika jest już w drodze.',
   'guide.progression.bandLabel': 'Poziomy od {min} do {max}',
   'guide.progression.capBody':
@@ -7351,11 +7963,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Nie ma pośpiechu. Świat jest po to, by się nim cieszyć we własnym tempie, więc wędruj, podejmuj zadania, które przykują twoją uwagę, i pozwól bohaterowi rosnąć po drodze.',
   'guide.progression.prestigeBody':
     'Doświadczenie liczy się dalej nawet po osiągnięciu limitu. Zasila kosmetyczny poziom wirtualny, więc pasek doświadczenia wciąż się wypełnia, oraz długoterminową rangę prestiżu, którą możesz odebrać z karty postaci, gdy już tam dotrzesz. Przekraczanie wielkich kamieni milowych życiowego doświadczenia zdobywa też czyny w twojej Księdze Czynów, z kosmetycznymi tytułami i obramowaniami plakietki z imieniem, które widać na twojej karcie postaci. Wszystko to jest czysto opcjonalne i nigdy nie daje mocy, to jedynie znak przebytej drogi.',
-  'guide.progression.restedBody': 'Wejdź do gospody i pozostań poza walką, a twoja postać gromadzi wypoczęte doświadczenie, gdy czekasz. Każde miasto ma jedną. Następnym razem, gdy wyjdziesz i będziesz walczyć, ta pula da twoim zabójstwom dodatkowy zastrzyk, dopóki się nie wyczerpie. Przerwa w gospodzie nigdy nie jest straconym czasem; przyspiesza twój kolejny odcinek zdobywania poziomów. Pula ma pułap, więc nocleg gromadzi mniej więcej tyle co bardzo długi pobyt, a gdy osiągniesz maksymalny poziom, nie ma już paska poziomu do wypełnienia, więc wypoczęte doświadczenie przestaje się gromadzić.',
+  'guide.progression.restedBody':
+    'Wejdź do gospody i pozostań poza walką, a twoja postać gromadzi wypoczęte doświadczenie, gdy czekasz. Każde miasto ma jedną. Następnym razem, gdy wyjdziesz i będziesz walczyć, ta pula da twoim zabójstwom dodatkowy zastrzyk, dopóki się nie wyczerpie. Przerwa w gospodzie nigdy nie jest straconym czasem; przyspiesza twój kolejny odcinek zdobywania poziomów. Pula ma pułap, więc nocleg gromadzi mniej więcej tyle co bardzo długi pobyt, a gdy osiągniesz maksymalny poziom, nie ma już paska poziomu do wypełnienia, więc wypoczęte doświadczenie przestaje się gromadzić.',
   'guide.progression.restedTitle': 'Wypoczęte doświadczenie',
-  'guide.progression.xpBody': 'Doświadczenie zdobywasz, kończąc zadania, pokonując wrogów, czyszcząc wyprawy i uprawiając profesję: zbieranie i wytwarzanie płacą doświadczeniem postaci ponad umiejętność fachową, której uczą, dopóki praca wciąż cię czegoś uczy. Zadania dają zdecydowanie najwięcej, więc podążanie szlakiem zadań to najszybsza droga w górę, podczas gdy zabójstwa, wyprawy i zbieractwo po drodze dopełniają resztę.',
+  'guide.progression.xpBody':
+    'Doświadczenie zdobywasz, kończąc zadania, pokonując wrogów, czyszcząc wyprawy i uprawiając profesję: zbieranie i wytwarzanie płacą doświadczeniem postaci ponad umiejętność fachową, której uczą, dopóki praca wciąż cię czegoś uczy. Zadania dają zdecydowanie najwięcej, więc podążanie szlakiem zadań to najszybsza droga w górę, podczas gdy zabójstwa, wyprawy i zbieractwo po drodze dopełniają resztę.',
   'guide.progression.xpTitle': 'Jak zdobywasz doświadczenie',
-  'guide.questsPage.acceptBody': 'Ludzie ze znacznikiem nad głową mają dla ciebie pracę, a znacznik mówi jaką. Złoty wykrzyknik oznacza zadanie, które możesz wziąć od razu, a złoty znak zapytania zadanie, które ukończyłeś i możesz oddać. Na tabliczce z imieniem zobaczysz też szary znak zapytania, co znaczy, że masz to zadanie, ale jeszcze go nie skończyłeś. Powtarzalna praca używa tych samych znaków w niebieskim: jasnoniebieski wykrzyknik to zlecenie, które już wykonałeś i możesz wziąć ponownie, a ten sam znak przygaszony to takie, które wciąż czeka w swoim okresie karencji. Każdy znak poza szarym pokazuje się na tabliczkach z imionami, na minimapie i na mapie świata, więc pracę wypatrzysz przez całe miasto. W Eastbrook marszałek Redbrook czeka z zadaniem Wilki u drzwi, jednym z pierwszych, jakie możesz wziąć.',
+  'guide.questsPage.acceptBody':
+    'Ludzie ze znacznikiem nad głową mają dla ciebie pracę, a znacznik mówi jaką. Złoty wykrzyknik oznacza zadanie, które możesz wziąć od razu, a złoty znak zapytania zadanie, które ukończyłeś i możesz oddać. Na tabliczce z imieniem zobaczysz też szary znak zapytania, co znaczy, że masz to zadanie, ale jeszcze go nie skończyłeś. Powtarzalna praca używa tych samych znaków w niebieskim: jasnoniebieski wykrzyknik to zlecenie, które już wykonałeś i możesz wziąć ponownie, a ten sam znak przygaszony to takie, które wciąż czeka w swoim okresie karencji. Każdy znak poza szarym pokazuje się na tabliczkach z imionami, na minimapie i na mapie świata, więc pracę wypatrzysz przez całe miasto. W Eastbrook marszałek Redbrook czeka z zadaniem Wilki u drzwi, jednym z pierwszych, jakie możesz wziąć.',
   'guide.questsPage.acceptTitle': 'Znajdowanie i przyjmowanie',
   'guide.questsPage.heading': 'Zadania',
   'guide.questsPage.intro':
@@ -7396,17 +8011,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.turninBody':
     'Zanieś ukończone zadanie do jego znacznika oddania, mapa pokaże ci gdzie, po doświadczenie, monety i często część ekwipunku dobraną do twojej klasy. Zwykle jest to ten, kto ci je zlecił, choć niektóre zadania odsyłają cię do kogoś innego.',
   'guide.questsPage.turninTitle': 'Oddawanie zadania',
-  'guide.questsPage.typeGatherBody': 'Zbieraj przedmioty ze świata albo z tego, co upuszczają wrogowie: zioła, rudę, ponure odczynniki kultu. Niektóre elementy padają tylko z konkretnego wroga, więc łowy i zbiory idą w parze. Rzeczy na ziemi należące do zadania oddają się tylko wtedy, gdy naprawdę je masz, i powiedzą ci o tym, jeśli go nie masz albo jeśli masz już dosyć. Niektóre zadania wręczają ci przy przyjęciu również narzędzie: pilnuj toreb i używaj go tak, jak opisuje treść zadania. Jeśli zadanie potrzebuje narzędzia, które dał ci wcześniejszy krok, przyjęcie go zwraca ci je, gdy już go nie masz, więc zgubione narzędzie nie może zapędzić łańcucha w ślepy zaułek.',
+  'guide.questsPage.typeGatherBody':
+    'Zbieraj przedmioty ze świata albo z tego, co upuszczają wrogowie: zioła, rudę, ponure odczynniki kultu. Niektóre elementy padają tylko z konkretnego wroga, więc łowy i zbiory idą w parze. Rzeczy na ziemi należące do zadania oddają się tylko wtedy, gdy naprawdę je masz, i powiedzą ci o tym, jeśli go nie masz albo jeśli masz już dosyć. Niektóre zadania wręczają ci przy przyjęciu również narzędzie: pilnuj toreb i używaj go tak, jak opisuje treść zadania. Jeśli zadanie potrzebuje narzędzia, które dał ci wcześniejszy krok, przyjęcie go zwraca ci je, gdy już go nie masz, więc zgubione narzędzie nie może zapędzić łańcucha w ślepy zaułek.',
   'guide.questsPage.typeGatherTitle': 'Zbieranie',
   'guide.questsPage.typeGroupBody':
     'Każdy rozdział głównej opowieści kończy się u drzwi lochu. Wprowadzenie da się przejść samotnie, lecz ostateczny cios przeciwko złoczyńcy rozdziału jest przeznaczony dla pięcioosobowej drużyny.',
   'guide.questsPage.typeGroupTitle': 'Grupowe finały',
-  'guide.questsPage.typeInteractBody': 'Użyj, oczyść albo przeczytaj coś nieruchomego w świecie: zbezczeszczony grób, ostrzeżenie wyryte w nadbrzeżnej skale, zapieczętowane drzwi krypty. Podejdź do znacznika i podziałaj na niego. Gdy zadanie prosi o kilka, ma na myśli kilka różnych: każdy obiekt zalicza ci się tylko raz, więc szukaj następnego, zamiast używać dwa razy tego samego. Obiekt nie zużywa się, gdy na niego podziałasz, więc każdy w twojej drużynie może wziąć z niego własne zaliczenie.',
+  'guide.questsPage.typeInteractBody':
+    'Użyj, oczyść albo przeczytaj coś nieruchomego w świecie: zbezczeszczony grób, ostrzeżenie wyryte w nadbrzeżnej skale, zapieczętowane drzwi krypty. Podejdź do znacznika i podziałaj na niego. Gdy zadanie prosi o kilka, ma na myśli kilka różnych: każdy obiekt zalicza ci się tylko raz, więc szukaj następnego, zamiast używać dwa razy tego samego. Obiekt nie zużywa się, gdy na niego podziałasz, więc każdy w twojej drużynie może wziąć z niego własne zaliczenie.',
   'guide.questsPage.typeInteractTitle': 'Interakcja',
   'guide.questsPage.typeMusterBody':
     'Niektóre zadania każą ci zmobilizować miasto przed natarciem na północ: przerzedź zagrożenie u bram i zbierz to, czego potrzebują obrońcy. To cele typu pokonaj i zbierz w służbie ludzi, w których historii uczestniczysz, i utrzymują cię w ruchu wraz z nimi.',
   'guide.questsPage.typeMusterTitle': 'Zmobilizuj obronę',
-  'guide.questsPage.typeSlayBody': 'Przetrzeb watahę bestii albo złam uścisk kultu, pokonując określoną liczbę oznaczonego wroga. Jedno z twoich pierwszych zadań, oczyszczenie drogi pod Eastbrook z wilków, jest właśnie takie. Od czasu do czasu zadanie budzi własne cele: to, co przy ostatnim przejściu wyglądało na scenografię, dostaje tabliczkę z imieniem i staje się czymś, w co możesz uderzyć, gdy tylko niesiesz zadanie, które tego dotyczy, więc wróć i spójrz jeszcze raz.',
+  'guide.questsPage.typeSlayBody':
+    'Przetrzeb watahę bestii albo złam uścisk kultu, pokonując określoną liczbę oznaczonego wroga. Jedno z twoich pierwszych zadań, oczyszczenie drogi pod Eastbrook z wilków, jest właśnie takie. Od czasu do czasu zadanie budzi własne cele: to, co przy ostatnim przejściu wyglądało na scenografię, dostaje tabliczkę z imieniem i staje się czymś, w co możesz uderzyć, gdy tylko niesiesz zadanie, które tego dotyczy, więc wróć i spójrz jeszcze raz.',
   'guide.questsPage.typeSlayTitle': 'Pokonywanie',
   'guide.questsPage.typesBody':
     'Większość zadań przyjmuje jeden z kilku znajomych kształtów. Ekranowy znacznik dokładnie określa, czego każde z nich wymaga, więc nigdy nie zostajesz bez wskazówki.',
@@ -7456,17 +8074,22 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanYell': 'Krzycz.',
   'guide.social.chanYellBody':
     'Głośniejsza wersja Mów, która niesie się nieco dalej, na tyle, by dotrzeć przez cały obóz.',
-  'guide.social.chatBody': 'Okno czatu zaczyna się od dwóch widoków, które są tam zawsze, jednego wspólnego dziennika wszystkiego, co powiedziano, i dziennika walki. Poza nimi przyciskiem plus dodajesz zakładki, jakich chcesz, po jednej na kanał, a na komputerze możesz przeciągać je w dowolną kolejność (Alt z lewą albo prawą strzałką przesuwa aktywną zakładkę z klawiatury); kliknij zakładkę prawym przyciskiem, by ją zamknąć, a twój układ jest pamiętany między sesjami. Pisanie w zakładce kanału wysyła na ten kanał, a polecenie z ukośnikiem wysyła jedną linijkę gdzie indziej bez zmiany zakładki. Jest też zakładka szeptów, która gromadzi w jednym miejscu każdy szept, jaki wyślesz i odbierzesz, i w której pisanie po prostu odpowiada temu, kto napisał do ciebie ostatni. Oto kanały, na których możesz mówić:',
+  'guide.social.chatBody':
+    'Okno czatu zaczyna się od dwóch widoków, które są tam zawsze, jednego wspólnego dziennika wszystkiego, co powiedziano, i dziennika walki. Poza nimi przyciskiem plus dodajesz zakładki, jakich chcesz, po jednej na kanał, a na komputerze możesz przeciągać je w dowolną kolejność (Alt z lewą albo prawą strzałką przesuwa aktywną zakładkę z klawiatury); kliknij zakładkę prawym przyciskiem, by ją zamknąć, a twój układ jest pamiętany między sesjami. Pisanie w zakładce kanału wysyła na ten kanał, a polecenie z ukośnikiem wysyła jedną linijkę gdzie indziej bez zmiany zakładki. Jest też zakładka szeptów, która gromadzi w jednym miejscu każdy szept, jaki wyślesz i odbierzesz, i w której pisanie po prostu odpowiada temu, kto napisał do ciebie ostatni. Oto kanały, na których możesz mówić:',
   'guide.social.chatHeading': 'Kanały czatu',
-  'guide.social.etiquetteBody': 'Łączenie się w drużynę to wybór, nie obowiązek. Przywitaj się, gdy dołączasz, rzucaj Potrzebę tylko na wyposażenie, którego naprawdę użyjesz, i daj drużynie znać, zanim ruszysz dalej. Odrobina uprzejmości niesie daleko, a większość graczy cieszy się z towarzystwa.',
+  'guide.social.etiquetteBody':
+    'Łączenie się w drużynę to wybór, nie obowiązek. Przywitaj się, gdy dołączasz, rzucaj Potrzebę tylko na wyposażenie, którego naprawdę użyjesz, i daj drużynie znać, zanim ruszysz dalej. Odrobina uprzejmości niesie daleko, a większość graczy cieszy się z towarzystwa.',
   'guide.social.etiquetteHeading': 'Etykieta grupowania',
   'guide.social.friendsBody':
     'Dodaj graczy do listy przyjaciół, by widzieć, kiedy są online i gdzie się znajdują, abyś mógł połączyć się w grupę w chwili, gdy się zalogują.',
   'guide.social.friendsHeading': 'Znajomi, ignorowanie i blokowanie',
-  'guide.social.guildBody': 'Gildia to trwała grupa graczy, do której należysz między sesjami. Założenie jej kosztuje założyciela jednorazową opłatę 1 sztuki złota, albo możesz po prostu przyjąć zaproszenie i dołączyć, a możesz być w jednej gildii naraz. Członkowie noszą rangę: przywódca, oficerowie i członkowie.',
-  'guide.social.guildChatBody': 'Przynależność do gildii daje ci prywatny kanał czatu gildii i wspólną listę twoich towarzyszy z gildii. Nowsi członkowie noszą plakietkę Rekrut, a wieloletni plakietkę Weteran zamiast prostej etykiety członka, podczas gdy oficerowie i przywódca gildii zawsze pokazują swoją rangę, a gdy chcesz zobaczyć tylko tych, którzy są teraz, możesz ukryć nazwy niepodłączonych. Oficerowie i przywódca gildii mogą też przypiąć krótką wiadomość tablicową na górze zakładki Gildia, a jest ona odczytywana w twoim dzienniku czatu przy następnym logowaniu i właśnie tak większość gildii ogłasza plany tygodnia.',
+  'guide.social.guildBody':
+    'Gildia to trwała grupa graczy, do której należysz między sesjami. Założenie jej kosztuje założyciela jednorazową opłatę 1 sztuki złota, albo możesz po prostu przyjąć zaproszenie i dołączyć, a możesz być w jednej gildii naraz. Członkowie noszą rangę: przywódca, oficerowie i członkowie.',
+  'guide.social.guildChatBody':
+    'Przynależność do gildii daje ci prywatny kanał czatu gildii i wspólną listę twoich towarzyszy z gildii. Nowsi członkowie noszą plakietkę Rekrut, a wieloletni plakietkę Weteran zamiast prostej etykiety członka, podczas gdy oficerowie i przywódca gildii zawsze pokazują swoją rangę, a gdy chcesz zobaczyć tylko tych, którzy są teraz, możesz ukryć nazwy niepodłączonych. Oficerowie i przywódca gildii mogą też przypiąć krótką wiadomość tablicową na górze zakładki Gildia, a jest ona odczytywana w twoim dzienniku czatu przy następnym logowaniu i właśnie tak większość gildii ogłasza plany tygodnia.',
   'guide.social.guildHeading': 'Gildie',
-  'guide.social.ignoreBody': 'Jeśli ktoś gada więcej, niż byś chciał, dodaj go do listy ignorowanych, a jego publiczny czat przestanie do ciebie docierać. Ignorowanie to wyłącznie ustawienie czatu i nigdy nie usuwa nikogo z twojej listy znajomych.',
+  'guide.social.ignoreBody':
+    'Jeśli ktoś gada więcej, niż byś chciał, dodaj go do listy ignorowanych, a jego publiczny czat przestanie do ciebie docierać. Ignorowanie to wyłącznie ustawienie czatu i nigdy nie usuwa nikogo z twojej listy znajomych.',
   'guide.social.intro':
     'Większość świata da się przejść samotnie, lecz gra jest stworzona do grania z innymi ludźmi. Oto jak rozmawiać, łączyć siły i znaleźć swoje grono.',
   'guide.social.lootBody':
@@ -7526,7 +8149,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.stats.spBody':
     'Moc zaklęć to odpowiednik mocy ataku dla rzucającego zaklęcia: zwiększa obrażenia zadawane przez twoje czary. Zasila ją inteligencja, a ekwipunek i wzmocnienia rzucającego dokładają jeszcze więcej, dlatego rzucający zaklęcia pilnuje mocy zaklęć tak, jak walczący wręcz pilnuje mocy ataku.',
   'guide.stats.spTitle': 'Moc zaklęć',
-  'guide.stats.spiBody': 'Duch rządzi tempem, w jakim wraca mana rzucającego zaklęcia. Płaci w pełni dopiero wtedy, gdy minie kilka sekund bez wydatku, a jego część płynie dalej nawet w trakcie rzucania, więc Duch nigdy nie jest martwym ciężarem w walce, choć rzucający, który wali bez ustanku, i tak wyschnie. Zatrzymanie się na oddech to prawdziwa decyzja o manie, w walce tak samo jak między walkami. Podobnie jak Inteligencja, Duch służy klasom manowym, a dla pozostałych znaczy niewiele.',
+  'guide.stats.spiBody':
+    'Duch rządzi tempem, w jakim wraca mana rzucającego zaklęcia. Płaci w pełni dopiero wtedy, gdy minie kilka sekund bez wydatku, a jego część płynie dalej nawet w trakcie rzucania, więc Duch nigdy nie jest martwym ciężarem w walce, choć rzucający, który wali bez ustanku, i tak wyschnie. Zatrzymanie się na oddech to prawdziwa decyzja o manie, w walce tak samo jak między walkami. Podobnie jak Inteligencja, Duch służy klasom manowym, a dla pozostałych znaczy niewiele.',
   'guide.stats.spiTitle': 'Duch',
   'guide.stats.staBody':
     'Wytrzymałość to twoja zdolność do przetrwania. Więcej Wytrzymałości oznacza większą pulę zdrowia i przyspiesza zdrowie odzyskiwane podczas odpoczynku poza walką. Każda klasa chce jej nieco mieć.',
@@ -7546,17 +8170,21 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'Przyjazne dla samotników',
   'guide.tagline': 'Klasyczne MMO, w które zagrasz za darmo w przeglądarce.',
   'guide.talentsPage.heading': 'Talenty i specjalizacje',
-  'guide.talentsPage.howBody': 'Talenty otwierają się na 5. poziomie, tym samym, na którym wybierasz specjalizację. W miarę wspinaczki dochodzi pięć kolejnych rzędów, po jednym na poziomach 8, 11, 14, 17 i 20, tak że ostatni ląduje na maksymalnym poziomie. Wyborów dokonujesz w panelu talentów swojej klasy, w zakładce Wybory obok zakładki Specjalizacja.',
+  'guide.talentsPage.howBody':
+    'Talenty otwierają się na 5. poziomie, tym samym, na którym wybierasz specjalizację. W miarę wspinaczki dochodzi pięć kolejnych rzędów, po jednym na poziomach 8, 11, 14, 17 i 20, tak że ostatni ląduje na maksymalnym poziomie. Wyborów dokonujesz w panelu talentów swojej klasy, w zakładce Wybory obok zakładki Specjalizacja.',
   'guide.talentsPage.howHeading': 'Jak działają',
   'guide.talentsPage.intro':
     'Talenty to sposób, w jaki czynisz klasę swoją własną. Są opcjonalne, wyrozumiałe i łatwe do zmiany, więc możesz eksperymentować bez obaw.',
-  'guide.talentsPage.resetNote': 'Talenty możesz zresetować w dowolnej chwili, gdy jesteś poza walką i nie na arenie, więc wczesny wybór nigdy nie jest pułapką. Reset czyści twoje wybory w rzędach i nic nie kosztuje, a twoja specjalizacja zostaje taka, jaka jest, więc reset nigdy nie odbiera ci roli w połowie przejścia. Pole bitwy jest wyjątkiem i tam możesz zmieniać build między walkami. Próbuj różnych rzeczy, patrz, co ci odpowiada, i zmieniaj zdanie do woli.',
+  'guide.talentsPage.resetNote':
+    'Talenty możesz zresetować w dowolnej chwili, gdy jesteś poza walką i nie na arenie, więc wczesny wybór nigdy nie jest pułapką. Reset czyści twoje wybory w rzędach i nic nie kosztuje, a twoja specjalizacja zostaje taka, jaka jest, więc reset nigdy nie odbiera ci roli w połowie przejścia. Pole bitwy jest wyjątkiem i tam możesz zmieniać build między walkami. Próbuj różnych rzeczy, patrz, co ci odpowiada, i zmieniaj zdanie do woli.',
   'guide.talentsPage.resetTitle': 'Nic nie jest na stałe',
   'guide.talentsPage.shareNote':
     'Gotowy zestaw można skopiować do krótkiego kodu do udostępniania i przekazać przyjacielowi, który wkleja go prosto do własnego panelu talentów, aby go wczytać.',
-  'guide.talentsPage.specsBody': 'Każda klasa ma garstkę specjalizacji, każdą z własną rolą i charakterystycznym akcentem. Jedną wybierasz w panelu talentów na 5. poziomie. Daje ona charakterystyczną umiejętność i trwałe mistrzostwo, większość dokłada pasywne premie pasujące do roli, a jest też rolą, jako którą zgłaszasz się w Znajdywaczu Lochów. Oto kształt ich wszystkich. Otwórz klasę, by zobaczyć jej pełny zestaw.',
+  'guide.talentsPage.specsBody':
+    'Każda klasa ma garstkę specjalizacji, każdą z własną rolą i charakterystycznym akcentem. Jedną wybierasz w panelu talentów na 5. poziomie. Daje ona charakterystyczną umiejętność i trwałe mistrzostwo, większość dokłada pasywne premie pasujące do roli, a jest też rolą, jako którą zgłaszasz się w Znajdywaczu Lochów. Oto kształt ich wszystkich. Otwórz klasę, by zobaczyć jej pełny zestaw.',
   'guide.talentsPage.specsHeading': 'Specjalizacje według klas',
-  'guide.talentsPage.whatBody': 'Twoje talenty to krótka drabina wyborów, a nie sterta punktów. Każdy otwierający się rząd oferuje trzy możliwości, a ty bierzesz dokładnie jedną. Kształtują one to, jak gra się daną klasą, przechylając ją ku większym obrażeniom, twardszej obronie albo silniejszemu leczeniu.',
+  'guide.talentsPage.whatBody':
+    'Twoje talenty to krótka drabina wyborów, a nie sterta punktów. Każdy otwierający się rząd oferuje trzy możliwości, a ty bierzesz dokładnie jedną. Kształtują one to, jak gra się daną klasą, przechylając ją ku większym obrażeniom, twardszej obronie albo silniejszemu leczeniu.',
   'guide.talentsPage.whatHeading': 'Co robią talenty',
   'guide.toc.heading': 'Na tej stronie',
   'guide.viewer.canvasLabel': 'Obrotowy model 3D: {name}',
@@ -7575,7 +8203,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.wishPage.i2Body':
     'Gdy polegniesz, powstajesz jako duch na najbliższym cmentarzu. Wróć do ciała, by odrodzić się za darmo, albo skorzystaj z natychmiastowego wskrzeszenia u Bladego Strażnika i przyjmij za tę wygodę krótkotrwałe osłabienie. Nie tracisz doświadczenia, ekwipunku ani monet, więc spokojnie możesz ryzykować i się uczyć.',
   'guide.wishPage.i2Title': 'Śmierć prawie nic nie kosztuje',
-  'guide.wishPage.i3Body': 'Twój pierwszy talent przychodzi na 5. poziomie, a każdy z sześciu rzędów to jeden wybór spośród trzech, więc build to garstka decyzji, które ogarniasz jednym spojrzeniem. Zresetować możesz, kiedy jesteś poza walką i nie na arenie, więc nic, co wybierzesz wcześnie, cię nie zamyka.',
+  'guide.wishPage.i3Body':
+    'Twój pierwszy talent przychodzi na 5. poziomie, a każdy z sześciu rzędów to jeden wybór spośród trzech, więc build to garstka decyzji, które ogarniasz jednym spojrzeniem. Zresetować możesz, kiedy jesteś poza walką i nie na arenie, więc nic, co wybierzesz wcześnie, cię nie zamyka.',
   'guide.wishPage.i3Title': 'Talenty to nie pułapka',
   'guide.wishPage.i4Body':
     'Zadania to najszybszy sposób na zdobywanie poziomów i prowadzą cię przez cały świat. Gdy nie wiesz, dokąd iść, odszukaj kolejny znacznik.',
@@ -7599,9 +8228,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gladeTitle': 'Cichy zakątek: Brightwood Glade',
   'guide.worldPage.heading': 'Świat',
   'guide.worldPage.hub': 'Baza wypadowa',
-  'guide.worldPage.intro': 'World of ClaudeCraft to jedna ciągła kraina, którą przemierzasz pieszo. Stary trakt biegnie z południa na północ przez startową dolinę, bagno i szczyty, i wspina się dalej za nie, w kotlinę i śnieżny kraj u góry mapy. Kolumna wyższych królestw otwiera się od tego traktu na zachód, a druga na wschód, u wschodniego wybrzeża Doliny zaś leży wyspa. Nie ma szybkiej podróży, tras lotniczych ani dyliżansów: każdą drogę pokonuje się pieszo albo wierzchem, więc dotarcie na miejsce jest częścią przygody.\n\nKraina odmierza też czas. Cykl dnia i nocy biegnie na prawdziwym zegarze dzielonym przez wszystkich w twoim świecie, więc niebo przechodzi od świtu przez południe ku zmierzchowi i ciemności dla was wszystkich naraz, księżyc przychodzi i odchodzi przez swoje fazy, a światło na ziemi zmienia się razem z nim. Tarcza wokół twojej minimapy to miejsce, w którym odczytujesz godzinę.',
+  'guide.worldPage.intro':
+    'World of ClaudeCraft to jedna ciągła kraina, którą przemierzasz pieszo. Stary trakt biegnie z południa na północ przez startową dolinę, bagno i szczyty, i wspina się dalej za nie, w kotlinę i śnieżny kraj u góry mapy. Kolumna wyższych królestw otwiera się od tego traktu na zachód, a druga na wschód, u wschodniego wybrzeża Doliny zaś leży wyspa. Nie ma szybkiej podróży, tras lotniczych ani dyliżansów: każdą drogę pokonuje się pieszo albo wierzchem, więc dotarcie na miejsce jest częścią przygody.\n\nKraina odmierza też czas. Cykl dnia i nocy biegnie na prawdziwym zegarze dzielonym przez wszystkich w twoim świecie, więc niebo przechodzi od świtu przez południe ku zmierzchowi i ciemności dla was wszystkich naraz, księżyc przychodzi i odchodzi przez swoje fazy, a światło na ziemi zmienia się razem z nim. Tarcza wokół twojej minimapy to miejsce, w którym odczytujesz godzinę.',
   'guide.worldPage.mapHeading': 'Trakt i królestwa za nim',
-  'guide.worldPage.mapSub': 'Szlak zadań biegnie z południa na północ środkiem mapy: dolina, bagno, szczyty i dalej za nie, w kotlinę i śnieg. Pozostałe królestwa otwierają się wzdłuż tego traktu, a nie za nim, przez bramy na wschód i na zachód od bagiennej drogi, natomiast wyspę Farshore osiąga się od wschodniego wybrzeża Doliny. Tym, co trzyma cię z dala od dalekich królestw, są ich pasma poziomów, nie marsz: pięć z nich dzieli najwyższe pasmo, więc gdy będziesz gotów, możesz brać je w dowolnej kolejności. Farshore jest wyjątkiem, to kraina niskiego poziomu, którą możesz odwiedzić wcześnie.',
+  'guide.worldPage.mapSub':
+    'Szlak zadań biegnie z południa na północ środkiem mapy: dolina, bagno, szczyty i dalej za nie, w kotlinę i śnieg. Pozostałe królestwa otwierają się wzdłuż tego traktu, a nie za nim, przez bramy na wschód i na zachód od bagiennej drogi, natomiast wyspę Farshore osiąga się od wschodniego wybrzeża Doliny. Tym, co trzyma cię z dala od dalekich królestw, są ich pasma poziomów, nie marsz: pięć z nich dzieli najwyższe pasmo, więc gdy będziesz gotów, możesz brać je w dowolnej kolejności. Farshore jest wyjątkiem, to kraina niskiego poziomu, którą możesz odwiedzić wcześnie.',
   'guide.worldPage.marshBlurb':
     'Zatopiona kraina mgieł i ruin. Mudfiny roją się na płyciznach, a coś starszego porusza się pod wodą, obserwowane z mostowego miasteczka Fenbridge.',
   'guide.worldPage.marshGreeter': 'Strażniczka Fenwick, Fenbridge',
@@ -7609,12 +8240,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zatrzymaj się przy bramie. Za tymi trzcinami trzęsawisko zabija za nas.',
   'guide.worldPage.marshPlaceNotes':
     'Fenbridge strzeże jedynej suchej drogi. Trzciny Czyhacza i Płycizny Głębotopieli aż się roją od bagiennych bestii i Mudfinów; Gąszcz Wdowy jest gęsto osnuty pajęczyną; Zatopiona Kaplica i Kopce Trolli kryją starsze niebezpieczeństwa, a Utopiona Litania, własna wyprawa trzęsawiska, otwiera się tuż na północ od kopców; Obozowisko Gravecallera to okopany kult, a Zatopiony Bastion to instancjowane serce trzęsawiska.',
-  'guide.worldPage.peaksBlurb': 'Wychłostane wiatrem granie i stare wyrobiska górnicze pnące się ku najtrudniejszym niebezpieczeństwom startowego traktu, trzymane przez placówkę Highwatch.',
+  'guide.worldPage.peaksBlurb':
+    'Wychłostane wiatrem granie i stare wyrobiska górnicze pnące się ku najtrudniejszym niebezpieczeństwom startowego traktu, trzymane przez placówkę Highwatch.',
   'guide.worldPage.peaksGreeter': 'Kapitan Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'Od dwustu lat ten mur trzyma. Nie pęknie na mojej warcie, ale jęczy.',
-  'guide.worldPage.peaksPlaceNotes':
-    'Highwatch trzyma mur. Grań Skradacza i Głębogłazowe Nory należą do górskich kotów i drążycieli; Pogórze Ogrów i Obóz Wojenny Drogmara do najemnych brutali; Stormcrag trzaska żywiołami, a poniżej jarzy się Glimmermere, górskie jeziorko, którego brzeg strzeże wrót bladego światła wiodących w dół do Zatopionej Świątyni; Namioty Kultu Żmija i Pola Powracających otaczają wyżynne pozycje kultu, a na ich szczycie wznosi się Sanktuarium Grobowego Żmija.',
   'guide.worldPage.places': 'Godne uwagi miejsca',
   'guide.worldPage.residents': 'Kogo spotkasz',
   'guide.worldPage.valeBlurb':
@@ -7752,12 +8382,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.readyOre': 'Żyła rudy gotowa do wydobycia',
   'hud.core.mapMarkerLabels.readyWood': 'Drzewostan gotowy do wyrębu',
   'hud.core.mapMarkerLabels.readyHerb': 'Łan ziół gotowy do zebrania',
-  'hud.core.mapMarkerLabels.readyLockedOre':
-    'Żyła rudy gotowa do wydobycia, narzędzie niedostępne',
-  'hud.core.mapMarkerLabels.readyLockedWood':
-    'Drzewostan gotowy do wyrębu, narzędzie niedostępne',
-  'hud.core.mapMarkerLabels.readyLockedHerb':
-    'Łan ziół gotowy do zebrania, narzędzie niedostępne',
+  'hud.core.mapMarkerLabels.readyLockedOre': 'Żyła rudy gotowa do wydobycia, narzędzie niedostępne',
+  'hud.core.mapMarkerLabels.readyLockedWood': 'Drzewostan gotowy do wyrębu, narzędzie niedostępne',
+  'hud.core.mapMarkerLabels.readyLockedHerb': 'Łan ziół gotowy do zebrania, narzędzie niedostępne',
   'hud.core.mapMarkerLabels.cooldownOre': 'Wyczerpana żyła rudy',
   'hud.core.mapMarkerLabels.cooldownWood': 'Wycięty drzewostan',
   'hud.core.mapMarkerLabels.cooldownHerb': 'Zebrany łan ziół',
@@ -8460,47 +9087,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.roar': 'Ryk',
   'hudChrome.emotes.salute': 'Salut',
   'hudChrome.emotes.wave': 'Pomachaj',
-  'hudChrome.enchantName.enchant_chest_armor': 'Zaklinanie piersi - Wzmocnienie',
-  'hudChrome.enchantName.enchant_chest_greater_stamina': 'Zaklinanie piersi - Wielka wytrzymałość',
-  'hudChrome.enchantName.enchant_chest_runeweave': 'Zaklinanie piersi - Runowy splot',
-  'hudChrome.enchantName.enchant_chest_spirit': 'Zaklinanie piersi - Duch',
-  'hudChrome.enchantName.enchant_chest_stamina': 'Zaklinanie piersi - Wytrzymałość',
-  'hudChrome.enchantName.enchant_feet_agility': 'Zaklinanie butów - Zwinność',
-  'hudChrome.enchantName.enchant_feet_stamina': 'Zaklinanie butów - Wytrzymałość',
-  'hudChrome.enchantName.enchant_feet_strength': 'Zaklinanie butów - Siła',
-  'hudChrome.enchantName.enchant_gloves_agility': 'Zaklinanie rękawic - Zwinność',
-  'hudChrome.enchantName.enchant_gloves_greater_agility': 'Zaklinanie rękawic - Wielka zwinność',
-  'hudChrome.enchantName.enchant_gloves_intellect': 'Zaklinanie rękawic - Moc zaklęć',
-  'hudChrome.enchantName.enchant_gloves_strength': 'Zaklinanie rękawic - Siła',
-  'hudChrome.enchantName.enchant_helmet_armor': 'Zaklinanie hełmu - Wzmocnienie',
-  'hudChrome.enchantName.enchant_helmet_fortitude': 'Zaklinanie hełmu - Krzepkość',
-  'hudChrome.enchantName.enchant_helmet_greater_fortitude': 'Zaklinanie hełmu - Wielka krzepkość',
-  'hudChrome.enchantName.enchant_helmet_intellect': 'Zaklinanie hełmu - Intelekt',
-  'hudChrome.enchantName.enchant_helmet_runed_links': 'Zaklinanie hełmu - Runowe ogniwa',
-  'hudChrome.enchantName.enchant_legs_greater_stamina': 'Zaklinanie nóg - Wielka wytrzymałość',
-  'hudChrome.enchantName.enchant_legs_intellect': 'Zaklinanie nóg - Intelekt',
-  'hudChrome.enchantName.enchant_legs_runed_hide': 'Zaklinanie nóg - Runowa skóra',
-  'hudChrome.enchantName.enchant_legs_stamina': 'Zaklinanie nóg - Wytrzymałość',
-  'hudChrome.enchantName.enchant_neck_agility': 'Zaklinanie naszyjnika - Zwinność',
-  'hudChrome.enchantName.enchant_neck_intellect': 'Zaklinanie naszyjnika - Intelekt',
-  'hudChrome.enchantName.enchant_neck_spirit': 'Zaklinanie naszyjnika - Duch',
-  'hudChrome.enchantName.enchant_offhand_stamina': 'Zaklinanie ręki dodatkowej - Wytrzymałość',
-  'hudChrome.enchantName.enchant_ring_agility': 'Zaklinanie pierścienia - Zwinność',
-  'hudChrome.enchantName.enchant_ring_intellect': 'Zaklinanie pierścienia - Intelekt',
-  'hudChrome.enchantName.enchant_ring_spirit': 'Zaklinanie pierścienia - Duch',
-  'hudChrome.enchantName.enchant_ring_strength': 'Zaklinanie pierścienia - Siła',
-  'hudChrome.enchantName.enchant_shoulder_agility': 'Zaklinanie naramienników - Zwinność',
-  'hudChrome.enchantName.enchant_shoulder_intellect': 'Zaklinanie naramienników - Intelekt',
-  'hudChrome.enchantName.enchant_shoulder_strength': 'Zaklinanie naramienników - Siła',
-  'hudChrome.enchantName.enchant_waist_agility': 'Zaklinanie pasa - Zwinność',
-  'hudChrome.enchantName.enchant_waist_stamina': 'Zaklinanie pasa - Wytrzymałość',
-  'hudChrome.enchantName.enchant_waist_strength': 'Zaklinanie pasa - Siła',
-  'hudChrome.enchantName.enchant_weapon_agility': 'Zaklinanie broni - Zwinność',
-  'hudChrome.enchantName.enchant_weapon_greater_might': 'Zaklinanie broni - Wielka moc',
-  'hudChrome.enchantName.enchant_weapon_greater_spellpower': 'Zaklinanie broni - Wielka moc zaklęć',
-  'hudChrome.enchantName.enchant_weapon_intellect': 'Zaklinanie broni - Moc zaklęć',
-  'hudChrome.enchantName.enchant_weapon_might': 'Zaklinanie broni - Moc',
-  'hudChrome.enchantName.enchant_weapon_runed_edge': 'Zaklinanie broni - Runowe ostrze',
   'hudChrome.enchanting.disenchantConfirmBody':
     'To niszczy {item} i daje materiały arkaniczne. Nie można tego cofnąć.',
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
@@ -8538,7 +9124,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.takeLootTooltip':
     'Bierze monety i wypadłe przedmioty. Nie zużywa zebranych zasobów.',
   'hudChrome.loot.unifiedPressHint':
-    'Klawisz interakcji bierze łup i zbiera zasoby jednym naciśnięciem, korzystając z priorytetów miasta.',
+    'Klawisz interakcji zabiera tylko łup. Aby zebrać komponenty, użyj tutaj Zbierz.',
   'hudChrome.meters.move': 'Przeciągnij, aby przesunąć ten licznik',
   'hudChrome.meters.resize': 'Przeciągnij, aby zmienić rozmiar tego licznika',
   'hudChrome.meters.dock': 'Zadokuj ten licznik z powrotem w oknie liczników',
@@ -8716,7 +9302,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Twoje szacowane obrażenia bronią na sekundę, łączące obrażenia i szybkość twojej broni z mocą ataku.',
   'hudChrome.statInfo.desc.int':
     'Powiększa zasób many rzucającego zaklęcia i zwiększa jego szansę na trafienie krytyczne zaklęciem.',
-  'hudChrome.statInfo.desc.spi': 'Przyspiesza tempo, w jakim wraca mana rzucającego zaklęcia. Większość płynie podczas odpoczynku, poza walką, a część wraca nawet w walce.',
+  'hudChrome.statInfo.desc.spi':
+    'Przyspiesza tempo, w jakim wraca mana rzucającego zaklęcia. Większość płynie podczas odpoczynku, poza walką, a część wraca nawet w walce.',
   'hudChrome.statInfo.desc.sta':
     'Hartuje twoje ciało, podnosząc maksymalne zdrowie oraz tempo regeneracji zdrowia podczas odpoczynku.',
   'hudChrome.statInfo.desc.str': 'Zwiększa twoją moc ataku, więc twoje ciosy bronią są mocniejsze.',
@@ -8806,6 +9393,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.tooManyListings': 'Możesz wystawić na rynku najwyżej {count} towarów naraz.',
   'itemUi.kind.armor': 'Pancerz',
   'itemUi.kind.drink': 'Napój',
+  'itemUi.kind.recipe': 'Wzór',
   'itemUi.kind.elixir': 'Eliksir',
   'itemUi.kind.food': 'Jedzenie',
   'itemUi.kind.junk': 'Tandeta',
@@ -8814,7 +9402,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Narzędzie',
   'itemUi.kind.weapon': 'Broń',
   'itemUi.kind.mount': 'Wierzchowiec',
-  'itemUi.kind.skin': 'Skórka',
   'itemUi.logs.boughtBackItem': 'Odkupiono {item} za {money}.',
   'itemUi.logs.boughtItem': 'Kupiono {item} za {money}.',
   'itemUi.logs.collectedMoney': 'Odbierasz {money} od kupca.',
@@ -9066,10 +9653,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Graj w poziomym trybie pełnoekranowym, aby uzyskać najlepsze wrażenia na urządzeniu mobilnym.',
   'mobilePreflight.rotateTitle': 'Obróć do poziomu',
   'mobilePreflight.title': 'Graj w poziomym trybie pełnoekranowym',
-  'mode.caCopyAria': 'Skopiuj adres kontraktu',
-  'mode.caLabel': 'Adres kontraktu $WOC',
-  'mode.caNote':
-    'WOC to nasz token społecznościowy. Nie jest potrzebny do gry. Dołącz do Discorda, aby porozmawiać o użyteczności WOC i jego napędzie.',
   'mode.offlineAria': 'Graj offline: rozpocznij natychmiastową lokalną sesję jednoosobową',
   'mode.offlineDesc':
     'Natychmiastowy świat jednoosobowy w twojej przeglądarce. Nic nie jest zapisywane: idealny na szybką potyczkę lub testy.',
@@ -9335,7 +9918,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateAbsoluteZero': 'Zero Absolutne wybucha!',
   'sim.rift.detonateAbyssalMaw': 'Otchłanna Paszcza zamyka się!',
   'sim.rift.detonateArcaneAnnihilation': 'Eteryczna Anihilacja wybucha!',
-  'sim.rift.detonateBloodRite': 'Krwawy Rytuał spada!',
   'sim.rift.detonateBroodmothersMark': 'Znamię Matki Roju eksploduje!',
   'sim.rift.detonateCoreMeltdown': 'Stopienie Rdzenia eksploduje!',
   'sim.rift.detonateCrushingDepth': 'Miażdżąca Głębia miażdży!',
@@ -9343,11 +9925,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Rozłam Ziemi eksploduje!',
   'sim.rift.detonateFinalJudgment': 'Ostateczny Wyrok trafia!',
   'sim.rift.detonateGlacialGrave': 'Lodowaty Grób eksploduje!',
-  'sim.rift.detonateHellfireBrand': 'Piekielny Płomień eksploduje!',
   'sim.rift.detonateLightningRod': 'Piorunochron uderza!',
   'sim.rift.detonateMagmaWell': 'Studnia Magmy wybucha!',
-  'sim.rift.detonatePactSeal': 'Pieczęć Paktu eksploduje!',
-  'sim.rift.detonatePitSentence': 'Wyrok Otchłani eksploduje!',
   'sim.rift.detonateSoulGrave': 'Grób Dusz eksploduje!',
   'sim.rift.detonateStormcallersWrath': 'Gniew Przyzywacza Burzy wybucha!',
   'sim.rift.detonateVenomPool': 'Kałuża Jadu wybucha!',
@@ -9946,23 +10525,30 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'download.linuxHint':
     'AppImage: uczyń go wykonywalnym, a następnie uruchom. Nie wymaga instalacji.',
   'guide.nav.settings': 'Ustawienia i wydajność',
-  'guide.settingsPage.advancedBody': 'Nie musisz wybierać Advanced, by zobaczyć pokrętła szczegółów. Panel Grafika pokazuje je zawsze, w dwóch kartach: Szczegóły świata mieszczą Szczegóły terenu, Gęstość listowia, Szczegóły powierzchni, Zasięg widzenia, Jakość wody i Szczegóły postaci, a Oświetlenie i efekty mieszczą Efekty i oświetlenie, Jakość cieni, Okluzję otoczenia, Bloom, Wygładzanie krawędzi, Światła dynamiczne i Efekty cząsteczkowe. Pod stałym ustawieniem każde pokrętło pokazuje z grubsza, gdzie to ustawienie leży.',
+  'guide.settingsPage.advancedBody':
+    'Nie musisz wybierać Advanced, by zobaczyć pokrętła szczegółów. Panel Grafika pokazuje je zawsze, w dwóch kartach: Szczegóły świata mieszczą Szczegóły terenu, Gęstość listowia, Szczegóły powierzchni, Zasięg widzenia, Jakość wody i Szczegóły postaci, a Oświetlenie i efekty mieszczą Efekty i oświetlenie, Jakość cieni, Okluzję otoczenia, Bloom, Wygładzanie krawędzi, Światła dynamiczne i Efekty cząsteczkowe. Pod stałym ustawieniem każde pokrętło pokazuje z grubsza, gdzie to ustawienie leży.',
   'guide.settingsPage.advancedHeading': 'Pokrętła szczegółów i mieszanka Advanced',
-  'guide.settingsPage.advancedMixes': 'Dwie ulubione mieszanki: trzymaj Jakość cieni wysoko i ustaw Efekty i oświetlenie na Low, by uzyskać ostry, pozbawiony poświaty wygląd, który chodzi lekko, albo zrób odwrotnie, by zachować bloom i zmiękczyć cienie. Jedna rzecz warta wiedzy przed mieszaniem: Okluzja otoczenia, Bloom i Wygładzanie krawędzi wiszą na tym samym łańcuchu co Efekty i oświetlenie, więc z tym pokrętłem na Low nie mają na czym działać.',
+  'guide.settingsPage.advancedMixes':
+    'Dwie ulubione mieszanki: trzymaj Jakość cieni wysoko i ustaw Efekty i oświetlenie na Low, by uzyskać ostry, pozbawiony poświaty wygląd, który chodzi lekko, albo zrób odwrotnie, by zachować bloom i zmiękczyć cienie. Jedna rzecz warta wiedzy przed mieszaniem: Okluzja otoczenia, Bloom i Wygładzanie krawędzi wiszą na tym samym łańcuchu co Efekty i oświetlenie, więc z tym pokrętłem na Low nie mają na czym działać.',
   'guide.settingsPage.balancedTagline':
     'Najlepszy sposób na większość maszyn i nasza domyślna rada.',
   'guide.settingsPage.balancedTitle': 'Zrównoważony',
-  'guide.settingsPage.balancedWhy': 'Medium przynosi prawdziwe cienie i pełne materiały, a High dokłada do tego okluzję otoczenia i bloom. Wbudowana siatka bezpieczeństwa pozostaje napięta na każdym poziomie, więc Balanced przetrzyma zatłoczoną walkę bez twojego nadzoru.',
+  'guide.settingsPage.balancedWhy':
+    'Medium przynosi prawdziwe cienie i pełne materiały, a High dokłada do tego okluzję otoczenia i bloom. Wbudowana siatka bezpieczeństwa pozostaje napięta na każdym poziomie, więc Balanced przetrzyma zatłoczoną walkę bez twojego nadzoru.',
   'guide.settingsPage.colDoes': 'Co to robi',
   'guide.settingsPage.colImpact': 'wpływ FPS',
   'guide.settingsPage.colSetting': 'Ustawienie',
-  'guide.settingsPage.factDetectBody': 'Przy pierwszym uruchomieniu gra odczytuje twoje urządzenie i zapisuje dla ciebie rozsądny poziom. Każdy telefon i tablet zaczyna na Low, żebyś od razu wszedł do świata, i tak samo stara albo programowa karta graficzna. Mocny komputer zaczyna na Ultra, albo na High, gdy maszyna wygląda na skąpą w pamięć. To, czego gra nie potrafi umieścić, zostaje na Medium. Każdy wybór, który zrobisz sam, zawsze wygrywa i się trzyma.',
+  'guide.settingsPage.factDetectBody':
+    'Przy pierwszym uruchomieniu gra odczytuje twoje urządzenie i zapisuje dla ciebie rozsądny poziom. Każdy telefon i tablet zaczyna na Low, żebyś od razu wszedł do świata, i tak samo stara albo programowa karta graficzna. Mocny komputer zaczyna na Ultra, albo na High, gdy maszyna wygląda na skąpą w pamięć. To, czego gra nie potrafi umieścić, zostaje na Medium. Każdy wybór, który zrobisz sam, zawsze wygrywa i się trzyma.',
   'guide.settingsPage.factDetectTitle': 'Gra najpierw sama się dostraja',
-  'guide.settingsPage.factGovernorBody': 'Każdy poziom trzyma napiętą siatkę bezpieczeństwa: gdy wielka walka skacze, gra na moment po cichu przerzedza trawę, efekty i oświetlenie, a potem je przywraca. Ultra i Insane po prostu czekają znacznie dłużej, zanim to zrobią, więc pojedyncza wolna klatka nigdy nie zakłóci ustawienia z najwyższej półki.',
+  'guide.settingsPage.factGovernorBody':
+    'Każdy poziom trzyma napiętą siatkę bezpieczeństwa: gdy wielka walka skacze, gra na moment po cichu przerzedza trawę, efekty i oświetlenie, a potem je przywraca. Ultra i Insane po prostu czekają znacznie dłużej, zanim to zrobią, więc pojedyncza wolna klatka nigdy nie zakłóci ustawienia z najwyższej półki.',
   'guide.settingsPage.factGovernorTitle': 'Wbudowana siatka zabezpieczająca',
-  'guide.settingsPage.factReloadBody': 'Panel Grafika edytuje szkic. Zmień Jakość grafiki albo któreś z pokręteł szczegółów, potem naciśnij Zastosuj, a gra przebuduje świat tam, gdzie stoisz, bez przeładowania. Wiersz obok przycisku powie ci, kiedy to nastąpiło. Każda inna opcja, w tym panelu i wszędzie indziej, działa w chwili, gdy ją zmienisz, a tylko przebudowa, która zawiedzie zupełnie, zaproponuje ci w zamian przycisk przeładowania.',
+  'guide.settingsPage.factReloadBody':
+    'Panel Grafika edytuje szkic. Zmień Jakość grafiki albo któreś z pokręteł szczegółów, potem naciśnij Zastosuj, a gra przebuduje świat tam, gdzie stoisz, bez przeładowania. Wiersz obok przycisku powie ci, kiedy to nastąpiło. Każda inna opcja, w tym panelu i wszędzie indziej, działa w chwili, gdy ją zmienisz, a tylko przebudowa, która zawiedzie zupełnie, zaproponuje ci w zamian przycisk przeładowania.',
   'guide.settingsPage.factReloadTitle': 'Dwa rodzaje opcji',
-  'guide.settingsPage.fairnessBody': 'Żadna opcja tutaj nie wymienia piękna na moc. Niższe ustawienia rezygnują tylko z kosmetycznego blasku, nigdy z informacji, którymi walczysz: twoje osłabienia, paski rzucania, zdrowie drużyny i liczby obrażeń są identyczne od Low po Insane. Gra na skromnej maszynie nigdy nie jest utrudnieniem.',
+  'guide.settingsPage.fairnessBody':
+    'Żadna opcja tutaj nie wymienia piękna na moc. Niższe ustawienia rezygnują tylko z kosmetycznego blasku, nigdy z informacji, którymi walczysz: twoje osłabienia, paski rzucania, zdrowie drużyny i liczby obrażeń są identyczne od Low po Insane. Gra na skromnej maszynie nigdy nie jest utrudnieniem.',
   'guide.settingsPage.fairnessTitle': 'Uczciwe według projektu',
   'guide.settingsPage.fpsTagline':
     'Do starszych laptopów, zintegrowanej grafiki i odtwarzania na baterii.',
@@ -9980,14 +10566,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.loadoutsHeading': 'Trzy gotowe zestawy wyposażenia',
   'guide.settingsPage.loadoutsIntro':
     'Zacznij od wyposażenia, które brzmi jak Twoja maszyna, a następnie dostosowuj jedną opcję na raz, aż poczujesz, że jest właściwa.',
-  'guide.settingsPage.mobileBody': 'Na telefonie albo tablecie gra uruchamia cię na Low. Każde urządzenie dotykowe ląduje tam przy pierwszym uruchomieniu, celowo, żebyś wszedł do świata i grał; podnieś je sam z panelu Grafika, kiedy chcesz. W przeglądarce na Androidzie cała drabina stoi przed tobą otworem, a twój wybór się trzyma. Na iPhonie i iPadzie nadal możesz wybrać najwyższe ustawienia i chwytają, gdy tylko naciśniesz Zastosuj, ale gra cofa cię do High przy następnym uruchomieniu, bo iOS potrafi zamknąć kartę w trakcie budowania tak dużej sceny. Pobrana aplikacja jest jeszcze węższa: jej lista ustawień kończy się na High, a poszczególne pokrętła systemowe są ukryte, bo aplikacja zarządza nimi sama.',
+  'guide.settingsPage.mobileBody':
+    'Na telefonie albo tablecie gra uruchamia cię na Low. Każde urządzenie dotykowe ląduje tam przy pierwszym uruchomieniu, celowo, żebyś wszedł do świata i grał; podnieś je sam z panelu Grafika, kiedy chcesz. W przeglądarce na Androidzie cała drabina stoi przed tobą otworem, a twój wybór się trzyma. Na iPhonie i iPadzie nadal możesz wybrać najwyższe ustawienia i chwytają, gdy tylko naciśniesz Zastosuj, ale gra cofa cię do High przy następnym uruchomieniu, bo iOS potrafi zamknąć kartę w trakcie budowania tak dużej sceny. Pobrana aplikacja jest jeszcze węższa: jej lista ustawień kończy się na High, a poszczególne pokrętła systemowe są ukryte, bo aplikacja zarządza nimi sama.',
   'guide.settingsPage.mobileTitle': 'Na telefonach i tabletach',
   'guide.settingsPage.recommended': 'Zalecony',
   'guide.settingsPage.rowBrightness':
     'Ekspozycja sceny, ciemniejsza lub jaśniejsza. Czysta preferencja.',
   'guide.settingsPage.rowBrowserEffects':
     'Jak fantazyjny może być sam interfejs: rozmycie szkła, poświata, animowane menu. Automatycznie dopasowuje się do Twojej przeglądarki; tak czy inaczej świat 3D pozostaje nietknięty.',
-  'guide.settingsPage.rowEffectsQuality': 'Bloom, okluzja otoczenia oraz to, ile pochodni i zaklęć rzuca prawdziwe światło. Największa pojedyncza oszczędność wśród pokręteł szczegółów i przełącznik, od którego zależą pozostałe pokrętła oświetlenia.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Bloom, okluzja otoczenia oraz to, ile pochodni i zaklęć rzuca prawdziwe światło. Największa pojedyncza oszczędność wśród pokręteł szczegółów i przełącznik, od którego zależą pozostałe pokrętła oświetlenia.',
   'guide.settingsPage.rowFieldOfView':
     'Jaka część świata mieści się na ekranie, od powiększenia 55 do 100 stopni. Komfortowy wybór; szersze widoki rysują nieco więcej.',
   'guide.settingsPage.rowFoliageDensity':
@@ -10008,7 +10596,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Bogate, mieszane tekstury podłoża w porównaniu z prostszym, szybszym wyglądem terenu.',
   'guide.settingsPage.rowWeather':
     'Deszcz i śnieg w otoczeniu. Tylko atmosfera, a wyłączenie jej trochę oszczędza podczas burz.',
-  'guide.settingsPage.tableFoot': 'Szukasz limitu FPS? Nie ma czego szukać: tempo klatek podąża za twoim ekranem. Zasięg rysowania to osobne pokrętło, Zasięg widzenia, w karcie Szczegóły świata, a każde ustawienie wstępne ustawia go za ciebie, dopóki sam go nie ruszysz.',
+  'guide.settingsPage.tableFoot':
+    'Szukasz limitu FPS? Nie ma czego szukać: tempo klatek podąża za twoim ekranem. Zasięg rysowania to osobne pokrętło, Zasięg widzenia, w karcie Szczegóły świata, a każde ustawienie wstępne ustawia go za ciebie, dopóki sam go nie ruszysz.',
   'guide.settingsPage.tableHeading': 'Każda opcja graficzna, objaśniona',
   'guide.settingsPage.tagReload': 'naciśnij Zastosuj',
   'guide.settingsPage.value100': '100%',
@@ -10018,8 +10607,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.valueOnOptional': 'Włączone (opcjonalnie)',
   'guide.settingsPage.visualsTagline': 'Tryb zrzutu ekranu dla wydajnych komputerów stacjonarnych.',
   'guide.settingsPage.visualsTitle': 'Najlepsze efekty wizualne',
-  'guide.settingsPage.visualsWhy': 'Ultra renderuje w najwyższej rozdzielczości, jaką oferuje twój ekran, z najbogatszym oświetleniem. Nad nim stoi Insane, wystawa z wszystkim włączonym: ten musisz wybrać ręcznie, bo gra nigdy nie wybierze go za ciebie, choćby twoja maszyna była nie wiadomo jak mocna.',
-  'guide.settingsPage.wherePath': 'Wszystko na tej stronie żyje w grze: naciśnij Esc, aby otworzyć menu gry. Wypisuje ono panele jako przyciski: Przypisania klawiszy, Kontroler, Grafika, Interfejs, Aury, Dźwięk i Nakładka wydajności, a pod nimi Wiki, Uwolnij, Wyloguj i Powrót do gry, przy czym Zgłoś błąd dołącza do listy, gdy grasz online. Grafika i Interfejs mieszczą niemal wszystko, co tu opisano.',
+  'guide.settingsPage.visualsWhy':
+    'Ultra renderuje w najwyższej rozdzielczości, jaką oferuje twój ekran, z najbogatszym oświetleniem. Nad nim stoi Insane, wystawa z wszystkim włączonym: ten musisz wybrać ręcznie, bo gra nigdy nie wybierze go za ciebie, choćby twoja maszyna była nie wiadomo jak mocna.',
+  'guide.settingsPage.wherePath':
+    'Wszystko na tej stronie żyje w grze: naciśnij Esc, aby otworzyć menu gry. Wypisuje ono panele jako przyciski: Przypisania klawiszy, Kontroler, Grafika, Interfejs, Aury, Dźwięk i Nakładka wydajności, a pod nimi Wiki, Uwolnij, Wyloguj i Powrót do gry, przy czym Zgłoś błąd dołącza do listy, gdy grasz online. Grafika i Interfejs mieszczą niemal wszystko, co tu opisano.',
   'guide.settingsPage.whyLabel': 'Dlaczego to działa:',
   'hudChrome.crafting.close': 'Zamknij rzemiosło',
   'hudChrome.crafting.craftedToast': 'Wykonane: {name}',
@@ -10105,6 +10696,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Rozdziera pancerz celu, zmniejszając go o {damage}% za każde nałożenie. Kumuluje się do 5 razy. Generuje dużą ilość zagrożenia.',
   'entities.mobs.training_dummy.name': 'Manekin treningowy',
+  'entities.mobs.hub_training_dummy.name': 'Manekin treningowy',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Pasja',
   'hudChrome.auraEffect.armorPct': 'Zmniejsza pancerz o {pct}%',
@@ -10193,7 +10785,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.catalogBody':
     'Oto wszystkie czyny, jakie mieści Księga, zebrane według kategorii. Te tajemne celowo pominięto: czekają, aż je odnajdziesz. Otwórz Księgę Czynów w grze, aby zobaczyć dokładnie, czego każdy z nich wymaga.',
   'guide.deedsPage.catalogHeading': 'Pełny rejestr czynów',
-  'guide.deedsPage.chroniclesBody': 'Każda strefa prowadzi własną Kronikę, zbiór czynów zebrany przez miejscowego kronikarza, który wziął na siebie zapisywanie każdego podróżnego, jaki tędy przechodzi. Saul z Doliny Eastbrook jest pierwszym z nich, Osric Fenn prowadzi Kronikę Bagien we Fenbridge tam w Mirefen, a Zenzie zapisuje Kronikę Szczytów w górze w Highwatch. Kronika dzieli się na rozdziały, a ty możesz przechodzić je w kolejności, jaka ci odpowiada.',
+  'guide.deedsPage.chroniclesBody':
+    'Każda strefa prowadzi własną Kronikę, zbiór czynów zebrany przez miejscowego kronikarza, który wziął na siebie zapisywanie każdego podróżnego, jaki tędy przechodzi. Saul z Doliny Eastbrook jest pierwszym z nich, Osric Fenn prowadzi Kronikę Bagien we Fenbridge tam w Mirefen, a Zenzie zapisuje Kronikę Szczytów w górze w Highwatch. Kronika dzieli się na rozdziały, a ty możesz przechodzić je w kolejności, jaka ci odpowiada.',
   'guide.deedsPage.chroniclesHeading': 'Kroniki',
   'guide.deedsPage.colName': 'Czyn',
   'guide.deedsPage.colRenown': 'Renoma',
@@ -10324,7 +10917,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_af_orchard_call.title': 'Wóz dla Sadu',
   'entities.quests.q_af_sprites_and_spigots.completion':
     'Cztery wiadra z powrotem na hakach, a rzędy ucichły. Masz cięższą rękę do chochlików niż ja, {playerName}, i dziś się z tego cieszę.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Przepędzony Chochlik Żniw',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label':
     'Odzyskane Wiadro do Zbierania Soku',
   'entities.quests.q_af_sprites_and_spigots.text':
@@ -10520,12 +11112,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_ember_caches.text':
     'Sanie ze skrytkami żaru przewróciły się zeszłej nocy na drodze przez jeziorko: żelazne kotły, które utrzymują żywy ogień przez miesiąc. Trzy z nich wciąż leżą w śniegu, {playerName}, a dom nie może obejść się bez tego, co zawierają. Przynieś ogień do domu.',
   'entities.quests.q_fv_ember_caches.title': 'Żar na Drodze przez Jeziorko',
-  'entities.quests.q_fv_frostmane_tyrant.completion':
-    'Gdy zeszłej nocy wiatr ucichł, cała wioska usłyszała ciszę tam, gdzie kiedyś była Szronogrzywa. Kraina jest ci winna dług, który będzie spłacać latami, {playerName}. Noś to, a każde drzwi w Icemantle będą dla ciebie otwarte.',
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Pokonana Szronogrzywa',
-  'entities.quests.q_fv_frostmane_tyrant.text':
-    'Wyjce nie polowały, gdy schodziły z tarasów. Uciekały. Yeti zajęła wyżyny, górski lud nazywa ją Szronogrzywą, i nawet stada nie chcą dzielić z nią zbocza. To musi się skończyć, {playerName}, zanim zima zapędzi ją do moich murów. Weź przyjaciela. Weź dwóch.',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Tyran Szronogrzywy',
   'entities.quests.q_fv_howl_above.completion':
     'Osiem, i zmierzchowy chór jest przez to cichszy. Ale wyjce nie opuszczają wierzchołków bez powodu. Coś tam na górze je poruszyło, i obawiam się, że to coś ma imię.',
   'entities.quests.q_fv_howl_above.objectives.0.label': 'Pokonany Wyjec Tarasów',
@@ -10660,7 +11246,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Mielizny są znów tylko wodą. Widziałem, jak ta skorupa łamała lepszych łowców niż ja, {playerName}. Nie ciebie.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Pokonany Stary Szpikoskorupiec',
   'entities.quests.q_hollow_old_marrowshell.text':
-    'Pierwsze imię to Stary Szpikoskorupiec, krab wielkości wozu, który poluje na wschodnich mieliznach, odkąd Eldergleam miało jeszcze bramę. Wędruje, {playerName}, więc będziesz musiał iść wzdłuż brzegu, aż natkniesz się na jego trop. Nie idź sam i nie ufaj jego bezruchowi.',
+    'Pierwsze imię to Stary Szpikoskorupiec, krab wielkości wozu, który poluje na wschodnich mieliznach, odkąd Eldershine miało jeszcze bramę. Wędruje, {playerName}, więc będziesz musiał iść wzdłuż brzegu, aż natkniesz się na jego trop. Nie idź sam i nie ufaj jego bezruchowi.',
   'entities.quests.q_hollow_old_marrowshell.title': 'Stara Skorupa Mielizn',
   'entities.quests.q_hollow_the_huntsman.completion':
     'Fenna cię przysłała? Dobrze. Więc ci ufa, a ja mam dwa imiona, które trzeba wykreślić.',
@@ -10679,15 +11265,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'Nie zostały żadne wątpliwości. Każdy namiar przesunął się w stronę Bezsennego Kurhanu, jakby samo niebo pochylało się nad tym kopcem, by patrzeć. Starzy królowie nie bez powodu zostali pochowani pod ustawionymi gwiazdami, {playerName}.',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Odczytana Mapa Gwiazd',
-  'entities.quests.q_nb_charts_of_the_stones.text':
-    'Kamienie Czuwania są starsze niż Moonrest, starsze niż nocnorodni, którzy się nimi opiekują, a ich powierzchnie są wyryte mapami gwiazd, które całe życie uczyłem się odczytywać. Niebo się przesunęło, {playerName}, i muszę wiedzieć, jak daleko. Odczytaj mapy na trzech kamieniach i przynieś mi ich namiary.',
   'entities.quests.q_nb_charts_of_the_stones.title': 'Mapy w Kamieniach',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'Lira cię przysłała? Więc ogrody też to czują. Usiądź na chwilę przy lunecie, {playerName}. Gwiazdy są niespokojne od miesiąca, a każda mapa, jaką rysuję, przechyla się na północ, ku kurhanowi.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     'Znajdź Astronoma Cassiana przy Wiecznym Czuwaniu',
-  'entities.quests.q_nb_eyes_on_the_vigil.text':
-    'Coś sprawia, że wędrowce są śmiałe, a stada niespokojne, {playerName}, i nie potrafię tego odczytać z kwiatów. Cassian potrafi odczytać to z nieba. Trzyma swój obserwatoryjny obóz przy Wiecznym Czuwaniu na wschód stąd, gdzie nocnorodni dryfują między kamieniami. Znajdź go i zapytaj, co mówią gwiazdy.',
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Oczy na Czuwaniu',
   'entities.quests.q_nb_night_gardens.completion':
     'Wciąż jarzące się, każdy płatek. Świątynia będzie pachnieć nocą przez tydzień, i Moonrest śpi przez to spokojniej.',
@@ -10714,8 +11296,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_striders_in_the_dark.text':
     'Wędrowce mroku zawsze były cierpliwymi łowcami, {playerName}, ale ostatnio wślizgują się prosto w grządki kwiatów i porywają jagnięta z księżycowego runa pod naszymi latarniami. Wybij dziesięć z nich i oddaj wzgórzom ich spokój.',
   'entities.quests.q_nb_striders_in_the_dark.title': 'Wędrowce w Ciemności',
-  'entities.quests.q_nb_the_barrow_king.completion':
-    'Gwiazdy uspokoiły się po raz pierwszy od sezonu, {playerName}. Kopce są zamknięte, nocnorodni znieruchomieli przy swoich kamieniach, a król znów śpi pod ziemią. Noś ten płaszcz: Moonrest skroiło go dla kogoś, komu noc w końcu zaufała.',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Uspokojony Król Kurhanu',
   'entities.quests.q_nb_the_barrow_king.text':
     'Każdy namiar, każda niespokojna gwiazda, każdy otwarty kopiec wskazuje na jedno: Król Kurhanu budzi się pod wielkim kopcem, a ta kraina nie ma świtu, by go powstrzymać. Musi zostać uśpiony, zanim przypomni sobie o swojej koronie, {playerName}. Nie idź sam: weź przyjaciela i miej kwietny blask za plecami.',
@@ -10767,9 +11347,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'Isha cię przysłała? Perłowa Matka nie wymawiała mojego imienia od lat. Usiądź poza zasięgiem pnączy, {playerName}, a powiem ci, co wiem: bębny nie są zagrożeniem. Są ostrzeżeniem.',
   'entities.quests.q_pr_the_man_who_went_in.objectives.0.label':
-    'Znajdź Okku przy Wodospadzie Pnączy',
+    'Znajdź Okrim przy Wodospadzie Pnączy',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    'Nurkowie nie przekroczą linii drzew, {playerName}, i nie będę ich o to prosił. Na pewno słyszałeś już bębny: każdy je słyszy, do drugiej nocy. Jeden człowiek na tej wyspie kiedykolwiek szedł w stronę tego dźwięku i wrócił. Okku. Obozuje pod wielkimi banianami przy Wodospadzie Pnączy, głęboko w górę drogi przez Gęstwinę. Znajdź go i zapytaj, co ukrywa zieleń.',
+    'Nurkowie nie przekroczą linii drzew, {playerName}, i nie będę ich o to prosił. Na pewno słyszałeś już bębny: każdy je słyszy, do drugiej nocy. Jeden człowiek na tej wyspie kiedykolwiek szedł w stronę tego dźwięku i wrócił. Okrim. Obozuje pod wielkimi banianami przy Wodospadzie Pnączy, głęboko w górę drogi przez Gęstwinę. Znajdź go i zapytaj, co ukrywa zieleń.',
   'entities.quests.q_pr_the_man_who_went_in.title': 'Człowiek, Który Wszedł',
   'entities.quests.q_pr_what_the_drums_guard.completion':
     'Mech, perłowa skorupa i krew dzika, ubite palcami. Coś w tej ruinie wciąż podtrzymuje swoje rytuały, {playerName}, a Strażnik trzyma z dala wszystko inne. Czas, byśmy mówili o tym otwarcie.',
@@ -10897,20 +11477,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Na pewno już to słyszałeś, {playerName}: chrapanie. Wolne i ciężkie, za Sennymi Rozlewiskami, jakby samo mokradło przewracało się we śnie. Ropuchy, chochliki, wispy płonące w południe: wszystko zaczęło się, gdy zaczął się ten dźwięk. Jedna dusza może wiedzieć, co to jest. Matka Sedge trzyma obóz w Willowweep, na zachód wokół fosy i w dół dalekiego brzegu. Znajdź ją i zapytaj, co śpi pośrodku mojego mokradła.',
   'entities.quests.q_wf_witch_of_willowweep.title': 'Wiedźma z Willowweep',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    'Cobb wysłał cię drogą w górę całego, tak? Dobry człowiek. Utrzymuje te latarnie bramowe zapalone od trzydziestu lat, a las nigdy go nie ominął. Witaj w Gallowmere, {playerName}. Uważaj na dzwony.',
+    'Cobb wysłał cię drogą w górę całego, tak? Dobry człowiek. Utrzymuje te latarnie bramowe zapalone od trzydziestu lat, a las nigdy go nie ominął. Witaj w Gibbetmere, {playerName}. Uważaj na dzwony.',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Zgłoś się do Grabarza Marrow',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    'Słyszysz to bicie dzwonów, {playerName}? To Gallowmere, w górę północnej drogi, wydzwania swoich zmarłych do snu. Grabarz Marrow prowadzi rejestr każdej duszy pod baldachimem drzew, żywej i pochowanej. Idź i zostań policzony, zanim las policzy cię sam.',
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Dzwony Gallowmere',
+    'Słyszysz to bicie dzwonów, {playerName}? To Gibbetmere, w górę północnej drogi, wydzwania swoich zmarłych do snu. Grabarz Marrow prowadzi rejestr każdej duszy pod baldachimem drzew, żywej i pochowanej. Idź i zostań policzony, zanim las policzy cię sam.',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Dzwony Gibbetmere',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     'Wszystkie cztery płoną? To odetchnij, {playerName}. Ty tego nie słyszałeś, ale cała wioska tak: dzwony zabrzmiały lżej w chwili, gdy zapłonął ostatni knot.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label':
     'Ponownie zapalona Nagrobna Świeca',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    'Cztery kamienie graniczne otaczają Gallowmere, {playerName}, jeden na każdej drodze wyjściowej, a na każdym kamieniu płonie nagrobna świeca. Póki płoną, pochowani pozostają pochowani. Mżawka je zgasiła, wszystkie cztery, a ja jestem zbyt stary, by chodzić po granicach samemu. Weź moją świecę i zapal je na nowo, szybko.',
+    'Cztery kamienie graniczne otaczają Gibbetmere, {playerName}, jeden na każdej drodze wyjściowej, a na każdym kamieniu płonie nagrobna świeca. Póki płoną, pochowani pozostają pochowani. Mżawka je zgasiła, wszystkie cztery, a ja jestem zbyt stary, by chodzić po granicach samemu. Weź moją świecę i zapal je na nowo, szybko.',
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Świece na Granicach',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    'Róg urwał się w połowie nuty. Każdy dzwon w Gallowmere zabrzmiał raz, sam z siebie, a potem las ucichł bardziej, niż słyszałam od trzydziestu lat. Dokonałeś obrzędu, którego ja nie mogłam, {playerName}. Noś to i chodź pod baldachimem bez strachu.',
+    'Róg urwał się w połowie nuty. Każdy dzwon w Gibbetmere zabrzmiał raz, sam z siebie, a potem las ucichł bardziej, niż słyszałam od trzydziestu lat. Dokonałeś obrzędu, którego ja nie mogłam, {playerName}. Noś to i chodź pod baldachimem bez strachu.',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Strącony z konia Blady Łowca',
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     'Na pewno już słyszałeś róg, {playerName}, cienki i daleki, dźwięk, na który cały las wstrzymuje oddech. Blady Łowca jeździ po swojej polanie na północ stąd, a każdy grób, który mija, staje się płytszy. Kiedyś był człowiekiem, i został pochowany źle, a ja przestałam udawać, że modlitwa to naprawi. Weź przyjaciela, weź dwóch, i strąć go z konia.',
@@ -10928,9 +11508,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Na południe stąd Kaplica Kamienia Żałoby niszczeje przy swoim czarnym jeziorku, a jeden człowiek wciąż jej doglada: Wikary Creel, który nie odszedł, gdy zawalił się dach. Zna stare rytuały lepiej niż moje dzwony, {playerName}, i nie przesłał wieści od miesiąca. Idź drogą do kaplicy i sprawdź, czy wciąż oddycha.',
   'entities.quests.q_ww_the_last_vicar.title': 'Ostatni Wikary',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    'Przeszedł przez bramę na własnych nogach, przysięgając, że od teraz nie wykopie niczego głębszego niż grządka rzepy. Wróci na cmentarz do niedzieli, zawsze wracają. Dziękuję, {playerName}. Gallowmere zatrzymuje swoich ludzi, to całe nasze prawo.',
+    'Przeszedł przez bramę na własnych nogach, przysięgając, że od teraz nie wykopie niczego głębszego niż grządka rzepy. Wróci na cmentarz do niedzieli, zawsze wracają. Dziękuję, {playerName}. Gibbetmere zatrzymuje swoich ludzi, to całe nasze prawo.',
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Grabarz Mosley bezpiecznie odprowadzony do Gallowmere',
+    'Grabarz Mosley bezpiecznie odprowadzony do Gibbetmere',
   'entities.quests.q_ww_walking_mosley_home.text':
     'Mój grabarz Mosley wyruszył drogą do kaplicy trzy dni temu, by otworzyć grób na starym cmentarzu, i wykop zawalił się na niego. Wygrzebał się na zewnątrz, głupiec żyje, ale kuli się przy grobach kaplicy i nie ruszy się z powodu prządek na drodze. Odprowadź go do domu, {playerName}. Nie mogę bić w dzwony dla żywego człowieka.',
   'entities.quests.q_ww_walking_mosley_home.title': 'Odprowadzenie Mosleya do Domu',
@@ -10940,7 +11520,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_what_the_bark_holds.objectives.1.label':
     'Zdjęte Szczątki Owinięte Jedwabiem',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    'Na Polanie Wisielców na wschód od Gallowmere prządki wieszają swoich owiniętych jedwabiem zmarłych na konarach, a grobowe wleczyste stoją na straży pod spodem jak cierpliwi żałobnicy niosący trumnę. To nasi ludzie tam w górze, {playerName}. Powal pięć wleczystych, zetnij trzech owiniętych zmarłych i przynieś ich do domu, do ziemi.',
+    'Na Polanie Wisielców na wschód od Gibbetmere prządki wieszają swoich owiniętych jedwabiem zmarłych na konarach, a grobowe wleczyste stoją na straży pod spodem jak cierpliwi żałobnicy niosący trumnę. To nasi ludzie tam w górze, {playerName}. Powal pięć wleczystych, zetnij trzech owiniętych zmarłych i przynieś ich do domu, do ziemi.',
   'entities.quests.q_ww_what_the_bark_holds.title': 'Co Kryje Kora',
   'entities.quests.q_ww_widows_skeins.completion':
     'Sześć motków, miękkich jak wstrzymany oddech. Zmarli będą leżeć w tym spokojniej. Weź te owijacze, uszyłam je z ostatniej partii, i las nigdy ich nie przegryzł.',
@@ -11007,7 +11587,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Nie musisz wstrzeliwać się z naciśnięciami co do klatki. Naciśnij następną zdolność w ostatnich chwilach obecnego rzucania, a zostanie zakolejkowana i odpali w momencie, gdy rzucanie dobiegnie końca, dzięki czemu wprawna gra płynie bez przerw. Naciśnięcie zbyt wczesne jest po prostu odrzucane, więc nic się nie marnuje. Niektóre ciosy w zwarciu działają tak samo, wychodząc wraz z twoim następnym zamachem bronią.',
   'guide.combat.queueTitle': 'Twój następny ruch jest już gotowy',
   'guide.controls.arrowKeys': 'Klawisze strzałek',
-  'guide.controls.attackMoveNote': 'Ruch ataku jest wyłączony, dopóki go nie włączysz: otwórz panel Przypisania klawiszy, włącz go, a wiersz A powyżej zacznie działać. Z kursorem nad światem gry ruszysz w stronę kursora i otworzysz ogień do wroga pod nim albo do pierwszego wrogo nastawionego napotkanego po drodze. Dopóki opcja jest włączona, A wykonuje ten ruch ataku zamiast obracać w lewo, więc obracaj lewą strzałką, którą Obróć w lewo również nosi domyślnie, albo przypisz Obróć w lewo własny klawisz.',
+  'guide.controls.attackMoveNote':
+    'Ruch ataku jest wyłączony, dopóki go nie włączysz: otwórz panel Przypisania klawiszy, włącz go, a wiersz A powyżej zacznie działać. Z kursorem nad światem gry ruszysz w stronę kursora i otworzysz ogień do wroga pod nim albo do pierwszego wrogo nastawionego napotkanego po drodze. Dopóki opcja jest włączona, A wykonuje ten ruch ataku zamiast obracać w lewo, więc obracaj lewą strzałką, którą Obróć w lewo również nosi domyślnie, albo przypisz Obróć w lewo własny klawisz.',
   'guide.controls.bothMouse': 'Oba przyciski myszy',
   'guide.controls.calendar': 'Kalendarz wydarzeń',
   'guide.controls.crafting': 'Wytwarzanie',
@@ -11018,9 +11599,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.controls.runForward': 'Biegnij naprzód',
   'guide.dungeonsPage.heroicBody':
     'Każdy loch dla pięciu graczy, a także sam rajd, ma wersję heroiczną czekającą za pułapem poziomów. Te same sale, przebudowane dla wyposażonej drużyny endgame: wszystko uderza mocniej, niczego nie da się prześcignąć na własnych nogach, a bossowie całkowicie ignorują ogłuszenia i spętania. Najpierw wyrośnij ponad wersje normalne; tryb heroiczny zakłada, że już to zrobiłeś.',
-  'guide.dungeonsPage.heroicHowBody': 'Wybierz poziom trudności, zanim twoja drużyna zajmie instancję: wpisz /dungeon heroic albo wybierz Ustaw trudność lochu w menu własnego portretu. Sam ustawiasz go ty; w drużynie może to tylko przywódca, a wybór obejmuje wszystkich i zatrzaskuje się przy drzwiach, więc przejście pozostaje tym, jako co je zajęto.',
-  'guide.dungeonsPage.heroicLockoutBody': 'Zwykłe lochy można przemierzać cały dzień. Heroiczny wymaga cierpliwości: zabicie końcowego bossa ogranicza wszystkich w przejściu do jednego heroicznego ukończenia tego lochu na dzień, a rajd trzyma dzienną blokadę dla każdego poziomu trudności. Na żywym królestwie wszystkie dzienne blokady opadają razem o własnej nocnej godzinie resetu królestwa, więc ukończenie wzięte tuż przed tą godziną i inne tuż po niej wypadają w dwóch różnych dniach; zagraj zamiast tego offline w przeglądarce, a blokada po prostu wygasa dobę po twoim własnym zabiciu. Już ukończone pięcioosobowe przejście pozostaje otwarte dla własnej drużyny na biegi po zwłoki i łup, więc nikt nie zostaje odcięty od tego, na co tam zapracował. Rajd jest surowszy: gdy jego zabicie raz cię zablokuje, drzwi pozostają zamknięte do resetu, a jedyna droga z powrotem do środka to bieg po zwłoki kogoś, kto padł dokładnie w tym przejściu, które go zablokowało, więc żywy rajdowiec, który wychodzi, wyszedł na cały dzień. Zbierz swoje zdobycze, zanim opuścisz arenę. Każda z tych blokad należy do postaci, która na nią zapracowała, więc ukończenie na twojej głównej postaci zostawia pozostałe postacie wolne.',
-  'guide.dungeonsPage.heroicRewardsBody': 'Heroiczni bossowie upuszczają łup, który znasz, ulepszony i oznaczony jako Heroiczny w opisie, a końcowy boss każdego przejścia dokłada epiki nie do znalezienia nigdzie indziej. To ostatnie zabicie zostawia też Heroiczne Znaki każdemu uczestnikowi: walutę, którą wydaje się u kwatermistrza Vexa w Highwatch, którego lada to półka pierścieni i wisiorów, jakich nie kupi nic poza dowodem z heroicznych głębin.',
+  'guide.dungeonsPage.heroicHowBody':
+    'Wybierz poziom trudności, zanim twoja drużyna zajmie instancję: wpisz /dungeon heroic albo wybierz Ustaw trudność lochu w menu własnego portretu. Sam ustawiasz go ty; w drużynie może to tylko przywódca, a wybór obejmuje wszystkich i zatrzaskuje się przy drzwiach, więc przejście pozostaje tym, jako co je zajęto.',
+  'guide.dungeonsPage.heroicLockoutBody':
+    'Zwykłe lochy można przemierzać cały dzień. Heroiczny wymaga cierpliwości: zabicie końcowego bossa ogranicza wszystkich w przejściu do jednego heroicznego ukończenia tego lochu na dzień, a rajd trzyma dzienną blokadę dla każdego poziomu trudności. Na żywym królestwie wszystkie dzienne blokady opadają razem o własnej nocnej godzinie resetu królestwa, więc ukończenie wzięte tuż przed tą godziną i inne tuż po niej wypadają w dwóch różnych dniach; zagraj zamiast tego offline w przeglądarce, a blokada po prostu wygasa dobę po twoim własnym zabiciu. Już ukończone pięcioosobowe przejście pozostaje otwarte dla własnej drużyny na biegi po zwłoki i łup, więc nikt nie zostaje odcięty od tego, na co tam zapracował. Rajd jest surowszy: gdy jego zabicie raz cię zablokuje, drzwi pozostają zamknięte do resetu, a jedyna droga z powrotem do środka to bieg po zwłoki kogoś, kto padł dokładnie w tym przejściu, które go zablokowało, więc żywy rajdowiec, który wychodzi, wyszedł na cały dzień. Zbierz swoje zdobycze, zanim opuścisz arenę. Każda z tych blokad należy do postaci, która na nią zapracowała, więc ukończenie na twojej głównej postaci zostawia pozostałe postacie wolne.',
+  'guide.dungeonsPage.heroicRewardsBody':
+    'Heroiczni bossowie upuszczają łup, który znasz, ulepszony i oznaczony jako Heroiczny w opisie, a końcowy boss każdego przejścia dokłada epiki nie do znalezienia nigdzie indziej. To ostatnie zabicie zostawia też Heroiczne Znaki każdemu uczestnikowi: walutę, którą wydaje się u kwatermistrza Vexa w Highwatch, którego lada to półka pierścieni i wisiorów, jakich nie kupi nic poza dowodem z heroicznych głębin.',
   'guide.dungeonsPage.heroicRewardsTitle': 'Znaki Heroiczne i ulepszone zdobycze',
   'guide.dungeonsPage.heroicTitle': 'Tryb heroiczny',
   'guide.economy.dailyBody':
@@ -11032,7 +11616,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Odbiór działa tak samo, tyle że na odwrót: stań przy dowolnym filarze, aby przeczytać listy i przenieść to, co niosą, do sakiewki i toreb. Zwykły list po pewnym czasie znika, ale ten, który wciąż niesie monety lub towary, czeka na ciebie, jakkolwiek długo zwlekasz. Niektórych rzeczy poczta odmawia wprost: przedmioty związane z duszą, przedmioty zadaniowe i jedyne w swoim rodzaju kosmetyczne żetony podróżują z tobą albo wcale. I miej oko na filar po udanym oddaniu zadania; niektórzy zleceniodawcy piszą.',
   'guide.economy.mailTitle': 'Krucza Poczta',
   'guide.footer.linksLabel': 'Odnośniki do gry i społeczności',
-  'guide.gear.bagsBody': 'Wszystko, co podnosisz, jedzie we wspólnym worku, a powiększasz go, zakładając torby. Twoje okno toreb ma cztery sloty: kliknij torbę w worku, by wsunąć ją w wolny slot, a każda noszona torba dokłada własne miejsce. Proste torby to tani towar kupiecki, pojemniejsze padają z bestii, a najlepsze pochodzą od bossów z lochów, więc twoja ładowność rośnie równo z wyposażeniem. Wszystko, co się układa w stosy, mówi w opisie, ile jednostek zmieści jeden slot, i właśnie dzięki temu wiesz z góry, że porządny zakup mikstur będzie cię kosztował dwa.',
+  'guide.gear.bagsBody':
+    'Wszystko, co podnosisz, jedzie we wspólnym worku, a powiększasz go, zakładając torby. Twoje okno toreb ma cztery sloty: kliknij torbę w worku, by wsunąć ją w wolny slot, a każda noszona torba dokłada własne miejsce. Proste torby to tani towar kupiecki, pojemniejsze padają z bestii, a najlepsze pochodzą od bossów z lochów, więc twoja ładowność rośnie równo z wyposażeniem. Wszystko, co się układa w stosy, mówi w opisie, ile jednostek zmieści jeden slot, i właśnie dzięki temu wiesz z góry, że porządny zakup mikstur będzie cię kosztował dwa.',
   'guide.gear.bagsTitle': 'Torby i miejsce na noszenie',
   'guide.gear.slotFinger': 'Palec',
   'guide.gear.slotNeck': 'Szyja',
@@ -11045,7 +11630,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.heroicDef':
     'Trudniejsza wersja lochu lub rajdu, dostrojona do wyposażonych drużyn endgame. Heroiczni bossowie upuszczają ulepszony łup, a ostatni boss płaci Znakami Heroicznymi.',
   'guide.glossary.heroicTerm': 'Tryb heroiczny',
-  'guide.glossary.loadoutDef': 'Zapisany układ talentów, do dziesięciu sztuk. Każdy pamięta swoje wybory w rzędach i swój pasek akcji, a może też pamiętać wyposażenie, które nosiłeś, więc zmiana buildu to jedno kliknięcie zamiast przerabiania każdego rzędu.',
+  'guide.glossary.loadoutDef':
+    'Zapisany układ talentów, do dziesięciu sztuk. Każdy pamięta swoje wybory w rzędach i swój pasek akcji, a może też pamiętać wyposażenie, które nosiłeś, więc zmiana buildu to jedno kliknięcie zamiast przerabiania każdego rzędu.',
   'guide.glossary.loadoutTerm': 'Układ',
   'guide.glossary.lockoutDef':
     'Dzienny limit największych powtarzalnych nagród. Każdy heroiczny loch wypłaca jedno ukończenie na dzień, rajd liczy tryb normalny i heroiczny osobno, a złupienie bossa świata uruchamia twoją blokadę. Ukończony przebieg dla pięciu graczy pozostaje otwarty dla własnej drużyny; zablokowane drzwi rajdu nie otworzą się ponownie aż do resetu.',
@@ -11089,13 +11675,18 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.professions.harvestTitle': 'Pozyskiwanie z samego łowu',
   'guide.search.typeAbility': 'Zdolność',
   'guide.search.typeDeed': 'Czyn',
-  'guide.settingsPage.audioBody': 'Okno opcji to nie tylko piksele. Dźwięk mieści trzy suwaki głośności, dla efektów dźwiękowych, muzyki i głosu, plus przełącznik muzyki i cztery przełączniki dla dźwięków, które najszybciej się przejadają: głosy NPC, kroki, dźwięki interfejsu i odzew kliknięcia. Zakładka Ogólne w panelu Interfejs nosi wybór języka, który na miejscu przelokalizowuje cały interfejs, bez przeładowania, oraz wybór motywu dla oprawy okien.',
+  'guide.settingsPage.audioBody':
+    'Okno opcji to nie tylko piksele. Dźwięk mieści trzy suwaki głośności, dla efektów dźwiękowych, muzyki i głosu, plus przełącznik muzyki i cztery przełączniki dla dźwięków, które najszybciej się przejadają: głosy NPC, kroki, dźwięki interfejsu i odzew kliknięcia. Zakładka Ogólne w panelu Interfejs nosi wybór języka, który na miejscu przelokalizowuje cały interfejs, bez przeładowania, oraz wybór motywu dla oprawy okien.',
   'guide.settingsPage.audioTitle': 'Dźwięk i język',
-  'guide.settingsPage.autolootBody': 'Wolisz nie klikać każdego trupa? Automatyczne zbieranie w przejściu, w zakładce Walka w panelu Interfejs i domyślnie wyłączone, zgarnia łup z twoich własnych ofiar, gdy koło nich przechodzisz.',
-  'guide.settingsPage.factSearchBody': 'Nie ma pola wyszukiwania, więc warto znać kształt menu. Grafika jest ułożona w karty: Jakość, Szczegóły świata, Oświetlenie i efekty, Kamera, Ekran i System, plus Sterowanie dotykowe na ekranie dotykowym. Interfejs dzieli się na cztery zakładki: Ogólne, Okna, Czat i Walka. Jeśli ustawienie zmienia to, jak rysowany jest świat, jest w Grafice, a jeśli zmienia to, co pokazuje ci interfejs, jest w Interfejsie.',
+  'guide.settingsPage.autolootBody':
+    'Wolisz nie klikać każdego trupa? Automatyczne zbieranie w przejściu, w zakładce Walka w panelu Interfejs i domyślnie wyłączone, zgarnia łup z twoich własnych ofiar, gdy koło nich przechodzisz.',
+  'guide.settingsPage.factSearchBody':
+    'Nie ma pola wyszukiwania, więc warto znać kształt menu. Grafika jest ułożona w karty: Jakość, Szczegóły świata, Oświetlenie i efekty, Kamera, Ekran i System, plus Sterowanie dotykowe na ekranie dotykowym. Interfejs dzieli się na cztery zakładki: Ogólne, Okna, Czat i Walka. Jeśli ustawienie zmienia to, jak rysowany jest świat, jest w Grafice, a jeśli zmienia to, co pokazuje ci interfejs, jest w Interfejsie.',
   'guide.settingsPage.factSearchTitle': 'Gdzie mieszka dane ustawienie',
-  'guide.settingsPage.touchBody': 'Na ekranie dotykowym panel Grafika zyskuje własną kartę Sterowanie dotykowe: rozmiar i martwa strefa gałki, rozmiar przycisków na ekranie, krycie sterowania, opcjonalna gałka kamery, lustrzany układ dla leworęcznych i odwrócone rozglądanie dotykiem, aby ekran dopasował się do twoich dłoni, a nie odwrotnie.',
-  'guide.social.calendarBody': 'Naciśnij I, by otworzyć kalendarz wydarzeń. Zaznacza on dni królestwa, wokół których warto planować, cotygodniowe Wezwanie do Rajdu, Dzień Targowy, Starcie na Arenie i Zawody Wędkarskie, plus comiesięczny Dzień Wypraw i Komunię Księżycowej Bramy, i to właśnie tam gildie prowadzą swój terminarz: przywódca gildii i oficerowie mogą wpisywać na nim wydarzenia, a każdy członek widzi je na tej samej stronie. Dni królestwa to zachęta do zebrania się, a nie premia; nic w twojej postaci nie zmienia się przez to, że dzień jest zaznaczony.',
+  'guide.settingsPage.touchBody':
+    'Na ekranie dotykowym panel Grafika zyskuje własną kartę Sterowanie dotykowe: rozmiar i martwa strefa gałki, rozmiar przycisków na ekranie, krycie sterowania, opcjonalna gałka kamery, lustrzany układ dla leworęcznych i odwrócone rozglądanie dotykiem, aby ekran dopasował się do twoich dłoni, a nie odwrotnie.',
+  'guide.social.calendarBody':
+    'Naciśnij I, by otworzyć kalendarz wydarzeń. Zaznacza on dni królestwa, wokół których warto planować, cotygodniowe Wezwanie do Rajdu, Dzień Targowy, Starcie na Arenie i Zawody Wędkarskie, plus comiesięczny Dzień Wypraw i Komunię Księżycowej Bramy, i to właśnie tam gildie prowadzą swój terminarz: przywódca gildii i oficerowie mogą wpisywać na nim wydarzenia, a każdy członek widzi je na tej samej stronie. Dni królestwa to zachęta do zebrania się, a nie premia; nic w twojej postaci nie zmienia się przez to, że dzień jest zaznaczony.',
   'guide.social.calendarHeading': 'Kalendarz wydarzeń',
   'guide.social.communityBody':
     'Zacznij linię czatu wykrzyknikiem, aby ogłosić wezwanie społeczności: !lfg, gdy szukasz grupy, !wts i !wtb do handlu, !recruit dla twojej gildii, !event, by ogłosić rajd lub spotkanie, i !help, gdy prosisz o pomoc. Menu wezwań pojawia się w chwili, gdy wpiszesz znak. Każde wezwanie jest rozgłaszane w świecie i powtarzane na społecznościowym Discordzie, więc dociera nawet do graczy, którzy nie są zalogowani. Wezwania społeczności są częścią gry online.',
@@ -11114,7 +11705,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.stats.hasteBody':
     'Pośpiech to jedna z cech, która przyspiesza wszystko, co robisz: zamachy w zwarciu, strzały z dystansu i rzucanie zaklęć nabierają tempa razem. Pochodzi z ekwipunku, zwłaszcza z premii kompletów pancerza, a kilka zdolności daje krótki zryw szybszych zamachów. Na twojej karcie widnieje jako Ocena pośpiechu.',
   'guide.stats.hasteTitle': 'Pośpiech',
-  'guide.talentsPage.choiceNote': 'Każdy rząd to rozdroże: oferuje trzy możliwości, a ty wiążesz się z jedną z nich. Twój następny reset otwiera na nowo każdy z tych wyborów.',
+  'guide.talentsPage.choiceNote':
+    'Każdy rząd to rozdroże: oferuje trzy możliwości, a ty wiążesz się z jedną z nich. Twój następny reset otwiera na nowo każdy z tych wyborów.',
   'guide.worldPage.worldBossBody':
     'Wysoko na Ciernistym Szczycie burza nad Stormcrag czasem przybiera kształt. Thunzharr, Budzący się Szczyt powstaje tam w stałym rytmie, żywiołak o sile rajdowej zwalczany w otwartym świecie przez każdego, kto odpowie na wezwanie, i staje się tym potężniejszy, im więcej wyzywających staje przeciw niemu. Każdy, kto dołączy do walki, otrzymuje własne losowanie jego zdobyczy, honorowane na zasadach blokady rajdowej, a jego upadek trwa dość długo, by polegli zdążyli wrócić po swoje. Zbierz więcej mieczy, niż sądzisz, że potrzebujesz.',
   'guide.worldPage.worldBossTitle': 'Gdy szczyt się budzi: boss świata',
@@ -11126,12 +11718,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.amberPlaceNotes':
     'Lanternmere jaśnieje w samym sercu żniw. Złoty Roztop to śliska od bursztynu przełęcz prowadząca do środka; Złocony Sad i Żniwna Kotlina kryją najsłodsze zbiory i najzuchwalszych złodziei; Wielkie Jezioro odbija płonące liście; Wzgórze Popiołowych Klonów wznosi się najwyżej i płonie najczerwieniej; a Pochylony Monolit pamięta coś starszego niż jesień.',
   'guide.worldPage.duskBlurb':
-    'Dolina wiecznego zmierzchu pod wielkim drzewem Eldergleam, gdzie kryształowe ruiny jarzą się, a powietrze brzęczy od starej magii.',
-  'guide.worldPage.duskGreeter': 'Strażniczka Saelwyn, Eldergleam',
+    'Dolina wiecznego zmierzchu pod wielkim drzewem Eldershine, gdzie kryształowe ruiny jarzą się, a powietrze brzęczy od starej magii.',
+  'guide.worldPage.duskGreeter': 'Strażniczka Saelwyn, Eldershine',
   'guide.worldPage.duskGreeting':
     'Niewielu z twojego rodu stało pod tymi konarami. Stąpaj delikatnie i bądź mile widziany.',
   'guide.worldPage.duskPlaceNotes':
-    'Eldergleam skupia się pod wielkim drzewem. Jaskinia Zmierzchu i jej Punkt Widokowy to wejście i pierwszy widok na dolinę; Prastary Gaj i Kotlina Spadających Gwiazd strzegą cichego południa; Zatopiony Dziedziniec kryje zarośnięte ruiny na wschodzie; a Lśniąca Głębia i Krystaliczne Mielizny jarzą się na północy.',
+    'Eldershine skupia się pod wielkim drzewem. Jaskinia Zmierzchu i jej Punkt Widokowy to wejście i pierwszy widok na dolinę; Prastary Gaj i Kotlina Spadających Gwiazd strzegą cichego południa; Zatopiony Dziedziniec kryje zarośnięte ruiny na wschodzie; a Lśniąca Głębia i Krystaliczne Mielizny jarzą się na północy.',
   'guide.worldPage.emberBlurb':
     'Oświetlone burzami pustkowia popiołu i krwistego szkła, gdzie smoki krążą nad kalderą, a ognie trolli płoną wśród wydm, obserwowane z bramnego miasta Wyrmwatch.',
   'guide.worldPage.emberGreeter': 'Strażnik bramy, Wyrmwatch',
@@ -11168,12 +11760,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gardenPlaceNotes':
     'Hedgewick czeka przy Bramie Ogrodu. Aleja Parterowa kwitnie w przyciętych barwach; Zamek Brzasku musztruje swoich rycerzy za nowymi murami; Staw Płatków dryfuje różowo przez cały rok; Stary Młyn obraca własne kręgi grządek; Wielki Labirynt zmienia swoje układy dla każdego gościa, a jego łuki obserwują liściaste lisy; Północna Strażnica strzeże drogi wyjścia; Kotlina Lilii spoczywa poza tym wszystkim; a Dziedziniec Fontanny wciąż płynie czysto w sercu ogrodu.',
   'guide.worldPage.hauntBlurb':
-    'Nawiedzony las pod olbrzymimi koronami drzew, gdzie latarnie Gallowmere są jedynym uczciwym światłem na drodze.',
-  'guide.worldPage.hauntGreeter': 'Latarnik, Gallowmere',
+    'Nawiedzony las pod olbrzymimi koronami drzew, gdzie latarnie Gibbetmere są jedynym uczciwym światłem na drodze.',
+  'guide.worldPage.hauntGreeter': 'Latarnik, Gibbetmere',
   'guide.worldPage.hauntGreeting':
     'Trzymaj się latarni, podróżniku. A jeśli las zawoła cię po imieniu z dala od drogi, nie odpowiadaj.',
   'guide.worldPage.hauntPlaceNotes':
-    'Gallowmere kuli się we własnych latarniach. Wronia Brama to ponure wejście do lasu; Gąszcz Wdowy jest gęsto oplątany pajęczyną; Polana Wisielców i Kaplica Kamienia Żałoby kryją najstarsze żale lasu; a Polana Łowczego należy do tego, co wciąż tam poluje.',
+    'Gibbetmere kuli się we własnych latarniach. Wronia Brama to ponure wejście do lasu; Gąszcz Wdowy jest gęsto oplątany pajęczyną; Polana Wisielców i Kaplica Kamienia Żałoby kryją najstarsze żale lasu; a Polana Łowczego należy do tego, co wciąż tam poluje.',
   'guide.worldPage.jungleBlurb':
     'Tropikalna gęstwina palm, białego piasku i głośnych ptaków, gdzie nadmorskie miasteczko Drifthaven utrzymuje ognisko na plaży.',
   'guide.worldPage.jungleGreeter': 'Kapitanka portu, Drifthaven',
@@ -11193,11 +11785,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Leczy przyjazny cel za {damage}, a następnie przeskakuje na maksymalnie 2 sojuszników w promieniu 12 metrów. Każdy przeskok leczy za 50% poprzedniego celu. Każdy objęty sojusznik zużywa twój pozostały Nurt Cerowania i natychmiast leczy się za 125% zużytej ilości. Początkowe leczenie rośnie wraz z mocą zaklęć. (sygnatura Odnowienia)',
   'entities.abilities.desperate_prayer.description':
     'Natychmiast leczy cię za 30% maksymalnego zdrowia.',
-  'entities.abilities.counter_shot.description': 'Przerywa cel i uniemożliwia mu rzucanie zaklęć z tej szkoły przez 4 s.',
+  'entities.abilities.counter_shot.description':
+    'Przerywa cel i uniemożliwia mu rzucanie zaklęć z tej szkoły przez 4 s.',
   'entities.abilities.counter_shot.name': 'Uciszający Strzał',
   'entities.abilities.counterspell.description':
     'Kontruje zaklęcia celu i zapobiega rzucaniu ich z tej szkoły przez 6 sekund.',
-  'entities.abilities.counterspell.name': 'Kontrzaklęcie',
   'entities.abilities.holy_taunt.description':
     'Drwi z celu: twoje zagrożenie wzrasta, dorównując najbardziej znienawidzonemu wrogowi i jest on zmuszony do ataku na ciebie przez 3 sekundy.',
   'entities.abilities.holy_taunt.name': 'Święte Podjudzenie',
@@ -11213,7 +11805,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.skull_bash.description':
     'Uderzenie głową z doskoku, które przerywa rzucenie zaklęcia celu i blokuje tę szkołę na 4 sek.',
   'entities.abilities.skull_bash.name': 'Uderzenie Czaszką',
-  'entities.abilities.spell_lock.description': 'Przerywa rzucanie zaklęć przez wroga i uniemożliwia mu rzucanie zaklęć z tej szkoły przez 4 s.',
+  'entities.abilities.spell_lock.description':
+    'Przerywa rzucanie zaklęć przez wroga i uniemożliwia mu rzucanie zaklęć z tej szkoły przez 4 s.',
   'entities.abilities.spell_lock.name': 'Otchłanny knebel',
   'entities.items.ashen_focus_ring.name': 'Popielaty Pierścień Fokusu',
   'entities.items.ashstalker_cowl.name': 'Osłona Ashstalkera',
@@ -11471,8 +12064,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Szronowe czuwanie',
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Zakrzywione ostrze bladego lodowatego lodu, postrzępione kryształy szronu wzdłuż grzbietu, świecący cyjanowy zamrożony rdzeń w pełniejszym soplowym jelcu.',
-  'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    'Okręt flagowy gatunku mrożonego i przedmiot, po który każdy kolekcjoner sięga jako pierwszy. Lodowy Kieł został wyrzeźbiony, a nie sfałszowany, z kła lodowca pokrywającego Cierniowy Szczyt nad Wysoką Strażą, a jego cyjanowe jądro płonęło zimno niczym światło z Glimmermere. To samo powietrze, które przecina. Strażnik muru przysięga, że ​​jeden żołnierz niósł go tej nocy, gdy wysokie śniegi powstrzymywały Kult Wyrm, i „kupił mur na zimę”.',
   'hudChrome.wocStore.skins.ice_fang_sword.name': 'Lodowy Kieł',
   'hudChrome.wocStore.skins.lacquered_wand.look':
     'Smukła różdżka lakierowana w kolorze głębokiej czerwieni, dwie polerowane mosiężne opaski, mała zaokrąglona mosiężna końcówka.',
@@ -11518,7 +12109,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Posrebrzana stal i łuk z błękitnego lodu, świecący cyjanowy zamrożony rdzeń w pionie, strzała z cięciwą z litego lodu i zimnej pary.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Łuk ze srebrzonej stali i lodu Cierniowego Szczytu, jego pion oświetlony zimnym cyjanowym rdzeniem, który przytrzymuje strzałę na cięciwie. Łączy szyb z litego lodu lodowcowego, który odnawia każde zaciągnięcie; łucznik nie nosi na ścianie kołczanu, tylko chłód. Wysoka Straż utrzymała Podchodyer Ridge podczas oblężenia z kimś podobnym: jednym łucznikiem, jak mówią, i strzałami na całą zimę, które zawsze tam były.',
-  'hudChrome.wocStore.skins.winterbite.name': 'Ukąszenie zimy',
   'hudChrome.wocStore.storeTab': 'Sklep',
   'hudChrome.wocStore.tabsLabel': 'Sekcje sklepu WOC',
   'hudChrome.wocStore.title': 'Sklep WOK',
@@ -11543,7 +12133,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.name': 'Awatar',
   'entities.abilities.avatar.description':
     'Przemieniasz się w kolosa na 20 sek., uwalniając się od wszystkich efektów kontroli i zwiększając zadawane obrażenia o 20%.',
-  'entities.abilities.avenging_wrath.description': 'Rozwija cielesne skrzydła ze złotej świętej mocy, zyskując 10 Oddania i podwajając na 15 s Oddanie generowane przez twoje umiejętności. Zwiększa ponadto zadawane obrażenia i leczenie o 20%. Żniwiarz świtu: umożliwia Młot gniewu przeciw dowolnemu celowi.',
+  'entities.abilities.avenging_wrath.description':
+    'Rozwija cielesne skrzydła ze złotej świętej mocy, zyskując 10 Oddania i podwajając na 15 s Oddanie generowane przez twoje umiejętności. Zwiększa ponadto zadawane obrażenia i leczenie o 20%. Żniwiarz świtu: umożliwia Młot gniewu przeciw dowolnemu celowi.',
   'entities.abilities.berserk.description':
     'Zwiększa twoją siłę ataku o 70 na 15 sek. (talent Druida)',
   'entities.abilities.bladestorm.name': 'Burza Ostrzy',
@@ -11551,9 +12142,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Stajesz się wirującą burzą stali i przez 4 sek. co sekundę zadajesz {damage} pkt. obrażeń wszystkim wrogom w promieniu 6 m.',
   'entities.abilities.blink.description':
     'Teleportuje cię o 15 m do przodu i usuwa efekty unieruchomienia. (talent Maga)',
-  'entities.abilities.bloodlust.description': 'Zwiększa szybkość ataku, rzucania i kanałowania sojuszników z drużyny albo rajdu w promieniu 30 m o 30% na 15 s. Objęci sojusznicy nie mogą przez 10 min ponownie skorzystać z Bębnów Wojny ani z Przyspieszenia czasu. (Talent szamana)',
-  'entities.abilities.chain_lightning.description': 'Uderza do 3 wrogów w promieniu 10 m za {damage} obrażeń od natury każdego. Żywioły: trafienie daje 1 Grom. Obrażenia rosną z mocą zaklęć.',
-  'entities.abilities.chaos_bolt.description': 'Wydaje 3 Spustoszenia, by cisnąć ciężkim pociskiem chaotycznego ognia zadającym {damage} obrażeń od ognia. Ruina skraca jego rzucanie o 30%.',
+  'entities.abilities.bloodlust.description':
+    'Zwiększa szybkość ataku, rzucania i kanałowania sojuszników z drużyny albo rajdu w promieniu 30 m o 30% na 15 s. Objęci sojusznicy nie mogą przez 10 min ponownie skorzystać z Bębnów Wojny ani z Przyspieszenia czasu. (Talent szamana)',
+  'entities.abilities.chain_lightning.description':
+    'Uderza do 3 wrogów w promieniu 10 m za {damage} obrażeń od natury każdego. Żywioły: trafienie daje 1 Grom. Obrażenia rosną z mocą zaklęć.',
+  'entities.abilities.chaos_bolt.description':
+    'Wydaje 3 Spustoszenia, by cisnąć ciężkim pociskiem chaotycznego ognia zadającym {damage} obrażeń od ognia. Ruina skraca jego rzucanie o 30%.',
   'entities.abilities.cloak_of_shadows.description':
     'Otacza cię cieniami i pochłania 420 obrażeń przez 5 sek. (talent Łotrzyka)',
   'entities.abilities.cone_of_cold.description':
@@ -11566,21 +12160,24 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Congela profundamente a cel, inflige {damage} de daño de Mrozu y lo aturde durante 4 s. (talent maga)',
   'entities.abilities.deterrence.description':
     'Zwiększa twoją szansę na unik o 50 punktów procentowych na 10 sek. (talent Łowcy)',
-  'entities.abilities.earthbind.description': 'Unieruchamia wrogów w promieniu 4 m od punktu celu na 2 s, a następnie spowalnia ich o 40% na 6 s. (Talent szamana)',
+  'entities.abilities.earthbind.description':
+    'Unieruchamia wrogów w promieniu 4 m od punktu celu na 2 s, a następnie spowalnia ich o 40% na 6 s. (Talent szamana)',
   'entities.abilities.evocation.description':
     'Kanalizujesz przez 6 sek.: co sekundę przywracasz 100 many i zyskujesz 8 mocy zaklęć. Premia kumuluje się podczas kanalizowania i trwa 15 sek. (talent maga)',
   'entities.abilities.frenzied_regeneration.description':
     'Przywraca 40% maksymalnego zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)',
   'entities.abilities.frost_trap.description':
     'Zamraża wrogów w wybranym obszarze na 3 sek., uniemożliwiając im ruch i działanie. (talent Łowcy)',
-  'entities.abilities.hammer_of_wrath.description': 'Ciska świętym młotem za {damage} obrażeń i generuje 1 Oddanie. Użyteczny poniżej 20% zdrowia albo podczas Boskiego Wzniesienia lub Mściwego gniewu. Gniew Świtu daje dodatkowe rzucenie przeciw dowolnemu celowi, które ignoruje trwający czas odnowienia i zadaje o 20% więcej obrażeń. Wzniesienie zwiększa jego obrażenia o 30%.',
+  'entities.abilities.hammer_of_wrath.description':
+    'Ciska świętym młotem za {damage} obrażeń i generuje 1 Oddanie. Użyteczny poniżej 20% zdrowia albo podczas Boskiego Wzniesienia lub Mściwego gniewu. Gniew Świtu daje dodatkowe rzucenie przeciw dowolnemu celowi, które ignoruje trwający czas odnowienia i zadaje o 20% więcej obrażeń. Wzniesienie zwiększa jego obrażenia o 30%.',
   'entities.abilities.healing_stream.description':
     'Przywraca sojuszniczemu celowi 120 zdrowia przez 12 sek. (talent Szamana)',
   'entities.abilities.howl_of_terror.description':
     'Przeraża pobliskich wrogów na maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)',
   'entities.abilities.ice_block.description':
     'Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)',
-  'entities.abilities.inner_focus.description': 'Sprawia, że twoje następne zaklęcie kapłana jest darmowe i nieprzerywalne. Trwa 60 s.',
+  'entities.abilities.inner_focus.description':
+    'Sprawia, że twoje następne zaklęcie kapłana jest darmowe i nieprzerywalne. Trwa 60 s.',
   'entities.abilities.innervate.description':
     'Żywe soki wzbierają w tobie przez 10 sek. i falami przywracają 20 twojego bieżącego zasobu: many, szału lub energii. Zmiana postaci ich nie przerywa. Sen, ogłuszenie lub zastój zatrzymują przepływ soków. (talent Druida)',
   'entities.abilities.mend_pet.name': 'Opatrunek',
@@ -11588,15 +12185,18 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Sana a przyjazny cel por {damage} durante 15 s. (talent łowcy)',
   'entities.abilities.meteor.description':
     'Przyzywa meteor na wybrany obszar, zadając {damage} obrażeń od Ognia. Następnie przez 6 sek. zadaje znajdującym się tam wrogom od 12 do 18 obrażeń od Ognia co 2 sek. (talent Maga)',
-  'entities.abilities.mind_sear.description': 'Kanałuje przez 3 s, zadając {damage} obrażeń od cienia co sekundę wrogom w promieniu 8 m od obszaru celu. Obrażenia rosną z mocą zaklęć. (Talent kapłana)',
+  'entities.abilities.mind_sear.description':
+    'Kanałuje przez 3 s, zadając {damage} obrażeń od cienia co sekundę wrogom w promieniu 8 m od obszaru celu. Obrażenia rosną z mocą zaklęć. (Talent kapłana)',
   'entities.abilities.multi_shot.description':
     'Wystrzeliwuje salwę w wybrany obszar, zadając wrogom w promieniu 8 m {damage} obrażeń fizycznych. (talent Łowcy)',
-  'entities.abilities.prayer_of_healing.description': 'Leczy sojuszników w promieniu 30 m o {damage}. Leczenie rośnie z mocą zaklęć. (Świętość)',
+  'entities.abilities.prayer_of_healing.description':
+    'Leczy sojuszników w promieniu 30 m o {damage}. Leczenie rośnie z mocą zaklęć. (Świętość)',
   'entities.abilities.preparation.description':
     'Kończy czas odnowienia Sprintu, Uniku i Zniknięcia. (talent Łotrzyka)',
   'entities.abilities.presence_of_mind.description':
     'Sprawia, że twoje następne zaklęcie z czasem rzucania jest natychmiastowe. Trwa 60 sek. (talent maga)',
-  'entities.abilities.psychic_scream.description': 'Przeraża wrogów w promieniu 8 m na maksymalnie 4 s. Obrażenia mogą przerwać efekt.',
+  'entities.abilities.psychic_scream.description':
+    'Przeraża wrogów w promieniu 8 m na maksymalnie 4 s. Obrażenia mogą przerwać efekt.',
   'entities.abilities.shadowstep.description':
     'Przechodzisz przez cienie do celu, sprzymierzeńca lub wroga, bez przerywania Zasłony zmierzchu. (talent Łotrzyka)',
   'entities.abilities.silence.description': 'Wycisza cel na 4 sek. (talent Kapłana)',
@@ -11611,8 +12211,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blazing_barrier.description':
     'Otaczasz się płomieniami, pochłaniając {damage} obrażeń przez 60 sek. (Ogień)',
   'entities.abilities.cold_snap.name': 'Zew zimy',
-  'entities.abilities.cold_snap.description':
-    'Kończy czas odnowienia Migotliwego kroku, Mroźnej zasłony i Większej niewidzialności. (talent maga)',
   'entities.abilities.greater_invisibility.name': 'Większa niewidzialność',
   'entities.abilities.hot_streak.name': 'Gorąca seria',
   'entities.abilities.hot_streak.description':
@@ -11663,7 +12261,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.emberwing_drake.name': 'Smok Żarolot',
   'entities.mobs.fen_sprite.name': 'Chochlik Mokradeł',
   'entities.mobs.fisher_bram.name': 'Rybak Bram',
-  'entities.mobs.frostmane_yeti.name': 'Yeti Szronogrzywy',
   'entities.mobs.gale_wisp.name': 'Wisp Wichru',
   'entities.mobs.gilded_stag.name': 'Złocony Jeleń',
   'entities.mobs.gleamstag.name': 'Lśniący Jeleń',
@@ -11672,7 +12269,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gloam_strider.name': 'Wędrowiec Mroku',
   'entities.mobs.gravedigger_mosley.name': 'Grabarz Mosley',
   'entities.mobs.gravenbark_shambler.name': 'Grobowy Wleczysty',
-  'entities.mobs.harvest_sprite.name': 'Chochlik Żniw',
   'entities.mobs.hedge_gnome.name': 'Gnom Żywopłotowy',
   'entities.mobs.hedge_knight.name': 'Rycerz Zamku Brzasku',
   'entities.mobs.ice_wisp.name': 'Wisp Lodu',
@@ -11682,7 +12278,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.moonfleece_grazer.name': 'Wypasacz Księżycowego Runa',
   'entities.mobs.moor_ram.name': 'Baran Wrzosowisk',
   'entities.mobs.mushroom_pixie.name': 'Chochlik Lśniącego Ludu',
-  'entities.mobs.nightkin_stargazer.name': 'Nocny Obserwator Gwiazd',
   'entities.mobs.old_marrowshell.name': 'Stary Szpikoskorupiec',
   'entities.mobs.orchard_treant.name': 'Drzewiec Sadu',
   'entities.mobs.pale_huntsman.name': 'Blady Łowca',
@@ -11875,7 +12470,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.body':
     'Twoja grupa pokonała heroiczną próbę, gdy walczyłeś na tyłach lub leżałeś pokonany. Twoja blokada również została zapisana, dlatego należna część heroicznych znaków trafiła tutaj, zamiast przepaść. Dobrze je wykorzystaj.\n\n- Heroiczny kwatermistrz',
   'guide.dungeonsPage.resetTitle': 'Resetowanie instancji',
-  'guide.dungeonsPage.resetBody': 'Zmień poziom trudności, gdy twoja drużyna wciąż trzyma zajęte przejścia, a stare zajęcia pozostaną chwilę, zanim same puszczą. Przywódca drużyny może zamiast tego puścić je od razu: wybierzcie Zresetuj wszystkie instancje w menu własnego portretu albo wpiszcie /dungeon reset. Reset działa dopiero po faktycznej zmianie trudności, tylko dopóki nikt, żywy ani poległy, nie został w środku, tylko gdy każde zwłoki tam w środku zostały doszczętnie ograbione, a jeden reset od następnego dzieli krótki czas odnowienia. Przyjdziecie pod drzwi ze złą trudnością, a gra powie o tym, zanim przejście się zacznie. Rajd nigdy nie resetuje się w ten sposób; obowiązują jego własne reguły blokad.',
+  'guide.dungeonsPage.resetBody':
+    'Zmień poziom trudności, gdy twoja drużyna wciąż trzyma zajęte przejścia, a stare zajęcia pozostaną chwilę, zanim same puszczą. Przywódca drużyny może zamiast tego puścić je od razu: wybierzcie Zresetuj wszystkie instancje w menu własnego portretu albo wpiszcie /dungeon reset. Reset działa dopiero po faktycznej zmianie trudności, tylko dopóki nikt, żywy ani poległy, nie został w środku, tylko gdy każde zwłoki tam w środku zostały doszczętnie ograbione, a jeden reset od następnego dzieli krótki czas odnowienia. Przyjdziecie pod drzwi ze złą trudnością, a gra powie o tym, zanim przejście się zacznie. Rajd nigdy nie resetuje się w ten sposób; obowiązują jego własne reguły blokad.',
   'guide.dungeonsPage.wildheartBody':
     'Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by zobaczyć, kto czeka na szczycie.',
   'guide.gear.itemLevelBody':
@@ -11896,7 +12492,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Następny Cios łupieżcy lub Okaleczające uderzenie nie kosztuje wściekłości',
   'hudChrome.auraEffect.revengeFree': 'Twój następny Odwet nie kosztuje wściekłości',
-  'hudChrome.auraEffect.victoryRush': 'Zryw zwycięstwa jest gotowy',
   'hudChrome.auraEffect.maxHpPct': 'Zwiększa maksymalne zdrowie o {pct}%',
   'hudChrome.statInfo.names.parry': 'Parowanie',
   'hudChrome.statInfo.desc.parry':
@@ -12009,7 +12604,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Słony Mech z Dalekiego Wybrzeża',
   'entities.items.fenway_mooring_line.name': 'Przecięta Lina Cumownicza',
   'entities.items.fountain_court_mantle.name': 'Płaszcz Dziedzińca Fontanny',
-  'entities.items.frostmane_mantle.name': 'Płaszcz Szronogrzywego',
   'entities.items.galecrest_ram_wool.name': 'Tłusta Wełna Barania',
   'entities.items.gallowmere_grave_candle.name': 'Nagrobna Świeca',
   'entities.items.gilded_sap_clot.name': 'Złocona Grudka Soku',
@@ -12284,7 +12878,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Strażniczka Domu Ogniska',
   'entities.npcs.hermit_okku.greeting':
     'Cicho teraz. Bębny liczą wszystko, co chodzi pod drzewami, a ciebie już policzyły.',
-  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.name': 'Okrim',
   'entities.npcs.hermit_okku.title': 'Człowiek, Który Wszedł',
   'entities.npcs.huntsman_deral.greeting':
     'Cicho teraz. Stado zna każdy dźwięk, jaki wydaje ta dolina, i ja też go znam.',
@@ -12336,7 +12930,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.provisioner_fenna.greeting':
     'Chleb wciąż ciepły, woda wciąż słodka. Kotlina zaopatruje, i ja też.',
   'entities.npcs.provisioner_fenna.name': 'Zaopatrzeniowiec Fenna',
-  'entities.npcs.provisioner_fenna.title': 'Zaopatrzeniowiec Eldergleam',
+  'entities.npcs.provisioner_fenna.title': 'Zaopatrzeniowiec Eldershine',
   'entities.npcs.quartermaster_edda.greeting':
     'Stal i sól, {className}, to wszystko, co mi zostało do rozdania. Weź to i spraw, by wyłomy pożałowały, że otworzyły się tam, gdzie mogłam po nie sięgnąć.',
   'entities.npcs.quartermaster_edda.name': 'Kwatermistrzyni Edda',
@@ -12372,7 +12966,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.sexton_marrow.greeting':
     'Grzebiemy ich tu głęboko i bijemy w dzwony, by pamiętali, żeby zostać pod ziemią.',
   'entities.npcs.sexton_marrow.name': 'Grabarz Marrow',
-  'entities.npcs.sexton_marrow.title': 'Grabarz Gallowmere',
+  'entities.npcs.sexton_marrow.title': 'Grabarz Gibbetmere',
   'entities.npcs.strandwatcher_pell.greeting':
     'Nareszcie poza czarnymi drzewami. Odetchnij, obcy, słońce trzyma się po tej stronie przełęczy.',
   'entities.npcs.strandwatcher_pell.name': 'Strażniczka Wybrzeża Pell',
@@ -12419,7 +13013,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.widow_tansy.greeting':
     'Świeca na każdy grób, i żadna nie może zgasnąć. Żadna, słyszysz mnie?',
   'entities.npcs.widow_tansy.name': 'Wdowa Tansy',
-  'entities.npcs.widow_tansy.title': 'Świecarka z Gallowmere',
+  'entities.npcs.widow_tansy.title': 'Świecarka z Gibbetmere',
   'gatherEvent.ancientHeartwood': '{finder} ściął starożytną twardziel!',
   'gatherEvent.moonlitBloom': '{finder} odkrył rozkwit w świetle księżyca!',
   'gatherEvent.pristineVein': '{finder} trafił w nieskazitelną żyłę!',
@@ -12649,10 +13243,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.marketIndicator.aria': 'Przychody lub przedmioty z Rynku Świata czekają',
   'hudChrome.marketIndicator.tip':
     'Przychody ze sprzedaży lub zwrócone przedmioty czekają na ciebie u Kupca.',
-  'hudChrome.materialHint.arcaneDust':
-    'Składnik do zaklinania. Pozyskiwany z rozbrajania pospolitego i niezwykłego ekwipunku.',
-  'hudChrome.materialHint.arcaneEssence':
-    'Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiego ekwipunku.',
   'hudChrome.materialHint.arcaneShard':
     'Składnik do zaklinania. Pozyskiwany z rozbrajania epickiego i legendarnego ekwipunku.',
   'hudChrome.materialHint.resonantHide':
@@ -12814,7 +13404,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seraphic_vigil.description':
     'Chroni sojusznika przez 30 s. Pierwszy cios, który zepchnie go poniżej 35% zdrowia, zużywa Straż i leczy go za {buff}. (Sygnatura Błogosławieństwa)',
   'entities.abilities.scouring_mercy.description':
-    'Zadaje od 72 do 84 obrażeń Świętych wrogowi albo leczy sojuszniczy cel za 130 do 155. Obie wartości rosną wraz z mocą zaklęć. Obrażenia leczą także każdego sojusznika związanego Doktryną za 30% albo członka drużyny o najniższym zdrowiu za 15%, jeśli nikt nie jest związany. (Sygnatura Doktryny)',
+    'Zadaje {damage} obrażeń Świętych wrogowi albo leczy sojuszniczy cel o {healing}. Obrażenia rosną wraz z mocą zaklęć, a leczenie z mocą leczenia. Doktryna zamienia te obrażenia w leczenie poprzez twoje więzi. Jeśli żaden związany ranny członek drużyny nie znajduje się w promieniu 30 metrów, leczy rannego członka drużyny o najniższym zdrowiu w promieniu 30 metrów za 15% obrażeń. Wyleczenie członka drużyny leczy też do 2 innych rannych członków drużyny w promieniu 10 metrów od tego celu i w twojej linii wzroku, każdego za 50% przywróconego zdrowia. Te dodatkowe leczenia nie mogą być krytyczne ani tworzyć więzi Doktryny. (Sygnatura Doktryny)',
   'entities.abilities.solar_invocation.description':
     'Natychmiast leczy sojusznika za {damage} albo zadaje umiarkowane obrażenia Święte wrogowi. Oba zastosowania generują 1 Oddanie. Podczas Wzniesienia rzut leczący leczy także sojuszniczych graczy w promieniu 10 m od celu o połowę.',
   'entities.abilities.solar_step.description': 'Zwiększa twoją prędkość ruchu o 150% na 2 s.',
@@ -13396,7 +13986,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wskazuje wroga, którego działania i cierpienie będą zasilać twoje Potępienie.',
   'hud.pet.abyssalChain': 'Otchłanny łańcuch',
   'hud.pet.abyssalChainDesc':
-    'Rozkazuje Gloomshade\'owi przyciągnąć do siebie zwykłego wroga znajdującego się dalej niż 8 i nie dalej niż 20 metrów. Bossów nie można przyciągnąć. Czas odnowienia: 15 sekund. Kliknij prawym przyciskiem myszy, dotknij i przytrzymaj lub naciśnij Shift+Enter, aby przełączyć automatyczne rzucanie.',
+    "Rozkazuje Duskmurk'owi przyciągnąć do siebie zwykłego wroga znajdującego się dalej niż 8 i nie dalej niż 20 metrów. Bossów nie można przyciągnąć. Czas odnowienia: 15 sekund. Kliknij prawym przyciskiem myszy, dotknij i przytrzymaj lub naciśnij Shift+Enter, aby przełączyć automatyczne rzucanie.",
   'hud.pet.abyssalChainTitle': 'Otchłanny łańcuch',
   'hud.pet.autocastOff':
     'Automatyczne rzucanie wyłączone. Kliknij prawym przyciskiem myszy, dotknij i przytrzymaj lub naciśnij Shift+Enter, aby je włączyć.',
@@ -13459,14 +14049,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formMoonkin':
     'Postać księżycowej sowy: obrażenia zaklęć zwiększone o {pct}%, a pancerz o {armorPct}%',
   'hudChrome.auraEffect.formShadow': 'Postać cienia: obrażenia od Cienia zwiększone o {pct}%',
-  'hudChrome.auraEffect.freeExecute': 'Twoja następna dostępna zdolność dobijająca nic nie kosztuje',
+  'hudChrome.auraEffect.freeExecute':
+    'Twoja następna dostępna zdolność dobijająca nic nie kosztuje',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Funeral Harvest nie może jeszcze stworzyć kolejnego Odłamka Duszy',
   'hudChrome.auraEffect.galeheartWeapon':
     'Ukończenie {steps}-ciosowej kadencji Ducha Wojny odbija cios {count} razy za {pct}% jego obrażeń jako obrażenia od Natury',
   'hudChrome.auraEffect.healEcho': 'Spadek poniżej {threshold}% zdrowia przywraca {value} zdrowia',
-  'hudChrome.auraEffect.icicles':
-    '{value} z {max} Sopli; przy {max} można rzucić Lodowcowy kolec',
+  'hudChrome.auraEffect.icicles': '{value} z {max} Sopli; przy {max} można rzucić Lodowcowy kolec',
   'hudChrome.auraEffect.internalCooldown':
     'Ten efekt nie może się ponownie uruchomić, dopóki nie upłynie jego czas',
   'hudChrome.auraEffect.leadenHexLock':
@@ -13502,7 +14092,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'Ciosy jednocelowe trafiają też {targets} pobliskiego wroga za {pct}% obrażeń',
   'hudChrome.auraEffect.temporalEcho':
-    'Obrażenia od Arkanów rzucającego leczą cię za {singlePct}% obrażeń jednocelowych lub {areaPct}% obrażeń obszarowych',
+    'Obrażenia od Arkanów rzucającego leczą cię za {singlePct}% obrażeń jednocelowych lub {areaPct}% obrażeń obszarowych. Przypływ Eteru i Eteryczne Pociski otrzymują premię x4 przy indywidualnym Echu Czasu. Grupowe Echa tworzą równą rezerwę leczenia, rozdzielaną według brakującego zdrowia między naznaczonych sojuszników poniżej 60% zdrowia',
   'hudChrome.auraEffect.warlockAnchor':
     'Rzuć ponownie w promieniu {range} m, aby tu wrócić i zużyć kotwicę',
   'hudChrome.auraEffect.wintersChill':
@@ -13512,8 +14102,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.soulFragmentsMeter': 'Odłamki Duszy',
   'hudChrome.warlock.doomEmptyStatus': '{value} z {max} Potępienia.',
   'hudChrome.warlock.doomLabel': 'Potępienie',
-  'hudChrome.warlock.doomMeterLock': 'Zablokuj pasek zasobu Udręki',
-  'hudChrome.warlock.doomMeterUnlock': 'Przesuń pasek zasobu Udręki',
   'hudChrome.warlock.doomStatus': '{value} z {max} Potępienia; {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady':
     'Trzy Nici Przeznaczenia: Pochłonięcie może wpleść je w dodatkowe Potępienie.',
@@ -13734,9 +14322,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unpinAria': 'Odepnij {name}',
   'loading.tips.reliquary':
     'Wskazówka: Relikwiarz śledzi wyjątkowe łupy, które zbierasz, półka po półce.',
-  'guide.talentsPage.loadoutGearNote': 'Układ może nieść także twoje wyposażenie. Zapisz go pozycją, która proponuje zachować również wyposażenie, a odnotuje on i to, co miałeś na sobie, i właśnie to sprawia, że komplet PvP i komplet do lochów dzieli jedno kliknięcie zamiast szesnastu. Pamięta dokładny element, a nie tylko jego nazwę, więc zaczarowany pierścień nigdy nie zostaje po cichu podmieniony na zwykłego bliźniaka leżącego obok niego w torbach. To, czego nie znajdzie przy powrocie, zostaje po prostu w spokoju i zostaje zgłoszone, więc komplet, który stracił element na rzecz banku albo rynku, i tak zakłada całą resztę.',
-  'guide.thornhollowPage.backfillNote': 'Zajęcie miejsca na zmianę jest celowo pozbawione ryzyka: wchodzisz w wynik, w którym nie miałeś udziału, więc pojedynek nie tyka twojego rankingu w żadną stronę, przy wygranej czy przegranej, a opuszczenie takiego miejsca nic ci nie zabiera. Propozycja przestaje też przychodzić, gdy tylko pojedynek jest na tyle blisko końca, że przybycie nie mogłoby go zmienić, więc nigdy nie sadzają cię w cudzym zakończeniu.',
-  'guide.thornhollowPage.leavingBody': 'Opuszczenie trwającego pojedynku jest dezercją z niego, a rankingowa drabina nie może nagradzać wyciągania wtyczki przy przegrywającym wyniku: dezerter zabiera porażkę i idący z nią ranking na miejscu, upuszcza flagę, jeśli ją niósł, a jego drużyna walczy dalej w osłabieniu o jednego gracza. Właśnie do tego służy puste miejsce. Dopóki pojedynkowi brakuje wojownika, kolejka może zaproponować krzesło komuś, kto czeka, i zawsze jest to propozycja, którą przyjmujesz albo odrzucasz, a nie teleportacja, która ci się przydarza; odmowa nic cię nie kosztuje i przekazuje ją następnemu w kolejce. Pytani są tylko ci, którzy zgłosili się solo, więc drużyna, która zgłosiła się razem, nigdy nie zostaje rozdzielona, by załatać dziurę.',
+  'guide.talentsPage.loadoutGearNote':
+    'Układ może nieść także twoje wyposażenie. Zapisz go pozycją, która proponuje zachować również wyposażenie, a odnotuje on i to, co miałeś na sobie, i właśnie to sprawia, że komplet PvP i komplet do lochów dzieli jedno kliknięcie zamiast szesnastu. Pamięta dokładny element, a nie tylko jego nazwę, więc zaczarowany pierścień nigdy nie zostaje po cichu podmieniony na zwykłego bliźniaka leżącego obok niego w torbach. To, czego nie znajdzie przy powrocie, zostaje po prostu w spokoju i zostaje zgłoszone, więc komplet, który stracił element na rzecz banku albo rynku, i tak zakłada całą resztę.',
+  'guide.thornhollowPage.backfillNote':
+    'Zajęcie miejsca na zmianę jest celowo pozbawione ryzyka: wchodzisz w wynik, w którym nie miałeś udziału, więc pojedynek nie tyka twojego rankingu w żadną stronę, przy wygranej czy przegranej, a opuszczenie takiego miejsca nic ci nie zabiera. Propozycja przestaje też przychodzić, gdy tylko pojedynek jest na tyle blisko końca, że przybycie nie mogłoby go zmienić, więc nigdy nie sadzają cię w cudzym zakończeniu.',
+  'guide.thornhollowPage.leavingBody':
+    'Opuszczenie trwającego pojedynku jest dezercją z niego, a rankingowa drabina nie może nagradzać wyciągania wtyczki przy przegrywającym wyniku: dezerter zabiera porażkę i idący z nią ranking na miejscu, upuszcza flagę, jeśli ją niósł, a jego drużyna walczy dalej w osłabieniu o jednego gracza. Właśnie do tego służy puste miejsce. Dopóki pojedynkowi brakuje wojownika, kolejka może zaproponować krzesło komuś, kto czeka, i zawsze jest to propozycja, którą przyjmujesz albo odrzucasz, a nie teleportacja, która ci się przydarza; odmowa nic cię nie kosztuje i przekazuje ją następnemu w kolejce. Pytani są tylko ci, którzy zgłosili się solo, więc drużyna, która zgłosiła się razem, nigdy nie zostaje rozdzielona, by załatać dziurę.',
   'guide.thornhollowPage.leavingHeading': 'Wcześniejsze wyjście i zajmowanie pustego miejsca',
   'hudChrome.bags.itemAriaLocked': '{item}, liczba {count}, zablokowane',
   'hudChrome.bags.itemLockedLine': 'Zablokowane',
@@ -13744,87 +14335,128 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.unlockItem': 'Odblokuj przedmiot',
   'hudChrome.crafting.reagentLocked': 'Odczynnik do tego jest zablokowany.',
   'hudChrome.enchanting.salvageLocked': 'Ten przedmiot jest zablokowany.',
-  'hudChrome.otaUpdate.applying': 'Aktualizacja pobrana. Gra zostanie uruchomiona ponownie, aby ją zastosować.',
+  'hudChrome.otaUpdate.applying':
+    'Aktualizacja pobrana. Gra zostanie uruchomiona ponownie, aby ją zastosować.',
   'hudChrome.otaUpdate.continueAnyway': 'Kontynuuj bez aktualizacji',
   'hudChrome.otaUpdate.downloading': 'Pobieranie aktualizacji: {percent}',
-  'hudChrome.otaUpdate.incompatible': 'Do gry wymagana jest aktualizacja. Zostanie zastosowana zaraz po zakończeniu pobierania.',
+  'hudChrome.otaUpdate.incompatible':
+    'Do gry wymagana jest aktualizacja. Zostanie zastosowana zaraz po zakończeniu pobierania.',
   'hudChrome.otaUpdate.progressLabel': 'Postęp pobierania aktualizacji',
   'hudChrome.otaUpdate.title': 'Aktualizacja gry',
   'apiError.cheater_mark.admin_target': 'Kont operatorów nie można oznaczać.',
   'apiError.cheater_mark.reason_required': 'Wymagane jest podanie powodu.',
-  'apiError.cheater_mark.invalid_duration': 'Podaj czas trwania oznaczenia wynoszący co najmniej jedną sekundę.',
+  'apiError.cheater_mark.invalid_duration':
+    'Podaj czas trwania oznaczenia wynoszący co najmniej jedną sekundę.',
   'apiError.cheater_mark.not_marked': 'To konto nie jest oznaczone.',
   'auth.shareTab': 'Udostępnij',
   'auth.designCode': 'Kod wyglądu',
-  'auth.designCodeHint': 'Skopiuj ten kod, aby zapisać lub udostępnić ten wygląd. Wklej tutaj kod i zaimportuj go, aby wczytać wygląd.',
+  'auth.designCodeHint':
+    'Skopiuj ten kod, aby zapisać lub udostępnić ten wygląd. Wklej tutaj kod i zaimportuj go, aby wczytać wygląd.',
   'auth.copyCode': 'Kopiuj kod',
   'auth.importCode': 'Importuj',
   'auth.designCodeCopied': 'Kod wyglądu skopiowany.',
-  'auth.designCodeCopyManual': 'Automatyczne kopiowanie jest tutaj zablokowane. Kod jest zaznaczony; skopiuj go za pomocą klawiatury.',
+  'auth.designCodeCopyManual':
+    'Automatyczne kopiowanie jest tutaj zablokowane. Kod jest zaznaczony; skopiuj go za pomocą klawiatury.',
   'auth.designCodeImported': 'Wygląd zaimportowany.',
-  'auth.designCodeImportedPartial': 'Wygląd zaimportowany. Wartości nieznane tej wersji zostały pominięte.',
+  'auth.designCodeImportedPartial':
+    'Wygląd zaimportowany. Wartości nieznane tej wersji zostały pominięte.',
   'auth.designCodeErrEmpty': 'Najpierw wklej kod wyglądu.',
   'auth.designCodeErrHeader': 'To nie wygląda na kod wyglądu.',
   'auth.designCodeErrVersion': 'Ten kod wyglądu pochodzi z nowszej wersji gry.',
-  'auth.designCodeErrMalformed': 'Ten kod wyglądu jest uszkodzony. Skopiuj cały kod i spróbuj ponownie.',
+  'auth.designCodeErrMalformed':
+    'Ten kod wyglądu jest uszkodzony. Skopiuj cały kod i spróbuj ponownie.',
   'hudChrome.nameplate.cheaterTag': '< Oszust >',
   'hud.options.displayMode': 'Tryb wyświetlania',
   'hud.options.displayModeBorderless': 'Pełny ekran bez obramowania',
   'hud.options.displayModeWindowed': 'Okno',
   'hudChrome.options.discordPresence': 'Rozbudowana obecność w Discordzie',
-  'hudChrome.options.discordPresenceNote': 'Pokazuje jako twoją aktywność na Discordzie strefę, w której się znajdujesz, oraz czas trwania tej sesji gry, a każdy, kto widzi twój profil Discord, może zobaczyć oba te elementy. Udostępniane są wyłącznie nazwa strefy, czas sesji i nazwa gry, nigdy twoja postać, konto ani osoby, z którymi grasz. Wymaga uruchomionej aplikacji Discord na tym komputerze.',
+  'hudChrome.options.discordPresenceNote':
+    'Pokazuje jako twoją aktywność na Discordzie strefę, w której się znajdujesz, oraz czas trwania tej sesji gry, a każdy, kto widzi twój profil Discord, może zobaczyć oba te elementy. Udostępniane są wyłącznie nazwa strefy, czas sesji i nazwa gry, nigdy twoja postać, konto ani osoby, z którymi grasz. Wymaga uruchomionej aplikacji Discord na tym komputerze.',
   'hudChrome.options.forceHighPerfGpu': 'Użyj dedykowanej karty graficznej do gier',
-  'hudChrome.options.forceHighPerfGpuNote': 'Domyślnie włączone: aplikacja desktopowa prosi ten komputer o użycie dedykowanej karty graficznej do gier. Wyłącz tę opcję, jeśli gra się nie uruchamia, otwiera się na czarnym ekranie lub ekran laptopa gaśnie. Zmiana zacznie obowiązywać przy następnym uruchomieniu gry.',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Domyślnie włączone: aplikacja desktopowa prosi ten komputer o użycie dedykowanej karty graficznej do gier. Wyłącz tę opcję, jeśli gra się nie uruchamia, otwiera się na czarnym ekranie lub ekran laptopa gaśnie. Zmiana zacznie obowiązywać przy następnym uruchomieniu gry.',
   'desktop.notify.partyInviteBody': '{name} zaprasza cię do swojej drużyny.',
   'desktop.notify.partyInviteTitle': 'Zaproszenie do drużyny',
-  'desktop.notify.updateReadyBody': 'Uruchom ponownie World of ClaudeCraft, aby zastosować aktualizację.',
+  'desktop.notify.updateReadyBody':
+    'Uruchom ponownie World of ClaudeCraft, aby zastosować aktualizację.',
   'desktop.notify.updateReadyTitle': 'Aktualizacja {version} jest gotowa',
   'desktop.notify.updateReadyTitleNoVersion': 'Aktualizacja jest gotowa',
   'desktop.update.whatsNew': 'Zobacz w przeglądarce, co się zmieniło.',
-  'entities.abilities.challenging_roar.description': 'Złowieszczy ryk: każdy wróg w promieniu 10 jardów zostaje sprowokowany, a jego zagrożenie wobec ciebie wzrasta do poziomu jego najbardziej znienawidzonego wroga, przez co zostaje zmuszony do atakowania cię przez 3 sek. Tylko w postaci Bruina.',
+  'entities.abilities.challenging_roar.description':
+    'Złowieszczy ryk: każdy wróg w promieniu 10 jardów zostaje sprowokowany, a jego zagrożenie wobec ciebie wzrasta do poziomu jego najbardziej znienawidzonego wroga, przez co zostaje zmuszony do atakowania cię przez 3 sek. Tylko w postaci Bruina.',
   'entities.abilities.challenging_roar.name': 'Złowieszczy ryk',
-  'entities.abilities.cheap_shot.descriptionNoStealth': 'Uderz cel za {damage} obrażeń, ogłuszając go na 4 sekundy. Przyznaje 2 punkty combo.',
-  'gpuNotice.bodyDiscreteInactive': 'Gra nie korzysta z dedykowanej karty graficznej (do gier) i zamiast tego działa na oszczędnej karcie graficznej, przez co wydajność ucierpi. Zaktualizuj sterowniki karty graficznej, a następnie zrestartuj grę. W systemie Windows ustaw także grę na Wysoką wydajność w Ustawienia > System > Ekran > Grafika.',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Uderz cel za {damage} obrażeń, ogłuszając go na 4 sekundy. Przyznaje 2 punkty combo.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Gra nie korzysta z dedykowanej karty graficznej (do gier) i zamiast tego działa na oszczędnej karcie graficznej, przez co wydajność ucierpi. Zaktualizuj sterowniki karty graficznej, a następnie zrestartuj grę. W systemie Windows ustaw także grę na Wysoką wydajność w Ustawienia > System > Ekran > Grafika.',
+  'guide.profPages.faq.q3': 'Jaka jest różnica między plądrowaniem a zbieraniem tuszy?',
+  'guide.profPages.faq.q4': 'Dlaczego moja Kłoda Żelaznej Kory jest podpisana?',
+  'guide.profPages.faq.q5': 'Jak odwiązać zamówiony przedmiot i ile to kosztuje?',
+  'guide.profPages.faq.q6': 'Gdzie uczę się przepisów i ile kosztują?',
+  'guide.profPages.faq.q7': 'Dlaczego moje zbieranie nagle zwolniło?',
+  'guide.profPages.faq.q8': 'Czy mogę wytwarzać z dala od miasta?',
+  'guide.profPages.faq.a3':
+    'To dwie osobne czynności na tym samym ciele. Wszystko, co tusza zawiera, monety i łupy plus wszelkie zbieralne składniki, otwiera się w tym samym oknie, ale klawisz interakcji i Weź łup zabierają wyłącznie zwykły łup, który podąża za normalnymi zasadami łupów. Zbieranie to strona profesji, ściągająca materiały z samej tuszy, i następuje dopiero wtedy, gdy w tym oknie wybierzesz Zbierz.\n\nZbieranie odbywa się na zasadzie kto pierwszy, jednorazowe użycie: każda tusza może być zebrana dokładnie raz, przez tego, kto ją pierwszy zgłosi, także online. Twoje Priorytety Miasta kształtują to, co dostaniesz: stojąc w centrum miasta, możesz rozłożyć 10 punktów priorytetu na typy składników, na których ci zależy, a każdy priorytetowy składnik wylosuje lepszy poziom (co 5 punktów podnosi go o krok, co najwyżej dwa kroki) i da więcej (10 procent za punkt). Niepiorytetowane składniki nigdy nie są pogarszane.',
+  'guide.profPages.faq.a4':
+    'Trafiła ci się gratka. Mniej więcej 1 zbiór na 90 wyzwala rzadkie zdarzenie zbierackie (starożytne twarde drewno na drzewie, pierwotna żyła w rudzie, rozkwitły w blasku księżyca kwiat wśród ziół): mnoży plon pięć razy, podpisuje każdą jednostkę twoim imieniem i ogłasza znalezisko całej strefie. Rzut na rzadką lub lepszą jakość przy zwykłym zbiorze również podpisuje plon.\n\nPodpisane materiały warto zachować albo sprzedać drogo: trzymanie przy warsztacie dowolnej podpisanej kopii potrzebnego reagentu dodaje 2 punkty procentowe do szansy na arcydzieło. Pamiętaj tylko, że łączą się w stos wyłącznie z identycznie podpisanymi kopiami, więc zajmują własny slot w torbie.',
+  'guide.profPages.faq.a5':
+    'Podejdź do dowolnej stacji rzemieślniczej z przedmiotem w torbie i zapłać mistrzowi. Opłata zależy od jakości przedmiotu: 25 srebrnych za niepospolity, 1 złoty za rzadki, 4 złote za epicki; legendarny płaci stawkę epicką, a pospolity wyrób na zamówienie stawkę niepospolitą. Musi to być prawdziwa stacja: ruchoma stacja nigdy tej usługi nie oferuje.\n\nOpłata kupuje czysty zapis, nie lekarstwo: przedmiot pozostaje zamówieniem, więc wiąże się ponownie z tym, kto go otrzyma w następnej wymianie. Jeśli kilka związanych kopii dzieli stos, jedna kopia jest oddzielana i odwiązywana za każdą płatność.',
+  'guide.profPages.faq.a8':
+    'Częściowo. Dziewięć pospolitych przepisów polowych (startowa broń, pancerz, jedzenie i mikstury) wytwarza się wszędzie i o każdej porze, podobnie jak trzy przepisy kombinowane przysięgniętych par. Wszystko powyżej nich jest związane z typem stacji: kuźnia, kuchnie, apteka, garbarnia, warsztat tkacki lub narzędziownia, a żeby wyrób doszedł do skutku, musisz być w promieniu 20 jardów od stacji.\n\nPrzy 75 umiejętności w rzemiośle specjalizujesz się, a wraz z 20-procentową zniżką na materiały zyskujesz ruchomą stację: rozstaw ją w terenie, a stoi przez 10 minut, obsługując przepisy tego rzemiosła tak, jakbyś stał przy prawdziwej. Ruchoma stacja służy wyłącznie do wytwarzania: nauka przepisów i odwiązywanie zamówień zawsze wymagają prawdziwej stacji w mieście.',
+  'guide.profPages.craftProse.cooking.materialsBody':
+    'Wędkarstwo zaopatruje w charakterystyczne składniki, strefa po strefie: pstrąg lustrzany i okoń rzeczny z wód Doliny Wschodniego Strumienia, szczupak moczarowy i węgorz bagienny z Trzęsawiska Mokrzawia, pstrąg mroźnoskrzelny i karp Slatefin z Wyżyn Ciernistego Szczytu. Szczeble mieszają strefy swobodnie (darmowy szczebel już chce szczupaka moczarowego, środkowy mroźnoskrzelnego z Ciernistego Szczytu, a rzadka kolacja wplata z powrotem pstrąga lustrzanego z Doliny), więc kucharz, który łowi wszędzie tam, dokąd prowadzi droga, nigdy nie zostaje na sucho.\n\nStrona rzeźnicza schodzi ze zbieranych zwłok: Mięso z dziczyzny z dzików i ich krewnych, a przy rzadkim lub lepszym rzucie zbioru podpisane Pierwsze cięcie, centralny element wielkiej pieczeni. Zioła doprawiają lepsze dania, jedna Kłoda Jesionu Popiołowego wędzi węgorza, a Sól kuchenna kosztuje 8 miedzianych za woreczek na własnym straganie Marlowa.',
   // v0.40 release i18n fill.
-  "abilityUi.tooltip.anyTarget": "Wróg lub przyjazny cel",
-  "hudChrome.account.passwordSet": "Hasło ustawione. Możesz teraz zalogować się przy użyciu swojej nazwy użytkownika i hasła w dowolnym miejscu.",
-  "hudChrome.account.setPasswordHint": "To konto zostało utworzone przy użyciu opcji Zaloguj się za pomocą Apple lub Discord i nie ma jeszcze hasła. Ustaw, aby logować się na innych urządzeniach, takich jak aplikacje komputerowe na komputerach Mac i Windows lub w Internecie, oraz aby łączyć dodatkowe metody logowania.",
-  "hudChrome.account.setPasswordSubmit": "Ustaw hasło",
-  "hudChrome.account.setPasswordTitle": "Ustaw hasło",
-  "hudChrome.controller.cancelAction": "Anuluj / Wróć",
-  "hudChrome.controller.confirmAction": "Potwierdź / Wybierz",
-  "hudChrome.controller.crossHotbar": "Krzyżowy pasek Hotbar",
-  "hudChrome.controller.crossHotbarArrangeChord": "{bumper} + {button}",
-  "hudChrome.controller.crossHotbarCarrying": "Przenoszenie {action}: potwierdź w komórce, aby go umieścić, anuluj, aby odłożyć.",
-  "hudChrome.controller.crossHotbarDisplay": "Wyświetlacz słupkowy",
-  "hudChrome.controller.crossHotbarDisplayCompact": "Kompaktowy",
-  "hudChrome.controller.crossHotbarDisplayFull": "Pełny",
-  "hudChrome.controller.crossHotbarDisplayMinimal": "Tylko podczas trzymania",
-  "hudChrome.controller.crossHotbarEditHelp": "Przytrzymaj lewy zderzak i wciśnij górny przycisk na twarzy, aby ułożyć drążek z kontrolerem.",
-  "hudChrome.controller.crossHotbarEditHint": "Organizowanie: potwierdź odbiór z komórki lub księgi zaklęć i upuść na komórkę, anuluj czyści jedną.",
-  "hudChrome.controller.crossHotbarEnable": "Włącz krzyżowy pasek skrótów",
-  "hudChrome.controller.crossHotbarExpand": "Pasek skrótów Double Cross",
-  "hudChrome.controller.crossHotbarHelp": "Przytrzymaj spust, aby podświetlić osiem miejsc na pasku akcji na padzie kierunkowym i przyciskach twarzowych. Naciśnij drugi spust, aby przejść do drugiego zestawu.",
-  "hudChrome.controller.crossHotbarOwnsButtons": "Wyzwalacze i pad kierunkowy należą do krzyżowego paska skrótów, gdy jest on włączony, więc są ustawione poniżej, a nie tutaj.",
-  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
-  "hudChrome.controller.crossHotbarResetLayout": "Zresetuj krzyżowy pasek skrótów",
-  "hudChrome.controller.cycleHudAction": "Interfejs rowerowy",
-  "hudChrome.controller.cycleSetAction": "Zmień zestaw pasków skrótu",
-  "hudChrome.controller.subcommandsAction": "Podpolecenia / Mapa",
-  "hudChrome.options.showReliquaryTracker": "Pokaż narzędzie do śledzenia relikwiarzy",
-  "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch": "Kolekcje śmieci działają w długich ramkach",
-  "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch": "Długie klatki pochodzą z pracy poza wywołaniem zwrotnym renderowania",
-  "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild": "Kompilacje strumieniowania strefowego powodują problemy",
-  "hudChrome.perf.diagnostics.metrics.hitchesBuild": "strefa buduje {zoneBuilds} | poza kadrem {offFrame} | gc {gc}",
-  "hudChrome.reliquary.trackerToggleHideHint": "Ukryj narzędzie do śledzenia relikwiarza na ekranie",
-  "hudChrome.reliquary.trackerToggleLabel": "Śledzenie HUD-u",
-  "hudChrome.reliquary.trackerToggleShowHint": "Pokaż moduł śledzenia relikwiarzy na swoim ekranie",
-  "apiError.account.password_already_set": "To konto ma już hasło. Zamiast tego użyj opcji Zmień hasło.",
-  "entities.abilities.melting_acid.description": "Opryskuje cel żrącą trucizną, zadając {damage} obrażeń natury i zmniejszając jego pancerz o 5% na 12 sek.",
-  "entities.abilities.melting_acid.name": "Topniejący kwas",
-  "entities.abilities.nightshade_coating.description": "Pokrywa cel psianką, zadając {damage} obrażeń natury i redukując otrzymywane leczenie o 25% na 12 sek.",
-  "entities.abilities.nightshade_coating.name": "Powłoka Nocnego Cienia",
-  "guide.settingsPage.ifShowReliquaryTracker": "Czy moduł śledzenia Relikwiarza (przypięte strony i ich postęp) znajduje się na Twoim HUD-ie. Okno Relikwiarza ma pasujący przycisk oka, a przypięcie strony powoduje ponowne włączenie modułu śledzącego.",
+  'abilityUi.tooltip.anyTarget': 'Wróg lub przyjazny cel',
+  'hudChrome.account.passwordSet':
+    'Hasło ustawione. Możesz teraz zalogować się przy użyciu swojej nazwy użytkownika i hasła w dowolnym miejscu.',
+  'hudChrome.account.setPasswordHint':
+    'To konto zostało utworzone przy użyciu opcji Zaloguj się za pomocą Apple lub Discord i nie ma jeszcze hasła. Ustaw, aby logować się na innych urządzeniach, takich jak aplikacje komputerowe na komputerach Mac i Windows lub w Internecie, oraz aby łączyć dodatkowe metody logowania.',
+  'hudChrome.account.setPasswordSubmit': 'Ustaw hasło',
+  'hudChrome.account.setPasswordTitle': 'Ustaw hasło',
+  'hudChrome.controller.cancelAction': 'Anuluj / Wróć',
+  'hudChrome.controller.confirmAction': 'Potwierdź / Wybierz',
+  'hudChrome.controller.crossHotbar': 'Krzyżowy pasek Hotbar',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying':
+    'Przenoszenie {action}: potwierdź w komórce, aby go umieścić, anuluj, aby odłożyć.',
+  'hudChrome.controller.crossHotbarDisplay': 'Wyświetlacz słupkowy',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Kompaktowy',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Pełny',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Tylko podczas trzymania',
+  'hudChrome.controller.crossHotbarEditHelp':
+    'Przytrzymaj lewy zderzak i wciśnij górny przycisk na twarzy, aby ułożyć drążek z kontrolerem.',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Organizowanie: potwierdź odbiór z komórki lub księgi zaklęć i upuść na komórkę, anuluj czyści jedną.',
+  'hudChrome.controller.crossHotbarEnable': 'Włącz krzyżowy pasek skrótów',
+  'hudChrome.controller.crossHotbarExpand': 'Pasek skrótów Double Cross',
+  'hudChrome.controller.crossHotbarHelp':
+    'Przytrzymaj spust, aby podświetlić osiem miejsc na pasku akcji na padzie kierunkowym i przyciskach twarzowych. Naciśnij drugi spust, aby przejść do drugiego zestawu.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'Wyzwalacze i pad kierunkowy należą do krzyżowego paska skrótów, gdy jest on włączony, więc są ustawione poniżej, a nie tutaj.',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.controller.crossHotbarResetLayout': 'Zresetuj krzyżowy pasek skrótów',
+  'hudChrome.controller.cycleHudAction': 'Interfejs rowerowy',
+  'hudChrome.controller.cycleSetAction': 'Zmień zestaw pasków skrótu',
+  'hudChrome.controller.subcommandsAction': 'Podpolecenia / Mapa',
+  'hudChrome.options.showReliquaryTracker': 'Pokaż narzędzie do śledzenia relikwiarzy',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch':
+    'Kolekcje śmieci działają w długich ramkach',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch':
+    'Długie klatki pochodzą z pracy poza wywołaniem zwrotnym renderowania',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'Kompilacje strumieniowania strefowego powodują problemy',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild':
+    'strefa buduje {zoneBuilds} | poza kadrem {offFrame} | gc {gc}',
+  'hudChrome.reliquary.trackerToggleHideHint':
+    'Ukryj narzędzie do śledzenia relikwiarza na ekranie',
+  'hudChrome.reliquary.trackerToggleLabel': 'Śledzenie HUD-u',
+  'hudChrome.reliquary.trackerToggleShowHint': 'Pokaż moduł śledzenia relikwiarzy na swoim ekranie',
+  'apiError.account.password_already_set':
+    'To konto ma już hasło. Zamiast tego użyj opcji Zmień hasło.',
+  'entities.abilities.melting_acid.name': 'Topniejący kwas',
+  'entities.abilities.nightshade_coating.name': 'Powłoka Nocnego Cienia',
+  'guide.settingsPage.ifShowReliquaryTracker':
+    'Czy moduł śledzenia Relikwiarza (przypięte strony i ich postęp) znajduje się na Twoim HUD-ie. Okno Relikwiarza ma pasujący przycisk oka, a przypięcie strony powoduje ponowne włączenie modułu śledzącego.',
   // v0.41 release i18n fill.
   'entities.items.reins_rickshaw_mount.name': 'Spętane lejce: Spętana Kośćmi Riksza',
   'hudChrome.itemMenu.sell': 'Sprzedaj',
@@ -13854,20 +14486,30 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   // v0.41 release i18n fill (pl_PL autoFillable batch).
   'hud.core.mapMarkerLabels.bossAggressiveEnemy': 'Boss atakujący cię: {name}',
   'hud.core.mapMarkerLabels.bossEnemy': 'Boss: {name}',
-  'hud.errors.tradeWindowIneligible': 'Można to wymienić wyłącznie z graczami, z którymi ten przedmiot wypadł.',
+  'hud.errors.tradeWindowIneligible':
+    'Można to wymienić wyłącznie z graczami, z którymi ten przedmiot wypadł.',
   'hudChrome.actionBar.conflictAccept': 'Przypisz mimo to',
-  'hudChrome.actionBar.conflictBody': '{key} jest już przypisany do {other}. Przypisanie go do {action} usunie przypisanie {other}.',
+  'hudChrome.actionBar.conflictBody':
+    '{key} jest już przypisany do {other}. Przypisanie go do {action} usunie przypisanie {other}.',
   'hudChrome.actionBar.conflictTitle': 'Klawisz już przypisany',
   'hudChrome.actionBar.hideExtraBar': 'Ukryj pasek akcji',
   'hudChrome.actionBar.showExtraBar': 'Pokaż kolejny pasek akcji',
-  'hudChrome.auraEffect.makersBrand': 'Przez {duration} sek. każdy ładunek zwiększa obrażenia otrzymywane od Varkhula o {pct}%. Nakłada się maksymalnie {max} razy. Tankowie powinni się zmieniać przy {swap} ładunkach.',
-  'hudChrome.auraEffect.sharedPyre': 'Zadaje {total}% maksymalnego zdrowia każdego gracza, podzielone przez liczbę graczy wewnątrz kręgu ({perPlayer}% każdy przy {players} graczach).',
-  'hudChrome.auraEffect.varkhulCrucibleExposure': 'Blokowanie Promienia Tygla zadaje co sekundę rosnące obrażenia od maksymalnego zdrowia. Ładunki znikają 10 sekund po opuszczeniu promienia w trybie normalnym i po 60 sekundach w trybie heroicznym.',
-  'hudChrome.auraEffect.varkhulForgeLink': 'Przechwyć aktywny promień filaru, zanim dotrze do kuźni. Otwarte promienie dodają 6% żaru na sekundę. W trybie normalnym zablokowane promienie i nieaktywne filary chłodzą kuźnię; w trybie heroicznym żar nigdy nie spada. Przy 100% kuźnia ulega śmiertelnemu Stopieniu.',
-  'hudChrome.auraEffect.varkhulMoltenCore': 'Zanieś ten rdzeń do kuźni. Roztopiony Ciężar zadaje rosnące obrażenia co {interval} sek., od {min}% do {max}% maksymalnego zdrowia.',
-  'hudChrome.auraEffect.varkhulSentinelsGaze': 'Strażnik Żaru ściga cię. Trzymaj go z dala od rajdu, aż zostanie zniszczony.',
-  'hudChrome.auraEffect.varkhulSharedPyre': 'Zadaje {total}% maksymalnego zdrowia każdego gracza, podzielone między graczy wewnątrz kręgu ({perPlayer}% każdy przy {players} graczach). Każdy brakujący gracz zadaje też {missingPenalty}% maksymalnego zdrowia całemu rajdowi, w tym graczom wewnątrz kręgu.',
-  'hudChrome.bags.capacityPoolsAria': 'Zajęte miejsca w torbie: {used} z {total}. Przedmioty ogólne: {generalUsed} z {generalTotal}. Materiały: {materialsUsed} z {materialsTotal}.',
+  'hudChrome.auraEffect.makersBrand':
+    'Przez {duration} sek. każdy ładunek zwiększa obrażenia otrzymywane od Varkhula o {pct}%. Nakłada się maksymalnie {max} razy. Tankowie powinni się zmieniać przy {swap} ładunkach.',
+  'hudChrome.auraEffect.sharedPyre':
+    'Zadaje {total}% maksymalnego zdrowia każdego gracza, podzielone przez liczbę graczy wewnątrz kręgu ({perPlayer}% każdy przy {players} graczach).',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'Blokowanie Promienia Tygla zadaje co sekundę rosnące obrażenia od maksymalnego zdrowia. Ładunki znikają 10 sekund po opuszczeniu promienia w trybie normalnym i po 60 sekundach w trybie heroicznym.',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    'Przechwyć aktywny promień filaru, zanim dotrze do kuźni. Otwarte promienie dodają 6% żaru na sekundę. W trybie normalnym zablokowane promienie i nieaktywne filary chłodzą kuźnię; w trybie heroicznym żar nigdy nie spada. Przy 100% kuźnia ulega śmiertelnemu Stopieniu.',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    'Zanieś ten rdzeń do kuźni. Roztopiony Ciężar zadaje rosnące obrażenia co {interval} sek., od {min}% do {max}% maksymalnego zdrowia.',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    'Strażnik Żaru ściga cię. Trzymaj go z dala od rajdu, aż zostanie zniszczony.',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    'Zadaje {total}% maksymalnego zdrowia każdego gracza, podzielone między graczy wewnątrz kręgu ({perPlayer}% każdy przy {players} graczach). Każdy brakujący gracz zadaje też {missingPenalty}% maksymalnego zdrowia całemu rajdowi, w tym graczom wewnątrz kręgu.',
+  'hudChrome.bags.capacityPoolsAria':
+    'Zajęte miejsca w torbie: {used} z {total}. Przedmioty ogólne: {generalUsed} z {generalTotal}. Materiały: {materialsUsed} z {materialsTotal}.',
   'hudChrome.bags.poolGeneral': 'Ogólne: {used} z {total}',
   'hudChrome.bags.poolMaterials': 'Materiały: {used} z {total}',
   'hudChrome.bank.buyConfirmClaudium': 'Kup za {cost} Claudium',
@@ -13875,22 +14517,31 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.buyConfirmGold': 'Kup za {price}',
   'hudChrome.bank.buySlotsDualAria': 'Kup {count} miejsc za {price} lub {cost} Claudium',
   'hudChrome.bank.meterLabel': '{used} z {total} miejsc',
-  'hudChrome.bank.meterMaterialsNote': 'Miejsce wyłącznie na materiały z osadzonych toreb. Inne przedmioty nie mogą go używać.',
+  'hudChrome.bank.meterMaterialsNote':
+    'Miejsce wyłącznie na materiały z osadzonych toreb. Inne przedmioty nie mogą go używać.',
   'hudChrome.bank.meterPoolGeneral': 'Ogólne: {used} z {total}',
   'hudChrome.bank.meterPoolMaterials': 'Materiały: {used} z {total}',
-  'hudChrome.bank.meterPoolsAria': 'Zajęte miejsca w banku: {used} z {total}. Przedmioty ogólne: {generalUsed} z {generalTotal}. Materiały: {materialsUsed} z {materialsTotal}.',
-  'hudChrome.bank.priceChanged': 'Cena zmieniła się, zanim zakup został zakończony. Sprawdź odświeżoną cenę i potwierdź ponownie.',
+  'hudChrome.bank.meterPoolsAria':
+    'Zajęte miejsca w banku: {used} z {total}. Przedmioty ogólne: {generalUsed} z {generalTotal}. Materiały: {materialsUsed} z {materialsTotal}.',
+  'hudChrome.bank.priceChanged':
+    'Cena zmieniła się, zanim zakup został zakończony. Sprawdź odświeżoną cenę i potwierdź ponownie.',
   'hudChrome.bank.priceDisclaimer': 'Ceny mogą się zmieniać wraz z ekonomią gry.',
-  'hudChrome.bank.rungAlreadyGranted': 'Te miejsca są już przypisane do tej postaci. Nie zostałeś ponownie obciążony opłatą.',
-  'hudChrome.bank.rungApplyDeferred': 'Płatność zakończona. Miejsca zostaną zastosowane automatycznie przy następnym zalogowaniu tej postaci.',
+  'hudChrome.bank.rungAlreadyGranted':
+    'Te miejsca są już przypisane do tej postaci. Nie zostałeś ponownie obciążony opłatą.',
+  'hudChrome.bank.rungApplyDeferred':
+    'Płatność zakończona. Miejsca zostaną zastosowane automatycznie przy następnym zalogowaniu tej postaci.',
   'hudChrome.bank.rungDoesNotFit': 'Bank tej postaci nie pomieści kolejnego rozszerzenia.',
   'hudChrome.bank.rungFailed': 'Nie udało się zakończyć zakupu.',
-  'hudChrome.bank.rungGrantUnresolved': 'Płatność zakończona, ale miejsca nie mogły zostać jeszcze zastosowane. Zakup został zapisany, a wsparcie techniczne może dokończyć go za ciebie.',
-  'hudChrome.bank.rungGranted': 'Miejsca w banku zostały dodane. Bank tej postaci jest teraz większy.',
-  'hudChrome.bank.rungInProgress': 'Zakup dla tej postaci wciąż jest finalizowany. Spróbuj ponownie za chwilę.',
+  'hudChrome.bank.rungGrantUnresolved':
+    'Płatność zakończona, ale miejsca nie mogły zostać jeszcze zastosowane. Zakup został zapisany, a wsparcie techniczne może dokończyć go za ciebie.',
+  'hudChrome.bank.rungGranted':
+    'Miejsca w banku zostały dodane. Bank tej postaci jest teraz większy.',
+  'hudChrome.bank.rungInProgress':
+    'Zakup dla tej postaci wciąż jest finalizowany. Spróbuj ponownie za chwilę.',
   'hudChrome.bank.rungItemName': '{count} miejsc w banku',
   'hudChrome.bank.rungNotPurchasable': 'Tych miejsc w banku nie można teraz kupić.',
-  'hudChrome.bank.rungOutage': 'Nie udało się potwierdzić zakupu. Spróbuj ponownie za pomocą tego przycisku, a nie zostaniesz obciążony dwukrotnie. Ponowne wczytanie gry przed tym może utracić tę ochronę.',
+  'hudChrome.bank.rungOutage':
+    'Nie udało się potwierdzić zakupu. Spróbuj ponownie za pomocą tego przycisku, a nie zostaniesz obciążony dwukrotnie. Ponowne wczytanie gry przed tym może utracić tę ochronę.',
   'hudChrome.bank.socketEmpty': 'Puste gniazdo na torbę banku',
   'hudChrome.bank.socketEmptyHint': 'Kliknij torbę w swoich torbach, aby umieścić ją w banku',
   'hudChrome.bank.socketHint': 'Kliknij, aby osadzić tę torbę w banku',
@@ -13908,10 +14559,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultDepositAllDone': 'Zdeponowane materiały: {count}.',
   'hudChrome.bank.vaultDepositAllFull': 'Zdeponowane materiały: {count}. Niektóre limity są pełne.',
   'hudChrome.bank.vaultDepositAllNone': 'Limity skarbca pełne: niczego nie zdeponowano.',
-  'hudChrome.bank.vaultDepositAllTooltip': 'Wysyła wszystkie materiały z twoich toreb do skarbca za jednym razem, wypełniając każdy materiał aż do jego limitu. Ekwipunek, narzędzia, przedmioty zadań i konsumpcyjne nigdy nie są ruszane.',
+  'hudChrome.bank.vaultDepositAllTooltip':
+    'Wysyła wszystkie materiały z twoich toreb do skarbca za jednym razem, wypełniając każdy materiał aż do jego limitu. Ekwipunek, narzędzia, przedmioty zadań i konsumpcyjne nigdy nie są ruszane.',
   'hudChrome.bank.vaultDepositHint': 'Kliknij, aby zdeponować w skarbcu',
-  'hudChrome.bank.vaultEmpty': 'Twój skarbiec jest pusty. Kliknij materiał w swoich torbach, aby go zdeponować.',
-  'hudChrome.bank.vaultLockedIntro': 'Odblokuj Skarbiec Materiałów, aby gromadzić materiały rzemieślnicze obok swojego banku. Każdy materiał ma swoje własne miejsce, aż do {cap} sztuk każdy.',
+  'hudChrome.bank.vaultEmpty':
+    'Twój skarbiec jest pusty. Kliknij materiał w swoich torbach, aby go zdeponować.',
+  'hudChrome.bank.vaultLockedIntro':
+    'Odblokuj Skarbiec Materiałów, aby gromadzić materiały rzemieślnicze obok swojego banku. Każdy materiał ma swoje własne miejsce, aż do {cap} sztuk każdy.',
   'hudChrome.bank.vaultRowAria': '{item}: przechowywane {count} z {cap}',
   'hudChrome.bank.vaultRowWithdrawName': 'Wyjmij {item}',
   'hudChrome.bank.vaultTab': 'Skarbiec',
@@ -13928,7 +14582,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.actionBar2Vertical': 'Pionowy pasek akcji 2',
   'hudChrome.interfaceUnlock.actionBar3Vertical': 'Pionowy pasek akcji 3',
   'hudChrome.interfaceUnlock.actionBarsVertical': 'Pionowe paski akcji',
-  'hudChrome.interfaceUnlock.barsNote': 'Podczas edycji widoczne są tylko włączone paski akcji. Aby dodać więcej pasków, najpierw dodaj je przyciskami plus i minus na głównym pasku akcji.',
+  'hudChrome.interfaceUnlock.barsNote':
+    'Podczas edycji widoczne są tylko włączone paski akcji. Aby dodać więcej pasków, najpierw dodaj je przyciskami plus i minus na głównym pasku akcji.',
   'hudChrome.interfaceUnlock.buffsLeftToRight': 'Wzmocnienia od lewej do prawej',
   'hudChrome.interfaceUnlock.debuffsLeftToRight': 'Osłabienia od lewej do prawej',
   'hudChrome.interfaceUnlock.frameNames.actionBar1': 'Pasek akcji',
@@ -13946,8 +14601,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.targetFrame': 'Cel',
   'hudChrome.interfaceUnlock.frameNames.xpBar': 'Pasek doświadczenia',
   'hudChrome.interfaceUnlock.framesMenu': 'Ustawienia ramek',
-  'hudChrome.interfaceUnlock.framesMenuTitle': 'Pokazuj lub ukrywaj poszczególne ramki. Odznaczona ramka pozostaje ukryta, dopóki jej ponownie nie zaznaczysz albo nie przywrócisz ustawień domyślnych.',
-  'hudChrome.interfaceUnlock.frozenNote': 'Podczas edycji interfejs i kamera są zablokowane: przyciski i ramki stają się nieruchomymi obrazami do rozmieszczenia, a kliknięcia nie docierają do świata gry.',
+  'hudChrome.interfaceUnlock.framesMenuTitle':
+    'Pokazuj lub ukrywaj poszczególne ramki. Odznaczona ramka pozostaje ukryta, dopóki jej ponownie nie zaznaczysz albo nie przywrócisz ustawień domyślnych.',
+  'hudChrome.interfaceUnlock.frozenNote':
+    'Podczas edycji interfejs i kamera są zablokowane: przyciski i ramki stają się nieruchomymi obrazami do rozmieszczenia, a kliknięcia nie docierają do świata gry.',
   'hudChrome.interfaceUnlock.label': 'Edytuj ramki',
   'hudChrome.interfaceUnlock.lock': 'Zablokuj interfejs',
   'hudChrome.interfaceUnlock.lockAll': 'Zablokuj interfejs',
@@ -13963,15 +14620,19 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.snapToGrid': 'Przyciągaj do siatki',
   'hudChrome.interfaceUnlock.unlock': 'Odblokuj interfejs',
   'hudChrome.interfaceUnlock.unlockFrame': 'Odblokuj tę ramkę',
-  'hudChrome.itemTooltip.partyTradeWindow': 'Możesz wymienić ten przedmiot z graczami, z którymi wypadł, jeszcze przez {time}. Założenie go kończy okno wymiany.',
-  'hudChrome.loot.bindConfirmBody': 'Ten łup zawiera przedmiot, który przywiąże się do ciebie, gdy go zabierzesz. Przywiązany przedmiot można wymienić wyłącznie z graczami, z którymi wypadł, i tylko przez ograniczony czas.',
+  'hudChrome.itemTooltip.partyTradeWindow':
+    'Możesz wymienić ten przedmiot z graczami, z którymi wypadł, jeszcze przez {time}. Założenie go kończy okno wymiany.',
+  'hudChrome.loot.bindConfirmBody':
+    'Ten łup zawiera przedmiot, który przywiąże się do ciebie, gdy go zabierzesz. Przywiązany przedmiot można wymienić wyłącznie z graczami, z którymi wypadł, i tylko przez ograniczony czas.',
   'hudChrome.loot.bindConfirmTitle': 'Przywiązuje się po podniesieniu',
   'hudChrome.options.alwaysShowAllBuffs': 'Zawsze pokazuj wszystkie wzmocnienia',
   'hudChrome.options.combineActionBars': 'Połącz paski akcji',
   'hudChrome.options.confirmVendorSell': 'Potwierdzaj przed sprzedażą',
-  'hudChrome.options.confirmVendorSellNote': 'Wyłączenie tego sprawia, że przedmioty sprzedają się jednym kliknięciem bez potwierdzenia, więc przesunięty slot w torbie może sprzedać niewłaściwy przedmiot.',
+  'hudChrome.options.confirmVendorSellNote':
+    'Wyłączenie tego sprawia, że przedmioty sprzedają się jednym kliknięciem bez potwierdzenia, więc przesunięty slot w torbie może sprzedać niewłaściwy przedmiot.',
   'hudChrome.options.touchPreciseAim': 'Precyzyjne celowanie naziemne',
-  'hudChrome.options.touchPreciseAimNote': 'Celuj przed rzuceniem zaklęć naziemnych. Wyłącz, aby rzucać natychmiast w sugerowany punkt.',
+  'hudChrome.options.touchPreciseAimNote':
+    'Celuj przed rzuceniem zaklęć naziemnych. Wyłącz, aby rzucać natychmiast w sugerowany punkt.',
   'hudChrome.partyFrames.optionsSection': 'Opcje ramek drużyny',
   'hudChrome.raidBossGuide.abilitiesHeading': 'Umiejętności',
   'hudChrome.raidBossGuide.abilityControlLabel': '{action}. {details}',
@@ -13989,58 +14650,96 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.flagInterruptible': 'Można przerwać',
   'hudChrome.raidBossGuide.flagsLabel': 'Ostrzeżenia o mechanikach',
   'hudChrome.raidBossGuide.heroic': 'Heroiczny',
-  'hudChrome.raidBossGuide.ignivar.apocalypse': 'Apokalipsa: pokonaj Wzywacza Popiołu Ignivara, zanim dokończy rzucanie.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    'Apokalipsa: pokonaj Wzywacza Popiołu Ignivara, zanim dokończy rzucanie.',
   'hudChrome.raidBossGuide.ignivar.apocalypseName': 'Apokalipsa',
-  'hudChrome.raidBossGuide.ignivar.apocalypseResponse': 'Przekieruj wszystkie dostępne obrażenia na Wzywacza Popiołu Ignivara i pokonaj go, zanim dokończy rzucanie.',
-  'hudChrome.raidBossGuide.ignivar.apocalypseSummary': 'Ignivar przyzywa Wzywacza Popiołu. Jeśli ten posiłek dokończy Apokalipsę, drużyna rajdowa zostaje natychmiast pokonana.',
-  'hudChrome.raidBossGuide.ignivar.brand': 'Piętno Stosu: rozejdźcie się. Wyceluj Płonący Nawał w gotowy kanał wodny, a potem przejdź przez wodę sam, aby się oczyścić.',
-  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse': 'Rozejdźcie się. Otwórz kanał Płonącym Nawałem i oczyszczaj oznaczonych graczy pojedynczo. Każde oczyszczenie wywołuje Odrzut Oczyszczenia obejmujący cały rajd.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    'Przekieruj wszystkie dostępne obrażenia na Wzywacza Popiołu Ignivara i pokonaj go, zanim dokończy rzucanie.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    'Ignivar przyzywa Wzywacza Popiołu. Jeśli ten posiłek dokończy Apokalipsę, drużyna rajdowa zostaje natychmiast pokonana.',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    'Piętno Stosu: rozejdźcie się. Wyceluj Płonący Nawał w gotowy kanał wodny, a potem przejdź przez wodę sam, aby się oczyścić.',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    'Rozejdźcie się. Otwórz kanał Płonącym Nawałem i oczyszczaj oznaczonych graczy pojedynczo. Każde oczyszczenie wywołuje Odrzut Oczyszczenia obejmujący cały rajd.',
   'hudChrome.raidBossGuide.ignivar.brandName': 'Piętno Stosu',
-  'hudChrome.raidBossGuide.ignivar.brandResponse': 'Rozejdźcie się. Wyceluj Płonący Nawał w gotowy kanał wodny, a potem niech każdy oznaczony gracz przejdzie przez aktywowaną wodę sam, aby się oczyścić.',
-  'hudChrome.raidBossGuide.ignivar.brandSummary': 'Ignivar znaczy graczy spoza roli tanka trwałymi obrażeniami od ognia. Naznaczeni gracze parzą też pobliskich sojuszników.',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    'Rozejdźcie się. Wyceluj Płonący Nawał w gotowy kanał wodny, a potem niech każdy oznaczony gracz przejdzie przez aktywowaną wodę sam, aby się oczyścić.',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    'Ignivar znaczy graczy spoza roli tanka trwałymi obrażeniami od ognia. Naznaczeni gracze parzą też pobliskich sojuszników.',
   'hudChrome.raidBossGuide.ignivar.chainsName': 'Łańcuchy Kuźni',
-  'hudChrome.raidBossGuide.ignivar.chainsResponse': 'Trzymaj się blisko powiązanego partnera, poruszajcie się razem i nie pozwalajcie innym graczom przechodzić przez wasz łańcuch.',
-  'hudChrome.raidBossGuide.ignivar.chainsSummary': 'Ignivar łączy pobliskie pary graczy. Zbytnie oddalenie się lub przecięcie łańcucha innej pary powoduje śmiertelne obrażenia.',
-  'hudChrome.raidBossGuide.ignivar.finale': 'Ostatnie Piekło: pokonaj Ignivara, zanim nastąpi nieunikniona klęska całej drużyny, podczas gdy szybsze meteory, ataki frontalne i Wirujące Piekło trwają nadal.',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    'Trzymaj się blisko powiązanego partnera, poruszajcie się razem i nie pozwalajcie innym graczom przechodzić przez wasz łańcuch.',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    'Ignivar łączy pobliskie pary graczy. Zbytnie oddalenie się lub przecięcie łańcucha innej pary powoduje śmiertelne obrażenia.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    'Ostatnie Piekło: pokonaj Ignivara, zanim nastąpi nieunikniona klęska całej drużyny, podczas gdy szybsze meteory, ataki frontalne i Wirujące Piekło trwają nadal.',
   'hudChrome.raidBossGuide.ignivar.forgeStrikeName': 'Uderzenie Kuźni',
-  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse': 'Tankowie zmieniają się przy {stacks} ładunkach. Uzdrowiciele przygotowują się na uderzenie i pierwsze ciosy wręcz nowego tanka.',
-  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary': 'Ignivar uderza obecnego tanka i nakłada Roztopioną Zbroję, zwiększającą obrażenia otrzymywane od Ignivara.',
-  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary': 'Rozszerzająca się ściana ognia przemierza arenę, zostawiając dwie przeciwległe luki i odrzucając trafionych graczy znacznie dalej.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    'Tankowie zmieniają się przy {stacks} ładunkach. Uzdrowiciele przygotowują się na uderzenie i pierwsze ciosy wręcz nowego tanka.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    'Ignivar uderza obecnego tanka i nakłada Roztopioną Zbroję, zwiększającą obrażenia otrzymywane od Ignivara.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    'Rozszerzająca się ściana ognia przemierza arenę, zostawiając dwie przeciwległe luki i odrzucając trafionych graczy znacznie dalej.',
   'hudChrome.raidBossGuide.ignivar.forgeWaveName': 'Fala Kuźni',
-  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse': 'Znajdź jedną z luk podczas zamachu, ustaw się w niej i unikaj odrzucenia w stronę krawędzi areny.',
-  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary': 'Rozszerzająca się ściana ognia przemierza arenę, zostawiając dwie przeciwległe luki i odrzucając trafionych graczy.',
-  'hudChrome.raidBossGuide.ignivar.heroic': 'Heroiczny: powiązani gracze trzymają się blisko podczas Łańcuchów Kuźni, Piętno pozostaje aktywne podczas Sądu, a Fala Kuźni odrzuca dalej.',
-  'hudChrome.raidBossGuide.ignivar.judgment': 'Sąd Kuźni: rozpoznaj unikalne schronienie podczas ostrzeżenia, a potem zbierzcie się w jego oznaczonych granicach, gdy podłoga stanie w ogniu.',
-  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary': 'Ignivar oznacza jedno bezpieczne schronienie, podczas gdy arena płonie. Piętno Stosu pozostaje aktywne i wciąż zadaje obrażenia pobliskim sojusznikom.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    'Znajdź jedną z luk podczas zamachu, ustaw się w niej i unikaj odrzucenia w stronę krawędzi areny.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    'Rozszerzająca się ściana ognia przemierza arenę, zostawiając dwie przeciwległe luki i odrzucając trafionych graczy.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    'Heroiczny: powiązani gracze trzymają się blisko podczas Łańcuchów Kuźni, Piętno pozostaje aktywne podczas Sądu, a Fala Kuźni odrzuca dalej.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    'Sąd Kuźni: rozpoznaj unikalne schronienie podczas ostrzeżenia, a potem zbierzcie się w jego oznaczonych granicach, gdy podłoga stanie w ogniu.',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    'Ignivar oznacza jedno bezpieczne schronienie, podczas gdy arena płonie. Piętno Stosu pozostaje aktywne i wciąż zadaje obrażenia pobliskim sojusznikom.',
   'hudChrome.raidBossGuide.ignivar.judgmentName': 'Sąd Kuźni',
-  'hudChrome.raidBossGuide.ignivar.judgmentResponse': 'Rozpoznaj unikalnie oznaczone schronienie podczas ostrzeżenia i zbierzcie się w pełni w jego granicach, zanim podłoga stanie w ogniu.',
-  'hudChrome.raidBossGuide.ignivar.judgmentSummary': 'Ignivar oznacza trzy schronienia, wskazuje jedno bezpieczne, a potem wielokrotnie podpala resztę areny.',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    'Rozpoznaj unikalnie oznaczone schronienie podczas ostrzeżenia i zbierzcie się w pełni w jego granicach, zanim podłoga stanie w ogniu.',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    'Ignivar oznacza trzy schronienia, wskazuje jedno bezpieczne, a potem wielokrotnie podpala resztę areny.',
   'hudChrome.raidBossGuide.ignivar.lastInfernoName': 'Ostatnie Piekło',
-  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse': 'Użyj pozostałych zdolności obrażeń i leczenia, wciąż wykonuj mechaniki ruchu i pokonaj Ignivara, zanim odliczanie dobiegnie końca.',
-  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary': 'Ignivar wpada w szał i szykuje nieuniknioną klęskę całej drużyny, podczas gdy Deszcz Popiołów, Płonący Nawał i Wirujące Piekło przyspieszają.',
-  'hudChrome.raidBossGuide.ignivar.movement': 'Ruch: unikaj stożków Deszczu Popiołów i meteorów, poruszaj się zgodnie z Wirującym Piekłem i korzystaj z dwóch luk Fali Kuźni.',
-  'hudChrome.raidBossGuide.ignivar.overview': 'Varkhul wykuł Ignivara jako herolda, żywą pieczęć i klucz do Inner Crucible. To starcie sprawdza kontrolę nad kanałami wodnymi, precyzyjny ruch oraz szybkie, priorytetowe obrażenia.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    'Użyj pozostałych zdolności obrażeń i leczenia, wciąż wykonuj mechaniki ruchu i pokonaj Ignivara, zanim odliczanie dobiegnie końca.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    'Ignivar wpada w szał i szykuje nieuniknioną klęskę całej drużyny, podczas gdy Deszcz Popiołów, Płonący Nawał i Wirujące Piekło przyspieszają.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    'Ruch: unikaj stożków Deszczu Popiołów i meteorów, poruszaj się zgodnie z Wirującym Piekłem i korzystaj z dwóch luk Fali Kuźni.',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    'Varkhul wykuł Ignivara jako herolda, żywą pieczęć i klucz do Inner Crucible. To starcie sprawdza kontrolę nad kanałami wodnymi, precyzyjny ruch oraz szybkie, priorytetowe obrażenia.',
   'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': 'Przerwa: Apokalipsa',
-  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary': 'Przy {health} zdrowia Ignivar przyzywa Wzywacza Popiołu, który próbuje zakończyć starcie.',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    'Przy {health} zdrowia Ignivar przyzywa Wzywacza Popiołu, który próbuje zakończyć starcie.',
   'hudChrome.raidBossGuide.ignivar.phaseFinaleName': 'Finał: Ostatnie Piekło',
-  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary': 'Przy {health} zdrowia Ignivar rozpoczyna ostatnią fazę spalania z nieprzekraczalnym czasem i szybciej powtarzającymi się mechanikami.',
-  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary': 'Przy {health} zdrowia Ignivar podpala arenę, a aktywne Piętna wciąż zagrażają pobliskim graczom wewnątrz schronienia.',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    'Przy {health} zdrowia Ignivar rozpoczyna ostatnią fazę spalania z nieprzekraczalnym czasem i szybciej powtarzającymi się mechanikami.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    'Przy {health} zdrowia Ignivar podpala arenę, a aktywne Piętna wciąż zagrażają pobliskim graczom wewnątrz schronienia.',
   'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': 'Sąd Kuźni',
-  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary': 'Przy {health} zdrowia Ignivar podpala arenę i ujawnia jedno bezpieczne schronienie spośród trzech.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    'Przy {health} zdrowia Ignivar podpala arenę i ujawnia jedno bezpieczne schronienie spośród trzech.',
   'hudChrome.raidBossGuide.ignivar.phaseOpeningName': 'Herold się budzi',
-  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary': 'Kontroluj Piętno Stosu za pomocą kanałów wodnych, radząc sobie jednocześnie z powtarzającym się atakiem frontalnym Ignivara, ogniem z nieba, wirującymi promieniami i rozszerzającą się Falą Kuźni.',
-  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary': 'Trzy ogniste sektory i oznaczone uderzenia meteorów zadają ekstremalne obrażenia graczom, którzy pozostają w ich zasięgu ostrzeżenia.',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    'Kontroluj Piętno Stosu za pomocą kanałów wodnych, radząc sobie jednocześnie z powtarzającym się atakiem frontalnym Ignivara, ogniem z nieba, wirującymi promieniami i rozszerzającą się Falą Kuźni.',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    'Trzy ogniste sektory i oznaczone uderzenia meteorów zadają ekstremalne obrażenia graczom, którzy pozostają w ich zasięgu ostrzeżenia.',
   'hudChrome.raidBossGuide.ignivar.rainName': 'Deszcz Popiołów',
-  'hudChrome.raidBossGuide.ignivar.rainResponse': 'Przesuń się w nieoznaczoną lukę i opuść każdy krąg meteoru przed uderzeniem.',
-  'hudChrome.raidBossGuide.ignivar.rainSummary': 'Trzy ogniste sektory i oznaczone uderzenia meteorów karzą graczy, którzy pozostają w ich zasięgu ostrzeżenia.',
-  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary': 'Wirujące ogniste promienie zataczają krąg wokół Ignivara i zadają dotkliwe, powtarzające się obrażenia przy kontakcie.',
+  'hudChrome.raidBossGuide.ignivar.rainResponse':
+    'Przesuń się w nieoznaczoną lukę i opuść każdy krąg meteoru przed uderzeniem.',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    'Trzy ogniste sektory i oznaczone uderzenia meteorów karzą graczy, którzy pozostają w ich zasięgu ostrzeżenia.',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    'Wirujące ogniste promienie zataczają krąg wokół Ignivara i zadają dotkliwe, powtarzające się obrażenia przy kontakcie.',
   'hudChrome.raidBossGuide.ignivar.raysName': 'Wirujące Piekło',
-  'hudChrome.raidBossGuide.ignivar.raysResponse': 'Poruszaj się razem z wolną przestrzenią między promieniami. Nie przecinaj promienia, nawet szybką zdolnością ruchu.',
-  'hudChrome.raidBossGuide.ignivar.raysSummary': 'Wirujące ogniste promienie zataczają krąg wokół Ignivara i wielokrotnie zadają obrażenia graczom, którzy ich dotkną.',
-  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary': 'Ignivar namierza gracza, a potem uwalnia niemal śmiertelny wybuch frontalny. Gotowy kanał wodny trafiony wybuchem staje się aktywny na krótki czas.',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    'Poruszaj się razem z wolną przestrzenią między promieniami. Nie przecinaj promienia, nawet szybką zdolnością ruchu.',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    'Wirujące ogniste promienie zataczają krąg wokół Ignivara i wielokrotnie zadają obrażenia graczom, którzy ich dotkną.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    'Ignivar namierza gracza, a potem uwalnia niemal śmiertelny wybuch frontalny. Gotowy kanał wodny trafiony wybuchem staje się aktywny na krótki czas.',
   'hudChrome.raidBossGuide.ignivar.searingTorrentName': 'Płonący Nawał',
-  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse': 'Wyceluj ostrzeżenie dokładnie w jeden gotowy kanał. Wszyscy pozostali opuszczają strefę frontalną, zanim rzucanie się zakończy.',
-  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary': 'Ignivar namierza gracza, a potem uwalnia szeroki wybuch frontalny. Gotowy kanał wodny trafiony wybuchem staje się aktywny na krótki czas.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    'Wyceluj ostrzeżenie dokładnie w jeden gotowy kanał. Wszyscy pozostali opuszczają strefę frontalną, zanim rzucanie się zakończy.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    'Ignivar namierza gracza, a potem uwalnia szeroki wybuch frontalny. Gotowy kanał wodny trafiony wybuchem staje się aktywny na krótki czas.',
   'hudChrome.raidBossGuide.normal': 'Normalny',
   'hudChrome.raidBossGuide.overviewHeading': 'Przegląd',
   'hudChrome.raidBossGuide.portraitAlt': 'Portret starcia z {boss}',
@@ -14052,68 +14751,115 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.title': 'Przewodnik po bossie',
   'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
-  'hudChrome.raidBossGuide.varkhul.anvil': 'Edykt Kowadła: Varkhul podchodzi do wielkiej kuźni i uderza w nią trzykrotnie, zadając obrażenia całemu rajdowi. W trybie heroicznym spadają też oznaczone meteory.',
-  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse': 'Rozprowadźcie oznaczone meteory z dala od grupy, podczas gdy uzdrowiciele i zdolności obronne pokrywają wszystkie {strikes} uderzenia.',
-  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary': 'Varkhul uderza w wielką kuźnię {strikes} razy, zadając coraz większe obrażenia całemu rajdowi, podczas gdy na graczy spadają oznaczone meteory.',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    'Edykt Kowadła: Varkhul podchodzi do wielkiej kuźni i uderza w nią trzykrotnie, zadając obrażenia całemu rajdowi. W trybie heroicznym spadają też oznaczone meteory.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    'Rozprowadźcie oznaczone meteory z dala od grupy, podczas gdy uzdrowiciele i zdolności obronne pokrywają wszystkie {strikes} uderzenia.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    'Varkhul uderza w wielką kuźnię {strikes} razy, zadając coraz większe obrażenia całemu rajdowi, podczas gdy na graczy spadają oznaczone meteory.',
   'hudChrome.raidBossGuide.varkhul.anvilName': 'Edykt Kowadła',
-  'hudChrome.raidBossGuide.varkhul.anvilResponse': 'Zgromadźcie się do leczenia rajdowego i użyjcie zdolności obronnych na ostatnie uderzenie.',
-  'hudChrome.raidBossGuide.varkhul.anvilSummary': 'Varkhul podchodzi do wielkiej kuźni i uderza w nią {strikes} razy, zadając coraz większe obrażenia całemu rajdowi.',
-  'hudChrome.raidBossGuide.varkhul.assembly': 'Zgromadzenie Mistrza: blokujcie oba promienie kuźni, zabijajcie każdą falę z portali, przerywajcie Wstrząs Tygla i nie pozwólcie Inżynierom Żaru leczyć Varkhula.',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse':
+    'Zgromadźcie się do leczenia rajdowego i użyjcie zdolności obronnych na ostatnie uderzenie.',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    'Varkhul podchodzi do wielkiej kuźni i uderza w nią {strikes} razy, zadając coraz większe obrażenia całemu rajdowi.',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    'Zgromadzenie Mistrza: blokujcie oba promienie kuźni, zabijajcie każdą falę z portali, przerywajcie Wstrząs Tygla i nie pozwólcie Inżynierom Żaru leczyć Varkhula.',
   'hudChrome.raidBossGuide.varkhul.assemblyName': 'Zgromadzenie Mistrza',
-  'hudChrome.raidBossGuide.varkhul.assemblyResponse': 'Podzielcie uwagę między kontrolę promieni a priorytetowe cele. Pokonajcie cały Legion Kuźni, zanim upłynie czas Zgromadzenia.',
-  'hudChrome.raidBossGuide.varkhul.assemblySummary': 'Varkhul staje się chroniony i rozpoczyna zgromadzenie na czas. Rajd musi pokonać każdą falę z portali, zanim kuźnia ukończy jego arcydzieło.',
-  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary': 'Aktywne promienie filarów rozgrzewają kuźnię, chyba że zablokuje je gracz. Blokujący otrzymują coraz większe obrażenia od Ekspozycji Tygla, a żar kuźni nigdy nie spada.',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    'Podzielcie uwagę między kontrolę promieni a priorytetowe cele. Pokonajcie cały Legion Kuźni, zanim upłynie czas Zgromadzenia.',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    'Varkhul staje się chroniony i rozpoczyna zgromadzenie na czas. Rajd musi pokonać każdą falę z portali, zanim kuźnia ukończy jego arcydzieło.',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    'Aktywne promienie filarów rozgrzewają kuźnię, chyba że zablokuje je gracz. Blokujący otrzymują coraz większe obrażenia od Ekspozycji Tygla, a żar kuźni nigdy nie spada.',
   'hudChrome.raidBossGuide.varkhul.beamName': 'Promień Tygla',
-  'hudChrome.raidBossGuide.varkhul.beamResponse': 'Stań między każdym aktywnym filarem a kuźnią, a potem zmieniajcie blokujących, zanim ekspozycja stanie się niebezpieczna. Osiągnięcie pełnego żaru powoduje śmiertelne Stopienie Kuźni.',
-  'hudChrome.raidBossGuide.varkhul.beamSummary': 'Aktywne promienie filarów rozgrzewają kuźnię, chyba że zablokuje je gracz. Blokujący otrzymują coraz większe obrażenia od Ekspozycji Tygla, natomiast zablokowane i nieaktywne promienie pozwalają żarowi opaść.',
-  'hudChrome.raidBossGuide.varkhul.forge': 'Filary kuźni: blokujcie aktywne promienie, zanim dosięgną kuźni, i zmieniajcie blokujących, gdy rośnie Ekspozycja Tygla. Pełny wskaźnik żaru powoduje Stopienie Kuźni.',
-  'hudChrome.raidBossGuide.varkhul.forgestorm': 'Burza Kuźni: obserwuj spadające meteory i opuszczaj każde oznaczone miejsce uderzenia, zanim spadnie każda z trzech fal.',
-  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary': 'Varkhul sprowadza {waves} kolejnych fal oznaczonych uderzeń meteorów, zadających ekstremalne obrażenia.',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    'Stań między każdym aktywnym filarem a kuźnią, a potem zmieniajcie blokujących, zanim ekspozycja stanie się niebezpieczna. Osiągnięcie pełnego żaru powoduje śmiertelne Stopienie Kuźni.',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    'Aktywne promienie filarów rozgrzewają kuźnię, chyba że zablokuje je gracz. Blokujący otrzymują coraz większe obrażenia od Ekspozycji Tygla, natomiast zablokowane i nieaktywne promienie pozwalają żarowi opaść.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    'Filary kuźni: blokujcie aktywne promienie, zanim dosięgną kuźni, i zmieniajcie blokujących, gdy rośnie Ekspozycja Tygla. Pełny wskaźnik żaru powoduje Stopienie Kuźni.',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    'Burza Kuźni: obserwuj spadające meteory i opuszczaj każde oznaczone miejsce uderzenia, zanim spadnie każda z trzech fal.',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    'Varkhul sprowadza {waves} kolejnych fal oznaczonych uderzeń meteorów, zadających ekstremalne obrażenia.',
   'hudChrome.raidBossGuide.varkhul.forgestormName': 'Burza Kuźni',
-  'hudChrome.raidBossGuide.varkhul.forgestormResponse': 'Obserwuj każdy nowy zestaw ostrzeżeń na ziemi i odsuń się, zanim ta fala spadnie. Nie wracaj na poprzednią pozycję bez sprawdzenia kolejnej fali.',
-  'hudChrome.raidBossGuide.varkhul.forgestormSummary': 'Varkhul sprowadza {waves} kolejnych fal oznaczonych uderzeń meteorów na całej arenie.',
-  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary': 'Varkhul uwalnia bardzo szeroki zamach frontalny, zadający niemal śmiertelne obrażenia od ognia wszystkim przed nim.',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    'Obserwuj każdy nowy zestaw ostrzeżeń na ziemi i odsuń się, zanim ta fala spadnie. Nie wracaj na poprzednią pozycję bez sprawdzenia kolejnej fali.',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    'Varkhul sprowadza {waves} kolejnych fal oznaczonych uderzeń meteorów na całej arenie.',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    'Varkhul uwalnia bardzo szeroki zamach frontalny, zadający niemal śmiertelne obrażenia od ognia wszystkim przed nim.',
   'hudChrome.raidBossGuide.varkhul.frontalName': 'Zamach Ojca Kuźni',
-  'hudChrome.raidBossGuide.varkhul.frontalResponse': 'Trzymaj Varkhula odwróconego od grupy i przejdź za niego, jak tylko pojawi się ostrzeżenie.',
-  'hudChrome.raidBossGuide.varkhul.frontalSummary': 'Varkhul uwalnia bardzo szeroki zamach frontalny, zadający ciężkie obrażenia od ognia wszystkim przed nim.',
-  'hudChrome.raidBossGuide.varkhul.heroic': 'Heroiczny: żar kuźni nigdy nie opada, Edykt Kowadła dodaje meteory, a ostatnia faza usuwa większość mechanik, skupiając się na Pożodze Świata.',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    'Trzymaj Varkhula odwróconego od grupy i przejdź za niego, jak tylko pojawi się ostrzeżenie.',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    'Varkhul uwalnia bardzo szeroki zamach frontalny, zadający ciężkie obrażenia od ognia wszystkim przed nim.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    'Heroiczny: żar kuźni nigdy nie opada, Edykt Kowadła dodaje meteory, a ostatnia faza usuwa większość mechanik, skupiając się na Pożodze Świata.',
   'hudChrome.raidBossGuide.varkhul.legionName': 'Legion Kuźni',
-  'hudChrome.raidBossGuide.varkhul.legionResponse': 'Przerywaj Wstrząs Tygla, zatrzymuj Protokół Naprawy i skupiaj się na każdym groźnym rzucającym, zanim oczyścisz pozostałe posiłki.',
-  'hudChrome.raidBossGuide.varkhul.legionSummary': 'Strażnicy Tygla rzucają Wstrząs Tygla, zwiększając żar kuźni, a Inżynierowie Żaru używają Protokołu Naprawy, aby leczyć Varkhula.',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    'Przerywaj Wstrząs Tygla, zatrzymuj Protokół Naprawy i skupiaj się na każdym groźnym rzucającym, zanim oczyścisz pozostałe posiłki.',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    'Strażnicy Tygla rzucają Wstrząs Tygla, zwiększając żar kuźni, a Inżynierowie Żaru używają Protokołu Naprawy, aby leczyć Varkhula.',
   'hudChrome.raidBossGuide.varkhul.makersBrandName': 'Piętno Twórcy',
-  'hudChrome.raidBossGuide.varkhul.makersBrandResponse': 'Tankowie zmieniają się przy {stacks} ładunkach. Uzdrowiciele przygotowują nadchodzącego tanka, zanim Varkhul zmieni cel.',
-  'hudChrome.raidBossGuide.varkhul.makersBrandSummary': 'Varkhul uderza obecnego tanka i nakłada narastający efekt zwiększający wszystkie obrażenia od niego otrzymywane.',
-  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary': 'Varkhul atakuje szybciej i zadaje więcej obrażeń, podczas gdy Pożoga Świata zastępuje większość wcześniejszych mechanik w ostatniej fazie spalania.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    'Tankowie zmieniają się przy {stacks} ładunkach. Uzdrowiciele przygotowują nadchodzącego tanka, zanim Varkhul zmieni cel.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    'Varkhul uderza obecnego tanka i nakłada narastający efekt zwiększający wszystkie obrażenia od niego otrzymywane.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    'Varkhul atakuje szybciej i zadaje więcej obrażeń, podczas gdy Pożoga Świata zastępuje większość wcześniejszych mechanik w ostatniej fazie spalania.',
   'hudChrome.raidBossGuide.varkhul.masterpieceName': 'Arcydzieło Uwolnione',
-  'hudChrome.raidBossGuide.varkhul.masterpieceResponse': 'Użyjcie pozostałych zdolności ofensywnych i obronnych i pokonajcie Varkhula, zanim ostateczne odliczanie dobiegnie końca.',
-  'hudChrome.raidBossGuide.varkhul.masterpieceSummary': 'Varkhul atakuje szybciej, zadaje więcej obrażeń i wielokrotnie podpala rajd, aż do ostatecznej klęski.',
-  'hudChrome.raidBossGuide.varkhul.orbs': 'Kule Żaru: oznaczeni gracze rozchodzą się do krawędzi pomieszczenia. Ich ogniste kałuże utrzymują się, a uwolnione kule przemierzają pomieszczenie.',
-  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary': 'Oznaczeni gracze spoza roli tanka zostawiają silnie obrażające, trwałe kałuże żaru i uwalniają niebezpieczne ogniste kule we wszystkich kierunkach. Rozżarzony Metal pochłania też otrzymywane leczenie.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    'Użyjcie pozostałych zdolności ofensywnych i obronnych i pokonajcie Varkhula, zanim ostateczne odliczanie dobiegnie końca.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    'Varkhul atakuje szybciej, zadaje więcej obrażeń i wielokrotnie podpala rajd, aż do ostatecznej klęski.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    'Kule Żaru: oznaczeni gracze rozchodzą się do krawędzi pomieszczenia. Ich ogniste kałuże utrzymują się, a uwolnione kule przemierzają pomieszczenie.',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    'Oznaczeni gracze spoza roli tanka zostawiają silnie obrażające, trwałe kałuże żaru i uwalniają niebezpieczne ogniste kule we wszystkich kierunkach. Rozżarzony Metal pochłania też otrzymywane leczenie.',
   'hudChrome.raidBossGuide.varkhul.orbsName': 'Kule Żaru',
-  'hudChrome.raidBossGuide.varkhul.orbsResponse': 'Zanieś każde oznaczenie do krawędzi pomieszczenia, oddziel kałuże, a potem unikaj kul przemierzających arenę. Uzdrowiciele powinni szybko usunąć pochłanianie.',
-  'hudChrome.raidBossGuide.varkhul.orbsSummary': 'Oznaczeni gracze spoza roli tanka zostawiają trwałe kałuże żaru i uwalniają ogniste kule we wszystkich kierunkach. Rozżarzony Metal pochłania też otrzymywane leczenie.',
-  'hudChrome.raidBossGuide.varkhul.overview': 'Varkhul uwięził umierający Last Spring, aby wykuć żywy metal, po czym stworzył Ignivara, by strzegł tej zbrodni. To starcie łączy indywidualne ustawianie się z kontrolą wielkiej kuźni obejmującą cały rajd.',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    'Zanieś każde oznaczenie do krawędzi pomieszczenia, oddziel kałuże, a potem unikaj kul przemierzających arenę. Uzdrowiciele powinni szybko usunąć pochłanianie.',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    'Oznaczeni gracze spoza roli tanka zostawiają trwałe kałuże żaru i uwalniają ogniste kule we wszystkich kierunkach. Rozżarzony Metal pochłania też otrzymywane leczenie.',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    'Varkhul uwięził umierający Last Spring, aby wykuć żywy metal, po czym stworzył Ignivara, by strzegł tej zbrodni. To starcie łączy indywidualne ustawianie się z kontrolą wielkiej kuźni obejmującą cały rajd.',
   'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': 'Przerwa: Zgromadzenie Mistrza',
-  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary': 'Przy {health} zdrowia Varkhul staje się chroniony, gdy jego Legion Kuźni wkracza przez portale, a promienie filarów grożą Stopieniem Kuźni.',
-  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary': 'Przy {health} zdrowia Varkhul porzuca większość wcześniejszych mechanik, gdy Pożoga Świata zaciska się do środka i pochłania tygiel.',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    'Przy {health} zdrowia Varkhul staje się chroniony, gdy jego Legion Kuźni wkracza przez portale, a promienie filarów grożą Stopieniem Kuźni.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    'Przy {health} zdrowia Varkhul porzuca większość wcześniejszych mechanik, gdy Pożoga Świata zaciska się do środka i pochłania tygiel.',
   'hudChrome.raidBossGuide.varkhul.phaseFinaleName': 'Finał: Arcydzieło Uwolnione',
-  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary': 'Przy {health} zdrowia Varkhul atakuje szybciej, zadaje więcej obrażeń i zsyła fale ognia na cały rajd aż do nieprzekraczalnego czasu.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    'Przy {health} zdrowia Varkhul atakuje szybciej, zadaje więcej obrażeń i zsyła fale ognia na cały rajd aż do nieprzekraczalnego czasu.',
   'hudChrome.raidBossGuide.varkhul.phaseOpeningName': 'Ojciec Kuźni',
-  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary': 'Varkhul naprzemiennie stosuje presję na tanka, szerokie ataki frontalne, poruszające się pociski, wspólne wchłanianie obrażeń w grupie, fale meteorów i ataki od strony wielkiego kowadła.',
-  'hudChrome.raidBossGuide.varkhul.pyre': 'Wspólny Stos: wybierany jest tylko gracz bez Rozżarzonego Metalu. Zbierzcie czterech graczy wewnątrz poruszającego się kręgu w obu poziomach trudności. Każdy brakujący gracz zadaje 15% maksymalnego zdrowia całemu rajdowi.',
-  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary': 'Poruszający się krąg podąża za graczem bez Rozżarzonego Metalu i dzieli większe trafienie. Każdy brakujący gracz zadaje też {missingPenalty} obrażeń od maksymalnego zdrowia całemu rajdowi.',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    'Varkhul naprzemiennie stosuje presję na tanka, szerokie ataki frontalne, poruszające się pociski, wspólne wchłanianie obrażeń w grupie, fale meteorów i ataki od strony wielkiego kowadła.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    'Wspólny Stos: wybierany jest tylko gracz bez Rozżarzonego Metalu. Zbierzcie czterech graczy wewnątrz poruszającego się kręgu w obu poziomach trudności. Każdy brakujący gracz zadaje 15% maksymalnego zdrowia całemu rajdowi.',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    'Poruszający się krąg podąża za graczem bez Rozżarzonego Metalu i dzieli większe trafienie. Każdy brakujący gracz zadaje też {missingPenalty} obrażeń od maksymalnego zdrowia całemu rajdowi.',
   'hudChrome.raidBossGuide.varkhul.pyreName': 'Wspólny Stos',
-  'hudChrome.raidBossGuide.varkhul.pyreResponse': 'Zbierzcie co najmniej {players} graczy wewnątrz kręgu i poruszajcie się z jego celem, aż rzucanie się zakończy.',
-  'hudChrome.raidBossGuide.varkhul.pyreSummary': 'Poruszający się krąg podąża za graczem bez Rozżarzonego Metalu. Jego obrażenia dzielone są między graczy w środku, a każdy brakujący gracz zadaje {missingPenalty} obrażeń od maksymalnego zdrowia całemu rajdowi.',
-  'hudChrome.raidBossGuide.varkhul.ray': 'Promień Hartowania: inny gracz, zwykle tank, przechwytuje poruszającą się linię, zanim zakończy się długi zamach. Trafiony gracz otrzymuje Hartowaną Ranę.',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    'Zbierzcie co najmniej {players} graczy wewnątrz kręgu i poruszajcie się z jego celem, aż rzucanie się zakończy.',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    'Poruszający się krąg podąża za graczem bez Rozżarzonego Metalu. Jego obrażenia dzielone są między graczy w środku, a każdy brakujący gracz zadaje {missingPenalty} obrażeń od maksymalnego zdrowia całemu rajdowi.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    'Promień Hartowania: inny gracz, zwykle tank, przechwytuje poruszającą się linię, zanim zakończy się długi zamach. Trafiony gracz otrzymuje Hartowaną Ranę.',
   'hudChrome.raidBossGuide.varkhul.rayName': 'Promień Hartowania',
-  'hudChrome.raidBossGuide.varkhul.rayResponse': 'Wyznacz zdrowego gracza, zwykle off-tanka, aby wszedł w linię. Trzymaj pozostałych graczy z dala i zmieniajcie przechwytujących, dopóki Hartowana Rana jest aktywna.',
-  'hudChrome.raidBossGuide.varkhul.raySummary': 'Promień namierza oznaczonego gracza podczas długiego zamachu. Pierwszy inny gracz stojący między Varkhulem a celem przechwytuje trafienie i otrzymuje Hartowaną Ranę.',
-  'hudChrome.raidBossGuide.varkhul.tanks': 'Tankowie: zmieniajcie się przy dwóch ładunkach Piętna Twórcy i trzymajcie Varkhula w zasięgu wręcz.',
-  'hudChrome.raidBossGuide.varkhul.worldfire': 'Pożoga Świata: w trybie heroicznym płonąca krawędź zaciska się w stronę środka podczas ostatniej fazy. Pokonaj Varkhula, zanim spłonie cały tygiel.',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    'Wyznacz zdrowego gracza, zwykle off-tanka, aby wszedł w linię. Trzymaj pozostałych graczy z dala i zmieniajcie przechwytujących, dopóki Hartowana Rana jest aktywna.',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    'Promień namierza oznaczonego gracza podczas długiego zamachu. Pierwszy inny gracz stojący między Varkhulem a celem przechwytuje trafienie i otrzymuje Hartowaną Ranę.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'Tankowie: zmieniajcie się przy dwóch ładunkach Piętna Twórcy i trzymajcie Varkhula w zasięgu wręcz.',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    'Pożoga Świata: w trybie heroicznym płonąca krawędź zaciska się w stronę środka podczas ostatniej fazy. Pokonaj Varkhula, zanim spłonie cały tygiel.',
   'hudChrome.raidBossGuide.varkhul.worldfireName': 'Pożoga Świata',
-  'hudChrome.raidBossGuide.varkhul.worldfireResponse': 'Przesuwaj się do środka przed każdym nadciągającym pasem ognia, zachowuj kurczącą się bezpieczną przestrzeń i dobij Varkhula, zanim zapłonie środek.',
-  'hudChrome.raidBossGuide.varkhul.worldfireSummary': 'W trybie heroicznym ogień etapami przesuwa się od krawędzi areny w stronę środka, aż spłonie cały tygiel.',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    'Przesuwaj się do środka przed każdym nadciągającym pasem ognia, zachowuj kurczącą się bezpieczną przestrzeń i dobij Varkhula, zanim zapłonie środek.',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    'W trybie heroicznym ogień etapami przesuwa się od krawędzi areny w stronę środka, aż spłonie cały tygiel.',
   'hudChrome.raidBossGuide.whatToDo': 'Co robić',
   'hudChrome.raidBossGuide.whatToDoResponse': 'Co robić: {response}',
   'hudChrome.statInfo.names.healPower': 'Moc leczenia',
@@ -14122,7 +14868,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.transfer.applyReload': 'Zastosuj i przeładuj',
   'hudChrome.transfer.copied': 'Skopiowano do schowka.',
   'hudChrome.transfer.copy': 'Kopiuj',
-  'hudChrome.transfer.copyFailed': 'Kopiowanie nie powiodło się. Zaznacz kod i skopiuj go samodzielnie.',
+  'hudChrome.transfer.copyFailed':
+    'Kopiowanie nie powiodło się. Zaznacz kod i skopiuj go samodzielnie.',
   'hudChrome.transfer.exportAction': 'Eksportuj',
   'hudChrome.transfer.frameLayout': 'Układ ramek',
   'hudChrome.transfer.importAction': 'Importuj',
@@ -14139,40 +14886,56 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.leftPillarCharging': 'Lewy filar kuźni się ładuje. Zapłonie za 3 sek!',
   'hudChrome.varkhulCallout.portalsOpening': 'Portale kuźni się otwierają!',
   'hudChrome.varkhulCallout.rightPillar': 'Prawy filar kuźni zapłonął!',
-  'hudChrome.varkhulCallout.rightPillarCharging': 'Prawy filar kuźni się ładuje. Zapłonie za 3 sek!',
-  'hudChrome.varkhulCallout.worldfireBegins': 'Pożoga Świata zapala się na krawędzi pomieszczenia. Tygiel zostanie pochłonięty za 42 sek!',
-  'hudChrome.varkhulCallout.worldfireClosing': 'Pożoga Świata zaciska się. Przesuń się w stronę środka!',
+  'hudChrome.varkhulCallout.rightPillarCharging':
+    'Prawy filar kuźni się ładuje. Zapłonie za 3 sek!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    'Pożoga Świata zapala się na krawędzi pomieszczenia. Tygiel zostanie pochłonięty za 42 sek!',
+  'hudChrome.varkhulCallout.worldfireClosing':
+    'Pożoga Świata zaciska się. Przesuń się w stronę środka!',
   'hudChrome.varkhulCallout.worldfireConsumed': 'Cały tygiel płonie!',
   'hudChrome.varkhulWaveStatus': 'Fala {wave}/{waves} | Wrogowie: {remaining}',
-  'hudChrome.wocMarket.walletLinkedConnected': 'Twoja powiązana aplikacja portfela jest połączona i gotowa do zakupów $WOC.',
-  'hudChrome.wocMarket.walletLinkedDisconnected': 'Twój publiczny adres jest powiązany. Połącz ponownie tę aplikację portfela, gdy będziesz chciał zapłacić w $WOC.',
+  'hudChrome.wocMarket.walletLinkedConnected':
+    'Twoja powiązana aplikacja portfela jest połączona i gotowa do zakupów $WOC.',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    'Twój publiczny adres jest powiązany. Połącz ponownie tę aplikację portfela, gdy będziesz chciał zapłacić w $WOC.',
   'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.walletUsdUnknown': 'Nieznane',
-  'hudChrome.wocStore.charter.alreadyGranted': 'Ten statut jest już przypisany do tej postaci. Nie zostałeś ponownie obciążony opłatą.',
-  'hudChrome.wocStore.charter.applyDeferred': 'Płatność zakończona. Miejsca zostaną zastosowane automatycznie przy następnym zalogowaniu tej postaci.',
+  'hudChrome.wocStore.charter.alreadyGranted':
+    'Ten statut jest już przypisany do tej postaci. Nie zostałeś ponownie obciążony opłatą.',
+  'hudChrome.wocStore.charter.applyDeferred':
+    'Płatność zakończona. Miejsca zostaną zastosowane automatycznie przy następnym zalogowaniu tej postaci.',
   'hudChrome.wocStore.charter.buy': 'Kup statut',
   'hudChrome.wocStore.charter.buyAria': 'Kup {item}',
   'hudChrome.wocStore.charter.confirmBody': 'Kupić {item} za {cost} Claudium?',
   'hudChrome.wocStore.charter.confirmTitle': 'Potwierdź zakup statutu',
-  'hudChrome.wocStore.charter.doesNotFit': 'Bank tej postaci nie pomieści pełnej puli tego statutu.',
+  'hudChrome.wocStore.charter.doesNotFit':
+    'Bank tej postaci nie pomieści pełnej puli tego statutu.',
   'hudChrome.wocStore.charter.eyebrow': 'Szkatuła',
   'hudChrome.wocStore.charter.failed': 'Nie udało się zakończyć zakupu.',
   'hudChrome.wocStore.charter.grant': 'Dodaje {slots} miejsc w banku',
-  'hudChrome.wocStore.charter.grantUnresolved': 'Płatność zakończona, ale miejsca nie mogły zostać jeszcze zastosowane. Zakup został zapisany, a wsparcie techniczne może dokończyć go za ciebie.',
-  'hudChrome.wocStore.charter.granted': 'Statut został zastosowany. Bank tej postaci jest teraz większy.',
-  'hudChrome.wocStore.charter.inProgress': 'Zakup dla tej postaci wciąż jest finalizowany. Spróbuj ponownie za chwilę.',
+  'hudChrome.wocStore.charter.grantUnresolved':
+    'Płatność zakończona, ale miejsca nie mogły zostać jeszcze zastosowane. Zakup został zapisany, a wsparcie techniczne może dokończyć go za ciebie.',
+  'hudChrome.wocStore.charter.granted':
+    'Statut został zastosowany. Bank tej postaci jest teraz większy.',
+  'hudChrome.wocStore.charter.inProgress':
+    'Zakup dla tej postaci wciąż jest finalizowany. Spróbuj ponownie za chwilę.',
   'hudChrome.wocStore.charter.names.strongbox_charter_1': 'Mniejszy Statut Szkatuły',
   'hudChrome.wocStore.charter.names.strongbox_charter_2': 'Większy Statut Szkatuły',
   'hudChrome.wocStore.charter.names.strongbox_charter_3': 'Wielki Statut Szkatuły',
   'hudChrome.wocStore.charter.names.strongbox_charter_complete': 'Pełny Statut Szkatuły',
-  'hudChrome.wocStore.charter.noCharterFits': 'Żaden statut nie zmieści się w miejscu pozostałym w banku tej postaci.',
+  'hudChrome.wocStore.charter.noCharterFits':
+    'Żaden statut nie zmieści się w miejscu pozostałym w banku tej postaci.',
   'hudChrome.wocStore.charter.noRoom': 'Bank tej postaci nie ma już miejsca na statut.',
   'hudChrome.wocStore.charter.notPurchasable': 'Tego statutu nie można teraz kupić.',
-  'hudChrome.wocStore.charter.outage': 'Nie udało się potwierdzić zakupu. Spróbuj ponownie za pomocą tego przycisku, a nie zostaniesz obciążony dwukrotnie. Ponowne wczytanie gry przed tym może utracić tę ochronę.',
-  'hudChrome.wocStore.charter.outageStale': 'Wróć do sklepu i ponownie użyj tej samej opcji Kup statut. Nie zostaniesz obciążony dwukrotnie. Ponowne wczytanie gry przed tym może utracić tę ochronę.',
+  'hudChrome.wocStore.charter.outage':
+    'Nie udało się potwierdzić zakupu. Spróbuj ponownie za pomocą tego przycisku, a nie zostaniesz obciążony dwukrotnie. Ponowne wczytanie gry przed tym może utracić tę ochronę.',
+  'hudChrome.wocStore.charter.outageStale':
+    'Wróć do sklepu i ponownie użyj tej samej opcji Kup statut. Nie zostaniesz obciążony dwukrotnie. Ponowne wczytanie gry przed tym może utracić tę ochronę.',
   'hudChrome.wocStore.charter.resultContext': '{item} ({sku}): {message}',
-  'hudChrome.wocStore.charter.scope': 'Statut rozszerza bank wyłącznie tej postaci. Skarbnik sprzedaje te same miejsca za złoto.',
-  'hudChrome.wocStore.charter.someHiddenByFit': 'Statuty zbyt duże dla miejsca pozostałego w banku tej postaci nie są pokazywane.',
+  'hudChrome.wocStore.charter.scope':
+    'Statut rozszerza bank wyłącznie tej postaci. Skarbnik sprzedaje te same miejsca za złoto.',
+  'hudChrome.wocStore.charter.someHiddenByFit':
+    'Statuty zbyt duże dla miejsca pozostałego w banku tej postaci nie są pokazywane.',
   'hudChrome.wocStore.charter.title': 'Statuty Szkatuły',
   'itemUi.lootRoll.bindsOnPickup': 'Przywiązuje się po podniesieniu',
   'entities.items.warspirit_emberscale_helmet.name': 'Hełm Łuski Żaru',
@@ -14192,36 +14955,50 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.derelict_mech.name': 'Opuszczony Mech',
   'entities.mobs.ignivar_cinder_artificer.name': 'Żarowy Inżynier',
   'entities.mobs.ignivar_crucible_warden.name': 'Strażnik Tygla',
-  'entities.quests.q_ignivar_the_forgefather.completion': 'Kuźnia wreszcie ucichła. Ostatnie Źródło może nigdy nie odzyskać sił, lecz Varkhul nie ukształtuje już żadnego życia w kajdany.',
+  'entities.quests.q_ignivar_the_forgefather.completion':
+    'Kuźnia wreszcie ucichła. Ostatnie Źródło może nigdy nie odzyskać sił, lecz Varkhul nie ukształtuje już żadnego życia w kajdany.',
   'entities.quests.q_ignivar_the_forgefather.objectives.0.label': 'Pokonany Varkhul',
-  'entities.quests.q_ignivar_the_forgefather.text': 'Ścieżka poniżej prowadzi do Varkhula, Ojca Kuźni Ostatniego Płomienia. Uwięził Ostatnie Źródło, by tchnąć życie w metal, a potem wykuł Ignivara, aby utrzymać zbrodnię w tajemnicy. Wejdź do Wewnętrznego Tygla i zakończ jego dzieło.',
+  'entities.quests.q_ignivar_the_forgefather.text':
+    'Ścieżka poniżej prowadzi do Varkhula, Ojca Kuźni Ostatniego Płomienia. Uwięził Ostatnie Źródło, by tchnąć życie w metal, a potem wykuł Ignivara, aby utrzymać zbrodnię w tajemnicy. Wejdź do Wewnętrznego Tygla i zakończ jego dzieło.',
   'entities.quests.q_ignivar_the_forgefather.title': 'Ojciec Kuźni',
-  'guide.economy.bankSockets': 'Za drabinką miejsc skarbnik sprzedaje także do czterech gniazd na torby, odblokowywanych kolejno za coraz wyższą cenę. Umieść w jednym z nich zapasową torbę z zestawu noszonych toreb, a jej miejsca dołączą do twojego skarbca: zwykła torba powiększa cały magazyn, zaś sakwa na reagenty dodaje miejsce tylko na materiały rzemieślnicze. Kliknij torbę w swoich torbach, aby ją umieścić, a następnie kliknij gniazdo, by ją wyjąć. Wyjęcie torby nigdy nie zabiera żadnych przechowywanych przedmiotów: jeśli pojemność skarbca okaże się większa niż zmniejszona liczba miejsc, wszystko pozostaje na miejscu, a nowe depozyty po prostu czekają na wolne miejsce.',
-  'guide.settingsPage.ifAlwaysShowAllBuffs': 'Pokazuje wszystkie aktywne wzmocnienia nawet przy niskim poziomie grafiki, omijając zwykły limit ikon wzmocnień.',
+  'guide.economy.bankSockets':
+    'Za drabinką miejsc skarbnik sprzedaje także do czterech gniazd na torby, odblokowywanych kolejno za coraz wyższą cenę. Umieść w jednym z nich zapasową torbę z zestawu noszonych toreb, a jej miejsca dołączą do twojego skarbca: zwykła torba powiększa cały magazyn, zaś sakwa na reagenty dodaje miejsce tylko na materiały rzemieślnicze. Kliknij torbę w swoich torbach, aby ją umieścić, a następnie kliknij gniazdo, by ją wyjąć. Wyjęcie torby nigdy nie zabiera żadnych przechowywanych przedmiotów: jeśli pojemność skarbca okaże się większa niż zmniejszona liczba miejsc, wszystko pozostaje na miejscu, a nowe depozyty po prostu czekają na wolne miejsce.',
+  'guide.settingsPage.ifAlwaysShowAllBuffs':
+    'Pokazuje wszystkie aktywne wzmocnienia nawet przy niskim poziomie grafiki, omijając zwykły limit ikon wzmocnień.',
   'entities.mobs.ignivar_ember_sentinel.name': 'Żarowy Wartownik',
   'entities.mobs.ignivar_heart_of_the_end.name': 'Ignivar, Przywoływacz Popiołu',
   'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Ignivar, Herold Ostatniego Płomienia',
-  'entities.mobs.varkhul_forgefather_of_the_last_flame.name': 'Varkhul, Ojciec Kuźni Ostatniego Płomienia',
-  'entities.npcs.archivist_maelin_ember_projection.greeting': 'Żar niesie głos Maelin przez kuźnię.',
+  'entities.mobs.varkhul_forgefather_of_the_last_flame.name':
+    'Varkhul, Ojciec Kuźni Ostatniego Płomienia',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    'Żar niesie głos Maelin przez kuźnię.',
   'entities.npcs.archivist_maelin_ember_projection.name': 'Żarowa Projekcja Maelin',
   'entities.npcs.archivist_maelin_ember_projection.title': 'Żarowa Projekcja',
-  'entities.npcs.archivist_maelin_emberward.greeting': 'Każdy ślad młota w tym miejscu jest zdaniem. Pomóż mi odczytać to, co Varkhul próbował ukryć.',
+  'entities.npcs.archivist_maelin_emberward.greeting':
+    'Każdy ślad młota w tym miejscu jest zdaniem. Pomóż mi odczytać to, co Varkhul próbował ukryć.',
   'entities.npcs.archivist_maelin_emberward.name': 'Archiwistka Maelin Żarowa Straż',
   'entities.npcs.archivist_maelin_emberward.title': 'Archiwistka Tygla',
-  'entities.npcs.crucible_quartermaster.greeting': 'Kuźnia rozpoznaje swoich. Przynieś mi pieczęć z Tygla, a wyposażą cię do wojny.',
+  'entities.npcs.crucible_quartermaster.greeting':
+    'Kuźnia rozpoznaje swoich. Przynieś mi pieczęć z Tygla, a wyposażą cię do wojny.',
   'entities.npcs.crucible_quartermaster.name': 'Kwatermistrz Bronn Żarowa Straż',
   'entities.npcs.crucible_quartermaster.title': 'Kwatermistrz Tygla',
-  'entities.quests.q_ignivar_echoes_in_iron.completion': 'Echa potwierdzają. Varkhul związał wodę z umierającego Ostatniego Źródła w żywy metal. Te automaty były nieudanymi próbami hartowania. Przetrwał tylko Ignivar.',
+  'entities.quests.q_ignivar_echoes_in_iron.completion':
+    'Echa potwierdzają. Varkhul związał wodę z umierającego Ostatniego Źródła w żywy metal. Te automaty były nieudanymi próbami hartowania. Przetrwał tylko Ignivar.',
   'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': 'Pokonane Żarowe Wartowniki',
   'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': 'Pokonani Strażnicy Tygla',
-  'entities.quests.q_ignivar_echoes_in_iron.text': 'Te automaty nie są żołnierzami. To szkice. Rozbij każdą linię montażową i słuchaj, gdy upadnie ostatnia skorupa. Kuźnia pamięta, co Varkhul próbował wymazać.',
+  'entities.quests.q_ignivar_echoes_in_iron.text':
+    'Te automaty nie są żołnierzami. To szkice. Rozbij każdą linię montażową i słuchaj, gdy upadnie ostatnia skorupa. Kuźnia pamięta, co Varkhul próbował wymazać.',
   'entities.quests.q_ignivar_echoes_in_iron.title': 'Echa w żelazie',
-  'entities.quests.q_ignivar_heralds_heart.completion': 'Ignivar nigdy nie był zwykłym strażnikiem. Jego serce było kluczem, a jego ostatnie płyty otworzyły zapieczętowany Tygiel poniżej.',
+  'entities.quests.q_ignivar_heralds_heart.completion':
+    'Ignivar nigdy nie był zwykłym strażnikiem. Jego serce było kluczem, a jego ostatnie płyty otworzyły zapieczętowany Tygiel poniżej.',
   'entities.quests.q_ignivar_heralds_heart.objectives.0.label': 'Pokonany Ignivar',
-  'entities.quests.q_ignivar_heralds_heart.text': 'Ocalały, którego imię powtarza się w każdym echu, to Ignivar. Varkhul nazywał go heroldem, pieczęcią i kluczem. Pokonaj go. Jeśli zapisy mówią prawdę, jego śmierć ujawni, czego miał strzec jako wykuty strażnik.',
+  'entities.quests.q_ignivar_heralds_heart.text':
+    'Ocalały, którego imię powtarza się w każdym echu, to Ignivar. Varkhul nazywał go heroldem, pieczęcią i kluczem. Pokonaj go. Jeśli zapisy mówią prawdę, jego śmierć ujawni, czego miał strzec jako wykuty strażnik.',
   'entities.quests.q_ignivar_heralds_heart.title': 'Serce Herolda',
-  'apiError.character.delete_busy': 'Kraina jest zajęta. Spróbuj ponownie usunąć tę postać za chwilę.',
-  'apiError.character.storage_purchase_open': 'Zakup miejsca musi się zakończyć lub zostać rozstrzygnięty, zanim będzie można usunąć tę postać.',
+  'apiError.character.delete_busy':
+    'Kraina jest zajęta. Spróbuj ponownie usunąć tę postać za chwilę.',
+  'apiError.character.storage_purchase_open':
+    'Zakup miejsca musi się zakończyć lub zostać rozstrzygnięty, zanim będzie można usunąć tę postać.',
   'crucibleShop.balance': 'Twoje pieczęcie: {list}',
   'crucibleShop.balanceEntry': '{name} x{count}',
   'crucibleShop.browse': 'Wymień pieczęcie',
@@ -14234,114 +15011,181 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'crucibleShop.empty': 'Elementy zestawu dla twojej klasy nie są dostępne do wymiany.',
   'crucibleShop.noSigils': 'Nie masz żadnych pieczęci Tygla.',
   'crucibleShop.price': '1 {sigil}',
-  'entities.dungeons.ignivar_forge_approach.enterText': 'Odgłosy młotów rozbrzmiewają w Salach Pierwszego Hartowania.',
-  'entities.dungeons.ignivar_forge_approach.leaveText': 'Odchodzisz od pierwszej kuźni i znów swobodnie oddychasz.',
+  'entities.dungeons.ignivar_forge_approach.enterText':
+    'Odgłosy młotów rozbrzmiewają w Salach Pierwszego Hartowania.',
+  'entities.dungeons.ignivar_forge_approach.leaveText':
+    'Odchodzisz od pierwszej kuźni i znów swobodnie oddychasz.',
   'entities.dungeons.ignivar_forge_approach.name': 'Sale Pierwszego Hartowania',
-  'entities.dungeons.ignivar_forge_lift.enterText': 'Winda kuźnicza drży i opada; odgłosy młotów wznoszą się ku tobie.',
-  'entities.dungeons.ignivar_forge_lift.leaveText': 'Winda wynosi cię z powrotem na otwarte powietrze twierdzy.',
+  'entities.dungeons.ignivar_forge_lift.enterText':
+    'Winda kuźnicza drży i opada; odgłosy młotów wznoszą się ku tobie.',
+  'entities.dungeons.ignivar_forge_lift.leaveText':
+    'Winda wynosi cię z powrotem na otwarte powietrze twierdzy.',
   'entities.dungeons.ignivar_forge_lift.name': 'Winda kuźni',
   'entities.dungeons.ignivar_inner_crucible.enterText': 'Otwarta brama prowadzi głębiej do Tygla.',
   'entities.dungeons.ignivar_inner_crucible.leaveText': 'Opuszczasz milczące głębiny Tygla.',
   'entities.dungeons.ignivar_inner_crucible.name': 'Wewnętrzny Tygiel',
-  'entities.dungeons.ignivar_molten_assembly.enterText': 'Otwarta brama prowadzi do płynnej hali montażowej.',
-  'entities.dungeons.ignivar_molten_assembly.leaveText': 'Opuszczasz linię montażową i wracasz do Tygla.',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    'Otwarta brama prowadzi do płynnej hali montażowej.',
+  'entities.dungeons.ignivar_molten_assembly.leaveText':
+    'Opuszczasz linię montażową i wracasz do Tygla.',
   'entities.dungeons.ignivar_molten_assembly.name': 'Płynny montaż',
   'entities.dungeons.ignivar_raid_arena.enterText': 'Nad zamkniętymi wodami Tygla migocze żar.',
-  'entities.dungeons.ignivar_raid_arena.leaveText': 'Odchodzisz od Tygla i znów swobodnie oddychasz.',
+  'entities.dungeons.ignivar_raid_arena.leaveText':
+    'Odchodzisz od Tygla i znów swobodnie oddychasz.',
   'entities.dungeons.ignivar_raid_arena.name': 'Tygiel Ostatniego Źródła',
   'entities.itemSets.ashveil.bonus2': 'Cios Czającego się zadaje o 25 procent większe obrażenia.',
-  'entities.itemSets.ashveil.bonus4': 'Cios Ukrytego Ostrza zadaje potrójne obrażenia zamiast podwójnych.',
+  'entities.itemSets.ashveil.bonus4':
+    'Cios Ukrytego Ostrza zadaje potrójne obrażenia zamiast podwójnych.',
   'entities.itemSets.ashveil.name': 'Szaty Popiołowej Zasłony',
-  'entities.itemSets.benison_dawnweave.bonus2': 'Ratunek Seraficznej Warty leczy za 270 zamiast 180. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.benison_dawnweave.bonus4': 'Po aktywowaniu Seraficznej Warty jej sojusznik zostaje uleczony o 15 procent maksymalnego zdrowia w ciągu 10 sek.',
+  'entities.itemSets.benison_dawnweave.bonus2':
+    'Ratunek Seraficznej Warty leczy za 270 zamiast 180. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.benison_dawnweave.bonus4':
+    'Po aktywowaniu Seraficznej Warty jej sojusznik zostaje uleczony o 15 procent maksymalnego zdrowia w ciągu 10 sek.',
   'entities.itemSets.benison_dawnweave.name': 'Błogosławiona Tkanina Świtu',
-  'entities.itemSets.chronoweave.bonus2': 'Echo Czasu zamienia 50 procent twoich obrażeń tajemnych przeciw jednemu celowi w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Echo Czasu zamienia 50 procent twoich obrażeń tajemnych przeciw jednemu celowi w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.chronoweave.bonus4': 'Czas odnowienia Czasowej Kaskady skraca się o 5 sek.',
   'entities.itemSets.chronoweave.name': 'Szaty Eterowej Tkaniny',
-  'entities.itemSets.cinderbark.bonus2': 'Zamiatające Szpony mają 30 procent szans na zgromadzenie dodatkowej Starej Krwi.',
-  'entities.itemSets.cinderbark.bonus4': 'Łamanie Szpiku zadaje o 30 procent większe obrażenia, a jego awaryjna osłona nie zastępuje już ciosu.',
+  'entities.itemSets.cinderbark.bonus2':
+    'Zamiatające Szpony mają 30 procent szans na zgromadzenie dodatkowej Starej Krwi.',
+  'entities.itemSets.cinderbark.bonus4':
+    'Łamanie Szpiku zadaje o 30 procent większe obrażenia, a jego awaryjna osłona nie zastępuje już ciosu.',
   'entities.itemSets.cinderbark.name': 'Osłona Żarokory',
-  'entities.itemSets.cinderfang.bonus2': 'Zwrot energii Rytuału Jadu wzrasta do 20 za każdy generator.',
+  'entities.itemSets.cinderfang.bonus2':
+    'Zwrot energii Rytuału Jadu wzrasta do 20 za każdy generator.',
   'entities.itemSets.cinderfang.bonus4': 'Czas odnowienia Strzałki Jadu skraca się do 4 sek.',
   'entities.itemSets.cinderfang.name': 'Całun Żarokła',
   'entities.itemSets.coldsight_trackers.bonus2': 'Mierzony Strzał przywraca dodatkowe 5 skupienia.',
-  'entities.itemSets.coldsight_trackers.bonus4': 'Trafienia krytyczne Długiego Naciągnięcia wydłużają Zimne Skupienie o 2 sek., maksymalnie o 6 sek. na aktywację.',
+  'entities.itemSets.coldsight_trackers.bonus4':
+    'Trafienia krytyczne Długiego Naciągnięcia wydłużają Zimne Skupienie o 2 sek., maksymalnie o 6 sek. na aktywację.',
   'entities.itemSets.coldsight_trackers.name': 'Tropiciele Zimnego Wzroku',
-  'entities.itemSets.crownforged.bonus6': 'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 5 obrażeń od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',
-  'entities.itemSets.dawnforged.bonus2': 'Latarnia Światła kopiuje 55 procent twoich bezpośrednich uzdrowień. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.dawnforged.bonus4': 'Wzmocniony przez Promienny Rezonans Uścisk Świtu jest natychmiastowy.',
+  'entities.itemSets.crownforged.bonus6':
+    'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 5 obrażeń od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',
+  'entities.itemSets.bramblehide.name': 'Cierniowa Skóra Rootsa',
+  'entities.itemSets.bramblehide.bonus2': 'Zwiększa siłę ataku o 40.',
+  'entities.itemSets.bramblehide.bonus4':
+    'Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.',
+  'entities.itemSets.bramblehide.bonus6':
+    'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 5 obrażeń od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',
+  'entities.itemSets.dawnforged.bonus2':
+    'Latarnia Światła kopiuje 55 procent twoich bezpośrednich uzdrowień. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.dawnforged.bonus4':
+    'Wzmocniony przez Promienny Rezonans Uścisk Świtu jest natychmiastowy.',
   'entities.itemSets.dawnforged.name': 'Szaty Wykute o Świcie',
-  'entities.itemSets.deathlord.bonus6': 'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 5 obrażeń od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',
+  'entities.itemSets.deathlord.bonus6':
+    'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 5 obrażeń od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',
   'entities.itemSets.emberfury.bonus2': 'Rozjuszenie trwa 6 sek. zamiast 4.',
-  'entities.itemSets.emberfury.bonus4': 'Upuszczanie Krwi zawsze cię rozjusza, a jego leczenie wzrasta do 8 procent twojego maksymalnego zdrowia.',
+  'entities.itemSets.emberfury.bonus4':
+    'Upuszczanie Krwi zawsze cię rozjusza, a jego leczenie wzrasta do 8 procent twojego maksymalnego zdrowia.',
   'entities.itemSets.emberfury.name': 'Rynsztunek Żaru Furii',
-  'entities.itemSets.emberscreed.bonus2': 'Więź Doktryny zamienia o 10 procent więcej twoich obrażeń świętych w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.emberscreed.bonus4': 'Gdy Psalm Ochrony zostanie w pełni zużyty, twój następny Hymn Oczyszczenia w ciągu 10 sek. jest natychmiastowy. Efekt może wystąpić nie częściej niż raz na 15 sek.',
+  'entities.itemSets.emberscreed.bonus2':
+    'Więź Doktryny zamienia o 10 procent więcej twoich obrażeń świętych w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.emberscreed.bonus4':
+    'Gdy Psalm Ochrony zostanie w pełni zużyty, twój następny Hymn Oczyszczenia w ciągu 10 sek. jest natychmiastowy. Efekt może wystąpić nie częściej niż raz na 15 sek.',
   'entities.itemSets.emberscreed.name': 'Szaty Credo Żaru',
-  'entities.itemSets.forgewall.bonus2': 'Żelazna Determinacja zamienia furię w 5 punktów absorpcji za punkt zamiast 4.',
-  'entities.itemSets.forgewall.bonus4': 'Rzucenie Pęknięcia Tarczy skraca pozostały czas odnowienia Żelaznej Determinacji o 2 sek.',
+  'entities.itemSets.forgewall.bonus2':
+    'Żelazna Determinacja zamienia furię w 5 punktów absorpcji za punkt zamiast 4.',
+  'entities.itemSets.forgewall.bonus4':
+    'Rzucenie Pęknięcia Tarczy skraca pozostały czas odnowienia Żelaznej Determinacji o 2 sek.',
   'entities.itemSets.forgewall.name': 'Egida Kuźnomuru',
-  'entities.itemSets.frostquench.bonus2': 'Krytyczne trafienia Loduńca zachowują drugi Sopel, maksymalnie do 5. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.frostquench.bonus4': 'Zimowy Bicz nakłada 3 ładunki Zimowego Chłodu zamiast 2.',
+  'entities.itemSets.frostquench.bonus2':
+    'Krytyczne trafienia Loduńca zachowują drugi Sopel, maksymalnie do 5. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.frostquench.bonus4':
+    'Zimowy Bicz nakłada 3 ładunki Zimowego Chłodu zamiast 2.',
   'entities.itemSets.frostquench.name': 'Splot Mroźnego Ukojenia',
-  'entities.itemSets.gravebrand.bonus2': 'Czas odnowienia Rozkazu Żniw skraca się o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.gravebrand.bonus4': 'Zjednoczone trafienia Rozkazu Żniw zadają o 25 procent większe obrażenia.',
+  'entities.itemSets.gravebrand.bonus2':
+    'Czas odnowienia Rozkazu Żniw skraca się o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.gravebrand.bonus4':
+    'Zjednoczone trafienia Rozkazu Żniw zadają o 25 procent większe obrażenia.',
   'entities.itemSets.gravebrand.name': 'Regalia Grobowego Znaku',
-  'entities.itemSets.grovespring.bonus2': 'Szybkie Uzdrowienie najpierw zużywa twój własny Dzikokwiat lub Drugi Rozkwit i leczy o 25 procent więcej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.grovespring.bonus4': 'Nadrozkwit zbiera 75 procent twoich pozostałych efektów, a następnie zachowuje 1 punkt Zieloności.',
+  'entities.itemSets.grovespring.bonus2':
+    'Szybkie Uzdrowienie najpierw zużywa twój własny Dzikokwiat lub Drugi Rozkwit i leczy o 25 procent więcej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.grovespring.bonus4':
+    'Nadrozkwit zbiera 75 procent twoich pozostałych efektów, a następnie zachowuje 1 punkt Zieloności.',
   'entities.itemSets.grovespring.name': 'Strój Gajowego Źródła',
-  'entities.itemSets.hexthread.bonus2': 'Igła Losu zapewnia 2 dodatkowe punkty Potępienia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.hexthread.bonus2':
+    'Igła Losu zapewnia 2 dodatkowe punkty Potępienia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.hexthread.bonus4': 'Wykonanie Wyroku zwraca 10 punktów Potępienia.',
   'entities.itemSets.hexthread.name': 'Całun Klątwy',
-  'entities.itemSets.moonscorch.bonus2': 'Księżycowe Nasienie może dwukrotnie wydłużyć Księżycową Nawałnicę przy jednym nałożeniu, maksymalnie do 12 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.moonscorch.bonus4': 'Księżycowy Przypływ i Słoneczne Przebudzenie uderzają o 25 procent mocniej.',
+  'entities.itemSets.moonscorch.bonus2':
+    'Księżycowe Nasienie może dwukrotnie wydłużyć Księżycową Nawałnicę przy jednym nałożeniu, maksymalnie do 12 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.moonscorch.bonus4':
+    'Księżycowy Przypływ i Słoneczne Przebudzenie uderzają o 25 procent mocniej.',
   'entities.itemSets.moonscorch.name': 'Strój Księżycowego Żaru',
-  'entities.itemSets.necromancers.bonus6': 'Zwiększa szybkość ataku i rzucania zaklęć o 4%. Twoje zaklęcia mają 10% szansy zapewnić Duszny Żar, zwiększając moc zaklęć o 25 na 10 sek.',
-  'entities.itemSets.nighttalon.bonus6': 'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 4 obrażenia od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',
-  'entities.itemSets.oathpyre.bonus2': 'Szansa, że Cios Strażnika Przysięgi uzbroi Słoneczny Odwet, wzrasta do 30 procent, a blokowanie ataku uzbraja go w 40 procent przypadków.',
-  'entities.itemSets.oathpyre.bonus4': 'Zużycie Słonecznego Odwetu osłania cię na 6 procent maksymalnego zdrowia przez 10 sek.',
+  'entities.itemSets.necromancers.bonus6':
+    'Zwiększa szybkość ataku i rzucania zaklęć o 4%. Twoje zaklęcia mają 10% szansy zapewnić Duszny Żar, zwiększając moc zaklęć o 25 na 10 sek.',
+  'entities.itemSets.nighttalon.bonus6':
+    'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 4 obrażenia od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',
+  'entities.itemSets.oathpyre.bonus2':
+    'Szansa, że Cios Strażnika Przysięgi uzbroi Słoneczny Odwet, wzrasta do 30 procent, a blokowanie ataku uzbraja go w 40 procent przypadków.',
+  'entities.itemSets.oathpyre.bonus4':
+    'Zużycie Słonecznego Odwetu osłania cię na 6 procent maksymalnego zdrowia przez 10 sek.',
   'entities.itemSets.oathpyre.name': 'Bastion Ognia Przysięgi',
-  'entities.itemSets.packlord_emberhide.bonus2': 'Czas odnowienia Rozkazu Sfory zostaje skrócony do 3 sek.',
-  'entities.itemSets.packlord_emberhide.bonus4': 'Szansa, że Rozkaz Sfory zresetuje czas odnowienia Stampede, wzrasta do 30 procent.',
+  'entities.itemSets.packlord_emberhide.bonus2':
+    'Czas odnowienia Rozkazu Sfory zostaje skrócony do 3 sek.',
+  'entities.itemSets.packlord_emberhide.bonus4':
+    'Szansa, że Rozkaz Sfory zresetuje czas odnowienia Stampede, wzrasta do 30 procent.',
   'entities.itemSets.packlord_emberhide.name': 'Żaroskóra Władcy Sfory',
-  'entities.itemSets.pyroclast.bonus2': 'Oparzenie zawsze zadaje trafienie krytyczne celom mającym najwyżej 35 procent zdrowia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.pyroclast.bonus4': 'Krytyczne trafienia twoimi zaklęciami ognia poza Trancem Feniksa skracają jego pozostały czas odnowienia o 1,5 sek.',
+  'entities.itemSets.pyroclast.bonus2':
+    'Oparzenie zawsze zadaje trafienie krytyczne celom mającym najwyżej 35 procent zdrowia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.pyroclast.bonus4':
+    'Krytyczne trafienia twoimi zaklęciami ognia poza Trancem Feniksa skracają jego pozostały czas odnowienia o 1,5 sek.',
   'entities.itemSets.pyroclast.name': 'Regalia Piroklastu',
-  'entities.itemSets.ruincaller.bonus2': 'Spustoszenie ma 3 ładunki. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.ruincaller.bonus2':
+    'Spustoszenie ma 3 ładunki. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.ruincaller.bonus4': 'Pocisk Zagłady uderza o 20 procent mocniej.',
   'entities.itemSets.ruincaller.name': 'Szaty Przywoływacza Ruiny',
-  'entities.itemSets.slagbreaker.bonus2': 'Czerwony Znak wzmacnia następne Miażdżące Uderzenie o 30 procent za każdy ładunek zamiast 20.',
-  'entities.itemSets.slagbreaker.bonus4': 'Co drugie użycie Czerwonego Znaku skraca pozostały czas odnowienia Przełamującego o 3 sek.',
+  'entities.itemSets.slagbreaker.bonus2':
+    'Czerwony Znak wzmacnia następne Miażdżące Uderzenie o 30 procent za każdy ładunek zamiast 20.',
+  'entities.itemSets.slagbreaker.bonus4':
+    'Co drugie użycie Czerwonego Znaku skraca pozostały czas odnowienia Przełamującego o 3 sek.',
   'entities.itemSets.slagbreaker.name': 'Rynsztunek Łamacza Żużlu',
   'entities.itemSets.slagsnare.bonus2': 'Rozpruwające Uderzenie generuje 20 punktów Skupienia.',
-  'entities.itemSets.slagsnare.bonus4': 'Rozcięcie Ran, które zużywa 3 ładunki Łowieckiego Pędu, zachowuje je. Nie może się to zdarzyć częściej niż raz na 8 sek.',
+  'entities.itemSets.slagsnare.bonus4':
+    'Rozcięcie Ran, które zużywa 3 ładunki Łowieckiego Pędu, zachowuje je. Nie może się to zdarzyć częściej niż raz na 8 sek.',
   'entities.itemSets.slagsnare.name': 'Oprawa Żużlowej Pułapki',
   'entities.itemSets.smolderstrike.bonus2': 'Cios Młota uderza o 20 procent mocniej.',
-  'entities.itemSets.smolderstrike.bonus4': 'Koniec Zabawy zwraca 6 sek. pozostałego czasu odnowienia Lustrzanych Ostrzy.',
+  'entities.itemSets.smolderstrike.bonus4':
+    'Koniec Zabawy zwraca 6 sek. pozostałego czasu odnowienia Lustrzanych Ostrzy.',
   'entities.itemSets.smolderstrike.name': 'Skóry Żarowego Uderzenia',
-  'entities.itemSets.soulflame.bonus6': 'Zwiększa szybkość ataku i rzucania zaklęć o 4%. Twoje zaklęcia mają 10% szansy zapewnić Płomień Duszy, zwiększając moc zaklęć o 25 na 10 sek.',
-  'entities.itemSets.springmender.bonus2': 'Czas odnowienia Wezwania Przypływu zostaje skrócony o 4 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.springmender.bonus4': 'Kaskadowe Uzdrowienie dosięga czwartego sojusznika i zbiera Prądy Uzdrowienia w wysokości 150 procent.',
+  'entities.itemSets.soulflame.bonus6':
+    'Zwiększa szybkość ataku i rzucania zaklęć o 4%. Twoje zaklęcia mają 10% szansy zapewnić Płomień Duszy, zwiększając moc zaklęć o 25 na 10 sek.',
+  'entities.itemSets.springmender.bonus2':
+    'Czas odnowienia Wezwania Przypływu zostaje skrócony o 4 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.springmender.bonus4':
+    'Kaskadowe Uzdrowienie dosięga czwartego sojusznika i zbiera Prądy Uzdrowienia w wysokości 150 procent.',
   'entities.itemSets.springmender.name': 'Łuska Wiosennego Uzdrowiciela',
-  'entities.itemSets.stonehearth.bonus2': 'Podczas Kamiennego Związania Kamienne Uzdrowienie Wód Burzy nie kosztuje many i leczy o 25 procent więcej.',
-  'entities.itemSets.stonehearth.bonus4': 'Podczas Kamiennego Związania ukończenie kadencji leczy cię za 3 procent maksymalnego zdrowia.',
+  'entities.itemSets.stonehearth.bonus2':
+    'Podczas Kamiennego Związania Kamienne Uzdrowienie Wód Burzy nie kosztuje many i leczy o 25 procent więcej.',
+  'entities.itemSets.stonehearth.bonus4':
+    'Podczas Kamiennego Związania ukończenie kadencji leczy cię za 3 procent maksymalnego zdrowia.',
   'entities.itemSets.stonehearth.name': 'Bastion Kamiennego Serca',
-  'entities.itemSets.stormcallers.bonus6': 'Zwiększa szybkość ataku i rzucania zaklęć o 4%. Twoje zaklęcia mają 10% szansy zapewnić Płomień Duszy, zwiększając moc zaklęć o 25 na 10 sek.',
-  'entities.itemSets.stormkindled.bonus2': 'Uwolnienie Broni na Żarze Stosu zapewnia 3 ładunki Gromu. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.stormkindled.bonus4': 'Premia Wstrząsu Ziemi za każdy ładunek Gromu wzrasta do 30 procent.',
+  'entities.itemSets.stormcallers.bonus6':
+    'Zwiększa szybkość ataku i rzucania zaklęć o 4%. Twoje zaklęcia mają 10% szansy zapewnić Płomień Duszy, zwiększając moc zaklęć o 25 na 10 sek.',
+  'entities.itemSets.stormkindled.bonus2':
+    'Uwolnienie Broni na Żarze Stosu zapewnia 3 ładunki Gromu. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.stormkindled.bonus4':
+    'Premia Wstrząsu Ziemi za każdy ładunek Gromu wzrasta do 30 procent.',
   'entities.itemSets.stormkindled.name': 'Regalia Rozpalonej Burzy',
-  'entities.itemSets.vesperash.bonus2': 'Czas odnowienia Przyzwania Żniwiarza Dziesięciny zostaje skrócony o 6 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.vesperash.bonus4': 'Przyzwanie Żniwiarza Dziesięciny resetuje czas odnowienia Rozłamania Umysłu, a żniwiarz zwraca dwa razy więcej many za każde trafienie.',
+  'entities.itemSets.vesperash.bonus2':
+    'Czas odnowienia Przyzwania Żniwiarza Dziesięciny zostaje skrócony o 6 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.vesperash.bonus4':
+    'Przyzwanie Żniwiarza Dziesięciny resetuje czas odnowienia Rozłamania Umysłu, a żniwiarz zwraca dwa razy więcej many za każde trafienie.',
   'entities.itemSets.vesperash.name': 'Całun Wieczornego Popiołu',
-  'entities.itemSets.warspirit_emberscale.bonus2': 'Uderzenie Przodków przesuwa twoją kadencję o 3 kroki.',
-  'entities.itemSets.warspirit_emberscale.bonus4': 'Uderzenie Przodków uderza o 30 procent mocniej.',
+  'entities.itemSets.warspirit_emberscale.bonus2':
+    'Uderzenie Przodków przesuwa twoją kadencję o 3 kroki.',
+  'entities.itemSets.warspirit_emberscale.bonus4':
+    'Uderzenie Przodków uderza o 30 procent mocniej.',
   'entities.itemSets.warspirit_emberscale.name': 'Łuska Żaru Ducha Wojny',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Krwawy Zbiór przywraca 45 energii zamiast 30.',
   'entities.itemSets.wildfang_emberhide.bonus4': 'Krwawy Zbiór nakłada na cel świeże Rozdarcie.',
   'entities.itemSets.wildfang_emberhide.name': 'Żaroskóra Dzikiego Kła',
-  'entities.itemSets.wyrmshadow.bonus6': 'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 4 obrażenia od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',
-  'entities.itemSets.zealfire.bonus2': 'Dekret Ostateczny i Świt Zagłady skracają wzajemnie pozostały czas odnowienia o 3 sek. zamiast o 2.',
-  'entities.itemSets.zealfire.bonus4': 'Rzut Młotem Gniewu podczas Gniewu Świtu zadaje o 40 procent większe obrażenia zamiast o 20.',
+  'entities.itemSets.wyrmshadow.bonus6':
+    'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 4 obrażenia od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',
+  'entities.itemSets.zealfire.bonus2':
+    'Dekret Ostateczny i Świt Zagłady skracają wzajemnie pozostały czas odnowienia o 3 sek. zamiast o 2.',
+  'entities.itemSets.zealfire.bonus4':
+    'Rzut Młotem Gniewu podczas Gniewu Świtu zadaje o 40 procent większe obrażenia zamiast o 20.',
   'entities.itemSets.zealfire.name': 'Płyta Bojowa Płomienia Zapału',
   'entities.items.anvilguard_blade.name': 'Ostrze Straży Kowadła',
   'entities.items.anvilstance_sabatons.name': 'Sabatony Kowadłowej Postawy',
@@ -14540,4 +15384,448 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.warforged_waistguard.name': 'Ochraniacz Pasa Wykuty na Wojnę',
   'entities.items.warspirit_emberscale_chest.name': 'Kolczuga Łuski Żaru Ducha Wojny',
   'entities.items.warspirit_emberscale_gloves.name': 'Rękawice Łuski Żaru Ducha Wojny',
+  'apiError.discord.invalid_input': 'Nieprawidłowe dane wejściowe.',
+  'apiError.kick.admin_target': 'Konta operatorów nie mogą zostać wyrzucone.',
+  'apiError.kick.reason_required': 'Wymagany jest powód.',
+  'apiError.kick.target_offline': 'Ten gracz nie jest już online na tym serwerze.',
+  'entities.abilities.melting_acid.description':
+    'Pokrywa twoją broń na 30 min. Każdy atak wręcz opryskuje cel żrącym kwasem i zmniejsza jego pancerz o 5% na 12 sek.',
+  'entities.abilities.nightshade_coating.description':
+    'Pokrywa twoją broń na 30 min. Każdy atak wręcz pokrywa cel psianką i redukuje otrzymywane leczenie o 25% na 12 sek.',
+  'entities.items.reins_chimeglass_tortoise.name': 'Pasek dzwonkowy Roadwardena: Tolliver',
+  'entities.items.reins_goblin_rocket_sled.name': 'Kluczyk zapłonu: Goblińskie sanie rakietowe',
+  'entities.items.reins_mech_bird.name': 'Kluczyk zapłonu: Cluckwork Mech Bird',
+  'entities.items.reins_rallycart_rxt.name': 'Kluczyk zapłonu: Rallycart RXT',
+  'entities.npcs.riftwright_maelis.greeting':
+    'Zespół Riftbound pamięta przerwę, która go dokonała, {className}. Przynieś mi zespół i esencję przerw, a nauczę go zapamiętywać więcej.',
+  'entities.npcs.riftwright_maelis.name': 'Maelis, rzemieślniczka Szczelin',
+  'entities.npcs.riftwright_maelis.title': 'Mistrz Kuźni Szczeliny',
+  'guide.riftsPage.forgeBody':
+    'Zespół, który zajmuje pierwsze miejsce w czystych mennicach, nie jest gotowy w momencie jego otrzymania. Riftwright Maelis, który prowadzi kuźnię na Łące Strażniczej na Farshore, w górę brzegu od Gullhaven, obok Uczonego Przekroczenia, będzie podnosił poziom swoich przedmiotów krok po kroku i umieszczał w gniazdach kolorowe klejnoty wpadające przez szczeliny, każdy kolor ma jedną ocenę bojową. Pełny zespół zabiera nowy klejnot w miejsce najstarszego, więc możesz go później dostroić. Wszystko to jest płacone w Esencji Szczeliny i klejnotach Szczeliny, w walucie kuźni, która wypada z bossów szczeliny i którą można swobodnie handlować, dzięki czemu znajomy może przekazać Ci esencję, której brakuje. Zdejmij opaskę, zanim jej ją przyniesiesz: ona pracuje nad tym, co masz w torbach, a nie robi nic, chyba że stoisz w jej kuźni.',
+  'guide.riftsPage.forgeHeading': 'Kuźnia Szczeliny',
+  'guide.settingsPage.ifAuraBarBelowFrame':
+    'Przenosi rząd wzmocnień pod ramkę twojej jednostki zamiast nad nią. Ma znaczenie tylko wtedy, gdy wzmocnienia są wyświetlane na ramce gracza.',
+  'guide.settingsPage.ifFilterProfanity':
+    'Maskuje wulgaryzmy na czacie gwiazdkami. Domyślnie włączone; wyłącz tę opcję, jeśli wolisz czytać czat bez filtrów.',
+  'guide.settingsPage.ifPlayerHealthText':
+    'To, co wyświetla Twój własny pasek zdrowia: nic, wartość procentowa, aktualne zdrowie, aktualne i maksymalne lub oba z wartością procentową obok nich.',
+  'guide.settingsPage.ifTargetHealthText':
+    'Wyświetlane paski zdrowia celu i celu, z tymi samymi wyborami, co w twojej własnej ramce.',
+  'hudChrome.bags.capacityPools':
+    'Przedmioty {generalUsed}/{generalTotal}, materiały {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': 'Tylko materiały',
+  'hudChrome.bank.depositAllNotable': 'Zdeponowane materiały: {count}, w tym {item}.',
+  'hudChrome.bank.depositAllNotableFull':
+    'Zdeponowane materiały: {count}, w tym {item}. Bank jest teraz pełny.',
+  'hudChrome.bank.vaultDepositAllNotable': 'Zdeponowane materiały: {count}, w tym {item}.',
+  'hudChrome.bank.vaultDepositAllNotableFull':
+    'Zdeponowane materiały: {count}, w tym {item}. Niektóre sufity są pełne.',
+  'hudChrome.bootcamp.promptAccessInterface': 'Otwórz interfejs',
+  'hudChrome.bootcamp.promptMoveToTarget': 'Przejdź do: {target}',
+  'hudChrome.bootcamp.promptSelectItem': 'Wybierz: {item}',
+  'hudChrome.continentMap.toInstance': 'Mapa instancji',
+  'hudChrome.discord.queuePingsLabel':
+    'Wyślij mi bezpośrednią wiadomość Discord, gdy pojawi się kolejka na polu bitwy lub arenie (wymaga połączonego konta Discord)',
+  'hudChrome.enchanting.riftGear': 'Zespoły Riftbound przyjmują klejnoty Rift, a nie zaklęcia.',
+  'hudChrome.interfaceUnlock.frameNames.targetDots': 'Punkty docelowe',
+  'hudChrome.itemTooltip.riftGemSocket': 'Bonus za gniazdo dla zespołu Riftbound',
+  'hudChrome.lootExplorer.category.delve': 'Zagłęb się',
+  'hudChrome.lootExplorer.category.dungeon': 'Loch',
+  'hudChrome.lootExplorer.category.ground_object': 'Obiekt Świata',
+  'hudChrome.lootExplorer.category.open_world': 'Otwarty świat',
+  'hudChrome.lootExplorer.category.quest_objective': 'Cel zadania',
+  'hudChrome.lootExplorer.category.quest_reward': 'Nagroda za zadanie',
+  'hudChrome.lootExplorer.category.raid': 'Nalot',
+  'hudChrome.lootExplorer.category.rift': 'Szczelina',
+  'hudChrome.lootExplorer.category.starting_equipment': 'Sprzęt startowy',
+  'hudChrome.lootExplorer.category.vendor': 'Sprzedawca',
+  'hudChrome.lootExplorer.chance': '{pct}% szansy',
+  'hudChrome.lootExplorer.close': 'Zamknij Eksplorator łupów',
+  'hudChrome.lootExplorer.difficulty.heroic': 'Bohaterski',
+  'hudChrome.lootExplorer.difficulty.normal': 'Normalne',
+  'hudChrome.lootExplorer.empty': 'Żaden łup nie pasuje do tych filtrów.',
+  'hudChrome.lootExplorer.filterAll': 'Wszystko',
+  'hudChrome.lootExplorer.filterCategoryAria': 'Źródło',
+  'hudChrome.lootExplorer.filterClassAria': 'Klasa',
+  'hudChrome.lootExplorer.filterQualityAria': 'Jakość',
+  'hudChrome.lootExplorer.filterStatAria': 'Statystyka',
+  'hudChrome.lootExplorer.gatedByQuest': 'Podczas wykonywania zadania: {quest}',
+  'hudChrome.lootExplorer.guaranteed': 'Gwarantowane',
+  'hudChrome.lootExplorer.resultCount': 'Wyniki {count}',
+  'hudChrome.lootExplorer.riftRankLabel': 'Ranga Szczeliny {rank}',
+  'hudChrome.lootExplorer.searchAria': 'Wyszukaj elementy',
+  'hudChrome.lootExplorer.searchPlaceholder': 'Wyszukaj elementy...',
+  'hudChrome.lootExplorer.source': '{category}: {name}',
+  'hudChrome.lootExplorer.sourceWithContext': '{category}: {name} ({context})',
+  'hudChrome.lootExplorer.tabEncounters': 'Przez spotkanie',
+  'hudChrome.lootExplorer.tabItems': 'Według pozycji',
+  'hudChrome.lootExplorer.title': 'Eksplorator łupów',
+  'hudChrome.mobile.lootExplorer': 'Eksplorator łupów',
+  'hudChrome.mounts.desc_chimeglass_tortoise':
+    'Żółw solny, który wyprzedził trzy pokolenia przyczep kempingowych. Druciarze zmielili mu okulary ze szkła burzowego i zawiesili mu na szyi dzwonek z brązu, tak że droga usłyszy go na długo, zanim go zobaczy.',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Niebezpiecznie przekombinowane goblińskie sanie, napędzane dwiema rakietami i znakomicie złym osądem.',
+  'hudChrome.mounts.desc_lanternback_troll':
+    'Hill troll złamany do jarzma przez latarników, niosący na ramionach żelazny tron z latarniami burzowymi płonącymi na obu ramionach.',
+  'hudChrome.mounts.desc_mech_bird':
+    'Ręcznie zbudowany mechaniczny kurczak bojowy, który biegnie na pstrykających serwach, a nakręcany klucz wciąż się obraca.',
+  'hudChrome.mounts.desc_rallycart_rxt': 'Mała maszyna rajdowa, która zwiększa prędkość podróży.',
+  'hudChrome.mounts.name_chimeglass_tortoise': 'Tolliver Chimeglass',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Goblińskie sanie rakietowe',
+  'hudChrome.mounts.name_lanternback_troll': 'Grumbol Latarniowy Grzbiet',
+  'hudChrome.mounts.name_mech_bird': 'Cluckwork Mech Ptak',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.options.auraBarBelowFrame': 'Wzmocnienia pod ramką gracza',
+  'hudChrome.options.nameplateDotScale': 'Rozmiar kropki na tabliczce znamionowej',
+  'hudChrome.options.playerHealthText': 'Tekst dotyczący zdrowia gracza',
+  'hudChrome.options.showNameplateDots': 'Pokaż moje kropki na tabliczkach znamionowych',
+  'hudChrome.options.showTargetDots': 'Pokaż kropki docelowe',
+  'hudChrome.options.targetHealthText': 'Docelowy tekst dotyczący zdrowia',
+  'hudChrome.partyFrames.healthCurrentMaxPercent': 'Prąd / Maks. (Procent)',
+  'hudChrome.realmBuilder.close': 'Zamknij',
+  'hudChrome.realmBuilder.currentLabel': 'Uhonorowany w tym miesiącu',
+  'hudChrome.realmBuilder.pastEmpty': 'Na liście nie ma jeszcze żadnych nazwisk.',
+  'hudChrome.realmBuilder.pastTitle': 'Byli wyróżnieni',
+  'hudChrome.realmBuilder.placeholderHint': 'Ta płyta czeka na swoje imię.',
+  'hudChrome.realmBuilder.placeholderName': 'Twoje imię tutaj',
+  'hudChrome.realmBuilder.title': 'Konstruktor Miesiąca Królestw',
+  'hudChrome.reliquary.filterEmptyPages': 'Żadna strona nie pasuje do tego filtra.',
+  'hudChrome.reliquary.filterGroupAriaPages': 'Filtruj strony według tego, czy są podświetlone',
+  'hudChrome.reliquary.filterIlluminated': 'Podświetlany',
+  'hudChrome.reliquary.filterRemaining': 'Pozostało',
+  'hudChrome.reliquary.sourceVendorGated': 'Sprzedaje {vendor} ({requirement})',
+  'hudChrome.riftForge.currency': '{name}: {count}',
+  'hudChrome.riftForge.done.socket': 'Włożono klejnot do {name}.',
+  'hudChrome.riftForge.done.socketReplaced': 'Włożono klejnot do {name}; {gem} został zniszczony.',
+  'hudChrome.riftForge.done.upgrade': 'Ulepszono {name}.',
+  'hudChrome.riftForge.empty':
+    'Żadnego zespołu Riftbound w twoich torbach. Rankingowa Szczelina jako pierwsza wyczyści miętówki.',
+  'hudChrome.riftForge.gemOption': '{name} ({bonus})',
+  'hudChrome.riftForge.gemPickAria': 'Klejnot do gniazda',
+  'hudChrome.riftForge.noGems': 'Żadnych klejnotów Rift w twoich torbach',
+  'hudChrome.riftForge.reason.dead': 'Nie możesz tego zrobić będąc martwym.',
+  'hudChrome.riftForge.reason.insufficientEssence': 'Za mało Esencji Szczeliny.',
+  'hudChrome.riftForge.reason.invalidGem': 'Nie masz takiego klejnotu Rift.',
+  'hudChrome.riftForge.reason.maxUpgrade': 'Ten zespół jest w pełni zmodernizowany.',
+  'hudChrome.riftForge.reason.notFound': 'Tego zespołu nie ma w twoich torbach.',
+  'hudChrome.riftForge.reason.notRiftGear': 'Można stworzyć tylko bandę Riftbound.',
+  'hudChrome.riftForge.reason.tooFar': 'Jesteś za daleko od Kuźni Szczeliny.',
+  'hudChrome.riftForge.refused': 'Kuźnia odmówiła. Stań u Riftwrighta i spróbuj ponownie.',
+  'hudChrome.riftForge.socketBtn': 'Gniazdo',
+  'hudChrome.riftForge.socketReplaceHint':
+    'Gniazda pełne: kolejna perełka zastępuje najstarszą, {gem}.',
+  'hudChrome.riftForge.socketsNone': 'żadnych klejnotów',
+  'hudChrome.riftForge.subtitle': 'Zespoły Riftbound',
+  'hudChrome.riftForge.title': 'Kuźnia Szczeliny',
+  'hudChrome.riftForge.upgradeBtn': 'Uaktualnij do poziomu przedmiotu {level} (esencja {cost})',
+  'hudChrome.riftForge.upgradeMax': 'W pełni zmodernizowany',
+  'hudChrome.riftForge.wornHint': 'Zużyty. Zdemontuj go, aby go wykuć.',
+  'hudChrome.social.roster.confirm':
+    'Rozszerzyć skład gildii o miejsca {seats} dla {price}? Złoto pochodzi z Twojego portfela i nie podlega zwrotowi.',
+  'hudChrome.social.roster.confirmAction': 'Rozwiń',
+  'hudChrome.social.roster.expand': 'Rozszerz skład (+ miejsca {seats} dla {price})',
+  'hudChrome.social.roster.expandedLine': '{name} rozszerzył skład gildii o członków {cap}.',
+  'hudChrome.social.roster.maxed': 'Lista jest w największym rozmiarze',
+  'hudChrome.social.roster.result.cannotAfford':
+    'Potrzebujesz {price}, aby rozszerzyć listę gildii.',
+  'hudChrome.social.roster.result.maxed': 'Lista gildii nie może się już powiększać.',
+  'hudChrome.social.roster.result.notLeader': 'Tylko Mistrz Gildii może poszerzać skład gildii.',
+  'hudChrome.social.roster.result.retry':
+    'Skład gildii zmienił się podczas zakupu. Spróbuj ponownie.',
+  'hudChrome.social.roster.seats': '{count} z siedzeń {cap}',
+  'hudChrome.targetDots.overflow': '{count} więcej nie pokazano',
+  'hudChrome.targetDots.row': '{aura} na {target}',
+  'hudChrome.targetDots.title': 'Punkty docelowe',
+  'hudChrome.wocMarket.walletCardDismiss': 'Ukryj kartę portfela',
+  'hudChrome.wocStore.mountBuyAria': 'Kup {item}',
+  'hudChrome.wocStore.mountsEyebrow': 'Mocowania konta',
+  'hudChrome.wocStore.mountsTitle': 'Maszyna stabilna',
+  'loading.kickedByModerator': 'Moderator Cię rozłączył: {reason}',
+  'loading.rendererContextLost':
+    'Renderer 3D utracił kontekst graficzny i nie zdołał go odzyskać. Odśwież stronę.',
+  'sim.rift.forgeGemReplaced': 'Klejnot szczeliny zastąpiony dla {name}: {gem} zniszczony.',
+  'worldContent.realmBuilderMonumentName': 'Pomnik Budowniczego Królestw',
+  'entities.abilities.arcane_shot.specNote_marksmanship':
+    'Odczyt Zimnowidzenia z ukończonego Gorączkowego Naciągu sprawia, że twój następny Plugawy strzał zadaje o 75% więcej obrażeń. Oddanie strzału zużywa Odczyt.',
+  'entities.items.bramblehide_cinch.name': 'Korzeniowy pas z ciernistej skóry',
+  'entities.items.bramblehide_crown.name': 'Korzeniowa korona z ciernistej skóry',
+  'entities.items.bramblehide_grips.name': 'Korzeniowe rękawice z ciernistej skóry',
+  'entities.items.bramblehide_harness.name': 'Korzeniowa uprząż z ciernistej skóry',
+  'entities.items.bramblehide_legguards.name': 'Korzeniowe nagolenniki z ciernistej skóry',
+  'entities.items.bramblehide_mantle.name': 'Korzeniowy płaszcz z ciernistej skóry',
+  'entities.items.bramblehide_treads.name': 'Korzeniowe trzewiki z ciernistej skóry',
+  'entities.items.courtiers_bonefang.name': 'Kościany kieł dworzanina',
+  'entities.items.gravecourt_hewer.name': 'Topór Cmentarnego Dworu',
+  'entities.items.stormhymn_chain_grips.name': 'Kolcze rękawice Hymnu Burzy',
+  'entities.items.stormhymn_chain_treads.name': 'Kolcze trzewiki Hymnu Burzy',
+  'entities.items.thornpeak_moonhide_cowl.name': 'Kaptur z księżycowej skóry Ciernistego Szczytu',
+  'entities.items.thornpeak_wardblade.name': 'Ostrze ochronne Ciernistego Szczytu',
+  'entities.items.votive_ward_of_the_deathless_court.name': 'Wotywna ochrona Nieśmiertelnego Dworu',
+  'entities.mobs.nythraxis_bone_spike.name': 'Kościany kolec',
+  'gpuNotice.bodyRequestedBackend':
+    'Gra nie mogła uruchomić się na wybranym zapleczu graficznym, więc działa zamiast tego na OpenGL. Wszystko działa; wczytywanie i pierwsze minuty mogą bardziej przycinać. Zaplecze możesz wybrać ponownie w Opcjach, w sekcji Grafika i System.',
+  'hudChrome.auraEffect.coldsightRead':
+    'Twój następny Długi naciąg zadaje o {longDrawPct}% więcej obrażeń albo twój następny Plugawy strzał zadaje o {fellShotPct}% więcej',
+  'hudChrome.auraEffect.nythraxisAscension':
+    'Nieśmiertelne Wniebowstąpienie: {stacks} ładunków, o {pct}% więcej obrażeń i szybkości ataku. Przeciągnij Nythraxis na Pieczęć Wiążącą, aby je oczyścić.',
+  'hudChrome.auraEffect.nythraxisBoneStorm':
+    'Kościana Burza: Nythraxis ignoruje zagrożenie, wiruje za {tick}% maksymalnego zdrowia co sekundę w zasięgu {radius} jardów i szarżuje na rajderów. Rozproszcie się i uciekajcie.',
+  'hudChrome.auraEffect.nythraxisBound':
+    'Spętany dawnymi ochronami: Nythraxis otrzymuje o {pct}% więcej obrażeń przez {duration} sek.',
+  'hudChrome.auraEffect.nythraxisCrownEndures':
+    'Korona Trwa: {stacks} ładunków, o {pct}% więcej obrażeń i o {haste}% szybsze ataki. Rajdowi skończył się czas.',
+  'hudChrome.auraEffect.nythraxisDreadCurse':
+    'Każdy ładunek zwiększa obrażenia otrzymywane od Nythraxis o {perStack}% przez {duration} sek.: teraz {stacks} z {max} ładunków, o {pct}% więcej obrażeń. Co {every} sek. jego następne trafienie w cel zadaje {hit}% maksymalnego zdrowia i dodaje ładunek. Tankowie powinni zmienić się przy {swap} ładunkach.',
+  'hudChrome.auraEffect.nythraxisImpaled':
+    'Nadziany na kościany kolec: nie możesz działać i tracisz {normal}% swojego maksymalnego zdrowia co {interval} sek. ({heroic}% na Heroic), dopóki rajd nie zniszczy kolca.',
+  'hudChrome.auraEffect.nythraxisKingsWrath':
+    'Gniew Króla: Nythraxis zadaje o {pct}% więcej obrażeń do końca walki.',
+  'hudChrome.auraEffect.nythraxisUnbound':
+    'Uwolniony: Nythraxis zadaje o {pct}% więcej obrażeń, dopóki Pieczęć Wiążąca go nie utrzyma.',
+  'hudChrome.auraEffect.veiledEdgeStrike':
+    'Twój następny Cios Skrytobójcy zadaje o {pct}% więcej obrażeń od broni',
+  'hudChrome.bank.guildHistoryTab': 'Historia',
+  'hudChrome.bank.logActionAdminPurge': 'Usunięto',
+  'hudChrome.bank.logActionBuySlots': 'Kupiono rozszerzenie',
+  'hudChrome.bank.logActionCharterFee': 'Opłacono wpisowe statutowe',
+  'hudChrome.bank.logActionDeposit': 'Wpłacono',
+  'hudChrome.bank.logActionOpenBank': 'Otwarto bank',
+  'hudChrome.bank.logActionWithdraw': 'Wypłacono',
+  'hudChrome.bank.logActorAdmin': 'Administrator',
+  'hudChrome.bank.logColAction': 'Akcja',
+  'hudChrome.bank.logColDetail': 'Szczegóły',
+  'hudChrome.bank.logColMember': 'Członek',
+  'hudChrome.bank.logColTime': 'Kiedy',
+  'hudChrome.bank.logDetailItem': '{count} {item}',
+  'hudChrome.bank.logEmptyFiltered': 'Żadne działania banku gildii nie pasują do tego filtra.',
+  'hudChrome.bank.logEnd': 'To cała historia banku gildii.',
+  'hudChrome.bank.logFilterAll': 'Wszystko',
+  'hudChrome.bank.logFilterAria': 'Filtruj historię banku gildii',
+  'hudChrome.bank.logFilterItems': 'Przedmioty',
+  'hudChrome.bank.logFilterMoney': 'Pieniądze',
+  'hudChrome.bank.logOlder': 'Pokaż starsze',
+  'hudChrome.bank.logOlderLoading': 'Wczytywanie starszych działań...',
+  'hudChrome.bank.logSearchAria':
+    'Szukaj w załadowanych działaniach banku gildii według członka, akcji lub przedmiotu',
+  'hudChrome.bank.logSearchNoMatch':
+    'Żadne załadowane działania banku gildii nie pasują do wyszukiwania. Pokaż starsze wiersze, aby rozszerzyć zakres.',
+  'hudChrome.bank.logSearchPlaceholder': 'Szukaj w historii',
+  'hudChrome.bank.logShowing': 'Pokazano {count} działań banku gildii, od najnowszych.',
+  'hudChrome.bank.logShowingMatched':
+    'Pokazano {matched} z {count} załadowanych działań banku gildii.',
+  'hudChrome.finder.mech.binding_sigil':
+    'Pieczęć Wiążąca (przeciągnij bossa na pieczęć albo rajd zapłaci)',
+  'hudChrome.finder.mech.bone_spike':
+    'Kościany kolec (nadziani rajderzy słabną, dopóki kolec nie zostanie zniszczony)',
+  'hudChrome.finder.mech.bone_storm':
+    'Kościana Burza (ignoruje zagrożenie, wiruje i szarżuje na rajd)',
+  'hudChrome.finder.mech.crown_endures': 'Korona Trwa (twardy enrage o 6:00, Heroic 5:00)',
+  'hudChrome.finder.mech.deathless_court':
+    'Nieśmiertelny Dwór (tylko Heroic, królewski dwór powstaje po Nieśmiertelnym Szału)',
+  'hudChrome.finder.mech.grave_eruption':
+    'Grobowa Erupcja (kręgi ostrzegawcze zostawiające płonącą ziemię)',
+  'hudChrome.finder.mech.gravefire':
+    'Grobowy Ogień (wędrująca linia ognia, której trzeba zejść z drogi)',
+  'hudChrome.finder.mech.kings_wrath':
+    'Gniew Króla (30%: stały bonus obrażeń, szybsze zagrożenia na podłodze)',
+  'hudChrome.finder.mech.soulfire':
+    'Ogień Dusz (detonacje Rozdarcia Duszy zostawiają płonące kałuże)',
+  'hudChrome.fullTransfer.excluded':
+    'Nigdy nie obejmuje: danych logowania, konta, portfela ani zakupów. Układy pasków akcji są zapisywane na koncie i przenoszą się razem z nim.',
+  'hudChrome.fullTransfer.fullSettings': 'Pełne ustawienia',
+  'hudChrome.fullTransfer.intro':
+    'Wyeksportuj wszystkie preferencje zapisane na tym urządzeniu jako jeden kod i wklej go na innym urządzeniu lub w innej przeglądarce, aby je zaimportować: grafikę, dźwięk, interfejs, motyw, układ ramek, skróty klawiszowe każdej postaci, przypisania kontrolera i krzyżowych pasków skrótów, czat, filtry okien, język oraz odrzucone wskazówki.',
+  'hudChrome.fullTransfer.menu': 'Import / eksport',
+  'hudChrome.fullTransfer.title': 'Import / eksport ustawień',
+  'hudChrome.interfaceUnlock.frameNames.damageMeter': 'Miernik obrażeń',
+  'hudChrome.interfaceUnlock.frameNames.deedTracker': 'Śledzenie czynów',
+  'hudChrome.interfaceUnlock.frameNames.delveTracker': 'Śledzenie wypraw',
+  'hudChrome.interfaceUnlock.frameNames.petBar': 'Pasek chowańca',
+  'hudChrome.interfaceUnlock.frameNames.procOverlay': 'Aktywacje zaklęć',
+  'hudChrome.interfaceUnlock.frameNames.questTracker': 'Śledzenie zadań',
+  'hudChrome.interfaceUnlock.frameNames.reliquaryTracker': 'Śledzenie relikwiarza',
+  'hudChrome.interfaceUnlock.frameNames.riftTracker': 'Śledzenie szczeliny',
+  'hudChrome.interfaceUnlock.frameNames.swingBarOffhand': 'Lewa ręka',
+  'hudChrome.keybindTransfer.apply': 'Zastosuj',
+  'hudChrome.keybindTransfer.imported': 'Układ skrótów zaimportowany.',
+  'hudChrome.keybindTransfer.setup': 'Układ skrótów',
+  'hudChrome.keybindTransfer.wrongKind': 'Ten kod jest eksportem ustawień, a nie układem skrótów.',
+  'hudChrome.keyboardMap.assignHint': 'Wybierz akcję do przypisania do {key}.',
+  'hudChrome.keyboardMap.assignOption': '{category}: {action}',
+  'hudChrome.keyboardMap.assignPlaceholder': 'Przypisz akcję do {key}',
+  'hudChrome.keyboardMap.bindingLine': '{key}: {action}',
+  'hudChrome.keyboardMap.boundTo': 'Przypisano {action} do {key}.',
+  'hudChrome.keyboardMap.close': 'Zamknij przegląd klawiatury',
+  'hudChrome.keyboardMap.form60': '60%',
+  'hudChrome.keyboardMap.form75': '75%',
+  'hudChrome.keyboardMap.formFull': 'Pełny rozmiar',
+  'hudChrome.keyboardMap.formGroup': 'Rozmiar klawiatury',
+  'hudChrome.keyboardMap.formTkl': 'Bez bloku numerycznego',
+  'hudChrome.keyboardMap.hint':
+    'Używane klawisze są pokolorowane według kategorii. Najedź na klawisz lub ustaw na nim fokus, aby zobaczyć wszystko, co jest do niego przypisane.',
+  'hudChrome.keyboardMap.hintInteractive':
+    'Używane klawisze są pokolorowane według kategorii. Kliknij klawisz, aby zmienić jego działanie; najedź lub ustaw fokus, aby zobaczyć wszystkie przypisania.',
+  'hudChrome.keyboardMap.keyDetail': '{key}: {bindings}',
+  'hudChrome.keyboardMap.layerAlt': 'Alt',
+  'hudChrome.keyboardMap.layerCtrl': 'Ctrl',
+  'hudChrome.keyboardMap.layerGroup': 'Warstwa modyfikatora',
+  'hudChrome.keyboardMap.layerNone': 'Bez modyfikatora',
+  'hudChrome.keyboardMap.layerShift': 'Shift',
+  'hudChrome.keyboardMap.legendGroup': 'Etykiety klawiszy',
+  'hudChrome.keyboardMap.legendLayout': 'Twój układ',
+  'hudChrome.keyboardMap.legendQwerty': 'QWERTY',
+  'hudChrome.keyboardMap.notBindable': 'Tego klawisza nie można przypisać.',
+  'hudChrome.keyboardMap.notOnLayout': 'Nie ma na tej klawiaturze: {bindings}',
+  'hudChrome.keyboardMap.otherLayers': 'Także przypisane z modyfikatorem',
+  'hudChrome.keyboardMap.popOut': 'Otwórz osobno',
+  'hudChrome.keyboardMap.pressKey': 'Naciśnij klawisz dla {action}. Esc anuluje.',
+  'hudChrome.keyboardMap.separator': ', ',
+  'hudChrome.keyboardMap.title': 'Przegląd klawiatury',
+  'hudChrome.nythraxisCallout.boneStormBegins': 'Kościana Burza! Rozproszcie się i uciekajcie!',
+  'hudChrome.nythraxisCallout.boneStormCharge': 'Nythraxis szarżuje na CIEBIE! Uciekaj!',
+  'hudChrome.nythraxisCallout.boneStormEnds': 'Kościana Burza skończona. Tankowie, przejmijcie go!',
+  'hudChrome.nythraxisCallout.crownEndures': 'Korona Trwa! Nythraxis wpadł w szał!',
+  'hudChrome.nythraxisCallout.crownEndures10': 'Dziesięć sekund! Spalcie go!',
+  'hudChrome.nythraxisCallout.crownEndures30': 'Trzydzieści sekund do Korona Trwa!',
+  'hudChrome.nythraxisCallout.crownEndures60': 'Minuta do Korona Trwa!',
+  'hudChrome.nythraxisCallout.dreadCurseSwap': 'Straszliwa Klątwa: zmienić tanków!',
+  'hudChrome.nythraxisCallout.gravefireTarget': 'Grobowy Ogień pędzi ku tobie! Zejdź w bok!',
+  'hudChrome.nythraxisCallout.impaled': 'Kościane kolce! Uwolnijcie nadzianych!',
+  'hudChrome.nythraxisCallout.kingsWrath':
+    'Król powstaje w gniewie! Wszystko uderza teraz mocniej!',
+  'hudChrome.nythraxisCallout.sigilAppears':
+    'Pieczęć Wiążąca rozbłyska! Przeciągnij na nią Nythraxis!',
+  'hudChrome.nythraxisCallout.sigilBound': 'Nythraxis spętany! Spalcie go!',
+  'hudChrome.nythraxisCallout.sigilUnbound':
+    'Pieczęć gaśnie bez spętania! Nythraxis rośnie w siłę!',
+  'hudChrome.nythraxisCallout.spikeBroken': 'Kolec roztrzaskany!',
+  'hudChrome.nythraxisCallout.youAreImpaled': 'Jesteś nadziany! Wytrzymaj!',
+  'hudChrome.options.gpuBackend': 'Zaplecze graficzne',
+  'hudChrome.options.gpuBackendActive': 'Obecnie używane: {backend}.',
+  'hudChrome.options.gpuBackendActiveAutoCapped':
+    'Obecnie używane: {backend}. Auto jeszcze nie próbuje Vulkan na tej karcie graficznej; wybierz Vulkan, aby go sprawdzić.',
+  'hudChrome.options.gpuBackendActiveNameOpenGL': 'OpenGL',
+  'hudChrome.options.gpuBackendActiveNameVulkan': 'Vulkan',
+  'hudChrome.options.gpuBackendActiveUnavailable':
+    'Obecnie używane: {backend} (nie udało się włączyć Vulkan).',
+  'hudChrome.options.gpuBackendAuto': 'Automatycznie',
+  'hudChrome.options.gpuBackendNote':
+    'Auto wybiera najlepszą opcję. Vulkan jest szybszy i zalecany dla większości graczy. OpenGL jest wolniejszy, ale może pomóc, jeśli Vulkan nie działa poprawnie. Zmiana zacznie działać przy następnym uruchomieniu gry.',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL (wolne)',
+  'hudChrome.options.gpuBackendSaveFailed':
+    'Nie udało się zapisać wyboru. Następny start zachowa {backend}.',
+  'hudChrome.options.gpuBackendVulkan': 'Vulkan',
+  'hudChrome.options.restartFailed':
+    'Gra nie mogła uruchomić się ponownie sama. Zamknij ją i włącz jeszcze raz.',
+  'hudChrome.options.restartGame': 'Uruchom grę ponownie',
+  'hudChrome.options.restartInProgress': 'Ponowne uruchamianie gry...',
+  'hudChrome.options.restartPending': 'Niektóre zmiany zaczną działać po ponownym uruchomieniu.',
+  'hudChrome.options.shaderWarm': 'Proces rozgrzewania shaderów',
+  'hudChrome.options.shaderWarmAuto': 'Automatycznie',
+  'hudChrome.options.shaderWarmNote':
+    'Wstępnie rozgrzewa pamięć podręczną shaderów w tle, aby zapobiegać przycięciom w grze. Auto: włączone tylko, gdy obsługuje to system graficzny. (Zalecane). Włączone: wymuszone wszędzie. Na niektórych konfiguracjach może pogorszyć wydajność. Wyłączone: nieaktywne.',
+  'hudChrome.options.shaderWarmOff': 'Wył.',
+  'hudChrome.options.shaderWarmOn': 'Wł.',
+  'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
+    'Co {everyHeroic} sek. na podłodze od {minDist} do {maxDist} jardów od Nythraxis rozbłyska pieczęć dawnych ochron, a on rozpoczyna Nieśmiertelne Wniebowstąpienie, zyskując {ascensionHeroic} obrażeń i szybkości ataku co {ascensionEvery} sek. Jeśli stanie na pieczęci w ciągu {bindHeroic} sek., zostaje Spętany: Wniebowstąpienie zostaje oczyszczone, on jest ogłuszony na {stunHeroic} sek. i otrzymuje o {vulnerability} więcej obrażeń przez {boundHeroic} sek. W przeciwnym razie każdy rajder otrzymuje {unboundHitHeroic} maksymalnego zdrowia jako obrażenia Cienia, a on zachowuje o {unboundBonusHeroic} więcej obrażeń do następnego wiązania.',
+  'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Pieczęć Wiążąca',
+  'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
+    'Tank natychmiast przeciąga Nythraxis na pieczęć, przez każdy ogień zostawiony przez rajd. Walczący wręcz podążają za przeciągnięciem, a dystansowi trzymają się poza nowym stożkiem Grobołamacza. Wszyscy spalają go, gdy jest Spętany.',
+  'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
+    'Co {everyNormal} sek. na podłodze od {minDist} do {maxDist} jardów od Nythraxis rozbłyska pieczęć dawnych ochron, a on rozpoczyna Nieśmiertelne Wniebowstąpienie, zyskując {ascensionNormal} obrażeń i szybkości ataku co {ascensionEvery} sek. Jeśli stanie na pieczęci w ciągu {bindNormal} sek., zostaje Spętany: Wniebowstąpienie zostaje oczyszczone, on jest ogłuszony na {stunNormal} sek. i otrzymuje o {vulnerability} więcej obrażeń przez {boundNormal} sek. W przeciwnym razie każdy rajder otrzymuje {unboundHitNormal} maksymalnego zdrowia jako obrażenia Cienia, a on zachowuje o {unboundBonusNormal} więcej obrażeń do następnego wiązania.',
+  'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
+    'Co {everyHeroic} sek. Nythraxis nadziewa {victimsHeroic} rajderów innych niż jego obecny cel na Kościane Kolce. Nadziany rajder nie może działać i traci {drainHeroic} maksymalnego zdrowia co sekundę, dopóki jego kolec nie zostanie zniszczony.',
+  'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Kościany kolec',
+  'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
+    'Zadający obrażenia natychmiast przełączają się na Kościane Kolce i niszczą je, aby uwolnić nadzianych rajderów. Uzdrowiciele utrzymują nadzianych przy życiu, dopóki kolce nie padną.',
+  'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
+    'Co {everyNormal} sek. Nythraxis nadziewa {victimsNormal} rajderów innych niż jego obecny cel na Kościane Kolce. Nadziany rajder nie może działać i traci {drainNormal} maksymalnego zdrowia co sekundę, dopóki jego kolec nie zostanie zniszczony.',
+  'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
+    'Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyHeroic} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlHeroic} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamHeroic} maksymalnego zdrowia. Rzuca Kościany Kolec {spikeAt} sek. po rozpoczęciu burzy, a Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.',
+  'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Kościana Burza',
+  'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
+    'Rozproszcie się i stale uciekajcie przed Nythraxis. Szarżowany rajder ucieka, a wszyscy inni zostawiają miejsce wokół trasy szarży; potem tankowie przejmują go, gdy burza się skończy.',
+  'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
+    'Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyNormal} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlNormal} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamNormal} maksymalnego zdrowia. Rzuca Kościany Kolec {spikeAt} sek. po rozpoczęciu burzy, a Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.',
+  'hudChrome.raidBossGuide.nythraxis.courtName': 'Nieśmiertelny Dwór',
+  'hudChrome.raidBossGuide.nythraxis.courtResponse':
+    'Tankowie przejmują Aldrena i odwracają jego rozłupanie od rajdu. Ogłuszcie lub uciszcie Malrica, gdy tylko zacznie Leczenie Malrica, i zabijcie go jako pierwszego; potem unieruchomcie lub ogłuszcie Vossa z dala od uzdrowicieli, bo nie można go sprowokować, i wykończcie go następnego.',
+  'hudChrome.raidBossGuide.nythraxis.courtSummary':
+    'Na Heroic Nythraxis podnosi swój dwór po każdym Nieśmiertelnym Szału, przerwanym lub nie, gdy poprzedni dwór upadnie. Duch Aldrena rozcina wszystko przy swoim celu Królewskim Rozłupaniem. Duch Malrica kanałuje Leczenie Malrica, lecząc Nythraxis coraz mocniej z każdym rzuceniem. Duch Vossa ignoruje prowokacje i poluje na rajd.',
+  'hudChrome.raidBossGuide.nythraxis.crownEnduresHeroicSummary':
+    'Po {enrageHeroic} sek. od rozpoczęcia walki (zegar zatrzymuje się, gdy brat Aldric wchodzi przy 70%) Korona Trwa uruchamia twardy enrage. Nythraxis zyskuje o {damage} więcej obrażeń i o {haste} szybsze ataki, a potem kolejne {rampStep} obrażeń co {rampEveryHeroic} sek. Nie ma paska czasu. Ostrzeżenia przychodzą jako okrzyki przy {warn60}, {warn30} i {warn10} sek. do końca.',
+  'hudChrome.raidBossGuide.nythraxis.crownEnduresName': 'Korona Trwa',
+  'hudChrome.raidBossGuide.nythraxis.crownEnduresResponse':
+    'Pierwsze ostrzeżenie traktujcie jak ostatni burn. Zachowajcie ruch i defensywne cooldowny na pozostałe mechaniki, a potem pokonajcie Nythraxis przed enrage.',
+  'hudChrome.raidBossGuide.nythraxis.crownEnduresSummary':
+    'Po {enrageNormal} sek. od rozpoczęcia walki (zegar zatrzymuje się, gdy brat Aldric wchodzi przy 70%) Korona Trwa uruchamia twardy enrage. Nythraxis zyskuje o {damage} więcej obrażeń i o {haste} szybsze ataki, a potem kolejne {rampStep} obrażeń co {rampEveryNormal} sek. Nie ma paska czasu. Ostrzeżenia przychodzą jako okrzyki przy {warn60}, {warn30} i {warn10} sek. do końca.',
+  'hudChrome.raidBossGuide.nythraxis.deathlessRageHeroicSummary':
+    'Co {every} sek. Nythraxis rzuca Nieśmiertelny Szał przez {cast} sek. Podczas rzucania każdy zapalony kamień ochronny może być kanałowany przez jednego rajdera przez {channel} sek. Jeśli trzech różnych rajderów ukończy po jednym kamieniu ochronnym przed końcem rzucania, Szał zostaje przerwany, a Nythraxis ogłuszony na {stun} sek. W przeciwnym razie każdy rajder otrzymuje {damageHeroic} maksymalnego zdrowia jako obrażenia Cienia, czego żadna pula zdrowia nie przeżyje.',
+  'hudChrome.raidBossGuide.nythraxis.deathlessRageName': 'Nieśmiertelny Szał',
+  'hudChrome.raidBossGuide.nythraxis.deathlessRageResponse':
+    'Przydzielcie po jednym rajderze do każdego kamienia ochronnego przed pullem. Gdy zacznie się rzucanie, każdy biegnie do swojego kamienia i kanałuje go do końca. Ogłuszenia, odejście i śmierć przerywają kanałowanie, więc chrońcie kanałujących i nigdy nie przydzielajcie nadzianego rajdera.',
+  'hudChrome.raidBossGuide.nythraxis.deathlessRageSummary':
+    'Co {every} sek. Nythraxis rzuca Nieśmiertelny Szał przez {cast} sek. Podczas rzucania każdy zapalony kamień ochronny może być kanałowany przez jednego rajdera przez {channel} sek. Jeśli trzech różnych rajderów ukończy po jednym kamieniu ochronnym przed końcem rzucania, Szał zostaje przerwany, a Nythraxis ogłuszony na {stun} sek. W przeciwnym razie każdy rajder otrzymuje {damageNormal} maksymalnego zdrowia jako obrażenia Cienia.',
+  'hudChrome.raidBossGuide.nythraxis.dreadCurseHeroicSummary':
+    'Co {every} sek. Nythraxis uderza obecnego tanka za {hitHeroic} maksymalnego zdrowia jako obrażenia Cienia i dodaje ładunek Straszliwej Klątwy. Przez {duration} sek. każdy ładunek zwiększa obrażenia, które ten tank otrzymuje od Nythraxis, o {perStackHeroic}, do {max} ładunków.',
+  'hudChrome.raidBossGuide.nythraxis.dreadCurseName': 'Straszliwa Klątwa',
+  'hudChrome.raidBossGuide.nythraxis.dreadCurseResponse':
+    'Tankowie zmieniają się przy {stacks} ładunkach: drugi tank prowokuje, a przeklęty tank zostaje poza stożkiem Grobołamacza, aż ładunki znikną. Uzdrowiciele przygotowują wchodzącego tanka przed zmianą.',
+  'hudChrome.raidBossGuide.nythraxis.dreadCurseSummary':
+    'Co {every} sek. Nythraxis uderza obecnego tanka za {hitNormal} maksymalnego zdrowia jako obrażenia Cienia i dodaje ładunek Straszliwej Klątwy. Przez {duration} sek. każdy ładunek zwiększa obrażenia, które ten tank otrzymuje od Nythraxis, o {perStackNormal}, do {max} ładunków.',
+  'hudChrome.raidBossGuide.nythraxis.graveEruptionHeroicSummary':
+    'Co {everyHeroic} sek. szkieletowe dłonie oznaczają pod rajderami {countHeroic} kręgów o promieniu {radius} jardów. Po {warning} sek. każdy krąg wybucha za {burstHeroic} maksymalnego zdrowia jako obrażenia Cienia, potem płonie jako Grobowy Płomień przez {flameHeroic} sek., zadając {tickHeroic} maksymalnego zdrowia co sekundę każdemu, kto w nim stoi.',
+  'hudChrome.raidBossGuide.nythraxis.graveEruptionName': 'Grobowa Erupcja',
+  'hudChrome.raidBossGuide.nythraxis.graveEruptionResponse':
+    'Wyjdźcie z każdego kręgu ostrzegawczego, zanim wybuchnie, i trzymajcie się z dala od płonącej ziemi. Tankowie odciągają Nythraxis od płomieni, aby walczący wręcz mieli miejsce do pracy.',
+  'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
+    'Co {everyNormal} sek. szkieletowe dłonie oznaczają pod rajderami {countNormal} kręgów o promieniu {radius} jardów. Po {warning} sek. każdy krąg wybucha za {burstNormal} maksymalnego zdrowia jako obrażenia Cienia, potem płonie jako Grobowy Płomień przez {flameNormal} sek., zadając {tickNormal} maksymalnego zdrowia co sekundę każdemu, kto w nim stoi.',
+  'hudChrome.raidBossGuide.nythraxis.gravebreakerName': 'Grobołamacz',
+  'hudChrome.raidBossGuide.nythraxis.gravebreakerResponse':
+    'Tankowie trzymają Nythraxis twarzą odwróconą od rajdu. Wszyscy inni stoją za nim lub obok niego i nigdy nie przecinają stożka.',
+  'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
+    'Co {seconds} sek. Nythraxis ładuje następny trafiający zamach. Jego cel otrzymuje tylko sam zamach, ale wszyscy inni w promieniu {range} jardów w stożku {arc} stopni przed nim otrzymują {splash} tego zamachu jako obrażenia Fizyczne, zmniejszone przez własny pancerz.',
+  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
+    'Co {everyHeroic} sek. linia fioletowego grobowego ognia biegnie od Nythraxis ku rajderowi, rosnąc o {speed} jardów co sekundę do {length} jardów. Każdy jard płonie przez {burnHeroic} sek. i zadaje {tickHeroic} maksymalnego zdrowia co sekundę każdemu, kto w nim stoi.',
+  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Grobowy Ogień',
+  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
+    'Zejdź w bok, gdy linia nadchodzi: jest wąska i nigdy nie skręca. Rajderzy dystansowi pozostają w ruchu zamiast stać w jednym miejscu.',
+  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
+    'Co {everyNormal} sek. linia fioletowego grobowego ognia biegnie od Nythraxis ku rajderowi, rosnąc o {speed} jardów co sekundę do {length} jardów. Każdy jard płonie przez {burnNormal} sek. i zadaje {tickNormal} maksymalnego zdrowia co sekundę każdemu, kto w nim stoi.',
+  'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Gniew Króla',
+  'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
+    'Użyjcie pozostałych defensywnych cooldownów na nieuniknione obrażenia. Utrzymujcie każdą wcześniejszą mechanikę czysto, gdy rajd kończy walkę.',
+  'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
+    'Nythraxis zadaje o {bonusNormal} więcej obrażeń na Normal albo o {bonusHeroic} na Heroic do końca walki. Grobowa Erupcja następuje co {eruptionEveryNormal} sek. ({eruptionEveryHeroic} na Heroic), a Grobowy Ogień co {gravefireEveryNormal} sek. ({gravefireEveryHeroic} na Heroic).',
+  'hudChrome.raidBossGuide.nythraxis.overview':
+    'Arcykapłan Malric odmówił pozwolenia, by jego król umarł, a rytuał, który podniósł Nythraxis, związał cały dwór z kryptą. Starcie sprawdza zdyscyplinowaną zmianę tanków, szybkie przełączanie się na Kościane Kolce, ruch poza płonącą ziemią i skoordynowane kanałowanie kamieni ochronnych, gdy Tron upadnie.',
+  'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'Gniew Króla',
+  'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
+    'Przy {health} zdrowia Nythraxis ryczy w Gniewie Króla i zyskuje o {bonusNormal} więcej obrażeń na Normal albo o {bonusHeroic} na Heroic do końca walki. Grobowa Erupcja przyspiesza do co {eruptionEveryNormal} sek. ({eruptionEveryHeroic} na Heroic), a Grobowy Ogień do co {gravefireEveryNormal} sek. ({gravefireEveryHeroic} na Heroic). Każda inna mechanika zachowuje swoje tempo.',
+  'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'Tron',
+  'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
+    'Nythraxis utrzymuje salę tronową naładowanym czołowym rozłupaniem, zmianą tanków pod Straszliwą Klątwę, Kościanymi Kolcami nadziewającymi rajderów i Grobowymi Erupcjami zostawiającymi płonącą ziemię.',
+  'hudChrome.raidBossGuide.nythraxis.phaseWardstonesName': 'Kamienie ochronne',
+  'hudChrome.raidBossGuide.nythraxis.phaseWardstonesSummary':
+    'Przy {health} zdrowia Drżące Tupnięcie unieruchamia rajd, gdy brat Aldric przybywa i zapala kamienie ochronne. Każdy kolec pęka, podłoga przestaje płonąć, a potem Rozdarcie Duszy i Nieśmiertelny Szał dołączają do mechanik Tronu.',
+  'hudChrome.raidBossGuide.nythraxis.raiseFallenName': 'Wskrzeszenie Poległych',
+  'hudChrome.raidBossGuide.nythraxis.raiseFallenResponse':
+    'Off-tank przejmuje każdą falę, gdy powstaje. Zadający obrażenia czyszczą strażników między Kościanymi Kolcami, aby fale nigdy nie spiętrzyły się przed upadkiem Tronu.',
+  'hudChrome.raidBossGuide.nythraxis.raiseFallenSummary':
+    'Co {every} sek. podczas Tronu Nythraxis podnosi za sobą Wskrzeszonych Królewskich Strażników. Pędzą na jego obecny cel i walczą, dopóki nie zostaną zniszczeni.',
+  'hudChrome.raidBossGuide.nythraxis.soulRendHeroicSummary':
+    'Nythraxis oznacza {marksHeroic} rajderów innych niż jego obecny cel Rozdarciem Duszy. Po {fuse} sek. każdy znak zadaje {damageHeroic} maksymalnego zdrowia swojego nosiciela jako obrażenia Cienia, podzielone przez liczbę oznaczonych rajderów w promieniu {range} jardów od niego. Znak, który rozwiąże się samotnie, jest śmiertelny.',
+  'hudChrome.raidBossGuide.nythraxis.soulRendName': 'Rozdarcie Duszy',
+  'hudChrome.raidBossGuide.nythraxis.soulRendResponse':
+    'Każdy oznaczony rajder biegnie do jednego punktu zbiórki i staje w promieniu {range} jardów od innych znaków, zanim skończy się bezpiecznik {fuse} sek. Uzdrowiciele dolecza grupę, gdy znaki się rozwiązują.',
+  'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
+    'Nythraxis oznacza {marksNormal} rajderów innych niż jego obecny cel Rozdarciem Duszy. Po {fuse} sek. każdy znak zadaje pełne maksymalne zdrowie swojego nosiciela jako obrażenia Cienia, podzielone przez liczbę oznaczonych rajderów w promieniu {range} jardów od niego.',
+  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
+    'Każda detonacja Rozdarcia Duszy zostawia jedną kałużę fioletowego ognia o promieniu {radius} jardów na każdą skupioną grupę znaków, płonącą przez {secondsHeroic} sek. za {tickHeroic} maksymalnego zdrowia co sekundę. Stanie tam, gdzie kałuże się nakładają, daje tylko jeden tik, nigdy zsumowane kopie. Kałuże nigdy nie powstają w promieniu {clearance} jardów od kamienia ochronnego.',
+  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Ogień Dusz',
+  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
+    'Wyjdźcie z fioletowej kałuży, gdy tylko znaki zdetonują. Utrzymujcie kolejny punkt zbiórki wolny od aktywnego ognia.',
+  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
+    'Każda detonacja Rozdarcia Duszy zostawia kałużę fioletowego ognia o promieniu {radius} jardów tam, gdzie stał każdy znak, płonącą przez {seconds} sek. za {tickNormal} maksymalnego zdrowia co sekundę. Stanie tam, gdzie kałuże się nakładają, zadaje tik z każdej z nich. Kałuże nigdy nie powstają w promieniu {clearance} jardów od kamienia ochronnego.',
+  'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Sople lodu',
 };

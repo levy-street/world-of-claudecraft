@@ -106,3 +106,16 @@ export function serializeCadence(map: CadenceMap, now: number): Record<string, n
   }
   return record;
 }
+
+/** The sparse CharacterState fragment for one save (the sim.ts
+ *  serializeCharacter shape every optional field follows): absent when
+ *  serializeCadence has no live window left to write (load-hygiene pruning
+ *  applied at serialize time too, not only at load, so a long-running
+ *  session's autosave stops carrying past-due keys forward). */
+export function questCadenceSaveFragment(
+  map: CadenceMap,
+  now: number,
+): { questCadence?: Record<string, number> } {
+  const cadence = serializeCadence(map, now);
+  return cadence ? { questCadence: cadence } : {};
+}

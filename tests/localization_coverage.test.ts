@@ -27,6 +27,7 @@ import {
   deedTitleText,
   deedTranslationManifest,
   ensureDeedLocalesLoaded,
+  RETIRED_DEED_DESCRIPTION_FALLBACK_IDS,
 } from '../src/ui/deed_i18n';
 import {
   assertEntityTranslationsReady,
@@ -434,6 +435,7 @@ describe('i18n Localization Key Coverage', () => {
     requirement: 'Requires Mining 40',
     resource: 'Mana',
     seconds: 7,
+    servings: 10,
     shown: 120,
     slot: 5,
     source: 'Wolf',
@@ -991,14 +993,16 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should track item-set names and bonus text in the entity catalog', async () => {
     const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
-    // 7 raid/dungeon families with name+bonus2+bonus4+bonus6 (the lineage
-    // ladder: every family shares its archetype's 2/4/6 tiers), plus 3
+    // 8 raid/dungeon families with name+bonus2+bonus4+bonus6 (the lineage
+    // ladder: every family shares its archetype's 2/4/6 tiers; the eighth is
+    // Roots' Bramblehide, the druid-only Strength leather family), plus 3
     // leveling haste kits carrying a single 3-piece tier (name+bonus3 only),
     // the 5 WARFARE families x (name + bonus2/4/7), and the Crucible tier
     // sets x (name + bonus2/bonus4). The druid wave completed the Crucible
     // rollout, so all 29 sets are registered (the ledger in
-    // tests/ignivar_loot.test.ts).
-    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4 + 29 * 3);
+    // tests/ignivar_loot.test.ts). The eleven crafted collections each carry
+    // a name plus one two-piece bonus, not another raid four-piece tier.
+    expect(itemSetEntries).toHaveLength(8 * 4 + 3 * 2 + 5 * 4 + 29 * 3 + 11 * 2);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -1065,11 +1069,16 @@ describe('i18n Localization Key Coverage', () => {
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +
-      // Ravenpost authored letters: welcome + Heroic Marks reward + mastery
-      // reset notice + the three $WOC Exchange custody letters + quest
-      // letters + Guild trend letters + master tier letters (keyed pair ->
-      // tier), 3 fields each.
-      (6 +
+      // Ravenpost authored letters: welcome + Heroic Marks reward + Wyrmfall
+      // Core reward (Masterwrought phase 04; it reached the translation key set
+      // at once but entity_i18n's own registry only at the phase 10 QA, which
+      // is when this hand count grew from 3 to 4) + mastery reset notice + the
+      // three $WOC Exchange custody letters (the release side, joined at the
+      // Phase 11k QA sync: 4 + 3 = 7) + quest letters + Guild trend letters +
+      // master tier letters (keyed pair -> tier), 3 fields each. Counted by
+      // hand on purpose: deriving it from authoredLettersById would compare the
+      // manifest with itself.
+      (7 +
         Object.keys(QUEST_LETTERS).length +
         Object.keys(GUILD_TREND_LETTERS).length +
         Object.values(MASTER_TIER_LETTERS).reduce(
@@ -1341,10 +1350,12 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    // name + desc per deed, plus one title entry per title deed (live count;
-    // tests/deeds_content.test.ts pins the catalog).
+    // name + release-filled desc per deed, plus one title entry per title
+    // deed (live count; tests/deeds_content.test.ts pins the catalog).
     const titleCount = Object.values(DEEDS).filter((d) => d.reward?.kind === 'title').length;
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + titleCount);
+    expect(deedEntries.length).toBe(
+      Object.keys(DEEDS).length * 2 + titleCount - RETIRED_DEED_DESCRIPTION_FALLBACK_IDS.length,
+    );
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -1640,7 +1651,16 @@ describe('i18n Localization Key Coverage', () => {
     );
     expect(minimapPainterSource).toContain('this.writers.setText(zoneLabelEl, this.localizeZone(');
     expect(hudSource).toContain('zonePoiLabel');
-    expect(hudSource).toContain('dungeonDisplayNameFromSource');
+    // The dungeon party-size warning's name localization moved with the whole
+    // of localizeSystemText into src/ui/system_text_i18n.ts when hud.ts hit its
+    // monolith ceiling (PR #3925). The helper still renders the dungeon name,
+    // just from the extracted module, the minimap_painter shape above.
+    const systemTextSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/ui/system_text_i18n.ts'),
+      'utf8',
+    );
+    expect(systemTextSource).toContain('dungeonDisplayNameFromSource(match[1])');
+    expect(hudSource).not.toContain('dungeonDisplayNameFromSource');
     expect(hudSource).not.toContain('zoneWelcomeText(');
 
     // The per-entity nameplate content (corpse/mob names) moved into the

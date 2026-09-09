@@ -13,7 +13,10 @@ const i18n = vi.hoisted(() => ({
   language: 'fr_FR',
   table: {} as Record<string, string>,
 }));
-vi.mock('../src/ui/i18n', () => ({
+// Additive, never bare (the reliquary_window_behavior lesson): only the two
+// members the fixture steers stay overridden; the rest passes through.
+vi.mock('../src/ui/i18n', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/i18n')>()),
   getLanguage: () => i18n.language,
   t: (key: string) => i18n.table[key] ?? key,
 }));

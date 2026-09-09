@@ -92,7 +92,6 @@ function phaseOneState(): NonNullable<Entity['nythraxis']> {
     deathlessCastRemaining: 0,
     deathlessStunRemaining: 0,
     wardChannels: [],
-    finalStand: false,
     deathSpoken: false,
   } as NonNullable<Entity['nythraxis']>;
 }

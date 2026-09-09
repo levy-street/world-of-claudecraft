@@ -1,5 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { ABILITIES } from '../src/sim/data';
+import { ABILITIES, ITEMS } from '../src/sim/data';
+import {
+  NYTHRAXIS_ASCENSION_AURA_ID,
+  NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
+  NYTHRAXIS_BOUND_AURA_ID,
+  NYTHRAXIS_BOUND_STUN_AURA_ID,
+  NYTHRAXIS_UNBOUND_AURA_ID,
+} from '../src/sim/nythraxis_binding_sigil';
+import { NYTHRAXIS_IMPALED_AURA_ID } from '../src/sim/nythraxis_bone_spike';
+import { NYTHRAXIS_BONE_STORM_AURA_ID } from '../src/sim/nythraxis_bone_storm';
+import {
+  NYTHRAXIS_CROWN_ENDURES_AURA_ID,
+  NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID,
+} from '../src/sim/nythraxis_enrage_clock';
+import { NYTHRAXIS_KINGS_WRATH_AURA_ID } from '../src/sim/nythraxis_kings_wrath';
 import {
   BATTLE_RUNE_AURA_ID,
   CARRIED_FLAG_AURA_ID,
@@ -75,8 +89,89 @@ describe('aura icons reuse image-based ability art', () => {
     );
   });
 
+  it("Well Fed carries its own plate recipe, distinct from every role food's stat generic", () => {
+    // Masterwrought phase 10. Well Fed is keyed by AURA id like the rune buffs
+    // above, and it has to be: the role foods share the id but carry an
+    // ordinary stat kind each, so without a row of its own the resolver falls
+    // through to aura_buff_<kind> and Well Fed wears the elixir-or-flask glyph
+    // of whichever stat it happens to grant. Three buffs, one picture, on the
+    // bar where the player picks between them.
+    expect(hasAuraRecipe('well_fed'), 'Well Fed needs its identity recipe').toBe(true);
+    expect(isUnknownIconRecipe(auraIconRecipe('well_fed'))).toBe(false);
+    // The distinctness half, which the presence check alone cannot say: the
+    // recipe is not the one any role food's stat generic resolves to, so the
+    // buff really is separable at a glance from the elixir of the same stat.
+    // The kinds come off the LIVE role-food defs (every def that grants Well
+    // Fed), so a fourth role food on a new axis is checked the day it ships;
+    // the literal floor keeps the sweep from passing over an empty list.
+    const kinds = [
+      ...new Set(
+        Object.values(ITEMS)
+          .map((def) => (def as { wellFed?: { kind?: string } }).wellFed?.kind)
+          .filter((kind): kind is string => typeof kind === 'string'),
+      ),
+    ];
+    expect(
+      kinds.length,
+      'the shipped role foods span at least three stat kinds',
+    ).toBeGreaterThanOrEqual(3);
+    expect(kinds).toEqual(expect.arrayContaining(['buff_sta', 'buff_ap', 'buff_int']));
+    for (const kind of kinds) {
+      expect(auraIconRecipe('well_fed'), `well_fed vs aura_${kind}`).not.toEqual(
+        auraIconRecipe(`aura_${kind}`),
+      );
+    }
+  });
+
   it('keeps a readable attack-power-percent safety fallback', () => {
     expect(hasAuraRecipe('aura_buff_ap_pct')).toBe(true);
+  });
+
+  it("the Nythraxis Impaled stun carries the spike's own recipe", () => {
+    // An encounter-owned stun with no ability record and no painted art: without
+    // this row the resolver collapses it to the aura_stun sunburst.
+    expect(hasAuraRecipe(NYTHRAXIS_IMPALED_AURA_ID), 'Impaled needs its identity recipe').toBe(
+      true,
+    );
+    expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_IMPALED_AURA_ID))).not.toBe(
+      JSON.stringify(auraIconRecipe('aura_stun')),
+    );
+  });
+
+  it('gives every Binding Sigil aura its own readable identity recipe', () => {
+    const ids = [
+      NYTHRAXIS_ASCENSION_AURA_ID,
+      NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
+      NYTHRAXIS_BOUND_AURA_ID,
+      NYTHRAXIS_BOUND_STUN_AURA_ID,
+      NYTHRAXIS_UNBOUND_AURA_ID,
+    ];
+    for (const id of ids) {
+      expect(hasAuraRecipe(id), id).toBe(true);
+      expect(isUnknownIconRecipe(auraIconRecipe(id)), id).toBe(false);
+    }
+    expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_BOUND_STUN_AURA_ID))).not.toBe(
+      JSON.stringify(auraIconRecipe('aura_stun')),
+    );
+    expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_ASCENSION_HASTE_AURA_ID))).not.toBe(
+      JSON.stringify(auraIconRecipe('aura_buff_haste')),
+    );
+  });
+
+  it('gives every phase three Nythraxis aura its own readable identity recipe', () => {
+    const ids = [
+      NYTHRAXIS_KINGS_WRATH_AURA_ID,
+      NYTHRAXIS_BONE_STORM_AURA_ID,
+      NYTHRAXIS_CROWN_ENDURES_AURA_ID,
+      NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID,
+    ];
+    for (const id of ids) {
+      expect(hasAuraRecipe(id), id).toBe(true);
+      expect(isUnknownIconRecipe(auraIconRecipe(id)), id).toBe(false);
+    }
+    expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_CROWN_ENDURES_AURA_ID))).not.toBe(
+      JSON.stringify(auraIconRecipe(NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID)),
+    );
   });
 
   it('keeps painted modifier timers meaningful before their WebPs decode', () => {

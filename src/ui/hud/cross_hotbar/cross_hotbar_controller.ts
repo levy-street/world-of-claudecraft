@@ -10,12 +10,8 @@
 // ARIA drops both on a generic role, leaving the announced name behind.
 
 import { CROSS_HOTBAR_ATTACK_ID } from '../../../game/cross_hotbar';
-import { resolveActionReplacement } from '../../../sim/combat/action_replacement';
-import { resolveColdsightAbilityForSpec } from '../../../sim/combat/hunter_coldsight';
-import { resolveHunterSharedAbilityForTalents } from '../../../sim/combat/hunter_shared';
-import type { TalentAllocation } from '../../../sim/content/talents';
 import type { ResolvedAbility } from '../../../sim/sim';
-import type { AbilityDef, Entity, ItemDef, PlayerClass } from '../../../sim/types';
+import type { AbilityDef, ItemDef } from '../../../sim/types';
 import { formatNumber, t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarSlotElements } from '../action_bar/action_bar_painter';
@@ -115,10 +111,7 @@ export interface CrossHotbarResolvers {
  *  than inline at the call site so src/ui/hud.ts carries a call, not a shape. */
 export function crossHotbarResolvers(
   sim: {
-    known: readonly ResolvedAbility[];
-    player: Entity;
-    talents: TalentAllocation;
-    cfg: { playerClass: PlayerClass };
+    resolvedAbility(id: string): ResolvedAbility | null;
   },
   items: Record<string, ItemDef>,
   abilityName: (def: AbilityDef) => string,
@@ -126,17 +119,10 @@ export function crossHotbarResolvers(
   activeAimAbilityId: () => string | null,
 ): CrossHotbarResolvers {
   return {
-    // Same resolution the action bar performs on its own slots: a saved binding
-    // keeps the BASE ability id while the painted cell follows aura and talent
-    // state, so a transformed ability shows what would actually be cast.
-    abilityById: (id) => {
-      const known = sim.known.find((k) => k.def.id === id) ?? null;
-      if (!known) return null;
-      const resolved = resolveActionReplacement(known, sim.player);
-      if (sim.cfg.playerClass !== 'hunter') return resolved;
-      const coldsight = resolveColdsightAbilityForSpec(resolved, sim.player, sim.talents.spec);
-      return resolveHunterSharedAbilityForTalents(coldsight, sim.player, sim.talents);
-    },
+    // Same resolution the action bar performs on its own slots (IWorld.resolvedAbility):
+    // a saved binding keeps the BASE ability id while the painted cell follows aura and
+    // talent state, so a transformed ability shows what would actually be cast.
+    abilityById: (id) => sim.resolvedAbility(id),
     itemById: (id) => items[id] ?? null,
     abilityName,
     itemName,

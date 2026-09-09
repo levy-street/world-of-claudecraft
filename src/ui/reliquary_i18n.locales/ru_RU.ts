@@ -11,6 +11,10 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  professions_crucible: {
+    name: 'Мастерство Горнила',
+    desc: 'Одиннадцать комплектов из рейдовых материалов, в каждом есть нагрудник, пояс и обувь. Выкройки и формулы дают знания, но не считаются реликвиями.',
+  },
   // Dungeon, delve and world-boss pages: entities.* names verbatim.
   conquerors_hollow_crypt: {
     name: 'Пустая крипта',
@@ -189,5 +193,13 @@ export const table: ReliquaryLocaleTable = {
   conquerors_varkhul_heroic: {
     name: 'Героизм: Внутреннее Горнило',
     desc: 'Щиты и оружие, которые падают только в героическом режиме с Варкхула, отца ковки Последнего Пламени.',
+  },
+  professions_forgebreaker: {
+    name: 'Горнолом',
+    desc: 'Голос Последнего Источника, освобождённый из горна и заключённый в молоте вашей работы.',
+  },
+  conquerors_set_bramblehide: {
+    name: 'Тернистая шкура Рутса',
+    desc: 'Полное кожаное семейство Bramblehide.',
   },
 };

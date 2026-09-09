@@ -230,7 +230,7 @@ describe('a refused selection consumes nothing and grants nothing', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = metaOf(sim);
-    const selling = firstItem((d) => d.kind === 'junk');
+    const selling = firstItem((d) => d.kind === 'junk' && !d.soulbound && !d.noVendorSell);
     const other = Object.values(ITEMS).find((d) => d.kind === 'junk' && d.id !== selling);
     if (!other) throw new Error('need two junk items');
     meta.inventory.length = 0;

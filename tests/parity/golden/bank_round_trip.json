@@ -23,7 +23,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 998,
+      "nextId": 1006,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -37,9 +37,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "07839078",
-      "events": "1bb068e7",
+      "nextId": 1007,
+      "state": "1999d904",
+      "events": "7482333e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -70,6 +70,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -84,7 +85,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -92,6 +93,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -100,7 +104,13 @@
             },
             {
               "count": 5,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -116,7 +126,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -131,7 +142,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -145,7 +156,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -189,8 +200,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "29bf009e",
+      "nextId": 1007,
+      "state": "909921c1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -213,7 +224,13 @@
             "inventory": [
               {
                 "count": 2,
-                "itemId": "wolf_fang"
+                "itemId": "wolf_fang",
+                "materialSources": [
+                  {
+                    "count": 2,
+                    "source": {}
+                  }
+                ]
               }
             ],
             "socketBags": [
@@ -228,6 +245,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -245,7 +263,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -253,6 +271,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -261,7 +282,13 @@
             },
             {
               "count": 3,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 3,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -277,7 +304,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -292,7 +320,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -306,7 +334,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -350,8 +378,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "9e6368d4",
+      "nextId": 1007,
+      "state": "fa511406",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -374,7 +402,13 @@
             "inventory": [
               {
                 "count": 5,
-                "itemId": "wolf_fang"
+                "itemId": "wolf_fang",
+                "materialSources": [
+                  {
+                    "count": 5,
+                    "source": {}
+                  }
+                ]
               }
             ],
             "socketBags": [
@@ -389,6 +423,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -406,7 +441,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -414,6 +449,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -434,7 +472,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -449,7 +488,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -463,7 +502,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -507,8 +546,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "fdf69b86",
+      "nextId": 1007,
+      "state": "e1a878cd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -531,7 +570,13 @@
             "inventory": [
               {
                 "count": 4,
-                "itemId": "wolf_fang"
+                "itemId": "wolf_fang",
+                "materialSources": [
+                  {
+                    "count": 4,
+                    "source": {}
+                  }
+                ]
               }
             ],
             "socketBags": [
@@ -546,6 +591,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -563,7 +609,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -571,6 +617,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -579,7 +628,13 @@
             },
             {
               "count": 1,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -595,7 +650,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -610,7 +666,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -624,7 +680,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -668,8 +724,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "6ff4a8ca",
+      "nextId": 1007,
+      "state": "a889eaaa",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -701,6 +757,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -718,7 +775,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -726,6 +783,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -734,7 +794,13 @@
             },
             {
               "count": 5,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -750,7 +816,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -765,7 +832,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -779,7 +846,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -823,9 +890,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "b1fb6cc0",
-      "events": "acb8d7d0",
+      "nextId": 1007,
+      "state": "61f53a40",
+      "events": "2ba2598f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -857,6 +924,7 @@
           "companionUpgrades": {},
           "copper": 500,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -874,7 +942,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -882,6 +950,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -890,7 +961,13 @@
             },
             {
               "count": 5,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -906,7 +983,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -921,7 +999,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -935,7 +1013,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -979,9 +1057,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "6957fa66",
-      "events": "39e02754",
+      "nextId": 1007,
+      "state": "94004387",
+      "events": "831f4b82",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1013,6 +1091,7 @@
           "companionUpgrades": {},
           "copper": 71000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1032,7 +1111,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1040,6 +1119,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1048,15 +1130,33 @@
             },
             {
               "count": 5,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 10,
-              "itemId": "copper_ore"
+              "itemId": "copper_ore",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "ashwood_log"
+              "itemId": "ashwood_log",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -1072,7 +1172,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1087,7 +1188,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -1101,7 +1202,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1145,9 +1246,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "1b3c34c2",
-      "events": "8bdba07a",
+      "nextId": 1007,
+      "state": "5978dbb7",
+      "events": "e02fc6c5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1179,6 +1280,7 @@
           "companionUpgrades": {},
           "copper": 51000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1198,7 +1300,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1206,6 +1308,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1214,15 +1319,33 @@
             },
             {
               "count": 5,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 10,
-              "itemId": "copper_ore"
+              "itemId": "copper_ore",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "ashwood_log"
+              "itemId": "ashwood_log",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -1239,7 +1362,8 @@
           "vault": {
             "stock": {},
             "upgrades": 1
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1254,7 +1378,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -1268,7 +1392,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1312,8 +1436,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "4dd57841",
+      "nextId": 1007,
+      "state": "d9a850cb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1346,6 +1470,7 @@
           "companionUpgrades": {},
           "copper": 51000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1365,7 +1490,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1373,6 +1498,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1381,15 +1509,33 @@
             },
             {
               "count": 5,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "copper_ore"
+              "itemId": "copper_ore",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "ashwood_log"
+              "itemId": "ashwood_log",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -1408,7 +1554,8 @@
               "copper_ore": 6
             },
             "upgrades": 1
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1423,7 +1570,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -1437,7 +1584,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1481,8 +1628,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "351c00f2",
+      "nextId": 1007,
+      "state": "d38fd847",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1515,6 +1662,7 @@
           "companionUpgrades": {},
           "copper": 51000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1534,7 +1682,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1542,6 +1690,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1550,11 +1701,23 @@
             },
             {
               "count": 5,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "copper_ore"
+              "itemId": "copper_ore",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -1574,7 +1737,8 @@
               "copper_ore": 6
             },
             "upgrades": 1
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1589,7 +1753,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -1603,7 +1767,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1647,8 +1811,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "f1f5ff8e",
+      "nextId": 1007,
+      "state": "328f2df9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1681,6 +1845,7 @@
           "companionUpgrades": {},
           "copper": 51000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1700,7 +1865,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1708,6 +1873,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1716,11 +1884,23 @@
             },
             {
               "count": 5,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 6,
-              "itemId": "copper_ore"
+              "itemId": "copper_ore",
+              "materialSources": [
+                {
+                  "count": 6,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -1740,7 +1920,8 @@
               "copper_ore": 4
             },
             "upgrades": 1
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1755,7 +1936,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -1769,7 +1950,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1813,9 +1994,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "7f105b1e",
-      "events": "703edd98",
+      "nextId": 1007,
+      "state": "73916485",
+      "events": "a0f66a8d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1847,6 +2028,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1866,7 +2048,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1874,6 +2056,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1882,11 +2067,23 @@
             },
             {
               "count": 5,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 6,
-              "itemId": "copper_ore"
+              "itemId": "copper_ore",
+              "materialSources": [
+                {
+                  "count": 6,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -1906,7 +2103,8 @@
               "copper_ore": 4
             },
             "upgrades": 2
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1921,7 +2119,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -1935,7 +2133,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1979,9 +2177,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "0b087793",
-      "events": "0b5294fa",
+      "nextId": 1007,
+      "state": "e64ee2e9",
+      "events": "f0a19a87",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2013,6 +2211,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -2033,7 +2232,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2041,6 +2240,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -2070,7 +2272,8 @@
               "wolf_fang": 5
             },
             "upgrades": 2
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2085,7 +2288,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -2099,7 +2302,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2143,9 +2346,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 999,
-      "state": "c97f38ed",
-      "events": "54eb8d21",
+      "nextId": 1007,
+      "state": "7f1ac513",
+      "events": "aed8e06d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2177,6 +2380,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -2207,7 +2411,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2215,6 +2419,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -2245,7 +2452,8 @@
               "wolf_fang": 5
             },
             "upgrades": 2
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2260,7 +2468,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -2274,7 +2482,7 @@
           "fiveSecondRule": 99.1,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

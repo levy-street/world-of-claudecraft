@@ -88,6 +88,13 @@ export interface GuildInfo {
   pledgeSettings: GuildPledgeSettings;
   pledges: GuildPledgeInfo[];
   tier: number;
+  // Roster expansion (docs/prd/guild-roster-expansion.md): the seats the guild
+  // may fill (base seats plus bought pages) and the copper price of the next
+  // page, null once the ladder is complete. Both server-derived; optional on
+  // the mirror because a frame from an older server carries neither, and the
+  // view core (social_view.ts guildView) falls back to the base roster.
+  memberCap?: number;
+  nextRosterPrice?: number | null;
 }
 
 export interface SocialInfo {
@@ -160,6 +167,11 @@ export interface IWorldSocialGraph {
   // guild billboard: set (or clear, with '') the message pinned atop the Guild
   // tab. Officers + the Guild Master only; the server enforces the rank gate.
   guildSetMotd(text: string): void;
+  // Roster expansion: buy the next 20-seat page from the viewer's OWN purse.
+  // Guild Master only; the server prices the page from the guild row and
+  // refuses everyone else (socialInfo.guild.nextRosterPrice is the UX price,
+  // never the charged one). Inert offline.
+  guildBuyRosterPage(): void;
   // realm-scoped username typeahead for friend/ignore/guild search
   searchCharacters(query: string): Promise<CharacterSearchResult[]>;
   // public profile for any character on the realm, by name. Lets the player menu

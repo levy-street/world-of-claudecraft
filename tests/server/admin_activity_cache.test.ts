@@ -80,6 +80,29 @@ describe('admin activity cache', () => {
     expect(levels).toEqual(BUNDLE.levels);
   });
 
+  it('installs the bundle DEEP-frozen: the four arrays and their rows, not just the wrapper', async () => {
+    // The route's serialize-once memo (server/ok_response_memo.ts) keys on
+    // these arrays' identities and replays bytes built from their contents; a
+    // shallow freeze left every row mutable (the hot-path review's nit).
+    const [registrations, sessions, classes, levels] = await Promise.all([
+      registrationsByDay(ACTIVITY_WINDOW_DAYS),
+      sessionsByDay(ACTIVITY_WINDOW_DAYS),
+      classDistribution(),
+      levelDistribution(),
+    ]);
+    for (const rows of [registrations, sessions, classes, levels]) {
+      expect(Object.isFrozen(rows)).toBe(true);
+      expect(rows.length).toBeGreaterThan(0);
+      for (const row of rows) expect(Object.isFrozen(row)).toBe(true);
+    }
+    expect(() => {
+      (registrations as { day: string; count: number }[]).push({ day: 'x', count: 0 });
+    }).toThrow();
+    expect(() => {
+      (classes[0] as { count: number }).count = 99;
+    }).toThrow();
+  });
+
   it('a warm hit inside the TTL serves every field without re-querying', async () => {
     await registrationsByDay(ACTIVITY_WINDOW_DAYS);
     nowMs += ADMIN_ACTIVITY_TTL_MS - 1;

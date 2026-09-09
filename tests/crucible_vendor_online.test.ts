@@ -5,8 +5,8 @@
 // buy-path outcome over handleMessage (sigil debit, set-piece grant), the
 // routed vendor response frame, and the ClientWorld inventory mirror.
 //
-// The fixture moves the player to the quartermaster at the overworld raid
-// entrance; crucible_buy is an ordinary player command with no dev gating.
+// The fixture stands at the overworld landing singleton, using the ordinary
+// player command without dev gating.
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so the live GameServer suite needs no Postgres (the
@@ -63,20 +63,16 @@ import {
 const SET_PIECE = 'slagbreaker_helmet';
 const SIGIL = 'sigil_anvil_helmet';
 
-function raidServer(): GameServer {
-  return new GameServer();
-}
-
-/** Join a session and stand the player at the overworld raid quartermaster. */
+/** Join a session and stand at the keep's landing quartermaster. */
 function joinAtQuartermaster(server: GameServer, fc: FakeClient): ClientSession {
   const session = joinServer(server, fc, 1, 'Redeemer');
   const vendor = [...server.sim.entities.values()].find(
     (e) => e.kind === 'npc' && e.templateId === CRUCIBLE_VENDOR_NPC_ID,
   );
-  if (!vendor) throw new Error('Crucible Quartermaster did not spawn outside the raid entrance');
+  if (!vendor) throw new Error('Crucible Quartermaster did not spawn in the overworld');
   const player = server.sim.entities.get(session.pid);
   if (!player) throw new Error('joined player missing');
-  player.pos = { x: vendor.pos.x + 1, y: player.pos.y, z: vendor.pos.z };
+  player.pos = { x: vendor.pos.x + 1, y: vendor.pos.y, z: vendor.pos.z };
   player.prevPos = { ...player.pos };
   (server.sim as unknown as { rebucket(e: unknown): void }).rebucket(player);
   return session;
@@ -92,7 +88,7 @@ function sendBuy(server: GameServer, session: ClientSession, itemId: unknown): v
 
 describe('crucible_buy over the GameServer wire', () => {
   it('debits the sigil, grants the set piece, routes the vendor frame, and mirrors the bags', () => {
-    const server = raidServer();
+    const server = new GameServer();
     const fc = fakeWs();
     const session = joinAtQuartermaster(server, fc);
     server.sim.addItem(SIGIL, 2, session.pid);
@@ -134,7 +130,7 @@ describe('crucible_buy over the GameServer wire', () => {
   });
 
   it('rejects non-string itemId payloads at the dispatch guard, before the sim handler', () => {
-    const server = raidServer();
+    const server = new GameServer();
     const fc = fakeWs();
     const session = joinAtQuartermaster(server, fc);
     server.sim.addItem(SIGIL, 1, session.pid);
@@ -168,7 +164,7 @@ describe('crucible_buy over the GameServer wire', () => {
     // The heroic_buy wire test's refusal arm, mirrored: dispatch passes the
     // string through and the sim's own range gate answers with an error event
     // instead of a grant.
-    const server = raidServer();
+    const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Farbuyer');
     const vendor = [...server.sim.entities.values()].find(
@@ -177,7 +173,7 @@ describe('crucible_buy over the GameServer wire', () => {
     const player = server.sim.entities.get(session.pid);
     if (!vendor || !player) throw new Error('vendor or player missing');
     // Explicitly out of reach (the sim-direct suite's +40 recipe).
-    player.pos = { x: vendor.pos.x + 40, y: player.pos.y, z: vendor.pos.z };
+    player.pos = { x: vendor.pos.x + 40, y: vendor.pos.y, z: vendor.pos.z };
     player.prevPos = { ...player.pos };
     (server.sim as unknown as { rebucket(e: unknown): void }).rebucket(player);
     server.sim.addItem(SIGIL, 1, session.pid);

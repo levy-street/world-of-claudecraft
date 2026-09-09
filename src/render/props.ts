@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import {
-  deinterleaveGeometry,
-  mergeGeometries,
-} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
@@ -37,7 +34,6 @@ import {
   isEastbrookRebuildStall,
   isEastbrookRebuildWell,
 } from './eastbrook_town';
-import { indexExactVertexTuples } from './exact_index_geometry';
 import {
   isFenbridgeRebuildBuilding,
   isFenbridgeRebuildStall,
@@ -67,6 +63,7 @@ import {
   updatePropCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
+import { mergeBandDepth, mergeStaticMeshes, normalizedStaticGeometry } from './static_merge';
 import { applySurfaceDetail, type WornFamilyPick, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
@@ -133,8 +130,6 @@ export interface PropsResult {
   revealRoots(key: string): readonly THREE.Object3D[];
 }
 
-const mergeBandDepth = (): number => (GFX.standardMaterials ? 180 : 90);
-
 // ---------------------------------------------------------------------------
 // Asset registry — loads kick off at module import; main.ts awaits
 // assetsReady() before the Renderer is constructed, so buildProps() can read
@@ -151,8 +146,9 @@ interface PropAssetDef {
   strip?: RegExp;
 }
 
-// exported for render/castle_features.ts, which instances the kcas castle
-// set through the same registry (one preload gate, one manifest surface)
+// exported for the castle render assemblies (render/dawnhold_features.ts),
+// which instance the kcas castle set through the same registry (one preload
+// gate, one manifest surface)
 export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   house1: { url: '/models/props/house_1.glb', kit: 'village' },
   house2: { url: '/models/props/house_2.glb', kit: 'village', yaw: -Math.PI / 2 },
@@ -752,12 +748,21 @@ function convertMaterial(
       emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
+  // Distant-zone air (biome_haze_field.ts): every converted kit material
+  // hazes with the ground under it. Attached FIRST, before the worn detail,
+  // because that is the order surfaceMat, foliage.ts and
+  // reattachClonedMaterialHooks compose the two hooks: a kit material
+  // attached the other way round composed a different key text, so every
+  // hook-preserving clone of it linked a second program for the same GLSL
+  // (12 links per login at Eastbrook in the 2026-08-27 program-key ledger).
+  attachBiomeHaze(mat);
   // Triplanar surface-detail layer, applied before caching so every consumer
   // of the shared per-key material carries it (the helper self-gates to
   // standard materials, so the Lambert branch is a no-op). Routing matches on
   // the SOURCE material name (s.name), which keys the cache; the context
   // flags keep emissive/transparent surfaces clean and let Tripo props that
-  // ship their own PBR maps skip the bare-coverage fallback.
+  // ship their own PBR maps skip the bare-coverage fallback. Chains over the
+  // haze hook above.
   const worn =
     familyOverride !== undefined
       ? familyOverride
@@ -771,9 +776,6 @@ function convertMaterial(
       strength: worn.strength,
     });
   }
-  // Distant-zone air (biome_haze_field.ts): every converted kit material
-  // hazes with the ground under it, chained over the worn-detail hook.
-  attachBiomeHaze(mat);
   mat.name = `${kit}:${s.name}`;
   matConvCache.set(key, mat);
   return mat;
@@ -2941,65 +2943,6 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
     out.push(cell);
   }
   return out;
-}
-
-// Bake every static prop mesh into world space and merge per
-// (material, castShadow, z-band). Flames (animated) and InstancedMeshes
-// survive untouched, as do the PointLights (not meshes). The merged meshes
-// replace the originals on the same group; emptied sub-groups are left in
-// place (they carry lights). Non-indexed procedural shapes receive exact tuple
-// indices so they can share indexed glTF buckets without expanding either.
-function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE.Mesh[] {
-  group.updateMatrixWorld(true);
-  interface Bucket {
-    material: THREE.Material;
-    castShadow: boolean;
-    geoms: THREE.BufferGeometry[];
-  }
-  const buckets = new Map<string, Bucket>();
-  const merged: THREE.Mesh[] = [];
-  group.traverse((o) => {
-    const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh || keep.has(mesh) || (mesh as THREE.InstancedMesh).isInstancedMesh) return;
-    const material = mesh.material as THREE.Material;
-    const worldX = mesh.matrixWorld.elements[12];
-    const worldZ = mesh.matrixWorld.elements[14];
-    const band = Math.floor((worldZ - WORLD_MIN_Z) / mergeBandDepth());
-    // x-halved like the instance batches above: world-wide merged bands
-    // defeat shadow-frustum culling (their bounds always intersect it).
-    const key = `${material.uuid}:${mesh.castShadow ? 1 : 0}:${worldX < 0 ? 'w' : 'e'}:${band}`;
-    let bucket = buckets.get(key);
-    if (!bucket) {
-      bucket = { material, castShadow: mesh.castShadow, geoms: [] };
-      buckets.set(key, bucket);
-    }
-    // Extracted geometries are shared across placements, so the bake must
-    // never mutate them in place. Preserve source index reuse and normalize
-    // procedural streams with byte-exact full-tuple indices.
-    const geo = normalizedStaticGeometry(mesh.geometry);
-    bucket.geoms.push(geo.applyMatrix4(mesh.matrixWorld));
-    merged.push(mesh);
-  });
-  for (const mesh of merged) mesh.removeFromParent();
-  const out: THREE.Mesh[] = [];
-  for (const bucket of buckets.values()) {
-    const geo = mergeGeometries(bucket.geoms, false);
-    if (!geo) continue;
-    geo.computeBoundingBox();
-    geo.computeBoundingSphere();
-    const mesh = new THREE.Mesh(geo, bucket.material);
-    mesh.castShadow = bucket.castShadow;
-    mesh.receiveShadow = true;
-    group.add(mesh);
-    out.push(mesh);
-  }
-  return out;
-}
-
-function normalizedStaticGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
-  const normalized = source.clone();
-  deinterleaveGeometry(normalized);
-  return normalized.index ? normalized : indexExactVertexTuples(normalized);
 }
 
 export const propStaticMergeInternalsForTest = { mergeStaticMeshes };

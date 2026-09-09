@@ -1,5 +1,5 @@
 // Round-7 surface-detail verification captures: the Eastbrook keep (Grand
-// Armoury), a town street, natural boulders (rock family), the Eldergleam
+// Armoury), a town street, natural boulders (rock family), the Eldershine
 // giant trunk (landmark bark), the Last Keep bailey, and a forge close-up
 // (Metal013 metalness). Grazing-angle variants exercise the deepened
 // per-family parallax. Modeled on scripts/gfx_judge_shots.mjs (real GPU via
@@ -40,7 +40,7 @@ const SHOTS = [
   // Natural boulders near the peaks: the rock family (no brick pattern).
   { name: 'boulder_close', x: 30, z: 700, yaw: 0.5, pitch: 0.3, dist: 6 },
   { name: 'boulder_graze', x: 30, z: 700, yaw: 0.5, pitch: 0.02, dist: 4 },
-  // The Eldergleam great tree at (-40, 1026), scale 6.5: landmark bark.
+  // The Eldershine great tree at (-40, 1026), scale 6.5: landmark bark.
   { name: 'great_tree_trunk', x: -33, z: 1020, yaw: -0.86, pitch: 0.15, dist: 8 },
   // The Last Keep bailey (khex/kcas masonry stays ashlar).
   { name: 'last_keep_street', x: 396, z: 2040, yaw: 2.24, pitch: -0.15, dist: 12 },

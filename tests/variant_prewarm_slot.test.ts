@@ -60,6 +60,22 @@ describe('createVariantPrewarmSlot', () => {
     expect(twin.parent).toBe(h.scene);
   });
 
+  it('names the staged group as the link unit root, read when the unit runs', async () => {
+    // The resume lane warms a unit's roots through the worker before its
+    // link; the group exists only after the stage unit, so the root is a
+    // live read, empty before it and the group after.
+    const h = host();
+    const twin = new THREE.Group();
+    const slot = createVariantPrewarmSlot(h.api, 'landmarks.impact-site', () => twin);
+    const units = slot.resumeUnits();
+    expect(units[0].roots).toBeUndefined();
+    expect(units[1].roots).toEqual([]);
+    await units[0].run();
+    expect(units[1].roots).toEqual([twin]);
+    slot.cleanup();
+    expect(units[1].roots).toEqual([]);
+  });
+
   it('hides at entry and removes without disposing at cleanup', () => {
     const h = host();
     const twin = new THREE.Group();

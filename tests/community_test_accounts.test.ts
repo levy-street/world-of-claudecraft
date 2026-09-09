@@ -59,9 +59,12 @@ describe('community test character templates', () => {
       // The worn set is exactly the class's primary BiS kit (a 2H class may
       // legitimately leave the offhand empty).
       expect(Object.keys(state.equipment).sort()).toEqual(Object.keys(bisKit(cls)).sort());
-      // Derived from bestBoostBag(), never a literal id or total: two GENERAL
-      // 16-slot bags tie at the top since phase 05 (wayfarers_backpack and
-      // resonant_weave_bag) and bestBoostBag breaks the tie by ascending id,
+      // Derived from bestBoostBag(), never a literal id or total: on the
+      // merged tree THREE general 16-slot bags tie at the top
+      // (wayfarers_backpack, Bank Storage phase 05's resonant_weave_bag, and
+      // the Masterwrought apex sunspun_haversack; the phase 08 ruling that a
+      // test-account template picks the true best bag holds through the
+      // derivation) and bestBoostBag breaks the tie by ascending id,
       // the same explicit rule as dev_kit's bestBy, so a content-table reorder
       // cannot move the answer. Deriving keeps this suite agnostic to which
       // bag wins if the catalog moves; the sibling suites (server/pbe_boost,

@@ -16,15 +16,16 @@ vi.mock('../src/render/characters/portrait', () => ({
   portraitsReady: vi.fn(() => false),
   visualPortraitDataUrl: vi.fn(),
 }));
-vi.mock('../src/ui/icons', () => ({
+// Additive, never bare (the reliquary_window_behavior lesson): the canvas
+// resolvers stay stubbed; every export the factory does not name passes
+// through, so hud.ts dereferencing a NEW icons export at module scope (the
+// createAuraIconResolver hunt this mock's history records) can never again
+// throw "No export is defined" from a file the change never touched.
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
   iconDataUrl: (kind: string, id: string) => `mock:${kind}:${id}`,
   QUALITY_COLOR: {},
   raidMarkerDataUrl: vi.fn(() => ''),
-  // hud.ts dereferences these three at MODULE scope (createAuraIconResolver's
-  // call site), not just inside a method, so a mock missing any of them throws
-  // "No export is defined" the instant hud.ts is imported, before any test
-  // body runs. The other three are only read inside methods this suite never
-  // calls, but are stubbed too so a future call path does not repeat the hunt.
   auraImageUrl: vi.fn(() => null),
   cachedProceduralIconDataUrl: vi.fn((kind: string, id: string) => `mock:${kind}:${id}`),
   hasAbilityIconIdentity: vi.fn(() => false),
@@ -197,7 +198,7 @@ describe('Hud Warlock pet signature bar', () => {
     expect(hud.sim.setPetAutoSpecial).toHaveBeenCalledTimes(2);
   });
 
-  it('shows Gloomshade Chain and Taunt, including touch-hold autocast control', () => {
+  it('shows Duskmurk Chain and Taunt, including touch-hold autocast control', () => {
     vi.useFakeTimers();
     document.body.classList.add('mobile-touch');
     const hud = makeHud('gloomshade');
@@ -338,6 +339,35 @@ describe('Hud Warlock pet signature bar', () => {
     hud.renderPetBar(null);
 
     expect(document.getElementById('petbar')?.style.display).toBe('none');
+  });
+
+  it('rebuilds and hides without touching the movable-frame chrome beside its groups', () => {
+    // The pet bar is a HUD frame (HUD_FRAME_SPECS 'petBar'): MovableFrame
+    // mints its corner button, grip, name chip and edge glow as DIRECT
+    // children of #petbar, so the rebuild and the hide path may wipe only
+    // the .petbar-group children, never bar.innerHTML.
+    const CHROME = ['tf-move-btn', 'mf-resize-grip', 'tf-frame-label', 'tf-edge-glow'];
+    const bar = document.getElementById('petbar') as HTMLElement;
+    for (const cls of CHROME) {
+      const el = document.createElement(cls === 'tf-frame-label' ? 'span' : 'button');
+      el.className = cls;
+      bar.appendChild(el);
+    }
+    const hud = makeHud('emberkin');
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
+    expect(bar.querySelectorAll('.petbar-group')).toHaveLength(2);
+    // A signature change rebuilds the groups in place.
+    hud.petModeMenuOpen = true;
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
+    expect(bar.querySelectorAll('.petbar-group')).toHaveLength(2);
+    // Dismissed pet: the groups go, the chrome stays.
+    hud.sim.entities.delete(2);
+    hud.renderPetBar(null);
+    expect(bar.style.display).toBe('none');
+    expect(bar.querySelectorAll('.petbar-group')).toHaveLength(0);
+    for (const cls of CHROME) {
+      expect(bar.querySelector(`.${cls}`), cls).not.toBeNull();
+    }
   });
 
   it('keeps a non-colour autocast cue in forced-colors mode', () => {

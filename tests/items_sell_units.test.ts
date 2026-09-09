@@ -12,7 +12,17 @@ import { removeSellUnitsFromInventory, removeVendorSellUnits } from '../src/sim/
 import type { SimContext } from '../src/sim/sim_context';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 
-const ID = 'wolf_fang';
+// A GENUINE non-material item id (kind 'potion', never 'junk', so
+// isMaterialItemId is false for it no matter what content tables ship): the
+// walk below is the legacy per-slot payload/marker path, and the
+// reference-identity contract below (clone-on-survival) can only be proved on
+// that path, since a material unit's payload is ALWAYS a fresh clone by
+// contract (material_inventory_units.ts). The material-sourced walk gets its
+// own coverage in "material units (canonical source order)" below, over a
+// real material id, so this rename does not drop material coverage: it moves
+// it to the block that can state its own (different) contract correctly.
+const ID = 'minor_healing_potion';
+const MATERIAL_ID = 'wolf_fang'; // a real material id (junk-kind, HARVEST_COMPONENT_ITEMS)
 
 describe('the plain pass', () => {
   it('consumes plain slots highest-index-first, reporting each unit with its own marker', () => {
@@ -240,6 +250,147 @@ describe('asking for more than the bags hold', () => {
     const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 1 }];
     expect(removeSellUnitsFromInventory(inv, ID, 3)).toEqual([]);
     expect(inv).toEqual([{ itemId: 'baked_bread', count: 1 }]);
+  });
+});
+
+describe('material units (canonical source order)', () => {
+  // A material id routes through takeMaterialUnits (material_item_custody.ts)
+  // instead of the plain/instanced walks above. Every fixture here uses
+  // MATERIAL_ID so isMaterialItemId is true; the returned units carry
+  // `materialSources` (material_inventory_units.ts materialInventoryUnits) and
+  // the legacy `signer` moves off `instance` into `source.signer`.
+
+  it('a legacy signed slot reports source.signer with no invented gatherer', () => {
+    const inv: InvSlot[] = [{ itemId: MATERIAL_ID, count: 1, instance: { signer: 'Ayla' } }];
+    const units = removeSellUnitsFromInventory(inv, MATERIAL_ID, 1);
+    expect(units).toEqual([
+      {
+        instance: undefined,
+        craftedRecipeId: undefined,
+        materialSources: [{ source: { signer: 'Ayla' }, count: 1 }],
+      },
+    ]);
+    expect(inv).toEqual([]);
+  });
+
+  it('a plain unrecorded slot reports the empty source, not a fabricated one', () => {
+    const inv: InvSlot[] = [{ itemId: MATERIAL_ID, count: 1 }];
+    const units = removeSellUnitsFromInventory(inv, MATERIAL_ID, 1);
+    expect(units).toEqual([
+      {
+        instance: undefined,
+        craftedRecipeId: undefined,
+        materialSources: [{ source: {}, count: 1 }],
+      },
+    ]);
+  });
+
+  it('preserves the rest of the payload and the craftedRecipeId marker, signer only stripped', () => {
+    const inv: InvSlot[] = [
+      {
+        itemId: MATERIAL_ID,
+        count: 1,
+        instance: { signer: 'Ayla', rolled: { stats: { agi: 1 } } },
+        craftedRecipeId: 'recipe_material',
+      },
+    ];
+    const units = removeSellUnitsFromInventory(inv, MATERIAL_ID, 1);
+    expect(units).toEqual([
+      {
+        instance: { rolled: { stats: { agi: 1 } } },
+        craftedRecipeId: 'recipe_material',
+        materialSources: [{ source: { signer: 'Ayla' }, count: 1 }],
+      },
+    ]);
+  });
+
+  it('spends unrecorded stock before a premium (signed) one, even when the premium sits at the LOWER index', () => {
+    // Index order would take the premium copy first (it sits at index 0); the
+    // canonical spend order (material_sources.ts compareMaterialSpendOrder)
+    // takes unrecorded material first regardless of index, so the signed copy
+    // at index 0 must survive untouched.
+    const inv: InvSlot[] = [
+      { itemId: MATERIAL_ID, count: 1, instance: { signer: 'Cedric' } },
+      { itemId: MATERIAL_ID, count: 1 },
+    ];
+    const units = removeSellUnitsFromInventory(inv, MATERIAL_ID, 1);
+    expect(units).toEqual([
+      {
+        instance: undefined,
+        craftedRecipeId: undefined,
+        materialSources: [{ source: {}, count: 1 }],
+      },
+    ]);
+    expect(inv).toEqual([{ itemId: MATERIAL_ID, count: 1, instance: { signer: 'Cedric' } }]);
+  });
+
+  it('within one spend tier, the SAME descriptor is taken from the highest index first', () => {
+    const inv: InvSlot[] = [
+      { itemId: MATERIAL_ID, count: 1 },
+      { itemId: MATERIAL_ID, count: 1 },
+    ];
+    removeSellUnitsFromInventory(inv, MATERIAL_ID, 1);
+    // The index-1 copy left; index 0 is the one that survives.
+    expect(inv).toEqual([{ itemId: MATERIAL_ID, count: 1 }]);
+  });
+
+  it('reports units in ascending stack-index order, never in spend-priority order', () => {
+    // Spend priority takes index 2 (unrecorded, highest-index tiebreak) and
+    // index 0 (unrecorded) before the premium index 1 copy, but the RETURNED
+    // array is ordered by which STACK each unit came from, ascending: this is
+    // the "canonical descriptor ordering... replaces blind index order"
+    // contract, and it is a real behavior change from the old walk (which
+    // reported highest-index-first).
+    const inv: InvSlot[] = [
+      { itemId: MATERIAL_ID, count: 1 }, // index 0: unrecorded
+      { itemId: MATERIAL_ID, count: 1, instance: { signer: 'Ayla' } }, // index 1: premium
+      { itemId: MATERIAL_ID, count: 1 }, // index 2: unrecorded
+    ];
+    const units = removeSellUnitsFromInventory(inv, MATERIAL_ID, 3);
+    expect(units).toEqual([
+      {
+        instance: undefined,
+        craftedRecipeId: undefined,
+        materialSources: [{ source: {}, count: 1 }],
+      },
+      {
+        instance: undefined,
+        craftedRecipeId: undefined,
+        materialSources: [{ source: { signer: 'Ayla' }, count: 1 }],
+      },
+      {
+        instance: undefined,
+        craftedRecipeId: undefined,
+        materialSources: [{ source: {}, count: 1 }],
+      },
+    ]);
+    expect(inv).toEqual([]);
+  });
+
+  it('skip/deprioritize are judged on the EFFECTIVE payload (source.signer), same contract as the instanced walk', () => {
+    const deprioritize = (instance: ItemInstancePayload): boolean => instance.signer === 'Ayla';
+    const inv: InvSlot[] = [
+      { itemId: MATERIAL_ID, count: 1, instance: { signer: 'Cedric' } },
+      { itemId: MATERIAL_ID, count: 1, instance: { signer: 'Ayla' } },
+    ];
+    const units = removeSellUnitsFromInventory(inv, MATERIAL_ID, 1, undefined, deprioritize);
+    expect(units).toEqual([
+      {
+        instance: undefined,
+        craftedRecipeId: undefined,
+        materialSources: [{ source: { signer: 'Cedric' }, count: 1 }],
+      },
+    ]);
+    expect(inv).toEqual([{ itemId: MATERIAL_ID, count: 1, instance: { signer: 'Ayla' } }]);
+  });
+
+  it('no unit aliases its source slot: two units off one bucket are independent objects', () => {
+    const inv: InvSlot[] = [{ itemId: MATERIAL_ID, count: 2, instance: { signer: 'Ayla' } }];
+    const units = removeSellUnitsFromInventory(inv, MATERIAL_ID, 2);
+    expect(units).toHaveLength(2);
+    expect(units[0].materialSources).not.toBe(units[1].materialSources);
+    expect(units[0].materialSources![0].source).not.toBe(units[1].materialSources![0].source);
+    expect(units[0].materialSources).toEqual(units[1].materialSources);
   });
 });
 

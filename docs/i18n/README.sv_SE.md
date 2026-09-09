@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.sv_SE.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Varje instans går också att köra på **Heroic**: fiender på högre nivå, sk
 
 ### Delves
 
-Delves är ett separat, skalbart läge för små grupper med en eller två spelare, ombyggt från slumpade kammare vid varje genomgång och avslutat vid en låst relikvariekista som öppnas genom ett dyrkningsminispel i stället för ett lootkast. **The Collapsed Reliquary** (nivå 7 och uppåt) slutar vid Deacon Varric, med en AI-följeslagare, Tessa, som slåss vid din sida om du går ensam. **The Drowned Litany** (nivå 12 och uppåt) följer spåret in i en översvämmad helgedom i utkanten av Mirefen Marsh. En delve-tavla sätter nivån: Heroic höjer fiendernas nivåer och lägger till ett slumpat affix för rikare belöningar.
+Delves är ett separat, skalbart läge för små grupper med en eller två spelare, ombyggt från slumpade kammare vid varje genomgång och avslutat vid en låst relikvariekista som öppnas genom ett dyrkningsminispel i stället för ett lootkast. **The Collapsed Reliquary** (nivå 7 och uppåt) slutar vid Deacon Vandric, med en AI-följeslagare, Tessa, som slåss vid din sida om du går ensam. **The Drowned Litany** (nivå 12 och uppåt) följer spåret in i en översvämmad helgedom i utkanten av Mirefen Marsh. En delve-tavla sätter nivån: Heroic höjer fiendernas nivåer och lägger till ett slumpat affix för rikare belöningar.
 
 ### Rankad PvP (the Ashen Coliseum)
 

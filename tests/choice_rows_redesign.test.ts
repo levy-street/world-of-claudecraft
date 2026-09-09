@@ -217,7 +217,7 @@ describe('paladin redesign', () => {
     );
   });
 
-  it('Sanctified Fervor: Avenging Wrath grants critical strike and both haste channels', () => {
+  it('Sanctified Fervor: Zealwing grants critical strike and both haste channels', () => {
     const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_sanctified_fervor' });
     sim.castAbility('avenging_wrath');
     expect(p.auras.some((a) => a.kind === 'buff_crit' && a.value === 0.15)).toBe(true);

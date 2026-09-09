@@ -183,11 +183,11 @@ describe('Intervene (level-5 warrior mobility row)', () => {
     expect(intervene.amount).toBeLessThan(psalmAtCap.amount / 3);
   });
 
-  it('holds the warrior mobility budget: Intervene and Heroic Leap on 30 sec', () => {
+  it('holds the warrior mobility budget: Intervene and Vaulting Charge on 30 sec', () => {
     // The point of this row re-cut is the PvP mobility budget, so the two knobs move
     // together and are pinned together. Intervene sits at DOUBLE the hostile Onrush
     // deliberately: the replacement must not hand a short-cooldown reposition back
-    // through the friendly door. Heroic Leap is base kit, so its 30 sec reaches all
+    // through the friendly door. Vaulting Charge is base kit, so its 30 sec reaches all
     // three specs, not just the warriors who take this row.
     expect(ABILITIES.intervene.cooldown).toBe(30);
     expect(ABILITIES.heroic_leap.cooldown).toBe(30);

@@ -18,7 +18,7 @@ const DISMISSED_KEY = 'woc_gpu_notice_dismissed';
 // frames. Seed the FULL component set instead: sorted and comma-joined, exactly
 // what the toast writes when a player dismisses every component at once.
 // Kept in sync with GPU_NOTICE_COMPONENTS by tests/gpu_notice_view.test.ts.
-const DISMISSED_ALL_COMPONENTS = 'discrete-inactive,hybrid,software';
+const DISMISSED_ALL_COMPONENTS = 'discrete-inactive,hybrid,requested-backend,software';
 
 /** @param {import('puppeteer-core').Page} page */
 export async function suppressGpuNotice(page) {

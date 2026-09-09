@@ -13,13 +13,12 @@ vi.mock('pg', () => ({
   },
 }));
 
+import { DB_STATEMENT_TIMEOUT_MS, insertBankLedgerRow, insertBankLedgerRows } from '../server/db';
 import {
-  DB_STATEMENT_TIMEOUT_MS,
   GUILD_BANK_LOG_TIMEOUT_MS,
-  insertBankLedgerRow,
-  insertBankLedgerRows,
+  loadGuildBankLogPage,
   loadGuildBankLogRows,
-} from '../server/db';
+} from '../server/guild_bank_log_db';
 import { REALM } from '../server/realm';
 
 beforeEach(() => {
@@ -436,10 +435,72 @@ describe('loadGuildBankLogRows: the activity log statement', () => {
     // it cannot widen the LIMIT walk: a guild lives on one realm and guild ids
     // are globally unique, so it matches every row the container predicate does.
     expect(sql).toContain('bl.realm = $4');
-    expect(params).toEqual([913, ['deposit', 'withdraw'], 50, 'Claudemoon']);
+    // LIMIT is the window PLUS ONE: the extra row is the `more` probe the
+    // cursor needs, and it is dropped before the page leaves the reader.
+    expect(params).toEqual([913, ['deposit', 'withdraw'], 51, 'Claudemoon']);
+    // The newest window carries NO cursor predicate at all (a `$5 IS NULL OR`
+    // form can demote the cursor to a filter under a generic plan).
+    expect(sql).not.toContain('bl.id <');
     // No wrapper around the indexed columns: a COALESCE / lower() / cast on
     // container_id or id makes the index unusable.
     expect(sql).not.toMatch(/COALESCE\s*\(\s*bl\.(container_id|id)/i);
+  });
+
+  it('an older page adds the id cursor as a bound parameter on the same index column', async () => {
+    const client = { query: vi.fn(), release: vi.fn() };
+    client.query.mockResolvedValue({ rows: [], rowCount: 0 } as never);
+    dbMock.connect.mockResolvedValue(client as never);
+    await loadGuildBankLogPage(913, 50, ['deposit'], 400);
+    const [sql, params] = client.query.mock.calls.find((c) =>
+      String(c[0]).includes('FROM bank_ledger'),
+    ) as [string, unknown[]];
+    // Strictly older (`<`, never `<=`, so the cursor row is never repeated),
+    // on `bl.id` itself (the index's trailing column, no wrapper), bound.
+    expect(sql).toContain('bl.id < $5');
+    expect(sql).toContain('ORDER BY bl.id DESC');
+    expect(params).toEqual([913, ['deposit'], 51, 'Claudemoon', 400]);
+  });
+
+  it('the money slice binds no op list: its predicate is the partial index literal', async () => {
+    const client = { query: vi.fn(), release: vi.fn() };
+    client.query.mockResolvedValue({ rows: [], rowCount: 0 } as never);
+    dbMock.connect.mockResolvedValue(client as never);
+    await loadGuildBankLogPage(
+      913,
+      50,
+      ['deposit_gold', 'withdraw_gold', 'buy_slots', 'open_bank', 'create_fee'],
+      400,
+    );
+    const [sql, params] = client.query.mock.calls.find((c) =>
+      String(c[0]).includes('FROM bank_ledger'),
+    ) as [string, unknown[]];
+    expect(sql).toContain(
+      "bl.op IN ('buy_slots', 'create_fee', 'deposit_gold', 'open_bank', 'withdraw_gold')",
+    );
+    expect(sql).not.toContain('ANY(');
+    expect(sql).toContain('bl.id < $4');
+    expect(params).toEqual([913, 51, 'Claudemoon', 400]);
+  });
+
+  it('reports `more` from the probe row and never hands it to the caller', async () => {
+    const client = { query: vi.fn(), release: vi.fn() };
+    const row = (id: number) => ({
+      id,
+      created_at: new Date(0),
+      op: 'deposit',
+      item_id: 'x',
+      count: 1,
+      copper_delta: '0',
+      character_name: 'Kara',
+    });
+    client.query.mockResolvedValue({ rows: [row(3), row(2), row(1)], rowCount: 3 } as never);
+    dbMock.connect.mockResolvedValue(client as never);
+    const full = await loadGuildBankLogPage(913, 2, ['deposit'], null);
+    expect(full.rows.map((r) => r.id)).toEqual([3, 2]);
+    expect(full.more).toBe(true);
+    const short = await loadGuildBankLogPage(913, 3, ['deposit'], null);
+    expect(short.rows.map((r) => r.id)).toEqual([3, 2, 1]);
+    expect(short.more).toBe(false);
   });
 
   it('selects nothing account-scoped: privacy is the column list', async () => {

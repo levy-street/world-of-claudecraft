@@ -9,9 +9,9 @@
 // consumeDot cash-out, aura-only. Cinderbark 2pc is the one wearer-only rng
 // draw of the wave (a 30 percent extra Old Blood roll per landed Sweeping
 // Claws, flag-gated so non-wearers draw nothing); 4pc is a dmgPct row sized
-// DELIVERED (0.45 against the 1.5 Primal Heart baseline) plus the flag-gated
-// skip of the one directDamage break, so the guard shields AND the strike
-// lands with its authored threat. Grovespring 2pc prefers the caster's own
+// DELIVERED (0.495 against the v0.42.0 Wildfang-raised 1.65 Primal Heart
+// baseline) plus the flag-gated skip of the one directDamage break, so the
+// guard shields AND the strike lands with its authored threat. Grovespring 2pc prefers the caster's own
 // blooms at the consumeMatchingAura pick (with the explicit any-HoT fallback)
 // and rewrites the resolved consumeAura heal x1.25; 4pc rewrites the resolved
 // harvest fraction (0.6 to 0.75) and banks 1 Verdance via setBank after the
@@ -558,14 +558,19 @@ describe('Cinderbark 2pc: Sweeping Claws may bank an additional Old Blood', () =
 });
 
 describe('Cinderbark 4pc: Marrowbreak hits harder and the guard keeps the strike', () => {
-  it('the accumulator and the resolved damage: 1.95 against the 1.5 Primal Heart baseline', () => {
+  it('the accumulator and the resolved damage: 2.145 against the 1.65 Primal Heart baseline', () => {
     const wearerMult = resolveTalentHitMult(
       ABILITIES.marrowbreak,
       druidMods('feral', worn('cinderbark', 4)),
     ).dmgMult;
     const baseMult = resolveTalentHitMult(ABILITIES.marrowbreak, druidMods('feral', {})).dmgMult;
-    expect(baseMult).toBeCloseTo(1.5, 10);
-    expect(wearerMult).toBeCloseTo(1.5 + CINDERBARK_4PC_MARROWBREAK_DMG_PCT, 10);
+    // v0.42.0 Wildfang adds a +0.15 offense-only ability bonus
+    // (spec_output_tuning.ts, druid.feral.physical) on top of the 1.5
+    // Primal Heart baseline, for 1.65. CINDERBARK_4PC_MARROWBREAK_DMG_PCT is
+    // re-sized alongside it (0.495, owned by the set-bonus source file) so
+    // Cinderbark 4pc keeps delivering exactly 30% more: the decisive check.
+    expect(baseMult).toBeCloseTo(1.65, 10);
+    expect(wearerMult).toBeCloseTo(1.65 + CINDERBARK_4PC_MARROWBREAK_DMG_PCT, 10);
     // Delivered: exactly the 30 percent the copy promises.
     expect(wearerMult / baseMult).toBeCloseTo(1.3, 10);
     // Marrowbreak only exists through the Old Blood transform, so the pin
@@ -580,12 +585,12 @@ describe('Cinderbark 4pc: Marrowbreak hits harder and the guard keeps the strike
       return expectDefined(res.effects.find((eff) => eff.type === 'directDamage'));
     }
     expect(resolvedDirect(false)).toMatchObject({
-      min: Math.round(78 * 1.5),
-      max: Math.round(96 * 1.5),
+      min: Math.round(78 * 1.65),
+      max: Math.round(96 * 1.65),
     });
     expect(resolvedDirect(true)).toMatchObject({
-      min: Math.round(78 * 1.95),
-      max: Math.round(96 * 1.95),
+      min: Math.round(78 * 2.145),
+      max: Math.round(96 * 2.145),
     });
     // The 2pc alone must NOT move the damage (the row is the 4pc's).
     expect(druidMods('feral', worn('cinderbark', 2)).abilities.marrowbreak?.dmgPct ?? 0).toBe(0);
@@ -805,7 +810,10 @@ describe('the wearer literals against the authored copy', () => {
     expect(MOONSCORCH_4PC_PAYOFF_DMG_PCT).toBeCloseTo(0.3075, 10);
     expect(WILDFANG_2PC_REDHARVEST_ENERGY_MULT).toBeCloseTo(1.5, 10);
     expect(CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE).toBeCloseTo(0.3, 10);
-    expect(CINDERBARK_4PC_MARROWBREAK_DMG_PCT).toBeCloseTo(0.45, 10);
+    // v0.42.0: re-sized to 0.495 so it still delivers exactly 30% on top of
+    // the Wildfang-raised 1.65 Primal Heart baseline (see the Cinderbark 4pc
+    // describe block above).
+    expect(CINDERBARK_4PC_MARROWBREAK_DMG_PCT).toBeCloseTo(0.495, 10);
     expect(GROVESPRING_2PC_SWIFTMEND_HEAL_MULT).toBeCloseTo(1.25, 10);
     expect(GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT).toBeCloseTo(0.75, 10);
     expect(GROVESPRING_4PC_VERDANCE_BANK).toBe(1);

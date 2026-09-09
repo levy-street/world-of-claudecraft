@@ -110,7 +110,7 @@ export const DELVE_ITEMS: Record<string, ItemDef> = {
   },
   varric_shadow_cowl: {
     id: 'varric_shadow_cowl',
-    name: "Varric's Shadow Cowl",
+    name: "Vandric's Shadow Cowl",
     kind: 'armor',
     armorType: 'cloth',
     slot: 'helmet',

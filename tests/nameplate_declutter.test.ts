@@ -11,6 +11,7 @@ import {
   OVERLAP_THRESHOLD_Y_PX,
   STACK_OFFSET_PX,
 } from '../src/render/nameplate_declutter';
+import { NAMEPLATE_DOT_SCALE_MAX, nameplateDotRowHeight } from '../src/render/nameplate_dots_core';
 
 // Independent oracle literals. This reference exists to catch drift in the
 // optimized spatial-hash implementation, so it must not import the production
@@ -22,6 +23,12 @@ const HERALDRY_OVERLAP_X = 95;
 const HERALDRY_OVERLAP_Y = 26;
 const HERALDRY_STACK = 28;
 const HERALDRY_EXTRA_LIFT = 8;
+// The dot row's lift at the slider's 150% default and 300% maximum: a 13px icon,
+// a 7px countdown step and 3px of pad, scaled (nameplate_dots_core.ts). Literal
+// here for the same reason as the thresholds above; the production row height
+// is pinned to these in the dot-row cases below.
+const DOT_ROW_LIFT_DEFAULT = 34.5;
+const DOT_ROW_LIFT_MAX = 69;
 
 function liftOf(anchor: NameplateAnchor): number {
   return anchor.extraLift ?? 0;
@@ -32,9 +39,10 @@ function heraldryAnchor(id: number, sx: number, sy: number): NameplateAnchor {
 }
 
 function referenceAnchorsOverlap(a: NameplateAnchor, b: NameplateAnchor): boolean {
-  const hasHeraldry = liftOf(a) > 0 || liftOf(b) > 0;
-  const overlapX = hasHeraldry ? HERALDRY_OVERLAP_X : BASE_OVERLAP_X;
-  const overlapY = hasHeraldry ? HERALDRY_OVERLAP_Y : BASE_OVERLAP_Y;
+  const lifted = liftOf(a) > 0 || liftOf(b) > 0;
+  const overlapX = lifted ? HERALDRY_OVERLAP_X : BASE_OVERLAP_X;
+  // the taller lift of the pair extends the bare vertical reach by exactly itself
+  const overlapY = BASE_OVERLAP_Y + Math.max(liftOf(a), liftOf(b));
   return Math.abs(a.sx - b.sx) <= overlapX && Math.abs(a.sy - b.sy) <= overlapY;
 }
 
@@ -71,7 +79,8 @@ function declutterReference(anchors: NameplateAnchor[]): NameplateAnchor[] {
     }
     cluster.sort((a, b) => a.id - b.id);
     const baseSy = cluster.reduce((sum, a) => sum + a.sy, 0) / cluster.length;
-    const stack = cluster.some((member) => liftOf(member) > 0) ? HERALDRY_STACK : BASE_STACK;
+    // one pitch per component: the bare one plus the tallest lift in it
+    const stack = BASE_STACK + cluster.reduce((tallest, a) => Math.max(tallest, liftOf(a)), 0);
     cluster.forEach((member, i) => {
       const target = byId.get(member.id);
       if (target) target.sy = baseSy + (i - (cluster.length - 1) / 2) * stack;
@@ -88,6 +97,47 @@ function makeRng(seed: number): () => number {
     s = (s * 1664525 + 1013904223) >>> 0;
     return s / 0x100000000;
   };
+}
+
+/** The hot path must agree with the oracle anchor for anchor on `anchors`. */
+function expectHotPathMatchesReference(anchors: NameplateAnchor[], label: string): void {
+  const expected = declutterReference(anchors);
+  const actual = declutterNameplatesInPlace(anchors.map((a) => ({ ...a })));
+  const byId = (arr: NameplateAnchor[]) => new Map(arr.map((a) => [a.id, a]));
+  const e = byId(expected);
+  const a = byId(actual);
+  expect(a.size).toBe(e.size);
+  for (const [id, ea] of e) {
+    const aa = a.get(id);
+    expect(aa, `${label}, id ${id}`).toBeDefined();
+    expect(aa?.sx, `${label}, id ${id} sx`).toBeCloseTo(ea.sx, 9);
+    expect(aa?.sy, `${label}, id ${id} sy`).toBeCloseTo(ea.sy, 9);
+  }
+}
+
+/** Unique-id random crowd in a box, so clusters genuinely form and overlap. */
+function randomCrowd(
+  rng: () => number,
+  trial: number,
+  box: { width: number; height: number },
+  pickLift: () => number,
+): NameplateAnchor[] {
+  const n = 2 + Math.floor(rng() * 60);
+  const anchors: NameplateAnchor[] = [];
+  for (let i = 0; i < n; i++)
+    anchors.push({
+      id: Math.floor(rng() * 100000),
+      sx: Math.round(rng() * box.width - (trial % 2 === 0 ? 0 : box.width / 2)),
+      sy: Math.round(rng() * box.height - (trial % 2 === 0 ? 0 : box.height / 2)),
+      extraLift: pickLift(),
+    });
+  // ids must be unique (entity ids are)
+  const seen = new Set<number>();
+  return anchors.filter((anchor) => {
+    if (seen.has(anchor.id)) return false;
+    seen.add(anchor.id);
+    return true;
+  });
 }
 
 describe('nameplate declutter', () => {
@@ -173,6 +223,130 @@ describe('nameplate declutter', () => {
     const out = declutterNameplates(anchors);
 
     expect(out.map((anchor) => anchor.sy)).toEqual([72, 100, 128]);
+  });
+
+  describe('the dot row lift as a pixel count', () => {
+    // Two enemies at one projected anchor, both carrying your dot row. Read as
+    // a flag, every lifted plate took the 8px heraldry envelope, so at 300% the
+    // pair landed 28px apart under 39px icons (PR 3853 review).
+    it.each([
+      ['100%', 1, 23, 43, [78.5, 121.5]],
+      ['the 150% default', 1.5, 34.5, 54.5, [72.75, 127.25]],
+      ['the 300% maximum', 3, 69, 89, [55.5, 144.5]],
+    ])(
+      'stacks two dotted plates at %s far enough to clear the whole row',
+      (_label, scale, lift, pitch, expected) => {
+        // the production row height at this scale, and the literal it must be
+        expect(nameplateDotRowHeight(1, scale)).toBe(lift);
+        const anchors: NameplateAnchor[] = [
+          { id: 1, sx: 100, sy: 100, extraLift: lift },
+          { id: 2, sx: 100, sy: 100, extraLift: lift },
+        ];
+
+        const out = declutterNameplates(anchors);
+
+        expect(out.map((anchor) => anchor.sy)).toEqual(expected);
+        expect(out[1].sy - out[0].sy).toBe(pitch);
+        expect(pitch).toBe(BASE_STACK + lift);
+      },
+    );
+
+    it('pins the slider maximum the 300% case stands on', () => {
+      expect(NAMEPLATE_DOT_SCALE_MAX).toBe(3);
+      expect(nameplateDotRowHeight(1, NAMEPLATE_DOT_SCALE_MAX)).toBe(DOT_ROW_LIFT_MAX);
+      expect(nameplateDotRowHeight(1, 1.5)).toBe(DOT_ROW_LIFT_DEFAULT);
+    });
+
+    it.each([
+      ['the dotted plate is below', false],
+      ['the dotted plate is above', true],
+    ])('collides across the whole row height when %s', (_label, dottedAbove) => {
+      const reach = BASE_OVERLAP_Y + DOT_ROW_LIFT_DEFAULT;
+      const dotted = (id: number, sy: number): NameplateAnchor => ({
+        id,
+        sx: 100,
+        sy,
+        extraLift: DOT_ROW_LIFT_DEFAULT,
+      });
+      const pair = (gap: number): NameplateAnchor[] =>
+        dottedAbove
+          ? [dotted(1, 100), { id: 2, sx: 100, sy: 100 + gap }]
+          : [{ id: 1, sx: 100, sy: 100 }, dotted(2, 100 + gap)];
+
+      // at the exact reach the pair stacks at the row's pitch around its mean
+      expect(declutterNameplates(pair(reach)).map((anchor) => anchor.sy)).toEqual([99, 153.5]);
+      const apart = pair(reach + 0.0001);
+      expect(declutterNameplates(apart)).toEqual(apart);
+    });
+
+    it('sweeps enough hash cells to find a 300% row five cells below a bare plate', () => {
+      // 100 sits in cell 5 and 187 in cell 10: outside the 5x5 heraldry sweep,
+      // but exactly 18px plus the 69px row apart, so the pair collides.
+      const reach = BASE_OVERLAP_Y + DOT_ROW_LIFT_MAX;
+      const bare: NameplateAnchor = { id: 1, sx: 100, sy: 100 };
+      const lifted = (dx: number, dy: number): NameplateAnchor => ({
+        id: 2,
+        sx: 100 + dx,
+        sy: 100 + dy,
+        extraLift: DOT_ROW_LIFT_MAX,
+      });
+
+      expect(declutterNameplates([bare, lifted(0, reach)]).map((a) => a.sy)).toEqual([99, 188]);
+      expect(
+        declutterNameplates([bare, lifted(HERALDRY_OVERLAP_X, reach)]).map((a) => a.sy),
+      ).toEqual([99, 188]);
+      const pastSideways = [bare, lifted(HERALDRY_OVERLAP_X + 0.0001, reach)];
+      expect(declutterNameplates(pastSideways)).toEqual(pastSideways);
+      const pastBelow = [bare, lifted(HERALDRY_OVERLAP_X, reach + 0.0001)];
+      expect(declutterNameplates(pastBelow)).toEqual(pastBelow);
+    });
+
+    it('widens the vertical neighbour sweep with the tallest live lift', () => {
+      const metrics: NameplateDeclutterMetrics = {
+        candidateChecks: 0,
+        neighborCellProbes: 0,
+        spatialHashResizes: 0,
+      };
+      const far = (lift: number): NameplateAnchor[] => [
+        { id: 1, sx: 0, sy: 0, extraLift: lift },
+        { id: 2, sx: OVERLAP_THRESHOLD_X_PX * 8, sy: 0 },
+      ];
+
+      // 18 + 34.5 = 52.5px of reach spans three 18px cells; 87px spans five;
+      // heraldry on a 300% row (95px) spans six. Sideways stays two cells.
+      declutterNameplatesInPlace(far(DOT_ROW_LIFT_DEFAULT), 2, metrics);
+      expect(metrics.neighborCellProbes).toBe(2 * 5 * 7);
+      declutterNameplatesInPlace(far(DOT_ROW_LIFT_MAX), 2, metrics);
+      expect(metrics.neighborCellProbes).toBe(2 * 5 * 11);
+      declutterNameplatesInPlace(far(HERALDRY_EXTRA_LIFT + DOT_ROW_LIFT_MAX), 2, metrics);
+      expect(metrics.neighborCellProbes).toBe(2 * 5 * 13);
+    });
+
+    it('fans a mixed component at the pitch its tallest member needs', () => {
+      const anchors: NameplateAnchor[] = [
+        { id: 1, sx: 0, sy: 100 },
+        { id: 2, sx: 70, sy: 100 },
+        { id: 3, sx: 165, sy: 100, extraLift: DOT_ROW_LIFT_DEFAULT },
+      ];
+      expect(declutterNameplates(anchors).map((a) => a.sy)).toEqual([45.5, 100, 154.5]);
+
+      // heraldry and a 300% row on the same plate add up
+      const wearer: NameplateAnchor[] = [
+        { id: 1, sx: 100, sy: 100, extraLift: HERALDRY_EXTRA_LIFT + DOT_ROW_LIFT_MAX },
+        heraldryAnchor(2, 100, 100),
+      ];
+      expect(declutterNameplates(wearer).map((a) => a.sy)).toEqual([51.5, 148.5]);
+    });
+
+    it('reads a non-finite or negative lift as no lift at all', () => {
+      // an infinite lift would otherwise make the sweep radius unbounded
+      const anchors: NameplateAnchor[] = [
+        { id: 1, sx: 100, sy: 100, extraLift: Number.POSITIVE_INFINITY },
+        { id: 2, sx: 100, sy: 100, extraLift: Number.NaN },
+        { id: 3, sx: 100, sy: 100, extraLift: -5 },
+      ];
+      expect(declutterNameplates(anchors).map((a) => a.sy)).toEqual([80, 100, 120]);
+    });
   });
 
   it('separates two anchors that project to nearly the same spot', () => {
@@ -276,36 +450,36 @@ describe('nameplate declutter: spatial-hash hot path', () => {
   it('matches the O(N^2) reference on dense random crowds', () => {
     const rng = makeRng(0xc0ffee);
     for (let trial = 0; trial < 60; trial++) {
-      const n = 2 + Math.floor(rng() * 60);
-      const anchors: NameplateAnchor[] = [];
-      for (let i = 0; i < n; i++)
-        anchors.push({
-          // a tight screen box, so clusters genuinely form and overlap
-          id: Math.floor(rng() * 100000),
-          sx: Math.round(rng() * 400 - (trial % 2 === 0 ? 0 : 200)),
-          sy: Math.round(rng() * 90 - (trial % 2 === 0 ? 0 : 45)),
-          extraLift: rng() < 0.35 ? HERALDRY_EXTRA_LIFT : 0,
-        });
-      // ids must be unique (entity ids are)
-      const seen = new Set<number>();
-      const uniq = anchors.filter((anchor) => {
-        if (seen.has(anchor.id)) return false;
-        seen.add(anchor.id);
-        return true;
-      });
+      // a tight screen box, so clusters genuinely form and overlap
+      const crowd = randomCrowd(rng, trial, { width: 400, height: 90 }, () =>
+        rng() < 0.35 ? HERALDRY_EXTRA_LIFT : 0,
+      );
+      expectHotPathMatchesReference(crowd, `trial ${trial}`);
+    }
+  });
 
-      const expected = declutterReference(uniq);
-      const actual = declutterNameplatesInPlace(uniq.map((a) => ({ ...a })));
-      const byId = (arr: NameplateAnchor[]) => new Map(arr.map((a) => [a.id, a]));
-      const e = byId(expected);
-      const a = byId(actual);
-      expect(a.size).toBe(e.size);
-      for (const [id, ea] of e) {
-        const aa = a.get(id);
-        expect(aa, `trial ${trial}, id ${id}`).toBeDefined();
-        expect(aa?.sx, `trial ${trial}, id ${id} sx`).toBeCloseTo(ea.sx, 9);
-        expect(aa?.sy, `trial ${trial}, id ${id} sy`).toBeCloseTo(ea.sy, 9);
-      }
+  it('matches the O(N^2) reference on dense crowds carrying dot rows and heraldry', () => {
+    // Every lift the painter can produce, mixed at random: the taller-lift
+    // rule, the lifted reach edges and the widened sweep all have to agree
+    // with the oracle on the same crowd, including a plate wearing both.
+    const rng = makeRng(0xd07);
+    const lifts = [
+      0,
+      0,
+      HERALDRY_EXTRA_LIFT,
+      DOT_ROW_LIFT_DEFAULT,
+      DOT_ROW_LIFT_MAX,
+      HERALDRY_EXTRA_LIFT + DOT_ROW_LIFT_MAX,
+    ];
+    for (let trial = 0; trial < 60; trial++) {
+      // taller than the heraldry box, so a 300% row does not merge everything
+      const crowd = randomCrowd(
+        rng,
+        trial,
+        { width: 400, height: 400 },
+        () => lifts[Math.floor(rng() * lifts.length)],
+      );
+      expectHotPathMatchesReference(crowd, `mixed trial ${trial}`);
     }
   });
 

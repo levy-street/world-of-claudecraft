@@ -275,7 +275,7 @@ export const TALENT_ABILITIES_V2_A = {
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'clearCooldowns', abilities: ['sprint', 'evasion', 'vanish'] }],
-    description: 'Finishes the cooldown on Swift Heels, Ghostfoot, and Smokestep. (Rogue talent)',
+    description: 'Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)',
   },
   ghostly_strike: {
     id: 'ghostly_strike',
@@ -520,7 +520,7 @@ export const TALENT_ABILITIES_V2_A = {
     requiresTarget: false,
     effects: [],
     description:
-      'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)',
+      'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritcall adds 50% more healing to Mending Current. (Shaman talent)',
   },
   bloodlust: {
     id: 'bloodlust',

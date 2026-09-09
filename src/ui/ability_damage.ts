@@ -4,12 +4,20 @@
 // they update live as gear changes). It reuses the EXACT sim coefficient helpers
 // (src/sim/spell_scaling.ts) so the tooltip can never drift from what combat does.
 //
+// v0.42.0 (docs/design/class-balance-v042.md): the rider below also folds in
+// `res.outputScaling` (src/sim/ability_output_scaling.ts), the same resolved
+// talent/mastery multiplier and dotDmgPct/hotHealPct/absorbPct global the
+// matching combat call site applies. A missing `outputScaling` (a mob/pet
+// ability) takes the all-1 neutral default, matching pre-v0.42 behavior.
+//
 // This only changes the NUMBERS spliced into the description placeholders ($d
 // damage, $o over-time total, $b buff value, $t duration), never adds a string,
 // so it needs no new i18n keys. It also owns the placeholder EFFECT PICKERS
 // (which effect each placeholder reads), so ability_description.ts and the tooltip-consistency
 // guard test share one definition and cannot drift. Unit-tested in
-// tests/ability_damage.test.ts; hud.ts is the thin consumer.
+// tests/ability_damage.test.ts and tests/v042_balance_tooltips.test.ts;
+// hud.ts is the thin consumer.
+import type { AbilityOutputScaling } from '../sim/ability_output_scaling';
 import type { ResolvedAbility } from '../sim/sim';
 import {
   abilityScalingPower,
@@ -21,6 +29,18 @@ import {
   hotTickBonus,
 } from '../sim/spell_scaling';
 import type { AbilityEffect, Entity } from '../sim/types';
+
+// The all-1 fallback used everywhere `res.outputScaling` is absent (a mob/pet
+// ability, or a caller resolved before this metadata existed): reproduces the
+// pre-v0.42 tooltip numbers exactly.
+const NEUTRAL_OUTPUT_SCALING: AbilityOutputScaling = {
+  damage: 1,
+  healing: 1,
+  dot: 1,
+  hot: 1,
+  absorb: 1,
+  primaryHealing: 1,
+};
 
 /** The character's live scaling ratings (entity.spellPower / healPower /
  *  rangedPower / attackPower). healPower feeds the heal, HoT, and absorb
@@ -53,11 +73,14 @@ export function abilityDamageBonus(
   scaling: AbilityScaling,
 ): number {
   const def = res.def;
+  const out = res.outputScaling ?? NEUTRAL_OUTPUT_SCALING;
   // Finishers (Eviscerate, Ferocious Bite) fold Attack Power into the listed
   // damage via the sim's effectiveAttackPower / 14 path, separate from the
-  // coefficient model below; only physical finishers get it.
+  // coefficient model below; only physical finishers get it. Combat
+  // (effect_dispatch.ts 'finisherDamage') multiplies this rider by the same
+  // resolved talent damage multiplier as every other damage rider.
   if (eff.type === 'finisherDamage') {
-    return def.school === 'physical' ? Math.round(scaling.attackPower / 14) : 0;
+    return def.school === 'physical' ? Math.round((scaling.attackPower / 14) * out.damage) : 0;
   }
   // A weaponStrike / weaponDamage listed number is its flat bonus; Attack Power
   // rides the weapon swing (shown on the character sheet), so it falls through to
@@ -69,8 +92,8 @@ export function abilityDamageBonus(
       // A channelled directDamage (Arcane Missiles) is a per-tick hit: it uses the
       // channel coefficient in combat, not the single-cast one.
       return def.channel
-        ? channelTickBonus(power, def)
-        : directHitBonus(power, def, res.castTime, false, 1, eff.spellPowerCoeff);
+        ? channelTickBonus(power, def, out.damage)
+        : directHitBonus(power, def, res.castTime, false, out.damage, eff.spellPowerCoeff);
     case 'aoeDamage':
     case 'aoeRoot':
     case 'chainDamage':
@@ -79,32 +102,38 @@ export function abilityDamageBonus(
       // each pulse, not the single-cast AoE coefficient. chainDamage (Hallowed Wall
       // bounce) is a one-shot AoE hit, so it takes the same AoE coefficient.
       return def.channel
-        ? channelTickBonus(power, def)
-        : directHitBonus(power, def, res.castTime, true);
+        ? channelTickBonus(power, def, out.damage)
+        : directHitBonus(power, def, res.castTime, true, out.damage);
     case 'groundAoE':
       // Each ground pulse is an AoE hit: effect_dispatch snapshots
       // directHitBonus(..., aoe) into the zone's spBonus at cast time.
-      return directHitBonus(power, def, res.castTime, true);
+      return directHitBonus(power, def, res.castTime, true, out.damage);
     case 'valkyrsCalling':
       // The delayed landing owns its authored range in the movement system.
       return 0;
     case 'aoeHeal':
-      // AoE heals take the same per-target coefficient penalty as aoeDamage.
-      return directHealBonus(scaling.healPower, res.castTime);
+      // A self-centered healing channel (Gladesong/Tranquility) pulses via
+      // channelTickBonus each tick (casting_lifecycle.ts); an instant aoeHeal
+      // takes the AoE-penalised direct coefficient instead (effect_dispatch.ts,
+      // aoe=true). A prior version of this helper always used the instant
+      // path with aoe=FALSE, over-reporting both.
+      return def.channel
+        ? channelTickBonus(scaling.healPower, def, out.healing)
+        : directHealBonus(scaling.healPower, res.castTime, true, out.healing);
     case 'chainHeal':
       // Combat applies the full direct-heal coefficient to the first target,
       // then applies the authored falloff to each jump.
-      return directHealBonus(scaling.healPower, res.castTime);
+      return directHealBonus(scaling.healPower, res.castTime, false, out.healing);
     case 'consumeAura':
-      if (eff.deal) return directHitBonus(power, def, res.castTime, false);
-      if (eff.heal) return directHealBonus(scaling.healPower, res.castTime);
+      if (eff.deal) return directHitBonus(power, def, res.castTime, false, out.damage);
+      if (eff.heal) return directHealBonus(scaling.healPower, res.castTime, false, out.healing);
       return 0;
     case 'heal':
       // Combat adds the direct-heal rider (full cast-time coefficient off Spell
       // Power, no AP scale-down) to every direct heal in effect_dispatch.
-      return directHealBonus(scaling.healPower, res.castTime);
+      return directHealBonus(scaling.healPower, res.castTime, false, out.healing);
     case 'absorb':
-      return absorbBonus(scaling.healPower, eff.spellPowerCoeff ?? 0);
+      return absorbBonus(scaling.healPower, eff.spellPowerCoeff ?? 0, out.absorb);
     case 'hot': {
       // A HoT that rides a direct heal (Regrowth) does NOT scale in combat (the
       // direct part already took the coefficient); only pure HoTs (Rejuvenation)
@@ -113,10 +142,10 @@ export function abilityDamageBonus(
       const hybridHeal = res.effects.some((e) => e.type === 'heal');
       if (hybridHeal) return 0;
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
-      return hotTickBonus(scaling.healPower, eff.duration, eff.interval) * ticks;
+      return hotTickBonus(scaling.healPower, eff.duration, eff.interval, out.hot) * ticks;
     }
     case 'drainTick':
-      return channelTickBonus(power, def);
+      return channelTickBonus(power, def, out.damage);
     case 'dot': {
       // A DoT that rides a direct/AoE nuke (hybrid) does NOT scale its rider in the
       // sim (the direct part already took the coefficient), so the tooltip must not
@@ -128,7 +157,7 @@ export function abilityDamageBonus(
       // The tooltip shows the DoT's TOTAL; the sim adds the per-tick bonus to each
       // tick, so the total gains per-tick-bonus * tick-count.
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
-      return dotTickBonus(power, def, eff.duration, eff.interval) * ticks;
+      return dotTickBonus(power, def, eff.duration, eff.interval, out.dot) * ticks;
     }
     case 'hunterBloodhook':
       return Math.round(scaling.rangedPower * eff.rangedPowerCoeff * (eff.damageMult ?? 1));
@@ -140,6 +169,70 @@ export function abilityDamageBonus(
       return 0;
     default:
       return 0;
+  }
+}
+
+/** The v0.42 primary-healing spec factor (Spiritmend, Sunmender, Groveheart;
+ *  `res.outputScaling.primaryHealing`, matching primary_healing.ts's
+ *  `scalePrimaryHealing`) folded onto the COMPLETE base-plus-power heal or
+ *  HoT amount, exactly once, after the whole raw packet, before crit/target
+ *  resolution: the same placement combat uses. Returns null when the factor
+ *  is 1, or the effect never takes it (a fixed max-HP heal/HoT, since combat
+ *  cannot know the target's max HP from an `AbilityScaling` snapshot either).
+ *
+ *  A hybrid HoT (Regrowth) DOES take the factor on its flat per-tick base
+ *  even though its SP rider is suppressed to 0 (effect_dispatch.ts's 'hot'
+ *  case scales `hotBase + hotSp` unconditionally, only pctOfMax opts out);
+ *  `abilityDamageBonus` already returns 0 for the rider in that case, so no
+ *  extra branch is needed here beyond the pctOfMax check.
+ *
+ *  The combined `hot` amount is computed at the PER-TICK level, not by
+ *  scaling the authored total directly: combat rounds
+ *  `round(total / ticks) + hotTickBonus(...)` once per tick, applies the
+ *  factor to THAT amount, then multiplies by the tick count. */
+export function abilityPrimaryHealingTotal(
+  res: ResolvedAbility,
+  eff: AbilityEffect,
+  scaling: AbilityScaling,
+): { min: number; max: number } | null {
+  const factor = res.outputScaling?.primaryHealing ?? 1;
+  if (factor === 1) return null;
+  switch (eff.type) {
+    case 'heal': {
+      if (eff.casterMaxHpPct !== undefined) return null;
+      const bonus = abilityDamageBonus(res, eff, scaling);
+      return {
+        min: Math.round((eff.min + bonus) * factor),
+        max: Math.round((eff.max + bonus) * factor),
+      };
+    }
+    case 'chainHeal':
+    case 'aoeHeal': {
+      const bonus = abilityDamageBonus(res, eff, scaling);
+      return {
+        min: Math.round((eff.min + bonus) * factor),
+        max: Math.round((eff.max + bonus) * factor),
+      };
+    }
+    case 'consumeAura': {
+      if (!eff.heal) return null;
+      const bonus = abilityDamageBonus(res, eff, scaling);
+      return {
+        min: Math.round((eff.heal.min + bonus) * factor),
+        max: Math.round((eff.heal.max + bonus) * factor),
+      };
+    }
+    case 'hot': {
+      if (eff.pctOfMax !== undefined) return null;
+      const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
+      const tickBase = Math.max(1, Math.round(eff.total / ticks));
+      const tickBonus = abilityDamageBonus(res, eff, scaling) / ticks;
+      const tick = Math.round((tickBase + tickBonus) * factor);
+      const total = tick * ticks;
+      return { min: total, max: total };
+    }
+    default:
+      return null;
   }
 }
 

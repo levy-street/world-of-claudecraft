@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.ja_JP.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Gravecaller のストーリーラインは3つの5人エリートインスタン
 
 ### Delve
 
-Delve は1人または2人のプレイヤーのための、独立したスケーラブルな小規模パーティモードです。毎回ランダム化された部屋から組み直され、戦利品の抽選ではなく鍵開けのミニゲームで開く、施錠された聖遺物箱で終わります。**The Collapsed Reliquary**（レベル7以上）は Deacon Varric で終わり、ソロでこなすと、AIの相棒 Tessa があなたの隣で戦います。**The Drowned Litany**（レベル12以上）は、その足跡をたどって Mirefen Marsh の縁にある水没した聖域へと向かいます。delve ボードがティアを決めます。Heroic は敵のレベルを上げ、ランダムなアフィックスを加えて、より豊かな報酬をもたらします。
+Delve は1人または2人のプレイヤーのための、独立したスケーラブルな小規模パーティモードです。毎回ランダム化された部屋から組み直され、戦利品の抽選ではなく鍵開けのミニゲームで開く、施錠された聖遺物箱で終わります。**The Collapsed Reliquary**（レベル7以上）は Deacon Vandric で終わり、ソロでこなすと、AIの相棒 Tessa があなたの隣で戦います。**The Drowned Litany**（レベル12以上）は、その足跡をたどって Mirefen Marsh の縁にある水没した聖域へと向かいます。delve ボードがティアを決めます。Heroic は敵のレベルを上げ、ランダムなアフィックスを加えて、より豊かな報酬をもたらします。
 
 ### ランク制PvP（the Ashen Coliseum）
 

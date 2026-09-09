@@ -6,7 +6,7 @@
 // craft at a time: tab order follows first appearance in the recipe list, a
 // stale pick falls back to the first tab, only the selected craft's rows
 // paint, tab clicks route through the HUD-held selection, the learn hint is
-// scoped to the selected craft, and an empty book keeps the vendor-empty
+// scoped to the selected craft, and an empty book keeps the family empty
 // state with no strip at all.
 
 import { readFileSync } from 'node:fs';
@@ -22,8 +22,8 @@ import {
   craftingTabs,
   craftOwnsTab,
   resolveSelectedCraft,
-} from '../src/ui/crafting_view';
-import { renderCraftingWindow } from '../src/ui/crafting_window';
+} from '../src/ui/hud/professions/crafting_view';
+import { renderCraftingWindow } from '../src/ui/hud/professions/crafting_window';
 import { isRecipeKnownForViewer } from '../src/ui/hud/vendor/train_view';
 
 // Two weaponcrafting recipes that STRADDLE an alchemy recipe in ALL_RECIPES
@@ -303,12 +303,12 @@ describe('renderCraftingWindow tab strip', () => {
     expect(closure).toContain('?.focus();');
   });
 
-  it('an empty book paints no tab strip and keeps the vendor-empty state', () => {
+  it('an empty book paints no tab strip and keeps the family empty state', () => {
     const el = document.createElement('div');
     renderCraftingWindow(el, buildCraftingView([], [], ITEMS), craftingDeps());
     expect(el.querySelector('.crafting-tabs')).toBeNull();
     expect(el.querySelectorAll('.crafting-tab')).toHaveLength(0);
     expect(el.querySelector('.crafting-section-title')).toBeNull();
-    expect(el.querySelector('.vendor-empty')?.textContent).toBe('No recipes known yet.');
+    expect(el.querySelector('.prof-empty')?.textContent).toBe('No recipes known yet.');
   });
 });

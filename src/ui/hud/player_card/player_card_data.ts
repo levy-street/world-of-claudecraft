@@ -4,8 +4,8 @@ import type { IWorld } from '../../../world_api';
 import { deedTitleText } from '../../deed_i18n';
 import { classDisplayName, itemDisplayName } from '../../entity_i18n';
 import { formatNumber, t } from '../../i18n';
-import { QUALITY_COLOR } from '../../icons';
 import { weaponDps } from '../../stat_tooltip';
+import { wornItemCellParts } from '../../worn_item_cell_view';
 import type { PlayerCardData, PlayerCardStat } from './player_card';
 import type { CharacterStanding, ReferralInfo } from './player_card_share';
 
@@ -71,10 +71,14 @@ export function buildPlayerCardData(world: IWorld, input: PlayerCardDataInput): 
   const gear = slots.map((slot) => {
     const itemId = world.equipment[slot];
     const item = itemId ? ITEMS[itemId] : null;
+    // The player's OWN worn gear, so a promoted legendary is directly
+    // reachable here: the cell reads the worn COPY (the all-surfaces item-cell
+    // rule, worn_item_cell_view.ts), never the def alone.
+    const cell = item ? wornItemCellParts(item, world.equipmentInstances?.[slot]) : null;
     return {
       slot: input.slotName(slot),
-      name: item ? itemDisplayName(item) : t('itemUi.equipment.empty'),
-      color: item ? (QUALITY_COLOR[item.quality ?? 'common'] ?? '#cfc3a0') : '#7c7058',
+      name: cell ? cell.name : t('itemUi.equipment.empty'),
+      color: cell ? cell.color : '#7c7058',
     };
   });
 

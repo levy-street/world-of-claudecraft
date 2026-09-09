@@ -8,6 +8,7 @@
  *
  * Node-only (RENDER_PURE_CORES): no three.js, no DOM.
  */
+import { CHARACTER_EFFECT_IMPALED, hasCharacterEffect } from '../character_effects_core';
 import type { AnimState } from './anim_state';
 
 /** The entity facts the overrides read. A structural subset of sim `Entity`, so
@@ -22,11 +23,14 @@ export interface AnimOverrideFacts {
 }
 
 /** Mutates `st` in place. Called once per entity per frame, so it allocates
- *  nothing and takes the facts by reference rather than cloning the state. */
+ *  nothing and takes the facts by reference rather than cloning the state.
+ *  `characterEffects` is the entity's character_effects_core flag word, which
+ *  the renderer already folds once per frame from the aura list. */
 export function applyEntityAnimOverrides(
   st: AnimState,
   e: AnimOverrideFacts,
   visuallyDead: boolean,
+  characterEffects = 0,
 ): void {
   // Engaged with someone: a rig that ships a battle stance holds it between
   // swings instead of relaxing into its idle. Reading the aggro target (rather
@@ -41,6 +45,21 @@ export function applyEntityAnimOverrides(
   // wins over the engagement flag above: a warlord shoved onto the ice slides
   // stiff rather than sliding in his fighting stance.
   if (e.riftSliding && !visuallyDead) {
+    st.moving = false;
+    st.running = false;
+    st.airborne = false;
+    st.combat = false;
+  }
+  // Impaled on a Nythraxis Bone Spike: the body lies pinned to the floor, so
+  // the rig takes the DEATH pose while alive. `dead` is a level the visual
+  // edge-triggers (CharacterVisual.enterDeath plays the death clip and clamps
+  // its last frame under deadLock; the aura clearing flips it back through
+  // revive, which stands the body up). Presentation only: the sim's `dead`
+  // stays false, so nameplate, health bar and targeting keep the live read.
+  // Last, so nothing above can undo it, and pinned over the other overrides:
+  // a pinned body neither braces nor slides.
+  if (hasCharacterEffect(characterEffects, CHARACTER_EFFECT_IMPALED)) {
+    st.dead = true;
     st.moving = false;
     st.running = false;
     st.airborne = false;

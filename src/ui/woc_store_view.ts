@@ -4,6 +4,7 @@
 // supplies the skins themselves (model and rarity) and the apply rules
 // decide which skins the player can attach right now. DOM-free and unit-tested.
 
+import { MOUNT_SKIN_IDS, type MountSkinId } from '../sim/content/mount_skins';
 import {
   eligibleClassesForWeaponSkinType,
   skinnableWeaponTypesFor,
@@ -122,6 +123,65 @@ export function buildArmorySections(
   }
   const rarityRank = (r: WeaponSkinRarity) => WEAPON_SKIN_RARITY_ORDER.indexOf(r);
   return [...sections.values()].sort((a, b) => rarityRank(b.rarity) - rarityRank(a.rarity));
+}
+
+// ── Store mounts ─────────────────────────────────────────────────────────────
+
+export interface StoreMountRow {
+  /** The mount skin id, which is also the kind 'skin' economy SKU item id. */
+  itemId: string;
+  skinId: MountSkinId;
+  /** Claudium cost from the economy service, or null when the SKU is unavailable. */
+  costClaudium: number | null;
+  /** The economy service has this SKU with a valid price, so Buy can succeed. */
+  purchasable: boolean;
+  owned: boolean;
+  affordable: boolean;
+  shortfall: number | null;
+}
+
+/** Where the mount skin store art ships (src/sim/content/mount_skins.ts ids),
+ *  outside the item-art audit like the Armory skin art: a skin is not an item. */
+export const MOUNT_SKIN_ART_DIR = '/ui/store/mount_skins';
+
+export function mountSkinArt(skinId: string): string {
+  return `${MOUNT_SKIN_ART_DIR}/${skinId}.webp`;
+}
+
+/** Rows for the store's Machine Stable section: every catalog mount skin
+ *  (src/sim/content/mount_skins.ts), catalog-first like the Armory, so a skin
+ *  missing from the service snapshot renders unavailable with no invented
+ *  price. Owned unions the service grant flag with the account cosmetics
+ *  mirror (IWorldCosmetics.accountCosmetics.mountSkinIds), so a fresh purchase
+ *  reflects the moment the live push lands. */
+export function buildStoreMountRows(
+  balance: number | null,
+  items: WocStoreItemInput[],
+  ownedMountSkinIds: readonly string[],
+): StoreMountRow[] {
+  const serviceRows = new Map(items.filter((i) => i.kind === 'skin').map((i) => [i.itemId, i]));
+  return MOUNT_SKIN_IDS.map((skinId) => {
+    const service = serviceRows.get(skinId);
+    const owned = (service?.owned ?? false) || ownedMountSkinIds.includes(skinId);
+    const costClaudium =
+      service && Number.isFinite(service.costClaudium) && service.costClaudium > 0
+        ? service.costClaudium
+        : null;
+    return {
+      itemId: skinId,
+      skinId,
+      costClaudium,
+      purchasable: costClaudium !== null,
+      owned,
+      affordable: !owned && balance !== null && costClaudium !== null && balance >= costClaudium,
+      shortfall:
+        costClaudium === null || balance === null
+          ? null
+          : owned
+            ? 0
+            : Math.max(0, costClaudium - balance),
+    };
+  });
 }
 // ── Strongbox charters ──────────────────────────────────────────────────────
 //

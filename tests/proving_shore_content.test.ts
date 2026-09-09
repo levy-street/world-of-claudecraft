@@ -400,3 +400,16 @@ describe('proving shore placement', () => {
     ).toHaveLength(6);
   });
 });
+
+describe('proving shore welcome copy', () => {
+  // The zone welcome is the banner a player reads the first time the island
+  // loads, and it doubles as the Guide's zone blurb. It names both ways off
+  // the shore: Odo's crossing at the end of the rail, and the ferry bell,
+  // which is clickable from the moment they land.
+  it('names Ferryman Odo AND the bell as ways across to the vale', () => {
+    const welcome = PROVING_SHORE_ZONE.welcome ?? '';
+    expect(welcome).toMatch(/Ferryman Odo/);
+    expect(welcome).toMatch(/\bbell\b/);
+    expect(welcome).toMatch(/vale/);
+  });
+});

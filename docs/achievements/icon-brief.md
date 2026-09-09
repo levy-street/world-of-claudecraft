@@ -1,17 +1,23 @@
 # Icon brief: new deeds (2026-07-09)
 
-> Completed 2026-08-10: every live deed now has committed painted art. The final 30-crested
+> Completed 2026-08-10: every live deed then had committed painted art. The final 30-crested
 > completion wave is recorded in `placeholder-art-completion-2026-08-09/README.md` and
 > `placeholder-art-completion-2026-08-09/accepted-art.json`. The nine later Reliquary crests are
 > recorded in `release-art-audit-v036-2026-08-10/reliquary-deed-art.md`.
-> `DEED_ART_PENDING` is empty.
+> Later content reopened `DEED_ART_PENDING` to 20 rows. Updated 2026-09-02: the
+> Masterwrought art completion painted its 10 rows, leaving 10 inherited release-base rows in
+> `src/ui/icons.ts`: the two walk-in castles, two bank sockets, Proving Shore graduation, and
+> five Crucible deeds. The completed Masterwrought set and its provenance are recorded in
+> `masterwrought-art-completion-2026-09-02/accepted-art.json`.
+> Updated 2026-09-05: the hidden Forgebreaker celebration adds one pending crest,
+> bringing the ledger to 11. Its commission brief is at the end of this file.
 
 Ready to send. One line per new deed, same format as the v1 brief; icon files
-are named exactly by deed id at 512x512 RGBA like the existing set. The original
-six transcribed ids used their procedural category crests while commissioning
-was in progress; every live id now resolves to accepted painted art. The two
-deferred salvage ids are listed at the end, marked, so the whole batch can be
-commissioned in one sitting when their deeds transcribe.
+are named exactly by deed id at 512x512 RGBA like the existing set. The 11 rows
+named above still use their procedural category crests while commissioning is
+in progress; every Masterwrought deed resolves to accepted painted art. The two
+deferred salvage ids are listed at the end, marked, so they can be commissioned
+when their deeds transcribe.
 
 Progression:
 
@@ -130,6 +136,7 @@ category crest until the painting lands (enumerated in `DEED_ART_PENDING`,
 Progression (the tutorial island):
 
 - [v1] `prog_ready_for_an_adventure`, Ready for an Adventure: the island ferry bell mid-swing against a dawn strait, the Proving Shore small behind it, rope trailing toward an unseen hand, sea teal on brass gold.
+- [v1] `prog_legendmaker`, The Legendmaker (Masterwrought, the orange promotion): a finished apex piece on an anvil catching a legendary orange glow, a signed Deed of Making beneath it with its wax seal cracked, a quill laid across the parchment, ember orange on iron black.
 
 Item icons (the tutorial island's two interact props): shipped as renders of
 their own world models (`scripts/render_island_item_icons.mjs`), so no
@@ -138,6 +145,41 @@ painted pass:
 
 - [v1] `ps_castaway_crate`, Castaway Crate: a salt-bleached slat crate bound in tarred rope, one plank sprung, sand still in its seams.
 - [v1] `ps_ferry_bell`, Ferry Bell: a brass dockside bell on a weathered post bracket, rope pull knotted twice, morning light off the rim.
+
+## The Masterwrought angling crest (2026-09-02)
+
+One collection crest from the Masterwrought high-band fishing pass, under the
+same 512x512 RGBA delivery contract as the other deed paintings.
+
+- [v1] `col_deepest_cast`, The Deepest Cast: a Clockreel Fishing Rod casting a taut luminous line into a deep teal whirlpool, the reel's brass cogs catching one pale highlight above abyssal blue water.
+
+## The farming celebration crests (2026-08-18)
+
+Seven new ids from the farming celebrations pass (D13), same delivery contract
+as above: one 512x512 RGBA PNG per deed, named exactly by deed id, ingested
+with `npm run assets:deeds <source-dir>`. Six of the seven ride their
+procedural category crests until the paintings land (enumerated in
+`DEED_ART_PENDING`, `src/ui/icons.ts`); `prog_farming_100` is the exception,
+shipped with a COMMITTED interim crest because the Reliquary title shelf
+forbids fallback art for title deeds (see its row's NOTE below).
+
+Progression and chronicle (the planting and first-harvest line):
+
+- [v1] `prog_first_planting`, Sow It Begins: a single seed dropped into a fresh furrow from an open hand, morning light on turned earth.
+- [v1] `chr_vale_first_harvest`, First Fruits of the Vale: a wicker basket of ripe vegetables against rolling green meadow and a distant mill, warm valley daylight.
+- [v1] `chr_marsh_first_harvest`, Sprouts in the Peat: bright young shoots standing in dark peaty soil, mist and reed silhouettes behind, bog green on umber.
+- [v1] `chr_peaks_first_harvest`, A Crop Among the Crags: a hardy barley sheaf lashed to a stone cairn on a windswept ledge, thin mountain sky.
+- [v1] `chr_evergarden_first_harvest`, A Plot in Paradise: a tidy raised bed overflowing with produce beneath drifting petals, lush garden light.
+
+Collection (the rare-find family):
+
+- [v1] `col_golden_harvest`, Golden Harvest: one impossibly golden gourd glowing amid ordinary crops, radiant sunburst rays on harvest amber.
+- [v1] `col_farm_roster`, Every Furrow Filled: a quartered crop field bearing four distinct harvests inside a simple grain-and-leaf wreath, rich earth brown under seasonal green and harvest gold.
+
+Progression (the profession milestone):
+
+- [v1] `prog_farming_100`, Harvestmaster: a crossed hoe and sickle over a ribbon-tied wheat crown, proud guild-seal framing in bronze and gold. NOTE: an interim tied-wheat-sheaf medallion crest is COMMITTED with the phase (the Reliquary title shelf forbids fallback art for title deeds, so this one could not ride the pending ledger); the commissioned piece replaces it through the normal converter run.
+- [v1] `prog_field_to_feast`, From Field to Feast: a cultivated furrow and fresh greens flowing into a generous communal feast platter, a garden hoe and cook's ladle crossed behind it, earth green warming into hearth gold.
 
 ## The Crucible of the Last Spring raid crests (2026-08-29)
 
@@ -154,3 +196,69 @@ Dungeon (the Crucible of the Last Spring raid):
 - [v1] `dgn_varkhul`, The Forge Goes Cold: Varkhul's great anvil under a raised silent hammer, the forge glow fading to blue-grey ash, one thin line of spring water cutting through the coals.
 - [v1] `dgn_varkhul_heroic`, Heroic: The Forge Goes Cold: the cold anvil and hammer ringed by a gold heroic laurel, frost creeping over the anvil face.
 - [v1] `dgn_varkhul_flawless`, Not One Ember Lost: ten unbroken candle flames in a ring above the forge floor, none guttering, warm gold on deep bronze.
+## Roots' Bramblehide (2026-09-04)
+
+> Landed 2026-09-07: every id below is painted (roots-bramblehide-icons-2026-09-07, the deed crest included).
+
+One new deed id and seven new item ids from the Roots' Bramblehide set (the
+feral druid's Strength leather family on the Nythraxis raid table, named for
+the druid Roots). Same delivery contract as above for the deed crest: one
+512x512 RGBA PNG named exactly by deed id, ingested with
+`npm run assets:deeds <source-dir>`. It rides the procedural collection
+category crest until the painting lands (enumerated in `DEED_ART_PENDING`,
+`src/ui/icons.ts`).
+
+Collection:
+
+- [v1] `col_set_bramblehide`, Roots' Bramblehide: a leather druid's pauldron wrapped in living bramble, thorns curling into a root knot at the collar, moss green and bark brown on charcoal.
+
+Item icons (the seven set pieces, plus their seven generated heroic raid
+variants `heroic_<id>`, which follow the shipped heroic-set convention of a
+distinct painting per variant): commission per
+`docs/design/item-icon-art-style.md` (`woc-item-icon-v1`), file provenance in
+`public/ui/items/mapping.json`, then empty `BRAMBLEHIDE_ART_PENDING_ITEM_IDS`
+(`src/sim/content/zone3.ts`). One family language: dark oiled leather with
+bramble-vine stitching, thorn studs, and a single root-knot clasp per piece;
+the heroic twins carry the same silhouette with a faint moss-green sheen.
+
+- [v1] `bramblehide_crown`, Roots' Bramblehide Crown: a leather half-helm with a bramble circlet grown through its brow band, two small thorn horns.
+- [v1] `bramblehide_mantle`, Roots' Bramblehide Mantle: paired leather pauldrons bound by knotted roots, thorn studs along the cap edge.
+- [v1] `bramblehide_harness`, Roots' Bramblehide Harness: a sleeveless leather chest harness laced with living bramble, root-knot clasp at the sternum.
+- [v1] `bramblehide_cinch`, Roots' Bramblehide Cinch: a wide leather belt woven through with thorn vine, a wooden root-knot buckle.
+- [v1] `bramblehide_legguards`, Roots' Bramblehide Legguards: leather leg wraps with bramble-vine stitching down the outer seam and thorn studs at the knee.
+- [v1] `bramblehide_grips`, Roots' Bramblehide Grips: a pair of fingerless leather grips, bramble wrapped over the knuckles into claw-like thorns.
+- [v1] `bramblehide_treads`, Roots' Bramblehide Treads: a pair of soft leather boots with roots grown around the ankle and thorn-tipped toe caps.
+
+## Nythraxis gap-fill drops (2026-09-04)
+
+> Landed 2026-09-07: the four paintings below shipped in roots-bramblehide-icons-2026-09-07.
+
+Four new item ids from the Nythraxis gap-fill wave (the three one-handers in
+the same wave ship deterministic in-engine renders of their held models via
+`scripts/render_weapon_still_icons.mjs` and the jobs table under
+`docs/achievements/nythraxis-gap-weapon-renders-2026-09-04/`, so no commission
+is outstanding for them). Commission per `docs/design/item-icon-art-style.md`, file provenance in
+`public/ui/items/mapping.json`, then empty `NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS`
+(`src/sim/content/zone3.ts`). Heroic variants follow the shipped heroic-set
+convention of a distinct painting per variant. Family language: the Deathless
+Court's bone-and-violet palette that the Direfang and Bonewrought pieces share.
+
+- [v1] `votive_ward_of_the_deathless_court`, Votive Ward of the Deathless Court: a round mail-banded shield faced with a pale bone votive plate, a violet candle-glow sigil at its boss.
+- [v1] `thornpeak_moonhide_cowl`, Thornpeak Moonhide Cowl: a soft leather cowl with a crescent bone brow plate and thorn-vine stitching down the hood.
+- [v1] `stormhymn_chain_grips`, Stormhymn Chain Grips: fine chain gloves with storm-blue votive beads knotted across the knuckles.
+- [v1] `stormhymn_chain_treads`, Stormhymn Chain Treads: chain-wrapped boots with a bone shin guard and storm-blue votive beading at the ankle.
+
+## The self-crafted Forgebreaker celebration (2026-09-05)
+
+One hidden, zero-Renown deed from the one-time hammer quest. It uses the existing
+procedural hidden-category crest until an accepted painting lands, explicitly
+tracked in `DEED_ART_PENDING` in `src/ui/icons.ts`. Deliver
+`hid_forgebreaker.png` as a centered 512x512 RGBA medallion with genuinely transparent
+exterior pixels, then ingest with `npm run assets:deeds <source-dir>`. Do not paint a
+checkerboard into the background: both initial generated candidates failed that
+alpha requirement and are not shipping art. The quest reagent has its own accepted
+item icon; this commission is only for the deed crest.
+
+Hidden (the one-time Forgebreaker shaping):
+
+- [v1] `hid_forgebreaker`, A Spring Unchained: a finished dark-iron two-handed hammer over a broken forge chain, a single clear spring-water ribbon flowing through its open links; restrained ember-orange highlights against cool spring blue, framed as a readable medallion with no text, letters, watermark or background plate. Keep the hammer head and broken link legible at 32px and 48px; transparent exterior, never a painted checkerboard.

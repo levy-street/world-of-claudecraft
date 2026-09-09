@@ -18,7 +18,11 @@ export function summonQuestMob(
   // instead of queueing behind a stranger's. Omitted, the guard stays
   // site-wide, the original Nythraxis behavior. hardDespawnSeconds gives a
   // summon a fixed lifetime that combat and retargeting cannot clear.
-  opts?: { perOwner?: boolean; hardDespawnSeconds?: number },
+  // announceOwnerOnly scopes the awaken line and the opening yell to the
+  // summoner (pid-scoped personal events) instead of a world-visible log:
+  // right for a per-owner summon on a shared site, where a stranger's chat
+  // would otherwise fill with someone else's private quest beat.
+  opts?: { perOwner?: boolean; hardDespawnSeconds?: number; announceOwnerOnly?: boolean },
 ): void {
   const existing = [...ctx.entities.values()].some(
     (e) =>
@@ -52,11 +56,28 @@ export function summonQuestMob(
     return Math.abs(mob.pos.x - origin.x) < 120 && Math.abs(mob.pos.z - origin.z) < 250;
   });
   if (inst) inst.mobIds.push(mob.id);
-  ctx.emit({ type: 'log', text: `${template.name} awakens!`, color: '#ff6666' });
-  emitQuestMobDialogue(ctx, templateId, mob.id);
+  const announcePid = opts?.announceOwnerOnly ? ownerPid : undefined;
+  if (announcePid === undefined) {
+    ctx.emit({ type: 'log', text: `${template.name} awakens!`, color: '#ff6666' });
+  } else {
+    ctx.emit({
+      type: 'log',
+      text: `${template.name} awakens!`,
+      color: '#ff6666',
+      pid: announcePid,
+    });
+  }
+  emitQuestMobDialogue(ctx, templateId, mob.id, announcePid);
 }
 
-export function emitQuestMobDialogue(ctx: SimContext, templateId: string, entityId: number): void {
+// pid (when set) makes the yell a personal event delivered only to that player;
+// omitted, it stays a world-visible log anchored to the yelling entity.
+export function emitQuestMobDialogue(
+  ctx: SimContext,
+  templateId: string,
+  entityId: number,
+  pid?: number,
+): void {
   const text =
     templateId === 'fallen_captain_aldren'
       ? 'Fallen Captain Aldren yells, "None shall disturb the king\'s rest! For Thornpeak!"'
@@ -67,5 +88,7 @@ export function emitQuestMobDialogue(ctx: SimContext, templateId: string, entity
           : templateId === 'mister_crabs'
             ? 'Mister Crabs yells, "MINE! The pearl is mine, and mine she stays!"'
             : null;
-  if (text) ctx.emit({ type: 'log', text, color: '#ff9999', entityId });
+  if (!text) return;
+  if (pid === undefined) ctx.emit({ type: 'log', text, color: '#ff9999', entityId });
+  else ctx.emit({ type: 'log', text, color: '#ff9999', entityId, pid });
 }

@@ -129,6 +129,7 @@ describe('holderContribution and the sum over holders', () => {
     expect(opened.ladder).toBe(true);
     expect(sumContributions([c, opened])).toEqual({
       items: new Map(),
+      sourceUnits: new Map(),
       copper: 20_000,
       ladder: true,
     });
@@ -165,9 +166,10 @@ describe('guildBankUnsettledRefusal: withdraws', () => {
     // No count asked means the whole stack.
     expect(refusal('withdraw', { slot: 1 }, two, logs)).toBeNull();
     expect(refusal('withdraw', { slot: 0 }, two, logs)).toEqual(legs);
-    // The sim floors a fractional count, so the gate judges the floor.
+    // Release materials require an exact safe-integer take. A fractional
+    // material request is refused by the sim without forcing a holder flush.
     expect(refusal('withdraw', { slot: 0, count: 10.9 }, two, logs)).toBeNull();
-    expect(refusal('withdraw', { slot: 0, count: 11.1 }, two, logs)).toEqual(legs);
+    expect(refusal('withdraw', { slot: 0, count: 11.1 }, two, logs)).toBeNull();
   });
 
   it("is blind to another session's unsettled REMOVAL (the live count already reflects it)", () => {
@@ -295,6 +297,9 @@ describe('the dependency a refusal names, and who feeds it', () => {
     expect(deficitDependency({ ...base, kind: 'ladder_behind', itemId: null })).toEqual({
       kind: 'ladder',
     });
+    expect(
+      deficitDependency({ ...base, kind: 'source_unreadable', itemId: 'iron_ore' }),
+    ).toBeNull();
     expect(deficitDependency(null)).toBeNull();
   });
 });

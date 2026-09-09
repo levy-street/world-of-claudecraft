@@ -50,7 +50,10 @@ import type { DailyRewardStatus, IWorld } from '../src/world_api';
 function worldStub(): IWorld {
   return {
     player: { templateId: 'warrior', mainhandItemId: null },
-    accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {} },
+    accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {}, mountSkinIds: [] },
+    // The store's Machine Stable strip unions service ownership with the account
+    // cosmetics mirror (accountCosmetics.mountSkinIds); nothing is owned here.
+    ownedMounts: () => [],
   } as unknown as IWorld;
 }
 
@@ -609,9 +612,9 @@ describe('DailyRewardsWindow store refresh behavior', () => {
 
     await (
       window as unknown as {
-        armoryPurchases: { purchase(row: ArmorySkinRow): Promise<void> };
+        storeSpend: { armory: { purchase(row: ArmorySkinRow): Promise<void> } };
       }
-    ).armoryPurchases.purchase(row);
+    ).storeSpend.armory.purchase(row);
 
     expect(spendStoreItem).toHaveBeenCalledWith('cinderbrand_sword', 'skin', 200);
     expect((window as unknown as { storeBalance: number | null }).storeBalance).toBe(100);
@@ -659,9 +662,9 @@ describe('DailyRewardsWindow store refresh behavior', () => {
 
     await (
       window as unknown as {
-        armoryPurchases: { purchase(row: ArmorySkinRow): Promise<void> };
+        storeSpend: { armory: { purchase(row: ArmorySkinRow): Promise<void> } };
       }
-    ).armoryPurchases.purchase(original);
+    ).storeSpend.armory.purchase(original);
 
     expect(spendStoreItem).toHaveBeenCalledWith('cinderbrand_sword', 'skin', 200);
     expect(confirmations).toHaveLength(1);
@@ -737,8 +740,7 @@ function charterHarness(
     /** Hold the spend open until the test resolves it, for the in-flight guard. */
     gate?: { wait: Promise<void> };
     /** Exercise the real StoreDecisionPrompts path instead of recording the
-     *  decision, for body-level mount ownership and #confirm-dialog collision
-     *  coverage. */
+     *  decision, for prompt-stack ownership and collision coverage. */
     realDecisions?: boolean;
     /** Give the stub world an identity, which is what turns DURABILITY on
      *  (src/ui/purchase_intent_durability.ts derives the storage row from
@@ -800,7 +802,8 @@ function charterHarness(
           ...(options.scope ? { name: options.scope.name } : {}),
         },
         ...(options.scope ? { cfg: { playerClass: options.scope.playerClass } } : {}),
-        accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {} },
+        accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {}, mountSkinIds: [] },
+        ownedMounts: () => [],
         get bankPurchasedSlots() {
           return state.purchasedSlots;
         },
@@ -849,8 +852,8 @@ function charterHarness(
     setCharterBusy(itemId: string, busy: boolean): void;
   };
   const armoryPurchases = (
-    window_ as unknown as { armoryPurchases: { purchase(row: unknown): Promise<void> } }
-  ).armoryPurchases;
+    window_ as unknown as { storeSpend: { armory: { purchase(row: unknown): Promise<void> } } }
+  ).storeSpend.armory;
   internals.purchaseArmorySkin = (row) => armoryPurchases.purchase(row);
   const buyButton = (itemId: string) =>
     root.querySelector<HTMLButtonElement>(`[data-charter-buy="${itemId}"]`);
@@ -1955,7 +1958,7 @@ describe('WOC Store Strongbox charters', () => {
     expect(h.internals.charterFocus.peek()).toBeNull();
   });
 
-  it('abandons the exact unsent charter intent when a competing confirm owns the dialog id', async () => {
+  it('abandons the exact unsent charter intent when a competing confirm owns the stack', async () => {
     const scope = { playerClass: 'warrior', name: 'PromptCollision' };
     const rowName = `woc_purchase_intents_${scope.playerClass}_${scope.name}`;
     const h = charterHarness({ purchasedSlots: 0, scope, realDecisions: true });
@@ -2926,5 +2929,57 @@ describe('the charter idempotency-key minter', () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+});
+
+describe('WOC Store Machine Stable', () => {
+  // The mount-skin strip rides the same body paint as the charters. These arms
+  // pin the ordering nothing else does: the mount rows are re-projected by
+  // rebuildArmorySections BEFORE paintStore reads sectionHtml(), so an open
+  // store shows the strip (a paint that reached the section before any rebuild
+  // would silently emit nothing), and the card button reaches the purchase
+  // prompt through the store body binding.
+  const MOUNT_ITEM: WocStoreItemInput = {
+    itemId: 'mech_bird',
+    name: 'service name',
+    kind: 'skin',
+    costClaudium: 1_200,
+    owned: false,
+  };
+
+  it('paints the Machine Stable strip as an Armory-family section with the rarity on the section', async () => {
+    const h = charterHarness({ items: [MOUNT_ITEM], balance: 5_000 });
+    await h.internals.renderStore(null);
+
+    expect(h.html()).toContain('<section class="armory-section store-mounts rarity-epic">');
+    expect(h.html()).toContain('data-store-mount-buy="mech_bird"');
+    expect(h.html()).toContain('/ui/store/mount_skins/mech_bird.webp');
+    // The service price, in the shared cost slot, never a computed one.
+    expect(h.html()).toMatch(/<span class="armory-cost"><img [^>]*><strong>1,200<\/strong>/);
+    const button = h.root.querySelector<HTMLButtonElement>('[data-store-mount-buy]');
+    expect(button?.disabled).toBe(false);
+  });
+
+  it('routes the card click to the purchase prompt and spends nothing until confirmed', async () => {
+    const h = charterHarness({ items: [MOUNT_ITEM], balance: 5_000 });
+    await h.internals.renderStore(null);
+    h.root.querySelector<HTMLButtonElement>('[data-store-mount-buy]')?.click();
+
+    expect(h.dialogs).toHaveLength(1);
+    expect(h.dialogs[0].title).toBe(t('hudChrome.wocStore.confirmTitle'));
+    expect(h.dialogs[0].body).toContain('1,200');
+    expect(h.spendCalls).toHaveLength(0);
+  });
+
+  it('renders a mount the service snapshot lacks as unavailable with a disabled card', async () => {
+    const h = charterHarness({ items: [], balance: 5_000 });
+    await h.internals.renderStore(null);
+
+    expect(h.html()).toContain('armory-section store-mounts');
+    expect(h.html()).toContain('<span class="armory-state unavailable">');
+    const button = h.root.querySelector<HTMLButtonElement>('[data-store-mount-buy]');
+    expect(button?.disabled).toBe(true);
+    button?.click();
+    expect(h.dialogs).toHaveLength(0);
   });
 });

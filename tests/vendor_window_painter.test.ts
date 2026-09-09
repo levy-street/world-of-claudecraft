@@ -46,6 +46,12 @@ function promptButton(prompt: Element, label: 'Buy' | 'Cancel'): HTMLButtonEleme
   return match as HTMLButtonElement;
 }
 
+function requireElement<T extends Element>(root: ParentNode, selector: string): T {
+  const match = root.querySelector<T>(selector);
+  if (!match) throw new Error(`missing test element ${selector}`);
+  return match;
+}
+
 function item(id: string): ItemDef {
   return {
     id,
@@ -248,6 +254,52 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     const rows = grids[0].querySelectorAll('.vendor-item');
     expect(rows.length).toBe(1);
     expect(rows[0].parentElement).toBe(grids[0]);
+  });
+
+  it('a vendored promoted copy sits in buyback under its chosen name with its own rim', () => {
+    // The all-surfaces item-cell rule on the one vendor row a bound copy can
+    // reach (a bound copy CAN be vendored): the row reads the cell authority
+    // for the accessible name, the label, and the quality it asks the icon
+    // dep for (the phase 13 QA round-2 frontend finding).
+    const buyback: VendorBuybackRow[] = [
+      {
+        itemId: 'sword',
+        item: item('sword'),
+        count: 1,
+        price: 100,
+        index: 0,
+        instance: { rolled: { quality: 'legendary' }, name: '<b>Oath</b> of "Vel\'tara"' },
+      },
+    ];
+    const view: VendorView = {
+      goods: [],
+      buyback,
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
+    const qualities: (string | undefined)[] = [];
+    const el = document.createElement('div');
+    renderVendorWindow(
+      el,
+      'Vendor',
+      view,
+      deps({
+        itemIcon: (_item, quality) => {
+          qualities.push(quality);
+          return '<img>';
+        },
+      }),
+    );
+    const row = el.querySelector('.vendor-item');
+    // The hostile spelling from the tooltip suite: raw into the aria (an
+    // attribute value), escaped at the innerHTML sink, never parsed as markup.
+    expect(row?.getAttribute('aria-label')).toContain('<b>Oath</b> of "Vel\'tara"');
+    const name = row?.querySelector('.vi-name');
+    expect(name?.textContent).toContain('<b>Oath</b> of "Vel\'tara"');
+    expect(name?.innerHTML).toContain('&lt;b&gt;');
+    expect(name?.querySelector('b')).toBeNull();
+    expect(qualities).toEqual(['legendary']);
   });
 
   it('paints a requirement-unmet row ENABLED with its advisory line and the buy aria-label (R22)', () => {
@@ -875,13 +927,13 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
     document.body.appendChild(el);
     try {
       renderVendorWindow(el, 'Vendor', before, deps());
-      const five = el.querySelector<HTMLButtonElement>('[data-focus-key="qty:5"]')!;
+      const five = requireElement<HTMLButtonElement>(el, '[data-focus-key="qty:5"]');
       five.focus();
       expect(five.getAttribute('aria-pressed')).toBe('false');
       // The activation's rebuild, as the Hud performs it: same container,
       // the view rebuilt for the newly selected multiple.
       renderVendorWindow(el, 'Vendor', { ...before, multiple: 5 }, deps());
-      const rebuilt = el.querySelector<HTMLButtonElement>('[data-focus-key="qty:5"]')!;
+      const rebuilt = requireElement<HTMLButtonElement>(el, '[data-focus-key="qty:5"]');
       expect(rebuilt).not.toBe(five); // genuinely a fresh element
       expect(document.activeElement).toBe(rebuilt);
       expect(rebuilt.getAttribute('aria-pressed')).toBe('true');
@@ -1143,7 +1195,7 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
     // unrelated method, and the slice is comment-stripped so a line of prose
     // quoting the call cannot stand in for the call itself.
     const itemTooltipStart = anchor(
-      'private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {',
+      'private itemTooltip(\n    item: ItemDef,\n    compare = true,\n    instance?: ItemInstancePayload,\n    materialSources?: MaterialComposition,\n  ): string {',
     );
     const itemProcBlockStart = anchor('private itemProcBlock(item: ItemDef): string {');
     expect(itemProcBlockStart).toBeGreaterThan(itemTooltipStart);
@@ -1279,7 +1331,7 @@ describe('renderVendorWindow: the 1x/5x/10x/custom control row (phase 21)', () =
       view([goodsRow('bread', { countBuy: { count: 5, copper: 125, affordable: true } })], 5),
       deps({ onBuy: (id, opts) => calls.push([id, opts]) }),
     );
-    const row = el.querySelector<HTMLButtonElement>('.vendor-item')!;
+    const row = requireElement<HTMLButtonElement>(el, '.vendor-item');
     row.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     row.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
     expect(calls).toEqual([
@@ -1291,7 +1343,7 @@ describe('renderVendorWindow: the 1x/5x/10x/custom control row (phase 21)', () =
   it('a force-1 row at a fixed multiple keeps its plain 1x rendering (no chip, no count aria)', () => {
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view([goodsRow('marks_blade')], 5), deps());
-    const row = el.querySelector<HTMLButtonElement>('.vendor-item')!;
+    const row = requireElement<HTMLButtonElement>(el, '.vendor-item');
     expect(row.querySelector('.vi-qty')).toBeNull();
     expect(row.getAttribute('aria-label')).toContain('marks_blade');
   });
@@ -1334,7 +1386,7 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
       },
       deps({ onBuy: (id, opts) => calls.push([id, opts]), buyCustomMax: () => 64 }),
     );
-    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+    requireElement<HTMLButtonElement>(el, '.vendor-item').dispatchEvent(
       new MouseEvent('click', { bubbles: true }),
     );
     expect(calls).toEqual([]);
@@ -1373,7 +1425,7 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
       },
       deps({ buyCustomMax: () => 0 }),
     );
-    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+    requireElement<HTMLButtonElement>(el, '.vendor-item').dispatchEvent(
       new MouseEvent('click', { bubbles: true }),
     );
     const input = stack.querySelector<HTMLInputElement>('.buy-quantity-prompt .prompt-number');
@@ -1399,11 +1451,11 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
       },
       deps({ onBuy: (id, opts) => calls.push([id, opts]), buyCustomMax: () => 10 }),
     );
-    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+    requireElement<HTMLButtonElement>(el, '.vendor-item').dispatchEvent(
       new MouseEvent('click', { bubbles: true }),
     );
-    const prompt = stack.querySelector('.buy-quantity-prompt')!;
-    const input = prompt.querySelector<HTMLInputElement>('.prompt-number')!;
+    const prompt = requireElement<HTMLElement>(stack, '.buy-quantity-prompt');
+    const input = requireElement<HTMLInputElement>(prompt, '.prompt-number');
     input.value = '999';
     promptButton(prompt, 'Buy').click();
     expect(calls).toEqual([['bread', { count: 10 }]]);
@@ -1439,11 +1491,11 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
         },
         deps({ onBuy: (id, opts) => calls.push([id, opts]), buyCustomMax: () => 10 }),
       );
-      el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+      requireElement<HTMLButtonElement>(el, '.vendor-item').dispatchEvent(
         new MouseEvent('click', { bubbles: true }),
       );
-      const prompt = stack.querySelector('.buy-quantity-prompt')!;
-      prompt.querySelector<HTMLInputElement>('.prompt-number')!.value = typed;
+      const prompt = requireElement<HTMLElement>(stack, '.buy-quantity-prompt');
+      requireElement<HTMLInputElement>(prompt, '.prompt-number').value = typed;
       promptButton(prompt, 'Buy').click();
       expect(calls, `typed ${JSON.stringify(typed)}`).toEqual([['bread', { count: expected }]]);
       el.remove();
@@ -1471,7 +1523,7 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
       },
       deps({ onBuy: (id, opts) => calls.push([id, opts]) }),
     );
-    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+    requireElement<HTMLButtonElement>(el, '.vendor-item').dispatchEvent(
       new MouseEvent('click', { bubbles: true }),
     );
     expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
@@ -1514,7 +1566,7 @@ describe('buy_quantity_prompt_window: force-close backstop and focus landing net
       customView([customRow('bread')]),
       deps(onBuy ? { onBuy, buyCustomMax: () => 10 } : { buyCustomMax: () => 10 }),
     );
-    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+    requireElement<HTMLButtonElement>(el, '.vendor-item').dispatchEvent(
       new MouseEvent('click', { bubbles: true }),
     );
     const prompt = stack.querySelector<HTMLElement>('.buy-quantity-prompt');
@@ -1560,7 +1612,7 @@ describe('buy_quantity_prompt_window: force-close backstop and focus landing net
         );
       };
       const prompt = openPrompt(el, stack, onBuy);
-      prompt.querySelector<HTMLInputElement>('.prompt-number')!.value = '3';
+      requireElement<HTMLInputElement>(prompt, '.prompt-number').value = '3';
       promptButton(prompt, 'Buy').click();
       expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
       expect(el.inert).toBe(false);
@@ -1586,10 +1638,10 @@ describe('buy_quantity_prompt_window: force-close backstop and focus landing net
         customView([customRow('bread')]),
         deps({ buyCustomMax: () => 10 }),
       );
-      const row = el.querySelector<HTMLButtonElement>('[data-focus-key="buy:bread"]')!;
+      const row = requireElement<HTMLButtonElement>(el, '[data-focus-key="buy:bread"]');
       row.focus();
       row.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-      const prompt = stack.querySelector<HTMLElement>('.buy-quantity-prompt')!;
+      const prompt = requireElement<HTMLElement>(stack, '.buy-quantity-prompt');
       // The mid-prompt rebuild: the captured opener row is now detached.
       renderVendorWindow(el, 'Vendor', customView([customRow('bread')]), deps());
       expect(row.isConnected).toBe(false);

@@ -151,12 +151,17 @@ function shouldLogConsoleLevel(level) {
   return level === 'warning' || level === 'error';
 }
 
-// Classify a render-process-gone reason. 'clean-exit' and 'killed' are normal
-// lifecycle (window close, task manager, our own quit); everything else
-// ('crashed', 'oom', 'abnormal-exit', 'launch-failed', 'integrity-failure',
-// 'memory-eviction', and any future reason) is a crash the shell must react
-// to. 'integrity-failure' is special-cased by the caller: it means the asar
-// failed its integrity check, so reloading the same bundle is pointless.
+// Classify a process-gone reason (render-process-gone, and the GPU arm of
+// child-process-gone: both use the same vocabulary). 'clean-exit' and 'killed'
+// are not crashes: a clean exit is the process's own shutdown (window close,
+// our own quit), a kill came from OUTSIDE the process (the task manager, the OS
+// OOM killer, the shell's own shutdown terminating stragglers), which nothing
+// the shell does about a crash can answer. Everything else ('crashed', 'oom',
+// 'abnormal-exit', which is also how the GPU watchdog terminates a hung GPU
+// process, 'launch-failed', 'integrity-failure', 'memory-eviction', and any
+// future reason) is a crash the shell must react to. 'integrity-failure' is
+// special-cased by the renderer caller: it means the asar failed its integrity
+// check, so reloading the same bundle is pointless.
 function classifyRendererExit(reason) {
   return reason === 'clean-exit' || reason === 'killed' ? 'benign' : 'crash';
 }

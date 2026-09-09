@@ -1,0 +1,304 @@
+// @vitest-environment happy-dom
+import './_setup';
+import { render, screen, waitFor } from '@testing-library/svelte';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import type { AdminMarketMetrics, AdminMarketMetricsBucket } from '../../src/admin/types';
+
+const NO_SOLD = { saleCount: 0, quantity: 0, copper: 0 };
+
+function emptyBucket(bucket: AdminMarketMetricsBucket['bucket'], tracked: number) {
+  return {
+    bucket,
+    listingCount: 0,
+    totalQuantity: 0,
+    trackedItemCount: tracked,
+    listedItemCount: 0,
+    items: [],
+    sold: { ...NO_SOLD },
+  };
+}
+
+const METRICS: AdminMarketMetrics = {
+  realm: 'eastbrook',
+  soldWindowDays: 7,
+  soldAvailable: true,
+  buckets: [
+    {
+      bucket: 'cores',
+      listingCount: 2,
+      totalQuantity: 5,
+      trackedItemCount: 1,
+      listedItemCount: 1,
+      items: [
+        {
+          itemId: 'wyrmfall_core',
+          name: 'Wyrmfall Core',
+          listingCount: 2,
+          totalQuantity: 5,
+          lowestPerUnit: 3,
+          medianPerUnit: 4,
+        },
+      ],
+      sold: { saleCount: 6, quantity: 11, copper: 4200 },
+    },
+    emptyBucket('essence', 2),
+    {
+      // a SECOND listed bucket, so the aria-labelledby identity and
+      // id-uniqueness arms exercise more than one table
+      bucket: 'patterns',
+      listingCount: 1,
+      totalQuantity: 1,
+      trackedItemCount: 40,
+      listedItemCount: 1,
+      items: [
+        {
+          itemId: 'pattern_sunspun_vestments',
+          name: 'Pattern: Sunspun Vestments',
+          listingCount: 1,
+          totalQuantity: 1,
+          lowestPerUnit: 12,
+          medianPerUnit: 15,
+        },
+      ],
+      sold: { saleCount: 1, quantity: 1, copper: 900 },
+    },
+    emptyBucket('produce', 24),
+    emptyBucket('seeds', 12),
+    emptyBucket('compost', 2),
+  ],
+};
+
+const EMPTY_METRICS: AdminMarketMetrics = {
+  realm: 'eastbrook',
+  soldWindowDays: 7,
+  soldAvailable: true,
+  buckets: [
+    emptyBucket('cores', 1),
+    emptyBucket('essence', 2),
+    emptyBucket('patterns', 40),
+    emptyBucket('produce', 24),
+    emptyBucket('seeds', 12),
+    emptyBucket('compost', 2),
+  ],
+};
+
+// Keep the real module (ApiError included: handleAuthFailure instanceof-checks
+// it on the failure branch) and override only the transport.
+vi.mock('../../src/admin/api', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../src/admin/api')>()),
+  apiGet: vi.fn(async (path: string) => {
+    if (path === '/admin/api/market/metrics') return METRICS;
+    throw new Error(`unexpected path ${path}`);
+  }),
+  apiPost: vi.fn(async () => ({})),
+  getToken: () => 'tok',
+  getAdminName: () => 'admin',
+  clearSession: () => {},
+}));
+
+import { ApiError, apiGet } from '../../src/admin/api';
+import { fmtCopper, fmtNumber } from '../../src/admin/format';
+import { t } from '../../src/admin/i18n';
+import MarketMetrics from '../../src/admin/pages/MarketMetrics.svelte';
+import { auth } from '../../src/admin/state/auth.svelte';
+
+// The generic apiGet<T> cannot take a concrete mockImplementation without a
+// cast; unknown keeps the payload swap per test type-checked at the call site.
+const apiGetMock = apiGet as unknown as Mock<(path: string) => Promise<unknown>>;
+
+describe('Market Metrics page', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    apiGetMock.mockImplementation(async (path: string) => {
+      if (path === '/admin/api/market/metrics') return METRICS;
+      throw new Error(`unexpected path ${path}`);
+    });
+  });
+
+  it('renders every bucket title, the realm line, and the item rows', async () => {
+    render(MarketMetrics);
+    expect(await screen.findByText('Wyrmfall Core')).toBeInTheDocument();
+    expect(apiGetMock).toHaveBeenCalledWith('/admin/api/market/metrics');
+    expect(screen.getByText(t('marketMetrics.realm', { realm: 'eastbrook' }))).toBeInTheDocument();
+    for (const key of [
+      'marketMetrics.bucketCores',
+      'marketMetrics.bucketEssence',
+      'marketMetrics.bucketPatterns',
+      'marketMetrics.bucketProduce',
+      'marketMetrics.bucketSeeds',
+      'marketMetrics.bucketCompost',
+    ]) {
+      expect(screen.getByText(t(key))).toBeInTheDocument();
+    }
+    expect(
+      screen.getByText(
+        t('marketMetrics.bucketSummary', {
+          listings: fmtNumber(2),
+          quantity: fmtNumber(5),
+          listed: fmtNumber(1),
+          tracked: fmtNumber(1),
+        }),
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText(fmtCopper(3))).toBeInTheDocument();
+    expect(screen.getByText(fmtCopper(4))).toBeInTheDocument();
+  });
+
+  it('shows the essence tripwire note', async () => {
+    render(MarketMetrics);
+    await screen.findByText('Wyrmfall Core');
+    expect(screen.getByText(t('marketMetrics.essenceNote'))).toBeInTheDocument();
+  });
+
+  it('shows the loading state until the fetch resolves', () => {
+    apiGetMock.mockImplementation(() => new Promise(() => {}));
+    render(MarketMetrics);
+    expect(screen.getByText(t('marketMetrics.loading'))).toBeInTheDocument();
+  });
+
+  it('shows the failure state on a non-auth error', async () => {
+    apiGetMock.mockRejectedValue(new Error('boom'));
+    render(MarketMetrics);
+    expect(await screen.findByText(t('marketMetrics.loadFailed'))).toBeInTheDocument();
+  });
+
+  it('routes an ApiError(401) through auth.handleAuthFailure, not the failure line', async () => {
+    // The api mock spreads the REAL module precisely so this arm can throw the
+    // real ApiError class (handleAuthFailure instanceof-checks it). The spy
+    // still calls through, so the real 401 arm (logout) runs.
+    const authSpy = vi.spyOn(auth, 'handleAuthFailure');
+    apiGetMock.mockRejectedValue(new ApiError(401, 'admin authentication required'));
+    render(MarketMetrics);
+    await waitFor(() => expect(authSpy).toHaveBeenCalledTimes(1));
+    expect(authSpy).toHaveReturnedWith(true);
+    // A 401 hands the operator to the login screen; the page must not ALSO
+    // paint its own failure line on top of the forced logout.
+    expect(screen.queryByText(t('marketMetrics.loadFailed'))).not.toBeInTheDocument();
+    authSpy.mockRestore();
+  });
+
+  it('shows the all-quiet line plus per-bucket empties when nothing is listed', async () => {
+    apiGetMock.mockResolvedValue(EMPTY_METRICS);
+    render(MarketMetrics);
+    expect(await screen.findByText(t('marketMetrics.empty'))).toBeInTheDocument();
+    expect(screen.getAllByText(t('marketMetrics.bucketEmpty'))).toHaveLength(6);
+  });
+
+  it('renders the auto-refresh toggle with its interval label', async () => {
+    render(MarketMetrics);
+    await screen.findByText('Wyrmfall Core');
+    expect(screen.getByText(t('marketMetrics.autoRefresh', { seconds: 30 }))).toBeInTheDocument();
+  });
+
+  it('names every bucket table by its own heading (aria-labelledby resolves)', async () => {
+    // The accessible-name wiring is markup only, so it can regress silently
+    // without this pin: each table must point at the id of the h3 carrying
+    // its bucket title.
+    render(MarketMetrics);
+    await screen.findByText('Wyrmfall Core');
+    const tables = document.querySelectorAll('table');
+    expect(tables.length).toBeGreaterThanOrEqual(1);
+    const seenIds: string[] = [];
+    for (const table of tables) {
+      const labelId = table.getAttribute('aria-labelledby');
+      expect(labelId, 'a metrics table has no aria-labelledby').toMatch(/^market-bucket-/);
+      seenIds.push(labelId as string);
+      const heading = document.getElementById(labelId as string);
+      expect(heading?.tagName, `no heading element for ${labelId}`).toBe('H3');
+      // the heading carries ITS OWN bucket's title, not just any text
+      const bucket = (labelId as string).replace('market-bucket-', '');
+      const titleKey = `marketMetrics.bucket${bucket.charAt(0).toUpperCase()}${bucket.slice(1)}`;
+      expect(heading?.textContent?.trim()).toBe(t(titleKey));
+    }
+    // one heading per table: duplicated ids would all resolve to the first
+    expect(new Set(seenIds).size).toBe(seenIds.length);
+  });
+
+  it('renders each bucket its own sold-volume line over the stated window', async () => {
+    render(MarketMetrics);
+    await screen.findByText('Wyrmfall Core');
+    expect(
+      screen.getByText(
+        t('marketMetrics.bucketSold', {
+          days: fmtNumber(7),
+          sales: fmtNumber(6),
+          quantity: fmtNumber(11),
+          copper: fmtCopper(4200),
+        }),
+      ),
+    ).toBeInTheDocument();
+    // A second bucket with its OWN figures: a line rendered from the wrong
+    // bucket's row would still satisfy a single-bucket assertion.
+    expect(
+      screen.getByText(
+        t('marketMetrics.bucketSold', {
+          days: fmtNumber(7),
+          sales: fmtNumber(1),
+          quantity: fmtNumber(1),
+          copper: fmtCopper(900),
+        }),
+      ),
+    ).toBeInTheDocument();
+    // The four buckets with nothing sold say so rather than showing zeros.
+    expect(screen.getAllByText(t('marketMetrics.soldNone', { days: fmtNumber(7) }))).toHaveLength(
+      4,
+    );
+    expect(screen.queryByText(t('marketMetrics.soldUnavailable'))).not.toBeInTheDocument();
+  });
+
+  it('says sold volume is unavailable rather than showing a misleading zero', async () => {
+    // soldAvailable false means the server could not read the store. Rendering
+    // "nothing sold" there would be a lie an operator could act on.
+    apiGetMock.mockResolvedValue({ ...METRICS, soldAvailable: false });
+    render(MarketMetrics);
+    expect(await screen.findByText(t('marketMetrics.soldUnavailable'))).toBeInTheDocument();
+    expect(
+      screen.queryByText(t('marketMetrics.soldNone', { days: fmtNumber(7) })),
+    ).not.toBeInTheDocument();
+    // ...and the listing half still renders in full.
+    expect(screen.getByText('Wyrmfall Core')).toBeInTheDocument();
+    expect(screen.getByText(fmtCopper(3))).toBeInTheDocument();
+  });
+
+  it('honours the window the server states rather than a hard-coded one', async () => {
+    apiGetMock.mockResolvedValue({ ...METRICS, soldWindowDays: 30 });
+    render(MarketMetrics);
+    await screen.findByText('Wyrmfall Core');
+    expect(
+      screen.getByText(
+        t('marketMetrics.bucketSold', {
+          days: fmtNumber(30),
+          sales: fmtNumber(6),
+          quantity: fmtNumber(11),
+          copper: fmtCopper(4200),
+        }),
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('auto-refresh refetches on the 30 s interval and the toggle-off cancels it', async () => {
+    // The interval itself, driven (the Phase 16 QA): the label-only case
+    // above stays green with the setInterval or the toggle wiring deleted.
+    vi.useFakeTimers();
+    try {
+      render(MarketMetrics);
+      await vi.advanceTimersByTimeAsync(0); // flush the mount fetch
+      expect(apiGetMock).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(apiGetMock).toHaveBeenCalledTimes(2);
+      const toggle = screen.getByRole('checkbox') as HTMLInputElement;
+      expect(toggle.checked).toBe(true);
+      toggle.click();
+      await vi.advanceTimersByTimeAsync(90_000); // three would-be intervals
+      expect(apiGetMock, 'the cancelled interval refetched').toHaveBeenCalledTimes(2);
+      // toggling back ON refetches immediately AND re-arms the interval
+      toggle.click();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(apiGetMock, 'toggle-on must refetch immediately').toHaveBeenCalledTimes(3);
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(apiGetMock, 'toggle-on must re-arm the interval').toHaveBeenCalledTimes(4);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});

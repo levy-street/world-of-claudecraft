@@ -52,6 +52,8 @@ const guildSnap = (rank: 'leader' | 'officer' | 'member'): SocialSnapshot => ({
     pledgeSettings: { enabled: true, minLevel: 1, note: '' },
     pledges: [],
     tier: 0,
+    memberCap: 100,
+    nextRosterPrice: 400_000,
     members: [],
     events: [],
   },
@@ -153,10 +155,13 @@ describe('the guild membership stamp fence (guildStampSeq)', () => {
     expect(calls).toEqual([
       `guildBankDepositGoldFor(${pid},1500)`,
       `guildBankWithdrawGoldFor(${pid},2500)`,
-      `guildBankDepositFor(${pid},3,2)`,
-      `guildBankDepositFor(${pid},4,)`, // count omitted stays undefined (whole stack)
-      `guildBankWithdrawFor(${pid},5,1)`,
-      `guildBankWithdrawFor(${pid},6,)`,
+      // The fourth argument is the material-source selection
+      // (readMaterialSourceTransferWire); a plain wire message with no
+      // explicit selection passes undefined through, same as an omitted count.
+      `guildBankDepositFor(${pid},3,2,)`,
+      `guildBankDepositFor(${pid},4,,)`, // count omitted stays undefined (whole stack)
+      `guildBankWithdrawFor(${pid},5,1,)`,
+      `guildBankWithdrawFor(${pid},6,,)`,
       `guildBankBuySlotsFor(${pid})`,
     ]);
     // Shape rejects never reach the sim at all.
@@ -166,6 +171,46 @@ describe('the guild membership stamp fence (guildStampSeq)', () => {
     send({ cmd: 'guild_bank_deposit' });
     send({ cmd: 'guild_bank_withdraw', slot: '3' });
     expect(calls).toEqual([]);
+  });
+
+  it('a valid material-source selection reaches the sim as the exact 4th arg, and a mismatched one never reaches it', () => {
+    // The routing pin above only proves the undefined arm; the selection
+    // decode hop (server/material_source_transfer_wire.ts) is a separate
+    // parse this pins directly, with the real object rather than a joined
+    // string (String(object) would hide a shape regression).
+    const server = new GameServer();
+    const session = joinServer(server, 7, 'Selector');
+    const pid = session.pid;
+    const rawCalls: unknown[][] = [];
+    for (const name of ['guildBankDepositFor', 'guildBankWithdrawFor'] as const) {
+      // biome-ignore lint/suspicious/noExplicitAny: spying the pid-first facade seam
+      (server.sim as any)[name] = (...args: unknown[]) => rawCalls.push(args);
+    }
+    const send = (msg: Record<string, unknown>) =>
+      priv(server).dispatchMessage(session, { t: 'cmd', ...msg }, JSON.stringify(msg), 0);
+    // A well-formed selection: one source bucket, its target pinned to the
+    // command's own slot, its quantities summing to the command's count
+    // (src/sim/material_source_transfer_selection.ts readMaterialSourceTransferSelection).
+    const selection = (slotIndex: number, count: number) => ({
+      itemId: 'copper_ore',
+      target: { slotIndex, pin: '0'.repeat(32), anchor: { ordinal: 0, count: 1 } },
+      quantities: [{ sourceIndex: 0, count }],
+    });
+
+    send({ cmd: 'guild_bank_deposit', slot: 3, count: 2, selection: selection(3, 2) });
+    send({ cmd: 'guild_bank_withdraw', slot: 5, count: 1, selection: selection(5, 1) });
+    expect(rawCalls).toEqual([
+      [pid, 3, 2, selection(3, 2)],
+      [pid, 5, 1, selection(5, 1)],
+    ]);
+
+    // A selection naming a slot other than msg.slot, or one whose quantities
+    // disagree with msg.count, fails materialSourceTransferSelectionMatches:
+    // the whole command is refused before dispatchMessage ever calls the sim.
+    rawCalls.length = 0;
+    send({ cmd: 'guild_bank_deposit', slot: 3, count: 2, selection: selection(4, 2) });
+    send({ cmd: 'guild_bank_withdraw', slot: 5, count: 9, selection: selection(5, 1) });
+    expect(rawCalls).toEqual([]);
   });
 
   it('a stamp BEFORE the flight does not fence it: the snapshot still applies', async () => {

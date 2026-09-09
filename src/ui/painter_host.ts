@@ -39,7 +39,9 @@
 // / `el.style.*`) on elements handed to them, but never reach for a browser global,
 // so the host itself imports cleanly under Vitest.
 
+import type { MaterialComposition } from '../sim/material_sources';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
+import type { MaterialSourcesDialogOptions } from './material_sources_dialog';
 
 /**
  * Facet 1: the presentation dep-bag. Exactly the icon / money / tooltip helpers a
@@ -48,16 +50,31 @@ import type { ItemDef, ItemInstancePayload } from '../sim/types';
  * hands it to every window that renders items, so the helpers live in one place.
  */
 export interface PainterHostPresentation {
-  /** `<img>` markup for an item's procedural icon. */
-  itemIcon(item: ItemDef): string;
+  /** `<img>` markup for an item's procedural icon. The optional `quality` is
+   *  the cell's INSTANCE-effective quality (worn_item_cell_view.ts): a
+   *  promoted legendary copy gets its orange rim here rather than its def
+   *  tier's, and every item cell routes through this one dep so the icon
+   *  seam stays injected (the phase 13 QA). */
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   /** Localized coin markup (gold/silver/copper) for a copper amount. */
   moneyHtml(copper: number): string;
   /** Full item tooltip markup (name, stats, compare). The optional per-copy
    *  instance payload adds the masterwork seal, enchanted marker, baked bonus
-   *  stats, and maker's mark lines (Professions 2.0). */
-  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
+   *  stats, and maker's mark lines (Professions 2.0). The optional
+   *  `materialSources` is the hovered STACK's per-unit provenance: a surface
+   *  that has the slot in hand passes it and the card gains one line per
+   *  contributor, and one that does not simply omits it. Every surface showing
+   *  OWNED stacks should pass it (the all-surfaces item-mark doctrine in
+   *  src/ui/CLAUDE.md: a fact about the item must not vanish between windows). */
+  itemTooltip(
+    item: ItemDef,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string;
   /** Attach a lazily-built tooltip to an element. */
   attachTooltip(el: HTMLElement, html: () => string): void;
+  /** Open the uncapped source details/picker surface when the host has mounted it. */
+  openMaterialSources?(options: MaterialSourcesDialogOptions): void;
 }
 
 /**
@@ -74,6 +91,24 @@ export interface PainterHostPresentation {
  * setStyleProp/toggleClass/setAttr are MULTI-SLOT (keyed per (element, prop) /
  * (element, class) / (element, attr)), since one element holds many custom
  * properties, toggled classes, and attributes.
+ *
+ * THE GUARANTEE IS PER (ELEMENT, KIND), NOT PER ELEMENT, and the difference is a
+ * defect that has shipped. Because the four single-slot writers share ONE entry
+ * per element, an element written through TWO DIFFERENT single-slot writers has
+ * that entry flipped by each call, the equality below is false every time, and
+ * BOTH writes bypass elision FOREVER. Nothing renders wrong, so no behavior test
+ * fails; the writes just never elide and count as real writes in hotDomWrites.
+ * It shipped at seven sites across five modules, the worst being the aura stacks
+ * badge (setDisplay + setText on one node, every frame, per stacking aura).
+ *
+ * SO: a node that needs two facets gives the second one its OWN slot. Use
+ * setStyleProp for a CSS property (its contract covers a standard property, not
+ * just a `--var`: `setStyleProp(el, 'display', v)` is byte-for-byte the write
+ * setDisplay performs, keyed per (element, 'display')), toggleClass when the
+ * state belongs in the stylesheet, or setAttr for an attribute. Two separate
+ * ELEMENTS work equally well and are sometimes the honest answer; a second cache
+ * slot is simply cheaper than a second node.
+ * Guarded by tests/painter_single_slot_collision_guard.test.ts.
  */
 export interface PainterHostWriters {
   /** Set `el.textContent`, eliding a repeat of the same text. */

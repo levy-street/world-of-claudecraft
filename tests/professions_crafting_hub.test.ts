@@ -127,8 +127,9 @@ describe('station content', () => {
         `${type} needs a physical station`,
       ).toBeGreaterThan(0);
     }
-    // The three station-less crafts stay station-less (no station-bound
-    // content exists for them today).
+    // The three station-less crafts stay station-less as CRAFTS: no station
+    // type is named after them. Their individual recipes may still bind to a
+    // foreign station per record (the sanctioned shape, pinned below).
     for (const craftId of ['jewelcrafting', 'inscription', 'enchanting']) {
       expect(stationTypeForCraft(craftId)).toBeUndefined();
     }
@@ -180,20 +181,66 @@ describe('station content', () => {
     // ruled exception class: a craft with no station of its own (enchanting/
     // jewelcrafting/inscription) may bind a recipe to a foreign station, and
     // that binding then IS the recipe's teaching home (training.ts
-    // trainingStationTypeFor). The tool-effect charms are the whole class
-    // today: enchanting home, toolworks binding, pinned literally so a new
-    // foreign binding is a deliberate edit here, not a drive-by.
+    // trainingStationTypeFor). Five families make up the class today: the
+    // two enchanting tool-effect charms (enchanting home, toolworks binding;
+    // the phase 09 Maker's Charm is engineering-home and so NOT foreign
+    // bound, deliberately absent from this list), the
+    // Masterwrought phase 05 jewelcrafting base catalog (jewelcrafting home,
+    // forge binding at forgemistress_darva), the Masterwrought phase 06
+    // inscription base catalog (inscription home, apothecary binding at
+    // alchemist_verane), the three station-less-craft rows of the
+    // Masterwrought phase 07 intermediates (Prismglass Setting at the forge,
+    // Lucent Reagent at the toolworks per the phase's enchanting station
+    // decision, Sablewax Vellum at the apothecary), and the Masterwrought
+    // phase 09 apex gear rows for the station-less crafts (the three
+    // jewelcrafting apex pieces at the forge, inscription's Voidbound
+    // Grimoire at the apothecary), and the Masterwrought phase 13 Deed of
+    // Making (inscription home, the same apothecary binding as the rest of
+    // its craft's rows), pinned literally so a
+    // new foreign binding is a deliberate edit here, not a drive-by. The
+    // pin carries id:station PAIRS (review round; the Masterwrought phase 11l
+    // trophy rows all bind their own craft's station and ride the equality
+    // branch, the Valefire Lantern's apothecary binding having left with its
+    // row at the 11l QA): a bare id list would
+    // stay green if a station-less craft's recipe silently moved to a
+    // different foreign station.
     const foreignBound: string[] = [];
     for (const recipe of ALL_RECIPES) {
       if (!recipe.stationType) continue;
       const ownStation = stationTypeForCraft(recipe.professionId);
       if (ownStation === undefined) {
-        foreignBound.push(recipe.id);
+        foreignBound.push(`${recipe.id}:${recipe.stationType}`);
         continue;
       }
       expect(recipe.stationType, `${recipe.id} station/craft mismatch`).toBe(ownStation);
     }
-    expect(foreignBound.sort()).toEqual(['recipe_artisans_eye', 'recipe_gatherers_cache']);
+    expect(foreignBound.sort()).toEqual([
+      'recipe_artisans_eye:toolworks',
+      'recipe_burnished_thorium_amulet:forge',
+      'recipe_coiled_copper_torc:forge',
+      'recipe_deed_of_making:apothecary',
+      'recipe_etched_iron_loop:forge',
+      'recipe_gatherers_cache:toolworks',
+      'recipe_gleaming_thorium_loop:forge',
+      'recipe_goldleaf_folio:apothecary',
+      'recipe_goldleaf_scroll:apothecary',
+      'recipe_hammered_copper_band:forge',
+      'recipe_iron_link_choker:forge',
+      'recipe_lucent_reagent:toolworks',
+      'recipe_polished_copper_loop:forge',
+      'recipe_prismglass_loop:forge',
+      'recipe_prismglass_setting:forge',
+      'recipe_riveted_iron_signet:forge',
+      'recipe_sablewax_vellum:apothecary',
+      'recipe_silverleaf_primer:apothecary',
+      'recipe_silverleaf_scroll:apothecary',
+      'recipe_sunpetal_grimoire:apothecary',
+      'recipe_sunpetal_scroll:apothecary',
+      'recipe_voidbound_grimoire:apothecary',
+      'recipe_warhewn_signet:forge',
+      'recipe_weighted_thorium_band:forge',
+      'recipe_wyrmfall_pendant:forge',
+    ]);
   });
 });
 

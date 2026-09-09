@@ -3,7 +3,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { modalPromptOpen } from '../src/ui/prompt_dialog';
 import {
   clearOpenStoreResult,
   STORE_RESULT_EXPIRY_MS,
@@ -64,7 +63,7 @@ describe('StoreDecisionPrompts', () => {
     for (const prompts of created.splice(0)) prompts.unregister();
   });
 
-  it('owns an accessible body-level modal and restores the exact opener on Escape', () => {
+  it('owns an accessible modal in the prompt stack and restores the exact opener on Escape', () => {
     const root = document.getElementById('store') as HTMLElement;
     const opener = document.getElementById('buy') as HTMLButtonElement;
     const cancelled = vi.fn();
@@ -81,14 +80,7 @@ describe('StoreDecisionPrompts', () => {
       onCancel: cancelled,
     });
 
-    const prompt = document.getElementById('confirm-dialog') as HTMLElement;
-    // Body-level ON PURPOSE, never a #prompt-stack child: the stack lives inside
-    // #ui, a position:fixed z-index:10 stacking context (base.css), so no z-index
-    // inside it can clear the body-level armory inspect overlay (z 90). A
-    // stack-hosted decision opened invisibly under an open inspector while both
-    // surfaces sat inert (the v0.41.0 desktop Purchase Skin freeze); the HUD
-    // confirm floors itself above the overlay for the same reason (src/ui/hud.ts).
-    expect(prompt.parentElement).toBe(document.body);
+    const prompt = document.querySelector('#prompt-stack #confirm-dialog') as HTMLElement;
     expect(prompt.getAttribute('role')).toBe('dialog');
     expect(prompt.getAttribute('aria-modal')).toBe('true');
     expect(prompt.getAttribute('aria-labelledby')).toBeTruthy();
@@ -308,65 +300,5 @@ describe('StoreDecisionPrompts', () => {
     expect(css).toMatch(
       /body\.mobile-touch #prompt-stack \.woc-store-global-result\s*\{[^}]*pointer-events:\s*auto;/s,
     );
-  });
-
-  it('an open decision gates gameplay keybinds through the family modal matcher', () => {
-    // Hud.promptModalOpen() delegates to modalPromptOpen(), which the gameplay
-    // input gate consults before every keyboard/gamepad action. The matcher must
-    // see the decision at its BODY-LEVEL mount: a #prompt-stack-scoped selector
-    // reported false here, so while the confirm owned the screen, Tab fired the
-    // target-nearest bind instead of cycling the trap and ability keys stayed
-    // live under an aria-modal purchase dialog.
-    const root = document.getElementById('store') as HTMLElement;
-    const prompts = makePrompts(() => root);
-    expect(modalPromptOpen()).toBe(false);
-    prompts.open({
-      title: 'Confirm purchase',
-      body: 'Buy the skin?',
-      confirmText: 'Purchase',
-      cancelText: 'Cancel',
-      closeText: 'Close',
-      onConfirm: vi.fn(),
-    });
-    expect(modalPromptOpen()).toBe(true);
-    prompts.dismiss(false);
-    expect(modalPromptOpen()).toBe(false);
-  });
-
-  it('the modal matcher still sees the stack-mounted bank prompt family', () => {
-    // The other mount the selector must keep covering: an installPromptDialog
-    // prompt hosted in #prompt-stack (bank/bags/vendor quantity prompts).
-    const stackPrompt = document.createElement('div');
-    stackPrompt.className = 'prompt panel';
-    stackPrompt.setAttribute('aria-modal', 'true');
-    document.getElementById('prompt-stack')?.appendChild(stackPrompt);
-    expect(modalPromptOpen()).toBe(true);
-    stackPrompt.remove();
-    expect(modalPromptOpen()).toBe(false);
-  });
-
-  it('pins its own fixed geometry above the armory inspect overlay', () => {
-    // The decision is a body-level .prompt: the generic #confirm-dialog rule
-    // centers it but brings no position of its own (the HUD confirm gets that
-    // from .window), and its z-index 60 sits UNDER the inspector. The scoped
-    // rule must carry both, or the modal lands back under the overlay it was
-    // moved out of the prompt stack to clear.
-    const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
-    const rule = css.match(/#confirm-dialog\.woc-store-prompt\s*\{[^}]*\}/s)?.[0] ?? '';
-    expect(rule).toContain('position: fixed');
-    const promptZ = Number(rule.match(/z-index:\s*(\d+)/)?.[1] ?? Number.NaN);
-    const overlayRule = css.match(/\.armory-inspect-overlay\s*\{[^}]*\}/s)?.[0] ?? '';
-    const overlayZ = Number(overlayRule.match(/z-index:\s*(\d+)/)?.[1] ?? Number.NaN);
-    expect(Number.isFinite(overlayZ)).toBe(true);
-    expect(promptZ).toBeGreaterThan(overlayZ);
-    // The mobile HUD raises the whole #ui stacking context while a window is
-    // open (body.mobile-touch.mobile-window-open #ui). The body-level decision
-    // must stay above THAT too, or the mobile store re-buries its own confirm.
-    const mobileCss = readFileSync(resolve(process.cwd(), 'src/styles/hud.mobile.css'), 'utf8');
-    const mobileUiRule =
-      mobileCss.match(/body\.mobile-touch\.mobile-window-open #ui\s*\{[^}]*\}/s)?.[0] ?? '';
-    const mobileUiZ = Number(mobileUiRule.match(/z-index:\s*(\d+)/)?.[1] ?? Number.NaN);
-    expect(Number.isFinite(mobileUiZ)).toBe(true);
-    expect(promptZ).toBeGreaterThan(mobileUiZ);
   });
 });

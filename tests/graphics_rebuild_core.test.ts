@@ -97,8 +97,8 @@ describe('per-system dial staging (round 12)', () => {
     // is medium's exact 2560 map, high is the documented Advanced-Medium
     // profile plus the full high post stack (SMAA + bloom + half-res AO),
     // ultra adds full-res AO and the 128-cell water field, insane the 4-tap
-    // worn walk and the 8yd vista grid; shadows top out at High's 4096 map
-    // everywhere (the dial is capped at level 1).
+    // worn walk and the 8yd vista grid; shadows top out at the dial's 4096
+    // rung everywhere (it is capped at level 1).
     expect(advancedDialSeed(1)).toEqual({
       terrainDetail: 0,
       foliageDensity: 0,
@@ -366,7 +366,6 @@ describe('dial seeds versus the real gfx.ts tier ladder', () => {
       'surfaceDetail',
       'surfaceDetailTaps',
       'surfaceDetailClampK',
-      'shadowMap',
       'composer',
       'ao',
       'aoFullRes',
@@ -375,6 +374,14 @@ describe('dial seeds versus the real gfx.ts tier ladder', () => {
       'farCharacterAnimScale',
     ] as const;
     for (const knob of highKnobs) expect(advancedFor(3)[knob], `high ${knob}`).toEqual(high[knob]);
+    // shadowMap is deliberately NOT in that list. The high tier renders the
+    // 2560 working map, the dial's top rung is the 4096 showcase allocation,
+    // and no rung expresses "2560 WITH terrain-cast shadows" (the Medium rung
+    // sheds those), so the High seed keeps the top rung and the map size does
+    // not round-trip. Pinned here so the deviation stays deliberate.
+    expect(high.shadowMap).toBe(2560);
+    expect(advancedFor(3).shadowMap).toBe(4096);
+    expect(advancedFor(3).terrainCastShadows).toBe(high.terrainCastShadows);
 
     const ultra = settingsFor('ultra', desktopHints);
     const ultraKnobs = [

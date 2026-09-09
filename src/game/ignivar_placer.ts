@@ -29,12 +29,16 @@ import {
   IGNIVAR_LIFT_LAYOUT,
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../sim/dungeon_layout';
+import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../sim/forgefather_fortress';
 import type { Entity } from '../sim/types';
 
 export interface IgnivarPlacerDeps {
   scene: THREE.Scene;
   getPlayer: () => Entity | undefined;
   log: (text: string, color?: string) => void;
+  /** the chat send path, for the dev commands the rig drives itself
+   *  (the mob freeze on open/close) */
+  chat: (text: string) => void;
 }
 
 interface PlacedEntry {
@@ -152,10 +156,41 @@ const EXTERIOR_KIT: readonly IgnivarEnvPropKey[] = [
   'tower_top',
 ];
 
-type AssetKit = 'interior' | 'exterior';
+/** The owner's NEW asset kit for the Drakelands rebuild (the Last Keep and
+ *  Wyrmwatch placer passes): a dedicated picker section that holds ONLY the
+ *  new assets the owner provides, never a key from the interior or exterior
+ *  rosters. Baked from the owner's drop by
+ *  scripts/assets/build_drakelands_kit.mjs; a future drop registers in
+ *  IGNIVAR_ENV_PROP_URLS (plus its native dims) and then joins this list. */
+const CUSTOM_KIT: readonly IgnivarEnvPropKey[] = [
+  'barracks',
+  'building_1',
+  'building_2',
+  'building_base',
+  'building_base_roof',
+  'castle_door',
+  'church',
+  'dragon_statue',
+  'dummy',
+  'fence',
+  'gravestone_2',
+  'gravestone_3',
+  'horse_head',
+  'notice_board',
+  'shield_rack',
+  'signpost',
+  'stables',
+  'tavern_sign',
+  'weapon_rack',
+  'well_pump',
+];
+
+type AssetKit = 'interior' | 'exterior' | 'custom';
+
+const KIT_CYCLE: readonly AssetKit[] = ['interior', 'exterior', 'custom'];
 
 /** null = follow the site (exterior site shows the exterior kit); the panel
- *  button overrides so either kit is reachable anywhere. */
+ *  button cycles the three kits so any of them is reachable anywhere. */
 let kitOverride: AssetKit | null = null;
 
 function activeKit(): AssetKit {
@@ -163,7 +198,9 @@ function activeKit(): AssetKit {
 }
 
 function kitKeys(): readonly IgnivarEnvPropKey[] {
-  return activeKit() === 'exterior'
+  const kit = activeKit();
+  if (kit === 'custom') return CUSTOM_KIT;
+  return kit === 'exterior'
     ? EXTERIOR_KIT
     : (Object.keys(IGNIVAR_ENV_PROP_URLS) as IgnivarEnvPropKey[]);
 }
@@ -223,6 +260,21 @@ const WORKLIGHT_INTENSITY = 1.4;
 let worklightOn = true;
 
 const worklightLabel = (): string => (worklightOn ? 'work light: on' : 'work light: off');
+
+// The placement mob freeze: the rig drives /dev freezemobs itself so opening
+// the placer never draws aggro mid-layout (frozen mobs skip their whole AI
+// update: no wander, no pulls, no swings). On by default every open, released
+// on close; the panel button flips it for anyone who wants the world moving
+// while they place. Explicit on/off forms keep the rig idempotent against
+// hand-typed toggles.
+let freezeMobsOn = true;
+
+const freezeLabel = (): string => (freezeMobsOn ? 'mobs: frozen' : 'mobs: live');
+
+function sendFreeze(on: boolean): void {
+  freezeMobsOn = on;
+  state.deps?.chat(on ? '/dev freezemobs on' : '/dev freezemobs off');
+}
 
 function applyWorklight(): void {
   const deps = state.deps;
@@ -317,7 +369,19 @@ function rebuildGroup(): void {
   }
   state.group.position.set(room.ox, 0, room.oz);
   state.group.clear();
-  const placements = state.entries.map(toPlacement);
+  // A street_lamp row already baked into the fortress table renders through
+  // the world's streetlamp fixture pipeline (brazier model, night light, post
+  // collider), so drawing the raw GLB here too would show every baked lamp
+  // twice while the placer is open. A new or moved lamp row has no baked twin
+  // at its spot yet and keeps its ghost; the selection ring is drawn
+  // separately, so a hidden lamp stays editable.
+  const bakedLampAt = (p: IgnivarPropPlacement): boolean =>
+    p.key === 'street_lamp' &&
+    (state.room?.exterior ?? false) &&
+    FORGEFATHER_FORTRESS_PLACEMENTS.some(
+      (b) => b.key === 'street_lamp' && Math.abs(b.x - p.x) < 0.01 && Math.abs(b.z - p.z) < 0.01,
+    );
+  const placements = state.entries.map(toPlacement).filter((p) => !bakedLampAt(p));
   appendIgnivarEnvProps(state.group, placements, false);
   // Live fire preview for placed torches so lighting can be judged while
   // placing. Preview lights bypass the renderer's fire-light budget (throwaway
@@ -494,7 +558,17 @@ function renderPicker(): void {
   const picker = state.pickerEl;
   if (!picker) return;
   picker.textContent = '';
-  for (const key of kitKeys()) picker.appendChild(button(key, () => placeProp(key)));
+  const keys = kitKeys();
+  for (const key of keys) picker.appendChild(button(key, () => placeProp(key)));
+  if (keys.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'font-size:11px;color:#9a917f;padding:2px 0;';
+    empty.textContent =
+      activeKit() === 'custom'
+        ? 'custom kit is empty: the new assets join CUSTOM_KIT as they land'
+        : 'this kit is empty';
+    picker.appendChild(empty);
+  }
   if (state.kitBtn) state.kitBtn.textContent = kitLabel();
 }
 
@@ -682,8 +756,12 @@ function buildPanel(): void {
     setWorklight(!worklightOn);
     worklightBtn.textContent = worklightLabel();
   });
+  const freezeBtn = button(freezeLabel(), () => {
+    sendFreeze(!freezeMobsOn);
+    freezeBtn.textContent = freezeLabel();
+  });
   const kitBtn = button(kitLabel(), () => {
-    kitOverride = activeKit() === 'exterior' ? 'interior' : 'exterior';
+    kitOverride = KIT_CYCLE[(KIT_CYCLE.indexOf(activeKit()) + 1) % KIT_CYCLE.length];
     renderPicker();
   });
   state.kitBtn = kitBtn;
@@ -698,6 +776,7 @@ function buildPanel(): void {
     ),
     kitBtn,
     worklightBtn,
+    freezeBtn,
     button('close', closePlacer),
   ]);
 
@@ -725,6 +804,10 @@ function closePlacer(): void {
     window.clearInterval(state.timer);
     state.timer = null;
   }
+  // release the placement freeze before anything else tears down (explicit
+  // off, so a hand-typed toggle mid-session cannot leave the world stuck)
+  sendFreeze(false);
+  freezeMobsOn = true; // next open freezes again by default
   state.panel?.remove();
   state.panel = null;
   state.listEl = null;
@@ -748,6 +831,13 @@ function openPlacer(deps: IgnivarPlacerDeps): void {
     if (state.panel) return;
     buildPanel();
     applyWorklight();
+    sendFreeze(true);
+    // The freeze is sim-wide: on a shared dev realm every mob stops for
+    // everyone connected until this rig closes, so say so where the other
+    // players' "mobs stopped moving" report would otherwise start a hunt.
+    deps.log(
+      '[placer] mobs frozen realm-wide while the rig is open (/dev freezemobs); released on close.',
+    );
     const room = roomForPlayer(deps.getPlayer());
     if (room) enterRoom(room);
     tickStatus();

@@ -32,6 +32,7 @@
   import AntibotConfig from './pages/AntibotConfig.svelte';
   import SharedIps from './pages/SharedIps.svelte';
   import ChatFilter from './pages/ChatFilter.svelte';
+  import RealmBuilders from './pages/RealmBuilders.svelte';
   import BlockedIps from './pages/BlockedIps.svelte';
   import BugReports from './pages/BugReports.svelte';
   import UnstuckReports from './pages/UnstuckReports.svelte';
@@ -39,6 +40,7 @@
   import Staff from './pages/Staff.svelte';
   import TopHolders from './pages/TopHolders.svelte';
   import Flags from './pages/Flags.svelte';
+  import MarketMetrics from './pages/MarketMetrics.svelte';
 
   // Root of the admin SPA. Shows the login overlay until authed, then the shared
   // navigation shell and the routed page. The {#key session.locale} wrapper
@@ -48,6 +50,7 @@
   let route = $state<AdminRoute>(currentAdminRoute());
   const PAGE_COMPONENTS = {
     overview: Overview,
+    'market-metrics': MarketMetrics,
     accounts: Accounts,
     characters: Characters,
     'online-players': OnlinePlayers,
@@ -62,6 +65,7 @@
     'antibot-config': AntibotConfig,
     'shared-ips': SharedIps,
     'chat-filter': ChatFilter,
+    'realm-builders': RealmBuilders,
     'blocked-ips': BlockedIps,
     'bug-reports': BugReports,
     'unstuck-reports': UnstuckReports,

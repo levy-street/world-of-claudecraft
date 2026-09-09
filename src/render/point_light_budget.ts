@@ -99,11 +99,18 @@ export function applyPointLightBudget(
   sceneRoot?: THREE.Object3D,
 ): number {
   for (const entry of ranked) {
-    if (entry.dynamic) entry.light.getWorldPosition(entry.worldPos);
+    // Eligibility FIRST, because getWorldPosition below walks and recomputes
+    // the whole ancestor matrix chain. An ineligible light is one nothing can
+    // draw (a far-LOD swap hid the rig carrying it, a streamed group is off),
+    // it can never hold a counted slot, and its stale d2 only ever orders it
+    // against other ineligible entries in the tail the sort pushes it into.
+    // Weapon-skin lights ride a rig that hides on the LOD swap, so a crowd is
+    // exactly the case that pays this walk for nothing.
+    entry.eligible = sceneRoot === undefined || isDrawnEligible(entry.light, sceneRoot);
+    if (entry.dynamic && entry.eligible) entry.light.getWorldPosition(entry.worldPos);
     const dx = entry.worldPos.x - px;
     const dz = entry.worldPos.z - pz;
     entry.d2 = dx * dx + dz * dz;
-    entry.eligible = sceneRoot === undefined || isDrawnEligible(entry.light, sceneRoot);
   }
   // Sort whenever the live budget (which can sit below visibleCount under the
   // frame-budget governor or on constrained-memory tiers) actually truncates

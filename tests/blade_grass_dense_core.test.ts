@@ -27,13 +27,25 @@ describe('blade grass dense submission', () => {
     expect(state.count).toBe(1);
   });
 
-  it('wires the dense prefix into the existing single blade-grass draw', () => {
-    const source = readFileSync(new URL('../src/render/blade_grass.ts', import.meta.url), 'utf8');
+  it('wires the dense prefix into the blade-grass sector meshes', () => {
+    // The packer moved behind blade_grass_sector_pool.ts when the pools split
+    // into frustum-cullable sectors: the pool modules place and remove through
+    // it, and it is the one place that mints their instanced meshes.
+    const pool = readFileSync(
+      new URL('../src/render/blade_grass_sector_pool.ts', import.meta.url),
+      'utf8',
+    );
+    expect(pool.match(/new THREE\.InstancedMesh\(/g)).toHaveLength(1);
+    expect(pool).toContain('const dense = activateDenseSlot(s.dense, slot);');
+    expect(pool).toContain('s.im.getMatrixAt(s.dense.count, movedMatrix);');
+    expect(pool).toContain('s.im.setColorAt(removedDense, movedColor);');
 
-    expect(source.match(/new THREE\.InstancedMesh\(/g)).toHaveLength(1);
-    expect(source).toContain('const dense = activateDenseSlot(denseSlots, slot);');
-    expect(source).toContain('im.getMatrixAt(denseSlots.count, movedMatrix);');
-    expect(source).toContain('im.setColorAt(removedDense, movedColor);');
+    for (const file of ['blade_grass.ts', 'blade_grass_band.ts']) {
+      const source = readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
+      expect(source).not.toContain('new THREE.InstancedMesh(');
+      expect(source).toContain('sectorPool.place(slot, m, c);');
+      expect(source).toContain('sectorPool.remove(slot);');
+    }
   });
 
   it('builds the initial dense prefix before rendering and skips all steady-state uploads', () => {
@@ -59,9 +71,10 @@ describe('blade grass dense submission', () => {
     expect(steadyReturn).toBeGreaterThan(0);
     for (const transitionWork of [
       'scanTargetBlock(baseI, baseJ, PLACE_BUDGET)',
-      'im.count = denseSlots.count;',
-      'im.instanceMatrix.needsUpdate = true;',
-      'im.instanceColor.needsUpdate = true;',
+      // the banded ranges and the per-sector counts and bounds live in
+      // blade_grass_sector_pool.ts; the update only drives it
+      'sectorPool.queueUploads();',
+      'sectorPool.syncSectors();',
     ]) {
       expect(updateSource.indexOf(transitionWork)).toBeGreaterThan(steadyReturn);
     }

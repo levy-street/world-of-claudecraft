@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
+import { handleGatherNodeInteract } from '../src/game/gather_node_interact';
 import {
   handlePickedEntity,
   shouldApproachPickedEntity,
@@ -9,7 +10,13 @@ import {
 } from '../src/game/interactions';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { MOBS } from '../src/sim/data';
+import { harvestFamilyYieldsItem } from '../src/sim/professions/gathering';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 // The open-gate flip: the hcb wire mirror (PR 2087) made online corpse
 // harvest-claim state reliable, so the helper arms main.ts calls now run with
@@ -147,18 +154,21 @@ describe('direct corpse hits over gather nodes', () => {
   it('defers an all-unmapped corpse with nothing to loot, claim or no claim (#2513)', () => {
     // The click-path knock-on of the corpse-level harvest gate. fen_troll
     // carried claw and tusk, neither mapped at the time, so it had no harvest
-    // half to open for; both are mapped now (this branch's own fix), so no
-    // shipped template is left in that shape. gills and horn are still
-    // waiting on theirs, so this retags a real, otherwise-untagged template
-    // (warlock_imp) for the duration of the case, restored in a finally. With
-    // no loot either, `canOpen` is false and a click on the corpse mesh should
-    // fall through to a gather node sitting under it rather than being swallowed.
-    // Pinned with the claim UNSPENT, which is the state that used to keep it
-    // open, so this is the predicate talking and not the pre-existing claim arm.
-    const template = MOBS.warlock_imp;
-    const priorTags = template.componentTags;
-    template.componentTags = ['gills', 'horn'];
-    try {
+    // half to open for; both are mapped now (#2905), and Phase 11m mapped
+    // gills and horn after them, so no shipped template is left in that
+    // shape. This retags two real, otherwise-untagged templates with the
+    // synthetic never-mapped families (tests/helpers/unmapped_family.ts) for
+    // the duration of the case, restored in a finally: warlock_imp
+    // all-unmapped, warlock_voidwalker mixed. With no loot either, `canOpen`
+    // is false and a click on the corpse mesh should fall through to a gather
+    // node sitting under it rather than being swallowed. Pinned with the claim
+    // UNSPENT, which is the state that used to keep it open, so this is the
+    // predicate talking and not the pre-existing claim arm.
+    const retags = {
+      warlock_imp: [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2],
+      warlock_voidwalker: ['hide', UNMAPPED_FAMILY],
+    };
+    withRetaggedTemplates(retags, () => {
       const troll = corpse({ templateId: 'warlock_imp', harvestClaimedBy: null, loot: null });
       expect(shouldDeferPickedCorpseToGatherNode(troll, 1)).toBe(true);
       // ...and click-to-walk no longer marches the player to it either: there is
@@ -178,13 +188,22 @@ describe('direct corpse hits over gather nodes', () => {
         loot: { copper: 50, items: [] },
       });
       expect(shouldDeferPickedCorpseToGatherNode(withCoin, 1)).toBe(false);
-    } finally {
-      template.componentTags = priorTags;
-    }
-    // The discriminator on real content: a MIXED template carrying an
-    // unmapped horn beside two mapped families keeps its harvest half, so an
-    // empty one still opens.
-    expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn']);
+      // The discriminator: a MIXED template carrying an unmapped family
+      // beside a mapped one keeps its harvest half, so an empty one still
+      // opens (same two-tag width as the all-unmapped fixture, so it is the
+      // yield table deciding and not the count).
+      const mixed = corpse({
+        templateId: 'warlock_voidwalker',
+        harvestClaimedBy: null,
+        loot: null,
+      });
+      expect(shouldDeferPickedCorpseToGatherNode(mixed, 1)).toBe(false);
+    });
+    // ...and on real content: sethrael_palecoil (the shipped mixed exemplar
+    // until Phase 11m mapped its horn) still carries horn, every tag it
+    // carries maps now, and an empty one still opens.
+    expect(MOBS.sethrael_palecoil.componentTags).toContain('horn');
+    expect(MOBS.sethrael_palecoil.componentTags?.every(harvestFamilyYieldsItem)).toBe(true);
     const palecoil = corpse({
       templateId: 'sethrael_palecoil',
       harvestClaimedBy: null,
@@ -235,6 +254,10 @@ describe('tryNearbyInteraction default arm', () => {
       resurrectAtSpiritHealer: () => false as const,
       nodeHarvestableByMe: () => true,
       harvestNode,
+      // The press now falls through past the corpse to the bed arm, which
+      // reads these; inert here.
+      farmPatches: [],
+      myFarmPlots: [],
     } as unknown as Parameters<typeof tryNearbyInteraction>[0];
     const hud = {
       openMailbox: () => {},
@@ -250,26 +273,25 @@ describe('tryNearbyInteraction default arm', () => {
   it('dispatches a lootable corpse without any harvest-state argument (the default arm)', () => {
     const withLoot = corpse({ loot: { copper: 5, items: [] } });
     const { world, hud, lootCorpse } = nearbyRig(withLoot);
-    expect(
-      tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'escortAway', 'nothing'),
-    ).toBe(true);
+    expect(tryNearbyInteraction(world, hud, 'escortAway', 'nothing')).toBe(true);
     expect(lootCorpse).toHaveBeenCalledWith(2);
   });
 
-  it('a harvest-only corpse now captures the interact key (unified press)', () => {
-    // The nearby-interact corpse pick keys off canOpen since the unified
-    // press: a harvest-only corpse is a target, and only its harvest half is
-    // dispatched (no loot command, so no denial toast on an empty table).
+  it('a harvest-only corpse is no interact-key target (intentional gathering: loot only)', () => {
+    // The nearby-interact corpse pick keys off hasLoot: an OPENABLE
+    // harvest-only corpse (canOpen true, the click path above) is still not
+    // a generic press target, so neither half is sent and the press reports
+    // nothing to interact rather than a loot denial toast.
     const { world, hud, lootCorpse, harvestCorpse } = nearbyRig(corpse({}));
-    expect(
-      tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'escortAway', 'nothing'),
-    ).toBe(true);
-    expect(harvestCorpse).toHaveBeenCalledWith(2);
+    expect(corpseLootAvailability(corpse({}), 1).canOpen).toBe(true);
+    expect(tryNearbyInteraction(world, hud, 'escortAway', 'nothing')).toBe(false);
+    expect(harvestCorpse).not.toHaveBeenCalled();
     expect(lootCorpse).not.toHaveBeenCalled();
-    expect(hud.showError).not.toHaveBeenCalled();
+    expect(hud.showError).toHaveBeenCalledTimes(1);
+    expect(hud.showError).toHaveBeenCalledWith('nothing');
   });
 
-  it('lets an overlapped node win when the corpse has no loot or harvest for this player', () => {
+  it('never gathers an overlapped node from the press; the explicit node action still does', () => {
     const blockedCorpse = corpse({ loot: null, harvestClaimedBy: 9 });
     const node = {
       id: 'ore_under_corpse',
@@ -281,12 +303,27 @@ describe('tryNearbyInteraction default arm', () => {
     } as const;
     const { world, hud, lootCorpse, harvestCorpse, harvestNode } = nearbyRig(blockedCorpse);
 
-    expect(
-      tryNearbyInteraction(world, hud, [node], null, 'far', 'notReady', 'escortAway', 'nothing'),
-    ).toBe(true);
+    expect(tryNearbyInteraction(world, hud, 'escortAway', 'nothing')).toBe(false);
     expect(harvestCorpse).not.toHaveBeenCalled();
     expect(lootCorpse).not.toHaveBeenCalled();
+    expect(harvestNode).not.toHaveBeenCalled();
+    expect(hud.showError).toHaveBeenCalledWith('nothing');
+
+    // The blocked corpse does not block the deliberate node click beside it.
+    expect(
+      handleGatherNodeInteract(
+        world as unknown as Parameters<typeof handleGatherNodeInteract>[0],
+        hud,
+        world.player.pos,
+        node.id,
+        node.pos,
+        'far',
+        'notReady',
+      ),
+    ).toBe(true);
     expect(harvestNode).toHaveBeenCalledWith('ore_under_corpse');
+    expect(harvestCorpse).not.toHaveBeenCalled();
+    expect(lootCorpse).not.toHaveBeenCalled();
   });
 });
 

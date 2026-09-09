@@ -768,9 +768,9 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     if (quested.kind !== 'quest') throw new Error('prog_callused_hands is no longer a quest deed');
     (
       server as unknown as {
-        applyAccountQuestLockouts(pid: number, c: unknown): void;
+        cosmetics: { applyQuestLockouts(pid: number, c: unknown): void };
       }
-    ).applyAccountQuestLockouts(session.pid, {
+    ).cosmetics.applyQuestLockouts(session.pid, {
       completedQuestIds: [quested.questId],
       mechChromaIds: [],
     });
@@ -1289,8 +1289,10 @@ describe('reliquaryUnlock illumination fan-out through GameServer.detectActivity
     expect(itemIds.has(LAST_RELIC)).toBe(true);
 
     // Reach owned === total-1 directly on the sim (the sanctioned test
-    // route): every item but the last, every mark (masterwork:engineering's
-    // live write site is pended, direct mark grants are the test route),
+    // route): every item but the last, every mark (direct mark grants are
+    // the sanctioned test route; masterwork:engineering's live write site
+    // has been earnable since the masterwrought Phase 11o un-pend, and the
+    // direct grant stays the route regardless),
     // every mount's reins through bags, and every non-ladder catalog title.
     // The ladder titles are never granted by hand: the completion sync is
     // their only legitimate writer, and hand-granting them would

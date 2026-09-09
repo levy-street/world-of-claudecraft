@@ -468,12 +468,64 @@ describe('every professions grant site is accounted for (#2430)', () => {
   const EXPECTED_GRANT_SITES: Record<string, number> = {
     'commission.ts': 1,
     'commission_order.ts': 1,
-    'crafting.ts': 6,
+    // 6 -> 9 at Masterwrought phase 12: the perfecting head-start mint arm
+    // (resolveCraftForRecipe) grants through the same silent + callerLogs
+    // discipline as the masterwork arm it sits beside: the head-started
+    // instance, its commissioned remainder copies, and the plain remainder.
+    'crafting.ts': 9,
     'enchanting.ts': 4,
+    // Farming's eight grants: base produce, its fine twin, the withered-husk
+    // payout on each of the two failure arms (a lost survival roll and the
+    // defensive retired-crop fallback), the knobs phase's compost grant in
+    // convertHusks, the crop-ladder phase's tier 3/4 seed-back grant (ONE
+    // call site above the survived/withered branch, deliberately shared by
+    // both outcomes, so it counts once), the celebrations phase's golden
+    // BONUS grant (one extra item on a golden win: a next-tier seed or a
+    // farming pattern), and harvestCrop's grantGolden closure, which used to
+    // be TWO call sites per grade (a signed addItemInstance mint for what
+    // fit, plus a plain addItem overflow remainder for what did not) and is
+    // now ONE: the signature no longer lives on the granted payload, it rides
+    // the granted units' own SOURCE bucket (material_gatherer.ts's
+    // gatheredMaterialSources), so a full bag can no longer separate the
+    // units from their mark and the truncating overflow arm it existed for is
+    // gone (farming.ts's own banner on grantGolden). 9 -> 8 on that
+    // consolidation alone; nothing left the sweep uncovered. All eight carry
+    // both flags, because farmHarvested / farmWithered / farmHusksConverted
+    // own the whole player feedback; the bonus is named on farmHarvested as
+    // goldenBonusItemId, the seedBackCount idiom, so it has a line of its own
+    // in the client without a second hub grant line.
+    'farming.ts': 8,
     'fishing.ts': 2,
-    'gathering.ts': 2,
+    // gathering.ts's harvest grant was the same shape as farming's golden
+    // closure: a signed addItemInstance arm for what fit, plus a plain addItem
+    // fungible top-up for what did not. `resolveHarvest`'s `grantFungibleFit`
+    // now grants once, signed or not, via the same source-bucket provenance
+    // (gatheredMaterialSources with an optional signer); the truncating
+    // second arm is gone with it. 2 -> 1 on that consolidation; no addItem
+    // call left this file, so nothing is missing from the sweep.
+    'gathering.ts': 1,
+    // Masterwrought phase 04: the two core delivery arms (heroic/raid kill
+    // and rift first clear) and the two ember accrual arms, all documented
+    // NO_RESULT_EVENT_GRANTS; plus the sundering essence grant, whose sunder
+    // line owns the feedback (silent + callerLogs).
+    'masterwrought_materials.ts': 4,
+    'sundering.ts': 1,
     'salvage.ts': 2,
-    'interaction.ts:harvestCorpse': 6,
+    // Intentional Gathering PR3 extracted the corpse-harvest completion body
+    // (interaction.ts's old `harvestCorpse`, 6 grant sites) into its own
+    // module BEHIND src/sim/professions, `corpse_harvest_grant.ts`'s
+    // `grantCorpseHarvest`: it is no longer a command body living outside this
+    // directory, so the directory walk below finds it on its own and the old
+    // interaction.ts-specific slice (see the boundary test below) is retired.
+    // The count also drops one, 6 -> 5, on the exact same consolidation as
+    // farming/gathering above: the signed-component grant used to be a
+    // separate addItemInstance mint (with a plain top-up for what a full bag
+    // refused), and now rides the plain grant's own source-bucket provenance
+    // in one call (`grantCorpseHarvest`'s "SIGNED-COMPONENT loop" comment);
+    // zero addItemInstance calls remain in the file. Both drops are
+    // consolidation, never missing scan coverage: every remaining call still
+    // carries silent + callerLogs, pinned below.
+    'corpse_harvest_grant.ts': 5,
   };
 
   // Sites that deliberately carry NEITHER flag, keyed by a stable substring of
@@ -493,6 +545,17 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // completed trade (trade.ts's grantOffer, outside this directory, stays
     // loud for the identical reason).
     'order.requesterId',
+    // masterwrought_materials.ts (phase 04): the Wyrmfall Core and Maker's
+    // Ember participation awards follow the heroic-marks precedent (which
+    // lives in instances/dungeons.ts, outside this sweep): no result event
+    // exists, so the hub's "You receive:" line and the loot ding ARE the
+    // player's whole notification that a kill or completion paid out. One
+    // marker per delivery arm (boss kill, rift first clear, ember first
+    // grant, ember accrual), each pinned to its own call.
+    'WYRMFALL_CORE_ITEM_ID, count',
+    'WYRMFALL_CORE_ITEM_ID, riftCount',
+    'MAKERS_EMBER_ITEM_ID, 1',
+    'MAKERS_EMBER_ITEM_ID, granted',
   ];
 
   // Source with comments removed (`://` protocol slashes preserved), the repo's
@@ -556,26 +619,33 @@ describe('every professions grant site is accounted for (#2430)', () => {
     return source.slice(open, end + 1);
   };
 
-  // #2457: corpse harvest is a professions grant flow that does NOT live in
-  // src/sim/professions (it is a command body in interaction.ts), so the
-  // directory walk above could never see it, and its six grants sat unflagged
-  // through the whole of #2430. Only harvestCorpse's own body joins the sweep:
-  // the other grants in that file (lootCorpse's distribution, pickUpObject)
-  // are ordinary loot and must keep printing the hub line.
-  const harvestBody = functionBody(
-    codeOnly(readFileSync(path.resolve(process.cwd(), 'src/sim/interaction.ts'), 'utf8')),
-    'export function harvestCorpse(',
+  // #2457 opened with corpse harvest as a professions grant flow that did NOT
+  // live in src/sim/professions (it was a command body in interaction.ts), so
+  // the directory walk above could never see it, and its six grants sat
+  // unflagged through the whole of #2430; a bespoke slice of interaction.ts's
+  // `harvestCorpse` body joined the sweep by hand. Intentional Gathering PR3
+  // moved the whole completion body into this directory as
+  // `corpse_harvest_grant.ts`'s `grantCorpseHarvest` (interaction.ts's
+  // `harvestCorpse` is now a one-line delegate to the timed-cast starter,
+  // with zero grant calls of its own), so `grantSitesUnder(dir)` now finds it
+  // like any other file and the hand-spliced join below is retired. Only the
+  // FUNCTION-BOUNDARY guard survives, retargeted at the real grant function:
+  // this module's other exports (`snapshotCorpseHarvestGrantInputs`,
+  // `corpseHarvestOrdinaryYields`) grant nothing, so a slice that ran short or
+  // long would show up as a wrong site count against the same file.
+  const grantCorpseHarvestBody = functionBody(
+    codeOnly(
+      readFileSync(
+        path.resolve(process.cwd(), 'src/sim/professions/corpse_harvest_grant.ts'),
+        'utf8',
+      ),
+    ),
+    'export function grantCorpseHarvest(',
   );
 
   type GrantSite = { file: string; call: string };
 
-  const sites: GrantSite[] = [
-    ...grantSitesUnder(dir),
-    ...grantCalls(harvestBody).map((call) => ({
-      file: 'interaction.ts:harvestCorpse',
-      call: flatten(call),
-    })),
-  ];
+  const sites: GrantSite[] = grantSitesUnder(dir);
 
   // The two rules the sweeps below enforce, as functions of a site list, so the
   // recursion case can put a nested grant to the REAL predicates rather than to
@@ -627,20 +697,20 @@ describe('every professions grant site is accounted for (#2430)', () => {
     expect(sites.find((s) => s.file === 'salvage.ts')?.call).toContain('callerLogs: true');
   });
 
-  it('the harvestCorpse slice is the whole function and nothing but the function', () => {
+  it('the grantCorpseHarvest slice is the whole function and nothing but the function', () => {
     // Two ways the slice could go wrong and leave the sweep green while
-    // checking the wrong thing: stopping early (the six grants shrink to
+    // checking the wrong thing: stopping early (the five grants shrink to
     // fewer, so a real unflagged one hides outside the window) or running past
-    // the function's closing brace into the ordinary loot grants below, which
-    // legitimately carry neither flag and would turn the sweep permanently
-    // red. Bind both ends.
-    const harvestSites = sites.filter((s) => s.file === 'interaction.ts:harvestCorpse');
-    expect(harvestSites).toHaveLength(6);
+    // the function's closing brace, which cannot happen here (grantCorpseHarvest
+    // is the last export in the file) but is still worth binding so a future
+    // sibling appended after it cannot silently join the count. Bind both ends.
+    const harvestSites = sites.filter((s) => s.file === 'corpse_harvest_grant.ts');
+    expect(harvestSites).toHaveLength(5);
     // BOTH flags. The shared cue sweep below now asks for `silent` everywhere
     // too (#2458 retired the one site that owned the line without the cue), and
-    // EXPECTED_GRANT_SITES now carries the count of six as well, so neither is
+    // EXPECTED_GRANT_SITES now carries the count of five as well, so neither is
     // this pin's alone any more. It stays because the count belongs HERE, next
-    // to the boundary checks it interprets: six is what says the slice found
+    // to the boundary checks it interprets: five is what says the slice found
     // the whole function. One harvest command grants several DISTINCT items, so
     // a site that kept `callerLogs` but lost `silent` would give one harvest
     // several cues rather than one stray ding (#2457 acceptance criterion 3).
@@ -648,11 +718,14 @@ describe('every professions grant site is accounted for (#2430)', () => {
       expect(site.call, site.call).toContain('silent: true');
       expect(site.call, site.call).toContain('callerLogs: true');
     }
-    // pickUpObject's grant is the nearest one outside the function.
-    expect(harvestBody).not.toContain('objectItemId');
-    // ... and the sliced window really is harvestCorpse: its last statement,
-    // the corpse-timer clamp, is inside it.
-    expect(harvestBody).toContain('CORPSE_INTERACT_GRACE_SECONDS');
+    // corpseHarvestOrdinaryYields (the sibling just above grantCorpseHarvest
+    // in the same file) grants nothing itself; its own return-value builder is
+    // the nearest grant-shaped text outside the function, so its presence here
+    // would mean the slice opened too early.
+    expect(grantCorpseHarvestBody).not.toContain('wanted.push');
+    // ... and the sliced window really is grantCorpseHarvest: its last
+    // statement, the corpse-timer clamp, is inside it.
+    expect(grantCorpseHarvestBody).toContain('CORPSE_INTERACT_GRACE_SECONDS');
   });
 
   it('every grant either stands its hub line down or is a named no-result-event grant', () => {

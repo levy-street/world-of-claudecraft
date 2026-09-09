@@ -37,15 +37,21 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   // and hunter ranged AP only (entity.ts), where agiPct would also lift the
   // Agility-derived armor, dodge, and crit. This deep-equal is the guard that
   // no defensive key sneaks back into the damage baseline.
+  // v0.42.0 Fieldcraft +10%: apPct 0.15 -> 0.22 (meleeDmgPct is untouched here;
+  // the paired offensive ability delta lives in spec_output_tuning.ts, see
+  // tests/spec_output_tuning.test.ts).
   'hunter/survival': {
-    stats: { agi: 3, crit: 0.03, dodge: 0.12, apPct: 0.15 },
+    stats: { agi: 3, crit: 0.03, dodge: 0.12, apPct: 0.22 },
     global: { meleeDmgPct: 0.3 },
   },
   // v0.34 rogue base re-band (spec_baselines.ts): the BiS-epic floor lift that
   // ships with the Thronebane hand fix. apPct/crit carry the auto-attack heavy
   // kit; meleeDmgPct tops up the builder and finisher share.
+  // v0.42.0 Knifework +10%: apPct 0.36 -> 0.57 (meleeDmgPct is untouched here;
+  // the paired offensive ability delta lives in spec_output_tuning.ts, see
+  // tests/spec_output_tuning.test.ts).
   'rogue/assassination': {
-    stats: { crit: 0.12, apPct: 0.36 },
+    stats: { crit: 0.12, apPct: 0.57 },
     global: { meleeDmgPct: 0.22 },
     abilities: {
       sinister_strike: { costPct: -0.16 },
@@ -62,13 +68,15 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     global: { meleeDmgPct: 0.16 },
     abilities: { sinister_strike: { dmgPct: 0.2, costPct: -0.16 } },
   },
+  // v0.42.0 Skulduggery numeric budget: apPct 0.12 -> 0 (removed), meleeDmgPct
+  // 0.08 -> 0.04, ambush's own dmgPct 0.16 -> 0 (removed). Straight reductions
+  // of existing legacy fields; no offense-only component involved.
   'rogue/subtlety': {
-    stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.12 },
-    global: { meleeDmgPct: 0.08 },
+    stats: { agi: 7, crit: 0.1, dodge: 0.05 },
+    global: { meleeDmgPct: 0.04 },
     abilities: {
       stealth: { cooldownPct: -0.7 },
       backstab: { dmgPct: 0.16 },
-      ambush: { dmgPct: 0.16 },
     },
   },
   'priest/discipline': {
@@ -130,17 +138,24 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
       drain_life: { costPct: -0.08 },
     },
   },
+  // v0.42.0 Necromancy +20%: petDmgPct 0.15 -> 0.42, soul_harvest dmgPct
+  // 0.08 -> 0.096 (the design doc's exact damage-only refinement). The paired
+  // owner spell offensive delta lives in spec_output_tuning.ts (spellDmgPct
+  // stays 0.1 here, so Fiendhide's existing collateral does not grow).
   'warlock/demonology': {
     stats: { sta: 8, armorPct: 0.06, int: 6 },
-    global: { spellDmgPct: 0.1, petDmgPct: 0.15 },
+    global: { spellDmgPct: 0.1, petDmgPct: 0.42 },
     abilities: {
-      soul_harvest: { costPct: -0.08, dmgPct: 0.08 },
+      soul_harvest: { costPct: -0.08, dmgPct: 0.096 },
       bone_armor: { costPct: -0.08 },
     },
   },
+  // v0.42.0 Ruination +10%: petDmgPct 0 -> 0.1 (the paired ordinary-pet
+  // bonus; Pyre Aura's own fix lives in combat/destruction.ts). The owner
+  // spell offensive delta lives in spec_output_tuning.ts.
   'warlock/destruction': {
     stats: { sta: 6 },
-    global: { spellDmgPct: 0.1 },
+    global: { spellDmgPct: 0.1, petDmgPct: 0.1 },
     abilities: {
       shadow_bolt: { costPct: -0.23, castPct: -0.03 },
       immolate: { costPct: -0.23, castPct: -0.03 },
@@ -156,8 +171,10 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
       starfire: { castPct: -0.16 },
     },
   },
+  // v0.42.0 Wildfang +10%: apPct 0 -> 0.1 (feeds autos in both forms). The
+  // paired offensive physical ability delta lives in spec_output_tuning.ts.
   'druid/feral': {
-    stats: { armorPct: 0.23, staPct: 0.25 },
+    stats: { armorPct: 0.23, staPct: 0.25, apPct: 0.1 },
     global: { threatPct: 0.2 },
     abilities: {
       maul: { dmgPct: 0.35 },
@@ -308,8 +325,12 @@ describe('v0.28 passive restoration hotfix', () => {
       .find(({ def }) => def.id === 'shrapnel_charge')
       ?.effects.find((effect) => effect.type === 'hunterShrapnel');
 
-    expect(bloodhook).toMatchObject({ damageMult: 1.3 });
-    expect(shrapnel).toMatchObject({ damageMult: 1.3 });
+    // v0.42.0 Fieldcraft +10%: 1.3 -> 1.45 (legacy meleeDmgPct 0.3 plus the
+    // offensive physical delta +0.15 in spec_output_tuning.ts). The design
+    // doc explicitly calls out auditing Bloodhook/Shrapnel wound copies for
+    // this exact coverage.
+    expect(bloodhook).toMatchObject({ damageMult: 1.45 });
+    expect(shrapnel).toMatchObject({ damageMult: 1.45 });
   });
 
   // 18, not the old 21: #2428 retired the three legacy paladin spec baselines
@@ -361,12 +382,13 @@ describe('v0.28 passive restoration hotfix', () => {
     // 2026-08-09 120s band round: subtlety's apPct stepped 0.35 to 0.12 to
     // land the 150-200 BiS band, leaving too little margin for a ratio floor
     // (measured 1.186 over bare). Pin the exact resolved AP instead, derived
-    // from the wiring under guard: bare 118, plus the baseline agi 7, times
-    // 1.12 apPct = 140. A dropped agi row reads 132, a dropped apPct reads
-    // 125, so either wiring break fails decisively. Re-pin with the values on
+    // from the wiring under guard: bare 118, plus the baseline agi 7. v0.42.0
+    // Skulduggery numeric budget removed subtlety's apPct entirely (0.12 -> 0),
+    // so the agi-7 stat alone now carries the whole delta over bare: 125. A
+    // dropped agi row would read back at bare (118). Re-pin with the values on
     // the next re-band.
     expect(bare).toBe(118);
-    expect(apFor('subtlety'), 'subtlety').toBe(140);
+    expect(apFor('subtlety'), 'subtlety').toBe(125);
   });
 
   it('adds no baseline when no specialization is selected', () => {

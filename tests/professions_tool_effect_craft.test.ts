@@ -18,7 +18,12 @@ import {
   TOOL_EFFECT_IDS,
   TOOL_EFFECTS,
 } from '../src/sim/content/professions';
-import { ALL_RECIPES, recipeById, TOOL_EFFECT_RECIPES } from '../src/sim/content/recipes';
+import {
+  ALL_RECIPES,
+  APEX_GEAR_RECIPES,
+  recipeById,
+  TOOL_EFFECT_RECIPES,
+} from '../src/sim/content/recipes';
 import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 import { resolveCraft } from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
@@ -85,8 +90,14 @@ describe('the craftable set derives from the R9 slot policy (no path mints what 
   it('the two live effects are craftable and Springback is not (the policy today)', () => {
     // The derived arm above would stay green if the POLICY itself drifted;
     // this literal arm pins today's policy outcome so a policy widening is a
-    // deliberate edit here, not a silent content unlock.
-    expect(effectItems.map((def) => def.id).sort()).toEqual(['artisans_eye', 'gatherers_cache']);
+    // deliberate edit here, not a silent content unlock. makers_charm is the
+    // Masterwrought phase 09 apex rung (quantity-kind, so the policy admits
+    // it on the land professions like its gatherers_cache kin).
+    expect(effectItems.map((def) => def.id).sort()).toEqual([
+      'artisans_eye',
+      'gatherers_cache',
+      'makers_charm',
+    ]);
     expect(
       effectItems.some((def) => def.use.effectId === 'quickening_charm'),
       'no Springback item may exist while the policy refuses respawnSpeed everywhere',
@@ -102,21 +113,33 @@ describe('the craftable set derives from the R9 slot policy (no path mints what 
       expect(def.id, 'item id and effect id are one identity').toBe(def.use.effectId);
       const minting = ALL_RECIPES.filter((recipe) => recipe.resultItemId === def.id);
       expect(minting.length, `${def.id} needs exactly one production recipe`).toBe(1);
-      expect(TOOL_EFFECT_RECIPES.some((recipe) => recipe.resultItemId === def.id)).toBe(true);
+      // The recipe home is the effect's rung: the enchanting charms mint from
+      // TOOL_EFFECT_RECIPES, the apex charm (Masterwrought phase 09) from
+      // APEX_GEAR_RECIPES beside its engineering siblings.
+      const home = def.id === 'makers_charm' ? APEX_GEAR_RECIPES : TOOL_EFFECT_RECIPES;
+      expect(home.some((recipe) => recipe.resultItemId === def.id)).toBe(true);
     }
-    expect(effectItems.length, 'the recipe table and the item set stay in lockstep').toBe(
-      TOOL_EFFECT_RECIPES.length,
+    const apexCharmRecipes = APEX_GEAR_RECIPES.filter(
+      (recipe) => recipe.resultItemId === 'makers_charm',
+    );
+    expect(effectItems.length, 'the recipe tables and the item set stay in lockstep').toBe(
+      TOOL_EFFECT_RECIPES.length + apexCharmRecipes.length,
     );
   });
 
   it('every effect item def carries the shape the provenance chain depends on', () => {
     for (const def of effectItems) {
-      // Rare quality is LOAD-BEARING: the craft signing rule (#1149) only
-      // mints a signed { signer } instance for rare-or-better outputs, and the
-      // signer is what the slot copies into craftedBy for the
-      // original-crafter recharge discount. Dropping the quality silently
-      // strips provenance from every future charm.
-      expect(def.quality, `${def.id} must stay rare-or-better for the signing rule`).toBe('rare');
+      // Rare-or-better quality is LOAD-BEARING: the craft signing rule
+      // (#1149) only mints a signed { signer } instance for rare-or-better
+      // outputs, and the signer is what the slot copies into craftedBy for
+      // the original-crafter recharge discount. Dropping the quality
+      // silently strips provenance from every future charm. Pinned per rung
+      // (rare for the enchanting charms, epic for the apex charm) so a
+      // quality drift on either rung is a deliberate edit here.
+      const expectedQuality = def.id === 'makers_charm' ? 'epic' : 'rare';
+      expect(def.quality, `${def.id} must stay rare-or-better for the signing rule`).toBe(
+        expectedQuality,
+      );
       expect(def.kind).toBe('tool');
       expect(def.buyValue, `${def.id} must never carry a copper price`).toBeUndefined();
       const effect = TOOL_EFFECTS[def.use.effectId as keyof typeof TOOL_EFFECTS];

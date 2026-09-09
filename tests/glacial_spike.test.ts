@@ -12,9 +12,9 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 
-// Glacial Spike (owner design 2026-07-14, combat/frost_mage.ts + content): the
-// frost spender. Rimelance impacts and Frozen Orb pulses bank Icicles (up to 5);
-// at a full stack Glacial Spike is castable, consumes the whole stack for a slow
+// Rimeneedle (owner design 2026-07-14, combat/frost_mage.ts + content): the
+// frost spender. Rimelance impacts and Frostglobe pulses bank Icicles (up to 5);
+// at a full stack Rimeneedle is castable, consumes the whole stack for a slow
 // heavy hit, and freezes the target so the follow-up spells Shatter.
 
 type TestSim = Sim & {
@@ -93,11 +93,11 @@ const knownIds = (spec: string | null): Set<string> =>
     abilitiesKnownAt('mage', 20, computeTalentModifiers('mage', alloc(spec))).map((k) => k.def.id),
   );
 
-describe('Glacial Spike content def', () => {
+describe('Rimeneedle content def', () => {
   it('pins the slow, heavy, icicle-gated spender', () => {
     const def = ABILITIES.glacial_spike;
     expect(def).toBeDefined();
-    expect(def.name).toBe('Glacial Spike');
+    expect(def.name).toBe('Rimeneedle');
     expect(def.specs).toEqual(['frost']);
     // Slow and powerful: a long cast, no cooldown (the Icicle gate is the limiter).
     expect(def.castTime).toBeGreaterThanOrEqual(2.5);
@@ -140,7 +140,7 @@ describe('Icicles build-up', () => {
   });
 });
 
-describe('Glacial Spike gating + payoff', () => {
+describe('Rimeneedle gating + payoff', () => {
   it('does not cast below a full Icicle stack (the stack is untouched)', () => {
     const { sim, p } = makeSim();
     const target = spawnTarget(sim, p);
@@ -150,8 +150,8 @@ describe('Glacial Spike gating + payoff', () => {
     sim.castAbility('glacial_spike');
     const events: SimEvent[] = [...sim.drainEvents()];
     for (let i = 0; i < 160; i++) events.push(...sim.tick());
-    // Blocked: no Glacial Spike damage, no root planted, the Icicles are not spent.
-    expect(damageEvents(events, 'Glacial Spike')).toHaveLength(0);
+    // Blocked: no Rimeneedle damage, no root planted, the Icicles are not spent.
+    expect(damageEvents(events, 'Rimeneedle')).toHaveLength(0);
     expect(target.auras.some((a) => a.kind === 'root')).toBe(false);
     expect(frostIcicleCharges(p.auras)).toBe(ICICLE_MAX - 1);
   });
@@ -160,9 +160,9 @@ describe('Glacial Spike gating + payoff', () => {
     const { sim, p } = makeSim();
     const target = spawnTarget(sim, p);
     pushAura(p, { id: 'icicles', name: 'Icicles', kind: 'icicles', stacks: ICICLE_MAX });
-    const events = castAndResolve(sim, p, 'glacial_spike', 'Glacial Spike');
+    const events = castAndResolve(sim, p, 'glacial_spike', 'Rimeneedle');
     // It landed its heavy hit.
-    expect(damageEvents(events, 'Glacial Spike').length).toBeGreaterThan(0);
+    expect(damageEvents(events, 'Rimeneedle').length).toBeGreaterThan(0);
     // It consumed the whole Icicle stack.
     expect(frostIcicleCharges(p.auras)).toBe(0);
     // It froze the target (a root aura), so isRooted counts it as frozen and the
@@ -170,7 +170,7 @@ describe('Glacial Spike gating + payoff', () => {
     expect(target.auras.some((a) => a.kind === 'root')).toBe(true);
   });
 
-  // Issue #2632: Glacial Spike's cast bar completes (mana spent, cooldown armed)
+  // Issue #2632: Rimeneedle's cast bar completes (mana spent, cooldown armed)
   // several ticks before its frost bolt actually reaches the target (the
   // projectile travels at PROJECTILE_SPEED). A rapid second press landing in
   // that window used to re-check the Icicles gate, find it still at full stacks
@@ -199,7 +199,7 @@ describe('Glacial Spike gating + payoff', () => {
       castCompleted = events.some((e) => e.type === 'castStop' && e.entityId === p.id && e.success);
     }
     expect(castCompleted).toBe(true);
-    expect(damageEvents(events, 'Glacial Spike')).toHaveLength(0);
+    expect(damageEvents(events, 'Rimeneedle')).toHaveLength(0);
 
     // A rapid second press in that window: must be rejected outright, not
     // accepted as a fresh cast against the same (already-spent) Icicles stack.
@@ -217,9 +217,9 @@ describe('Glacial Spike gating + payoff', () => {
     expect(secondPressEvents.some((e) => e.type === 'error')).toBe(true);
 
     // Let the first (and only accepted) bolt land, then confirm exactly one
-    // Glacial Spike hit landed and the whole Icicle stack was spent once.
+    // Rimeneedle hit landed and the whole Icicle stack was spent once.
     for (let i = 0; i < 20; i++) events.push(...sim.tick());
-    expect(damageEvents(events, 'Glacial Spike')).toHaveLength(1);
+    expect(damageEvents(events, 'Rimeneedle')).toHaveLength(1);
     expect(frostIcicleCharges(p.auras)).toBe(0);
   });
 });

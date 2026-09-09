@@ -44,7 +44,8 @@ import {
 import { recipeById } from '../src/sim/content/recipes';
 import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
 import { resolveCraftForRecipe } from '../src/sim/professions/crafting';
-import { Sim } from '../src/sim/sim';
+import { type PlayerMeta, Sim } from '../src/sim/sim';
+import type { Entity, InvSlot } from '../src/sim/types';
 import {
   bareClient,
   broadcast,
@@ -124,29 +125,33 @@ function send(server: GameServerType, session: unknown, msg: Record<string, unkn
   server.handleMessage(session as any, JSON.stringify({ t: 'cmd', ...msg }));
 }
 
+function requirePlayer(sim: Sim, pid: number): PlayerMeta {
+  const meta = sim.players.get(pid);
+  if (!meta) throw new Error(`missing test player ${pid}`);
+  return meta;
+}
+
 // Relocate the first banker NPC onto the player (the bank_wire.test.ts idiom):
 // nearBanker is a dist2d check, and moving the NPC (which has no wander AI)
 // avoids pushing the PLAYER into a collider. Returns the banker entity.
-// biome-ignore lint/suspicious/noExplicitAny: the Sim internals this rig reaches for
-function bringBankerToPlayer(sim: any, pid: number): any {
+function bringBankerToPlayer(sim: Sim, pid: number): Entity {
   const banker = sim.entities.get(sim.bankerIds[0]);
   const p = sim.entities.get(pid);
+  if (!banker || !p) throw new Error('missing banker/player test entity');
   banker.pos = { ...p.pos };
   banker.prevPos = { ...banker.pos };
   return banker;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: see bringBankerToPlayer
-function itemIndex(sim: any, pid: number, itemId: string): number {
-  return sim.players.get(pid).inventory.findIndex((s: any) => s.itemId === itemId);
+function itemIndex(sim: Sim, pid: number, itemId: string): number {
+  return requirePlayer(sim, pid).inventory.findIndex((s: InvSlot) => s.itemId === itemId);
 }
 
 /** The LAST bag slot holding `itemId`. copper_ore stacks at 20, so a 60-item
  *  grant lands as three slots; the headroom tests need an untouched full stack,
  *  which is never the first index once earlier deposits have eaten into it. */
-// biome-ignore lint/suspicious/noExplicitAny: see bringBankerToPlayer
-function lastItemIndex(sim: any, pid: number, itemId: string): number {
-  const inv = sim.players.get(pid).inventory;
+function lastItemIndex(sim: Sim, pid: number, itemId: string): number {
+  const inv = requirePlayer(sim, pid).inventory;
   for (let i = inv.length - 1; i >= 0; i--) if (inv[i].itemId === itemId) return i;
   return -1;
 }
@@ -154,12 +159,10 @@ function lastItemIndex(sim: any, pid: number, itemId: string): number {
 /** The TOTAL carried count of `itemId`, summed across every bag slot: a stack
  *  cap means one material can occupy several, and a first-slot read would
  *  under-report the bags exactly where the headroom cases put them. */
-// biome-ignore lint/suspicious/noExplicitAny: see bringBankerToPlayer
-function bagCount(sim: any, pid: number, itemId: string): number {
-  return sim.players
-    .get(pid)
-    .inventory.filter((s: any) => s.itemId === itemId)
-    .reduce((sum: number, s: any) => sum + s.count, 0);
+function bagCount(sim: Sim, pid: number, itemId: string): number {
+  return requirePlayer(sim, pid)
+    .inventory.filter((s: InvSlot) => s.itemId === itemId)
+    .reduce((sum: number, s: InvSlot) => sum + s.count, 0);
 }
 
 /** Every value stored under `key` anywhere inside a decoded wire frame, at any
@@ -376,11 +379,16 @@ describe('materials vault wire round-trip', () => {
       slot: meta.inventory.length - 1,
     });
     expect(meta.vault.stock).toEqual({});
+    // The legacy premium signer moves off the instance payload and into the
+    // exact per-unit composition (material_stack.ts normalizeMaterialStack)
+    // as source.signer; no gatherer is invented, signer and gatherer are
+    // distinct concepts (material_sources.ts).
     expect(meta.vault.special).toEqual([
       {
         itemId: 'copper_ore',
         count: 1,
-        instance: { signer: 'Ada', rolled: { quality: 'rare', stats: { sta: 2 } } },
+        instance: { rolled: { quality: 'rare', stats: { sta: 2 } } },
+        materialSources: [{ count: 1, source: { signer: 'Ada' } }],
       },
     ]);
 
@@ -398,9 +406,10 @@ describe('materials vault wire round-trip', () => {
     });
 
     expect(meta.vault.special).toEqual([]);
+    // The withdrawn copy's signer now rides materialSources, not instance.
     expect(
-      meta.inventory.find(
-        (slot: { instance?: { signer?: string } }) => slot.instance?.signer === 'Ada',
+      meta.inventory.find((slot: { materialSources?: { source?: { signer?: string } }[] }) =>
+        slot.materialSources?.some((s) => s.source?.signer === 'Ada'),
       ),
     ).toMatchObject({ itemId: 'copper_ore', count: 1 });
     expect(journalLedgerRows(session).map((row) => [row.op, row.instance])).toEqual([
@@ -769,17 +778,27 @@ describe('materials vault wire round-trip', () => {
     // Sim handed the identical null refuses outright. Without this arm the
     // "deviation" is only half recorded, and an offline change that started
     // accepting null would close the gap with nothing going red.
-    // biome-ignore lint/suspicious/noExplicitAny: the Sim internals this rig reaches for
-    const offline = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true }) as any;
+    const offline = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
     const offPid = offline.playerId;
     bringBankerToPlayer(offline, offPid);
     offline.addItem('copper_ore', 5, offPid);
-    offline.players.get(offPid).copper = 20000;
+    requirePlayer(offline, offPid).copper = 20000;
     offline.vaultBuyUpgrade(offPid);
-    offline.vaultDeposit(itemIndex(offline, offPid, 'copper_ore'), null as any, offPid);
+    const vaultDepositWithNullableCount = offline.vaultDeposit as (
+      this: Sim,
+      slotIndex: number,
+      count: number | null,
+      pid?: number,
+    ) => void;
+    vaultDepositWithNullableCount.call(
+      offline,
+      itemIndex(offline, offPid, 'copper_ore'),
+      null,
+      offPid,
+    );
     // Nothing moved in EITHER direction: the stock is still empty and the bags
     // still hold all 5 (the exact opposite of the online 5/0 above).
-    expect(offline.players.get(offPid).vault.stock).toEqual({});
+    expect(requirePlayer(offline, offPid).vault.stock).toEqual({});
     expect(bagCount(offline, offPid, 'copper_ore')).toBe(5);
   });
 
@@ -1264,6 +1283,51 @@ describe('materials vault wire round-trip', () => {
     expect(batch).toHaveLength(2);
   });
 
+  /** Exact per-row proof for a sweep of lone signed `pristine_hide` units,
+   *  keyed by signer (order-independent): every stored special row is a lone
+   *  unit carrying EXACTLY its own signer bucket (never dropped or merged),
+   *  its stats identity survived, and the ledger reconstruction carries the
+   *  same source leg back (signer merged onto the effective payload,
+   *  server/bank_ledger.ts effectiveCountPayload). Never weakens the
+   *  caller's own row-count / uniqueness proof; this only adds content. */
+  function expectExactSignedVaultRows(
+    special: readonly {
+      itemId: string;
+      count: number;
+      materialSources?: { source?: { signer?: string } }[];
+    }[],
+    batch: readonly Record<string, unknown>[],
+    signers: readonly string[],
+    statsFor: (index: number) => number,
+  ): void {
+    const specialBySigner = new Map(
+      special.map((row) => [row.materialSources?.[0]?.source?.signer, row]),
+    );
+    const ledgerBySigner = new Map(
+      batch.map((row) => [
+        (row.instance as { instance?: { signer?: string } } | null)?.instance?.signer,
+        row,
+      ]),
+    );
+    signers.forEach((signer, index) => {
+      expect(specialBySigner.get(signer)).toEqual({
+        itemId: 'pristine_hide',
+        count: 1,
+        instance: { rolled: { stats: { sta: statsFor(index) } } },
+        materialSources: [{ count: 1, source: { signer } }],
+      });
+      const ledgerRow = ledgerBySigner.get(signer);
+      expect(ledgerRow?.itemId).toBe('pristine_hide');
+      expect(ledgerRow?.op).toBe('deposit');
+      expect(ledgerRow?.count).toBe(1);
+      expect(ledgerRow?.instance).toEqual({
+        vaultSpecial: 1,
+        instance: { rolled: { stats: { sta: statsFor(index) } }, signer },
+        craftedRecipeId: null,
+      });
+    });
+  }
+
   it.each([56, 112])(
     'vault_deposit_all: admits %i distinct signed identities in one batch',
     (identityCount) => {
@@ -1272,11 +1336,18 @@ describe('materials vault wire round-trip', () => {
       const fw = fakeWs();
       const { session, sim, meta } = seat(server, fw, 1, 'Vaultsigners', 0);
       meta.vault.upgrades = 5;
+      // The signer alone no longer keeps a unit in its own row: it legally
+      // rides the composition (materialSources; the signer is a legacy
+      // PREMIUM marker moved into source.signer, never an invented gatherer),
+      // and stacks with an otherwise-equal payload MERGE (that is the
+      // feature). A genuinely incompatible, non-signer payload field
+      // (`rolled.stats.sta`, distinct per unit, a legal rolled field) is what
+      // still forces `identityCount` separate slots here.
       meta.inventory.push(
         ...Array.from({ length: identityCount }, (_, index) => ({
           itemId: 'pristine_hide',
           count: 1,
-          instance: { signer: `Crafter ${index}` },
+          instance: { signer: `Crafter ${index}`, rolled: { stats: { sta: index + 1 } } },
         })),
       );
       const journalStart = journalBatchCount(session);
@@ -1293,6 +1364,12 @@ describe('materials vault wire round-trip', () => {
       expect(batch).toHaveLength(identityCount);
       expect(new Set(batch.map((ledgerRow) => JSON.stringify(ledgerRow.instance))).size).toBe(
         identityCount,
+      );
+      expectExactSignedVaultRows(
+        meta.vault.special,
+        batch,
+        Array.from({ length: identityCount }, (_, index) => `Crafter ${index}`),
+        (index) => index + 1,
       );
       expect(session.escrowQuarantined).toBe(false);
       expect(sim.events.slice(eventStart)).not.toContainEqual({
@@ -1318,30 +1395,57 @@ describe('materials vault wire round-trip', () => {
         seat(server, fakeWs(), 2, 'Realmsweeptwo', 0),
         seat(server, fakeWs(), 3, 'Realmsweepthree', 0),
       ];
+      // Short, legal signer names: isLegalCrafterName caps a signer at 16
+      // chars (src/sim/professions/tools.ts MAX_CRAFTED_BY_LENGTH).
+      // Overlong names refuse the sweep, leaving the units in bags.
+      const signerFor = (playerIndex: number, signerIndex: number): string =>
+        `A${playerIndex}C${signerIndex}`;
       for (const [playerIndex, player] of players.entries()) {
         player.meta.vault.upgrades = 5;
+        // See the identity-count test above: a distinct non-signer payload
+        // field is what keeps each unit in its own row now that the signer
+        // alone rides the (mergeable) composition instead.
         player.meta.inventory.push(
           ...Array.from({ length: 112 }, (_, signerIndex) => ({
             itemId: 'pristine_hide',
             count: 1,
-            instance: { signer: `Account ${playerIndex} Crafter ${signerIndex}` },
+            instance: {
+              signer: signerFor(playerIndex, signerIndex),
+              rolled: { stats: { sta: signerIndex + 1 } },
+            },
           })),
         );
       }
 
-      for (const player of players.slice(0, 2)) {
+      for (const [playerIndex, player] of players.slice(0, 2).entries()) {
+        const journalStart = journalBatchCount(player.session);
         send(server, player.session, { cmd: 'vault_deposit_all' });
         expect(player.meta.vault.special).toHaveLength(112);
-        expect(journalLedgerRows(player.session)).toHaveLength(112);
+        const batch = journalLedgerRows(player.session, journalStart);
+        expect(batch).toHaveLength(112);
+        expectExactSignedVaultRows(
+          player.meta.vault.special,
+          batch,
+          Array.from({ length: 112 }, (_, signerIndex) => signerFor(playerIndex, signerIndex)),
+          (signerIndex) => signerIndex + 1,
+        );
       }
 
       // The THIRD legitimate account's sweep lands past the realm burst: it
       // ADMITS, its rows commit, no drop is counted, and the breach counter
       // records the admission the old refusing guard would have dropped.
       const third = players[2];
+      const thirdJournalStart = journalBatchCount(third.session);
       send(server, third.session, { cmd: 'vault_deposit_all' });
       expect(third.meta.vault.special).toHaveLength(112);
-      expect(journalLedgerRows(third.session)).toHaveLength(112);
+      const thirdBatch = journalLedgerRows(third.session, thirdJournalStart);
+      expect(thirdBatch).toHaveLength(112);
+      expectExactSignedVaultRows(
+        third.meta.vault.special,
+        thirdBatch,
+        Array.from({ length: 112 }, (_, signerIndex) => signerFor(2, signerIndex)),
+        (signerIndex) => signerIndex + 1,
+      );
       expect(dropped).not.toHaveBeenCalledWith('bank_vault');
       // biome-ignore lint/suspicious/noExplicitAny: private coordinator probe
       const snapshot = (server as any).bankVaultLedgerGuardCoordinator.snapshot();
@@ -1525,7 +1629,7 @@ describe('materials vault wire round-trip', () => {
       simAny.craftItem('recipe_eastbrook_arming_sword', false, thePid, 1);
       completeCraftCast(simAny as never, thePid);
     }
-    const craftOutcome = (simAny: unknown, thePid: number) => {
+    const craftOutcome = (simAny: Sim, thePid: number) => {
       const meta = (
         simAny as {
           players: Map<

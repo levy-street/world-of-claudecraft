@@ -10,6 +10,7 @@
 // database the URL points at. Pattern: tests/woc_market_settlement_pg_integration.test.ts.
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { materialSourceConnection } from '../server/material_source_connection';
 import type { WocCustodyExtract, WocMarketCustody, WocMarketService } from '../server/woc_market';
 import type { PgWocMarketDb } from '../server/woc_market_db';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
@@ -68,7 +69,7 @@ describeDb('woc market directed rail against real Postgres', () => {
     await db.ensureSchema();
     await db.runConcurrentIndexMigrations();
 
-    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 12 });
+    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 12 });
     marketDb = new marketDbMod.PgWocMarketDb(pool);
   }, 120_000);
 

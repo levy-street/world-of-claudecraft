@@ -4,13 +4,24 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { tintedMaterial } from '../src/render/characters/assets';
 import { VISUALS } from '../src/render/characters/manifest';
+import { CharacterVisual } from '../src/render/characters/visual';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import {
+  MOUNT_LAMP_COLOR,
+  MOUNT_LAMP_DISTANCE,
+  MOUNT_LAMP_INTENSITY,
+  MOUNT_LENS_COLOR,
+  MOUNT_SKIN_VISUAL_SPECS,
   MOUNT_VISUAL_SPECS,
+  type MountRideSpec,
+  type MountVisualSpec,
   mountBobY,
+  mountLampFlicker,
   mountSeatLift,
   mountVisualSpec,
+  stepRocketSledJumpPitch,
 } from '../src/render/mount_visuals';
+import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
 describe('mount visual specs cover the sim catalog', () => {
@@ -49,6 +60,33 @@ describe('mount visual specs cover the sim catalog', () => {
     expect(mountSeatLift('')).toBe(0);
   });
 
+  it('names only seat, lamp, and glow bones present in the shipping GLBs', () => {
+    const expected = {
+      lanternback_troll: ['chair', 'lantern_l', 'lantern_r'],
+      chimeglass_tortoise: ['lens', 'saddle'],
+    } as const;
+    for (const [key, expectedBones] of Object.entries(expected)) {
+      const spec =
+        key === 'chimeglass_tortoise'
+          ? MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise
+          : MOUNT_VISUAL_SPECS.lanternback_troll;
+      const requested = new Set([
+        ...(spec.seatBone ? [spec.seatBone.bone] : []),
+        ...spec.lamps.map((lamp) => lamp.bone),
+        ...spec.glows.map((glow) => glow.bone),
+      ]);
+      expect([...requested].sort(), `${key} runtime sockets`).toEqual([...expectedBones].sort());
+
+      const bytes = readFileSync(path.join(__dirname, '..', 'public', VISUALS[spec.visualKey].url));
+      const jsonLength = bytes.readUInt32LE(12);
+      const json = JSON.parse(bytes.subarray(20, 20 + jsonLength).toString('utf8')) as {
+        nodes?: { name?: string }[];
+      };
+      const shipped = new Set((json.nodes ?? []).map((node) => node.name).filter(Boolean));
+      for (const bone of requested) expect(shipped.has(bone), `${key} missing ${bone}`).toBe(true);
+    }
+  });
+
   it('preserves authored vertex colors when Low converts mount materials to Lambert', () => {
     const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
     try {
@@ -63,6 +101,195 @@ describe('mount visual specs cover the sim catalog', () => {
     } finally {
       restoreGfx();
     }
+  });
+
+  it('pins the Cluckwork Mech Bird rig, gait aliases, and rider placement', () => {
+    expect(MOUNT_SKIN_VISUAL_SPECS.mech_bird).toEqual({
+      visualKey: 'mount_mech_bird',
+      seat: 2.05,
+      seatFwd: 0,
+      groundLift: 0,
+      rigged: true,
+      bobAmp: 0,
+      bobHz: 0,
+      bobIdle: false,
+      bobShape: 'hop',
+      fx: null,
+      lamps: [],
+      seatBone: null,
+      glows: [],
+      ride: null,
+      jumpTips: false,
+    });
+    expect(VISUALS.mount_mech_bird).toMatchObject({
+      url: 'models/mounts/mech_bird.glb',
+      height: 3.4,
+      walkRef: 5.2,
+      runRef: 12.25,
+      lazyPreload: true,
+    });
+    expect(VISUALS.mount_mech_bird.clips).toEqual({
+      idle: 'Idle',
+      walk: 'Run',
+      run: 'Run',
+      attack: [],
+      death: 'Idle',
+      jump: 'Jump',
+    });
+
+    const bytes = readFileSync(path.join(__dirname, '..', 'public', 'models/mounts/mech_bird.glb'));
+    const jsonLength = bytes.readUInt32LE(12);
+    const json = JSON.parse(bytes.subarray(20, 20 + jsonLength).toString('utf8')) as {
+      animations?: { name?: string }[];
+    };
+    expect((json.animations ?? []).map((animation) => animation.name).sort()).toEqual([
+      'Idle',
+      'Jump',
+      'Run',
+    ]);
+  });
+});
+
+interface RidePoseHarness {
+  rideBlend: number;
+  climbOn: boolean;
+  climbBlend: number;
+  setRidePose(spec: MountRideSpec | null): void;
+  applyRidePose(dt: number): void;
+}
+
+function ridePoseHarness(): {
+  visual: RidePoseHarness;
+  bones: Map<string, THREE.Object3D>;
+} {
+  const model = new THREE.Group();
+  const bones = new Map<string, THREE.Object3D>();
+  for (const name of [
+    'upperlegl',
+    'upperlegr',
+    'lowerlegl',
+    'lowerlegr',
+    'footl',
+    'footr',
+    'hips',
+  ]) {
+    const bone = new THREE.Object3D();
+    bone.name = name;
+    bones.set(name, bone);
+    model.add(bone);
+  }
+  const visual = Object.create(CharacterVisual.prototype) as RidePoseHarness;
+  Object.assign(visual, {
+    model,
+    rideSpec: null,
+    rideBlend: 0,
+    climbOn: false,
+    climbBlend: 0,
+    climbLegBones: undefined,
+    climbShinBones: undefined,
+    rideFootBones: undefined,
+    rideHipBone: undefined,
+  });
+  return { visual, bones };
+}
+
+function boneNamed(bones: Map<string, THREE.Object3D>, name: string): THREE.Object3D {
+  const bone = bones.get(name);
+  if (!bone) throw new Error(`the ride-pose test rig is missing ${name}`);
+  return bone;
+}
+
+function expectQuaternion(
+  actual: THREE.Quaternion,
+  expected: readonly [number, number, number, number],
+): void {
+  for (const [index, component] of actual.toArray().entries()) {
+    expect(component).toBeCloseTo(expected[index], 12);
+  }
+}
+
+describe('Chimeglass rider straddle', () => {
+  it('drives the literal authored pose onto both leg chains and hips', () => {
+    const { visual, bones } = ridePoseHarness();
+    const ride = MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise.ride;
+    expect(ride).toEqual({ spread: 0.68, thigh: 0.8, knee: 0.6, ankle: -0.45, hips: -0.18 });
+    if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
+
+    visual.setRidePose(ride);
+    visual.applyRidePose(0.125);
+
+    expectQuaternion(
+      boneNamed(bones, 'upperlegl').quaternion,
+      [0.8683345493323961, 0.30716195257435025, 0.12986599060280818, 0.3671259590537949],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'upperlegr').quaternion,
+      [0.8683345493323961, -0.30716195257435025, -0.12986599060280818, 0.3671259590537949],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'lowerlegl').quaternion,
+      [0.29552020666133955, 0, 0, 0.955336489125606],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'lowerlegr').quaternion,
+      [0.29552020666133955, 0, 0, 0.955336489125606],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'footl').quaternion,
+      [-0.22310636213174545, 0, 0, 0.9747941070689433],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'footr').quaternion,
+      [-0.22310636213174545, 0, 0, 0.9747941070689433],
+    );
+    expect(boneNamed(bones, 'hips').rotation.x).toBeCloseTo(-0.18, 12);
+  });
+
+  it('yields the legs while the character is actively climbing', () => {
+    const { visual, bones } = ridePoseHarness();
+    const ride = MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise.ride;
+    if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
+
+    visual.climbOn = true;
+    visual.climbBlend = 0;
+    visual.setRidePose(ride);
+    visual.applyRidePose(0.125);
+    expect(visual.rideBlend).toBe(0);
+    expect(boneNamed(bones, 'upperlegl').quaternion.equals(new THREE.Quaternion())).toBe(true);
+  });
+
+  it('yields the legs while a previous climb pose is still blending out', () => {
+    const { visual, bones } = ridePoseHarness();
+    const ride = MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise.ride;
+    if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
+
+    visual.climbOn = false;
+    visual.climbBlend = 0.25;
+    visual.setRidePose(ride);
+    visual.applyRidePose(0.125);
+    expect(visual.rideBlend).toBe(0);
+    expect(boneNamed(bones, 'upperlegl').quaternion.equals(new THREE.Quaternion())).toBe(true);
+  });
+
+  it('hands the legs back to the unposed mixer frame when the mount clears', () => {
+    const { visual, bones } = ridePoseHarness();
+    const ride = MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise.ride;
+    if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
+
+    visual.setRidePose(ride);
+    visual.applyRidePose(0.125);
+    const thigh = boneNamed(bones, 'upperlegl');
+    expect(thigh.quaternion.equals(new THREE.Quaternion())).toBe(false);
+
+    // The animation mixer writes its unmounted pose before the post-mixer ride
+    // layer runs. Clearing the ride spec must leave that fresh pose untouched,
+    // not force identity or reapply the stale straddle.
+    const mixerPose = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.14, -0.2, 0.07));
+    thigh.quaternion.copy(mixerPose);
+    visual.setRidePose(null);
+    visual.applyRidePose(0.125);
+    expect(visual.rideBlend).toBe(0);
+    expect(thigh.quaternion.angleTo(mixerPose)).toBeLessThan(1e-12);
   });
 });
 
@@ -97,10 +324,11 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the Terrorspark Groundshaker, the Bonebound Rickshaw, and the Valorsteed', () => {
+  it('carries authored COLOR_0 on exactly the goblin rocket sled, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
+      'models/mounts/goblin_rocket_sled.glb',
       'models/mounts/rickshaw_mount.glb',
       'models/mounts/terrorspark_groundshaker.glb',
       'models/mounts/valorsteed.glb',
@@ -167,9 +395,174 @@ describe('procedural bob math', () => {
     expect(mountBobY(spec, 0.7, true)).toBe(0);
   });
 
+  it('parks the rocket sled still, seats its rider lower, and clears terrain while moving', () => {
+    const spec = MOUNT_SKIN_VISUAL_SPECS.goblin_rocket_sled;
+    expect(spec.seat).toBe(1.29);
+    expect(spec.bobIdle).toBe(false);
+    expect(mountBobY(spec, 0.25 / spec.bobHz, false)).toBe(0);
+    expect(mountBobY(spec, 0.25 / spec.bobHz, true)).toBeCloseTo(spec.bobAmp, 5);
+    expect(spec.groundLift).toBe(0.09);
+    expect(spec.groundLift).toBeGreaterThan(spec.bobAmp);
+    const lowPoint = spec.groundLift + mountBobY(spec, 0.75 / spec.bobHz, true);
+    expect(lowPoint).toBeGreaterThan(0);
+  });
+
+  it('tips the rocket sled through a velocity-aware jump arc and settles flat', () => {
+    let pitch = 0;
+    for (let i = 0; i < 10; i++) pitch = stepRocketSledJumpPitch(pitch, true, 7.5, 1 / 60);
+    expect((pitch * 180) / Math.PI).toBeGreaterThan(18);
+    expect((pitch * 180) / Math.PI).toBeLessThan(23);
+    for (let i = 0; i < 12; i++) pitch = stepRocketSledJumpPitch(pitch, true, 0, 1 / 60);
+    expect((pitch * 180) / Math.PI).toBeGreaterThan(11);
+    expect((pitch * 180) / Math.PI).toBeLessThan(15);
+    for (let i = 0; i < 20; i++) pitch = stepRocketSledJumpPitch(pitch, true, -7.5, 1 / 60);
+    expect((pitch * 180) / Math.PI).toBeLessThan(0);
+    expect((pitch * 180) / Math.PI).toBeGreaterThan(-5);
+    for (let i = 0; i < 24; i++) pitch = stepRocketSledJumpPitch(pitch, false, 0, 1 / 60);
+    expect(Math.abs((pitch * 180) / Math.PI)).toBeLessThan(0.01);
+  });
+
   it('the snail glides flat (no bob at all)', () => {
     const spec = MOUNT_VISUAL_SPECS.stalkglider_snail;
     expect(mountBobY(spec, 0.5, true)).toBe(0);
+  });
+
+  it('the Lanternback Troll seats its rider ON the throne pan, not through it', () => {
+    const spec = MOUNT_VISUAL_SPECS.lanternback_troll;
+    const def = VISUALS.mount_lanternback_troll;
+    expect(spec).toMatchObject({
+      visualKey: 'mount_lanternback_troll',
+      seat: 5.15,
+      seatFwd: -0.36,
+      rigged: true,
+      bobAmp: 0,
+      fx: null,
+    });
+    expect(def).toMatchObject({
+      url: 'models/mounts/lanternback_troll.glb',
+      height: 7,
+      walkRef: 5.6,
+      runRef: 12.6,
+      lazyPreload: true,
+    });
+    // Fitted against a live probe: the throne's seat pan sits 3.656 above
+    // ground and the sit pose carries the rider's hip 0.087 above their root,
+    // so the lift has to clear the pan. Below it the throne's side panel
+    // swallows the rider's whole lower body.
+    const SEAT_PAN_ABOVE_GROUND = 3.656 * 1.4;
+    const SIT_POSE_HIP_ABOVE_ROOT = 0.087 * 1.4;
+    expect(spec.seat + SIT_POSE_HIP_ABOVE_ROOT).toBeGreaterThan(SEAT_PAN_ABOVE_GROUND);
+    // ...but not so far that he floats: keep it inside a hand's width.
+    expect(spec.seat + SIT_POSE_HIP_ABOVE_ROOT - SEAT_PAN_ABOVE_GROUND).toBeLessThan(0.35);
+    // The mount carries no procedural bob; the authored lope owns the bounce.
+    expect(mountBobY(spec, 0.7, true)).toBe(0);
+  });
+
+  it('seats the Chimeglass rider on the carapace, not over the neck', () => {
+    const spec = MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise;
+    const def = VISUALS.mount_chimeglass_tortoise;
+    // He is low and broad: shorter than the griffin (4.1) and far under the
+    // Lanternback (7.0), but tall enough to ride.
+    expect(def.height).toBe(3.6);
+    expect(spec.rigged).toBe(true);
+    // No procedural bob: his authored plod carries what bounce a tortoise has.
+    expect(mountBobY(spec, 0.7, true)).toBe(0);
+
+    // The rider rides the SHELL bone, because the carapace rolls under him
+    // every stride and a fixed lift would let it slide through him.
+    expect(spec.seatBone?.bone).toBe('saddle');
+    const offset = spec.seatBone!.offset;
+    // In that bone's local frame +Y runs up the bone and -Z runs toward the
+    // tail. The rider must be lifted clear of the bone head AND set back: the
+    // head sits at model y -0.02 while the carapace centres near +0.03, so
+    // seating him on the head alone perches him over the neck.
+    expect(offset[1]).toBeGreaterThan(0);
+    expect(offset[2]).toBeLessThan(0);
+    // ...but not so far back that he slides off the tail. The shell runs about
+    // 0.37 model units nose-to-tail, so half of that is the outer bound.
+    expect(Math.abs(offset[2])).toBeLessThan(0.185);
+    expect(offset[0]).toBe(0); // centred across the shell
+
+    // `seat`/`seatFwd` are only the pre-load fallback and the nameplate anchor
+    // once seatBone resolves, but they still have to be sane: the shell crown
+    // sits at model z 0.5 of a 1.0-tall model, so at height 3.6 that is ~1.8.
+    expect(spec.seat).toBeGreaterThan(1.8);
+    expect(spec.seat).toBeLessThan(2.6);
+  });
+
+  it('only the Lanternback and the Chimeglass carry lamps, on their own terms', () => {
+    // Catalog mounts and mount SKINS alike: a skin is drawn by the same lamp
+    // path, so a new skin shipping stray lamps fails here too.
+    const specs: [string, MountVisualSpec][] = [
+      ...MOUNT_KEYS.map((key): [string, MountVisualSpec] => [key, MOUNT_VISUAL_SPECS[key]]),
+      ...MOUNT_SKIN_IDS.map((id): [string, MountVisualSpec] => [id, MOUNT_SKIN_VISUAL_SPECS[id]]),
+    ];
+    for (const [key, spec] of specs) {
+      const lamps = spec.lamps;
+      if (key === 'lanternback_troll') {
+        expect(lamps.map((l) => l.bone)).toEqual(['lantern_l', 'lantern_r']);
+        // Both chains are identical, so both lamps share one measured offset
+        // straight down the bone (0.681 of a 1.02-unit bone, in MODEL units).
+        for (const lamp of lamps) {
+          expect(lamp.offset[1]).toBeCloseTo(0.681, 3);
+          expect(Math.abs(lamp.offset[0])).toBeLessThan(0.02);
+          expect(Math.abs(lamp.offset[2])).toBeLessThan(0.02);
+        }
+        // He takes the shared lantern defaults rather than overriding them.
+        for (const lamp of lamps) {
+          expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
+          expect(lamp.intensity ?? MOUNT_LAMP_INTENSITY).toBe(MOUNT_LAMP_INTENSITY);
+        }
+      } else if (key === 'chimeglass_tortoise') {
+        // ONE light for the pair of lenses, hung off the single spectacle bone
+        // so it tracks his head. Two would be the two nearest dynamic lights on
+        // screen by construction (the camera rides this mount) and would evict
+        // two world lights from the ranked budget for no visible gain.
+        expect(lamps.map((l) => l.bone)).toEqual(['lens']);
+        // Cold blue, and far dimmer/tighter than a storm lantern: spectacles
+        // should read as eyes, not floodlight the road. Steady, not guttering:
+        // enchanted glass has no wick.
+        for (const lamp of lamps) {
+          expect(lamp.color).toBe(MOUNT_LENS_COLOR);
+          expect(lamp.intensity).toBeLessThan(MOUNT_LAMP_INTENSITY);
+          expect(lamp.distance).toBeLessThan(MOUNT_LAMP_DISTANCE);
+          expect(lamp.flicker).toBe('steady');
+        }
+      } else {
+        expect(lamps, `${key} must carry no lamps`).toEqual([]);
+      }
+    }
+    // Warm sodium, a touch under a wall torch, on the standard decay-2 falloff.
+    expect(MOUNT_LAMP_COLOR).toBe(0xff8c32);
+    expect(MOUNT_LAMP_INTENSITY).toBe(6.5);
+    expect(MOUNT_LAMP_DISTANCE).toBe(17);
+    expect(MOUNT_LENS_COLOR).toBe(0x3d8cff);
+  });
+
+  it('lamp flicker stays inside the band that keeps the light budget stable', () => {
+    // A lamp that guttered to zero would flip the budget's shine decision on
+    // and off; one that spiked would bloom. Sample a long stretch densely.
+    let lo = Number.POSITIVE_INFINITY;
+    let hi = Number.NEGATIVE_INFINITY;
+    for (let i = 0; i < 20000; i++) {
+      for (const lamp of [0, 1]) {
+        const v = mountLampFlicker(i * 0.0037, lamp);
+        lo = Math.min(lo, v);
+        hi = Math.max(hi, v);
+      }
+    }
+    expect(lo).toBeGreaterThan(0.77);
+    expect(hi).toBeLessThan(1.15);
+    // Deterministic, so a headless render is reproducible.
+    expect(mountLampFlicker(3.25, 0)).toBe(mountLampFlicker(3.25, 0));
+    // The two lamps are detuned: pulsing in lockstep is what gives a scripted
+    // flicker away. Over a real stretch they must diverge substantially.
+    let maxSplit = 0;
+    for (let i = 0; i < 4000; i++) {
+      const t = i * 0.0037;
+      maxSplit = Math.max(maxSplit, Math.abs(mountLampFlicker(t, 0) - mountLampFlicker(t, 1)));
+    }
+    expect(maxSplit).toBeGreaterThan(0.15);
   });
 
   it('pins the ambient particle effects: snail slime, hover-cycle exhaust', () => {

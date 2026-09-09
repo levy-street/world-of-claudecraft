@@ -119,6 +119,13 @@ const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8')
   /\r\n/g,
   '\n',
 );
+// The Meta pixel SENDER, extracted whole out of hud.ts at the Masterwrought
+// phase 18 sweep (analytics glue belongs in src/game/, not in a coordinator).
+// The level-5 trigger stayed in the HUD, so the pin below reads both halves.
+const metaPixelTs = readFileSync(
+  new URL('../src/game/meta_pixel.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const mobileActionRingTs = readFileSync(
   new URL('../src/ui/hud/action_bar/mobile_action_ring_controller.ts', import.meta.url),
   'utf8',
@@ -129,6 +136,11 @@ const consumableSeatControllerTs = readFileSync(
 ).replace(/\r\n/g, '\n');
 const touchRouterTs = readFileSync(
   new URL('../src/game/touch_router.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+// The body-class scan hud.ts used to hold inline (Phase 14 extraction).
+const windowOpenStateTs = readFileSync(
+  new URL('../src/ui/window_open_state.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
 const playerCardControllerTs = readFileSync(
@@ -1018,17 +1030,49 @@ describe('client HTML shell', () => {
     expect(html).toContain(
       "if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {",
     );
-    expect(hudTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
-    expect(hudTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    // The sender moved to src/game/meta_pixel.ts, so the two arities are pinned
+    // in their new home. Both halves of the chain are read, not just the one
+    // that moved: the sender alone is inert without a caller, and the HUD's
+    // trigger alone proves nothing about what reaches the pixel.
+    expect(metaPixelTs).toContain(
+      "if (options) fbq('trackCustom', eventName, data ?? {}, options);",
+    );
+    expect(metaPixelTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    expect(hudTs).toContain("import { trackMetaPixel } from '../game/meta_pixel';");
     expect(hudTs).toContain('if (ev.level === 5) {');
+    // Whitespace-collapsed: this call sits deep enough that biome re-wraps it
+    // with any nearby edit, and the pin is about the CALL, not the indentation.
+    expect(hudTs.replace(/\s+/g, ' ')).toContain(
+      "trackMetaPixel( 'ReachedLevel5', { level: ev.level },",
+    );
     expect(hudTs).toContain('characterId ? { eventID: `lvl5_$' + '{characterId}` } : undefined');
-    expect(mainTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
-    expect(mainTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    // main.ts used to carry a BYTE-IDENTICAL private copy of the sender, and
+    // these two lines pinned that copy's arities. The Phase 18 QA collapsed it
+    // onto src/game/meta_pixel.ts (src/main.ts is a firewall, not a home), so the
+    // arities are pinned ONCE, in metaPixelTs above, and behaviorally in
+    // tests/meta_pixel.test.ts. What main.ts owes now is only that it reaches the
+    // shared sender rather than re-implementing it: while the duplicate stood, its
+    // three events were guarded by nothing behavioral at all.
+    expect(mainTs).toContain("import { trackMetaPixel } from './game/meta_pixel';");
+    expect(mainTs).not.toContain("fbq('trackCustom'");
     expect(mainTs).toContain(
       'registered.accountId ? { eventID: `acct_$' + '{registered.accountId}` } : undefined',
     );
     expect(mainTs).toContain("'GitHubClick'");
     expect(mainTs).toContain("'DiscordClick'");
+  });
+
+  it('keeps the $WOC contract address box off the landing page', () => {
+    // Removed in v0.42.0: the token box on the home page was deterring new players.
+    // The wallet verification row stays on character select (post-login), so only
+    // the landing-page surfaces are pinned absent here.
+    expect(html).not.toContain('id="token-ca"');
+    expect(html).not.toContain('btn-copy-ca');
+    expect(html).not.toContain('data-i18n="mode.caLabel"');
+    expect(mainTs).not.toContain('wireContractAddressCopy');
+    expect(shellCss).not.toContain('#token-ca');
+    expect(hudCss).not.toContain('#token-ca');
+    expect(hudMobileCss).not.toContain('#token-ca');
   });
 
   it('excludes wallet surfaces from unverified native and Steam builds while allowing Seeker', () => {
@@ -1038,7 +1082,7 @@ describe('client HTML shell', () => {
     );
     expect(hudCss).not.toContain('body.native-app .cs-wallet,');
     expect(hudCss).toContain('body.native-app #performance-tip,');
-    expect(hudCss).toContain('body.desktop-app #token-ca,\n  body.desktop-app .official-site-copy');
+    expect(hudCss).toContain('body.desktop-app .official-site-copy {');
     expect(hudCss).not.toContain('body.desktop-app .cs-wallet');
     expect(html).toContain('<section class="account-card account-wallet-card">');
     expect(mainTs).toContain("document.body.classList.toggle('desktop-app', DESKTOP_APP);");
@@ -2295,7 +2339,7 @@ describe('client HTML shell', () => {
     expect(bindButton.indexOf("document.getElementById('mobile-more')?.focus();")).toBeLessThan(
       bindButton.indexOf('cb();'),
     );
-    expect(hudTs).toContain(".filter((win) => win.id !== 'mobile-extra-controls')");
+    expect(windowOpenStateTs).toContain(".filter((win) => win.id !== 'mobile-extra-controls')");
     expect(hudTs).toContain('if (destination) this.focusManager.focusFirst(destination);');
   });
 
@@ -2402,9 +2446,16 @@ describe('client HTML shell', () => {
     expect(shellCss).not.toContain('trailer-fade-out');
   });
 
-  it('omits Meters from the mobile More tray while keeping the desktop window', () => {
-    expect(html).toContain('id="meters-window"');
-    expect(html).not.toContain('id="mobile-meters"');
+  it('gives Meters a real mobile More-tray entry point (touch has no other way to reach it)', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="meters-window"');
+      expect(entry).toMatch(
+        /<button[^>]* class="mobile-btn" id="mobile-meters"[^>]*data-icon="meters"><span class="mobile-label" data-i18n="hud\.keybinds\.actions\.meters">/,
+      );
+      expect(entry).toContain(
+        'id="mobile-meters" data-i18n-title="hud.keybinds.actions.meters" data-i18n-aria="hud.keybinds.actions.meters"',
+      );
+    }
   });
 
   it('keeps the World Market to one scroll container with browse filters below the tabs', () => {
@@ -2827,14 +2878,16 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
     // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
-    // corpse-claim mirror online). The R40 confirm gate now trails the
-    // nothing-to-interact string, with harvestStateReliable still an
-    // explicit `undefined` (the default), never a live override.
-    // preferNpcId trails the confirm gate: the pad names the npc the player
-    // SELECTED, so a talk press cannot answer whoever happens to stand closer.
+    // corpse-claim mirror online); it stays an explicit `undefined` (the
+    // default), never a live override. Intentional gathering: the generic
+    // press takes no node list, tool gate, or R40 confirm gate any more (it
+    // never gathers; those stay on the explicit node/tool entry points).
+    // preferNpcId trails: the pad names the npc the player SELECTED, so a
+    // talk press cannot answer whoever happens to stand closer.
     expect(mainTs).toContain(
-      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n        preferNpcId,\n      ),",
+      "t('errors.nothingInteract'),\n        undefined,\n        preferNpcId,\n      ),",
     );
+    expect(mainTs).not.toContain('GATHER_NODES,\n        (node) => gatherNodeToolGateFor');
     // The escort away line sits immediately before it (escort_interact.ts): an
     // escort run has no other client entry point, so an unwired argument here
     // would silently make those quests uncompletable again.
@@ -3350,9 +3403,9 @@ describe('client HTML shell', () => {
   });
 
   it('stacks the mobile map below the quest log when both are open', () => {
-    expect(hudTs).toContain("'mobile-map-quest-open'");
-    expect(hudTs).toContain('this.isWindowVisible(mapWindow)');
-    expect(hudTs).toContain('this.isWindowVisible(questLogWindow)');
+    expect(windowOpenStateTs).toContain("'mobile-map-quest-open'");
+    expect(windowOpenStateTs).toContain('isWindowVisible(mapWindow)');
+    expect(windowOpenStateTs).toContain('isWindowVisible(questLogWindow)');
     expect(hudMobileCss).toContain(
       '--mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
     );
@@ -3438,9 +3491,12 @@ describe('pet cluster layout', () => {
 
   it('lays the cluster out as one row and un-anchors the pet bar from the stack edge', () => {
     expect(hudCssSrc).toMatch(/#pet-cluster \{[^}]*display: flex/);
-    // The bar keeps its own absolute top:-52px seat for the mobile sheet, so the
-    // desktop cluster has to override it or the two halves overlap.
-    expect(hudCssSrc).toMatch(/#pet-cluster > #petbar \{[^}]*position: static/);
+    // The bar keeps its own absolute top:-52px seat for the mobile sheet, so
+    // the desktop cluster has to override it or the two halves overlap.
+    // RELATIVE, not static: the docked bar is a containing block for its
+    // movable-frame chrome (HUD_FRAME_SPECS row 'petBar') while staying an
+    // ordinary flex item of the cluster row.
+    expect(hudCssSrc).toMatch(/#pet-cluster > #petbar \{[^}]*position: relative/);
   });
 
   it('shares one content inset with the player frame so the row lines up with it', () => {

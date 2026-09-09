@@ -16,6 +16,7 @@ import { formatNumber, getLanguage, type TranslationKey, t } from './i18n';
 import type { MapMarkerSemantic, MapMarkerSemanticLayer } from './map_marker_semantics_core';
 import type {
   MapAllyMarker,
+  MapFarmPatchMarker,
   MapGatherNodeMarker,
   MapNavigationMarker,
   MapNpcMarker,
@@ -279,6 +280,7 @@ export type MapSemanticLabelId =
   | 'cooldownLockedHerb'
   | 'station'
   | 'service'
+  | 'farmPatch'
   | 'partyMember'
   | 'deadPartyMember'
   | 'partyMemberGeneric'
@@ -401,6 +403,9 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
     case 'cooldownLockedOre':
     case 'cooldownLockedWood':
     case 'cooldownLockedHerb':
+    // A garden-bed site is a gathering destination, so it groups with the
+    // resource nodes rather than earning a summary category of its own.
+    case 'farmPatch':
       return 'gather';
     case 'station':
       return 'station';
@@ -588,6 +593,7 @@ export interface OverworldSemanticMapModel {
   gatherNodes: readonly MapGatherNodeMarker[];
   stations: readonly MapStationMarker[];
   services: readonly MapServiceMarker[];
+  farmPatches: readonly MapFarmPatchMarker[];
   navigation: readonly MapNavigationMarker[];
   player: MapPlayerMarker | null;
   allies: readonly MapAllyMarker[];
@@ -1088,6 +1094,10 @@ export class MapSemanticAccessibilityCore {
       this.add(station.mx, station.my, 'station', 'station', station.type);
     for (const service of model.services)
       this.add(service.mx, service.my, 'service', 'service', service.kind);
+    // Garden beds take the argument-free label: every patch is the same kind of
+    // site, and the zone-scoped map plus the direction and distance band the
+    // summary already carries are what identify which one is being described.
+    for (const patch of model.farmPatches) this.add(patch.mx, patch.my, 'farmPatch');
     for (const member of model.party)
       this.add(
         member.mx,

@@ -19,8 +19,18 @@
     { "icon": "dfinder", "motif": "Stone dungeon archway with a raised portcullis" },
     { "icon": "donate", "motif": "Solid gold heart" },
     { "icon": "emote", "motif": "Round gold medallion with a smiling face in relief" },
+    {
+      "icon": "harvest-journal",
+      "motif": "Green leather harvest journal with a gilt crop-field and sprout emblem",
+      "source": "OpenAI built-in image generation; exact prompt and source lineage in docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/special-ui-deeds.json"
+    },
     { "icon": "leaderboard", "motif": "Three-step podium under a crown" },
     { "icon": "map", "motif": "Rolled parchment map with a drawn compass" },
+    {
+      "icon": "perfecting",
+      "motif": "Smithing hammer striking a bright beveled Masterwrought ingot",
+      "source": "OpenAI built-in image generation; exact prompt and source lineage in docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/special-ui-deeds.json"
+    },
     { "icon": "professions", "motif": "Stone mortar and pestle with herb leaves" },
     { "icon": "questlog", "motif": "Unrolled scroll with a wax seal and a quill" },
     { "icon": "social", "motif": "Two figures shoulder to shoulder before a banner" },

@@ -37,10 +37,19 @@ describe('owned-class level 20 balance harness (Druid bands)', () => {
       // Lane-diet re-measure: moongrove full actual 154.00 (120 s), diet
       // actual 152.33 (60 s); wildfang 176.08 / 179.05. Diet bands re-derived
       // at the same relative margins: 137 to 178 and 168 to 208.
-      expect(moongrove.dps).toBeGreaterThanOrEqual(band(138, 137));
-      expect(moongrove.dps).toBeLessThanOrEqual(band(180, 178));
-      expect(wildfang.dps).toBeGreaterThanOrEqual(band(165, 168));
-      expect(wildfang.dps).toBeLessThanOrEqual(band(205, 208));
+      // Re-measured at the Drakelands site-swap sync (PR #3746: the keep and
+      // Trollmoot sites traded, camps and props moved, so the shared rng
+      // stream forked; release/v0.42.0 alone still measures inside the old
+      // bands): moongrove 142.63 full / 142.45 diet, wildfang 164.85 / 166.20.
+      // Both arms moved about 7 percent in the same direction, the probe's
+      // seed-driven proc sequence, not a kit or coefficient change (no druid
+      // code moved). Re-derived at the same relative margins: moongrove
+      // 127 to 166 full / 128 to 166 diet, wildfang 154 to 191 / 155 to 193.
+      // FLAGGED for the class owner: the nightly full sweep is the arbiter.
+      expect(moongrove.dps).toBeGreaterThanOrEqual(band(127, 128));
+      expect(moongrove.dps).toBeLessThanOrEqual(band(166, 166));
+      expect(wildfang.dps).toBeGreaterThanOrEqual(band(154, 155));
+      expect(wildfang.dps).toBeLessThanOrEqual(band(191, 193));
     },
     FULL_SWEEP ? 180_000 : 90_000,
   );

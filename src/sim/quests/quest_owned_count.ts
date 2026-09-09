@@ -13,19 +13,19 @@
 // 0 the moment the player followed the very next instruction, so the quest
 // could never be handed in by anyone who did as they were told.
 //
-// Only the bag SOCKETS are added here, not the bank or the mail: an ownership
-// objective is about what the player has on them, and the four sockets are the
-// one store a player reaches by following a quest instruction rather than by
-// stashing something away.
+// Worn equipment and bag SOCKETS count too, not bank or mail: ownership
+// objectives ask what the player has with them. Forgebreaker's follow-up must
+// remain complete when its crafter equips the hammer before returning to Maelin.
 //
 // Pure and host-agnostic (no ctx, no rng): the caller passes the carried count
 // it already computed, so this stays a total, not a second source of truth.
 
 import type { PlayerMeta } from '../sim';
 
-/** Carried copies plus any worn in a bag socket. */
+/** Carried copies plus worn equipment and bag sockets. */
 export function ownedItemCount(carried: number, meta: PlayerMeta, itemId: string): number {
   let worn = 0;
   for (const socket of meta.bags) if (socket === itemId) worn++;
+  for (const equipped of Object.values(meta.equipment)) if (equipped === itemId) worn++;
   return carried + worn;
 }

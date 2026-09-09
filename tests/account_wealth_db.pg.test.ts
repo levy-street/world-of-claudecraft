@@ -11,6 +11,7 @@ import type { Pool as PgPool } from 'pg';
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { BANK_LEDGER_ACCOUNT_FK_INDEX_SQL } from '../server/bank_ledger_indexes';
+import { materialSourceConnection } from '../server/material_source_connection';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
 const VERIFY_DB = 'wocc_account_wealth_planner_verify';
@@ -53,7 +54,7 @@ describeDb('account wealth large-movement planner (real PostgreSQL)', () => {
     // reachable in their shipped order.
     await db.runConcurrentIndexMigrations();
 
-    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 1 });
+    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 1 });
     const accounts = await pool.query(
       `INSERT INTO accounts (username, password_hash)
        SELECT 'account_wealth_planner_' || g, 'x'

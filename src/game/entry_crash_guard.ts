@@ -73,6 +73,7 @@ export const ENTRY_CHECKPOINTS = [
   'quest-dialog-closed',
   'webgl-context-lost',
   'webgl-context-restored',
+  'webgl-context-stuck',
   'connection-lost',
   'connection-restored',
   'window-error',

@@ -1288,7 +1288,7 @@ export const WEAPON_VFX = {
 
   winterbite: {
     tier: 'epic',
-    name: 'Winterbite',
+    name: 'Wintergnaw',
     type: 'bow',
     lore: 'A bow of silvered steel and blue ice, a glowing frozen core in the riser and a nocked arrow of solid ice trailing cold.',
     emissive: { intensity: 1.35 },

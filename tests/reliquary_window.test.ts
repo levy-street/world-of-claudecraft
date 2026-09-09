@@ -27,6 +27,7 @@ const labels = read('../src/ui/reliquary_labels.ts');
 const trackerView = read('../src/ui/reliquary_tracker_view.ts');
 const trackerPainter = read('../src/ui/reliquary_tracker_painter.ts');
 const hud = read('../src/ui/hud.ts');
+const sideButtons = read('../src/ui/hud/menu/side_buttons.ts');
 const mainSrc = read('../src/main.ts');
 const inputSrc = read('../src/game/input.ts');
 const keybindsSrc = read('../src/game/keybinds.ts');
@@ -428,13 +429,15 @@ describe('painter hygiene', () => {
     // swap in "no relics match" for a shelf that is empty for another reason.
     const code = stripComments(painter);
     expect(code).toContain("return this.search.trim() !== ''");
-    // Three callers: the Overview empty line, the shelf empty line, and the
-    // grid empty-state chooser. All must ask the same question, or two
-    // surfaces disagree about whether a search is running. (The live-region
-    // gate deliberately does NOT ask it: it gates on the model's own
-    // narrowing answer, because a needle that matches everything narrows
-    // nothing; see the announce pin below.)
-    expect(code.match(/this\.searchActive\(\)/g)?.length).toBe(3);
+    // Two callers: the Overview empty line and the shared empty-state chooser
+    // (emptyGridText), which the shelf list and the grid both route through so
+    // a chip that empties a shelf blames the chip, never a search. All must
+    // ask the same question, or two surfaces disagree about whether a search
+    // is running. (The live-region gate deliberately does NOT ask it: it
+    // gates on the model's own narrowing answer, because a needle that
+    // matches everything narrows nothing; see the announce pin below.)
+    expect(code.match(/this\.searchActive\(\)/g)?.length).toBe(2);
+    expect(code).toContain("this.emptyGridText(model.filtered, 'shelf')");
     // No site may re-derive it inline and drift from the shared definition.
     expect(code).not.toMatch(/this\.search === ''/);
     expect(code).not.toMatch(/this\.search\.trim\(\) === ''/);
@@ -945,7 +948,7 @@ describe('hud orchestration', () => {
     expect(hud).toContain(
       "$('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary())",
     );
-    expect(hud).toContain("['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title']");
+    expect(sideButtons).toContain("['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title']");
   });
 });
 
@@ -958,7 +961,7 @@ describe('keybind and input dispatch', () => {
   it('routes through input and main onUiKey', () => {
     expect(inputSrc).toContain("| 'reliquary'");
     expect(inputSrc).toContain("case 'reliquary':");
-    expect(mainSrc).toContain("case 'reliquary':");
+    expect(mainSrc).toContain('dispatchCollectionAction(key, hud)');
     expect(mainSrc).toContain('hud.toggleReliquary()');
   });
 
@@ -1133,7 +1136,7 @@ describe('entry HTML and i18n chrome', () => {
     // (noUnusedLocals is off) while a veteran's one catch-up line vanishes:
     // the deeds sibling pins its emission (tests/deeds_window.test.ts) and
     // the reliquary side must too.
-    expect(handler).toContain("this.log(retroText, '#ffd100');");
+    expect(handler).toContain('this.log(retroText, HUD_LOG.NOTICE);');
     expect(handler).toContain('this.combatAnnouncer.push(retroText, performance.now());');
     // Exactly the live-find banner push plus the retro push: a stray or
     // duplicated announcement cannot hide (the deeds sibling pins the same).
@@ -1180,7 +1183,7 @@ describe('entry HTML and i18n chrome', () => {
     // A relic the catalog no longer places keeps a PLAIN line: a link that
     // opens nothing is worse than no link (the recent strip's inert chip).
     expect(handler).toMatch(
-      /if \(pageId === null\) \{\s*this\.log\(t\('hudChrome\.reliquary\.unlockToast', \{ name \}\), '#ffd100'\);\s*continue;\s*\}/,
+      /if \(pageId === null\) \{\s*this\.log\(t\('hudChrome\.reliquary\.unlockToast', \{ name \}\), HUD_LOG\.NOTICE\);\s*continue;\s*\}/,
     );
     // The retro catch-up summary stays plain by design (it names no single
     // relic to jump to), so nothing after the retroCount gate may go node-built.
@@ -1248,8 +1251,12 @@ describe('entry HTML and i18n chrome', () => {
   });
 
   it('maps the reliquary keybind action through t() in Options', () => {
-    // Without this entry, Options/gamepad fall back to raw English BIND_ACTIONS labels.
-    expect(optionsWindow).toContain("reliquary: 'hudChrome.reliquary.title'");
+    // Without this entry, Options/gamepad fall back to raw English BIND_ACTIONS
+    // labels. The table lives in the shared keybind_action_names_core.ts (the on-bar
+    // rebind prompts read the same one).
+    expect(read('../src/ui/keybind_action_names_core.ts')).toContain(
+      "reliquary: 'hudChrome.reliquary.title'",
+    );
   });
 });
 

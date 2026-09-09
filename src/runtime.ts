@@ -124,6 +124,32 @@ export interface DesktopDiscordActivity {
   timestamps?: { start: number };
 }
 
+export type DesktopGpuBackendSetting = 'auto' | 'vulkan' | 'opengl';
+/** The shell answers more (the last trial's verdict, the platform answer);
+ *  the renderer reads only what a surface consumes: the platform gate is the
+ *  synchronous hasGpuBackendChoice below, never an awaited field. */
+export interface DesktopGpuBackendState {
+  /** What the NEXT launch will do (the stored preference). */
+  setting: DesktopGpuBackendSetting;
+  /** The rung THIS launch is actually running, once the shell has judged it.
+   *  A rung, not a setting: the two Vulkan rungs differ by an ANGLE feature the
+   *  player never picks, and the options row reads both as "Vulkan". */
+  active?: string;
+  /** The launch bound something lower than the setting asked for. */
+  requestedUnavailable?: boolean;
+  /** Auto wanted Vulkan and the shell's policy held this launch at OpenGL (an
+   *  excluded GPU); Vulkan stays the player's to pick. */
+  autoCapped?: boolean;
+}
+
+/** The next-launch settings as the running shell process read them at startup
+ *  (electron/launch_settings.cjs): the values THIS launch runs on, where the
+ *  getters serve the stored ones a setter moves live. */
+export interface DesktopLaunchSettings {
+  gpuForceOptOut: boolean;
+  gpuBackend: DesktopGpuBackendSetting;
+}
+
 export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
@@ -188,6 +214,28 @@ export interface DesktopBridge {
   // before use, like the other post-trio methods.
   getGpuForceOptOut?(): Promise<boolean>;
   setGpuForceOptOut?(optOut: boolean): Promise<boolean>;
+  // The persisted graphics backend choice (Linux: the Vulkan trial). The shell
+  // prefs store is the source of truth; the getter returns the STORED setting
+  // and the setter persists for the next launch; hasGpuBackendChoice is the
+  // platform answer, a synchronous value so the options row can be gated when
+  // the window opens. Absent on older shells: feature-check before use.
+  getGpuBackend?(): Promise<DesktopGpuBackendState>;
+  setGpuBackend?(setting: DesktopGpuBackendSetting): Promise<boolean>;
+  /** The same state, pushed when the shell judges the launch: a page already on
+   *  the options row would otherwise show the pre-judgement reading all session. */
+  onGpuBackendState?(callback: (state: DesktopGpuBackendState) => void): () => void;
+  hasGpuBackendChoice?: boolean;
+  // The next-launch settings this process started with, and the restart that
+  // applies a changed one (src/game/desktop_next_launch_settings.ts). The
+  // restart answers false when the new process never started; on success this
+  // process quits and the promise never settles. Absent on older shells:
+  // feature-check before use.
+  getLaunchSettings?(): Promise<DesktopLaunchSettings>;
+  restartApp?(): Promise<boolean>;
+  // The page's WebGL renderer string, the evidence the shell judges its Linux
+  // Vulkan trial on (getGPUInfo carries no renderer string there). A send, no
+  // answer. Absent on older shells: feature-check before use.
+  reportGpuRenderer?(renderer: string, parallelCompile?: boolean): void;
   // The persisted display mode. The shell prefs store is the source of truth;
   // the setter persists AND applies it to the live window (unlike the GPU
   // pref, which only takes effect next launch), the getter returns the stored

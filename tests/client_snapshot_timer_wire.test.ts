@@ -132,6 +132,30 @@ describe('stable snapshot timer protocol', () => {
     });
   });
 
+  it('mirrors the FLASK marker, and clears it when the wire stops sending it', () => {
+    // The buff bar paints a distinct glyph off this marker, so a sticky
+    // mirror would keep showing "flask" after the flask was replaced by an
+    // elixir of the same stat, which shares its aura id.
+    const client = bareClient(1);
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: 10,
+      self: playerWire(1, {
+        auras: [{ ...aura('elixir_buff_sta', { exp: 900 }), fl: 1 }],
+      }),
+    });
+    expect(client.player.auras[0]).toMatchObject({ id: 'elixir_buff_sta', flask: true });
+
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: 20,
+      self: playerWire(1, {
+        auras: [aura('elixir_buff_sta', { exp: 900 })],
+      }),
+    });
+    expect(client.player.auras[0].flask).toBeUndefined();
+  });
+
   it('ages the nodeRespawnSeconds countdown off the stable ncd deadlines', () => {
     // The countdown read rides the same deadline set the readiness mirror
     // does: ncd { ore: 12 } at stable time 10 is a deadline, so the remaining

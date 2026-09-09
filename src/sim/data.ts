@@ -27,7 +27,6 @@ import type {
 
 export type { FishingEntry } from './content/items';
 
-import { CASTLE_BLOCKERS } from './castle_layout';
 import {
   AMBERFALL_CAMPS,
   AMBERFALL_ITEMS,
@@ -169,7 +168,13 @@ import {
   PALMREACH_ROADS,
   PALMREACH_ZONE,
 } from './content/palmreach';
-import { PRACTICE_DUMMY_CAMPS, PRACTICE_DUMMY_MOBS } from './content/practice_dummies';
+import {
+  HUB_PRACTICE_NPCS,
+  HUB_PRACTICE_QUEST_ORDER,
+  HUB_PRACTICE_QUESTS,
+  PRACTICE_DUMMY_CAMPS,
+  PRACTICE_DUMMY_MOBS,
+} from './content/practice_dummies';
 import { STATIONS } from './content/professions';
 import {
   PROVING_SHORE_CAMPS,
@@ -309,8 +314,10 @@ export {
   resolveDelveShopOffers,
 } from './content/delves';
 
+import { APEX_PATTERN_ITEMS } from './content/apex_patterns';
 import { CRUCIBLE_PROFESSION_ITEMS } from './content/crucible_professions';
 import { DELVE_ITEMS } from './content/delves/items';
+import { FARM_PATTERN_ITEMS } from './content/farm_patterns';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
@@ -356,6 +363,8 @@ export { STATIONS };
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
   PROFESSION_ITEMS,
+  APEX_PATTERN_ITEMS,
+  FARM_PATTERN_ITEMS,
   ZONE2_ITEMS,
   ZONE3_ITEMS,
   TEMPLE_ITEMS,
@@ -446,13 +455,17 @@ export const NPCS: Record<string, NpcDef> = {
   // for the same insertion-order stability reason as the realms above.
   ...PROVING_SHORE_NPCS,
   ...IGNIVAR_RAID_LORE_NPCS,
-  // The Crucible Quartermaster at the raid's overworld entrance, appended
-  // after the lore NPCs for insertion-order stability.
+  // The Crucible Quartermaster (dynamic: true, spawned by the raid's approach
+  // room), appended after the lore NPCs for insertion-order stability.
   ...IGNIVAR_VENDOR_NPCS,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
   [SPIRIT_HEALER_NPC_ID]: SPIRIT_HEALER,
+  // The Eastbrook quay's sparring master (content/practice_dummies.ts):
+  // dynamic, spawned after the player by sim/hub_practice.ts, so his
+  // presence in this record moves no id.
+  ...HUB_PRACTICE_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -477,6 +490,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...FARSHORE_QUESTS,
   ...PROVING_SHORE_QUESTS,
   ...IGNIVAR_RAID_LORE_QUESTS,
+  ...HUB_PRACTICE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -497,6 +511,7 @@ export const QUEST_ORDER: string[] = [
   ...FARSHORE_QUEST_ORDER,
   ...PROVING_SHORE_QUEST_ORDER,
   ...IGNIVAR_RAID_LORE_QUEST_ORDER,
+  ...HUB_PRACTICE_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -559,6 +574,8 @@ export const CAMPS: CampDef[] = [
   // private streams (mob/idle_rng.ts) move: a content append like this one
   // legitimately re-mints the parity goldens without touching a draw digest.
   ...PROVING_SHORE_CAMPS,
+  // The Eastbrook hub dummy is NOT a camp: it spawns with its sparring master
+  // after the player (sim/hub_practice.ts), so it consumes only trailing ids.
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
@@ -778,8 +795,7 @@ export const BUILTIN_WORLD: WorldContent = {
     graveyards: OVERWORLD_GRAVEYARDS,
   },
   // invisible collision walls: the moderation cage plus the Last Keep's
-  // sealed building slot (castle_layout.ts CASTLE_BLOCKERS)
-  blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
+  blockers: [...JAIL_BLOCKERS],
   terrainEdits: [
     ...JAIL_TERRAIN_EDITS,
     ...COPPER_DIG_TERRAIN_EDITS,

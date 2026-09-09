@@ -1,0 +1,164 @@
+[
+  {
+    "id": "bogtoad",
+    "beforeSha256": "c74d58d2b282328f588d9d51b1b66eb123a963b047410ab95b017518a33794bb",
+    "afterSha256": "c74d58d2b282328f588d9d51b1b66eb123a963b047410ab95b017518a33794bb",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "drowsy_croaker",
+    "beforeSha256": "994a349fdcb47bfbbfe2af7f92eb7a6feaa95f38a1998147723fb585e240167a",
+    "afterSha256": "994a349fdcb47bfbbfe2af7f92eb7a6feaa95f38a1998147723fb585e240167a",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "mere_lurker",
+    "beforeSha256": "dd958843a504ea6f07e97f92f0e5a477faa6eff52647e8c4af7e2ad5a02a4d0d",
+    "afterSha256": "dd958843a504ea6f07e97f92f0e5a477faa6eff52647e8c4af7e2ad5a02a4d0d",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "the_meredark",
+    "beforeSha256": "9317cb96146327564f5dbb821fed757b628e47ace76df133fd3f2acc91df4d0e",
+    "afterSha256": "9317cb96146327564f5dbb821fed757b628e47ace76df133fd3f2acc91df4d0e",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "breach_wretch",
+    "beforeSha256": "7a472425d553051ade36fab448f8cb0091f2bb76a555e93b535ed21ea1a6f427",
+    "afterSha256": "7a472425d553051ade36fab448f8cb0091f2bb76a555e93b535ed21ea1a6f427",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "fen_sprite",
+    "beforeSha256": "27e20641545265cb933edf9220a7262ef69cd7b5fb9f8ea4ca943417b243303a",
+    "afterSha256": "27e20641545265cb933edf9220a7262ef69cd7b5fb9f8ea4ca943417b243303a",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "harvest_sprite",
+    "beforeSha256": "91acea51e4a36630146eb55e2b48a980405083aaa997e6325162722e77842c78",
+    "afterSha256": "91acea51e4a36630146eb55e2b48a980405083aaa997e6325162722e77842c78",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "hedge_gnome",
+    "beforeSha256": "b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d",
+    "afterSha256": "b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "willow_sprite",
+    "beforeSha256": "c1dc29dbb2a2f33a65306af3f7747a6f431d2af9961075fcb6d63a8bdcdebaa3",
+    "afterSha256": "c1dc29dbb2a2f33a65306af3f7747a6f431d2af9961075fcb6d63a8bdcdebaa3",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "downs_bandit",
+    "beforeSha256": "b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d",
+    "afterSha256": "b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "wreck_thief",
+    "beforeSha256": "b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d",
+    "afterSha256": "b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d",
+    "meanAbsoluteChannelDelta": 0,
+    "maxChannelDelta": 0,
+    "differingPixels": 0,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "training_dummy",
+    "beforeSha256": "66efb4999739669201bd44e21aca2d6e222ba8dfeb410d018c1e5e7d156e0e65",
+    "afterSha256": "ff36c52017c5e7361602e61e9c1ea224519ed2d90f77cc911cffe2b71e3914ba",
+    "meanAbsoluteChannelDelta": 0.9993082682291666,
+    "maxChannelDelta": 18,
+    "differingPixels": 9723,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "gravedigger_mosley",
+    "beforeSha256": "074e53c4715efc8139889b3232968c6ee54baefb984cb01ed571714b81b5d365",
+    "afterSha256": "ba0f0bcf7b9f33b6a0236087517b902f292964f0bca37cf1855da6ac9d71073b",
+    "meanAbsoluteChannelDelta": 0.7664794921875,
+    "maxChannelDelta": 15,
+    "differingPixels": 7268,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "castaway_navigator",
+    "beforeSha256": "6711572931e5cfc6ed2d0aca599aa70c4ec92c6163b098bf3f222d90317cbe26",
+    "afterSha256": "d4f0bf6105904dd5ddaa573e09d8cdf6da1fc17db0ab2c4b9106f7052d1e0f78",
+    "meanAbsoluteChannelDelta": 0.5733235677083334,
+    "maxChannelDelta": 12,
+    "differingPixels": 5318,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "fisher_bram",
+    "beforeSha256": "8f18935329142987a17c888b39dfd6bd30413fd0528933829e0b3e0f3c6f6fe5",
+    "afterSha256": "4e4961e7e5f7b1ee42892ebc11667ba3a3bc114680fad339d9fac56eb3c890fd",
+    "meanAbsoluteChannelDelta": 0.6806437174479166,
+    "maxChannelDelta": 16,
+    "differingPixels": 6508,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "cindraleth_maw_matriarch",
+    "beforeSha256": "7d8d2dad0b160e147bb719fc48db4fe092bfc2a789cf0ee21993cfa683d72a65",
+    "afterSha256": "39bafb97c82172605678ebc755f420536c26b91c5f388d992f5359c4a877a15c",
+    "meanAbsoluteChannelDelta": 1.18011474609375,
+    "maxChannelDelta": 20,
+    "differingPixels": 9269,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "grubjaw",
+    "beforeSha256": "cd9810cbb956c043fe6d1a514c20d3a941afa19910b5fc005c460e66d1a2d2b1",
+    "afterSha256": "de48a90c28d1fa473856186aba8119eb2458e4cc99cc0f3ebd5aedc606704a69",
+    "meanAbsoluteChannelDelta": 1.0590413411458333,
+    "maxChannelDelta": 17,
+    "differingPixels": 9738,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "the_wreck_warden",
+    "beforeSha256": "e11030bfe58ca95bfa73670c6b35ae3004253f501352bac37c47152190b57006",
+    "afterSha256": "43aa6f55256d34afc6130b9497c2d9fb96fa20981dce1c433e741b9632e3766e",
+    "meanAbsoluteChannelDelta": 0.9054361979166666,
+    "maxChannelDelta": 16,
+    "differingPixels": 7223,
+    "pixelsMeanDeltaOver20": 0
+  }
+]

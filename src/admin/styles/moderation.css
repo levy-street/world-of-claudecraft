@@ -60,13 +60,15 @@
   }
   .ip-block .danger,
   .ip-add .danger,
-  .mod-account-actions .danger {
+  .mod-account-actions .danger,
+  .row-actions .danger {
     border-color: var(--color-danger-border);
     color: var(--color-danger);
   }
   .ip-block .danger:hover,
   .ip-add .danger:hover,
-  .mod-account-actions .danger:hover {
+  .mod-account-actions .danger:hover,
+  .row-actions .danger:hover {
     border-color: var(--color-danger);
     color: var(--text-bright);
   }

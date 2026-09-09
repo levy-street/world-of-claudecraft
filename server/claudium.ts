@@ -14,6 +14,7 @@
 // until the legacy ladder is removed.
 
 import type * as http from 'node:http';
+import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { isKnownStorageSkuId } from '../src/sim/content/storage_charters';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
@@ -35,7 +36,12 @@ import {
   claudiumStripeWebhook,
   claudiumUsdcBalance,
 } from './claudium_proxy';
-import { accountAndScopeForToken, grantAccountWeaponSkins, moderationStatusForAccount } from './db';
+import {
+  accountAndScopeForToken,
+  grantAccountMountSkins,
+  grantAccountWeaponSkins,
+  moderationStatusForAccount,
+} from './db';
 import { ctxAccountId } from './http/context';
 import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
 import {
@@ -131,12 +137,18 @@ export function claudiumConfigured(): boolean {
 
 // Live-game hooks, injected from server/main.ts exactly like configureDiscordRuntime
 // so `export const routes` stays a static array. The economy service is the
-// ownership source of truth for Claudium purchases; these hooks mirror weapon-skin
-// grants into the rollback-safe game entitlement table so the in-game equip gate
-// and identity wire see them immediately (and the self-snapshot pushes to any live
-// session).
+// ownership source of truth for Claudium purchases; these hooks mirror skin
+// grants (weapon skins and mount skins, the two cosmetic families that share
+// the kind 'skin' SKU) into their rollback-safe game entitlement tables so the
+// in-game equip gates and identity wire see them immediately (and the
+// self-snapshot pushes to any live session).
 interface ClaudiumGameHooks {
   grantWeaponSkins(accountId: number, skinIds: string[]): void;
+  /** Mirror purchased mount skins (src/sim/content/mount_skins.ts, kind 'skin'
+   *  SKUs) into account_mount_cosmetics, the same account-wide shape as the
+   *  weapon skins. Wearing one is the character's own later command; a grant
+   *  never lands an item anywhere. */
+  grantMountSkins(accountId: number, skinIds: string[]): void;
   /** The whole storage purchase flow (Bank Storage phase 11): resolve the
    *  live character session, gate, persist the pending record, spend, and
    *  apply the slots exactly once (server/storage_purchases.ts). The result
@@ -173,6 +185,25 @@ function noteWeaponSkinGrants(accountId: number, skinIds: string[]): void {
   void grantAccountWeaponSkins(accountId, known).catch((err) =>
     console.error('failed to persist weapon skin grant:', err),
   );
+}
+
+function noteMountSkinGrants(accountId: number, skinIds: string[]): void {
+  const known = skinIds.filter(isMountSkinId);
+  if (known.length === 0) return;
+  if (claudiumRuntime) {
+    claudiumRuntime.grantMountSkins(accountId, known);
+    return;
+  }
+  // No live game wired (tests/tools): persist directly so ownership still lands.
+  void grantAccountMountSkins(accountId, known).catch((err) =>
+    console.error('failed to persist mount skin grant:', err),
+  );
+}
+
+/** The kind 'skin' allowlist: a weapon skin OR a mount skin, two disjoint
+ *  registries behind one SKU family (docs/claudium-store.md). */
+function isKnownSkinSkuId(itemId: string): boolean {
+  return isKnownWeaponSkinId(itemId) || isMountSkinId(itemId);
 }
 
 export async function handleClaudiumStripeWebhook(
@@ -261,27 +292,30 @@ export async function handleClaudiumApi(
       ...store,
       items: store.items.filter(
         (item) =>
-          (item.kind === 'skin' && isKnownWeaponSkinId(item.itemId)) ||
+          (item.kind === 'skin' && isKnownSkinSkuId(item.itemId)) ||
           (item.kind === 'storage' && isKnownStorageSkuId(item.itemId)),
       ),
     };
     // Reconcile: the service's grant ledger is authoritative for purchases, so
-    // mirror any owned weapon skins the game DB does not know about yet.
+    // mirror any owned skins (weapon or mount) the game does not know about yet.
     // Filtering on `owned` alone is safe here, and it is worth saying why so a
     // later reader does not "fix" it the wrong way. `owned` means the service
     // holds a GRANT row, which only the skin family ever has: a storage spend
-    // writes no grant row, so a storage row's owned is false by construction and
-    // forever. Two independent gates keep a storage id out of the weapon-skin
-    // entitlement table even if the service ever set the flag on one: the filter
-    // just above admits a row only under its OWN family's registry, and
-    // noteWeaponSkinGrants re-filters its input through isKnownWeaponSkinId.
-    // Reaching the table would take an id carried by BOTH registries, and they
-    // are disjoint (tests/server/storage_gates.test.ts pins the tampered
-    // owned:true storage row never reaching the mirror).
-    noteWeaponSkinGrants(
-      accountId,
-      supportedStore.items.filter((item) => item.owned).map((item) => item.itemId),
-    );
+    // writes no grant row, so a storage row's owned is false by construction
+    // and forever. Two independent gates keep a storage id out of either skin
+    // entitlement table even if the service ever set the flag on one: the
+    // filter just above admits a row only under its OWN family's registry, and
+    // noteWeaponSkinGrants / noteMountSkinGrants re-filter their input through
+    // isKnownWeaponSkinId / isMountSkinId. Reaching either would take an id
+    // carried by two registries, and all three are disjoint
+    // (tests/server/storage_gates.test.ts pins the tampered owned:true storage
+    // row never reaching the mirror). The two skin mirrors receive the SAME
+    // owned id list and each keeps only its own registry's ids.
+    const ownedSkinIds = supportedStore.items
+      .filter((item) => item.owned && item.kind === 'skin')
+      .map((item) => item.itemId);
+    noteWeaponSkinGrants(accountId, ownedSkinIds);
+    noteMountSkinGrants(accountId, ownedSkinIds);
     return json(res, 200, supportedStore);
   }
   if (req.method === 'GET' && path === '/api/claudium/history') {
@@ -416,7 +450,11 @@ export async function handleClaudiumApi(
         }),
       );
     }
-    if (kind !== 'skin' || !isKnownWeaponSkinId(itemId)) {
+    // The paid cosmetic family: kind 'skin' carries both weapon skins and mount
+    // skins. Legacy kind 'item' rows (the retired reins-in-bags store mount)
+    // are no longer products and fall through as unknown_item.
+    const supportedSku = kind === 'skin' && isKnownSkinSkuId(itemId);
+    if (!supportedSku) {
       return json(res, 200, {
         granted: false,
         balance: null,
@@ -437,11 +475,20 @@ export async function handleClaudiumApi(
     // authoritative grant ledger and mirror only this exact owned skin. A transient
     // store failure leaves the game mirror untouched; the next store open heals it.
     if (result.granted || result.reason === 'already_granted') {
+      // The raw store, not the filtered view: `itemId` already passed the
+      // family allowlist above and `kind` is pinned, so the only row this can
+      // match is a real skin, and both mirrors re-filter through their own
+      // registry before anything lands.
       const store = await claudiumStore(accountId);
-      const ownsRequestedSkin = store.items.some(
-        (item) => item.kind === 'skin' && item.itemId === itemId && item.owned,
+      const ownsRequested = store.items.some(
+        (item) => item.kind === kind && item.itemId === itemId && item.owned,
       );
-      if (ownsRequestedSkin) noteWeaponSkinGrants(accountId, [itemId]);
+      if (ownsRequested) {
+        // Each mirror re-filters through its own registry; the id lands in
+        // exactly one of the two.
+        noteWeaponSkinGrants(accountId, [itemId]);
+        noteMountSkinGrants(accountId, [itemId]);
+      }
     }
     return json(res, 200, result);
   }

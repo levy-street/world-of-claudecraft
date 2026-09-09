@@ -8,7 +8,6 @@ import {
   awardSharedLootItem,
   CORPSE_INTERACT_GRACE_SECONDS,
   distributeLootCopper,
-  killSnapshotEligibility,
   lootRollGroupStatus,
   lootSlotVisibleTo,
   partyLootCandidatesForMob,
@@ -23,6 +22,11 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, LootEntry, LootSlot, SimEvent } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 // Direct unit tests for the extracted loot-distribution module (L1). These drive the
 // module's exported `(ctx, ...)` functions through `sim.ctx` (the real SimContext
@@ -119,12 +123,30 @@ describe('loot_roll: rollLoot producer (drop-rate determinism)', () => {
           mobIds: [mob.id],
         } as unknown as (typeof sim.ctx.instances)[number]);
       }
-      const nextSpy = vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.99);
+      // Pin the partition draw to the middle of Emberward's own slice, derived
+      // from the live heroic table so a re-cut of the group cannot silently
+      // move the pin off the legendary.
+      const heroicTable = HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? [];
+      const emberward = heroicTable.find((entry) => entry.itemId === 'varkhul_emberward');
+      if (!emberward?.rollGroup) throw new Error('expected Emberward in a heroic rollGroup');
+      let sliceStart = 0;
+      for (const entry of heroicTable) {
+        if (entry.rollGroup !== emberward.rollGroup) continue;
+        if (entry === emberward) break;
+        sliceStart += entry.chance;
+      }
+      const nextSpy = vi
+        .spyOn(sim.ctx.rng, 'next')
+        .mockReturnValue(sliceStart + emberward.chance / 2);
       rollLoot(sim.ctx, mob, meta);
       nextSpy.mockRestore();
       return (mob.loot?.items ?? []).map((slot) => slot.itemId);
     };
 
+    // The Normal half is guaranteed by the heroic-append gate itself (the whole
+    // HEROIC_BOSS_LOOT loop sits behind heroicClaim), not by the derived roll:
+    // it catches Emberward leaking into the base table, a different claim from
+    // the heroic half, which exercises the partition math.
     expect(rollVarkhul(false)).not.toContain('varkhul_emberward');
     expect(rollVarkhul(true)).toContain('varkhul_emberward');
   });
@@ -654,20 +676,19 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     // The fourth arm, and the reason the harvest half is isHarvestableCorpse
     // here and not a tag COUNT. fen_troll carried claw and tusk, neither
     // mapped at the time, so the command boundary refused a harvest and the
-    // claim could never be spent. Both are mapped now (this branch's own
-    // fix), so no shipped template is left in that shape: gills and horn are
-    // still waiting on theirs, so this retags a real, otherwise-untagged
-    // template (warlock_imp) for the duration of the case, restored in a
-    // finally. Counting tags held the 30s grace window open forever waiting
-    // on it, which is worse than the pre-#2513 world where a player could at
-    // least burn the claim to collapse the corpse.
+    // claim could never be spent. Both are mapped now (#2905), and Phase 11m
+    // mapped gills and horn after them, so no shipped template is left in
+    // that shape: this retags a real, otherwise-untagged template
+    // (warlock_imp) with the synthetic never-mapped families
+    // (tests/helpers/unmapped_family.ts) for the duration of the case,
+    // restored in a finally. Counting tags held the 30s grace window open
+    // forever waiting on it, which is worse than the pre-#2513 world where a
+    // player could at least burn the claim to collapse the corpse.
     const template = MOBS.warlock_imp;
-    const priorTags = template.componentTags;
-    template.componentTags = ['gills', 'horn'];
-    const sim = makeSim();
-    try {
+    const sim = withRetaggedTemplates({ warlock_imp: [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2] }, () => {
+      const retaggedSim = makeSim();
       expect(isHarvestableCorpse(template.componentTags)).toBe(false);
-      const mob = createMob(sim.nextId++, template, 12, { x: 0, y: 0, z: 0 });
+      const mob = createMob(retaggedSim.nextId++, template, 12, { x: 0, y: 0, z: 0 });
       mob.dead = true;
       mob.lootable = true;
       mob.corpseTimer = 60;
@@ -675,14 +696,13 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
       // the arm is chosen by the corpse's families, not by the claim.
       expect(mob.harvestClaimedBy).toBeNull();
       mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
-      sim.entities.set(mob.id, mob);
-      pruneCorpseLoot(sim.ctx, mob);
+      retaggedSim.entities.set(mob.id, mob);
+      pruneCorpseLoot(retaggedSim.ctx, mob);
       expect(mob.loot).toBeNull();
       expect(mob.lootable).toBe(false);
       expect(mob.corpseTimer).toBe(4);
-    } finally {
-      template.componentTags = priorTags;
-    }
+      return retaggedSim;
+    });
     // The discriminator, identical rig and identical unspent claim: a corpse
     // with a MAPPED family still takes the grace arm, so this is the predicate
     // narrowing and not the grace arm being deleted.
@@ -737,13 +757,15 @@ describe('loot_roll: heroic-append cross-group dedup arm', () => {
     expect(problems).toEqual([]);
   });
 
-  it('never shares an item id with the same mob’s base loot table', () => {
+  it('never shares an item id with base loot that also rolls on Heroic', () => {
     const problems: string[] = [];
     for (const [mobId, heroicEntries] of Object.entries(HEROIC_BOSS_LOOT)) {
       const template = MOBS[mobId];
       if (!template) continue;
       const baseIds = new Set(
-        template.loot.flatMap((entry: LootEntry) => (entry.itemId ? [entry.itemId] : [])),
+        template.loot.flatMap((entry: LootEntry) =>
+          entry.itemId && !entry.normalOnly ? [entry.itemId] : [],
+        ),
       );
       for (const entry of heroicEntries) {
         if (entry.itemId && baseIds.has(entry.itemId)) {
@@ -796,43 +818,19 @@ describe('loot_roll: heroic-append cross-group dedup arm', () => {
 });
 
 describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () => {
-  it('keeps the exact drop group eligible when a member disconnects before distribution', () => {
-    const { sim, a, b, c } = partyOfThree();
-    playerMeta(sim, a).characterId = 101;
-    playerMeta(sim, b).characterId = 102;
-    playerMeta(sim, c).characterId = 103;
-    const mob = createMob(sim.nextId++, MOBS.ignivar_herald_of_the_last_flame, 20, {
-      x: 0,
-      y: 0,
-      z: 0,
-    });
-    mob.lootRecipientIds = [a, b, c];
-    rollLoot(sim.ctx, mob, playerMeta(sim, a), [
-      playerMeta(sim, a),
-      playerMeta(sim, b),
-      playerMeta(sim, c),
-    ]);
-    playerMeta(sim, b).leaving = true;
-
-    expect(killSnapshotEligibility(sim.ctx, mob)).toEqual({
-      names: ['Aaa', 'Bbb', 'Ccc'],
-      characterIds: [101, 102, 103],
-    });
-  });
-
   it('stamps the drop-moment candidate snapshot onto a need/greed win of a soulbound item', () => {
     const { sim, a, b, c } = partyOfThree();
     const mob = deadCorpse(sim, a, [a, b, c], {
       copper: 0,
-      items: [{ itemId: 'sigil_anvil_helmet', count: 1 }],
+      items: [{ itemId: 'slagbreaker_helmet', count: 1 }],
     });
-    awardSharedLootItem(sim.ctx, 'sigil_anvil_helmet', mob, playerMeta(sim, a));
+    awardSharedLootItem(sim.ctx, 'slagbreaker_helmet', mob, playerMeta(sim, a));
     const rollId = lootRollEvent(sim).rollId;
     submitLootRoll(sim.ctx, rollId, 'need', a);
     submitLootRoll(sim.ctx, rollId, 'pass', b);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
     const slot = expectDefined(
-      playerMeta(sim, a).inventory.find((s) => s.itemId === 'sigil_anvil_helmet'),
+      playerMeta(sim, a).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
     );
     // Winner included: the whole kill-time candidate set may receive the copy.
     expect(slot.instance?.partyTrade?.eligible).toEqual(['Aaa', 'Bbb', 'Ccc']);
@@ -862,15 +860,15 @@ describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () 
     const { sim, a, b, c } = partyOfThree();
     const mob = deadCorpse(sim, a, [a, b, c], {
       copper: 0,
-      items: [{ itemId: 'sigil_anvil_helmet', count: 1 }],
+      items: [{ itemId: 'slagbreaker_helmet', count: 1 }],
     });
-    awardSharedLootItem(sim.ctx, 'sigil_anvil_helmet', mob, playerMeta(sim, a));
+    awardSharedLootItem(sim.ctx, 'slagbreaker_helmet', mob, playerMeta(sim, a));
     mob.loot = { copper: 0, items: [] };
     const rollId = lootRollEvent(sim).rollId;
     submitLootRoll(sim.ctx, rollId, 'pass', a);
     submitLootRoll(sim.ctx, rollId, 'pass', b);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
-    expect(mob.loot?.items.find((s) => s.itemId === 'sigil_anvil_helmet')?.openToAll).toBe(true);
+    expect(mob.loot?.items.find((s) => s.itemId === 'slagbreaker_helmet')?.openToAll).toBe(true);
 
     // The pickup from the returned openToAll slot is the interaction path,
     // which must route through the same windowed grant as a roll win: the
@@ -882,7 +880,7 @@ describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () 
     sim.rebucket(looter);
     expect(sim.lootCorpse(mob.id, b)).toBe(true);
     const slot = expectDefined(
-      playerMeta(sim, b).inventory.find((s) => s.itemId === 'sigil_anvil_helmet'),
+      playerMeta(sim, b).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
     );
     expect(slot.instance?.partyTrade?.eligible).toEqual(['Aaa', 'Bbb', 'Ccc']);
   });
@@ -892,13 +890,137 @@ describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () 
     const a = sim.addPlayer('warrior', 'Solo');
     const mob = deadCorpse(sim, a, [a], {
       copper: 0,
-      items: [{ itemId: 'sigil_anvil_helmet', count: 1 }],
+      items: [{ itemId: 'slagbreaker_helmet', count: 1 }],
     });
-    const taken = awardSharedLootItem(sim.ctx, 'sigil_anvil_helmet', mob, playerMeta(sim, a));
+    const taken = awardSharedLootItem(sim.ctx, 'slagbreaker_helmet', mob, playerMeta(sim, a));
     expect(taken).toBe(true);
     const slot = expectDefined(
-      playerMeta(sim, a).inventory.find((s) => s.itemId === 'sigil_anvil_helmet'),
+      playerMeta(sim, a).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
     );
     expect(slot.instance).toBeUndefined();
+  });
+});
+
+describe('loot_roll: normalOnly rows (a Heroic slot REPLACES a Normal slot)', () => {
+  // A normalOnly row is authored for the Normal table alone: a heroic claim
+  // skips it (a whole rollGroup at once) and draws NO rng for it, so the
+  // boss's HEROIC_BOSS_LOOT append can pay that slot instead of stacking on
+  // it (the Crucible's one-item-per-five-raiders cadence). Substitutes a
+  // synthetic base table on a real boss id, the same pattern the heroic-append
+  // collision case above uses, so the SAME rollLoot path real content runs is
+  // the one proven here.
+  const synthetic = (normalOnly: true | undefined): LootEntry[] => [
+    { itemId: 'always_item', chance: 1, rollGroup: 'base_group' },
+    { itemId: 'normal_item_a', chance: 0.5, rollGroup: 'normal_group', normalOnly },
+    { itemId: 'normal_item_b', chance: 0.5, rollGroup: 'normal_group', normalOnly },
+    { itemId: 'normal_single', chance: 1, normalOnly },
+  ];
+
+  function rollMorthen(loot: LootEntry[], heroic: boolean) {
+    const original = MOBS.morthen.loot;
+    MOBS.morthen.loot = loot;
+    try {
+      const sim = makeSim(5);
+      const pid = sim.addPlayer('warrior', 'Looter');
+      const meta = playerMeta(sim, pid);
+      const template = MOBS.morthen;
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      if (heroic) {
+        sim.ctx.instances.push({
+          id: -1,
+          dungeonId: 'hollow_crypt',
+          difficulty: 'heroic',
+          partyKey: 'test-party',
+          mobIds: [mob.id],
+        } as unknown as (typeof sim.ctx.instances)[number]);
+      }
+      const nextSpy = vi.spyOn(sim.ctx.rng, 'next');
+      const chanceSpy = vi.spyOn(sim.ctx.rng, 'chance');
+      rollLoot(sim.ctx, mob, meta);
+      const draws = { next: nextSpy.mock.calls.length, chance: chanceSpy.mock.calls.length };
+      nextSpy.mockRestore();
+      chanceSpy.mockRestore();
+      return { ids: (mob.loot?.items ?? []).map((s) => s.itemId), draws };
+    } finally {
+      MOBS.morthen.loot = original;
+    }
+  }
+
+  it('rolls every normalOnly row on a Normal kill exactly like an unflagged row', () => {
+    const flagged = rollMorthen(synthetic(true), false);
+    const plain = rollMorthen(synthetic(undefined), false);
+    expect(flagged.ids).toEqual(plain.ids);
+    expect(flagged.draws).toEqual(plain.draws);
+    expect(flagged.ids).toContain('always_item');
+    expect(flagged.ids).toContain('normal_single');
+    expect(flagged.ids.some((id) => id === 'normal_item_a' || id === 'normal_item_b')).toBe(true);
+  });
+
+  it('skips every normalOnly row on a heroic claim and draws no rng for it', () => {
+    const flagged = rollMorthen(synthetic(true), true);
+    const plain = rollMorthen(synthetic(undefined), true);
+    expect(flagged.ids).toContain('always_item');
+    expect(flagged.ids).not.toContain('normal_item_a');
+    expect(flagged.ids).not.toContain('normal_item_b');
+    expect(flagged.ids).not.toContain('normal_single');
+    // The unflagged twin still pays the group and the single on heroic, so the
+    // difference is exactly the skipped group's partition draw and the
+    // skipped single's chance draw, which rides next too (two next calls,
+    // one chance call); the heroic appends' own draws cancel out.
+    expect(plain.ids.some((id) => id === 'normal_item_a' || id === 'normal_item_b')).toBe(true);
+    expect(plain.draws.next - flagged.draws.next).toBe(2);
+    expect(plain.draws.chance - flagged.draws.chance).toBe(1);
+  });
+
+  // The content invariant behind the gate, as a pure check so its negative arm
+  // is provable: a rollGroup that mixes flagged and unflagged rows would let a
+  // heroic claim draw a PARTIAL partition (the roller skips rows one by one),
+  // and a heroic append carrying the flag would be a row no kill ever rolls.
+  function normalOnlyProblems(
+    mobs: Iterable<{ id: string; loot?: readonly LootEntry[] }>,
+    heroicTables: Record<string, readonly LootEntry[] | undefined>,
+  ): string[] {
+    const problems: string[] = [];
+    for (const mob of mobs) {
+      const flagsByGroup = new Map<string, Set<boolean>>();
+      for (const entry of mob.loot ?? []) {
+        if (!entry.rollGroup) continue;
+        const flags = flagsByGroup.get(entry.rollGroup) ?? new Set<boolean>();
+        flags.add(entry.normalOnly === true);
+        flagsByGroup.set(entry.rollGroup, flags);
+      }
+      for (const [group, flags] of flagsByGroup) {
+        if (flags.size !== 1) problems.push(`${mob.id}: ${group} mixes normalOnly rows`);
+      }
+    }
+    for (const [mobId, entries] of Object.entries(heroicTables)) {
+      for (const entry of entries ?? []) {
+        if (entry.normalOnly)
+          problems.push(`${mobId}: heroic append ${entry.itemId} is normalOnly`);
+      }
+    }
+    return problems;
+  }
+
+  it('every rollGroup agrees on normalOnly, and the heroic appends never carry it', () => {
+    expect(normalOnlyProblems(Object.values(MOBS), HEROIC_BOSS_LOOT)).toEqual([]);
+  });
+
+  it('the invariant check itself trips on a mixed group and on a flagged heroic append', () => {
+    const mixed = {
+      id: 'bad_mob',
+      loot: [
+        { itemId: 'a', chance: 0.5, rollGroup: 'mixed_group', normalOnly: true as const },
+        { itemId: 'b', chance: 0.5, rollGroup: 'mixed_group' },
+        { itemId: 'c', chance: 1, rollGroup: 'clean_group', normalOnly: true as const },
+      ],
+    };
+    const flaggedAppend = {
+      bad_boss: [{ itemId: 'd', chance: 1, rollGroup: 'h_group', normalOnly: true as const }],
+    };
+    expect(normalOnlyProblems([mixed], flaggedAppend)).toEqual([
+      'bad_mob: mixed_group mixes normalOnly rows',
+      'bad_boss: heroic append d is normalOnly',
+    ]);
   });
 });

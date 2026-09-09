@@ -23,6 +23,8 @@ import {
   lastKeepLiftAt,
   layoutColliders,
 } from '../src/sim/dungeon_layout';
+import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../src/sim/forgefather_fortress';
+import { IGNIVAR_PROP_NATIVE } from '../src/sim/ignivar_props';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { authoredLiftAt, roomAt } from '../src/sim/rift/authored';
 import { Sim } from '../src/sim/sim';
@@ -404,5 +406,22 @@ describe('The Last Keep layout', () => {
     expect(sim.player.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
     expect(leaveDungeon((sim as any).ctx, pid)).toBe(true);
     expect(sim.player.pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
+    // The rebuilt keep's exit sets the body down ON the temple terrace deck
+    // (the plate over the stair band at the drop point), never under its top:
+    // seated at the walk-lift ground beneath the plate, the body was
+    // depenetrated straight back into the door trigger and re-entered on the
+    // next tick (the exit-then-re-enter loop).
+    const door = DUNGEONS.the_last_keep.doorPos;
+    const off = DUNGEONS.the_last_keep.leaveOffset ?? { x: 0, z: 0 };
+    const drop = { x: door.x + off.x, z: door.z + off.z };
+    const plate = FORGEFATHER_FORTRESS_PLACEMENTS.filter((r) => r.key === 'bridge_floor')
+      .map((r) => ({ r, d: Math.hypot(r.x - drop.x, r.z - drop.z) }))
+      .sort((a, b) => a.d - b.d)[0].r;
+    const plateTop = plate.y + IGNIVAR_PROP_NATIVE.bridge_floor.hei * plate.scale;
+    expect(sim.player.pos.y, 'seated on the terrace plate').toBeGreaterThanOrEqual(plateTop - 1e-6);
+    for (let i = 0; i < 20; i++) sim.tick();
+    expect(sim.player.pos.x, 'the exit never bounces back through the door').toBeLessThan(
+      DUNGEON_X_THRESHOLD,
+    );
   });
 });

@@ -573,7 +573,9 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     const events = sim.drainEvents();
     expect(events.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
     const still = sim.mailInfoFor(bob)?.messages.find((m) => m.id === parcel.id);
-    expect(still?.items).toEqual([{ itemId: 'linen_scrap', count: 2 }]); // kept, not destroyed
+    expect(still?.items).toEqual([
+      { itemId: 'linen_scrap', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]); // kept, not destroyed
     expect(sim.countItem('linen_scrap', bob)).toBe(0);
 
     // Free one general slot and the same material parcel arrives.

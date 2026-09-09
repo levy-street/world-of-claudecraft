@@ -20,6 +20,8 @@ describe('exact runtime aura paintings', () => {
     'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-fear-aura-art.json';
   const mobManifest =
     'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json';
+  const masterwroughtManifest =
+    'docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json';
   const secondPassManifestSha256 =
     'bdf2aeaf3db9c63f0952f55fbcde2458d9c0706aa9f08cf9f26ab4eff9ec83fe';
   const externalAuraArt = new Map([
@@ -149,6 +151,28 @@ describe('exact runtime aura paintings', () => {
         prompt: string;
       }>;
     };
+    const masterwroughtBytes = readFileSync(path.join(process.cwd(), masterwroughtManifest));
+    const masterwrought = JSON.parse(masterwroughtBytes.toString('utf8')) as {
+      schemaVersion: number;
+      batch: { id: string; acceptedDate: string; rasterGenerator: string };
+      scope: { exactRuntimeAuras: number; runtimeIdentity: string };
+      generationContract: {
+        builtInImagegenCalls: number;
+        acceptedFirstOutputs: number;
+        rejectedOutputs: number;
+      };
+      assets: Array<{
+        auraId: string;
+        sourceProvenance: string;
+        sourceFile: string;
+        sourceBytes: number;
+        sourceSha256: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+        references: Array<{ path: string; role: string }>;
+        prompt: string;
+      }>;
+    };
     const committed = readdirSync(auraArtDir).sort();
     const committedIds = committed
       .filter((name) => name.endsWith('.webp') && !name.startsWith('mob_'))
@@ -241,12 +265,29 @@ describe('exact runtime aura paintings', () => {
             },
           ] as const,
       ),
+      ...masterwrought.assets.map(
+        (asset) =>
+          [
+            asset.auraId,
+            {
+              auraId: asset.auraId,
+              sourceFile: asset.sourceFile,
+              sourceBytes: asset.sourceBytes,
+              sourceSha256: asset.sourceSha256,
+              acceptedSha256: asset.acceptedSha256,
+              acceptedBytes: asset.acceptedBytes,
+              acceptedArtManifest: masterwroughtManifest,
+              references: asset.references.map(({ path: referencePath }) => referencePath),
+              sourceProvenance: asset.sourceProvenance,
+            },
+          ] as const,
+      ),
     ]);
 
     expect(committed.filter((name) => name !== 'mapping.json' && !name.endsWith('.webp'))).toEqual(
       [],
     );
-    expect(expectedIds).toHaveLength(85);
+    expect(expectedIds).toHaveLength(86);
     expect(committedIds).toEqual(expectedIds);
     expect(mappedIds).toEqual(expectedIds);
     expect([...acceptedById.keys()].sort()).toEqual(expectedIds);
@@ -312,6 +353,24 @@ describe('exact runtime aura paintings', () => {
     expect(fear.scope.liveProducerFamilies).toHaveLength(6);
     expect(fear.scope.semanticConstraint).toContain('does not claim a caster class');
     expect(fear.assets).toHaveLength(1);
+    expect(createHash('sha256').update(masterwroughtBytes).digest('hex')).toBe(
+      'a9a13f55a838d2ef15f17e3eaea61b4115a528796cae72ba106343efffaa11c5',
+    );
+    expect(masterwrought).toMatchObject({
+      schemaVersion: 1,
+      batch: {
+        id: 'masterwrought-art-completion-2026-09-02',
+        acceptedDate: '2026-09-02',
+        rasterGenerator: 'OpenAI built-in image generation',
+      },
+      scope: { exactRuntimeAuras: 1, runtimeIdentity: 'well_fed' },
+      generationContract: {
+        builtInImagegenCalls: 1,
+        acceptedFirstOutputs: 1,
+        rejectedOutputs: 0,
+      },
+    });
+    expect(masterwrought.assets).toHaveLength(1);
     for (const asset of [...secondPass.assets, ...elixir.assets, ...fear.assets]) {
       expect(asset.sourceFile, asset.auraId).toMatch(/^tmp\/imagegen\/v039-second-pass\//);
       expect(asset.sourceBytes, asset.auraId).toBeGreaterThan(0);
@@ -340,6 +399,7 @@ describe('exact runtime aura paintings', () => {
         elixirManifest,
         fearManifest,
         mobManifest,
+        masterwroughtManifest,
       ]),
     );
     expect(mapping.externalAssets.map(({ auraId, runtimeUrl }) => [auraId, runtimeUrl])).toEqual([

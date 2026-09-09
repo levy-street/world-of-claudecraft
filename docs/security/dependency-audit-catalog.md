@@ -115,10 +115,47 @@ reach the defect.
 
 **Retire this entry when** `jayson` (or `@solana/web3.js`) moves to uuid 11+.
 
+### GHSA-528h-pc64-c93x: stream-json path filters are O(depth^2) on nested input
+
+**Severity** medium (CVSS 6.2). **Path**
+`@solana/web3.js > jayson > stream-json` (stream-json 1.9.1).
+
+**Unfixable without breaking the consumer.** The advisory's patched floor is
+3.5.0, but `jayson@4.3.0` requires `stream-json@^1.9.1` and reads it through
+paths that only exist on the 1.x layout (`stream-json/streamers/StreamValues`,
+`stream-json/utils/Verifier`, both loaded at the top of `jayson/lib/utils.js`).
+Forcing the override past 1.x (a prior state of this override pinned
+`^3.5.0`) does not "fix" the advisory, it makes `jayson/lib/utils.js` throw
+`MODULE_NOT_FOUND` on load, since those paths moved under `src/` in stream-json
+3.x. There is no stream-json version that is both `>=3.5.0` and importable by
+this jayson release.
+
+**Not reachable here, on two independent grounds.**
+
+1. This repo never loads the file that requires stream-json at all. The only
+   consumer, `@solana/web3.js`, requires exactly `jayson/lib/client/browser` in
+   all three of its bundles (`lib/index.cjs.js`, `lib/index.browser.cjs.js`,
+   `lib/index.native.js`), and that module only requires `uuid` and
+   `jayson/lib/generateRequest`, never `jayson/lib/utils`. `jayson/lib/utils.js`
+   (the file with the `stream-json/streamers/StreamValues` /
+   `stream-json/utils/Verifier` requires) backs jayson's server and TCP/stream
+   clients, none of which this repo's dependency graph reaches.
+2. Even if it were reached, the advisory itself scopes the defect to the
+   `pick`/`ignore`/`filter`/`replace` path filters in
+   `src/core/filters/filter-base.js`, which recompute the full nesting-stack
+   path string on every checkable token. The `StreamValues` streamer jayson
+   actually imports is explicitly called out by the advisory as not affected:
+   "the `streamArray`/`streamObject`/`streamValues` streamers use `asm.depth`
+   (an O(1) getter), so they don't exhibit this."
+
+**Retire this entry when** `jayson` bumps its own `stream-json` dependency to
+`>=3.5.0` (adopting the v3 API surface) or drops `stream-json` entirely.
+
 ## The re-mint chore any dependency change triggers
 
-`pnpm-lock.yaml` is a fingerprinted source input of the Eastbrook and Fenbridge
-asset pipelines, so a lockfile-only change invalidates their provenance seals and
+`pnpm-lock.yaml` is a fingerprinted source input of the Eastbrook, Fenbridge,
+Dreadspark Groundshaker, and inscription-tome asset pipelines, so a
+lockfile-only change invalidates their provenance seals and
 reddens the asset suites. Use the size-preserving in-place re-mint
 (`scripts/assets/remint_lockfile_fingerprints.mjs`, then
 `eastbrook_grand_armoury/remint_polish_provenance.mjs`, then

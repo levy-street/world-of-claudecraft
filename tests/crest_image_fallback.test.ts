@@ -7,7 +7,10 @@ const iconMocks = vi.hoisted(() => ({
   procedural: vi.fn((_kind: string, id: string) => `data:image/png;base64,${id}`),
 }));
 
-vi.mock('../src/ui/icons', () => ({
+// Additive, never bare (the reliquary_window_behavior lesson): the three
+// resolvers under test stay stubbed; everything else passes through.
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
   cachedProceduralIconDataUrl: iconMocks.cached,
   iconDataUrl: iconMocks.painted,
   proceduralIconDataUrl: iconMocks.procedural,

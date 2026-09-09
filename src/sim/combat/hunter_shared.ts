@@ -5,6 +5,7 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d } from '../types';
 import { replaceResolvedAbility } from './action_replacement';
+import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import { livingGroupRaidInRadius } from './group_targeting';
 import { coldsightLongDrawCritExtensionSec } from './hunter_coldsight';
 
@@ -558,6 +559,7 @@ export function runHunterWildheart(ctx: SimContext, hunter: Entity): void {
   const recipients = pet && !pet.dead ? [hunter, pet] : [hunter];
   if (pet && !pet.dead) {
     const heal = Math.min(Math.round(pet.maxHp * 0.3), pet.maxHp - pet.hp);
+    onCraftedCollectionHeal(ctx, hunter, pet, Math.round(pet.maxHp * 0.3) - heal);
     if (heal > 0) {
       pet.hp += heal;
       ctx.emit({

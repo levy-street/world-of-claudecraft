@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { HEAVY_SELF_CMDS } from '../server/heavy_self';
+import { dispatchInventoryGroupingCommand } from '../server/material_stack_wire';
 import { stackSizeOf } from '../src/sim/bags';
 // Aliased: this file declares a small synthetic table for the ladder arms; the
 // real merged catalog drives the whole-catalog and grade-family arms.
@@ -14,6 +16,7 @@ import {
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef } from '../src/sim/types';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // Synthetic defs for the ladder arms; the material-grade family arms use REAL
 // grade-table ids (elderwood_log / fine_elderwood_log / copper_ore /
@@ -43,10 +46,30 @@ const ITEMS: Record<string, ItemDef> = {
   pouch: { id: 'pouch', name: 'Linen Pouch', kind: 'bag', bagSlots: 6, quality: 'common' },
   potion: { id: 'potion', name: 'Minor Healing Potion', kind: 'potion', quality: 'common' },
   elixir: { id: 'elixir', name: 'Elixir of Vigor', kind: 'elixir', quality: 'common' },
+  flask: {
+    id: 'flask',
+    name: 'Flask of Vigor',
+    kind: 'flask',
+    quality: 'common',
+    elixir: { aura: 'Vigor', kind: 'buff_sta', value: 1, duration: 60 },
+  },
+  scroll: {
+    id: 'scroll',
+    name: 'Scroll of Vigor',
+    kind: 'scroll',
+    quality: 'common',
+    elixir: { aura: 'Vigor', kind: 'buff_sta', value: 1, duration: 60 },
+  },
   bread: { id: 'bread', name: 'Crusty Bread', kind: 'food', quality: 'common' },
   water: { id: 'water', name: 'Spring Water', kind: 'drink', quality: 'common' },
   pick: { id: 'pick', name: 'Miner Pick', kind: 'tool', quality: 'common' },
   reins: { id: 'reins', name: 'Reins of the Valorsteed', kind: 'mount', quality: 'rare' },
+  pattern: {
+    id: 'pattern',
+    name: 'Pattern: Arming Sword',
+    kind: 'recipe',
+    quality: 'uncommon',
+  },
   elderwood_log: {
     id: 'elderwood_log',
     name: 'Elderwood Log',
@@ -122,10 +145,13 @@ describe('compareBagStacks: the clean-up ladder', () => {
       slot('pelt', 5),
       slot('keystone'),
       slot('copper_ore', 8),
+      slot('pattern'),
       slot('reins'),
       slot('pick'),
       slot('water', 2),
       slot('bread', 2),
+      slot('scroll', 2),
+      slot('flask', 2),
       slot('elixir', 2),
       slot('potion', 3),
       slot('pouch'),
@@ -140,10 +166,17 @@ describe('compareBagStacks: the clean-up ladder', () => {
       'pouch',
       'potion',
       'elixir',
+      // The two later kinds slot inside KIND_RANK's consumable run rather than
+      // after it: the phase 10 flask sits with the elixir it replaces, and the
+      // phase 06 scroll with the elixir it alternates with, both ahead of the
+      // picnic food.
+      'flask',
+      'scroll',
       'bread',
       'water',
       'pick',
       'reins',
+      'pattern',
       'copper_ore',
       'keystone',
       'pelt',
@@ -215,7 +248,10 @@ describe('consolidateBagStacks', () => {
   it('tops up the earliest partial stack and splices emptied donors', () => {
     const inv = [slot('copper_ore', 15), slot('blade'), slot('copper_ore', 5)];
     consolidateBagStacks(inv, lookup, cap);
-    expect(inv).toEqual([slot('copper_ore', 20), slot('blade')]);
+    expect(inv).toEqual([
+      slot('copper_ore', 20, { materialSources: [{ source: {}, count: 20 }] }),
+      slot('blade'),
+    ]);
   });
 
   it('leaves a remainder stack when the total exceeds one cap', () => {
@@ -224,7 +260,7 @@ describe('consolidateBagStacks', () => {
     expect(inv.map((s) => s.count)).toEqual([20, 5]);
   });
 
-  it('never merges a plain stack with an instanced copy, in either direction', () => {
+  it('merges plain and legacy signed material while preserving the exact quantities', () => {
     const inv = [
       slot('copper_ore', 5),
       slot('copper_ore', 5, { instance: { signer: 'Aldric' } }),
@@ -232,12 +268,16 @@ describe('consolidateBagStacks', () => {
     ];
     consolidateBagStacks(inv, lookup, cap);
     expect(inv).toEqual([
-      slot('copper_ore', 10),
-      slot('copper_ore', 5, { instance: { signer: 'Aldric' } }),
+      slot('copper_ore', 15, {
+        materialSources: [
+          { source: {}, count: 10 },
+          { source: { signer: 'Aldric' }, count: 5 },
+        ],
+      }),
     ]);
   });
 
-  it('merges byte-equal instanced payloads and keeps distinct payloads apart', () => {
+  it('combines different legacy signatures with exact surviving bucket counts', () => {
     const inv = [
       slot('copper_ore', 5, { instance: { signer: 'Aldric' } }),
       slot('copper_ore', 5, { instance: { signer: 'Brenna' } }),
@@ -245,8 +285,12 @@ describe('consolidateBagStacks', () => {
     ];
     consolidateBagStacks(inv, lookup, cap);
     expect(inv).toEqual([
-      slot('copper_ore', 10, { instance: { signer: 'Aldric' } }),
-      slot('copper_ore', 5, { instance: { signer: 'Brenna' } }),
+      slot('copper_ore', 15, {
+        materialSources: [
+          { source: { signer: 'Aldric' }, count: 10 },
+          { source: { signer: 'Brenna' }, count: 5 },
+        ],
+      }),
     ]);
   });
 
@@ -264,7 +308,13 @@ describe('consolidateBagStacks', () => {
       slot('copper_ore', 5, { craftedRecipeId: 'r1' }),
     ];
     consolidateBagStacks(inv, lookup, cap);
-    expect(inv).toEqual([slot('copper_ore', 10, { craftedRecipeId: 'r1' }), slot('copper_ore', 5)]);
+    expect(inv).toEqual([
+      slot('copper_ore', 10, {
+        craftedRecipeId: 'r1',
+        materialSources: [{ source: {}, count: 10 }],
+      }),
+      slot('copper_ore', 5, { materialSources: [{ source: {}, count: 5 }] }),
+    ]);
   });
 
   it('lets a legacy overstacked entry donate without ever being split', () => {
@@ -277,7 +327,10 @@ describe('consolidateBagStacks', () => {
     const inv = [slot('copper_ore', 10), slot('copper_ore', -3), slot('copper_ore', 4)];
     consolidateBagStacks(inv, lookup, cap);
     // The corrupt entry neither donates nor vanishes; the honest stacks merge.
-    expect(inv).toEqual([slot('copper_ore', 14), slot('copper_ore', -3)]);
+    expect(inv).toEqual([
+      slot('copper_ore', 14, { materialSources: [{ source: {}, count: 14 }] }),
+      slot('copper_ore', -3),
+    ]);
   });
 
   it('never lets a corrupt non-positive count ABSORB honest units either', () => {
@@ -285,7 +338,10 @@ describe('consolidateBagStacks', () => {
     // deficit leaves 7 and silently destroys three real items.
     const inv = [slot('copper_ore', -3), slot('copper_ore', 10)];
     consolidateBagStacks(inv, lookup, cap);
-    expect(inv).toEqual([slot('copper_ore', -3), slot('copper_ore', 10)]);
+    expect(inv).toEqual([
+      slot('copper_ore', -3),
+      slot('copper_ore', 10, { materialSources: [{ source: {}, count: 10 }] }),
+    ]);
   });
 
   it('treats a non-integer count as corrupt on both sides (never donates, never absorbs)', () => {
@@ -294,15 +350,22 @@ describe('consolidateBagStacks', () => {
     // the honest stacks around it still merge.
     const inv = [slot('copper_ore', 2.5), slot('copper_ore', 10), slot('copper_ore', 4)];
     consolidateBagStacks(inv, lookup, cap);
-    expect(inv).toEqual([slot('copper_ore', 2.5), slot('copper_ore', 14)]);
+    expect(inv).toEqual([
+      slot('copper_ore', 2.5),
+      slot('copper_ore', 14, { materialSources: [{ source: {}, count: 14 }] }),
+    ]);
   });
 
-  it('never merges an instanced target into a later plain donor (the other direction)', () => {
+  it('merges a legacy signed target with a later plain donor', () => {
     const inv = [slot('copper_ore', 5, { instance: { signer: 'Aldric' } }), slot('copper_ore', 5)];
     consolidateBagStacks(inv, lookup, cap);
     expect(inv).toEqual([
-      slot('copper_ore', 5, { instance: { signer: 'Aldric' } }),
-      slot('copper_ore', 5),
+      slot('copper_ore', 10, {
+        materialSources: [
+          { source: {}, count: 5 },
+          { source: { signer: 'Aldric' }, count: 5 },
+        ],
+      }),
     ]);
   });
 
@@ -544,6 +607,85 @@ describe('sortInventoryStacks against the REAL catalog', () => {
       ).toBeLessThan(0);
     }
   });
+
+  it('phase 11l trophy promotion holds in the ladder: adopted trophies rank as junk, holdouts as trash', () => {
+    // categoryRankOf (src/sim/inventory_sort.ts) sends a poor-quality def to
+    // TRASH_RANK before it reads the kind, so promoting the seven trophies to
+    // common moved them out of the tail band and into KIND_RANK.junk, where
+    // every material lives. The ranks are module-private, so each band is
+    // pinned BEHAVIORALLY through compareBagStacks, the exported comparator,
+    // by sandwiching: a real recipe pattern (KIND_RANK.recipe, the rank just
+    // below junk) must sort before every adopted trophy and a real quest item
+    // (KIND_RANK.quest, the rank just above) after it. The sandwich pins the
+    // RANK into the recipe-to-quest band and no further: a trophy flipped to
+    // kind 'recipe' would sit at the pattern's own rank and still pass it,
+    // because at an equal rank the comparator falls through to quality and
+    // the epic pattern sorts before a common trophy on that tiebreak. The
+    // KIND is pinned by the derivation instead (adoptedTrophyIds keeps only
+    // junk-kind reagents), so that flip reds on the derived equality below,
+    // never on the sandwich. A holdout must sort after that quest item and
+    // before a def the lookup cannot resolve (MISSING_DEF_RANK, the last
+    // rank), which only TRASH_RANK satisfies while the KIND_RANK Record stays
+    // total (UNRANKED_KIND_RANK is unreachable).
+    // The adopted list is DERIVED from the shipped rows by the shared
+    // tests/helpers/adopted_trophy_ids.ts (every junk-kind reagent of a
+    // trophy row that no other recipe also consumes) and held equal to the
+    // literal, so a de-adopted trophy (its row dropped or re-picked off it)
+    // reds here too. The chipped tusk left the list when the sixth fix round
+    // output-excluded it, and the bogiron nugget and the cracked fetish when
+    // the 11l QA excluded them the same way: poor again, all three rank as
+    // trash beside the holdouts.
+    const adopted = [
+      'bandit_bandana',
+      'cracked_ogre_tusk',
+      'cracked_wyrm_scale',
+      'emberwing_cinderscale',
+      'mudfin_scale',
+      'old_cragmaws_pelt',
+      'tallow_candle',
+    ] as const;
+    // A do-not-shrink marker, not a pin: it compares the literal to itself
+    // and can only red when someone edits the list above. The derived
+    // equality on the next line is the pin.
+    expect(adopted).toHaveLength(7);
+    expect(adoptedTrophyIds(REAL_ITEMS)).toEqual([...adopted]);
+    // The sandwich neighbours are checked to be what the comment says, so a
+    // content edit to either id cannot hollow the arm out.
+    expect(REAL_ITEMS.pattern_spiritweld_girdle?.kind).toBe('recipe');
+    expect(REAL_ITEMS.boar_hide?.kind).toBe('quest');
+    expect(REAL_ITEMS.mystery_from_the_future).toBeUndefined();
+    const pattern = slot('pattern_spiritweld_girdle');
+    const quest = slot('boar_hide');
+    const missing = slot('mystery_from_the_future');
+    for (const id of adopted) {
+      expect(REAL_ITEMS[id]?.quality, id).toBe('common');
+      expect(
+        compareBagStacks(pattern, slot(id), realLookup),
+        `${id} after the pattern`,
+      ).toBeLessThan(0);
+      expect(
+        compareBagStacks(slot(id), quest, realLookup),
+        `${id} before the quest item`,
+      ).toBeLessThan(0);
+    }
+    for (const id of [
+      'tangled_weed',
+      'soggy_moccasin',
+      'chipped_tusk',
+      'bogiron_nugget',
+      'cracked_fetish',
+    ] as const) {
+      expect(REAL_ITEMS[id]?.quality, id).toBe('poor');
+      expect(
+        compareBagStacks(quest, slot(id), realLookup),
+        `${id} after the quest item`,
+      ).toBeLessThan(0);
+      expect(
+        compareBagStacks(slot(id), missing, realLookup),
+        `${id} before a missing def`,
+      ).toBeLessThan(0);
+    }
+  });
 });
 
 describe('Sim.sortInventory (the command against the real sim)', () => {
@@ -652,16 +794,32 @@ describe('server wiring for inv_sort (source pins)', () => {
   );
 
   it("keeps 'inv_sort' in HEAVY_SELF_CMDS", () => {
-    const start = gameSource.indexOf('const HEAVY_SELF_CMDS = new Set<string>([');
-    expect(start).toBeGreaterThanOrEqual(0);
-    const declaration = gameSource.slice(start, gameSource.indexOf(']);', start));
-    expect(declaration).toContain("'inv_sort'");
+    // The set moved WHOLE to server/heavy_self.ts (an exported leaf) at the
+    // v0.38.0 fourteenth absorb, so the old game.ts source scrape became a
+    // direct membership read: stronger than the regex pin it replaces, and
+    // tests/server/heavy_self.test.ts pins the full set plus the game.ts
+    // import that keeps the policy consumed.
+    expect(HEAVY_SELF_CMDS.has('inv_sort')).toBe(true);
   });
 
   it('dispatches the inv_sort case to sim.sortInventory(pid)', () => {
     const start = gameSource.indexOf("case 'inv_sort':");
     expect(start).toBeGreaterThanOrEqual(0);
     const body = gameSource.slice(start, gameSource.indexOf('break;', start));
-    expect(body).toContain('sim.sortInventory(pid)');
+    expect(body).toContain('dispatchInventoryGroupingCommand(sim, pid, msg)');
+    const calls: (number | undefined)[] = [];
+    dispatchInventoryGroupingCommand(
+      {
+        sortInventory: (pid) => {
+          calls.push(pid);
+        },
+        moveInventoryItem: () => {},
+        separateMaterialStack: () => {},
+        combineMaterialStacks: () => {},
+      },
+      7,
+      { cmd: 'inv_sort' },
+    );
+    expect(calls).toEqual([7]);
   });
 });

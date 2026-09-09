@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { SHARD_LOG_FILE_FLOOR } from '../scripts/lib/ci_shard_weight_harvest_guard.mjs';
 import { parseWeightLines, SKIPPED_FILE_WEIGHT_MS } from '../scripts/lib/ci_shard_weight_parse.mjs';
 
 const harvestIo = vi.hoisted(() => ({
@@ -51,6 +52,36 @@ describe('CI shard weight harvester provenance', () => {
   // Shared rig: a green full-mode run with the 8 shards + 2 lanes, and a
   // fresh execution of the harvester (its whole body runs at import time, so
   // every test must reset the module registry before importing again).
+  /** The same rig, with one shard's log truncated to `files` per-file lines.
+   *  A full-mode `PR tests` shard that parses fewer than SHARD_LOG_FILE_FLOOR
+   *  files is the 2026-08-28 regression that wrote an EMPTY table. */
+  function primeShortShard(files: number) {
+    const jobs = [
+      ...Array.from({ length: 8 }, (_unused, i) => ({
+        id: i + 1,
+        name: `PR tests (${i + 1})`,
+        conclusion: 'success',
+      })),
+      { id: 9, name: 'PR long sims', conclusion: 'success' },
+      { id: 10, name: 'PR gate', conclusion: 'success' },
+    ];
+    const lines = (count: number) =>
+      Array.from(
+        { length: count },
+        (_unused, i) => `\u2713 tests/example_${i}.test.ts (1 test) 20ms`,
+      ).join('\n');
+    let logCall = 0;
+    harvestIo.execFileSync.mockImplementation((_file: string, args: string[]) => {
+      if (args.includes('--json')) return JSON.stringify(jobs);
+      logCall += 1;
+      // The THIRD shard is the short one: a refusal must not depend on the
+      // truncated shard being the first log the harvester reads.
+      const count = logCall === 3 ? files : SHARD_LOG_FILE_FLOOR + 20;
+      return `changes-job decision: mode=full\n${lines(count)}`;
+    });
+    harvestIo.writeFileSync.mockClear();
+  }
+
   function primeGreenRun() {
     const jobs = [
       ...Array.from({ length: 8 }, (_, i) => ({
@@ -61,10 +92,20 @@ describe('CI shard weight harvester provenance', () => {
       { id: 9, name: 'PR long sims', conclusion: 'success' },
       { id: 10, name: 'PR gate', conclusion: 'success' },
     ];
+    // The per-file lines have to clear the harvester's short-shard floor: a
+    // full-mode `PR tests` shard that parses fewer than SHARD_LOG_FILE_FLOOR files
+    // is a reporter or fetch regression, and the harvester refuses to write the
+    // table at all (scripts/lib/ci_shard_weight_harvest_guard.mjs). These cases
+    // are about the provenance advisory, not about shard size, so the rig hands
+    // each shard a plausible number of files. Do not shrink it back to one.
+    const fileLines = Array.from(
+      { length: SHARD_LOG_FILE_FLOOR + 20 },
+      (_unused, i) => `\u2713 tests/example_${i}.test.ts (1 test) 20ms`,
+    ).join('\n');
     harvestIo.execFileSync.mockImplementation((_file: string, args: string[]) =>
       args.includes('--json')
         ? JSON.stringify(jobs)
-        : 'changes-job decision: mode=full\n\u2713 tests/example.test.ts (1 test) 20ms',
+        : `changes-job decision: mode=full\n${fileLines}`,
     );
     harvestIo.writeFileSync.mockClear();
   }
@@ -82,32 +123,43 @@ describe('CI shard weight harvester provenance', () => {
     }
   }
 
-  it('warns before replacing the checked-in mergedLocal/mergedFiles rows', async () => {
+  it('reports the checked-in carried rows before replacing them', async () => {
     primeGreenRun();
     harvestIo.readFileSync.mockReturnValue(
       JSON.stringify({
         __provenance: {
           run: '32621561241',
-          mergedLocal: '2026-08-24',
-          mergedFiles: 46,
+          harvested: '2026-08-23',
+          files: 3,
+          harvestedFiles: 1,
+          carried: {
+            'tests/local.test.ts': {
+              ms: 20,
+              method: 'local-median',
+              measured: '2026-08-24',
+              reason: 'pending harvest',
+              runs: [19, 20, 21],
+            },
+            'tests/backfill.test.ts': { ms: 7, method: 'prose-backfill' },
+          },
+          backfill: { date: '2026-08-31', note: 'legacy carry batch attribution' },
         },
       }),
     );
     const logs = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
     await runHarvester();
 
     const replacement = logs.mock.calls
       .map(([line]) => String(line))
-      .find((line) => line.includes('locally measured rows'));
-    expect(replacement).toContain('46 locally measured rows');
-    expect(replacement).toContain('2026-08-24');
+      .find((line) => line.includes('carried weights'));
+    expect(replacement).toContain('2 carried weights');
+    expect(warns).not.toHaveBeenCalled();
     expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();
   });
 
   it('speaks up on an unrecognized provenance shape instead of a silent discard', async () => {
-    // A THIRD local-merge shape (neither sibling mergedLocal/mergedFiles nor
-    // nested localMerge) used to fall through the ?? chain and the bare
-    // catch, printing NOTHING while the rewrite discarded its rows.
+    // An unknown provenance shape must warn before the rewrite discards it.
     primeGreenRun();
     harvestIo.readFileSync.mockReturnValue(
       JSON.stringify({
@@ -129,24 +181,58 @@ describe('CI shard weight harvester provenance', () => {
     // Names the shape it could not parse and the consequence.
     expect(warning).toContain('merged');
     expect(warning).toContain('DISCARDS');
-    // The known-shape advisory must NOT also fire.
+    // The current-schema advisory must NOT also fire.
     expect(
-      logs.mock.calls
-        .map(([line]) => String(line))
-        .find((l) => l.includes('locally measured rows')),
+      logs.mock.calls.map(([line]) => String(line)).find((l) => l.includes('carried weights')),
     ).toBeUndefined();
     // The rewrite itself still proceeds: the arm warns, it does not block.
     expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();
   });
 
+  it('writes NOTHING when one shard parses under the floor', async () => {
+    // The floor's placement is pinned by source text in
+    // tests/ci_shard_weight_harvest_guard.test.ts, and source text cannot see
+    // whether the refusal is REACHED: neutering the condition to `if (false &&
+    // !verdict.ok)` leaves that pin green and ships the empty-table bug again.
+    // This case runs the harvester and asserts the table is not written.
+    primeShortShard(SHARD_LOG_FILE_FLOOR - 1);
+    harvestIo.readFileSync.mockReturnValue(JSON.stringify({ __provenance: { run: '1' } }));
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const exited = new Error('process.exit');
+    const exit = vi.spyOn(process, 'exit').mockImplementation(() => {
+      throw exited;
+    });
+    await expect(runHarvester()).rejects.toBe(exited);
+    expect(exit).toHaveBeenCalledWith(1);
+    expect(harvestIo.writeFileSync).not.toHaveBeenCalled();
+    // And it says why, so the operator is not left with a silent no-op.
+    expect(errors.mock.calls.map(([line]) => String(line)).join('\n')).toContain('floor');
+  });
+
+  it('writes the table when every shard clears the floor exactly', async () => {
+    // The other arm of the same boundary: at the floor, not under it, the
+    // harvest proceeds. Without this a refusal that fired on EVERY run would
+    // satisfy the case above.
+    primeShortShard(SHARD_LOG_FILE_FLOOR);
+    harvestIo.readFileSync.mockReturnValue(JSON.stringify({ __provenance: { run: '1' } }));
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    await runHarvester();
+    expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();
+  });
+
   it('stays silent on the plain-harvest provenance this script writes itself', async () => {
-    // A prior table with ONLY run/harvested/files carries no locally measured
-    // rows, so neither the advisory nor the unrecognized-shape warning should
-    // fire (a warning here would cry wolf on every routine re-harvest).
+    // A prior table with no carried rows needs neither advisory nor warning.
     primeGreenRun();
     harvestIo.readFileSync.mockReturnValue(
       JSON.stringify({
-        __provenance: { run: '32621561241', harvested: '2026-08-23', files: 3188 },
+        __provenance: {
+          run: '32621561241',
+          harvested: '2026-08-23',
+          files: 1,
+          harvestedFiles: 1,
+          carried: {},
+        },
       }),
     );
     const logs = vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -154,9 +240,7 @@ describe('CI shard weight harvester provenance', () => {
     await runHarvester();
 
     expect(
-      logs.mock.calls
-        .map(([line]) => String(line))
-        .find((l) => l.includes('locally measured rows')),
+      logs.mock.calls.map(([line]) => String(line)).find((l) => l.includes('carried weights')),
     ).toBeUndefined();
     expect(warns.mock.calls).toHaveLength(0);
     expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();

@@ -1,10 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  type DesktopPlatform,
   dismissGpuNotice,
   formatGpuNoticeSignature,
   GPU_NOTICE_COMPONENTS,
   type GpuNoticeComponent,
+  type GpuNoticeVerdict,
   gpuNoticeBodyKey,
   gpuNoticeComponents,
   gpuNoticeVerdictsEqual,
@@ -14,20 +16,27 @@ import {
   resolveGpuNotice,
 } from '../src/ui/gpu_notice_view';
 
-// The notice carries THREE independent components (software rendering, the
-// desktop shell's inactive-dedicated-GPU verdict, and the browser-only
-// hybrid-GPU-likely verdict), so every dimension gets a decisive case:
+// The notice carries FOUR independent components (software rendering, the
+// desktop shell's inactive-dedicated-GPU verdict, the browser-only
+// hybrid-GPU-likely verdict, and the Linux shell rescuing the launch off the
+// backend the player picked), so every dimension gets a decisive case:
 // component arming, the dismissal signature round trip, the legacy values
 // shipped installs already stored ('1' on the signature key, and the separate
 // v0.36.0 hybrid key surfaced as legacyHybridDismissed), the subset rule that
 // decides re-nag vs re-arm, and the body-copy precedence.
 
-const NONE = { softwareRendering: false, discreteInactive: false, hybridGpuLikely: false };
+const NONE = {
+  softwareRendering: false,
+  discreteInactive: false,
+  hybridGpuLikely: false,
+  requestedBackendUnavailable: false,
+};
 const SOFTWARE = { ...NONE, softwareRendering: true };
 const DISCRETE = { ...NONE, discreteInactive: true };
 const HYBRID = { ...NONE, hybridGpuLikely: true };
 const SOFTWARE_AND_DISCRETE = { ...NONE, softwareRendering: true, discreteInactive: true };
 const SOFTWARE_AND_HYBRID = { ...NONE, softwareRendering: true, hybridGpuLikely: true };
+const REQUESTED_BACKEND = { ...NONE, requestedBackendUnavailable: true };
 
 // resolveGpuNotice with no stored dismissals unless a case overrides them.
 const FRESH = { dismissedSignature: '', legacyHybridDismissed: false };
@@ -40,6 +49,13 @@ describe('gpuNoticeComponents', () => {
     expect(gpuNoticeComponents(HYBRID)).toEqual(['hybrid']);
     expect(gpuNoticeComponents(SOFTWARE_AND_DISCRETE)).toEqual(['discrete-inactive', 'software']);
     expect(gpuNoticeComponents(SOFTWARE_AND_HYBRID)).toEqual(['hybrid', 'software']);
+    expect(gpuNoticeComponents(REQUESTED_BACKEND)).toEqual(['requested-backend']);
+    // Its own component, so its own dismissal: a player who dismissed the
+    // hardware notice months ago must still be told their backend fell back.
+    expect(gpuNoticeComponents({ ...REQUESTED_BACKEND, softwareRendering: true })).toEqual([
+      'requested-backend',
+      'software',
+    ]);
   });
 });
 
@@ -301,5 +317,32 @@ describe('the capture helper suppresses every component, not just software', () 
     );
     // And that value really does cover every component.
     expect(parseGpuNoticeSignature(full).sort()).toEqual([...GPU_NOTICE_COMPONENTS].sort());
+  });
+
+  it('gives the backend fallback its own body, and yields to the hardware ones', () => {
+    // The other three say the hardware is not being used properly, which is the
+    // more urgent read when both fire. This one is a setting that did not take
+    // on a session that is otherwise fine, so it comes last.
+    const at = (verdict: GpuNoticeVerdict, desktopPlatform: DesktopPlatform = 'linux') =>
+      gpuNoticeBodyKey({ desktopShell: true, desktopPlatform, verdict });
+    expect(at(REQUESTED_BACKEND)).toBe('gpuNotice.bodyRequestedBackend');
+    expect(at({ ...REQUESTED_BACKEND, softwareRendering: true })).toBe('gpuNotice.bodyDesktop');
+    expect(at({ ...REQUESTED_BACKEND, discreteInactive: true })).toBe(
+      'gpuNotice.bodyDiscreteInactive',
+    );
+    expect(at({ ...REQUESTED_BACKEND, hybridGpuLikely: true })).toBe('gpuNotice.hybridBodyLinux');
+    // And it never displaces a hybrid body on the platforms that have their own.
+    expect(at({ ...REQUESTED_BACKEND, hybridGpuLikely: true }, 'win')).toBe(
+      'gpuNotice.hybridBodyWindows',
+    );
+  });
+
+  it('merges and compares the backend fallback like every other component', () => {
+    // A late shell push arms it, and the equality that decides whether to
+    // re-render must see it, or the notice would never update for it.
+    expect(mergeGpuNoticeVerdicts(NONE, REQUESTED_BACKEND).requestedBackendUnavailable).toBe(true);
+    expect(mergeGpuNoticeVerdicts(REQUESTED_BACKEND, NONE).requestedBackendUnavailable).toBe(true);
+    expect(gpuNoticeVerdictsEqual(NONE, REQUESTED_BACKEND)).toBe(false);
+    expect(gpuNoticeVerdictsEqual(REQUESTED_BACKEND, REQUESTED_BACKEND)).toBe(true);
   });
 });

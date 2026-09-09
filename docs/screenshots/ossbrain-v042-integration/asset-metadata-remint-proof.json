@@ -1,0 +1,242 @@
+[
+  {
+    "file": "public/models/props/eastbrook_bank.glb",
+    "bytes": 52508,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_smithy.glb",
+    "bytes": 40352,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_inn.glb",
+    "bytes": 67768,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_chapel.glb",
+    "bytes": 66132,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_weaving_workshop.glb",
+    "bytes": 40392,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_toolworks.glb",
+    "bytes": 39920,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_market_stall.glb",
+    "bytes": 27072,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_wall_wing.glb",
+    "bytes": 8352,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_civic_well_beacon.glb",
+    "bytes": 13216,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_grand_armoury.glb",
+    "bytes": 137012,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/eastbrook_noticeboard.glb",
+    "bytes": 24684,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/mailbox_pillar.glb",
+    "bytes": 32884,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/mounts/terrorspark_groundshaker.glb",
+    "bytes": 1161436,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/weapons/tome_silverleaf.glb",
+    "bytes": 11136,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/weapons/tome_goldleaf.glb",
+    "bytes": 12948,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/weapons/tome_sunpetal.glb",
+    "bytes": 13956,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/weapons/tome_voidbound.glb",
+    "bytes": 16556,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_warden_gatehouse.glb",
+    "bytes": 141848,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_crooked_reed_inn.glb",
+    "bytes": 149080,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_lantern_chapel.glb",
+    "bytes": 107392,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_moonwort_apothecary.glb",
+    "bytes": 104468,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_gilded_strongbox.glb",
+    "bytes": 69908,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_hesk_tannery.glb",
+    "bytes": 198908,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_scout_lodge.glb",
+    "bytes": 110556,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_mirelight_cistern.glb",
+    "bytes": 48940,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_provision_stall.glb",
+    "bytes": 26332,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_palisade_wing.glb",
+    "bytes": 15680,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_gate_arch.glb",
+    "bytes": 24276,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_boardwalk.glb",
+    "bytes": 9264,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/fenbridge_muster_board.glb",
+    "bytes": 17480,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/quest/fenbridge_muster_order.glb",
+    "bytes": 6888,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_bed.glb",
+    "bytes": 6880,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_sprout.glb",
+    "bytes": 5168,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_grain_stage2.glb",
+    "bytes": 5248,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_rootleaf_stage2.glb",
+    "bytes": 8792,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_gourd_stage2.glb",
+    "bytes": 9580,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_grain_stage3.glb",
+    "bytes": 10988,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_rootleaf_stage3.glb",
+    "bytes": 17776,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_gourd_stage3.glb",
+    "bytes": 16460,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_grain_stage4.glb",
+    "bytes": 12212,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_rootleaf_stage4.glb",
+    "bytes": 22308,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_gourd_stage4.glb",
+    "bytes": 16740,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_grain_withered.glb",
+    "bytes": 9656,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_rootleaf_withered.glb",
+    "bytes": 11724,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_gourd_withered.glb",
+    "bytes": 13872,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_compost_bin.glb",
+    "bytes": 7440,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_feast.glb",
+    "bytes": 15644,
+    "onlyFingerprintChanged": true
+  },
+  {
+    "file": "public/models/props/farm_feast_apex.glb",
+    "bytes": 17712,
+    "onlyFingerprintChanged": true
+  }
+]

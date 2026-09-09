@@ -51,7 +51,11 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     meta.delveLoreUnlocked = new Set(['lore_1']);
     meta.delveDaily = { date: '2026-06-26', firstClearXp: new Set(['crypt']), markClears: 2 };
     meta.bank.inventory = [
-      { itemId: 'linen_scrap', count: 9 },
+      // linen_scrap is a material: its canonical anonymous composition is an
+      // explicit materialSources row, not a bare count, so the hand-stuffed
+      // row already matches what a load normalizes it to and the round trip
+      // stays byte-identical.
+      { itemId: 'linen_scrap', count: 9, materialSources: [{ source: {}, count: 9 }] },
       { itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } },
     ];
     meta.bank.purchasedSlots = 6;
@@ -119,6 +123,23 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
       'lifetimeXp',
       'restedXp',
       'bank',
+      // The later optional blocks, added by the Phase 11d QA migration review.
+      // A fresh seed character omits most of these anyway, so listing them costs
+      // nothing today; the point is that this list is the "oldest production
+      // save" model, and a field left off it is a field this arm silently stops
+      // modelling the moment a seed character does start carrying it.
+      'heroicDaily',
+      'reliquary',
+      'deeds',
+      'farmPlots',
+      'craftDaily',
+      'wyrmfallDaily',
+      'emberWeekAnchor',
+      // The release/v0.41.0 Materials Vault block (added at the seventh sync
+      // merge): serializeCharacter emits it unconditionally, so the oldest
+      // production save must strip it here or the arm silently stops
+      // modelling a vault-less load.
+      'vault',
     ]) {
       delete legacy[key];
     }
@@ -149,6 +170,9 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
       socketBags: [null, null, null, null],
       appliedStorageKeys: [],
     });
+    // A vault-less save loads to the defaulted locked vault and re-saves in
+    // the pre-feature sparse shape (empty stock, no special list, rung 0).
+    expect(sim2.serializeCharacter(pid)?.vault).toEqual({ stock: {}, upgrades: 0 });
     // re-serializing a defaulted character does not throw and fills the new fields.
     expect(() => sim2.serializeCharacter(pid)).not.toThrow();
     expect(sim2.serializeCharacter(pid)!.delveMarks).toBe(0);

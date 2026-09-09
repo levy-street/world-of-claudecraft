@@ -59,6 +59,13 @@ function link(title, label = title) {
   return title === label ? '[[' + title + ']]' : '[[' + title + '|' + label + ']]';
 }
 
+function kindWording(kind) {
+  // kind 'recipe' is the physical PATTERN item (it teaches a recipe when
+  // used), so prose, facts, and categories say 'pattern': an item page must
+  // never read as the recipe it teaches. Every other kind is its own word.
+  return kind === 'recipe' ? 'pattern' : kind;
+}
+
 function section(title, body) {
   return '== ' + title + ' ==\\n' + body.trim() + '\\n\\n';
 }
@@ -124,12 +131,12 @@ World of Claudecraft is a browser-playable, classic-style micro-MMO with online 
 </div>
 </div>
 \` + section('Featured portals', bullets([
-  link('Zones') + ' — Eastbrook Vale, Mirefen Marsh, Thornpeak Heights.',
-  link('Classes') + ' — all nine playable class kits.',
-  link('Quests') + ' — the full source-defined quest chain.',
-  link('Dungeons') + ' — Hollow Crypt, Sunken Bastion, and Gravewyrm Sanctum.',
-  link('Community Lore') + ' — launch-week player culture from Discord, Reddit, and X.',
-  link('Development Timeline') + ' — issue, PR, and release themes.',
+  link('Zones') + ': Eastbrook Vale, Mirefen Marsh, Thornpeak Heights.',
+  link('Classes') + ': all nine playable class kits.',
+  link('Quests') + ': the full source-defined quest chain.',
+  link('Dungeons') + ': Hollow Crypt, Sunken Bastion, and Gravewyrm Sanctum.',
+  link('Community Lore') + ': launch-week player culture from Discord, Reddit, and X.',
+  link('Development Timeline') + ': issue, PR, and release themes.',
 ])), ['Wiki']);
 
 add('Quick Start', section('First hour route', bullets([
@@ -144,9 +151,9 @@ add('Quick Start', section('First hour route', bullets([
 ])), ['Guides']);
 
 add('The Gravecaller Saga', section('Overview', 'The main story follows Brother Aldric from restless bones outside Eastbrook to Korzul the Gravewyrm beneath Thornpeak.') + section('Acts', bullets([
-  link(titleBy.zone.get('eastbrook_vale'), 'Eastbrook Vale') + ' — Morthen the Gravecaller and ' + link(titleBy.dungeon.get('hollow_crypt'), 'The Hollow Crypt') + '.',
-  link(titleBy.zone.get('mirefen_marsh'), 'Mirefen Marsh') + ' — Vael the Fogbinder and ' + link(titleBy.dungeon.get('sunken_bastion'), 'The Sunken Bastion') + '.',
-  link(titleBy.zone.get('thornpeak_heights'), 'Thornpeak Heights') + ' — Wyrmcult zealots, Highwatch, and ' + link(titleBy.dungeon.get('gravewyrm_sanctum'), 'Gravewyrm Sanctum') + '.',
+  link(titleBy.zone.get('eastbrook_vale'), 'Eastbrook Vale') + ': Morthen the Gravecaller and ' + link(titleBy.dungeon.get('hollow_crypt'), 'The Hollow Crypt') + '.',
+  link(titleBy.zone.get('mirefen_marsh'), 'Mirefen Marsh') + ': Vael the Fogbinder and ' + link(titleBy.dungeon.get('sunken_bastion'), 'The Sunken Bastion') + '.',
+  link(titleBy.zone.get('thornpeak_heights'), 'Thornpeak Heights') + ': Broodsworn zealots, Highwatch, and ' + link(titleBy.dungeon.get('gravewyrm_sanctum'), 'Gravewyrm Sanctum') + '.',
 ])), ['Lore', 'Quests']);
 
 add('Community Lore', section('Launch-week myths', bullets([
@@ -199,7 +206,7 @@ const systemRows = [
   ['Mobile Play', 'Touch controls, joystick fixes, quest-log access, fullscreen polish, and launch-week mobile testing.'],
   ['Agents and Bots', 'Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.'],
 ];
-add('Gameplay Systems', section('Systems index', bullets(systemRows.map(([name, desc]) => link(name) + ' — ' + desc))), ['Systems']);
+add('Gameplay Systems', section('Systems index', bullets(systemRows.map(([name, desc]) => link(name) + ': ' + desc))), ['Systems']);
 for (const [name, desc] of systemRows) {
   add(name, section('Overview', desc), ['Systems']);
 }
@@ -264,9 +271,9 @@ for (const [id, mob] of Object.entries(MOBS)) {
 }
 
 for (const [id, item] of Object.entries(ITEMS)) {
-  add(titleBy.item.get(id), section('Overview', item.name + ' is a ' + (item.quality ?? 'common') + ' ' + item.kind + (item.slot ? ' for ' + item.slot : '') + '.') + section('Facts', table([
-    ['Kind', item.kind], ['Quality', item.quality ?? 'common'], ['Slot', item.slot ?? 'None'], ['Sell value', money(item.sellValue)], ['Buy value', money(item.buyValue)], ['Required class', item.requiredClass?.join(', ') ?? 'Any'],
-  ])) + (item.weapon ? section('Weapon', table([['Damage', item.weapon.min + '-' + item.weapon.max], ['Speed', String(item.weapon.speed)], ['Dagger', item.weapon.dagger ? 'Yes' : 'No']])) : '') + (item.stats ? section('Stats', table(Object.entries(item.stats).map(([k, v]) => [k.toUpperCase(), String(v)]))) : '') + (item.foodHp || item.drinkMana ? section('Consumable', table([['Health restored', String(item.foodHp ?? 0)], ['Mana restored', String(item.drinkMana ?? 0)]])) : ''), ['Items', item.kind, item.quality ?? 'common']);
+  add(titleBy.item.get(id), section('Overview', item.name + ' is a ' + (item.quality ?? 'common') + ' ' + kindWording(item.kind) + (item.slot ? ' for ' + item.slot : '') + '.') + section('Facts', table([
+    ['Kind', kindWording(item.kind)], ['Quality', item.quality ?? 'common'], ['Slot', item.slot ?? 'None'], ['Sell value', money(item.sellValue)], ['Buy value', money(item.buyValue)], ['Required class', item.requiredClass?.join(', ') ?? 'Any'],
+  ])) + (item.weapon ? section('Weapon', table([['Damage', item.weapon.min + '-' + item.weapon.max], ['Speed', String(item.weapon.speed)], ['Dagger', item.weapon.dagger ? 'Yes' : 'No']])) : '') + (item.stats ? section('Stats', table(Object.entries(item.stats).map(([k, v]) => [k.toUpperCase(), String(v)]))) : '') + (item.foodHp || item.drinkMana ? section('Consumable', table([['Health restored', String(item.foodHp ?? 0)], ['Mana restored', String(item.drinkMana ?? 0)]])) : ''), ['Items', kindWording(item.kind), item.quality ?? 'common']);
 }
 
 for (const [id, ability] of visibleAbilities) {

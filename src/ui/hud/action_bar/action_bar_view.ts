@@ -53,6 +53,7 @@ import { priestActionGlowActive } from '../../../sim/combat/priest/presentation'
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
+import { countRawInSlots } from '../../../sim/item_lock';
 import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
   type AbilityDef,
@@ -98,6 +99,7 @@ const NEXT_CAST_CHEAP: AuraKind = 'next_cast_cheap';
 const SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.slotAria';
 const EMPTY_SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.emptySlotAria';
 const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
+const UNAVAILABLE_ARIA_KEY: TranslationKey = 'abilityUi.tooltip.unavailable';
 const ASCENSION_SPENDER_ARIA_KEY: TranslationKey = 'hudChrome.paladin.ascensionSpenderAria';
 const PROC_ARIA_KEY: TranslationKey = 'guide.glossary.procTerm';
 const FATE_CONSUME_READY_ARIA_KEY: TranslationKey = 'hudChrome.warlock.fateThreadsConsumeReady';
@@ -114,7 +116,7 @@ export interface ActionBarAbility {
    *  Ice Block); total max = 1 + bonusCharges. undefined = 0. */
   bonusCharges?: number;
   /** Cooldown map key when a cooldown-carrying transform shares the base
-   *  button's clock (Swiftmend/Overbloom); the sweep must read the same key
+   *  button's clock (Fleetmend/Overbloom); the sweep must read the same key
    *  the sim gate checks, or a running shared clock is invisible while the
    *  button is transformed. */
   cooldownId?: string;
@@ -123,6 +125,18 @@ export interface ActionBarAbility {
    *  read by the sim's cast gate; the bar must read it too or the talent's one
    *  button paints unusable while the cast it refuses to advertise succeeds. */
   ignoreStealthRequirement?: boolean;
+  /** False when this slot is bound to a real ability the ACTIVE build does not
+   *  currently grant. Undefined/true means the normal case (every other caller
+   *  only ever supplies a currently-known ability). The one legitimate source is
+   *  the freed Attack slot (barSlot 0, "Show Attack Button" off): it is
+   *  deliberately not scoped to any one talent build (ActionBarController.
+   *  loadAttackAction), so its assignment can outlive a build switch. Without
+   *  this flag the slot fell through the ability===null branch below and
+   *  painted fully empty the instant a non-granting build went active, which
+   *  looked exactly like the assignment being cleared even though it survives
+   *  in storage. Skips the live cost/cooldown/proc math (none of it applies to
+   *  an ability the player cannot currently cast) and forces the slot unusable. */
+  known?: boolean;
 }
 
 /** The aura fields the bar reads to derive proc glows and next-cast empowerment. */
@@ -132,7 +146,7 @@ export interface ActionBarAuraInput {
   kind: AuraKind;
   value?: number;
   empowerAbilities?: readonly string[];
-  /** Stacks, for a stack-gated ability (Glacial Spike needs 5 Icicles). */
+  /** Stacks, for a stack-gated ability (Rimeneedle needs 5 Icicles). */
   stacks?: number;
 }
 
@@ -403,21 +417,6 @@ export function actionBarCooldownRemaining(
   return player.cooldowns.get(ability.cooldownId ?? abilityId) ?? 0;
 }
 
-/** How many of `itemId` the player is carrying, summed across stacks. Exported
- *  because the consumables seat needs the same number for its tooltip's in-bags
- *  line, off the same snapshot the bar state is built from. */
-export function inventoryCount(
-  inventory: readonly { itemId: string; count: number }[],
-  itemId: string,
-): number {
-  // A for-loop, not reduce: no per-frame closure allocation on the hot path.
-  let total = 0;
-  for (const slot of inventory) {
-    if (slot.itemId === itemId) total += slot.count;
-  }
-  return total;
-}
-
 /**
  * Build an action-bar view bound to one descriptor. The per-slot state array is
  * preallocated once here; tick() mutates it in place and returns the SAME references
@@ -534,7 +533,7 @@ export function createActionBarView(
         }
 
         if (item !== null) {
-          const count = inventoryCount(world.inventory, item.id);
+          const count = countRawInSlots(world.inventory, item.id);
           // Potions share one global cooldown, so any potion slot paints the same
           // swipe; other items have no cooldown.
           const potionCd = item.kind === 'potion' ? player.potionCdRemaining : 0;
@@ -578,6 +577,41 @@ export function createActionBarView(
         // ability (the only remaining kind: item was null, so ability is non-null;
         // this guard mirrors the former `if (!known) continue` and narrows the type).
         if (ability === null) continue;
+
+        // Bound to a real ability, but not one the active build currently grants
+        // (the freed Attack slot only, see ActionBarAbility.known): paint the icon
+        // dimmed and unusable instead of running the live cost/cooldown/proc math,
+        // which has no meaning for an ability the player cannot press right now.
+        if (ability.known === false) {
+          slot.kind = 'ability';
+          slot.abilityId = ability.def.id;
+          slot.itemId = null;
+          slot.iconKey = `${ABILITY_ICON_PREFIX}${ability.def.id}`;
+          slot.cooldownRemaining = 0;
+          slot.cooldownTotal = 0;
+          slot.cooldownPercent = 0;
+          slot.cdText = '';
+          slot.count = '';
+          slot.isCharges = false;
+          slot.rechargePercent = 0;
+          slot.usable = false;
+          slot.outOfRange = false;
+          slot.queued = false;
+          slot.procGlow = false;
+          slot.empowered = false;
+          slot.ascensionSpender = false;
+          slot.ascensionCostLabel = '';
+          slot.fateConsumeReady = false;
+          slot.fateSentenceReady = false;
+          slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
+            slot: slotLabel,
+            ability: deps.abilityName(ability.def),
+          });
+          slot.ariaDescription = deps.t(UNAVAILABLE_ARIA_KEY);
+          slot.keybindLabel = sd.keybindLabel();
+          continue;
+        }
+
         const def = ability.def;
         const dawnsWrathActive = dawnsWrathHammerActive(player, def.id);
         const solarReprisalActive = solarReprisalAbilityGlowActive(player, def.id);
@@ -649,7 +683,7 @@ export function createActionBarView(
           player.auras,
           cheapCostMultiplier === null ? ability.cost : ability.cost * cheapCostMultiplier,
         );
-        // A kill-window ability (Victory Rush): usable only while its enabling
+        // A kill-window ability (Victor's Surge): usable only while its enabling
         // aura is worn, and it glows while the window is open.
         let windowOpen = true;
         let windowGlow = false;

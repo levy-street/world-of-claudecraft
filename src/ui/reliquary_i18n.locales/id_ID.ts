@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Heroik: The Inner Crucible',
     desc: 'Perisai dan senjata khusus mode heroik dari Varkhul, Forgefather of the Last Flame.',
   },
+  conquerors_set_bramblehide: {
+    name: 'Kulit Semak Duri Roots',
+    desc: 'Keluarga kulit Bramblehide yang lengkap.',
+  },
 };

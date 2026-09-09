@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Nightbloomie.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Kragi na ksiezycowej studni',
     desc: 'Zlow rybe w wodach Nightbloomu.',
   },
   chr_wraithwood_gatherer: {
@@ -187,7 +186,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Mistrz Łąk', desc: 'Osiągnij 100 biegłości w Zielarstwie.' },
   prog_master_gatherer: {
     name: 'Mistrz Zbieractwa',
-    desc: 'Osiągnij 100 biegłości w dowolnych trzech spośród Górnictwa, Drwalnictwa, Zielarstwa i Wędkarstwa.',
   },
   prog_first_craft: { name: 'Własnoręczna Robota', desc: 'Ukończ swój pierwszy udany wyrób.' },
   prog_craft_specialist: {
@@ -301,7 +299,6 @@ export const table: DeedLocaleTable = {
     title: 'Żmijobójca',
   },
   dgn_sanctum_speed: {
-    name: 'Sprint przez Sanktuarium',
     desc: 'Pokonaj Korzula Grobowego Żmija w ciągu 15 minut od zajęcia Sanktuarium Grobowego Żmija przez twoją drużynę.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -367,7 +364,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Dzwony milkną',
-    desc: 'Pokonaj Diakona Varrica tak, aby każdy wskrzeszony przez niego Pogrzebowy Dzwonnik poległ przed nim.',
+    desc: 'Pokonaj Diakona Vandrica tak, aby każdy wskrzeszony przez niego Pogrzebowy Dzwonnik poległ przed nim.',
   },
   dlv_nhalia_bells: {
     name: 'Uciszyciel Dzwonów',
@@ -380,7 +377,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Kronika Doliny, rozdział II',
-    desc: 'Ukończ drugi rozdział kroniki Saula: wytęp bandytów, murloki i kopalniane szkodniki, rozegraj mecz na Maciorowym Błoniu i staw czoła Relikwiarzowi.',
   },
   chr_vale_chapter_iii: {
     name: 'Kronika Doliny',
@@ -398,7 +394,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Pogromca Watahy', desc: 'Zabij 3 Leśne Wilki w ciągu 10 sekund.' },
   chr_vale_cup_debut: {
     name: 'Pretendent do Miedzianego Wiadra',
-    desc: 'Wyjdź na boisko i dotknij piłki w meczu Pucharu Doliny na Maciorowym Błoniu.',
   },
   chr_vale_rares: {
     name: 'Zgrozy Doliny',
@@ -443,12 +438,11 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Kronika Ciernistego Szczytu',
-    desc: 'Doprowadź historię góry do końca: Kult Żmija rozbity, Sanktuarium uciszone, Budzący się Szczyt powalony, a każda z osławionych zgróz turni pokonana.',
     title: 'z Ciernistego Szczytu',
   },
   chr_peaks_sparring: {
     name: 'Musztra na murach',
-    desc: 'Zadaj łącznie 1000 punktów obrażeń manekinowi treningowemu nad Wysoką Strażnicą.',
+    desc: 'Zadaj łącznie 1000 punktów obrażeń manekinowi treningowemu.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Zimna woda, zimniejsze światło',
@@ -535,7 +529,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stały klient',
-    desc: 'Odkryj wszystkie dziesięć przedmiotów z zapasów Kwatermistrza Vexa.',
+    desc: 'Odkryj wszystkie dziesięć części ekwipunku z zapasów Kwatermistrza Vexa.',
   },
   col_glimmerfin: {
     name: 'Promyk nadziei',
@@ -589,66 +583,51 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Buty na murawie',
-    desc: 'Rozegraj pełny mecz Pucharu Doliny na Maciorowym Błoniu, wygrany czy przegrany.',
   },
-  pvp_vcup_first_win: { name: 'Pierwsze trofeum', desc: 'Wygraj rankingowy mecz Pucharu Doliny.' },
+  pvp_vcup_first_win: { name: 'Pierwsze trofeum' },
   pvp_vcup_wins_10: {
     name: 'Wyjadacz dziczego balonu',
-    desc: 'Wygraj 10 rankingowych meczów Pucharu Doliny.',
   },
   pvp_vcup_wins_25: {
     name: 'Legenda dziczego balonu',
-    desc: 'Wygraj 25 rankingowych meczów Pucharu Doliny.',
     title: 'Legenda dziczego balonu',
   },
   pvp_vcup_first_goal: {
     name: 'Na listę strzelców',
-    desc: 'Zdobądź gola w rankingowym meczu Pucharu Doliny.',
   },
   pvp_vcup_hat_trick: {
     name: 'Bohater hat-tricka',
-    desc: 'Zdobądź trzy gole w jednym rankingowym meczu Pucharu Doliny, w lidze 3v3 lub większej.',
   },
   pvp_vcup_golden_goal: {
     name: 'Złota chwila',
-    desc: 'Strzel złotego gola, który rozstrzyga rankingowy mecz Pucharu Doliny.',
   },
   pvp_vcup_first_save: {
     name: 'Pewne ręce',
-    desc: 'Obroń strzał jako bramkarz w rankingowym meczu Pucharu Doliny.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Mur nie do przebicia',
-    desc: 'Wygraj rankingowy mecz Pucharu Doliny jako bramkarz, nie wpuszczając ani jednego gola.',
   },
   pvp_vcup_guild_win: {
     name: 'Za sztandar!',
-    desc: 'Wygraj rankingowy mecz Pucharu Doliny, grając pod sztandarem swojej gildii.',
   },
   pvp_fiesta_first_bout: {
     name: 'Nieproszony gość',
-    desc: 'Stocz pełne starcie Fiesty 2v2, wygrane czy przegrane.',
   },
-  pvp_fiesta_first_win: { name: 'Dusza Fiesty', desc: 'Wygraj starcie Fiesty 2v2.' },
+  pvp_fiesta_first_win: { name: 'Dusza Fiesty' },
   pvp_fiesta_double: {
     name: 'Podwójny kłopot',
-    desc: 'Zalicz dwa powalenia w Fieście w ciągu czterech sekund.',
   },
   pvp_fiesta_shutdown: {
     name: 'Koniec imprezy',
-    desc: 'Powal w Fieście przeciwnika, który ma serię trzech lub więcej powaleń.',
   },
   pvp_fiesta_full_build: {
     name: 'Strój na okazję',
-    desc: 'Wygraj starcie Fiesty, mając zatwierdzone ulepszenie z każdej z trzech fal.',
   },
   pvp_fiesta_powerups: {
     name: 'Po jednym z każdego',
-    desc: 'Podnieś przynajmniej raz każde z czterech wzmocnień ringu: Demona Prędkości, Kolosa, Księżycowe Buty i Berserkera.',
   },
   pvp_fiesta_five_kills: {
     name: 'Cała impreza na barkach',
-    desc: 'Zalicz pięć powaleń w jednym starciu Fiesty.',
   },
   soc_first_party: { name: 'Razem raźniej', desc: 'Dołącz do drużyny z innym graczem.' },
   soc_full_house: { name: 'Pełen skład', desc: 'Ukończ loch w pełnej, pięcioosobowej drużynie.' },
@@ -1062,5 +1041,9 @@ export const table: DeedLocaleTable = {
     name: 'Ani Jednej Zgasłej Iskry',
     desc: 'Pokonaj Varkhul, Forgefather of the Last Flame, na heroicznym poziomie trudności tak, by ani jeden rajdowiec nie zginął.',
     title: 'Niespalony',
+  },
+  col_set_bramblehide: {
+    name: 'Cierniowa Skóra Rootsa',
+    desc: 'Odkryj każdą część Cierniowej Skóry Rootsa.',
   },
 };

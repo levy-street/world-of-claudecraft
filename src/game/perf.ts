@@ -1,11 +1,19 @@
 import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
+import { postRevealLinksSnapshot } from '../render/live_program_watch';
+import type { PostRevealLinksSnapshot } from '../render/post_reveal_links_core';
 import type { Renderer } from '../render/renderer';
 import {
   censusTableLines,
   type HitchSummary,
   type SceneCensusReport,
 } from '../render/scene_census_core';
+import { type ShaderWarmAuditSnapshot, shaderWarmAuditSnapshot } from '../render/shader_warm_audit';
+import {
+  noteShaderWarmFrameMs,
+  type ShaderWarmSnapshot,
+  shaderWarmSnapshot,
+} from '../render/shader_warm_client';
 import {
   createHeapSawtooth,
   type HeapFloorTrend,
@@ -55,6 +63,23 @@ export interface PerfSnapshot {
   // frame crossed the hitch threshold stores the DIFF between its two
   // bracketing snapshots, so a production hitch carries its own diagnosis.
   hitchForensics: HitchForensicsRecord[];
+  // Always-on post-curtain program window (src/render/post_reveal_links_core.ts):
+  // how much three's program list grew in the first seconds after the reveal,
+  // the live-frame half of the prewarm's programsDelta. Null before the reveal.
+  postRevealLinks: PostRevealLinksSnapshot | null;
+  // The shader warm audit (src/render/shader_warm_audit.ts, `?perf` only): do
+  // the sources a gate dry-assembles at creation match what three links later.
+  // Local-only, never in the beacon payload (perf_reporter.ts builds it field
+  // by field). Under the flags the audit adds its own work to the frames and
+  // to the compile units the budget learns from; its `selfCostMs` says how
+  // much, so a capture taken with it on is read net of it, never compared
+  // raw to one taken without.
+  shaderWarmAudit: ShaderWarmAuditSnapshot;
+  // The shader warm worker's readout (src/render/shader_warm_client.ts):
+  // what the gates asked, held, bypassed and got. Local, except the eight
+  // fields the beacon projects out of it (src/game/perf_shader_warm_core.ts):
+  // the adapter, the bypass counts and the timings stay on the machine.
+  shaderWarm: ShaderWarmSnapshot;
   input: {
     intents: number;
     lastKind: string;
@@ -508,6 +533,8 @@ export class PerfMonitor {
     const ms = Math.min(250, Math.max(0, dt * 1000));
     this.lastFrameMs = ms;
     this.frameMs.push(ms);
+    // The warm worker's pause signal rides the same reading.
+    noteShaderWarmFrameMs(ms);
     this.frameWindow.push(now, ms);
     this.frameWindow.pruneBefore(now - MAX_WINDOW_MS);
   }
@@ -1041,6 +1068,9 @@ export class PerfMonitor {
       netPipeline: this.netPipelineSource?.summary() ?? null,
       heapSawtooth: this.heapSawtooth.summary(),
       hitchForensics: this.hitchForensics.records(),
+      postRevealLinks: postRevealLinksSnapshot(),
+      shaderWarmAudit: shaderWarmAuditSnapshot(),
+      shaderWarm: shaderWarmSnapshot(),
       input: {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,
@@ -1246,7 +1276,7 @@ export class PerfMonitor {
       `hud writes ${hud?.hotDomWrites ?? 0}  skip ${Math.round((hud?.hotDomSkipRate ?? 0) * 100)}%`,
       `rph e ${rp?.entities.p95 ?? 0} w ${rp?.world.p95 ?? 0} np ${rp?.nameplates.p95 ?? 0} sub ${rp?.submit.p95 ?? 0}ms`,
       `calls ${r?.calls ?? 0}  tris ${r?.triangles ?? 0}  tex ${r?.textures ?? 0}`,
-      `scale ${r?.effectiveRenderScale ?? 0}/${r?.renderScale ?? 0}  tier ${r?.tier ?? '-'}`,
+      `scale ${r?.effectiveRenderScale ?? 0}/${r?.renderScale ?? 0}  tier ${r?.tier ?? '-'}  post ${r?.postShedRung ?? '-'}`,
       `assets wait ${s.assets.preload.waitMs}ms  gltf ${gltf?.count ?? 0}/${gltf?.p95Ms ?? 0}ms  hdr ${hdr?.count ?? 0}/${hdr?.p95Ms ?? 0}ms  tex ${tex?.count ?? 0}/${tex?.p95Ms ?? 0}ms`,
       `input f ${s.input.intentToFrame.p95}ms  send ${s.input.intentToSend.p95}ms  echo ${s.input.sendToEcho.p95}ms  vis ${s.input.intentToVisible.p95}ms`,
       `gl ${r?.glRenderer ? r.glRenderer.slice(0, 34) : '-'}  lost ${r?.contextLost ?? 0}`,

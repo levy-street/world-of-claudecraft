@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { ModerationAccountDetail, ReportDetail } from '../types';
   import { apiGet, apiPost } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { localizeAdminError, t } from '../i18n';
   import { fmtDate } from '../format';
@@ -28,15 +30,15 @@
     | { kind: 'force-rename'; report: ReportDetail };
 
   let detail = $state<ModerationAccountDetail | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let selectedReportAction = $state<SelectedReportAction | null>(null);
 
   async function refetch(): Promise<void> {
     try {
       detail = await apiGet<ModerationAccountDetail>(`/admin/api/moderation/accounts/${accountId}`);
-      failed = false;
+      failed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -105,7 +107,9 @@
   }
 </script>
 
-{#if failed}
+{#if failed === 'forbidden'}
+  <PermissionDenied />
+{:else if failed === 'error'}
   <div class="empty">{t('report.loadFailed')}</div>
 {:else if detail}
   <div class="mod-detail">

@@ -16,10 +16,10 @@
 
 import type { WocQuoteView } from '../../../net/woc_market_sdk';
 import { ITEMS } from '../../../sim/data';
+import type { MaterialComposition } from '../../../sim/material_sources';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { userFacingApiError } from '../../api_error_i18n';
-import { bagQualityKey } from '../../bags_view';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
@@ -27,6 +27,12 @@ import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i1
 import type { TranslationKey } from '../../i18n.catalog';
 import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
+import {
+  appendMaterialSourcesActionAfter,
+  attachMaterialSourcesContextMenu,
+  closeMaterialSourcesDialogForOwner,
+  type MaterialSourcesDialogOpener,
+} from '../../material_sources_dialog';
 
 import { termsUrlFor } from '../../terms_link';
 import { buildTradeItemRow, tradeRowTooltipTarget } from '../../trade_view';
@@ -57,6 +63,7 @@ import { WOC_LOG_BAD, WOC_LOG_GOOD, WOC_LOG_NOTE } from '../../woc_log_tones';
 import { wocPaymentPendingText } from '../../woc_market_reason_text';
 import type { WocMarketHooks } from '../../woc_market_window';
 import { wocTokensText } from '../../woc_tokens_text';
+import { wornItemCellParts } from '../../worn_item_cell_view';
 import {
   adoptedWocOffer,
   selectStandingWocOffer,
@@ -110,9 +117,15 @@ export interface WocTradeControllerDeps {
   /** Re-read the wallet footer balance after tokens moved on-chain. */
   refreshWocBalance(): void;
   log(text: string, color?: string): void;
-  itemIcon(item: ItemDef): string;
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   attachTooltip(el: HTMLElement, html: () => string): void;
-  itemTooltip(item: ItemDef, compare?: boolean, instance?: ItemInstancePayload): string;
+  openMaterialSources?: MaterialSourcesDialogOpener;
+  itemTooltip(
+    item: ItemDef,
+    compare?: boolean,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string;
   renderBags(): void;
 }
 
@@ -245,14 +258,19 @@ export class WocTradeController {
   private log(text: string, color?: string): void {
     this.deps.log(text, color);
   }
-  private itemIcon(item: ItemDef): string {
-    return this.deps.itemIcon(item);
+  private itemIcon(item: ItemDef, quality?: ItemDef['quality']): string {
+    return this.deps.itemIcon(item, quality);
   }
   private attachTooltip(el: HTMLElement, html: () => string): void {
     this.deps.attachTooltip(el, html);
   }
-  private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {
-    return this.deps.itemTooltip(item, compare, instance);
+  private itemTooltip(
+    item: ItemDef,
+    compare = true,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string {
+    return this.deps.itemTooltip(item, compare, instance, materialSources);
   }
   private renderBags(): void {
     this.deps.renderBags();
@@ -1216,6 +1234,7 @@ export class WocTradeController {
     const info = this.sim.tradeInfo;
     if (!info) {
       if (this.tradeWasOpen) {
+        closeMaterialSourcesDialogForOwner(el);
         el.style.display = 'none';
         this.tradeWasOpen = false;
         this.stagedTrade = { items: [], copper: 0 };
@@ -1422,10 +1441,20 @@ export class WocTradeController {
         // family: it carries border-color plus an epic and legendary glow and
         // never a text colour, so on a bare span it painted a stray halo and
         // left the name the inherited grey.
-        const qColor = item
-          ? itemNameColor({ kind: item.kind, quality: bagQualityKey(item) })
-          : QUALITY_DEFAULT_COLOR;
-        const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
+        // The staged COPY's own quality (a legacy legendary-rolled copy is
+        // tradable and reads legendary here, the all-surfaces item-cell rule;
+        // a promoted copy is bound and never reaches the table).
+        // One cell-authority read for the color AND the rim (the label keeps
+        // the def name plus count from buildTradeItemRow: a promoted copy is
+        // bound and never reaches the table, so only a persisted named-but-
+        // unbound payload, which the load arm admits but the live shape never
+        // mints, would show the def here beside the chosen name in its tooltip).
+        const parts = item ? wornItemCellParts(item, s.instance) : null;
+        const qColor =
+          item && parts
+            ? itemNameColor({ kind: item.kind, quality: parts.quality ?? 'common' })
+            : QUALITY_DEFAULT_COLOR;
+        const inner = `${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
         return mine
           ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
           : `<div class="trade-item">${inner}</div>`;
@@ -1535,8 +1564,22 @@ export class WocTradeController {
         rows.forEach((row, i) => {
           const target = tradeRowTooltipTarget(slots, i);
           if (!target) return;
-          this.attachTooltip(row as HTMLElement, () =>
-            this.itemTooltip(target.item, true, target.instance),
+          const rowElement = row as HTMLElement;
+          this.attachTooltip(rowElement, () =>
+            this.itemTooltip(target.item, true, target.instance, target.materialSources),
+          );
+          const itemName = itemDisplayName(target.item);
+          attachMaterialSourcesContextMenu(
+            rowElement,
+            itemName,
+            target.materialSources,
+            this.deps.openMaterialSources,
+          );
+          appendMaterialSourcesActionAfter(
+            rowElement,
+            itemName,
+            target.materialSources,
+            this.deps.openMaterialSources,
           );
         });
       };

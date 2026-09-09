@@ -58,6 +58,7 @@ import {
 import { isEscortNpcTemplate } from '../escort';
 import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
 import { isPinnedInPlace, releasePin } from '../instances/instance_combat_hold';
+import { NYTHRAXIS_BONE_SPIKE_ID, pinNythraxisBoneSpike } from '../nythraxis_bone_spike';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
@@ -351,6 +352,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     return;
   }
 
+  // A Bone Spike never walks, aggroes, or swings: the encounter frees its
+  // victim when it dies (encounters/nythraxis.ts onBossDeath).
+  if (mob.templateId === NYTHRAXIS_BONE_SPIKE_ID) {
+    pinNythraxisBoneSpike(mob);
+    return;
+  }
+
   if (
     (mob.templateId === VARKHUL_CINDER_ARTIFICER_ID ||
       mob.templateId === VARKHUL_CRUCIBLE_WARDEN_ID ||
@@ -447,13 +455,17 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     isVarkhul ||
     (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')
   ) {
+    // Bone Storm joins the script-locked windows: the encounter driver moves
+    // him itself (encounters/nythraxis.ts updateNythraxisBoneStorm), so the
+    // chase and swing below must not fight it.
     const nythraxisScriptLocked =
       isNythraxis &&
       mob.nythraxis &&
       (mob.nythraxis.phase === 'transition' ||
         mob.nythraxis.deathlessCastRemaining > 0 ||
         mob.nythraxis.deathlessStunRemaining > 0 ||
-        (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0);
+        (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0 ||
+        (mob.nythraxis.boneStorm ?? null) !== null);
     if (isNythraxis) {
       ctx.updateNythraxisEncounter(mob);
       if (
@@ -462,7 +474,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           (mob.nythraxis.phase === 'transition' ||
             mob.nythraxis.deathlessCastRemaining > 0 ||
             mob.nythraxis.deathlessStunRemaining > 0 ||
-            (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
+            (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0 ||
+            (mob.nythraxis.boneStorm ?? null) !== null))
       )
         return;
     } else if (isIgnivar) {

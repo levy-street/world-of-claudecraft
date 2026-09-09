@@ -20,12 +20,13 @@ import {
   type ActivityItem,
   buildActivityMessage,
   buildDailyRewardWinnersMessage,
+  buildQueuePopMessage,
   buildRelayMessage,
   type DailyRewardWinnersDay,
   type RelayItem,
 } from './logic';
 import type { BreakerState } from './rate_governor';
-import type { OutboxEnvelope, OutboxLinkChangeItem } from './server_client';
+import type { OutboxEnvelope, OutboxLinkChangeItem, OutboxQueuePopItem } from './server_client';
 
 /**
  * Thrown by a post whose target channel id is not configured.
@@ -63,6 +64,10 @@ export interface OutboxIo {
   markWinnersDay: (day: string) => Promise<unknown>;
   /** Pure: the sweep's belief update. Cannot fail, so it is not wrapped. */
   applyLinkChanges: (items: readonly OutboxLinkChangeItem[]) => void;
+  /** DM one queue pop to its player. Rejects on a failed send, like the posts. */
+  postQueuePop: (item: OutboxQueuePopItem) => Promise<unknown>;
+  /** Wall clock, for the queue-pop deadline check (see runOutboxPoll). */
+  now: () => number;
   onError?: (error: unknown, where: string) => void;
 }
 
@@ -75,13 +80,17 @@ export interface OutboxChannels {
 
 export interface OutboxIoOptions {
   createMessage: (channelId: string, payload: Record<string, unknown>) => Promise<unknown>;
+  /** The Discord shell's DM path (open the channel, then post), by user id. */
+  sendDirectMessage: (userId: string, payload: Record<string, unknown>) => Promise<unknown>;
   markDailyRewardWinners: (day: string) => Promise<unknown>;
   channels: OutboxChannels;
-  /** Public game URL, for the relay embed's respond deep link. */
+  /** Public game URL, for the relay embed's respond deep link and the DM's button. */
   gameUrl: string;
   breakerState: () => BreakerState;
   drain: () => Promise<OutboxEnvelope | null>;
   applyLinkChanges: (items: readonly OutboxLinkChangeItem[]) => void;
+  /** Wall clock for the queue-pop deadline; the forwarding default reads Date.now. */
+  now?: () => number;
   onError?: (error: unknown, where: string) => void;
   /** Called AT MOST ONCE per unset channel, the first time it is needed. */
   onMissingChannel?: (channel: keyof OutboxChannels) => void;
@@ -126,6 +135,11 @@ export function outboxIoFor(options: OutboxIoOptions): OutboxIo {
     postWinnersDay: (day) => post('dailyRewards', buildDailyRewardWinnersMessage(day)),
     markWinnersDay: (day) => options.markDailyRewardWinners(day),
     applyLinkChanges: options.applyLinkChanges,
+    // A DM has no channel to route: the user id IS the destination, so the
+    // unset-channel machinery above never applies to this stream.
+    postQueuePop: (item) =>
+      options.sendDirectMessage(item.discordUserId, buildQueuePopMessage(item, options.gameUrl)),
+    now: options.now ?? (() => Date.now()),
     onError: options.onError,
   };
 }
@@ -241,7 +255,18 @@ export async function runOutboxPoll(
   const activityItems = listOf(streams.activity?.items);
   const winnerDays = listOf(streams.winners?.days);
   const linkChanges = listOf(streams.linkChanges?.items);
-  const consumedWork = relayItems.length > 0 || activityItems.length > 0 || linkChanges.length > 0;
+  const queuePops = listOf(streams.queuePops?.items);
+  // The watch signal counts as work WITHOUT anything being drained: an
+  // opted-in, linked player is waiting in a queue, and the pop that ends the
+  // wait has a 30 s answer window, so the loop holds its fast cadence rather
+  // than decaying to the idle interval and finding the pop half a window late.
+  // Tolerant of an older server that sends no such field (false).
+  const watching = streams.queuePops?.watching === true;
+  const consumedWork =
+    relayItems.length > 0 ||
+    activityItems.length > 0 ||
+    linkChanges.length > 0 ||
+    queuePops.length > 0;
 
   const report = (error: unknown, where: string): void => {
     // The unset-channel case has already been reported once by the factory;
@@ -259,6 +284,23 @@ export async function runOutboxPoll(
   // below reads them.
   io.applyLinkChanges(linkChanges);
 
+  // Queue pops go FIRST, ahead of every channel post: they are the one stream
+  // with a deadline measured in seconds, and the loops below can run for
+  // minutes on a backlog. Each item's deadline is re-checked here, at send time
+  // and against this process's clock, because the governor can hold a DM
+  // behind a backlog or a pause for longer than an Accept window lasts, and a
+  // DM about an offer that already lapsed is worse than none. A lapsed item is
+  // skipped silently: it is not a failure, and the server already dropped the
+  // ones that lapsed before the drain. Sequential and per-item, the same rule
+  // as the posts below.
+  for (const item of queuePops) {
+    if (!(item.expiresAtMs > io.now())) continue;
+    try {
+      await io.postQueuePop(item);
+    } catch (error) {
+      report(error, 'queue-pop');
+    }
+  }
   // Sequential, and each post in its own catch. Sequential because the governor
   // paces these anyway and a burst of parallel posts would only queue deeper;
   // per item because one refusal (an open breaker mid-run, a 403 on one channel)
@@ -323,5 +365,5 @@ export async function runOutboxPoll(
       report(error, 'winners-mark');
     }
   }
-  return consumedWork || winnersProgress;
+  return consumedWork || winnersProgress || watching;
 }

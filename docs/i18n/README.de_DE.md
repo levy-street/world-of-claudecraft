@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.de_DE.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Jede Instanz läuft außerdem auf **Heroisch**: höherstufige Gegner, schärfere
 
 ### Delves
 
-Delves sind ein separater, skalierbarer Kleingruppen-Modus für ein oder zwei Spieler, bei jedem Durchlauf aus zufallsgenerierten Kammern neu aufgebaut und endend an einer verschlossenen Reliquientruhe, die sich über ein Schlossknack-Minispiel statt über einen Beutewurf öffnet. **The Collapsed Reliquary** (ab Stufe 7) endet bei Deacon Varric, und wenn du allein gehst, kämpft die KI-Begleiterin Tessa an deiner Seite. **The Drowned Litany** (ab Stufe 12) folgt der Spur in einen gefluteten Schrein am Rand von Mirefen Marsh. Ein Delve-Board legt die Stufe fest: Heroisch hebt die Gegnerstufen an und fügt für reichere Belohnungen ein zufälliges Affix hinzu.
+Delves sind ein separater, skalierbarer Kleingruppen-Modus für ein oder zwei Spieler, bei jedem Durchlauf aus zufallsgenerierten Kammern neu aufgebaut und endend an einer verschlossenen Reliquientruhe, die sich über ein Schlossknack-Minispiel statt über einen Beutewurf öffnet. **The Collapsed Reliquary** (ab Stufe 7) endet bei Deacon Vandric, und wenn du allein gehst, kämpft die KI-Begleiterin Tessa an deiner Seite. **The Drowned Litany** (ab Stufe 12) folgt der Spur in einen gefluteten Schrein am Rand von Mirefen Marsh. Ein Delve-Board legt die Stufe fest: Heroisch hebt die Gegnerstufen an und fügt für reichere Belohnungen ein zufälliges Affix hinzu.
 
 ### Gewertetes PvP (das Ashen Coliseum)
 

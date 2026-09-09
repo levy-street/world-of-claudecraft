@@ -67,11 +67,17 @@ describe('identity-preserving Materials Vault stacks', () => {
     sim.vaultDeposit(0);
     expect(meta.inventory).toEqual([]);
     expect(meta.vault.stock).toEqual({});
+    // The legacy signer rides a SOURCE BUCKET now, not the payload. That is the
+    // shared material model's projection (material_stack.ts
+    // normalizeMaterialStack), applied by the packing core every material grant
+    // goes through, and it is lossless in both directions: the same signature,
+    // the same premium eligibility, one representation instead of two.
     expect(meta.vault.special).toEqual([
       {
         itemId: 'copper_ore',
         count: 1,
-        instance: { signer: 'Ada', rolled: { quality: 'rare', stats: { sta: 2 } } },
+        instance: { rolled: { quality: 'rare', stats: { sta: 2 } } },
+        materialSources: [{ source: { signer: 'Ada' }, count: 1 }],
       },
     ]);
     expect(meta.vault.special[0]).not.toBe(carried);
@@ -137,7 +143,13 @@ describe('identity-preserving Materials Vault stacks', () => {
 
     expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(40);
     expect(meta.vault.stock.copper_ore).toBe(39);
-    expect(meta.inventory).toEqual([{ itemId: 'copper_ore', count: 2 }]);
+    // The remainder carries its EXACT per-unit quantities, never a bare count:
+    // two units nobody recorded a gatherer for are two units in the unrecorded
+    // bucket. (The crafted row already in `special` cannot share with plain
+    // stock, so this deposit still pools rather than folding.)
+    expect(meta.inventory).toEqual([
+      { itemId: 'copper_ore', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
   });
 
   it('moves instance stacks whole but permits partial recipe-only moves', () => {
@@ -166,11 +178,22 @@ describe('identity-preserving Materials Vault stacks', () => {
       craftedRecipeId: 'smelt_copper',
     });
     sim.vaultDeposit(0);
+    // Both halves carry their exact per-unit quantities.
     expect(meta.inventory).toEqual([
-      { itemId: 'copper_ore', count: 2, craftedRecipeId: 'smelt_copper' },
+      {
+        itemId: 'copper_ore',
+        count: 2,
+        craftedRecipeId: 'smelt_copper',
+        materialSources: [{ source: {}, count: 2 }],
+      },
     ]);
     expect(meta.vault.special).toEqual([
-      { itemId: 'copper_ore', count: 1, craftedRecipeId: 'smelt_copper' },
+      {
+        itemId: 'copper_ore',
+        count: 1,
+        craftedRecipeId: 'smelt_copper',
+        materialSources: [{ source: {}, count: 1 }],
+      },
     ]);
   });
 
@@ -181,19 +204,26 @@ describe('identity-preserving Materials Vault stacks', () => {
     const ben: InvSlot = { itemId: 'copper_ore', count: 1, instance: { signer: 'Ben' } };
     meta.vault.special.push(ada, ben);
 
+    // Ben's units come back with the signature in a SOURCE BUCKET (the shared
+    // model's projection), not in the payload it was persisted under.
+    const withdrawnBen = {
+      itemId: 'copper_ore',
+      count: 1,
+      materialSources: [{ source: { signer: 'Ben' }, count: 1 }],
+    };
     const staleBenRef = ref(0, ben);
     sim.vaultWithdraw('copper_ore', undefined, staleBenRef);
     expect(meta.vault.special).toEqual([ada]);
-    expect(meta.inventory).toEqual([ben]);
+    expect(meta.inventory).toEqual([withdrawnBen]);
 
     const wrongRef: VaultSpecialRef = { index: 0, instance: { signer: 'Mallory' } };
     sim.vaultWithdraw('copper_ore', undefined, wrongRef);
     expect(meta.vault.special).toEqual([ada]);
-    expect(meta.inventory).toEqual([ben]);
+    expect(meta.inventory).toEqual([withdrawnBen]);
 
     sim.vaultWithdraw('copper_ore');
     expect(meta.vault.special).toEqual([ada]);
-    expect(meta.inventory).toEqual([ben]);
+    expect(meta.inventory).toEqual([withdrawnBen]);
   });
 
   it('sanitizes full payloads without aliasing, retains unknown rows, and keeps demoted rows special', () => {
@@ -215,12 +245,17 @@ describe('identity-preserving Materials Vault stacks', () => {
     const clean = sanitizeVaultState(raw, 'Ada', dropped, 1);
 
     expect(clean.special).toEqual([
+      // An UNKNOWN id with no source marker stays dormant exactly as stored:
+      // the shared reader has no material model to apply to it, so it neither
+      // normalizes nor refuses (its buckets are the thing that would be judged).
       {
         itemId: 'future_material',
         count: 2,
         instance: { signer: 'Ada', rolled: { quality: 'rare', stats: { sta: 3 } } },
       },
-      { itemId: 'copper_ore', count: 1 },
+      // A KNOWN material does normalize, so its one unit gets the unrecorded
+      // bucket it always implied.
+      { itemId: 'copper_ore', count: 1, materialSources: [{ source: {}, count: 1 }] },
     ]);
     expect(clean.special[0]).not.toBe(raw.special[0]);
     expect(clean.special[0].instance).not.toBe(raw.special[0].instance);

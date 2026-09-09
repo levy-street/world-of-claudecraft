@@ -170,11 +170,10 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
       bloodhook.effects.find((candidate) => candidate.type === 'hunterBloodhook'),
     );
     expect(abilityDamageBonus(bloodhook, effect, { ...SC, rangedPower: 0 })).toBe(0);
-    // 2026-08-09 120s band round: the survival baseline meleeDmgPct stepped
-    // 0.06 to 0.3 (the rest of the raise rides the baseline agiPct), so the 34
-    // base and 200*0.26 rider re-derive at 1.3x.
-    expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(68);
-    expect(abilityEffectText(bloodhook, SC)).toBe('44.2 (+68)');
+    // Fieldcraft: 1 + 0.30 legacy + 0.15 offensive tuning.
+    // Base 34 * 1.45 = 49.3; rider round(200 * 0.26 * 1.45) = 75.
+    expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(75);
+    expect(abilityEffectText(bloodhook, SC)).toBe('49.3 (+75)');
   });
 
   it('a channelled directDamage (Arcane Missiles) uses the per-tick CHANNEL coefficient', () => {
@@ -204,9 +203,9 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   });
 
   it('a direct heal folds Spell Power at the cast-time coefficient (combat directHealBonus)', () => {
-    const heal = abilitiesKnownAt('priest', MAX_LEVEL).find((k) =>
-      k.effects.some((e) => e.type === 'heal'),
-    )!;
+    const heal = required(
+      abilitiesKnownAt('priest', MAX_LEVEL).find((k) => k.effects.some((e) => e.type === 'heal')),
+    );
     const eff = required(heal.effects.find((e) => e.type === 'heal'));
     expect(abilityDamageBonus(heal, eff, SC)).toBe(directHealBonus(SC.spellPower, heal.castTime));
     expect(abilityDamageBonus(heal, eff, SC)).toBeGreaterThan(0);
@@ -215,13 +214,23 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   it('Cascading Mend shows the same Spell Power bonus as its first combat heal', () => {
     const chain = known('shaman', 'chain_heal', SPIRITMEND_MODS);
     const effect = required(chain.effects.find((candidate) => candidate.type === 'chainHeal'));
+    if (effect.type !== 'chainHeal') throw new Error('expected chainHeal');
     expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 0, healPower: 0 })).toBe(0);
     expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 100, healPower: 100 })).toBe(
       directHealBonus(100, chain.castTime),
     );
-    expect(abilityEffectText(chain, { ...SC, spellPower: 0, healPower: 0 })).toBe('120 to 145');
-    expect(abilityEffectText(chain, { ...SC, spellPower: 100, healPower: 100 })).toMatch(
-      /^120 to 145 \(\+\d+\)$/,
+    // v0.42.0 Spiritmend (docs/design/class-balance-v042.md): +10% primary
+    // healing folds onto the WHOLE completed packet once, so the tooltip
+    // shows the combined range instead of the unscaled base plus a separate
+    // "(+N)" bonus badge (a display change, not just a bigger bonus number).
+    const factor = chain.outputScaling?.primaryHealing ?? 1;
+    expect(factor).not.toBe(1);
+    expect(abilityEffectText(chain, { ...SC, spellPower: 0, healPower: 0 })).toBe(
+      `${Math.round(effect.min * factor)} to ${Math.round(effect.max * factor)}`,
+    );
+    const bonus = abilityDamageBonus(chain, effect, { ...SC, spellPower: 100, healPower: 100 });
+    expect(abilityEffectText(chain, { ...SC, spellPower: 100, healPower: 100 })).toBe(
+      `${Math.round((effect.min + bonus) * factor)} to ${Math.round((effect.max + bonus) * factor)}`,
     );
   });
 
@@ -263,8 +272,14 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   it('the reworked Rain of Fire ground pulse uses the AoE-penalised direct coefficient', () => {
     const rof = known('warlock', 'rain_of_fire', DESTRUCTION_MODS);
     const eff = required(rof.effects.find((e) => e.type === 'groundAoE'));
+    // v0.42.0 Ruination (docs/design/class-balance-v042.md): the ground pulse's
+    // runtime Spell Power rider now carries the resolved talent/offense-tuning
+    // damage multiplier the same way the base magnitude already did, so this
+    // no longer matches a bare (unmultiplied) directHitBonus.
+    const dmgMult = rof.outputScaling?.damage ?? 1;
+    expect(dmgMult).not.toBe(1);
     expect(abilityDamageBonus(rof, eff, SC)).toBe(
-      directHitBonus(SC.spellPower, rof.def, rof.castTime, true),
+      directHitBonus(SC.spellPower, rof.def, rof.castTime, true, dmgMult),
     );
   });
 });

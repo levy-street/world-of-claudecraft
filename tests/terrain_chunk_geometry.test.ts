@@ -134,7 +134,31 @@ describe('generated chunk geometry is stable', () => {
     // height atlas (tests/terrain_height_parity.test.ts fixture, re-minted
     // in the same commit): the whole ten-node placement fix moves 146 of
     // its 140639 points, 0.1 percent, all inside the moved nodes' pad
-    // footprints. Re-minted again for the Proving Shore tutorial island
+    // footprints.
+    // Re-minted again for the northwest coast spit carve in applyValeCoast
+    // (src/sim/world.ts): the low beach shelf that aproned the grey cliff foot
+    // is submerged so the bay water meets the cliff, an intended, looked-at
+    // visual change. The carve only ever lowers and stays local: sampled on a
+    // 0.5yd lattice over the vale and its gap cells it moves 8704 of 1589721
+    // points, 0.5 percent, every one inside x -211.5..-132.5, z 116.5..145.5,
+    // and nothing rises anywhere. Both digests move because that window
+    // straddles the rect edge at x = -180.
+    // Re-minted again for the farming go-live's four farmer NPCs: every NPC
+    // is a calm-anchor world fixture (terrain_calm_anchors.ts pads NPCS at
+    // rIn 6 / rOut 14), and Farmer Jessica then stood beside the Eastbrook
+    // garden beds at (24.5, 32.5) (re-seated to (-15.5, -81.5) at the
+    // release/v0.41.0 merge), so her pad reshapes the vale vertices around the
+    // patch. Localization checked against the dense height atlas
+    // (tests/terrain_height_parity.test.ts fixture, re-minted in the same
+    // commit): the four pads move 60 of its 282406 points, 0.02 percent, all
+    // inside the four farmers' pad footprints (the largest under Farmer
+    // Hollis's Highwatch stand, where the natural relief diverges most from
+    // the legacy field). The gap digest is checked below with the same
+    // literal it had: Jessica's pad is far inside the rect.
+    // Upstream re-minted the same digest on its own arm over the same span,
+    // kept rather than dropped (its v0.37.0 note below records the same coast
+    // spit carve this branch's paragraph above records from its own side; both
+    // arms re-minted it once). Re-minted again for the Proving Shore tutorial island
     // (provingCoast/provingMoat reshape the Vale's west strand) and once more
     // on the v0.37.0 merge, which added the northwest coast spit carve in
     // applyValeCoast (the low beach shelf under the grey cliff foot submerged
@@ -331,6 +355,28 @@ describe('generated chunk geometry is stable', () => {
     // Proving Shore island: both sides' intended terrain changes combine, so
     // the digest matches neither parent (set from a suite run on the merged
     // tree).
+    // MERGE OF release/v0.41.0 INTO feature/masterwrought (base 9a89e3483e,
+    // release tip ff2837da1f): the release's Proving Shore island, Eastbrook
+    // rebuild rounds and Sowfield demolition land on top of this branch's
+    // four farmer pads. Parent values for the record: ours
+    // affb4c8d6201b0832458a2c2bcd0f29b, the release
+    // 1d9b0a4a7e0d97c5a11c918b1a8f29c3. MEASURED on the merged working tree
+    // (npx vitest run tests/terrain_chunk_geometry.test.ts, twice in separate
+    // processes) AFTER the same merge re-seated Farmer Jessica from (24.5,
+    // 32.5) to (-15.5, -81.5) at the rebuilt town's north-east edge: the
+    // merged digest equals the RELEASE's literal, which is what the pin below
+    // carries. The NEW seat is the measured one: the merge commit 9f130d3b7c
+    // records the (-15.5, -81.5) site on already-calm town ground, probed on a
+    // 0.5 yd lattice with zero points moved, so her calm pad moves no in-rect
+    // vertex there. The OLD seat (24.5, 32.5) has no such record; that it
+    // moved nothing is an inference, not a measurement: it sat 23.2 yd from
+    // the second forest_wolf camp at (12, 52) r26, inside that camp's own
+    // flatten disc (world.ts levels terrain to the camp-centre height within
+    // radius * 0.8 and blends it out to radius * 1.8, 46.8 yd; the seat sat
+    // in the blend band), which is camp levelling, not the town's.
+    // The branch's gap super-chunk pin (c4839177e825dbcf8dc5bcf501336fc2) is
+    // gone with the gap chunks themselves: the island claims the old vale gap
+    // cells, and gapFill.length above pins their absence.
     expect(digestOf(inRect)).toBe('1d9b0a4a7e0d97c5a11c918b1a8f29c3');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins

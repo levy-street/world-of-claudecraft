@@ -42,8 +42,11 @@ describe('quest_item_tooltip_view: non-quest', () => {
       'tool',
       'potion',
       'elixir',
+      'flask',
+      'scroll',
       'bag',
       'mount',
+      'recipe',
     ]) {
       expect(questItemTooltipModel({ kind, itemId: 'x' }), kind).toBeNull();
     }

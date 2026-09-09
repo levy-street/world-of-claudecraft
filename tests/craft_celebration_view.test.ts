@@ -10,14 +10,14 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { audio } from '../src/game/audio';
 import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
+import { type BannerVariant, Hud } from '../src/ui/hud';
 import {
   buildCraftCelebrationPlan,
   CRAFT_TIER_UP_DRAIN_WINDOW,
   computeCraftTierUps,
   observeCraftSkillsForTierUps,
-} from '../src/ui/craft_celebration_view';
-import { type BannerVariant, Hud } from '../src/ui/hud';
-import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
+} from '../src/ui/hud/professions/craft_celebration_view';
+import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/hud/professions/profession_art';
 
 describe('computeCraftTierUps', () => {
   it('reports no tier-ups on first observation (null prev), the silent init', () => {

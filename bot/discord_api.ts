@@ -431,4 +431,34 @@ export class DiscordApi {
   async createMessage(channelId: string, payload: Record<string, unknown>): Promise<void> {
     await this.request('POST', `/channels/${channelId}/messages`, payload);
   }
+
+  /**
+   * Direct-message one user: open (or re-open, Discord answers the existing
+   * one) the DM channel, then post into it. Two calls, both carrying the SAME
+   * subject key, because the failure that matters here lands on the SECOND:
+   * a user whose privacy settings refuse DMs from server members answers the
+   * channel open with 200 and the message with 403 (Discord code 50007), and
+   * a subject-keyed 403 enters the governor's permanent-failure cache so the
+   * next pop for that user is refused locally rather than spent against
+   * Discord's invalid-request budget. Non-essential like every outbox post:
+   * an open breaker refuses it, and the outbox consumer's breaker gate keeps
+   * the item server-side until the breaker closes.
+   */
+  async sendDirectMessage(userId: string, payload: Record<string, unknown>): Promise<void> {
+    const subjectKey = dmSubject(userId);
+    const channel = (await this.request(
+      'POST',
+      '/users/@me/channels',
+      { recipient_id: userId },
+      { subjectKey },
+    )) as { id?: unknown } | null;
+    const channelId = channel && typeof channel.id === 'string' ? channel.id : '';
+    if (!channelId) throw new Error(`[bot] DM channel open for user ${userId} answered no id`);
+    await this.request('POST', `/channels/${channelId}/messages`, payload, { subjectKey });
+  }
+}
+
+/** The permanent-failure cache key for a user's DMs (see sendDirectMessage). */
+export function dmSubject(userId: string): string {
+  return `dm:${userId}`;
 }

@@ -29,6 +29,7 @@
 // frame is each head's own bounding box mapped to the unit sphere, so the ~3%
 // proportion difference is already divided out.
 import * as THREE from 'three';
+import { applyTextureAnisotropy } from '../texture_anisotropy';
 import {
   type BlushShade,
   blushColor,
@@ -269,7 +270,7 @@ export function makeupTextureFromData(
   tex.magFilter = THREE.LinearFilter;
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   tex.generateMipmaps = true;
-  tex.anisotropy = 8;
+  applyTextureAnisotropy(tex, 'colour');
   tex.needsUpdate = true;
   textureCache.set(key, tex);
   return tex;

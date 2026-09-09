@@ -21,6 +21,7 @@ import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   accumulateTalentEffect,
+  computeTalentModifiers,
   emptyModifiers,
   type TalentModifiers,
 } from '../src/sim/content/talents';
@@ -448,5 +449,48 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
       // amount regardless of Chronoweave's global healPct.
       expect(boostedHeals[i] / baseHeals[i]).toBeCloseTo(1 + healPct, 1);
     }
+  });
+
+  // v0.42.0 class balance (docs/design/class-balance-v042.md): the new
+  // offense-only spec tuning (src/sim/spec_output_tuning.ts) is added
+  // alongside the existing resolution, reaching only real damage magnitudes
+  // and their runtime riders, never a flat-magnitude buff riding the same
+  // ability. Demonology is the documented case: its existing spellDmgPct
+  // already scales Fiendhide's armor (an accepted collateral, spec_baselines.ts),
+  // and that collateral must not grow just because Necromancy's owner spell
+  // bonus does.
+  describe('the v0.42.0 offense-only bonus never reaches a flat-magnitude buff (#class-balance-v042)', () => {
+    it('a committed demonology warlock gets the offense bonus on Soul Harvest but Fiendhide armor stays at the legacy (pre-offense) multiplier', () => {
+      const mods = computeTalentModifiers('warlock', { spec: 'demonology', rows: {} }, 20);
+      const known = abilitiesKnownAt('warlock', 20, mods);
+
+      const soulHarvest = known.find((a) => a.def.id === 'soul_harvest');
+      const fiendhide = known.find((a) => a.def.id === 'demon_skin');
+      if (!soulHarvest || !fiendhide) throw new Error('missing soul_harvest/demon_skin');
+
+      const { dmgMult, legacyDmgMult } = resolveTalentHitMult(soulHarvest.def, mods);
+      // spellDmgPct 0.1 (legacy) + soul_harvest's own ability dmgPct 0.096 +
+      // the offense-only demonology delta 0.22 (spec_output_tuning.ts).
+      expect(legacyDmgMult).toBeCloseTo(1 + 0.1 + 0.096, 10);
+      expect(dmgMult).toBeCloseTo(1 + 0.1 + 0.096 + 0.22, 10);
+
+      const armorEffect = fiendhide.effects.find((e) => e.type === 'selfBuff');
+      if (armorEffect?.type !== 'selfBuff') throw new Error('missing Fiendhide selfBuff');
+      // 80 (authored rank 3 base) x 1.1 (legacy spellDmgPct only): the offense
+      // bonus must never reach this, or Fiendhide's armor would silently grow
+      // alongside a damage-only spec rebalance.
+      expect(armorEffect.value).toBe(88);
+    });
+
+    it('a spec-less or untuned character keeps a factor of one extra offense bonus', () => {
+      const noSpec = emptyModifiers();
+      const shadowBolt = abilitiesKnownAt('warlock', 20, noSpec).find(
+        (a) => a.def.id === 'shadow_bolt',
+      );
+      if (!shadowBolt) throw new Error('missing shadow_bolt');
+      const { dmgMult, legacyDmgMult } = resolveTalentHitMult(shadowBolt.def, noSpec);
+      expect(dmgMult).toBe(1);
+      expect(legacyDmgMult).toBe(1);
+    });
   });
 });

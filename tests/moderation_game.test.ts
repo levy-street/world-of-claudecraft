@@ -856,6 +856,54 @@ describe('moderator spectate integration', () => {
     if (!restoredSnap?.self) throw new Error('restored snapshot missing');
     expect(restoredSnap.self.tal?.alloc).toEqual(moderatorMeta.talents);
   });
+
+  it('spectates another staff member like any player and restores the moderator', async () => {
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const colleagueWs = fakeWs();
+    const colleague = joined(
+      server.join(colleagueWs, 2, 102, 'Colleague', 'priest', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const moderatorEntity = entity(server, moderator.pid);
+    const originalPos = { ...moderatorEntity.pos };
+    const colleaguePos = { ...entity(server, colleague.pid).pos };
+
+    command(server, moderator, '/spectate Colleague');
+    await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
+
+    expect(moderation.recordInGameAction).toHaveBeenCalledWith({
+      action: 'spectate',
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'Spectated via in-game moderator command',
+    });
+    expect(moderator.spectating?.characterId).toBe(colleague.characterId);
+    expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: 'Colleague' });
+    // The watched staff member is not moved, flagged, or notified.
+    expect(entity(server, colleague.pid).pos).toEqual(colleaguePos);
+    expect(colleague.spectating).toBeNull();
+    expect(frames(colleagueWs).some((frame) => frame.t === 'spectate')).toBe(false);
+
+    moderatorWs.send.mockClear();
+    internals(server).broadcastSnapshots();
+    const snapshot = frames(moderatorWs).find((frame) => frame.t === 'snap');
+    if (!snapshot?.self) throw new Error('spectator snapshot missing');
+    expect(snapshot.self.id).toBe(colleague.pid);
+    expect(snapshot.self.nm).toBe('Colleague');
+
+    command(server, moderator, '/unspectate');
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
+    expect(moderatorEntity.pos).toEqual(originalPos);
+  });
 });
 
 describe('server-side teleports end a live profession session', () => {

@@ -602,7 +602,9 @@ describe('bank ledger dispatch integration', () => {
     sim.addItem('wolf_fang', 3, pid);
 
     send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid), count: 2 });
-    expect(sim.players.get(pid).bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    expect(sim.players.get(pid).bank.inventory).toEqual([
+      { itemId: 'wolf_fang', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(1);
     expect(saveCharacterMock).not.toHaveBeenCalled();
 
@@ -694,7 +696,14 @@ describe('diffVaultOp (pure)', () => {
     ]);
   });
 
-  it('keeps a sanitizer-demoted special row distinct with an all-null wrapper', () => {
+  it('a payload-free special row IS pooled stock to the count ledger', () => {
+    // The identity BUILDER still mints the versioned all-null wrapper, because
+    // rows written before the per-bucket rule carry it and the audit has to keep
+    // reading them (scripts/bank_audit.mjs historicalVaultIdentity folds it onto
+    // the pooled key). What CHANGED is what the writer emits: a holding with no
+    // payload, no crafted marker and no signer is ordinary pooled stock
+    // whichever of the vault's two stores it physically sits in, so it keys as
+    // [itemId, null] and the wrapper is never written for it again.
     const slot = { itemId: 'copper_ore', count: 2 };
     expect(vaultSpecialLedgerIdentity(slot)).toEqual({
       vaultSpecial: 1,
@@ -705,10 +714,279 @@ describe('diffVaultOp (pure)', () => {
       {
         itemId: 'copper_ore',
         count: 2,
-        instance: { vaultSpecial: 1, instance: null, craftedRecipeId: null },
+        instance: null,
         copperDelta: 0,
         purchasedSlotsAfter: 1,
       },
+    ]);
+  });
+
+  // -------------------------------------------------------------------------
+  // The COUNT ledger across the per-unit-provenance representation change.
+  //
+  // The vault now stores attribution-bearing material in `special` even when
+  // the units are ordinary, and a deposit that opens or joins such a block
+  // FOLDS the compact row into it. This table is a COUNT ledger: it must record
+  // what actually moved and nothing else, so a fold writes no row, a gatherer
+  // splits no identity, and a signature keys exactly the way it keyed when it
+  // lived on the payload. Gatherer and signature movement is the separate
+  // material_source_journal's business (tests/material_source_ledger.test.ts).
+  // -------------------------------------------------------------------------
+  const ANA = { kind: 'character' as const, id: 11, name: 'Ana' };
+
+  it('a deposit that FOLDS ten pooled units into a new block records ONE, not eleven', () => {
+    // The regression this whole rule exists for. Ten unrecorded units sat in
+    // `stock`; depositing one gathered unit opens an identity block and pulls
+    // those ten in with it. A row-shaped identity would see the block appear
+    // from nothing and book eleven, over-reporting the deposit by exactly the
+    // units that never left the vault.
+    const after = vinfo({}, 1, 50000, [
+      {
+        itemId: 'copper_ore',
+        count: 11,
+        materialSources: [
+          { source: {}, count: 10 },
+          { source: { gatherer: ANA }, count: 1 },
+        ],
+      },
+    ]);
+    expect(diffVaultOp('deposit', vinfo({ copper_ore: 10 }), after)).toEqual([
+      { itemId: 'copper_ore', count: 1, instance: null, copperDelta: 0, purchasedSlotsAfter: 1 },
+    ]);
+  });
+
+  it('a pure representation change of plain stock records NOTHING, in either direction', () => {
+    const pooled = vinfo({ copper_ore: 10 });
+    const blocked = vinfo({}, 1, 50000, [
+      { itemId: 'copper_ore', count: 10, materialSources: [{ source: {}, count: 10 }] },
+    ]);
+    expect(diffVaultOp('deposit', pooled, blocked)).toEqual([]);
+    expect(diffVaultOp('withdraw', pooled, blocked)).toEqual([]);
+    expect(diffVaultOp('deposit', blocked, pooled)).toEqual([]);
+    expect(diffVaultOp('withdraw', blocked, pooled)).toEqual([]);
+  });
+
+  it('a same-count re-attribution records NOTHING: a gatherer is not count identity', () => {
+    // Four units change hands from unrecorded to gathered-by-Ana with no
+    // quantity change at all. Splitting the old identity on the gatherer would
+    // book a phantom withdraw AND a phantom deposit of the same four units.
+    const before = vinfo({}, 1, 50000, [
+      { itemId: 'copper_ore', count: 4, materialSources: [{ source: {}, count: 4 }] },
+    ]);
+    const after = vinfo({}, 1, 50000, [
+      {
+        itemId: 'copper_ore',
+        count: 4,
+        materialSources: [{ source: { gatherer: ANA }, count: 4 }],
+      },
+    ]);
+    expect(diffVaultOp('deposit', before, after)).toEqual([]);
+    expect(diffVaultOp('withdraw', before, after)).toEqual([]);
+  });
+
+  it('a legacy signer on the payload and the same signer in a bucket are ONE identity', () => {
+    // The compatibility hinge. Every row this table wrote before the change
+    // recorded the first shape; the vault now stores the second. If they keyed
+    // apart, the migration itself would read as a whole-stack withdraw plus a
+    // whole-stack deposit, and every pre-change row would stop matching the
+    // state it produced.
+    const legacy = vinfo({}, 1, 50000, [
+      { itemId: 'copper_ore', count: 3, instance: { signer: 'Ana' } },
+    ]);
+    const normalized = vinfo({}, 1, 50000, [
+      {
+        itemId: 'copper_ore',
+        count: 3,
+        materialSources: [{ source: { signer: 'Ana' }, count: 3 }],
+      },
+    ]);
+    expect(diffVaultOp('deposit', legacy, normalized)).toEqual([]);
+    expect(diffVaultOp('withdraw', legacy, normalized)).toEqual([]);
+
+    // And both project onto the SAME wrapper a pre-change row carries.
+    const signed = {
+      itemId: 'copper_ore',
+      count: 3,
+      instance: { vaultSpecial: 1, instance: { signer: 'Ana' }, craftedRecipeId: null },
+      copperDelta: 0,
+      purchasedSlotsAfter: 1,
+    };
+    expect(diffVaultOp('deposit', vinfo({}), legacy)).toEqual([signed]);
+    expect(diffVaultOp('deposit', vinfo({}), normalized)).toEqual([signed]);
+  });
+
+  it('withdraws the EXACT signer bucket from a mixed block, leaving the pooled units alone', () => {
+    // A mixed block holds two count identities at once. Taking two signed units
+    // must book a withdraw against the signed identity only: booking it against
+    // the block would launder a premium signature into pooled stock, and the
+    // audit would then accept a later pooled withdraw that never had the units.
+    const before = vinfo({}, 1, 50000, [
+      {
+        itemId: 'copper_ore',
+        count: 5,
+        materialSources: [
+          { source: {}, count: 2 },
+          { source: { signer: 'Ana' }, count: 3 },
+        ],
+      },
+    ]);
+    const after = vinfo({}, 1, 50000, [
+      {
+        itemId: 'copper_ore',
+        count: 3,
+        materialSources: [
+          { source: {}, count: 2 },
+          { source: { signer: 'Ana' }, count: 1 },
+        ],
+      },
+    ]);
+    expect(diffVaultOp('withdraw', before, after)).toEqual([
+      {
+        itemId: 'copper_ore',
+        count: 2,
+        instance: { vaultSpecial: 1, instance: { signer: 'Ana' }, craftedRecipeId: null },
+        copperDelta: 0,
+        purchasedSlotsAfter: 1,
+      },
+    ]);
+  });
+
+  it('an EMPTY-STRING signer keeps a payload, because the legacy row it mirrors had one', () => {
+    // Signer PRESENCE decides, never premium-ness. `signer: ''` is a legal
+    // legacy value that really did sit on the payload, so folding it to pooled
+    // stock would orphan every historical row that carries that wrapper.
+    const after = vinfo({}, 1, 50000, [
+      { itemId: 'copper_ore', count: 2, materialSources: [{ source: { signer: '' }, count: 2 }] },
+    ]);
+    expect(diffVaultOp('deposit', vinfo({}), after)).toEqual([
+      {
+        itemId: 'copper_ore',
+        count: 2,
+        instance: { vaultSpecial: 1, instance: { signer: '' }, craftedRecipeId: null },
+        copperDelta: 0,
+        purchasedSlotsAfter: 1,
+      },
+    ]);
+  });
+
+  it('the WRITER and the audit SCRIPT agree on every vault identity (round trip)', async () => {
+    // scripts/bank_audit.mjs runs under plain node against a database, so it
+    // cannot import the TypeScript material model and mirrors this projection by
+    // hand. Nothing else keeps the mirror honest: a shape the writer splits one
+    // way and the script another reconciles as a permanent mismatch on live
+    // data, which is exactly the class this suite cannot otherwise see.
+    //
+    // The round trip is decisive without exporting either side's internals:
+    // deposit each shape from an EMPTY vault, hand the writer's own rows and the
+    // same shape as persisted state to the audit, and require zero findings.
+    const { auditBank } = await import('../scripts/bank_audit.mjs');
+    const shapes: {
+      label: string;
+      stock: Record<string, number>;
+      special: VaultInfo['special'];
+    }[] = [
+      { label: 'pooled only', stock: { copper_ore: 6 }, special: [] },
+      {
+        label: 'an unrecorded block (the fold target)',
+        stock: {},
+        special: [{ itemId: 'copper_ore', count: 6, materialSources: [{ source: {}, count: 6 }] }],
+      },
+      {
+        label: 'a gatherer-only block',
+        stock: { copper_ore: 2 },
+        special: [
+          {
+            itemId: 'copper_ore',
+            count: 4,
+            materialSources: [{ source: { gatherer: ANA }, count: 4 }],
+          },
+        ],
+      },
+      {
+        label: 'a mixed block beside pooled stock',
+        stock: { copper_ore: 2 },
+        special: [
+          {
+            itemId: 'copper_ore',
+            count: 5,
+            materialSources: [
+              { source: {}, count: 1 },
+              { source: { gatherer: ANA }, count: 1 },
+              { source: { signer: 'Ana' }, count: 3 },
+            ],
+          },
+        ],
+      },
+      {
+        label: 'a legacy signer still on the payload',
+        stock: {},
+        special: [{ itemId: 'copper_ore', count: 3, instance: { signer: 'Ana' } }],
+      },
+      {
+        label: 'a payload and a crafted marker beside a signer bucket',
+        stock: {},
+        special: [
+          {
+            itemId: 'copper_ore',
+            count: 2,
+            instance: { rolled: { quality: 'rare' } },
+            craftedRecipeId: 'smelt_copper',
+            materialSources: [
+              { source: {}, count: 1 },
+              { source: { signer: 'Ana' }, count: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        label: 'an unreadable composition',
+        stock: {},
+        special: [{ itemId: 'copper_ore', count: 4, materialSources: [{ source: {}, count: 3 }] }],
+      },
+    ];
+
+    for (const shape of shapes) {
+      const after = vinfo(shape.stock, 1, 50000, shape.special);
+      const deltas = diffVaultOp('deposit', vinfo({}), after);
+      // Non-vacuity: a shape that produced no rows would pass the audit for the
+      // wrong reason (nothing to disagree about).
+      expect(deltas.length, `${shape.label} should deposit something`).toBeGreaterThan(0);
+      const ledgerRows = deltas.map((delta, i) => ({
+        id: i + 1,
+        realm: 'Claudemoon',
+        character_id: 1,
+        op: 'deposit',
+        item_id: delta.itemId,
+        count: delta.count,
+        instance: delta.instance,
+        copper_delta: 0,
+        purchased_slots_after: 1,
+        container: 'vault',
+        container_id: null,
+      }));
+      const findings = auditBank({
+        ledgerRows,
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: { vault: { stock: shape.stock, special: shape.special, upgrades: 1 } },
+          },
+        ],
+      });
+      expect(findings, `${shape.label}: ${JSON.stringify(findings)}`).toEqual([]);
+    }
+  });
+
+  it('an UNREADABLE composition keeps the whole-row legacy projection', () => {
+    // Buckets that do not sum to the row's count cannot be split, and an
+    // observer must never throw into the dispatch path. The row keeps whatever
+    // identity the pre-provenance ledger gave it: payload-free here, so pooled.
+    const after = vinfo({}, 1, 50000, [
+      { itemId: 'copper_ore', count: 4, materialSources: [{ source: {}, count: 3 }] },
+    ]);
+    expect(diffVaultOp('deposit', vinfo({}), after)).toEqual([
+      { itemId: 'copper_ore', count: 4, instance: null, copperDelta: 0, purchasedSlotsAfter: 1 },
     ]);
   });
 
@@ -1415,6 +1693,7 @@ describe('diffGuildBankOp (pure)', () => {
       {
         itemId: 'wolf_fang',
         count: 3,
+        materialSources: [{ source: {}, count: 3 }],
         instance: null,
         craftedRecipeId: null,
         copperDelta: 0,
@@ -1432,6 +1711,7 @@ describe('diffGuildBankOp (pure)', () => {
       {
         itemId: 'wolf_fang',
         count: 2,
+        materialSources: [{ source: {}, count: -2 }],
         instance: null,
         craftedRecipeId: null,
         copperDelta: 0,

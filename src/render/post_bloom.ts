@@ -1,7 +1,8 @@
 import { type Texture, Vector2, type WebGLRenderer, type WebGLRenderTarget } from 'three';
 import type { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { restoreClassicBloomComposite } from './post_bloom_shader_core';
+import { guardBloomHighPassInput, restoreClassicBloomComposite } from './post_bloom_shader_core';
+import { FINITE_GUARD_GLSL } from './post_finite_guard_glsl';
 
 const BLUR_X = new Vector2(1, 0);
 const BLUR_Y = new Vector2(0, 1);
@@ -43,9 +44,16 @@ interface BloomPassInternals {
  */
 export class PreparedBloomPass extends UnrealBloomPass {
   readonly bloomTexture: Texture;
+  /** Blur mips rendered per frame, the post shed's `bloom-mips` rung
+   *  (post_shed_core.ts). The chain is sequential, so only the tail can be
+   *  skipped; post_shed.ts clears the skipped vertical targets once so the
+   *  composite (which still reads all five) adds nothing from them. Written
+   *  by post_shed.ts only; defaults to every mip. */
+  activeMips: number;
 
   constructor(resolution: Vector2, strength: number, radius: number, threshold: number) {
     super(resolution, strength, radius, threshold);
+    this.activeMips = this.nMips;
     // Keep the high-pass output distinct from v0. Aliasing them adds a write,
     // read, write transition that can force synchronization on ANGLE and Metal.
     this.bloomTexture = this.renderTargetsHorizontal[0].texture;
@@ -59,6 +67,13 @@ export class PreparedBloomPass extends UnrealBloomPass {
     }
     this.materialHighPassFilter.depthTest = false;
     this.materialHighPassFilter.depthWrite = false;
+    // One NaN beauty texel must not become a frame-wide NaN bloom: guard the
+    // high-pass read, the one place every mip below descends from.
+    this.materialHighPassFilter.fragmentShader = guardBloomHighPassInput(
+      this.materialHighPassFilter.fragmentShader,
+      FINITE_GUARD_GLSL,
+    );
+    this.materialHighPassFilter.needsUpdate = true;
     for (const material of this.separableBlurMaterials) {
       material.depthTest = false;
       material.depthWrite = false;
@@ -102,7 +117,8 @@ export class PreparedBloomPass extends UnrealBloomPass {
     fsQuad.render(renderer);
 
     let inputRenderTarget = this.renderTargetBright;
-    for (let mip = 0; mip < this.nMips; mip++) {
+    const mips = Math.min(this.nMips, Math.max(0, this.activeMips));
+    for (let mip = 0; mip < mips; mip++) {
       const material = this.separableBlurMaterials[mip];
       fsQuad.material = material;
       material.uniforms.colorTexture.value = inputRenderTarget.texture;

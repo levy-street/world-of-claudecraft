@@ -124,6 +124,9 @@ describe('the real catalog', () => {
       'col_first_legendary',
       'col_first_rare',
       'col_glimmerfin',
+      // Deliberate growth (D13 farming celebrations): the golden-harvest
+      // rare find joins its gather_event siblings per the same rule 2.
+      'col_golden_harvest',
       'col_moonlit_bloom',
       'col_perfect_specimen',
       'col_pristine_vein',
@@ -141,6 +144,7 @@ describe('the real catalog', () => {
       'col_reliquary_rank_4',
       'col_reliquary_rank_5',
       'col_set_boundstone_vanguard',
+      'col_set_bramblehide',
       'col_set_crownforged',
       'col_set_deathlord',
       'col_set_greyjaw_stalker',
@@ -153,6 +157,7 @@ describe('the real catalog', () => {
       'col_seven_regalia',
       'col_true_colors',
       'hid_bountiful_coffer',
+      'hid_forgebreaker',
       'hid_roll_hundred',
     ]);
   });

@@ -411,7 +411,7 @@ function expectedTokens(effect: unknown): string[] {
         // divineAscension case (the exported paladin_devotion constants), so the
         // stated numbers are intrinsic, not this 1.
         if (key === 'ascensionRush' || key === 'ascensionWard') continue;
-        // Kill Chain's Smokestep refresh and Foul Play's CC guard are
+        // Kill Chain's Smokefade refresh and Foul Play's CC guard are
         // picked/not-picked flags too; their copy is behavioral, not numeric.
         if (key === 'onKillVanishReset' || key === 'foulPlayGuard') continue;
         // costPct -1 means the ability costs nothing; tooltips say "cost no

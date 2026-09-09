@@ -228,21 +228,46 @@ describe('fixture premises', () => {
       haystack.split(needle).length - 1;
 
     const craft = read('../src/sim/professions/crafting.ts');
+    const craftPlan = read('../src/sim/professions/craft_reagent_plan.ts');
     const enchant = read('../src/sim/professions/enchanting.ts');
+    const goalProjection = read('../src/sim/professions/material_goal_projection.ts');
 
-    // One declaration plus its call sites. crafting.ts has FIVE sites (the
-    // availability check, the lock-only denial probe from the v0.40.0
+    // PR4 extracted the craft-side planner out of crafting.ts into its own
+    // module: the declaration now lives ONCE in craft_reagent_plan.ts, never
+    // in crafting.ts, and crafting.ts keeps its FIVE call sites unchanged
+    // (the availability check, the lock-only denial probe from the v0.40.0
     // item-lock merge, which re-plans with locked copies counted, the
-    // capacity scratch, the real consumption, and the batch simulation);
-    // enchanting.ts has SIX (three resolve arms and three admission arms).
-    expect(occurrences(craft, 'function planCraftReagentDraw(')).toBe(1);
-    expect(occurrences(craft, 'planCraftReagentDraw(')).toBe(6);
+    // capacity scratch, the real consumption, and the batch simulation).
+    // enchanting.ts is untouched by the extraction: its own local planner
+    // still declares ONCE, is CALLED six times (three resolve arms and three
+    // admission arms), for seven total occurrences of the name counting the
+    // declaration itself, and it still calls the shared implementation
+    // directly once (it was never part of this extraction).
+    expect(occurrences(craft, 'function planCraftReagentDraw(')).toBe(0);
+    expect(occurrences(craft, 'planCraftReagentDraw(')).toBe(5);
+    expect(occurrences(craftPlan, 'function planCraftReagentDraw(')).toBe(1);
     expect(occurrences(enchant, 'function planEnchantReagentDraw(')).toBe(1);
     expect(occurrences(enchant, 'planEnchantReagentDraw(')).toBe(7);
 
-    // And each file-local planner is a thin wrapper over the ONE shared
-    // carried-first implementation, called exactly once per file.
-    expect(occurrences(craft, 'planReagentSourceDraw(')).toBe(1);
+    // The material-goal projection (PR4) reuses the SAME shared planner for
+    // its payable-craft-count answer, exactly once (line 225's
+    // `projectPayableCraftCount`), never a re-derived copy. Both consumers
+    // import the name from the shared owning module, never redeclaring it.
+    expect(occurrences(goalProjection, 'planCraftReagentDraw(')).toBe(1);
+    expect(craft).toMatch(
+      /import\s*\{\s*planCraftReagentDraw\s*\}\s*from\s*'\.\/craft_reagent_plan';/,
+    );
+    expect(goalProjection).toMatch(
+      /import\s*\{\s*planCraftReagentDraw\s*\}\s*from\s*'\.\/craft_reagent_plan';/,
+    );
+
+    // Each planner is a thin wrapper over the ONE shared carried-first
+    // implementation, called exactly once in its own owning module.
+    // crafting.ts no longer calls the shared implementation directly (its
+    // own call moved to craft_reagent_plan.ts with the rest of the wrapper);
+    // enchanting.ts still does, unchanged.
+    expect(occurrences(craft, 'planReagentSourceDraw(')).toBe(0);
+    expect(occurrences(craftPlan, 'planReagentSourceDraw(')).toBe(1);
     expect(occurrences(enchant, 'planReagentSourceDraw(')).toBe(1);
   });
 });

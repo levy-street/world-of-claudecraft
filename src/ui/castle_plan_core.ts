@@ -1,13 +1,13 @@
-// Both castles as a MAP PLAN: the curtain runs, tower squares and inner
-// courts of the Last Keep and Dawnhold, as axis-aligned world rects the map
-// window can project and stroke.
+// The walkable castle as a MAP PLAN: Dawnhold's curtain runs, tower squares
+// and inner court, as axis-aligned world rects the map window can project
+// and stroke. (The Last Keep's plan retired with its castle: the site is
+// flat build land now, docs/design/drakelands-improvements/plan.md.)
 //
-// The castles were invisible on the map even though both are named there.
-// The baked plate paints from terrainHeight, and a curtain wall is not
-// terrain there: it is lift field added on top (terrainHeight at the Last
-// Keep's east wall is the 6.0 pad, while groundHeight is the 13.0 walk), so
-// no wall, tower or gate ever reached the plate. The bailey buildings are
-// decorProps, which the map's detail pass does not read either.
+// The castle was invisible on the map even though it is named there. The
+// baked plate paints from terrainHeight, and a curtain wall is not terrain
+// there: it is lift field added on top, so no wall, tower or gate ever
+// reached the plate. The bailey buildings are decorProps, which the map's
+// detail pass does not read either.
 //
 // Drawing the plan as a VECTOR overlay rather than baking it keeps it crisp
 // at every zoom (the plate is 1.33 px/yd against 5.6 to 6.0 px/yd on screen
@@ -20,7 +20,6 @@
 //
 // Pure core: no DOM, no i18n, no color. The painter owns all three.
 
-import { BARBICAN, CASTLE, CASTLE_GATES, CASTLE_TOWERS, GARDEN } from '../sim/castle_layout';
 import {
   DAWNHOLD,
   DAWNHOLD_COURT,
@@ -107,51 +106,6 @@ function bounds(parts: { rect: PlanRect }[]): {
   return { minX, maxX, minZ, maxZ };
 }
 
-function lastKeepPlan(): CastlePlan {
-  const th = CASTLE.wallTh;
-  const parts: { part: PlanPart; rect: PlanRect }[] = [];
-  // the ward terrace, drawn under the walls so the keep's own yard reads
-  parts.push({
-    part: 'court',
-    rect: {
-      cx: (CASTLE.ward.x0 + CASTLE.ward.x1) / 2,
-      cz: (CASTLE.ward.z0 + CASTLE.ward.z1) / 2,
-      hw: (CASTLE.ward.x1 - CASTLE.ward.x0) / 2,
-      hd: (CASTLE.ward.z1 - CASTLE.ward.z0) / 2,
-    },
-  });
-  // the curtain: west and east run along z, north and south along x
-  parts.push(
-    ...wallRuns('x', CASTLE.wx0, CASTLE.wz0, CASTLE.wz1, th, [CASTLE_GATES.main]),
-    ...wallRuns('x', CASTLE.wx1, CASTLE.wz0, CASTLE.wz1, th, [CASTLE_GATES.breach]),
-    ...wallRuns('z', CASTLE.wz0, CASTLE.wx0, CASTLE.wx1, th, [CASTLE_GATES.postern]),
-    ...wallRuns('z', CASTLE.wz1, CASTLE.wx0, CASTLE.wx1, th, []),
-  );
-  // the barbican: the outer work west of the main gate
-  parts.push(
-    ...wallRuns('x', BARBICAN.x, BARBICAN.z0, BARBICAN.z1, BARBICAN.th, [CASTLE_GATES.outer]),
-    ...wallRuns('z', BARBICAN.z0, BARBICAN.x, CASTLE.wx0, BARBICAN.th, []),
-    ...wallRuns('z', BARBICAN.z1, BARBICAN.x, CASTLE.wx0, BARBICAN.th, []),
-  );
-  // the garden annex south of the curtain: its own south wall plus two
-  // side returns up to the curtain (the sim builds exactly these three)
-  parts.push(
-    ...wallRuns('z', GARDEN.wallZ, GARDEN.x0, GARDEN.x1, GARDEN.th, GARDEN.gates),
-    ...wallRuns('x', GARDEN.x0, CASTLE.wz1, GARDEN.wallZ, GARDEN.th, []),
-    ...wallRuns('x', GARDEN.x1, CASTLE.wz1, GARDEN.wallZ, GARDEN.th, []),
-  );
-  for (const t of CASTLE_TOWERS) {
-    parts.push({ part: 'tower', rect: { cx: t.x, cz: t.z, hw: t.hw, hd: t.hw } });
-  }
-  return {
-    id: 'the_last_keep',
-    cx: (CASTLE.wx0 + CASTLE.wx1) / 2,
-    cz: (CASTLE.wz0 + CASTLE.wz1) / 2,
-    ...bounds(parts),
-    parts,
-  };
-}
-
 function dawnholdPlan(): CastlePlan {
   const th = DAWNHOLD.wallTh;
   const parts: { part: PlanPart; rect: PlanRect }[] = [];
@@ -191,8 +145,8 @@ function dawnholdPlan(): CastlePlan {
   };
 }
 
-/** Both castles' plans, built once from the authored layouts. */
-export const CASTLE_MAP_PLANS: readonly CastlePlan[] = [lastKeepPlan(), dawnholdPlan()];
+/** Every standing castle's plan, built once from the authored layouts. */
+export const CASTLE_MAP_PLANS: readonly CastlePlan[] = [dawnholdPlan()];
 
 /** a plan part projected into canvas space */
 export interface CastlePlanMarker {

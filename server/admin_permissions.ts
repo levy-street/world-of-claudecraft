@@ -30,20 +30,31 @@ export const ADMIN_PERMISSIONS = [
   // SUPERADMIN_ONLY_PERMISSIONS below), so no dashboard-grantable role reaches
   // it, which is the conservative default for an irreversible action.
   'guildbank.purge',
+  // The stamped-legendary-name strip (server/clear_item_name.ts): deletes a
+  // player-authored, deed-earned name off an item copy with no in-game undo,
+  // so like guildbank.purge it DESTROYS PLAYER PROPERTY and is deliberately
+  // its OWN permission rather than riding moderation.act. SUPERADMIN-ONLY
+  // (see SUPERADMIN_ONLY_PERMISSIONS below), so no dashboard-grantable role
+  // reaches it, the conservative default for an irreversible action.
+  'moderation.clearItemName',
   'staff.manage',
 ] as const;
 
 export type AdminPermission = (typeof ADMIN_PERMISSIONS)[number];
 
 // Permissions that only superadmin may hold. staff.manage (grant/revoke roles)
-// is the privilege-escalation vector, and guildbank.purge DESTROYS PLAYER
-// PROPERTY with no in-game undo, so both are deliberately kept out of every
-// dashboard-grantable role, including the otherwise-everything `admin` role.
+// is the privilege-escalation vector, and guildbank.purge and
+// moderation.clearItemName DESTROY PLAYER PROPERTY with no in-game undo, so
+// all three are deliberately kept out of every dashboard-grantable role,
+// including the otherwise-everything `admin` role.
 // Relaxing this later is a one-line change; an item removed by a role that
 // should not have held the permission cannot be un-destroyed. A test pins that
 // these are reachable ONLY through superadmin.
 export const SUPERADMIN_ONLY_PERMISSIONS: readonly AdminPermission[] = [
   'guildbank.purge',
+  // Destroys a player-authored legendary name with no undo (the guildbank
+  // rationale at its ADMIN_PERMISSIONS row).
+  'moderation.clearItemName',
   'staff.manage',
 ];
 

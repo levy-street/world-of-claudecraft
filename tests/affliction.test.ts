@@ -4,6 +4,7 @@ import {
   AFFLICTION_DOOM_DURATION,
   AFFLICTION_DOOM_MAX,
   AFFLICTION_EYE_DEATH_GAIN,
+  afflictionConsumeThreadDoomBonus,
   completeNeedleOfFateCast,
   consumeDoom,
   doomValue,
@@ -507,6 +508,112 @@ describe('Affliction Warlock', () => {
     sim.player.gcdRemaining = 0;
     finishCast(sim, 'needle_of_fate', target);
     expect(doomValue(sim.player)).toBe(58);
+  });
+
+  // Both openers are "Instant, off GCD" burst buttons (docs/design/warlock-overhaul.md),
+  // pressed in the middle of the Needle cast or Consume channel they empower. Before
+  // the fix the busy guard rejected the press outside the cast-queue tail, so the
+  // player saw "You are busy." and gained no Condemnation (bug report 2026-09-04).
+  it('lets Hour of Judgment fire through a Needle of Fate cast without disturbing it', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('needle_of_fate');
+    for (let i = 0; i < 4; i++) sim.tick();
+    expect(sim.player.castingAbility).toBe('needle_of_fate');
+    const castRemaining = sim.player.castRemaining;
+    expect(castRemaining).toBeGreaterThan(CAST_QUEUE_WINDOW_SEC);
+
+    sim.castAbility('hour_of_judgment');
+    const events = sim.tick();
+
+    expect(events.filter((event) => event.type === 'error')).toEqual([]);
+    expect(doomValue(sim.player)).toBe(40);
+    expect(ownedFateThreads(sim.player)).toBe(3);
+    expect(sim.player.cooldowns.get('hour_of_judgment')).toBeCloseTo(90 - 1 / 20, 6);
+    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_judgment')).toBe(true);
+    expect(sim.player.castingAbility).toBe('needle_of_fate');
+    expect(sim.player.castRemaining).toBeCloseTo(castRemaining - 1 / 20, 6);
+    expect(sim.player.queuedCastAbility).toBeNull();
+
+    // The Needle in flight completes under Judgment: (7 + 2 possessed) doubled.
+    for (let i = 0; i < 20 * 5 && sim.player.castingAbility; i++) sim.tick();
+    for (let i = 0; i < 200 && ctx(sim).pendingProjectiles.length > 0; i++) sim.tick();
+    expect(doomValue(sim.player)).toBe(58);
+  });
+
+  it('lets Possess the Evil Eye fire through a Consume channel and keeps it channeling', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('drain_life');
+    for (let i = 0; i < 5; i++) sim.tick();
+    expect(sim.player.castingAbility).toBe('drain_life');
+    expect(sim.player.channeling).toBe(true);
+    expect(sim.player.castRemaining).toBeGreaterThan(CAST_QUEUE_WINDOW_SEC);
+    const doomBefore = doomValue(sim.player);
+    const mana = sim.player.resource;
+
+    sim.castAbility('possess_evil_eye');
+    const events = sim.tick();
+
+    expect(events.filter((event) => event.type === 'error')).toEqual([]);
+    expect(doomValue(sim.player)).toBeGreaterThanOrEqual(doomBefore + 35);
+    expect(sim.player.resource).toBeLessThanOrEqual(mana - 75);
+    expect(sim.player.cooldowns.get('possess_evil_eye')).toBeCloseTo(45 - 1 / 20, 6);
+    expect(
+      sim.player.auras.find((aura) => aura.kind === 'affliction_possession')?.remaining,
+    ).toBeCloseTo(15 - 1 / 20, 6);
+    expect(sim.player.castingAbility).toBe('drain_life');
+    expect(sim.player.channeling).toBe(true);
+    expect(sim.player.queuedCastAbility).toBeNull();
+  });
+
+  it('fires Hour of Judgment at once inside the cast-queue tail instead of queueing it', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('needle_of_fate');
+    while (sim.player.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+    expect(sim.player.castingAbility).toBe('needle_of_fate');
+
+    sim.castAbility('hour_of_judgment');
+
+    // Through-cast, not queued: the opener lands on the press tick and the
+    // Needle in flight is what gets doubled, exactly like a press earlier in
+    // the cast.
+    expect(sim.player.queuedCastAbility).toBeNull();
+    expect(doomValue(sim.player)).toBe(40);
+    expect(sim.player.cooldowns.get('hour_of_judgment')).toBe(90);
+    expect(sim.player.castingAbility).toBe('needle_of_fate');
+    for (let i = 0; i < 20 * 5 && sim.player.castingAbility; i++) sim.tick();
+    for (let i = 0; i < 200 && ctx(sim).pendingProjectiles.length > 0; i++) sim.tick();
+    expect(doomValue(sim.player)).toBe(58);
+  });
+
+  it('keeps a running Consume on the Threads it consumed when Hour of Judgment lands mid-channel', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('drain_life');
+    for (let i = 0; i < 5; i++) sim.tick();
+    expect(sim.player.channeling).toBe(true);
+    const consumeThreads = afflictionConsumeThreadDoomBonus(sim.player);
+
+    sim.castAbility('hour_of_judgment');
+    sim.tick();
+
+    // The three granted Threads stay banked on the warlock for the next
+    // Sentence; the channel already running keeps the (zero) Thread bonus it
+    // consumed at its start rather than re-reading the new ones each tick.
+    expect(ownedFateThreads(sim.player)).toBe(3);
+    expect(afflictionConsumeThreadDoomBonus(sim.player)).toBe(consumeThreads);
+    expect(sim.player.castingAbility).toBe('drain_life');
+    expect(sim.player.channeling).toBe(true);
   });
 
   it('promotes a Coven target before applying Hour of Judgment Needle generation', () => {

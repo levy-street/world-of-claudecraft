@@ -14,7 +14,8 @@ describe('zone1 quest text direction (issue #2680)', () => {
   function poi(id: string): { x: number; z: number } {
     const found = ZONE1_ZONE.pois.find((p) => p.id === id);
     expect(found, `${id} should be a registered zone1 POI`).toBeTruthy();
-    return found!;
+    if (!found) throw new Error(`${id} should be a registered zone1 POI`);
+    return found;
   }
 
   function campCenter(mobId: string): { x: number; z: number } {

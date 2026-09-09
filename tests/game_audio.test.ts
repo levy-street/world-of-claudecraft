@@ -80,6 +80,17 @@ describe('sampled GameAudio facade', () => {
       ['cardReveal', 'ui_card_reveal'],
       ['cardRoundPush', 'ui_card_round_push'],
       ['cardShuffle', 'ui_card_shuffle'],
+      ['farmPlant', 'ui_farm_plant'],
+      ['farmHarvest', 'ui_farm_harvest'],
+      ['farmWithered', 'ui_farm_withered'],
+      ['farmReady', 'ui_farm_ready'],
+      ['farmGolden', 'ui_farm_golden'],
+      ['farmFeast', 'ui_farm_feast'],
+      // Masterwrought crafting-UX cues (phase 14).
+      ['perfectingAttempt', 'ui_perfecting_attempt'],
+      ['perfectingSuccess', 'ui_perfecting_success'],
+      ['legendaryForged', 'ui_legendary_forged'],
+      ['sunderComplete', 'ui_sunder_complete'],
     ] as const;
 
     for (const [method, key] of routes) {
@@ -125,6 +136,25 @@ describe('sampled GameAudio facade', () => {
       'fishCast',
       'fishReel',
       'craftCast',
+      // The farming RESULT half. Its plant twin is on the ungated arm below,
+      // which is the whole point of the split.
+      'farmHarvest',
+      // The withered twin of that result: the same action resolving, so it
+      // takes the same gate as the harvest it replaces, never the ungated
+      // affordance arm the press itself rides.
+      'farmWithered',
+      // The ready NOTICE: nothing was pressed, so it rides the feedback gate
+      // like the mail and quest chimes and falls silent with them.
+      'farmReady',
+      // The golden-harvest sting: a result notification layered over the
+      // achievement cue, so it gates like masterwork and gatherRareTier.
+      'farmGolden',
+      // The Masterwrought crafting-UX cues (phase 14): result feedback like
+      // craftSuccess/masterwork, so all four ride the feedback gate.
+      'perfectingAttempt',
+      'perfectingSuccess',
+      'legendaryForged',
+      'sunderComplete',
     ] as const;
     for (const m of feedback) audio[m]();
     // The parameterized gather/rarity/craft/enchanting cues gate the same way;
@@ -147,12 +177,18 @@ describe('sampled GameAudio facade', () => {
     audio.duelCountdownTick();
     audio.fiestaWave();
     audio.fishBite();
+    audio.farmPlant();
+    // Setting out the feast is a direct affordance like the plant, so it
+    // rides the ungated arm with it.
+    audio.farmFeast();
     expect(sfxMock.playUi.mock.calls.map(([k]) => k)).toEqual([
       'ui_click',
       'ui_bag_open',
       'ui_duel_countdown',
       'ui_fiesta_wave',
       'ui_fish_bite',
+      'ui_farm_plant',
+      'ui_farm_feast',
     ]);
 
     // Re-enabling restores the feedback cues.
@@ -289,18 +325,40 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 15 unique UI cues to the authoritative studio inventory', () => {
+  it('adds 25 unique UI cues to the authoritative studio inventory', () => {
     // 13 pre-12b cues plus the Phase 12b gathering-rhythm placeholder
     // (ui_gather_cast) plus the Craft Cast System Phase 6 craft-family
-    // cast-start placeholder (ui_craft_cast). ui_gather_strike/rare and
-    // ui_fish_cast/bite/reel were retired once real per-node-type /
+    // cast-start placeholder (ui_craft_cast) plus the Farming render/juice
+    // pair (ui_farm_plant, ui_farm_harvest) plus the farming ready notice
+    // (ui_farm_ready, the ready-notice phase) plus the golden-harvest sting
+    // (ui_farm_golden, the celebrations phase) plus the shared-feast
+    // placement (ui_farm_feast, the Phase 12 feast). ui_gather_strike/rare
+    // and ui_fish_cast/bite/reel were retired once real per-node-type /
     // rarity-tier / fishing recordings replaced them (src/game/audio.ts);
-    // ui_vcup_kickoff left with the Vale Cup minigame.
+    // ui_vcup_kickoff left with the Vale Cup minigame (the release's Sowfield
+    // demolition), which is why the branch's 21 (counted with 14 pre-12b cues)
+    // landed at 20 on the merged tree: the release's 15 plus the five farm
+    // cues. Masterwrought phase 14 then added its four crafting-UX cues
+    // (ui_perfecting_attempt, ui_perfecting_success, ui_legendary_forged,
+    // ui_sunder_complete): 20 -> 24, measured from UI_SFX_CATALOG. The Phase
+    // 18 sweep then closed the deferred withered sting (ui_farm_withered,
+    // the disappointment cue farmWithered borrowed from farmHarvest until
+    // now): 24 -> 25.
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(15);
+    expect(keys).toHaveLength(25);
     expect(keys).toContain('ui_craft_cast');
+    expect(keys).toContain('ui_farm_plant');
+    expect(keys).toContain('ui_farm_harvest');
+    expect(keys).toContain('ui_farm_withered');
+    expect(keys).toContain('ui_farm_ready');
+    expect(keys).toContain('ui_farm_golden');
+    expect(keys).toContain('ui_farm_feast');
+    expect(keys).toContain('ui_perfecting_attempt');
+    expect(keys).toContain('ui_perfecting_success');
+    expect(keys).toContain('ui_legendary_forged');
+    expect(keys).toContain('ui_sunder_complete');
     expect(new Set(keys).size).toBe(keys.length);
     expect(keys.every((key: string) => key.startsWith('ui_'))).toBe(true);
     expect(UI_SFX_CATALOG.every((cue: { generator: string }) => cue.generator === 'ffmpeg')).toBe(

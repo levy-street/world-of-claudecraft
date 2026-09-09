@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.nl_NL.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Elke instance draait ook op **Heroic**: vijanden van een hoger level, scherpere 
 
 ### Delves
 
-Delves zijn een aparte, schaalbare modus voor kleine groepen van één of twee spelers, elke run opnieuw opgebouwd uit gerandomiseerde kamers en eindigend bij een vergrendelde reliekkist die opengaat via een lockpicking-minigame in plaats van een loot roll. **The Collapsed Reliquary** (level 7 en hoger) eindigt bij Deacon Varric, met een AI-metgezel, Tessa, die aan je zij vecht als je alleen gaat. **The Drowned Litany** (level 12 en hoger) volgt het spoor naar een ondergelopen heiligdom aan de rand van Mirefen Marsh. Een delve-bord bepaalt de tier: Heroic verhoogt de vijandlevels en voegt een willekeurige affix toe voor rijkere beloningen.
+Delves zijn een aparte, schaalbare modus voor kleine groepen van één of twee spelers, elke run opnieuw opgebouwd uit gerandomiseerde kamers en eindigend bij een vergrendelde reliekkist die opengaat via een lockpicking-minigame in plaats van een loot roll. **The Collapsed Reliquary** (level 7 en hoger) eindigt bij Deacon Vandric, met een AI-metgezel, Tessa, die aan je zij vecht als je alleen gaat. **The Drowned Litany** (level 12 en hoger) volgt het spoor naar een ondergelopen heiligdom aan de rand van Mirefen Marsh. Een delve-bord bepaalt de tier: Heroic verhoogt de vijandlevels en voegt een willekeurige affix toe voor rijkere beloningen.
 
 ### Ranked PvP (the Ashen Coliseum)
 

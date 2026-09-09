@@ -3,6 +3,8 @@
   import { apiGet } from '../api';
   import { fmtCopper, fmtDate, fmtNumber, fmtRelative } from '../format';
   import { t } from '../i18n';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from './PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import type { AccountWealthData } from '../types';
   import GuildLink from './GuildLink.svelte';
@@ -14,7 +16,7 @@
   let { accountId }: { accountId: number } = $props();
 
   let wealth = $state<AccountWealthData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let requestId = 0;
 
   async function refresh(): Promise<void> {
@@ -23,10 +25,10 @@
       const result = await apiGet<AccountWealthData>(`/admin/api/accounts/${accountId}/wealth`);
       if (currentRequest !== requestId) return;
       wealth = result;
-      failed = false;
+      failed = 'none';
     } catch (err) {
       if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -40,7 +42,9 @@
 
 <div class="wealth-panel">
   <h4>{t('wealth.header')}</h4>
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('wealth.loadFailed')}</div>
   {:else if wealth === null}
     <div class="empty">{t('wealth.loading')}</div>

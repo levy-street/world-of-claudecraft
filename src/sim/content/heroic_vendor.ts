@@ -1,8 +1,11 @@
 import type { ItemDef } from '../types';
 
-// The Heroic Quartermaster's marks-currency stock: the game's only source of
-// neck and ring jewelry. Prices are HEROIC MARKS (the heroic_mark inventory
-// item from ./dungeon_difficulty.ts), debited from the buyer's bags by
+// The Heroic Quartermaster's marks-currency stock: the endgame neck and ring
+// jewelry bought with marks. It is not the game's only jewelry (the WARFARE
+// honor sets, the rift ring abysswrought_band, and the crafted jewelcrafting
+// pieces all ship elsewhere); the item-level and rating notes below describe
+// THIS stock. Prices are HEROIC MARKS (the heroic_mark inventory item from
+// ./dungeon_difficulty.ts), debited from the buyer's bags by
 // buyHeroicVendorItem (src/sim/instances/heroic_vendor.ts).
 //
 // Item level: the source index (src/sim/item_level.ts) treats this stock as
@@ -158,4 +161,89 @@ export const HEROIC_VENDOR_STOCK: readonly HeroicVendorOffer[] = [
   { itemId: 'zense_meridian', marks: 16 },
   { itemId: 'swiftfang_talisman', marks: 16 },
   { itemId: 'medallion_of_endless_profit', marks: 16 },
+  // Masterwrought phase 04: the deterministic Wyrmfall Core catch-up valve
+  // (ruling R8's day-one vendor channel). Deliberately priced at the ring
+  // point of the mark family: a bad-luck backstop for the last core, never a
+  // farm that outpaces the boss faucet (1 to 3 per kill). The def lives in
+  // content/items.ts with the other materials; the item_level stock bump
+  // no-ops for it (junk is not item-level eligible).
+  { itemId: 'wyrmfall_core', marks: 12 },
+  // Masterwrought phase 11: the eight APEX_CONSUMABLE patterns, ruling R8's
+  // deterministic pillar. This marks vendor IS the valve, live from day one:
+  // consumable crafters get deterministic access so the raid economy
+  // functions, while the gear patterns stay chase drops per R8's split.
+  // Prices sit in the shipped mark family: the six skill-100 patterns at the
+  // ring point (12), the two skill-125 capstones at the neck point (16).
+  // Patterns are tradable, so duplicates are purchasable BY DESIGN: surplus
+  // copies flow to the World Market and this vendor price acts as the market
+  // ceiling. Purchase quantity is the vendor's hardcoded 1 per buy
+  // (buyHeroicVendorItem debits one price and grants exactly one copy; this
+  // vendor has no count multiplier). The defs live in
+  // content/apex_patterns.ts; the item_level stock bump still indexes their
+  // source level, but kind 'recipe' carries no slot so the rows are not
+  // item-level ELIGIBLE and itemLevel() stays undefined for them.
+  { itemId: 'pattern_ironhusk_flask', marks: 12 },
+  { itemId: 'pattern_warboar_flask', marks: 12 },
+  { itemId: 'pattern_runewater_flask', marks: 12 },
+  { itemId: 'pattern_stonepot_stew', marks: 12 },
+  { itemId: 'pattern_warspice_skewers', marks: 12 },
+  { itemId: 'pattern_sageleaf_chowder', marks: 12 },
+  { itemId: 'pattern_grand_cauldron', marks: 16 },
+  { itemId: 'pattern_laden_hearth', marks: 16 },
+  // Masterwrought phase 11i: the angler's endgame patterns, on the same R8
+  // deterministic pillar as the eight above and for the same reason. The
+  // engineering schematic is here rather than in a drop table because the rod
+  // it teaches is the GATE on catch band 5: a luck-gated schematic would put a
+  // whole band of a gathering profession behind luck (R18), and
+  // docs/design/deeds.md would then also zero the Renown on the deed attached
+  // to it.
+  //
+  // PRICED BY THE RUNG EACH TEACHES, read off the two points this family
+  // already has rather than invented: 12 for the rung-75 and rung-100 cooking
+  // patterns (the ring point, where every skill-100 pattern sits) and 16 for
+  // the two rung-125 rows, the cooking capstone and the schematic (the neck
+  // point, where the skill-125 capstones sit). No third price point is minted.
+  { itemId: 'pattern_peppered_deepbarb_catfish', marks: 12 },
+  { itemId: 'pattern_roast_hollowgill_sturgeon', marks: 12 },
+  // The apex feast tier (masterwrought Phase 11k), at the 16-marks skill-125
+  // rung the two mobile stations occupy. They replace the retired
+  // pattern_deepwater_feast row; no new price point is minted.
+  { itemId: 'pattern_stonepot_feast', marks: 16 },
+  { itemId: 'pattern_warspice_feast', marks: 16 },
+  { itemId: 'pattern_sageleaf_feast', marks: 16 },
+  { itemId: 'pattern_clockreel_fishing_rod', marks: 16 },
+  // Masterwrought phase 11f: the farming valve. All SIX farming patterns and
+  // every tier-3 and tier-4 SEED, on the wyrmfall_core precedent above ("a
+  // bad-luck backstop ... never a farm that outpaces the boss faucet"), so
+  // nothing this phase puts in a drop table can fossilize behind bad luck.
+  // That backstop is what makes the luck-gated arms legal at all: D13 says a
+  // luck-gated trigger can never be the only faucet for a pattern.
+  //
+  // EVERY ROW AT 12, the ring point, and the price is DERIVED rather than
+  // chosen: the shipped mark family has exactly two points, 12 for the
+  // skill-100 patterns and 16 for the skill-125 capstones, and under the Phase
+  // 11f rung climb every farming pattern teaches a rung-75 or rung-100 row. NO
+  // farming row sits at 16, and minting a third point below 12 to make seeds
+  // cheap stays reserved for a maintainer decision over the whole family.
+  //
+  // The seeds are kind 'junk', so the item_level stock bump no-ops for them
+  // exactly as it does for wyrmfall_core, and the gear-shape sweep in
+  // tests/heroic_vendor.test.ts excludes them BY KIND rather than by a growing
+  // id list. They do NOT replace the copper counters: Phase 11e stocked all
+  // eight at farmer_hollis and farmer_verbena and that remains the everyday
+  // route, which is the whole point of the identity guard.
+  { itemId: 'pattern_highwatch_gourd_soup', marks: 12 },
+  { itemId: 'pattern_highwatch_barley_porridge', marks: 12 },
+  { itemId: 'pattern_evergarden_sunmelon_tart', marks: 12 },
+  { itemId: 'pattern_evergarden_harvest_platter', marks: 12 },
+  { itemId: 'pattern_evergarden_braised_greens', marks: 12 },
+  { itemId: 'pattern_harvest_feast', marks: 12 },
+  { itemId: 'highland_barley_seed', marks: 12 },
+  { itemId: 'frost_gourd_seed', marks: 12 },
+  { itemId: 'thornpeak_cabbage_seed', marks: 12 },
+  { itemId: 'frost_lentils_seed', marks: 12 },
+  { itemId: 'gilded_sunmelon_seed', marks: 12 },
+  { itemId: 'evergarden_greens_seed', marks: 12 },
+  { itemId: 'gilded_yam_seed', marks: 12 },
+  { itemId: 'evergarden_pumpkin_seed', marks: 12 },
 ];

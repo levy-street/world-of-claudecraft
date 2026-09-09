@@ -5,8 +5,13 @@
 // (move + import, not a rewrite). The XP curve formulas (xpForLevel / canPrestige)
 // stay pure in ../types and are imported here.
 
-import { buildingContainsRestPoint, buildingRestPadding } from '../building_layout';
+import {
+  buildingContainsPoint,
+  buildingContainsRestPoint,
+  buildingRestPadding,
+} from '../building_layout';
 import { getActiveWorldContent } from '../data';
+import { KIT_BUILDINGS } from '../kit_buildings';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type BuildingDef, canPrestige, DT, type Entity, MAX_LEVEL, xpForLevel } from '../types';
@@ -18,14 +23,24 @@ const RESTED_FILL_HOURS = 8; // accrued per this many in-game hours of resting
 const RESTED_CAP_LEVELS = 1.5; // pool clamps to 1.5 levels of XP, the classic-era cap
 // True while the player is standing in (or just beside) an inn footprint and
 // out of combat — the classic "resting" state that accrues rested XP.
+// Two inn sources: the authored BuildingDef inns of the active world, and the
+// placed-kit inns derived from the fortress table (kit_buildings.ts: the
+// Drakelands rebuild's tavern, which draws and blocks through the kit
+// pipeline and never appears in props.buildings). The kit footprint is the
+// kit collider's own OBB, so it takes the collider-correct point test.
 export function isResting(
   p: Entity,
   buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
+  kitBuildings: readonly BuildingDef[] = KIT_BUILDINGS,
 ): boolean {
   if (p.inCombat) return false;
   for (const b of buildings) {
     if (b.kind !== 'inn') continue;
     if (buildingContainsRestPoint(b, p.pos.x, p.pos.z, buildingRestPadding(b))) return true;
+  }
+  for (const b of kitBuildings) {
+    if (b.kind !== 'inn') continue;
+    if (buildingContainsPoint(b, p.pos.x, p.pos.z, buildingRestPadding(b))) return true;
   }
   return false;
 }

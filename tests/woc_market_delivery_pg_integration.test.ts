@@ -24,6 +24,7 @@
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { BankLedgerOutboxSnapshot } from '../server/bank_ledger_outbox';
+import { materialSourceConnection } from '../server/material_source_connection';
 import type { StorageAppliedEffect } from '../server/storage_purchase_db';
 import type {
   WocCustodyGrant,
@@ -34,6 +35,7 @@ import type {
 import type { PgWocMarketDb } from '../server/woc_market_db';
 import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
+import { fullMaterialSourceSaveFixture } from './helpers/material_source_save_fixture';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
 const VERIFY_DB = 'wocc_woc_market_delivery_verify';
@@ -143,7 +145,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
     await db.ensureSchema();
     await db.runConcurrentIndexMigrations();
 
-    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 12 });
+    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 12 });
     marketDb = new marketDbMod.PgWocMarketDb(pool);
   }, 120_000);
 
@@ -1897,7 +1899,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
     }, 30_000);
 
     it('measures the transaction cost against its statement allowance', async () => {
-      // The workload-scoped 4s statement_timeout replaced the 60s heavy
+      // The workload-scoped statement_timeout replaced the 60s heavy
       // allowance because this transaction now heads a character's save FIFO.
       // Prove the expected cost really is orders of magnitude under the
       // ceiling with a representative blob (a few hundred inventory slots),
@@ -1941,9 +1943,64 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       );
       // 25x the observed 8.3ms max: loose enough for a loaded dev box, tight
       // enough that a plan regression (a scan, a lost index) reds here
-      // instead of hiding under the 4s allowance.
+      // instead of hiding under the scoped allowance.
       expect(p99).toBeLessThan(ESCROW_STATEMENT_TIMEOUT_MS / 25);
     }, 30_000);
+
+    it('measures real escrow saves with full material source containers', async () => {
+      const { REALM } = await import('../server/realm');
+      for (const shape of ['single', 'five', 'per-unit'] as const) {
+        const sourceState = fullMaterialSourceSaveFixture(shape);
+        const account = await seedAccount();
+        const characterId = await seedCharacter(REALM, account);
+        await seedLease(REALM, characterId, 'escrow-source-live');
+        await pool.query('UPDATE characters SET state = $1::jsonb WHERE id = $2', [
+          JSON.stringify(sourceState),
+          characterId,
+        ]);
+        const samples: number[] = [];
+        for (let pass = 0; pass < 4; pass++) {
+          const next = structuredClone(sourceState);
+          // First pass creates the opening; later passes change an existing
+          // anchor. Every pass changes both bank and vault without changing stock.
+          for (const slots of [next.bank!.inventory, next.vault!.special!]) {
+            slots[0]!.materialSources = slots[0]!.materialSources!.map((entry, index) =>
+              index === 0
+                ? {
+                    ...entry,
+                    source: {
+                      ...entry.source,
+                      signer: pass % 2 === 0 ? 'A'.repeat(16) : 'B'.repeat(16),
+                    },
+                  }
+                : entry,
+            );
+          }
+          const startedAt = performance.now();
+          const out = await marketDb.escrowInsertListing(
+            { characterId, level: 12, state: next, leaseNonce: 'escrow-source-live' },
+            escrowListing(REALM, account, characterId),
+          );
+          samples.push(performance.now() - startedAt);
+          if (!out.ok) throw new Error(`source escrow refused (${shape}/${pass}): ${out.reason}`);
+          await pool.query(
+            "UPDATE woc_market_listings SET status = 'closed', resolution = 'cancelled' WHERE id = $1",
+            [out.id],
+          );
+        }
+        const anchors = await pool.query(
+          'SELECT container, current_revision::text FROM material_source_containers WHERE owner_character_id = $1 ORDER BY container',
+          [characterId],
+        );
+        expect(anchors.rows).toEqual([
+          { container: 'personal', current_revision: '4' },
+          { container: 'vault', current_revision: '4' },
+        ]);
+        process.stdout.write(
+          `[escrow-material-source-cost] ${JSON.stringify({ shape, serializedBytes: Buffer.byteLength(JSON.stringify(sourceState)), milliseconds: samples })}\n`,
+        );
+      }
+    }, 120_000);
 
     it('persists the maximum ledger prefix plus one storage effect under PostgreSQL 16', async () => {
       const { BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS, serializeBankLedgerCommandBatch } =
@@ -1960,6 +2017,10 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const buyer = await seedAccount();
       const characterId = await seedCharacter(REALM, account);
       await seedLease(REALM, characterId, 'escrow-max-prefix-live');
+      await pool.query('UPDATE characters SET state = $1::jsonb WHERE id = $2', [
+        JSON.stringify(fullMaterialSourceSaveFixture('per-unit')),
+        characterId,
+      ]);
       const { maxRows, maxEncodedBytes } = BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS;
       const buildBatch = (batchKey: string, payloadBytes: number) => {
         const instance = { padding: 'x'.repeat(payloadBytes) };
@@ -2068,7 +2129,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
           {
             characterId,
             level: 12,
-            state: SAVE_STATE,
+            state: fullMaterialSourceSaveFixture('per-unit', String(sample).repeat(16)),
             leaseNonce: 'escrow-max-prefix-live',
             storageEffects: [storageEffect],
             bankLedgerSnapshot,
@@ -2085,11 +2146,11 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       samples.sort((a, b) => a - b);
       const p50 = samples[Math.floor(samples.length / 2)] ?? 0;
       const max = samples[samples.length - 1] ?? 0;
-      console.log(
-        `[escrow-max-prefix] PostgreSQL ${serverVersion}, ${maxRows} rows, ${calibrated.encodedBytes} encoded bytes, ${ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS} statements under ${ESCROW_STATEMENT_TIMEOUT_MS}ms each: p50 ${p50.toFixed(1)}ms max ${max.toFixed(1)}ms over ${samples.length} passes`,
+      process.stdout.write(
+        `[escrow-max-prefix] PostgreSQL ${serverVersion}, ${maxRows} rows, ${calibrated.encodedBytes} encoded bytes, ${ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS} statements under ${ESCROW_STATEMENT_TIMEOUT_MS}ms each: p50 ${p50.toFixed(1)}ms max ${max.toFixed(1)}ms over ${samples.length} passes\n`,
       );
       // Success is the timeout proof: PostgreSQL itself enforces the installed
-      // 4s statement_timeout on every workload statement. The observed wall
+      // scoped statement_timeout on every workload statement. The observed wall
       // time is logged, not promoted into a made-up CI latency promise.
       expect(max).toBeGreaterThan(0);
     }, 120_000);

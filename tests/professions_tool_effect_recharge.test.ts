@@ -5,11 +5,16 @@
 // expensive generic recharge any shipped tool can price).
 
 import { describe, expect, it } from 'vitest';
-import type { TOOL_EFFECT_IDS } from '../src/sim/content/professions';
-import { TOOL_EFFECT_RECIPES } from '../src/sim/content/recipes';
+import {
+  HARVEST_COMPONENT_ITEMS,
+  HARVEST_COMPONENT_SPECIMENS,
+  type TOOL_EFFECT_IDS,
+} from '../src/sim/content/professions';
+import { ALL_RECIPES, APEX_GEAR_RECIPES, TOOL_EFFECT_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/disenchant_reagents';
+import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
   NO_TOOL_OWNED,
   normalizeToolEffectSlots,
@@ -24,6 +29,7 @@ import {
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { completeRechargeCast, runRecharge } from './helpers/enchant_family_cast';
+import { reagentUnitValue } from './helpers/reagent_unit_value';
 
 const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 const metaOf = (sim: Sim): PlayerMeta => sim.meta(sim.playerId) as PlayerMeta;
@@ -403,13 +409,9 @@ describe('the recharge command: price, consume, refill', () => {
 });
 
 describe('the R39 economics inequality: a fresh mint always out-costs a generic recharge', () => {
-  // The same price basis recipe_economy.test.ts uses: buyValue when a vendor
-  // sells the reagent for copper, else sellValue.
-  const unitValue = (itemId: string): number => {
-    const def = ITEMS[itemId];
-    if (!def) throw new Error(`no ItemDef for ${itemId}`);
-    return typeof def.buyValue === 'number' && def.buyValue > 0 ? def.buyValue : def.sellValue;
-  };
+  // The same price basis recipe_economy.test.ts uses, imported from its one
+  // home (tests/helpers/reagent_unit_value.ts) rather than restated.
+  const unitValue = reagentUnitValue;
 
   // Every rarity rung a SHIPPED gathering tool can resolve at recharge time:
   // derived from the live item table, so the day a legendary tool ships, its
@@ -463,6 +465,135 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
             `charm becomes the cheap recharge`,
         ).toBeGreaterThan(rechargeValue);
       }
+    }
+  });
+
+  it('holds for the apex charm at every reachable rung (Masterwrought phase 09)', () => {
+    // The apex rung minted from APEX_GEAR_RECIPES rather than
+    // TOOL_EFFECT_RECIPES: same inequality, its OWN craft (engineering, the
+    // effect's craftId), so the cheapest mint a player can perform is the
+    // engineering-specialized bill. startingDurability stays at the family's
+    // 20, so the worst generic recharge is the SAME 275-copper epic fill the
+    // enchanting charms price against.
+    const recipe = APEX_GEAR_RECIPES.find((row) => row.resultItemId === 'makers_charm');
+    if (!recipe) throw new Error('recipe_makers_charm missing from APEX_GEAR_RECIPES');
+    expect(recipe.professionId).toBe('engineering');
+    const listed = mintValue(recipe, {});
+    const cheapest = mintValue(recipe, { engineering: 125 });
+    expect(cheapest, 'the specialization discount must really bite').toBeLessThan(listed);
+    for (const rung of reachableRungs) {
+      const fill = startingDurabilityFor('makers_charm', rung);
+      const genericCount = Math.ceil(fill / RECHARGE_CHARGES_PER_MATERIAL);
+      const ladderRung = ['common', 'uncommon', 'rare', 'epic', 'legendary'][
+        rarityLadderIndex(rung)
+      ];
+      const rechargeValue = genericCount * unitValue(DISENCHANT_MATERIAL_BY_QUALITY[ladderRung]);
+      expect(
+        cheapest,
+        `${recipe.id} at the ${String(rung)} rung: the CHEAPEST mint ${cheapest} must ` +
+          `exceed the generic full-fill recharge ${rechargeValue}, or re-crafting the apex ` +
+          `charm becomes the cheap recharge`,
+      ).toBeGreaterThan(rechargeValue);
+    }
+    // The resolved rung arithmetic, pinned so a one-sided retune of either
+    // the reagent bill or the material prices cannot drift silently:
+    // listed 3x45 + 2x50 + 4x60 + 2x60 = 595; specialized floor(count x 0.8)
+    // is 2x45 + 1x50 + 3x60 + 1x60 = 380; worst generic recharge stays 275
+    // (the 50-charge epic fill at 5 shards).
+    expect(listed).toBe(595);
+    expect(cheapest).toBe(380);
+    expect(
+      Math.ceil(startingDurabilityFor('makers_charm', 'epic') / RECHARGE_CHARGES_PER_MATERIAL) *
+        unitValue('arcane_shard'),
+    ).toBe(275);
+  });
+
+  it('holds for the apex charm SELF-GATHERED too, with exactly one line of slack', () => {
+    // The block above prices the plain specialized bill. The cheaper bill a
+    // player actually reaches signs it: thorium_ore and ashwood_log are node
+    // yields (NODE_MATERIAL_TABLE), and a rare-or-better roll signs the
+    // grant, so an engineer who mined and cut their own two lines pays the
+    // #1145 reduction on both (max(1, count - 1)) BEFORE the specialization
+    // multiplier. The other two lines have no signed source, which is what
+    // this block pins forward.
+    const recipe = APEX_GEAR_RECIPES.find((row) => row.resultItemId === 'makers_charm');
+    if (!recipe) throw new Error('recipe_makers_charm missing from APEX_GEAR_RECIPES');
+    const bill = (signedIds: readonly string[]): number =>
+      recipe.reagents.reduce((total, reagent) => {
+        const { count } = requiredReagentCountFor(
+          signedIds.includes(reagent.itemId),
+          reagent,
+          { engineering: 125 },
+          'engineering',
+        );
+        return total + count * unitValue(reagent.itemId);
+      }, 0);
+    const worstRecharge =
+      Math.ceil(startingDurabilityFor('makers_charm', 'epic') / RECHARGE_CHARGES_PER_MATERIAL) *
+      unitValue('arcane_shard');
+    expect(worstRecharge).toBe(275);
+    // 2 chassis 90 (unsigned, floor(3 x 0.8)) + 1 core 50 (unsigned) + 2 logs
+    // 120 (4 - 1 = 3, floor(3 x 0.8) = 2) + 1 ore 60 (2 - 1 = 1, floor(0.8)
+    // floored back up to 1) = 320.
+    const selfGathered = bill(['thorium_ore', 'ashwood_log']);
+    expect(selfGathered).toBe(320);
+    expect(
+      selfGathered,
+      'the self-gathered apex bill must still out-cost the worst generic recharge',
+    ).toBeGreaterThan(worstRecharge);
+    // The slack is one line wide. Signing every line composes to EXACTLY the
+    // recharge floor, so the strict bound is gone (a tie, not a win) the day
+    // a signed source for precision_chassis or wyrmfall_core ships. Both are
+    // off the signing paths today, and the absences are asserted below so a
+    // new source has to widen this pin deliberately rather than quietly
+    // flipping the inequality.
+    const allSelfSigned = bill(recipe.reagents.map((r) => r.itemId));
+    expect(allSelfSigned).toBe(275);
+    expect(allSelfSigned).toBe(worstRecharge);
+    // The three shipped ways a held copy comes back signed: a node yield (any
+    // rare-or-better roll signs it), the #1149 craft stamp, which fires on
+    // a rare-or-better OUTPUT def quality (`poor`/absent normalize to
+    // `common` first, mirroring crafting.ts's defOutputQuality), and the
+    // corpse-harvest premium arm, whose component and specimen grants arrive
+    // signed (HARVEST_COMPONENT_ITEMS / HARVEST_COMPONENT_SPECIMENS). The
+    // fourth production signer, the masterwork proc, is deliberately NOT
+    // modeled: it needs a stats-bearing gear def (masterworkBonusStats
+    // returns null otherwise) and all four apex reagents are junk-kind
+    // materials it can never reach, so the list here is the reachable set,
+    // not the exhaustive one.
+    const admitsSignedSource = (itemId: string): boolean => {
+      const nodeYield = Object.values(NODE_MATERIAL_TABLE).some((byZone) =>
+        Object.values(byZone).some((row) => row.itemId === itemId),
+      );
+      const corpseComponent =
+        Object.values(HARVEST_COMPONENT_ITEMS).includes(itemId) ||
+        Object.values(HARVEST_COMPONENT_SPECIMENS).includes(itemId);
+      const quality = ITEMS[itemId]?.quality;
+      const outputQuality = quality === undefined || quality === 'poor' ? 'common' : quality;
+      return (
+        nodeYield ||
+        corpseComponent ||
+        (ALL_RECIPES.some((row) => row.resultItemId === itemId) &&
+          isSignableMaterialRarity(outputQuality))
+      );
+    };
+    // POSITIVE CONTROLS on ALL THREE arms of that read, or the two absences
+    // below would pass over a predicate that answers false for everything:
+    // the two lines signed above really are node yields, the recipe's own
+    // epic output really clears the craft stamp's threshold, and a shipped
+    // corpse component really trips the harvest arm.
+    expect(admitsSignedSource('thorium_ore'), 'the ore line must be node-reachable').toBe(true);
+    expect(admitsSignedSource('ashwood_log'), 'the log line must be node-reachable').toBe(true);
+    expect(admitsSignedSource('makers_charm'), 'the epic output must be craft-signable').toBe(true);
+    expect(
+      admitsSignedSource('rough_hide'),
+      'a shipped corpse component must trip the harvest arm',
+    ).toBe(true);
+    for (const itemId of ['precision_chassis', 'wyrmfall_core']) {
+      expect(
+        admitsSignedSource(itemId),
+        `${itemId} must stay off the signing paths, or the apex bound collapses to a tie`,
+      ).toBe(false);
     }
   });
 

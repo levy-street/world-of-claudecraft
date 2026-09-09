@@ -10,6 +10,7 @@
 // field a call path touches must be seeded first).
 
 import { describe, expect, it } from 'vitest';
+import { ActionBarLayoutUploader } from '../src/net/action_bar_upload';
 import { ClientWorld } from '../src/net/online';
 import { allocRiftCollisionToken, isBlocked } from '../src/sim/colliders';
 import { riftInstanceOrigin } from '../src/sim/data';
@@ -40,8 +41,7 @@ function riftReadyClient(): ClientWorld {
   // would have these from its constructor; a bare one needs them seeded to
   // return early rather than reach the WebSocket/timer fields this test
   // never constructs.
-  c.actionBarSaveTimer = null;
-  c.actionBarSavePending = null;
+  c.actionBarUploader = new ActionBarLayoutUploader((command) => c.cmd(command));
   c.pendingCommandOutcomes = undefined;
   c.sendTimer = undefined;
   c.reconnectTimer = undefined;

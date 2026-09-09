@@ -212,6 +212,22 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     },
   },
   {
+    id: 'farmgrow',
+    category: 'progress',
+    labelKey: 'devCommand.actions.farmgrow.label',
+    descriptionKey: 'devCommand.actions.farmgrow.description',
+    // The bed is OPTIONAL, the one shape /dev farmgrow already accepts: with
+    // a bed it advances that plot, without one it advances every planted bed
+    // the caller owns. An unusable value therefore falls back to the
+    // all-plots form rather than refusing (the biskit optional-spec
+    // contract), because there is nothing to inject into: the token gate is
+    // what keeps a crafted value out of the command line either way.
+    command: (values) => {
+      const bed = token(values, 'bed');
+      return bed ? `/dev farmgrow ${bed}` : '/dev farmgrow';
+    },
+  },
+  {
     id: 'teleport',
     category: 'travel',
     labelKey: 'devCommand.actions.teleport.label',

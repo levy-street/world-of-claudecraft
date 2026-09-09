@@ -59,22 +59,22 @@ export interface IWorldDungeons {
   // INSTANCE, not per seed; a fixed value allocated once per world (offline
   // Sim or online ClientWorld). Note this member's client-side reach is
   // narrower than the token's overall reach: the swept-landing crest
-  // re-resolve behind Blink, Shadowstep, and Heroic Leap
+  // re-resolve behind Blink, Shadowstep, and Vaulting Charge
   // (src/sim/combat/heroic_leap.ts) reads SimContext.riftCollisionToken,
   // which is always the authoritative Sim (offline, or the server's own),
   // never this ClientWorld member; that route was never inert online. This
   // member instead feeds the client's OWN two consumers: click-to-move
   // (findPlayerPath/resolvePlayerDestination in src/main.ts) and the
-  // display-only self-motion predictor (src/render/self_motion.ts). Movement
+  // display-only self-motion predictor (src/render/self_motion.ts), both of
+  // which treat a rift wall as solid instead of open floor. Movement
   // resolution itself stays server-authoritative online either way; the
   // ONLINE client registers a region under this token purely so those two
   // local, display-only routes can resolve against real rift geometry
-  // instead of treating a rift wall as open floor (src/net/online.ts
-  // applyRiftStateEvent mirrors the riftFloor's colliders under it, and
-  // endSession clears the region on session end). The token carries no
-  // registered region (inert, matching outside-a-rift behavior) outside a
-  // rift; 0 itself is reserved for "no token" (a caller like mob pathing that
-  // never passes one).
+  // (src/net/online.ts applyRiftStateEvent mirrors the riftFloor's colliders
+  // under it, and endSession clears the region on session end). The token
+  // carries no registered region (inert, matching outside-a-rift behavior)
+  // outside a rift; 0 itself is reserved for "no token" (a caller like mob
+  // pathing that never passes one).
   riftCollisionToken: number;
   // Live lethal death zones on the current rift boss floor (empty outside a rift or
   // before the A-rank mechanic fires). The renderer draws a pulsing red decal ring

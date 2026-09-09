@@ -20,7 +20,20 @@ export const TRIPO_BASE = 'https://openapi.tripo3d.ai/v3';
 
 // Generation model ids (pin dated forms, aliases drift).
 export const MODEL_LOWPOLY = 'P1-20260311'; // low-poly game specialist
+export const MODEL_P2 = 'P2-20260801'; // P2.0: low-poly specialist, wider face budget, sharper silhouettes
 export const MODEL_HIFI = 'v3.1-20260211'; // flagship H-series
+
+/** The generation model for a `--model` quality word: lowpoly (default), p2, hifi. */
+export function modelFor(quality) {
+  if (quality === 'hifi') return MODEL_HIFI;
+  if (quality === 'p2') return MODEL_P2;
+  return MODEL_LOWPOLY;
+}
+
+/** The quality word recorded in a job for a `--model` option (default lowpoly). */
+export function modelQuality(quality) {
+  return quality === 'hifi' || quality === 'p2' ? quality : 'lowpoly';
+}
 export const RIG_MODEL_BIPED = 'v1.0-20240301'; // biped only, 90+ preset:biped:* clips
 export const RIG_MODEL_ALL = 'v2.5-20260210'; // all rig types, small preset set
 
@@ -244,10 +257,10 @@ export async function generateModel({
   onTaskCreated,
 }) {
   // smart_low_poly (clean hand-crafted topology, +10 credits) is an H-series
-  // (>= v3.0) option; P1 is already a low-poly specialist and rejects it.
+  // (>= v3.0) option; the P-series are already low-poly specialists and reject it.
   const extras = {
     ...(faceLimit ? { face_limit: faceLimit } : {}),
-    ...(smartLowPoly && !model.startsWith('P1') ? { smart_low_poly: true } : {}),
+    ...(smartLowPoly && !model.startsWith('P') ? { smart_low_poly: true } : {}),
     texture,
     pbr,
   };

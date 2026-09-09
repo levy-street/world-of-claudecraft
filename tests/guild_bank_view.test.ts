@@ -91,6 +91,19 @@ describe('buildGuildBankView', () => {
     expect(view.empty).toBe(false);
   });
 
+  it('keys the rim off instance-effective quality: a promoted copy reads legendary here too', () => {
+    // The all-surfaces item-cell rule (phase 13): the shared-pool grid may not
+    // strip the mark a copy wears in the bags; the plain sibling is the
+    // def-only negative.
+    const slots: InvSlot[] = [
+      { itemId: 'sword', count: 1, instance: { rolled: { quality: 'legendary' } } },
+      { itemId: 'sword', count: 1 },
+    ];
+    const view = buildGuildBankView(guildInfo({ slots, capacity: 12 }), lookup, 0);
+    if (view.kind !== 'guild') throw new Error('expected guild');
+    expect(view.slots.map((s) => s.qualityKey)).toEqual(['legendary', 'rare']);
+  });
+
   it('flags each pipe dimension dormant (quest / soulbound / noMarketList / transfer lock) and never drops a slot', () => {
     const slots: InvSlot[] = [
       { itemId: 'sword', count: 1 },

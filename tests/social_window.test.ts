@@ -410,3 +410,72 @@ describe('social_window: guild header copy', () => {
     expect(hudChromeCatalog).toContain("other: 'your guild rank is {rank}; {count} members'");
   });
 });
+
+describe('social_window: guild roster expansion (source pins)', () => {
+  // The painter renders what the pure core decided (guildView memberCap /
+  // nextRosterPrice / canExpandRoster), spends gold only through the shared
+  // confirm prompt, and formats the price with the money formatter.
+  it('reads the seat cap off the pure core and formats the price, never a raw number', () => {
+    expect(painter).toContain("t('hudChrome.social.roster.seats'");
+    expect(painter).toContain('cap: formatNumber(g.memberCap');
+    expect(painter).toContain('formatMoney(roster.nextRosterPrice)');
+    expect(painter).not.toMatch(/roster\.nextRosterPrice\s*\/\s*10_?000/);
+  });
+
+  it('shows the buy button to the leader only, disabled once the ladder is complete', () => {
+    expect(painter).toContain("if (roster && guild.rank === 'leader')");
+    expect(painter).toContain('data-act="guild-expand" disabled');
+    expect(painter).toContain("t('hudChrome.social.roster.maxed')");
+    expect(painter).toContain("t('hudChrome.social.roster.expand'");
+  });
+
+  it('a bought page (a structural change) rebuilds the footer around a preserved draft', () => {
+    // The footer button is emitted by render(), which refreshIfChanged reaches
+    // only on a structural change; the roster cap and price are part of that
+    // signature (tests/social_view.test.ts), and the rebuild keeps the
+    // half-typed invite or billboard draft the relocalize() way.
+    const start = painter.indexOf('refreshIfChanged(): void {');
+    const body = painter.slice(start, painter.indexOf('relocalize(): void {', start));
+    expect(body).toContain('const draft = captureFormDraft(el);');
+    expect(body).toContain('this.render();');
+    expect(body).toContain('restoreFormDraft(el, draft);');
+    expect(body.indexOf('captureFormDraft(el)')).toBeLessThan(body.indexOf('this.render();'));
+    expect(body.indexOf('this.render();')).toBeLessThan(
+      body.indexOf('restoreFormDraft(el, draft)'),
+    );
+  });
+
+  it('buys through the shared confirm prompt, gated on the pure core permission', () => {
+    const handler = painter.slice(painter.indexOf("act === 'guild-expand'"));
+    const body = handler.slice(0, handler.indexOf("act === 'guild-leave'"));
+    expect(body).toContain('roster?.canExpandRoster && roster.nextRosterPrice !== null');
+    expect(body).toContain('this.deps.showPrompt(');
+    expect(body).toContain("t('hudChrome.social.roster.confirm'");
+    expect(body).toContain("t('hudChrome.social.roster.confirmAction')");
+    expect(body).toContain('() => w.guildBuyRosterPage()');
+  });
+
+  it('the catalog carries the roster block with every key the painter and hud read', () => {
+    // Scoped to the `roster: {` block under `social`, so a same-named key
+    // elsewhere in the catalog (there are several `maxed:` / `retry:` leaves)
+    // cannot satisfy this pin; tests/result_code_keys.test.ts resolves the
+    // hud-side keys through the generated bundle.
+    const start = hudChromeCatalog.indexOf('    roster: {');
+    expect(start).toBeGreaterThan(-1);
+    const block = hudChromeCatalog.slice(start, hudChromeCatalog.indexOf('\n    },\n', start));
+    for (const key of [
+      'seats:',
+      'expand:',
+      'maxed:',
+      'confirm:',
+      'confirmAction:',
+      'expandedLine:',
+      'result: {',
+      'notLeader:',
+      'cannotAfford:',
+      'retry:',
+    ]) {
+      expect(block, key).toContain(key);
+    }
+  });
+});

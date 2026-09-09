@@ -41,6 +41,7 @@
 // the line clean: the old clip ran per FACE on a mesh whose lower half is a
 // handful of big triangles, and no amount of subdivision fixed the sawtooth.
 import * as THREE from 'three';
+import { applyTextureAnisotropy } from '../texture_anisotropy';
 import {
   type BeardDecal,
   type Gender,
@@ -585,7 +586,7 @@ export function decalTextureFromData(
   // The projection oversamples the jaw badly (see the unwrap note), so one
   // screen pixel can span many texels one way and few the other. Without
   // anisotropy that reads as a blurred chin.
-  tex.anisotropy = 8;
+  applyTextureAnisotropy(tex, 'colour');
   tex.needsUpdate = true;
   textureCache.set(key, tex);
   return tex;
@@ -987,8 +988,10 @@ function cachedFrame(geo: THREE.BufferGeometry): HeadFrame | null {
   return f;
 }
 
-/** The head mesh a decal rides. Named parts survive `mergeSkinnedParts`
- *  untouched, because a part carrying morph targets is never merged. */
+/** The head mesh a decal rides. It survives `mergeSkinnedParts` untouched
+ *  because the head is its own merge partition, and `shareRigSkeleton` keeps
+ *  its GEOMETRY untouched by making it the canonical bind space: both so the
+ *  cut below can key on that one buffer (see modularHeadFor). */
 export function headNodeName(gender: Gender): string {
   return gender === 'female' ? 'F_Head' : 'M_Head';
 }

@@ -4,12 +4,12 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { syncPaladinAvengingWrathVisual } from '../src/render/paladin_avenging_wrath_visual';
 
-describe('Paladin Avenging Wrath visual', () => {
+describe('Paladin Zealwing visual', () => {
   it('keeps two physical golden wings visible and freezes their pose for reduced motion', () => {
     const parent = new THREE.Group();
     const visual = syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, false);
     expect(visual).not.toBeNull();
-    if (!visual) throw new Error('missing Avenging Wrath visual');
+    if (!visual) throw new Error('missing Zealwing visual');
 
     const left = parent.getObjectByName('paladin-avenging-wrath-left-wing');
     const right = parent.getObjectByName('paladin-avenging-wrath-right-wing');

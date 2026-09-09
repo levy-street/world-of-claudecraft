@@ -43,11 +43,15 @@ export function ktx2SiblingPath(srcPath) {
 // ambientCG-style PBR channel suffix -> encoder + transfer function.
 // NormalGL / AmbientOcclusion / Displacement carry per-texel GEOMETRY, and
 // ETC1S's endpoint clustering is exactly what bands that kind of smooth
-// gradient, so they take UASTC (the same split compress_glb_textures.mjs
-// makes with its UASTC_SLOTS normal/occlusion filter) plus zstd
+// gradient, so they take UASTC (the same reasoning compress_glb_textures.mjs
+// applies to its UASTC_SLOTS normal/occlusion filter) plus zstd
 // supercompression to claw the payload back. `_Color` is an ordinary sRGB
-// color map. `_Roughness` and `_Metalness` are single-signal linear masks
-// whose ETC1S artifacts stay under the material response.
+// color map and stays on basis-lz: unlike compress_glb_textures.mjs's Tripo
+// baseColor carve-out (UASTC_SLOTS_WITH_BASE_COLOR), nothing that reaches
+// this module is Tripo-generated painterly content, so there is no matching
+// quality gap to buy back here. `_Roughness` and `_Metalness` are
+// single-signal linear masks whose ETC1S artifacts stay under the material
+// response.
 const CHANNEL_CLASSES = {
   normalgl: { encoding: 'uastc', transferFunction: 'linear' },
   ambientocclusion: { encoding: 'uastc', transferFunction: 'linear' },

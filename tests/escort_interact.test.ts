@@ -252,7 +252,19 @@ describe('isEscorteeEntity', () => {
 });
 
 describe('the Interact action reaches the escort run (tryNearbyInteraction)', () => {
-  function rig(list: Entity[], player: Entity, log = activeLog()) {
+  function rig(
+    list: Entity[],
+    player: Entity,
+    log = activeLog(),
+    farmPatches: {
+      id: string;
+      zoneId: string;
+      tier: 1;
+      x: number;
+      z: number;
+      beds: { id: string; x: number; z: number }[];
+    }[] = [],
+  ) {
     const calls: string[] = [];
     const world = {
       playerId: player.id,
@@ -275,6 +287,17 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
       leaveDungeon: () => false as const,
       pickUpObject: () => false as const,
       nodeHarvestableByMe: () => true,
+      // Phase 9b bed-arm seam members (the ordering arms below exercise them).
+      farmPatches,
+      myFarmPlots: [] as const,
+      harvestCrop: (bedId: string) => {
+        calls.push(`harvestCrop:${bedId}`);
+      },
+      // Phase 12 feast-arm seam member: inert here (the feast ordering arms
+      // live in tests/nearby_interaction.test.ts).
+      consumeFeast: (feastId: number) => {
+        calls.push(`consumeFeast:${feastId}`);
+      },
       harvestNode: (id: string) => {
         calls.push(`harvest:${id}`);
         return true;
@@ -286,9 +309,10 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
       openDelveBoard: () => {},
       showError: (text: string) => calls.push(`error:${text}`),
       requestSpiritHealerResurrect: () => {},
+      // Phase 9b bed-arm seam member: inert here (lane A's arms exercise it).
+      openPlantSheet: (bedId: string) => calls.push(`plantSheet:${bedId}`),
     };
-    const press = (nodes: Parameters<typeof tryNearbyInteraction>[2] = []) =>
-      tryNearbyInteraction(world, hud, nodes, null, 'too far', 'not ready', AWAY_TEXT, 'nothing');
+    const press = () => tryNearbyInteraction(world, hud, AWAY_TEXT, 'nothing');
     return { press, calls };
   }
 
@@ -305,6 +329,43 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
 
     expect(r.press()).toBe(false);
     expect(r.calls).toEqual([`error:${AWAY_TEXT}`]);
+  });
+
+  it('a free bed underfoot outranks the escort-away last resort', () => {
+    // Empty post (quest active, escortee absent) PLUS a bed in reach: the
+    // bed arm sits above the away line, so the press farms instead of
+    // toasting (the ordering the arm's comment claims).
+    const bed = { id: 'bed_order_1', x: WREN.start.x, z: WREN.start.z };
+    const r = rig([], playerAt(WREN.start.x, WREN.start.z), activeLog(), [
+      { id: 'patch_order', zoneId: 'eastbrook_vale', tier: 1, x: bed.x, z: bed.z, beds: [bed] },
+    ]);
+    expect(r.press()).toBe(true);
+    expect(r.calls).toEqual(['plantSheet:bed_order_1']);
+  });
+
+  it('a feast underfoot outranks the escort-away last resort (the Phase 12 arm ordering)', () => {
+    // Empty post (quest active, escortee absent) PLUS a placed feast in
+    // reach: the feast arm sits above the away line like the bed arm does,
+    // so the press eats instead of toasting.
+    const feast = entity({
+      id: 6,
+      kind: 'object',
+      templateId: 'farm_feast',
+      pos: { x: WREN.start.x, y: 0, z: WREN.start.z },
+    });
+    const r = rig([feast], playerAt(WREN.start.x, WREN.start.z));
+    expect(r.press()).toBe(true);
+    expect(r.calls).toEqual(['consumeFeast:6']);
+  });
+
+  it('an escortee in reach outranks a bed underfoot (escort start stays above the bed arm)', () => {
+    const wren = escorteeAt();
+    const bed = { id: 'bed_order_2', x: WREN.start.x + 1, z: WREN.start.z };
+    const r = rig([wren], playerAt(WREN.start.x + 1, WREN.start.z), activeLog(), [
+      { id: 'patch_order', zoneId: 'eastbrook_vale', tier: 1, x: bed.x, z: bed.z, beds: [bed] },
+    ]);
+    expect(r.press()).toBe(true);
+    expect(r.calls).toEqual([`target:${wren.id}`, 'interact']);
   });
 
   it('never swallows a corpse press: looting the ambush wave still wins', () => {
@@ -324,33 +385,15 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
     expect(r.calls).toEqual(['loot:5']);
   });
 
-  it('beats a gather node underfoot', () => {
-    const wren = escorteeAt();
-    const r = rig([wren], playerAt(WREN.start.x + 1, WREN.start.z));
-    const node = {
-      id: 'ore_1',
-      type: 'ore',
-      tier: 1,
-      pos: { x: WREN.start.x + 1, z: WREN.start.z },
-    } as const;
-
-    expect(r.press([node])).toBe(true);
-    expect(r.calls).toEqual([`target:${wren.id}`, 'interact']);
-  });
-
-  it('never eats another arm press while she is away: the node underfoot wins', () => {
-    // Regression: the away line is a last resort, not a priority. Standing at
-    // an empty post over an ore node must still harvest the node.
+  it('never gathers from an empty post: the away line shows and no harvest command is sent', () => {
+    // Intentional gathering: the generic press knows no nodes, so standing at
+    // an empty post (over an ore node or not) explains the absence rather
+    // than harvesting anything. The away line staying a LAST resort, not a
+    // priority, is pinned by the bed and feast cases above.
     const r = rig([], playerAt(WREN.start.x, WREN.start.z));
-    const node = {
-      id: 'ore_1',
-      type: 'ore',
-      tier: 1,
-      pos: { x: WREN.start.x, z: WREN.start.z },
-    } as const;
 
-    expect(r.press([node])).toBe(true);
-    expect(r.calls).toEqual(['harvest:ore_1']);
+    expect(r.press()).toBe(false);
+    expect(r.calls).toEqual([`error:${AWAY_TEXT}`]);
   });
 
   it('falls through to the generic line without the quest', () => {
@@ -386,6 +429,8 @@ describe('a right-click reaches the escort run (handlePickedEntity)', () => {
       showError: vi.fn(),
       closeContextMenu: vi.fn(),
       requestSpiritHealerResurrect: vi.fn(),
+      // Phase 9b bed-arm seam member: inert here (lane A's arms exercise it).
+      openPlantSheet: vi.fn(),
     };
     return { world, hud, interact, startAutoAttack };
   }

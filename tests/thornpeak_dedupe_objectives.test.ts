@@ -37,7 +37,7 @@ describe('Thornpeak quest de-duplication', () => {
       }
       expect(q.objectives.some((x) => x.type === 'kill')).toBe(false);
     });
-    it('the orders drop from Wyrmcult Zealots at 10%', () => {
+    it('the orders drop from Broodsworn Zealots at 10%', () => {
       const drop = (MOBS.wyrmcult_zealot.loot ?? []).find((l) => l.itemId === 'wyrmcult_orders');
       expect(drop?.chance).toBe(0.1);
       expect(drop?.questId).toBe('q_cult_orders');

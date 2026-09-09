@@ -708,6 +708,8 @@ async function main(): Promise<void> {
   // what let the periodic full-roster rescan go.
   const outboxIo = outboxIoFor({
     createMessage: (channelId, payload) => discord.createMessage(channelId, payload),
+    // The queue-pop stream DMs its player directly (no channel id to configure).
+    sendDirectMessage: (userId, payload) => discord.sendDirectMessage(userId, payload),
     markDailyRewardWinners: (day) => server.markDailyRewardWinners(day),
     channels: {
       relay: cfg.relayChannelId,

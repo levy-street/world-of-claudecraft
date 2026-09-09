@@ -3,7 +3,8 @@ import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { ABILITIES } from '../src/sim/data';
 
-// The ability/spell tooltip (hud.ts abilityTooltip / describeAbilitySummary) renders
+// The ability/spell tooltip (hud.ts abilityTooltip over
+// ability_tooltip_lines.ts describeAbilitySummary) renders
 // the RESOLVED ability (res.cost / res.castTime / res.cooldown / res.effects), not the
 // base def, so a selected talent's cost/cast/cooldown/damage reduction shows up. This
 // pins the data contract those tooltips depend on: abilitiesKnownAt(cls, lvl, mods) bakes

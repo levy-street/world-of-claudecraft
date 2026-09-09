@@ -1,0 +1,13 @@
+{
+  "note": "Eastbrook Vale's Realm Builder monument. Source sculpt in tmp/asset_src/realm_builder/ (Tripo base, finished in Blender by scripts/assets/realm_builder_monument.py). Unlike the rest of the Eastbrook civic set this keeps its BAKED ALBEDO rather than town-palette vertex colours, so it does not join the town's merged micro-batch: the carved detail is the point of the statue. Its COLOR_0 is a per-vertex TINT multiplied over that albedo, which is what paints the plaque's dark plate and gold frame.",
+  "items": [
+    {
+      "src": "tmp/asset_src/realm_builder/realm_builder_monument.glb",
+      "out": "models/props/eastbrook_realm_builder_monument.glb",
+      "type": "static",
+      "keepExtras": true,
+      "keepAttributes": true,
+      "maxTex": 1024
+    }
+  ]
+}

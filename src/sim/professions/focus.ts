@@ -55,14 +55,21 @@ export const EMPTY_FOCUS_ALLOCATION: FocusAllocation = {};
  * is defined here, in the sim, because the sim is the authority on what it
  * will accept.
  *
- * Deliberately NARROWER than the corpse tag vocabulary, which also carries
- * claw, tusk, gills and horn. Those are real tags on shipped mobs, but no item
- * maps to them and focus spent on one is not merely inert: the
- * omitted-components harvest default derives its pick from this allocation
- * (src/sim/interaction.ts), so a persisted `{ gills: 1 }` would make every
- * plain interact press on a murloc take the #2509 all-forfeit refusal. Keeping
- * the unmapped families out of the allocation is what makes that unreachable
- * rather than merely unlikely.
+ * Deliberately keyed on the ITEM MAP, never the corpse tag vocabulary: a tag
+ * a mob carries that HARVEST_COMPONENT_ITEMS maps to no item can never enter
+ * the allocation, and that exclusion is load-bearing, not tidy. Focus spent
+ * on such a family would not be merely inert: the omitted-components harvest
+ * default derives its pick from this allocation (src/sim/interaction.ts), so
+ * a persisted point on an unmapped family would make every plain interact
+ * press on a carrier of that tag take the #2509 all-forfeit refusal.
+ * Deriving the list from the map is what keeps that unreachable rather than
+ * merely unlikely, for any future unmapped tag too. Four shipped families
+ * were in that state when this landed (claw, tusk, gills, horn; a persisted
+ * `{ gills: 1 }` meant that refusal on every murloc): #2905 mapped claw and
+ * tusk and Masterwrought Phase 11m horn and gills, so today the two
+ * vocabularies coincide on shipped content and the corpse suites drive the
+ * excluded shape through the synthetic families of
+ * tests/helpers/unmapped_family.ts.
  *
  * Being derived from content, this is a live-save contract and not just a
  * table: renaming or retiring a HARVEST_COMPONENT_ITEMS key silently drops
@@ -261,12 +268,18 @@ export function setTownFocus(
  * when it was counting unknown keys toward it.
  *
  * One stated behavior change for an affected character, not a side effect:
- * dropping a real-but-unmapped corpse tag (claw/tusk/gills/horn) changes the
- * DERIVED harvest pick from that single tag to the empty pick, so a plain
- * interact press that used to hit the #2509 all-forfeit refusal and draw
- * nothing now spreads and draws. That is the corpse paying out instead of
- * refusing, it is deterministic and identical on all three hosts, and no
- * parity scenario allocates a town focus.
+ * dropping a corpse tag the validator no longer accepts changes the DERIVED
+ * harvest pick from that single tag to the empty pick, so a plain interact
+ * press that used to hit the #2509 all-forfeit refusal and draw nothing now
+ * spreads and draws. That is the corpse paying out instead of refusing, it
+ * is deterministic and identical on all three hosts, and no parity scenario
+ * allocates a town focus. When this arm landed the reachable case was a
+ * point persisted on a real-but-unmapped tag (claw/tusk/gills/horn); all
+ * four map since #2905 (claw, tusk) and Masterwrought Phase 11m (horn,
+ * gills), so such a point now validates and SURVIVES the load, and the drop
+ * arm's live subjects are a key retired from HARVEST_COMPONENT_ITEMS and
+ * the synthetic families the corpse suites retag fixtures with
+ * (tests/helpers/unmapped_family.ts).
  *
  * Takes `unknown` values on purpose: this reads a JSONB blob, so the runtime
  * type guard below is load-bearing rather than decorative.

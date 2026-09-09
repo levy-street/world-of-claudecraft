@@ -5,6 +5,8 @@
 // same database transaction.
 
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
+import { canonicalMaterialSourceLegs } from '../src/sim/guild_bank_material';
+import type { MaterialSourceDelta } from '../src/sim/material_sources';
 import type { BankLedgerRow } from './db';
 
 export interface BankLedgerOutboxLimits {
@@ -59,11 +61,26 @@ export interface BankLedgerGuildEffectInput {
 }
 
 export type SerializedBankLedgerGuildDelta = Readonly<
-  Omit<GuildBankOpDelta, 'instance' | 'craftedRecipeId'> & {
+  Omit<GuildBankOpDelta, 'instance' | 'craftedRecipeId' | 'materialSources'> & {
     /** Detached JSON, kept beside the command receipt instead of a live Sim object. */
     readonly instanceJson: string | null;
     /** Optional source markers normalize to null so receipt bytes stay canonical. */
     readonly craftedRecipeId: string | null;
+    /** The exact per-source legs a MATERIAL move carried, canonicalized through
+     *  the shared algebra (descriptors validated, identical descriptors
+     *  coalesced, a net-zero descriptor dropped, ordered by descriptor key) and
+     *  DEEP FROZEN, so two sessions that moved the same units hash to the same
+     *  receipt bytes whatever order they observed the legs in.
+     *
+     *  OPTIONAL, and ABSENT (never `null`) on every legacy delta and every
+     *  non-material op. That is a compatibility requirement, not a style
+     *  preference: `JSON.stringify` omits an absent key and emits `"...":null`
+     *  for a present one, so normalizing absence to null would change the
+     *  fingerprint of every guild receipt already durable. Those receipts are
+     *  retried after a restart, and a retry whose payload hash no longer matches
+     *  its stored row is not an idempotent retry any more. A stop-then-cutover
+     *  does not help: the rows outlive the stop. */
+    readonly materialSources?: readonly MaterialSourceDelta[];
   }
 >;
 
@@ -401,6 +418,40 @@ function normalizeSerializedRow(row: SerializedBankLedgerOutboxRow): SerializedB
   });
 }
 
+/**
+ * The receipt's own copy of a move's source legs: canonicalized through the ONE
+ * shared adapter (so the descriptor rules are never restated here) and deep
+ * frozen, because a receipt payload is hashed and later replayed and must be
+ * immutable in both roles.
+ *
+ * `undefined` means the key is OMITTED from the receipt entirely (see the type's
+ * note): absent, null, and a leg list that coalesces to nothing all carry no
+ * attribution, so all three serialize as the absence they are and leave a legacy
+ * receipt's bytes untouched.
+ *
+ * The freeze reaches the GATHERER. Freezing only the leg and its `source` left
+ * `source.gatherer` writable, so the id or the historic name snapshot inside a
+ * hashed, replayed receipt could still be edited in place after the fact. The
+ * shared algebra already hands back a freshly built descriptor, so nothing here
+ * aliases a caller's object; this makes the copy immutable all the way down.
+ */
+function serializeGuildDeltaSources(
+  materialSources: readonly MaterialSourceDelta[] | null | undefined,
+): readonly MaterialSourceDelta[] | undefined {
+  if (materialSources === undefined || materialSources === null) return undefined;
+  const canonical = canonicalMaterialSourceLegs(materialSources);
+  if (!canonical.ok) {
+    throw new TypeError(`bank ledger guild delta materialSources is invalid: ${canonical.error}`);
+  }
+  if (canonical.value.length === 0) return undefined;
+  return Object.freeze(
+    canonical.value.map((leg) => {
+      if (leg.source.gatherer !== undefined) Object.freeze(leg.source.gatherer);
+      return Object.freeze({ source: Object.freeze(leg.source), count: leg.count });
+    }),
+  );
+}
+
 function serializeGuildDelta(delta: GuildBankOpDelta): SerializedBankLedgerGuildDelta {
   if (typeof delta !== 'object' || delta === null || !GUILD_BANK_DELTA_OPS.has(delta.op)) {
     throw new TypeError('bank ledger guild delta has an invalid op');
@@ -413,6 +464,7 @@ function serializeGuildDelta(delta: GuildBankOpDelta): SerializedBankLedgerGuild
   }
   assertNonNegativeInteger(delta.purchasedSlotsBefore, 'guild delta.purchasedSlotsBefore');
   assertNonNegativeInteger(delta.purchasedSlotsAfter, 'guild delta.purchasedSlotsAfter');
+  const materialSources = serializeGuildDeltaSources(delta.materialSources);
   return Object.freeze({
     op: delta.op,
     itemId: delta.itemId,
@@ -422,6 +474,10 @@ function serializeGuildDelta(delta: GuildBankOpDelta): SerializedBankLedgerGuild
     copperDelta: delta.copperDelta,
     purchasedSlotsBefore: delta.purchasedSlotsBefore,
     purchasedSlotsAfter: delta.purchasedSlotsAfter,
+    // Spread, never `materialSources: undefined`: an explicitly-undefined key is
+    // still an OWN key, and while JSON.stringify skips it, Object.keys and every
+    // structural comparison would see a legacy delta grow a field it never had.
+    ...(materialSources === undefined ? {} : { materialSources }),
   });
 }
 
@@ -450,6 +506,10 @@ export function serializeBankLedgerGuildEffect(
           copperDelta: serialized.copperDelta,
           purchasedSlotsBefore: serialized.purchasedSlotsBefore,
           purchasedSlotsAfter: serialized.purchasedSlotsAfter,
+          // Re-canonicalized rather than trusted: an already-serialized fixture
+          // (or a durable row read back) goes through the SAME adapter as a
+          // fresh delta, so one shape can never hash two ways.
+          materialSources: serialized.materialSources,
         });
       }
       return serializeGuildDelta(delta as GuildBankOpDelta);

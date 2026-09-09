@@ -30,8 +30,11 @@ const markerDir = path.join(repoRoot, 'public/ui/map-markers');
 const mappingPath = path.join(markerDir, 'mapping.json');
 const historicalProvenanceRef = 'docs/achievements/map-marker-art-2026-08-12.md';
 const v2ProvenanceRef = 'docs/achievements/map-marker-art-v2-2026-08-12.md';
+const completionProvenanceRef =
+  'docs/achievements/masterwrought-art-completion-2026-09-02/README.md';
 const historicalProvenancePath = path.join(repoRoot, historicalProvenanceRef);
 const v2ProvenancePath = path.join(repoRoot, v2ProvenanceRef);
+const completionProvenancePath = path.join(repoRoot, completionProvenanceRef);
 const creditsPath = path.join(repoRoot, 'CREDITS.md');
 const loaderSource = readFileSync(path.join(repoRoot, 'src/ui/map_marker_icon_loader.ts'), 'utf8');
 const tokenSource = readFileSync(path.join(repoRoot, 'src/styles/tokens.css'), 'utf8');
@@ -70,6 +73,7 @@ const SOURCE_SHA256_BY_ID = {
   'gather-ore': '3b43300921bdf6dd5568ca7b6b31cca3d0b8c065a05381c8b7acac22a028693c',
   'gather-wood': 'd1a7e193aa778f7e58cf06b153e9ea83a2215c3d00dfd073e2c9423ee85b96da',
   'gather-herb': '334fd6ece51b15b366f91a747b34fe15b2694d071c168e95fa006f67cf366985',
+  'farm-patch': 'ac104f7cd3b1d250e0d7282e77e28f047e33d467403bec5021dd129b20586494',
   'station-forge': '3da0df40f27c9b9d841ab6e16b5427cfd6db4cae4ed9bc380575ab603d74519f',
   'station-kitchens': 'e4885c27ac3859df748dda39057634d7aa058d37c010ee1d3f94c5892d6607f0',
   'station-apothecary': 'c66b306ef9008449a115c5d0477e8a2d16904a8e9556fd8d9c462297e650e315',
@@ -104,6 +108,7 @@ const SHIPPING_SHA256_BY_ID = {
   'gather-ore': '32afbd4bb56dd4e8254faed09304ce9746b388b00c35175187f98fe21adf9ecb',
   'gather-wood': '1a80702fc7a43ddff51f44d3c0d447cbaf61d905f26ad3fa8315e289fe591b91',
   'gather-herb': '0c51c70a735a7ad25863111e47afbcf4bef8cbc1c385dba1689507618a547509',
+  'farm-patch': 'ac433b15f4352d0b449fd85d5184e6115a1cbc02e30bca375055db176bb3bfee',
   'station-forge': '706307171fe33aec62a0a48806de6ef1c92c22ee5af0d1dbe58bdea7df2d91ea',
   'station-kitchens': '9a767650b30028de780d70b707344e00aac95d7245ed98a1025f4eac45a211bb',
   'station-apothecary': '9d88cf7375593a1184e290e9407916606fa81b82295ea13b0b9a1ba11791f07b',
@@ -139,6 +144,7 @@ const PROMPT_SHA256_BY_ID = {
   'gather-ore': 'c05e60dc15eb8232f87d07980bb6770a9019f6596bf705a9ede39330f7429cdd',
   'gather-wood': '00d6baff777a679574078aa9b37e31bb943f3a716d9b48ce98819d4711a1db30',
   'gather-herb': '1de7677a533ad82d46facde2ebbf11ef94640ebe9a2768255033e2117846c31e',
+  'farm-patch': '006643284ba064e127b0a091e3e509f40b669350d6bf3b7dc048b0b6686411b5',
   'station-forge': '58534ce47242caecba0d5f26aeed7005f40e27a17627f586b389a127e59f1eff',
   'station-kitchens': 'a17e7e31695237a3b9562bb26738279b2ed4404d47c1abb0f47f9c663db0c6eb',
   'station-apothecary': 'c6dcaaccb5b6460e1b2ee8e3e485b90fcf9564b03cd6acc94ac8b4600c2b588f',
@@ -696,6 +702,7 @@ describe('map marker painted art', () => {
       'dungeon-entrance',
       'dungeon-exit',
       ...GATHER_TYPES.map((type) => `gather-${type}`),
+      'farm-patch',
       ...STATION_TYPES.map((type) => `station-${type}`),
       'service-mailbox',
       'service-noticeboard',
@@ -861,6 +868,7 @@ describe('map marker painted art', () => {
     const provenanceByRef = new Map([
       [historicalProvenanceRef, readFileSync(historicalProvenancePath, 'utf8')],
       [v2ProvenanceRef, readFileSync(v2ProvenancePath, 'utf8')],
+      [completionProvenanceRef, readFileSync(completionProvenancePath, 'utf8')],
     ]);
     const expectedFamilies: Readonly<Record<MapMarkerArtId, MarkerFamily>> = {
       'dungeon-entrance': 'dungeon',
@@ -868,6 +876,7 @@ describe('map marker painted art', () => {
       'gather-ore': 'gather',
       'gather-wood': 'gather',
       'gather-herb': 'gather',
+      'farm-patch': 'station',
       'station-forge': 'station',
       'station-kitchens': 'station',
       'station-apothecary': 'station',
@@ -941,9 +950,10 @@ describe('map marker painted art', () => {
       expect(promptRefMatch, `${entry.id} exact prompt reference`).not.toBeNull();
       const promptDocRef = promptRefMatch?.[1] ?? '';
       const promptAnchor = promptRefMatch?.[2] ?? '';
-      expect([historicalProvenanceRef, v2ProvenanceRef], `${entry.id} prompt document`).toContain(
-        promptDocRef,
-      );
+      expect(
+        [historicalProvenanceRef, v2ProvenanceRef, completionProvenanceRef],
+        `${entry.id} prompt document`,
+      ).toContain(promptDocRef);
       expect(promptAnchor, `${entry.id} prompt anchor`).toBe(entry.id);
       const provenance = provenanceByRef.get(promptDocRef) ?? '';
       const promptHeadings = [...provenance.matchAll(/^### (.+)$/gm)].map((match) => match[1]);
@@ -980,7 +990,7 @@ describe('map marker painted art', () => {
       .split('\n')
       .filter((line) => line.includes('public/ui/map-markers/*.webp'));
     expect(creditRows).toEqual([
-      '| Map and minimap marker paintings (`public/ui/map-markers/*.webp`) | World of ClaudeCraft | Twenty-eight original micro-icons generated with OpenAI built-in image generation from the exact World of ClaudeCraft references and prompts recorded in `public/ui/map-markers/mapping.json`; the [V1 map-marker lineage](docs/achievements/map-marker-art-2026-08-12.md) preserves the first accepted batch and the [V2 map-marker lineage](docs/achievements/map-marker-art-v2-2026-08-12.md) records the responsive redesigns, gathering and reward state treatments, four painted quest states, and the delve, rift, Duskfall passage, and reward families, all chroma-keyed, reviewed at actual runtime sizes, and optimized locally | Project asset, rights reserved | **No, permission required** |',
+      '| Map and minimap marker paintings (`public/ui/map-markers/*.webp`) | World of ClaudeCraft | Twenty-nine original micro-icons generated with OpenAI built-in image generation from the exact World of ClaudeCraft references and prompts recorded in `public/ui/map-markers/mapping.json`; the [V1 map-marker lineage](docs/achievements/map-marker-art-2026-08-12.md) preserves the first accepted batch, the [V2 map-marker lineage](docs/achievements/map-marker-art-v2-2026-08-12.md) records the responsive redesigns and expanded families, and the [Masterwrought completion lineage](docs/achievements/masterwrought-art-completion-2026-09-02/) records `farm-patch`; all were chroma-keyed, reviewed at actual runtime sizes, and optimized locally | Project asset, rights reserved | **No, permission required** |',
     ]);
   });
 
@@ -1127,6 +1137,12 @@ describe('map marker painted art', () => {
         'mapStationCompact',
       ]);
     }
+    expect(mapMarkerSizesFor('farm-patch')).toEqual([
+      'minimapStation',
+      'minimapStationCompact',
+      'mapStation',
+      'mapStationCompact',
+    ]);
     expect(mapMarkerSizesFor('service-mailbox')).toEqual([
       'minimapService',
       'minimapServiceCompact',
@@ -1247,7 +1263,7 @@ describe('map marker painted art', () => {
     );
     // Closed catalog bound, including all exact profile, rank, reward-state,
     // and bountiful variants. No painter creates a state canvas at redraw time.
-    expect(expectedCanvasCount).toBe(248);
+    expect(expectedCanvasCount).toBe(252);
     // One reusable scratch surface prepares every retained exact-size raster.
     expect(canvases).toHaveLength(expectedCanvasCount + 1);
     const scratch = canvases[0];

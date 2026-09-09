@@ -12,6 +12,7 @@
 // UI_PURE_CORES); world types are imported type-only from world_api so the same
 // model is derived from a Sim and a ClientWorld mirror.
 
+import { GUILD_ROSTER_BASE_MEMBERS } from '../sim/guild_roster';
 import type {
   FriendInfo,
   GuildMemberInfo,
@@ -26,9 +27,12 @@ export type SocialTab = 'friends' | 'guild' | 'pledges' | 'ignore' | 'block' | '
 
 /** Structural identity of the panel: which tab, online or not, and the guild
  *  membership/rank (which changes the footer AND the officer-only Pledges tab)
- *  plus the open-pledge count (the Pledges tab label carries it) and the raid
- *  roster shape. Content within a tab (a friend's zone, a member's hp) does NOT
- *  count, so it refreshes in place rather than triggering a full rebuild. */
+ *  plus the open-pledge count (the Pledges tab label carries it), the roster
+ *  cap and next page price (the footer's buy button is rendered from them, so
+ *  a bought page must rebuild it or it keeps advertising the old price), and
+ *  the raid roster shape. Content within a tab (a friend's zone, a member's
+ *  hp) does NOT count, so it refreshes in place rather than triggering a full
+ *  rebuild. */
 export function socialStructSig(
   tab: SocialTab,
   social: SocialInfo | null,
@@ -38,7 +42,8 @@ export function socialStructSig(
   const raidSig = party
     ? `${party.raid ? 1 : 0}:${party.leader}:${party.members.map((m) => `${m.pid}.${m.group}`).join(',')}`
     : 'solo';
-  return `${tab}|${social !== null}|${g?.id ?? 0}|${g?.rank ?? ''}|${g?.pledges?.length ?? 0}|${raidSig}`;
+  const rosterSig = `${g?.memberCap ?? 0}:${g?.nextRosterPrice ?? 'none'}`;
+  return `${tab}|${social !== null}|${g?.id ?? 0}|${g?.rank ?? ''}|${g?.pledges?.length ?? 0}|${rosterSig}|${raidSig}`;
 }
 
 /** The status dot kind for a presence row: 'off' when offline, otherwise the
@@ -145,6 +150,15 @@ export interface GuildView {
      *  from the server): styles the guild-head name, matching the nameplate
      *  ladder and the guild board. */
     tier: number;
+    /** Roster expansion (docs/prd/guild-roster-expansion.md): the seats the
+     *  guild may fill, the copper price of the next 20-seat page (null once
+     *  the ladder is complete), and whether the viewer may buy it (leader
+     *  only, and only while a page is left). UX only: the server re-prices
+     *  from the guild row and refuses everyone else. A mirror from an older
+     *  server carries neither field and falls back to the base roster. */
+    memberCap: number;
+    nextRosterPrice: number | null;
+    canExpandRoster: boolean;
     rows: GuildRow[];
   } | null;
 }
@@ -189,8 +203,39 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       motdSetBy: guild.motdSetBy ?? '',
       canEditMotd: me === 'leader' || me === 'officer',
       tier: guild.tier ?? 0,
+      ...rosterOf(guild),
       rows,
     },
+  };
+}
+
+/** Roster expansion (docs/prd/guild-roster-expansion.md), as the Guild tab
+ *  footer and its buy prompt read it: the guild's seat cap, the copper price
+ *  of the next page (null once the ladder is complete), and whether the
+ *  viewer may buy it (leader only, and only while a page is left). UX only:
+ *  the server re-prices from the guild row and refuses everyone else. */
+export interface GuildRosterView {
+  memberCap: number;
+  nextRosterPrice: number | null;
+  canExpandRoster: boolean;
+}
+
+/** The roster view WITHOUT the per-member rows guildView also maps: the
+ *  footer and the click handler only need these three facts, and a 1,000-seat
+ *  roster makes the row mapping the expensive half of a rebuild. Null for a
+ *  guildless viewer. A mirror from an older server carries neither roster
+ *  field and falls back to the base roster with nothing to buy. */
+export function guildRosterView(social: SocialInfo | null): GuildRosterView | null {
+  const guild = social?.guild ?? null;
+  return guild ? rosterOf(guild) : null;
+}
+
+function rosterOf(guild: NonNullable<SocialInfo['guild']>): GuildRosterView {
+  const nextRosterPrice = guild.nextRosterPrice ?? null;
+  return {
+    memberCap: guild.memberCap ?? GUILD_ROSTER_BASE_MEMBERS,
+    nextRosterPrice,
+    canExpandRoster: guild.rank === 'leader' && nextRosterPrice !== null,
   };
 }
 

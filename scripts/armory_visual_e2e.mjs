@@ -218,17 +218,12 @@ await pageA.evaluate(() => document.querySelector('[data-armory-mode="weapon"]')
 await sleep(2200);
 await pageA.screenshot({ path: 'tmp/armory_inspect_weapon.png' });
 
-// Buy through the panel (the body-level Store decision), then apply. The
-// confirm markup is store_decision_prompt.ts's, not the HUD confirm's [data-ok]
-// (stale here since the v0.41.0 store rework routed skin purchases off
-// Hud.confirmDialog).
+// Buy through the panel (confirm dialog), then apply.
 await pageA.evaluate(() => document.querySelector('[data-armory-buy]')?.click());
-await pageA.waitForSelector('#confirm-dialog [data-store-prompt-confirm]', { timeout: 8000 });
+await pageA.waitForSelector('#confirm-dialog [data-ok]', { timeout: 8000 });
 await sleep(400);
 await pageA.screenshot({ path: 'tmp/armory_confirm_over_inspect.png' });
-await pageA.evaluate(() =>
-  document.querySelector('#confirm-dialog [data-store-prompt-confirm]')?.click(),
-);
+await pageA.evaluate(() => document.querySelector('#confirm-dialog [data-ok]')?.click());
 await pageA.waitForSelector('[data-armory-apply]', { timeout: 12000 });
 await sleep(400);
 await pageA.screenshot({ path: 'tmp/armory_inspect_owned.png' });

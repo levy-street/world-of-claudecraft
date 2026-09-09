@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "69311947",
+      "nextId": 1007,
+      "state": "66339138",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -47,6 +47,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -59,7 +60,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -67,6 +68,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -87,7 +91,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -104,7 +109,7 @@
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 62,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -156,9 +161,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1009,
-      "state": "8f9a9bfe",
-      "events": "7bf285bb",
+      "nextId": 1017,
+      "state": "cb87c461",
+      "events": "ebc76dfc",
       "rng": {
         "draws": 1,
         "digest": "368503ad"
@@ -189,6 +194,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -201,7 +207,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -209,6 +215,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -230,7 +239,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -246,7 +256,7 @@
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 93,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -297,9 +307,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1009,
-      "state": "dedd6e5f",
-      "events": "c0235a42",
+      "nextId": 1017,
+      "state": "170d089c",
+      "events": "d2e65cca",
       "rng": {
         "draws": 1,
         "digest": "368503ad"
@@ -330,6 +340,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -352,7 +363,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -360,6 +371,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -382,7 +396,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -399,7 +414,7 @@
           "fiveSecondRule": 99.1,
           "healPower": 6,
           "hp": 185,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -451,8 +466,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1009,
-      "state": "dedd6e5f",
+      "nextId": 1017,
+      "state": "170d089c",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -484,6 +499,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -506,7 +522,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -514,6 +530,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -536,7 +555,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -553,7 +573,7 @@
           "fiveSecondRule": 99.1,
           "healPower": 6,
           "hp": 185,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",

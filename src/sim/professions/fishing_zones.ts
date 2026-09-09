@@ -86,8 +86,9 @@ export function rodTierRequiredForZone(zoneId: string): number {
 }
 
 // WHY THE BAND SIDE OF THIS LADDER IS NOT EXPORTED. A zone's required BAND is
-// rodTier - 1, and how far a given band falls short of it is what the nine
-// catch-table cells are authored against (content/items.ts). None of that has
+// rodTier - 1, and how far a given band falls short of it is what the EIGHTEEN
+// catch-table cells are authored against (content/items.ts; nine until
+// masterwrought Phase 11i widened the ladder from three bands to six). None of that has
 // a runtime consumer: the engine reads the table it is handed and never asks
 // how the numbers in it were chosen. Exporting the arithmetic anyway would put
 // production code in src/sim/ whose only caller is a test, so the schedule

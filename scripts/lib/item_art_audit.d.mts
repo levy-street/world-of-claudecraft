@@ -92,6 +92,7 @@ export type ItemArtAuditBuildOptions = {
   outputDirectory: string;
   renderOutputs?: boolean;
   items: Record<string, ItemArtDefinition>;
+  pendingArtIds?: readonly string[];
   mapping: {
     entries?: readonly { itemId?: unknown }[];
     generatedBatches?: readonly { itemIds?: readonly unknown[] }[];
@@ -99,6 +100,7 @@ export type ItemArtAuditBuildOptions = {
   expected?: Partial<{
     catalogCount: number;
     liveItemCount: number;
+    pendingArtCount: number;
     generatedHeroicDefinitions: number;
     heroicDefinitionsWithOwnWebp: number;
     heroicWeaponArtAliases: number;

@@ -1,8 +1,8 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { createDoomMeter } from '../src/ui/hud/warlock/doom_meter';
-import type { MovableFrameConfig } from '../src/ui/movable_frame';
+import { HUD_FRAME_SPECS } from '../src/ui/interface_unlock_core';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 
 function writers(): PainterHostWriters {
@@ -39,63 +39,38 @@ function elementById(id: string): HTMLElement {
 }
 
 describe('Affliction resource block movement', () => {
-  it('moves Condemnation and Fate Threads as one persisted frame', () => {
+  it('mints the frame the doomMeter registry row governs, with the legacy storage key', () => {
     document.body.innerHTML = '<div id="ui"></div><div id="stock"><div id="before"></div></div>';
-    const detachedParent = elementById('ui');
     const stockParent = elementById('stock');
     const before = elementById('before');
-    const moverConfigs: MovableFrameConfig[] = [];
-    const mover = {
-      relocalize: vi.fn(),
-      reapplyPosition: vi.fn(),
-      reset: vi.fn(),
-    };
 
-    const meter = createDoomMeter(
-      document,
-      stockParent,
-      before,
-      writers(),
-      {
-        label: () => 'Condemnation',
-        formatCount: String,
-        formatEmptyStatus: (value, max) => `${value}/${max}`,
-        formatStatus: (value, max) => `${value}/${max}`,
-        fateThreadsLabel: () => 'Fate Threads',
-        formatFateThreadsStatus: (value, max) => `${value}/${max}`,
-      },
-      {
-        detachedParent,
-        isMobileLayout: () => false,
-        createMover: (config) => {
-          moverConfigs.push(config);
-          return mover;
-        },
-      },
-    );
+    createDoomMeter(document, stockParent, before, writers(), {
+      label: () => 'Condemnation',
+      formatCount: String,
+      formatEmptyStatus: (value, max) => `${value}/${max}`,
+      formatStatus: (value, max) => `${value}/${max}`,
+      fateThreadsLabel: () => 'Fate Threads',
+      formatFateThreadsStatus: (value, max) => `${value}/${max}`,
+    });
 
-    expect(moverConfigs).toHaveLength(1);
-    const [config] = moverConfigs;
-    if (!config) throw new Error('Doom meter did not create its mover');
-    expect(config.frame.querySelector('#warlock-doom')).not.toBeNull();
-    expect(config.frame.querySelector('.warlock-fate-threads')).not.toBeNull();
-    expect(config.frame.querySelectorAll('.warlock-fate-thread')).toHaveLength(3);
-    expect(config.storageKey).toBe('woc_warlock_doom_frame_pos');
+    // Movement, hide and resize come from the "Unlock interface" registry
+    // (HUD_FRAME_SPECS row 'doomMeter'), not a private mover, so the two
+    // sides must agree on the element id, and the row must keep the storage
+    // key the pre-registry mover persisted under (player layout data) plus
+    // the #ui re-home its transformed #actionbar-stack ancestor demands.
+    const spec = HUD_FRAME_SPECS.find((s) => s.id === 'doomMeter');
+    if (!spec) throw new Error('doomMeter registry row is gone');
+    const frame = document.getElementById(spec.elementId);
+    expect(frame).not.toBeNull();
+    expect(frame?.parentElement).toBe(stockParent);
+    expect(frame?.nextElementSibling).toBe(before);
+    expect(spec.storageKey).toBe('woc_warlock_doom_frame_pos');
+    expect(spec.detachToUiRoot).toBe(true);
 
-    config.onPositioned?.(true);
-    expect(config.frame.parentElement).toBe(detachedParent);
-    expect(config.frame.classList.contains('doom-detached')).toBe(true);
-
-    config.onPositioned?.(false);
-    expect(config.frame.parentElement).toBe(stockParent);
-    expect(config.frame.nextElementSibling).toBe(before);
-    expect(config.frame.classList.contains('doom-detached')).toBe(false);
-
-    meter.relocalize();
-    meter.reapplyPosition();
-    meter.resetPosition();
-    expect(mover.relocalize).toHaveBeenCalledOnce();
-    expect(mover.reapplyPosition).toHaveBeenCalledOnce();
-    expect(mover.reset).toHaveBeenCalledOnce();
+    // Condemnation and the Fate Threads pips ride the one frame, so a drag
+    // moves them together.
+    expect(frame?.querySelector('#warlock-doom')).not.toBeNull();
+    expect(frame?.querySelector('.warlock-fate-threads')).not.toBeNull();
+    expect(frame?.querySelectorAll('.warlock-fate-thread')).toHaveLength(3);
   });
 });

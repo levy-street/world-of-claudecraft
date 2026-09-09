@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Héroïque : The Inner Crucible',
     desc: 'Boucliers et armes exclusifs au mode héroïque de Varkhul, Forgefather of the Last Flame.',
   },
+  conquerors_set_bramblehide: {
+    name: 'Peau de Ronces de Roots',
+    desc: 'La famille complète de cuir Bramblehide.',
+  },
 };

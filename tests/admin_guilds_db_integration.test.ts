@@ -19,6 +19,7 @@ import {
   GUILD_NAME_COLLISION_SQL,
   guildNameLockKey,
 } from '../server/guild_name_db';
+import { GUILD_ROSTER_MAX_MEMBERS } from '../src/sim/guild_roster';
 
 const DB_URL = process.env.TEST_DATABASE_URL;
 const SCHEMA = 'admin_guilds_integration_test';
@@ -248,7 +249,10 @@ describeDb('admin guild name integrity (real Postgres)', () => {
 const QUERY_SCHEMA = 'admin_guilds_query_integration_test';
 const QUERY_REALM = 'QueryRealm';
 const OTHER_REALM = 'OtherRealm';
-const ROSTER_CAP = 100;
+// The ABSOLUTE roster bound (base seats plus every ladder page): the detail
+// read pages at it and the rename guard refuses above it, whatever a guild's
+// own bought cap is.
+const ROSTER_CAP = GUILD_ROSTER_MAX_MEMBERS;
 
 type GuildsDb = typeof import('../server/admin_guilds_db');
 type AdminDb = typeof import('../server/admin_db');
@@ -382,9 +386,9 @@ describeDb('admin guild production SQL (real Postgres)', () => {
     await bootstrap.end();
   });
 
-  it('pins the roster cap the detail read and rename guard share', async () => {
-    const social = await import('../server/social');
-    expect(social.GUILD_MEMBER_LIMIT).toBe(ROSTER_CAP);
+  it('pins the roster bound the detail read and rename guard share', () => {
+    // The 1,000-seat hard cap: base seats plus every roster page.
+    expect(ROSTER_CAP).toBe(1000);
   });
 
   it('pages and counts the name-sorted branch, scoped to this realm', async () => {

@@ -67,7 +67,12 @@ interface ClientInternals {
   cmd(payload: { cmd: string } & Record<string, unknown>): void;
 }
 
-function makeWorld(): { world: ClientWorld; wire: ClientInternals; sends: string[] } {
+function makeWorld(): {
+  world: ClientWorld;
+  wire: ClientInternals;
+  sends: string[];
+  payloads: Record<string, unknown>[];
+} {
   const world = withDomStubs(() => {
     const w = new ClientWorld('gbank-log-token', 1, 'warrior', 'http://localhost');
     w.close();
@@ -75,11 +80,13 @@ function makeWorld(): { world: ClientWorld; wire: ClientInternals; sends: string
   });
   const wire = world as unknown as ClientInternals;
   const sends: string[] = [];
+  const payloads: Record<string, unknown>[] = [];
   // Record the wire tokens without a socket: cmd() is the one send funnel.
   wire.cmd = (payload) => {
     sends.push(payload.cmd);
+    payloads.push(payload);
   };
-  return { world, wire, sends };
+  return { world, wire, sends, payloads };
 }
 
 const frame = (body: Record<string, unknown>) => JSON.stringify({ t: 'gbanklog', ...body });
@@ -119,6 +126,9 @@ describe('decodeGuildBankLogFrame', () => {
     const decoded = decodeGuildBankLogFrame({ t: 'gbanklog', ok: true, entries: [wireRow()] });
     expect(decoded).toEqual({
       refused: false,
+      kind: null,
+      before: null,
+      more: false,
       entries: [
         {
           id: 5,
@@ -137,6 +147,9 @@ describe('decodeGuildBankLogFrame', () => {
     // A refusal must never be able to smuggle history onto the pane.
     expect(decodeGuildBankLogFrame({ t: 'gbanklog', ok: false, entries: [wireRow()] })).toEqual({
       refused: true,
+      kind: null,
+      before: null,
+      more: false,
       entries: [],
     });
   });
@@ -203,15 +216,52 @@ describe('decodeGuildBankLogFrame', () => {
   it('tolerates a missing entries array', () => {
     expect(decodeGuildBankLogFrame({ t: 'gbanklog', ok: true })).toEqual({
       refused: false,
+      kind: null,
+      before: null,
+      more: false,
       entries: [],
     });
   });
+
+  it('decodes the query echo and the older-rows word, re-validating each', () => {
+    const decoded = decodeGuildBankLogFrame({
+      t: 'gbanklog',
+      ok: true,
+      kind: 'money',
+      before: 400,
+      more: true,
+      entries: [],
+    });
+    expect(decoded).toMatchObject({ kind: 'money', before: 400, more: true });
+    // An unknown (present) kind reads as `all`, a bad cursor as none, a
+    // non-boolean `more` as false: a skewed frame can never invent a filter
+    // or a page. An ABSENT kind is different: it decodes as unstated (null),
+    // the pre-paging server's frame, which the mirror accepts under any chip.
+    const skewed = decodeGuildBankLogFrame({
+      t: 'gbanklog',
+      ok: true,
+      kind: 'ops',
+      before: '400',
+      more: 'yes',
+      entries: [],
+    });
+    expect(skewed).toMatchObject({ kind: 'all', before: null, more: false });
+  });
 });
+
+/** The view a client reports before any answer: `all`, nothing loaded. */
+const loadingView = {
+  state: 'loading',
+  kind: 'all',
+  entries: [],
+  more: false,
+  olderPending: false,
+};
 
 describe('ClientWorld.guildBankLog: the on-demand round trip', () => {
   it('the first read REQUESTS the log and reports loading', () => {
     const { world, sends } = makeWorld();
-    expect(world.guildBankLog()).toEqual({ state: 'loading', entries: [] });
+    expect(world.guildBankLog()).toEqual(loadingView);
     expect(sends).toEqual(['guild_bank_log']);
   });
 
@@ -236,7 +286,7 @@ describe('ClientWorld.guildBankLog: the on-demand round trip', () => {
     const { world, wire } = makeWorld();
     world.guildBankLog();
     wire.onMessage(frame({ ok: true, entries: [] }));
-    expect(world.guildBankLog()).toEqual({ state: 'ready', entries: [] });
+    expect(world.guildBankLog()).toEqual({ ...loadingView, state: 'ready' });
   });
 
   it('a refusal reports refused and KEEPS reporting it (never degrades to empty-ready)', () => {
@@ -299,7 +349,7 @@ describe('ClientWorld.guildBankLog: the on-demand round trip', () => {
     wire.applySnapshot(selfSnap(null));
     expect(world.guildBankInfo).toBeNull();
     const after = world.guildBankLog();
-    expect(after).toEqual({ state: 'loading', entries: [] });
+    expect(after).toEqual(loadingView);
     expect(sends.length).toBe(2); // the reset re-armed the request gate
   });
 
@@ -325,9 +375,63 @@ describe('ClientWorld.guildBankLog: the on-demand round trip', () => {
 
     wire.applySnapshot(selfSnap(GATE)); // walked up to the banker
     // One paint later the pane is loading a fresh answer, not still refused.
-    expect(world.guildBankLog()).toEqual({ state: 'loading', entries: [] });
+    expect(world.guildBankLog()).toEqual(loadingView);
     expect(sends.length).toBe(2);
     wire.onMessage(frame({ ok: true, entries: [wireRow({ id: 9 })] }));
     expect(world.guildBankLog().state).toBe('ready');
+  });
+});
+
+describe('ClientWorld.guildBankLog: the transaction history round trip', () => {
+  it('reads under a kind, sends it on the wire, and an older page carries the cursor', () => {
+    const { world, wire, sends, payloads } = makeWorld();
+    world.guildBankLog('money');
+    expect(payloads[0]).toEqual({ cmd: 'guild_bank_log', kind: 'money' });
+    wire.onMessage(
+      frame({
+        ok: true,
+        kind: 'money',
+        before: null,
+        more: true,
+        entries: [wireRow({ id: 9, op: 'deposit_gold', itemId: null, count: null, copper: 50 })],
+      }),
+    );
+    expect(world.guildBankLog('money').more).toBe(true);
+    world.guildBankLogOlder();
+    expect(sends).toEqual(['guild_bank_log', 'guild_bank_log']);
+    expect(payloads[1]).toEqual({ cmd: 'guild_bank_log', kind: 'money', before: 9 });
+    expect(world.guildBankLog('money').olderPending).toBe(true);
+    wire.onMessage(
+      frame({
+        ok: true,
+        kind: 'money',
+        before: 9,
+        more: false,
+        entries: [wireRow({ id: 4, op: 'withdraw_gold', itemId: null, count: null, copper: 20 })],
+      }),
+    );
+    const view = world.guildBankLog('money');
+    expect(view.entries.map((e) => e.id)).toEqual([9, 4]);
+    expect(view.more).toBe(false);
+    expect(view.olderPending).toBe(false);
+  });
+
+  it('guildBankLogOlder sends nothing when there is nothing to ask for', () => {
+    const { world, sends } = makeWorld();
+    world.guildBankLogOlder();
+    expect(sends).toEqual([]);
+    world.guildBankLog();
+    world.guildBankLogOlder();
+    expect(sends).toEqual(['guild_bank_log']);
+  });
+
+  it('switching the kind drops the loaded rows and re-requests at once', () => {
+    const { world, wire, sends } = makeWorld();
+    world.guildBankLog();
+    wire.onMessage(frame({ ok: true, entries: [wireRow({ id: 9 })] }));
+    const view = world.guildBankLog('items');
+    expect(view.state).toBe('loading');
+    expect(view.entries).toEqual([]);
+    expect(sends).toEqual(['guild_bank_log', 'guild_bank_log']);
   });
 });

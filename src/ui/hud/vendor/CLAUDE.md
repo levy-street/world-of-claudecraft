@@ -28,7 +28,12 @@ Maker's Bond unbind service, and the WARFARE quartermaster honor shop
   every pending or confirmed Learn the MIRRORED known set does not answer
   yet (`availableTrainCopper`), so sibling rows disable on the first click
   and never double-reserve an already-debited purse (mirrored knownness and
-  the copper debit arrive together in both hosts). The unbind list re-prices
+  the copper debit arrive together in both hosts). It reserves ONLY what the
+  trainer path could have charged: `resolveTrain` refuses a recipe with no
+  `trainer` acquisition ahead of every charging arm, so an unsolicited
+  fee-free pattern-item learn joining the confirmed overlay
+  (`src/sim/professions/pattern_items.ts`) holds nothing back. Never reserve
+  a fee that cannot be debited. The unbind list re-prices
   on the same hook but keeps no in-flight reserve of its own: the confirm
   dialog narrows the same race without closing it (a second confirm can
   still beat the first fee's mirror), an accepted gap while the exposure

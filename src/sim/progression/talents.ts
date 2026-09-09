@@ -36,6 +36,7 @@ import { clearAfflictionState } from '../combat/affliction';
 import { stripTemporalEchoes } from '../combat/chronomancy';
 import { clearDestructionState } from '../combat/destruction';
 import { cleanDruidEngineState } from '../combat/druid_engines';
+import { cleanColdsightReadState } from '../combat/hunter_coldsight_read';
 import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
 import { clearPacklordState } from '../combat/hunter_packlord';
 import { clearHunterTalentState } from '../combat/hunter_shared';
@@ -50,7 +51,6 @@ import { reconcileWarlockTalentState } from '../combat/warlock_talents';
 import { abilitiesKnownAt } from '../content/classes';
 import {
   cloneAllocation,
-  computeTalentModifiers,
   MAX_LOADOUTS,
   ROW_LEVELS,
   repairAllocation,
@@ -380,6 +380,7 @@ function commitTalentAllocation(
     if (sanitized.spec !== 'survival') clearFieldcraftState(ctx, player);
     if (sanitized.spec !== 'marksmanship') {
       player.auras = player.auras.filter((aura) => aura.kind !== 'hunter_cold_focus');
+      cleanColdsightReadState(ctx, player);
     }
   }
   // Chronomancy: leaving the healer spec (the new build no longer knows Temporal

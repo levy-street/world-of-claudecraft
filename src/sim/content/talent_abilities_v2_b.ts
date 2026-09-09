@@ -4,7 +4,7 @@ import type { AbilityDef } from '../types';
 export const TALENT_ABILITIES_V2_B = {
   spellsteal: {
     id: 'spellsteal',
-    name: 'Spellsteal',
+    name: 'Spellplunder',
     class: 'mage',
     learnLevel: 8,
     cost: 40,

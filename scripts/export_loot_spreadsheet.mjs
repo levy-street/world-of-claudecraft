@@ -381,9 +381,14 @@ for (const mob of Object.values(MOBS)) {
       drop_rate_decimal: entry.chance,
       roll_group: entry.rollGroup ?? '',
       gated_by_quest_id: entry.questId ?? '',
-      notes: entry.rollGroup
-        ? 'Exclusive roll group: at most one item from this group is selected by the listed weights.'
-        : '',
+      notes: [
+        entry.rollGroup
+          ? 'Exclusive roll group: at most one item from this group is selected by the listed weights.'
+          : '',
+        entry.normalOnly ? 'Normal difficulty only: a Heroic kill skips this row.' : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
     });
   }
 }

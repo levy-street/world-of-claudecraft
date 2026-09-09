@@ -83,7 +83,7 @@ export function isInStasis(e: Entity): boolean {
 //      this leaf importing the content tables, which would pull all of
 //      `sim/data.ts` into a module `player_motion`/`climb`/`aura_classify`
 //      already sit downstream of.
-// Every OTHER incapacitate (Gouge, Sap, Blind, Hibernate, Wyvern Sting,
+// Every OTHER incapacitate (Gouge, Sap, Blind, Hibernate, Drakesting,
 // Startle Shot, Dragon's Breath, the staged-cone daze, temporal_hourglass) is
 // deliberately NOT a fear: those hold the victim in place rather than sending
 // it running, so the reads that key off this must not claim them.

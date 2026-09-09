@@ -76,6 +76,24 @@ export type ItemLookup = (itemId: string) => ItemDef | undefined;
 // kind test: grey vendor trash and the unclassified trophies match only 'all', and
 // the implements/charms/cosmetic tokens the old junk-or-tool predicate swept in
 // live under the 'tool' chip instead.
+// Recipe patterns (kind 'recipe') are deliberately ALL-ONLY: none of the chips fits
+// (a pattern is not a restorative, not an honest material, and not an implement), and
+// widening 'consumable' to cover it would put a permanent unlock beside the potions a
+// player filters for in a fight. Note patterns do NOT stack: 'recipe' is an
+// UNSTACKED_KIND (src/sim/bags.ts), so every copy holds its own slot and a player
+// sitting on unlearned patterns pays more bag space than a stacking drop would cost.
+// That makes the case for a dedicated chip arrive SOONER, not later; all-only stands
+// for now purely on chip-count restraint, and is the first thing to revisit if the
+// chip rail ever earns another entry.
+// Scrolls (kind 'scroll', the Masterwrought phase 06 inscription stamina buffs) live
+// under 'consumable' beside the potions and elixirs: a scroll is a timed restorative
+// buff sharing an exclusivity family with elixirs (src/sim/types.ts), and the sim's
+// clean-up ladder already ranks it in the consumable run (KIND_RANK in
+// src/sim/inventory_sort.ts: potion, elixir, flask, scroll), so the chip a player
+// filters for in a fight is exactly where it belongs. Flasks (kind 'flask', the
+// phase 10 alchemy apex) join for the same reason and one more: a flask is
+// literally the buff a raider reaches for before a pull, so burying it under 'all'
+// would hide the most-clicked consumable in the game.
 export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
   switch (category) {
     case 'all':
@@ -89,7 +107,9 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
         item.kind === 'food' ||
         item.kind === 'drink' ||
         item.kind === 'potion' ||
-        item.kind === 'elixir'
+        item.kind === 'elixir' ||
+        item.kind === 'flask' ||
+        item.kind === 'scroll'
       );
     case 'material':
       return isMaterialItem(item);

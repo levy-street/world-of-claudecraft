@@ -676,10 +676,14 @@
     height: 14px;
     display: block;
   }
-  .wallet-mini:hover,
-  .wallet-mini:focus-visible {
+  .wallet-mini:hover {
     color: var(--color-text-light);
     border-color: var(--gold-dim);
+    outline: none;
+  }
+  .wallet-mini:focus-visible {
+    color: var(--color-text-light);
+    border-color: var(--color-border-focus);
     outline: none;
   }
   #btn-wallet-unlink:hover,
@@ -2517,127 +2521,6 @@
     font-family: var(--font-heading);
     letter-spacing: 0.8px;
     margin-right: var(--spacing-xs);
-  }
-  /* $WOC contract address, click-to-copy pill, sits under the performance tip. */
-  #token-ca {
-    margin: var(--spacing-lg) auto 0;
-    padding-top: var(--spacing-md);
-    border-top: 1px solid rgba(255, 209, 0, 0.14);
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-sm);
-  }
-  .token-ca-label {
-    font-family: var(--font-heading);
-    color: var(--color-primary);
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    font-size: 12px;
-    text-shadow:
-      0 0 8px var(--color-primary-glow),
-      1px 1px 2px #000;
-  }
-  .token-ca-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    max-width: 100%;
-    margin: 0;
-    padding: 9px var(--spacing-md);
-    background: rgba(11, 11, 18, 0.6);
-    border: 1px solid rgba(199, 148, 26, 0.45);
-    border-radius: var(--radius-md);
-    color: var(--color-text-light);
-    cursor: var(--cursor-point);
-    font: inherit;
-    text-align: left;
-    transition:
-      border-color var(--transition-speed) var(--transition-ease),
-      box-shadow var(--transition-speed) var(--transition-ease),
-      background var(--transition-speed) var(--transition-ease);
-  }
-  .token-ca-pill:hover,
-  .token-ca-pill:focus-visible {
-    border-color: var(--color-primary);
-    background: rgba(11, 11, 18, 0.85);
-    box-shadow: 0 0 12px var(--color-primary-glow);
-    outline: none;
-  }
-  .token-ca-addr {
-    font-family: "SFMono-Regular", ui-monospace, "Cascadia Code", "Courier New", monospace;
-    font-size: 13px;
-    letter-spacing: 0.4px;
-    color: var(--color-text-light);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-shadow: 1px 1px 2px #000;
-  }
-  .token-ca-copy {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    color: var(--color-primary-dim);
-    transition: color var(--transition-speed) var(--transition-ease);
-  }
-  .token-ca-pill:hover .token-ca-copy {
-    color: var(--color-primary);
-  }
-  .token-ca-copy svg {
-    width: 16px;
-    height: 16px;
-    display: block;
-  }
-  .token-ca-copy .icon-check {
-    display: none;
-  }
-  .token-ca-feedback {
-    display: none;
-    font-family: var(--font-sans);
-    font-size: 12px;
-    color: var(--color-text-success);
-  }
-  /* Small print under the pill: token disclaimer + community call-to-action. */
-  .token-ca-note {
-    margin: 0;
-    max-width: 520px;
-    font-family: var(--font-sans);
-    font-size: 12px;
-    line-height: 1.55;
-    color: var(--color-text-muted);
-    text-align: center;
-    text-shadow: 1px 1px 2px #000;
-  }
-  /* Copied state, swap clipboard glyph for a check, reveal the confirmation. */
-  #token-ca.is-copied .token-ca-pill {
-    border-color: var(--color-text-success);
-  }
-  #token-ca.is-copied .token-ca-copy {
-    color: var(--color-text-success);
-  }
-  #token-ca.is-copied .token-ca-copy .icon-clipboard {
-    display: none;
-  }
-  #token-ca.is-copied .token-ca-copy .icon-check {
-    display: block;
-  }
-  #token-ca.is-copied .token-ca-feedback {
-    display: block;
-  }
-  @media (max-width: 520px) {
-    .token-ca-addr {
-      font-size: 11px;
-      letter-spacing: 0.2px;
-    }
-    .token-ca-pill {
-      padding: 8px var(--spacing-sm);
-    }
   }
   .auth-panel {
     width: 100%;

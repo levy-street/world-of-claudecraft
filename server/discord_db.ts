@@ -16,6 +16,7 @@ import type { Pool } from 'pg';
 import { discordStatusIndexForPoints } from '../src/sim/discord_tier';
 import { enqueueLinkChange } from './discord_link_changes';
 import { discordAvatarUrl } from './discord_oauth';
+import { bustQueuePingCache } from './discord_queue_ping_cache';
 import { bustDiscordStatus } from './discord_status_cache';
 import { isUniqueViolation } from './http_util';
 
@@ -286,6 +287,7 @@ export async function linkDiscordToAccount(
   // the cached /api/discord core is stale. The refusal arms above write nothing
   // and must not evict a healthy snapshot.
   bustDiscordStatus(accountId);
+  bustQueuePingCache(accountId);
   return true;
 }
 
@@ -295,7 +297,10 @@ export async function unlinkDiscord(pool: Pool, accountId: number): Promise<void
   // no-op and must not evict a healthy /api/discord snapshot (busts ride real
   // writes only). A user who unlinks and immediately reloads must see
   // linked:false, which this bust guarantees within this process.
-  if ((res.rowCount ?? 0) > 0) bustDiscordStatus(accountId);
+  if ((res.rowCount ?? 0) > 0) {
+    bustDiscordStatus(accountId);
+    bustQueuePingCache(accountId);
+  }
 }
 
 // Update just the captured Discord email on an existing link, e.g. when a

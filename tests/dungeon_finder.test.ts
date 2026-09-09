@@ -176,19 +176,33 @@ describe('finder catalogue metadata', () => {
     }
   });
 
-  it('the heroic Nythraxis raid preview carries Dread Curse; the normal tier does not', () => {
-    // Regression: NYTHRAXIS_RAID_ENCOUNTERS used to be shared between the
-    // normal and heroic FinderActivity entries, so the heroic-only Dread
-    // Curse tank-swap mechanic (src/sim/encounters/nythraxis.ts
-    // updateNythraxisDreadCurse) never appeared in the finder's mechanics
-    // preview. The heroic entry now carries its own encounter array.
+  it('both Nythraxis raid previews carry the swap, the spikes, and the eruptions, and neither carries adds', () => {
+    // The mechanics redo runs every Nythraxis mechanic on both difficulties
+    // (src/sim/encounters/nythraxis.ts): Dread Curse is the normal-mode tank
+    // swap now, not a heroic-only addition. The guard waves and the heroic
+    // court are switched off with the adds (NYTHRAXIS_ADDS_ENABLED), so no
+    // preview advertises them on either tier.
     const normal = finderActivity('nythraxis_boss_arena_normal');
     const heroic = finderActivity('nythraxis_boss_arena_heroic');
-    expect(normal?.encounters.flatMap((e) => e.mechanics)).not.toContain('dread_curse');
-    expect(heroic?.encounters.flatMap((e) => e.mechanics)).toContain('dread_curse');
-    // Heroic keeps every normal-tier mechanic on top of the addition.
     const normalMechanics = normal?.encounters.flatMap((e) => e.mechanics) ?? [];
     const heroicMechanics = heroic?.encounters.flatMap((e) => e.mechanics) ?? [];
+    for (const m of [
+      'dread_curse',
+      'bone_spike',
+      'grave_eruption',
+      'wardstones',
+      'kings_wrath',
+      'bone_storm',
+      'crown_endures',
+    ]) {
+      expect(normalMechanics, m).toContain(m);
+      expect(heroicMechanics, m).toContain(m);
+    }
+    for (const add of ['raise_fallen', 'deathless_court']) {
+      expect(normalMechanics, add).not.toContain(add);
+      expect(heroicMechanics, add).not.toContain(add);
+    }
+    // Heroic keeps every normal-tier mechanic on top of the addition.
     for (const m of normalMechanics) expect(heroicMechanics).toContain(m);
   });
 });
@@ -466,6 +480,81 @@ describe('automatic queue', () => {
     sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], pids[4]);
     tickAll(sim, 1);
     expect(sim.dungeonFinderInfoFor(pids[4])?.queue).not.toBeNull();
+  });
+
+  it('drops a premade whose member declines or lapses, blaming only the offender', () => {
+    // The corrected guide clause (guide.social.finderBodyLeaderQueues): failProposal drops
+    // every unit holding an offender, so a premade mate who accepted loses their place with
+    // the offender, while the units with no offender return with their original joinedAt.
+    // Only offenders are cooled down. queueFive drives solo units alone, so both arms here
+    // are premade-shaped.
+    const defs: { cls: PlayerClass; roles: Role[]; level: number; name?: string }[] = [
+      { cls: 'warrior', roles: ['tank'], level: 8, name: 'Lead' },
+      { cls: 'priest', roles: ['healer'], level: 8, name: 'Mate' },
+      { cls: 'mage', roles: ['dps'], level: 8, name: 'Solo0' },
+      { cls: 'rogue', roles: ['dps'], level: 8, name: 'Solo1' },
+      { cls: 'hunter', roles: ['dps'], level: 8, name: 'Solo2' },
+    ];
+
+    // Arm 1: the premade's non-leader declines after their leader has accepted.
+    const sim = makeSim();
+    const [lead, mate, ...solos] = addPlayers(sim, defs);
+    sim.partyInvite(mate, lead);
+    sim.partyAccept(mate);
+    for (const pid of solos) sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], pid);
+    tickAll(sim, 1);
+    sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], lead);
+    tickAll(sim, 1);
+    expect(sim.dungeonFinderInfoFor(mate)?.proposal).not.toBeNull();
+    // Queue time accrues well inside the availability window before anyone answers.
+    tickAll(sim, 20 * 5);
+    for (const pid of [lead, ...solos]) sim.dungeonFinderRespond(true, pid);
+    sim.dungeonFinderRespond(false, mate);
+    tickAll(sim, 1);
+    // The offender: out of the queue and locked out.
+    expect(sim.dungeonFinderInfoFor(mate)?.queue).toBeNull();
+    expect(sim.dungeonFinderInfoFor(mate)?.cooldown).toBeGreaterThan(
+      FINDER_DECLINE_COOLDOWN_SECONDS - 3,
+    );
+    // The mate who accepted: dropped with the unit, but never blamed.
+    expect(sim.dungeonFinderInfoFor(lead)?.queue).toBeNull();
+    expect(sim.dungeonFinderInfoFor(lead)?.cooldown).toBe(0);
+    // The solo units that accepted keep their place, original wait intact.
+    for (const pid of solos) {
+      const info = sim.dungeonFinderInfoFor(pid);
+      expect(info?.queue).not.toBeNull();
+      expect(info?.proposal).toBeNull();
+      expect(info?.queue?.waited).toBeGreaterThanOrEqual(5);
+      expect(info?.cooldown).toBe(0);
+    }
+    // The party cannot return while the offender is still locked out.
+    sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], lead);
+    expect(errorsFor(tickAll(sim, 1), lead)).toContain('Mate cannot join the queue again yet.');
+
+    // Arm 2: the same premade, with the mate silent until the offer runs out.
+    const sim2 = makeSim(7);
+    const [lead2, mate2, ...solos2] = addPlayers(sim2, defs);
+    sim2.partyInvite(mate2, lead2);
+    sim2.partyAccept(mate2);
+    for (const pid of solos2) sim2.dungeonFinderQueueJoin(['hollow_crypt_normal'], pid);
+    tickAll(sim2, 1);
+    sim2.dungeonFinderQueueJoin(['hollow_crypt_normal'], lead2);
+    tickAll(sim2, 1);
+    expect(sim2.dungeonFinderInfoFor(mate2)?.proposal).not.toBeNull();
+    for (const pid of [lead2, ...solos2]) sim2.dungeonFinderRespond(true, pid);
+    tickAll(sim2, 20 * (FINDER_PROPOSAL_SECONDS + 2));
+    // The silent member is the only offender, and the only one cooled down.
+    expect(sim2.dungeonFinderInfoFor(mate2)?.queue).toBeNull();
+    expect(sim2.dungeonFinderInfoFor(mate2)?.cooldown).toBeGreaterThan(
+      FINDER_DECLINE_COOLDOWN_SECONDS - 5,
+    );
+    // Their mate accepted in time and is dropped all the same, without a lockout.
+    expect(sim2.dungeonFinderInfoFor(lead2)?.queue).toBeNull();
+    expect(sim2.dungeonFinderInfoFor(lead2)?.cooldown).toBe(0);
+    for (const pid of solos2) {
+      expect(sim2.dungeonFinderInfoFor(pid)?.queue).not.toBeNull();
+      expect(sim2.dungeonFinderInfoFor(pid)?.cooldown).toBe(0);
+    }
   });
 
   it('a proposal expires after 30 seconds, penalizing only the non-responders', () => {

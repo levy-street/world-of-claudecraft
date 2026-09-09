@@ -1101,6 +1101,60 @@ describe('Input Book of Deeds keybind', () => {
   });
 });
 
+describe('Input Harvest Journal, Perfecting, and Loot Explorer keybinds', () => {
+  // Merge coverage: release added the Harvest Journal + Perfecting edges,
+  // OSSBrain PR3781 added Loot Explorer, and both land in the same
+  // dispatchEdge switch in main.ts's onUiKey union. A dropped case here would
+  // silently eat the keypress with no compile error.
+  it("dispatches onUiKey('harvestJournal') for the default Shift+K chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyK', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('harvestJournal');
+  });
+
+  it("dispatches onUiKey('perfecting') for the default Shift+T chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyT', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('perfecting');
+  });
+
+  it("dispatches onUiKey('lootExplorer') for the default Shift+O chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyO', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('lootExplorer');
+  });
+
+  it('cancels the default action so the newly-focused search box does not also receive this keydown as typed text', () => {
+    // Regression: opening the Loot Explorer autofocuses its search input as a
+    // side effect of this very keydown (loot_explorer_window.ts `open()`).
+    // Left un-prevented, the browser still delivers the follow-up keypress
+    // (and its default character insertion) to that now-focused input, so the
+    // bound key both opened the window AND typed itself into the search box
+    // before the player ever saw an empty placeholder. Proven on the
+    // REMAPPED physical key too, so the fix tracks the chord, not the
+    // hardcoded default.
+    const kb = new Keybinds();
+    expect(kb.bind('lootExplorer', 0, 'Shift+KeyL')).toBe(true);
+    const { windowListeners } = makeInput();
+    const preventDefault = vi.fn();
+
+    windowListeners.get('keydown')!({
+      code: 'KeyL',
+      repeat: false,
+      shiftKey: true,
+      preventDefault,
+    });
+
+    expect(preventDefault).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('Input Mount / Dismount keybind', () => {
   it("dispatches onUiKey('mount') for the default Backquote key", () => {
     const { cb, windowListeners } = makeInput();

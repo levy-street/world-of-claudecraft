@@ -37,8 +37,13 @@ describe('destruction 200 DPS anchors at 120 seconds', () => {
     // new-tier kit actually measures, above 200 included.
     // Re-anchored for the 2026-08-30 legendary band (Heartwood in the frozen
     // kit; measured 190.9 on the gate run).
-    expect(mean('dps')).toBeGreaterThanOrEqual(181);
-    expect(mean('dps')).toBeLessThanOrEqual(201);
+    // Re-anchored for the v0.42.0 Ruination retune (+10% destruction damage:
+    // spec_output_tuning.ts's +0.11 offensive spell bonus plus the explicit
+    // Pyre Aura pet-damage fix, docs/design/class-balance-v042-results.md).
+    // Measured 203.75208333333336 on this frozen kit; about plus or minus 5%
+    // around that, same as every prior re-anchor here.
+    expect(mean('dps')).toBeGreaterThanOrEqual(194);
+    expect(mean('dps')).toBeLessThanOrEqual(214);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 
@@ -54,8 +59,14 @@ describe('destruction 200 DPS anchors at 120 seconds', () => {
     // lifts the level-20 dummy to 207.2, so the old 206 ceiling was measuring
     // the gear, not drift. Ceiling moves to measurement plus 5% (218); the
     // floor stays where it was, since it still guards a real collapse.
-    expect(mean('dps')).toBeGreaterThanOrEqual(182);
-    expect(mean('dps')).toBeLessThanOrEqual(218);
+    // Re-anchored for the v0.42.0 Ruination retune (+10% destruction damage,
+    // see the heroic anchor note above): measured 227.5625 on this frozen
+    // kit. Both floor and ceiling move by about plus or minus 5% around the
+    // new measurement, preserving the same relative width as every prior
+    // re-anchor here (this pin has no separate collapse-guard rationale for
+    // its floor, unlike the OSSBrain re-anchor above).
+    expect(mean('dps')).toBeGreaterThanOrEqual(216);
+    expect(mean('dps')).toBeLessThanOrEqual(239);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 });

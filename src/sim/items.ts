@@ -25,6 +25,7 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
+import { buildConsuming } from './consuming';
 import { isRawCookingCatch } from './content/items';
 import { ITEMS, NPCS } from './data';
 import { markItemDiscovered } from './deeds';
@@ -35,7 +36,10 @@ import {
   canEquipItem,
   canEquipItemInSlot,
   displacedSlotForEquip,
+  equipCandidateInstance,
+  equipCandidateQuality,
   isUniqueEquipped,
+  masterwroughtConflictSlot,
   resolveEquipSlot,
   slotAcceptsItem,
   uniqueEquipConflictSlot,
@@ -47,6 +51,7 @@ import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
+import type { ItemCopyAnchor } from './item_copy_anchor';
 import {
   consumeNewestInventoryUnit,
   consumeSelectedInventorySlot,
@@ -56,18 +61,29 @@ import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_inst
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
+import { isMaterialItemId } from './material_ids';
+import {
+  buybackCompositionAfter,
+  commitMaterialUnitWithdrawal,
+  consumeMaterialUnitPayloads,
+  planMaterialUnitWithdrawal,
+  takeMaterialUnits,
+} from './material_item_custody';
+import type { MaterialComposition } from './material_sources';
 import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
+import { placeFeastAction } from './professions/feast';
 import { useGatherToolItem } from './professions/gathering';
+import { placeMobileStationFromItem } from './professions/mobile_station';
+import { useRecipePatternItem } from './professions/pattern_items';
 import { refreshModsForEquipmentChange } from './progression/talents';
+import { useForgebreakerEmber } from './quests/forgebreaker_ember';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { usePassingStone } from './tutorial/death_lesson';
 import {
   ALL_EQUIP_SLOTS,
-  CONSUME_DURATION,
-  CONSUME_TICKS,
   cloneItemInstancePayload,
   dist2d,
   type Entity,
@@ -213,6 +229,13 @@ function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
 // mirrors removeItem's highest-index-first order and clone-on-survival return
 // contract exactly, so a caller mutating a returned payload (the trade
 // bind-on-trade stamp) never aliases a surviving stack's shared payload.
+// A MATERIAL takes none of the walk below. Fungible-first is a payload-presence
+// priority, and a material's units rank by their SOURCE (unrecorded first,
+// premium last) across the whole eligible pool; `skip`/`deprioritize` are judged
+// on each unit's effective payload, since the signer they keyed on now lives in
+// the descriptor. The returned payloads stay the legacy consumed-effect shape,
+// so this arm is for consumption that DESTROYS the copies; a caller that
+// re-grants them needs the unit carriers (material_item_custody.ts).
 export function removePreferFungible(
   ctx: SimContext,
   itemId: string,
@@ -227,6 +250,16 @@ export function removePreferFungible(
   // beside it. Absent, the walk is byte-identical to before.
   deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
+  if (isMaterialItemId(itemId)) {
+    const held = ctx.resolve(pid);
+    if (!held) return [];
+    const payloads = consumeMaterialUnitPayloads(held.meta.inventory, itemId, count, {
+      skip,
+      deprioritize,
+    });
+    ctx.onInventoryChangedForQuests?.(held.meta);
+    return payloads;
+  }
   const fungibleAvailable = ctx.countFungibleItem(itemId, pid);
   const fungibleTake = Math.min(fungibleAvailable, count);
   if (fungibleTake > 0) ctx.removeFungibleItem(itemId, fungibleTake, pid);
@@ -316,6 +349,17 @@ export function removeSellUnitsFromInventory(
   // window-carrying instanced copies may ever ship.
   skipPlainStacks = false,
 ): VendorRemovedUnit[] {
+  // A MATERIAL ships as exact per-unit carriers: same signature, same
+  // predicates (read on each unit's effective payload), but the source rides
+  // along on every unit, so a sale, a trade preview and the real swap move the
+  // units they said they would. `skipPlainStacks` reads as payload-only here.
+  if (isMaterialItemId(itemId)) {
+    return takeMaterialUnits(inventory, itemId, count, {
+      skip,
+      deprioritize,
+      payloadOnly: skipPlainStacks,
+    });
+  }
   const consumed: VendorRemovedUnit[] = [];
   let left = count;
   for (let i = inventory.length - 1; i >= 0 && left > 0 && !skipPlainStacks; i--) {
@@ -384,6 +428,7 @@ export function discardItem(
   count = 1,
   pid?: number,
   slotIndex?: number,
+  anchor?: ItemCopyAnchor,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -407,7 +452,11 @@ export function discardItem(
   // enchanted or signed copy standing longest.
   const single = discardCount === 1 && slotIndex !== undefined;
   if (single) {
-    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    // The anchor rides with the selection: the index proves the cell still
+    // holds this ITEM, the anchor proves it still holds this COPY. A mismatch
+    // answers null here, the same refusal a bad index already answered, so a
+    // stale discard destroys nothing instead of destroying an id-mate.
+    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex, anchor);
     if (taken === null) {
       ctx.error(meta.entityId, "You don't have that item.");
       return;
@@ -533,15 +582,50 @@ export function equipItem(
   // same item). The target slot and a displaced slot are exempt: both are
   // emptied by this swap, so the copy they hold never coexists with the
   // incoming one (the Titan Grip same-id NON-legendary pair stays legal).
-  if (
-    uniqueEquipConflictSlot(
-      def,
-      meta.equipment,
-      (id) => ITEMS[id],
-      displacedSlot ? [slot, displacedSlot] : [slot],
-    )
-  ) {
+  // Instance-aware since phase 13: the worn payloads and the candidate copy's
+  // own payload ride along, so a promoted legendary-rolled copy counts on
+  // either side (the same candidate peek the sub-cap below makes). The peek
+  // carries the caller's slotIndex so it judges EXACTLY the copy the consume
+  // below will lift, never the highest-index one when they differ.
+  const ignoreSlots = displacedSlot ? [slot, displacedSlot] : [slot];
+  const uniqueConflict = uniqueEquipConflictSlot(
+    def,
+    meta.equipment,
+    (id) => ITEMS[id],
+    ignoreSlots,
+    meta.equipmentInstance,
+    equipCandidateInstance(meta.inventory, itemId, slotIndex),
+  );
+  if (uniqueConflict) {
     ctx.error(meta.entityId, 'You can only equip one of those.');
+    return;
+  }
+  // Masterwrought is a COUNTED family rather than a per-item one: at most two
+  // flagged pieces worn and at most one of those legendary. The incoming
+  // quality is peeked off the exact copy the consume below will lift (the
+  // caller's slotIndex threads through, so a named lower-index promoted copy
+  // is judged as itself), so a legendary copy sitting under a plain one in
+  // the bags cannot slip past the sub-cap. Same ignoreSlots as the unique
+  // rule: a swap that empties a slot cannot conflict with what it puts there.
+  const masterwroughtConflict = masterwroughtConflictSlot(
+    def,
+    meta.equipment,
+    (id) => ITEMS[id],
+    ignoreSlots,
+    meta.equipmentInstance,
+    def.masterwrought ? equipCandidateQuality(meta.inventory, itemId, def, slotIndex) : undefined,
+  );
+  if (masterwroughtConflict) {
+    // Two plain calls, each on ONE physical line: once biome wraps a call it
+    // also adds a trailing comma, which the S3 drift-guard's closing-paren
+    // anchor on this emit form does not match, and the guard's ternary form
+    // cannot span lines at all. Keep each literal short enough to never wrap,
+    // or the guard goes blind to it.
+    if (masterwroughtConflict.reason === 'legendary') {
+      ctx.error(meta.entityId, 'You can only equip one legendary Masterwrought item.');
+    } else {
+      ctx.error(meta.entityId, 'You can only equip two Masterwrought items.');
+    }
     return;
   }
   const displacedId = displacedSlot ? meta.equipment[displacedSlot] : undefined;
@@ -590,7 +674,6 @@ export function equipItem(
   } else {
     consumed = consumeNewestInventoryUnit(meta.inventory, itemId);
   }
-  ctx.onInventoryChangedForQuests(meta);
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
     // its own instanced slot (never merged into a plain stack, which would
@@ -610,6 +693,9 @@ export function equipItem(
   } else if (meta.equipmentInstance) {
     delete meta.equipmentInstance[slot];
   }
+  // Recompute only after both sides of the swap exist. An ownership quest
+  // must never see its item disappear between the bag and the equipment slot.
+  ctx.onInventoryChangedForQuests(meta);
   // The all-slots deed reads equipment, so re-check this player's triggers.
   ctx.markDeedsDirty(meta.entityId);
   refreshModsForEquipmentChange(ctx, meta);
@@ -666,7 +752,8 @@ export function benchDuplicateUniqueEquipped(meta: PlayerMeta): string[] {
     const itemId = meta.equipment[slot];
     if (!itemId) continue;
     const def = ITEMS[itemId];
-    if (!def || !isUniqueEquipped(def)) continue;
+    // Instance-aware (phase 13): a promoted legendary-rolled copy counts too.
+    if (!def || !isUniqueEquipped(def, meta.equipmentInstance?.[slot])) continue;
     const family = uniqueEquipFamily(def);
     if (!worn.has(family)) {
       worn.add(family);
@@ -727,8 +814,9 @@ export function useItem(
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  // All three use branches (food/drink, potion, elixir) consume one unit, so the
-  // selection is honored here once instead of at each arm. Returns the consumed
+  // Every consumable use branch (food/drink, potion, and the shared
+  // elixir/scroll arm) consumes one unit, so the selection is honored here
+  // once instead of at each arm. Returns the consumed
   // payload because the potion branch reads it (the crafting-provenance trickle).
   //
   // Consumables of one id are interchangeable in effect, so this matters less
@@ -794,6 +882,51 @@ export function useItem(
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
     return;
   }
+  // The Field Kit (Intentional Gathering, PR3): a reusable settings tool that
+  // opens the shared harvest-preference picker. Placed beside skinSelect,
+  // ahead of the busy/dead gates below, on purpose: it is a settings action,
+  // not a harvest start, so it is allowed while dead, in combat, or mid
+  // another non-spell cast (the authoritative HARVEST start gates live
+  // separately in professions/harvest_admission.ts). Never consumed, never
+  // picks a preference itself, draws no rng: text-free, pid-scoped event only.
+  if (def.use?.type === 'harvestPreference') {
+    ctx.emit({ type: 'harvestPreferenceOpen', pid: meta.entityId });
+    return;
+  }
+  // The Master's Field Forge (Masterwrought phase 09): places a party-shared
+  // mobile crafting station at the user's position. Two SEPARATE deliberate
+  // choices meet on this arm. First, its placement AHEAD of the busy/dead
+  // gates below matches the gate profile of the place_mobile_station wire
+  // command, which has no busy gate (the module body owns the dead gate and
+  // every placement rule), so the item surface and the wire command refuse
+  // identically. Second, non-consumption: the mount-reins convention covers
+  // ONLY that the item is a permanent tool, never spent, so no consumeOneUnit
+  // here; it says nothing about gate order.
+  if (def.use?.type === 'placeMobileStation') {
+    placeMobileStationFromItem(ctx, def.use.stationCraftId, def.name, meta.entityId);
+    return;
+  }
+  // The placeable shared feast (ItemDef.feast, Farming Phase 12): using the
+  // item IS placing it, so this arm and the bags placeFeast classification
+  // converge on the ONE action body (professions/feast.ts owns every gate
+  // and the lock-aware spend; nothing here consumes a unit). Without it a
+  // use_item frame naming the feast would be exactly the silent no-op the
+  // raw-catch arm below exists to refuse. The validated slotIndex threads
+  // through (the consumeOneUnit rule above: the family has no id-only holes
+  // left for a new command to copy), so the CLICKED copy is the one spent.
+  // The two arms key on different fields (def.use?.type vs def.feast), so
+  // they are mutually exclusive per item and this order is behaviorally free
+  // (ours-first per the absorb's RULE 3b). The `in` guard is the union port:
+  // `feast` lives on OtherItemDef (kind-scoped), not BaseItemDef.
+  if ('feast' in def && def.feast) {
+    // The USED item id is threaded through (masterwrought Phase 11k): this arm
+    // is already generic on the def, and passing the id is what makes the
+    // ACTION generic too, so the clicked feast is the one spent and the one
+    // placed. Before this the action re-read a module constant and a
+    // non-party feast either did nothing or destroyed a party feast instead.
+    placeFeastAction(ctx, p, meta, slotIndex, itemId);
+    return;
+  }
   // Raw fishing catches are cooking reagents only (kind junk, no foodHp).
   // Without this arm a right-click is a silent no-op; refuse loudly instead
   // of letting the player think the item is broken. Does not remove the stack.
@@ -817,10 +950,18 @@ export function useItem(
     useBrinyLure(ctx, p, meta);
     return;
   }
+  if (def.use?.type === 'forgebreakerEmber') {
+    useForgebreakerEmber(ctx, p, meta);
+    return;
+  }
   if (def.use?.type === 'passingStone') {
     usePassingStone(ctx, p, meta);
     return;
   }
+  // Buff dishes mint their Well Fed aura at COMPLETION of the sit-restore,
+  // not here: the completion site in updateRegen (src/sim/combat/auras.ts)
+  // clears the slot and then pays the carried payload through the one mint in
+  // src/sim/wellfed.ts.
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");
@@ -844,14 +985,11 @@ export function useItem(
     }
     consumeOneUnit();
     p.sitting = true;
-    p[slot] = {
-      itemId,
-      kind: def.kind,
-      hpPer2s: def.foodHp ? Math.round(def.foodHp / CONSUME_TICKS) : 0,
-      manaPer2s: def.drinkMana ? Math.round(def.drinkMana / CONSUME_TICKS) : 0,
-      remaining: CONSUME_DURATION,
-      ticksElapsed: 0,
-    };
+    // The one Consuming build site (src/sim/consuming.ts): rates, clock, and
+    // the Well Fed carry. The buff rides the meal rather than being granted
+    // here: it is the reward for FINISHING (combat/auras.ts pays it when the
+    // drain runs out), so standing up early forfeits it, classic.
+    p[slot] = buildConsuming(def.kind, def);
     // A one-shot bite/gulp the instant you sit down, on top of the regular
     // every-3rd-tick cadence (updateRegen, combat/auras.ts): otherwise the
     // first sound doesn't land until ~6s in and using the item reads silent.
@@ -937,20 +1075,74 @@ export function useItem(
       color: '#c9f',
       pid: meta.entityId,
     });
-  } else if (def.kind === 'elixir') {
-    // Battle elixir: grant a temporary stat-buff aura. Usable in combat (classic),
-    // no shared potion cooldown; re-quaffing refreshes the buff via applyAura.
-    // The aura id is keyed on the elixir's EFFECT kind, not the item, so every
-    // elixir of one stat shares one id and the same-id replacement in applyAura
-    // makes same-stat elixirs exclusive: last drunk wins (classic overwrite,
-    // weaker included). Different-kind elixirs coexist; class buffs
-    // (buff_sta_pct) and negative buff_sta debuffs ride their own ids. This
-    // assumes one stat kind equals one exclusivity slot: if a guardian elixir
-    // family that should stack with battle elixirs ever lands, the id needs a
-    // family component (elixir_battle_...), not just the kind.
+  } else if (def.kind === 'elixir' || def.kind === 'scroll' || def.kind === 'flask') {
+    // Battle elixir, the inscription buff scroll that is its ALTERNATIVE
+    // SOURCE, or the alchemy apex FLASK: grant a temporary stat-buff aura.
+    // All three take this one arm and one aura id scheme deliberately; the
+    // flask's own two extra rules ride the Aura.flask marker stamped below,
+    // never a separate application path. Usable in combat (classic), no shared
+    // potion cooldown; re-applying refreshes the buff via applyAura.
+    // The aura id is keyed on the effect's kind, not the item OR its kind, so
+    // every elixir, scroll, and flask of one stat shares one id and the same-id
+    // replacement in applyAura makes same-stat sources exclusive: last applied
+    // wins in both orders (classic overwrite, weaker included), never a stack.
+    // Different-kind effects coexist; class buffs (buff_sta_pct) and negative
+    // buff_sta debuffs ride their own ids. This assumes one stat kind equals
+    // one exclusivity slot: if a guardian elixir family that should stack with
+    // battle elixirs ever lands, the id needs a family component
+    // (elixir_battle_...), not just the kind.
     const elx = def.elixir;
     if (!elx) return;
+    const isFlask = def.kind === 'flask';
+    // DOWNWARD REFUSAL. A flask outranks the elixir and scroll of its stat, so
+    // a weaker source may not silently destroy it: refuse before the unit is
+    // consumed, leaving the item in the bag and the flask on the player. Only
+    // the DOWNWARD direction is blocked; flask over elixir still replaces
+    // (upward), and flask over flask is newest-wins through the strip below.
+    // The guard can only fire when a flask-marked aura of this exact family is
+    // already worn, which no elixir or scroll can create, so shipped
+    // elixir-versus-elixir and scroll-versus-elixir behavior is untouched.
+    if (!isFlask && p.auras.some((a) => a.id === `elixir_${elx.kind}` && a.flask === true)) {
+      ctx.error(meta.entityId, 'A more powerful effect is already active.');
+      return;
+    }
     consumeOneUnit();
+    if (isFlask) {
+      // ONE flask at a time, whatever its stat: shed every aura already
+      // carrying the flask marker before the new one lands. Same-id flasks are
+      // left alone on purpose so applyAura's own same-id rule still handles
+      // them, which keeps a re-quaff of the SAME flask a silent refresh rather
+      // than a fade plus a fresh application. This is the cancelAura removal
+      // idiom (splice, then emit the fade the client cannot infer, then
+      // recalc). applyAura below recalcs too, so the explicit call is
+      // belt-and-braces rather than strictly required: it keeps the stat book
+      // correct on its own, instead of depending on a later call that has
+      // several early-return guards of its own.
+      let stripped = false;
+      for (let i = p.auras.length - 1; i >= 0; i--) {
+        const worn = p.auras[i];
+        if (worn.flask !== true || worn.id === `elixir_${elx.kind}`) continue;
+        p.auras.splice(i, 1);
+        stripped = true;
+        ctx.emit({
+          type: 'aura',
+          targetId: p.id,
+          name: worn.name,
+          gained: false,
+          sourceId: worn.sourceId,
+          abilityId: worn.id,
+        });
+      }
+      if (stripped) {
+        recalcPlayerStats(
+          p,
+          meta.cls,
+          meta.equipment,
+          ctx.playerMods(meta),
+          meta.equipmentInstance,
+        );
+      }
+    }
     ctx.applyAura(p, {
       id: `elixir_${elx.kind}`,
       name: elx.aura,
@@ -960,13 +1152,33 @@ export function useItem(
       value: elx.value,
       sourceId: p.id,
       school: 'nature',
+      // A flask also stamps undispellable (phase 10 QA STK-2 ruling, taken
+      // 2026-08-16): classic consumable buffs carried no dispel type, so an
+      // offensive dispel skips a flask and Spellplunder cannot take one (the
+      // steal copies the WHOLE aura, flask marker included, so a stolen flask
+      // would ride the thief's own singleton/refusal/death rules). The flag's
+      // standing rule also makes the flask non-right-click-cancelable and it
+      // is accepted deliberately: the elixir/scroll sources of the same aura
+      // id stay dispellable and cancelable. The mob Spellgnaw devour affix
+      // reads neither flag and still eats a flask (recorded exception: the
+      // ruling covers player counters; see mob/mob_swing.ts isDevourableAura).
+      ...(isFlask ? { flask: true as const, undispellable: true as const } : {}),
     });
-    ctx.emit({
-      type: 'log',
-      text: `You quaff ${def.name}.`,
-      color: '#c9f',
-      pid: meta.entityId,
-    });
+    if (def.kind === 'scroll') {
+      ctx.emit({
+        type: 'log',
+        text: `You read ${def.name}.`,
+        color: '#c9f',
+        pid: meta.entityId,
+      });
+    } else {
+      ctx.emit({
+        type: 'log',
+        text: `You quaff ${def.name}.`,
+        color: '#c9f',
+        pid: meta.entityId,
+      });
+    }
   } else if (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') {
     // Forward the selection: click-to-equip routes through 'use', so this is the
     // most common equip gesture in the game. Dropping it here left that gesture
@@ -980,6 +1192,15 @@ export function useItem(
     // first. Reins are never consumed: mountOwned() derives ownership from holding
     // the item, so removing it here would delete the mount.
     summonMountItem(ctx, meta.entityId, def.mount);
+  } else if (def.kind === 'recipe') {
+    // A pattern teaches the recipe it names and is spent doing so.
+    // useRecipePatternItem owns every gate and the consume; it sits here, below
+    // the dead gate above, so using a pattern while dead is a silent no-op like
+    // every other kind arm in this chain. The selection is forwarded like the
+    // equip arms above: the learn spends the exact clicked copy, never the
+    // newest-first guess (which the v0.38.0 per-copy item lock made
+    // distinguishable).
+    useRecipePatternItem(ctx, itemId, def, meta, slotIndex);
   }
 }
 
@@ -1176,12 +1397,19 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
 // can never pair the wrong count with the wrong payload. The stored payload
 // is a deep clone: the caller's instance is never aliased into the buyback
 // list.
+//
+// `materialSources` is the sold unit's EXACT one-unit composition. Merging a
+// row absorbs it through the source algebra, so a row that already held three
+// descriptors gains one unit rather than being rewritten, and the recency and
+// limit rules are untouched: the merged row still moves to the front and the
+// list still pops past VENDOR_BUYBACK_LIMIT.
 function recordVendorBuyback(
   meta: PlayerMeta,
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
 ): void {
   const existingIndex = meta.vendorBuyback.findIndex(
     (s) =>
@@ -1192,6 +1420,8 @@ function recordVendorBuyback(
   if (existingIndex >= 0) {
     const [existing] = meta.vendorBuyback.splice(existingIndex, 1);
     existing.count += count;
+    const merged = buybackCompositionAfter(existing.materialSources, materialSources);
+    if (merged !== undefined) existing.materialSources = merged;
     meta.vendorBuyback.unshift(existing);
   } else {
     meta.vendorBuyback.unshift({
@@ -1199,6 +1429,10 @@ function recordVendorBuyback(
       count,
       ...(instance && { instance: cloneItemInstancePayload(instance) }),
       ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+      // Deep-copied by the algebra, so the row never aliases the sold unit.
+      ...(materialSources === undefined
+        ? {}
+        : { materialSources: buybackCompositionAfter(undefined, materialSources) }),
     });
   }
   while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
@@ -1210,6 +1444,7 @@ export function sellItem(
   count = 1,
   pid?: number,
   slotIndex?: number,
+  anchor?: ItemCopyAnchor,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -1306,8 +1541,10 @@ export function sellItem(
     }
     // `!taken` rather than `=== null`: the undefined arm cannot occur inside this
     // branch (slotIndex is defined), and narrowing on it keeps the type honest
-    // without an assertion.
-    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    // without an assertion. The anchor rides with the selection (the index
+    // proves the cell still holds this ITEM, the anchor that it still holds
+    // this COPY), so a stale sell refuses instead of vendoring an id-mate.
+    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex, anchor);
     if (!taken) {
       ctx.error(meta.entityId, "You don't have that item.");
       return;
@@ -1328,7 +1565,7 @@ export function sellItem(
     );
   }
   for (const unit of consumedUnits) {
-    recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
+    recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId, unit.materialSources);
   }
   const payout = def.sellValue * sellableCount;
   meta.copper += payout;
@@ -1340,15 +1577,36 @@ export function sellItem(
     pid: meta.entityId,
   });
   // A mixed stack sold fewer copies than asked because the clamp above spared
-  // bound ones: say so in one info line instead of a silent partial (the
-  // maintainer-ruled replacement). keptCount counts only bound copies the
-  // player actually asked to sell, since sellCount is pre-clamped to
-  // `available`; a clean unbound sell emits nothing here.
+  // some: say so instead of a silent partial (the maintainer-ruled
+  // replacement). The clamp subtracts TWO classes, and they are different
+  // rules with different remedies, so each gets its own line: a bound copy is
+  // never vendor-sellable (the unbind fee ladder is the only way out), while a
+  // player-locked one sells the moment its owner unlocks it. Reporting a
+  // locked copy as bound sent that player to the wrong remedy.
+  //
+  // sellCount is pre-clamped to `available`, so the shortfall can never exceed
+  // boundHeld + lockedHeld; a clean sell of unlocked, unbound copies emits
+  // nothing here. When the request covers the whole stack (the sell-all case)
+  // the shortfall IS boundHeld + lockedHeld and both counts are exact. A
+  // partial ask that reaches only part way into the spared copies cannot say
+  // WHICH of them it would have taken (a request is a count, not a slot
+  // pick), so the bound ones are named first: they are the copies no click can
+  // free. Either way the two counts sum to the shortfall and neither can
+  // exceed its own tally.
   const keptCount = sellCount - sellableCount;
-  if (keptCount > 0) {
+  const keptBoundCount = Math.min(boundHeld, keptCount);
+  const keptLockedCount = keptCount - keptBoundCount;
+  if (keptBoundCount > 0) {
     ctx.emit({
       type: 'loot',
-      text: `Kept ${keptCount} bound ${keptCount === 1 ? 'copy' : 'copies'}.`,
+      text: `Kept ${keptBoundCount} bound ${keptBoundCount === 1 ? 'copy' : 'copies'}.`,
+      pid: meta.entityId,
+    });
+  }
+  if (keptLockedCount > 0) {
+    ctx.emit({
+      type: 'loot',
+      text: `Kept ${keptLockedCount} locked ${keptLockedCount === 1 ? 'copy' : 'copies'}.`,
       pid: meta.entityId,
     });
   }
@@ -1419,7 +1677,14 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
       sellerSignedCharmDeprioritize(meta.name, itemId),
     );
     for (const unit of consumedUnits) {
-      recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
+      recordVendorBuyback(
+        meta,
+        itemId,
+        1,
+        unit.instance,
+        unit.craftedRecipeId,
+        unit.materialSources,
+      );
     }
     total += def.sellValue * count;
     soldCount += count;
@@ -1496,23 +1761,46 @@ export function buyBackItem(
   // merge rule addStacked itself uses below, #2139-class gap): preflight the
   // regrant with the row's own instance instead of always checking room for
   // a generic plain copy.
+  //
+  // A MATERIAL row is planned first and committed only after every refusal:
+  // the preflight must model the SAME single unit the regrant lands (a row
+  // holding three descriptors would never match a one-unit fit check), and a
+  // row that cannot give a unit reads as unavailable rather than half-spent.
+  const rowIndex = meta.vendorBuyback.indexOf(slot);
+  const withdrawal = planMaterialUnitWithdrawal(meta.vendorBuyback, itemId, rowIndex);
+  if (isMaterialItemId(itemId) && withdrawal === null) {
+    ctx.error(meta.entityId, 'That item is not available for buyback.');
+    return;
+  }
+  const unitSources = withdrawal?.unit.materialSources;
   const fits =
-    countFit(meta.inventory, bagPools(meta.bags), itemId, 1, slot.instance, slot.craftedRecipeId) >=
-    1;
+    countFit(
+      meta.inventory,
+      bagPools(meta.bags),
+      itemId,
+      1,
+      withdrawal ? withdrawal.unit.instance : slot.instance,
+      slot.craftedRecipeId,
+      unitSources,
+    ) >= 1;
   if (!fits) {
-    bagsFullError(ctx, meta.entityId);
+    bagsFullError(ctx, meta.entityId, itemId);
     return;
   }
   meta.copper -= def.sellValue;
-  const instance = slot.instance;
+  const instance = withdrawal ? withdrawal.unit.instance : slot.instance;
   const craftedRecipeId = slot.craftedRecipeId;
-  slot.count -= 1;
-  if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
+  if (withdrawal) {
+    commitMaterialUnitWithdrawal(meta.vendorBuyback, withdrawal);
+  } else {
+    slot.count -= 1;
+    if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
+  }
   // A row recorded with an instance payload (a masterwork/signed piece sold
   // unbound, #2207 sibling gap) re-grants that exact payload instead of a
   // generic plain copy; addStacked deep-clones it into the new/topped-up
   // inventory slot, so the buyback row's own copy is never aliased.
-  addItemSilent(itemId, 1, meta, instance, craftedRecipeId);
+  addItemSilent(itemId, 1, meta, instance, craftedRecipeId, unitSources);
   // The silent add bypasses the inventory hub, so credit the discovery
   // ledger here (an acquisition like any other; the mark is idempotent), and
   // carry the SAME movement provenance the hub would have carried.
@@ -1554,6 +1842,9 @@ function addItemSilent(
   meta: PlayerMeta,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  // The silent regrant carries the exact composition the row gave up, so a
+  // buyback puts back the units it took rather than minting unrecorded stock.
+  materialSources?: MaterialComposition,
 ): void {
-  addStacked(meta.inventory, itemId, count, instance, craftedRecipeId);
+  addStacked(meta.inventory, itemId, count, instance, craftedRecipeId, materialSources);
 }

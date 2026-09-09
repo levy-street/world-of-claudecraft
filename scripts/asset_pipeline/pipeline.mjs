@@ -464,7 +464,7 @@ async function cmdWeapon() {
       prompt: opt('prompt')
         ? conceptPrompt({ kind: 'weapon', description: opt('prompt'), family })
         : null,
-      model: opt('model') === 'hifi' ? tripo.MODEL_HIFI : tripo.MODEL_LOWPOLY,
+      model: tripo.modelFor(opt('model')),
       faceLimit: faceLimitOpt(CATEGORY_SPECS.weapon.faceLimit),
     });
   }
@@ -564,7 +564,7 @@ async function cmdProp() {
   const gen = await generateStage(job, {
     input,
     prompt: opt('prompt') ? conceptPrompt({ kind: 'prop', description: opt('prompt') }) : null,
-    model: opt('model') === 'hifi' ? tripo.MODEL_HIFI : tripo.MODEL_LOWPOLY,
+    model: tripo.modelFor(opt('model')),
     faceLimit: faceLimitOpt(CATEGORY_SPECS.prop.faceLimit),
   });
   if (await reviewStop(job, 'generate', gen.raw)) return;
@@ -584,7 +584,7 @@ async function cmdProp() {
     rotateYDeg,
     maxTex,
     faceLimit: faceLimitOpt(CATEGORY_SPECS.prop.faceLimit),
-    model: opt('model') === 'hifi' ? 'hifi' : 'lowpoly',
+    model: tripo.modelQuality(opt('model')),
   });
   await job.step(`normalize_${normalizeVariant}`, () =>
     normalizeProp(tex?.glb ?? gen.raw, built, { height, rotateY, maxTex }),
@@ -642,7 +642,7 @@ async function cmdCreature() {
   const gen = await generateStage(job, {
     input,
     prompt: opt('prompt') ? conceptPrompt({ kind: 'creature', description: opt('prompt') }) : null,
-    model: opt('model') === 'hifi' ? tripo.MODEL_HIFI : tripo.MODEL_LOWPOLY,
+    model: tripo.modelFor(opt('model')),
     faceLimit: faceLimitOpt(CATEGORY_SPECS.creature.faceLimit),
   });
   if (await reviewStop(job, 'generate', gen.raw)) return;

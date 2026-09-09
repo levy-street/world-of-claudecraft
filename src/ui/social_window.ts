@@ -21,6 +21,7 @@
 // color literal here) and the two typeahead timings are named constants.
 
 import { CLASSES } from '../sim/data';
+import { GUILD_ROSTER_PAGE_SEATS } from '../sim/guild_roster';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { deedTitleText } from './deed_i18n';
@@ -29,7 +30,7 @@ import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
-import { formatDateTime, formatNumber, t, tPlural } from './i18n';
+import { formatDateTime, formatMoney, formatNumber, t, tPlural } from './i18n';
 import { localizeZone } from './server_i18n';
 import {
   blockRows,
@@ -39,6 +40,7 @@ import {
   type GuildView,
   guildDisplayedRole,
   guildRosterItems,
+  guildRosterView,
   guildView,
   ignoreRows,
   myPledgeView,
@@ -57,6 +59,16 @@ import { svgIcon } from './ui_icons';
 // mousedown on a suggestion can still fire first.
 const SUGGEST_DEBOUNCE_MS = 160;
 const SUGGEST_BLUR_CLEAR_MS = 150;
+
+// Founding a guild rides the metered name_screen WS lane (refill 2/s, burst 5,
+// shared with pet_rename and the named perfect_item promotion): a lane DROP
+// sends NOTHING back, so a mashed Found button would read as dead. Hold the
+// submit for a beat after each send, exactly as the legendary naming dialog
+// does (src/ui/hud/professions/legendary_naming_controller.ts, the same lane).
+// About 600ms: longer than the lane's 500ms per-token refill, so an honest
+// retry after the lock lifts always has a token waiting. Re-submitting is
+// always safe; the server re-validates the name.
+export const GUILD_CREATE_LOCK_MS = 600;
 
 // Guild billboard input cap; mirrors GUILD_MOTD_MAX in server/social.ts (the
 // server clamps authoritatively, this is UX only).
@@ -219,6 +231,11 @@ export class SocialWindow {
   // is actionable info, never gated on graphics tier). Loaded once; the delegated body
   // handler flips + persists it and refreshes the list in place.
   private hideOffline = loadGuildHideOffline();
+  // The name_screen lane hold on the Found button (GUILD_CREATE_LOCK_MS). It lives
+  // on the instance, not on the button, because the panel rebuilds its footer on
+  // every structural repaint; applyGuildCreateLock re-stamps the fresh button.
+  private guildCreateLocked = false;
+  private guildCreateTimer: number | undefined;
 
   constructor(private readonly deps: SocialWindowDeps) {}
 
@@ -267,7 +284,14 @@ export class SocialWindow {
     if (struct !== this.lastStruct) {
       this.lastStruct = struct;
       this.lastContent = this.contentSig();
+      // A structural change mid-session (a bought roster page re-pricing the
+      // footer button, a rank change) rebuilds the whole panel, which would
+      // otherwise wipe a half-typed invite or billboard draft: capture and
+      // restore them around the rebuild, the relocalize() recipe.
+      const el = this.deps.root();
+      const draft = captureFormDraft(el);
       this.render();
+      restoreFormDraft(el, draft);
     } else {
       const content = this.contentSig();
       if (content !== this.lastContent) {
@@ -410,6 +434,9 @@ export class SocialWindow {
     }
     this.refreshList();
     this.renderNotice();
+    // The footer was rebuilt above, so a hold taken before this repaint has to be
+    // re-stamped onto the fresh Found button.
+    this.applyGuildCreateLock();
   }
 
   // Lighter refresh: just the list inside the current tab, leaving the footer
@@ -668,7 +695,16 @@ export class SocialWindow {
     const guildCount = formatNumber(g.memberCount, { maximumFractionDigits: 0 });
     // The guild name carries its lifetime-XP colour tier (the nameplate ladder,
     // shared .guild-tier-N classes with the guild board).
-    const head = `<div class="soc-guild-head"><span class="guild-tier-${g.tier}">${esc(g.name)}</span> <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabel(g.rank), count: guildCount }))}</span></div>`;
+    // The seat readout beside the rank line: the roster's bought cap
+    // (memberCap) is what the count is measured against, so a guild that has
+    // outgrown its base roster can see the ceiling it is buying pages toward.
+    const seats = esc(
+      t('hudChrome.social.roster.seats', {
+        count: guildCount,
+        cap: formatNumber(g.memberCap, { maximumFractionDigits: 0 }),
+      }),
+    );
+    const head = `<div class="soc-guild-head"><span class="guild-tier-${g.tier}">${esc(g.name)}</span> <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabel(g.rank), count: guildCount }))}</span> <span class="gm" data-field="roster-seats">${seats}</span></div>`;
     // The persisted "hide offline" toggle: a pressed-state button (a single click event
     // through the delegated body handler, unlike a label+checkbox that double-fires).
     const toggle =
@@ -866,6 +902,18 @@ export class SocialWindow {
         16,
         true,
       );
+    // Roster expansion (the pure core decides who may buy and at what price;
+    // the server re-prices and refuses everyone but the Guild Master anyway):
+    // the leader sees the next page's price on the button, or a disabled
+    // button once the ladder is complete; other ranks see nothing here.
+    const roster = guildRosterView(this.deps.world().socialInfo);
+    if (roster && guild.rank === 'leader') {
+      const label =
+        roster.nextRosterPrice === null
+          ? `<button class="btn" data-act="guild-expand" disabled>${esc(t('hudChrome.social.roster.maxed'))}</button>`
+          : `<button class="btn" data-act="guild-expand">${esc(t('hudChrome.social.roster.expand', { seats: formatNumber(GUILD_ROSTER_PAGE_SEATS, { maximumFractionDigits: 0 }), price: formatMoney(roster.nextRosterPrice) }))}</button>`;
+      foot += `<div class="soc-add soc-leave">${label}</div>`;
+    }
     // classic MMOs: a Guild Master with other members can't just leave (they disband,
     // or hand over leadership via the crown action). Everyone else can leave.
     foot +=
@@ -930,9 +978,28 @@ export class SocialWindow {
       else if (act === 'guild-invite') void this.resolveAndAct('ginvite', field('ginvite'));
       else if (act === 'guild-create') {
         const n = field('gname');
-        if (n) {
+        if (n && !this.guildCreateLocked) {
           w.guildCreate(n);
           this.clearInput('gname');
+          this.lockGuildCreate();
+        }
+      } else if (act === 'guild-expand') {
+        // Gold leaves the buyer's own purse and never comes back, so the page
+        // is bought through the shared confirm prompt like a disband. The
+        // prompt re-reads the price from the pure core at click time.
+        const roster = guildRosterView(w.socialInfo);
+        if (roster?.canExpandRoster && roster.nextRosterPrice !== null) {
+          this.deps.showPrompt(
+            esc(
+              t('hudChrome.social.roster.confirm', {
+                seats: formatNumber(GUILD_ROSTER_PAGE_SEATS, { maximumFractionDigits: 0 }),
+                price: formatMoney(roster.nextRosterPrice),
+              }),
+            ),
+            t('hudChrome.social.roster.confirmAction'),
+            () => w.guildBuyRosterPage(),
+            () => {},
+          );
         }
       } else if (act === 'guild-leave')
         this.deps.showPrompt(
@@ -1139,6 +1206,34 @@ export class SocialWindow {
       this.clearInput('ginvite');
     }
     this.renderSuggest(kind, []);
+  }
+
+  // Hold the Found button for one lane beat after a send. One-shot re-arm: the
+  // timer lifts the hold, and a landed creation lifts it sooner by retiring the
+  // create row entirely (the guild footer replaces it on the next repaint).
+  private lockGuildCreate(): void {
+    this.guildCreateLocked = true;
+    window.clearTimeout(this.guildCreateTimer);
+    this.guildCreateTimer = window.setTimeout(() => {
+      this.guildCreateTimer = undefined;
+      this.guildCreateLocked = false;
+      this.applyGuildCreateLock();
+    }, GUILD_CREATE_LOCK_MS);
+    this.applyGuildCreateLock();
+  }
+
+  // Stamp the hold onto whichever Found button is currently mounted. Called
+  // after every full render so a structural repaint mid-hold cannot hand the
+  // player a live button, and no player-visible string changes (disabled +
+  // aria-busy is the house busy form; `.btn:disabled` carries the visuals).
+  private applyGuildCreateLock(): void {
+    const btn = this.deps
+      .root()
+      .querySelector('.soc-add .btn[data-act="guild-create"]') as HTMLButtonElement | null;
+    if (!btn) return;
+    btn.disabled = this.guildCreateLocked;
+    if (this.guildCreateLocked) btn.setAttribute('aria-busy', 'true');
+    else btn.removeAttribute('aria-busy');
   }
 
   private clearInput(field: string): void {

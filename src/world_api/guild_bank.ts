@@ -1,3 +1,4 @@
+import type { MaterialSourceTransferSelection } from '../sim/material_source_transfer_selection';
 import type { InvSlot } from '../sim/types';
 
 // ---------------------------------------------------------------------------
@@ -84,6 +85,46 @@ export type GuildBankLogOp =
   | 'create_fee' // the founder's charter fee (a purse payment, not a treasury move)
   | 'admin_purge'; // an operator removed a stuck item; NEVER a guildmate's doing
 
+/**
+ * The TRANSACTION HISTORY filter: which slice of the visible ops one read asks
+ * for. `all` is every visible op; `items` is the two item moves plus the
+ * operator purge (the three ops that change the book's contents); `money` is
+ * every copper movement (treasury moves and the purse-paid ladder/charter
+ * payments). A CLOSED vocabulary on the seam because the server turns it into
+ * the SQL op predicate: the client never names ops on the wire, only a kind,
+ * so a tampered request can widen nothing (a kind outside this set is read as
+ * `all`, which is the widest thing a member may see anyway).
+ */
+export type GuildBankLogKind = 'all' | 'items' | 'money';
+
+/** The filter vocabulary in display order (the pane's chip strip). */
+export const GUILD_BANK_LOG_KINDS: readonly GuildBankLogKind[] = ['all', 'items', 'money'];
+
+/**
+ * Which filter slice one visible op belongs to. Exhaustive by construction
+ * (the Record type), so a new visible op cannot ship without being classified,
+ * and the server's SQL predicate and the client's chip strip read the SAME
+ * classification rather than two lists that could drift.
+ */
+export const GUILD_BANK_LOG_OP_KIND: Readonly<
+  Record<GuildBankLogOp, Exclude<GuildBankLogKind, 'all'>>
+> = {
+  deposit: 'items',
+  withdraw: 'items',
+  admin_purge: 'items',
+  deposit_gold: 'money',
+  withdraw_gold: 'money',
+  buy_slots: 'money',
+  open_bank: 'money',
+  create_fee: 'money',
+};
+
+/** Coerce anything (a wire field, a remembered setting) to a kind, `all` when
+ *  it is not one: the widest slice a member may read is the safe default. */
+export function guildBankLogKindOf(raw: unknown): GuildBankLogKind {
+  return raw === 'items' || raw === 'money' ? raw : 'all';
+}
+
 /** One rendered line of guild bank history. Carries no account id, no character
  *  id, no realm, and no IP: an actor is a DISPLAY NAME or nothing at all. */
 export interface GuildBankLogEntry {
@@ -115,10 +156,21 @@ export interface GuildBankLogEntry {
  *  the last successful response carried, so a refresh never blanks the pane);
  *  `refused` means the server declined the read (a lost guild, a kick
  *  mid-view, a walk-away), which the pane must say out loud rather than showing
- *  an empty list that reads as "no officer has ever done anything". */
+ *  an empty list that reads as "no officer has ever done anything".
+ *
+ *  The TRANSACTION HISTORY shape: `entries` is every page loaded so far for
+ *  `kind` (the newest window plus any older pages the viewer asked for,
+ *  contiguous, newest first), `more` says whether the server holds rows older
+ *  than the oldest one loaded, and `olderPending` says an older page is in
+ *  flight. `more` is a server FACT (the page reader fetches one row past the
+ *  window to learn it), never inferred from a full page, so "that is the whole
+ *  history" is only ever said when it is true. */
 export interface GuildBankLogView {
   state: 'loading' | 'ready' | 'refused';
+  kind: GuildBankLogKind;
   entries: readonly GuildBankLogEntry[];
+  more: boolean;
+  olderPending: boolean;
 }
 
 export interface IWorldGuildBank {
@@ -135,11 +187,30 @@ export interface IWorldGuildBank {
    *  view is CLOSED nobody calls it at all, so nothing is sent. Neither alone
    *  is enough (the second is the one a caller can get wrong), which is why the
    *  UI gates on the pane being visible rather than on its remembered sub-view.
-   *  The offline Sim has no guild and always answers an empty ready view. */
-  guildBankLog(): GuildBankLogView;
+   *  The offline Sim has no guild and always answers an empty ready view.
+   *
+   *  `kind` selects the history slice (default `all`). Reading a DIFFERENT
+   *  kind than the last read drops the loaded pages and requests that kind's
+   *  newest window at once: the pages belong to one filter, and a row set
+   *  built under another must never be shown under this label. */
+  guildBankLog(kind?: GuildBankLogKind): GuildBankLogView;
+  /** Request the next OLDER page of the history slice last read (rows older
+   *  than the oldest loaded one). A no-op while nothing is loaded, while an
+   *  older page is already in flight, or once the view reports no `more`: the
+   *  view is what says whether this has anything to ask for, so a caller
+   *  never has to guard it. Offline: inert (no guild, nothing to page). */
+  guildBankLogOlder(): void;
   guildBankDepositGold(amount: number): void;
   guildBankWithdrawGold(amount: number): void;
-  guildBankDeposit(slotIndex: number, count?: number): void;
-  guildBankWithdraw(slotIndex: number, count?: number): void;
+  guildBankDeposit(
+    slotIndex: number,
+    count?: number,
+    selection?: MaterialSourceTransferSelection,
+  ): void;
+  guildBankWithdraw(
+    slotIndex: number,
+    count?: number,
+    selection?: MaterialSourceTransferSelection,
+  ): void;
   guildBankBuySlots(): void;
 }

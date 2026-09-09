@@ -53,11 +53,18 @@ describe('owned-class raid-level balance harness (armor and avoidance)', () => {
       // level 24 only, where avoidance rolls against the +4 boss are the most
       // frequent of the three levels, so the per-spec avoided pins keep the
       // deepest margin the sweep offers.
+      // Probe seed re-hunted 29_930 to 29_931 for the Drakelands site swap:
+      // the reshaped world reflows every fight roll downstream, and 29_930's
+      // new stream rolled vespers (the rare-resist minimum this pin already
+      // flags) to ZERO avoids in every window, diet and full alike (A/B:
+      // green at the pre-swap base, red at the tip, same code). The
+      // neighboring seed keeps every spec's rare rolls landing; the sibling
+      // fixture test pins its own seeds and is untouched.
       const results = FULL_SWEEP
-        ? runOwnedClassRaidMatrix(29_930, 'raid-test-head')
+        ? runOwnedClassRaidMatrix(29_931, 'raid-test-head')
         : OWNED_DPS_SPECS.flatMap((spec) =>
             RAID_SCENARIOS_UNDER_TEST.map((scenario) =>
-              runOwnedClassDpsProbe(spec, scenario, 29_930, 'raid-test-head'),
+              runOwnedClassDpsProbe(spec, scenario, 29_931, 'raid-test-head'),
             ),
           );
       expect(results).toHaveLength(RAID_SCENARIOS_UNDER_TEST.length * 8);

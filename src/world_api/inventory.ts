@@ -1,6 +1,14 @@
 import type { PlayerEquipmentInstances } from '../sim/entity';
+import type { NamedSlotTarget } from '../sim/item_copy_ref';
+import type { MaterialComposition } from '../sim/material_sources';
+import type { MaterialStackSelection } from '../sim/material_stack_selection';
+import type { RiftForgeResult } from '../sim/rift/progression';
 import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
 import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
+
+/** The forge pair's host-dependent answer: the offline Sim's synchronous
+ *  RiftForgeResult, or ClientWorld's awaited commandOutcome ack. */
+export type RiftForgeOutcome = RiftForgeResult | Promise<boolean>;
 
 export interface IWorldInventory {
   inventory: InvSlot[];
@@ -28,6 +36,14 @@ export interface IWorldInventory {
    *  command; deterministic, so both hosts land the identical grid
    *  (src/sim/inventory_sort.ts). */
   sortInventory(): void;
+  /** Owner grouping only. The captured target and any exact source quantities
+   * are revalidated against the authoritative inventory before changing it. */
+  separateMaterialStack(
+    itemId: string,
+    target: MaterialStackSelection,
+    selectedSources?: MaterialComposition,
+  ): void;
+  combineMaterialStacks(itemId: string, target: MaterialStackSelection): void;
   /** Equip into the exact slot the player aimed at (a paperdoll drop target),
    *  instead of letting the sim's resolver pick (a ring dropped on the second
    *  finger lands there even while the first is free). The sim re-validates the
@@ -39,13 +55,22 @@ export interface IWorldInventory {
   /** Return the bag in `socket` to the inventory (refused when items would not fit). */
   unequipBag(socket: number): void;
   useItem(itemId: string, target?: { slotIndex: number }): void;
-  discardItem(itemId: string, count?: number, target?: { slotIndex: number }): void;
+  /** `target.anchor` is the OPTIONAL ordinal-plus-count description of the copy
+   *  the player clicked (src/sim/item_copy_anchor.ts). The slot index alone
+   *  proves only that the cell still holds this ITEM; the anchor proves it
+   *  still holds this COPY, which is the case a lagging mirror actually breaks
+   *  (a splice moves every slot down one and the index lands on the id-mate
+   *  beside the piece the player picked). Server-revalidated: the sim
+   *  re-derives the anchor against its OWN bags and refuses a mismatch with the
+   *  existing not-held answer. Omit it and the command behaves exactly as it
+   *  always has, which is what keeps an older client working. */
+  discardItem(itemId: string, count?: number, target?: NamedSlotTarget): void;
   /** Lock or unlock the ONE bag copy at `target.slotIndex` (issue 3042): a
    *  locked copy refuses salvage, profession-craft reagent consumption, and
    *  vendor sell (single and bulk) until unlocked again. Always targets a
    *  specific slot (mutate-in-place, item_copy_ref.ts selectedInventorySlot),
    *  never an id-only bulk toggle. */
-  setItemLocked(itemId: string, locked: boolean, target: { slotIndex: number }): void;
+  setItemLocked(itemId: string, locked: boolean, target: NamedSlotTarget): void;
   // The request rides an options bag (VendorBuyOptions, phase 21): `bulk`
   // requests as many units as the buyer can currently afford in one purchase,
   // capped at the item's bag stack size (VendorGoodsRow.bulkQuantity previews
@@ -55,7 +80,7 @@ export interface IWorldInventory {
   // at most one of the two fields. An empty/omitted bag buys the ordinary
   // single unit (or the food/drink staple stack), byte-identical to today.
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void;
-  sellItem(itemId: string, count?: number, target?: { slotIndex: number }): void;
+  sellItem(itemId: string, count?: number, target?: NamedSlotTarget): void;
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;
@@ -72,9 +97,17 @@ export interface IWorldInventory {
     instance?: ItemInstancePayload,
     craftedRecipeId?: string,
   ): void;
-  upgradeRiftItem(itemId: string, target?: { slotIndex: number }): void;
-  enchantRiftItem(itemId: string, stat: string, target?: { slotIndex: number }): void;
-  socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void;
+  /** The Rift Forge pair (src/sim/rift/progression.ts): an essence upgrade
+   *  raises the copy's item level by one; a gem socket adds (or, on a full
+   *  band, replaces the oldest) rating line. The offline Sim answers
+   *  synchronously with the sim's RiftForgeResult; ClientWorld answers the
+   *  commandOutcome ack (false on a closed or refused forge). Either way the
+   *  riftForgeResult event carries the reason; a caller only needs the outcome
+   *  to know whether to re-read the ring or show the refusal. The retired
+   *  forge enchant (`rift_enchant_item`) has no member: the wire token survives
+   *  as a dispatch-only tombstone because the vocabulary is append-only. */
+  upgradeRiftItem(itemId: string, target?: { slotIndex: number }): RiftForgeOutcome;
+  socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): RiftForgeOutcome;
   /** Milliseconds left before the bind-on-pickup party trade deadline
    *  `untilMs` (an ItemInstancePayload.partyTrade.untilMs value), clamped to
    *  zero. Host-aware on purpose: `untilMs` is stamped from the sim's

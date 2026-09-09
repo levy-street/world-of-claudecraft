@@ -29,7 +29,16 @@ const manifestPath = path.join(repoRoot, manifestRelativePath);
 const bootstrapReviewRelativePath =
   'docs/achievements/placeholder-art-completion-2026-08-09/portrait-manifest-bootstrap-review.md';
 
-export async function buildManifest() {
+/**
+ * `renderEnv` is the ONE manifest field this bookkeeping command cannot derive:
+ * every other field is read back off the tree, while the render environment is a
+ * fact only the actual render observed. So it is carried IN. On --write it comes
+ * from the receipt (the environment that really baked these bytes) and on
+ * --check from the committed manifest (nothing was re-rendered, so the recorded
+ * environment still stands, and re-deriving it as absent would read as drift on
+ * every check). Absent on both sides is the pre-existing state and stays legal.
+ */
+export async function buildManifest({ renderEnv = null } = {}) {
   const renderer = await buildPortraitRendererContract(repoRoot);
   const portraits = (await buildMobPortraitJobs(repoRoot))
     .sort((left, right) => left.mobId.localeCompare(right.mobId))
@@ -55,6 +64,12 @@ export async function buildManifest() {
       'Binds every shipped mob portrait to the actual renderer job, model, attachment, tint, renderer, and output bytes.',
     bootstrapReview: fileDigest(repoRoot, bootstrapReviewRelativePath),
     rendererFingerprint: portraitRendererFingerprint(renderer),
+    // Additive at the SAME schemaVersion, and deliberately so: bumping the
+    // schema would make every committed manifest a bootstrap migration and
+    // demand the 242-row re-render this field exists to prevent. Absent means
+    // "not recorded", which the drift classifier and the write guard both read
+    // as "nothing can be concluded" rather than as a match or as drift.
+    ...(renderEnv ? { renderEnv } : {}),
     renderer,
     portraitCount: portraits.length,
     portraits,
@@ -122,12 +137,14 @@ function parseArgs(argv) {
   if (mode !== '--write' && mode !== '--check') {
     throw new Error(
       'usage: node scripts/build_mob_portrait_source_manifest.mjs --write|--check ' +
-        '[--receipt <renderer-receipt.json>] [--manifest <path>] [--bootstrap-reviewed]',
+        '[--receipt <renderer-receipt.json>] [--manifest <path>] [--bootstrap-reviewed] ' +
+        '[--allow-environment-remint]',
     );
   }
   let receiptPath = null;
   let targetManifestPath = manifestPath;
   let bootstrapReviewed = false;
+  let environmentRemint = false;
   for (let index = 0; index < rest.length; index++) {
     const arg = rest[index];
     if (arg === '--receipt') {
@@ -139,14 +156,16 @@ function parseArgs(argv) {
       targetManifestPath = path.resolve(repoRoot, target);
     } else if (arg === '--bootstrap-reviewed') {
       bootstrapReviewed = true;
+    } else if (arg === '--allow-environment-remint') {
+      environmentRemint = true;
     } else {
       throw new Error(`unknown argument ${arg}`);
     }
   }
-  if (mode === '--check' && (receiptPath || bootstrapReviewed)) {
+  if (mode === '--check' && (receiptPath || bootstrapReviewed || environmentRemint)) {
     throw new Error('--check does not accept write authorization arguments');
   }
-  return { mode, receiptPath, targetManifestPath, bootstrapReviewed };
+  return { mode, receiptPath, targetManifestPath, bootstrapReviewed, environmentRemint };
 }
 
 function readJson(filePath, label) {
@@ -166,7 +185,21 @@ async function main() {
     process.exit(2);
   }
 
-  const next = await buildManifest();
+  // Read the two carriers of renderEnv BEFORE building, because the field cannot
+  // be derived from the tree (see buildManifest): the receipt owns it on a write,
+  // the committed manifest carries it forward on a check.
+  const committedManifest = existsSync(args.targetManifestPath)
+    ? parseManifestOrNull(readFileSync(args.targetManifestPath))
+    : null;
+  const loadedReceipt = args.receiptPath
+    ? readJson(path.resolve(repoRoot, args.receiptPath), 'renderer receipt')
+    : null;
+  const next = await buildManifest({
+    renderEnv:
+      (args.mode === '--write' ? loadedReceipt?.renderEnv : null) ??
+      committedManifest?.renderEnv ??
+      null,
+  });
   const serialized = `${JSON.stringify(next, null, 2)}\n`;
   if (args.mode === '--check') {
     const current = existsSync(args.targetManifestPath)
@@ -204,15 +237,14 @@ async function main() {
   const previous = existsSync(args.targetManifestPath)
     ? readJson(args.targetManifestPath, 'existing manifest')
     : null;
-  const receipt = args.receiptPath
-    ? readJson(path.resolve(repoRoot, args.receiptPath), 'renderer receipt')
-    : null;
+  const receipt = loadedReceipt;
   try {
     assertManifestWriteAuthorized({
       previous,
       next,
       receipt,
       allowBootstrap: args.bootstrapReviewed,
+      allowEnvironmentRemint: args.environmentRemint,
     });
   } catch (error) {
     console.error(

@@ -63,6 +63,8 @@ describe('the grep-proof: zero hardcoded currency or ticker spellings in src/ui,
   // position in the template (not only right before the closing backtick), or
   // glued in front of one.
   const TICKER = '(?:USDC|USD|SOL|\\$?WOC)';
+  const hole = (name: string): string => ['$', '{', name, '}'].join('');
+  const templateCase = (body: string): string => `const x = \`${body}\`;`;
   const SHAPES: readonly RegExp[] = [
     /`[^`]*\$\$\{/,
     /['"]\$['"]\s*\+|\+\s*['"]\$['"]/,
@@ -95,28 +97,28 @@ describe('the grep-proof: zero hardcoded currency or ticker spellings in src/ui,
   });
 
   it('positive control: the scanner sees every shape it hunts, and not the clean forms', () => {
-    expect(offends('const x = `$${amount}`;')).toBe(true);
+    expect(offends(templateCase(`$${hole('amount')}`))).toBe(true);
     expect(offends("const x = '$' + amount;")).toBe(true);
     expect(offends('const x = "$"+amount;')).toBe(true);
     expect(offends("const x = amount + '$';")).toBe(true);
-    expect(offends('const x = `${amount} USD`;')).toBe(true);
-    expect(offends('const x = `${amount} SOL`;')).toBe(true);
-    expect(offends('const x = `${amount} USDC`;')).toBe(true);
-    expect(offends('const x = `${amount} WOC`;')).toBe(true);
-    expect(offends('const x = `${tokens} $WOC`;')).toBe(true);
+    expect(offends(templateCase(`${hole('amount')} USD`))).toBe(true);
+    expect(offends(templateCase(`${hole('amount')} SOL`))).toBe(true);
+    expect(offends(templateCase(`${hole('amount')} USDC`))).toBe(true);
+    expect(offends(templateCase(`${hole('amount')} WOC`))).toBe(true);
+    expect(offends(templateCase(`${hole('tokens')} $WOC`))).toBe(true);
     // The mid-template and prefix glues: the same defect away from the
     // template's end, and the unit in front of the number.
-    expect(offends('const x = `${amount} SOL each`;')).toBe(true);
-    expect(offends('const x = `pay ${amount} USD now`;')).toBe(true);
-    expect(offends('const x = `about WOC ${amount}`;')).toBe(true);
-    expect(offends('const x = `WOC ${amount}`;')).toBe(true);
-    expect(offends('const x = `pay WOC${amount}`;')).toBe(true);
+    expect(offends(templateCase(`${hole('amount')} SOL each`))).toBe(true);
+    expect(offends(templateCase(`pay ${hole('amount')} USD now`))).toBe(true);
+    expect(offends(templateCase(`about WOC ${hole('amount')}`))).toBe(true);
+    expect(offends(templateCase(`WOC ${hole('amount')}`))).toBe(true);
+    expect(offends(templateCase(`pay WOC${hole('amount')}`))).toBe(true);
     // Ticker-shaped identifiers and longer tickers stay clean: the lookahead
     // rejects a letter after the ticker, and USDC matches as itself.
-    expect(offends('const x = `${amount} USDT`;')).toBe(false);
-    expect(offends('const x = `${amount} SOLID plan`;')).toBe(false);
-    expect(offends('const x = `${amountUSD}`;')).toBe(false);
-    expect(offends('const x = `${amount}`;')).toBe(false);
+    expect(offends(templateCase(`${hole('amount')} USDT`))).toBe(false);
+    expect(offends(templateCase(`${hole('amount')} SOLID plan`))).toBe(false);
+    expect(offends(templateCase(hole('amountUSD')))).toBe(false);
+    expect(offends(templateCase(hole('amount')))).toBe(false);
     expect(offends("t('hudChrome.claudium.priceSol', { amount })")).toBe(false);
     expect(offends('const x = usdText(cents);')).toBe(false);
     expect(offends("t('hudChrome.trade.woc.moneyUsd', { usd })")).toBe(false);

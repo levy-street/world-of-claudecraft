@@ -53,11 +53,12 @@ describe('cap literals as content data', () => {
     expect(() => craftMaxSkillFor('not_a_craft')).toThrow();
   });
 
-  it('gathering caps: mining, logging, herbalism at 100; fishing at 200', () => {
+  it('gathering caps: mining, logging, herbalism, farming at 100; fishing at 200', () => {
     expect(GATHERING_PROFESSIONS.mining.maxSkill).toBe(100);
     expect(GATHERING_PROFESSIONS.logging.maxSkill).toBe(100);
     expect(GATHERING_PROFESSIONS.herbalism.maxSkill).toBe(100);
     expect(GATHERING_PROFESSIONS.fishing.maxSkill).toBe(200);
+    expect(GATHERING_PROFESSIONS.farming.maxSkill).toBe(100);
   });
 });
 
@@ -115,6 +116,7 @@ describe('arm 4: normalizeGatheringProficiency clamps an over-cap save DOWN to t
       logging: 0,
       herbalism: 0,
       fishing: 200,
+      farming: 0,
     });
   });
 
@@ -134,6 +136,7 @@ describe('arm 4: normalizeGatheringProficiency clamps an over-cap save DOWN to t
       logging: 0,
       herbalism: 0,
       fishing: 200,
+      farming: 0,
     });
   });
 });

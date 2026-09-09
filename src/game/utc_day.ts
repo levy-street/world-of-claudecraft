@@ -1,11 +1,16 @@
 // The offline sim wants its wall-clock day strings but must not read the clock
-// itself, so the frame loop supplies them (via `feedSimCalendar` below):
-// `currentUtcDay` stamps WHEN something happened (the Book of Deeds earn date),
-// `currentResetDay` says which daily window we are in (the first battleground
-// win, honor DR, the delve daily), and `currentEventLeadDay` is the weekend
-// event's early-open probe of the same boundary. Building any of the strings is
-// a Date allocation plus some formatting; at 60 Hz that is pure churn for a
-// value that changes once a day, so cache and re-derive at most once a second.
+// itself, so the frame loop supplies them through ONE call, `feedSimCalendar`
+// below: `utcDay` stamps WHEN something happened (the Book of Deeds earn
+// date), `resetDay` says which daily window we are in (the first battleground
+// win, honor DR, the delve daily), `eventLeadDay` is the weekend event's
+// early-open probe of the same boundary, and `dailyResetRemainingSec` is the
+// when-half of `resetDay` (the daily-gate refusal countdown). Building the
+// strings is a Date allocation plus some formatting; at 60 Hz that is pure
+// churn for values that change once a day, so the feed caches the whole set
+// and re-derives it at most once a second, from ONE instant, so the four can
+// never straddle the boundary (the server twin, server/sim_calendar_feed.ts,
+// has the same single-instant shape). The pure `*Of(at)` functions below are
+// the clock-free primitives the feed and the tests share.
 
 import { DOUBLE_HONOR_LEAD_MS } from '../sim/pvp/honor_event';
 
@@ -16,19 +21,13 @@ import { DOUBLE_HONOR_LEAD_MS } from '../sim/pvp/honor_event';
 // makes its players: a daily never turns over in the middle of an evening.
 export const DAILY_RESET_HOUR = 3;
 
-let cachedDay = '';
-let dayRefreshAtMs = 0;
-let cachedResetDay = '';
-let resetRefreshAtMs = 0;
-
-/** Current UTC day as `YYYY-MM-DD`, recomputed at most once per second. */
-export function currentUtcDay(): string {
-  const now = Date.now();
-  if (now >= dayRefreshAtMs) {
-    cachedDay = new Date(now).toISOString().slice(0, 10);
-    dayRefreshAtMs = now + 1000;
-  }
-  return cachedDay;
+/** The feed's 1-second cache refreshes when its deadline passes AND when the
+ *  wall clock steps BACKWARD out of its window (an NTP correction, a manual
+ *  change): a deadline-only check would serve the stale set until the old
+ *  deadline came round, which after a large step is effectively forever (the
+ *  server memo's recorded case, server/raid_reset.ts). */
+function cacheStale(now: number, refreshAtMs: number): boolean {
+  return now >= refreshAtMs || now < refreshAtMs - 1000;
 }
 
 function pad2(n: number): string {
@@ -51,16 +50,6 @@ export function resetDayOf(at: Date): string {
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
 
-/** The current daily-reset window, recomputed at most once per second. */
-export function currentResetDay(): string {
-  const now = Date.now();
-  if (now >= resetRefreshAtMs) {
-    cachedResetDay = resetDayOf(new Date(now));
-    resetRefreshAtMs = now + 1000;
-  }
-  return cachedResetDay;
-}
-
 /**
  * The weekend event's early-open probe: the daily-reset window the player will
  * be in DOUBLE_HONOR_LEAD_MS from the given instant, in their OWN local zone
@@ -73,18 +62,31 @@ export function eventLeadDayOf(at: Date): string {
   return resetDayOf(new Date(at.getTime() + DOUBLE_HONOR_LEAD_MS));
 }
 
-let cachedEventLeadDay = '';
-let eventLeadRefreshAtMs = 0;
-
-/** The current early-open probe key, recomputed at most once per second. */
-export function currentEventLeadDay(): string {
-  const now = Date.now();
-  if (now >= eventLeadRefreshAtMs) {
-    cachedEventLeadDay = eventLeadDayOf(new Date(now));
-    eventLeadRefreshAtMs = now + 1000;
-  }
-  return cachedEventLeadDay;
+/**
+ * The instant the current daily window CLOSES: the next local
+ * DAILY_RESET_HOUR strictly after `at`, in the player's own zone (offline
+ * there is no realm; the server twin resolves its realm zone in
+ * server/raid_reset.ts). Clock-free and expressed in local `Date` terms like
+ * `resetDayOf` above, so month, year, and DST edges are the platform's
+ * arithmetic; a zone whose spring-forward skips the reset hour outright gets
+ * the platform's normalization of that wall time, the same best-effort the
+ * server side documents.
+ */
+export function nextResetMsOf(at: Date): number {
+  const target = new Date(at.getTime());
+  target.setHours(DAILY_RESET_HOUR, 0, 0, 0);
+  if (target.getTime() <= at.getTime()) target.setDate(target.getDate() + 1);
+  return target.getTime();
 }
+
+/** Whole seconds until the next local daily reset (>= 1: at the boundary the
+ *  window flips and a full day remains), the when-half of `resetDayOf`. */
+export function resetRemainingSecOf(at: Date): number {
+  return Math.max(1, Math.ceil((nextResetMsOf(at) - at.getTime()) / 1000));
+}
+
+let calendarRefreshAtMs = 0;
+const calendarCache = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
 
 /**
  * Feed the offline sim its whole host calendar in one call: the frame loop's
@@ -96,8 +98,27 @@ export function feedSimCalendar(sim: {
   utcDay: string;
   resetDay: string;
   eventLeadDay: string;
+  dailyResetRemainingSec: number;
 }): void {
-  sim.utcDay = currentUtcDay();
-  sim.resetDay = currentResetDay();
-  sim.eventLeadDay = currentEventLeadDay();
+  // ONE instant for all four values (the server twin's shape,
+  // server/sim_calendar_feed.ts). The retired per-key caches each carried
+  // their own 1-second deadline, so fed through them the four could straddle
+  // the local reset boundary by up to a second (a refreshed ~24h countdown
+  // beside a stale old-window resetDay, so a refusal fired in that sub-second
+  // window would name a full day at the instant the gate actually reopens).
+  // One shared deadline keeps the 1 Hz cadence and makes the set coherent by
+  // construction, and step-safe (cacheStale above).
+  const now = Date.now();
+  if (cacheStale(now, calendarRefreshAtMs)) {
+    const at = new Date(now);
+    calendarCache.utcDay = at.toISOString().slice(0, 10);
+    calendarCache.resetDay = resetDayOf(at);
+    calendarCache.eventLeadDay = eventLeadDayOf(at);
+    calendarCache.dailyResetRemainingSec = resetRemainingSecOf(at);
+    calendarRefreshAtMs = now + 1000;
+  }
+  sim.utcDay = calendarCache.utcDay;
+  sim.resetDay = calendarCache.resetDay;
+  sim.eventLeadDay = calendarCache.eventLeadDay;
+  sim.dailyResetRemainingSec = calendarCache.dailyResetRemainingSec;
 }

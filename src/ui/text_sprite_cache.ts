@@ -80,7 +80,9 @@ interface TextInk {
  *  server- or content-capped (tests/text_sprite_cache.test.ts pins the
  *  arithmetic against those sources, so raising a cap fails there first):
  *
- *    150  ally names   (server/social.ts FRIEND_LIMIT 50 + GUILD_MEMBER_LIMIT 100)
+ *   1050  ally names   (server/social.ts FRIEND_LIMIT 50 + the largest roster a
+ *                       guild can buy, src/sim/guild_roster.ts
+ *                       GUILD_ROSTER_MAX_MEMBERS 1000)
  *      N  badge digits (nothing caps the active quest log, but a badge number is
  *                       an index into it and it is keyed by quest id, so the
  *                       count of quests in the content tables is the ceiling;
@@ -92,7 +94,7 @@ interface TextInk {
  *      3  quest-giver glyphs (gold '?', gold '!', repeat-blue '!'; the
  *         cooldown variant reuses the blue raster and dims at blit time)
  *   ----
- *    371 as derived today (tests/text_sprite_cache.test.ts recomputes it
+ *   1285 as derived today (tests/text_sprite_cache.test.ts recomputes it
  *    from the live caps and floors the total, so a shrunken term reddens).
  *
  *  The budget is a ceiling, not a working set: ordinary play resides at a couple
@@ -103,17 +105,20 @@ interface TextInk {
  *  actually rasterizes: a 16-character ally name 126x43px (21KB of backing
  *  store), a POI label 162x45 (29KB), a portal name 138x44 (24KB), the zone title
  *  154x49 (30KB), a quest-giver glyph 34x48 (6KB), a badge digit 12x20 (1KB). So
- *  the ordinary couple of dozen is around half a megabyte, the 371-label
- *  pathological mix is 5.2MB, and 384 sprites all of them ally names, which
- *  nothing can actually ask for, would be 8.1MB: the same class as a handful of
- *  cached zone terrain canvases. (371 is the worst case the realm grid brought,
- *  plus the phase 23 repeat glyph: more zones means more POI labels and more
- *  overworld doors, and the quest tables grew with them.
+ *  the ordinary couple of dozen is around half a megabyte, the 1285-label
+ *  pathological mix is about 23MB, and 1300 sprites all of them ally names,
+ *  which nothing can actually ask for (it needs a 1,000-seat guild entirely
+ *  online and plotted at once, the realm's whole concurrency target in one
+ *  guild), would be 27MB: the same class as a handful of cached zone terrain
+ *  canvases, and the LRU trim is what keeps ordinary play nowhere near it.
+ *  (385 was the worst case the realm grid brought, plus the phase 23 repeat
+ *  glyph; the 900 on top is the guild roster ladder, which took the ally-name
+ *  term from a fixed 100-member guild to the 1,000-seat hard cap.
  *  tests/text_sprite_cache.ts derives it from content.) */
-// 416: the tutorial-island + eastbrook quest tables carried the derived worst
-// case to 385, past the old 384; the next power-of-two-ish step keeps a small
-// content margin (the test reddens again the day it is outgrown).
-export const TEXT_SPRITE_LIMIT = 416;
+// 1300: the guild roster ladder (src/sim/guild_roster.ts) carried the derived
+// worst case from 385 to 1285; the next round step keeps a small content margin
+// (the test reddens again the day it is outgrown).
+export const TEXT_SPRITE_LIMIT = 1300;
 
 // Slack around the measured ink on every side, so glyph antialiasing is never
 // clipped. The outline's own reach is added on top (see SPRITE_MITER_LIMIT).

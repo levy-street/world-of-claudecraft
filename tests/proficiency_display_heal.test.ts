@@ -95,13 +95,35 @@ describe('healDisplayRoundedProficiency', () => {
     expect(prof.fishing).toBe(200);
   });
 
-  it('ignores the mid-band gain-schedule breakpoint: 150 is not a threshold', () => {
-    // 150 halves the fishing gain but nothing reads it with >=: a 149.5
-    // displayed "150" claimed nothing a deed or band grants, so no heal.
+  it('HEALS at 150 for fishing, because Phase 11i made it a real threshold', () => {
+    // THIS ARM IS INVERTED ON PURPOSE and the inversion is the whole point, so
+    // read the history rather than just the expectation. It used to assert the
+    // opposite ("150 is not a threshold") and its reasoning was correct at the
+    // time: 150 only halved the fishing gain, nothing read it with >=, and a
+    // 149.5 displayed as "150" therefore claimed nothing a deed or a band
+    // grants. No claim, no strand, no heal.
+    //
+    // Masterwrought Phase 11i gave 150 a reader: it is the band-2 CATCH GATE on
+    // fishing's own ladder. So a pre-fix blob at 149.5 to 149.99 now sits one
+    // hundredth below a table the sheet has already told the player they earned,
+    // which is exactly the strand class this module exists to close. Leaving the
+    // old expectation in place would have kept the module's contract stated
+    // correctly while making it false of the game.
     const prof = emptyGatheringProficiency();
     prof.fishing = 149.5;
+    expect(healDisplayRoundedProficiency(prof)).toBe(true);
+    expect(prof.fishing).toBe(150);
+  });
+
+  it('and 150 stays a NON-threshold for the land trades, which never gained one', () => {
+    // The other half, and the reason the fix is a per-profession ladder rather
+    // than a new shared rung: nothing about mining changed. A land trade at
+    // 149.5 still claims nothing at 150 (its own cap is 100 anyway), so healing
+    // it would invent a threshold the shared ladder does not have.
+    const prof = emptyGatheringProficiency();
+    prof.mining = 149.5;
     expect(healDisplayRoundedProficiency(prof)).toBe(false);
-    expect(prof.fishing).toBe(149.5);
+    expect(prof.mining).toBe(149.5);
   });
 
   it('never heals past a profession cap, even on a malformed over-cap record', () => {

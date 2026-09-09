@@ -42,7 +42,7 @@ const SAINTLESS_HALL_SPAWNS = {
 const FINALE_SPAWNS = {
   id: 'boss',
   weight: 1,
-  // Dais face is at ~z=68 (dais z=80, r=12); spawn just south so Varric strides
+  // Dais face is at ~z=68 (dais z=80, r=12); spawn just south so Vandric strides
   // onto the platform as the encounter opens.
   spawns: [{ mobId: 'deacon_varric', x: 0, z: 72 }],
 };

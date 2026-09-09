@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'En ring pa manbrunnen',
     desc: 'Fanga en fisk i Nightblooms vatten.',
   },
   chr_wraithwood_gatherer: {
@@ -172,7 +171,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Ängens mästare', desc: 'Nå 100 i färdigheten Örtkunskap.' },
   prog_master_gatherer: {
     name: 'Mästersamlare',
-    desc: 'Nå 100 i skicklighet i tre valfria av Gruvdrift, Skogsavverkning, Örtkunskap och Fiske.',
   },
   prog_first_craft: { name: 'Handgjort', desc: 'Slutför ditt första lyckade hantverk.' },
   prog_craft_specialist: {
@@ -283,7 +281,6 @@ export const table: DeedLocaleTable = {
     title: 'Lindormsfällaren',
   },
   dgn_sanctum_speed: {
-    name: 'Helgedomssprinten',
     desc: 'Besegra Korzul Gravlindormen inom 15 minuter efter att din grupp gjort anspråk på Gravlindormens helgedom.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -349,7 +346,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Klockorna tystnar',
-    desc: 'Besegra Diakon Varric när varje begravningsringare han väcker redan är dräpt.',
+    desc: 'Besegra Diakon Vandric när varje begravningsringare han väcker redan är dräpt.',
   },
   dlv_nhalia_bells: {
     name: 'Klockstillare',
@@ -362,7 +359,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Dalskrönikan, kapitel II',
-    desc: 'Avsluta det andra kapitlet i Sauls krönika: banditer, murlocker och gruvans ohyra nedgjorda, Suggfältet spelat och relikvariet trotsat.',
   },
   chr_vale_chapter_iii: {
     name: 'Dalens krönika',
@@ -380,7 +376,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Flockbrytare', desc: 'Dräp 3 skogsvargar inom 10 sekunder.' },
   chr_vale_cup_debut: {
     name: 'Kopparspannens utmanare',
-    desc: 'Gå ut på planen och rör bollen i en Dalcupsmatch på Suggfältet.',
   },
   chr_vale_rares: {
     name: 'Dalens fasor',
@@ -425,12 +420,11 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Törntoppens krönika',
-    desc: 'Följ bergets hela berättelse till slutet: Lindormskulten krossad, helgedomen tystad, den vaknande toppen fälld och klippornas alla namnkunniga fasor nedlagda.',
     title: 'av Törntoppen',
   },
   chr_peaks_sparring: {
     name: 'Murövningar',
-    desc: 'Tillfoga träningsdockan ovanför Högvakten sammanlagt 1 000 skada.',
+    desc: 'Tillfoga en träningsdocka sammanlagt 1 000 skada.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Kallt vatten, kallare ljus',
@@ -511,7 +505,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stamkund',
-    desc: 'Upptäck alla tio delar av den heroiska kvartersmästarens utbud.',
+    desc: 'Upptäck alla tio utrustningsdelar i den heroiska kvartersmästarens utbud.',
   },
   col_glimmerfin: {
     name: 'Ett skimmer av hopp',
@@ -559,63 +553,49 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Stövlar på planen',
-    desc: 'Spela färdigt en hel Dalcupsmatch på Suggfältet, oavsett vinst eller förlust.',
   },
-  pvp_vcup_first_win: { name: 'Första bucklan', desc: 'Vinn en rankad Dalcupsmatch.' },
-  pvp_vcup_wins_10: { name: 'Rutinerad vildsvinsbollare', desc: 'Vinn 10 rankade Dalcupsmatcher.' },
+  pvp_vcup_first_win: { name: 'Första bucklan' },
+  pvp_vcup_wins_10: { name: 'Rutinerad vildsvinsbollare' },
   pvp_vcup_wins_25: {
     name: 'Vildsvinsbollslegend',
-    desc: 'Vinn 25 rankade Dalcupsmatcher.',
     title: 'Vildsvinsbollslegend',
   },
-  pvp_vcup_first_goal: { name: 'Målkontot öppnat', desc: 'Gör ett mål i en rankad Dalcupsmatch.' },
+  pvp_vcup_first_goal: { name: 'Målkontot öppnat' },
   pvp_vcup_hat_trick: {
     name: 'Hattrickhjälte',
-    desc: 'Gör tre mål i en och samma rankade Dalcupsmatch, i 3 mot 3-divisionen eller större.',
   },
   pvp_vcup_golden_goal: {
     name: 'Gyllene ögonblick',
-    desc: 'Gör det gyllene mål som avgör en rankad Dalcupsmatch.',
   },
   pvp_vcup_first_save: {
     name: 'Säkra händer',
-    desc: 'Gör en räddning som målvakt i en rankad Dalcupsmatch.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Här kommer inget förbi',
-    desc: 'Vinn en rankad Dalcupsmatch som målvakt utan att släppa in ett mål.',
   },
   pvp_vcup_guild_win: {
     name: 'För baneret',
-    desc: 'Vinn en rankad Dalcupsmatch spelad under ditt gilles baner.',
   },
   pvp_fiesta_first_bout: {
     name: 'Objuden gäst',
-    desc: 'Utkämpa en hel 2 mot 2-drabbning i Fiestan, oavsett vinst eller förlust.',
   },
   pvp_fiesta_first_win: {
     name: 'Festens medelpunkt',
-    desc: 'Vinn en 2 mot 2-drabbning i Fiestan.',
   },
   pvp_fiesta_double: {
     name: 'Två flugor i en smäll',
-    desc: 'Fäll två motståndare i Fiestan inom fyra sekunder.',
   },
   pvp_fiesta_shutdown: {
     name: 'Glädjedödare',
-    desc: 'Fäll en Fiestamotståndare som är inne på en svit om tre eller fler.',
   },
   pvp_fiesta_full_build: {
     name: 'Klädd för tillfället',
-    desc: 'Vinn en Fiestadrabbning med en förstärkning låst från var och en av de tre vågorna.',
   },
   pvp_fiesta_powerups: {
     name: 'En av varje',
-    desc: 'Plocka upp var och en av ringens fyra kraftbonusar minst en gång: Fartdemon, Koloss, Månkängor och Bärsärk.',
   },
   pvp_fiesta_five_kills: {
     name: 'Bär hela festen',
-    desc: 'Fäll fem motståndare i en och samma Fiestadrabbning.',
   },
   soc_first_party: { name: 'Bättre tillsammans', desc: 'Gå med i en grupp med en annan spelare.' },
   soc_full_house: { name: 'Fullt hus', desc: 'Rensa ett fängelsehål med en full grupp om fem.' },
@@ -1005,5 +985,9 @@ export const table: DeedLocaleTable = {
     name: 'Ingen enda glöd slocknad',
     desc: 'Besegra Varkhul, Forgefather of the Last Flame, på heroisk svårighetsgrad utan att en enda raidmedlem dör.',
     title: 'den Obrända',
+  },
+  col_set_bramblehide: {
+    name: "Roots' Törnehud",
+    desc: "Upptäck varje del av Roots' Törnehud.",
   },
 };

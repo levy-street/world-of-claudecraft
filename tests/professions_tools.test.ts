@@ -162,11 +162,17 @@ describe('gathering tool tier gating (#1123)', () => {
     // "20 copper at any zone hub") needs the entry tools to STAY trivial
     // one-time purchases. Literal buyValue pins so a price rebalance must
     // consciously touch this claim rather than drift past it.
+    // garden_hoe joined the rung with the hoe phase: farming's entry tool is
+    // the same trivial one-time purchase. It is the ONLY vendor-priced hoe:
+    // rungs 2 to 4 are deliberately absent from the 120/400 pins below
+    // because they are craft-only (HOE_RECIPES, engineering at the
+    // toolworks), bought from players rather than counters.
     for (const toolId of [
       'copper_mining_pick',
       'handaxe',
       'gathering_sickle',
       'simple_fishing_pole',
+      'garden_hoe',
     ] as const) {
       expect(ITEMS[toolId]?.buyValue, toolId).toBe(20);
     }
@@ -257,7 +263,7 @@ describe('toolless-state helpers (#2343)', () => {
         def.use?.type === 'fishing' ||
         (def.use?.type === 'gatherTool' && def.use.professionId === 'fishing'),
     );
-    expect(tackle.length).toBe(5); // the pole plus four tiered rods
+    expect(tackle.length).toBe(6); // the pole plus five tiered rods (11i's apex rung)
     for (const def of tackle) {
       expect(hasFishingImplement([{ itemId: def.id, count: 1 }], ITEMS), def.id).toBe(true);
     }
@@ -734,7 +740,20 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     const mining = [ITEMS.thorium_mining_pick, ITEMS.arcanite_mining_pick];
     const logging = [ITEMS.ashwood_axe, ITEMS.elderwood_axe];
     const herbalism = [ITEMS.goldleaf_sickle, ITEMS.sunpetal_sickle];
-    const fishing = [ITEMS.stormreel_fishing_rod, ITEMS.tidewrought_fishing_rod];
+    // THREE since masterwrought Phase 11i: the apex rung is the game's first
+    // tier-6 gathering tool, so it is also the first member of this set above
+    // tier 5. The derivation below is `tier > 3` rather than a tier list, which
+    // is why it caught the new rod by existing.
+    const fishing = [
+      ITEMS.stormreel_fishing_rod,
+      ITEMS.tidewrought_fishing_rod,
+      ITEMS.clockreel_fishing_rod,
+    ];
+    // TWO since masterwrought Phase 11j: the hoe phase left farming's ladder
+    // topping out at the crafted tier-4 osmium_hoe, and 11j added the tier-5
+    // rung that made farming the fifth member of the apex base-tool family
+    // rather than the one gathering profession stopping a rung short.
+    const farming = [ITEMS.osmium_hoe, ITEMS.evergarden_hoe];
     // DERIVED, not hand-listed: every gatherTool above tier 3, whatever its
     // profession. The four lists are the readable statement of what that set
     // is today, and the cross-check is what makes a future crafted tool land
@@ -745,7 +764,7 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       (def) => def.use?.type === 'gatherTool' && def.use.tier > 3,
     );
     const craftedIds = new Set(
-      [...mining, ...logging, ...herbalism, ...fishing].map((item) => item.id),
+      [...mining, ...logging, ...herbalism, ...fishing, ...farming].map((item) => item.id),
     );
     expect([...craftedIds].sort()).toEqual(craftedFromContent.map((d) => d.id).sort());
     // THE CLAIM IS "NEVER FOR COPPER", NOT "NEVER ON A COUNTER". Marks are a
@@ -776,6 +795,36 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       Object.values(DELVE_SHOPS).flatMap((entries) => entries.map((e) => e.itemId)),
     );
     for (const id of craftedIds) {
+      // OSMIUM_HOE IS NO LONGER AN EXCEPTION (masterwrought Phase 11j,
+      // decision B). It used to be pinned ABSENT from the Marks route because
+      // the hoe phase shipped no fallback row and flagged the question for the
+      // maintainer; that question is answered, both crafted hoe rungs now sit
+      // on the Drowned Litany counter beside their land and rod siblings, and
+      // farming is no longer the only gathering profession without a
+      // non-crafter route at the tier-4 rung (masterwrought R18). It therefore
+      // falls through to the ordinary sweep below and is asserted PRESENT like
+      // every other crafted tool, which is a stronger pin than the waiver was.
+      // clockreel_fishing_rod is the SECOND deliberate exception (masterwrought
+      // Phase 11i), and it is a different argument from the hoe's rather than
+      // the same waiver twice. The Marks route exists so a tool ladder is never
+      // gated behind one lucky crafter; this rung's whole chain is already
+      // luck-free without it, because its SCHEMATIC is deterministic Heroic
+      // Marks stock (content/heroic_vendor.ts) rather than a drop, so any
+      // engineer can learn it on a fixed price. The rod itself also stays
+      // market-listable by R18, which is the non-engineer's route. Adding a
+      // tier-6 apex tool to a delve counter would require a separate delve
+      // pricing and tier decision; the absence is pinned here rather than
+      // assumed.
+      if (id === 'clockreel_fishing_rod') {
+        expect(delveStocked.has(id)).toBe(false);
+        // The deterministic route the exception rests on, asserted rather than
+        // described: if the schematic ever left the marks counter, this waiver
+        // would stop being true and this arm is where that reds.
+        expect(HEROIC_VENDOR_STOCK.some((o) => o.itemId === 'pattern_clockreel_fishing_rod')).toBe(
+          true,
+        );
+        continue;
+      }
       expect(delveStocked.has(id), `${id} needs a Marks route`).toBe(true);
     }
     for (const [profession, tools] of [
@@ -786,12 +835,26 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     ] as const) {
       expect(tools.every(Boolean)).toBe(true);
       const tiers = tools.map((item) => gatherToolTier(item, profession));
-      expect(tiers).toEqual([4, 5]);
+      // FISHING runs one rung deeper than the land ladders since masterwrought
+      // Phase 11i: its apex rod is the game's only tier-6 gathering tool, and
+      // it exists because fishing is the only profession whose catch table has
+      // a band above what a tier-5 tool opens. The three land ladders still
+      // stop at 5, which is why this is a per-profession expectation rather
+      // than one shared literal.
+      expect(tiers).toEqual(profession === 'fishing' ? [4, 5, 6] : [4, 5]);
       // Produced by a profession or bought with Marks, never with coin: no
       // buyValue is what makes "not for copper" true of the item itself, so a
       // future counter row cannot quietly price one.
       for (const item of tools) expect(item.buyValue).toBeUndefined();
     }
+    // Farming's crafted rungs. Kept OUTSIDE the pair loop above even now that
+    // it reads [4, 5] like the land ladders, because the loop walks the
+    // professions whose ladders that phase shipped and this list is the one
+    // masterwrought Phase 11j completed; folding it in would hide which change
+    // made the pair true. Never priced in copper, same as every rung above 1.
+    expect(farming.every(Boolean)).toBe(true);
+    expect(farming.map((item) => gatherToolTier(item, 'farming'))).toEqual([4, 5]);
+    for (const item of farming) expect(item.buyValue).toBeUndefined();
   });
 
   it('the copper sweep is non-vacuous: the counters it reads really do stock things', () => {
@@ -914,6 +977,21 @@ describe('tool effect slotting, on the axes the live harvest path has', () => {
     expect(bonused.gradeToolTier).toBe(baseOutcome.gradeToolTier);
     // Pure: the input outcome is never mutated.
     expect(baseOutcome.quantity).toBe(2);
+  });
+
+  it("the apex quantity rung (Maker's Charm, phase 09) grants base + 2 through the same path", () => {
+    const slot = slotEffect('makers_charm');
+    // Both halves here too: the knob the slot reads, and the literal, so a
+    // durability retune cannot hide behind the knob-relative half.
+    expect(slot.durability).toBe(TOOL_EFFECTS.makers_charm.startingDurability);
+    expect(slot.durability).toBe(20);
+    const bonused = applyEffectBonus(slot, baseOutcome);
+    // Both halves of the pin: the content knob the live grant reads, AND the
+    // literal rung, so a silent knob edit cannot re-tune the apex charm while
+    // the knob-relative half stays green.
+    expect(bonused.quantity).toBe(baseOutcome.quantity + TOOL_EFFECTS.makers_charm.bonus);
+    expect(bonused.quantity).toBe(baseOutcome.quantity + 2);
+    expect(bonused.gradeToolTier).toBe(baseOutcome.gradeToolTier);
   });
 
   it('a quality effect raises the grade tool tier and nothing else', () => {

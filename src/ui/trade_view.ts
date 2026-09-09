@@ -15,15 +15,20 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 import { ITEMS } from '../sim/data';
+import { countRawInSlots } from '../sim/item_lock';
+import type { MaterialComposition } from '../sim/material_sources';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import { itemDisplayName } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 import { knownItemDef } from './known_item';
+import { materialSourcesForDisplay } from './material_sources_view';
 
 /** Total held count of `itemId` across every bag slot: the trade offer
- *  stepper's ceiling. */
+ *  stepper's ceiling. A thin domain alias over the shared sim walk
+ *  (item_lock.ts countRawInSlots), so the ceiling can never drift from the
+ *  summed total the sim validates the offer against. */
 export function tradeOfferCeiling(inventory: InvSlot[], itemId: string): number {
-  return inventory.filter((s) => s.itemId === itemId).reduce((n, s) => n + s.count, 0);
+  return countRawInSlots(inventory, itemId);
 }
 
 /** One offer row, resolved for rendering. `item` is undefined for an id this
@@ -65,7 +70,11 @@ export function buildTradeItemRow(
 export function tradeRowTooltipTarget(
   items: InvSlot[],
   index: number,
-): { item: ItemDef; instance?: ItemInstancePayload } | null {
+): {
+  item: ItemDef;
+  instance?: ItemInstancePayload;
+  materialSources?: MaterialComposition;
+} | null {
   const s = items[index];
   if (!s) return null;
   // knownItemDef, not a bare ITEMS index: this branches between a known-item
@@ -73,5 +82,8 @@ export function tradeRowTooltipTarget(
   // unknown arm here too (R34 family, src/ui/known_item.ts).
   const item = knownItemDef(ITEMS, s.itemId);
   if (!item) return null;
-  return { item, instance: s.instance };
+  // A staged offer line PINS the exact units it offers, so the row states which
+  // contributors are on the table: this is the identity the counterparty is
+  // agreeing to, not decoration.
+  return { item, instance: s.instance, materialSources: materialSourcesForDisplay(s) };
 }

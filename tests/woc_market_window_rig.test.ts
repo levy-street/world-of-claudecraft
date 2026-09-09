@@ -35,6 +35,7 @@ import {
   WocMarketWindow,
   type WocMarketWindowDeps,
 } from '../src/ui/woc_market_window';
+import { WOC_WALLET_CARD_DISMISS_KEY } from '../src/ui/woc_wallet_card_dismiss';
 import type { IWorld } from '../src/world_api';
 
 // The icon path stays real for QUALITY_COLOR but composes no canvas: a
@@ -339,6 +340,8 @@ beforeEach(() => {
   setWalletUiEnabled(false);
   setWalletConnectionAddresses(null, null);
   setWocBalance(null);
+  // The wallet card's persisted dismissal is read at window construction.
+  localStorage.removeItem(WOC_WALLET_CARD_DISMISS_KEY);
 });
 
 describe('WocMarketWindow live rig: open, browse, select', () => {
@@ -796,6 +799,116 @@ describe('WocMarketWindow live rig: tabs, rebuild, focus and scroll', () => {
     expect(ranges).toContainEqual([1, 1]);
   });
 
+  it('holds rebuilds only while a filter dropdown may be open, and resumes on the pick', async () => {
+    // The report behind this: the Browse filters kept closing before anything
+    // could be clicked. A native select exposes no open state, so the
+    // interaction watch is the proxy (mousedown on the select arms it), ANDed
+    // with focus; the pick disarms it, so countdowns resume immediately even
+    // though a picked select KEEPS focus.
+    const r = rig();
+    r.win.open();
+    await flush();
+    // Land a data change so the digest genuinely moves: the poll fetch is
+    // kicked while nothing is armed and settles into state.
+    r.fake.answers.browse = async () => ({
+      ok: true,
+      hasMore: false,
+      page: 0,
+      listings: [listing(1, { currentBidCents: 7777, minNextBidCents: 7877 })],
+    });
+    r.win.refreshIfChanged();
+    await flush();
+    // The SORT select, deliberately: a filter pick marks the view filtered,
+    // which the background poll excludes by design, so the resume half below
+    // would be untestable through a filter.
+    const sel = q<HTMLSelectElement>(r.root, 'select[data-field="sort"]');
+    sel.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    sel.focus();
+    expect(document.activeElement).toBe(sel);
+    // The digest has moved, but the hold is on: the same ELEMENT stays in
+    // the DOM (a rebuild would have replaced it and closed its dropdown).
+    r.win.refreshIfChanged();
+    await flush();
+    expect(q<HTMLSelectElement>(r.root, 'select[data-field="sort"]')).toBe(sel);
+    // The pick: a change event both repaints THROUGH the user path (the
+    // sort handler reloads, with the select still focused, as real browsers
+    // always fire change) and releases the hold.
+    sel.value = 'price_asc';
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    const rebuilt = q<HTMLSelectElement>(r.root, 'select[data-field="sort"]');
+    expect(rebuilt).not.toBe(sel);
+    // Background rebuilds are live again even though the fresh select holds
+    // focus (the focus restore put it back): only the armed hold waits.
+    expect(document.activeElement).toBe(rebuilt);
+    r.fake.answers.browse = async () => ({
+      ok: true,
+      hasMore: false,
+      page: 0,
+      listings: [listing(1, { currentBidCents: 8888, minNextBidCents: 8988 })],
+    });
+    // Step past the background poll's own cadence throttle (a real slow-band
+    // gap) so the re-ask fires now instead of minutes from now.
+    (r.win as unknown as { pollStartedMs: number }).pollStartedMs = 0;
+    r.win.refreshIfChanged();
+    await flush();
+    r.win.refreshIfChanged();
+    await flush();
+    expect(q<HTMLSelectElement>(r.root, 'select[data-field="sort"]')).not.toBe(rebuilt);
+  });
+
+  it('a wallet beat skipped under the hold repaints on the first unheld tick', async () => {
+    // onWalletChanged is event-driven with no retry of its own, so the skip
+    // arms walletRepaintDue and the poll repaints even though the data digest
+    // never moved (without the flag the card would sit stale on a quiet page).
+    const r = rig();
+    r.win.open();
+    await flush();
+    const sel = q<HTMLSelectElement>(r.root, 'select[data-field="filter-quality"]');
+    sel.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    sel.focus();
+    setWalletUiEnabled(true);
+    setWalletConnectionAddresses('9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', null);
+    r.win.onWalletChanged();
+    await flush();
+    // Held: same element, no rebuild.
+    expect(q<HTMLSelectElement>(r.root, 'select[data-field="filter-quality"]')).toBe(sel);
+    // Released without any data change: the due flag alone repaints.
+    sel.blur();
+    r.win.refreshIfChanged();
+    await flush();
+    expect(q<HTMLSelectElement>(r.root, 'select[data-field="filter-quality"]')).not.toBe(sel);
+  });
+
+  it('a wallet beat before the first render neither throws nor paints (no hold yet)', async () => {
+    // hud.ts fans onWalletChanged out with no isOpen gate, so a balance beat
+    // can reach a never-opened Exchange; the hold attaches on the first
+    // render, and until then there is no DOM to hold and nothing to paint.
+    const r = rig();
+    setWalletUiEnabled(true);
+    setWalletConnectionAddresses('9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', null);
+    expect(() => r.win.onWalletChanged()).not.toThrow();
+    await flush();
+    expect(r.root.innerHTML).toBe('');
+  });
+
+  it('construction reads no dep: the root closure is first called on render', () => {
+    // hud.ts builds these painters as field initializers over a bare
+    // querySelector cast, so an eager deps.root() in the constructor would
+    // have thrown for a missing element at HUD construction and bricked the
+    // whole HUD, not just this window.
+    const base = (rig().win as unknown as { deps: WocMarketWindowDeps }).deps;
+    expect(
+      () =>
+        new WocMarketWindow({
+          ...base,
+          root: () => {
+            throw new Error('deps.root() read before render');
+          },
+        }),
+    ).not.toThrow();
+  });
+
   it('keeps the detail pane scroll on the same listing and resets it on another', async () => {
     const r = rig({
       rows: [listing(1), listing(2, { itemId: EPIC_TWO, item: { itemId: EPIC_TWO, count: 1 } })],
@@ -829,6 +942,79 @@ describe('WocMarketWindow live rig: tabs, rebuild, focus and scroll', () => {
     r.win.render();
     expect(q<HTMLElement>(r.root, '.wm-body').scrollTop).toBe(120);
     q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="activity"]').click();
+    expect(q<HTMLElement>(r.root, '.wm-body').scrollTop).toBe(0);
+  });
+
+  it('keeps the body offset when the focused row itself leaves the list (no rung to land on)', async () => {
+    // The live case behind this pin: every row's Open button carries its own
+    // focus key (wm-row-<id>), so a player reading a scrolled list with a row
+    // focused, whose listing then sells or ends, has the poll rebuild the
+    // table WITHOUT that row. No rung exists to focus, so no focus() ran and
+    // nothing scrolled the pane: the kept offset must come back. Spelling the
+    // degrade as "landed anywhere else" read this as degraded too and dropped
+    // the offset, a jump to the top the base never had. Keyboard focus is the
+    // premise: a mouse click parks focus on the dialog root (pointer_blur),
+    // which focusedWithin refuses, so that arm carries no key at all and the
+    // offset survives through the focusKey === null path instead.
+    const r = rig({ rows: [listing(1), listing(2)] });
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '[data-focus-key="wm-row-1"]').focus();
+    q<HTMLElement>(r.root, '.wm-body').scrollTop = 120;
+    r.fake.answers.browse = async () => ({
+      ok: true,
+      hasMore: false,
+      page: 0,
+      listings: [listing(2)],
+    });
+    // Step past the poll's cadence throttle, then two ticks: the poll only
+    // MUTATES on the first, the second's digest compare is the rebuild.
+    (r.win as unknown as { pollStartedMs: number }).pollStartedMs = 0;
+    r.win.refreshIfChanged();
+    await flush();
+    r.win.refreshIfChanged();
+    await flush();
+    // The positive control: the table really was rebuilt without the row, and
+    // nothing inside the window took focus in its place (the nowhere landing).
+    expect(r.root.querySelector('[data-focus-key="wm-row-1"]')).toBeNull();
+    expect(r.root.querySelectorAll('.wm-row').length).toBe(1);
+    expect(r.root.contains(document.activeElement)).toBe(false);
+    expect(q<HTMLElement>(r.root, '.wm-body').scrollTop).toBe(120);
+  });
+
+  it('drops the kept offset only when the focus ladder degrades to another rung', async () => {
+    // The order-independent half of the scroll-after-focus contract. A
+    // page-next that lands on the last page rebuilds its own button disabled
+    // and the ladder falls to prev, a control the player may not be looking
+    // at: its bare focus() scroll (real browsers; happy-dom models none) has
+    // to stay visible (WCAG 2.4.11), so the write-back skips itself. The
+    // same-rung page turn before it is the control: there the offset survives.
+    const r = rig();
+    r.fake.answers.browse = async () => ({
+      ok: true,
+      hasMore: true,
+      page: 0,
+      listings: [listing(1)],
+    });
+    r.win.open();
+    await flush();
+    const next = q<HTMLButtonElement>(r.root, 'button[data-action="page-next"]');
+    next.focus();
+    q<HTMLElement>(r.root, '.wm-body').scrollTop = 120;
+    next.click();
+    await flush();
+    const rebuiltNext = q<HTMLButtonElement>(r.root, 'button[data-action="page-next"]');
+    expect(document.activeElement).toBe(rebuiltNext);
+    expect(q<HTMLElement>(r.root, '.wm-body').scrollTop).toBe(120);
+    r.fake.answers.browse = async () => ({
+      ok: true,
+      hasMore: false,
+      page: 1,
+      listings: [listing(1)],
+    });
+    rebuiltNext.click();
+    await flush();
+    expect(document.activeElement).toBe(q(r.root, 'button[data-action="page-prev"]'));
     expect(q<HTMLElement>(r.root, '.wm-body').scrollTop).toBe(0);
   });
 
@@ -1542,5 +1728,53 @@ describe('WocMarketWindow live rig: resolved disclosure figures and the select s
     expect(caption).toContain(t('hudChrome.wocMarket.sellEmptyFloor', { floor: 'Epic' }));
     expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesMounts'));
     expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesChromas'));
+  });
+});
+
+describe('WocMarketWindow live rig: the reconnect wallet card can be hidden', () => {
+  it('a tap on the glyph drops the card, keeps focus in the window, persists, and the card returns on a state change', async () => {
+    setWalletUiEnabled(true);
+    // The phone reading of a desktop-linked account: linked, nothing connected.
+    setWalletConnectionAddresses('linked', null);
+    const r = rig({ walletLinked: true });
+    r.win.open();
+    await flush();
+    const card = q<HTMLElement>(r.root, '.wm-banner-wallet');
+    expect(card.getAttribute('data-wallet-kind')).toBe('linked_disconnected');
+    const dismiss = q<HTMLButtonElement>(card, 'button[data-action="dismiss-wallet-card"]');
+    expect(dismiss.getAttribute('aria-label')).toBe(t('hudChrome.wocMarket.walletCardDismiss'));
+    dismiss.focus();
+    dismiss.click();
+    // The real click handler drove the real rebuild: no card, focus on the
+    // selected tab (the glyph removed itself), and the choice persisted.
+    expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();
+    expect(r.root.querySelector('#woc-market-panel')).not.toBeNull();
+    expect(document.activeElement).toBe(q(r.root, '.wm-tab-selected'));
+    expect(localStorage.getItem(WOC_WALLET_CARD_DISMISS_KEY)).toBe('linked_disconnected');
+    // Still hidden across the wallet fan-out while the kind is unchanged.
+    r.win.onWalletChanged();
+    expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();
+    // The wallet connects: a different kind, so the card is back, as the
+    // Manage card, which offers no glyph of its own.
+    setWalletConnectionAddresses('linked', 'linked');
+    r.win.onWalletChanged();
+    const back = q<HTMLElement>(r.root, '.wm-banner-wallet');
+    expect(back.getAttribute('data-wallet-kind')).toBe('linked_connected');
+    expect(back.querySelector('button[data-action="dismiss-wallet-card"]')).toBeNull();
+    expect(q(back, 'button[data-action="connect-wallet"]').textContent).toBe(
+      t('hudChrome.wocStore.wallet.manage'),
+    );
+  });
+
+  it('a persisted dismissal hides the card from the first paint of a new window', async () => {
+    setWalletUiEnabled(true);
+    setWalletConnectionAddresses('linked', null);
+    localStorage.setItem(WOC_WALLET_CARD_DISMISS_KEY, 'linked_disconnected');
+    const r = rig({ walletLinked: true });
+    r.win.open();
+    await flush();
+    expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();
+    // Browse itself is untouched: the filters still lead the panel.
+    expect(r.root.querySelector('#woc-market-panel .wm-browse select')).not.toBeNull();
   });
 });

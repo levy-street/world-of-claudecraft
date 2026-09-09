@@ -6,20 +6,21 @@ import { QUESTS } from '../../../sim/data';
 import type { QuestObjectiveRef } from '../../../sim/quest_targets';
 import { questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
-import { stationNameText } from '../../crafting_window';
 import { tEntity } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { gatherNodeTooltipHtml } from '../../gather_node_tooltip_controller';
-import { buildGatherNodeTooltip } from '../../gathering_view';
 import { formatNumber, t } from '../../i18n';
 import { type MapGatherTipMemo, resolveGatherTipMemo } from '../../map_gather_tip_memo';
 import type {
+  MapFarmPatchMarker,
   MapGatherNodeMarker,
   MapNpcMarker,
   MapServiceMarker,
   MapStationMarker,
 } from '../../map_window_view';
 import { questMarkerTooltipTag } from '../../quest_marker_tags';
+import { stationNameText } from '../professions/crafting_window';
+import { buildGatherNodeTooltip } from '../professions/gathering_view';
 
 function questTitle(questId: string): string {
   return tEntity({ kind: 'quest', id: questId, field: 'title' });
@@ -80,6 +81,13 @@ export class MapMarkerTooltipContent {
     const key =
       marker.kind === 'mailbox' ? 'worldContent.mailboxName' : 'worldContent.noticeboardName';
     return `<div class="tt-title">${esc(t(key))}</div>`;
+  }
+
+  // Every farming patch is the same kind of place, one per farming hub, so the
+  // pin needs no per-site name: the zone map is already zone-scoped, which is
+  // what tells the four sites apart. Same shape as service() above.
+  farm(_marker: MapFarmPatchMarker): string {
+    return `<div class="tt-title">${esc(t('worldContent.farmPatchName'))}</div>`;
   }
 
   navigation(text: string): string {

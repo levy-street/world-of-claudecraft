@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   actionBarBindEnter,
+  actionBarBindPrompt,
   actionBarBindResolveCapture,
   actionBarBindSelectSlot,
   actionBarBindStatus,
@@ -47,5 +48,22 @@ describe('actionBarBindResolveCapture', () => {
     const state = actionBarBindResolveCapture(null);
     expect(state).toEqual({ selectedSlot: null, lastBoundKeyLabel: null });
     expect(actionBarBindStatus(state)).toBe('idle');
+  });
+});
+
+describe('actionBarBindPrompt', () => {
+  it('binds silently when the key is free, whether or not the slot already had one', () => {
+    expect(actionBarBindPrompt({ key: 'R', other: null, slot: 'Fireball' })).toBeNull();
+    expect(actionBarBindPrompt({ key: 'R', other: null, slot: 'Slot 4' })).toBeNull();
+  });
+
+  it('warns with the conflict prompt when the pressed key is already in use elsewhere', () => {
+    expect(actionBarBindPrompt({ key: 'R', other: 'Toggle Autorun', slot: 'Fireball' })).toEqual({
+      titleKey: 'hudChrome.actionBar.conflictTitle',
+      bodyKey: 'hudChrome.actionBar.conflictBody',
+      acceptKey: 'hudChrome.actionBar.conflictAccept',
+      cancelKey: 'hudChrome.actionBar.cancel',
+      params: { key: 'R', other: 'Toggle Autorun', action: 'Fireball' },
+    });
   });
 });

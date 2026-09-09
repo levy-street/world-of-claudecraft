@@ -291,9 +291,26 @@ describe('talent production save migrations', () => {
     expect(first.level).toBe(20);
     expect(first.xp).toBe(173);
     expect(first.copper).toBe(9876);
-    expect(first.inventory).toEqual(fixture.state.inventory);
+    // wolf_fang is a gathering material: the legacy `instance.signer` legacy
+    // stack now loads as a `materialSources` composition, source-keyed on the
+    // same signer, rather than an `instance` payload.
+    expect(first.inventory).toEqual([
+      { itemId: 'baked_bread', count: 4 },
+      {
+        itemId: 'wolf_fang',
+        count: 9,
+        materialSources: [{ source: { signer: 'Fixture' }, count: 9 }],
+      },
+    ]);
     expect(first.bags).toEqual(fixture.state.bags);
-    expect(first.bank).toEqual(fixture.state.bank);
+    // linen_scrap is likewise a material: the fixture's anonymous bank stock
+    // loads with the same explicit `materialSources` composition, the rest of
+    // the bank block (slot counts) unchanged.
+    expect(first.bank).toEqual({
+      inventory: [{ itemId: 'linen_scrap', count: 7, materialSources: [{ source: {}, count: 7 }] }],
+      purchasedSlots: 6,
+      bonusSlots: 2,
+    });
     expect(first.equipment).toEqual(fixture.state.equipment);
     // The fixture's active questLog ids are REAL quests (q_spiders, q_wolves):
     // the load arm prunes unknown active quest ids

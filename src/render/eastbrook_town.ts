@@ -7,13 +7,6 @@ import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import {
-  createEastbrookCivicBeaconState,
-  decorateEastbrookCivicBeaconMaterial,
-  type EastbrookCivicBeaconState,
-  setEastbrookCivicMask,
-  updateEastbrookCivicBeaconMotion,
-} from './eastbrook_civic_beacon';
 import { buildEastbrookHarbor } from './eastbrook_harbor';
 import {
   applyEastbrookTownSurfaceDetail,
@@ -43,6 +36,10 @@ import {
   occluderFadeRecordFor,
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
+import {
+  buildRealmBuilderMonumentBody,
+  buildRealmBuilderMonumentFx,
+} from './realm_builder_monument_fx';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
   newTownPiecewiseReveal,
@@ -75,7 +72,7 @@ const STATIC_REVEAL_KEY = 'eastbrook-town-static';
 const NEW_ASSET_URLS = Object.freeze([
   ...new Set([
     ...EASTBROOK_LAYOUT.buildings.map((building) => building.assetId),
-    EASTBROOK_LAYOUT.civic.wellBeacon.assetId,
+    EASTBROOK_LAYOUT.civic.monument.assetId,
     EASTBROOK_LAYOUT.market.stalls[0].assetId,
     EASTBROOK_LAYOUT.wall.assetId,
   ]),
@@ -92,7 +89,7 @@ const ASSET_INSTANCE_COUNTS = (() => {
     counts[assetUrl] = (counts[assetUrl] ?? 0) + 1;
   };
   for (const building of EASTBROOK_LAYOUT.buildings) add(building.assetId);
-  add(EASTBROOK_LAYOUT.civic.wellBeacon.assetId);
+  add(EASTBROOK_LAYOUT.civic.monument.assetId);
   for (const bench of EASTBROOK_LAYOUT.civic.benches) add(bench.assetId);
   for (const stall of EASTBROOK_LAYOUT.market.stalls) add(stall.assetId);
   for (const fence of EASTBROOK_LAYOUT.fences) add(fence.assetId);
@@ -176,6 +173,15 @@ export interface EastbrookTownView {
   setRevealGate(gate: RevealGateCore | null): void;
   /** The compile roots behind the town's reveal key (the static batches). */
   staticRevealRoots(): readonly THREE.Object3D[];
+  /**
+   * Re-bake the Realm Builder monument's projected name.
+   *
+   * The town is built while the world loads, and online the realm's honour
+   * roll may not have arrived yet; an operator can also name somebody in the
+   * middle of a live session. Either way the plaque has to catch up without a
+   * reload, so the name is a texture this can swap.
+   */
+  setRealmBuilderHonouree(name: string): void;
 }
 
 export interface EastbrookTownDrawStats {
@@ -327,13 +333,12 @@ function prepareTemplates(
     if (cache.has(url)) continue;
     const source = sources.get(url);
     if (!source) throw new Error(`Eastbrook town asset was not preloaded: ${url}`);
-    // Kit buildings (the Galecrest hexb mix) render with their OWN GLB
-    // materials: their color lives in KTX2 palette textures the GPU samples,
-    // which the atlas vertex-color pipeline cannot bake (a compressed image
-    // is not CPU-readable; sampling it crashed the renderer). The raw scene
-    // rides the template cache for buildKitBuilding, and its GLB cache entry
-    // is never released (the clones share its textures).
-    if (isKitBuildingAsset(url)) {
+    // Kit buildings (the Galecrest hexb mix) and the Realm Builder monument
+    // render with their OWN GLB materials (see keepsOwnMaterials). The raw
+    // scene rides the template cache for buildKitBuilding and
+    // buildRealmBuilderMonumentBody, and its GLB cache entry is never released
+    // (the clones share its textures).
+    if (keepsOwnMaterials(url)) {
       const box = new THREE.Box3().setFromObject(source);
       const kitSize = new THREE.Vector3();
       box.getSize(kitSize);
@@ -351,6 +356,20 @@ function prepareTemplates(
 
 function isKitBuildingAsset(url: string): boolean {
   return url.startsWith('/models/biome/');
+}
+
+/**
+ * Assets that keep their OWN GLB materials instead of being baked into the
+ * vertex-colour micro-batch.
+ *
+ * Two different reasons land here. The kit buildings' colour lives in KTX2
+ * palette textures the CPU cannot sample. The Realm Builder monument is a
+ * judgement call: its baked albedo carries the carving that makes it a statue
+ * rather than a shape, and the owner rejected the palette-colour version on
+ * sight, so it draws as its own textured prop.
+ */
+function keepsOwnMaterials(url: string): boolean {
+  return isKitBuildingAsset(url) || url === EASTBROOK_LAYOUT.civic.monument.assetId;
 }
 
 // Kit materials keep their GLB textures; on the Lambert tiers they downgrade
@@ -806,18 +825,6 @@ function addPlacedGeometry(
   if (geometry) out.push(geometry.clone().applyMatrix4(matrix));
 }
 
-function addPlacedCivicEmissiveGeometry(
-  out: THREE.BufferGeometry[],
-  geometry: THREE.BufferGeometry | null,
-  matrix: THREE.Matrix4,
-  selected: boolean,
-): void {
-  if (!geometry) return;
-  const placed = geometry.clone().applyMatrix4(matrix);
-  setEastbrookCivicMask(placed, selected);
-  out.push(placed);
-}
-
 function placementMatrix(
   template: TownAssetTemplate,
   x: number,
@@ -943,7 +950,6 @@ function wallSegmentNeedsMirror(segment: (typeof EASTBROOK_LAYOUT.wall.segments)
 
 interface MicroBatchBuild {
   batches: THREE.Mesh[];
-  civicBeaconState: EastbrookCivicBeaconState;
 }
 
 function buildMicroBatches(
@@ -953,31 +959,17 @@ function buildMicroBatches(
 ): MicroBatchBuild {
   const opaque: THREE.BufferGeometry[] = [];
   const emissive: THREE.BufferGeometry[] = [];
-  const well = EASTBROOK_LAYOUT.civic.wellBeacon;
-  const civicBeaconState = createEastbrookCivicBeaconState(well.position.x, well.position.z);
-  const add = (url: string, matrix: THREE.Matrix4, civic = false): void => {
+  const add = (url: string, matrix: THREE.Matrix4): void => {
     const template = templates.get(url);
     if (!template) throw new Error(`Eastbrook town template is missing: ${url}`);
     addPlacedGeometry(opaque, template.opaque, matrix);
-    addPlacedCivicEmissiveGeometry(emissive, template.emissive, matrix, civic);
+    addPlacedGeometry(emissive, template.emissive, matrix);
   };
 
-  const wellTemplate = templates.get(well.assetId);
-  if (!wellTemplate) throw new Error(`Eastbrook town template is missing: ${well.assetId}`);
-  add(
-    well.assetId,
-    placementMatrix(
-      wellTemplate,
-      well.position.x,
-      groundAt(well.position.x, well.position.z),
-      well.position.z,
-      0,
-      well.nativeDimensions.width,
-      well.nativeDimensions.height,
-      well.nativeDimensions.depth,
-    ),
-    true,
-  );
+  // The monument is NOT in this batch: it keeps its own textured materials and
+  // is built beside the batches by buildRealmBuilderMonumentBody. Nothing else
+  // in the town is selected by the civic emissive mask, so it now selects
+  // nothing at all (see the note on the civic flag in addPlacedCivicEmissiveGeometry).
 
   for (const bench of EASTBROOK_LAYOUT.civic.benches) {
     const template = templates.get(bench.assetId);
@@ -1049,11 +1041,7 @@ function buildMicroBatches(
   }
   const emissiveGeometry = mergeParts(emissive, 'micro emissive batch');
   if (emissiveGeometry) {
-    const material = decorateEastbrookCivicBeaconMaterial(
-      townMaterial(true, atlas, true),
-      civicBeaconState,
-    );
-    const mesh = new THREE.Mesh(emissiveGeometry, material);
+    const mesh = new THREE.Mesh(emissiveGeometry, townMaterial(true, atlas, true));
     mesh.name = 'eastbrookTownMicroEmissiveBatch';
     mesh.userData.eastbrookMicroBatch = 'emissive';
     mesh.userData.neverRoofHideTarget = true;
@@ -1061,7 +1049,7 @@ function buildMicroBatches(
     mesh.receiveShadow = false;
     batches.push(mesh);
   }
-  return { batches, civicBeaconState };
+  return { batches };
 }
 
 interface WallInstancePlacement {
@@ -1196,6 +1184,7 @@ function buildFromTemplates(
       update: () => undefined,
       setRevealGate: () => undefined,
       staticRevealRoots: () => [],
+      setRealmBuilderHonouree: () => undefined,
     };
   }
 
@@ -1223,6 +1212,31 @@ function buildFromTemplates(
   const microBuild = buildMicroBatches(templates, groundAt, atlas);
   const microBatches = microBuild.batches;
   for (const batch of microBatches) group.add(batch);
+  // The monument's living half: the honouree's name projected off both honour
+  // plates, and the lantern halos and embers. Additive and text, which a merged
+  // opaque batch cannot carry, so it is its own small group beside the batches.
+  // The square's centrepiece, drawn beside the batches rather than inside them:
+  // it keeps its own textured materials (keepsOwnMaterials), so the body is a
+  // placed clone of the raw GLB, and the projections and lantern light ride on
+  // top of it.
+  const monumentPlacement = EASTBROOK_LAYOUT.civic.monument;
+  const monumentSeat = {
+    x: monumentPlacement.position.x,
+    z: monumentPlacement.position.z,
+    groundY: groundAt(monumentPlacement.position.x, monumentPlacement.position.z),
+    rotation: monumentPlacement.rotation,
+    nativeWidth: monumentPlacement.nativeDimensions.width,
+    nativeHeight: monumentPlacement.nativeDimensions.height,
+    nativeDepth: monumentPlacement.nativeDimensions.depth,
+  };
+  const monumentTemplate = templates.get(monumentPlacement.assetId);
+  if (!monumentTemplate?.raw) {
+    throw new Error(`Eastbrook town template is missing: ${monumentPlacement.assetId}`);
+  }
+  const monumentBody = buildRealmBuilderMonumentBody(monumentTemplate.raw, monumentSeat);
+  group.add(monumentBody.group);
+  const monumentFx = buildRealmBuilderMonumentFx(monumentSeat);
+  group.add(monumentFx.group);
   const wallTemplate = templates.get(EASTBROOK_LAYOUT.wall.assetId);
   if (!wallTemplate)
     throw new Error(`Eastbrook town template is missing: ${EASTBROOK_LAYOUT.wall.assetId}`);
@@ -1265,7 +1279,7 @@ function buildFromTemplates(
     (batch) => batch.userData.handedness === 'mirrored',
   )?.userData.segmentIds;
   group.userData.microPlacementIds = [
-    EASTBROOK_LAYOUT.civic.wellBeacon.id,
+    EASTBROOK_LAYOUT.civic.monument.id,
     ...EASTBROOK_LAYOUT.civic.benches.map((bench) => bench.id),
     ...EASTBROOK_LAYOUT.market.stalls.map((stall) => stall.id),
     ...EASTBROOK_LAYOUT.fences.map((fence) => fence.id),
@@ -1287,6 +1301,9 @@ function buildFromTemplates(
   const orderedRevealRoots: THREE.Object3D[] = [];
   return {
     group,
+    setRealmBuilderHonouree(name: string): void {
+      monumentFx.setHonouree(name);
+    },
     setRevealGate(gate: RevealGateCore | null): void {
       revealGate = gate;
     },
@@ -1311,7 +1328,15 @@ function buildFromTemplates(
       dt: number,
       reducedMotion = false,
     ): void {
-      updateEastbrookCivicBeaconMotion(microBuild.civicBeaconState, reducedMotion);
+      // One write drives both halves: the body's gold pulse and the effects
+      // read the same reduced-motion scalar, so they can never disagree. The
+      // same call carries the camera's distance to the monument's own point,
+      // which is what swaps the statue for its billboard and drops the
+      // projections and lantern light out at range.
+      monumentBody.reducedMotion.value = reducedMotion ? 1 : 0;
+      const monumentDistance = Math.hypot(camX - monumentSeat.x, camZ - monumentSeat.z);
+      monumentBody.setLod(monumentDistance, camX, camZ);
+      monumentFx.update(reducedMotion, monumentDistance);
       lastCamX = camX;
       lastCamZ = camZ;
       // Eastbrook is centred on the world origin, so the camera's distance
@@ -1408,8 +1433,12 @@ export function isEastbrookRebuildBuilding(building: BuildingDef): boolean {
   );
 }
 
+/** The authored town's own centrepiece record. It still rides the `wells`
+ *  category (a circular civic feature: one collider, one foliage exclusion,
+ *  one map dot), which is what the category has always meant, even though the
+ *  Realm Builder monument replaced the well beacon that named it. */
 export function isEastbrookRebuildWell(well: ZonePropsDef['wells'][number]): boolean {
-  const candidate = EASTBROOK_LAYOUT.civic.wellBeacon;
+  const candidate = EASTBROOK_LAYOUT.civic.monument;
   return (
     sameNumber(candidate.position.x, well.x) &&
     sameNumber(candidate.position.z, well.z) &&
@@ -1494,7 +1523,15 @@ export function eastbrookTownTriangleBudget(
   const maximumFoundationTriangles = EASTBROOK_LAYOUT.buildings.length * 12;
   const maximumRuntimeTriangles = assetTriangles + maximumFoundationTriangles;
   const hardCeiling = 40_000;
-  const target = 30_000;
+  // Round 8 (owner): raised 30,000 to 33,000 to pay for the Realm Builder
+  // monument at full sculpt resolution and double size. The earlier pass
+  // collapse-decimated the statue to 45 percent to fit under 30,000, and the
+  // owner rejected the result on sight: at the size players read it from, the
+  // face and beard went to putty. A target is a budget, not a law of physics,
+  // and this is the town's one hero prop; the HARD CEILING is untouched, so
+  // the headroom that actually protects the frame is unchanged. Everything
+  // else in this town still has to earn its triangles against the new figure.
+  const target = 33_000;
   return {
     assetTriangles,
     maximumFoundationTriangles,

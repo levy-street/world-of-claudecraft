@@ -168,19 +168,14 @@ describe('cosmetic skin-select event', () => {
     expect(sim.accountCosmetics.mechChromaIds).toEqual(['amber_crimson']);
     expect(sim.player.skin).toBe(0);
     expect(sim.player.skinCatalog).toBe('class');
-    // The equip consumed the plate, so unequipping hands the tradable copy
-    // back (issue #3680): the item round-trips while the unlock stays put.
-    expect(sim.countItem('amber_crimson_armor_plate')).toBe(1);
+    // Nothing is minted back: the look was never itemized to begin with, and
+    // re-equipping should never require a fresh copy of the plate.
+    expect(sim.countItem('amber_crimson_armor_plate')).toBe(0);
 
     // Re-equipping needs no item at all: the account already owns the look.
     sim.changeSkin(0, 'mech');
     expect(sim.player.skin).toBe(0);
     expect(sim.player.skinCatalog).toBe('mech');
-
-    // And that free display-only re-equip carries no plate: a second unequip
-    // mints nothing (the #3437 duplicate-minting exploit stays closed).
-    expect(sim.unequipMechChroma('amber_crimson')).toBe(true);
-    expect(sim.countItem('amber_crimson_armor_plate')).toBe(1);
   });
 
   it('the mech cosmetic plate is non-vendorable, non-discardable, non-marketable', () => {
@@ -219,6 +214,7 @@ describe('cosmetic skin-select event', () => {
         mechChromaIds: [chroma.id],
         weaponSkinIds: [],
         weaponSkinLoadout: {},
+        mountSkinIds: [],
       };
       sim.setPlayerSkin(sim.playerId, skin, 'mech');
 
@@ -226,8 +222,7 @@ describe('cosmetic skin-select event', () => {
       // The unlock survives the unequip, for every chroma in the catalog.
       expect(sim.accountCosmetics.mechChromaIds).toContain(chroma.id);
       expect(sim.player.skinCatalog).toBe('class');
-      // A display-only wear (seeded here via setPlayerSkin, no item consumed)
-      // carries no plate custody, so no item is minted for any chroma.
+      // No item is minted for any chroma: the look is never itemized.
       expect(sim.countItem(expectDefined(itemId))).toBe(0);
 
       // Free re-equip: the unlock alone gates it, no item spent.

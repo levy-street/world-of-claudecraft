@@ -5,11 +5,13 @@ import {
   NORMAL_DUNGEON_TUNING,
 } from '../content/dungeon_difficulty';
 import { MOBS } from '../data';
+import { IGNIVAR_LIFT_ROOM_ID } from '../ignivar_raid_ids';
 import type { DungeonDifficulty, Entity, MobTemplate } from '../types';
 
 export const HEROIC_DUNGEON_IDS = new Set([
   ...Object.keys(HEROIC_DUNGEON_TUNING),
   ...Object.keys(HEROIC_MOB_TUNING),
+  IGNIVAR_LIFT_ROOM_ID,
 ]);
 
 function heroicMobTuningFor(dungeonId: string): HeroicMobTuning | undefined {
@@ -54,10 +56,11 @@ export function mobTemplateForDungeonDifficulty(
     const normal = NORMAL_DUNGEON_TUNING[dungeonId];
     if (!normal) return template;
     const dmgMult = normal.damageMultiplierByMob[template.id] ?? 1;
+    const hpMult = normal.healthMultiplierByMob?.[template.id] ?? normal.healthMultiplier;
     return {
       ...template,
-      hpBase: template.hpBase * normal.healthMultiplier,
-      hpPerLevel: template.hpPerLevel * normal.healthMultiplier,
+      hpBase: template.hpBase * hpMult,
+      hpPerLevel: template.hpPerLevel * hpMult,
       dmgBase: template.dmgBase * dmgMult,
       dmgPerLevel: template.dmgPerLevel * dmgMult,
     };

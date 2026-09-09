@@ -20,6 +20,14 @@ vi.mock('../../server/db', () => ({
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
+  })),
+  grantAccountMountSkins: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
+    mountSkinIds: [],
   })),
   moderationStatusForAccount: vi.fn(),
   scopeAllowsMutation: vi.fn(() => true),
@@ -46,6 +54,7 @@ const storagePurchase = vi.fn(async () => ({
   reason: null as string | null,
 }));
 const grantWeaponSkins = vi.fn();
+const grantMountSkins = vi.fn();
 
 function responseJson(res: FakeRes): unknown {
   return JSON.parse(res.body);
@@ -84,7 +93,7 @@ describe('the storage kind gates', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetClaudiumMutationRateLimits();
-    configureClaudiumRuntime({ grantWeaponSkins, storagePurchase });
+    configureClaudiumRuntime({ grantWeaponSkins, grantMountSkins, storagePurchase });
   });
 
   it('forwards an allowlisted storage spend to the purchase flow verbatim', async () => {

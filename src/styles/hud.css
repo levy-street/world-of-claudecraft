@@ -611,6 +611,89 @@
     line-height: 1.45;
     color: #d8d0bc;
   }
+  /* The Realm Builder honour roll (realm_builder_popup.ts): the same tutorial
+     card chrome as the signpost popup above, with the current honouree set
+     apart in gold at the top and the past roll scrolling underneath. */
+  .tut-card.rb-popup {
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 380px;
+    animation: none;
+  }
+  .rb-current {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border: 1px solid #d4a23c40;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #d4a23c1a, #00000022);
+    text-align: center;
+  }
+  .rb-label,
+  .rb-past-title {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #b6ab93;
+  }
+  .rb-past-title {
+    margin-top: 12px;
+  }
+  .rb-name {
+    margin-top: 4px;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--gold);
+    text-shadow: 0 0 10px #d4a23c55;
+  }
+  .rb-month {
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: #d8d0bc;
+  }
+  .rb-hint {
+    margin-top: 6px;
+    font-size: 12px;
+    font-style: italic;
+    line-height: 1.4;
+    color: #a49a86;
+  }
+  .rb-list {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: calc(var(--app-vh, 100vh) * 0.34);
+    overflow-y: auto;
+  }
+  .rb-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #ffffff14;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #00000022;
+  }
+  .rb-item-month {
+    flex: 0 0 auto;
+    font-size: 11.5px;
+    color: #b6ab93;
+  }
+  .rb-item-name {
+    flex: 1 1 auto;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .rb-empty {
+    padding: 8px 2px;
+    font-size: 12.5px;
+    font-style: italic;
+    color: #a49a86;
+  }
   .tut-arrow {
     position: absolute;
     left: 0;
@@ -888,7 +971,7 @@
     margin-bottom: 3px;
     pointer-events: none;
   }
-  .warlock-doom-frame.doom-detached {
+  .warlock-doom-frame.hud-frame-detached {
     position: absolute;
     z-index: 21;
     width: 300px;
@@ -1251,8 +1334,12 @@
     margin: 0 auto;
     padding-left: var(--unit-frame-content-inset);
   }
+  /* relative, not static: the docked bar stays an ordinary flex item but is
+     a containing block for its movable-frame chrome (corner button, grip,
+     name chip; the frame is HUD_FRAME_SPECS row 'petBar'). A static bar hung
+     that chrome off #actionbar-stack instead. */
   #pet-cluster > #petbar {
-    position: static;
+    position: relative;
     margin-bottom: 4px;
   }
   /* The health half of the cluster. Hidden until the player actually has a pet; the
@@ -1465,9 +1552,7 @@
   body.target-frame-dragging,
   body.target-frame-dragging *,
   body.player-frame-dragging,
-  body.player-frame-dragging *,
-  body.warlock-doom-frame-dragging,
-  body.warlock-doom-frame-dragging * {
+  body.player-frame-dragging * {
     user-select: none;
   }
   body.mobile-touch .unitframe .tf-move-btn,
@@ -1492,14 +1577,73 @@
   #side-buttons.tf-unlocked,
   #minimap-wrap.tf-unlocked,
   #pet-frame.tf-unlocked,
+  #petbar.tf-unlocked,
   #stancebar.tf-unlocked,
   #xpbar.tf-unlocked,
   #buff-bar.tf-unlocked,
-  #debuff-bar.tf-unlocked {
+  #debuff-bar.tf-unlocked,
+  #aura-track-defensives.tf-unlocked,
+  #aura-track-self.tf-unlocked,
+  #aura-track-power.tf-unlocked,
+  #aura-track-utility.tf-unlocked,
+  #aura-track-friendly.tf-unlocked,
+  #aura-track-shields.tf-unlocked,
+  #target-dots.tf-unlocked,
+  #quest-tracker.tf-unlocked,
+  #deed-tracker.tf-unlocked,
+  #reliquary-tracker.tf-unlocked,
+  #delve-tracker.tf-unlocked,
+  #rift-tracker.tf-unlocked,
+  .gathering-goal-panel.tf-unlocked,
+  #swingbar-offhand.tf-unlocked,
+  #paladin-devotion-frame.tf-unlocked,
+  #proc-overlay.tf-unlocked,
+  #meters-window.tf-unlocked {
     cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: -1px;
     touch-action: none;
+  }
+  /* The trackers, the devotion medallion and the proc overlay are
+     click-through while locked (their roots carry pointer-events: none so the
+     world stays clickable behind them), so arranging has to switch events
+     back on, the doom meter's own rule above. */
+  #quest-tracker.tf-unlocked,
+  #deed-tracker.tf-unlocked,
+  #reliquary-tracker.tf-unlocked,
+  #delve-tracker.tf-unlocked,
+  #rift-tracker.tf-unlocked,
+  #paladin-devotion-frame.tf-unlocked,
+  #proc-overlay.tf-unlocked {
+    pointer-events: auto;
+  }
+  /* The Target dots tracker and the six aura tracks are click-through in play
+     too (they sit over the world and must never eat a click meant for a mob),
+     so the unlock mode has to hand their pointer events back or the frames
+     could not be dragged. Each is also hidden whenever it has no rows, so
+     editing forces the placeholder visible. */
+  #aura-track-defensives.tf-unlocked,
+  #aura-track-self.tf-unlocked,
+  #aura-track-power.tf-unlocked,
+  #aura-track-utility.tf-unlocked,
+  #aura-track-friendly.tf-unlocked,
+  #aura-track-shields.tf-unlocked,
+  #target-dots.tf-unlocked {
+    display: flex !important;
+    min-height: 34px;
+    pointer-events: auto;
+  }
+  /* The two warlock proc states (the Soul Fragment bank and the Wrack
+     ritual, whose art is always on) RE-ASSERT the click-through on their own
+     later rules at the same id+class specificity, so the plain unlock
+     hand-back above loses the order tie for exactly those two specs and the
+     mover's pointerdown never fires. These state-qualified selectors outrank
+     them, so a demonology or destruction warlock can drag the frame like
+     everyone else. (Prose here names no selector-plus-brace pattern: the
+     guard regexes scan comments too.) */
+  #proc-overlay.necromancy.tf-unlocked,
+  #proc-overlay.destruction.tf-unlocked {
+    pointer-events: auto;
   }
   /* The corner button and grip need a positioned host to hang off. Only the
      action bars lack one: the cast bar, the menu rail and the minimap wrap are
@@ -1524,13 +1668,31 @@
   #actionbar2.hud-frame-detached,
   #actionbar3.hud-frame-detached,
   #pet-frame.hud-frame-detached,
+  #petbar.hud-frame-detached,
   #stancebar.hud-frame-detached,
   #xpbar.hud-frame-detached,
   #buff-bar.hud-frame-detached,
-  #debuff-bar.hud-frame-detached {
+  #debuff-bar.hud-frame-detached,
+  #quest-tracker.hud-frame-detached,
+  #deed-tracker.hud-frame-detached,
+  #reliquary-tracker.hud-frame-detached,
+  #delve-tracker.hud-frame-detached,
+  #rift-tracker.hud-frame-detached,
+  .gathering-goal-panel.hud-frame-detached {
     position: absolute;
     margin: 0;
     z-index: 20;
+  }
+  /* A tracker re-homed onto #ui keeps the stack's column width: its docked
+     width: 100% resolved against #right-tracker-stack's 240px, and against
+     #ui it would span the whole screen. */
+  #quest-tracker.hud-frame-detached,
+  #deed-tracker.hud-frame-detached,
+  #reliquary-tracker.hud-frame-detached,
+  #delve-tracker.hud-frame-detached,
+  #rift-tracker.hud-frame-detached,
+  .gathering-goal-panel.hud-frame-detached {
+    width: 240px;
   }
   #actionbar .tf-move-btn,
   #actionbar2 .tf-move-btn,
@@ -1539,10 +1701,21 @@
   #side-buttons .tf-move-btn,
   #minimap-wrap .tf-move-btn,
   #pet-frame .tf-move-btn,
+  #petbar .tf-move-btn,
   #stancebar .tf-move-btn,
   #xpbar .tf-move-btn,
   #buff-bar .tf-move-btn,
   #debuff-bar .tf-move-btn,
+  #quest-tracker .tf-move-btn,
+  #deed-tracker .tf-move-btn,
+  #reliquary-tracker .tf-move-btn,
+  #delve-tracker .tf-move-btn,
+  #rift-tracker .tf-move-btn,
+  .gathering-goal-panel .tf-move-btn,
+  #swingbar-offhand .tf-move-btn,
+  #paladin-devotion-frame .tf-move-btn,
+  #proc-overlay .tf-move-btn,
+  #meters-window .tf-move-btn,
   #chatlog-wrap .chat-move-btn {
     position: absolute;
     top: -10px;
@@ -1568,6 +1741,17 @@
   #xpbar .tf-move-btn:focus-visible,
   #buff-bar .tf-move-btn:focus-visible,
   #debuff-bar .tf-move-btn:focus-visible,
+  #quest-tracker .tf-move-btn:focus-visible,
+  #deed-tracker .tf-move-btn:focus-visible,
+  #reliquary-tracker .tf-move-btn:focus-visible,
+  #delve-tracker .tf-move-btn:focus-visible,
+  #rift-tracker .tf-move-btn:focus-visible,
+  .gathering-goal-panel .tf-move-btn:focus-visible,
+  #swingbar-offhand .tf-move-btn:focus-visible,
+  #paladin-devotion-frame .tf-move-btn:focus-visible,
+  #petbar .tf-move-btn:focus-visible,
+  #proc-overlay .tf-move-btn:focus-visible,
+  #meters-window .tf-move-btn:focus-visible,
   #chatlog-wrap .chat-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
@@ -1684,7 +1868,8 @@
      inline value beats an ordinary rule. A real cast repaints over the top of
      this, so it never suppresses live cast information. */
   body.interface-unlocked #castbar,
-  body.interface-unlocked #swingbar {
+  body.interface-unlocked #swingbar,
+  body.interface-unlocked #swingbar-offhand {
     display: block !important;
     opacity: 0.55;
   }
@@ -1701,9 +1886,25 @@
      points at the plus/minus buttons for turning more on. */
   body.interface-unlocked #target-frame.tf-unlocked,
   body.interface-unlocked #pet-frame.tf-unlocked,
-  body.interface-unlocked #stancebar.tf-unlocked {
+  body.interface-unlocked #petbar.tf-unlocked,
+  body.interface-unlocked #stancebar.tf-unlocked,
+  body.interface-unlocked #paladin-devotion-frame.tf-unlocked,
+  body.interface-unlocked .warlock-doom-frame.tf-unlocked {
     display: flex !important;
     opacity: 0.55;
+  }
+  /* The trackers are block flow (and an empty docked one is folded away by
+     the stack's :empty rule), so their placeholders force block display and
+     keep a graspable minimum box like the stance bar's. */
+  body.interface-unlocked #quest-tracker.tf-unlocked,
+  body.interface-unlocked #deed-tracker.tf-unlocked,
+  body.interface-unlocked #reliquary-tracker.tf-unlocked,
+  body.interface-unlocked #delve-tracker.tf-unlocked,
+  body.interface-unlocked #rift-tracker.tf-unlocked,
+  body.interface-unlocked .gathering-goal-panel.tf-unlocked {
+    display: block !important;
+    opacity: 0.55;
+    min-height: 48px;
   }
   /* A resizable unit frame needs a positioned host for its grip; the three
      already carry one (.unitframe and #party-frames are absolute, #player-frame
@@ -1725,6 +1926,28 @@
   body.interface-unlocked #stancebar.tf-unlocked {
     min-width: 160px;
     min-height: 30px;
+  }
+  /* The pet ACTION bar's placeholder: with no pet out its button groups are
+     wiped, so the graspable minimum matches a two-group bar's footprint. */
+  body.interface-unlocked #petbar.tf-unlocked {
+    min-width: 200px;
+    min-height: 44px;
+  }
+  /* The tabbed damage window is usually CLOSED (inline display: none written
+     by its toggle), so its placeholder forces the framed column shape; its
+     title bar and tabs are the sample content. */
+  body.interface-unlocked #meters-window.tf-unlocked {
+    display: flex !important;
+    flex-direction: column;
+    opacity: 0.55;
+    min-height: 140px;
+  }
+  /* The proc overlay hides through OPACITY, not display (a 0.7s burn-out
+     fade), so its placeholder brightens rather than un-hiding: the warlock
+     states paint their art continuously and the mage side gets the preview
+     bird from the unlock hook in hud.ts. */
+  body.interface-unlocked #proc-overlay.tf-unlocked {
+    opacity: 0.55;
   }
   /* The arrange-mode name chip: which frame is which, sitting just ABOVE the
      frame so it never covers the frame's own contents. A frame parked against
@@ -1764,7 +1987,8 @@
      placeholders, so letting them spill costs nothing. */
   body.interface-unlocked #xpbar.tf-unlocked,
   body.interface-unlocked #castbar.tf-unlocked,
-  body.interface-unlocked #swingbar.tf-unlocked {
+  body.interface-unlocked #swingbar.tf-unlocked,
+  body.interface-unlocked #swingbar-offhand.tf-unlocked {
     overflow: visible;
   }
   /* While unlocked a frame's CONTENTS are a static picture: pointer-inert so a
@@ -1877,47 +2101,10 @@
   body.interface-unlocked #party-frames > .party-rows {
     display: none;
   }
-  .tf-preview-unit {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-  }
-  .tf-preview-portrait {
-    width: 26px;
-    height: 26px;
-    flex: none;
-    border: 1px solid var(--gold);
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #3a3a4c, #15151f);
-  }
-  .tf-preview-bars {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-  .tf-preview-name {
-    font-size: 10px;
-    line-height: 12px;
-    color: #fff0d0;
-    text-shadow: 1px 1px 1px #000;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  .tf-preview-hp {
-    height: 8px;
-    width: 78%;
-    border-radius: 2px;
-    background: linear-gradient(#7ddb8a, #2e8f3e 60%, #1d5c28);
-  }
-  .tf-preview-mp {
-    height: 5px;
-    width: 62%;
-    border-radius: 2px;
-    background: linear-gradient(#8fb6e6, #3d6ea8 60%, #274a74);
-  }
+  /* The generic .tf-preview-unit portrait/hp/mp mock retired with the pet
+     frame's sample: like the target frame, its placeholder shows the REAL
+     unit-frame chrome, and the mock read as a second fake frame on top
+     (owner feedback). */
   /* The filled cast/swing samples: a fill under the frame's own label layer. */
   .tf-preview-bar {
     inset: 0;
@@ -1973,6 +2160,30 @@
         #c9a54528 0 1px,
         transparent 1px calc(16px / var(--ui-scale, 1))
       );
+  }
+  /* Screen centerlines while the grid is up: one vertical and one horizontal
+     bar through the middle, brighter than the grid lines, so centering a
+     frame on the screen is a sight line rather than a count of grid cells.
+     Children of the overlay, so they ride the same hidden gate; the 2px
+     thickness divides by the UI scale like the grid pitch above, and the
+     50% midpoint is scale-invariant. */
+  #interface-grid-overlay::before,
+  #interface-grid-overlay::after {
+    content: "";
+    position: absolute;
+    background: #c9a54573;
+  }
+  #interface-grid-overlay::before {
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 1px / var(--ui-scale, 1));
+    width: calc(2px / var(--ui-scale, 1));
+  }
+  #interface-grid-overlay::after {
+    left: 0;
+    right: 0;
+    top: calc(50% - 1px / var(--ui-scale, 1));
+    height: calc(2px / var(--ui-scale, 1));
   }
   #interface-edit-controls {
     position: absolute;
@@ -2569,6 +2780,11 @@
     box-shadow: 0 0 calc(5px * var(--fx-shadow, 1)) #ff5533aa;
     border-color: #ffad99;
   }
+  /* The devotion medallion is a governed HUD frame (HUD_FRAME_SPECS row
+     'paladinDevotion'): pointer-inert while locked so it never eats a world
+     click, and the .tf-unlocked rules below re-enable it for arranging. The
+     centering translate is the stock seat only; a custom position writes
+     left/top from the top-left corner, so the detached state drops it. */
   .paladin-devotion-frame {
     position: fixed;
     left: 50%;
@@ -2580,11 +2796,11 @@
     align-items: center;
     justify-content: center;
     translate: -50% -50%;
-    cursor: grab;
-    touch-action: none;
+    pointer-events: none;
   }
-  .paladin-devotion-frame.dragging {
-    cursor: grabbing;
+  .paladin-devotion-frame.hud-frame-detached,
+  #proc-overlay.hud-frame-detached {
+    translate: none;
   }
   .paladin-devotion {
     --devotion-scale: 0;
@@ -2872,10 +3088,33 @@
   }
 
   /* ---------- buff bar ---------- */
-  #buff-bar {
+  /* The two player aura strips share ONE column (classic layout: debuffs beneath
+     buffs). They used to be two independently absolute strips at fixed `top`
+     offsets, which cannot hold: each icon's duration label hangs 13px BELOW the
+     icon and out of flow, so a 28px icon really occupies 41px, and the buff strip
+     wraps to a second row as soon as the player carries more buffs than fit the
+     max-width. Any constant gap is then wrong at some buff count, and on the
+     mobile offsets it was wrong at the very first wrap: the second buff row landed
+     on top of the debuff row and hid its own duration labels behind the debuff
+     icons. Stacking them in a flex column makes the clearance a consequence of
+     flow rather than a number to maintain, at every wrap count and viewport. */
+  #aura-stack {
     position: absolute;
     right: 196px;
     top: 14px;
+    display: flex;
+    flex-direction: column;
+    /* Shrink-to-fit rows whose RIGHT edge pins to the stack's anchor, matching the
+       old `right`-anchored absolute strips. Wrapping still happens at max-width. */
+    align-items: flex-end;
+    /* Clears the last buff row's out-of-flow duration labels (13px) before the
+       debuff row starts, with a little breathing room on top. */
+    gap: 20px;
+    max-width: 320px;
+    /* The column's empty area must not eat clicks; the strips re-enable it. */
+    pointer-events: none;
+  }
+  #buff-bar {
     display: flex;
     /* Icon flow rides the buffsLeftToRight setting (Frames Settings menu):
        stock row-reverse grows right-to-left from the minimap-side anchor;
@@ -2883,31 +3122,35 @@
     flex-direction: var(--buff-bar-direction, row-reverse);
     flex-wrap: wrap;
     gap: 4px;
-    max-width: 320px;
+    /* Wrapped rows need the label band reserved too, or row 2 sits on row 1's
+       durations exactly the way the debuff strip used to. */
+    row-gap: 17px;
+    max-width: 100%;
     pointer-events: auto;
   }
-  /* Debuffs sit in their own row well beneath the buff row (classic layout),
-     level with the minimap's lower edge (the mail badge), so a wrapping wall of
-     raid buffs and their duration labels never crowds the debuff row. */
   #debuff-bar {
-    position: absolute;
-    right: 196px;
-    top: 172px;
     display: flex;
     /* The debuff row's twin of the #buff-bar direction var above
        (debuffsLeftToRight). */
     flex-direction: var(--debuff-bar-direction, row-reverse);
     flex-wrap: wrap;
     gap: 4px;
-    max-width: 320px;
+    row-gap: 17px;
+    max-width: 100%;
     pointer-events: auto;
   }
   /* Buffs on the Player Frame (aurasOnPlayerFrame): hud.ts reparents the BUFF
      row into #player-frame, where it inherits its position and children-zoom
-     scale. Docked, the row sits ABOVE the frame (the xp/action bars live
-     below); moved (pf-detached), it sits BELOW it, reading like the target
-     frame's debuff strip. The row runs left-to-right from the frame's left edge. */
+     scale. It sits ABOVE the frame by default (the xp/action bars live below);
+     the "Buffs Below the Player Frame" setting (auraBarBelowFrame, main.ts)
+     flips it BELOW instead, reading like the target frame's debuff strip. This
+     is keyed on that setting's own body.auras-below-frame class, NEVER on
+     pf-detached: the row must not silently flip sides just because the player
+     dragged the frame somewhere. The row runs left-to-right from the frame's
+     left edge. */
   #player-frame > #buff-bar {
+    /* Re-asserted: out of the stack the row is absolute against the frame again. */
+    position: absolute;
     right: auto;
     left: 0;
     top: auto;
@@ -2915,16 +3158,36 @@
     flex-direction: row;
     max-width: 100%;
   }
-  #player-frame.pf-detached > #buff-bar {
+  body.auras-below-frame #player-frame > #buff-bar {
     bottom: auto;
     top: calc(100% + 8px);
   }
-  /* With the buff row anchored to the frame, the player's own debuffs slide up
-     beside the minimap into the vacated top spot (classic WoW's debuff corner),
-     keeping the right-to-left stacking and wrapping downward from there. */
-  body.auras-on-frame #debuff-bar {
-    top: 14px;
+  /* Docked (never dragged) + buffs-below is a combination this fix newly makes
+     reachable: before, "below" only ever coexisted with pf-detached, which
+     already carries z-index: 6. Docked #player-frame has no z-index of its
+     own, so the flipped icon (sitting right at the frame's bottom edge, flush
+     with #actionbar's top) painted BEHIND the action bar's buttons in plain
+     DOM order. The row itself (not the whole frame, which would needlessly
+     hoist the portrait/bars into a new stacking context too) gets the same
+     z-index pf-detached uses, keeping the icon fully visible regardless of
+     whether the frame has ever been moved. There is no room in the docked 8px
+     gap to clear the action bar's first slot entirely without reflowing
+     #actionbar-stack, so this deliberately favors the buff staying READABLE
+     over the slot staying visually uncovered; pointer-events: none right
+     below hands clicks in that overlap through to the action button, which is
+     the more safety-critical of the two (a player acts on it, a buff read is
+     glanceable from its still-visible art/duration). */
+  body.auras-on-frame.auras-below-frame #player-frame > #buff-bar {
+    z-index: 6;
+    pointer-events: none;
   }
+  body.auras-on-frame.auras-below-frame #player-frame.pf-detached > #buff-bar {
+    pointer-events: auto;
+  }
+  /* With the buff row reparented onto the player frame, the debuff row is the only
+     child left in the stack, so it rises to the stack's top on its own (classic
+     WoW's debuff corner). That used to need a `body.auras-on-frame #debuff-bar`
+     top override; flow does it now, and the override is gone. */
   /* Party member mini aura strip: overlay the compact icons so gaining or losing
      an aura never changes frame height or shifts the surrounding raid grid. */
   .party-frame .pfm-auras {
@@ -3075,6 +3338,340 @@
     background: rgba(8, 8, 12, 0.92);
     border: 1px solid var(--color-debuff);
     border-radius: 7px;
+  }
+
+  /* ---------- target dots ---------- */
+  /* The multi-target dot tracker (#target-dots): one bar row per debuff the local
+     player has out, across every enemy in range. A movable HUD frame
+     (HUD_FRAME_SPECS row targetDots), seated left of centre by default so it sits
+     in the eye's path between the world and the action bars without covering
+     either. The painter sets display:none whenever the list is empty, so an
+     empty box never floats over the world. */
+  #target-dots {
+    position: absolute;
+    left: 18px;
+    top: 34%;
+    z-index: 6;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    width: 232px;
+    max-width: 40vw;
+    pointer-events: none;
+  }
+  .td-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 20px;
+  }
+  .td-icon {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    border: 1px solid #000;
+    border-radius: 3px;
+    background-color: #10141c;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  /* The bar is the row: the fill is the remaining fraction, the label rides on
+     top of it, and the countdown sits outside so a long name can never push the
+     number off the row. */
+  .td-bar {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 18px;
+    border: 1px solid #000;
+    border-radius: 2px;
+    background: rgba(8, 8, 12, 0.78);
+    overflow: hidden;
+  }
+  .td-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 100%;
+    background: var(--color-debuff);
+  }
+  /* School tint, the same --color-debuff-* tokens the aura strips use, so one
+     school reads identically on a nameplate, the target frame and this row. */
+  .td-fill[data-school="fire"] {
+    background: var(--color-debuff-fire);
+  }
+  .td-fill[data-school="frost"] {
+    background: var(--color-debuff-frost);
+  }
+  .td-fill[data-school="arcane"] {
+    background: var(--color-debuff-arcane);
+  }
+  .td-fill[data-school="shadow"] {
+    background: var(--color-debuff-shadow);
+  }
+  .td-fill[data-school="nature"] {
+    background: var(--color-debuff-nature);
+  }
+  .td-fill[data-school="holy"] {
+    background: var(--color-debuff-holy);
+  }
+  .td-label {
+    position: relative;
+    display: block;
+    padding: 0 5px;
+    /* Line height rides INSIDE the font shorthand: declared separately above it
+       the shorthand resets it to normal, which un-centred the label in its bar. */
+    font: 600 11px / 18px var(--body-font);
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .td-stacks {
+    position: absolute;
+    top: 1px;
+    right: 2px;
+    min-width: 12px;
+    padding: 0 2px;
+    text-align: center;
+    font: 700 9px / 11px var(--body-font);
+    color: #fff;
+    background: rgba(8, 8, 12, 0.92);
+    border: 1px solid var(--color-debuff);
+    border-radius: 6px;
+  }
+  .td-time {
+    flex: none;
+    min-width: 30px;
+    text-align: right;
+    font: 700 11px var(--body-font);
+    font-variant-numeric: tabular-nums;
+    color: #8ce68c;
+    text-shadow: 1px 1px 1px #000;
+  }
+  /* The row on your CURRENT target reads first: a gold rule down its left edge,
+     which is a position cue rather than colour alone. */
+  .td-row.td-on-target .td-icon {
+    box-shadow: -2px 0 0 0 var(--color-primary, #d8b56b);
+  }
+  /* Final seconds: the countdown turns amber and the row blinks, the same cue
+     (and the same reduced-motion fallback) the aura strips already use. */
+  .td-row.td-expiring .td-time {
+    color: #ffcf40;
+  }
+  .td-row.td-expiring .td-fill {
+    animation: aura-expire-blink 0.8s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .td-row.td-expiring .td-fill {
+      animation: none;
+      filter: brightness(1.4);
+    }
+  }
+  .td-overflow {
+    padding-left: 21px;
+    font: 400 10px var(--body-font);
+    color: #cfcfcf;
+    text-shadow: 1px 1px 1px #000;
+  }
+
+  /* ---------- aura tracks ---------- */
+  /* Six bars of the auras YOU have out (src/ui/hud/aura_tracks/), one movable,
+     resizable frame per question. One row vocabulary across all six: the fill
+     is what is left, the label rides the bar, the readout sits outside it so a
+     long spell name can never push the number off the row. Every track is
+     display:none until its painter has rows, so an empty bordered box never
+     floats over the world, and each is click-through in play. */
+  #aura-track-defensives,
+  #aura-track-self,
+  #aura-track-power,
+  #aura-track-utility,
+  #aura-track-friendly,
+  #aura-track-shields {
+    position: absolute;
+    z-index: 6;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    width: 236px;
+    max-width: 42vw;
+    pointer-events: none;
+  }
+  /* Default seats: two columns of three, starting one frame width in from the
+     left rail. The rail itself (left: 18px, top: 34%) is the Target dots
+     tracker's seat, and a first cut put the Defensives and Self tracks at 30%
+     and 44% on that same rail, so a player who opened both families watched
+     the dot bars land between two aura bars. The 16% pitch is about seven rows
+     at 1080p, so a track fills most of the way to its cap before it reaches the
+     seat below; none sits under the action bars, the chat box or the minimap.
+     A player moves them from here; these only decide where an opted-in track
+     first appears. */
+  #aura-track-defensives {
+    left: 268px;
+    top: 30%;
+  }
+  #aura-track-self {
+    left: 268px;
+    top: 46%;
+  }
+  #aura-track-power {
+    left: 268px;
+    top: 62%;
+  }
+  #aura-track-utility {
+    left: 518px;
+    top: 30%;
+  }
+  #aura-track-friendly {
+    left: 518px;
+    top: 46%;
+  }
+  #aura-track-shields {
+    left: 518px;
+    top: 62%;
+  }
+
+  .at-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 20px;
+  }
+  .at-icon {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    border: 1px solid #000;
+    border-radius: 3px;
+    background-color: #10141c;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .at-bar {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 18px;
+    border: 1px solid #000;
+    border-radius: 2px;
+    background: rgba(8, 8, 12, 0.78);
+    overflow: hidden;
+  }
+  /* The fill is the CATEGORY colour, set per track by its own frame id: one
+     school of meaning per bar, so a glance at the colour says which question
+     the row answers before the label is read. */
+  .at-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 100%;
+    background: var(--at-fill, var(--color-buff));
+  }
+  #aura-track-defensives {
+    --at-fill: #b0563c;
+  }
+  #aura-track-self {
+    --at-fill: #3f7fa8;
+  }
+  #aura-track-power {
+    --at-fill: #a2478c;
+  }
+  #aura-track-utility {
+    --at-fill: #6a7f9e;
+  }
+  #aura-track-friendly {
+    --at-fill: #2e8b57;
+  }
+  #aura-track-shields {
+    --at-fill: #c8a24a;
+  }
+  .at-label {
+    position: relative;
+    display: block;
+    padding: 0 5px;
+    /* Line height rides INSIDE the shorthand: declared separately the shorthand
+       resets it and the label stops being centred in its bar. */
+    font: 600 11px / 18px var(--body-font);
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .at-stacks {
+    position: absolute;
+    top: 1px;
+    right: 2px;
+    min-width: 12px;
+    padding: 0 2px;
+    text-align: center;
+    font: 700 9px / 11px var(--body-font);
+    color: #fff;
+    background: rgba(8, 8, 12, 0.92);
+    border: 1px solid var(--color-buff);
+    border-radius: 6px;
+  }
+  .at-time {
+    flex: none;
+    min-width: 30px;
+    text-align: right;
+    font: 700 11px var(--body-font);
+    font-variant-numeric: tabular-nums;
+    color: #8ce68c;
+    text-shadow: 1px 1px 1px #000;
+  }
+  /* A shield spends POINTS, not seconds: the points lead and the countdown
+     rides behind them, dimmed, because either can end the shield first. */
+  .at-points {
+    flex: none;
+    min-width: 42px;
+    text-align: right;
+    font: 700 11px var(--body-font);
+    font-variant-numeric: tabular-nums;
+    color: #f0d68a;
+    text-shadow: 1px 1px 1px #000;
+  }
+  .at-points-row .at-time {
+    min-width: 26px;
+    font-weight: 400;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  /* A MODE has no timer, so nothing in its row may look like it is draining:
+     the bar sits full and dim and the readout is a steady chip. */
+  .at-mode-row .at-bar {
+    background: rgba(8, 8, 12, 0.6);
+  }
+  .at-mode-row .at-fill {
+    width: 100% !important;
+    opacity: 0.34;
+  }
+  .at-mode-row .at-time {
+    font: 700 9px var(--body-font);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #cfe4a8;
+  }
+  /* Final seconds: the same cue and the same reduced-motion fallback the aura
+     strips use, so one aura never blinks on one surface and not the other. */
+  .at-row.at-expiring .at-time {
+    color: #ffcf40;
+  }
+  .at-row.at-expiring .at-fill {
+    animation: aura-expire-blink 0.8s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .at-row.at-expiring .at-fill {
+      animation: none;
+      filter: brightness(1.4);
+    }
+  }
+  .at-overflow {
+    padding-left: 21px;
+    font: 400 10px var(--body-font);
+    color: #cfcfcf;
+    text-shadow: 1px 1px 1px #000;
   }
 
   /* ---------- cast bar ---------- */
@@ -3364,6 +3961,8 @@
     display: flex;
     align-items: flex-end;
     gap: 8px;
+    /* The containing block for #meters-window's absolute dock seat below. */
+    position: relative;
   }
   /* xp bar sits UNDER the action bar as the stack's last row, pinned to the
      bottom of the screen; the taller side-button column must not push the
@@ -4043,9 +4642,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    /* Explicit, not content-sized: #daily-rewards-button is 50px wide against
-       the 34px .micro-btn, and flex-end would otherwise right-align it inside
-       a 50px-wide column, opening a dead gutter between the two columns. */
+    /* Keep both columns aligned to the standard launcher width. */
     width: 34px;
     gap: 4px;
   }
@@ -4062,8 +4659,7 @@
   /* Horizontal menu rail (menuRailHorizontal, the Frames Settings menu): the
      rail's two stacked columns become two side-by-side ROWS, reading as one
      horizontal strip. The explicit 34px column width is dropped (a row sizes
-     to its buttons), and the rows bottom-align so the taller daily-rewards
-     chest never staggers the strip. */
+     to its buttons), and the rows bottom-align. */
   body.menu-rail-horizontal #side-buttons {
     flex-direction: column;
     align-items: flex-end;
@@ -4078,19 +4674,6 @@
     /* The column's 4px button gap read as spacing BETWEEN items in a row;
        the horizontal strip packs its buttons flush (owner request). */
     gap: 0;
-  }
-  /* The daily-rewards chest's 46px box plus its 14px column spacing
-     inflated its row to 60px, floating the row's top edge 30px above the
-     30px buttons: exactly the seam the rows-touch rule above closes. In
-     the strip it takes a standard 30px slot and its art (overflow is
-     visible on the button) simply pokes past the box. */
-  body.menu-rail-horizontal #daily-rewards-button {
-    height: 30px;
-    margin-bottom: 0;
-  }
-  body.menu-rail-horizontal #daily-rewards-button .daily-rewards-icon {
-    width: 44px;
-    height: 44px;
   }
   .micro-btn {
     width: 34px;
@@ -4221,14 +4804,15 @@
   }
 
   /* On-bar action-bar key-binding mode (issue #1238): a plain banner (no window
-     chrome) anchored above the visible action bar(s) via #actionbar-stack's own
-     position: relative. Built/removed by hud.ts on enter/exit. */
+     chrome) that is a #ui-root child, placed by hud.ts against the LIVE primary
+     bar (inline left/top in HUD author px). Never anchored to #actionbar-stack:
+     a bar moved with Interface Unlock is reparented to #ui and painted over a
+     stack-anchored banner, so its slots ate every Done / Reset click and re-armed
+     a capture instead. Sits in the always-above tier (90+, over the 20..89
+     window band and the detached frames at 20) so no frame can cover its exit.
+     Built/removed by hud.ts on enter/exit. */
   #actionbar-bind-banner {
     position: absolute;
-    left: 50%;
-    bottom: 100%;
-    transform: translateX(-50%);
-    margin-bottom: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -4243,7 +4827,7 @@
     color: var(--color-text-light);
     font-family: var(--ui-font);
     text-align: center;
-    z-index: 25;
+    z-index: 90;
   }
   .actionbar-bind-hint {
     font-size: 13px;
@@ -4760,6 +5344,14 @@
   #right-tracker-stack > :empty {
     display: none;
   }
+  /* The quest tracker no longer matches :empty even with no quests: it hosts
+     its movable-frame chrome (corner button, grip, name chip) beside the
+     #qt-body the controller paints, so emptiness is judged on the body. The
+     edit mode's force-shown placeholder (display !important below) still
+     wins while arranging. */
+  #quest-tracker:has(> #qt-body:empty) {
+    display: none;
+  }
   /* ---------- quest tracker ---------- */
   #quest-tracker {
     width: 100%;
@@ -5099,12 +5691,18 @@
   }
 
   /* ---------- delve tracker ---------- */
+  /* Visibility is the body's: the controller paints #delve-body (the root is
+     a movable frame hosting the mover chrome beside it), and an empty body
+     folds the whole tracker out of the stack, replacing the old inline
+     root display toggle. The edit mode's force-show still wins. */
   #delve-tracker {
     width: 100%;
     font-size: 12px;
     color: var(--gold);
     text-shadow: 1px 1px 2px #000;
     pointer-events: none;
+  }
+  #delve-tracker:has(> #delve-body:empty) {
     display: none;
   }
   #delve-tracker .dt-header {
@@ -5167,12 +5765,15 @@
   /* Floor progress + the "closes in" event countdown (issue #2655). Same shape
      as the delve tracker above; actionable pacing info, so it stays visible on
      every graphics tier (docs/design/graphics-settings-fairness.md). */
+  /* Same body-owned visibility as #delve-tracker above. */
   #rift-tracker {
     width: 100%;
     font-size: 12px;
     color: var(--gold);
     text-shadow: 1px 1px 2px #000;
     pointer-events: none;
+  }
+  #rift-tracker:has(> #rift-body:empty) {
     display: none;
   }
   #rift-tracker .rt-header {
@@ -5189,12 +5790,136 @@
     margin-top: 4px;
   }
 
+  /* ---------- practice DPS tracker ---------- */
+  /* Live DPS on a training dummy plus the last few finished runs
+     (src/ui/hud/practice/). Same shape as the rift tracker above; the live
+     number is actionable (it is what a player changes a build against), so it
+     stays visible on every graphics tier (docs/design/graphics-settings-fairness.md). */
+  #practice-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--gold);
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+    display: none;
+  }
+  #practice-tracker .pt-header {
+    font-family: var(--title-font);
+    font-size: 14px;
+    border-bottom: 1px solid #ffd10044;
+    margin-bottom: 4px;
+    padding-bottom: 2px;
+  }
+  #practice-tracker .pt-live {
+    font-family: var(--title-font);
+    font-size: 20px;
+    color: #fff4c4;
+    margin: 2px 0 2px 8px;
+  }
+  #practice-tracker .pt-obj {
+    color: #e8e0c8;
+    font-size: 11px;
+    margin-left: 8px;
+    margin-top: 4px;
+  }
+  #practice-tracker .pt-run {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 6px;
+    color: #e8e0c8;
+    font-size: 11px;
+    margin-left: 8px;
+    margin-top: 2px;
+  }
+  #practice-tracker .pt-run-dps {
+    text-align: right;
+    color: #fff4c4;
+  }
+  #practice-tracker .pt-run-sum {
+    grid-column: 1 / -1;
+    color: #b8b0a0;
+    font-size: 10px;
+  }
+  /* The best finished run so far: the number a new build has to beat. */
+  #practice-tracker .pt-best .pt-run-dps {
+    color: #7ee08a;
+  }
+
+  /* ---------- hub lesson coach ---------- */
+  /* Drillmaster Hale's guided Meters coaching (src/ui/hud/practice/), beside
+     the practice DPS tracker above: one line naming the next real control,
+     an optional keybind chip, and (for read-row/review-comparison) a small
+     explicit acknowledgment button. Actionable tutorial guidance, so it
+     stays visible on every graphics tier like the tracker above it. */
+  #hub-lesson-coach {
+    width: 100%;
+    font-size: 12px;
+    color: var(--gold);
+    text-shadow: 1px 1px 2px #000;
+    margin-top: 8px;
+    display: none;
+  }
+  #hub-lesson-coach .hlc-line {
+    color: #e8e0c8;
+    line-height: 1.35;
+  }
+  #hub-lesson-coach .hlc-chip {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 5px;
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    color: #fff4c4;
+    font-family: var(--title-font);
+    font-size: 11px;
+  }
+  #hub-lesson-coach .hlc-ack,
+  #hub-lesson-coach .hlc-replay {
+    display: block;
+    margin-top: 6px;
+    pointer-events: auto;
+  }
+  /* The world-anchored echo of the card above: hub_lesson_controller.ts
+     paints the SAME hlc-line/hlc-chip/hlc-ack markup into the island coach's
+     own floating .tut-prompt bubble (never the replay offer, kept as a
+     tracker-only affordance), positioned over whichever dummy the current
+     step is about. A modifier on the shared chrome, not a rewrite of it: the
+     base .tut-prompt rules (Tutorial Island's own bubbles) are untouched.
+     Stacked and width-capped with real wrapping, unlike the base bubble's
+     one-line nowrap pill, because a lesson sentence runs longer than an
+     interact verb; the ack button is the one pointer-events exception on an
+     otherwise click-through bubble, so it never blocks re-targeting the
+     world underneath it. */
+  .tut-prompt.tut-prompt-hub-lesson {
+    flex-direction: column;
+    align-items: flex-start;
+    white-space: normal;
+    max-width: 220px;
+    text-align: left;
+  }
+  .tut-prompt.tut-prompt-hub-lesson .hlc-chip {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 5px;
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    color: #fff4c4;
+    font-family: var(--title-font);
+    font-size: 11px;
+  }
+  .tut-prompt.tut-prompt-hub-lesson .hlc-ack {
+    margin-top: 6px;
+    pointer-events: auto;
+  }
+
   /* ---------- combat meters ---------- */
   /* The damage window and the two detachable meters (Healing, Threat) share one
      panel shape. Undisturbed they sit in the bottom-right HUD stack exactly as
-     the meters window always has; once the player drags or resizes one,
-     meters_frame.ts switches it to absolute left/top/width/height and stamps
-     .mt-framed, which is what turns it into a fixed-height scrolling column. */
+     the meters window always has. Once moved, a DETACHED window's own
+     MeterFrame stamps .mt-framed; the TABBED window is the 'damageMeter'
+     Unlock Interface registry frame instead, whose detacher stamps
+     .hud-frame-detached. Either class turns the panel into the fixed-height
+     scrolling column below. */
   .mt-panel {
     width: 240px;
     padding: 8px 10px;
@@ -5202,6 +5927,31 @@
     align-self: flex-end;
     margin-bottom: 6px;
     text-align: left;
+  }
+  /* The tabbed damage window's DOCK is an absolute seat beside the action-bar
+     row, not a flex slot: #bottom-bar re-centers itself with translateX(-50%),
+     so a 240px flex item appearing on open slid the whole action-bar stack
+     sideways (the reported "opening the meters moves the UI around"). The
+     seat reproduces the old flex-end spot; the detached state below clears it
+     so the registry mover's inline left/top own the box. The two pop-out
+     meters keep their flex slots: they are transient windows a player has
+     usually already parked via their own title drag.
+     The left is CLAMPED to the #ui edge: the seat resolves against the
+     612px centered row, so on any #ui narrower than 1108 author px (a
+     1280px window at UI Scale 1.2) the flex-end spot would hang past the
+     overflow:hidden root and clip. Half the #ui author width plus 66px is
+     the largest left that keeps the 240px panel's right edge inside
+     ((uiW - 612) / 2 + left + 240 <= uiW); the #ui width derives from
+     --app-vw the same way the tracker rule below does. */
+  #meters-window {
+    position: absolute;
+    left: min(calc(100% + 8px), calc(var(--app-vw, 100vw) / var(--ui-scale, 1) / 2 + 66px));
+    bottom: 6px;
+    margin-bottom: 0;
+  }
+  #meters-window.hud-frame-detached {
+    left: auto;
+    bottom: auto;
   }
   .mt-panel .panel-title {
     margin-bottom: 4px;
@@ -5211,11 +5961,19 @@
   /* The framed column's `display: flex` is written inline alongside the box (the
      panel's open/closed state is an inline display too, so the class cannot win
      that tie); this carries the rest of the framed layout. */
-  .mt-panel.mt-framed {
+  .mt-panel.mt-framed,
+  #meters-window.hud-frame-detached {
     flex-direction: column;
     z-index: 21;
   }
-  .mt-panel.mt-framed .mt-rows {
+  /* A positioned tabbed window that has never been height-stretched still
+     needs a bound, or the row list grows the panel with the encounter and
+     the scrolling column never engages; a box-resize height (inline) wins. */
+  #meters-window.hud-frame-detached {
+    height: 320px;
+  }
+  .mt-panel.mt-framed .mt-rows,
+  #meters-window.hud-frame-detached .mt-rows {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
@@ -6221,78 +6979,38 @@
       0 0 8px #c9a86a66,
       0 1px 3px #000a;
   }
+  /* The store chest occupies a normal menu slot, including compact mode. */
   #daily-rewards-button {
-    position: relative;
-    width: 50px;
-    height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    cursor: var(--cursor-point);
     pointer-events: auto;
     touch-action: manipulation;
-    border-radius: 8px;
-    margin-bottom: 14px;
-    background: transparent;
-    border: 0;
-    box-shadow: none;
-    color: #f6c15b;
-    overflow: visible;
-    transition:
-      transform 0.16s,
-      filter 0.16s;
   }
   #daily-rewards-button.spin-ready {
-    box-shadow: none;
-    color: #fff;
+    border-color: var(--gold);
   }
   #daily-rewards-button.spin-ready .daily-rewards-icon {
     animation: daily-rewards-icon-pulse 1.6s ease-in-out infinite;
     animation-duration: calc(1.6s * var(--motion-scale, 1));
     animation-play-state: var(--fx-ambient-anim, running);
   }
-  #daily-rewards-button::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #ffe08a99 0%, #ffd10066 34%, #ffd10000 72%);
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.85);
-    pointer-events: none;
-    z-index: 0;
-  }
-  #daily-rewards-button::after {
-    content: none;
-  }
-  #daily-rewards-button.spin-ready::before {
-    animation: daily-rewards-glow-pulse 1.6s ease-in-out infinite;
-    animation-duration: calc(1.6s * var(--motion-scale, 1));
-    animation-play-state: var(--fx-ambient-anim, running);
-  }
   #daily-rewards-button .daily-rewards-icon {
     position: relative;
     z-index: 1;
-    width: 64px;
-    height: 64px;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
     display: block;
     object-fit: contain;
     pointer-events: none;
-    filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 4px #ffd56d55);
+    filter: drop-shadow(0 1px 2px #000b);
   }
   #daily-rewards-button:hover,
   #daily-rewards-button:focus-visible {
-    border-color: #ffe08a;
-    outline: none;
-    color: #fff;
-  }
-  #daily-rewards-button:hover,
-  #daily-rewards-button:focus-visible {
-    transform: translateY(-1px);
+    border-color: var(--gold);
     filter: brightness(1.1);
   }
   #daily-rewards-button:focus-visible {
@@ -6307,17 +7025,6 @@
     50% {
       filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 14px #ffe08acc) brightness(1.16)
         saturate(1.12);
-    }
-  }
-  @keyframes daily-rewards-glow-pulse {
-    0%,
-    100% {
-      opacity: 0.34;
-      transform: translate(-50%, -50%) scale(0.9);
-    }
-    50% {
-      opacity: 0.82;
-      transform: translate(-50%, -50%) scale(1.18);
     }
   }
   /* the lockout panel rows inside the shared tooltip box */
@@ -6424,7 +7131,6 @@
   body.native-app .community-link.donate,
   body.native-app .social-link.donate,
   body.native-app #mobile-donate,
-  body.native-app #token-ca,
   body.native-app #nav-btn-download,
   body.native-app:not(.seeker-wallet-enabled) .cs-wallet,
   body.native-app:not(.seeker-wallet-enabled) .cs-wallet-hidden-note,
@@ -6433,7 +7139,6 @@
   body.native-app .official-site-copy {
     display: none !important;
   }
-  body.desktop-app #token-ca,
   body.desktop-app .official-site-copy {
     display: none !important;
   }
@@ -6530,6 +7235,11 @@
     z-index: 100;
     pointer-events: none;
     max-width: min(720px, calc(100vw - 16px));
+    /* The height cap is written inline per paint (tooltip_clamp_core.ts via
+       Hud.paintTooltipAt: the viewport height in AUTHOR space, which a static
+       vh value cannot express under the UI scale); this only keeps a capped
+       box from spilling its tail past the border. */
+    overflow-y: auto;
     padding: 8px 10px;
     font-size: 12px;
     line-height: 1.5;
@@ -7692,6 +8402,13 @@
     left: 50%;
     top: 21%;
     transform: translateX(-50%);
+    /* No z-index left this at the implicit auto tier, which paints BEHIND any
+       open .window (base z-index 20, raised to the 50-89 band on focus by
+       bringWindowToFront in hud.ts): a deny toast fired while a window was
+       open (e.g. mailing an unmailable item) rendered invisible under it,
+       visible only once the window was dragged aside. 90 matches the
+       established "always above the window band" tier (#ctx-menu, hud.css). */
+    z-index: 90;
     color: #ff2020;
     font-size: 18px;
     font-weight: bold;
@@ -7970,6 +8687,44 @@
   }
   #ghost-prompt .btn {
     pointer-events: auto;
+  }
+  /* Interact affordance: a small, NON-BLOCKING line shown only while an interact
+     press is ambiguous between two farming targets in reach (a placed feast over
+     a garden bed). Sits just above the ghost prompt's band and below the action
+     bar, in the same read-and-keep-playing register: pointer-events:none, so it
+     never eats a click meant for the world, and no transition, because it must
+     be readable the instant the player steps into the ambiguity rather than
+     fading in after they have already pressed.
+     Visibility is a CLASS, not a display write, and that is load-bearing rather
+     than stylistic: the PainterHost facet keeps ONE (kind, value) entry per
+     element for its four single-slot writers, so a module writing both setText
+     and setDisplay to the same node would flip that entry every poll and elide
+     NOTHING. The class cache is multi-slot, so `is-shown` and the text elide
+     independently. Painted by
+     src/ui/hud/professions/farm_press_affordance_controller.ts. */
+  #interact-affordance {
+    position: absolute;
+    left: 50%;
+    bottom: 30%;
+    transform: translateX(-50%);
+    opacity: 0;
+    max-width: min(420px, calc(100vw - 48px));
+    box-sizing: border-box;
+    padding: 6px 12px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
+    background: var(--color-bg-map-ink);
+    color: var(--color-text-light);
+    font-family: var(--font-serif);
+    font-size: 15px;
+    line-height: 1.3;
+    text-align: center;
+    text-wrap: balance;
+    z-index: 30;
+    pointer-events: none;
+  }
+  #interact-affordance.is-shown {
+    opacity: 1;
   }
   /* The death actions use the same live Confirm binding as the rest of pad UI.
      Generated content leaves the localized button text intact while making the
@@ -9306,16 +10061,20 @@
     left: 50%;
     top: 34%;
     transform: translateX(-50%);
-    z-index: 80;
+    /* 80 sat INSIDE the .window focus band (bringWindowToFront cycles 50-89 in
+       hud.ts), so a prompt mounted here (e.g. the vendor sell-confirm prompt,
+       bags_window.ts showSellConfirmPrompt) rendered behind whichever window
+       had most recently climbed past 80, intermittently and only after enough
+       window focus churn in the session: 90 clears the whole band, matching
+       #error-msg and #ctx-menu's "always above the window band" tier. */
+    z-index: 90;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
-  /* Async store results remain readable after the Store itself has closed.
-     The modal store DECISION no longer lives in the stack: it mounts on
-     document.body (components.css #confirm-dialog.woc-store-prompt), because
-     no z-index inside #ui's stacking context can clear the body-level Armory
-     inspector (z90). */
+  /* Store decisions must clear the Armory inspector (z90), and async results
+     remain readable after the Store itself has closed. */
+  #prompt-stack.store-decision-active,
   #prompt-stack.store-result-active {
     z-index: 96;
   }
@@ -9966,7 +10725,8 @@
 /* Spell-activation proc overlay: the Rising Phoenix (owner design, replacing
    the twin proc arcs). Heating Up lights the LEFT half; Hot Streak completes
    the RIGHT, whitens the core and beats both wings once; the proc fading or
-   being spent puts the fire out. Drag it (proc_overlay_drag) to park it. */
+   being spent puts the fire out. Parking it is the Unlock Interface mode's:
+   the overlay is the 'procOverlay' registry frame (interface_unlock_core). */
 /* This whole tail of the file (through EOF) had fallen OUTSIDE @layer
    components: nothing reopened the layer after the small #aura-overlays
    block closed it below, so every rule from here on (proc-overlay, the
@@ -9986,7 +10746,17 @@
     translate: -50% -50%;
     width: 300px;
     height: 232px;
-    z-index: 30;
+    /* #proc-overlay is appended straight to <body> (hud.ts), a SIBLING of #ui,
+       not a descendant of it: its own position:fixed z-index establishes a
+       stacking context that competes with #ui's as a whole, not with any
+       window's internal 20-89 focus band. #ui's desktop base is z-index 10
+       (base.css), so the old 30 here painted the Rising Phoenix / soul-crystal
+       bank ABOVE every window: opening Bags mid-proc drew the phoenix (or the
+       Warlock's soul fragments) over the bag grid. 5 sits above #nameplates (1)
+       and #game-canvas (0), so the proc stays visible over the 3D world during
+       normal play, but now clears behind #ui (and, on mobile, its already
+       higher in-game/window-open z-index of 80/90) the moment a window opens. */
+    z-index: 5;
     opacity: 0;
     pointer-events: none;
     /* OFF transition = the gentle fade-out (owner: a bit slower, no hard snap);
@@ -10252,13 +11022,12 @@
     }
   }
   /* The login preview: for a few seconds after entering the world the whole
-   bird glows dimly, so the player can see where it lives and drag it BEFORE
-   any proc lights it for real. Placed before the proc rules so a real proc
-   arriving mid-preview wins the cascade. */
+   bird glows dimly, so the player can see where it lives (moving it is the
+   Unlock Interface mode's: the overlay is the 'procOverlay' registry frame,
+   and this same class doubles as its edit-mode sample art). Placed before
+   the proc rules so a real proc arriving mid-preview wins the cascade. */
   #proc-overlay.preview {
     opacity: 1;
-    pointer-events: auto;
-    cursor: grab;
   }
   #proc-overlay.preview .fire-embers {
     opacity: 0.38;
@@ -10267,16 +11036,12 @@
   #proc-overlay.hot,
   #proc-overlay.combustion {
     /* Lit but a touch translucent (owner: softer over the scene), shared with the
-     Chronomancy .c1 rule; fire is TWO procs (Heating Up, then Hot Streak). */
+     Chronomancy .c1 rule; fire is TWO procs (Heating Up, then Hot Streak).
+     Pointer-inert in every state: moving lives with the registry frame, so
+     the burning bird never eats a click meant for the world behind it. */
     opacity: 0.85;
-    /* Grabbable only while it burns; hidden it can never eat a click. */
-    pointer-events: auto;
-    cursor: grab;
     /* Quick to light (the ON transition); the slow OFF fade lives on the base. */
     transition: opacity 0.2s ease;
-  }
-  #proc-overlay.dragging {
-    cursor: grabbing;
   }
   #proc-overlay .fire-bird {
     position: absolute;
@@ -10535,12 +11300,10 @@
     filter: saturate(1.18) brightness(1.2) drop-shadow(0 0 10px rgba(139, 92, 246, 0.8))
       drop-shadow(0 0 24px rgba(103, 232, 249, 0.62));
   }
-  /* Visible and grabbable once any charge is held (a touch translucent, matching
-   the fire bird's .heating/.hot opacity). */
+  /* Visible once any charge is held (a touch translucent, matching the fire
+   bird's .heating/.hot opacity); pointer-inert like every overlay state. */
   #proc-overlay.chrono.c1 {
     opacity: 0.85;
-    pointer-events: auto;
-    cursor: grab;
   }
   /* Reveal order: left wing, right wing, central bird, final temporal flare. */
   #proc-overlay.chrono.c1 .chrono-left,
@@ -10664,15 +11427,8 @@
   #proc-overlay.destruction .ruin-ritual {
     display: block;
   }
-  #proc-overlay.destruction .ruin-ritual,
-  #proc-overlay.destruction .ruin-mark {
-    pointer-events: auto;
-    cursor: grab;
-  }
-  #proc-overlay.destruction.dragging .ruin-ritual,
-  #proc-overlay.destruction.dragging .ruin-mark {
-    cursor: grabbing;
-  }
+  /* The artwork stays pointer-inert: moving the always-on ritual lives with
+     the Unlock Interface registry frame, so it never eats a world click. */
   #proc-overlay.destruction .ruin-ritual::before,
   #proc-overlay.destruction .ruin-ritual::after {
     content: "";
@@ -10727,8 +11483,6 @@
       inset 0 3px var(--color-ruin-ritual-shadow),
       0 -1px var(--color-ruin-inner-shine);
     opacity: 0.76;
-    pointer-events: auto;
-    cursor: grab;
   }
   #proc-overlay.destruction.r5 .ruin-ring {
     border-top-color: var(--color-ruin-lit-border);
@@ -10964,15 +11718,9 @@
     opacity: 0.9;
     animation: soul-bank-full-flare 1.8s ease-in-out infinite;
   }
-  #proc-overlay.necromancy .soul-rail,
-  #proc-overlay.necromancy .soul-crystal {
-    pointer-events: auto;
-    cursor: grab;
-  }
-  #proc-overlay.necromancy.dragging .soul-rail,
-  #proc-overlay.necromancy.dragging .soul-crystal {
-    cursor: grabbing;
-  }
+  /* The soul bank's artwork stays pointer-inert: moving the always-on bank
+     lives with the Unlock Interface registry frame, so it never eats a world
+     click behind the crystals. */
   #proc-overlay.necromancy .soul-rail {
     position: absolute;
     left: 3px;
@@ -11178,7 +11926,7 @@
     animation: none !important;
   }
 
-  /* ---- Frost spec variant: the Glacial Spike Icicle bank ------------------ */
+  /* ---- Frost spec variant: the Rimeneedle Icicle bank ------------------ */
   /* The complete frozen phoenix is visible from the first Icicle. Additional
    Icicles glaze the same silhouette with brighter layers, and the fifth locks
    it with a sharp crystal crown. */
@@ -11261,8 +12009,6 @@
   }
   #proc-overlay.frost.f1 {
     opacity: 0.88;
-    pointer-events: auto;
-    cursor: grab;
   }
   #proc-overlay.frost .frost-part {
     position: absolute;

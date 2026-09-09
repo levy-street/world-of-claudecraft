@@ -88,6 +88,15 @@ describe('aura_overflow_priority: selectShedSlots', () => {
     expect(shedKeys(slots, 2)).toEqual(['b2', 'b3']);
   });
 
+  it('keeps the earned Coldsight shot choice visible when the short-buff budget is exhausted', () => {
+    const slots = [
+      slot({ key: 'short_a', shortDuration: true }),
+      slot({ key: 'short_b', shortDuration: true }),
+      slot({ key: 'hunter_coldsight_read', shortDuration: true }),
+    ];
+    expect(shedKeys(slots, 1)).toEqual(['short_b']);
+  });
+
   it('is deterministic and allocation-stable: repeat calls with a caller-reused array agree', () => {
     const slots = Array.from({ length: 6 }, (_, i) => slot({ key: `b${i}` }));
     const out: boolean[] = [];

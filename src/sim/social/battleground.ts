@@ -35,6 +35,7 @@ import { detachFromDungeon } from '../instances/dungeons';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { type MatchPetSnapshot, restoreMatchPet, snapshotMatchPet } from '../pet/pet_match_return';
 import { restorePetOnOwnerRevive } from '../pet/pet_owner_revive';
+import { removeMatchFeasts } from '../professions/feast_lifecycle';
 import {
   awardBattlegroundAssistHonor,
   awardBattlegroundHonor,
@@ -2061,6 +2062,7 @@ function resolveBgResult(
 function releaseBgFighters(ctx: SimContext, match: BgMatch): void {
   if (match.fightersReleased) return;
   match.fightersReleased = true;
+  removeMatchFeasts(ctx, 'battleground', match.id);
   for (const pid of bgAllPids(match)) ctx.bgMatches.delete(pid);
   ctx.bgBusySlots.delete(match.slot);
   // Unwind the match-formed party links FIRST, so the disband/leave notices

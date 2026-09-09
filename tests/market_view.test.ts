@@ -421,6 +421,34 @@ describe('market_view: collect states', () => {
     expect(body.rows).toEqual([]);
   });
 
+  it('carries the sold copy CHOSEN name onto its row, and omits it for a plain copy', () => {
+    // A ledger row describes a past transaction: the copy is gone, so nothing
+    // downstream can recover what it was called. Two listings of one id used to
+    // read as two identical rows.
+    const body = buildMarketCollect(
+      info({
+        collectionCopper: 2000,
+        collectionSales: [
+          {
+            itemId: 'wolf_fang',
+            itemName: 'Dawn Oath',
+            count: 1,
+            price: 1000,
+            proceeds: 950,
+            buyerName: 'Buyer',
+          },
+          { itemId: 'wolf_fang', count: 1, price: 1000, proceeds: 950, buyerName: 'Other' },
+        ],
+      }),
+    );
+    expect(body.state).toBe('items');
+    if (body.state !== 'items') return;
+    expect(body.sales.map((row) => row.itemName)).toEqual(['Dawn Oath', undefined]);
+    // The two rows are the SAME item id, so the name is the only thing telling
+    // them apart, which is the point.
+    expect(body.sales.map((row) => row.item.id)).toEqual(['wolf_fang', 'wolf_fang']);
+  });
+
   it('carries the sim ledger cap through as an omitted count', () => {
     const body = buildMarketCollect(
       info({

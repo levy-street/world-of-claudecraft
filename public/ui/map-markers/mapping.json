@@ -123,6 +123,19 @@
       "promptRef": "docs/achievements/map-marker-art-2026-08-12.md#gather-herb"
     },
     {
+      "id": "farm-patch",
+      "family": "station",
+      "file": "farm_patch.webp",
+      "motif": "Two-leaf farm seedling rising from three curved tilled-soil furrows",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-7fbc6f46-e6e3-4c10-92d3-f2b1f5f445fe.png",
+      "sourceSha256": "ac104f7cd3b1d250e0d7282e77e28f047e33d467403bec5021dd129b20586494",
+      "promptSha256": "006643284ba064e127b0a091e3e509f40b669350d6bf3b7dc048b0b6686411b5",
+      "shippingSha256": "ac433b15f4352d0b449fd85d5184e6115a1cbc02e30bca375055db176bb3bfee",
+      "bytes": 2634,
+      "promptRef": "docs/achievements/masterwrought-art-completion-2026-09-02/README.md#farm-patch"
+    },
+    {
       "id": "station-forge",
       "family": "station",
       "file": "station_forge.webp",

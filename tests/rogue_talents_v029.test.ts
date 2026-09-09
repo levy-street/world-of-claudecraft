@@ -119,7 +119,7 @@ describe('rogue v0.29 row grid', () => {
 });
 
 describe('Kill Chain (capstone)', () => {
-  it('killing blows grant 5 combo points and refresh Smokestep; without the option neither happens', () => {
+  it('killing blows grant 5 combo points and refresh Smokefade; without the option neither happens', () => {
     const { sim, p } = rig({ 20: 'rog_r20_kill_chain' });
     const victim = addTargetMob(sim, 10, 3);
     p.cooldowns.set('vanish', 200);

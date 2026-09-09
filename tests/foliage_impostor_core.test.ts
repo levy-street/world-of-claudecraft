@@ -30,7 +30,11 @@ import {
   foliageDistanceScale,
   foliageFogLimit,
   LOD_HIGH,
+  lodDistsFor,
+  TREE_DETAIL_FAR_BY_TIER,
 } from '../src/render/foliage_lod';
+import { GFX_BUCKET_BANDS } from '../src/render/gfx';
+import { PLAYER_INTEREST_DROP_RADIUS, PLAYER_INTEREST_RADIUS } from '../src/sim/types';
 
 function spec(over: Partial<ImpostorArchetypeSpec> = {}): ImpostorArchetypeSpec {
   return {
@@ -174,6 +178,90 @@ describe('sprite swap law', () => {
     expect(1 - (swap / budgeted) ** 2).toBeGreaterThan(0.35);
     // and never inside the authors' own clear-air floor
     expect(swap).toBeGreaterThan(SPRITE_SWAP_MIN);
+  });
+
+  it('spreads the real-model radius across the tier ladder, floored at SPRITE_SWAP_MIN', () => {
+    // The shipped clear-air answer per tier: the tier's authored radius
+    // (foliage_lod.ts TREE_DETAIL_FAR_BY_TIER) times its own rested bucket
+    // baseline through foliageDistanceScale, times SPRITE_SWAP_BUDGET, then
+    // floored at SPRITE_SWAP_MIN. Vale fog (near 55, far 700), rested budget.
+    const fogLimit = foliageFogLimit(700, 1);
+    const radiusFor = (tier: 'medium' | 'high' | 'ultra' | 'insane') => {
+      const baseline = GFX_BUCKET_BANDS[tier].foliage.baseline;
+      const dists = lodDistsFor(false, tier);
+      return spriteSwapDistance(
+        dists.treeDetailFar,
+        foliageDistanceScale(baseline, false),
+        55,
+        700,
+        fogLimit,
+      );
+    };
+    const round = (v: number) => Math.round(v * 100) / 100;
+    expect({
+      medium: round(radiusFor('medium')),
+      high: round(radiusFor('high')),
+      ultra: round(radiusFor('ultra')),
+      insane: round(radiusFor('insane')),
+    }).toEqual({ medium: 150, high: 174.38, ultra: 234, insane: 234 });
+    // Medium sits exactly ON the clear-air floor, which is what keeps a
+    // spread base from ever pushing a billboard into the near field.
+    expect(radiusFor('medium')).toBe(SPRITE_SWAP_MIN);
+    // The span the ladder buys: it was 217 / 227 / 234 (an 8 percent spread)
+    // when every non-lean tier read one authored radius.
+    expect(radiusFor('ultra') / radiusFor('medium')).toBeGreaterThan(1.5);
+    // And the disc AREA medium sheds against ultra, which is what the layer
+    // actually costs.
+    expect(1 - (radiusFor('medium') / radiusFor('ultra')) ** 2).toBeGreaterThan(0.55);
+  });
+
+  it('states plainly which tiers the authored radius still moves, and which sit on the floor', () => {
+    // MEDIUM'S AUTHORED BASE LANDS UNDER THE CLEAR-AIR FLOOR, deliberately:
+    // its budgeted term is ~137 against SPRITE_SWAP_MIN's 150, so medium
+    // ships AT the floor and its foliage governor lever has no tree-handoff
+    // arm left to pull (there is nothing further to shed there). This is the
+    // pin that reds if someone raises 190 back above the floor believing the
+    // number is live, or lowers the floor believing medium would follow.
+    const budgeted = (tier: 'medium' | 'high' | 'ultra' | 'insane') =>
+      TREE_DETAIL_FAR_BY_TIER[tier] *
+      foliageDistanceScale(GFX_BUCKET_BANDS[tier].foliage.baseline, false) *
+      SPRITE_SWAP_BUDGET;
+    expect(budgeted('medium')).toBeLessThan(SPRITE_SWAP_MIN);
+    // Even at the top of medium's governable foliage band it stays under.
+    expect(
+      TREE_DETAIL_FAR_BY_TIER.medium *
+        foliageDistanceScale(GFX_BUCKET_BANDS.medium.foliage.max, false) *
+        SPRITE_SWAP_BUDGET,
+    ).toBeLessThan(SPRITE_SWAP_MIN);
+    // High and above ARE live: their authored radius is what ships, so a
+    // change to those numbers changes the picture.
+    for (const tier of ['high', 'ultra', 'insane'] as const) {
+      expect(budgeted(tier), tier).toBeGreaterThan(SPRITE_SWAP_MIN);
+    }
+  });
+
+  it('keeps the billboard band of every tier outside the server interest scope', () => {
+    // THE FAIRNESS FLOOR. A sprite is a picture of the tree, but the reason
+    // this ladder cannot become a fairness question at all is arithmetic: the
+    // nearest clear-air handoff any tier can take is SPRITE_SWAP_MIN, and the
+    // per-instance jitter undercuts it by at most IMPOSTOR_SWAP_FADE. That
+    // floor must stay outside the radius at which the server will even tell a
+    // client another player exists, so no tier can differ in how a player
+    // behind a tree reads.
+    expect(SPRITE_SWAP_MIN - IMPOSTOR_SWAP_FADE).toBeGreaterThan(PLAYER_INTEREST_DROP_RADIUS);
+    expect(PLAYER_INTEREST_DROP_RADIUS).toBeGreaterThan(PLAYER_INTEREST_RADIUS);
+    // And no shipped tier may author a radius under that floor.
+    const fogLimit = foliageFogLimit(700, 1);
+    for (const tier of ['medium', 'high', 'ultra', 'insane'] as const) {
+      const swap = spriteSwapDistance(
+        lodDistsFor(false, tier).treeDetailFar,
+        foliageDistanceScale(GFX_BUCKET_BANDS[tier].foliage.baseline, false),
+        55,
+        700,
+        fogLimit,
+      );
+      expect(swap - IMPOSTOR_SWAP_FADE, tier).toBeGreaterThan(PLAYER_INTEREST_DROP_RADIUS);
+    }
   });
 
   it('never hands off closer than the clear-air floor', () => {
@@ -471,5 +559,29 @@ describe('shared GLSL and constants', () => {
     // (the murk realms bottom out near the 50 percent blend line).
     expect(IMPOSTOR_SWAP_FADE).toBeGreaterThan(0);
     expect(IMPOSTOR_SWAP_FADE).toBeLessThan(SPRITE_SWAP_MIN / 4);
+  });
+});
+
+describe('the impostor material keys its program on the shader text alone', () => {
+  // The per-category view count and wind amplitude reach the shader as
+  // UNIFORMS (uImpViews, uImpWind); the GLSL is the same for every category,
+  // so a key carrying the view count split one program into one per
+  // category for nothing (two extra links per login in the 2026-08-27
+  // program-key ledger). The zone haze wraps the key afterwards and keeps it
+  // shared the same way.
+  it('uses one constant customProgramCacheKey and passes the category values as uniforms', () => {
+    const source = readFileSync(
+      new URL('../src/render/foliage_impostor.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain("mat.customProgramCacheKey = () => 'foliage-impostor';");
+    expect(source).toContain('shader.uniforms.uImpViews = { value: CATEGORY_VIEWS[category] };');
+    expect(source).toContain('shader.uniforms.uImpWind = { value: windStrength };');
+    const hook = source.slice(
+      source.indexOf('mat.onBeforeCompile = (shader) => {'),
+      source.indexOf('mat.customProgramCacheKey'),
+    );
+    // No category-dependent value is ever interpolated into the shader text.
+    expect(hook).not.toMatch(/\$\{[^}]*(category|CATEGORY_|windStrength)[^}]*\}/);
   });
 });

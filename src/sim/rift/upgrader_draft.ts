@@ -2,7 +2,11 @@
 // The local artifact is immediately playable and doubles as the fallback when
 // an optional server-side AI service is disabled, slow, invalid, or over budget.
 
-import { queryRiftMonsters, RIFT_MONSTER_BY_ID } from '../content/rift/monster_index';
+import {
+  queryRiftMonsters,
+  RIFT_ABILITY_LABELS,
+  RIFT_MONSTER_BY_ID,
+} from '../content/rift/monster_index';
 import { RIFT_THEMES } from '../content/rift/themes';
 import type { SimContext } from '../sim_context';
 import { generateRiftFloor, generateRiftPlan, isSetPieceRift } from './rift_gen';
@@ -42,6 +46,19 @@ export interface RiftDungeonDraft {
 
 function themeIdForName(name: string): string {
   return RIFT_THEMES.find((theme) => theme.name === name)?.id ?? 'infernal_citadel';
+}
+
+/** Renders a boss's raw ability keys as a natural-language mechanic list (e.g.
+ * "area pulses, summoned adds, and enrage") instead of joining the internal
+ * camelCase keys directly, which reads as leaked identifiers to a player. */
+function mechanicList(abilities: readonly string[]): string {
+  const labels = abilities.map(
+    (key) => RIFT_ABILITY_LABELS[key as keyof typeof RIFT_ABILITY_LABELS] ?? key,
+  );
+  if (labels.length === 0) return '';
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
+  return `${labels.slice(0, -1).join(', ')}, and ${labels[labels.length - 1]}`;
 }
 
 export function buildRiftDungeonDraft(seed: number, baseLevel: number): RiftDungeonDraft {
@@ -142,7 +159,7 @@ export function buildHeuristicRiftUpgrade(draft: RiftDungeonDraft): RiftUpgradeM
     boss: {
       templateId: finalBoss.id,
       name: finalBoss.name,
-      concept: `${finalBoss.lore} Its existing ${finalBoss.abilities.join(', ') || 'melee'} mechanics form the climax.`,
+      concept: `${finalBoss.lore} Its existing ${mechanicList(finalBoss.abilities) || 'melee'} mechanics form the climax.`,
     },
     rewards: { lootMultiplier: 1, craftingMaterialBias: 0.25 },
     assetRequests: [

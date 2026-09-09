@@ -3,6 +3,8 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { PerfSnapshot } from '../src/game/perf';
 import { diagnosePerfSnapshot, formatPerfDiagnosisMarkdown } from '../src/game/perf_diagnosis_core';
+import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
+import { shaderWarmSnapshot } from '../src/render/shader_warm_client';
 
 function digest(value = 0) {
   return { count: 600, avg: value, p95: value, max: value };
@@ -64,6 +66,11 @@ function baseSnapshot(): PerfSnapshot {
       renderScale: 1,
       effectiveRenderScale: 1,
       shadowCadenceHalfRate: false,
+      shadowExtentStep: 0,
+      shadowExtentScale: 1,
+      shadowExtentHalf: 105,
+      terrainDetailLevel: 1,
+      postShedRung: 'full',
       renderBudget: {
         enabled: true,
         mode: 'stable',
@@ -78,7 +85,7 @@ function baseSnapshot(): PerfSnapshot {
         stallHoldSeconds: 0,
         stableSeconds: 20,
         cooldownSeconds: 0,
-        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 },
+        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1, post: 1 },
         caps: {
           targetCalls: 620,
           urgentCalls: 860,
@@ -95,6 +102,13 @@ function baseSnapshot(): PerfSnapshot {
       pixelRatio: 1.5,
       width: 1440,
       height: 900,
+      drawingBuffer: {
+        width: 1728,
+        height: 1080,
+        cssWidth: 1440,
+        cssHeight: 900,
+        dynamicResolution: false,
+      },
       calls: 300,
       triangles: 1_000_000,
       geometries: 200,
@@ -115,9 +129,11 @@ function baseSnapshot(): PerfSnapshot {
         submit: digest(4),
         total: digest(9),
       },
+      nameplates: { paints: 0, paintsSkipped: 0 },
       renderDiagnostics: {} as never,
       nightAmount: 0,
       prewarm: null,
+      castVfx: { ready: true, refused: 0, pending: 0, forced: false },
       entryDetailHorizon: {
         active: false,
         cap: 700,
@@ -225,6 +241,9 @@ function baseSnapshot(): PerfSnapshot {
     netPipeline: null,
     heapSawtooth: null,
     hitchForensics: [],
+    postRevealLinks: null,
+    shaderWarmAudit: shaderWarmAuditSnapshot(),
+    shaderWarm: shaderWarmSnapshot(),
     input: {
       intents: 20,
       lastKind: 'move',

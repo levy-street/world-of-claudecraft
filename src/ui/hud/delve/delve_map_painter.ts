@@ -215,7 +215,6 @@ export function delveDrawModel(
   pad: number,
   delveName: string,
   moduleName: string,
-  northLabel = 'N',
   fit: DelveMapFit = 'rect',
 ): DelveDrawModel | null {
   const run = world.delveRun;
@@ -226,7 +225,7 @@ export function delveDrawModel(
   const layout = DELVE_MODULE_LAYOUTS[layoutId] ?? DELVE_MODULE_LAYOUTS[DEFAULT_DELVE_MODULE];
   const moduleOrigin = delveCurrentModuleOrigin(run);
 
-  const schematic = delveSchematicStatic(layout, canvasSize, pad, northLabel, fit);
+  const schematic = delveSchematicStatic(layout, canvasSize, pad, fit);
 
   const mobs: DelveMobMarker[] = [];
   const rewards: DelveObjectMarker[] = [];
@@ -321,10 +320,15 @@ export class DelveMapPainter {
     private readonly markerProfile: () => MapMarkerProfile = () => 'standard',
   ) {}
 
-  /** Drop the cached static-schematic backgrounds on a language switch: the
-   *  baked compass-north glyph (northLabel, resolved from `hudChrome.compass.N`)
-   *  is drawn INTO the cached canvas, so it never re-resolves on its own like a
-   *  write-elided string would. Cleared rather than cleared-and-rebuilt so the
+  /** Drop the cached static-schematic backgrounds and the title sprites on a
+   *  language switch. The static schematic itself bakes NO localized text
+   *  (delveSchematicStatic emits circles, rects and lines; its 'text'
+   *  primitive kind exists for a north-exit glyph nothing emits today, so the
+   *  compass label the painter once threaded through was dead and the Phase
+   *  18 sweep removed it), but the TITLE SPRITES do carry the localized delve
+   *  and module names (resolveNames), rasterized into canvases that never
+   *  re-resolve on their own like a write-elided string would. The
+   *  backgrounds are cleared with them rather than rebuilt in place, so the
    *  next paint rebuilds through the ordinary cache-miss path (same idiom as
    *  MapWindowPainter.relocalize, its sibling in the write-elision writeup).
    *  Hud calls this from its woc:languagechange fan-out, alongside
@@ -684,15 +688,7 @@ export class DelveMapPainter {
     const run = world.delveRun;
     if (!run) return;
     const { delveName, moduleName } = this.resolveNames(run);
-    const model = delveDrawModel(
-      world,
-      size,
-      MINIMAP_PAD,
-      delveName,
-      moduleName,
-      t('hudChrome.compass.N'),
-      'circle',
-    );
+    const model = delveDrawModel(world, size, MINIMAP_PAD, delveName, moduleName, 'circle');
     if (!model) return;
     // The one DOM write this Canvas pilot routes through the write-elision facet.
     this.writers.setText(zoneLabelEl, model.areaLabel);
@@ -750,7 +746,7 @@ export class DelveMapPainter {
     if (!run) return null;
     const { delveName, moduleName } = this.resolveNames(run);
     const pad = Math.round(size * WORLD_MAP_PAD_RATIO);
-    const model = delveDrawModel(world, size, pad, delveName, moduleName, t('hudChrome.compass.N'));
+    const model = delveDrawModel(world, size, pad, delveName, moduleName);
     if (!model) return null;
     const colors = this.resolveColors();
     const profile = this.markerProfile();

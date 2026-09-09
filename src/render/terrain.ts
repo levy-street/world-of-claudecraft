@@ -74,6 +74,7 @@ import {
   type WorldRect,
 } from './terrain_region_core';
 import { terrainSplatPresence, terrainSplatPresenceMask } from './terrain_splat_presence_core';
+import { applyTextureAnisotropy } from './texture_anisotropy';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
 import { disposeZoneBuildPool, zoneBuildPool } from './zone_build_pool';
 
@@ -112,8 +113,6 @@ const IDLE_BUILD_TIMEOUT_MS = 200;
 
 const TERRAIN_TEX: Record<string, THREE.Texture> = {};
 const terrainTexTasks = new Map<string, Promise<void>>();
-const ALBEDO_ANISOTROPY = 8;
-const NORMAL_ANISOTROPY = 4;
 
 function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<void> {
   if (TERRAIN_TEX[key]) return Promise.resolve();
@@ -140,7 +139,7 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
       : loadTexture(url, { srgb, repeat: true })
   )
     .then((tex: THREE.Texture) => {
-      tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
+      applyTextureAnisotropy(tex, srgb ? 'colour' : 'normal');
       TERRAIN_TEX[key] = tex;
     })
     .catch((err) => {
@@ -410,7 +409,7 @@ function terrainNormalTexture(): THREE.DataTexture {
   // rebakeNormalRegion re-upload regenerates it automatically.
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   tex.generateMipmaps = true;
-  tex.anisotropy = NORMAL_ANISOTROPY;
+  applyTextureAnisotropy(tex, 'normal');
   tex.needsUpdate = true;
   return tex;
 }
@@ -807,7 +806,7 @@ function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArr
   texture.magFilter = THREE.LinearFilter;
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.generateMipmaps = true;
-  texture.anisotropy = ALBEDO_ANISOTROPY;
+  applyTextureAnisotropy(texture, 'colour');
   texture.needsUpdate = true;
   splatAlbedoCache?.texture.dispose();
   splatAlbedoCache = { texture, grassMean, complete };
@@ -874,6 +873,8 @@ function buildSplatMaterial(
       sh.uniforms.uCarpetRing = sharedUniforms.uCarpetRing;
       sh.uniforms.uPlainLift = { value: plainGrassLift(albedo.grassMean, grassBake.mean) };
     }
+    // The live terrain-detail shed level (terrain_detail_shed_core.ts), by shared reference.
+    if (terrainReliefLevel() >= 2) sh.uniforms.uReliefSteps = sharedUniforms.uReliefSteps;
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -914,6 +915,7 @@ function buildSplatMaterial(
         uniform sampler2DArray uAlb;
         uniform sampler2D uGrassN, uDirtN, uRockN, uSandN, uMacro, uGroundAO;
         ${grassBake ? 'uniform sampler2D uGrassBake;\n        uniform vec3 uCarpetRing;\n        uniform vec3 uPlainLift;' : ''}
+        ${terrainReliefLevel() >= 2 ? 'uniform float uReliefSteps;' : ''}
         ${SPLAT_ALBEDO_GLSL}
         ${GROUND_RELIEF_GLSL}
         ${BRUSH_RING_GLSL}`,
@@ -1013,7 +1015,8 @@ function buildSplatMaterial(
         float pFade = (1.0 - vExtra.y)
           * smoothstep(0.55, 0.85, upW)
           * smoothstep(0.15, 0.38, pNdv)
-          * (1.0 - smoothstep(14.0, 36.0, pDist));
+          * (1.0 - smoothstep(14.0, 36.0, pDist))
+          * clamp(uReliefSteps - 1.0, 0.0, 1.0); // the live terrain-detail shed
         if (pFade > 0.015) {
           // planar-XZ UVs put the tangent frame on world x/z with world y as
           // the surface normal, so the ray projects without a TBN. Offset
@@ -1098,8 +1101,9 @@ function buildSplatMaterial(
         // and occl is zero on its own. The gate only stops the shader paying
         // two to six texture taps to arrive at that zero; the smoothstep is
         // what guarantees no ring at the boundary.
-        float microFade = 1.0
-          - smoothstep(WOC_MICRO_SHADOW_NEAR, WOC_MICRO_SHADOW_FAR, wocCamDist);
+        float microFade = (1.0
+          - smoothstep(WOC_MICRO_SHADOW_NEAR, WOC_MICRO_SHADOW_FAR, wocCamDist))
+          * clamp(uReliefSteps - 2.0, 0.0, 1.0); // the live terrain-detail shed
         if (microFade > 0.0) {
           vec2 sunStep = vec2(${SUN_UV_STEP.x}, ${SUN_UV_STEP.y});
           float occl = max(
@@ -1637,6 +1641,9 @@ function buildSplatMaterial(
 }
 
 export const terrainInternalsForTest = {
+  createLambertMaterial(): THREE.MeshLambertMaterial {
+    return buildLambertMaterial(makeBrushUniforms());
+  },
   createSplatMaterial(): THREE.MeshStandardMaterial {
     const normal = new THREE.DataTexture(new Uint8Array([128, 128, 255, 255]), 1, 1);
     return buildSplatMaterial(normal, makeBrushUniforms());
@@ -1654,10 +1661,18 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
     emissive: GFX.lowPlus ? 0x182014 : 0x000000,
     emissiveIntensity: GFX.lowPlus ? 0.08 : 1,
   });
+  // Under the standard-materials rig the shadow fill is the IBL environment,
+  // which a Lambert material never samples: lift its hemisphere irradiance by
+  // the rig ratio instead (the shared uTerrainFillBoost the renderer eases
+  // from outdoor_light_rig_core.ts), so the Advanced mix's Terrain Detail Low
+  // no longer renders every sun-averted slope black. The sun term is
+  // untouched, night still darkens the fill through the graded hemisphere it
+  // multiplies, and it sits at 1 under an interior rig or on the Lambert tier.
   // The Lambert tier has no world-position varying of its own, so the brush
   // patch carries one (r165 chunk names; same idiom as the splat patch above).
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, brush);
+    sh.uniforms.uWocFillBoost = sharedUniforms.uTerrainFillBoost;
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -1674,7 +1689,15 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
         '#include <common>',
         `#include <common>
         varying vec3 vWocWPos;
+        uniform float uWocFillBoost;
         ${BRUSH_RING_GLSL}`,
+      )
+      .replace(
+        '#include <lights_fragment_begin>',
+        `#include <lights_fragment_begin>
+        #if defined( RE_IndirectDiffuse )
+        irradiance *= uWocFillBoost;
+        #endif`,
       )
       .replace(
         '#include <emissivemap_fragment>',
@@ -1787,6 +1810,16 @@ export interface TerrainView {
    * abandoned zone builds keep running on a setTimeout chain.
    */
   cancelStreaming(): void;
+  /**
+   * Terminal teardown: releases every resident chunk regardless of zone
+   * (removes each mesh from `group` and disposes its geometry), plus the
+   * shared terrain material and its per-instance normal map. Call once, when
+   * this view is being discarded for good (renderer shutdown); a later
+   * ensureZone/unloadZone on a disposed view has nothing left to build on.
+   * The normal map and material are built fresh per `buildTerrain` call
+   * (never shared with another view), so disposing them here is safe.
+   */
+  dispose(): void;
 }
 
 export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
@@ -2290,6 +2323,15 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     cancelStreaming(): void {
       cancelled = true;
       disposeZoneBuildPool();
+    },
+    dispose(): void {
+      cancelled = true;
+      disposeZoneBuildPool();
+      for (const chunk of chunks) group.remove(chunk.mesh);
+      for (const chunk of chunks) chunk.mesh.geometry.dispose();
+      chunks.length = 0;
+      mat.dispose();
+      normalTex?.dispose();
     },
     unloadZone(zone: ZoneDef): void {
       // A zone with an in-flight ensureZone is not resident yet (it only

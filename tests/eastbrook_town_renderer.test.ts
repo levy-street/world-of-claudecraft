@@ -321,7 +321,7 @@ describe('Eastbrook town renderer', () => {
     expect(view.group.userData.gateCount).toBe(0);
     expect(view.group.userData.roofHideTargetCount).toBe(EASTBROOK_LAYOUT.buildings.length);
     expect(view.group.userData.microPlacementIds).toEqual([
-      EASTBROOK_LAYOUT.civic.wellBeacon.id,
+      EASTBROOK_LAYOUT.civic.monument.id,
       ...EASTBROOK_LAYOUT.civic.benches.map((bench) => bench.id),
       ...EASTBROOK_LAYOUT.market.stalls.map((stall) => stall.id),
       ...EASTBROOK_LAYOUT.fences.map((fence) => fence.id),
@@ -347,9 +347,15 @@ describe('Eastbrook town renderer', () => {
     // colorDraws goes 34 to 35 (22 clone materials + 11 window panes + the 2
     // micro batches) and shadowDraws 22 to 23 (the 22 clones + the micro
     // opaque batch). The panes still never cast.
+    // Round 8: the Realm Builder monument left the merged micro-batch and now
+    // draws as its own textured prop, so its meshes are counted individually.
+    // These are the FIXTURE's numbers: fixtureSources supplies a two-mesh
+    // stand-in for it, hence +2 colour and +2 shadow. The shipping asset splits
+    // three ways (surface, gold tools, flame cores) and its flame cores never
+    // cast, so in game it is +3 colour and +2 shadow.
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({
-      colorDraws: 35,
-      shadowDraws: 23,
+      colorDraws: 37,
+      shadowDraws: 25,
       buildingCount: 11,
       roofHideTargetCount: 11,
       microBatchCount: 2,
@@ -658,7 +664,7 @@ describe('Eastbrook town renderer', () => {
     // kit path: 35 meshes are the 11 kit instances' 22 raw GLB clones, their 11
     // window-pane meshes, and the 2 micro batches, with no template building
     // mesh left at all.
-    expect(meshes).toHaveLength(35);
+    expect(meshes).toHaveLength(37);
     const kitBuildings = EASTBROOK_LAYOUT.buildings.filter((building) =>
       isKitBuildingAsset(building.assetId),
     );
@@ -676,9 +682,19 @@ describe('Eastbrook town renderer', () => {
     );
     expect(kitMeshes).toHaveLength(22);
     expect(paneMeshes).toHaveLength(11);
-    // Round 6b: the only template-path meshes left in town are the 2 micro
+    // Round 6b: the only template-path meshes left in town were the 2 micro
     // batches; the chapel pair that used to join them is a kit clone now.
-    expect(templateMeshes).toHaveLength(2);
+    // Round 8 added the Realm Builder monument's own textured meshes beside
+    // them (the fixture's two-mesh stand-in for it), so this bucket is the 2
+    // micro batches plus the monument body. Its meshes keep their own GLB
+    // materials on every tier, exactly like the kit clones, so they are
+    // excluded from the Lambert assertion below rather than counted into it.
+    const monumentMeshes = meshesOf(
+      view.group.getObjectByName('eastbrookRealmBuilderMonumentFxBody') as THREE.Object3D,
+    );
+    expect(monumentMeshes.length).toBeGreaterThan(0);
+    const microBatchMeshes = templateMeshes.filter((mesh) => !monumentMeshes.includes(mesh));
+    expect(microBatchMeshes).toHaveLength(2);
     // The template pipeline swaps to shared Lambert vertex-color materials on
     // Low. The kit clones keep their OWN authored GLB materials on every tier
     // (their color is in KTX2 palette textures, not vertex colors), cloned
@@ -688,12 +704,20 @@ describe('Eastbrook town renderer', () => {
     // Low they downgrade to Lambert like the template meshes, one
     // independent material per building.
     expect(
-      templateMeshes.every(
+      microBatchMeshes.every(
         (mesh) => (mesh.material as THREE.Material).type === 'MeshLambertMaterial',
       ),
     ).toBe(true);
     expect(
-      templateMeshes.every((mesh) => (mesh.material as THREE.MeshLambertMaterial).vertexColors),
+      microBatchMeshes.every((mesh) => (mesh.material as THREE.MeshLambertMaterial).vertexColors),
+    ).toBe(true);
+    // The monument downgrades to Lambert on Low like everything else, but it
+    // keeps its own material NAMES and its albedo map: its colour is a texture,
+    // not a vertex-colour bake, which is the whole reason it left the batch.
+    expect(
+      monumentMeshes.every(
+        (mesh) => (mesh.material as THREE.Material).type === 'MeshLambertMaterial',
+      ),
     ).toBe(true);
     expect(
       kitMeshes.every((mesh) =>
@@ -708,7 +732,7 @@ describe('Eastbrook town renderer', () => {
       paneMeshes.every((mesh) => (mesh.material as THREE.MeshLambertMaterial).vertexColors),
     ).toBe(true);
     expect(new Set(paneMeshes.map((mesh) => mesh.material)).size).toBe(11);
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 35, shadowDraws: 23 });
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 37, shadowDraws: 25 });
   });
 
   it('mirrors exactly the first real wall chord after each asymmetric gate socket', async () => {
@@ -971,12 +995,21 @@ describe('Eastbrook repeated placement triangle budget', () => {
     // 2,519 with the building count and the 132-triangle skirt allowance
     // unchanged. 29,203 becomes 26,684 and the runtime total 29,335 becomes
     // 26,816, further under the 30,000 target than before.
-    expect(budget.assetTriangles).toBe(26_684);
+    // Round 7 swapped the square's centrepiece: the well beacon (464) out, the
+    // Realm Builder monument in, on its one instance. Round 8 (owner) doubled
+    // that statue and put the FULL sculpt back (the decimated one read as
+    // putty at that size), so the monument is 5,923 triangles and the aggregate
+    // is 32,143. The 30,000 target moved to 33,000 to pay for it; the reasoning
+    // is on `target` in src/render/eastbrook_town.ts. The monument is counted
+    // here even though it no longer merges into the micro-batch: it is still
+    // drawn in this town, and a budget that hides the town's biggest prop is
+    // not a budget.
+    expect(budget.assetTriangles).toBe(32_143);
     expect(budget.maximumFoundationTriangles).toBe(132);
     expect(budget.maximumRuntimeTriangles).toBe(
       budget.assetTriangles + budget.maximumFoundationTriangles,
     );
-    expect(budget.maximumRuntimeTriangles).toBe(26_816);
+    expect(budget.maximumRuntimeTriangles).toBe(32_275);
     expect(
       budget.maximumRuntimeTriangles,
       JSON.stringify({
@@ -985,7 +1018,7 @@ describe('Eastbrook repeated placement triangle budget', () => {
       }),
     ).toBeLessThanOrEqual(40_000);
     expect(budget.withinHardCeiling).toBe(true);
-    expect(budget.target).toBe(30_000);
+    expect(budget.target).toBe(33_000);
     expect(budget.maximumRuntimeTriangles).toBeLessThanOrEqual(budget.target);
     expect(budget.meetsTarget).toBe(true);
   });

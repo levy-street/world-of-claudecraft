@@ -113,6 +113,10 @@ describe('weapon type classification', () => {
 
   it('stays in lockstep with the render variant family for mapped items', () => {
     const familyOf = (variant: string): string | null => {
+      // The violet-gem KayKit sword and axe (the Nythraxis gap-fill one-handers)
+      // carry the same VAR_SWORD / VAR_AXE grips as the adv set in assets.ts.
+      if (variant === 'purple_sword') return 'sword';
+      if (variant === 'purple_axe') return 'axe';
       if (/^(adv_)?sword/.test(variant)) return 'sword';
       // The bespoke dagger skins carry thematic names; assets.ts tags each of
       // these variants VAR_DAGGER, which is the render-side family authority.

@@ -138,39 +138,11 @@
         "repairedWeightVertices": 9018,
         "bones": 69,
         "legChains": [
-          [
-            "bone_12",
-            "bone_13",
-            "bone_14",
-            "bone_15",
-            "bone_16"
-          ],
-          [
-            "bone_17",
-            "bone_18",
-            "bone_19",
-            "bone_20"
-          ],
-          [
-            "bone_21",
-            "bone_22",
-            "bone_23",
-            "bone_24",
-            "bone_25"
-          ],
-          [
-            "bone_7",
-            "bone_8",
-            "bone_9",
-            "bone_10",
-            "bone_11"
-          ],
-          [
-            "bone_3",
-            "bone_4",
-            "bone_5",
-            "bone_6"
-          ],
+          ["bone_12", "bone_13", "bone_14", "bone_15", "bone_16"],
+          ["bone_17", "bone_18", "bone_19", "bone_20"],
+          ["bone_21", "bone_22", "bone_23", "bone_24", "bone_25"],
+          ["bone_7", "bone_8", "bone_9", "bone_10", "bone_11"],
+          ["bone_3", "bone_4", "bone_5", "bone_6"],
           [
             "tripo::0_Left_Limb_1",
             "tripo::0_Left_Limb_2",
@@ -276,10 +248,7 @@
         "repairedWeightVertices": 0,
         "bones": 34,
         "legChains": [
-          [
-            "tripo::2_Right_Limb_0",
-            "tripo::2_Right_Limb_1"
-          ],
+          ["tripo::2_Right_Limb_0", "tripo::2_Right_Limb_1"],
           [
             "tripo::1_Right_Limb_0",
             "tripo::1_Right_Limb_1",
@@ -304,10 +273,7 @@
             "tripo::1_Left_Limb_2",
             "tripo::1_Left_Limb_3"
           ],
-          [
-            "tripo::0_Left_Limb_0",
-            "tripo::0_Left_Limb_1"
-          ]
+          ["tripo::0_Left_Limb_0", "tripo::0_Left_Limb_1"]
         ],
         "normalizedIdleSampleSeconds": 0.5,
         "idleFloor": 0.0005795955657958984
@@ -397,27 +363,10 @@
             "tripo::2_Right_Limb_2",
             "tripo::2_Right_Limb_3"
           ],
-          [
-            "Beetle_MiddleRight_0",
-            "Beetle_MiddleRight_1",
-            "Beetle_MiddleRight_2"
-          ],
-          [
-            "tripo::1_Right_Limb_0",
-            "tripo::1_Right_Limb_1",
-            "tripo::1_Right_Limb_2"
-          ],
-          [
-            "bone_5",
-            "tripo::2_Left_Limb_0",
-            "tripo::2_Left_Limb_1",
-            "tripo::2_Left_Limb_2"
-          ],
-          [
-            "bone_16",
-            "tripo::1_Left_Limb_0",
-            "tripo::1_Left_Limb_1"
-          ],
+          ["Beetle_MiddleRight_0", "Beetle_MiddleRight_1", "Beetle_MiddleRight_2"],
+          ["tripo::1_Right_Limb_0", "tripo::1_Right_Limb_1", "tripo::1_Right_Limb_2"],
+          ["bone_5", "tripo::2_Left_Limb_0", "tripo::2_Left_Limb_1", "tripo::2_Left_Limb_2"],
+          ["bone_16", "tripo::1_Left_Limb_0", "tripo::1_Left_Limb_1"],
           [
             "tripo::0_Left_Limb_0",
             "tripo::0_Left_Limb_1",

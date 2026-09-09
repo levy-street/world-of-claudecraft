@@ -1,7 +1,8 @@
 // Screenshots for the castle exterior fixes: the Dawnhold curtain's remainder
-// breach (now filled), the Ashen Bulwark's previously invisible walls (now a
-// full render assembly, src/render/bulwark_features.ts), and the banner cloth
-// that vanished from outside the walls (now double-sided via castle_kit).
+// breach (now filled) and the banner cloth that vanished from outside the
+// walls (now double-sided via castle_kit). The Ashen Bulwark and the Last
+// Keep castle shots retired with those structures (the Drakelands
+// map-improvements epic razed both; docs/design/drakelands-improvements).
 // Boots the offline world once, then drives the renderer's editor free-cam
 // seam through one framing per fix, outside the walls where each defect was
 // reported. Needs `npm run dev` running; browser via scripts/browser_path.mjs.
@@ -127,14 +128,6 @@ await shot('dawnhold_west_wall', { x: 230, z: 916, h: 6 }, { x: 241, z: 917.5, h
 // 2. Dawnhold's east front from outside the main gate: tower shield banners
 // and the gate banners, which used to vanish from this side.
 await shot('dawnhold_gate_banners', { x: 302, z: 886, h: 7 }, { x: 291, z: 895, h: 9 });
-// 3. The Ashen Bulwark from the isthmus approach: the muster gate front and
-// the east curtain, which previously rendered nothing at all.
-await shot('bulwark_muster_front', { x: 260, z: 2344, h: 6 }, { x: 243, z: 2340, h: 6 });
-// 4. The Bulwark wide from the southeast, Sea Watch behind the south run.
-await shot('bulwark_wide', { x: 262, z: 2360, h: 9 }, { x: 230, z: 2330, h: 6 });
-// 5. The Last Keep's west front from the Wyrmwatch road: barbican banners and
-// the wall-walk banners, from the outside where they used to vanish.
-await shot('lastkeep_west_banners', { x: 336, z: 2026, h: 8 }, { x: 361, z: 2030, h: 11 });
 
 await browser.close();
 console.log('done');

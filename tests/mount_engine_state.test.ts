@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  advanceInterruptibleMountEngine,
   advanceMountEngine,
   type MountEngineEntry,
   mountEngineLoopActive,
@@ -75,5 +76,35 @@ describe('mount_engine_state', () => {
     const { next, action } = advanceMountEngine(entry, true, 20.2, START_DURATION);
     expect(next).toEqual({ state: 'starting', phaseStartedAt: 20.2 });
     expect(action).toBe('playStart');
+  });
+});
+
+describe('interruptible mount engine state', () => {
+  it('cuts start directly to stop on a quick release', () => {
+    const start = advanceInterruptibleMountEngine(undefined, true, 0, START_DURATION);
+    const stop = advanceInterruptibleMountEngine(start.next, false, 0.1, START_DURATION);
+    expect(stop).toEqual({
+      next: { state: 'stopping', phaseStartedAt: 0.1 },
+      action: 'playStop',
+    });
+  });
+
+  it('cuts stop directly back to start on a re-press', () => {
+    const stopping: MountEngineEntry = { state: 'stopping', phaseStartedAt: 0.1 };
+    const restart = advanceInterruptibleMountEngine(stopping, true, 0.2, START_DURATION);
+    expect(restart).toEqual({
+      next: { state: 'starting', phaseStartedAt: 0.2 },
+      action: 'playStart',
+    });
+  });
+
+  it('hard-splices to the sustain state only after the full start duration', () => {
+    const start = advanceInterruptibleMountEngine(undefined, true, 0, START_DURATION);
+    expect(advanceInterruptibleMountEngine(start.next, true, 0.8, START_DURATION).next.state).toBe(
+      'starting',
+    );
+    expect(advanceInterruptibleMountEngine(start.next, true, 0.9, START_DURATION).next.state).toBe(
+      'moving',
+    );
   });
 });

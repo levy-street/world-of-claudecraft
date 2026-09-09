@@ -262,4 +262,23 @@ describe('bank deposit-all against a synchronously-mutating (offline-shaped) wor
       'Materials deposited: 1. Bank now full.',
     );
   });
+
+  // #3xxx: the same "Core of the Last Flame" reports the vault's notable-item
+  // arm was built to close reproduce off the Bank's own, older Deposit All
+  // button (the reviewed follow-up: the reclassification made the reagent
+  // eligible on both surfaces). This is the third-altitude behavior proof for
+  // the mirrored arm, off the REAL catalog id (lastflame_core is the shipped
+  // taxonomy's one epic-or-better material, pinned in materials_vault.test.ts).
+  it('names an epic-or-better material the sweep actually sends, not a bare count', () => {
+    const h = harness();
+    h.world.inventory = [
+      { itemId: MATS[0], count: 3 },
+      { itemId: 'lastflame_core', count: 1 },
+    ];
+    h.window.open();
+    (h.root.querySelector('.bank-deposit-all') as HTMLElement).click();
+    expect(h.root.querySelector('.bank-status')?.textContent).toBe(
+      'Materials deposited: 2, including Core of the Last Flame.',
+    );
+  });
 });

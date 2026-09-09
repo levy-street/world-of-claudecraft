@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.es.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Todas las instancias corren también en **Heroico**: enemigos de mayor nivel, me
 
 ### Delves
 
-Los delves son un modo aparte, escalable y de grupo pequeño para uno o dos jugadores, reconstruido a partir de cámaras aleatorias en cada partida y que termina en un cofre relicario cerrado que se abre con un minijuego de ganzúas en lugar de una tirada de botín. **The Collapsed Reliquary** (nivel 7 en adelante) termina en Deacon Varric, con una compañera de IA, Tessa, luchando a tu lado si vas en solitario. **The Drowned Litany** (nivel 12 en adelante) sigue el rastro hasta un santuario inundado en el borde de Mirefen Marsh. Un tablero de delves fija el nivel: el Heroico sube los niveles de los enemigos y agrega un afijo aleatorio para recompensas más ricas.
+Los delves son un modo aparte, escalable y de grupo pequeño para uno o dos jugadores, reconstruido a partir de cámaras aleatorias en cada partida y que termina en un cofre relicario cerrado que se abre con un minijuego de ganzúas en lugar de una tirada de botín. **The Collapsed Reliquary** (nivel 7 en adelante) termina en Deacon Vandric, con una compañera de IA, Tessa, luchando a tu lado si vas en solitario. **The Drowned Litany** (nivel 12 en adelante) sigue el rastro hasta un santuario inundado en el borde de Mirefen Marsh. Un tablero de delves fija el nivel: el Heroico sube los niveles de los enemigos y agrega un afijo aleatorio para recompensas más ricas.
 
 ### PvP clasificatorio (the Ashen Coliseum)
 

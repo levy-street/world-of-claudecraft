@@ -41,11 +41,13 @@ import {
   syncDivineAscensionAura,
 } from '../paladin_devotion';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
+import { scalePrimaryHealing } from '../primary_healing';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import { summonSoulwell } from '../soulwell';
+import { primaryHealingMultiplier } from '../spec_output_tuning';
 import {
   abilityScalingPower,
   absorbBonus,
@@ -58,6 +60,7 @@ import { stunDrCategory } from '../stun_dr';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, dropThreat } from '../threat';
 import { creditAbilityDrill } from '../tutorial/ability_drill';
+import { creditHubHealingDrill } from '../tutorial/hub_healing_drill';
 import type { AbilityDef, Aura, Entity } from '../types';
 import {
   angleTo,
@@ -92,6 +95,8 @@ import {
   hasSweepingStrikes,
   sweepStrikeDamage,
 } from './area_echo';
+import { absorbAuraId, buffTargetAuraId, selfBuffAuraId } from './aura_ids';
+import { resetSwingTimer } from './auto_attack';
 import {
   damageBreakThreshold,
   hasUnbreakableMovementLock,
@@ -107,6 +112,7 @@ import {
   placeTemporalEcho,
   selectCascadeTargets,
 } from './chronomancy';
+import { cascadeReliefMultiplier } from './chronomancy_echo_distribution';
 import {
   advanceBurningPactTick,
   applyDuskfireClaim,
@@ -205,6 +211,12 @@ import {
 } from './paladin_talents';
 import { armValkyrsCalling } from './paladin_valkyrs_calling';
 import { activateVeilboundMarch } from './paladin_veilbound_march';
+import {
+  captureDirgeReapplication,
+  doctrineScouringMercyRescue,
+  refreshDirgeFieldAfterReapplication,
+  vespersDirgeSpMultiplier,
+} from './priest';
 import { benisonAfterAbility } from './priest/benison';
 import { doctrineAfterAbility } from './priest/doctrine';
 import { priestAfterAbility, priestOnGroupHeal } from './priest/talents';
@@ -220,6 +232,11 @@ import {
   rogueEngineOnFinisher,
   rogueGloamDetonation,
 } from './rogue_engines';
+import {
+  capturedTrueStealthAmbush,
+  trueStealthOpenerMultiplier,
+  trueStealthOpenerScaleBonus,
+} from './rogue_stealth_opener';
 import { wearsSetBonus } from './set_bonus_wearer';
 import { consumeMendingCurrent, depositMendingCurrent } from './shaman_spiritmend';
 import {
@@ -465,6 +482,7 @@ export function runEffects(
   const ascensionFxTargetHostile = target !== null && ctx.isHostileTo(p, target);
   const isSpell = ability.school !== 'physical';
   const mods = ctx.playerMods(meta);
+  const primaryHealMult = primaryHealingMultiplier(meta.cls, mods.spec);
   // The resolved mastery/talent damage and heal multiplier for this ability
   // (talent_hit_mult.ts): the SAME number applyTalentMods already baked into
   // its authored base magnitudes, reused here to scale the SP/AP rider a
@@ -499,6 +517,7 @@ export function runEffects(
   // in the open with a full Gloam bank raises the shadow veil BEFORE this
   // cast's effects resolve, so the detonating Lurker's Strike is the doubled
   // one. Checked before breakStealth: a true-stealth opener banks instead.
+  const trueStealthOpener = capturedTrueStealthAmbush(ctx, p, ability.id);
   rogueGloamDetonation(ctx, p, ability.id);
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
@@ -581,7 +600,7 @@ export function runEffects(
     }
   }
 
-  // requiresAuraKind (Glacial Spike's Icicles, Victory Rush's kill window) is now
+  // requiresAuraKind (Rimeneedle's Icicles, Victor's Surge's kill window) is now
   // consumed atomically at cast commit in casting_lifecycle.ts's applyAbility,
   // alongside spendAbilityCost/armAbilityCooldown, not here: a ranged ability's
   // runEffects can run ticks after the cast committed (once its projectile
@@ -648,8 +667,14 @@ export function runEffects(
           (ability.id === 'raptor_strike' || ability.id === 'mongoose_bite');
         let landedDamage = 0;
         // Veiled Edge (rogue sub engine): the first Lurker's Strike from
-        // inside the veil consumes the edge and strikes for double.
-        weaponMult *= consumeVeiledEdge(ctx, p, ability.id);
+        // inside the veil consumes the edge and strikes for +50% weapon
+        // damage. A true-stealth opener wins its own (stronger) reward
+        // instead and must not spend an armed Edge for a discarded return
+        // value: "cannot stack" leaves the Edge armed for the next eligible
+        // strike, so the consume call is skipped entirely here.
+        const veiledEdgeMult = trueStealthOpener ? 1 : consumeVeiledEdge(ctx, p, ability.id);
+        weaponMult *= trueStealthOpener ? trueStealthOpenerMultiplier(true) : veiledEdgeMult;
+        bonus = trueStealthOpenerScaleBonus(trueStealthOpener, bonus);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
           cannotBeDodged: eff.cannotBeDodged,
           normalizedInstant: eff.normalized,
@@ -845,9 +870,9 @@ export function runEffects(
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         // Aether Surge (Chronomancy Phase 3): each held Arcane Charge scales the
-        // FULL post-spell-power, post-crit damage. The extra damage is what feeds
-        // more Temporal Echo healing (no hidden heal bonus). Deterministic; reads
-        // the caster's charge aura (combat/chronomancy.ts).
+        // FULL post-spell-power, post-crit damage. The extra damage feeds more
+        // Temporal Echo healing before Chronomancy applies its individual-mark
+        // rotation weight. Deterministic; reads the caster's charge aura.
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
@@ -1186,7 +1211,8 @@ export function runEffects(
         // selectCascadeTargets resolves and ORDERS the whole list (primary first,
         // then the members nearest the primary within radius, capped at maxTargets)
         // BEFORE any heal or aura is applied. Each target then takes a small initial
-        // heal (Spell-Power-scaled, can crit) and a 13% group echo; the overlap rule
+        // heal (Spell-Power-scaled, can crit, scaled by the ally's missing health via
+        // cascadeReliefMultiplier) and a 13% group echo; the overlap rule
         // in placeGroupEcho keeps a pre-existing individual mark at 40%. The Arcane
         // conversion lives in combat/chronomancy.ts. (mage-chronomancy.md Phase 4)
         const primary = target ?? p;
@@ -1203,9 +1229,15 @@ export function runEffects(
           // by the massTemporalEcho case in classes.ts, and talentHealMult reaches
           // the SP rider here too, so Chronoweave's "all healing" bonus applies to
           // Temporal Cascade's initial heal the same way it does every other heal.
-          const healAmount =
+          // The rng draw stays FIRST and unconditional: the relief multiplier is
+          // pure health arithmetic applied after it, so the global stream is
+          // untouched and the parity goldens still line up.
+          const healRoll =
             ctx.rng.range(eff.heal.min, eff.heal.max) +
             directHealBonus(p.healPower, res.castTime, false, talentHealMult);
+          // Cast on a healthy group this is 1 and the heal is exactly what it has
+          // always been; cast into real damage it scales up to the authored ceiling.
+          const healAmount = Math.round(healRoll * cascadeReliefMultiplier(ally.hp, ally.maxHp));
           ctx.applyHeal(p, ally, healAmount, ability.name);
           if (devPlaytest) {
             const applied = ally.hp - before;
@@ -1246,8 +1278,6 @@ export function runEffects(
           break;
         }
         offerResurrection(ctx, p, ally, eff.hpFrac, resurrectionCastRange(ability.range));
-        // The ability's own school, not a hardcoded arcane: Temporal Reversal
-        // is arcane either way, and the Groveheart combat rez reads as nature.
         ctx.emit({
           type: 'spellfx',
           sourceId: p.id,
@@ -1306,10 +1336,14 @@ export function runEffects(
             : Math.round(p.maxHp * eff.casterMaxHpPct);
         // The cast-scoped multiplier (see the runEffects parameter note): the
         // === 1 guard keeps every unmarked cast's arithmetic byte-identical.
-        const healAmount =
+        const castHealAmount =
           castHealMult === 1
             ? baseHealAmount
             : Math.max(1, Math.round(baseHealAmount * castHealMult));
+        const healAmount =
+          eff.casterMaxHpPct === undefined
+            ? scalePrimaryHealing(castHealAmount, primaryHealMult)
+            : castHealAmount;
         if (eff.canCrit === false) ctx.rng.chance(0);
         // Only this direct-heal effect opts into Beacon transfer. Derived,
         // periodic, chained, area, and self-heal effects remain ineligible.
@@ -1323,6 +1357,16 @@ export function runEffects(
           true,
           true,
         );
+        // The hub's optional healing lesson (tutorial/hub_healing_drill.ts):
+        // one credit per effective heal, from THIS primary direct-heal
+        // resolution only, before the Power Echo repeat below runs. That
+        // ordering is what keeps an echoed copy of this same cast (and every
+        // other derived/chained/procced applyHeal call, none of which run
+        // through this case) from ever double-crediting a single real cast.
+        creditHubHealingDrill(ctx, p, healTarget, healed, ability.id);
+        if (ability.id === 'scouring_mercy') {
+          doctrineScouringMercyRescue(ctx, p, meta, healTarget, healed);
+        }
         if (ability.id === 'healing_wave' || ability.id === 'tidecall') {
           depositMendingCurrent(ctx, p, healTarget, healAmount, ability.id);
         }
@@ -1393,9 +1437,11 @@ export function runEffects(
         // Selection and the per-hop spellfx arc adopted from Blaine1705's #1434.
         const first = target ?? p;
         if (first !== p && ctx.isHostileTo(p, first)) break;
-        const baseAmount =
+        const baseAmount = scalePrimaryHealing(
           ctx.rng.range(eff.min, eff.max) +
-          directHealBonus(p.healPower, res.castTime, false, talentHealMult);
+            directHealBonus(p.healPower, res.castTime, false, talentHealMult),
+          primaryHealMult,
+        );
         // Springmender 4pc (the Crucible set doc): Cascading Mend reaches a
         // FOURTH ally, one extra hop past the authored jumps. Bespoke: no
         // talent primitive reaches chainHeal's jump count, so the bend lives
@@ -1504,7 +1550,10 @@ export function runEffects(
           kind: 'hot',
           remaining: eff.duration,
           duration: eff.duration,
-          value: hotBase + hotSp,
+          value:
+            eff.pctOfMax === undefined
+              ? scalePrimaryHealing(hotBase + hotSp, primaryHealMult)
+              : hotBase + hotSp,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,
@@ -1515,11 +1564,8 @@ export function runEffects(
       }
       case 'absorb': {
         const shieldTarget = target ?? p;
-        const hasStasisSelfBuff = ability.effects.some(
-          (effect) => effect.type === 'selfBuff' && effect.kind === 'stasis',
-        );
         ctx.applyAura(shieldTarget, {
-          id: eff.auraId ?? (hasStasisSelfBuff ? `${ability.id}_absorb` : ability.id),
+          id: absorbAuraId(ability, eff),
           name: ability.name,
           kind: 'absorb',
           remaining: eff.duration,
@@ -1850,8 +1896,7 @@ export function runEffects(
       case 'drainTick':
         break; // handled per channel tick
       case 'buffTarget': {
-        const auraId =
-          targetBuffIndex === 0 ? ability.id : `${ability.id}_${eff.kind}_${targetBuffIndex}`;
+        const auraId = buffTargetAuraId(ability, eff, targetBuffIndex);
         targetBuffIndex += 1;
         const applyBuff = (e: Entity) => {
           const lifetime = eff.permanent ? Number.POSITIVE_INFINITY : eff.duration;
@@ -1996,10 +2041,14 @@ export function runEffects(
               ability,
               dotDuration,
               eff.interval,
-              talentDmgMult * (1 + mods.global.dotDmgPct),
+              talentDmgMult *
+                (1 + mods.global.dotDmgPct) *
+                (ability.id === 'shadow_word_pain' ? vespersDirgeSpMultiplier(meta) : 1),
             )
           : 0;
         const dotId = eff.auraId ?? ability.id;
+        const priorDirge =
+          ability.id === 'shadow_word_pain' ? captureDirgeReapplication(target, p.id) : null;
         ctx.applyAura(target, {
           id: dotId,
           name: ABILITIES[dotId]?.name ?? ability.name,
@@ -2013,6 +2062,8 @@ export function runEffects(
           school: eff.school ?? ability.school,
           leechPct: eff.leechPct,
         });
+        if (priorDirge)
+          refreshDirgeFieldAfterReapplication(ctx, p, meta, target, priorDirge, ability.range);
         if (dotId === 'rupture') {
           ctx.emit({
             type: 'spellfx',
@@ -2221,9 +2272,9 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
           breaksOnDamage: true,
-          // Generic fear-family members get the graded chance. Harrow uses
-          // the deterministic Warlock budget, while plain incapacitates
-          // (Eye Jab, Wyvern Sting) insta-break.
+          // Generic fear-family members (fearDr: Harrow, Morrowlash) get the
+          // graded chance. Harrow uses the deterministic Warlock budget, while
+          // plain incapacitates (Eye Jab, Drakesting) insta-break.
           breakChanceScale:
             ability.fearDr && warlockBreakThreshold === undefined
               ? FEAR_BREAK_CHANCE_SCALE
@@ -2231,7 +2282,7 @@ export function runEffects(
           breakThreshold: warlockBreakThreshold,
         });
         // Fear-flavored incapacitates (Harrow) sound at the target, distinct
-        // from plain stuns/incapacitates (Eye Jab, Wyvern Sting), which have
+        // from plain stuns/incapacitates (Eye Jab, Drakesting), which have
         // no dedicated fear audio. Gated to ability.id, not the broader
         // fearDr flag: death_coil (Morrowlash) also carries fearDr for its
         // diminishing-returns/break-chance treatment but has no fear
@@ -2259,6 +2310,11 @@ export function runEffects(
             ability: ability.id,
           });
         }
+        // Eye Jab (gouge) resets the caster's own swing timer (classic WoW's
+        // Gouge does the same): otherwise the auto-attack already in flight
+        // lands on the very next tick and, being a direct hit, breaks the
+        // incapacitate this same cast just applied.
+        if (ability.id === 'gouge') resetSwingTimer(ctx, p, meta);
         if (ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
@@ -2686,7 +2742,10 @@ export function runEffects(
         for (const m of friendliesInRadius(ctx, center, eff.radius)) {
           if (eff.playersOnly && m.kind !== 'player') continue;
           if (!ctx.hasLineOfSight(center, m)) continue;
-          const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
+          const healAmount = scalePrimaryHealing(
+            ctx.rng.range(eff.min, eff.max) + aoeHealBonus,
+            primaryHealMult,
+          );
           const missingBefore = m.maxHp - m.hp;
           const resolution = { resolved: 0 };
           const healed = ctx.applyHeal(
@@ -2720,7 +2779,7 @@ export function runEffects(
         break;
       }
       case 'frozenOrb': {
-        // Frozen Orb (combat/frozen_orb.ts): release the drifting orb from the
+        // Frostglobe (combat/frozen_orb.ts): release the drifting orb from the
         // caster, snapshotting the per-pulse spell-power rider like a groundAoE.
         spawnFrozenOrb(
           ctx,
@@ -2783,7 +2842,7 @@ export function runEffects(
                 }
               : undefined,
         };
-        // A fresh Blizzard zone gets a fresh Frozen Orb refund budget (the
+        // A fresh Blizzard zone gets a fresh Frostglobe refund budget (the
         // same per-cast budget the old channel reset at channel start).
         if (eff.orbCdr) frostMageChannelStart(p, ability.id);
         // Visual riders (owner playtest): a delayed FIRE zone is a falling
@@ -3465,9 +3524,11 @@ export function runEffects(
           );
         }
         if (eff.heal) {
-          const healAmount =
+          const healAmount = scalePrimaryHealing(
             ctx.rng.range(eff.heal.min, eff.heal.max) +
-            directHealBonus(p.healPower, res.castTime, false, talentHealMult);
+              directHealBonus(p.healPower, res.castTime, false, talentHealMult),
+            primaryHealMult,
+          );
           ctx.applyHeal(p, target, healAmount, ability.name, ability.id);
         }
         break;
@@ -3626,16 +3687,12 @@ export function runEffects(
         }
         // An ability can grant SEVERAL self-buffs at once (Arcane Power: spell damage AND
         // haste; Metamorphosis: damage AND haste). applyAura dedups by (id, sourceId), so
-        // every companion buff needs a distinct id or the last would evict the rest. The
-        // PRIMARY self-buff (the first kind on the DEF) keeps the bare ability id (so its
-        // icon/name resolve and the form/aspect toggle-off still finds it by id); companions
-        // get a kind-suffixed id. Compare by KIND, not object identity: applyTalentMods may
-        // have replaced the resolved effect objects, so a reference check would misfire.
-        const firstSelfBuffKind = ability.effects.find((e) => e.type === 'selfBuff')?.kind;
-        const isPrimarySelfBuff = eff.kind === firstSelfBuffKind;
+        // every companion buff needs a distinct id or the last would evict the rest; the
+        // rule (primary keeps the bare id, companions are kind-suffixed, an explicit
+        // auraId wins) lives in ./aura_ids.ts, shared with the HUD's aura-track catalog.
         const lifetime = eff.permanent ? Number.POSITIVE_INFINITY : eff.duration;
         ctx.applyAura(p, {
-          id: eff.auraId ?? (isPrimarySelfBuff ? ability.id : `${ability.id}_${eff.kind}`),
+          id: selfBuffAuraId(ability, eff),
           name: eff.auraName ?? ability.name,
           kind: eff.kind,
           remaining: lifetime,

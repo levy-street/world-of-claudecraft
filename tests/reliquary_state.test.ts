@@ -58,6 +58,7 @@ import {
   relicFillScoresForRank,
   reliquaryCatalogIndexProbe,
   reliquaryOwnershipOpts,
+  reliquarySaveFragment,
   reliquaryScoringPagesProbe,
   reliquaryWireCacheProbe,
   reliquaryWireJson,
@@ -73,6 +74,7 @@ import {
 } from '../src/sim/reliquary';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import { runApplyEnchant, runCraft } from './helpers/enchant_family_cast';
+import { stripComments } from './helpers/strip_comments';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -114,6 +116,13 @@ describe('Reliquary fresh state + serialize omit-empty', () => {
 
   it('serializeReliquaryState returns undefined for a fresh state', () => {
     expect(serializeReliquaryState(freshReliquaryState())).toBeUndefined();
+  });
+
+  it('reliquarySaveFragment wraps serializeReliquaryState into the sim.ts save shape', () => {
+    expect(reliquarySaveFragment(freshReliquaryState())).toEqual({});
+    const marked = restoreReliquaryState(undefined);
+    marked.marks.add('relic_test');
+    expect(reliquarySaveFragment(marked)).toEqual({ reliquary: serializeReliquaryState(marked) });
   });
 
   it('restore of undefined yields empty state', () => {
@@ -831,10 +840,11 @@ describe('Reliquary profession marks (Phase 7)', () => {
     // The load this regex still carries is the isCataloguedRelicMark gate
     // on the derived visit write, which no behavioral case can reach while
     // every masterwork-capable craft has an authored mark (only equippable
-    // outputs can proc, and all four gear-capable professions sit in
-    // RELIQUARY_PROFESSION_MARKS.masterworkByCraft; its fifth entry,
+    // outputs can proc, and every gear-capable profession sits in
+    // RELIQUARY_PROFESSION_MARKS.masterworkByCraft; its one non-gear entry,
     // engineering, is the pended tool-only craft that can never proc, see
-    // the gear-capability pin in tests/reliquary_content.test.ts).
+    // the gear-capability pin in tests/reliquary_content.test.ts, which
+    // derives that membership from the live recipes in both directions).
     const craftSrc = fs
       .readFileSync(path.join(__dirname, '../src/sim/professions/crafting.ts'), 'utf8')
       .split('\n')
@@ -864,13 +874,14 @@ describe('Reliquary profession marks (Phase 7)', () => {
       /const visitMark = `gather_event:\$\{flavor\}`;[\s\S]*?ctx\.markVisited\(finder, visitMark\);[\s\S]*?noteReliquaryMark\(ctx, finder, visitMark\);/,
     );
 
-    const interactionSrc = fs
-      .readFileSync(path.join(__dirname, '../src/sim/interaction.ts'), 'utf8')
-      .split('\n')
-      .filter((line) => !/^\s*\/\//.test(line))
-      .join('\n');
+    const corpseHarvestGrantSrc = stripComments(
+      fs.readFileSync(
+        path.join(__dirname, '../src/sim/professions/corpse_harvest_grant.ts'),
+        'utf8',
+      ),
+    );
     // Perfect specimen land: deed visit + Reliquary mark on the same arm.
-    expect(interactionSrc).toMatch(
+    expect(corpseHarvestGrantSrc).toMatch(
       /ctx\.markVisited\(meta, 'gather_event:perfect_specimen'\);[\s\S]*?noteReliquaryMark\(ctx, meta, 'gather_event:perfect_specimen'\);/,
     );
 
@@ -1795,13 +1806,15 @@ describe('Reliquary obtain counts', () => {
     // BOTH handovers really happened (otherwise the count claim is vacuous).
     expect(taker.inventory.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
     expect(taker.inventory.some((s) => s.itemId === STACKABLE_RELIC)).toBe(true);
-    // Premise for the INSTANCED arm: the received unit still carries its
-    // payload, so the handover really took grantOffer's addItemInstance branch
-    // (a unit that lost its payload would fall into the plain branch and leave
-    // that call site's movement flag untested).
-    expect(taker.inventory.find((s) => s.itemId === STACKABLE_RELIC)?.instance?.signer).toBe(
-      'Giver',
-    );
+    // Premise for the INSTANCED arm: STACKABLE_RELIC is a gathering material,
+    // so the received unit's signer rides its `materialSources` composition
+    // rather than an `instance` payload; the handover still moved through
+    // grantOffer's addItemInstance call site (a unit that lost its provenance
+    // would leave that site's movement flag untested).
+    expect(
+      taker.inventory.find((s) => s.itemId === STACKABLE_RELIC)?.materialSources?.[0]?.source
+        .signer,
+    ).toBe('Giver');
     expect(taker.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
     // ...and the receiving side gained membership without gaining a tally on
     // EITHER arm (plain and instanced).
@@ -2667,8 +2680,19 @@ describe('Reliquary catalog index memo', () => {
     expect(first).not.toBe(RELIQUARY_PAGES);
     expect(Object.isFrozen(first)).toBe(true);
     // A hand-carried literal, not the production filter restated (which would
-    // prove nothing): 39 pages minus the vault and riftbound flags.
-    expect(first?.length).toBe(37);
+    // prove nothing): base 39 pages minus the vault and riftbound flags (37).
+    //
+    // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought.
+    // BOTH parent pins for the record: ours 41 pages / 38 scoring (the vault,
+    // riftbound and personal-Forgebreaker flags; Crucible crafts remain part
+    // of completion), the release 40 pages / 38 scoring (the vault and
+    // riftbound flags only). Counted directly off the resolved
+    // src/sim/content/reliquary.ts RELIQUARY_PAGES literal: 42 top-level page
+    // entries, 3 carrying excludeFromCompletion (the vault, riftbound and
+    // personal-Forgebreaker flags), so 39 scoring pages, matching the
+    // arithmetic reconciliation (base 39 + ours' delta +2 + theirs' delta +1
+    // = 42; flagged base 2 + ours' delta +1 + theirs' delta +0 = 3).
+    expect(first?.length).toBe(39);
     expect(first?.some((p) => p.excludeFromCompletion !== undefined)).toBe(false);
 
     // An UNFLAGGED synthetic table answers the caller's own array by identity:
@@ -3414,9 +3438,10 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
    * the slots named in `skip`. The four on-page ladder titles are never
    * granted directly: the sync under test is their only legitimate writer, so
    * the rig earning them by hand would vacuous-green every assertion below.
-   * masterwork:engineering is granted directly like every other mark: its
-   * live write site is pended (13b QA owner ruling), and direct mark grants
-   * are the sanctioned test route to owned === total.
+   * masterwork:engineering is granted directly like every other mark:
+   * direct mark grants are the sanctioned test route to owned === total
+   * (its live write site has been earnable since the masterwrought Phase
+   * 11o un-pend; the direct grant stays the route regardless).
    */
   function grantWholeCharacterCatalog(sim: Sim, skip: ReadonlySet<string> = new Set()): void {
     const { meta } = primary(sim);

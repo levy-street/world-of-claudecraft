@@ -1,7 +1,7 @@
 // Gathering proficiency bands (Professions 2.0): the shared
 // 0/100/200 band ladder over a gathering profession's proficiency counter.
-// Extracted from fishing.ts (FISHING_BAND_THRESHOLDS/fishingBandFor, which now
-// delegate here) so gathering.ts can read a band for the gather-cast duration
+// Extracted from fishing.ts so fishingBandFor can delegate here and
+// gathering.ts can read a band for the gather-cast duration
 // without a back-import: fishing.ts already imports queueGatheringGrant FROM
 // gathering.ts, so importing fishing.ts from gathering.ts would cycle. Pure
 // leaf: no SimContext, no rng, Vitest-importable directly.

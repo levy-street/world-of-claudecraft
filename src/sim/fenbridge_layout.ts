@@ -920,6 +920,11 @@ const NPCS = [
   ),
   // Face the square with the building (craft station stays on the apron).
   makeNpc('tanner_hesk', TANNER_POSITION, TANNERY.rotation, TANNERY.id),
+  // The farmer (the farming go-live): outside the hub circle on the town
+  // side of the patch_mirefen raised beds (content/farm_patches.ts, beds at
+  // z 339 and 344), facing north across them (facing 0 looks along +z).
+  // Anchored to the patch rather than a building: nothing is built there.
+  makeNpc('farmer_teasel', { x: -21, z: 333.5 }, 0, 'patch_mirefen'),
 ] as const;
 
 const PRESERVED_PROPS = {

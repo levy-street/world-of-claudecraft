@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { decodeVaultInfoWire, vaultWithdrawPayload } from '../src/net/vault_snapshot_wire';
+import {
+  decodeVaultInfoWire,
+  isWireBankSlot,
+  vaultWithdrawPayload,
+} from '../src/net/vault_snapshot_wire';
 import {
   VAULT_BASE_CAP,
   VAULT_UPGRADE_PRICES,
@@ -128,5 +132,46 @@ describe('Materials Vault snapshot wire decoder', () => {
     expect(payload.special?.instance).not.toBe(special.instance);
     special.instance.rolled.stats.sta = 99;
     expect(payload.special?.instance?.rolled?.stats?.sta).toBe(2);
+  });
+});
+
+describe('material sources on owner storage snapshots', () => {
+  const sources = [
+    { source: { gatherer: { kind: 'character', id: 7, name: 'Ayla' }, signer: 'Ayla' }, count: 1 },
+    { source: {}, count: 2 },
+  ];
+  const slot = { itemId: 'copper_ore', count: 3, materialSources: sources };
+
+  it('accepts exact source quantities in a vault row without rebuilding the snapshot', () => {
+    const frame = { ...VALID, special: [slot] };
+    expect(decodeVaultInfoWire(frame)).toBe(frame);
+  });
+
+  it('accepts the bank owner grouping flag and bag cell with material sources', () => {
+    expect(isWireBankSlot({ ...slot, slot: 4, materialSeparated: true })).toBe(true);
+  });
+
+  it.each([
+    { ...slot, count: 4 },
+    { ...slot, materialSources: [] },
+    { ...slot, materialSources: [{ source: {}, count: -3 }] },
+    {
+      ...slot,
+      materialSources: [
+        { source: { gatherer: { kind: 'character', id: 0, name: 'Ayla' } }, count: 3 },
+      ],
+    },
+    { ...slot, materialSources: [{ source: { invented: true }, count: 3 }] },
+    { ...slot, instance: { signer: 'Ayla' } },
+  ])('refuses inconsistent or ambiguous source row %j', (invalid) => {
+    expect(isWireBankSlot(invalid)).toBe(false);
+    expect(decodeVaultInfoWire({ ...VALID, special: [invalid] })).toBeNull();
+  });
+
+  it('does not admit a grouping flag in vault transfer rows or a malformed bank flag', () => {
+    expect(
+      decodeVaultInfoWire({ ...VALID, special: [{ ...slot, materialSeparated: true }] }),
+    ).toBeNull();
+    expect(isWireBankSlot({ ...slot, materialSeparated: false })).toBe(false);
   });
 });

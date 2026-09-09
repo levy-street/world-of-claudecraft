@@ -99,6 +99,10 @@ export interface InputCallbacks {
       | 'deeds'
       | 'professions'
       | 'reliquary'
+      | 'harvestJournal'
+      | 'perfecting'
+      | 'lootExplorer'
+      | 'cosmetics'
       | 'crafting'
       | 'sheathe'
       | 'mount',
@@ -1051,16 +1055,18 @@ export class Input {
       // Edge reserve Ctrl+1..8 outright), but this reclaims the ones that are
       // (Firefox) and is a no-op where there is nothing to cancel.
       if (e.ctrlKey || e.altKey || e.metaKey) e.preventDefault?.();
-      // 'chat' focuses the composer textarea as a side effect of this very
-      // keydown. Left un-prevented, the browser still delivers the follow-up
-      // keypress (and its default newline insertion) to whichever element is
-      // focused AT THAT POINT, i.e. the composer we just focused, so Enter
-      // both opens chat and types a newline into it before the placeholder is
-      // ever seen. Cancel the default so the composer opens empty, but only
-      // when the key was not itself focused on a button: a button's own Enter
-      // activation is a real default action too, and it should still fire
-      // alongside chat opening, same as before this fix.
-      if (edge === 'chat' && tag !== 'button') e.preventDefault?.();
+      // 'chat' and 'lootExplorer' both autofocus a text input as a side effect
+      // of this very keydown (the composer textarea; the loot explorer's
+      // search box). Left un-prevented, the browser still delivers the
+      // follow-up keypress (and its default character/newline insertion) to
+      // whichever element is focused AT THAT POINT, i.e. the field we just
+      // focused, so the bound key both opens the window and types itself into
+      // it before the placeholder is ever seen. Cancel the default so the
+      // field opens empty, but only when the key was not itself focused on a
+      // button: a button's own Enter activation is a real default action too,
+      // and it should still fire alongside the window opening, same as before
+      // this fix.
+      if ((edge === 'chat' || edge === 'lootExplorer') && tag !== 'button') e.preventDefault?.();
       if (edge.startsWith('slot')) {
         // Slot keys use DOWN/UP so a slot can hold to charge; the HUD decides
         // whether a slot charges (shoot) or fires immediately (tap = down+up).
@@ -1211,6 +1217,18 @@ export class Input {
         return;
       case 'reliquary':
         this.cb.onUiKey('reliquary');
+        return;
+      case 'harvestJournal':
+        this.cb.onUiKey('harvestJournal');
+        return;
+      case 'perfecting':
+        this.cb.onUiKey('perfecting');
+        return;
+      case 'lootExplorer':
+        this.cb.onUiKey('lootExplorer');
+        return;
+      case 'cosmetics':
+        this.cb.onUiKey('cosmetics');
         return;
       case 'chat':
         this.cb.onUiKey('chat');

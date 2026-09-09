@@ -207,18 +207,93 @@ function isTwoHanded(item: ItemDef): boolean {
   return item.kind === 'weapon' && weaponHand(item) === 'twohand';
 }
 
-// Deterministic argmax: ties break on id so the same spec always yields the same set.
-function bestBy(items: readonly ItemDef[], score: (item: ItemDef) => number): ItemDef | null {
+// Deterministic argmax. A tie is judged inside a RELATIVE epsilon band, never
+// by exact equality: roleItemScore sums float products, so two candidates
+// that tie in real arithmetic (the rung-25 str ring vs the rung-50 int loop,
+// both exactly 1.8 under the PHYS_AGI weights; the STR camps see a real gap)
+// can differ by one ulp depending on term order, and an exact compare turns
+// that rounding accident into the winner, silently flipping picks on any
+// rounding-equivalent scorer refactor (phase 05 QA mutation probe). An
+// in-band tie resolves on the caller's tieScore first (buildDevKit passes the
+// role's raw identity sum, so a kit prefers the item that actually carries
+// the role's stats over an alphabetically lucky dead-stat piece), then on id.
+// Caveats this comment owns rather than overclaims: the accepted best is
+// bounded within two bands of the true maximum, not equal to it (a higher
+// in-band value whose tiebreak loses does not raise the anchor); a CHAIN of
+// distinct near-ties about 1.5 bands apart is order-sensitive in principle,
+// unreachable from the shipped tables whose pool order (Object.values(ITEMS))
+// is fixed and host-identical; and the unconditional first-item seed assumes
+// score never returns NaN, which no shipped scorer does.
+// AMENDED at masterwrought Phase 11o: buildDevKit's tieScore is now the
+// composite identity-then-quality (roleIdentitySum scaled above a bounded
+// quality rank), not the raw identity sum; identity stays strictly dominant
+// because stats are integers and the scale exceeds the ladder's top rank.
+const SCORE_TIE_EPSILON = 1e-9;
+
+// The quality half of buildDevKit's in-band tiebreak (masterwrought Phase
+// 11o): two dead-stat held offhands (the uncommon copperlens_ocular vs the
+// rare sunpetal_grimoire, both sta 2 to a feral druid) tie on identity, and
+// the pre-11o alphabet break silently handed the kit the strictly weaker
+// item the day a lower id shipped. Typed over the full quality union so a
+// new quality string fails tsc here instead of silently ranking below rare;
+// the scale is DERIVED from the ladder size (any value past its top rank),
+// so identity, an integer sum over integer stats, stays strictly dominant.
+// Exported for tests: tests/dev_kit.test.ts pins the dominance property
+// (the scale strictly exceeds the ladder's top rank) beside the
+// integer-stat premise it composes with.
+export const QUALITY_TIE_RANK: Record<NonNullable<ItemDef['quality']>, number> = {
+  poor: 0,
+  common: 1,
+  uncommon: 2,
+  rare: 3,
+  epic: 4,
+  legendary: 5,
+};
+export const QUALITY_TIE_SCALE = Object.keys(QUALITY_TIE_RANK).length;
+
+function bestBy(
+  items: readonly ItemDef[],
+  score: (item: ItemDef) => number,
+  tieScore?: (item: ItemDef) => number,
+): ItemDef | null {
   let best: ItemDef | null = null;
   let bestScore = Number.NEGATIVE_INFINITY;
   for (const item of items) {
     const value = score(item);
-    if (value > bestScore || (value === bestScore && best !== null && item.id < best.id)) {
+    if (best === null) {
       best = item;
       bestScore = value;
+      continue;
+    }
+    const band = SCORE_TIE_EPSILON * Math.max(1, Math.abs(value), Math.abs(bestScore));
+    if (value > bestScore + band) {
+      best = item;
+      bestScore = value;
+    } else if (value >= bestScore - band) {
+      // In-band tie: higher tieScore wins, then the smaller id; the band
+      // anchor only ever moves upward.
+      const tieA = tieScore?.(item) ?? 0;
+      const tieB = tieScore?.(best) ?? 0;
+      if (tieA > tieB || (tieA === tieB && item.id < best.id)) {
+        best = item;
+        if (value > bestScore) bestScore = value;
+      }
     }
   }
   return best;
+}
+
+/** The raw sum of an item's values in the stats a role weights: the DOMINANT
+ *  term of the in-band tiebreak (identity, then quality, then id since
+ *  masterwrought Phase 11o), so a tied kit pick carries the role's own stats
+ *  rather than whatever id sorts first (a hunter never gets an intellect
+ *  ring over a strength ring on an alphabet accident). */
+function roleIdentitySum(role: DevKitRole, item: ItemDef): number {
+  let identity = 0;
+  for (const stat of Object.keys(role.weights)) {
+    identity += item.stats?.[stat as 'str' | 'agi' | 'sta' | 'int' | 'spi'] ?? 0;
+  }
+  return identity;
 }
 
 /** The largest-capacity bag in the fresh-20 pool, or null if there is none.
@@ -256,12 +331,15 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
 
   const pool = Object.values(ITEMS).filter((item) => isFreshTwentyItem(cls, item));
   const score = (item: ItemDef): number => roleItemScore(role, item);
+  const tie = (item: ItemDef): number =>
+    roleIdentitySum(role, item) * QUALITY_TIE_SCALE + QUALITY_TIE_RANK[item.quality ?? 'common'];
   const equip: Partial<Record<EquipSlot, string>> = {};
 
   for (const slot of KIT_SLOTS) {
     const best = bestBy(
       pool.filter((item) => canEquipItemInSlot(cls, item, slot, spec)),
       score,
+      tie,
     );
     if (best) equip[slot] = best.id;
   }
@@ -273,13 +351,14 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
         (item) => item.id !== equip.ring1 && canEquipItemInSlot(cls, item, 'ring2', spec),
       ),
       score,
+      tie,
     );
     if (secondRing) equip.ring2 = secondRing.id;
     else delete equip.ring2;
   }
 
   const weapons = pool.filter((item) => canEquipItemInSlot(cls, item, 'mainhand', spec));
-  const mainhand = bestBy(weapons, score);
+  const mainhand = bestBy(weapons, score, tie);
   if (mainhand) equip.mainhand = mainhand.id;
 
   if (role.hands === 'shield') {
@@ -290,9 +369,10 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
     const oneHand = bestBy(
       weapons.filter((item) => !isTwoHanded(item)),
       score,
+      tie,
     );
     if (oneHand) equip.mainhand = oneHand.id;
-    const shield = bestBy(shields, score);
+    const shield = bestBy(shields, score, tie);
     if (shield) equip.offhand = shield.id;
   } else if (role.hands === 'dualWield') {
     // A dual-wield spec wants a ONE-hander in the main hand so the second
@@ -302,6 +382,7 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
     const oneHand = bestBy(
       weapons.filter((item) => !isTwoHanded(item)),
       score,
+      tie,
     );
     if (oneHand) equip.mainhand = oneHand.id;
     const offhand = bestBy(
@@ -312,6 +393,7 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
           canEquipItemInSlot(cls, item, 'offhand', spec),
       ),
       score,
+      tie,
     );
     if (offhand) equip.offhand = offhand.id;
     // Fall back to a held offhand rather than leaving the slot empty. Reached when a
@@ -323,6 +405,13 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
       const held = bestBy(
         pool.filter((item) => item.kind === 'held_offhand' && canEquipItem(cls, item)),
         score,
+        // The same identity-then-quality-then-id tiebreak the caster path
+        // passes: before the inscription tomes this filter never held two
+        // candidates, so the omission was unreachable; with several offhands
+        // in the pool an in-band tie here must not resolve on alphabetical
+        // id alone (the bestBy caveat block above owns the tiebreak
+        // contract).
+        tie,
       );
       if (held) equip.offhand = held.id;
     }
@@ -332,6 +421,7 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
     const offhand = bestBy(
       pool.filter((item) => item.kind === 'held_offhand' && canEquipItem(cls, item)),
       score,
+      tie,
     );
     if (offhand) equip.offhand = offhand.id;
   }

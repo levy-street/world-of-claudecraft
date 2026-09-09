@@ -29,7 +29,7 @@ describe('bag_fine_mark_view: fine grade mark', () => {
     for (const id of [
       'boar_hide',
       'apprentice_staff',
-      'mudfin_scale',
+      'soggy_moccasin',
       'copper_pick',
       '',
       'Fine_copper_ore',

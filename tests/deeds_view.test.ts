@@ -841,19 +841,36 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 279 deeds - 4 feats - 9 hidden = 268 visible to a fresh character (the
+    // 287 deeds - 4 feats - 9 hidden = 274 visible to a fresh character. The
+    // farming absorb (masterwrought Phase 11d) carried this branch's 279 to 286
+    // with its seven deeds, none of them feat-flagged or hidden, so both
+    // subtrahends are unchanged and the identity moves with the total alone.
+    // The chain below is the 279 history it extends (the
     // Drakelands brood pair, the four battleground deeds, the Rift coverage
-    // pair, the seven per-craft rare-tier profession deeds, the twelve
-    // remaining starter-zone chronicle pairs, the four Reliquary Curator rank
-    // bridges, the three WARFARE honor ranks, four of the five Phase 18
-    // Reliquary completion-ladder deeds, the walk-in castle visit pair, the
-    // Proving Shore graduation deed, and the five Crucible raid deeds;
-    // col_reliquary_complete is the catalog's one off-prefix feat, so it sits
-    // outside the completion denominator like the three feat_ deeds).
+    // pair, the per-craft rare-tier profession deeds, the twelve remaining
+    // starter-zone chronicle pairs, the four Reliquary Curator rank bridges,
+    // the three WARFARE honor ranks, four of the five Phase 18 Reliquary
+    // completion-ladder deeds, the walk-in castle visit pair, the Proving
+    // Shore graduation deed, the five Crucible raid deeds, the Roots'
+    // Bramblehide set collection deed, this branch's own Crucible
+    // professions additions (col_farm_roster, col_deepest_cast,
+    // prog_field_to_feast, prog_legendmaker) and hid_forgebreaker (the
+    // Forgebreaker quest's hidden deed), PLUS OSSBrain PR3781's own feat-flag
+    // changes, which land on existing deed ids rather than adding new ones
+    // (the total stays 300; only the feat/hidden split moves).
+    // col_reliquary_complete is the catalog's off-prefix feat, so it sits
+    // outside the completion denominator with every other feat, and
+    // hid_forgebreaker sits outside it unearned like every other hidden deed.
+    // Recomputed directly against the merged live catalog
+    // (src/sim/content/deeds.ts) with a standalone probe calling
+    // buildDeedsView + countsTowardCompletion directly (tsx, no full
+    // compile), since the tree does not compile yet:
+    // 300 deeds - 22 feats - 10 hidden = 268 visible to a fresh character.
     expect(view.summary.visibleTotal).toBe(268);
-    // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
-    // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(272);
+    // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
+    // deeds never enter a bucket at all, so only the 22 feats separate this
+    // from visibleTotal): 268 + 22 = 290.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(290);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

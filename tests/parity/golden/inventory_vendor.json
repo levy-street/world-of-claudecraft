@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 998,
+      "nextId": 1006,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "07ae3a5f",
+      "nextId": 1007,
+      "state": "a318b091",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -67,6 +67,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -80,7 +81,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -88,6 +89,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -108,7 +112,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -123,7 +128,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -137,7 +142,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -181,9 +186,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "ab9c791e",
-      "events": "95927429",
+      "nextId": 1007,
+      "state": "c87955d0",
+      "events": "9fdd922b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -214,6 +219,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -229,7 +235,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -237,6 +243,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -265,7 +274,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -280,7 +290,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -294,7 +304,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -338,9 +348,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "096441fc",
-      "events": "b2b642a5",
+      "nextId": 1007,
+      "state": "36d0c2ee",
+      "events": "2dd3ba8b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -371,6 +381,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -388,7 +399,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
@@ -397,6 +408,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -436,7 +450,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -451,7 +466,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -465,7 +480,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 130,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -509,9 +524,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "ec3fc2cb",
-      "events": "3bed5181",
+      "nextId": 1007,
+      "state": "9f792bbd",
+      "events": "476105b0",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -542,6 +557,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -559,7 +575,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
@@ -568,6 +584,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -607,7 +626,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -622,7 +642,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -636,7 +656,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 120,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -680,9 +700,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "c37ed30f",
-      "events": "b8569d6c",
+      "nextId": 1007,
+      "state": "54910af9",
+      "events": "7a6d00a9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -713,6 +733,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -730,7 +751,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -738,6 +759,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -781,7 +805,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -796,7 +821,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -810,7 +835,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -854,9 +879,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "4c1d6eef",
-      "events": "47b456bf",
+      "nextId": 1007,
+      "state": "5e428335",
+      "events": "de45e147",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -887,6 +912,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -904,7 +930,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -912,6 +938,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -955,7 +984,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -970,7 +1000,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -996,7 +1026,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1041,9 +1071,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "61e027a4",
-      "events": "c6cc92f6",
+      "nextId": 1007,
+      "state": "34ca0394",
+      "events": "1c12ceec",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1074,6 +1104,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1091,7 +1122,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1099,6 +1130,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1138,7 +1172,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1153,7 +1188,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             }
           ],
           "blockChance": 0.05,
@@ -1179,7 +1214,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1224,9 +1259,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "397d50a9",
-      "events": "a0a3df55",
+      "nextId": 1007,
+      "state": "4ab80fa4",
+      "events": "754cec5d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1257,6 +1292,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1275,7 +1311,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1283,6 +1319,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1322,7 +1361,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1337,7 +1377,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             },
             {
               "duration": 900,
@@ -1346,7 +1386,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 998,
+              "sourceId": 1006,
               "value": 12
             }
           ],
@@ -1373,7 +1413,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1418,9 +1458,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "e4a9dbfe",
-      "events": "0bc06cb5",
+      "nextId": 1007,
+      "state": "8a1af533",
+      "events": "f6b4b9bb",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1451,6 +1491,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1473,7 +1514,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1481,6 +1522,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1520,7 +1564,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1535,7 +1580,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             },
             {
               "duration": 900,
@@ -1544,7 +1589,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 998,
+              "sourceId": 1006,
               "value": 12
             }
           ],
@@ -1571,7 +1616,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1616,9 +1661,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "04f11cfb",
-      "events": "a7c4dd14",
+      "nextId": 1007,
+      "state": "1f862717",
+      "events": "91ae776e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1649,6 +1694,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1672,7 +1718,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1680,6 +1726,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1700,7 +1749,13 @@
             },
             {
               "count": 2,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -1723,7 +1778,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1738,7 +1794,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             },
             {
               "duration": 900,
@@ -1747,7 +1803,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 998,
+              "sourceId": 1006,
               "value": 12
             }
           ],
@@ -1774,7 +1830,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1819,9 +1875,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "44df1f0a",
-      "events": "d52c6f9c",
+      "nextId": 1007,
+      "state": "99bc2a3f",
+      "events": "34f6d1e0",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1852,6 +1908,7 @@
           "companionUpgrades": {},
           "copper": 714,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1875,7 +1932,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1883,6 +1940,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1903,7 +1963,13 @@
             },
             {
               "count": 1,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -1930,9 +1996,16 @@
           "vendorBuyback": [
             {
               "count": 1,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1947,7 +2020,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             },
             {
               "duration": 900,
@@ -1956,7 +2029,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 998,
+              "sourceId": 1006,
               "value": 12
             }
           ],
@@ -1983,7 +2056,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2028,9 +2101,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "99bd0517",
-      "events": "03450c48",
+      "nextId": 1007,
+      "state": "00fe5545",
+      "events": "d3c51e88",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2059,15 +2132,15 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 720,
+          "copper": 723,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "bandit_bandana",
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
@@ -2075,6 +2148,7 @@
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
+              "soggy_moccasin",
               "spring_water",
               "wolf_fang",
               "worn_sword"
@@ -2085,7 +2159,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2093,6 +2167,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -2113,7 +2190,13 @@
             },
             {
               "count": 1,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -2140,13 +2223,20 @@
           "vendorBuyback": [
             {
               "count": 1,
-              "itemId": "bandit_bandana"
+              "itemId": "soggy_moccasin"
             },
             {
               "count": 1,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2161,7 +2251,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             },
             {
               "duration": 900,
@@ -2170,7 +2260,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 998,
+              "sourceId": 1006,
               "value": 12
             }
           ],
@@ -2197,7 +2287,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2242,9 +2332,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "ff923a22",
-      "events": "80d9aa71",
+      "nextId": 1007,
+      "state": "2a2d023f",
+      "events": "be61fd6d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2273,15 +2363,15 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 716,
+          "copper": 719,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "bandit_bandana",
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
@@ -2289,6 +2379,7 @@
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
+              "soggy_moccasin",
               "spring_water",
               "wolf_fang",
               "worn_sword"
@@ -2299,7 +2390,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2307,6 +2398,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -2327,7 +2421,13 @@
             },
             {
               "count": 2,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -2354,9 +2454,10 @@
           "vendorBuyback": [
             {
               "count": 1,
-              "itemId": "bandit_bandana"
+              "itemId": "soggy_moccasin"
             }
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2371,7 +2472,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             },
             {
               "duration": 900,
@@ -2380,7 +2481,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 998,
+              "sourceId": 1006,
               "value": 12
             }
           ],
@@ -2407,7 +2508,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2452,8 +2553,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "ff923a22",
+      "nextId": 1007,
+      "state": "2a2d023f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2483,15 +2584,15 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 716,
+          "copper": 719,
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "bandit_bandana",
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
@@ -2499,6 +2600,7 @@
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
+              "soggy_moccasin",
               "spring_water",
               "wolf_fang",
               "worn_sword"
@@ -2509,7 +2611,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2517,6 +2619,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -2537,7 +2642,13 @@
             },
             {
               "count": 2,
-              "itemId": "wolf_fang"
+              "itemId": "wolf_fang",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -2564,9 +2675,10 @@
           "vendorBuyback": [
             {
               "count": 1,
-              "itemId": "bandit_bandana"
+              "itemId": "soggy_moccasin"
             }
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2581,7 +2693,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1006
             },
             {
               "duration": 900,
@@ -2590,7 +2702,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 998,
+              "sourceId": 1006,
               "value": 12
             }
           ],
@@ -2617,7 +2729,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

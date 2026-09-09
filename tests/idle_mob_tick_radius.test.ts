@@ -89,8 +89,17 @@ describe('idle-mob distance culling is wired into the production server (#2703)'
   });
 
   it('uses the same invisible-idle-mob throttle in the offline browser game', () => {
+    const offlineWorldConfigSrc = readFileSync(
+      new URL('../src/game/offline_world_config.ts', import.meta.url),
+      'utf8',
+    );
+    expect(offlineWorldConfigSrc).toContain('idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS');
+
+    // Reachability: main.ts must actually reach that config, not just have the
+    // literal sitting unused in a sibling module.
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
-    expect(main).toContain('idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS');
+    expect(main).toContain("import { offlineWorldConfig } from './game/offline_world_config'");
+    expect(main).toContain('offlineWorldConfig(');
   });
 
   it('the render drop radius sits well past the farthest a mob can ever detect a player, so culling never skips a scan that could pull', () => {

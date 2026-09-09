@@ -4,6 +4,9 @@
 // risk-free kill, which also breaks the classic reset contract.
 import { describe, expect, it } from 'vitest';
 import { dealDamage } from '../src/sim/combat/damage';
+import { MOBS } from '../src/sim/data';
+import { createMob, createPlayer } from '../src/sim/entity';
+import { isEvadingWildMob } from '../src/sim/mob/evade_immunity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { dist2d } from '../src/sim/types';
@@ -294,5 +297,41 @@ describe('an evading mob that cannot path home recovers instead of getting stuck
     expect(reset).toBe(true);
     // it walked home under its own power (no snap needed): well within ~20yd of spawn
     expect(dist2d(mob.pos, mob.spawnPos)).toBeLessThan(0.5);
+  });
+});
+
+// Direct unit test for the pure leaf (no SimContext, no rng) extracted from the
+// dealDamage check above: isEvadingWildMob is now the single shared predicate every
+// attacker-side entry point (dealDamage here, plus pet_ai.ts, pet_commands.ts, and
+// warlock_pet_skills.ts) consults before newly engaging or continuing to attack a
+// mob mid-evade, so a pet can no longer lunge at one either.
+describe('isEvadingWildMob (the pure leaf behind the immunity above)', () => {
+  const POS = { x: 0, y: 0, z: 0 };
+
+  it('is true only for a wild mob whose aiState is evade', () => {
+    const mob = createMob(1, MOBS.forest_wolf, 5, POS);
+    mob.aiState = 'evade';
+    expect(isEvadingWildMob(mob)).toBe(true);
+  });
+
+  it('is false for the same mob in any non-evade aiState', () => {
+    const mob = createMob(1, MOBS.forest_wolf, 5, POS);
+    for (const state of ['idle', 'chase', 'attack', 'flee', 'dead'] as const) {
+      mob.aiState = state;
+      expect(isEvadingWildMob(mob)).toBe(false);
+    }
+  });
+
+  it('is false for an owned mob (a pet), even if its aiState happens to read evade', () => {
+    const mob = createMob(1, MOBS.forest_wolf, 5, POS);
+    mob.aiState = 'evade';
+    mob.ownerId = 42; // owned mobs run pet AI, never legitimately carry this state
+    expect(isEvadingWildMob(mob)).toBe(false);
+  });
+
+  it('is false for a player, regardless of aiState', () => {
+    const player = createPlayer(1, 'hunter', POS, 'Aleph');
+    player.aiState = 'evade';
+    expect(isEvadingWildMob(player)).toBe(false);
   });
 });

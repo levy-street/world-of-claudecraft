@@ -43,52 +43,88 @@
 // so every zone the sim can put on a fishing event is a member of this list.
 //
 // CARDINALITY IS BOUNDED BY CONSTRUCTION, the same contract as
-// server/http/game_signals.ts: zones x bands is 3 x 3 per fishing family and
-// the rod-fee family is the two shipped rod recipes. Nothing per-player
+// server/http/game_signals.ts: the fishing families are ZONES x BANDS, which is
+// HARVEST_BANDS (14 zones) x 6 bands = 84 pre-seeded series per counter since
+// masterwrought Phase 11i grew the catch ladder from three bands to six. The
+// old wording here said "3 x 3", which understated the zone term even before
+// 11i: only THREE zones have a catch table of their OWN (every other zone's
+// water draws the eastbrook_vale fallback, so it fishes and can appear on a
+// fishing event), and the exporter pre-seeds the full zone vocabulary anyway so
+// a zone-and-band pair that never fires reads as a real zero rather than a gap
+// (tests/server/http/game_metrics.test.ts derives the cross product rather than
+// restating it). The rod-fee family is the TRAINER-taught rod
+// recipes, still two after 11i added a third, drop-taught rung. Nothing per-player
 // (account id, character id, name, ip) is ever a label, and the exporter's
 // membership guards drop anything off these lists rather than minting a series
 // for it.
 
 import { FISHING_RARE_ID } from '../src/sim/content/items';
 import { ROD_RECIPES } from '../src/sim/content/recipes';
+import type { FishingCatchBand } from '../src/sim/professions/fishing_bands';
 import { trainingFeeFor } from '../src/sim/professions/training';
 
 /**
- * The three fishing bands, as label values. Fixed at three by the proficiency
- * ladder (FISHING_BAND_THRESHOLDS) and by the three per-band catch tables, NOT
- * derived from a content list: a band is a rung, not a record, so a fourth one
- * is a design change that should redden this pin rather than silently widen
- * every fishing series.
+ * The six fishing bands, as label values. Fixed at six by the catch-band
+ * ladder (FISHING_CATCH_BAND_THRESHOLDS in
+ * src/sim/professions/fishing_bands.ts) and by the six per-band catch tables,
+ * NOT derived from a content list: a band is a rung, not a record, so a
+ * SEVENTH one is a design change that should redden this pin rather than
+ * silently widen every fishing series.
+ *
+ * IT WAS THREE UNTIL masterwrought Phase 11i, and this pin did exactly the job
+ * the paragraph above promised: growing the ladder reddened it and the widening
+ * was a deliberate edit here rather than a series that appeared on its own.
+ * Hand-written on purpose even so, because the alternative (deriving the length
+ * from the threshold array) would make the next widening silent again.
  *
  * The band a cast is counted under is the EFFECTIVE band the sim resolved
  * (effectiveFishingBand: min of proficiency band and the owned rod's band), so
  * an over-rodded low-proficiency angler counts where they actually fished.
  */
-export const FISHING_BANDS = ['0', '1', '2'] as const;
+export const FISHING_BANDS = ['0', '1', '2', '3', '4', '5'] as const;
 
-/** One of the three fishing band label values. */
+/** One of the six fishing band label values. */
 export type FishingBandLabel = (typeof FISHING_BANDS)[number];
 
 /**
- * The label value for a sim-side band. The sim types the band 0 | 1 | 2 on
- * every fishing event, so this is total over its whole domain; a value outside
- * it can only come from a caller bug, and the exporter's membership guard drops
- * that rather than minting a series (a band is a distribution, so re-banding a
- * malformed sample would corrupt the very question R4 asks of it).
+ * The label value for a sim-side band. The sim types the band
+ * `FishingCatchBand` on every fishing event, so this is total over its whole
+ * domain; a value outside it can only come from a caller bug, and the
+ * exporter's membership guard drops that rather than minting a series (a band
+ * is a distribution, so re-banding a malformed sample would corrupt the very
+ * question R4 asks of it).
  */
-export function fishingBandLabel(band: 0 | 1 | 2): FishingBandLabel {
+export function fishingBandLabel(band: FishingCatchBand): FishingBandLabel {
   return FISHING_BANDS[band];
 }
 
 /**
- * The rod recipes whose training fee is counted, derived from the rod recipe
- * list so the label set cannot drift from the shipped rods. Exactly the two
- * trainer-taught rods today (recipe_stormreel_fishing_rod at skillReq 75 and
- * recipe_tidewrought_fishing_rod at 125); a third rod extends the label set by
- * construction and the exporter pre-seeds it to zero.
+ * The rod recipes whose training fee is counted: the rod recipe list filtered
+ * to the rows a TRAINER actually teaches. Two today
+ * (recipe_stormreel_fishing_rod at skillReq 75 and
+ * recipe_tidewrought_fishing_rod at 125), out of a three-rung ladder.
+ *
+ * THE FILTER IS THE FEE-BEARING DISCRIMINATOR the emission site in
+ * server/game.ts asks for, and masterwrought Phase 11i is what forced it. That
+ * site counts a `trainResult ok` for any id this list contains, and its own
+ * comment recorded the condition precisely: the counter is a PAYMENT count only
+ * while no rod recipe carries 'drop' acquisition, because a pattern-item learn
+ * emits `trainResult ok` having charged nothing. 11i's apex rung is
+ * drop-taught, so an unfiltered list would have counted every pattern learn of
+ * it as a fee paid and quietly turned the metric into a learn count.
+ *
+ * FILTERING THE VOCABULARY rather than adding a second check at the emit site
+ * is deliberate: it makes `isRodFeeRecipe` correct by construction, so the one
+ * predicate every consumer already calls carries the rule, and a future
+ * drop-taught rung joins the exemption by existing. A rung that is BOTH
+ * trainer-taught and pattern-taught would still need a real per-event
+ * discriminator; nothing in the ladder is, and this is the arm that would have
+ * to change if one ever were.
  */
 export const ROD_FEE_RECIPE_IDS: readonly string[] = Object.freeze(
-  ROD_RECIPES.map((recipe) => recipe.id),
+  ROD_RECIPES.filter((recipe) => !(recipe.acquisition ?? []).includes('drop')).map(
+    (recipe) => recipe.id,
+  ),
 );
 
 /** The static training fee in copper for each rod recipe, derived once from content.
@@ -97,7 +133,10 @@ export const ROD_FEE_RECIPE_IDS: readonly string[] = Object.freeze(
  *  from a client-driven command, and a plain-object lookup would resolve
  *  'toString' or 'constructor' to an inherited function. */
 const ROD_FEE_BY_RECIPE: ReadonlyMap<string, number> = new Map(
-  ROD_RECIPES.map((recipe) => [recipe.id, trainingFeeFor(recipe)]),
+  ROD_RECIPES.filter((recipe) => !(recipe.acquisition ?? []).includes('drop')).map((recipe) => [
+    recipe.id,
+    trainingFeeFor(recipe),
+  ]),
 );
 
 /** Whether a trained recipe id is one of the rod recipes the fee counter tracks. */

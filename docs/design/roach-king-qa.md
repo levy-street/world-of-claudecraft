@@ -1,8 +1,10 @@
 # Roach King local QA
 
-This worktree is based on published release `v0.41.4` (`511ee2e1fa`). The original
-checkout and its unrelated changes were preserved. No changes were staged,
-committed, pushed, or deployed.
+Initial authoring used published release `v0.41.4` (`511ee2e1fa`). PR integration
+merges the active `release/v0.42.0` branch (`17cc8505c1`) into the isolated
+`feature/roach-king-rifts` worktree. The original checkout and its unrelated
+changes remain preserved. The initial validation and animation revision records
+below describe their original snapshots; current integration evidence follows.
 
 ## Reviewed scope
 
@@ -195,3 +197,37 @@ ratio is 2.369. Final capture sources are `tmp/roach-king-shell-final/`; the
 selected comparison images and revision receipt live in
 `docs/screenshots/roach-king/`. Earlier candidate Death captures are marked
 rejected and are not final acceptance evidence.
+
+
+## Active release integration
+
+The release overlap audit compared feature-owned surfaces with both merge
+parents. Mob lifecycle cleanup preserves corpse-harvest cancellation and Roach
+King state reset. The extracted `spawnBossAdds` binding retains current release
+rank scaling, threat, loot, and Masterwrought reward behavior. Existing world
+facets already carry the encounter state; no new facet or persistence schema
+is needed. The real server/client danger-zone replay remains covered by
+`tests/rift_death_zone_online.test.ts`.
+
+The release extracted cast labels from the HUD. The merged
+`src/ui/cast_display_name.ts` delegates rift casts to `riftCastDisplayName` while
+retaining the release's other cast resolvers. Roach GLB definitions opt into
+`authoredAtlas` under the release's material preparation contract. The VFX
+prewarm regression now exercises the release's actual instanced light-pillar
+pool. Renderer compile-tail preparation, terrain grounding, locale additions,
+and generated inventories preserve both sides. Coordinator ceilings were
+lowered after extraction; no gate threshold was raised.
+
+Frozen-lockfile installation and TypeScript checks pass. The focused merge
+verification covers sim/content contracts, online replay, real GLB deformation,
+material preparation, cast labels, architecture, and coordinator budgets.
+Canonical localization, wiki, media, and portrait generators produced the
+merged artifacts. The portrait receipt records the actual macOS rendering
+environment; historical Linux portrait byte pins are refreshed only after
+before/after visual inspection. See the portrait source manifest and its
+companion README for the complete generation record.
+
+The release merge also replaces the initial timing harvest with the active
+release's canonical timing snapshot. Earlier initial-base gate failures above
+are historical findings, not evidence about the merged tree. The current
+pre-merge gate and PR CI results are recorded with the PR.

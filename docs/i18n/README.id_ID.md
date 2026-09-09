@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.id_ID.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Setiap instance juga berjalan pada **Heroic**: musuh berlevel lebih tinggi, meka
 
 ### Delve
 
-Delve adalah mode grup kecil yang terpisah dan dapat diskalakan untuk satu atau dua pemain, dibangun ulang dari ruang acak di setiap putaran dan berakhir pada peti reliquary terkunci yang dibuka lewat minigame membobol kunci alih-alih lemparan loot. **The Collapsed Reliquary** (level 7 ke atas) berakhir di Deacon Varric, dengan seorang pendamping AI, Tessa, bertarung di sisi Anda jika Anda pergi sendiri. **The Drowned Litany** (level 12 ke atas) mengikuti jejak itu ke kuil yang terendam di tepi Mirefen Marsh. Sebuah papan delve menentukan tier-nya: Heroic menaikkan level musuh dan menambah afiks acak untuk reward yang lebih kaya.
+Delve adalah mode grup kecil yang terpisah dan dapat diskalakan untuk satu atau dua pemain, dibangun ulang dari ruang acak di setiap putaran dan berakhir pada peti reliquary terkunci yang dibuka lewat minigame membobol kunci alih-alih lemparan loot. **The Collapsed Reliquary** (level 7 ke atas) berakhir di Deacon Vandric, dengan seorang pendamping AI, Tessa, bertarung di sisi Anda jika Anda pergi sendiri. **The Drowned Litany** (level 12 ke atas) mengikuti jejak itu ke kuil yang terendam di tepi Mirefen Marsh. Sebuah papan delve menentukan tier-nya: Heroic menaikkan level musuh dan menambah afiks acak untuk reward yang lebih kaya.
 
 ### PvP berperingkat (the Ashen Coliseum)
 

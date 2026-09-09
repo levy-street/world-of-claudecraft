@@ -13,8 +13,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../src/sim/content/professions';
 import type { InvSlot, ItemDef } from '../src/sim/types';
-import { buildCraftingView, type RecipeDefLike } from '../src/ui/crafting_view';
-import { type CraftingWindowDeps, renderCraftingWindow } from '../src/ui/crafting_window';
+import { buildCraftingView, type RecipeDefLike } from '../src/ui/hud/professions/crafting_view';
+import {
+  type CraftingWindowDeps,
+  renderCraftingWindow,
+} from '../src/ui/hud/professions/crafting_window';
 
 function item(id: string): ItemDef {
   return { id, name: id, quality: 'common', kind: 'junk', sellValue: 0 } as unknown as ItemDef;

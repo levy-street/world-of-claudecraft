@@ -87,7 +87,7 @@ describe('Paladin Retribution abilities', () => {
     );
   });
 
-  it('gates Hammer of Wrath by target health, Ascension, or Avenging Wrath', () => {
+  it('gates Tolling Hammer by target health, Ascension, or Zealwing', () => {
     const blocked = makeRet();
     const healthy = targetAt(blocked, 20);
     blocked.castAbility('hammer_of_wrath');
@@ -125,7 +125,7 @@ describe('Paladin Retribution abilities', () => {
     expect(avengingTarget.hp).toBeLessThan(avengingTarget.maxHp);
   });
 
-  it('Avenging Wrath grants 10 Devotion, doubles generation, increases damage and healing, and expires', () => {
+  it('Zealwing grants 10 Devotion, doubles generation, increases damage and healing, and expires', () => {
     const sim = makeRet();
     const target = targetAt(sim, 2);
 

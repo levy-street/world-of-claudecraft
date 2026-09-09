@@ -5,6 +5,8 @@
   import Panel from '../components/Panel.svelte';
   import { fmtDate, fmtNumber } from '../format';
   import { adminLanguageTag, t } from '../i18n';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import type {
     UnstuckArea,
@@ -17,7 +19,7 @@
   const PAGE_LIMIT = 50;
 
   let data = $state<UnstuckReportsData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let loadingMore = $state(false);
   let loadMoreFailed = $state(false);
   let requestId = 0;
@@ -60,7 +62,7 @@
       loadMoreFailed = false;
     } else {
       data = null;
-      failed = false;
+      failed = 'none';
     }
 
     try {
@@ -83,13 +85,13 @@
       } else {
         data = result;
       }
-      failed = false;
+      failed = 'none';
       loadMoreFailed = false;
     } catch (err) {
       if (currentRequest !== requestId) return;
       if (!auth.handleAuthFailure(err)) {
         if (append) loadMoreFailed = true;
-        else failed = true;
+        else failed = classifyAdminLoadFailure(err);
       }
     } finally {
       if (currentRequest === requestId) loadingMore = false;
@@ -141,7 +143,13 @@
     {t('unstuckReports.description', { days: fmtNumber(data?.days ?? REPORT_DAYS) })}
   </p>
 
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <!-- No retry button on this arm: retrying cannot grant a permission, so
+         offering it would only invite the operator to re-fail. -->
+    <Panel>
+      <PermissionDenied />
+    </Panel>
+  {:else if failed === 'error'}
     <Panel>
       <div class="request-state" role="alert">
         <p>{t('unstuckReports.loadFailed')}</p>

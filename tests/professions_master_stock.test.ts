@@ -172,8 +172,11 @@ describe('master vendor stocking after the delist', () => {
     // them. What this arm has always been for is unchanged and still holds:
     // the counter carries arcanite_bar, the one premium reagent that is
     // refined rather than gathered, and no node yield at all.
+    // Intentional Gathering (PR3) added field_kit, the corpse-harvest key,
+    // between the tier-1 tools and the reagent: not a gathered node yield, so
+    // the "nothing gathered" claim above still holds.
     const stock = stockOf(ZONE1_NPCS, 'tinker_gizzel');
-    expect(stock).toEqual(['handaxe', 'simple_fishing_pole', 'arcanite_bar']);
+    expect(stock).toEqual(['handaxe', 'simple_fishing_pole', 'field_kit', 'arcanite_bar']);
   });
 
   it('the forge, loom, and tannery masters carry no premium reagent at all', () => {

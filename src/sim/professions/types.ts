@@ -34,6 +34,8 @@ export interface ProfessionNodeRecord {
 export interface ProfessionReagent {
   itemId: string;
   count: number;
+  // Rare raid inputs and one-time quest proofs retain their authored cost.
+  noDiscount?: true;
 }
 
 // A static recipe a crafting profession can learn: what it consumes, what it
@@ -87,6 +89,9 @@ export interface ProfessionRecipeRecord {
   // grandfathered set and is never correct for new content (a new recipe with
   // no list would be silently known to every character with no learn step).
   acquisition?: readonly ('trainer' | 'drop' | 'quest')[];
+  // A one-use shaping taught by a non-repeatable quest. A successful craft
+  // consumes the knownRecipes entry; denied or cancelled attempts keep it.
+  consumeOnCraft?: true;
   // Station-bound crafting (Professions 2.0, the hands-vs-stations
   // split; supersedes #1297's requiresHubStation boolean and its level-20
   // hub). Present only on a recipe that must be crafted AT a station of this
@@ -98,6 +103,14 @@ export interface ProfessionRecipeRecord {
   // never costs anything beyond materials" rule. There is NO level arm: the
   // old hub's level-20 gate retired with it (2026-07-17 maintainer ruling).
   stationType?: StationType;
+  // Daily craft gate (Masterwrought Phase 07): at most ONE successful craft
+  // of this recipe per character per reset day, keyed on ctx.resetDay (the
+  // wyrmfallDaily idiom: a host that never sets resetDay sees a one-shot
+  // gate; see professions/masterwrought_materials.ts). The per-character
+  // state rides PlayerMeta.craftDaily, persisted with the same load clamps.
+  // Admission refuses with the 'daily_limit' CraftResult reason; the day
+  // stamp lands in resolveCraftForRecipe on successful consumption only.
+  oncePerDay?: true;
 }
 
 // One performed craft (a runtime instance of a RecipeRecord being worked),

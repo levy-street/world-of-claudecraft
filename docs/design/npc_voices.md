@@ -149,14 +149,30 @@ every clause of it. Age 40s, female.
 
 **Voice test:** *"The forge answers to me. Bring good ore and it will answer to you too."*
 
-### Groundskeeper Bram: *Keeper of the Sowfield*
-**Visual:** villager, field green (#3f7d34), sporting field.
+### Farmer Jessica: *Allotment Keeper*
+**Visual:** villager, harvest gold (#a8843a), the Eastbrook allotments at the
+harbor town's north-east edge, north of the civic ring and east of the chapel yard.
 
-Broad, weather-cured country baritone, gruff and grinning: a man who referees a
-rough game and enjoys it. Rolling rural vowels, easy laugh, firm on the rules.
-Age 40s to 50s, male. (Not Keeper Bram of the Galecrest beacon.)
+Warm, plain-spoken, sun-and-soil mezzo, unhurried and patient, the voice of
+someone who explains a thing once and trusts you with it. Open vowels, an
+easy country cadence, no bark in her at all: the profession's front door
+should sound like a welcome. Age 30s to 40s, female. **No designed voice of her
+own yet:** she borrows Provisioner Fenna's bright, generous mezzo through
+`VOICE_ALIAS` (a role match, not the same character), so her lines ship in
+that voice until a key is available to design and render this description.
+Promote her to her own `VOICE_PROMPTS` entry then, slower and earthier than
+Fenna's market patter.
 
-**Voice test:** *"The truce holds at the Sowfield: boots and shoulders only. Care to play for the Copper Pail?"*
+**Voice test:** *"Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils."*
+
+### Groundskeeper Bram: *Keeper of the Sowfield* (retired)
+Retired with the Sowfield and the Vale Cup in release/v0.41.0 (1c74387b4c): the
+NPC, his `VOICE_PROMPTS` entry and his country baritone are gone from the world.
+Two pieces of release-side residue still carry him, both orphaned and harmless:
+his ElevenLabs id in `scripts/voices/voice_ids.json` and his look row,
+`NPC_LOOKS.groundskeeper_bram` in `src/render/characters/npc_looks.ts`. Farmer
+Hollis borrowed this voice until then (see his section). (Not Keeper Bram of the
+Galecrest beacon, nor Fisher Bram of the Farshore.)
 
 ### Tinker Gizzel: *Master of the Toolworks*
 **Visual:** `npc_smith`, brass (#b08d57), apron full of things that tick.
@@ -237,6 +253,20 @@ in them at all. Not unfriendly, simply finished talking. Faint rasp of lye and
 hide-smoke. Age 40s to 50s, male.
 
 **Voice test:** *"Vats are empty. Bring eight rough hides. Coin when you do."*
+
+### Farmer Teasel: *Fen Paddy Farmer*
+**Visual:** villager, paddy olive (#6b7f3a), the raised beds south-west of Fenbridge.
+
+Dry, laconic, mud-and-reed baritone, sentences that end early because the fen
+does not reward talk. Wary of the water, fond of the crop, faintly amused by
+anyone in clean boots. Age 50s, male. **No designed voice of his own yet:** he
+borrows Trapper Brosk's craggy, cold-roughened old fen voice through
+`VOICE_ALIAS` (a role match: another man alone with the marsh), so his lines
+ship in that voice until a key is available. Promote him to his own
+`VOICE_PROMPTS` entry then, younger and warmer than Brosk, with the water in
+it rather than the cold.
+
+**Voice test:** *"Marsh rice and bog beet seed, and compost to feed them. The paddies drain slow, so mind where you tread."*
 
 ---
 
@@ -339,6 +369,22 @@ the throat. Age 40s, female.
 
 **Voice test:** *"I will not hand you the reins until you can sit the Valorsteed without kissing the dirt."*
 
+### Farmer Hollis: *Highwatch Terrace Farmer*
+**Visual:** villager, terrace brown (#8c6a4a), the terraces on the shelf below Highwatch.
+
+Broad, weather-cured hill-farmer baritone, slow and even, the patience of a man
+who works stone terraces by hand. Rolling rural vowels, thin mountain air in
+the breath, gruff kindness. Age 50s to 60s, male. **No designed voice of his own
+yet:** he borrowed Groundskeeper Bram's country baritone through `VOICE_ALIAS`
+(a role match, not the same character) until the Sowfield and the Vale Cup
+retired with Bram's voice entry (release/v0.41.0); since the v0.41.0 merge he
+borrows Huntsman Deral's weathered, steady, rural male register instead, the
+nearest surviving role match, so his lines ship in that voice until a key is
+available. Promote him to his own `VOICE_PROMPTS` entry then, broader and
+warmer than Deral's herd-warden murmur, with the hill farmer's gruff kindness.
+
+**Voice test:** *"The terraces give what the mountain allows. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."*
+
 ---
 
 ## Glimmermere Temple
@@ -368,7 +414,7 @@ guttural rasp of decay. Ancient, male. Encounter dialogue is voiced through
 
 ---
 
-## Eldergleam, the Veiled Hollow
+## Eldershine, the Veiled Hollow
 
 ### Keeper Saelwyn: *Keeper of the Hollow*
 **Visual:** `npc_mage`, pale lilac (#d8c4f0).
@@ -390,7 +436,7 @@ gently insistent that grim work is still mending work. Age 60s to 70s, female.
 
 **Voice test:** *"Every light in this valley remembers something. Help me listen."*
 
-### Provisioner Fenna: *Eldergleam Provisioner*
+### Provisioner Fenna: *Eldershine Provisioner*
 **Visual:** `npc_villager`, soft green (#8fbf8a).
 
 Bright, generous mezzo with an open smile in it, brisk market cadence, always
@@ -507,9 +553,9 @@ female.
 
 ---
 
-## The Wraithwood (Gallowmere)
+## The Wraithwood (Gibbetmere)
 
-### Sexton Marrow: *Sexton of Gallowmere*
+### Sexton Marrow: *Sexton of Gibbetmere*
 **Visual:** villager, slate grey (#6a6a72). (Defined in `src/sim/content/dungeons.ts`.)
 
 Deep, measured, sepulchral bass, patient as a tolling bell, kindly in a way that
@@ -537,7 +583,7 @@ sorrowing devotion: Creel has stopped expecting help.
 
 **Voice test:** *"The chapel fell years ago. The dead beneath it did not notice, and so I stayed."*
 
-### Widow Tansy: *Candlewright of Gallowmere*
+### Widow Tansy: *Candlewright of Gibbetmere*
 **Visual:** villager, mourning mauve (#b8a2c8).
 
 Brittle, tremulous old voice that thins upward when she insists, with unbending
@@ -587,6 +633,21 @@ Speaks of the garden as a colleague and of his own masterwork as something that
 must now be unmade. Age 90s or older, male.
 
 **Voice test:** *"The garden is afraid. In a hundred years I have never once known it afraid."*
+
+### Farmer Verbena: *Parterre Gardener*
+**Visual:** villager, parterre green (#7d9b5c), the eight showcase beds west of The
+Parterre Walk.
+
+Precise, proprietary older alto, clipped and a little tart, the pride of the
+parterre in every sentence and a real, grudging warmth for anyone who keeps
+the edging straight. Age 50s to 60s, female. **No designed voice of her own
+yet:** she borrows Orchardist Pomeline's tart, territorial older voice through
+`VOICE_ALIAS` (a role match: another woman proprietary about her rows), so her
+lines ship in that voice until a key is available. Promote her to her own
+`VOICE_PROMPTS` entry then, more polished than Pomeline, a garden voice rather
+than an orchard one.
+
+**Voice test:** *"Mind the edging, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."*
 
 ---
 
@@ -738,7 +799,7 @@ female.
 
 **Voice test:** *"The sea gives, the sand keeps, and the jungle takes. Stay on the strand, stranger."*
 
-### Okku: *The Man Who Went In*
+### Okrim: *The Man Who Went In*
 **Visual:** villager, deep jungle green (#6f8a5a), banyan camp.
 
 Hushed, cracked voice, whisper-taut and hyper-attentive, breaking off to count a

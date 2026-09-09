@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { zonePrewarmTemplateIds } from '../src/render/zone_prewarm_templates_core';
-import { CAMPS, DUNGEON_X_THRESHOLD, NPCS, zoneAt } from '../src/sim/data';
+import {
+  summonableTemplateIds,
+  zonePrewarmTemplateIds,
+} from '../src/render/zone_prewarm_templates_core';
+import { MAGE_PET_MOBS } from '../src/sim/content/mage_pets';
+import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
+import { ABILITIES, CAMPS, DUNGEON_X_THRESHOLD, MOBS, NPCS, zoneAt } from '../src/sim/data';
 
 const EASTBROOK = 'eastbrook_vale';
 
@@ -73,6 +78,43 @@ describe('zonePrewarmTemplateIds', () => {
     expect(ids.filter((id) => id === here.mobId)).toHaveLength(1);
     expect(ids[0]).toBe('aaa_first');
     expect([...ids].sort()).toEqual(ids);
+  });
+});
+
+describe('summonable pets', () => {
+  const summonEffectTargets = (): string[] => {
+    const ids = new Set<string>();
+    for (const ability of Object.values(ABILITIES)) {
+      for (const effects of [ability.effects, ...(ability.ranks ?? []).map((r) => r.effects)]) {
+        for (const effect of effects) if (effect.type === 'summonDemon') ids.add(effect.mobId);
+      }
+    }
+    return [...ids];
+  };
+
+  it('unions every class pet table with every summonDemon target, sorted and unique', () => {
+    const ids = summonableTemplateIds();
+    for (const id of [...Object.keys(MAGE_PET_MOBS), ...Object.keys(WARLOCK_PET_MOBS)])
+      expect(ids).toContain(id);
+    const effectTargets = summonEffectTargets();
+    expect(effectTargets.length).toBeGreaterThan(0);
+    for (const id of effectTargets) expect(ids).toContain(id);
+    // The talent-summoned guardian has a table row and no summon effect.
+    expect(effectTargets).not.toContain('pyre_colossus');
+    expect(ids).toContain('pyre_colossus');
+    expect(ids).toContain('water_elemental');
+    for (const id of ids) expect(MOBS[id]).toBeDefined();
+    expect([...new Set(ids)].sort()).toEqual(ids);
+  });
+
+  it('warms every summonable pet in every zone, for mobs only', () => {
+    // A summon has no camp: without the arm no zone would ever prewarm its rig.
+    for (const id of summonableTemplateIds()) {
+      expect(CAMPS.some((camp) => camp.mobId === id)).toBe(false);
+      expect(zonePrewarmTemplateIds(EASTBROOK, 'mob', [])).toContain(id);
+      expect(zonePrewarmTemplateIds('proving_shore', 'mob', [])).toContain(id);
+      expect(zonePrewarmTemplateIds(EASTBROOK, 'npc', [])).not.toContain(id);
+    }
   });
 });
 

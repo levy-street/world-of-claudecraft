@@ -222,6 +222,12 @@ export function focusedWithin(root: ParentNode): HTMLElement | null {
  * into view is the behaviour that keeps focus visible. A caller re-focusing the SAME
  * control it captured is the case where the offset should win instead.
  *
+ * The $WOC Exchange window reaches that same split by ORDER instead of the option: its
+ * scroll write-back runs after this call and skips itself when the ladder degraded, so
+ * the same-control case keeps the offset while a degraded rung stays scrolled into
+ * view (woc_market_window.ts renderInner; its slow-band rebuilds under a focused
+ * filter bar are why it needed one of the two spellings at all).
+ *
  * SYNCHRONOUS on purpose, unlike FocusManager.restore, which defers a tick to win
  * against a browser's own post-close focus move. There is no competing move here: the
  * caller has just finished rebuilding its own subtree, and deferring would let a Tab
@@ -235,4 +241,16 @@ export function restoreFirstEnabled(
     candidate.focus();
     return;
   }
+}
+
+/**
+ * Stamp one fixed control's focus key: the first element matching `selector`
+ * under `root` gets `key`, and a miss stamps NOTHING (an empty key would still
+ * satisfy the restore ladder). For the windows that annotate a handful of
+ * fixed controls after a rebuild (the bank's buy row, the history's Show
+ * older), so each site is one line and the namespace stays in this module.
+ */
+export function stampFocusKey(root: ParentNode, selector: string, key: string): void {
+  const el = root.querySelector<HTMLElement>(selector);
+  if (el) el.dataset.focusKey = key;
 }

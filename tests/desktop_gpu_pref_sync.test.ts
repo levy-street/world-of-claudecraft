@@ -263,6 +263,10 @@ describe('desktop_gpu_pref_sync: boot reflection', () => {
 // regression the module suite cannot see.
 describe('desktop_gpu_pref_sync: main.ts wiring pins', () => {
   const mainSource = readFileSync(join(__dirname, '..', 'src', 'main.ts'), 'utf8');
+  const shellSettingsSource = readFileSync(
+    join(__dirname, '..', 'src', 'game', 'desktop_shell_settings.ts'),
+    'utf8',
+  );
 
   it('boots the reflection with the live-or-fresh settings factory, desktop-gated', () => {
     // The factory resolution is load-bearing twice over: it must construct the
@@ -274,8 +278,13 @@ describe('desktop_gpu_pref_sync: main.ts wiring pins', () => {
     expect(mainSource).toContain(
       'const settingsForShellReflection = (): Settings => liveSettings ?? new Settings();',
     );
+    // The reflection fans out through src/game/desktop_shell_settings.ts,
+    // which hands this module the same factory.
     expect(mainSource).toContain(
-      'if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), settingsForShellReflection);',
+      'if (DESKTOP_APP) syncDesktopShellSettings(desktopBridge(), settingsForShellReflection);',
+    );
+    expect(shellSettingsSource).toContain(
+      'void syncDesktopGpuPrefSetting(bridge, createSettings);',
     );
     // startGame publishes its long-lived store into the holder the factory reads.
     expect(mainSource).toContain('liveSettings = settings;');
@@ -286,7 +295,10 @@ describe('desktop_gpu_pref_sync: main.ts wiring pins', () => {
     // returns it); pushDesktopGpuPref inverts exactly once. An inline `!` here
     // would double-invert, and a settings.get would push a stale value.
     expect(mainSource).toContain(
-      "pushDesktopGpuPref(desktopBridge(), settings.set('forceHighPerfGpu', !!value));",
+      'if (applyDesktopShellSetting(key, value, settings, desktopBridge())) return;',
+    );
+    expect(shellSettingsSource).toContain(
+      "pushDesktopGpuPref(bridge, settings.set('forceHighPerfGpu', !!value));",
     );
   });
 });

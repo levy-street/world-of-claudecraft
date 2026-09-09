@@ -329,6 +329,30 @@ export function banIp(
   };
 }
 
+// Kick a live player from the Online players page (POST .../accounts/:id/kick,
+// server/admin_kick_api.ts). The dashboard twin of the in-game /kick: audited
+// under the same 'kick' action, so it requires a reason like every other audited
+// action, and danger because it drops the player's session on the spot. The
+// target is the ACCOUNT (a kick tears down every session on it); the character
+// name is what the operator clicked, carried as a confirm row only.
+export function kickPlayer(accountId: number, characterName: string, note: string): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  return {
+    pending: {
+      title: t('dialog.confirmKick'),
+      rows: [
+        { label: t('dialog.character'), value: characterName },
+        accountRow(accountId),
+        { label: t('dialog.action'), value: t('dialog.actionKick') },
+        reasonRow(note),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/kick`,
+      body: { reason: note },
+      danger: true,
+    },
+  };
+}
+
 export function forceRename(characterId: number, characterName: string, note: string): Built {
   if (!note) return { errorKey: 'alert.noteRequired' };
   return {

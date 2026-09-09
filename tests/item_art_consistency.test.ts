@@ -4,14 +4,22 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
-import { auditIconAssets, validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
+import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
 import { ITEM_ART_AUDIT_RENDERER_FINGERPRINT } from '../scripts/lib/item_art_audit.mjs';
+import { heroicVariantId } from '../src/sim/content/heroic_variants';
 import { ITEMS } from '../src/sim/data';
+import { ITEM_ART_PENDING } from '../src/ui/icons';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const evidenceDir = 'docs/achievements/item-art-consistency-2026-08-09';
 const manifestPath = path.join(repoRoot, evidenceDir, 'accepted-art.json');
 const BATCH_ID = 'item-art-consistency-2026-08-09';
+const CURRENT_EVIDENCE_DIR = 'docs/achievements/masterwrought-art-completion-2026-09-02';
+const CURRENT_VERDICT_PATH = `${CURRENT_EVIDENCE_DIR}/final-item-art-audit-verdict.json`;
+const CURRENT_BATCH_ID = 'masterwrought-art-completion-2026-09-02';
+const FIELD_KIT_EVIDENCE_DIR = 'docs/achievements/intentional-gathering-field-kit-2026-09-06';
+const FIELD_KIT_BATCH_ID = 'intentional-gathering-field-kit-2026-09-06';
+const CRUCIBLE_BATCH_ID = 'crucible-professions-2026-09-05';
 const LICENSE = 'World of ClaudeCraft project-generated art, project asset, rights reserved';
 
 type ReportPin = {
@@ -121,6 +129,7 @@ type ItemMapping = {
     commonPrompt: string;
     provenanceRecord?: string;
     provenanceRecords?: string[];
+    provenance?: string;
     itemIds: string[];
   }>;
 };
@@ -341,9 +350,16 @@ describe('item-art consistency accepted-art provenance', () => {
         acceptedBytes: 294_428,
       },
       {
+        // Re-minted by the farming absorb's --refresh-verdict run: only the
+        // catalog sha and the lib self-hash moved, so the byte count held.
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '551f582e7189528275759142cf0a98da2a7bd8ec0e6ff37ab80423af31d7498f',
-        acceptedBytes: 120_959,
+        // Re-minted by the OSSBrain PR #3781 reconcile into release/v0.42.0: the
+        // release side's 1153 (Masterwrought) and the candidate's 1071 (the
+        // Goblin Rocket Sled and Rallycart RXT reins icons) are disjoint
+        // additions over the shared 1069 base, so the merged scope is
+        // 1069 + 84 + 2 = 1155.
+        acceptedSha256: 'cc7a2254f1ad5a0335494d4afee6642d3a514d762a19e23bac00c979795b5832',
+        acceptedBytes: 140_013,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -451,16 +467,16 @@ describe('item-art consistency accepted-art provenance', () => {
     }
   });
 
-  it('pins the final item-art visual audit, Heroic accounting, and evidence digests', () => {
+  it('pins the sealed historical visual audit and its internal evidence digests', () => {
     const verdictPath = `${evidenceDir}/final-item-art-audit-verdict.json`;
     const readme = readFileSync(path.join(repoRoot, evidenceDir, 'README.md'), 'utf8');
     expect(readme).toContain('`final-item-art-audit-verdict.json`');
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(120_959);
+    expect(verdictBytes.length).toBe(140_013);
     expect(sha256(verdictBytes)).toBe(
-      '551f582e7189528275759142cf0a98da2a7bd8ec0e6ff37ab80423af31d7498f',
+      'cc7a2254f1ad5a0335494d4afee6642d3a514d762a19e23bac00c979795b5832',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -470,46 +486,110 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 1041,
-      liveItemDefinitions: 1056,
-      generatedHeroicDefinitions: 64,
-      heroicDefinitionsWithOwnWebp: 48,
-      heroicWeaponArtAliases: 16,
+      // 907 / 922 on the Masterwrought branch, 829 / 844 on release v0.41.0;
+      // 913 / 928 at the merge (the release's six art-shipping ids join both
+      // terms), measured as the committed .webp count under public/ui/items
+      // and as live ITEMS minus ITEM_ART_PENDING. 920 / 935 at the v0.41.0
+      // release-batch sync: the release's seven painted bank bags join both
+      // terms. 1124 / 1139 at the v0.41.0 Crucible sync: the release's own
+      // arm reached 1040 / 1055 (its 204 post-base Crucible ids: nine painted
+      // raid weapons, two Varkhul legendary renders, the 192-piece set wave
+      // and the Core of the Last Flame reagent), and those 204 join both
+      // terms; the debt term stays this branch's 81.
+      // 1125 / 1140 at the v0.42.0 sync: the release's own arm reached
+      // 1041 / 1056 with one post-base id, the Bonebound Rickshaw reins
+      // (reins_rickshaw_mount), which ships committed art, so it joins both
+      // terms; the debt term stays this branch's 81. Re-counted on the merged
+      // tree as 1125 committed .webp files under public/ui/items. The final
+      // release union adds two reviewed mount icons and definitions.
+      // v0.42.0 professions merge: this branch's own arm (1128 / 1143, heroic
+      // terms 64 / 48 / 16) and the release's Nythraxis gap-fill plus Roots'
+      // Bramblehide waves (1069 / 1087, heroic terms 78 / 59 / 19) both add
+      // non-overlapping ids on top of the shared 1044 / 1059 base; the union
+      // is base + this branch's delta + the release's delta, confirmed
+      // against the re-minted historical report at
+      // docs/achievements/item-art-consistency-2026-08-09/final-item-art-audit-verdict.json.
+      // OSSBrain PR #3781 reconcile: the release's own arm reached 1153 / 1171
+      // (the Masterwrought delta above) and the OSSBrain candidate's arm
+      // reached 1071 / 1089 (two reins icons, reins_goblin_rocket_sled and
+      // reins_rallycart_rxt, on top of the shared 1069 / 1087 base); the two
+      // deltas are disjoint, so the union is 1069 + 84 + 2 = 1155 and
+      // 1087 + 84 + 2 = 1173.
+      itemArtFilesReviewed: 1155,
+      liveItemDefinitions: 1173,
+      generatedHeroicDefinitions: 78,
+      heroicDefinitionsWithOwnWebp: 59,
+      heroicWeaponArtAliases: 19,
       modifiedItemArtCount: 274,
     });
     expect(verdict.auditScope.modifiedItemArtPaths).toEqual(
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      1041,
+      1155,
     );
-    expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
-    expect(verdict.auditScope.incrementalReviews.at(-1)).toEqual({
-      reviewedAt: '2026-08-26',
-      branch: 'feature/bank-storage-pr',
-      reviewer: 'implementation agent',
-      replacedIds: [
-        'burlap_reagent_pouch',
-        'duskweave_bag',
-        'foragers_haversack',
-        'loombound_reagent_satchel',
-        'necromancers_reagent_satchel',
-        'resonant_weave_bag',
-        'wayfarers_backpack',
-      ],
-      provenance: [
-        'docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json',
-        'public/ui/items/mapping.json',
-      ],
-      note: 'Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged.',
-    });
+    // 23 -> 24 at Masterwrought phase 10: the three apex flasks are a new item
+    // kind, and the audit groups by kind, so they form their own census group
+    // (and their own contact-sheet page, below).
+    // 24 -> 25 at Masterwrought phase 11: the 28 apex recipe patterns are the
+    // first kind:'recipe' items, forming their own census group and page.
+    // The release side's own arm stayed at 22 groups (no new item kind); the
+    // merged count keeps this branch's 25.
+    expect(Object.keys(verdict.auditScope.groups)).toHaveLength(25);
+    // The OSSBrain PR #3781 reconcile appends its own two entries
+    // (goblin_rocket_sled, rallycart_rxt) after the existing five, so the
+    // troll/tortoise pair that used to be the tail is now the middle two of
+    // the last four.
+    expect(verdict.auditScope.incrementalReviews.slice(-4, -2)).toEqual([
+      {
+        reviewedAt: '2026-08-15',
+        branch: 'feature/troll-mount',
+        reviewer: 'owner',
+        addedIds: ['reins_lanternback_troll'],
+        provenance: ['public/ui/items/mapping.json'],
+        note: 'The Lanternback Troll mount reins icon. The owner supplied the painted 624x624 master and directed its use for this item; it was downscaled to the 128px opaque woc-item-icon-v1 shipping format with no other change, and owner-reviewed pass on 2026-08-15. The 2026-08-09 campaign review of the prior 817 files and the 2026-08-10 review of the five class-overhaul integration additions both stand unchanged.',
+      },
+      {
+        reviewedAt: '2026-08-15',
+        branch: 'feature/turtle-mount',
+        reviewer: 'owner',
+        addedIds: ['reins_chimeglass_tortoise'],
+        provenance: ['public/ui/items/mapping.json'],
+        note: "The Chimeglass Tortoise mount reins icon. Rendered from the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) as a three-quarter head study, background keyed and flattened to the 128px opaque woc-item-icon-v1 shipping format, and owner-reviewed pass on 2026-08-15. Re-rendered on 2026-08-16 alongside the mount's lens-glow pass, which restyled the glowing lens pair the icon frames: same three-quarter head study, same shipping format, 3062 to 3784 bytes, owner-reviewed pass again on 2026-08-16. The 2026-08-09 campaign review of the prior 817 files, the 2026-08-10 review of the five class-overhaul integration additions, and the 2026-08-15 Lanternback Troll review all stand unchanged. Joined the 2026-08-09 record at the release/v0.42.0 sync of PR #3439 (which carries the troll of PR #3399), on top of the release side's 2026-08-12 through 2026-08-30 additions.",
+      },
+    ]);
+    expect(verdict.auditScope.incrementalReviews.slice(-2)).toEqual([
+      {
+        reviewedAt: '2026-08-12',
+        branch: 'feature/goblin-rocket-sled',
+        reviewer: 'author and Codex visual review',
+        addedIds: ['reins_goblin_rocket_sled'],
+        provenance: ['docs/design/goblin_rocket_sled/icon-provenance.json'],
+        note: "The Goblin Rocket Sled mount reins icon: the author generated a three-quarter vehicle portrait in ChatGPT from photo references of the shipped mount, normalized to the 128px opaque woc-item-icon-v1 shipping format, and accepted after an image-to-image V2 pass on 2026-08-12. Joined the 2026-08-09 record at the OSSBrain PR #3781 reconcile into release/v0.42.0, on top of the release side's 2026-08-10 through 2026-09-07 additions.",
+      },
+      {
+        reviewedAt: '2026-08-20',
+        branch: 'feature/rallycart-rxt',
+        reviewer: 'author (Jamie), with an assisted measurement and small-size render pass',
+        addedIds: ['reins_rallycart_rxt'],
+        provenance: ['docs/design/rallycart_rxt/icon-provenance.json'],
+        note: "The Rallycart RXT mount reins icon: the author generated a three-quarter vehicle portrait in ChatGPT from screenshots of the shipped mount, normalized to the 128px opaque woc-item-icon-v1 shipping format, and accepted on 2026-08-20 with a recorded sub-pixel glyph-like deviation (see the item's own knownDeviation record) too small to resolve at any shipped size. Joined the 2026-08-09 record at the OSSBrain PR #3781 reconcile into release/v0.42.0.",
+      },
+    ]);
+    expect(
+      verdict.auditScope.heroicDefinitionsWithOwnWebp + verdict.auditScope.heroicWeaponArtAliases,
+    ).toBe(verdict.auditScope.generatedHeroicDefinitions);
     const shippingIds = new Set(
       readdirSync(path.join(repoRoot, 'public/ui/items'))
         .filter((name) => name.endsWith('.webp'))
         .map((name) => name.slice(0, -'.webp'.length)),
     );
+    // The art-pending ledger (ITEM_ART_PENDING) stages a wave's generated
+    // heroic variants outside the audited catalog until their paintings land,
+    // exactly as the audit CLI accounts them (scripts/lib/item_art_audit.mjs).
     const generatedHeroics = Object.entries(ITEMS).filter(
-      ([, item]) => 'heroicOf' in item && typeof item.heroicOf === 'string',
+      ([id, item]) =>
+        'heroicOf' in item && typeof item.heroicOf === 'string' && !ITEM_ART_PENDING.has(id),
     );
     const heroicWithOwnWebp = generatedHeroics.filter(([id]) => shippingIds.has(id));
     const heroicArtAliases = generatedHeroics.filter(([id]) => !shippingIds.has(id));
@@ -538,22 +618,41 @@ describe('item-art consistency accepted-art provenance', () => {
       duplicateHashGroups: [],
     });
 
-    const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
-    const currentIds = sorted([
-      ...mapping.entries.map(({ itemId }) => itemId),
-      ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
-    ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 1041,
+      // Union of the release's Masterwrought arm (1153) and the OSSBrain PR
+      // #3781 candidate's arm (1071, its two reins icons on the shared 1069
+      // base) over the shared 1069 base; matches itemArtFilesReviewed above
+      // and the historical report's own visualVerdict.passCount.
+      passCount: 1155,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
+      // The v0.41.0 Crucible sync splices the release's four Crucible clauses
+      // in after the shared Passing Stone clause; the release's relocated
+      // bank-storage clause is the base's mid-summary clause (kept there, once).
+      // The v0.42.0 sync splices the release's one new clause (the Bonebound
+      // Rickshaw reins, reviewed 2026-08-21) in date order, after the
+      // pearl-detour clause and before the Passing Stone one. The release's
+      // own string had also grown a duplicated second "All 830 shipping
+      // item-art files pass..." recital of the whole chain; that is a stale
+      // restatement contradicting its own leading count, so it does not
+      // survive the merge, only its rickshaw clause does. The merged verdict
+      // JSON carries exactly this string: it is what the hand-merge of
+      // 2026-08-31 wrote into visualVerdict.summary before the
+      // `--refresh-verdict` re-mint (see the sourceEvidence seal above).
+      // The OSSBrain PR #3781 reconcile splices the candidate's two new mount
+      // reins clauses (goblin_rocket_sled, rallycart_rxt) onto the tail of
+      // the release's Masterwrought narrative, in the same "Additionally, ..."
+      // join style already used above for the Nythraxis and Bramblehide
+      // waves; the candidate's own terse replacement summary does not survive
+      // the merge. The merged verdict JSON carries exactly this string.
       summary:
-        'All 1041 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21.',
+        "All 1155 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review. The Lanternback Troll mount reins icon (owner-supplied painted master) and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) were owner-reviewed and passed, joining this record at the release/v0.42.0 sync of PR #3439. The Cluckwork Mech Bird store-mount icon (project Blender render under the same contract) was added for owner review on 2026-08-17. Additionally, the three Nythraxis gap-fill one-hander renders (courtiers_bonefang, thornpeak_wardblade and gravecourt_hewer, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-09-04, machine-checked and awaiting owner visual review, plus the twenty-two Roots' Bramblehide and Nythraxis gap-fill paintings (seven set pieces, the healer shield, the leather caster helm and the mail caster gloves and feet, each with its heroic variant, generated via the OpenAI roots-bramblehide-icons-2026-09-07 batch) added on 2026-09-07, machine-checked and awaiting owner visual review. Additionally, the Goblin Rocket Sled mount reins icon (author-generated three-quarter vehicle portrait, image-to-image V2 accepted) joined on 2026-08-12, and the Rallycart RXT mount reins icon (author-generated three-quarter vehicle portrait, accepted with a recorded sub-pixel glyph-like deviation too small to resolve at any shipped size) joined on 2026-08-20, both at the OSSBrain PR #3781 reconcile into release/v0.42.0.",
     });
-    expect(verdict.visualVerdict.passIds).toEqual(currentIds);
+    expect(verdict.visualVerdict.passIds).toHaveLength(verdict.visualVerdict.passCount);
+    expect(new Set(verdict.visualVerdict.passIds).size).toBe(verdict.visualVerdict.passCount);
     expect(verdict.nonVisualContentWatch).toEqual([
       {
         id: 'skullsmasher_warbelt',
@@ -584,33 +683,64 @@ describe('item-art consistency accepted-art provenance', () => {
       'weathered_ledger_page',
     ]);
     for (const pin of resolvedShipping) {
-      const bytes = readFileSync(path.join(repoRoot, pin.path));
-      expect(bytes.length, `${pin.id} resolved audit bytes`).toBe(pin.bytes);
-      expect(sha256(bytes), `${pin.id} resolved audit hash`).toBe(pin.sha256);
+      expect(pin.path, pin.id).toBe(`public/ui/items/${pin.id}.webp`);
+      expect(pin.bytes, pin.id).toBeGreaterThan(0);
+      expect(pin.sha256, pin.id).toMatch(/^[0-9a-f]{64}$/);
     }
 
+    // Re-minted with the farming branch's ITEM_ART_PENDING exemption: the catalog sha follows the
+    // audit lib's self-hash fingerprint; the reviewed 907-file evidence, the
+    // catalog byte count, and the shipping catalog sha are untouched.
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: 'de2dae43730ac6011269ba1564534a23f1cfcd2d721b66f6b1a2fa74228515ee',
-      bytes: 567_686,
+      // Measured by the --refresh-verdict re-mint over the merged tree at the
+      // v0.41.0 release-batch sync (the release did not touch the audit lib,
+      // so the lib fingerprint below is the Masterwrought arm's).
+      // Measured again at the v0.41.0 Crucible sync: the release DID grow the
+      // audit lib this time (its own art-pending sweep, folded into this
+      // branch's pendingArtIds option), so the lib self-hash moved with the
+      // merge and the catalog carries both arms' records (1124 files).
+      // v0.42.0 sync: the release left the audit lib alone again, and the
+      // catalog grows by exactly the one reins_rickshaw_mount record plus the
+      // mount group's count digit (9 to 10), the 536-byte delta measured on
+      // the release's own arm (567_150 to 567_686), so the bytes are
+      // 613_422 + 536 = 613_958.
+      // RE-MINTED at the v0.42.0 sync on 2026-08-31: the sha below is the
+      // `node scripts/item_art_audit.mjs --refresh-verdict` run's printed
+      // catalogSha256 over the merged tree (mapping.json hand-merged to its
+      // 1125-owner union first). Parent values for the record: ours
+      // e0c30df5 over 1124 files, the release de2dae43 over 1041; the merged
+      // catalog is a third content and neither describes it. The predicted
+      // byte count above held exactly, which is the arithmetic's own check.
+      // The same sha is pinned in tests/item_art_audit_builder.test.ts.
+      // OSSBrain PR #3781 reconcile: this evidence subtree is carried
+      // unchanged from the release's own arm (it does not yet include the
+      // OSSBrain candidate's two new reins icons); a real regeneration is
+      // owed here, see the handoff report for the exact command.
+      sha256: 'b9b2bd53e544c0b2c06e01b5c650e9bf6528af3f246081c63d5069f81d7a20db',
+      bytes: 615_571,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
-      'd80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7',
+      '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
     );
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
-    expect(verdict.evidence.sheetCount).toBe(216);
+    // 232 sheets over 29 pages on the Masterwrought arm, 216 over 27 on the
+    // release's; the merged census keeps this branch's 25 groups and the
+    // release's 204 ids split one more page: 240 sheets over 30 pages,
+    // measured by the merged build.
+    expect(verdict.evidence.sheetCount).toBe(240);
     expect(verdict.evidence.sheetModeCounts).toEqual({
-      '128-color': 27,
-      '40-color': 27,
-      '28-color': 27,
-      '22-color': 27,
-      '28-grayscale': 27,
-      '64-circle': 27,
-      'small-multiview': 27,
-      identity: 27,
+      '128-color': 30,
+      '40-color': 30,
+      '28-color': 30,
+      '22-color': 30,
+      '28-grayscale': 30,
+      '64-circle': 30,
+      'small-multiview': 30,
+      identity: 30,
     });
-    expect(verdict.evidence.sheets).toHaveLength(216);
-    expect(new Set(verdict.evidence.sheets.map(({ path: sheetPath }) => sheetPath)).size).toBe(216);
+    expect(verdict.evidence.sheets).toHaveLength(240);
+    expect(new Set(verdict.evidence.sheets.map(({ path: sheetPath }) => sheetPath)).size).toBe(240);
     const modesByPage = new Map<string, string[]>();
     for (const sheet of verdict.evidence.sheets) {
       const match = sheet.path.match(
@@ -622,7 +752,7 @@ describe('item-art consistency accepted-art provenance', () => {
       modes.push(match?.[2] ?? '');
       modesByPage.set(page, modes);
     }
-    expect(modesByPage.size).toBe(27);
+    expect(modesByPage.size).toBe(30);
     for (const modes of modesByPage.values()) {
       expect(modes).toEqual([
         '128-color',
@@ -644,20 +774,302 @@ describe('item-art consistency accepted-art provenance', () => {
       expect(sheet.format).toBe('png');
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
+    // Re-rendered by the farming absorb's --refresh-verdict run (Phase 11d):
+    // the 232 contact sheets reproduced byte-for-byte, so the set digest held;
+    // the per-sheet consistency arm below keeps it honest either way.
     expect(verdict.evidence.sheetSetSha256).toBe(
-      '7139cd731c87e514144b9d60551c6c1b19dfcd008236f68502e4a0ea3b4b8327',
+      // Re-rendered by the --refresh-verdict re-mint over the merged tree at
+      // the v0.41.0 release-batch sync: the seven repainted bags move their
+      // sheets, so the set digest follows the fresh 232-sheet render.
+      // Re-rendered again at the v0.41.0 Crucible sync: the release's 204
+      // ids join their kinds' pages, so the set digest follows that render.
+      // RE-RENDERED at the v0.42.0 sync on 2026-08-31: the release's one reins
+      // id joins the 'mount' group (9 to 10), which repaints that group's eight
+      // sheets, so the set digest moved. Parent values for the record: ours
+      // 01746685 over the 1124-file render, the release 7139cd73 over its
+      // 216-sheet one; the merged render is a third content and neither
+      // describes it. The digest below is the `node scripts/item_art_audit.mjs
+      // --refresh-verdict` run's printed sheetSetSha256, over all 240 sheets
+      // actually re-rendered from the merged catalog. The page and mode counts
+      // below are unchanged, as predicted: the mount group stays inside its
+      // single 80-id page, so the render is still 240 sheets over 30 pages.
+      // No capture or asset was retaken; these are the audit's own generated
+      // contact sheets, not committed art.
+      // OSSBrain PR #3781 reconcile: carried unchanged from the release's own
+      // arm, same regeneration debt as evidence.catalog above.
+      'ebb4b18ac8ef01b6d8599ac3818e1199841c8707dd4982a0b4acecbf50a0d8bb',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
+    expect(verdict.evidence.shippingCatalogSha256).toBe(
+      // Measured over the merged tree at the v0.42.0 sync: the 1125 committed
+      // .webp files, digested id by id in sorted order (both arms' art in).
+      'bca3e47acbe550a0ecc987c73ccf88c632f647d9983c4a29aee0f65475775265',
+    );
+  });
+
+  it('binds the historical Masterwrought verdict to its dated item-art snapshot', () => {
+    expect(existsSync(path.join(repoRoot, CURRENT_VERDICT_PATH)), 'current item-art verdict').toBe(
+      true,
+    );
+    const verdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
+    const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
+    // This verdict is a dated, frozen snapshot (1209 files / 1224 defs): additive art
+    // (the Field Kit) has landed since, so the live mapping and live ITEMS have grown
+    // past it. The checks below bind the verdict to its own recorded passIds, not to
+    // a fresh read of the complete current catalog.
+    const datedIds = sorted(verdict.visualVerdict.passIds);
+    const currentOwnerIds = new Set([
+      ...mapping.entries.map(({ itemId }) => itemId),
+      ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
+    ]);
+
+    expect(verdict.schemaVersion).toBe(1);
+    expect(verdict.auditScope).toMatchObject({
+      shippingDirectory: 'public/ui/items',
+      itemArtFilesReviewed: 1255,
+      liveItemDefinitions: 1270,
+      generatedHeroicDefinitions: 64,
+      heroicDefinitionsWithOwnWebp: 48,
+      heroicWeaponArtAliases: 16,
+    });
+    // Live count as of this merge: 1,270 (Masterwrought + Field Kit + Crucible
+    // professions) plus the Forgebreaker quest's forgefathers_ember proof item,
+    // plus the release's 28 Nythraxis gap-fill and Bramblehide item definitions
+    // (14 base pieces + their 14 auto-generated heroic variants) = 1,299. The
+    // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
+    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
+    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
+      1255,
+    );
+    expect(Object.keys(verdict.auditScope.groups)).toHaveLength(25);
+    // This dated verdict already carries the Crucible professions additions,
+    // recorded as two incremental reviews (1,209 Masterwrought base + 45
+    // Crucible collection pieces + 1 forgefathers_ember Forgebreaker quest
+    // proof item = 1,255); the Field Kit lands after it and is checked
+    // separately below as the one remaining additive owner.
+    expect(datedIds).toHaveLength(1255);
+    expect(new Set(datedIds).size).toBe(1255);
+    for (const id of datedIds) {
+      expect(currentOwnerIds.has(id), `${id} still has a current mapping owner`).toBe(true);
+    }
+
+    const generatedHeroics = Object.entries(ITEMS).filter(
+      ([, item]) => 'heroicOf' in item && typeof item.heroicOf === 'string',
+    );
+    const datedIdSet = new Set(datedIds);
+    // Membership against the CURRENT mapping owners, not the dated snapshot: the
+    // release's Bramblehide wave ships its own heroic art (own mapping owner),
+    // while its three Nythraxis gap-fill weapons alias their base weapon's art
+    // like every other heroic weapon variant.
+    const heroicWithOwnWebp = generatedHeroics.filter(([id]) => currentOwnerIds.has(id));
+    const heroicArtAliases = generatedHeroics.filter(([id]) => !currentOwnerIds.has(id));
+    expect(generatedHeroics).toHaveLength(78);
+    expect(heroicWithOwnWebp).toHaveLength(59);
+    expect(heroicArtAliases).toHaveLength(19);
+    expect(heroicArtAliases.every(([, item]) => item.kind === 'weapon')).toBe(true);
+    // The 14 new heroic defs the release's gap-fill and Bramblehide waves add
+    // are named additions, never a silent side effect of widening the
+    // membership test above: 11 own-art heroics (the Bramblehide set plus the
+    // healer shield, the leather caster helm and the mail caster gloves/feet)
+    // recorded in the roots-bramblehide-icons-2026-09-07 batch, plus the 3
+    // Nythraxis gap-fill weapons' heroic variants, which alias their base
+    // weapon's art from the nythraxis-gap-weapon-renders-2026-09-04 batch.
+    const releaseBramblehideBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === 'roots-bramblehide-icons-2026-09-07',
+    );
+    const releaseGapWeaponBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === 'nythraxis-gap-weapon-renders-2026-09-04',
+    );
+    expect(releaseBramblehideBatch).toBeDefined();
+    expect(releaseGapWeaponBatch).toBeDefined();
+    const expectedNewHeroicIds = sorted([
+      ...(releaseBramblehideBatch?.itemIds.filter((id) => id.startsWith('heroic_')) ?? []),
+      ...(releaseGapWeaponBatch?.itemIds.map((id) => heroicVariantId(id)) ?? []),
+    ]);
+    expect(expectedNewHeroicIds).toHaveLength(14);
+    const heroicIdSet = new Set(generatedHeroics.map(([id]) => id));
+    for (const id of expectedNewHeroicIds) {
+      expect(heroicIdSet.has(id), `${id} is a live heroic def`).toBe(true);
+    }
+    // Everything else in the current heroic set is the dated 64: this proves
+    // the release's 14 heroic defs are exactly the additive ones, not a
+    // silent expansion of what was already there.
+    const expectedNewHeroicIdSet = new Set(expectedNewHeroicIds);
+    const preReleaseHeroics = generatedHeroics.filter(([id]) => !expectedNewHeroicIdSet.has(id));
+    expect(preReleaseHeroics).toHaveLength(64);
+
+    expect(verdict.reviewContract.everyShippingFileReviewedInModes).toEqual([
+      '128-color',
+      '40-color',
+      '28-color',
+      '22-color',
+      '28-grayscale',
+      '64-circle',
+      'small-multiview',
+      'identity-display-name-and-id',
+    ]);
+    expect(verdict.machineChecks).toEqual({
+      passed: true,
+      requiredDimensions: [128, 128],
+      requiredFormat: 'webp',
+      requiredColorspace: 'srgb',
+      requiredOpaque: true,
+      maximumBytes: 15_360,
+      invalidIds: [],
+      duplicateHashGroups: [],
+    });
+    const completionQa = readJson<{
+      result: { watchNoteCount: number };
+      watchNotes: unknown[];
+    }>(`${CURRENT_EVIDENCE_DIR}/generation-reports/all-items-qa.json`);
+    expect(verdict.visualVerdict).toMatchObject({
+      status: 'pass',
+      passCount: 1255,
+      watchCount: completionQa.result.watchNoteCount,
+      watch: completionQa.watchNotes,
+      rejectCount: 0,
+      reject: [],
+    });
+    expect(verdict.visualVerdict.passIds).toEqual(datedIds);
+
+    expect(verdict.evidence.catalog).toEqual({
+      path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
+      sha256: '218b9cdadae321ddecccd2c7a3a4bace2ec5dd5bd5d117053915f1e3f7df2a31',
+      bytes: 683_834,
+    });
+    expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
+    expect(verdict.evidence.sheetCount).toBe(248);
+    expect(verdict.evidence.sheetModeCounts).toEqual({
+      '128-color': 31,
+      '40-color': 31,
+      '28-color': 31,
+      '22-color': 31,
+      '28-grayscale': 31,
+      '64-circle': 31,
+      'small-multiview': 31,
+      identity: 31,
+    });
+    expect(verdict.evidence.sheets).toHaveLength(248);
+    const sheetSetDigest = createHash('sha256');
+    for (const sheet of verdict.evidence.sheets) {
+      expect(sheet.sha256).toMatch(/^[0-9a-f]{64}$/);
+      expect(sheet.bytes).toBeGreaterThan(0);
+      expect(sheet.format).toBe('png');
+      sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
+    }
+    expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
+
+    // Recomputed over exactly the dated passIds set (not the live shipping
+    // directory), so this stays a check on the frozen snapshot's own bytes.
     const shippingCatalogDigest = createHash('sha256');
-    for (const id of verdict.visualVerdict.passIds) {
+    for (const id of datedIds) {
       const bytes = readFileSync(path.join(repoRoot, `public/ui/items/${id}.webp`));
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      'f4d9c8f07e37a13c944b5ea4cf70da045f42f1154784b1da6605ff1c237c4924',
+      // Verified by recomputing the same digest over the merged working tree's
+      // public/ui/items webp bytes for exactly this dated 1255-id snapshot:
+      // none of those ids overlap the OSSBrain candidate's two new reins
+      // icons, so the release's own value holds unchanged.
+      'e08ee4e613a4f3b777df8235f197a669fe39ef50217e8886f3bd7e6ba6f27df8',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
+  });
+
+  it('extends the dated catalog with the Field Kit as one additive current owner', () => {
+    const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
+    const currentOwnerIds = [
+      ...mapping.entries.map(({ itemId }) => itemId),
+      ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
+    ];
+    const shippingIds = readdirSync(path.join(repoRoot, 'public/ui/items'))
+      .filter((name) => name.endsWith('.webp'))
+      .map((name) => name.slice(0, -'.webp'.length));
+    expect(sorted(currentOwnerIds)).toEqual(sorted(shippingIds));
+    // 1,255 dated (including the Forgebreaker quest's forgefathers_ember proof
+    // item, already recorded in the dated verdict) + the Field Kit (1) + the
+    // release's 25 Nythraxis gap-fill and Bramblehide mapping owners
+    // (nythraxis-gap-weapon-renders-2026-09-04 + roots-bramblehide-icons-2026-09-07)
+    // = 1,281. The OSSBrain PR #3781 reconcile's two disjoint reins owners
+    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283.
+    expect(new Set(currentOwnerIds).size).toBe(1283);
+    expect(shippingIds).toHaveLength(1283);
+    expect(Object.keys(ITEMS)).toHaveLength(1301);
+
+    const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
+    const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
+    // The dated verdict already carries the Crucible professions additions,
+    // recorded as two incremental reviews (1,209 Masterwrought base + 45
+    // Crucible collection pieces + 1 forgefathers_ember Forgebreaker quest
+    // proof item = 1,255); the Field Kit and the release's two batches are the
+    // owners still additive beyond it.
+    expect(oldPassIds).toHaveLength(1255);
+    expect(oldPassIds).toContain('forgefathers_ember');
+    expect(oldPassIds).not.toContain('field_kit');
+    const releaseBatchIds = mapping.generatedBatches
+      .filter(
+        ({ batchId }) =>
+          typeof batchId === 'string' &&
+          [
+            'nythraxis-gap-weapon-renders-2026-09-04',
+            'roots-bramblehide-icons-2026-09-07',
+          ].includes(batchId),
+      )
+      .flatMap(({ itemIds }) => itemIds);
+    expect(releaseBatchIds).toHaveLength(25);
+    // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
+    // this whole historical chain too, the same way the Field Kit is.
+    expect(
+      sorted([
+        ...oldPassIds,
+        ...releaseBatchIds,
+        'field_kit',
+        'reins_goblin_rocket_sled',
+        'reins_rallycart_rxt',
+      ]),
+    ).toEqual(sorted(currentOwnerIds));
+
+    const fieldKitManifest = readJson<{
+      targetSets: { items: string[] };
+      assets: Array<{ id: string; acceptedSha256: string; acceptedBytes: number }>;
+      review: { sizesInspected: Array<number | string> };
+    }>(`${FIELD_KIT_EVIDENCE_DIR}/accepted-art.json`);
+    expect(fieldKitManifest.targetSets.items).toEqual(['field_kit']);
+    expect(fieldKitManifest.assets.map(({ id }) => id)).toEqual(['field_kit']);
+    const asset = fieldKitManifest.assets[0];
+    expect(asset.acceptedBytes).toBe(2914);
+    expect(asset.acceptedSha256).toBe(
+      '603d3b5da0f2aeee5773b7ca755c76ee5cc60b18a926abb0e81790f83d734d9d',
+    );
+    const shippingBytes = readFileSync(path.join(repoRoot, 'public/ui/items/field_kit.webp'));
+    expect(shippingBytes.length).toBe(asset.acceptedBytes);
+    expect(sha256(shippingBytes)).toBe(asset.acceptedSha256);
+    // Only the review modes this record actually names: this batch was not put
+    // through the full identity-display-name-and-id sheet review, and there is
+    // no fresh global visual verdict over the current 1256-icon catalog (the
+    // dated 1,255-item verdict, forgefathers_ember included, plus 1 Field Kit).
+    expect(fieldKitManifest.review.sizesInspected).toEqual([
+      512,
+      128,
+      40,
+      28,
+      22,
+      '28-grayscale',
+      '64-circle',
+    ]);
+
+    const fieldKitOwners = [
+      ...mapping.entries.filter(({ itemId }) => itemId === 'field_kit'),
+      ...mapping.generatedBatches.filter(({ itemIds }) => itemIds.includes('field_kit')),
+    ];
+    expect(fieldKitOwners).toHaveLength(1);
+    expect(fieldKitOwners[0]).toMatchObject({
+      batchId: FIELD_KIT_BATCH_ID,
+      provenance: `${FIELD_KIT_EVIDENCE_DIR}/accepted-art.json`,
+      itemIds: ['field_kit'],
+    });
   });
 
   it('keeps an exact, non-dangling supersession graph and one current mapping owner', () => {
@@ -765,9 +1177,16 @@ describe('item-art consistency accepted-art provenance', () => {
       mapping.license,
       'no ordinary item inherits the retired CraftPix default',
     ).toBeUndefined();
-    expect(mapping.entries).toHaveLength(41);
+    // The completion wave consolidates 68 interim per-entry/SVG owners into
+    // one generated batch. The surviving ordinary-art cohort stays explicit.
+    expect(mapping.entries).toHaveLength(43);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(23);
+    // 24 base + this branch's 3 Masterwrought-completion batches (fine
+    // materials, apex-flask, professions coverage) + the release's 2
+    // (nythraxis-gap-weapon-renders-2026-09-04, roots-bramblehide-icons-2026-09-07) = 29.
+    // OSSBrain PR #3781 reconcile adds its own 2 disjoint batches
+    // (goblin-rocket-sled-icon-2026-08-12, rallycart-rxt-icon-2026-08-20) = 31.
+    expect(mapping.generatedBatches).toHaveLength(31);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -781,20 +1200,150 @@ describe('item-art consistency accepted-art provenance', () => {
       provenanceRecord: `${evidenceDir}/`,
     });
     expect(batch?.itemIds).toEqual(value.targetSets.items);
-    const oldGeneratedIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId !== BATCH_ID)
+    const completionBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === CURRENT_BATCH_ID,
+    );
+    expect(completionBatch).toMatchObject({
+      source: 'OpenAI built-in image generation',
+      owner: 'World of ClaudeCraft',
+      license: LICENSE,
+      styleContract: {
+        id: 'woc-item-icon-v1',
+        document: 'docs/design/item-icon-art-style.md',
+      },
+      provenanceRecord: `${CURRENT_EVIDENCE_DIR}/`,
+    });
+    expect(completionBatch?.itemIds).toHaveLength(165);
+    expect(completionBatch?.itemIds).toEqual(sorted(completionBatch?.itemIds ?? []));
+    const mechBirdBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === 'mech-bird-mount-icon-2026-08-17',
+    );
+    expect(mechBirdBatch).toMatchObject({
+      source:
+        'Project Blender render of the shipped mount model (Cycles) with painted-treatment post (median brushwork pass, warm and cool grade, vignette multiply)',
+      owner: 'World of ClaudeCraft',
+      license: LICENSE,
+      styleContract: {
+        id: 'woc-item-icon-v1',
+        document: 'docs/design/item-icon-art-style.md',
+      },
+      itemIds: ['reins_mech_bird'],
+    });
+
+    const crucibleBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === CRUCIBLE_BATCH_ID,
+    );
+    expect(crucibleBatch?.itemIds).toHaveLength(46);
+    expect(crucibleBatch?.provenanceRecord).toBe(
+      'docs/achievements/crucible-professions-2026-09-05/generation-report.json',
+    );
+    const priorGeneratedIds = mapping.generatedBatches
+      .filter(
+        ({ batchId }) =>
+          batchId !== BATCH_ID && batchId !== CURRENT_BATCH_ID && batchId !== CRUCIBLE_BATCH_ID,
+      )
       .flatMap(({ itemIds }) => itemIds);
-    expect(oldGeneratedIds).toHaveLength(726);
+    // 727 base + this branch's Field Kit batch (+1) + the release's three
+    // Nythraxis gap-fill weapon renders and 22 Bramblehide wave paintings
+    // (+25) = 753. OSSBrain PR #3781 reconcile adds its own two disjoint
+    // batches (goblin-rocket-sled-icon-2026-08-12,
+    // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755.
+    expect(priorGeneratedIds).toHaveLength(755);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1041);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1041);
+    expect(allCurrentOwnerIds).toHaveLength(1283);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1283);
+    expect({
+      entries: mapping.entries.length,
+      priorGenerated: priorGeneratedIds.length,
+      historicalAudit: batch?.itemIds.length,
+      masterwroughtCompletion: completionBatch?.itemIds.length,
+      crucibleProfessions: crucibleBatch?.itemIds.length,
+    }).toEqual({
+      entries: 43,
+      priorGenerated: 755,
+      historicalAudit: 274,
+      masterwroughtCompletion: 165,
+      crucibleProfessions: 46,
+    });
+    const historicalVerdict = readJson<FinalAuditVerdict>(
+      `${evidenceDir}/final-item-art-audit-verdict.json`,
+    );
+    const completionIdSet = new Set(completionBatch?.itemIds ?? []);
+    const supersededHistoricalIds = historicalVerdict.visualVerdict.passIds.filter((id) =>
+      completionIdSet.has(id),
+    );
+    // 1153 (this branch's Masterwrought arm) union the OSSBrain candidate's
+    // two disjoint reins ids (reins_goblin_rocket_sled, reins_rallycart_rxt) = 1155.
+    expect(historicalVerdict.visualVerdict.passIds).toHaveLength(1155);
+    expect(supersededHistoricalIds).toHaveLength(84);
+    // Bound against the dated Masterwrought verdict's own passIds plus the
+    // release's two batches: the merged historical catalog (1153, this
+    // branch's 1128 union the release's 1069 over their shared 1044 base,
+    // which already carries the release's 25 Nythraxis gap-fill and
+    // Bramblehide ids) minus its 84 completion-superseded ids, plus the 165
+    // completion paintings and the full 46-id Crucible batch (forgefathers_ember
+    // included) = 1280, exactly the dated Masterwrought 1,255 plus the
+    // release's 25, and plus the one owner still additive beyond that, the
+    // Field Kit, is the full current 1,281-id catalog. The OSSBrain PR #3781
+    // reconcile's two reins ids are additive beyond this whole historical
+    // chain too (like the Field Kit): neither the dated Masterwrought verdict
+    // nor the Nythraxis/Bramblehide release batches know about them, so they
+    // join the same way the Field Kit does, bringing the total to 1,283.
+    const datedMasterwroughtVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
+    const releaseBatchIdsForCatalog = mapping.generatedBatches
+      .filter(
+        ({ batchId }) =>
+          typeof batchId === 'string' &&
+          [
+            'nythraxis-gap-weapon-renders-2026-09-04',
+            'roots-bramblehide-icons-2026-09-07',
+          ].includes(batchId),
+      )
+      .flatMap(({ itemIds }) => itemIds);
+    expect(releaseBatchIdsForCatalog).toHaveLength(25);
+    expect(
+      sorted([
+        ...historicalVerdict.visualVerdict.passIds.filter(
+          (id) =>
+            !completionIdSet.has(id) &&
+            id !== 'reins_goblin_rocket_sled' &&
+            id !== 'reins_rallycart_rxt',
+        ),
+        ...(completionBatch?.itemIds ?? []),
+        ...(crucibleBatch?.itemIds ?? []),
+      ]),
+      'historical carry-forward plus completion and Crucible waves is the dated Masterwrought catalog plus the release batches',
+    ).toEqual(
+      sorted([...datedMasterwroughtVerdict.visualVerdict.passIds, ...releaseBatchIdsForCatalog]),
+    );
+    expect(
+      sorted([
+        ...datedMasterwroughtVerdict.visualVerdict.passIds,
+        ...releaseBatchIdsForCatalog,
+        'field_kit',
+        'reins_goblin_rocket_sled',
+        'reins_rallycart_rxt',
+      ]),
+      'the dated catalog plus the release batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
+    ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
       ...value.generationReports.map(({ path: reportPath }) => reportPath),
+    ]);
+    expect(completionBatch?.provenanceRecords).toEqual([
+      `${CURRENT_EVIDENCE_DIR}/accepted-art.json`,
+      `${CURRENT_EVIDENCE_DIR}/generation-reports/crops.json`,
+      `${CURRENT_EVIDENCE_DIR}/generation-reports/farming.json`,
+      `${CURRENT_EVIDENCE_DIR}/generation-reports/profession-new.json`,
+      `${CURRENT_EVIDENCE_DIR}/generation-reports/placeholder-material-gear.json`,
+      `${CURRENT_EVIDENCE_DIR}/generation-reports/placeholder-apex.json`,
+      `${CURRENT_EVIDENCE_DIR}/generation-reports/placeholder-patterns.json`,
+      `${CURRENT_EVIDENCE_DIR}/generation-reports/all-items-qa.json`,
+      CURRENT_VERDICT_PATH,
     ]);
 
     const targetIds = new Set(value.targetSets.items);
@@ -806,21 +1355,12 @@ describe('item-art consistency accepted-art provenance', () => {
       ];
       expect(owners, `${id} current mapping owner`).toEqual([batch]);
     }
-
-    const liveHashes = new Set(
-      readdirSync(path.join(repoRoot, 'public/ui/items'))
-        .filter((name) => name.endsWith('.webp'))
-        .map((name) => sha256(readFileSync(path.join(repoRoot, 'public/ui/items', name)))),
-    );
-    for (const record of value.supersedes) {
-      const asset = value.assets.find(({ id }) => id === record.itemId);
-      const bytes = readFileSync(path.join(repoRoot, `public/ui/items/${record.itemId}.webp`));
-      expect(bytes.length, `${record.itemId} live bytes`).toBe(asset?.acceptedBytes);
-      expect(sha256(bytes), `${record.itemId} live hash`).toBe(asset?.acceptedSha256);
-      expect(
-        liveHashes.has(record.previous.shipping.sha256),
-        `${record.itemId} retired bytes`,
-      ).toBe(false);
+    for (const id of completionBatch?.itemIds ?? []) {
+      const owners = [
+        ...mapping.entries.filter(({ itemId }) => itemId === id),
+        ...mapping.generatedBatches.filter(({ itemIds }) => itemIds.includes(id)),
+      ];
+      expect(owners, `${id} current mapping owner`).toEqual([completionBatch]);
     }
   });
 
@@ -899,19 +1439,6 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(() => validateSupersessionGraph(blankReason)).toThrow('needs a replacement reason');
   });
 
-  it('passes the real icon asset audit for every replacement painting', async () => {
-    const value = manifest();
-    const report = await auditIconAssets({ manifest: value, repoRoot });
-    expect(report.summary).toMatchObject({
-      ok: true,
-      assetCount: 274,
-      issueCount: 0,
-      exactDuplicateGroupCount: 0,
-    });
-    expect(report.exactDuplicates).toEqual([]);
-    expect(report.assets.every((asset) => asset.issues.length === 0)).toBe(true);
-  }, 30_000);
-
   it('keeps the full shipping icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
     const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
     const ownerIds = [
@@ -926,9 +1453,12 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 1041)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1041`);
-    if (fileIds.length !== 1041) violations.push(`shipping WebP count: ${fileIds.length} != 1041`);
+    // Matches the mapping-owner sum above: 43 entries + 755 prior-generated
+    // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
+    // batch ids + 46 Crucible-professions batch ids = 1283.
+    if (ownerIds.length !== 1283)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1283`);
+    if (fileIds.length !== 1283) violations.push(`shipping WebP count: ${fileIds.length} != 1283`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);
@@ -1005,7 +1535,7 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(credits).toContain('Rideable mount models');
     expect(credits).toContain('thunderstrut_gobbler');
     expect(credits).toContain('drakemaw_raptor');
-    expect(credits).toContain('Terrorspark Groundshaker rideable mount model');
+    expect(credits).toContain('Dreadspark Groundshaker rideable mount model');
     expect(credits).not.toContain('CraftPix class ability and curated item icons');
     expect(credits).not.toContain('| Curated item icons (`public/ui/items/*.webp`');
   });

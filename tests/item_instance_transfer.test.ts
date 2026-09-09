@@ -37,19 +37,29 @@ describe('isTransferLockedInstance', () => {
 });
 
 describe('publicInstanceView: the display trim', () => {
-  it('projects exactly signer/enchant/rolled and drops the rest', () => {
+  it('projects inspect identity and Perfected activity, keeping rank and binding private', () => {
+    // The fixture carries EVERY dropped field by name, the Perfecting pair
+    // included, so privacy is pinned directly rather than only transitively
+    // through the eqi cross-pin. Perfected is visible for dormant enchants.
     const full: ItemInstancePayload = {
       signer: 'Ayla',
       enchant: 'ench_stat_str',
-      rolled: { quality: 'epic', stats: { str: 2 }, masterwork: true },
+      rolled: { quality: 'legendary', stats: { str: 2 }, masterwork: true },
+      name: "Vel'tara's Oath",
       charges: { zap: 3 },
       bindOnTrade: true,
       boundTo: 12,
+      perfecting: 2,
+      perfected: true,
+      perfectingBound: true,
+      perfectingBonus: { str: 2 },
     };
     expect(publicInstanceView(full)).toEqual({
       signer: 'Ayla',
       enchant: 'ench_stat_str',
-      rolled: { quality: 'epic', stats: { str: 2 }, masterwork: true },
+      rolled: { quality: 'legendary', stats: { str: 2 }, masterwork: true },
+      name: "Vel'tara's Oath",
+      perfected: true,
     });
   });
 
@@ -60,19 +70,56 @@ describe('publicInstanceView: the display trim', () => {
     expect(live.rolled!.stats!.str).toBe(2);
   });
 
+  it('projects a Riftbound band record by value (rank, upgrades, gems) and nothing bound', () => {
+    const live: ItemInstancePayload = {
+      boundTo: 7,
+      rolled: { quality: 'epic', stats: { str: 8, sta: 6 } },
+      rift: {
+        sourceEventId: 'e',
+        tier: 'S',
+        power: 4,
+        upgradeLevel: 5,
+        maxUpgradeLevel: 5,
+        gemSlots: 2,
+        gems: ['rift_gem_verdant'],
+      },
+    };
+    const pub = publicInstanceView(live);
+    expect(pub).toEqual({ rolled: live.rolled, rift: live.rift });
+    expect(pub).not.toHaveProperty('boundTo');
+    pub.rift!.gems.push('rift_gem_azure');
+    expect(live.rift!.gems).toEqual(['rift_gem_verdant']);
+  });
+
   it('matches the eqi wire allowlist in server/game.ts: widen both or neither', () => {
     // Source-scrape the eqi projection loop (the enchant_apply_view.test.ts
-    // pin) and assert this module projects the identical key set.
+    // pin) and assert this module projects the identical key set. `name`
+    // joined both sites together (Masterwrought phase 13); the ban list below
+    // still holds every non-cosmetic field out by name.
     const game = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
     const projected = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)].map((m) => m[1]);
-    expect(projected.sort()).toEqual(['enchant', 'rolled', 'signer']);
+    expect(projected.sort()).toEqual(['enchant', 'name', 'perfected', 'rift', 'rolled', 'signer']);
     const transfer = readFileSync(
       new URL('../src/sim/item_instance_transfer.ts', import.meta.url),
       'utf8',
     );
     const trimmed = [...transfer.matchAll(/pub\.(\w+) = /g)].map((m) => m[1]);
-    expect([...new Set(trimmed)].sort()).toEqual(['enchant', 'rolled', 'signer']);
-    for (const banned of ['boundTo', 'bindOnTrade', 'charges']) {
+    expect([...new Set(trimmed)].sort()).toEqual([
+      'enchant',
+      'name',
+      'perfected',
+      'rift',
+      'rolled',
+      'signer',
+    ]);
+    for (const banned of [
+      'boundTo',
+      'bindOnTrade',
+      'charges',
+      'perfecting',
+      'perfectingBound',
+      'perfectingBonus',
+    ]) {
       expect(transfer.includes(`pub.${banned}`), `${banned} must never project`).toBe(false);
     }
   });
@@ -157,19 +204,23 @@ describe('removeMatchingInstance', () => {
 });
 
 describe('canGrantCopies / grantCopies: the shared exchange-pipe pair', () => {
-  it('capacity: plain-stack room is not instanced room, and the reverse', () => {
+  it('capacity: plain-stack room excludes enchanted payloads in either direction', () => {
     const inventory: InvSlot[] = [{ itemId: 'pristine_hide', count: 1 }];
     // One free slot short: the plain stack tops up, the instanced copy needs
     // its own slot.
     expect(canGrantCopies(inventory, { general: 1, materials: 0 }, 'pristine_hide', 1)).toBe(true);
     expect(
-      canGrantCopies(inventory, { general: 1, materials: 0 }, 'pristine_hide', 1, SIGNED),
+      canGrantCopies(inventory, { general: 1, materials: 0 }, 'pristine_hide', 1, {
+        enchant: 'ench_stat_str',
+      }),
     ).toBe(false);
     const signedStack: InvSlot[] = [
-      { itemId: 'pristine_hide', count: 1, instance: { signer: 'Ayla' } },
+      { itemId: 'pristine_hide', count: 1, instance: { enchant: 'ench_stat_str' } },
     ];
     expect(
-      canGrantCopies(signedStack, { general: 1, materials: 0 }, 'pristine_hide', 1, SIGNED),
+      canGrantCopies(signedStack, { general: 1, materials: 0 }, 'pristine_hide', 1, {
+        enchant: 'ench_stat_str',
+      }),
     ).toBe(true);
     expect(canGrantCopies(signedStack, { general: 1, materials: 0 }, 'pristine_hide', 1)).toBe(
       false,

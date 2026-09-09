@@ -9,6 +9,7 @@
     Overview,
   } from '../types';
   import { apiGet } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
   import { auth } from '../state/auth.svelte';
   import { ACTIVITY_REFRESH_MS, LIVE_REFRESH_MS, poll } from '../state/poll';
   import { classLabel, t } from '../i18n';
@@ -19,6 +20,7 @@
     fmtNumber,
   } from '../format';
   import Panel from '../components/Panel.svelte';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import StatCard from '../components/StatCard.svelte';
   import BarChart from '../components/BarChart.svelte';
   import LineChart from '../components/LineChart.svelte';
@@ -32,8 +34,11 @@
   let activity = $state<Activity | null>(null);
   let onlineHistory = $state<OnlineHistory | null>(null);
   let onlineHistoryRange = $state<OnlineHistoryRange>('24h');
-  let liveFailed = $state(false);
-  let activityFailed = $state(false);
+  // Two independent reads, so two independent verdicts: an operator holding
+  // the live-stats permission but not the analytics one must see the charts
+  // half say "permission denied" while the stat cards keep updating.
+  let liveFailed = $state<AdminLoadFailure>('none');
+  let activityFailed = $state<AdminLoadFailure>('none');
 
   const dayLabel = (day: string) => day.slice(5); // YYYY-MM-DD -> MM-DD
   let registrationPoints = $derived<BarPoint[]>((activity?.registrations ?? []).map((p) => ({ label: dayLabel(p.day), value: p.count })));
@@ -63,9 +68,9 @@
   async function refreshLive(): Promise<void> {
     try {
       overview = await apiGet<Overview>('/admin/api/overview');
-      liveFailed = false;
+      liveFailed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) liveFailed = true;
+      if (!auth.handleAuthFailure(err)) liveFailed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -77,9 +82,9 @@
       ]);
       activity = nextActivity;
       onlineHistory = nextOnlineHistory;
-      activityFailed = false;
+      activityFailed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) activityFailed = true;
+      if (!auth.handleAuthFailure(err)) activityFailed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -99,7 +104,9 @@
 </script>
 
 <section id="stats">
-  {#if liveFailed}
+  {#if liveFailed === 'forbidden'}
+    <PermissionDenied />
+  {:else if liveFailed === 'error'}
     <div class="empty">{t('stats.loadFailed')}</div>
   {:else if overview}
     <StatCard value={fmtNumber(overview.server.online)} label={t('stats.onlineNow')} />
@@ -124,7 +131,9 @@
 </section>
 
 <section id="charts">
-  {#if activityFailed}
+  {#if activityFailed === 'forbidden'}
+    <PermissionDenied />
+  {:else if activityFailed === 'error'}
     <div class="empty">{t('charts.loadFailed')}</div>
   {:else}
     <Panel

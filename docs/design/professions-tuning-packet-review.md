@@ -176,6 +176,16 @@ content. Full text in this file's git history (pass-1 revision).
 - **R33. Tier-3 danger placements are deliberate**, allowlisted with
   intent comments; the Grix-adjacent tutorial veins got spacing fixes.
 - **R34. Stale clients get GUARDS, not a version floor.**
+  SUPERSEDED BY CIRCUMSTANCE 2026-09-01 (masterwrought ruling
+  qr-19-stale-client-deploy-window), not reversed. The guards this ruling
+  chose still ship and are still the right shape; a version floor arrived
+  anyway, for unrelated wire-shape reasons, when ONLINE_WORLD_LAYOUT_VERSION
+  reached 26 and the world socket became fail-closed on it. A stale bundle is
+  now refused at the handshake before it can be handed an id it cannot
+  resolve, so the deploy-window apparatus the ruling implied (the frozen
+  HEROIC_BOSS_LOOT snapshot and its loot-table exclusion) was retired in the
+  same change. The ruling was right about the trade-off it faced; the
+  premise underneath it went away.
 - **R35. GM tooling v1 is the minimal pair:** inspect professions state,
   restore a lost item or slot row.
 - **R36. The 1,000-concurrent baseline is recorded on the maintainer's

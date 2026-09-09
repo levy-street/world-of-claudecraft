@@ -83,14 +83,17 @@ describe('mob portrait source manifest', () => {
   it('covers every live mob and records each render dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
     const liveIds = Object.keys(MOBS).sort();
-    // 245: the 233 the v0.39.0 base carried, minus vale_cup_ball (retired with
+    // 243: the 233 the v0.39.0 base carried, minus vale_cup_ball (retired with
     // the Vale Cup by the New Eastbrook program), plus the Proving Shore
     // tutorial island's training_effigy, shore_scuttler, and mister_crabs
     // tide-pool miniboss, plus the seven Ignivar raid enemies (the herald,
     // the ember sentinel, cinder artificer, crucible warden, heart of the
     // end, Varkhul the Forgefather, and the derelict mech bomber), plus the
-    // Roach King encounter's Asmon, roachling, and garbage beetle.
-    expect(liveIds).toHaveLength(245);
+    // Nythraxis Bone Spike the mechanics redo raises under impaled raiders.
+    // 245: plus the Eastbrook hub practice yard's own two dummies
+    // (hub_training_dummy, hub_healing_dummy).
+    // 248: plus Asmon, the Royal Roachling, and the Tribute Beetle.
+    expect(liveIds).toHaveLength(248);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
@@ -208,6 +211,65 @@ describe('mob portrait source manifest', () => {
         receipt: partialReceipt,
       }),
     ).toThrow(/missing changed row mob_001/);
+  });
+
+  it('authorizes a fingerprint-only refresh without a receipt, and only that', () => {
+    // The renderer fingerprint hashes the esbuild browser bundle, whose
+    // import graph reaches sim content, so content work moves it with zero
+    // pixel impact. The eligible shape is the drift classifier's
+    // bookkeepingOnly verdict: ONLY the bundle digest moved. Row drift, a
+    // row-set change, or an edit to a tracked renderer file (renderer work,
+    // not content churn) still demands the rendered receipt.
+    const rows = Array.from({ length: 3 }, (_, index) => ({
+      id: `mob_${index}`,
+      sourceFingerprint: `source-${index}`,
+      output: { bytes: 100 + index, sha256: `output-${index}` },
+    }));
+    const trackedFiles = [
+      { path: 'scripts/render_finder_portraits.mjs', bytes: 10, sha256: 'tf-a' },
+    ];
+    const previous = {
+      schemaVersion: 2,
+      rendererFingerprint: 'renderer-a',
+      renderer: {
+        trackedFiles: structuredClone(trackedFiles),
+        browserBundle: { bytes: 1000, sha256: 'bundle-a' },
+      },
+      portraits: structuredClone(rows),
+    };
+    const fingerprintOnly = {
+      schemaVersion: 2,
+      rendererFingerprint: 'renderer-b',
+      renderer: {
+        trackedFiles: structuredClone(trackedFiles),
+        browserBundle: { bytes: 1002, sha256: 'bundle-b' },
+      },
+      portraits: structuredClone(rows),
+    };
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: fingerprintOnly, receipt: null }),
+    ).not.toThrow();
+    const alsoRowDrift = structuredClone(fingerprintOnly);
+    alsoRowDrift.portraits[1].sourceFingerprint = 'changed-source';
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: alsoRowDrift, receipt: null }),
+    ).toThrow(/without a renderer receipt/);
+    const removedRow = structuredClone(fingerprintOnly);
+    removedRow.portraits.pop();
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: removedRow, receipt: null }),
+    ).toThrow(/without a renderer receipt/);
+    // The tightened arm: the stills renderer scripts themselves moved, rows
+    // intact. That is exactly the camera/lighting edit the receipt exists to
+    // evidence, so the receipt-free path must refuse it.
+    const trackedFileMoved = structuredClone(fingerprintOnly);
+    trackedFileMoved.renderer.trackedFiles[0].sha256 = 'tf-b';
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: trackedFileMoved, receipt: null }),
+    ).toThrow(/without a renderer receipt/);
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: structuredClone(previous), receipt: null }),
+    ).not.toThrow();
   });
 
   it('accepts a renderer receipt only when every changed source and output matches', () => {

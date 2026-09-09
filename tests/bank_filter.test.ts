@@ -50,7 +50,11 @@ const LOCALIZED: Record<string, string> = {
   relic: 'Relikwie',
   iron_ore: 'Ysterets',
 };
-const nameOf = (id: string): string => LOCALIZED[id] ?? id;
+// The painter's own rule, in miniature: a copy's chosen name wins over the def's
+// localized one, which is what makes search and the name-sort agree with the
+// label the cell actually shows.
+const nameOf = (slot: BankSlotModel): string =>
+  slot.instance?.name ?? LOCALIZED[slot.itemId] ?? slot.itemId;
 
 // slotIndex is intentionally NOT the array position, so a filter/sort that dropped or
 // reordered it would visibly corrupt the pinned slotIndex sequences below.
@@ -291,6 +295,62 @@ describe('filterBankSlots: unknown ids', () => {
       'keystone',
       'blade',
     ]);
+  });
+});
+
+describe('filterBankSlots: a copy CHOSEN name is what search and the name-sort read', () => {
+  // Two copies of one id, one of them renamed. The resolver is slot-keyed for
+  // exactly this: an id-keyed one could answer only one name for both cells,
+  // and the cells already show two.
+  const named: BankSlotModel = {
+    slotIndex: 1,
+    itemId: 'blade',
+    count: 1,
+    showCount: false,
+    qualityKey: 'legendary',
+    instance: { name: 'Dawn Oath' } as BankSlotModel['instance'],
+  };
+  const plain: BankSlotModel = {
+    slotIndex: 4,
+    itemId: 'blade',
+    count: 1,
+    showCount: false,
+    qualityKey: 'uncommon',
+  };
+  const pair = [named, plain];
+
+  it('finds a renamed copy by its chosen name', () => {
+    expect(indices(filterBankSlots(pair, lookup, state({ search: 'dawn' }), nameOf))).toEqual([1]);
+    expect(indices(filterBankSlots(pair, lookup, state({ search: 'OATH' }), nameOf))).toEqual([1]);
+  });
+
+  it('the plain twin is still found by the def name, and the renamed one is NOT', () => {
+    // The behavior extension is honest in both directions: a chosen name
+    // REPLACES the label on that cell, so searching the def name must not
+    // surface a copy whose cell never says it.
+    expect(indices(filterBankSlots(pair, lookup, state({ search: 'zwaard' }), nameOf))).toEqual([
+      4,
+    ]);
+  });
+
+  it('a renamed copy still answers to its category chip', () => {
+    // Renaming changes the label, never the def, so the category filter (which
+    // reads the def) is untouched by it.
+    expect(indices(filterBankSlots(pair, lookup, state({ category: 'weapon' }), nameOf))).toEqual([
+      1, 4,
+    ]);
+  });
+
+  it('name-sorts the renamed copy under its chosen name, not the def name', () => {
+    // Zwaard would sort both cells last; Dawn Oath sorts the renamed one first.
+    const out = filterBankSlots(
+      [...pair, { slotIndex: 7, itemId: 'helm', count: 1, showCount: false, qualityKey: 'common' }],
+      lookup,
+      state({ sort: 'name' }),
+      nameOf,
+    );
+    // Aardhelm, Dawn Oath, Zwaard.
+    expect(indices(out)).toEqual([7, 1, 4]);
   });
 });
 

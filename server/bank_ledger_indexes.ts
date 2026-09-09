@@ -59,6 +59,10 @@
 // server/db.ts already imports the registry (the client_perf_indexes.ts
 // precedent).
 
+// The one import is the pure world_api seam (no db, no registry), the op
+// classification the money predicate below is derived from.
+import { GUILD_BANK_LOG_OP_KIND } from '../src/world_api/guild_bank';
+
 export const BANK_LEDGER_CONTAINER_INDEX_SQL = `
 CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_container_recent
   ON bank_ledger(container_id, id DESC)
@@ -172,3 +176,54 @@ export const BANK_LEDGER_ACCOUNT_LARGE_INVALID_INDEX_DROP_SQL =
 
 export const BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL =
   'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_recent';
+
+// ---------------------------------------------------------------------------
+// The guild bank history's MONEY slice (server/guild_bank_log_db.ts, the
+// `money` kind of the paged reader, transaction-history review).
+//
+// The container index above bounds the `all` slice by its LIMIT because the
+// op filter rejects only the two rare diagnostic rows. The money slice is the
+// SPARSE one: item rows are the bulk of any guild's ledger (a vault
+// deposit-all writes one row per material), so under the container index a
+// Money page heap-fetches every item row between money rows, and proving
+// `more = false` walks the guild's whole history. bank_ledger is keep-forever,
+// so that only gets worse with age. This partial index carries exactly the
+// money rows of the guild container in id order, which turns a Money page
+// back into a bounded backward index scan.
+//
+// The predicate names the money ops as a LITERAL, derived from the seam's
+// classification (GUILD_BANK_LOG_OP_KIND) so the index and the statement can
+// never disagree about which ops are money, and interpolated verbatim into the
+// statement so the planner can prove the partial-index implication even under
+// a generic prepared plan (the account_wealth_db.ts large-movement precedent:
+// a bind parameter cannot prove it and silently strands the index). Sorted so
+// the SQL text is stable across builds.
+//
+// CONCURRENTLY, never boot DDL, same as every sibling: bank_ledger is too
+// large to lock for a transactional build. Appended to the registry after
+// every previously shipped entry (the order is load-bearing and pinned).
+
+const GUILD_MONEY_OPS = Object.entries(GUILD_BANK_LOG_OP_KIND)
+  .filter(([, kind]) => kind === 'money')
+  .map(([op]) => op)
+  .sort();
+
+export const BANK_LEDGER_GUILD_MONEY_OPS_PREDICATE_SQL = `op IN (${GUILD_MONEY_OPS.map(
+  (op) => `'${op}'`,
+).join(', ')})`;
+
+export const BANK_LEDGER_GUILD_MONEY_INDEX_SQL = `
+CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_container_money_recent
+  ON bank_ledger(container_id, id DESC)
+  WHERE container = 'guild' AND ${BANK_LEDGER_GUILD_MONEY_OPS_PREDICATE_SQL};
+`;
+
+export const BANK_LEDGER_GUILD_MONEY_INVALID_INDEX_CHECK_SQL = `
+SELECT 1
+  FROM pg_index i
+ WHERE i.indexrelid = to_regclass('bank_ledger_container_money_recent')
+   AND NOT i.indisvalid
+`;
+
+export const BANK_LEDGER_GUILD_MONEY_INVALID_INDEX_DROP_SQL =
+  'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_container_money_recent';

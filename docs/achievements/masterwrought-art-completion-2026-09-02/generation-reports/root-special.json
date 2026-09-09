@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "batchId": "masterwrought-art-completion-2026-09-02",
+  "generator": "OpenAI built-in image generation",
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "assets": [
+    {
+      "id": "gather_farming",
+      "kind": "profession",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064de-e910-7ee1-9dcf-8aa86ff5a21b/exec-3138a089-3749-468b-9354-dc5456f79364.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/professions/gather_farming_chroma.png",
+      "acceptedRaw": {
+        "sha256": "992da2d85ba4a2c1ee83455d0e1e2119f6a4f87a1f945d35250273344d9c4896",
+        "bytes": 1819176,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": false,
+        "alphaMode": "opaque",
+        "geometry": {
+          "alphaThreshold": 8,
+          "min": 255,
+          "max": 255,
+          "transparentPixels": 0,
+          "translucentPixels": 0,
+          "opaquePixels": 1572516,
+          "visiblePixels": 1572516,
+          "coverage": 1,
+          "alphaBounds": [0, 0, 1253, 1253],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
+        }
+      },
+      "normalizedSourcePath": "tmp/imagegen/masterwrought-art-2026-09-02/professions/gather_farming_512.png",
+      "normalizedSource": {
+        "sha256": "82811b427c9c35994d49e2c77241a491867448dc05fe41142d7cf3d3fd0cf317",
+        "bytes": 276865,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true,
+        "alphaMode": "transparent-subject",
+        "geometry": {
+          "alphaThreshold": 8,
+          "min": 0,
+          "max": 255,
+          "transparentPixels": 164024,
+          "translucentPixels": 6206,
+          "opaquePixels": 91914,
+          "visiblePixels": 96228,
+          "coverage": 0.367081,
+          "alphaBounds": [43, 32, 467, 479],
+          "padding": [43, 32, 44, 32],
+          "centerOffset": [-0.5, 0]
+        }
+      },
+      "runtimeUrl": "/ui/professions/gather_farming.webp",
+      "acceptedShipping": {
+        "sha256": "8c8b8c625b4045408768a9ddae67bec4e646ac47342d212a4c107b81962a939f",
+        "bytes": 5180,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colourspace": "srgb",
+        "hasAlpha": true,
+        "alphaMode": "transparent-subject",
+        "geometry": {
+          "alphaThreshold": 8,
+          "min": 0,
+          "max": 255,
+          "transparentPixels": 9628,
+          "translucentPixels": 1570,
+          "opaquePixels": 5186,
+          "visiblePixels": 6222,
+          "coverage": 0.379761,
+          "alphaBounds": [10, 7, 117, 120],
+          "padding": [10, 7, 10, 7],
+          "centerOffset": [0, 0]
+        }
+      },
+      "exactPrompt": "Use case: exact icon composite edit for a transparent Farming profession emblem.\n\nCreate one unified centered emblem on a perfectly uniform flat #FF00FF exterior. Combine:\n- Image 1: authoritative exact FARM HOE geometry. Preserve its simple one-sided broad rectangular blade at a right angle to the long wooden handle. This is the identity-critical silhouette.\n- Image 2: authoritative cultivated tilled-soil bed, bold furrows, central two-leaf green sprout, thick contour, and emblem composition.\n\nFinal emblem: the Image 1-style long-handled garden hoe leans diagonally behind a compact low oval bed of dark loam with two bold furrows and one crisp two-leaf young sprout. The hoe has exactly ONE broad flat rectangular soil-cutting blade perpendicular to the handle, with no metal extension or point on the opposite side. Do not make a pickaxe, mattock, axe, shovel, spade, trowel, double-headed tool, or blade aligned with the handle.\n\nComposition: complete unified silhouette, roughly 72% canvas fill with generous safe margin; legible in a 64px circular crop; head, sprout, and furrows remain distinct at 22px. Premium hand-painted classic dark-fantasy MMORPG icon, tactile worn iron, wood, moist loam, and leaf, near-black outer contour, warm top-left highlights, cool lower-right shadows, restrained pale-gold rim.\n\nExterior must be perfectly uniform #FF00FF, with no exterior texture, shadow, vignette, gradient, noise, haze, glow, or reflection. No magenta inside the emblem.\n\nNo wheat, seed sack, extra plants, multiple sprouts, text, letters, numbers, runes, pseudo-writing, frame, medallion, watermark, checkerboard, transparency, landscape, barn, character, hand, or crop.",
+      "references": [
+        {
+          "path": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/garden_hoe.png",
+          "role": "Authoritative one-sided long-handled garden-hoe geometry."
+        },
+        {
+          "path": "tmp/imagegen/masterwrought-art-2026-09-02/professions/gather_farming_v2_chroma.png",
+          "role": "Authoritative tilled-soil, two-leaf sprout, contour, and emblem composition."
+        }
+      ],
+      "rejectedOutputCount": 4,
+      "rejectedOutputSummary": [
+        "Initial wheat-and-hoe opaque composition.",
+        "Background-edit derivative.",
+        "Trowel or spade silhouette.",
+        "Pickaxe-like composite."
+      ],
+      "review": "Accepted after source, 128px, 22px, and circular-crop review. The one-sided long-handled hoe, two-leaf sprout, and tilled-soil furrows remain distinct."
+    },
+    {
+      "id": "well_fed",
+      "kind": "aura",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064de-e910-7ee1-9dcf-8aa86ff5a21b/exec-d0edeac7-f28e-4fb9-b830-64e9ed2d343a.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/auras/well_fed.png",
+      "acceptedRaw": {
+        "sha256": "482467fc60c686656a138f262ea7eadf1fbc15c509a49383e4546f1ba5d767a3",
+        "bytes": 2141126,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": false,
+        "alphaMode": "opaque"
+      },
+      "runtimeUrl": "/ui/auras/well_fed.webp",
+      "acceptedShipping": {
+        "sha256": "574bc0be1b4c524e2d49395a7e102b135ea8f78792a2b0cd667aa26dc223b602",
+        "bytes": 3468,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colourspace": "srgb",
+        "hasAlpha": false,
+        "alphaMode": "opaque",
+        "geometry": {
+          "alphaThreshold": 8,
+          "min": 255,
+          "max": 255,
+          "transparentPixels": 0,
+          "translucentPixels": 0,
+          "opaquePixels": 16384,
+          "visiblePixels": 16384,
+          "coverage": 1,
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
+        }
+      },
+      "exactPrompt": "Use case: production status-effect icon. Asset type: opaque square classic fantasy MMORPG aura icon. Primary request: paint the shared Well Fed buff identity (well_fed) for World of ClaudeCraft. Reference roles: Image 1 is authoritative only for the rustic farm-harvest food palette, compact grouping, and hand-painted material separation. Image 2 is authoritative only for feast abundance and tiny-size food readability. Image 3 is authoritative only for the existing aura family's deep high-contrast vignette, restrained magical edge light, and compact 128px presentation. Do not copy any reference object exactly. Subject: one cohesive, abundant but simple hearth meal: a shallow dark stoneware bowl/platter holding a golden roast portion, one small bread wedge, and a few bright green garden vegetables, with three broad curls of warm nourishing steam rising as one unified silhouette. The food must read as sustaining fullness and vitality, not a specific recipe, poison, empty dish, or restaurant spread. Composition: centered three-quarter overhead hero object, complete silhouette, about 72 percent fill, thick clear food masses and steam readable at 22px, safe margins, strong circular-crop read. Opaque full-square deep umber-charcoal painted vignette with subtle hearth warmth and contact shadow. Style: premium hand-painted classic dark-fantasy MMORPG status art; crisp food and steam focal edges, tactile roast, bread, greens, stoneware; warm top-left amber key, cool deep lower-right shadow; restrained healthful green-gold highlights. No broad neon aura or flat vector look. Constraints: one unified meal only; no person, hand, table scene, cutlery, loose ingredient pile, text, letters, numbers, labels, runes, pseudo-writing, UI border, rarity frame, circular frame, watermark, signature, checkerboard, transparency, split sheet, collage, crop, skull, potion, or empty bowl.",
+      "references": [
+        {
+          "path": "public/ui/items/harvest_feast.webp",
+          "role": "Rustic farm-harvest palette, compact grouping, and hand-painted material separation."
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Feast abundance and tiny-size food readability."
+        },
+        {
+          "path": "public/ui/auras/sated.webp",
+          "role": "Existing aura-family contrast, restrained edge light, and compact 128px presentation."
+        }
+      ],
+      "rejectedOutputCount": 0,
+      "review": "Accepted at source, 128px, and 22px. The bowl, roast, bread, greens, and three warm steam curls remain legible as a sustaining meal; no text, frame, transparency, or recipe-specific identity appears."
+    }
+  ]
+}

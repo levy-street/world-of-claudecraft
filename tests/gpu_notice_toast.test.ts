@@ -71,6 +71,7 @@ describe('dismissal signatures merge across different-verdict dismissals', () =>
   const hybrid = {
     softwareRendering: false,
     hybridGpuLikely: true,
+    requestedBackendUnavailable: false,
     desktopShell: false,
     desktopPlatform: 'win',
   } as const;
@@ -169,6 +170,7 @@ describe('the displayed latch under a persisted dismissal', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
   });
 });
@@ -198,6 +200,7 @@ describe('the displayed latch on a both-component verdict', () => {
       softwareRendering: true,
       discreteInactive: true,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
   });
 });
@@ -209,6 +212,7 @@ describe('the hybrid verdict at the toast level', () => {
       toast.initGpuNotice({
         softwareRendering: false,
         hybridGpuLikely: true,
+        requestedBackendUnavailable: false,
         desktopShell: false,
         desktopPlatform: 'win',
       }),
@@ -220,6 +224,7 @@ describe('the hybrid verdict at the toast level', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: true,
+      requestedBackendUnavailable: false,
     });
     // Dismissal stores the signature under the ONE key; the v0.36.0 per-variant
     // hybrid key is read-only compatibility and is never written back.
@@ -235,6 +240,7 @@ describe('the hybrid verdict at the toast level', () => {
       toast.initGpuNotice({
         softwareRendering: false,
         hybridGpuLikely: true,
+        requestedBackendUnavailable: false,
         desktopShell: false,
         desktopPlatform: 'linux',
       }),
@@ -244,6 +250,7 @@ describe('the hybrid verdict at the toast level', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
     });
     // The same stored key must NOT cover a software verdict.
     toast = await bootToast();

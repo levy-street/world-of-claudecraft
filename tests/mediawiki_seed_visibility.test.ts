@@ -8,6 +8,15 @@
 // content PR would drag that whole unrelated diff along. Rebuilding into a temp
 // dir keeps the real invariant: what the generator emits for TODAY's abilities is
 // exactly the visible set, with no duplicates and no dangling links.
+//
+// That trailing is now a two-tier posture rather than an unchecked one, and this
+// file is only its always-on half. tests/mediawiki_seed_freshness.test.ts owns
+// the other half: at PR tier it holds the committed copy to this generator's own
+// envelope and to the repo dash rule, and under MEDIAWIKI_SEED_RELEASE_TIER=1 it
+// demands the committed bytes equal a fresh build, so a release that forgets
+// `npm run wiki:seed` fails instead of shipping a stale wiki. Nothing here
+// changes: freshness of the committed bytes is still deliberately not this
+// file's business.
 
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';

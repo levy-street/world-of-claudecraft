@@ -8,17 +8,20 @@
 
   // Live players table. The parent owns sort/dir and re-derives the rows; passing
   // onSort turns the supported columns into sort buttons, and leaving it out renders
-  // the plain table.
+  // the plain table. Passing onKick adds a per-row Kick button in a trailing actions
+  // column; the parent gates it on moderation.act, so a viewer never sees the column.
   let {
     players,
     sort,
     dir = 'asc',
     onSort,
+    onKick,
   }: {
     players: LivePlayer[];
     sort?: OnlineSortColumn;
     dir?: OnlineSortDirection;
     onSort?: (column: OnlineSortColumn) => void;
+    onKick?: (player: LivePlayer) => void;
   } = $props();
 
   const ariaSort = (column: OnlineSortColumn): 'ascending' | 'descending' | 'none' =>
@@ -53,6 +56,9 @@
         {@render header('session', 'online.colSession', true)}
         {@render header('lastSave', 'online.colLastSave', true)}
         {@render header('account', 'online.colAcct', true)}
+        {#if onKick}
+          <th>{t('online.colActions')}</th>
+        {/if}
       </tr>
     </thead>
     <tbody>
@@ -67,6 +73,18 @@
           <td class="num">{fmtDuration(p.sessionSeconds)}</td>
           <td class="num">{t('common.ago', { value: fmtDuration(p.lastSaveSecondsAgo) })}</td>
           <td class="num"><AccountLink accountId={p.accountId} label={fmtNumber(p.accountId)} /></td>
+          {#if onKick}
+            <td class="row-actions">
+              <button
+                type="button"
+                class="danger"
+                aria-label={t('online.kickPlayer', { name: p.name })}
+                onclick={() => onKick?.(p)}
+              >
+                {t('online.kick')}
+              </button>
+            </td>
+          {/if}
         </tr>
       {/each}
     </tbody>

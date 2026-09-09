@@ -133,8 +133,12 @@ function isolatedState(gravebreakerTimer: number): NonNullable<Entity['nythraxis
     deathlessTimer: 999,
     deathlessCastRemaining: 0,
     deathlessStunRemaining: 0,
+    // The mechanics redo (Dread Curse on both difficulties, Bone Spike, Grave
+    // Eruption) is parked too: this suite isolates the charged Gravebreaker.
+    dreadCurseTimer: 999,
+    boneSpikeTimer: 999,
+    eruptionTimer: 999,
     wardChannels: [],
-    finalStand: false,
     deathSpoken: false,
   };
 }
@@ -209,6 +213,16 @@ describe('Nythraxis Gravebreaker as a charged auto-attack', () => {
     });
     const splashes = gravebreakerHits(rows, boss.id);
     expect(splashes.length).toBeGreaterThanOrEqual(2);
+    expect(
+      rows.some(
+        ({ at, event }) =>
+          at === splashes[0].at &&
+          event.type === 'spellfx' &&
+          event.sourceId === boss.id &&
+          event.school === 'physical' &&
+          event.ability === 'Gravebreaker',
+      ),
+    ).toBe(true);
 
     // The splash only ever hits the bystander: never the swing target, never
     // the player behind the boss.

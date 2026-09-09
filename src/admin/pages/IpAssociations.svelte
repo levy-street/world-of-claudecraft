@@ -3,6 +3,8 @@
   import type { IpAssociationsData } from '../types';
   import { apiGet, apiPost } from '../api';
   import { blockExpiryIso } from '../block_expiry';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { getAdminNavigation, routeHref } from '../navigation';
   import { fmtDate, fmtNumber } from '../format';
@@ -18,7 +20,7 @@
   let { ip }: { ip: string } = $props();
 
   let data = $state<IpAssociationsData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let page = $state(1);
   let blockDialogOpen = $state(false);
   let actionPending = $state(false);
@@ -32,10 +34,10 @@
       const result = await apiGet<IpAssociationsData>(`/admin/api/ip-associations?${params}`);
       if (currentRequest !== requestId) return;
       data = result;
-      failed = false;
+      failed = 'none';
     } catch (err) {
       if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -121,7 +123,9 @@
   <a class="back-link" href={routeHref({ page: 'shared-ips' })} onclick={back}>{t('ipAssociations.back')}</a>
 
   <Panel>
-    {#if failed}
+    {#if failed === 'forbidden'}
+      <PermissionDenied />
+    {:else if failed === 'error'}
       <div class="empty">{t('ipAssociations.loadFailed')}</div>
     {:else if data === null}
       <div class="empty">{t('ipAssociations.loading')}</div>

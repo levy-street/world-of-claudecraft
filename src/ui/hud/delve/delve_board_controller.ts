@@ -8,6 +8,7 @@ import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
+import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 
 type DelveTier = 'normal' | 'heroic';
@@ -20,7 +21,10 @@ export interface DelveBoardControllerDeps {
   closeOtherWindows(selector: string): void;
   hideTooltip(): void;
   attachTooltip(element: HTMLElement, html: () => string): void;
-  itemIcon(item: ItemDef): string;
+  /** The PainterHostPresentation.itemIcon signature, named from the seam
+   *  rather than re-typed; the quality parameter is shape uniformity only
+   *  here, since no copy payload reaches this surface, and is never passed. */
+  itemIcon: PainterHostPresentation['itemIcon'];
   itemTooltip(item: ItemDef): string;
   delveName(delveId: string): string;
   preloadInterior(event: Extract<SimEvent, { type: 'delveEntered' }>): void;

@@ -20,10 +20,24 @@ export const MINDFRACTURE_SPELL_POWER_COEFF = 0.5;
 export const TITHEFIEND_BASE_SPELL_POWER_COEFF = 0.15;
 export const TITHEFIEND_MAX_STACK_DAMAGE_MULT = 1.25;
 export const TITHEFIEND_MAX_STACK_SCALE = 1.1;
+// Living Covenant's per-application extension budget (vespersEchoDamage below,
+// and the Dirge range-refresh in dirge_refresh.ts): at most this many extra
+// seconds of Dirge duration may be banked past its base 18, seconds 18-24.
+export const LIVING_COVENANT_MAX_EXTENSION = 6;
+
+/** v0.42.0: VESPERS_DOT_DAMAGE_MULT reaches Dirge's authored base total via
+ * resolveVespersAbility above, but effect_dispatch.ts's runtime SP rider
+ * (dotSp, computed separately from the authored total) never received it.
+ * Parent multiplies this into that rider for shadow_word_pain only; see the
+ * handoff for the exact call site. Returns 1 (a no-op factor) for every
+ * non-Vespers caster. */
+export function vespersDirgeSpMultiplier(meta: PlayerMeta): number {
+  return meta.cls === 'priest' && meta.talents.spec === 'shadow' ? VESPERS_DOT_DAMAGE_MULT : 1;
+}
 
 export function resolveVespersAbility(
   resolved: ResolvedAbility,
-  meta: PlayerMeta,
+  meta: Pick<PlayerMeta, 'cls' | 'talents'>,
 ): ResolvedAbility {
   if (meta.cls !== 'priest' || meta.talents.spec !== 'shadow') return resolved;
   if (resolved.def.id === 'shadow_word_pain') {
@@ -49,7 +63,9 @@ export function resolveVespersAbility(
   return resolved;
 }
 
-function ownDirge(target: Entity, priestId: number): Aura | undefined {
+/** Exported for dirge_refresh.ts: the one predicate for "does this target carry
+ * this priest's own living Dirge", reused rather than re-derived. */
+export function ownDirge(target: Entity, priestId: number): Aura | undefined {
   return target.auras.find(
     (aura) => aura.id === 'shadow_word_pain' && aura.kind === 'dot' && aura.sourceId === priestId,
   );
@@ -71,7 +87,8 @@ export function hasTithefiendTarget(ctx: SimContext, priestId: number): boolean 
   return false;
 }
 
-function ownEffigy(target: Entity, priestId: number): Aura | undefined {
+/** Exported for dirge_refresh.ts: same reuse reasoning as ownDirge above. */
+export function ownEffigy(target: Entity, priestId: number): Aura | undefined {
   return target.auras.find((aura) => aura.id === EFFIGY_AURA_ID && aura.sourceId === priestId);
 }
 
@@ -294,7 +311,7 @@ export function vespersEchoDamage(
       hasPriestTalent(ctx, priest, PRIEST_TALENT_IDS.livingCovenant) &&
       dirge.extendedBy !== undefined
     ) {
-      const extension = Math.min(1, 6 - dirge.extendedBy);
+      const extension = Math.min(1, LIVING_COVENANT_MAX_EXTENSION - dirge.extendedBy);
       if (extension > 0) {
         dirge.extendedBy += extension;
         dirge.remaining += extension;

@@ -1,0 +1,279 @@
+// Transmissive GLB materials become translucent at load
+// (src/render/assets/transmission_neutralize.ts): three's transmission pass
+// (a second full-scene render per frame) never runs for a shipped asset.
+
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import * as THREE from 'three';
+import { describe, expect, it } from 'vitest';
+import {
+  isTransmissive,
+  neutralizeGltfTransmission,
+  neutralizeTransmission,
+  TRANSMISSION_OPACITY_LOSS,
+} from '../src/render/assets/transmission_neutralize';
+import { stripComments } from './helpers/strip_comments';
+import { tsFilesUnder } from './helpers/ts_files_under';
+
+describe('neutralizeTransmission', () => {
+  it('turns a transmissive physical material into a translucent one', () => {
+    const material = new THREE.MeshPhysicalMaterial({ transmission: 0.9, thickness: 0.24 });
+    expect(isTransmissive(material)).toBe(true);
+    expect(neutralizeTransmission(material)).toBe(true);
+    expect(material.transmission).toBe(0);
+    expect(isTransmissive(material)).toBe(false);
+    expect(material.transparent).toBe(true);
+    expect(material.opacity).toBeCloseTo(1 - 0.9 * TRANSMISSION_OPACITY_LOSS, 6);
+    expect(material.opacity).toBeCloseTo(0.8, 2);
+    expect(material.depthWrite).toBe(false);
+  });
+
+  it('keeps an authored lower opacity and leaves opaque materials alone', () => {
+    const faint = new THREE.MeshPhysicalMaterial({ transmission: 0.5, opacity: 0.3 });
+    neutralizeTransmission(faint);
+    expect(faint.opacity).toBe(0.3);
+    const plain = new THREE.MeshStandardMaterial({ opacity: 1 });
+    expect(neutralizeTransmission(plain as unknown as THREE.MeshPhysicalMaterial)).toBe(false);
+    expect(plain.transparent).toBe(false);
+    expect(plain.opacity).toBe(1);
+  });
+
+  it('walks a parsed GLB once per material, arrays included', () => {
+    const scene = new THREE.Scene();
+    const shared = new THREE.MeshPhysicalMaterial({ transmission: 0.72 });
+    const plain = new THREE.MeshStandardMaterial();
+    scene.add(new THREE.Mesh(new THREE.BufferGeometry(), shared));
+    scene.add(new THREE.Mesh(new THREE.BufferGeometry(), [shared, plain]));
+    expect(neutralizeGltfTransmission({ scene })).toBe(1);
+    expect(shared.transmission).toBe(0);
+    expect(shared.transparent).toBe(true);
+    expect(plain.transparent).toBe(false);
+  });
+});
+
+describe('the loader applies the rule to every parsed GLB', () => {
+  it('runs the walk in the parse resolve chain, before any consumer sees the scene', () => {
+    // Comments stripped, so a commented-out call cannot satisfy the pin.
+    const loader = stripComments(
+      readFileSync(new URL('../src/render/assets/loader.ts', import.meta.url), 'utf8'),
+    );
+    const polish = loader.indexOf('polishGltfTextures(gltf);');
+    const neutralize = loader.indexOf('neutralizeGltfTransmission(gltf);');
+    expect(polish).toBeGreaterThan(-1);
+    expect(neutralize).toBeGreaterThan(polish);
+  });
+
+  it('knows the shipped GLBs that carry the extension', () => {
+    // The sweep of 2026-08-28: one creature declares transmissive materials.
+    // A new one is allowed (the loader neutralizes it) but should be listed
+    // here on purpose, since its author probably expected refraction.
+    const glb = readFileSync(
+      new URL('../public/models/creatures/water_elemental.glb', import.meta.url),
+    );
+    const transmissive = glbMaterials(glb)
+      .filter((m) => m.extensions?.KHR_materials_transmission)
+      .map((m) => m.name);
+    expect(transmissive).toEqual(['living_water', 'deep_water']);
+  });
+});
+
+interface GlbMaterial {
+  name?: string;
+  extensions?: Record<string, unknown>;
+}
+
+/** The materials of a GLB's JSON chunk (12-byte header, chunk 0 length at
+ *  offset 12, its JSON at offset 20). */
+function glbMaterials(glb: Buffer): GlbMaterial[] {
+  if (glb.readUInt32LE(0) !== 0x46546c67) return [];
+  const length = glb.readUInt32LE(12);
+  const json = JSON.parse(glb.subarray(20, 20 + length).toString('utf8')) as {
+    materials?: GlbMaterial[];
+  };
+  return json.materials ?? [];
+}
+
+function* walkGlbs(dir: string): Generator<string> {
+  const entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
+    a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+  );
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) yield* walkGlbs(full);
+    else if (entry.name.endsWith('.glb')) yield full;
+  }
+}
+
+/** A KHR_materials_volume property in a MATERIAL position: an object-literal
+ *  key, or an assignment through a member expression. A plain `const thickness
+ *  = ...` is arithmetic, not a material: `src/render/mage_ground_fx.ts` computes
+ *  the meteor countdown ring's width that way, and a name-only match reads it as
+ *  a second scene pass. */
+const VOLUME_PROPS = 'thickness|attenuationColor|attenuationDistance';
+const VOLUME_PROPERTY_SET = new RegExp(
+  `(?<![.\\w$])(?:${VOLUME_PROPS})\\s*:|\\.\\s*(?:${VOLUME_PROPS})\\s*(?:[-+*/]|\\?\\?|\\|\\||&&)?=(?!=)`,
+);
+
+const PHYSICAL_MATERIAL_CONSTRUCTION = /new\s+(THREE\.)?MeshPhysicalMaterial\s*\(/;
+
+/** A transmission set to anything above zero. The VALUE is read rather than
+ *  pattern-excluded: the previous `(?!0\b)` guard meant to spare the
+ *  neutralizer's own `transmission = 0` and spared every `0.x` with it, which
+ *  is the whole authoring range of the property this scan exists to catch. */
+const TRANSMISSION_ASSIGNMENT = /\btransmission\s*[:=]\s*([0-9]*\.?[0-9]+)/g;
+
+function setsTransmission(source: string): boolean {
+  TRANSMISSION_ASSIGNMENT.lastIndex = 0;
+  for (
+    let match = TRANSMISSION_ASSIGNMENT.exec(source);
+    match !== null;
+    match = TRANSMISSION_ASSIGNMENT.exec(source)
+  ) {
+    if (Number.parseFloat(match[1] ?? '0') > 0) return true;
+  }
+  return false;
+}
+
+describe('the volume-property scan reads material positions, not every `thickness`', () => {
+  const flagged = (source: string) => VOLUME_PROPERTY_SET.test(source);
+
+  // Every property in both positions the scan claims to read: an object-literal
+  // key and an assignment through a member expression. One fixture per pair, so
+  // a narrowing that drops a property or a position cannot hide behind another.
+  const IN_MATERIAL_POSITION = [
+    'new THREE.MeshPhysicalMaterial({ transmission: 0.9, thickness: 0.24 })',
+    '    attenuationColor: new THREE.Color(0x88ccff),',
+    '  attenuationDistance: 3,',
+    'material.thickness = 0.24;',
+    'glass.attenuationColor = new THREE.Color(0x88ccff);',
+    'glass.attenuationDistance = 3;',
+  ];
+
+  it.each(IN_MATERIAL_POSITION)('catches a volume property written on a material: %s', (source) => {
+    expect(flagged(source)).toBe(true);
+  });
+
+  it('leaves a local thickness variable and a uniform name alone', () => {
+    expect(flagged('const thickness = radius * (0.05 - collapse * 0.02);')).toBe(false);
+    expect(flagged('let thickness = 0.4;')).toBe(false);
+    expect(flagged('var thickness = wall * 2;')).toBe(false);
+    expect(flagged('const innerRadius = Math.max(radius * 0.06, outerRadius - thickness);')).toBe(
+      false,
+    );
+    expect(flagged("  'thicknessMap',")).toBe(false);
+  });
+
+  // KNOWN BLIND SPOTS, listed so a future narrowing of the pattern is a
+  // conscious act rather than a discovery. Each of these DOES set a volume
+  // property on a material and the scan does not see it: none of these shapes
+  // is written anywhere the sweep below reads today, and the pattern covers the
+  // two spellings this tree actually uses. Widening it to reach one of them
+  // means moving that line out of this list, not deleting the list.
+  // Compound assignments through a member are assignments too.
+  const COMPOUND_ASSIGNMENTS = [
+    'mat.thickness += 0.1;',
+    'glass.attenuationDistance *= 2;',
+    'mat.thickness ??= 0.2;',
+    'mat.attenuationColor ||= tint;',
+  ];
+  it.each(COMPOUND_ASSIGNMENTS)('flags %s', (source) => {
+    expect(flagged(source)).toBe(true);
+  });
+  it('does not read a comparison as an assignment', () => {
+    expect(flagged('if (mat.thickness === 0.3) return;')).toBe(false);
+    expect(flagged('const same = mat.thickness == other.thickness;')).toBe(false);
+  });
+
+  const OUT_OF_REACH = [
+    // Shorthand property: the value is a variable of the same name, so there is
+    // no colon after it.
+    'new THREE.MeshPhysicalMaterial({ transmission: 0.9, thickness })',
+    // Bracket access, with either quote: no member dot to anchor on.
+    "mat['thickness'] = 0.3;",
+    'mat["attenuationDistance"] = 3;',
+    // The property named as a string argument.
+    "Object.defineProperty(mat, 'thickness', { value: 0.3 });",
+  ];
+
+  it.each(OUT_OF_REACH)('is knowingly blind to %s', (source) => {
+    expect(flagged(source)).toBe(false);
+  });
+});
+
+describe('no material buys a second scene pass (src/render/CLAUDE.md)', () => {
+  const root = fileURLToPath(new URL('..', import.meta.url));
+
+  /** Shipped models whose materials carry KHR_materials_transmission or
+   *  KHR_materials_volume, each neutralized at load. A new entry is a
+   *  decision, not a fact: the asset pipeline preserves the extension
+   *  (gltf-transform registers ALL_EXTENSIONS) and Tripo generates with
+   *  `pbr: true`, so a glass-like prompt lands one here. List it, and know
+   *  that the player will see alpha blending, never refraction. */
+  const TRANSMISSIVE_GLBS: Record<string, readonly string[]> = {
+    'public/models/creatures/water_elemental.glb': ['living_water', 'deep_water'],
+  };
+
+  it('every shipped GLB with a transmissive or volume material is listed on purpose', () => {
+    const found: Record<string, string[]> = {};
+    let scanned = 0;
+    for (const file of walkGlbs(join(root, 'public'))) {
+      scanned++;
+      const names = glbMaterials(readFileSync(file))
+        .filter(
+          (m) =>
+            m.extensions?.KHR_materials_transmission !== undefined ||
+            m.extensions?.KHR_materials_volume !== undefined,
+        )
+        .map((m) => m.name ?? '(unnamed)');
+      if (names.length > 0) found[relative(root, file)] = names;
+    }
+    // The vacuity floor: the walk must have seen the real model tree.
+    expect(scanned).toBeGreaterThan(1000);
+    expect(found).toEqual(TRANSMISSIVE_GLBS);
+  });
+
+  it('constructs no MeshPhysicalMaterial and sets no transmission in the client source', () => {
+    // three's transmission pass is what a MeshPhysicalMaterial with
+    // transmission > 0 buys; a physical material with none of it is a
+    // MeshStandardMaterial with extra uniforms. Translucency here is alpha
+    // blending. The neutralizer is the one writer, and it writes zero.
+    const offenders: string[] = [];
+    let scanned = 0;
+    for (const dir of ['src/render', 'src/ui', 'src/game', 'src/editor', 'src/guide']) {
+      for (const { file, full } of tsFilesUnder(join(root, dir))) {
+        if (file.endsWith('.test.ts')) continue;
+        const rel = `${dir}/${file}`;
+        if (rel === 'src/render/assets/transmission_neutralize.ts') continue;
+        scanned++;
+        const source = readFileSync(full, 'utf8');
+        if (PHYSICAL_MATERIAL_CONSTRUCTION.test(source)) offenders.push(`${rel}: construction`);
+        if (setsTransmission(source)) offenders.push(`${rel}: transmission set`);
+        if (VOLUME_PROPERTY_SET.test(source)) offenders.push(`${rel}: volume set`);
+      }
+    }
+    // The vacuity floor, the GLB sweep's twin: a walk that stops finding the
+    // client tree (a moved directory, a broken helper) must fail rather than
+    // report a clean sweep of nothing. Deliberately far under today's count
+    // (about 1,650 files across the five directories), so ordinary deletions
+    // never touch it.
+    expect(scanned).toBeGreaterThan(800);
+    expect(offenders).toEqual([]);
+  });
+
+  it('the client-source scan matches what it claims to catch', () => {
+    // The positive control the sweep above cannot give itself: it is green
+    // because the tree is clean, so a regex that matched nothing at all would
+    // read exactly the same. One fixture per arm, plus the two shapes that
+    // must NOT flag (a standard material, and the neutralizer's own zero).
+    expect(PHYSICAL_MATERIAL_CONSTRUCTION.test('new THREE.MeshPhysicalMaterial({})')).toBe(true);
+    expect(PHYSICAL_MATERIAL_CONSTRUCTION.test('const m = new MeshPhysicalMaterial();')).toBe(true);
+    expect(PHYSICAL_MATERIAL_CONSTRUCTION.test('new THREE.MeshStandardMaterial({})')).toBe(false);
+
+    expect(setsTransmission('new THREE.MeshPhysicalMaterial({ transmission: 0.9 })')).toBe(true);
+    expect(setsTransmission('material.transmission = 0.35;')).toBe(true);
+    expect(setsTransmission('glass.transmission = 1;')).toBe(true);
+    expect(setsTransmission('material.transmission = 0;')).toBe(false);
+    expect(setsTransmission('{ transmission: 0.0 }')).toBe(false);
+  });
+});

@@ -65,10 +65,21 @@ that receipt must be passed to
 `node scripts/build_mob_portrait_source_manifest.mjs --write --receipt <path>`.
 The renderer and ledger share `scripts/lib/mob_portrait_jobs.mjs`; partial, stale, or
 mismatched receipts are rejected, and a renderer-contract change requires every live row.
-The 2026-09-09 Asmon animation refresh rendered all 245 live portraits after the
-final king landing correction; the guarded receipt accepted the source ledger, including Asmon,
-the Royal Roachling, and the Tribute Beetle. Their final portraits were visually
-reviewed, and the enclosing `accepted-art.json` pins the refreshed ledger bytes.
+The 2026-09-09 Asmon release merge rendered all 248 live portraits, including
+Asmon, the Royal Roachling, and the Tribute Beetle. The accepted release baseline
+used Linux x64, Chrome 152.0.7977.82, and SwiftShader Subzero; this refresh used
+macOS arm64, Chrome 152.0.7977.83, and SwiftShader LLVM 10.0.0. The real renderer
+receipt was written to `tmp/roach-pr-portrait-receipt.json` and copied byte for byte
+to `docs/screenshots/roach-king/portrait-remint/renderer-receipt.json`.
+The guarded source-ledger write accepted that full receipt. The environment change
+moved the output bytes of 148 existing portraits with unchanged per-row render
+inputs. The before/after sheet and pixel statistics in that evidence directory
+record the visual review: seven of the eighteen historical portrait pins changed,
+with framing, subjects, and tints preserved. The water elemental's larger shading
+difference has its own before/after pair. Both reviewers accepted these outputs;
+the seven fixture hashes, seven supplemental-art pins, and enclosing source-ledger
+hash now record the actual rendered bytes. Every source and image guard remains
+in place.
 Absolute paths into `/Users/fernando/.codex/generated_images/` and the worktree are
 generation-time evidence, not runtime dependencies. High-resolution masters and review
 sheets remain in the ignored workspace, while accepted shipping assets live under

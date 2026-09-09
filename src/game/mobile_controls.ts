@@ -139,6 +139,10 @@ export interface MobileControlCallbacks {
   onQuestLog(): void;
   onCharacter(): void;
   onBags(): void;
+  /** Open the Damage Meters window, folded into the More tray on mobile (the
+   *  only touch entry point to it: the tabbed window has no fixed touch
+   *  button of its own, unlike the desktop Shift+H keybind). */
+  onMeters(): void;
   /** Open the Crafting window, folded into the More tray on mobile. */
   onCrafting(): void;
   onSpellbook(): void;
@@ -156,6 +160,8 @@ export interface MobileControlCallbacks {
   onDeeds(): void;
   /** Open The Reliquary window, folded into the More tray on mobile. */
   onReliquary(): void;
+  /** Open the Loot Explorer window, folded into the More tray on mobile. */
+  onLootExplorer(): void;
   /** Mount / dismount from the More tray. Dismounts instantly when riding;
    *  when unmounted, summons the player's first owned mount directly (no
    *  action-bar or bag detour needed), or falls back to the shared toggle's
@@ -535,6 +541,7 @@ export class MobileControls {
     this.bindButton('mobile-quest', () => this.callbacks.onQuestLog());
     this.bindButton('mobile-char', () => this.callbacks.onCharacter());
     this.bindButton('mobile-bags', () => this.callbacks.onBags());
+    this.bindButton('mobile-meters', () => this.callbacks.onMeters());
     this.bindButton('mobile-crafting', () => this.callbacks.onCrafting());
     this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
     this.bindButton('mobile-bar-editor', () => this.callbacks.onBarEditor());
@@ -545,6 +552,7 @@ export class MobileControls {
     this.bindButton('mobile-wocmarket', () => this.callbacks.onWocMarket());
     this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());
     this.bindButton('mobile-reliquary', () => this.callbacks.onReliquary());
+    this.bindButton('mobile-loot-explorer', () => this.callbacks.onLootExplorer());
     this.bindButton('mobile-mounts', () => this.callbacks.onMountToggle());
     this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
     const nameplatesBtn = document.getElementById('mobile-nameplates');

@@ -69,11 +69,11 @@ describe('every row-granted spell casts on its class', () => {
         p.hp = p.maxHp;
         if (g.ability === 'hammer_of_wrath') mob.hp = Math.floor(mob.maxHp * 0.1); // execute window
         if (g.ability === 'victory_rush') {
-          // Kill-window gate: the redesigned warrior's Victory Rush requires the
+          // Kill-window gate: the redesigned warrior's Victor's Surge requires the
           // on-kill aura handleDeath opens; seed it as a fresh killing blow would.
           sim.ctx.applyAura(p, {
             id: 'victory_rush',
-            name: 'Victory Rush',
+            name: "Victor's Surge",
             kind: 'victory_rush',
             value: 0,
             remaining: 20,

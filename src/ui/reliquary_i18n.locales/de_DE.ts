@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Heroisch: The Inner Crucible',
     desc: 'Nur heroisch erhältliche Schilde und Waffen von Varkhul, Forgefather of the Last Flame.',
   },
+  conquerors_set_bramblehide: {
+    name: "Roots' Dornenhaut",
+    desc: 'Die vollständige Bramblehide-Lederfamilie.',
+  },
 };

@@ -1,3 +1,4 @@
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
 import { ed25519 } from '@noble/curves/ed25519';
 import bs58 from 'bs58';
@@ -30,43 +31,60 @@ import {
   handleWalletUnlink,
 } from '../server/wallet';
 
+type TestResponse = ServerResponse & { body: string };
+type WalletHandler = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  accountId: number,
+) => Promise<void>;
+type JsonObject = Record<string, unknown>;
+
 // ── fakes for http.IncomingMessage / ServerResponse ─────────────────────────
-function makeReq(body: unknown): any {
-  const req: any = Readable.from([Buffer.from(JSON.stringify(body))]);
-  req.headers = { host: 'localhost:8787' };
-  req.socket = { remoteAddress: '127.0.0.1' };
+function makeReq(body: unknown): IncomingMessage {
+  const req = Readable.from([Buffer.from(JSON.stringify(body))]) as IncomingMessage;
+  Object.defineProperty(req, 'headers', { value: { host: 'localhost:8787' }, configurable: true });
+  Object.defineProperty(req, 'socket', {
+    value: { remoteAddress: '127.0.0.1' },
+    configurable: true,
+  });
   return req;
 }
-function makeUnreadableReq(): { req: any; wasRead: () => boolean } {
+function makeUnreadableReq(): { req: IncomingMessage; wasRead: () => boolean } {
   let read = false;
-  const req: any = new Readable({
+  const req = new Readable({
     read() {
       read = true;
       this.destroy(new Error('body should not be read'));
     },
+  }) as IncomingMessage;
+  Object.defineProperty(req, 'headers', { value: { host: 'localhost:8787' }, configurable: true });
+  Object.defineProperty(req, 'socket', {
+    value: { remoteAddress: '127.0.0.1' },
+    configurable: true,
   });
-  req.headers = { host: 'localhost:8787' };
-  req.socket = { remoteAddress: '127.0.0.1' };
   return { req, wasRead: () => read };
 }
-function makeRes(): any {
+function makeRes(): TestResponse {
   return {
     statusCode: 0,
     body: '',
-    writeHead(status: number) {
+    writeHead(this: TestResponse, status: number) {
       this.statusCode = status;
       return this;
     },
-    end(data: string) {
-      this.body = data ?? '';
+    end(this: TestResponse, data?: string | Uint8Array) {
+      this.body = typeof data === 'string' ? data : data ? Buffer.from(data).toString() : '';
       return this;
     },
-  };
+  } as unknown as TestResponse;
 }
-async function call(handler: any, body: unknown, accountId = 1) {
+async function call(handler: WalletHandler, body: unknown, accountId = 1) {
   const res = makeRes();
   await handler(makeReq(body), res, accountId);
-  return { status: res.statusCode, data: res.body ? JSON.parse(res.body) : {} };
+  return {
+    status: res.statusCode,
+    data: (res.body ? JSON.parse(res.body) : {}) as JsonObject,
+  };
 }
 
 // ── a real Solana-style wallet (ed25519) ────────────────────────────────────
@@ -78,10 +96,21 @@ const sign = (message: string, priv: Uint8Array) =>
   bs58.encode(ed25519.sign(new TextEncoder().encode(message), priv));
 
 // per-test control over what the mocked DB returns, routed by SQL
-let challengeRows: any[] = [];
-let ownerRows: any[] = [];
-let walletRows: any[] = [];
-let accountRows: any[] = [];
+type ChallengeRow = { address: string; message: string };
+type OwnerRow = { account_id: number };
+type WalletRow = { account_id: number; pubkey: string; linked_at: string };
+type AccountRow = {
+  id: number;
+  username: string;
+  password_hash: string;
+  password_set: boolean;
+  totp_secret: string | null;
+};
+
+let challengeRows: ChallengeRow[] = [];
+let ownerRows: OwnerRow[] = [];
+let walletRows: WalletRow[] = [];
+let accountRows: AccountRow[] = [];
 
 beforeEach(() => {
   challengeRows = [];

@@ -6,7 +6,7 @@ import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
-import type { PainterHostWriters } from '../../painter_host';
+import type { PainterHostPresentation, PainterHostWriters } from '../../painter_host';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { reconcileLootRolls } from './loot_roll_reconcile';
 import {
@@ -38,7 +38,10 @@ export interface LootRollControllerDeps {
   world(): LootRollWorld;
   now(): number;
   isMobileLayout(): boolean;
-  itemIcon(item: ItemDef): string;
+  /** The PainterHostPresentation.itemIcon signature, named from the seam
+   *  rather than re-typed; the quality parameter is shape uniformity only
+   *  here, since no copy payload reaches this surface, and is never passed. */
+  itemIcon: PainterHostPresentation['itemIcon'];
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   // Dismisses the shared #tooltip box immediately. render() tears down and

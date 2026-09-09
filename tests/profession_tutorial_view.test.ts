@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
-import { buildProfessionTutorialModel } from '../src/ui/profession_tutorial_view';
+import { buildProfessionTutorialModel } from '../src/ui/hud/professions/profession_tutorial_view';
 
 describe('buildProfessionTutorialModel', () => {
   it('lists the three explainer paragraphs in order behind stable keys', () => {

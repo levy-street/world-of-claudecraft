@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Riak di Sumur Bulan',
     desc: 'Tangkap ikan dari perairan Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -187,7 +186,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Penguasa Padang Rumput', desc: 'Capai 100 kecakapan Herbalisme.' },
   prog_master_gatherer: {
     name: 'Pengumpul Ulung',
-    desc: 'Capai 100 kecakapan pada tiga dari Penambangan, Penebangan Kayu, Herbalisme, dan Memancing.',
   },
   prog_first_craft: { name: 'Buatan Tangan', desc: 'Selesaikan hasil kerajinan sukses pertamamu.' },
   prog_craft_specialist: {
@@ -301,7 +299,6 @@ export const table: DeedLocaleTable = {
     title: 'Penumbang Wyrm',
   },
   dgn_sanctum_speed: {
-    name: 'Lari Kencang Sanktum',
     desc: 'Kalahkan Korzul sang Gravewyrm dalam 15 menit sejak party-mu mengklaim Sanktum Gravewyrm.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -364,7 +361,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Lonceng-Lonceng Terdiam',
-    desc: 'Kalahkan Diaken Varric dengan setiap Pembunyi Lonceng Pemakaman yang ia bangkitkan telah tewas lebih dulu.',
+    desc: 'Kalahkan Diaken Vandric dengan setiap Pembunyi Lonceng Pemakaman yang ia bangkitkan telah tewas lebih dulu.',
   },
   dlv_nhalia_bells: {
     name: 'Peredam Lonceng',
@@ -377,7 +374,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Kronik Lembah, Bab II',
-    desc: 'Selesaikan bab kedua kronik Saul: bandit, murloc, dan hama tambang ditumpas, laga di Sowfield dimainkan, dan Reliquary dijajal.',
   },
   chr_vale_chapter_iii: {
     name: 'Kronik Sang Lembah',
@@ -398,7 +394,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Penantang Ember Tembaga',
-    desc: 'Turun ke lapangan dan sentuh bola dalam sebuah pertandingan Piala Lembah di Sowfield.',
   },
   chr_vale_rares: {
     name: 'Teror-Teror Lembah',
@@ -443,12 +438,12 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Kronik Thornpeak',
-    desc: 'Tuntaskan seluruh kisah gunung: Wyrmcult dihancurkan, Sanktum dibungkam, sang Puncak yang Terjaga dirobohkan, dan setiap teror bernama di tebing-tebing ditumbangkan.',
+    desc: 'Tuntaskan seluruh kisah gunung: Broodsworn dihancurkan, Sanktum dibungkam, sang Puncak yang Terjaga dirobohkan, dan setiap teror bernama di tebing-tebing ditumbangkan.',
     title: 'dari Thornpeak',
   },
   chr_peaks_sparring: {
     name: 'Latihan Tembok',
-    desc: 'Berikan total 1.000 kerusakan pada Boneka Latihan di atas Menara Pengawas.',
+    desc: 'Berikan total 1.000 kerusakan pada sebuah boneka latihan.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Air Dingin, Cahaya Lebih Dingin',
@@ -541,7 +536,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Pelanggan Kesayangan',
-    desc: 'Temukan kesepuluh barang dagangan Kepala Perbekalan Vex.',
+    desc: 'Temukan kesepuluh barang perlengkapan dagangan Kepala Perbekalan Vex.',
   },
   col_glimmerfin: {
     name: 'Kilau Harapan',
@@ -586,69 +581,53 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Turun ke Lapangan',
-    desc: 'Selesaikan satu pertandingan Piala Lembah secara penuh di Sowfield, menang ataupun kalah.',
   },
   pvp_vcup_first_win: {
     name: 'Trofi Pertama',
-    desc: 'Menangkan satu pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_wins_10: {
     name: 'Pebola Babi Hutan Kawakan',
-    desc: 'Menangkan 10 pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_wins_25: {
     name: 'Legenda Bola Babi Hutan',
-    desc: 'Menangkan 25 pertandingan Piala Lembah berperingkat.',
     title: 'Legenda Bola Babi Hutan',
   },
   pvp_vcup_first_goal: {
     name: 'Pecah Telur',
-    desc: 'Cetak satu gol dalam pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_hat_trick: {
     name: 'Pahlawan Hat-trick',
-    desc: 'Cetak tiga gol dalam satu pertandingan Piala Lembah berperingkat, di divisi 3v3 atau lebih besar.',
   },
   pvp_vcup_golden_goal: {
     name: 'Momen Emas',
-    desc: 'Cetak gol emas yang menentukan hasil sebuah pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_first_save: {
     name: 'Tangan Andal',
-    desc: 'Lakukan satu penyelamatan sebagai kiper dalam pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Tak Satu Pun Lolos',
-    desc: 'Menangkan pertandingan Piala Lembah berperingkat sebagai kiper tanpa kebobolan satu gol pun.',
   },
   pvp_vcup_guild_win: {
     name: 'Demi Sang Panji',
-    desc: 'Menangkan pertandingan Piala Lembah berperingkat yang diikuti di bawah panji guild-mu.',
   },
   pvp_fiesta_first_bout: {
     name: 'Penyusup Pesta',
-    desc: 'Bertarunglah dalam satu laga Fiesta 2v2 secara penuh, menang ataupun kalah.',
   },
-  pvp_fiesta_first_win: { name: 'Bintang Fiesta', desc: 'Menangkan satu laga Fiesta 2v2.' },
+  pvp_fiesta_first_win: { name: 'Bintang Fiesta' },
   pvp_fiesta_double: {
     name: 'Sekali Dayung, Dua Tumbang',
-    desc: 'Robohkan dua lawan Fiesta dalam rentang empat detik.',
   },
   pvp_fiesta_shutdown: {
     name: 'Perusak Pesta',
-    desc: 'Robohkan lawan Fiesta yang tengah berada dalam rentetan tiga atau lebih.',
   },
   pvp_fiesta_full_build: {
     name: 'Berdandan untuk Pesta',
-    desc: 'Menangkan laga Fiesta dengan augmen terkunci dari ketiga gelombang.',
   },
   pvp_fiesta_powerups: {
     name: 'Cicipi Semuanya',
-    desc: 'Ambil masing-masing dari keempat power-up gelanggang setidaknya sekali: Setan Kecepatan, Raksasa, Bot Bulan, dan Berserker.',
   },
   pvp_fiesta_five_kills: {
     name: 'Tulang Punggung Pesta',
-    desc: 'Robohkan lima lawan dalam satu laga Fiesta.',
   },
   soc_first_party: {
     name: 'Lebih Baik Bersama',
@@ -1071,5 +1050,9 @@ export const table: DeedLocaleTable = {
     name: 'Tak Sebutir Bara Pun Hilang',
     desc: 'Kalahkan Varkhul, Bapak Penempa Api Terakhir, pada tingkat kesulitan Heroik tanpa satu pun anggota raid yang mati.',
     title: 'sang Nirbakar',
+  },
+  col_set_bramblehide: {
+    name: 'Kulit Semak Duri Roots',
+    desc: 'Temukan setiap bagian dari Kulit Semak Duri Roots.',
   },
 };

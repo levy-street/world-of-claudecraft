@@ -148,7 +148,7 @@ export const RELIQUARY_FINALE_LAYOUT: DungeonLayout = {
   // Two tomb rows in the south half; north fighting ring stays clear.
   tombs: grid(16, 28, 12, [-19, 19]),
   stubs: [],
-  // Wider dais (r=12) so Deacon Varric's 8yd Bell Toll stomp fits without
+  // Wider dais (r=12) so Deacon Vandric's 8yd Bell Toll stomp fits without
   // the boss immediately stepping off the platform.
   dais: { x: 0, z: 80, r: 12 },
   clutter: FINALE_CLUTTER,

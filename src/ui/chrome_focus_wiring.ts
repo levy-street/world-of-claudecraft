@@ -38,6 +38,14 @@ export const CHROME_GUARDED_PANELS: readonly string[] = [
   // without the guard a focused Exchange button swallows Space/Enter meant
   // for the game while the window is open.
   '#woc-market-window',
+  // The two farming windows this branch adds (Phase 11b's absorb): they are the same
+  // non-modal overlay family, so they take the guard here rather than keeping the
+  // inline loop hud.ts used before the release extracted it.
+  '#harvest-journal-window',
+  '#plant-sheet-window',
+  // The shared corpse-harvest preference picker (Intentional Gathering PR3):
+  // the same non-modal overlay family as the two farming windows above.
+  '#harvest-preference-window',
   '#side-buttons',
 ];
 

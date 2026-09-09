@@ -382,7 +382,7 @@ describe('Varkhul forge pillars and add intermission', () => {
       .map((id) => sim.entities.get(id))
       .find((add) => add?.templateId === VARKHUL_CINDER_ARTIFICER_ID);
     if (!artificer) throw new Error('Cinder Artificer did not emerge');
-    expect(artificer.maxHp).toBe(6_488);
+    expect(artificer.maxHp).toBe(4_542);
     expect(artificer.mechanicDamageMult).toBe(1);
     expect(artificer.rangedDamageMult).toBeUndefined();
     expect(artificer.ccImmune).not.toBe(true);
@@ -2737,7 +2737,7 @@ describe('Varkhul forge pillars and add intermission', () => {
       .map((id) => sim.entities.get(id))
       .find((add) => add?.templateId === VARKHUL_CRUCIBLE_WARDEN_ID);
     if (!warden) throw new Error('Crucible Warden did not emerge');
-    expect(warden.maxHp).toBe(4_011);
+    expect(warden.maxHp).toBe(2_807);
     expect(warden.mechanicDamageMult).toBeCloseTo((92.2 * 1.25) / 99.8, 12);
     state.assemblyForgeBeamWarmupRemaining = 999;
 

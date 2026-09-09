@@ -21,6 +21,7 @@ export const ADMIN_PERMISSIONS = [
   'botdetector.read',
   'botdetector.configure',
   'guildbank.purge',
+  'moderation.clearItemName',
   'staff.manage',
 ] as const;
 

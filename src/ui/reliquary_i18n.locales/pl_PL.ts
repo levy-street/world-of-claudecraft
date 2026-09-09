@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Heroiczny: The Inner Crucible',
     desc: 'Tarcze i bronie dostępne wyłącznie heroicznie od Varkhul, Forgefather of the Last Flame.',
   },
+  conquerors_set_bramblehide: {
+    name: 'Cierniowa Skóra Rootsa',
+    desc: 'Pełna rodzina skórzana Bramblehide.',
+  },
 };

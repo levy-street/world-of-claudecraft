@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.fr_CA.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Chaque instance tourne aussi en **Héroïque** : des ennemis de niveau supérieu
 
 ### Delves
 
-Les delves sont un mode séparé et évolutif pour petit groupe d'un ou deux joueurs, reconstruit à partir de chambres aléatoires à chaque partie et se terminant sur un coffre-reliquaire verrouillé qui s'ouvre par un mini-jeu de crochetage plutôt que par un jet de butin. **The Collapsed Reliquary** (niveau 7 et plus) se termine chez Deacon Varric, avec une compagne IA, Tessa, qui combat à vos côtés si vous y allez seul. **The Drowned Litany** (niveau 12 et plus) suit la piste jusqu'à un sanctuaire inondé à la lisière de Mirefen Marsh. Un tableau des delves fixe le palier : Héroïque relève les niveaux des ennemis et ajoute un affixe aléatoire pour de plus riches récompenses.
+Les delves sont un mode séparé et évolutif pour petit groupe d'un ou deux joueurs, reconstruit à partir de chambres aléatoires à chaque partie et se terminant sur un coffre-reliquaire verrouillé qui s'ouvre par un mini-jeu de crochetage plutôt que par un jet de butin. **The Collapsed Reliquary** (niveau 7 et plus) se termine chez Deacon Vandric, avec une compagne IA, Tessa, qui combat à vos côtés si vous y allez seul. **The Drowned Litany** (niveau 12 et plus) suit la piste jusqu'à un sanctuaire inondé à la lisière de Mirefen Marsh. Un tableau des delves fixe le palier : Héroïque relève les niveaux des ennemis et ajoute un affixe aléatoire pour de plus riches récompenses.
 
 ### JcJ classé (the Ashen Coliseum)
 

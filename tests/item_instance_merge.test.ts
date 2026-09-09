@@ -38,6 +38,29 @@ describe('itemInstancePayloadsEqual', () => {
     ).toBe(false);
   });
 
+  it('the Perfecting fields participate: a rank or the Perfected stamp never equals its absence (phase 12)', () => {
+    // Every present key compares, so a copy one rank along the Perfecting
+    // track, or one carrying the Perfected stamp, is its own identity: a bagged
+    // head-started copy never folds into a plain signed stack of the same
+    // apex id, and two mid-track copies at different ranks stay apart.
+    const signed: ItemInstancePayload = { signer: 'Ana' };
+    expect(itemInstancePayloadsEqual(signed, { signer: 'Ana', perfecting: 1 })).toBe(false);
+    expect(itemInstancePayloadsEqual(signed, { signer: 'Ana', perfected: true })).toBe(false);
+    expect(
+      itemInstancePayloadsEqual({ signer: 'Ana', perfecting: 1 }, { signer: 'Ana', perfecting: 2 }),
+    ).toBe(false);
+    expect(
+      itemInstancePayloadsEqual({ signer: 'Ana', perfecting: 2 }, { signer: 'Ana', perfecting: 2 }),
+    ).toBe(true);
+    expect(canStackInstancePayloads(signed, { signer: 'Ana', perfecting: 1 })).toBe(false);
+    // The header's forward-compatibility claim, pinned: a field this binary
+    // has never heard of is still an identity term (an older binary can never
+    // fold a newer copy into an older-shaped stack).
+    expect(
+      itemInstancePayloadsEqual(signed, { signer: 'Ana', futureField: 1 } as ItemInstancePayload),
+    ).toBe(false);
+  });
+
   it('the nested rolled record compares per-key: quality, stats, masterwork all participate', () => {
     const mw: ItemInstancePayload = {
       signer: 'Ana',
@@ -83,6 +106,29 @@ describe('itemInstancePayloadsEqual', () => {
         { signer: 'Ana', rolled: { quality: 'rare' } },
       ),
     ).toBe(true);
+  });
+
+  it('a JSON-parsed own __proto__ key is an ordinary identity term, in both directions', () => {
+    // JSON.parse mints '__proto__' as an OWN key; reading it off the other side
+    // without an ownership check lands on Object.prototype, which has no own
+    // enumerable keys and so matched any empty object.
+    const tainted = JSON.parse('{"__proto__":{}}') as ItemInstancePayload;
+    const ordinary = JSON.parse('{"unrelated":{}}') as ItemInstancePayload;
+    expect(itemInstancePayloadsEqual(tainted, ordinary)).toBe(false);
+    expect(itemInstancePayloadsEqual(ordinary, tainted)).toBe(false);
+    // Still equal to its own shape, and still value-sensitive.
+    expect(itemInstancePayloadsEqual(tainted, JSON.parse('{"__proto__":{}}'))).toBe(true);
+    expect(
+      itemInstancePayloadsEqual(
+        JSON.parse('{"__proto__":{"a":1}}'),
+        JSON.parse('{"__proto__":{"a":2}}'),
+      ),
+    ).toBe(false);
+    // Nested, where the same read happens one level down.
+    const nested = JSON.parse('{"rolled":{"__proto__":{}}}') as ItemInstancePayload;
+    const nestedPlain = JSON.parse('{"rolled":{"unrelated":{}}}') as ItemInstancePayload;
+    expect(itemInstancePayloadsEqual(nested, nestedPlain)).toBe(false);
+    expect(itemInstancePayloadsEqual(nestedPlain, nested)).toBe(false);
   });
 
   it('charge maps compare per-key (equal maps equal, differing maps refuse)', () => {

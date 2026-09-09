@@ -4,6 +4,7 @@
 // toggled classes, so the quarter-by-quarter reveal is pinned.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { HUD_FRAME_SPECS } from '../src/ui/interface_unlock_core';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import { ProcOverlayPainter } from '../src/ui/proc_overlay_painter';
 import {
@@ -128,6 +129,26 @@ describe('ProcOverlayPainter class mapping', () => {
     expect(classes.get('hot')).toBe(true);
   });
 
+  it('lifts the inactive states aria-hidden while the interface is unlocked', () => {
+    // The movable-frame corner button and grip live INSIDE the root, so
+    // arranging must not leave focusable chrome under aria-hidden (axe
+    // aria-hidden-focus); the warlock states are aria-visible regardless.
+    const { writers, attrs } = fakeWriters();
+    const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+    painter.paint('none');
+    expect(attrs.get('aria-hidden')).toBe('true');
+    painter.setEditing(true);
+    painter.paint('none');
+    expect(attrs.get('aria-hidden')).toBe('false');
+    painter.paintFrostCharges(0);
+    expect(attrs.get('aria-hidden')).toBe('false');
+    painter.setEditing(false);
+    painter.paintChronoCharges(0);
+    expect(attrs.get('aria-hidden')).toBe('true');
+    painter.paintNecromancyCharges(2, 'Soul Fragments', '2 of 5');
+    expect(attrs.get('aria-hidden')).toBe('false');
+  });
+
   it('lights one frozen section per Icicle and clears other themes', () => {
     const { writers, classes } = fakeWriters();
     const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
@@ -246,7 +267,9 @@ describe('ProcOverlayPainter class mapping', () => {
     expect(attrs.get('aria-valuenow')).toBe('5');
     expect(attrs.get('aria-valuetext')).toBe('5 of 5 Ruin');
     expect(attrs.get('aria-label')).toBe('Ruin');
-    expect(attrs.get('tabindex')).toBe('0');
+    // -1 like every other state: the mover chrome owns the keyboard path, so
+    // the always-on bank must not be a focus stop of its own.
+    expect(attrs.get('tabindex')).toBe('-1');
   });
 
   it('clears every Destruction mark and restores the meter label on a theme switch', () => {
@@ -351,18 +374,43 @@ describe('Necromancy Soul Fragment visual progression', () => {
     }
   });
 
-  it('keeps the empty bank visible and makes only its artwork draggable', () => {
+  it('keeps the empty bank visible and pointer-inert', () => {
     const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
     const rule = css.match(/#proc-overlay\.necromancy\s*\{([^}]*)\}/)?.[1] ?? '';
-    const artworkRule =
-      css.match(
-        /#proc-overlay\.necromancy \.soul-rail,\s*#proc-overlay\.necromancy \.soul-crystal\s*\{([^}]*)\}/,
-      )?.[1] ?? '';
 
     expect(rule).toContain('opacity: 0.72');
     expect(rule).toContain('pointer-events: none');
-    expect(artworkRule).toContain('pointer-events: auto');
-    expect(artworkRule).toContain('cursor: grab');
+    // No per-artwork pointer-events/cursor rules: the retired grab-drag's
+    // rules made the always-on bank eat world clicks; movement belongs to
+    // the Unlock Interface registry frame now. The POSITIVE control below
+    // proves the regex shape can match at all (the edit-mode rule really
+    // hands pointer events back), so the negative cannot rot silently. The
+    // negatives exclude .tf-unlocked: the edit mode's own state-qualified
+    // hand-back (the test below) is the one sanctioned auto, and BOTH
+    // always-on warlock states hold the same click-through contract, so both
+    // carry the same pin.
+    expect(css).toMatch(/#proc-overlay\.tf-unlocked[^{}]*\{[^}]*pointer-events: auto/);
+    for (const state of ['necromancy', 'destruction']) {
+      expect(css, `${state} stays click-through outside the unlock`).not.toMatch(
+        new RegExp(`#proc-overlay\\.${state}(?!\\.tf-unlocked)[^{}]*\\{[^}]*pointer-events: auto`),
+      );
+    }
+  });
+
+  it('the unlock mode hands pointer events back on the warlock states too', () => {
+    // #proc-overlay.necromancy and #proc-overlay.destruction re-assert
+    // pointer-events: none at the same id+class specificity LATER in the
+    // sheet, so the plain #proc-overlay.tf-unlocked hand-back loses the order
+    // tie for exactly the two specs whose art is always on. Without these
+    // state-qualified (higher-specificity) selectors a demonology or
+    // destruction warlock cannot drag the frame at all: the root swallows the
+    // pointerdown the mover listens for (the reported Soul Fragments bug).
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    for (const state of ['necromancy', 'destruction']) {
+      expect(css, `${state} unlock hand-back`).toMatch(
+        new RegExp(`#proc-overlay\\.${state}\\.tf-unlocked[^{}]*\\{[^}]*pointer-events: auto`),
+      );
+    }
   });
 
   it('adds a stronger persistent full-bank glow at five fragments', () => {
@@ -401,13 +449,9 @@ describe('Destruction Ruin visual progression', () => {
     expect(css).not.toContain('.combo-row.ruin');
   });
 
-  it('exposes a bounded keyboard-movable meter and honors motion preferences', () => {
+  it('exposes a bounded meter with registry-governed movement and honors motion preferences', () => {
     const domSource = readFileSync(
       new URL('../src/ui/proc_overlay_dom.ts', import.meta.url),
-      'utf8',
-    );
-    const dragSource = readFileSync(
-      new URL('../src/ui/proc_overlay_drag.ts', import.meta.url),
       'utf8',
     );
     const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
@@ -415,9 +459,13 @@ describe('Destruction Ruin visual progression', () => {
     expect(domSource).toContain("el.setAttribute('role', 'meter')");
     expect(domSource).toContain("el.setAttribute('aria-valuemin', '0')");
     expect(domSource).toContain("el.setAttribute('aria-valuemax', '5')");
-    expect(domSource).toContain("el.setAttribute('tabindex', '-1')");
-    expect(domSource).toContain("el.setAttribute('aria-keyshortcuts'");
-    expect(dragSource).toContain("el.addEventListener('keydown'");
+    // Movement (and its arrow-key path) is the Unlock Interface registry's:
+    // the overlay is a HUD_FRAME_SPECS row, so the retired grab-drag's own
+    // tabindex and aria-keyshortcuts must NOT come back on the root.
+    const procSpec = HUD_FRAME_SPECS.find((spec) => spec.id === 'procOverlay');
+    expect(procSpec?.elementId).toBe('proc-overlay');
+    expect(domSource).not.toContain('aria-keyshortcuts');
+    expect(domSource).not.toContain('tabindex');
     expect(css).toMatch(
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*?#proc-overlay\.destruction[\s\S]*?transition: none !important;/,
     );
@@ -426,21 +474,38 @@ describe('Destruction Ruin visual progression', () => {
     );
   });
 
-  it('keeps the empty bank visible, draggable, and gives the full bank a flare', () => {
+  it('the unlock hook drives the edit placeholder and the login preview yields to it', () => {
+    // Caller-side pins on Hud's wiring (the file's source-shape idiom):
+    // deleting any of these compiles and every DOM test stays green, but the
+    // edit mode silently loses its sample art or its aria lift.
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(hud).toContain('this.unlockPreview.setActive(unlocked);');
+    expect(hud).toContain("const previewBird = unlocked && this.sim.cfg.playerClass === 'mage';");
+    expect(hud).toContain("this.procOverlayEl.classList.toggle('preview', previewBird);");
+    expect(hud).toContain('this.procOverlayPainter.setEditing(unlocked);');
+    // The one-shot login preview's 8s timer must yield to an active edit
+    // session instead of stripping the sample art out from under it.
+    expect(hud).toContain(
+      "if (this.interfaceUnlock.isUnlocked && this.sim.cfg.playerClass === 'mage') return;",
+    );
+  });
+
+  it('keeps the empty bank visible and pointer-inert, and gives the full bank a flare', () => {
     const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
     const rootRule = css.match(/#proc-overlay\.destruction\s*\{([^}]*)\}/)?.[1] ?? '';
-    const artworkRule =
-      css.match(
-        /#proc-overlay\.destruction \.ruin-ritual,\s*#proc-overlay\.destruction \.ruin-mark\s*\{([^}]*)\}/,
-      )?.[1] ?? '';
     const fullRule = css.match(/#proc-overlay\.destruction\.r5\s*\{([^}]*)\}/)?.[1] ?? '';
     const flareRule =
       css.match(/#proc-overlay\.destruction\.r5 \.ruin-ritual::after\s*\{([^}]*)\}/)?.[1] ?? '';
 
     expect(rootRule).toContain('opacity: 0.76');
     expect(rootRule).toContain('pointer-events: none');
-    expect(artworkRule).toContain('pointer-events: auto');
-    expect(artworkRule).toContain('cursor: grab');
+    // The retired grab-drag's per-artwork pointer-events/cursor rules must
+    // not come back: the always-on ritual would eat world clicks with no
+    // drag handler behind them (movement is the registry frame's now). The
+    // positive control on the same shape (the edit-mode move cursor exists)
+    // keeps the negative honest if the regex ever stops matching anything.
+    expect(css).toMatch(/#proc-overlay[^{}]*\{[^}]*cursor: var\(--cursor-move/);
+    expect(css).not.toMatch(/#proc-overlay[^{}]*\{[^}]*cursor: grab/);
     expect(fullRule).toContain('opacity: 1');
     expect(flareRule).toContain('animation: ruin-bank-full-flare');
   });

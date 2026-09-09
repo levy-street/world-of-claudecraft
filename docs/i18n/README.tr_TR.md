@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.tr_TR.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Her örnek **Heroic** olarak da çalışır: daha yüksek seviyeli düşmanlar, 
 
 ### Delve'ler
 
-Delve'ler, bir veya iki oyuncu için ayrı, ölçeklenebilir bir küçük grup modudur; her seferinde rastgele odalardan yeniden inşa edilir ve bir ganimet zarı yerine kilit açma mini oyunuyla açılan kilitli bir kutsal emanet sandığında biter. **The Collapsed Reliquary** (seviye 7 ve üstü) Deacon Varric'te sona erer ve tek başına gidersen bir yapay zeka yoldaşı, Tessa, yanında savaşır. **The Drowned Litany** (seviye 12 ve üstü) izi Mirefen Marsh'ın kıyısındaki su basmış bir tapınağa kadar takip eder. Bir delve panosu kademeyi belirler: Heroic düşman seviyelerini yükseltir ve daha zengin ödüller için rastgele bir ek özellik ekler.
+Delve'ler, bir veya iki oyuncu için ayrı, ölçeklenebilir bir küçük grup modudur; her seferinde rastgele odalardan yeniden inşa edilir ve bir ganimet zarı yerine kilit açma mini oyunuyla açılan kilitli bir kutsal emanet sandığında biter. **The Collapsed Reliquary** (seviye 7 ve üstü) Deacon Vandric'te sona erer ve tek başına gidersen bir yapay zeka yoldaşı, Tessa, yanında savaşır. **The Drowned Litany** (seviye 12 ve üstü) izi Mirefen Marsh'ın kıyısındaki su basmış bir tapınağa kadar takip eder. Bir delve panosu kademeyi belirler: Heroic düşman seviyelerini yükseltir ve daha zengin ödüller için rastgele bir ek özellik ekler.
 
 ### Dereceli PvP (the Ashen Coliseum)
 

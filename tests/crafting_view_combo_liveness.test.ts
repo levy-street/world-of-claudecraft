@@ -38,7 +38,7 @@ import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
-import { buildCraftingView, type CraftingRecipeRow } from '../src/ui/crafting_view';
+import { buildCraftingView, type CraftingRecipeRow } from '../src/ui/hud/professions/crafting_view';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
 // The armorcrafting+weaponcrafting minTier-1 combo recipe (content pinned by

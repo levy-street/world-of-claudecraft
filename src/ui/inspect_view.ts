@@ -17,7 +17,13 @@
 // pins every gate and the day math without a DOM or a real clock.
 
 import { CLASSES } from '../sim/data';
-import type { EquipSlot, ItemDef, PlayerClass, SkinCatalog } from '../sim/types';
+import type {
+  EquipSlot,
+  ItemDef,
+  ItemInstancePayload,
+  PlayerClass,
+  SkinCatalog,
+} from '../sim/types';
 import { buildPaperdollView, type PaperdollView } from './char_view';
 import { borderAccent, deedBorderSlug } from './deed_border_view';
 
@@ -169,6 +175,14 @@ export interface InspectInput {
    */
   selfStanding?: { curatorRank: number; owned: number; total: number } | null;
   equippedItems: Partial<Record<EquipSlot, string>>;
+  /** The worn per-copy payloads keyed by slot: the entity's eqi mirror for a
+   *  peer; for the VIEWER, Hud.openInspect hands IWorld.equipmentInstances
+   *  (the full self mirror) so both hosts agree, since the ONLINE self
+   *  entity's mirror is eqi-shaped and would drop the Unique-Equipped tag.
+   *  Threaded into buildPaperdollView, which projects each through
+   *  wornTooltipInstance, so the equipment row describes the worn COPY (a
+   *  promoted legendary's chosen name and color) exactly as on the sheet. */
+  equippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>;
   holderTier: number;
   holderBalance: number | null;
   discordTier: number;
@@ -278,7 +292,7 @@ export function buildInspectView(
     header,
     badges: { holder, discord, dev, curator: curatorBadge },
     curator,
-    gear: buildPaperdollView(input.equippedItems, items),
+    gear: buildPaperdollView(input.equippedItems, items, input.equippedInstances),
     skin: input.skin,
     skinCatalog: input.skinCatalog,
   };

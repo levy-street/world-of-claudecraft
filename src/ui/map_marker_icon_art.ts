@@ -16,6 +16,7 @@ export const MAP_MARKER_ART_IDS = [
   'gather-ore',
   'gather-wood',
   'gather-herb',
+  'farm-patch',
   'station-forge',
   'station-kitchens',
   'station-apothecary',
@@ -328,6 +329,7 @@ const MAP_MARKER_URLS: Readonly<Record<MapMarkerArtId, string>> = {
   'gather-ore': '/ui/map-markers/gather_ore.webp',
   'gather-wood': '/ui/map-markers/gather_wood.webp',
   'gather-herb': '/ui/map-markers/gather_herb.webp',
+  'farm-patch': '/ui/map-markers/farm_patch.webp',
   'station-forge': '/ui/map-markers/station_forge.webp',
   'station-kitchens': '/ui/map-markers/station_kitchens.webp',
   'station-apothecary': '/ui/map-markers/station_apothecary.webp',
@@ -654,6 +656,7 @@ export function mapMarkerSizeForSemantic(
 export function mapMarkerSizesFor(id: MapMarkerArtId): readonly MapMarkerSize[] {
   if (id.startsWith('dungeon-')) return DUNGEON_MARKER_SIZES;
   if (id.startsWith('gather-')) return GATHER_MARKER_SIZES;
+  if (id === 'farm-patch') return STATION_MARKER_SIZES;
   if (id.startsWith('service-')) return SERVICE_MARKER_SIZES;
   if (id === 'quest-cooldown') return QUEST_COOLDOWN_MARKER_SIZES;
   if (id.startsWith('quest-')) return QUEST_MARKER_SIZES;

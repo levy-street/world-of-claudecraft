@@ -10,11 +10,14 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { DELVE_X_MIN, GATHER_NODES, ITEMS, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
   createMinimapMarkers,
+  FARM_PATCH_MARKER_SIZE,
+  FARM_PATCH_MARKER_SIZE_COMPACT,
   MINIMAP_CLIP_INSET,
   type MinimapMarker,
   minimapMode,
@@ -85,6 +88,10 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     [10, ent({ id: 10, kind: 'object', lootable: true, pos: { x: 11, z: PZ } })],
     [11, ent({ id: 11, kind: 'mob', hostile: true, aggroTargetId: 1, pos: { x: 12, z: PZ } })],
     [12, ent({ id: 12, kind: 'mob', hostile: true, aggroTargetId: null, pos: { x: 13, z: PZ } })],
+    // A corpse holding ordinary loot for the viewer: untapped, so the shared
+    // pool is open to everyone (the mob-loot marker keys on WHAT THIS VIEWER
+    // MAY TAKE, never on the lootable flag alone, which a harvest-only body
+    // keeps true through its grace window).
     [
       13,
       ent({
@@ -93,6 +100,9 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
         hostile: true,
         dead: true,
         lootable: true,
+        loot: { copper: 4, items: [] },
+        tappedById: null,
+        harvestClaimedBy: null,
         pos: { x: 14, z: PZ },
       }),
     ],
@@ -140,6 +150,7 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     cfg: { seed: 42, playerClass: 'warrior' },
     playerId: 1,
     stationPlacements: STATIONS,
+    farmPatches: [],
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
     // The gather-node reads. This scenario is not about gathering, but the core
     // consults both members for any node inside the rim, and whether one IS
@@ -468,6 +479,67 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     const markers = buildMarkers(world as unknown as IWorld);
     expect(markers.filter((marker) => marker.kind === 'mob')).toHaveLength(2);
     expect(markers.filter((marker) => marker.kind === 'mob-loot')).toHaveLength(1);
+  });
+
+  describe('the corpse marker distinguishes ordinary loot from an open harvest', () => {
+    // forest_wolf carries mapped componentTags: harvestable while unclaimed.
+    // The seeded corpse (id 13) is re-shaped per case; every other seeded
+    // marker is unaffected, so the kinds list is filtered to the two corpse
+    // markers.
+    type CorpseShape = {
+      templateId: string;
+      loot: { copper: number; items: unknown[] } | null;
+      tappedById: number | null;
+      lootFfaTimer?: number;
+      harvestClaimedBy: number | null;
+      ownerId?: number | null;
+      corpseTimer?: number;
+    };
+    function corpseMarkers(shape: Partial<CorpseShape>, partyPids?: number[]) {
+      const world = makeWorld('sim') as unknown as {
+        entities: Map<number, Record<string, unknown>>;
+        partyInfo: { members: { pid: number }[] } | null;
+      };
+      const body = world.entities.get(13);
+      if (!body) throw new Error('expected the seeded corpse');
+      Object.assign(body, shape);
+      if (partyPids) world.partyInfo = { members: partyPids.map((pid) => ({ pid })) };
+      return buildMarkers(world as unknown as IWorld)
+        .map((m) => m.kind)
+        .filter((kind) => kind === 'mob-loot' || kind === 'mob-harvest');
+    }
+
+    it('keeps the loot square while ordinary loot remains, even with the harvest open', () => {
+      expect(corpseMarkers({ templateId: 'forest_wolf', loot: { copper: 4, items: [] } })).toEqual([
+        'mob-loot',
+      ]);
+    });
+
+    it('swaps to the harvest marker on a harvest-only body, and drops it once claimed', () => {
+      expect(corpseMarkers({ templateId: 'forest_wolf', loot: null })).toEqual(['mob-harvest']);
+      expect(corpseMarkers({ templateId: 'forest_wolf', loot: null, harvestClaimedBy: 9 })).toEqual(
+        [],
+      );
+    });
+
+    it("never advertises a stranger's owner-locked loot as mine", () => {
+      const locked = {
+        loot: { copper: 4, items: [] },
+        tappedById: 9,
+        lootFfaTimer: 60,
+        harvestClaimedBy: 9,
+      };
+      expect(corpseMarkers(locked)).toEqual([]);
+      // The lock lapses into FFA: the square returns.
+      expect(corpseMarkers({ ...locked, lootFfaTimer: 0 })).toEqual(['mob-loot']);
+      // A party mate's tap reads as mine through the viewer roster.
+      expect(corpseMarkers({ ...locked, tappedById: 5 }, [1, 5])).toEqual(['mob-loot']);
+    });
+
+    it('shows neither marker for an owned pet body or an expired body', () => {
+      expect(corpseMarkers({ ownerId: 1, loot: { copper: 4, items: [] } })).toEqual([]);
+      expect(corpseMarkers({ corpseTimer: 0, loot: { copper: 4, items: [] } })).toEqual([]);
+    });
   });
 
   it('preserves each gathering node type for the painter', () => {
@@ -874,6 +946,7 @@ describe('station markers (Professions 2.0)', () => {
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
       stationPlacements: STATIONS,
+      farmPatches: [],
       questState: () => 'unavailable',
       nodeHarvestableByMe: () => true,
       // Paired with nodeHarvestableByMe above: both gather-node reads, both
@@ -893,7 +966,8 @@ describe('station markers (Professions 2.0)', () => {
       const markers = stationMarkers(makeStationWorld(shape));
       // The four Eastbrook stations; the two other-zone stations are culled.
       expect(markers, shape).toHaveLength(4);
-      // The forge (STATIONS[0], x -5.80, z -123.90) lands at the projected px:
+      // The forge (STATIONS[0]; coordinates read live from STATIONS[0].pos)
+      // lands at the projected px:
       // mx = half - dx * pxPerYard, my = half - dz * pxPerYard.
       const half = S / 2;
       const forge = STATIONS[0];
@@ -959,6 +1033,105 @@ describe('station markers (Professions 2.0)', () => {
     const lastStation = markers.map((m) => m.kind).lastIndexOf('station');
     expect(lastStation).toBeGreaterThanOrEqual(0);
     expect(lastStation).toBeLessThan(markers.length - 1);
+  });
+
+  // Farm patches ride the same static-content doctrine as the stations above:
+  // one pin per site, no per-viewer state, identical on both hosts.
+  function farmMarkers(world: IWorld): MinimapMarker[] {
+    return buildMarkers(world).filter((m) => m.kind === 'farm-patch');
+  }
+
+  // The Eastbrook allotments (-21.5, -81.5) sit 20 yd from the civic center,
+  // inside the rim from VIEW_POS; the tier-2 Mirefen site (z 341) is far
+  // beyond it.
+  const NEAR_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_eastbrook');
+  const FAR_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_mirefen');
+
+  it('projects one marker per in-range patch anchor at the exact canvas px (both shapes)', () => {
+    expect(NEAR_PATCH).toBeDefined();
+    if (!NEAR_PATCH) return;
+    for (const shape of ['sim', 'client'] as const) {
+      const markers = farmMarkers(makeStationWorld(shape, { farmPatches: FARM_PATCHES }));
+      expect(markers, shape).toEqual([
+        {
+          kind: 'farm-patch',
+          patchId: 'patch_eastbrook',
+          mx: S / 2 - (NEAR_PATCH.x - VIEW_POS.x) * PPY,
+          my: S / 2 - (NEAR_PATCH.z - VIEW_POS.z) * PPY,
+        },
+      ]);
+    }
+  });
+
+  it('culls a patch beyond the rim and a zone with no patch at all', () => {
+    expect(FAR_PATCH).toBeDefined();
+    if (!FAR_PATCH) return;
+    expect(farmMarkers(makeStationWorld('sim', { farmPatches: [FAR_PATCH] }))).toEqual([]);
+    expect(farmMarkers(makeStationWorld('sim', { farmPatches: [] }))).toEqual([]);
+  });
+
+  it('sizes the pin from its own painted footprint, not a marker-art row', () => {
+    // Literals, not a re-read of the constant production uses: the pin has no
+    // MapMarkerArtId, so these two numbers are the whole size contract.
+    expect(FARM_PATCH_MARKER_SIZE).toBe(16);
+    expect(FARM_PATCH_MARKER_SIZE_COMPACT).toBe(22);
+  });
+
+  it('drops a patch whose painted footprint would cross the minimap rim', () => {
+    expect(NEAR_PATCH).toBeDefined();
+    if (!NEAR_PATCH) return;
+    // Straddle the exact safe-centre radius for a standard-profile pin. The
+    // margin is deliberately far smaller than the gap to any neighbouring
+    // marker size, so drawing this cull from the wrong footprint flips an arm.
+    const clearance = minimapPaintedMarkerClearance(FARM_PATCH_MARKER_SIZE);
+    const safeYards = minimapSafeCenterRadius(S, clearance) / PPY;
+    const at = (yards: number) => ({ ...NEAR_PATCH, x: VIEW_POS.x, z: VIEW_POS.z + yards });
+    expect(
+      farmMarkers(makeStationWorld('sim', { farmPatches: [at(safeYards - 0.01)] })),
+    ).toHaveLength(1);
+    expect(farmMarkers(makeStationWorld('sim', { farmPatches: [at(safeYards + 0.01)] }))).toEqual(
+      [],
+    );
+  });
+
+  it('gives the compact touch profile its own larger clearance', () => {
+    expect(NEAR_PATCH).toBeDefined();
+    if (!NEAR_PATCH) return;
+    const compactClearance = minimapPaintedMarkerClearance(FARM_PATCH_MARKER_SIZE_COMPACT);
+    const compactSafeYards = minimapSafeCenterRadius(S, compactClearance) / PPY;
+    // A patch just outside the COMPACT safe radius but inside the standard one:
+    // the standard profile keeps it, the compact profile culls it.
+    const patch = { ...NEAR_PATCH, x: VIEW_POS.x, z: VIEW_POS.z + compactSafeYards + 0.01 };
+    const world = makeStationWorld('sim', { farmPatches: [patch] });
+    expect(farmMarkers(world)).toHaveLength(1);
+    const compact = createMinimapMarkers()
+      .build(world, S, PPY, 'compact')
+      .markers.filter((m) => m.kind === 'farm-patch');
+    expect(compact).toEqual([]);
+  });
+
+  it('is viewer-invariant: quest, social, and profession state never change the set', () => {
+    const base = farmMarkers(makeStationWorld('sim', { farmPatches: FARM_PATCHES }));
+    expect(base).toHaveLength(1);
+    const busy = makeStationWorld('client', {
+      farmPatches: FARM_PATCHES,
+      questState: () => 'available',
+      nodeHarvestableByMe: () => false,
+      socialInfo: {
+        friends: [{ id: 20, name: 'Friend', online: true }],
+        blocks: [],
+        guild: { id: 1, name: 'G', rank: 'member', members: [] },
+      },
+    });
+    expect(farmMarkers(busy)).toEqual(base);
+  });
+
+  it('draws patches before the player arrow (draw order: the arrow stays on top)', () => {
+    const markers = buildMarkers(makeStationWorld('sim', { farmPatches: FARM_PATCHES }));
+    expect(markers[markers.length - 1].kind).toBe('player');
+    const lastPatch = markers.map((m) => m.kind).lastIndexOf('farm-patch');
+    expect(lastPatch).toBeGreaterThanOrEqual(0);
+    expect(lastPatch).toBeLessThan(markers.length - 1);
   });
 });
 
@@ -1030,6 +1203,7 @@ describe('gather-node markers: the locked dimension', () => {
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
       stationPlacements: STATIONS,
+      farmPatches: [],
       inventory: opts.inventory ?? [],
       gatheringProficiency: opts.gatheringProficiency ?? {},
       nodeHarvestableByMe: opts.harvestable ?? (() => true),
@@ -1174,6 +1348,7 @@ describe('gather-node markers scale with the rim, not the node table (phase 16)'
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
       stationPlacements: [],
+      farmPatches: [],
       inventory: [],
       gatheringProficiency: {},
       nodeHarvestableByMe: () => true,
@@ -1221,5 +1396,32 @@ describe('gather-node markers scale with the rim, not the node table (phase 16)'
 
   it('a viewer far from every node draws zero node markers regardless of the table size', () => {
     expect(nodeMarkersAt(99000, 99000)).toHaveLength(0);
+  });
+});
+
+describe('harvest marker full silhouette at the circular rim', () => {
+  it.each([
+    { profile: 'standard' as const, radius: 3.5, outline: 1.25 },
+    { profile: 'compact' as const, radius: 5.25, outline: 1.75 },
+  ])('contains the bottom miter corners in $profile mode', ({ profile, radius, outline }) => {
+    const world = makeWorld('client');
+    const corpse = world.entities.get(13)!;
+    corpse.templateId = 'forest_wolf';
+    corpse.loot = null;
+    // The painter's triangle has vertices (0,-r), (r,0.7r), (-r,0.7r).
+    // Its widest radial stroke point is a bottom miter, not the top apex.
+    const cornerX = radius + (outline / 2) * ((Math.hypot(1, 1.7) + 1) / 1.7);
+    const cornerY = radius * 0.7 + outline / 2;
+    const envelope = Math.hypot(cornerX, cornerY);
+    const safeCenter = S / 2 - MINIMAP_CLIP_INSET - envelope;
+    corpse.pos.x = world.player.pos.x - (safeCenter + 0.01);
+    corpse.pos.z = world.player.pos.z;
+    const harvest = () =>
+      createMinimapMarkers()
+        .build(world, S, 1, profile)
+        .markers.filter((marker) => marker.kind === 'mob-harvest');
+    expect(harvest()).toEqual([]);
+    corpse.pos.x = world.player.pos.x - (safeCenter - 0.01);
+    expect(harvest()).toHaveLength(1);
   });
 });

@@ -41,9 +41,6 @@ magic while each specialization changes the player's central decision.
 - Levels 5, 8, 11, 14, 17, and 20 follow movement, defense, control, kit amplification, major
   cooldown, and capstone themes.
 - Every option must benefit Doctrine, Benison, and Vespers.
-- Benison and Doctrine receive Prayer of Returning at level 20 (owner directive 2026-09-01,
-  `docs/design/resurrection-cooldowns.md`): a seven-second out-of-combat group revive on the
-  shared healer resurrection cooldown, not a combat resurrection. Vespers does not learn it.
 - Damage-only and healing-only primary effects require explicit cross-role fallbacks.
 - The specialization's defining loop belongs in automatic passives, signatures, and masteries.
 

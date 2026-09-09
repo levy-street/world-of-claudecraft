@@ -4,29 +4,31 @@ import { describe, expect, it } from 'vitest';
 describe('live UI Scale geometry refresh', () => {
   // The three unit-frame movers are no longer named one by one in these two
   // methods: they register with the InterfaceUnlock coordinator (which also owns
-  // the action bars, cast bar, menu rail, minimap and pet frame), and the
+  // the action bars, cast bar, menu rail, minimap, pet frame, trackers and
+  // class resource bars), and the
   // coordinator fans out to every entry. So the shape pinned here is the
   // DELEGATION, and the completeness half moved to two behavioural pins: the
   // registration below, and tests/interface_unlock.test.ts, which drives the real
   // coordinator and asserts every registered frame is reached. The doom meter
-  // stays outside the registry and so is still named explicitly.
-  it('reapplies chat, every registered frame, and the doom meter through the live Hud seam', () => {
+  // joined the registry with the other class resource bars, so it rides the
+  // same fan-out rather than an explicit line.
+  it('reapplies chat and every registered frame through the live Hud seam', () => {
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     expect(hud).toMatch(
-      /reapplySavedGeometry\(\): void {\s*this\.chatGeometry\.reapply\(\);\s*this\.interfaceUnlock\.reapplyAll\(\);\s*this\.doomMeter\.reapplyPosition\(\);\s*}/,
+      /reapplySavedGeometry\(\): void {\s*this\.chatGeometry\.reapply\(\);\s*this\.interfaceUnlock\.reapplyAll\(\);\s*}/,
     );
   });
 
-  it('includes the Affliction resource block in the unit-frame reset fanout', () => {
+  it('routes the unit-frame reset fanout through the registry', () => {
     // The fanout grew (chat, meters, target auras, the combined-bars split),
     // so pin the delegations by containment over the method body rather than
-    // an exact-body regex that reds on every legitimate addition.
+    // an exact-body regex that reds on every legitimate addition. The doom
+    // meter is a registry row now, so resetAll covers it.
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     const start = hud.indexOf('resetUnitFrames(): void {');
     expect(start).toBeGreaterThan(-1);
     const body = hud.slice(start, hud.indexOf('\n  }\n', start));
     expect(body).toContain('this.interfaceUnlock.resetAll();');
-    expect(body).toContain('this.doomMeter.resetPosition();');
   });
 
   it('registers all three unit-frame movers with the coordinator that drives them', () => {

@@ -23,9 +23,33 @@ function def(partial: Partial<AbilityDef>): AbilityDef {
 }
 
 describe('resolveTalentHitMult', () => {
-  it('with no talents applied, both multipliers are 1 (a no-op)', () => {
+  it('with no talents applied, every multiplier is 1 (a no-op)', () => {
     const mods = emptyModifiers();
-    expect(resolveTalentHitMult(def({}), mods)).toEqual({ dmgMult: 1, healMult: 1 });
+    expect(resolveTalentHitMult(def({}), mods)).toEqual({
+      dmgMult: 1,
+      healMult: 1,
+      legacyDmgMult: 1,
+    });
+  });
+
+  // v0.42.0 class balance: dmgMult is legacyDmgMult PLUS the offense-only spec
+  // tuning (spec_output_tuning.ts), reaching only real damage magnitudes;
+  // legacyDmgMult is what content/classes.ts's scaleEffect uses for a flat
+  // buff riding the same ability, so it must NOT include the offense delta.
+  it('a v0.42.0 offense-only spec adds to dmgMult but leaves legacyDmgMult and healMult alone', () => {
+    const mods: ReturnType<typeof emptyModifiers> = { ...emptyModifiers(), spec: 'feral' };
+    const hit = resolveTalentHitMult(def({ class: 'druid', school: 'physical' }), mods);
+    expect(hit.legacyDmgMult).toBe(1);
+    expect(hit.healMult).toBe(1);
+    // druid/feral's offense-only physical bonus is +0.15 (docs/design/class-balance-v042.md).
+    expect(hit.dmgMult).toBeCloseTo(1.15, 10);
+  });
+
+  it('an untargeted spec on a targeted class gets no offense-only bonus', () => {
+    const mods: ReturnType<typeof emptyModifiers> = { ...emptyModifiers(), spec: 'balance' };
+    const hit = resolveTalentHitMult(def({ class: 'druid', school: 'physical' }), mods);
+    expect(hit.dmgMult).toBe(1);
+    expect(hit.legacyDmgMult).toBe(1);
   });
 
   it('a global spellDmgPct reaches a spell-school ability dmgMult, not physical', () => {

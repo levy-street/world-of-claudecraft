@@ -22,6 +22,7 @@ import {
   planDepositAllMaterials,
 } from '../src/ui/bank_view';
 import type { BankInfo } from '../src/world_api';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // The bank core maps the proximity-gated BankInfo snapshot (null away from a
 // banker) to a flat render model (capacity / ordered slots / empty pad / buy
@@ -77,14 +78,39 @@ describe('buildBankView', () => {
 
   it('passes the per-copy instance payload through to the slot model (tooltip lines)', () => {
     const instance = { signer: 'Anna', rolled: { masterwork: true, stats: { str: 2 } } };
+    // Two source buckets (an unrecorded bucket plus a signed one), the merged
+    // shape a material stack now carries (src/ui/bank_view.ts:295-303).
+    const materialSources = [
+      { source: {}, count: 4 },
+      { source: { signer: 'Bankwyn' }, count: 1 },
+    ];
     const slots: InvSlot[] = [
       { itemId: 'sword', count: 1, instance },
       { itemId: 'potion', count: 5 },
+      { itemId: 'copper_ore', count: 5, materialSources },
     ];
     const view = buildBankView(bankInfo({ slots, capacity: 24 }), lookup);
     if (view.kind !== 'bank') throw new Error('expected bank');
     expect(view.slots[0].instance).toBe(instance);
     expect(view.slots[1].instance).toBeUndefined();
+    // materialSources rides through unchanged: same buckets, same length.
+    expect(view.slots[2].materialSources).toEqual(materialSources);
+    expect(view.slots[2].materialSources).toHaveLength(2);
+    expect(view.slots[1].materialSources).toBeUndefined();
+  });
+
+  it('keys the rim off instance-effective quality: a promoted copy reads legendary in the bank too', () => {
+    // The all-surfaces item-cell rule (phase 13): a mark describes the ITEM,
+    // so depositing a promoted copy must not strip its legendary rim.
+    const slots: InvSlot[] = [
+      { itemId: 'sword', count: 1, instance: { rolled: { quality: 'legendary' } } },
+      { itemId: 'sword', count: 1 },
+    ];
+    const view = buildBankView(bankInfo({ slots, capacity: 24 }), lookup);
+    if (view.kind !== 'bank') throw new Error('expected bank');
+    expect(view.slots[0].qualityKey).toBe('legendary');
+    // The def-only negative: the plain copy of the same def keeps its def tier.
+    expect(view.slots[1].qualityKey).toBe('rare');
   });
 
   it('projects the occupied grid preserving order, count display, and quality', () => {
@@ -760,6 +786,7 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
       sends: [],
       stacks: 0,
       full: false,
+      notableItemId: null,
     });
   });
 
@@ -769,6 +796,7 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
       sends: [],
       stacks: 0,
       full: false,
+      notableItemId: null,
     });
   });
 
@@ -786,6 +814,7 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
       sends: [],
       stacks: 0,
       full: false,
+      notableItemId: null,
     });
     expect(hasDepositableMaterials(inv, questLookup)).toBe(true);
   });
@@ -793,7 +822,7 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
   it('reports the bank already full: nothing sent but full is set', () => {
     const inv: InvSlot[] = [{ itemId: 'copper_ore', count: 1 }];
     const plan = planDepositAllMaterials(inv, [{ itemId: 'gear', count: 1 }], flat(1), lookup);
-    expect(plan).toEqual({ sends: [], stacks: 0, full: true });
+    expect(plan).toEqual({ sends: [], stacks: 0, full: true, notableItemId: null });
   });
 
   it('consumes the two-pool split, not a flat total: the socket-aware precheck pin', () => {
@@ -839,19 +868,96 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
     expect(hasDepositableMaterials([{ itemId: 'ghost', count: 1 }], lookup)).toBe(false);
     expect(hasDepositableMaterials([], lookup)).toBe(false);
   });
+
+  // #3xxx: the same "Core of the Last Flame" reports the vault's notable-item
+  // signal closes (see tests/vault_view.test.ts) reproduce identically off the
+  // Bank's own, older Deposit All button, since the reclassification made the
+  // reagent eligible on both surfaces. This pins the mirrored signal here.
+  describe('notableItemId: flags an epic-or-better material the plan actually sends', () => {
+    // Layers a synthetic quality onto game_meat ALONE: every other KINDS id
+    // stays quality-less, so a sweep with no epic-or-better stack proves the
+    // null default rather than free-riding on a lookup that always names one.
+    const notableLookup: ItemLookup = (id) =>
+      KINDS[id]
+        ? ({ id, kind: KINDS[id], ...(id === 'game_meat' ? { quality: 'epic' } : {}) } as ItemDef)
+        : undefined;
+
+    it('an ordinary sweep with no epic-or-better material leaves it null', () => {
+      const inv: InvSlot[] = [
+        { itemId: 'copper_ore', count: 5 },
+        { itemId: 'iron_ore', count: 3 },
+      ];
+      const plan = planDepositAllMaterials(inv, [], flat(24), notableLookup);
+      expect(plan.notableItemId).toBeNull();
+    });
+
+    it('an epic material actually sent is named, even among ordinary ones', () => {
+      const inv: InvSlot[] = [
+        { itemId: 'copper_ore', count: 5 },
+        { itemId: 'game_meat', count: 1 },
+        { itemId: 'iron_ore', count: 3 },
+      ];
+      const plan = planDepositAllMaterials(inv, [], flat(24), notableLookup);
+      expect(plan.notableItemId).toBe('game_meat');
+      expect(plan.stacks).toBe(3);
+    });
+
+    it('an epic stack the bank could not fit is never flagged (nothing of it actually moved)', () => {
+      // Two free bank slots for three materials; game_meat sits at the LOWEST
+      // index, so the descending walk reaches it last, once room is already
+      // gone: the send never happens (whole-stack-or-skip) and notableItemId
+      // stays null, matching the vault's "ceiling-blocked" sibling case.
+      const inv: InvSlot[] = [
+        { itemId: 'game_meat', count: 1 },
+        { itemId: 'copper_ore', count: 1 },
+        { itemId: 'iron_ore', count: 1 },
+      ];
+      const plan = planDepositAllMaterials(inv, [], flat(2), notableLookup);
+      expect(plan.sends).toEqual([
+        { slot: 2, count: 1 },
+        { slot: 1, count: 1 },
+      ]);
+      expect(plan.full).toBe(true);
+      expect(plan.notableItemId).toBeNull();
+    });
+  });
 });
 
-describe('depositAllSummaryKey: the three-arm summary selection', () => {
+describe('depositAllSummaryKey: the five-arm summary selection', () => {
   it('picks None when nothing moved (materials existed but none fit)', () => {
-    expect(depositAllSummaryKey({ stacks: 0, full: true })).toBe('hudChrome.bank.depositAllNone');
+    expect(depositAllSummaryKey({ stacks: 0, full: true, notableItemId: null })).toBe(
+      'hudChrome.bank.depositAllNone',
+    );
   });
 
   it('picks Full when some stacks moved but at least one did not fit', () => {
-    expect(depositAllSummaryKey({ stacks: 3, full: true })).toBe('hudChrome.bank.depositAllFull');
+    expect(depositAllSummaryKey({ stacks: 3, full: true, notableItemId: null })).toBe(
+      'hudChrome.bank.depositAllFull',
+    );
   });
 
   it('picks Done when every material stack fit', () => {
-    expect(depositAllSummaryKey({ stacks: 3, full: false })).toBe('hudChrome.bank.depositAllDone');
+    expect(depositAllSummaryKey({ stacks: 3, full: false, notableItemId: null })).toBe(
+      'hudChrome.bank.depositAllDone',
+    );
+  });
+
+  it('an epic-or-better item takes priority over full, once anything moved', () => {
+    expect(depositAllSummaryKey({ stacks: 3, full: false, notableItemId: 'signed_blade' })).toBe(
+      'hudChrome.bank.depositAllNotable',
+    );
+    expect(depositAllSummaryKey({ stacks: 3, full: true, notableItemId: 'signed_blade' })).toBe(
+      'hudChrome.bank.depositAllNotableFull',
+    );
+  });
+
+  it('none still wins over notable when nothing actually moved', () => {
+    // Unreachable from the real planDepositAllMaterials (notableItemId is only
+    // ever set alongside a successful send), but the priority order is pinned
+    // directly here rather than only through the reachable shape.
+    expect(depositAllSummaryKey({ stacks: 0, full: true, notableItemId: 'signed_blade' })).toBe(
+      'hudChrome.bank.depositAllNone',
+    );
   });
 });
 
@@ -924,10 +1030,15 @@ describe('planDepositAllMaterials: replays cleanly against a real Sim', () => {
     expect(m.inventory.map((s) => s.itemId)).toEqual(['boar_hide']);
   });
 
-  it('moves an instanced (signed) material whole through the real sim, never merging it', () => {
-    // #1145 corpse harvest stamps rare+ materials with an instance payload; the
-    // deposit-all plan must carry such a slot through the real sim.bankDeposit as
-    // one indivisible unit that never merges into a plain stack of the same id.
+  it('moves a signed material through the real sim, merging into the compatible bucketed stack', () => {
+    // #1145 corpse harvest stamps rare+ materials with a legacy signer payload.
+    // Since the source-count algebra landed, a legacy signer projects into its
+    // own MaterialSourceCount bucket (material_stack.ts normalizeMaterialStack)
+    // rather than staying a separate per-instance slot: a signed and an
+    // unrecorded stack of the same material id are COMPATIBLE
+    // (compatibleMaterialStacks) and share one bank slot, with each bucket's
+    // exact count and signer preserved in materialSources rather than merged
+    // away or lost.
     const sim = new Sim({ seed: 13, playerClass: 'warrior', autoEquip: false });
     moveToBanker(sim);
     const m = metaOf(sim);
@@ -953,13 +1064,20 @@ describe('planDepositAllMaterials: replays cleanly against a real Sim', () => {
     }
     expect(errors).toEqual([]);
     expect(m.inventory).toEqual([]);
-    // Two separate bank slots: the signed copy keeps its payload and count 1.
+    // One merged bank slot: the two source buckets ride together, each with its
+    // own exact count, and neither the total count nor the signer is lost.
     const banked = m.bank.inventory.filter((s) => s.itemId === MATS[0]);
-    expect(banked).toHaveLength(2);
-    const signed = banked.find((s) => s.instance);
-    expect(signed?.count).toBe(1);
-    expect(signed?.instance).toEqual({ signer: 'Bankwyn' });
-    expect(banked.find((s) => !s.instance)?.count).toBe(4);
+    expect(banked).toHaveLength(1);
+    const [merged] = banked;
+    expect(merged.count).toBe(5);
+    expect(merged.instance).toBeUndefined();
+    expect(merged.materialSources).toEqual(
+      expect.arrayContaining([
+        { source: {}, count: 4 },
+        { source: { signer: 'Bankwyn' }, count: 1 },
+      ]),
+    );
+    expect(merged.materialSources).toHaveLength(2);
   });
 
   it('replays a mid-run-full plan exactly: only the fitting stacks deposit, none refuse', () => {
@@ -1043,12 +1161,16 @@ describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
     'spider_leg', // mob-drop reagent
     'arcanite_bar', // vendor staple (Q6: in)
     'raw_river_perch', // raw fishing catch (junk cooking reagent: in)
+    // every adopted junk trophy (phase 11l junk-kind reagents: in), derived by
+    // the shared helper so an adoption or a de-adoption reds this suite
+    ...adoptedTrophyIds(REAL_ITEMS),
   ] as const;
   // ...and of every excluded class the settlement ruled on.
   const EXCLUDED = [
     'simple_fishing_pole', // gathering implement (kind tool)
     'gatherers_cache', // charm (kind tool by deliberate authoring)
     'amber_hide', // grey vendor trash (Q3: out)
+    'cracked_fetish', // output-excluded 11l trophy, poor again (the 11l QA: out)
     'guardian_core', // non-poor junk oddment (Q4: out)
     'boar_hide', // quest item
     'linen_pouch', // bag item
@@ -1072,6 +1194,7 @@ describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
       simple_fishing_pole: { kind: 'tool' },
       gatherers_cache: { kind: 'tool' },
       amber_hide: { kind: 'junk', quality: 'poor' },
+      cracked_fetish: { kind: 'junk', quality: 'poor' },
       guardian_core: { kind: 'junk' },
       boar_hide: { kind: 'quest' },
       linen_pouch: { kind: 'bag' },

@@ -19,8 +19,11 @@ import { eastbrookMailboxSourceFingerprint } from './eastbrook_mailbox/source_fi
 import { eastbrookNoticeboardSourceFingerprint } from './eastbrook_noticeboard/source_fingerprint.mjs';
 import { eastbrookTownSourceFingerprint } from './eastbrook_town/source_fingerprint.mjs';
 import { eastbrookSurfaceAtlasFingerprint } from './eastbrook_town/surface_atlas.mjs';
+import { FARM_PROP_CONTRACTS, FARM_PROP_IDS } from './farm_props/model.js';
+import { farmPropsSourceFingerprint } from './farm_props/source_fingerprint.mjs';
 import { FENBRIDGE_TOWN_ASSET_IDS, FENBRIDGE_TOWN_CONTRACTS } from './fenbridge_town/model.js';
 import { fenbridgeTownSourceFingerprint } from './fenbridge_town/source_fingerprint.mjs';
+import { inscriptionTomesSourceFingerprint } from './inscription_tomes/source_fingerprint.mjs';
 import { tankSourceFingerprint } from './terrorspark_groundshaker/source_fingerprint.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -37,6 +40,16 @@ const FENBRIDGE_ASSETS = FENBRIDGE_TOWN_ASSET_IDS.map((id) => ({
   kind: 'fenbridge',
 }));
 
+// The farm props ship one stamped GLB per contract too, so their rows derive
+// the same way and for the same reason: sixteen beds, growth stages and the
+// feast table, plus whatever a later farm prop adds. Their contract declares
+// one `out` that already carries the directory (`models/props/farm_bed.glb`),
+// where Fenbridge splits it in two, so the join takes only the `public` prefix.
+const FARM_PROPS_ASSETS = FARM_PROP_IDS.map((id) => ({
+  rel: path.posix.join('public', FARM_PROP_CONTRACTS[id].out),
+  kind: 'farm',
+}));
+
 const ASSETS = [
   { rel: 'public/models/props/eastbrook_bank.glb', kind: 'town' },
   { rel: 'public/models/props/eastbrook_smithy.glb', kind: 'town' },
@@ -51,7 +64,12 @@ const ASSETS = [
   { rel: 'public/models/props/eastbrook_noticeboard.glb', kind: 'notice' },
   { rel: 'public/models/props/mailbox_pillar.glb', kind: 'mailbox' },
   { rel: 'public/models/mounts/terrorspark_groundshaker.glb', kind: 'tank' },
+  { rel: 'public/models/weapons/tome_silverleaf.glb', kind: 'tomes' },
+  { rel: 'public/models/weapons/tome_goldleaf.glb', kind: 'tomes' },
+  { rel: 'public/models/weapons/tome_sunpetal.glb', kind: 'tomes' },
+  { rel: 'public/models/weapons/tome_voidbound.glb', kind: 'tomes' },
   ...FENBRIDGE_ASSETS,
+  ...FARM_PROPS_ASSETS,
 ];
 
 const requestedAssets = new Set(
@@ -99,8 +117,10 @@ const fps = {
   notice: eastbrookNoticeboardSourceFingerprint(ROOT),
   armoury: eastbrookGrandArmourySourceFingerprint(ROOT),
   tank: tankSourceFingerprint(ROOT),
+  tomes: inscriptionTomesSourceFingerprint(ROOT),
   atlas: eastbrookSurfaceAtlasFingerprint(ROOT),
   fenbridge: fenbridgeTownSourceFingerprint(ROOT),
+  farm: farmPropsSourceFingerprint(ROOT),
 };
 
 console.log('live source fingerprints:');

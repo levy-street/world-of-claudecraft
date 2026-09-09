@@ -1,0 +1,743 @@
+// Masterwrought phase 09, slice 3: the party-usable mobile crafting station
+// (the Master's Field Forge item path). Pins the partyShared discriminator on
+// MobileCraftingStation, the item placement path (placeMobileStationFromItem:
+// no specialization gate, never consumed, zero rng, dead-gated, one success
+// log line), the widened crafting station gate (a party member's ACTIVE
+// partyShared station satisfies a type-matched recipe WITHIN STATION_RADIUS
+// of the crafter; owner-only legacy stations never do), and the SET resolver
+// activeMobileStationCraftsForViewer: the deduped, sorted array of every
+// craft whose station serves the viewer (own at any distance, plus every
+// in-range partyShared party station), so the crafting-window row set
+// mirrors the craft gate exactly instead of shadowing one craft behind
+// another. The owner-only arms themselves stay pinned by
+// tests/professions_crafting_hub.test.ts; this file owns only the party half.
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { STATION_RADIUS, STATIONS } from '../src/sim/content/professions';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
+import { resolveCraft } from '../src/sim/professions/crafting';
+import {
+  nameCarriesOwnArticle,
+  placeMobileStationForPlayer,
+  placeMobileStationFromItem,
+} from '../src/sim/professions/mobile_station';
+import {
+  inRangeStationTypes,
+  isAtStation,
+  stationTypeForCraft,
+} from '../src/sim/professions/stations';
+import { isSpecialized } from '../src/sim/professions/wheel';
+import { Sim } from '../src/sim/sim';
+import type { ItemDef, SimEvent, WorldContent } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
+import { tEntity } from '../src/ui/entity_i18n';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { localizeSimText } from '../src/ui/sim_i18n';
+
+// Entity-stripped world (the tests/social_shared.ts SOCIAL_TEST_WORLD shape,
+// redefined locally per the tests/CLAUDE.md sim-test convention): every case
+// here talks only between hand-added players, so ambient camps/NPCs/objects
+// just cost construction time.
+const TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+function makeWorld(seed = 42): Sim {
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: TEST_WORLD });
+}
+
+function simCtx(sim: Sim) {
+  return (sim as any).ctx;
+}
+
+function metaOf(sim: Sim, pid: number) {
+  return (sim as any).players.get(pid);
+}
+
+function teleport(sim: Sim, pid: number, x: number, z: number) {
+  const e = (sim as any).entities.get(pid);
+  e.pos.x = x;
+  e.pos.z = z;
+  e.pos.y = groundHeight(x, z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
+}
+
+function grantItem(sim: Sim, itemId: string, count: number, pid: number) {
+  for (let i = 0; i < count; i++) sim.addItem(itemId, 1, pid);
+}
+
+function drainEvents(sim: Sim): SimEvent[] {
+  return (sim as any).drainEvents();
+}
+
+/** EVERY placement log line the drained events carry, in order. Matched on the
+ *  verb alone rather than on the expected sentence, so an assertion against it
+ *  pins the whole set: a second, differently worded set-up line fails instead of
+ *  being filtered out of view by the very text the test is checking for. */
+function setUpLines(sim: Sim): string[] {
+  return drainEvents(sim)
+    .filter((ev): ev is Extract<SimEvent, { type: 'log' }> => ev.type === 'log')
+    .map((ev) => ev.text)
+    .filter((text) => /\bset up\b/.test(text));
+}
+
+// A real trainer-taught forge recipe (weaponcrafting rung 0). The premise is
+// re-derived from the live table rather than assumed, so a content change
+// that unbinds it from the forge fails HERE, not as a silent green.
+const FORGE_RECIPE_ID = 'recipe_copper_bearded_axe';
+function mustForgeRecipe() {
+  const recipe = ALL_RECIPES.find((r) => r.id === FORGE_RECIPE_ID);
+  if (!recipe) throw new Error(`${FORGE_RECIPE_ID} missing from ALL_RECIPES`);
+  if (recipe.stationType !== 'forge') {
+    throw new Error(`${FORGE_RECIPE_ID} is no longer forge-bound`);
+  }
+  return recipe;
+}
+
+/** Teach the recipe and grant exactly the recipe's own reagent list. */
+function readyForgeCrafter(sim: Sim, pid: number) {
+  const recipe = mustForgeRecipe();
+  metaOf(sim, pid).knownRecipes.add(recipe.id);
+  for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
+  return recipe;
+}
+
+// The alchemy twin of the forge recipe above, for the SHIPPED-capstone arm.
+// Derived from the live table the same way, so a content change that unbinds it
+// from the apothecary fails HERE rather than as a silent green.
+const APOTHECARY_RECIPE_ID = 'recipe_silverleaf_healing_draught';
+function mustApothecaryRecipe() {
+  const recipe = ALL_RECIPES.find((r) => r.id === APOTHECARY_RECIPE_ID);
+  if (!recipe) throw new Error(`${APOTHECARY_RECIPE_ID} missing from ALL_RECIPES`);
+  if (recipe.stationType !== 'apothecary') {
+    throw new Error(`${APOTHECARY_RECIPE_ID} is no longer apothecary-bound`);
+  }
+  return recipe;
+}
+
+/** Teach the alchemy recipe and grant exactly its own reagent list. */
+function readyApothecaryCrafter(sim: Sim, pid: number) {
+  const recipe = mustApothecaryRecipe();
+  metaOf(sim, pid).knownRecipes.add(recipe.id);
+  for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
+  return recipe;
+}
+
+// The cooking twin, for the OTHER shipped capstone. Derived from the live table
+// the same way, so a content change that unbinds it from the kitchens fails
+// HERE rather than as a silent green.
+const KITCHENS_RECIPE_ID = 'recipe_hunters_game_skewer';
+function mustKitchensRecipe() {
+  const recipe = ALL_RECIPES.find((r) => r.id === KITCHENS_RECIPE_ID);
+  if (!recipe) throw new Error(`${KITCHENS_RECIPE_ID} missing from ALL_RECIPES`);
+  if (recipe.stationType !== 'kitchens') {
+    throw new Error(`${KITCHENS_RECIPE_ID} is no longer kitchens-bound`);
+  }
+  return recipe;
+}
+
+/** Teach the cooking recipe and grant exactly its own reagent list. */
+function readyKitchensCrafter(sim: Sim, pid: number) {
+  const recipe = mustKitchensRecipe();
+  metaOf(sim, pid).knownRecipes.add(recipe.id);
+  for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
+  return recipe;
+}
+
+function makeParty(sim: Sim, ...pids: number[]) {
+  const [leader, ...rest] = pids;
+  for (const pid of rest) {
+    sim.partyInvite(pid, leader);
+    sim.partyAccept(pid);
+  }
+}
+
+// A spot far outside every static station circle, so any station-gate pass in
+// these tests is attributable to the mobile arms alone (asserted per test via
+// isAtStation, not assumed from the coordinate).
+const FIELD = { x: 5000, z: 5000 };
+
+// Synthetic use-item carrying the new placeMobileStation ItemUse arm,
+// injected into the live ITEMS table (the equip_drop_core.test.ts precedent).
+// A test-owned id, deliberately NOT the shipped Master's Field Forge def:
+// this file pins the PLUMBING, the content row is another suite's surface.
+const TEST_FORGE_ID = 'test_field_forge_plumbing';
+const TEST_FORGE_NAME = 'Test Field Forge';
+
+beforeAll(() => {
+  ITEMS[TEST_FORGE_ID] = {
+    id: TEST_FORGE_ID,
+    name: TEST_FORGE_NAME,
+    kind: 'tool',
+    use: { type: 'placeMobileStation', stationCraftId: 'weaponcrafting' },
+    sellValue: 1,
+  } as ItemDef;
+});
+
+afterAll(() => {
+  delete ITEMS[TEST_FORGE_ID];
+});
+
+describe("Master's Field Forge item placement (placeMobileStation ItemUse)", () => {
+  it('useItem places a partyShared forge-craft station with NO specialization gate', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const m = metaOf(sim, a);
+    // The live specialization gate really would refuse this player: the item
+    // path bypassing it is a behavior difference, not a dead gate.
+    expect(isSpecialized(m.craftSkills, 'weaponcrafting')).toBe(false);
+    expect(placeMobileStationForPlayer(simCtx(sim), 'weaponcrafting', a)).toBeUndefined();
+    expect(m.mobileStation).toBeNull();
+
+    teleport(sim, a, FIELD.x, FIELD.z);
+    grantItem(sim, TEST_FORGE_ID, 1, a);
+    drainEvents(sim);
+    sim.useItem(TEST_FORGE_ID, a);
+
+    const station = m.mobileStation;
+    expect(station).not.toBeNull();
+    expect(station.partyShared).toBe(true);
+    expect(station.craftId).toBe('weaponcrafting');
+    // The craft identity resolves to the forge through the live mapping.
+    expect(stationTypeForCraft(station.craftId)).toBe('forge');
+    expect(station.pos).toEqual({ x: FIELD.x, z: FIELD.z });
+    // A permanent tool: the use never consumes the item.
+    expect(sim.countItem(TEST_FORGE_ID, a)).toBe(1);
+    // Success is never silent: the one scroll-pattern log line, exactly once
+    // (matched by log.placeStationThe in src/ui/sim_i18n.ts). Pinned as the WHOLE
+    // set of set-up lines rather than a count of matches, so a second, differently
+    // worded placement line cannot ride along unnoticed beside the right one.
+    // The article is name-aware (phase 14): an article-free name gains "the".
+    expect(setUpLines(sim)).toEqual([`You set up the ${TEST_FORGE_NAME}.`]);
+  });
+
+  it('the article is name-aware: a "The ..." item never doubles it, a bare name gains it', () => {
+    // The Laden Hearth is the shipped name that made the phase 09 article
+    // omission visible: unconditionally gluing "the" on produced "You set up
+    // the The Laden Hearth." The phase 14 polish keeps the bare line for a
+    // name that begins with an article and adds "the" for one that does not
+    // (the article-free form read as a dropped word: "You set up Master's
+    // Field Forge."). Each arm is its own emit literal with its own matcher.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, FIELD.x, FIELD.z);
+    drainEvents(sim);
+    placeMobileStationFromItem(simCtx(sim), 'cooking', ITEMS.laden_hearth.name, a);
+
+    expect(setUpLines(sim)).toEqual(['You set up The Laden Hearth.']);
+
+    // The indefinite articles hold the same rule (per-dimension negatives:
+    // "An" must not become "the An ..."), case-insensitively.
+    drainEvents(sim);
+    placeMobileStationFromItem(simCtx(sim), 'cooking', 'An Elder Kiln', a);
+    expect(setUpLines(sim)).toEqual(['You set up An Elder Kiln.']);
+
+    // And the predicate itself: an article PREFIX inside a word never counts.
+    expect(nameCarriesOwnArticle('The Laden Hearth')).toBe(true);
+    expect(nameCarriesOwnArticle('a travelling forge')).toBe(true);
+    expect(nameCarriesOwnArticle("Master's Field Forge")).toBe(false);
+    expect(nameCarriesOwnArticle('Anvil of Dawn')).toBe(false);
+    expect(nameCarriesOwnArticle('Theron Kiln')).toBe(false);
+  });
+
+  it('placement draws zero rng', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, FIELD.x, FIELD.z);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
+    const station = placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, a);
+    (sim as any).rng.setObserver(null);
+    expect(station).toBeDefined();
+    expect(draws).toBe(0);
+  });
+
+  it('is deterministic: the same seed and commands place and craft identically twice', () => {
+    const run = () => {
+      const sim = makeWorld(7);
+      const a = sim.addPlayer('warrior', 'Aleph');
+      const b = sim.addPlayer('priest', 'Bet');
+      makeParty(sim, a, b);
+      for (let i = 0; i < 10; i++) sim.tick();
+      teleport(sim, b, FIELD.x, FIELD.z);
+      const station = placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, b);
+      teleport(sim, a, FIELD.x + 10, FIELD.z);
+      readyForgeCrafter(sim, a);
+      const result = resolveCraft(simCtx(sim), a, FORGE_RECIPE_ID);
+      return { station, ok: result.ok, mst: sim.activeMobileStationCraftsFor(a) };
+    };
+    const first = run();
+    // The anchor is the live tick at placement, not a wall clock: 10 ticks in
+    // on both runs, so both records agree without ever reading Date.now.
+    expect(first.station?.placedAtTick).toBe(10);
+    expect(first.ok).toBe(true);
+    expect(first.mst).toEqual(['weaponcrafting']);
+    expect(run()).toEqual(first);
+  });
+
+  it('the item path is dead-gated: exactly one while-dead refusal, slot untouched', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, FIELD.x, FIELD.z);
+    grantItem(sim, TEST_FORGE_ID, 1, a);
+    const e = (sim as any).entities.get(a);
+    e.hp = 0;
+    e.dead = true;
+    drainEvents(sim);
+    sim.useItem(TEST_FORGE_ID, a);
+    const events = drainEvents(sim);
+    const deadErrors = events.filter(
+      (ev) => ev.type === 'error' && ev.text === "You can't do that while dead.",
+    );
+    expect(deadErrors.length).toBe(1);
+    // No placement, no success line, and the permanent tool survives.
+    expect(metaOf(sim, a).mobileStation).toBeNull();
+    expect(events.some((ev) => ev.type === 'log')).toBe(false);
+    expect(sim.countItem(TEST_FORGE_ID, a)).toBe(1);
+  });
+
+  it('item and specialization placements clobber each other: the slot holds the newer record', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, FIELD.x, FIELD.z);
+    metaOf(sim, a).craftSkills.cooking = 75;
+    const legacy = placeMobileStationForPlayer(simCtx(sim), 'cooking', a);
+    expect(legacy).toBeDefined();
+    expect(metaOf(sim, a).mobileStation).toBe(legacy);
+
+    // The item placement OVERWRITES the active specialization station...
+    const shared = placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, a);
+    expect(shared).toBeDefined();
+    expect(metaOf(sim, a).mobileStation).toBe(shared);
+    expect(metaOf(sim, a).mobileStation.partyShared).toBe(true);
+    // ...and the old grant is GONE with it: the set carries only the newer craft.
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['weaponcrafting']);
+
+    // The reverse clobber: a new specialization placement replaces the shared
+    // one, and the shared grant is gone.
+    const legacyAgain = placeMobileStationForPlayer(simCtx(sim), 'cooking', a);
+    expect(legacyAgain).toBeDefined();
+    expect(metaOf(sim, a).mobileStation).toBe(legacyAgain);
+    expect(metaOf(sim, a).mobileStation.partyShared).toBe(false);
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['cooking']);
+  });
+});
+
+describe('crafting station gate: the partyShared arm', () => {
+  it('a party member crafts a forge recipe within STATION_RADIUS of the shared forge', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+    teleport(sim, b, FIELD.x, FIELD.z);
+    expect(
+      placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, b),
+    ).toBeDefined();
+
+    teleport(sim, a, FIELD.x + STATION_RADIUS - 2, FIELD.z);
+    const recipe = readyForgeCrafter(sim, a);
+    // The pass below is attributable to the party arm alone: no static forge
+    // in reach, and the crafter has no station of their own.
+    const crafterPos = (sim as any).entities.get(a).pos;
+    expect(isAtStation(STATIONS, crafterPos, 'forge')).toBe(false);
+    expect(metaOf(sim, a).mobileStation).toBeNull();
+
+    const result = resolveCraft(simCtx(sim), a, FORGE_RECIPE_ID);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem(recipe.resultItemId, a)).toBe(1);
+  });
+
+  it('crafts at exactly STATION_RADIUS from the shared station, refused one unit past', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+    teleport(sim, b, FIELD.x, FIELD.z);
+    expect(
+      placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, b),
+    ).toBeDefined();
+
+    // ON the boundary: the gate is <=, so exactly STATION_RADIUS away crafts.
+    teleport(sim, a, FIELD.x + STATION_RADIUS, FIELD.z);
+    const recipe = readyForgeCrafter(sim, a);
+    expect(resolveCraft(simCtx(sim), a, FORGE_RECIPE_ID).ok).toBe(true);
+
+    // One unit past: denied, consuming nothing.
+    teleport(sim, a, FIELD.x + STATION_RADIUS + 1, FIELD.z);
+    readyForgeCrafter(sim, a);
+    const denied = resolveCraft(simCtx(sim), a, FORGE_RECIPE_ID);
+    expect(denied.ok).toBe(false);
+    expect(denied.reason).toBe('station_required');
+    for (const reagent of recipe.reagents) {
+      expect(sim.countItem(reagent.itemId, a)).toBe(reagent.count);
+    }
+  });
+
+  it('a NON-party player standing beside the shared forge is refused', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    const c = sim.addPlayer('rogue', 'Gimel');
+    makeParty(sim, a, b); // c stays outside the party
+    teleport(sim, b, FIELD.x, FIELD.z);
+    expect(
+      placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, b),
+    ).toBeDefined();
+
+    teleport(sim, c, FIELD.x + 1, FIELD.z);
+    readyForgeCrafter(sim, c);
+    const result = resolveCraft(simCtx(sim), c, FORGE_RECIPE_ID);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('station_required');
+  });
+
+  it('a shared station of a FOREIGN-type craft never satisfies a forge recipe', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+    teleport(sim, b, FIELD.x, FIELD.z);
+    // alchemy maps to the apothecary, verified against the live mapping so a
+    // content remap fails HERE, not as a silent green elsewhere. The cooking
+    // row rides beside it because the two shipped capstones (Grand Cauldron and
+    // The Laden Hearth) are the SAME placement code pointed at different
+    // crafts: if either mapping moved, one capstone would quietly open the
+    // wrong station and only this line would say so.
+    expect(stationTypeForCraft('alchemy')).toBe('apothecary');
+    expect(stationTypeForCraft('cooking')).toBe('kitchens');
+    expect(placeMobileStationFromItem(simCtx(sim), 'alchemy', 'Test Field Still', b)).toBeDefined();
+
+    teleport(sim, a, FIELD.x + 1, FIELD.z);
+    readyForgeCrafter(sim, a);
+    const result = resolveCraft(simCtx(sim), a, FORGE_RECIPE_ID);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('station_required');
+    // The crafts SET still carries the craft under its own identity: the set
+    // carries crafts, and the type mapping happens in inRangeStationTypes.
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['alchemy']);
+    const types = inRangeStationTypes(STATIONS, (sim as any).entities.get(a).pos, ['alchemy']);
+    expect(types.has('apothecary')).toBe(true);
+    expect(types.has('forge')).toBe(false);
+  });
+
+  it('the SHIPPED Grand Cauldron, used from the bags, opens alchemy for a party member', () => {
+    // The end-to-end capstone arm, and the one that runs the real content row
+    // rather than this file's synthetic plumbing item: the shipped
+    // grand_cauldron def, through sim.useItem, satisfying a real
+    // apothecary-bound recipe for a DIFFERENT player standing in range. Every
+    // other arm here exercises the machinery with a test-owned id, so nothing
+    // yet proved the authored def is wired to it.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+
+    // The premise, read off the live def: a placement tool pointed at alchemy.
+    expect(ITEMS.grand_cauldron.use).toEqual({
+      type: 'placeMobileStation',
+      stationCraftId: 'alchemy',
+    });
+
+    teleport(sim, b, FIELD.x, FIELD.z);
+    grantItem(sim, 'grand_cauldron', 1, b);
+    sim.useItem('grand_cauldron', b);
+    expect(metaOf(sim, b).mobileStation?.craftId, 'the placement landed').toBe('alchemy');
+    expect(metaOf(sim, b).mobileStation?.partyShared).toBe(true);
+
+    // The MEMBER, in range but not the owner, gets the craft gate and the
+    // readout the crafting window paints from. Both, because the row set is
+    // what tells the member the station is there at all.
+    teleport(sim, a, FIELD.x + 1, FIELD.z);
+    readyApothecaryCrafter(sim, a);
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['alchemy']);
+    const result = resolveCraft(simCtx(sim), a, APOTHECARY_RECIPE_ID);
+    expect(result.ok, 'the party member crafts off the shared cauldron').toBe(true);
+
+    // A permanent tool: the capstone is never consumed by placing it.
+    expect(sim.countItem('grand_cauldron', b), 'the cauldron survives its own use').toBe(1);
+  });
+
+  it('the SHIPPED Laden Hearth, used from the bags, opens cooking for a party member', () => {
+    // The cauldron arm's twin, and not redundant with it: the two capstones are
+    // the same placement code pointed at DIFFERENT crafts, and only the cauldron
+    // was ever driven end to end. A def whose stationCraftId slipped (or a
+    // kitchens mapping that moved) would open the wrong station for the whole
+    // cooking half with every other arm here still green.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+
+    // The premise, read off the live def: a placement tool pointed at cooking.
+    expect(ITEMS.laden_hearth.use).toEqual({
+      type: 'placeMobileStation',
+      stationCraftId: 'cooking',
+    });
+
+    teleport(sim, b, FIELD.x, FIELD.z);
+    grantItem(sim, 'laden_hearth', 1, b);
+    sim.useItem('laden_hearth', b);
+    expect(metaOf(sim, b).mobileStation?.craftId, 'the placement landed').toBe('cooking');
+    expect(metaOf(sim, b).mobileStation?.partyShared).toBe(true);
+
+    // The MEMBER, in range but not the owner, gets the kitchens craft gate and
+    // the readout the crafting window paints its row set from.
+    teleport(sim, a, FIELD.x + 1, FIELD.z);
+    const recipe = readyKitchensCrafter(sim, a);
+    const crafterPos = (sim as any).entities.get(a).pos;
+    expect(isAtStation(STATIONS, crafterPos, 'kitchens'), 'no static kitchen in reach').toBe(false);
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['cooking']);
+    const result = resolveCraft(simCtx(sim), a, KITCHENS_RECIPE_ID);
+    expect(result.ok, 'the party member cooks off the shared hearth').toBe(true);
+    expect(sim.countItem(recipe.resultItemId, a)).toBe(recipe.resultCount);
+
+    // A permanent tool: the capstone is never consumed by placing it.
+    expect(sim.countItem('laden_hearth', b), 'the hearth survives its own use').toBe(1);
+  });
+
+  it('a cook holding a live Laden Hearth cooks the Harvest Feast away from any kitchen (11c pairing pin)', () => {
+    // The already-true pairing, pinned so it cannot silently break (11c:
+    // recipe_harvest_feast carries stationType kitchens, STATION_TYPE_BY_CRAFT
+    // maps cooking there, the Hearth places a cooking station, and the craft
+    // gate satisfies a kitchens recipe from the live mobile station), which is
+    // exactly the flavor the guide's cooking prose promises: dinner, and the
+    // feast that seeds it, get cooked at the dungeon door. Every input is read
+    // off the live recipe so a re-tier or bill edit re-aims this pin by itself.
+    const sim = makeWorld();
+    const cook = sim.addPlayer('warrior', 'Aleph');
+    const recipe = ALL_RECIPES.find((r) => r.id === 'recipe_harvest_feast');
+    expect(recipe, 'the feast recipe exists').toBeDefined();
+    if (!recipe) return;
+    expect(recipe.stationType, 'the feast recipe is kitchens-bound').toBe('kitchens');
+
+    teleport(sim, cook, FIELD.x, FIELD.z);
+    grantItem(sim, 'laden_hearth', 1, cook);
+    sim.useItem('laden_hearth', cook);
+    expect(metaOf(sim, cook).mobileStation?.craftId, 'the field kitchen stands').toBe('cooking');
+
+    metaOf(sim, cook).knownRecipes.add(recipe.id);
+    metaOf(sim, cook).craftSkills.cooking = recipe.skillReq;
+    for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, cook);
+    const crafterPos = (sim as any).entities.get(cook).pos;
+    expect(isAtStation(STATIONS, crafterPos, 'kitchens'), 'no static kitchen in reach').toBe(false);
+    const result = resolveCraft(simCtx(sim), cook, recipe.id);
+    expect(result.ok, 'the feast cooks at the field kitchen').toBe(true);
+    expect(sim.countItem(recipe.resultItemId, cook)).toBe(recipe.resultCount);
+  });
+
+  it('regression: a legacy specialization placement stays owner-only for party members', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+    teleport(sim, b, FIELD.x, FIELD.z);
+    metaOf(sim, b).craftSkills.weaponcrafting = 75; // specialized: placement is gated on it
+    const station = placeMobileStationForPlayer(simCtx(sim), 'weaponcrafting', b);
+    expect(station).toBeDefined();
+    // The discriminator, not an absent field: specialization placements set
+    // owner-only explicitly.
+    expect(station?.partyShared).toBe(false);
+
+    // Right beside the owner, same party, type-matched recipe: still refused.
+    teleport(sim, a, FIELD.x + 1, FIELD.z);
+    readyForgeCrafter(sim, a);
+    expect(resolveCraft(simCtx(sim), a, FORGE_RECIPE_ID).reason).toBe('station_required');
+
+    // The OWNER's own gate is untouched by the widening: b still crafts.
+    readyForgeCrafter(sim, b);
+    expect(resolveCraft(simCtx(sim), b, FORGE_RECIPE_ID).ok).toBe(true);
+  });
+
+  it('expiry ends the party grant', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+    teleport(sim, b, FIELD.x, FIELD.z);
+    const station = placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, b);
+    expect(station).toBeDefined();
+    if (!station) return;
+
+    teleport(sim, a, FIELD.x + 5, FIELD.z);
+    readyForgeCrafter(sim, a);
+    expect(resolveCraft(simCtx(sim), a, FORGE_RECIPE_ID).ok).toBe(true);
+
+    // Shorten the window to the next tick and cross it with a REAL tick, so
+    // the expiry is exercised in the tick domain rather than rewritten into
+    // the past (isStationActive is a strict < on expiresAtTick).
+    station.expiresAtTick = sim.tickCount + 1;
+    sim.tick();
+    readyForgeCrafter(sim, a);
+    expect(resolveCraft(simCtx(sim), a, FORGE_RECIPE_ID).reason).toBe('station_required');
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual([]);
+  });
+});
+
+describe('activeMobileStationCraftsFor set arms', () => {
+  it('own only is a one-craft set; a DIFFERENT-craft in-range shared station joins it, sorted', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+    teleport(sim, a, FIELD.x, FIELD.z);
+    metaOf(sim, a).craftSkills.cooking = 75;
+    expect(placeMobileStationForPlayer(simCtx(sim), 'cooking', a)).toBeDefined();
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['cooking']);
+
+    // The arm that kills the old single-id shadowing: the shared craft joins
+    // the own craft instead of being hidden behind it, sorted order.
+    teleport(sim, b, FIELD.x + 2, FIELD.z);
+    expect(
+      placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, b),
+    ).toBeDefined();
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['cooking', 'weaponcrafting']);
+  });
+
+  it('an own craft equal to an in-range shared craft dedupes to one entry', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+    teleport(sim, a, FIELD.x, FIELD.z);
+    teleport(sim, b, FIELD.x + 2, FIELD.z);
+    expect(
+      placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, b),
+    ).toBeDefined();
+    metaOf(sim, a).craftSkills.weaponcrafting = 75;
+    expect(placeMobileStationForPlayer(simCtx(sim), 'weaponcrafting', a)).toBeDefined();
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['weaponcrafting']);
+  });
+
+  it('every in-range shared station contributes: no nearest pick, no tie-break', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    const c = sim.addPlayer('rogue', 'Gimel');
+    makeParty(sim, a, b, c);
+    // Two shared stations 18 units apart with distinct craft ids: under the
+    // retired nearest rule only one could surface; the set carries both.
+    teleport(sim, b, FIELD.x, FIELD.z);
+    expect(
+      placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, b),
+    ).toBeDefined();
+    teleport(sim, c, FIELD.x + 18, FIELD.z);
+    expect(
+      placeMobileStationFromItem(simCtx(sim), 'armorcrafting', 'Test Field Anvil', c),
+    ).toBeDefined();
+
+    teleport(sim, a, FIELD.x + 4, FIELD.z); // 4 from b's, 14 from c's: both in range
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['armorcrafting', 'weaponcrafting']);
+  });
+
+  it('in range AT the boundary, absent beyond it, and never a legacy station', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+    teleport(sim, b, FIELD.x, FIELD.z);
+    expect(
+      placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', TEST_FORGE_NAME, b),
+    ).toBeDefined();
+
+    // The gate is <=: exactly STATION_RADIUS away is still in the set.
+    teleport(sim, a, FIELD.x + STATION_RADIUS, FIELD.z);
+    const atBoundary = sim.activeMobileStationCraftsFor(a);
+    expect(atBoundary).toEqual(['weaponcrafting']);
+    // The non-empty array is FROZEN like the ClientWorld mirror's split
+    // result (tests/snapshots.test.ts pins the online half), so both IWorld
+    // implementations hand consumers one array contract: a mutation throws
+    // in either world instead of succeeding offline only.
+    expect(Object.isFrozen(atBoundary)).toBe(true);
+    teleport(sim, a, FIELD.x + STATION_RADIUS + 1, FIELD.z);
+    // The empty case allocates nothing: the frozen module constant, returned
+    // by identity on every empty resolve.
+    const empty = sim.activeMobileStationCraftsFor(a);
+    expect(empty).toEqual([]);
+    expect(Object.isFrozen(empty)).toBe(true);
+    expect(sim.activeMobileStationCraftsFor(a)).toBe(empty);
+
+    // A legacy owner-only station never joins a party member's set, however
+    // close: replace b's shared station with a specialization placement.
+    metaOf(sim, b).craftSkills.weaponcrafting = 75;
+    expect(placeMobileStationForPlayer(simCtx(sim), 'weaponcrafting', b)).toBeDefined();
+    teleport(sim, a, FIELD.x + 1, FIELD.z);
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual([]);
+  });
+});
+
+// The name-aware article above is pinned in English only, and English is the
+// one locale where the matcher's own regexes cannot be caught out: the general
+// /^You set up (.+)\.$/ rule would capture an articled sentence as
+// "the <name>", which no item name resolves, so the articled arm has its OWN
+// rule (log.placeStationThe) registered ahead of it. Both arms' emit-to-matcher
+// chains only show their localization once run through a non-English locale.
+describe('the set-up line round trips through a real locale', () => {
+  // ja_JP is picked because the shipped overlay already carries an
+  // entities.items.laden_hearth.name fill; en_XA is URL-param-only and not
+  // selectable here. The fixture premise (a name that really differs from the
+  // English one) is asserted rather than assumed, so a locale that lost the fill
+  // fails loudly instead of passing on an English-equals-English comparison.
+  const LOCALE = 'ja_JP' as const;
+
+  afterEach(() => {
+    setLanguage('en');
+  });
+
+  it('localizes the item name inside the REAL emit, end to end, leaving no English behind', async () => {
+    await ensureLocaleLoaded(LOCALE);
+    setLanguage(LOCALE);
+    const english = ITEMS.laden_hearth.name;
+    const localized = tEntity({ kind: 'item', id: 'laden_hearth', field: 'name' });
+    expect(localized, 'the fixture locale really translates this item').not.toBe(english);
+
+    // The sentence comes off the sim's own log event for a real placement, not
+    // a test-composed string, so this pins the emit-to-matcher chain and not
+    // the matcher alone.
+    const sim = makeWorld();
+    const b = sim.addPlayer('priest', 'Bet');
+    teleport(sim, b, FIELD.x, FIELD.z);
+    grantItem(sim, 'laden_hearth', 1, b);
+    drainEvents(sim);
+    sim.useItem('laden_hearth', b);
+    const [line] = setUpLines(sim);
+    expect(line, 'the placement logged its set-up line').toBe(`You set up ${english}.`);
+
+    const out = localizeSimText(line);
+    expect(out, 'the matcher recognized the line').not.toBeNull();
+    expect(out, 'the localized name reached the sentence').toContain(localized);
+    expect(out, 'no English name left in the localized line').not.toContain(english);
+  });
+
+  it('the ARTICLED arm localizes end to end too, off its own matcher rule', async () => {
+    // The phase 14 arm: an article-free name (Master's Field Forge) now emits
+    // "You set up the {name}.", and that sentence must resolve through the
+    // dedicated log.placeStationThe rule, whose capture is the bare name, so
+    // the localized line carries the localized item name and no English. This
+    // replaces the old CHARACTERIZATION arm that recorded the doubled-article
+    // capture failure: the articled sentence is now a first-class emit with
+    // its own rule, so the failure mode it recorded no longer exists.
+    await ensureLocaleLoaded(LOCALE);
+    setLanguage(LOCALE);
+    const english = ITEMS.masters_field_forge.name;
+    const localized = tEntity({ kind: 'item', id: 'masters_field_forge', field: 'name' });
+    expect(localized, 'the fixture locale really translates this item').not.toBe(english);
+
+    const sim = makeWorld();
+    const b = sim.addPlayer('priest', 'Bet');
+    teleport(sim, b, FIELD.x, FIELD.z);
+    drainEvents(sim);
+    placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', english, b);
+    const [line] = setUpLines(sim);
+    expect(line, 'the placement logged the articled line').toBe(`You set up the ${english}.`);
+
+    const out = localizeSimText(line);
+    expect(out, 'the matcher recognized the articled line').not.toBeNull();
+    expect(out, 'the localized name reached the sentence').toContain(localized);
+    expect(out, 'no English name left in the localized line').not.toContain(english);
+  });
+});

@@ -310,8 +310,12 @@ describe('hidden-state wire invariant', () => {
     const b = run(777);
     expect(a.delay).not.toBe(b.delay); // genuinely different hidden delays
     expect(a.stream).toEqual(b.stream); // identical broadcastable fields
-    expect(a.stream[0][0]).toBe(15);
-    expect(a.stream[114][0]).toBe(15);
+    // 16 since masterwrought Phase 11i took the defensive fishing session cap
+    // up a second (professions/fishing.ts): what this arm cares about is that
+    // the WIRE value is identical across two sims whose hidden delays differ,
+    // and the cap is the value it reads.
+    expect(a.stream[0][0]).toBe(16);
+    expect(a.stream[114][0]).toBe(16);
   });
 
   it('no wire snapshot carries fishBiteAtTick, fishReelDeadlineTick, fishCastZoneId, gatherCastNodeId, gatherCastToolRarity, or gatherCastEffectConfirmed', () => {

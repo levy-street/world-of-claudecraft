@@ -281,8 +281,26 @@
 
     <div id="party-frames" role="group" data-i18n-aria="hudChrome.unitFrame.partyLabel" aria-label="Your Band"></div>
 
-    <div id="buff-bar"></div>
-    <div id="debuff-bar"></div>
+    <div id="aura-stack">
+      <div id="buff-bar"></div>
+      <div id="debuff-bar"></div>
+    </div>
+
+    <!-- Target dots: every debuff YOU have out, across every enemy in range. The
+         painter builds its rows and sets role/aria-label; it stays display:none
+         whenever the list is empty. -->
+    <div id="target-dots"></div>
+
+    <!-- Aura tracks: the player's own beneficial auras, one movable frame per
+         question (see src/ui/hud/aura_tracks/). Each painter builds its rows and
+         sets role/aria-label; each stays display:none while its track is empty
+         or its setting is off. -->
+    <div id="aura-track-defensives"></div>
+    <div id="aura-track-self"></div>
+    <div id="aura-track-power"></div>
+    <div id="aura-track-utility"></div>
+    <div id="aura-track-friendly"></div>
+    <div id="aura-track-shields"></div>
 
     <div id="ctx-menu" class="panel"></div>
     <div id="prompt-stack"></div>
@@ -345,14 +363,19 @@
     </nav>
 
     <div id="right-tracker-stack">
-      <div id="quest-tracker"></div>
+      <div id="quest-tracker"><div id="qt-body"></div></div>
       <div id="deed-tracker"></div>
       <div id="reliquary-tracker"></div>
-      <div id="delve-tracker"></div>
-      <div id="rift-tracker"></div>
+      <div id="delve-tracker"><div id="delve-body"></div></div>
+      <div id="rift-tracker"><div id="rift-body"></div></div>
+      <div id="practice-tracker"></div>
+      <div id="hub-lesson-coach"></div>
+      <div id="gathering-goal-tracker" class="gathering-goal-panel">
+        <div id="gathering-goal-body"></div>
+      </div>
     </div>
 
-    <div class="paladin-devotion-frame" id="paladin-devotion-frame" role="group" tabindex="0" data-i18n-aria="hudChrome.paladin.devotion" aria-label="Devotion">
+    <div class="paladin-devotion-frame" id="paladin-devotion-frame" role="group" data-i18n-aria="hudChrome.paladin.devotion" aria-label="Devotion">
       <div class="paladin-devotion" id="paladin-devotion" role="progressbar" data-i18n-aria="hudChrome.paladin.devotion" aria-label="Devotion" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0">
         <div class="paladin-devotion-fill" id="paladin-devotion-fill"></div>
         <div class="paladin-devotion-label" id="paladin-devotion-label"></div>
@@ -544,6 +567,7 @@
     <div id="bg-proposal-popup" class="panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
     <div id="guild-board-window" class="window panel"></div>
+    <div id="rift-forge-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel"></div>
     <div id="claudium-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
@@ -552,7 +576,12 @@
     <div id="bank-window" class="window panel"></div>
     <div id="deeds-window" class="window panel"></div>
     <div id="reliquary-window" class="window panel"></div>
+    <div id="loot-explorer-window" class="window panel"></div>
+    <div id="cosmetics-window" class="window panel"></div>
     <div id="professions-window" class="window panel"></div>
+    <div id="harvest-journal-window" class="window panel"></div>
+    <div id="plant-sheet-window" class="window panel"></div>
+    <div id="harvest-preference-window" class="window panel"></div>
     <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
     <div id="options-menu" class="window panel"></div>
@@ -568,13 +597,17 @@
         <button type="button" class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
         <button type="button" class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
         <button type="button" class="micro-btn" id="mm-reliquary" data-i18n-title="hudChrome.reliquary.title" data-i18n-aria="hudChrome.reliquary.title" title="The Reliquary" aria-label="The Reliquary" data-icon="crown"><span class="keybind">s-x</span></button>
+        <button type="button" class="micro-btn" id="mm-loot-explorer" data-i18n-title="hudChrome.lootExplorer.title" data-i18n-aria="hudChrome.lootExplorer.title" title="Loot Explorer" aria-label="Loot Explorer" data-icon="chest"><span class="keybind">s-o</span></button>
         <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="keybind">s-p</span></button>
+        <button type="button" class="micro-btn" id="mm-harvest-journal" data-i18n-title="hudChrome.harvestJournal.title" data-i18n-aria="hudChrome.harvestJournal.title" title="Harvest Journal" aria-label="Harvest Journal" data-icon="harvest-journal"><span class="keybind">s-k</span></button>
         <button type="button" class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
         <button type="button" class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
         <button type="button" class="micro-btn" id="mm-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>
+        <button type="button" class="micro-btn" id="mm-perfecting" data-i18n-title="hudChrome.perfecting.title" data-i18n-aria="hudChrome.perfecting.title" title="Perfecting" aria-label="Perfecting" data-icon="perfecting"><span class="keybind">s-t</span></button>
       </div>
       <div id="side-buttons-col-b" class="side-buttons-col">
-        <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
+        <button id="daily-rewards-button" class="micro-btn" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
+        <button type="button" class="micro-btn" id="mm-cosmetics" data-i18n-title="hudChrome.cosmetics.title" data-i18n-aria="hudChrome.cosmetics.title" title="Cosmetics" aria-label="Cosmetics" data-icon="mount"><span class="keybind">s-y</span></button>
         <button type="button" class="micro-btn" id="mm-arena" data-i18n-title="hudChrome.pvp.launcherTitle" data-i18n-aria="hudChrome.pvp.launcherTitle" title="PvP: Thornhollow Fields and the Arenas" aria-label="PvP: Thornhollow Fields and the Arenas" data-icon="arena"><span class="keybind">g</span></button>
         <button type="button" class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
         <button type="button" class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
@@ -606,6 +639,12 @@
       <button type="button" class="btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
       <button type="button" class="btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
     </div>
+    <!-- Interact affordance: a small non-blocking line, hidden until an interact press
+         is ambiguous between two farming targets in reach (a placed feast over a garden
+         bed). role=status so a screen reader hears the ambiguity the sighted line shows;
+         it carries no authored text because every sentence is localized at paint time by
+         src/ui/hud/professions/farm_press_affordance_controller.ts. -->
+    <div id="interact-affordance" role="status" aria-live="polite"></div>
   </div>
 
   <textarea id="chat-input" rows="1" maxlength="255" data-i18n-placeholder="hud.core.chatPlaceholder" placeholder="Say something... (/w name, /r, /p, /gu, /o, /general, /join world|lfg, /afk, /dnd)" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other"></textarea>
@@ -839,18 +878,6 @@
                tours / E2E scripts use to drive the online & offline flows directly. -->
           <button type="button" id="btn-online" class="play-compat-trigger" tabindex="-1" aria-hidden="true"></button>
           <button type="button" id="btn-offline" class="play-compat-trigger" tabindex="-1" aria-hidden="true"></button>
-
-          <div id="token-ca">
-            <span class="token-ca-label" data-i18n="mode.caLabel">$WOC Contract Address</span>
-            <button type="button" id="btn-copy-ca" class="token-ca-pill" data-ca="3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth" data-i18n-aria="mode.caCopyAria" aria-label="Copy contract address">
-              <code class="token-ca-addr">3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth</code>
-              <span class="token-ca-copy" aria-hidden="true">
-                <svg class="icon-clipboard" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                <svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              </span>
-            </button>
-            <p class="token-ca-note" data-i18n="mode.caNote">WOC is our community token. It is not needed to play. Join Discord to discuss the WOC utility and flywheel.</p>
-          </div>
 
           <!-- Tip — part of the same play container (divider above). -->
           <div class="play-tip">
@@ -1366,19 +1393,19 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.41.4-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.42.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.41.4-win-x64.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.42.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.41.4-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.42.0-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
@@ -1607,7 +1634,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.41.4</div>
+      <div id="game-version">v0.42.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>
@@ -1809,6 +1836,7 @@
           <button type="button" class="mobile-btn" id="mobile-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="mobile-label" data-i18n="hudChrome.finder.title">Dungeon Finder</span></button>
           <button type="button" class="mobile-btn" id="mobile-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="mobile-label" data-i18n="hud.keybinds.actions.char">Character</span></button>
           <button type="button" class="mobile-btn" id="mobile-bags" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags"><span class="mobile-label" data-i18n="hud.keybinds.actions.bags">Bags</span></button>
+          <button type="button" class="mobile-btn" id="mobile-meters" data-i18n-title="hud.keybinds.actions.meters" data-i18n-aria="hud.keybinds.actions.meters" title="Damage Meters" aria-label="Damage Meters" data-icon="meters"><span class="mobile-label" data-i18n="hud.keybinds.actions.meters">Damage Meters</span></button>
           <button type="button" class="mobile-btn" id="mobile-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="mobile-label" data-i18n="hudChrome.crafting.title">Crafting</span></button>
           <button type="button" class="mobile-btn" id="mobile-spellbook" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="mobile-label" data-i18n="abilityUi.spellbook.title">Spellbook</span></button>
           <button type="button" class="mobile-btn" id="mobile-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="mobile-label" data-i18n="game.talents.title">Talents</span></button>
@@ -1818,6 +1846,7 @@
           <button type="button" class="mobile-btn" id="mobile-wocmarket" hidden data-i18n-title="hudChrome.wocMarket.launcherLabel" data-i18n-aria="hudChrome.wocMarket.launcherLabel" title="$WOC Exchange" aria-label="$WOC Exchange" data-icon="market"><span class="mobile-label" data-i18n="hudChrome.mobile.wocMarket">Exchange</span></button>
           <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
           <button type="button" class="mobile-btn" id="mobile-reliquary" data-i18n-title="hudChrome.reliquary.title" data-i18n-aria="hudChrome.reliquary.title" title="The Reliquary" aria-label="The Reliquary" data-icon="crown"><span class="mobile-label" data-i18n="hudChrome.mobile.reliquary">Reliquary</span></button>
+          <button type="button" class="mobile-btn" id="mobile-loot-explorer" data-i18n-title="hudChrome.lootExplorer.title" data-i18n-aria="hudChrome.lootExplorer.title" title="Loot Explorer" aria-label="Loot Explorer" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.lootExplorer">Loot Explorer</span></button>
           <button type="button" class="mobile-btn" id="mobile-mounts" data-i18n-title="hudChrome.keybinds.mount" data-i18n-aria="hudChrome.keybinds.mount" title="Mount / Dismount" aria-label="Mount / Dismount" data-icon="mount"><span class="mobile-label" data-i18n="hudChrome.mounts.mount">Mount</span></button>
           <button type="button" class="mobile-btn" id="mobile-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="mobile-label" data-i18n="hudChrome.mobile.professions">Professions</span></button>
           <button type="button" class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>

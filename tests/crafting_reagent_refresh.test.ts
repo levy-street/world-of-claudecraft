@@ -24,9 +24,13 @@ import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import type { InvSlot, ItemDef } from '../src/sim/types';
-import { buildCraftingView, craftingReagentSig, type RecipeDefLike } from '../src/ui/crafting_view';
-import { renderCraftingWindow } from '../src/ui/crafting_window';
 import { Hud } from '../src/ui/hud';
+import {
+  buildCraftingView,
+  craftingReagentSig,
+  type RecipeDefLike,
+} from '../src/ui/hud/professions/crafting_view';
+import { renderCraftingWindow } from '../src/ui/hud/professions/crafting_window';
 
 const VIEWER = 'Fernando';
 

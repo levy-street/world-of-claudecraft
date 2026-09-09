@@ -12,9 +12,11 @@
 //      never even begin.
 //   2. The bindOnTrade JSONB persistence round-trip: an armed-unstamped payload
 //      and a stamped payload both survive serializeCharacter -> JSON -> load
-//      byte-identically inside an InvSlot, and an absurd persisted count on an
-//      armed instanced stack load-clamps through the SHARED bags.ts
-//      instancedCountCap ceiling (no bespoke bypass for the new payload shape).
+//      byte-identically inside an InvSlot; resonant_steel is a source-aware
+//      material, so an absurd persisted count refuses the whole load when the
+//      per-source composition no longer sums to it (no bespoke bypass for the
+//      new payload shape), and is tolerated as legacy excess, per-source
+//      bucket intact, when the composition stays internally consistent.
 //   3+4. Online concurrent-cast busy deny + cross-action attribution over a live
 //      GameServer (Craft Cast System Phase 5 retired the shared throttle): a
 //      second profession action while one cast is live denies with ITS OWN
@@ -51,8 +53,6 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import type { ClientWorld } from '../src/net/online';
-import { instancedCountCap } from '../src/sim/bags';
-import { ITEMS } from '../src/sim/data';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { InvSlot, SimEvent } from '../src/sim/types';
 import { bareClient } from './helpers/bare_client';
@@ -256,9 +256,16 @@ describe('online bind-on-trade arc (two sessions, live GameServer)', () => {
     const aSession = tradeSessionFor(server, a.pid);
     const aOffer = aSession?.a === a.pid ? aSession?.offerA : aSession?.offerB;
     // The staged slot carries the armed payload since the per-copy staging
-    // change: the counterparty SEES bind arming before agreeing.
+    // change: the counterparty SEES bind arming before agreeing. The single
+    // unit is unrecorded provenance (no gatherer, no signer), stated exactly
+    // as its own source bucket rather than dropped from the comparison.
     expect(aOffer?.items).toEqual([
-      { itemId: SECONDARY, count: 1, instance: { bindOnTrade: true } },
+      {
+        itemId: SECONDARY,
+        count: 1,
+        instance: { bindOnTrade: true },
+        materialSources: [{ source: {}, count: 1 }],
+      },
     ]);
     cmd(server, a, { cmd: 'trade_cancel' });
   });
@@ -296,7 +303,7 @@ describe('bindOnTrade persistence round-trip (serialize -> JSONB -> load)', () =
     expect(stamped?.count).toBe(1);
   });
 
-  it('an absurd persisted count on an armed instanced stack load-clamps through the SHARED instancedCountCap', () => {
+  it('an absurd persisted count on an armed instanced stack refuses the load unless the composition stays internally consistent (no bespoke bypass for the new payload shape)', () => {
     const src = freshSim();
     const pid = src.addPlayer('warrior', 'Src');
     src.ctx.addItemInstance(SECONDARY, { bindOnTrade: true }, pid);
@@ -304,24 +311,47 @@ describe('bindOnTrade persistence round-trip (serialize -> JSONB -> load)', () =
     const state = src.serializeCharacter(pid);
     if (!state) throw new Error('serializeCharacter returned null');
     const wire = JSON.parse(JSON.stringify(state)) as typeof state;
-    // Tamper: inflate the armed stack's persisted count far past any legitimate
-    // merge could build.
+    // Tamper: inflate ONLY the top-level count, past any legitimate merge
+    // could build, while leaving the persisted per-source composition (one
+    // unrecorded unit) untouched. resonant_steel is now a source-aware
+    // material (an enchanting reagent), so the shared bags.ts
+    // instancedCountCap ceiling that clamps a NON-material instanced stack
+    // never runs for it (materials tolerate legacy excess; packing applies
+    // the cap on every later grant, never on raw load). What DOES run is the
+    // exact-composition gate: a top-level count with no matching bucket sum
+    // is an internally inconsistent payload, and the load refuses whole
+    // rather than silently laundering the tamper into a wider stack.
     const tampered = wire.inventory.find((s) => s.itemId === SECONDARY);
     if (!tampered) throw new Error('no persisted resonant_steel slot');
     tampered.count = 9999;
 
     const dst = freshSim(9);
-    const loadedPid = dst.addPlayer('warrior', 'Dst', { state: wire });
-    const loaded = (dst.ctx.resolve(loadedPid)?.meta.inventory ?? []).find(
+    const before = dst.ctx.players.size;
+    expect(() => dst.addPlayer('warrior', 'Dst', { state: wire })).toThrow(
+      /material source state is invalid; refusing character load/,
+    );
+    // Nothing was half-created by the refused load.
+    expect(dst.ctx.players.size).toBe(before);
+
+    // The same tamper, but with the composition kept in step (a single
+    // unrecorded bucket honestly claiming the inflated total): the exact
+    // per-source accounting the new model is built on, not a dropped field.
+    const consistent = JSON.parse(JSON.stringify(state)) as typeof state;
+    const consistentSlot = consistent.inventory.find((s) => s.itemId === SECONDARY);
+    if (!consistentSlot) throw new Error('no persisted resonant_steel slot');
+    consistentSlot.count = 9999;
+    (consistentSlot as unknown as InvSlot).materialSources = [{ source: {}, count: 9999 }];
+
+    const dst2 = freshSim(11);
+    const loadedPid = dst2.addPlayer('warrior', 'Dst2', { state: consistent });
+    const loaded = (dst2.ctx.resolve(loadedPid)?.meta.inventory ?? []).find(
       (s) => s.itemId === SECONDARY,
     );
-    // The load consumed the SHARED bags.ts helper: the armed payload is mergeable
-    // (no charges), so it caps at the item's stack size, NOT at 1, and NOT at the
-    // tampered 9999. No bespoke bypass for the new bindOnTrade shape.
-    const cap = instancedCountCap(ITEMS[SECONDARY], { bindOnTrade: true });
-    expect(loaded?.count).toBe(cap);
-    expect(cap).toBeGreaterThan(1); // mergeable arm (stack size), not the one-per-slot charge arm
-    expect(loaded?.count).toBeLessThan(9999); // genuinely clamped
+    // No bespoke bypass in the OTHER direction either: a genuinely
+    // consistent material composition is tolerated legacy excess, never
+    // silently clamped or destroyed, and its per-source bucket rides along.
+    expect(loaded?.count).toBe(9999);
+    expect(loaded?.materialSources).toEqual([{ source: {}, count: 9999 }]);
     expect(loaded?.instance).toEqual({ bindOnTrade: true }); // payload itself untouched
   });
 });

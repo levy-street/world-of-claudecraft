@@ -108,6 +108,60 @@ function mountControls() {
   };
 }
 
+/** The shipped #player-frame, mirroring index.html rather than a hand-shortened
+ *  copy of it. The heraldry-era frame is what the seat under test is measured
+ *  against: the name row is a `uf-name-header deed-heraldry-plaque` carrying the
+ *  pattern motif (not a bare `uf-name`), the portrait carries the heraldry seal
+ *  beside its level chip, and the bars carry the combo row plus the absorb and
+ *  text layers. All of that is rendered HEIGHT, and height is exactly what the
+ *  player-to-pet gap below is measured from. The combat and rest markers are
+ *  `display: none` until their state class lands (hud.css), so they add no
+ *  height here and are present for shape. */
+const PLAYER_FRAME_MARKUP = `
+      <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" aria-label="Your Hero">
+        <div class="portrait-wrap" id="pf-portrait-wrap">
+          <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
+          <span class="deed-heraldry-seal" aria-hidden="true">
+            <svg class="deed-heraldry-seal-art" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path id="pf-heraldry-seal-motif"></path>
+            </svg>
+          </span>
+          <div class="level-chip" id="pf-level">1</div>
+          <div class="combat-flash" id="pf-combat" role="status" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" alt="" aria-hidden="true" /></div>
+          <div class="rest-indicator" id="pf-rest" role="status" aria-label="Resting">z</div>
+        </div>
+        <div class="uf-bars">
+          <div class="uf-name-header deed-heraldry-plaque" id="pf-name-header">
+            <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path id="pf-heraldry-pattern-motif"></path>
+            </svg>
+            <div class="uf-name" id="pf-name">Hero</div>
+          </div>
+          <!-- Painted display, not markup default: Hud.update sets the combo row to
+               flex only for an ENERGY user and to none otherwise, and both fixtures
+               model a stance-bearing warrior. -->
+          <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-hidden="true" style="display: none"></div>
+          <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
+          <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
+        </div>
+      </div>`;
+
+/** The shipped #pet-frame, the other half of the pair this suite measures. It
+ *  carries no heraldry (only the player frame does), but it is a unit frame in
+ *  the same column, so it mirrors index.html for the same reason: its level chip
+ *  and health-bar text layer are height the gap assertion reads. */
+const PET_FRAME_MARKUP = `
+        <div id="pet-frame" class="unitframe petframe" role="button" tabindex="0" aria-label="Your Pet">
+          <div class="portrait-wrap">
+            <div class="portrait"><canvas id="petf-portrait" width="54" height="54"></canvas></div>
+            <div class="level-chip" id="petf-level">1</div>
+          </div>
+          <div class="uf-bars">
+            <div class="uf-name" id="petf-name">Snarl</div>
+            <div class="bar hp"><div class="bar-fill" id="petf-hp"></div><div class="bar-text" id="petf-hp-text"></div></div>
+          </div>
+        </div>`;
+
 /** The bottom-centre column, in its shipped nesting: the player frame on the row
  *  line with the pet health frame hanging below it. Real content, because both
  *  frames' rendered heights are content-driven and then scaled, and the seat
@@ -123,25 +177,9 @@ function mountColumn() {
           <button type="button" class="pet-btn"></button>
           <button type="button" class="pet-btn"></button>
         </div></div>
-        <div id="pet-frame" class="unitframe">
-          <div class="portrait-wrap"><div class="portrait"><canvas width="54" height="54"></canvas></div></div>
-          <div class="uf-bars">
-            <div class="uf-name">Snarl</div>
-            <div class="bar hp"><div class="bar-fill"></div></div>
-          </div>
-        </div>
+        ${PET_FRAME_MARKUP}
       </div>
-      <div id="player-frame" class="unitframe" role="group" tabindex="0">
-        <div class="portrait-wrap" id="pf-portrait-wrap">
-          <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
-          <div class="level-chip" id="pf-level">1</div>
-        </div>
-        <div class="uf-bars">
-          <div class="uf-name" id="pf-name">Hero</div>
-          <div class="bar hp"><div class="bar-fill" id="pf-hp"></div></div>
-          <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div></div>
-        </div>
-      </div>
+      ${PLAYER_FRAME_MARKUP}
       <div id="stancebar"><div class="stancebar-group">
         <button type="button" class="stance-btn"></button>
       </div></div>

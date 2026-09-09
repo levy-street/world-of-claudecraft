@@ -75,7 +75,7 @@ mismo mago. Después, esas marcas se consumen.
 
 Reglas propuestas:
 
-- Duración provisional de la marca: 15 segundos.
+- Duración provisional de la marca: 22,5 segundos.
 - La marca pertenece al mago que la aplicó.
 - Un mismo mago puede marcar a varios aliados.
 - Varios magos pueden marcar al mismo aliado sin pisarse entre sí.
@@ -374,7 +374,7 @@ del daño Arcano realmente infligido por ese mago se convierte en curación para
 
 Valores provisionales para el primer playtest:
 
-- Duración: 15 segundos.
+- Duración: 22,5 segundos.
 - Conversión de daño Arcano de objetivo único: 40%.
 - Un objetivo marcado de base.
 - Eco temporal realiza una pequeña cura inicial al aplicarse.
@@ -525,7 +525,7 @@ rotación, el maná, Ancla y Rebobinar.
 ### 13.10 Objetivo de daño y curación
 
 Como dirección de balance inicial, un Cronomante ejecutado correctamente debería aportar
-aproximadamente entre el 50% y el 65% del daño de una especialización DPS pura con equipo y
+aproximadamente entre el 50% y el 70% del daño de una especialización DPS pura con equipo y
 condiciones equivalentes.
 
 Su curación completa debe exigir:
@@ -746,7 +746,7 @@ sin cooldown, alcance 30, escuela arcana, `targetType: 'friendly'` (aliado o uno
 construye con DOS efectos: un `heal` normal (la cura inicial, alimenta `$d` y puede critear como
 cualquier cura directa) y un efecto nuevo minimo `temporalEcho` (solo lleva `duration`, alimenta
 `$t` y coloca la marca). Rangos: n1 (5) cura 24-30 por 40 mana; n2 (12) 40-50 por 60; n3 (18)
-58-70 por 85; n4 (20) 84-102 por 90. Marca: 15 s. Justificacion: la cura inicial es deliberadamente pequena (~40% de
+58-70 por 85; n4 (20) 84-102 por 90. Marca: 22,5 s. Justificacion: la cura inicial es deliberadamente pequena (~40% de
 Remiendo temporal) porque el grueso de la sanacion viene de la conversion; el maná moderado y el
 GCD, mas la regla de una sola marca propia, limitan el spameo.
 
@@ -796,3 +796,107 @@ Convergencia temporal (aplicacion grupal), acumulaciones nuevas de Explosion Arc
 maná, Misiles Arcanos consumiendo acumulaciones, Ancla temporal, Rebobinar, Preservacion
 cronostatica, reduccion especifica de PvP para la conversion (los early-returns PvP de `dealDamage`,
 duelo/fiesta/arena, NO convierten hoy) y la revision completa de filas de talentos del mago.
+
+### 15.6 Ajuste de viabilidad ofensiva (2026-09-02, release/v0.42.0)
+
+Los porcentajes provisionales de la marca funcionaban, pero no sostenian la identidad jugable:
+la rotacion ofensiva conservadora producia 30.0 DPS y solo 17.6 HPS de Eco, frente a unos 169 HPS
+de Remiendo temporal. Los parses de raid confirmaron que la forma competitiva de jugar terminaba
+siendo lanzar Remiendo continuamente y aportar cero dano.
+
+Oleada de eter y Dardos de eter aplican ahora un multiplicador de conversion de 4 a la marca
+INDIVIDUAL. No aumenta su dano ni multiplica Explosion Arcana, varitas o dano Arcano incidental.
+El 2p de Vestiduras de etertejido sigue elevando el coeficiente individual de 40% a 50% antes del
+multiplicador, por lo que mantiene su mejora relativa del 25%.
+
+Las marcas grupales conservan su conversion base de 13% por objetivo. En cada impacto de Oleada o
+Dardos, cada marca grupal viva aporta otra reserva del 13%. Esa reserva completa solo se reparte
+entre los aliados marcados que estaban por debajo del 60% de vida al producirse el impacto, con
+peso proporcional a su porcentaje de vida faltante. Si nadie cumple el umbral, la reserva no se
+usa. La vida de todas las marcas se captura antes de curar para que el reparto sea determinista e
+independiente del orden de entidades; una marca sobre un aliado muerto no cura ni aporta reserva.
+
+La misma revision amplia las ventanas de mantenimiento: la marca individual dura 22,5 s y las
+marcas grupales de Cascada duran 15 s. En 12 semillas del arnes de rendimiento rapido, con nivel
+20 y equipo BiS real, la rotacion mixta entrega medianas de 248,1 HPS y 107,4 DPS sostenidos sin
+agotarse durante la ventana de 60 s.
+
+Cascada temporal reduce ademas su tiempo de lanzamiento de 2 a 1,5 s. Conserva el GCD, el coste,
+el cooldown y toda su curacion: el ajuste solo acorta la preparacion de la ventana grupal para que
+el Cronomante pueda volver antes a su rotacion ofensiva.
+
+La prueba de raid usa Ignivar Heroico real, diez jugadores (2 tanques, Cronomancia + sacerdote
+sagrado y 6 DPS), tope de 240 s y 12 semillas. La variante x4 individual sin bonificacion grupal
+mata en 6/12 intentos (50%), con 86,9 HPS y 76,5 DPS medianos de Cronomancia y cinco muertes de
+mediana. Aplicar x2 sin condiciones a todas las marcas grupales subia Cronomancia a 91,2 HPS y
+mantenia 75,6 DPS, pero empeoraba la muestra a 4/12 kills (33,3%) y diez muertes de mediana.
+
+Con la reserva inteligente completa (financiada solo por marcas grupales, pero disponible para
+cualquier aliado marcado bajo el umbral, incluido el Eco individual del tanque), las mismas
+semillas quedan en 5/12 kills (41,7%), kill mediano de 194,2 s, 87,1 HPS y 78,1 DPS medianos de
+Cronomancia, 177,3 HPS del sacerdote y cinco muertes de mediana. El total baja de 71 a 66 muertes
+frente a x4 individual, y Brand of the Pyre baja de 53 a 44, pero esa redistribucion no mejora el
+numero de victorias. Todas las semillas alcanzan Apocalypse, Judgment, Last Inferno y tres Forge
+Chains, y las doce registran rechazo por mana entre 105,8 y 122,5 s. La reserva evita la regresion
+de muertes del x2 general y ayuda cuando coincide con dano critico, pero la muestra sigue por debajo
+del 50% de kills: no es evidencia suficiente para declarar resuelta la viabilidad en Heroico.
+
+La correccion de mana de 2026-09-04 usa las herramientas ya creadas para la especializacion en
+lugar de inflar la regeneracion pasiva. El build de raid elige Aetherwell y lo canaliza cuando
+le faltan al menos 600 de mana y el tanque esta por encima del 45% de vida. La regeneracion natural
+puede solapar parte del ultimo pulso, un coste aceptado para iniciar antes el cooldown; cada uso
+sacrifica 6 s de actividad y el cooldown de 120 s limita la recuperacion. El 4p de Vestiduras de etertejido reduce ademas el coste de
+Cascada temporal de 170 a 119 (30%), compensando el gasto adicional que introducia su propia
+reduccion de cooldown de 17 a 12 s: 10,0 mana/s base frente a 9,9 mana/s con el set.
+
+En las mismas 12 semillas de Ignivar Heroico, todos los combates canalizan Aetherwell dos veces.
+Con el lanzamiento final de Cascada de 1,5 s, el resultado pasa de 5/12 a 7/12 kills (58,3%), con
+kill mediano de 193,1 s, 109,7 HPS y 100,2 DPS medianos de Cronomancia, 177,9 HPS del sacerdote y
+tres muertes de mediana. Las muertes totales bajan de 66 a 58. Diez de doce intentos aun registran
+rechazo por mana, ahora con mediana de 173,0 s, frente al intervalo anterior de 105,8 a 122,5 s.
+El recurso sigue agotandose bajo presion
+prolongada, pero deja de cortar la contribucion del Cronomante a mitad de la pelea.
+
+Una ablacion posterior mantiene Ignivar Heroico, el roster de diez jugadores, el tope de 240 s
+y las mismas 12 semillas, cambiando una sola condicion cada vez. Con el mejor equipo anterior a
+Ignivar (cero piezas de su tabla), pero conservando Aetherwell y el sacerdote, el resultado es
+6/12 kills (50%), kill mediano de 196,7 s, 94,7 HPS y 78,3 DPS de Cronomancia, siete muertes de
+mediana y 63 totales. Sin Aetherwell, pero con el 4p completo y el sacerdote, queda en 7/12 kills
+(58,3%), kill mediano de 194,8 s, 99,6 HPS y 81,9 DPS, cinco muertes de mediana y 53 totales; las
+12 semillas rechazan una accion por mana, con mediana de 128,4 s. El 4p sostiene por tanto la mayor
+parte de la correccion, mientras Aetherwell aporta un margen visible en los pulls largos.
+
+Con BiS y Aetherwell pero el sacerdote completamente pasivo, conservando su cuerpo para no cambiar
+el reparto de mecanicas, no hay ninguna victoria (0/12): el jefe conserva 64% de vida de mediana y
+la raid pierde ocho jugadores de mediana, 104 en total. El aumento aparente de HPS del Cronomante
+en algunas semillas solo refleja que absorbe todo el trabajo hasta que el grupo colapsa. Esta
+composicion confirma que Cronomancia es viable como uno de dos healers, no como unico healer de
+Ignivar Heroico con este roster y esta rotacion.
+
+La matriz simetrica de composiciones conserva las mismas 12 semillas y obliga a Cronomancia a
+mantener su rotacion ofensiva mientras cura. Con sacerdote sagrado logra 7/12 kills, 109,7 HPS y
+100,2 DPS medianos; con chaman Restauracion mejora a 11/12 (91,7%), 124,2 HPS y 100,6 DPS de
+Cronomancia, 227,2 HPS del chaman y una muerte de mediana. Por tanto, no depende especificamente del sacerdote
+y ocupa una plaza real de healer sin abandonar su contribucion ofensiva.
+
+Las parejas sin respuesta grupal reactiva quedan muy por debajo: con druida Restauracion solo
+logra 2/12 kills (16,7%), aunque Cronomancia conserva 136,8 HPS y 93,9 DPS. Dos Cronomantes,
+repartiendo uno el tanque y otro el aliado mas herido, tambien quedan en 0/12. Escalonar Cascada
+seis segundos y exigir 30 s entre Rebobinados mejora el segundo a 113,8 HPS y 30,2 DPS, reduce las
+muertes de mediana de diez a ocho y las totales de 106 a 93, pero el jefe aun conserva 14,8% de
+vida de mediana. El primero mantiene 127,5 HPS y 95,7 DPS. No es un resultado causado por
+convertirlos en healers pasivos: ambos siguen atacando, aunque el segundo sacrifica actividad para
+triage.
+
+Un candidato de balance que elevaba un 25% la reserva critica de cada Eco grupal tampoco produce
+victorias en las 12 semillas: deja al jefe al 15,4% de vida y 94 muertes totales. Sondas mas altas
+y estrategias que movian o cruzaban Ecos individuales cambian el orden de muertes, pero no rompen
+la meseta. Se descartan y el multiplicador permanece en 1. La carencia de doble Cronomancia no se
+resuelve inflando conversion o mana; requiere, si se decide soportar esa composicion, una respuesta
+grupal distinta que no potencie tambien las parejas ya fuertes.
+
+Los controles de un solo healer tambien quedan en 0/12. El sacerdote solo deja al jefe al 31,2%
+de vida de mediana; Cronomancia sola con rotacion de raid deja 49,3%, entrega 174,0 HPS y aun hace
+16,7 DPS, pero rechaza acciones por mana a los 83,7 s. El encuentro 2-2-6 no espera que ningun
+healer lo sostenga solo. La deuda revelada por la matriz es de compatibilidad entre dos kits sin
+curacion grupal reactiva, no que Cronomancia sea un support incapaz de cubrir una plaza de healer.

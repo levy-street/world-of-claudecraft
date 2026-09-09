@@ -94,6 +94,13 @@ d('storage_purchases against real PostgreSQL', () => {
       container_id BIGINT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`);
+    const { MATERIAL_SOURCE_JOURNAL_SCHEMA } = await import(
+      '../../server/material_source_journal_db'
+    );
+    // The production DDL, applied verbatim: bankLedgerGrowthBudgetSchema audits
+    // material_source_journal alongside bank_ledger and refuses to install
+    // until that table exists.
+    await pool.query(MATERIAL_SOURCE_JOURNAL_SCHEMA);
     const growth = await import('../../server/bank_ledger_growth_budget');
     await pool.query(growth.bankLedgerGrowthBudgetSchema(SCHEMA));
     await pool.query('INSERT INTO accounts (id) VALUES (1), (2)');

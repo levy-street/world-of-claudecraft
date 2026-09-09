@@ -256,6 +256,13 @@ Use the seams this repo already has, do not invent new ones:
   (M16); `src/ui/world_entity_i18n.ts` names for new named entities. The
   `content-obligations-reviewer` agent audits exactly this list; dispatch it on any
   content diff.
+  **Every new player-visible proper noun is IP-checked BEFORE it ships, in the same
+  change that authors it**: web-verify the name (exact-phrase plus coined-token
+  searches against the major game wikis) and never reuse a coined term or a full
+  name distinctive to another game; shared generic fantasy English is fine. Protocol
+  and worked verdicts: `src/sim/content/CLAUDE.md` "Naming originality" and
+  `docs/design/naming-audit.md`. A collision found after shipping is
+  fixed display-only (ids are frozen) and pinned in `tests/originality_renames.test.ts`.
 - New server REST endpoint: a `RouteDef` module (`server/<domain>.ts` `export const routes`)
   registered in `server/http/registry.ts`, never an inline handler in `main.ts`. Scaffold with
   `npm run new:endpoint` (see `server/http/CLAUDE.md`).

@@ -106,12 +106,6 @@ replant; the garden gets its 8 seconds to tick. Cooldown-free payoffs
 (Redharvest, Marrowbreak, the hunter's Unleash Beast) keep casting through the
 base button's recharge, unchanged.
 
-Groveheart receives both resurrections (owner directive 2026-09-01,
-`docs/design/resurrection-cooldowns.md`): Wildwake at level 16, a two-second
-in-combat single-target revive, and Grove Awakening at level 20, a
-seven-second out-of-combat group revive. Both share the healer resurrection
-cooldown.
-
 ## Rows
 
 - Level 5: Wildshift, Loping Stride, Skylark.

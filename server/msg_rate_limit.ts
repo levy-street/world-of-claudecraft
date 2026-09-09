@@ -21,7 +21,7 @@
 //
 // The abuse score is shaped by the stall-then-flush constraint: a network
 // stall shorter than the keepalive termination window (WS_KEEPALIVE_PING_MS,
-// server/game.ts) leaves the client buffering sends at up to 80/s and TCP
+// server/keepalive_sweep.ts) leaves the client buffering sends at up to 80/s and TCP
 // delivers the whole backlog in one burst on recovery, thousands of frames
 // inside about one receive-time second.
 // Any score that integrates total drops would kick that legitimate client, so

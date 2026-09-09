@@ -291,7 +291,7 @@ describe('casting_lifecycle: Vanish escape stealth blocks a hostile cast (issue 
   function vanishAura(sourceId: number): Aura {
     return {
       id: 'vanish',
-      name: 'Smokestep',
+      name: 'Smokefade',
       kind: 'stealth',
       remaining: 10,
       duration: 10,

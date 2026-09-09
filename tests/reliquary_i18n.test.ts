@@ -44,6 +44,12 @@ import {
 import type { ReliquaryViewInput } from '../src/ui/reliquary_view';
 import { ReliquaryWindow, type ReliquaryWindowDeps } from '../src/ui/reliquary_window';
 
+// These two new personal/profession pages ship their five M16 name fills at
+// PR tier. All prior page names remain translated in every locale; the full
+// release-tier manifest below still requires every new name and description.
+const NEW_PROFESSION_PAGES = new Set(['professions_crucible', 'professions_forgebreaker']);
+const M16_LOCALES = new Set(['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU']);
+
 describe('reliquary_i18n English resolution', () => {
   it('resolves name and desc from the catalog page def', () => {
     expect(reliquaryPageName('conquerors_hollow_crypt')).toBe('The Hollow Crypt');
@@ -71,14 +77,20 @@ describe('reliquary_i18n English resolution', () => {
     // manifest still emits the desc row conditionally so a desc-less page added
     // later contributes only its name row instead of an empty-string row.
     // This count is the FILL TRIPWIRE: adding a catalog page must be accompanied
-    // by a name row in every shipped locale chunk (the per-locale row count is
-    // pinned to the same 39 below), so a new page cannot quietly render English
-    // to a CJK or Cyrillic reader. 35 + the four Crucible raid pages.
-    expect(pageCount).toBe(39);
-    expect(descCount).toBe(39);
+    // by a name row in every M16 locale chunk, so a new page cannot quietly
+    // render English to a CJK or Cyrillic reader. The 39 original pages plus
+    // the Roots' Bramblehide set page keep all-locale coverage (40); the
+    // Crucible collection and Forgebreaker personal-hammer pages add two more.
+    expect(pageCount).toBe(42);
+    expect(descCount).toBe(42);
     expect(manifest.length).toBe(pageCount + descCount);
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(39);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(39);
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(42);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(42);
+    expect(manifest).toContainEqual({
+      id: 'professions_forgebreaker',
+      field: 'name',
+      source: 'Forgebreaker',
+    });
     expect(manifest).toContainEqual({
       id: 'conquerors_thunzharr',
       field: 'name',
@@ -167,8 +179,18 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
   it('carries only real catalog page ids, and no empty values', () => {
     for (const lang of tableLocales()) {
       // Vacuity floor: an emptied chunk would satisfy every for-loop in this
-      // suite silently. One row per catalog page, in every shipped locale.
-      expect(Object.keys(tables[lang]).length, `${lang} row count`).toBe(39);
+      // suite silently. Preserve all 40 pages that ship everywhere (the 39
+      // original pages plus Roots' Bramblehide, filled in every shipped
+      // locale by the release fill). The two new profession pages ship M16
+      // names now; their Latin-language prose follows release fill.
+      const namesFilled = M16_LOCALES.has(lang);
+      expect(
+        Object.keys(tables[lang]).filter((id) => !NEW_PROFESSION_PAGES.has(id)).length,
+        `${lang} original row count`,
+      ).toBe(40);
+      for (const id of NEW_PROFESSION_PAGES) {
+        expect(Object.hasOwn(tables[lang], id), `${lang}.${id}`).toBe(namesFilled);
+      }
       for (const [id, entry] of Object.entries(tables[lang])) {
         expect(RELIQUARY_PAGES_BY_ID[id], `${lang}.${id} is not a catalog page`).toBeDefined();
         for (const field of ['name', 'desc'] as const) {
@@ -265,6 +287,12 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
       const table = tables[lang];
       for (const row of nameRows) {
         const value = table[row.id]?.name;
+        // Existing 39-page translations remain mandatory in every locale.
+        // New content fills M16 now; these pages' Latin names use English until release fill.
+        if (NEW_PROFESSION_PAGES.has(row.id) && !M16_LOCALES.has(lang)) {
+          expect(value).toBeUndefined();
+          continue;
+        }
         expect(value !== undefined && value.trim().length > 0, `${lang}.${row.id}.name`).toBe(true);
       }
     }
@@ -325,11 +353,11 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
         swept.push(`${lang}.${page.id}`);
       }
     }
-    // Vacuity floor, snug to the real corpus: 19 anchorable pages x 18 locales
-    // since the release fill (5 normal + 5 heroic dungeons, 2 delves, 7 sets;
-    // the world-boss page is mark-anchored and the rest carry no derivable
-    // anchor).
-    expect(swept.length).toBeGreaterThanOrEqual(342);
+    // Vacuity floor, snug to the real corpus: 20 anchorable pages x 18 locales
+    // since the release fill (5 normal + 5 heroic dungeons, 2 delves, 8 sets
+    // now that Roots' Bramblehide joined the set-page family; the world-boss
+    // page is mark-anchored and the rest carry no derivable anchor).
+    expect(swept.length).toBeGreaterThanOrEqual(360);
   });
 
   // RELEASE-TIER ONLY: channel English lives in RELIQUARY_PAGES, outside the

@@ -166,4 +166,8 @@ export const table: ReliquaryLocaleTable = {
     name: 'Eroico: The Inner Crucible',
     desc: 'Scudi e armi esclusivi della modalità eroica di Varkhul, Forgefather of the Last Flame.',
   },
+  conquerors_set_bramblehide: {
+    name: 'Pelle di Rovo di Roots',
+    desc: 'La famiglia completa in cuoio Bramblehide.',
+  },
 };

@@ -194,15 +194,23 @@ describe('#ctx-menu destructive meta sub-line (Apply Enchant replace row)', () =
     expect(arm).not.toMatch(/var\(--/);
   });
 
-  it('scales up on touch, alone among the meta sub-lines', () => {
+  it('scales up on touch, with the gate line, apart from the plain meta line', () => {
     // The tier captions and effect lines already take a touch bump ("the base
     // sizes are tuned for the desktop popup and read as fine print at arm's
-    // length"); a destroy warning has the strongest claim on that, and the
-    // informational tags beside it stay at the base size so the hierarchy is
+    // length"); a destroy warning has the strongest claim on that, and since the
+    // Masterwrought phase 10 QA so does the act-on GATE line (the skill floor or
+    // the Perfected requirement, the only explanation of why a row cannot be
+    // tapped): the two share ONE rule (the gate selector first, the danger
+    // selector last, which this block regex depends on), while the plain
+    // informational meta line stays at the base size so the hierarchy is
     // visible rather than uniform.
     const danger = block(
       HUD_MOBILE_CSS,
       /body\.mobile-touch #ctx-menu \.ctx-item-meta\.ctx-item-danger\s*\{[^}]*\}/,
+    );
+    // The gate line rides the same rule (one declaration, two selectors).
+    expect(HUD_MOBILE_CSS).toMatch(
+      /body\.mobile-touch #ctx-menu \.ctx-item-meta\.ctx-item-gate,\s*body\.mobile-touch #ctx-menu \.ctx-item-meta\.ctx-item-danger\s*\{/,
     );
     const size = danger.match(/font-size:\s*(\d+(?:\.\d+)?)px/);
     expect(size, 'the destructive sub-line needs a touch size').not.toBeNull();

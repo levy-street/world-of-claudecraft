@@ -7,6 +7,15 @@ import type { BiomeId } from '../sim/types';
 
 export type Surface = 'grass' | 'dirt' | 'stone' | 'wood' | 'snow' | 'water';
 
+/** Where a mount's engine audio currently is, for visuals that want to land on
+ *  a specific moment of it. Kept structural rather than importing the sim-side
+ *  state type, so src/render keeps its no-src/game rule. */
+export interface MountEnginePhase {
+  state: 'idle' | 'starting' | 'moving' | 'stopping';
+  /** Seconds on the audio clock since this phase began. */
+  elapsed: number;
+}
+
 export interface AmbientPointSource {
   readonly id: string;
   // 'rift_portal'/'rift_roller'/'rift_ice_glide' are dynamic (spawn/move/
@@ -66,9 +75,17 @@ export interface SpatialAudioSink {
     running: boolean,
     self: boolean,
   ): void;
-  /** One custom running stride for a mounted entity. */
-  mountRun(x: number, y: number, z: number, mountKey: string, self: boolean): void;
-  mountSummon(x: number, y: number, z: number, mountKey: string, self: boolean): void;
+  /** One running stride for a mounted entity. `surface` is the ground the
+   *  mount is on, used only by mounts with no stride cue of their own, which
+   *  fall back to the ordinary footfall for that surface. */
+  mountRun(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    surface: Surface,
+    self: boolean,
+  ): void;
   /** Windup/loop/winddown engine audio for a mount with a dedicated take set
    *  (see src/game/mount_engine_state.ts); call every frame a rider is
    *  mounted and grounded. Returns true when `mountKey` actually has an
@@ -81,13 +98,53 @@ export interface SpatialAudioSink {
     mountKey: string,
     moving: boolean,
     entityId: number,
+    backwards?: boolean,
+    airborne?: boolean,
+    /** Turning on the spot. Works the engine the way reverse does, load with
+     *  no road speed, so it takes the same pitch bend. */
+    pivoting?: boolean,
   ): boolean;
-  /** Drop an entity's mountEngine state and silence its loop (dismount,
-   *  interest culled, disconnect). */
+  /** The mount-appears one-shot, fired on the summon channel's completion
+   *  edge. Silent for a mount with no summon take. */
+  mountSummon(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    self: boolean,
+    entityId: number,
+  ): void;
+  /** Warm a mount's summon take on the channel's START edge. */
+  preloadMountSummon(mountKey: string): void;
+  /** The standstill powered-on hum for a mount with a dedicated idle take
+   *  (mount_idle_<mountKey>): active=true every grounded stopped frame,
+   *  active=false from the moving branch. A no-op for mounts without one. */
+  mountIdle(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    active: boolean,
+    entityId: number,
+  ): void;
+  /** Drop an entity's per-mount loops (engine phase + idle hum) and state
+   *  (dismount, death while mounted, audio-gate exit, interest culled,
+   *  disconnect). */
   mountEngineReset(entityId: number): void;
-  /** Warm a mount's engine clips (windup/loop/winddown) ahead of first use,
-   *  e.g. on the mountKey transition that also calls mountEngineReset. A
-   *  no-op for a mount with no engine take set. */
+  /** Whether this mount's engine keeps running while airborne, and so can be
+   *  polled mid-jump without a hop reading as a stop. True for a mount with a
+   *  parked idle take. */
+  mountEngineIdles(mountKey: string): boolean;
+  /** Engine phase for an entity, or null when it has no engine running.
+   *
+   *  `elapsed` is seconds since the phase began, measured on the AUDIO clock
+   *  rather than a frame counter. That is what lets a visual event be pinned to
+   *  a known moment INSIDE an authored take and stay pinned through a frame
+   *  hitch, instead of drifting against the sound it is meant to punctuate. */
+  mountEnginePhase(entityId: number): MountEnginePhase | null;
+  /** Warm a mount's authored run/idle/jump/land and engine take set ahead of
+   *  first movement. The renderer calls this on summon-cast and mountKey
+   *  transitions. A no-op for a mount with no custom movement clips. */
   preloadMountEngine(mountKey: string): void;
   /** Continuous movement loop for a mount that HAS one (a wheeled cart rolls;
    *  it has no stride to hang a one-shot on). Called every frame per mounted
@@ -96,13 +153,17 @@ export interface SpatialAudioSink {
   mountLoop(id: number, x: number, y: number, z: number, mountKey: string, moving: boolean): void;
   /** Drop a mount loop when its entity despawns or dismounts. */
   stopMountLoop(id: number): void;
-  /** A discrete movement event (jump / land / water entry / swim stroke). */
+  /** A discrete movement event (jump / land / water entry / swim stroke).
+   *
+   *  `mountKey` is the rider's mount, '' when on foot. A mount that ships its
+   *  own takeoff and landing takes uses them instead of the rider's. */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',
     x: number,
     y: number,
     z: number,
     self: boolean,
+    mountKey?: string,
   ): void;
   /** Lich Form entry, ambient pulse, and a sacrificed soul reaching its owner. */
   necromancy(

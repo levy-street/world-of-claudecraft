@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "auditId": "masterwrought-all-item-masters-qa-2026-09-02",
+  "auditedOn": "2026-09-02",
+  "worktree": "/Users/fernando/Documents/wocc-masterwrought",
+  "contractId": "woc-item-icon-v1",
+  "scope": {
+    "inclusionRule": "Completed expected-ID PNG masters directly under each listed batch directory.",
+    "exclusionRule": "Ignore review artifacts and filenames beginning with an underscore.",
+    "batchCount": 6,
+    "auditedMasterCount": 165,
+    "batches": [
+      {
+        "name": "crops",
+        "directory": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops",
+        "generationReport": "tmp/imagegen/masterwrought-art-2026-09-02/reports/crops.json",
+        "auditedCount": 36,
+        "auditedIds": [
+          "bog_beet",
+          "bog_beet_seed",
+          "brook_carrot",
+          "brook_carrot_seed",
+          "evergarden_greens",
+          "evergarden_greens_seed",
+          "evergarden_pumpkin",
+          "evergarden_pumpkin_seed",
+          "fine_bog_beet",
+          "fine_brook_carrot",
+          "fine_evergarden_greens",
+          "fine_evergarden_pumpkin",
+          "fine_frost_gourd",
+          "fine_frost_lentils",
+          "fine_gilded_sunmelon",
+          "fine_gilded_yam",
+          "fine_highland_barley",
+          "fine_marsh_rice",
+          "fine_thornpeak_cabbage",
+          "fine_vale_wheat",
+          "frost_gourd",
+          "frost_gourd_seed",
+          "frost_lentils",
+          "frost_lentils_seed",
+          "gilded_sunmelon",
+          "gilded_sunmelon_seed",
+          "gilded_yam",
+          "gilded_yam_seed",
+          "highland_barley",
+          "highland_barley_seed",
+          "marsh_rice",
+          "marsh_rice_seed",
+          "thornpeak_cabbage",
+          "thornpeak_cabbage_seed",
+          "vale_wheat",
+          "vale_wheat_seed"
+        ]
+      },
+      {
+        "name": "farming",
+        "directory": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming",
+        "generationReport": "tmp/imagegen/masterwrought-art-2026-09-02/reports/farming.json",
+        "auditedCount": 27,
+        "auditedIds": [
+          "bronze_hoe",
+          "compost",
+          "eastbrook_glazed_carrots",
+          "eastbrook_root_pottage",
+          "evergarden_braised_greens",
+          "evergarden_harvest_platter",
+          "evergarden_hoe",
+          "evergarden_sunmelon_tart",
+          "fenbridge_beet_braise",
+          "fenbridge_rice_bowl",
+          "fenbridge_rice_pudding",
+          "garden_hoe",
+          "growth_tonic",
+          "harvest_feast",
+          "highwatch_barley_bannock",
+          "highwatch_barley_porridge",
+          "highwatch_gourd_soup",
+          "osmium_hoe",
+          "pattern_evergarden_braised_greens",
+          "pattern_evergarden_harvest_platter",
+          "pattern_evergarden_sunmelon_tart",
+          "pattern_harvest_feast",
+          "pattern_highwatch_barley_porridge",
+          "pattern_highwatch_gourd_soup",
+          "skysilver_hoe",
+          "vale_hearth_loaf",
+          "withered_husks"
+        ]
+      },
+      {
+        "name": "profession-new",
+        "directory": "tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new",
+        "generationReport": "tmp/imagegen/masterwrought-art-2026-09-02/reports/profession-new.json",
+        "auditedCount": 18,
+        "auditedIds": [
+          "clockreel_fishing_rod",
+          "cogwheel_blank",
+          "copperlens_ocular",
+          "deed_of_making",
+          "pattern_clockreel_fishing_rod",
+          "pattern_peppered_deepbarb_catfish",
+          "pattern_roast_hollowgill_sturgeon",
+          "pattern_sageleaf_feast",
+          "pattern_stonepot_feast",
+          "pattern_warspice_feast",
+          "peppered_deepbarb_catfish",
+          "raw_deepbarb_catfish",
+          "raw_hollowgill_sturgeon",
+          "raw_stillmere_salmon",
+          "roast_hollowgill_sturgeon",
+          "sageleaf_feast",
+          "stonepot_feast",
+          "warspice_feast"
+        ]
+      },
+      {
+        "name": "placeholder-material-gear",
+        "directory": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear",
+        "generationReport": "tmp/imagegen/masterwrought-art-2026-09-02/reports/placeholder-material-gear.json",
+        "auditedCount": 38,
+        "auditedIds": [
+          "barksong_handguards",
+          "briarstep_jerkin",
+          "burnished_thorium_amulet",
+          "coiled_copper_torc",
+          "duskforged_billet",
+          "etched_iron_loop",
+          "fenbloom_breeches",
+          "forgefold_legguards",
+          "forgefold_plating",
+          "gleaming_thorium_loop",
+          "goldleaf_folio",
+          "goldleaf_scroll",
+          "hammered_copper_band",
+          "iron_link_choker",
+          "lucent_reagent",
+          "makers_ember",
+          "polished_copper_loop",
+          "precision_chassis",
+          "prismglass_setting",
+          "quickening_catalyst",
+          "riveted_iron_signet",
+          "sablewax_vellum",
+          "seasoned_stock",
+          "silverleaf_primer",
+          "silverleaf_scroll",
+          "spiritweld_girdle",
+          "sundered_essence",
+          "sunpetal_grimoire",
+          "sunpetal_scroll",
+          "sunspun_bolt",
+          "sunspun_handwraps",
+          "sunspun_haversack",
+          "sunspun_leggings",
+          "sunspun_vestments",
+          "wardspeaker_sabatons",
+          "weighted_thorium_band",
+          "wyrmfall_core",
+          "wyrmhide_cording"
+        ]
+      },
+      {
+        "name": "placeholder-apex",
+        "directory": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex",
+        "generationReport": "tmp/imagegen/masterwrought-art-2026-09-02/reports/placeholder-apex.json",
+        "auditedCount": 32,
+        "auditedIds": [
+          "duskforged_bulwark",
+          "duskforged_warblade",
+          "grand_cauldron",
+          "gyrelens_array",
+          "ironhusk_flask",
+          "laden_hearth",
+          "makers_charm",
+          "masters_field_forge",
+          "pattern_barksong_handguards",
+          "pattern_briarstep_jerkin",
+          "pattern_duskforged_bulwark",
+          "pattern_duskforged_warblade",
+          "pattern_fenbloom_breeches",
+          "pattern_forgefold_legguards",
+          "pattern_ridgebreaker",
+          "pattern_spiritweld_girdle",
+          "pattern_sunspun_handwraps",
+          "pattern_sunspun_haversack",
+          "pattern_sunspun_leggings",
+          "pattern_sunspun_vestments",
+          "pattern_wardspeaker_sabatons",
+          "pattern_wyrmfall_pendant",
+          "prismglass_loop",
+          "ridgebreaker",
+          "runewater_flask",
+          "sageleaf_chowder",
+          "stonepot_stew",
+          "voidbound_grimoire",
+          "warboar_flask",
+          "warhewn_signet",
+          "warspice_skewers",
+          "wyrmfall_pendant"
+        ]
+      },
+      {
+        "name": "placeholder-patterns",
+        "directory": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns",
+        "generationReport": "tmp/imagegen/masterwrought-art-2026-09-02/reports/placeholder-patterns.json",
+        "auditedCount": 14,
+        "auditedIds": [
+          "pattern_grand_cauldron",
+          "pattern_gyrelens_array",
+          "pattern_ironhusk_flask",
+          "pattern_laden_hearth",
+          "pattern_makers_charm",
+          "pattern_masters_field_forge",
+          "pattern_prismglass_loop",
+          "pattern_runewater_flask",
+          "pattern_sageleaf_chowder",
+          "pattern_stonepot_stew",
+          "pattern_voidbound_grimoire",
+          "pattern_warboar_flask",
+          "pattern_warhewn_signet",
+          "pattern_warspice_skewers"
+        ]
+      }
+    ]
+  },
+  "deterministicChecks": {
+    "dimensions": {
+      "expected": "1254x1254",
+      "passingCount": 165,
+      "failingCount": 0,
+      "failures": []
+    },
+    "colorSpace": {
+      "expected": "sRGB",
+      "passingCount": 165,
+      "failingCount": 0,
+      "failures": []
+    },
+    "opacity": {
+      "expected": "three-channel srgb with no alpha channel",
+      "passingCount": 165,
+      "failingCount": 0,
+      "failures": []
+    },
+    "hashUniqueness": {
+      "algorithm": "SHA-256",
+      "uniqueCount": 165,
+      "duplicateHashGroupCount": 0,
+      "duplicates": [],
+      "conclusion": "No byte-identical master paintings were found across the six audited batches."
+    }
+  },
+  "visualReview": {
+    "contexts": [
+      {
+        "context": "source",
+        "method": "Inspected labeled family contact sheets at high detail and opened targeted masters at original 1254px resolution."
+      },
+      {
+        "context": "128px color",
+        "method": "Inspected all masters downsampled to shipping-scale color thumbnails."
+      },
+      {
+        "context": "22px color",
+        "method": "Inspected all masters after a true 22px downsample enlarged with nearest-neighbor solely for review."
+      },
+      {
+        "context": "28px grayscale",
+        "method": "Inspected all masters after a true 28px grayscale downsample enlarged solely for value-read review."
+      },
+      {
+        "context": "64px circular crop",
+        "method": "Inspected all masters through a centered 64px circular mask enlarged solely for review."
+      }
+    ],
+    "criteria": [
+      "correct authored item identity",
+      "no accidental text or pseudo-writing",
+      "complete square framing and useful circular-crop read",
+      "fully opaque painted background",
+      "no byte-identical or obvious recolor-only duplicate identity",
+      "correct tool and equipment type",
+      "related-family distinction",
+      "woc-item-icon-v1 lighting, material, and painted-vignette fit"
+    ]
+  },
+  "result": {
+    "acceptedCount": 165,
+    "rejectedCount": 0,
+    "blockingFindings": [],
+    "watchNoteCount": 6,
+    "acceptanceMeaning": "Every audited master is accepted. Watch notes are non-blocking and identify the best candidates for downstream in-game screenshot scrutiny."
+  },
+  "watchNotes": [
+    {
+      "severity": "non-blocking",
+      "ids": ["evergarden_hoe"],
+      "observation": "Its leaf-like angled blade can read closer to a scythe or adze than a hoe at 22px and in the circular crop.",
+      "acceptanceBasis": "The long handled working-tool silhouette, head attachment, palette tier, and comparison with the hoe ladder preserve the intended identity."
+    },
+    {
+      "severity": "non-blocking",
+      "ids": ["skysilver_hoe"],
+      "observation": "Its pointed angled blade can read closer to a pick or scythe than the flatter heads of the lower-tier hoes at 22px.",
+      "acceptanceBasis": "The complete handle, blade socket, gathering-tool presentation, and family progression still make it usable as the Skysilver hoe."
+    },
+    {
+      "severity": "non-blocking",
+      "ids": ["clockreel_fishing_rod"],
+      "observation": "The thin rod shaft loses contrast in the 22px grayscale view and both extremities sit tight against the 64px circular crop.",
+      "acceptanceBasis": "The prominent clockwork reel, fishing guides, line, and complete square-canvas silhouette retain the fishing-rod read."
+    },
+    {
+      "severity": "non-blocking",
+      "ids": ["prismglass_setting"],
+      "observation": "At 22px its circular clawed silhouette can initially read as a compass, small shield, or portal.",
+      "acceptanceBasis": "At shipping scale the retaining claws, thick faceted centerpiece, and jewelry-metal construction resolve it as an unfinished setting, with no compass needle, cardinal lettering, or UI marks."
+    },
+    {
+      "severity": "non-blocking",
+      "ids": ["sunspun_handwraps"],
+      "observation": "The upright paired silhouette can read as mittens or short boots at 22px.",
+      "acceptanceBasis": "Visible thumbs, layered wrapping bands, wrist cuffs, and the Sunspun set language resolve the hand-slot identity at 128px and in normal tooltip context."
+    },
+    {
+      "severity": "non-blocking",
+      "ids": ["fine_frost_gourd", "fine_gilded_sunmelon"],
+      "observation": "Both Fine variants deliberately change silhouette substantially from their base crop, so their smallest-size family relationship relies more heavily on palette and material.",
+      "acceptanceBasis": "Frost Gourd keeps the powdery ivory-blue rind and squash construction; Gilded Sunmelon keeps golden rind, vine, and melon surface. The generation briefs explicitly require structural rather than overlay-only Fine differentiation."
+    }
+  ],
+  "familyReviewConclusion": "Crop triplets, farming dishes, fish and feast families, armor sets, jewelry ladders, inscription tiers, crafted apex items, and pattern/product pairs otherwise remain distinct side-by-side. No accidental written marks, hard crop, transparent master, repeated painting, or clear house-style miss was found."
+}

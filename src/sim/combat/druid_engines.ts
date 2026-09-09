@@ -8,9 +8,11 @@ import {
   CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE,
   GROVESPRING_4PC_VERDANCE_BANK,
 } from '../content/ignivar_set_bonuses';
+import { scalePrimaryHealing } from '../primary_healing';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
+import { primaryHealingMultiplier } from '../spec_output_tuning';
 import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
@@ -30,7 +32,9 @@ export const WILD_APEX_MULT = 1.25;
 export const QUICKENING_ENERGY = 5;
 export const QUICKENING_RAGE = 3;
 export const QUICKENING_MANA_PCT = 0.02;
-export const LOPING_STRIDE_SPEED = 0.6;
+// buff_speed auras carry a 1+fraction multiplier (moveSpeedMult takes the max
+// over 1), so +60% is 1.6; a bare 0.6 was silently discarded by the max.
+export const LOPING_STRIDE_SPEED = 1.6;
 export const LOPING_STRIDE_DURATION = 3;
 const LOPING_STRIDE_ICD_KEY = 'dru_loping_stride';
 const LOPING_STRIDE_ICD = 20;
@@ -328,9 +332,25 @@ function replantWildbloom(ctx: SimContext, player: Entity, target: Entity): void
   const resolved = ctx.resolvedAbility('rejuvenation', player.id);
   const hot = resolved?.effects.find((effect) => effect.type === 'hot');
   if (!resolved || !hot || hot.type !== 'hot') return;
-  const tickValue =
-    Math.max(1, Math.round(hot.total / (hot.duration / hot.interval))) +
-    hotTickBonus(player.healPower, hot.duration, hot.interval);
+  const meta = player.kind === 'player' ? ctx.players.get(player.id) : undefined;
+  if (!meta) return;
+  const mods = ctx.playerMods(meta);
+  // The replant historically passed no talent/HoT multiplier on its Healing
+  // Power rider, unlike a real Rejuvenation cast (effect_dispatch.ts 'hot'
+  // case). Resolve the same multiplier here so the two applications agree,
+  // then scale the complete tick once for the Groveheart primary factor.
+  const talentHealMult = resolveTalentHitMult(resolved.def, mods).healMult;
+  const hotBase = Math.max(1, Math.round(hot.total / (hot.duration / hot.interval)));
+  const hotSp = hotTickBonus(
+    player.healPower,
+    hot.duration,
+    hot.interval,
+    talentHealMult * (1 + mods.global.hotHealPct),
+  );
+  const tickValue = scalePrimaryHealing(
+    hotBase + hotSp,
+    primaryHealingMultiplier(meta.cls, mods.spec),
+  );
   ctx.applyAura(target, {
     id: 'rejuvenation',
     name: resolved.def.name,

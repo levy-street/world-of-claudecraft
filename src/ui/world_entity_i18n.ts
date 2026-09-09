@@ -1,15 +1,4 @@
-import {
-  GUILD_TREND_LETTERS,
-  HEROIC_MARK_LETTER,
-  type LetterDef,
-  MASTER_TIER_LETTERS,
-  MASTERY_RESET_LETTER,
-  QUEST_LETTERS,
-  WELCOME_LETTER,
-  WOC_MARKET_DELIVERY_LETTER,
-  WOC_MARKET_RETURN_LETTER,
-  WOC_MARKET_SOLD_LETTER,
-} from '../sim/content/letters';
+import { authoredLettersById } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
@@ -55,6 +44,9 @@ const MOB_IDS = [
   'friendly_player_dummy',
   'normal_boss_dummy',
   'heroic_boss_dummy',
+  // The Eastbrook hub's own level-5 practice targets (sim/content/practice_dummies.ts).
+  'hub_training_dummy',
+  'hub_healing_dummy',
   'ridge_stalker',
   'deeprock_kobold',
   'thornpeak_ogre',
@@ -94,6 +86,7 @@ const MOB_IDS = [
   'nythraxis_heroic_priest_add',
   'nythraxis_heroic_rogue_add',
   'nythraxis_scourge_of_thornpeak',
+  'nythraxis_bone_spike',
   'ignivar_herald_of_the_last_flame',
   'ignivar_heart_of_the_end',
   'ignivar_ember_sentinel',
@@ -291,7 +284,7 @@ const NPC_IDS = [
   'chronicler_saul', // Book of Deeds Chronicler (Eastbrook, zone 1)
   'chronicler_osric_fenn', // Book of Deeds Chronicler (Fenbridge, zone 2)
   'chronicler_edda_hartwell', // Book of Deeds Chronicler (Highwatch, zone 3)
-  // Eldergleam, the Veiled Hollow
+  // Eldershine, the Veiled Hollow
   'keeper_saelwyn',
   'loremother_bryn',
   'provisioner_fenna',
@@ -323,7 +316,7 @@ const NPC_IDS = [
   'lira_dewsong',
   'weaver_amelle',
   'astronomer_cassian',
-  // Gallowmere, the Wraithwood
+  // Gibbetmere, the Wraithwood
   'lampman_cobb',
   'sexton_marrow',
   'widow_tansy',
@@ -350,12 +343,19 @@ const NPC_IDS = [
   'mender_saul',
   'bellkeeper_tam',
   'fisher_nell',
+  'riftwright_maelis', // the Rift Forge (Gullhaven, Farshore)
   'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
   'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)
   'weaver_ottilie', // crafting-station master: loom (Eastbrook, zone 1)
   'tinker_gizzel', // crafting-station master: toolworks (Eastbrook, zone 1)
   'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
   'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
+  // The farmer NPCs (the farming go-live), one per farming hub, in the same
+  // tier order as the corresponding FARM_PATCHES rows.
+  'farmer_jessica', // Eastbrook allotments (zone 1, tier 1)
+  'farmer_teasel', // Fenbridge raised beds (zone 2, tier 2)
+  'farmer_hollis', // Highwatch terraces (zone 3, tier 3)
+  'farmer_verbena', // the Evergarden parterre (tier 4)
   // the Proving Shore (tutorial island) + its Eastbrook-spawn greeter
   'wayfarer_bryn',
   'instructor_maren',
@@ -366,10 +366,13 @@ const NPC_IDS = [
   'overseer_pell',
   'drillmaster_rook',
   'tidewarden_nel',
+  // the Eastbrook quay's sparring master (content/practice_dummies.ts)
+  'drillmaster_hale',
 ] as const;
 
 const QUEST_IDS = [
   'q_prof_intro',
+  'q_farm_intro',
   'q_wolves',
   'q_greyjaw',
   'q_boars',
@@ -448,6 +451,8 @@ const QUEST_IDS = [
   'q_ignivar_echoes_in_iron',
   'q_ignivar_heralds_heart',
   'q_ignivar_the_forgefather',
+  'q_forgefathers_requiem',
+  'q_requiem_at_the_forge',
   'q_mogger',
   'q_prof_attune_smith',
   'q_prof_attune_outfitter',
@@ -459,6 +464,8 @@ const QUEST_IDS = [
   'q_prof_amends_bombardier',
   'q_prof_workorder_forge',
   'q_prof_workorder_kitchens',
+  'q_prof_workorder_kitchens_wheat',
+  'q_prof_workorder_kitchens_rice',
   'q_prof_workorder_loom',
   'q_prof_workorder_toolworks',
   'q_prof_workorder_tannery',
@@ -592,6 +599,9 @@ const QUEST_IDS = [
   'q_gc_the_far_shore',
   'q_gc_dead_mens_cargo',
   'q_gc_the_wreck_warden',
+  // the Eastbrook hub dummy lesson (content/practice_dummies.ts)
+  'q_hub_know_your_numbers',
+  'q_hub_healing_numbers',
 ] as const;
 
 const ZONE_IDS = [
@@ -635,6 +645,9 @@ const LETTER_IDS = [
   'letter_q_greyjaw',
   'letter_q_hollow',
   'heroic_marks_reward',
+  // The absent-participant Wyrmfall Core delivery (Masterwrought phase 04,
+  // WYRMFALL_CORE_LETTER in src/sim/content/letters.ts).
+  'wyrmfall_core_reward',
   // Guild trend letters (Professions 2.0), one per canonical adjacent
   // pair in CRAFT_RING order (GUILD_TREND_LETTERS in src/sim/content/letters.ts).
   'guild_trend_engineering_alchemy',
@@ -723,6 +736,8 @@ type WorldEntityTranslations = {
     delveRiteShrineSkullInteract: string;
     mailboxName: string;
     noticeboardName: string;
+    farmPatchName: string;
+    realmBuilderMonumentName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -810,19 +825,10 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     };
   });
 
-  const lettersById: Record<string, LetterDef> = {
-    [WELCOME_LETTER.letterId]: WELCOME_LETTER,
-    [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
-    [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
-    [WOC_MARKET_DELIVERY_LETTER.letterId]: WOC_MARKET_DELIVERY_LETTER,
-    [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
-    [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
-  };
-  for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
-  for (const letter of Object.values(GUILD_TREND_LETTERS)) lettersById[letter.letterId] = letter;
-  for (const byTier of Object.values(MASTER_TIER_LETTERS)) {
-    for (const letter of Object.values(byTier)) lettersById[letter.letterId] = letter;
-  }
+  // The one shared letter map (src/sim/content/letters.ts authoredLettersById),
+  // the same source entity_i18n.ts answers knownLetterId from; LETTER_IDS above
+  // fixes the ORDER and orderedValues throws for an id it lacks.
+  const lettersById = authoredLettersById();
   const letters = {} as LetterTranslations;
   orderedValues(LETTER_IDS, lettersById).forEach((letter) => {
     letters[letter.letterId as LetterId] = {
@@ -848,6 +854,8 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
       mailboxName: 'Mailbox',
       noticeboardName: 'Notice Board',
+      farmPatchName: 'Garden Beds',
+      realmBuilderMonumentName: 'Realm Builder Monument',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

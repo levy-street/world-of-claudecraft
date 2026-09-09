@@ -393,6 +393,34 @@ describe('buildInspectView: gear reuses the char_view paperdoll (no forked slot 
     );
     expect(emptySlots.length).toBe(m.gear.right.length); // nothing on the right in `base`
   });
+
+  it('threads worn instances into the cells (projected), and stays def-only without them', () => {
+    // The 2026-08-27 QA round: the inspect card was the one item-cell surface
+    // still def-only. The core now hands equippedInstances to
+    // buildPaperdollView, whose cells carry each slot's eqi-projected payload
+    // (cosmetic fields survive, the bond fields are trimmed).
+    const promoted = {
+      name: 'Dawnbreaker',
+      rolled: { quality: 'legendary' as const },
+      signer: 'Maker',
+      boundTo: 7,
+    };
+    const m = buildInspectView({ ...base, equippedInstances: { helmet: promoted } }, ITEMS);
+    expect(m.gear).toEqual(buildPaperdollView(base.equippedItems, ITEMS, { helmet: promoted }));
+    expect(m.gear.left[0].instance).toEqual({
+      name: 'Dawnbreaker',
+      rolled: { quality: 'legendary' },
+      signer: 'Maker',
+    });
+    // Slot-keyed, never smeared: the worn mainhand carries no payload.
+    expect(m.gear.left[4].item).toBe(ITEMS.worn_sword);
+    expect(m.gear.left[4].instance).toBeNull();
+    // The def-only negative: no instances input resolves every cell
+    // payload-free, byte for byte the old model.
+    const defOnly = buildInspectView(base, ITEMS);
+    expect(defOnly.gear.left.every((c) => c.instance === null)).toBe(true);
+    expect(defOnly.gear.right.every((c) => c.instance === null)).toBe(true);
+  });
 });
 
 describe('buildInspectRemoteView: the thin out-of-range card carries no gear', () => {

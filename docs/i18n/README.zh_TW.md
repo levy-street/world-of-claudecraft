@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.zh_TW.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Gravecaller 劇情線貫穿三個五人精英實例，第四個實例帶著自�
 
 ### Delves
 
-Delves 是一種獨立、可縮放的小隊模式，供一到兩名玩家進行，每次進入都會從隨機房間重新組建，並在一個上鎖的聖物箱前結束，那個箱子是透過一個開鎖小遊戲打開，而不是擲骰決定戰利品。**The Collapsed Reliquary**（7 級以上）的終點是 Deacon Varric，若你單人前往，AI 同伴 Tessa 會在你身邊作戰。**The Drowned Litany**（12 級以上）則沿著線索走進 Mirefen Marsh 邊緣一座淹沒的神殿。一個 delve 看板決定難度層級：Heroic 會提升敵人等級並加上一個隨機詞綴，以換取更豐厚的獎勵。
+Delves 是一種獨立、可縮放的小隊模式，供一到兩名玩家進行，每次進入都會從隨機房間重新組建，並在一個上鎖的聖物箱前結束，那個箱子是透過一個開鎖小遊戲打開，而不是擲骰決定戰利品。**The Collapsed Reliquary**（7 級以上）的終點是 Deacon Vandric，若你單人前往，AI 同伴 Tessa 會在你身邊作戰。**The Drowned Litany**（12 級以上）則沿著線索走進 Mirefen Marsh 邊緣一座淹沒的神殿。一個 delve 看板決定難度層級：Heroic 會提升敵人等級並加上一個隨機詞綴，以換取更豐厚的獎勵。
 
 ### 排名制 PvP（the Ashen Coliseum）
 

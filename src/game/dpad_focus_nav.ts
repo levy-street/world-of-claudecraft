@@ -82,12 +82,64 @@ export function setPadNavSpansWindows(on: boolean): void {
   spanWindows = on;
 }
 
+/**
+ * How a window ranks against the whole page: its own z-index PLUS the z-index of
+ * every positioned ancestor, outermost first.
+ *
+ * A z-index only orders siblings within one stacking context, so two windows in
+ * different contexts cannot be compared by their own numbers. The HUD really has
+ * two: windows live inside #ui (a positioned layer with its own z-index, raised
+ * again while a mobile sheet is open), while the confirm/input prompts are
+ * appended to <body>. Read straight, the corpse popup's 96 inside #ui (90)
+ * outranked the bind confirmation's 95 at body level, and the pad selected the
+ * body underneath the prompt covering it.
+ */
+function stackingPath(el: HTMLElement): number[] {
+  const path: number[] = [];
+  // Stops at <body>, which every candidate shares: a common prefix cannot change
+  // the order, so walking past it would only cost more style reads on a path the
+  // pad polls while it is navigating.
+  for (
+    let node: HTMLElement | null = el;
+    node && node !== document.body;
+    node = node.parentElement
+  ) {
+    const style = getComputedStyle(node);
+    const z = Number.parseFloat(style.zIndex);
+    // Only a positioned box takes part; a stray z-index on a static one is inert
+    // in the cascade and must stay inert here.
+    if (Number.isFinite(z) && style.position !== 'static') path.push(z);
+  }
+  return path.reverse();
+}
+
+/** Positive when `a` paints above `b`; a deeper path wins an otherwise equal
+ *  prefix, since a positioned descendant paints over its own ancestor. */
+function compareStacking(a: readonly number[], b: readonly number[]): number {
+  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+    if (a[i] !== b[i]) return a[i] - b[i];
+  }
+  return a.length - b.length;
+}
+
 /** The open window the d-pad should navigate inside, or null for the document. */
 function activeRoot(): HTMLElement | null {
   if (spanWindows) return null;
   const open = [...document.querySelectorAll<HTMLElement>(WINDOW_SELECTOR)].filter(isVisible);
-  // Last in document order is the most recently mounted, which is the one on top.
-  if (open.length > 0) return open[open.length - 1];
+  // HUD windows are mounted once and raised by z-index when opened. DOM order
+  // alone can select a background window, including the corpse dialog's opener.
+  let top: HTMLElement | null = null;
+  let topPath: number[] | null = null;
+  for (const window of open) {
+    const path = stackingPath(window);
+    // >= keeps the LAST of equally ranked windows, the document-order tie-break
+    // this has always used.
+    if (!topPath || compareStacking(path, topPath) >= 0) {
+      top = window;
+      topPath = path;
+    }
+  }
+  if (top) return top;
   return activeStandaloneRoot();
 }
 
@@ -119,7 +171,13 @@ function focusables(root: HTMLElement | Document): HTMLElement[] {
  */
 function firstMeaningful(els: readonly HTMLElement[]): HTMLElement | null {
   if (els.length === 0) return null;
-  return els.find((el) => !el.hasAttribute('data-close')) ?? els[0];
+  // A choice dialog can nominate a neutral entry, so opening it with Confirm
+  // never silently arms its first spending action.
+  return (
+    els.find((el) => el.hasAttribute('data-pad-initial-focus')) ??
+    els.find((el) => !el.hasAttribute('data-close')) ??
+    els[0]
+  );
 }
 
 function toRect(el: HTMLElement): NavRect {

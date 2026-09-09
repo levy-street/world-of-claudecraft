@@ -9,7 +9,7 @@ import type { AuraKind, Entity } from '../src/sim/types';
 
 // Direct pins for the action-slot replacement leaf (src/sim/combat/action_replacement.ts),
 // previously covered only through whole-sim scenarios. Anchored on real content rules:
-// Swiftmend -> Overbloom (shared 8 sec clock), Eviscerate's two spec-gated rules, and
+// Fleetmend -> Overbloom (shared 8 sec clock), Eviscerate's two spec-gated rules, and
 // Skyfall's Moonwing-gated Sunwake transform.
 
 function resolved(id: string): ResolvedAbility {
@@ -46,12 +46,12 @@ describe('resolveActionReplacement', () => {
     expect(resolveActionReplacement(base, actorWith({ kind: 'verdance', stacks: 4 }))).toBe(base);
   });
 
-  it('transforms Swiftmend into Overbloom at 5 Verdance and stamps the shared clock', () => {
+  it('transforms Fleetmend into Overbloom at 5 Verdance and stamps the shared clock', () => {
     const base = resolved('swiftmend');
     const out = resolveActionReplacement(base, actorWith({ kind: 'verdance', stacks: 5 }));
     expect(out.def.id).toBe('overbloom');
     // One slot, one clock: the cooldown-carrying transform arms the BASE
-    // button's cooldown key, so Swiftmend and Overbloom share one 8 sec clock.
+    // button's cooldown key, so Fleetmend and Overbloom share one 8 sec clock.
     expect(out.cooldown).toBe(8);
     expect(out.cooldownId).toBe('swiftmend');
   });

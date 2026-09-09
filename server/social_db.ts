@@ -4,6 +4,7 @@
 // stored now so cross-realm friends/guilds need no migration later).
 
 import type { Pool } from 'pg';
+import { guildRosterCap, guildRosterPagesBought } from '../src/sim/guild_roster';
 import { bustAdminGuildListReads } from './admin_guilds_read';
 import {
   GUILD_NAME_ADVISORY_LOCK_SQL,
@@ -143,6 +144,45 @@ ALTER TABLE guilds ADD COLUMN IF NOT EXISTS motd_set_by TEXT NOT NULL DEFAULT ''
 ALTER TABLE guilds ADD COLUMN IF NOT EXISTS pledges_enabled BOOLEAN NOT NULL DEFAULT TRUE;
 ALTER TABLE guilds ADD COLUMN IF NOT EXISTS pledge_min_level INT NOT NULL DEFAULT 1;
 ALTER TABLE guilds ADD COLUMN IF NOT EXISTS pledge_note TEXT NOT NULL DEFAULT '';
+
+-- Guild roster expansion (docs/prd/guild-roster-expansion.md): how many
+-- 20-seat pages the Guild Master has bought. The CAP derives from it
+-- (src/sim/guild_roster.ts guildRosterCap), never the other way round, so the
+-- next page's price always indexes the ladder by pages actually paid for.
+-- Additive and idempotent; 0 keeps every existing guild at the base roster.
+ALTER TABLE guilds ADD COLUMN IF NOT EXISTS roster_pages INT NOT NULL DEFAULT 0;
+
+-- One receipt per bought roster page, written in the SAME transaction as the
+-- page and the buyer's charged purse (server/guild_roster_page_db.ts). Its
+-- only reader is the reconcile step after a lost COMMIT answer: a matching
+-- row under the purchase's own key proves the page landed and must not be
+-- refunded. Bounded by construction (the compare-and-set caps pages at the
+-- ladder's length, so at most that many rows per guild, gone with the
+-- guild), so no retention sweep is needed. copper is BIGINT on purpose: the
+-- ladder crosses INT4 at page 30. Uniqueness is the batch_key alone, NOT
+-- (guild_id, page): an operator who lowers roster_pages to compensate a
+-- player must be able to sell that page number again without deleting
+-- receipts first, so the page index below is a plain index (it serves the
+-- guild cascade). The inline CHECKs are frozen at first creation (CREATE
+-- TABLE IF NOT EXISTS never revisits the body, the bank_ledger_batch_db
+-- lesson); they interpolate no constant, so a change needs its own ALTER.
+CREATE TABLE IF NOT EXISTS guild_roster_receipts (
+  batch_key TEXT PRIMARY KEY,
+  guild_id INT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
+  page INT NOT NULL,
+  character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  copper BIGINT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT guild_roster_receipts_page_positive CHECK (page > 0),
+  CONSTRAINT guild_roster_receipts_copper_positive CHECK (copper > 0)
+);
+-- The first cut of this table (never released) made (guild_id, page) unique.
+ALTER TABLE guild_roster_receipts DROP CONSTRAINT IF EXISTS guild_roster_receipts_page_once;
+CREATE INDEX IF NOT EXISTS guild_roster_receipts_guild_page
+  ON guild_roster_receipts (guild_id, page);
+-- The character cascade (the account-delete path) must never scan this table.
+CREATE INDEX IF NOT EXISTS guild_roster_receipts_character
+  ON guild_roster_receipts (character_id);
 
 -- One active pledge per character (the pledge is a public line on the
 -- character, singular by construction). Bounded at one row per character, so
@@ -421,22 +461,30 @@ export class PgSocialDb implements SocialDb {
 
   async guildMembership(
     charId: number,
-  ): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null> {
+  ): Promise<{ guildId: number; guildName: string; rank: GuildRank; rosterPages: number } | null> {
+    // roster_pages rides the same JOIN the membership read already pays for,
+    // so the roster cap costs the snapshot and the invite gate no extra query.
     const res = await this.pool.query(
-      `SELECT gm.guild_id, g.name AS guild_name, gm.rank
+      `SELECT gm.guild_id, g.name AS guild_name, gm.rank, g.roster_pages
        FROM guild_members gm JOIN guilds g ON g.id = gm.guild_id
        WHERE gm.character_id = $1`,
       [charId],
     );
     const row = res.rows[0];
-    return row ? { guildId: row.guild_id, guildName: row.guild_name, rank: row.rank } : null;
+    return row
+      ? {
+          guildId: row.guild_id,
+          guildName: row.guild_name,
+          rank: row.rank,
+          rosterPages: guildRosterPagesBought(row.roster_pages),
+        }
+      : null;
   }
 
   async addGuildMemberAtomic(
     guildId: number,
     charId: number,
     rank: GuildRank,
-    limit: number,
     requirePledge = false,
   ): Promise<'ok' | 'full' | 'already_member' | 'no_guild' | 'no_pledge'> {
     const client = await this.pool.connect();
@@ -444,11 +492,17 @@ export class PgSocialDb implements SocialDb {
       await client.query('BEGIN');
       // lock the guild row so concurrent accepts serialize — without this the
       // count-then-insert races and N pending invitees can all pass the cap.
-      const g = await client.query('SELECT id FROM guilds WHERE id = $1 FOR UPDATE', [guildId]);
+      // The cap is read from the SAME locked row (bought roster pages), so a
+      // page purchase landing between a caller's snapshot and this seat is
+      // honoured, and a stale client-side cap can never widen it.
+      const g = await client.query('SELECT id, roster_pages FROM guilds WHERE id = $1 FOR UPDATE', [
+        guildId,
+      ]);
       if (g.rowCount === 0) {
         await client.query('ROLLBACK');
         return 'no_guild';
       }
+      const limit = guildRosterCap(guildRosterPagesBought(g.rows[0].roster_pages));
       const existing = await client.query('SELECT 1 FROM guild_members WHERE character_id = $1', [
         charId,
       ]);

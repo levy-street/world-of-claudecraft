@@ -108,7 +108,7 @@ export function eastbrookGrassExclusions(
         radius: 1.5,
       });
     }
-    const well = EASTBROOK_LAYOUT.civic.wellBeacon;
+    const well = EASTBROOK_LAYOUT.civic.monument;
     exclusions.push({
       kind: 'circle',
       id: well.id,

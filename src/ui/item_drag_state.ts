@@ -21,6 +21,17 @@ export interface BagItemDrag {
    *  cannot be reordered from there). It is what the manual-order move command
    *  sends as `from`; the sim re-validates it. */
   index: number | null;
+  /** itemCopyPin of the source slot at pick-up: WHICH copy is in flight, as
+   *  opposed to which cell it came out of. The index alone is not an identity
+   *  over the life of a drag, because the bags can shift underneath it (a
+   *  snapshot lands, a stack merges, an earlier slot empties), after which the
+   *  index either names nothing or, worse, names a different copy of the same
+   *  id; carrying the pin lets every drop target re-resolve the copy at its
+   *  CURRENT index instead (resolveDraggedCopy, equip_drop_core.ts).
+   *
+   *  Empty when the source could name no copy, which keeps every consumer's
+   *  pre-existing id-only behavior for exactly that case. */
+  copyPin: string;
 }
 
 export class ItemDragState {
@@ -28,7 +39,12 @@ export class ItemDragState {
 
   /** Pick up a bag stack (dragstart, or the touch hold arming). */
   begin(drag: BagItemDrag): void {
-    this.current = { itemId: drag.itemId, count: drag.count, index: drag.index };
+    this.current = {
+      itemId: drag.itemId,
+      count: drag.count,
+      index: drag.index,
+      copyPin: drag.copyPin,
+    };
   }
 
   /** The stack in flight, or null when nothing is being dragged. */

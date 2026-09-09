@@ -91,6 +91,45 @@ describe('generic dungeon map view', () => {
     expect(model?.markers.at(-1)).toMatchObject({ kind: 'player' });
   });
 
+  it("draws a party member's dungeon from OUTSIDE via the anchor: party marker, no player arrow", () => {
+    const origin = instanceOrigin(DUNGEONS.hollow_crypt.index, 2);
+    const outside = worldIn('hollow_crypt') as unknown as {
+      player: { pos: { x: number; y: number; z: number } };
+      partyInfo: unknown;
+    };
+    outside.player.pos = { x: 0, y: 0, z: 0 };
+    outside.partyInfo = {
+      members: [{ pid: 7, name: 'Ally', cls: 'mage', dead: 0, x: origin.x + 3, z: origin.z + 2 }],
+    };
+    const world = outside as unknown as IWorld;
+    expect(dungeonMapActive(world)).toBe(false);
+    expect(buildDungeonWorldMapModel(world, 560, 34)).toBeNull();
+    const model = buildDungeonWorldMapModel(world, 560, 34, { x: origin.x + 3, z: origin.z + 2 });
+    expect(model).not.toBeNull();
+    expect(model?.dungeonId).toBe('hollow_crypt');
+    expect(model?.markers.map((m) => m.kind)).toEqual(['party']);
+    // A member in ANOTHER copy of the same dungeon shares the local coordinates
+    // but not the origin: never a marker on this plan (both builders).
+    const other = instanceOrigin(DUNGEONS.hollow_crypt.index, 4);
+    outside.partyInfo = {
+      members: [
+        { pid: 7, name: 'Ally', cls: 'mage', dead: 0, x: origin.x + 3, z: origin.z + 2 },
+        { pid: 8, name: 'Elsewhere', cls: 'rogue', dead: 0, x: other.x + 3, z: other.z + 2 },
+      ],
+    };
+    const filtered = buildDungeonWorldMapModel(world, 560, 34, {
+      x: origin.x + 3,
+      z: origin.z + 2,
+    });
+    expect(filtered?.markers.map((m) => m.kind)).toEqual(['party']);
+    // The stateful core takes the same anchor and agrees.
+    const core = new DungeonMapViewCore();
+    const hot = core.worldMap(world, 560, 34, { x: origin.x + 3, z: origin.z + 2 });
+    expect(hot?.dungeonId).toBe('hollow_crypt');
+    expect(hot?.markers.map((m) => m.kind)).toEqual(['party']);
+    expect(core.worldMap(world, 560, 34)).toBeNull();
+  });
+
   it('shows exits, sealed gates, bosses, NPCs, loot, party, and the player without host drift', () => {
     const entities: EntityInput[] = [
       {

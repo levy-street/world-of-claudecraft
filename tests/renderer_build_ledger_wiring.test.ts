@@ -108,7 +108,8 @@ describe('the ledger producers and the arrival mark are wired in the renderer (s
     // every timedBuild call names a feature builder; a bare builder call
     // beside them would be an untimed zone step
     const timed = source.match(/this\.timedBuild\('(build\w+)', (build\w+)\)/g) ?? [];
-    expect(timed.length).toBeGreaterThanOrEqual(12);
+    // eleven since the Ashen Bulwark's builder retired with its barracks
+    expect(timed.length).toBeGreaterThanOrEqual(11);
     for (const call of timed) {
       const [, name, fn] = /this\.timedBuild\('(build\w+)', (build\w+)\)/.exec(call) ?? [];
       expect(name).toBe(fn);
@@ -133,11 +134,19 @@ describe('the ledger producers and the arrival mark are wired in the renderer (s
     expect(create).toContain(
       'this.buildLedger.record(`view:${kind}`, performance.now() - started, started);',
     );
+    // The lazy mount build lives in mount_lifecycle.ts (syncMountVisual) and
+    // reaches the ledger through the renderer's one MountViewHost.
     expect(source).toContain(
-      "this.buildLedger.record('view:mount', performance.now() - mountStarted, mountStarted);",
+      "recordBuild: (ms, startedAt) => this.buildLedger.record('view:mount', ms, startedAt),",
     );
-    expect(source).toContain(
-      'const mountStarted = performance.now();\n          v.mountVisual = createMountVisual(mountSpec.visualKey);',
+    const lifecycle = readFileSync(
+      new URL('../src/render/mount_lifecycle.ts', import.meta.url),
+      'utf8',
+    );
+    expect(lifecycle).toContain(
+      'const started = performance.now();\n' +
+        '  v.mountVisual = createMountVisual(spec.visualKey);\n' +
+        '  host.recordBuild(performance.now() - started, started);',
     );
   });
 

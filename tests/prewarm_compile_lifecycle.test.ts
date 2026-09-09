@@ -28,7 +28,7 @@ describe('prewarm compile lifecycle', () => {
 
     expect(
       runPrewarmBudgetVariants(
-        [{ grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 }],
+        [{ grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1, post: 1 }],
         [],
         host,
       ),
@@ -42,7 +42,7 @@ describe('prewarm compile lifecycle', () => {
     const stats: Parameters<typeof runPrewarmBudgetVariants>[1] = [
       {
         index: -1,
-        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 },
+        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1, post: 1 },
         elapsedMs: 0,
         syncMs: 0,
         programsBefore: 0,
@@ -53,8 +53,8 @@ describe('prewarm compile lifecycle', () => {
     ];
     passes = 10;
     const levels = [
-      { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 },
-      { grass: 0.5, foliage: 0.75, vfx: 0.8, lighting: 0.9, resolution: 0.95 },
+      { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1, post: 1 },
+      { grass: 0.5, foliage: 0.75, vfx: 0.8, lighting: 0.9, resolution: 0.95, detail: 1, post: 1 },
     ];
     const appliedLevels: typeof levels = [];
 
@@ -112,7 +112,9 @@ describe('prewarm compile lifecycle', () => {
       },
     };
     const stats: Parameters<typeof runPrewarmBudgetVariants>[1] = [];
-    const levels = [{ grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 }];
+    const levels = [
+      { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1, post: 1 },
+    ];
 
     expect(runPrewarmBudgetVariants([], stats, host)).toEqual({ timedOut: false });
     expect(stats).toEqual([]);
@@ -126,8 +128,8 @@ describe('prewarm compile lifecycle', () => {
     let applied = 0;
     const stats: Parameters<typeof runPrewarmBudgetVariants>[1] = [];
     const levels = [
-      { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 },
-      { grass: 0.5, foliage: 0.75, vfx: 0.8, lighting: 0.9, resolution: 0.95 },
+      { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1, post: 1 },
+      { grass: 0.5, foliage: 0.75, vfx: 0.8, lighting: 0.9, resolution: 0.95, detail: 1, post: 1 },
     ];
 
     const result = runPrewarmBudgetVariants(levels, stats, {

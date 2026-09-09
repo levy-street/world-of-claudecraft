@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import {
+  ABILITY_KEYS,
   queryRiftMonsters,
+  RIFT_ABILITY_LABELS,
   RIFT_MONSTER_BY_ID,
   RIFT_MONSTER_INDEX,
 } from '../src/sim/content/rift/monster_index';
@@ -40,6 +42,14 @@ describe('Rift monster index', () => {
     expect(queryRiftMonsters({ themeId: 'frost', bosses: false }).length).toBeGreaterThanOrEqual(2);
     expect(queryRiftMonsters({ themeId: 'frost', bosses: true })).toHaveLength(1);
   });
+
+  it('gives every ability key a human-readable label, never a raw camelCase leak', () => {
+    for (const key of ABILITY_KEYS) {
+      const label = RIFT_ABILITY_LABELS[key];
+      expect(label.length).toBeGreaterThan(0);
+      expect(label).not.toMatch(/[a-z][A-Z]/);
+    }
+  });
 });
 
 describe('AI Dungeon Upgrader contract', () => {
@@ -58,6 +68,23 @@ describe('AI Dungeon Upgrader contract', () => {
     expect(upgraded).not.toBe(base);
     expect(generateRiftFloor(424242, 22, 0)).toBe(base);
     expect(upgraded.name).toContain(first.title);
+  });
+
+  // Regression: the boss `concept` line used to join raw MobTemplate flag keys
+  // (e.g. "Its existing aoePulse, summonAdds, enrage mechanics form the
+  // climax."), leaking internal camelCase identifiers into a player-visible
+  // rift log line with no "and" before the last item.
+  it('never leaks a raw camelCase ability key into the boss concept text', () => {
+    for (const seed of [11, 424242, 909090, 55555, 7654321]) {
+      for (const baseLevel of [3, 22, 40]) {
+        const manifest = buildHeuristicRiftUpgrade(buildRiftDungeonDraft(seed, baseLevel));
+        if (!manifest) continue;
+        expect(manifest.boss.concept).not.toMatch(/[a-z][A-Z]/);
+        const finalBoss = RIFT_MONSTER_BY_ID[manifest.boss.templateId]!;
+        if (finalBoss.abilities.length >= 3) expect(manifest.boss.concept).toContain(', and ');
+        if (finalBoss.abilities.length === 2) expect(manifest.boss.concept).toContain(' and ');
+      }
+    }
   });
 
   it('rejects invented templates, executable-shaped data, and out-of-range rewards', () => {

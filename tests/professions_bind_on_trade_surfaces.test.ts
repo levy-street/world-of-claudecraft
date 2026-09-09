@@ -395,13 +395,13 @@ describe('vendor: plain and armed copies sell, stamped copies are refused (wash 
     // removal never consumes the spared slot.
     const { sim, pid } = vendorSetup();
     setCopper(sim, pid, 0);
-    sim.addItem('mudfin_scale', 3, pid);
-    sim.addItemInstance('mudfin_scale', { ...STAMPED }, pid);
+    sim.addItem('soggy_moccasin', 3, pid);
+    sim.addItemInstance('soggy_moccasin', { ...STAMPED }, pid);
     sim.sellAllJunk(pid);
     const loot = lootTexts(sim.drainEvents());
-    expect(loot).toContain('Sold 3 junk items for 15c.');
-    expect(copperOf(sim, pid)).toBe(15);
-    const left = slotsOf(sim, pid, 'mudfin_scale');
+    expect(loot).toContain('Sold 3 junk items for 27c.');
+    expect(copperOf(sim, pid)).toBe(27);
+    const left = slotsOf(sim, pid, 'soggy_moccasin');
     expect(left).toHaveLength(1);
     expect(left[0].count).toBe(1);
     expect(left[0].instance).toEqual({ bindOnTrade: true, boundTo: 999 });

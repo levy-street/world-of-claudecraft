@@ -69,8 +69,8 @@ describe('healer resurrection cooldown parity', () => {
       expect(ABILITIES[id].cooldown, id).toBe(SHARED_REZ_COOLDOWN);
     }
     // The mass rezzes stay pinned to the Chronomancy twin so no group revive
-    // outclasses another; the cooldown, not requiresOutOfCombat, is the real
-    // throttle on chaining one inside a single encounter.
+    // outclasses another; the cooldown limits repeats across encounters,
+    // while requiresOutOfCombat blocks casts during an active combat hold.
     for (const id of ['prayer_of_returning', 'grove_awakening']) {
       const def = ABILITIES[id];
       expect(def.cooldown, id).toBe(ABILITIES.collective_reversal.cooldown);

@@ -1,0 +1,742 @@
+[
+  {
+    "id": "water_elemental",
+    "meanAbsoluteChannelDelta": 6.576456705729167,
+    "pixelsMeanDeltaOver20": 2209
+  },
+  {
+    "id": "varkhul_forgefather_of_the_last_flame",
+    "meanAbsoluteChannelDelta": 1.7912394205729167,
+    "pixelsMeanDeltaOver20": 1
+  },
+  {
+    "id": "wildheart_beastmaster",
+    "meanAbsoluteChannelDelta": 1.6629638671875,
+    "pixelsMeanDeltaOver20": 2
+  },
+  {
+    "id": "wildheart_hexcaller",
+    "meanAbsoluteChannelDelta": 1.6604410807291667,
+    "pixelsMeanDeltaOver20": 1
+  },
+  {
+    "id": "wildheart_high_priest",
+    "meanAbsoluteChannelDelta": 1.61358642578125,
+    "pixelsMeanDeltaOver20": 6
+  },
+  {
+    "id": "mushroom_pixie",
+    "meanAbsoluteChannelDelta": 1.5617268880208333,
+    "pixelsMeanDeltaOver20": 4
+  },
+  {
+    "id": "gloomshade",
+    "meanAbsoluteChannelDelta": 1.5608927408854167,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "tunnel_rat",
+    "meanAbsoluteChannelDelta": 1.5590006510416667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "ignivar_crucible_warden",
+    "meanAbsoluteChannelDelta": 1.5028889973958333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "ignivar_heart_of_the_end",
+    "meanAbsoluteChannelDelta": 1.4762776692708333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "ignivar_herald_of_the_last_flame",
+    "meanAbsoluteChannelDelta": 1.4655965169270833,
+    "pixelsMeanDeltaOver20": 1
+  },
+  {
+    "id": "wildheart_ravager",
+    "meanAbsoluteChannelDelta": 1.436279296875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "wild_boar",
+    "meanAbsoluteChannelDelta": 1.3702189127604167,
+    "pixelsMeanDeltaOver20": 2
+  },
+  {
+    "id": "drowned_warlord",
+    "meanAbsoluteChannelDelta": 1.3582356770833333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "dragonkin_broodguard",
+    "meanAbsoluteChannelDelta": 1.3441569010416667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "mogger",
+    "meanAbsoluteChannelDelta": 1.3224690755208333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_stone_ogre",
+    "meanAbsoluteChannelDelta": 1.3125813802083333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "korgath_the_bound",
+    "meanAbsoluteChannelDelta": 1.3016357421875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "drowned_dead",
+    "meanAbsoluteChannelDelta": 1.2771809895833333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "topiary_wolf",
+    "meanAbsoluteChannelDelta": 1.2738444010416667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "ridge_stalker",
+    "meanAbsoluteChannelDelta": 1.2716267903645833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "thicket_boar",
+    "meanAbsoluteChannelDelta": 1.26251220703125,
+    "pixelsMeanDeltaOver20": 3
+  },
+  {
+    "id": "rift_thornback",
+    "meanAbsoluteChannelDelta": 1.26092529296875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "grix_the_tunnelking",
+    "meanAbsoluteChannelDelta": 1.2585042317708333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "ignivar_cinder_artificer",
+    "meanAbsoluteChannelDelta": 1.25250244140625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "ogre_crusher",
+    "meanAbsoluteChannelDelta": 1.251220703125,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "brutok_skullsmasher",
+    "meanAbsoluteChannelDelta": 1.2297770182291667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "reliquary_ledger_wraith",
+    "meanAbsoluteChannelDelta": 1.2122395833333333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "sundered_horror",
+    "meanAbsoluteChannelDelta": 1.2100423177083333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "dragonkin_whelp",
+    "meanAbsoluteChannelDelta": 1.2009073893229167,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "drakemaw_broodlord",
+    "meanAbsoluteChannelDelta": 1.19830322265625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "spider_egg",
+    "meanAbsoluteChannelDelta": 1.1953938802083333,
+    "pixelsMeanDeltaOver20": 2
+  },
+  {
+    "id": "ashbone_warcaller",
+    "meanAbsoluteChannelDelta": 1.18902587890625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_frost_revenant",
+    "meanAbsoluteChannelDelta": 1.1873982747395833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "raised_bonewalker",
+    "meanAbsoluteChannelDelta": 1.1847330729166667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_bonewalker",
+    "meanAbsoluteChannelDelta": 1.1847330729166667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "emberkin",
+    "meanAbsoluteChannelDelta": 1.1847127278645833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "brakka_wallbreaker",
+    "meanAbsoluteChannelDelta": 1.1836751302083333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_boneclad",
+    "meanAbsoluteChannelDelta": 1.1818440755208333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "captain_verlan",
+    "meanAbsoluteChannelDelta": 1.1806233723958333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "cindraleth_maw_matriarch",
+    "meanAbsoluteChannelDelta": 1.18011474609375,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "yumi_cat",
+    "meanAbsoluteChannelDelta": 1.17974853515625,
+    "pixelsMeanDeltaOver20": 2
+  },
+  {
+    "id": "necromancy_skeletal_warrior",
+    "meanAbsoluteChannelDelta": 1.17156982421875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "thornpeak_ogre",
+    "meanAbsoluteChannelDelta": 1.1684366861979167,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "spider_egg_sac",
+    "meanAbsoluteChannelDelta": 1.1627197265625,
+    "pixelsMeanDeltaOver20": 3
+  },
+  {
+    "id": "wildheart_stalker",
+    "meanAbsoluteChannelDelta": 1.1598103841145833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "necromancy_gravewing",
+    "meanAbsoluteChannelDelta": 1.1593017578125,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "grave_silt_bulwark",
+    "meanAbsoluteChannelDelta": 1.1560465494791667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "reedbound_acolyte",
+    "meanAbsoluteChannelDelta": 1.150634765625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_boss_brute",
+    "meanAbsoluteChannelDelta": 1.14910888671875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "warlord_drogmar",
+    "meanAbsoluteChannelDelta": 1.1354166666666667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "ashbone_raider",
+    "meanAbsoluteChannelDelta": 1.1322835286458333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "gorrak",
+    "meanAbsoluteChannelDelta": 1.1313680013020833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "drowned_deckhand",
+    "meanAbsoluteChannelDelta": 1.1175740559895833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "varkas_boneguard",
+    "meanAbsoluteChannelDelta": 1.1145222981770833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "hub_training_dummy",
+    "meanAbsoluteChannelDelta": 1.1144002278645833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "drowned_templeguard",
+    "meanAbsoluteChannelDelta": 1.1026814778645833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "drowned_votary",
+    "meanAbsoluteChannelDelta": 1.097412109375,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "barrow_wight",
+    "meanAbsoluteChannelDelta": 1.0965983072916667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "restless_bones",
+    "meanAbsoluteChannelDelta": 1.0894775390625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "reliquary_bonewalker",
+    "meanAbsoluteChannelDelta": 1.0856526692708333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "drowned_thrall",
+    "meanAbsoluteChannelDelta": 1.0819295247395833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_boss_necro",
+    "meanAbsoluteChannelDelta": 1.0689290364583333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "normal_boss_dummy",
+    "meanAbsoluteChannelDelta": 1.0631510416666667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "grubjaw",
+    "meanAbsoluteChannelDelta": 1.0590413411458333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_boss_frost",
+    "meanAbsoluteChannelDelta": 1.0511881510416667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "bound_guardian",
+    "meanAbsoluteChannelDelta": 1.0509847005208333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "wraithbinder_maldrec",
+    "meanAbsoluteChannelDelta": 1.0481770833333333,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "friendly_player_dummy",
+    "meanAbsoluteChannelDelta": 1.045654296875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "dragonkin_egg",
+    "meanAbsoluteChannelDelta": 1.0327351888020833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "pyre_colossus",
+    "meanAbsoluteChannelDelta": 1.025390625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "hub_healing_dummy",
+    "meanAbsoluteChannelDelta": 1.0239664713541667,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "training_dummy",
+    "meanAbsoluteChannelDelta": 0.9993082682291666,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "old_greyjaw",
+    "meanAbsoluteChannelDelta": 0.9879353841145834,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "heroic_boss_dummy",
+    "meanAbsoluteChannelDelta": 0.9804890950520834,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "snowdrift_wolf",
+    "meanAbsoluteChannelDelta": 0.9604085286458334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "nythraxis_heroic_warrior_add",
+    "meanAbsoluteChannelDelta": 0.9508463541666666,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "nythraxis_skeleton_warrior",
+    "meanAbsoluteChannelDelta": 0.9508463541666666,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_boss_ritualist",
+    "meanAbsoluteChannelDelta": 0.95050048828125,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "sanctum_boneguard",
+    "meanAbsoluteChannelDelta": 0.9477335611979166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "terrace_howler",
+    "meanAbsoluteChannelDelta": 0.9260050455729166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "glimmerwisp",
+    "meanAbsoluteChannelDelta": 0.9246012369791666,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "bastion_revenant",
+    "meanAbsoluteChannelDelta": 0.92431640625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "waking_warden",
+    "meanAbsoluteChannelDelta": 0.92156982421875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "graveguard",
+    "meanAbsoluteChannelDelta": 0.92144775390625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "mire_prowler",
+    "meanAbsoluteChannelDelta": 0.9178670247395834,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "forest_wolf",
+    "meanAbsoluteChannelDelta": 0.9150797526041666,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "nythraxis_scourge_of_thornpeak",
+    "meanAbsoluteChannelDelta": 0.9088134765625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "the_wreck_warden",
+    "meanAbsoluteChannelDelta": 0.9054361979166666,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "marrowlord_varkas",
+    "meanAbsoluteChannelDelta": 0.9039306640625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "void_stalker",
+    "meanAbsoluteChannelDelta": 0.88726806640625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "ancient_guardian",
+    "meanAbsoluteChannelDelta": 0.8791097005208334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "training_effigy",
+    "meanAbsoluteChannelDelta": 0.8608601888020834,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "ignivar_ember_sentinel",
+    "meanAbsoluteChannelDelta": 0.8549601236979166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "idol_guardian",
+    "meanAbsoluteChannelDelta": 0.8379923502604166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "tolling_bell",
+    "meanAbsoluteChannelDelta": 0.8273722330729166,
+    "pixelsMeanDeltaOver20": 1
+  },
+  {
+    "id": "vision_deathstalker_voss",
+    "meanAbsoluteChannelDelta": 0.801025390625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "morthen",
+    "meanAbsoluteChannelDelta": 0.78961181640625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "edda_reedhand",
+    "meanAbsoluteChannelDelta": 0.78363037109375,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "gravedigger_mosley",
+    "meanAbsoluteChannelDelta": 0.7664794921875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "duskwisp",
+    "meanAbsoluteChannelDelta": 0.7631022135416666,
+    "pixelsMeanDeltaOver20": 1
+  },
+  {
+    "id": "deacon_voss",
+    "meanAbsoluteChannelDelta": 0.7599894205729166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "grand_necromancer_velkhar",
+    "meanAbsoluteChannelDelta": 0.7599894205729166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "nythraxis_bone_spike",
+    "meanAbsoluteChannelDelta": 0.7560831705729166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "sexton_marrow",
+    "meanAbsoluteChannelDelta": 0.7295328776041666,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "corrupted_priest_malric",
+    "meanAbsoluteChannelDelta": 0.7198486328125,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "sister_nhalia",
+    "meanAbsoluteChannelDelta": 0.7193603515625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "apprentice_wren",
+    "meanAbsoluteChannelDelta": 0.7105712890625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "sister_nhalia_drowned_canticle",
+    "meanAbsoluteChannelDelta": 0.6974690755208334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "nythraxis_heroic_priest_add",
+    "meanAbsoluteChannelDelta": 0.6870930989583334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "fisher_bram",
+    "meanAbsoluteChannelDelta": 0.6806437174479166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "boneclad_revenant",
+    "meanAbsoluteChannelDelta": 0.62677001953125,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "derelict_mech",
+    "meanAbsoluteChannelDelta": 0.6152547200520834,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_pact_acolyte",
+    "meanAbsoluteChannelDelta": 0.6064656575520834,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "wyrmcult_necromancer",
+    "meanAbsoluteChannelDelta": 0.5981648763020834,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "pale_huntsman",
+    "meanAbsoluteChannelDelta": 0.5898844401041666,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "acolyte_tessa",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "choirmother_selthe",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "gravecaller_mender",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "mogger_lackey",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "nhalia_mourner",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "pale_choir_acolyte",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_boss_arcane",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "rift_void_acolyte",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "threnos_first_voice",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "tidebound_acolyte",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "vale_bandit",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "wyrmcult_zealot",
+    "meanAbsoluteChannelDelta": 0.5813802083333334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "vision_malric_mage",
+    "meanAbsoluteChannelDelta": 0.5795694986979166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "fallen_captain_aldren",
+    "meanAbsoluteChannelDelta": 0.5767822265625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "reliquary_saintless_effigy",
+    "meanAbsoluteChannelDelta": 0.57568359375,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "castaway_navigator",
+    "meanAbsoluteChannelDelta": 0.5733235677083334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "hedge_knight",
+    "meanAbsoluteChannelDelta": 0.5648396809895834,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "barrow_king",
+    "meanAbsoluteChannelDelta": 0.56365966796875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "vision_aldren_warrior",
+    "meanAbsoluteChannelDelta": 0.5589396158854166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "reliquary_gravecall_acolyte",
+    "meanAbsoluteChannelDelta": 0.55816650390625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "gravecaller_summoner",
+    "meanAbsoluteChannelDelta": 0.5526123046875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "crypt_shambler",
+    "meanAbsoluteChannelDelta": 0.5521443684895834,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "gravecaller_cultist",
+    "meanAbsoluteChannelDelta": 0.55072021484375,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "vael_the_mistcaller",
+    "meanAbsoluteChannelDelta": 0.5326741536458334,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "nythraxis_heroic_rogue_add",
+    "meanAbsoluteChannelDelta": 0.52459716796875,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "hollow_acolyte",
+    "meanAbsoluteChannelDelta": 0.5225830078125,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "knight_commander_olen",
+    "meanAbsoluteChannelDelta": 0.52105712890625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "drowned_cantor",
+    "meanAbsoluteChannelDelta": 0.5166015625,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "deacon_varric",
+    "meanAbsoluteChannelDelta": 0.5162150065104166,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "necromancy_bone_mage",
+    "meanAbsoluteChannelDelta": 0.51214599609375,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "deathstalker_voss",
+    "meanAbsoluteChannelDelta": 0.4881795247395833,
+    "pixelsMeanDeltaOver20": 0
+  },
+  {
+    "id": "reliquary_funeral_ringer",
+    "meanAbsoluteChannelDelta": 0.4576619466145833,
+    "pixelsMeanDeltaOver20": 0
+  }
+]

@@ -33,6 +33,7 @@ const stripLineComments = (src: string): string =>
 const painter = read('../src/ui/deeds_window.ts');
 const tracker = read('../src/ui/deed_tracker_painter.ts');
 const hud = read('../src/ui/hud.ts');
+const sideButtons = read('../src/ui/hud/menu/side_buttons.ts');
 const mainSrc = read('../src/main.ts');
 const inputSrc = read('../src/game/input.ts');
 const settingsSrc = read('../src/game/settings.ts');
@@ -213,11 +214,11 @@ describe('hud wiring', () => {
     const end = hud.indexOf('\n  log(\n', start);
     const body = stripLineComments(hud.slice(start, end));
     expect(body).toMatch(
-      /for \(const id of plan\.titleHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedTitleHint', \{ title: deedTitleText\(id\) \}\),\s*'#ffd100',?\s*\);/,
+      /for \(const id of plan\.titleHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedTitleHint', \{ title: deedTitleText\(id\) \}\),\s*HUD_LOG\.NOTICE,?\s*\);/,
     );
     // Named by the DEED: a border reward carries a palette slug, never text.
     expect(body).toMatch(
-      /for \(const id of plan\.borderHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedBorderHint', \{ name: deedName\(id\) \}\),\s*'#ffd100',?\s*\);/,
+      /for \(const id of plan\.borderHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedBorderHint', \{ name: deedName\(id\) \}\),\s*HUD_LOG\.NOTICE,?\s*\);/,
     );
   });
 
@@ -243,7 +244,7 @@ describe('hud wiring', () => {
       expect(start, anchor).toBeGreaterThan(-1);
       const body = stripLineComments(hud.slice(start, hud.indexOf('break;', start)));
       expect(body, anchor).toContain(
-        "if (this.showBanner(text) !== 'show') this.log(text, '#fa6');",
+        "if (this.showBanner(text) !== 'show') this.log(text, HUD_LOG.CONTEST);",
       );
     }
   });
@@ -536,7 +537,7 @@ describe('hud wiring', () => {
     // The chat-pane delivery too, not just the announcer: deleting the log
     // call would compile and pass everything else while the visible catch-up
     // line vanishes (the reliquary sibling pins its log line the same way).
-    expect(body).toContain("this.log(retroText, '#ffd100');");
+    expect(body).toContain('this.log(retroText, HUD_LOG.NOTICE);');
   });
 
   it('marks the watch toggle state and names the recent-strip jump buttons', () => {
@@ -635,7 +636,7 @@ describe('entry HTMLs', () => {
     }
     // hud.ts binds the click and repaints the keycap from the live binding.
     expect(hud).toContain("$('#mm-deeds').addEventListener('click', () => this.toggleDeeds());");
-    expect(hud).toContain("['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],");
+    expect(sideButtons).toContain("['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],");
   });
 });
 
@@ -797,7 +798,8 @@ describe('mobile layout (hud.mobile.css)', () => {
 describe('keybind dispatch chain', () => {
   it('dispatches the deeds edge action end to end (keyboard and gamepad)', () => {
     expect(inputSrc).toMatch(/case 'deeds':\s*this\.cb\.onUiKey\('deeds'\);/);
-    expect(mainSrc.match(/case 'deeds':\s*hud\.toggleDeeds\(\);/g)?.length).toBe(2);
+    expect(mainSrc).toContain('dispatchCollectionAction(key, hud)');
+    expect(mainSrc).toContain('dispatchCollectionAction(id, hud)');
   });
 });
 
@@ -1121,6 +1123,8 @@ describe('chrome keys and CSS floors', () => {
 });
 
 describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
+  const buttonEl = (): HTMLElement => document.createElement('button');
+
   it('adds the Book of Deeds window to the guard array, keeping the shared guard body', () => {
     // The Book is a non-modal overlay, so canUseGameKeys() stays true while a
     // Book button has focus: without the guard, Space jumps the character and
@@ -1150,7 +1154,13 @@ describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
     // Bound the slice at the function's closing brace so the negative below never
     // polices whatever follows the guard in the module.
     const guardBody = guardSrc.slice(bodyStart, guardSrc.indexOf('\n}\n', bodyStart) + 3);
-    expect(guardBody).toContain("tagName !== 'BUTTON'");
+    // The decision itself is the pure src/ui/panel_key_guard.ts rule (only a
+    // focused BUTTON, only Enter/Space, and the one bag item row Space must
+    // pass through to reach the jump); the guard body delegates to it.
+    expect(guardBody).toContain('panelKeyGuardStops(');
+    const rule = stripLineComments(read('../src/ui/panel_key_guard.ts'));
+    expect(rule).toContain("tagName !== 'BUTTON'");
+    expect(rule).not.toContain('preventDefault');
     expect(guardBody).toContain('ke.stopPropagation()');
     expect(guardBody).not.toContain('preventDefault');
   });

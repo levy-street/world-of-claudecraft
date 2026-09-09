@@ -1,0 +1,165 @@
+import { describe, expect, it } from 'vitest';
+import { canopyDetailProfileFor } from '../src/render/canopy_detail';
+import {
+  CANOPY_FADE_END_AO_ONLY,
+  CANOPY_FADE_END_FULL,
+  CANOPY_FADE_START,
+  CANOPY_TAPS_AO_ONLY,
+  CANOPY_TAPS_FULL,
+  CANOPY_TAPS_OFF,
+  CANOPY_TRIPLANAR_TAPS,
+  canopyDetailProfile,
+  canopyDetailProgramCacheKey,
+  canopyTexturesSatisfy,
+} from '../src/render/canopy_detail_tier_core';
+import { gfxInternalsForTest } from '../src/render/gfx';
+
+const TIERS = ['low', 'medium', 'high', 'ultra', 'insane'] as const;
+const PHONE = { platform: 'ios' as const };
+
+describe('canopy detail tier profile', () => {
+  it('splits the layer into its two triplanar halves', () => {
+    expect(CANOPY_TAPS_AO_ONLY).toBe(CANOPY_TRIPLANAR_TAPS);
+    expect(CANOPY_TAPS_FULL).toBe(2 * CANOPY_TRIPLANAR_TAPS);
+    expect(canopyDetailProfile(CANOPY_TAPS_OFF)).toBeNull();
+    expect(canopyDetailProfile(CANOPY_TAPS_AO_ONLY)).toEqual({
+      taps: 3,
+      normalDetail: false,
+      fadeStart: CANOPY_FADE_START,
+      fadeEnd: CANOPY_FADE_END_AO_ONLY,
+    });
+    expect(canopyDetailProfile(CANOPY_TAPS_FULL)).toEqual({
+      taps: 6,
+      normalDetail: true,
+      fadeStart: CANOPY_FADE_START,
+      fadeEnd: CANOPY_FADE_END_FULL,
+    });
+  });
+
+  it('tightens the band with the taps, from the same start', () => {
+    const ao = canopyDetailProfile(CANOPY_TAPS_AO_ONLY);
+    const full = canopyDetailProfile(CANOPY_TAPS_FULL);
+    // Same start: nothing a player sees up close changes on the lighter arm.
+    expect(ao?.fadeStart).toBe(full?.fadeStart);
+    expect(ao?.fadeEnd).toBeLessThan(full?.fadeEnd ?? 0);
+    // A fade that ends before it starts would compile a nonsense smoothstep.
+    expect(CANOPY_FADE_START).toBeLessThan(CANOPY_FADE_END_AO_ONLY);
+    // The ring the AO-only arm gives up, which is what the cut actually buys.
+    const areaShed = 1 - (CANOPY_FADE_END_AO_ONLY / CANOPY_FADE_END_FULL) ** 2;
+    expect(areaShed).toBeGreaterThan(0.3);
+  });
+
+  it('rounds a stray knob value DOWN onto a shipped rung', () => {
+    expect(canopyDetailProfile(0)).toBeNull();
+    expect(canopyDetailProfile(2)).toBeNull();
+    expect(canopyDetailProfile(-1)).toBeNull();
+    expect(canopyDetailProfile(Number.NaN)).toBeNull();
+    expect(canopyDetailProfile(5)?.taps).toBe(CANOPY_TAPS_AO_ONLY);
+    expect(canopyDetailProfile(99)?.taps).toBe(CANOPY_TAPS_FULL);
+  });
+});
+
+describe('canopy detail tier ladder', () => {
+  it('pins the taps and the band each tier compiles', () => {
+    const rows = TIERS.map((tier) => {
+      const settings = gfxInternalsForTest.settingsFor(tier);
+      const profile = canopyDetailProfile(settings.canopyDetailTaps);
+      return [tier, settings.canopyDetailTaps, profile?.fadeEnd ?? null];
+    });
+    expect(rows).toEqual([
+      ['low', 0, null],
+      ['medium', 0, null],
+      ['high', 0, null],
+      ['ultra', 3, CANOPY_FADE_END_AO_ONLY],
+      ['insane', 6, CANOPY_FADE_END_FULL],
+    ]);
+  });
+
+  it('keeps the taps knob and the on/off flag from ever disagreeing', () => {
+    // canopy_detail.ts consults both; a tier where one says yes and the other
+    // says no would either compile a dead layer or skip a live one.
+    for (const tier of TIERS) {
+      for (const hints of [undefined, PHONE, { graphicsPreset: 5 }]) {
+        const s = gfxInternalsForTest.settingsFor(tier, hints);
+        expect(s.canopyDetail, `${tier} ${JSON.stringify(hints ?? null)}`).toBe(
+          s.canopyDetailTaps > 0,
+        );
+      }
+    }
+  });
+
+  it('never lets a lower tier pay more taps than the one above it', () => {
+    const taps = TIERS.map((tier) => gfxInternalsForTest.settingsFor(tier).canopyDetailTaps);
+    for (let i = 1; i < taps.length; i++) {
+      expect(taps[i], `${TIERS[i]} vs ${TIERS[i - 1]}`).toBeGreaterThanOrEqual(taps[i - 1]);
+    }
+    // The phone-class memory profile sheds the whole layer on every tier.
+    for (const tier of TIERS) {
+      expect(gfxInternalsForTest.settingsFor(tier, PHONE).canopyDetailTaps).toBe(CANOPY_TAPS_OFF);
+    }
+  });
+
+  it('lets the Advanced Foliage Density dial reach both arms', () => {
+    const adv = (foliageDensity: number) =>
+      gfxInternalsForTest.settingsFor('high', { graphicsPreset: 5, foliageDensity });
+    expect(adv(0).canopyDetailTaps).toBe(CANOPY_TAPS_OFF);
+    expect(adv(0.5).canopyDetailTaps).toBe(CANOPY_TAPS_OFF);
+    expect(adv(1).canopyDetailTaps).toBe(CANOPY_TAPS_AO_ONLY);
+    expect(adv(2).canopyDetailTaps).toBe(CANOPY_TAPS_FULL);
+  });
+});
+
+describe('canopy detail material identity and residency', () => {
+  it('gives the two arms different program cache keys, on every dimension', () => {
+    // The arms compile DIFFERENT fragment sources (3 taps against 6), so a
+    // shared program would draw one tier with the other's shader.
+    const ao = canopyDetailProfile(CANOPY_TAPS_AO_ONLY);
+    const full = canopyDetailProfile(CANOPY_TAPS_FULL);
+    if (!ao || !full) throw new Error('both shipped arms must resolve');
+    const aoKey = canopyDetailProgramCacheKey(ao, true, 'base');
+    const fullKey = canopyDetailProgramCacheKey(full, true, 'base');
+    expect(aoKey).not.toBe(fullKey);
+    // Every OTHER key input moves it too, one dimension at a time.
+    expect(canopyDetailProgramCacheKey(ao, false, 'base')).not.toBe(aoKey);
+    expect(canopyDetailProgramCacheKey(ao, true, '')).not.toBe(aoKey);
+    expect(canopyDetailProgramCacheKey(ao, true, 'base', 2)).not.toBe(aoKey);
+    // The chained base key is still carried, so the collapse semantics that
+    // key ahead of this one keep splitting programs the way they did.
+    expect(aoKey.endsWith('|base')).toBe(true);
+    // The shipped arms spelled out, so a silent reshaping of the key reds.
+    expect(aoKey).toBe('canopy-detail|on|t3|f34.0,44.0|base');
+    expect(fullKey).toBe('canopy-detail|on|t6|f34.0,55.0|base');
+  });
+
+  it('waits only on the maps its own arm samples', () => {
+    const ao = canopyDetailProfile(CANOPY_TAPS_AO_ONLY);
+    const full = canopyDetailProfile(CANOPY_TAPS_FULL);
+    if (!ao || !full) throw new Error('both shipped arms must resolve');
+    // The AO arm is ready on the AO map alone: keyed off the normal map too,
+    // ultra would fail soft forever and ship plain leaves.
+    expect(canopyTexturesSatisfy(ao, { ao: true, normal: false })).toBe(true);
+    expect(canopyTexturesSatisfy(ao, { ao: false, normal: true })).toBe(false);
+    expect(canopyTexturesSatisfy(ao, { ao: false, normal: false })).toBe(false);
+    // The full arm needs both.
+    expect(canopyTexturesSatisfy(full, { ao: true, normal: false })).toBe(false);
+    expect(canopyTexturesSatisfy(full, { ao: false, normal: true })).toBe(false);
+    expect(canopyTexturesSatisfy(full, { ao: true, normal: true })).toBe(true);
+  });
+
+  it('resolves the arm a target profile ships, off included', () => {
+    expect(canopyDetailProfileFor(gfxInternalsForTest.settingsFor('high'))).toBeNull();
+    expect(canopyDetailProfileFor(gfxInternalsForTest.settingsFor('ultra'))?.normalDetail).toBe(
+      false,
+    );
+    expect(canopyDetailProfileFor(gfxInternalsForTest.settingsFor('insane'))?.normalDetail).toBe(
+      true,
+    );
+    // canopyDetail false wins over any tap count that survived a remap.
+    expect(
+      canopyDetailProfileFor({
+        ...gfxInternalsForTest.settingsFor('insane'),
+        canopyDetail: false,
+      }),
+    ).toBeNull();
+  });
+});

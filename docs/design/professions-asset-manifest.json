@@ -122,6 +122,13 @@
           "description": "A hooked fish curling above water rings",
           "palette": "river blue, silver scale",
           "priority": 1
+        },
+        {
+          "id": "gather_farming",
+          "name": "Farming",
+          "description": "A hoe leaning over a tilled bed with a young sprout breaking the soil",
+          "palette": "loam brown, young-leaf green",
+          "priority": 1
         }
       ],
       "size": "512px source PNG, served 128px WebP",

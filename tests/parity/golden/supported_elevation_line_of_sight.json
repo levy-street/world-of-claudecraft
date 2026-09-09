@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 998,
+      "nextId": 1006,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1000,
-      "state": "12c99f5e",
-      "events": "809e3b26",
+      "nextId": 1008,
+      "state": "33defdca",
+      "events": "24ac508b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -61,6 +61,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -74,13 +75,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -105,7 +109,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -130,6 +135,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -143,7 +149,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -151,6 +157,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -171,7 +180,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -179,7 +189,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 2,
-          "castTargetId": 999,
+          "castTargetId": 1007,
           "castTotal": 2,
           "castingAbility": "lesser_heal",
           "combatTimer": 99,
@@ -192,7 +202,7 @@
           "gcdRemaining": 1.5,
           "healPower": 12,
           "hp": 51,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -242,7 +252,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -256,7 +266,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1,
-          "id": 999,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -300,8 +310,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1000,
-      "state": "c4c1d3c7",
+      "nextId": 1008,
+      "state": "3a65ca5d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -311,9 +321,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1000,
-      "state": "97a23dc3",
-      "events": "cd57c7b0",
+      "nextId": 1008,
+      "state": "cfb45e7f",
+      "events": "84a9176e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -322,8 +332,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1000,
-      "state": "48dde1de",
+      "nextId": 1008,
+      "state": "8d5147e6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -333,9 +343,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1000,
-      "state": "ea16e959",
-      "events": "cb5cd354",
+      "nextId": 1008,
+      "state": "77ef5d9e",
+      "events": "ebd46e95",
       "rng": {
         "draws": 2,
         "digest": "f56e9f11"
@@ -344,8 +354,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1000,
-      "state": "ea16e959",
+      "nextId": 1008,
+      "state": "77ef5d9e",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -376,6 +386,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -393,13 +404,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -424,7 +438,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -449,6 +464,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -465,7 +481,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -473,6 +489,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -493,7 +512,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -510,7 +530,7 @@
           "fiveSecondRule": 0.05,
           "healPower": 12,
           "hp": 51,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -560,7 +580,7 @@
               "name": "Battle Stance",
               "remaining": 3598,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -574,7 +594,7 @@
           "fiveSecondRule": 101,
           "healPower": 5,
           "hp": 74,
-          "id": 999,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -618,9 +638,9 @@
     {
       "tick": 41,
       "time": 2.05,
-      "nextId": 1000,
-      "state": "2bbb1d83",
-      "events": "809e3b26",
+      "nextId": 1008,
+      "state": "686cae45",
+      "events": "24ac508b",
       "rng": {
         "draws": 6,
         "digest": "05c1975a"
@@ -650,6 +670,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -667,13 +688,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -698,7 +722,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -723,6 +748,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -739,7 +765,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -747,6 +773,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -767,7 +796,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -775,7 +805,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 2,
-          "castTargetId": 999,
+          "castTargetId": 1007,
           "castTotal": 2,
           "castingAbility": "lesser_heal",
           "combatTimer": 101.05,
@@ -788,7 +818,7 @@
           "gcdRemaining": 1.5,
           "healPower": 12,
           "hp": 51,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -838,7 +868,7 @@
               "name": "Battle Stance",
               "remaining": 3597.95,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -852,7 +882,7 @@
           "fiveSecondRule": 101.05,
           "healPower": 5,
           "hp": 1,
-          "id": 999,
+          "id": 1007,
           "jumping": true,
           "kind": "player",
           "level": 1,
@@ -896,8 +926,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1000,
-      "state": "7034e073",
+      "nextId": 1008,
+      "state": "93633f19",
       "events": "741638a5",
       "rng": {
         "draws": 68,
@@ -907,8 +937,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1000,
-      "state": "94014410",
+      "nextId": 1008,
+      "state": "eca516c4",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -918,8 +948,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 1000,
-      "state": "3bfdfe9d",
+      "nextId": 1008,
+      "state": "4ace6313",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -929,8 +959,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1000,
-      "state": "c0339f2a",
+      "nextId": 1008,
+      "state": "a1ffce4c",
       "events": "741638a5",
       "rng": {
         "draws": 353,
@@ -940,9 +970,9 @@
     {
       "tick": 81,
       "time": 4.05,
-      "nextId": 1000,
-      "state": "f63f9a7d",
-      "events": "cb5cd354",
+      "nextId": 1008,
+      "state": "497bdc4e",
+      "events": "ebd46e95",
       "rng": {
         "draws": 362,
         "digest": "156325a6"
@@ -972,6 +1002,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -989,13 +1020,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1020,7 +1054,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1045,6 +1080,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1062,7 +1098,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1070,6 +1106,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1090,7 +1129,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1107,7 +1147,7 @@
           "fiveSecondRule": 0.05,
           "healPower": 12,
           "hp": 51,
-          "id": 998,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1157,7 +1197,7 @@
               "name": "Battle Stance",
               "remaining": 3595.95,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -1171,7 +1211,7 @@
           "fiveSecondRule": 103.05,
           "healPower": 5,
           "hp": 74,
-          "id": 999,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1215,9 +1255,9 @@
     {
       "tick": 81,
       "time": 4.05,
-      "nextId": 1000,
-      "state": "34300421",
-      "events": "68efffb7",
+      "nextId": 1008,
+      "state": "d7c9e31c",
+      "events": "3cfab940",
       "rng": {
         "draws": 362,
         "digest": "156325a6"
@@ -1247,6 +1287,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1264,13 +1305,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1295,7 +1339,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1320,6 +1365,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1337,7 +1383,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1345,6 +1391,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1365,7 +1414,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1382,7 +1432,7 @@
           "fiveSecondRule": 0.05,
           "healPower": 12,
           "hp": 51,
-          "id": 998,
+          "id": 1006,
           "jumping": true,
           "kind": "player",
           "level": 1,
@@ -1432,7 +1482,7 @@
               "name": "Battle Stance",
               "remaining": 3595.95,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -1446,7 +1496,7 @@
           "fiveSecondRule": 103.05,
           "healPower": 5,
           "hp": 1,
-          "id": 999,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1490,8 +1540,8 @@
     {
       "tick": 81,
       "time": 4.05,
-      "nextId": 1000,
-      "state": "34300421",
+      "nextId": 1008,
+      "state": "d7c9e31c",
       "events": "741638a5",
       "rng": {
         "draws": 362,
@@ -1522,6 +1572,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1539,13 +1590,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1006,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1570,7 +1624,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1595,6 +1650,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1612,7 +1668,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1620,6 +1676,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1640,7 +1699,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1657,7 +1717,7 @@
           "fiveSecondRule": 0.05,
           "healPower": 12,
           "hp": 51,
-          "id": 998,
+          "id": 1006,
           "jumping": true,
           "kind": "player",
           "level": 1,
@@ -1707,7 +1767,7 @@
               "name": "Battle Stance",
               "remaining": 3595.95,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -1721,7 +1781,7 @@
           "fiveSecondRule": 103.05,
           "healPower": 5,
           "hp": 1,
-          "id": 999,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

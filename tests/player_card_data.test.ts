@@ -38,6 +38,30 @@ function build(gameWorld: IWorld, overrides: Record<string, unknown> = {}) {
 }
 
 describe('buildPlayerCardData', () => {
+  it('gear rows read the worn COPY: a promoted legendary shows its chosen name in orange', () => {
+    // The player's OWN worn gear (the phase 13 QA frontend finding: the card
+    // read the def alone while the paperdoll two panels over read the copy).
+    const data = build(
+      world({
+        equipment: { mainhand: 'wyrmfall_pendant', chest: null, legs: null, feet: null },
+        equipmentInstances: {
+          mainhand: {
+            perfected: true,
+            rolled: { quality: 'legendary', stats: { int: 2 } },
+            name: 'Dawn Oath',
+          },
+        },
+      }),
+    );
+    expect(data.gear[0]).toEqual({ slot: 'slot:mainhand', name: 'Dawn Oath', color: '#ff8000' });
+    // An unnamed worn copy keeps the def name and the def tier's color.
+    const plain = build(
+      world({ equipment: { mainhand: 'wyrmfall_pendant', chest: null, legs: null, feet: null } }),
+    );
+    expect(plain.gear[0].name).not.toBe('Dawn Oath');
+    expect(plain.gear[0].color).toBe('#a335ee');
+  });
+
   it('projects only share-safe display data and applies the fallback slug', () => {
     const data = build(world());
 

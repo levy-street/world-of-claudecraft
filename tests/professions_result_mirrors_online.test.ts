@@ -39,7 +39,8 @@ import { type ClientSession, GameServer } from '../server/game';
 import type { ClientWorld } from '../src/net/online';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import type { Entity, SimEvent } from '../src/sim/types';
+import { HARVEST_CAST_SECONDS } from '../src/sim/professions/harvest_admission';
+import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { grantItemToken, grantQtyText, harvestLineKey } from '../src/ui/grant_line_view';
 import { t } from '../src/ui/i18n';
 import { bareClient } from './helpers/bare_client';
@@ -49,6 +50,14 @@ const COMMON_WEAPON = 'eastbrook_arming_sword';
 const DUST = 'arcane_dust';
 const WEAPON_ENCHANT = 'enchant_weapon_might';
 const FIELD_POS = { x: 0, z: 150 };
+// Intentional Gathering PR3: corpse harvest now starts a timed cast rather
+// than resolving on the same tick, and requires an owned Field Kit
+// (src/sim/professions/corpse_harvest_session.ts). Both harvest arms below
+// grant the tool and drive the cast to completion over real server ticks
+// (the tests/corpse_harvest_command.test.ts TICKS_PER_CAST shape), so the
+// wire assertions still exercise the actual production cast rather than an
+// instant grant that no longer happens.
+const TICKS_PER_CAST = Math.round(HARVEST_CAST_SECONDS / DT);
 
 type WireMsg = {
   t: string;
@@ -77,12 +86,33 @@ function joinServer(
   return session;
 }
 
+// Grounded via sim.groundPos (never a bare y left over from spawn): a
+// mismatched y reads to the physics step as an airborne body, and gravity's
+// per-tick fall is exactly the kind of position drift the timed harvest
+// cast's own displacement check (corpse_harvest_session.ts) is built to
+// catch, invalidating the cast before it can complete.
 function placeAt(server: GameServer, pid: number, pos: { x: number; z: number }): void {
   const entity = server.sim.entities.get(pid) as PositionedEntity | undefined;
   if (!entity) throw new Error(`no entity for pid ${pid}`);
-  entity.pos.x = pos.x;
-  entity.pos.z = pos.z;
+  entity.pos = server.sim.groundPos(pos.x, pos.z);
   entity.prevPos = { ...entity.pos };
+  entity.vx = 0;
+  entity.vy = 0;
+  entity.vz = 0;
+  entity.onGround = true;
+}
+
+// The real GameServer boots the real production world, which seeds ambient
+// mobs near FIELD_POS. The harvest cast's own validity recheck
+// (corpse_harvest_session.ts) cancels on `actor.inCombat`, and over real
+// ticks an ambient mob can wander into aggro range and flip that flag: not a
+// production defect, just an unrelated ambient actor this fixture never
+// asked for. Strip every ambient mob entity BEFORE the owned corpse is
+// planted (never the player) so the cast has nothing to fight.
+function removeAmbientMobs(server: GameServer): void {
+  for (const [id, entity] of server.sim.entities) {
+    if (entity.kind === 'mob') server.sim.entities.delete(id);
+  }
 }
 
 function routeTick(server: GameServer): void {
@@ -274,7 +304,8 @@ describe('the corpse-harvest result event survives the server to client wire', (
    *  own sim. The same construction the offline suites use. */
   function plantCorpse(server: GameServer, at: { x: number; z: number }): Entity {
     const template = MOBS.forest_wolf;
-    const mob = createMob(CORPSE_ID, template, template.maxLevel, { x: at.x, y: 0, z: at.z });
+    const pos = server.sim.groundPos(at.x, at.z);
+    const mob = createMob(CORPSE_ID, template, template.maxLevel, pos);
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
@@ -298,13 +329,32 @@ describe('the corpse-harvest result event survives the server to client wire', (
     const fc = fakeWs();
     const st = joinServer(server, fc, 708, 'WireHarvest');
     placeAt(server, st.pid, FIELD_POS);
+    server.sim.addItem('field_kit', 1, st.pid);
+    // Discard the Field Kit's own setup grant (it queues an ordinary loot
+    // event) before sampling, so it never lands inside the `mark`-scoped
+    // window the harvest assertions below read.
+    server.sim.drainEvents();
+    removeAmbientMobs(server);
     plantCorpse(server, FIELD_POS);
     const client = bareClient(st.pid);
 
     const mark = fc.sent.length;
     cmd(server, st, { cmd: 'harvestCorpse', id: CORPSE_ID });
-    routeTick(server);
+    for (let i = 0; i < TICKS_PER_CAST; i++) {
+      routeTick(server);
+      // Proves the isolation actually holds: the real cast never cancels on
+      // an ambient combat flag over the whole run.
+      expect(server.sim.entities.get(st.pid)?.inCombat).toBe(false);
+      // No result before the cast actually completes: the real server ticks
+      // drive it, not an instant grant.
+      if (i < TICKS_PER_CAST - 1) {
+        expect(eventsFor(fc.sent, 'harvestResult', mark)).toHaveLength(0);
+      }
+    }
     for (const f of eventFrames(fc.sent, mark)) feed(client, f);
+
+    // The cast really started, over the real wire.
+    expect(eventsFor(fc.sent, 'castStart', mark)).toHaveLength(1);
 
     // What the server actually put on the wire, and what the client ended up
     // holding, are the same object: nothing strips the nested array.
@@ -342,13 +392,28 @@ describe('the corpse-harvest result event survives the server to client wire', (
     const fc = fakeWs();
     const st = joinServer(server, fc, 709, 'WireHarvestFlags');
     placeAt(server, st.pid, FIELD_POS);
+    server.sim.addItem('field_kit', 1, st.pid);
+    // Same setup-grant elision as the arm above: the Field Kit's own loot
+    // event carries neither flag, so it would otherwise contaminate the
+    // no-double-lines sweep below.
+    server.sim.drainEvents();
+    removeAmbientMobs(server);
     plantCorpse(server, FIELD_POS);
     const client = bareClient(st.pid);
 
     const mark = fc.sent.length;
     cmd(server, st, { cmd: 'harvestCorpse', id: CORPSE_ID });
-    routeTick(server);
+    for (let i = 0; i < TICKS_PER_CAST; i++) {
+      routeTick(server);
+      expect(server.sim.entities.get(st.pid)?.inCombat).toBe(false);
+      if (i < TICKS_PER_CAST - 1) {
+        expect(eventsFor(fc.sent, 'harvestResult', mark)).toHaveLength(0);
+      }
+    }
     for (const f of eventFrames(fc.sent, mark)) feed(client, f);
+
+    expect(eventsFor(fc.sent, 'castStart', mark)).toHaveLength(1);
+    expect(eventsFor(fc.sent, 'harvestResult', mark)).toHaveLength(1);
 
     const loot = queueOf(client).filter((e: SimEvent) => e.type === 'loot') as Array<{
       silent?: boolean;

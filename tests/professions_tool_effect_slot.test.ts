@@ -7,7 +7,7 @@
 // object still serializes into the parity state digest and initialising it
 // moved every golden in the suite for a feature no scenario uses. Several arms
 // below assert absence specifically, not emptiness.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   GATHERING_PROFESSION_IDS,
   TOOL_EFFECT_IDS,
@@ -17,6 +17,7 @@ import { MAX_ECHOED_WIRE_ID_LENGTH } from '../src/sim/professions/tool_effect_ac
 import {
   MAX_CRAFTED_BY_LENGTH,
   normalizeToolEffectSlots,
+  promptSlotRefused,
   RARITY_DURABILITY_BONUS,
   slotToolEffectRefused,
   startingDurabilityFor,
@@ -824,6 +825,92 @@ describe('the id tables and the load normalizer, directly', () => {
     } as never);
     expect(mixed?.mining?.effectId).toBe('gatherers_cache');
     expect(mixed && 'fishing' in mixed).toBe(false);
+  });
+
+  it('drops a persisted FARMING prompt row: the mint-side farming+prompt gate load twin', () => {
+    // The mint refuses farming+'prompt' outright (promptSlotRefused:
+    // harvest_crop carries no confirm channel, so a farming slot minted in
+    // prompt mode could never fire or spend). Phase 18 lands the load-side
+    // twin the mint comment used to argue away: a persisted farming prompt
+    // row has NO legal writer (hand-edited JSONB, or a rogue path), so it is
+    // normalized away at load like a policy-refused pair instead of loading
+    // as a permanently dead slot. The drop is announced on the dev channel
+    // (the farm_load_report posture), naming the profession, the row, and
+    // the owner when the caller supplies one.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let farmingPrompt: ReturnType<typeof normalizeToolEffectSlots>;
+    try {
+      farmingPrompt = normalizeToolEffectSlots(
+        {
+          farming: {
+            effectId: 'gatherers_cache',
+            durability: 5,
+            maxDurability: 20,
+            confirmMode: 'prompt',
+          },
+        } as never,
+        'Hoewright',
+      );
+      expect(warn).toHaveBeenCalledTimes(1);
+      const line = String(warn.mock.calls[0][0]);
+      expect(line).toContain('farming');
+      expect(line).toContain('gatherers_cache');
+      expect(line).toContain('Hoewright');
+    } finally {
+      warn.mockRestore();
+    }
+    expect(farmingPrompt).toBeUndefined();
+    // A GARBLED mode fail-safes to 'prompt' (the coercion arm below), which
+    // on farming is the refused pair: the garbled row rides the twin out too.
+    const garbled = normalizeToolEffectSlots({
+      farming: { effectId: 'gatherers_cache', durability: 5, maxDurability: 20, confirmMode: 7 },
+    } as never);
+    expect(garbled).toBeUndefined();
+    // The twin refuses the PAIR, never the mode or the profession: a legal
+    // farming 'always' row and a land-profession 'prompt' row both survive,
+    // and a refused farming row beside a live one drops ALONE.
+    const mixed = normalizeToolEffectSlots({
+      farming: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'prompt',
+      },
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'prompt',
+      },
+    } as never);
+    expect(mixed && 'farming' in mixed).toBe(false);
+    expect(mixed?.mining?.confirmMode).toBe('prompt');
+    const always = normalizeToolEffectSlots({
+      farming: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(always?.farming?.confirmMode).toBe('always');
+    // The mirror arm (the admin-restore suite's tuple-for-tuple idea, applied
+    // to the load): for EVERY gathering profession the load's verdict on a
+    // prompt row follows the mint's own predicates, so the two gates cannot
+    // drift apart profession by profession.
+    for (const professionId of GATHERING_PROFESSION_IDS) {
+      const row = normalizeToolEffectSlots({
+        [professionId]: {
+          effectId: 'gatherers_cache',
+          durability: 5,
+          maxDurability: 20,
+          confirmMode: 'prompt',
+        },
+      } as never);
+      const refused =
+        slotToolEffectRefused(professionId, 'gatherers_cache') || promptSlotRefused(professionId);
+      expect(row?.[professionId] !== undefined, professionId).toBe(!refused);
+    }
   });
 
   it('craftedBy shape clamp: legal names keep provenance, junk drops ALONE', () => {

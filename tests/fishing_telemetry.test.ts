@@ -18,22 +18,27 @@ import { ROD_RECIPES } from '../src/sim/content/recipes';
 import { trainingFeeFor } from '../src/sim/professions/training';
 
 describe('fishing band labels', () => {
-  it('is a closed three-value set, one per shipped catch table', () => {
-    // Literal pin: the label values external dashboards group by. A fourth
+  it('is a closed SIX-value set, one per shipped catch table', () => {
+    // Literal pin: the label values external dashboards group by. A SEVENTH
     // band is a design change, and it must redden this rather than silently
-    // widen every fishing series.
-    expect([...FISHING_BANDS]).toEqual(['0', '1', '2']);
-    // Non-vacuity, and the reason there are exactly three: one per band of
-    // catch tables the sim actually rolls.
+    // widen every fishing series. It read three until masterwrought Phase 11i
+    // grew the ladder, and this pin did exactly its job then: the widening was
+    // a deliberate edit here rather than a set of series that appeared on their
+    // own.
+    expect([...FISHING_BANDS]).toEqual(['0', '1', '2', '3', '4', '5']);
+    // Non-vacuity, and the reason there are exactly SIX (three until
+    // masterwrought Phase 11i): one per band of catch tables the sim actually
+    // rolls. Derived from FISHING_TABLES_BY_BAND rather than restated, so a
+    // seventh band reds here instead of minting an undefined label series.
     expect(FISHING_TABLES_BY_BAND).toHaveLength(FISHING_BANDS.length);
   });
 
   it('maps every sim band to its own label, with no collisions', () => {
-    const bands = [0, 1, 2] as const;
-    expect(bands.map((band) => fishingBandLabel(band))).toEqual(['0', '1', '2']);
+    const bands = [0, 1, 2, 3, 4, 5] as const;
+    expect(bands.map((band) => fishingBandLabel(band))).toEqual(['0', '1', '2', '3', '4', '5']);
     // Distinctness is the property the counters need: two bands sharing a
     // label would silently merge two rungs into one series.
-    expect(new Set(bands.map((band) => fishingBandLabel(band))).size).toBe(3);
+    expect(new Set(bands.map((band) => fishingBandLabel(band))).size).toBe(6);
     for (const band of bands) {
       expect(FISHING_BANDS, String(band)).toContain(fishingBandLabel(band));
     }
@@ -53,12 +58,28 @@ describe('fishing band labels', () => {
 });
 
 describe('rod fee vocabulary', () => {
-  it('IS the rod recipe list, derived not restated', () => {
-    // Both directions: every rod recipe has a label, and every label is a rod
-    // recipe. A one-directional pin would let a stale extra id survive.
-    expect([...ROD_FEE_RECIPE_IDS]).toEqual(ROD_RECIPES.map((recipe) => recipe.id));
-    for (const recipe of ROD_RECIPES) {
+  it('IS the TRAINER-taught rod recipe list, derived not restated', () => {
+    // Both directions: every trainer-taught rod recipe has a label, and every
+    // label is a rod recipe. A one-directional pin would let a stale extra id
+    // survive.
+    //
+    // THE FILTER IS THE POINT, and masterwrought Phase 11i is why it exists.
+    // This counter is a PAYMENT count, and the emission site in server/game.ts
+    // fires on `trainResult ok` for any id in this list. A pattern-item learn
+    // also emits `trainResult ok`, having charged nothing, so the moment a rod
+    // recipe became drop-taught an unfiltered vocabulary would have counted
+    // every pattern learn as a fee paid. 11i's apex rung is that recipe.
+    const trainerTaught = ROD_RECIPES.filter((r) => !(r.acquisition ?? []).includes('drop'));
+    const dropTaught = ROD_RECIPES.filter((r) => (r.acquisition ?? []).includes('drop'));
+    expect([...ROD_FEE_RECIPE_IDS]).toEqual(trainerTaught.map((recipe) => recipe.id));
+    for (const recipe of trainerTaught) {
       expect(isRodFeeRecipe(recipe.id), recipe.id).toBe(true);
+    }
+    // And the drop-taught rung is REFUSED, which is the half that actually
+    // protects the metric. Non-vacuous: the ladder really does carry one.
+    expect(dropTaught.map((r) => r.id)).toEqual(['recipe_clockreel_fishing_rod']);
+    for (const recipe of dropTaught) {
+      expect(isRodFeeRecipe(recipe.id), `${recipe.id} charges no fee`).toBe(false);
     }
     for (const id of ROD_FEE_RECIPE_IDS) {
       expect(
@@ -66,11 +87,13 @@ describe('rod fee vocabulary', () => {
         id,
       ).toBe(true);
     }
-    // Non-vacuity plus the concrete members a dashboard filters on.
+    // Non-vacuity plus the concrete members a dashboard filters on. Still TWO
+    // after 11i added a third rung, because that rung charges no fee.
     expect([...ROD_FEE_RECIPE_IDS]).toEqual([
       'recipe_stormreel_fishing_rod',
       'recipe_tidewrought_fishing_rod',
     ]);
+    expect(ROD_RECIPES).toHaveLength(3);
   });
 
   it('closes the set: a non-rod recipe and a prototype key are both refused', () => {
@@ -95,7 +118,16 @@ describe('rod fee vocabulary', () => {
   it('publishes each rod fee as the trainer actually charges it', () => {
     // Derived from the SAME trainingFeeFor the sim charges with, so the
     // published gauge cannot drift from the copper a player really paid.
+    // Scoped to the rows a trainer teaches, for the reason the vocabulary is:
+    // trainingFeeFor is a pure tier lookup that answers for ANY recipe, so
+    // asking it about the drop-taught rung would publish a fee no trainer ever
+    // quotes. The rung reads 0 here, which is rodFeeForRecipe's not-a-rod-fee
+    // answer rather than a free lesson.
     for (const recipe of ROD_RECIPES) {
+      if ((recipe.acquisition ?? []).includes('drop')) {
+        expect(rodFeeForRecipe(recipe.id), `${recipe.id} publishes no fee`).toBe(0);
+        continue;
+      }
       expect(rodFeeForRecipe(recipe.id), recipe.id).toBe(trainingFeeFor(recipe));
       expect(rodFeeForRecipe(recipe.id), recipe.id).toBeGreaterThan(0);
     }

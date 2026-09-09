@@ -12,6 +12,17 @@ Then:
     obs, info = env.reset(seed=42)
     obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
 
+The env also exposes an OPTIONAL, explicit corpse-gathering command family
+(`inspect_gathering`/`buy_field_kit`/`set_harvest_preference`/`harvest_corpse`)
+alongside the ordinary `step` API; none of it advances sim time or the episode
+step, and it covers only corpse harvesting, not other professions. See
+`env.gathering_capability` for discovery and `headless/CLAUDE.md` for the contract.
+
+A SEPARATE, closed one-goal tracking family (`inspect_gathering_goal`/
+`track_gathering_recipe`/`track_gathering_commission`/`clear_gathering_goal`)
+sits beside it; see `env.gathering_goal_capability` and
+`docs/protocols/gathering-goal.md`.
+
 For parallel training just create N envs (each owns its own subprocess) or use
 gymnasium.vector.AsyncVectorEnv / SyncVectorEnv with `make_env`.
 """
@@ -88,6 +99,13 @@ class WoWClassicEnv(gym.Env):
         self.observation_space = spaces.Box(-2.0, 2.0, shape=(self._obs_size,), dtype=np.float32)
         self.action_space = spaces.Discrete(int(meta["num_actions"]))
         self._episode_seed = 0
+        # Discovery only: the optional gathering command family's version/verbs,
+        # or None on a server bundle built before it existed. See the gathering
+        # methods below and headless/CLAUDE.md.
+        self.gathering_capability: dict[str, Any] | None = meta.get("gathering")
+        # Discovery for the separate one-goal tracking family below, or None
+        # on a server bundle built before it existed.
+        self.gathering_goal_capability: dict[str, Any] | None = meta.get("gathering_goal")
 
     # ------------------------------------------------------------------
     def _request(self, msg: dict[str, Any]) -> dict[str, Any]:
@@ -127,6 +145,47 @@ class WoWClassicEnv(gym.Env):
         res = self._request({"cmd": "step", "action": int(action)})
         obs = np.asarray(res["obs"], dtype=np.float32)
         return obs, float(res["reward"]), bool(res["terminated"]), bool(res["truncated"]), res.get("info", {})
+
+    # -- Optional corpse-gathering command family (PR3, Intentional Gathering) --
+    # Exact mirrors of the `{"cmd":"gathering","verb":...}` requests documented in
+    # `headless/env_server.ts` / `gathering_protocol.ts`. None of these advance sim
+    # time or the episode step. Each returns the full parsed reply verbatim
+    # (including a `reason` on a refusal): the TS validator is the sole authority
+    # on argument validity, so no argument is coerced, rounded, or parsed here.
+    def inspect_gathering(self) -> dict[str, Any]:
+        return self._request({"cmd": "gathering", "verb": "inspect"})
+
+    def buy_field_kit(self, npc_id) -> dict[str, Any]:
+        return self._request({"cmd": "gathering", "verb": "buy_field_kit", "npcId": npc_id})
+
+    def set_harvest_preference(self, preference) -> dict[str, Any]:
+        return self._request(
+            {"cmd": "gathering", "verb": "set_preference", "preference": preference}
+        )
+
+    def harvest_corpse(self, corpse_id) -> dict[str, Any]:
+        return self._request({"cmd": "gathering", "verb": "harvest", "corpseId": corpse_id})
+
+    # -- Optional one-goal tracking command family (PR4, Intentional Gathering) --
+    # Exact mirrors of the `{"cmd":"gathering_goal","verb":...}` requests documented
+    # in `headless/env_server.ts` / `gathering_goal_protocol.ts`. Same rules as the
+    # gathering family above: no sim-time advance, no argument coercion, full reply
+    # returned verbatim (refusal reason included).
+    def inspect_gathering_goal(self) -> dict[str, Any]:
+        return self._request({"cmd": "gathering_goal", "verb": "inspect"})
+
+    def track_gathering_recipe(self, recipe_id, count) -> dict[str, Any]:
+        return self._request(
+            {"cmd": "gathering_goal", "verb": "track_recipe", "recipeId": recipe_id, "count": count}
+        )
+
+    def track_gathering_commission(self, order_id) -> dict[str, Any]:
+        return self._request(
+            {"cmd": "gathering_goal", "verb": "track_commission", "orderId": order_id}
+        )
+
+    def clear_gathering_goal(self) -> dict[str, Any]:
+        return self._request({"cmd": "gathering_goal", "verb": "clear"})
 
     def close(self):
         if self._proc.poll() is None:

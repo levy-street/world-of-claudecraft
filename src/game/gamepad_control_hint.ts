@@ -16,11 +16,15 @@ import {
 } from './gamepad_bindings';
 import {
   GAMEPAD_CONFIRM,
+  GAMEPAD_CYCLE_HUD,
   GAMEPAD_CYCLE_SET,
+  GAMEPAD_NONE,
   type GamepadActionId,
   type GamepadKind,
+  GP,
   gamepadButtonLabel,
 } from './gamepad_map';
+import type { TutorialBagControllerStep } from './tutorial_bag_controller_step';
 
 export interface GamepadControlHintSource {
   entries: readonly GamepadBindingEntry[];
@@ -33,6 +37,7 @@ export interface GamepadControlHintSource {
 export type GamepadControlHintIntent =
   | { readonly type: 'interact' }
   | { readonly type: 'target' }
+  | { readonly type: 'bagItem'; readonly step: TutorialBagControllerStep }
   | { readonly type: 'action'; readonly action: GamepadActionId }
   | {
       readonly type: 'crossHotbar';
@@ -55,6 +60,23 @@ export function gamepadControlHint(
   if (intent.type === 'target') {
     const label = labelForGamepadTarget(source.entries, source.kind, source.crossHotbarEnabled);
     return label ? [label] : [];
+  }
+  if (intent.type === 'bagItem') {
+    const enterHud = safeTutorialActionLabel(source, GAMEPAD_CYCLE_HUD);
+    const confirm = safeTutorialActionLabel(source, GAMEPAD_CONFIRM);
+    const dpadAvailable = dpadNavigatesHud(source);
+    if (!tutorialBagRouteAvailable(intent.step, enterHud, confirm, dpadAvailable)) return [];
+    if (intent.step === 'enterHud') {
+      return enterHud ? [enterHud] : [];
+    }
+    if (
+      intent.step === 'navigateToBlockingWindowClose' ||
+      intent.step === 'navigateToBags' ||
+      intent.step === 'navigateToItem'
+    ) {
+      return ['D-pad'];
+    }
+    return confirm ? [confirm] : [];
   }
   if (intent.type === 'action') {
     const label = labelForGamepadAction(source.entries, intent.action, source.kind);
@@ -83,6 +105,36 @@ export function gamepadControlHint(
     return cycle ? [cycle, chord] : [];
   }
   return [];
+}
+
+function tutorialBagRouteAvailable(
+  step: TutorialBagControllerStep,
+  enterHud: string | null,
+  confirm: string | null,
+  dpadAvailable: boolean,
+): boolean {
+  if (!confirm) return false;
+  if (step === 'useItem') return true;
+  if (!dpadAvailable) return false;
+  return step !== 'enterHud' || enterHud !== null;
+}
+
+function safeTutorialActionLabel(
+  source: GamepadControlHintSource,
+  action: GamepadActionId,
+): string | null {
+  const entry = source.entries.find(
+    (candidate) => candidate.action === action && candidate.button !== GP.BACK,
+  );
+  return entry ? gamepadButtonLabel(entry.button, source.kind) : null;
+}
+
+function dpadNavigatesHud(source: GamepadControlHintSource): boolean {
+  return [GP.DPAD_UP, GP.DPAD_DOWN, GP.DPAD_LEFT, GP.DPAD_RIGHT].every((button) => {
+    const action =
+      source.entries.find((candidate) => candidate.button === button)?.action ?? GAMEPAD_NONE;
+    return action === GAMEPAD_NONE || (source.crossHotbarEnabled && action.startsWith('slot'));
+  });
 }
 
 function crossHotbarChord(position: number, kind: GamepadKind): string | null {

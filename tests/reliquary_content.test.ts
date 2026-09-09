@@ -4,6 +4,7 @@
 // unbounded auto-scrape), while this suite DERIVES its expectations from the
 // live loot / deed tables so a content change reds until the curator decides.
 // Update the literal floors and totals deliberately when product adds content.
+
 import { describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import { CLASSES } from '../src/sim/content/classes';
@@ -80,13 +81,14 @@ import {
 } from '../src/sim/data';
 import { RARE_SLAIN_TEMPLATES } from '../src/sim/deeds';
 import type { LootTier } from '../src/sim/lockpick';
+import { mountItemId } from '../src/sim/mounts';
+import { craftBonusStatsFor } from '../src/sim/professions/crafting';
 import {
   ARMOR_SECONDARY_BY_TYPE,
   DISENCHANT_MATERIAL_BY_QUALITY,
 } from '../src/sim/professions/disenchant_reagents';
 import { gatherRareEventFlavor } from '../src/sim/professions/gather_events';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
-import { masterworkBonusStats } from '../src/sim/professions/masterwork';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import {
   catalogCharacterCompletion,
@@ -195,32 +197,65 @@ function dungeonObjectItemIds(dungeonId: string): string[] {
  * hangs off MobTemplate.loot (src/sim/types.ts), never the DungeonDef itself,
  * and ground objects contribute their interaction yield. Filler falls out by
  * live ITEMS quality, not hand-listing.
+ *
+ * DELIBERATE CARVE-OUT, written at the read per docs/design/reliquary.md's
+ * own curation latitude ("do not auto-include every loot table row without
+ * review"): kind 'recipe' pattern items are EXCLUDED from the derived set.
+ * The phase 11 apex patterns are epic drops on the Nythraxis table, but a
+ * pattern is repeatable (0.04 per kill), tradable, and consumed on learn:
+ * not conquerable unique loot, so no Reliquary page exists for one and the
+ * equality pin must not demand it (the build decision in the Phase 11 BUILT
+ * ledger; the ruling-10 tools precedent plus non-uniqueness carry the call).
+ * The carve-out is kind-keyed, never id-listed, so a future pattern joins it
+ * automatically; its vacuity guard below pins that it excludes EXACTLY the
+ * live raid patterns and nothing else, so it can never silently over-carve.
  */
+function isReliquaryCarvedOut(itemId: string): boolean {
+  return ITEMS[itemId]?.kind === 'recipe';
+}
+
 // Crafting materials fall out by kind too: 'junk' is the material
 // convention (crucible_professions.ts), and a reagent like the Core of the
 // Last Flame is banked and consumed, not a conquerable relic (the
 // professions doctrine: the crafted OUTPUTS are the uniques). The liveness
 // arm in the raid-page describe proves this filter excludes a real epic row.
 function isMaterialId(itemId: string): boolean {
-  return ITEMS[itemId]?.kind === 'junk';
+  return (
+    ITEMS[itemId]?.kind === 'junk' ||
+    // Forgebreaker's retained quest ember is spent by its one-use recipe.
+    // The hammer is the unique, not the consumed proof. Ordinary quest items
+    // are NOT excluded: only live recipe reagents join the material rule.
+    (ITEMS[itemId]?.kind === 'quest' &&
+      ALL_RECIPES.some((recipe) => recipe.reagents.some((reagent) => reagent.itemId === itemId)))
+  );
 }
 
-function dungeonRarePlusLootIds(dungeonId: string): string[] {
+function dungeonRarePlusLootIds(
+  dungeonId: string,
+  opts?: { includeCarvedOut?: boolean },
+): string[] {
+  // The includeCarvedOut arm exists ONLY for the vacuity guard below, which
+  // diffs this ONE walk against itself instead of second-modeling it (the
+  // recorded second-model-of-a-walk trap): a future third loot source added
+  // here is automatically covered by the guard with no twin to update. The
+  // flag lifts the recipe carve-out alone: redemption tokens (the Crucible
+  // sigils are epic 'tool' rows on both raid bosses' tables) and materials
+  // fall out by kind on both arms, and the liveness pins in the raid-page
+  // describe prove each of those two filters really excludes something.
+  const include = opts?.includeCarvedOut === true;
+  const admits = (itemId: string): boolean =>
+    isRarePlus(itemId) &&
+    !isRedemptionTokenId(itemId) &&
+    !isMaterialId(itemId) &&
+    (include || !isReliquaryCarvedOut(itemId));
   const ids = new Set<string>();
   for (const mobId of dungeonMobIds(dungeonId)) {
     for (const entry of MOBS[mobId]?.loot ?? []) {
-      if (entry.itemId === undefined) continue;
-      // Redemption tokens fall out by kind (the Crucible sigils are epic
-      // 'tool' rows on both raid bosses' tables); the liveness arm in the
-      // raid-page describe proves the filter really excludes something.
-      if (isRedemptionTokenId(entry.itemId)) continue;
-      if (isMaterialId(entry.itemId)) continue;
-      if (isRarePlus(entry.itemId)) ids.add(entry.itemId);
+      if (entry.itemId !== undefined && admits(entry.itemId)) ids.add(entry.itemId);
     }
   }
   for (const itemId of dungeonObjectItemIds(dungeonId)) {
-    if (isRarePlus(itemId) && !isRedemptionTokenId(itemId) && !isMaterialId(itemId))
-      ids.add(itemId);
+    if (admits(itemId)) ids.add(itemId);
   }
   return [...ids].sort();
 }
@@ -337,12 +372,13 @@ const CHEST_FN_BY_DELVE: Record<string, { chest: ChestFn; floor: number }> = {
 describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
     // 27 + the four Crucible raid pages (per-boss N+H, the obligations
-    // closeout of docs/prd/ignivar-raid-loot.md).
-    expect(CONQUEROR_PAGES.length).toBe(31);
-    expect(PROFESSION_PAGES.length).toBe(3);
+    // closeout of docs/prd/ignivar-raid-loot.md) + the Roots' Bramblehide
+    // set page (the eighth epic armor family).
+    expect(CONQUEROR_PAGES.length).toBe(32);
+    expect(PROFESSION_PAGES.length).toBe(5);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(39);
+    expect(RELIQUARY_PAGES.length).toBe(42);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -379,21 +415,49 @@ describe('Reliquary Conqueror catalog structure', () => {
     // the 29 NEW Spoils uniques (31 slots minus the 2 set members already
     // catalogued; a relic on two pages is one relic), then the 47 Warfare
     // honor pieces and the 3 fishing additions (the koi and both rods):
-    // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
+    // 223 + 16 + 19 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
-    // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the Bonebound
-    // Rickshaw's new horizons_mounts slot: 341. Catalog growth reverts
+    // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the jewelcrafting
+    // masterwork mark the trainer ladder made earnable: 341, plus the
+    // Grandmaster Jewelcrafting title-shelf slot the phase 05 QA ruling
+    // authored: 342, plus the Masterwrought phase 06 inscription pair (the
+    // masterwork:inscription mark and the Grandmaster Inscription title-shelf
+    // slot): 344, plus the absorbed farming packet's Harvestmaster title-shelf
+    // slot: 345, plus the Masterwrought phase 11i apex fishing rod, the third
+    // rung of the crafted rod ladder the specimen page already catalogues: 346.
+    // Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
-    // The two excludeFromCompletion pages add
+    // The three excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
     // slots and horizons_riftbound the three class-personal Riftbound bands,
-    // and the flag keeps each whole page out of owned AND total (the dedicated
+    // plus the personal Forgebreaker quest craft. The flag keeps each page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
-    // hold both sides), so neither page moves these two literals.
-    // The four Crucible raid pages add 41 distinct new item ids (17 arena
-    // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields), on top of
-    // the batch's own page: 340 + 1 + 45.
-    expect(full).toEqual({ owned: 386, total: 386 });
+    // hold both sides), so none of these pages moves these two literals.
+    // The bank-storage merge (release/v0.41.0, 2026-08-29) pages the release's
+    // two live bag drops (wayfarers_backpack on Spoils,
+    // necromancers_reagent_satchel on Gravewyrm Sanctum), the
+    // derivation-equality pins' own demand: 348 on the merged tree
+    // (346 + 2; the release's own chain read 342 = 340 + 2). The four
+    // Crucible raid pages (the 2026-08-30 sync merge) add the release's 43
+    // distinct new item ids (its own chain read 385 = 342 + 43): 391. The
+    // masterwrought Phase 18 golden-harvest field note is the 392nd, retiring
+    // the farming phase's ledgered cell deferral. The release/v0.42.0 merge
+    // adds one relic more, the Bonebound Rickshaw's horizons_mounts slot (the
+    // release's own chain read 386 = 340 + 1 + 45): 393, MEASURED on the
+    // merged tree. Lanternback Troll and Chimeglass Tortoise add the final two
+    // mount relics: 395. The Cluckwork Mech Bird store mount adds the 396th.
+    // Moving Emberward from Varkhul's normal page to its
+    // heroic page in the same release re-slots a relic already catalogued, so
+    // it moves neither this pair nor the character pair below.
+    // Eleven Crucible collections add 33 distinct crafted item relics: 429.
+    // Roots Bramblehide adds its seven FERAL-locked raid pieces (each on the
+    // Nythraxis page and its own set page, one relic apiece) and the seven
+    // Nythraxis gap-fill drops one relic apiece: 443. The OSSBrain candidate
+    // side of THIS merge independently adds two more SOURCE_PENDING_RULING
+    // horizons_mounts rows (goblin_rocket_sled, rallycart_rxt): 445, MEASURED
+    // on the merged tree. UNION MERGE: base plus both deltas, the professions
+    // and release branches content is disjoint.
+    expect(full).toEqual({ owned: 440, total: 440 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -401,11 +465,27 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands (same deltas as the overview
-    // pair above, including the three release-merged daggers, the Bonebound
-    // Rickshaw's new mount slot and the 41 Crucible raid relics; marks are
+    // pair above, including the three release-merged daggers, both craft
+    // masterwork marks, the two Grandmaster title-shelf slots, the two
+    // bank-storage bag drops, and the 43 Crucible raid relics; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
-    // weapon skins).
-    expect(character).toEqual({ owned: 357, total: 357 });
+    // weapon skins). The phase 11i apex rod is an ITEM, so it moves this pair
+    // by the same one as the overview: 319 on the merged tree before the raid
+    // pages (317 + 2), 362 with them, and 363 with the Phase 18
+    // golden-harvest MARK, which is character-scoped like every other mark.
+    // 364 with the release/v0.42.0 Bonebound Rickshaw: a MOUNT is
+    // character-scoped too, so it moves this pair by the same one as the
+    // overview (only the weapon skins are account-scoped). Lanternback Troll
+    // and Chimeglass Tortoise add two more character-scoped slots: 366. The
+    // Cluckwork Mech Bird is another character-scoped mount slot: 367. Eleven
+    // Crucible collections (character-scoped items) add 33: 400. Roots
+    // Bramblehide seven pieces plus the seven Nythraxis gap-fill drops (all
+    // character-scoped items) add 14: 414. The OSSBrain candidate side of
+    // THIS merge independently adds its own two character-scoped mount slots
+    // (goblin_rocket_sled, rallycart_rxt), the same +2 as the overview pair
+    // above: 416, MEASURED on the merged tree. UNION MERGE: base plus both
+    // deltas, see the overview pair's note above.
+    expect(character).toEqual({ owned: 411, total: 411 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -415,29 +495,57 @@ describe('Reliquary Conqueror catalog structure', () => {
     // catalog by 4, and the measured value wins), and the seven Phase 21
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
     // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
-    // three daggers the v0.36.0 release merge added to live content: 375,
-    // plus the Bonebound Rickshaw's new horizons_mounts slot: 376 total.
-    // Slots, not unique relics: the two Spoils set repeats count again here,
-    // and the seven excludeFromCompletion slots (four vault, three bands)
-    // count here while adding zero to every completion pair, which is why this
-    // number exceeds the overview total above by more than the mark count.
-    // Plus the two bank-storage bag drops the v0.37.0 merge paged
-    // (wayfarers_backpack on Spoils, necromancers_reagent_satchel on
-    // Gravewyrm Sanctum): 377.
+    // three daggers the v0.36.0 release merge added to live content (375), the
+    // jewelcrafting masterwork slot the trainer ladder earned (376), the
+    // Grandmaster Jewelcrafting title slot the phase 05 QA ruling authored
+    // (377), the two Masterwrought phase 06 inscription slots (the
+    // masterwork:inscription mark slot and the Grandmaster Inscription title
+    // slot): 379, and the absorbed farming packet's Harvestmaster title slot
+    // on horizons_titles: 380, and the Masterwrought phase 11i apex fishing rod
+    // slot on professions_specimens: 381, and the two bank-storage bag drops
+    // the release/v0.41.0 merge paged (wayfarers_backpack on Spoils,
+    // necromancers_reagent_satchel on Gravewyrm Sanctum): 383, and the
+    // Bonebound Rickshaw slot the release/v0.42.0 merge added to
+    // horizons_mounts: 384 total. Lanternback Troll and Chimeglass Tortoise
+    // add the next two mount slots: 386 before later catalog growth.
+    // Slots, not unique relics: the eight excludeFromCompletion slots (four
+    // vault, three bands, one Forgebreaker) count here while adding zero to every completion
+    // pair, and every duplicate ITEM slot counts again here where the overview
+    // counts the relic once (28 such slots, the two Spoils set repeats among
+    // them; most predate Phase 21), which is why this number exceeds the
+    // overview total above by 36.
     const slots = RELIQUARY_PAGES.reduce((n, page) => n + page.relics.length, 0);
     // Diagnostic names the per-page breakdown, so a red here says WHICH page
     // moved instead of only that the sum did. The four Crucible raid pages
     // add 41 slots (17 + 3 + 16 + 5) on top of the 375 measured before them,
     // and the raid's flawless title joins the titles page, plus the two
-    // Varkhul legendary slots reached 419; then 418 when the maintainer
-    // pulled Forgebreaker to route it through crafting. Moving Emberward
-    // from Varkhul's normal page to its heroic page keeps the total fixed.
+    // Varkhul legendaries at the launch wiring: 419; then 418 when the
+    // maintainer pulled Forgebreaker to route it through crafting. The
+    // masterwrought Phase 18 golden-harvest field note is the one slot after
+    // that: 427, and the release/v0.42.0 Bonebound Rickshaw mount slot the
+    // next: 428. Lanternback Troll and Chimeglass Tortoise bring the merged
+    // total to 430. The Cluckwork Mech Bird adds one more mount slot: 431.
+    // Moving Emberward from Varkhul's normal page to its heroic page in the
+    // same release re-slots it and keeps this total fixed. The one-time
+    // Forgebreaker quest adds one personal slot beside 33 Crucible crafts,
+    // taking the total to 465. Roots Bramblehide adds 14 slots (seven on the
+    // Nythraxis page, seven on its own set page) and the seven Nythraxis
+    // gap-fill drops add seven more slots on the Nythraxis page: 486. The
+    // OSSBrain candidate side of THIS merge independently adds its own two
+    // horizons_mounts slots (goblin_rocket_sled, rallycart_rxt): 488,
+    // MEASURED on the merged tree. UNION MERGE: base plus both deltas, see
+    // the completion pair note above.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(421);
-    // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
-    // rare-slain proofs of conquerors_rares_of_the_realm.
+    ).toBe(483);
+    // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
+    // proofs of conquerors_rares_of_the_realm, the two craft masterwork
+    // marks (masterwork:jewelcrafting, masterwork:inscription), and the
+    // masterwrought Phase 18 gather_event:golden_harvest field note. Neither
+    // branch's new content (Crucible/Forgebreaker items, Roots' Bramblehide
+    // set, the Nythraxis gap-fill drops, the two new pending mounts) is a
+    // mark, so this total is unchanged by the merge.
     expect(
       RELIQUARY_MARK_IDS.size,
       `mark total moved; by namespace: ${[
@@ -450,7 +558,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       ]
         .map(([ns, n]) => `${ns}=${n}`)
         .join(', ')}`,
-    ).toBe(29);
+    ).toBe(32);
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -648,12 +756,18 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // predicate IS the index membership test.)
     // The Phase 21 measured final, hand-carried: 237 unique catalogued item
     // ids, plus the three daggers the v0.36.0 release merge added (240), plus
-    // the Crucible raid relics incl. the Varkhul shield: 282 (Forgebreaker
-    // left the pages with its loot row, pending its crafting chain; the
-    // sixth figure of the ledger row's
-    // "all pinned" claim; the other five are the page/overview/character/
-    // slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(284);
+    // the Masterwrought phase 11i apex fishing rod (241), plus the two
+    // bank-storage bag drops the release/v0.41.0 merge paged (243), plus the
+    // Crucible raid relics incl. the Varkhul shield the 2026-08-30 sync merge
+    // paged (Forgebreaker left the pages with its loot row, pending its
+    // crafting chain; the release's own chain read 284 = 242 + 42): 285, the
+    // sixth figure of the ledger row's "all pinned" claim; the other five are
+    // the page/overview/character/slot/mark literals nearby.
+    // 33 Crucible collection items plus the personal Forgebreaker shaping: 319.
+    // Plus the seven Roots Bramblehide pieces and the seven Nythraxis
+    // gap-fill drops: 333. UNION MERGE: base plus both deltas, see the
+    // completion pair note above.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(333);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -833,18 +947,65 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     varkhul_forgefather_of_the_last_flame: 'conquerors_varkhul_heroic',
   };
 
-  /** The live ids a heroic page is expected to catalog, all three carve-outs applied
-   *  (mount reins, auto-generated heroic variants, and redemption tokens). */
-  function catalogueableHeroicIds(entries: (typeof HEROIC_BOSS_LOOT)[string]): string[] {
+  /** The live ids a heroic page is expected to catalog, all carve-outs applied
+   *  (mount reins, auto-generated heroic variants, redemption tokens, and the
+   *  kind 'recipe' patterns).
+   *
+   *  THE CONDITION THIS JSDOC USED TO DEFER ON HAS ARRIVED. It said the raid
+   *  carve-out was "deliberately NOT threaded here" because patterns rode the
+   *  BASE Nythraxis table only, and that if a kind 'recipe' pattern ever
+   *  entered a HEROIC_BOSS_LOOT table, isReliquaryCarvedOut should be threaded
+   *  into this filter and the vacuity diff extended to the heroic walk.
+   *  masterwrought Phase 11f put two on every heroic five-man table, so both
+   *  are done here rather than left as an inline `kind === 'recipe'` twin of a
+   *  predicate defined 650 lines above (the second-model-of-a-walk trap: two
+   *  models of one rule drift, and the guard below can only pin the one it
+   *  calls). The verdict itself is unchanged and is both packets': a pattern
+   *  is a teaching item spent to learn, the catalog records what a player
+   *  HOLDS, so it takes no page. */
+  function catalogueableHeroicIds(
+    entries: (typeof HEROIC_BOSS_LOOT)[string],
+    opts?: { includeCarvedOut?: boolean },
+  ): string[] {
+    // The includeCarvedOut arm exists ONLY for the vacuity guard below, and it
+    // is a FLAG on this one walk rather than a second walk beside it, exactly
+    // as dungeonRarePlusLootIds does it: a future fourth pre-filter added here
+    // is then covered by the guard automatically, with no twin to update.
+    const include = opts?.includeCarvedOut === true;
     const liveIds: string[] = [];
     for (const e of entries) {
+      // Migrated base drops keep their existing normal-page curation.
+      if (e.preserveSourceTier) continue;
       if (typeof e.itemId !== 'string') continue;
       if (isMountReinsId(e.itemId) || isHeroicVariantId(e.itemId)) continue;
       if (isRedemptionTokenId(e.itemId)) continue;
+      if (!include && isReliquaryCarvedOut(e.itemId)) continue;
       liveIds.push(e.itemId);
     }
     return [...new Set(liveIds)].sort();
   }
+
+  it('the heroic carve-out removes EXACTLY the live heroic patterns, and really fires', () => {
+    // The vacuity guard the JSDoc above prescribes, in the same diff-against-
+    // itself shape the dungeon walk uses rather than a re-implementation: run
+    // the same filter with the carve-out disabled and diff. Without it the
+    // threaded call could carve nothing, or everything, and every heroic
+    // equality pin would still pass.
+    const removed = new Set<string>();
+    for (const bossId of Object.keys(HEROIC_PAGE_BY_BOSS)) {
+      const entries = HEROIC_BOSS_LOOT[bossId] ?? [];
+      const kept = new Set(catalogueableHeroicIds(entries));
+      for (const id of catalogueableHeroicIds(entries, { includeCarvedOut: true })) {
+        if (!kept.has(id)) removed.add(id);
+      }
+    }
+    // The two rung-75 farming patterns masterwrought Phase 11f appended, and
+    // nothing else: over-carving a real relic reds here just as loudly.
+    expect([...removed].sort()).toEqual([
+      'pattern_highwatch_barley_porridge',
+      'pattern_highwatch_gourd_soup',
+    ]);
+  });
 
   /** Bosses whose heroic table holds at least one catalogue-able unique. A boss drops out
    *  of this list ONLY when every one of its live ids is a carve-out, which the sweep below
@@ -890,6 +1051,7 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     expect(droppedBosses.length).toBeGreaterThan(0);
     for (const bossId of droppedBosses) {
       for (const entry of HEROIC_BOSS_LOOT[bossId]) {
+        if (entry.preserveSourceTier) continue;
         expect(
           typeof entry.itemId === 'string' &&
             (isMountReinsId(entry.itemId) ||
@@ -1096,11 +1258,11 @@ describe('Reliquary Riftbound page (class-personal, outside completion)', () => 
 });
 
 describe('Reliquary outside-completion pages (the flagged set)', () => {
-  it('flags exactly the two pages, in catalog order, each with its reason', () => {
+  it('flags exactly the three pages, in catalog order, each with its reason', () => {
     // Catalog-wide companion to the per-page pins: the flag is the one lever
     // that removes a page from every completion pair, so its whole membership
-    // is pinned in one place. A third flagged page is a product decision and
-    // reds here until it is made deliberately.
+    // is pinned in one place. Forgebreaker's approved one-time, class-restricted
+    // shaping adds the third personal page without widening completion.
     expect(
       RELIQUARY_PAGES.filter((p) => p.excludeFromCompletion !== undefined).map((p) => [
         p.id,
@@ -1109,6 +1271,7 @@ describe('Reliquary outside-completion pages (the flagged set)', () => {
     ).toEqual([
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
+      ['professions_forgebreaker', 'personal'],
     ]);
     // Both reasons are live, so neither arm of the reason-driven chrome
     // (window chip, styles) is pinned against an empty set. Sorting keeps
@@ -1191,7 +1354,32 @@ describe('Reliquary Rares of the Realm pages pin against the live rare tables', 
         hints.filter((h) => h.sourceKind === 'zone'),
         relic.itemId,
       ).toHaveLength(1);
+      // At most one profession door per spoils relic: a craft route beside
+      // a rare's roll is a deliberate second door (the gravewyrm quiver's
+      // shape), never a bundle of them. None is named today: the phase 11l
+      // huntcord door was withdrawn in the third fix round, and the fourth
+      // round's re-pick (recipe_wildgrove_cinch) outputs a trash drop no
+      // page catalogs, so this arm is vacuous over the spoils page; the
+      // positive control below proves the filter sees a profession hint.
+      expect(
+        hints.filter((h) => h.sourceKind === 'profession').length,
+        relic.itemId,
+      ).toBeLessThanOrEqual(1);
     }
+    // Positive control for the vacuous arm above: the same filter, run over
+    // the one slot that DOES carry a craft door (gravewyrm_bone_quiver on
+    // conquerors_gravewyrm_sanctum, the boss-plus-leatherworking shape),
+    // yields exactly one profession hint. A filter that stopped seeing
+    // sourceKind 'profession' would pass every spoils relic and red here.
+    const sanctum = RELIQUARY_PAGES_BY_ID.conquerors_gravewyrm_sanctum;
+    const quiver = sanctum.relics.find(
+      (r) => r.kind === 'item' && r.itemId === 'gravewyrm_bone_quiver',
+    );
+    if (!quiver)
+      throw new Error('conquerors_gravewyrm_sanctum lost its gravewyrm_bone_quiver slot');
+    expect(
+      reliquaryRelicSource(sanctum, quiver).filter((h) => h.sourceKind === 'profession'),
+    ).toEqual([{ sourceKind: 'profession', sourceId: 'leatherworking' }]);
   });
 
   it('the five no-drop rares stay marks-only (signatures sub-rare by quality)', () => {
@@ -1430,6 +1618,9 @@ describe('Reliquary curation bounds (no full-table scrape)', () => {
       'bone_fragments',
       'linen_scrap',
       'spider_leg',
+      // Poor trash again since masterwrought Phase 11l's sixth fix round
+      // output-excluded it (it was briefly a common TROPHY_RECIPES reagent),
+      // refused as a non-relic exactly as before the phase.
       'chipped_tusk',
       'inert_storm_shard',
       'deepfen_pearl',
@@ -1572,12 +1763,82 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
+  it('excludes exactly the consumed Forgefather quest ember, not ordinary quest relics', () => {
+    const questMaterials = [
+      ...new Set(Object.keys(DUNGEONS).flatMap((id) => [...dungeonLootIdsAnyQuality(id)])),
+    ]
+      .filter((id) => ITEMS[id]?.kind === 'quest' && isRarePlus(id) && isMaterialId(id))
+      .sort();
+    expect(questMaterials).toEqual(['forgefathers_ember']);
+    expect(ALL_RECIPES.find((recipe) => recipe.id === 'recipe_varkhul_forgebreaker')).toMatchObject(
+      {
+        acquisition: ['quest'],
+        consumeOnCraft: true,
+        reagents: expect.arrayContaining([
+          { itemId: 'forgefathers_ember', count: 1, noDiscount: true },
+        ]),
+      },
+    );
+    expect(dungeonRarePlusLootIds('ignivar_inner_crucible')).not.toContain('forgefathers_ember');
+    expect(isCataloguedRelicItem('forgefathers_ember')).toBe(false);
+  });
+
   it('normal dungeon and raid pages equal their live rare+ mob drops', () => {
     for (const [dungeonId, { pageId, floor }] of Object.entries(EQUALITY_PAGES)) {
       const derived = dungeonRarePlusLootIds(dungeonId);
       expect(derived.length, `${dungeonId} vacuity floor`).toBeGreaterThanOrEqual(floor);
       expect(itemRelicIds(RELIQUARY_PAGES_BY_ID[pageId]).sort(), pageId).toEqual(derived);
     }
+  });
+
+  it('the recipe carve-out excludes EXACTLY the live raid patterns and nothing else', () => {
+    // The vacuity guard for isReliquaryCarvedOut: run THE SAME derivation
+    // walk with the carve-out disabled and diff it against the protected
+    // form (never a re-implemented twin: the second-model trap). The
+    // removed set must be exactly the live patterns reachable through the
+    // walked dungeon loot (kind 'recipe': repeatable tradable
+    // consumed-on-learn teaching drops, not conquerable unique loot, per the
+    // recorded verdict of both packets), so the carve-out can neither
+    // over-carve a real relic nor go silently dead, and a future loot source
+    // in the walk is covered automatically. Grew by one at masterwrought
+    // Phase 11f, which put pattern_harvest_feast on the Nythraxis base table;
+    // its five siblings ride the heroic five-man tables and the rift, neither
+    // of which this dungeon-loot walk reaches.
+    const removed = new Set<string>();
+    for (const dungeonId of Object.keys(EQUALITY_PAGES)) {
+      const protectedSet = new Set(dungeonRarePlusLootIds(dungeonId));
+      for (const id of dungeonRarePlusLootIds(dungeonId, { includeCarvedOut: true })) {
+        if (!protectedSet.has(id)) removed.add(id);
+      }
+    }
+    expect([...removed].sort()).toEqual([
+      'formula_lastflame_zeal',
+      'pattern_crucible_agi_leather',
+      'pattern_crucible_caster_cloth',
+      'pattern_crucible_caster_leather',
+      'pattern_crucible_caster_mail',
+      'pattern_crucible_healer_cloth',
+      'pattern_crucible_healer_leather',
+      'pattern_crucible_healer_mail',
+      'pattern_crucible_str_leather',
+      'pattern_crucible_str_mail',
+      'pattern_crucible_tank_leather',
+      'pattern_crucible_tank_mail',
+      'pattern_duskforged_bulwark',
+      'pattern_duskforged_warblade',
+      'pattern_gyrelens_array',
+      'pattern_harvest_feast',
+      'pattern_makers_charm',
+      'pattern_masters_field_forge',
+      'pattern_prismglass_loop',
+      'pattern_ridgebreaker',
+      'pattern_voidbound_grimoire',
+      'pattern_warhewn_signet',
+      'pattern_wyrmfall_pendant',
+    ]);
+    // The predicate itself stays kind-keyed: a real relic never carves.
+    expect(isReliquaryCarvedOut('duskforged_warblade')).toBe(false);
+    expect(isReliquaryCarvedOut('pattern_duskforged_warblade')).toBe(true);
   });
 
   it('the redemption-token filter really excludes live rare+ tool rows', () => {
@@ -1610,11 +1871,11 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     }
   });
 
-  it('the Varkhul legendaries: Emberward is Heroic-only and Forgebreaker is craft-pending', () => {
+  it('the Varkhul legendaries: Emberward is Heroic-only and Forgebreaker is personally crafted', () => {
     // Emberward's drop and museum route move as one unit: it is absent from
     // Varkhul's normal table and page, present in the heroic append and page,
     // and remains catalogued globally. Forgebreaker is deliberately off both
-    // tables and pages while its crafting route is pending.
+    // loot tables and catalogued on its own personal professions page.
     const normalLootIds = (MOBS.varkhul_forgefather_of_the_last_flame.loot ?? []).map(
       (entry) => entry.itemId,
     );
@@ -1631,7 +1892,10 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     expect(itemRelicIds(RELIQUARY_PAGES_BY_ID.conquerors_varkhul_heroic)).toContain(
       'varkhul_emberward',
     );
-    expect(isCataloguedRelicItem('varkhul_forgebreaker')).toBe(false);
+    expect(isCataloguedRelicItem('varkhul_forgebreaker')).toBe(true);
+    expect(itemRelicIds(RELIQUARY_PAGES_BY_ID.professions_forgebreaker)).toEqual([
+      'varkhul_forgebreaker',
+    ]);
     expect(normalLootIds).not.toContain('varkhul_forgebreaker');
     expect(heroicLootIds).not.toContain('varkhul_forgebreaker');
   });
@@ -1823,10 +2087,37 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
   });
 });
 
+/**
+ * Can this craft ever proc a masterwork? Answered through craftBonusStatsFor,
+ * the SAME gate the proc path consults in crafting.ts (the R1 arm included:
+ * a masterwrought output never bakes a bonus, so a craft whose only
+ * stat-bearing output is apex reads masterwork-incapable here exactly as it
+ * is in play), over the craft's live recipes: a craft returns null everywhere
+ * either because every output is slotless or statless (engineering's base
+ * tools) OR because its only stat-bearing outputs are masterwrought and the
+ * R1 arm suppresses them (engineering since phase 09's gyrelens_array; the
+ * pin below holds that distinction). Shared by both masterwork pins below so
+ * the two cannot derive eligibility differently.
+ */
+function craftIsGearCapable(craftId: string): boolean {
+  return ALL_RECIPES.some((recipe) => {
+    if (recipe.professionId !== craftId) return false;
+    const def = ITEMS[recipe.resultItemId];
+    if (!def) return false;
+    return craftBonusStatsFor(def, recipe) !== null;
+  });
+}
+
 describe('Reliquary Professions shelf (Phase 7)', () => {
-  it('authors masterwork, field notes, and specimen pages (not empty stubs)', () => {
+  it('authors masterwork, field notes, specimens, and the personal Forgebreaker page', () => {
     expect(PROFESSION_PAGES.map((p) => p.id).sort()).toEqual(
-      ['professions_field_notes', 'professions_masterwork', 'professions_specimens'].sort(),
+      [
+        'professions_crucible',
+        'professions_field_notes',
+        'professions_forgebreaker',
+        'professions_masterwork',
+        'professions_specimens',
+      ].sort(),
     );
     for (const page of PROFESSION_PAGES) {
       expect(page.relics.length).toBeGreaterThan(0);
@@ -1843,6 +2134,8 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       'masterwork:armorcrafting',
       'masterwork:tailoring',
       'masterwork:leatherworking',
+      'masterwork:jewelcrafting',
+      'masterwork:inscription',
       'masterwork:engineering',
     ]);
     expect(RELIQUARY_PROFESSION_MARKS.masterworkFirst).toBe('masterwork:first');
@@ -1856,30 +2149,20 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
 
   it('a masterwork craft is hinted iff it is gear-capable (derived, not ring membership)', () => {
     // Ring membership alone let masterwork:engineering ship an unearnable
-    // hint: every engineering recipe produces a slotless, statless tool, so
-    // masterworkBonusStats (the SAME gate the proc path consults in
-    // crafting.ts) returns null for all of them and the mark can never be
-    // written. Deriving gear-capability through that gate reds both drifts: a
-    // tool-only craft gaining a hint, and a craft becoming gear-capable while
-    // its slot still sits pended (QA ruling 2026-08-07).
+    // hint. From phase 09 to masterwrought Phase 11o the reason was R1
+    // suppression, not tool-only output (gyrelens_array is a stats-bearing
+    // engineering craft that craftBonusStatsFor nulls as masterwrought);
+    // the 11o copperlens_ocular then made the craft capable through the
+    // same live gate, which is exactly the drift this arm exists to catch
+    // in BOTH directions: a tool-only craft gaining a hint, and a craft
+    // becoming gear-capable while its slot still sits pended (QA ruling
+    // 2026-08-07; its un-pend condition fired 2026-08-25).
     const page = RELIQUARY_PAGES_BY_ID.professions_masterwork;
     const pendedMarks = new Set(SOURCE_PENDING_RULING.professions_masterwork);
     let gearCapableCount = 0;
     for (const markId of RELIQUARY_PROFESSION_MARKS.masterworkByCraft) {
       const craftId = markId.slice('masterwork:'.length);
-      const gearCapable = ALL_RECIPES.some((recipe) => {
-        if (recipe.professionId !== craftId) return false;
-        const def = ITEMS[recipe.resultItemId];
-        if (!def) return false;
-        return (
-          masterworkBonusStats({
-            level: recipe.level,
-            quality: def.quality,
-            slot: def.slot,
-            stats: def.stats,
-          }) !== null
-        );
-      });
+      const gearCapable = craftIsGearCapable(craftId);
       if (gearCapable) gearCapableCount += 1;
       const relic = page.relics.find((r) => r.kind === 'mark' && r.markId === markId);
       expect(relic, markId).toBeDefined();
@@ -1887,8 +2170,74 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       expect(hinted, `${markId} hinted iff gear-capable`).toBe(gearCapable);
       expect(pendedMarks.has(markId), `${markId} pended iff NOT gear-capable`).toBe(!gearCapable);
     }
-    // Liveness: the derivation is worthless if it calls everything ineligible.
-    expect(gearCapableCount).toBe(4);
+    // Liveness: the derivation is worthless if it calls everything
+    // ineligible. All seven since masterwrought Phase 11o made engineering
+    // gear-capable (copperlens_ocular).
+    expect(gearCapableCount).toBe(7);
+  });
+
+  it('R1 still suppresses the apex def; engineering is capable through the 11o ocular alone', () => {
+    // The phase 09 premise pin, re-derived at masterwrought Phase 11o:
+    // gyrelens_array is a stats-bearing, slot-bearing engineering output and
+    // the R1 arm (craftBonusStatsFor nulling masterwrought defs) still bakes
+    // it nothing, so when Phase 12 moves suppression to the effect gate this
+    // arm reds on the RIGHT line. The craft as a whole is gear-capable now,
+    // and EXACTLY through the non-masterwrought ocular: pinning the full
+    // capable-output set keeps the R1 arm's reach visible (a second capable
+    // output, or the apex def slipping past suppression, both red here).
+    const def = ITEMS.gyrelens_array;
+    expect(def.stats).toBeDefined();
+    expect(def.slot).toBe('offhand');
+    expect(def.masterwrought).toBe(true);
+    const recipe = ALL_RECIPES.find((r) => r.resultItemId === 'gyrelens_array');
+    expect(recipe).toBeDefined();
+    if (!recipe) return;
+    expect(recipe.professionId).toBe('engineering');
+    expect(craftBonusStatsFor(def, recipe)).toBeNull();
+    expect(craftIsGearCapable('engineering')).toBe(true);
+    const capableOutputs = ALL_RECIPES.filter((r) => {
+      if (r.professionId !== 'engineering') return false;
+      const out = ITEMS[r.resultItemId];
+      return !!out && craftBonusStatsFor(out, r) !== null;
+    }).map((r) => r.resultItemId);
+    expect(capableOutputs).toEqual(['copperlens_ocular']);
+  });
+
+  it('every gear-capable craft owns a masterwork slot (derived FROM the recipes)', () => {
+    // The blind spot this closes: the pin above walks masterworkByCraft, so it
+    // can only judge crafts the hand list already names. A craft that BECOMES
+    // gear-capable while absent from the list is invisible to it, and that is
+    // exactly what shipped: jewelcrafting's trainer ladder made the craft
+    // masterwork-capable, crafting.ts started writing masterwork:jewelcrafting,
+    // and the gallery discarded every one of those marks because the list had
+    // no row. Sweeping CRAFT_RING and deriving the eligible set from the live
+    // recipes reds on the missing row instead of the missing hint.
+    const derivedEligible = CRAFT_RING.map((craft) => craft.id)
+      .filter((craftId) => craftIsGearCapable(craftId))
+      .sort();
+    const catalogued = RELIQUARY_PROFESSION_MARKS.masterworkByCraft.map((markId) =>
+      markId.slice('masterwork:'.length),
+    );
+    const missing = derivedEligible.filter((craftId) => !catalogued.includes(craftId));
+    expect(
+      missing,
+      `gear-capable crafts with no Reliquary masterwork slot: ${missing.join(', ')}`,
+    ).toEqual([]);
+    // Literal, so the derivation cannot go quietly vacuous: these are the
+    // seven crafts whose recipes really produce stats-bearing equipment today
+    // (inscription joined with the phase 06 tomes, its slotless scrolls
+    // cannot masterwork; engineering joined at masterwrought Phase 11o with
+    // the copperlens_ocular, its tools and R1-suppressed apex still bake
+    // nothing).
+    expect(derivedEligible).toEqual([
+      'armorcrafting',
+      'engineering',
+      'inscription',
+      'jewelcrafting',
+      'leatherworking',
+      'tailoring',
+      'weaponcrafting',
+    ]);
   });
 
   it('field notes reuse visited gather_event:* namespaces', () => {
@@ -1898,6 +2247,10 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       'gather_event:pristine_vein',
       'gather_event:ancient_heartwood',
       'gather_event:moonlit_bloom',
+      // masterwrought Phase 18 retired the farming phase's deliberate absence:
+      // the farm-bed flavor now has its cell beside the three node siblings,
+      // so the allowlist no longer documents a missing row here.
+      'gather_event:golden_harvest',
       'gather_event:perfect_specimen',
     ]);
     expect([...RELIQUARY_PROFESSION_MARKS.fieldNotes]).toEqual(markRelicIds(page));
@@ -1922,11 +2275,13 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       'glimmerfin_koi',
       'stormreel_fishing_rod',
       'tidewrought_fishing_rod',
+      'clockreel_fishing_rod',
     ]);
     expect([
       ...RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
       'stormreel_fishing_rod',
       'tidewrought_fishing_rod',
+      'clockreel_fishing_rod',
     ]).toEqual(itemRelicIds(page));
     for (const id of itemRelicIds(page)) {
       expect(ITEMS[id], id).toBeDefined();
@@ -1938,7 +2293,7 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     expect((RELIQUARY_PROFESSION_SPECIMEN_ITEMS as readonly string[]).at(-1)).toBe(FISHING_RARE_ID);
   });
 
-  it('the two rods are really craftable and really on the Litany Marks counter (and only there)', () => {
+  it('all three rods are craftable; the two trainer rungs are on the Litany counter and only there', () => {
     // The rod slots' two doors, walked back to their live tables. Craft half:
     // both recipes output the rods under the engineering profession (the same
     // derivation the profession truth arm uses; this arm pins the recipe IDS
@@ -1950,8 +2305,15 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     // Collapsed Reliquary counter rod-free and the page authors no second
     // delve door (following the Marks-stock-only vendor idiom,
     // sister_nhalia_choir_plate precedent).
-    const rodIds = ['stormreel_fishing_rod', 'tidewrought_fishing_rod'];
-    for (const rodId of rodIds) {
+    //
+    // Phase 11i added a THIRD rung, and it deliberately does NOT walk this
+    // loop: the clockreel is craft-only, so the vendor half below would fail
+    // on it truthfully. It gets its own arm underneath, which pins the
+    // craft-only shape POSITIVELY rather than just leaving the rod out of the
+    // list (a rod silently missing from a two-name literal is exactly how the
+    // page comment went stale in the first place).
+    const vendoredRodIds = ['stormreel_fishing_rod', 'tidewrought_fishing_rod'];
+    for (const rodId of vendoredRodIds) {
       const recipes = ALL_RECIPES.filter((r) => r.resultItemId === rodId);
       expect(recipes.length, rodId).toBe(1);
       expect(recipes[0].id, rodId).toBe(`recipe_${rodId}`);
@@ -1964,7 +2326,7 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     expect(DELVES.drowned_litany.boardNpcId).toBe('brother_halven_marsh');
     // Both slots answer craft + keeper, byte-stable in authored order.
     const page = RELIQUARY_PAGES_BY_ID.professions_specimens;
-    for (const rodId of rodIds) {
+    for (const rodId of vendoredRodIds) {
       const relic = page.relics.find((r) => r.kind === 'item' && r.itemId === rodId);
       expect(relic, rodId).toBeDefined();
       expect(reliquaryRelicSource(page, relic!)).toEqual([
@@ -1972,6 +2334,40 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
         { sourceKind: 'vendor', sourceId: 'brother_halven_marsh' },
       ]);
     }
+  });
+
+  it('the apex rod is craft-only: no counter stocks it, and the page says so', () => {
+    // The Phase 11i rung. THREE independent facts, because the interesting
+    // failure is a future content change quietly giving the rod a shop row and
+    // leaving the one-hint page behind: (1) it really is engineering-crafted,
+    // (2) NO delve counter stocks the finished rod, and (3) the authored hint
+    // list is exactly the craft, with no vendor door invented for it.
+    const rodId = 'clockreel_fishing_rod';
+    const recipes = ALL_RECIPES.filter((r) => r.resultItemId === rodId);
+    expect(recipes.length).toBe(1);
+    expect(recipes[0].id).toBe(`recipe_${rodId}`);
+    expect(recipes[0].professionId).toBe('engineering');
+    for (const [delveId, rows] of Object.entries(DELVE_SHOPS)) {
+      expect(
+        rows.find((e) => e.itemId === rodId),
+        `${rodId} must not be stocked on the ${delveId} counter`,
+      ).toBeUndefined();
+    }
+    const page = RELIQUARY_PAGES_BY_ID.professions_specimens;
+    const relic = page.relics.find((r) => r.kind === 'item' && r.itemId === rodId);
+    expect(relic).toBeDefined();
+    expect(reliquaryRelicSource(page, relic!)).toEqual([
+      { sourceKind: 'profession', sourceId: 'engineering' },
+    ]);
+    // The schematic IS sold, and the page deliberately does not name that
+    // counter (a vendor hint points at where the RELIC is bought). Pinning the
+    // stock row here is what keeps the omission readable as a decision: if the
+    // quartermaster ever stops carrying the pattern, this arm says so rather
+    // than the page quietly meaning something else.
+    const patternRow = HEROIC_VENDOR_STOCK.find(
+      (e) => e.itemId === 'pattern_clockreel_fishing_rod',
+    );
+    expect(patternRow).toBeDefined();
   });
 
   it('every corpse-harvest specimen family has its slot on the specimen page', () => {
@@ -2514,7 +2910,7 @@ const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
  * row here in the same change.
  */
 const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
-  // The four gaps are CONTENT gaps, not vocabulary gaps: no live table awards
+  // The five gaps are CONTENT gaps, not vocabulary gaps: no live table awards
   // any of them, so there is no door to name. Every other slot the catalog
   // used to leave pending turned out to be a several-doors slot rather than a
   // no-answer slot, and Phase 13b authored all of them (a relic lists every
@@ -2523,21 +2919,20 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
   // slot stays listed and sourceless until the mount gets a route.
-  // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
-  // quests, mob loot, heroic loot, and the rift reins pools.
-  // rickshaw_mount: same shape as terrorspark_groundshaker, dev-grant only,
-  // no player-facing acquisition path yet (see the def comment in
-  // content/mounts.ts).
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker', 'rickshaw_mount'],
-  // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
-  // engineering recipe produces a slotless, statless tool, masterworkBonusStats
-  // returns null for all of them, so the masterwork proc can never fire and
-  // the mark can never be written (write site crafting.ts, gate masterwork.ts).
-  // The slot stays catalogued and un-hinted until the owner either ships a
-  // stats-bearing engineering craftable or retires the slot. The
-  // gear-capability pin below derives the eligible set from the live recipes
-  // and reds if either side moves.
-  professions_masterwork: ['masterwork:engineering'],
+  // terrorspark_groundshaker and lanternback_troll: DEVELOPER_MOUNTS,
+  // dev-grant only, deliberately absent from
+  // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
+  // def comments in content/mounts.ts).
+  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
+  // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
+  // R1 suppression on the craft's only stats-bearing output) until
+  // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
+  // stats-bearing NON-masterwrought engineering offhand: craftIsGearCapable
+  // flipped through the live gate rather than through the Phase 12
+  // suppression move the old note predicted, the three pins moved together
+  // (the gearCapableCount liveness literal, the R1-premise arm, this pended
+  // row), and the slot is hinted like its six siblings. Nothing professions-
+  // side is pending any more.
 };
 
 /**
@@ -2605,7 +3000,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_sunken_bastion_heroic: 1,
   conquerors_drowned_temple: 2,
   conquerors_drowned_temple_heroic: 1,
-  conquerors_gravewyrm_sanctum: 8,
+  // NINE since Masterwrought phase 11l: the trophy recipe route added
+  // fromProfession('leatherworking') beside the quiver's korzul hint.
+  conquerors_gravewyrm_sanctum: 9,
   conquerors_gravewyrm_sanctum_heroic: 1,
   conquerors_wildheart_basin: 2,
   conquerors_wildheart_basin_heroic: 1,
@@ -2627,20 +3024,33 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_set_nighttalon: 2,
   conquerors_set_soulflame: 2,
   conquerors_set_stormcallers: 2,
-  // 5 = activity (masterworkFirst) + the four gear-capable craft professions;
-  // masterwork:engineering is pended un-hinted (QA ruling 2026-08-07).
-  professions_masterwork: 5,
-  professions_field_notes: 4,
+  // Roots' Bramblehide: the whole family drops from the one raid boss.
+  conquerors_set_bramblehide: 1,
+  // 8 = activity (masterworkFirst) + the seven gear-capable craft
+  // professions (engineering hinted since masterwrought Phase 11o un-pended
+  // it; the count read 7 while its mark rode SOURCE_PENDING_RULING
+  // un-hinted).
+  professions_masterwork: 8,
+  // 5 = corpse_harvest (perfect_specimen) + the three node-working gathering
+  // professions + farming, whose golden-harvest cell landed at masterwrought
+  // Phase 18.
+  professions_field_notes: 5,
   // 7 = corpse_harvest + the four gathering professions with a jackpot slot
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
   // their Litany board keeper (Phase 21).
   professions_specimens: 7,
+  professions_crucible: 3,
+  professions_forgebreaker: 1,
+  // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
+  // pending-ruling absences resolve to nothing. The storefront door left with
+  // the Mech Bird: a paid mount is a mount SKIN now, never a relic.
   horizons_mounts: 10,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
-  // rows: 36 + the four Phase 18 completion-ladder titles + the Crucible
-  // raid's flawless title.
-  horizons_titles: 41,
+  // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
+  // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
+  // Crucible raid's flawless title.
+  horizons_titles: 44,
   // The Roach King replaces the old theme/citadel boss sources: one boss,
   // 17 trash carriers, and the B/S rank doors. The first-clear activity
   // belongs to the bands page.
@@ -2652,7 +3062,11 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_rares_of_the_realm: 24,
   // 19 = the 14 rares that drop a rare+ item (the five no-drop templates
   // contribute nothing here), their 4 camp zones (no drakelands: the
-  // broodlord is marks-only), plus gutripper_shiv's q_drogmar door.
+  // broodlord is marks-only), and gutripper_shiv's q_drogmar door. (The
+  // Masterwrought phase 11l leatherworking door on cragmaw_huntcord was
+  // withdrawn in the phase's third fix round: the pelt recipe now makes
+  // wildgrove_cinch, a Ridge Stalker trash drop no page catalogs, not Old
+  // Cragmaw's own chase belt.)
   conquerors_spoils_of_the_realm: 19,
   // The two honor quartermasters, on every slot of both pages (Phase 21).
   conquerors_warfare_gallery: 2,
@@ -2977,6 +3391,24 @@ describe('Reliquary source hints resolve against live content', () => {
         }
       }
     }
+    // The farming arm (masterwrought Phase 18): farm beds are deliberately
+    // never gather nodes, so the 'crop' rare-event source has NO
+    // NODE_HARVEST_TABLE row and the node loop above structurally cannot
+    // reach the golden harvest. Derive it from what is live anyway:
+    // gatherRareEventFlavor maps 'crop' to the flavor, and farming is the one
+    // gathering profession that works no node type and is not the fishing arm
+    // above, so it is the only honest answer for a source with no node. A
+    // SWAP still fails, which is the whole point of this test: crediting the
+    // golden harvest to mining reds because mining's own flavor derives from
+    // its node row.
+    const nodeProfessions = new Set<string>(
+      nodeTypes.map((t) => NODE_HARVEST_TABLE[t].professionId),
+    );
+    const nodelessProfessions = Object.keys(GATHERING_PROFESSIONS).filter(
+      (id) => !nodeProfessions.has(id) && id !== 'fishing',
+    );
+    expect(nodelessProfessions).toEqual(['farming']);
+    remember(`gather_event:${gatherRareEventFlavor('crop')}`, nodelessProfessions[0]);
     // A slot deriving two professions would make the comparison below
     // meaningless, so it fails here rather than silently picking the last one.
     expect(conflicts).toEqual([]);
@@ -2984,6 +3416,7 @@ describe('Reliquary source hints resolve against live content', () => {
     // every node type, so a table that stopped contributing cannot leave this
     // test quietly comparing nothing.
     expect(nodeTypes.length).toBe(3);
+    expect(expectedBySlotId.get('gather_event:golden_harvest')).toBe('farming');
     expect(expectedBySlotId.get('gather_event:pristine_vein')).toBeDefined();
     expect(expectedBySlotId.get('fine_thorium_ore')).toBeDefined();
     expect(expectedBySlotId.get('glimmerfin_koi')).toBe('fishing');
@@ -3026,10 +3459,86 @@ describe('Reliquary source hints resolve against live content', () => {
       }
     }
     expect(offenders).toEqual([]);
-    // Vacuity floor: three field-note marks, three fine-material jackpots, the
-    // two crafted Sanctum combo pieces, the fishing koi, and the two
-    // engineering-crafted rods (Phase 21).
-    expect(checked).toBeGreaterThanOrEqual(11);
+    // Vacuity floor: four field-note marks (the golden harvest joined at
+    // masterwrought Phase 18), three fine-material jackpots, the two crafted
+    // Sanctum combo pieces, the fishing koi, and the two engineering-crafted
+    // rods (Phase 21).
+    expect(checked).toBeGreaterThanOrEqual(12);
+  });
+
+  it('every catalogued relic with a live recipe names that craft as a door (the reverse pass)', () => {
+    // The sweep above validates every AUTHORED profession hint against the
+    // live tables but skips a relic that carries none, so a craftable relic
+    // shipped without its craft door stayed green (docs/design/reliquary.md:
+    // an uncollected silhouette lists EVERY real way to get it). This pass
+    // runs the other direction (the 11l QA): every catalogued slot with a
+    // recipe must carry a profession hint naming a craft that really makes
+    // it. Masterwork marks are derived rows and are skipped as above.
+    const craftableBySlotId = new Map<string, Set<string>>();
+    for (const recipe of ALL_RECIPES) {
+      const professions = craftableBySlotId.get(recipe.resultItemId) ?? new Set<string>();
+      professions.add(recipe.professionId);
+      craftableBySlotId.set(recipe.resultItemId, professions);
+    }
+    const craftable = new Set<string>();
+    const missing: string[] = [];
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      if (slotId.startsWith('masterwork:')) continue;
+      const crafts = craftableBySlotId.get(slotId);
+      if (!crafts) continue;
+      craftable.add(slotId);
+      const doors = reliquaryRelicSource(page, relic)
+        .filter((h) => h.sourceKind === 'profession')
+        .map((h) => h.sourceId);
+      if (!doors.some((id) => crafts.has(id))) missing.push(`${page.id}:${slotId}`);
+    }
+    expect(missing).toEqual([]);
+    // The craftable catalogued slots, exactly (the two Sanctum combo pieces,
+    // the Masterwrought phase 11l quiver door, and the three engineering
+    // rods), so an emptied recipe table or a renamed resultItemId cannot pass
+    // this pass by checking nothing.
+    expect([...craftable].sort()).toEqual([
+      'boundstone_helm',
+      'clockreel_fishing_rod',
+      'crucible_agi_leather_chest',
+      'crucible_agi_leather_feet',
+      'crucible_agi_leather_waist',
+      'crucible_caster_cloth_chest',
+      'crucible_caster_cloth_feet',
+      'crucible_caster_cloth_waist',
+      'crucible_caster_leather_chest',
+      'crucible_caster_leather_feet',
+      'crucible_caster_leather_waist',
+      'crucible_caster_mail_chest',
+      'crucible_caster_mail_feet',
+      'crucible_caster_mail_waist',
+      'crucible_healer_cloth_chest',
+      'crucible_healer_cloth_feet',
+      'crucible_healer_cloth_waist',
+      'crucible_healer_leather_chest',
+      'crucible_healer_leather_feet',
+      'crucible_healer_leather_waist',
+      'crucible_healer_mail_chest',
+      'crucible_healer_mail_feet',
+      'crucible_healer_mail_waist',
+      'crucible_str_leather_chest',
+      'crucible_str_leather_feet',
+      'crucible_str_leather_waist',
+      'crucible_str_mail_chest',
+      'crucible_str_mail_feet',
+      'crucible_str_mail_waist',
+      'crucible_tank_leather_chest',
+      'crucible_tank_leather_feet',
+      'crucible_tank_leather_waist',
+      'crucible_tank_mail_chest',
+      'crucible_tank_mail_feet',
+      'crucible_tank_mail_waist',
+      'gravewyrm_bone_quiver',
+      'gravewyrm_gauntlets',
+      'stormreel_fishing_rod',
+      'tidewrought_fishing_rod',
+      'varkhul_forgebreaker',
+    ]);
   });
 
   it('authored craft professions resolve through the live craftById lookup', () => {
@@ -3042,10 +3551,10 @@ describe('Reliquary source hints resolve against live content', () => {
         .map((h) => h.sourceId)
         .filter((id) => !(id in GATHERING_PROFESSIONS)),
     );
-    // Vacuity floor: the four gear-capable crafts on the masterwork page (the
-    // two crafted Sanctum relics name two of those same four; engineering is
+    // Vacuity floor: the five gear-capable crafts on the masterwork page (the
+    // two crafted Sanctum relics name two of those same five; engineering is
     // pended, see the gear-capability pin).
-    expect(crafts.size).toBeGreaterThanOrEqual(4);
+    expect(crafts.size).toBeGreaterThanOrEqual(5);
     for (const craftId of crafts) {
       expect(() => craftById(craftId), craftId).not.toThrow();
       expect(craftById(craftId).id, craftId).toBe(craftId);
@@ -3221,6 +3730,10 @@ describe('Reliquary source hints resolve against live content', () => {
         if (hint.sourceKind !== 'store') continue;
         checked += 1;
         if (relic.kind !== 'weapon_skin') {
+          // The store's other cosmetic family, the mount SKINS
+          // (content/mount_skins.ts), are account cosmetics and never relics:
+          // a mount slot with a store hint would be a mount item sold for
+          // money, which no longer exists.
           offenders.push(`${page.id}:${slotId} is a ${relic.kind} slot with a store hint`);
         } else if (!Object.hasOwn(WEAPON_SKINS, slotId)) {
           offenders.push(`${page.id}:${slotId} is not a live Armory skin`);
@@ -3424,9 +3937,11 @@ describe('Reliquary source hint coverage', () => {
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land. 368 = 375 slots minus the
-    // four retired vault slots minus the two gap mounts minus the pended
-    // masterwork:engineering. It tracks the slot total, so it moved with the
+    // excluded. Literal: tighten as rulings land. 368 was 375 slots minus
+    // the four retired vault slots minus the two gap mounts minus the then
+    // pended masterwork:engineering; the masterwrought Phase 11o un-pend
+    // hinted that slot, so the live hinted count sits one above the floor.
+    // It tracks the slot total, so it moved with the
     // three daggers the v0.36.0 release merge added, keeping the original slack.
     const hinted = RELIC_SLOTS.length - retiredSlots - actuallyUnhinted.size;
     expect(hinted).toBeGreaterThanOrEqual(368);
@@ -3488,30 +4003,26 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the four slots content awards no route at all', () => {
+  it('the surviving pending rows are the five mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
     // RELIQUARY_HORIZON_WEAPON_SKINS are gone with them. What is left is a
     // hand-listed set of CONTENT gaps, and hand-listing is the point: a new
     // mount must now be authored or deliberately added here, never auto-enrol.
-    expect(Object.keys(SOURCE_PENDING_RULING)).toEqual([
-      'horizons_mounts',
-      'professions_masterwork',
-    ]);
+    // (masterwork:engineering was a row here too until masterwrought Phase
+    // 11o's stats-bearing ocular un-pended it; see the pending-table comment.)
+    expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
+      'lanternback_troll',
       'terrorspark_groundshaker',
-      'rickshaw_mount',
     ]);
-    // masterwork:engineering pended by the QA ruling 2026-08-07: no
-    // engineering recipe can proc a masterwork (see the gear-capability pin),
-    // so its former profession hint named a door that awards nothing.
-    expect(SOURCE_PENDING_RULING.professions_masterwork).toEqual(['masterwork:engineering']);
     // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
       expect(RELIQUARY_HORIZON_MOUNTS, mountId).toContain(mountId);
     }
+    // The un-pended engineering mark stays catalogued, now hinted.
     expect(RELIQUARY_PROFESSION_MARKS.masterworkByCraft).toContain('masterwork:engineering');
     // And the skins page really is fully answered now, which is the half of the
     // executed ruling this row can no longer show.
@@ -3744,9 +4255,25 @@ describe('Reliquary source hint coverage', () => {
     // shared drops' two rares each, and the two dominated trash routes (35);
     // the quest family gains gutripper_shiv's q_drogmar door. The Warfare
     // pages grow the vendor family by 94 (47 slots on two counters each) and
-    // the rods add their Litany board keeper (2) plus their two engineering
-    // recipes on the recipe family. The v0.37.0 bank-storage merge adds 5 mob
-    // routes (wayfarers_backpack's Brutok door plus its three acknowledged
+    // the rods add their Litany board keeper (2) plus, on the recipe family,
+    // the three engineering rod recipes (every catalogued rod names the
+    // craft, the apex rung since masterwrought Phase 11i). The recipe family
+    // is six today: the two combo brand pieces (boundstone_helm's
+    // armorcrafting helm, gravewyrm_gauntlets' weaponcrafting gauntlets), the
+    // three rods, and the one masterwrought Phase 11l trophy route,
+    // recipe_gravewyrm_bone_quiver (leatherworking, beside its Korzul boss
+    // door on conquerors_gravewyrm_sanctum). The phase's second round also
+    // counted recipe_cragmaw_huntcord here; its third fix round withdrew
+    // that door, because the pelt is Old Cragmaw's guaranteed drop and one
+    // pelt per craft made his own 0.25 chase belt deterministic (the recipe
+    // now makes wildgrove_cinch, the Ridge Stalkers' trash drop, which no
+    // page catalogs). The floor tracks the family COUNT and cannot tell a
+    // lost route from a returned one (a withdrawn door and a new door net to
+    // zero here); the whole-record distinct-sources equality
+    // (EXPECTED_DISTINCT_SOURCES, 'pins the distinct source count of every
+    // page') is the pin that does.
+    // The release/v0.41.0 bank-storage merge adds 5 mob routes
+    // (wayfarers_backpack's Brutok door plus its three acknowledged
     // ordinary-mob farms on Spoils; the satchel's Velkhar door on Gravewyrm),
     // re-measured exact at 216.
     // The paired citadel vestment route is one canonical boss route now.
@@ -3754,13 +4281,20 @@ describe('Reliquary source hint coverage', () => {
     expect(routesByFamily.heroic).toBeGreaterThanOrEqual(47);
     expect(routesByFamily.vendor).toBeGreaterThanOrEqual(101);
     expect(routesByFamily.quest).toBeGreaterThanOrEqual(8);
-    expect(routesByFamily.recipe).toBeGreaterThanOrEqual(4);
+    expect(routesByFamily.recipe).toBeGreaterThanOrEqual(6);
     expect(routesByFamily.delveChest).toBeGreaterThanOrEqual(8);
     expect(routesByFamily.riftReins).toBeGreaterThanOrEqual(6);
     expect(routesByFamily.store).toBeGreaterThanOrEqual(29);
     expect(routesByFamily.activity).toBeGreaterThanOrEqual(10);
     const checkedRoutes = Object.values(routesByFamily).reduce((a, b) => a + b, 0);
-    expect(checkedRoutes).toBeGreaterThanOrEqual(428);
+    // Measured at Phase 11l's third fix round: mob 211, heroic 47, vendor
+    // 101, quest 8, recipe 6, delveChest 8, riftReins 6, store 29, activity
+    // 10, then the release/v0.41.0 merge's 5 bank-storage mob routes lift the
+    // mob term to 216. The paired citadel vestment route then merges into
+    // one Roach King door, leaving 215 mob routes. This total equals the sum of the nine family floors
+    // above, so it is documentation of the whole rather than an independent
+    // tripwire: the per-family floors are what red on a lost route.
+    expect(checkedRoutes).toBeGreaterThanOrEqual(430);
   });
 
   it('every acknowledgment family can actually fail (one doctored miss per family)', () => {
@@ -3878,11 +4412,11 @@ describe('Reliquary source hint coverage', () => {
     expect(delveOnly.counts.vendor).toBeGreaterThanOrEqual(1);
   });
 
-  it('the two pending mounts really have ZERO live award routes (the row is justified)', () => {
+  it('the five pending mounts really have ZERO live award routes (the row is justified)', () => {
     // The surviving SOURCE_PENDING_RULING row's whole claim is "no live table
-    // awards either mount", and the acknowledgment sweep can never check it
+    // awards any pending mount", and the acknowledgment sweep can never check it
     // (it short-circuits on un-hinted relics). This is the inverse sweep: the
-    // day content gives either mount ANY route, this reds and forces the hint
+    // day content gives any pending mount a route, this reds and forces the hint
     // plus the pending-row deletion in the same change, so the window can
     // never keep painting a blank silhouette content has learned to answer.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
@@ -3900,25 +4434,10 @@ describe('Reliquary source hint coverage', () => {
         activity: 0,
       });
     }
-    // The pended masterwork:engineering mark makes the same claim through a
-    // different door: no family may count a live route for it (the activity
-    // family maps masterwork_craft to masterwork:first only, and the
-    // gear-capability pin above owns the "could the write site ever fire"
-    // half, which these nine families cannot see).
-    for (const markId of SOURCE_PENDING_RULING.professions_masterwork) {
-      const { counts } = judgeSlotRoutes('mark', markId, markId, []);
-      expect(counts, `${markId} has no live award route`).toEqual({
-        mob: 0,
-        heroic: 0,
-        vendor: 0,
-        quest: 0,
-        recipe: 0,
-        delveChest: 0,
-        riftReins: 0,
-        store: 0,
-        activity: 0,
-      });
-    }
+    // (The pended masterwork:engineering half of this sweep retired with its
+    // row at masterwrought Phase 11o: the mark is earnable now, its write
+    // site can fire through the copperlens_ocular, and the gear-capability
+    // pin above owns that claim in both directions.)
   });
 
   it('the named non-route exclusions still hold (self-checking, not comment-only)', () => {
@@ -3932,7 +4451,7 @@ describe('Reliquary source hint coverage', () => {
       if (reliquaryRelicSource(page, relic).length === 0) continue;
       watchedAwardIds.add(awardIdForSlot(relic, slotId));
     }
-    // The two PENDING mounts' reins ride along: their whole pending claim is
+    // The five PENDING mounts' reins ride along: their whole pending claim is
     // "no route anywhere", and the nine-family inverse sweep above cannot see
     // these three excluded surfaces, so a pending reins entering one must red
     // HERE rather than leave the silhouette blank while content can answer.
@@ -4054,10 +4573,11 @@ describe('Reliquary source hint coverage', () => {
       if (inherited === 0) offenders.push(`${page.id} defaults but every relic owns a hint`);
     }
     expect(offenders).toEqual([]);
-    // All fourteen defaults are live today (nine boss pages, the storefront
-    // on the skins page, and the four Crucible raid pages); update
+    // All fifteen defaults are live today (nine boss pages, the storefront
+    // on the skins page, the four Crucible raid pages, and Forgebreaker's
+    // one Weaponcrafting door); update
     // deliberately with the authoring.
-    expect(defaults).toBe(14);
+    expect(defaults).toBe(15);
   });
 });
 

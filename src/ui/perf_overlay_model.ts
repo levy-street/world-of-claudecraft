@@ -650,3 +650,23 @@ export function overlayFractionFromPixel(
     y: clamp01((top - margin) / availY),
   };
 }
+
+// A positive, finite divisor for the UI-scale compensation below. A bad read (0,
+// negative, NaN, Infinity) falls back to 1 so a reposition never blanks the overlay.
+// Mirrors target_frame_pos.ts / party_below_target_core.ts safeScale.
+function safeScale(scale: number): number {
+  return Number.isFinite(scale) && scale > 0 ? scale : 1;
+}
+
+/** Convert a clamped VISUAL pixel offset (from overlayPixelPosition, or the live
+ *  drag clamp in perf_overlay.ts) into the AUTHOR-space value to write to
+ *  style.left/top: #perf-overlay lives inside #ui (`zoom: var(--ui-scale)`), which
+ *  re-multiplies an author length back to this visual position on screen. Mirrors
+ *  target_frame_pos.ts placeTargetFrame's css half; a scale of 1 is a no-op. */
+export function overlayCssOffset(
+  px: { left: number; top: number },
+  uiScale: number,
+): { left: number; top: number } {
+  const z = safeScale(uiScale);
+  return { left: px.left / z, top: px.top / z };
+}

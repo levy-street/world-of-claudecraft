@@ -23,6 +23,7 @@ export interface GlbJson {
   meshes?: unknown[];
   nodes?: { extras?: unknown }[];
   asset?: { extras?: unknown };
+  materials?: { name?: string }[];
 }
 
 export function glbJsonChunk(buf: Buffer): GlbJson;
@@ -33,3 +34,4 @@ export function snapshotMismatch(
   after: GlbStructuralSnapshot,
 ): string[] | null;
 export function weaponVfxModelKeys(source: string): string[];
+export function hasTripoGeneratedMaterial(json: GlbJson): boolean;

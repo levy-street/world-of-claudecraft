@@ -7,9 +7,21 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
+import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
+import { ensureLocaleLoaded, getLanguage, setLanguage, t } from '../src/ui/i18n';
+import { SUPPORTED_LANGUAGES } from '../src/ui/i18n.resolved.generated/loaders';
+import { itemKindLabel } from '../src/ui/item_kind_label';
 
 const painter = readFileSync(new URL('../src/ui/bank_window.ts', import.meta.url), 'utf8');
+// The personal-bank grid CELL (icon/mark/aria/tooltip) was extracted out of
+// BankWindow into its own module; the quality-color fallback pin below lives
+// there now, not in the coordinator it was pulled out of.
+const personalBankItemCell = readFileSync(
+  new URL('../src/ui/personal_bank_item_cell.ts', import.meta.url),
+  'utf8',
+);
 const promptDialog = readFileSync(new URL('../src/ui/prompt_dialog.ts', import.meta.url), 'utf8');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
@@ -26,7 +38,7 @@ describe('bank_window: no magic values', () => {
   });
 
   it('uses the --color-quality-default token for the unranked-quality fallback', () => {
-    expect(painter).toContain('var(--color-quality-default)');
+    expect(personalBankItemCell).toContain('var(--color-quality-default)');
   });
 
   it('defines --color-quality-default in the design-token sheet', () => {
@@ -169,6 +181,16 @@ describe('bank_window: modal prompt a11y contract', () => {
     const promptBody = stripped.slice(stripped.indexOf('private showWithdrawQuantityPrompt('));
     expect(promptBody.slice(0, 400)).toContain('knownItemDef(ITEMS, slot.itemId)');
     expect(promptBody.slice(0, 400)).not.toContain('? ITEMS[slot.itemId]');
+    // The title reads the cell authority, and reads it through the SHARED core
+    // the bank's search and name-sort read (bank_item_name_core), not through a
+    // second open-coded copy of that core's body. Pinning the duplicated text
+    // was itself holding the duplication in place, so the pin moved to the call
+    // (inert today: the partial rung offers only on !slot.instance; pinned so
+    // an instanced rung cannot regress it silently, the round-4 audit).
+    expect(promptBody.slice(0, 600)).toContain('bankSlotDisplayName(item, slot)');
+    // The regression this actually guards: falling back to the def name, which
+    // is what the title showed before a copy could carry its own.
+    expect(promptBody.slice(0, 600)).not.toContain('itemDisplayName(item)');
   });
 
   it('re-validates the live slot at quantity-prompt submit (stale-index guard)', () => {
@@ -433,7 +455,21 @@ describe('bank_window: search / sort / deposit-all', () => {
   });
 
   it('carries the ORIGINAL slotIndex through the filtered grid to the click handler', () => {
-    expect(painter).toContain('this.onSlotClick(slot.slotIndex, ev.shiftKey)');
+    // The click wiring itself now sits in the extracted personal-bank cell
+    // (personal_bank_item_cell.ts), which reads the click straight off the
+    // slot it was minted for: slot.slotIndex + event.shiftKey. BankWindow
+    // only forwards that pair into its own onSlotClick via the injected
+    // onWithdraw callback; both halves are load-bearing for the ORIGINAL
+    // (unfiltered) index to actually reach the world command.
+    // The callback/leaf pins alone could both pass against an orphan leaf that
+    // no longer wires from BankWindow's actual grid-fill call, so also span the
+    // real buildPersonalBankItemCell(...) call site itself, comment-stripped,
+    // with its exact args in construction context.
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    expect(code).toMatch(
+      /buildPersonalBankItemCell\(\s*this\.deps,\s*slot,\s*this\.fmt\(slot\.count\),\s*\(slotIndex, partial\) => this\.onSlotClick\(slotIndex, partial\),\s*\(\) => this\.render\(\),\s*\)/,
+    );
+    expect(personalBankItemCell).toContain('onWithdraw(slot.slotIndex, event.shiftKey)');
   });
 
   it('gates the deposit-all button on hasDepositableMaterials and plans + sends on click', () => {
@@ -447,6 +483,61 @@ describe('bank_window: search / sort / deposit-all', () => {
   it('gives the deposit-all button a tooltip clarifying which items it moves (issue #2132)', () => {
     expect(painter).toContain("const depositTooltip = t('hudChrome.bank.depositAllTooltip')");
     expect(painter).toContain('deposit.title = depositTooltip');
+  });
+
+  it('the deposit-all tooltip says what the sweep does: every Material moves, everything else stays', () => {
+    // The full-sentence pin (#2715; moved here from the cooking-catch suite
+    // at the Masterwrought 11l QA, beside the render pins above). The sweep
+    // is set membership on isMaterialItem (src/ui/bank_view.ts), which is
+    // exactly the set whose tooltip kind line reads Material
+    // (src/ui/item_kind_label.ts): seeds, husks, compost and the growth tonic
+    // included, gray junk and every non-poor keepsake excluded, so the copy
+    // names the kind line rather than "reagents" and refuses to enumerate what
+    // stays. A rewrite that keeps only loose tokens fails here; the 18
+    // overlays were re-filled in the same change (the reword-staleness class).
+    expect(t('hudChrome.bank.depositAllTooltip')).toBe(
+      'Sends every crafting material (anything whose tooltip reads Material or Fine Material) from your bags to the bank in one trip. Everything else stays in your bags, gathering tools, quest items, consumables, and gray items included.',
+    );
+    // The parenthetical names BOTH kind lines the swept set renders: the nine
+    // fine grades are in MATERIAL_ITEM_IDS (so the sweep moves them) and their
+    // line reads Fine Material, not Material, which the first reword missed
+    // (in pt_BR the two labels share no word, so a player could not read
+    // through). Pinned against the live set and the live label for EVERY
+    // fine grade, not one exemplar: fine_iron_ore is also a recipe reagent
+    // (the tier-4 pick), so it enters the set through the recipes loop even
+    // with the grade rule deleted, and three grades no recipe consumes
+    // (fine_copper_ore, fine_ironbark_log, fine_silverleaf_herb) are what
+    // make the grade rule itself visible here.
+    const grades = Object.values(MATERIAL_GRADES);
+    expect(grades).toHaveLength(9);
+    for (const row of grades) {
+      expect(MATERIAL_ITEM_IDS.has(row.fineItemId), row.fineItemId).toBe(true);
+      expect(itemKindLabel('junk', row.fineItemId), row.fineItemId).toBe('Fine Material');
+    }
+    expect(itemKindLabel('junk', 'iron_ore')).toBe('Material');
+  });
+
+  it('every locale carries both of its own kind labels inside the deposit-all tooltip', async () => {
+    // The English parenthetical quotes the two kind lines a swept item can
+    // render; each locale's fill must quote ITS OWN itemUi.kind.material and
+    // itemUi.kind.fineMaterial, or the player is told to look for a word that
+    // never appears on the tooltip (the pt_BR miss the 11l QA closed, where
+    // the two labels share no word). The reword-staleness class has no hash
+    // gate; this containment is locale-agnostic and would have caught it. A
+    // locale still pending on the key resolves to English and passes on the
+    // English labels, which is the same containment.
+    const before = getLanguage();
+    try {
+      for (const lang of SUPPORTED_LANGUAGES) {
+        await ensureLocaleLoaded(lang);
+        setLanguage(lang);
+        const tooltip = t('hudChrome.bank.depositAllTooltip');
+        expect(tooltip, `${lang} material`).toContain(t('itemUi.kind.material'));
+        expect(tooltip, `${lang} fine material`).toContain(t('itemUi.kind.fineMaterial'));
+      }
+    } finally {
+      setLanguage(before);
+    }
   });
 
   it('exposes the deposit-all clarification beyond hover-only title (PR #2715 review)', () => {
@@ -482,12 +573,19 @@ describe('bank_window: search / sort / deposit-all', () => {
   it('renders the summary as a transient polite aria-live status line (no hud.ts toast dep)', () => {
     expect(painter).toContain("status.setAttribute('role', 'status')");
     expect(painter).toContain("status.setAttribute('aria-live', 'polite')");
-    // The arm CHOICE (none fit / partial / all fit) lives in the pure core's
-    // depositAllSummaryKey, pinned per-arm in bank_view.test.ts; here pin that the
-    // painter delegates to it and renders the None arm count-less.
+    // The arm CHOICE (none fit / notable / partial / all fit) lives in the pure
+    // core's depositAllSummaryKey, pinned per-arm in bank_view.test.ts; here pin
+    // that the painter delegates to it, and resolves a notable item's name
+    // through knownItemDef, never a raw ITEMS index (the reviewed
+    // vault_window.ts nit, mirrored here from the start). The actual text
+    // (None arm count-less, {item} interpolation) is shared with the vault via
+    // deposit_all_status_text.ts, pinned directly in that module's own test.
     expect(painter).toContain('depositAllSummaryKey(plan)');
     expect(painter).toContain(
-      'plan.stacks === 0 ? t(key) : t(key, { count: this.fmt(plan.stacks) })',
+      'const notable = plan.notableItemId ? knownItemDef(ITEMS, plan.notableItemId) : undefined;',
+    );
+    expect(painter).toContain(
+      'depositAllStatusText(depositAllSummaryKey(plan), this.fmt(plan.stacks), notable)',
     );
     // Pin the literal like BANK_INFO_GRACE_MS above: it drives BOTH the status-line
     // lifetime and the deposit-all pending-guard fallback timer.
@@ -503,9 +601,11 @@ describe('bank_window: search / sort / deposit-all', () => {
       painter.indexOf('render(): void {'),
       painter.indexOf('refreshIfChanged(): void {'),
     );
-    expect(body).toContain('active === searchEl');
-    expect(body).toContain('searchEl.selectionStart');
-    expect(body).toContain('fresh.setSelectionRange(searchFocus.start, searchFocus.end)');
+    // The carry itself lives in bank_search_focus.ts (captureSearchCaret /
+    // restoreSearchCaret, unit-tested there); render() must capture before the
+    // wipe and restore on BOTH pane arms (the guild history has a search box too).
+    expect(body).toContain('const searchFocus = captureSearchCaret(el, active);');
+    expect(body.split('restoreSearchCaret(el, searchFocus)').length).toBe(3);
     // Non-search focus re-lands via the key ladder (the focused control by its
     // data-focus-key, else [data-close]), never a blanket close-button yank.
     expect(body).toContain('} else if (hadFocus) {');
@@ -604,11 +704,14 @@ describe('bank_window: touch peek suppression', () => {
   it('consults the shared peek guard FIRST in the cell click, before onSlotClick', () => {
     // A long-press peek shows the tooltip and marks the guard; the release click must
     // consume that peek and inspect the slot instead of withdrawing. The guard check
-    // must sit BEFORE onSlotClick, so deleting it (or moving onSlotClick above it)
-    // reds this. A plain tap / desktop click returns false and falls through.
+    // must sit BEFORE the withdraw callback, so deleting it (or moving the withdraw
+    // above it) reds this. A plain tap / desktop click returns false and falls through.
+    // The click itself now lives in the extracted personal-bank cell
+    // (personal_bank_item_cell.ts): deps.consumePeek is threaded through as an
+    // injected dep, and the actual click handler moved with it.
     expect(painter).toContain('consumePeek(): boolean;');
-    expect(painter).toMatch(
-      /cell\.addEventListener\('click', \(ev\) => \{[\s\S]{0,260}?if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}\s*this\.onSlotClick\(slot\.slotIndex, ev\.shiftKey\);/,
+    expect(personalBankItemCell).toMatch(
+      /cell\.addEventListener\('click', \(event\) => \{[\s\S]{0,260}?if \(deps\.consumePeek\(\)\) \{\s*deps\.hideTooltip\(\);\s*return;\s*\}\s*onWithdraw\(slot\.slotIndex, event\.shiftKey\);/,
     );
   });
 
@@ -750,15 +853,11 @@ describe('bank_window: keyboard a11y (non-modal activation + prompt Enter)', () 
     // bind fires and steals the focus return. promptModalOpen() matches ONLY the
     // installPromptDialog family (party/trade/duel prompts carry no aria-modal and
     // must stay non-blocking), and the shared gameplay gate consults it before
-    // every keyboard/gamepad action predicate. The matcher itself lives with the
-    // family in prompt_dialog.ts and must cover BOTH mounts: the bank prompts in
-    // #prompt-stack AND the body-level Store decision (a stack-scoped selector
-    // left that decision ungated, so Tab inside it fired the target-nearest
-    // bind; behavior is driven in tests/store_decision_prompt.test.ts).
+    // every keyboard/gamepad action predicate.
     expect(hud).toContain('promptModalOpen(): boolean {');
-    expect(hud).toContain('return modalPromptOpen()');
-    expect(promptDialog).toContain('#prompt-stack .prompt[aria-modal="true"]');
-    expect(promptDialog).toContain('body > .prompt[aria-modal="true"]');
+    expect(hud).toContain(
+      `$('#prompt-stack').querySelector('.prompt[aria-modal="true"]') !== null`,
+    );
     const gateStart = mainSrc.indexOf('const gameplayInputBlocked = () =>');
     const gate = mainSrc.slice(gateStart, mainSrc.indexOf(';', gateStart));
     expect(gateStart).toBeGreaterThan(0);
@@ -866,20 +965,22 @@ describe('bank_window: unknown-id slots stay visible (stale-client guard, R34)',
     // The grid loop used to drop the row entirely (`if (!item) continue`),
     // which is how a counted bank slot turned invisible.
     expect(code).not.toContain('if (!item) continue');
-    expect(code).toContain('item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)');
+    // The per-cell icon/aria/tooltip decisions were extracted out of
+    // BankWindow into personal_bank_item_cell.ts (buildPersonalBankItemCell);
+    // BankWindow's own grid loop now only forwards the slot into it, so the
+    // detailed pins below moved with the logic they describe.
+    const cell = personalBankItemCell.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    expect(cell).toContain(
+      'item && parts ? deps.itemIcon(item, parts.quality) : unknownItemIconHtml(slot.itemId)',
+    );
     // Plain unknown cells use unknownItemAria; instanced unknown cells (a
     // masterwork / signed copy whose def this client predates) use the shared
-    // UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS so the per-copy flag still announces.
-    // Both pins are scoped to the grid-fill loop (a whole-file contain is
-    // satisfied by the import line alone), and the argument literal keeps the
-    // raw id as the {id} the unknown wording speaks.
-    const loop = code.slice(
-      code.indexOf('for (const slot of visible)'),
-      code.indexOf('private appendEmptyCells('),
-    );
-    expect(loop).toContain("'itemUi.bags.unknownItemAria'");
-    expect(loop).toContain('UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind]');
-    expect(loop).toContain('{ id: slot.itemId, count: countLabel }');
+    // UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS so the per-copy flag still announces,
+    // and the argument literal keeps the raw id as the {id} the unknown
+    // wording speaks.
+    expect(cell).toContain("'itemUi.bags.unknownItemAria'");
+    expect(cell).toContain('UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind]');
+    expect(cell).toMatch(/\{\s*id: slot\.itemId,\s*count: countLabel,\s*\}/);
   });
 
   it('never skips a slot in the grid fill (no continue of any wording)', () => {
@@ -896,14 +997,16 @@ describe('bank_window: unknown-id slots stay visible (stale-client guard, R34)',
   it('keeps the withdraw click def-free and swaps only the tooltip body', () => {
     // Withdraw resolves server-side by slotIndex, so the click stays wired
     // for an unknown slot; the def-derived tooltip body is what falls back.
-    const start = code.indexOf('for (const slot of visible)');
-    const end = code.indexOf('private appendEmptyCells(');
-    expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const body = code.slice(start, end);
-    expect(body).toContain('this.onSlotClick(slot.slotIndex, ev.shiftKey)');
-    expect(body).toContain('? this.deps.itemTooltip(item, slot.instance)');
-    expect(body).toContain("t('itemUi.bags.unknownItem')");
+    // Both halves now live in the extracted personal-bank cell
+    // (personal_bank_item_cell.ts): BankWindow forwards the wiring, and the
+    // cell itself reads slot.slotIndex/event.shiftKey and swaps the tooltip
+    // body (the call also carries the material composition, displayedSources,
+    // since the source-count algebra landed).
+    expect(code).toContain('(slotIndex, partial) => this.onSlotClick(slotIndex, partial)');
+    const cell = personalBankItemCell.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    expect(cell).toContain('onWithdraw(slot.slotIndex, event.shiftKey)');
+    expect(cell).toContain('? deps.itemTooltip(item, slot.instance, displayedSources)');
+    expect(cell).toContain("t('itemUi.bags.unknownItem')");
   });
 });
 

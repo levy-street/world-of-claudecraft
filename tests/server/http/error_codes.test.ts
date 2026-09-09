@@ -133,6 +133,7 @@ const EXPECTED_CODES = [
   'woc_market.stepup_wallet_mismatch',
   'woc_market.stepup_binding_mismatch',
   'woc_market.stepup_signature_invalid',
+  'discord.invalid_input',
   'deeds.invalid_input',
   'guilds.invalid_roster_name',
   'guilds.unknown',
@@ -153,6 +154,9 @@ const EXPECTED_CODES = [
   'cheater_mark.reason_required',
   'cheater_mark.invalid_duration',
   'cheater_mark.not_marked',
+  'kick.reason_required',
+  'kick.admin_target',
+  'kick.target_offline',
 ];
 
 describe('ERROR_CODES catalog', () => {

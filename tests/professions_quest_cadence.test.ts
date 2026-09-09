@@ -7,6 +7,7 @@ import {
   isCadenceBlocked,
   isCadenceElapsed,
   NUDGE_CADENCE_TICKS,
+  questCadenceSaveFragment,
   serializeCadence,
   WORK_ORDER_CADENCE_TICKS,
 } from '../src/sim/professions/cadence';
@@ -132,6 +133,12 @@ describe('cadence.ts pure helpers', () => {
     // Nothing live left -> null, so the save field omits (zero-default omission).
     expect(serializeCadence(map, 500)).toBe(null);
     expect(serializeCadence(new Map(), 0)).toBe(null);
+  });
+
+  it('questCadenceSaveFragment wraps serializeCadence into the sim.ts save shape', () => {
+    expect(questCadenceSaveFragment(new Map(), 0)).toEqual({});
+    const map = new Map<string, number>([['live', 500]]);
+    expect(questCadenceSaveFragment(map, 200)).toEqual({ questCadence: { live: 500 } });
   });
 
   it('armCadence clamps a negative window to immediately elapsed and floors a fraction', () => {

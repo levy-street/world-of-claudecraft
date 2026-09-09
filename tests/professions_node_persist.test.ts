@@ -11,7 +11,11 @@ import {
   NODE_HARVEST_TABLE,
   resolveHarvest,
 } from '../src/sim/professions/gathering';
-import { applyNodeReadiness, serializeNodeReadiness } from '../src/sim/professions/node_persist';
+import {
+  applyNodeReadiness,
+  nodeReadinessSaveFragment,
+  serializeNodeReadiness,
+} from '../src/sim/professions/node_persist';
 import { Rng } from '../src/sim/rng';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -107,6 +111,13 @@ describe('the pure remaining-delta round trip (no Sim)', () => {
     expect(applyNodeReadiness({ [NODE.id]: Number.POSITIVE_INFINITY }, 0)).toEqual({});
     // A hand-edited save cannot lock a node for longer than one real respawn.
     expect(applyNodeReadiness({ [NODE.id]: 999999 }, 0)).toEqual({ [NODE.id]: RESPAWN_SECONDS });
+  });
+
+  it('nodeReadinessSaveFragment wraps serializeNodeReadiness into the sim.ts save shape', () => {
+    expect(nodeReadinessSaveFragment({}, 0)).toEqual({});
+    expect(nodeReadinessSaveFragment({ [NODE.id]: 10 }, 5)).toEqual({
+      nodeHarvestCooldowns: { [NODE.id]: 5 },
+    });
   });
 });
 

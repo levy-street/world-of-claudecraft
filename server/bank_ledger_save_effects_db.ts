@@ -155,29 +155,12 @@ export async function lockCharacterSaveAccountParentKeyShareOnClient(
   return rememberCharacterSaveAccountLock(db, accountId);
 }
 
-/** Build the one UPDATE whose EXISTS clause is the character-lease fence. */
-export function characterUpdateStatement(
-  characterId: number,
-  level: number,
-  stateJson: string,
-  leaseHolder: string,
-  leaseNonce: string | undefined,
-): { text: string; values: unknown[] } {
-  return leaseNonce === undefined
-    ? {
-        text: 'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
-        values: [characterId, level, stateJson],
-      }
-    : {
-        text: `UPDATE characters SET level = $2, state = $3, updated_at = now()
-            WHERE id = $1
-              AND EXISTS (
-                SELECT 1 FROM character_leases
-                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
-              )`,
-        values: [characterId, level, stateJson, leaseHolder, leaseNonce],
-      };
-}
+// The character UPDATE statement builder lives in
+// server/character_save_statement.ts (the fence-shaped form that also carries
+// the blob-size signal and the 'unleased' offline fence); server/db.ts routes
+// every save site through it. The same-named twin that briefly sat here was
+// deleted at the v0.41.0 sync merge so a future caller cannot import the arm
+// that skips the size signal.
 
 /** Validate all cross-effect identity before a save issues its first query. */
 export function prepareBankLedgerSaveEffects(

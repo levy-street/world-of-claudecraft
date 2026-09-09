@@ -13,7 +13,6 @@ import {
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
-import { CASTLE_WALL_LEDGES, castleParapetSegments, PARAPET_HALF } from './castle_layout';
 import {
   buildColliderCellIndex,
   type ColliderCellIndex,
@@ -58,7 +57,11 @@ import {
 // their './colliders' path.
 export { MAX_BODY_RADIUS } from './collider_cells';
 
-import { DAWNHOLD_WALL_LEDGES, dawnholdParapetSegments } from './dawnhold_layout';
+import {
+  DAWNHOLD_PARAPET_HALF,
+  DAWNHOLD_WALL_LEDGES,
+  dawnholdParapetSegments,
+} from './dawnhold_layout';
 import { buildDecorPropColliders } from './decor_prop_colliders';
 import {
   decorationHasCollider,
@@ -117,7 +120,7 @@ import { type PlacedStreetlamp, planStreetlamps, styleStreetlampSites } from './
 import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetlamp_style';
 import { townPropPlacements } from './town_props';
 import type { WorldContent } from './types';
-import { WILDHEART_FIELD_COLLIDER_SPECS, WILDHEART_FIELD_WALLS } from './wildheart_field';
+import { WILDHEART_COLLIDERS } from './wildheart_field';
 import {
   crossesSealedBorder,
   type Decoration,
@@ -167,6 +170,14 @@ export interface CircleCollider {
   standable?: boolean;
   /** Optional pitched surface for the standable top (see {@link TopSlope}). */
   topSlope?: TopSlope;
+  /**
+   * Absolute world-space UNDERSIDE of an elevated slab: a mover with height
+   * whose head clears this passes BENEATH the collider (the balcony-walk
+   * contract; see `passesOver`). Height-less movers (mobs, pathfinding) never
+   * read it, so to them the slab stays a full-height solid by design.
+   * Undefined means nothing passes under (the default for everything).
+   */
+  passUnderY?: number;
   /** Engine bookkeeping: index into the owning grid's dedupe stamp buffer. */
   gridIndex?: number;
 }
@@ -186,6 +197,8 @@ export interface ObbCollider {
   standable?: boolean;
   /** See {@link CircleCollider.topSlope}. */
   topSlope?: TopSlope;
+  /** See {@link CircleCollider.passUnderY}. */
+  passUnderY?: number;
   /**
    * Low fence rail: a grounded mover collides normally, but a mover that is
    * airborne above the rail (see `FENCE_RAIL_HEIGHT`) jumps clear of it. Set on
@@ -310,12 +323,21 @@ export function moverHeight(e: { pos: { y: number }; onGround: boolean }): Mover
   return { y: e.pos.y, lift: e.onGround ? 0 : MANTLE_REACH };
 }
 
+/** Head clearance a mover with height needs to walk beneath an elevated slab
+ *  (`passUnderY`): a touch above the tallest body so a deck one yard overhead
+ *  still walls, while a real balcony admits the walk below. */
+const PASS_UNDER_HEADROOM = 2.1;
+
 // Does the mover pass clean over this collider at (x, z)? Full-height
 // colliders (moveTopY undefined) never pass; standable tops grant the mantle
 // lift. Sloped tops are sampled at the mover's own point, so the eaves of a
-// roof pass a body the ridge would still wall.
+// roof pass a body the ridge would still wall. An elevated slab that carries
+// `passUnderY` also passes the mover walking BENEATH it when their head
+// clears its underside (the balcony-walk contract); height-less movers never
+// reach here, so mobs and pathfinding still see a full-height solid.
 function passesOver(c: Collider, mover: MoverHeight | undefined, x: number, z: number): boolean {
   if (!mover || c.moveTopY === undefined) return false;
+  if (c.passUnderY !== undefined && mover.y + PASS_UNDER_HEADROOM <= c.passUnderY) return true;
   return colliderTopAt(c, x, z) <= mover.y + (c.standable ? mover.lift : 0) + MOVE_TOP_EPS;
 }
 
@@ -504,24 +526,11 @@ function staticWorldColliders(seed: number): Collider[] {
       r: w.r,
       cameraTopY: topY(seed, w.x, w.z, 6),
     });
-  // The castles' outside climbing chains: corbelled shelves up each curtain
+  // Dawnhold's outside climbing chain: corbelled shelves up each curtain
   // so the wall-walk is reachable by parkour as well as by the flights.
-  // These are the only STANDABLE tops either castle has outdoors, because
+  // These are the only STANDABLE tops the castle has outdoors, because
   // the walls themselves are lift terrain rather than colliders and terrain
   // grants no ledge to grab.
-  for (const l of CASTLE_WALL_LEDGES) {
-    out.push({
-      type: 'obb',
-      x: l.x,
-      z: l.z,
-      hw: l.hw,
-      hd: l.hd,
-      rot: 0,
-      moveTopY: l.top,
-      standable: true,
-      cameraTopY: l.top,
-    });
-  }
   for (const l of DAWNHOLD_WALL_LEDGES) {
     out.push({
       type: 'obb',
@@ -545,15 +554,15 @@ function staticWorldColliders(seed: number): Collider[] {
   // a body whose feet are below the stone is blocked by it, and nobody may ever
   // the shelves right beside it, so the chase camera does not yank in on a
   // knee-high rail.
-  for (const seg of [...castleParapetSegments(), ...dawnholdParapetSegments()]) {
+  for (const seg of dawnholdParapetSegments()) {
     const alongHalf = (seg.a1 - seg.a0) / 2;
     const mid = (seg.a0 + seg.a1) / 2;
     out.push({
       type: 'obb',
       x: seg.axis === 'z' ? seg.line : mid,
       z: seg.axis === 'z' ? mid : seg.line,
-      hw: seg.axis === 'z' ? PARAPET_HALF : alongHalf,
-      hd: seg.axis === 'z' ? alongHalf : PARAPET_HALF,
+      hw: seg.axis === 'z' ? DAWNHOLD_PARAPET_HALF : alongHalf,
+      hd: seg.axis === 'z' ? alongHalf : DAWNHOLD_PARAPET_HALF,
       rot: 0,
       moveTopY: seg.top,
       cameraTopY: seg.top,
@@ -1348,30 +1357,6 @@ const LASTKEEP_COLLIDERS: Collider[] = layoutColliders(LASTKEEP_LAYOUT, undefine
 // Dawnhold Castle: the Evergarden garden palace, same authored room-graph
 // derivation as The Last Keep (walls minus doorways plus decor footprints).
 const DAWNHOLD_COLLIDERS: Collider[] = layoutColliders(DAWNHOLD_LAYOUT, undefined, DUNGEON_FLOOR_Y);
-
-// Wildheart follows the same open-field contract, but its walkable bridges and
-// water ribbons are heightfield surfaces rather than blocking props.
-const WILDHEART_COLLIDERS: Collider[] = [
-  ...WILDHEART_FIELD_WALLS.map(
-    (wall): Collider => ({
-      type: 'obb',
-      x: wall.x,
-      z: wall.z,
-      hw: wall.hw,
-      hd: wall.hd,
-      rot: 0,
-    }),
-  ),
-  ...WILDHEART_FIELD_COLLIDER_SPECS.map(
-    (spec): Collider => ({
-      type: 'circle',
-      x: spec.x,
-      z: spec.z,
-      r: spec.r,
-      cameraTopY: spec.h,
-    }),
-  ),
-];
 
 // Arena slots host fixed maps by slot parity (EVEN = Coliseum, ODD = Drowned
 // Court; see ARENA_MAPS in dungeon_layout.ts). Both sets are built once at

@@ -6,8 +6,9 @@
 import { describe, expect, it } from 'vitest';
 import { resolvePosition } from '../src/sim/colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
-import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
+import { FARM_RECIPES } from '../src/sim/content/recipes';
 import {
   BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
@@ -997,7 +998,7 @@ describe('dungeons: heroic difficulty', () => {
     ).toBe(true);
   });
 
-  it('does not include raid claims in Reset All Instances', () => {
+  it('includes a raid-allowed claim in Reset All Instances, but nythraxis_crypt has no heroic mode so the clamp finds nothing to change (issue #3784)', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Raider', { characterId: 201 });
     enterDungeon(sim.ctx, 'nythraxis_crypt', pid);
@@ -1005,12 +1006,27 @@ describe('dungeons: heroic difficulty', () => {
     leaveDungeon(sim.ctx, pid);
     const claimId = raidClaim.exitId;
     sim.setDungeonDifficulty('heroic', pid);
+    sim.drainEvents();
 
     sim.resetDungeonInstances(pid);
 
+    // nythraxis_crypt is story content with no heroic tuning: the clamped
+    // selection is still Normal, so the claim is refused by the SAME
+    // same-difficulty transition guard every non-heroic dungeon gets, not by
+    // a raid-specific exclusion (raid claims used to be dropped from `owned`
+    // entirely, before ever reaching this comparison).
     expect(raidClaim.exitId).toBe(claimId);
     expect(raidClaim.difficulty).toBe('normal');
     expect(raidClaim.partyKey).not.toBeNull();
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === pid &&
+          event.text ===
+            'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
+      ),
+    ).toBe(true);
   });
 
   it('claims heroic Hollow Crypt as a fixed heroic instance with level-22 transformed mobs', () => {
@@ -1347,7 +1363,12 @@ describe('dungeons: heroic marks', () => {
     expect(morthen.dead).toBe(true);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(1);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, member)).toBe(1);
-    expect(sim.players.get(leader)!.inventory).toHaveLength(fullCapacity + 1);
+    // Two direct kill-time grants land together: the marks stack plus the
+    // Masterwrought phase 04 Wyrmfall Core stack (awardWyrmfallCores rides the
+    // same death-hub call). No ember here: the bare test Sim has no resetDay,
+    // so the weekly check stays closed, like every other calendar gate.
+    expect(sim.players.get(leader)!.inventory).toHaveLength(fullCapacity + 2);
+    expect(sim.countItem('wyrmfall_core', leader)).toBeGreaterThanOrEqual(1);
     const markSlots = ((morthen.loot?.items ?? []) as any[]).filter(
       (s) => s.itemId === HEROIC_MARK_ITEM_ID,
     );
@@ -1430,34 +1451,18 @@ describe('dungeons: heroic boss drops', () => {
     return boss;
   }
 
-  it('a heroic final-boss corpse carries two epics, one from each roll group', () => {
-    // Morthen has two rollGroups (morthen_heroic + morthen_heroic2), so each
-    // heroic kill drops exactly two epics, one per group. Sweep seeds so the
-    // groups land on different entries over the run.
-    const groups = ['morthen_heroic', 'morthen_heroic2'];
-    const byGroup: Record<string, string[]> = {};
-    for (const e of HEROIC_BOSS_LOOT.morthen) {
-      byGroup[e.rollGroup!] ??= [];
-      byGroup[e.rollGroup!].push(e.itemId!);
-    }
+  it('a heroic final-boss corpse carries one equipment item', () => {
     const dropped = new Set<string>();
     for (let seed = 1; seed <= 8; seed++) {
       const sim = makeSim(seed);
       const boss = killFinalBoss(sim, 'hollow_crypt', 'morthen');
-      const epics = ((boss.loot?.items ?? []) as any[]).filter((s) =>
-        HEROIC_BOSS_LOOT.morthen.some((e) => e.itemId === s.itemId),
+      const gear = (boss.loot?.items ?? []).filter(
+        (entry) => ITEMS[entry.itemId]?.slot && ITEMS[entry.itemId]?.kind !== 'bag',
       );
-      expect(epics.length, `seed ${seed}`).toBe(2);
-      // Exactly one from each group.
-      for (const g of groups) {
-        expect(
-          epics.filter((s: any) => byGroup[g].includes(s.itemId)).length,
-          `${g} seed ${seed}`,
-        ).toBe(1);
-      }
-      for (const s of epics) dropped.add(s.itemId);
+      expect(gear, 'seed ' + seed).toHaveLength(1);
+      dropped.add(gear[0].itemId);
     }
-    expect(dropped.size).toBeGreaterThan(2); // the groups actually vary
+    expect(dropped.size).toBeGreaterThan(1);
   });
 
   it('normal final bosses and heroic trash never drop the heroic epics', () => {
@@ -1481,10 +1486,113 @@ describe('dungeons: heroic boss drops', () => {
     const heroicIds = new Set(
       Object.values(HEROIC_BOSS_LOOT)
         .flat()
+        .filter((e) => !e.preserveSourceTier && e.itemId && ITEMS[e.itemId]?.quality === 'epic')
         .map((e) => e.itemId),
     );
     expect(((nBoss.loot?.items ?? []) as any[]).some((s) => heroicIds.has(s.itemId))).toBe(false);
   });
+
+  it('every heroic FIVE-MAN final boss carries the farming pattern group, appended last', () => {
+    // Farming's dungeon channel (masterwrought Phase 11f). The five-man final
+    // bosses each gain ONE appended rollGroup carrying the two rung-75 farm
+    // patterns; the raid table and the mid-boss table deliberately do not (the
+    // raid's farm channel rides its BASE table instead, with the feast pattern
+    // and the tier-4 seeds).
+    //
+    // The membership is DERIVED from FARM_RECIPES rather than listed, so a
+    // re-tiered row reds here instead of leaving the group stale.
+    const expectedIds = FARM_RECIPES.filter(
+      (r) => r.acquisition?.includes('drop') && r.skillReq === 75,
+    )
+      .map((r) => `pattern_${r.resultItemId}`)
+      .sort();
+    expect(expectedIds, 'the two rung-75 patterns').toHaveLength(2);
+
+    const FIVE_MAN_FINAL_BOSSES = [
+      'morthen',
+      'vael_the_mistcaller',
+      'ysolei',
+      'korzul_the_gravewyrm',
+      'wildheart_high_priest',
+    ];
+    for (const bossId of FIVE_MAN_FINAL_BOSSES) {
+      const table = HEROIC_BOSS_LOOT[bossId];
+      expect(table, bossId).toBeDefined();
+      const farmRows = table.filter((e) => e.rollGroup === FARM_HEROIC_PATTERN_GROUP);
+      expect(farmRows.map((e) => e.itemId).sort(), bossId).toEqual(expectedIds);
+      for (const row of farmRows) expect(row.chance, `${bossId} ${row.itemId}`).toBe(0.04);
+      // THE APPEND POSITION IS THE CONTRACT, and it is the detail that is easy
+      // to get wrong here: in every heroic table the ungrouped mount rows sit
+      // LAST, and loot_roll.ts walks heroic entries in array order, so a group
+      // spliced in above them would move each mount's chance() draw one
+      // position later. Appended after them it adds exactly one draw at the
+      // very end and every existing heroic draw keeps its position.
+      const lowestFarmIndex = Math.min(
+        ...table.flatMap((e, i) => (e.rollGroup === FARM_HEROIC_PATTERN_GROUP ? [i] : [])),
+      );
+      const highestOtherIndex = Math.max(
+        ...table.flatMap((e, i) => (e.rollGroup === FARM_HEROIC_PATTERN_GROUP ? [] : [i])),
+      );
+      expect(lowestFarmIndex, `${bossId}: the farm group must be appended last`).toBeGreaterThan(
+        highestOtherIndex,
+      );
+    }
+    // And the two tables that must NOT carry it: the raid boss (its farm
+    // channel is on the base table) and the mid-boss (not a final boss).
+    for (const bossId of ['nythraxis_scourge_of_thornpeak', 'wildheart_beastmaster']) {
+      expect(
+        HEROIC_BOSS_LOOT[bossId].some((e) => e.rollGroup === FARM_HEROIC_PATTERN_GROUP),
+        `${bossId} must not carry the five-man farm group`,
+      ).toBe(false);
+    }
+  });
+
+  it('a heroic five-man really sheds a farm pattern, and a normal one never can', () => {
+    // The drive behind the table pin above: the group is not merely authored,
+    // it resolves through the real heroic claim. Seeds are swept until a hit
+    // lands because the rate is 0.08 per clear; the sweep is bounded and the
+    // arm states what it found, so a group that stopped resolving fails here
+    // rather than staying green on a table read alone.
+    const patternIds = new Set(
+      HEROIC_BOSS_LOOT.morthen
+        .filter((e) => e.rollGroup === FARM_HEROIC_PATTERN_GROUP)
+        .map((e) => e.itemId),
+    );
+    expect(patternIds.size).toBe(2);
+    let heroicHits = 0;
+    for (let seed = 1; seed <= 120; seed++) {
+      const sim = makeSim(seed);
+      const boss = killFinalBoss(sim, 'hollow_crypt', 'morthen');
+      const hits = ((boss.loot?.items ?? []) as any[]).filter((s) => patternIds.has(s.itemId));
+      // At most ONE per kill: the group is partitioned, never compounded.
+      expect(hits.length, `seed ${seed}`).toBeLessThanOrEqual(1);
+      heroicHits += hits.length;
+    }
+    expect(heroicHits, 'a 0.08 group over 120 heroic clears must land some hits').toBeGreaterThan(
+      0,
+    );
+    // The negative arm: the same boss on NORMAL never sheds one, because the
+    // whole heroic block only runs for a heroic claim.
+    for (let seed = 1; seed <= 30; seed++) {
+      const sim = makeSim(seed);
+      const pid = sim.addPlayer('warrior', 'Norm');
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+      const boss = mobInInstance(sim, claimedDungeon(sim, 'hollow_crypt', 'normal'), 'morthen');
+      (sim as any).dealDamage(
+        sim.entities.get(pid),
+        boss,
+        boss.hp + 1000,
+        false,
+        'physical',
+        null,
+        'hit',
+      );
+      expect(
+        ((boss.loot?.items ?? []) as any[]).some((s) => patternIds.has(s.itemId)),
+        `normal seed ${seed}`,
+      ).toBe(false);
+    }
+  }, 60_000);
 
   it('a heroic Nythraxis kill drops raid-tier heroic set pieces plus one heroic-only weapon', () => {
     // The explicit heroic raid table carries only the heroic-ONLY extras: the
@@ -2097,9 +2205,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     expect(boss.maxHp).toBe(pins.maxHp);
     expect(boss.weapon.min).toBe(pins.weaponMin);
     expect(boss.weapon.max).toBe(pins.weaponMax);
-    expect(boss.mechanicDamageMult).toBe(
-      HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplier,
-    );
+    expect(boss.mechanicDamageMult).toBe(1.488);
 
     // The encounter's scripted add waves inherit the instance difficulty.
     spawnNythraxisAdds(sim.ctx, boss);
@@ -2123,10 +2229,10 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
   it('a normal raid claim carries the normal retune; a heroic kill pays marks to every raider', () => {
     const normal = raidSetup('normal');
     const nBoss = mobInInstance(normal.sim, normal.inst, NYTHRAXIS_BOSS_ID);
-    // Normal Nythraxis rides NORMAL_DUNGEON_TUNING (economy retune): doubled
-    // health (was 60000) and the 5x per-mob multiplier stamped for mechanics.
+    // The boss keeps the 120k health pool and its new melee factor;
+    // skeletons retain their separate 5x tuning.
     expect(nBoss.maxHp).toBe(120000);
-    expect(nBoss.mechanicDamageMult).toBe(5);
+    expect(nBoss.mechanicDamageMult).toBe(1.132);
     spawnNythraxisAdds(normal.sim.ctx, nBoss);
     const nAdd = normal.sim.entities.get((nBoss.summonedIds as number[])[0]) as AnyEntity;
     expect(nAdd.mechanicDamageMult).toBe(5);
@@ -2516,16 +2622,14 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, fallen)).toBe(0);
   });
 
-  it('the empty-instance reaper never frees the arena while raiders stand in its wide outer floor', () => {
+  it('the empty-instance reaper never frees the arena while raiders stand in its far corner', () => {
     const { sim, raiders, inst } = raidSetup('normal');
     const origin = instanceOriginOf(inst);
-    // NYTHRAXIS_LAYOUT (dungeon_layout.ts) authors tomb alcoves at local
-    // x = +/-210, legitimately inside the wide wallX:230/floorHalfX:228 raid
-    // room (and within instanceClaimContains's NYTHRAXIS_ROOM_RADIUS carve-out),
-    // but outside the generic 120yd box that instanceContains checks. Standing
-    // there is a real, in-fight position, not an edge case.
-    const tombX = origin.x + 210;
-    const tombZ = origin.z + 20;
+    // NYTHRAXIS_LAYOUT (dungeon_layout.ts) is one hall about 100 by 100 yd; its
+    // far front corner is a real, in-fight position that must stay inside
+    // instanceClaimContains's NYTHRAXIS_ROOM_RADIUS carve-out.
+    const tombX = origin.x + 48;
+    const tombZ = origin.z + 18;
     raiders.forEach((pid) => {
       teleport(sim, sim.entities.get(pid) as AnyEntity, tombX, tombZ);
     });
@@ -2533,6 +2637,52 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     updateInstances(sim.ctx);
     expect(inst.partyKey).not.toBeNull();
     expect(inst.emptyFor).toBe(0);
+  });
+
+  it('Reset All Instances refuses the arena while a raider stands in its wide outer floor (issue #3784)', () => {
+    const { sim, tank, raiders, inst } = raidSetup('normal');
+    const origin = instanceOriginOf(inst);
+    const tombX = origin.x + 210;
+    const tombZ = origin.z + 20;
+    raiders.forEach((pid) => {
+      teleport(sim, sim.entities.get(pid) as AnyEntity, tombX, tombZ);
+    });
+    sim.setDungeonDifficulty('heroic', tank);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(tank);
+
+    expect(inst.difficulty).toBe('normal');
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === tank &&
+          event.text === 'You cannot reset instances while someone is still inside.',
+      ),
+    ).toBe(true);
+  });
+
+  it('a heroic-locked raid claim refuses Reset All Instances, the same way a standard heroic-locked claim does (issue #3784)', () => {
+    const { sim, tank, raiders, inst } = raidSetup('normal');
+    raiders.forEach((pid) => {
+      teleport(sim, sim.entities.get(pid) as AnyEntity, 0, 0);
+    });
+    sim.players.get(tank)!.raidLockouts.set('nythraxis_boss_arena:heroic', 999999999);
+    sim.setDungeonDifficulty('heroic', tank);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(tank);
+
+    expect(inst.difficulty).toBe('normal');
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === tank &&
+          event.text === 'You are locked to Heroic Nythraxis Raid Arena.',
+      ),
+    ).toBe(true);
   });
 });
 
@@ -2714,7 +2864,7 @@ describe('dungeons: raid lockout gate', () => {
     return leader;
   }
 
-  it('does not include the Nythraxis boss arena claim in Reset All Instances', () => {
+  it('includes the Nythraxis boss arena claim in Reset All Instances (issue #3784)', () => {
     const sim = makeSim();
     const leader = attunedRaid(sim);
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
@@ -2725,9 +2875,185 @@ describe('dungeons: raid lockout gate', () => {
 
     sim.resetDungeonInstances(leader);
 
-    expect(claim.exitId).toBe(claimId);
-    expect(claim.difficulty).toBe('normal');
+    expect(claim.exitId).not.toBe(claimId);
+    expect(claim.difficulty).toBe('heroic');
     expect(claim.partyKey).not.toBeNull();
+  });
+
+  it('tells a raid member entering a claim at the other difficulty how to transition, same as a standard dungeon', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    const inst = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+
+    sim.drainEvents();
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+
+    // The claim still wins (mid-run flips and corpse runs depend on it), but
+    // entry is no longer silent about the mismatch, exactly like a standard
+    // dungeon (previously raid claims were exempted from this notice too).
+    expect(claimedDungeon(sim, 'nythraxis_boss_arena', 'normal')).toBe(inst);
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'log' &&
+          event.pid === leader &&
+          event.text ===
+            'This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.',
+      ),
+    ).toBe(true);
+  });
+
+  it('tells a raid member the reverse mismatch too: a Heroic claim against a Normal selection', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+    const inst = claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic');
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('normal', leader);
+
+    sim.drainEvents();
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+
+    expect(claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic')).toBe(inst);
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'log' &&
+          event.pid === leader &&
+          event.text ===
+            'This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run.',
+      ),
+    ).toBe(true);
+  });
+
+  it("blocks a normal-tier reset while the raid room's own lockout still applies to the target difficulty", () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    const inst = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+    expect(inst.difficulty).toBe('heroic');
+
+    // As if the leader had already cleared the arena on Normal earlier
+    // today: that lockout is keyed on the plain dungeon id (normal-tier),
+    // independent of the heroic key, and must still bar a fresh Normal
+    // claim through Reset All exactly like the door does.
+    sim.time += INSTANCE_EMPTY_TIMEOUT;
+    sim.players.get(leader)!.raidLockouts.set('nythraxis_boss_arena', 999999999);
+    sim.setDungeonDifficulty('normal', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    expect(inst.difficulty).toBe('heroic');
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === leader &&
+          event.text === 'You are locked to Nythraxis Raid Arena.',
+      ),
+    ).toBe(true);
+  });
+
+  it('blocks the disband-and-reform bypass: an active reset lock still bars a fresh raid slot under a brand-new party id', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+
+    // Every other member leaves, dissolving the raid entirely (down to a
+    // solo leader); re-inviting the same four and reconverting to a raid
+    // reforms under a genuinely fresh (ephemeral) party id. Before this fix
+    // that reform was the ONLY way a raid group could switch difficulty at
+    // all, because a fresh party key claims a brand-new slot with none of
+    // the checks Reset All enforces (issue #3784).
+    const others = (sim.partyOf(leader)!.members as number[]).filter((m) => m !== leader);
+    for (const m of others) sim.partyLeave(m);
+    for (const m of others) {
+      sim.partyInvite(m, leader);
+      sim.partyAccept(m);
+    }
+    sim.convertPartyToRaid(leader);
+    sim.setDungeonDifficulty('normal', leader);
+    sim.drainEvents();
+
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === leader &&
+          event.text === 'Instances can only be reset once every 5 minutes.',
+      ),
+    ).toBe(true);
+    expect(sim.instanceSlotAt((sim.entities.get(leader) as AnyEntity).pos)).toBeNull();
+  });
+
+  it('a fresh recruit inherits the raid claim reset lock on party join, the same way a standard claim already did', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+
+    const recruit = sim.addPlayer('priest', 'LateJoiner', { characterId: 601 });
+    sim.partyInvite(recruit, leader);
+    sim.partyAccept(recruit);
+
+    expect(sim.dungeonResetLocks.has('char:601:nythraxis_boss_arena')).toBe(true);
+  });
+
+  it('Reset All Instances is atomic across everything the key owns: a raid claim can block resetting an unrelated standard dungeon claim held under the same party', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'Lead');
+    while ((sim.partyOf(leader)?.members.length ?? 1) < 5) {
+      const pid = sim.addPlayer('priest', `Fill${sim.players.size}`);
+      sim.partyInvite(pid, leader);
+      sim.partyAccept(pid);
+    }
+    // The party holds a stale standard-dungeon claim from before converting
+    // to a raid; Reset All Instances resets everything the key owns
+    // together, or nothing.
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    const cryptInst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+    leaveDungeon(sim.ctx, leader);
+    sim.convertPartyToRaid(leader);
+    sim.players.get(leader)!.questsDone.add('q_nythraxis_bound_guardian');
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    const arenaInst = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
+    const arenaClaimId = arenaInst.exitId;
+    // The raider is still standing inside the arena; the crypt is empty.
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    // The occupied raid claim blocks the WHOLE reset, including the
+    // unrelated, empty, otherwise-resettable crypt claim.
+    expect(cryptInst.difficulty).toBe('normal');
+    expect(arenaInst.exitId).toBe(arenaClaimId);
+    expect(arenaInst.difficulty).toBe('normal');
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === leader &&
+          event.text === 'You cannot reset instances while someone is still inside.',
+      ),
+    ).toBe(true);
   });
 
   it('an active lockout blocks entry and emits the locked-to-arena error', () => {
@@ -2775,6 +3101,120 @@ describe('dungeons: raid lockout gate', () => {
       events.some(
         (e) =>
           e.type === 'error' && e.text === 'You must convert your party to a raid group first.',
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('dungeons: Ignivar linked-room family in Reset All Instances (issue #3784)', () => {
+  // A minimal hand-built claim for one room of the chain, the
+  // ignivar_weekly_lockout.test.ts idiom: no mobs/npcs/objects, just enough
+  // shape for resetDungeonInstances and the family occupancy walk to read.
+  function familyClaim(sim: AnySim, dungeonId: string, partyKey: string): any {
+    const inst = {
+      dungeonId,
+      difficulty: 'normal' as const,
+      slot: 0,
+      partyKey,
+      mobIds: [] as number[],
+      raidReturnKeys: new Set<string>(),
+      raidBossWelcomeKeys: new Set<string>(),
+      npcIds: [] as number[],
+      objectIds: [] as number[],
+      exitId: sim.ctx.nextId++,
+      bossExitId: null,
+      emptyFor: 0,
+      resetAvailableAt: 0,
+      clearedBy: new Set<number>(),
+      enteredBy: new Set<number>(),
+      combatExitMemory: new Map(),
+    };
+    (sim.instances as any[]).push(inst);
+    return inst;
+  }
+
+  it('blocks resetting the lift room while a raider stands in a deeper family room already at the target difficulty', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'DeepRaider', { characterId: 501 });
+    const key = instanceKeyFor(sim.ctx, leader);
+    const lift = familyClaim(sim, 'ignivar_forge_lift', key); // normal: needs the transition
+    const arena = familyClaim(sim, 'ignivar_raid_arena', key);
+    arena.difficulty = 'heroic'; // already at the target: excluded from `resettable` on its own
+    const arenaOrigin = instanceOrigin(DUNGEONS.ignivar_raid_arena.index, 0);
+    teleport(sim, sim.entities.get(leader) as AnyEntity, arenaOrigin.x, arenaOrigin.z);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    // The arena is not itself resettable (it already matches the target
+    // difficulty), so a per-claim-only occupancy check would never look at
+    // it and would let the lift reset succeed. Family-wide occupancy
+    // (mirroring the empty-instance reaper) still catches the raider
+    // standing there and refuses.
+    expect(lift.difficulty).toBe('normal');
+    expect(lift.partyKey).toBe(key);
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === leader &&
+          event.text === 'You cannot reset instances while someone is still inside.',
+      ),
+    ).toBe(true);
+  });
+
+  it('reclaims only the lift immediately; a deeper Ignivar room is freed, not preserved, so a difficulty switch cannot skip re-clearing the chain', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'ClearRaider', { characterId: 502 });
+    const key = instanceKeyFor(sim.ctx, leader);
+    const lift = familyClaim(sim, 'ignivar_forge_lift', key);
+    const arena = familyClaim(sim, 'ignivar_raid_arena', key);
+    const liftClaimId = lift.exitId;
+    sim.setDungeonDifficulty('heroic', leader);
+
+    sim.resetDungeonInstances(leader);
+
+    // The lift, the raid's only overworld door, is reclaimed immediately at
+    // the new difficulty, exactly like a standard dungeon's single room.
+    expect(lift.exitId).not.toBe(liftClaimId);
+    expect(lift.difficulty).toBe('heroic');
+    expect(lift.partyKey).toBe(key);
+    // The deeper room is freed, NOT reclaimed: the group's checkpoint is
+    // gone, so re-entering must walk the whole chain again instead of
+    // zoning straight into a freshly spawned heroic boss with none of that
+    // room's own trash re-fought.
+    expect(arena.partyKey).toBeNull();
+    expect(arena.difficulty).toBe('normal');
+    expect(arena.exitId).toBeNull();
+  });
+
+  it("blocks a normal-tier reset while the raid room's own WEEKLY lockout still applies (Ignivar arm)", () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'WeeklyLocked', { characterId: 503 });
+    const key = instanceKeyFor(sim.ctx, leader);
+    const lift = familyClaim(sim, 'ignivar_forge_lift', key);
+    lift.difficulty = 'heroic';
+    const arena = familyClaim(sim, 'ignivar_raid_arena', key);
+    arena.difficulty = 'heroic';
+    // As if the leader had already cleared the arena on Normal earlier this
+    // week: WEEKLY_LOCKOUT_RAID_ROOMS carries its own normal-tier lock,
+    // independent of the DAILY_LOCKOUT_RAID_ROOMS arm nythraxis_boss_arena
+    // exercises elsewhere.
+    sim.players.get(leader)!.raidLockouts.set('ignivar_raid_arena', 999999999);
+    sim.setDungeonDifficulty('normal', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    expect(lift.difficulty).toBe('heroic');
+    expect(arena.difficulty).toBe('heroic');
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === leader &&
+          event.text === `You are locked to ${DUNGEONS.ignivar_raid_arena.name}.`,
       ),
     ).toBe(true);
   });

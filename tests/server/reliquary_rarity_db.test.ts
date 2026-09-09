@@ -40,6 +40,11 @@ import {
   RELIQUARY_MARK_IDS,
   RELIQUARY_PAGE_ORDER,
 } from '../../src/sim/content/reliquary';
+import {
+  resolveNamedImportSpecifier,
+  saveFragmentReturnKeys,
+  stateLiteralSpreadKeys,
+} from '../helpers/save_fragment_keys';
 
 // Real catalogued ids, one per relic kind, so a row fixture can never describe a
 // shape the catalog does not actually carry.
@@ -241,11 +246,43 @@ describe('the SQL blob paths match the sim serializer layout', () => {
       expect.arrayContaining(['itemsDiscovered']),
     );
     expect(src).toContain('$.deedStats.itemsDiscovered');
-    // Top-level segments: the sim.ts save composition writes these exact keys
-    // through shorthand spreads (source pin; the runtime save path is
-    // exercised end to end by the sim suites).
-    const simSrc = readFileSync(new URL('../../src/sim/sim.ts', import.meta.url), 'utf8');
-    expect(simSrc).toContain('return deedStats ? { deedStats } : {}');
-    expect(simSrc).toContain('return reliquary ? { reliquary } : {}');
+  });
+
+  // Top-level segments: PR4 extracted the two inline sparse fragments this suite used to
+  // pin as literal `sim.ts` return strings (`deedStatsSaveFragment` / `reliquarySaveFragment`,
+  // src/sim/deeds.ts + src/sim/reliquary.ts). Walking Sim.serializeCharacter's real `state`
+  // object literal, resolving the two bare-identifier spreads to their owning modules, and
+  // reading each helper's own declared return key proves the SQL's top-level segments still
+  // name the real save composition rather than a string this file keeps agreeing with itself
+  // about: a rename of either helper, its module, or its returned key reds this before it
+  // reds production.
+  it('the deedStats/reliquary top-level segments come from the real save-fragment owners, spread live into Sim.serializeCharacter', async () => {
+    const { readFileSync } = await import('node:fs');
+    const simFileName = '../../src/sim/sim.ts';
+    const simSrc = readFileSync(new URL(simFileName, import.meta.url), 'utf8');
+    const { helperCallNames } = stateLiteralSpreadKeys(
+      simSrc,
+      simFileName,
+      'Sim',
+      'serializeCharacter',
+    );
+    expect(helperCallNames).toEqual(
+      expect.arrayContaining(['deedStatsSaveFragment', 'reliquarySaveFragment']),
+    );
+
+    for (const [localName, expectedKey] of [
+      ['deedStatsSaveFragment', 'deedStats'],
+      ['reliquarySaveFragment', 'reliquary'],
+    ] as const) {
+      const resolved = resolveNamedImportSpecifier(simSrc, simFileName, localName);
+      expect(resolved, `${localName} must be a named import in sim.ts`).toBeDefined();
+      const modulePath = `${resolved!.modulePath}.ts`;
+      const moduleSrc = readFileSync(
+        new URL(modulePath, new URL(simFileName, import.meta.url)),
+        'utf8',
+      );
+      const keys = saveFragmentReturnKeys(resolved!.exportedName, moduleSrc, modulePath);
+      expect(keys).toEqual([expectedKey]);
+    }
   });
 });

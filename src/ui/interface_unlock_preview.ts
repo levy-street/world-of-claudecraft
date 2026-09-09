@@ -36,6 +36,11 @@ export class InterfaceUnlockPreview {
      *  approximation. Optional so a host without the painter (tests) still
      *  gets the other samples. */
     private readonly buildPartySample?: (host: HTMLElement) => void,
+    /** The pet ACTION bar's sample command icons, resolved per build so the
+     *  placeholder shows this CLASS's real buttons (petBarPreviewIconIds:
+     *  Growl for a hunter, Water Jet for a frost mage, Mend for a warlock),
+     *  never a generic dummy row. Absent (tests) skips the sample. */
+    private readonly petBarIcons?: () => readonly string[],
   ) {}
 
   /** Mint the sample overlays (true) or remove them all (false). Rebuilding
@@ -51,7 +56,12 @@ export class InterfaceUnlockPreview {
     // The TARGET frame deliberately gets no sample: its placeholder already
     // shows the real frame chrome (portrait ring, bars), and a second set of
     // sample bars over it read as clutter (owner feedback).
-    this.mount('pet-frame', this.unitSample(t('hudChrome.unitFrame.petLabel')));
+    // The PET frame deliberately gets no sample either (same rationale as the
+    // target frame above): its placeholder already shows the real unit-frame
+    // chrome, and the old generic portrait/hp/mp mock read as a second fake
+    // frame stacked on it (owner feedback). The name chip says whose it is.
+    const petIcons = this.petBarIcons?.();
+    if (petIcons && petIcons.length > 0) this.mount('petbar', this.auraRow(petIcons, 'ability'));
     this.mount(
       'castbar',
       this.barSample(PREVIEW_CAST_FRAC, t('hudChrome.interfaceUnlock.previewSpell'), 'cast'),
@@ -74,41 +84,16 @@ export class InterfaceUnlockPreview {
     return el;
   }
 
-  private auraRow(ids: readonly string[]): HTMLElement {
+  private auraRow(ids: readonly string[], kind: 'aura' | 'ability' = 'aura'): HTMLElement {
     const row = this.shell('tf-preview-auras');
     for (const id of ids) {
       const icon = this.doc.createElement('img');
       icon.className = 'tf-preview-icon';
-      icon.src = iconDataUrl('aura', id, PREVIEW_ICON_SIZE);
+      icon.src = iconDataUrl(kind, id, PREVIEW_ICON_SIZE);
       icon.alt = '';
       row.appendChild(icon);
     }
     return row;
-  }
-
-  private unitRow(name: string): HTMLElement {
-    const unit = this.doc.createElement('div');
-    unit.className = 'tf-preview-unit';
-    const portrait = this.doc.createElement('div');
-    portrait.className = 'tf-preview-portrait';
-    const bars = this.doc.createElement('div');
-    bars.className = 'tf-preview-bars';
-    const label = this.doc.createElement('span');
-    label.className = 'tf-preview-name';
-    label.textContent = name;
-    const hp = this.doc.createElement('div');
-    hp.className = 'tf-preview-hp';
-    const mp = this.doc.createElement('div');
-    mp.className = 'tf-preview-mp';
-    bars.append(label, hp, mp);
-    unit.append(portrait, bars);
-    return unit;
-  }
-
-  private unitSample(name: string): HTMLElement {
-    const shell = this.shell('tf-preview-unit-host');
-    shell.appendChild(this.unitRow(name));
-    return shell;
   }
 
   /** The party sample: a host the Hud fills with REAL party-frame rows via

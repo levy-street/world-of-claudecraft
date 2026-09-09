@@ -1,7 +1,10 @@
+import { scalePrimaryHealing } from '../primary_healing';
 import type { ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import { primaryHealingMultiplier } from '../spec_output_tuning';
 import { channelTickBonus, directHealBonus } from '../spell_scaling';
-import type { AbilityEffect, Entity } from '../types';
+import { resolveTalentHitMult } from '../talent_hit_mult';
+import type { AbilityDef, AbilityEffect, Entity } from '../types';
 
 export const PALADIN_AEGIS_ID = 'aegis_first_dawn';
 const PROTECTION_REFRESH_SECONDS = 0.15;
@@ -16,6 +19,24 @@ function effectOf(res: ResolvedAbility): AegisEffect | null {
 
 function protectionId(casterId: number): string {
   return `${PALADIN_AEGIS_ID}_dr:${casterId}`;
+}
+
+// Aegis' SP riders historically omitted the resolved talent healing
+// multiplier, and its complete tick/final amounts never received the
+// Sunmender-only primary-healing factor. Both are resolved together here so
+// the two corrections cannot drift out of sync between the tick and the
+// completion burst.
+function healingContext(
+  ctx: SimContext,
+  caster: Entity,
+  def: AbilityDef,
+): { talentHealMult: number; healMultiplier: number } {
+  const meta = caster.kind === 'player' ? ctx.players.get(caster.id) : undefined;
+  const mods = meta ? ctx.playerMods(meta) : undefined;
+  return {
+    talentHealMult: mods ? resolveTalentHitMult(def, mods).healMult : 1,
+    healMultiplier: meta && mods ? primaryHealingMultiplier(meta.cls, mods.spec) : 1,
+  };
 }
 
 function eligibleAllies(ctx: SimContext, caster: Entity, radius: number): Entity[] {
@@ -77,9 +98,13 @@ export function tickPaladinAegis(ctx: SimContext, caster: Entity, res: ResolvedA
   const effect = effectOf(res);
   if (!effect) return false;
 
-  const spellPowerBonus = channelTickBonus(caster.healPower, res.def);
+  const { talentHealMult, healMultiplier } = healingContext(ctx, caster, res.def);
+  const spellPowerBonus = channelTickBonus(caster.healPower, res.def, talentHealMult);
   for (const ally of eligibleAllies(ctx, caster, effect.radius)) {
-    const amount = ctx.rng.range(effect.tickMin, effect.tickMax) + spellPowerBonus;
+    const amount = scalePrimaryHealing(
+      ctx.rng.range(effect.tickMin, effect.tickMax) + spellPowerBonus,
+      healMultiplier,
+    );
     ctx.applyHeal(caster, ally, amount, res.def.name, res.def.id);
   }
   ctx.emit({
@@ -105,9 +130,13 @@ export function completePaladinAegis(
   const effect = effectOf(res);
   if (!effect) return false;
 
-  const finalBonus = directHealBonus(caster.healPower, 0, true);
+  const { talentHealMult, healMultiplier } = healingContext(ctx, caster, res.def);
+  const finalBonus = directHealBonus(caster.healPower, 0, true, talentHealMult);
   for (const ally of eligibleAllies(ctx, caster, effect.radius)) {
-    const amount = ctx.rng.range(effect.finalMin, effect.finalMax) + finalBonus;
+    const amount = scalePrimaryHealing(
+      ctx.rng.range(effect.finalMin, effect.finalMax) + finalBonus,
+      healMultiplier,
+    );
     ctx.applyHeal(caster, ally, amount, res.def.name, res.def.id);
     ctx.applyAura(ally, {
       id: `${PALADIN_AEGIS_ID}_speed`,

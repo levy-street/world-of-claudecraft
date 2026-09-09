@@ -17,6 +17,7 @@ export const MARKET_ITEM_TYPE_FILTERS = [
   'consumable',
   'material',
   'cosmetic',
+  'pattern',
   'other',
 ] as const;
 export const MARKET_ARMOR_TYPE_FILTERS = [
@@ -198,17 +199,23 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
       item.kind === 'food' ||
       item.kind === 'drink' ||
       item.kind === 'potion' ||
-      item.kind === 'elixir'
+      item.kind === 'elixir' ||
+      item.kind === 'flask' ||
+      item.kind === 'scroll'
     );
   if (filter === 'bag') return item.kind === 'bag';
   if (filter === 'material')
     return !isCosmeticItem(item) && (item.kind === 'junk' || item.kind === 'tool');
   if (filter === 'cosmetic') return isCosmeticItem(item);
+  if (filter === 'pattern') return item.kind === 'recipe';
   // The catch-all for catalog kinds with no browse category of their own. Mount
   // reins join quest items here: quest items are never listable, and reins
   // (listable now that they are unbound) are too few to earn a filter chip.
-  // Neither may be left reachable through 'All' alone
-  // (tests/market_filters.test.ts).
+  // Recipe patterns parked here through phase 02 for the same fewness reason;
+  // phase 11 shipped the apex pattern content and gave the kind its own chip
+  // (the 'pattern' arm above), so quest and mount are the whole bucket again.
+  // Neither may be left reachable through 'All' alone (pinned by the sweep in
+  // tests/market_filters.test.ts, which sees only the live catalog).
   if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is

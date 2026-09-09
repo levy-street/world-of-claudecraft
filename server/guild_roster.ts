@@ -8,6 +8,7 @@
 // needed (the deeds-runtime cycle only existed because that cache already
 // lived in main.ts).
 
+import { GUILD_ROSTER_MAX_MEMBERS } from '../src/sim/guild_roster';
 import type { GuildRosterInfo } from '../src/world_api/progression_xp';
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, ELIGIBLE_ACCOUNT_SQL, runWithStatementTimeout } from './db';
 import { singleFlight } from './deeds_board_warm';
@@ -24,10 +25,13 @@ export const GUILD_ROSTER_TTL_MS = 30_000;
  *  somehow reaches it the whole cache resets rather than growing. */
 const ROSTER_CACHE_MAX = 512;
 
-/** Row bound on the anonymous, cached read: far above the server's guild
- *  size in practice, and an explicit ceiling so a pathological roster can
- *  never balloon the cached payload. */
-const ROSTER_MEMBER_LIMIT = 500;
+/** Row bound on the anonymous, cached read: the largest roster any guild can
+ *  buy (src/sim/guild_roster.ts), so the public drill-in never truncates a
+ *  roster the ladder allows, and still an explicit ceiling so a tampered row
+ *  can never balloon the cached payload (ROSTER_CACHE_MAX entries of this
+ *  many rows is the memory bound; tests/server/guild_roster.test.ts pins the
+ *  derivation). */
+export const ROSTER_MEMBER_LIMIT = GUILD_ROSTER_MAX_MEMBERS;
 
 /** The uncached read. The eligibility screen matches topGuilds (server/db.ts):
  *  a banned or suspended member drops off the roster without delisting the

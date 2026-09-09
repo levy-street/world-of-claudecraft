@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.it_IT.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Ogni istanza gira anche in **Eroico**: nemici di livello più alto, meccaniche p
 
 ### Delve
 
-Le delve sono una modalità per piccoli gruppi separata e scalabile per uno o due giocatori, ricostruita da camere casuali a ogni run e conclusa su una cassa reliquiario chiusa a chiave che si apre attraverso un minigioco di scasso anziché con un tiro sul bottino. **The Collapsed Reliquary** (livello 7 e oltre) si conclude con Deacon Varric, con una compagna IA, Tessa, che combatte al tuo fianco se vai in solitaria. **The Drowned Litany** (livello 12 e oltre) segue la traccia dentro un santuario allagato ai margini di Mirefen Marsh. Una bacheca delle delve imposta il livello: l'Eroico alza i livelli dei nemici e aggiunge un affisso casuale per ricompense più ricche.
+Le delve sono una modalità per piccoli gruppi separata e scalabile per uno o due giocatori, ricostruita da camere casuali a ogni run e conclusa su una cassa reliquiario chiusa a chiave che si apre attraverso un minigioco di scasso anziché con un tiro sul bottino. **The Collapsed Reliquary** (livello 7 e oltre) si conclude con Deacon Vandric, con una compagna IA, Tessa, che combatte al tuo fianco se vai in solitaria. **The Drowned Litany** (livello 12 e oltre) segue la traccia dentro un santuario allagato ai margini di Mirefen Marsh. Una bacheca delle delve imposta il livello: l'Eroico alza i livelli dei nemici e aggiunge un affisso casuale per ricompense più ricche.
 
 ### PvP classificato (l'Ashen Coliseum)
 

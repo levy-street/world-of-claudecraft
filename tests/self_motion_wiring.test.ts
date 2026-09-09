@@ -11,11 +11,13 @@ describe('online self-motion lifecycle wiring', () => {
     );
     expect(frameWrite).toContain('net.connected &&');
 
-    const reconnectHook = mainSource.slice(
-      mainSource.indexOf('online.onReconnected = () => {'),
-      mainSource.indexOf('hud.marketResyncAfterReconnect();') +
-        'hud.marketResyncAfterReconnect();'.length,
-    );
+    const reconnectStart = mainSource.indexOf('online.onReconnected = () => {');
+    const reconnectEnd = mainSource.indexOf('\n    };', reconnectStart);
+    expect(reconnectStart).toBeGreaterThan(-1);
+    expect(reconnectEnd).toBeGreaterThan(reconnectStart);
+    const reconnectHook = mainSource.slice(reconnectStart, reconnectEnd);
+    expect(reconnectHook).toContain('priorOnReconnected?.();');
+    expect(reconnectHook).toContain('hud.resyncAfterReconnect();');
     expect(reconnectHook).toContain('inputEcho.echoMs = inputEcho.jitterMs = 0;');
     expect(reconnectHook).toContain('Object.assign(kbTurn, newKeyboardTurnState());');
     expect(reconnectHook).toContain('movementPrediction.reset();');

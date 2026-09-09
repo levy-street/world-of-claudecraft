@@ -52,6 +52,7 @@ const GROUPS: Group[] = [
       { keys: ['C'], label: 'controls.charPane' },
       { keys: ['P'], label: 'controls.spellbook' },
       { keys: ['Shift+P'], label: 'guide.controls.professions' },
+      { keys: ['Shift+K'], label: 'guide.controls.harvestJournal' },
       { keys: ['L'], label: 'controls.questLog' },
       { keys: ['M'], label: 'controls.worldMap' },
       { keys: ['B'], label: 'controls.bags' },
@@ -59,8 +60,14 @@ const GROUPS: Group[] = [
       { keys: ['Z'], label: 'guide.controls.sheathe' },
       { keys: ['Shift+Z'], label: 'guide.controls.deeds' },
       { keys: ['Shift+X'], label: 'guide.controls.reliquary' },
+      { keys: ['Shift+Y'], label: 'hudChrome.cosmetics.title' },
       { keys: ['T'], label: 'guide.controls.crafting' },
+      // Perfecting parks on crafting's shifted layer (masterwrought Phase 18,
+      // the rail tile and keybind); the label reuses the window's own title
+      // key, the way the tile and the keybind options row do.
+      { keys: ['Shift+T'], label: 'hudChrome.perfecting.title' },
       { keys: ['O'], label: 'controls.friends' },
+      { keys: ['Shift+O'], label: 'hudChrome.lootExplorer.title' },
       { keys: ['G'], label: 'guide.controls.arena' },
       { keys: ['`'], label: 'guide.controls.mount' },
       { keys: ['K'], label: 'guide.controls.leaderboard' },

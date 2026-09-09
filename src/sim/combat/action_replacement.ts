@@ -20,7 +20,7 @@ export function resolveActionReplacement(base: ResolvedAbility, actor: Entity): 
     if (active) {
       const replaced = replaceResolvedAbility(base, rule.abilityId, actor.level);
       // One slot, one clock: an aura-state transform that carries its own
-      // cooldown checks and arms the BASE button's cooldown (Swiftmend and
+      // cooldown checks and arms the BASE button's cooldown (Fleetmend and
       // Overbloom share one 8 sec clock), while a cooldown-free payoff
       // (Unleash Beast) casts through the base recharge and arms nothing.
       // Only THIS rule path stamps the shared key: the hunter resolver also

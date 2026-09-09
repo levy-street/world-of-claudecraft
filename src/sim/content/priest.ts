@@ -36,7 +36,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
       { type: 'heal', min: 130, max: 155 },
     ],
     description:
-      'Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)',
+      'Deal $d Holy damage to an enemy or heal a friendly target for $h. Damage increases with Spell Power; healing increases with Healing Power. Doctrine converts this damage into healing through your links. If no injured linked group member is within 30 yards, heal the lowest-health injured group member within 30 yards for 15% of the damage. Healing a group member also heals up to 2 other injured group members within 10 yards of that target and in your line of sight, each for 50% of the health restored. These extra heals cannot critically heal or create Doctrine links. (Doctrine signature)',
   },
   seraphic_vigil: {
     id: 'seraphic_vigil',
@@ -114,14 +114,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     description:
       'Channel for 6 sec, healing party members within 30 yards for $d every 2 sec. Healing increases with Spell Power.',
   },
-  // Out-of-combat mass resurrection for the two healing priest specs, the
-  // ancestor_return / collective_reversal twin. The five-minute cooldown is the
-  // real throttle: requiresOutOfCombat alone is not one, because a backline
-  // healer who never draws aggro drops combat mid-fight the moment combatTimer
-  // passes the 5s linger (see the engagedPids pass in sim.ts), so a
-  // zero-cooldown mass rez could be chained repeatedly inside a single
-  // encounter. Kept equal to collective_reversal so the mass rezzes cannot be
-  // played against each other; tests pin that equality.
+  // Both healer specs share the out-of-combat group resurrection.
   prayer_of_returning: {
     id: 'prayer_of_returning',
     name: 'Prayer of Returning',

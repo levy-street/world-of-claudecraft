@@ -1,6 +1,8 @@
 // The renderer's readouts of three's live program list (`renderer.info.programs`):
-// the prewarm counts, and the post-reveal watch that names every program the
-// driver minted inside a live frame.
+// the prewarm counts, the post-reveal watch that names every program the
+// driver minted inside a live frame, and the post-reveal link WINDOW that
+// counts how much the list grew in the first seconds after the curtain
+// (post_reveal_links_core.ts), for the perf beacon.
 //
 // The watch is the in-game half of what only the external capture kit could say
 // before: after the curtain fades, any program that appears is a variant no
@@ -12,6 +14,11 @@
 // State is module-owned rather than a renderer field on purpose: the renderer
 // is under a line ratchet, the arm is idempotent, and a graphics rebuild
 // re-arms at its own reveal, which re-seats the baseline for the new context.
+//
+// Every readout here also sweeps the program-key ledger (program_key_ledger.ts,
+// off without `?perf`), which is how the ledger sees every program without the
+// renderer gaining a call site; the per-frame readouts and the arm sweep the
+// shader warm audit (shader_warm_audit.ts, same flag) the same way.
 
 import { recordGpuPrepEvent } from './gpu_prep_events';
 import {
@@ -22,22 +29,59 @@ import {
   disarmLiveProgramWatch,
   type LiveProgramEntry,
 } from './live_program_watch_core';
+import {
+  armPostRevealLinkWindow,
+  createPostRevealLinkWindow,
+  type PostRevealLinksSnapshot,
+  resetPostRevealLinkWindow,
+  samplePostRevealLinkWindow,
+  postRevealLinksSnapshot as snapshotLinkWindow,
+} from './post_reveal_links_core';
+import { sweepProgramKeyLedger } from './program_key_ledger';
+import {
+  armShaderWarmAudit,
+  noteShaderWarmAuditOutOfBand,
+  sweepShaderWarmAudit,
+} from './shader_warm_audit';
+import { armShaderWarm } from './shader_warm_client';
 
 interface ProgramInfoHost {
   info: { programs?: LiveProgramEntry[] | null; memory: { textures: number } };
+  /** The GL context, for the shader warm audit's source read-back. */
+  getContext?(): unknown;
 }
 
 /** The slice the per-draw watch reads: three's program list, when the host
  *  exposes one at all (a test's stub renderer need not). */
 export interface ProgramListHost {
   info?: { programs?: LiveProgramEntry[] | null } | null;
+  getContext?(): unknown;
 }
 
 const watch = createLiveProgramWatch();
 const labels: string[] = [];
+const linkWindow = createPostRevealLinkWindow();
+// The real clock, passed as a thunk: the link window reads it only while the
+// window is open (its first 20 s), the ledger sweep only when it has a program
+// to stamp.
+const realClock = (): number => performance.now();
+let clock: () => number = realClock;
+
+/** Once per DRAWN frame, after the render: the count the draw left behind. */
+function sampleLinkWindow(programs: readonly LiveProgramEntry[] | null | undefined): void {
+  if (linkWindow.closed || linkWindow.armedAtMs < 0 || !programs) return;
+  samplePostRevealLinkWindow(linkWindow, clock(), programs.length);
+}
+
+/** The post-curtain link window as the perf beacon reads it; null before the
+ *  first reveal of this page. */
+export function postRevealLinksSnapshot(): PostRevealLinksSnapshot | null {
+  return snapshotLinkWindow(linkWindow);
+}
 
 /** Linked programs and resident textures, as three reports them. */
 export function programCounts(webgl: ProgramInfoHost): { programs: number; textures: number } {
+  sweepProgramKeyLedger(webgl, realClock);
   return {
     programs: webgl.info.programs?.length ?? 0,
     textures: webgl.info.memory.textures,
@@ -46,13 +90,42 @@ export function programCounts(webgl: ProgramInfoHost): { programs: number; textu
 
 /** Curtain-fade boundary: everything linked so far is prep, not an escape. */
 export function armLiveProgramWatch(webgl: ProgramInfoHost): void {
+  sweepProgramKeyLedger(webgl, realClock);
+  armShaderWarmAudit(webgl);
+  // The worker is worth asking from the first reveal on: the light census
+  // and the post pipeline are settled, and a held link is felt.
+  armShaderWarm();
   armWatch(watch, webgl.info.programs ?? undefined);
+  // The escape watch re-baselines on EVERY arm (an arrival's prep is prep);
+  // the link window is anchored to the FIRST arm on purpose, the world entry,
+  // and later arms only count (post_reveal_links_core.ts). A host without a
+  // program list has no baseline to anchor, so it never opens a window.
+  if (webgl.info.programs) {
+    armPostRevealLinkWindow(linkWindow, clock(), webgl.info.programs.length);
+  }
+}
+
+/**
+ * An out-of-band render burst brackets itself (the scene census): `begin`
+ * before its first render, `end` once it is over. The programs minted between
+ * the two are its own, charged to the burst instead of to the gates, and the
+ * ones already waiting at the begin keep the class they earned
+ * (shader_warm_audit.ts). The escape watch needs no such call, since the
+ * absorb below adopts anything minted between two draws as prep.
+ */
+export function noteOutOfBandPrograms(
+  webgl: ProgramListHost,
+  phase: 'begin' | 'end' = 'end',
+): void {
+  noteShaderWarmAuditOutOfBand(webgl, phase);
 }
 
 /** Right before the frame's render: everything minted since the last draw is
  *  prep (compileAsync prologues push programs too), so it is adopted, not
  *  reported. */
 export function absorbLivePrograms(webgl: ProgramListHost): void {
+  sweepProgramKeyLedger(webgl, realClock);
+  sweepShaderWarmAudit(webgl);
   absorbPrograms(watch, webgl.info?.programs ?? undefined);
 }
 
@@ -63,13 +136,23 @@ export function absorbLivePrograms(webgl: ProgramListHost): void {
  * frames after it.
  */
 export function recordNewLivePrograms(webgl: ProgramListHost): void {
+  sweepProgramKeyLedger(webgl, realClock);
+  sweepShaderWarmAudit(webgl);
   const found = collectNewLivePrograms(watch, webgl.info?.programs ?? undefined, labels);
   for (let i = 0; i < found; i++) {
     recordGpuPrepEvent({ kind: 'live-program', key: labels[i], ageMs: 0 });
   }
+  sampleLinkWindow(webgl.info?.programs);
+}
+
+/** Replace the link window's clock; the reset below restores the real one. */
+export function setLiveProgramWatchClockForTest(nowMs: () => number): void {
+  clock = nowMs;
 }
 
 export function resetLiveProgramWatchForTest(): void {
   disarmLiveProgramWatch(watch);
   labels.length = 0;
+  resetPostRevealLinkWindow(linkWindow);
+  clock = realClock;
 }

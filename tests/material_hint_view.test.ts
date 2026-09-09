@@ -1,15 +1,22 @@
 // Purpose hints: the hint table is keyed on exactly the eight arcane/resonant
-// enchanting ids plus the nine fine gathered grades and nothing else, every row
-// resolves to real English, and the rendered line is the muted description
-// style the tooltip's other def-driven use lines share.
+// enchanting ids, the nine fine gathered grades, and the crafted farm supply
+// (growth_tonic, the Phase 6 re-pin: a recipe output must state its purpose,
+// and the tonic's junk kind carries no def-level use to say it) and nothing
+// else, every row resolves to real English, and the rendered line is the muted
+// description style the tooltip's other def-driven use lines share.
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import {
   ARMOR_SECONDARY_BY_TYPE,
   TIMBER_WEAPON_TYPES,
 } from '../src/sim/professions/disenchant_reagents';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/enchanting';
+import {
+  WYRMFALL_BOSS_MAX,
+  WYRMFALL_BOSS_MIN,
+  WYRMFALL_RIFT_COUNT,
+} from '../src/sim/professions/masterwrought_materials';
 import {
   baseMaterialFor,
   MATERIAL_GRADES,
@@ -19,7 +26,8 @@ import {
   MATERIAL_HINT_KEYS,
   materialHintKey,
   materialHintLine,
-} from '../src/ui/material_hint_view';
+} from '../src/ui/hud/professions/material_hint_view';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 const ENCHANTING_IDS = [
   'arcane_dust',
@@ -34,12 +42,70 @@ const ENCHANTING_IDS = [
 // Derived from the live grade table rather than restated, so a tenth gathered
 // material cannot ship with a tooltip that says nothing about its grade.
 const FINE_IDS = Object.values(MATERIAL_GRADES).map((row) => row.fineItemId);
-const EXPECTED_IDS = [...ENCHANTING_IDS, ...FINE_IDS].sort();
+// The Masterwrought skill-75 intermediates (Phase 07): nine share one
+// craft-free lead; the catalyst carries its own line stating the daily limit.
+const MASTERWROUGHT_IDS = [
+  'duskforged_billet',
+  'forgefold_plating',
+  'wyrmhide_cording',
+  'sunspun_bolt',
+  'prismglass_setting',
+  'precision_chassis',
+  'quickening_catalyst',
+  'seasoned_stock',
+  'lucent_reagent',
+  'sablewax_vellum',
+];
+// The crafted farm supply joined in Phase 6 when the alchemy recipe made it a
+// recipe output (crafted_item_tooltip_coverage demands purpose text and its
+// junk kind has no def-level use line to provide it).
+const FARM_SUPPLY_HINT_IDS = ['growth_tonic'];
+// The promotion writ (Masterwrought phase 13): the Deed of Making is a recipe
+// output (recipe_deed_of_making) whose junk kind carries no def-level use
+// because the final Perfecting rank consumes it, so the purpose line is the
+// one place its tooltip says what it is for (the growth_tonic precedent).
+const PROMOTION_WRIT_HINT_IDS = ['deed_of_making'];
+// The apex catalyst (Masterwrought phase 14 UX pass): the Wyrmfall Core is
+// kind 'junk' with no def-level use, and unlike the intermediates its whole
+// point is WHERE it comes from, so its line names the faucets
+// (masterwrought_materials.ts) and is pinned to that module's constants below.
+const APEX_CATALYST_HINT_IDS = ['wyrmfall_core'];
+// The adopted trophies (Masterwrought phase 11l, leads authored at Phase 18).
+// DERIVED from the live TROPHY_RECIPES the same way the fine grades derive
+// from MATERIAL_GRADES, never restated: a de-adopted trophy leaves this set
+// and the coverage arms below then demand its lead be removed with it.
+const TROPHY_HINT_IDS = adoptedTrophyIds(ITEMS);
+const EXPECTED_IDS = [
+  ...ENCHANTING_IDS,
+  ...FINE_IDS,
+  ...MASTERWROUGHT_IDS,
+  ...FARM_SUPPLY_HINT_IDS,
+  ...PROMOTION_WRIT_HINT_IDS,
+  ...APEX_CATALYST_HINT_IDS,
+  ...TROPHY_HINT_IDS,
+].sort();
 
 describe('material_hint_view', () => {
-  it('covers exactly the enchanting materials and the fine grades, no more and no less', () => {
+  it('covers exactly the enchanting materials, fine grades, masterwrought intermediates, farm supplies, and the promotion writ, no more and no less', () => {
     expect(Object.keys(MATERIAL_HINT_KEYS).slice().sort()).toEqual(EXPECTED_IDS);
     expect(FINE_IDS).toHaveLength(9);
+    expect(MASTERWROUGHT_IDS).toHaveLength(10);
+  });
+
+  it('the nine intermediates share one craft-free lead and the catalyst states its daily limit', () => {
+    const nine = MASTERWROUGHT_IDS.filter((id) => id !== 'quickening_catalyst');
+    const keys = new Set(nine.map((id) => materialHintKey(id)));
+    expect(keys.size, 'the nine intermediates must share exactly one key').toBe(1);
+    expect([...keys][0]).toBe('hudChrome.materialHint.masterwroughtIntermediate');
+    const catalyst = materialHintLine('quickening_catalyst');
+    expect(catalyst).toContain('class="tt-desc"');
+    expect(catalyst).toContain('only one each day');
+    const component = materialHintLine('duskforged_billet');
+    expect(component).toContain('Masterwrought crafting component.');
+    // Craft-free leads: neither may start with the craft-naming prefix that
+    // would move CRAFT_NAMING_HINT_KEYS membership and suppress Used-by.
+    expect(catalyst).not.toContain('Enchanting reagent.');
+    expect(component).not.toContain('Enchanting reagent.');
   });
 
   it('every fine grade carries the one shared hint, and its BASE carries none', () => {
@@ -86,7 +152,7 @@ describe('material_hint_view', () => {
       expect(materialHintKey(id), id).toBeUndefined();
       expect(materialHintLine(id)).toBe('');
     }
-    // A broad sweep: nothing outside the eight ids carries a hint.
+    // A broad sweep: nothing outside the expected ids carries a hint.
     const hinted = Object.keys(ITEMS).filter((id) => materialHintKey(id) !== undefined);
     expect(hinted.slice().sort()).toEqual(EXPECTED_IDS);
   });
@@ -94,8 +160,13 @@ describe('material_hint_view', () => {
   it('renders each hint as a muted description line naming its source', () => {
     const dust = materialHintLine('arcane_dust');
     expect(dust).toContain('class="tt-desc"');
-    expect(dust).toContain('Enchanting reagent.');
+    // The dust/essence leads reworded to the craft-neutral form when
+    // jewelcrafting became their second consumer (the appended Used-by line
+    // names the crafts); the single-consumer shard keeps the enchanting lead.
+    expect(dust).toContain('Crafting reagent.');
+    expect(dust).not.toContain('Enchanting reagent.');
     expect(dust).toContain('common and uncommon');
+    expect(materialHintLine('arcane_shard')).toContain('Enchanting reagent.');
     expect(materialHintLine('arcane_essence')).toContain('rare gear');
     expect(materialHintLine('arcane_shard')).toContain('epic and legendary');
     expect(materialHintLine('resonant_thread')).toContain('cloth armor');
@@ -103,6 +174,133 @@ describe('material_hint_view', () => {
     expect(materialHintLine('resonant_links')).toContain('mail armor');
     expect(materialHintLine('resonant_steel')).toContain('melee weapons');
     expect(materialHintLine('resonant_timber')).toContain('staves');
+  });
+
+  it('the wyrmfall core line names its faucets with the live income constants', () => {
+    // Written from src/sim/professions/masterwrought_materials.ts: the line's
+    // numbers are pinned to the module's own constants so a faucet retune
+    // fails here instead of shipping a stale sentence. "1 to 3" is the
+    // per-source daily boss roll; "1 or 2" is the deterministic A/S rift
+    // first-clear pair, in rank order.
+    const line = materialHintLine('wyrmfall_core');
+    expect(line).toContain('class="tt-desc"');
+    // BOTH boss clauses pin the income constants (a retune of either reds),
+    // and the TRIGGER wording is part of the pin (the tooltip standard's
+    // trigger/limit rule): the boss gate is per (dungeon, difficulty) and
+    // only the raid has two eligible difficulties (dungeon bosses pay on
+    // heroic alone, so "on each difficulty" belongs to the raid clause only,
+    // and "each" keeps the dungeon limit per dungeon); the rolled count goes
+    // to every participant; the rift arm pays on the day's first WINNING A
+    // or S clear whatever earlier losses (a losing clear forfeits the cores,
+    // masterwrought_materials.ts), so the sentence names the first WIN of
+    // the day, never merely clearing and never "winning your first race",
+    // with the pair mapped to its rank.
+    expect(line).toContain(
+      `The raid final boss drops ${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} to each player once per day on each difficulty.`,
+    );
+    expect(line).toContain(
+      `Heroic dungeon final bosses each drop ${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} to each player once per day.`,
+    );
+    // "A or S rank" is the trigger (a B or C rank win neither pays nor
+    // consumes the daily source, so the day's first B win leaves the later
+    // A or S win paying); dropping it reads as if any first win were the one.
+    expect(line).toContain(
+      `Your first A or S rank Rift race win of the day grants ${WYRMFALL_RIFT_COUNT.A} at A rank or ${WYRMFALL_RIFT_COUNT.S} at S rank.`,
+    );
+    expect(line).toContain('Heroic Quartermaster');
+    expect(line).toContain('Heroic Marks');
+    // Craft-free lead scoping (the intermediates rule): the lead must not
+    // claim a single craft, because the Used-by line names the consumers.
+    expect(line).not.toContain('Enchanting reagent.');
+  });
+
+  it('every trophy lead names a faucet the live mob tables really pay, at the rate it claims', () => {
+    // The seven adopted trophies each carry their OWN lead (masterwrought
+    // Phase 18 reopened the phase 11l refusal), so each has to be true of
+    // its own item. Written from the live MOBS loot tables the way the
+    // wyrmfall core line is written from its income module: the rate WORDS
+    // are the pin, so a retuned drop chance reds here.
+    //
+    // The vocabulary, held to the live chances:
+    //   "always" / "every time he falls"  -> a chance of exactly 1
+    //   "about half the time"             -> the 0.5 band
+    //   "more often than not"             -> above 0.5, below 1
+    // and an "only source" claim means exactly one mob drops the id.
+    const dropsOf = (itemId: string): { name: string; chance: number }[] => {
+      const rows: { name: string; chance: number }[] = [];
+      for (const mob of Object.values(MOBS)) {
+        for (const entry of mob.loot ?? []) {
+          if (entry.itemId === itemId) rows.push({ name: mob.name, chance: entry.chance });
+        }
+      }
+      return rows;
+    };
+    // Anti-vacuity: the derived trophy set is the live seven, and each really
+    // has a mob faucet, so the per-id arms below cannot pass over an empty
+    // list.
+    expect(TROPHY_HINT_IDS).toHaveLength(7);
+    for (const id of TROPHY_HINT_IDS) {
+      const line = materialHintLine(id);
+      expect(line, id).toContain('class="tt-desc"');
+      expect(line, id).toContain('Crafting reagent.');
+      // Craft-free, so the Used-by line still names the consuming craft.
+      expect(line, id).not.toContain('Enchanting reagent.');
+      expect(dropsOf(id).length, `${id} has a live faucet`).toBeGreaterThan(0);
+    }
+    // The two SOLE-SOURCE claims: one mob, chance 1.
+    for (const [id, mobName] of [
+      ['old_cragmaws_pelt', 'Old Cragmaw'],
+      ['emberwing_cinderscale', 'Voskar the Emberwing'],
+      ['cracked_ogre_tusk', 'Brutok Skullsmasher'],
+    ] as const) {
+      const rows = dropsOf(id);
+      expect(
+        rows.map((r) => r.name),
+        `${id} sole source`,
+      ).toEqual([mobName]);
+      expect(rows[0].chance, `${id} always drops`).toBe(1);
+      expect(materialHintLine(id), id).toContain(mobName);
+      expect(materialHintLine(id), `${id} claims certainty`).toContain('every time he falls');
+    }
+    // The "nothing else in the world carries one" claim on the wyrm scale:
+    // one mob at the 0.5 band.
+    const wyrm = dropsOf('cracked_wyrm_scale');
+    expect(wyrm.map((r) => r.name)).toEqual(['Sanctum Scaleguard']);
+    expect(wyrm[0].chance).toBe(0.5);
+    expect(materialHintLine('cracked_wyrm_scale')).toContain(
+      'Sanctum Scaleguards drop it about half the time',
+    );
+    // The MULTI-SOURCE claims: a common drop at the 0.5 band plus named
+    // sources that always carry one. The bandana line says both halves and
+    // names no mob, so only the rates are pinned.
+    const bandana = dropsOf('bandit_bandana');
+    expect(bandana.filter((r) => r.chance === 0.5).length).toBeGreaterThanOrEqual(3);
+    expect(bandana.some((r) => r.chance === 1)).toBe(true);
+    expect(materialHintLine('bandit_bandana')).toContain('about half the time');
+    expect(materialHintLine('bandit_bandana')).toContain('named leaders always carry one');
+    const mudfin = dropsOf('mudfin_scale');
+    expect(mudfin.find((r) => r.name === 'Mudfin Skulker')?.chance).toBe(0.5);
+    // "a little less often" for the deeper marsh fish: strictly under the
+    // Skulker's rate, and above nothing.
+    for (const row of mudfin.filter((r) => r.chance !== 1 && r.name !== 'Mudfin Skulker')) {
+      expect(row.chance, `${row.name} is a softer rate`).toBeLessThan(0.5);
+      expect(row.chance, `${row.name} still drops`).toBeGreaterThan(0);
+    }
+    expect(mudfin.some((r) => r.chance === 1)).toBe(true);
+    expect(materialHintLine('mudfin_scale')).toContain(
+      'Mudfin Skulkers drop it about half the time',
+    );
+    // "more often than not" for the Deeprock digger: strictly above the half
+    // band and strictly below certainty, so neither neighbouring word fits.
+    const candle = dropsOf('tallow_candle');
+    const digger = candle.find((r) => r.name === 'Deeprock Digger');
+    expect(digger?.chance, 'Deeprock Digger rate').toBeGreaterThan(0.5);
+    expect(digger?.chance).toBeLessThan(1);
+    expect(candle.some((r) => r.name.startsWith('Gravecaller') && r.chance < 0.5)).toBe(true);
+    expect(candle.some((r) => r.chance === 1)).toBe(true);
+    expect(materialHintLine('tallow_candle')).toContain(
+      'Deeprock diggers drop it more often than not',
+    );
   });
 
   it('every enchanting-hinted material is really consumed by at least one enchant', () => {

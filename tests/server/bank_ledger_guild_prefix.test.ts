@@ -28,12 +28,27 @@ function liveDelta(overrides: Partial<GuildBankOpDelta> = {}): GuildBankOpDelta 
   };
 }
 
+/**
+ * The durable sidecar a live delta serializes to, normalized the way the real
+ * serializer normalizes: the payload detaches to JSON, the crafted marker
+ * normalizes to null, and the source legs are OMITTED whenever the live delta
+ * carries none.
+ *
+ * The omission is the compatibility contract, not tidiness. `JSON.stringify`
+ * drops an absent key and emits `"materialSources":null` for a present one, so
+ * a fixture that spread a null through would model receipt bytes no durable row
+ * has: every guild receipt written before the legs existed would stop hashing to
+ * its stored payload, and a restart's retry of one would no longer be an
+ * idempotent retry. It also happens to be what the type says, since the durable
+ * side admits no null there.
+ */
 function durableDelta(delta: GuildBankOpDelta): SerializedBankLedgerGuildDelta {
-  const { instance, craftedRecipeId, ...fields } = delta;
+  const { instance, craftedRecipeId, materialSources, ...fields } = delta;
   return {
     ...fields,
     instanceJson: instance == null ? null : JSON.stringify(instance),
     craftedRecipeId: craftedRecipeId ?? null,
+    ...(materialSources == null ? {} : { materialSources }),
   };
 }
 
@@ -230,6 +245,63 @@ describe('guild ledger prefix verification', () => {
     expect(guildLedgerPrefixCounts(source, [guildBatch('purge.bare', 7, [durable])])).toEqual(
       new Map([[7, 1]]),
     );
+  });
+
+  it('matches on the SOURCE LEGS too, and refuses a sidecar that lost them', () => {
+    // The prefix splice retires a command by declaring its durable receipt
+    // equivalent. A live delta whose legs the durable sidecar does not carry is
+    // NOT that command: splicing it would retire an op whose exact provenance
+    // never committed, so the audit would open on stock nothing recorded.
+    const legs = [
+      { source: { gatherer: { kind: 'character', id: 7, name: 'Mara' } }, count: 1 },
+      { source: {}, count: 1 },
+    ] as const;
+    const live = liveDelta({ materialSources: legs });
+    const source = { unflushedGuildBankOps: new Map([[7, [live]]]) };
+
+    const carried = durableDelta(live);
+    expect(carried.materialSources).toEqual(legs);
+    expect(guildLedgerPrefixCounts(source, [guildBatch('legs.exact', 7, [carried])])).toEqual(
+      new Map([[7, 1]]),
+    );
+
+    // The SAME legs observed in the other order still match: both sides go
+    // through the one canonical adapter, which orders by descriptor key.
+    const reordered = { ...carried, materialSources: [legs[1], legs[0]] };
+    expect(guildLedgerPrefixCounts(source, [guildBatch('legs.reordered', 7, [reordered])])).toEqual(
+      new Map([[7, 1]]),
+    );
+
+    // A sidecar that lost the legs, or carries different ones, is refused. The
+    // lost one is the SAME command as written by a binary that recorded no
+    // legs: every other field matches, which is what makes the refusal decisive.
+    const lost = durableDelta(liveDelta());
+    expect(lost).toEqual({ ...carried, materialSources: undefined });
+    expect(guildLedgerPrefixCounts(source, [guildBatch('legs.lost', 7, [lost])])).toBeNull();
+    expect(
+      guildLedgerPrefixCounts(source, [
+        guildBatch('legs.other', 7, [{ ...carried, materialSources: [{ source: {}, count: 2 }] }]),
+      ]),
+    ).toBeNull();
+  });
+
+  it('OMITS the legs key for a legacy delta, so old receipt bytes are unchanged', () => {
+    // Absent, never null: a durable row written before the legs existed carries
+    // no such key, and its retry must still hash to the payload it stored.
+    const live = liveDelta();
+    const durable = durableDelta(live);
+    expect('materialSources' in durable).toBe(false);
+    expect(JSON.stringify(durable)).not.toContain('materialSources');
+    const absentSource = { unflushedGuildBankOps: new Map([[7, [live]]]) };
+    const absentBatch = guildBatch('legacy.absent', 7, [durable]);
+    expect(guildLedgerPrefixCounts(absentSource, [absentBatch])).toEqual(new Map([[7, 1]]));
+    // A live delta that spells its absence as null is the same legacy delta,
+    // and still matches that same key-less receipt.
+    const explicitNull = liveDelta({ materialSources: null });
+    expect(durableDelta(explicitNull)).toEqual(durable);
+    const nullSource = { unflushedGuildBankOps: new Map([[7, [explicitNull]]]) };
+    const nullBatch = guildBatch('legacy.null', 7, [durable]);
+    expect(guildLedgerPrefixCounts(nullSource, [nullBatch])).toEqual(new Map([[7, 1]]));
   });
 
   it('normalizes an omitted live crafted recipe only to durable null', () => {

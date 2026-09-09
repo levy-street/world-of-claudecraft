@@ -50,7 +50,7 @@ function chainSetup() {
   // Everyone at 18: the allies' health pools comfortably exceed each hop's heal,
   // so heal2 amounts show the raw falloff instead of the missing-hp clamp.
   sim.setPlayerLevel(18, caster);
-  // Chain Heal is the Restoration (Spiritmend) signature: granted on spec pick.
+  // Chain Heal is the Restoration (Spiritcall) signature: granted on spec pick.
   sim.setSpec('restoration', caster);
   sim.setPlayerLevel(18, near);
   sim.setPlayerLevel(18, mid);

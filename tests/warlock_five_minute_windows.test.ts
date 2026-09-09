@@ -35,11 +35,20 @@ describe('Affliction full-BiS five-minute inert-boss balance', () => {
 });
 
 describe('Demonology full-BiS five-minute inert-boss balance', () => {
-  it('keeps a modest sustain floor without approaching Affliction', () => {
+  // Re-anchored for the v0.42.0 Necromancy retune (+20% demonology damage:
+  // spec_output_tuning.ts's owner spell bonus 0.10 -> 0.32 plus the baseline
+  // pet bonus 0.15 -> 0.42, docs/design/class-balance-v042-results.md).
+  // Measured seed-42 actual moved 179 -> 228.92 on this fixture; the corridor
+  // moves with it, preserving the SAME relative floor/ceiling margins as the
+  // pre-v0.42.0 corridor (150/210 against a measured 179, i.e. about -16%/
+  // +17%) rather than just raising the ceiling. This asserts demonology's own
+  // corridor only; it overlaps Affliction's (175-235, above), so no cross-spec
+  // ordering is claimed or tested here.
+  it('lands the Necromancy-buffed sustained DPS corridor', () => {
     const result = runWarlockBalanceProbe('demonology', 42, 300);
 
-    expect(result.dps).toBeGreaterThanOrEqual(150);
-    expect(result.dps).toBeLessThanOrEqual(210);
+    expect(result.dps).toBeGreaterThanOrEqual(192);
+    expect(result.dps).toBeLessThanOrEqual(269);
     expect(result.manaEndPct).toBeLessThan(0.12);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);

@@ -39,6 +39,9 @@ interface YumiHudEls {
   respawnCount: HTMLElement;
 }
 
+// Visibility for the one node that also carries text; see the paint site.
+const DISPLAY_PROP = 'display';
+
 export class YumiMatchPainter {
   private els: YumiHudEls | null = null;
   private readonly live: YumiLiveState = {
@@ -146,7 +149,13 @@ export class YumiMatchPainter {
         : t('yumi.hud.teleportIn', { s: num(m.teleportIn) });
     this.w.setText(els.sub, sub);
     // Teleports freeze in sudden death: the line would count nothing down.
-    this.w.setDisplay(els.sub, m.suddenDeath ? 'none' : 'block');
+    // Visibility rides setStyleProp, not setDisplay, because this ONE node also
+    // carries its text: the single-slot cache holds one (kind, value) entry per
+    // element, so two single-slot writers on it would flip that entry every call
+    // and BOTH would bypass elision forever. The slot keyed (element, 'display')
+    // writes the same inline display it always did. A second node would have
+    // worked equally well; a second cache slot is cheaper.
+    this.w.setStyleProp(els.sub, DISPLAY_PROP, m.suddenDeath ? 'none' : 'block');
     this.w.setText(els.mineName, t('yumi.hud.yourYumi'));
     this.w.setText(els.theirsName, t('yumi.hud.enemyYumi'));
     // Team identity: my bar wears MY team's color (matching the spawn-plaza

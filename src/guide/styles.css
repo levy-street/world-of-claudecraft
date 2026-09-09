@@ -3066,6 +3066,14 @@ a.guide-poi:hover {
 .guide-tools-table {
   min-width: 640px;
 }
+/* The dish effect sub-lines under a recipe name (C10): quiet reference
+   prose, one line per fact, so the effect never crowds the name cell. */
+.guide-prof-effect {
+  display: block;
+  font-size: 0.85em;
+  font-weight: 400;
+  color: var(--g-text-dim);
+}
 .guide-set-name {
   color: var(--g-text);
   font-weight: 600;
@@ -3073,6 +3081,36 @@ a.guide-poi:hover {
 }
 .guide-set-name .guide-tags {
   margin-block-start: var(--g-xs);
+}
+/* The recipe-cell gate badges (combo requirement, the phase 07 Once per day
+   daily gate): inline beside the item name, so they need their own
+   separation and a muted register or they render glued to the name (the
+   scoped re-review found "Quickening CatalystOnce per day" on the live
+   page). */
+.guide-prof-combo {
+  display: inline-block;
+  margin-inline-start: var(--g-xs);
+  color: var(--g-text-muted);
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+/* The recipe-cell MATERIAL entries, and the same defect one row up rather than
+   a new one: materialsCell joins its spans with NO separator, so with no rule
+   here the cell renders glued, exactly as the combo badge did ("Quickening
+   CatalystOnce per day"). Marlow's Grand Roast read "Prime Cut x1Game Meat
+   x4Highland Barley x2Frost Gourd x2Sunpetal Herb x1Cooking Salt x2".
+   Long-standing, and the masterwrought supply-line phases are what made it the
+   worst run on the page: 11g took two bills to six entries, then 11h took seven
+   more to six and recipe_laden_hearth to SEVEN, the longest bill in the game.
+   Separated by the ADJACENT-SIBLING rule rather than a trailing margin on every
+   entry, so a one-material cell gains no phantom gap; nowrap keeps an entry
+   from breaking between its name and its count. */
+span.guide-prof-mat {
+  display: inline-block;
+  white-space: nowrap;
+}
+span.guide-prof-mat + span.guide-prof-mat {
+  margin-inline-start: var(--g-xs);
 }
 .guide-set-impact {
   white-space: nowrap;

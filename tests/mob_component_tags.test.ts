@@ -3,10 +3,13 @@ import { MOBS } from '../src/sim/data';
 import {
   BASE_TIER_WEIGHTS,
   HARVEST_TIERS,
+  harvestConcentrationBonus,
   harvestFamilyYieldsItem,
   harvestTierQuantity,
   isHarvestableCorpse,
+  yieldingFocusComponents,
 } from '../src/sim/professions/gathering';
+import { UNMAPPED_FAMILY } from './helpers/unmapped_family';
 
 // Profession harvesting (issue #1140): mob content records may carry an optional
 // `componentTags` list (skinning/salvage component types like 'hide', 'horn',
@@ -18,10 +21,6 @@ describe('mob component-type tags', () => {
   const tagged = Object.values(MOBS).filter(
     (mob) => Array.isArray(mob.componentTags) && mob.componentTags.length > 0,
   );
-
-  it('has tagged at least one mob (a representative sample across zones)', () => {
-    expect(tagged.length).toBeGreaterThan(0);
-  });
 
   it('every componentTags entry is a non-empty string with no duplicates', () => {
     for (const mob of tagged) {
@@ -39,18 +38,21 @@ describe('mob component-type tags', () => {
 
   it('names every template whose tags ALL miss the yield table (#2513)', () => {
     // A content-author-facing pin, deliberately in the tag validator rather than
-    // only in the harvest suites: tagging a template with nothing but gills or
-    // horn does NOT give it a harvest. isHarvestableCorpse answers on the
-    // MAPPED families a template carries, so such a corpse is never offered one
-    // and an explicit command is refused, exactly like an untagged template.
-    // That is the settled ruling, not a bug, but it is easy to author by
-    // accident, so a new one has to be added here on purpose.
+    // only in the harvest suites: tagging a template with nothing but a family
+    // HARVEST_COMPONENT_ITEMS does not map does NOT give it a harvest.
+    // isHarvestableCorpse answers on the MAPPED families a template carries,
+    // so such a corpse is never offered one and an explicit command is
+    // refused, exactly like an untagged template. That is the settled ruling,
+    // not a bug, but it is easy to author by accident, so a new one has to be
+    // added here on purpose.
     //
-    // claw and tusk joined the yield table (fen_troll's family): no shipped
-    // template is left carrying nothing but unmapped tags, so this sweep is
-    // legitimately empty today, not a weakened guard. Should a future template
-    // ship tagged only gills/horn (or a new, still-unmapped family), it lands
-    // here and the row below moves off the full tagged count.
+    // claw and tusk joined the yield table at #2905 (fen_troll's family), and
+    // gills and horn at Masterwrought Phase 11m: every family shipped content
+    // tags maps now, so this sweep is legitimately empty, not a weakened
+    // guard. Should a future template ship tagged only with a new,
+    // still-unmapped family, it lands here and the row below moves off the
+    // full tagged count (tests/harvest_geography.test.ts pins the same fact
+    // from the tag side: no template carries a tag absent from the table).
     const allUnmapped = tagged
       .filter((mob) => !isHarvestableCorpse(mob.componentTags))
       .map((mob) => mob.id)
@@ -58,11 +60,15 @@ describe('mob component-type tags', () => {
     expect(allUnmapped).toEqual([]);
     // The complement, so an always-false predicate could not pass the row above
     // by emptying the sweep. Every tagged template is harvestable now that
-    // claw and tusk are mapped: fen_troll (claw, tusk), the one shipped
+    // every shipped family is mapped: fen_troll (claw, tusk), the one shipped
     // template that used to be the sole all-unmapped holdout, is mapped too.
     expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(
       tagged.length,
     );
+    // ...and the predicate is not simply always true: a synthetic family no
+    // row maps is refused, on its own and beside a second one.
+    expect(isHarvestableCorpse([UNMAPPED_FAMILY])).toBe(false);
+    expect(isHarvestableCorpse([UNMAPPED_FAMILY, 'hide'])).toBe(true);
   });
 
   it('never lets a template out-pay the tag list it advertises (#2514)', () => {
@@ -113,24 +119,52 @@ describe('mob component-type tags', () => {
       const fullyMapped = tags.length * expectedQty(0);
       expect(defaultPick, `${mob.id} (${tags.join(', ')})`).toBeLessThanOrEqual(fullyMapped);
     }
-    // ...over every PARTLY-mapped template, so an emptied sweep reads as wrong
-    // rather than as a pass. A CORPUS CENSUS, not a behaviour claim: claw and
-    // tusk joining the yield table folded 5 of the former 10 mixed templates
-    // (every claw/tusk-only mix) into fully-mapped, leaving the 5 that still
-    // mix a mapped family with gills or horn (the two families still waiting
-    // on theirs). The per-template bound above is what holds the line.
-    expect(mixedSeen).toBe(6);
+    // ...over every PARTLY-mapped template. A CORPUS CENSUS, not a behaviour
+    // claim: claw and tusk joining the yield table (#2905) folded 5 of the
+    // former 10 mixed templates (every claw/tusk-only mix) into fully-mapped,
+    // leaving the 6 that mixed a mapped family with gills or horn (the four
+    // `gills, hide` swamp dwellers plus sethrael_palecoil and
+    // wildheart_hexcaller); Masterwrought Phase 11m then mapped gills and
+    // horn, folding those last 6 in too. ZERO is the shipped reality this row
+    // pins, and it is not a weakened guard: the per-template bound above holds
+    // the line the moment a template mixes again, and the synthetic shape
+    // below keeps the bound itself exercised while none does.
+    expect(mixedSeen).toBe(0);
+    // The bound on a SYNTHETIC mixed shape, through the shipped readers rather
+    // than the mirror formula alone, so the sweep above is not the only place
+    // the arithmetic is asked. One mapped family beside one family no row
+    // maps (tests/helpers/unmapped_family.ts): the default pick extracts hide
+    // alone at bonus 1 (the unmapped tag is forfeited breadth, #2514), which
+    // is below the M=3 overtake, so it never out-pays the fully-mapped twin.
+    const synthetic = ['hide', UNMAPPED_FAMILY];
+    expect(yieldingFocusComponents(synthetic, [])).toEqual(['hide']);
+    expect(harvestConcentrationBonus(synthetic, [])).toBe(1);
+    expect(harvestConcentrationBonus(synthetic, ['hide'])).toBe(1);
+    expect(harvestConcentrationBonus(synthetic, ['hide', UNMAPPED_FAMILY])).toBe(1);
+    const syntheticMapped = yieldingFocusComponents(synthetic, []).length;
+    const syntheticDefault =
+      syntheticMapped * expectedQty(harvestConcentrationBonus(synthetic, []));
+    expect(syntheticDefault).toBeLessThanOrEqual(synthetic.length * expectedQty(0));
+    // ...and the discriminating contrast: the same two tags both mapped is
+    // bonus 0 with both extracted, which is what "fully-mapped twin" means.
+    expect(yieldingFocusComponents(['hide', 'fang'], [])).toEqual(['hide', 'fang']);
+    expect(harvestConcentrationBonus(['hide', 'fang'], [])).toBe(0);
     // And the threshold really is where the comment says it is, stated as a
     // hypothetical shape rather than waiting for content to author one.
     expect(3 * expectedQty(1)).toBeGreaterThan(4 * expectedQty(0));
     expect(2 * expectedQty(1)).toBeLessThanOrEqual(3 * expectedQty(0));
   });
 
-  it('lists which mobs are tagged so the sample stays visible in test output', () => {
-    const summary = tagged.map((mob) => `${mob.id}: ${mob.componentTags?.join(', ')}`).sort();
-    expect(summary.length).toBeGreaterThanOrEqual(10);
-    // Not a hard assertion on content, just keeps a readable record in the
-    // test report of exactly which mobs and tags were added.
-    expect(summary).toEqual(expect.arrayContaining(summary));
+  it('keeps the tagged-corpus ratchet at the measured census', () => {
+    // A ratchet at the measured count (54 tagged templates after the 11m
+    // spread, 2026-08-25): raise it when a spread lands; lowering it is a
+    // conscious edit with its ledger entry. The old >= 10 floor let a
+    // regression strip 40 templates' tags and stay green here (the exact
+    // 54 / 181 partition is pinned in gathering.test.ts; this file's own
+    // sweeps iterate `tagged`, so the ratchet is their non-vacuity floor).
+    // The arrayContaining(summary) line that used to sit here was x === x
+    // and asserted nothing; removed 2026-08-25 (11m QA), and the separate
+    // at-least-one-tagged arm folded in here (this floor subsumes it).
+    expect(tagged.length).toBeGreaterThanOrEqual(54);
   });
 });

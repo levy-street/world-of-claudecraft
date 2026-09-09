@@ -227,10 +227,13 @@ describe('combat-rating tier ladder', () => {
 
     // The 8 Nythraxis set pieces plus the 5 offhand-slot / two-hander epics
     // (bonewrought_greatsword/bulwark, direfang_greatblade, wraithfire_orb, and
-    // the hunter's direfang_quiver) and the feral ladder's raid capstone
-    // (maul_of_the_scourged_wilds).
+    // the hunter's direfang_quiver), the feral ladder's raid capstone
+    // (maul_of_the_scourged_wilds), and the seven Roots' Bramblehide pieces
+    // (the feral druid's Strength leather family), and the seven Nythraxis
+    // gap-fill drops (three one-handers, the healer shield, the leather caster
+    // helm, the mail caster gloves and feet).
     const ilvl29 = allGear.filter((item) => itemLevel(item) === 29);
-    expect(ilvl29).toHaveLength(14);
+    expect(ilvl29).toHaveLength(28);
     for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
 
     // ilvl-31: heroic five-man boss pieces (40 rating) + rift clear-time epics
@@ -274,10 +277,12 @@ describe('combat-rating tier ladder', () => {
     });
     // 13 pre-existing pieces plus the 6 generated heroic raid variants of the
     // normal-raid epics (greatsword, greatblade, bulwark, orb, the hunter's
-    // direfang_quiver, and the feral ladder capstone maul_of_the_scourged_wilds).
+    // direfang_quiver, and the feral ladder capstone maul_of_the_scourged_wilds)
+    // plus the 7 generated variants of Roots' Bramblehide and the 7 of the
+    // Nythraxis gap-fill drops.
     // Minus the two heroic legendaries, which live in the ilvl-honesty
     // carve-out above with their shipped rating identity.
-    expect(heroicRaidGear).toHaveLength(17);
+    expect(heroicRaidGear).toHaveLength(31);
     for (const item of heroicRaidGear) {
       const ilvl = itemLevel(item);
       const expectedPrimary = ilvl === 37 ? 70 : item.weapon ? 65 : 55;

@@ -291,6 +291,12 @@ trash floored at 100 and the boss at 200), with two roster-forced departures:
 Floors, literals, live-spawn wiring, and the Heroic transform are pinned by
 `tests/wildheart_normal_tuning.test.ts`.
 
+Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): the 2861 reference above is a PINNED constant, not a live
+measurement of the catalog. The committed max-armour kit pins at 4085
+(`tests/heroic_difficulty_floors.test.ts`), and whether 2861 was ever the raw kit armour or a
+prot-mastery-folded reading is UNSETTLED, so it is not re-based here and rides the packet's R5
+re-measure. The trash and boss measurements above are on that constant.
+
 ### 8.2 Premature boss pull
 
 `DungeonDef.bossChainPull` (opt-in, live only here) makes aggroing Zulgar while any of the route is

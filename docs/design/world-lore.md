@@ -116,7 +116,7 @@ they were ever one thing:
   in Thornpeak (decayed into a plain garrison; Captain Thessaly doesn't know
   what her wall was originally watching *for*), and the **Gullhaven redoubt**
   on the Farshore (the only chapter whose enemy actually showed up, the
-  Rifts). The lantern-wardens of Gallowmere in the Wraithwood are a lapsed
+  Rifts). The lantern-wardens of Gibbetmere in the Wraithwood are a lapsed
   fourth chapter.
 - **The Chapel of the Sleep.** The funerary faith founded after the Dreamer
   fell, whose whole liturgy is teaching the dead to sleep *without* her:
@@ -197,7 +197,7 @@ Korzul, then lay down along its spine and became it. Every quake is the
 prisoner turning; every elemental shaken loose at Stormcrag is the jailer's
 strength fraying loose of his purpose; the Glimmermere is the lake that
 gathered in the crater where Korzul's swallowed shard first struck earth:
-the Wyrmcult camps beside it because the water still *shows things*. Korgath
+the Broodsworn camps beside it because the water still *shows things*. Korgath
 the Bound was the Smith's foreman, a giant set as living lock on the seal;
 the cult's cruelest work was binding the binder. Highwatch is a Vigil chapter
 that forgot itself: Thessaly's order has watched this wall for forty
@@ -238,7 +238,7 @@ When the sea rose, the Gardener saved exactly one valley: not the Court's
 lords, but its gardeners, orchard-keepers, and singers, folk who had tended
 rather than taken. She drew a veil woven from dream-light over the whole
 vale, cut every road, and planted a cutting of the First Tree at its heart:
-Eldergleam, under which Keeper Saelwyn's line has kept the veil for sixty
+Eldershine, under which Keeper Saelwyn's line has kept the veil for sixty
 generations (their long lives are the tree's doing). Starfall Basin holds the
 shard whose light the veil is woven from: the Hollow's protection and its
 single point of failure. The Sunken Court on its coast is the one Court city
@@ -246,7 +246,7 @@ the veil half-saved: drowned to the rooftops, but *gently*, its dead among
 the very few who sleep sound. The Gleaming Deep and Crystalline Shallows
 gleam with star-glass sifted down from the Basin.
 
-**Threads:** portal-only access is the veil, not geography. Eldergleam ↔ the
+**Threads:** portal-only access is the veil, not geography. Eldershine ↔ the
 Gardener ↔ the Evergarden. If the Gravecallers ever learned a heart-shard
 sits in Starfall Basin, undefended by anything but a curtain of light:
 that's an expansion.
@@ -341,7 +341,7 @@ darkness, but *her* night, soft and floral and lit from below by blooms that
 open for a moon that isn't there. She lies in the Dreamer's Bowl, and
 directly above the caldera hangs the Sleeping World: the second world she was
 weaving, half-finished, moored in the sky like a ship waiting on its captain
-(the game's existing "sleeping world that hangs in the sky"). The Moonwell is
+(the game's existing "sleeping world that hangs in the sky"). The Moonspring is
 pooled dream-light; drink and you dream true, which the locals of Moonrest
 treat with the same practical caution as strong drink. The Standing Vigil are
 Gleaming Court penitents who walked here after the Drowning and turned to
@@ -367,7 +367,7 @@ than *inhabited*, a forest-shaped waiting room. The Huntsman was a lord of
 the Gleaming Court who survived the Drowning and swore to gather his drowned
 people's souls home; he hunts still, long past being alive himself, and his
 Wild Hunt through the Hanging Glade is the closest thing the lost dead have
-to a shepherd (Erlking by way of the Stranger). Gallowmere's lantern-line is
+to a shepherd (Erlking by way of the Stranger). Gibbetmere's lantern-line is
 a lapsed Vigil chapter that now guides souls instead of gods. The Mournstone
 Chapel is the Chapel of the Sleep's last northern chapter, where one brother
 still rings a bell the dead can follow: the wood's whispering is every name
@@ -420,7 +420,7 @@ and consider this proper.
 
 **Threads:** the Great Maze is the lock on the path she took: solve it and
 you follow a god's footprints toward wherever the story goes next (the
-built-in door for future northward realms). Eldergleam in the Hollow is a
+built-in door for future northward realms). Eldershine in the Hollow is a
 cutting from her First Tree. The Rose Wilds going feral at the edges is the
 world's quietest countdown: the garden is very slowly forgetting her.
 
@@ -442,10 +442,10 @@ refuses to touch: dead calm, always: because its surface still shows the sky
 as it was *before* the Night of Glass. Keepers go there once a year, on the
 anniversary, to look at the star.
 
-**Threads:** mother-house of the Vigil: Highwatch, Gullhaven, and Gallowmere
+**Threads:** mother-house of the Vigil: Highwatch, Gullhaven, and Gibbetmere
 are its forgotten daughters. The Mirror Tarn is the only place in the world
 you can see the Loom whole: the single most valuable scrying surface alive,
-which the Gravecallers, the Wyrmcult, and worse would all kill for. The
+which the Gravecallers, the Broodsworn, and worse would all kill for. The
 Shear's cliffs face the Farshore's torn sky across the water.
 
 ---
@@ -564,7 +564,7 @@ of the Gardener's footprints: hedgerows grown over her campsites, a rose
 blooming in the dead of winter wherever she slept, and her pruning-hook left
 hanging on a gate no wall was ever built around. The realm's wrongness: her
 trail gets *younger* as you go north: as if she is still just ahead.
-**Pulls threads:** Evergarden (the Maze), Veiled Hollow (Eldergleam feels her
+**Pulls threads:** Evergarden (the Maze), Veiled Hollow (Eldershine feels her
 pass), the Other (what she walked north to face).
 
 ### The Tidecourt: *the Drowned Capital* (shallow-sea ruin realm · west)

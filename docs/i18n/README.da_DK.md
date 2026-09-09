@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.da_DK.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Hver instance kører også på **Heroic**: fjender af højere level, skarpere me
 
 ### Delves
 
-Delves er en separat, skalerbar mode for små grupper på én eller to spillere, genopbygget fra randomiserede kamre i hvert gennemløb og med en låst relikvie-kiste til sidst, der åbnes gennem et dirke-minispil frem for et loot roll. **The Collapsed Reliquary** (level 7 og op) ender ved Deacon Varric, med en AI-ledsager, Tessa, der kæmper ved din side, hvis du går solo. **The Drowned Litany** (level 12 og op) følger sporet ind i en oversvømmet helligdom i udkanten af Mirefen Marsh. En delve-tavle sætter tier'en: Heroic hæver fjendernes levels og tilføjer et tilfældigt affix for rigere belønninger.
+Delves er en separat, skalerbar mode for små grupper på én eller to spillere, genopbygget fra randomiserede kamre i hvert gennemløb og med en låst relikvie-kiste til sidst, der åbnes gennem et dirke-minispil frem for et loot roll. **The Collapsed Reliquary** (level 7 og op) ender ved Deacon Vandric, med en AI-ledsager, Tessa, der kæmper ved din side, hvis du går solo. **The Drowned Litany** (level 12 og op) følger sporet ind i en oversvømmet helligdom i udkanten af Mirefen Marsh. En delve-tavle sætter tier'en: Heroic hæver fjendernes levels og tilføjer et tilfældigt affix for rigere belønninger.
 
 ### Ranket PvP (the Ashen Coliseum)
 

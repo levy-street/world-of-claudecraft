@@ -10,6 +10,7 @@ import { BIND_ACTIONS } from '../src/game/keybinds';
 import { padReelItemId } from '../src/game/pad_reel';
 import { ITEMS } from '../src/sim/data';
 import { FISHING_CAST_ID, GATHER_CAST_ID } from '../src/sim/types';
+import { dispatchCollectionAction } from '../src/ui/collection_actions_core';
 
 describe('padReelItemId', () => {
   it('answers the carried implement only during a live fishing cast', () => {
@@ -100,13 +101,24 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
     return mainTs.slice(start, end);
   };
 
-  it('every offered edge action id has a case in dispatchGamepadAction', () => {
+  it('every offered edge action id routes through the collection dispatcher or a direct case', () => {
     const body = dispatchBody();
+    expect(body).toContain('if (dispatchCollectionAction(id, hud)) return;');
+    const collections = {
+      toggleDeeds() {},
+      toggleProfessions() {},
+      toggleReliquary() {},
+      toggleCosmetics() {},
+      toggleHarvestJournal() {},
+      togglePerfecting() {},
+      toggleLootExplorer() {},
+    };
     for (const action of BIND_ACTIONS) {
       if (action.kind !== 'edge') continue;
       if (action.id === 'attackMove') continue; // panel-excluded, pinned below
       if (action.id === 'jump' || action.id === 'autorun') continue; // gamepad.ts-handled, pinned below
       if (action.id.startsWith('slot')) continue; // the slotN prefix arm, pinned below
+      if (dispatchCollectionAction(action.id, collections)) continue;
       expect(body.includes(`case '${action.id}'`), `pad dispatch drops '${action.id}'`).toBe(true);
     }
   });
@@ -156,14 +168,19 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
       const arm = body.slice(at, body.indexOf('break;', at));
       expect(arm, `case '${id}' body`).toContain(call);
     }
-    // sheathe carries the keyboard arm's cue-on-state-change rule whole.
-    const at = body.indexOf("case 'sheathe': {");
+    // sheathe carries the keyboard arm's cue-on-state-change rule whole: both
+    // dispatches call the ONE extracted rule (src/game/sheathe_toggle.ts,
+    // behavior pinned in tests/sheathe_toggle.test.ts), so the pad arm cannot
+    // drift from the keyboard arm by carrying its own copy.
+    const at = body.indexOf("case 'sheathe':");
     expect(at).toBeGreaterThan(-1);
-    const sheathe = body.slice(at, body.indexOf('}', body.indexOf('break;', at)));
-    expect(sheathe).toContain('const wasStowed = world.player.weaponStowed;');
-    expect(sheathe).toContain('world.toggleWeaponStow();');
-    expect(sheathe).toContain('if (world.player.weaponStowed !== wasStowed) {');
-    expect(sheathe).toContain('audio.weaponSheathe();');
-    expect(sheathe).toContain('audio.weaponUnsheathe();');
+    const sheathe = body.slice(at, body.indexOf('break;', at));
+    expect(sheathe).toContain('toggleSheatheWithCue(world, audio);');
+    const keyboardAt = mainTs.indexOf("case 'sheathe':");
+    expect(keyboardAt).toBeGreaterThan(-1);
+    expect(keyboardAt).toBeLessThan(mainTs.indexOf('function dispatchGamepadAction'));
+    expect(mainTs.slice(keyboardAt, mainTs.indexOf('break;', keyboardAt))).toContain(
+      'toggleSheatheWithCue(world, audio);',
+    );
   });
 });

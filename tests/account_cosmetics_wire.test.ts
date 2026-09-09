@@ -12,6 +12,7 @@ describe('normalizeAccountCosmetics', () => {
       mechChromaIds: [],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
   });
 
@@ -21,6 +22,7 @@ describe('normalizeAccountCosmetics', () => {
       mechChromaIds: [],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
   });
 

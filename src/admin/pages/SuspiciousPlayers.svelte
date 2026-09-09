@@ -1,17 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { apiGet } from '../api';
-  import {
-    readAutoRefreshPreference,
-    writeAutoRefreshPreference,
-  } from '../auto_refresh_preference';
   import AccountLink from '../components/AccountLink.svelte';
   import AutoRefreshToggle from '../components/AutoRefreshToggle.svelte';
   import IpLink from '../components/IpLink.svelte';
   import Panel from '../components/Panel.svelte';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { fmtDate, fmtRelative } from '../format';
   import { adminLanguageTag, t } from '../i18n';
-  import { auth } from '../state/auth.svelte';
+  import { createAutoRefresh } from '../state/auto_refresh.svelte';
   import { buildSuspiciousSessionsExport } from '../suspicious_sessions_export';
   import type { SuspiciousEvidence, SuspiciousPlayer, SuspiciousPlayersData } from '../types';
 
@@ -21,14 +18,15 @@
   const AUTO_REFRESH_STORAGE_KEY = 'claudecraft_admin_suspicious_auto_refresh';
   const AUTO_REFRESH_MS = 30_000;
 
-  let data = $state<SuspiciousPlayersData | null>(null);
-  let failed = $state(false);
+  const surface = createAutoRefresh<SuspiciousPlayersData>({
+    storageKey: AUTO_REFRESH_STORAGE_KEY,
+    intervalMs: AUTO_REFRESH_MS,
+    load: () => apiGet<SuspiciousPlayersData>('/admin/api/suspicious-players'),
+  });
+  let data = $derived(surface.data);
   let sort = $state<SortColumn>('observed');
   let direction = $state<SortDirection>('desc');
   let query = $state('');
-  let autoRefresh = $state(true);
-  let mounted = $state(false);
-  let requestId = 0;
 
   const sortedPlayers = $derived.by(() => {
     if (!data) return [];
@@ -116,19 +114,6 @@
     return parts.join(' | ');
   }
 
-  async function refresh(): Promise<void> {
-    const currentRequest = ++requestId;
-    try {
-      const result = await apiGet<SuspiciousPlayersData>('/admin/api/suspicious-players');
-      if (currentRequest !== requestId) return;
-      data = result;
-      failed = false;
-    } catch (err) {
-      if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
-    }
-  }
-
   function downloadJson(): void {
     if (data === null) return;
     const file = buildSuspiciousSessionsExport(data);
@@ -167,26 +152,7 @@
     return direction === 'asc' ? '▲' : '▼';
   }
 
-  function changeAutoRefresh(enabled: boolean): void {
-    autoRefresh = enabled;
-    writeAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY, enabled);
-    if (enabled) void refresh();
-  }
-
-  $effect(() => {
-    if (!mounted || !autoRefresh) return;
-    const id = setInterval(() => void refresh(), AUTO_REFRESH_MS);
-    return () => clearInterval(id);
-  });
-
-  onMount(() => {
-    autoRefresh = readAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY);
-    mounted = true;
-    void refresh();
-    return () => {
-      requestId += 1;
-    };
-  });
+  onMount(() => surface.start());
 </script>
 
 <div class="suspicious-page">
@@ -196,9 +162,9 @@
         <p class="description">{t('suspiciousPlayers.sessionDescription')}</p>
         <div class="control-actions">
           <AutoRefreshToggle
-            checked={autoRefresh}
+            checked={surface.enabled}
             label={t('suspiciousPlayers.autoRefresh', { seconds: AUTO_REFRESH_MS / 1000 })}
-            onChange={changeAutoRefresh}
+            onChange={(enabled) => surface.setEnabled(enabled)}
           />
           <button type="button" disabled={data === null} onclick={downloadJson}>
             {t('suspiciousPlayers.downloadJson')}
@@ -219,7 +185,9 @@
       {data === null ? '' : resultCountLabel(sortedPlayers.length)}
     </p>
 
-    {#if failed}
+    {#if surface.failure === 'forbidden'}
+      <PermissionDenied />
+    {:else if surface.failure === 'error'}
       <div class="empty">{t('suspiciousPlayers.loadFailed')}</div>
     {:else if data === null}
       <div class="empty">{t('suspiciousPlayers.loading')}</div>

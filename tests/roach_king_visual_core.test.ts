@@ -43,6 +43,7 @@ describe('Roach King authoritative visual identity', () => {
       expect(def.clips.death).toBe('Death');
       expect(def.clips.attack).toEqual(['Attack']);
       expect(def.tint).toBeUndefined();
+      expect(def.authoredAtlas).toBe(true);
     }
     expect(VISUALS.mob_roach_king.height).toBeGreaterThan(VISUALS.mob_asmon_hermit.height);
     expect(VISUALS.mob_asmon_hermit.clips.castByAbility?.rift_asmon_coronation).toBe('Transform');

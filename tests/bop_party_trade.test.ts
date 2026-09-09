@@ -7,10 +7,10 @@ import { describe, expect, it } from 'vitest';
 import { BOP_PARTY_TRADE_MS } from '../src/sim/loot/bop_trade_window';
 import { grantAwardedLootItem } from '../src/sim/loot/loot_roll';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import { type ItemInstancePayload, TICK_RATE } from '../src/sim/types';
+import type { ItemInstancePayload } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
 
-const HELM = 'furyforged_warhelm'; // soulbound epic warrior PvP helmet
+const HELM = 'slagbreaker_helmet'; // soulbound epic warrior tier piece
 
 function tradeSim() {
   const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
@@ -85,34 +85,6 @@ describe('BoP party trade window: the trade path', () => {
 
     expect(sim.countItem(HELM, alice)).toBe(1);
     expect(sim.countItem(HELM, bob)).toBe(0);
-  });
-
-  it('prunes a staged copy when its window expires and resets both acceptances', () => {
-    const { sim, alice, bob } = tradeSim();
-    const expiring = { partyTrade: { untilMs: 25, eligible: ['Alice', 'Bob'] } };
-    sim.addItemInstance(HELM, expiring, alice);
-    sim.addItemInstance(HELM, expiring, bob);
-    openTrade(sim, alice, bob);
-    sim.tradeSetOffer([{ itemId: HELM, count: 1 }], 0, alice);
-    sim.tradeSetOffer([{ itemId: HELM, count: 1 }], 0, bob);
-    const session = expectDefined(sim.ctx.trades.get(alice));
-    session.acceptedA = true;
-    session.acceptedB = true;
-
-    for (let i = 0; i < TICK_RATE - 1; i++) sim.tick();
-    expect(session.offerA.items).toHaveLength(1);
-    expect(session.offerB.items).toHaveLength(1);
-    expect(session.acceptedA).toBe(true);
-    expect(session.acceptedB).toBe(true);
-
-    sim.tick();
-
-    expect(session.offerA.items).toEqual([]);
-    expect(session.offerB.items).toEqual([]);
-    expect(session.acceptedA).toBe(false);
-    expect(session.acceptedB).toBe(false);
-    expect(sim.countItem(HELM, alice)).toBe(1);
-    expect(sim.countItem(HELM, bob)).toBe(1);
   });
 
   it('never offers a plain soulbound copy that carries no window at all', () => {

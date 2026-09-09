@@ -13,7 +13,7 @@ const HUD = stripComments(readFileSync(join(__dirname, '..', 'src', 'ui', 'hud.t
 describe('storage rung authoritative-refusal wiring', () => {
   it('observes raw error and log text before either localization path transforms it', () => {
     expect(HUD).toContain('this.localizeErrorText(this.bankWindow.observeStorageText(ev.text))');
-    expect(HUD).toContain('this.localizeSystemText(this.bankWindow.observeStorageText(ev.text))');
+    expect(HUD).toContain('localizeSystemText(this.bankWindow.observeStorageText(ev.text))');
     expect(HUD.match(/observeStorageText\(ev\.text\)/g)).toHaveLength(2);
   });
 });

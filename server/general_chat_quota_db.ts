@@ -34,12 +34,20 @@ const GENERAL_CHAT_QUOTA_LISTENER_RETRY_MAX_MS = 5_000;
 // .env loading and fail-fast validation). Read its resolved connection string
 // when available; the env fallback keeps legacy unit-test partial pool mocks
 // importable without widening the db.ts mock contract across the repository.
+// The shared pool's `options` config property (materialSourceConnection.ts)
+// carries the operator's own lifted startup options PLUS the code-owned
+// writer capability, as a string separate from the connection string: lift
+// only that one field, never the rest of the shared pool's config, so this
+// module's independently-sized timeouts below stay its own.
 const GENERAL_CHAT_QUOTA_DATABASE_URL =
   (pool as { options?: { connectionString?: string } }).options?.connectionString ??
   process.env.DATABASE_URL;
+const GENERAL_CHAT_QUOTA_DATABASE_OPTIONS = (pool as { options?: { options?: string } }).options
+  ?.options;
 
 const quotaPool = new Pool({
   connectionString: GENERAL_CHAT_QUOTA_DATABASE_URL,
+  options: GENERAL_CHAT_QUOTA_DATABASE_OPTIONS,
   max: GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS,
   connectionTimeoutMillis: GENERAL_CHAT_QUOTA_ACQUIRE_TIMEOUT_MS,
   lock_timeout: GENERAL_CHAT_QUOTA_LOCK_TIMEOUT_MS,
@@ -530,6 +538,7 @@ export function createGeneralChatQuotaListener(deps: {
 async function connectGeneralChatQuotaListener(): Promise<GeneralChatQuotaListenerClient> {
   const raw = new Client({
     connectionString: GENERAL_CHAT_QUOTA_DATABASE_URL,
+    options: GENERAL_CHAT_QUOTA_DATABASE_OPTIONS,
     connectionTimeoutMillis: GENERAL_CHAT_QUOTA_ACQUIRE_TIMEOUT_MS,
     statement_timeout: GENERAL_CHAT_QUOTA_STATEMENT_TIMEOUT_MS,
     query_timeout: GENERAL_CHAT_QUOTA_STATEMENT_TIMEOUT_MS + GENERAL_CHAT_QUOTA_ACQUIRE_TIMEOUT_MS,

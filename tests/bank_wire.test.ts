@@ -154,27 +154,41 @@ describe('bank wire round-trip', () => {
     const meta = sim.players.get(pid);
     const bagCount = () => meta.inventory.find((x: any) => x.itemId === 'wolf_fang')?.count ?? 0;
 
-    // 1) deposit a partial count (2 of 5): the rest stays in the bags.
+    // 1) deposit a partial count (2 of 5): the rest stays in the bags. The
+    // unrecorded-gatherer bag stock projects into an exact `materialSources`
+    // bucket (material_stack.ts normalizeMaterialStack) as it splits off into
+    // the bank, on both the sim state and the wire mirror.
     send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid), count: 2 });
-    expect(meta.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    expect(meta.bank.inventory).toEqual([
+      { itemId: 'wolf_fang', count: 2, materialSources: [{ count: 2, source: {} }] },
+    ]);
     expect(bagCount()).toBe(3);
     fw.sent.length = 0;
     (server as any).broadcastSnapshots();
-    expect(lastSnap(fw.sent).self.bank.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    expect(lastSnap(fw.sent).self.bank.slots).toEqual([
+      { itemId: 'wolf_fang', count: 2, materialSources: [{ count: 2, source: {} }] },
+    ]);
 
     // 2) deposit the whole remaining stack (3): merges into the bank slot -> 5, and
     // the MERGED stack rides the wire (a mis-encode of a merged slot would slip past
-    // the op-1 and op-4 snapshots, which only ever see counts 2 and 3).
+    // the op-1 and op-4 snapshots, which only ever see counts 2 and 3). The two
+    // unrecorded buckets coalesce into one (mergeMaterialCompositions).
     send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid) });
-    expect(meta.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
+    expect(meta.bank.inventory).toEqual([
+      { itemId: 'wolf_fang', count: 5, materialSources: [{ count: 5, source: {} }] },
+    ]);
     expect(meta.inventory.some((x: any) => x.itemId === 'wolf_fang')).toBe(false);
     fw.sent.length = 0;
     (server as any).broadcastSnapshots();
-    expect(lastSnap(fw.sent).self.bank.slots).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
+    expect(lastSnap(fw.sent).self.bank.slots).toEqual([
+      { itemId: 'wolf_fang', count: 5, materialSources: [{ count: 5, source: {} }] },
+    ]);
 
     // 3) withdraw a partial count (2): bank -> bags.
     send(server, s, { cmd: 'bank_withdraw', slot: 0, count: 2 });
-    expect(meta.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+    expect(meta.bank.inventory).toEqual([
+      { itemId: 'wolf_fang', count: 3, materialSources: [{ count: 3, source: {} }] },
+    ]);
     expect(bagCount()).toBe(2);
 
     // 4) buy the first expansion: exact copper spent, +6 purchased slots.
@@ -186,7 +200,9 @@ describe('bank wire round-trip', () => {
     fw.sent.length = 0;
     (server as any).broadcastSnapshots();
     const snap = lastSnap(fw.sent);
-    expect(snap.self.bank.slots).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+    expect(snap.self.bank.slots).toEqual([
+      { itemId: 'wolf_fang', count: 3, materialSources: [{ count: 3, source: {} }] },
+    ]);
     expect(snap.self.bank.capacity).toBe(30); // 24 base + 6 purchased
     expect(snap.self.bank.purchasedSlots).toBe(6);
     expect(snap.self.bank.nextExpansionCost).toBe(1000); // second expansion price
@@ -206,11 +222,15 @@ describe('bank wire round-trip', () => {
     fw.sent.length = 0;
     (server as any).broadcastSnapshots();
     const snap1 = lastSnap(fw.sent);
-    expect(snap1.self.bank.slots).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
+    expect(snap1.self.bank.slots).toEqual([
+      { itemId: 'wolf_fang', count: 4, materialSources: [{ count: 4, source: {} }] },
+    ]);
 
     const client = bareClient(pid);
     (client as any).applySnapshot(snap1);
-    expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
+    expect(client.bankInfo?.slots).toEqual([
+      { itemId: 'wolf_fang', count: 4, materialSources: [{ count: 4, source: {} }] },
+    ]);
     const bankRef = client.bankInfo;
 
     // A second broadcast with no bank change: the maybe() closure sees byte-identical
@@ -224,7 +244,9 @@ describe('bank wire round-trip', () => {
     // `if (s.bank !== undefined)` guard is never entered).
     (client as any).applySnapshot(snap2);
     expect(client.bankInfo).toBe(bankRef);
-    expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
+    expect(client.bankInfo?.slots).toEqual([
+      { itemId: 'wolf_fang', count: 4, materialSources: [{ count: 4, source: {} }] },
+    ]);
   });
 
   it('leaving a banker encodes an explicit null and the client mirror clears', () => {
@@ -289,14 +311,20 @@ describe('bank wire round-trip', () => {
     // as the documented coercion contract (a dispatch that instead rejected bad
     // counts would red this); it also stocks the bank for the withdraw refusals below.
     send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid), count: 'two' });
-    expect(meta.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
+    expect(meta.bank.inventory).toEqual([
+      { itemId: 'wolf_fang', count: 5, materialSources: [{ count: 5, source: {} }] },
+    ]);
     expect(bagCount()).toBe(0);
 
     // Wrong-type + missing slot on withdraw: rejected, the bank is untouched.
     send(server, s, { cmd: 'bank_withdraw', slot: 'zero' });
-    expect(meta.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
+    expect(meta.bank.inventory).toEqual([
+      { itemId: 'wolf_fang', count: 5, materialSources: [{ count: 5, source: {} }] },
+    ]);
     send(server, s, { cmd: 'bank_withdraw' });
-    expect(meta.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
+    expect(meta.bank.inventory).toEqual([
+      { itemId: 'wolf_fang', count: 5, materialSources: [{ count: 5, source: {} }] },
+    ]);
 
     // bank_buy_slots carries no client fields to validate, so its authority lives in
     // the Sim: far from every banker the proximity gate refuses, spending nothing.
@@ -470,7 +498,9 @@ describe('bank wire round-trip', () => {
     const onBank = readBank(sim, onPid);
 
     // Both paths land the same literal outcome...
-    expect(offBank.inventory).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
+    expect(offBank.inventory).toEqual([
+      { itemId: 'wolf_fang', count: 4, materialSources: [{ count: 4, source: {} }] },
+    ]);
     expect(offBank.purchasedSlots).toBe(6);
     expect(offBank.copper).toBe(500);
     // ...and they equal each other (offline Sim == authoritative server Sim).

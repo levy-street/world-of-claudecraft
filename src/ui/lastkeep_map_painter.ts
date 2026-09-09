@@ -25,6 +25,7 @@
 // (marker radii, arrow geometry, fonts, line widths) is a named constant.
 
 import type { IWorld } from '../world_api';
+import type { MapAnchor } from './dungeon_map_view';
 import { dungeonDisplayName } from './entity_i18n';
 import { type TranslationKey, t } from './i18n';
 import {
@@ -96,7 +97,12 @@ export interface CastleMapPainterSpec {
   titlePrefix: string;
   planSvg: (storyId: string) => string;
   buildMinimap: (world: IWorld, size: number, pxPerYard: number) => LastKeepMapModel | null;
-  buildWorldMap: (world: IWorld, size: number, pad: number) => LastKeepMapModel | null;
+  buildWorldMap: (
+    world: IWorld,
+    size: number,
+    pad: number,
+    anchor?: MapAnchor,
+  ) => LastKeepMapModel | null;
 }
 
 export const LASTKEEP_MAP_PAINTER_SPEC: CastleMapPainterSpec = {
@@ -278,9 +284,14 @@ export class LastKeepMapPainter {
    * and the story title drawn ON the canvas (the world map has no DOM zone
    * label). Returns the localized title so Hud can reuse it for '#map-summary'.
    */
-  paintWorldMap(ctx: CanvasRenderingContext2D, world: IWorld, size: number): string {
+  paintWorldMap(
+    ctx: CanvasRenderingContext2D,
+    world: IWorld,
+    size: number,
+    anchor?: MapAnchor,
+  ): string {
     const pad = Math.round(size * WORLD_MAP_PAD_RATIO);
-    const model = this.spec.buildWorldMap(world, size, pad);
+    const model = this.spec.buildWorldMap(world, size, pad, anchor);
     if (!model) return '';
     const colors = this.resolveColors();
     const plate = this.plateFor(model.storyId);

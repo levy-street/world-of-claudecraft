@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { buyPurchaseTotals } from '../src/sim/vendor_buy_stack';
 import { buildVendorView, sellJunkButtonState } from '../src/ui/hud/vendor/vendor_view';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // Minimal ItemDef fixtures: buildVendorView only reads id / buyValue / sellValue.
 function item(
@@ -285,6 +287,25 @@ describe('sellJunkButtonState', () => {
       proceeds: 0,
     });
     expect(sellJunkButtonState([], table(keeper))).toEqual({ enabled: false, proceeds: 0 });
+  });
+
+  it('an adopted 11l trophy never enables the sweep nor joins its quote (the REAL catalog)', () => {
+    // The Sell Junk button reads junkSellableSlot, the sweep's own predicate,
+    // so a promoted trophy (common now) is neither previewed nor swept; the
+    // holdout beside it proves the real-catalog arm is live. The adopted list
+    // is the shared derivation (tests/helpers/adopted_trophy_ids.ts).
+    const adopted = adoptedTrophyIds(ITEMS);
+    expect(adopted).toHaveLength(7);
+    for (const id of adopted) {
+      expect(sellJunkButtonState([{ itemId: id, count: 3 }], ITEMS), id).toEqual({
+        enabled: false,
+        proceeds: 0,
+      });
+    }
+    expect(sellJunkButtonState([{ itemId: 'soggy_moccasin', count: 3 }], ITEMS)).toEqual({
+      enabled: true,
+      proceeds: 27,
+    });
   });
 });
 

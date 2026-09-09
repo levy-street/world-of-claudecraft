@@ -1418,7 +1418,14 @@ describe('Ignivar encounter renderer', () => {
       renderer.match(/this\.mageGroundFx\.syncWorldMeteorWarnings\(this\.sim\);/g),
     ).toHaveLength(2);
     expect(renderer).toContain('if (handleMageGroundSpellfxEvent(this.mageGroundFx, ev)) break;');
-    expect(hud).toContain('resolveCastLabel: (s) => abilityDisplayNameFromSource(s.label)');
+    // The target cast bar's resolver is a semantic union since the eighth
+    // v0.41.0 sync (2026-08-30): the Masterwrought branch's farming-cast arm
+    // resolves first and every other id still routes through the release's
+    // abilityDisplayNameFromSource (which passes an unknown id through
+    // unchanged), so the pin follows the merged construct.
+    expect(hud).toContain(
+      'return farming === s.label ? abilityDisplayNameFromSource(s.label) : farming;',
+    );
   });
 
   it('locks the boss render facing for every facing-anchored telegraph cast', () => {
@@ -1488,7 +1495,15 @@ describe('Ignivar encounter renderer', () => {
         persistentId: 'm1',
       }),
     ).toBe(true);
-    expect(stub.impactMeteor).toHaveBeenCalledWith('m1', 7, 8);
+    // The event's own cue identity rides along so an impact whose warning
+    // this client never saw can still detonate in it (mage_ground_fx.ts
+    // impactMeteor uses this only when no stored warning is found).
+    expect(stub.impactMeteor).toHaveBeenCalledWith('m1', 7, 8, {
+      radius: undefined,
+      ability: undefined,
+      school: 'fire',
+      sourceId: undefined,
+    });
     // Without a persistent id the impact stays unclaimed so the renderer's
     // generic ground-impact burst still fires for it.
     expect(

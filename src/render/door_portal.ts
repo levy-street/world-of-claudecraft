@@ -974,9 +974,14 @@ export function buildRiftPuzzleProp(
  *  buildDoorBody renders only the invisible click-box. The Forgefather arm
  *  is data-driven: it flips once the owner bakes a dungeon_entrance facade
  *  into the fortress placements. */
+/** How close a placed castle_door must stand to the keep's doorPos to be
+ *  the keep door: one row of the facade's own footprint, so a second
+ *  castle_door placed at another site (a town gate) never claims the arch. */
+const KEEP_FACADE_REACH = 4;
+
 export function doorArchAuthoredElsewhere(
   dungeonId: string | null | undefined,
-  placements: readonly { key: string }[] = FORGEFATHER_FORTRESS_PLACEMENTS,
+  placements: readonly { key: string; x?: number; z?: number }[] = FORGEFATHER_FORTRESS_PLACEMENTS,
 ): boolean {
   if (dungeonId === 'nythraxis_crypt') return true;
   // The raid family's overworld door belongs to its chain HEAD (the
@@ -985,6 +990,20 @@ export function doorArchAuthoredElsewhere(
   // over the owner's facade).
   if (dungeonId === 'ignivar_forge_lift' || dungeonId === 'ignivar_forge_approach')
     return placements.some((p) => p.key === 'dungeon_entrance');
+  // The rebuilt Last Keep: the owner's placed castle_door facade on the
+  // temple court IS the keep door (the same data-driven flip: it engages
+  // the moment a castle_door is baked into the fortress table AT the keep
+  // door; one placed elsewhere is some other site's gate).
+  if (dungeonId === 'the_last_keep') {
+    const door = DUNGEONS.the_last_keep.doorPos;
+    return placements.some(
+      (p) =>
+        p.key === 'castle_door' &&
+        p.x !== undefined &&
+        p.z !== undefined &&
+        Math.hypot(p.x - door.x, p.z - door.z) <= KEEP_FACADE_REACH,
+    );
+  }
   return false;
 }
 

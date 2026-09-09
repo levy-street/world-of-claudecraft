@@ -3,7 +3,11 @@ import type { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { describe, expect, it } from 'vitest';
 import { PreparedBloomPass } from '../src/render/post_bloom';
-import { restoreClassicBloomComposite } from '../src/render/post_bloom_shader_core';
+import {
+  guardBloomHighPassInput,
+  restoreClassicBloomComposite,
+} from '../src/render/post_bloom_shader_core';
+import { FINITE_GUARD_GLSL } from '../src/render/post_finite_guard_glsl';
 
 const NUM_MIPS = 5;
 // The real composite shader from the installed three, not a hand-written stand
@@ -215,6 +219,65 @@ describe('PreparedBloomPass internals against the installed three', () => {
     expect(last?.target).toBe(pass.renderTargetsHorizontal[0]);
     // render() restores the renderer's autoClear after the pass.
     expect(stub.autoClear).toBe(true);
+    pass.dispose();
+  });
+});
+
+describe('guardBloomHighPassInput', () => {
+  // The installed three high-pass, not a hand-written stand in: the guard has
+  // to find the pinned beauty read in the shader the pass really compiles.
+  const INSTALLED_HIGH_PASS: string = new UnrealBloomPass(new Vector2(64, 64), 0.4, 0.6, 1.32)
+    .materialHighPassFilter.fragmentShader;
+
+  it('wraps the beauty read in the shared bit-exact guard, declared before main', () => {
+    const guarded = guardBloomHighPassInput(INSTALLED_HIGH_PASS, FINITE_GUARD_GLSL);
+    const guardAt = guarded.indexOf('bvec4 wocNonFinite(highp vec4 v)');
+    const mainAt = guarded.indexOf('void main()');
+    const readAt = guarded.indexOf(
+      'vec4 texel = wocSanitizeFinite4( texture2D( tDiffuse, vUv ) );',
+    );
+    expect(guardAt).toBeGreaterThan(-1);
+    expect(mainAt).toBeGreaterThan(guardAt);
+    expect(readAt).toBeGreaterThan(mainAt);
+    // The bare read is gone: every high-pass texel now descends from the guard.
+    expect(guarded).not.toMatch(/vec4\s+texel\s*=\s*texture2D\s*\(\s*tDiffuse/);
+    // The rest of the high-pass (threshold, smoothstep mix) is untouched.
+    expect(guarded).toContain(
+      'smoothstep( luminosityThreshold, luminosityThreshold + smoothWidth, v )',
+    );
+  });
+
+  it('guards NaN AND Inf, by exponent bits, with a select and never a mix', () => {
+    expect(FINITE_GUARD_GLSL).toContain(
+      'highp uvec4 exponentBits = floatBitsToUint(v) & uvec4(0x7f800000u)',
+    );
+    expect(FINITE_GUARD_GLSL).toContain('equal(exponentBits, uvec4(0x7f800000u))');
+    expect(FINITE_GUARD_GLSL).toContain('bad.x ? 0.0 : v.x');
+    expect(FINITE_GUARD_GLSL).not.toMatch(/mix\s*\(/);
+    expect(FINITE_GUARD_GLSL).not.toMatch(/isnan|isinf|<\s*0\.0\s*\|\|/);
+  });
+
+  it('fails closed when the shipped high-pass read is not there', () => {
+    const noRead = INSTALLED_HIGH_PASS.replace(
+      /texture2D\s*\(\s*tDiffuse\s*,\s*vUv\s*\)/,
+      'vec4(0.0)',
+    );
+    expect(() => guardBloomHighPassInput(noRead, FINITE_GUARD_GLSL)).toThrow(
+      'Pinned three LuminosityHighPassShader changed shape (beauty read)',
+    );
+    expect(() =>
+      guardBloomHighPassInput('vec4 texel = texture2D(tDiffuse, vUv);', FINITE_GUARD_GLSL),
+    ).toThrow('Pinned three LuminosityHighPassShader changed shape (main)');
+  });
+
+  it('is applied to the live PreparedBloomPass high-pass material', () => {
+    const pass = new PreparedBloomPass(new Vector2(64, 64), 0.4, 0.6, 1.32);
+    expect(pass.materialHighPassFilter.fragmentShader).toContain(
+      'vec4 texel = wocSanitizeFinite4( texture2D( tDiffuse, vUv ) );',
+    );
+    expect(pass.materialHighPassFilter.fragmentShader).toContain(
+      'bvec4 wocNonFinite(highp vec4 v)',
+    );
     pass.dispose();
   });
 });

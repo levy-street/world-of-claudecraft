@@ -76,3 +76,27 @@ export function restoreClassicBloomComposite(shader: string, nMips: number): str
   }
   return patched;
 }
+
+/** The shipped LuminosityHighPassShader beauty read, whitespace-tolerant. */
+const HIGH_PASS_TEXEL = /vec4\s+texel\s*=\s*texture2D\s*\(\s*tDiffuse\s*,\s*vUv\s*\)\s*;/;
+const HIGH_PASS_MAIN = /void\s+main\s*\(\s*\)\s*\{/;
+const HIGH_PASS_SHAPE_ERROR = 'Pinned three LuminosityHighPassShader changed shape';
+
+/**
+ * Scrubs NaN and Inf out of the bloom high-pass input, so one bad beauty texel
+ * costs one bloom texel instead of the whole frame: every Gaussian mip below
+ * reads this target, and a single NaN in it reaches every pixel of the composite.
+ * The guard is the shared bit-exact snippet (post_finite_guard_glsl.ts); fails
+ * closed if three's shipped shader no longer has the pinned read.
+ */
+export function guardBloomHighPassInput(shader: string, guardGlsl: string): string {
+  if (!HIGH_PASS_TEXEL.test(shader)) throw new Error(`${HIGH_PASS_SHAPE_ERROR} (beauty read)`);
+  if (!HIGH_PASS_MAIN.test(shader)) throw new Error(`${HIGH_PASS_SHAPE_ERROR} (main)`);
+  const guarded = shader
+    .replace(HIGH_PASS_MAIN, `${guardGlsl}\n\t\tvoid main() {`)
+    .replace(HIGH_PASS_TEXEL, 'vec4 texel = wocSanitizeFinite4( texture2D( tDiffuse, vUv ) );');
+  if (!guarded.includes('wocSanitizeFinite4( texture2D( tDiffuse, vUv ) )')) {
+    throw new Error(`${HIGH_PASS_SHAPE_ERROR} (guard not applied)`);
+  }
+  return guarded;
+}

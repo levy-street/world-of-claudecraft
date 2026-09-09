@@ -29,6 +29,7 @@ import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
+import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import { runWeaponProcs } from './equip_procs';
 import {
   BEACON_OF_LIGHT_NAME,
@@ -148,6 +149,9 @@ export function applyHeal(
   // double-count. Rides the event for parses (fidelity 7.1).
   const overheal = beforeClamp - healed;
   target.hp += healed;
+  if (abilityId !== 'enchant_weapon_lastflame_zeal') {
+    onCraftedCollectionHeal(ctx, source, target, overheal);
+  }
   ctx.emit({
     type: 'heal2',
     sourceId: source.id,
@@ -191,6 +195,7 @@ function applyBeaconTransfer(
   healed = consumeHealAbsorb(ctx, beacon, healed);
   const intended = healed;
   healed = Math.min(healed, beacon.maxHp - beacon.hp);
+  onCraftedCollectionHeal(ctx, source, beacon, intended - healed);
   if (healed <= 0) return;
   beacon.hp += healed;
   const overheal = intended - healed;

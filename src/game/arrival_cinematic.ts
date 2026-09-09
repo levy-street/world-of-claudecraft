@@ -1,5 +1,5 @@
-// The first-visit island arrival cinematic: when the ferry (the greeting's
-// accept button or the town bell) sets a character down on the Proving Shore
+// The first-visit island arrival cinematic: when the compulsory greeting ferry
+// or the town bell sets a character down on the Proving Shore
 // for the FIRST time, the chase camera starts high and far, the whole strait
 // and the town they just left small below, then falls and tightens onto the
 // player over a few seconds until it settles at the ordinary chase framing,

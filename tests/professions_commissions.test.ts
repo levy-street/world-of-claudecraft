@@ -614,6 +614,113 @@ describe('unbind service deny order and mutation', () => {
     expect(copperOf(sim, pid)).toBe(50000);
   });
 
+  it("a MIXED holding unbinds the ordinary Maker's Bond copy and skips the Perfecting-bound one, in either bag order", () => {
+    // The resolver's walk and the unbind window's rows must agree: a
+    // Perfecting-bound copy is never the pick, whatever its index, so the
+    // ordinary bound copy of the same id beside it unbinds for the fee exactly
+    // once, and the Perfecting bind is never cleared.
+    for (const perfectingFirst of [true, false]) {
+      const sim = makeSim();
+      const pid = sim.playerId;
+      const ordinary = { boundTo: pid, bindOnTrade: true };
+      const onTrack = { boundTo: pid, perfecting: 2 };
+      sim.ctx.addItemInstance(SWORD, perfectingFirst ? onTrack : ordinary, pid);
+      sim.ctx.addItemInstance(SWORD, perfectingFirst ? ordinary : onTrack, pid);
+      standAtStation(sim, pid);
+      setCopper(sim, pid, 50000);
+      const result = unbindItemMod(sim.ctx, SWORD, pid);
+      expect(result.ok, `perfectingFirst=${perfectingFirst}`).toBe(true);
+      expect(copperOf(sim, pid)).toBe(47500);
+      const slots = slotsOf(sim, pid, SWORD);
+      const stillOnTrack = slots.filter((s) => s.instance?.perfecting === 2);
+      expect(stillOnTrack, 'the Perfecting copy keeps its bind').toHaveLength(1);
+      expect(stillOnTrack[0].instance?.boundTo).toBe(pid);
+      expect(
+        slots.filter(
+          (s) => s.instance?.boundTo === undefined && s.instance?.perfecting === undefined,
+        ),
+        'the ordinary copy is the one cleared',
+      ).toHaveLength(1);
+      // A second command finds no serviceable bound copy: the refusal names the
+      // Perfecting bind that remains, and charges nothing.
+      const again = unbindItemMod(sim.ctx, SWORD, pid);
+      expect(again.ok).toBe(false);
+      expect(again.reason).toBe('unbind_perfecting');
+      expect(copperOf(sim, pid)).toBe(47500);
+    }
+  });
+
+  it('a Perfecting-bound copy denies unbind_perfecting BEFORE the range and fee arms, clears nothing', () => {
+    // Masterwrought phase 12 (R2): the Perfecting bind rides boundTo but is
+    // not a fee-reversible Maker's Bond. Standing in the WILDS with an empty
+    // purse proves the placement: neither out_of_range nor cannot_afford gets
+    // to answer, and the bind survives untouched on both track states.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(SWORD, { boundTo: pid, perfecting: 2 }, pid);
+    standInWilds(sim, pid);
+    setCopper(sim, pid, 0);
+    const midTrack = unbindItemMod(sim.ctx, SWORD, pid);
+    expect(midTrack.ok).toBe(false);
+    expect(midTrack.reason).toBe('unbind_perfecting');
+    expect(midTrack.fee).toBe(2500);
+    expect(slotsOf(sim, pid, SWORD)[0].instance).toEqual({ boundTo: pid, perfecting: 2 });
+
+    // The Perfected stamp (the track's top) refuses the same way, at a
+    // station with the fee in hand, so the refusal is not the range's or the
+    // purse's doing either.
+    const done = makeSim();
+    const dp = done.playerId;
+    done.ctx.addItemInstance(
+      SWORD,
+      { boundTo: dp, perfected: true, rolled: { stats: { str: 2 } } },
+      dp,
+    );
+    standAtStation(done, dp);
+    setCopper(done, dp, 50000);
+    const stamped = unbindItemMod(done.ctx, SWORD, dp);
+    expect(stamped.ok).toBe(false);
+    expect(stamped.reason).toBe('unbind_perfecting');
+    expect(copperOf(done, dp)).toBe(50000);
+    expect(slotsOf(done, dp, SWORD)[0].instance?.boundTo).toBe(dp);
+    expect(slotsOf(done, dp, SWORD)[0].instance?.perfected).toBe(true);
+
+    // The control: the same copy with the Perfecting fields stripped is an
+    // ordinary Maker's Bond and unbinds at the station for the fee.
+    const plain = makeSim();
+    const pp = plain.playerId;
+    plain.ctx.addItemInstance(SWORD, { boundTo: pp, bindOnTrade: true }, pp);
+    standAtStation(plain, pp);
+    setCopper(plain, pp, 50000);
+    expect(unbindItemMod(plain.ctx, SWORD, pp).ok).toBe(true);
+    expect(copperOf(plain, pp)).toBe(47500);
+  });
+
+  it('a FAILED first attempt leaves a bound rank-0 copy the unbind service still clears (the recorded shape)', () => {
+    // The R2 bind stamps boundTo BEFORE the roll and the fail arm writes no
+    // marker, so a failed-first-attempt copy carries boundTo with neither
+    // perfecting nor perfected: byte-identical to a fee-reversible Maker's
+    // Bond, and the service clears it. This pins the LIVE behavior the
+    // Phase 14 QA reworded the bind copy to match ("binds", not
+    // "permanently binds"); whether the sim should close the rank-0 hole is
+    // the ledger's maintainer read, and closing it must flip this arm.
+    // A real APEX copy (the only kind the R2 bind can land on), never a
+    // plain sword: a future closure keyed off the masterwrought def flag
+    // must flip THIS arm, which a common fixture could not witness.
+    const APEX = 'duskforged_warblade';
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(APEX, { boundTo: pid }, pid);
+    standAtStation(sim, pid);
+    setCopper(sim, pid, 50000);
+    const cleared = unbindItemMod(sim.ctx, APEX, pid);
+    expect(cleared.ok).toBe(true);
+    expect(copperOf(sim, pid)).toBeLessThan(50000);
+    expect(slotsOf(sim, pid, APEX).filter((s) => s.instance?.boundTo !== undefined)).toHaveLength(
+      0,
+    );
+  });
+
   it('away from every static station: unbind_out_of_range, no charge, no clear', () => {
     const sim = makeSim();
     const pid = sim.playerId;

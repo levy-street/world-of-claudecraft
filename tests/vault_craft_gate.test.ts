@@ -592,16 +592,27 @@ describe('vaultDrawStock and craftVaultStockFor', () => {
     expect(Object.hasOwn(stock, 'silverleaf_herb')).toBe(false);
   });
 
-  it('vaultDrawStock hands back the LIVE record, so sequential reagents see each spend', () => {
-    // The consume path plans one reagent, spends it, then plans the next: a
-    // second reagent naming the same material must see the first one's spend.
-    // This is the deliberate difference from craftVaultStockFor's clone.
+  it('vaultDrawStock is a fresh per-call PROJECTION, never the live record', () => {
+    // It stopped being the live reference when the vault gained per-unit
+    // provenance: drawable material now lives in TWO representations (the
+    // compact count map and the identity collection), and no record reference
+    // can express the second one. Cloning is safe because every consumer plans
+    // its whole draw before applying any of it and tallies both pools while
+    // planning (professions/reagent_sources.ts countMinusPlanned), so two
+    // reagents naming one material are never promised the same units; the live
+    // stores are re-read by consumeVaultStock, which is the one writer.
     const sim = makeSim();
     const pid = sim.playerId;
     placeInOpenWorld(sim, pid);
     const stock = stockOf(sim, pid);
     stock.copper_ore = 5;
 
-    expect(vaultDrawStock(sim.ctx, pid)).toBe(stock);
+    const projection = vaultDrawStock(sim.ctx, pid);
+    expect(projection).toEqual({ copper_ore: 5 });
+    expect(projection).not.toBe(stock);
+    // Writing to the copy moves nothing: a consumer that decremented it would
+    // otherwise believe it had spent something.
+    if (projection) projection.copper_ore = 999;
+    expect(stock.copper_ore).toBe(5);
   });
 });

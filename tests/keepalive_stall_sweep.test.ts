@@ -18,6 +18,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
+import { noteClientFrame, WS_SILENCE_DEADLINE_MS } from '../server/keepalive_sweep';
 
 function fakeWs() {
   const ws: any = {
@@ -72,5 +73,53 @@ describe('keepalive sweep under an event-loop stall', () => {
     expect(session.linkdead).toBe(true);
     expect(session.left).toBe(false);
     expect(server.clients.size).toBe(1);
+  });
+});
+
+// A socket that answers no frame at all (no pong, no input) for the whole
+// WS_SILENCE_DEADLINE_MS is terminated into the linkdead grace by the NEXT sweep
+// even when that sweep fired late. The pong check above deliberately pauses while
+// the loop is stalled; without a hard deadline a black-holed socket on a
+// chronically late server held its character 'already in world' with no bound,
+// and the client's bounded reconnect gave up long before the socket was reaped.
+describe('keepalive silence deadline in the sweep', () => {
+  it('terminates a socket silent past the deadline even on a delayed sweep', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Silent', 'warrior', null));
+    const t0 = Date.now();
+    noteClientFrame(ws, t0 - WS_SILENCE_DEADLINE_MS - 60_000);
+
+    // The previous sweep ran one deadline after the last processed frame, and the
+    // process has stalled since (this sweep is late): the stall guard alone would
+    // reap nobody, but silence proven up to the previous sweep is stall-proof.
+    backdateLastSweep(server, 60_000);
+    server.pingLiveSessions();
+    expect(ws.terminate).toHaveBeenCalledTimes(1);
+    expect(session.linkdead).toBe(true);
+    expect(session.left).toBe(false);
+    expect(server.clients.size).toBe(1);
+  });
+
+  it('keeps a quiet but answering client (an AFK player) in the world', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Afk', 'warrior', null));
+    // Frames keep landing (the browser answers pings on its own), just under the
+    // deadline each time.
+    noteClientFrame(ws, Date.now() - WS_SILENCE_DEADLINE_MS + 1_000);
+    backdateLastSweep(server, 30_000);
+    server.pingLiveSessions();
+    expect(ws.terminate).not.toHaveBeenCalled();
+    expect(session.linkdead).toBe(false);
+  });
+
+  it('does not judge a session whose socket has not produced a frame yet', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    expectJoined(server.join(ws, 11, 101, 'Fresh', 'warrior', null));
+    backdateLastSweep(server, WS_SILENCE_DEADLINE_MS * 3);
+    server.pingLiveSessions();
+    expect(ws.terminate).not.toHaveBeenCalled();
   });
 });

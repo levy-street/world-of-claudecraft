@@ -181,7 +181,7 @@ describe('ability VFX offscreen presentation sleep', () => {
 
     abilityVfx.syncEntity(entity, false);
     abilityVfx.update(1 / 60);
-    expect(sleepEntity).toHaveBeenCalledWith(entity.id);
+    expect(sleepEntity).toHaveBeenCalledWith(entity.id, false);
     expect(holdGroundAura).toHaveBeenCalledTimes(1);
     expect(orbit).toHaveBeenCalledTimes(1);
 

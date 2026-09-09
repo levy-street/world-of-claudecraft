@@ -46,6 +46,7 @@ git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 pathspec=(
   .
   ':(exclude)src/ui/i18n.locales'
+  ':(exclude)tests/fixtures/guide_wiki_audit_fills.ts'
   ':(exclude)src/ui/i18n.resolved.generated'
   ':(exclude)src/admin/i18n.resolved.generated'
   ':(exclude)docs/i18n/*.ru_RU.md'

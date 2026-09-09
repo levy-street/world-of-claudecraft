@@ -6,7 +6,7 @@
 // `sendInput`'s unconditional 50 ms timer at full rate regardless of whether
 // the previous frame drained, so intent frames pile up instead of being
 // shed. WebSocket rides one ordered TCP stream, so the server's keepalive
-// pong (`WS_KEEPALIVE_PING_MS`, server/game.ts) queues behind that same
+// pong (`WS_KEEPALIVE_PING_MS`, server/keepalive_sweep.ts) queues behind that same
 // backlog; once a session misses one whole keepalive interval the server
 // terminates it into linkdead, and the client's reconnect_policy.ts auto-retry
 // reads back as a "quick reconnecting" loop.

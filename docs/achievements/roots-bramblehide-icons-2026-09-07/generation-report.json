@@ -1,0 +1,498 @@
+{
+  "batchId": "roots-bramblehide-icons-2026-09-07",
+  "source": "OpenAI built-in image generation (gpt-image-2)",
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "context": "The seven Roots' Bramblehide set pieces and the four Nythraxis gap-fill shield and armor pieces with their eleven generated heroic raid variants, painted to clear the BRAMBLEHIDE and NYTHRAXIS_GAP art-pending ledgers; plus the col_set_bramblehide deed crest source.",
+  "items": [
+    {
+      "id": "bramblehide_crown",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A leather half-helm with a bramble circlet grown through its brow band and two small thorn horns. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/bramblehide_crown.png",
+        "bytes": 1623250,
+        "sha256": "ea4cafececd5ff454bd7397134a7147b4cf63ee8c90b396e394ac429c5234545",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/bramblehide_crown.png",
+        "bytes": 453418,
+        "sha256": "52d63389bff580a276afc250f10e37a59859e10e5e8c27dbf354c2c2cbc0358c",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_bramblehide_crown",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A leather half-helm with a bramble circlet grown through its brow band and two small thorn horns. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal. Heroic variant of the same piece: identical silhouette and construction, the leather carrying a faint luminous moss-green sheen and the thorns tipped with brighter pale-green highlights.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_bramblehide_crown.png",
+        "bytes": 1639115,
+        "sha256": "a14d39344bd808d96e1e3079dd75c2edcaba1420cf981aad22bb06c5dfa18953",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_bramblehide_crown.png",
+        "bytes": 455372,
+        "sha256": "986c41a090e439a3873dad5d5820a689c784325adde17192a71990891e69f226",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "bramblehide_mantle",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of leather pauldrons bound together by knotted roots, thorn studs along each cap edge. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/bramblehide_mantle.png",
+        "bytes": 1686444,
+        "sha256": "0dec6031965f2cc6075e010eac905b25d2fde221fb5563904d22b63aaa9eda62",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/bramblehide_mantle.png",
+        "bytes": 432090,
+        "sha256": "e34ae4fc225b5cc5c6e75c7c6c88e6aca232d0c82acbb6d9530eec87ddf6d1d3",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_bramblehide_mantle",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of leather pauldrons bound together by knotted roots, thorn studs along each cap edge. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal. Heroic variant of the same piece: identical silhouette and construction, the leather carrying a faint luminous moss-green sheen and the thorns tipped with brighter pale-green highlights.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_bramblehide_mantle.png",
+        "bytes": 1560362,
+        "sha256": "93761843696d4981741fe5f99a7769489c5b636de0ce8ec97e773233321ac676",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_bramblehide_mantle.png",
+        "bytes": 431056,
+        "sha256": "6cd28230f2f87d082cc339f3ca7c5c785a58b81dc655adf36f3b63f09ebf115b",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "bramblehide_harness",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A sleeveless leather chest harness laced with living bramble, a carved root-knot clasp at the sternum. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/bramblehide_harness.png",
+        "bytes": 1757373,
+        "sha256": "4bf6473dc69ab8ec698c3edfa9f748b7290587cad78ba383690c1d1857a203ad",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/bramblehide_harness.png",
+        "bytes": 465139,
+        "sha256": "1bef86c761e034ceb7d13145b1f2efbfc24957cb5dfce33ed2abc61e3976769a",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_bramblehide_harness",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A sleeveless leather chest harness laced with living bramble, a carved root-knot clasp at the sternum. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal. Heroic variant of the same piece: identical silhouette and construction, the leather carrying a faint luminous moss-green sheen and the thorns tipped with brighter pale-green highlights.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_bramblehide_harness.png",
+        "bytes": 1741251,
+        "sha256": "0e4fdaf32697ea848c96aa7f97c33b25d67ea970fe27cfbd19cfe6581e8b7de0",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_bramblehide_harness.png",
+        "bytes": 482590,
+        "sha256": "783afa9b965cc7f03de3c4349c4abebb987b8b188b107415df675bb1ef8c55ad",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "bramblehide_cinch",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A wide leather belt woven through with thorn vine and closed by a carved wooden root-knot buckle. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/bramblehide_cinch.png",
+        "bytes": 1576894,
+        "sha256": "922929240ff8540075baf467aa795021872669857922e91f265d28419211a56e",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/bramblehide_cinch.png",
+        "bytes": 415392,
+        "sha256": "a940c312567fda6da0dd58f43897deb3022650190f340dd95cbd0316b699d413",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_bramblehide_cinch",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A wide leather belt woven through with thorn vine and closed by a carved wooden root-knot buckle. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal. Heroic variant of the same piece: identical silhouette and construction, the leather carrying a faint luminous moss-green sheen and the thorns tipped with brighter pale-green highlights.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_bramblehide_cinch.png",
+        "bytes": 1583079,
+        "sha256": "3f377b679addf66ff874bc05f73b7529064d31349704d8f8d03964263ea10735",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_bramblehide_cinch.png",
+        "bytes": 466269,
+        "sha256": "a0ee65058f5fc54337dc0ea8742a2c1620a6f2bafb9967f287b30b84d7f03794",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "bramblehide_legguards",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: Leather leg wraps with bramble-vine stitching down the outer seam and thorn studs at the knee. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/bramblehide_legguards.png",
+        "bytes": 1439931,
+        "sha256": "6a7a9fd978bdcc110162c08d95433cfbd5636fff0c5e69cd257bb16d3bc5bb54",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/bramblehide_legguards.png",
+        "bytes": 413737,
+        "sha256": "64ed35ce0f8cb8b29349e9f43597f177b3bff08d86fff3bb1ff6eb576d2eef28",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_bramblehide_legguards",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: Leather leg wraps with bramble-vine stitching down the outer seam and thorn studs at the knee. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal. Heroic variant of the same piece: identical silhouette and construction, the leather carrying a faint luminous moss-green sheen and the thorns tipped with brighter pale-green highlights.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_bramblehide_legguards.png",
+        "bytes": 1676785,
+        "sha256": "bcbc03a53a956733a70535784c592f7f50ad954d0e068310bacc4d37bbd4e48e",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_bramblehide_legguards.png",
+        "bytes": 469755,
+        "sha256": "ff58a51800b3f76d9b408428c4161cba010636c3b81c8821bf8f28336967c991",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "bramblehide_grips",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of fingerless leather grips with bramble wrapped over the knuckles into claw-like thorns. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/bramblehide_grips.png",
+        "bytes": 1591490,
+        "sha256": "a46eea3d2d397b21998bc361e2e7c8e6d776a5a18ca0da7fa732c237b09342b9",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/bramblehide_grips.png",
+        "bytes": 415908,
+        "sha256": "b5fbe2f9d8ac6fe68368568695ee604462b1c44ce674528a014bb90d0bd0d039",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_bramblehide_grips",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of fingerless leather grips with bramble wrapped over the knuckles into claw-like thorns. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal. Heroic variant of the same piece: identical silhouette and construction, the leather carrying a faint luminous moss-green sheen and the thorns tipped with brighter pale-green highlights.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_bramblehide_grips.png",
+        "bytes": 1825577,
+        "sha256": "d73c4437c954f7b9b381ebbd4756440ebed04fb62ded672fbe148fb41d52ad12",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_bramblehide_grips.png",
+        "bytes": 496474,
+        "sha256": "fc77065928b3a8e6742ca909d2cde5532c78b3ac0a53abd65b97d1f810f03aa8",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "bramblehide_treads",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of soft leather boots with roots grown around the ankles and thorn-tipped toe caps. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/bramblehide_treads.png",
+        "bytes": 1909602,
+        "sha256": "dbb6274c2215b8bed2354bc7cf56c0b211a2e0635a1dd9ed0789067846a33207",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/bramblehide_treads.png",
+        "bytes": 492449,
+        "sha256": "aa11f044cae300c6d57cc23892c60581a13ce14177112ccbcc5b72dc73576790",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_bramblehide_treads",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of soft leather boots with roots grown around the ankles and thorn-tipped toe caps. Family language: dark oiled druid leather with bramble-vine stitching, small thorn studs, and a single carved root-knot clasp, moss green and bark brown on charcoal. Heroic variant of the same piece: identical silhouette and construction, the leather carrying a faint luminous moss-green sheen and the thorns tipped with brighter pale-green highlights.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_bramblehide_treads.png",
+        "bytes": 1618562,
+        "sha256": "cc80e8252050eaf9867f21320d68955718d7671ce32a05c1ba5ce717167d8a71",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_bramblehide_treads.png",
+        "bytes": 456782,
+        "sha256": "1d54b807c57ef940d682d0dcdd6014b9de5f6085be35c9d38c314a5f1809e88c",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "votive_ward_of_the_deathless_court",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A round shield banded in dark chainmail and faced with a pale bone votive plate, a violet candle-glow sigil at its central boss. Family language: the Deathless Court's bone-and-violet palette, pale bone fittings and a faint violet candle-glow, on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/votive_ward_of_the_deathless_court.png",
+        "bytes": 1764145,
+        "sha256": "2f9acd1e15bff463b3a1b1f5ba75641fe8acce8da2c82284fc2b51023523860c",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/votive_ward_of_the_deathless_court.png",
+        "bytes": 513584,
+        "sha256": "5be280fcbca9a0e907fdbb085092b4828ca3d4ba1d33e0eee8e77ff006ca837e",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_votive_ward_of_the_deathless_court",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A round shield banded in dark chainmail and faced with a pale bone votive plate, a violet candle-glow sigil at its central boss. Family language: the Deathless Court's bone-and-violet palette, pale bone fittings and a faint violet candle-glow, on charcoal. Heroic variant of the same piece: identical silhouette and construction, the bone fittings whiter and the violet candle-glow brighter and more saturated.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_votive_ward_of_the_deathless_court.png",
+        "bytes": 1857375,
+        "sha256": "dea9f5033d4552d3d4e596e9e18ac0085fde76103204ce6581d9fb14ec24c974",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_votive_ward_of_the_deathless_court.png",
+        "bytes": 561813,
+        "sha256": "3659cba5b35cc4cba02fb70255745ec250fa5d7143b4d3fca460268c931ecac8",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "thornpeak_moonhide_cowl",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A soft leather cowl with a crescent bone brow plate and thorn-vine stitching running down the hood. Family language: the Deathless Court's bone-and-violet palette, pale bone fittings and a faint violet candle-glow, on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/thornpeak_moonhide_cowl.png",
+        "bytes": 1283888,
+        "sha256": "b7658f80e54791d91dbf4f19dad9cb65221cb6d923807d0a761398fd94659eeb",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/thornpeak_moonhide_cowl.png",
+        "bytes": 372745,
+        "sha256": "6e4b8eb7d0f239107681ec293d1e26a366866b11a18b0c224bfb07b9ad79f47f",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_thornpeak_moonhide_cowl",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A soft leather cowl with a crescent bone brow plate and thorn-vine stitching running down the hood. Family language: the Deathless Court's bone-and-violet palette, pale bone fittings and a faint violet candle-glow, on charcoal. Heroic variant of the same piece: identical silhouette and construction, the bone fittings whiter and the violet candle-glow brighter and more saturated.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_thornpeak_moonhide_cowl.png",
+        "bytes": 1454030,
+        "sha256": "9c547aba69e2e10758443afb67ab70eb24b8cdb463dd2113987dc85ba15a0a5d",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_thornpeak_moonhide_cowl.png",
+        "bytes": 448935,
+        "sha256": "8b8ceaa885e9627b60919160f0dfff758fbc9d135a5bf660b619f4c971068ab9",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "stormhymn_chain_grips",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of fine chainmail gloves with storm-blue votive beads knotted across the knuckles. Family language: the Deathless Court's bone-and-violet palette, pale bone fittings and a faint violet candle-glow, on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/stormhymn_chain_grips.png",
+        "bytes": 1728185,
+        "sha256": "a6160db3b19ab3a4113fff99657ee037e0d2a0253f4bdb746d402d0f3a90ba73",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/stormhymn_chain_grips.png",
+        "bytes": 513970,
+        "sha256": "c02701e7ef6d37a413400eddce2627f9b3748328ee598fe8fdc1524d2fddd332",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_stormhymn_chain_grips",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of fine chainmail gloves with storm-blue votive beads knotted across the knuckles. Family language: the Deathless Court's bone-and-violet palette, pale bone fittings and a faint violet candle-glow, on charcoal. Heroic variant of the same piece: identical silhouette and construction, the bone fittings whiter and the violet candle-glow brighter and more saturated.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_stormhymn_chain_grips.png",
+        "bytes": 1920503,
+        "sha256": "2c622369353c30fdde26d4a1f14f31bef74f882e59ac99aea92a3b4253fc9de0",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_stormhymn_chain_grips.png",
+        "bytes": 552746,
+        "sha256": "2116e2f2506cd14b8550dc65c60ca0c9fe6d7a66512400675e1b940ec98db6ce",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "stormhymn_chain_treads",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of chain-wrapped boots with a pale bone shin guard and storm-blue votive beading at the ankle. Family language: the Deathless Court's bone-and-violet palette, pale bone fittings and a faint violet candle-glow, on charcoal.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/stormhymn_chain_treads.png",
+        "bytes": 1378198,
+        "sha256": "cdc5b12824484e1116730ffd36f1b57f4e5285df33c38790c244460823086e4c",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/stormhymn_chain_treads.png",
+        "bytes": 399438,
+        "sha256": "a48be8e2878ae6d0751e37a34c8b0d8c8baeeb40400af8bbc082020fdd8114cd",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "heroic_stormhymn_chain_treads",
+      "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A pair of chain-wrapped boots with a pale bone shin guard and storm-blue votive beading at the ankle. Family language: the Deathless Court's bone-and-violet palette, pale bone fittings and a faint violet candle-glow, on charcoal. Heroic variant of the same piece: identical silhouette and construction, the bone fittings whiter and the violet candle-glow brighter and more saturated.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/heroic_stormhymn_chain_treads.png",
+        "bytes": 1409527,
+        "sha256": "34fca4be11993b3db44e031f21b3efd5f8aeab138ee4a48a7aaff710f7434d29",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/accepted/heroic_stormhymn_chain_treads.png",
+        "bytes": 441578,
+        "sha256": "c52bf499ec68ad5157d7c2f061ab5bbffc6c8cc9659da1ffb60fbfbb1ea499b1",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    }
+  ],
+  "deeds": [
+    {
+      "id": "col_set_bramblehide",
+      "prompt": "Premium hand-painted classic-fantasy MMORPG achievement crest: a single round medallion emblem, centered, filling most of the square, on a flat pure white background with nothing else. A dark bronze ring frames a leather druid pauldron wrapped in living bramble, thorns curling into a carved root knot at the collar, moss green and bark brown on charcoal inside the ring. No text, no writing, no watermark, no frame outside the medallion, no drop shadow onto the white.",
+      "master": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/masters/col_set_bramblehide.png",
+        "bytes": 2028523,
+        "sha256": "531d9f98c7aec9208d5c9c3644e2f963154fdda76dd499098c2b1339d3eb546f",
+        "width": 1024,
+        "height": 1024,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/roots-bramblehide-icons/deeds/col_set_bramblehide.png",
+        "bytes": 414206,
+        "sha256": "812ef91f201d22ef3290d85c62c0fdece52caab5e6867257566886429b44d9ca",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "transparent-outside-medallion"
+      }
+    }
+  ]
+}

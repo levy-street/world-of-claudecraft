@@ -140,23 +140,79 @@ describe('Hud action-bar facade', () => {
   // to cancel here any more. What still matters at this seam is the OTHER half
   // that test covered: a form swap must drop the desktop drag AND re-clamp the
   // ring page, or the newly loaded bar is exposed through a stale page.
-  it('drops the desktop drag and re-clamps the ring page on a form swap', () => {
-    const hud = Object.create(Hud.prototype) as unknown as {
-      actionBarController: { syncActiveForm(): boolean };
-      dragAction: unknown;
-      mobileActionPage: number;
-      currentMobileActionPage(): number;
-      syncActiveHotbarForm(): void;
+  interface FormSyncHud {
+    actionBarController: { syncActiveForm(): boolean; syncProfile(): boolean };
+    spellbookWindow: { refreshHotbarControls(): void };
+    dragAction: unknown;
+    mobileActionPage: number;
+    currentMobileActionPage(): number;
+    syncActiveHotbarForm(): void;
+  }
+
+  function formSyncHud(
+    profileSwitched: boolean,
+    formSwapped: boolean,
+  ): FormSyncHud & {
+    refreshes: number;
+    formSyncs: number;
+  } {
+    const hud = Object.create(Hud.prototype) as unknown as FormSyncHud & {
+      refreshes: number;
+      formSyncs: number;
     };
-    hud.actionBarController = { syncActiveForm: () => true };
+    hud.refreshes = 0;
+    hud.formSyncs = 0;
+    hud.actionBarController = {
+      syncActiveForm: () => {
+        hud.formSyncs += 1;
+        return formSwapped;
+      },
+      syncProfile: () => profileSwitched,
+    };
+    hud.spellbookWindow = {
+      refreshHotbarControls: () => {
+        hud.refreshes += 1;
+      },
+    };
     hud.dragAction = { action: { type: 'ability', id: 'strike' }, sourceIndex: 0 };
     hud.mobileActionPage = 4;
     hud.currentMobileActionPage = () => 1;
+    return hud;
+  }
+
+  it('drops the desktop drag and re-clamps the ring page on a form swap', () => {
+    const hud = formSyncHud(false, true);
 
     hud.syncActiveHotbarForm();
 
     expect(hud.dragAction).toBeNull();
     expect(hud.mobileActionPage).toBe(1);
+    expect(hud.refreshes).toBe(0);
+  });
+
+  // A mid-session Interface Mode flip re-seeds the bars from the other
+  // surface's keys: the same drag drop and page re-clamp as a form swap, plus
+  // the spellbook's hotbar controls re-read the newly loaded bar.
+  it('drops the drag, re-clamps the page, and refreshes the spellbook on a surface flip', () => {
+    const hud = formSyncHud(true, false);
+
+    hud.syncActiveHotbarForm();
+
+    expect(hud.dragAction).toBeNull();
+    expect(hud.mobileActionPage).toBe(1);
+    expect(hud.refreshes).toBe(1);
+    // The reload already loaded the resolved form; no second form sync runs.
+    expect(hud.formSyncs).toBe(0);
+  });
+
+  it('leaves the drag and page alone when neither the surface nor the form changed', () => {
+    const hud = formSyncHud(false, false);
+
+    hud.syncActiveHotbarForm();
+
+    expect(hud.dragAction).not.toBeNull();
+    expect(hud.mobileActionPage).toBe(4);
+    expect(hud.refreshes).toBe(0);
   });
 
   it('leaves no touch long-press rearrange path on the action bar', () => {

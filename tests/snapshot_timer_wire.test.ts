@@ -106,6 +106,26 @@ describe('StableAuraWireCache', () => {
     expect(JSON.parse(ordinaryWire.json)[0]).not.toHaveProperty('und');
   });
 
+  it('serializes the FLASK marker and rebuilds when the source changes', () => {
+    // A flask, an elixir and a scroll of one stat share an aura id, so the
+    // marker is the only thing on the wire that says which source a buff came
+    // from. Presence-only, and sparse: an ordinary aura carries no `fl` at all.
+    const cache = new StableAuraWireCache();
+    const active = aura('elixir_buff_sta', 900);
+    active.flask = true;
+
+    const flaskWire = cache.encode([active], 0, false);
+    expect(JSON.parse(flaskWire.json)[0]).toMatchObject({ fl: 1 });
+
+    active.flask = undefined;
+    const ordinaryWire = cache.encode([active], 0, false);
+    // The cache must NOTICE the change: same id, same kind, same duration, so
+    // a diff blind to the marker would elide the rebuild and keep serving the
+    // flask glyph for an elixir.
+    expect(ordinaryWire.revision).toBe(flaskWire.revision + 1);
+    expect(JSON.parse(ordinaryWire.json)[0]).not.toHaveProperty('fl');
+  });
+
   it('rebuilds for every wire-visible mutation and explicit empty removal', () => {
     const cache = new StableAuraWireCache();
     const first = aura('first', 10);

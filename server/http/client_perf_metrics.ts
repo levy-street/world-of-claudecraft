@@ -19,11 +19,12 @@
 //   not a player) while still reaching storage for the admin reader.
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as game_metrics.ts: every
-// label value comes from one of the fixed vocabularies below. The two ingest
+// label value comes from one of the fixed vocabularies below. The ingest
 // fields that are NOT bounded upstream (zone_or_scenario is free text,
 // gl_renderer_bucket has an open-ended slug fallback for unrecognized
-// hardware) NEVER reach a label raw: classifyClientPerfScene and
-// classifyClientPerfGpuFamily collapse them into fixed classes with an
+// hardware, shader_warm_refusal is a bounded but open token) NEVER reach a
+// label raw: classifyClientPerfScene, classifyClientPerfGpuFamily and
+// shaderWarmRefusalLabel collapse them into fixed classes with an
 // explicit fallback, so a hand-rolled beacon cannot mint series. Nothing
 // per-player, per-session, or per-device (account id, character id, session
 // id, ip, exact renderer string) is ever a label.
@@ -42,6 +43,10 @@
 // the jank threshold both sit at that clamp).
 
 import { Counter, Histogram, type Registry } from 'prom-client';
+// Imported, not copied: gl_backend.ts imports nothing, so unlike the
+// suggestion-id catalog (which would cycle perf_report <-> this module) the
+// real vocabulary can be the one source here.
+import { GL_BACKEND_LABELS, type GlBackend } from '../gl_backend';
 
 /** The five graphics tiers the ingest allowlist admits (perf_report.ts gfxTier). */
 export const CLIENT_PERF_GFX_TIERS = ['low', 'medium', 'high', 'ultra', 'insane'] as const;
@@ -125,6 +130,35 @@ export const CLIENT_PERF_SUGGESTION_IDS = [
 export type ClientPerfSuggestionId = (typeof CLIENT_PERF_SUGGESTION_IDS)[number];
 
 /**
+ * The shader warm-up refusal tokens worth telling apart as a LABEL: the causes
+ * the client mints today (src/render/shader_warm_client.ts retireForCause plus
+ * the worker's own ready refusals), each one a different operator action. The
+ * stored shader_warm_refusal column is a free-ish token, so it never reaches a
+ * label raw: shaderWarmRefusalLabel folds anything not listed here to 'other'
+ * and an empty refusal to 'none'. 'extension-drift' stands for the whole
+ * `extension-drift:<extension>` family (the extension name is unbounded, and
+ * the drill-down for WHICH extension is the stored column).
+ */
+export const CLIENT_PERF_SHADER_WARM_REFUSALS = [
+  'none',
+  'cannot-serve:hold-cap',
+  'context-lost',
+  'extension-drift',
+  'extension-mismatch',
+  'hold-timeouts:expired-share',
+  'hold-timeouts:wedged',
+  'ios-webkit',
+  'no-offscreen-canvas',
+  'no-webgl2',
+  'no-worker',
+  'pagehide',
+  'ready-timeout',
+  'worker-error',
+  'other',
+] as const;
+export type ClientPerfShaderWarmRefusal = (typeof CLIENT_PERF_SHADER_WARM_REFUSALS)[number];
+
+/**
  * A report whose worst 10s window p95 reached this many ms counts as janky.
  * This is the client reporter's own clamp value, so "reached" and "hit the
  * clamp" are the same test and the jank share is exactly the share of reports
@@ -142,6 +176,11 @@ export const WOC_CLIENT_LONG_TASK_P95_SECONDS = 'woc_client_long_task_p95_second
 export const WOC_CLIENT_EFFECTIVE_RENDER_SCALE = 'woc_client_effective_render_scale';
 export const WOC_CLIENT_CONTEXT_LOSSES_TOTAL = 'woc_client_context_losses_total';
 export const WOC_CLIENT_SUGGESTIONS_TOTAL = 'woc_client_suggestions_total';
+// The shader-warm cut of the SAME stored reports woc_client_reports_total
+// counts, under its own name because its labels are a different question
+// (is the warm-up worker alive on this client, and why not) rather than a
+// different population.
+export const WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL = 'woc_client_shader_warm_reports_total';
 
 // Bucket edges are part of the exporter's public contract (a bucket edit
 // silently rewrites every dashboard quantile), so they are exported and pinned
@@ -178,6 +217,7 @@ export interface ClientPerfSample {
   mobileTouch: boolean;
   osFamily: string;
   glRendererBucket: string;
+  glBackend: string;
   zoneOrScenario: string;
   fpsAvg: number;
   frameP95Ms: number;
@@ -186,6 +226,8 @@ export interface ClientPerfSample {
   effectiveRenderScale: number;
   contextLostCount: number;
   suggestionIds: string[];
+  shaderWarmWorkerActive: boolean;
+  shaderWarmRefusal: string;
 }
 
 /**
@@ -255,6 +297,21 @@ export function classifyClientPerfScene(zoneOrScenario: string): ClientPerfScene
   return 'overworld';
 }
 
+/**
+ * Collapse a stored shader_warm_refusal onto the bounded label vocabulary: the
+ * empty refusal is 'none', an `extension-drift:<extension>` token keeps only
+ * its family, and anything unlisted (an older or newer client's cause, a
+ * hand-rolled beacon's invention) folds to 'other'. The label set is therefore
+ * fixed at CLIENT_PERF_SHADER_WARM_REFUSALS whatever the wire carries.
+ */
+export function shaderWarmRefusalLabel(refusal: string): ClientPerfShaderWarmRefusal {
+  if (refusal === '') return 'none';
+  const family = refusal.startsWith('extension-drift:') ? 'extension-drift' : refusal;
+  return (CLIENT_PERF_SHADER_WARM_REFUSALS as readonly string[]).includes(family)
+    ? (family as ClientPerfShaderWarmRefusal)
+    : 'other';
+}
+
 function tierIn(value: string): ClientPerfGfxTier {
   // The ingest allowlist already guarantees membership with a 'low' fallback;
   // this mirrors that fallback so a direct caller cannot widen the label.
@@ -267,6 +324,15 @@ function osIn(value: string): ClientPerfOsFamily {
   return (CLIENT_PERF_OS_FAMILIES as readonly string[]).includes(value)
     ? (value as ClientPerfOsFamily)
     : 'other';
+}
+
+// The ingest derives gl_backend from the adapter name through the same closed
+// vocabulary, so membership already holds; this mirrors the tier and os
+// fallback so a direct caller cannot widen the label either.
+function backendIn(value: string): GlBackend {
+  return (GL_BACKEND_LABELS as readonly string[]).includes(value)
+    ? (value as GlBackend)
+    : 'unknown';
 }
 
 // Every observed value routes through this ONE sanitizer, and the jank compare
@@ -297,10 +363,15 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     labelNames: ['gfx_tier', 'device'] as const,
     registers: [registry],
   });
+  // The backend label lives HERE rather than on woc_client_reports_total,
+  // which answers the "is this graphics API slower on comparable hardware"
+  // question directly, and whose _count doubles as the per-backend report
+  // population. Putting it on the reports counter as well would multiply that
+  // cross product for a denominator this histogram already exposes.
   const frameP95 = new Histogram({
     name: WOC_CLIENT_FRAME_P95_SECONDS,
-    help: 'Reported frame-time p95 per report window, by graphics tier and device class.',
-    labelNames: ['gfx_tier', 'device'] as const,
+    help: 'Reported frame-time p95 per report window, by graphics tier, device class, and graphics backend.',
+    labelNames: ['gfx_tier', 'device', 'backend'] as const,
     buckets: [...CLIENT_PERF_FRAME_P95_BUCKETS_SECONDS],
     registers: [registry],
   });
@@ -332,10 +403,19 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     buckets: [...CLIENT_PERF_RENDER_SCALE_BUCKETS],
     registers: [registry],
   });
+  // A context loss is a driver-path event, so the API is the label that makes
+  // the counter actionable: "which backend drops contexts" is not answerable
+  // from the OS alone (Windows serves d3d11, opengl and vulkan clients).
   const contextLosses = new Counter({
     name: WOC_CLIENT_CONTEXT_LOSSES_TOTAL,
-    help: 'WebGL context losses summed from stored gameplay perf reports, by OS family.',
-    labelNames: ['os'] as const,
+    help: 'WebGL context losses summed from stored gameplay perf reports, by OS family and graphics backend.',
+    labelNames: ['os', 'backend'] as const,
+    registers: [registry],
+  });
+  const shaderWarmReports = new Counter({
+    name: WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
+    help: 'Stored gameplay perf reports by shader warm-up worker state: whether the worker was active on the reporting client, and the bounded refusal cause when it was not.',
+    labelNames: ['shader_warm_active', 'shader_warm_refusal'] as const,
     registers: [registry],
   });
   const suggestions = new Counter({
@@ -350,14 +430,24 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   // every counter cross product registers at zero and every histogram series
   // is pre-seeded, so the first post-deploy increment is visible to
   // increase()/rate() and the jank SHARE reads 0% for a healthy cohort rather
-  // than "no data". The full family is a fixed ~600-sample scrape ceiling,
-  // measured immaterial per scrape.
+  // than "no data". The full family is a fixed scrape ceiling, measured
+  // immaterial per scrape.
+  //
+  // CARDINALITY, since pre-seeding means every cross product exists whether or
+  // not a client ever reports it: the backend label multiplies exactly two
+  // series families and nothing else. frame_p95 is 5 tiers x 2 devices x 7
+  // backends = 70 series, and context_losses is 6 os x 7 backends = 42. Both
+  // vocabularies are closed and neither grows with fleet size, players, or
+  // hardware; adding a backend value is a source edit in gl_backend.ts, not a
+  // thing a beacon can mint.
   for (const gfxTier of CLIENT_PERF_GFX_TIERS) {
     for (const device of CLIENT_PERF_DEVICE_CLASSES) {
       const tierDevice = { gfx_tier: gfxTier, device };
       jankReports.inc(tierDevice, 0);
-      frameP95.zero(tierDevice);
       fpsAvg.zero(tierDevice);
+      for (const backend of GL_BACKEND_LABELS) {
+        frameP95.zero({ ...tierDevice, backend });
+      }
       for (const gpuFamily of CLIENT_PERF_GPU_FAMILIES) {
         reports.inc({ ...tierDevice, gpu_family: gpuFamily }, 0);
       }
@@ -368,7 +458,14 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   for (const scene of CLIENT_PERF_SCENE_CLASSES) {
     for (const device of CLIENT_PERF_DEVICE_CLASSES) worst10s.zero({ scene, device });
   }
-  for (const os of CLIENT_PERF_OS_FAMILIES) contextLosses.inc({ os }, 0);
+  for (const os of CLIENT_PERF_OS_FAMILIES) {
+    for (const backend of GL_BACKEND_LABELS) contextLosses.inc({ os, backend }, 0);
+  }
+  for (const refusal of CLIENT_PERF_SHADER_WARM_REFUSALS) {
+    for (const active of ['true', 'false']) {
+      shaderWarmReports.inc({ shader_warm_active: active, shader_warm_refusal: refusal }, 0);
+    }
+  }
   for (const suggestion of CLIENT_PERF_SUGGESTION_IDS) suggestions.inc({ suggestion }, 0);
 
   return {
@@ -382,12 +479,20 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         const gfxTier = tierIn(sample.gfxTier);
         const device: ClientPerfDeviceClass = sample.mobileTouch ? 'mobile' : 'desktop';
         const tierDevice = { gfx_tier: gfxTier, device };
+        const backend = backendIn(sample.glBackend);
 
         reports.inc({
           ...tierDevice,
           gpu_family: classifyClientPerfGpuFamily(sample.glRendererBucket),
         });
-        frameP95.observe(tierDevice, observedOrZero(sample.frameP95Ms) / MS_PER_SECOND);
+        shaderWarmReports.inc({
+          shader_warm_active: sample.shaderWarmWorkerActive ? 'true' : 'false',
+          shader_warm_refusal: shaderWarmRefusalLabel(sample.shaderWarmRefusal),
+        });
+        frameP95.observe(
+          { ...tierDevice, backend },
+          observedOrZero(sample.frameP95Ms) / MS_PER_SECOND,
+        );
         fpsAvg.observe(tierDevice, observedOrZero(sample.fpsAvg));
         const worst10sMs = observedOrZero(sample.worst10sFrameP95Ms);
         worst10s.observe(
@@ -401,7 +506,7 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         );
         renderScale.observe({ gfx_tier: gfxTier }, observedOrZero(sample.effectiveRenderScale));
         const lost = Math.floor(observedOrZero(sample.contextLostCount));
-        if (lost > 0) contextLosses.inc({ os: osIn(sample.osFamily) }, lost);
+        if (lost > 0) contextLosses.inc({ os: osIn(sample.osFamily), backend }, lost);
         for (const id of sample.suggestionIds) {
           // The ingest allowlist already filtered these; membership is re-checked
           // so a direct caller cannot mint a label value.

@@ -54,11 +54,15 @@ export function mergeShellGpuVerdict(input: {
   localSoftwareRendering: boolean;
   localHybridGpuLikely: boolean;
   shell: DesktopGpuStatus | null;
+  /** The Linux shell rescued the launch off the backend the player picked; the
+   *  page learns it from the backend state, not from this GPU status push. */
+  requestedBackendUnavailable?: boolean;
 }): GpuNoticeVerdict {
   return {
     softwareRendering: input.localSoftwareRendering || input.shell?.softwareRendering === true,
     discreteInactive: input.shell?.discreteInactive === true,
     hybridGpuLikely: input.localHybridGpuLikely,
+    requestedBackendUnavailable: input.requestedBackendUnavailable === true,
   };
 }
 

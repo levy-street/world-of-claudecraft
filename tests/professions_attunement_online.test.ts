@@ -34,6 +34,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
+import { GuildBankLogMirror } from '../src/net/guild_bank_log_mirror';
 import { ClientWorld } from '../src/net/online';
 import { MASTER_TIER_LETTERS } from '../src/sim/content/letters';
 import { QUESTS, zoneAt } from '../src/sim/data';
@@ -41,7 +42,7 @@ import { announceAttunement } from '../src/sim/professions/attunement_events';
 import { WORK_ORDER_CADENCE_TICKS } from '../src/sim/professions/cadence';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
-import { buildAttunementPreview } from '../src/ui/profession_identity_view';
+import { buildAttunementPreview } from '../src/ui/hud/professions/profession_identity_view';
 import type { CraftingIdentityView } from '../src/world_api/professions';
 
 const SMITH_PAIR = 'weaponcrafting+armorcrafting';
@@ -282,8 +283,13 @@ function bareClient(identity: Partial<CraftingIdentityView>): ClientWorld {
     playerId: number;
     entities: Map<number, { level: number }>;
     craftingIdentity: CraftingIdentityView;
+    guildBankLogMirror: GuildBankLogMirror;
   };
   w.questLog = new Map();
+  // applySnapshot resets the guild bank history mirror when the bank gate
+  // flips; a constructor-less client must carry the field like the shared
+  // fixture does (tests/helpers/bare_client.ts).
+  w.guildBankLogMirror = new GuildBankLogMirror();
   w.questsDone = new Set();
   w.pendingQuestCommands = new Map();
   // `this.player` is a getter over entities.get(playerId); questState reads only
@@ -379,6 +385,9 @@ describe('tier mail over the live GameServer wire (session routing)', () => {
 function snapshotClient(pid: number): ClientWorld {
   const c: any = Object.create(ClientWorld.prototype);
   c.cfg = { seed: 20061, playerClass: 'warrior' };
+  // applySnapshot resets the guild bank history mirror when the bank gate
+  // flips; a constructor-less client carries the field like the shared fixture.
+  c.guildBankLogMirror = new GuildBankLogMirror();
   c.entities = new Map();
   c.playerId = pid;
   c.ownPlayerId = pid;

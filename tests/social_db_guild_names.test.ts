@@ -110,7 +110,7 @@ describe('PgSocialDb case-insensitive guild creation', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 1 }) // membership insert
       .mockResolvedValueOnce({ rows: [], rowCount: 0 }); // COMMIT
 
-    await expect(db.addGuildMemberAtomic(12, 8, 'member', 50)).resolves.toBe('ok');
+    await expect(db.addGuildMemberAtomic(12, 8, 'member')).resolves.toBe('ok');
 
     expect(mocks.bustGuildList).toHaveBeenCalledOnce();
     expect(client.query).toHaveBeenLastCalledWith('COMMIT');

@@ -11,7 +11,7 @@ import type { Aura, Entity } from '../src/sim/types';
 // min(1, amount / (scale * maxHp)), so big hits reliably break it and dot
 // ticks usually do not (the classic behavior that makes dot-then-fear a
 // warlock rotation instead of an anti-combo). Plain incapacitates (Eye Jab,
-// Wyvern Sting, Startle Shot) keep the classic break-on-any-damage rule, and G5
+// Drakesting, Startle Shot) keep the classic break-on-any-damage rule, and G5
 // left the warrior Lingering Dread soak threshold alone. (That soak has since
 // moved 20% -> 10% of max health, anchored on FEAR_BREAK_CHANCE_SCALE so it now
 // absorbs exactly one guaranteed-break hit; see src/sim/content/warrior_rows.ts.)
@@ -110,7 +110,9 @@ describe('G5: damage-scaled fear break', () => {
     // private-scatter sync moved those late camps onto their own stream and
     // the branch hunt went stale; 4 is the release side's own recorded hunt
     // and holds on the merged stream (the Reliquary branch itself adds no
-    // world-gen draws). Release spares on record: 6, 8.
+    // world-gen draws; the Masterwrought branch's one appended draw is a
+    // KILL-time roll, so it cannot touch world-gen either, and seed 4 holds
+    // on the composed tree). Release spares on record: 6, 8.
     const sim = new Sim({ seed: 4, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(14);
     const mob = addTarget(sim, 3);

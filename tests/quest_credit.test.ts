@@ -4,10 +4,11 @@
 // each function against a minimal fake SimContext (capturing emitted events + a
 // controllable countItem) and real QUESTS content (q_wolves kill-8, q_boars collect-5).
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import {
   checkQuestReady,
+  onCropFarmedForQuests,
   onInventoryChangedForQuests,
   onMobKilledForQuests,
 } from '../src/sim/quests/quest_credit';
@@ -15,6 +16,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import {
   type Entity,
+  type QuestDef,
   type QuestProgress,
   questObjectiveRequired,
   type SimEvent,
@@ -234,5 +236,98 @@ describe('questObjectiveRequired and resolvedCounts-aware credit', () => {
     // Further kills never over-credit past the resolved requirement.
     onMobKilledForQuests(ctx, wolf, meta);
     expect(qp.counts[0]).toBe(2);
+  });
+});
+
+// The farm ACTION arm (Farming go-live): the plant and harvest bodies in
+// professions/farming.ts call this after the action commits; the arm itself
+// is the pure predicate over action + optional cropId, and it must NEVER
+// read bags (the gather precedent: inventory cannot prove the deed). The
+// quest is synthetic (no shipped row is needed to pin the arm); the
+// end-to-end plant/harvest drive lives in tests/farm_quest_objective.test.ts.
+describe('quest_credit: onCropFarmedForQuests (farm action credit)', () => {
+  const FARM_QUEST_ID = 'q_test_farm_credit_unit';
+  const originalQuest = QUESTS[FARM_QUEST_ID];
+  afterEach(() => {
+    if (originalQuest) QUESTS[FARM_QUEST_ID] = originalQuest;
+    else delete QUESTS[FARM_QUEST_ID];
+  });
+  function installFarmQuest(): QuestDef {
+    const quest: QuestDef = {
+      id: FARM_QUEST_ID,
+      name: 'Test Farm Credit',
+      giverNpcId: 'foreman_odell',
+      turnInNpcId: 'foreman_odell',
+      text: 'Test only.',
+      completionText: 'Test complete.',
+      objectives: [
+        { type: 'farm', action: 'plant', cropId: 'vale_wheat', count: 2, label: 'Wheat planted' },
+        { type: 'farm', action: 'harvest', count: 1, label: 'Any crop harvested' },
+      ],
+      xpReward: 0,
+      copperReward: 0,
+      itemRewards: {},
+      retired: true,
+    };
+    QUESTS[FARM_QUEST_ID] = quest;
+    return quest;
+  }
+
+  it('matches action and cropId, credits once per call, and never reads bags', () => {
+    installFarmQuest();
+    // A countItem that THROWS: any inventory read inside the arm reds here.
+    const ctx = makeCtx(() => {
+      throw new Error('the farm crediter must never read inventory');
+    });
+    const meta = makeMeta();
+    const qp: QuestProgress = { questId: FARM_QUEST_ID, counts: [0, 0], state: 'active' };
+    meta.questLog.set(FARM_QUEST_ID, qp);
+
+    // Wrong crop for the narrowed plant objective: nothing moves.
+    onCropFarmedForQuests(ctx, 'plant', 'brook_carrot', meta);
+    expect(qp.counts).toEqual([0, 0]);
+    expect(ctx.events).toEqual([]);
+    // Wrong action for both (a harvest of the named crop credits only the
+    // unnamed harvest objective, never the plant one).
+    onCropFarmedForQuests(ctx, 'harvest', 'vale_wheat', meta);
+    expect(qp.counts).toEqual([0, 1]);
+    expect(event(ctx.events, 'questProgress').at(-1)).toMatchObject({
+      questId: FARM_QUEST_ID,
+      objectiveIndex: 1,
+      current: 1,
+      required: 1,
+      text: 'Any crop harvested: 1/1',
+    });
+    // The named plant objective, twice to its count; the second flips ready.
+    onCropFarmedForQuests(ctx, 'plant', 'vale_wheat', meta);
+    expect(qp.counts).toEqual([1, 1]);
+    expect(qp.state).toBe('active');
+    onCropFarmedForQuests(ctx, 'plant', 'vale_wheat', meta);
+    expect(qp.counts).toEqual([2, 1]);
+    expect(qp.state).toBe('ready');
+    expect(meta.counters.questProgress).toBe(3);
+    expect(event(ctx.events, 'questProgress').length).toBe(3);
+    expect(event(ctx.events, 'questReady').map((e) => e.questId)).toEqual([FARM_QUEST_ID]);
+    // Past the count: no over-credit, no further event.
+    onCropFarmedForQuests(ctx, 'plant', 'vale_wheat', meta);
+    expect(qp.counts).toEqual([2, 1]);
+    expect(event(ctx.events, 'questProgress').length).toBe(3);
+  });
+
+  it('ignores non-farm objectives and non-active quests', () => {
+    installFarmQuest();
+    const ctx = makeCtx();
+    const meta = makeMeta();
+    // A kill quest sits in the log beside a READY farm quest: neither moves.
+    const wolves: QuestProgress = { questId: 'q_wolves', counts: [0], state: 'active' };
+    const farm: QuestProgress = { questId: FARM_QUEST_ID, counts: [2, 1], state: 'ready' };
+    meta.questLog.set('q_wolves', wolves);
+    meta.questLog.set(FARM_QUEST_ID, farm);
+    onCropFarmedForQuests(ctx, 'plant', 'vale_wheat', meta);
+    onCropFarmedForQuests(ctx, 'harvest', 'vale_wheat', meta);
+    expect(wolves.counts).toEqual([0]);
+    expect(farm.counts).toEqual([2, 1]);
+    expect(ctx.events).toEqual([]);
+    expect(meta.counters.questProgress).toBe(0);
   });
 });

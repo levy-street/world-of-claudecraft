@@ -27,6 +27,8 @@ mkdirSync(outDir, { recursive: true });
 if (debugDir) mkdirSync(debugDir, { recursive: true });
 
 // Per-mount render jobs. `file` is the GLB basename, `id` the reins item id (icon filename).
+// The Lanternback Troll is deliberately absent: its reins ship a PAINTED icon, and a
+// render job here would overwrite that with a 3D cut-out on the next run.
 // `cfg` overrides the generic head framing (defaults live in the entry); tuned by eye until
 // each mount's face fills the frame. All mounts face +Z (the model convention), so `fwd` is
 // only set where a model deviates.
@@ -85,6 +87,11 @@ const JOBS = [
     id: 'reins_drakemaw_raptor',
     cfg: { headFwd: 0.95, headUp: 0.82, fill: 0.55, yaw: 0.52, pitch: 0.14 },
   },
+  // The Chimeglass Tortoise, the Cluckwork Mech Bird and the Bonebound Rickshaw
+  // are mount SKINS now (src/sim/content/mount_skins.ts): their renders ship as
+  // store art under public/ui/store/mount_skins, outside the item-icon set this
+  // script fills (the rickshaw's icon was a woc-item-icon-v1 generation, never a
+  // job here).
 ];
 
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;

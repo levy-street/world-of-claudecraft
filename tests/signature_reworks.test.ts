@@ -33,7 +33,7 @@ function addAlly(sim: Sim, x: number, z: number, hp = 100): Entity {
 }
 
 describe('reworked signatures', () => {
-  it('Conflagrate uses two 18s charges and Swiftmend keeps its 8s cooldown', () => {
+  it('Conflagrate uses two 18s charges and Fleetmend keeps its 8s cooldown', () => {
     const lock = makeSim('warlock', 'destruction');
     expect(lock.resolvedAbility('conflagrate')?.cooldown).toBe(18);
     expect(lock.resolvedAbility('conflagrate')?.bonusCharges).toBe(1);

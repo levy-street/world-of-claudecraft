@@ -205,10 +205,12 @@ describe('destruction progression', () => {
     const consume = sim.ctx.resolvedAbility('drain_life', p.id);
     const drain = consume?.effects.find((effect) => effect.type === 'drainTick');
     if (!consume || drain?.type !== 'drainTick') throw new Error('Missing Destruction Consume');
-    // The 2026-08-23 viability floor gives Destruction spellDmgPct 0.1, and
-    // the engine scales the channel tick's spell-power rider by the same
+    // The 2026-08-23 viability floor gives Destruction spellDmgPct 0.1; the
+    // v0.42.0 Ruination retune adds a further +0.11 offensive spec bonus
+    // (spec_output_tuning.ts), so the resolved dmgMult is 1.21, not 1.1. The
+    // engine scales the channel tick's spell-power rider by that same
     // resolved talent multiplier the baked base already carries.
-    const spellPowerBonus = channelTickBonus(p.spellPower, consume.def, 1.1);
+    const spellPowerBonus = channelTickBonus(p.spellPower, consume.def, 1.21);
     expect(spellPowerBonus).toBeGreaterThan(0);
     const rawTick = drain.min + spellPowerBonus;
     const expectedHeal = Math.round(rawTick * 0.7);
@@ -1034,7 +1036,9 @@ describe('Pyre Colossus', () => {
     expect(
       pulses.filter((event) => event.type === 'damage' && event.targetId === friendly.id),
     ).toHaveLength(0);
-    expect(pulses.every((event) => event.type === 'damage' && event.amount === 60)).toBe(true);
+    // v0.42.0 Ruination: the explicit destruction-only Pyre Aura pet bonus
+    // lifts the flat nova from 60 to 66.
+    expect(pulses.every((event) => event.type === 'damage' && event.amount === 66)).toBe(true);
     expect(ruinAmount(p)).toBe(4);
   });
 

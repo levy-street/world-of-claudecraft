@@ -12,8 +12,9 @@ The numbers are not interpreted the same way:
   anchor.** It counts the hot-DOM writes that bypassed the write-elision cache (boot plus the
   occasional state-change write). A longer run adds only skips, never new bypass writes once the
   world is steady, so the count does not move with frame count, CPU or GPU speed, or machine
-  load. The establishing-write floor DOES differ by viewport (the touch HUD builds more
-  per-frame elements than the desktop layout) and can jitter by a write or two run to run, so
+  load. The establishing-write floor DOES differ by viewport (which viewport is worse has
+  flipped across captures: mobile at the 2026-07-24 and 2026-08-08 rows, desktop since
+  2026-08-28; the canonical row names the current worst) and can jitter by a write or two run to run, so
   the committed anchor is a single canonical row covering the WORST viewport with that jitter
   as headroom. A collapse of write-elision makes the count balloon toward the frame count
   (thousands, far past any viewport delta), so the standing gate (ARM 3) asserts the count
@@ -59,6 +60,13 @@ PERF_OUT=/path/to/perf-tour-desktop.json PERF_VIEWPORT=desktop node scripts/perf
 PERF_GPU=1 PERF_VIEWPORT=both node scripts/perf_tour.mjs
 ```
 
+Run the headed tour TWICE and read the second capture: the first headed launch after a cold
+start over-reports long frames (a 13-long-frame first launch against warm runs of 1 to 2 on
+2026-08-28), which is a capture artifact, not a HUD regression, and must not be absorbed
+into the `frameLong50` anchor. Chrome's own profile is fresh on EVERY launch (perf_tour
+passes no userDataDir), so the state a second run warms is the Vite transform cache and the
+OS and driver caches (binary page-in, the Metal shader cache), not the browser profile.
+
 `PERF_VIEWPORT` selects the profile: `desktop`, `mobile`, or `both` (default). Other relevant
 defaults: `GAME_URL=http://localhost:5173`, `PERF_SCENARIO=bench_perf_tour`,
 `PERF_STEP_MS=2500`, `PERF_SETTLE_MS=600`, `PERF_BOOT_TIMEOUT_MS=120000`. The mobile profile
@@ -80,8 +88,8 @@ carry their own capture dates and browser modes.
 | Browser (swiftshader rows) | Google Chrome 149.0.7827.196, headless, ANGLE swiftshader (software WebGL) |
 | Captured (swiftshader rows) | 2026-06-24 |
 | Node (real-GPU rows) | v26.5.0 |
-| Browser (real-GPU rows) | Google Chrome 150.0.7871.182, HEADED, real GPU (`PERF_GPU=1`) |
-| Captured (real-GPU rows) | 2026-07-23; packet-close reconfirm + bypass-anchor re-derivation 2026-07-24 |
+| Browser (real-GPU rows) | Google Chrome 150.0.7871.182, HEADED, real GPU (`PERF_GPU=1`); the 2026-08-28 bypass re-capture on Google Chrome 151.0.7922.175, macOS 26.5.2, Node v26.5.0 |
+| Captured (real-GPU rows) | 2026-07-23; packet-close reconfirm + bypass-anchor re-derivation 2026-07-24; bypass-anchor re-capture 2026-08-08 (superseded); bypass-anchor re-capture 2026-08-28 (frameLong50 and tourMinFrames rows KEPT) |
 
 ## Recorded floor
 
@@ -111,7 +119,7 @@ per-frame anchor is the elision-bypass count: its canonical row lives in the rea
 gates section below (a single anchor covering the worst viewport), and the gate keys on it,
 not on the frame-count-dependent ratio.
 
-### real-GPU tour gates (PERF_GPU=1, headed, captured 2026-07-23, reconfirmed 2026-07-24)
+### real-GPU tour gates (PERF_GPU=1, headed, captured 2026-07-23, reconfirmed 2026-07-24; hudHotDomWrites re-captured 2026-08-08, 2026-08-28, and 2026-08-30)
 
 The ARM 3 frame gates plus the elision-bypass anchor. Captured with
 `PERF_GPU=1 PERF_VIEWPORT=both` over two back-to-back runs on the capture machine above
@@ -131,15 +139,17 @@ packet-close captures sit comfortably inside both rows, so per R13 the rows were
 The elision-bypass anchor was re-derived at the packet close: the healthy captures measured
 desktop 538 and 539 bypass writes and mobile 632 and 632 (the v0.30 HUD growth, with the
 deed tracker, yumi strip, party-below-target, tab strip, and mobile action ring all
-establishing writes at boot; the touch HUD explains the viewport delta). The committed
-anchor covers the worst viewport (632) plus run-jitter headroom; a write-elision collapse
-balloons the count toward the frame count (thousands), so the headroom costs no detection.
+establishing writes at boot; the touch HUD explained the viewport delta then). The committed
+anchor covers the worst viewport plus run-jitter headroom (the canonical row below carries
+the live value and its dated re-derivations; 632 was the packet-close worst); a
+write-elision collapse balloons the count toward the frame count (thousands), so the
+headroom costs no detection.
 
 | Metric | Value | Role |
 |---|---|---|
 | frameLong50 | 12 | ARM 3 anchor: frames at or over 50 ms in the tour window (worst healthy capture 7) |
 | tourMinFrames | 500 | ARM 3 floor: minimum real frames the tour must render (worst healthy capture 873) |
-| hudHotDomWrites | 706 | ARM 3 anchor: elision-bypass writes, every viewport (worst healthy capture 698, mobile). Re-captured 2026-08-08: release-side growth inherited at the v0.36.0 base, branch-neutral (the reliquary branch measures 695 and the clean release tip 696 to 698, byte-identical write sets across 1232 and 3007-frame runs; Phase 16 QA attribution plus the Phase 17 re-measure). Same 8-write headroom discipline as the 632-to-640 original. |
+| hudHotDomWrites | 1062 | ARM 3 anchor: elision-bypass writes, every viewport (worst healthy capture 1054, DESKTOP). Re-grounded 2026-08-30 against the clean v0.41.0 release tip and the merged branch tip. The definitive same-machine A/B reads release desktop 1054 cold with one 1074 warm outlier under concurrent test load and mobile 573/589; the branch reads desktop 1054/1054 and mobile 573/564. The branch therefore adds zero writes on either viewport. The 1062 limit preserves eight writes of headroom over the stable 1054 desktop result. Evidence: `docs/perf/masterwrought/hud-perf-ab-2026-08-30.json`. |
 
 All rows are single canonical rows valid for every viewport: each committed anchor covers
 the worst viewport, the committed floor the slowest one. `frameLong50` is windowed by the

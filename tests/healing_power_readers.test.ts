@@ -15,21 +15,28 @@
 // Expected values are literals computed from the live classic coefficients in
 // src/sim/spell_scaling.ts (direct: clamp(castTime, 1.5, 3.5)/3.5, HoT:
 // duration/15 split across ticks, channel: clamp(duration, 1.5, 3.5)/3.5
-// split across ticks, AoE penalty 0.333, HEALING_SP_SCALE 2 on direct/HoT).
+// split across ticks, AoE penalty 0.333, HEALING_SP_SCALE 2 on direct/HoT),
+// PLUS (v0.42.0 class-balance-v042.md) one more pass through
+// primary_healing.ts scalePrimaryHealing(rawPacket, primaryHealingMultiplier)
+// for every reader whose caster is a Spiritmend shaman, Sunmender paladin, or
+// Groveheart druid: the whole raw packet (authored base + SP rider) is
+// multiplied once, not just the rider. An unspecced/other-spec caster keeps
+// multiplier 1 and its literal unchanged.
 //
 // Reader families and their sim code paths:
-//   chain heal    combat/effect_dispatch.ts 'chainHeal' (directHealBonus)
-//   HoT           combat/effect_dispatch.ts 'hot' (hotTickBonus)
-//   absorb        combat/effect_dispatch.ts 'absorb' (absorbBonus)
-//   AoE heal      combat/effect_dispatch.ts 'aoeHeal' (directHealBonus, aoe)
-//   channel AoE   combat/casting_lifecycle.ts aoeHeal pulse (channelTickBonus)
-//   druid replant combat/druid_engines.ts replantWildbloom (hotTickBonus)
-//   Paladin Aegis combat/paladin_aegis.ts tick + final burst
+//   chain heal    combat/effect_dispatch.ts 'chainHeal' (directHealBonus) - Spiritmend x1.10
+//   HoT           combat/effect_dispatch.ts 'hot' (hotTickBonus) - unspecced priest, x1 (unaffected)
+//   absorb        combat/effect_dispatch.ts 'absorb' (absorbBonus) - outside the healing-factor scope
+//   AoE heal      combat/effect_dispatch.ts 'aoeHeal' (directHealBonus, aoe) - Sunmender x1.10
+//   channel AoE   combat/casting_lifecycle.ts aoeHeal pulse (channelTickBonus) - unspecced druid, x1 (unaffected)
+//   druid replant combat/druid_engines.ts replantWildbloom (hotTickBonus) - Groveheart x1.20
+//   Paladin Aegis combat/paladin_aegis.ts tick + final burst - Sunmender x1.10
 import { describe, expect, it } from 'vitest';
 import { castAbility, updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { resolveDruidOverbloom } from '../src/sim/combat/druid_engines';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { WORLD_WITHOUT_HUB_YARD } from './helpers/hub_yard';
 
 const BASE_POWER = 70;
 const HEALING_POWER_DELTA = 140; // the flat Healing Power robe of the boost arm
@@ -86,8 +93,11 @@ function drainCast(sim: Sim, caster: Entity, arm: StatArm, limit = 400): void {
 
 describe('chain heal reads healPower (effect_dispatch chainHeal)', () => {
   // Cascading Mend: castTime 2.5, base 120 to 145 (midpoint 132.5). Rider =
-  // round(healPower * 2 * 2.5/3.5): 70 -> 100, 210 -> 300. First hop =
-  // round(132.5 + rider). Spiritmend carries no heal multiplier (costPct only).
+  // round(healPower * 2 * 2.5/3.5): 70 -> 100, 210 -> 300. Restoration carries
+  // no legacy talent heal multiplier on this ability (costPct only), but
+  // Spiritmend's v0.42.0 primary factor (1.10) now scales the WHOLE raw
+  // packet (base + rider) once, before rounding: first hop =
+  // round((132.5 + rider) * 1.10).
   function firstHopHeal(arm: StatArm): number {
     const sim = new Sim({ seed: 5, playerClass: 'shaman', noPlayer: true });
     const casterId = sim.addPlayer('shaman', 'Chainer');
@@ -110,13 +120,13 @@ describe('chain heal reads healPower (effect_dispatch chainHeal)', () => {
     return ally.hp - 1;
   }
 
-  it('a flat Healing Power delta adds exactly the cast-time coefficient rider', () => {
-    expect(firstHopHeal('baseline')).toBe(233); // round(132.5 + 100)
-    expect(firstHopHeal('healingPowerBoost')).toBe(433); // round(132.5 + 300)
+  it('a flat Healing Power delta adds exactly the cast-time coefficient rider, then the Spiritmend factor once', () => {
+    expect(firstHopHeal('baseline')).toBe(256); // round((132.5 + 100) * 1.10)
+    expect(firstHopHeal('healingPowerBoost')).toBe(476); // round((132.5 + 300) * 1.10)
   });
 
   it('raw spellPower with healPower held changes nothing', () => {
-    expect(firstHopHeal('spellPowerRaised')).toBe(233);
+    expect(firstHopHeal('spellPowerRaised')).toBe(256);
   });
 });
 
@@ -182,10 +192,16 @@ describe('coefficient absorb reads healPower (effect_dispatch absorb)', () => {
 describe('direct AoE heal reads healPower (effect_dispatch aoeHeal)', () => {
   // Radiant Chorus (holy paladin, level 14): castTime 2, base 90 to 110
   // (midpoint 100). Rider = round(healPower * 2 * (2/3.5) * 0.333):
-  // 70 -> 27, 210 -> 80. Sunmender's mastery is crit-heal only (no
-  // multiplier reaches a non-crit heal).
+  // 70 -> 27, 210 -> 80. Sunmender's mastery is crit-heal only (no legacy
+  // multiplier reaches a non-crit heal), but the v0.42.0 Sunmender primary
+  // factor (1.10) now scales the whole raw packet once: round((100 + rider) * 1.10).
   function selfAoeHeal(arm: StatArm): number {
-    const sim = new Sim({ seed: 17, playerClass: 'paladin', autoEquip: true });
+    const sim = new Sim({
+      seed: 17,
+      playerClass: 'paladin',
+      autoEquip: true,
+      world: WORLD_WITHOUT_HUB_YARD,
+    });
     sim.setPlayerLevel(14);
     expect(sim.setSpec('holy')).toBe(true);
     const p = sim.player;
@@ -199,13 +215,13 @@ describe('direct AoE heal reads healPower (effect_dispatch aoeHeal)', () => {
     return p.hp - 1;
   }
 
-  it('a flat Healing Power delta adds exactly the AoE-penalized rider', () => {
-    expect(selfAoeHeal('baseline')).toBe(127); // 100 + round(70 * 2 * (2/3.5) * 0.333)
-    expect(selfAoeHeal('healingPowerBoost')).toBe(180); // 100 + round(210 * 2 * (2/3.5) * 0.333)
+  it('a flat Healing Power delta adds exactly the AoE-penalized rider, then the Sunmender factor once', () => {
+    expect(selfAoeHeal('baseline')).toBe(140); // round((100 + round(70 * 2 * (2/3.5) * 0.333)) * 1.10) = round(127 * 1.10)
+    expect(selfAoeHeal('healingPowerBoost')).toBe(198); // round((100 + round(210 * 2 * (2/3.5) * 0.333)) * 1.10) = round(180 * 1.10)
   });
 
   it('raw spellPower with healPower held changes nothing', () => {
-    expect(selfAoeHeal('spellPowerRaised')).toBe(127);
+    expect(selfAoeHeal('spellPowerRaised')).toBe(140);
   });
 });
 
@@ -245,9 +261,28 @@ describe('channeled AoE heal pulse reads healPower (casting_lifecycle aoeHeal ar
 });
 
 describe('druid Overbloom replant reads healPower (druid_engines replantWildbloom)', () => {
-  // The replanted Wildbloom tick carries hotTickBonus(healPower, 12, 3) =
-  // round(healPower * 2 * (12/15) / 4) = round(healPower * 0.4):
-  // 70 -> 28, 210 -> 84 (the replant passes no talent multiplier).
+  // At level 10 (rank 2, authored hot.total 32 -> 56 on rank), restoration's
+  // spec_baselines.ts global healPct 0.08 plus rejuvenation's ability dmgPct
+  // 0.24 give talentHealMult 1.32 (resolveTalentHitMult, level-independent);
+  // Grove's Gift mastery hotHealPct is LEVEL-SCALED and reads 0.125 at level
+  // 10 (half its level-20 value of 0.25), so combinedHotMult here is
+  // 1.32 * 1.125 = 1.485, not the level-20 1.65 an unscaled reading would
+  // suggest. That combined multiplier bakes into the resolved ability's
+  // hot.total (classes.ts scaleEffect) AND separately scales the runtime SP
+  // rider (hotTickBonus) the replant now correctly threads through
+  // (previously it passed no multiplier at all, the v0.42.0 bug fix).
+  // hotBase = round(83 / (12/3)) = 21 is the SAME across every arm (it comes
+  // from the baked total, not runtime healPower); hotSp = hotTickBonus(healPower,
+  // 12, 3, 1.485): 0 -> 0, 70 -> 42, 210 -> 125. The Groveheart primary factor
+  // is 1.05 (spec_output_tuning.ts; retuned down from an initial 1.20
+  // candidate once this replant SP-rider fix was in, per class-balance-v042.md's
+  // "do not silently stack a full buff on a large bug fix") and scales the
+  // WHOLE (hotBase + hotSp) sum once, so the per-arm literals below are
+  // computed as round((21 + hotSp) * 1.05) rather than as a delta off the
+  // zero arm: rounding the sum once, instead of rounding the rider alone and
+  // adding a separately-rounded base, is not exactly linear, so a
+  // delta-style assertion here would drift by rounding noise instead of
+  // proving the actual formula.
   function replantTickValue(arm: StatArm | 'zero'): { value: number } {
     const sim = new Sim({ seed: 25, playerClass: 'druid', autoEquip: true });
     sim.setPlayerLevel(10);
@@ -269,14 +304,14 @@ describe('druid Overbloom replant reads healPower (druid_engines replantWildbloo
     return { value: hot.value };
   }
 
-  it('a flat Healing Power delta adds exactly the split DoT-coefficient rider', () => {
-    const base = replantTickValue('zero').value;
-    expect(replantTickValue('baseline').value).toBe(base + 28);
-    expect(replantTickValue('healingPowerBoost').value).toBe(base + 84);
+  it('a flat Healing Power delta adds exactly the split DoT-coefficient rider, then the Groveheart factor once', () => {
+    expect(replantTickValue('zero').value).toBe(22); // round((21 + 0) * 1.05)
+    expect(replantTickValue('baseline').value).toBe(66); // round((21 + 42) * 1.05)
+    expect(replantTickValue('healingPowerBoost').value).toBe(153); // round((21 + 125) * 1.05)
   });
 
   it('raw spellPower with healPower held changes nothing', () => {
-    expect(replantTickValue('spellPowerRaised').value).toBe(replantTickValue('baseline').value);
+    expect(replantTickValue('spellPowerRaised').value).toBe(66);
   });
 });
 
@@ -286,9 +321,14 @@ describe('Paladin Aegis reads healPower (paladin_aegis tick and final burst)', (
   // (70 -> 14, 210 -> 42) on the 35 to 45 base (midpoint 40); the completion
   // burst rider is directHealBonus(healPower, 0, aoe) =
   // round(healPower * 2 * (1.5/3.5) * 0.333) (70 -> 20, 210 -> 60) on the
-  // 120 to 150 base (midpoint 135). Read the heal2 events (the ally cannot
-  // hold a maxHp poke: the protection aura's recalc rescales hp by fraction),
-  // re-hurting the ally each step so no heal clamps against the real pool.
+  // 120 to 150 base (midpoint 135). Holy carries no legacy talent heal
+  // multiplier here (paladin has no spec_baselines.ts entry and no row grants
+  // aegis_first_dawn an ability mod), but the v0.42.0 Sunmender primary
+  // factor (1.10) scales the WHOLE raw tick/burst packet once: tick =
+  // round((40 + rider) * 1.10), burst = round((135 + rider) * 1.10). Read the
+  // heal2 events (the ally cannot hold a maxHp poke: the protection aura's
+  // recalc rescales hp by fraction), re-hurting the ally each step so no heal
+  // clamps against the real pool.
   function allyAegisHeals(arm: StatArm): number[] {
     const sim = new Sim({ seed: 29, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
@@ -318,12 +358,14 @@ describe('Paladin Aegis reads healPower (paladin_aegis tick and final burst)', (
     );
   }
 
-  it('a flat Healing Power delta adds exactly the tick and burst riders', () => {
-    expect(allyAegisHeals('baseline')).toEqual([54, 54, 54, 54, 54, 155]);
-    expect(allyAegisHeals('healingPowerBoost')).toEqual([82, 82, 82, 82, 82, 195]);
+  it('a flat Healing Power delta adds exactly the tick and burst riders, then the Sunmender factor once', () => {
+    // baseline: tick round((40+14)*1.10)=59, burst round((135+20)*1.10)=171.
+    expect(allyAegisHeals('baseline')).toEqual([59, 59, 59, 59, 59, 171]);
+    // healingPowerBoost: tick round((40+42)*1.10)=90, burst round((135+60)*1.10)=215.
+    expect(allyAegisHeals('healingPowerBoost')).toEqual([90, 90, 90, 90, 90, 215]);
   });
 
   it('raw spellPower with healPower held changes nothing', () => {
-    expect(allyAegisHeals('spellPowerRaised')).toEqual([54, 54, 54, 54, 54, 155]);
+    expect(allyAegisHeals('spellPowerRaised')).toEqual([59, 59, 59, 59, 59, 171]);
   });
 });

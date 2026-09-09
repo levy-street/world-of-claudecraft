@@ -31,6 +31,22 @@ export function fmtDate(iso: string | null): string {
   }).format(d);
 }
 
+/**
+ * "August 2026" in the operator's own language, from a calendar year and a
+ * 1-12 month.
+ *
+ * UTC throughout: a month LABEL must not slide to the previous one for an
+ * operator sitting west of the meridian, which a local-midnight Date would do
+ * for every January.
+ */
+export function fmtMonthYear(year: number, month: number): string {
+  return new Intl.DateTimeFormat(adminLanguageTag(), {
+    year: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, 1)));
+}
+
 export function fmtChartBucket(iso: string, bucket: 'hour' | 'day'): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;

@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.41.4-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.42.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.pl_PL.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -234,7 +234,7 @@ Każda instancja działa też w wersji **Heroic**: wyżej poziomowani przeciwnic
 
 ### Delves
 
-Delves to osobny, skalowalny tryb dla małej grupy jednego lub dwóch graczy, odbudowywany z losowych komnat przy każdym wejściu i kończący się na zamkniętej skrzyni relikwiarza, którą otwiera minigra we włamywanie zamiast rzutu na loot. **The Collapsed Reliquary** (poziom 7 i wyżej) kończy się na Deacon Varric, a jeśli idziesz sam, u twojego boku walczy towarzyszka AI, Tessa. **The Drowned Litany** (poziom 12 i wyżej) prowadzi tropem do zalanej świątyni na skraju Mirefen Marsh. Tablica delves ustala poziom trudności: Heroic podnosi poziomy wrogów i dodaje losowy afiks dla bogatszych nagród.
+Delves to osobny, skalowalny tryb dla małej grupy jednego lub dwóch graczy, odbudowywany z losowych komnat przy każdym wejściu i kończący się na zamkniętej skrzyni relikwiarza, którą otwiera minigra we włamywanie zamiast rzutu na loot. **The Collapsed Reliquary** (poziom 7 i wyżej) kończy się na Deacon Vandric, a jeśli idziesz sam, u twojego boku walczy towarzyszka AI, Tessa. **The Drowned Litany** (poziom 12 i wyżej) prowadzi tropem do zalanej świątyni na skraju Mirefen Marsh. Tablica delves ustala poziom trudności: Heroic podnosi poziomy wrogów i dodaje losowy afiks dla bogatszych nagród.
 
 ### Rankingowe PvP (the Ashen Coliseum)
 

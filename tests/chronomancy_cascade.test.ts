@@ -3,10 +3,10 @@
 //   - target selection: caster + LIVING group/raid members only, primary always in,
 //     nearest-four-to-the-primary within 15 yd, ties by stable id, cap of five,
 //   - the group echo's stored origin + reduced coefficient (13% single / 6% area),
-//   - the individual-overlap rule (keep 40%, extend-to-8 not refresh-to-15, count in five),
+//   - the individual-overlap rule (keep 40%, extend only to the group window, count in five),
 //   - the group->individual upgrade then move (ally left bare, no group rebuild in v1),
-//   - conversion: each marked ally converts its OWN coefficient from one hit (no shared
-//     budget), area reduction, non-crit, no recursion, never heals a dead ally,
+//   - conversion: each marked ally keeps its OWN base coefficient; Surge/Darts also fund
+//     the smart group reserve, with area reduction, non-crit, no recursion, and no dead allies,
 //   - two chronomancers keep independent marks by sourceId,
 //   - UI visibility: the local player sees ONLY their own echoes (party strip + target frame).
 import { describe, expect, it } from 'vitest';
@@ -16,11 +16,14 @@ import {
   ECHO_CONVERT_SINGLE,
   ECHO_GROUP_CONVERT_AOE,
   ECHO_GROUP_CONVERT_SINGLE,
+  ECHO_ROTATION_CONVERSION_MULT,
   placeGroupEcho,
   placeTemporalEcho,
   selectCascadeTargets,
   TEMPORAL_ECHO_ID,
 } from '../src/sim/combat/chronomancy';
+import { TEMPORAL_CASCADE_CAST_SECONDS } from '../src/sim/content/chronomancy_tuning';
+import { ABILITIES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Aura, Entity } from '../src/sim/types';
@@ -142,6 +145,26 @@ describe('Cascada target selection', () => {
 });
 
 describe('Cascada group echo + individual overlap', () => {
+  it('uses the shortened 1.5 second cast across every rank', () => {
+    expect(TEMPORAL_CASCADE_CAST_SECONDS).toBe(1.5);
+    expect(ABILITIES.temporal_cascade.castTime).toBe(TEMPORAL_CASCADE_CAST_SECONDS);
+    expect(ABILITIES.temporal_cascade.ranks?.every((rank) => rank.castTime === undefined)).toBe(
+      true,
+    );
+  });
+
+  it('keeps every rank of the group Echo active for the longer 15 second window', () => {
+    const rows = [ABILITIES.temporal_cascade, ...(ABILITIES.temporal_cascade.ranks ?? [])];
+    const durations = rows.map(
+      (row) => row.effects.find((effect) => effect.type === 'massTemporalEcho')?.duration,
+    );
+
+    expect(durations).toEqual([15, 15, 15]);
+    expect(ABILITIES.temporal_cascade.description).toContain('below 60% health');
+    expect(ABILITIES.temporal_cascade.description).toContain('equal healing reserve');
+    expect(ABILITIES.temporal_cascade.description).toContain('Aether Surge and Aether Darts');
+  });
+
   it('stores the group origin and the reduced 13% coefficient', () => {
     const { sim, p } = chronoMage();
     const ally = addAlly(sim, p.pos.x, p.pos.z + 2, 'Ally');
@@ -152,14 +175,14 @@ describe('Cascada group echo + individual overlap', () => {
     expect(a.remaining).toBe(8);
   });
 
-  it('keeps a pre-existing individual echo at 40%, extending up to 8s but never to 15s', () => {
+  it('keeps a pre-existing individual echo at 40%, extending only to the requested group window', () => {
     const { sim, p } = chronoMage();
     const ally = addAlly(sim, p.pos.x, p.pos.z + 2, 'Ally');
     placeTemporalEcho(ctxOf(sim), p, ally, 15);
     const indiv = echoAura(ally, p.id)!;
     expect(indiv.echoGroup).toBe(false);
 
-    // Less than 8s left: the group cast extends it up to 8, still individual/40%.
+    // Less than the requested group window: extend to it, still individual/40%.
     indiv.remaining = 3;
     placeGroupEcho(ctxOf(sim), p, ally, 8);
     const after = echoAura(ally, p.id)!;
@@ -167,7 +190,7 @@ describe('Cascada group echo + individual overlap', () => {
     expect(after.echoConvertRate).toBe(ECHO_CONVERT_SINGLE);
     expect(after.remaining).toBe(8); // extended up to 8
 
-    // More than 8s left: the group cast never shortens it and never refreshes to 15.
+    // More than the requested group window: never shorten or fully refresh it.
     after.remaining = 12;
     placeGroupEcho(ctxOf(sim), p, ally, 8);
     expect(echoAura(ally, p.id)!.remaining).toBe(12);
@@ -205,6 +228,62 @@ describe('Cascada conversion', () => {
     expect(group.hp - g0).toBe(Math.round(100 * ECHO_GROUP_CONVERT_SINGLE)); // 13
   });
 
+  it('keeps x4 individual while concentrating the group reserve on low-health marks', () => {
+    const { sim, p } = chronoMage();
+    const single = addAlly(sim, p.pos.x, p.pos.z + 2, 'SingleDriver');
+    const lowGroup = addAlly(sim, p.pos.x, p.pos.z + 3, 'LowGroupDriver');
+    const healthyGroup = addAlly(sim, p.pos.x, p.pos.z + 4, 'HealthyGroupDriver');
+    placeTemporalEcho(ctxOf(sim), p, single, 15);
+    placeGroupEcho(ctxOf(sim), p, lowGroup, 8);
+    placeGroupEcho(ctxOf(sim), p, healthyGroup, 8);
+    single.maxHp = 1_000;
+    lowGroup.maxHp = 1_000;
+    healthyGroup.maxHp = 1_000;
+    expect(ECHO_ROTATION_CONVERSION_MULT).toBe(4);
+    for (const abilityId of ['arcane_surge', 'arcane_missiles']) {
+      single.hp = 700;
+      lowGroup.hp = 500;
+      healthyGroup.hp = 700;
+      chronomancyConvertArcaneDamage(ctxOf(sim), p, 100, 'arcane', false, abilityId);
+      expect(single.hp - 700, abilityId).toBe(160);
+      expect(lowGroup.hp - 500, abilityId).toBe(39);
+      expect(healthyGroup.hp - 700, abilityId).toBe(13);
+    }
+  });
+
+  it('can route the group-funded reserve to a low-health individual Echo', () => {
+    const run = () => {
+      const { sim, p } = chronoMage();
+      const tank = addAlly(sim, p.pos.x, p.pos.z + 2, 'IndividualTank');
+      const group = addAlly(sim, p.pos.x, p.pos.z + 3, 'HealthyGroupMark');
+      placeTemporalEcho(ctxOf(sim), p, tank, 15);
+      placeGroupEcho(ctxOf(sim), p, group, 8);
+      tank.maxHp = 1_000;
+      tank.hp = 500;
+      group.maxHp = 1_000;
+      group.hp = 700;
+      sim.drainEvents();
+      const draws: number[] = [];
+      sim.ctx.rng.setObserver((value) => draws.push(value));
+
+      chronomancyConvertArcaneDamage(ctxOf(sim), p, 100, 'arcane', false, 'arcane_surge');
+
+      sim.ctx.rng.setObserver(null);
+      return {
+        draws,
+        heals: sim.drainEvents().filter((event) => event.type === 'heal2'),
+        tankHealing: tank.hp - 500,
+        groupHealing: group.hp - 700,
+      };
+    };
+
+    const first = run();
+    expect(first.draws).toEqual([]);
+    expect(first.tankHealing).toBe(173); // 40% x4 plus the one group mark's 13% reserve
+    expect(first.groupHealing).toBe(13); // its base heal still lands; it is not under 60%
+    expect(run()).toEqual(first);
+  });
+
   it('applies the reduced area rate to a group echo and the normal area rate to an individual', () => {
     const { sim, p } = chronoMage();
     const single = addAlly(sim, p.pos.x, p.pos.z + 2, 'Single');
@@ -218,19 +297,21 @@ describe('Cascada conversion', () => {
     expect(group.hp - g0).toBe(Math.round(100 * ECHO_GROUP_CONVERT_AOE)); // 6
   });
 
-  it('never heals a dead ally and never crits (exact coefficient, no doubling)', () => {
+  it('never heals or funds the smart reserve from a dead group mark', () => {
     const { sim, p } = chronoMage();
     const live = addAlly(sim, p.pos.x, p.pos.z + 2, 'Live');
     const dead = addAlly(sim, p.pos.x, p.pos.z + 3, 'Dead');
     placeGroupEcho(ctxOf(sim), p, live, 8);
     placeGroupEcho(ctxOf(sim), p, dead, 8);
     dead.dead = true;
+    live.maxHp = 1_000;
+    live.hp = 500;
     const d0 = dead.hp;
     const l0 = live.hp;
-    chronomancyConvertArcaneDamage(ctxOf(sim), p, 200, 'arcane', false);
+    chronomancyConvertArcaneDamage(ctxOf(sim), p, 100, 'arcane', false, 'arcane_surge');
     expect(dead.hp).toBe(d0); // dead ally untouched
-    // Exactly the coefficient, never a crit-doubled amount.
-    expect(live.hp - l0).toBe(Math.round(200 * ECHO_GROUP_CONVERT_SINGLE));
+    // One living mark contributes one 13% reserve. The dead mark contributes nothing.
+    expect(live.hp - l0).toBe(Math.round(100 * ECHO_GROUP_CONVERT_SINGLE * 2));
   });
 
   it('ignores non-arcane damage', () => {
@@ -292,6 +373,7 @@ describe('Cascada cast gating (group/raid-only target)', () => {
     for (let i = 0; i < 60; i++) sim.tick(); // let the 2s cast complete
     expect(p.resource).toBeLessThan(mana0); // cost was paid
     expect(marked(member, p.id)).toBe(true);
+    expect(echoAura(member, p.id)?.duration).toBe(15);
   });
 
   it('casts on the caster itself even with no party', () => {

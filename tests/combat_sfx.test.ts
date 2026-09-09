@@ -15,6 +15,7 @@ import {
   mobVoiceCue,
   mobVoiceCueWithFallback,
   mobVoiceFamily,
+  nythraxisCalloutCue,
   playerSwingCueForDamage,
   playerVoiceCue,
   shouldPlayCombatImpactForTarget,
@@ -518,7 +519,7 @@ describe('combat SFX policy', () => {
     ).toBe('impact_fire');
   });
 
-  it('gives Frozen Orb and Glacial Spike their own impact instead of the shared impact_frost', () => {
+  it('gives Frostglobe and Rimeneedle their own impact instead of the shared impact_frost', () => {
     for (const [abilityId, key] of [
       ['frozen_orb', 'frozen_orb'],
       ['glacial_spike', 'glacial_spike'],
@@ -995,7 +996,19 @@ describe('combat SFX policy', () => {
 
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     expect(hud).toContain("case 'varkhulCallout'");
-    expect(hud).toContain('dispatchVarkhulCalloutSfx(');
+    // The HUD arm is shared with the Nythraxis callouts: dispatchRaidCalloutSfx
+    // routes a varkhulCallout event through dispatchVarkhulCalloutSfx.
+    expect(hud).toContain('dispatchRaidCalloutSfx(');
+  });
+
+  it('gives every new Nythraxis warning an existing sampled cue', () => {
+    expect(nythraxisCalloutCue('sigilAppears')).toBe('impact_arcane');
+    expect(nythraxisCalloutCue('sigilBound')).toBe('impact_arcane');
+    expect(nythraxisCalloutCue('sigilUnbound')).toBe('impact_shadow');
+    expect(nythraxisCalloutCue('gravefireTarget')).toBe('impact_shadow');
+    for (const call of ['sigilAppears', 'sigilBound', 'sigilUnbound', 'gravefireTarget'] as const) {
+      expect(nythraxisCalloutCue(call) in SFX_CLIPS, call).toBe(true);
+    }
   });
 });
 

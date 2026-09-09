@@ -3,6 +3,14 @@ export interface CanopyShaderPatchConfig {
   fadeEnd: number;
   creviceDownStart: number;
   creviceDownFull: number;
+  /**
+   * Compile the NormalGL half of the layer (3 more taps plus the
+   * shading-normal bend). False leaves the AO half alone, and the sampler and
+   * strength uniforms it needs are not declared either, so the tier's
+   * fragment shader is genuinely 3 taps rather than 6 with dead code.
+   * canopy_detail_tier_core.ts owns which tier gets which.
+   */
+  normalDetail: boolean;
 }
 
 export interface PatchedShaderSource {
@@ -105,16 +113,18 @@ export function patchCanopyDetailShaderSource(
         vCanopyDown = max( 0.0, -normalize( normal ).y );`,
     );
 
+  // Spliced in place rather than appended, so the full 6-tap arm reproduces
+  // the historical declaration order byte for byte and its program is untouched.
+  const normalTexDecl = config.normalDetail ? '\n        uniform sampler2D uCanopyNormalTex;' : '';
+  const normalStrengthDecl = config.normalDetail ? '\n        uniform float uCanopyStrength;' : '';
   const patchedFragment = fragmentShader
     .replace(
       '#include <common>',
       `#include <common>
         varying vec3 vCanopyWorldPos;
         varying vec3 vCanopyWorldNormal;
-        varying float vCanopyDown;
-        uniform sampler2D uCanopyNormalTex;
-        uniform sampler2D uCanopyAoTex;
-        uniform float uCanopyStrength;
+        varying float vCanopyDown;${normalTexDecl}
+        uniform sampler2D uCanopyAoTex;${normalStrengthDecl}
         uniform float uCanopyTile;
         uniform float uCanopyAoLo;
         uniform float uCanopyAoSpan;
@@ -155,7 +165,8 @@ export function patchCanopyDetailShaderSource(
     )
     .replace(
       '#include <normal_fragment_maps>',
-      `#include <normal_fragment_maps>
+      config.normalDetail
+        ? `#include <normal_fragment_maps>
         if ( canopyDetK > 0.0 ) {
           vec3 canopyNx = texture2D( uCanopyNormalTex, canopyP.zy ).xyz * 2.0 - 1.0;
           vec3 canopyNy = texture2D( uCanopyNormalTex, canopyP.xz ).xyz * 2.0 - 1.0;
@@ -167,7 +178,8 @@ export function patchCanopyDetailShaderSource(
             canopyNx.zyx * canopyW.x + canopyNy.xzy * canopyW.y + canopyNz.xyz * canopyW.z );
           vec3 canopyViewN = normalize( ( viewMatrix * vec4( canopyWorldN, 0.0 ) ).xyz );
           normal = normalize( mix( normal, canopyViewN, uCanopyStrength * canopyDetK ) );
-        }`,
+        }`
+        : '#include <normal_fragment_maps>',
     );
 
   return { vertexShader: patchedVertex, fragmentShader: patchedFragment };

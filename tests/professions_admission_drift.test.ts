@@ -30,6 +30,7 @@ import {
   resolveDisenchant,
 } from '../src/sim/professions/enchanting';
 import { evaluateSalvageAdmission, resolveSalvage } from '../src/sim/professions/salvage';
+import { createRiftGearInstance } from '../src/sim/rift/progression';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, EquipSlot, InvSlot, SimEvent } from '../src/sim/types';
 import { completeRechargeCast } from './helpers/enchant_family_cast';
@@ -290,6 +291,19 @@ describe('apply-enchant admission matches its resolver (shared gates)', () => {
         sim.addItem(DUST, 5, pid);
       },
     },
+    {
+      // Riftbound bands are forge-only: refused by id on both halves so a
+      // doomed cast never starts (a ring enchant would otherwise admit it).
+      name: 'a Riftbound band (forge-only gear)',
+      expected: 'rift_gear',
+      itemId: 'riftbound_band_of_might',
+      enchantId: 'enchant_ring_spirit',
+      setup: (sim, _meta, pid) => {
+        const band = createRiftGearInstance('drift', 'S', 'warrior', pid);
+        sim.addItemInstance(band.itemId, band.instance, pid);
+        sim.addItem(DUST, 5, pid);
+      },
+    },
   ]);
 });
 
@@ -318,8 +332,8 @@ describe('apply-enchant admission matches its resolver (worn arm)', () => {
       },
     },
     {
-      name: 'the confirmed replace re-applies the enchant already worn',
-      expected: 'same_enchant',
+      name: 'the confirmed replace re-applies the enchant already worn (admitted: a normal replace)',
+      expected: null,
       itemId: SWORD,
       enchantId: MIGHT,
       slot: 'mainhand',
@@ -414,8 +428,8 @@ describe('apply-enchant admission matches its resolver (bagged arm)', () => {
 describe('apply-enchant admission matches its resolver (bagged replace arm)', () => {
   runApplyRows([
     {
-      name: 'the confirmed replace re-applies the enchant already on the victim',
-      expected: 'same_enchant',
+      name: 'the confirmed replace re-applies the enchant already on the victim (admitted: a normal replace)',
+      expected: null,
       itemId: SWORD,
       enchantId: MIGHT,
       confirmReplace: true,
@@ -463,6 +477,50 @@ describe('apply-enchant admission matches its resolver (bagged replace arm)', ()
         sim.addItemInstance(SWORD, { enchant: AGILITY, rolled: { stats: { agi: 2 } } }, pid, 1);
         sim.addItem(DUST, 5, pid);
       },
+    },
+  ]);
+});
+
+describe('apply-enchant admission matches its resolver (the requiresPerfected gate)', () => {
+  // The Lucent Infusion holding both rows share: a PLAIN unenchanted copy of
+  // the apex chest (the unconfirmed walk's victim) shadowing an enchanted
+  // Perfected copy (the replace walk's victim), with the bill and the skill
+  // met so only the marker gate can answer.
+  const lucentHolding = (sim: Sim, meta: PlayerMeta, pid: number): void => {
+    meta.craftSkills.enchanting = 125;
+    sim.addItem('briarstep_jerkin', 1, pid);
+    sim.addItemInstance(
+      'briarstep_jerkin',
+      {
+        perfected: true,
+        enchant: 'enchant_chest_lucent_stamina',
+        rolled: { stats: { sta: 10 } },
+      },
+      pid,
+      1,
+    );
+    sim.addItem('lucent_reagent', 6, pid);
+    sim.addItem('arcane_shard', 4, pid);
+  };
+  runApplyRows([
+    {
+      name: 'a confirmed replace peeks the REPLACE victim, the enchanted Perfected copy',
+      // Dropping the confirmReplace forwarding into the admission's
+      // not_perfected gate makes the admission judge the plain shadow copy
+      // and refuse a cast the resolver accepts: this row reds on the
+      // admission side alone (the drift the file exists to catch).
+      expected: null,
+      itemId: 'briarstep_jerkin',
+      enchantId: 'enchant_lucent_infusion',
+      confirmReplace: true,
+      setup: lucentHolding,
+    },
+    {
+      name: 'the unconfirmed apply on the same holding judges the plain copy and denies not_perfected',
+      expected: 'not_perfected',
+      itemId: 'briarstep_jerkin',
+      enchantId: 'enchant_lucent_infusion',
+      setup: lucentHolding,
     },
   ]);
 });

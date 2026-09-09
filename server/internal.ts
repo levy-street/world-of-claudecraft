@@ -28,6 +28,12 @@ import {
   type QueuedLinkChange,
   requeueLinkChanges,
 } from './discord_link_changes';
+import {
+  drainQueuePops,
+  type QueuedQueuePop,
+  queuePopsWatching,
+  requeueQueuePops,
+} from './discord_queue_pops';
 import { drainRelay, type QueuedRelay, requeueRelay } from './discord_relay';
 import type { GameServer } from './game';
 import {
@@ -570,8 +576,8 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  *    successful response on the floor loses those items to its own next full
  *    resync, not to this endpoint.
  *
- * The envelope field order is relay, activity, winners, linkChanges, and each
- * stream keeps its queue's FIFO order. The relay and activity streams keep the
+ * The envelope field order is relay, activity, winners, linkChanges, queuePops,
+ * and each stream keeps its queue's FIFO order. The relay and activity streams keep the
  * item shapes their retired per-endpoint GETs served (invariant D11, now this
  * poll's own contract with the bot); the winners stream dropped the fields
  * announcing never used when the standalone GET's byte-parity pin retired with
@@ -585,16 +591,19 @@ export const outboxHandler: RouteHandler = async (ctx) => {
   let relayItems: QueuedRelay[] = [];
   let activityItems: QueuedActivity[] = [];
   let linkChangeItems: QueuedLinkChange[] = [];
+  let queuePopItems: QueuedQueuePop[] = [];
   try {
     relayItems = drainRelay();
     activityItems = drainActivity();
     linkChangeItems = drainLinkChanges(OUTBOX_LINK_CHANGE_PAGE);
+    queuePopItems = drainQueuePops(Date.now());
     const accountIds = new Set<number>();
     for (const it of relayItems) accountIds.add(it.accountId);
     for (const it of activityItems) {
       for (const accountId of it.accountIds) accountIds.add(accountId);
     }
     for (const it of linkChangeItems) accountIds.add(it.accountId);
+    for (const it of queuePopItems) accountIds.add(it.accountId);
     const links = accountIds.size === 0 ? [] : await discordLinksForAccounts(pool, [...accountIds]);
     const linkByAccount = new Map<number, DiscordOutboxLinkRow>(
       links.map((row) => [row.account_id, row]),
@@ -653,11 +662,25 @@ export const outboxHandler: RouteHandler = async (ctx) => {
       });
     }
 
+    // Queue pops resolve to the ONE Discord id the DM goes to; an unlinked
+    // account (its link removed between the opt-in read and the drain) is
+    // dropped here, the activity stream's nobody-linked rule. `watching` is the
+    // cadence signal (discord_queue_pops.ts header): true while an opted-in,
+    // linked player waits in a queue, so the bot holds its fast poll for as
+    // long as a DM could be needed and no longer.
+    const queuePops: unknown[] = [];
+    for (const it of queuePopItems) {
+      const discordUserId = linkByAccount.get(it.accountId)?.discord_user_id ?? null;
+      if (discordUserId === null) continue;
+      queuePops.push({ ...it, discordUserId });
+    }
+
     return ok(ctx.res, {
       relay: { items: relay },
       activity: { items: activity },
       winners,
       linkChanges: { items: linkChanges },
+      queuePops: { items: queuePops, watching: queuePopsWatching() },
     });
   } catch (err) {
     // The queues are the bot's only copy of these items, so a failed response
@@ -666,6 +689,7 @@ export const outboxHandler: RouteHandler = async (ctx) => {
     requeueRelay(relayItems);
     requeueActivity(activityItems);
     requeueLinkChanges(linkChangeItems);
+    requeueQueuePops(queuePopItems);
     throw err;
   }
 };

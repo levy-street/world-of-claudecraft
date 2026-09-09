@@ -547,8 +547,19 @@ describe('coachPromptChips + coachGlowButtonId (the touch button mapping)', () =
     expect(coachGlowButtonId(null, 'touch', inputs)).toBeNull();
   });
 
-  it('names the working controller route for bag-item lessons', () => {
-    const bags = { ...inputs, padControlCaps: ['View'] };
-    expect(coachPromptChips('use', 'pad', bags)).toEqual([{ cap: 'View' }]);
+  it('keeps keyboard and touch bag guidance unchanged while accepting the pad route', () => {
+    const bags = {
+      ...inputs,
+      padControlCaps: ['R3', 'D-pad', 'A', 'D-pad', 'A'],
+    };
+    expect(coachPromptChips('use', 'keyboard', bags)).toEqual([{ cap: 'B' }]);
+    expect(coachPromptChips('use', 'touch', bags)).toEqual([]);
+    expect(coachPromptChips('use', 'pad', bags)).toEqual([
+      { cap: 'R3' },
+      { cap: 'D-pad' },
+      { cap: 'A' },
+      { cap: 'D-pad' },
+      { cap: 'A' },
+    ]);
   });
 });

@@ -103,7 +103,13 @@ describe('Shaman v0.29 Spiritmend', () => {
     );
     expect(owned).toHaveLength(1);
     expect(owned[0].value).toBeGreaterThan(firstAmount);
-    expect(owned[0].value).toBeLessThanOrEqual(ally.maxHp * 0.3);
+    // The pool cap is an INTEGER (shaman_spiritmend.ts depositRawMendingCurrent:
+    // `Math.round(target.maxHp * MENDING_CURRENT_MAX_HP_CAP)`), so the bound here
+    // must match that rounding, not the raw fraction. Restoration's v0.42.0
+    // primaryHealingMultiplier (x1.10) pushes this deposit to exactly saturate
+    // the cap, which previously landed comfortably under the raw-fraction bound
+    // and never exercised the round-up case.
+    expect(owned[0].value).toBeLessThanOrEqual(Math.round(ally.maxHp * 0.3));
     // The helper continues ticking after the cast resolves; a refreshed
     // 12-second pool should still retain roughly nine seconds here.
     expect(owned[0].remaining).toBeGreaterThan(9);

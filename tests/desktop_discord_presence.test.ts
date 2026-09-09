@@ -613,13 +613,21 @@ describe('discord presence: src/main.ts wiring pins', () => {
   const mainSource = stripComments(readFileSync(join(__dirname, '..', 'src', 'main.ts'), 'utf8'));
 
   it('routes the options toggle through the push, same polarity end to end', () => {
-    expect(mainSource).toContain("if (key === 'discordPresence') {");
+    // The arm lives in src/game/desktop_shell_settings.ts; main.ts routes every
+    // shell-mirrored key through it.
+    const shellSource = stripComments(
+      readFileSync(join(__dirname, '..', 'src', 'game', 'desktop_shell_settings.ts'), 'utf8'),
+    );
     expect(mainSource).toContain(
-      "pushDiscordPresenceEnabled(desktopBridge(), settings.set('discordPresence', !!value));",
+      'if (applyDesktopShellSetting(key, value, settings, desktopBridge())) return;',
+    );
+    expect(shellSource).toContain("if (key === 'discordPresence') {");
+    expect(shellSource).toContain(
+      "pushDiscordPresenceEnabled(bridge, settings.set('discordPresence', !!value));",
     );
     // No inversion at this crossing (unlike the GPU preference beside it): a `!`
     // added in front of the stored value would tell the shell the opposite.
-    expect(mainSource).not.toContain('pushDiscordPresenceEnabled(desktopBridge(), !settings.set(');
+    expect(shellSource).not.toContain('pushDiscordPresenceEnabled(bridge, !settings.set(');
   });
 
   it('feeds the presence from BOTH frame paths, and only those two', () => {

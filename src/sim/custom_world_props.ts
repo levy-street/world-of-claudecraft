@@ -6,7 +6,7 @@ const EASTBROOK_BUILDING_IDS = new Set<string>([
   ...EASTBROOK_LAYOUT.preservedBuildings.map((placement) => placement.id),
   ...EASTBROOK_LAYOUT.buildings.map((placement) => placement.id),
 ]);
-const EASTBROOK_WELL_IDS = new Set<string>([EASTBROOK_LAYOUT.civic.wellBeacon.id]);
+const EASTBROOK_WELL_IDS = new Set<string>([EASTBROOK_LAYOUT.civic.monument.id]);
 const EASTBROOK_STALL_IDS = new Set<string>(
   EASTBROOK_LAYOUT.market.stalls.map((placement) => placement.id),
 );

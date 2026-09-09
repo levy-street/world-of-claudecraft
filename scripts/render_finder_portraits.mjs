@@ -33,6 +33,7 @@ import {
   portraitRendererFingerprint,
   sha256,
 } from './lib/mob_portrait_jobs.mjs';
+import { recordRenderEnv } from './lib/mob_portrait_render_env.mjs';
 
 const root = process.cwd();
 const publicDir = path.join(root, 'public');
@@ -167,6 +168,40 @@ if (only) {
 await page.goto(`${origin}/__portraits.html`, { waitUntil: 'load', timeout: 30000 });
 await page.waitForFunction('window.__ready === true', { timeout: 20000 });
 
+// WHERE these bytes are being baked, asked of the live GL context rather than
+// inferred from the launch flags. The flags above are a REQUEST; what actually
+// answers is the driver, and the driver is what decides the pixels. Portrait
+// WebPs are deterministic per machine and not across GL stacks, so without this
+// a re-bake on a second machine moves every committed row while every render
+// input is identical, and the manifest acceptance can only read that as content
+// drift (scripts/lib/mob_portrait_render_env.mjs carries the full reasoning).
+const renderEnv = recordRenderEnv({
+  platform: process.platform,
+  arch: process.arch,
+  requestedBackend: process.env.REAL_GPU ? 'metal' : 'swiftshader',
+  browserVersion: await browser.version(),
+  ...(await page.evaluate(() => {
+    // A throwaway context: the render canvas is mid-scene and must not be
+    // disturbed, and the debug extension is per-context anyway.
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+    if (!gl) return { gpuVendor: '', gpuRenderer: '' };
+    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    if (!debugInfo) {
+      // Masked strings still separate the stacks far better than nothing.
+      return { gpuVendor: gl.getParameter(gl.VENDOR), gpuRenderer: gl.getParameter(gl.RENDERER) };
+    }
+    return {
+      gpuVendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+      gpuRenderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL),
+    };
+  })),
+});
+console.log(
+  `render environment ${renderEnv.fingerprint.slice(0, 12)} ` +
+    `(${renderEnv.platform}/${renderEnv.arch}, ${renderEnv.gpuRenderer || 'unknown GL'})`,
+);
+
 let ok = 0;
 let failed = 0;
 const renderedPortraits = [];
@@ -246,6 +281,10 @@ if (receiptPath) {
     schemaVersion: 1,
     generatedBy: 'scripts/render_finder_portraits.mjs',
     rendererFingerprint: portraitRendererFingerprint(renderer),
+    // Observed above, beside the renderer fingerprint: WHAT rendered these bytes
+    // and WHERE, so the acceptance can tell a re-bake on another GPU stack from
+    // an art change.
+    renderEnv,
     portraits: renderedPortraits.sort((left, right) => left.id.localeCompare(right.id)),
   };
   mkdirSync(path.dirname(receiptPath), { recursive: true });

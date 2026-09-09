@@ -1011,10 +1011,22 @@ describe('persistence', () => {
     const m2 = meta(sim2, pid);
     expect(m2.bank.unlockedSockets).toBe(2);
     expect(m2.bank.socketBags).toEqual([GENERAL_16, null, null, null]);
-    expect(m2.bank.inventory).toEqual(m.bank.inventory);
+    // The load path stamps the legacy (unsigned) ore stack with its exact
+    // provenance (material_slot_load.ts normalizeLoadedMaterialSlot), so the
+    // reloaded copy carries `materialSources` the pre-load `m.bank.inventory`
+    // never had; comparing the two directly would be a stale premise.
+    const oreCount = stackSizeOf(ITEMS[ORE]);
+    const normalizedInventory = [
+      { itemId: ORE, count: oreCount, materialSources: [{ count: oreCount, source: {} }] },
+    ];
+    expect(m2.bank.inventory).toEqual(normalizedInventory);
     expect(bankPools(m2.bank)).toEqual({ general: 40, materials: 0 });
-    // A second round trip is byte-stable.
-    expect(sim2.serializeCharacter(pid)!.bank).toEqual(state.bank);
+    // A second round trip is byte-stable: normalization already landed on
+    // this load, so re-serializing carries it forward unchanged.
+    expect(sim2.serializeCharacter(pid)!.bank).toEqual({
+      ...state.bank,
+      inventory: normalizedInventory,
+    });
   });
 
   it('a zero-socket character serializes with the socket keys ABSENT', () => {

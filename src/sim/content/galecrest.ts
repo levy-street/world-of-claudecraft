@@ -138,7 +138,9 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0xd8d0c0,
-    componentTags: ['hide', 'meat'],
+    // A ram is horned (horn maps to curved_tusk per 11m-ORPHAN). Phase 11m
+    // added the tag as a band-3 open-world horn source.
+    componentTags: ['hide', 'horn', 'meat'],
   },
   gale_wisp: {
     id: 'gale_wisp',
@@ -175,7 +177,9 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.2,
     color: 0x8898a8,
-    componentTags: ['meat'],
+    // A shoal crab breathes through gills like the murlocs and the bogtoad.
+    // Phase 11m added the tag (gills maps to mudfin_scale per 11m-ORPHAN).
+    componentTags: ['gills', 'meat'],
   },
   downs_bandit: {
     id: 'downs_bandit',

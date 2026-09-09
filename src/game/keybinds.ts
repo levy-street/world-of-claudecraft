@@ -92,7 +92,7 @@ const SLOT_DEFAULTS = [
 ];
 
 export const BIND_ACTIONS: BindAction[] = [
-  // Movement / camera — polled every frame (held)
+  // Movement / camera: polled every frame (held)
   {
     id: 'forward',
     label: 'Move Forward',
@@ -326,6 +326,46 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyX'],
   },
+  // The Harvest Journal parks on Shift+K. Its own initials are both spoken
+  // for on the shifted layer (Shift+H is Damage Meters, Shift+J is Target
+  // Buffs and Debuffs), and K is the free key next to them; bare KeyK stays
+  // the Leaderboard. Rebindable like any action.
+  {
+    id: 'harvestJournal',
+    label: 'Harvest Journal',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyK'],
+  },
+  // Perfecting parks on the shifted layer of KeyT, Crafting's letter: bare
+  // KeyT is Crafting, its own initial is spoken for on both layers (bare P is
+  // the Spellbook, Shift+P is Professions), and Perfecting is the crafting
+  // family's endgame surface, so it sits over Crafting the way Professions
+  // sits over the Spellbook. Rebindable like any action.
+  {
+    id: 'perfecting',
+    label: 'Perfecting',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyT'],
+  },
+  // Loot Explorer parks on Shift+O: bare KeyO is free, and Shift+O keeps the
+  // shifted-letter-row convention every other collection/catalog window uses.
+  {
+    id: 'lootExplorer',
+    label: 'Loot Explorer',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyO'],
+  },
+  // Cosmetics uses Shift+Y; Shift+K belongs to the Harvest Journal.
+  {
+    id: 'cosmetics',
+    label: 'Cosmetics',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyY'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',
@@ -410,6 +450,20 @@ export const BIND_CATEGORIES = [...new Set(BIND_ACTIONS.map((a) => a.category))]
 // first rebind. The legacy blob is read-only here and never overwritten.
 const KEY_PREFIX = 'woc_keybinds';
 const SLOTS_PER_ACTION = 2; // primary + secondary
+// Marks a stored profile as already having run repairStoredBindings() at least
+// once, so the signature match in keybinds_repair.ts is genuinely one-time
+// rather than re-evaluated on every load. Without this, a deliberate rebind
+// that happens to reproduce an old corruption signature (e.g. slot10/11 -> Q/E,
+// which evicts strafeLeft/strafeRight to null via the ordinary uniqueness sweep
+// in bind(), byte-identical to the reverted Q/E strafe overhaul's leftover
+// shape) gets silently reverted on every relogin instead of just once. Not a
+// valid BIND_ACTIONS id, so it is never touched by the id-keyed load/save loops.
+// IMPORTANT for a future repair signature (a "Signature C"): once this marker is
+// set, repairStoredBindings() never runs again for that profile, so a signature
+// added later will never fire for anyone who saved since this shipped. Adding one
+// means deciding (and documenting here) whether existing marked profiles need to
+// see it too, e.g. by moving this to a version number bumped for that signature.
+const REPAIR_MARKER = '__repaired';
 
 export function actionKind(id: string): BindKind | null {
   return ACTION_BY_ID.get(id)?.kind ?? null;
@@ -435,7 +489,7 @@ export interface KeyMods {
   meta?: boolean;
 }
 
-// e.code values for the modifier keys themselves — never bindable on their own.
+// e.code values for the modifier keys themselves, never bindable on their own.
 const MODIFIER_CODES = new Set([
   'ShiftLeft',
   'ShiftRight',
@@ -536,6 +590,41 @@ function codeLabel(code: string): string {
   return named[code] ?? code;
 }
 
+const MODIFIER_NAMES = new Set(['Ctrl', 'Alt', 'Shift', 'Meta']);
+const CODE_RE = /^[A-Za-z0-9]+$/;
+
+/**
+ * The one shape a stored or imported binding may take, re-spelled the way
+ * makeCombo spells it: each modifier at most once, in canonical order, over a
+ * bare KeyboardEvent.code (or a Mouse<n> pseudo-code). A modifier key may be the
+ * bare code (Swim Down is Left Ctrl by default, polled as a held key) but never
+ * under a modifier head, and no head repeats. Returns null for anything else
+ * (`Shift+Shift+KeyA`, `Alt+ControlRight`, a garbage string), which applyBlob
+ * then skips: such a value could never match a keydown, and one sink (the
+ * keyboard overview) turns a code into a DOM lookup. A hand-edited
+ * `Shift+Ctrl+KeyA` comes back as `Ctrl+Shift+KeyA`.
+ */
+export function canonicalCombo(raw: string): string | null {
+  const parts = raw.split('+');
+  const code = parts.pop() ?? '';
+  if (!CODE_RE.test(code)) return null;
+  if (isModifierCode(code) && parts.length > 0) return null;
+  if (parts.some((m) => !MODIFIER_NAMES.has(m)) || new Set(parts).size !== parts.length)
+    return null;
+  return makeCombo(code, {
+    ctrl: parts.includes('Ctrl'),
+    alt: parts.includes('Alt'),
+    shift: parts.includes('Shift'),
+    meta: parts.includes('Meta'),
+  });
+}
+
+/** The registry's English label for an action id (the fallback name the
+ *  display-name table uses for an action it does not know). */
+export function bindActionLabel(id: string): string | undefined {
+  return ACTION_BY_ID.get(id)?.label;
+}
+
 // Read a stored bindings blob, returning a plain object map or null. A missing,
 // corrupt (unparseable), or non-object value (including a JSON array) counts as
 // "no profile"; the caller then falls back to the legacy seed or to defaults.
@@ -607,13 +696,26 @@ export class Keybinds {
     // changes (Q/E strafe overhaul; targetFriendly/meters KeyH collision). It
     // deletes only the exact corrupted keys so they re-seed to current defaults
     // below, and leaves every other stored value (including deliberate remaps)
-    // untouched. See keybinds_repair.ts.
-    repairStoredBindings(obj);
-    // Apply stored codes over the defaults, but only for known actions and
-    // never letting one code land on two actions (first writer keeps it).
-    // Actions absent from the stored blob (e.g. ones added in a later release
-    // than the player's last save) KEEP their defaults rather than loading
-    // unbound — explicit stored bindings still win, so this only fills gaps.
+    // untouched. See keybinds_repair.ts. Gated on REPAIR_MARKER so it truly runs
+    // once per profile: without the gate, a deliberate remap that later
+    // reproduces the same corrupted shape (see REPAIR_MARKER's own comment)
+    // would keep getting reverted on every load.
+    if (obj[REPAIR_MARKER] !== true) {
+      repairStoredBindings(obj);
+    }
+    this.applyBlob(obj);
+  }
+
+  /**
+   * Apply a bindings blob (stored profile or an imported setup) over the current
+   * defaults. Only known actions are read, and one code never lands on two
+   * actions (first writer keeps it). Actions absent from the blob (e.g. ones
+   * added in a later release than the blob was written by) KEEP their defaults
+   * rather than going unbound; explicit entries still win, so this only fills
+   * gaps. Shared by load() and importBindings() so an imported setup obeys the
+   * exact invariants a stored one does.
+   */
+  private applyBlob(obj: Record<string, unknown>): void {
     const claimed = new Set<string>();
     for (const a of BIND_ACTIONS) {
       const entry = obj[a.id];
@@ -621,8 +723,14 @@ export class Keybinds {
       const slots: (string | null)[] = [null, null];
       const shared = actionAllowsShared(a.id);
       for (let i = 0; i < SLOTS_PER_ACTION; i++) {
-        const v = entry[i];
-        if (typeof v !== 'string' || isReservedCode(v)) continue;
+        const raw = entry[i];
+        const combo = typeof raw === 'string' ? canonicalCombo(raw) : null;
+        if (combo === null) continue;
+        // Held (movement) actions are stored bare, as bind() stores them; a
+        // modifier on one (only a hand-edited import can carry it) is dropped
+        // so the poll and the eviction sweep keep matching.
+        const v = a.kind === 'held' ? comboCode(combo) : combo;
+        if (isReservedCode(v)) continue;
         // Shared actions keep their code even if another action already claimed
         // it, and never claim it themselves, so the overlap survives a round-trip.
         if (!shared && claimed.has(v)) continue;
@@ -648,9 +756,34 @@ export class Keybinds {
     }
   }
 
-  private save(): void {
+  /**
+   * The current bindings as a plain actionId -> [primary, secondary] object, the
+   * same shape save() persists. This is the payload a hotkey-setup export
+   * carries (src/ui/keybind_transfer_core.ts); a copy, so callers cannot mutate
+   * the live map through it.
+   */
+  snapshot(): Record<string, (string | null)[]> {
     const obj: Record<string, (string | null)[]> = {};
+    for (const [id, codes] of this.map) obj[id] = [...codes];
+    return obj;
+  }
+
+  /**
+   * Replace this profile with an imported hotkey setup: defaults first, then the
+   * blob applied with load()'s validation (unknown actions ignored, reserved
+   * codes skipped, one code per action, missing actions keep their defaults).
+   * Persists immediately, so the setup survives a reload like any rebind.
+   */
+  importBindings(obj: Record<string, unknown>): void {
+    this.map = this.defaults();
+    this.applyBlob(obj);
+    this.save();
+  }
+
+  private save(): void {
+    const obj: Record<string, (string | null)[] | boolean> = {};
     for (const [id, codes] of this.map) obj[id] = codes;
+    obj[REPAIR_MARKER] = true;
     try {
       localStorage.setItem(this.storeKey, JSON.stringify(obj));
     } catch {
@@ -707,7 +840,7 @@ export class Keybinds {
     return keyLabel(this.codeAt(id, index));
   }
 
-  /** Primary (or, if unset, secondary) label — used for action-bar keycaps. */
+  /** Primary (or, if unset, secondary) label, used for action-bar keycaps. */
   primaryLabel(id: string): string {
     const codes = this.map.get(id) ?? [];
     return keyLabel(codes[0] ?? codes[1] ?? null);

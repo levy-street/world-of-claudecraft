@@ -9,32 +9,75 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import type { ItemDef } from '../src/sim/types';
-import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
+import type { AuraKind, ItemDef } from '../src/sim/types';
+import { elixirTooltipLines } from '../src/ui/hud/professions/elixir_tooltip_view';
 import { formatNumber, setLanguage } from '../src/ui/i18n';
 
-// Synthetic elixir variants: one def spread with a replaced record, so the
-// mapped-stat rows, the formatter options, and the escaping are each pinned
-// off-data (every shipped elixir is a small-number buff_sta, which exercises
-// exactly one map row and no grouping, rounding, or escaping).
-function elixirDef(record: NonNullable<ItemDef['elixir']>): ItemDef {
-  return { ...ITEMS.elixir_of_the_boar, elixir: record };
+/** The shared temporary-buff effect record both builders read. */
+type BuffRecord = { aura: string; kind: AuraKind; value: number; duration: number };
+
+// Synthetic probe defs, so the mapped-stat rows, the formatter options, and the
+// escaping are each pinned off-data (every shipped elixir is a small-number
+// buff_sta, which exercises exactly one map row and no grouping, rounding, or
+// escaping). Written as whole literals rather than a spread of a shipped def:
+// ItemDef is a discriminated union whose flask arm NARROWS the effect record's
+// kind (types.ts FlaskAuraKind), so a spread carries the whole union's shape
+// along and refuses a probe record on the unrelated arms. Both builders read
+// only the kind and the payload, so a literal is exactly as faithful.
+function elixirDef(record: BuffRecord): ItemDef {
+  return {
+    id: 'qa_probe_elixir',
+    name: 'QA Probe Elixir',
+    kind: 'elixir',
+    quality: 'common',
+    sellValue: 1,
+    // Cast at this ONE boundary, deliberately. TimedStatBuffPayload.kind is
+    // narrowed to TimedStatBuffAuraKind (the three flat-stat kinds the live
+    // carriers use), so an unmapped kind is no longer constructible through the
+    // def type at all. That narrowing is what the fallback below defends
+    // against being needed for, but the fallback is still the safety net for
+    // the day the union widens without ELIXIR_STAT_KEYS gaining the row, so the
+    // probe reaches past the type to keep exercising it.
+    elixir: record as ItemDef['elixir'],
+  };
 }
 
 describe('elixirTooltipLines', () => {
   afterEach(() => setLanguage('en'));
 
-  it('elixir of the boar states its stamina buff, duration, and combat use', () => {
+  it('elixir of the boar states its stamina buff, duration, replacement rule, and combat use', () => {
+    // The replacement clause is the family exclusivity rule at the point of
+    // use (a scroll and an elixir of one stat share a single buff slot).
     expect(elixirTooltipLines(ITEMS.elixir_of_the_boar)).toBe(
-      '<div class="tt-desc">Use: Increases your Stamina by 6 for 10 min. Usable in combat.</div>',
+      '<div class="tt-desc">Use: Increases your Stamina by 6 for 10 min. Replaces any other elixir or scroll of the same stat. Usable in combat.</div>',
     );
   });
 
-  it('every elixir in the game data renders a use line carrying its own numbers', () => {
-    const elixirs = Object.values(ITEMS).filter((def) => def.kind === 'elixir');
-    // bear, boar, venomfire, serpent: all four are recipe outputs (the bear
-    // via the combo recipe, the rest on the alchemy ladder).
-    expect(elixirs.length).toBeGreaterThanOrEqual(4);
+  it('a buff scroll renders the SAME use line as its band elixir (alternative source)', () => {
+    // The inscription scrolls (phase 06) reuse the elixir payload and the
+    // same view arm (it gates on the record, not the kind), so a scroll and
+    // its band elixir promise the identical buff in the identical words.
+    expect(ITEMS.silverleaf_scroll.kind).toBe('scroll');
+    expect(elixirTooltipLines(ITEMS.silverleaf_scroll)).toBe(
+      elixirTooltipLines(ITEMS.elixir_of_the_boar),
+    );
+    expect(elixirTooltipLines(ITEMS.goldleaf_scroll)).toBe(
+      elixirTooltipLines(ITEMS.venomfire_elixir),
+    );
+    expect(elixirTooltipLines(ITEMS.sunpetal_scroll)).toBe(
+      elixirTooltipLines(ITEMS.elixir_of_the_serpent),
+    );
+    // And the line is real, not two empty strings agreeing.
+    expect(elixirTooltipLines(ITEMS.silverleaf_scroll)).toContain('Use:');
+  });
+
+  it('every elixir and scroll in the game data renders a use line carrying its own numbers', () => {
+    const elixirs = Object.values(ITEMS).filter(
+      (def) => def.kind === 'elixir' || def.kind === 'scroll',
+    );
+    // bear, boar, venomfire, serpent plus the three phase 06 scrolls: all
+    // recipe outputs except the bear, which drops and combo-crafts.
+    expect(elixirs.length).toBeGreaterThanOrEqual(7);
     for (const def of elixirs) {
       expect(def.elixir, `${def.id} must carry an elixir effect record`).toBeDefined();
       const html = elixirTooltipLines(def);
@@ -55,12 +98,16 @@ describe('elixirTooltipLines', () => {
       elixirDef({ aura: 'Probe', kind: 'buff_sta', value: 1234, duration: 450 }),
     );
     expect(html).toBe(
-      '<div class="tt-desc">Use: Increases your Stamina by 1,234 for 7.5 min. Usable in combat.</div>',
+      '<div class="tt-desc">Use: Increases your Stamina by 1,234 for 7.5 min. Replaces any other elixir or scroll of the same stat. Usable in combat.</div>',
     );
   });
 
   it('maps every stat-buff kind to its own stat label', () => {
-    const cases: Array<[NonNullable<ItemDef['elixir']>['kind'], string]> = [
+    // BuffRecord's own wide kind, not the def's narrowed one: two of these
+    // four rows (buff_agi, buff_armor) are stat labels the map still carries
+    // for a kind no shipped carrier uses, and the narrowing means they can
+    // only be reached through the probe boundary in elixirDef above.
+    const cases: Array<[BuffRecord['kind'], string]> = [
       ['buff_int', 'Intellect'],
       ['buff_agi', 'Agility'],
       ['buff_armor', 'Armor'],
@@ -87,7 +134,7 @@ describe('elixirTooltipLines', () => {
       duration: 300,
     });
     expect(elixirTooltipLines(def)).toBe(
-      '<div class="tt-desc">Use: Grants Might of the Boar for 5 min. Usable in combat.</div>',
+      '<div class="tt-desc">Use: Grants Might of the Boar for 5 min. Replaces any other elixir or scroll of its kind. Usable in combat.</div>',
     );
   });
 
@@ -121,6 +168,9 @@ describe('elixirTooltipLines', () => {
     // alone: a /* strip would misfire on string and regex literals, the
     // gather_tool_tooltip.test.ts idiom). Scoped to the itemTooltip method
     // body so the call cannot drift into some other surface and still pass.
+    // The Well Fed line moved to the ONE surviving view in
+    // wellfed_tooltip_view.ts (Masterwrought 11c); its wiring, including the
+    // exactly-one-call rule, is pinned in tests/wellfed_tooltip_view.test.ts.
     const hudSrc = readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8').replace(
       /^\s*\/\/.*$/gm,
       '',
@@ -129,6 +179,79 @@ describe('elixirTooltipLines', () => {
     const end = hudSrc.indexOf('private itemProcBlock(');
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
-    expect(hudSrc.slice(start, end)).toContain('html += elixirTooltipLines(item);');
+    const body = hudSrc.slice(start, end);
+    expect(body).toContain('html += elixirTooltipLines(item);');
+  });
+
+  describe('flask rules', () => {
+    // A flask renders the shared Use line PLUS four rules; an elixir or scroll
+    // of the same family renders the Use line alone. Both directions are
+    // pinned, because the gate is the item KIND and an inverted gate would put
+    // the flask rules on every elixir in the game.
+    const FLASK_RULES = [
+      '<div class="tt-desc">Only one flask effect at a time. Drinking another flask replaces this one.</div>',
+      '<div class="tt-desc">A weaker elixir or scroll of the same stat cannot replace it.</div>',
+      // The counter-immunity clause (phase 10 QA STK-2 ruling): the mint
+      // stamps undispellable, so dispel, Spellplunder, and the owner's own
+      // right-click all refuse, and the tooltip states the limits per the
+      // live mechanic (docs/design/tooltip-writing.md).
+      '<div class="tt-desc">It cannot be dispelled, stolen, or canceled by hand.</div>',
+      // The clean-slate clause is the instanced-match limit (aurasSurvivingCleanSlate,
+      // reached directly at arena entry and Fiesta downs and indirectly through
+      // readyArenaFighter clearPrep: true at every seat, start, end, and Yumi
+      // revive) the QA audit found the line silent about; death survival is unchanged.
+      '<div class="tt-desc">The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.</div>',
+    ];
+
+    it('a flask adds its four rules under the shared Use line', () => {
+      expect(ITEMS.ironhusk_flask.kind).toBe('flask');
+      // The magnitude in the sentence below is the DEF's, so the literal names
+      // its source: Phase 15's R5 envelope tune moved the flask band 15 to 13
+      // and this pin moved with it.
+      expect(ITEMS.ironhusk_flask.elixir?.value).toBe(13);
+      const html = elixirTooltipLines(ITEMS.ironhusk_flask);
+      // The Use line is the SAME sentence the elixirs get, word for word: a
+      // flask really does replace the same-stat elixir or scroll, so the rules
+      // are additions rather than a restatement.
+      expect(html).toContain(
+        '<div class="tt-desc">Use: Increases your Stamina by 13 for 20 min. Replaces any other elixir or scroll of the same stat. Usable in combat.</div>',
+      );
+      for (const rule of FLASK_RULES) expect(html, `flask must state: ${rule}`).toContain(rule);
+      // Exactly five blocks, so a rule cannot be dropped or doubled unnoticed.
+      expect(html.split('<div class="tt-desc">')).toHaveLength(6);
+    });
+
+    it('every shipped flask states all four, on its own stat axis', () => {
+      const flasks = Object.values(ITEMS).filter((def) => def.kind === 'flask');
+      // The three role flasks: stamina, attack power, intellect.
+      expect(flasks.length).toBeGreaterThanOrEqual(3);
+      const axes = new Set<string>();
+      for (const def of flasks) {
+        const html = elixirTooltipLines(def);
+        for (const rule of FLASK_RULES)
+          expect(html, `${def.id} must state: ${rule}`).toContain(rule);
+        axes.add(def.elixir?.kind ?? '');
+      }
+      // Not one axis three times: the rules ride every role, not just stamina.
+      expect(axes.size).toBeGreaterThanOrEqual(3);
+    });
+
+    it('an elixir and a scroll state NONE of them (the other direction)', () => {
+      for (const def of [
+        ITEMS.elixir_of_the_boar,
+        ITEMS.elixir_of_the_serpent,
+        ITEMS.silverleaf_scroll,
+        ITEMS.sunpetal_scroll,
+      ]) {
+        const html = elixirTooltipLines(def);
+        // The premise: these really do render a Use line, so the absences
+        // below are refusals rather than an empty string agreeing with itself.
+        expect(html, `${def.id} renders a use line`).toContain('Use:');
+        for (const rule of FLASK_RULES) {
+          expect(html, `${def.id} must NOT state a flask rule`).not.toContain(rule);
+        }
+        expect(html.split('<div class="tt-desc">')).toHaveLength(2);
+      }
+    });
   });
 });

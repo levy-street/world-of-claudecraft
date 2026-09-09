@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Thu hoach mot mach quang, mot vung go va mot luong thao moc o Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Gon song tren gieng trang',
     desc: 'Cau mot con ca trong vung nuoc Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -187,7 +186,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Bậc Thầy Đồng Cỏ', desc: 'Đạt 100 điểm thành thạo Thảo Dược Học.' },
   prog_master_gatherer: {
     name: 'Bậc Thầy Thu Thập',
-    desc: 'Đạt 100 điểm thành thạo trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá.',
   },
   prog_first_craft: {
     name: 'Làm Bằng Đôi Tay',
@@ -301,7 +299,6 @@ export const table: DeedLocaleTable = {
     title: 'Kẻ Đốn Long',
   },
   dgn_sanctum_speed: {
-    name: 'Nước Rút Thánh Đường',
     desc: 'Đánh bại Korzul Mộ Long trong vòng 15 phút kể từ khi tổ đội của bạn tiến chiếm Thánh Đường Mộ Long.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -361,7 +358,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Chuông Ngừng Ngân',
-    desc: 'Đánh bại Chấp Sự Varric khi mọi Kẻ Rung Chuông Tang Lễ hắn dựng dậy đều đã bị diệt từ trước.',
+    desc: 'Đánh bại Chấp Sự Vandric khi mọi Kẻ Rung Chuông Tang Lễ hắn dựng dậy đều đã bị diệt từ trước.',
   },
   dlv_nhalia_bells: {
     name: 'Kẻ Lặng Chuông',
@@ -374,7 +371,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Biên Niên Sử Thung Lũng, Chương II',
-    desc: 'Hoàn thành chương thứ hai trong biên niên sử của Saul: dẹp yên lũ cướp, đám murloc và loài sâu bọ trong mỏ, so tài trên Sân Heo Nái, và liều mình bước vào Thánh Tích Sụp Đổ.',
   },
   chr_vale_chapter_iii: {
     name: 'Trọn Bộ Biên Niên Sử Thung Lũng',
@@ -392,7 +388,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Kẻ Phá Bầy', desc: 'Hạ 3 Sói Rừng trong vòng 10 giây.' },
   chr_vale_cup_debut: {
     name: 'Kẻ Tranh Xô Đồng',
-    desc: 'Ra sân và chạm bóng trong một trận Cúp Thung Lũng tại Sân Heo Nái.',
   },
   chr_vale_rares: {
     name: 'Nỗi Kinh Hoàng Thung Lũng',
@@ -437,12 +432,11 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Trọn Bộ Biên Niên Sử Đỉnh Gai',
-    desc: 'Theo trọn câu chuyện của ngọn núi: Long Giáo bị đập tan, Thánh Đường Mộ Long phải bặt tiếng, Đỉnh Núi Thức Giấc bị quật ngã, và mọi nỗi kinh hoàng hữu danh của vách đá đều bị hạ gục.',
     title: 'Xứ Đỉnh Gai',
   },
   chr_peaks_sparring: {
     name: 'Luyện Đòn Trên Tường',
-    desc: 'Gây tổng cộng 1.000 sát thương lên Hình Nộm Tập Luyện phía trên Vọng Đài Cao.',
+    desc: 'Gây tổng cộng 1.000 sát thương lên một hình nộm tập luyện.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Nước Lạnh, Ánh Sáng Còn Lạnh Hơn',
@@ -535,7 +529,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Khách Quen Hạng Nhất',
-    desc: 'Khám phá đủ cả mười món hàng của Quân Nhu Trưởng Vex.',
+    desc: 'Khám phá đủ cả mười món trang bị của Quân Nhu Trưởng Vex.',
   },
   col_glimmerfin: {
     name: 'Tia Hy Vọng Lấp Lánh',
@@ -589,66 +583,51 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Đôi Giày Chạm Cỏ',
-    desc: 'Chơi trọn vẹn một trận Cúp Thung Lũng tại Sân Heo Nái, dù thắng hay thua.',
   },
   pvp_vcup_first_win: {
     name: 'Chiếc Cúp Đầu Tay',
-    desc: 'Thắng một trận Cúp Thung Lũng xếp hạng.',
   },
-  pvp_vcup_wins_10: { name: 'Cầu Thủ Dạn Dày', desc: 'Thắng 10 trận Cúp Thung Lũng xếp hạng.' },
+  pvp_vcup_wins_10: { name: 'Cầu Thủ Dạn Dày' },
   pvp_vcup_wins_25: {
     name: 'Huyền Thoại Bóng Heo Rừng',
-    desc: 'Thắng 25 trận Cúp Thung Lũng xếp hạng.',
     title: 'Huyền Thoại Bóng Heo Rừng',
   },
   pvp_vcup_first_goal: {
     name: 'Khai Nòng',
-    desc: 'Ghi một bàn thắng trong một trận Cúp Thung Lũng xếp hạng.',
   },
   pvp_vcup_hat_trick: {
     name: 'Người Hùng Hat-trick',
-    desc: 'Ghi ba bàn trong cùng một trận Cúp Thung Lũng xếp hạng, ở nhánh 3v3 trở lên.',
   },
   pvp_vcup_golden_goal: {
     name: 'Khoảnh Khắc Vàng',
-    desc: 'Ghi bàn thắng vàng định đoạt một trận Cúp Thung Lũng xếp hạng.',
   },
   pvp_vcup_first_save: {
     name: 'Đôi Tay Vững Vàng',
-    desc: 'Cản phá một pha bóng trong vai thủ môn ở một trận Cúp Thung Lũng xếp hạng.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Đừng Hòng Qua Được Ta',
-    desc: 'Thắng một trận Cúp Thung Lũng xếp hạng trong vai thủ môn mà không để thủng lưới bàn nào.',
   },
   pvp_vcup_guild_win: {
     name: 'Vì Màu Cờ Sắc Áo',
-    desc: 'Thắng một trận Cúp Thung Lũng xếp hạng khi ra sân dưới kỳ hiệu bang hội của bạn.',
   },
   pvp_fiesta_first_bout: {
     name: 'Khách Không Mời',
-    desc: 'Đấu trọn một trận Fiesta 2v2, dù thắng hay thua.',
   },
-  pvp_fiesta_first_win: { name: 'Linh Hồn Của Bữa Tiệc', desc: 'Thắng một trận Fiesta 2v2.' },
+  pvp_fiesta_first_win: { name: 'Linh Hồn Của Bữa Tiệc' },
   pvp_fiesta_double: {
     name: 'Họa Vô Đơn Chí',
-    desc: 'Ghi hai pha hạ gục trong Fiesta chỉ trong bốn giây.',
   },
   pvp_fiesta_shutdown: {
     name: 'Kẻ Phá Đám',
-    desc: 'Hạ gục một đối thủ Fiesta đang trên chuỗi ba mạng trở lên.',
   },
   pvp_fiesta_full_build: {
     name: 'Chỉnh Tề Dự Tiệc',
-    desc: 'Thắng một trận Fiesta sau khi chốt món tăng cường ở cả ba đợt.',
   },
   pvp_fiesta_powerups: {
     name: 'Mỗi Thứ Một Chút',
-    desc: 'Nhặt đủ cả bốn món tăng lực trên võ đài ít nhất một lần: Quỷ Tốc Độ, Người Khổng Lồ, Giày Mặt Trăng và Kẻ Cuồng Chiến.',
   },
   pvp_fiesta_five_kills: {
     name: 'Gánh Cả Bữa Tiệc',
-    desc: 'Ghi năm pha hạ gục trong cùng một trận Fiesta.',
   },
   soc_first_party: { name: 'Có Nhau Vẫn Hơn', desc: 'Gia nhập một tổ đội cùng người chơi khác.' },
   soc_full_house: { name: 'Kín Đội Hình', desc: 'Dọn sạch một hầm ngục với tổ đội đủ năm người.' },
@@ -1074,5 +1053,9 @@ export const table: DeedLocaleTable = {
     name: 'Không Một Tia Lửa Nào Tắt',
     desc: 'Đánh bại Varkhul, Forgefather of the Last Flame, ở độ khó Anh Hùng mà không một thành viên raid nào tử trận.',
     title: 'Kẻ Bất Thiêu',
+  },
+  col_set_bramblehide: {
+    name: 'Da Gai Của Roots',
+    desc: 'Khám phá đủ mọi món của bộ Da Gai Của Roots.',
   },
 };

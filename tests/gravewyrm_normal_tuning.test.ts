@@ -18,6 +18,13 @@
 // max-armor pick per equip slot over ITEMS via canEquipItemInSlot at
 // requiredLevel <= 20, folded through characterDerivedStats with the prot
 // mastery (armorPct 0.10, staPct 0.40, armorFromStrPct 0.70).
+// Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+// PINNED constant, not a live measurement of the catalog. The committed
+// max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+// whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+// UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+// The derivation named above folds the prot mastery in, and that RAISES armour,
+// so it cannot produce 2861 from a raw max-armour kit that measured 2969.
 
 import { describe, expect, it } from 'vitest';
 import {

@@ -24,10 +24,21 @@ describe('material_profession_affinity as the first-evaluated sim module', () =>
     ]);
     expect(craftIdsForMaterialItem('fine_iron_ore')).toEqual([
       'engineering',
+      'jewelcrafting',
       'weaponcrafting',
       'armorcrafting',
     ]);
-    expect(craftIdsForMaterialItem('arcane_dust')).toEqual(['enchanting']);
+    // Jewelcrafting joined the dust consumers with the Masterwrought phase 05
+    // catalog (rung-0 recipes), inscription joined at phase 06
+    // (INSCRIPTION_RECIPES), and engineering joined at masterwrought Phase
+    // 11o (the copperlens_ocular bill), so the dust is four-craft now,
+    // ring-ordered.
+    expect(craftIdsForMaterialItem('arcane_dust')).toEqual([
+      'engineering',
+      'inscription',
+      'enchanting',
+      'jewelcrafting',
+    ]);
     expect(craftIdsForMaterialItem('not_a_real_item')).toEqual([]);
   });
 

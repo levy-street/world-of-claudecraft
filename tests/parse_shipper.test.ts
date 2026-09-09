@@ -1,4 +1,4 @@
-import { mkdtempSync, readdirSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { gunzipSync } from 'node:zlib';
@@ -53,6 +53,21 @@ function batchLines(body: Uint8Array): Record<string, unknown>[] {
     .toString('utf8')
     .split('\n')
     .map((line) => JSON.parse(line) as Record<string, unknown>);
+}
+
+interface Deferred<T> {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+}
+
+/** A promise plus its resolver, so a test can hold a fetch response open and
+ * release it on demand rather than racing real network/timer completion. */
+function createDeferred<T>(): Deferred<T> {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
 }
 
 const IDENTITY = { realm: 'Claudemoon', env: 'qa' as const, build: '0.35.0' };
@@ -230,21 +245,114 @@ describe('BatchShipper', () => {
     expect(calls).toHaveLength(0);
   });
 
-  test('stop awaits the in-flight cycle then drains, spooling when the service is down', async () => {
+  test('stop awaits an in-flight batch before draining and spooling the remaining records', async () => {
     const counters = createParseCounters();
     const dir = tempSpoolDir();
     const spool = new BatchSpool(dir, 1024 * 1024, counters);
-    const { fetch } = fakeFetch([new Error('down')]);
-    const shipper = new BatchShipper(IDENTITY, 'http://svc/ingest', null, spool, counters, fetch);
+    const firstInvoked = createDeferred<void>();
+    const firstGate = createDeferred<Response>();
+    let calls = 0;
+    const fetchImpl = (async () => {
+      if (calls++ === 0) {
+        firstInvoked.resolve();
+        return firstGate.promise;
+      }
+      return { ok: false, status: 503 } as Response;
+    }) as typeof fetch;
+    const shipper = new BatchShipper(
+      IDENTITY,
+      'http://svc/ingest',
+      null,
+      spool,
+      counters,
+      fetchImpl,
+    );
 
-    // Enqueue 1500: the 500th enqueue starts an in-flight cycle that splices
-    // 500 records (spool file 1); stop() must AWAIT it, then drain the
-    // remaining 1000 as one marshal-capped batch (spool file 2).
+    for (let i = 0; i < 500; i++) shipper.enqueue({ t: 'ev', fightId: 'f1', tick: i, ev: {} });
+    // Explicitly start a flush; enqueue only schedules its automatic callback.
+    const flushPromise = shipper.flush();
+    let stopPromise: Promise<void> | undefined;
+    try {
+      await firstInvoked.promise;
+      for (let i = 500; i < 1500; i++) shipper.enqueue({ t: 'ev', fightId: 'f1', tick: i, ev: {} });
+      stopPromise = shipper.stop();
+      firstGate.resolve({ ok: false, status: 503 } as Response);
+      await stopPromise;
+
+      // Check durability at stop completion, before awaiting flush separately.
+      const files = readdirSync(dir).sort();
+      expect(files).toHaveLength(2);
+      const batches = files.map((name) => batchLines(readFileSync(path.join(dir, name))).slice(1));
+      expect(batches.map((records) => records.length).sort((a, b) => a - b)).toEqual([500, 1000]);
+      expect(
+        batches
+          .flat()
+          .map((record) => record.tick)
+          .sort((a, b) => Number(a) - Number(b)),
+      ).toEqual(Array.from({ length: 1500 }, (_, i) => i));
+      expect(counters.recordsBuffered).toBe(0);
+    } finally {
+      firstGate.resolve({ ok: false, status: 503 } as Response);
+      await flushPromise;
+      await (stopPromise ?? shipper.stop());
+    }
+  });
+
+  test('a queued flush leaves the shutdown drain alone and stop returns only after all records spool', async () => {
+    vi.useFakeTimers({ toFake: ['setImmediate'] });
+    const counters = createParseCounters();
+    const dir = tempSpoolDir();
+    const spool = new BatchSpool(dir, 1024 * 1024, counters);
+    const firstInvoked = createDeferred<void>();
+    const firstGate = createDeferred<Response>();
+    let calls = 0;
+    const fetchImpl = (async () => {
+      if (calls++ === 0) {
+        firstInvoked.resolve();
+        return firstGate.promise;
+      }
+      return { ok: false, status: 503 } as Response;
+    }) as typeof fetch;
+    const shipper = new BatchShipper(
+      IDENTITY,
+      'http://svc/ingest',
+      null,
+      spool,
+      counters,
+      fetchImpl,
+    );
+
     for (let i = 0; i < 1500; i++) shipper.enqueue({ t: 'ev', fightId: 'f1', tick: i, ev: {} });
-    await shipper.stop();
+    const stopPromise = shipper.stop();
+    try {
+      // Real gzip and filesystem work continue; only the queued callback is held.
+      await firstInvoked.promise;
+      const bufferedBeforeCallback = counters.recordsBuffered;
+      expect(bufferedBeforeCallback).toBeGreaterThan(0);
+      vi.runOnlyPendingTimers();
+      // A stray flush synchronously steals the tail and clears this public counter.
+      expect(counters.recordsBuffered).toBe(bufferedBeforeCallback);
+      firstGate.resolve({ ok: false, status: 503 } as Response);
+      await stopPromise;
 
-    expect(readdirSync(dir)).toHaveLength(2);
-    expect(counters.recordsBuffered).toBe(0);
+      const files = readdirSync(dir).sort();
+      expect(files).toHaveLength(2);
+      const batches = files.map((name) => batchLines(readFileSync(path.join(dir, name))).slice(1));
+      expect(batches.map((records) => records.length).sort((a, b) => a - b)).toEqual([500, 1000]);
+      expect(
+        batches
+          .flat()
+          .map((record) => record.tick)
+          .sort((a, b) => Number(a) - Number(b)),
+      ).toEqual(Array.from({ length: 1500 }, (_, i) => i));
+      expect(counters.recordsBuffered).toBe(0);
+    } finally {
+      firstGate.resolve({ ok: false, status: 503 } as Response);
+      await stopPromise;
+      vi.useRealTimers();
+      // Drain a stray writer on the failing version only, after all assertions.
+      await settle(() => counters.batchesSpooled >= 2);
+    }
   });
 
   test('past the stop deadline, remaining batches spool without ship attempts', async () => {

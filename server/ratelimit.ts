@@ -945,6 +945,87 @@ export function resetAdminOversightRateLimits(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Admin analytics dashboard reads (overview / activity / market metrics, the
+// analytics.read family). These are warm in-memory cached reads with zero
+// per-request DB cost, so the meter is about uniform admin-surface metering
+// (no read route is the unthrottled odd one out), not query protection. The
+// path's real per-request DB cost is upstream of the handler and upstream of
+// this meter: require_admin (server/http/middleware/require_admin.ts) awaits
+// accountAndScopeForToken then adminRolesForAccount on every admin request
+// before any handler runs, so a polled dashboard tab costs two reads per poll
+// whatever the handler caches. That pair is deliberately unmetered here
+// because the admin gate stays on the DIRECT db reads (never the marketplace
+// auth-guard cache), so the sizing below prices tab-equivalents, not queries.
+// Own
+// bucket pair, NOT the oversight maps above: the Overview landing page polls
+// at the dashboard's 5 s tick for every operator by default, and that routine
+// traffic must never burn the economy-oversight budget (whose exhaustion
+// would 429 the moderation Flagged workflow), nor vice versa.
+//
+// SIZED IN TAB-EQUIVALENTS, because the fused shape has two arms with very
+// different fan-in (the hot-path review of the first cut: an IP arm equal to
+// the account arm 429'd three operators with three tabs each behind one NAT,
+// and a 429 collapses the Overview live cards to "load failed"). One open
+// dashboard tab polls at most:
+//   overview        every LIVE_REFRESH_MS = 5 s      -> 12 / min
+//   activity        every ACTIVITY_REFRESH_MS = 60 s ->  1 / min
+//   online history  every ACTIVITY_REFRESH_MS = 60 s ->  1 / min
+//   market metrics  every AUTO_REFRESH_MS = 30 s     ->  2 / min
+//   (src/admin/state/poll.ts, src/admin/pages/MarketMetrics.svelte)
+// so ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE is 16. ONLINE HISTORY is the
+// fourth term and it is easy to miss: Overview's refreshActivity fetches
+// /admin/api/online-history in the SAME Promise.all as /admin/api/activity
+// (src/admin/pages/Overview.svelte), so it rides the activity cadence rather
+// than a poll constant of its own. It was omitted when the bucket was first
+// sized, which left the documented 8-tab account headroom at 8 x 16 = 128
+// against a 120 ceiling: 429s at exactly the headroom the comment promises,
+// and a 429 here collapses the Overview live cards to "load failed". Note a
+// range-button click costs 2 more, because selectOnlineHistoryRange re-runs
+// refreshActivity. The ACCOUNT arm meters one
+// operator's own tabs: 8 tabs of headroom (nobody runs eight dashboards, and a
+// looping tab still trips it) = 120 / min. The IP arm meters a whole office
+// behind one NAT: 40 tab-equivalents (say, a dozen operators with three tabs
+// each, plus reloads) = 600 / min. Both derived, never re-typed as literals;
+// the relation is pinned in tests/admin_rate_limit_buckets.test.ts against
+// the SPA's own poll constants.
+// ---------------------------------------------------------------------------
+export const ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE = 12 + 1 + 1 + 2;
+export const ADMIN_ANALYTICS_ACCOUNT_TAB_BUDGET = 8;
+export const ADMIN_ANALYTICS_IP_TAB_BUDGET = 40;
+/** The per-OPERATOR (account arm) budget: one operator's own open tabs. */
+export const ADMIN_ANALYTICS_READ_MAX_PER_MINUTE =
+  ADMIN_ANALYTICS_ACCOUNT_TAB_BUDGET * ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE;
+/** The per-IP arm: every operator behind one NAT, in tab-equivalents. */
+export const ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE =
+  ADMIN_ANALYTICS_IP_TAB_BUDGET * ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE;
+
+const adminAnalyticsReadIpAttempts = new Map<string, number[]>();
+const adminAnalyticsReadAccountAttempts = new Map<number, number[]>();
+
+export function adminAnalyticsReadRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    adminAnalyticsReadIpAttempts,
+    requestIp(req),
+    ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    adminAnalyticsReadAccountAttempts,
+    accountId,
+    ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset admin analytics-read throttles. Test-only. */
+export function resetAdminAnalyticsRateLimits(): void {
+  adminAnalyticsReadIpAttempts.clear();
+  adminAnalyticsReadAccountAttempts.clear();
+}
+
+// ---------------------------------------------------------------------------
 // Per-account failed-login throttle (#93)
 //
 // The per-IP limiter above can't stop credential stuffing: a botnet spreads

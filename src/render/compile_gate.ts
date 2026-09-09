@@ -171,6 +171,10 @@ export class CompileGateQueue {
     pieces: CompileGatePiece[],
     timeoutMs: number,
     options: CompileGateOptions = {},
+    /** The index of `pieces[0]` in its gate's cut, so a gate submitted in
+     *  several calls (the shader warm gate, one piece at a time as each warms)
+     *  labels its units as one call would have. */
+    firstIndex = 0,
   ): Promise<CompileGateResult> {
     if (pieces.length === 0) return Promise.resolve({ failed: false, timedOut: false });
     const scheduler = options.scheduler ?? defaultScheduler;
@@ -215,7 +219,7 @@ export class CompileGateQueue {
         },
         options.label === undefined
           ? options
-          : { ...options, label: linkPieceLabel(options.label, index) },
+          : { ...options, label: linkPieceLabel(options.label, index + firstIndex) },
       ),
     );
     return Promise.all(settled).then(
@@ -293,7 +297,8 @@ export class SerialGateLane {
  * as it resolves, revealing the newer target before its own compile is done:
  * exactly the freeze this gate exists to prevent. Passing the raw setter
  * (`current => null`) instead of this guard is only safe when the field is
- * dedicated to a single target, as mountCompilePending/visualCompilePending are.
+ * dedicated to a single target, as visualCompilePending is. Boolean ownership
+ * fields such as mountCompilePending need an external current-root guard.
  */
 export function settlePendingSwap<T>(current: T | null, owner: T): T | null {
   return current === owner ? null : current;

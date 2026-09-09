@@ -11,6 +11,7 @@ import {
   MAX_CC_BANDS,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
+import { tanHalfVerticalFov } from '../vfx_screen_bounds_core';
 import { type DecalStyle, GroundDecals } from './decals';
 import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
@@ -1061,9 +1062,12 @@ export class AbilityVfxFx implements SequencerHost {
   // Presentation-culling transition for one entity. Semantic held state lives
   // in the painter, while scarce render pools are released immediately so an
   // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
-  sleepEntity(entityId: number): void {
+  sleepEntity(entityId: number, keepCcBand = false): void {
     if (this.disposed) return;
-    this.ccBands.delete(entityId);
+    // The cast gate's hold keeps the band (actionable, refreshed in place by
+    // the hold that follows, so no entry is re-minted per frame); a culled
+    // rig drops it, and an unrefreshed one is swept at the next update.
+    if (!keepCcBand) this.ccBands.delete(entityId);
     this.windups.delete(entityId);
     const bands = this.orbits.get(entityId);
     if (bands) {
@@ -1561,6 +1565,13 @@ export class AbilityVfxFx implements SequencerHost {
 
   // ---- frame advance ------------------------------------------------------
 
+  /** tan(vfov / 2) of the host camera, 0 when it is not a perspective camera
+   *  (the impact-quad screen bound then stays off, see flipbooks.update). */
+  private tanHalfVFov(): number {
+    const perspective = this.camera as THREE.PerspectiveCamera;
+    return perspective.isPerspectiveCamera ? tanHalfVerticalFov(perspective.fov) : 0;
+  }
+
   update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
     this.time += dt;
@@ -1591,7 +1602,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.decals.setCameraPosition(camPosScratch.x, camPosScratch.z);
     this.ribbons.update(dt, camPosScratch, reducedMotion);
     this.rings.update(dt, this.camera.quaternion);
-    this.flipbooks.update(dt, this.camera.quaternion);
+    this.flipbooks.update(dt, this.camera.quaternion, camPosScratch, this.tanHalfVFov());
     this.decals.update(dt);
     this.pillars.update(dt);
     this.shells.update(dt, this.time, this.frame, this.anchor);

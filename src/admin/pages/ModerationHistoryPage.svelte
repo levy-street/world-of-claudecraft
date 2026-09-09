@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import type { ModerationActionHistoryRow, Paginated } from '../types';
   import { apiGet } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { fmtDate } from '../format';
   import { t } from '../i18n';
@@ -18,7 +20,7 @@
   const LIMIT = 100;
 
   let data = $state<Paginated<ModerationActionHistoryRow> | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let page = $state(1);
   let tab = $state<ModerationHistoryTab>('all');
 
@@ -38,9 +40,9 @@
       data = await apiGet<Paginated<ModerationActionHistoryRow>>(
         `/admin/api/moderation/history?${params}`,
       );
-      failed = false;
+      failed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -70,7 +72,9 @@
     {/each}
   </div>
 
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('moderationHistoryPage.loadFailed')}</div>
   {:else if data && data.rows.length === 0}
     <div class="empty">{t('moderationHistoryPage.empty')}</div>

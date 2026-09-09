@@ -23,11 +23,11 @@ const callees = scan.sites.map((s) => s.call);
 describe('Hud.resetUnitFrames restores the stock interface layout', () => {
   it('fans out to every surface that persists layout state of its own', () => {
     // The registered movers (unit frames, action bars + combined group, cast
-    // bar, menu, minimap, pet, stance bar, XP bar, aura group) ...
+    // bar, menu, minimap, pet, stance bar, XP bar, aura group, the trackers
+    // and the class resource bars, doom meter included) ...
     expect(callees).toContain('this.interfaceUnlock.resetAll');
-    // ... plus the four panels that keep their own geometry outside the
+    // ... plus the three panels that keep their own geometry outside the
     // registry. Each is a real persisted box a player can strand somewhere.
-    expect(callees).toContain('this.doomMeter.resetPosition');
     expect(callees).toContain('this.chatGeometry.reset');
     expect(callees).toContain('this.meters.resetFrames');
     expect(callees).toContain('this.targetAurasWindow.resetFrame');

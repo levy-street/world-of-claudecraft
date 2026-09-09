@@ -21,8 +21,11 @@ import { castAbility } from '../src/sim/combat/casting_lifecycle';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import {
   DEFAULT_MOUNT,
+  DEVELOPER_MOUNTS,
+  isDeveloperMount,
   MOUNT_KEYS,
   MOUNTS,
   mountDef,
@@ -103,11 +106,14 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly ten mounts with the horse first and the developer rickshaw last', () => {
+  it('has exactly ten mounts with the horse first and the developer tank last', () => {
     expect(MOUNT_KEYS).toHaveLength(10);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
-    expect(MOUNT_KEYS.at(-1)).toBe('rickshaw_mount');
+    expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
+    // Every developer-only mount is a real catalog key, and the tank keeps the
+    // tail so a new PLAYER-facing mount always lands above it.
+    for (const key of DEVELOPER_MOUNTS) expect(MOUNT_KEYS).toContain(key);
   });
 
   it('pins each card: rarity and speed, with NO per-mount level gate', () => {
@@ -122,8 +128,9 @@ describe('mount catalog', () => {
     expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
+    expect(spec('lanternback_troll')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
-    expect(spec('rickshaw_mount')).toEqual(['epic', 0.8]);
+    expect(spec('drakemaw_raptor')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -171,16 +178,17 @@ describe('mount reins items (the collection: owning the item is owning the mount
   const reinsFor = (key: string) =>
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
-  it('every mount has exactly one reins item; player reins are unbound, the dev tank stays bound', () => {
+  it('every mount has exactly one reins item; player reins are unbound, dev mounts stay bound', () => {
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (key === 'terrorspark_groundshaker' || key === 'rickshaw_mount') {
-        // The developer-only tank/rickshaw stay soulbound: neither has a
-        // player acquisition path, and tradability would turn a dev grant
-        // into a leak vector.
+      if (isDeveloperMount(key)) {
+        // Bound reins, for the same leak reason from different doors: a
+        // developer-only mount has no player acquisition path, and the store
+        // mount's reins is a real-money grant (server/claudium.ts). Either
+        // trading hands would turn a grant into an economy leak.
         expect(item.soulbound).toBe(true);
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
@@ -245,7 +253,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
+    const NO_SOURCE_YET: readonly string[] = [
+      'reins_drakemaw_raptor',
+      'reins_goblin_rocket_sled',
+      'reins_rallycart_rxt',
+    ];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -255,7 +267,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
 
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
-      if (key === 'terrorspark_groundshaker' || key === 'rickshaw_mount') continue; // developer-only, pinned separately below
+      if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity.
@@ -269,6 +281,10 @@ describe('mount reins items (the collection: owning the item is owning the mount
       const heroicEntries = Object.entries(HEROIC_BOSS_LOOT).flatMap(([bossId, entries]) =>
         entries.filter((l) => l.itemId === itemId).map((l) => ({ bossId, ...l })),
       );
+
+      // There is no store MOUNT any more: a paid mount is a mount SKIN
+      // (content/mount_skins.ts), an account cosmetic with no reins item, so
+      // every catalog reins below has an in-world story or is dev-only.
 
       if (rarity === 'epic') {
         // Rift S clears are the sole source, EXCEPT a mount held sourceless on
@@ -319,127 +335,69 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it('keeps the tank developer-only and absent from every normal acquisition table', () => {
-    const itemId = 'reins_terrorspark_groundshaker';
-    const item = ITEMS[itemId] as MountItemDef;
-    expect(item).toMatchObject({
-      kind: 'mount',
-      mount: 'terrorspark_groundshaker',
-      quality: 'epic',
-      soulbound: true,
-      noDiscard: true,
-      sellValue: 0,
-    });
-    expect(item.buyValue).toBeUndefined();
+  it.each([...DEVELOPER_MOUNTS])(
+    'keeps %s developer-only and absent from every normal acquisition table',
+    (mountKey) => {
+      const itemId = mountItemId(mountKey)!;
+      const item = ITEMS[itemId] as MountItemDef;
+      expect(item).toMatchObject({
+        kind: 'mount',
+        mount: mountKey,
+        quality: 'epic',
+        soulbound: true,
+        noDiscard: true,
+        sellValue: 0,
+      });
+      expect(item.buyValue).toBeUndefined();
 
-    for (const mob of Object.values(MOBS)) {
+      for (const mob of Object.values(MOBS)) {
+        expect(
+          mob.loot.some((entry) => entry.itemId === itemId),
+          `${itemId} must not be on ${mob.id}`,
+        ).toBe(false);
+      }
+      for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
+        expect(
+          loot.some((entry) => entry.itemId === itemId),
+          `${itemId} must not be on heroic boss ${bossId}`,
+        ).toBe(false);
+      }
+      expect([
+        ...RIFT_GREEN_MOUNT_REINS,
+        ...RIFT_BLUE_MOUNT_REINS,
+        ...RIFT_EPIC_MOUNT_REINS,
+      ]).not.toContain(itemId);
+      for (const npc of Object.values(NPCS)) {
+        expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
+          itemId,
+        );
+      }
       expect(
-        mob.loot.some((entry) => entry.itemId === itemId),
-        `${itemId} must not be on ${mob.id}`,
-      ).toBe(false);
-    }
-    for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
-      expect(
-        loot.some((entry) => entry.itemId === itemId),
-        `${itemId} must not be on heroic boss ${bossId}`,
-      ).toBe(false);
-    }
-    expect([
-      ...RIFT_GREEN_MOUNT_REINS,
-      ...RIFT_BLUE_MOUNT_REINS,
-      ...RIFT_EPIC_MOUNT_REINS,
-    ]).not.toContain(itemId);
-    for (const npc of Object.values(NPCS)) {
-      expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
-        itemId,
-      );
-    }
-    expect(
-      HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
-      `${itemId} must not be sold by the Heroic Quartermaster`,
-    ).not.toContain(itemId);
-    for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
-      expect(
-        offers.map((offer) => offer.itemId),
-        `${itemId} must not be sold by delve shop ${delveId}`,
+        HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
+        `${itemId} must not be sold by the Heroic Quartermaster`,
       ).not.toContain(itemId);
-    }
-    expect(
-      MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
-      `${itemId} must not be seeded by the World Market`,
-    ).not.toContain(itemId);
-    for (const quest of Object.values(QUESTS)) {
+      for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
+        expect(
+          offers.map((offer) => offer.itemId),
+          `${itemId} must not be sold by delve shop ${delveId}`,
+        ).not.toContain(itemId);
+      }
       expect(
-        Object.values(quest.itemRewards),
-        `${itemId} must not be rewarded by ${quest.id}`,
+        MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
+        `${itemId} must not be seeded by the World Market`,
       ).not.toContain(itemId);
-      expect(
-        quest.requiredItems ?? [],
-        `${itemId} must not be required by ${quest.id}`,
-      ).not.toContain(itemId);
-    }
-  });
-
-  it('keeps the rickshaw developer-only and absent from every normal acquisition table', () => {
-    const itemId = 'reins_rickshaw_mount';
-    const item = ITEMS[itemId] as MountItemDef;
-    expect(item).toMatchObject({
-      kind: 'mount',
-      mount: 'rickshaw_mount',
-      quality: 'epic',
-      soulbound: true,
-      noDiscard: true,
-      sellValue: 0,
-    });
-    expect(item.buyValue).toBeUndefined();
-
-    for (const mob of Object.values(MOBS)) {
-      expect(
-        mob.loot.some((entry) => entry.itemId === itemId),
-        `${itemId} must not be on ${mob.id}`,
-      ).toBe(false);
-    }
-    for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
-      expect(
-        loot.some((entry) => entry.itemId === itemId),
-        `${itemId} must not be on heroic boss ${bossId}`,
-      ).toBe(false);
-    }
-    expect([
-      ...RIFT_GREEN_MOUNT_REINS,
-      ...RIFT_BLUE_MOUNT_REINS,
-      ...RIFT_EPIC_MOUNT_REINS,
-    ]).not.toContain(itemId);
-    for (const npc of Object.values(NPCS)) {
-      expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
-        itemId,
-      );
-    }
-    expect(
-      HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
-      `${itemId} must not be sold by the Heroic Quartermaster`,
-    ).not.toContain(itemId);
-    for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
-      expect(
-        offers.map((offer) => offer.itemId),
-        `${itemId} must not be sold by delve shop ${delveId}`,
-      ).not.toContain(itemId);
-    }
-    expect(
-      MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
-      `${itemId} must not be seeded by the World Market`,
-    ).not.toContain(itemId);
-    for (const quest of Object.values(QUESTS)) {
-      expect(
-        Object.values(quest.itemRewards),
-        `${itemId} must not be rewarded by ${quest.id}`,
-      ).not.toContain(itemId);
-      expect(
-        quest.requiredItems ?? [],
-        `${itemId} must not be required by ${quest.id}`,
-      ).not.toContain(itemId);
-    }
-  });
+      for (const quest of Object.values(QUESTS)) {
+        expect(
+          Object.values(quest.itemRewards),
+          `${itemId} must not be rewarded by ${quest.id}`,
+        ).not.toContain(itemId);
+        expect(
+          quest.requiredItems ?? [],
+          `${itemId} must not be required by ${quest.id}`,
+        ).not.toContain(itemId);
+      }
+    },
+  );
 
   it('the rift mount tiers pay exactly the heroic rate for the rarity they carry', () => {
     // The rule this protects: a rift must never be a cheaper route to a mount
@@ -873,7 +831,7 @@ describe('mount purchase (Marla sells reins for 10g after ridingTrained)', () =>
   });
 
   it('gates the horse behind q_riding_lessons: level 20, given/turned in at Marla', () => {
-    const quest = QUESTS['q_riding_lessons'];
+    const quest = QUESTS.q_riding_lessons;
     expect(quest).toBeDefined();
     expect(quest.giverNpcId).toBe('stablemaster_marla');
     expect(quest.turnInNpcId).toBe('stablemaster_marla');
@@ -881,7 +839,7 @@ describe('mount purchase (Marla sells reins for 10g after ridingTrained)', () =>
   });
 
   it('the quest itemRewards are empty; it gives gold and XP only', () => {
-    const quest = QUESTS['q_riding_lessons'];
+    const quest = QUESTS.q_riding_lessons;
     expect(quest.itemRewards).toEqual({});
     expect(quest.copperReward).toBe(5000);
     expect(quest.xpReward).toBe(3000);
@@ -1308,6 +1266,162 @@ describe('mount + form/ghost_wolf interaction', () => {
   });
 });
 
+// "Stealth horse": mounting while stealthed used to leave the Duskveil aura active,
+// so a rider stayed concealed (shrunk detection radius, invisible to duel opponents
+// per canObserveEntity in server/game.ts) while ALSO gaining the mount's speed bonus,
+// an invisible-and-fast combination no duel opponent could pin down. Real MMOs prevent
+// this by having mounting break stealth outright; this suite pins that fix the same
+// way the form/ghost_wolf suite above pins its cancellation.
+describe('mount + stealth interaction (stealth horse fix)', () => {
+  // Helper: give the player the real Duskveil stealth aura directly (bypasses cast
+  // gates), matching src/sim/content/classes.ts `stealth` ability's effect exactly.
+  function putInStealth(sim: Sim, pid: number): void {
+    const e = sim.entities.get(pid)!;
+    e.auras.push({
+      id: 'stealth',
+      name: 'Duskveil',
+      kind: 'stealth',
+      remaining: 3600,
+      duration: 3600,
+      value: 0.5,
+      sourceId: pid,
+      school: 'physical',
+    });
+    e.stealthed = true;
+  }
+
+  function giveReins(sim: Sim, pid: number): void {
+    sim.addItem('reins_valorsteed', 1, pid);
+  }
+
+  it('starting a mount summon breaks stealth', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInStealth(sim, pid);
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect(e.stealthed).toBe(true);
+
+    sim.drainEvents();
+    const started = summonMountItem(sim.ctx, pid, 'valorsteed');
+    const events = sim.drainEvents();
+
+    expect(started).toBe(true);
+    // Stealth is gone the instant the summon starts: no window where the rider is
+    // both concealed and accelerating toward mount speed.
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(e.stealthed).toBe(false);
+    const removal = events.find(
+      (ev) => ev.type === 'aura' && ev.targetId === pid && !ev.gained && ev.name === 'Duskveil',
+    );
+    expect(removal).toBeDefined();
+  });
+
+  it('starting a mount summon clears stacked stealth auras through their removal funnel', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInStealth(sim, pid);
+    e.auras.push({
+      id: 'greater_invisibility',
+      name: 'Greater Invisibility',
+      kind: 'stealth',
+      remaining: 20,
+      duration: 20,
+      value: 1,
+      value2: 0.35,
+      value3: 4,
+      sourceId: pid,
+      school: 'arcane',
+    });
+    expect(e.auras.filter((a) => a.kind === 'stealth').map((a) => a.name)).toEqual([
+      'Duskveil',
+      'Greater Invisibility',
+    ]);
+
+    sim.drainEvents();
+    const started = summonMountItem(sim.ctx, pid, 'valorsteed');
+    const events = sim.drainEvents();
+
+    expect(started).toBe(true);
+    expect(e.auras.filter((a) => a.kind === 'stealth')).toEqual([]);
+    expect(e.stealthed).toBe(false);
+    const removals = events.filter(
+      (ev): ev is Extract<SimEvent, { type: 'aura' }> =>
+        ev.type === 'aura' && ev.targetId === pid && !ev.gained,
+    );
+    expect(removals.map((ev) => ev.name)).toEqual(['Duskveil', 'Greater Invisibility']);
+    expect(e.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'greater_invisibility_dr',
+        kind: 'buff_dr',
+        value: 0.35,
+        remaining: 4,
+      }),
+    );
+  });
+
+  it("once mounted, full mount speed applies with no lingering stealth slow (the exploit's speed half)", () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInStealth(sim, pid);
+
+    ride(sim, pid, 'valorsteed');
+
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.stealthed).toBe(false);
+    // Full valorsteed speed (1.6): the exploit combined the stealth slow (0.5) with the
+    // mount bonus (1.6) into a 0.8 apparent multiplier while STILL fully concealed; with
+    // stealth broken there is nothing left riding along with the mount speed.
+    expect(moveSpeedMult(e)).toBeCloseTo(1.6, 5);
+  });
+
+  it('summon completion strips a stealth aura that slipped through mid-channel', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
+    const pid = sim.addPlayer('rogue', 'Shade');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    const e = sim.entities.get(pid)!;
+
+    // Start the summon channel (no stealth yet).
+    expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(true);
+    expect(e.mountCastKey).toBe('valorsteed');
+
+    // Inject a stealth aura mid-channel (simulates Duskveil cast during the 1.5s window).
+    e.auras.push({
+      id: 'stealth',
+      name: 'Duskveil',
+      kind: 'stealth',
+      remaining: 3600,
+      duration: 3600,
+      value: 0.5,
+      sourceId: pid,
+      school: 'physical',
+    });
+    e.stealthed = true;
+
+    // Act: complete the summon channel (drives updateMountTransition to completion).
+    finishTransition(sim, pid);
+
+    // Assert: the player is mounted AND stealth is gone.
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(e.stealthed).toBe(false);
+  });
+});
+
 describe('riding skill gate (Req 5)', () => {
   it('blocks toggleMount when ridingTrained is absent', () => {
     const sim = makeWorld();
@@ -1583,7 +1697,7 @@ describe('pre-armed auto-attack while mounted (Fix #3)', () => {
     expect(e.mountKey).toBe('grag_bear');
 
     // Spawn a hostile mob right next to the player in melee range.
-    const tpl = MOBS['wild_boar'];
+    const tpl = MOBS.wild_boar;
     const mobId = (sim as any).nextId++;
     const mob = createMob(mobId, tpl, 3, { x: e.pos.x + 1, y: e.pos.y, z: e.pos.z });
     mob.maxHp = 100_000;
@@ -1648,5 +1762,29 @@ describe('summon completion strips forms that slipped through mid-channel (Fix #
     // Assert: the player is mounted AND the form is gone.
     expect(e.mountKey).toBe('valorsteed');
     expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(false);
+  });
+});
+
+// Real sim behavior: a paid look never grants a ride or changes its speed.
+describe('mount skins preserve gameplay', () => {
+  it.each(MOUNT_SKIN_IDS)('%s keeps the base mount speed and survives a character save', (skin) => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    sim.setMountSkin(pid, skin);
+    const rider = sim.entities.get(pid)!;
+    expect(rider.mountKey).toBe('');
+    expect(moveSpeedMult(rider)).toBe(1);
+    for (const [key, speed] of [
+      ['valorsteed', 1.6],
+      ['grag_bear', 1.75],
+    ] as const) {
+      rider.mountKey = key;
+      expect(moveSpeedMult(rider)).toBeCloseTo(speed, 10);
+    }
+    const saved = sim.serializeCharacter(pid)!;
+    expect(saved.mountSkinId).toBe(skin);
+    const alt = sim.addPlayer('warrior', 'Alt', { state: saved });
+    expect(sim.entities.get(alt)?.mountSkinId).toBe(skin);
+    expect(sim.ownedMountsFor(alt)).toEqual([]);
   });
 });

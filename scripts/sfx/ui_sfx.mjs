@@ -29,6 +29,25 @@ const MASTER_GAINS_DB = {
   // Craft-family cast-start placeholder (Craft Cast System Phase 6): soft
   // workbench wind-up, distinct from the per-family completion cues.
   ui_craft_cast: 0,
+  // Farming PLACEHOLDER pair (the render / juice phase): the plant action and
+  // the harvest result. Unity gain like the other stand-ins, so a real
+  // recording can drop in without a mix re-balance.
+  ui_farm_plant: 0,
+  ui_farm_harvest: 0,
+  // The withered-outcome PLACEHOLDER, unity gain with its five siblings.
+  ui_farm_withered: 0,
+  // The ready-notice PLACEHOLDER, unity gain with its two siblings.
+  ui_farm_ready: 0,
+  // The golden-harvest sting PLACEHOLDER, unity gain with its three siblings.
+  ui_farm_golden: 0,
+  // The shared-feast placement PLACEHOLDER, unity gain with its four siblings.
+  ui_farm_feast: 0,
+  // Masterwrought crafting-UX cues (phase 14): unity gain like the other
+  // synth stand-ins, so a real recording can drop in without a mix re-balance.
+  ui_perfecting_attempt: 0,
+  ui_perfecting_success: 0,
+  ui_legendary_forged: 0,
+  ui_sunder_complete: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -147,6 +166,139 @@ export const UI_SFX_SPECS = [
     tone(220, 0, 0.2, 0.14, { wave: 'triangle', endFrequency: 160 }),
     tone(330, 0.04, 0.22, 0.08, { wave: 'triangle', endFrequency: 240 }),
     noise('brown', 0, 0.18, 0.06, { lowpass: 700 }),
+  ]),
+  // Farming PLACEHOLDER (the render / juice phase), for the sound engineer:
+  // a deterministic synth stand-in for the seed going into the bed. Low
+  // filtered noise is the soil scrape and the sinking triangle is the tamp
+  // that closes it, the same vocabulary as ui_gather_cast's woody wind-up.
+  // Swap for a real recording when one lands, exactly as the gather-strike,
+  // rarity and fishing placeholders were swapped before it.
+  cue('ui_farm_plant', 0.5, 'Soft earthy soil scrape and tamp as a seed is planted.', [
+    noise('brown', 0, 0.26, 0.11, { lowpass: 420 }),
+    tone(150, 0.12, 0.22, 0.13, { wave: 'triangle', endFrequency: 110 }),
+  ]),
+  // Farming PLACEHOLDER (the render / juice phase), for the sound engineer:
+  // the harvest twin of the row above. A short bright noise burst is the leaf
+  // rustle, the triangle body is the pluck itself, and the rising tail is the
+  // small "got it" lift the reward cues share. Swap for a real recording.
+  cue('ui_farm_harvest', 0.6, 'Leafy pluck and rustle with a short satisfying upward tail.', [
+    noise('white', 0, 0.18, 0.05, { highpass: 2200, lowpass: 7000 }),
+    tone(420, 0.02, 0.16, 0.12, { wave: 'triangle' }),
+    tone(620, 0.16, 0.3, 0.1, { wave: 'triangle', endFrequency: 880 }),
+  ]),
+  // Farming PLACEHOLDER (the deferred Phase 8/10 disappointment sting, landed
+  // at the Phase 18 sweep), for the sound engineer: the harvest that paid
+  // husks instead of produce. Deliberately the harvest cue's OWN vocabulary
+  // (the same leaf rustle, the same triangle body) so the player still hears
+  // the action they took land, with the tail INVERTED: ui_farm_harvest lifts
+  // 620 to 880, this one sags 294 to 220, the falling-because-something-was-
+  // lost shape ui_sunder_complete uses. The difference is PITCH SHAPE, not
+  // level: both cues sit under the 1.0s threshold, so the conform pass
+  // peak-normalizes each to the same ceiling and a quieter authoring gain
+  // would just be normalized back (cross-clip trim is a sfx_gain_map.json
+  // entry, and this cue takes none, unity like its siblings). It must never
+  // be silence: a mute arm reads as an input that never registered. Swap for
+  // a real recording when one lands, exactly as its farming siblings.
+  cue('ui_farm_withered', 0.6, 'Dry husk rustle sagging into a soft two-note downward sigh.', [
+    noise('white', 0, 0.16, 0.04, { highpass: 1800, lowpass: 5200 }),
+    tone(392, 0.02, 0.18, 0.1, { wave: 'triangle' }),
+    tone(294, 0.16, 0.34, 0.09, { wave: 'triangle', endFrequency: 220 }),
+  ]),
+  // Farming PLACEHOLDER (the ready-notice phase), for the sound engineer: the
+  // unprompted "your crops are in" chime. Deliberately the QUIETEST and
+  // softest of the three farming stand-ins and the only one with no noise
+  // layer: it arrives without the player pressing anything, so it must read as
+  // a gentle notice rather than an action landing. Two clean rising thirds,
+  // the notification vocabulary the mail and quest chimes share. Swap for a
+  // real recording when one lands.
+  cue('ui_farm_ready', 0.5, 'Soft two-note wooden chime announcing that crops have finished.', [
+    tone(587, 0, 0.18, 0.08, { wave: 'triangle' }),
+    tone(784, 0.12, 0.26, 0.07, { wave: 'triangle' }),
+  ]),
+  // Farming PLACEHOLDER (the celebrations phase), for the sound engineer: the
+  // golden-harvest sting the finder hears layered over the shared rare-event
+  // achievement cue. A short ascending golden shimmer: a bright triangle
+  // arpeggio climbing a major arc (the ui_level_up flourish vocabulary,
+  // shortened) with a soft high sparkle on top so it reads as sunlight on
+  // grain rather than a fanfare. Swap for a real recording when one lands,
+  // exactly as its three farming siblings above.
+  cue('ui_farm_golden', 0.7, 'Bright golden shimmer sting celebrating a rare five-fold harvest.', [
+    tone(659, 0, 0.22, 0.12, { wave: 'triangle' }),
+    tone(831, 0.08, 0.24, 0.12, { wave: 'triangle' }),
+    tone(1046, 0.16, 0.3, 0.13, { wave: 'triangle' }),
+    tone(1318, 0.24, 0.36, 0.11, { wave: 'triangle', endFrequency: 1568 }),
+    noise('white', 0.1, 0.5, 0.02, { highpass: 3400 }),
+  ]),
+  // Farming PLACEHOLDER (Phase 12, the shared feast), for the sound engineer:
+  // setting the feast table out. A woody double thud (boards landing on the
+  // trestles) under a short convivial rattle of plates and mugs, closed by a
+  // small warm lift so it reads as an invitation rather than furniture being
+  // dropped. Swap for a real recording when one lands, exactly as its four
+  // farming siblings above.
+  cue('ui_farm_feast', 0.7, 'Woody table thud with a warm rattle of plates being set out.', [
+    tone(140, 0, 0.18, 0.16, { wave: 'triangle', endFrequency: 100 }),
+    tone(170, 0.12, 0.18, 0.13, { wave: 'triangle', endFrequency: 120 }),
+    noise('brown', 0, 0.2, 0.07, { lowpass: 600 }),
+    noise('white', 0.18, 0.26, 0.035, { highpass: 2400, lowpass: 8000 }),
+    tone(523, 0.3, 0.3, 0.09, { wave: 'triangle', endFrequency: 659 }),
+  ]),
+  // Masterwrought Perfecting ATTEMPT (phase 14), for the sound engineer: the
+  // anvil-and-arcane strike of an attempt resolving. Weighty and short where
+  // ui_craft_cast is a soft wind-up: a low saw thud with a brown-noise body is
+  // the hammer landing, the mid square partial is the metal answering, and a
+  // small high sparkle tail is the arcane charge in the work. Swap for a real
+  // recording when one lands, exactly as the gather/fishing placeholders were.
+  cue('ui_perfecting_attempt', 0.6, 'Weighty anvil strike with a short arcane sparkle tail.', [
+    tone(160, 0, 0.18, 0.2, { wave: 'saw', endFrequency: 90 }),
+    tone(660, 0, 0.12, 0.1, { wave: 'square', endFrequency: 620 }),
+    noise('brown', 0, 0.12, 0.09, { lowpass: 900 }),
+    noise('white', 0.04, 0.3, 0.03, { highpass: 3000 }),
+  ]),
+  // Masterwrought Perfecting SUCCESS (phase 14), for the sound engineer: a
+  // rank landing. Bright and ascending, shorter than a level-up: a clean
+  // three-note rising octave arc in the ui_farm_golden vocabulary (the
+  // ui_level_up flourish, shortened) with a soft shimmer, so it reads as one
+  // rung locking in rather than a fanfare. Swap for a real recording.
+  cue('ui_perfecting_success', 0.6, 'Short bright three-note ascending rank-up chime.', [
+    tone(523, 0, 0.2, 0.13, { wave: 'triangle' }),
+    tone(784, 0.09, 0.22, 0.13, { wave: 'triangle' }),
+    tone(1046, 0.18, 0.3, 0.14, { wave: 'triangle' }),
+    noise('white', 0.12, 0.4, 0.02, { highpass: 3200 }),
+  ]),
+  // THE ORANGE MOMENT (Masterwrought phase 14), for the sound engineer: the
+  // legendary promotion's own capstone cue, replacing the reused
+  // ui_achievement (which made the rarest moment in the crafting game sound
+  // like any deed unlock). A deep forge strike opens it, then a five-note
+  // triumphant flourish climbs PAST the ui_level_up ceiling with a long
+  // shimmer, so it audibly outranks ui_masterwork and the deed chime. Swap
+  // for a real recording when one lands.
+  cue(
+    'ui_legendary_forged',
+    1.4,
+    'Deep forge strike into a triumphant rising fanfare with long shimmer.',
+    [
+      noise('brown', 0, 0.2, 0.1, { lowpass: 700 }),
+      tone(130, 0, 0.3, 0.16, { wave: 'saw', endFrequency: 65 }),
+      tone(523, 0.12, 0.5, 0.12, { wave: 'triangle' }),
+      tone(659, 0.24, 0.5, 0.12, { wave: 'triangle' }),
+      tone(784, 0.36, 0.55, 0.13, { wave: 'triangle' }),
+      tone(1046, 0.48, 0.6, 0.14, { wave: 'triangle' }),
+      tone(1318, 0.6, 0.7, 0.12, { wave: 'triangle', endFrequency: 1568 }),
+      noise('white', 0.4, 0.95, 0.025, { highpass: 2800 }),
+    ],
+  ),
+  // Masterwrought SUNDERING completion (phase 14), for the sound engineer:
+  // the one silent craft-family completion closes (the sunder grant is
+  // silent + callerLogs, so no generic ding ever covered it). A raid epic
+  // breaking into essence: a bright crack over a low fracture body, then a
+  // FALLING arcane release with a soft shimmer, downward on purpose because
+  // something is destroyed, not won. Swap for a real recording.
+  cue('ui_sunder_complete', 0.7, 'Sharp crack into a falling arcane release with soft shimmer.', [
+    noise('white', 0, 0.12, 0.07, { highpass: 1200, lowpass: 6000 }),
+    tone(300, 0, 0.16, 0.15, { wave: 'saw', endFrequency: 120 }),
+    noise('brown', 0.02, 0.2, 0.08, { lowpass: 600 }),
+    tone(880, 0.14, 0.4, 0.08, { wave: 'sine', endFrequency: 440 }),
+    noise('white', 0.16, 0.4, 0.02, { highpass: 3000 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

@@ -44,7 +44,7 @@ export interface BgPlayerInfo {
   // open-world interest radii. The battleground's raised match-wide radius
   // covers only your own team plus the field's non-player entities (flags,
   // runes, props); see bgWideInterestApplies and BG_MATCH_INTEREST_RADIUS in
-  // server/game.ts, with the per-arm pins in tests/battleground_wire.test.ts.
+  // server/interest_policy.ts, with the per-arm pins in tests/battleground_wire.test.ts.
   // So an honest client cannot draw an enemy on the map or minimap from data
   // it was never sent, and this omission is the matching rule for the one
   // match-wide payload.

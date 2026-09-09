@@ -636,11 +636,70 @@ function prepareItem(itemId: string): THREE.Group | null {
   return root;
 }
 
+/** The feast contract bounds (scripts/assets/farm_props/model.js), which size
+ *  the no-item pick proxy below. BOTH feast GLBs, the party trestle table and
+ *  the apex pedestal banquet, are authored to this one envelope precisely so
+ *  the single proxy fits either table. Exported ONLY for the drift pin in
+ *  tests/farm_props_asset.test.ts: an authored prop resize on EITHER must move
+ *  this pair or the click box silently desyncs from the visible table. */
+export const NO_ITEM_PICK_HEIGHT = 0.9;
+export const NO_ITEM_PICK_FOOTPRINT = 1.6;
+
+/**
+ * The ONE material every no-item pick proxy wears (the sparkleMat precedent):
+ * renderer-owned and dispose-exempt (markSharedMaterial), so removeView's
+ * per-view teardown skips it and the program it holds stays resident. A fresh
+ * MeshBasicMaterial per view was one compile-gate unit per feast that LINKED
+ * (the view's gate enumerates the proxy as its own material group, and each
+ * despawn disposed the only material holding that program, so the next feast's
+ * gate linked it cold again); shared, the unit remains (one piece per gated
+ * root) but is a program-cache hit after the first feast of a session. Never
+ * clone this: Material.copy carries the shared tag into the clone
+ * (shared_resource.ts markOwnedMaterial), so a tinted or per-view variant
+ * would be one more never-disposed material. The proxy is invisible, so the
+ * material's look is irrelevant; the program key is a plain MeshBasicMaterial.
+ */
+const NO_ITEM_PICK_MATERIAL = markSharedMaterial(new THREE.MeshBasicMaterial());
+
+/** Test-only: the shared proxy material, so a suite can pin identity. */
+export function noItemPickMaterialForTest(): THREE.Material {
+  return NO_ITEM_PICK_MATERIAL;
+}
+
 export function buildGroundQuestObject(
   itemId: string,
   entityId: number,
 ): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
+  // A ground object that grants NO item (renderer passes objectItemId ?? '';
+  // today only a placed feast, kind 'object', objectItemId null, carrying one
+  // of the templateIds `isFeastTemplateId` in src/sim/professions/feast.ts
+  // admits: the party feast's 'farm_feast' plus the three apex role feasts
+  // masterwrought Phase 11k added. Never key on the bare string here or
+  // anywhere; the family is derived from the catalog. Its world prop is drawn by
+  // farm_patches.ts, which since Phase 18 picks BETWEEN TWO TABLES off that
+  // same templateId (the party trestle table and the apex pedestal banquet;
+  // farmFeastModelUrl in farm_patches_core.ts), so this generic view must not
+  // stack a supply-crate body on top of either. What the view still owes the
+  // renderer is a raycastable click body and an honest anchor height, so the
+  // proxy is an INVISIBLE box at the feast contract's bounds, the ONE envelope
+  // both tables are authored to (the character clickProxy precedent:
+  // three's raycaster ignores `visible`). Fresh geometry per view on purpose
+  // (removeView's non-pooled path disposes it); the material is the shared
+  // dispose-exempt NO_ITEM_PICK_MATERIAL above, so the teardown that frees the
+  // box leaves the material, and its program, resident for the next feast.
+  if (!itemId) {
+    const proxy = new THREE.Mesh(
+      new THREE.BoxGeometry(NO_ITEM_PICK_FOOTPRINT, NO_ITEM_PICK_HEIGHT, NO_ITEM_PICK_FOOTPRINT),
+      NO_ITEM_PICK_MATERIAL,
+    );
+    proxy.position.y = NO_ITEM_PICK_HEIGHT / 2;
+    proxy.visible = false;
+    proxy.castShadow = false;
+    proxy.receiveShadow = false;
+    group.add(proxy);
+    return { group, height: NO_ITEM_PICK_HEIGHT };
+  }
   const key =
     PROCEDURAL_ITEM_IDS.has(itemId) || QUEST_OBJECT_URLS[itemId] ? itemId : 'supply_crate';
   const template = prepareItem(key);

@@ -1,10 +1,19 @@
+import type { LocalGathererIdentity } from './material_gatherer';
+import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
+import type { MaterialComposition } from './material_sources';
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
-import type { GatheringProfessionId, ToolEffectId } from './content/professions';
+import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
+import type { RealmBuilderHonour } from './content/realm_builders';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
+import type {
+  PerfectingSwapDenyReason,
+  PerfectingSwapRequest,
+} from './professions/perfecting_swap';
 import type { RespawnWindow } from './respawn_policy';
 import type { RoachKingState } from './rift/types';
 import type {
@@ -67,6 +76,13 @@ export const DUNGEON_LEASH_DISTANCE = 70;
 // Nythraxis add template id. Used by the mob-locomotion slice (the add branch of
 // updateMob); the boss id NYTHRAXIS_BOSS_ID lives lower in this file (C1 relocation).
 export const NYTHRAXIS_ADD_ID = 'nythraxis_skeleton_warrior';
+// Owner playtest call 2026-09-04: the mechanics redo fields NO adds. Raise
+// Fallen's guard waves (phase 1) and the heroic court summon (phase 2) both read
+// this switch, and so do the Raid Boss Guide page and the Dungeon Finder blurbs,
+// so the fight and the text that describes it always agree. The add templates
+// and their AI stay authored (loot, portraits, deeds, and the direct-call unit
+// tests reference them); flipping this back restores the waves and the court.
+export const NYTHRAXIS_ADDS_ENABLED = false;
 export const GCD = 1.5; // seconds
 // Owner 2026-07-13: spell haste now shortens the global cooldown, floored here so it
 // never collapses to nothing. The base GCD is divided by spellHasteMult at cast time.
@@ -147,7 +163,7 @@ export const FISHING_CAST_ID = 'fishing';
 // carries ZERO information about the hidden bite (max bite delay plus max
 // reel window end every real session well before it), so the broadcast cast
 // fields can never leak the bite timing to a modified client.
-export const FISHING_SESSION_CAP_SEC = 15;
+export const FISHING_SESSION_CAP_SEC = 16;
 // The gather-cast sentinel riding castingAbility (Professions 2.0),
 // beside FISHING_CAST_ID above: an activity marker, never an ability id.
 export const GATHER_CAST_ID = 'gathering';
@@ -161,10 +177,29 @@ export const CRAFT_CAST_ID = 'crafting';
 export const DISENCHANT_CAST_ID = 'disenchanting';
 export const ENCHANT_CAST_ID = 'enchanting_apply';
 export const SALVAGE_CAST_ID = 'salvaging';
+// The Sundered Essence extraction cast (Masterwrought phase 04): breaks a
+// raid-won epic into the bound ceiling material. Same enchant-family session
+// shape (professions/sundering.ts reuses the enchantCast* fields and the
+// pinned-slot re-check).
+export const SUNDER_CAST_ID = 'sundering';
 // Tool-effect recharge cast sentinel (Craft Cast System Phase 5): same
 // activity-marker shape as craft/enchant-family. Separate id keeps cast-bar
 // labels and audio routing clean.
 export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
+// The planting cast sentinel (Farming, the growth-engine phase): same
+// activity-marker shape as the craft/gather family. UNLIKE every other
+// sentinel here, this cast decides NOTHING: plantCrop resolves the whole
+// plant at command time and the cast is pure flavor, so its completion arm in
+// combat/casting_lifecycle.ts dispatches no work (see the comment there).
+// Membership in isNonSpellCast below is what buys it the shared bundle
+// (silence exemption, no spell queue, damage cancels instead of pushing back,
+// item use blocked while it runs).
+export const FARMING_CAST_ID = 'farming';
+// The corpse-harvest cast (Intentional Gathering, PR3): same activity-marker
+// shape as gather/craft/fishing. HARVEST_CAST_SECONDS (professions/
+// harvest_admission.ts) is the frozen duration; professions/
+// corpse_harvest_session.ts owns the whole session.
+export const CORPSE_HARVEST_CAST_ID = 'corpse_harvest';
 // The non-spell casts: castingAbility sentinels that are activities, not
 // abilities. They share one semantics bundle at the casting choke points:
 // exempt from silence and school lockouts, no blink-through, no spell queue,
@@ -180,8 +215,36 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === DISENCHANT_CAST_ID ||
     castId === ENCHANT_CAST_ID ||
     castId === SALVAGE_CAST_ID ||
-    castId === TOOL_RECHARGE_CAST_ID
+    castId === SUNDER_CAST_ID ||
+    castId === TOOL_RECHARGE_CAST_ID ||
+    castId === FARMING_CAST_ID ||
+    castId === CORPSE_HARVEST_CAST_ID
   );
+}
+
+// Corpse-harvest per-corpse state (Intentional Gathering, PR3), transient:
+// never persisted, never on the wire. Lives on the mob Entity so the single
+// live reservation and the kill-credit priority snapshot travel with the
+// corpse itself. `token` is a fresh, unexported-shape marker object minted
+// once per `recordCorpseHarvestDeath` (or lazily on first admitted harvest
+// for a corpse that never went through a recorded death, e.g. a bare test
+// fixture): comparing it by REFERENCE is what lets an in-flight session tell
+// its own corpse apart from a same-entity-id corpse that despawned and came
+// back (respawnMob reuses the entity id), since a fresh token never equals an
+// old one even though every primitive field could coincidentally match.
+export interface CorpseHarvestState {
+  readonly token: object;
+  /** ctx.time the kill-credit priority window closes; 0 (or any time already
+   *  passed) means the corpse is public. */
+  priorityEndsAt: number;
+  /** Stable priority keys snapshotted once at death (see
+   *  professions/harvest_admission.ts `harvestPriorityKeyFor`); never
+   *  recomputed from live party state. Empty means nobody is owed the
+   *  window. */
+  readonly priorityMemberKeys: readonly string[];
+  /** entityId of the actor holding the single live reservation/cast against
+   *  this corpse, or null when nobody has one. */
+  reservedBy: number | null;
 }
 // Seconds an empty instance idles before it resets. Shared by the dungeon instance
 // reaper (instances/dungeons.ts) and the delve reaper (sim.ts). NYTHRAXIS_BOSS_ID
@@ -319,6 +382,7 @@ export type AuraKind =
   | 'pet_spellhaste'
   | 'buff_armor'
   | 'buff_int'
+  | 'buff_str'
   | 'buff_agi'
   | 'buff_dodge'
   | 'buff_speed'
@@ -432,8 +496,8 @@ export type AuraKind =
   // cooldown, and keeps its base damage (consumed in castAbility's override).
   // `winters_chill`: TARGET debuff with 2 charges; each compatible spell
   // impact spends one to count the target as frozen.
-  // `icicles`: self buff, up to 5 stacks, built by Rimelance impacts and Frozen
-  // Orb pulses. At 5 it gates Glacial Spike (requiresAuraStacks), which consumes
+  // `icicles`: self buff, up to 5 stacks, built by Rimelance impacts and
+  // Frostglobe pulses. At 5 it gates Rimeneedle (requiresAuraStacks), which consumes
   // the whole stack for its slow, heavy hit + a target freeze.
   | 'fingers_of_frost'
   | 'brain_freeze'
@@ -545,6 +609,11 @@ export type AuraKind =
   | 'hunter_ferocity'
   | 'hunter_frenzy'
   | 'hunter_cold_focus'
+  // Coldsight shot-choice read (combat/hunter_coldsight_read.ts, v0.42): the
+  // visible 10 sec opportunity a fully completed Fevered Draw grants. The
+  // internal reserved-marker step of that state machine deliberately rides
+  // the existing 'internal_cd' kind instead of a second new kind here.
+  | 'hunter_coldsight_read'
   | 'hunter_momentum'
   | 'hunter_reentry'
   | 'hunter_bloodtrail'
@@ -650,14 +719,43 @@ export interface Aura {
   unbreakableControl?: true;
   // Encounter-authored mechanic that ordinary dispels and broad self-cleanses
   // cannot remove. Death, natural expiry, and the encounter script still clear it.
+  // Server-internal by qr-19-encounter-owned-aura-wire (Phase 19): no aura snapshot
+  // carries it on the wire until an encounter applies one to a PLAYER, the trigger
+  // that would earn the encode/decode pair and the parity re-record.
   encounterOwned?: true;
-  // A penalty no player counter may shed: dispel, purge, and cleanse all skip it, and
-  // it is never right-click cancelable. Only its own timer takes it off. Set today at
-  // exactly one site, applySickness in ./spirit.ts, which serves both recovery
-  // sicknesses, matching the fact that they already survive death and relogging;
-  // without it a single dispel erased the entire Pale Keeper / unstuck penalty. The
-  // rule itself is isPlayerRemovableAura in ./aura_classify.ts.
+  // An aura no PLAYER counter may shed: dispel, cleanse, spellsteal, and any
+  // player purge that ever ships all skip it, and it is never right-click
+  // cancelable. The mob Spellgnaw devour affix deliberately reads neither
+  // this flag nor the flask marker (mob/mob_swing.ts isDevourableAura), so a
+  // mob purge still takes a flagged buff: the rule scopes to player-driven
+  // counters. Only its own timer (or a rule that bypasses player counters
+  // entirely) takes it off. Set today
+  // at four sites: applySickness in ./spirit.ts (both recovery sicknesses,
+  // matching the fact that they already survive death and relogging; without
+  // it a single dispel erased the entire Pale Keeper / unstuck penalty), the
+  // cheater mark (./moderation/cheater_mark.ts), the flask mint in
+  // ./items.ts useItem (the phase 10 QA STK-2 ruling: classic consumable
+  // buffs carried no dispel type, so a flask is neither offensively
+  // dispellable nor stealable), and the warlock Fate Threads self-aura
+  // (./combat/affliction.ts, the v0.40.0 rework: a resource carrier a
+  // dispel could strip would zero the class kit). The rule itself is
+  // isPlayerRemovableAura in
+  // ./aura_classify.ts.
   undispellable?: true;
+  // Marks a FLASK consumable aura (kind 'flask', src/sim/items.ts useItem).
+  // Three rules key on it and nothing else does: the one-flask singleton strip
+  // (a second flask sheds every aura already carrying this marker, whatever its
+  // effect kind, so only one flask ever rides at a time), the downward-refusal
+  // guard (a same-family elixir or scroll is refused rather than allowed to
+  // overwrite a flask), and death persistence (aurasSurvivingDeath in
+  // ./resurrection.ts keeps it). DEATH only: auras are session state and are
+  // not persisted, so a flask does not survive a logout or a restart. The
+  // elixir/scroll sources of the same aura id never set it, so a plain elixir
+  // stays mortal and stays outside the singleton. The mint also stamps
+  // `undispellable` BESIDE this marker (the phase 10 QA STK-2 ruling; see
+  // that field above): dispel/steal protection rides that flag, never this
+  // marker, so the three rules here stay the marker's complete consumer list.
+  flask?: true;
   breaksOnDamage?: boolean;
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
   // breaking. Undefined retains the normal break-on-any-damage behavior.
@@ -869,6 +967,8 @@ export type ItemUse =
   // player meets their first death somewhere nothing is hunting them.
   // Consumed on use and refused unless the lesson is active.
   | { type: 'passingStone' }
+  // Starts the one-time hammer quest; the Ember is consumed by crafting.
+  | { type: 'forgebreakerEmber' }
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
@@ -878,6 +978,9 @@ export type ItemUse =
   // type never carries a durability field (this repo has no durability
   // mechanic anywhere), so a base tool can never become unusable.
   | { type: 'gatherTool'; professionId: GatheringProfessionId; tier: number }
+  // A reusable all-class tool that opens the shared harvest-preference picker
+  // (runtime integration lands separately; this item's use arm only marks it).
+  | { type: 'harvestPreference' }
   // A crafted tool-effect charm (the acquisition craft): the item form of one
   // TOOL_EFFECTS entry. Consumed by the slot_tool_effect command through
   // resolveSlotToolEffect (src/sim/professions/tools.ts), never by useItem:
@@ -886,7 +989,18 @@ export type ItemUse =
   // single source of the effect-to-item mapping; a guard derives the craftable
   // set from these defs against the R9 slot policy so no item can exist for an
   // effect the policy refuses everywhere.
-  | { type: 'toolEffect'; effectId: ToolEffectId };
+  | { type: 'toolEffect'; effectId: ToolEffectId }
+  // Places a party-shared mobile crafting station at the user's position
+  // (Masterwrought phase 09, the Master's Field Forge): no specialization
+  // gate, holding the item is the credential, and the item is never consumed
+  // (a permanent tool). `stationCraftId` is a CRAFT id, not a StationType, so
+  // stationTypeForCraft resolves the station's type (weaponcrafting or
+  // armorcrafting for a forge) and MobileCraftingStation plus the `mst` wire
+  // value keep their existing craft-id shape unchanged. CraftDef['id'] is the
+  // narrowest named craft-id type the professions content has (there is no
+  // craft-id union today; CRAFT_RING types its ids as string), so this
+  // documents the domain without changing the checked type.
+  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -908,8 +1022,59 @@ export type ItemKind =
   | 'tool'
   | 'potion'
   | 'elixir'
+  | 'flask'
+  | 'scroll'
   | 'bag'
-  | 'mount';
+  | 'mount'
+  | 'recipe';
+// The aura kinds a timed FLAT STAT buff may carry. Narrower than AuraKind on
+// purpose: this payload's whole contract is "a flat stat buff for a while", and
+// its consumers act on that. The grant sites apply the kind as a plain stat aura
+// and let recalcPlayerStats fold it, and the one-flask singleton strip
+// (src/sim/items.ts useItem) sheds a worn one by splicing the aura and
+// recalculating, which is correct for a flat stat buff and silently WRONG for a
+// kind whose removal owes more than a recalc (a stealth or invisibility aura, a
+// percent-scaled buff, anything with a paired timer). Typing the field as the
+// whole AuraKind let a content author write one of those into a food or elixir
+// record and get no compiler complaint at all.
+//
+// The set is exactly the three kinds the live carriers use (the elixir, scroll
+// and flask defs plus the seven buff foods), derived rather than re-typed so it
+// cannot drift from AuraKind's own spelling. Widening it means auditing the
+// singleton strip in the same change, not just adding a row; FlaskAuraKind below
+// carries the same warning over the same three kinds, and
+// tests/wellfed.test.ts pins that the two stay identical.
+export type TimedStatBuffAuraKind = Extract<AuraKind, 'buff_sta' | 'buff_ap' | 'buff_int'>;
+
+// What a successful `useItem` reports back to its caller when the use did more
+// than consume the item. `undefined` is the ordinary answer (a potion, a food,
+// a scroll: the effect is already applied and there is nothing to say); a
+// variant means the caller has a follow-up of its own, which today is the
+// mech-chroma unlock the online host mirrors as an account-cosmetic change.
+//
+// Home moved here (masterwrought Phase 18) from mech_chroma_ownership.ts, where
+// it had been parked beside its ONLY variant. That home read as if the type
+// belonged to the chroma system rather than to `useItem`, so the next variant
+// would have had a choice between importing the cosmetic module for an
+// unrelated result and quietly starting a second result type. It is an
+// items-domain shape, so it lives with the other shared item types; sim.ts
+// keeps its public re-export so every foreign importer stands unchanged.
+export interface ItemUseResult {
+  type: 'mechChroma';
+  chromaId: string;
+}
+
+// One timed flat stat buff, the payload shape shared by the elixir/scroll/flask
+// `elixir` record, the role foods' `wellFed` record, and the meal in flight
+// (FoodConsuming.wellFed). Named once because three copies had grown (the repo's
+// rule-of-three threshold); the grant POINT (use vs meal completion) is what
+// makes them different mechanics, never the payload.
+export interface TimedStatBuffPayload {
+  aura: string;
+  kind: TimedStatBuffAuraKind;
+  value: number;
+  duration: number;
+}
 
 interface BaseItemDef {
   id: string;
@@ -975,7 +1140,7 @@ interface BaseItemDef {
   // elixirs: a temporary stat-buff aura granted on use (classic battle elixirs).
   // `aura` is a flavor name shown in the buff frame; `value` is the stat amount,
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.
-  elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
+  elixir?: TimedStatBuffPayload;
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   // bags (kind:'bag'): extra inventory slots granted while equipped in one of
   // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).
@@ -1006,6 +1171,10 @@ interface BaseItemDef {
   // Marks a bespoke heroic-tier item (e.g. the Heroic Nythraxis raid epics) for
   // tooltip chrome; these keep their own name key, unlike heroicOf variants.
   heroic?: boolean;
+  // Member of the Masterwrought counted equip family: at most two flagged items
+  // worn, at most one of them with effective legendary quality
+  // (src/sim/equipment_rules.ts masterwroughtConflictSlot).
+  masterwrought?: boolean;
 }
 
 // Item-set bonuses (classic "tier set" style). Flat effects fold into
@@ -1199,8 +1368,137 @@ export interface HeldOffhandItemDef extends BaseItemDef {
 }
 
 export interface OtherItemDef extends BaseItemDef {
-  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'held_offhand' | 'mount'>;
+  kind: Exclude<
+    ItemKind,
+    'armor' | 'weapon' | 'held_offhand' | 'mount' | 'recipe' | 'scroll' | 'flask' | 'food'
+  >;
   armorType?: never;
+  // The shared feast (farming, D16): a placeable item whose use spawns a
+  // world entity instead of consuming food. `charges` is how many
+  // players may eat once each, `durationTicks` the tick-domain lifetime, and
+  // `dishItemId` names the dish whose serving each bite IS: the eating slot
+  // points at that dish, so its foodHp and wellFed fields drive the restore
+  // and the completion mint unchanged (src/sim/professions/feast.ts owns the
+  // whole lifecycle; both numbers are maintainer-flagged tuning). It lives
+  // HERE rather than on BaseItemDef for the same reason wellFed lives on
+  // FoodItemDef: the shipped harvest_feast is kind 'junk' (the tonic
+  // precedent for a crafted non-equippable usable), and kind-scoping keeps a
+  // sword or a drink from silently carrying a feast payload nothing places.
+  //
+  // `templateId` NAMES THE PLACED ENTITY'S TEMPLATE, and it is a content field
+  // rather than a constant in the behavior module for one reason
+  // (masterwrought Phase 11k): the placed title is composed client-side off
+  // templateId, so a feast sharing another feast's template is labelled as the
+  // rung it is not. Putting it here makes the placeable FAMILY derivable from
+  // the catalog (professions/feast.ts walks ITEMS for this payload and builds
+  // the membership set). FIVE sites key on a template id and none of them names
+  // a string literal any more, which is the narrow and true version of the
+  // claim: authoring a def joins the DERIVED set at all five. It does not
+  // finish the job. Two of those five are the title composers, and they reach
+  // the family through a hand-listed key map in src/ui/hud/professions/feast_title.ts (a t()
+  // key built by template literal is invisible to every static consumer), so a
+  // new def leaves that map short and the exhaustiveness pin in
+  // tests/entity_display_name.test.ts is what catches it. professions/feast.ts's
+  // own header carries the full site list. The template must be UNIQUE per
+  // feast id, pinned in tests/professions_feast.
+  feast?: {
+    charges: number;
+    durationTicks: number;
+    dishItemId: string;
+    templateId: string;
+  };
+}
+
+// FOOD. Its own kind-scoped def for exactly one reason: `wellFed` lives HERE
+// rather than on BaseItemDef, so a drink (or a potion, or a sword) cannot
+// silently carry a Well Fed payload that nothing would ever grant. Only the
+// eating path GRANTS it (the item tooltip merely describes it), and only a
+// food def can spell it.
+//
+// The buff is the classic Well Fed: same payload shape as `elixir`, but the
+// grant POINT is what makes it a different mechanic. It lands only when the
+// 18-second Consuming drain runs out (combat/auras.ts updateRegen), so standing
+// up early feeds you and buffs you not at all. Every well-fed food shares one
+// aura id ('well_fed'), so the newest meal replaces the last through the
+// ordinary same-id rule, and it carries no flask marker: Well Fed dies with you.
+// Optional, because most food is a plain sit-down heal with no buff at all.
+export interface FoodItemDef extends BaseItemDef {
+  kind: 'food';
+  // The one well-fed field (unified in Masterwrought 11c; farming's lowercase
+  // `wellfed` twin was retired with its per-kind aura namespace). The aura is
+  // minted only when the 18s sit-restore COMPLETES (never on first bite; an
+  // interrupted meal forfeits it; src/sim/wellfed.ts owns the mint), under
+  // the one shared WELL_FED_AURA_ID.
+  wellFed?: TimedStatBuffPayload;
+  // A food is a sit-down heal that may leave Well Fed; it is never also an
+  // elixir source (the use path's elixir arm would never see a food anyway,
+  // so an `elixir` record here would be dead data, the same class as `use`).
+  elixir?: never;
+  armorType?: never;
+  weapon?: never;
+  // Barred for the same reason ScrollItemDef and FlaskItemDef bar it: a `use`
+  // payload resolves in useItem's use-arm chain ABOVE the kind arms, so a food
+  // carrying one would never reach the eating path at all and its wellFed
+  // record would be dead data. The kind was split out to make the eating path's
+  // assumptions type-enforced; this is one of them.
+  use?: never;
+}
+
+// A buff SCROLL: the inscription-crafted alternative source of a battle-elixir
+// aura family (masterwrought R14 corollary; see docs/design/professions.md). It reuses the SAME
+// `elixir` effect payload and the same use-path arm as kind 'elixir', so the
+// synthesized aura id (`elixir_${kind}`) and applyAura same-id replacement make
+// a scroll and an elixir of one family mutually exclusive in both orders with
+// no new stacking path. Its own kind rather than another 'elixir' row so the
+// tooltip kind line and the use log can say scroll ("You read"), and so the
+// effect payload can never be omitted (the Exclude above).
+export interface ScrollItemDef extends BaseItemDef {
+  kind: 'scroll';
+  elixir: NonNullable<BaseItemDef['elixir']>;
+  // A scroll is read, never eaten or drunk: the sit-down payloads are dead
+  // data on this kind (the eating arm never sees a scroll), barred like `use`.
+  foodHp?: never;
+  drinkMana?: never;
+  armorType?: never;
+  weapon?: never;
+  use?: never;
+}
+
+// A FLASK: the alchemy apex consumable (see docs/design/professions.md). Like
+// the scroll above it reuses the SAME `elixir` effect payload and the same
+// use-path arm, so it joins the shipped `elixir_${kind}` aura family and a flask
+// and an elixir of one stat replace each other in both orders through applyAura,
+// with no new stacking path. Two rules make it a flask rather than a stronger
+// elixir, both keyed on the Aura.flask marker the use path stamps, never on the
+// item kind: only ONE flask rides at a time whatever its stat (a second sheds
+// the first), and the buff survives death. Its own kind rather than another
+// 'elixir' row so the tooltip kind line, the bag/market/tray surfaces, and the
+// sort ladder can name it, and so the effect payload can never be omitted (the
+// Exclude above). Its band deliberately sits ABOVE the documented elixir
+// ceiling (value <= 12, duration <= 900): the ceiling binds the elixir/scroll
+// bands, which is exactly what a flask is meant to beat.
+//
+// The effect kind is NARROWED to the three flat stat axes the shipped rung
+// uses, deliberately, and it is the type that enforces it rather than a
+// comment: the one-flask singleton strip (src/sim/items.ts useItem) sheds a
+// worn flask by splicing the aura and recalculating stats, which is correct for
+// a flat stat buff and silently WRONG for a kind whose removal owes more than a
+// stat recalc (a stealth or invisibility aura, a percent-scaled buff). Those
+// omissions are known-inert only because no such flask can exist; widening this
+// union means auditing that strip in the same change, not just adding a row.
+export type FlaskAuraKind = Extract<AuraKind, 'buff_sta' | 'buff_ap' | 'buff_int'>;
+
+export interface FlaskItemDef extends BaseItemDef {
+  kind: 'flask';
+  elixir: NonNullable<BaseItemDef['elixir']> & { kind: FlaskAuraKind };
+  // Quaffed, never eaten or drunk over 18 seconds: the sit-down payloads are
+  // dead data on this kind, barred like `use` (symmetric with FoodItemDef
+  // barring `elixir`).
+  foodHp?: never;
+  drinkMana?: never;
+  armorType?: never;
+  weapon?: never;
+  use?: never;
 }
 
 // A collectible mount item. Owning the item IS owning the mount: while it sits
@@ -1217,13 +1515,44 @@ export interface MountItemDef extends BaseItemDef {
   weapon?: never;
 }
 
+// A recipe PATTERN item: the physical drop that teaches one ProfessionRecipeRecord
+// when used from the bags (src/sim/professions/pattern_items.ts). The def names the
+// recipe it teaches and nothing else; `teachesRecipeId` is a recipe id
+// (content/recipes.ts recipeById), never an item id. Patterns are ordinary
+// tradable drops: no soulbound, no noMarketList. The bind happens by CONSUMPTION
+// at learn time, so a pattern is worth exactly what an unlearned copy is worth
+// and nothing once the knowledge is spent. Its own kind rather than a `use` arm
+// on OtherItemDef, so the recipe id can never be omitted (the Exclude above) and
+// the browse/stack/tooltip surfaces can key on the kind. Two more fields are
+// barred outright: a `use` payload would resolve in useItem's use-arm chain
+// ABOVE the recipe kind arm, so the click would never reach the learn, and an
+// explicit `stackSize` wins over UNSTACKED_KINDS in stackSizeOf, so it would
+// silently stack a kind every surface asserts is one-per-slot.
+export interface RecipeItemDef extends BaseItemDef {
+  kind: 'recipe';
+  teachesRecipeId: string;
+  /** A collection manual teaches these recipes atomically. The first id also
+   *  occupies teachesRecipeId for legacy discovery and preview consumers. */
+  teachesRecipeIds?: readonly string[];
+  /** A formula uses the enchant catalog rather than the crafting catalog. */
+  teachesEnchantId?: string;
+  armorType?: never;
+  weapon?: never;
+  use?: never;
+  stackSize?: never;
+}
+
 export type ItemDef =
   | ArmorItemDef
   | WeaponItemDef
   | JewelryItemDef
   | HeldOffhandItemDef
   | OtherItemDef
-  | MountItemDef;
+  | MountItemDef
+  | RecipeItemDef
+  | ScrollItemDef
+  | FlaskItemDef
+  | FoodItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
@@ -1268,6 +1597,47 @@ export interface ItemInstancePayload {
    *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
    *  an ordinary freely-tradeable instance. */
   bindOnTrade?: boolean;
+  /** Mid-track Perfecting rank (Masterwrought phase 12,
+   *  professions/perfecting.ts): an integer in [1, PERFECTING_RANKS - 1],
+   *  absent = rank 0, DELETED when `perfected` below stamps (rank
+   *  PERFECTING_RANKS is Perfected itself, never a `perfecting` value).
+   *  Written by resolvePerfectingAttempt and by the crafting.ts masterwork
+   *  head start (PERFECTING_HEADSTART_RANK). A plain number, so
+   *  cloneItemInstancePayload's spread covers it; the load bound keeps only a
+   *  legal in-range integer (item_instance_load.ts, drop-only). */
+  perfecting?: number;
+  /** Permanent Perfecting binding, retained when a collection rank swap leaves rank zero. */
+  perfectingBound?: true;
+  /** This collection copy's immutable primary bonus, applied in rolled.stats only while Perfected. */
+  perfectingBonus?: Partial<CoreStats>;
+  /** Marks a copy that has completed the Perfecting stage (Masterwrought R1).
+   *  Minted by phase 12's rank walk (professions/perfecting.ts
+   *  resolvePerfectingAttempt, when the track reaches PERFECTING_RANKS); the
+   *  phase 10 Lucent Infusion guard (content/enchants.ts requiresPerfected,
+   *  professions/enchanting.ts) reads it. Only ever `true`; absent is an
+   *  ordinary copy, so pre-phase saves load clean. Included in the public
+   *  inspect projection so Perfected-only enchants can correctly become
+   *  dormant after rank exchange; mid-track ranks and binding/bonus
+   *  provenance remain owner-only via `inv` and `einst`. */
+  perfected?: true;
+  /** Player-chosen legendary name (Masterwrought phase 13, R3): stamped by the
+   *  orange promotion (professions/perfecting.ts, the chain
+   *  resolvePerfectingAttempt -> its internal promotion arm ->
+   *  promotePerfectedCopy, the last being the stamp site) alongside
+   *  rolled.quality = 'legendary', on an already-Perfected copy only.
+   *  Player-authored TEXT, always a VALUE and never an i18n key: standalone it
+   *  renders raw through the entity-name path (esc, untranslated); composed
+   *  lines interpolate it into a t() template (the feast/makers-mark
+   *  precedent). This field is COSMETIC PRESTIGE and
+   *  deliberately JOINS the server's `eqi` peer wire allowlist and
+   *  publicInstanceView (the phase 13 decision: an inspecting viewer seeing
+   *  the name is the point of the promotion), beside signer/enchant/rolled.
+   *  Live shape is validated in the sim (legendary_name.ts); the load bound
+   *  keeps a printable-ASCII string within its own byte ceiling
+   *  (item_instance_load.ts, a dedicated drop-only arm on the signer
+   *  doctrine: deliberately looser than the live shape so persisted values
+   *  outlive an alphabet widening). */
+  name?: string;
   /** Player-toggled safety mark (issue 3042, item_lock.ts isItemLocked): while
    *  true this specific copy refuses salvage, profession-craft reagent
    *  consumption, and vendor sell (single and bulk) until the player unlocks
@@ -1287,18 +1657,27 @@ export interface ItemInstancePayload {
    *  ordinary soulbound copy. */
   partyTrade?: { untilMs: number; eligible: string[]; eligibleIds?: number[] };
   /** Long-term Rift gear progression. `rolled.stats` is the authoritative
-   * aggregate bonus consumed by recalcPlayerStats; this record explains how it
-   * was earned and lets forge operations rebuild it deterministically. */
+   * aggregate consumed by recalcPlayerStats (the band's whole stat line plus
+   * its gem ratings); this record is the bounded input it is rebuilt from
+   * (rift/progression.ts rebuildRolledStats, priced by rift/band_ladder.ts):
+   * the clear's rank sets the base item level, every essence upgrade raises it
+   * by one, and each socketed gem adds one rating line. `power` is the rank's
+   * essence weight (salvage yield and first-clear essence count). */
   rift?: {
     sourceEventId: string;
     tier: RiftTier;
     power: number;
     upgradeLevel: number;
     maxUpgradeLevel: number;
-    baseStats: Record<string, number>;
-    enchant?: { stat: string; value: number };
     gemSlots: number;
     gems: string[];
+    /** LEGACY (pre-ladder payloads only): the old additive base line. Never
+     *  read; the load rebuild drops it. Kept optional so a persisted copy
+     *  still types. */
+    baseStats?: Record<string, number>;
+    /** LEGACY (pre-ladder payloads only): the retired forge enchant. Never
+     *  read; the load rebuild drops it. */
+    enchant?: { stat: string; value: number };
   };
 }
 
@@ -1311,6 +1690,12 @@ export interface ItemInstancePayload {
 export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
   const instance: ItemInstancePayload = { ...src };
   if (src.charges) instance.charges = { ...src.charges };
+  if (
+    src.perfectingBonus &&
+    typeof src.perfectingBonus === 'object' &&
+    !Array.isArray(src.perfectingBonus)
+  )
+    instance.perfectingBonus = { ...src.perfectingBonus };
   if (src.rolled)
     instance.rolled = {
       ...src.rolled,
@@ -1326,7 +1711,7 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
   if (src.rift) {
     instance.rift = {
       ...src.rift,
-      baseStats: { ...src.rift.baseStats },
+      ...(src.rift.baseStats && { baseStats: { ...src.rift.baseStats } }),
       ...(src.rift.enchant && { enchant: { ...src.rift.enchant } }),
       ...(Array.isArray(src.rift.gems) ? { gems: [...src.rift.gems] } : {}),
     };
@@ -1345,6 +1730,10 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
 export interface InvSlot {
   itemId: string;
   count: number;
+  /** Exact surviving material sources. Absent on legacy homogeneous saves. */
+  materialSources?: MaterialComposition;
+  /** Owner grouping choice, retained by sorting/saving and stripped on transfer. */
+  materialSeparated?: true;
   /** Additive, optional per-instance payload (#1165). Absent for ordinary fungible stacks. */
   instance?: ItemInstancePayload;
   /** Recipe id that minted this stack when crafting provenance matters but the
@@ -1364,8 +1753,19 @@ export interface InvSlot {
 // equipped-instance map, src/sim/professions/enchanting.ts) for why that is
 // unsafe and what this clones instead.
 export function cloneInvSlot<T extends InvSlot>(slot: T): T {
-  if (!slot.instance) return { ...slot };
-  return { ...slot, instance: cloneItemInstancePayload(slot.instance) };
+  const copied = { ...slot };
+  if (slot.instance) {
+    copied.instance =
+      slot.materialSources === undefined
+        ? cloneItemInstancePayload(slot.instance)
+        : cloneMaterialPayload(slot.instance);
+  }
+  // Copy before load validation without interpreting malformed source data.
+  // A rejected descriptor must never be silently replaced with unknown stock.
+  if (slot.materialSources !== undefined) {
+    copied.materialSources = cloneMaterialData(slot.materialSources);
+  }
+  return copied;
 }
 
 /** ONE unit lifted out of an inventory slot, carrying BOTH provenance channels
@@ -1384,6 +1784,8 @@ export function cloneInvSlot<T extends InvSlot>(slot: T): T {
 export interface InventoryUnit {
   instance: ItemInstancePayload | undefined;
   craftedRecipeId: string | undefined;
+  /** Exact material source for this one unit; payload stays canonical. */
+  materialSources?: MaterialComposition;
 }
 
 export interface LootSlot extends InvSlot {
@@ -1497,6 +1899,17 @@ export interface LootEntry {
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
   // their chances, so at most one matching entry drops.
   rollGroup?: string;
+  // Rolls on Normal kills only: a heroic claim skips the entry, and for a
+  // rollGroup the whole group (no rng draw), so the boss's HEROIC_BOSS_LOOT
+  // append can REPLACE that slot instead of stacking on it (the Crucible's
+  // one-item-per-five-raiders cadence; loot/loot_difficulty_gate.ts is the one
+  // predicate). Every entry of a group must agree, and the heroic-append
+  // tables never carry it (both pinned by tests/loot_roll.test.ts).
+  normalOnly?: true;
+  // A migrated base-loot acquisition in HEROIC_BOSS_LOOT keeps its original
+  // source level and stats; listing it here must not promote it to the
+  // bespoke heroic equipment tier or seed the higher-tier rift reward pool.
+  preserveSourceTier?: true;
 }
 
 export type MobFamily =
@@ -2548,6 +2961,37 @@ type AoeRootEffect =
       trap: { armTime: number; lifetime: number };
     });
 
+/** A weapon-coat rider: what ONE landed melee swing inflicts on the struck
+ *  target while the coating is worn. Authored on an `imbue` effect, so a coat
+ *  is always carried by the imbue aura the coating ability applies, and the
+ *  rider borrows that aura's id and display name (combat/poison_coating.ts).
+ *  This is the player-side twin of the mob on-hit DoT seam (`stackPoison`,
+ *  `venom`, `corrode` on MobTemplate): same aura shapes, but applied by a
+ *  coating the player chose to put on rather than by a creature's innate bite. */
+export type PoisonCoat =
+  // Classic Deadly Poison: a stacking damage-over-time whose per-tick damage is
+  // perTick x stacks. Every landed swing adds a stack (up to maxStacks) and
+  // fully refreshes the timer, so the poison bites harder the longer you stay on
+  // the target. Reuses the `dot` aura kind; the shared slot carries the count.
+  | {
+      rider: 'stackDot';
+      perTick: number;
+      maxStacks: number;
+      duration: number;
+      interval: number;
+      school?: Aura['school'];
+    }
+  // A plain refreshing debuff rider (an armor shred, a healing-taken cut): every
+  // landed swing re-applies it at full duration, the same shape the mob on-hit
+  // debuffs already use.
+  | {
+      rider: 'debuff';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      school?: Aura['school'];
+    };
+
 export type AbilityEffect =
   | { type: 'weaponDamage'; bonus: number } // on-next-swing bonus (heroic strike)
   | {
@@ -2593,7 +3037,7 @@ export type AbilityEffect =
       hitsPrimary?: boolean;
     }
   // Removes magic-only auras in the ally/enemy direction. `steal` transfers a
-  // stripped enemy benefit to the caster (Spellsteal). `selfHealPctMaxOnDispel`
+  // stripped enemy benefit to the caster (Spellplunder). `selfHealPctMaxOnDispel`
   // heals the caster this fraction of max health ONLY when something was
   // actually devoured (Voidfeast: no free heal off an empty target).
   // `requiresDispellable` refuses the CAST at the gate (before billing mana or
@@ -2802,7 +3246,9 @@ export type AbilityEffect =
       casterMaxHpPct?: number;
       auraId?: string;
     } // power word: shield
-  | { type: 'imbue'; bonus: number; duration: number } // seals / rockbiter: extra damage per swing
+  // seals / rockbiter / rogue poisons: flat extra damage on every swing, plus the
+  // optional weapon-coat rider a landed swing inflicts on whatever it strikes.
+  | { type: 'imbue'; bonus: number; duration: number; coat?: PoisonCoat }
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
   | {
@@ -2927,7 +3373,7 @@ export type AbilityEffect =
       // Blizzard: each pulse also snares everyone struck (kind 'slow').
       slowMult?: number;
       slowDuration?: number;
-      // Blizzard: each struck enemy shaves the running Frozen Orb cooldown
+      // Blizzard: each struck enemy shaves the running Frostglobe cooldown
       // (frost_mage's per-cast budget, reset when the zone is placed).
       orbCdr?: boolean;
       // Paladin Consecration grants this amount once, on the first pulse that
@@ -2995,7 +3441,7 @@ export type AbilityEffect =
         incapacitateDuration?: number;
       }[];
     }
-  // Frozen Orb (combat/frozen_orb.ts): releases a slow-drifting orb from the
+  // Frostglobe (combat/frozen_orb.ts): releases a slow-drifting orb from the
   // caster that pulses frost damage + a snare every `interval` for `duration`
   // seconds and banks Icicles (frost mage spec kit).
   | {
@@ -3348,10 +3794,10 @@ export interface AbilityDef {
   // raid instance. Toggle buffs may still be cancelled there to avoid trapping the
   // player in an action-locking form.
   requiresOutsideInstance?: boolean;
-  // Usable only while the caster wears an aura of this kind (Victory Rush's
+  // Usable only while the caster wears an aura of this kind (Victor's Surge's
   // on-kill window); runEffects consumes the enabling aura on a successful cast.
   requiresAuraKind?: AuraKind;
-  // Minimum stacks of requiresAuraKind needed to cast (Glacial Spike needs the
+  // Minimum stacks of requiresAuraKind needed to cast (Rimeneedle needs the
   // full 5-stack Icicles buff). Absent means any presence of the aura suffices.
   // The whole aura is still consumed on cast (consumeAuraKind removes it).
   requiresAuraStacks?: number;
@@ -3442,9 +3888,22 @@ export interface NpcDef {
   // A flag on the warfareVendor precedent so a second placement never widens a
   // hard-keyed constant.
   crucibleVendor?: boolean;
+  // The Riftwright: talking to this NPC opens the Rift Forge window (upgrade,
+  // socket on Riftbound rings, src/sim/rift/progression.ts), and the
+  // two forge commands gate on standing within reach of one of these (the
+  // banker precedent, src/sim/rift/forge_gate.ts). A flag rather than a
+  // hard-keyed id so a second forge placement never widens a constant.
+  riftForge?: boolean;
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;
+  // A farmer NPC (the farming go-live): the range anchor of the husk-to-compost
+  // trade (src/sim/professions/farming.ts convertHusks refuses out of reach of
+  // one) and the gossip row that offers it. A FLAG rather than a hard-keyed id
+  // list (the warfareVendor precedent) so a fifth farmer needs no constant
+  // widened. Vending stays emergent from vendorItems; the watch fee is a
+  // plant-time bag payment and never gates on this flag (D9).
+  farmer?: true;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
@@ -3486,10 +3945,22 @@ export interface GroundObjectDef {
 // issue is content plus visibility only, no harvest logic (see G3).
 export type GatherNodeType = 'ore' | 'wood' | 'herb';
 
-// Rare gather event flavors (Professions 2.0), one per node family:
+// Rare gather event flavors (Professions 2.0), one per gather family:
 // ore rolls pristine_vein, wood rolls ancient_heartwood, herb rolls
-// moonlit_bloom (professions/gather_events.ts gatherRareEventFlavor).
-export type GatherRareEventFlavor = 'pristine_vein' | 'ancient_heartwood' | 'moonlit_bloom';
+// moonlit_bloom, and a farm-bed harvest rolls golden_harvest, all mapped by
+// professions/gather_events.ts gatherRareEventFlavor.
+export type GatherRareEventFlavor =
+  | 'pristine_vein'
+  | 'ancient_heartwood'
+  | 'moonlit_bloom'
+  | 'golden_harvest';
+
+// What rolled a rare event: a gather-node family, or a farm bed ('crop').
+// Widens the gatherRareEvent payload's nodeType leaf WITHOUT conscripting
+// 'crop' into GatherNodeType itself: farm beds are deliberately not gather
+// nodes (no GATHER_NODES row, no placement suite, no node tooltip family;
+// the fishing precedent).
+export type GatherRareEventSource = GatherNodeType | 'crop';
 
 export interface GatherNodeDef {
   id: string;
@@ -3863,7 +4334,7 @@ export interface ZonePropsDef {
     arch: { x: number; z: number; dir: number };
     jumps: { x: number; z: number; dir: number; kind: 'vertical' | 'oxer' }[];
   };
-  // Hand-placed giant trees (the Eldergleam centerpiece): solid trunk
+  // Hand-placed giant trees (the Eldershine centerpiece): solid trunk
   // colliders here, rendered by render/realm_flora.ts from the same record.
   greatTrees?: { x: number; z: number; r: number }[];
   // Hand-placed one-off GLB props (the generated storybook set). `key` names a
@@ -3945,7 +4416,20 @@ export type QuestObjective =
   // NPC reaches its final waypoint with this player in credit range. count is
   // always 1; the run starts by interacting with the idle escortee while this
   // quest is active.
-  | (QuestObjectiveBase & { type: 'escort'; escortId: string });
+  | (QuestObjectiveBase & { type: 'escort'; escortId: string })
+  // Farm: credited by the plant and harvest ACTIONS in
+  // src/sim/professions/farming.ts (the gather precedent: inventory cannot
+  // prove the deed, and produce is a fungible material). `cropId` narrows the
+  // action to one crop; `patchId` is marker guidance only (quest_targets.ts
+  // encloses that patch's beds; without it every farming patch qualifies) and
+  // never gates the credit. A harvest credits on every outcome, withered
+  // included: the visit is the deed.
+  | (QuestObjectiveBase & {
+      type: 'farm';
+      action: 'plant' | 'harvest';
+      cropId?: string;
+      patchId?: string;
+    });
 
 // ---------------------------------------------------------------------------
 // Escort runs (src/sim/escort.ts): a quest NPC that walks an authored waypoint
@@ -4020,6 +4504,10 @@ export interface QuestDef {
   xpReward: number;
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
+  // Teaches through acquisition source 'quest' on a successful turn-in.
+  // The recipe's own craft skill floor is checked before any rewards or
+  // consumption, so an early hand-in cannot lose the recipe.
+  recipeReward?: string;
   requiresQuest?: string; // prerequisite quest id (must be turned in)
   // Acceptance requires the purchased riding skill (PlayerMeta.ridingTrained).
   // Enforced in finalizeQuestAccept so every accept path (npc, linked share,
@@ -4029,10 +4517,17 @@ export interface QuestDef {
   // quest needs; re-granted on accept if the player no longer has them, to avoid a progression block
   requiredClass?: PlayerClass[]; // class-locked quest: only these classes see/accept it
   // (e.g. the paladin-only Divine Tome chain). Availability enforced in computeQuestState.
+  // Additionally requires a resolvable ability beyond class/level alone. The ONE
+  // user today is the hub's optional healing lesson (q_hub_healing_numbers),
+  // which needs the SAME resolver its credit arm and the UI coach read
+  // (sim/tutorial/hub_healing_lesson.ts hubHealingAbilityId) so a class that is
+  // nominally eligible never sees the quest before their kit has anything to
+  // teach the lesson with. Enforced in computeQuestState.
+  requiresUsableHealAbility?: boolean;
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
-  // includes copies worn in a bag socket (quests/quest_owned_count.ts) and the
+  // includes worn equipment and bag sockets (quests/quest_owned_count.ts) and the
   // turn-in never consumes them. For a quest that asks the player to acquire
   // and KEEP a thing rather than fetch it, e.g. the tutorial island's Pouch
   // and Purse: it tells the player to buy a Linen Pouch and buckle it on, so
@@ -4125,9 +4620,8 @@ export function questObjectiveRequired(
 export const CONSUME_DURATION = 18; // seconds
 export const CONSUME_TICKS = 9; // CONSUME_DURATION / 2s regen tick
 
-export interface Consuming {
+interface ConsumingBase {
   itemId: string;
-  kind: 'food' | 'drink';
   hpPer2s: number;
   manaPer2s: number;
   remaining: number;
@@ -4137,6 +4631,32 @@ export interface Consuming {
   // read for anything else.
   ticksElapsed: number;
 }
+
+// A meal in the eating slot: the ONE Consuming arm that can spell a Well Fed
+// payload, so the D15 food-only contract is kind-scoped at the record as well
+// as at the def (FoodItemDef.wellFed): types beat guards at both layers, and
+// the completion site (combat/auras.ts) narrows on the record's kind before
+// handing the payload to the one mint in src/sim/wellfed.ts.
+export interface FoodConsuming extends ConsumingBase {
+  kind: 'food';
+  // The Well Fed buff this meal owes on COMPLETION, carried by reference off
+  // the food def at sit-down (FoodItemDef.wellFed, the only ItemDef member
+  // that can spell it) by the src/sim/consuming.ts builder. Carried here
+  // rather than re-read from the def at the end so the grant is decided by
+  // what was eaten, not by what the catalog says now, and so the drain in
+  // combat/auras.ts needs no item lookup. Absent for food that grants no
+  // buff. A REFERENCE to the def's record, not a copy (house style, the same
+  // as `def.elixir`): read-only by every consumer.
+  wellFed?: TimedStatBuffPayload;
+}
+
+// A drink in the drinking slot: no payload arm at all, so a gulp completion
+// can never reach the mint with one (unrepresentable, not guarded).
+export interface DrinkConsuming extends ConsumingBase {
+  kind: 'drink';
+}
+
+export type Consuming = FoodConsuming | DrinkConsuming;
 
 export function isConsuming(e: { eating: Consuming | null; drinking: Consuming | null }): boolean {
   return e.eating !== null || e.drinking !== null;
@@ -4262,7 +4782,7 @@ export interface Entity extends ClientMirroredEntityFields {
   // pinned by the parity digest (excluded in tests/parity/trace.ts ENTITY_EXCLUDE);
   // it lives on the entity so it is dropped automatically when the entity is removed.
   damageHistory?: DamageTick[];
-  // Transient per-cast budget: how much Frozen Orb cooldown this Blizzard
+  // Transient per-cast budget: how much Frostglobe cooldown this Blizzard
   // channel has already refunded (combat/frost_mage.ts, reset at channel
   // start). Never serialized or wired.
   blizzardOrbCdr?: number;
@@ -4387,6 +4907,8 @@ export interface Entity extends ClientMirroredEntityFields {
   rangedHaste: number;
   spellHaste: number;
   setProcs: SetProc[];
+  /** Derived from two worn pieces of one Crucible crafting collection; never saved. */
+  craftedCollectionId?: string;
   procReadyAt: Record<string, number>;
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
@@ -4614,7 +5136,7 @@ export interface Entity extends ClientMirroredEntityFields {
   chargeTargetId: number | null;
   chargeTimeLeft: number; // seconds; failsafe so a blocked charge can't run forever
   chargePath: Vec3[]; // waypoints consumed front-to-back; last leg homes on the live target
-  // Authoritative Heroic Leap arc. While present, it owns movement and defers the
+  // Authoritative Vaulting Charge arc. While present, it owns movement and defers the
   // landing area hit until touchdown. Absent until first use so unrelated entity
   // snapshots and deterministic traces do not gain inert state.
   leap?: HeroicLeapFlight | null;
@@ -4888,6 +5410,13 @@ export interface Entity extends ClientMirroredEntityFields {
   // (src/sim/professions/gathering.ts), which the client resolves locally off
   // `tid` (#2513).
   harvestClaimedBy: number | null;
+  // Corpse-harvest CAST state (Intentional Gathering, PR3): the kill-credit
+  // priority window and the single live reservation against a timed harvest
+  // cast, transient (never persisted, never on the wire), owned by
+  // professions/corpse_harvest_session.ts. Absent means no death was ever
+  // recorded for this corpse (a bare fixture, or content lootable outside a
+  // kill): treated as immediately public with no reservation.
+  corpseHarvestState?: CorpseHarvestState;
   despawnTimer?: number;
   // An unconditional lifetime countdown. Unlike despawnTimer, combat, retargeting,
   // and evade transitions never clear this timer.
@@ -4900,10 +5429,6 @@ export interface Entity extends ClientMirroredEntityFields {
   lootable: boolean;
   loot: CorpseLoot | null;
   lootRecipientIds?: number[];
-  /** Runtime-only stable identity for a soulbound drop's party-trade window.
-   *  Captured synchronously when loot rolls, so a later disconnect cannot
-   *  erase a kill-eligible character from the copy's transfer group. */
-  lootPartyTradeEligibility?: { names: string[]; characterIds: number[] };
   xpValue: number;
   // npc
   questIds: string[];
@@ -5067,6 +5592,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // applies. Render-only: the client swaps the held weapon model and rarity VFX.
   // Recomputed in recalcPlayerStats and synced in identity fields (terse `wsk`).
   weaponSkinId: string | null;
+  // Worn mount skin id (players only; null otherwise): the account cosmetic
+  // drawn OVER whatever mount `mountKey` names (content/mount_skins.ts).
+  // Render-only: the client swaps the mount visual and audio set. The sim never
+  // reads it for gameplay (speed stays on mountKey). Set by Sim.setMountSkin and
+  // synced in identity fields (terse `msk`), like `wsk`.
+  mountSkinId: string | null;
   // Full worn equipment (players only; empty otherwise). Render-only mirror of
   // PlayerMeta.equipment, recomputed in recalcPlayerStats and synced in identity
   // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,
@@ -5144,8 +5675,16 @@ export interface NythraxisDialogueCue {
   text: string;
 }
 
+/** One live Bone Spike: the spike mob and the raider it holds. */
+export interface NythraxisBoneSpike {
+  spikeId: number;
+  playerId: number;
+  // Seconds until the next impale drain tick.
+  tickTimer: number;
+}
+
 export interface NythraxisEncounterState {
-  phase: 1 | 'transition' | 2 | 'dead';
+  phase: 1 | 'transition' | 2 | 3 | 'dead';
   introSpoken: boolean;
   transitionStarted: boolean;
   transitionTimer: number;
@@ -5167,11 +5706,89 @@ export interface NythraxisEncounterState {
   deathlessCastRemaining: number;
   deathlessStunRemaining: number;
   heroicSummonChannelRemaining?: number;
+  // The mechanic-redo fields below are optional on the TYPE only so the many
+  // hand-built state literals in tests stay valid; initNythraxisEncounter sets
+  // every one, and the driver backfills a missing field with its default
+  // (encounters/nythraxis.ts nythraxisMechanicState) before reading it.
+  // Dread Curse (the tank swap, both difficulties): only the cadence lives
+  // here; the stacks live on the victim's aura (nythraxis_dread_curse.ts).
   dreadCurseTimer?: number;
-  dreadCurseTargetId?: number | null;
-  dreadCurseStacks?: number;
+  // Bone Spike cadence and the live spike/victim pairs (nythraxis_bone_spike.ts).
+  boneSpikeTimer?: number;
+  boneSpikes?: NythraxisBoneSpike[];
+  // Spikes and fire never overlap: seconds left in the settle window after an
+  // eruption lands (spikes hold) and after a spike wave (eruptions hold).
+  eruptionSettleTimer?: number;
+  spikeSettleTimer?: number;
+  // Grave Eruption: the cadence, the live warning window, and the burning
+  // patches it left behind (nythraxis_grave_eruption.ts). eruptionCastKey is
+  // the stable id root the warning rows and their impact events share.
+  eruptionTimer?: number;
+  eruptionCastKey?: number;
+  eruptionImpactRemaining?: number;
+  eruptionPoints?: { x: number; z: number }[];
+  // Every burning patch, Grave Flame and Soulfire alike (kind tells them
+  // apart; nythraxis_soulfire.ts pushes the Soul Rend pools into this list).
+  graveFlames?: {
+    seq: number;
+    kind: 'grave' | 'soul';
+    radius: number;
+    x: number;
+    z: number;
+    remaining: number;
+    tickTimer: number;
+  }[];
+  graveFlameSeq?: number;
+  // Heroic-only: the last boss-clock time (ctx.time) each player took a
+  // Soulfire tick, so standing in more than one heroic pool, or catching two
+  // staggered Soul Rend casts, never yields more than one normal-strength
+  // tick per second (nythraxis_soulfire.ts admitNythraxisSoulfireTick owns
+  // the gate; encounters/nythraxis.ts is the sole reader/writer).
+  soulfireTickAt?: { playerId: number; at: number }[];
+  // Gravefire: the cadence and the live traveling lines (nythraxis_gravefire.ts).
+  gravefireTimer?: number;
+  gravefires?: {
+    seq: number;
+    x: number;
+    z: number;
+    dirX: number;
+    dirZ: number;
+    elapsed: number;
+    tickTimer: number;
+  }[];
+  gravefireSeq?: number;
+  // Binding Sigil: the cadence, the live sigil (null between casts), and the
+  // gap timer that keeps the body-owning majors (Deathless Rage, the sigil
+  // drag) from overlapping (nythraxis_binding_sigil.ts).
+  sigilTimer?: number;
+  sigil?: {
+    castKey: number;
+    x: number;
+    z: number;
+    remaining: number;
+    ascensionTimer: number;
+    ascensionStacks: number;
+  } | null;
+  majorGapTimer?: number;
+  // The Crown Endures: seconds since the first encounter tick (the clock runs
+  // through the transition) and the enrage stack the boss carries once it has
+  // run out (nythraxis_enrage_clock.ts).
+  enrageElapsed?: number;
+  enrageStacks?: number;
+  // Bone Storm (phase 3): the cadence and the live storm, null between storms
+  // (nythraxis_bone_storm.ts).
+  boneStormTimer?: number;
+  boneStorm?: {
+    castKey: number;
+    elapsed: number;
+    chargeIndex: number;
+    chargeTargetId: number | null;
+    slammed: boolean;
+    whirlTickTimer: number;
+    spikeCast: boolean;
+    chargedIds: number[];
+  } | null;
   wardChannels: NythraxisWardChannel[];
-  finalStand: boolean;
   deathSpoken: boolean;
   // Players seen alive inside the arena during this pull. Session-only attempt
   // roster used for raid-wipe recovery, so a remote group member cannot farm
@@ -5417,6 +6034,12 @@ export type CalendarResultCode =
 // Guild billboard command outcomes (mirrors server/social.ts MotdResultCode;
 // `set` is the success, the rest refusals).
 export type MotdResultCode = 'set' | 'notInGuild' | 'notOfficer';
+
+// Guild roster expansion refusals (mirrors server/social.ts
+// GuildRosterResultCode; every code is a refusal, the success is the
+// guild-wide guildRosterExpanded event). Redeclared here because src/sim
+// never imports server/; tests/social_system.test.ts pins the two in lockstep.
+export type GuildRosterResultCode = 'notInGuild' | 'notLeader' | 'maxed' | 'cannotAfford' | 'retry';
 
 // An in-flight party/raid ready check (social/ready_check.ts). Keyed on Sim by party
 // id. Each member is 'pending' until they answer; anyone still 'pending' when the
@@ -5746,6 +6369,29 @@ export type SimEvent = { pid?: number } & (
         | 'worldfireClosing'
         | 'worldfireConsumed';
     }
+  // Text-free structured Nythraxis raid warning (the Varkhul callout's
+  // sibling): the sim ships the enum, the client renders localized copy.
+  | {
+      type: 'nythraxisCallout';
+      sourceId: number;
+      call:
+        | 'impaled'
+        | 'youAreImpaled'
+        | 'spikeBroken'
+        | 'dreadCurseSwap'
+        | 'sigilAppears'
+        | 'sigilBound'
+        | 'sigilUnbound'
+        | 'gravefireTarget'
+        | 'kingsWrath'
+        | 'boneStormBegins'
+        | 'boneStormCharge'
+        | 'boneStormEnds'
+        | 'crownEndures60'
+        | 'crownEndures30'
+        | 'crownEndures10'
+        | 'crownEndures';
+    }
   | {
       type: 'aura';
       targetId: number;
@@ -5806,11 +6452,30 @@ export type SimEvent = { pid?: number } & (
   // Structured data only (pid supplied by the union intersection); the client
   // builds every visible string, the mailbox precedent.
   | { type: 'bank' }
+  // Asks the client to open the Rift Forge window (the interact path at a
+  // riftForge NPC). Structured only, the bank precedent above.
+  | { type: 'riftForge' }
+  // Asks the client to open the corpse-harvest preference picker (the Field
+  // Kit's 'harvestPreference' use effect, Intentional Gathering PR3). `pid`
+  // is REQUIRED here, unlike `mailbox`/`bank` above: this is minted directly
+  // from an item-use command body rather than routed through the union
+  // intersection's usual pid-supplied-by-caller convention, so a future
+  // caller cannot accidentally emit it world-wide with no owner.
+  | { type: 'harvestPreferenceOpen'; pid: number }
   // Interacting with a town noticeboard. Structured and personal: the client
   // owns localized feedback, and online routing sends it only to the reader.
   // 'listings' carries the board's posted notices verbatim (guild names and
   // notes are world data, spliced by the client like player names, never
   // translated); a board with nothing posted stays the bare 'empty' shape.
+  | {
+      // The Realm Builder monument was inspected. Carries the whole roll so
+      // the card renders identically offline and online, and so a later live
+      // source (Postgres, or the Discord role sync) only has to change what
+      // fills these fields. Honouree names splice verbatim, like player names.
+      type: 'realmBuilder';
+      current: RealmBuilderHonour;
+      past: readonly RealmBuilderHonour[];
+    }
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
   | {
       type: 'noticeboard';
@@ -5836,6 +6501,13 @@ export type SimEvent = { pid?: number } & (
   // sim never edits the billboard); declared here, like calendarResult, so the
   // one client event switch stays exhaustively typed.
   | { type: 'motdResult'; code: MotdResultCode }
+  // Guild roster expansion refusal (a code, never English; `price` in copper
+  // rides only the cannotAfford arm) and the guild-wide success line: the
+  // buyer's name and the new seat cap. Both emitted only by the server's
+  // SocialService (the sim never seats guild members); declared here, like
+  // calendarResult, so the one client event switch stays exhaustively typed.
+  | { type: 'guildRosterResult'; code: GuildRosterResultCode; price?: number }
+  | { type: 'guildRosterExpanded'; byName: string; cap: number }
   // A guildmate's or followed friend's marquee deed unlock. Emitted only by
   // the server's SocialService (the sim never sees other players' social
   // graphs); declared here, like calendarResult, so the one client event
@@ -6198,7 +6870,7 @@ export type SimEvent = { pid?: number } & (
         // Necromancy Lich Form entry. The event is cosmetic and lets clients
         // synchronize the eruption, camera impulse, and transformation sound.
         | 'lichTransform'
-        // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
+        // A teleport step (Flitstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
         | 'blinkStep'
         // A DoT landing on its target the moment it is APPLIED (Rupture): audio-only,
@@ -6242,7 +6914,7 @@ export type SimEvent = { pid?: number } & (
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
   // on the caster). The renderer drapes it onto the terrain at (x, z). An 'orb'
-  // is the roaming Frozen Orb release: its flight is a straight line at fixed
+  // is the roaming Frostglobe release: its flight is a straight line at fixed
   // speed, so this ONE event carries the whole path (origin, direction, speed,
   // duration) and the client animates the sphere locally; the sim's orb state
   // (ctx.frozenOrbs) is never wired.
@@ -6418,7 +7090,17 @@ export type SimEvent = { pid?: number } & (
         | 'throttled'
         | 'busy'
         | 'station_required'
-        | 'no_bag_space';
+        | 'no_bag_space'
+        // Masterwrought phase 07: the recipe is oncePerDay and this
+        // character already crafted it inside the current reset-day window
+        // (professions/crafting.ts CraftResult.reason mirror).
+        | 'daily_limit';
+      // Masterwrought phase 14: whole seconds until the daily reset reopens
+      // the gate, present ONLY beside reason 'daily_limit' and only when the
+      // host fed a live calendar countdown (Sim.dailyResetRemainingSec > 0).
+      // Refusal-time data by ruling: gate STATE stays learn-on-attempt, so
+      // no standing readout or snapshot field may ever mirror this.
+      retryAfterSeconds?: number;
     }
   // Materials Vault craft consumption (Bank Storage Phase 04): emitted at cast
   // completion, AFTER the stock decrement, when a craft or enchant drew any
@@ -6475,15 +7157,24 @@ export type SimEvent = { pid?: number } & (
       reason?:
         | 'unknown_item'
         | 'unknown_enchant'
+        | 'recipe_not_learned'
         | 'wrong_slot'
         | 'not_held'
         | 'insufficient_materials'
         | 'throttled'
         | 'no_bag_space'
-        // #2415: already-enchanted target without the confirmReplace flag,
-        // and the identical-enchant-id re-apply denied on every arm.
+        // #2415: already-enchanted target without the confirmReplace flag. A
+        // confirmed identical-enchant-id re-apply is a normal replace, not a
+        // deny (professions/enchanting.ts).
         | 'already_enchanted'
-        | 'same_enchant'
+        // Masterwrought phase 10: the Lucent tier's two gates. A
+        // requiresPerfected enchant aimed at a copy carrying no `perfected`
+        // marker, and an enchant whose skillReq is above the applier's flat
+        // Enchanting skill.
+        | 'not_perfected'
+        | 'insufficient_skill'
+        // A Riftbound band: forge-only gear (professions/enchanting.ts).
+        | 'rift_gear'
         | 'busy';
     }
   // Outcome of applying a loadout's saved gear set. TEXT-FREE on purpose: the sim
@@ -6584,10 +7275,25 @@ export type SimEvent = { pid?: number } & (
       reason?:
         | 'unbind_not_eligible'
         | 'unbind_not_bound'
+        | 'unbind_perfecting'
         | 'unbind_out_of_range'
         | 'unbind_no_space'
         | 'unbind_cannot_afford';
       fee: number;
+    }
+  // Personal, text-free confirmation outcome. Echo both capture tokens so a
+  // stale refusal cannot complete a newer prompt for the same item ids.
+  | {
+      type: 'perfectingSwapResult';
+      ok: boolean;
+      sourceItemId?: string;
+      targetItemId?: string;
+      sourceRank?: number;
+      targetRank?: number;
+      craftId?: string | null;
+      skillReq?: number;
+      reason?: PerfectingSwapDenyReason;
+      request?: PerfectingSwapRequest;
     }
   // Commission order board outcome (issue #1298): mirrors one of
   // professions/commission_order.ts's four result shapes (OpenOrderResult/
@@ -6652,6 +7358,29 @@ export type SimEvent = { pid?: number } & (
       crafterName: string;
       itemId: string;
       recipeId: string;
+      zoneId: string;
+    }
+  // Orange promotion (Masterwrought phase 13, R3): a Perfected copy consumed a
+  // Deed of Making and became legendary presentation. Personal (emitted with
+  // pid = the owner's entity id, which `owner` repeats as payload). Ids plus
+  // the player-chosen name only, no other text: the client renders its own
+  // localized line with the name interpolated as a VALUE
+  // (hudChrome.crafting.legendaryLine).
+  | { type: 'legendaryForged'; itemId: string; name: string; owner: number }
+  // The soft zone-wide copy, one per overworld player currently in the owner's
+  // zone INCLUDING the owner, `pid` being the RECIPIENT (the masterworkZone
+  // idiom above; a SEPARATE type for the same own-mirror reason). itemName is
+  // the player-chosen legendary name; the first event type carrying a
+  // player-authored ITEM name beside a character name (ownerName and
+  // itemName; duelEnd and guildInvite already carry two player-chosen names),
+  // both VALUES the client interpolates, never keys.
+  | {
+      type: 'legendaryForgedZone';
+      pid: number;
+      ownerPid: number;
+      ownerName: string;
+      itemId: string;
+      itemName: string;
       zoneId: string;
     }
   // Riding lesson (src/sim/mounts_training.ts). Both personal (pid-scoped).
@@ -6759,23 +7488,26 @@ export type SimEvent = { pid?: number } & (
       type: 'riftForgeResult';
       pid: number;
       ok: boolean;
-      action: 'upgrade' | 'enchant' | 'socket';
+      action: 'upgrade' | 'socket';
       itemId: string;
       reason?:
         | 'not_found'
         | 'not_rift_gear'
         | 'max_upgrade'
         | 'insufficient_essence'
-        | 'invalid_stat'
         | 'invalid_gem'
-        | 'sockets_full'
         // Type-level only: the while-dead refusal is returned to callers but
-        // never emitted (the three dead-gate early returns in
+        // never emitted (the two dead-gate early returns in
         // rift/progression.ts sit ABOVE emitResult); its one player-facing
         // surface is the shared "You can't do that while dead." error line.
-        | 'dead';
+        | 'dead'
+        // Type-level only as well: the away-from-forge refusal (forge_gate.ts)
+        // returns above emitResult; its surface is the too-far error line.
+        | 'too_far';
       upgradeLevel?: number;
       essenceSpent?: number;
+      /** The gem a socket destroyed to make room (sockets are replaceable). */
+      replacedGem?: string;
     }
   // Gather-node harvest outcome (#1729): a successful resource harvest emits
   // this so the client can play a gathering audio cue for the acting player.
@@ -6853,10 +7585,14 @@ export type SimEvent = { pid?: number } & (
   // gatherDenied above): the client composes its own localized copy off the
   // structured fields. Emitted at most ONCE per harvest command (the
   // gatherDenied dedupe idiom), even when several yields downgrade.
+  // 'crop' is the golden-harvest surface (farming.ts):
+  // farming's nothing-rots rule means a crop can only ever lose the mark
+  // (totals always land in full; only the signature truncates), so a crop
+  // event always carries lost 'mark', never 'find'.
   | {
       type: 'gatherDowngrade';
       pid: number;
-      surface: 'node' | 'corpse';
+      surface: 'node' | 'corpse' | 'crop';
       lost: 'mark' | 'find';
     }
   // Corpse-harvest outcome (#2457): what one harvestCorpse command actually
@@ -6909,7 +7645,7 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       quality: NonNullable<ItemDef['quality']>;
       zoneId: string;
-      band: 0 | 1 | 2;
+      band: FishingCatchBand;
     }
   // Fishing bite (Professions 2.0): the hidden seeded bite fired
   // for this angler's running fishing session. Personal (pid = the angler)
@@ -6929,7 +7665,7 @@ export type SimEvent = { pid?: number } & (
   // carries the reason, and this event's line records the loss. Costs
   // nothing but the ended cast; recast immediately. zoneId/band mirror
   // fishingResult, for the telemetry.
-  | { type: 'fishingGotAway'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  | { type: 'fishingGotAway'; pid: number; zoneId: string; band: FishingCatchBand }
   // Fishing early reel (the spam-click fix): the angler re-pressed the pole
   // BEFORE the bite, so the line came in empty and the session ended. Exists
   // because a free pre-bite no-op made spam-pressing a guaranteed catch (one
@@ -6939,22 +7675,25 @@ export type SimEvent = { pid?: number } & (
   // is the game costing the player; an early reel is self-inflicted, and
   // folding them would hide whether the anti-spam change burns real
   // anglers). Costs nothing but the ended cast; recast immediately.
-  | { type: 'fishingEarlyReel'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  | { type: 'fishingEarlyReel'; pid: number; zoneId: string; band: FishingCatchBand }
   // Fishing empty hook (Professions 2.0): the single table draw resolved
   // the itemId: null row (nothing was biting). Telemetry-only sibling of
   // fishingResult: the player feedback stays the existing localized log
   // line, and old clients ignore the unknown type. Emitted exactly where
   // the null row resolves, draw-free.
-  | { type: 'fishingEmptyHook'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  | { type: 'fishingEmptyHook'; pid: number; zoneId: string; band: FishingCatchBand }
   // Rare gather event (Professions 2.0): a harvest struck a pristine
-  // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is
-  // emitted per player currently in the node's zone, `pid` being the RECIPIENT
-  // (the chat fanout idiom); finderPid/finderName identify the harvester. Ids
-  // plus values only, text-free on purpose: the client renders its own
-  // localized line off `flavor` (the gatherEvent.* keys). The HUD reads only
+  // vein / ancient heartwood / moonlit bloom, or a farm bed paid a golden
+  // harvest (nodeType 'crop', the farming celebrations phase). Soft zone
+  // broadcast: one copy is emitted per player currently in the source's
+  // zone, `pid` being the RECIPIENT (the chat fanout idiom);
+  // finderPid/finderName identify the harvester. Ids plus values only,
+  // text-free on purpose: the client renders its own localized line off
+  // `flavor` (the gatherEvent.* keys). The HUD reads only
   // flavor/finderName/finderPid today; zoneId/nodeType/itemId are forward
   // payload for the per-family deeds/tuning consumers (asserted by the
-  // gather rare-event tests so the shape is already load-bearing on the wire).
+  // gather rare-event tests so the shape is already load-bearing on the
+  // wire).
   | {
       type: 'gatherRareEvent';
       pid: number;
@@ -6962,7 +7701,7 @@ export type SimEvent = { pid?: number } & (
       finderName: string;
       finderPid: number;
       zoneId: string;
-      nodeType: GatherNodeType;
+      nodeType: GatherRareEventSource;
       itemId: string;
     }
   // Rift boss lethal death zone placed (deathZoneCast / deathZoneStrike mechanic).
@@ -7002,13 +7741,6 @@ export type SimEvent = { pid?: number } & (
   // the client renders its own one-shot tier-up explainer. Carries no ids beyond
   // the recipient; the persisted one-shot flag guarantees it never re-fires.
   | { type: 'profTierTutorial'; pid: number }
-  // Spawn greeting (tutorial island): fired exactly once per character, on a
-  // genuinely fresh character's first swept tick (sim/tutorial/greeting.ts).
-  // Personal (pid = the newcomer) and text-free: the client renders the
-  // greeter dialog itself, choosing first-character vs refresher copy off
-  // `firstCharacter` (a server-recomputed account fact, never persisted).
-  // The persisted one-shot flag guarantees it never re-fires.
-  | { type: 'tutorialGreeting'; pid: number; firstCharacter: boolean }
   // Ferry bell homecoming (tutorial island): fired every time the island's
   // bell sets a player down in Eastbrook town (interactions/ferry_bell.ts).
   // Personal and text-free: the client decides ONCE per device (localStorage)
@@ -7043,6 +7775,145 @@ export type SimEvent = { pid?: number } & (
       pairId: string;
       zoneId: string;
     }
+  // Farming: a crop went into a bed (the growth-engine phase). Personal
+  // (pid = the farmer) and text-free on purpose (the gatherResult idiom): the
+  // client logs its own localized line off the ids. Carries no timing, because
+  // the plot projection (the fplot wire key) already serves readyAtMs and is
+  // the ONE place growth deadlines reach a client.
+  | { type: 'farmPlanted'; pid: number; bedId: string; cropId: string }
+  // Farming: a ready plot was harvested. `count` is the base-grade produce
+  // granted and `fineCount` the fine-grade twin; the two together are the
+  // picks the harvest-lives roll resolved, since a fine roll UPGRADES a pick
+  // rather than adding one. Both fine fields are absent when no pick upgraded
+  // (the effectDepleted precedent: an absent optional keeps the common event
+  // byte-identical to the pre-field wire). `seedBackCount` is the tier 3/4
+  // seed-back roll's payout in crop seeds (the client resolves the seed item
+  // from cropId), present ONLY when positive, the same only-when-true rule.
+  // `effectDepleted` is gatherResult's last-charge signal on the farming
+  // path: present (true) exactly when THIS harvest's R42 settle spent the
+  // slotted tool effect's final charge, so the client can announce the break
+  // instead of the charm dying silently. Only farmHarvested can carry it:
+  // the withered return sits above the effect block, so a failed crop never
+  // applies, spends, or depletes. `goldenBonusItemId` (masterwrought Phase
+  // 11f) is the ONE extra item a GOLDEN harvest's bonus draw paid, a seed of
+  // the next tier up or, far more rarely, a farming pattern; present only on a
+  // golden win, the same only-when-set rule as the fields above, so an
+  // ordinary harvest's frame stays byte-identical. It is named on the event
+  // rather than logged by the grant because the farmHarvested line owns the
+  // whole visit's feedback (the #2430 one-line-per-grant rule), exactly as
+  // seedBackCount does. Text-free (the gatherResult idiom).
+  | {
+      type: 'farmHarvested';
+      pid: number;
+      bedId: string;
+      cropId: string;
+      itemId: string;
+      count: number;
+      fineItemId?: string;
+      fineCount?: number;
+      seedBackCount?: number;
+      goldenBonusItemId?: string;
+      effectDepleted?: true;
+    }
+  // Farming: a plot that lost its survival pre-roll was cleared, paying
+  // `count` withered husks instead of produce. Emitted at HARVEST, never at
+  // the growth deadline: nothing rots and no timer fires, so the player learns
+  // the outcome when they come to collect. `seedBackCount` mirrors
+  // farmHarvested's field (the tier 3/4 seed-back roll fires on BOTH
+  // outcomes; the withered consolation is deliberate), present ONLY when
+  // positive. Text-free (the gatherResult idiom).
+  | {
+      type: 'farmWithered';
+      pid: number;
+      bedId: string;
+      cropId: string;
+      count: number;
+      seedBackCount?: number;
+    }
+  // Farming: a plant or harvest was refused. Personal and text-free (the
+  // gatherDenied idiom): the client composes its own localized copy off
+  // `reason`. `bedId` and `cropId` are present when the refusing arm KNOWS
+  // them: usually because the refused command named them, and on harvest's
+  // not_ready arm the cropId comes from the STORED plot (harvest_crop names
+  // only the bed). Do not prune a field to match the named-by-the-command
+  // reading; the wire and the goldens carry the stored-plot case today.
+  | {
+      type: 'farmDenied';
+      pid: number;
+      reason:
+        | 'bad_bed'
+        | 'bad_crop'
+        | 'range'
+        | 'bed_taken'
+        | 'skill'
+        | 'no_seed'
+        | 'not_ready'
+        | 'no_plot'
+        // The knobs phase, appended (wire enums are never reordered):
+        // convert_husks with fewer husks than one batch costs, then the
+        // three plant-time knob payments that could not be met (each denies
+        // the WHOLE plant with nothing consumed and zero draws).
+        | 'no_husks'
+        | 'no_compost'
+        | 'no_fee_produce'
+        | 'no_tonic'
+        // The hoe phase, appended: the step-12 hoe gate refused the plant (no
+        // WIELDABLE farming hoe covering the crop's tier in bags; one reason
+        // for both the no-hoe and the tier-short case, like gatherDenied's
+        // tool arm).
+        | 'tool'
+        // The v0.38.0 sync, appended: the shortfall is caused SOLELY by the
+        // owner's own item locks (issue 3042 acceptance: "each refused
+        // action surfaces a clear locked-item message", the CraftResult
+        // 'locked' twin). Fired when the raw held count would have passed
+        // the gate that the unlocked count failed, for any of the five
+        // farming spends.
+        | 'locked'
+        // The farming go-live, appended: convert_husks refused because no
+        // farmer NPC stands within FARMER_TRADE_RANGE of the sender
+        // (professions/farmer_npcs.ts). Its own reason rather than 'range',
+        // whose HUD line names a crop bed; the trade has no bed.
+        | 'no_farmer'
+        // The shared feast, appended (professions/feast.ts): place-arm
+        // refusals cover a missing item or an already-active table. Consume-arm
+        // refusals cover a stale or expired id, a picked-clean table, or a
+        // repeat diner. An out-of-range lookup is deliberately
+        // indistinguishable from a stale feast id, so it reuses feast_expired.
+        // The lock-caused shortfall reuses locked above.
+        | 'no_feast'
+        | 'feast_active'
+        | 'feast_expired'
+        | 'feast_finished'
+        | 'feast_eaten';
+      bedId?: string;
+      cropId?: string;
+    }
+  // Farming: withered husks were traded for compost (the knobs phase's
+  // convert_husks command). Personal and text-free (the gatherResult idiom):
+  // `husks` is what left the bags and `compost` what arrived, so the client
+  // composes its one localized line off the counts. The compost grant itself
+  // rides the hub loot event with the silent/callerLogs flags, exactly like a
+  // harvest grant, so this event owns both halves of the feedback.
+  | { type: 'farmHusksConverted'; pid: number; husks: number; compost: number }
+  // Farming: one or more of this player's plots FINISHED (the ready-notice
+  // phase). Personal (pid = the farmer) and text-free like every other farm
+  // event, and COUNTS ONLY: `ready` is how many beds are waiting to be
+  // brought in and `withered` how many finished as failed crops, omitted
+  // when zero (the seedBackCount idiom). `ready` is always present and IS 0
+  // on a withered-only notice: consumers branch on each count, not on the
+  // event's presence. Deliberately carries no bed or crop
+  // id, and no timing: the fplot projection is already the ONE place a client
+  // learns which bed holds what, so a per-plot payload here would be a second
+  // definition of plot state free to drift from it. Emitted once per plot per
+  // growth cycle, gated by the plot's persisted `notified` flag
+  // (professions/farm_ready.ts), so relogging never repeats a notice.
+  | { type: 'farmReady'; pid: number; ready: number; withered?: number }
+  // The shared feast: the placer's own confirmation that the feast entity
+  // spawned (professions/feast.ts). Personal and text-free like every farm
+  // event; the entity itself is everyone else's signal (it rides the normal
+  // snapshot), so this exists only to drive the placer's cue and toast.
+  // `feastId` is the spawned entity id.
+  | { type: 'farmFeastPlaced'; pid: number; feastId: number }
 );
 
 export interface MoveInput {
@@ -7143,6 +8014,23 @@ export interface MailboxDef {
    *  always had; content sets it only where a slot faces the wrong way. */
   facing?: number;
 }
+
+// The Eastbrook Vale Realm Builder monument. One singleton static service, so
+// it needs a templateId rather than a def list: interaction.ts recognises the
+// entity by this id and the client sizes its click range from it.
+export const REALM_BUILDER_MONUMENT_TEMPLATE_ID = 'realm_builder_monument' as const;
+/**
+ * How close (yards, from the statue's centre) a player must stand for the
+ * monument to be the object an interact press picks. Its collider keeps the
+ * player 3.19 yd out, so the live band is 3.19 to 4 yd: arm's reach from the
+ * plinth. The Ravenpost mailbox stands 6.21 yd from the centre and its posting
+ * spot about 7 yd, so a player who walked up to post a letter is outside this
+ * band, and one pressed against the plinth on the mailbox's side is nearer
+ * the mailbox anyway: nearest wins, and the monument never takes the press
+ * from it. The client sizes its click range from the same constant
+ * (src/game/interactions.ts objectInteractionRange).
+ */
+export const REALM_BUILDER_MONUMENT_INTERACT_RADIUS = 4;
 
 // Noticeboards currently have one complete cross-platform implementation. Keep
 // the world-content shape closed over that renderer/collider contract instead
@@ -7433,6 +8321,21 @@ export interface SimConfig {
   // before a craft or enchant consumes from the Materials Vault. Offline and
   // headless hosts omit it and receive an inert successful reservation.
   vaultConsumptionAdmission?: VaultConsumptionAdmission;
+  // The material-gatherer identity for the player this constructor MINTS (the
+  // primary offline/headless character), allocated by the HOST outside the sim
+  // and passed in whole (src/sim/material_gatherer.ts). A VALUE, never a
+  // factory: the sim reads it once at construction and never derives one, so
+  // the same explicit inputs always give the same attribution and no clock,
+  // randomness or crypto is reachable from here.
+  //
+  // A production browser or headless host ALWAYS supplies it for a real player.
+  // Omitting it (a unit test, a probe rig, the editor viewport) is the supported
+  // UNKNOWN case: that player gathers unrecorded stock exactly as before this
+  // feature, and nothing is invented from the seed, the entity id or the name.
+  //
+  // Secondary players a host adds later carry their OWN id through
+  // addPlayer({ localGathererIdentity }); this field never covers them.
+  gathererIdentity?: LocalGathererIdentity;
 }
 
 export function emptyMoveInput(): MoveInput {
@@ -7671,7 +8574,11 @@ export type DeedStatKey =
   | 'riftSRankClears'
   // Rides home rung on the island ferry bell AFTER the Proving Shore rail is
   // fully handed in (interactions/ferry_bell.ts): the graduation moment.
-  | 'tutorialGraduations';
+  | 'tutorialGraduations'
+  // Orange promotions performed (Masterwrought phase 13): bumped once per
+  // legendary promotion at the promotePerfectedCopy stamp site
+  // (professions/perfecting.ts, reached via resolvePerfectingAttempt's internal promotion arm), feeding prog_legendmaker.
+  | 'legendariesForged';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -7703,6 +8610,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'riftClears',
   'riftSRankClears',
   'tutorialGraduations',
+  'legendariesForged',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new
@@ -7780,7 +8688,9 @@ export type DeedTrigger =
   // craftSkills: with craftId, that one craft at or above level; without, at
   // least `count` (default 1) crafts on the ring at or above level.
   | { kind: 'craftSkill'; craftId?: string; level: number; count?: number }
-  // gatheringProficiency: same shape as craftSkill over the three professions.
+  // gatheringProficiency: same shape as craftSkill over the gathering
+  // professions (the live roster is GATHERING_PROFESSION_IDS in
+  // content/professions.ts).
   | {
       kind: 'gathering';
       professionId?: GatheringProfessionId;
