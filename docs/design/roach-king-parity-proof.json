@@ -1,0 +1,870 @@
+[
+  {
+    "name": "rift_clear_rewards",
+    "baseRef": "17cc8505c1",
+    "fullBaselineControlMatch": true,
+    "allRngEventsPlayersMatch": true,
+    "draws": 351,
+    "drawDigest": "fb32a2e4",
+    "finalLoot": {
+      "copper": 35000,
+      "items": [
+        {
+          "count": 1,
+          "itemId": "mistforged_pauldrons"
+        },
+        {
+          "count": 1,
+          "itemId": "pattern_forgefold_legguards"
+        }
+      ]
+    },
+    "frameDeltas": [
+      {
+        "tick": 60,
+        "stateBefore": "407597aa",
+        "stateAfter": "6f4bfea9",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 41338,
+            "feature": 45683
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 788,
+            "feature": 840
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 3338,
+            "feature": 3671
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 2137,
+            "feature": 2350
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      },
+      {
+        "tick": 67,
+        "label": "clear-paid",
+        "stateBefore": "2d83d6f3",
+        "stateAfter": "6e37a99c",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 41338,
+            "feature": 45683
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 788,
+            "feature": 840
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 3338,
+            "feature": 3671
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 2137,
+            "feature": 2350
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      },
+      {
+        "tick": 67,
+        "label": "final",
+        "stateBefore": "2d83d6f3",
+        "stateAfter": "6e37a99c",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 41338,
+            "feature": 45683
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 788,
+            "feature": 840
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 3338,
+            "feature": 3671
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 2137,
+            "feature": 2350
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "rift_clear_rewards_c",
+    "baseRef": "17cc8505c1",
+    "fullBaselineControlMatch": true,
+    "allRngEventsPlayersMatch": true,
+    "draws": 347,
+    "drawDigest": "52855f0a",
+    "finalLoot": {
+      "copper": 10000,
+      "items": [
+        {
+          "count": 1,
+          "itemId": "necromancers_soulspire_mantle"
+        }
+      ]
+    },
+    "frameDeltas": [
+      {
+        "tick": 60,
+        "stateBefore": "dc3c3fe1",
+        "stateAfter": "647c9508",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 6311,
+            "feature": 6975
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 630,
+            "feature": 672
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 1100,
+            "feature": 1210
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 704,
+            "feature": 774
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      },
+      {
+        "tick": 67,
+        "label": "clear-paid",
+        "stateBefore": "5c03a5e2",
+        "stateAfter": "ece9821d",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 6311,
+            "feature": 6975
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 630,
+            "feature": 672
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 1100,
+            "feature": 1210
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 704,
+            "feature": 774
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      },
+      {
+        "tick": 67,
+        "label": "final",
+        "stateBefore": "5c03a5e2",
+        "stateAfter": "ece9821d",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 6311,
+            "feature": 6975
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 630,
+            "feature": 672
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 1100,
+            "feature": 1210
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 704,
+            "feature": 774
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "rift_clear_rewards_b",
+    "baseRef": "17cc8505c1",
+    "fullBaselineControlMatch": true,
+    "allRngEventsPlayersMatch": true,
+    "draws": 362,
+    "drawDigest": "2fca4af3",
+    "finalLoot": {
+      "copper": 10000,
+      "items": [
+        {
+          "count": 1,
+          "itemId": "shroud_of_the_gravewyrm"
+        },
+        {
+          "count": 1,
+          "itemId": "pattern_sunspun_handwraps"
+        }
+      ]
+    },
+    "frameDeltas": [
+      {
+        "tick": 60,
+        "stateBefore": "299b6eba",
+        "stateAfter": "a27775ac",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 20737,
+            "feature": 22916
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 706,
+            "feature": 753
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 2785,
+            "feature": 3062
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 1782,
+            "feature": 1960
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      },
+      {
+        "tick": 67,
+        "label": "clear-paid",
+        "stateBefore": "247dcf4d",
+        "stateAfter": "d0307d2b",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 20737,
+            "feature": 22916
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 706,
+            "feature": 753
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 2785,
+            "feature": 3062
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 1782,
+            "feature": 1960
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      },
+      {
+        "tick": 67,
+        "label": "final",
+        "stateBefore": "247dcf4d",
+        "stateAfter": "d0307d2b",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 20737,
+            "feature": 22916
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 706,
+            "feature": 753
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 2785,
+            "feature": 3062
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 1782,
+            "feature": 1960
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "rift_clear_rewards_s",
+    "baseRef": "17cc8505c1",
+    "fullBaselineControlMatch": true,
+    "allRngEventsPlayersMatch": true,
+    "draws": 397,
+    "drawDigest": "835984d0",
+    "finalLoot": {
+      "copper": 50000,
+      "items": [
+        {
+          "count": 1,
+          "itemId": "gravewyrm_claws"
+        },
+        {
+          "count": 1,
+          "itemId": "pattern_sunspun_haversack"
+        },
+        {
+          "count": 1,
+          "itemId": "pattern_evergarden_harvest_platter"
+        }
+      ]
+    },
+    "frameDeltas": [
+      {
+        "tick": 60,
+        "stateBefore": "d97125e0",
+        "stateAfter": "99737989",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 61978,
+            "feature": 68482
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 924,
+            "feature": 986
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 3629,
+            "feature": 3990
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 2322,
+            "feature": 2554
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      },
+      {
+        "tick": 67,
+        "label": "clear-paid",
+        "stateBefore": "7f970ac1",
+        "stateAfter": "b60395f4",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 61978,
+            "feature": 68482
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 924,
+            "feature": 986
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 3629,
+            "feature": 3990
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 2322,
+            "feature": 2554
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      },
+      {
+        "tick": 67,
+        "label": "final",
+        "stateBefore": "7f970ac1",
+        "stateAfter": "b60395f4",
+        "changes": [
+          {
+            "path": "entities/1/aoeSlowTimer",
+            "baseline": 12
+          },
+          {
+            "path": "entities/1/bigCastTimer",
+            "baseline": 16,
+            "feature": 8
+          },
+          {
+            "path": "entities/1/deathZoneCastTimer",
+            "baseline": 22,
+            "feature": 20
+          },
+          {
+            "path": "entities/1/deathZoneStrikeTimer",
+            "baseline": 26,
+            "feature": 24
+          },
+          {
+            "path": "entities/1/maxHp",
+            "baseline": 61978,
+            "feature": 68482
+          },
+          {
+            "path": "entities/1/pulseTimer",
+            "baseline": 9
+          },
+          {
+            "path": "entities/1/stats/armor",
+            "baseline": 924,
+            "feature": 986
+          },
+          {
+            "path": "entities/1/stoneskinTimer",
+            "baseline": 16
+          },
+          {
+            "path": "entities/1/templateId",
+            "baseline": "rift_boss_frost",
+            "feature": "rift_boss_asmon"
+          },
+          {
+            "path": "entities/1/weapon/max",
+            "baseline": 3629,
+            "feature": 3990
+          },
+          {
+            "path": "entities/1/weapon/min",
+            "baseline": 2322,
+            "feature": 2554
+          },
+          {
+            "path": "entities/1/weapon/speed",
+            "baseline": 2.5,
+            "feature": 2.7
+          }
+        ]
+      }
+    ]
+  }
+]

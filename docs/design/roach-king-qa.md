@@ -257,3 +257,22 @@ stderr marker from the bounded combined tail. The fixture repair exercises
 both overflow streams independently, keeps each required suffix on its own
 ordered stream, and verifies both complete sinks and the unchanged tail bound.
 No runner behavior, timeout, retry, or exit-code policy changes.
+
+The four `rift_clear_rewards` parity records now track Asmon's corpse. Raw
+frame comparison against release `17cc8505c1` first diverges at tick 60, then
+at the tick-67 clear-paid and final checkpoints: only the boss template,
+mechanic timers, maximum health, armor, and weapon stats change. A scoped
+control that substitutes the retained frost template for the Asmon lookup,
+without changing any other code, reproduces every baseline golden exactly.
+Every player sample, event digest, RNG count/order, and exact corpse reward
+remains identical; C/B/A/S copper remains 10000/10000/35000/50000. The full
+per-frame comparison is preserved in [roach-king-parity-proof.json](roach-king-parity-proof.json).
+These numerical encounter changes require deliberate golden regeneration;
+they are not a rename-only exception. The owning runner regenerated only the
+four records, and a second run with updates disabled passed all 13 selected
+parity/determinism and reward-coverage checks:
+
+```sh
+UPDATE_PARITY=1 npx vitest run tests/parity/parity_g.test.ts -t 'rift_clear_rewards' --maxWorkers=1
+npx vitest run tests/parity/parity_g.test.ts tests/parity/coverage_c.test.ts -t 'rift_clear_rewards|four rift reward scenarios' --maxWorkers=1
+```

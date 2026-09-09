@@ -701,7 +701,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1050,
-      "state": "d97125e0",
+      "state": "99737989",
       "events": "ffa4d533",
       "rng": {
         "draws": 343,
@@ -712,7 +712,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1050,
-      "state": "7f970ac1",
+      "state": "b60395f4",
       "events": "741638a5",
       "rng": {
         "draws": 397,
@@ -898,15 +898,14 @@
         },
         {
           "aiState": "idle",
-          "aoeSlowTimer": 12,
-          "bigCastTimer": 16,
+          "bigCastTimer": 8,
           "combatTimer": 99.05,
           "comboUntil": -1,
           "corpseTimer": 58.75,
           "critChance": 0.05,
           "dead": true,
-          "deathZoneCastTimer": 22,
-          "deathZoneStrikeTimer": 26,
+          "deathZoneCastTimer": 20,
+          "deathZoneStrikeTimer": 24,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -0.080917,
@@ -934,7 +933,7 @@
           },
           "lootFfaTimer": "Infinity",
           "lootable": true,
-          "maxHp": 61978,
+          "maxHp": 68482,
           "mechanicDamageMult": 22.4,
           "mechanicHealMult": 13.34,
           "moveSpeed": 8,
@@ -947,7 +946,6 @@
             "z": -480.860458
           },
           "potionCooldownUntil": -1,
-          "pulseTimer": 9,
           "respawnTimer": -1.25,
           "riftMechanicLimit": 4,
           "riftMechanicSpacing": 5,
@@ -956,19 +954,18 @@
             "z": -481
           },
           "stats": {
-            "armor": 924
+            "armor": 986
           },
-          "stoneskinTimer": 16,
-          "templateId": "rift_boss_frost",
+          "templateId": "rift_boss_asmon",
           "wanderTarget": {
             "x": 108399.75277,
             "z": -477.951319
           },
           "wanderTimer": 30,
           "weapon": {
-            "max": 3629,
-            "min": 2322,
-            "speed": 2.5
+            "max": 3990,
+            "min": 2554,
+            "speed": 2.7
           }
         }
       ]
@@ -977,7 +974,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1050,
-      "state": "7f970ac1",
+      "state": "b60395f4",
       "events": "741638a5",
       "rng": {
         "draws": 397,
@@ -1163,15 +1160,14 @@
         },
         {
           "aiState": "idle",
-          "aoeSlowTimer": 12,
-          "bigCastTimer": 16,
+          "bigCastTimer": 8,
           "combatTimer": 99.05,
           "comboUntil": -1,
           "corpseTimer": 58.75,
           "critChance": 0.05,
           "dead": true,
-          "deathZoneCastTimer": 22,
-          "deathZoneStrikeTimer": 26,
+          "deathZoneCastTimer": 20,
+          "deathZoneStrikeTimer": 24,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -0.080917,
@@ -1199,7 +1195,7 @@
           },
           "lootFfaTimer": "Infinity",
           "lootable": true,
-          "maxHp": 61978,
+          "maxHp": 68482,
           "mechanicDamageMult": 22.4,
           "mechanicHealMult": 13.34,
           "moveSpeed": 8,
@@ -1212,7 +1208,6 @@
             "z": -480.860458
           },
           "potionCooldownUntil": -1,
-          "pulseTimer": 9,
           "respawnTimer": -1.25,
           "riftMechanicLimit": 4,
           "riftMechanicSpacing": 5,
@@ -1221,19 +1216,18 @@
             "z": -481
           },
           "stats": {
-            "armor": 924
+            "armor": 986
           },
-          "stoneskinTimer": 16,
-          "templateId": "rift_boss_frost",
+          "templateId": "rift_boss_asmon",
           "wanderTarget": {
             "x": 108399.75277,
             "z": -477.951319
           },
           "wanderTimer": 30,
           "weapon": {
-            "max": 3629,
-            "min": 2322,
-            "speed": 2.5
+            "max": 3990,
+            "min": 2554,
+            "speed": 2.7
           }
         }
       ]
