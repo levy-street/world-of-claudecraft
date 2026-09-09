@@ -75,11 +75,11 @@ const EXEMPT_FIELDS: Readonly<Record<string, string>> = {
   // arm emits a heal on the mob and no named aura. Proved by the real swing
   // path below.
   lifeleech: 'the name is never read by the sim',
-  // The lethal-zone pair is localized by castId through the ability catalog
-  // (abilityUi.cast.<castId>, resolved by castDisplayName on the target cast
-  // bar); the driver never reads def.name. Proved against the catalog below.
-  deathZoneCast: 'localized as abilityUi.cast.<castId>',
-  deathZoneStrike: 'localized as abilityUi.cast.<castId>',
+  // The lethal-zone pair is localized by castId through castDisplayName:
+  // legacy mechanics use abilityUi.cast, and Asmon uses sim.rift.roachKing.
+  // Each authored name is proved against its catalog key below.
+  deathZoneCast: 'localized through the cast-name catalog resolver',
+  deathZoneStrike: 'localized through the cast-name catalog resolver',
 };
 
 type NamedRow = { id: string; field: string; name: string };
@@ -176,24 +176,27 @@ describe('rift mechanic names are localized', () => {
 });
 
 describe('the rift matcher exemptions are earned', () => {
-  it('every lethal-zone name is the ability catalog English for its castId', () => {
-    // deathZoneCast/deathZoneStrike names never reach localizeSimAuraName: the
-    // driver (src/sim/mob/locomotion.ts runDeathZoneDriver) reads castId, and the
-    // target cast bar resolves it through abilityUi.cast.<castId>. That only
-    // holds while the two sides agree byte for byte, so pin them against each
-    // other: rename the mechanic in content and this reds.
+  it('every lethal-zone name is the catalog English and cast-bar label for its castId', () => {
+    // Cast bars resolve the castId rather than printing the template name.
+    // Pin the authored English against both the catalog and the runtime
+    // resolver, so a name change or a missing resolver branch fails here.
+    setLanguage('en');
+    const roachKeys: Readonly<Record<string, TranslationKey>> = {
+      rift_asmon_filth: 'sim.rift.roachKing.mountainOfFilth',
+      rift_asmon_swarm: 'sim.rift.roachKing.royalSwarm',
+    };
     let checked = 0;
     for (const tmpl of Object.values(RIFT_MOBS) as MobTemplate[]) {
       for (const def of [tmpl.deathZoneCast, tmpl.deathZoneStrike]) {
         if (!def) continue;
         checked++;
-        const key = `abilityUi.cast.${def.castId}` as TranslationKey;
+        const key = roachKeys[def.castId] ?? (`abilityUi.cast.${def.castId}` as TranslationKey);
         expect(t(key), `${def.castId} catalog English`).toBe(def.name);
-        expect(castDisplayName(def.castId), `${def.castId} cast bar label`).not.toBe(def.castId);
+        expect(castDisplayName(def.castId), `${def.castId} cast bar label`).toBe(def.name);
       }
     }
-    // Eight rift bosses carry the A-rank and S-rank zones.
-    expect(checked, 'lethal-zone definitions checked').toBe(16);
+    // Eight legacy templates retain their pairs; Asmon adds Filth and Swarm.
+    expect(checked, 'lethal-zone definitions checked').toBe(18);
   });
 
   it('the sim never surfaces lifeleech.name (the real swing path emits no such name)', () => {
