@@ -8,6 +8,7 @@
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
+import { cosmeticsStrings } from './cosmetics';
 
 export const hudChromeStrings = {
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
@@ -381,11 +382,12 @@ export const hudChromeStrings = {
     tabsLabel: 'WOC Store sections',
     storeTab: 'Store',
     rewardsTab: 'Daily Rewards',
-    // The store's Mounts strip (content/store_mounts.ts): account mounts sold
-    // for Claudium; the purchase grants the soulbound reins to every character.
-    mountsEyebrow: 'Account Mounts',
+    // The store's Machine Stable strip (content/mount_skins.ts): account-wide
+    // mount skins sold for Claudium; wearing one is the Cosmetics window's job.
+    mountsEyebrow: 'Account Mount Skins',
     mountsTitle: 'Machine Stable',
     mountBuyAria: 'Purchase {item}',
+    mountSkinType: 'Mount skin',
     loading: 'Loading WOC Store...',
     error: 'The WOC Store is unavailable right now. Please try again shortly.',
     balance: 'Claudium Balance',
@@ -1720,6 +1722,7 @@ export const hudChromeStrings = {
     desc_goblin_rocket_sled:
       'A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.',
     desc_rallycart_rxt: 'A pint-sized rally machine that provides enhanced travel speed.',
+    desc_rallycart_skin: 'A tiny rally car with a mighty roar.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
@@ -5722,12 +5725,13 @@ export const hudChromeStrings = {
     // count against the guild's cap, the Guild Master's buy button and its
     // confirm prompt, the guild-wide success line, and the refusal codes the
     // server answers with (hud.ts renders them from result_code_keys.ts).
-    // {seats} is the page size, {price} the formatted page price, {cap} the
-    // seat cap, {name} the buyer's character name spliced verbatim.
+    // {seats} is the page size, {price} the page price (the confirm prompt
+    // splices coin-icon markup into it, so the button itself carries neither),
+    // {cap} the seat cap, {name} the buyer's character name spliced verbatim.
     // Wordy, M16: the five non-Latin fills land in this same change.
     roster: {
       seats: '{count} of {cap} seats',
-      expand: 'Expand roster (+{seats} seats for {price})',
+      expand: 'Expand roster',
       maxed: 'The roster is at its largest size',
       confirm:
         'Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.',
@@ -7374,6 +7378,8 @@ export const hudChromeStrings = {
   // deed_i18n.ts, never through these keys.
   // The Reliquary: cold collection trophy window (Overview + shelf chrome in
   // Phase 4; page grids and Illumination celebration land later).
+  // The Cosmetics window (src/ui/hud/cosmetics/): English lives in cosmetics.ts.
+  cosmetics: cosmeticsStrings,
   reliquary: {
     title: 'The Reliquary',
     close: 'Close The Reliquary',

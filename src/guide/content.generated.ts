@@ -1252,6 +1252,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "summon_tithefiend",
         "name": "Call Tithefiend"
+      },
+      {
+        "id": "prayer_of_returning",
+        "name": "Prayer of Returning"
       }
     ],
     "model": "player_priest",
@@ -2094,6 +2098,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "primal_reflexes",
         "name": "Primal Reflexes"
+      },
+      {
+        "id": "wildwake",
+        "name": "Wildwake"
+      },
+      {
+        "id": "grove_awakening",
+        "name": "Grove Awakening"
       }
     ],
     "model": "player_druid",
@@ -6822,10 +6834,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
-        "name": "Cluckwork Mech Bird"
-      },
-      {
-        "kind": "mount",
         "name": "Aether-Jouster Hover-Cycle"
       },
       {
@@ -6838,27 +6846,11 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
-        "name": "Goblin Rocket Sled"
-      },
-      {
-        "kind": "mount",
-        "name": "Rallycart RXT"
-      },
-      {
-        "kind": "mount",
         "name": "Grumbol the Lanternback"
       },
       {
         "kind": "mount",
-        "name": "Tolliver the Chimeglass"
-      },
-      {
-        "kind": "mount",
         "name": "Dreadspark Groundshaker"
-      },
-      {
-        "kind": "mount",
-        "name": "Bonebound Rickshaw"
       }
     ]
   },

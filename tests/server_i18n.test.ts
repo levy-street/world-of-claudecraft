@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GUILD_CREATION_FEE_COPPER } from '../src/sim/guild_bank';
 import { ensureLocaleLoaded, setLanguage, supportedLanguages } from '../src/ui/i18n';
@@ -49,6 +51,8 @@ describe('server-sent message localization', () => {
     // literal and these matchers ships English to every locale.
     'You need 1 gold to found a guild.',
     'The guild bank must be emptied before the guild can be disbanded.',
+    'You are busy. Try again in a moment.',
+    'The guild bank is still saving a recent change. Try again in a moment.',
     // guildCreate's screened-name refusal (guild.nameNotAllowed): emitted from
     // server/social.ts, which the S3 guard does not scan, so the emit literal
     // is pinned to the EXACT matcher here like the tiers above.
@@ -337,6 +341,42 @@ describe('localizeServerDuration maps formatDuration output (via the filter-mute
       expect(localizeServerText(input), `es duration ${c.duration}`).toBe(
         `Estás silenciado y no puedes chatear durante ${c.es} más.`,
       );
+    }
+    setLanguage('en');
+  });
+});
+
+// The S3 emit scanner (tests/localization_fixes.test.ts) reads server/game.ts
+// only, and the guild bank op coordinator emits its own player notices
+// (host.sendPlayerNotice literals) from a sibling module, so those literals
+// would drift from the matcher unguarded. Pin them here: every literal the
+// coordinator emits must be recognized and must not stay English.
+describe('guild bank op coordinator notices stay matchable', () => {
+  const src = fs.readFileSync(
+    path.resolve(process.cwd(), 'server/guild_bank_op_coordinator.ts'),
+    'utf8',
+  );
+  const literals = [...src.matchAll(/sendPlayerNotice\(\s*'((?:[^'\\]|\\.)*)'/g)].map((m) => m[1]);
+
+  it('finds the coordinator notices, the unsettled gate refusal included', () => {
+    expect(literals).toContain(
+      'The guild bank is still saving a recent change. Try again in a moment.',
+    );
+    expect(literals).toContain('The guild bank is closing. Try again in a moment.');
+    expect(literals).toContain('You are busy. Try again in a moment.');
+  });
+
+  it('localizes every coordinator notice in every non-English locale', async () => {
+    for (const lang of supportedLanguages) {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      for (const text of literals) {
+        const out = localizeServerText(text);
+        expect(out, `${lang}: "${text}" should be recognized`).not.toBeNull();
+        if (lang !== 'en' && lang !== 'en_CA') {
+          expect(out, `${lang}: "${text}" should not stay English`).not.toBe(text);
+        }
+      }
     }
     setLanguage('en');
   });

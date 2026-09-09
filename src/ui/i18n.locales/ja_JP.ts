@@ -758,7 +758,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': '準備確認はすでに進行中です。',
   'entities.abilities.collective_reversal.name': '集団逆行',
   'entities.abilities.collective_reversal.description':
-    'グループまたはレイドの死亡した全メンバーの時間軸を巻き戻し、遺体のそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）',
+    'グループまたはレイドの、40ヤード以内で視線の通る死亡した全メンバーの時間軸を巻き戻し、あなたのそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）',
   'entities.abilities.temporal_hourglass.name': '停止の砂時計',
   'entities.abilities.temporal_hourglass.description':
     '選択地点に時の砂時計を置きます。敵の足元では PvE で {hostilePveDuration} 秒、PvP で {hostilePvpDuration} 秒間停止させ、ダメージを受けると解除されます。自分またはパーティの味方の足元では {duration} 秒間の停滞となり、ダメージを受けず行動不能になり、最大体力の {healing}% を回復します。自分のクールダウンは {selfCooldownRecovery}%、味方は {allyCooldownRecovery}% 速く回復します。空の地面に置くと {groundDuration} 秒間待機し、最初に踏んだ有効な対象へ効果を与えます。強化効果は手動で解除できます。',
@@ -1242,7 +1242,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.billboard.result.notOfficer':
     '掲示板を編集できるのは幹部とギルドマスターだけです。',
   'hudChrome.social.roster.seats': '{count} / {cap} 席',
-  'hudChrome.social.roster.expand': '名簿を拡張（+{seats}席、{price}）',
+  'hudChrome.social.roster.expand': '名簿を拡張',
   'hudChrome.social.roster.maxed': '名簿はすでに最大です',
   'hudChrome.social.roster.confirm':
     '{price}でギルド名簿を{seats}席拡張しますか？ゴールドはあなた自身の所持金から支払われ、返金されません。',
@@ -11835,7 +11835,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '時の残響をパーティ内に連鎖させ、対象と最も近い味方最大4人を即座に回復し、それぞれに{duration}秒間印を付けます。あなたが与えた秘術ダメージの一部が残響を通じて戻り、印のついた味方を回復します。（クロノマンシー）',
   'entities.abilities.temporal_reversal.name': '時の逆転',
   'entities.abilities.temporal_reversal.description':
-    '倒れた味方の時間軸を巻き戻し、戦闘中でも、その遺体の場所で体力とマナの一部を持った状態で蘇生します。（クロノマンシー）',
+    '倒れた味方の時間軸を巻き戻し、戦闘中でも、体力とマナが35%の状態であなたのそばに蘇生します。（クロノマンシー）',
   'entities.abilities.temporal_rewind.name': '巻き戻し',
   'entities.abilities.temporal_rewind.description':
     'パーティまたはレイドに秘術の波を送り、時間を巻き戻します。40ヤード以内の各味方が過去5秒間に受けたダメージの30%を回復します（最大体力の35%まで）。この効果はクリティカルになりません。（クロノマンシー）',
@@ -13680,7 +13680,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.title': 'ワールドマップ',
   'hudChrome.continentMap.summary': 'ワールドマップ。地域を選ぶとその地図が開きます。',
   'hudChrome.continentMap.toWorld': 'ワールドマップ',
-  'hudChrome.continentMap.toggleAria': 'ワールドマップとゾーンマップを切り替える',
+  'hudChrome.continentMap.toggleAria':
+    'ワールドマップ、ゾーンマップ、インスタンスマップを切り替える',
   'hudChrome.continentMap.levels': 'レベル {min} から {max}',
   'hudChrome.continentMap.toZone': 'ゾーンマップ',
   'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
@@ -14019,7 +14020,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.specNote_subtlety':
     'ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで、どの角度からでも使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始し、2倍のダメージを与える。',
   'entities.abilities.ancestor_return.description':
-    'グループまたはレイドの倒れたメンバー全員を遺体の場所で蘇生し、体力とマナを30%回復させる。戦闘中は使用できない。（霊癒）',
+    'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（霊癒）',
   'entities.abilities.ancestor_return.name': '祖霊の帰還',
   'entities.abilities.army_of_the_dead.description':
     '墓所の門を開き、選んだドミニオンの従者に加えて、スケルタル・ウォリアー、ボーン・メイジ、グレイヴウィングを20秒間召喚する。',
@@ -14230,7 +14231,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。',
   'entities.abilities.reaping_command.name': '刈り取りの号令',
   'entities.abilities.recall_the_fallen.description':
-    '死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。',
+    '死亡したグループメンバーを、体力とマナが35%の状態であなたのそばに蘇生する。レベル16以上のサンメンダーは代わりに、グループの30ヤード以内で視線の通る倒れたメンバー全員を呼び戻す。',
   'entities.abilities.recall_the_fallen.name': '倒れし者の呼び戻し',
   'entities.abilities.redharvest.description':
     '古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
@@ -15332,8 +15333,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.healEcho': '体力が{threshold}%未満になると体力を{value}回復する',
   'hudChrome.auraEffect.hunterFerocity':
     '群れの獰猛さ{stacks}スタック：ペットの与えるダメージが{pct}%上昇',
-  'hudChrome.auraEffect.icicles':
-    'アイシクル{value}/{max}。{max}でグレイシャル・スパイクを使用できる',
+  'hudChrome.auraEffect.icicles': 'アイシクル{value}/{max}。{max}でリムニードルを使用できる',
   'hudChrome.auraEffect.internalCooldown': 'タイマー終了までこの効果は再発動しない',
   'hudChrome.auraEffect.leadenHexLock': 'レドン・ヘックスはまだこの対象を再び移動不能にできない',
   'hudChrome.auraEffect.mendingCurrent':
@@ -15377,7 +15377,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     '単体攻撃が近くの敵{targets}体にも{pct}%のダメージを与える',
   'hudChrome.auraEffect.temporalEcho':
-    '術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる',
+    '術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる。エーテルサージとエーテルダートは個別の時の残響に4倍のボーナスを使う。グループの残響は同量の回復予備を作り、体力が60%未満の標識付き味方へ失った体力に応じて分配する',
   'hudChrome.auraEffect.veiledEdge': '次に放つ「潜伏者の一撃」は2倍のダメージを与える',
   'hudChrome.auraEffect.veiledEdgeStrike': '次に放つ「潜伏者の一撃」の武器ダメージが{pct}%増加する',
   'hudChrome.auraEffect.coldsightRead':
@@ -16705,6 +16705,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.lootExplorer': '戦利品ブラウザ',
   'hudChrome.mounts.desc_goblin_rocket_sled':
     '危険なほど過剰に組み上げられたゴブリンのそり。二基のロケットと最悪の判断力で突き進む。',
+  'hudChrome.mounts.desc_rallycart_skin': '小さな車体から豪快なエンジン音を響かせるラリーカー。',
   'hudChrome.mounts.desc_rallycart_rxt': '小型ながら本格的なラリーマシン。移動速度を高めてくれる。',
   'hudChrome.mounts.name_goblin_rocket_sled': 'ゴブリンロケットそり',
   'hudChrome.mounts.name_rallycart_rxt': 'ラリーカートRXT',
@@ -16727,4 +16728,61 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.kickedByModerator': 'モデレーターによって切断されました：{reason}',
   'loading.rendererContextLost':
     '3D レンダラーがグラフィックスコンテキストを失い、復旧できませんでした。再読み込みしてください。',
+
+  'hudChrome.wocStore.mountSkinType': 'マウントスキン',
+  'hudChrome.cosmetics.title': 'コスメティック',
+  'hudChrome.cosmetics.close': 'コスメティックを閉じる',
+  'hudChrome.cosmetics.tabsLabel': 'コスメティックの区分',
+  'hudChrome.cosmetics.tabMounts': 'マウント',
+  'hudChrome.cosmetics.tabSkins': 'スキン',
+  'hudChrome.cosmetics.tabMech': 'メカ',
+  'hudChrome.cosmetics.legend':
+    'アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。',
+  'hudChrome.cosmetics.scopeAccount': 'アカウント',
+  'hudChrome.cosmetics.scopeCharacter': 'キャラクター',
+  'hudChrome.cosmetics.wear': '装着',
+  'hudChrome.cosmetics.takeOff': '外す',
+  'hudChrome.cosmetics.worn': '装着中',
+  'hudChrome.cosmetics.apply': '適用',
+  'hudChrome.cosmetics.detach': '解除',
+  'hudChrome.cosmetics.applied': '適用中',
+  'hudChrome.cosmetics.owned': '所持',
+  'hudChrome.cosmetics.storeOnly': 'WOCストアで入手可能',
+  'hudChrome.cosmetics.cardAria': '{name}、{rarity}',
+  'hudChrome.cosmetics.mountsNoMount':
+    'まずマウントを入手してください。スキンには乗るものが必要です。',
+  'hudChrome.cosmetics.skinsEmpty': '武器スキンをまだ所持していません。WOCストアをご覧ください。',
+  'hudChrome.cosmetics.skinsApplyHint': '{type}を装備するとこのスキンを適用できます。',
+  'hudChrome.cosmetics.mechEmpty': 'コンバットメカのクロマをまだ所持していません。',
+  'hudChrome.cosmetics.mountsIntro':
+    'マウントスキンはこのキャラクターが乗るどのマウントにも重ねて描かれます。速度は変わりません。',
+  'hudChrome.cosmetics.mechIntro':
+    'コンバットメカはこのキャラクターの身体を置き換えます。装着できるクロマは一度に一つです。',
+  'hudChrome.auraTracks.mode': 'オン',
+  'hudChrome.auraTracks.row': '{unit} に {aura}',
+  'hudChrome.auraTracks.selfRow': '{aura}',
+  'hudChrome.crafting.oncePerDay': '1日1回',
+  'hudChrome.masterwrought.slotsValue': '{used} / {cap}',
+  'hudChrome.meters.millions': '{value}m',
+  'hudChrome.meters.thousands': '{value}k',
+  'hudChrome.practiceDps.liveDps': '{value} DPS',
+  'hudChrome.practiceDps.liveLabel': '今回の練習',
+  'hudChrome.practiceDps.runLabel': '{index}回目の練習',
+  'hudChrome.practiceDps.runSummary': '{time} で {total}',
+
+  'entities.abilities.grove_awakening.description':
+    'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（回復）',
+  'entities.abilities.grove_awakening.name': '樹林の覚醒',
+  'entities.abilities.prayer_of_returning.description':
+    'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（聖なる・ディシプリン）',
+  'entities.abilities.prayer_of_returning.name': '帰還の祈り',
+  'entities.abilities.wildwake.description':
+    '倒れた味方を不意の開花へと促し、戦闘の最中でも、体力とマナが35%の状態であなたのそばに蘇生させる。（回復）',
+  'entities.abilities.wildwake.name': '野性の目覚め',
+
+  'devCommand.actions.farmgrow.description':
+    '作物を植えたすべての畝、またはIDで指定した畝一つを収穫可能な時刻まで進めます。それ以外は変わりません。収穫の結果は植えた時点で抽選済みです。',
+  'devCommand.actions.farmgrow.label': '作物を成熟させる',
+  'devCommand.fields.bed': '畝のID（任意）',
+  'guide.profPages.oncePerDay': '1日1回',
 };

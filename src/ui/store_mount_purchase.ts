@@ -1,16 +1,17 @@
-// Store-mount purchase controller for the WOC Store's Machine Stable strip: the
+// Mount-skin purchase controller for the WOC Store's Machine Stable strip: the
 // row model, the one-spend guard, confirmation, authoritative refusal handling,
 // and stale-surface result routing, mirroring the weapon-skin controller
 // (src/ui/store_armory_purchase.ts). DailyRewardsWindow supplies only its spend
 // and repaint seams. Kept as its own controller rather than generalizing the
-// skin one: that one is typed on ArmorySkinRow end to end (inspector refresh,
+// weapon one: that one is typed on ArmorySkinRow end to end (inspector refresh,
 // skin copy), and this is the second copy, not the third.
 //
 // What the two share is stated once as StoreSpendSeams so the window wires one
-// object into both. A mount SKU is a GRANT (like a skin, unlike a repeatable
-// charter): the service dedupes on the grant row, so no intent key travels, and
-// ownership reflects through the refreshed rows once the reins lands in the
-// bags via the server mirror (server/store_mount_grants.ts).
+// object into both. A mount skin SKU is a GRANT in the same kind 'skin' family
+// as a weapon skin: the service dedupes on the grant row, so no intent key
+// travels, and ownership reflects through the refreshed rows once the account
+// mirror lands (server/account_cosmetics_service.ts pushes it live). Wearing
+// the skin is the Cosmetics window's job; nothing lands in the bags.
 
 import type { StoreSpendResult } from './claudium_purchase_bridge';
 import { formatNumber, t } from './i18n';
@@ -37,7 +38,7 @@ export type StoreSpendSeams = Pick<
 >;
 
 export interface StoreMountPurchaseDeps extends StoreSpendSeams {
-  /** The service spend for a kind 'item' SKU. */
+  /** The service spend for a kind 'skin' SKU (the mount skin family). */
   spend(itemId: string, cost: number): Promise<StoreSpendResult | undefined>;
 }
 
@@ -47,15 +48,15 @@ export class StoreMountPurchase {
 
   constructor(private readonly deps: StoreMountPurchaseDeps) {}
 
-  /** Re-project the rows from the service snapshot plus the live mount
-   *  ownership mirror (IWorldMounts.ownedMounts), so a fresh purchase reads as
-   *  owned as soon as the reins is in the bags. */
+  /** Re-project the rows from the service snapshot plus the account cosmetics
+   *  mirror (accountCosmetics.mountSkinIds), so a fresh purchase reads as owned
+   *  as soon as the live push lands. */
   rebuild(
     balance: number | null,
     items: WocStoreItemInput[],
-    ownedMountKeys: readonly string[],
+    cosmetics: { mountSkinIds: readonly string[] },
   ): void {
-    this.rows = buildStoreMountRows(balance, items, ownedMountKeys);
+    this.rows = buildStoreMountRows(balance, items, cosmetics.mountSkinIds);
   }
 
   sectionHtml(): string {
@@ -170,8 +171,8 @@ export class StoreMountPurchase {
       return null;
     }
     // On the live surface only the refreshed row proves ownership, exactly as
-    // the skin controller reads it: an already_granted answer whose reins the
-    // mirror has not landed is the error state, not a silent success (the
+    // the weapon controller reads it: an already_granted answer whose grant
+    // the mirror has not landed is the error state, not a silent success (the
     // stale-surface toast above is the one place already_granted reads as
     // owned, because there is no row to check against there).
     if (!result?.granted && !this.rowById(row.itemId)?.owned) this.deps.setError();

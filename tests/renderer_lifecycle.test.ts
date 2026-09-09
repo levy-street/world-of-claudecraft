@@ -10,6 +10,10 @@ const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url
 // rideable-mount lifecycle was extracted (the renderer is under a line
 // ratchet). The guarantee these tests encode is unchanged, so they follow the
 // code rather than pinning the file it used to live in.
+const mountAudioSource = readFileSync(
+  new URL('../src/render/ridden_mount_audio.ts', import.meta.url),
+  'utf8',
+);
 const mountLifecycleSource = readFileSync(
   new URL('../src/render/mount_lifecycle.ts', import.meta.url),
   'utf8',
@@ -173,11 +177,7 @@ describe('Renderer lifecycle wiring', () => {
   });
 
   it('resets an entity engine-mount audio state on every mountKey transition', () => {
-    const mountKeyEdge = sliceIn(
-      mountLifecycleSource,
-      'if (x.mountKey !== v.lastMountKey) {',
-      '\n  }\n  return x.mountCasting;',
-    );
+    const mountKeyEdge = sliceIn(mountLifecycleSource, 'if (mountChanged) {', '\n  }');
     // Covers dismount (mountKey -> ''), a live mount swap (mountKey -> a
     // different mountKey), and a fresh summon reusing this entity id
     // ('' -> mountKey): all three funnel through this one check, and
@@ -189,11 +189,7 @@ describe('Renderer lifecycle wiring', () => {
   });
 
   it('resets engine state BEFORE arming the summon, not after', () => {
-    const mountKeyEdge = sliceIn(
-      mountLifecycleSource,
-      'if (x.mountKey !== v.lastMountKey) {',
-      '\n  }\n  return x.mountCasting;',
-    );
+    const mountKeyEdge = sliceIn(mountLifecycleSource, 'if (mountChanged) {', '\n  }');
     const resetAt = mountKeyEdge.indexOf('x.engineReset()');
     const summonAt = mountKeyEdge.indexOf('x.summonCall()');
     expect(resetAt).toBeGreaterThan(-1);
@@ -212,15 +208,11 @@ describe('Renderer lifecycle wiring', () => {
   });
 
   it("preloads a new mount's engine clips on the same mountKey-transition edge", () => {
-    const mountKeyEdge = sliceIn(
-      mountLifecycleSource,
-      'if (x.mountKey !== v.lastMountKey) {',
-      '\n  }\n  return x.mountCasting;',
-    );
+    const mountKeyEdge = sliceIn(mountLifecycleSource, 'if (mountChanged) {', '\n  }');
     // Threading the preload through the same edge that resets state (rather
     // than lazily on the first movement frame) is what actually shrinks the
     // cold-first-ride silence window: the fetch+decode gets a head start.
-    expect(mountKeyEdge).toContain('x.preloadEngine(x.mountKey)');
+    expect(mountKeyEdge).toContain('x.preloadEngine(x.mountLook)');
     expect(source).toContain(
       'preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key)',
     );
@@ -232,7 +224,7 @@ describe('Renderer lifecycle wiring', () => {
       "if (x.mountCasting && !v.wasMountCasting && x.mountCastKey !== '') {",
       '\n  }',
     );
-    const preloadAt = summonEdge.indexOf('x.preloadEngine(x.mountCastKey)');
+    const preloadAt = summonEdge.indexOf('x.preloadEngine(x.mountLook)');
     const poseGateAt = summonEdge.indexOf('x.poseAllowed');
 
     expect(preloadAt).toBeGreaterThan(-1);
@@ -256,50 +248,20 @@ describe('Renderer lifecycle wiring', () => {
   });
 
   it('pins the mount gait cadence and all three stride-accumulator callers', () => {
-    expect(source).toContain('const MOUNT_STRIDE_RUN = 5.8;');
+    expect(mountAudioSource).toContain('const MOUNT_STRIDE_RUN = 5.8;');
     expect(source).toContain('strideHit(v, loco.speed, dt, SWIM_STRIDE)');
-    expect(source).toContain('strideHit(v, loco.speed, dt, MOUNT_STRIDE_RUN)');
+    expect(mountAudioSource).toContain('strideHit(state, speed, dt, MOUNT_STRIDE_RUN)');
     expect(source).toContain(
       'strideHit(v, loco.speed, dt, running ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK)',
     );
   });
 
-  it('forwards the mount key into run, jump, and landing dispatch', () => {
-    const audioBlock = slice(
-      '// --- spatial movement audio (self + others) --------------------------',
-      "// Capture the flight's peak fall speed before the landing reset",
-    );
-    const mountedStart = audioBlock.indexOf('logicallyMounted && moving && !airborne');
-    const airborneStart = audioBlock.indexOf('logicallyMounted && airborne', mountedStart);
-    const stoppedStart = audioBlock.indexOf(
-      'logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)',
-      airborneStart,
-    );
-    const onFootStart = audioBlock.indexOf('moving && !airborne', stoppedStart);
-    expect(mountedStart).toBeGreaterThan(-1);
-    expect(airborneStart).toBeGreaterThan(mountedStart);
-    expect(stoppedStart).toBeGreaterThan(airborneStart);
-    expect(onFootStart).toBeGreaterThan(stoppedStart);
-    const mountedMoving = audioBlock.slice(mountedStart, airborneStart);
-    const mountedStopped = audioBlock.slice(stoppedStart, onFootStart);
-
-    expect(mountedMoving).toContain('sink.mountIdle(ax, ay, az, e.mountKey, false, e.id)');
-    expect(mountedMoving).toContain(
-      'sink.mountEngine(ax, ay, az, e.mountKey, true, e.id, st.backwards, false)',
-    );
-    expect(mountedMoving).toContain(
-      'sink.mountRun(ax, ay, az, e.mountKey, this.surfaceAt(ax, az, ay), isSelf)',
-    );
-    expect(mountedStopped).toContain(
-      'sink.mountEngine(ax, ay, az, e.mountKey, false, e.id, false, false, v.mountPivot)',
-    );
-    expect(mountedStopped).toContain('sink.mountIdle(ax, ay, az, e.mountKey, true, e.id)');
-    expect(audioBlock).toContain(
-      "sink.movement('jump', ax, ay, az, isSelf, e.mountKey || undefined)",
-    );
-    expect(audioBlock).toContain(
-      "sink.movement('land', ax, ay, az, isSelf, e.mountKey || undefined)",
-    );
+  it('forwards the resolved skin look into run, jump, and landing dispatch', () => {
+    expect(source).toContain('const mountLook = mountPresentationKey(e.mountKey, e.mountSkinId);');
+    expect(source).toMatch(/updateRiddenMountAudio\(\s*sink,\s*v,\s*mountLook,\s*e.id,/);
+    expect(source).toContain("sink.movement('jump', ax, ay, az, isSelf, mountLook || undefined)");
+    expect(source).toContain("sink.movement('land', ax, ay, az, isSelf, mountLook || undefined)");
+    expect(mountAudioSource).toContain('sink.mountRun(x, y, z, look, surfaceAt(x, z, y), self)');
   });
 
   it("preloads an already-mounted entity's engine clips at view creation", () => {
@@ -311,54 +273,17 @@ describe('Renderer lifecycle wiring', () => {
       'private createView(e: Entity, opts?: AssembleOptions, requiredForEntry = false): void {',
       '\n  }\n\n  // Shared core',
     );
-    expect(createView).toContain("if (e.mountKey !== '') this.audioSink?.preloadMountEngine(");
+    expect(createView).toContain("if (look !== '') this.audioSink?.preloadMountEngine(look);");
   });
 
-  it("holds an engine mount's audio phase while airborne instead of polling a stop", () => {
-    const audioBlock = slice(
-      '// --- spatial movement audio (self + others) --------------------------',
-      "// Capture the flight's peak fall speed before the landing reset",
+  it('keeps the airborne engine poll limited to the spaceship or an idling engine', () => {
+    const branch = sliceIn(mountAudioSource, 'if (airborne) {', '} else if (moving) {');
+    expect(branch).toContain("if (look === 'goblin_rocket_sled' || sink.mountEngineIdles(look)) {");
+    expect(branch).toContain(
+      'sink.mountEngine(x, y, z, look, moving, id, backwards, true, state.mountPivot)',
     );
-    // The airborne branch must come before the "not moving" branch that
-    // polls mountEngine with moving=false, and must not itself call
-    // mountEngine at all: calling it with moving=false would run a full
-    // winddown-then-windup cycle on every jump instead of holding steady.
-    const airborneBranch = audioBlock.indexOf('logicallyMounted && airborne');
-    const notMovingBranch = audioBlock.indexOf(
-      'logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)',
-    );
-    expect(airborneBranch).toBeGreaterThan(-1);
-    expect(notMovingBranch).toBeGreaterThan(airborneBranch);
-    const airborneBranchBody = audioBlock.slice(airborneBranch, notMovingBranch);
-    expect(airborneBranchBody).toContain('sink.mountIdle(ax, ay, az, e.mountKey, false, e.id)');
-    expect(airborneBranchBody).not.toContain('sink.mountEngineReset(');
-    // ORDINARY mounts still must not poll: strip the sanctioned exception
-    // first, then assert nothing else calls it. The Goblin Rocket Sled is a
-    // deliberate carve-out, not a regression: its turbine startup continues
-    // through a hop and an active sustain bends pitch upward under no load, so
-    // it needs the poll the hold exists to avoid for everything else.
-    //
-    // A mount that IDLES a loop joined it, deliberately, and is named in the
-    // condition rather than hidden behind the sled's own flag: a parked idle is
-    // audible the whole time the mount is out, so holding its phase through a
-    // hop would leave the loop running against a stale pitch target instead of
-    // tracking the jump. The guard stays an exact-string match on the WHOLE
-    // condition, so a THIRD member still cannot join without editing this line,
-    // which is the property that makes this test worth having.
-    const sledException = airborneBranchBody.indexOf(
-      'if (rocketSledMounted || sink.mountEngineIdles(e.mountKey)) {',
-    );
-    expect(
-      sledException,
-      'the airborne carve-out condition changed; confirm the new member is deliberate, then update this string',
-    ).toBeGreaterThan(-1);
-    const sledExceptionEnd = airborneBranchBody.indexOf(
-      '}',
-      airborneBranchBody.indexOf('sink.mountEngine(', sledException),
-    );
-    const withoutSledException =
-      airborneBranchBody.slice(0, sledException) + airborneBranchBody.slice(sledExceptionEnd);
-    expect(withoutSledException).not.toContain('sink.mountEngine(');
+    expect(branch.match(/sink.mountEngine\(/g)).toHaveLength(1);
+    expect(branch).not.toContain('sink.mountEngineReset(');
   });
 
   it('tears down a still-active engine-mount loop when the rider exits the move-audio range gate', () => {

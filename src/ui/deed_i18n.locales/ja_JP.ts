@@ -198,6 +198,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '野辺の名人', desc: '薬草学の熟練度100に到達する。' },
   prog_master_gatherer: {
     name: '採集の達人',
+    desc: 'いずれか3つの採集職で熟練度100に到達する。',
   },
   prog_first_craft: { name: '手仕事の味', desc: '初めての製作を成功させる。' },
   prog_craft_specialist: {
@@ -373,6 +374,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_packbreaker: { name: '群れ崩し', desc: '10秒以内に森の狼を3体倒す。' },
   chr_vale_cup_debut: {
+    desc: 'ソウフィールドで行われるヴェイルカップの試合に出場し、ボールに触れる。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
     name: '銅の手桶の挑戦者',
   },
   chr_vale_rares: {
@@ -545,45 +547,74 @@ export const table: DeedLocaleTable = {
   pvp_duel_first_win: { name: '表へ出ろ', desc: '決闘に勝利する。' },
   pvp_duel_grace: { name: '謙虚さの心得', desc: '威厳をおおむね保ったまま、決闘に敗れる。' },
   pvp_vcup_first_match: {
+    desc: 'ソウフィールドでヴェイルカップの試合を、勝敗にかかわらず最後まで戦い抜く。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
     name: 'ピッチに立つ',
   },
-  pvp_vcup_first_win: { name: '初めての銀杯' },
-  pvp_vcup_wins_10: { name: '熟練ボアボーラー' },
+  pvp_vcup_first_win: {
+    name: '初めての銀杯',
+    desc: 'レート制ヴェイルカップの試合に勝利する。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
+  },
+  pvp_vcup_wins_10: {
+    name: '熟練ボアボーラー',
+    desc: 'レート制ヴェイルカップの試合で10勝する。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
+  },
   pvp_vcup_wins_25: {
+    desc: 'レート制ヴェイルカップの試合で25勝する。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
     name: 'ボアボールの伝説',
     title: 'ボアボールの伝説',
   },
-  pvp_vcup_first_goal: { name: 'まずは一点' },
+  pvp_vcup_first_goal: {
+    name: 'まずは一点',
+    desc: 'レート制ヴェイルカップの試合でゴールを決める。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
+  },
   pvp_vcup_hat_trick: {
+    desc: '3対3以上のレート制ヴェイルカップの試合で、1試合に3ゴールを決める。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
     name: 'ハットトリックの英雄',
   },
   pvp_vcup_golden_goal: {
+    desc: 'レート制ヴェイルカップの試合を決めるゴールデンゴールを決める。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
     name: '黄金の瞬間',
   },
   pvp_vcup_first_save: {
+    desc: '3対3以上のレート制ヴェイルカップの試合で、キーパーとしてセーブする。手の感触を試すほど速いシュートだけが対象で、やさしいキャッチは対象外。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
     name: '鉄壁の両手',
   },
   pvp_vcup_clean_sheet: {
+    desc: '3対3以上のレート制ヴェイルカップの試合で、キーパーとして無失点で勝利する。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
     name: '何ひとつ通さない',
   },
   pvp_vcup_guild_win: {
+    desc: '自分のギルドの旗を掲げて参加したレート制ヴェイルカップの試合に勝利する。ヴェイルカップの試合はもうプレイできないため、新たに獲得することはできない。',
     name: '旗の名にかけて',
   },
   pvp_fiesta_first_bout: {
+    desc: '勝敗にかかわらず、Fiestaの2対2の試合を最後まで戦い抜く。Fiestaの試合はアリーナのキューからなくなったため、新たに獲得することはできない。',
     name: '宴への乱入者',
   },
-  pvp_fiesta_first_win: { name: '宴の主役' },
-  pvp_fiesta_double: { name: '二丁上がり' },
+  pvp_fiesta_first_win: {
+    name: '宴の主役',
+    desc: 'Fiestaの2対2の試合に勝利する。Fiestaの試合はアリーナのキューからなくなったため、新たに獲得することはできない。',
+  },
+  pvp_fiesta_double: {
+    name: '二丁上がり',
+    desc: 'Fiestaで4秒以内に2回テイクダウンする。Fiestaの試合はアリーナのキューからなくなったため、新たに獲得することはできない。',
+  },
   pvp_fiesta_shutdown: {
+    desc: '3連勝以上のFiestaの敵をテイクダウンする。Fiestaの試合はアリーナのキューからなくなったため、新たに獲得することはできない。',
     name: '祭りに水を差す者',
   },
   pvp_fiesta_full_build: {
+    desc: '3ウェーブすべてで強化を1つ固定した状態で、Fiestaの試合に勝利する。Fiestaの試合はアリーナのキューからなくなったため、新たに獲得することはできない。',
     name: '宴の正装',
   },
   pvp_fiesta_powerups: {
+    desc: 'リングの4種のパワーアップ、スピードデーモン、コロッサス、ムーンブーツ、バーサーカーを、それぞれ少なくとも1回取得する。Fiestaの試合はアリーナのキューからなくなったため、新たに獲得することはできない。',
     name: '全部ひとつずつ',
   },
-  pvp_fiesta_five_kills: { name: '宴を背負う者' },
+  pvp_fiesta_five_kills: {
+    name: '宴を背負う者',
+    desc: '1回のFiestaの試合で5回テイクダウンする。Fiestaの試合はアリーナのキューからなくなったため、新たに獲得することはできない。',
+  },
   soc_first_party: { name: '持つべきものは仲間', desc: '他のプレイヤーとパーティを組む。' },
   soc_full_house: { name: 'フルハウス', desc: '5人満員のパーティでダンジョンを攻略する。' },
   soc_guild_joined: { name: '同じ旗の下に', desc: 'ギルドの一員になる。' },
@@ -957,5 +988,46 @@ export const table: DeedLocaleTable = {
   col_set_bramblehide: {
     name: 'ルーツのブランブルハイド',
     desc: 'ルーツのブランブルハイドの全部位を発見する。',
+  },
+  col_deepest_cast: {
+    desc: 'Clockreelの釣り竿を手に入れる。最深部の獲物に届く唯一の竿だ。',
+    name: '最深の一投',
+  },
+  prog_first_planting: { desc: '畑に初めて作物を植える。', name: '種まきの始まり' },
+  chr_vale_first_harvest: {
+    desc: 'イーストブルック渓谷の畑で、初めて元気に育った作物を収穫する。',
+
+    name: '谷の初穂',
+  },
+  chr_marsh_first_harvest: {
+    desc: 'マイアフェン湿地の畑で、初めて元気に育った作物を収穫する。',
+    name: '泥炭に芽吹く',
+  },
+  chr_peaks_first_harvest: {
+    desc: 'ソーンピーク高地の畑で、初めて元気に育った作物を収穫する。',
+    name: '岩峰の実り',
+  },
+  chr_evergarden_first_harvest: {
+    desc: 'Evergardenの畑で、初めて元気に育った作物を収穫する。',
+    name: '楽園の畑',
+  },
+  col_golden_harvest: {
+    desc: '黄金の収穫を得て、その知らせをゾーン全体に届ける。',
+    name: '黄金の収穫',
+  },
+  prog_farming_100: {
+    desc: '農耕の熟練度100に到達する。',
+    name: '収穫の達人',
+    title: '収穫の達人',
+  },
+  col_farm_roster: { desc: '4つの畑で育つすべての作物を収穫する。', name: 'すべての畝に実りを' },
+  prog_field_to_feast: {
+    desc: '最上級の宴を料理し、レイド全体が囲める食卓を作る。',
+    name: '畑から祝宴へ',
+  },
+  prog_legendmaker: {
+    desc: '創造の証書で完全化された作品を伝説に引き上げ、自分だけの名前を与える。',
+
+    name: '伝説を生む者',
   },
 };

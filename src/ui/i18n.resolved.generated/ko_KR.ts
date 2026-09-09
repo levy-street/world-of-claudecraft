@@ -65,7 +65,7 @@ export const ko_KR: EnTranslations = {
       "difficulty": "난이도",
       "name": "이름",
       "spec": "전문화",
-      "bed": "Bed id (optional)"
+      "bed": "경작지 ID (선택 사항)"
     },
     "difficulty": {
       "normal": "일반",
@@ -153,8 +153,8 @@ export const ko_KR: EnTranslations = {
         "description": "채집 전문 기술을 올립니다."
       },
       "farmgrow": {
-        "label": "Ripen crops",
-        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
+        "label": "작물 익히기",
+        "description": "심어 둔 모든 경작지 또는 ID로 지정한 경작지 하나를 수확 가능한 시점까지 진행시킵니다. 그 외에는 바뀌지 않습니다. 수확 결과는 심을 때 이미 무작위로 결정되었습니다."
       },
       "teleport": {
         "label": "순간이동",
@@ -577,6 +577,7 @@ export const ko_KR: EnTranslations = {
       "mountsEyebrow": "계정 탈것",
       "mountsTitle": "기계 마구간",
       "mountBuyAria": "{item} 구매",
+      "mountSkinType": "탈것 스킨",
       "loading": "WOC 상점 불러오는 중…",
       "error": "현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
       "balance": "Claudium 잔액",
@@ -1260,11 +1261,11 @@ export const ko_KR: EnTranslations = {
     "practiceDps": {
       "title": "훈련용 허수아비",
       "liveDps": "{value} DPS",
-      "liveLabel": "This run",
+      "liveLabel": "이번 연습",
       "prompt": "허수아비를 공격하여 측정을 시작하세요",
       "previous": "이전 측정",
-      "runLabel": "Run {index}",
-      "runSummary": "{total} in {time}"
+      "runLabel": "{index}번째 연습",
+      "runSummary": "{time} 동안 {total}"
     },
     "hubLesson": {
       "target": "먼저 허수아비를 대상으로 삼으세요.",
@@ -1356,9 +1357,9 @@ export const ko_KR: EnTranslations = {
       "utility": "이동 및 은신",
       "friendly": "아군에게 건 내 버프",
       "shields": "내 보호막",
-      "row": "{aura} on {unit}",
+      "row": "{unit}에게 {aura} 적용",
       "selfRow": "{aura}",
-      "mode": "on",
+      "mode": "켜짐",
       "overflow": "{count}개 더 표시되지 않음"
     },
     "targetDots": {
@@ -1464,6 +1465,7 @@ export const ko_KR: EnTranslations = {
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
       "desc_goblin_rocket_sled": "위험할 정도로 과하게 만들어진 고블린 썰매. 쌍발 로켓과 형편없는 판단력으로 내달린다.",
       "desc_rallycart_rxt": "작지만 본격적인 랠리 머신. 이동 속도를 높여준다.",
+      "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
@@ -3035,7 +3037,7 @@ export const ko_KR: EnTranslations = {
       "suddenDeath": "다음 마무리 일격은 분노를 소모하지 않고 생명력 조건을 무시합니다",
       "aoeEcho": "메아리 {charges}회 남음: 단일 대상 기술이 주변 최대 {targets}명에게 {pct}% 피해를 줍니다",
       "sureCrit": "다음 공격 기술 {charges}회가 반드시 치명타로 적중합니다",
-      "temporalEcho": "시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다",
+      "temporalEcho": "시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다. 에테르 쇄도와 에테르 화살은 개별 시간의 메아리에 4배 보너스를 적용합니다. 집단 메아리는 같은 양의 치유 예비량을 만들고, 체력이 60% 미만인 표식이 있는 아군에게 잃은 생명력에 따라 나눠 줍니다",
       "arcaneCharge": "비전 충전 {stacks}중첩: 에테르 쇄도의 피해가 {damagePct}% 증가하고 시전이 {castPct}% 빨라지며 마나가 {costMult}배 듭니다",
       "physicalReduction": "받는 물리 피해가 {pct}% 감소합니다",
       "temporalHourglass": "피해에 면역이고 행동할 수 없습니다. 생명력을 회복하고 재사용 대기시간을 가속합니다. 우클릭으로 취소할 수 있습니다.",
@@ -3154,7 +3156,7 @@ export const ko_KR: EnTranslations = {
       "fingersOfFrost": "충전 {charges}회 남음: 얼음창이 대상을 빙결 상태로 간주하고 빙결 피해 {pct}%를 줍니다",
       "brainFreeze": "다음 눈보라가 즉시 시전되고 재사용 대기시간을 무시합니다",
       "wintersChill": "충전 {charges}회 남음: 적용 가능한 주문이 이 대상을 빙결 상태로 간주합니다",
-      "icicles": "고드름 {value}/{max}개. {max}개면 빙하 쐐기를 사용할 수 있습니다",
+      "icicles": "고드름 {value}/{max}개. {max}개면 서리 바늘을 사용할 수 있습니다",
       "desolation": "충전 {charges}회 남음: 다음 혼돈의 화살 시전이 {castPct}% 빨라지거나 불의 비가 즉시 떨어집니다",
       "ruinousBrand": "복제 {charges}회 남음: 직접 주문 피해의 {otherPct}%를 이곳에 복제하며, 이곳이 주 대상이면 {selfPct}%를 복제합니다",
       "duskfireClaim": "대상이 죽으면 파멸을 {value} 얻습니다",
@@ -4002,7 +4004,7 @@ export const ko_KR: EnTranslations = {
       },
       "roster": {
         "seats": "{count} / {cap} 자리",
-        "expand": "명단 확장 (+{seats}자리, {price})",
+        "expand": "명단 확장",
         "maxed": "명단이 이미 최대 규모입니다",
         "confirm": "{price}(으)로 길드 명단을 {seats}자리 확장하시겠습니까? 골드는 본인의 소지금에서 차감되며 환불되지 않습니다.",
         "confirmAction": "확장",
@@ -4468,7 +4470,7 @@ export const ko_KR: EnTranslations = {
       "noBagSpace": "가방에 제작한 아이템을 넣을 공간이 없습니다.",
       "dailyLimit": "하루에 한 번만 제작할 수 있습니다.",
       "dailyLimitRetry": "하루에 한 번만 제작할 수 있습니다. {duration} 후에 다시 제작할 수 있습니다.",
-      "oncePerDay": "Once per day",
+      "oncePerDay": "하루 한 번",
       "skillReqLine": "{craft} {skill} 필요",
       "difficultyFull": "숙련도 전량 상승",
       "difficultyReduced": "숙련도 상승 감소",
@@ -4877,6 +4879,32 @@ export const ko_KR: EnTranslations = {
         "deathless_court": "불사의 궁정(영웅 전용, 불사의 격노 이후 왕실 궁정이 일어남)"
       }
     },
+    "cosmetics": {
+      "title": "외형",
+      "close": "외형 닫기",
+      "tabsLabel": "외형 구역",
+      "tabMounts": "탈것",
+      "tabSkins": "스킨",
+      "tabMech": "메카",
+      "legend": "계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.",
+      "scopeAccount": "계정",
+      "scopeCharacter": "캐릭터",
+      "wear": "착용",
+      "takeOff": "벗기",
+      "worn": "착용 중",
+      "apply": "적용",
+      "detach": "해제",
+      "applied": "적용됨",
+      "owned": "보유 중",
+      "storeOnly": "WOC 상점에서 구매 가능",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "탈것 스킨은 이 캐릭터가 타는 어떤 탈것 위에도 덧입혀집니다. 속도는 바뀌지 않습니다.",
+      "mountsNoMount": "먼저 탈것을 얻으세요. 스킨에는 탈 대상이 필요합니다.",
+      "skinsEmpty": "아직 보유한 무기 스킨이 없습니다. WOC 상점을 방문하세요.",
+      "skinsApplyHint": "{type}을(를) 장착하면 이 스킨을 적용할 수 있습니다.",
+      "mechIntro": "전투 메카는 이 캐릭터의 몸을 대체합니다. 한 번에 하나의 크로마만 착용합니다.",
+      "mechEmpty": "아직 보유한 전투 메카 크로마가 없습니다."
+    },
     "reliquary": {
       "title": "성물고",
       "close": "성물고 닫기",
@@ -5096,7 +5124,7 @@ export const ko_KR: EnTranslations = {
       "toWorld": "세계 지도",
       "toZone": "지역 지도",
       "toInstance": "인스턴스 지도",
-      "toggleAria": "세계 지도와 지역 지도 전환",
+      "toggleAria": "세계 지도, 지역 지도, 인스턴스 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     },
     "arenaGate": {
@@ -7182,7 +7210,7 @@ export const ko_KR: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "{a}와 {b} 필요",
-      "oncePerDay": "Once per day",
+      "oncePerDay": "하루 한 번",
       "effectFood": "먹으면 {seconds}초에 걸쳐 생명력을 {amount} 회복합니다.",
       "effectWellFed": "식사를 마치면 잘 먹음: {minutes}분간 {stat} +{value}.",
       "effectWellFedAura": "식사를 마치면 {minutes}분간 {aura} 효과를 얻습니다.",
@@ -11392,7 +11420,7 @@ export const ko_KR: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "쓰러진 자 소환",
-        "description": "죽은 파티원을 생명력과 마나가 35%인 상태로 되살립니다."
+        "description": "죽은 파티원을 당신 곁에서 생명력과 마나가 35%인 상태로 되살립니다. 레벨 16 이상의 태양 치유사는 대신 파티에서 30야드 내 시야가 닿는 쓰러진 모든 구성원을 불러 되살립니다."
       },
       "beacon_of_light": {
         "name": "빛의 봉화",
@@ -12125,6 +12153,14 @@ export const ko_KR: EnTranslations = {
         "name": "골수분쇄",
         "description": "오랜 피 3단계를 소모해 {damage}의 피해를 입히는 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 8초 동안 최대 생명력의 18%를 흡수하는 보호막을 얻고 분노 15를 돌려받습니다."
       },
+      "wildwake": {
+        "name": "야생의 소생",
+        "description": "쓰러진 아군을 갑작스러운 개화로 이끌어, 치열한 전투 중에도 생명력과 마나 35%로 당신 곁에 되살립니다. (회복)"
+      },
+      "grove_awakening": {
+        "name": "숲의 각성",
+        "description": "파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (회복)"
+      },
       "overbloom": {
         "name": "만개",
         "description": "푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다."
@@ -12435,15 +12471,15 @@ export const ko_KR: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "시간 역전",
-        "description": "쓰러진 아군의 시간선을 되돌려, 전투 중에도 시체가 있는 자리에서 생명력과 마나의 일부를 지닌 채 되살립니다. (시간술)"
+        "description": "쓰러진 아군의 시간선을 되돌려, 전투 중에도 당신 곁에서 생명력과 마나의 35%를 지닌 채 되살립니다. (시간술)"
       },
       "collective_reversal": {
         "name": "집단 역행",
-        "description": "그룹 또는 공격대에서 사망한 모든 구성원의 시간선을 되돌려 시체 옆에서 생명력과 마나가 30%인 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)"
+        "description": "그룹 또는 공격대에서 40야드 내 시야가 닿는 사망한 모든 구성원의 시간선을 되돌려 당신 곁에서 생명력과 마나가 30%인 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)"
       },
       "ancestor_return": {
         "name": "선조의 귀환",
-        "description": "파티 또는 공격대에서 쓰러진 모든 구성원을 시체가 있는 곳에서 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (영혼치유사)"
+        "description": "파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (영혼치유사)"
       },
       "temporal_rewind": {
         "name": "되감기",
@@ -12585,6 +12621,10 @@ export const ko_KR: EnTranslations = {
       "martyrs_aegis": {
         "name": "순교자의 방패",
         "description": "아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다."
+      },
+      "prayer_of_returning": {
+        "name": "귀환의 기도",
+        "description": "파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (신성 및 수양)"
       },
       "choir_of_deliverance": {
         "name": "구원의 성가대",

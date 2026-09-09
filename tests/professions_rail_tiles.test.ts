@@ -11,6 +11,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { BIND_ACTIONS, keyCapLabel } from '../src/game/keybinds';
 import { hasChromeIconArt } from '../src/ui/chrome_icon_art';
+import { SIDE_BUTTONS } from '../src/ui/hud/menu/side_buttons';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import { hasUiIcon, hydrateIcons, svgIcon } from '../src/ui/ui_icons';
 
@@ -61,7 +62,11 @@ describe('the Perfecting rail tile and keybind (the seven-piece exemplar)', () =
     expect(hud).toContain(
       "$('#mm-perfecting')?.addEventListener('click', () => this.togglePerfecting());",
     );
-    expect(hud).toContain("['#mm-perfecting', 'perfecting', 'hudChrome.perfecting.title'],");
+    expect(SIDE_BUTTONS).toContainEqual([
+      '#mm-perfecting',
+      'perfecting',
+      'hudChrome.perfecting.title',
+    ]);
     // The toggle it reaches is the pre-existing public surface, unchanged.
     expect(hud).toContain('togglePerfecting(): void {');
     expect(hud).toContain('this.perfectingWindow.toggle();');
@@ -97,11 +102,11 @@ describe('the Perfecting rail tile and keybind (the seven-piece exemplar)', () =
       gamepadStart,
       mainSrc.indexOf('const gamepad =', gamepadStart),
     );
-    const route = /case 'perfecting':\s*hud\.togglePerfecting\(\);\s*break;/g;
     expect(keyboardStart).toBeGreaterThan(-1);
     expect(gamepadStart).toBeGreaterThan(-1);
-    expect(keyboardRoute.match(route)).toHaveLength(1);
-    expect(gamepadRoute.match(route)).toHaveLength(1);
+    expect(keyboardRoute).toContain('dispatchCollectionAction(key, hud)');
+    expect(gamepadRoute).toContain('dispatchCollectionAction(id, hud)');
+    // collection_actions_core.test.ts verifies the original toggle for each action.
   });
 
   it('maps the keybind action through t() in Options (never the raw English label)', () => {
@@ -150,9 +155,11 @@ describe('the Harvest Journal rail tile (the tile half over the existing Shift+K
     expect(hud).toContain(
       "$('#mm-harvest-journal')?.addEventListener('click', () => this.toggleHarvestJournal());",
     );
-    expect(hud).toContain(
-      "['#mm-harvest-journal', 'harvestJournal', 'hudChrome.harvestJournal.title'],",
-    );
+    expect(SIDE_BUTTONS).toContainEqual([
+      '#mm-harvest-journal',
+      'harvestJournal',
+      'hudChrome.harvestJournal.title',
+    ]);
     expect(hud).toContain('this.harvestJournalWindow.toggle();');
   });
 
@@ -184,11 +191,10 @@ describe('both tiles hydrate and stay under the rail height budget', () => {
     }
   });
 
-  it('pins the 13 default tiles and fits the height budget with Town Focus visible', () => {
-    // Loot Explorer joins the release's 12 default tiles. Town Focus is
-    // hidden in markup but the HUD reveals it in town, so budget for that
-    // extra tile too: 14 x 34px + 74px = 550px uncompacted, and
-    // 14 x 25px + 74px = 424px compacted. The authored pixel ceilings
+  it('pins the professions column and fits the height budget with Town Focus visible', () => {
+    // Cosmetics sits beside the shop in col-b. Town Focus is hidden in
+    // markup but the HUD reveals it in town, so budget for that extra tile
+    // alongside the default professions column. The authored pixel ceilings
     // remain those guarded against CSS in crafting_launcher.test.ts.
     const UNCOMPACTED_MICRO_PLUS_GAP_PX = 34;
     const COMPACT_MICRO_PLUS_GAP_PX = 25;
@@ -217,6 +223,12 @@ describe('both tiles hydrate and stay under the rail height budget', () => {
       );
       const ids = visible.map((b) => /id="([^"]+)"/.exec(b)?.[1]);
       expect(ids, name).toEqual(EXPECTED_IDS);
+      const colB = html.slice(html.indexOf('id="side-buttons-col-b"'));
+      expect(colB.indexOf('id="mm-cosmetics"'), name).toBeGreaterThan(
+        colB.indexOf('id="daily-rewards-button"'),
+      );
+      expect(colB.indexOf('id="mm-cosmetics"'), name).toBeLessThan(colB.indexOf('id="mm-arena"'));
+      expect(html.match(/id="mm-cosmetics"/g), name).toHaveLength(1);
       const townFocus = buttons.filter((b) => /id="mm-town-focus"/.test(b));
       expect(townFocus, name).toHaveLength(1);
       const townVisibleCount = visible.length + townFocus.length;

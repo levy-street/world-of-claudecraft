@@ -118,20 +118,15 @@ describe('the real death hook: recordCorpseHarvestDeath is actually wired into h
     expect(mob.corpseHarvestState).toBeDefined();
     expect(mob.corpseHarvestState?.priorityMemberKeys.length).toBeGreaterThan(0);
 
-    // Landing the killing blow puts the killer IN COMBAT (the real
-    // in-combat gate is correct and must not be weakened to make this
-    // fixture pass): let real sim ticks clear it via the ordinary
-    // combatTimer/COMBAT_LINGER decay, well inside the still-open
-    // HARVEST_PRIORITY_SECONDS window, before testing priority admission.
-    for (let i = 0; i < 110 && killer.inCombat; i++) sim.tick();
-    expect(killer.inCombat).toBe(false);
+    // The killing blow leaves combat active, but harvesting is available immediately.
+    expect(killer.inCombat).toBe(true);
     expect(killer.dead).toBe(false);
     const remaining = (mob.corpseHarvestState?.priorityEndsAt ?? 0) - sim.time;
     expect(remaining).toBeGreaterThan(0);
     sim.drainEvents();
 
     // The bystander's refusal must be the PRIORITY gate specifically, not an
-    // unrelated dead/combat/range denial that would pass for the wrong
+    // unrelated dead/range denial that would pass for the wrong
     // reason.
     expect(startCorpseHarvest(sim.ctx, mob.id, bystanderPid)).toBe(false);
     const bystanderErrors = sim

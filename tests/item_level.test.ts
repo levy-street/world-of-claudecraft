@@ -264,7 +264,9 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
     const ids = Object.entries(HEROIC_BOSS_LOOT)
       .filter(([bossId]) => !IGNIVAR_RAID_BOSSES.has(bossId))
       .flatMap(([, entries]) => entries)
-      .flatMap((e) => (e.itemId && isGearEntry(e.itemId) ? [e.itemId] : []));
+      .flatMap((e) =>
+        e.itemId && !e.preserveSourceTier && isGearEntry(e.itemId) ? [e.itemId] : [],
+      );
     expect(ids.length).toBeGreaterThanOrEqual(12); // the full five-man heroic set + raid weapons
     for (const id of ids) {
       const item = ITEMS[id];

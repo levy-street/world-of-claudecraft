@@ -169,14 +169,16 @@ export function comboReadout(e: Entity): string {
   if (e.comboPoints <= 0) return 'You have no combo points built up.';
   return `Combo points: ${e.comboPoints}/5.`;
 }
-// Readout for "/combat": reads only the live Entity.inCombat / combatTimer
-// (no new fields). combatTimer is "time since last combat event"; a player
-// lingers in combat until it reaches COMBAT_LINGER (the literal 5s drop-out
-// window applied in updatePlayers, sim.ts where inCombat is recomputed). If
-// inCombat is still set past that window, an enemy is actively engaged, so no
-// countdown can be promised.
-export function combatReadout(e: Entity): string {
+// Readout for "/combat": reads the live Entity.inCombat / combatTimer plus
+// `heldByEnemies`, the caller's answer from combat/engaged_combat.ts
+// (isHeldInCombat: an enemy still carries the player on its hate table, or an
+// engaged boss holds their group). combatTimer is "time since last combat
+// event"; a player only lingers in combat until it reaches COMBAT_LINGER (the
+// literal 5s window the coordinator's engaged pass applies in sim.ts) when no
+// enemy holds them, so a countdown is promised only then.
+export function combatReadout(e: Entity, heldByEnemies: boolean): string {
   if (!e.inCombat) return 'You are not in combat.';
+  if (heldByEnemies) return 'You are in combat (enemies still engaged).';
   const COMBAT_LINGER = 5;
   const remaining = COMBAT_LINGER - e.combatTimer;
   if (remaining > 0) {

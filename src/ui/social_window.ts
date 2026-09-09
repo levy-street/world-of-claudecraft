@@ -30,7 +30,8 @@ import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
-import { formatDateTime, formatMoney, formatNumber, t, tPlural } from './i18n';
+import { formatDateTime, formatNumber, t, tPlural } from './i18n';
+import { moneyHtml } from './money_html';
 import { localizeZone } from './server_i18n';
 import {
   blockRows,
@@ -152,6 +153,29 @@ function roleLabel(role: GuildDisplayedRole): string {
   if (role === 'recruit') return t('hud.social.tenure.recruit');
   if (role === 'veteran') return t('hud.social.tenure.veteran');
   return rankLabel(role);
+}
+
+// The roster-expansion confirm body. The price is coin-icon markup (gold and
+// silver glyphs, bare digits), so the localized sentence is escaped FIRST with an
+// inert slot in the price position and the trusted markup spliced in afterwards:
+// catalog and overlay text never reaches innerHTML raw. The NUL slot cannot occur
+// in catalog text and esc() leaves it untouched (deed_i18n.ts uses the same token).
+const PRICE_SLOT = '\u0000';
+export function rosterExpandConfirmHtml(seats: string, priceHtml: string): string {
+  return splicePriceHtml(
+    esc(t('hudChrome.social.roster.confirm', { seats, price: PRICE_SLOT })),
+    priceHtml,
+  );
+}
+
+/** Fill EVERY price slot of an escaped sentence with the trusted price markup
+ *  (split/join: verbatim, no replacement-pattern parsing). A sentence with no slot
+ *  at all (H10 pins the placeholder set, so only a hand-edited overlay could lose
+ *  it) still shows the price after the sentence: a gold spend is never confirmed
+ *  unpriced. */
+export function splicePriceHtml(escapedSentence: string, priceHtml: string): string {
+  if (!escapedSentence.includes(PRICE_SLOT)) return `${escapedSentence} ${priceHtml}`;
+  return escapedSentence.split(PRICE_SLOT).join(priceHtml);
 }
 
 /** One guild-roster row. A stateless string builder (module-level, exported so
@@ -904,22 +928,24 @@ export class SocialWindow {
       );
     // Roster expansion (the pure core decides who may buy and at what price;
     // the server re-prices and refuses everyone but the Guild Master anyway):
-    // the leader sees the next page's price on the button, or a disabled
-    // button once the ladder is complete; other ranks see nothing here.
+    // the leader sees an Expand roster button (the seats and price live in the
+    // confirm prompt), or a disabled button once the ladder is complete; other
+    // ranks see nothing here. It leads the same footer row the disband / leave
+    // button ends (.soc-foot-start pushes it to the start edge).
     const roster = guildRosterView(this.deps.world().socialInfo);
-    if (roster && guild.rank === 'leader') {
-      const label =
-        roster.nextRosterPrice === null
-          ? `<button class="btn" data-act="guild-expand" disabled>${esc(t('hudChrome.social.roster.maxed'))}</button>`
-          : `<button class="btn" data-act="guild-expand">${esc(t('hudChrome.social.roster.expand', { seats: formatNumber(GUILD_ROSTER_PAGE_SEATS, { maximumFractionDigits: 0 }), price: formatMoney(roster.nextRosterPrice) }))}</button>`;
-      foot += `<div class="soc-add soc-leave">${label}</div>`;
-    }
+    const expand =
+      roster && guild.rank === 'leader'
+        ? roster.nextRosterPrice === null
+          ? `<button class="btn soc-foot-start" data-act="guild-expand" disabled>${esc(t('hudChrome.social.roster.maxed'))}</button>`
+          : `<button class="btn soc-foot-start" data-act="guild-expand">${esc(t('hudChrome.social.roster.expand'))}</button>`
+        : '';
     // classic MMOs: a Guild Master with other members can't just leave (they disband,
     // or hand over leadership via the crown action). Everyone else can leave.
-    foot +=
+    const leave =
       guild.rank === 'leader' && guild.members.length > 1
-        ? `<div class="soc-add soc-leave"><button class="btn" data-act="guild-disband">${esc(t('hud.social.disbandGuild'))}</button></div>`
-        : `<div class="soc-add soc-leave"><button class="btn" data-act="guild-leave">${esc(t('hud.social.leaveGuild'))}</button></div>`;
+        ? `<button class="btn" data-act="guild-disband">${esc(t('hud.social.disbandGuild'))}</button>`
+        : `<button class="btn" data-act="guild-leave">${esc(t('hud.social.leaveGuild'))}</button>`;
+    foot += `<div class="soc-add soc-leave">${expand}${leave}</div>`;
     return foot;
   }
 
@@ -990,11 +1016,9 @@ export class SocialWindow {
         const roster = guildRosterView(w.socialInfo);
         if (roster?.canExpandRoster && roster.nextRosterPrice !== null) {
           this.deps.showPrompt(
-            esc(
-              t('hudChrome.social.roster.confirm', {
-                seats: formatNumber(GUILD_ROSTER_PAGE_SEATS, { maximumFractionDigits: 0 }),
-                price: formatMoney(roster.nextRosterPrice),
-              }),
+            rosterExpandConfirmHtml(
+              formatNumber(GUILD_ROSTER_PAGE_SEATS, { maximumFractionDigits: 0 }),
+              moneyHtml(roster.nextRosterPrice, { compact: true, grouping: false }),
             ),
             t('hudChrome.social.roster.confirmAction'),
             () => w.guildBuyRosterPage(),

@@ -10,6 +10,7 @@ import { BIND_ACTIONS } from '../src/game/keybinds';
 import { padReelItemId } from '../src/game/pad_reel';
 import { ITEMS } from '../src/sim/data';
 import { FISHING_CAST_ID, GATHER_CAST_ID } from '../src/sim/types';
+import { dispatchCollectionAction } from '../src/ui/collection_actions_core';
 
 describe('padReelItemId', () => {
   it('answers the carried implement only during a live fishing cast', () => {
@@ -100,13 +101,24 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
     return mainTs.slice(start, end);
   };
 
-  it('every offered edge action id has a case in dispatchGamepadAction', () => {
+  it('every offered edge action id routes through the collection dispatcher or a direct case', () => {
     const body = dispatchBody();
+    expect(body).toContain('if (dispatchCollectionAction(id, hud)) return;');
+    const collections = {
+      toggleDeeds() {},
+      toggleProfessions() {},
+      toggleReliquary() {},
+      toggleCosmetics() {},
+      toggleHarvestJournal() {},
+      togglePerfecting() {},
+      toggleLootExplorer() {},
+    };
     for (const action of BIND_ACTIONS) {
       if (action.kind !== 'edge') continue;
       if (action.id === 'attackMove') continue; // panel-excluded, pinned below
       if (action.id === 'jump' || action.id === 'autorun') continue; // gamepad.ts-handled, pinned below
       if (action.id.startsWith('slot')) continue; // the slotN prefix arm, pinned below
+      if (dispatchCollectionAction(action.id, collections)) continue;
       expect(body.includes(`case '${action.id}'`), `pad dispatch drops '${action.id}'`).toBe(true);
     }
   });

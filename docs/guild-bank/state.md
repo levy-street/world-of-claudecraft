@@ -933,7 +933,10 @@ not preventing one. Concretely:
   is TRANSIENT: their commit is what makes the replay applicable and it lands
   within an autosave interval. Nothing is consumed, and the marks and log are
   exactly as they were. It is metered as `escrow_refused_retry`, deliberately
-  NOT as `escrow_save_failed`: nothing failed.
+  NOT as `escrow_save_failed`: nothing failed. Since the unsettled gate
+  (2026-09-02, "Known gotchas" below) an ordinary two-officer session never
+  reaches this arm: the consume that would have created the dependency is
+  refused at dispatch instead, so the arm is the backstop, not the path.
 - When no session can ever make the missing value durable (or the retries run
   out after `GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS`), the session's live
   state is ABANDONED: its own book ops come back off the live book, it is
@@ -1101,9 +1104,10 @@ What remains accepted:
     and refetches the listing, and a 200 with `audited: false` says the item went but its
     moderation row did not.
 - Guild bank incidents are metered (2026-08-03): `woc_guild_bank_incidents_total{kind}`
-  over the fixed ELEVEN `GUILD_BANK_INCIDENTS` (escrow_save_failed, escrow_refused_retry,
+  over the fixed TWELVE `GUILD_BANK_INCIDENTS` (escrow_save_failed, escrow_refused_retry,
   save_fenced_out, escrow_quarantined, reconcile, book_unloaded, ledger_write_failed,
-  counterparty_orphan, counterparty_unstamped, log_read_failed, create_fee_unpaid)
+  counterparty_orphan, counterparty_unstamped, log_read_failed, create_fee_unpaid,
+  unsettled_refused)
   through the `gameMetricsCounters` seam,
   pre-registered at zero. Guild id stays in the loud log and is never a metric label.
   Each counter sits BESIDE its log, never instead of it.
@@ -1121,7 +1125,9 @@ What remains accepted:
   `counterparty_orphan`, `counterparty_unstamped` and the legacy-cardinality
   `create_fee_unpaid` are single-sample defects and are PAGE-worthy on `> 0`; the current
   atomic paid-create path cannot emit the latter, so any new sample implies mixed-release
-  traffic or an invariant breach. `escrow_refused_retry` is alert-worthy on its RATE,
+  traffic or an invariant breach. `unsettled_refused` (the dispatch-time gate refusing a
+  consume of another session's not-yet-durable work, 2026-09-02) and
+  `escrow_refused_retry` are alert-worthy on their RATE,
   not its presence: it is ordinary two-officer concurrency on a healthy realm, so alert on
   a sustained rise (or a rate that tracks ONE guild), which is the shape that means a book
   is failing to converge rather than two officers sharing it. `escrow_save_failed`,
@@ -1317,3 +1323,44 @@ the deployment premise the cache bust and the single-writer narrowing both rest 
   tab (a client without the def cannot evaluate the pipe's four refusal dimensions,
   and a refused copy strands dormant), which is now an explicit arm with its own pin
   rather than a side effect of the two bank modes being exclusive.
+- The unsettled gate (2026-09-02, `server/guild_bank_settle_gate.ts`, wired through
+  `server/guild_bank_op_coordinator.ts` before admission): a withdraw, gold withdraw, or
+  rung purchase may consume only durable value plus the acting session's OWN unflushed
+  deposits. Another session's not-yet-durable deposit is UNSETTLED: the op is refused
+  with the `guild.bankSettling` notice and that session is flushed on the spot, so the
+  retry lands a round trip later. Why: the retry/rollback arm honours only a ONE-WAY
+  dependency, and the old note that "only ladder rungs can deadlock both replays" was
+  true for one fungible and false for two item identities. On 2026-09-01 (prod guild
+  294) two officers swapped spider legs for venom glands inside one autosave window;
+  each replay was short on the other's key, the retry bound rolled BOTH back
+  (disconnected as "taken over"), and the per-session reverts of an already-consumed
+  deposit CLAMPED on the live book, leaving a phantom 20-stack that quarantined every
+  later withdrawer of it until the realm restarted. With the gate a log carries only
+  deposits, removals of settled copies, and rungs on a settled ladder, so
+  `handleGuildBankEscrowRefusal` (now `server/guild_bank_escrow_refusal.ts` behind a
+  GameServer port) is the backstop for unusable rows and tampering. Tests that need the
+  backstop SEED the log under the gate (`seedUnflushed` in
+  `tests/guild_bank_persistence.test.ts`); the gate's own pins are
+  `tests/guild_bank_settle_gate.test.ts` and the gate describe block in the persistence
+  suite. The v0.42.0 main sync also checks exact material-source legs through
+  `server/guild_bank_material_settle_gate.ts`, including zero-count source
+  reattribution. An equal settled quantity from another gatherer cannot satisfy
+  a selected unsettled source; `tests/guild_bank_material_settle_gate.test.ts`
+  and the persistence dispatch test pin refusal, holder flush, and retry.
+  Metered as `unsettled_refused` (rate, never presence). Review hardening
+  (2026-09-02): (a) EDIT AUTHORITY FIRST: a read-only member view (`canEdit` false) never
+  reaches the gate, so a plain member can buy neither an incident nor a flush; (b) the
+  gate reads a per-guild HOLDER INDEX with each holder's contribution cached
+  (`server/guild_book_holders.ts` GuildBookHolderIndex: touch on every op, resync after
+  every commit and rollback, dropGuild on disband, dropSession on leave), never a
+  realm-wide session scan per op, and a cached contribution is invalidated, never
+  patched (a commit that consumed one entry while an op pushed another keeps the log
+  LENGTH and changes its contents); (c) the refusal flush reaches only the holders whose
+  contribution FEEDS the refused dependency (`GuildBookDependency`: the exact identity,
+  the arm's item id, copper, or the ladder), at most `GUILD_BOOK_FLUSH_FAN_OUT_MAX` of
+  them, through the background-permit save, with ONE flush queued or running per holder
+  and a single re-arm behind it (`requestGuildBookFlush`), shared with the refusal arm's
+  retry flush; (d) the gate mirrors the sim's admissibility checks (floored count within
+  the stack, positive safe-integer amount within the treasury, a priced rung the
+  treasury covers) and passes every inadmissible shape through unjudged, so a request
+  the sim refuses anyway can never buy a refusal, an incident, or a flush.

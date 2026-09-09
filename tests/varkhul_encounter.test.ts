@@ -1054,7 +1054,6 @@ describe('Varkhul encounter behavior', () => {
 
     sim.ctx.handleDeath(sim.player, boss);
     sim.ctx.handleDeath(raider, boss);
-    boss.combatExitHoldUntil = sim.ctx.time;
     updateVarkhulEncounter(sim.ctx, boss);
 
     expect(boss.varkhul).toBeUndefined();
@@ -1702,41 +1701,6 @@ describe('Varkhul empty-raid reset and terminal wipe', () => {
     expect(boss.evadeEpoch).toBe(epochBefore + 1);
     expect(boss.hp).toBe(boss.maxHp);
     expect(boss.auras).toEqual([]);
-    expect(boss.pos).toEqual(boss.spawnPos);
-  });
-
-  it('parks in evade without resetting or drawing rng while a combat-exit hold is live', () => {
-    const { sim, boss } = claimedEncounter(58);
-    updateVarkhulEncounter(sim.ctx, boss);
-    expect(boss.varkhul).toBeDefined();
-    boss.pos = { x: boss.spawnPos.x + 8, y: boss.spawnPos.y, z: boss.spawnPos.z + 8 };
-    boss.prevPos = { ...boss.pos };
-    const parkedPos = { ...boss.pos };
-    sim.player.dead = true;
-    sim.player.hp = 0;
-    boss.combatExitHoldUntil = sim.ctx.time + 5;
-    const epochBefore = boss.evadeEpoch;
-    let draws = 0;
-    sim.rng.setObserver(() => {
-      draws += 1;
-    });
-    for (let i = 0; i < 3; i++) updateVarkhulEncounter(sim.ctx, boss);
-    expect(draws).toBe(0);
-    expect(boss.evadeEpoch).toBe(epochBefore);
-    expect(boss.varkhul).toBeDefined();
-    expect(boss.aiState).toBe('evade');
-    expect(boss.pos).toEqual(parkedPos);
-
-    boss.combatExitHoldUntil = 0;
-    updateVarkhulEncounter(sim.ctx, boss);
-    const drawsAfterReset = draws;
-    expect(drawsAfterReset).toBeGreaterThan(0);
-    for (let i = 0; i < 3; i++) updateVarkhulEncounter(sim.ctx, boss);
-    sim.rng.setObserver(null);
-
-    expect(draws).toBe(drawsAfterReset);
-    expect(boss.evadeEpoch).toBe(epochBefore + 1);
-    expect(boss.varkhul).toBeUndefined();
     expect(boss.pos).toEqual(boss.spawnPos);
   });
 

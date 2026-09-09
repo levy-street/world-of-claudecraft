@@ -739,7 +739,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': '就绪确认已在进行中。',
   'entities.abilities.collective_reversal.name': '集体逆转',
   'entities.abilities.collective_reversal.description':
-    '倒转队伍或团队中每位阵亡成员的时间线，使其在遗体旁以30%生命值和法力值复活。无法在战斗中施放。（时空魔法）',
+    '倒转队伍或团队中 40 码内且在你视线内的每位阵亡成员的时间线，使其回到你身边以30%生命值和法力值复活。无法在战斗中施放。（时空魔法）',
   'entities.abilities.temporal_hourglass.name': '悬停沙漏',
   'entities.abilities.temporal_hourglass.description':
     '在选定位置放置一个时间沙漏。置于敌人脚下时，在 PvE 中使其悬停 {hostilePveDuration} 秒，在 PvP 中悬停 {hostilePvpDuration} 秒；受到任何伤害都会解除效果。置于自己或队伍盟友脚下时，进入 {duration} 秒的停滞，免疫伤害且无法行动，恢复 {healing}% 最大生命值，并使自己的冷却恢复速度提高 {selfCooldownRecovery}%，盟友提高 {allyCooldownRecovery}%。若位置为空，沙漏会等待 {groundDuration} 秒并影响第一个踩上去的有效单位。增益光环可手动移除。',
@@ -1202,7 +1202,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.billboard.result.set': '公会公告板已更新。',
   'hudChrome.social.billboard.result.notOfficer': '只有官员和会长可以编辑公告板。',
   'hudChrome.social.roster.seats': '{count} / {cap} 席位',
-  'hudChrome.social.roster.expand': '扩充名册（+{seats} 席位，{price}）',
+  'hudChrome.social.roster.expand': '扩充名册',
   'hudChrome.social.roster.maxed': '名册已达最大规模',
   'hudChrome.social.roster.confirm':
     '花费 {price} 为公会名册扩充 {seats} 个席位？金币从你自己的钱包扣除，不予退还。',
@@ -11243,7 +11243,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '让一道回响在队伍中奔流：立即治疗目标及其至多四名最近的盟友，并为每人施加持续 {duration} 秒的印记；你造成的部分奥术伤害会通过回响转化为对他们的治疗。（时光术）',
   'entities.abilities.temporal_reversal.name': '时光逆转',
   'entities.abilities.temporal_reversal.description':
-    '倒转一名阵亡盟友的时间线，使其在遗体处以部分生命值和法力值复活，即使正在激烈战斗中也可使用。（时光术）',
+    '倒转一名阵亡盟友的时间线，使其回到你身边以35%生命值和法力值复活，即使正在激烈战斗中也可使用。（时光术）',
   'entities.abilities.temporal_rewind.name': '回溯',
   'entities.abilities.temporal_rewind.description':
     '向队伍或团队发出一道奥术波，回溯时间，为 40 码内每名盟友恢复其过去 5 秒所受伤害的 30%（最多为其最大生命值的 35%）。此效果无法暴击。（时光术）',
@@ -13022,7 +13022,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.title': '世界地图',
   'hudChrome.continentMap.summary': '世界地图。选择一个地区以打开其地图。',
   'hudChrome.continentMap.toWorld': '世界地图',
-  'hudChrome.continentMap.toggleAria': '在世界地图和地区地图之间切换',
+  'hudChrome.continentMap.toggleAria': '在世界地图、地区地图和副本地图之间切换',
   'hudChrome.continentMap.levels': '等级 {min} 到 {max}',
   'hudChrome.continentMap.toZone': '地区地图',
   'hudChrome.enchanting.wornTagIndexed': '已装备（{slot}{index}）',
@@ -13354,7 +13354,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.specNote_subtlety':
     '从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可从任意角度使用：该次使用不消耗能量，消耗全部3层幽暝，开启持续6秒的暗影缠身，并造成双倍伤害。',
   'entities.abilities.ancestor_return.description':
-    '呼唤小队或团队中所有阵亡成员，使其在尸体处复活并恢复30%生命值和法力值。战斗中无法施放。（灵愈）',
+    '呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（灵愈）',
   'entities.abilities.ancestor_return.name': '先祖归来',
   'entities.abilities.army_of_the_dead.description':
     '开启墓穴传送门，在你选择的统御仆从之外额外召唤一名骷髅战士、骸骨法师和墓翼，持续 20 秒。',
@@ -13563,7 +13563,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '消耗2枚灵魂碎片，命令所有亡灵仆从同时攻击。墓卫嘲讽并防御，骷髅战士牵制目标，骸骨法师暴露魔法防御，墓翼撕裂所有被击中的敌人。',
   'entities.abilities.reaping_command.name': '收割号令',
   'entities.abilities.recall_the_fallen.description':
-    '使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。',
+    '使一名死亡的小队成员回到你身边复活，并恢复 35% 的生命值和法力值。16 级或以上的黎明愈者则会改为呼唤小队中 30 码内且在你视线内的所有阵亡成员回到你身边复活。',
   'entities.abilities.recall_the_fallen.name': '唤回逝者',
   'entities.abilities.redharvest.description':
     '消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复{rage}点能量。无需连击点也可使用。',
@@ -14595,7 +14595,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '幽暝：第{stacks}/{max}层。从暮帷中使用的先制技各累积1层。达到{max}层时，你的先制技无需潜行即可使用，下一次先制技免费施放，消耗全部3层并开启暗影缠身',
   'hudChrome.auraEffect.healEcho': '生命值低于 {threshold}% 时恢复 {value} 点生命值',
   'hudChrome.auraEffect.hunterFerocity': '{stacks} 层兽群凶性：你的宠物造成的伤害提高 {pct}%',
-  'hudChrome.auraEffect.icicles': '{value}/{max} 根冰刺；达到 {max} 根时可施放冰川尖刺',
+  'hudChrome.auraEffect.icicles': '{value}/{max} 根冰刺；达到 {max} 根时可施放凝霜冰针',
   'hudChrome.auraEffect.internalCooldown': '计时结束前此效果无法再次触发',
   'hudChrome.auraEffect.leadenHexLock': '铅沉妖术暂时无法再次定身此目标',
   'hudChrome.auraEffect.mendingCurrent': '储存 {value} 点治疗量，随时间释放或由湍流愈合消耗',
@@ -14636,7 +14636,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sureCrit': '接下来 {charges} 个伤害技能必定暴击',
   'hudChrome.auraEffect.sweepingStrikes': '单体攻击还会对附近 {targets} 个敌人造成 {pct}% 伤害',
   'hudChrome.auraEffect.temporalEcho':
-    '施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%',
+    '施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%。以太涌动和以太飞镖在单独的时光回响上按4倍加成计算。群体回响会产生等量的治疗储备，按照缺失生命值在生命低于60%的被标记盟友之间分配',
   'hudChrome.auraEffect.veiledEdge': '你的下一次潜伏突袭造成双倍伤害',
   'hudChrome.auraEffect.veiledEdgeStrike': '你的下一次潜伏突袭造成的武器伤害提高{pct}%',
   'hudChrome.auraEffect.coldsightRead':
@@ -15874,6 +15874,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.lootExplorer': '战利品浏览器',
   'hudChrome.mounts.desc_goblin_rocket_sled':
     '一辆结构过剩到危险的哥布林雪橇，靠双发火箭和极差的判断力推进。',
+  'hudChrome.mounts.desc_rallycart_skin': '一辆小巧的拉力赛车，轰鸣声却震天响。',
   'hudChrome.mounts.desc_rallycart_rxt': '一辆小巧却地道的拉力赛车，能提升移动速度。',
   'hudChrome.mounts.name_goblin_rocket_sled': '哥布林火箭雪橇',
   'hudChrome.mounts.name_rallycart_rxt': '拉力卡丁车 RXT',
@@ -15895,4 +15896,57 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletCardDismiss': '隐藏钱包卡片',
   'loading.kickedByModerator': '管理员已将您断开连接：{reason}',
   'loading.rendererContextLost': '3D 渲染器丢失了图形上下文，且无法恢复。请尝试刷新。',
+
+  'hudChrome.wocStore.mountSkinType': '坐骑皮肤',
+  'hudChrome.cosmetics.title': '外观',
+  'hudChrome.cosmetics.close': '关闭外观',
+  'hudChrome.cosmetics.tabsLabel': '外观分区',
+  'hudChrome.cosmetics.tabMounts': '坐骑',
+  'hudChrome.cosmetics.tabSkins': '皮肤',
+  'hudChrome.cosmetics.tabMech': '机甲',
+  'hudChrome.cosmetics.legend': '账号：所有角色共享。角色：仅此角色。',
+  'hudChrome.cosmetics.scopeAccount': '账号',
+  'hudChrome.cosmetics.scopeCharacter': '角色',
+  'hudChrome.cosmetics.wear': '穿戴',
+  'hudChrome.cosmetics.takeOff': '取下',
+  'hudChrome.cosmetics.worn': '已穿戴',
+  'hudChrome.cosmetics.apply': '应用',
+  'hudChrome.cosmetics.detach': '解除',
+  'hudChrome.cosmetics.applied': '已应用',
+  'hudChrome.cosmetics.owned': '已拥有',
+  'hudChrome.cosmetics.storeOnly': '可在 WOC 商店购买',
+  'hudChrome.cosmetics.cardAria': '{name}，{rarity}',
+  'hudChrome.cosmetics.mountsNoMount': '先拥有一匹坐骑：皮肤需要可骑乘的对象。',
+  'hudChrome.cosmetics.skinsEmpty': '尚未拥有武器皮肤。请访问 WOC 商店。',
+  'hudChrome.cosmetics.skinsApplyHint': '装备一件{type}后即可应用此皮肤。',
+  'hudChrome.cosmetics.mechEmpty': '尚未拥有战斗机甲配色。',
+  'hudChrome.cosmetics.mountsIntro': '坐骑皮肤会覆盖在此角色骑乘的任何坐骑上，绝不改变速度。',
+  'hudChrome.cosmetics.mechIntro': '战斗机甲会替换此角色的身体。一次只能穿戴一种配色。',
+  'hudChrome.auraTracks.mode': '开启',
+  'hudChrome.auraTracks.row': '{aura} 对 {unit} 生效',
+  'hudChrome.auraTracks.selfRow': '{aura}',
+  'hudChrome.crafting.oncePerDay': '每天一次',
+  'hudChrome.masterwrought.slotsValue': '{used} / {cap}',
+  'hudChrome.meters.millions': '{value}m',
+  'hudChrome.meters.thousands': '{value}k',
+  'hudChrome.practiceDps.liveDps': '{value} DPS',
+  'hudChrome.practiceDps.liveLabel': '本次练习',
+  'hudChrome.practiceDps.runLabel': '第 {index} 次练习',
+  'hudChrome.practiceDps.runSummary': '{time} 内 {total}',
+
+  'entities.abilities.grove_awakening.description':
+    '呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（恢复）',
+  'entities.abilities.grove_awakening.name': '林地觉醒',
+  'entities.abilities.prayer_of_returning.description':
+    '呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（神圣与戒律）',
+  'entities.abilities.prayer_of_returning.name': '归返祈祷',
+  'entities.abilities.wildwake.description':
+    '催发倒下的盟友骤然绽放，使其回到你身边复活，恢复35%生命值和法力值，即使激战正酣也可施放。（恢复）',
+  'entities.abilities.wildwake.name': '野性复苏',
+
+  'devCommand.actions.farmgrow.description':
+    '将所有已种植的田畦推进至成熟时间，也可按ID指定一处田畦。其他内容保持不变：收获结果在种植时就已随机确定。',
+  'devCommand.actions.farmgrow.label': '催熟作物',
+  'devCommand.fields.bed': '田畦ID（可选）',
+  'guide.profPages.oncePerDay': '每日一次',
 };

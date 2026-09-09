@@ -1221,4 +1221,39 @@ export const ko_KR: Record<string, string> = {
   'realmBuilders.saveNew': '게시',
   'realmBuilders.useNextMonth': '다음 달',
   'realmBuilders.yearLabel': '연도',
+  'error.clearItemNameBagRange': 'bag은 {min}에서 {max} 사이의 정수여야 합니다',
+  'error.clearItemNameWentOffline':
+    '이름 제거가 적용되기 전에 캐릭터가 오프라인이 되었습니다. 다시 시도하세요',
+  'error.itemNameClearFailed': '아이템 이름 제거 실패',
+  'loadFailure.forbiddenDetail':
+    '현재 보기에 필요한 권한이 스태프 역할에 없습니다. 슈퍼 관리자에게 권한 부여를 요청한 뒤 다시 불러오세요.',
+  'loadFailure.forbiddenTitle': '권한 없음',
+  'marketMetrics.autoRefresh': '자동 새로 고침({seconds}초)',
+  'marketMetrics.bucketCompost': '퇴비',
+  'marketMetrics.bucketCores': '핵심',
+  'marketMetrics.bucketEmpty': '등록된 항목 없음',
+  'marketMetrics.bucketEssence': '정수',
+  'marketMetrics.bucketPatterns': '도안',
+  'marketMetrics.bucketProduce': '생산물',
+  'marketMetrics.bucketSeeds': '씨앗',
+  'marketMetrics.bucketSold': '지난 {days}일간 판매: {sales}건, {quantity}개, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings}개 등록, {quantity}개, 추적 항목 {tracked}개 중 {listed}개 등록',
+  'marketMetrics.colItem': '아이템',
+  'marketMetrics.colListings': '등록 수',
+  'marketMetrics.colLowest': '최저가(개당)',
+  'marketMetrics.colMedian': '중간값(개당)',
+  'marketMetrics.colQuantity': '수량',
+  'marketMetrics.empty': '추적 중인 모든 분류에 등록된 항목이 없습니다',
+  'marketMetrics.essenceNote':
+    '이 재료들은 영혼 귀속되어 등록할 수 없습니다. 여기에 행이 표시되면 시장 에스크로 불변식이 깨진 것이므로 엔지니어링 확인이 필요합니다.',
+  'marketMetrics.hint':
+    '추적 공급 분류의 월드 마켓 실시간 등록 목록입니다. 판매량이 아니라 현재 장부에 올라온 항목을 보여 줍니다. 서버가 이 정보를 약 15초간 캐시합니다.',
+  'marketMetrics.loadFailed': '시장 지표를 불러오지 못했습니다',
+  'marketMetrics.loading': '불러오는 중…',
+  'marketMetrics.realm': '렐름: {realm}',
+  'marketMetrics.soldNone': '지난 {days}일간 판매: 없음',
+  'marketMetrics.soldUnavailable':
+    '현재 판매량을 확인할 수 없어 아래에는 등록된 항목만 표시됩니다.',
+  'nav.marketMetrics': '시장 지표',
 };

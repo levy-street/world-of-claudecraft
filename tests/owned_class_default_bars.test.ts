@@ -151,6 +151,7 @@ const EXPECTED = {
     'lesser_heal',
     'mind_flay',
     'power_word_fortitude',
+    'prayer_of_returning',
   ],
   'priest/holy': [
     'seraphic_vigil',
@@ -168,6 +169,7 @@ const EXPECTED = {
     'shadow_word_pain',
     'mind_flay',
     'power_word_fortitude',
+    'prayer_of_returning',
   ],
   'priest/shadow': [
     'shadow_word_pain',
@@ -217,6 +219,7 @@ const EXPECTED = {
     'regrowth',
     'healing_touch',
     'swiftmend',
+    'wildwake',
     'barkskin',
     'entangling_roots',
     'moonfire',
@@ -224,6 +227,7 @@ const EXPECTED = {
     'mark_of_the_wild',
     'thorns',
     'travel_form',
+    'grove_awakening',
   ],
 } as const;
 

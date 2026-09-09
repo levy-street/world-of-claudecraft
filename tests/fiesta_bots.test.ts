@@ -196,3 +196,59 @@ describe('fiesta bots: cover recovery on the real drive path', () => {
     expect(b.trace).toEqual(a.trace);
   });
 });
+
+// The GCD-tail spell queue (PR 3800) deliberately does NOT apply to bots: a
+// bare-GCD press would load the queue and silently tighten bot cast cadence
+// past the pre-queue tuning. This pins the guard both ways on the real drive
+// path: a bot never loads the queue while a bare GCD runs, and still presses
+// the moment the GCD is clear.
+describe('fiesta bots: bare-GCD presses are skipped, not queued', () => {
+  it('skips the press on a bare running GCD and presses once the GCD clears', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'warrior' });
+    expect(sim.startFiestaPractice()).toBe(true);
+    let match: ReturnType<typeof sim.arenaMatchFor> = null;
+    for (let i = 0; i < 20 * 30 && match?.state !== 'active'; i++) {
+      sim.updateFiestaBots();
+      sim.tick();
+      match = sim.arenaMatchFor(sim.playerId);
+    }
+    expect(match?.state).toBe('active');
+    const o = arenaOrigin(match!.slot);
+    const enemyTeam = match!.teamA.includes(sim.playerId) ? match!.teamB : match!.teamA;
+    const botPid = enemyTeam.find((pid) => sim.fiestaBotPids.includes(pid))!;
+    sim.fiestaBotPids = [botPid]; // drive ONLY the bot under test
+    const park = (pid: number, x: number, z: number): void => {
+      const e = sim.entities.get(pid)!;
+      e.pos.x = o.x + x;
+      e.pos.z = o.z + z;
+      e.prevPos = { ...e.pos };
+      sim.rebucket(e);
+    };
+    for (const pid of [...match!.teamA, ...match!.teamB]) {
+      if (pid !== botPid && pid !== sim.playerId) park(pid, -16, 20);
+    }
+    park(sim.playerId, 8, 8); // adjacent, away from the centre pillar
+    park(botPid, 8, 9.2);
+    const bot = sim.entities.get(botPid)!;
+
+    // Align on the bot's press stagger tick without consuming it.
+    while (sim.tickCount % 24 !== botPid % 24) sim.tick();
+    bot.castingAbility = null;
+    bot.castRemaining = 0;
+    bot.queuedCastAbility = null;
+    bot.queuedCastAim = null;
+    bot.queuedCastTargetId = null;
+    bot.resource = bot.maxResource;
+
+    // A bare running GCD: the press is skipped outright, never queued.
+    bot.gcdRemaining = 0.3; // inside the queue window, where a press WOULD queue
+    sim.updateFiestaBots();
+    expect(bot.queuedCastAbility).toBeNull();
+    expect(bot.castingAbility).toBeNull();
+
+    // The same stagger tick with a clear GCD: the press goes through.
+    bot.gcdRemaining = 0;
+    sim.updateFiestaBots();
+    expect(bot.gcdRemaining > 0 || bot.castingAbility !== null).toBe(true);
+  });
+});

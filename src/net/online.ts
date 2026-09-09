@@ -195,6 +195,7 @@ import { apiErrorFromBody } from './api_error';
 import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire } from './bank_snapshot_wire';
+import { blankEntity } from './blank_entity';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
@@ -249,6 +250,7 @@ import {
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
+import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
 
@@ -1231,231 +1233,6 @@ const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
 // (and needs no clock at all in the decode path).
 const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
 
-function blankEntity(id: number): Entity {
-  return {
-    id,
-    kind: 'mob',
-    templateId: '',
-    name: '',
-    level: 1,
-    mendTimer: 0,
-    wardTimer: 0,
-    channelTimer: 0,
-    channelRamp: 0,
-    rallyTimer: 0,
-    warcryTimer: 0,
-    petPath: [],
-    petPathCooldown: 0,
-    petOwnerHpBonus: 0,
-    castPushbackReduction: 0,
-    knockbackResistance: 0,
-    ccDurationReduction: 0,
-    pos: { x: 0, y: 0, z: 0 },
-    prevPos: { x: 0, y: 0, z: 0 },
-    facing: 0,
-    prevFacing: 0,
-    vx: 0,
-    vz: 0,
-    vy: 0,
-    onGround: true,
-    jumping: false,
-    fallStartY: 0,
-    swimStroke: 0,
-    swimDiving: false,
-    fatigueTicks: 0,
-    breathUsedTicks: 0,
-    drownTicks: 0,
-    hp: 1,
-    maxHp: 1,
-    resource: 0,
-    maxResource: 0,
-    resourceType: null,
-    overheadEmoteId: null,
-    overheadEmoteUntil: 0,
-    overheadEmoteSeq: 0,
-    stats: {
-      str: 0,
-      agi: 0,
-      sta: 0,
-      int: 0,
-      spi: 0,
-      armor: 0,
-      pvpOffense: 0,
-      pvpDefense: 0,
-    },
-    weapon: { min: 1, max: 2, speed: 2 },
-    offhandWeapon: null,
-    attackPower: 0,
-    rangedPower: 0,
-    spellPower: 0,
-    healPower: 0,
-    meleeHaste: 0,
-    rangedHaste: 0,
-    spellHaste: 0,
-    setProcs: [],
-    procReadyAt: undefined as unknown as Record<string, number>,
-    critChance: 0.05,
-    sharedCritBonus: 0,
-    critRating: 0,
-    hasteRating: 0,
-    hitRating: 0,
-    hitBonus: 0,
-    critDmgSpellBonus: 0,
-    critDmgPhysBonus: 0,
-    critDmgHealBonus: 0,
-    dodgeChance: 0.05,
-    blockChance: 0,
-    blockValue: 0,
-    moveSpeed: 7,
-    hostile: false,
-    targetId: null,
-    autoAttack: false,
-    swingTimer: 0,
-    offhandSwingTimer: 0,
-    dualWielding: false,
-    // Server-side combat state: the mirror never computes damage, so the
-    // authoritative titansGrip never needs to cross the wire.
-    titansGrip: false,
-    inCombat: false,
-    combatTimer: 99,
-    auras: [],
-    stealthed: false,
-    ccDr: new Map(),
-    castingAbility: null,
-    castRemaining: 0,
-    castTotal: 0,
-    castTargetId: null,
-    castAim: null,
-    gatherCastNodeId: '',
-    gatherCastToolRarity: '',
-    gatherCastEffectConfirmed: false,
-    craftCastRecipeId: '',
-    craftCastCommission: false,
-    craftCastBatchRemaining: 0,
-    craftCastBatchTotal: 0,
-    enchantCastItemId: '',
-    enchantCastBagSlot: 0,
-    enchantCastEnchantId: '',
-    enchantCastEquipSlot: '',
-    enchantCastConfirmReplace: false,
-    enchantCastTargetPin: '',
-    toolRechargeCastProfessionId: '',
-    fishBiteAtTick: 0,
-    fishReelDeadlineTick: 0,
-    fishCastZoneId: '',
-    channeling: false,
-    channelTickTimer: 0,
-    channelTickEvery: 0,
-    channelTicksLeft: 0,
-    gcdRemaining: 0,
-    cooldowns: new Map(),
-    queuedOnSwing: null,
-    queuedCastAbility: null,
-    queuedCastAim: null,
-    fiveSecondRule: 99,
-    comboPoints: 0,
-    comboUntil: -1,
-    overpowerUntil: -1,
-    potionCooldownUntil: -1,
-    potionCdRemaining: 0,
-    firebottleCdRemaining: 0,
-    savedMana: 0,
-    chargeTargetId: null,
-    chargeTimeLeft: 0,
-    chargePath: [],
-    followTargetId: null,
-    sitting: false,
-    riftSliding: false,
-    afk: false,
-    weaponStowed: false,
-    helmHidden: false,
-    modularAppearance: null,
-    eating: null,
-    drinking: null,
-    aiState: 'idle',
-    tappedById: null,
-    pulseTimer: 0,
-    stompTimer: 0,
-    bigCastTimer: 0,
-    deathZoneCastTimer: 0,
-    deathZoneStrikeTimer: 0,
-    infernoTimer: 0,
-    infernoRemaining: 0,
-    infernoPulsesFired: 0,
-    infernoGatesFired: 0,
-    yelledEngage: false,
-    stoneskinTimer: 0,
-    terrifyTimer: 0,
-    aoeSlowTimer: 0,
-    loudYellTimer: 0,
-    loudYellIndex: 0,
-    detonateTimer: Infinity,
-    firedSummons: 0,
-    summonedIds: [],
-    summonedAdd: false,
-    enraged: false,
-    healedThisPull: false,
-    threat: new Map(),
-    bossDamagers: new Set(),
-    forcedTargetId: null,
-    forcedTargetTimer: 0,
-    ownerId: null,
-    petMode: 'defensive',
-    petTauntTimer: 0,
-    petSkillTimer: 0,
-    petAutoTaunt: false,
-    petAutoWaterJet: false,
-    petAutoSkill: false,
-    petManualTauntPending: false,
-    spawnPos: { x: 0, y: 0, z: 0 },
-    leashAnchor: null,
-    evadeStall: 0,
-    chaseStall: 0,
-    evadeEpoch: 0,
-    combatExitHoldUntil: 0,
-    chainPullInbound: false,
-    fleeTimer: 0,
-    fleeReturnTimer: 0,
-    hasFled: false,
-    wanderTarget: null,
-    wanderTimer: 0,
-    aggroTargetId: null,
-    respawnTimer: 0,
-    corpseTimer: 0,
-    lootFfaTimer: Infinity,
-    harvestClaimedBy: null,
-    lootable: false,
-    loot: null,
-    xpValue: 0,
-    questIds: [],
-    vendorItems: [],
-    objectItemId: null,
-    dungeonId: null,
-    dead: false,
-    ghost: false,
-    corpsePos: null,
-    corpseInstanceId: null,
-    scale: 1,
-    color: 0xffffff,
-    skinCatalog: 'class',
-    skin: 0,
-    mountKey: '',
-    mountCastRemaining: 0,
-    mountCastKey: '',
-    mainhandItemId: null,
-    offhandItemId: null,
-    weaponSkinLoadout: {},
-    weaponSkinId: null,
-    equippedItems: {},
-    equippedInstances: {},
-    guild: '',
-    pledgeGuild: '',
-    guildTier: 0,
-    title: null,
-    border: null,
-  };
-}
-
 // The two wire fields a per-copy selection's ANCHOR rides on (`ord`/`n`), or
 // nothing at all when the caller named no anchor. Spread into the frame so an
 // unanchored command is byte-identical to what it always sent, which is what
@@ -1499,6 +1276,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   };
   // --- IWorldProgressionXp: XP + post-cap progression scalars + unlocked
   // milestones, mirrored from snapshot self. ---
@@ -2962,6 +2740,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
+        e.mountSkinId = w.msk ?? null; // worn mount skin cosmetic (render-only, like wsk)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         // Worn per-slot instance payloads (masterwork/enchant rolls), for the
         // inspect window (terse `eqi`, sparse like `eq`: an absent key on a
@@ -4450,32 +4229,28 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   changeWeaponSkin(skinId: string | null, weaponType?: WeaponSkinType): void {
     // Optimistic local nudge mirroring the server's resolution, so the held
-    // weapon swaps without a round trip; the identity wire reconciles.
+    // weapon swaps without a round trip; the identity wire reconciles. The
+    // math lives in weapon_skin_optimistic.ts; a malformed request sends nothing.
     const p = this.entities.get(this.playerId);
     const def = skinId ? WEAPON_SKINS[skinId] : null;
     if (skinId !== null && !def) return;
     const type = def ? def.weaponType : weaponType;
     if (p && type) {
-      const next = { ...p.weaponSkinLoadout };
-      if (def) {
-        const applied = withWeaponSkinApplied(next, def.id);
-        if (!applied) return;
-        p.weaponSkinLoadout = applied;
-      } else delete next[type];
-      if (!def) p.weaponSkinLoadout = next;
-      const appliedLoadout = p.weaponSkinLoadout;
-      p.weaponSkinId = resolveActiveWeaponSkin(
-        p.templateId,
-        p.mainhandItemId,
-        appliedLoadout,
-        p.skinCatalog ?? 'class',
-      );
-      const loadout: Record<string, string> = {};
-      for (const [t, id] of Object.entries(appliedLoadout)) if (id) loadout[t] = id;
-      this.accountCosmetics = { ...this.accountCosmetics, weaponSkinLoadout: loadout };
+      const next = optimisticWeaponSkinChange(p, skinId, type);
+      if (!next) return;
+      p.weaponSkinLoadout = next.loadout;
+      p.weaponSkinId = next.weaponSkinId;
+      this.accountCosmetics = { ...this.accountCosmetics, weaponSkinLoadout: next.loadoutRecord };
       this.cosmeticsChanged = true;
     }
     this.cmd({ cmd: 'change_weapon_skin', skin: skinId, wtype: type ?? null });
+  }
+  changeMountSkin(skinId: string | null): void {
+    // Optimistic own-entity nudge (the identity wire reconciles); an unowned id skips the send.
+    if (skinId !== null && !this.accountCosmetics.mountSkinIds.includes(skinId)) return;
+    const p = this.entities.get(this.playerId);
+    if (p) p.mountSkinId = skinId;
+    this.cmd({ cmd: 'change_mount_skin', skin: skinId });
   }
   saveActionBarLayout(profile: ActionBarLayoutProfile, layout: ActionBarLayout): void {
     // Debounced, deduped upload of one profile's whole layout (the uploader owns

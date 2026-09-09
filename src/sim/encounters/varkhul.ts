@@ -2782,7 +2782,6 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
       return;
     }
     boss.aiState = 'evade';
-    if (boss.combatExitHoldUntil > ctx.time) return;
     for (const playerId of boss.varkhul?.attemptParticipantIds ?? []) {
       const player = ctx.entities.get(playerId);
       const meta = ctx.players.get(playerId);

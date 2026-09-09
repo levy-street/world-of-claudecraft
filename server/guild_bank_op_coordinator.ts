@@ -21,6 +21,13 @@ import {
   counterpartySnapshot,
   stampCounterpartyDeltas,
 } from './guild_bank_counterparty';
+import {
+  type GuildBankOpRequest,
+  type GuildBookDependency,
+  guildBankUnsettledRefusal,
+  isGuildBankGatedOp,
+  type UnsettledGuildBook,
+} from './guild_bank_settle_gate';
 
 export type GuildBankOpTarget =
   | { readonly pid: number }
@@ -55,7 +62,13 @@ export interface GuildBankOpHostPort {
   readonly bankLedgerNeedsSave: () => boolean;
   readonly scheduleBankLedgerHighWaterSave: () => void;
   readonly markGuildBankDirty: (guildId: number) => void;
-  readonly recordGuildBankIncident: (kind: 'counterparty_orphan') => void;
+  /** Every OTHER live session's unflushed work on this guild's book,
+   *  aggregated for the unsettled gate (server/guild_bank_settle_gate.ts). */
+  readonly unsettledGuildBook: (guildId: number) => UnsettledGuildBook;
+  /** Flush the holders whose work FEEDS the refused dependency, so a refused
+   *  op's retry lands a round trip later rather than an autosave later. */
+  readonly flushUnsettledGuildBook: (guildId: number, dependency: GuildBookDependency) => void;
+  readonly recordGuildBankIncident: (kind: 'counterparty_orphan' | 'unsettled_refused') => void;
   readonly logError: (message: string) => void;
 }
 
@@ -73,6 +86,8 @@ export function runGuildBankOp(
   target: GuildBankOpTarget,
   op: GuildBankLedgerOp,
   run: () => void,
+  // The op's client-supplied inputs, read by the unsettled gate only.
+  request: GuildBankOpRequest = {},
 ): void {
   const playerTarget = 'pid' in target;
   const actingGuildId = playerTarget
@@ -83,6 +98,34 @@ export function runGuildBankOp(
       host.sendPlayerNotice('The guild bank is closing. Try again in a moment.');
     }
     return;
+  }
+
+  // The unsettled gate (server/guild_bank_settle_gate.ts): a withdraw, a gold
+  // withdraw, or a rung purchase that would consume value another session has
+  // not made durable yet is refused BEFORE admission (nothing mutates, nothing
+  // is reserved, no row and no mark), and the holders feeding that dependency
+  // are flushed so the retry lands a round trip later. Player targets only:
+  // the operator purge removes a dormant copy, which can only be durable.
+  // EDIT AUTHORITY FIRST: guildBankInfoFor hands every guild member a view,
+  // read-only for a plain member (canEdit false), whose op the sim refuses on
+  // rank; that view never reaches the gate, so a member can neither buy an
+  // incident nor force a holder flush. The notice is English on the wire,
+  // re-localized by the client matcher (src/ui/server_i18n.ts
+  // guild.bankSettling).
+  if (playerTarget && actingGuildId !== undefined && isGuildBankGatedOp(op)) {
+    const live = host.sim.guildBankInfoFor(target.pid);
+    const refusal =
+      live === null || !live.canEdit
+        ? null
+        : guildBankUnsettledRefusal(op, request, live, host.unsettledGuildBook(actingGuildId));
+    if (refusal !== null) {
+      host.recordGuildBankIncident('unsettled_refused');
+      host.sendPlayerNotice(
+        'The guild bank is still saving a recent change. Try again in a moment.',
+      );
+      host.flushUnsettledGuildBook(actingGuildId, refusal);
+      return;
+    }
   }
 
   const reservation = session.bankLedgerJournal.admission.tryReserve(2, 2, 'guild');

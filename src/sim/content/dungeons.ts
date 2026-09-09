@@ -30,13 +30,13 @@ import type {
 } from '../types';
 import { CRUCIBLE_PROFESSION_PATTERN_LOOT } from './crucible_collections';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
-import { CRUCIBLE_VENDOR_NPC_ID } from './ignivar_loot';
 import {
   IGNIVAR_LORE_OBJECTS,
   IGNIVAR_MAELIN_NPC_ID,
   IGNIVAR_MAELIN_PROJECTION_NPC_ID,
   IGNIVAR_RECORD_IDS,
 } from './ignivar_raid_lore';
+import { NYTHRAXIS_EQUIPMENT_LOOT } from './nythraxis_loot';
 
 // Keepsake ground-object items owned by the walk-in castle interiors below
 // (their zone item modules are other workstreams' files), merged into ITEMS
@@ -494,8 +494,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     },
     loot: [
       { copper: 400, chance: 1 },
-      { itemId: 'quilted_trousers', chance: 0.4 },
-      { itemId: 'oiled_boots', chance: 0.4 },
+      { itemId: 'quilted_trousers', chance: 0.4, normalOnly: true },
+      { itemId: 'oiled_boots', chance: 0.4, normalOnly: true },
     ],
     scale: 1.2,
     color: 0x839192,
@@ -524,13 +524,28 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     aoePulse: { min: 12, max: 18, radius: 12, every: 10, name: 'Shadow Pulse' },
     loot: [
       { copper: 2500, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
-      { itemId: 'cryptbone_greaves', chance: 0.34, rollGroup: 'morthen_guaranteed_uncommon' },
-      { itemId: 'quilted_trousers', chance: 0.33, rollGroup: 'morthen_guaranteed_uncommon' },
-      { itemId: 'oiled_boots', chance: 0.33, rollGroup: 'morthen_guaranteed_uncommon' },
-      { itemId: 'greyjaw_hide_boots', chance: 0.25, rollGroup: 'morthen_bonus' },
-      { itemId: 'gravewoven_bag', chance: 0.2, rollGroup: 'morthen_bonus' },
-      { itemId: 'cryptbone_helm', chance: 0.18, rollGroup: 'morthen_bonus' },
-      { itemId: 'cryptbone_pauldrons', chance: 0.18, rollGroup: 'morthen_bonus' },
+      {
+        itemId: 'cryptbone_greaves',
+        chance: 0.34,
+        rollGroup: 'morthen_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'quilted_trousers',
+        chance: 0.33,
+        rollGroup: 'morthen_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'oiled_boots',
+        chance: 0.33,
+        rollGroup: 'morthen_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      { itemId: 'greyjaw_hide_boots', chance: 0.25, rollGroup: 'morthen_bonus', normalOnly: true },
+      { itemId: 'gravewoven_bag', chance: 0.2, rollGroup: 'morthen_bonus', normalOnly: true },
+      { itemId: 'cryptbone_helm', chance: 0.18, rollGroup: 'morthen_bonus', normalOnly: true },
+      { itemId: 'cryptbone_pauldrons', chance: 0.18, rollGroup: 'morthen_bonus', normalOnly: true },
     ],
     scale: 1.35,
     color: 0x4a235a,
@@ -647,12 +662,22 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     },
     loot: [
       { copper: 800, chance: 1 },
-      { itemId: 'trollhide_leggings', chance: 0.5, rollGroup: 'olen_guaranteed_uncommon' },
-      { itemId: 'marshstrider_boots', chance: 0.5, rollGroup: 'olen_guaranteed_uncommon' },
-      { itemId: 'fenmist_robe', chance: 0.25, rollGroup: 'olen_bonus' },
-      { itemId: 'tideguard_greaves', chance: 0.1, rollGroup: 'olen_bonus' },
-      { itemId: 'tideguard_sabatons', chance: 0.1, rollGroup: 'olen_bonus' },
-      { itemId: 'eelscale_leggings', chance: 0.1, rollGroup: 'olen_bonus' },
+      {
+        itemId: 'trollhide_leggings',
+        chance: 0.5,
+        rollGroup: 'olen_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'marshstrider_boots',
+        chance: 0.5,
+        rollGroup: 'olen_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      { itemId: 'fenmist_robe', chance: 0.25, rollGroup: 'olen_bonus', normalOnly: true },
+      { itemId: 'tideguard_greaves', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
+      { itemId: 'tideguard_sabatons', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
+      { itemId: 'eelscale_leggings', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
     ], // his greaves are Maren's quest reward, not a drop
     scale: 1.2,
     color: 0x95a5a6,
@@ -681,18 +706,33 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     summonAdds: { mobId: 'drowned_thrall', count: 2, atHpPct: [0.6, 0.3] },
     loot: [
       { copper: 5000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
-      { itemId: 'trollhide_leggings', chance: 0.34, rollGroup: 'vael_guaranteed_uncommon' },
-      { itemId: 'marshstrider_boots', chance: 0.33, rollGroup: 'vael_guaranteed_uncommon' },
-      { itemId: 'fenmist_robe', chance: 0.33, rollGroup: 'vael_guaranteed_uncommon' },
+      {
+        itemId: 'trollhide_leggings',
+        chance: 0.34,
+        rollGroup: 'vael_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'marshstrider_boots',
+        chance: 0.33,
+        rollGroup: 'vael_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'fenmist_robe',
+        chance: 0.33,
+        rollGroup: 'vael_guaranteed_uncommon',
+        normalOnly: true,
+      },
       { itemId: 'deepfen_pearl', chance: 1 },
-      { itemId: 'eelskin_tunic', chance: 0.2, rollGroup: 'vael_bonus' },
-      { itemId: 'tidescale_vest', chance: 0.1, rollGroup: 'vael_bonus' },
-      { itemId: 'drowned_prayer_leggings', chance: 0.1, rollGroup: 'vael_bonus' },
-      { itemId: 'drowned_prayer_sandals', chance: 0.1, rollGroup: 'vael_bonus' },
-      { itemId: 'eelscale_treads', chance: 0.1, rollGroup: 'vael_bonus' },
-      { itemId: 'mistveil_cord', chance: 0.12, rollGroup: 'vael_bonus' },
-      { itemId: 'mistveil_grips', chance: 0.12, rollGroup: 'vael_bonus' },
-      { itemId: 'mistcallers_duffel', chance: 0.1, rollGroup: 'vael_bonus' },
+      { itemId: 'eelskin_tunic', chance: 0.2, rollGroup: 'vael_bonus', normalOnly: true },
+      { itemId: 'tidescale_vest', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
+      { itemId: 'drowned_prayer_leggings', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
+      { itemId: 'drowned_prayer_sandals', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
+      { itemId: 'eelscale_treads', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
+      { itemId: 'mistveil_cord', chance: 0.12, rollGroup: 'vael_bonus', normalOnly: true },
+      { itemId: 'mistveil_grips', chance: 0.12, rollGroup: 'vael_bonus', normalOnly: true },
+      { itemId: 'mistcallers_duffel', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
     ],
     scale: 1.35,
     color: 0x48c9b0,
@@ -804,19 +844,34 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     stomp: { radius: 10, every: 12, duration: 1.5, min: 20, max: 30, name: 'Shuddering Stomp' },
     loot: [
       { copper: 5000, chance: 1 },
-      { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'korgath_guaranteed_uncommon' },
-      { itemId: 'revenant_silk_robe', chance: 0.33, rollGroup: 'korgath_guaranteed_uncommon' },
-      { itemId: 'nightwalk_jerkin', chance: 0.33, rollGroup: 'korgath_guaranteed_uncommon' },
-      { itemId: 'zealotsbane_blade', chance: 0.19, rollGroup: 'korgath_bonus' },
-      { itemId: 'korgaths_chainwraps', chance: 0.1, rollGroup: 'korgath_bonus' },
-      { itemId: 'staff_of_velkhar', chance: 0.1, rollGroup: 'korgath_bonus' },
-      { itemId: 'shadowmeld_tunic', chance: 0.1, rollGroup: 'korgath_bonus' },
-      { itemId: 'wyrmcult_grand_robe', chance: 0.1, rollGroup: 'korgath_bonus' },
-      { itemId: 'gravewyrm_sabatons', chance: 0.1, rollGroup: 'korgath_bonus' },
-      { itemId: 'wyrmcult_soulsteps', chance: 0.1, rollGroup: 'korgath_bonus' },
-      { itemId: 'wyrmshadow_treads', chance: 0.05, rollGroup: 'korgath_bonus' },
-      { itemId: 'boundstone_helm', chance: 0.08, rollGroup: 'korgath_bonus' },
-      { itemId: 'gravewyrm_mantle', chance: 0.08, rollGroup: 'korgath_bonus' },
+      {
+        itemId: 'boneplate_vest',
+        chance: 0.34,
+        rollGroup: 'korgath_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'revenant_silk_robe',
+        chance: 0.33,
+        rollGroup: 'korgath_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'nightwalk_jerkin',
+        chance: 0.33,
+        rollGroup: 'korgath_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      { itemId: 'zealotsbane_blade', chance: 0.19, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'korgaths_chainwraps', chance: 0.1, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'staff_of_velkhar', chance: 0.1, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'shadowmeld_tunic', chance: 0.1, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'wyrmcult_grand_robe', chance: 0.1, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'gravewyrm_sabatons', chance: 0.1, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'wyrmcult_soulsteps', chance: 0.1, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'wyrmshadow_treads', chance: 0.05, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'boundstone_helm', chance: 0.08, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'gravewyrm_mantle', chance: 0.08, rollGroup: 'korgath_bonus', normalOnly: true },
     ],
     scale: 1.5,
     color: 0x8f6f46,
@@ -842,17 +897,52 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     summonAdds: { mobId: 'raised_bonewalker', count: 3, atHpPct: [0.66, 0.33] },
     loot: [
       { copper: 5000, chance: 1 },
-      { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'velkhar_guaranteed_uncommon' },
-      { itemId: 'revenant_silk_robe', chance: 0.33, rollGroup: 'velkhar_guaranteed_uncommon' },
-      { itemId: 'nightwalk_jerkin', chance: 0.33, rollGroup: 'velkhar_guaranteed_uncommon' },
-      { itemId: 'emberwood_staff', chance: 0.2, rollGroup: 'velkhar_bonus' },
-      { itemId: 'boneguard_breastplate', chance: 0.1, rollGroup: 'velkhar_bonus' },
-      { itemId: 'shadowmeld_tunic', chance: 0.1, rollGroup: 'velkhar_bonus' },
-      { itemId: 'staff_of_velkhar', chance: 0.1, rollGroup: 'velkhar_bonus' },
-      { itemId: 'gravewyrm_stalkers_treads', chance: 0.1, rollGroup: 'velkhar_bonus' },
-      { itemId: 'deathlord_legguards', chance: 0.05, rollGroup: 'velkhar_bonus' },
-      { itemId: 'necromancers_soulsteps', chance: 0.05, rollGroup: 'velkhar_bonus' },
-      { itemId: 'wyrmshadow_legguards', chance: 0.05, rollGroup: 'velkhar_bonus' },
+      {
+        itemId: 'boneplate_vest',
+        chance: 0.34,
+        rollGroup: 'velkhar_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'revenant_silk_robe',
+        chance: 0.33,
+        rollGroup: 'velkhar_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'nightwalk_jerkin',
+        chance: 0.33,
+        rollGroup: 'velkhar_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      { itemId: 'emberwood_staff', chance: 0.2, rollGroup: 'velkhar_bonus', normalOnly: true },
+      {
+        itemId: 'boneguard_breastplate',
+        chance: 0.1,
+        rollGroup: 'velkhar_bonus',
+        normalOnly: true,
+      },
+      { itemId: 'shadowmeld_tunic', chance: 0.1, rollGroup: 'velkhar_bonus', normalOnly: true },
+      { itemId: 'staff_of_velkhar', chance: 0.1, rollGroup: 'velkhar_bonus', normalOnly: true },
+      {
+        itemId: 'gravewyrm_stalkers_treads',
+        chance: 0.1,
+        rollGroup: 'velkhar_bonus',
+        normalOnly: true,
+      },
+      { itemId: 'deathlord_legguards', chance: 0.05, rollGroup: 'velkhar_bonus', normalOnly: true },
+      {
+        itemId: 'necromancers_soulsteps',
+        chance: 0.05,
+        rollGroup: 'velkhar_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'wyrmshadow_legguards',
+        chance: 0.05,
+        rollGroup: 'velkhar_bonus',
+        normalOnly: true,
+      },
       // The dungeon rung of the materials-satchel ladder, same shape and rate
       // as the Gravewoven Bag on Morthen. Velkhar is the one Sanctum boss with
       // room for it: velkhar_bonus sums to 0.75, so a 0.2 row lands fully
@@ -861,7 +951,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       // 1.0 (an appended row could never be rolled) and korzul_bonus to 0.87
       // (0.2 would overflow and clip its own tail), so neither could carry it
       // without re-pricing the pieces already there.
-      { itemId: 'necromancers_reagent_satchel', chance: 0.2, rollGroup: 'velkhar_bonus' },
+      {
+        itemId: 'necromancers_reagent_satchel',
+        chance: 0.2,
+        rollGroup: 'velkhar_bonus',
+        normalOnly: true,
+      },
     ],
     scale: 1.25,
     color: 0x512e5f,
@@ -915,29 +1010,79 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       // heroic clear pays the 10g finale base instead;
       // tests/gravewyrm_boss_gold.test.ts pins both bands.
       { copper: 15000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
-      { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'korzul_guaranteed_uncommon' },
-      { itemId: 'revenant_silk_robe', chance: 0.33, rollGroup: 'korzul_guaranteed_uncommon' },
-      { itemId: 'nightwalk_jerkin', chance: 0.33, rollGroup: 'korzul_guaranteed_uncommon' },
-      { itemId: 'cultist_flayer', chance: 0.1, rollGroup: 'korzul_bonus' },
-      { itemId: 'wyrmfang_greatblade', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'staff_of_the_gravewyrm', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'fang_of_korzul', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'deathlord_warplate', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'necromancers_starshroud', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'wyrmshadow_harness', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'boundstone_girdle', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'gravewyrm_gauntlets', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'deathlords_dread_visage', chance: 0.04, rollGroup: 'korzul_bonus' },
-      { itemId: 'necromancers_soulspire_mantle', chance: 0.04, rollGroup: 'korzul_bonus' },
-      { itemId: 'wyrmshadow_talongrips', chance: 0.04, rollGroup: 'korzul_bonus' },
-      { itemId: 'nightfangs_greatstaff', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'wildgrowth_leggings', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'grovewardens_grips', chance: 0.05, rollGroup: 'korzul_bonus' },
-      { itemId: 'verdant_walkers', chance: 0.05, rollGroup: 'korzul_bonus' },
+      {
+        itemId: 'boneplate_vest',
+        chance: 0.34,
+        rollGroup: 'korzul_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'revenant_silk_robe',
+        chance: 0.33,
+        rollGroup: 'korzul_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'nightwalk_jerkin',
+        chance: 0.33,
+        rollGroup: 'korzul_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      { itemId: 'cultist_flayer', chance: 0.1, rollGroup: 'korzul_bonus', normalOnly: true },
+      { itemId: 'wyrmfang_greatblade', chance: 0.05, rollGroup: 'korzul_bonus', normalOnly: true },
+      {
+        itemId: 'staff_of_the_gravewyrm',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+        normalOnly: true,
+      },
+      { itemId: 'fang_of_korzul', chance: 0.05, rollGroup: 'korzul_bonus', normalOnly: true },
+      { itemId: 'deathlord_warplate', chance: 0.05, rollGroup: 'korzul_bonus', normalOnly: true },
+      {
+        itemId: 'necromancers_starshroud',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+        normalOnly: true,
+      },
+      { itemId: 'wyrmshadow_harness', chance: 0.05, rollGroup: 'korzul_bonus', normalOnly: true },
+      { itemId: 'boundstone_girdle', chance: 0.05, rollGroup: 'korzul_bonus', normalOnly: true },
+      { itemId: 'gravewyrm_gauntlets', chance: 0.05, rollGroup: 'korzul_bonus', normalOnly: true },
+      {
+        itemId: 'deathlords_dread_visage',
+        chance: 0.04,
+        rollGroup: 'korzul_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'necromancers_soulspire_mantle',
+        chance: 0.04,
+        rollGroup: 'korzul_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'wyrmshadow_talongrips',
+        chance: 0.04,
+        rollGroup: 'korzul_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'nightfangs_greatstaff',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+        normalOnly: true,
+      },
+      { itemId: 'wildgrowth_leggings', chance: 0.05, rollGroup: 'korzul_bonus', normalOnly: true },
+      { itemId: 'grovewardens_grips', chance: 0.05, rollGroup: 'korzul_bonus', normalOnly: true },
+      { itemId: 'verdant_walkers', chance: 0.05, rollGroup: 'korzul_bonus', normalOnly: true },
       // korzul_bonus deliberately sums below 1 (some kills yield no bonus
       // piece), so the quiver takes its 0.05 from that slack at the same
       // per-class rate as every other piece here, diluting none of them.
-      { itemId: 'gravewyrm_bone_quiver', chance: 0.05, rollGroup: 'korzul_bonus' },
+      {
+        itemId: 'gravewyrm_bone_quiver',
+        chance: 0.05,
+        rollGroup: 'korzul_bonus',
+        normalOnly: true,
+      },
     ],
     scale: 1.8,
     color: 0x3d5c45,
@@ -1111,99 +1256,19 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 42,
     moveSpeed: 10.5,
     aggroRadius: 22,
-    // Each nythraxis_drop_* rollGroup is exclusive (one partitioned rng draw per
-    // group) and sums to exactly 1.00. The offhand/two-hander epics ride the
-    // existing four groups, with the set-piece chances rebalanced; group 3 is
-    // the offhand group and carries two (the caster orb and the hunter quiver).
+    // One equipment item per five raiders on either difficulty: the shared
+    // partition plus Normal epics or the Heroic-exclusive weapon partition.
     loot: [
       { copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
-      { itemId: 'deathless_heartwood', chance: 0.03, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'bonewrought_greatsword', chance: 0.13, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'soulflame_cowl', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'stormcallers_crown', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'kingsbane_last_oath', chance: 0.03, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'bonewrought_bulwark', chance: 0.13, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'crownforged_warspaulders', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'stormcallers_spaulders', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      // Group 3 is the offhand group and now carries both offhand epics, the
-      // caster orb and the hunter quiver, at an equal 0.14. The group is
-      // exclusive and must sum to exactly 1, so seating an eighth entry is the
-      // one place a quiver costs existing drops: the two offhands come down from
-      // 0.16 and the six shared set pieces from 0.14 to 0.12.
-      { itemId: 'wraithfire_orb', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'direfang_quiver', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_crown', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_cowl', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'stormcallers_crown', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_mantle', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'direfang_greatblade', chance: 0.16, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'crownforged_warspaulders', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'stormcallers_spaulders', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      // The feral ladder's top rung rides its own bonus group: a fifth,
-      // independent draw so the four guaranteed groups above keep their exact
-      // 1.00 partitions (a 25% bonus shot, never displacing a set piece).
-      { itemId: 'maul_of_the_scourged_wilds', chance: 0.25, rollGroup: 'nythraxis_drop_5' },
-      // Roots' Bramblehide (zone3.ts), the feral druid's Strength leather
-      // family: a sixth independent bonus group, the same shape as the maul's
-      // group 5, so the four guaranteed groups keep their exact 1.00
-      // partitions and no other class's set piece is displaced. Seven pieces at
-      // 0.08 each: a 56% shot at ONE family piece per kill. The pieces carry
-      // the FERAL tag, which armor equips do not enforce (canEquipItem gates
-      // armor by weight alone), but as a separate bonus draw the family never
-      // displaces a piece from the shared helm/shoulder groups above. Appended
-      // AFTER group 5 so the earlier draw order stays byte-identical.
-      { itemId: 'bramblehide_crown', chance: 0.08, rollGroup: 'nythraxis_drop_6' },
-      { itemId: 'bramblehide_mantle', chance: 0.08, rollGroup: 'nythraxis_drop_6' },
-      { itemId: 'bramblehide_harness', chance: 0.08, rollGroup: 'nythraxis_drop_6' },
-      { itemId: 'bramblehide_cinch', chance: 0.08, rollGroup: 'nythraxis_drop_6' },
-      { itemId: 'bramblehide_legguards', chance: 0.08, rollGroup: 'nythraxis_drop_6' },
-      { itemId: 'bramblehide_grips', chance: 0.08, rollGroup: 'nythraxis_drop_6' },
-      { itemId: 'bramblehide_treads', chance: 0.08, rollGroup: 'nythraxis_drop_6' },
-      // The seven gap-fill drops (zone3.ts, owner request 2026-09-04): a fifth
-      // GUARANTEED group (sums to exactly 1.00) so each lane the top-parse review
-      // found empty at the raid tier gets the same per-kill availability as a
-      // set piece. Appended AFTER group 6 so the earlier draw order stays
-      // byte-identical.
-      { itemId: 'courtiers_bonefang', chance: 0.15, rollGroup: 'nythraxis_drop_7' },
-      { itemId: 'thornpeak_wardblade', chance: 0.15, rollGroup: 'nythraxis_drop_7' },
-      { itemId: 'gravecourt_hewer', chance: 0.14, rollGroup: 'nythraxis_drop_7' },
-      {
-        itemId: 'votive_ward_of_the_deathless_court',
-        chance: 0.14,
-        rollGroup: 'nythraxis_drop_7',
-      },
-      { itemId: 'thornpeak_moonhide_cowl', chance: 0.14, rollGroup: 'nythraxis_drop_7' },
-      { itemId: 'stormhymn_chain_grips', chance: 0.14, rollGroup: 'nythraxis_drop_7' },
-      { itemId: 'stormhymn_chain_treads', chance: 0.14, rollGroup: 'nythraxis_drop_7' },
-      // MERGE NOTE (release/v0.42.0 -> feature/masterwrought): the groups below
-      // were authored on masterwrought assuming they would sit immediately
-      // after group 5 (nythraxis_drop_5); release's drop_6/drop_7 groups above
-      // now sit between them and group 5 instead. The rollGroup draw order has
-      // therefore shifted for every group below relative to masterwrought's own
-      // prior parity recording; tests/parity's nythraxis scenarios need
-      // re-minting after this merge (see the merge report).
+      ...NYTHRAXIS_EQUIPMENT_LOOT,
       // Masterwrought apex GEAR patterns (Phase 11, R8 channel doctrine): the
       // raid pillar carries the ten weaponcrafting/jewelcrafting/engineering/
       // inscription patterns (content/apex_patterns.ts) as ONE new partitioned
       // rollGroup, 0.04 each (0.40 total: at most one pattern per kill, 60% of
       // kills shed none). APPENDED AT THE TAIL by contract: loot_roll.ts
       // consumes rng draws in array order (one draw per rollGroup at its first
-      // member's index; a normalOnly group draws nothing on a heroic claim, and
-      // no row in this table is normalOnly), so a tail append leaves every
+      // member's index; the second equipment group is Normal-only and draws
+      // nothing on a heroic claim), so a tail append leaves every
       // existing draw's stream
       // position byte-identical WITHIN THE BASE WALK (a heroic claim's
       // HEROIC_BOSS_LOOT draws roll after the base table in the same rollLoot
@@ -1211,8 +1276,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       // which recorded the nythraxis_heroic_claim parity scenario for exactly
       // that stream, so this is no longer covered only by the normal-difficulty
       // kill the sibling scenario drives) while an insert or
-      // reorder forks the parity digest. Never insert or reorder any entry
-      // above this group. kind 'recipe' defs mint no heroic variants
+      // reorder forks the parity digest. The v0.42.0 equipment re-cut above
+      // intentionally changes that stream; recipe probabilities stay fixed.
+      // kind 'recipe' defs mint no heroic variants
       // (heroic_variants.ts generator filter), so the heroic auto-upgrade
       // path ignores them.
       { itemId: 'pattern_duskforged_warblade', chance: 0.04, rollGroup: 'nythraxis_patterns' },
@@ -1694,9 +1760,6 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     npcs: [
       { npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 },
       { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: 48 },
-      // The sigil-redemption vendor beside the raid entrance (APPEND-only:
-      // instance entity ids allocate in list order).
-      { npcId: CRUCIBLE_VENDOR_NPC_ID, x: 6, z: -47 },
     ],
     objects: [
       {

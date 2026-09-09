@@ -146,7 +146,7 @@ describe('Wildheart Basin premature boss pull', () => {
     }
   });
 
-  it('re-arms the leash once an arriving mob reaches the pull point', () => {
+  it('spends the transit grace on arrival and keeps the pull anchored at the pull point', () => {
     const { sim, player, boss, others } = claim('wildheart_basin', 'wildheart_high_priest');
     standAtShrine(sim, player, boss);
     const pullPoint = { ...player.pos };
@@ -154,9 +154,8 @@ describe('Wildheart Basin premature boss pull', () => {
     sim.aggroMob(boss, player, false);
     tickWithImmortalPuller(sim, player, 20 * 60);
 
-    // Arrived means anchored again: the transit grace is spent and the leash is
-    // live from the pull point, so the group still cannot walk the instance out
-    // through the door one pack at a time.
+    // Arrived means anchored again: the transit grace is spent and the anchor
+    // still reads the pull point (the hold below is what keeps the pull now).
     for (const mob of others) {
       expect(mob.chainPullInbound, `${mob.templateId} ${mob.id}`).toBe(false);
       expect(mob.leashAnchor, `${mob.templateId} ${mob.id}`).toEqual(pullPoint);
@@ -164,6 +163,41 @@ describe('Wildheart Basin premature boss pull', () => {
         DUNGEON_LEASH_DISTANCE,
       );
     }
+  });
+
+  // The farm this pull was being used for: kite the whole basin around without
+  // getting hit until every add leashes or stalls home, then take the boss alone.
+  // Inside a claimed instance slot nothing sheds an attacker by distance
+  // (instances/instance_combat_hold.ts): the pull follows the kiter across the
+  // basin and past the old leash until he leaves the instance.
+  it('follows a kiter past the old leash instead of shedding the pull', () => {
+    const { sim, player, boss, others } = claim('wildheart_basin', 'wildheart_high_priest');
+    standAtShrine(sim, player, boss);
+    sim.aggroMob(boss, player, false);
+    tickWithImmortalPuller(sim, player, 20 * 40);
+    for (const mob of others)
+      expect(mob.aggroTargetId, `${mob.templateId} ${mob.id}`).toBe(player.id);
+
+    // Kite the pack 100 yards back down the basin toward the entrance, past
+    // DUNGEON_LEASH_DISTANCE from the pull point (still inside the slot's claim
+    // envelope), and wait out the old stall window several times over.
+    const anchor = { ...player.pos };
+    player.pos = sim.ctx.groundPos(player.pos.x, player.pos.z - 100);
+    player.prevPos = { ...player.pos };
+    sim.ctx.rebucket(player);
+    tickWithImmortalPuller(sim, player, 20 * 30);
+
+    for (const mob of others) {
+      const tag = `${mob.templateId} ${mob.id}`;
+      expect(mob.aiState, tag).not.toBe('evade');
+      expect(mob.inCombat, tag).toBe(true);
+      expect(mob.threat.has(player.id), tag).toBe(true);
+      expect(mob.aggroTargetId, tag).toBe(player.id);
+    }
+    // At least the front of the pack is now well past the old leash sphere.
+    const chased = others.filter((m) => dist2d(m.pos, anchor) > DUNGEON_LEASH_DISTANCE);
+    expect(chased.length).toBeGreaterThan(0);
+    expect(player.inCombat).toBe(true);
   });
 
   it('is a no-op once the route is cleared, so a clean clear fights the boss alone', () => {

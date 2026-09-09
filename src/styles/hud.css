@@ -4642,9 +4642,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    /* Explicit, not content-sized: #daily-rewards-button is 50px wide against
-       the 34px .micro-btn, and flex-end would otherwise right-align it inside
-       a 50px-wide column, opening a dead gutter between the two columns. */
+    /* Keep both columns aligned to the standard launcher width. */
     width: 34px;
     gap: 4px;
   }
@@ -4661,8 +4659,7 @@
   /* Horizontal menu rail (menuRailHorizontal, the Frames Settings menu): the
      rail's two stacked columns become two side-by-side ROWS, reading as one
      horizontal strip. The explicit 34px column width is dropped (a row sizes
-     to its buttons), and the rows bottom-align so the taller daily-rewards
-     chest never staggers the strip. */
+     to its buttons), and the rows bottom-align. */
   body.menu-rail-horizontal #side-buttons {
     flex-direction: column;
     align-items: flex-end;
@@ -4677,19 +4674,6 @@
     /* The column's 4px button gap read as spacing BETWEEN items in a row;
        the horizontal strip packs its buttons flush (owner request). */
     gap: 0;
-  }
-  /* The daily-rewards chest's 46px box plus its 14px column spacing
-     inflated its row to 60px, floating the row's top edge 30px above the
-     30px buttons: exactly the seam the rows-touch rule above closes. In
-     the strip it takes a standard 30px slot and its art (overflow is
-     visible on the button) simply pokes past the box. */
-  body.menu-rail-horizontal #daily-rewards-button {
-    height: 30px;
-    margin-bottom: 0;
-  }
-  body.menu-rail-horizontal #daily-rewards-button .daily-rewards-icon {
-    width: 44px;
-    height: 44px;
   }
   .micro-btn {
     width: 34px;
@@ -6995,78 +6979,38 @@
       0 0 8px #c9a86a66,
       0 1px 3px #000a;
   }
+  /* The store chest occupies a normal menu slot, including compact mode. */
   #daily-rewards-button {
-    position: relative;
-    width: 50px;
-    height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    cursor: var(--cursor-point);
     pointer-events: auto;
     touch-action: manipulation;
-    border-radius: 8px;
-    margin-bottom: 14px;
-    background: transparent;
-    border: 0;
-    box-shadow: none;
-    color: #f6c15b;
-    overflow: visible;
-    transition:
-      transform 0.16s,
-      filter 0.16s;
   }
   #daily-rewards-button.spin-ready {
-    box-shadow: none;
-    color: #fff;
+    border-color: var(--gold);
   }
   #daily-rewards-button.spin-ready .daily-rewards-icon {
     animation: daily-rewards-icon-pulse 1.6s ease-in-out infinite;
     animation-duration: calc(1.6s * var(--motion-scale, 1));
     animation-play-state: var(--fx-ambient-anim, running);
   }
-  #daily-rewards-button::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #ffe08a99 0%, #ffd10066 34%, #ffd10000 72%);
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.85);
-    pointer-events: none;
-    z-index: 0;
-  }
-  #daily-rewards-button::after {
-    content: none;
-  }
-  #daily-rewards-button.spin-ready::before {
-    animation: daily-rewards-glow-pulse 1.6s ease-in-out infinite;
-    animation-duration: calc(1.6s * var(--motion-scale, 1));
-    animation-play-state: var(--fx-ambient-anim, running);
-  }
   #daily-rewards-button .daily-rewards-icon {
     position: relative;
     z-index: 1;
-    width: 64px;
-    height: 64px;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
     display: block;
     object-fit: contain;
     pointer-events: none;
-    filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 4px #ffd56d55);
+    filter: drop-shadow(0 1px 2px #000b);
   }
   #daily-rewards-button:hover,
   #daily-rewards-button:focus-visible {
-    border-color: #ffe08a;
-    outline: none;
-    color: #fff;
-  }
-  #daily-rewards-button:hover,
-  #daily-rewards-button:focus-visible {
-    transform: translateY(-1px);
+    border-color: var(--gold);
     filter: brightness(1.1);
   }
   #daily-rewards-button:focus-visible {
@@ -7081,17 +7025,6 @@
     50% {
       filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 14px #ffe08acc) brightness(1.16)
         saturate(1.12);
-    }
-  }
-  @keyframes daily-rewards-glow-pulse {
-    0%,
-    100% {
-      opacity: 0.34;
-      transform: translate(-50%, -50%) scale(0.9);
-    }
-    50% {
-      opacity: 0.82;
-      transform: translate(-50%, -50%) scale(1.18);
     }
   }
   /* the lockout panel rows inside the shared tooltip box */

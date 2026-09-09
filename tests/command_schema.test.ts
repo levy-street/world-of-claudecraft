@@ -166,8 +166,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // 220+14+1=235, dispatch-only 13+0+1=14), NOT a suite run, which the NOTE
 // above explicitly warns against trusting: confirm with
 // `npx vitest run tests/command_schema.test.ts` before merge lands.
-const EXPECTED_SEND_COUNT = 221;
-const EXPECTED_DISPATCH_COUNT = 235;
+const EXPECTED_SEND_COUNT = 222;
+const EXPECTED_DISPATCH_COUNT = 236;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

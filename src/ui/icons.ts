@@ -3273,6 +3273,19 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
   feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
   swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
+  // Groveheart resurrections: the in-combat single rez (a heart bursting back
+  // to life) and the out-of-combat group rez (the ancestor_return shape in the
+  // druid's leaf, not the shaman's rune).
+  wildwake: r('nature', 'leafGreen', ['heart', { p: 'sunburst', ...TR }], ['glow']),
+  grove_awakening: r(
+    'nature',
+    'leafGreen',
+    [
+      { p: 'cross', s: 0.9 },
+      { p: 'leaf', ...TR },
+    ],
+    ['sparkle', 'glow'],
+  ),
   // Talents V2 and the winning Warrior overlay. These explicit recipes remain
   // the deterministic fallback contract even when authored painted art wins at
   // render time, and every recipe is deliberately distinct.
@@ -3367,6 +3380,17 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     'arcanePink',
     ['cross', { p: 'wing', ...BR }],
     ['sparkle', 'arcs'],
+  ),
+  // Benison/Doctrine out-of-combat group rez: the holy cross with a lifted
+  // wing, distinct from prayer_of_healing's sunburst and the mass-rez twins.
+  prayer_of_returning: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'cross', s: 0.9 },
+      { p: 'wing', ...TR },
+    ],
+    ['sparkle', 'glow'],
   ),
   // shaman
   healing_stream: r('nature', 'sky', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
@@ -4511,6 +4535,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'summon_tithefiend',
   'martyrs_aegis',
   'choir_of_deliverance',
+  'prayer_of_returning',
   // warlock (CraftPix premium "RPG Warlock skill icons" pack + "RPG Demon skill icons"
   // pack for the summons/life_tap/searing_pain that the warlock pack couldn't cover).
   'shadow_bolt',
@@ -4847,6 +4872,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'swiftmend',
   'tranquility',
   'typhoon',
+  'wildwake',
+  'grove_awakening',
   // hunter
   'aspect_of_the_wild',
   'bestial_wrath',
@@ -5434,8 +5461,6 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_thunderstrut_gobbler',
   'reins_terrorspark_groundshaker',
   'reins_lanternback_troll',
-  'reins_chimeglass_tortoise',
-  'reins_rickshaw_mount',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the

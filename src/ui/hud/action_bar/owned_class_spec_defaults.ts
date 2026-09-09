@@ -128,6 +128,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'lesser_heal',
       'mind_flay',
       'power_word_fortitude',
+      'prayer_of_returning',
     ],
     holy: [
       'seraphic_vigil',
@@ -145,6 +146,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'shadow_word_pain',
       'mind_flay',
       'power_word_fortitude',
+      'prayer_of_returning',
     ],
     shadow: [
       'shadow_word_pain',
@@ -196,6 +198,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'regrowth',
       'healing_touch',
       'swiftmend',
+      'wildwake',
       'barkskin',
       'entangling_roots',
       'moonfire',
@@ -203,6 +206,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'mark_of_the_wild',
       'thorns',
       'travel_form',
+      'grove_awakening',
     ],
   },
 };

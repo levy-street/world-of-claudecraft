@@ -52,25 +52,44 @@ The plugin itself is MPL-2.0; self-hosting is a documented, supported mode.
    boot (`src/main.ts`). A bundle that never confirms within the plugin's
    ready timeout is rolled back to the previous bundle automatically; that is
    the crash-safety net, do not remove the call. The same module carries the
-   other two duck-typed plugin calls the gate uses: `watchOtaUpdates`
-   (download progress/complete/failed listeners) and `applyPendingOtaUpdate`
-   (the plugin's `reload()`, an immediate WebView-reload apply).
+   other duck-typed plugin calls the gate uses: `watchOtaUpdates` (download
+   progress/complete/staged/failed listeners), `pendingOtaBundleId` (asks the
+   plugin, via `getNextBundle()` + `current()`, for a downloaded bundle it has
+   not switched to yet) and `applyPendingOtaUpdate` (the plugin's
+   `set({ id })`, an immediate switch-and-reload to a NAMED bundle).
+
+   The event order matters and the gate is built around it: the plugin emits
+   `downloadComplete` from inside its download routine, before it verifies the
+   bundle or records it as the next bundle, and `updateAvailable` once the
+   bundle is verified, one statement before that record is written (same
+   order on iOS and Android). A `reload()` issued on `downloadComplete`
+   therefore finds no pending bundle and reboots the stale client, which then
+   meets the incompatible-version rejection until the app is force-quit. So
+   the apply keys on `updateAvailable` and names the bundle through `set`.
 5. **The visible update gate.** `src/net/ota_update_gate.ts` (wired in
    `src/main.ts`, painted by `src/ui/ota_update_overlay.ts`) turns the silent
    default into a visible flow on the shells. Pre-world, a running download
    shows a modal with live percent progress and no cancel/dismiss action (a
    skipped update strands the player on a stale bundle headed for the
    incompatible-version dead end, so the gate holds until the update lands);
-   when the download completes and the player has not entered the world, the
-   staged bundle is applied immediately via `reload()` instead of waiting
-   for a backgrounding. When the server rejects a stale bundle's
-   world-layout epoch
-   (`ONLINE_WORLD_INCOMPATIBLE_MESSAGE`) while a download is in flight or
-   staged, the gate replaces the dead-end fatal overlay: progress, then
-   auto-apply, and the resume marker survives so the reload lands back in the
-   world on the new bundle. In-world sessions are never interrupted: the
-   overlay stays hidden and the apply falls back to the plugin's
-   apply-on-background behavior.
+   once the plugin reports the download STAGED (`updateAvailable`) and the
+   player has not entered the world, the bundle is applied immediately via
+   `set({ id })` instead of waiting for a backgrounding (`downloadComplete`
+   alone only holds the screen; a completed download the plugin never stages
+   is released after a bounded grace window). A download can finish before
+   the JS context exists (cold start, or the context an earlier apply
+   reloaded) and no event replays, so the gate asks the plugin for an
+   already-staged bundle at install and applies that too. When the server
+   rejects a stale bundle's world-layout epoch
+   (`ONLINE_WORLD_INCOMPATIBLE_MESSAGE`), the gate claims the screen instead
+   of the dead-end fatal overlay: progress for a download in flight, then
+   auto-apply once staged; with nothing in flight it asks the plugin once
+   more, applies a staged bundle it finds, and hands the dead-end overlay
+   back only on a miss. The resume marker survives every apply (the dead-end
+   overlay is what clears it, and it paints only once there is provably
+   nothing to apply), so the reload lands back in the world on the new
+   bundle. In-world sessions are never interrupted: the overlay stays hidden
+   and the apply falls back to the plugin's apply-on-background behavior.
 
 Bandwidth economics: the update CHECK is a tiny JSON POST against the game
 server; the heavy zip download is served by the bundle host, so game-server
@@ -323,12 +342,17 @@ feed. Keep it scoped to the one bucket and rotate it on any suspicion.
   plus the delta channel: per-entry validation (all-or-nothing), the embedded
   `manifest` on offers, zip-only degradation, and the serialize-once body.
 - `tests/native_ota.test.ts`: the duck-typed plugin glue (`notifyAppReady`,
-  `watchOtaUpdates`, `applyPendingOtaUpdate`) plus source pins on the
-  `src/main.ts` wiring (boot confirm AND the gate install/disconnect arm),
-  `capacitor.config.ts` plugin block, and the `package.json` dependency.
+  `watchOtaUpdates` including the `updateAvailable` staged signal,
+  `pendingOtaBundleId` and its never-guess rules, `applyPendingOtaUpdate`
+  switching by id through `set` and refusing the running bundle) plus source
+  pins on the `src/main.ts` wiring (boot confirm AND the gate
+  install/disconnect arm), `capacitor.config.ts` plugin block, and the
+  `package.json` dependency.
 - `tests/ota_update_gate.test.ts`: the visible-gate state machine (progress,
-  auto-apply, in-world suppression, the incompatible-version
-  takeover and its fatal-mode dead ends).
+  the staged-keyed auto-apply and the regression it pins: no apply on
+  `downloadComplete` alone, the boot and rejection-time probes, the staging
+  grace window, in-world suppression, the incompatible-version takeover and
+  its fatal-mode dead ends).
 - `tests/ota_update_overlay.test.ts`: the overlay painter (mount/update in
   place, progressbar semantics, the no-cancel contract, fatal copy).
 - `tests/ota_publish.test.ts`: the publish planner (keys, URLs, manifest

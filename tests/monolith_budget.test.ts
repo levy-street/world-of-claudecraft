@@ -443,16 +443,12 @@ const MONOLITHS: MonolithRow[] = [
     // The aura-tracks release sync (186dd8fe7f) composes its system-text
     // extraction with the OSSBrain long-press and tooltip modules. The
     // measured combined count is below both parent pins (18574 / 18489).
-    // RESOLVED for the merge of release/v0.42.0 (tip 723752ea5c, the OSSBrain
-    // integration #3781 and #3918) into feature/hub-training-dummy-dps. Our
-    // own arm had lowered to 18481 (formatLockoutDuration moved out to
-    // src/ui/raid_lockout_format.ts to pay for the hub practice coach's
-    // Meters deps); the incoming arm lowered its copy to 18486. Neither
-    // parent pin fits the resolved tree: `wc -l < src/ui/hud.ts` on the
-    // reconciled file measures 18478, below both arms, so the ceiling
-    // follows it down. Exact merged count, zero slack: any further growth
-    // reds again.
-    ceiling: 18478,
+    // Compose the mount cosmetics and practice lesson extractions.
+    // Measured combined size; retain zero headroom after the release merge.
+    // LOWERED for the coin-icon money readout extraction (moneyHtml moved out
+    // to src/ui/money_html.ts so the social tab's roster confirm shares it);
+    // the coordinator keeps three one-line deps wirings. Exact count, zero slack.
+    ceiling: 18461,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -842,10 +838,12 @@ const MONOLITHS: MonolithRow[] = [
     // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: Fiesta effects moved to render/fiesta_effects.ts.
     // Measured after formatting; lower the ratchet with the extraction.
+    // Mount skins: bank the coordinator extraction at its measured size.
+    // Restored per-ability resurrection school lookup removes one line.
     // Lowered again when the gather-node shadow shed and reach hide moved
     // behind GatherNodesView.update (the two guard blocks collapsed to one
     // call each and the shadowLightDirection scratch left the renderer).
-    ceiling: 12872,
+    ceiling: 12844,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1017,7 +1015,8 @@ const MONOLITHS: MonolithRow[] = [
     // the resolved tree: `wc -l < src/sim/sim.ts` on the reconciled file
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 11923,
+    // Main hotfix integration: combined extractions, exact merged count.
+    ceiling: 11879,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1210,16 +1209,9 @@ const MONOLITHS: MonolithRow[] = [
     // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: mobile preflight detection and copy moved to game/mobile_preflight.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    // RESOLVED for the merge of release/v0.42.0 (tip 723752ea5c, the OSSBrain
-    // integration #3781 and #3918) into feature/hub-training-dummy-dps. Our
-    // own arm had lowered to 11382 (normalizeDeleteConfirmation moved out
-    // to src/ui/char_delete_button.ts to pay for the touch More-tray Damage
-    // Meters entry); the incoming arm lowered its copy to 11366. Neither
-    // parent pin fits the resolved tree: `wc -l < src/main.ts` on the
-    // reconciled file measures 11363, below both arms, so the ceiling
-    // follows it down. Exact merged count, zero slack: any further growth
-    // reds again.
-    ceiling: 11363,
+    // Compose the mount cosmetics and practice lesson extractions.
+    // Measured combined size; retain zero headroom after the release merge.
+    ceiling: 11332,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1432,7 +1424,9 @@ const MONOLITHS: MonolithRow[] = [
     // the exact `wc -l < server/game.ts` measurement on the resolved tree.
     // RE-CONFIRMED at the final line-budget reconciliation: still 10291,
     // below both parent pins. Exact merged count, zero slack.
-    ceiling: 10291,
+    // Mount skins: bank the coordinator extraction at its measured size.
+    // Main hotfix integration: combined extractions, exact merged count.
+    ceiling: 10095,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1574,7 +1568,8 @@ const MONOLITHS: MonolithRow[] = [
     // zero slack: any further growth reds again.
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    ceiling: 5765,
+    // Main hotfix integration: combined extractions, exact merged count.
+    ceiling: 5540,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1585,7 +1580,8 @@ const MONOLITHS: MonolithRow[] = [
     // the raid theme registrations were paid for by moving the Gravewyrm Sanctum composer to its sibling module; exact count.
     // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
     // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
-    ceiling: 4935,
+    // Pure location/rift routing moved to music_zones.ts; floor streams reuse the director.
+    ceiling: 4850,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -1721,7 +1717,8 @@ const MONOLITHS: MonolithRow[] = [
     // stays imported at the top of db.ts too (the save-family fence sites
     // reach it directly), unlike createCharacterCapped's pure re-export.
     // Exact count, zero slack.
-    ceiling: 4893,
+    // Mount skins: bank the coordinator extraction at its measured size.
+    ceiling: 4744,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

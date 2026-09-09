@@ -157,7 +157,7 @@ export function loadGuildBanksIntoSim(
 // escrow transaction rolls back, character row included: writing what durable
 // truth could cover while the paired character half commits mints exactly the
 // difference, and recording that is a receipt for a mint rather than a
-// mitigation. The caller retries; see server/game.ts
+// mitigation. The caller retries; see server/guild_bank_escrow_refusal.ts
 // handleGuildBankEscrowRefusal for what happens when a retry can never win.
 export function mergeGuildBankRow(
   durableRaw: unknown,

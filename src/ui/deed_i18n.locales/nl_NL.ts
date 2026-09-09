@@ -89,6 +89,8 @@ export const table: DeedLocaleTable = {
   },
   chr_nightbloom_first_cast: {
     desc: 'Vang een vis in de wateren van Nightbloom.',
+
+    name: 'Een rimpeling in de Maanbron',
   },
   chr_wraithwood_gatherer: {
     name: 'Oogst onder het bladerdak',
@@ -192,6 +194,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Meesterverzamelaar',
+    desc: 'Bereik vaardigheid 100 in drie verschillende verzamelberoepen.',
   },
   prog_first_craft: { name: 'Handwerk', desc: 'Voltooi je eerste geslaagde ambachtswerk.' },
   prog_craft_specialist: {
@@ -303,6 +306,8 @@ export const table: DeedLocaleTable = {
   },
   dgn_sanctum_speed: {
     desc: 'Versla Korzul de Grafwurm binnen 15 minuten nadat je groep het Grafwurm-Heiligdom heeft opgeëist.',
+
+    name: 'Heiligdomsloop',
   },
   dgn_nythraxis_gravebreaker: {
     name: 'Kniel voor Geen Koning',
@@ -341,7 +346,7 @@ export const table: DeedLocaleTable = {
     desc: 'Zuiver de Verdronken Litanie op het Heroïsche niveau.',
   },
   dlv_lore_journal: {
-    name: 'Marginalia',
+    name: 'Kanttekeningen',
     desc: 'Ontgrendel alle vijf de aantekeningen in het delve-dagboek.',
   },
   dlv_companion_max: {
@@ -441,6 +446,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Kroniek van Doorntop',
+    desc: 'Zie het hele verhaal van de berg tot het einde: de Broedswornus gebroken, het Heiligdom tot zwijgen gebracht, de Ontwakende Piek geveld en elke genoemde verschrikking van de bergkammen neergehaald.',
     title: 'van Doorntop',
   },
   chr_peaks_sparring: {
@@ -1037,27 +1043,109 @@ export const table: DeedLocaleTable = {
   },
   dgn_ignivar: {
     name: 'De Heraut Valt',
-    desc: 'Versla Ignivar, Herald of the Last Flame, in de Crucible of the Last Spring.',
+    desc: 'Versla Ignivar, Heraut van de Laatste Vlam, in de Smeltkroes van de Laatste Bron.',
   },
   dgn_ignivar_heroic: {
     name: 'Heroïsch: De Heraut Valt',
-    desc: 'Versla Ignivar, Herald of the Last Flame, op Heroïsche moeilijkheidsgraad.',
+    desc: 'Versla Ignivar, Heraut van de Laatste Vlam, op Heroïsche moeilijkheidsgraad.',
   },
   dgn_varkhul: {
     name: 'De Smidse Koelt Af',
-    desc: 'Versla Varkhul, Forgefather of the Last Flame, in de Inner Crucible.',
+    desc: 'Versla Varkhul, Smidvader van de Laatste Vlam, in de Binnenste Smeltkroes.',
   },
   dgn_varkhul_heroic: {
     name: 'Heroïsch: De Smidse Koelt Af',
-    desc: 'Versla Varkhul, Forgefather of the Last Flame, op Heroïsche moeilijkheidsgraad.',
+    desc: 'Versla Varkhul, Smidvader van de Laatste Vlam, op Heroïsche moeilijkheidsgraad.',
   },
   dgn_varkhul_flawless: {
     name: 'Geen Sintel Verloren',
-    desc: 'Versla Varkhul, Forgefather of the Last Flame, op Heroïsche moeilijkheidsgraad zonder dat één raider sterft.',
+    desc: 'Versla Varkhul, Smidvader van de Laatste Vlam, op Heroïsche moeilijkheidsgraad zonder dat één raider sterft.',
     title: 'de Ongeschondene',
   },
   col_set_bramblehide: {
     name: "Roots' Doornhuid",
     desc: "Ontdek elk onderdeel van Roots' Doornhuid.",
+  },
+  prog_jewelcrafting_rare: {
+    desc: 'Maak je eerste voorwerp van zeldzame rang met Juwelenmaken.',
+
+    name: 'Gepolijst tot Schittering',
+  },
+  prog_jewelcrafting_50: {
+    desc: 'Bereik vaardigheid 50 in Juwelenmaken.',
+    name: 'Facet en Filigraan',
+  },
+  prog_grandmaster_jewelcrafting: {
+    desc: 'Bereik vaardigheid 125 in Juwelenmaken, het absolute hoogtepunt van het ambacht.',
+
+    name: 'Grootmeester Juwelenmaken',
+    title: 'Grootmeester Juwelenmaken',
+  },
+  prog_inscription_rare: {
+    desc: 'Maak je eerste voorwerp van zeldzame rang met Inscriptie.',
+
+    name: 'Geschreven met Fijne Inkt',
+  },
+  prog_inscription_50: { desc: 'Bereik vaardigheid 50 in Inscriptie.', name: 'Pen en Pigment' },
+  prog_grandmaster_inscription: {
+    desc: 'Bereik vaardigheid 125 in Inscriptie, het absolute hoogtepunt van het ambacht.',
+
+    name: 'Grootmeester Inscriptie',
+    title: 'Grootmeester Inscriptie',
+  },
+  col_deepest_cast: {
+    desc: 'Verwerf een Clockreel-hengel, de enige hengel die de diepste vangsten bereikt.',
+
+    name: 'De Diepste Worp',
+  },
+  prog_first_planting: {
+    desc: 'Plant je eerste gewas in een kweekbed.',
+    name: 'Zo Begint het Zaaien',
+  },
+  chr_vale_first_harvest: {
+    desc: 'Oogst je eerste bloeiende gewas uit een kweekbed in het Oostbeekdal.',
+
+    name: 'Eerste Vruchten van het Dal',
+  },
+  chr_marsh_first_harvest: {
+    desc: 'Oogst je eerste bloeiende gewas uit een kweekbed in het Mirefenmoeras.',
+
+    name: 'Spruiten in het Veen',
+  },
+  chr_peaks_first_harvest: {
+    desc: 'Oogst je eerste bloeiende gewas uit een kweekbed in de Doorntop-Hoogten.',
+
+    name: 'Een Gewas tussen de Rotspieken',
+  },
+  chr_evergarden_first_harvest: {
+    desc: 'Oogst je eerste bloeiende gewas uit een kweekbed in Evergarden.',
+
+    name: 'Een Perceel in het Paradijs',
+  },
+  col_golden_harvest: {
+    desc: 'Oogst een gouden oogst en laat de hele zone ervan weten.',
+
+    name: 'Gouden Oogst',
+  },
+  prog_farming_100: {
+    desc: 'Bereik vaardigheid 100 in Landbouw.',
+    name: 'Oogstmeester',
+    title: 'Oogstmeester',
+  },
+  col_farm_roster: { desc: 'Oogst elk gewas dat de vier tuinen telen.', name: 'Elke Vore Gevuld' },
+  prog_field_to_feast: {
+    desc: 'Bereid een Apex-feestmaal waar een hele raid van kan eten.',
+
+    name: 'Van Veld tot Feestmaal',
+  },
+  prog_legendmaker: {
+    desc: 'Verhef een geperfectioneerd werk met een Inscriptie-oorkonde tot een legende en geef het een unieke naam.',
+
+    name: 'De Legendenmaker',
+  },
+  hid_forgebreaker: {
+    desc: 'Vorm zelf de Smederijbreker en keer terug naar Maelin met de voltooide hamer.',
+
+    name: 'Een Ongeketende Bron',
   },
 };

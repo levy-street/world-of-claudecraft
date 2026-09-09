@@ -263,16 +263,11 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'shadowjump_toad',
   'grag_bear',
   'stalkglider_snail',
-  'mech_bird',
   'aether_hover_cycle',
   'thunderstrut_gobbler',
   'drakemaw_raptor',
-  'goblin_rocket_sled',
-  'rallycart_rxt',
   'lanternback_troll',
-  'chimeglass_tortoise',
   'terrorspark_groundshaker',
-  'rickshaw_mount',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
@@ -288,22 +283,8 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// drakemaw_raptor, goblin_rocket_sled, rallycart_rxt, lanternback_troll,
-// chimeglass_tortoise, terrorspark_groundshaker and rickshaw_mount are absent,
-// and that absence IS the answer: no live table awards any of them
-// (drakemaw_raptor has no acquisition path; the others are DEVELOPER_MOUNTS,
-// dev-grant only). They are the catalog's seven SOURCE_PENDING_RULING mounts.
-// masterwork:engineering was an eighth pending slot (QA ruling 2026-08-07)
-// until masterwrought Phase 11o's stats-bearing ocular un-pended it on that
-// ruling's own condition, so the pending list is mounts-only now.
-//
-// ONE CONSEQUENCE, recorded 2026-09-01 under masterwrought ruling
-// qr-19-shipped-id-golden-remint-cadence: reins_rickshaw_mount's id is now
-// pinned in tests/shipped_item_ids.golden.json, which makes it permanent API.
-// The DELETE arm of this pending question is therefore closed for it, and the
-// retirement remedy that replaces deletion is degenerate here, because the item
-// has no acquisition path to drop. Settling the row upward (give it a source)
-// stays available; settling it downward no longer means removing the def.
+// Drakemaw Raptor, Lanternback Troll and Dreadspark Groundshaker have no
+// player acquisition path. Paid mount skins are deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -339,9 +320,6 @@ const MOUNT_SOURCES: Readonly<
   ],
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
-  // The store mount: sold for Claudium (content/store_mounts.ts). The 'store'
-  // kind is the whole answer, the same one door the Armory skins point at.
-  mech_bird: fromStore(),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS
@@ -1469,12 +1447,11 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Mounts',
     desc: 'Rideable mounts from the stable, heroic reins, Rift epics, and rarer saddles. Ownership follows the live reins seam (bags and bank).',
     clearSource: { kind: 'none' },
-    // Seven of the fourteen mounts name every door that awards their reins (see
+    // Earnable mounts name every door that awards their reins (see
     // MOUNT_SOURCES above): the four heroic reins each drop from two or three
     // HEROIC_BOSS_LOOT bosses AND from their Rift rank's ladder, the two epic
     // reins are Rift-only, and valorsteed is Marla's counter. The page-wide
-    // pending ruling that used to cover all nine is executed; the seven that
-    // remain (drakemaw_raptor and the six DEVELOPER_MOUNTS) are content gaps,
+    // Remaining source-pending mounts are content gaps,
     // not vocabulary gaps, and stay hand-listed in SOURCE_PENDING_RULING.
     relics: mounts(...mountEntries(RELIQUARY_HORIZON_MOUNTS)),
   },

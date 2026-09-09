@@ -590,6 +590,56 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Overbloom (overbloom)\nCanonical mechanic: Spends 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of what those effects had left.\nSubject: A verdant flower bursting open in an overwhelming bloom of healing light.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "wildwake",
+      "sourcePack": "woc_openai_healer_rez_icons_2026_09_01",
+      "sourceFile": "public/ui/skills/druid/wildwake.png (converted in place by assets:skills, original deleted)",
+      "output": "wildwake.webp",
+      "source": "OpenAI gpt-image-2 (images/edits, style-referenced)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A single luminous green flower bursting open over a fallen silhouette, its light lifting the figure upright.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/rejuvenation.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/druid/healing_touch.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wildwake (wildwake)\nCanonical mechanic: Wildwake is a 2 sec combat cast that returns one fallen ally to life at the caster with 35% health and mana; 5 min cooldown.\nSubject: A single luminous green flower bursting open over a fallen silhouette, its light lifting the figure upright.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "grove_awakening",
+      "sourcePack": "woc_openai_healer_rez_icons_2026_09_01",
+      "sourceFile": "public/ui/skills/druid/grove_awakening.png (converted in place by assets:skills, original deleted)",
+      "output": "grove_awakening.webp",
+      "source": "OpenAI gpt-image-2 (images/edits, style-referenced)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An ancient glowing tree spreading rings of green light over three rising spirits at its roots.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/rejuvenation.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/druid/healing_touch.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Grove Awakening (grove_awakening)\nCanonical mechanic: Grove Awakening is a 7 sec out-of-combat rite that calls every fallen group or raid member within 40 yd back to life with 30% health and mana; 5 min cooldown.\nSubject: An ancient glowing tree spreading rings of green light over three rising spirits at its roots.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
   "deferredStayProcedural": {},

@@ -1225,4 +1225,53 @@ export const tr_TR: Record<string, string> = {
   'realmBuilders.saveNew': 'Yayınla',
   'realmBuilders.useNextMonth': 'Gelecek ay',
   'realmBuilders.yearLabel': 'Yıl',
+  'error.clearItemNameAllLiteral': 'all tam olarak true değişmezi olmalıdır',
+  'error.clearItemNameBagIndex': 'bag negatif olmayan bir tam sayı olmalıdır',
+  'error.clearItemNameBagPair':
+    'bir çanta hedefi hem hücre dizinini hem de eşya kimliğini gerektirir',
+  'error.clearItemNameBagRange': 'bag, {min} ile {max} arasında bir tam sayı olmalıdır',
+  'error.clearItemNameCameOnline':
+    'karakter silme uygulanmadan önce çevrimiçi oldu; bağlantısını kesin ve tekrar deneyin',
+  'error.clearItemNameLeased':
+    'karakterin etkin bir oturum kirası var; bağlantısını kesin (veya kira süresinin bitmesini bekleyin) ve tekrar deneyin',
+  'error.clearItemNameNoMatch': 'bu hedefle eşleşen adlandırılmış kopya yok',
+  'error.clearItemNameOnline': 'karakter bu diyarda çevrimiçi; önce bağlantısını kesin',
+  'error.clearItemNameTargetForms':
+    'tam olarak bir hedef adlandırın: giyilen bir yuva, çanta hücresi veya all: true',
+  'error.clearItemNameUnknownSlot': 'bilinmeyen ekipman yuvası',
+  'error.clearItemNameWentOffline':
+    'karakter silme uygulanmadan önce çevrimdışı oldu; tekrar deneyin',
+  'error.itemNameClearFailed': 'eşya adı silinemedi',
+  'loadFailure.forbiddenDetail':
+    'Personel rolleriniz bu görünümün okuduğu izne sahip değil. Bir süper yöneticiden izin vermesini isteyin ve yeniden yükleyin.',
+  'loadFailure.forbiddenTitle': 'İzin reddedildi',
+  'marketMetrics.autoRefresh': 'Otomatik yenileme ({seconds} sn)',
+  'marketMetrics.bucketCompost': 'Kompost',
+  'marketMetrics.bucketCores': 'Çekirdekler',
+  'marketMetrics.bucketEmpty': 'aktif ilan yok',
+  'marketMetrics.bucketEssence': 'Öz',
+  'marketMetrics.bucketPatterns': 'Şablonlar',
+  'marketMetrics.bucketProduce': 'Ürünler',
+  'marketMetrics.bucketSeeds': 'Tohumlar',
+  'marketMetrics.bucketSold': 'Son {days} günde satılan: {sales} satış, {quantity} eşya, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} ilan, {quantity} birim, {tracked} eşyanın {listed} kadarı listelendi',
+  'marketMetrics.colItem': 'Eşya',
+  'marketMetrics.colListings': 'İlanlar',
+  'marketMetrics.colLowest': 'En düşük (birim başına)',
+  'marketMetrics.colMedian': 'Medyan (birim başına)',
+  'marketMetrics.colQuantity': 'Miktar',
+  'marketMetrics.empty': 'izlenen hiçbir kovada aktif ilan yok',
+  'marketMetrics.essenceNote':
+    'Bu malzemeler ruh bağıdır ve asla listelenemez. Buradaki her satır pazar emanet değişmezinin bozulduğunu ve mühendislik incelemesi gerektiğini gösterir.',
+  'marketMetrics.hint':
+    'İzlenen arz kovaları için canlı Dünya Pazarı ilanları: satılan miktar değil, şu anda defterde olanlar. Sunucu bu görünümü yaklaşık 15 saniye önbelleğe alır.',
+  'marketMetrics.loadFailed': 'pazar ölçümleri yüklenemedi',
+  'marketMetrics.loading': 'yükleniyor…',
+  'marketMetrics.realm': 'Diyar: {realm}',
+  'marketMetrics.soldNone': 'Son {days} günde satılan: yok',
+  'marketMetrics.soldUnavailable':
+    'Satış hacmi şu anda kullanılamıyor; bu nedenle aşağıda yalnızca canlı ilanlar gösteriliyor.',
+  'moderationHistory.actionClearItemName': 'Eşya adı silindi',
+  'nav.marketMetrics': 'Pazar ölçümleri',
 };

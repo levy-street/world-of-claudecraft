@@ -189,6 +189,7 @@ export const IWORLD_MEMBERS = [
   { name: 'claimEventSkin', kind: 'method' },
   { name: 'unequipMechChroma', kind: 'method' },
   { name: 'changeWeaponSkin', kind: 'method' },
+  { name: 'changeMountSkin', kind: 'method' },
   { name: 'toggleWeaponStow', kind: 'method' },
   { name: 'setHelmHidden', kind: 'method' },
   { name: 'unstuck', kind: 'method' },
@@ -854,9 +855,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet-file exhaustiveness checks (AssertNever) also pass on the fully
     // resolved production tree.
-    expect(IWORLD_MEMBERS.length).toBe(370);
+    expect(IWORLD_MEMBERS.length).toBe(371);
     expect(DATA_MEMBERS.length).toBe(103);
-    expect(METHOD_MEMBERS.length).toBe(267);
+    expect(METHOD_MEMBERS.length).toBe(268);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -932,6 +933,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'castAbilityBySlot',
       'castAbilityOn',
       'cfg',
+      'changeMountSkin',
       'changeSkin',
       'changeWeaponSkin',
       'characterProfile',
@@ -1387,6 +1389,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'castAbilityAt',
       'castAbilityBySlot',
       'castAbilityOn',
+      'changeMountSkin',
       'changeSkin',
       'changeWeaponSkin',
       'characterProfile',
@@ -1819,6 +1822,7 @@ const FACET_COSMETICS = [
   'claimEventSkin',
   'unequipMechChroma',
   'changeWeaponSkin',
+  'changeMountSkin',
   'toggleWeaponStow',
   'setHelmHidden',
 ] as const satisfies readonly (keyof IWorldCosmetics)[];
@@ -2363,8 +2367,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet arrays actually reconstruct IWORLD_MEMBERS with no gaps or
     // collisions; this pin and the one above must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(370);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(370);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(371);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(371);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -773,6 +773,7 @@ export function plantCrop(
   // it would fire unprompted one tick after it ends.
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   ctx.emit({
     type: 'castStart',
     entityId: p.id,

@@ -166,60 +166,46 @@ describe('dungeon finder view core', () => {
       ),
     );
     const boss = view.detail?.encounters.find((e) => e.final);
-    // THREE groups since masterwrought Phase 11f, and the split is the claim:
-    // the two GEAR groups still partition a full draw apiece (one epic each,
-    // guaranteed), and the appended farming pattern group deliberately does
-    // not (0.08 total, at most one pattern per clear). The preview showing it
-    // is correct rather than a regression: it really is a drop off this boss,
-    // and a browser deciding whether to queue should see it. The old literal
-    // predates the second group, so it is re-cut rather than the guaranteed
-    // check being dropped, which would have hidden a gear group falling below
-    // a full draw.
-    expect(boss?.heroicGroups.length).toBe(3);
-    expect(boss?.heroicGroups.filter((g) => g.guaranteed).length, 'the two gear groups').toBe(2);
-    expect(
-      boss?.heroicGroups.filter((g) => !g.guaranteed).length,
-      'the appended farming group is a bonus draw, never guaranteed',
-    ).toBe(1);
+    // One guaranteed equipment group, plus the unchanged bonus farming group.
+    expect(boss?.heroicGroups.length).toBe(2);
+    expect(boss?.heroicGroups.filter((g) => g.guaranteed).length).toBe(1);
+    expect(boss?.heroicGroups.filter((g) => !g.guaranteed).length).toBe(1);
+    expect(boss?.groups).toEqual([]);
     expect(view.detail?.heroicMarks).toBe(1);
     // The heroic finale preview advertises the raised heroicCopper base the
     // kill actually pays; a non-finale encounter keeps its normal copper.
     expect(boss?.copper).toBe(100000);
     const sexton = view.detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
     expect(sexton?.copper).toBe(400);
-    // The heroic-slot gate mirrors the roller: keyed on the encounter having a
-    // HEROIC_BOSS_LOOT table, not on it being the finale, so a non-finale
-    // encounter without a table previews no heroic slot.
-    expect(HEROIC_BOSS_LOOT.sexton_marrow).toBeUndefined();
-    expect(sexton?.heroicGroups).toEqual([]);
+    expect(sexton?.heroicGroups).toHaveLength(1);
+    expect(sexton?.heroicGroups[0].guaranteed).toBe(true);
   });
 
-  it('previews a NON-finale encounter heroic table on Heroic only (the roller gate, not enc.final)', () => {
-    // The positive arm of the gate above: inject a heroic table for a
-    // catalogued non-finale encounter and the Heroic preview must show it
-    // while the Normal preview must not. With the old `enc.final` gate this
-    // assertion fails, which is exactly the regression it protects against
-    // (no live catalogue row exercises the branch yet).
-    expect(HEROIC_BOSS_LOOT.sexton_marrow).toBeUndefined();
-    HEROIC_BOSS_LOOT.sexton_marrow = [
-      { itemId: 'mistveil_cord', chance: 1, rollGroup: 'finder_test_nonfinal_heroic' },
-    ];
-    try {
-      const sextonOn = (activityId: string) =>
-        live(
-          buildDungeonFinderView(
-            input({ playerLevel: 20, specRole: 'tank', selectedActivityId: activityId }),
-          ),
-        ).detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
-      const heroic = sextonOn('hollow_crypt_heroic');
-      expect(heroic?.final).toBe(false);
-      expect(heroic?.heroicGroups).toMatchObject([
-        { guaranteed: true, items: [{ itemId: 'mistveil_cord', chance: 1 }] },
-      ]);
-      expect(sextonOn('hollow_crypt_normal')?.heroicGroups).toEqual([]);
-    } finally {
-      delete HEROIC_BOSS_LOOT.sexton_marrow;
-    }
+  it('previews the live non-finale equipment budget on Heroic only', () => {
+    const sextonOn = (activityId: string) =>
+      live(
+        buildDungeonFinderView(
+          input({
+            playerLevel: 20,
+            specRole: 'tank',
+            selectedActivityId: activityId,
+          }),
+        ),
+      ).detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
+    const heroic = sextonOn('hollow_crypt_heroic');
+    expect(heroic?.final).toBe(false);
+    expect(heroic?.heroicGroups).toMatchObject([
+      {
+        guaranteed: true,
+        items: [
+          { itemId: 'quilted_trousers', chance: 0.5 },
+          { itemId: 'oiled_boots', chance: 0.5 },
+        ],
+      },
+    ]);
+    expect(heroic?.groups).toEqual([]);
+    expect(heroic?.singles).toEqual([]);
+    expect(sextonOn('hollow_crypt_normal')?.heroicGroups).toEqual([]);
   });
 
   it('maps raid entrances to the Abandoned Crypt door with its zone', () => {

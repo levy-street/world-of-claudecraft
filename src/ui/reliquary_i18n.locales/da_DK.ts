@@ -151,23 +151,33 @@ export const table: ReliquaryLocaleTable = {
     desc: 'De personlige riftringe, præget til hver mester i gruppen, der vinder den første gennemførsel af en rangeret Rift. En figur kan kun eje sin egen.',
   },
   conquerors_ignivar: {
-    name: 'Crucible of the Last Spring',
-    desc: 'Episk bytte fra Ignivar, Herald of the Last Flame.',
+    name: 'Den Sidste Kildes Digel',
+    desc: 'Episk bytte fra Ignivar, den Sidste Flammes Herold.',
   },
   conquerors_ignivar_heroic: {
-    name: 'Heroisk: Crucible of the Last Spring',
-    desc: 'Våben kun fra heroisk tilstand, fra Ignivar, Herald of the Last Flame.',
+    name: 'Heroisk: Den Sidste Kildes Digel',
+    desc: 'Våben kun fra heroisk tilstand, fra Ignivar, den Sidste Flammes Herold.',
   },
   conquerors_varkhul: {
-    name: 'The Inner Crucible',
-    desc: 'Episk bytte fra Varkhul, Forgefather of the Last Flame.',
+    name: 'Den Indre Digel',
+    desc: 'Episk bytte fra Varkhul, den Sidste Flammes Smedefader.',
   },
   conquerors_varkhul_heroic: {
-    name: 'Heroisk: The Inner Crucible',
-    desc: 'Skjolde og våben kun fra heroisk tilstand, fra Varkhul, Forgefather of the Last Flame.',
+    name: 'Heroisk: Den Indre Digel',
+    desc: 'Skjolde og våben kun fra heroisk tilstand, fra Varkhul, den Sidste Flammes Smedefader.',
   },
   conquerors_set_bramblehide: {
     name: "Roots' Tornehud",
-    desc: 'Hele Bramblehide-familien i læder.',
+    desc: 'Hele læderfamilien Roots’ Tornehud.',
+  },
+  professions_crucible: {
+    desc: 'Elleve raidfremstillede samlinger, som hver tilbyder et bryst-, talje- og fodstykke. Manualer og formler er viden, ikke relikvier.',
+
+    name: 'Digelhåndværk',
+  },
+
+  professions_forgebreaker: {
+    name: 'Smedebryder',
+    desc: 'Stemmen fra Den Sidste Kilde, befriet fra essen og båret i en hammer, du selv har lavet.',
   },
 };

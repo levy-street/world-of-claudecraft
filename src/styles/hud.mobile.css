@@ -4490,7 +4490,7 @@
     );
     transform: none;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow: hidden;
   }
   /* The shared harvest-preference picker's Apply/Cancel ride the plain .btn
      shape, whose desktop 6px/16px padding falls short of the 40px touch
@@ -4498,6 +4498,41 @@
      (components.css min-height:40px). */
   body.mobile-touch #harvest-preference-window .btn {
     min-height: 40px;
+  }
+  @media (orientation: landscape) {
+    body.mobile-touch #harvest-preference-window {
+      width: 560px;
+      max-width: calc(
+        (
+          var(--app-vw, 100dvw) -
+          max(10px, env(safe-area-inset-left)) -
+          max(10px, env(safe-area-inset-right))
+        ) /
+        var(--window-scale, 1)
+      );
+      left: calc(
+        (
+          var(--app-vw, 100dvw) +
+          max(10px, env(safe-area-inset-left)) -
+          max(10px, env(safe-area-inset-right))
+        ) /
+        var(--window-scale, 1) /
+        2
+      );
+      right: auto;
+      transform: translateX(-50%);
+    }
+    body.mobile-touch .harvest-preference-rows {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    body.mobile-touch .harvest-preference-header {
+      margin-bottom: var(--spacing-sm);
+      padding-bottom: var(--spacing-sm);
+    }
+    body.mobile-touch .harvest-preference-actions {
+      margin-top: var(--spacing-sm);
+      padding-top: var(--spacing-sm);
+    }
   }
   /* $WOC Exchange browse tab on touch: one column, detail pane stacked under
      the table. The desktop template reserves a 240px-min side column, which on
@@ -6532,6 +6567,27 @@
   /* ---------- mobile Reliquary (standalone window) ---------- */
   /* Full-bleed safe-area panel, horizontal shelf chips, 40px targets. The
      body column collapses the desktop rail into a chip row (deeds idiom). */
+  body.mobile-touch #cosmetics-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    z-index: 95;
+  }
+  body.mobile-touch #cosmetics-window .cos-tabs {
+    height: auto;
+  }
+  body.mobile-touch #cosmetics-window .cos-tab {
+    min-height: 40px;
+  }
+  body.mobile-touch #cosmetics-window .cos-grid {
+    grid-template-columns: 1fr;
+  }
   body.mobile-touch #reliquary-window {
     position: fixed;
     left: max(10px, env(safe-area-inset-left));

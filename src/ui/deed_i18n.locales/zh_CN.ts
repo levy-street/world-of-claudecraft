@@ -186,6 +186,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '草甸之主', desc: '草药学熟练度达到100点。' },
   prog_master_gatherer: {
     name: '采集大师',
+    desc: '任意三种采集行业的熟练度达到100点。',
   },
   prog_first_craft: { name: '亲手所制', desc: '完成你的第一次成功制造。' },
   prog_craft_specialist: {
@@ -321,7 +322,10 @@ export const table: DeedLocaleTable = {
   chr_vale_gatherer: { name: '靠山吃山', desc: '在东溪谷采集一处矿脉、一片林木与一丛草药。' },
   chr_vale_first_cast: { name: '镜湖有物', desc: '在东溪谷的水域钓起一条鱼。' },
   chr_vale_packbreaker: { name: '破群者', desc: '在 10 秒内斩杀 3 只森林狼。' },
-  chr_vale_cup_debut: { name: '铜桶新秀' },
+  chr_vale_cup_debut: {
+    name: '铜桶新秀',
+    desc: '在母猪场参加一场野猪球比赛并触球。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
   chr_vale_rares: {
     name: '溪谷群凶',
     desc: '斩杀东溪谷的五大恶名之敌：老灰颚、莫格、隧道之王格里克斯、维尔兰队长与缚魂者玛尔德雷克。',
@@ -424,29 +428,75 @@ export const table: DeedLocaleTable = {
   pvp_arena_2v2_1900: { name: '天作之合', desc: '在竞技场2v2组别中将评级提升至1900。' },
   pvp_duel_first_win: { name: '门外了断', desc: '赢得一场决斗。' },
   pvp_duel_grace: { name: '谦逊一课', desc: '输掉一场决斗，体面大致还在。' },
-  pvp_vcup_first_match: { name: '踏上赛场' },
-  pvp_vcup_first_win: { name: '首座奖杯' },
-  pvp_vcup_wins_10: { name: '野猪球老手' },
-  pvp_vcup_wins_25: { name: '野猪球传奇', title: '野猪球传奇' },
-  pvp_vcup_first_goal: { name: '首开纪录' },
-  pvp_vcup_hat_trick: { name: '帽子戏法' },
-  pvp_vcup_golden_goal: { name: '黄金一刻' },
-  pvp_vcup_first_save: { name: '一双稳手' },
-  pvp_vcup_clean_sheet: { name: '此路不通' },
-  pvp_vcup_guild_win: { name: '为了旗帜' },
-  pvp_fiesta_first_bout: { name: '不请自来' },
-  pvp_fiesta_first_win: { name: '狂欢之魂' },
-  pvp_fiesta_double: { name: '祸不单行' },
+  pvp_vcup_first_match: {
+    name: '踏上赛场',
+    desc: '在母猪场打完一场野猪球比赛，不论胜负。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_vcup_first_win: {
+    name: '首座奖杯',
+    desc: '赢得一场评级野猪球比赛。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_vcup_wins_10: {
+    name: '野猪球老手',
+    desc: '赢得 10 场评级野猪球比赛。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_vcup_wins_25: {
+    name: '野猪球传奇',
+    title: '野猪球传奇',
+    desc: '赢得 25 场评级野猪球比赛。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_vcup_first_goal: {
+    name: '首开纪录',
+    desc: '在评级野猪球比赛中射入一球。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_vcup_hat_trick: {
+    name: '帽子戏法',
+    desc: '在一场 3v3 或更高组别的评级野猪球比赛中射入三球。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_vcup_golden_goal: {
+    name: '黄金一刻',
+    desc: '射入决定评级野猪球比赛胜负的金球。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_vcup_first_save: {
+    name: '一双稳手',
+    desc: '在一场 3v3 或更高组别的评级野猪球比赛中担任守门员并完成一次扑救。只有足以考验接球手感的快速射门才计入，轻柔接球不计入。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_vcup_clean_sheet: {
+    name: '此路不通',
+    desc: '在一场 3v3 或更高组别的评级野猪球比赛中担任守门员，零封对手并获胜。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_vcup_guild_win: {
+    name: '为了旗帜',
+    desc: '在公会旗帜下参加并赢得一场评级野猪球比赛。野猪球比赛已不再开放，因此无法再新获得此成就。',
+  },
+  pvp_fiesta_first_bout: {
+    name: '不请自来',
+    desc: '完成一场 Fiesta 2v2 对局，不论胜负。Fiesta 对局已不再出现在竞技场队列中，因此无法再新获得此成就。',
+  },
+  pvp_fiesta_first_win: {
+    name: '狂欢之魂',
+    desc: '赢得一场 Fiesta 2v2 对局。Fiesta 对局已不再出现在竞技场队列中，因此无法再新获得此成就。',
+  },
+  pvp_fiesta_double: {
+    name: '祸不单行',
+    desc: '在四秒内完成两次 Fiesta 击倒。Fiesta 对局已不再出现在竞技场队列中，因此无法再新获得此成就。',
+  },
   pvp_fiesta_shutdown: {
+    desc: '击倒一名连胜三场或以上的 Fiesta 对手。Fiesta 对局已不再出现在竞技场队列中，因此无法再新获得此成就。',
     name: '扫兴大师',
   },
   pvp_fiesta_full_build: {
+    desc: '在三波中都锁定一项强化，并赢得一场 Fiesta 对局。Fiesta 对局已不再出现在竞技场队列中，因此无法再新获得此成就。',
     name: '盛装出席',
   },
   pvp_fiesta_powerups: {
+    desc: '至少各拾取一次四种圆环强化：速度恶魔、巨像、月靴和狂战士。Fiesta 对局已不再出现在竞技场队列中，因此无法再新获得此成就。',
     name: '样样来一份',
   },
-  pvp_fiesta_five_kills: { name: '全场我来扛' },
+  pvp_fiesta_five_kills: {
+    name: '全场我来扛',
+    desc: '在一场 Fiesta 对局中完成五次击倒。Fiesta 对局已不再出现在竞技场队列中，因此无法再新获得此成就。',
+  },
   soc_first_party: { name: '结伴同行', desc: '与另一名玩家组成队伍。' },
   soc_full_house: { name: '满堂彩', desc: '以五人满编队伍通关一座地下城。' },
   soc_guild_joined: { name: '同旗之下', desc: '成为一个公会的成员。' },
@@ -774,5 +824,38 @@ export const table: DeedLocaleTable = {
   col_set_bramblehide: {
     name: '鲁茨的荆棘皮甲',
     desc: '发现鲁茨的荆棘皮甲的每一个部件。',
+  },
+  col_deepest_cast: {
+    desc: '获得Clockreel鱼竿，这是唯一能钓到最深处鱼获的鱼竿。',
+    name: '最深一掷',
+  },
+  prog_first_planting: { desc: '在一块田畦里种下你的第一株作物。', name: '播种伊始' },
+  chr_vale_first_harvest: {
+    desc: '在东溪谷的一块田畦里采收你的第一株茁壮作物。',
+    name: '谷地初果',
+  },
+  chr_marsh_first_harvest: {
+    desc: '在泥沼湿地的一块田畦里采收你的第一株茁壮作物。',
+    name: '泥炭新芽',
+  },
+  chr_peaks_first_harvest: {
+    desc: '在荆峰高地的一块田畦里采收你的第一株茁壮作物。',
+    name: '峭壁间的收成',
+  },
+  chr_evergarden_first_harvest: {
+    desc: '在Evergarden的一块田畦里采收你的第一株茁壮作物。',
+    name: '乐土方寸田',
+  },
+  col_golden_harvest: { desc: '收获一次黄金丰收，让整个区域都听见消息。', name: '金色丰收' },
+  prog_farming_100: { desc: '耕作熟练度达到100点。', name: '丰收大师', title: '丰收大师' },
+  col_farm_roster: { desc: '采收四座花园种出的每一种作物。', name: '田垄无遗' },
+  prog_field_to_feast: {
+    desc: '烹饪一顿顶级盛宴，让整个团队都能在这桌上用餐。',
+    name: '从田间到盛宴',
+  },
+  prog_legendmaker: {
+    desc: '用造物契据将一件臻至完美的作品提升为传奇，并为它取一个独一无二的名字。',
+
+    name: '传奇缔造者',
   },
 };

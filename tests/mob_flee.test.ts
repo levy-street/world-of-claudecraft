@@ -148,10 +148,10 @@ describe('cowardly mobs flee at low HP', () => {
     const fleer = mobs[0];
     const ally = mobs.find((m) => m.id !== fleer.id)!;
     engageLowHp(sim, fleer, 'gravecaller_cultist', 0.12);
-    // Park the player far away (-x) so the idle ally cannot detect it on its own
+    // Park the player well away (-x, inside THREAT_DROP_RANGE) so the idle ally cannot detect it on its own
     // (idle proximity aggro reaches at most 20yd). That isolates the flee path: only
     // the flee rally can pull the ally. The fleer runs the opposite way (+x).
-    sim.player.pos = { x: fleer.pos.x - 200, z: fleer.pos.z, y: fleer.pos.y };
+    sim.player.pos = { x: fleer.pos.x - 60, z: fleer.pos.z, y: fleer.pos.y };
     sim.player.prevPos = { ...sim.player.pos };
     // an idle same-family ally a couple of yards down the escape lane: the fleer comes
     // within the 5yd social radius of it almost as soon as it starts running.
@@ -179,9 +179,9 @@ describe('cowardly mobs flee at low HP', () => {
     const mobs = wildMobs(sim);
     const fleer = mobs[0];
     engageLowHp(sim, fleer, 'gravecaller_cultist', 0.12);
-    // Park the player far away (-x); the fleer runs the opposite way (+x) down a lane.
+    // Park the player well away (-x, inside THREAT_DROP_RANGE); the fleer runs the opposite way (+x) down a lane.
     // Isolates the rally from idle proximity aggro (which reaches at most 20yd).
-    sim.player.pos = { x: fleer.pos.x - 200, z: fleer.pos.z, y: fleer.pos.y };
+    sim.player.pos = { x: fleer.pos.x - 60, z: fleer.pos.z, y: fleer.pos.y };
     sim.player.prevPos = { ...sim.player.pos };
     const near = mobs[1];
     const far = mobs[2];

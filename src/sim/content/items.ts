@@ -399,19 +399,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
-  // The store mount (content/store_mounts.ts): granted by a verified Claudium
-  // spend, never sold for copper and never dropped. SOULBOUND like the dev tank:
-  // a real-money grant that could trade hands would be an economy leak, and a
-  // lost paid mount is a support ticket. No buyValue: Claudium is not copper.
+  // Legacy reins: preserve the shipped item ID for saved bags and banks.
+  // The paid look now lives in mount_skins.ts; this souvenir is discardable
+  // and cannot grant a ride, currency, or cosmetic ownership.
   reins_mech_bird: {
     id: 'reins_mech_bird',
     name: 'Ignition Key: Cluckwork Mech Bird',
-    kind: 'mount',
-    mount: 'mech_bird',
+    kind: 'junk',
     quality: 'rare',
     soulbound: true,
     noVendorSell: true,
-    noDiscard: true,
     sellValue: 0,
   },
   // Developer-only mount. It is intentionally absent from vendors, quests,
@@ -429,16 +426,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
-  // Developer-only mount checkpoint. It deliberately has no acquisition path;
-  // use /dev mounts or /dev give reins_rallycart_rxt during visual review.
+  // Legacy cosmetic reins; same inert, discardable treatment as mech_bird.
   reins_rallycart_rxt: {
     id: 'reins_rallycart_rxt',
     name: 'Ignition Key: Rallycart RXT',
-    kind: 'mount',
-    mount: 'rallycart_rxt',
+    kind: 'junk',
     quality: 'epic',
     soulbound: true,
-    noDiscard: true,
+    noVendorSell: true,
     sellValue: 0,
   },
   // Developer-only mount, on the same terms as the tank above (DEVELOPER_MOUNTS
@@ -455,40 +450,34 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Legacy cosmetic reins; the spaceship is now a mount skin.
   reins_goblin_rocket_sled: {
     id: 'reins_goblin_rocket_sled',
     name: 'Ignition Key: Goblin Rocket Sled',
-    kind: 'mount',
-    mount: 'goblin_rocket_sled',
+    kind: 'junk',
     quality: 'epic',
     soulbound: true,
-    noDiscard: true,
+    noVendorSell: true,
     sellValue: 0,
   },
-  // Developer-only on the same terms (DEVELOPER_MOUNTS in content/mounts.ts):
-  // no vendor, quest, creature, heroic or Rift source, soulbound so a dev grant
-  // cannot be traded in. Use /dev mounts or /dev give reins_chimeglass_tortoise.
+  // Legacy cosmetic reins; retain old saves without granting paid ownership.
   reins_chimeglass_tortoise: {
     id: 'reins_chimeglass_tortoise',
     name: "Roadwarden's Bellstrap: Tolliver",
-    kind: 'mount',
-    mount: 'chimeglass_tortoise',
+    kind: 'junk',
     quality: 'epic',
     soulbound: true,
-    noDiscard: true,
+    noVendorSell: true,
     sellValue: 0,
   },
-  // Developer-only, same treatment as the tank above: no acquisition path, so
-  // it stays soulbound rather than tradable. Use /dev give reins_rickshaw_mount
-  // while the feature remains under development.
+  // Legacy cosmetic reins; the mount skin is an account entitlement.
   reins_rickshaw_mount: {
     id: 'reins_rickshaw_mount',
     name: 'Bound Reins: Bonebound Rickshaw',
-    kind: 'mount',
-    mount: 'rickshaw_mount',
+    kind: 'junk',
     quality: 'epic',
     soulbound: true,
-    noDiscard: true,
+    noVendorSell: true,
     sellValue: 0,
   },
   mistveil_cord: {

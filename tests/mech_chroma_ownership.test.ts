@@ -26,6 +26,7 @@ function makeHost(counts: Record<string, number> = {}): FakeHost {
       completedQuestIds: [],
       mechChromaIds: [],
       weaponSkinIds: [],
+      mountSkinIds: [],
       weaponSkinLoadout: {},
     },
     removed: [],

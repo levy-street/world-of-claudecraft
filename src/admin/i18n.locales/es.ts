@@ -1241,4 +1241,55 @@ export const es: Record<string, string> = {
   'realmBuilders.saveNew': 'Publicar',
   'realmBuilders.useNextMonth': 'El próximo mes',
   'realmBuilders.yearLabel': 'Año',
+  'error.clearItemNameAllLiteral': 'all debe ser el literal true',
+  'error.clearItemNameBagIndex': 'bag debe ser un número entero no negativo',
+  'error.clearItemNameBagPair':
+    'un objetivo de bolsa necesita tanto el índice de celda como su id de objeto',
+  'error.clearItemNameBagRange': 'bag debe ser un número entero entre {min} y {max}',
+  'error.clearItemNameCameOnline':
+    'el personaje se conectó antes de aplicar la retirada; expúlsalo y vuelve a intentarlo',
+  'error.clearItemNameLeased':
+    'el personaje tiene una sesión activa arrendada; expúlsalo (o espera a que caduque el arrendamiento) y vuelve a intentarlo',
+  'error.clearItemNameNoMatch': 'ninguna copia con nombre coincide con ese objetivo',
+  'error.clearItemNameOnline': 'el personaje está conectado en este mundo; desconéctalo primero',
+  'error.clearItemNameTargetForms':
+    'nombra exactamente un objetivo: una ranura equipada, una celda de bolsa o all: true',
+  'error.clearItemNameUnknownSlot': 'ranura de equipo desconocida',
+  'error.clearItemNameWentOffline':
+    'el personaje se desconectó antes de aplicar la retirada; vuelve a intentarlo',
+  'error.itemNameClearFailed': 'no se pudo borrar el nombre del objeto',
+  'loadFailure.forbiddenDetail':
+    'Tus roles de personal no incluyen el permiso que lee esta vista. Pide a un superadministrador que lo conceda y vuelve a cargar.',
+  'loadFailure.forbiddenTitle': 'Permiso denegado',
+  'marketMetrics.autoRefresh': 'Actualización automática ({seconds} s)',
+  'marketMetrics.bucketCompost': 'Abono',
+  'marketMetrics.bucketCores': 'Núcleos',
+  'marketMetrics.bucketEmpty': 'ninguna publicación activa',
+  'marketMetrics.bucketEssence': 'Esencia',
+  'marketMetrics.bucketPatterns': 'Patrones',
+  'marketMetrics.bucketProduce': 'Productos',
+  'marketMetrics.bucketSeeds': 'Semillas',
+  'marketMetrics.bucketSold':
+    'Vendidos en los últimos {days} días: {sales} ventas, {quantity} objetos, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} publicaciones, {quantity} unidades, {listed} de {tracked} objetos publicados',
+  'marketMetrics.colItem': 'Objeto',
+  'marketMetrics.colListings': 'Publicaciones',
+  'marketMetrics.colLowest': 'Mínimo (por unidad)',
+  'marketMetrics.colMedian': 'Mediana (por unidad)',
+  'marketMetrics.colQuantity': 'Cantidad',
+  'marketMetrics.empty': 'ninguna publicación activa en los lotes seguidos',
+  'marketMetrics.essenceNote':
+    'Estos materiales están ligados al alma y nunca se pueden publicar. Cualquier fila aquí indica que se rompió la invariante del depósito del mercado y requiere atención de ingeniería.',
+  'marketMetrics.hint':
+    'Publicaciones activas del Mercado Mundial para los lotes de suministro seguidos: lo que está en el libro ahora, no el volumen vendido. El servidor guarda esta lectura en caché durante unos 15 segundos.',
+  'marketMetrics.loadFailed': 'no se pudieron cargar las métricas del mercado',
+  'marketMetrics.loading': 'cargando…',
+  'marketMetrics.realm': 'Mundo: {realm}',
+  'marketMetrics.soldNone': 'Vendidos en los últimos {days} días: ninguno',
+  'marketMetrics.soldUnavailable':
+    'El volumen vendido no está disponible ahora, así que abajo solo se muestran las publicaciones activas.',
+  'moderationHistory.actionClearItemName': 'Nombre del objeto borrado',
+  'nav.marketMetrics': 'Métricas del mercado',
+  'poi.thornpeak_heights.7': 'Tiendas Juramentadas de la Nidada',
 };

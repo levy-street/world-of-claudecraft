@@ -229,11 +229,13 @@ describe('mob crowd cost: per-tick aggro-scan visits equal the grid product', ()
 
     // Steady state: only camp A still pays scan cost (4 x 3 = 12); the engaged camp
     // B wolves pay threat-walk cost instead (3 wolves x 1 hate-table entry, the bait
-    // seeded by aggroMob, walked once per engaged tick).
+    // seeded by aggroMob), walked twice per engaged tick: once by the mob AI's
+    // target pass (mob/targeting.ts) and once by the coordinator's engaged pass
+    // (combat/engaged_combat.ts, the hate-table combat hold), so 3 x 2 = 6.
     for (let t = 0; t < 5; t++) {
       sim.tick();
       expect(sim.mobScanCounters.aggroScanPlayerVisits).toBe(12);
-      expect(sim.mobScanCounters.threatEntryVisits).toBe(3);
+      expect(sim.mobScanCounters.threatEntryVisits).toBe(6);
     }
 
     for (const w of wolvesA) expect(w.aiState).toBe('idle');

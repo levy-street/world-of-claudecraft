@@ -757,13 +757,15 @@ describe('loot_roll: heroic-append cross-group dedup arm', () => {
     expect(problems).toEqual([]);
   });
 
-  it('never shares an item id with the same mob’s base loot table', () => {
+  it('never shares an item id with base loot that also rolls on Heroic', () => {
     const problems: string[] = [];
     for (const [mobId, heroicEntries] of Object.entries(HEROIC_BOSS_LOOT)) {
       const template = MOBS[mobId];
       if (!template) continue;
       const baseIds = new Set(
-        template.loot.flatMap((entry: LootEntry) => (entry.itemId ? [entry.itemId] : [])),
+        template.loot.flatMap((entry: LootEntry) =>
+          entry.itemId && !entry.normalOnly ? [entry.itemId] : [],
+        ),
       );
       for (const entry of heroicEntries) {
         if (entry.itemId && baseIds.has(entry.itemId)) {

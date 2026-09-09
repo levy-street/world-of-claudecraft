@@ -26,6 +26,7 @@ import {
   type QuestProgress,
   questObjectiveRequired,
 } from '../types';
+import { completeForgebreakerCraftQuest } from './forgebreaker_ember';
 import { ownedItemCount } from './quest_owned_count';
 
 /** The one questProgress emit: `${label}: ${cur}/${req}` text (matched by the
@@ -94,6 +95,7 @@ export function onRecipeCraftedForQuests(
     meta,
     (objective) => objective.type === 'craft' && objective.recipeId === recipeId,
   );
+  completeForgebreakerCraftQuest(ctx, recipeId, meta);
 }
 
 /** Credit a gather objective only after the node's authoritative grant succeeds. */

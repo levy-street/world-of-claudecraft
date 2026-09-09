@@ -41,6 +41,7 @@ function world(bodies: Entity[], over: { dead?: boolean; targetId?: number | nul
     player,
     playerId: ME,
     partyInfo: null,
+    inventory: [{ itemId: 'field_kit', count: 1 }],
     entities: new Map<number, Entity>([
       [player.id, player],
       ...bodies.map((b): [number, Entity] => [b.id, b]),
@@ -118,4 +119,10 @@ describe('pickHarvestBody', () => {
   it('names nothing for a dead viewer', () => {
     expect(pickHarvestBody(world([corpse(2, 1)], { dead: true }))).toBeNull();
   });
+});
+
+it('offers no corpse choice without a carried field kit', () => {
+  const w = world([corpse(2, 1)]);
+  expect(pickHarvestBody({ ...w, inventory: [] })).toBeNull();
+  expect(pickHarvestBody({ ...w, inventory: [{ itemId: 'field_kit', count: 0 }] })).toBeNull();
 });

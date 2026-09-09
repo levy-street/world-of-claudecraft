@@ -7,6 +7,10 @@ source for the music editor and the offline render pipeline); the shipped game
 streams the remastered mp3 renders under `public/audio/music/` (catalog:
 `src/game/music_tracks.ts`).
 
+The Crucible uses a separate set of [final floor soundtracks](crucible-floor-soundtrack.md)
+that continue through combat. These owner-provided productions are not generated
+by the procedural render pipeline below.
+
 ## The cues
 
 Overworld zones (played by `musicZoneForLocation` via the zone's biome, or a

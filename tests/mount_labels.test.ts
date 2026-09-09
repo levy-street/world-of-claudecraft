@@ -3,7 +3,12 @@ import { MOUNT_KEYS } from '../src/sim/content/mounts';
 import { ITEMS } from '../src/sim/data';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
-import { MOUNT_DESC_KEYS, MOUNT_NAME_KEYS, mountDisplayName } from '../src/ui/mount_labels';
+import {
+  MOUNT_DESC_KEYS,
+  MOUNT_NAME_KEYS,
+  mountDisplayName,
+  mountSkinDescription,
+} from '../src/ui/mount_labels';
 
 afterEach(() => setLanguage('en'));
 
@@ -24,7 +29,7 @@ describe('mount label maps', () => {
     expect(
       ['mech_bird', 'lanternback_troll', 'chimeglass_tortoise'].map((key) => ({
         name: mountDisplayName(key),
-        description: t(MOUNT_DESC_KEYS[key]),
+        description: MOUNT_DESC_KEYS[key] ? t(MOUNT_DESC_KEYS[key]) : mountSkinDescription(key),
       })),
     ).toEqual([
       {

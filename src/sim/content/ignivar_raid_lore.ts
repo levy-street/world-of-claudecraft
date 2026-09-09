@@ -68,9 +68,10 @@ export const IGNIVAR_RAID_LORE_NPCS: Record<string, NpcDef> = {
   },
 };
 
-const DEV_RAID_QUEST = {
-  xpReward: 0,
-  copperReward: 0,
+// Match the established level-20 endgame milestone reward (q_gravewyrm).
+const RAID_QUEST = {
+  xpReward: 5300,
+  copperReward: 25000,
   itemRewards: {},
   minLevel: 20,
   suggestedPlayers: 10,
@@ -79,7 +80,7 @@ const DEV_RAID_QUEST = {
 
 export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
   [IGNIVAR_LORE_QUEST_IDS.echoesInIron]: {
-    ...DEV_RAID_QUEST,
+    ...RAID_QUEST,
     id: IGNIVAR_LORE_QUEST_IDS.echoesInIron,
     giverNpcId: IGNIVAR_MAELIN_NPC_ID,
     turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
@@ -104,7 +105,7 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
     ],
   },
   [IGNIVAR_LORE_QUEST_IDS.heraldsHeart]: {
-    ...DEV_RAID_QUEST,
+    ...RAID_QUEST,
     id: IGNIVAR_LORE_QUEST_IDS.heraldsHeart,
     giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
     turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
@@ -124,7 +125,7 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
     requiresQuest: IGNIVAR_LORE_QUEST_IDS.echoesInIron,
   },
   [IGNIVAR_LORE_QUEST_IDS.forgefather]: {
-    ...DEV_RAID_QUEST,
+    ...RAID_QUEST,
     id: IGNIVAR_LORE_QUEST_IDS.forgefather,
     giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
     turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
@@ -143,14 +144,14 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
     requiresQuest: IGNIVAR_LORE_QUEST_IDS.heraldsHeart,
   },
   [CRUCIBLE_HAMMER_QUEST_IDS.requiem]: {
-    ...DEV_RAID_QUEST,
+    ...RAID_QUEST,
     id: CRUCIBLE_HAMMER_QUEST_IDS.requiem,
     giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
     turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
     name: "The Forgefather's Requiem",
-    text: 'Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.',
+    text: 'Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.',
     completionText:
-      'It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.',
+      'It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.',
     rev: 1,
     objectives: [
       {
@@ -166,12 +167,12 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
     recipeReward: 'recipe_varkhul_forgebreaker',
   },
   [CRUCIBLE_HAMMER_QUEST_IDS.forging]: {
-    ...DEV_RAID_QUEST,
+    ...RAID_QUEST,
     id: CRUCIBLE_HAMMER_QUEST_IDS.forging,
     giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
     turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
     name: 'Requiem at the Forge',
-    text: 'Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.',
+    text: 'Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.',
     completionText:
       "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
     rev: 1,

@@ -759,7 +759,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': '준비 확인이 이미 진행 중입니다.',
   'entities.abilities.collective_reversal.name': '집단 역행',
   'entities.abilities.collective_reversal.description':
-    '그룹 또는 공격대에서 사망한 모든 구성원의 시간선을 되돌려 시체 옆에서 생명력과 마나가 30%인 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)',
+    '그룹 또는 공격대에서 40야드 내 시야가 닿는 사망한 모든 구성원의 시간선을 되돌려 당신 곁에서 생명력과 마나가 30%인 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)',
   'entities.abilities.temporal_hourglass.name': '정지의 모래시계',
   'entities.abilities.temporal_hourglass.description':
     '선택한 위치에 시간의 모래시계를 놓습니다. 적의 발밑에서는 PvE에서 {hostilePveDuration}초, PvP에서 {hostilePvpDuration}초 동안 정지시키며 피해를 받으면 해제됩니다. 자신이나 파티 아군의 발밑에서는 {duration}초 동안 정지 상태가 되어 피해에 면역이고 행동할 수 없으며, 최대 생명력의 {healing}%를 회복합니다. 자신의 재사용 대기시간은 {selfCooldownRecovery}%, 아군의 재사용 대기시간은 {allyCooldownRecovery}% 더 빠르게 회복됩니다. 빈 지면에 놓으면 {groundDuration}초 동안 유지되며 처음 밟은 유효한 대상에게 적용됩니다. 이로운 효과는 직접 해제할 수 있습니다.',
@@ -1234,7 +1234,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.billboard.result.notOfficer':
     '게시판은 임원과 길드 마스터만 수정할 수 있습니다.',
   'hudChrome.social.roster.seats': '{count} / {cap} 자리',
-  'hudChrome.social.roster.expand': '명단 확장 (+{seats}자리, {price})',
+  'hudChrome.social.roster.expand': '명단 확장',
   'hudChrome.social.roster.maxed': '명단이 이미 최대 규모입니다',
   'hudChrome.social.roster.confirm':
     '{price}(으)로 길드 명단을 {seats}자리 확장하시겠습니까? 골드는 본인의 소지금에서 차감되며 환불되지 않습니다.',
@@ -11802,7 +11802,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '시간의 메아리를 파티에 연쇄시켜 대상과 가장 가까운 아군 최대 네 명을 즉시 치유하고 각각에게 {duration}초 동안 징표를 남깁니다. 자신이 입힌 비전 피해의 일부가 메아리를 타고 돌아와 징표가 있는 아군을 치유합니다. (시간술)',
   'entities.abilities.temporal_reversal.name': '시간 역전',
   'entities.abilities.temporal_reversal.description':
-    '쓰러진 아군의 시간선을 되돌려, 전투 중에도 시체가 있는 자리에서 생명력과 마나의 일부를 지닌 채 되살립니다. (시간술)',
+    '쓰러진 아군의 시간선을 되돌려, 전투 중에도 당신 곁에서 생명력과 마나의 35%를 지닌 채 되살립니다. (시간술)',
   'entities.abilities.temporal_rewind.name': '되감기',
   'entities.abilities.temporal_rewind.description':
     '파티 또는 공격대에 비전 파동을 보내 시간을 되감습니다. 40미터 내 각 아군이 지난 5초 동안 받은 피해의 30%를 회복시킵니다(최대 생명력의 35%까지). 이 효과는 치명타로 발동하지 않습니다. (시간술)',
@@ -13648,7 +13648,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.title': '세계 지도',
   'hudChrome.continentMap.summary': '세계 지도. 지역을 선택하면 해당 지도가 열립니다.',
   'hudChrome.continentMap.toWorld': '세계 지도',
-  'hudChrome.continentMap.toggleAria': '세계 지도와 지역 지도 전환',
+  'hudChrome.continentMap.toggleAria': '세계 지도, 지역 지도, 인스턴스 지도 전환',
   'hudChrome.continentMap.levels': '레벨 {min}부터 {max}까지',
   'hudChrome.continentMap.toZone': '지역 지도',
   'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
@@ -13986,7 +13986,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.specNote_subtlety':
     '황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 어느 각도에서든 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸이고, 두 배의 피해를 입힙니다.',
   'entities.abilities.ancestor_return.description':
-    '파티 또는 공격대에서 쓰러진 모든 구성원을 시체가 있는 곳에서 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (영혼치유사)',
+    '파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (영혼치유사)',
   'entities.abilities.ancestor_return.name': '선조의 귀환',
   'entities.abilities.army_of_the_dead.description':
     '무덤 차원문을 열어 선택한 지배 하수인에 더해 해골 전사, 뼈 마법사, 무덤날개를 20초 동안 임시로 일으킵니다.',
@@ -14199,7 +14199,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '영혼 조각 2개를 소모해 모든 언데드 하수인이 일제히 공격하게 합니다. 무덤수호병은 도발하고 방어하며, 해골 전사는 발을 묶고, 뼈 마법사는 마법 방어를 노출하며, 무덤날개는 적중한 모든 적을 찢습니다.',
   'entities.abilities.reaping_command.name': '수확의 명령',
   'entities.abilities.recall_the_fallen.description':
-    '죽은 파티원을 생명력과 마나가 35%인 상태로 되살립니다.',
+    '죽은 파티원을 당신 곁에서 생명력과 마나가 35%인 상태로 되살립니다. 레벨 16 이상의 태양 치유사는 대신 파티에서 30야드 내 시야가 닿는 쓰러진 모든 구성원을 불러 되살립니다.',
   'entities.abilities.recall_the_fallen.name': '쓰러진 자 소환',
   'entities.abilities.redharvest.description':
     '오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히며, 두 출혈 효과를 제거하고 기력을 {rage}만큼 회복합니다. 연계 점수가 없어도 사용할 수 있습니다.',
@@ -15301,7 +15301,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.hunterFerocity':
     '무리의 흉포함 {stacks}중첩: 야수가 입히는 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.icicles':
-    '고드름 {value}/{max}개. {max}개면 빙하 쐐기를 사용할 수 있습니다',
+    '고드름 {value}/{max}개. {max}개면 서리 바늘을 사용할 수 있습니다',
   'hudChrome.auraEffect.internalCooldown': '타이머가 끝날 때까지 이 효과가 다시 발동하지 않습니다',
   'hudChrome.auraEffect.leadenHexLock':
     '납빛 주술이 아직 이 대상을 다시 이동 불가로 만들 수 없습니다',
@@ -15348,7 +15348,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     '단일 대상 공격이 주변 적 {targets}명에게도 {pct}% 피해를 줍니다',
   'hudChrome.auraEffect.temporalEcho':
-    '시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다',
+    '시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다. 에테르 쇄도와 에테르 화살은 개별 시간의 메아리에 4배 보너스를 적용합니다. 집단 메아리는 같은 양의 치유 예비량을 만들고, 체력이 60% 미만인 표식이 있는 아군에게 잃은 생명력에 따라 나눠 줍니다',
   'hudChrome.auraEffect.veiledEdge': '다음 잠복자의 일격이 두 배의 피해를 입힙니다',
   'hudChrome.auraEffect.veiledEdgeStrike':
     '다음 잠복자의 일격이 입히는 무기 피해가 {pct}% 증가합니다',
@@ -16673,6 +16673,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.lootExplorer': '전리품 탐색기',
   'hudChrome.mounts.desc_goblin_rocket_sled':
     '위험할 정도로 과하게 만들어진 고블린 썰매. 쌍발 로켓과 형편없는 판단력으로 내달린다.',
+  'hudChrome.mounts.desc_rallycart_skin': '작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.',
   'hudChrome.mounts.desc_rallycart_rxt': '작지만 본격적인 랠리 머신. 이동 속도를 높여준다.',
   'hudChrome.mounts.name_goblin_rocket_sled': '고블린 로켓 썰매',
   'hudChrome.mounts.name_rallycart_rxt': '랠리카트 RXT',
@@ -16695,4 +16696,59 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'loading.kickedByModerator': '운영자가 연결을 끊었습니다: {reason}',
   'loading.rendererContextLost':
     '3D 렌더러가 그래픽 컨텍스트를 잃어 복구할 수 없습니다. 새로고침해 보세요.',
+
+  'hudChrome.wocStore.mountSkinType': '탈것 스킨',
+  'hudChrome.cosmetics.title': '외형',
+  'hudChrome.cosmetics.close': '외형 닫기',
+  'hudChrome.cosmetics.tabsLabel': '외형 구역',
+  'hudChrome.cosmetics.tabMounts': '탈것',
+  'hudChrome.cosmetics.tabSkins': '스킨',
+  'hudChrome.cosmetics.tabMech': '메카',
+  'hudChrome.cosmetics.legend': '계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.',
+  'hudChrome.cosmetics.scopeAccount': '계정',
+  'hudChrome.cosmetics.scopeCharacter': '캐릭터',
+  'hudChrome.cosmetics.wear': '착용',
+  'hudChrome.cosmetics.takeOff': '벗기',
+  'hudChrome.cosmetics.worn': '착용 중',
+  'hudChrome.cosmetics.apply': '적용',
+  'hudChrome.cosmetics.detach': '해제',
+  'hudChrome.cosmetics.applied': '적용됨',
+  'hudChrome.cosmetics.owned': '보유 중',
+  'hudChrome.cosmetics.storeOnly': 'WOC 상점에서 구매 가능',
+  'hudChrome.cosmetics.cardAria': '{name}, {rarity}',
+  'hudChrome.cosmetics.mountsNoMount': '먼저 탈것을 얻으세요. 스킨에는 탈 대상이 필요합니다.',
+  'hudChrome.cosmetics.skinsEmpty': '아직 보유한 무기 스킨이 없습니다. WOC 상점을 방문하세요.',
+  'hudChrome.cosmetics.skinsApplyHint': '{type}을(를) 장착하면 이 스킨을 적용할 수 있습니다.',
+  'hudChrome.cosmetics.mechEmpty': '아직 보유한 전투 메카 크로마가 없습니다.',
+  'hudChrome.cosmetics.mountsIntro':
+    '탈것 스킨은 이 캐릭터가 타는 어떤 탈것 위에도 덧입혀집니다. 속도는 바뀌지 않습니다.',
+  'hudChrome.cosmetics.mechIntro':
+    '전투 메카는 이 캐릭터의 몸을 대체합니다. 한 번에 하나의 크로마만 착용합니다.',
+  'hudChrome.auraTracks.mode': '켜짐',
+  'hudChrome.auraTracks.row': '{unit}에게 {aura} 적용',
+  'hudChrome.auraTracks.selfRow': '{aura}',
+  'hudChrome.crafting.oncePerDay': '하루 한 번',
+  'hudChrome.masterwrought.slotsValue': '{used} / {cap}',
+  'hudChrome.meters.millions': '{value}m',
+  'hudChrome.meters.thousands': '{value}k',
+  'hudChrome.practiceDps.liveDps': '{value} DPS',
+  'hudChrome.practiceDps.liveLabel': '이번 연습',
+  'hudChrome.practiceDps.runLabel': '{index}번째 연습',
+  'hudChrome.practiceDps.runSummary': '{time} 동안 {total}',
+
+  'entities.abilities.grove_awakening.description':
+    '파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (회복)',
+  'entities.abilities.grove_awakening.name': '숲의 각성',
+  'entities.abilities.prayer_of_returning.description':
+    '파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (신성 및 수양)',
+  'entities.abilities.prayer_of_returning.name': '귀환의 기도',
+  'entities.abilities.wildwake.description':
+    '쓰러진 아군을 갑작스러운 개화로 이끌어, 치열한 전투 중에도 생명력과 마나 35%로 당신 곁에 되살립니다. (회복)',
+  'entities.abilities.wildwake.name': '야생의 소생',
+
+  'devCommand.actions.farmgrow.description':
+    '심어 둔 모든 경작지 또는 ID로 지정한 경작지 하나를 수확 가능한 시점까지 진행시킵니다. 그 외에는 바뀌지 않습니다. 수확 결과는 심을 때 이미 무작위로 결정되었습니다.',
+  'devCommand.actions.farmgrow.label': '작물 익히기',
+  'devCommand.fields.bed': '경작지 ID (선택 사항)',
+  'guide.profPages.oncePerDay': '하루 한 번',
 };

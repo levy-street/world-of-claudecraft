@@ -358,6 +358,14 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyO'],
   },
+  // Cosmetics uses Shift+Y; Shift+K belongs to the Harvest Journal.
+  {
+    id: 'cosmetics',
+    label: 'Cosmetics',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyY'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',

@@ -297,15 +297,73 @@ jobs:
           restore-keys: |
             electron-builder-${{ runner.os }}-
 
-      # CSC_LINK is the base64 .p12 (electron-builder consumes it directly);
-      # the App Store Connect API key must be a file on disk, so the .p8
-      # secret content is written to the runner temp dir and APPLE_API_KEY
-      # points at it. Signing and notarization then activate automatically in
-      # scripts/electron-build.mjs / electron-builder.
-      - name: Build signed and notarized macOS desktop artifacts
+      # electron-builder 26.15.7 imports CSC_LINK into a keychain of its own and
+      # then runs `security set-key-partition-list -k` with the CERTIFICATE
+      # password instead of the keychain password. The macOS 26.6 runner image
+      # (20260831) rejects that call ("SecKeychainUnlock: The user name or
+      # passphrase you entered is not correct") where 26.5 let it through;
+      # electron-builder fixed it in 26.16.1 ("use keychain password for
+      # set-key-partition-list"). Until that bump lands (it moves pnpm-lock.yaml,
+      # which re-mints every GLB seal), this step owns the keychain: it imports
+      # the .p12 with the right passwords, adds electron-builder's bundled Apple
+      # root keychain to the search list exactly as its createKeychain would, and
+      # hands electron-builder the result through CSC_KEYCHAIN plus the identity
+      # name through CSC_NAME (scripts/electron-build.mjs treats CSC_NAME as the
+      # real-signing signal). The build step deliberately does NOT receive
+      # CSC_LINK: with it set, electron-builder would create its own keychain
+      # again and fail the same way.
+      - name: Import the signing certificate into a temporary keychain
         env:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          keychain="$RUNNER_TEMP/woc-signing.keychain-db"
+          keychain_password="$(openssl rand -base64 24)"
+          cert="$RUNNER_TEMP/csc.p12"
+          # CSC_LINK is the base64 .p12 (docs/desktop-release.md, "Publishing from
+          # CI"); an optional data: URI prefix is stripped, and the path/URL forms
+          # electron-builder also accepts are refused because this step does not fetch.
+          case "$CSC_LINK" in
+            http://*|https://*|file:*|/*)
+              echo "CSC_LINK must be the base64 .p12 for the keychain import step" >&2
+              exit 1 ;;
+          esac
+          printf '%s' "${CSC_LINK#data:*;base64,}" | base64 --decode > "$cert"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$cert" -k "$keychain" -P "$CSC_KEY_PASSWORD" \
+            -T /usr/bin/codesign -T /usr/bin/productbuild -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain"
+          rm -f "$cert"
+          root_certs="$(find node_modules -name root_certs.keychain -path '*/app-builder-lib/certs/*' -print -quit)"
+          if [ -z "$root_certs" ]; then
+            echo "app-builder-lib's bundled root_certs.keychain was not found under node_modules" >&2
+            exit 1
+          fi
+          cp "$root_certs" "$RUNNER_TEMP/electron-builder-root-certs.keychain"
+          existing="$(security list-keychains -d user | tr -d '" ')"
+          # shellcheck disable=SC2086
+          security list-keychains -d user -s "$keychain" "$RUNNER_TEMP/electron-builder-root-certs.keychain" $existing
+          # electron-builder wants the name WITHOUT the "Developer ID Application:"
+          # prefix (it refuses the prefixed form and picks the certificate type itself).
+          identity="$(security find-identity -v -p codesigning "$keychain" \
+            | sed -n 's/.*"Developer ID Application: \([^"]*\)".*/\1/p' | head -n 1)"
+          if [ -z "$identity" ]; then
+            echo "No valid Developer ID Application identity in the imported certificate" >&2
+            security find-identity -p codesigning "$keychain" >&2 || true
+            exit 1
+          fi
+          echo "CSC_KEYCHAIN=$keychain" >> "$GITHUB_ENV"
+          echo "CSC_NAME=$identity" >> "$GITHUB_ENV"
+
+      # The App Store Connect API key must be a file on disk, so the .p8 secret
+      # content is written to the runner temp dir and APPLE_API_KEY points at it.
+      # Signing (CSC_KEYCHAIN and CSC_NAME from the step above) and notarization
+      # then activate automatically in scripts/electron-build.mjs / electron-builder.
+      - name: Build signed and notarized macOS desktop artifacts
+        env:
           APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}

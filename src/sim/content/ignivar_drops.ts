@@ -16,6 +16,7 @@ export const IGNIVAR_DROP_ITEMS: Record<string, ItemDef> = {
     kind: 'quest',
     quality: 'epic',
     questId: 'q_forgefathers_requiem',
+    use: { type: 'forgebreakerEmber' },
     soulbound: true,
     noDiscard: true,
     noVendorSell: true,

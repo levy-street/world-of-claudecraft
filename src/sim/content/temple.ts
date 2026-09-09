@@ -249,7 +249,7 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 14,
     loot: [
       { copper: 700, chance: 1 },
-      { itemId: 'selthes_seastriders', chance: 0.4 },
+      { itemId: 'selthes_seastriders', chance: 0.4, normalOnly: true },
       { itemId: 'briny_idol', chance: 0.5 },
     ],
     scale: 1.15,
@@ -298,11 +298,16 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     enrage: { belowHpPct: 0.3, dmgMult: 1.4, hasteMult: 1.3 },
     loot: [
       { copper: 6000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
-      { itemId: 'ysols_pearl_greaves', chance: 0.5 },
+      { itemId: 'ysols_pearl_greaves', chance: 0.5, normalOnly: true },
       // exclusive "one of three" blue chests (weights sum to 1.0)
-      { itemId: 'moonshroud_breastplate', chance: 0.34, rollGroup: 'ysolei_blue' },
-      { itemId: 'moonshroud_robe', chance: 0.33, rollGroup: 'ysolei_blue' },
-      { itemId: 'moonshroud_tunic', chance: 0.33, rollGroup: 'ysolei_blue' },
+      {
+        itemId: 'moonshroud_breastplate',
+        chance: 0.34,
+        rollGroup: 'ysolei_blue',
+        normalOnly: true,
+      },
+      { itemId: 'moonshroud_robe', chance: 0.33, rollGroup: 'ysolei_blue', normalOnly: true },
+      { itemId: 'moonshroud_tunic', chance: 0.33, rollGroup: 'ysolei_blue', normalOnly: true },
     ],
     scale: 1.65,
     color: 0xbcd2ec,

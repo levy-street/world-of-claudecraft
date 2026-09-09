@@ -38,7 +38,9 @@ describe('heroic loot flair: variant generation', () => {
     const fiveManBossVariantIds = new Set(
       Object.entries(HEROIC_BOSS_LOOT)
         .filter(([bossId]) => bossId !== NYTHRAXIS_RAID_BOSS_ID)
-        .flatMap(([, entries]) => entries.flatMap((e) => (e.itemId ? [e.itemId] : []))),
+        .flatMap(([, entries]) =>
+          entries.flatMap((e) => (e.itemId && !e.preserveSourceTier ? [e.itemId] : [])),
+        ),
     );
     const all = variants();
     expect(all.length).toBeGreaterThan(0);

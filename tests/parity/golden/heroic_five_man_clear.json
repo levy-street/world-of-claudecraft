@@ -6,12 +6,12 @@
   "coverage": [
     "a heroic FIVE-MAN claim: setDungeonDifficulty heroic + enterDungeon per member sharing one instance (instanceKeyFor), the five-man counterpart of the raid claim above",
     "rollLoot HEROIC arm on a five-man final boss: the base-table walk, then the appended HEROIC_BOSS_LOOT draws in the SAME call",
-    "heroicItem(): base drops swapped IN PLACE for their heroic variants at the FIVE-MAN tier (HEROIC_VARIANT_SOURCE_LEVEL), the arm the raid claim cannot reach",
-    "awardHeroicMarks on a five-man heroic kill: marksPerParticipant to every participant, plus the hollow_crypt:heroic daily lockout",
+    "Normal-only base equipment skipped; one combined heroic partition preserves the existing base-variant and bespoke item tiers",
+    "awardHeroicMarks on a five-man heroic kill: marksPerParticipant to every participant, plus the gravewyrm_sanctum:heroic daily lockout",
     "class:warrior"
   ],
-  "draws": 65,
-  "drawDigest": "00a5e257",
+  "draws": 62,
+  "drawDigest": "86e69dc4",
   "frames": [
     {
       "tick": 0,
@@ -746,11 +746,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1033,
-      "state": "6ab7b12b",
-      "events": "23dcd40a",
+      "state": "b1ce9c79",
+      "events": "5fce258b",
       "rng": {
-        "draws": 65,
-        "digest": "00a5e257"
+        "draws": 62,
+        "digest": "86e69dc4"
       },
       "label": "death",
       "players": [
@@ -960,7 +960,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1770,
+            "damageTaken": 1542,
             "deaths": 1,
             "xpGained": 98
           },
@@ -1954,19 +1954,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "revenant_silk_robe"
-              },
-              {
-                "count": 1,
-                "itemId": "heroic_wildgrowth_leggings"
-              },
-              {
-                "count": 1,
-                "itemId": "sanctum_prowlers_grips"
-              },
-              {
-                "count": 1,
-                "itemId": "gravewyrm_claws"
+                "itemId": "gravewyrm_cleaver"
               }
             ]
           },
@@ -2016,11 +2004,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1033,
-      "state": "6ab7b12b",
+      "state": "b1ce9c79",
       "events": "741638a5",
       "rng": {
-        "draws": 65,
-        "digest": "00a5e257"
+        "draws": 62,
+        "digest": "86e69dc4"
       },
       "label": "final",
       "players": [
@@ -2230,7 +2218,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1770,
+            "damageTaken": 1542,
             "deaths": 1,
             "xpGained": 98
           },
@@ -3224,19 +3212,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "revenant_silk_robe"
-              },
-              {
-                "count": 1,
-                "itemId": "heroic_wildgrowth_leggings"
-              },
-              {
-                "count": 1,
-                "itemId": "sanctum_prowlers_grips"
-              },
-              {
-                "count": 1,
-                "itemId": "gravewyrm_claws"
+                "itemId": "gravewyrm_cleaver"
               }
             ]
           },

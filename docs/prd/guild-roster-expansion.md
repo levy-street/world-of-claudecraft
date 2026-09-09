@@ -151,10 +151,13 @@ fan-out by it.
 ## What the player sees
 
 The Guild tab shows the roster count against the guild's cap ("37 of 100
-seats"). The Guild Master sees an "Expand roster (+20 seats for 20g)" button in
-the tab footer that opens the shared confirm prompt (the gold is theirs and is
-not refunded); once the ladder is complete the button reads "The roster is at
-its largest size" and is disabled. Everyone else sees only the count.
+seats"). The Guild Master sees an "Expand roster" button leading the tab's
+footer row (the disband / leave button ends the same row) that opens the shared
+confirm prompt; the prompt carries the seat count and the page price as a
+coin-icon readout with bare digits (gold and silver glyphs, no "g" / "s" and no
+thousands separators), and says the gold is theirs and is not refunded. Once
+the ladder is complete the button reads "The roster is at its largest size" and
+is disabled. Everyone else sees only the count.
 
 ## Follow-ups (not in the first change)
 

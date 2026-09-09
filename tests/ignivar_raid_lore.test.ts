@@ -87,8 +87,8 @@ describe('Ignivar raid lore content', () => {
         shareable: false,
         minLevel: 20,
         suggestedPlayers: 10,
-        xpReward: 0,
-        copperReward: 0,
+        xpReward: 5300,
+        copperReward: 25000,
         itemRewards: {},
       });
     }
@@ -119,8 +119,6 @@ describe('Ignivar raid lore content', () => {
     expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].npcs).toEqual([
       { npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 },
       { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: 48 },
-      // The sigil-redemption vendor beside the entrance (content/ignivar_loot.ts).
-      { npcId: 'crucible_quartermaster', x: 6, z: -47 },
     ]);
     expect(DUNGEONS[IGNIVAR_RAID_ARENA_ID].npcs).toEqual([
       { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 10, z: 24, facing: Math.PI },

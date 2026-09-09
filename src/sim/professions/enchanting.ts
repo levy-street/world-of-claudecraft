@@ -602,6 +602,7 @@ export function beginEnchantFamilyCast(
   }
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   const duration = ENCHANT_FAMILY_CAST_DURATION_SEC;
   p.castingAbility = castId;
   p.castTotal = duration;

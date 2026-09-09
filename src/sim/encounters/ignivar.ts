@@ -1613,7 +1613,6 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
   let players = allPlayers.filter((player) => !player.dead);
   if (players.length === 0) {
     boss.aiState = 'evade';
-    if (boss.combatExitHoldUntil > ctx.time) return;
     for (const playerId of boss.ignivar?.attemptParticipantIds ?? []) {
       const player = ctx.entities.get(playerId);
       const meta = ctx.players.get(playerId);

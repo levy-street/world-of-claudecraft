@@ -14,9 +14,9 @@ import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
+import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
-import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   DELVES,
@@ -109,12 +109,14 @@ import {
   type StableTimerWireVersion,
 } from '../src/world_api';
 import { sameAppearance } from '../src/world_api/appearance';
+import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
+import { AccountCosmeticsService } from './account_cosmetics_service';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
 import type { BackgroundDbGate } from './background_db_gate';
-import { type GuildBankLedgerOp, recordGuildBankEscrowRollback } from './bank_ledger';
+import type { GuildBankLedgerOp } from './bank_ledger';
 import type { BankLedgerProjectionSurface } from './bank_ledger_admission';
 import { BankLedgerGrowthLimitExceeded } from './bank_ledger_growth_budget';
 import {
@@ -194,6 +196,7 @@ import {
   closePlaySession,
   GUILD_BANK_ROW_MAX_BYTES,
   grantAccountMechChroma,
+  grantAccountMountSkins,
   grantAccountWeaponSkins,
   heartbeatCharacterLeases,
   insertChatLogs,
@@ -267,6 +270,7 @@ import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
+import { handleGuildBankEscrowRefusal as handleEscrowRefusal } from './guild_bank_escrow_refusal';
 import { createGuildBankLazyLoader, type GuildBankLazyLoader } from './guild_bank_lazy_loader';
 import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
 import { deliverGuildBankLog } from './guild_bank_log_delivery';
@@ -281,6 +285,7 @@ import {
   createGuildBankOpGuard,
   type GuildBankOpGuardState,
 } from './guild_bank_op_guard';
+import type { GuildBankOpRequest, GuildBookDependency } from './guild_bank_settle_gate';
 import {
   collectGuildBankDeltas,
   // Imported from the module that DEFINES it, never through ./db: every test
@@ -290,6 +295,7 @@ import {
   type GuildBankWriteResult,
   loadGuildBanksIntoSim,
 } from './guild_bank_state';
+import { GuildBookHolderIndex, requestGuildBookFlush } from './guild_book_holders';
 import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
 import { buyGuildRosterPageAtomic } from './guild_roster_page_db';
 import { guildRosterTransport } from './guild_roster_transport';
@@ -341,6 +347,7 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
+import { wornMountSkinAllowed } from './mount_skin_reconcile';
 import { MovementInputTimelineTickStats } from './movement_input_timeline_stats';
 import {
   applyMovementInputFrame,
@@ -1079,6 +1086,9 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   // only bounds how long a session waits for the other officer's commit before
   // it is rolled back and disconnected instead.
   guildBankDeficitSkips: Map<number, number>;
+  // Coalesced holder flush state (server/guild_book_holders.ts).
+  guildBookFlushInFlight: boolean;
+  guildBookFlushRearm: boolean;
   // Set once this session's book work can never become durable and its live
   // state has therefore been abandoned. A quarantined session persists
   // NOTHING, ever again: its character half is the half that would carry the
@@ -1249,6 +1259,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
+  if (e.mountSkinId) out.msk = e.mountSkinId; // worn mount-skin cosmetic (render-only, like wsk)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
@@ -1574,7 +1585,11 @@ export class GameServer {
   private activityDeps: ActivityDetectDeps<ClientSession> | null = null; // built lazily once
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
   private readonly storageRecoverySweep = new RecoverySweep(this.sessionsByCharacterId);
-  private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
+  private readonly cosmetics = new AccountCosmeticsService({
+    sim: () => this.sim,
+    sessions: () => this.clients.values(),
+    resyncQuests: (session) => this.resyncQuests(session as ClientSession),
+  });
   private readonly bankVaultLedgerGuardCoordinator: BankVaultLedgerGuardCoordinator =
     createBankVaultLedgerGuardCoordinator(() => Date.now() / 1000, {
       // Sized from the resolved realm player cap; cap<=0 (disabled) keeps the floor.
@@ -1656,10 +1671,12 @@ export class GameServer {
   // One FIFO per character id: every durable LIVE-SESSION character write
   // rides it, so commit order is enqueue order (exceptions: server/CLAUDE.md).
   readonly characterSaveQueues = createKeyedSerialWriter<number>();
+  // The per-guild holder index behind the unsettled gate
+  // (server/guild_book_holders.ts owns the maintenance contract).
+  private readonly guildBookHolders = new GuildBookHolderIndex<ClientSession>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
-  private readonly weaponSkinLoadoutSaveQueues = createKeyedSerialWriter<number>();
   // Action-bar layout is a whole-record replacement in its own character column.
   // One FIFO per character so a burst of debounced client saves cannot commit on
   // separate pool clients in reverse order and persist a stale layout.
@@ -2431,6 +2448,7 @@ export class GameServer {
           s.unflushedGuildBankOps.delete(guildId);
           s.guildBankDeficitSkips.delete(guildId);
         }
+        this.guildBookHolders.dropGuild(guildId);
       },
       // The disband guard's read, and the OPEN of the guild-delete window it
       // has to hold. Returns the LIVE sim book's holdings, or null (the guard
@@ -3281,168 +3299,20 @@ export class GameServer {
 
   // -------------------------------------------------------------------------
 
-  private applyAccountQuestLockouts(pid: number, cosmetics: AccountCosmetics): void {
-    const meta = this.sim.meta(pid);
-    if (!meta) return;
-    for (const questId of cosmetics.completedQuestIds) {
-      meta.questsDone.add(questId);
-      meta.questLog.delete(questId);
-    }
-    // The bare adds bypass the quest-credit mark site, and the lockout quests
-    // can satisfy quest/meta deed triggers: request a full evaluator pass.
-    if (cosmetics.completedQuestIds.length > 0) this.sim.ctx.markDeedsDirty(pid);
-  }
-
-  private mergeAccountCosmetics(a: AccountCosmetics, b: AccountCosmetics): AccountCosmetics {
-    // The weapon-skin reads stay nullish-tolerant: pre-weapon-skin callers and
-    // test doubles still hand over the older two-field shape at runtime.
-    return {
-      completedQuestIds: [...new Set([...a.completedQuestIds, ...b.completedQuestIds])],
-      mechChromaIds: [...new Set([...a.mechChromaIds, ...b.mechChromaIds])],
-      // Ownership is additive (a purchase is never un-bought here); the applied
-      // loadout is last-write-wins so a detach (key removed in the fresh state)
-      // never resurrects from the stale side.
-      weaponSkinIds: [...new Set([...(a.weaponSkinIds ?? []), ...(b.weaponSkinIds ?? [])])],
-      weaponSkinLoadout: { ...(b.weaponSkinLoadout ?? {}) },
-    };
-  }
-
-  /** The account loadout filtered to owned skins, as the Sim seeds it. */
-  private ownedWeaponSkinLoadout(cosmetics: AccountCosmetics): Record<string, string> {
-    const out: Record<string, string> = {};
-    for (const [t, skinId] of Object.entries(cosmetics.weaponSkinLoadout ?? {})) {
-      if (skinId && (cosmetics.weaponSkinIds ?? []).includes(skinId)) out[t] = skinId;
-    }
-    return out;
-  }
-
-  private rememberAccountCosmetics(
-    accountId: number,
-    cosmetics: AccountCosmetics,
-  ): AccountCosmetics {
-    const merged = this.mergeAccountCosmetics(
-      this.accountCosmeticsByAccount.get(accountId) ?? {
-        completedQuestIds: [],
-        mechChromaIds: [],
-        weaponSkinIds: [],
-        weaponSkinLoadout: {},
-      },
-      cosmetics,
-    );
-    this.accountCosmeticsByAccount.set(accountId, merged);
-    return merged;
-  }
-
-  private updateLiveAccountCosmetics(accountId: number, cosmetics: AccountCosmetics): void {
-    const merged = this.rememberAccountCosmetics(accountId, cosmetics);
-    for (const live of this.clients.values()) {
-      if (live.accountId !== accountId) continue;
-      live.accountCosmetics = merged;
-      this.applyAccountQuestLockouts(live.pid, merged);
-      this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(merged));
-      this.resyncQuests(live);
-    }
-  }
-
-  private noteAccountQuestComplete(session: ClientSession, questId: string): void {
-    const current = session.accountCosmetics;
-    const completedQuestIds = current.completedQuestIds.includes(questId)
-      ? current.completedQuestIds
-      : [...current.completedQuestIds, questId];
-    this.updateLiveAccountCosmetics(session.accountId, { ...current, completedQuestIds });
-    void markAccountQuestComplete(session.accountId, questId)
-      .then((cosmetics) => this.updateLiveAccountCosmetics(session.accountId, cosmetics))
-      .catch((err) => console.error('failed to save account quest cosmetic state:', err));
-  }
-
-  private noteAccountMechChroma(session: ClientSession, chromaId: string): void {
-    const current = session.accountCosmetics;
-    const mechChromaIds = current.mechChromaIds.includes(chromaId)
-      ? current.mechChromaIds
-      : [...current.mechChromaIds, chromaId];
-    this.updateLiveAccountCosmetics(session.accountId, { ...current, mechChromaIds });
-    void grantAccountMechChroma(session.accountId, chromaId)
-      .then((cosmetics) => this.updateLiveAccountCosmetics(session.accountId, cosmetics))
-      .catch((err) => console.error('failed to save account mech chroma:', err));
-  }
-
-  /**
-   * Grant a mech-chroma cosmetic to an account by id (a Discord swag claim, whose
-   * points/claim are already resolved durably server-side). Best-effort live update:
-   * persist the grant, then push the refreshed cosmetics to any online session on the
-   * account. The live push is a no-op when the account is offline. Injected into the
-   * ported Discord swag route via configureDiscordRuntime (server/discord.ts).
-   */
+  // Account-wide cosmetics (quest lockouts, mech chromas, weapon + mount skins)
+  // live in AccountCosmeticsService (server/account_cosmetics_service.ts); these
+  // three stay on GameServer as the hook surface server/main.ts injects into the
+  // Discord and Claudium routes.
   grantMechChromaToAccount(accountId: number, chromaId: string): void {
-    void grantAccountMechChroma(accountId, chromaId)
-      .then((cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics))
-      .catch((err) => console.error('failed to grant swag mech chroma:', err));
+    this.cosmetics.grantMechChroma(accountId, chromaId);
   }
 
-  /**
-   * Mirror Season 1 Armory weapon-skin ownership into accounts.cosmetics and
-   * push it to any live session on the account. Injected into the Claudium
-   * spend/store routes via configureClaudiumRuntime (server/claudium.ts); the
-   * economy service's grant ledger stays the purchase source of truth.
-   */
   grantWeaponSkinsToAccount(accountId: number, skinIds: string[]): void {
-    const known = skinIds.filter((id) => WEAPON_SKINS[id]);
-    if (known.length === 0) return;
-    const current = this.accountCosmeticsByAccount.get(accountId);
-    if (current && known.every((id) => current.weaponSkinIds.includes(id))) return;
-    // Optimistic live union first (mirrors noteAccountMechChroma): the buyer can
-    // hit Apply the moment the spend response lands, without racing the write.
-    if (current) {
-      this.updateLiveAccountCosmetics(accountId, {
-        ...current,
-        weaponSkinIds: [...new Set([...current.weaponSkinIds, ...known])],
-      });
-    }
-    void grantAccountWeaponSkins(accountId, known)
-      .then((cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics))
-      .catch((err) => console.error('failed to grant account weapon skins:', err));
+    this.cosmetics.grantWeaponSkins(accountId, skinIds);
   }
 
-  /** Apply (skinId set) or detach (skinId null + wtype) a Season 1 Armory weapon
-   *  skin. Server-authoritative: the account must own the skin, and the Sim
-   *  re-validates that a weapon of the skin's type is equipped right now. The
-   *  loadout is account state, so every session on the account updates live. */
-  private changeAccountWeaponSkin(
-    session: ClientSession,
-    skinId: string | null,
-    wtype?: string,
-  ): void {
-    const current = session.accountCosmetics;
-    let weaponSkinLoadout: Record<string, string>;
-    if (skinId !== null) {
-      const def = WEAPON_SKINS[skinId];
-      if (!def) return;
-      if (!current.weaponSkinIds.includes(skinId)) return; // must own it (anti-forge)
-      if (!this.sim.setWeaponSkin(session.pid, skinId)) return; // type-match gate
-      weaponSkinLoadout = withWeaponSkinApplied(current.weaponSkinLoadout, skinId) ?? {};
-    } else {
-      if (!wtype || !isWeaponSkinType(wtype)) return;
-      if (!current.weaponSkinLoadout[wtype]) return;
-      this.sim.setWeaponSkin(session.pid, null, wtype);
-      weaponSkinLoadout = { ...current.weaponSkinLoadout };
-      delete weaponSkinLoadout[wtype];
-    }
-    this.updateLiveAccountCosmetics(session.accountId, { ...current, weaponSkinLoadout });
-    this.enqueueWeaponSkinLoadoutSave(session.accountId, weaponSkinLoadout);
-  }
-
-  private enqueueWeaponSkinLoadoutSave(
-    accountId: number,
-    weaponSkinLoadout: Record<string, string>,
-  ): void {
-    const snapshot = { ...weaponSkinLoadout };
-    // Fire and forget BY CONTRACT: a failed save is a cosmetic loss the next
-    // apply overwrites, so it swallows to the log.
-    void this.weaponSkinLoadoutSaveQueues
-      .enqueue(accountId, () => setAccountWeaponSkinLoadout(accountId, snapshot))
-      .catch((err) => {
-        console.error('failed to save weapon skin loadout:', err);
-      });
+  grantMountSkinsToAccount(accountId: number, skinIds: string[]): void {
+    this.cosmetics.grantMountSkins(accountId, skinIds);
   }
 
   join(
@@ -3556,14 +3426,20 @@ export class GameServer {
       accountCosmetics: meta.accountCosmetics ?? EMPTY_ACCOUNT_COSMETICS,
       catalog: player?.skinCatalog,
       skin: player?.skin ?? 0,
-      remember: (cosmetics) => this.rememberAccountCosmetics(accountId, cosmetics),
+      remember: (cosmetics) => this.cosmetics.remember(accountId, cosmetics),
       grant: (chromaId) => grantAccountMechChroma(accountId, chromaId),
-      updateLive: (cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics),
+      updateLive: (cosmetics) => this.cosmetics.updateLive(accountId, cosmetics),
     });
-    this.applyAccountQuestLockouts(pid, accountCosmetics);
+    this.cosmetics.applyQuestLockouts(pid, accountCosmetics);
     // Seed the account-wide weapon-skin loadout onto the fresh sim entity so the
     // applied skin shows from the first snapshot (owned skins only).
-    this.sim.setWeaponSkinLoadout(pid, this.ownedWeaponSkinLoadout(accountCosmetics));
+    this.sim.setWeaponSkinLoadout(pid, ownedWeaponSkinLoadout(accountCosmetics));
+    // The worn mount skin rides the character save, ownership rides the
+    // account: a saved skin the account does not own comes off here (never
+    // healed into ownership; server/mount_skin_reconcile.ts).
+    if (!wornMountSkinAllowed(accountCosmetics, this.sim.meta(pid)?.mountSkinId)) {
+      this.sim.setMountSkin(pid, null);
+    }
     const sessionIp = meta.ip ?? '';
     const initialLevel = this.sim.entities.get(pid)?.level ?? state?.level ?? 1;
     const botTrackingContext = this.botDetector.createTrackingContext(
@@ -3648,6 +3524,8 @@ export class GameServer {
       bankLedgerSaveScheduled: false,
       unflushedGuildBankOps: new Map(),
       guildBankDeficitSkips: new Map(),
+      guildBookFlushInFlight: false,
+      guildBookFlushRearm: false,
       escrowQuarantined: false,
       inFlightGuildBankOps: new Map(),
       ignoredIds: new Set(),
@@ -4131,6 +4009,7 @@ export class GameServer {
     }
     session.bankLedgerJournal.outbox.discard();
     this.sessionsByCharacterId.delete(session.characterId);
+    this.guildBookHolders.dropSession(session);
     storageRecovery.offline(session.characterId);
     // Release the per-character load lease so a fresh login (here or on another
     // process) can reload the character without waiting out the TTL. Order
@@ -4292,6 +4171,7 @@ export class GameServer {
     }
     if (!session.bankLedgerJournal.outbox.acknowledgeCommittedPrefix(snapshot, batches)) return;
     consumeCommittedGuildLedgerPrefix(session, guildCounts);
+    this.guildBookHolders.resync(session);
     visitGuildLedgerIdsForOps(batches, GUILD_BANK_LOG_VISIBLE_OPS, bustGuildBankLog);
   }
 
@@ -4625,6 +4505,7 @@ export class GameServer {
             session.guildBankDeficitSkips.delete(guildId);
           }
         }
+        this.guildBookHolders.resync(session);
         // The blob is durable: publish every unlock it contains. A rejected
         // save skips this (the throw propagates past it), leaving the ids
         // pending for the next save attempt (the 30s autosave, the next
@@ -4887,6 +4768,7 @@ export class GameServer {
   // Schedule a guild's book for the next fenced escrow save of this session.
   private markGuildBankDirty(session: ClientSession, guildId: number): void {
     session.dirtyGuildBanks.set(guildId, (session.dirtyGuildBanks.get(guildId) ?? 0) + 1);
+    this.guildBookHolders.touch(session, guildId);
   }
 
   // When this session's escrow can never commit again, its guild-book
@@ -4912,6 +4794,7 @@ export class GameServer {
       dead.dirtyGuildBanks.delete(guildId);
       dead.unflushedGuildBankOps.delete(guildId);
       dead.guildBankDeficitSkips.delete(guildId);
+      this.guildBookHolders.resync(dead);
       if (log.length === 0) continue;
       // Counted per GUILD, the unit the remedy applies to: reaching this at
       // all means a session that can never commit again held unflushed book
@@ -4936,135 +4819,47 @@ export class GameServer {
   // round trip instead of an autosave interval.
   static readonly GUILD_BANK_DEFICIT_MAX_SKIPS = 2;
 
-  // The escrow REFUSAL arm. The book half could not be replayed onto durable
-  // truth, so the whole transaction rolled back and this save persisted
-  // NOTHING: not the books, not the character. That is the invariant the
-  // feature rests on, stated as a rule rather than as a residue:
-  //
-  //   If the book half cannot be applied, the character half must not commit.
-  //
-  // Carrying the shortfall and recording it was the alternative, and it is a
-  // two-account money printer: officer A deposits without flushing, officer B
-  // withdraws, B's character half commits while the book half does not, then A
-  // gets itself fenced (an ordinary re-login) so nothing will ever make A's
-  // deposit durable. B keeps the copper, A's stake comes back, repeatable on
-  // demand. Refusing removes it: B's purse can never durably gain what the
-  // book never durably lost.
-  //
-  // Two outcomes:
-  // - RETRY, while another session still holds unflushed work for the guild:
-  //   their commit is what makes this replay applicable, and it lands within
-  //   an autosave interval. Nothing is consumed; the marks and the log are
-  //   exactly as they were.
-  // - ROLL BACK, when no other session holds unflushed work (so nothing will
-  //   ever make the missing value durable) or the retries ran out. This
-  //   session's live state is abandoned: its own book ops come back off the
-  //   live book, it is QUARANTINED so it can never persist again, one
-  //   aggregate anomaly row records the incident, and it is disconnected to
-  //   reload from its durable row. Everything it did since its last successful
-  //   save is lost, which is exactly what a lease fence-out already does, and
-  //   it conserves precisely because none of it was ever durable.
+  // The escrow REFUSAL arm (server/guild_bank_escrow_refusal.ts) behind its
+  // GameServer seam; it shares flushGuildBookHolders with the unsettled gate.
   private handleGuildBankEscrowRefusal(
     session: ClientSession,
     results: readonly GuildBankWriteResult[],
-    // True when this is the LAST save this session will ever get (the leave
-    // flush, or the shutdown flush's second pass). There is no later retry to
-    // wait for, so the refusal is resolved now rather than left to a save that
-    // will never come: otherwise the session would tear down with its progress
-    // discarded and no log line and no ledger row to say why.
     final = false,
   ): void {
-    let quarantine = false;
-    for (const result of results) {
-      if (result.written) continue;
-      const guildId = result.guildId;
-      let anotherSessionDirty = false;
-      for (const s of this.sessionsByCharacterId.values()) {
-        // A quarantined or departing session's marks are NOT a reason to wait:
-        // it will never commit them, so counting it would burn every retry
-        // (blocking this session's character saves the whole time) before
-        // reaching the same rollback.
-        if (s === session || s.escrowQuarantined || s.left) continue;
-        if (s.dirtyGuildBanks.has(guildId)) {
-          anotherSessionDirty = true;
-          break;
-        }
-      }
-      const skips = (session.guildBankDeficitSkips.get(guildId) ?? 0) + 1;
-      const canResolve =
-        !final &&
-        anotherSessionDirty &&
-        !result.rowUnusable &&
-        skips < GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS;
-      if (canResolve) {
-        // ORDINARY CONCURRENCY, not a failure: another officer of this guild
-        // holds unflushed work, their commit is what makes this replay
-        // applicable, and the flush below makes that a round trip rather than
-        // an autosave interval. Nothing was consumed and nothing is lost, so
-        // it gets its own counter kind: sharing escrow_save_failed made that
-        // counter unusable for `> 0` alerting. Counted per GUILD, the unit the
-        // retry applies to.
-        gameMetricsCounters().guildBankIncident('escrow_refused_retry');
-        session.guildBankDeficitSkips.set(guildId, skips);
-        // Do not wait out an autosave interval: FLUSH the sessions whose
-        // unflushed work this replay is waiting on, so the retry lands a round
-        // trip later rather than 30 seconds later. This is what keeps the
-        // blocked window (during which THIS character persists nothing at all,
-        // including progress that has nothing to do with the guild bank) to
-        // the shortest it can be, and it is why the skip bound is small.
-        //
-        // Only on the FIRST refusal: if that flush is itself refused it will
-        // flush back, and an unbounded ping-pong of fire-and-forget saves
-        // between two mutually-stuck sessions is worse than the wait it saves.
-        if (skips > 1) continue;
-        for (const s of this.sessionsByCharacterId.values()) {
-          if (s === session || s.escrowQuarantined || s.left) continue;
-          if (!s.dirtyGuildBanks.has(guildId)) continue;
-          void this.saveCharacter(s).catch((err) =>
-            console.error(`guild bank deficit flush failed for ${s.name}:`, err),
-          );
-        }
-        continue;
-      }
-      const log = session.unflushedGuildBankOps.get(guildId) ?? [];
-      recordGuildBankEscrowRollback(session, guildId, log, result.deficit);
-      console.error(
-        `guild bank escrow rolled back for guild ${guildId} (character ${session.characterId}): ${
-          result.rowUnusable
-            ? 'the stored row is oversized or malformed, its live shadow vanished, or the merged book would cross the size bound, so it is preserved untouched'
-            : `${result.deficit?.kind} shortfall ${result.deficit?.shortfall} on ${result.deficit?.op}${result.deficit?.itemId ? ` (${result.deficit.itemId})` : ''}, and ${
-                anotherSessionDirty
-                  ? `it did not resolve within ${skips} escrow saves`
-                  : 'no other session holds unflushed work for this guild, so it never can'
-              }`
-        }. The session is quarantined and disconnected; nothing it did since its last save was durable, so nothing is lost that was.`,
+    handleEscrowRefusal(
+      {
+        maxDeficitSkips: GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS,
+        holders: (guildId, except) =>
+          this.guildBookHolders.holders(guildId, except, { includeLeaving: false }),
+        flushHolders: (guildId, except, dependency) =>
+          this.flushGuildBookHolders(guildId, except, dependency),
+        revertOwnGuildBookOps: (s, guildIds) => this.revertOwnGuildBookOps(s, guildIds),
+        kickSession: (s) => {
+          void this.kickSession(s, 'character taken over', 'guild bank escrow rollback');
+        },
+        recordIncident: (kind) => gameMetricsCounters().guildBankIncident(kind),
+        logError: (message) => console.error(message),
+      },
+      session,
+      results,
+      final,
+    );
+  }
+
+  // Flush the holders feeding the named dependency, bounded and coalesced,
+  // through the background-permit save (server/guild_book_holders.ts): the
+  // gate's refusal and the escrow arm's retry both land here.
+  private flushGuildBookHolders(
+    guildId: number,
+    except: ClientSession,
+    dependency: GuildBookDependency | null,
+  ): void {
+    for (const holder of this.guildBookHolders.contributors(guildId, except, dependency)) {
+      requestGuildBookFlush(holder, (s) =>
+        this.saveCharacterWithBackgroundPermit(s).catch((err) =>
+          console.error(`guild bank deficit flush failed for ${s.name}:`, err),
+        ),
       );
-      quarantine = true;
-    }
-    if (!quarantine) return;
-    // TERMINAL: this refusal will never resolve, so the save really did fail
-    // for good (character half included, nothing durable). That is what
-    // escrow_save_failed means, and it is booked here rather than at the throw
-    // site so a refusal that merely RETRIES never reaches it. Counted once per
-    // SAVE, matching the db-threw arm above.
-    gameMetricsCounters().guildBankIncident('escrow_save_failed');
-    // The terminal arm of the escrow design and the one an operator should
-    // alert on: a live session is being abandoned because its book half can
-    // never be replayed onto durable truth. Counted once per SESSION (the unit
-    // the remedy applies to; the per-guild reverts it triggers are counted as
-    // 'reconcile' inside revertOwnGuildBookOps), beside the loud log that
-    // carries the guild id and the deficit.
-    gameMetricsCounters().guildBankIncident('escrow_quarantined');
-    // The character half is the half that would carry the value the book half
-    // could not, so this session must never save again.
-    session.escrowQuarantined = true;
-    // Undo EVERY book this session dirtied, not only the refused one: the
-    // session as a whole is abandoned, so its deltas in a second guild's book
-    // are live value nobody will ever make durable, and another officer
-    // withdrawing that phantom value would be refused in turn.
-    this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
-    if (!session.left) {
-      void this.kickSession(session, 'character taken over', 'guild bank escrow rollback');
     }
   }
 
@@ -5077,6 +4872,7 @@ export class GameServer {
     target: { pid: number } | { guildId: number; actorAccountId: number },
     op: GuildBankLedgerOp,
     run: () => void,
+    request?: GuildBankOpRequest,
   ): void {
     coordinateGuildBankOp(
       {
@@ -5086,6 +4882,12 @@ export class GameServer {
         bankLedgerNeedsSave: () => bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox),
         scheduleBankLedgerHighWaterSave: () => this.scheduleBankLedgerHighWaterSave(session),
         markGuildBankDirty: (guildId) => this.markGuildBankDirty(session, guildId),
+        // The unsettled gate's inputs: every OTHER holder's cached
+        // contribution on this book (a departing session's included, its
+        // leave flush has not committed yet), and the flush a refusal fires.
+        unsettledGuildBook: (guildId) => this.guildBookHolders.unsettled(guildId, session),
+        flushUnsettledGuildBook: (guildId, dependency) =>
+          this.flushGuildBookHolders(guildId, session, dependency),
         recordGuildBankIncident: (kind) => gameMetricsCounters().guildBankIncident(kind),
         logError: (message) => console.error(message),
       },
@@ -5093,6 +4895,7 @@ export class GameServer {
       target,
       op,
       run,
+      request,
     );
   }
 
@@ -6637,7 +6440,7 @@ export class GameServer {
               })
               .catch((err) => console.error('daily reward quest task failed:', err));
             if (msg.quest === ALDRIC_METEOR_QUEST_ID) {
-              this.noteAccountQuestComplete(session, msg.quest);
+              this.cosmetics.noteQuestComplete(session, msg.quest);
             }
           }
           this.resyncQuests(session);
@@ -6690,7 +6493,8 @@ export class GameServer {
           // id-only path), never as index 0.
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
           const result = sim.useItem(msg.item, pid, slot);
-          if (result?.type === 'mechChroma') this.noteAccountMechChroma(session, result.chromaId);
+          if (result?.type === 'mechChroma')
+            this.cosmetics.noteMechChroma(session, result.chromaId);
         }
         break;
       case 'discard':
@@ -7052,9 +6856,16 @@ export class GameServer {
       case 'change_weapon_skin': {
         const skinId = typeof msg.skin === 'string' ? msg.skin : null;
         const wtype = typeof msg.wtype === 'string' ? msg.wtype : undefined;
-        if (skinId !== null || wtype) this.changeAccountWeaponSkin(session, skinId, wtype);
+        if (skinId !== null || wtype) this.cosmetics.changeWeaponSkin(session, skinId, wtype);
         break;
       }
+      // Mount skins: wear (skin: string) or take off (skin: null) an account
+      // mount skin on the acting character. Ownership is checked against the
+      // session's account cosmetics here; the Sim only validates the id.
+      case 'change_mount_skin':
+        if (!this.consumeCosmeticOp(session, receivedAtMs / 1000)) break;
+        this.cosmetics.changeMountSkin(session, msg.skin);
+        break;
       // Z-key sheathe toggle: cosmetic, no payload; the Sim owns the dead-gate
       // and the combat auto-unsheathe rule.
       case 'stow_weapon':
@@ -7080,7 +6891,7 @@ export class GameServer {
         if (typeof msg.skin === 'number') {
           const claim = sim.claimEventSkin(msg.skin, pid);
           if (claim?.catalog === 'mech' && claim.chromaId) {
-            this.noteAccountMechChroma(session, claim.chromaId);
+            this.cosmetics.noteMechChroma(session, claim.chromaId);
           }
         }
         break;
@@ -7959,8 +7770,12 @@ export class GameServer {
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.amount === 'number') {
           const amount = msg.amount;
-          this.runGuildBankOp(session, { pid }, 'withdraw_gold', () =>
-            sim.guildBankWithdrawGoldFor(pid, amount),
+          this.runGuildBankOp(
+            session,
+            { pid },
+            'withdraw_gold',
+            () => sim.guildBankWithdrawGoldFor(pid, amount),
+            { amount },
           );
         }
         break;
@@ -7983,8 +7798,12 @@ export class GameServer {
           const transfer = readMaterialSourceTransferWire(msg, slot);
           if (transfer === null) break;
           const { count, selection } = transfer;
-          this.runGuildBankOp(session, { pid }, 'withdraw', () =>
-            sim.guildBankWithdrawFor(pid, slot, count, selection),
+          this.runGuildBankOp(
+            session,
+            { pid },
+            'withdraw',
+            () => sim.guildBankWithdrawFor(pid, slot, count, selection),
+            { slot, count, selection },
           );
         }
         break;
@@ -8067,7 +7886,7 @@ export class GameServer {
           sim.completeQuestForDev(msg.quest, pid);
           const afterDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
           if (!beforeDone && afterDone && msg.quest === ALDRIC_METEOR_QUEST_ID) {
-            this.noteAccountQuestComplete(session, msg.quest);
+            this.cosmetics.noteQuestComplete(session, msg.quest);
           }
           this.resyncQuests(session);
         }
@@ -8079,7 +7898,7 @@ export class GameServer {
           sim.completeCurrentQuestsForDev(pid);
           const afterDone = sim.meta(pid)?.questsDone.has(ALDRIC_METEOR_QUEST_ID) ?? false;
           if (!beforeDone && afterDone) {
-            this.noteAccountQuestComplete(session, ALDRIC_METEOR_QUEST_ID);
+            this.cosmetics.noteQuestComplete(session, ALDRIC_METEOR_QUEST_ID);
           }
           this.resyncQuests(session);
         }

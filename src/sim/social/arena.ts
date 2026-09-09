@@ -1102,6 +1102,7 @@ export function readyArenaFighter(
   delete e.queuedOnSwingCostMultiplier;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
+  e.queuedCastTargetId = null;
   emitRainOfFireStop(ctx, e);
   // An in-flight corpse-harvest cast owns a reservation + a frozen session
   // beyond `castingAbility` itself (professions/corpse_harvest_session.ts);

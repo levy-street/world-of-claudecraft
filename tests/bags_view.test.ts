@@ -183,6 +183,11 @@ describe('bagDestroyAction', () => {
 });
 
 describe('bagItemAction priority order', () => {
+  it('uses the Forgefather Ember on click instead of offering to destroy it', () => {
+    const ember = CATALOG_ITEMS.forgefathers_ember;
+    expect(bagItemAction(ember, NO_MODE)).toBe('use');
+    expect(bagTooltipHintKey(ember, NO_MODE)).toBe('itemUi.tooltip.clickUse');
+  });
   it('honors trade > market-sell > vendor > pet-feed > quest > use', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, tradeOpen: true })).toBe('trade');
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true })).toBe('marketSell');

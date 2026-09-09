@@ -95,37 +95,52 @@ describe('buildLootExplorerIndex', () => {
     expect(delveChecked).toBeGreaterThan(0);
   });
 
-  it('mirrors the roller difficulty gate: normalOnly entries never get a heroic row, HEROIC_BOSS_LOOT entries are heroic-only', () => {
+  it('mirrors difficulty-specific sources when base and heroic tables share an item', () => {
     const { items } = buildLootExplorerIndex();
     const mobToDungeon = buildMobToDungeon();
     let normalOnlyChecked = 0;
+    let heroicAppendChecked = 0;
+    for (const bossId of Object.keys(HEROIC_BOSS_LOOT)) {
+      expect(MOBS[bossId], bossId).toBeDefined();
+      expect(mobToDungeon.has(bossId), bossId).toBe(true);
+    }
     for (const mob of Object.values(MOBS)) {
       if (!mobToDungeon.has(mob.id)) continue;
-      for (const entry of mob.loot ?? []) {
-        if (!entry.itemId || !entry.normalOnly) continue;
-        expect(lootEntryRollsOnClaim(entry, true)).toBe(false);
-        const item = items.find((i) => i.itemId === entry.itemId);
-        const heroicRows = item?.sources.filter(
-          (s) => s.sourceId === mob.id && s.difficulty === 'heroic' && s.chance === entry.chance,
+      const base = mob.loot ?? [];
+      const heroic = HEROIC_BOSS_LOOT[mob.id] ?? [];
+      const itemIds = new Set([...base, ...heroic].map((entry) => entry.itemId));
+      for (const itemId of itemIds) {
+        if (!itemId || !ITEMS[itemId]) continue;
+        const sources = items.find((item) => item.itemId === itemId)?.sources ?? [];
+        const normalRows = sources.filter(
+          (source) => source.sourceId === mob.id && source.difficulty === 'normal',
         );
-        expect(heroicRows ?? []).toHaveLength(0);
-        normalOnlyChecked++;
+        const heroicRows = sources.filter(
+          (source) => source.sourceId === mob.id && source.difficulty === 'heroic',
+        );
+        const signature = (entry: { chance?: number; rollGroup?: string }) => ({
+          chance: entry.chance,
+          rollGroup: entry.rollGroup,
+        });
+        const baseRows = base.filter((entry) => entry.itemId === itemId);
+        const appendRows = heroic.filter((entry) => entry.itemId === itemId);
+        // A normalOnly acquisition is excluded from Heroic, but the same item
+        // may have a separate valid Heroic acquisition, even at the same odds.
+        expect(normalRows.map(signature), `${mob.id}/${itemId}/normal`).toEqual(
+          baseRows.map(signature),
+        );
+        expect(heroicRows.map(signature), `${mob.id}/${itemId}/heroic`).toEqual(
+          [...baseRows.filter((entry) => !entry.normalOnly), ...appendRows].map(signature),
+        );
+        for (const entry of baseRows) {
+          if (!entry.normalOnly) continue;
+          expect(lootEntryRollsOnClaim(entry, true)).toBe(false);
+          normalOnlyChecked++;
+        }
+        heroicAppendChecked += appendRows.length;
       }
     }
     expect(normalOnlyChecked).toBeGreaterThan(0);
-    let heroicAppendChecked = 0;
-    for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
-      for (const entry of entries) {
-        if (!entry.itemId || !ITEMS[entry.itemId]) continue;
-        const rows =
-          items
-            .find((i) => i.itemId === entry.itemId)
-            ?.sources.filter((s) => s.sourceId === bossId) ?? [];
-        expect(rows.length).toBeGreaterThan(0);
-        for (const row of rows) expect(row.difficulty).toBe('heroic');
-        heroicAppendChecked++;
-      }
-    }
     expect(heroicAppendChecked).toBeGreaterThan(0);
   });
 

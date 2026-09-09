@@ -829,6 +829,8 @@ export const COMMAND_NAMES = [
   // Appended at the END, after the gathering-goal cluster above, because wire
   // tokens are never reordered.
   'swap_perfecting_ranks',
+  // Wear or take off an owned account mount skin on this character.
+  'change_mount_skin',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

@@ -1231,4 +1231,54 @@ export const nl_NL: Record<string, string> = {
   'realmBuilders.saveNew': 'Publiceren',
   'realmBuilders.useNextMonth': 'Volgende maand',
   'realmBuilders.yearLabel': 'Jaar',
+  'error.clearItemNameAllLiteral': 'all moet letterlijk true zijn',
+  'error.clearItemNameBagIndex': 'bag moet een niet-negatief geheel getal zijn',
+  'error.clearItemNameBagPair': 'een tasdoel heeft zowel de celindex als de item-id nodig',
+  'error.clearItemNameBagRange': 'bag moet een geheel getal van {min} tot {max} zijn',
+  'error.clearItemNameCameOnline':
+    'het personage kwam online voordat de naam werd verwijderd; verbreek de verbinding en probeer opnieuw',
+  'error.clearItemNameLeased':
+    'het personage heeft een actieve sessielease; verbreek de verbinding of wacht tot de lease afloopt en probeer opnieuw',
+  'error.clearItemNameNoMatch': 'geen benoemde kopie kwam overeen met dat doel',
+  'error.clearItemNameOnline': 'het personage is online in dit rijk; verbreek eerst de verbinding',
+  'error.clearItemNameTargetForms':
+    'noem precies één doel: een gedragen uitrustingsvak, een tascel of all: true',
+  'error.clearItemNameUnknownSlot': 'onbekend uitrustingsvak',
+  'error.clearItemNameWentOffline':
+    'het personage ging offline voordat de naam werd verwijderd; probeer opnieuw',
+  'error.itemNameClearFailed': 'naam van item wissen mislukt',
+  'loadFailure.forbiddenDetail':
+    'Je staffrollen hebben niet de rechten voor deze weergave. Vraag een superadmin om die rechten en laad daarna opnieuw.',
+  'loadFailure.forbiddenTitle': 'Toegang geweigerd',
+  'marketMetrics.autoRefresh': 'Automatisch vernieuwen ({seconds}s)',
+  'marketMetrics.bucketCompost': 'Compost',
+  'marketMetrics.bucketCores': 'Kernen',
+  'marketMetrics.bucketEmpty': 'geen actieve aanbiedingen',
+  'marketMetrics.bucketEssence': 'Essentie',
+  'marketMetrics.bucketPatterns': 'Patronen',
+  'marketMetrics.bucketProduce': 'Opbrengst',
+  'marketMetrics.bucketSeeds': 'Zaden',
+  'marketMetrics.bucketSold':
+    'Verkocht in de afgelopen {days} dagen: {sales} verkopen, {quantity} items, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} aanbiedingen, {quantity} eenheden, {listed} van {tracked} items aangeboden',
+  'marketMetrics.colItem': 'Item',
+  'marketMetrics.colListings': 'Aanbiedingen',
+  'marketMetrics.colLowest': 'Laagste prijs (per eenheid)',
+  'marketMetrics.colMedian': 'Mediaan (per eenheid)',
+  'marketMetrics.colQuantity': 'Aantal',
+  'marketMetrics.empty': 'geen actieve aanbiedingen in gevolgde categorieën',
+  'marketMetrics.essenceNote':
+    'Deze materialen zijn zielsgebonden en kunnen nooit worden aangeboden. Elke rij hier betekent dat de markt-escrowinvariant is geschonden en technische aandacht nodig heeft.',
+  'marketMetrics.hint':
+    'Actieve Wereldmarkt-aanbiedingen voor de gevolgde voorraadcategorieën: wat nu wordt aangeboden, niet het verkochte volume. De server bewaart dit overzicht ongeveer 15 seconden in de cache.',
+  'marketMetrics.loadFailed': 'marktstatistieken laden mislukt',
+  'marketMetrics.loading': 'laden…',
+  'marketMetrics.realm': 'Rijk: {realm}',
+  'marketMetrics.soldNone': 'Verkocht in de afgelopen {days} dagen: niets',
+  'marketMetrics.soldUnavailable':
+    'Verkocht volume is momenteel niet beschikbaar, dus hieronder worden alleen actieve aanbiedingen getoond.',
+  'moderationHistory.actionClearItemName': 'Itemnaam gewist',
+  'nav.marketMetrics': 'Marktstatistieken',
+  'poi.thornpeak_heights.7': 'Tenten van de Broedtrouw',
 };

@@ -1221,4 +1221,52 @@ export const pl_PL: Record<string, string> = {
   'realmBuilders.saveNew': 'Publikuj',
   'realmBuilders.useNextMonth': 'Następny miesiąc',
   'realmBuilders.yearLabel': 'Rok',
+  'error.clearItemNameAllLiteral': 'all musi być dosłowną wartością true',
+  'error.clearItemNameBagIndex': 'bag musi być nieujemną liczbą całkowitą',
+  'error.clearItemNameBagPair': 'cel torby wymaga indeksu komórki i id przedmiotu',
+  'error.clearItemNameBagRange': 'bag musi być liczbą całkowitą od {min} do {max}',
+  'error.clearItemNameCameOnline':
+    'postać połączyła się przed usunięciem; rozłącz ją i spróbuj ponownie',
+  'error.clearItemNameLeased':
+    'postać ma aktywną dzierżawę sesji; rozłącz ją (albo poczekaj na jej wygaśnięcie) i spróbuj ponownie',
+  'error.clearItemNameNoMatch': 'żadna nazwana kopia nie pasuje do tego celu',
+  'error.clearItemNameOnline': 'postać jest online w tym świecie; najpierw ją rozłącz',
+  'error.clearItemNameTargetForms':
+    'podaj dokładnie jeden cel: założony slot, komórkę torby albo all: true',
+  'error.clearItemNameUnknownSlot': 'nieznany slot wyposażenia',
+  'error.clearItemNameWentOffline': 'postać rozłączyła się przed usunięciem; spróbuj ponownie',
+  'error.itemNameClearFailed': 'nie udało się wyczyścić nazwy przedmiotu',
+  'loadFailure.forbiddenDetail':
+    'Twoje role personelu nie mają uprawnienia odczytywanego przez ten widok. Poproś superadministratora o jego nadanie, a potem odśwież.',
+  'loadFailure.forbiddenTitle': 'Brak uprawnienia',
+  'marketMetrics.autoRefresh': 'Automatyczne odświeżanie ({seconds} s)',
+  'marketMetrics.bucketCompost': 'Kompost',
+  'marketMetrics.bucketCores': 'Rdzenie',
+  'marketMetrics.bucketEmpty': 'brak aktywnych ofert',
+  'marketMetrics.bucketEssence': 'Esencja',
+  'marketMetrics.bucketPatterns': 'Wzory',
+  'marketMetrics.bucketProduce': 'Plony',
+  'marketMetrics.bucketSeeds': 'Nasiona',
+  'marketMetrics.bucketSold':
+    'Sprzedano w ostatnich {days} dniach: {sales} sprzedaży, {quantity} przedmiotów, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} ofert, {quantity} szt., wystawiono {listed} z {tracked} przedmiotów',
+  'marketMetrics.colItem': 'Przedmiot',
+  'marketMetrics.colListings': 'Oferty',
+  'marketMetrics.colLowest': 'Najniższa (za sztukę)',
+  'marketMetrics.colMedian': 'Mediana (za sztukę)',
+  'marketMetrics.colQuantity': 'Liczba',
+  'marketMetrics.empty': 'brak aktywnych ofert w żadnej śledzonej kategorii',
+  'marketMetrics.essenceNote':
+    'Te materiały są związane z duszą i nigdy nie mogą być wystawione. Każdy wiersz tutaj oznacza złamanie niezmiennika depozytu rynku i wymaga uwagi technicznej.',
+  'marketMetrics.hint':
+    'Aktywne oferty Rynku Świata dla śledzonych kategorii zapasów: to, co jest teraz w księdze, nie wielkość sprzedaży. Serwer buforuje ten odczyt przez około 15 sekund.',
+  'marketMetrics.loadFailed': 'nie udało się wczytać metryk rynku',
+  'marketMetrics.loading': 'wczytywanie…',
+  'marketMetrics.realm': 'Świat: {realm}',
+  'marketMetrics.soldNone': 'Sprzedano w ostatnich {days} dniach: nic',
+  'marketMetrics.soldUnavailable':
+    'Wielkość sprzedaży jest teraz niedostępna, więc poniżej pokazano tylko aktywne oferty.',
+  'moderationHistory.actionClearItemName': 'Nazwa przedmiotu wyczyszczona',
+  'nav.marketMetrics': 'Metryki rynku',
 };

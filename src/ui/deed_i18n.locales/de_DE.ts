@@ -88,7 +88,8 @@ export const table: DeedLocaleTable = {
     desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    desc: 'Fange einen Fisch in den Gewassern von Nightbloom.',
+    desc: 'Fange einen Fisch in den Gewässern von Nightbloom.',
+    name: 'Eine Welle an der Mondquelle',
   },
   chr_wraithwood_gatherer: {
     name: 'Ernte unter dem Blatterdach',
@@ -184,6 +185,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Meistersammler',
+    desc: 'Erreiche in drei beliebigen Sammelberufen eine Fertigkeit von 100.',
   },
   prog_first_craft: {
     name: 'Handarbeit',
@@ -297,7 +299,8 @@ export const table: DeedLocaleTable = {
     title: 'Wyrmfäller',
   },
   dgn_sanctum_speed: {
-    desc: 'Besiege Korzul den Gravewyrm binnen 15 Minuten, nachdem deine Gruppe das Gravewyrm-Heiligtum beansprucht hat.',
+    desc: 'Besiege Korzul den Gravewyrm innerhalb von 15 Minuten, nachdem deine Gruppe das Gravewyrm-Heiligtum beansprucht hat.',
+    name: 'Schnelllauf im Heiligtum',
   },
   dgn_nythraxis_gravebreaker: {
     name: 'Knie vor keinem König',
@@ -439,6 +442,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Die Chronik von Thornpeak',
+    desc: 'Erlebe die ganze Geschichte des Berges: Brütler gebrochen, Heiligtum zum Schweigen gebracht, Erwachender Gipfel gefällt und jeder benannte Schrecken der Klippen besiegt.',
     title: 'von Thornpeak',
   },
   chr_peaks_sparring: {
@@ -1052,5 +1056,80 @@ export const table: DeedLocaleTable = {
   col_set_bramblehide: {
     name: "Roots' Dornenhaut",
     desc: "Entdecke jedes Teil von Roots' Dornenhaut.",
+  },
+  prog_jewelcrafting_rare: {
+    desc: 'Stelle deinen ersten Gegenstand der seltenen Stufe mit Juwelierskunst her.',
+    name: 'Zu Glanz poliert',
+  },
+  prog_jewelcrafting_50: {
+    desc: 'Erreiche eine Fertigkeit von 50 in Juwelierskunst.',
+    name: 'Fassetten und Filigran',
+  },
+  prog_grandmaster_jewelcrafting: {
+    desc: 'Erreiche eine Fertigkeit von 125 in Juwelierskunst, den Gipfel dieses Handwerks.',
+    name: 'Großmeister der Juwelierskunst',
+    title: 'Großmeister der Juwelierskunst',
+  },
+  prog_inscription_rare: {
+    desc: 'Stelle deinen ersten Gegenstand der seltenen Stufe mit Inschriftenkunde her.',
+    name: 'In feiner Tinte geschrieben',
+  },
+  prog_inscription_50: {
+    desc: 'Erreiche eine Fertigkeit von 50 in Inschriftenkunde.',
+    name: 'Feder und Pigment',
+  },
+  prog_grandmaster_inscription: {
+    desc: 'Erreiche eine Fertigkeit von 125 in Inschriftenkunde, den Gipfel dieses Handwerks.',
+    name: 'Großmeister der Inschriftenkunde',
+    title: 'Großmeister der Inschriftenkunde',
+  },
+  col_deepest_cast: {
+    desc: 'Erhalte eine Uhrspulen-Angelrute, die einzige Rute, die die tiefsten Fänge erreicht.',
+    name: 'Der tiefste Wurf',
+  },
+  prog_first_planting: {
+    desc: 'Pflanze deine erste Feldfrucht in einem Gartenbeet.',
+    name: 'Hier beginnt die Saat',
+  },
+  chr_vale_first_harvest: {
+    desc: 'Ernte deine erste gedeihende Feldfrucht aus einem Gartenbeet im Eastbrook-Tal.',
+    name: 'Erstlinge des Tals',
+  },
+  chr_marsh_first_harvest: {
+    desc: 'Ernte deine erste gedeihende Feldfrucht aus einem Gartenbeet im Mirefen-Moor.',
+    name: 'Sprossen im Torf',
+  },
+  chr_peaks_first_harvest: {
+    desc: 'Ernte deine erste gedeihende Feldfrucht aus einem Gartenbeet in den Thornpeak-Höhen.',
+    name: 'Eine Ernte zwischen Klippen',
+  },
+  chr_evergarden_first_harvest: {
+    desc: 'Ernte deine erste gedeihende Feldfrucht aus einem Gartenbeet im Evergarten.',
+    name: 'Ein Beet im Paradies',
+  },
+  prog_farming_100: {
+    desc: 'Erreiche eine Pflanzenfertigkeit von 100.',
+    name: 'Erntemeister',
+    title: 'Erntemeister',
+  },
+  col_farm_roster: {
+    desc: 'Ernte jede Feldfrucht, die die vier Gärten anbauen.',
+    name: 'Jede Furche gefüllt',
+  },
+  prog_field_to_feast: {
+    desc: 'Koche ein Apex-Festmahl, von dessen Tafel ein ganzer Schlachtzug isst.',
+    name: 'Vom Feld zum Festmahl',
+  },
+  col_golden_harvest: {
+    desc: 'Ernte eine goldene Ernte und lass die ganze Zone davon erfahren.',
+    name: 'Goldene Ernte',
+  },
+  prog_legendmaker: {
+    desc: 'Erhebe ein perfektioniertes Werk mit einer Urkunde des Schaffens zur Legende und gib ihm einen einzigartigen Namen.',
+    name: 'Der Legendenmacher',
+  },
+  hid_forgebreaker: {
+    desc: 'Forme Schmiedebrecher selbst und kehre mit dem fertigen Hammer zu Maelin zurück.',
+    name: 'Eine entfesselte Quelle',
   },
 };

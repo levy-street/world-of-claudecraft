@@ -347,84 +347,49 @@ describe('Nythraxis raid encounter', () => {
     expect(boss.aggroTargetId).toBe(tank.id);
   });
 
-  it('defines the seven Nythraxis equipment roll groups with 3 percent legendary rolls', () => {
-    // Equipment drops only: the collectible mount reins (kind 'mount') is its
-    // own independent draw outside the four roll groups, pinned by tests/mounts.test.ts,
-    // and the apex recipe patterns (kind 'recipe', Masterwrought phase 11) ride
-    // their own appended 'nythraxis_patterns' group, pinned by the dedicated
-    // block below and by tests/apex_pattern_items.test.ts.
-    //
-    // The Phase 11f farming group is excluded BY ITS ROLLGROUP NAME rather than
-    // by kind, deliberately: it mixes a kind 'recipe' pattern with kind 'junk'
-    // seeds, so a kind filter would have to grow a second clause and would then
-    // also wave through a seed smuggled into one of the gear groups. Naming the
-    // group excludes exactly the appended draw and nothing else.
+  it('defines two Nythraxis equipment partitions with 3 percent legendary rolls', () => {
     const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
       (entry) =>
-        entry.itemId &&
-        entry.rollGroup !== APPENDED_GROUPS.farm &&
-        ITEMS[entry.itemId]?.kind !== 'mount' &&
-        ITEMS[entry.itemId]?.kind !== 'recipe',
+        entry.itemId && ['armor', 'weapon', 'held_offhand'].includes(ITEMS[entry.itemId].kind),
     );
     const groups = new Map<string, typeof loot>();
     for (const entry of loot) {
-      expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-7]$/);
+      expect(entry.rollGroup).toMatch(/^nythraxis_drop_[12]$/);
       const group = entry.rollGroup!;
       groups.set(group, [...(groups.get(group) ?? []), entry]);
       expect(ITEMS[entry.itemId!], entry.itemId).toBeTruthy();
     }
-
-    // Seven: four guaranteed set-piece groups, the maul's and Bramblehide's
-    // bonus draws, and the guaranteed gap-fill group (nythraxis_drop_7, seven
-    // lane fillers summing to exactly 1.00 like groups 1 to 4).
-    expect(groups.size).toBe(7);
+    expect(groups.size).toBe(2);
     for (const [name, entries] of groups) {
-      const total = entries.reduce((sum, entry) => sum + entry.chance, 0);
-      // nythraxis_drop_5 is the feral ladder's bonus draw (maul_of_the_scourged_wilds):
-      // a single independent 25% roll on top of the four guaranteed equipment
-      // groups, which keep their exact 1.00 partitions untouched.
-      if (name === 'nythraxis_drop_5') {
-        expect(entries.map((entry) => entry.itemId)).toEqual(['maul_of_the_scourged_wilds']);
-        expect(total).toBe(0.25);
-      } else if (name === 'nythraxis_drop_6') {
-        // Roots' Bramblehide, the feral druid's Strength leather family: a
-        // second independent bonus draw, seven FERAL-tagged pieces at 0.08
-        // each (56% for one piece per kill), never displacing a shared piece.
-        // The tag is a data pin, not an equip lock: canEquipItem gates armor
-        // by weight alone (equipment_rules.ts).
-        expect(entries.map((entry) => entry.itemId)).toEqual([
-          'bramblehide_crown',
-          'bramblehide_mantle',
-          'bramblehide_harness',
-          'bramblehide_cinch',
-          'bramblehide_legguards',
-          'bramblehide_grips',
-          'bramblehide_treads',
-        ]);
-        for (const entry of entries) {
-          expect(entry.chance).toBe(0.08);
-          expect(ITEMS[entry.itemId!].requiredClass).toEqual(['druid']);
-          expect(ITEMS[entry.itemId!].set).toBe('bramblehide');
-        }
-        expect(total).toBeCloseTo(0.56, 5);
-      } else if (name === 'nythraxis_drop_7') {
-        // The seven gap-fill lane fillers (zone3.ts NYTHRAXIS_GAP_ITEM_IDS): a
-        // guaranteed fifth equipment draw partitioned like groups 1 to 4, the
-        // two larger shares on the rogue dagger and the tank one-hander.
-        // Membership and chances pinned exactly, like group 6.
-        expect(entries.map((entry) => [entry.itemId, entry.chance])).toEqual([
-          ['courtiers_bonefang', 0.15],
-          ['thornpeak_wardblade', 0.15],
-          ['gravecourt_hewer', 0.14],
-          ['votive_ward_of_the_deathless_court', 0.14],
-          ['thornpeak_moonhide_cowl', 0.14],
-          ['stormhymn_chain_grips', 0.14],
-          ['stormhymn_chain_treads', 0.14],
-        ]);
-        expect(total).toBeCloseTo(1, 5);
-      } else {
-        expect(total).toBeCloseTo(1, 5);
+      expect(entries.reduce((sum, entry) => sum + entry.chance, 0)).toBe(1);
+      for (const entry of entries) {
+        expect(entry.normalOnly).toBe(name === 'nythraxis_drop_2' ? true : undefined);
       }
+    }
+    const sharedIds = groups.get('nythraxis_drop_1')!.map((entry) => entry.itemId);
+    for (const id of [
+      'maul_of_the_scourged_wilds',
+      'bramblehide_crown',
+      'bramblehide_mantle',
+      'bramblehide_harness',
+      'bramblehide_cinch',
+      'bramblehide_legguards',
+      'bramblehide_grips',
+      'bramblehide_treads',
+      'courtiers_bonefang',
+      'thornpeak_wardblade',
+      'gravecourt_hewer',
+      'votive_ward_of_the_deathless_court',
+      'thornpeak_moonhide_cowl',
+      'stormhymn_chain_grips',
+      'stormhymn_chain_treads',
+    ])
+      expect(sharedIds).toContain(id);
+    expect(sharedIds).toHaveLength(30);
+    expect(groups.get('nythraxis_drop_2')).toHaveLength(28);
+    for (const id of sharedIds.filter((id) => id!.startsWith('bramblehide_'))) {
+      expect(ITEMS[id!].requiredClass).toEqual(['druid']);
+      expect(ITEMS[id!].set).toBe('bramblehide');
     }
     expect(ITEMS.maul_of_the_scourged_wilds.requiredClass).toEqual(['druid']);
 
