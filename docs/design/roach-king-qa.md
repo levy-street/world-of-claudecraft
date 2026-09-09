@@ -231,3 +231,13 @@ The release merge also replaces the initial timing harvest with the active
 release's canonical timing snapshot. Earlier initial-base gate failures above
 are historical findings, not evidence about the merged tree. The current
 pre-merge gate and PR CI results are recorded with the PR.
+
+The merged runtime was rechecked on a fresh Vite instance: desktop-low runs the
+complete encounter and mobile-high checks transformation and death. Both pass
+without page errors, shader errors, or live-program events. Body-only arena
+raycasts retain shell support, and left/right corpse captures were inspected.
+Committed current-release evidence is under
+`docs/screenshots/roach-king/release-integration/`. A first desktop launch was
+reset by Vite's initial dependency optimization; the warmed launch passed
+without source changes. Expected offline API failures and unrelated startup
+preload diagnostics remain distinguished from encounter errors in the receipts.
