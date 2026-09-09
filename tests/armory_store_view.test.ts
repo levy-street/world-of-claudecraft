@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { STORE_MOUNT_ITEM_IDS } from '../src/sim/content/store_mounts';
+import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import {
   buildArmorySections,
   buildStoreMountRows,
@@ -154,9 +154,9 @@ describe('buildArmorySections', () => {
 
 describe('buildStoreMountRows (the store Mounts strip)', () => {
   const service = (over: Partial<WocStoreItemInput> = {}): WocStoreItemInput => ({
-    itemId: 'reins_mech_bird',
-    name: 'Ignition Key: Cluckwork Mech Bird',
-    kind: 'item',
+    itemId: 'mech_bird',
+    name: 'Cluckwork Mech Bird',
+    kind: 'skin',
     costClaudium: 1200,
     owned: false,
     ...over,
@@ -164,10 +164,10 @@ describe('buildStoreMountRows (the store Mounts strip)', () => {
 
   it('shows every declared store mount even when the service snapshot lacks the SKU', () => {
     const rows = buildStoreMountRows(5000, [], []);
-    expect(rows.map((r) => r.itemId)).toEqual([...STORE_MOUNT_ITEM_IDS]);
+    expect(rows.map((r) => r.itemId)).toEqual([...MOUNT_SKIN_IDS]);
     // The pinned no-invented-price rule: no service row means no price and no Buy.
     expect(rows[0]).toMatchObject({
-      mountKey: 'mech_bird',
+      skinId: 'mech_bird',
       costClaudium: null,
       purchasable: false,
       owned: false,

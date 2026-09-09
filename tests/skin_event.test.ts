@@ -214,6 +214,7 @@ describe('cosmetic skin-select event', () => {
         mechChromaIds: [chroma.id],
         weaponSkinIds: [],
         weaponSkinLoadout: {},
+        mountSkinIds: [],
       };
       sim.setPlayerSkin(sim.playerId, skin, 'mech');
 

@@ -127,6 +127,26 @@ describe('the shared displacement helper', () => {
     }
   });
 
+  it('drops a GCD-held queued press while leaving a live spell cast untouched', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    // A stored press must not survive a displacement: it would fire ticks
+    // later at the destination (with a clamped stale aim for a ground-target
+    // press). A live spell cast keeps its own teleport rules.
+    p.castingAbility = 'fireball';
+    p.castRemaining = 2;
+    p.queuedCastAbility = 'flamestrike';
+    p.queuedCastAim = { x: 10, z: 20 };
+    cancelProfessionSessionOnDisplacement(sim.ctx, p);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
+    expect(p.castingAbility).toBe('fireball');
+    p.castingAbility = null;
+    p.castRemaining = 0;
+  });
+
   it('the gather timer survives the cancel (nothing was spent)', () => {
     const sim = makeSim();
     const pid = sim.playerId;

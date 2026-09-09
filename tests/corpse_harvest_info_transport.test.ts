@@ -181,7 +181,7 @@ describe('the inspectCorpseHarvest wire command (real GameServer.handleMessage)'
     expect(reply).toMatchObject({ id: mob.id, rid: 6, info: { denial: null } });
   });
 
-  it('throttles to one real inspection per 0.5 sim seconds, answering info:null (no admission scan) in between', () => {
+  it('throttles to one real inspection per 0.5 sim seconds, replaying same-body status without admission scans in between', () => {
     const { server, session, fc } = joinedServer(1, 'Throttle');
     server.sim.addItem('field_kit', 1, session.pid);
     const mob = spawnCorpseAtSession(server, session, 9503);
@@ -215,7 +215,12 @@ describe('the inspectCorpseHarvest wire command (real GameServer.handleMessage)'
         rid: 1,
         info: expect.objectContaining({ denial: null }),
       },
-      { t: 'corpseHarvestInfo', id: mob.id, rid: 2, info: null },
+      {
+        t: 'corpseHarvestInfo',
+        id: mob.id,
+        rid: 2,
+        info: expect.objectContaining({ denial: null }),
+      },
       {
         t: 'corpseHarvestInfo',
         id: mob.id,

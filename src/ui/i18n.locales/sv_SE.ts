@@ -3197,7 +3197,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Drar en allierad ett ögonblick framåt i tid och läker {damage} hälsa när kroppen slår sig till ro i sitt friskare framtida jag. (Kronomantik-signatur)',
   'entities.abilities.temporal_mend.name': 'Tidsläkning',
   'entities.abilities.temporal_reversal.description':
-    'Spolar tillbaka en fallen allierades tidslinje och återupplivar dem vid kroppen med en del av deras hälsa och mana, även mitt i strid. (Kronomantik)',
+    'Spolar tillbaka en fallen allierades tidslinje och återupplivar dem vid din sida med 35% av deras hälsa och mana, även mitt i strid. (Kronomantik)',
   'entities.abilities.temporal_reversal.name': 'Tidsåtergång',
   'entities.abilities.temporal_rewind.description':
     'Skickar en arkan våg genom din grupp eller raid och spolar tillbaka tiden för att återställa 30% av skadan varje allierad inom 40 yards tog under de senaste 5 sekunderna (upp till 35% av deras maximala hälsa). Kan inte vara ett kritiskt slag. (Kronomantik)',
@@ -3785,7 +3785,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.abilityError.shieldRequired': 'Du måste ha en sköld utrustad.',
   'entities.abilities.collective_reversal.name': 'Kollektiv återgång',
   'entities.abilities.collective_reversal.description':
-    'Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid och återupplivar dem vid kroppen med 30% hälsa och mana. Kan inte användas i strid. (Kronomanti)',
+    'Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid inom 40 meter och inom synhåll, och återupplivar dem vid din sida med 30% hälsa och mana. Kan inte användas i strid. (Kronomanti)',
   'entities.abilities.sport_boot.description':
     'En lång, hög spark mot siktpunkten. Publiken älskar den.',
   'entities.abilities.sport_boot.name': 'Storspark',
@@ -13295,7 +13295,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Ökar besvärjelsekraften hos dig och gruppmedlemmarna med 20 i 30 min. Ersätter din egen Gryningens eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner.',
   'entities.abilities.recall_the_fallen.description':
-    'Återför en död gruppmedlem till livet med 35% hälsa och mana. En Solhelare på nivå 16 eller högre kallar i stället tillbaka varje fallen medlem i gruppen.',
+    'Återför en död gruppmedlem till livet vid din sida med 35% hälsa och mana. En Solhelare på nivå 16 eller högre kallar i stället tillbaka varje fallen medlem i gruppen inom 30 meter och inom synhåll.',
   'entities.abilities.sacred_challenge.description':
     'Tvingar en fiende att attackera dig. Under Upphöjelse minskar den även all skada du tar med 15% i 4 sek utan att förbruka en laddning.',
   'entities.abilities.sacred_form.description':
@@ -13369,6 +13369,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbrukar 3 Flockvildhet efter att ditt husdjur slagit för 83 till 105 fysisk skada och skakat varje fiende inom 6 meter för 26 till 34. Slaget och skakningen använder Flockvildhetens fulla husdjursskadebonus på 30% och ökar med husdjurets attackkraft. I 8 sek därefter gör husdjuret 25% mer skada, attackerar 35% snabbare och får Ondskeskott att träffa upp till 2 närliggande fiender.',
   'entities.abilities.wildheart.description': 'Återställer omedelbart 30% av din maximala hälsa.',
   'entities.abilities.ancestor_return.name': 'Förfädernas återkomst',
+  'entities.abilities.grove_awakening.description':
+    'Kallar varje fallen medlem i din grupp eller räd, inom 40 meter och inom synhåll, tillbaka till din sida med 30% hälsa och mana. Kan inte kastas i strid. (Lundhjärta)',
+  'entities.abilities.grove_awakening.name': 'Lundens uppvaknande',
+  'entities.abilities.prayer_of_returning.description':
+    'Kallar varje fallen medlem i din grupp eller räd, inom 40 meter och inom synhåll, tillbaka till din sida med 30% hälsa och mana. Kan inte kastas i strid. (Helig och Lära)',
+  'entities.abilities.prayer_of_returning.name': 'Återkomstens bön',
+  'entities.abilities.wildwake.description':
+    'Lockar en fallen bundsförvant till plötslig blomning och för denne tillbaka till livet vid din sida med 35% av dennes hälsa och mana, även mitt i striden. (Lundhjärta)',
+  'entities.abilities.wildwake.name': 'Vildväckelse',
   'entities.abilities.galeheart_weapon.name': 'Stormhjärtevapen',
   'entities.abilities.lifespring_weapon.name': 'Livskällevapen',
   'entities.abilities.primal_exaltation.name': 'Urtida upphöjelse',
@@ -13379,7 +13388,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Släpp loss vapnet',
   'entities.abilities.warspirit_cadence.name': 'Krigsandens kadens',
   'entities.abilities.ancestor_return.description':
-    'Kallar varje fallen medlem i din grupp eller räd tillbaka till livet vid sin kropp med 30% hälsa och mana. Kan inte kastas i strid. (Andelagning)',
+    'Kallar varje fallen medlem i din grupp eller räd, inom 40 meter och inom synhåll, tillbaka till din sida med 30% hälsa och mana. Kan inte kastas i strid. (Andelagning)',
   'entities.abilities.galeheart_weapon.description':
     'Förtrollar båda vapnen i 30 min och möjliggör Krigsandens kadens.',
   'entities.abilities.lifespring_weapon.description':

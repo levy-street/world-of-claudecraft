@@ -3233,7 +3233,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menarik sekutu sesaat ke depan dalam waktu, memulihkan {damage} kesehatan saat tubuh menyesuaikan diri dengan diri yang lebih sehat di masa depan. (kemampuan unggulan Kronomansi)',
   'entities.abilities.temporal_mend.name': 'Pemulihan Waktu',
   'entities.abilities.temporal_reversal.description':
-    'Memundurkan garis waktu sekutu yang gugur, menghidupkan mereka kembali di dekat jasad dengan sebagian kesehatan dan mana mereka, bahkan di tengah pertempuran. (Kronomansi)',
+    'Memundurkan garis waktu sekutu yang gugur, menghidupkan mereka kembali di sisimu dengan 35% kesehatan dan mana mereka, bahkan di tengah pertempuran. (Kronomansi)',
   'entities.abilities.temporal_reversal.name': 'Pembalikan Waktu',
   'entities.abilities.temporal_rewind.description':
     'Mengirim gelombang arkan melalui grupmu atau raid, memundurkan waktu untuk memulihkan 30% kerusakan yang diterima setiap sekutu dalam 40 yard selama 5 detik terakhir (hingga 35% dari kesehatan maksimum mereka). Tidak dapat menjadi efek kritis. (Kronomansi)',
@@ -3912,7 +3912,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': 'Pemeriksaan kesiapan sedang berlangsung.',
   'entities.abilities.collective_reversal.name': 'Pembalikan Kolektif',
   'entities.abilities.collective_reversal.description':
-    'Memundurkan alur waktu setiap anggota grup atau raid yang gugur, menghidupkan mereka kembali di dekat jasad dengan 30% kesehatan dan mana. Tidak dapat digunakan saat bertarung. (Kronomansi)',
+    'Memundurkan alur waktu setiap anggota grup atau raid yang gugur dalam 40 m dan dalam garis pandangmu, menghidupkan mereka kembali di sisimu dengan 30% kesehatan dan mana. Tidak dapat digunakan saat bertarung. (Kronomansi)',
   'entities.abilities.sport_boot.description':
     'Tendangan lambung jauh ke arah titik bidik. Penonton menyukainya.',
   'entities.abilities.sport_boot.name': 'Tendangan Jauh',
@@ -13425,7 +13425,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Menambah kekuatan mantra kamu dan anggota kelompok sebesar 20 selama 30 mnt. Menggantikan Pengabdian Fajar atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain.',
   'entities.abilities.recall_the_fallen.description':
-    'Menghidupkan kembali anggota kelompok yang mati dengan 35% nyawa dan mana. Penyembuh Surya level 16 atau lebih tinggi justru memanggil kembali seluruh anggota kelompok yang gugur.',
+    'Menghidupkan kembali anggota kelompok yang mati ke sisimu dengan 35% nyawa dan mana. Penyembuh Surya level 16 atau lebih tinggi justru memanggil kembali seluruh anggota kelompok yang gugur dalam 30 m dan dalam garis pandangmu.',
   'entities.abilities.sacred_challenge.description':
     'Memaksa musuh menyerangmu. Selama Kenaikan juga mengurangi seluruh kerusakan yang diterima sebesar 15% selama 4 dtk tanpa menghabiskan muatan.',
   'entities.abilities.sacred_form.description':
@@ -13499,6 +13499,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan 3 Keganasan Kawanan setelah hewan peliharaanmu menyerang sebesar 83 sampai 105 kerusakan Fisik dan mengguncang setiap musuh dalam 6 meter sebesar 26 sampai 34. Serangan dan guncangan memakai bonus kerusakan hewan peliharaan penuh 30% dari Keganasan Kawanan dan meningkat dengan kekuatan serang hewan peliharaan. Selama 8 dtk sesudahnya, hewan peliharaan memberi 25% lebih banyak kerusakan, menyerang 35% lebih cepat, dan membuat Tembakan Bengis membelah hingga 2 musuh di dekatnya.',
   'entities.abilities.wildheart.description': 'Seketika memulihkan 30% nyawa maksimummu.',
   'entities.abilities.ancestor_return.name': 'Kembalinya Leluhur',
+  'entities.abilities.grove_awakening.description':
+    'Memanggil kembali ke sisimu setiap anggota kelompok atau serbuanmu yang gugur dalam 40 m dan dalam garis pandangmu, dengan 30% nyawa dan mana. Tidak dapat dirapal dalam pertempuran. (Groveheart)',
+  'entities.abilities.grove_awakening.name': 'Kebangkitan Rimba',
+  'entities.abilities.prayer_of_returning.description':
+    'Memanggil kembali ke sisimu setiap anggota kelompok atau serbuanmu yang gugur dalam 40 m dan dalam garis pandangmu, dengan 30% nyawa dan mana. Tidak dapat dirapal dalam pertempuran. (Suci dan Disiplin)',
+  'entities.abilities.prayer_of_returning.name': 'Doa Kepulangan',
+  'entities.abilities.wildwake.description':
+    'Membujuk sekutu yang gugur untuk mekar seketika, menghidupkannya kembali di sisimu dengan 35% nyawa dan mananya, bahkan di tengah pertempuran. (Groveheart)',
+  'entities.abilities.wildwake.name': 'Bangkit Liar',
   'entities.abilities.galeheart_weapon.name': 'Senjata Hati Badai',
   'entities.abilities.lifespring_weapon.name': 'Senjata Mata Air Kehidupan',
   'entities.abilities.primal_exaltation.name': 'Pemuliaan Purba',
@@ -13509,7 +13518,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Lepaskan Senjata',
   'entities.abilities.warspirit_cadence.name': 'Irama Roh Perang',
   'entities.abilities.ancestor_return.description':
-    'Memanggil kembali setiap anggota kelompok atau serbuanmu yang gugur ke kehidupan di sisi jasadnya dengan 30% nyawa dan mana. Tidak dapat dirapal dalam pertempuran. (Tambal Roh)',
+    'Memanggil kembali ke sisimu setiap anggota kelompok atau serbuanmu yang gugur dalam 40 m dan dalam garis pandangmu, dengan 30% nyawa dan mana. Tidak dapat dirapal dalam pertempuran. (Tambal Roh)',
   'entities.abilities.galeheart_weapon.description':
     'Menyihir kedua senjata selama 30 mnt, mengaktifkan Irama Roh Perang.',
   'entities.abilities.lifespring_weapon.description':

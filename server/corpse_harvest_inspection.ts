@@ -9,10 +9,11 @@
 //
 // Throttled to at most one real inspection per CORPSE_HARVEST_INSPECT_INTERVAL_SEC
 // of SIM time per session, across every corpse id, checked BEFORE any call
-// into the sim: a throttled request still answers null on the request's own
-// id/rid (a valid correlation), but never reaches admission or an inventory
-// scan. Transient session state and sim time only: no mutable cache, no DB,
-// no timers, no polling without a request.
+// into the sim: a throttled request answers on its own id/rid, but never
+// reaches admission or an inventory
+// scan. Same-subject polls reuse the previous answer until the ORIGINAL
+// deadline, so wall-clock polling cannot turn a rate limit into unavailable
+// status. One session-local entry only: no DB, timers, or background work.
 
 import type { CorpseHarvestInfo } from '../src/world_api';
 
@@ -25,6 +26,12 @@ export interface InspectCorpseHarvestPayload {
 
 export interface InspectCorpseHarvestSession {
   nextCorpseHarvestInspectAt?: number;
+  corpseHarvestInspectionCache?: {
+    readonly sim: CorpseHarvestInspectionSim;
+    readonly pid: number;
+    readonly id: number;
+    readonly info: CorpseHarvestInfo | null;
+  };
 }
 
 export interface CorpseHarvestInspectionSim {
@@ -59,9 +66,15 @@ export function corpseHarvestInspectionReply(
   if (!validInspectCorpseHarvestCommand(msg)) return null;
   const { id, rid } = msg;
   const now = sim.time;
-  if ((session.nextCorpseHarvestInspectAt ?? 0) > now) return { id, rid, info: null };
+  if ((session.nextCorpseHarvestInspectAt ?? 0) > now) {
+    const cached = session.corpseHarvestInspectionCache;
+    const info = cached?.sim === sim && cached.pid === pid && cached.id === id ? cached.info : null;
+    return { id, rid, info };
+  }
   session.nextCorpseHarvestInspectAt = now + CORPSE_HARVEST_INSPECT_INTERVAL_SEC;
-  return { id, rid, info: sim.corpseHarvestInfo(id, pid) };
+  const info = sim.corpseHarvestInfo(id, pid);
+  session.corpseHarvestInspectionCache = { sim, pid, id, info };
+  return { id, rid, info };
 }
 
 /** The whole dispatch-switch case body, so server/game.ts calls one helper

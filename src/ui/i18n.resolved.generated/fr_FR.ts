@@ -577,6 +577,7 @@ export const fr_FR: EnTranslations = {
       "mountsEyebrow": "Montages de compte",
       "mountsTitle": "Stable à la machine",
       "mountBuyAria": "Acheter {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Chargement de la boutique WOC...",
       "error": "La boutique WOC est indisponible pour le moment. Veuillez réessayer dans quelques instants.",
       "balance": "Solde de Claudium",
@@ -1464,6 +1465,7 @@ export const fr_FR: EnTranslations = {
       "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
       "desc_goblin_rocket_sled": "Une luge gobeline dangereusement surconstruite, propulsée par deux fusées et un excellent mauvais jugement.",
       "desc_rallycart_rxt": "Une petite machine de rallye qui augmente la vitesse de déplacement.",
+      "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
       "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
       "desc_mech_bird": "Un poulet de guerre mécanique construit à la main qui sprinte sur des servos qui claquent, la clé de remontage tournant toujours.",
@@ -4876,6 +4878,32 @@ export const fr_FR: EnTranslations = {
         "crown_endures": "La Couronne perdure (enrage brutal à 6:00, 5:00 en héroïque)",
         "deathless_court": "La Cour immortelle (héroïque uniquement, la cour royale se relève après Rage immortelle)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Le Reliquaire",
@@ -11392,7 +11420,7 @@ export const fr_FR: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Rappel des tombés",
-        "description": "Ramène à la vie un membre mort du groupe avec 35% de points de vie et de mana. Un Sagesoleil de niveau 16 ou plus rappelle à la place tous les membres tombés du groupe."
+        "description": "Ramène à la vie un membre mort du groupe à vos côtés avec 35% de points de vie et de mana. Un Sagesoleil de niveau 16 ou plus rappelle à la place tous les membres tombés du groupe à moins de 30 mètres et dans votre ligne de vue."
       },
       "beacon_of_light": {
         "name": "Phare de lumière",
@@ -12125,6 +12153,14 @@ export const fr_FR: EnTranslations = {
         "name": "Brise-moelle",
         "description": "Consomme vos 3 Sang ancien pour une frappe lourde à haute menace de {damage} points de dégâts. Sous la moitié des points de vie, vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum pendant 8 s et rembourse 15 points de rage."
       },
+      "wildwake": {
+        "name": "Éveil sauvage",
+        "description": "Incite un allié tombé à fleurir soudainement, le ramenant à la vie à vos côtés avec 35% de points de vie et de mana, même en plein combat. (Cœur sylvestre)"
+      },
+      "grove_awakening": {
+        "name": "Éveil du bosquet",
+        "description": "Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Cœur sylvestre)"
+      },
       "overbloom": {
         "name": "Surfloraison",
         "description": "Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
@@ -12435,15 +12471,15 @@ export const fr_FR: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Inversion temporelle",
-        "description": "Rembobine la chronologie d'un allié tombé, le ramenant à la vie à l'emplacement de son corps avec une partie de sa vie et de son mana, même en plein combat. (Chromancie)"
+        "description": "Rembobine la chronologie d'un allié tombé, le ramenant à la vie à vos côtés avec 35% de sa vie et de son mana, même en plein combat. (Chromancie)"
       },
       "collective_reversal": {
         "name": "Réversion collective",
-        "description": "Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid et le ramène à la vie près de son corps avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)"
+        "description": "Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, et le ramène à la vie à vos côtés avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)"
       },
       "ancestor_return": {
         "name": "Retour des ancêtres",
-        "description": "Ramène à la vie auprès de leur corps tous les membres tombés de votre groupe ou raid avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Reprise spirituelle)"
+        "description": "Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Reprise spirituelle)"
       },
       "temporal_rewind": {
         "name": "Retour en arrière",
@@ -12585,6 +12621,10 @@ export const fr_FR: EnTranslations = {
       "martyrs_aegis": {
         "name": "Égide du martyr",
         "description": "Réduit de 40% les dégâts subis par un allié pendant 8 s."
+      },
+      "prayer_of_returning": {
+        "name": "Prière du retour",
+        "description": "Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Bénison et Doctrine)"
       },
       "choir_of_deliverance": {
         "name": "Chœur de délivrance",
@@ -18407,8 +18447,8 @@ export const fr_FR: EnTranslations = {
       },
       "q_forgefathers_requiem": {
         "title": "The Forgefather's Requiem",
-        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.",
-        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.",
+        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.",
+        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.",
         "objectives": {
           "0": {
             "label": "Forgefather's Ember recovered"
@@ -18417,7 +18457,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_requiem_at_the_forge": {
         "title": "Requiem at the Forge",
-        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.",
+        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.",
         "completion": "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
         "objectives": {
           "0": {

@@ -10,8 +10,8 @@
     "awardHeroicMarks on a heroic raid kill (instances/dungeons) plus the raid lockout, neither of which a normal claim grants",
     "class:warrior"
   ],
-  "draws": 18,
-  "drawDigest": "9189d94b",
+  "draws": 12,
+  "drawDigest": "e512a40d",
   "frames": [
     {
       "tick": 0,
@@ -735,11 +735,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1016,
-      "state": "0c6045fa",
-      "events": "6e506e40",
+      "state": "a15d420f",
+      "events": "a3304149",
       "rng": {
-        "draws": 18,
-        "digest": "9189d94b"
+        "draws": 12,
+        "digest": "e512a40d"
       },
       "label": "death",
       "players": [
@@ -886,11 +886,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -1066,11 +1066,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -1242,11 +1242,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -1418,11 +1418,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -1594,11 +1594,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -1929,31 +1929,11 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "heroic_bonewrought_greatsword"
-              },
-              {
-                "count": 1,
                 "itemId": "heroic_crownforged_dreadhelm"
               },
               {
                 "count": 1,
-                "itemId": "heroic_nighttalon_crown"
-              },
-              {
-                "count": 1,
-                "itemId": "heroic_direfang_greatblade"
-              },
-              {
-                "count": 1,
-                "itemId": "heroic_bramblehide_mantle"
-              },
-              {
-                "count": 1,
-                "itemId": "heroic_gravecourt_hewer"
-              },
-              {
-                "count": 1,
-                "itemId": "scepter_of_the_deathless_court"
+                "itemId": "stormcallers_focus"
               }
             ]
           },
@@ -2001,11 +1981,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1016,
-      "state": "0c6045fa",
+      "state": "a15d420f",
       "events": "741638a5",
       "rng": {
-        "draws": 18,
-        "digest": "9189d94b"
+        "draws": 12,
+        "digest": "e512a40d"
       },
       "label": "final",
       "players": [
@@ -2152,11 +2132,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -2332,11 +2312,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -2508,11 +2488,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -2684,11 +2664,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -2860,11 +2840,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 3,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 3,
                   "source": {}
                 }
               ]
@@ -3195,31 +3175,11 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "heroic_bonewrought_greatsword"
-              },
-              {
-                "count": 1,
                 "itemId": "heroic_crownforged_dreadhelm"
               },
               {
                 "count": 1,
-                "itemId": "heroic_nighttalon_crown"
-              },
-              {
-                "count": 1,
-                "itemId": "heroic_direfang_greatblade"
-              },
-              {
-                "count": 1,
-                "itemId": "heroic_bramblehide_mantle"
-              },
-              {
-                "count": 1,
-                "itemId": "heroic_gravecourt_hewer"
-              },
-              {
-                "count": 1,
-                "itemId": "scepter_of_the_deathless_court"
+                "itemId": "stormcallers_focus"
               }
             ]
           },

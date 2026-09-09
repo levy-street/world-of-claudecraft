@@ -18,12 +18,20 @@
 // (teleports that should break a spell keep their own rules), and delegated
 // to the one cancelCast on the seam, which already clears the queued-spell
 // slot and every hidden session field. Draw-free on every path.
+// The GCD-held queued press is the one exception to spell neutrality: a
+// stored press must not survive a displacement (it would fire ticks later at
+// the destination, with a clamped stale aim for a ground-target press), so
+// the slot is dropped on every displacement while a live spell cast stays
+// untouched.
 
 import type { SimContext } from '../sim_context';
 import { type Entity, isNonSpellCast } from '../types';
 
 export function cancelProfessionSessionOnDisplacement(ctx: SimContext, e: Entity): void {
   if (e.kind !== 'player') return;
+  e.queuedCastAbility = null;
+  e.queuedCastAim = null;
+  e.queuedCastTargetId = null;
   if (!isNonSpellCast(e.castingAbility)) return;
   ctx.cancelCast(e);
 }

@@ -577,6 +577,7 @@ export const da_DK: EnTranslations = {
       "mountsEyebrow": "Kontomontering",
       "mountsTitle": "Maskinstabil",
       "mountBuyAria": "Køb {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Indlæser WOC-butikken...",
       "error": "WOC-butikken er ikke tilgængelig lige nu. Prøv igen om lidt.",
       "balance": "Claudium-saldo",
@@ -1464,6 +1465,7 @@ export const da_DK: EnTranslations = {
       "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
       "desc_goblin_rocket_sled": "En farligt overbygget goblinslæde, drevet af to raketter og fremragende dårlig dømmekraft.",
       "desc_rallycart_rxt": "En lille rallymaskine, der øger rejsehastigheden.",
+      "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
       "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske.",
       "desc_mech_bird": "En håndbygget urværks-krigskylling, der spurter på knækkende servoer, mens optræksnøglen stadig drejer.",
@@ -4876,6 +4878,32 @@ export const da_DK: EnTranslations = {
         "crown_endures": "Kronen holder stand (hård rasen ved 6:00, heroic 5:00)",
         "deathless_court": "Det Dødsløse Hof (kun heroic, kongehofet rejser sig efter Dødsløs Rasen)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Relikvariet",
@@ -11392,7 +11420,7 @@ export const da_DK: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Kald de Faldne",
-        "description": "Bringer et dødt gruppemedlem tilbage til livet med 35% sundhed og mana. En Solheler på niveau 16 eller derover kalder i stedet ethvert faldent medlem af gruppen tilbage."
+        "description": "Bringer et dødt gruppemedlem tilbage til livet ved din side med 35% sundhed og mana. En Solheler på niveau 16 eller derover kalder i stedet ethvert faldent medlem af gruppen, som er inden for 30 meter og i din synsvidde, tilbage."
       },
       "beacon_of_light": {
         "name": "Lysets Bavn",
@@ -12125,6 +12153,14 @@ export const da_DK: EnTranslations = {
         "name": "Marvbrækker",
         "description": "Forbruger dine 3 Gammelt Blod til et tungt slag med høj trussel og {damage} skade. Under halvt helbred beskytter det dig i stedet med et skjold på 18% af dit maksimale helbred i 8 sek. og refunderer 15 raseri."
       },
+      "wildwake": {
+        "name": "Vildopvågnen",
+        "description": "Lokker en falden allieret til pludselig blomstring og bringer vedkommende tilbage til livet ved din side med 35% sundhed og mana, selv midt i kampens hede. (Lundhjerte)"
+      },
+      "grove_awakening": {
+        "name": "Lundens Opvågnen",
+        "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Lundhjerte)"
+      },
       "overbloom": {
         "name": "Overblomstring",
         "description": "Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet."
@@ -12435,15 +12471,15 @@ export const da_DK: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Tidsvending",
-        "description": "Tilbagespoler en falden allieredes tidslinje og bringer dem tilbage til livet ved deres krop med en del af deres helbred og mana, selv midt i kamp. (Kronomantik)"
+        "description": "Tilbagespoler en falden allieredes tidslinje og bringer dem tilbage til livet ved din side med 35% af deres helbred og mana, selv midt i kamp. (Kronomantik)"
       },
       "collective_reversal": {
         "name": "Kollektiv tilbagespoling",
-        "description": "Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid og genopliver dem ved deres krop med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)"
+        "description": "Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid, som er inden for 40 meter og i din synsvidde, og genopliver dem ved din side med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)"
       },
       "ancestor_return": {
         "name": "Forfædrenes Tilbagekomst",
-        "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt tilbage til livet ved deres krop med 30% sundhed og mana. Kan ikke kastes i kamp. (Åndelapning)"
+        "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Åndelapning)"
       },
       "temporal_rewind": {
         "name": "Tilbagespoling",
@@ -12585,6 +12621,10 @@ export const da_DK: EnTranslations = {
       "martyrs_aegis": {
         "name": "Martyrens Ægide",
         "description": "Reducerer den skade, en allieret tager, med 40% i 8 sek."
+      },
+      "prayer_of_returning": {
+        "name": "Tilbagekomstens Bøn",
+        "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Velsignelse og Lære)"
       },
       "choir_of_deliverance": {
         "name": "Befrielsens Kor",
@@ -18407,8 +18447,8 @@ export const da_DK: EnTranslations = {
       },
       "q_forgefathers_requiem": {
         "title": "The Forgefather's Requiem",
-        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.",
-        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.",
+        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.",
+        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.",
         "objectives": {
           "0": {
             "label": "Forgefather's Ember recovered"
@@ -18417,7 +18457,7 @@ export const da_DK: EnTranslations = {
       },
       "q_requiem_at_the_forge": {
         "title": "Requiem at the Forge",
-        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.",
+        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.",
         "completion": "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
         "objectives": {
           "0": {

@@ -291,13 +291,22 @@ describe('start gates', () => {
     expect(mob.harvestClaimedBy).toBeNull();
   });
 
-  it('refuses an actor already in combat, zero draws', () => {
+  it('starts and completes while the actor remains in combat, with no admission draws', () => {
     const { sim, a, mob } = setup();
-    mustEntity(sim, a).inCombat = true;
+    const p = mustEntity(sim, a);
+    p.inCombat = true;
+    p.combatTimer = 0;
     const counter = drawCounter(sim);
-    expect(startCorpseHarvest(sim.ctx, mob.id, a)).toBe(false);
+    expect(startCorpseHarvest(sim.ctx, mob.id, a)).toBe(true);
     expect(counter.stop()).toBe(0);
-    expect(mob.harvestClaimedBy).toBeNull();
+    expect(totalWolfMaterials(sim, a)).toBe(0);
+    tickWhileCasting(sim, a);
+    expect(p.inCombat).toBe(true);
+    expect(p.castingAbility).toBeNull();
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(totalWolfMaterials(sim, a)).toBeGreaterThan(0);
+    expect(mustMeta(sim, a).corpseHarvestSession).toBeNull();
+    expect(mob.corpseHarvestState?.reservedBy).toBeNull();
   });
 
   it('refuses an actor already busy with another cast, zero draws', () => {
@@ -482,17 +491,25 @@ describe('cancellation causes release the reservation with no lifetime extension
     expectCancelledAndReleased(sim, a, b, mob, timerBefore);
   });
 
-  it('entering combat mid-cast cancels and releases, zero draws', () => {
-    const { sim, a, b, mob } = setup();
-    const timerBefore = mob.corpseTimer;
+  it('entering combat mid-cast keeps the reservation and completes the harvest', () => {
+    const { sim, a, mob } = setup();
     expect(startCorpseHarvest(sim.ctx, mob.id, a)).toBe(true);
     sim.tick();
     const counter = drawCounter(sim);
     const p = mustEntity(sim, a);
     p.inCombat = true;
+    p.combatTimer = 0;
     sim.tick();
     expect(counter.stop()).toBe(0);
-    expectCancelledAndReleased(sim, a, b, mob, timerBefore);
+    expect(p.castingAbility).toBe(CORPSE_HARVEST_CAST_ID);
+    expect(mob.corpseHarvestState?.reservedBy).toBe(a);
+    expect(totalWolfMaterials(sim, a)).toBe(0);
+    tickWhileCasting(sim, a);
+    expect(p.inCombat).toBe(true);
+    expect(p.castingAbility).toBeNull();
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(totalWolfMaterials(sim, a)).toBeGreaterThan(0);
+    expect(mob.corpseHarvestState?.reservedBy).toBeNull();
   });
 
   it('the caster dying mid-cast cancels and releases (handleDeath may carry its own unrelated draws)', () => {

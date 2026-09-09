@@ -3263,7 +3263,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Leva um aliado um momento adiante no tempo, restaurando {damage} de vida enquanto o corpo se adapta ao seu eu futuro mais saudável. (Assinatura da Cronomancia)',
   'entities.abilities.temporal_mend.name': 'Cura Temporal',
   'entities.abilities.temporal_reversal.description':
-    'Reverte a linha do tempo de um aliado caído, retornando-o à vida junto ao seu corpo com uma parcela de vida e mana, mesmo no meio do combate. (Cronomancia)',
+    'Reverte a linha do tempo de um aliado caído, retornando-o à vida ao seu lado com 35% de vida e mana, mesmo no meio do combate. (Cronomancia)',
   'entities.abilities.temporal_reversal.name': 'Reversão Temporal',
   'entities.abilities.temporal_rewind.description':
     'Envia uma onda arcana pelo seu grupo ou raide, revertendo o tempo para restaurar 30% do dano que cada aliado dentro de 40 metros sofreu nos últimos 5 segundos (até 35% de sua vida máxima). Não pode ser um efeito crítico. (Cronomancia)',
@@ -3891,7 +3891,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.abilityError.shieldRequired': 'Você precisa ter um escudo equipado.',
   'entities.abilities.collective_reversal.name': 'Reversão coletiva',
   'entities.abilities.collective_reversal.description':
-    'Rebobina a linha temporal de cada membro morto do seu grupo ou raide e o traz de volta à vida junto ao corpo com 30% de vida e mana. Não pode ser lançada em combate. (Cronomancia)',
+    'Rebobina a linha temporal de cada membro morto do seu grupo ou raide a até 40 m e dentro da sua linha de visão, trazendo-o de volta à vida ao seu lado com 30% de vida e mana. Não pode ser lançada em combate. (Cronomancia)',
   'entities.abilities.sport_boot.description':
     'Um chutão alto e longo em direção ao ponto de mira. A torcida adora.',
   'entities.abilities.sport_boot.name': 'Chutão',
@@ -13510,7 +13510,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Aumenta o poder mágico seu e dos membros do grupo em 20 por 30 min. Substitui sua própria Devoção da Alvorada ou da Graça, mas coexiste com as Devoções de outros paladinos.',
   'entities.abilities.recall_the_fallen.description':
-    'Traz de volta à vida um membro morto do grupo com 35% de vida e mana. Um Curassol de nível 16 ou superior, em vez disso, chama de volta todos os membros caídos do grupo.',
+    'Traz de volta à vida, ao seu lado, um membro morto do grupo com 35% de vida e mana. Um Curassol de nível 16 ou superior, em vez disso, chama de volta todos os membros caídos do grupo a até 30 m e dentro da sua linha de visão.',
   'entities.abilities.sacred_challenge.description':
     'Obriga um inimigo a atacar você. Durante a Ascensão também reduz em 15% todo o dano recebido por 4 s sem consumir carga.',
   'entities.abilities.sacred_form.description':
@@ -13585,6 +13585,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Consome 3 de Ferocidade da Matilha depois que seu companheiro golpeia causando de 83 a 105 de dano Físico e sacode todos os inimigos a até 6 metros causando de 26 a 34. O golpe e a sacudida usam o bônus completo de 30% de dano de companheiro da Ferocidade da Matilha e aumentam com o poder de ataque do companheiro. Pelos 8 s seguintes, o companheiro causa 25% mais dano, ataca 35% mais rápido e faz o Tiro Vil atingir até 2 inimigos próximos.',
   'entities.abilities.wildheart.description': 'Restaura instantaneamente 30% da sua vida máxima.',
   'entities.abilities.ancestor_return.name': 'Retorno dos Ancestrais',
+  'entities.abilities.grove_awakening.description':
+    'Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Coração do Bosque)',
+  'entities.abilities.grove_awakening.name': 'Despertar do Bosque',
+  'entities.abilities.prayer_of_returning.description':
+    'Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Sagrado e Disciplina)',
+  'entities.abilities.prayer_of_returning.name': 'Prece do Retorno',
+  'entities.abilities.wildwake.description':
+    'Induz um aliado caído a um florescer repentino, trazendo-o de volta à vida ao seu lado com 35% de vida e mana, mesmo em pleno combate. (Coração do Bosque)',
+  'entities.abilities.wildwake.name': 'Despertar Selvagem',
   'entities.abilities.galeheart_weapon.name': 'Arma Coração de Vendaval',
   'entities.abilities.lifespring_weapon.name': 'Arma Fonte da Vida',
   'entities.abilities.primal_exaltation.name': 'Exaltação Primordial',
@@ -13595,7 +13604,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Desencadear Arma',
   'entities.abilities.warspirit_cadence.name': 'Cadência do Espírito Guerreiro',
   'entities.abilities.ancestor_return.description':
-    'Chama de volta à vida, junto ao próprio corpo, todos os membros caídos do seu grupo ou raide com 30% de vida e mana. Não pode ser conjurada em combate. (Remendo Espiritual)',
+    'Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Remendo Espiritual)',
   'entities.abilities.galeheart_weapon.description':
     'Encanta ambas as armas por 30 min, habilitando a Cadência do Espírito Guerreiro.',
   'entities.abilities.lifespring_weapon.description':

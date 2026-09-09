@@ -3309,7 +3309,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Propulse un allié un instant vers l'avenir, soignant {damage} points de vie tandis que son corps s'installe dans un futur plus sain. (Signature de Chromancie)",
   'entities.abilities.temporal_mend.name': 'Soin temporel',
   'entities.abilities.temporal_reversal.description':
-    "Rembobine la chronologie d'un allié tombé, le ramenant à la vie à l'emplacement de son corps avec une partie de sa vie et de son mana, même en plein combat. (Chromancie)",
+    "Rembobine la chronologie d'un allié tombé, le ramenant à la vie à vos côtés avec 35% de sa vie et de son mana, même en plein combat. (Chromancie)",
   'entities.abilities.temporal_reversal.name': 'Inversion temporelle',
   'entities.abilities.temporal_rewind.description':
     "Envoie une vague d'arcane à travers votre groupe ou raid, remontant le temps pour restaurer 30 % des dégâts que chaque allié à moins de 40 mètres a subis au cours des 5 dernières secondes (jusqu'à 35 % de leur vie maximale). Ne peut pas être un effet critique. (Chromancie)",
@@ -4391,7 +4391,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.charter.title': 'Chartes du coffre-fort',
   'entities.abilities.collective_reversal.name': 'Réversion collective',
   'entities.abilities.collective_reversal.description':
-    'Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid et le ramène à la vie près de son corps avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)',
+    'Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, et le ramène à la vie à vos côtés avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)',
   'entities.abilities.sport_boot.description':
     'Une longue balle bottée en cloche vers le point visé. La foule adore.',
   'entities.abilities.sport_boot.name': 'Grosse botte',
@@ -13866,7 +13866,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     "Augmente la puissance des sorts de vous-même et des membres du groupe de 20 pendant 30 min. Remplace votre propre Dévotion de l'aube ou de grâce, mais coexiste avec les Dévotions des autres paladins.",
   'entities.abilities.recall_the_fallen.description':
-    'Ramène à la vie un membre mort du groupe avec 35% de points de vie et de mana. Un Sagesoleil de niveau 16 ou plus rappelle à la place tous les membres tombés du groupe.',
+    'Ramène à la vie un membre mort du groupe à vos côtés avec 35% de points de vie et de mana. Un Sagesoleil de niveau 16 ou plus rappelle à la place tous les membres tombés du groupe à moins de 30 mètres et dans votre ligne de vue.',
   'entities.abilities.sacred_challenge.description':
     "Contraint un ennemi à vous attaquer. Pendant l'Ascension, réduit aussi de 15% tous les dégâts subis pendant 4 s sans consommer de charge.",
   'entities.abilities.sacred_form.description':
@@ -13942,6 +13942,15 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wildheart.description':
     'Restaure instantanément 30% de vos points de vie maximum.',
   'entities.abilities.ancestor_return.name': 'Retour des ancêtres',
+  'entities.abilities.grove_awakening.description':
+    'Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Cœur sylvestre)',
+  'entities.abilities.grove_awakening.name': 'Éveil du bosquet',
+  'entities.abilities.prayer_of_returning.description':
+    'Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Bénison et Doctrine)',
+  'entities.abilities.prayer_of_returning.name': 'Prière du retour',
+  'entities.abilities.wildwake.description':
+    'Incite un allié tombé à fleurir soudainement, le ramenant à la vie à vos côtés avec 35% de points de vie et de mana, même en plein combat. (Cœur sylvestre)',
+  'entities.abilities.wildwake.name': 'Éveil sauvage',
   'entities.abilities.galeheart_weapon.name': 'Arme Cœur-de-bourrasque',
   'entities.abilities.lifespring_weapon.name': 'Arme Source-de-vie',
   'entities.abilities.primal_exaltation.name': 'Exaltation primordiale',
@@ -13952,7 +13961,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': "Déchaîner l'arme",
   'entities.abilities.warspirit_cadence.name': "Cadence de l'esprit guerrier",
   'entities.abilities.ancestor_return.description':
-    'Ramène à la vie auprès de leur corps tous les membres tombés de votre groupe ou raid avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Reprise spirituelle)',
+    'Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Reprise spirituelle)',
   'entities.abilities.galeheart_weapon.description':
     "Enchante les deux armes pendant 30 min et active la Cadence de l'esprit guerrier.",
   'entities.abilities.lifespring_weapon.description':

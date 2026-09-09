@@ -201,10 +201,15 @@ describe('corpse lifetime', () => {
 });
 
 describe('the refusal categories', () => {
+  it('admits an otherwise eligible actor in combat', () => {
+    expect(admitCorpseHarvest(input({ actor: actor({ inCombat: true }) }))).toEqual(
+      admitCorpseHarvest(input()),
+    );
+  });
+
   it('names one reason per failing fact', () => {
     const cases: ReadonlyArray<readonly [string, HarvestAdmissionInput]> = [
       ['actor_dead', input({ actor: actor({ alive: false }) })],
-      ['actor_in_combat', input({ actor: actor({ inCombat: true }) })],
       ['actor_busy', input({ actor: actor({ alreadyCasting: true }) })],
       ['corpse_invalid', input({ corpse: corpse({ valid: false }) })],
       ['wrong_world', input({ actor: actor({ sameWorld: false }) })],

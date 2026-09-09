@@ -577,6 +577,7 @@ export const de_DE: EnTranslations = {
       "mountsEyebrow": "Konto-Mounts",
       "mountsTitle": "Maschinenstabil",
       "mountBuyAria": "Kaufen Sie {item}",
+      "mountSkinType": "Mount skin",
       "loading": "WOC-Shop wird geladen...",
       "error": "Der WOC-Shop ist derzeit nicht verfügbar. Bitte versuche es gleich noch einmal.",
       "balance": "Claudium-Guthaben",
@@ -1464,6 +1465,7 @@ export const de_DE: EnTranslations = {
       "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.",
       "desc_goblin_rocket_sled": "Ein gefährlich überkonstruierter Goblinschlitten, angetrieben von zwei Raketen und hervorragend schlechtem Urteilsvermögen.",
       "desc_rallycart_rxt": "Eine handliche Rallyemaschine, die die Reisegeschwindigkeit erhöht.",
+      "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
       "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht.",
       "desc_mech_bird": "Ein handgefertigtes Uhrwerk-Kriegshuhn, das mit schnappenden Servos sprintet, während sich der Aufziehschlüssel noch dreht.",
@@ -4876,6 +4878,32 @@ export const de_DE: EnTranslations = {
         "crown_endures": "Die Krone hält stand (harte Raserei bei 6:00, heroisch 5:00)",
         "deathless_court": "Der Todlose Hof (nur heroisch, der Königshof erhebt sich nach Todloser Raserei)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Das Reliquiar",
@@ -11392,7 +11420,7 @@ export const de_DE: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Ruf der Gefallenen",
-        "description": "Erweckt ein totes Gruppenmitglied mit 35% Gesundheit und Mana wieder zum Leben. Ein Sonnenheiler der Stufe 16 oder höher ruft stattdessen alle gefallenen Mitglieder der Gruppe zurück."
+        "description": "Erweckt ein totes Gruppenmitglied mit 35% Gesundheit und Mana an Eurer Seite wieder zum Leben. Ein Sonnenheiler der Stufe 16 oder höher ruft stattdessen alle gefallenen Mitglieder der Gruppe innerhalb von 30 Metern und in Eurer Sichtlinie zurück."
       },
       "beacon_of_light": {
         "name": "Leuchtfeuer des Lichts",
@@ -12125,6 +12153,14 @@ export const de_DE: EnTranslations = {
         "name": "Markbrecher",
         "description": "Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit für 8 Sek. und erstattet 15 Wut zurück."
       },
+      "wildwake": {
+        "name": "Wildwecken",
+        "description": "Lockt einen gefallenen Verbündeten zu plötzlicher Blüte und ruft ihn mit 35% seiner Gesundheit und seines Manas an Eure Seite ins Leben zurück, selbst mitten im Kampf. (Hainherz)"
+      },
+      "grove_awakening": {
+        "name": "Erwachen des Hains",
+        "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Hainherz)"
+      },
       "overbloom": {
         "name": "Überblüte",
         "description": "Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel."
@@ -12435,15 +12471,15 @@ export const de_DE: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Temporale Umkehr",
-        "description": "Spult den Zeitstrang eines gefallenen Verbündeten zurück und erweckt ihn an seinem Körper mit einem Teil seiner Gesundheit und seines Manas, selbst mitten im Kampf. (Chronomantie)"
+        "description": "Spult den Zeitstrang eines gefallenen Verbündeten zurück und erweckt ihn an deiner Seite mit 35% seiner Gesundheit und seines Manas, selbst mitten im Kampf. (Chronomantie)"
       },
       "collective_reversal": {
         "name": "Kollektive Umkehr",
-        "description": "Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe zurück und erweckt es bei seinem Körper mit 30% Gesundheit und Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)"
+        "description": "Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe innerhalb von 40 Metern und in eurer Sichtlinie zurück und erweckt es an eurer Seite mit 30% Gesundheit und Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)"
       },
       "ancestor_return": {
         "name": "Rückkehr der Ahnen",
-        "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs an seinem Körper mit 30% Gesundheit und Mana ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Geistflickung)"
+        "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Geistflickung)"
       },
       "temporal_rewind": {
         "name": "Rückspulen",
@@ -12585,6 +12621,10 @@ export const de_DE: EnTranslations = {
       "martyrs_aegis": {
         "name": "Ägide des Märtyrers",
         "description": "Verringert den von einem Verbündeten erlittenen Schaden 8 Sek. lang um 40%."
+      },
+      "prayer_of_returning": {
+        "name": "Gebet der Rückkehr",
+        "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Heilig und Doktrin)"
       },
       "choir_of_deliverance": {
         "name": "Chor der Erlösung",
@@ -18407,8 +18447,8 @@ export const de_DE: EnTranslations = {
       },
       "q_forgefathers_requiem": {
         "title": "The Forgefather's Requiem",
-        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.",
-        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.",
+        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.",
+        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.",
         "objectives": {
           "0": {
             "label": "Forgefather's Ember recovered"
@@ -18417,7 +18457,7 @@ export const de_DE: EnTranslations = {
       },
       "q_requiem_at_the_forge": {
         "title": "Requiem at the Forge",
-        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.",
+        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.",
         "completion": "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
         "objectives": {
           "0": {

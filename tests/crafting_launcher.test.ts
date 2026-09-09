@@ -14,6 +14,7 @@ import { hydrateIcons } from '../src/ui/ui_icons';
 const read = (rel: string): string => readFileSync(join(__dirname, rel), 'utf8');
 
 const hud = read('../src/ui/hud.ts');
+const sideButtons = read('../src/ui/hud/menu/side_buttons.ts');
 const mainSrc = read('../src/main.ts');
 const mobileControlsSrc = read('../src/game/mobile_controls.ts');
 const keybindsSrc = read('../src/game/keybinds.ts');
@@ -42,7 +43,7 @@ describe('desktop micro-menu launcher', () => {
     expect(hud).toContain(
       "$('#mm-crafting').addEventListener('click', () => this.toggleCrafting());",
     );
-    expect(hud).toContain("['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],");
+    expect(sideButtons).toContain("['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],");
   });
 });
 
@@ -150,9 +151,6 @@ describe('side rail height budget', () => {
   const UNCOMPACTED_GAP_PX = 4; // .side-buttons-col gap at full size (hud.css:1754)
   const COMPACT_MICRO_PX = 24; // .micro-btn height under @media (max-height: 600px)
   const COMPACT_GAP_PX = 1; // column gap under the same media query
-  // The Daily Rewards chest block (button plus its margin), which now lives
-  // at the top of col-b only, from the reviewer's offline measurement.
-  const DAILY_CHEST_BLOCK_PX = 128;
 
   function wrapperMarkup(html: string): string {
     const start = html.indexOf('<div id="side-buttons">');
@@ -199,12 +197,7 @@ describe('side rail height budget', () => {
     expect(gapMatch).not.toBeNull();
     expect(Number(gapMatch?.[1])).toBeLessThanOrEqual(10);
 
-    // The real driver of visible separation is each column's width against
-    // the #daily-rewards-button chest (50px), not the wrapper's flex gap:
-    // an unconstrained, content-sized col-b would right-align its 34px
-    // buttons inside a 50px box and open a dead gutter next to col-a. Pin
-    // the explicit width that keeps both columns the same 34px as the chest
-    // overhangs into, instead of the flex gap alone.
+    // Explicit widths keep both columns aligned to the standard launcher slot.
     const colRule = /\.side-buttons-col \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
     expect(colRule).toMatch(/width:\s*34px;/);
   });
@@ -228,7 +221,7 @@ describe('side rail height budget', () => {
     const colB = wrapper.slice(colBStart);
 
     // The Daily Rewards chest lives in col-b only: pin that so moving it
-    // back to col-a (silently shifting 128px of budget) still fails here.
+    // back to col-a still fails here. It shares the standard slot budget.
     expect(colB, name).toContain('id="daily-rewards-button"');
     expect(colA, name).not.toContain('id="daily-rewards-button"');
     return { colA, colB };
@@ -244,8 +237,7 @@ describe('side rail height budget', () => {
       const colBVisible = countVisibleMicroBtns(colB);
 
       const colAPx = colAVisible * (UNCOMPACTED_MICRO_PX + UNCOMPACTED_GAP_PX);
-      const colBPx =
-        DAILY_CHEST_BLOCK_PX + colBVisible * (UNCOMPACTED_MICRO_PX + UNCOMPACTED_GAP_PX);
+      const colBPx = colBVisible * (UNCOMPACTED_MICRO_PX + UNCOMPACTED_GAP_PX);
 
       expect(
         colAPx + BOTTOM_ANCHOR_PX,
@@ -268,7 +260,7 @@ describe('side rail height budget', () => {
       const colBVisible = countVisibleMicroBtns(colB);
 
       const colAPx = colAVisible * (COMPACT_MICRO_PX + COMPACT_GAP_PX);
-      const colBPx = DAILY_CHEST_BLOCK_PX + colBVisible * (COMPACT_MICRO_PX + COMPACT_GAP_PX);
+      const colBPx = colBVisible * (COMPACT_MICRO_PX + COMPACT_GAP_PX);
 
       expect(
         colAPx + BOTTOM_ANCHOR_PX,

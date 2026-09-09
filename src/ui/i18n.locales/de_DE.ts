@@ -3295,7 +3295,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Zieht einen Verbündeten einen Moment in die Zukunft und heilt {damage} Gesundheit, während der Körper in sein gesünderes zukünftiges Selbst eingeht. (Chronomantie-Signatur)',
   'entities.abilities.temporal_mend.name': 'Temporale Heilung',
   'entities.abilities.temporal_reversal.description':
-    'Spult den Zeitstrang eines gefallenen Verbündeten zurück und erweckt ihn an seinem Körper mit einem Teil seiner Gesundheit und seines Manas, selbst mitten im Kampf. (Chronomantie)',
+    'Spult den Zeitstrang eines gefallenen Verbündeten zurück und erweckt ihn an deiner Seite mit 35% seiner Gesundheit und seines Manas, selbst mitten im Kampf. (Chronomantie)',
   'entities.abilities.temporal_reversal.name': 'Temporale Umkehr',
   'entities.abilities.temporal_rewind.description':
     'Sendet eine arkane Welle durch deine Gruppe oder deinen Schlachtzug und dreht die Zeit zurück, um 30% des Schadens wiederherzustellen, den jeder Verbündete innerhalb von 40 Metern in den letzten 5 Sekunden erlitten hat (bis zu 35% seiner maximalen Gesundheit). Kann kein kritischer Effekt sein. (Chronomantie)',
@@ -3912,7 +3912,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.abilityError.shieldRequired': 'Ihr müsst einen Schild ausgerüstet haben.',
   'entities.abilities.collective_reversal.name': 'Kollektive Umkehr',
   'entities.abilities.collective_reversal.description':
-    'Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe zurück und erweckt es bei seinem Körper mit 30% Gesundheit und Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)',
+    'Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe innerhalb von 40 Metern und in eurer Sichtlinie zurück und erweckt es an eurer Seite mit 30% Gesundheit und Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)',
   'entities.abilities.sport_boot.description':
     'Ein hoher, weiter Schlag Richtung Zielpunkt. Die Menge liebt es.',
   'entities.abilities.sport_boot.name': 'Weitschlag',
@@ -12425,7 +12425,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Erhöht die Zaubermacht von Euch und Euren Gruppenmitgliedern 30 Min. lang um 20. Ersetzt Eure eigene Hingabe der Morgenröte oder Hingabe der Gnade, besteht aber neben den Hingaben anderer Paladine.',
   'entities.abilities.recall_the_fallen.description':
-    'Erweckt ein totes Gruppenmitglied mit 35% Gesundheit und Mana wieder zum Leben. Ein Sonnenheiler der Stufe 16 oder höher ruft stattdessen alle gefallenen Mitglieder der Gruppe zurück.',
+    'Erweckt ein totes Gruppenmitglied mit 35% Gesundheit und Mana an Eurer Seite wieder zum Leben. Ein Sonnenheiler der Stufe 16 oder höher ruft stattdessen alle gefallenen Mitglieder der Gruppe innerhalb von 30 Metern und in Eurer Sichtlinie zurück.',
   'entities.abilities.sacred_challenge.description':
     'Zwingt einen Gegner, Euch anzugreifen. Während des Aufstiegs verringert er zusätzlich 4 Sek. lang allen erlittenen Schaden um 15%, ohne eine Aufladung zu verbrauchen.',
   'entities.abilities.sacred_form.description':
@@ -12500,6 +12500,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wildheart.description':
     'Stellt sofort 30% Eurer maximalen Gesundheit wieder her.',
   'entities.abilities.ancestor_return.name': 'Rückkehr der Ahnen',
+  'entities.abilities.grove_awakening.description':
+    'Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Hainherz)',
+  'entities.abilities.grove_awakening.name': 'Erwachen des Hains',
+  'entities.abilities.prayer_of_returning.description':
+    'Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Heilig und Doktrin)',
+  'entities.abilities.prayer_of_returning.name': 'Gebet der Rückkehr',
+  'entities.abilities.wildwake.description':
+    'Lockt einen gefallenen Verbündeten zu plötzlicher Blüte und ruft ihn mit 35% seiner Gesundheit und seines Manas an Eure Seite ins Leben zurück, selbst mitten im Kampf. (Hainherz)',
+  'entities.abilities.wildwake.name': 'Wildwecken',
   'entities.abilities.galeheart_weapon.name': 'Sturmherzwaffe',
   'entities.abilities.lifespring_weapon.name': 'Lebensquellwaffe',
   'entities.abilities.primal_exaltation.name': 'Urtümliche Erhebung',
@@ -12510,7 +12519,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Waffe entfesseln',
   'entities.abilities.warspirit_cadence.name': 'Kriegsgeistkadenz',
   'entities.abilities.ancestor_return.description':
-    'Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs an seinem Körper mit 30% Gesundheit und Mana ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Geistflickung)',
+    'Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Geistflickung)',
   'entities.abilities.galeheart_weapon.description':
     'Verzaubert beide Waffen 30 Min. lang und ermöglicht die Kriegsgeistkadenz.',
   'entities.abilities.lifespring_weapon.description':

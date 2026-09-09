@@ -1799,7 +1799,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(notes.encounterReset).toBe(true);
   });
 
-  it('heroic_five_man_clear: one shared heroic claim, the variant swap and appended draws, marks and the lockout to every participant', () => {
+  it('heroic_five_man_clear: one shared claim, one equipment drop, marks and the lockout to every participant', () => {
     const rec = run('heroic_five_man_clear');
     const sim = rec.sim as any;
     const partyPids = rec.notes.partyPids as number[];
@@ -1820,33 +1820,18 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const droppedIds = ((boss.loot?.items ?? []) as any[]).map((s) => s.itemId);
     expect(droppedIds.length).toBeGreaterThan(0);
 
-    // ARM 1, the heroicItem swap: at least one drop came back as its heroic_
-    // copy of a BASE-table id, which is the arm the raid claim cannot reach
-    // (its variants read the raid tier instead). The base id is asserted too,
-    // so the swap is proven against the table rather than against a prefix.
-    const baseTableIds = new Set(
-      ((MOBS[HEROIC_FIVE_MAN_BOSS_ID].loot ?? []) as any[])
-        .map((e) => e.itemId)
-        .filter((id): id is string => typeof id === 'string'),
+    // The combined Heroic partition replaces the base equipment rolls.
+    // Exactly one item must come from that slot; recipes/bags/mounts are extra.
+    const gear = droppedIds.filter((id) =>
+      ['armor', 'weapon', 'held_offhand'].includes(ITEMS[id]?.kind),
     );
-    const swapped = droppedIds.filter(
-      (id) => id.startsWith('heroic_') && baseTableIds.has(id.slice('heroic_'.length)),
+    expect(gear).toHaveLength(1);
+    const heroicGearIds = new Set(
+      HEROIC_BOSS_LOOT[HEROIC_FIVE_MAN_BOSS_ID]
+        .filter((entry) => entry.rollGroup === 'korzul_heroic')
+        .map((entry) => entry.itemId),
     );
-    expect(swapped.length, `no variant swap in ${droppedIds.join(',')}`).toBeGreaterThan(0);
-    for (const id of swapped) {
-      expect(ITEMS[id]?.heroicOf, id).toBe(id.slice('heroic_'.length));
-    }
-
-    // ARM 2, the APPENDED heroic-only table: at least one drop came from
-    // HEROIC_BOSS_LOOT rather than the base walk, which is the stream position
-    // a base-table tail append shifts.
-    const heroicOnlyIds = new Set(
-      (HEROIC_BOSS_LOOT[HEROIC_FIVE_MAN_BOSS_ID] ?? []).map((e) => e.itemId),
-    );
-    expect(
-      droppedIds.filter((id) => heroicOnlyIds.has(id)).length,
-      `no appended heroic drop in ${droppedIds.join(',')}`,
-    ).toBeGreaterThan(0);
+    expect(heroicGearIds.has(gear[0])).toBe(true);
 
     // ARM 3, awardHeroicMarks on a FIVE-MAN: the tuning's marksPerParticipant
     // to EVERY participant (the raid pays 3, so the number itself says which

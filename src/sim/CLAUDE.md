@@ -73,6 +73,7 @@ plausibly covers means the table needs a new row in the same change.
 | `combat/damage.ts` | `dealDamage`, `handleDeath`, `grantXp` (+ lifetime-XP; milestone unlocks absorbed into `deeds.ts`) |
 | `combat/heal.ts` | `applyHeal`, healing threat/taken-mult, hex/crit-vuln mults, heal-absorb |
 | `combat/threat_modifiers.ts` | aura, talent, and known-passive threat multipliers through `SimContext` |
+| `combat/engaged_combat.ts` | the per-tick player combat flag (`collectEngagedPids`): the classic hate-table rule (anyone a live mob still carries on its table stays in combat, pets flag their owner), the hate-table reach (an attacker beyond `THREAT_DROP_RANGE` is dropped off the table on the same walk), and the boss "zone in combat" rule (an engaged boss holds its attackers' nearby group members); called from the coordinator's engaged pass, draws no rng |
 | `combat/auras.ts` + `combat/cc.ts` | per-tick auras/regen/timers, NPC aura cleanse; CC predicates (stun/root/silence/disarm/lockout/blind/tongues) |
 | `combat/casting_lifecycle.ts` | `updateCasting`, `castAbility(BySlot)`, `cancelCast`, `pushbackCast`, GCD/cost/cooldown |
 | `combat/effect_dispatch.ts` | `runEffects` (the per-effect switch) |
@@ -110,6 +111,7 @@ plausibly covers means the table needs a new row in the same change.
 | `quests/quest_item_presence.ts` | `playerHoldsQuestItem`: the accept-time re-grant predicate over bags/bank/mail/market escrow |
 | `quests/quest_marker_kind.ts` | `QuestMarkerKind` + `questMarkerKind`/`npcQuestMarkerKind`/`strongerQuestMarker`/`questMarkerRank`: the ONE quest-indicator classification rule the four presentation surfaces consume (nameplate, minimap, world map, gossip list); a pure leaf like `quest_targets.ts`, no SimContext, no rng, no clock |
 | `instances/dungeons.ts` | door triggers, enter/leave, instance slots, raid lockouts + raid gates, and the manual instance-reset lifecycle (`resetDungeonInstances` behind `/dungeon reset`, character-keyed cooldowns on the `dungeonResetLocks` primitive, `inheritDungeonResetLocks` on party join) |
+| `instances/instance_combat_hold.ts` | the instance combat hold: inside a claimed slot (a dungeon, or one raid room) hate tables are slot-scoped (an attacker drops only by leaving the slot, never by distance), the soft leash never fires, and a mob that cannot reach its target (geometry stall or hard tether) holds in place immune and aggro'd (`evadeInPlace`) instead of evading home; consumed by `combat/engaged_combat.ts`, `mob/combat_profile.ts`, `mob/reachability.ts`, `combat/damage.ts` |
 | `instances/ignivar_entry.ts` | the Ignivar raid door rules for entrants from outside the raid: the cleared-room checkpoint redirect (`resolveIgnivarEntryRoom` over the group's claims) and the anti-zerg combat entry lockout (`ignivarRaidInCombat`, the Rift rule applied to the four-room family); pure helpers `enterDungeon` consumes |
 | `rift/` | the procedural Rift subsystem: `runs.ts` (run lifecycle: enter/descend/exit, floor gates, level-20 gate, Heroic Mark rewards) + `portals.ts` (the ranked C/B/A/S world-portal scheduler), `rift_gen.ts` (the pure deterministic floor generator every host calls identically) + `authored.ts` (hand-authored room-graph floors; one wall-derivation source for collision and render) + `style.ts` (the theme-to-`InteriorStyle` leaf the generator and the authored floors share), `ranks.ts` (the ONE place baseLevel becomes rank-driven difficulty; every consumer derives the same rank), `progression.ts` (rift gear + deterministic forge ops; per-copy state on `ItemInstancePayload`, static defs stay the combat-safe shell), `persistence.ts` (versioned shared-event projection; runtime instance slots deliberately not saved), `race.ts` (the atomic first-clear claim on a shared `RiftEvent`), `loot_pools.ts` (rank loot pools reuse the tier's existing tables), `upgrade.ts` + `upgrader_draft.ts` (data-only Dungeon Upgrader artifacts, local draft as the AI-service fallback), `entry_clearance.ts` (the interior half of never-aggro-on-entry for GENERATED floors), `rift_lockpick.ts` (the giga-boss cache on the shared `lockpick.ts` engine + the delve lockpick wire). Content side: `content/rift/`; design: `docs/design/rift-portals.md` |
 | `instances/difficulty.ts` + `instances/heroic_vendor.ts` | heroic dungeons: tuning + `dungeonDifficulty`/`setDungeonDifficulty`, `awardHeroicMarks` and kill lockouts; the Heroic Quartermaster marks vendor |
@@ -327,7 +329,9 @@ decay, in-flight projectiles); the per-player loop (movement/doors/casting/auto-
 regen for live players, the ghost-run arm for released spirits, timers + auras for dead
 players too, intentionally); the per-entity loop (mob update + auras, friendly-NPC aura
 cleanse, object respawn); the `engagedPids` combat-flag pass (reads pet AND mob state
-after both update: this STAYS in the coordinator, never moves into a slice); the
+after both update, and drops out-of-reach attackers off the hate tables: the PHASE stays in
+the coordinator, never moves into a slice; the derivation itself is
+`combat/engaged_combat.ts`'s `collectEngagedPids`); the
 end-of-tick system block in fixed order (duels, Card Duel pairing + AFK deadlines,
 arena, trades/ready-checks, ..., through the delayed-event drain, then the
 deeds evaluator `updateDeeds`: zero rng, after the drain so it sees same-tick results); grid

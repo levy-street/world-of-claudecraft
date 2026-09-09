@@ -680,6 +680,7 @@ export function harvestNode(
   // unprompted one tick after it ends (updateCasting's retry arm).
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   ctx.emit({
     type: 'castStart',
     entityId: p.id,

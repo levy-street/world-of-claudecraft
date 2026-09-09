@@ -21,6 +21,7 @@ import { castAbility } from '../src/sim/combat/casting_lifecycle';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import {
   DEFAULT_MOUNT,
   DEVELOPER_MOUNTS,
@@ -32,7 +33,6 @@ import {
   normalizeSelectedMount,
   TRAINING_MOUNT_KEY,
 } from '../src/sim/content/mounts';
-import { isStoreMountItemId } from '../src/sim/content/store_mounts';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { guildBankPipeRefusal } from '../src/sim/guild_bank';
@@ -106,13 +106,13 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly fifteen mounts with the horse first and the developer rickshaw last', () => {
-    expect(MOUNT_KEYS).toHaveLength(15);
+  it('has exactly ten mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(10);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
-    expect(MOUNT_KEYS.at(-1)).toBe('rickshaw_mount');
+    expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
-    // Every developer-only mount is a real catalog key, and the rickshaw keeps
-    // the tail so a new PLAYER-facing mount always lands above it.
+    // Every developer-only mount is a real catalog key, and the tank keeps the
+    // tail so a new PLAYER-facing mount always lands above it.
     for (const key of DEVELOPER_MOUNTS) expect(MOUNT_KEYS).toContain(key);
   });
 
@@ -126,18 +126,11 @@ describe('mount catalog', () => {
     expect(spec('shadowjump_toad')).toEqual(['uncommon', 0.7]);
     expect(spec('grag_bear')).toEqual(['rare', 0.75]);
     expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
-    // The store mount is deliberately RARE, never epic: real money buys the
-    // look, not the top speed tier (the paid design the weapon skins set).
-    expect(spec('mech_bird')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
-    expect(spec('goblin_rocket_sled')).toEqual(['epic', 0.8]);
-    expect(spec('rallycart_rxt')).toEqual(['epic', 0.8]);
     expect(spec('lanternback_troll')).toEqual(['epic', 0.8]);
-    expect(spec('chimeglass_tortoise')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
     expect(spec('drakemaw_raptor')).toEqual(['epic', 0.8]);
-    expect(spec('rickshaw_mount')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -158,15 +151,6 @@ describe('mount catalog', () => {
         }
       }
     }
-  });
-
-  it('pins the Claudium-only Mech Bird card exactly', () => {
-    expect(MOUNTS.mech_bird).toEqual({
-      key: 'mech_bird',
-      name: 'Cluckwork Mech Bird',
-      rarity: 'rare',
-      moveSpeedPct: 0.75,
-    });
   });
 
   it('normalizeMountKey coerces unknown or absent keys to "" (unmounted)', () => {
@@ -200,7 +184,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (isDeveloperMount(key) || key === 'mech_bird') {
+      if (isDeveloperMount(key)) {
         // Bound reins, for the same leak reason from different doors: a
         // developer-only mount has no player acquisition path, and the store
         // mount's reins is a real-money grant (server/claudium.ts). Either
@@ -240,21 +224,6 @@ describe('mount reins items (the collection: owning the item is owning the mount
     for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed')) {
       expect(reinsFor(key)[0].buyValue).toBeUndefined();
     }
-  });
-
-  it('pins the Mech Bird reins as a soulbound Claudium grant, never a copper purchase', () => {
-    expect(ITEMS.reins_mech_bird).toEqual({
-      id: 'reins_mech_bird',
-      name: 'Ignition Key: Cluckwork Mech Bird',
-      kind: 'mount',
-      mount: 'mech_bird',
-      quality: 'rare',
-      soulbound: true,
-      noVendorSell: true,
-      noDiscard: true,
-      sellValue: 0,
-    });
-    expect(isStoreMountItemId('reins_mech_bird')).toBe(true);
   });
 
   it('pins each reins item to its acquisition path, DERIVED from its own rarity', () => {
@@ -313,55 +282,9 @@ describe('mount reins items (the collection: owning the item is owning the mount
         entries.filter((l) => l.itemId === itemId).map((l) => ({ bossId, ...l })),
       );
 
-      // STORE MOUNT (owner ask, 2026-08-17): the Cluckwork Mech Bird sells for
-      // Claudium (content/store_mounts.ts; the spend route materializes the
-      // soulbound reins). It takes NO in-world path despite its rare tier: the
-      // heroic sweep above plus every rift pool stays empty of it, pinned so
-      // the store remains its only door and never quietly gains a drop twin.
-      if (isStoreMountItemId(itemId)) {
-        expect(heroicEntries, `${itemId} (store) must not be heroic-reachable`).toEqual([]);
-        for (const [pool, name] of [
-          [RIFT_EPIC_MOUNT_REINS, 'rift S'],
-          [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
-          [RIFT_GREEN_MOUNT_REINS, 'rift green'],
-        ] as const) {
-          expect(
-            pool as readonly string[],
-            `${itemId} is store-only: not in ${name}`,
-          ).not.toContain(itemId);
-        }
-        for (const npc of Object.values(NPCS)) {
-          expect(
-            npc.vendorItems ?? [],
-            `${itemId} is store-only: not sold by ${npc.id}`,
-          ).not.toContain(itemId);
-        }
-        expect(
-          HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
-          `${itemId} is store-only: not sold by the Heroic Quartermaster`,
-        ).not.toContain(itemId);
-        for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
-          expect(
-            offers.map((offer) => offer.itemId),
-            `${itemId} is store-only: not sold by delve shop ${delveId}`,
-          ).not.toContain(itemId);
-        }
-        expect(
-          MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
-          `${itemId} is store-only: not seeded by the World Market`,
-        ).not.toContain(itemId);
-        for (const quest of Object.values(QUESTS)) {
-          expect(
-            Object.values(quest.itemRewards),
-            `${itemId} is store-only: not rewarded by ${quest.id}`,
-          ).not.toContain(itemId);
-          expect(
-            quest.requiredItems ?? [],
-            `${itemId} is store-only: not required by ${quest.id}`,
-          ).not.toContain(itemId);
-        }
-        continue;
-      }
+      // There is no store MOUNT any more: a paid mount is a mount SKIN
+      // (content/mount_skins.ts), an account cosmetic with no reins item, so
+      // every catalog reins below has an in-world story or is dev-only.
 
       if (rarity === 'epic') {
         // Rift S clears are the sole source, EXCEPT a mount held sourceless on
@@ -475,67 +398,6 @@ describe('mount reins items (the collection: owning the item is owning the mount
       }
     },
   );
-
-  it('keeps the rickshaw developer-only and absent from every normal acquisition table', () => {
-    const itemId = 'reins_rickshaw_mount';
-    const item = ITEMS[itemId] as MountItemDef;
-    expect(item).toMatchObject({
-      kind: 'mount',
-      mount: 'rickshaw_mount',
-      quality: 'epic',
-      soulbound: true,
-      noDiscard: true,
-      sellValue: 0,
-    });
-    expect(item.buyValue).toBeUndefined();
-
-    for (const mob of Object.values(MOBS)) {
-      expect(
-        mob.loot.some((entry) => entry.itemId === itemId),
-        `${itemId} must not be on ${mob.id}`,
-      ).toBe(false);
-    }
-    for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
-      expect(
-        loot.some((entry) => entry.itemId === itemId),
-        `${itemId} must not be on heroic boss ${bossId}`,
-      ).toBe(false);
-    }
-    expect([
-      ...RIFT_GREEN_MOUNT_REINS,
-      ...RIFT_BLUE_MOUNT_REINS,
-      ...RIFT_EPIC_MOUNT_REINS,
-    ]).not.toContain(itemId);
-    for (const npc of Object.values(NPCS)) {
-      expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
-        itemId,
-      );
-    }
-    expect(
-      HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
-      `${itemId} must not be sold by the Heroic Quartermaster`,
-    ).not.toContain(itemId);
-    for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
-      expect(
-        offers.map((offer) => offer.itemId),
-        `${itemId} must not be sold by delve shop ${delveId}`,
-      ).not.toContain(itemId);
-    }
-    expect(
-      MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
-      `${itemId} must not be seeded by the World Market`,
-    ).not.toContain(itemId);
-    for (const quest of Object.values(QUESTS)) {
-      expect(
-        Object.values(quest.itemRewards),
-        `${itemId} must not be rewarded by ${quest.id}`,
-      ).not.toContain(itemId);
-      expect(
-        quest.requiredItems ?? [],
-        `${itemId} must not be required by ${quest.id}`,
-      ).not.toContain(itemId);
-    }
-  });
 
   it('the rift mount tiers pay exactly the heroic rate for the rarity they carry', () => {
     // The rule this protects: a rift must never be a cheaper route to a mount
@@ -1900,5 +1762,29 @@ describe('summon completion strips forms that slipped through mid-channel (Fix #
     // Assert: the player is mounted AND the form is gone.
     expect(e.mountKey).toBe('valorsteed');
     expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(false);
+  });
+});
+
+// Real sim behavior: a paid look never grants a ride or changes its speed.
+describe('mount skins preserve gameplay', () => {
+  it.each(MOUNT_SKIN_IDS)('%s keeps the base mount speed and survives a character save', (skin) => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    sim.setMountSkin(pid, skin);
+    const rider = sim.entities.get(pid)!;
+    expect(rider.mountKey).toBe('');
+    expect(moveSpeedMult(rider)).toBe(1);
+    for (const [key, speed] of [
+      ['valorsteed', 1.6],
+      ['grag_bear', 1.75],
+    ] as const) {
+      rider.mountKey = key;
+      expect(moveSpeedMult(rider)).toBeCloseTo(speed, 10);
+    }
+    const saved = sim.serializeCharacter(pid)!;
+    expect(saved.mountSkinId).toBe(skin);
+    const alt = sim.addPlayer('warrior', 'Alt', { state: saved });
+    expect(sim.entities.get(alt)?.mountSkinId).toBe(skin);
+    expect(sim.ownedMountsFor(alt)).toEqual([]);
   });
 });

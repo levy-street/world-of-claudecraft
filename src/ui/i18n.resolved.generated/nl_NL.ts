@@ -577,6 +577,7 @@ export const nl_NL: EnTranslations = {
       "mountsEyebrow": "Accountbevestigingen",
       "mountsTitle": "Machinestabiel",
       "mountBuyAria": "Koop {item}",
+      "mountSkinType": "Mount skin",
       "loading": "WOC-winkel laden...",
       "error": "De WOC Store is momenteel niet beschikbaar. Probeer het binnenkort opnieuw.",
       "balance": "Claudium-saldo",
@@ -1464,6 +1465,7 @@ export const nl_NL: EnTranslations = {
       "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
       "desc_goblin_rocket_sled": "Een gevaarlijk overgebouwde goblinslee, voortgestuwd door twee raketten en uitstekend slecht beoordelingsvermogen.",
       "desc_rallycart_rxt": "Een compacte rallymachine die de reissnelheid verhoogt.",
+      "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
       "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend.",
       "desc_mech_bird": "Een met de hand gebouwde oorlogskip die sprint op klikkende servo's terwijl de opwindsleutel nog draait.",
@@ -4876,6 +4878,32 @@ export const nl_NL: EnTranslations = {
         "crown_endures": "De Kroon houdt stand (harde razernij om 6:00, heroic 5:00)",
         "deathless_court": "Het Doodloze Hof (alleen heroic, het koninklijk hof verrijst na Doodloze Razernij)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Het Reliquarium",
@@ -11392,7 +11420,7 @@ export const nl_NL: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Roep de Gevallenen",
-        "description": "Brengt een dood groepslid terug tot leven met 35% gezondheid en mana. Een Zonneheler van niveau 16 of hoger roept in plaats daarvan elk gevallen groepslid terug."
+        "description": "Brengt een dood groepslid terug tot leven aan je zijde met 35% gezondheid en mana. Een Zonneheler van niveau 16 of hoger roept in plaats daarvan elk gevallen groepslid binnen 30 meter en in je zichtlijn terug."
       },
       "beacon_of_light": {
         "name": "Baken van Licht",
@@ -12125,6 +12153,14 @@ export const nl_NL: EnTranslations = {
         "name": "Mergbreker",
         "description": "Verbruikt je 3 Oud Bloed voor een zware slag met hoge dreiging van {damage} schade. Onder de helft van je gezondheid beschermt hij je in plaats daarvan met een schild van 18% van je maximale gezondheid gedurende 8 sec en geeft 15 woede terug."
       },
+      "wildwake": {
+        "name": "Wildwaak",
+        "description": "Verleidt een gevallen bondgenoot tot plotselinge bloei en brengt die aan je zijde terug tot leven met 35% gezondheid en mana, zelfs in het heetst van de strijd. (Herstel)"
+      },
+      "grove_awakening": {
+        "name": "Woudontwaken",
+        "description": "Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Herstel)"
+      },
       "overbloom": {
         "name": "Overbloei",
         "description": "Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit."
@@ -12435,15 +12471,15 @@ export const nl_NL: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Temporele Omkering",
-        "description": "Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem bij zijn lichaam tot leven met een deel van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)"
+        "description": "Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem tot leven aan je zijde met 35% van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)"
       },
       "collective_reversal": {
         "name": "Collectieve omkering",
-        "description": "Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid terug en brengt hen bij hun lichaam tot leven met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)"
+        "description": "Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid binnen 40 meter en in je zichtlijn terug en brengt hen weer tot leven aan je zijde met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)"
       },
       "ancestor_return": {
         "name": "Terugkeer der Voorouders",
-        "description": "Roept elk gevallen lid van je groep of raid bij hun lichaam terug tot leven met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Geestherstel)"
+        "description": "Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Geestherstel)"
       },
       "temporal_rewind": {
         "name": "Terugspoelen",
@@ -12585,6 +12621,10 @@ export const nl_NL: EnTranslations = {
       "martyrs_aegis": {
         "name": "Aegis van de Martelaar",
         "description": "Vermindert 8 sec. lang de schade van een bondgenoot met 40%."
+      },
+      "prayer_of_returning": {
+        "name": "Terugkerend Gebed",
+        "description": "Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Heilig en Discipline)"
       },
       "choir_of_deliverance": {
         "name": "Koor der Verlossing",
@@ -18407,8 +18447,8 @@ export const nl_NL: EnTranslations = {
       },
       "q_forgefathers_requiem": {
         "title": "The Forgefather's Requiem",
-        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.",
-        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.",
+        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.",
+        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.",
         "objectives": {
           "0": {
             "label": "Forgefather's Ember recovered"
@@ -18417,7 +18457,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_requiem_at_the_forge": {
         "title": "Requiem at the Forge",
-        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.",
+        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.",
         "completion": "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
         "objectives": {
           "0": {

@@ -726,7 +726,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': 'Проверка готовности уже идёт.',
   'entities.abilities.collective_reversal.name': 'Коллективный откат',
   'entities.abilities.collective_reversal.description':
-    'Отматывает линию времени каждого погибшего участника группы или рейда и возвращает его к жизни у тела с 30% здоровья и маны. Нельзя применять в бою. (Хрономантия)',
+    'Отматывает линию времени каждого погибшего участника группы или рейда в пределах 40 м и в поле зрения и возвращает его к жизни рядом с вами с 30% здоровья и маны. Нельзя применять в бою. (Хрономантия)',
   'entities.abilities.temporal_hourglass.name': 'Песочные часы остановки',
   'entities.abilities.temporal_hourglass.description':
     'Помещает временные песочные часы в выбранную точку. Под врагом они останавливают его на {hostilePveDuration} сек. в PvE или на {hostilePvpDuration} сек. в PvP; любой урон снимает эффект. Под вами или союзником из группы они создают стазис на {duration} сек., защищают от урона, запрещают действовать и восстанавливают {healing}% максимального здоровья. Ваши способности восстанавливаются на {selfCooldownRecovery}% быстрее, а способности союзника на {allyCooldownRecovery}% быстрее. На пустой земле часы ждут {groundDuration} сек. и воздействуют на первую допустимую цель, которая на них наступит. Положительный эффект можно снять вручную.',
@@ -11680,7 +11680,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пускает эхо по группе: мгновенно исцеляет цель и до четырёх ближайших к ней союзников и отмечает каждого на {duration} сек. Часть наносимого вами урона от тайной магии возвращается через эхо и исцеляет отмеченных союзников. (хрономантия)',
   'entities.abilities.temporal_reversal.name': 'Обращение времени',
   'entities.abilities.temporal_reversal.description':
-    'Обращает ход времени погибшего союзника, возвращая его к жизни рядом с телом с частью здоровья и маны даже во время боя. (хрономантия)',
+    'Обращает ход времени погибшего союзника, возвращая его к жизни рядом с вами с 35% здоровья и маны даже во время боя. (хрономантия)',
   'entities.abilities.temporal_rewind.name': 'Перемотка времени',
   'entities.abilities.temporal_rewind.description':
     'Посылает по группе или рейду волну тайной магии, отматывая время и восстанавливая каждому союзнику в радиусе 40 м 30% урона, полученного за последние 5 сек. (не более 35% максимального запаса здоровья). Эффект не может быть критическим. (хрономантия)',
@@ -13893,7 +13893,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.specNote_subtlety':
     'Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности и с любого угла: такое применение ничего не стоит, тратит все 3 этапа, на 6 сек. окутывает вас тенью и наносит двойной урон.',
   'entities.abilities.ancestor_return.description':
-    'Возвращает к жизни всех погибших участников группы или рейда у их тел с 30% здоровья и маны. Нельзя применять в бою. (Целитель духов)',
+    'Призывает всех погибших участников группы или рейда в пределах 40 м и в поле зрения к вам и возвращает их к жизни с 30% здоровья и маны. Нельзя применять в бою. (Целитель духов)',
   'entities.abilities.ancestor_return.name': 'Возвращение предков',
   'entities.abilities.army_of_the_dead.description':
     'Открывает могильный портал и на 20 сек. поднимает временных Скелета-воина, Костяного мага и Могильное крыло в дополнение к выбранным прислужникам Господства.',
@@ -14108,7 +14108,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Расходует 2 осколка души и приказывает всем мёртвым слугам атаковать одновременно. Могильные стражи провоцируют и защищаются, воины приковывают цель, костяные маги раскрывают магическую защиту, а могильные крылья терзают всех поражённых врагов.',
   'entities.abilities.reaping_command.name': 'Приказ жатвы',
   'entities.abilities.recall_the_fallen.description':
-    'Возвращает погибшего участника группы к жизни с 35% здоровья и маны.',
+    'Возвращает погибшего участника группы к жизни рядом с вами с 35% здоровья и маны. Солнцелечитель 16-го уровня или выше вместо этого призывает обратно всех погибших участников группы в пределах 30 м и в поле зрения.',
   'entities.abilities.recall_the_fallen.name': 'Возвращение павших',
   'entities.abilities.redharvest.description':
     'Расходует ваши 3 стадии Старой крови: удар на {damage} ед. урона, который мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, снимает оба кровотечения и восстанавливает {rage} ед. энергии. Работает даже без очков серии приемов.',
@@ -16158,6 +16158,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.lootExplorer': 'Обозреватель добычи',
   'hudChrome.mounts.desc_goblin_rocket_sled':
     'Опасно переусложнённые гоблинские сани на двух ракетах и полном отсутствии здравого смысла.',
+  'hudChrome.mounts.desc_rallycart_skin': 'Крохотный раллийный автомобиль с могучим рёвом.',
   'hudChrome.mounts.desc_rallycart_rxt':
     'Компактная, но самая настоящая раллийная машина, повышающая скорость передвижения.',
   'hudChrome.mounts.name_goblin_rocket_sled': 'Гоблинские ракетные сани',
@@ -16181,4 +16182,39 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.kickedByModerator': 'Модератор отключил вас: {reason}',
   'loading.rendererContextLost':
     '3D-рендерер потерял графический контекст и не смог восстановиться. Попробуйте обновить страницу.',
+
+  'hudChrome.wocStore.mountSkinType': 'Облик ездового животного',
+  'hudChrome.cosmetics.title': 'Косметика',
+  'hudChrome.cosmetics.close': 'Закрыть косметику',
+  'hudChrome.cosmetics.tabsLabel': 'Разделы косметики',
+  'hudChrome.cosmetics.tabMounts': 'Ездовые животные',
+  'hudChrome.cosmetics.tabSkins': 'Облики',
+  'hudChrome.cosmetics.tabMech': 'Мех',
+  'hudChrome.cosmetics.legend': 'Аккаунт: общее для всех персонажей. Персонаж: только этот персонаж.',
+  'hudChrome.cosmetics.scopeAccount': 'Аккаунт',
+  'hudChrome.cosmetics.scopeCharacter': 'Персонаж',
+  'hudChrome.cosmetics.wear': 'Надеть',
+  'hudChrome.cosmetics.takeOff': 'Снять',
+  'hudChrome.cosmetics.worn': 'Надето',
+  'hudChrome.cosmetics.apply': 'Применить',
+  'hudChrome.cosmetics.detach': 'Отвязать',
+  'hudChrome.cosmetics.applied': 'Применено',
+  'hudChrome.cosmetics.owned': 'В коллекции',
+  'hudChrome.cosmetics.storeOnly': 'Доступно в магазине WOC',
+  'hudChrome.cosmetics.cardAria': '{name}, {rarity}',
+  'hudChrome.cosmetics.mountsNoMount': 'Сначала получите ездовое животное: облику нужно, на что садиться.',
+  'hudChrome.cosmetics.skinsEmpty': 'Обликов оружия пока нет. Загляните в магазин WOC.',
+  'hudChrome.cosmetics.skinsApplyHint': 'Экипируйте {type}, чтобы применить этот облик.',
+  'hudChrome.cosmetics.mechEmpty': 'Расцветок боевого меха пока нет.',
+  'hudChrome.cosmetics.mountsIntro': 'Облик ездового животного накладывается на любое животное, на котором ездит этот персонаж. Скорость не меняется.',
+  'hudChrome.cosmetics.mechIntro': 'Боевой мех заменяет тело этого персонажа. Одновременно надета одна расцветка.',
+  'entities.abilities.grove_awakening.description':
+    'Призывает всех погибших участников группы или рейда в пределах 40 м и в поле зрения к вам и возвращает их к жизни с 30% здоровья и маны. Нельзя применять в бою. (Исцеление)',
+  'entities.abilities.grove_awakening.name': 'Пробуждение рощи',
+  'entities.abilities.prayer_of_returning.description':
+    'Призывает всех погибших участников группы или рейда в пределах 40 м и в поле зрения к вам и возвращает их к жизни с 30% здоровья и маны. Нельзя применять в бою. (Свет и Послушание)',
+  'entities.abilities.prayer_of_returning.name': 'Молитва возвращения',
+  'entities.abilities.wildwake.description':
+    'Пробуждает в павшем союзнике внезапное цветение, возвращая его к жизни рядом с вами с 35% здоровья и маны даже в разгар боя. (Исцеление)',
+  'entities.abilities.wildwake.name': 'Дикое пробуждение',
 };

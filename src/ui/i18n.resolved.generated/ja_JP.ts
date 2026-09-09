@@ -577,6 +577,7 @@ export const ja_JP: EnTranslations = {
       "mountsEyebrow": "アカウント共有マウント",
       "mountsTitle": "機械の厩舎",
       "mountBuyAria": "{item}を購入",
+      "mountSkinType": "マウントスキン",
       "loading": "WOCストアを読み込み中…",
       "error": "WOCストアは現在利用できません。しばらくしてからお試しください。",
       "balance": "Claudium残高",
@@ -1464,6 +1465,7 @@ export const ja_JP: EnTranslations = {
       "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
       "desc_goblin_rocket_sled": "危険なほど過剰に組み上げられたゴブリンのそり。二基のロケットと最悪の判断力で突き進む。",
       "desc_rallycart_rxt": "小型ながら本格的なラリーマシン。移動速度を高めてくれる。",
+      "desc_rallycart_skin": "小さな車体から豪快なエンジン音を響かせるラリーカー。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
       "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
@@ -4876,6 +4878,32 @@ export const ja_JP: EnTranslations = {
         "crown_endures": "王冠不滅（6:00でハードエンレイジ、英雄は5:00）",
         "deathless_court": "不死の宮廷（英雄限定、不死の憤怒の後に王家の廷臣が蘇る）"
       }
+    },
+    "cosmetics": {
+      "title": "コスメティック",
+      "close": "コスメティックを閉じる",
+      "tabsLabel": "コスメティックの区分",
+      "tabMounts": "マウント",
+      "tabSkins": "スキン",
+      "tabMech": "メカ",
+      "legend": "アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。",
+      "scopeAccount": "アカウント",
+      "scopeCharacter": "キャラクター",
+      "wear": "装着",
+      "takeOff": "外す",
+      "worn": "装着中",
+      "apply": "適用",
+      "detach": "解除",
+      "applied": "適用中",
+      "owned": "所持",
+      "storeOnly": "WOCストアで入手可能",
+      "cardAria": "{name}、{rarity}",
+      "mountsIntro": "マウントスキンはこのキャラクターが乗るどのマウントにも重ねて描かれます。速度は変わりません。",
+      "mountsNoMount": "まずマウントを入手してください。スキンには乗るものが必要です。",
+      "skinsEmpty": "武器スキンをまだ所持していません。WOCストアをご覧ください。",
+      "skinsApplyHint": "{type}を装備するとこのスキンを適用できます。",
+      "mechIntro": "コンバットメカはこのキャラクターの身体を置き換えます。装着できるクロマは一度に一つです。",
+      "mechEmpty": "コンバットメカのクロマをまだ所持していません。"
     },
     "reliquary": {
       "title": "聖遺物庫",
@@ -11392,7 +11420,7 @@ export const ja_JP: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "倒れし者の呼び戻し",
-        "description": "死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。"
+        "description": "死亡したグループメンバーを、体力とマナが35%の状態であなたのそばに蘇生する。レベル16以上のサンメンダーは代わりに、グループの30ヤード以内で視線の通る倒れたメンバー全員を呼び戻す。"
       },
       "beacon_of_light": {
         "name": "光の標",
@@ -12125,6 +12153,14 @@ export const ja_JP: EnTranslations = {
         "name": "骨髄砕き",
         "description": "古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を8秒間得て、怒りを15回復する。"
       },
+      "wildwake": {
+        "name": "野性の目覚め",
+        "description": "倒れた味方を不意の開花へと促し、戦闘の最中でも、体力とマナが35%の状態であなたのそばに蘇生させる。（回復）"
+      },
+      "grove_awakening": {
+        "name": "樹林の覚醒",
+        "description": "グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（回復）"
+      },
       "overbloom": {
         "name": "満開",
         "description": "翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。"
@@ -12435,15 +12471,15 @@ export const ja_JP: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "時の逆転",
-        "description": "倒れた味方の時間軸を巻き戻し、戦闘中でも、その遺体の場所で体力とマナの一部を持った状態で蘇生します。（クロノマンシー）"
+        "description": "倒れた味方の時間軸を巻き戻し、戦闘中でも、体力とマナが35%の状態であなたのそばに蘇生します。（クロノマンシー）"
       },
       "collective_reversal": {
         "name": "集団逆行",
-        "description": "グループまたはレイドの死亡した全メンバーの時間軸を巻き戻し、遺体のそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）"
+        "description": "グループまたはレイドの、40ヤード以内で視線の通る死亡した全メンバーの時間軸を巻き戻し、あなたのそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）"
       },
       "ancestor_return": {
         "name": "祖霊の帰還",
-        "description": "グループまたはレイドの倒れたメンバー全員を遺体の場所で蘇生し、体力とマナを30%回復させる。戦闘中は使用できない。（霊癒）"
+        "description": "グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（霊癒）"
       },
       "temporal_rewind": {
         "name": "巻き戻し",
@@ -12585,6 +12621,10 @@ export const ja_JP: EnTranslations = {
       "martyrs_aegis": {
         "name": "殉教者の盾",
         "description": "味方1体が受けるダメージを8秒間40%軽減する。"
+      },
+      "prayer_of_returning": {
+        "name": "帰還の祈り",
+        "description": "グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（聖なる・ディシプリン）"
       },
       "choir_of_deliverance": {
         "name": "救済の聖歌隊",

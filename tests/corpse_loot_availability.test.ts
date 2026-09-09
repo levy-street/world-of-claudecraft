@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
+import {
+  corpseLootAvailability,
+  corpseLootAvailabilityInWorld,
+} from '../src/game/corpse_loot_availability';
 import { MOBS } from '../src/sim/data';
 import { harvestFamilyYieldsItem } from '../src/sim/professions/gathering';
 import type { Entity } from '../src/sim/types';
@@ -324,5 +327,40 @@ describe('corpseLootAvailability loot rights matrix', () => {
     expect(result.harvestable).toBe(true);
     expect(result.hasLoot).toBe(false);
     expect(result.canOpen).toBe(true);
+  });
+});
+
+describe('corpse popup field kit visibility', () => {
+  it('shows ordinary loot without exposing harvesting when no kit is carried', () => {
+    const world = { playerId: 1, partyInfo: null, inventory: [] };
+    const body = corpse({ templateId: 'forest_wolf', loot: { copper: 25, items: [] } });
+    expect(corpseLootAvailabilityInWorld(world, body)).toMatchObject({
+      harvestable: false,
+      hasLoot: true,
+      canOpen: true,
+      visibleCopper: 25,
+    });
+    expect(corpseLootAvailabilityInWorld(world, { ...body, loot: null }).canOpen).toBe(false);
+  });
+  it('follows live kit acquisition and removal', () => {
+    const body = corpse({ templateId: 'forest_wolf', loot: null });
+    const world = { playerId: 1, partyInfo: null, inventory: [{ itemId: 'field_kit', count: 1 }] };
+    expect(corpseLootAvailabilityInWorld(world, body).harvestable).toBe(true);
+    expect(corpseLootAvailabilityInWorld({ ...world, inventory: [] }, body).canOpen).toBe(false);
+    expect(
+      corpseLootAvailabilityInWorld(
+        {
+          ...world,
+          inventory: [{ itemId: 'rough_hide', count: 20 }],
+        },
+        body,
+      ).canOpen,
+    ).toBe(false);
+    expect(
+      corpseLootAvailabilityInWorld(
+        { ...world, inventory: [{ itemId: 'field_kit', count: 0 }] },
+        body,
+      ).canOpen,
+    ).toBe(false);
   });
 });

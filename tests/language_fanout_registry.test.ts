@@ -227,6 +227,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.calendarWindow.relocalize|',
   'this.mailboxWindow.relocalize|',
   'this.socialWindow.relocalize|',
+  'this.cosmeticsWindow.relocalize|',
   'this.cardDuelWindow.relocalize|',
   'this.spellbookWindow.relocalize|',
   'this.barEditorWindow.relocalize|',
@@ -396,6 +397,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig'],
     answer: 'this.deedsWindow.render',
     why: 'the earned/watched deed ids and their counters',
+  },
+  {
+    file: 'hud/cosmetics/cosmetics_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.cosmeticsWindow.relocalize',
+    why: 'tab labels, scope badges, card names and states, the empty and hint lines',
   },
   {
     file: 'reliquary_window.ts',

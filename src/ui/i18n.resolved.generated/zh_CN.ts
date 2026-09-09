@@ -577,6 +577,7 @@ export const zh_CN: EnTranslations = {
       "mountsEyebrow": "账号坐骑",
       "mountsTitle": "机械马厩",
       "mountBuyAria": "购买{item}",
+      "mountSkinType": "坐骑皮肤",
       "loading": "正在加载 WOC 商店…",
       "error": "WOC 商店暂时不可用，请稍后再试。",
       "balance": "Claudium 余额",
@@ -1464,6 +1465,7 @@ export const zh_CN: EnTranslations = {
       "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。",
       "desc_goblin_rocket_sled": "一辆结构过剩到危险的哥布林雪橇，靠双发火箭和极差的判断力推进。",
       "desc_rallycart_rxt": "一辆小巧却地道的拉力赛车，能提升移动速度。",
+      "desc_rallycart_skin": "一辆小巧的拉力赛车，轰鸣声却震天响。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
       "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
@@ -4876,6 +4878,32 @@ export const zh_CN: EnTranslations = {
         "crown_endures": "王冠不朽（6:00时触发强制狂暴，英雄难度为5:00）",
         "deathless_court": "不死王庭（仅英雄难度，不死之怒后王庭众魂会苏醒）"
       }
+    },
+    "cosmetics": {
+      "title": "外观",
+      "close": "关闭外观",
+      "tabsLabel": "外观分区",
+      "tabMounts": "坐骑",
+      "tabSkins": "皮肤",
+      "tabMech": "机甲",
+      "legend": "账号：所有角色共享。角色：仅此角色。",
+      "scopeAccount": "账号",
+      "scopeCharacter": "角色",
+      "wear": "穿戴",
+      "takeOff": "取下",
+      "worn": "已穿戴",
+      "apply": "应用",
+      "detach": "解除",
+      "applied": "已应用",
+      "owned": "已拥有",
+      "storeOnly": "可在 WOC 商店购买",
+      "cardAria": "{name}，{rarity}",
+      "mountsIntro": "坐骑皮肤会覆盖在此角色骑乘的任何坐骑上，绝不改变速度。",
+      "mountsNoMount": "先拥有一匹坐骑：皮肤需要可骑乘的对象。",
+      "skinsEmpty": "尚未拥有武器皮肤。请访问 WOC 商店。",
+      "skinsApplyHint": "装备一件{type}后即可应用此皮肤。",
+      "mechIntro": "战斗机甲会替换此角色的身体。一次只能穿戴一种配色。",
+      "mechEmpty": "尚未拥有战斗机甲配色。"
     },
     "reliquary": {
       "title": "圣物库",
@@ -11392,7 +11420,7 @@ export const zh_CN: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "唤回逝者",
-        "description": "使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。"
+        "description": "使一名死亡的小队成员回到你身边复活，并恢复 35% 的生命值和法力值。16 级或以上的黎明愈者则会改为呼唤小队中 30 码内且在你视线内的所有阵亡成员回到你身边复活。"
       },
       "beacon_of_light": {
         "name": "圣光道标",
@@ -12125,6 +12153,14 @@ export const zh_CN: EnTranslations = {
         "name": "碎髓",
         "description": "消耗你的3层古血，造成{damage}点伤害的高威胁重击。生命值低于一半时，改为吸收相当于最大生命值18%的伤害，持续8秒，并返还15点怒气。"
       },
+      "wildwake": {
+        "name": "野性复苏",
+        "description": "催发倒下的盟友骤然绽放，使其回到你身边复活，恢复35%生命值和法力值，即使激战正酣也可施放。（恢复）"
+      },
+      "grove_awakening": {
+        "name": "林地觉醒",
+        "description": "呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（恢复）"
+      },
       "overbloom": {
         "name": "盛放",
         "description": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。"
@@ -12435,15 +12471,15 @@ export const zh_CN: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "时光逆转",
-        "description": "倒转一名阵亡盟友的时间线，使其在遗体处以部分生命值和法力值复活，即使正在激烈战斗中也可使用。（时光术）"
+        "description": "倒转一名阵亡盟友的时间线，使其回到你身边以35%生命值和法力值复活，即使正在激烈战斗中也可使用。（时光术）"
       },
       "collective_reversal": {
         "name": "集体逆转",
-        "description": "倒转队伍或团队中每位阵亡成员的时间线，使其在遗体旁以30%生命值和法力值复活。无法在战斗中施放。（时空魔法）"
+        "description": "倒转队伍或团队中 40 码内且在你视线内的每位阵亡成员的时间线，使其回到你身边以30%生命值和法力值复活。无法在战斗中施放。（时空魔法）"
       },
       "ancestor_return": {
         "name": "先祖归来",
-        "description": "呼唤小队或团队中所有阵亡成员，使其在尸体处复活并恢复30%生命值和法力值。战斗中无法施放。（灵愈）"
+        "description": "呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（灵愈）"
       },
       "temporal_rewind": {
         "name": "回溯",
@@ -12585,6 +12621,10 @@ export const zh_CN: EnTranslations = {
       "martyrs_aegis": {
         "name": "殉道者圣盾",
         "description": "使一名盟友受到的伤害降低 40%，持续 8 秒。"
+      },
+      "prayer_of_returning": {
+        "name": "归返祈祷",
+        "description": "呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（神圣与戒律）"
       },
       "choir_of_deliverance": {
         "name": "救赎圣咏团",

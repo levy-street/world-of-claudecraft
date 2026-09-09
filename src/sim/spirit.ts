@@ -235,6 +235,7 @@ export function moveToGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
   delete p.queuedOnSwingCostMultiplier;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   // Applied last: the sickness drains stamina, so recalcPlayerStats (via applyAura) rebuilds
   // the pools and carries the current hp/mana FRACTIONS into the reduced maxima. A player at
   // full health arrives at full health of a smaller bar rather than over the top of it.
@@ -304,6 +305,7 @@ function releaseAtNearestGraveyard(
   delete p.queuedOnSwingCostMultiplier;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   p.combatTimer = 99;
   p.inCombat = false;
   // No event: the client transitions to the ghost UI from the snapshot's ghost flag.
@@ -434,6 +436,7 @@ function reviveAt(
   p.queuedOnSwing = null;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   p.combatTimer = 99;
   p.inCombat = false;
   // Apply sickness last: applyAura -> recalcPlayerStats preserves the hp/resource

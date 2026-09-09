@@ -925,6 +925,25 @@ interface World {
 // biome-ignore lint/suspicious/noExplicitAny: the harness spans private seams (dispatch, saveCharacter, reconcile)
 const priv = (server: GameServer): any => server as any;
 
+/** Servers of earlier worlds whose fire-and-forget holder flushes (the
+ *  unsettled gate's refusal flushes the depositor on the spot) may still sit
+ *  on a per-character save queue. The fake durable store is keyed by the SAME
+ *  guild and character ids across worlds, so a late commit from an old
+ *  server would land in the NEXT world's rows as a phantom durable prefix (an
+ *  opening replayed onto a ladder already at 24, a deposit applied twice).
+ *  Drain them before a new world is built; bounded so a stuck queue fails
+ *  the run instead of hanging it. */
+const straggleWatch: GameServer[] = [];
+async function drainStragglingSaves(): Promise<void> {
+  for (const server of straggleWatch) {
+    for (let spin = 0; server.characterSaveQueues.pendingKeys() > 0; spin++) {
+      if (spin > 2_000) throw new Error('a previous world never drained its save queues');
+      await new Promise((r) => setTimeout(r, 0));
+    }
+  }
+  straggleWatch.length = 0;
+}
+
 function fakeWs(): unknown {
   return {
     readyState: 1,
@@ -977,7 +996,9 @@ async function makeWorld(): Promise<World> {
   // "Worker exited unexpectedly" failure). The per-test beforeEach clear
   // stays for the suites that assert against a fresh history.
   vi.clearAllMocks();
+  await drainStragglingSaves();
   const server = new GameServer();
+  straggleWatch.push(server);
   const actors: Actor[] = [];
   for (const characterId of [1, 2]) {
     const session = server.join(

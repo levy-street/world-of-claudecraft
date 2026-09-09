@@ -966,6 +966,8 @@ export type ItemUse =
   // player meets their first death somewhere nothing is hunting them.
   // Consumed on use and refused unless the lesson is active.
   | { type: 'passingStone' }
+  // Starts the one-time hammer quest; the Ember is consumed by crafting.
+  | { type: 'forgebreakerEmber' }
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
@@ -1903,6 +1905,10 @@ export interface LootEntry {
   // predicate). Every entry of a group must agree, and the heroic-append
   // tables never carry it (both pinned by tests/loot_roll.test.ts).
   normalOnly?: true;
+  // A migrated base-loot acquisition in HEROIC_BOSS_LOOT keeps its original
+  // source level and stats; listing it here must not promote it to the
+  // bespoke heroic equipment tier or seed the higher-tier rift reward pool.
+  preserveSourceTier?: true;
 }
 
 export type MobFamily =
@@ -5089,11 +5095,15 @@ export interface Entity extends ClientMirroredEntityFields {
   queuedOnSwing: string | null; // heroic strike
   queuedOnSwingFree?: boolean; // next_cast_free consumed at queue time
   queuedOnSwingCostMultiplier?: number; // next_cast_cheap consumed at queue time
-  // single-slot spell queue: a press during the tail of the current cast (see
-  // CAST_QUEUE_WINDOW_SEC), fired by updateCasting on cast completion. Distinct
-  // from queuedOnSwing (a melee on-next-swing queue, not a cast queue).
+  // single-slot spell queue: a press during the tail of the current cast or of
+  // a bare GCD (see CAST_QUEUE_WINDOW_SEC), fired by updateCasting on cast
+  // completion or when the GCD clears. Distinct from queuedOnSwing (a melee
+  // on-next-swing queue, not a cast queue). queuedCastTargetId preserves the
+  // mouseover-cast target override so the fired press heals the unit the
+  // player pointed at, not their selected target.
   queuedCastAbility: string | null;
   queuedCastAim: { x: number; z: number } | null;
+  queuedCastTargetId: number | null;
   fiveSecondRule: number; // time since last mana spend
   comboPoints: number; // retail-style: character-bound, not anchored to a target
   comboUntil: number; // sim-time until which unspent combo points persist
@@ -5310,9 +5320,14 @@ export interface Entity extends ClientMirroredEntityFields {
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
   chaseStall: number; // seconds an engaged mob has been pinned unable to close on its target; at CHASE_STALL_TIMEOUT (mob/reachability.ts) it evades home like a leash break
-  evadeEpoch: number; // bumped every full evade-home reset (resetEvadingMob); lets a stamped-at-exit snapshot (instance_exit_memory.ts) detect a pull it no longer belongs to
-  combatExitHoldUntil: number; // sim time; while in the future, resetEvadingMob defers the full evade-home reset (issue #2653): a mob a player just left mid-combat stays parked in 'evade' (immune, undamaged, hate table intact) instead of healing/clearing so a same-claim re-entry within instance_exit_memory.ts's window resumes the exact fight it left, not a fresh unengaged pull
+  evadeEpoch: number; // bumped every full evade-home reset (resetEvadingMob): a test-observable count of pulls this mob has walked home from
   chainPullInbound: boolean; // woken by a boss chain pull and still crossing to the puller; suspends the soft leash until it arrives (mob/chain_pull_transit.ts)
+  // Holding in place in an evade stance inside an instance slot: immune while
+  // stuck, aggro intact, out of reach of its target; the value is the seconds
+  // held so far (instances/instance_combat_hold.ts phases the mob to its target
+  // once the grace runs out, attackable on the way). Undefined whenever not
+  // pinned (never deleted), which the parity sampler drops like an absent key.
+  evadeInPlace?: number;
   fleeTimer: number; // seconds left in a low-HP panic flee; counts down in the 'flee' state
   fleeReturnTimer: number; // grace after a panic flee hits leash edge, letting it run back before normal leash reset resumes
   hasFled: boolean; // a cowardly mob flees only once per pull; cleared when it resets at spawn
@@ -5575,6 +5590,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // applies. Render-only: the client swaps the held weapon model and rarity VFX.
   // Recomputed in recalcPlayerStats and synced in identity fields (terse `wsk`).
   weaponSkinId: string | null;
+  // Worn mount skin id (players only; null otherwise): the account cosmetic
+  // drawn OVER whatever mount `mountKey` names (content/mount_skins.ts).
+  // Render-only: the client swaps the mount visual and audio set. The sim never
+  // reads it for gameplay (speed stays on mountKey). Set by Sim.setMountSkin and
+  // synced in identity fields (terse `msk`), like `wsk`.
+  mountSkinId: string | null;
   // Full worn equipment (players only; empty otherwise). Render-only mirror of
   // PlayerMeta.equipment, recomputed in recalcPlayerStats and synced in identity
   // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,

@@ -613,6 +613,12 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_warspice_feast',
     'pattern_warspice_skewers',
     'pattern_wyrmfall_pendant',
+    // Retired premium reins remain inert saved items, with no use or material role.
+    'reins_chimeglass_tortoise',
+    'reins_goblin_rocket_sled',
+    'reins_mech_bird',
+    'reins_rallycart_rxt',
+    'reins_rickshaw_mount',
     'resonant_weave_bag',
     // masterwrought Phase 11k's three apex feasts, the same shape as
     // harvest_feast and All-only for the same reason: a placeable crafted

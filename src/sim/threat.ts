@@ -29,6 +29,21 @@ export const BEAR_FORM_THREAT_MULT = 1.3;
 export const CAT_FORM_THREAT_MULT = 0.71;
 export const RIGHTEOUS_FURY_THREAT_MULT = 1.3; // holy school only
 export const TAUNT_FORCE_SECONDS = 3;
+// An attacker this far (yards, 2D) from an OPEN-WORLD mob is no longer part of
+// its fight: the engaged pass (combat/engaged_combat.ts) drops them off the hate
+// table instead of holding them in combat. What makes 100 safe is the 40 yd
+// action envelope: the longest chain that keeps someone in the fight is a
+// healer at max range on a raider at max range from the mob, about 85 yd, so
+// the margin is about 15 yd. That margin is the constant's whole defence: the
+// reach DESTROYS threat rather than suspending it, so an ability or a
+// displacement mechanic that ever moves someone further than this returns them
+// to the fight on zero threat, not the threat they had; widen the reach with
+// any such addition. It sits under every instance slot pitch (hundreds of
+// yards), so teleporting away releases on the next tick: the classic map-change
+// threat drop. The open-world boss encounter hold uses the same radius so the
+// two rules agree. Inside a claimed instance slot distance never drops anyone;
+// leaving the slot does (instances/instance_combat_hold.ts).
+export const THREAT_DROP_RANGE = 100;
 // Stealth shrinks detection at equal level; higher-level observers pierce it
 // more easily, lower-level observers struggle. Shared by mobs and players.
 export const STEALTH_DETECTION_MULT = 0.25;
@@ -110,6 +125,11 @@ export function dropThreat(mob: Entity, sourceId: number): void {
     mob.forcedTargetId = null;
     mob.forcedTargetTimer = 0;
   }
+}
+
+/** True when `attacker` stands beyond THREAT_DROP_RANGE of the mob (flat). */
+export function beyondThreatRange(mob: Entity, attacker: Entity): boolean {
+  return dist2d(mob.pos, attacker.pos) > THREAT_DROP_RANGE;
 }
 
 /** Highest threat value on the table (0 when empty) — taunt matches this. */

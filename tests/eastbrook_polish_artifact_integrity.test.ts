@@ -1355,10 +1355,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // OSSBrain PR #3781: re-sealed with the canonical remint command after
 // renderer reconciliation and the lockfile compatibility fix. Shipping GLB
 // changes are fingerprint-only; no capture or visual approval was retaken.
+// PR3941: canonical source-only reseal for mount-skin renderer prewarm.
+// Historical images, performance scores and capture identity are unchanged.
+// PR3946: remint the renderer leaf after restoring school-aware resurrection VFX.
+// Existing captures, performance measurements and capture identity are unchanged.
+// PR fen-features-subcull: remint after merging release/v0.42.0 into the branch,
+// the renderer leaf having moved with the zone-feature sweep extraction.
+// Existing captures, performance measurements and capture identity are unchanged.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '4edafed302f175c65cd6a9849e631666611934ebeaab3ba8eb5a4311af256378';
+  '2b262a46faa3326d2039f29cbea04b8d52844d89788865ef84f1446f5040ddea';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'ce299a67af26ec1fb548ba759a2b0ddd1cddd08c5edbcaf044ba486f93df57e6';
+  '52d7ac5ce06a62ae5c88de3c45f993957c33f4ac15de5a5601be8958bbcb908c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2715,7 +2722,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       //
       // OSSBrain integration: this digest was recomputed LAST from the
       // canonical re-sealed evidence files. Capture pixels and scores did not change.
-    ).toBe('10b101fe220ba0b6b493b304298c22611fc38d8a9cb661fbdabe849855094fa7');
+    ).toBe('d21378452e0e216cbdbcfcaaabb1f8fcf26543a35028ffc0ffe5840af2820572');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

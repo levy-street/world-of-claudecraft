@@ -845,10 +845,11 @@ describe('item-art audit builder', () => {
     // and 1087 + 212 + 2 = 1301. The sha/bytes below are measured directly
     // from `node scripts/item_art_audit.mjs --verify-only` run on the merged
     // tree, not invented or derived from either parent.
+    // PR3941: measured again after retiring the five premium reins.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '270ad46e72bada61745a50c9e0bfe544f759db5dce3e662ba4615827b91da12b',
-      catalogBytes: 699144,
+      catalogSha256: '74bd65a9b0efd433b12c9bf0cdaa509eeac3e4986edb8878e8f069f4e24088f0',
+      catalogBytes: 699134,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
       catalogCount: 1283,
       liveItemCount: 1301,

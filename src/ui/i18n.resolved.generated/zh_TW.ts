@@ -577,6 +577,7 @@ export const zh_TW: EnTranslations = {
       "mountsEyebrow": "帳號坐騎",
       "mountsTitle": "機械馬廄",
       "mountBuyAria": "購買{item}",
+      "mountSkinType": "坐騎造型",
       "loading": "正在載入 WOC 商店…",
       "error": "WOC 商店目前無法使用，請稍後再試。",
       "balance": "Claudium 餘額",
@@ -1464,6 +1465,7 @@ export const zh_TW: EnTranslations = {
       "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
       "desc_goblin_rocket_sled": "一輛結構過剩到危險的哥布林雪橇，靠雙發火箭和極差的判斷力推進。",
       "desc_rallycart_rxt": "一輛小巧卻道地的拉力賽車，能提升移動速度。",
+      "desc_rallycart_skin": "一輛小巧的拉力賽車，轟鳴聲卻震天響。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
       "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。",
       "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。",
@@ -4876,6 +4878,32 @@ export const zh_TW: EnTranslations = {
         "crown_endures": "王冠永存（6:00 硬狂暴，英雄難度 5:00）",
         "deathless_court": "不死宮廷（僅英雄難度，不死之怒後王庭崛起）"
       }
+    },
+    "cosmetics": {
+      "title": "外觀",
+      "close": "關閉外觀",
+      "tabsLabel": "外觀分區",
+      "tabMounts": "坐騎",
+      "tabSkins": "造型",
+      "tabMech": "機甲",
+      "legend": "帳號：所有角色共用。角色：僅此角色。",
+      "scopeAccount": "帳號",
+      "scopeCharacter": "角色",
+      "wear": "穿戴",
+      "takeOff": "取下",
+      "worn": "已穿戴",
+      "apply": "套用",
+      "detach": "解除",
+      "applied": "已套用",
+      "owned": "已擁有",
+      "storeOnly": "可在 WOC 商店購買",
+      "cardAria": "{name}，{rarity}",
+      "mountsIntro": "坐騎造型會覆蓋在此角色騎乘的任何坐騎上，絕不改變速度。",
+      "mountsNoMount": "先擁有一匹坐騎：造型需要可騎乘的對象。",
+      "skinsEmpty": "尚未擁有武器造型。請前往 WOC 商店。",
+      "skinsApplyHint": "裝備一件{type}後即可套用此造型。",
+      "mechIntro": "戰鬥機甲會取代此角色的身體。一次只能穿戴一種配色。",
+      "mechEmpty": "尚未擁有戰鬥機甲配色。"
     },
     "reliquary": {
       "title": "聖物庫",
@@ -11392,7 +11420,7 @@ export const zh_TW: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "喚回逝者",
-        "description": "使一名死亡的隊伍成員復活，並恢復 35% 的生命值和法力值。"
+        "description": "使一名死亡的隊伍成員回到你身邊復活，並恢復 35% 的生命值和法力值。16 級或以上的黎明癒者則會改為呼喚隊伍中 30 碼內且在你視線內的所有陣亡成員回到你身邊復活。"
       },
       "beacon_of_light": {
         "name": "聖光信標",
@@ -12125,6 +12153,14 @@ export const zh_TW: EnTranslations = {
         "name": "碎髓",
         "description": "消耗3層古血，造成{damage}點高威脅的重擊。生命值低於一半時，改為吸收相當於最大生命值18%的傷害，持續8秒，並恢復15點怒氣。"
       },
+      "wildwake": {
+        "name": "野性復甦",
+        "description": "催發倒下的盟友驟然綻放，使其回到你身邊復活，恢復35%生命值和法力值，即使激戰正酣也能施放。（恢復）"
+      },
+      "grove_awakening": {
+        "name": "林地覺醒",
+        "description": "呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（恢復）"
+      },
       "overbloom": {
         "name": "盛放",
         "description": "消耗5層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的{buff}%立即治療，移除這些效果，並在目標身上種下一次新的野性綻放。"
@@ -12435,15 +12471,15 @@ export const zh_TW: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "時光逆轉",
-        "description": "倒轉一名陣亡盟友的時間線，使其在遺體處以部分生命值與法力值復活，即使正在激烈戰鬥中也能使用。（時光術）"
+        "description": "倒轉一名陣亡盟友的時間線，使其在你身邊以35%生命值與法力值復活，即使正在激烈戰鬥中也能使用。（時光術）"
       },
       "collective_reversal": {
         "name": "集體逆轉",
-        "description": "倒轉隊伍或團隊中每位陣亡成員的時間線，使其在遺體旁以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）"
+        "description": "倒轉隊伍或團隊中 40 碼內且在你視線內的每位陣亡成員的時間線，使其在你身邊以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）"
       },
       "ancestor_return": {
         "name": "先祖歸來",
-        "description": "呼喚隊伍或團隊中所有陣亡成員，使其在屍體處復活並恢復30%生命值和法力值。戰鬥中無法施放。（靈癒）"
+        "description": "呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（靈癒）"
       },
       "temporal_rewind": {
         "name": "回溯",
@@ -12585,6 +12621,10 @@ export const zh_TW: EnTranslations = {
       "martyrs_aegis": {
         "name": "殉道者聖盾",
         "description": "使一名盟友受到的傷害降低 40%，持續 8 秒。"
+      },
+      "prayer_of_returning": {
+        "name": "歸返祈禱",
+        "description": "呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（聖光與戒律）"
       },
       "choir_of_deliverance": {
         "name": "救贖聖詠團",

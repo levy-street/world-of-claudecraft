@@ -5,6 +5,8 @@ import {
   type GuildBankOpSessionPort,
   runGuildBankOp,
 } from '../../server/guild_bank_op_coordinator';
+import type { UnsettledGuildBook } from '../../server/guild_bank_settle_gate';
+import { guildBankDeltaIdentityKey } from '../../src/sim/guild_bank';
 import type { InvSlot } from '../../src/sim/types';
 import type { GuildBankInfo } from '../../src/world_api';
 
@@ -48,6 +50,15 @@ function makeRig() {
   const bankLedgerNeedsSave = vi.fn(() => false);
   const scheduleBankLedgerHighWaterSave = vi.fn();
   const markGuildBankDirty = vi.fn();
+  const unsettledGuildBook = vi.fn(
+    (): UnsettledGuildBook => ({
+      items: new Map(),
+      sourceUnits: new Map(),
+      copper: 0,
+      ladder: false,
+    }),
+  );
+  const flushUnsettledGuildBook = vi.fn();
   const recordGuildBankIncident = vi.fn();
   const logError = vi.fn();
   const host: GuildBankOpHostPort = {
@@ -57,6 +68,8 @@ function makeRig() {
     bankLedgerNeedsSave,
     scheduleBankLedgerHighWaterSave,
     markGuildBankDirty,
+    unsettledGuildBook,
+    flushUnsettledGuildBook,
     recordGuildBankIncident,
     logError,
   };
@@ -84,6 +97,8 @@ function makeRig() {
     bankLedgerNeedsSave,
     scheduleBankLedgerHighWaterSave,
     markGuildBankDirty,
+    unsettledGuildBook,
+    flushUnsettledGuildBook,
     recordGuildBankIncident,
     logError,
   };
@@ -609,5 +624,122 @@ describe('guild-bank op coordinator', () => {
     expect(rig.failAfterMutation).toHaveBeenCalledWith(error);
     expect(rig.session.unflushedGuildBankOps.get(23)).toHaveLength(1);
     expect(rig.bankLedgerNeedsSave).not.toHaveBeenCalled();
+  });
+});
+
+describe('the unsettled gate (server/guild_bank_settle_gate.ts) inside the coordinator', () => {
+  const NOTICE = 'The guild bank is still saving a recent change. Try again in a moment.';
+  const legsKey = guildBankDeltaIdentityKey({
+    itemId: 'spider_leg',
+    instance: null,
+    craftedRecipeId: null,
+  });
+  const unsettledLegs = (): UnsettledGuildBook => ({
+    items: new Map([[legsKey, 20]]),
+    sourceUnits: new Map(),
+    copper: 0,
+    ladder: false,
+  });
+
+  it('refuses an unsettled withdraw BEFORE admission: no reservation, no mutation, notice, flush, incident', () => {
+    const rig = makeRig();
+    rig.state.playerBook = book({ slots: [slot('spider_leg', 20)] });
+    rig.unsettledGuildBook.mockReturnValue(unsettledLegs());
+    const run = vi.fn();
+    runGuildBankOp(rig.host, rig.session, { pid: 5 }, 'withdraw', run, { slot: 0 });
+    expect(run).not.toHaveBeenCalled();
+    expect(rig.tryReserve).not.toHaveBeenCalled();
+    expect(rig.markGuildBankDirty).not.toHaveBeenCalled();
+    expect(rig.session.unflushedGuildBankOps.size).toBe(0);
+    expect(rig.unsettledGuildBook).toHaveBeenCalledWith(23);
+    expect(rig.sendPlayerNotice).toHaveBeenCalledWith(NOTICE);
+    expect(rig.flushUnsettledGuildBook).toHaveBeenCalledWith(23, { kind: 'items', key: legsKey });
+    expect(rig.recordGuildBankIncident).toHaveBeenCalledWith('unsettled_refused');
+  });
+
+  it('never gates a READ-ONLY view: a plain member buys neither an incident nor a flush', () => {
+    // guildBankInfoFor hands every member a view; only officer-plus get
+    // canEdit. The sim refuses the member's op on rank, and the gate must not
+    // run first (it would count an incident and flush a holder for a request
+    // that can never succeed).
+    const rig = makeRig();
+    rig.state.playerBook = book({ slots: [slot('spider_leg', 20)], canEdit: false });
+    rig.unsettledGuildBook.mockReturnValue(unsettledLegs());
+    const run = vi.fn();
+    runGuildBankOp(rig.host, rig.session, { pid: 5 }, 'withdraw', run, { slot: 0 });
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(rig.unsettledGuildBook).not.toHaveBeenCalled();
+    expect(rig.sendPlayerNotice).not.toHaveBeenCalled();
+    expect(rig.flushUnsettledGuildBook).not.toHaveBeenCalled();
+    expect(rig.recordGuildBankIncident).not.toHaveBeenCalledWith('unsettled_refused');
+  });
+
+  it('passes a settled withdraw through to admission and the mutation, with no notice and no flush', () => {
+    const rig = makeRig();
+    rig.state.playerBook = book({ slots: [slot('spider_leg', 20)] });
+    const run = vi.fn(() => {
+      // The withdraw moves the stack from the book into the acting bags.
+      rig.state.playerBook = book();
+      if (rig.state.meta) rig.state.meta.inventory = [slot('spider_leg', 20)];
+    });
+    runGuildBankOp(rig.host, rig.session, { pid: 5 }, 'withdraw', run, { slot: 0 });
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(rig.tryReserve).toHaveBeenCalledTimes(1);
+    expect(rig.markGuildBankDirty).toHaveBeenCalledWith(23);
+    expect(rig.sendPlayerNotice).not.toHaveBeenCalled();
+    expect(rig.flushUnsettledGuildBook).not.toHaveBeenCalled();
+    expect(rig.recordGuildBankIncident).not.toHaveBeenCalledWith('unsettled_refused');
+  });
+
+  it('never gates a deposit or an operator purge, whatever is unsettled', () => {
+    const rig = makeRig();
+    rig.state.playerBook = book({ slots: [slot('spider_leg', 20)] });
+    rig.state.guildBook = book({ slots: [slot('spider_leg', 20)] });
+    rig.unsettledGuildBook.mockReturnValue({
+      items: new Map([[legsKey, 20]]),
+      sourceUnits: new Map(),
+      copper: 50_000,
+      ladder: true,
+    });
+    const deposit = vi.fn();
+    runGuildBankOp(rig.host, rig.session, { pid: 5 }, 'deposit', deposit, { slot: 0 });
+    expect(deposit).toHaveBeenCalledTimes(1);
+    const purge = vi.fn();
+    runGuildBankOp(
+      rig.host,
+      rig.session,
+      { guildId: 41, actorAccountId: 97 },
+      'admin_purge',
+      purge,
+      { slot: 0 },
+    );
+    expect(purge).toHaveBeenCalledTimes(1);
+    expect(rig.unsettledGuildBook).not.toHaveBeenCalled();
+    expect(rig.sendPlayerNotice).not.toHaveBeenCalled();
+    expect(rig.flushUnsettledGuildBook).not.toHaveBeenCalled();
+  });
+
+  it('never gates an operator target even on a gated op (the purge carrier is only a carrier)', () => {
+    const rig = makeRig();
+    rig.state.guildBook = book({ slots: [slot('spider_leg', 20)] });
+    rig.unsettledGuildBook.mockReturnValue(unsettledLegs());
+    const run = vi.fn();
+    runGuildBankOp(rig.host, rig.session, { guildId: 41, actorAccountId: 97 }, 'withdraw', run, {
+      slot: 0,
+    });
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(rig.unsettledGuildBook).not.toHaveBeenCalled();
+    expect(rig.sendPlayerNotice).not.toHaveBeenCalled();
+  });
+
+  it('leaves a withdraw with no live book (not at a banker) to the sim, unjudged', () => {
+    const rig = makeRig();
+    rig.state.playerBook = null;
+    rig.unsettledGuildBook.mockReturnValue(unsettledLegs());
+    const run = vi.fn();
+    runGuildBankOp(rig.host, rig.session, { pid: 5 }, 'withdraw', run, { slot: 0 });
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(rig.sendPlayerNotice).not.toHaveBeenCalled();
+    expect(rig.flushUnsettledGuildBook).not.toHaveBeenCalled();
   });
 });

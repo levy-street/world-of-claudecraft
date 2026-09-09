@@ -253,6 +253,11 @@ export interface MountTransitionInputs {
   mountCastKey: string;
   mountCastRemaining: number;
   mountKey: string;
+  /** What the mount PRESENTS as (mountPresentationKey, src/sim/content/mount_skins.ts):
+   *  the worn skin's id or the mount key. Every sound keys off this while the
+   *  summon EDGE stays on mountKey, so a live skin swap rebuilds the visual
+   *  without replaying the call. */
+  mountLook: string;
   /** The rider is in a state that can play the call pose at all. */
   poseAllowed: boolean;
   /** This entity is being presented this frame (not shed by the LOD/budget). */
@@ -277,7 +282,7 @@ export interface MountTransitionInputs {
  * Returns the next `wasMountCasting` latch for the caller to store.
  */
 export function syncMountTransitionFx(
-  v: { lastMountKey: string; wasMountCasting: boolean },
+  v: { lastMountKey: string; lastMountLook?: string; wasMountCasting: boolean },
   x: MountTransitionInputs,
 ): boolean {
   // idle -> summoning edge (mountCastKey set): play the arm-raise call pose for
@@ -288,14 +293,15 @@ export function syncMountTransitionFx(
     // take at the CAST edge, not after the mount appears. Presentation
     // shedding may suppress the cosmetic call pose, but it must not also
     // throw away the only useful preload window.
-    x.preloadEngine(x.mountCastKey);
-    x.preloadSummon(x.mountCastKey);
+    x.preloadEngine(x.mountLook);
+    x.preloadSummon(x.mountLook);
     if (x.poseAllowed) x.playCallPose(x.mountCastRemaining);
   }
   // mountKey change = summon completed, dismount completed, or a live swap: fire
   // the shimmer at the rider. Tracked separately from mountVisualKey, which lags
   // async asset loading.
-  if (x.mountKey !== v.lastMountKey) {
+  const mountChanged = x.mountKey !== v.lastMountKey;
+  if (mountChanged) {
     v.lastMountKey = x.mountKey;
     if (x.present) x.summonGlow();
     // The mount's own call, on the same edge as the glow but only when a mount
@@ -318,7 +324,19 @@ export function syncMountTransitionFx(
     // playAt's cold path (silently dropped past a 0.12s fetch/decode window) and
     // the loop's cold path (a fallback fade-in instead of the immediate splice),
     // reading as ~0.9s of silence then a swell. A no-op for an ordinary mount.
-    if (x.mountKey !== '') x.preloadEngine(x.mountKey);
+    if (x.mountKey !== '') x.preloadEngine(x.mountLook);
   }
+  // A worn skin can change without a new summon. Retire the previous sound
+  // set without replaying the summon call or pose.
+  if (
+    !mountChanged &&
+    x.mountKey &&
+    v.lastMountLook !== undefined &&
+    x.mountLook !== v.lastMountLook
+  ) {
+    x.engineReset();
+    x.preloadEngine(x.mountLook);
+  }
+  v.lastMountLook = x.mountLook;
   return x.mountCasting;
 }

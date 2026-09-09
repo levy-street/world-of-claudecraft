@@ -252,6 +252,7 @@ function beginSalvageCast(
   }
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   const duration = ENCHANT_FAMILY_CAST_DURATION_SEC;
   p.castingAbility = SALVAGE_CAST_ID;
   p.castTotal = duration;

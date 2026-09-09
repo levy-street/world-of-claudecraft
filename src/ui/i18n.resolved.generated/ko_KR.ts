@@ -577,6 +577,7 @@ export const ko_KR: EnTranslations = {
       "mountsEyebrow": "계정 탈것",
       "mountsTitle": "기계 마구간",
       "mountBuyAria": "{item} 구매",
+      "mountSkinType": "탈것 스킨",
       "loading": "WOC 상점 불러오는 중…",
       "error": "현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
       "balance": "Claudium 잔액",
@@ -1464,6 +1465,7 @@ export const ko_KR: EnTranslations = {
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
       "desc_goblin_rocket_sled": "위험할 정도로 과하게 만들어진 고블린 썰매. 쌍발 로켓과 형편없는 판단력으로 내달린다.",
       "desc_rallycart_rxt": "작지만 본격적인 랠리 머신. 이동 속도를 높여준다.",
+      "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
@@ -4876,6 +4878,32 @@ export const ko_KR: EnTranslations = {
         "crown_endures": "굴하지 않는 왕관(6:00에 강제 격노, 영웅 5:00)",
         "deathless_court": "불사의 궁정(영웅 전용, 불사의 격노 이후 왕실 궁정이 일어남)"
       }
+    },
+    "cosmetics": {
+      "title": "외형",
+      "close": "외형 닫기",
+      "tabsLabel": "외형 구역",
+      "tabMounts": "탈것",
+      "tabSkins": "스킨",
+      "tabMech": "메카",
+      "legend": "계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.",
+      "scopeAccount": "계정",
+      "scopeCharacter": "캐릭터",
+      "wear": "착용",
+      "takeOff": "벗기",
+      "worn": "착용 중",
+      "apply": "적용",
+      "detach": "해제",
+      "applied": "적용됨",
+      "owned": "보유 중",
+      "storeOnly": "WOC 상점에서 구매 가능",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "탈것 스킨은 이 캐릭터가 타는 어떤 탈것 위에도 덧입혀집니다. 속도는 바뀌지 않습니다.",
+      "mountsNoMount": "먼저 탈것을 얻으세요. 스킨에는 탈 대상이 필요합니다.",
+      "skinsEmpty": "아직 보유한 무기 스킨이 없습니다. WOC 상점을 방문하세요.",
+      "skinsApplyHint": "{type}을(를) 장착하면 이 스킨을 적용할 수 있습니다.",
+      "mechIntro": "전투 메카는 이 캐릭터의 몸을 대체합니다. 한 번에 하나의 크로마만 착용합니다.",
+      "mechEmpty": "아직 보유한 전투 메카 크로마가 없습니다."
     },
     "reliquary": {
       "title": "성물고",
@@ -11392,7 +11420,7 @@ export const ko_KR: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "쓰러진 자 소환",
-        "description": "죽은 파티원을 생명력과 마나가 35%인 상태로 되살립니다."
+        "description": "죽은 파티원을 당신 곁에서 생명력과 마나가 35%인 상태로 되살립니다. 레벨 16 이상의 태양 치유사는 대신 파티에서 30야드 내 시야가 닿는 쓰러진 모든 구성원을 불러 되살립니다."
       },
       "beacon_of_light": {
         "name": "빛의 봉화",
@@ -12125,6 +12153,14 @@ export const ko_KR: EnTranslations = {
         "name": "골수분쇄",
         "description": "오랜 피 3단계를 소모해 {damage}의 피해를 입히는 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 8초 동안 최대 생명력의 18%를 흡수하는 보호막을 얻고 분노 15를 돌려받습니다."
       },
+      "wildwake": {
+        "name": "야생의 소생",
+        "description": "쓰러진 아군을 갑작스러운 개화로 이끌어, 치열한 전투 중에도 생명력과 마나 35%로 당신 곁에 되살립니다. (회복)"
+      },
+      "grove_awakening": {
+        "name": "숲의 각성",
+        "description": "파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (회복)"
+      },
       "overbloom": {
         "name": "만개",
         "description": "푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다."
@@ -12435,15 +12471,15 @@ export const ko_KR: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "시간 역전",
-        "description": "쓰러진 아군의 시간선을 되돌려, 전투 중에도 시체가 있는 자리에서 생명력과 마나의 일부를 지닌 채 되살립니다. (시간술)"
+        "description": "쓰러진 아군의 시간선을 되돌려, 전투 중에도 당신 곁에서 생명력과 마나의 35%를 지닌 채 되살립니다. (시간술)"
       },
       "collective_reversal": {
         "name": "집단 역행",
-        "description": "그룹 또는 공격대에서 사망한 모든 구성원의 시간선을 되돌려 시체 옆에서 생명력과 마나가 30%인 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)"
+        "description": "그룹 또는 공격대에서 40야드 내 시야가 닿는 사망한 모든 구성원의 시간선을 되돌려 당신 곁에서 생명력과 마나가 30%인 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)"
       },
       "ancestor_return": {
         "name": "선조의 귀환",
-        "description": "파티 또는 공격대에서 쓰러진 모든 구성원을 시체가 있는 곳에서 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (영혼치유사)"
+        "description": "파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (영혼치유사)"
       },
       "temporal_rewind": {
         "name": "되감기",
@@ -12585,6 +12621,10 @@ export const ko_KR: EnTranslations = {
       "martyrs_aegis": {
         "name": "순교자의 방패",
         "description": "아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다."
+      },
+      "prayer_of_returning": {
+        "name": "귀환의 기도",
+        "description": "파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (신성 및 수양)"
       },
       "choir_of_deliverance": {
         "name": "구원의 성가대",

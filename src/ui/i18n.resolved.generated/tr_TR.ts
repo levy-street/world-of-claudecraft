@@ -577,6 +577,7 @@ export const tr_TR: EnTranslations = {
       "mountsEyebrow": "Hesap Bağlantıları",
       "mountsTitle": "Makine Stabil",
       "mountBuyAria": "{item}'yi satın alın",
+      "mountSkinType": "Mount skin",
       "loading": "WOC Mağazası yükleniyor...",
       "error": "WOC Mağazası şu anda kullanılamıyor. Lütfen kısa süre sonra tekrar deneyin.",
       "balance": "Claudium Bakiyesi",
@@ -1464,6 +1465,7 @@ export const tr_TR: EnTranslations = {
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
       "desc_goblin_rocket_sled": "İki roket ve mükemmel derecede kötü muhakemeyle ilerleyen, tehlikeli biçimde aşırı tasarlanmış bir goblin kızağı.",
       "desc_rallycart_rxt": "Yolculuk hızını artıran küçük bir ralli makinesi.",
+      "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
       "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor.",
       "desc_mech_bird": "Kapanan servolarla koşan, kurma anahtarı hâlâ dönen, el yapımı, saat mekanizmalı bir savaş tavuğu.",
@@ -4876,6 +4878,32 @@ export const tr_TR: EnTranslations = {
         "crown_endures": "Taç Dayanır (6:00’da sert öfke, heroic 5:00)",
         "deathless_court": "Ölümsüz Saray (yalnız heroic, kraliyet sarayı Ölümsüz Öfke’den sonra ayağa kalkar)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Yadigârlık",
@@ -11392,7 +11420,7 @@ export const tr_TR: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Düşenleri Çağır",
-        "description": "Ölü bir grup üyesini 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun düşmüş tüm üyelerini geri çağırır."
+        "description": "Ölü bir grup üyesini yanına, 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun 30 yarda yakınındaki ve görüş hattındaki düşmüş tüm üyelerini geri çağırır."
       },
       "beacon_of_light": {
         "name": "Işık Feneri",
@@ -12125,6 +12153,14 @@ export const tr_TR: EnTranslations = {
         "name": "İlik Kıran",
         "description": "3 Kadim Kanı yüksek tehditli, {damage} hasar veren ağır bir vuruş için tüketir. Canın yarısının altındayken bunun yerine 8 sn boyunca azami canının %18 kadarı değerinde bir kalkanla seni korur ve 15 öfke iade eder."
       },
+      "wildwake": {
+        "name": "Yaban Uyanışı",
+        "description": "Düşmüş bir müttefiği ansızın çiçeğe durmaya çağırır ve savaşın tam ortasında bile yanına, canının ve manasının 35% kadarıyla hayata döndürür. (Koru Yüreği)"
+      },
+      "grove_awakening": {
+        "name": "Koru Uyanışı",
+        "description": "Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Koru Yüreği)"
+      },
       "overbloom": {
         "name": "Taşkın Çiçeklenme",
         "description": "5 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Yaban Çiçeği eker."
@@ -12435,15 +12471,15 @@ export const tr_TR: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Zamansal Tersine Çevirme",
-        "description": "Düşmüş bir müttefikin zaman çizelgesini geri sararak onları savaşın tam ortasında bile bedeninin yanında, canının ve manasının bir kısmıyla hayata döndürür. (Kronomansi)"
+        "description": "Düşmüş bir müttefikin zaman çizelgesini geri sararak onları savaşın tam ortasında bile yanına, canının ve manasının 35% kadarıyla hayata döndürür. (Kronomansi)"
       },
       "collective_reversal": {
         "name": "Toplu Geri Sarım",
-        "description": "Grubunuzdaki veya baskınınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları bedenlerinin yanında %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)"
+        "description": "Grubunuzdaki veya baskınınızdaki, 40 yarda yakınındaki ve görüş hattınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları yanınıza %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)"
       },
       "ancestor_return": {
         "name": "Ataların Dönüşü",
-        "description": "Grubunun ya da akınının düşmüş her üyesini bedeninin başında 30% can ve manayla yaşama döndürür. Savaşta okunamaz. (Ruh Onarımı)"
+        "description": "Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Ruh Onarımı)"
       },
       "temporal_rewind": {
         "name": "Geri Sar",
@@ -12585,6 +12621,10 @@ export const tr_TR: EnTranslations = {
       "martyrs_aegis": {
         "name": "Şehidin Kalkanı",
         "description": "Bir müttefikin aldığı hasarı 8 sn boyunca 40% azaltır."
+      },
+      "prayer_of_returning": {
+        "name": "Dönüş Duası",
+        "description": "Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Kutsal ve Disiplin)"
       },
       "choir_of_deliverance": {
         "name": "Kurtuluş Korosu",
@@ -18407,8 +18447,8 @@ export const tr_TR: EnTranslations = {
       },
       "q_forgefathers_requiem": {
         "title": "The Forgefather's Requiem",
-        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.",
-        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.",
+        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.",
+        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.",
         "objectives": {
           "0": {
             "label": "Forgefather's Ember recovered"
@@ -18417,7 +18457,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_requiem_at_the_forge": {
         "title": "Requiem at the Forge",
-        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.",
+        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.",
         "completion": "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
         "objectives": {
           "0": {

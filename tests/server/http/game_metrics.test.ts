@@ -1060,6 +1060,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       // Legacy cardinality: the current atomic path cannot create an unpaid
       // guild, so any new sample is a mixed-release/invariant defect.
       'create_fee_unpaid',
+      'unsettled_refused',
     ]);
 
     // Scrape BEFORE any increment: an alert rule cannot fire on a series that

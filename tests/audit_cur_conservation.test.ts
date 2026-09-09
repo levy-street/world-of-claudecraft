@@ -304,6 +304,29 @@ async function settle(): Promise<void> {
 const dispatch = (server: GameServer, session: ClientSession, msg: Record<string, unknown>) =>
   priv(server).dispatchMessage(session, { t: 'cmd', ...msg }, JSON.stringify(msg), 0);
 
+/** Dispatch one op with `hidden` sessions invisible to the dispatch-time
+ *  unsettled gate (server/guild_bank_settle_gate.ts): they read as quarantined
+ *  for the duration, so the gate sees no holder and the op lands through the
+ *  real coordinator exactly as every op did before the gate. The
+ *  consume-then-fence probes below pin the refusal/rollback machinery UNDER
+ *  the gate, which ordinary dispatch can no longer reach. */
+function dispatchUnderGate(
+  server: GameServer,
+  session: ClientSession,
+  msg: Record<string, unknown>,
+  hidden: readonly ClientSession[],
+): void {
+  const was = hidden.map((h) => h.escrowQuarantined);
+  for (const h of hidden) h.escrowQuarantined = true;
+  try {
+    dispatch(server, session, msg);
+  } finally {
+    hidden.forEach((h, n) => {
+      h.escrowQuarantined = was[n] ?? false;
+    });
+  }
+}
+
 const purse = (server: GameServer, session: ClientSession): number =>
   server.sim.players.get(session.pid)?.copper ?? -1;
 
@@ -441,13 +464,16 @@ describe("another officer's save can no longer launder an unflushed deposit into
 // itself fenced (an ordinary re-login) so nothing will ever make A's deposit
 // durable. B kept the value; A's stake came back.
 //
-// It is now impossible by construction: B's save cannot commit its character
-// half, because the book half it is paired with cannot be replayed onto
-// durable truth, so the whole transaction rolls back. B retries while A is
-// still around to make the deposit durable, and once A is gone B's live state
-// is abandoned wholesale: its own book ops come off the live book, it is
-// quarantined so it can never persist, and it reloads from a durable row that
-// never saw the withdrawal.
+// It is now impossible by construction, twice over. First line: the
+// dispatch-time unsettled gate (server/guild_bank_settle_gate.ts) refuses B's
+// consume of A's not-yet-durable deposit outright, so B never holds the value
+// (the last probe below). Backstop, reached here by hiding A from the gate:
+// B's save cannot commit its character half, because the book half it is
+// paired with cannot be replayed onto durable truth, so the whole transaction
+// rolls back. B retries while A is still around to make the deposit durable,
+// and once A is gone B's live state is abandoned wholesale: its own book ops
+// come off the live book, it is quarantined so it can never persist, and it
+// reloads from a durable row that never saw the withdrawal.
 // ---------------------------------------------------------------------------
 describe('consume-then-fence can no longer duplicate across two accounts', () => {
   it("refuses the consumer's save and rolls it back rather than minting", async () => {
@@ -471,7 +497,9 @@ describe('consume-then-fence can no longer duplicate across two accounts', () =>
     if (!aMeta) throw new Error('missing meta');
     const idx = aMeta.inventory.findIndex((s) => s.itemId === 'wolf_fang');
     dispatch(server, a, { cmd: 'guild_bank_deposit', slot: idx, count: 4 });
-    dispatch(server, b, { cmd: 'guild_bank_withdraw', slot: 0, count: 4 });
+    // The consume itself is what the gate refuses now; hide A to reach the
+    // backstop this probe pins.
+    dispatchUnderGate(server, b, { cmd: 'guild_bank_withdraw', slot: 0, count: 4 }, [a]);
     expect(countFangs({ inventory: server.sim.players.get(b.pid)?.inventory })).toBe(4);
 
     // A fences itself out (an ordinary re-login), so A's deposit will never be
@@ -533,7 +561,7 @@ describe('consume-then-fence can no longer duplicate across two accounts', () =>
       stamp(server, b);
       const start = durablePurse(1) + durablePurse(2);
       dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 400_000 });
-      dispatch(server, b, { cmd: 'guild_bank_withdraw_gold', amount: 400_000 });
+      dispatchUnderGate(server, b, { cmd: 'guild_bank_withdraw_gold', amount: 400_000 }, [a]);
       dbMock.setFence(1);
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const err = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -545,6 +573,58 @@ describe('consume-then-fence can no longer duplicate across two accounts', () =>
         durablePurse(1) + durablePurse(2) + (dbMock.durableBooks.get(GUILD_ID) as Book).treasury;
       expect(`round ${round}: ${end - start}`).toBe(`round ${round}: 0`);
     }
+  });
+
+  it('the unsettled gate refuses the consume at dispatch, so the fence-out strands nothing', async () => {
+    // The first line of defense: through ordinary dispatch B never holds A's
+    // not-yet-durable fangs at all, A's fence-out simply lifts its own deposit
+    // off the live book, B stays clean and saves normally, and no anomaly row
+    // is ever written.
+    dbMock.durableBooks.clear();
+    dbMock.durableChars.clear();
+    dbMock.setFence(null);
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'GateA');
+    const b = joinServer(server, 2, 'GateB');
+    await settle();
+    server.sim.loadGuildBank(GUILD_ID, { treasury: 0, inventory: [], purchasedSlots: 24 });
+    dbMock.durableBooks.set(GUILD_ID, { treasury: 0, inventory: [], purchasedSlots: 24 });
+    officer(server, a, 10_000);
+    officer(server, b, 10_000);
+    server.sim.addItem('wolf_fang', 4, a.pid);
+    await priv(server).saveCharacter(a);
+    await priv(server).saveCharacter(b);
+    stamp(server, a);
+    stamp(server, b);
+    const aMeta = server.sim.players.get(a.pid);
+    if (!aMeta) throw new Error('missing meta');
+    const idx = aMeta.inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    dispatch(server, a, { cmd: 'guild_bank_deposit', slot: idx, count: 4 });
+    dispatch(server, b, { cmd: 'guild_bank_withdraw', slot: 0, count: 4 });
+    // Refused: B holds nothing, the book still holds A's four, B has no book ops.
+    expect(countFangs({ inventory: server.sim.players.get(b.pid)?.inventory })).toBe(0);
+    expect(countFangs({ inventory: server.sim.guildBanks.get(GUILD_ID)?.inventory })).toBe(4);
+    expect(b.dirtyGuildBanks.size).toBe(0);
+    // The refusal flushed A; let that land, then fence A out and save both.
+    await settle();
+    dbMock.setFence(1);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await priv(server).saveCharacter(a);
+    stamp(server, b);
+    await priv(server).saveCharacter(b);
+    warn.mockRestore();
+    err.mockRestore();
+    expect(b.escrowQuarantined).toBe(false);
+    // Four fangs, in exactly one durable place, whatever A's flush managed
+    // before the fence: A's bags or the book, never both and never B.
+    const bookFangs = countFangs({
+      inventory: (dbMock.durableBooks.get(GUILD_ID) as Book).inventory,
+    });
+    expect(countFangs(dbMock.durableChars.get(1)) + bookFangs).toBe(4);
+    expect(countFangs(dbMock.durableChars.get(2))).toBe(0);
+    await bankLedgerIdle();
+    expect(capturedLedgerRows().filter((row) => row.op === 'escrow_deficit')).toEqual([]);
   });
 });
 

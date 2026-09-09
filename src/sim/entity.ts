@@ -140,6 +140,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     queuedOnSwing: null,
     queuedCastAbility: null,
     queuedCastAim: null,
+    queuedCastTargetId: null,
     fiveSecondRule: 99,
     comboPoints: 0,
     comboUntil: -1,
@@ -204,8 +205,10 @@ function baseEntity(id: number, pos: Vec3): Entity {
     evadeStall: 0,
     chaseStall: 0,
     evadeEpoch: 0,
-    combatExitHoldUntil: 0,
     chainPullInbound: false,
+    // The instance combat hold's pin clock: present from birth (undefined) so a
+    // mob's shape never forks on its first pin or release.
+    evadeInPlace: undefined,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -238,6 +241,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     offhandItemId: null,
     weaponSkinLoadout: {},
     weaponSkinId: null,
+    mountSkinId: null,
     equippedItems: {},
     equippedInstances: {},
     guild: '',

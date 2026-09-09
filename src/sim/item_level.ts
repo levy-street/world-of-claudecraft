@@ -206,14 +206,15 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // five-man epic pieces read item level 31 (25 + the epic bump). The 10-player
   // raid (Heroic Nythraxis) is one tier ABOVE the five-mans: its heroic-only
   // weapons register at NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL (27) so they land at
-  // item level 33.
+  // item level 33. Migrated base-table paths preserve their original source
+  // index; listing them in the shared heroic slot must not increase their level.
   for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
     const src =
       bossId === NYTHRAXIS_RAID_BOSS_ID
         ? NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL
         : HEROIC_LOOT_SOURCE_LEVEL;
     for (const entry of entries) {
-      if (entry.itemId) bump(entry.itemId, src, false);
+      if (entry.itemId && !entry.preserveSourceTier) bump(entry.itemId, src, false);
     }
   }
   // Heroic upgraded drop variants (content/heroic_variants.ts): the "Heroic X"

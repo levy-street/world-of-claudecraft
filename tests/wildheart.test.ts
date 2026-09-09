@@ -7,7 +7,7 @@ import { VISUALS } from '../src/render/characters/manifest';
 import { resolvePosition } from '../src/sim/colliders';
 import { DEEDS } from '../src/sim/content/deeds';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
-import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
 import {
   WILDHEART_DUNGEON_DEFS,
@@ -438,49 +438,22 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     );
   });
 
-  it('registers the heroic drop table: two roll groups, each summing to exactly 1.0', () => {
+  it('registers one heroic equipment partition with every former acquisition', () => {
     const entries = HEROIC_BOSS_LOOT.wildheart_high_priest;
-    expect(entries).toBeDefined();
-    // Gear rides exclusive roll groups; the mounts are group-less independent
-    // rolls appended after them (the house split, tests/dungeons.test.ts), and
-    // since masterwrought Phase 11f a farming pattern group is appended last.
-    // GEAR is what this arm is about, so the farm group is excluded by NAME
-    // rather than the group check being loosened: a stray third GEAR group
-    // still fails the membership assertion below.
     const gear = entries.filter(
-      (e) => e.rollGroup !== undefined && e.rollGroup !== FARM_HEROIC_PATTERN_GROUP,
+      (entry) => entry.itemId && ITEMS[entry.itemId]?.slot && ITEMS[entry.itemId]?.kind !== 'bag',
     );
-    const groupSum = (group: string) =>
-      gear.filter((e) => e.rollGroup === group).reduce((a, e) => a + e.chance, 0);
-    expect(groupSum('wildheart_heroic')).toBeCloseTo(1.0, 9);
-    expect(groupSum('wildheart_heroic2')).toBeCloseTo(1.0, 9);
-    // Every GEAR entry belongs to one of the two groups (no stray chance rolls),
-    // and the group names never collide with the base table's 'wildheart_bonus'.
-    for (const e of gear) {
-      expect(['wildheart_heroic', 'wildheart_heroic2']).toContain(e.rollGroup);
-    }
-    // Six DISTINCT items across the two groups, the shape every other heroic
-    // five-man uses: per-item rates stay at the house 0.33-0.34 (a dup-path
-    // re-listing pushed re-listed chests to 0.56-0.66 per kill, above any
-    // other heroic item in the game).
-    // WHOLE-TABLE uniqueness, farm rows INCLUDED: the two arms above exclude
-    // the farm group because they are about gear rates, but "no id is listed
-    // twice on this table" is true of every row and excluding any of them only
-    // narrows what the arm can catch. The farm ids are distinct here, so the
-    // unfiltered form is both correct today and stricter.
-    const ids = entries.map((e) => e.itemId);
-    expect(new Set(ids).size).toBe(ids.length);
-    // Per-item literals, not only group sums: 0.9/0.05/0.05 also sums to 1.0
-    // but pays one item far above the house 0.33-0.34 per-item band.
-    expect(gear.map((e) => e.chance)).toEqual([0.34, 0.33, 0.33, 0.34, 0.33, 0.33]);
-    expect(
-      gear.filter((e) => e.itemId === 'greatfang_of_the_basin').map((e) => e.rollGroup),
-    ).toEqual(['wildheart_heroic2']);
-    // The mounts must stay group-LESS: folding one into a gear group would make
-    // it compete with (and at 0.1% effectively erase) a guaranteed epic.
-    expect(gear.every((e) => e.itemId !== undefined && ITEMS[e.itemId]?.kind !== 'mount')).toBe(
-      true,
+    expect(gear).toHaveLength(12);
+    expect(gear.every((entry) => entry.rollGroup === 'wildheart_heroic')).toBe(true);
+    expect(gear.reduce((sum, entry) => sum + entry.chance, 0)).toBe(1);
+    expect(new Set(entries.map((entry) => entry.itemId)).size).toBe(entries.length);
+    // Former per-kill weights keep their relative proportions inside one slot.
+    const chance = (id: string) => gear.find((entry) => entry.itemId === id)!.chance;
+    expect(chance('basin_stalkers_tunic') / chance('verdant_heart_vestment')).toBeCloseTo(34 / 33);
+    expect(chance('heroic_wildheart_tuskblade') / chance('basin_stalkers_tunic')).toBeCloseTo(
+      6 / 34,
     );
+    expect(gear.some((entry) => entry.itemId === 'greatfang_of_the_basin')).toBe(true);
   });
 
   it('carries equal-rate secondary paths to both blue mounts, and to no other mount', () => {
@@ -583,33 +556,17 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     expect([...seen].sort()).toEqual([...trio].sort());
   });
 
-  it('pays exactly two DISTINCT heroic epics per heroic Zulgar kill', () => {
-    // GEAR ids only: the two mount entries are group-less 0.1% lotteries that
-    // no realistic seed set hits, so counting them here would make the
-    // reachability assertion below unsatisfiable. Since masterwrought Phase
-    // 11f the same is true of the appended farming pattern group (0.04 each),
-    // so it is excluded by NAME for exactly the same reason rather than the
-    // rollGroup test being loosened.
-    const heroicIds = new Set(
-      HEROIC_BOSS_LOOT.wildheart_high_priest.flatMap((e) =>
-        e.itemId && e.rollGroup !== undefined && e.rollGroup !== FARM_HEROIC_PATTERN_GROUP
-          ? [e.itemId]
-          : [],
-      ),
-    );
+  it('pays exactly one equipment item per heroic Zulgar kill', () => {
     const seen = new Set<string>();
     for (const seed of [3, 8, 11, 42, 97, 123]) {
       const { zulgar } = killZulgar(seed, 'heroic');
-      const drops = (zulgar.loot?.items ?? [])
-        .map((s) => s.itemId)
-        .filter((id) => heroicIds.has(id));
-      expect(drops, `seed ${seed}: two heroic epics`).toHaveLength(2);
-      expect(new Set(drops).size, `seed ${seed}: the two epics are distinct`).toBe(2);
-      for (const id of drops) seen.add(id);
+      const drops = (zulgar.loot?.items ?? []).filter(
+        (entry) => ITEMS[entry.itemId]?.slot && ITEMS[entry.itemId]?.kind !== 'bag',
+      );
+      expect(drops, 'seed ' + seed).toHaveLength(1);
+      seen.add(drops[0].itemId);
     }
-    // All six epics are reachable across the seed set, so no table entry can
-    // quietly become dead weight.
-    expect([...seen].sort()).toEqual([...heroicIds].sort());
+    expect(seen.size).toBeGreaterThan(1);
   });
 
   it("opens the shrine-terrace exit portal on Zulgar's death, on both difficulties", () => {

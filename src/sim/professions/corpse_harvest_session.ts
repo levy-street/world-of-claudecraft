@@ -150,7 +150,8 @@ function corpseHarvestStillValid(
   session: CorpseHarvestSession,
 ): Entity | null {
   if (meta.leaving) return null;
-  if (player.dead || player.inCombat) return null;
+  // Combat alone is allowed; damage and displacement use the shared cast cancellation.
+  if (player.dead) return null;
   if (ctx.countItem('field_kit', player.id) === 0) return null;
   if (displacedFromStart(player.pos, session.startPos)) return null;
   const mob = ctx.entities.get(session.corpseEntityId);

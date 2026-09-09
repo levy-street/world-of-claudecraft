@@ -577,6 +577,7 @@ export const it_IT: EnTranslations = {
       "mountsEyebrow": "Montaggi dell'account",
       "mountsTitle": "Stabile alla macchina",
       "mountBuyAria": "Acquista {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Caricamento del negozio WOC...",
       "error": "Il negozio WOC non è al momento disponibile. Per favore riprova a breve.",
       "balance": "Saldo Claudium",
@@ -1464,6 +1465,7 @@ export const it_IT: EnTranslations = {
       "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.",
       "desc_goblin_rocket_sled": "Una slitta goblin pericolosamente sovradimensionata, spinta da due razzi e da un eccellente pessimo giudizio.",
       "desc_rallycart_rxt": "Una piccola macchina da rally che aumenta la velocità di viaggio.",
+      "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi.",
       "desc_drakemaw_raptor": "Un raptor da covata domato per la sella, proveniente dalla Caldera di Drakemaw, tutto muscoli e scatto, che sa ancora vagamente di cenere.",
       "desc_mech_bird": "Un pollo da guerra a orologeria costruito a mano che scatta su servi scattanti, con la chiave di carica ancora in movimento.",
@@ -4876,6 +4878,32 @@ export const it_IT: EnTranslations = {
         "crown_endures": "La Corona perdura (enrage rigido a 6:00, 5:00 in eroica)",
         "deathless_court": "La Corte immortale (solo eroica, la corte reale si rialza dopo Furia immortale)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Il Reliquiario",
@@ -11392,7 +11420,7 @@ export const it_IT: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Richiamo dei Caduti",
-        "description": "Riporta in vita un membro morto del gruppo con il 35% di salute e mana. Un Sanasole di livello 16 o superiore richiama invece tutti i membri caduti del gruppo."
+        "description": "Riporta in vita al tuo fianco un membro morto del gruppo con il 35% di salute e mana. Un Sanasole di livello 16 o superiore richiama invece tutti i membri caduti del gruppo entro 30 metri e nella tua linea di vista."
       },
       "beacon_of_light": {
         "name": "Faro di Luce",
@@ -12125,6 +12153,14 @@ export const it_IT: EnTranslations = {
         "name": "Spezzamidollo",
         "description": "Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti protegge invece con uno scudo pari al 18% della tua salute massima per 8 sec e rimborsa 15 rabbia."
       },
+      "wildwake": {
+        "name": "Risveglio Selvaggio",
+        "description": "Induce un alleato caduto a sbocciare improvvisamente, riportandolo in vita al tuo fianco con il 35% della sua salute e mana, anche nel pieno del combattimento. (Groveheart)"
+      },
+      "grove_awakening": {
+        "name": "Risveglio del Bosco",
+        "description": "Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Groveheart)"
+      },
       "overbloom": {
         "name": "Sovrafioritura",
         "description": "Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio."
@@ -12435,15 +12471,15 @@ export const it_IT: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Inversione Temporale",
-        "description": "Riavvolge la linea temporale di un alleato caduto, riportandolo in vita accanto al suo corpo con una parte della sua salute e mana, anche nel pieno del combattimento. (Cronomanzia)"
+        "description": "Riavvolge la linea temporale di un alleato caduto, riportandolo in vita al tuo fianco con il 35% della sua salute e mana, anche nel pieno del combattimento. (Cronomanzia)"
       },
       "collective_reversal": {
         "name": "Inversione collettiva",
-        "description": "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione, riportandolo in vita accanto al corpo con il 30% di salute e mana. Non può essere lanciata in combattimento. (Cronomanzia)"
+        "description": "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione entro 40 metri e nella tua linea di vista, riportandolo in vita al tuo fianco con il 30% di salute e mana. Non può essere lanciata in combattimento. (Cronomanzia)"
       },
       "ancestor_return": {
         "name": "Ritorno degli Antenati",
-        "description": "Richiama in vita presso il loro corpo tutti i membri caduti del tuo gruppo o incursione con il 30% di salute e mana. Non può essere lanciata in combattimento. (Rammendo Spirituale)"
+        "description": "Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Rammendo Spirituale)"
       },
       "temporal_rewind": {
         "name": "Riavvolgimento",
@@ -12585,6 +12621,10 @@ export const it_IT: EnTranslations = {
       "martyrs_aegis": {
         "name": "Egida del Martire",
         "description": "Riduce del 40% i danni subiti da un alleato per 8 s."
+      },
+      "prayer_of_returning": {
+        "name": "Preghiera del Ritorno",
+        "description": "Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Sacro e Dottrina)"
       },
       "choir_of_deliverance": {
         "name": "Coro della Liberazione",
@@ -18407,8 +18447,8 @@ export const it_IT: EnTranslations = {
       },
       "q_forgefathers_requiem": {
         "title": "The Forgefather's Requiem",
-        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.",
-        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.",
+        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.",
+        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.",
         "objectives": {
           "0": {
             "label": "Forgefather's Ember recovered"
@@ -18417,7 +18457,7 @@ export const it_IT: EnTranslations = {
       },
       "q_requiem_at_the_forge": {
         "title": "Requiem at the Forge",
-        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.",
+        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.",
         "completion": "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
         "objectives": {
           "0": {

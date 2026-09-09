@@ -577,6 +577,7 @@ export const pt_BR: EnTranslations = {
       "mountsEyebrow": "Montagens de conta",
       "mountsTitle": "Máquina estável",
       "mountBuyAria": "Comprar {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Carregando Loja WOC...",
       "error": "A Loja WOC não está disponível no momento. Por favor, tente novamente em breve.",
       "balance": "Saldo de Claudium",
@@ -1464,6 +1465,7 @@ export const pt_BR: EnTranslations = {
       "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.",
       "desc_goblin_rocket_sled": "Um trenó goblin perigosamente superdimensionado, impulsionado por dois foguetes e por um péssimo julgamento excelente.",
       "desc_rallycart_rxt": "Uma máquina de rali em miniatura que aumenta a velocidade de viagem.",
+      "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
       "desc_drakemaw_raptor": "Um raptor da ninhada domado na sela, vindo da Caldeira de Drakemaw, puro músculo e velocidade, ainda com um leve cheiro de cinzas.",
       "desc_mech_bird": "Uma galinha de guerra mecânica construída à mão que corre em servos em movimento, com a chave de corda ainda girando.",
@@ -4876,6 +4878,32 @@ export const pt_BR: EnTranslations = {
         "crown_endures": "A Coroa perdura (enraivecimento rígido em 6:00, 5:00 no heroico)",
         "deathless_court": "A Corte imortal (somente heroico, a corte real se ergue após Fúria imortal)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "O Relicário",
@@ -11392,7 +11420,7 @@ export const pt_BR: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Chamar os Caídos",
-        "description": "Traz de volta à vida um membro morto do grupo com 35% de vida e mana. Um Curassol de nível 16 ou superior, em vez disso, chama de volta todos os membros caídos do grupo."
+        "description": "Traz de volta à vida, ao seu lado, um membro morto do grupo com 35% de vida e mana. Um Curassol de nível 16 ou superior, em vez disso, chama de volta todos os membros caídos do grupo a até 30 m e dentro da sua linha de visão."
       },
       "beacon_of_light": {
         "name": "Farol de Luz",
@@ -12125,6 +12153,14 @@ export const pt_BR: EnTranslations = {
         "name": "Quebra-Medula",
         "description": "Consome seus 3 de Sangue Antigo para um golpe pesado de alta ameaça com {damage} de dano. Abaixo de metade da vida, em vez disso protege você com um escudo de 18% da sua vida máxima por 8 s e devolve 15 de fúria."
       },
+      "wildwake": {
+        "name": "Despertar Selvagem",
+        "description": "Induz um aliado caído a um florescer repentino, trazendo-o de volta à vida ao seu lado com 35% de vida e mana, mesmo em pleno combate. (Coração do Bosque)"
+      },
+      "grove_awakening": {
+        "name": "Despertar do Bosque",
+        "description": "Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Coração do Bosque)"
+      },
       "overbloom": {
         "name": "Superflorescência",
         "description": "Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo."
@@ -12435,15 +12471,15 @@ export const pt_BR: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Reversão Temporal",
-        "description": "Reverte a linha do tempo de um aliado caído, retornando-o à vida junto ao seu corpo com uma parcela de vida e mana, mesmo no meio do combate. (Cronomancia)"
+        "description": "Reverte a linha do tempo de um aliado caído, retornando-o à vida ao seu lado com 35% de vida e mana, mesmo no meio do combate. (Cronomancia)"
       },
       "collective_reversal": {
         "name": "Reversão coletiva",
-        "description": "Rebobina a linha temporal de cada membro morto do seu grupo ou raide e o traz de volta à vida junto ao corpo com 30% de vida e mana. Não pode ser lançada em combate. (Cronomancia)"
+        "description": "Rebobina a linha temporal de cada membro morto do seu grupo ou raide a até 40 m e dentro da sua linha de visão, trazendo-o de volta à vida ao seu lado com 30% de vida e mana. Não pode ser lançada em combate. (Cronomancia)"
       },
       "ancestor_return": {
         "name": "Retorno dos Ancestrais",
-        "description": "Chama de volta à vida, junto ao próprio corpo, todos os membros caídos do seu grupo ou raide com 30% de vida e mana. Não pode ser conjurada em combate. (Remendo Espiritual)"
+        "description": "Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Remendo Espiritual)"
       },
       "temporal_rewind": {
         "name": "Rebobinar",
@@ -12585,6 +12621,10 @@ export const pt_BR: EnTranslations = {
       "martyrs_aegis": {
         "name": "Égide do Mártir",
         "description": "Reduz em 40% o dano sofrido por um aliado por 8 s."
+      },
+      "prayer_of_returning": {
+        "name": "Prece do Retorno",
+        "description": "Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Sagrado e Disciplina)"
       },
       "choir_of_deliverance": {
         "name": "Coro da Libertação",
@@ -18407,8 +18447,8 @@ export const pt_BR: EnTranslations = {
       },
       "q_forgefathers_requiem": {
         "title": "The Forgefather's Requiem",
-        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.",
-        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.",
+        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.",
+        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.",
         "objectives": {
           "0": {
             "label": "Forgefather's Ember recovered"
@@ -18417,7 +18457,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_requiem_at_the_forge": {
         "title": "Requiem at the Forge",
-        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.",
+        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.",
         "completion": "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
         "objectives": {
           "0": {

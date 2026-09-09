@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 3961,
-    "harvestedFiles": 3950,
+    "files": 3959,
+    "harvestedFiles": 3948,
     "carried": {
       "tests/hub_dummy_drill.test.ts": {
         "ms": 3069,
@@ -126,6 +126,9 @@
           11
         ]
       }
+    },
+    "removed": {
+      "tests/server/store_mount_grants.test.ts": "Replaced by store_mount_skin_grants.test.ts in PR3941; new suite uses the existing heuristic until measured."
     }
   },
   "tests/abilities_command.test.ts": 2213,
@@ -1793,7 +1796,6 @@
   "tests/inspect_instances.test.ts": 1719,
   "tests/inspect_view.test.ts": 24,
   "tests/inspect_window.test.ts": 128,
-  "tests/instance_exit_memory.test.ts": 8,
   "tests/instance_music.test.ts": 8,
   "tests/instance_provenance_boundaries.test.ts": 13372,
   "tests/instanced_occluder_ghosts.test.ts": 11,
@@ -3389,7 +3391,6 @@
   "tests/server/storage_recovery_gate.test.ts": 578,
   "tests/server/storage_recovery_session_sweep.test.ts": 6,
   "tests/server/storage_wire_ledger.test.ts": 72,
-  "tests/server/store_mount_grants.test.ts": 7,
   "tests/server/tick_perf_capture.test.ts": 5691,
   "tests/server/tick_perf_log.test.ts": 12,
   "tests/server/title_reads.test.ts": 11,

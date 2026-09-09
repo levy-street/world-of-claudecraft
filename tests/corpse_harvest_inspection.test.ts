@@ -135,11 +135,11 @@ describe('agreement with the real start admission', () => {
     expect(startCorpseHarvest(sim.ctx, mob.id, a)).toBe(false);
   });
 
-  it('in combat: reads actor_in_combat, matching the real refusal', () => {
+  it('in combat: reads no denial, matching the real admission', () => {
     const { sim, a, mob } = setup();
     mustEntity(sim, a).inCombat = true;
-    expect(corpseHarvestInfo(sim.ctx, mob.id, a)?.denial).toBe('actor_in_combat');
-    expect(startCorpseHarvest(sim.ctx, mob.id, a)).toBe(false);
+    expect(corpseHarvestInfo(sim.ctx, mob.id, a)?.denial).toBeNull();
+    expect(startCorpseHarvest(sim.ctx, mob.id, a)).toBe(true);
   });
 
   it('already reserved by another actor: reads reserved, matching the real refusal', () => {

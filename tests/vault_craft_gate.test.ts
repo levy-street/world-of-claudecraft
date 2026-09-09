@@ -343,7 +343,7 @@ describe('vaultDrawBlocked: the footprint arms decide on their own', () => {
     // Premise: the backstop cannot be what answers below.
     expect(origin.x).toBeLessThan(DUNGEON_X_THRESHOLD);
 
-    // Clone a real pool slot so every field (including combatExitMemory) is
+    // Clone a real pool slot so every field is
     // the shipped shape, then claim it for the synthetic westward dungeon.
     const template = sim.ctx.instances[0];
     sim.ctx.instances.push({

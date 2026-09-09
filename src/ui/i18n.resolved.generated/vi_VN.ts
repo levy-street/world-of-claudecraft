@@ -577,6 +577,7 @@ export const vi_VN: EnTranslations = {
       "mountsEyebrow": "Gắn kết tài khoản",
       "mountsTitle": "Máy ổn định",
       "mountBuyAria": "Mua {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Đang tải Cửa hàng WOC...",
       "error": "Cửa hàng WOC hiện không khả dụng. Vui lòng thử lại trong thời gian ngắn.",
       "balance": "Số dư Claudium",
@@ -1464,6 +1465,7 @@ export const vi_VN: EnTranslations = {
       "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
       "desc_goblin_rocket_sled": "Một chiếc xe trượt goblin được chế tạo quá mức đến nguy hiểm, phóng đi nhờ hai tên lửa và óc phán đoán tồi một cách xuất sắc.",
       "desc_rallycart_rxt": "Một cỗ máy đua rally nhỏ gọn giúp tăng tốc độ di chuyển.",
+      "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
       "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn.",
       "desc_mech_bird": "Một con gà chiến đồng hồ được chế tạo bằng tay chạy nước rút trên các động cơ servo, phím lên dây cót vẫn quay.",
@@ -4876,6 +4878,32 @@ export const vi_VN: EnTranslations = {
         "crown_endures": "Vương Miện Trường Tồn (cuồng nộ cứng ở 6:00, heroic 5:00)",
         "deathless_court": "Triều Đình Bất Tử (chỉ heroic, triều đình hoàng gia trỗi dậy sau Cơn Thịnh Nộ Bất Tử)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Kỳ Trân Các",
@@ -11392,7 +11420,7 @@ export const vi_VN: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Gọi Người Ngã Xuống",
-        "description": "Đưa một thành viên nhóm đã chết trở lại sự sống với 35% máu và mana. Người Chữa Lành Mặt Trời cấp 16 trở lên sẽ thay vào đó gọi về mọi thành viên đã ngã xuống của nhóm."
+        "description": "Đưa một thành viên nhóm đã chết trở lại sự sống bên cạnh bạn với 35% máu và mana. Người Chữa Lành Mặt Trời cấp 16 trở lên sẽ thay vào đó gọi về mọi thành viên đã ngã xuống của nhóm trong phạm vi 30 mét và trong tầm nhìn thẳng của bạn."
       },
       "beacon_of_light": {
         "name": "Ngọn Hải Đăng Ánh Sáng",
@@ -12125,6 +12153,14 @@ export const vi_VN: EnTranslations = {
         "name": "Đoạn Tủy",
         "description": "Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó tạo lá chắn bằng 18% máu tối đa của bạn trong 8 giây và hoàn lại 15 nộ."
       },
+      "wildwake": {
+        "name": "Bừng Nở Hoang Dã",
+        "description": "Dỗ dành một đồng minh đã ngã xuống bừng nở đột ngột, đưa họ trở lại sự sống ngay bên cạnh bạn với 35% máu và mana của họ, ngay cả khi đang giao tranh ác liệt. (Groveheart)"
+      },
+      "grove_awakening": {
+        "name": "Thức Tỉnh Khu Rừng",
+        "description": "Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, trở lại sự sống bên cạnh bạn với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Groveheart)"
+      },
       "overbloom": {
         "name": "Mãn Khai",
         "description": "Tiêu 5 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với {buff}% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Hoa Nở Hoang Dã mới lên mục tiêu."
@@ -12435,15 +12471,15 @@ export const vi_VN: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Đảo Ngược Thời Gian",
-        "description": "Tua lại dòng thời gian của một đồng minh đã ngã xuống, đưa họ trở lại cuộc sống tại thân xác với một phần máu và mana, ngay cả giữa chiến đấu. (Thời Thuật)"
+        "description": "Tua lại dòng thời gian của một đồng minh đã ngã xuống, đưa họ trở lại cuộc sống bên cạnh bạn với 35% máu và mana của họ, ngay cả giữa chiến đấu. (Thời Thuật)"
       },
       "collective_reversal": {
         "name": "Đảo ngược tập thể",
-        "description": "Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)"
+        "description": "Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, hồi sinh họ bên cạnh bạn với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)"
       },
       "ancestor_return": {
         "name": "Tổ Tiên Hồi Quy",
-        "description": "Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn trở lại sự sống ngay tại thi thể với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Vá Hồn)"
+        "description": "Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, trở lại sự sống bên cạnh bạn với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Vá Hồn)"
       },
       "temporal_rewind": {
         "name": "Quay Ngược",
@@ -12585,6 +12621,10 @@ export const vi_VN: EnTranslations = {
       "martyrs_aegis": {
         "name": "Khiên Tuẫn Đạo",
         "description": "Giảm 40% sát thương một đồng minh phải chịu trong 8 giây."
+      },
+      "prayer_of_returning": {
+        "name": "Lời Nguyện Hồi Quy",
+        "description": "Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, trở lại sự sống bên cạnh bạn với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Thần Thánh và Giáo Lý)"
       },
       "choir_of_deliverance": {
         "name": "Hợp Xướng Giải Thoát",
@@ -18407,8 +18447,8 @@ export const vi_VN: EnTranslations = {
       },
       "q_forgefathers_requiem": {
         "title": "The Forgefather's Requiem",
-        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.",
-        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.",
+        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.",
+        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.",
         "objectives": {
           "0": {
             "label": "Forgefather's Ember recovered"
@@ -18417,7 +18457,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_requiem_at_the_forge": {
         "title": "Requiem at the Forge",
-        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.",
+        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.",
         "completion": "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
         "objectives": {
           "0": {

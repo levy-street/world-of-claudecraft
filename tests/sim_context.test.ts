@@ -269,6 +269,13 @@ function makeFakeHost() {
   const clock = { time: 0, tick: 0 };
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    accountCosmetics: {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+      mountSkinIds: [],
+    },
     storagePrices: DEFAULT_STORAGE_PRICES,
     naturalRiftPortals: [],
     riftEvents: [],
@@ -362,6 +369,7 @@ function makeFakeHost() {
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),
+    engagedPids: new Set<number>(),
     bumpDeedStat: vi.fn(),
     bumpCommissionOrderBoardRev: vi.fn(),
     markItemDiscovered: vi.fn(),

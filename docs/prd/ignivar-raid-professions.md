@@ -193,8 +193,10 @@ weekly Maker's Ember used by Perfecting. It cannot be sold, banked, traded or
 discarded. Full bags leave the proof on the corpse for a later loot attempt;
 accepting or abandoning the quest never creates a free replacement.
 
-Return to the projection with Weaponcrafting skill 125. The turn-in keeps the
-ember and teaches `recipe_varkhul_forgebreaker` through the existing quest
+Use the carried Ember with Weaponcrafting skill 125 to finish recovery and
+start Requiem at the Forge directly. The existing projection turn-in remains
+valid for characters already following that route. Both paths keep the
+ember and teach `recipe_varkhul_forgebreaker` through the existing quest
 acquisition source. There is no recipe-learning fee. The recipe requires a
 forge and consumes:
 
@@ -232,10 +234,18 @@ alone contributes exactly 12 of those bytes. The professions subset is
 headroom. These are serialized payload measurements, not PostgreSQL/WAL
 latency claims.
 
-Requiem at the Forge (`q_requiem_at_the_forge`) is an ownership turn-in for
-the finished hammer, which the player keeps. Carried or equipped copies count;
+Requiem at the Forge (`q_requiem_at_the_forge`) completes automatically after
+the active quest holder successfully crafts the hammer. The ordinary ownership
+turn-in remains available for a hammer forged before accepting the follow-up,
+so existing characters are not stranded. The player keeps the finished hammer.
+Carried or equipped copies count;
 banked copies must be withdrawn. Crafting before accepting this follow-up,
 abandoning and accepting it again, and saving/loading all remain valid.
+The three raid lore quests and both hammer quests each award 5300 XP and
+25000 copper (2 gold 50 silver), matching the existing level-20 endgame
+milestone reward. Rewards use the normal quest completion path, once per
+character; this change does not replay previously completed quests.
+
 Forgebreaker is not Masterwrought and does not use Perfecting or promotion.
 It is soulbound to its crafter, so the commission board does not offer it and a
 commission flag cannot arm its output for trade. Ordinary weapon commissions

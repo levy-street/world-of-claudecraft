@@ -2,7 +2,7 @@
 // fixtures live in tests/fixes_shared.ts; the loot/quest-npc/combat shard is
 // tests/fixes_loot_npcs.test.ts.
 import { describe, expect, it } from 'vitest';
-import { isBlocked, resolvePosition } from '../src/sim/colliders';
+import { isBlocked, moverHeight, resolvePosition } from '../src/sim/colliders';
 import {
   CRYPT_DOOR_POS,
   DUNGEON_LIST,
@@ -177,7 +177,22 @@ describe('collision & terrain', () => {
       expect(groundHeight(e.pos.x, e.pos.z, SEED), `${e.name} underwater`).toBeGreaterThan(
         WATER_LEVEL + 0.5,
       );
-      expect(isBlocked(SEED, e.pos.x, e.pos.z, 0.4), `${e.name} inside a prop`).toBe(false);
+      // Mover-aware: an NPC may stand ON a walkable deck (the Crucible
+      // Quartermaster on the Forgefather keep's landing court plate); walls and
+      // full-height props still push the body, which is what "inside" means.
+      const settled = resolvePosition(
+        SEED,
+        e.pos.x,
+        e.pos.z,
+        0.4,
+        false,
+        undefined,
+        moverHeight(e),
+      );
+      expect(
+        Math.abs(settled.x - e.pos.x) + Math.abs(settled.z - e.pos.z),
+        `${e.name} inside a prop`,
+      ).toBeLessThan(1e-4);
     }
   });
 

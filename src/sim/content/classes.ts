@@ -437,6 +437,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'seraphic_vigil',
       'shadowform',
       'summon_tithefiend',
+      'prayer_of_returning',
     ],
     color: 0xc6d4f0,
   },
@@ -614,6 +615,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'hurricane',
       'skull_bash',
       'primal_reflexes',
+      'wildwake',
+      'grove_awakening',
     ],
     color: 0xff8c1a,
   },
@@ -2632,10 +2635,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ---- Chronomancy out-of-combat mass resurrection. The base seven-second cast
   // and mana cost are provisional playtest values. It has no target and rewinds all
   // dead members on the authoritative group or raid roster at cast completion.
-  // The five-minute cooldown is the real throttle: requiresOutOfCombat alone is not
-  // one, because a backline caster who never draws aggro drops combat mid-fight the
-  // moment combatTimer passes the 5s linger (see the engagedPids pass in sim.ts), so
-  // a zero-cooldown mass rez could be chained repeatedly inside a single encounter.
+  // requiresOutOfCombat is a real gate: the engaged pass (combat/engaged_combat.ts)
+  // holds everyone a live mob still carries on its hate table, and an engaged boss
+  // holds every nearby member of its attackers' group, so a backline caster cannot
+  // drop combat mid-fight by idling through the 5s linger. The five-minute cooldown
+  // is the throttle across encounters (and after a wipe, once the boss resets).
   collective_reversal: {
     id: 'collective_reversal',
     name: 'Collective Reversal',
@@ -4800,12 +4804,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Heal a friendly target for $d, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritcall signature)',
   },
   // ---- Spiritmend out-of-combat mass resurrection, the Chronomancy
-  // collective_reversal twin. The five-minute cooldown is the real throttle:
-  // requiresOutOfCombat alone is not one, because a backline healer who never draws
-  // aggro drops combat mid-fight the moment combatTimer passes the 5s linger (see the
-  // engagedPids pass in sim.ts), so a zero-cooldown mass rez could be chained
-  // repeatedly inside a single encounter. Kept equal to collective_reversal so the two
-  // mass rezzes cannot be played against each other; both are pinned to that equality.
+  // collective_reversal twin. requiresOutOfCombat is a real gate (the engaged pass in
+  // combat/engaged_combat.ts holds a backline healer in combat for the whole
+  // encounter), and the five-minute cooldown is the throttle across encounters. Kept
+  // equal to collective_reversal so the two mass rezzes cannot be played against each
+  // other; both are pinned to that equality.
   ancestor_return: {
     id: 'ancestor_return',
     name: "Ancestors' Return",
@@ -7949,6 +7952,45 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // there, everyone else the base 60.
     description:
       'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+  },
+
+  // Groveheart resurrection parity: the combat single revive and the
+  // out-of-combat group revive share the five-minute healer cooldown.
+  wildwake: {
+    id: 'wildwake',
+    name: 'Wildwake',
+    class: 'druid',
+    specs: ['restoration'],
+    learnLevel: 16,
+    cost: 60,
+    castTime: 2,
+    cooldown: 300,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    targetsDead: true,
+    effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
+    description:
+      'Coax a fallen ally into sudden bloom, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Groveheart)',
+  },
+  grove_awakening: {
+    id: 'grove_awakening',
+    name: 'Grove Awakening',
+    class: 'druid',
+    specs: ['restoration'],
+    learnLevel: 20,
+    cost: 250,
+    castTime: 7,
+    cooldown: 300,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    requiresOutOfCombat: true,
+    projectile: false,
+    effects: [{ type: 'massResurrectGroup', hpFrac: 0.3 }],
+    description:
+      'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)',
   },
 
   // Baseline class interrupts: every caster-pressuring class trains a short-cooldown

@@ -663,8 +663,13 @@ interface AttributionTargetFixture {
 // neither parent. No capture was retaken.
 // Re-minted for the second v0.42.0 reconcile after the release branch advanced
 // with Drakelands/hotkey renderer work. No capture was retaken.
+// PR3946: remint the renderer leaf after restoring school-aware resurrection VFX.
+// Existing captures, performance measurements and capture identity are unchanged.
+// PR fen-features-subcull: remint after merging release/v0.42.0 into the branch,
+// the renderer leaf having moved with the zone-feature sweep extraction.
+// Existing captures, performance measurements and capture identity are unchanged.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ce299a67af26ec1fb548ba759a2b0ddd1cddd08c5edbcaf044ba486f93df57e6';
+  '52d7ac5ce06a62ae5c88de3c45f993957c33f4ac15de5a5601be8958bbcb908c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

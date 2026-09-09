@@ -14,6 +14,7 @@
 // at the emit site (the S3 i18n guard scans this file + chat_readouts.ts).
 
 import { type AssistCandidate, resolveAssist } from '../assist';
+import { isHeldInCombat } from '../combat/engaged_combat';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { CLASSES, zoneAt } from '../data';
 import * as deedsMod from '../deeds';
@@ -581,7 +582,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
   if (/^\/(?:combat|cb|incombat)(?:\s|$)/i.test(raw)) {
-    ctx.error(r.meta.entityId, readouts.combatReadout(r.e));
+    ctx.error(r.meta.entityId, readouts.combatReadout(r.e, isHeldInCombat(ctx, r.e.id)));
     return null;
   }
   if (/^\/(?:graveyard|gy|spirithealer)(?:\s|$)/i.test(raw)) {
