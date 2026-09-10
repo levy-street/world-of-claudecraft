@@ -363,6 +363,8 @@ export type {
 } from './world_api/professions';
 export type {
   DevLeaderboardEntry,
+  GuildBoardCategory,
+  GuildBoardOfficer,
   GuildLeaderboardEntry,
   GuildRosterEntry,
   GuildRosterInfo,

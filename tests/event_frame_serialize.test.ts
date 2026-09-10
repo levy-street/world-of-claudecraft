@@ -648,6 +648,7 @@ describe('routeEvents selection guards', () => {
     const event: SimEvent = {
       type: 'noticeboard',
       noticeboardId: 'noticeboard_eastbrook',
+      boardId: 'eastbrook_noticeboard',
       state: 'empty',
       pid: reader.pid,
     };
@@ -657,6 +658,7 @@ describe('routeEvents selection guards', () => {
       eventsFrame({
         type: 'noticeboard',
         noticeboardId: 'noticeboard_eastbrook',
+        boardId: 'eastbrook_noticeboard',
         state: 'empty',
         pid: reader.pid,
       }),

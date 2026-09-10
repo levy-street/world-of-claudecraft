@@ -51,6 +51,10 @@ export interface GuildPledgeSettings {
   enabled: boolean;
   minLevel: number;
   note: string;
+  // Guild board categories (src/sim/guild_board_category.ts): the guild lists
+  // itself as new-player friendly, which the Proving Shore signpost opens on
+  // by default. Officer-plus editable like the rest of the settings.
+  newPlayerFriendly: boolean;
 }
 
 // One open pledge on the officer dashboard: who is asking, and since when.
@@ -151,7 +155,7 @@ export interface IWorldSocialGraph {
   guildPledge(name: string): void;
   guildPledgeWithdraw(): void;
   guildPledgeDecide(name: string, accept: boolean): void;
-  setGuildPledgeSettings(enabled: boolean, minLevel: number, note: string): void;
+  setGuildPledgeSettings(settings: GuildPledgeSettings): void;
   guildAccept(): void;
   guildDecline(): void;
   guildLeave(): void;

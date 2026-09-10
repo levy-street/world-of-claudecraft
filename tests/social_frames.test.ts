@@ -127,7 +127,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
         // The pledge-board normalization defaults (an older server's frame
         // carries none of these): settings read as accepting, no open
         // pledges, tier 0.
-        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledgeSettings: { enabled: true, minLevel: 1, note: '', newPlayerFriendly: false },
         pledges: [],
         tier: 0,
       },
@@ -268,7 +268,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
         rank: 'leader',
         motd: '',
         motdSetBy: '',
-        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledgeSettings: { enabled: true, minLevel: 1, note: '', newPlayerFriendly: false },
         pledges: [],
         tier: 0,
         members: [

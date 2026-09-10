@@ -268,7 +268,12 @@ export function pledgePanelView(social: SocialInfo | null): PledgePanelView | nu
   const guild = social?.guild ?? null;
   if (!guild || (guild.rank !== 'leader' && guild.rank !== 'officer')) return null;
   return {
-    settings: guild.pledgeSettings ?? { enabled: true, minLevel: 1, note: '' },
+    settings: guild.pledgeSettings ?? {
+      enabled: true,
+      minLevel: 1,
+      note: '',
+      newPlayerFriendly: false,
+    },
     rows: (guild.pledges ?? []).map((p) => ({
       name: p.name,
       cls: p.cls,

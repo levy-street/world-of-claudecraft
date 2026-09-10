@@ -7,7 +7,19 @@ import type {
 
 export type { GuildRosterEntry, GuildRosterInfo } from '../sim/leaderboard_page';
 
+import type { GuildBoardCategory } from '../sim/guild_board_category';
 import type { PlayerClass } from '../sim/types';
+
+export type { GuildBoardCategory } from '../sim/guild_board_category';
+
+// One officer-plus member the server saw ONLINE when it served the board row
+// (docs/prd/guild-pledge-board.md, "Officers online"): the Guild Master first,
+// then officers, each tier by name. Names are the same public roster names the
+// drill-in shows; no ids, no positions.
+export interface GuildBoardOfficer {
+  name: string;
+  rank: 'leader' | 'officer';
+}
 
 // One ranked row of the lifetime-XP leaderboard (Max-Level XP Overflow). Always
 // computed server-side; the client only displays it.
@@ -51,6 +63,15 @@ export interface GuildLeaderboardEntry {
   pledgesOpen?: boolean;
   pledgeMinLevel?: number;
   pledgeNote?: string;
+  // Guild board categories (src/sim/guild_board_category.ts): the guild opted
+  // into the new-player-friendly listing. Absent means opted out, so a
+  // pre-category server's rows read as plain guilds.
+  newPlayerFriendly?: boolean;
+  // Officer presence, resolved LIVE against this realm's sessions at serve
+  // time (never cached with the ranking): absent when no Guild Master or
+  // officer is online, or on the cross-realm board, which cannot see other
+  // realms' sessions.
+  onlineOfficers?: GuildBoardOfficer[];
 }
 
 // One ranked row of the DEVELOPER high-score board: contributors ranked by how
@@ -98,7 +119,14 @@ export interface IWorldProgressionXp {
   // The realm-scoped guild high-score board (guilds ranked by summed member
   // lifetime XP), paged server-side the same way as the player board. Guilds are
   // a server-only social system, so the offline Sim resolves an empty page.
-  guildLeaderboard(page?: number, pageSize?: number): Promise<GuildLeaderboardPage>;
+  // `category` narrows the board to guilds wearing that opt-in tag (the
+  // server filters its cached ranking BEFORE paging, so pages stay full and
+  // the total counts only matching guilds); null is the whole board.
+  guildLeaderboard(
+    page?: number,
+    pageSize?: number,
+    category?: GuildBoardCategory | null,
+  ): Promise<GuildLeaderboardPage>;
   /** The public roster drill-in behind the signpost guild board: the Guild
    *  Master, then officers, then members, each rank tier ranked by lifetime
    *  XP. Guilds are online-only, so the offline Sim resolves null, and null

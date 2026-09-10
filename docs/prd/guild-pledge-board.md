@@ -107,6 +107,76 @@ Per (guild, account), not per character:
   tier). Cosmetic only; thresholds tuned so a fresh guild starts at the base
   tier and the top tier is rare.
 
+## Guild board categories: "New player friendly" + "Officers online"
+
+ADDED 2026-09-10 (owner decision). The signpost board has been the main way
+new players find a guild, so it grows two things: a category a guild can opt
+into, and a live sign that someone who can actually answer a pledge is online.
+
+### The "New player friendly" category
+
+- A per-guild opt-in, officer-plus editable beside the other recruiting
+  settings (the Pledges tab's editor): one tick box, off by default. A guild
+  DECLARES it; the board never infers it from level floors or notes.
+- The board row of an opted-in guild wears a "New player friendly" chip on
+  its recruiting sub-line (the sprout glyph), so the tag reads at a glance
+  next to the accepting status and the level floor.
+- Every board carries a filter strip above the ranking with one tick box per
+  category (one today). The SERVER filters its cached ranking BEFORE paging
+  (`GET /api/leaderboard?board=guilds&category=newPlayerFriendly`), so pages
+  stay full and the total counts matching guilds; entries keep their REALM
+  rank rather than renumbering, so a filtered board still says where each
+  guild stands among every guild. A category no guild wears renders the
+  filtered empty state with a "Show all guilds" way back; an unknown category
+  is the whole board, never an error.
+- The Proving Shore's signpost (the tutorial island's recruits' board) opens
+  the window with the box TICKED, so a player deciding who to travel with
+  sees the guilds that want them first. Every other board, and any opener
+  that names no board, opens on the whole ranking. If that default view
+  comes back EMPTY (no guild has opted in yet), the window falls back once
+  to the whole ranking with the box cleared, so a brand-new player never
+  meets an empty board as their first impression; a filter the player
+  flipped on themselves keeps its honest empty state and its "Show all
+  guilds" way back. The noticeboard event
+  carries the board's own `boardId` for this (every board shares one
+  templateId); the client-side rule is `defaultGuildBoardCategory`
+  (`src/ui/guild_leaderboard_view.ts`).
+- The vocabulary is a closed, append-only table in
+  `src/sim/guild_board_category.ts` shared by all three hosts. Adding a
+  category (PvP, endgame raiding, ...) is a row there plus its guild-side
+  opt-in column and wire field; the filter, the query parameter and the
+  strip need no change. The wider per-category filter UI is deliberately
+  NOT built yet: one tick box today.
+- Wire back-compat: `newPlayerFriendly` is optional on the
+  `guild_pledge_settings` command; a client that predates categories omits
+  it and the server keeps the guild's stored flag rather than clearing an
+  opt-in the older client never saw (`server/guild_pledge_settings_cmd.ts`).
+
+### The "Officers online" dot
+
+- A guild whose Guild Master or an officer holds a session RIGHT NOW shows a
+  green dot beside its name on the board. Hovering, focusing (keyboard) or
+  long-pressing (touch) it opens the shared tooltip listing who is online,
+  the Guild Master first; the dot's accessible name carries the same list,
+  and the filter strip's legend explains the dot without a hover.
+- Two freshness regimes on purpose (`server/guild_board_presence.ts`): WHO
+  the officers are is a slow, viewer-identical read (`topGuildOfficers`,
+  `server/guild_board_db.ts`) behind one cached single-flight read on the
+  board's TTL, bust-wired into the moderation hook; WHETHER each is online
+  is answered live against this realm process's sessions at serve time, per
+  served page, so the dot never shows a logged-out officer for a cache
+  window. Names only ride the wire, never character ids.
+- Realm-scoped board only: the cross-realm board cannot see other realms'
+  sessions, so it carries no presence rather than a wrong one. A server
+  that predates presence sends no field, and the client shows no dot.
+- Presence names characters who are online right now to an anonymous
+  caller (the board is a public read), so it rides the shared per-IP
+  public-read budget: a caller past the budget still gets the board, only
+  without presence, so a scraper cannot poll officer activity at request
+  rate while a player at a signpost is never met with a 429. Officers only,
+  names only, no positions; the roster read carries the moderation
+  eligibility screen and is bust-wired to the moderation hook.
+
 ## Architecture (the seams this rides)
 
 - Guilds are ONLINE-ONLY (social service + Postgres); the offline Sim never
@@ -127,6 +197,15 @@ Per (guild, account), not per character:
 - UI: leaderboard guilds tab extension; a Pledges tab + settings in the
   social window's guild panel; nameplate painter pledge wording + tier
   colour tokens.
+- Guild board categories: `src/sim/guild_board_category.ts` (the closed
+  vocabulary + filter rule), `server/guild_board_db.ts` (the ranked read and
+  the officer roster, extracted from db.ts), `server/guild_board_presence.ts`
+  (the live "officers online" layer both dispatch arms share through
+  `buildGuildBoardResponse` in `server/leaderboard.ts`),
+  `server/guild_pledge_settings_cmd.ts` (the command parse), and the client
+  wire sibling `src/net/guild_board_wire.ts`. The `guilds` row gains
+  `new_player_friendly`; `GuildLeaderboardEntry` gains `newPlayerFriendly`
+  and `onlineOfficers`; `GuildPledgeSettings` gains `newPlayerFriendly`.
 
 ## Out of scope (this iteration)
 

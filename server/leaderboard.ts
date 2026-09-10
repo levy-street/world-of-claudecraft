@@ -25,6 +25,12 @@
 
 import type * as http from 'node:http';
 import {
+  filterGuildBoardEntries,
+  GUILD_BOARD_CATEGORY_PARAM,
+  type GuildBoardCategory,
+  parseGuildBoardCategory,
+} from '../src/sim/guild_board_category';
+import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
   paginateDeedsLeaderboard,
@@ -38,6 +44,7 @@ import type {
   DeedsLeaderboardSelf,
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
+  GuildLeaderboardPage,
   LeaderboardEntry,
 } from '../src/world_api';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
@@ -57,6 +64,7 @@ import { type RecentDeedRow, recentDeedsForCharacter } from './deeds_db';
 // barrels drag routes.ts and its load-time middleware construction into this
 // module's graph, which partial db mocks in tests cannot serve.
 import { epicEnabled } from './epic/config';
+import { type GuildBoardPresence, guildBoardPresence } from './guild_board_presence';
 import { requireAccount } from './http/middleware/require_account';
 import type { Ctx, RouteDef } from './http/types';
 import { json } from './http_util';
@@ -136,6 +144,9 @@ export interface LeaderboardRuntime {
   getLeaderboard(scope: LeaderboardScope): Promise<LeaderboardEntry[]>;
   /** Cache-fronted guild leaderboard read (main.ts getGuildLeaderboard). */
   getGuildLeaderboard(scope: LeaderboardScope): Promise<GuildLeaderboardEntry[]>;
+  /** Whether a character holds a live session on THIS realm process
+   *  (game.hasSessionForCharacter): the guild board's officer presence. */
+  isCharacterOnline(characterId: number): boolean;
   /** Cache-fronted contributor (developer) leaderboard read (main.ts topContributors). */
   getDevLeaderboard(): Promise<DevLeaderboardEntry[]>;
   /** Cache-fronted Renown (deeds) board read (main.ts getDeedsLeaderboard):
@@ -215,6 +226,12 @@ export function decodePageSize(raw: string | undefined): number {
   return Number(raw) || LEADERBOARD_PAGE_SIZE;
 }
 
+/** ?category=<GuildBoardCategory> on the guild fork: a known category narrows
+ *  the board to guilds wearing it; absent or unknown is the whole board. */
+export function decodeGuildBoardCategory(raw: string | undefined): GuildBoardCategory | null {
+  return parseGuildBoardCategory(raw);
+}
+
 /** ?limit=N for the legacy single-page board, clamped to [1, LEADERBOARD_MAX]. */
 export function decodeLegacyLimit(raw: string | undefined): number {
   return Math.max(
@@ -276,16 +293,111 @@ export function buildLegacyLimitBoard(
   };
 }
 
-/** The guild high-score board body: the guild-metric slice, its own golden case. */
+// The category slice is viewer-identical and changes only when the ranking
+// does, so it is paid once per cached ranking, not per request: the memo is
+// keyed on the cached entry array's IDENTITY (main.ts installs a fresh array
+// on every refresh and bust), so it self-invalidates with the board cache and
+// holds at most one slice per category per live ranking.
+const categorySliceMemo = new WeakMap<
+  readonly GuildLeaderboardEntry[],
+  Map<GuildBoardCategory, readonly GuildLeaderboardEntry[]>
+>();
+
+function categorySlice(
+  entries: readonly GuildLeaderboardEntry[],
+  category: GuildBoardCategory | null,
+): readonly GuildLeaderboardEntry[] {
+  if (category === null) return entries;
+  let slices = categorySliceMemo.get(entries);
+  if (!slices) {
+    slices = new Map();
+    categorySliceMemo.set(entries, slices);
+  }
+  let slice = slices.get(category);
+  if (!slice) {
+    slice = filterGuildBoardEntries(entries, category);
+    slices.set(category, slice);
+  }
+  return slice;
+}
+
+/** The guild high-score board body: the guild-metric slice, its own golden case.
+ *  A category filters the cached ranking BEFORE paging (pages stay full, the
+ *  total counts matching guilds); null is the whole board. */
 export function buildGuildBoard(
   realm: string,
   scope: LeaderboardScope,
   entries: readonly GuildLeaderboardEntry[],
   page: number,
   pageSize: number,
-): unknown {
-  const slice = paginateGuildLeaderboard(entries as GuildLeaderboardEntry[], page, pageSize);
-  return { realm, scope, board: 'guilds', metric: 'guildLifetimeXp', ...slice };
+  category: GuildBoardCategory | null = null,
+): GuildBoardBody {
+  const listed = categorySlice(entries, category);
+  const slice = paginateGuildLeaderboard(listed as GuildLeaderboardEntry[], page, pageSize);
+  // The applied category is echoed so the client renders the filter it GOT,
+  // not the one it asked for; omitted on the whole board, which keeps the
+  // default body byte-identical to the golden case.
+  return {
+    realm,
+    scope,
+    board: 'guilds',
+    metric: 'guildLifetimeXp',
+    ...slice,
+    ...(category === null ? {} : { category }),
+  };
+}
+
+/** The served guild board body shape (the golden case plus the paged slice). */
+export interface GuildBoardBody extends GuildLeaderboardPage {
+  realm: string;
+  scope: LeaderboardScope;
+  board: 'guilds';
+  metric: 'guildLifetimeXp';
+}
+
+// The presence layer both dispatch arms decorate the served page with. A
+// module-level binding (not a runtime member) so the legacy handleApi arm in
+// main.ts and the RouteDef handler share ONE cached roster, and so a test can
+// swap in a fake without reaching the Postgres-backed production instance.
+let presence: GuildBoardPresence = guildBoardPresence;
+
+/** Test seam: swap the officer-presence layer. */
+export function setGuildBoardPresenceForTests(fake: GuildBoardPresence): void {
+  presence = fake;
+}
+
+/** Test seam: restore the production presence layer. */
+export function resetGuildBoardPresenceForTests(): void {
+  presence = guildBoardPresence;
+}
+
+/**
+ * The guild board body as SERVED: buildGuildBoard's page with the live
+ * "officers online" presence attached to the realm-scoped rows
+ * (guild_board_presence.ts). The cross-realm board carries none: this
+ * process cannot see other realms' sessions. Shared by both dispatch arms so
+ * the two stay byte-identical by construction.
+ */
+export async function buildGuildBoardResponse(
+  realm: string,
+  scope: LeaderboardScope,
+  entries: readonly GuildLeaderboardEntry[],
+  page: number,
+  pageSize: number,
+  category: GuildBoardCategory | null,
+  isOnline: (characterId: number) => boolean,
+  req: http.IncomingMessage,
+): Promise<GuildBoardBody> {
+  const body = buildGuildBoard(realm, scope, entries, page, pageSize, category);
+  if (scope !== LEADERBOARD_SCOPE_DEFAULT) return body;
+  // Presence names characters who are online RIGHT NOW to an anonymous
+  // caller, so it rides the shared per-IP public-read budget
+  // (publicReadRateLimited, the sibling public reads' limiter): a caller
+  // past the budget still gets the board, just without presence, so a
+  // scraper cannot poll officer activity at request rate while a player
+  // opening the signpost is never met with a 429.
+  if (body.leaders.length === 0 || !publicReadRateLimited(req).allowed) return body;
+  return { ...body, leaders: await presence.attach(body.leaders, isOnline) };
 }
 
 /**
@@ -512,7 +624,23 @@ async function leaderboardHandler(ctx: Ctx): Promise<void> {
     const entries = await rt.getGuildLeaderboard(scope);
     const page = decodePage(firstQueryValue(ctx.query.page));
     const pageSize = decodePageSize(firstQueryValue(ctx.query.pageSize));
-    json(ctx.res, 200, buildGuildBoard(REALM, scope, entries, page, pageSize));
+    const category = decodeGuildBoardCategory(
+      firstQueryValue(ctx.query[GUILD_BOARD_CATEGORY_PARAM]),
+    );
+    json(
+      ctx.res,
+      200,
+      await buildGuildBoardResponse(
+        REALM,
+        scope,
+        entries,
+        page,
+        pageSize,
+        category,
+        (id) => rt.isCharacterOnline(id),
+        ctx.req,
+      ),
+    );
     return;
   }
   // The developer (open-source contributor) fork, byte-identical to the legacy

@@ -5791,6 +5791,7 @@ export class Hud {
     ...this.windowFocus('#guild-board-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     maskPlayerText: (text) => this.maskChat(text),
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
   });
   // The Rift Forge (src/ui/hud/rift_forge/): opened by the Riftwright's
   // interaction event, never a menu button; the forge lives in the world.
@@ -12397,10 +12398,9 @@ export class Hud {
           } else {
             // A board with no authored listings IS the guild board: the
             // signpost opens the realm's ranked pledge surface
-            // (src/ui/hud/guild_board/). Offline the window renders its
-            // localized nothing-posted state, so the interaction never
-            // looks inert on any host.
-            this.openGuildBoard();
+            // (src/ui/hud/guild_board/) on the view its board id selects.
+            // Offline the window renders its localized nothing-posted state.
+            this.openGuildBoard(ev.boardId);
           }
           break;
         case 'realmBuilder':
@@ -17082,10 +17082,10 @@ export class Hud {
     this.leaderboardWindow.toggle();
   }
 
-  /** The signpost guild board: opened by the world's noticeboard interaction
-   *  (and the E2E capture rigs); there is no menu launcher on purpose. */
-  openGuildBoard(): void {
-    this.guildBoardWindow.open();
+  /** The signpost guild board, opened by the noticeboard interaction (and the
+   *  E2E rigs), never a menu launcher; the board id picks the default view. */
+  openGuildBoard(boardId?: string): void {
+    this.guildBoardWindow.open(boardId);
   }
 
   /** The Rift Forge: opened by the Riftwright interaction (and the capture rigs). */

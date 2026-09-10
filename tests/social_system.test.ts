@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { GuildPledgeSettingsInput } from '../server/guild_pledge_settings_cmd';
 import { resolveRealm } from '../server/realm';
 import {
   type CharInfo,
@@ -23,6 +24,7 @@ import {
   guildRosterCap,
 } from '../src/sim/guild_roster';
 import type { SimEvent } from '../src/sim/types';
+import type { GuildPledgeSettings } from '../src/world_api/social_graph';
 
 // ---------------------------------------------------------------------------
 // In-memory fakes — let us exercise the full SocialService logic (friends,
@@ -33,7 +35,7 @@ class FakeDb implements SocialDb {
   private chars = new Map<number, CharInfo & { activeTitle: string | null }>();
   // guild pledges (docs/prd/guild-pledge-board.md)
   pledges = new Map<number, { guildId: number; sinceMs: number }>();
-  pledgeSettingsByGuild = new Map<number, { enabled: boolean; minLevel: number; note: string }>();
+  pledgeSettingsByGuild = new Map<number, GuildPledgeSettings>();
   ladder = new Map<string, { rejectCount: number; rejectedAtMs: number }>();
   accountOf = new Map<number, number>();
   guildXpTotals = new Map<number, number>();
@@ -46,14 +48,24 @@ class FakeDb implements SocialDb {
     }
     return null;
   }
-  async guildPledgeSettings(guildId: number) {
-    return this.pledgeSettingsByGuild.get(guildId) ?? { enabled: true, minLevel: 1, note: '' };
+  async guildPledgeSettings(guildId: number): Promise<GuildPledgeSettings> {
+    return (
+      this.pledgeSettingsByGuild.get(guildId) ?? {
+        enabled: true,
+        minLevel: 1,
+        note: '',
+        newPlayerFriendly: false,
+      }
+    );
   }
-  async setGuildPledgeSettings(
-    guildId: number,
-    settings: { enabled: boolean; minLevel: number; note: string },
-  ) {
-    this.pledgeSettingsByGuild.set(guildId, settings);
+  async setGuildPledgeSettings(guildId: number, settings: GuildPledgeSettingsInput) {
+    // The Postgres store merges an absent flag inside its UPDATE (COALESCE);
+    // the fake does the same over its stored row.
+    const current = await this.guildPledgeSettings(guildId);
+    this.pledgeSettingsByGuild.set(guildId, {
+      ...settings,
+      newPlayerFriendly: settings.newPlayerFriendly ?? current.newPlayerFriendly,
+    });
   }
   async guildPledges(guildId: number) {
     const rows: (CharInfo & { sinceMs: number })[] = [];
@@ -2565,13 +2577,28 @@ describe('guild pledges', () => {
 
   it('refuses a closed guild, an under-level pledger, and a member', async () => {
     const h = await seed();
-    await h.db.setGuildPledgeSettings(h.guildId, { enabled: false, minLevel: 1, note: '' });
+    await h.db.setGuildPledgeSettings(h.guildId, {
+      enabled: false,
+      minLevel: 1,
+      note: '',
+      newPlayerFriendly: false,
+    });
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');
     expect(await h.db.pledgeOf(4)).toBeNull();
-    await h.db.setGuildPledgeSettings(h.guildId, { enabled: true, minLevel: 20, note: '' });
+    await h.db.setGuildPledgeSettings(h.guildId, {
+      enabled: true,
+      minLevel: 20,
+      note: '',
+      newPlayerFriendly: false,
+    });
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');
     expect(await h.db.pledgeOf(4)).toBeNull();
-    await h.db.setGuildPledgeSettings(h.guildId, { enabled: true, minLevel: 1, note: '' });
+    await h.db.setGuildPledgeSettings(h.guildId, {
+      enabled: true,
+      minLevel: 1,
+      note: '',
+      newPlayerFriendly: false,
+    });
     await h.svc.guildPledge(h.actor(3), 'Bookbinders');
     expect(await h.db.pledgeOf(3)).toBeNull();
   });
@@ -2904,6 +2931,45 @@ describe('guild pledges', () => {
     expect(after.enabled).toBe(false);
     expect(after.minLevel).toBe(5);
     expect(after.note).toHaveLength(90);
+  });
+
+  it('persists the new-player-friendly opt-in, keeps it for an older client, and gates it', async () => {
+    const h = await seed();
+    await h.svc.setGuildPledgeSettings(h.actor(1), {
+      enabled: true,
+      minLevel: 1,
+      note: '',
+      newPlayerFriendly: true,
+    });
+    expect((await h.db.guildPledgeSettings(h.guildId)).newPlayerFriendly).toBe(true);
+    // An older client's write carries no flag (guild_pledge_settings_cmd.ts):
+    // the stored opt-in survives the other fields changing around it.
+    await h.svc.setGuildPledgeSettings(h.actor(1), { enabled: false, minLevel: 3, note: 'x' });
+    expect(await h.db.guildPledgeSettings(h.guildId)).toEqual({
+      enabled: false,
+      minLevel: 3,
+      note: 'x',
+      newPlayerFriendly: true,
+    });
+    // Officer-plus gated like every other setting: a plain member's write is refused whole.
+    await h.svc.setGuildPledgeSettings(h.actor(3), {
+      enabled: false,
+      minLevel: 3,
+      note: 'x',
+      newPlayerFriendly: false,
+    });
+    expect((await h.db.guildPledgeSettings(h.guildId)).newPlayerFriendly).toBe(true);
+    // Every member's snapshot carries the flag (the social window's editor reads it).
+    const plain = await h.svc.snapshot(3);
+    expect(plain.guild?.pledgeSettings.newPlayerFriendly).toBe(true);
+    // Clearing it writes false, never a default.
+    await h.svc.setGuildPledgeSettings(h.actor(1), {
+      enabled: true,
+      minLevel: 1,
+      note: '',
+      newPlayerFriendly: false,
+    });
+    expect((await h.db.guildPledgeSettings(h.guildId)).newPlayerFriendly).toBe(false);
   });
 
   it('refuses a board note the chat filter hard tier hits, storing nothing', async () => {

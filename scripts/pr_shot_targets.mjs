@@ -1502,6 +1502,150 @@ export const TARGETS = [
     },
   },
   {
+    key: 'guild-board',
+    label: 'Guild Signpost window: category filter, new-player-friendly chip, officers online',
+    // Committed frames live in docs/screenshots/guild-pledge-board/ (categories-*).
+    when: ['ui/hud/guild_board/', 'ui/guild_leaderboard_view.ts', 'sim/guild_board_category.ts'],
+    // The offline Sim ranks no guilds, so the recipe seeds a fixture page on
+    // the IWorld seam the window reads (guildLeaderboard + socialInfo), the
+    // way the sim.addItem recipes seed bags: the painter renders exactly what
+    // the online mirror would hand it. The Proving Shore variants open with
+    // the board id the tutorial island's signpost emits (the filter ticked);
+    // the town variant opens on the whole ranking.
+    variants: [
+      { key: 'proving-shore-desktop', boardId: 'proving_shore_noticeboard' },
+      { key: 'town-desktop', boardId: 'eastbrook_noticeboard' },
+      { key: 'proving-shore-mobile', boardId: 'proving_shore_noticeboard', mobile: true },
+    ],
+    async capture(page, variant) {
+      await dismissArrivalGreeting(page);
+      const opened = await page.evaluate((boardId) => {
+        const game = window.__game;
+        if (!game?.hud || !game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+        const guild = (rank, name, xp, members, top, extra) => ({
+          rank,
+          name,
+          memberCount: members,
+          totalLifetimeXp: xp,
+          topLevel: top,
+          pledgesOpen: true,
+          ...extra,
+        });
+        const all = [
+          guild(1, 'Stormcallers', 2_600_000, 38, 60, {
+            pledgeMinLevel: 20,
+            pledgeNote: 'Raid nights Tue and Thu, alts welcome.',
+            onlineOfficers: [
+              { name: 'Brannoc', rank: 'leader' },
+              { name: 'Wrenfield', rank: 'officer' },
+            ],
+          }),
+          guild(2, 'Lanternmere Wardens', 1_140_000, 27, 58, {
+            pledgeNote: 'Chill, invites open, we help you gear.',
+            newPlayerFriendly: true,
+            onlineOfficers: [{ name: 'Maelis', rank: 'officer' }],
+          }),
+          guild(3, 'Hollow Crown', 620_000, 12, 44, { pledgesOpen: false }),
+          guild(4, 'The Long Ferry', 310_000, 19, 31, {
+            pledgeNote: 'New to ClaudeCraft? Start here.',
+            newPlayerFriendly: true,
+          }),
+          guild(5, 'Gullhaven Rovers', 96_000, 6, 18, { newPlayerFriendly: true }),
+        ];
+        game.sim.guildLeaderboard = async (pg = 0, size = 20, category = null) => {
+          const rows = category ? all.filter((g) => g.newPlayerFriendly) : all;
+          // The served page echoes the category it applied (the window
+          // renders the filter it GOT, not the one it asked for).
+          return {
+            leaders: rows.slice(0, size),
+            page: pg,
+            pageCount: 1,
+            total: rows.length,
+            pageSize: size,
+            ...(category ? { category } : {}),
+          };
+        };
+        game.sim.socialInfo = { friends: [], blocks: [], ignores: [], guild: null, myPledge: null };
+        game.hud.openGuildBoard(boardId);
+        return { ok: true };
+      }, variant.boardId);
+      if (!opened.ok) return { skip: opened.reason };
+      const ready = await pollForSize(page, '#guild-board-window .lb-guild-entry');
+      if (!ready) return { skip: 'the guild board never rendered its rows' };
+      // The arrival greeting can spawn a beat after the board opens and sit
+      // over it; sweep its confirm through the settle window (the
+      // professions target's idiom) so the frame shows the board alone.
+      for (let i = 0; i < 6; i++) {
+        await page.evaluate(() => {
+          document.querySelector('#tutorial-greeting button')?.click();
+          document.querySelector('#tutorial-greeting')?.remove();
+          document.querySelector('.tut-skip')?.click();
+        });
+        await wait(400);
+      }
+      return { clip: '#guild-board-window' };
+    },
+  },
+  {
+    key: 'guild-pledge-settings',
+    label: 'Social window Pledges tab: the recruiting editor with the new-player-friendly opt-in',
+    // Committed frames live in docs/screenshots/guild-pledge-board/ (categories-*).
+    when: ['ui/social_window.ts', 'ui/social_view.ts', 'sim/guild_board_category.ts'],
+    // The Pledges tab exists for officer-plus members only and guilds are
+    // online-only, so the recipe seeds a Guild Master's social mirror on the
+    // IWorld seam and clicks the real tab.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      const opened = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.hud || !game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+        game.sim.socialInfo = {
+          friends: [],
+          blocks: [],
+          ignores: [],
+          myPledge: null,
+          guild: {
+            id: 1,
+            name: 'Lanternmere Wardens',
+            rank: 'leader',
+            motd: '',
+            motdSetBy: '',
+            members: [],
+            events: [],
+            pledgeSettings: {
+              enabled: true,
+              minLevel: 1,
+              note: 'Chill, invites open, we help you gear.',
+              newPlayerFriendly: true,
+            },
+            pledges: [
+              { id: 21, name: 'Hopeful', cls: 'mage', level: 12, realm: 'Test', sinceMs: 1 },
+            ],
+            tier: 1,
+          },
+        };
+        game.sim.socialDirty = true;
+        game.hud.toggleSocial();
+        return { ok: true };
+      });
+      if (!opened.ok) return { skip: opened.reason };
+      const ready = await pollForSize(page, '#social-window');
+      if (!ready) return { skip: 'the social window never became visible' };
+      const tabbed = await page.evaluate(() => {
+        const tab = document.querySelector('#social-window [data-tab="pledges"]');
+        if (!(tab instanceof HTMLElement)) return false;
+        tab.click();
+        return true;
+      });
+      if (!tabbed) return { skip: 'the Pledges tab did not render (not officer-plus?)' };
+      const editor = await pollForSize(page, '#social-window .soc-pledge-settings');
+      if (!editor) return { skip: 'the pledge settings editor never rendered' };
+      await wait(400);
+      return { clip: '#social-window' };
+    },
+  },
+  {
     key: 'event-calendar',
     label: 'Event Calendar window: recurring system-event rows',
     when: ['ui/calendar_view.ts', 'ui/calendar_window.ts'],
@@ -8775,7 +8919,12 @@ export const TARGETS = [
     // variants then click Expand roster and clip the prompt stack (the price there
     // is the coin-icon readout with bare digits).
     variants: [
-      { key: 'desktop', charName: 'Rueweaver', charClass: 'paladin', beforeLoad: seedLowGraphicsPreset },
+      {
+        key: 'desktop',
+        charName: 'Rueweaver',
+        charClass: 'paladin',
+        beforeLoad: seedLowGraphicsPreset,
+      },
       {
         key: 'desktop-confirm',
         charName: 'Rueweaver',

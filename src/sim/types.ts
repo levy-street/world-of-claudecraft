@@ -6474,10 +6474,14 @@ export type SimEvent = { pid?: number } & (
       current: RealmBuilderHonour;
       past: readonly RealmBuilderHonour[];
     }
-  | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
+  // `boardId` is the authored NoticeboardDef id (every board shares one
+  // templateId), so the client can tell the Proving Shore's recruits' signpost
+  // from a town board and open the guild board on its default view.
+  | { type: 'noticeboard'; noticeboardId: string; boardId: string; state: 'empty' }
   | {
       type: 'noticeboard';
       noticeboardId: string;
+      boardId: string;
       state: 'listings';
       listings: readonly NoticeboardListing[];
     }
