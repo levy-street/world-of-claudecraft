@@ -2565,9 +2565,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: true,
     targetType: 'friendly',
-    // Group/raid-only: the cast is refused (no cost/cooldown) on a friendly that is
-    // not the caster or a party/raid member, so an out-of-group target never wastes it.
-    partyOnlyTarget: true,
+    // Targets any friendly ally or self. Prioritizes group/raid members, but can be
+    // cast solo or on friendly allies/practice targets outside a group.
     effects: [
       {
         type: 'massTemporalEcho',
@@ -2750,7 +2749,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'perfectMoment' }],
     description:
-      'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancer)',
+      'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them and deals 20% increased damage. (Chronomancer)',
   },
   temporal_acceleration: {
     id: 'temporal_acceleration',

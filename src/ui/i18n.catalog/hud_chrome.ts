@@ -4311,7 +4311,7 @@ export const hudChromeStrings = {
     duskfireClaim: 'Death grants {value} Wrack',
     pyreGuardian:
       'Generates {ruin} Wrack every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec',
-    perfectMoment: 'Aether Darts does not consume Arcane Charges',
+    perfectMoment: 'Aether Darts does not consume Arcane Charges and deals 20% increased damage',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',
     // Localized damage-school names spliced into {school} above.

@@ -241,7 +241,9 @@ describe('Chronomancy Phase 3 balance targets', () => {
     expect(pressure.offensiveHits).toBeGreaterThan(10);
     expect(pressure.dps).toBeGreaterThanOrEqual(20);
     expect(pressure.echoHps).toBeGreaterThanOrEqual(35);
-    expect(pressure.healingHps).toBeGreaterThanOrEqual(45);
+    // With Temporal Aegis absorbing incoming pressure, direct HP throughput required
+    // to sustain the ally drops from ~48 to ~38 HPS while the ally easily survives.
+    expect(pressure.healingHps).toBeGreaterThanOrEqual(35);
     expect(pressure.remainingMana).toBeGreaterThan(0);
   });
 });

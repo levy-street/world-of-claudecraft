@@ -3526,7 +3526,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.duskfireClaim': 'Al morir, otorga {value} de Ruina',
   'hudChrome.auraEffect.pyreGuardian':
     'Genera {ruin} de Ruina cada {ruinInterval} s e inflige {damage} de daño de Fuego en {radius} m cada {damageInterval} s',
-  'hudChrome.auraEffect.perfectMoment': 'Dardos de éter no consume cargas Arcanas',
+  'hudChrome.auraEffect.perfectMoment':
+    'Dardos de éter no consume cargas Arcanas y su daño aumenta un 20%',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     'Tu próximo hechizo de la otra escuela elemental otorga Convergencia Elemental',
   'hudChrome.auraEffect.formFireball':
@@ -12540,7 +12541,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, lo sana un {echoSinglePct}% de tu otro daño Arcano a un objetivo y un {echoAreaPct}% de tu daño Arcano de área. Oleada de éter y Dardos de éter lo sanan en su lugar un {echoDriverPct}% del daño que infligen.',
   'entities.abilities.perfect_moment.name': 'Momento perfecto',
   'entities.abilities.perfect_moment.description':
-    'Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)',
+    'Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen y su daño aumenta un 20%. (Cronomancia)',
   'entities.abilities.aspect_of_the_wild.description':
     'Inspira a los aliados en un radio de 30 m con fuerza salvaje, aumentando su poder de ataque en 45 y su velocidad de ataque un 5% durante 5 min. (talento de Cazador)',
   'entities.abilities.avatar.name': 'Avatar de Guerra',

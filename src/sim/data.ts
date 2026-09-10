@@ -131,6 +131,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { HEALING_TRAINING_MOBS } from './content/healing_training';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -401,6 +402,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE2_MOBS,
   ...ZONE3_MOBS,
   ...PRACTICE_DUMMY_MOBS,
+  ...HEALING_TRAINING_MOBS,
   ...DUNGEON_MOBS,
   ...WARLOCK_PET_MOBS,
   ...NECROMANCY_MOBS,

@@ -3161,7 +3161,7 @@ export const es: EnTranslations = {
       "ruinousBrand": "Quedan {charges} copias: los hechizos directos copian aquí un {otherPct}% de daño, o un {selfPct}% si este es su objetivo",
       "duskfireClaim": "Al morir, otorga {value} de Ruina",
       "pyreGuardian": "Genera {ruin} de Ruina cada {ruinInterval} s e inflige {damage} de daño de Fuego en {radius} m cada {damageInterval} s",
-      "perfectMoment": "Dardos de éter no consume cargas Arcanas",
+      "perfectMoment": "Dardos de éter no consume cargas Arcanas y su daño aumenta un 20%",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -12495,7 +12495,7 @@ export const es: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Momento perfecto",
-        "description": "Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)"
+        "description": "Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen y su daño aumenta un 20%. (Cronomancia)"
       },
       "arcane_surge": {
         "name": "Impulso de Éter",
@@ -16404,6 +16404,21 @@ export const es: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Muñeco de sanación"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Acechador de la cresta"

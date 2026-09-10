@@ -170,6 +170,28 @@ export function handleDevChat(
     return null;
   }
 
+  if (/^\/(?:dev\s+healing|devhealing|healing)\s*$/i.test(raw)) {
+    const entity = ctx.entities.get(pid);
+    if (entity) {
+      cancelProfessionSessionOnDisplacement(ctx, entity);
+      const pos = ctx.groundPos(-82, -42);
+      entity.pos = pos;
+      entity.prevPos = { ...pos };
+      entity.facing = 0;
+      entity.prevFacing = 0;
+      ctx.rebucket(entity);
+      if (entity.level < 20) {
+        ctx.setPlayerLevel(20, pid);
+      }
+      emitDevLog(
+        ctx,
+        pid,
+        '[dev] Teleported to the Healing Training Ground. Level 20 set with all priest healing spells unlocked.',
+      );
+    }
+    return null;
+  }
+
   const spawnMatch = /^\/(?:dev\s+spawn|devspawn)\s+(\S+)(?:\s+(\d+))?(?:\s+(\d+))?\s*$/i.exec(raw);
   if (spawnMatch) {
     const templateId = spawnMatch[1];

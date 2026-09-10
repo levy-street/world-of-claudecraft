@@ -1979,7 +1979,7 @@ const classAbilityNamesEn = {
       [
         'perfect_moment',
         'Perfect Moment',
-        'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)',
+        'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them and deals 20% increased damage. (Chronomancy)',
       ],
       [
         'arcane_surge',

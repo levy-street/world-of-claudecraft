@@ -1104,7 +1104,7 @@ describe('persistence', () => {
         else if (name.endsWith('.ts')) {
           for (const line of readFileSync(p, 'utf8').split('\n')) {
             if (WRITER.test(line)) {
-              writers.push(`${relative(root, p)}: ${line.trim()}`);
+              writers.push(`${relative(root, p).replace(/\\/g, '/')}: ${line.trim()}`);
             }
           }
         }

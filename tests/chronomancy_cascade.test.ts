@@ -116,31 +116,42 @@ describe('Cascada target selection', () => {
     expect(chosen).toHaveLength(5);
   });
 
-  it('excludes members beyond the radius, the dead, and non-members', () => {
+  it('excludes members beyond the radius and the dead, and prioritizes group members over non-members', () => {
     const { sim, p } = chronoMage();
     const primary = addAlly(sim, p.pos.x, p.pos.z + 1, 'Primary');
-    const near = addAlly(sim, p.pos.x, p.pos.z + 2, 'Near');
+    const near = addAlly(sim, p.pos.x, p.pos.z + 4, 'Near');
     const far = addAlly(sim, p.pos.x, p.pos.z + 40, 'Far'); // beyond 15 yd
     const deadAlly = addAlly(sim, p.pos.x, p.pos.z + 3, 'Dead');
     deadAlly.dead = true;
-    const outsider = addAlly(sim, p.pos.x, p.pos.z + 2.5, 'Outsider'); // NOT in the raid
+    const outsider = addAlly(sim, p.pos.x, p.pos.z + 2, 'Outsider'); // NOT in the raid, closer than near
     makeRaid(sim, p.id, [primary.id, near.id, far.id, deadAlly.id]);
+    p.pos.x -= 40; // move mage away so self-candidacy does not take a slot
 
+    // With maxTargets=2, only primary and the prioritized raid member (near) are picked,
+    // even though outsider is closer (1 yd vs 3 yd from primary).
+    const chosen2 = selectCascadeTargets(ctxOf(sim), p, primary, 15, 2);
+    expect(chosen2.map((e) => e.id)).toEqual([primary.id, near.id]);
+
+    // With maxTargets=5, raid members are picked first, then outsider is picked to fill remaining slots.
     const chosen = selectCascadeTargets(ctxOf(sim), p, primary, 15, 5);
     const ids = chosen.map((e) => e.id);
     expect(ids).toContain(primary.id);
     expect(ids).toContain(near.id);
     expect(ids).not.toContain(far.id); // out of radius
     expect(ids).not.toContain(deadAlly.id); // dead
-    expect(ids).not.toContain(outsider.id); // not a raid member
+    expect(ids).toContain(outsider.id); // fills remaining slot after group members
   });
 
-  it('refuses when the primary is not the caster or a living group/raid member', () => {
+  it('allows casting when solo and selects target and nearby friendlies', () => {
     const { sim, p } = chronoMage();
     const stranger = addAlly(sim, p.pos.x, p.pos.z + 2, 'Stranger'); // no party
-    expect(selectCascadeTargets(ctxOf(sim), p, stranger, 15, 5)).toEqual([]);
-    // A solo caster can still target itself.
-    expect(selectCascadeTargets(ctxOf(sim), p, p, 15, 5)).toEqual([p]);
+    const targets = selectCascadeTargets(ctxOf(sim), p, stranger, 15, 5);
+    expect(targets[0].id).toBe(stranger.id);
+    expect(targets.length).toBeGreaterThanOrEqual(1);
+
+    // A solo caster can also target itself.
+    const selfTargets = selectCascadeTargets(ctxOf(sim), p, p, 15, 5);
+    expect(selfTargets[0].id).toBe(p.id);
   });
 });
 
@@ -349,17 +360,16 @@ describe('two chronomancers keep independent marks by sourceId', () => {
   });
 });
 
-describe('Cascada cast gating (group/raid-only target)', () => {
-  it('refuses to cast on a friendly outside the group, burning no cost or cooldown', () => {
+describe('Cascada cast gating', () => {
+  it('casts on a friendly even when outside the group (cost paid, mark placed)', () => {
     const { sim, p } = chronoMage();
     const outsider = addAlly(sim, p.pos.x + 2, p.pos.z, 'Outsider'); // friendly, NOT in party
     const mana0 = p.resource;
     sim.targetEntity(outsider.id);
     sim.castAbility('temporal_cascade');
-    // Refused before cost/cooldown: no mana spent, no mark placed, not mid-cast.
-    expect(p.resource).toBe(mana0);
-    expect(marked(outsider, p.id)).toBe(false);
-    expect((p as unknown as { castingAbility: string | null }).castingAbility).toBeNull();
+    for (let i = 0; i < 40; i++) sim.tick();
+    expect(p.resource).toBeLessThan(mana0);
+    expect(marked(outsider, p.id)).toBe(true);
   });
 
   it('casts on a party member (cost paid, the group is marked)', () => {

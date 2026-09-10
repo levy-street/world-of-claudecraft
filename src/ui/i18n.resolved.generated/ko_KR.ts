@@ -16405,6 +16405,21 @@ export const ko_KR: EnTranslations = {
       "hub_healing_dummy": {
         "name": "치유용 허수아비"
       },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
+      },
       "ridge_stalker": {
         "name": "산등성이 추적자"
       },

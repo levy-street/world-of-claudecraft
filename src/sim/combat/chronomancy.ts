@@ -20,6 +20,9 @@
 
 import { isDebuffAura, isPartyFrameRelevantAura } from '../aura_classify';
 import {
+  PERFECT_MOMENT_DARTS_DAMAGE_MULT,
+  TEMPORAL_AEGIS_CAP_MAX_HP_FRACTION,
+  TEMPORAL_AEGIS_DURATION_SECONDS,
   TEMPORAL_ECHO_AREA_CONVERSION,
   TEMPORAL_ECHO_ROTATION_CONVERSION_MULTIPLIER,
   TEMPORAL_ECHO_SINGLE_CONVERSION,
@@ -39,6 +42,8 @@ export const TEMPORAL_ECHO_ID = 'temporal_echo';
 // matcher (sim_i18n) localizes them exactly like a Temporal Mend heal, never the
 // raw id. Falls back to the id if the record is ever missing.
 const TEMPORAL_ECHO_NAME = ABILITIES[TEMPORAL_ECHO_ID]?.name ?? 'Temporal Echo';
+export const TEMPORAL_AEGIS_ID = 'temporal_aegis';
+export const TEMPORAL_AEGIS_NAME = 'Temporal Aegis';
 // Playtest-provisional (PRD section 13.1 / 13.14): 22.5s window, 40% single-target
 // conversion, 15% area conversion. Not balance-locked.
 export const ECHO_CONVERT_SINGLE = TEMPORAL_ECHO_SINGLE_CONVERSION;
@@ -241,13 +246,13 @@ export function chronomancyConvertArcaneDamage(
 
 /**
  * Resolve and ORDER the full Cascada temporal target list before any heal or aura
- * is applied (owner rule). Eligible = the caster plus LIVING members of the caster's
- * group/raid (never external friendlies or NPCs). The `primary` (the ability's
- * friendly target) must be one of those and is ALWAYS included first; the remaining
- * slots go to the members nearest to the PRIMARY (not the mage) within `radius`,
- * ordered by (distance, then stable id), capped at `maxTargets` total. Never random.
- * Returns [] if the primary is not a valid living group/raid member (the cast is
- * refused upstream). Draws no rng.
+ * is applied. The `primary` (the ability's friendly target) is ALWAYS included first.
+ * Additional targets within `radius` of `primary` are chosen up to `maxTargets` total.
+ * Group/raid members of the caster are ALWAYS prioritized first (closest to primary
+ * within the group tier). If remaining slots exist, other living friendly allies
+ * (players, companions, friendly practice targets) are included, nearest to primary.
+ * Ties broken by stable entity id. Returns [] if primary is dead or not friendly.
+ * Draws no rng.
  */
 export function selectCascadeTargets(
   ctx: SimContext,
@@ -256,28 +261,41 @@ export function selectCascadeTargets(
   radius: number,
   maxTargets: number,
 ): Entity[] {
+  if (primary.dead) return [];
+  if (primary.id !== caster.id && !ctx.isFriendlyTo(caster, primary)) return [];
+
   const party = ctx.partyOf(caster.id);
-  const memberIds = party ? party.members : [caster.id];
-  const memberSet = new Set(memberIds);
-  // The primary must be the caster or a living member of the caster's group/raid.
-  if (!memberSet.has(primary.id) || primary.dead) return [];
+  const partyMemberSet = party ? new Set(party.members) : null;
+
   const px = primary.pos.x;
   const pz = primary.pos.z;
   const r2 = radius * radius;
-  const extras: { e: Entity; d2: number }[] = [];
-  for (const pid of memberIds) {
-    if (pid === primary.id) continue;
-    const e = ctx.entities.get(pid);
-    const meta = ctx.players.get(pid); // players only, no NPC party companions
-    if (!e || !meta || e.dead) continue;
+
+  const extras: { e: Entity; d2: number; isPartyMember: boolean }[] = [];
+
+  for (const e of ctx.entities.values()) {
+    if (e.id === primary.id || e.dead) continue;
     const dx = e.pos.x - px;
     const dz = e.pos.z - pz;
     const d2 = dx * dx + dz * dz;
-    if (d2 > r2) continue; // outside the radius from the primary
-    extras.push({ e, d2 });
+    if (d2 > r2) continue;
+    if (e.id !== caster.id && !ctx.isFriendlyTo(caster, e)) continue;
+
+    const isPartyMember = partyMemberSet?.has(e.id) ?? false;
+    extras.push({ e, d2, isPartyMember });
   }
-  // Nearest to the primary first; ties broken by stable id, never randomly.
-  extras.sort((a, b) => a.d2 - b.d2 || a.e.id - b.e.id);
+
+  // Priority:
+  // 1. Group/raid members always prioritized over non-group friendlies.
+  // 2. Nearest to the primary within each tier.
+  // 3. Deterministic entity ID tie-break.
+  extras.sort((a, b) => {
+    if (a.isPartyMember !== b.isPartyMember) {
+      return a.isPartyMember ? -1 : 1;
+    }
+    return a.d2 - b.d2 || a.e.id - b.e.id;
+  });
+
   const chosen: Entity[] = [primary];
   for (const x of extras) {
     if (chosen.length >= maxTargets) break;
@@ -331,11 +349,45 @@ export function placeGroupEcho(
 }
 
 /**
+ * Convert excess healing (overheal) from Temporal Echo into a stacking absorb
+ * shield (Temporal Aegis). Capped at 20% of the ally's maximum health.
+ * Refreshes the 15s shield window on each application. Draws no rng.
+ */
+export function applyTemporalAegis(
+  ctx: SimContext,
+  source: Entity,
+  ally: Entity,
+  amount: number,
+): void {
+  if (ally.dead || amount <= 0) return;
+  const maxCap = Math.round(ally.maxHp * TEMPORAL_AEGIS_CAP_MAX_HP_FRACTION);
+  if (maxCap <= 0) return;
+
+  const existing = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+  const currentAbsorb = existing?.value ?? 0;
+  const newAbsorb = Math.min(maxCap, currentAbsorb + amount);
+  if (newAbsorb <= 0) return;
+
+  ctx.applyAura(ally, {
+    id: TEMPORAL_AEGIS_ID,
+    name: TEMPORAL_AEGIS_NAME,
+    kind: 'absorb',
+    remaining: TEMPORAL_AEGIS_DURATION_SECONDS,
+    duration: TEMPORAL_AEGIS_DURATION_SECONDS,
+    value: newAbsorb,
+    sourceId: source.id,
+    school: 'arcane',
+  });
+}
+
+/**
  * Apply a Temporal Echo conversion heal onto the marked ally. NON-crit by design
  * (the damage crit already fattened `dealt`). Rounds per hit so each Arcane impact
  * heals on its own (PRD: Arcane Missiles heals per missile). Honors the ally's
  * incoming-heal reduction and heal-absorb shields and clamps to missing health
  * exactly like the normal heal channel, then fans out effective-healing threat.
+ * Excess healing above full health generates/refreshes a Temporal Aegis shield
+ * capped at 20% of the ally's max health.
  * Emits a `heal2` (the number + heal-glow pulse over the ally on both hosts).
  */
 function applyEchoHeal(
@@ -350,24 +402,33 @@ function applyEchoHeal(
   if (healed <= 0) return;
   healed = consumeHealAbsorb(ctx, ally, healed);
   const preClamp = healed;
-  healed = Math.min(healed, ally.maxHp - ally.hp);
+  const missingHp = Math.max(0, ally.maxHp - ally.hp);
+  healed = Math.min(preClamp, missingHp);
+  const overheal = preClamp - healed;
   // DEV playtest tally (no-op without an active session): the applied heal plus the
   // portion lost to the missing-hp clamp (overheal). Never alters the healed value.
-  recordCascadeConversion(source, healed, preClamp - healed);
-  onCraftedCollectionHeal(ctx, source, ally, preClamp - healed);
-  if (healed <= 0) return;
-  ally.hp += healed;
-  const overheal = preClamp - healed;
-  ctx.emit({
-    type: 'heal2',
-    sourceId: source.id,
-    targetId: ally.id,
-    amount: healed,
-    crit: false,
-    ability: TEMPORAL_ECHO_NAME,
-    ...(overheal > 0 ? { overheal } : {}),
-  });
-  healingThreat(ctx, source, ally, healed);
+  recordCascadeConversion(source, healed, overheal);
+  onCraftedCollectionHeal(ctx, source, ally, overheal);
+  if (healed > 0) {
+    ally.hp += healed;
+  }
+  if (healed > 0 || overheal > 0) {
+    ctx.emit({
+      type: 'heal2',
+      sourceId: source.id,
+      targetId: ally.id,
+      amount: healed,
+      crit: false,
+      ability: TEMPORAL_ECHO_NAME,
+      ...(overheal > 0 ? { overheal } : {}),
+    });
+    if (healed > 0) {
+      healingThreat(ctx, source, ally, healed);
+    }
+  }
+  if (overheal > 0) {
+    applyTemporalAegis(ctx, source, ally, overheal);
+  }
 }
 
 // ---- Chronomancy Phase 3: the Arcane rotation engine (Aether Surge charges),
@@ -527,8 +588,9 @@ export function armAetherSurgeFree(ctx: SimContext, caster: Entity): void {
 // seconds of chained full-charge barrages. Deterministic aura writes, no rng.
 export const PERFECT_MOMENT_ID = 'perfect_moment';
 export const PERFECT_MOMENT_DURATION = 10;
+export { PERFECT_MOMENT_DARTS_DAMAGE_MULT };
 
-/** Whether the caster's Perfect Moment window is open (Darts keeps its charges). */
+/** Whether the caster's Perfect Moment window is open (Darts keeps its charges and deals +20% damage). */
 export function perfectMomentActive(e: Entity): boolean {
   return e.auras.some((a) => a.id === PERFECT_MOMENT_ID);
 }
@@ -541,7 +603,7 @@ export function applyPerfectMoment(ctx: SimContext, caster: Entity): void {
     id: PERFECT_MOMENT_ID,
     name: 'Perfect Moment',
     kind: 'perfect_moment',
-    value: 0,
+    value: 0.2,
     remaining: PERFECT_MOMENT_DURATION,
     duration: PERFECT_MOMENT_DURATION,
     sourceId: caster.id,

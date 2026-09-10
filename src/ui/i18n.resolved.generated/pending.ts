@@ -9,25 +9,145 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "es_ES": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "fr_FR": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "fr_CA": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "de_DE": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "zh_CN": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "zh_TW": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "ko_KR": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "ja_JP": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "pt_BR": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "ru_RU": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "cs_CZ": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "nl_NL": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "pl_PL": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "id_ID": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "tr_TR": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "sv_SE": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "vi_VN": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ],
+  "da_DK": [
+    "entities.mobs.healing_dummy_caster.name",
+    "entities.mobs.healing_dummy_ranger.name",
+    "entities.mobs.healing_dummy_scout.name",
+    "entities.mobs.healing_dummy_soldier.name",
+    "entities.mobs.healing_dummy_tank.name"
+  ]
 };
