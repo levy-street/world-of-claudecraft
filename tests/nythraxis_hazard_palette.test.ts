@@ -33,12 +33,12 @@ describe('Nythraxis hazard palette acceptance pins', () => {
     // floor under violet torchlight. Orange is the complement of the hall's
     // purple offensive palette, is not the sigil's friendly blue, and is not
     // Soul Rend's red/green, so a spike is unmistakably the thing to kill.
-    expect(NYTHRAXIS_BONE_SPIKE_TINT).toBe(0xff8c2a);
-    expect(NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH).toBe(0.9);
+    expect(NYTHRAXIS_BONE_SPIKE_TINT).toBe(0xff7a1a);
+    expect(NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH).toBe(1);
     expect(NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION).toBe(0.35);
     expect(VISUALS.mob_nythraxis_bone_spike).toMatchObject({
-      tint: 0xff8c2a,
-      tintStrength: 0.9,
+      tint: 0xff7a1a,
+      tintStrength: 1,
       selfIllumination: 0.35,
     });
   });

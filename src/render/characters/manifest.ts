@@ -1401,8 +1401,8 @@ const VELOCIRAPTOR: ClipMap = {
 // ---------------------------------------------------------------------------
 
 /** The Bone Spike's ember-orange recolour (see mob_nythraxis_bone_spike below). */
-export const NYTHRAXIS_BONE_SPIKE_TINT = 0xff8c2a;
-export const NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH = 0.9;
+export const NYTHRAXIS_BONE_SPIKE_TINT = 0xff7a1a;
+export const NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH = 1;
 export const NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION = 0.35;
 
 export const VISUALS: Record<string, VisualDef> = {
