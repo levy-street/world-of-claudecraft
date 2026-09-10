@@ -48,6 +48,7 @@ import {
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
+import { loadAccountLedger } from './account_ledger_db';
 import {
   configureTopWealthHolders,
   startAccountWealthSweep,
@@ -3797,6 +3798,7 @@ export async function startServer(): Promise<http.Server> {
     metaRequestUserData,
     metaEventSourceUrl,
     loadAccountCosmetics,
+    loadAccountLedger,
     isConnectionRefused,
     bufferHandshakeMessages,
     requestMetadata,

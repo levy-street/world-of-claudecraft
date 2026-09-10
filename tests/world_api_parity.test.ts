@@ -489,6 +489,7 @@ export const IWORLD_MEMBERS = [
   // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title/border
   // reads + the two cosmetic selection commands ---
   { name: 'deedsEarned', kind: 'data' },
+  { name: 'accountDeeds', kind: 'data' },
   { name: 'deedStats', kind: 'data' },
   { name: 'renown', kind: 'data' },
   { name: 'activeTitle', kind: 'data' },
@@ -504,6 +505,7 @@ export const IWORLD_MEMBERS = [
   { name: 'reliquaryMarks', kind: 'data' },
   { name: 'reliquaryRecent', kind: 'data' },
   { name: 'reliquaryObtainCounts', kind: 'data' },
+  { name: 'reliquaryAccountFinds', kind: 'data' },
   { name: 'reliquaryPageCompletion', kind: 'method' },
   { name: 'reliquaryCatalogCompletion', kind: 'method' },
   { name: 'reliquaryCuratorRank', kind: 'method' },
@@ -855,8 +857,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet-file exhaustiveness checks (AssertNever) also pass on the fully
     // resolved production tree.
-    expect(IWORLD_MEMBERS.length).toBe(371);
-    expect(DATA_MEMBERS.length).toBe(103);
+    // The account-wide Book of Deeds and Reliquary add the account ledger's
+    // two read halves: accountDeeds (IWorldDeeds, data) and
+    // reliquaryAccountFinds (IWorldReliquary, data), leaving 373 with the
+    // data half at 105. Set from a suite run, never by arithmetic in the diff.
+    expect(IWORLD_MEMBERS.length).toBe(373);
+    expect(DATA_MEMBERS.length).toBe(105);
     expect(METHOD_MEMBERS.length).toBe(268);
   });
   it('has no duplicate member names', () => {
@@ -875,6 +881,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptQuest',
       'accountAdmin',
       'accountCosmetics',
+      'accountDeeds',
       'accountFlair',
       'activeBorder',
       'activeConsecrations',
@@ -1140,6 +1147,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'releaseEmpoweredAbility',
       'releaseSpirit',
+      'reliquaryAccountFinds',
       'reliquaryCatalogCompletion',
       'reliquaryCuratorRank',
       'reliquaryFirstFind',
@@ -1246,6 +1254,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountAdmin',
       'accountCosmetics',
+      'accountDeeds',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
@@ -1326,6 +1335,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questsDone',
       'realm',
       'recipeList',
+      'reliquaryAccountFinds',
       'reliquaryFirstFind',
       'reliquaryMarks',
       'reliquaryObtainCounts',
@@ -2185,6 +2195,7 @@ type _ExhaustProfessions = AssertNever<
 
 const FACET_DEEDS = [
   'deedsEarned',
+  'accountDeeds',
   'deedStats',
   'renown',
   'activeTitle',
@@ -2202,6 +2213,7 @@ const FACET_RELIQUARY = [
   'reliquaryMarks',
   'reliquaryRecent',
   'reliquaryObtainCounts',
+  'reliquaryAccountFinds',
   'reliquaryPageCompletion',
   'reliquaryCatalogCompletion',
   'reliquaryCuratorRank',
@@ -2367,8 +2379,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet arrays actually reconstruct IWORLD_MEMBERS with no gaps or
     // collisions; this pin and the one above must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(371);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(371);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(373);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(373);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

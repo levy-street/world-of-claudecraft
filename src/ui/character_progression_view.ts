@@ -5,6 +5,7 @@
 // pattern, moved out of the hud.ts coordinator verbatim; the CharWindow deps
 // consume them through thin closures and the data-act buttons keep their
 // existing hud-side handlers.
+import { accountDeedLookup } from '../sim/account_ledger';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { talentsFor } from '../sim/content/talents';
 import {
@@ -67,8 +68,11 @@ export function progressionHtml(sim: IWorld, level: number): string {
   // ms-badge plumbing. The row is now a WORN-state readout: borders render on
   // nameplates and unit-frame portraits, and the one the player wears carries
   // the worn word in its own label, so the state never rides colour alone.
+  // Account-wide, like the Book's picker: a border an alt earned is wearable
+  // here too (the sim validator accepts the account ledger's deeds).
+  const earnedBorders = accountDeedLookup(sim.deedsEarned, { deeds: sim.accountDeeds });
   const borderBadges = DEED_ORDER.filter(
-    (id) => DEEDS[id].reward?.kind === 'border' && sim.deedsEarned.has(id),
+    (id) => DEEDS[id].reward?.kind === 'border' && earnedBorders.has(id),
   )
     .map((id) => {
       const worn = id === sim.activeBorder;

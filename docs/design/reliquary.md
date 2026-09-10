@@ -20,7 +20,8 @@ standard at `DESIGN.md`.
 | Relic | One unique slot on a page (item id, profession mark, mount, skin, title). |
 | Clear count | Lifetime clears / kills credited for that page's source. |
 | Illumination | Completing every relic on a page (first-time celebration). |
-| Curator rank | Cosmetic completion tiers over character-durable catalogued fills (items, marks, mounts, titles). Account weapon skins never score rank, so grants and display stay aligned. Five ranks at 1 / 10 / 25 / 50 / 100 owned (`apprentice`, `keeper`, `master`, `grand`, `eternal`, in `src/sim/reliquary.ts`). The thresholds are deliberately NOT rescaled as the catalog grows: rank 5 stays at 100 owned. |
+| Curator rank | Cosmetic completion tiers over catalogued fills (items, marks, mounts, titles). Account weapon skins never score rank. Five ranks at 1 / 10 / 25 / 50 / 100 owned (`apprentice`, `keeper`, `master`, `grand`, `eternal`, in `src/sim/reliquary.ts`). The thresholds are deliberately NOT rescaled as the catalog grows: rank 5 stays at 100 owned. DISPLAY is account-wide (the union with the account ledger, below); the rank-bridge GRANTS stay decided over the acting character's own fills. |
+| Account ledger | The account-wide record behind both books (`src/sim/account_ledger.ts`): which characters on the account found each relic (`IWorldReliquary.reliquaryAccountFinds`, keys `item:<id>` / `mark:<id>` / `mount:<key>`) and earned each deed. Every ownership read the window, tracker, character sheet, and inspect card make is the union of the character's own surfaces and the ledger; an owned cell names its finders (`hudChrome.reliquary.foundBy`). Persisted in `account_relic_finds` (the `character_deeds` sibling), loaded per join, fanned out live to the account's other sessions. Full model: `docs/design/deeds.md`, "The account ledger". |
 | First find | Optional metadata on a filled relic: clear# (and source) at first obtain. |
 | Obtain count | How many times a filled relic has been taken from the world. Information on a tooltip, never a score. |
 
@@ -461,8 +462,10 @@ evaluated over the ownership options.
     - Rule 1 still binds: counts feed no completion, rank, drop rate, deed,
       or reward. They are shown, and nothing consumes them.
 - Power rewards, pity timers, or drop-rate buffs for incomplete pages.
-- Account-wide item discovery merge (character-scoped like deeds v1 unless
-  a later account lane lands).
+- Account-wide GRANTS (a rank bridge or illumination deed decided over the
+  account union). Ownership display, completion, and rank display ARE
+  account-wide through the account ledger (vocabulary above); the grant lane
+  stays per character so a listed earner always did the thing itself.
 - Housing museum props (no housing system yet).
 - A per-character third-party API. Still deferred: no endpoint may serve one
   character's Reliquary state beyond the existing public sheet fields.

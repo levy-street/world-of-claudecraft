@@ -8,6 +8,7 @@ import {
   hasStreamerLink,
   wireStreamerLinks,
 } from '../src/sim/account_flair';
+import type { AccountLedger } from '../src/sim/account_ledger';
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
@@ -61,10 +62,11 @@ import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/se
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import {
+  accountReliquaryOwnership,
   catalogCharacterCompletion,
-  characterReliquaryOwnership,
   curatorRankFromOwned,
   reliquaryWireJson,
+  selfRelicKeys,
 } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
@@ -111,6 +113,8 @@ import {
 import { sameAppearance } from '../src/world_api/appearance';
 import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
+import { reconcileAccountRelics, recordRelicFinds } from './account_ledger_records';
+import { AccountLedgerService } from './account_ledger_service';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
@@ -190,6 +194,7 @@ import {
   consumeCosmeticOpToken,
   createCosmeticOpGuard,
 } from './cosmetic_op_guard';
+import { stampCuratorStanding } from './curator_standing';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
@@ -229,6 +234,7 @@ import {
   reconcileCharacterDeeds,
   recordDeedUnlocks,
 } from './deeds_records';
+import { appendBookOfDeedsWire } from './deeds_wire';
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
@@ -1129,6 +1135,10 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   // character does not have. Event-ordered; drained by saveCharacter up to
   // the count captured when the blob was serialized.
   pendingDeedRecords: string[];
+  // The Reliquary twin: accountRelicKeys the sim recorded for this character
+  // (relicRecorded events), awaiting the same successful save before they
+  // publish to account_relic_finds. Same durability ordering and drain.
+  pendingRelicRecords: string[];
   spectating: {
     characterId: number;
     name: string;
@@ -1589,6 +1599,13 @@ export class GameServer {
     sim: () => this.sim,
     sessions: () => this.clients.values(),
     resyncQuests: (session) => this.resyncQuests(session as ClientSession),
+  });
+  // The account ledger's live fan-out (server/account_ledger_service.ts): a
+  // deed earned or relic found on one character reaches the account's other
+  // live sessions in the same tick.
+  private readonly ledger = new AccountLedgerService({
+    sim: () => this.sim,
+    sessions: () => this.clients.values(),
   });
   private readonly bankVaultLedgerGuardCoordinator: BankVaultLedgerGuardCoordinator =
     createBankVaultLedgerGuardCoordinator(() => Date.now() / 1000, {
@@ -3129,54 +3146,15 @@ export class GameServer {
     }
   }
 
-  // Update one player's Curator standing (rank + the character-scoped completion
-  // pair) for the inspect card's Reliquary line and the rank-5 sigil. Cosmetic
-  // identity only: the sim never reads these back, and no client command can set
-  // them, so the numbers are server-computed or they do not exist.
-  //
-  // Unlike the three flair refreshers beside it this is pure CPU off the LIVE sim
-  // meta (one catalog walk, no DB row, no RPC), so it is synchronous and needs no
-  // "did the player leave mid-fetch" guard.
-  //
-  // What inspect and /c/ actually share: ONE formula (catalogCharacterCompletion)
-  // scored over EQUIVALENT ownership surfaces (items + marks + bags-AND-bank
-  // reins + earned deeds). Same inputs, same pair and same rank, with no second
-  // derivation to drift. That is NOT a promise the two agree at every instant.
-  // This reads LIVE meta; the public sheet reads the PERSISTED state blob, so /c/
-  // lags live meta until the next character save writes it. Join-time reconciles
-  // are the sharpest case: unionLegacyMilestones folds legacy milestone deeds
-  // into meta.deedsEarned at load, so a catalogued title relic behind one of them
-  // scores HERE the moment the character joins and only reaches the blob, and so
-  // /c/, at the save after that.
-  //
-  // Unranked reads as ABSENT, not zero: an owned count of 0 clears all three
-  // fields so a fresh character's identity record carries no standing at all.
+  // Update one player's Curator standing (rank + completion pair) for the
+  // inspect card's Reliquary line and the rank-5 sigil: pure CPU off the LIVE
+  // sim meta, synchronous (no leave-mid-fetch guard needed), and the doctrine
+  // (cosmetic only, account-wide union, absent-not-zero) lives with the stamp
+  // in server/curator_standing.ts.
   private refreshCuratorStanding(session: ClientSession): void {
     const e = this.sim.entities.get(session.pid);
     const meta = this.sim.meta(session.pid);
-    if (!e || !meta) return;
-    // Cleared BEFORE the walk so a throw inside the resolution fails to
-    // ABSENT, not to a stale stamp riding the wire (both call sites catch).
-    // The trade is explicit: a transient throw now hides a CORRECT standing
-    // for up to one sweep where the old code kept the last value; absent is
-    // the honest degraded state for a cosmetic, and the walk is pure CPU
-    // with no realistic throw path.
-    // Assigning unconditionally is free either way: wireCacheFor diffs the
-    // identity JSON, so an unchanged stamp re-broadcasts nothing and a changed
-    // one re-broadcasts itself, exactly like the flair refreshers above.
-    e.curatorRank = undefined;
-    e.relicsOwned = undefined;
-    e.relicsTotal = undefined;
-    const { owned, total } = catalogCharacterCompletion(characterReliquaryOwnership(meta));
-    const rank = curatorRankFromOwned(owned);
-    // Gated on the RANK, not the raw count, so all three move as one by
-    // construction: a raised rank-1 threshold could otherwise strand the pair
-    // on the wire with the rank absent. Today rank >= 1 iff owned >= 1.
-    if (rank > 0) {
-      e.curatorRank = rank;
-      e.relicsOwned = owned;
-      e.relicsTotal = total;
-    }
+    if (e && meta) stampCuratorStanding(e, meta);
   }
 
   // The periodic identity-flair cycle, in two halves that are deliberately NOT
@@ -3326,6 +3304,9 @@ export class GameServer {
     meta: RequestMetadata &
       Partial<AccountChatMuteStatus> & {
         accountCosmetics?: AccountCosmetics;
+        // The account ledger loaded for this account (server/account_ledger_db.ts);
+        // absent on the bare test join, which then fills a fresh ledger alone.
+        accountLedger?: AccountLedger;
         chatStrikes?: number;
         isAdmin?: boolean;
         adminPermissions?: readonly string[];
@@ -3387,6 +3368,7 @@ export class GameServer {
     const pid = this.sim.addPlayer(cls, name, {
       state: state ?? undefined,
       characterId,
+      accountLedger: meta.accountLedger,
       bankBonus: meta.bankBonus,
       appearance: meta.appearance ?? null,
       tutorialGreetingSent: state === null,
@@ -3582,6 +3564,7 @@ export class GameServer {
       leaseNonce: meta.leaseNonce,
       botTrackingContext,
       pendingDeedRecords: [],
+      pendingRelicRecords: [],
       spectating: null,
       jailed: state?.jail ?? null,
       jailVisit: null,
@@ -3616,6 +3599,13 @@ export class GameServer {
     reconcileCharacterDeeds({ characterId, accountId }, [
       ...(this.sim.meta(pid)?.deedsEarned.keys() ?? []),
     ]);
+    // The Reliquary twin of the heal above: replay every relic this
+    // character's live state proves (catalogued items, marks, owned mounts)
+    // into account_relic_finds idempotently, so the account ledger every alt
+    // loads at join lists this character for what it already holds. Same
+    // fire-and-forget contract; resumes skip it with the deeds reconcile.
+    const joinedMeta = this.sim.meta(pid);
+    if (joinedMeta) reconcileAccountRelics({ characterId, accountId }, selfRelicKeys(joinedMeta));
     // Storefront mirror drift heal (the steady-state counterpart to the
     // link-time reconcile): a live achievement push can exhaust its retry
     // ladder and drop, and an already-linked account never re-links, so the
@@ -4225,6 +4215,7 @@ export class GameServer {
       // stays pending for the save queued behind it, so the character_deeds
       // index (and Steam, chained off it) never runs ahead of durable state.
       const recordUpTo = session.pendingDeedRecords.length;
+      const relicRecordUpTo = session.pendingRelicRecords.length;
       const storageEffectsAtT0 = snapshotStorageAppliedEffects(
         session.pendingStorageAppliedEffects,
       );
@@ -4520,6 +4511,12 @@ export class GameServer {
         recordDeedUnlocks(
           { characterId: session.characterId, accountId: session.accountId },
           session.pendingDeedRecords.splice(0, recordUpTo),
+        );
+        // The Reliquary half of the account ledger drains on the same
+        // watermark rule: only finds already inside THIS blob publish.
+        recordRelicFinds(
+          { characterId: session.characterId, accountId: session.accountId },
+          session.pendingRelicRecords.splice(0, relicRecordUpTo),
         );
         // Same durability ordering as the deed publish above: the level the bot can
         // read only moved once this write landed. Delta-gated on the SERIALIZED level
@@ -8952,36 +8949,10 @@ export class GameServer {
       maybe('qlog', [...meta.questLog.values()]);
       maybe('qdone', [...meta.questsDone]);
       maybe('milestones', [...meta.unlockedMilestones]);
-      // Book of Deeds: the earned map (deed id -> utcDay) and the COMPLETE
-      // lifetime stat block. Maps and Sets do not survive JSON.stringify, so
-      // both wire as plain objects/arrays and ClientWorld rebuilds the Map
-      // and both Sets on apply. Heavy-gated: deedUnlocked is a
-      // HEAVY_SELF_EVENTS member, so an unlock re-diffs on the next snapshot.
-      // DELIBERATE freshness floor: a stat bump that crosses no unlock
-      // threshold re-wires only on the staggered safety refresh (<=2s), never
-      // per increment; flushing per kill would re-serialize every heavy field
-      // each combat tick, the exact cost this gate exists to avoid.
-      maybe('deeds', Object.fromEntries(meta.deedsEarned));
-      maybe('dstats', {
-        counters: meta.deedStats.counters,
-        itemsDiscovered: [...meta.deedStats.itemsDiscovered],
-        visited: [...meta.deedStats.visited],
-        dungeonClears: meta.deedStats.dungeonClears,
-      });
-      // Reliquary sparse blob only: firstFind (with its folded obtain tally) /
-      // illuminatedPages / marks / recent, omit-empty. Item ownership stays on
-      // dstats.itemsDiscovered; never a second full discovery array.
-      // Heavy-gated: reliquaryUnlock is a HEAVY_SELF_EVENTS member so a fill
-      // re-diffs on the next snapshot without saveCharacter.
-      // maybeRaw, not maybe: this is the same shape the realm readouts use, a
-      // value serialized ONCE by a memo instead of per session per tick.
-      // reliquaryWireJson caches on the state's own revision, so a staggered
-      // refresh for a player whose Reliquary has not moved (the overwhelming
-      // case) reuses the string rather than walking and re-stringifying the
-      // whole blob just to hand the delta gate bytes it already has. The output
-      // is byte-identical to the JSON.stringify path it replaces, so lastSent
-      // comparisons are unchanged across the swap.
-      maybeRaw('reliq', reliquaryWireJson(meta.reliquary));
+      // Book of Deeds (`deeds`/`dstats`), the Reliquary sparse blob (`reliq`),
+      // and the account ledger (`acct`): server/deeds_wire.ts owns the four
+      // keys and their heavy-gate doctrine.
+      appendBookOfDeedsWire(meta, maybe, maybeRaw);
       // talents/spec/loadouts: the client recomputes its known abilities from this.
       maybe('tal', {
         alloc: meta.talents,
@@ -9123,12 +9094,28 @@ export class GameServer {
           const ids = deedUnlocks.get(s);
           if (ids) ids.push(ev.deedId);
           else deedUnlocks.set(s, [ev.deedId]);
+          // Account ledger fan-out: the account's other live sessions list
+          // this character as an earner in the same tick (retro included: a
+          // back-credit is still a fact of the account's book).
+          this.ledger.noteDeedEarned(s, ev.deedId);
           // Marquee unlocks fan out to guildmates and followers, and
           // feed-worthy unlocks (titles, borders, the first koi) to the
           // Discord activity feed; retro unlocks NEVER fan out anywhere (a
           // veteran's first login after rollout must not spam their guild or
           // the feed).
           if (ev.retro !== true) this.fanOutDeedUnlock(s, ev.deedId, now);
+        }
+      }
+      // Account ledger relic record: the sim appended this character as a
+      // finder (item, mark, or mount). Stage the key for the post-save drain
+      // (the pendingDeedRecords durability rule) and fan the entry out to the
+      // account's other live sessions now. Retro rides too: the on-join seed
+      // pass is how a veteran's existing finds first reach the table.
+      if (ev.type === 'relicRecorded' && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (s) {
+          s.pendingRelicRecords.push(ev.key);
+          this.ledger.noteRelicFound(s, ev.key);
         }
       }
       // Reliquary first-ever page Illumination (Phase 18). The sim gates

@@ -10,7 +10,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // The toggle handlers read/write through the deeds SQL boundary; mock it so no
 // test reaches the pool-less test db.
-vi.mock('../../server/deeds_db', () => ({
+vi.mock('../../server/deeds_db', async (importOriginal) => ({
+  // The DDL constant is the real one: the pins below read the literal.
+  DEEDS_SCHEMA: (await importOriginal<typeof import('../../server/deeds_db')>()).DEEDS_SCHEMA,
   getDeedBroadcasts: vi.fn(async () => true),
   setDeedBroadcasts: vi.fn(async () => {}),
   recentDeedsForCharacter: vi.fn(async () => []),
@@ -19,7 +21,7 @@ vi.mock('../../server/deeds_db', () => ({
 import { characterSheet, SHEET_RECENT_DEEDS, sheetTitleText } from '../../server/character_sheet';
 import { type CharacterRow, SCHEMA } from '../../server/db';
 import { configureDeedsRuntime, resetDeedsRuntimeForTests, routes } from '../../server/deeds';
-import { getDeedBroadcasts, setDeedBroadcasts } from '../../server/deeds_db';
+import { DEEDS_SCHEMA, getDeedBroadcasts, setDeedBroadcasts } from '../../server/deeds_db';
 import {
   PUBLIC_READ_MAX_PER_MINUTE,
   publicReadRateLimited,
@@ -213,16 +215,17 @@ describe('broadcasts toggle handler', () => {
 });
 
 // ---------------------------------------------------------------------------
-// character_deeds DDL literal pins (the SCHEMA string, not a constant echo)
+// character_deeds DDL literal pins (the DEEDS_SCHEMA string in server/deeds_db.ts,
+// applied by ensureSchema after the core SCHEMA; not a constant echo)
 // ---------------------------------------------------------------------------
 
 describe('character_deeds DDL', () => {
   // The block runs from its CREATE TABLE to the retired-index reconcile that
   // immediately follows it; slicing keeps the realm/UNIQUE pins scoped to THIS
   // table, not a lookalike elsewhere.
-  const start = SCHEMA.indexOf('CREATE TABLE IF NOT EXISTS character_deeds');
-  const end = SCHEMA.indexOf('DROP INDEX IF EXISTS character_deeds_deed');
-  const block = SCHEMA.slice(start, end);
+  const start = DEEDS_SCHEMA.indexOf('CREATE TABLE IF NOT EXISTS character_deeds');
+  const end = DEEDS_SCHEMA.indexOf('DROP INDEX IF EXISTS character_deeds_deed');
+  const block = DEEDS_SCHEMA.slice(start, end);
 
   it('exists, with the idempotence backbone and the explicit-realm column', () => {
     expect(start).toBeGreaterThan(-1);
@@ -240,17 +243,17 @@ describe('character_deeds DDL', () => {
   });
 
   it('carries the two read-path indexes (account roll-up, sheet strip) and retires the deed_id index', () => {
-    expect(SCHEMA).toContain(
+    expect(DEEDS_SCHEMA).toContain(
       'CREATE INDEX IF NOT EXISTS character_deeds_account ON character_deeds(account_id)',
     );
-    expect(SCHEMA).toMatch(
+    expect(DEEDS_SCHEMA).toMatch(
       /CREATE INDEX IF NOT EXISTS character_deeds_character_earned\s+ON character_deeds\(character_id, earned_at DESC\)/,
     );
     // The lone deed_id index was pure write amplification (no query seeks by
     // deed_id): its CREATE is gone, and the boot DDL converges already-deployed
     // databases with an idempotent DROP INDEX IF EXISTS.
-    expect(SCHEMA).not.toContain('CREATE INDEX IF NOT EXISTS character_deeds_deed');
-    expect(SCHEMA).toContain('DROP INDEX IF EXISTS character_deeds_deed;');
+    expect(DEEDS_SCHEMA).not.toContain('CREATE INDEX IF NOT EXISTS character_deeds_deed');
+    expect(DEEDS_SCHEMA).toContain('DROP INDEX IF EXISTS character_deeds_deed;');
   });
 
   it('is additive-only, like every block in the boot-reapplied SCHEMA', () => {

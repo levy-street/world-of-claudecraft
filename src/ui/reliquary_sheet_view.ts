@@ -3,6 +3,7 @@
 // the numbers and chrome keys without a painter. Account weapon skins never
 // invent character rank or sheet totals (catalogCharacterCompletion).
 
+import { type AccountEarner, accountDeedLookup, accountRelicLookup } from '../sim/account_ledger';
 import {
   catalogCharacterCompletion,
   curatorRankFromOwned,
@@ -12,13 +13,20 @@ import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { curatorRankNameKey } from './reliquary_view';
 
-/** Surfaces the character sheet needs to recompute character-scoped Reliquary. */
+/** Surfaces the character sheet needs to recompute the Reliquary pair. The two
+ *  account-ledger halves are optional so a host or test with no ledger reads
+ *  exactly as the per-character sheet did; with them the pair is ACCOUNT-wide,
+ *  the same union the Reliquary window and the inspect card show. */
 export interface ReliquarySheetWorld {
   deedStats: { itemsDiscovered: OwnedIdLookup };
   reliquaryMarks: OwnedIdLookup;
   ownedMounts(): readonly string[];
   deedsEarned: OwnedIdLookup;
+  reliquaryAccountFinds?: ReadonlyMap<string, readonly AccountEarner[]>;
+  accountDeeds?: ReadonlyMap<string, readonly AccountEarner[]>;
 }
+
+const NO_ENTRIES: ReadonlyMap<string, readonly AccountEarner[]> = new Map();
 
 export interface ReliquarySheetModel {
   owned: number;
@@ -28,11 +36,15 @@ export interface ReliquarySheetModel {
 
 /** Pure character-scoped completion + rank for the paperdoll progression block. */
 export function buildReliquarySheetModel(world: ReliquarySheetWorld): ReliquarySheetModel {
+  const ledger = {
+    relics: world.reliquaryAccountFinds ?? NO_ENTRIES,
+    deeds: world.accountDeeds ?? NO_ENTRIES,
+  };
   const opts = {
-    itemsDiscovered: world.deedStats.itemsDiscovered,
-    marks: world.reliquaryMarks,
-    ownedMounts: new Set(world.ownedMounts()),
-    deedsEarned: world.deedsEarned,
+    itemsDiscovered: accountRelicLookup(world.deedStats.itemsDiscovered, ledger, 'item'),
+    marks: accountRelicLookup(world.reliquaryMarks, ledger, 'mark'),
+    ownedMounts: accountRelicLookup(new Set(world.ownedMounts()), ledger, 'mount'),
+    deedsEarned: accountDeedLookup(world.deedsEarned, ledger),
   };
   const completion = catalogCharacterCompletion(opts);
   return {

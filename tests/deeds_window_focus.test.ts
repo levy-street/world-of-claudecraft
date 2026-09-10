@@ -46,6 +46,7 @@ function makeWindow(state: WorldState): { w: DeedsWindow; el: HTMLElement } {
     world: () =>
       ({
         deedsEarned: state.deedsEarned,
+        accountDeeds: new Map(),
         deedStats: stats,
         renown: state.renown,
         activeTitle: state.activeTitle,

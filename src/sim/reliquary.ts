@@ -16,6 +16,15 @@
 // rescanning inventory + bank for owned mounts at every step.
 
 import {
+  type AccountRelicKind,
+  accountDeedLookup,
+  accountRelicKey,
+  accountRelicLookup,
+  recordAccountDeed,
+  recordAccountRelic,
+  selfEarner,
+} from './account_ledger';
+import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
   RELIQUARY_HORIZON_TITLES,
@@ -410,7 +419,11 @@ export function onItemDiscovered(
   opts?: Readonly<{ retro?: boolean; movement?: boolean }>,
 ): void {
   if (!isCataloguedRelicItem(itemId)) {
-    if (ITEMS[itemId]?.kind === 'mount') {
+    const def = ITEMS[itemId];
+    if (def?.kind === 'mount') {
+      // The account ledger lists this character as the mount's finder (the
+      // Horizons mount cell fills account-wide from here).
+      recordRelic(ctx, meta, 'mount', def.mount, opts);
       // ONE snapshot for both syncs: the reins discover is the join-heavy
       // path where rebuilding it per sync would rescan inventory + bank.
       const mountOwnership = characterReliquaryOwnership(meta);
@@ -429,6 +442,10 @@ export function onItemDiscovered(
   // Set built from a full inventory + bank scan, the expensive half) cannot
   // change inside a fill chain at all, since nothing here moves a reins item.
   const ownership = characterReliquaryOwnership(meta);
+  // Account ledger: this character is now a finder of the relic (the
+  // catalogued-item cell fills account-wide from here). Idempotent, so the
+  // join seed's re-walk of held items is a no-op after the first record.
+  recordRelic(ctx, meta, 'item', itemId, opts);
   // Rank is character-durable catalogued fills (items + marks + mounts + titles;
   // never account skins). Prior count is owned - 1 only when this discover
   // actually SCORED: the ledger add already happened (markItemDiscovered only
@@ -636,6 +653,7 @@ export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: str
   meta.reliquary.marks.add(markId);
   pushRecent(meta.reliquary, markId);
   bumpReliquaryWireRev(meta.reliquary);
+  recordRelic(ctx, meta, 'mark', markId);
   const newOwned = relicFillScoresForRank('mark', markId) ? previousOwned + 1 : previousOwned;
   const previousRank = curatorRankFromOwned(previousOwned);
   const newRank = curatorRankFromOwned(newOwned);
@@ -1284,6 +1302,33 @@ export function reliquaryOwnershipOpts(input: {
 }
 
 /**
+ * The ACCOUNT-WIDE completion opts both IWorld hosts build (Sim over live
+ * meta, ClientWorld over its mirrors): reliquaryOwnershipOpts with every
+ * character-durable surface unioned against the account ledger
+ * (src/sim/account_ledger.ts). ONE implementation so the two hosts cannot
+ * drift on which surfaces the ledger extends (items, marks, mounts, deeds;
+ * never skins, which are already account cosmetics).
+ */
+export function accountReliquaryOwnershipOpts(
+  ledger: Readonly<{ deeds: OwnedIdLookup; relics: OwnedIdLookup }>,
+  input: {
+    itemsDiscovered: OwnedIdLookup;
+    marks: OwnedIdLookup;
+    ownedMounts: readonly string[];
+    weaponSkinIds: readonly string[];
+    deedsEarned: OwnedIdLookup;
+  },
+): ReturnType<typeof reliquaryOwnershipOpts> {
+  return reliquaryOwnershipOpts({
+    itemsDiscovered: accountRelicLookup(input.itemsDiscovered, ledger, 'item'),
+    marks: accountRelicLookup(input.marks, ledger, 'mark'),
+    ownedMounts: accountRelicLookup(new Set(input.ownedMounts), ledger, 'mount'),
+    weaponSkinIds: input.weaponSkinIds,
+    deedsEarned: accountDeedLookup(input.deedsEarned, ledger),
+  });
+}
+
+/**
  * Character-scoped ownership for mutation paths and join sync: items, marks,
  * live ownedMounts (bags+bank reins), and deedsEarned. Weapon skins are
  * account cosmetics and are not on PlayerMeta; hosts pass them separately
@@ -1303,6 +1348,89 @@ export function characterReliquaryOwnership(meta: PlayerMeta): ReliquaryOwnershi
     ownedMounts: new Set(ownedMountKeys(meta)),
     deedsEarned: meta.deedsEarned,
   };
+}
+
+/**
+ * ACCOUNT-scoped ownership for the display lane (the Reliquary window, the
+ * inspect card's Curator standing): every character-durable surface is the
+ * union of this character's own state and the account ledger
+ * (src/sim/account_ledger.ts). Never used by a grant path: rank bridges and
+ * completion-ladder deeds stay decided over characterReliquaryOwnership so a
+ * character is listed as an earner only for what it did itself.
+ */
+export function accountReliquaryOwnership(meta: PlayerMeta): ReliquaryOwnershipSurfaces {
+  const ledger = meta.accountLedger;
+  return {
+    itemsDiscovered: accountRelicLookup(meta.deedStats.itemsDiscovered, ledger, 'item'),
+    marks: accountRelicLookup(meta.reliquary.marks, ledger, 'mark'),
+    ownedMounts: accountRelicLookup(new Set(ownedMountKeys(meta)), ledger, 'mount'),
+    deedsEarned: accountDeedLookup(meta.deedsEarned, ledger),
+  };
+}
+
+/**
+ * Append this character to the account ledger as a finder of one relic and
+ * emit the relicRecorded event the server persists and fans out. Idempotent
+ * per (relic, character): a repeat records and emits nothing. The event is
+ * not presentation (the client ignores it); `retro` rides through so the
+ * server can tell the on-join seed pass from a live find.
+ */
+function recordRelic(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  kind: AccountRelicKind,
+  id: string,
+  opts?: Readonly<{ retro?: boolean }>,
+): void {
+  const key = accountRelicKey(kind, id);
+  if (!recordAccountRelic(meta.accountLedger, key, selfEarner(meta, ctx.utcDay))) return;
+  ctx.emit({
+    type: 'relicRecorded',
+    key,
+    pid: meta.entityId,
+    ...(opts?.retro ? { retro: true } : {}),
+  });
+}
+
+/**
+ * Every account-ledger relic key this character's own state proves it holds:
+ * catalogued item relics out of itemsDiscovered, every authored mark, and the
+ * mounts whose reins sit in bags or bank. Pure; the server's join reconcile
+ * replays it into account_relic_finds (the deeds reconcile precedent) and the
+ * join seed below folds it into the live ledger.
+ */
+export function selfRelicKeys(meta: PlayerMeta): string[] {
+  const keys: string[] = [];
+  for (const itemId of meta.deedStats.itemsDiscovered) {
+    if (isCataloguedRelicItem(itemId)) keys.push(accountRelicKey('item', itemId));
+  }
+  for (const markId of meta.reliquary.marks) keys.push(accountRelicKey('mark', markId));
+  for (const mountKey of ownedMountKeys(meta)) keys.push(accountRelicKey('mount', mountKey));
+  return keys;
+}
+
+/**
+ * Join seed: make sure the live ledger lists this character for every deed
+ * and relic its own persisted state proves (a veteran's blob predates the
+ * ledger, the marks sync above has no event path, and a host may hand in no
+ * ledger at all). Silent: no events, since the server reconciles the same
+ * keys straight from deedsEarned and selfRelicKeys and nothing here is an
+ * earn moment. A deed keeps its own earned day; a relic has no per-character
+ * day on the blob and takes the host utcDay of this join, the same stamp the
+ * server's reconcile row carries. Idempotent: an entry the loaded ledger
+ * already lists for this character (with its real recorded day) is left
+ * alone. Returns how many entries landed.
+ */
+export function seedAccountLedgerSelf(ctx: SimContext, meta: PlayerMeta): number {
+  const earner = selfEarner(meta, ctx.utcDay);
+  let added = 0;
+  for (const [deedId, day] of meta.deedsEarned) {
+    if (recordAccountDeed(meta.accountLedger, deedId, { ...earner, day })) added++;
+  }
+  for (const key of selfRelicKeys(meta)) {
+    if (recordAccountRelic(meta.accountLedger, key, earner)) added++;
+  }
+  return added;
 }
 
 function asOwnedLookup(

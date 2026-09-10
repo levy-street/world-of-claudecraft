@@ -50,6 +50,7 @@ import type { ItemCopyAnchor } from './item_copy_anchor';
 
 export type { CharacterState, PetState } from './character_state';
 
+import { type AccountEarner, type AccountLedger, freshAccountLedger } from './account_ledger';
 import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
@@ -237,6 +238,7 @@ import {
   freshDeedStats,
   restoreDeedStats,
 } from './deeds';
+import { restoreBookOfDeeds, runBookOfDeedsJoinRetro } from './deeds_restore';
 import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
@@ -635,6 +637,7 @@ import {
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
 import {
+  accountReliquaryOwnershipOpts,
   catalogRankOwned,
   catalogRelicCompletion,
   clearCountForSource,
@@ -644,9 +647,7 @@ import {
   pageCompletion,
   RELIQUARY_PAGES_BY_ID,
   type ReliquaryState,
-  reliquaryOwnershipOpts,
   reliquarySaveFragment,
-  restoreReliquaryState,
 } from './reliquary';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { freshCounters, type RewardCounters } from './reward_counters';
@@ -1824,6 +1825,10 @@ export interface PlayerMeta {
   // marks, capped recent. Item ownership stays on deedStats.itemsDiscovered;
   // this field is omit-empty on serialize and never a second full discovery set.
   reliquary: ReliquaryState;
+  // The account ledger (src/sim/account_ledger.ts): which characters on this
+  // account earned each deed and found each relic. Host-loaded INPUT per join,
+  // appended by the grant paths; never serialized into CharacterState.
+  accountLedger: AccountLedger;
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -2767,6 +2772,11 @@ export class Sim {
       autoEquip?: boolean;
       state?: CharacterState;
       characterId?: number;
+      // The account ledger the host loaded for this account
+      // (src/sim/account_ledger.ts), passed INTO the join so the restore-time
+      // title/border validators already see an alt's deeds. Absent (offline, a
+      // bare test join) means a fresh ledger this character alone fills.
+      accountLedger?: AccountLedger;
       // The FRESH host-allocated material-gatherer identity for an
       // offline/headless character that has none persisted yet
       // (src/sim/material_gatherer.ts). Allocated by the host OUTSIDE the sim
@@ -3036,6 +3046,7 @@ export class Sim {
       activeBorder: null,
       renown: 0,
       reliquary: freshReliquaryState(),
+      accountLedger: opts?.accountLedger ?? freshAccountLedger(),
     };
     // A fresh character sets out provisioned (class-defined starter rations);
     // a saved character loads its own bags from savedState below.
@@ -3500,36 +3511,10 @@ export class Sim {
       if (dailyGate.wyrmfallDaily) meta.wyrmfallDaily = dailyGate.wyrmfallDaily;
       if (dailyGate.craftDaily) meta.craftDaily = dailyGate.craftDaily;
       meta.emberWeekAnchor = dailyGate.emberWeekAnchor;
-      // The Book of Deeds. Earned days load verbatim; the legacy milestone set
-      // unions into the earned map (milestone unification); renown is
-      // RECOMPUTED from the earned set below (the sim is authoritative, the
-      // saved number only feeds a SQL sort index).
-      for (const [deedId, day] of Object.entries(s.deeds ?? {})) {
-        if (typeof day === 'string') meta.deedsEarned.set(deedId, day);
-      }
-      meta.deedStats = restoreDeedStats(s.deedStats);
-      meta.reliquary = restoreReliquaryState(s.reliquary);
-      deedsMod.unionLegacyMilestones(meta);
-      deedsMod.recomputeRenown(meta);
-      // The saved title re-applies through the same validator the setter
-      // command uses (meta starts untitled), so a stale id from a content
-      // change loads as no title instead of riding the entity wire as a
-      // dangling reference. Stamps the entity `title` field alongside.
-      deedsMod.setActiveTitle(
-        meta,
-        player,
-        typeof s.activeTitle === 'string' ? s.activeTitle : null,
-      );
-      // The saved border re-applies through its own validator for the same
-      // reasons (stale id from a content change loads as no border rather
-      // than a dangling entity-wire reference). Stamps the entity `border`
-      // field alongside; a save written before borders existed has no key and
-      // lands null.
-      deedsMod.setActiveBorder(
-        meta,
-        player,
-        typeof s.activeBorder === 'string' ? s.activeBorder : null,
-      );
+      // The Book of Deeds + Reliquary restore (deeds_restore.ts): earned days,
+      // stat block, sparse Reliquary state, milestone unification, the renown
+      // recompute, and the validated title/border re-apply.
+      restoreBookOfDeeds(meta, player, s);
       // Resume with the weapon sheathed exactly as saved (absent = drawn).
       if (s.weaponStowed) player.weaponStowed = true;
       if (s.helmHidden) player.helmHidden = true;
@@ -3651,19 +3636,10 @@ export class Sim {
       meta.mailWelcomed = true;
       if (!opts?.bot) this.postOffice.sendWelcome(meta);
     }
-    // Book of Deeds retro-on-join, after the saved state is fully restored:
-    // seed the discovery ledger from current holdings, apply the retro
-    // fallbacks a predicate cannot express (proof inferences plus the
-    // stranded-deed heals), then evaluate every predicate against the loaded
-    // state (a pure function of that state and the catalog: no rng, so join
-    // order cannot fork the draw order). Counters start at zero, so counter
-    // deeds never retro-grant; the emitted events carry retro: true and
-    // drain with the next tick to this player only.
-    deedsMod.seedItemDiscovery(this.ctx, meta);
-    deedsMod.retroFallbackGrants(this.ctx, meta, player);
-    deedsMod.evaluateDeedsFor(this.ctx, meta, player, true);
-    this.deedDirtyPids.delete(player.id);
-    this.deedDirtyKeys.delete(player.id);
+    // Book of Deeds retro-on-join, after the saved state is fully restored
+    // (deeds_restore.ts): the discovery seed, the retro fallbacks, the full
+    // evaluator pass (retro: true events), and the account ledger self seed.
+    runBookOfDeedsJoinRetro(this.ctx, meta, player);
     notifyFarmReady(this.ctx, meta);
     return player.id;
   }
@@ -4866,6 +4842,12 @@ export class Sim {
   get deedsEarned(): ReadonlyMap<string, string> {
     return this.primary.deedsEarned;
   }
+  // The account ledger's deed half: every deed any character on the account
+  // earned, with its earners in earn order (the offline sandbox's one player
+  // appends itself, so the offline Book reads the same shape).
+  get accountDeeds(): ReadonlyMap<string, readonly AccountEarner[]> {
+    return this.primary.accountLedger.deeds;
+  }
   get deedStats(): Readonly<DeedStats> {
     return this.primary.deedStats;
   }
@@ -4900,9 +4882,15 @@ export class Sim {
   get reliquaryObtainCounts(): Readonly<Record<string, number>> {
     return this.primary.reliquary.counts;
   }
-  /** Full Reliquary ownership surfaces (items, marks, mounts, skins, titles). */
+  // The account ledger's relic half: accountRelicKey -> finders in find order.
+  get reliquaryAccountFinds(): ReadonlyMap<string, readonly AccountEarner[]> {
+    return this.primary.accountLedger.relics;
+  }
+  /** Full Reliquary ownership surfaces (items, marks, mounts, skins, titles),
+   *  ACCOUNT-WIDE through the ledger union (the display lane; grants stay
+   *  character-scoped, see src/sim/account_ledger.ts). */
   private reliquaryOwnershipSurfaces() {
-    return reliquaryOwnershipOpts({
+    return accountReliquaryOwnershipOpts(this.primary.accountLedger, {
       itemsDiscovered: this.primary.deedStats.itemsDiscovered,
       marks: this.primary.reliquary.marks,
       ownedMounts: this.ownedMounts(),

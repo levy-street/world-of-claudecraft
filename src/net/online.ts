@@ -14,6 +14,7 @@ import {
   type PlayerFlair,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { type AccountEarner, type AccountLedger, freshAccountLedger } from '../sim/account_ledger';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
@@ -59,6 +60,7 @@ import type { HarvestPreference } from '../sim/professions/harvest_preference';
 import type { PerfectingSwapRequest } from '../sim/professions/perfecting_swap';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
+  accountReliquaryOwnershipOpts,
   catalogRankOwned,
   catalogRelicCompletion,
   clearCountForSource,
@@ -196,6 +198,7 @@ import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura
 import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire } from './bank_snapshot_wire';
 import { blankEntity } from './blank_entity';
+import { applyBookOfDeedsWire } from './book_wire';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
@@ -1407,6 +1410,18 @@ export class ClientWorld extends ReconWireState implements IWorld {
   reliquaryMarks: Set<string> = new Set();
   reliquaryRecent: string[] = [];
   reliquaryObtainCounts: Record<string, number> = {};
+  // --- The account ledger (src/sim/account_ledger.ts), from the heavy-gated
+  // `acct` self key: which characters on the account earned each deed and
+  // found each relic. Both books and the ownership union below read it. The
+  // `relicRecorded` event is NOT presentation and never touches this mirror:
+  // the snapshot is the single authority (the deedUnlocked doctrine). ---
+  accountLedger: AccountLedger = freshAccountLedger();
+  get accountDeeds(): ReadonlyMap<string, readonly AccountEarner[]> {
+    return this.accountLedger.deeds;
+  }
+  get reliquaryAccountFinds(): ReadonlyMap<string, readonly AccountEarner[]> {
+    return this.accountLedger.relics;
+  }
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -3338,42 +3353,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.guildBankInfo = s.guildBank;
         if (hadGate !== (this.guildBankInfo !== null)) this.guildBankLogMirror.reset();
       }
-      // --- IWorldDeeds self-decode: `deeds`/`dstats` are heavy-gated,
-      // `renown`/`atitle`/`aborder` per-tick diffed (all five delta-omitted: a
-      // missing key keeps the prior mirror). The wire carries plain objects/arrays
-      // (Maps and Sets do not survive JSON.stringify), so the earned Map and
-      // both stat Sets rebuild here. `deedUnlocked` events are presentation
-      // only and never touch these mirrors. ---
-      if (s.deeds !== undefined) this.deedsEarned = new Map(Object.entries(s.deeds ?? {}));
-      if (s.dstats !== undefined && s.dstats) {
-        this.deedStats = {
-          counters: { ...freshDeedStats().counters, ...(s.dstats.counters ?? {}) },
-          itemsDiscovered: new Set(s.dstats.itemsDiscovered ?? []),
-          visited: new Set(s.dstats.visited ?? []),
-          dungeonClears: s.dstats.dungeonClears ?? {},
-        };
-      }
-      if (s.renown !== undefined) this.renown = s.renown ?? 0;
-      if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
-      if (s.aborder !== undefined) this.activeBorder = s.aborder ?? null;
-      // --- IWorldReliquary self-decode: `reliq` is heavy-gated and delta-omitted
-      // (a missing key keeps the prior mirror). Payload is the omit-empty
-      // SavedReliquaryState shape; never a second full itemsDiscovered array.
-      // `reliquaryUnlock` events are presentation only and never touch these. ---
-      if (s.reliq !== undefined) {
-        const restored = restoreReliquaryState((s.reliq ?? {}) as SavedReliquaryState | undefined);
-        this.reliquaryFirstFind = restored.firstFind;
-        this.reliquaryMarks = restored.marks;
-        this.reliquaryRecent = restored.recent;
-        // The obtain tally rides folded into the firstFind entries on the wire;
-        // restore splits it back out, so the mirror reads it the same way the
-        // offline Sim reads the live state.
-        this.reliquaryObtainCounts = restored.counts;
-        // restored.illuminatedPages is DELIBERATELY not mirrored: the sticky
-        // illumination record is sim/server-authoritative with no IWorld
-        // consumer (the client banner and the guild marquee both key off
-        // events). It rides the blob only because wire shape is save shape.
-      }
+      // --- IWorldDeeds / IWorldReliquary / account-ledger self-decode
+      // (`deeds`/`dstats`/`reliq`/`acct` heavy-gated, `renown`/`atitle`/
+      // `aborder` per-tick diffed, all delta-omitted): src/net/book_wire.ts. ---
+      applyBookOfDeedsWire(this, s);
       if (s.ptime !== undefined) this.playtimeSeconds = s.ptime ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
@@ -4889,7 +4872,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Identical offline Sim formulas so online/offline answer the same for
   // scripted state. ---
   private reliquaryOwnershipSurfaces() {
-    return reliquaryOwnershipOpts({
+    // ACCOUNT-WIDE through the one shared union helper the Sim uses too.
+    return accountReliquaryOwnershipOpts(this.accountLedger, {
       itemsDiscovered: this.deedStats.itemsDiscovered,
       marks: this.reliquaryMarks,
       ownedMounts: this.ownedMounts(),

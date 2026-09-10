@@ -150,9 +150,9 @@ and it surfaces as Renown, never as a count.
 
 | Readout | Set | Scope |
 |---|---|---|
-| Book of Deeds header pair (earned/total) | Completion | Character |
-| Book of Deeds category counts | Visible deeds per display bucket (the Feats shelf shows its own bucket) | Character |
-| Book of Deeds Renown stat | Scoring set, summed (the evaluator's denormalized sum) | Character |
+| Book of Deeds header pair (earned/total) | Completion | Account (own earns unioned with the account ledger; labeled by `hudChrome.deeds.accountScopeNote`) |
+| Book of Deeds category counts | Visible deeds per display bucket (the Feats shelf shows its own bucket) | Account |
+| Book of Deeds Renown stat | Scoring set, summed (the evaluator's own sum plus the Renown of every deed only an alt earned) | Account |
 | Character sheet `deeds.earnedCount` (JSON sheet + companion OAuth) | Completion | Character |
 | Renown board score | Scoring set, summed | Account |
 | Renown board tie-break | Scoring set, max over each deed's earliest earn | Account |
@@ -227,12 +227,44 @@ completionist trap that drags veterans back through the tutorial. If the
 island ever gains real conquerable content (a rare, a delve), that content
 authors deeds like any other.
 
+## The account ledger (the Book is account-wide)
+
+The Book of Deeds is shared across every character on an account, and every
+earned deed remembers which characters earned it. The mechanism is the
+account ledger (`src/sim/account_ledger.ts`), and its scope model is fixed:
+
+- **The grant lane stays per character.** The evaluator decides from the
+  acting character's own state, so a character is listed as an earner only
+  for what it accomplished itself. A rank bridge or completion-ladder deed an
+  alt earned shows as earned (by the alt); it is never re-granted to the
+  reader from the union.
+- **The display lane is account-wide.** The Book's earned state, header pair,
+  category counts, Renown, recent strip, and the title and border pickers all
+  read the union of `deedsEarned` and the ledger (`IWorldDeeds.accountDeeds`),
+  and each card names its earners with their earn dates
+  (`hudChrome.deeds.earnedBy`). The sim's title and border validators accept
+  any deed on the ledger, so a cosmetic an alt earned is wearable everywhere.
+- **The ledger is input, not sim truth.** The server assembles it per join
+  from `character_deeds` (deeds) and `account_relic_finds` (relics, the
+  Reliquary half) joined to `characters` for names (`loadAccountLedger`,
+  `server/account_ledger_db.ts`), hands it to `Sim.addPlayer`, and fans a
+  live earn out to the account's other sessions in the same tick
+  (`server/account_ledger_service.ts`). It rides the heavy `acct` self key
+  and is never serialized into `CharacterState`. Offline the one sandbox
+  character fills its own ledger, so both hosts read the same shape
+  (`tests/account_ledger_sim.test.ts`, `tests/account_ledger_wire.test.ts`).
+- **Character deletion follows `character_deeds`:** both tables cascade on
+  the character row, so a deleted character's earns leave the account's book
+  exactly as they leave the Renown board today.
+
 ## Deliberately deferred (do not "fix" these by shipping them)
 
-- **Account-level deeds** (`prog_three_paths`, `prog_ninefold`, and the
-  seven server-assisted `feat_*` world/realm firsts): the v1 evaluator is
-  strictly per-character and `server/deeds_records.ts` is observer-only; an
-  account-level grant lane must exist first.
+- **Account-level GRANTS** (`prog_three_paths`, `prog_ninefold`, and the
+  seven server-assisted `feat_*` world/realm firsts): the Book is account-wide
+  for display and cosmetics through the account ledger above, but the
+  evaluator is still strictly per-character and `server/deeds_records.ts` is
+  observer-only; a deed whose trigger reads ACROSS characters still needs an
+  account-level grant lane.
 - **`prog_ringwright`**: every ring craft now has a live gain path (the
   Masterwrought phase 06 inscription catalog closed the last gap, and its
   milestone and Grandmaster deeds shipped with it), so the old
