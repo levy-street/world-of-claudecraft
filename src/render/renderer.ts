@@ -676,7 +676,7 @@ import {
 } from './scene_census_core';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
-import { drapeRingLocalY } from './selection_ring';
+import { drapeRingLocalY, selectionRingScale } from './selection_ring';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
@@ -1394,6 +1394,13 @@ export class Renderer {
   // readable, especially on short mobile viewports. Initialized from Settings
   // and kept live by main.ts's applySetting dispatcher (mirrors showOwnNameplate).
   showPlayerNameplates = true;
+  // settings-backed cosmetic-buddy nameplate toggle (off by default): a buddy
+  // (src/sim/content/buddy_mobs.ts) has no health worth a bar and cannot be
+  // attacked, so its plate stays hidden regardless of showNameplates above
+  // unless this is on, in which case it shows name-only. Initialized from
+  // Settings and kept live by main.ts's applySetting dispatcher (mirrors
+  // showOwnNameplate).
+  showPetNames = false;
   // settings-menu graphics knobs (applied live)
   private renderScale = 1; // user-requested resolution ceiling on top of the device pixel ratio
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
@@ -2199,6 +2206,7 @@ export class Renderer {
       showDevBadges: () => this.showDevBadges,
       showOwnNameplate: () => this.showOwnNameplate,
       showPlayerNameplates: () => this.showPlayerNameplates,
+      showPetNames: () => this.showPetNames,
       isHostilePlayer: (e) => this.isHostilePlayer(e),
     });
 
@@ -11301,6 +11309,10 @@ export class Renderer {
         mountShown && !v.mountCompilePending && runCharacterPresentation,
         mountShown && !v.mountCompilePending && runCharacterPresentation ? this.vfx : null,
       );
+      // Buddy: since 2026-08-27 a real owned mob entity (src/sim/pet/
+      // buddy_ai.ts), rendered through the exact same per-entity view path as
+      // every other mob — no bespoke create/dispose/follow-transform code
+      // needed here any more.
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
@@ -11461,10 +11473,11 @@ export class Renderer {
         // The drape is a pure function of (cx, cz, scale) and nothing else writes
         // the ring's position attribute, so a stationary target reuses last
         // frame's per-vertex groundHeight samples untouched.
-        if (cx !== this.selRingX || cz !== this.selRingZ || target.scale !== this.selRingScale) {
+        const ringScale = selectionRingScale(target.scale, tv.height);
+        if (cx !== this.selRingX || cz !== this.selRingZ || ringScale !== this.selRingScale) {
           this.selRingX = cx;
           this.selRingZ = cz;
-          this.selRingScale = target.scale;
+          this.selRingScale = ringScale;
           const seed = this.sim.cfg.seed;
           // A target standing on a prop top (crate/rock) gets the ring on that
           // surface, not buried at terrain height under it.
@@ -11472,13 +11485,13 @@ export class Renderer {
           const gy = Math.max(groundHeight(cx, cz, seed), supportY);
           this.selectionDrapeSupportY = supportY;
           this.selectionRing.position.set(cx, gy, cz);
-          this.selectionRing.scale.setScalar(target.scale);
+          this.selectionRing.scale.setScalar(ringScale);
           const drape = drapeRingLocalY(
             this.selectionRingLocalXZ,
             cx,
             cz,
             gy,
-            target.scale,
+            ringScale,
             0.08,
             this.selectionGroundSample,
             this.selectionRingDrapeY,

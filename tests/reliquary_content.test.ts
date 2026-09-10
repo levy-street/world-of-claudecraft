@@ -122,6 +122,13 @@ function isMountReinsId(itemId: string): boolean {
   return itemId.startsWith('reins_');
 }
 
+/** Buddy whistles are cosmetics, not relics: like mount reins they name a
+ *  collectible the Collections window tracks and no Reliquary page ever
+ *  catalogs, so a boss table that drops one owes the museum nothing for it. */
+function isBuddyWhistleId(itemId: string): boolean {
+  return ITEMS[itemId]?.kind === 'buddy';
+}
+
 /** `heroic_<base>` ids are auto-generated stat copies (heroic_variants.ts), not the heroic
  *  UNIQUES the Reliquary catalogs (docs/design/reliquary.md, "Adding a page"): the base id
  *  already holds the slot, so listing the variant would double-count one weapon. The catalog
@@ -247,6 +254,7 @@ function dungeonRarePlusLootIds(
     isRarePlus(itemId) &&
     !isRedemptionTokenId(itemId) &&
     !isMaterialId(itemId) &&
+    !isBuddyWhistleId(itemId) && // a cosmetic, never a relic
     (include || !isReliquaryCarvedOut(itemId));
   const ids = new Set<string>();
   for (const mobId of dungeonMobIds(dungeonId)) {
@@ -979,6 +987,7 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
       if (typeof e.itemId !== 'string') continue;
       if (isMountReinsId(e.itemId) || isHeroicVariantId(e.itemId)) continue;
       if (isRedemptionTokenId(e.itemId)) continue;
+      if (isBuddyWhistleId(e.itemId)) continue; // a cosmetic, never a relic
       if (!include && isReliquaryCarvedOut(e.itemId)) continue;
       liveIds.push(e.itemId);
     }
@@ -1286,7 +1295,9 @@ describe('Reliquary Rares of the Realm pages pin against the live rare tables', 
   function rarePlusLootIds(templateId: string): string[] {
     const out: string[] = [];
     for (const row of MOBS[templateId]?.loot ?? []) {
-      if (typeof row.itemId === 'string' && isRarePlus(row.itemId)) out.push(row.itemId);
+      if (typeof row.itemId !== 'string' || !isRarePlus(row.itemId)) continue;
+      if (isBuddyWhistleId(row.itemId)) continue; // a cosmetic, never a relic
+      out.push(row.itemId);
     }
     return out;
   }
@@ -1479,7 +1490,12 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     // order.
     expect(FURY_NPC_ID).toBe('fury');
     for (const npcId of ['fury', 'warmarshal_draven_kole']) {
-      const stock = new Set(NPCS[npcId]?.vendorItems ?? []);
+      // Gear rows only: the Warmarshal additionally carries one cosmetic
+      // companion whistle (kind 'buddy', content/items.ts), which no relic
+      // page counts and which must never widen the honor GEAR stock.
+      const stock = new Set(
+        (NPCS[npcId]?.vendorItems ?? []).filter((id) => ITEMS[id]?.kind !== 'buddy'),
+      );
       expect(stock.size, npcId).toBe(FURY_STOCK.length);
       for (const id of FURY_STOCK) expect(stock.has(id), `${npcId} sells ${id}`).toBe(true);
     }

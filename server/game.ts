@@ -14,10 +14,8 @@ import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
-import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
-import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   DELVES,
   DUNGEON_X_THRESHOLD,
@@ -196,8 +194,6 @@ import {
   closePlaySession,
   GUILD_BANK_ROW_MAX_BYTES,
   grantAccountMechChroma,
-  grantAccountMountSkins,
-  grantAccountWeaponSkins,
   heartbeatCharacterLeases,
   insertChatLogs,
   loadAccountFlair,
@@ -206,7 +202,6 @@ import {
   loadMailState,
   loadMarketState,
   loadRiftState,
-  markAccountQuestComplete,
   openPlaySession,
   pool,
   releaseCharacterLease,
@@ -215,7 +210,6 @@ import {
   saveCharacterState,
   saveMarketState,
   saveRiftState,
-  setAccountWeaponSkinLoadout,
   touchCharacterLogin,
   walletForAccount,
 } from './db';
@@ -1256,6 +1250,16 @@ function identityFields(e: Entity): Record<string, unknown> {
   // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
   // made the appended self delta overwrite the live riding state in JSON.
   if (e.mountKey) out.mnt = e.mountKey;
+  // Active cosmetic buddy ('' omitted). Zero gameplay effect, like mnt, but
+  // unlike mnt not what draws the follower: the buddy is a real owned mob
+  // entity rendered through the ordinary per-mob path, so this is HUD/UI
+  // identity only (src/sim/types.ts's buddyKey doc).
+  if (e.buddyKey) out.bud = e.buddyKey;
+  // Buddy autoloot armed (false omitted, like the two above). Only the owner's
+  // own client reads it (to render the Enable/Disable row on the buddy's
+  // target-frame menu); it rides identity rather than a self delta because it
+  // changes about as often as `bud` does and costs nothing while off.
+  if (e.buddyAutoloot) out.budal = true;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
@@ -6821,6 +6825,18 @@ export class GameServer {
       case 'mount_toggle':
         sim.toggleMountFor(pid);
         break;
+      // Cosmetic buddies: dismiss-only (summoning a specific one is an item
+      // use, routed through use_item -> summonBuddyItem). The Sim re-validates
+      // ownership; the entity mirror `bud` field carries the result.
+      case 'buddy_toggle':
+        sim.toggleBuddyFor(pid);
+        break;
+      // Buddy autoloot: a preference flip, settable with no buddy out. The
+      // errand itself (walking to the player's own corpses and looting them)
+      // is entirely server-side, in the Sim tick.
+      case 'buddy_autoloot':
+        if (typeof msg.on === 'boolean') sim.setBuddyAutolootFor(pid, msg.on);
+        break;
       // Riding lesson: the Sim re-validates everything (level, range, quest
       // state, fee, session state).
       case 'mount_train_begin':
@@ -8939,6 +8955,11 @@ export class GameServer {
       // flag, not the modulo, is what carries correctness here. Wire key
       // `mntOwn`.
       maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+      // The owned buddy collection (IWorldBuddies.ownedBuddies): every buddy
+      // whose whistle sits in bags or bank. Same inputs/gating story as
+      // mntOwn above (bags heavy-gated, bank writes marked dirty). Wire key
+      // `budOwn`.
+      maybe('budOwn', this.sim.ownedBuddiesFor(anchorSession.pid));
       // The viewer's own farm plots (wire key `fplot`): heavy-gated, built by
       // appendFarmPlotsWire in server/farming_commands.ts since the v0.38.0
       // sync monolith heal; the gating and projection doctrine lives there.

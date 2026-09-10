@@ -178,6 +178,7 @@ function harness(knobs: {
     showDevBadges: () => true,
     showOwnNameplate: () => false,
     showPlayerNameplates: () => true,
+    showPetNames: () => false,
     nameplateDotScale: () => 0,
     isHostilePlayer: () => false,
   });

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { BUDDY_KEYS } from '../src/sim/content/buddies';
 import { FARM_CROP_IDS } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
 import { parseBisGearFor } from '../src/sim/dev/parse_bis_loadouts';
@@ -487,6 +488,19 @@ describe('/dev bg (Thornhollow Fields force-start)', () => {
     });
     sim.chat('/dev bg');
     expect(sim.bgMatchFor(sim.playerId)).toBeNull();
+  });
+
+  it('/dev buddies grants every catalog whistle, skipping ones already owned', () => {
+    const sim = devSim();
+    const meta = sim.players.get(sim.playerId);
+    if (!meta) throw new Error('missing player meta');
+    sim.addItem('whistle_ember_fox', 1, sim.playerId); // already owned before the command
+
+    sim.chat('/dev buddies');
+
+    expect(sim.ownedBuddies().length).toBe(BUDDY_KEYS.length);
+    // The already-owned whistle was not duplicated.
+    expect(meta.inventory.filter((s) => s.itemId === 'whistle_ember_fox')).toHaveLength(1);
   });
 
   it('freezes every mob in place with no aggro, and releases on off', () => {

@@ -9,8 +9,8 @@
     "lockpick minigame (flawless solve)",
     "reward chest + delve marks"
   ],
-  "draws": 11,
-  "drawDigest": "6ae3afff",
+  "draws": 15,
+  "drawDigest": "7eb57a54",
   "frames": [
     {
       "tick": 0,
@@ -196,11 +196,11 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 1019,
-      "state": "3c3412dd",
+      "state": "621240a8",
       "events": "73fb3ff3",
       "rng": {
-        "draws": 11,
-        "digest": "6ae3afff"
+        "draws": 15,
+        "digest": "7eb57a54"
       },
       "label": "delve-end",
       "players": [
@@ -227,7 +227,7 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 19,
+          "copper": 25,
           "counters": {
             "damageDealt": 1635,
             "kills": 1,
@@ -533,22 +533,22 @@
       "tick": 40,
       "time": 2,
       "nextId": 1019,
-      "state": "909ace09",
+      "state": "a176a89c",
       "events": "741638a5",
       "rng": {
-        "draws": 11,
-        "digest": "6ae3afff"
+        "draws": 15,
+        "digest": "7eb57a54"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 1019,
-      "state": "909ace09",
+      "state": "a176a89c",
       "events": "741638a5",
       "rng": {
-        "draws": 11,
-        "digest": "6ae3afff"
+        "draws": 15,
+        "digest": "7eb57a54"
       },
       "label": "final",
       "players": [
@@ -575,7 +575,7 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 19,
+          "copper": 25,
           "counters": {
             "damageDealt": 1635,
             "kills": 1,

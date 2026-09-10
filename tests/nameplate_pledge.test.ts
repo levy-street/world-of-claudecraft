@@ -79,6 +79,7 @@ async function harness() {
     hasOverheadEmote: false,
     threat: false,
     comboPips: 0,
+    noHealthBar: false,
   } satisfies NameplatePlan;
   const resolve = (entity: Entity) => painter.resolveContent(state, entity, me, plan, false, true);
   return { state, resolve, GUILD_TIER_FILLS: canvas.GUILD_TIER_FILLS };

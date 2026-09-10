@@ -32,10 +32,15 @@ export const WARFARE_SHOP_SET_ORDER: readonly string[] = [
   'warfare_cinderweave', // cloth, caster
 ];
 
-/** Section keys for the two non-set sections. Set sections key on their set id,
+/** Section keys for the three non-set sections. Set sections key on their set id,
  *  so every key in one view is unique and safe to build a focus key from. */
 export const WARFARE_SHOP_JEWELRY_KEY = 'jewelry';
 export const WARFARE_SHOP_WEAPONS_KEY = 'weapons';
+/** Cosmetic buddy whistles (kind 'buddy'), currently the Proud Grunt companion
+ *  Warmarshal Draven Kole carries. Its own section rather than the jewelry
+ *  fallback: a companion is not gear, carries no slot and no stats, and must
+ *  never read as a piece a set-completion count is waiting on. */
+export const WARFARE_SHOP_COMPANIONS_KEY = 'companions';
 
 /** The NpcDef shape this window gates on. A FLAG, never a hard-coded npc id:
  *  the Heroic Quartermaster is keyed to a single id and a second one would have
@@ -102,7 +107,7 @@ export interface WarfareShopSetSection {
 }
 
 export interface WarfareShopPlainSection {
-  kind: 'jewelry' | 'weapons';
+  kind: 'jewelry' | 'weapons' | 'companions';
   key: string;
   offers: WarfareShopOffer[];
 }
@@ -196,12 +201,17 @@ export function buildWarfareVendorView(
   const bySet = new Map<string, WarfareShopOffer[]>();
   const jewelry: WarfareShopOffer[] = [];
   const weapons: WarfareShopOffer[] = [];
+  const companions: WarfareShopOffer[] = [];
   for (const itemId of stock) {
     const item = items[itemId];
     if (!item) continue;
     const offer = offerFor(itemId, item, viewer);
     if (offer.honor <= 0) continue;
-    if (item.set) {
+    if (item.kind === 'buddy') {
+      // Checked before the set arm on purpose: a whistle carries no set tag
+      // today, and if one ever did it would still not be a gear piece.
+      companions.push(offer);
+    } else if (item.set) {
       const existing = bySet.get(item.set);
       if (existing) existing.push(offer);
       else bySet.set(item.set, [offer]);
@@ -256,6 +266,10 @@ export function buildWarfareVendorView(
   }
   if (weapons.length > 0) {
     sections.push({ kind: 'weapons', key: WARFARE_SHOP_WEAPONS_KEY, offers: weapons });
+  }
+  // Last: the cosmetic row never pushes a gear section down the window.
+  if (companions.length > 0) {
+    sections.push({ kind: 'companions', key: WARFARE_SHOP_COMPANIONS_KEY, offers: companions });
   }
   return { sections, balance: Math.max(0, Math.floor(viewer.honor)) };
 }

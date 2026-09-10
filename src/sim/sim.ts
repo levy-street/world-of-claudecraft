@@ -44,6 +44,11 @@ import {
 } from './bank';
 import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
+import {
+  ownedBuddies as ownedBuddiesImpl,
+  setBuddyAutoloot as setBuddyAutolootImpl,
+  toggleBuddy as toggleBuddyImpl,
+} from './buddies';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
 import type { ItemCopyAnchor } from './item_copy_anchor';
@@ -151,6 +156,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import type { BuddyKey } from './content/buddies';
 import { farmCropTier } from './content/farm_crops';
 import {
   FARM_BED_IDS,
@@ -415,6 +421,7 @@ import {
   PLAYER_MAX_CLIMB_SLOPE,
   PLAYER_SWIM_DEPTH,
 } from './pathfind';
+import { isBuddyMob } from './pet/buddy_ai';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
@@ -4390,6 +4397,37 @@ export class Sim {
   }
   toggleMounted(): void {
     this.toggleMountFor(this.primaryId);
+  }
+
+  /** Per-pid buddy dismiss (the server command path); the IWorld member below
+   *  rides primaryId. Rules live in src/sim/buddies.ts. Summoning a specific
+   *  buddy is not here: it is an item use (useItem -> summonBuddyItem). */
+  toggleBuddyFor(pid: number): boolean {
+    return toggleBuddyImpl(this.ctx, pid);
+  }
+
+  /** The owned subset of the buddy catalog for a player (the server wire path). */
+  ownedBuddiesFor(pid: number): BuddyKey[] {
+    const meta = this.players.get(pid);
+    return meta ? ownedBuddiesImpl(meta) : [];
+  }
+
+  /** Per-pid buddy autoloot toggle (the server command path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/buddies.ts, the per-tick
+   *  errand it arms in src/sim/pet/buddy_autoloot.ts. */
+  setBuddyAutolootFor(pid: number, enabled: boolean): boolean {
+    return setBuddyAutolootImpl(this.ctx, pid, enabled);
+  }
+
+  // --- IWorldBuddies ---
+  ownedBuddies(): readonly BuddyKey[] {
+    return this.ownedBuddiesFor(this.primaryId);
+  }
+  toggleBuddy(): void {
+    this.toggleBuddyFor(this.primaryId);
+  }
+  setBuddyAutoloot(enabled: boolean): void {
+    this.setBuddyAutolootFor(this.primaryId, enabled);
   }
 
   /** Purchase the riding skill from Marla (80g). Server path; IWorld member rides
@@ -9384,6 +9422,13 @@ export class Sim {
   isHostileTo(attacker: Entity, target: Entity): boolean {
     if (target.kind === 'mob') {
       if (target.templateId.startsWith('vision_')) return false;
+      // A cosmetic buddy (src/sim/pet/buddy_ai.ts) is never a valid hostile
+      // target, in a duel/arena/battleground or anywhere else: it carries no
+      // combat at all, so recursing to its owner below would make an
+      // opponent's follower Tab-targetable and AoE-eligible purely because
+      // the owner is hostile. Checked before the owner-recursion arm so it
+      // wins regardless of who the owner is.
+      if (isBuddyMob(target)) return false;
       // A Protect Yumi cat is attackable only by the opposing team of its
       // live match (social/yumi.ts owns the rule).
       if (yumiMod.isYumiCat(target)) return yumiMod.yumiCatHostileTo(this.ctx, attacker, target);

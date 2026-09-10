@@ -596,6 +596,13 @@ same file), and each module's header carries its own contract.
   members (a captured pet id would go stale). The sliver is deliberately NOT class `bar`
   (two shipped rules select every non-hp `.bar` child of a row) and not role=button (the row
   is the button; a nested control is the axe nested-interactive violation).
+- **hud/target_frame_menu.ts**: the pure half of the target frame's right-click menu.
+  `targetFrameMenuKind` is the ONE place that decides which menu a target opens (another
+  player, your own pet, your own cosmetic buddy, or a markable wild hostile), and
+  `buddyMenuHtml` builds the buddy menu's rows; `hud.ts` keeps only the openers, which
+  place the popup and bind its rows. A buddy is deliberately NOT a pet here: it takes no
+  pet command, so `isControllableOwnedPet` excludes it and `isOwnBuddy` (`pet_entity.ts`)
+  routes it to its own one-row menu (autoloot).
 - **hud/vendor/vendor_view.ts** / **vendor_window.ts**: the first window migrated out of
   `hud.ts` by the recipe above (pure view decides the rows; thin consumer paints from
   injected `deps`).

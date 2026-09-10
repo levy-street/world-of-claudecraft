@@ -1467,6 +1467,7 @@ async function startGame(
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
+    renderer.showPetNames = settings.get('showPetNames');
     setNameplateDotScale(settings.nameplateDotRenderScale());
     renderer.setWaterRipples(settings.get('waterRipples'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
@@ -1832,6 +1833,9 @@ async function startGame(
           case 'arena':
             hud.toggleArena();
             break;
+          case 'collections':
+            hud.toggleCollections();
+            break;
           case 'dungeonFinder':
             hud.toggleDungeonFinder();
             break;
@@ -2163,6 +2167,9 @@ async function startGame(
         break;
       case 'arena':
         hud.toggleArena();
+        break;
+      case 'collections':
+        hud.toggleCollections();
         break;
       case 'bgFlag':
         bgFlagKey();
@@ -2523,6 +2530,10 @@ async function startGame(
       renderer.showPlayerNameplates = settings.set('showPlayerNameplates', !!value);
       return;
     }
+    if (key === 'showPetNames') {
+      renderer.showPetNames = settings.set('showPetNames', !!value);
+      return;
+    }
     if (key === 'showNameplateDots') {
       settings.set('showNameplateDots', !!value);
       setNameplateDotScale(settings.nameplateDotRenderScale());
@@ -2769,6 +2780,7 @@ async function startGame(
     next.showDevBadges = settings.get('showDevBadges');
     next.showOwnNameplate = settings.get('showOwnNameplate');
     next.showPlayerNameplates = settings.get('showPlayerNameplates');
+    next.showPetNames = settings.get('showPetNames');
     setNameplateDotScale(settings.nameplateDotRenderScale());
     next.reduceMotionSetting = settings.get('reduceMotion');
     next.setBrightness(settings.get('brightness'));

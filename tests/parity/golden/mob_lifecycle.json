@@ -10,8 +10,8 @@
     "corpse-tick -> respawnMob: a slain wild mob respawns at spawnPos (rng.range(2,8) wanderTimer) and despawnSummonedAdds drops its summoned add",
     "corpse-tick gate: a dungeon mob (spawnPos.x > DUNGEON_X_THRESHOLD) stays dead, no respawn"
   ],
-  "draws": 20,
-  "drawDigest": "eacecc62",
+  "draws": 36,
+  "drawDigest": "41356f3b",
   "frames": [
     {
       "tick": 0,
@@ -34,8 +34,8 @@
       "state": "4a7182fc",
       "events": "71d518b3",
       "rng": {
-        "draws": 5,
-        "digest": "6fda2ce9"
+        "draws": 9,
+        "digest": "d32543fd"
       },
       "label": "pack-frenzy",
       "players": [
@@ -433,11 +433,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "431b3b4f",
+      "state": "500eeec3",
       "events": "6fa945d8",
       "rng": {
-        "draws": 8,
-        "digest": "db719754"
+        "draws": 16,
+        "digest": "1a09d230"
       },
       "label": "throes-arm",
       "players": [
@@ -864,7 +864,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 44
+            "copper": 40
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -905,11 +905,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "5b11af4d",
-      "events": "1abc6ede",
+      "state": "905be76b",
+      "events": "7478432d",
       "rng": {
-        "draws": 9,
-        "digest": "d32543fd"
+        "draws": 17,
+        "digest": "b3757ffe"
       },
       "label": "throes-detonate",
       "players": [
@@ -937,7 +937,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 2293,
-            "damageTaken": 16,
+            "damageTaken": 22,
             "kills": 2,
             "xpGained": 198
           },
@@ -1026,7 +1026,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
-          "hp": 999984,
+          "hp": 999978,
           "id": 1006,
           "inCombat": true,
           "kind": "player",
@@ -1045,7 +1045,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 1.76,
+          "resource": 2.42,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -1338,7 +1338,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 44
+            "copper": 40
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -1379,11 +1379,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "98b44638",
+      "state": "6cba78a2",
       "events": "66bea31b",
       "rng": {
-        "draws": 15,
-        "digest": "7fb5c277"
+        "draws": 27,
+        "digest": "63b17052"
       },
       "label": "respawn",
       "players": [
@@ -1411,7 +1411,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 3389,
-            "damageTaken": 16,
+            "damageTaken": 22,
             "kills": 3,
             "xpGained": 282
           },
@@ -1500,7 +1500,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
-          "hp": 999984,
+          "hp": 999978,
           "id": 1006,
           "inCombat": true,
           "kind": "player",
@@ -1519,7 +1519,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 1.76,
+          "resource": 2.42,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -1812,7 +1812,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 44
+            "copper": 40
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -1883,7 +1883,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 2.750794,
+          "wanderTimer": 6.207463,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1896,11 +1896,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1015,
-      "state": "aef9f533",
+      "state": "cd405702",
       "events": "f1975ce5",
       "rng": {
-        "draws": 20,
-        "digest": "eacecc62"
+        "draws": 36,
+        "digest": "41356f3b"
       },
       "label": "dungeon-stays-dead",
       "players": [
@@ -1928,7 +1928,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 4485,
-            "damageTaken": 16,
+            "damageTaken": 22,
             "kills": 4,
             "xpGained": 366
           },
@@ -2021,7 +2021,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
-          "hp": 999984,
+          "hp": 999978,
           "id": 1006,
           "inCombat": true,
           "kind": "player",
@@ -2040,7 +2040,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 1.76,
+          "resource": 2.42,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -2333,7 +2333,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 44
+            "copper": 40
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -2404,7 +2404,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 2.750794,
+          "wanderTimer": 6.207463,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2439,7 +2439,7 @@
           },
           "level": 5,
           "loot": {
-            "copper": 12
+            "copper": 8
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
@@ -2479,11 +2479,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1015,
-      "state": "aef9f533",
+      "state": "cd405702",
       "events": "741638a5",
       "rng": {
-        "draws": 20,
-        "digest": "eacecc62"
+        "draws": 36,
+        "digest": "41356f3b"
       },
       "label": "final",
       "players": [
@@ -2511,7 +2511,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 4485,
-            "damageTaken": 16,
+            "damageTaken": 22,
             "kills": 4,
             "xpGained": 366
           },
@@ -2604,7 +2604,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
-          "hp": 999984,
+          "hp": 999978,
           "id": 1006,
           "inCombat": true,
           "kind": "player",
@@ -2623,7 +2623,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 1.76,
+          "resource": 2.42,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -2916,7 +2916,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 44
+            "copper": 40
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -2987,7 +2987,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 2.750794,
+          "wanderTimer": 6.207463,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -3022,7 +3022,7 @@
           },
           "level": 5,
           "loot": {
-            "copper": 12
+            "copper": 8
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [

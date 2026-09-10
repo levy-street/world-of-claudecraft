@@ -39,6 +39,7 @@ import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
 import { grantAbilityDevotion } from '../paladin_devotion';
+import { isBuddyMob } from '../pet/buddy_ai';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
   recordCorpseHarvestDeath,
@@ -1629,6 +1630,18 @@ export function handleDeath(
     e.aggroTargetId = null;
     clearThreat(e);
     if (e.ownerId !== null) {
+      // A cosmetic buddy (src/sim/pet/buddy_ai.ts) has no revive command and
+      // no corpse mechanics of its own. isHostileTo/isEnemyTargetCandidate
+      // (sim.ts, targeting.ts) keep it out of ordinary hostile damage
+      // entirely, so this arm should be unreachable in practice, but a
+      // stray non-hostility-gated damage source (a hits-everyone AoE, a
+      // /dev command) must never leave it as a permanent stray corpse the
+      // way the Infinity corpseTimer below deliberately does for a real,
+      // revivable pet. Despawn outright instead; the owner can re-summon it.
+      if (isBuddyMob(e)) {
+        ctx.dropEntity(e.id);
+        return;
+      }
       const owner = ctx.entities.get(e.ownerId);
       const ownerMeta = owner ? ctx.players.get(owner.id) : null;
       if (owner && ownerMeta?.cls === 'hunter') clearPacklordState(ctx, owner);

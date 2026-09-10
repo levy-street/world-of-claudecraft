@@ -1657,6 +1657,7 @@ export const ja_JP: EnTranslations = {
       "showDevBadges": "開発者バッジを表示",
       "showOwnNameplate": "自分のネームプレートを表示",
       "showPlayerNameplates": "プレイヤーのネームプレートを表示",
+      "showPetNames": "ペット名を表示",
       "uiScale": "UIスケール",
       "playerFrameScale": "プレイヤーフレームの大きさ",
       "targetFrameScale": "ターゲットフレームの大きさ",
@@ -2100,6 +2101,7 @@ export const ja_JP: EnTranslations = {
       "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
       "jewelry": "アクセサリー",
       "weapons": "武器",
+      "companions": "コンパニオン",
       "owned": "所有済み",
       "buyAria": "{item}を{honor}で購入",
       "buyOwnedAria": "{item}を{honor}で購入、所有済み",
@@ -2638,6 +2640,12 @@ export const ja_JP: EnTranslations = {
       "watchKick": "Kick で視聴",
       "watchYouTube": "YouTube で視聴",
       "streamerBadgeTitle": "認証済み配信者"
+    },
+    "buddyMenu": {
+      "autolootEnable": "自動収集を有効化",
+      "autolootDisable": "自動収集を無効化",
+      "autolootHint": "バディが30ヤード以内にあるあなた自身の死体から戦利品を回収します。",
+      "cancel": "キャンセル"
     },
     "lootSettings": {
       "title": "分配設定",
@@ -3915,6 +3923,106 @@ export const ja_JP: EnTranslations = {
       "logOpenBank": "{actor} が {amount} でギルド銀行を開設しました",
       "logCharterFee": "{actor} がギルド設立費用 {amount} を支払いました",
       "logAdminPurge": "管理者が {item} を {count} 個削除しました"
+    },
+    "collections": {
+      "title": "ハンティング",
+      "close": "ハンティングを閉じる",
+      "keybindLabel": "ハンティング",
+      "launcherTitle": "ハンティング：バディ、マウント、装備セット",
+      "tabs": {
+        "buddies": "バディ",
+        "mounts": "マウント",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "収集済み",
+        "notOwned": "未収集",
+        "unavailable": "まだ入手不可"
+      },
+      "buddyLore": {
+        "ember_fox": "イーストブルック渓谷の生け垣から来た雌狐。冬枯れの茂みごしに覗く炭のように赤い毛からその名がついた。土地の罠師たちは何世代も前に子狐を狙うのをやめ、代わりに餌を置くようになった。",
+        "moss_hare": "ウィローフェンの野ウサギ。湿った泥炭に一生寝床を作るうちに毛が緑になった。沼の薬草師たちはこれを縁起物とし、戸口に来たものを追い払わせない。",
+        "frog": "マイアフェン湿地はこれを丸々と、のんきに育てる。葦の茂みから一晩じゅう鳴きどおしだ。沼の案内人たちは、これを乗せた舟は決して座礁しないと請け合う。",
+        "crimson_claw_crab": "遠つ岸の潮だまりのカニ。水から上げてしばらく経っても爪は赤いままだ。かつて波止場の連中は板の上でこれを競走させ、小銭を賭けていた。",
+        "golden_sentinel": "アンバーフォールの見張り甲虫。育った樹脂に鍍金されて金色になった。名のほうが樹脂より古い。誰かが樹液を瓶に詰めようと思いつくずっと前から、その種の歩哨がその林を守っていた。",
+        "nightfang": "ナイトブルームの若い狩人。同族の基準で見てもなお静かだ。連れ立つのは人恋しさからで、蛾より大きな獲物は狩らない。",
+        "tuskhorn_boar": "ソーンピーク高地の血統。柵を倒せない猪が欲しかった羊飼いたちによって、脚を短く掛け合わされた。気性のほうはそのまま残った。",
+        "emerald_wolf": "レイスウッドの子狼。林床までほとんど届かない木漏れ日の下では、その毛は緑に見える。森が残していった孤児は、どれもウォーデンたちが育てる。",
+        "tiger": "パームリーチの縞を持ちながら、パームリーチを見たことのない獣。古い見世物小屋が閉じて以来、この血統はずっと飼育下にある。応じるのは笛の音だけで、ほかには何にも応えない。",
+        "cate_coin": "腰を下ろしたコインから決して離れず、物を食べるところを誰も見たことがない猫。イーストブルックの商人たちは今も、どちらがペットなのかで揉めている。",
+        "alon": "どの地図も認めない道から来た旅人のマスコット。計画が狂っている場所に必ず現れる。見て、うなずいて、助けは一切しない。",
+        "trollface": "レイスウッドが世に出し、二度と引き取ろうとしなかった、にやりと笑うもの。これを説明しようとする試みは、いつも説明する側が笑い出して諦めるところで終わる。",
+        "ansem": "扉と闇について語るが、それ以上は決して口を割らない。ナイトブルームの信徒は自分たちのものだと言い張るが、儀式のたびにどこかへ行ってしまう。",
+        "triple_t": "何かが三つなのか、一つのものが三度あるのか。証言はどれも食い違い、当の生き物は数えられるほど長くはじっとしていない。",
+        "kekius": "出自不明の笑う相棒。ゲイルクレストの競走場が縁起物として迎え入れた。これを頼みにしていた厩舎を四つ見送っても、まだ健在だ。",
+        "solbot": "陽光を糧とする小さな自動機械。ドレイクランドの灰に半ば埋もれたところを掘り出されたが、まだ動いていた。これを造った工房は、筐体のどこにも刻印を残していない。",
+        "frostfire": "フロストヴェイルの果てで、氷原を突いて温泉が湧く場所に生まれた。自分がどちらの側のものなのか、いまだに決めかねている。冷たい空気の中では湯気を立て、暖かい所では震える。",
+        "rocky": "ソーンピーク高地のガレ場に棲む石殻の這うもの。のろく、そして何ごとにも動じない。落盤の直前に一瞬だけぴたりと止まる、そのために坑夫たちが飼っている。",
+        "proud_grunt": "戦備倉庫の古参兵。敬礼は保ち、階級は失った。戦元帥ドレイヴン・コールは、その代償を知るだけの名誉を持つ兵にこれを託す。",
+        "loot_goblin": "英雄の証を持つ者なら誰にでもついていくが、盗みを働くところを一度も押さえられていない。補給係ヴェックスは、それは何の証明にもならないと言い張っている。",
+        "penny_goldspark": "ノームの技師の弟子。時間で料金を取るが、その銅貨一枚ぶんの働きは必ずする。防具師ホードは借りを清算するために彼女を引き取り、今では千金を持つ者なら誰にでもこの取り決めを売っている。",
+        "stag": "エバーガーデンの血統。かつてウォーデンたちが乗った大鹿から小さく掛け合わされてきた。手を挙げれば今も頭を下げる。この個体より古い習いだ。",
+        "alpaca": "ゲイルクレストの群れは羊毛と気性のために飼っている。嵐の中でこれほど落ち着いた家畜はいない。この個体は道中きっかり一人に唾を吐く。",
+        "bull": "犬ほどの大きさのイーストブルック渓谷の雄牛。屋内で飼うのを誰もが承知した理由はそれだけだ。気性のほうは小さくならなかった。",
+        "spider": "レイスウッドの織り手。手のひらほどの大きさで、入れられた荷袋を必ず模様替えしてしまう。その糸は、置き換えられた縫い糸より丈夫だ。",
+        "raptor": "ドレイクランドの孵化個体。自分がどれだけ速く走れるかを覚える前に売りに出される。新しい飼い主は必ず「餌を切らすな」と言われ、二度言われる者はいない。",
+        "skeleton": "レイスウッドの塚から這い出し、自分の埃を払って、それ以来ずっと人についてまわっている。この骨が誰のものだったのかは、まだ誰も突き止めていない。",
+        "crystal_lich": "ナイスラクシスそのものの破片で、今なおそれを形づくった冷気を帯びて震えている。レイドの残骸から引き出した者に従うが、そのことをまだ許してはいない。",
+        "forgemaw": "最後の泉のるつぼで鍛えられ、ついに完成しなかったもの。槌の音がまだ響くうちにイグニヴァルの鋳場から歩み出た。見つけられるのはヒロイックの踏破だけだ。この溶けたものは自分を作った炉へ戻り続け、二度炎を生き延びた者について家まで来る。",
+        "crystal_tide": "自分のシーグラスの雫に乗る潮の精。イーストブルック渓谷から遠つ岸まで、夕飯を釣るつもりだった釣り人が静かな水から引き上げた。上がってきた時の水を離さず、戻れと言われても聞かない。",
+        "phantom": "レイスウッドの塚から出た手のひらほどの亡霊。布ばかりで骨はない。閉じたはずの荷袋の中に現れ、人恋しさから居着いてしまう。何を求めているのかは誰にも分からず、これまで一度も誰かを脅かそうとしたことがない。",
+        "emberfall_phoenix": "秋ごとに燃え尽きて一粒の燃えさしとなり、春には自らの灰から立ち上がってくる。誰に訊いても言えるのはそれだけだ。巣を見つけた者はおらず、同じ個体を二度捕らえた者もいない。"
+      },
+      "petKind": {
+        "beast": "ビースト",
+        "elemental": "エレメンタル",
+        "humanoid": "ヒューマノイド",
+        "undead": "アンデッド",
+        "celebrity": "セレブリティ"
+      },
+      "armor": {
+        "cloth": "布",
+        "mail": "Mail",
+        "leather": "革"
+      },
+      "stat": {
+        "intellect": "知力",
+        "agility": "敏捷性",
+        "strength": "筋力",
+        "mixed": "ハイブリッド"
+      },
+      "set": {
+        "owned": "{total}部位中{owned}部位",
+        "itemLevel": "アイテムレベル {level}",
+        "bonusLabel": "{pieces}部位"
+      },
+      "detail": {
+        "dropLabel": "ドロップ元",
+        "vendorLabel": "Sold by",
+        "bindLabel": "装備制限",
+        "sellLabel": "商人の買取額",
+        "marketLabel": "ワールドマーケット",
+        "exchangeLabel": "$WOC取引所",
+        "setLabel": "収集済み",
+        "drop": "{mob}（{location}）、討伐ごとに{chance}%",
+        "heroicDrop": "{mob}（{location}）、ヒロイック限定、討伐ごとに{chance}%",
+        "dropWithHeroic": "{mob}（{location}）、討伐ごとに{chance}%、ヒロイックでは{heroicChance}%",
+        "globalDrop": "任意の敵、討伐ごとに{chance}%、同レアリティ{count}種のうち1つ",
+        "fishingDrop": "どこでも釣り、釣り上げるごとに{chance}%",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "名誉{amount}",
+        "marksPrice": "英雄の証{amount}",
+        "noSource": "ゲーム内に入手手段はまだありません",
+        "noItem": "これを与えるアイテムはまだありません",
+        "tradeable": "取引可能",
+        "soulbound": "魂縛",
+        "noSell": "売却不可",
+        "marketAtMerchant": "商人のところで表示",
+        "marketChecking": "確認中…",
+        "marketNone": "出品なし",
+        "exchangeNone": "出品なし",
+        "exchangeUnavailable": "このクライアントでは利用できません"
+      }
     },
     "calendar": {
       "title": "イベントカレンダー",
@@ -10693,7 +10801,9 @@ export const ja_JP: EnTranslations = {
       "flask": "フラスコ",
       "scroll": "巻物",
       "bag": "バッグ",
-      "mount": "マウント"
+      "mount": "マウント",
+      "buddy": "バディ",
+      "skin": "Skin"
     },
     "stats": {
       "armor": "防御力",
@@ -14732,6 +14842,102 @@ export const ja_JP: EnTranslations = {
       "ps_passing_stone": {
         "name": "たましいの石"
       },
+      "whistle_ember_fox": {
+        "name": "燃えさし狐の笛"
+      },
+      "whistle_moss_hare": {
+        "name": "コケウサギの笛"
+      },
+      "whistle_frog": {
+        "name": "カエルの笛"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "紅爪ガニの笛"
+      },
+      "whistle_golden_sentinel": {
+        "name": "黄金の歩哨の笛"
+      },
+      "whistle_nightfang": {
+        "name": "ナイトファングの笛"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "タスクホーン・ボアの笛"
+      },
+      "whistle_emerald_wolf": {
+        "name": "エメラルドウルフの笛"
+      },
+      "whistle_tiger": {
+        "name": "トラの笛"
+      },
+      "whistle_cate_coin": {
+        "name": "ケイトコインの笛"
+      },
+      "whistle_alon": {
+        "name": "アロンの笛"
+      },
+      "whistle_trollface": {
+        "name": "トロールフェイスの笛"
+      },
+      "whistle_ansem": {
+        "name": "アンセムの笛"
+      },
+      "whistle_triple_t": {
+        "name": "トリプルTの笛"
+      },
+      "whistle_kekius": {
+        "name": "ケキウスの笛"
+      },
+      "whistle_solbot": {
+        "name": "ソルボットの笛"
+      },
+      "whistle_frostfire": {
+        "name": "フロストファイアの笛"
+      },
+      "whistle_rocky": {
+        "name": "ロッキーの笛"
+      },
+      "whistle_proud_grunt": {
+        "name": "誇り高きグラントの笛"
+      },
+      "whistle_loot_goblin": {
+        "name": "戦利品ゴブリンの笛"
+      },
+      "whistle_penny_goldspark": {
+        "name": "ペニー・ゴールドスパークの笛"
+      },
+      "whistle_stag": {
+        "name": "牡鹿の笛"
+      },
+      "whistle_alpaca": {
+        "name": "アルパカの笛"
+      },
+      "whistle_bull": {
+        "name": "雄牛の笛"
+      },
+      "whistle_spider": {
+        "name": "クモの笛"
+      },
+      "whistle_raptor": {
+        "name": "ラプターの笛"
+      },
+      "whistle_skeleton": {
+        "name": "スケルトンの笛"
+      },
+      "whistle_crystal_lich": {
+        "name": "クリスタルリッチの笛"
+      },
+      "whistle_forgemaw": {
+        "name": "溶けたフォージモウの笛"
+      },
+      "whistle_crystal_tide": {
+        "name": "クリスタルタイドの笛"
+      },
+      "whistle_phantom": {
+        "name": "ファントムの笛"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "エンバーフォール・フェニックスの笛"
+      },
       "lastflame_core": {
         "name": "最後の炎の核"
       },
@@ -16947,6 +17153,102 @@ export const ja_JP: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地の声ズルガー"
+      },
+      "buddy_ember_fox": {
+        "name": "燃えさし狐"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "エンバーフォール・フェニックス"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "紅爪ガニ"
+      },
+      "buddy_golden_sentinel": {
+        "name": "黄金の歩哨"
+      },
+      "buddy_nightfang": {
+        "name": "ナイトファング"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "タスクホーン・ボア"
+      },
+      "buddy_emerald_wolf": {
+        "name": "エメラルドウルフ"
+      },
+      "buddy_tiger": {
+        "name": "トラ"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "トロールフェイス"
+      },
+      "buddy_ansem": {
+        "name": "アンセム"
+      },
+      "buddy_triple_t": {
+        "name": "トリプルT"
+      },
+      "buddy_kekius": {
+        "name": "ケキウス"
+      },
+      "buddy_solbot": {
+        "name": "ソルボット"
+      },
+      "buddy_frostfire": {
+        "name": "フロストファイア"
+      },
+      "buddy_rocky": {
+        "name": "ロッキー"
+      },
+      "buddy_proud_grunt": {
+        "name": "誇り高きグラント"
+      },
+      "buddy_loot_goblin": {
+        "name": "戦利品ゴブリン"
+      },
+      "buddy_penny_goldspark": {
+        "name": "ペニー・ゴールドスパーク"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "アルパカ"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "クモ"
+      },
+      "buddy_raptor": {
+        "name": "ラプター"
+      },
+      "buddy_skeleton": {
+        "name": "スケルトン"
+      },
+      "buddy_crystal_lich": {
+        "name": "クリスタルリッチ"
+      },
+      "buddy_forgemaw": {
+        "name": "溶けたフォージモウ"
+      },
+      "buddy_crystal_tide": {
+        "name": "クリスタルタイド"
+      },
+      "buddy_phantom": {
+        "name": "ファントム"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"

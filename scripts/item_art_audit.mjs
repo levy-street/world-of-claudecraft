@@ -126,14 +126,21 @@ const build = await buildItemArtAudit({
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
     // 1087 + 212 + 2 = 1301. Verified with `node scripts/item_art_audit.mjs
     // --verify-only` against the merged tree.
-    catalogCount: 1283,
-    liveItemCount: 1301,
-    pendingArtCount: 0,
+    //
+    // RESOLVED for the merge of df2ae9880f (PR #3944, release/v0.42.0) into
+    // feature/buddy-companion-system: the buddy branch's 32 whistle items add
+    // on top with no overlap (31 with committed art, plus
+    // whistle_emberfall_phoenix, whose GLB is committed but not yet rendered
+    // to an icon -- BUDDY_ART_PENDING_ITEM_IDS). Verified with
+    // `node scripts/item_art_audit.mjs --verify-only` against the merged tree.
+    catalogCount: 1314,
+    liveItemCount: 1332,
+    pendingArtCount: 1,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 31,
-    groupCount: 25,
+    sheetPageCount: 32,
+    groupCount: 26,
   },
 });
 assertItemArtAuditPass(build);

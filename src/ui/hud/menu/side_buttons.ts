@@ -25,6 +25,12 @@ export const SIDE_BUTTONS: readonly [selector: string, action: string, labelKey:
     ['#mm-bag', 'bags', 'itemUi.bags.title'],
     ['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],
     ['#mm-arena', 'arena', 'hudChrome.pvp.launcherTitle'],
+    // The Hunting window (buddies/mounts/item sets), dropped from this table by
+    // a textual merge that replaced the array wholesale (see the resolution
+    // note in hud.ts's refreshKeybindLabels history); index.html still carries
+    // #mm-collections between #mm-arena and #mm-dfinder, so it is restored here
+    // in that same position.
+    ['#mm-collections', 'collections', 'hudChrome.collections.launcherTitle'],
     ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
     ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
     ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],

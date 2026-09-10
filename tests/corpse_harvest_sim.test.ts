@@ -2510,7 +2510,13 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // hub_training_dummy and hub_healing_dummy) ship untagged too, the same shape as the
     // Bone Spike above: they are struck or healed, never harvested, so they grow MOBS
     // without touching `tagged` either.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(191);
+    // 223, not 191: the merge of df2ae9880f (PR #3944, release/v0.42.0) into
+    // feature/buddy-companion-system adds the 32 buddy mob templates
+    // (src/sim/content/buddy_mobs.ts, one per BuddyKey): a cosmetic follower
+    // is struck by nothing and heals nothing, the same untagged shape as the
+    // practice dummies above, so it grows MOBS without touching `tagged`
+    // either.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(223);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

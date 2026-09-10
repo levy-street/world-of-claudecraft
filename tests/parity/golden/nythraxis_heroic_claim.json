@@ -10,8 +10,8 @@
     "awardHeroicMarks on a heroic raid kill (instances/dungeons) plus the raid lockout, neither of which a normal claim grants",
     "class:warrior"
   ],
-  "draws": 12,
-  "drawDigest": "e512a40d",
+  "draws": 17,
+  "drawDigest": "21ff5c13",
   "frames": [
     {
       "tick": 0,
@@ -735,11 +735,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1016,
-      "state": "a15d420f",
-      "events": "a3304149",
+      "state": "597e23e2",
+      "events": "b81eb6d0",
       "rng": {
-        "draws": 12,
-        "digest": "e512a40d"
+        "draws": 17,
+        "digest": "21ff5c13"
       },
       "label": "death",
       "players": [
@@ -886,11 +886,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1066,11 +1066,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1242,11 +1242,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1418,11 +1418,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1594,11 +1594,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1933,7 +1933,11 @@
               },
               {
                 "count": 1,
-                "itemId": "stormcallers_focus"
+                "itemId": "pattern_masters_field_forge"
+              },
+              {
+                "count": 1,
+                "itemId": "scepter_of_the_deathless_court"
               }
             ]
           },
@@ -1981,11 +1985,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1016,
-      "state": "a15d420f",
+      "state": "597e23e2",
       "events": "741638a5",
       "rng": {
-        "draws": 12,
-        "digest": "e512a40d"
+        "draws": 17,
+        "digest": "21ff5c13"
       },
       "label": "final",
       "players": [
@@ -2132,11 +2136,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2312,11 +2316,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2488,11 +2492,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2664,11 +2668,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2840,11 +2844,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -3179,7 +3183,11 @@
               },
               {
                 "count": 1,
-                "itemId": "stormcallers_focus"
+                "itemId": "pattern_masters_field_forge"
+              },
+              {
+                "count": 1,
+                "itemId": "scepter_of_the_deathless_court"
               }
             ]
           },

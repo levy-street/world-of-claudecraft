@@ -220,6 +220,10 @@ export function blankEntity(id: number): Entity {
     skinCatalog: 'class',
     skin: 0,
     mountKey: '',
+    // The active cosmetic buddy, the mountKey twin: an identity field the
+    // snapshot mirror fills, blank on a fresh shell (src/sim/content/buddies.ts).
+    buddyKey: '',
+    buddyAutoloot: false,
     mountCastRemaining: 0,
     mountCastKey: '',
     mainhandItemId: null,

@@ -240,6 +240,42 @@ const MOB_IDS = [
   'wildheart_hexcaller',
   'wildheart_beastmaster',
   'wildheart_high_priest',
+  // Cosmetic buddy followers (src/sim/content/buddy_mobs.ts). Their nameplate
+  // is off by default (the dedicated "Show Pet Names" option), but the
+  // canonical-fallback name still has to resolve in every locale the moment
+  // a player turns it on.
+  'buddy_ember_fox',
+  'buddy_emberfall_phoenix',
+  'buddy_moss_hare',
+  'buddy_frog',
+  'buddy_crimson_claw_crab',
+  'buddy_golden_sentinel',
+  'buddy_nightfang',
+  'buddy_tuskhorn_boar',
+  'buddy_emerald_wolf',
+  'buddy_tiger',
+  'buddy_cate_coin',
+  'buddy_alon',
+  'buddy_trollface',
+  'buddy_ansem',
+  'buddy_triple_t',
+  'buddy_kekius',
+  'buddy_solbot',
+  'buddy_frostfire',
+  'buddy_rocky',
+  'buddy_proud_grunt',
+  'buddy_loot_goblin',
+  'buddy_penny_goldspark',
+  'buddy_stag',
+  'buddy_alpaca',
+  'buddy_bull',
+  'buddy_spider',
+  'buddy_raptor',
+  'buddy_skeleton',
+  'buddy_crystal_lich',
+  'buddy_forgemaw',
+  'buddy_crystal_tide',
+  'buddy_phantom',
 ] as const;
 
 const NPC_IDS = [

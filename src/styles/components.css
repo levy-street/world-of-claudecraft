@@ -13329,6 +13329,200 @@
     gap: 6px;
   }
 
+  /* ---------- Collections (buddies, mounts, item sets) ---------- */
+  #collections-window {
+    width: 620px;
+    --window-pad: 14px;
+  }
+  .col-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 8px 0 10px;
+  }
+  .col-tab {
+    flex: 1;
+    font-family: var(--title-font);
+    font-size: 12px;
+    padding: 5px 4px;
+    color: var(--color-text-muted);
+    background: linear-gradient(#2a2418, #1d1811);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .col-tab.active {
+    color: var(--gold);
+    background: linear-gradient(#4a3c1c, #302713);
+  }
+  /* Readability pass (owner request): every word in this window is white and
+     bold. The item-quality tints the rows carry (q-common through q-epic) read
+     too dark against the panel to scan a long catalog by, so inside this window
+     the quality classes lose the color argument and the text wins it. Scoped to
+     #collections-window, so the same q-* classes keep their tints everywhere
+     else in the HUD. */
+  #collections-window,
+  #collections-window .col-row-name,
+  #collections-window .col-row-state,
+  #collections-window .col-detail-name,
+  #collections-window .col-line-label,
+  #collections-window .col-line-value,
+  #collections-window .col-note,
+  #collections-window .col-tab {
+    color: #fff;
+    font-weight: 700;
+  }
+  /* Two panes: the catalog list scrolls, the detail pane holds the preview. */
+  .col-body {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .col-list {
+    flex: 1 1 46%;
+    max-height: 620px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .col-detail {
+    flex: 1 1 54%;
+    max-height: 620px;
+    overflow-y: auto;
+  }
+  .col-row {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 3px 5px;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .col-row.active {
+    border-color: var(--color-border-showcase);
+    background: #ffffff0f;
+  }
+  /* An entry nothing in the game grants yet: still listed, visibly dimmed. */
+  .col-row.col-locked {
+    opacity: 0.55;
+  }
+  .col-row-name {
+    flex: 1;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+  .col-row-state {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .col-group-head {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 11px;
+    margin: 10px 0 3px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    padding-bottom: 2px;
+  }
+  /* The shared turntable's canvas is appended here by Hud.mountSharedPreview. */
+  /* The idle turntable, at double the height it shipped at (owner request):
+     a buddy rig is small in frame, and the pane is the only place a player
+     ever sees one up close. */
+  .col-preview {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    margin-bottom: 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .col-detail-name {
+    font-family: var(--title-font);
+    font-size: 14px;
+    margin: 0 0 6px;
+  }
+  /* The companion blurb: flavour, so it reads quieter than the derived facts
+     under it and never competes with them for the eye. */
+  .col-lore {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-style: italic;
+    line-height: 1.45;
+    color: #ded6c2;
+  }
+  .col-line {
+    display: flex;
+    gap: 8px;
+    margin: 2px 0;
+    font-size: 11px;
+  }
+  .col-line-label {
+    flex: 0 0 96px;
+    color: var(--color-text-muted);
+  }
+  .col-line-value {
+    flex: 1;
+  }
+  .col-note {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .col-pieces {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  /* A piece the player already owns: green tick beside the name and a green
+     ring on the icon, so a set can be read at a glance without counting. */
+  .col-piece.col-owned .item-icon {
+    outline: 2px solid #4fdc6a;
+    outline-offset: -2px;
+    border-radius: 3px;
+  }
+  .col-tick {
+    color: #4fdc6a;
+    margin-right: 4px;
+    font-weight: 700;
+  }
+  /* Item level rides the name line, dimmer than the name it qualifies. */
+  .col-ilvl {
+    color: #c9c1a8;
+    font-size: 10px;
+    font-weight: 400;
+  }
+  /* A set bonus the player has the pieces for reads live, the rest sit muted,
+     matching how the item tooltip lights a met tier. */
+  .col-bonus .col-line-value {
+    opacity: 0.6;
+  }
+  .col-bonus-live .col-line-value {
+    opacity: 1;
+    color: #4fdc6a;
+  }
+  .col-piece {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 8px;
+    padding: 6px 0;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .col-piece .col-line,
+  .col-piece .col-note {
+    grid-column: 2;
+  }
+  /* An entry with no committed item art: an empty cell at icon size, never a
+     broken image. */
+  .col-noart {
+    display: inline-block;
+    background: #ffffff0a;
+  }
+
   /* ---------- Ashen Coliseum (arena) ---------- */
   #arena-window {
     width: 360px;

@@ -63,6 +63,7 @@ import {
   OBJECT_RESPAWN,
   REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
   REALM_BUILDER_MONUMENT_TEMPLATE_ID,
+  type Vec3,
 } from './types';
 import { markWorldBossLooted } from './world_boss';
 
@@ -96,12 +97,19 @@ function corpseLootRights(
 // `quiet` (default false) suppresses the full-bags toast: the walk-by pass retries
 // every couple of seconds while the player stands near a corpse, so a full-bags
 // player would otherwise get the toast on loop; a deliberate click keeps it.
+// `reachFrom` (default the looting player's own position) is the point the
+// INTERACT_RANGE check is measured from. The ONE caller that passes it is the buddy
+// autoloot errand (src/sim/pet/buddy_autoloot.ts): the owner stays put and sends the
+// buddy, so it is the BUDDY that has to be standing on the corpse. Everything else
+// about the loot is still the owner's (their rights, their bags, their money), so
+// only the range origin moves, never the identity.
 export function lootCorpse(
   ctx: SimContext,
   mobId: number,
   pid?: number,
   honorFfa = true,
   quiet = false,
+  reachFrom?: Vec3,
 ): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
@@ -124,7 +132,7 @@ export function lootCorpse(
     ctx.error(meta.entityId, "You don't have permission to loot that.");
     return false;
   }
-  if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) {
+  if (dist2d(reachFrom ?? p.pos, mob.pos) > INTERACT_RANGE) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
   }

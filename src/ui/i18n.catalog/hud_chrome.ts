@@ -2053,6 +2053,10 @@ export const hudChromeStrings = {
     // Interface panel toggle: render other players' overhead nameplates (on by
     // default); off declutters crowded hubs, the current target stays visible.
     showPlayerNameplates: 'Show Player Nameplates',
+    // Interface panel toggle: render a cosmetic buddy follower's nameplate,
+    // name only, never a health bar (off by default — a buddy cannot be
+    // attacked and has no health worth showing).
+    showPetNames: 'Show Pet Names',
     // Interface panel: global HUD zoom slider, and the mirror of the landing
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',
@@ -2657,6 +2661,9 @@ export const hudChromeStrings = {
     gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
     jewelry: 'Jewelry',
     weapons: 'Weapons',
+    // Cosmetic buddy whistles (the Proud Grunt companion). Its own heading so a
+    // companion never reads as a set piece the collection count is waiting on.
+    companions: 'Companions',
     // Marks a piece the viewer already wears or carries. The tile still sells.
     owned: 'Owned',
     // The buy tile's accessible name, as ONE key per arm rather than a base name
@@ -3515,6 +3522,19 @@ export const hudChromeStrings = {
     // The chat-line badge marking a verified streamer's name; opens the same
     // player menu the name itself opens, with the channel link(s) up top.
     streamerBadgeTitle: 'Verified streamer',
+  },
+  // Right-click (desktop) / double-tap (touch) menu on the target frame when
+  // the target is your OWN cosmetic buddy. A buddy takes no pet commands, so
+  // this menu is only the autoloot errand: while it is on, the buddy walks to
+  // your own lootable corpses within 30 yards and loots them for you.
+  buddyMenu: {
+    autolootEnable: 'Enable Autoloot',
+    autolootDisable: 'Disable Autoloot',
+    // Hover/`title` explanation on whichever of the two rows is showing, so the
+    // 30-yard rule and the "your corpses only" rule are discoverable from the
+    // menu itself rather than only from patch notes.
+    autolootHint: 'Your buddy fetches loot from your own corpses within 30 yards.',
+    cancel: 'Cancel',
   },
   lootSettings: {
     title: 'Loot Settings',
@@ -5617,6 +5637,164 @@ export const hudChromeStrings = {
     // gap, and it names NOBODY: the underlying row's character is the escrow
     // carrier, a bystander who did not order it.
     logAdminPurge: 'An administrator removed {count} {item}',
+  },
+  // The Collections window (src/ui/collections/): every buddy, mount and
+  // epic-or-better armour set in the game, with where each one comes from.
+  // Sources are derived from the live content tables, so these strings are
+  // frames around derived values, never a second copy of the content itself.
+  collections: {
+    title: 'Hunting',
+    close: 'Close hunting',
+    keybindLabel: 'Hunting',
+    launcherTitle: 'Hunting: buddies, mounts and item sets',
+    tabs: {
+      buddies: 'Buddies',
+      mounts: 'Mounts',
+      sets: 'Item Sets',
+    },
+    state: {
+      owned: 'Collected',
+      notOwned: 'Not collected',
+      // The catalog carries entries with no source assigned yet. The row still
+      // renders: "not in the game yet" is the answer a collector needs.
+      unavailable: 'Not obtainable yet',
+    },
+    // One blurb per companion: where it comes from and a line of its story.
+    // Flavour only, and deliberately NOT the acquisition line beside it: the
+    // source row is derived from the live tables and stays correct on its own,
+    // so this text never repeats a drop rate or a vendor it could contradict.
+    buddyLore: {
+      ember_fox:
+        'A vixen out of the Eastbrook Vale hedgerows, named for the coal-red coat that shows through winter scrub. The trappers there gave up on the kits generations ago and started leaving food out instead.',
+      moss_hare:
+        'The Willowfen hare, green-furred from a lifetime bedded down in wet peat. Fen herbalists count them lucky and will not have one chased off a doorstep.',
+      frog: 'Mirefen Marsh raises them fat and unbothered, singing all night from the reed beds. The marsh guides swear a boat carrying one never runs aground.',
+      crimson_claw_crab:
+        'A Farshore tidal crab whose claw stays red long after it leaves the water. Dock crews used to race them along the boards for coin.',
+      golden_sentinel:
+        'A watch-beetle of the Amberfall, gilded by the resin it grew up in. The name is older than the resin: sentinels of a kind kept those groves long before anyone thought to bottle the sap.',
+      nightfang:
+        'A young Nightbloom hunter, silent even by the standards of its kind. It follows for the company and hunts nothing larger than a moth.',
+      tuskhorn_boar:
+        'Thornpeak stock, bred short-legged by shepherds who wanted a boar that could not put a fence down. It kept the temper regardless.',
+      emerald_wolf:
+        'A Wraithwood pup, its coat green in the canopy light that never quite reaches the forest floor. The wardens raise whichever orphans the wood leaves behind.',
+      tiger:
+        'Palmreach stripes on an animal that has never seen the Palmreach: the line has been kept in captivity since the old menageries closed. It answers to a whistle and to nothing else.',
+      cate_coin:
+        'A cat that will not be parted from the coin it sits on, and that nobody has ever seen eat. Eastbrook merchants still argue over which of the two is the pet.',
+      alon: "A traveller's mascot from a road no map will admit to, turning up wherever a plan is going badly. It watches, it approves, and it offers no help whatsoever.",
+      trollface:
+        'A grinning thing the Wraithwood put out and would not take back. Every attempt to describe it ends with the describer laughing and giving up.',
+      ansem:
+        'It speaks of doors and of darkness and will not be drawn further on either. The Nightbloom cultists claim it as theirs; it wanders off whenever they hold a rite.',
+      triple_t:
+        'Three of something, or one thing three times over. The accounts disagree, and the creature will not hold still long enough to be counted.',
+      kekius:
+        'A laughing companion of unclear origin, adopted by the Galecrest race yards as a charm. It has outlived four stables that swore by it.',
+      solbot:
+        'A small sun-fed automaton, dug half-buried out of the Drakelands ash and still ticking. Whatever workshop built it left no mark anywhere on the casing.',
+      frostfire:
+        'Born in the Frostveil Reach where a hot spring surfaces through the ice field, and it has never settled on which half it belongs to. It steams in cold air and shivers in warm.',
+      rocky:
+        'A stone-shelled crawler off the Thornpeak scree, slow and thoroughly unbothered. Miners keep them for the way they go still a moment before a collapse.',
+      proud_grunt:
+        'A veteran of the Warfare stores who kept the salute and lost the rank. Warmarshal Draven Kole hands one to any soldier with honor enough to know what that costs.',
+      loot_goblin:
+        'It follows anyone carrying Heroic Marks and has never once been caught stealing. Quartermaster Vex maintains that this proves nothing at all.',
+      penny_goldspark:
+        "A gnome tinker's apprentice who charges by the hour and is worth every copper of it. Armorer Hode took her on to settle a debt and now sells the arrangement to anyone holding a thousand gold.",
+      stag: 'Evergarden bloodline, bred down from the great stags the wardens once rode. It still lowers its head at a raised hand, from a habit older than the animal.',
+      alpaca:
+        'The Galecrest herds keep them for wool and for temper: nothing stays calmer in a storm. This one will spit at exactly one person per journey.',
+      bull: 'A Vale bull the size of a dog, which is the only reason anyone agreed to keep one indoors. The temperament did not scale down with the rest.',
+      spider:
+        'A Wraithwood weaver, palm-sized, that redecorates any pack it is carried in. The webbing is stronger than the thread it replaces.',
+      raptor:
+        'Drakelands hatchling stock, sold on before it learns how fast it can run. Every new owner is told to keep it fed, and none of them need telling twice.',
+      skeleton:
+        'It came up out of the Wraithwood barrows, dusted itself off, and has followed people about ever since. Nobody has established whose bones these were.',
+      crystal_lich:
+        'A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.',
+      forgemaw:
+        "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
+      crystal_tide:
+        'A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.',
+      phantom:
+        'A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.',
+      emberfall_phoenix:
+        'It burns down to an ember every autumn and comes back up out of its own ash by spring, which is the whole of what anyone can tell you about it. Nobody has ever found a nest, and nobody has ever caught one twice.',
+    },
+    // The buddy tab groups by what a companion IS before it sorts by rarity.
+    petKind: {
+      beast: 'Beasts',
+      elemental: 'Elementals',
+      humanoid: 'Humanoids',
+      undead: 'Undead',
+      // The guest characters: a group the sim has no creature type for, so
+      // the catalog authors it per companion (content/buddies.ts BuddyKind).
+      celebrity: 'Celebrities',
+    },
+    armor: {
+      cloth: 'Cloth',
+      mail: 'Mail',
+      leather: 'Leather',
+    },
+    stat: {
+      intellect: 'Intellect',
+      agility: 'Agility',
+      strength: 'Strength',
+      // A family whose pieces carry two primary stats evenly. A real identity,
+      // not a missing value.
+      mixed: 'Hybrid',
+    },
+    set: {
+      owned: '{owned} of {total} pieces',
+      // Item level, the tab's sort key: a player compares two families by it,
+      // so it rides both the family header and every piece row.
+      itemLevel: 'ilvl {level}',
+      // A set bonus tier. The bonus TEXT itself comes from the item entity
+      // catalog, the same source the item tooltip reads.
+      bonusLabel: '{pieces} pieces',
+    },
+    detail: {
+      dropLabel: 'Drops from',
+      vendorLabel: 'Sold by',
+      bindLabel: 'Binding',
+      sellLabel: 'Vendor pays',
+      marketLabel: 'World Market',
+      exchangeLabel: '$WOC Exchange',
+      setLabel: 'Collected',
+      drop: '{mob} ({location}), {chance}% per kill',
+      heroicDrop: '{mob} ({location}), Heroic only, {chance}% per kill',
+      // A row that drops at two rates: the same boss, the harder kill, better
+      // odds. Both figures belong on the line or the Heroic run looks equal.
+      dropWithHeroic: '{mob} ({location}), {chance}% per kill, {heroicChance}% on Heroic',
+      // The buddy whistles ride one shared per-kill roll for their whole rarity
+      // tier, so the odds belong to the tier and the winner is drawn from it.
+      globalDrop: 'Any enemy, {chance}% per kill, one of {count} at this rarity',
+      // Fishing: no mob to name and no place to name either, since any water
+      // in the world pays the same share of a landed catch.
+      fishingDrop: 'Fishing anywhere, {chance}% per catch',
+      vendor: '{npc} ({location}) for {price}',
+      honorPrice: '{amount} Honor',
+      marksPrice: '{amount} Heroic Marks',
+      noSource: 'No source in the game yet',
+      noItem: 'No item grants this yet',
+      tradeable: 'Tradeable',
+      soulbound: 'Soulbound',
+      noSell: 'Cannot be sold',
+      // The market figure is a live server read the client only receives while
+      // the player has the item staged at the Merchant, so the pane says where
+      // the number comes from rather than showing a stale one.
+      marketAtMerchant: 'Shown at the Merchant',
+      marketChecking: 'Checking...',
+      marketNone: 'No listings',
+      exchangeNone: 'No listings',
+      // Browser web only (docs/prd/woc/marketplace.md): every wrapped shell
+      // stays fail-closed, so the row says so instead of showing a blank price.
+      exchangeUnavailable: 'Not available on this client',
+    },
   },
   // The event calendar window: recurring system events plus the guild lane
   // (booked by officers and the Guild Master, mirrored via socialInfo).

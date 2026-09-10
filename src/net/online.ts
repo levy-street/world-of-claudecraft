@@ -16,6 +16,7 @@ import {
 } from '../sim/account_flair';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
+import { type BuddyKey, normalizeBuddyKey } from '../sim/content/buddies';
 import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
 import { applyAbilityCostTail, resolveAbilityChain } from '../sim/combat/ability_resolution';
 import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
@@ -2737,6 +2738,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.level = w.lv;
         e.skin = w.sk ?? 0;
         e.mountKey = w.mnt ?? ''; // active rideable mount ('' dismounted); feeds speed + render
+        e.buddyKey = w.bud ?? ''; // active cosmetic buddy ('' none); HUD/UI identity only, not read by the renderer (the buddy's own owned mob entity carries the body)
+        e.buddyAutoloot = w.budal === true; // buddy autoloot armed; HUD/UI only (the errand itself runs server-side)
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
@@ -3273,6 +3276,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
           .filter((k): k is MountKey => k !== '');
       }
       if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
+      // IWorldBuddies self-decode: budOwn is delta-guarded (omitted keeps the
+      // prior mirror), mirrored verbatim like mntOwn.
+      if (Array.isArray(s.budOwn)) {
+        this.selfOwnedBuddies = (s.budOwn as unknown[])
+          .map((k) => normalizeBuddyKey(typeof k === 'string' ? k : ''))
+          .filter((k): k is BuddyKey => k !== '');
+      }
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
       if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
@@ -4129,6 +4139,22 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   toggleMounted(): void {
     this.cmd({ cmd: 'mount_toggle' });
+  }
+  // --- IWorldBuddies: collection + dismiss. Summoning a specific buddy is an
+  // item use, not a buddy command, so nothing here sends one. The toggle stays
+  // authoritative (server-validated ownership) and the active identity mirror
+  // (bud) lands on the next snapshot either way. ---
+  ownedBuddies(): readonly BuddyKey[] {
+    return this.selfOwnedBuddies;
+  }
+  toggleBuddy(): void {
+    this.cmd({ cmd: 'buddy_toggle' });
+  }
+  // Autoloot is a server-authoritative preference like the toggle above: no
+  // optimistic local flip, the `budal` identity field on the next snapshot is
+  // what the menu renders from.
+  setBuddyAutoloot(enabled: boolean): void {
+    this.cmd({ cmd: 'buddy_autoloot', on: enabled });
   }
   // --- riding skill purchase: server-authoritative; on success the snapshot
   // delta (mntRtd=true) confirms the skill was granted. ---
@@ -5041,6 +5067,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Riding skill, mirrored from the snapshot `s.mntRtd`. False until the server
   // confirms the player purchased it from Marla.
   private selfRidingTrained = false;
+  // The owned buddy collection, mirrored from `s.budOwn`. Starts empty: nothing
+  // is owned until the server says so.
+  private selfOwnedBuddies: BuddyKey[] = [];
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};

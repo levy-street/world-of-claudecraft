@@ -237,6 +237,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     mountKey: '',
     mountCastRemaining: 0,
     mountCastKey: '',
+    buddyKey: '',
+    buddyAutoloot: false,
     mainhandItemId: null,
     offhandItemId: null,
     weaponSkinLoadout: {},

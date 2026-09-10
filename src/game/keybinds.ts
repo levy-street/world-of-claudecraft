@@ -261,6 +261,15 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyG'],
   },
   {
+    // Shift+KeyC: bare KeyC is the character sheet, and Collections is its
+    // catalog sibling, so it sits on the same letter one modifier up.
+    id: 'collections',
+    label: 'Hunting (Buddies, Mounts and Item Sets)',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyC'],
+  },
+  {
     // Shift+KeyI: bare KeyI belongs to Calendar (unchanged).
     id: 'dungeonFinder',
     label: 'Dungeon Finder',

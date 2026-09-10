@@ -1657,6 +1657,7 @@ export const zh_TW: EnTranslations = {
       "showDevBadges": "顯示開發者徽章",
       "showOwnNameplate": "顯示我的姓名板",
       "showPlayerNameplates": "顯示玩家姓名板",
+      "showPetNames": "顯示寵物名稱",
       "uiScale": "介面縮放",
       "playerFrameScale": "玩家框縮放",
       "targetFrameScale": "目標框縮放",
@@ -2100,6 +2101,7 @@ export const zh_TW: EnTranslations = {
       "gossipOptionAria": "瀏覽 {name} 提供的戰爭套裝商店",
       "jewelry": "飾品",
       "weapons": "武器",
+      "companions": "夥伴",
       "owned": "已擁有",
       "buyAria": "以 {honor} 購買 {item}",
       "buyOwnedAria": "以 {honor} 購買 {item}，已擁有",
@@ -2638,6 +2640,12 @@ export const zh_TW: EnTranslations = {
       "watchKick": "在 Kick 觀看",
       "watchYouTube": "在 YouTube 觀看",
       "streamerBadgeTitle": "認證主播"
+    },
+    "buddyMenu": {
+      "autolootEnable": "開啟自動拾取",
+      "autolootDisable": "關閉自動拾取",
+      "autolootHint": "你的夥伴會去拾取 30 碼內屬於你自己的屍體上的戰利品。",
+      "cancel": "取消"
     },
     "lootSettings": {
       "title": "拾取設定",
@@ -3915,6 +3923,106 @@ export const zh_TW: EnTranslations = {
       "logOpenBank": "{actor} 花費 {amount} 開啟了公會銀行",
       "logCharterFee": "{actor} 支付了 {amount} 的公會創建費用",
       "logAdminPurge": "管理員移除了 {count} 個 {item}"
+    },
+    "collections": {
+      "title": "狩獵",
+      "close": "關閉狩獵",
+      "keybindLabel": "狩獵",
+      "launcherTitle": "狩獵：夥伴、坐騎與套裝",
+      "tabs": {
+        "buddies": "夥伴",
+        "mounts": "坐騎",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "已收集",
+        "notOwned": "未收集",
+        "unavailable": "尚無法獲得"
+      },
+      "buddyLore": {
+        "ember_fox": "出自東溪谷樹籬間的母狐，得名於冬日枯叢中透出的炭紅皮毛。那裡的獵人幾代之前就不再打幼崽的主意，改成替牠們留下食物。",
+        "moss_hare": "柳澤沼地的野兔，一輩子臥在濕泥炭裡，長出了一身綠毛。沼澤的草藥師視牠們為吉兆，絕不肯把落在門前的趕走。",
+        "frog": "泥沼濕地把牠們養得肥壯而無憂無慮，整夜在葦叢裡高歌。沼澤嚮導都賭咒說，船上載著一隻就絕不會擱淺。",
+        "crimson_claw_crab": "遠岸的潮間蟹，離水許久之後鉗子依舊通紅。當年碼頭工人常讓牠們在跳板上賽跑賭錢。",
+        "golden_sentinel": "琥珀秋境的守望甲蟲，被自己長大的那片樹脂鍍成了金色。這名字比樹脂更古老：早在有人想到裝取樹液之前，就已有某種哨兵守著那些林子了。",
+        "nightfang": "夜綻花野的年輕獵手，即便以同類的標準衡量也安靜得出奇。牠跟著人只為作伴，獵物從不比飛蛾更大。",
+        "tuskhorn_boar": "荊峰高地的種，被牧人刻意育成短腿，圖的是一頭拱不倒籬笆的野豬。脾氣倒是原封不動地留下來了。",
+        "emerald_wolf": "一隻怨靈林的幼狼，皮毛在幾乎照不到林底的樹冠餘光裡泛著綠色。守林人會把森林留下的每一隻孤兒養大。",
+        "tiger": "一身棕櫚灣的斑紋，長在一頭從沒見過棕櫚灣的獸身上：自從舊日獸苑關閉，這一支血脈便一直圈養至今。牠只聽哨聲，此外什麼也不應。",
+        "cate_coin": "一隻貓，絕不肯離開自己屁股底下那枚錢幣，也從沒人見牠吃過東西。東溪谷的商人至今還在爭論：這兩者到底哪一個才是寵物。",
+        "alon": "一位旅人的吉祥物，來自任何地圖都不肯承認的道路，總在計畫出岔子的地方現身。牠看著，牠點頭，然後什麼忙也不幫。",
+        "trollface": "怨靈林放出來、又不肯收回去的一張咧嘴笑臉。每一次試圖描述牠的嘗試，都以描述者自己笑場放棄告終。",
+        "ansem": "牠談論門扉與黑暗，再問就不肯多說了。夜綻花野的信徒聲稱牠屬於他們；可每逢他們舉行儀式，牠就溜走了。",
+        "triple_t": "某樣東西的三份，或是同一樣東西重複三遍。各家說法互相矛盾，而這生物又從不肯老實待著讓人數清。",
+        "kekius": "一位來歷不明的歡笑同伴，被疾風崖的賽馬場收作吉祥物。發誓靠牠轉運的馬廄換了四家，牠還在。",
+        "solbot": "一具以陽光為食的小型自動機，從龍裔荒原的火山灰裡半埋著挖出來時仍在走動。造牠的作坊沒在外殼上留下任何印記。",
+        "frostfire": "生於霜幕之境一處溫泉湧出冰原的地方，牠始終沒弄明白自己屬於哪一半。冷天裡冒著熱氣，暖處又直打哆嗦。",
+        "rocky": "荊峰高地碎石坡上的石殼爬行者，行動遲緩，且徹底心無掛礙。礦工養著牠們，是因為牠們總在塌方前一瞬靜止不動。",
+        "proud_grunt": "戰備倉庫的一名老兵，敬禮保住了，軍銜丟了。戰帥德拉文·科爾會把這樣一位交給任何一個榮譽足以懂得那代價的士兵。",
+        "loot_goblin": "牠跟著每一個身上帶著英雄徽記的人，卻一次也沒被抓到偷東西。軍需官維克斯堅稱，這壓根說明不了任何問題。",
+        "penny_goldspark": "一位侏儒工匠的學徒，按小時收費，而且每一枚銅板都物有所值。護甲匠霍德當年為抵一筆債收下了她，如今誰揣著一千金，他就把這份差事賣給誰。",
+        "stag": "常青園的血脈，由守林人昔日騎乘的巨鹿一代代選育而來。有人抬手，牠仍會低下頭——那是比這頭鹿本身更古老的習慣。",
+        "alpaca": "疾風崖的牧群養牠們既為羊毛，也為脾氣：暴風雨裡沒有比牠更鎮定的。這一隻每趟旅程恰好會朝一個人吐口水。",
+        "bull": "一頭狗一般大的東溪谷公牛，這也是唯一讓人肯把牠養在屋裡的理由。可脾氣並沒跟著一起縮小。",
+        "spider": "怨靈林的織網者，巴掌大小，會把任何裝著牠的背包重新佈置一遍。那些蛛絲比牠替換掉的線還結實。",
+        "raptor": "龍裔荒原的雛龍種，還沒學會自己能跑多快就被轉手賣掉。每一位新主人都被叮囑要餵飽牠，而沒有一個需要被叮囑第二遍。",
+        "skeleton": "牠從怨靈林的古塚裡爬出來，撢了撢自己身上的土，從此就跟著人走。這副骨頭當初是誰的，至今沒人查清。",
+        "crystal_lich": "尼思拉克西斯本體的一枚碎片，至今仍鳴響著塑成牠的那股寒意。誰把牠從團隊副本的殘骸裡拽出來，牠就聽誰的——而且始終沒有原諒那個人。",
+        "forgemaw": "在最後泉源熔爐中鍛造，卻始終沒有真正完工——錘聲未歇，牠便自己走出了伊格尼瓦的鑄場。只有英雄難度的下潛才能找到牠：這熔融之物總會回到造出牠的那座爐子，然後跟著兩度熬過烈火的人回家。",
+        "crystal_tide": "一隻乘著自己那滴海玻璃的潮汐精靈，被從東溪谷到遠岸只想釣頓晚飯的漁人從靜水裡勾了上來。牠把撈起牠的那捧水一直帶在身邊，怎麼勸也不肯回去。",
+        "phantom": "來自怨靈林古塚的巴掌大幽魂，只有一層布、沒有骨頭，會出現在一個明明合好的背包裡，然後為了作伴留下來。沒人弄清牠想要什麼，而牠一次也沒試過嚇唬誰。",
+        "emberfall_phoenix": "每逢秋天牠便燃盡成一粒餘燼，到了春天又從自己的灰裡重新升起——關於牠，誰也說不出更多了。從沒有人找到過牠的巢，也從沒有人捉到過同一隻兩次。"
+      },
+      "petKind": {
+        "beast": "野獸",
+        "elemental": "元素生物",
+        "humanoid": "類人生物",
+        "undead": "不死生物",
+        "celebrity": "名流"
+      },
+      "armor": {
+        "cloth": "布甲",
+        "mail": "Mail",
+        "leather": "皮甲"
+      },
+      "stat": {
+        "intellect": "智力",
+        "agility": "敏捷",
+        "strength": "力量",
+        "mixed": "混合"
+      },
+      "set": {
+        "owned": "{total} 件中已收集 {owned} 件",
+        "itemLevel": "裝等 {level}",
+        "bonusLabel": "{pieces} 件套"
+      },
+      "detail": {
+        "dropLabel": "掉落自",
+        "vendorLabel": "Sold by",
+        "bindLabel": "綁定",
+        "sellLabel": "商人收購價",
+        "marketLabel": "世界市場",
+        "exchangeLabel": "$WOC 交易所",
+        "setLabel": "已收集",
+        "drop": "{mob}（{location}），每次擊殺 {chance}%",
+        "heroicDrop": "{mob}（{location}），僅限英雄難度，每次擊殺 {chance}%",
+        "dropWithHeroic": "{mob}（{location}），每次擊殺 {chance}%，英雄難度 {heroicChance}%",
+        "globalDrop": "任意敵人，每次擊殺 {chance}%，同稀有度 {count} 件中的一件",
+        "fishingDrop": "任意水域釣魚，每次上鉤 {chance}%",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "{amount} 榮譽",
+        "marksPrice": "{amount} 英雄徽記",
+        "noSource": "遊戲中尚無獲取途徑",
+        "noItem": "尚無物品可以獲得",
+        "tradeable": "可交易",
+        "soulbound": "靈魂綁定",
+        "noSell": "無法出售",
+        "marketAtMerchant": "在商人處查看",
+        "marketChecking": "查詢中…",
+        "marketNone": "無上架",
+        "exchangeNone": "無上架",
+        "exchangeUnavailable": "此用戶端不支援"
+      }
     },
     "calendar": {
       "title": "活動日曆",
@@ -10693,7 +10801,9 @@ export const zh_TW: EnTranslations = {
       "flask": "藥壺",
       "scroll": "卷軸",
       "bag": "背包",
-      "mount": "坐騎"
+      "mount": "坐騎",
+      "buddy": "夥伴",
+      "skin": "Skin"
     },
     "stats": {
       "armor": "護甲",
@@ -14732,6 +14842,102 @@ export const zh_TW: EnTranslations = {
       "ps_passing_stone": {
         "name": "往生石"
       },
+      "whistle_ember_fox": {
+        "name": "餘燼狐的哨子"
+      },
+      "whistle_moss_hare": {
+        "name": "苔蘚野兔的哨子"
+      },
+      "whistle_frog": {
+        "name": "青蛙的哨子"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "赤鉗蟹的哨子"
+      },
+      "whistle_golden_sentinel": {
+        "name": "黃金哨兵的哨子"
+      },
+      "whistle_nightfang": {
+        "name": "夜牙的哨子"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "獠角野豬的哨子"
+      },
+      "whistle_emerald_wolf": {
+        "name": "翡翠狼的哨子"
+      },
+      "whistle_tiger": {
+        "name": "猛虎的哨子"
+      },
+      "whistle_cate_coin": {
+        "name": "錢幣貓的哨子"
+      },
+      "whistle_alon": {
+        "name": "阿隆的哨子"
+      },
+      "whistle_trollface": {
+        "name": "巨魔臉的哨子"
+      },
+      "whistle_ansem": {
+        "name": "安塞姆的哨子"
+      },
+      "whistle_triple_t": {
+        "name": "三重T的哨子"
+      },
+      "whistle_kekius": {
+        "name": "凱基烏斯的哨子"
+      },
+      "whistle_solbot": {
+        "name": "索爾機偶的哨子"
+      },
+      "whistle_frostfire": {
+        "name": "霜火的哨子"
+      },
+      "whistle_rocky": {
+        "name": "岩仔的哨子"
+      },
+      "whistle_proud_grunt": {
+        "name": "驕傲步兵的哨子"
+      },
+      "whistle_loot_goblin": {
+        "name": "戰利品哥布林的哨子"
+      },
+      "whistle_penny_goldspark": {
+        "name": "潘妮·金火花的哨子"
+      },
+      "whistle_stag": {
+        "name": "雄鹿的哨子"
+      },
+      "whistle_alpaca": {
+        "name": "羊駝的哨子"
+      },
+      "whistle_bull": {
+        "name": "公牛的哨子"
+      },
+      "whistle_spider": {
+        "name": "蜘蛛的哨子"
+      },
+      "whistle_raptor": {
+        "name": "迅猛龍的哨子"
+      },
+      "whistle_skeleton": {
+        "name": "骷髏的哨子"
+      },
+      "whistle_crystal_lich": {
+        "name": "水晶巫妖的哨子"
+      },
+      "whistle_forgemaw": {
+        "name": "熔顎·熔融者的哨子"
+      },
+      "whistle_crystal_tide": {
+        "name": "水晶潮汐的哨子"
+      },
+      "whistle_phantom": {
+        "name": "幻魂的哨子"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "燼落鳳凰的哨子"
+      },
       "lastflame_core": {
         "name": "末焰之核"
       },
@@ -16947,6 +17153,102 @@ export const zh_TW: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地之聲祖爾加"
+      },
+      "buddy_ember_fox": {
+        "name": "餘燼狐"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "燼落鳳凰"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "赤鉗蟹"
+      },
+      "buddy_golden_sentinel": {
+        "name": "黃金哨兵"
+      },
+      "buddy_nightfang": {
+        "name": "夜牙"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "獠角野豬"
+      },
+      "buddy_emerald_wolf": {
+        "name": "翡翠狼"
+      },
+      "buddy_tiger": {
+        "name": "猛虎"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "巨魔臉"
+      },
+      "buddy_ansem": {
+        "name": "安塞姆"
+      },
+      "buddy_triple_t": {
+        "name": "三重T"
+      },
+      "buddy_kekius": {
+        "name": "凱基烏斯"
+      },
+      "buddy_solbot": {
+        "name": "索爾機偶"
+      },
+      "buddy_frostfire": {
+        "name": "霜火"
+      },
+      "buddy_rocky": {
+        "name": "岩仔"
+      },
+      "buddy_proud_grunt": {
+        "name": "驕傲的步兵"
+      },
+      "buddy_loot_goblin": {
+        "name": "戰利品哥布林"
+      },
+      "buddy_penny_goldspark": {
+        "name": "潘妮·金火花"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "羊駝"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "蜘蛛"
+      },
+      "buddy_raptor": {
+        "name": "迅猛龍"
+      },
+      "buddy_skeleton": {
+        "name": "骷髏"
+      },
+      "buddy_crystal_lich": {
+        "name": "水晶巫妖"
+      },
+      "buddy_forgemaw": {
+        "name": "熔顎·熔融者"
+      },
+      "buddy_crystal_tide": {
+        "name": "水晶潮汐"
+      },
+      "buddy_phantom": {
+        "name": "幻魂"
       },
       "ironvein_foreman": {
         "name": "鐵脈工頭"

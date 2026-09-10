@@ -7,8 +7,8 @@
     "respawnWindow: death -> resolveRespawnSeconds rolls rng.range(36, 72) x 25s base",
     "second kill after an in-place respawnMob rolls an independent window value"
   ],
-  "draws": 17,
-  "drawDigest": "1f988a97",
+  "draws": 25,
+  "drawDigest": "75f56c10",
   "frames": [
     {
       "tick": 0,
@@ -31,8 +31,8 @@
       "state": "e784c5f0",
       "events": "8034c5a2",
       "rng": {
-        "draws": 8,
-        "digest": "0abbf3ef"
+        "draws": 12,
+        "digest": "030ce60b"
       },
       "label": "first-kill",
       "players": [
@@ -289,11 +289,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1008,
-      "state": "daa0800b",
+      "state": "adc04ac4",
       "events": "a062dcbe",
       "rng": {
-        "draws": 17,
-        "digest": "1f988a97"
+        "draws": 25,
+        "digest": "75f56c10"
       },
       "label": "second-kill",
       "players": [
@@ -490,7 +490,7 @@
           },
           "level": 7,
           "loot": {
-            "copper": 130,
+            "copper": 97,
             "items": [
               {
                 "count": 1,
@@ -502,15 +502,7 @@
               },
               {
                 "count": 1,
-                "itemId": "tunnelkings_spade"
-              },
-              {
-                "count": 1,
-                "itemId": "moggers_copper_cudgel"
-              },
-              {
-                "count": 1,
-                "itemId": "briarroot_staff"
+                "itemId": "hollowbone_hauberk"
               }
             ]
           },
@@ -531,7 +523,7 @@
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 9,
-          "respawnTimer": 1463.975608,
+          "respawnTimer": 1000.484309,
           "spawnPos": {
             "x": -92,
             "y": -2,
@@ -542,7 +534,7 @@
           },
           "tappedById": 1006,
           "templateId": "grix_the_tunnelking",
-          "wanderTimer": 7.012083,
+          "wanderTimer": 4.961725,
           "weapon": {
             "max": 58,
             "min": 37,
@@ -555,11 +547,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1008,
-      "state": "daa0800b",
+      "state": "adc04ac4",
       "events": "741638a5",
       "rng": {
-        "draws": 17,
-        "digest": "1f988a97"
+        "draws": 25,
+        "digest": "75f56c10"
       },
       "label": "final",
       "players": [
@@ -756,7 +748,7 @@
           },
           "level": 7,
           "loot": {
-            "copper": 130,
+            "copper": 97,
             "items": [
               {
                 "count": 1,
@@ -768,15 +760,7 @@
               },
               {
                 "count": 1,
-                "itemId": "tunnelkings_spade"
-              },
-              {
-                "count": 1,
-                "itemId": "moggers_copper_cudgel"
-              },
-              {
-                "count": 1,
-                "itemId": "briarroot_staff"
+                "itemId": "hollowbone_hauberk"
               }
             ]
           },
@@ -797,7 +781,7 @@
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 9,
-          "respawnTimer": 1463.975608,
+          "respawnTimer": 1000.484309,
           "spawnPos": {
             "x": -92,
             "y": -2,
@@ -808,7 +792,7 @@
           },
           "tappedById": 1006,
           "templateId": "grix_the_tunnelking",
-          "wanderTimer": 7.012083,
+          "wanderTimer": 4.961725,
           "weapon": {
             "max": 58,
             "min": 37,

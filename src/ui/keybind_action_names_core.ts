@@ -43,6 +43,7 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   targetAuras: 'hudChrome.targetAuras.keybindLabel',
   social: 'hud.keybinds.actions.social',
   arena: 'hud.keybinds.actions.arena',
+  collections: 'hudChrome.collections.keybindLabel',
   dungeonFinder: 'hudChrome.finder.title',
   chat: 'hud.keybinds.actions.chat',
   // Combat/social target + emote-wheel actions. English-only chrome keys (the

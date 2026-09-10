@@ -62,6 +62,7 @@ import {
   PET_TELEPORT_DISTANCE,
   RUN_SPEED,
   steadyAngleTo,
+  type Vec3,
 } from '../types';
 import { isTameableFamily, petHeelSpeed, petOwnerScaling } from './pet_scaling';
 import { petCanForceTaunt } from './pet_taunt_gate';
@@ -302,9 +303,20 @@ function pullNearbyMobs(ctx: SimContext, pet: Entity): void {
 // at most every PET_PATH_RECALC and otherwise the cached waypoints are followed.
 // The teleport is kept as a recovery path when no route exists or the pet-owner
 // separation is implausibly large (for example, after an instance transition).
-export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
+export function petFollow(
+  ctx: SimContext,
+  pet: Entity,
+  owner: Entity,
+  targetOverride?: Vec3,
+): void {
+  // A real combat pet heels onto the owner's own tile (targetOverride unset).
+  // buddy_ai.ts's cosmetic-follower dispatcher passes its usual left-and-back
+  // offset point instead, so a buddy keeps standing where it always has while
+  // reusing this exact A*-pathed heel locomotion (owner speed/mount/slow
+  // still read off the real `owner` below; only the aimed-at point changes).
+  const target = targetOverride ?? owner.pos;
   pet.petPathCooldown = Math.max(0, pet.petPathCooldown - DT);
-  const d = dist2d(pet.pos, owner.pos);
+  const d = dist2d(pet.pos, target);
   if (d <= PET_FOLLOW_DISTANCE) {
     pet.petPath = [];
     return;
@@ -316,7 +328,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
     pet.petPath = findPlayerPath(
       ctx.cfg.seed,
       pet.pos,
-      owner.pos,
+      target,
       PET_PATH_SPAN,
       false,
       swim,
@@ -328,7 +340,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   // its end no longer lands near the (now-moved) owner. findPlayerPath returns a
   // single-waypoint straight line (length 1) when the goal is unreachable.
   const end = pet.petPath[pet.petPath.length - 1];
-  const stale = !end || dist2d(end, owner.pos) > PET_PATH_STALE_DISTANCE;
+  const stale = !end || dist2d(end, target) > PET_PATH_STALE_DISTANCE;
   if (pet.petPathCooldown <= 0 && stale) recompute();
   // drop waypoints we've reached; the last leg homes on the live owner position.
   while (pet.petPath.length > 1 && dist2d(pet.pos, pet.petPath[0]) < PET_WAYPOINT_REACHED)
@@ -350,7 +362,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
       !lineOfSightClear(
         ctx.cfg.seed,
         pet.pos,
-        owner.pos,
+        target,
         BODY_RADIUS,
         undefined,
         ctx.riftCollisionToken,
@@ -358,7 +370,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   ) {
     recompute();
     if (pet.petPath.length <= 1) {
-      pet.pos = { ...owner.pos };
+      pet.pos = { ...target };
       pet.prevPos = { ...pet.pos };
       pet.petPath = [];
       // a warp is a teleport: keep the spatial grid exact this tick instead of
@@ -370,7 +382,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   }
 
   const routed = pet.petPath.length > 1;
-  const aim = routed ? pet.petPath[0] : owner.pos;
+  const aim = routed ? pet.petPath[0] : target;
   // Heel against the owner's ACTUAL speed, not a fixed RUN_SPEED floor: mounts add
   // 60 to 80 percent, so the old 7.7 yd/s floor lost ground to every mounted owner
   // until the 60 yd teleport rescued the pet. moveSpeedMult(owner) already folds in

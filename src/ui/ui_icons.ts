@@ -75,6 +75,7 @@ export type UiIconName =
   | 'cards'
   | 'trash'
   | 'mount'
+  | 'hunting'
   | 'crafting'
   | 'professions'
   | 'makers-mark'
@@ -226,6 +227,11 @@ const ICONS: Record<UiIconName, string> = {
   book: '<path fill-rule="evenodd" d="M256 118c-44-26-104-38-172-38v312c68 0 128 12 172 38 44-26 104-38 172-38V80c-68 0-128 12-172 38zM124 122c40 4 76 13 104 28v246c-30-13-66-21-104-24V122zm264 0v250c-38 3-74 11-104 24V150c28-15 64-24 104-28z"/>',
   // hand-authored horseshoe (the Mounts window / mount keybind), opening up,
   // matching the bar glyph weight
+  // hand-authored animal face (the Hunting window launcher): two pricked ears
+  // over a rounded muzzle, with the eyes and nose punched out so the glyph
+  // still reads as a face at the 20px the side rail paints it.
+  hunting:
+    '<path d="M128 176 L96 64 L200 120 A160 160 0 0 1 312 120 L416 64 L384 176 A160 176 0 1 1 128 176 Z"/><circle cx="196" cy="252" r="26" fill="#000"/><circle cx="316" cy="252" r="26" fill="#000"/><path d="M256 316 l38 30 a38 38 0 0 1 -76 0 Z" fill="#000"/>',
   mount:
     '<path d="M120 140 A176 176 0 1 0 392 140 L340 188 A104 104 0 1 1 172 188 Z"/><path d="M96 108h84v36H96zM332 108h84v36h-84z"/>',
   // hand-authored playing card (the Card Duel minigame): a solid card body

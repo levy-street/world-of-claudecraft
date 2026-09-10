@@ -28,6 +28,14 @@ import { worldEntityText } from '../src/ui/world_entity_i18n';
 
 const SEED = 42;
 const KOLE = ZONE3_NPCS[WARFARE_QUARTERMASTER_NPC_ID];
+/** The one cosmetic row Kole carries beyond the mirrored WARFARE gear list. */
+const KOLE_COMPANION_ITEM_ID = 'whistle_proud_grunt';
+
+/** A vendor list with the cosmetic rows dropped, so the two placements' GEAR
+ *  can be compared for drift without the companion masking a real fork. */
+function gearRows(items: readonly string[] | undefined): string[] {
+  return [...(items ?? [])].filter((id) => ITEMS[id]?.kind !== 'buddy');
+}
 
 describe('Warmarshal Draven Kole: the definition', () => {
   it('is a Highwatch NPC with the authored name, title and rank', () => {
@@ -49,11 +57,17 @@ describe('Warmarshal Draven Kole: the definition', () => {
   });
 
   it('sells the one canonical WARFARE stock rather than a second copy of it', () => {
-    // One list, two placements. FURY keeps the identical stock in Eastbrook, so
-    // a divergence here means someone forked the item table.
-    expect(KOLE.vendorItems).toEqual([...FURY_STOCK]);
+    // One GEAR list, two placements. FURY keeps the identical stock in
+    // Eastbrook, so a divergence here means someone forked the item table.
+    // Kole additionally carries the Proud Grunt companion whistle, a cosmetic
+    // that is deliberately NOT part of the mirrored gear list; every other row
+    // must still match FURY's exactly.
+    expect(KOLE.vendorItems).toEqual([...FURY_STOCK, KOLE_COMPANION_ITEM_ID]);
     expect(NPCS[FURY_NPC_ID].vendorItems).toEqual([...FURY_STOCK]);
     expect(FURY_STOCK.length).toBeGreaterThan(0);
+    // The cosmetic is the ONLY divergence, and it is not gear.
+    expect(ITEMS[KOLE_COMPANION_ITEM_ID].kind).toBe('buddy');
+    expect(FURY_STOCK).not.toContain(KOLE_COMPANION_ITEM_ID);
   });
 
   it('carries the warfareVendor flag on BOTH placements, so the shop is not Highwatch-only', () => {
@@ -64,9 +78,10 @@ describe('Warmarshal Draven Kole: the definition', () => {
     // present identically; nothing else asserted either flag.
     expect(KOLE.warfareVendor, 'Warmarshal Draven Kole').toBe(true);
     expect(FURY_NPC.warfareVendor, 'FURY, the Eastbrook mirror').toBe(true);
-    // And the two really do sell the same list, not a copy that can drift.
-    expect(KOLE.vendorItems).toEqual(FURY_NPC.vendorItems);
-    expect(KOLE.vendorItems).toEqual([...FURY_STOCK]);
+    // And the two really do sell the same GEAR, not a copy that can drift: the
+    // companion whistle is the one authored addition on Kole's list.
+    expect(gearRows(KOLE.vendorItems)).toEqual(gearRows(FURY_NPC.vendorItems));
+    expect(gearRows(KOLE.vendorItems)).toEqual([...FURY_STOCK]);
   });
 
   it('is an honor vendor purely by virtue of its priced stock, not by a flag', () => {
@@ -142,7 +157,7 @@ describe('Warmarshal Draven Kole: the world build is untouched', () => {
     expect(kole.spawnPos.x).toBe(KOLE.pos.x);
     expect(kole.spawnPos.z).toBe(KOLE.pos.z);
     expect(kole.facing).toBe(KOLE.facing);
-    expect(kole.vendorItems).toEqual([...FURY_STOCK]);
+    expect(kole.vendorItems).toEqual([...FURY_STOCK, KOLE_COMPANION_ITEM_ID]);
   });
 
   it('is idempotent, so a second spawn call cannot mint a duplicate', () => {

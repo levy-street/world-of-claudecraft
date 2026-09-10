@@ -839,7 +839,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // (14 base pieces + their 14 auto-generated heroic variants) = 1,299. The
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    // RESOLVED for the merge of df2ae9880f (PR #3944, release/v0.42.0) into
+    // feature/buddy-companion-system: the buddy branch's 32 whistle item
+    // definitions (content/items.ts, one per BuddyKey including the new
+    // Emberfall Phoenix) add on top with no overlap: 1,333.
+    expect(Object.keys(ITEMS)).toHaveLength(1333);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -994,9 +998,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04 + roots-bramblehide-icons-2026-09-07)
     // = 1,281. The OSSBrain PR #3781 reconcile's two disjoint reins owners
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283.
-    expect(new Set(currentOwnerIds).size).toBe(1283);
-    expect(shippingIds).toHaveLength(1283);
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    // RESOLVED for the merge of df2ae9880f (PR #3944, release/v0.42.0) into
+    // feature/buddy-companion-system: the buddy branch's own
+    // buddy-whistle-icons-2026-08-28 mapping batch adds 31 more owners (every
+    // whistle EXCEPT whistle_emberfall_phoenix, which has no shipped icon yet
+    // and so no mapping owner -- see BUDDY_ART_PENDING_ITEM_IDS): 1,314. The
+    // ITEMS catalog itself carries all 32 buddy item DEFINITIONS regardless
+    // of shipped art, so it is one higher than the owner/shipping counts: 1,333.
+    expect(new Set(currentOwnerIds).size).toBe(1314);
+    expect(shippingIds).toHaveLength(1314);
+    expect(Object.keys(ITEMS)).toHaveLength(1333);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1019,12 +1030,20 @@ describe('item-art consistency accepted-art provenance', () => {
       )
       .flatMap(({ itemIds }) => itemIds);
     expect(releaseBatchIds).toHaveLength(25);
+    // The buddy branch's own generated batch (feature/buddy-companion-system),
+    // additive the same way: every whistle except whistle_emberfall_phoenix,
+    // which has no shipped icon yet (BUDDY_ART_PENDING_ITEM_IDS).
+    const buddyWhistleIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'buddy-whistle-icons-2026-08-28')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(buddyWhistleIds).toHaveLength(31);
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
     // this whole historical chain too, the same way the Field Kit is.
     expect(
       sorted([
         ...oldPassIds,
         ...releaseBatchIds,
+        ...buddyWhistleIds,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
@@ -1186,7 +1205,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04, roots-bramblehide-icons-2026-09-07) = 29.
     // OSSBrain PR #3781 reconcile adds its own 2 disjoint batches
     // (goblin-rocket-sled-icon-2026-08-12, rallycart-rxt-icon-2026-08-20) = 31.
-    expect(mapping.generatedBatches).toHaveLength(31);
+    // RESOLVED for the merge of df2ae9880f into feature/buddy-companion-system:
+    // the buddy branch's own buddy-whistle-icons-2026-08-28 batch adds one
+    // more disjoint batch: 32.
+    expect(mapping.generatedBatches).toHaveLength(32);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1248,13 +1270,18 @@ describe('item-art consistency accepted-art provenance', () => {
     // (+25) = 753. OSSBrain PR #3781 reconcile adds its own two disjoint
     // batches (goblin-rocket-sled-icon-2026-08-12,
     // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755.
-    expect(priorGeneratedIds).toHaveLength(755);
+    // RESOLVED for the merge of df2ae9880f into feature/buddy-companion-system:
+    // the buddy-whistle-icons-2026-08-28 batch's 31 ids are not excluded by
+    // the BATCH_ID/CURRENT_BATCH_ID/CRUCIBLE_BATCH_ID filter above, so they
+    // count here too: 755 + 31 = 786.
+    expect(priorGeneratedIds).toHaveLength(786);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1283);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1283);
+    // Mirrors the currentOwnerIds/shippingIds pin above: 1,314.
+    expect(allCurrentOwnerIds).toHaveLength(1314);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1314);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1263,7 +1290,10 @@ describe('item-art consistency accepted-art provenance', () => {
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
       entries: 43,
-      priorGenerated: 755,
+      // 755 base (see priorGeneratedIds above) + this branch's 31 buddy
+      // whistle ids, which the BATCH_ID/CURRENT_BATCH_ID/CRUCIBLE_BATCH_ID
+      // filter does not exclude: 786.
+      priorGenerated: 786,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1304,6 +1334,12 @@ describe('item-art consistency accepted-art provenance', () => {
       )
       .flatMap(({ itemIds }) => itemIds);
     expect(releaseBatchIdsForCatalog).toHaveLength(25);
+    // The buddy branch's own generated batch, additive here too (same 31 ids
+    // as the earlier Field Kit test's buddyWhistleIds).
+    const buddyWhistleIdsForCatalog = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'buddy-whistle-icons-2026-08-28')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(buddyWhistleIdsForCatalog).toHaveLength(31);
     expect(
       sorted([
         ...historicalVerdict.visualVerdict.passIds.filter(
@@ -1323,11 +1359,12 @@ describe('item-art consistency accepted-art provenance', () => {
       sorted([
         ...datedMasterwroughtVerdict.visualVerdict.passIds,
         ...releaseBatchIdsForCatalog,
+        ...buddyWhistleIdsForCatalog,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
       ]),
-      'the dated catalog plus the release batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
+      'the dated catalog plus the release batches, the buddy batch, the Field Kit, and the OSSBrain reins icons is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1453,12 +1490,13 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    // Matches the mapping-owner sum above: 43 entries + 755 prior-generated
-    // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
-    // batch ids + 46 Crucible-professions batch ids = 1283.
-    if (ownerIds.length !== 1283)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1283`);
-    if (fileIds.length !== 1283) violations.push(`shipping WebP count: ${fileIds.length} != 1283`);
+    // Matches the mapping-owner sum above: 43 entries + 786 prior-generated
+    // batch ids (755 base + this branch's 31 buddy whistle ids) + 274
+    // historical-audit batch ids + 165 Masterwrought-completion batch ids +
+    // 46 Crucible-professions batch ids = 1314.
+    if (ownerIds.length !== 1314)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1314`);
+    if (fileIds.length !== 1314) violations.push(`shipping WebP count: ${fileIds.length} != 1314`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -1261,6 +1261,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
       ...NYTHRAXIS_EQUIPMENT_LOOT,
+      // The Crystal Lich buddy (content/buddies.ts): 0.5% on normal, 1% on a
+      // heroic claim through the row's own heroicChance, so one row covers
+      // both difficulties and the heroic table never doubles the award.
+      // Ungrouped on purpose: an independent draw, so the cosmetic never
+      // displaces a set piece from one of the exact-1.00 partitions above.
+      { itemId: 'whistle_crystal_lich', chance: 0.005, heroicChance: 0.01 },
       // Masterwrought apex GEAR patterns (Phase 11, R8 channel doctrine): the
       // raid pillar carries the ten weaponcrafting/jewelcrafting/engineering/
       // inscription patterns (content/apex_patterns.ts) as ONE new partitioned

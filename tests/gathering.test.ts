@@ -364,8 +364,13 @@ describe('isHarvestableCorpse', () => {
     // `componentTags` either: 189. Plus the Eastbrook hub practice dummies
     // (hub_training_dummy, hub_healing_dummy): struck or healed, never
     // harvested, the same untagged shape as the Bone Spike above: 191.
+    // Plus the 32 buddy mob templates (src/sim/content/buddy_mobs.ts, the
+    // merge of df2ae9880f / PR #3944 / release/v0.42.0 into
+    // feature/buddy-companion-system): a cosmetic follower is struck by
+    // nothing and heals nothing, the same untagged shape as the dummies
+    // above: 223.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(191);
+    expect(untagged).toHaveLength(223);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

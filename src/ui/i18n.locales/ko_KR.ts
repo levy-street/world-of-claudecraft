@@ -16483,6 +16483,292 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.nameSubmitBusy': '벼려내는 중',
   'hudChrome.perfecting.nameCancel': '취소',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'entities.mobs.buddy_alpaca.name':
+    '알파카',
+  'entities.mobs.buddy_ansem.name':
+    '안셈',
+  'entities.mobs.buddy_crimson_claw_crab.name':
+    '진홍 집게 게',
+  'entities.mobs.buddy_crystal_lich.name':
+    '수정 리치',
+  'entities.mobs.buddy_crystal_tide.name':
+    '수정 물결',
+  'entities.mobs.buddy_ember_fox.name':
+    '잉걸불 여우',
+  'entities.mobs.buddy_emerald_wolf.name':
+    '에메랄드 늑대',
+  'entities.mobs.buddy_forgemaw.name':
+    '용융의 화로아귀',
+  'entities.mobs.buddy_frostfire.name':
+    '서리불꽃',
+  'entities.mobs.buddy_golden_sentinel.name':
+    '황금 파수병',
+  'entities.mobs.buddy_kekius.name':
+    '케키우스',
+  'entities.mobs.buddy_loot_goblin.name':
+    '전리품 고블린',
+  'entities.mobs.buddy_nightfang.name':
+    '밤엄니',
+  'entities.mobs.buddy_penny_goldspark.name':
+    '페니 골드스파크',
+  'entities.mobs.buddy_phantom.name':
+    '팬텀',
+  'entities.mobs.buddy_proud_grunt.name':
+    '자랑스러운 병졸',
+  'entities.mobs.buddy_raptor.name':
+    '랩터',
+  'entities.mobs.buddy_rocky.name':
+    '로키',
+  'entities.mobs.buddy_skeleton.name':
+    '해골',
+  'entities.mobs.buddy_solbot.name':
+    '솔봇',
+  'entities.mobs.buddy_spider.name':
+    '거미',
+  'entities.mobs.buddy_tiger.name':
+    '호랑이',
+  'entities.mobs.buddy_triple_t.name':
+    '트리플 T',
+  'entities.mobs.buddy_trollface.name':
+    '트롤페이스',
+  'entities.mobs.buddy_tuskhorn_boar.name':
+    '엄니뿔 멧돼지',
+  'entities.items.whistle_alon.name':
+    '알론의 호루라기',
+  'entities.items.whistle_alpaca.name':
+    '알파카의 호루라기',
+  'entities.items.whistle_ansem.name':
+    '안셈의 호루라기',
+  'entities.items.whistle_bull.name':
+    '황소의 호루라기',
+  'entities.items.whistle_cate_coin.name':
+    '케이트 코인의 호루라기',
+  'entities.items.whistle_crimson_claw_crab.name':
+    '진홍 집게 게의 호루라기',
+  'entities.items.whistle_crystal_lich.name':
+    '수정 리치의 호루라기',
+  'entities.items.whistle_crystal_tide.name':
+    '수정 물결의 호루라기',
+  'entities.items.whistle_ember_fox.name':
+    '잉걸불 여우의 호루라기',
+  'entities.items.whistle_emerald_wolf.name':
+    '에메랄드 늑대의 호루라기',
+  'entities.items.whistle_forgemaw.name':
+    '용융의 화로아귀의 호루라기',
+  'entities.items.whistle_frog.name':
+    '개구리의 호루라기',
+  'entities.items.whistle_frostfire.name':
+    '서리불꽃의 호루라기',
+  'entities.items.whistle_golden_sentinel.name':
+    '황금 파수병의 호루라기',
+  'entities.items.whistle_kekius.name':
+    '케키우스의 호루라기',
+  'entities.items.whistle_loot_goblin.name':
+    '전리품 고블린의 호루라기',
+  'entities.items.whistle_moss_hare.name':
+    '이끼 산토끼의 호루라기',
+  'entities.items.whistle_nightfang.name':
+    '밤엄니의 호루라기',
+  'entities.items.whistle_penny_goldspark.name':
+    '페니 골드스파크의 호루라기',
+  'entities.items.whistle_phantom.name':
+    '팬텀의 호루라기',
+  'entities.items.whistle_proud_grunt.name':
+    '자랑스러운 병졸의 호루라기',
+  'entities.items.whistle_raptor.name':
+    '랩터의 호루라기',
+  'entities.items.whistle_rocky.name':
+    '로키의 호루라기',
+  'entities.items.whistle_skeleton.name':
+    '해골의 호루라기',
+  'entities.items.whistle_solbot.name':
+    '솔봇의 호루라기',
+  'entities.items.whistle_spider.name':
+    '거미의 호루라기',
+  'entities.items.whistle_stag.name':
+    '수사슴의 호루라기',
+  'entities.items.whistle_tiger.name':
+    '호랑이의 호루라기',
+  'entities.items.whistle_triple_t.name':
+    '트리플 T의 호루라기',
+  'entities.items.whistle_trollface.name':
+    '트롤페이스의 호루라기',
+  'entities.items.whistle_tuskhorn_boar.name':
+    '엄니뿔 멧돼지의 호루라기',
+  'hudChrome.buddyMenu.autolootEnable':
+    '자동 전리품 켜기',
+  'hudChrome.buddyMenu.autolootDisable':
+    '자동 전리품 끄기',
+  'hudChrome.buddyMenu.autolootHint':
+    '버디가 30야드 이내에 있는 당신 소유의 시체에서 전리품을 가져옵니다.',
+  'hudChrome.buddyMenu.cancel':
+    '취소',
+  'hudChrome.collections.title':
+    '사냥',
+  'hudChrome.collections.close':
+    '사냥 닫기',
+  'hudChrome.collections.keybindLabel':
+    '사냥',
+  'hudChrome.collections.launcherTitle':
+    '사냥: 버디, 탈것, 아이템 세트',
+  'hudChrome.collections.tabs.buddies':
+    '버디',
+  'hudChrome.collections.tabs.mounts':
+    '탈것',
+  'hudChrome.collections.state.owned':
+    '수집함',
+  'hudChrome.collections.state.notOwned':
+    '수집 안 함',
+  'hudChrome.collections.state.unavailable':
+    '아직 획득 불가',
+  'hudChrome.collections.petKind.beast':
+    '야수',
+  'hudChrome.collections.petKind.humanoid':
+    '인간형',
+  'hudChrome.collections.petKind.elemental':
+    '정령',
+  'hudChrome.collections.petKind.undead':
+    '언데드',
+  'hudChrome.collections.petKind.celebrity':
+    '유명 인사',
+  'hudChrome.collections.armor.cloth':
+    '천',
+  'hudChrome.collections.armor.leather':
+    '가죽',
+  'hudChrome.collections.stat.strength':
+    '힘',
+  'hudChrome.collections.stat.agility':
+    '민첩성',
+  'hudChrome.collections.stat.intellect':
+    '지능',
+  'hudChrome.collections.stat.mixed':
+    '혼합',
+  'hudChrome.collections.set.owned':
+    '{total}개 중 {owned}개',
+  'hudChrome.collections.set.bonusLabel':
+    '{pieces}개 세트',
+  'hudChrome.collections.set.itemLevel':
+    '아이템 레벨 {level}',
+  'hudChrome.collections.detail.dropLabel':
+    '드롭 출처',
+  'hudChrome.collections.detail.drop':
+    '{mob}({location}), 처치당 {chance}%',
+  'hudChrome.collections.detail.dropWithHeroic':
+    '{mob}({location}), 처치당 {chance}%, 영웅 난이도에서 {heroicChance}%',
+  'hudChrome.collections.detail.heroicDrop':
+    '{mob}({location}), 영웅 난이도 전용, 처치당 {chance}%',
+  'hudChrome.collections.detail.globalDrop':
+    '아무 적, 처치당 {chance}%, 같은 등급 {count}종 중 하나',
+  'hudChrome.collections.detail.fishingDrop':
+    '아무 곳에서나 낚시, 낚을 때마다 {chance}%',
+  'hudChrome.collections.detail.noSource':
+    '아직 게임 내 획득처가 없습니다',
+  'hudChrome.collections.detail.noItem':
+    '아직 이를 주는 아이템이 없습니다',
+  'hudChrome.collections.detail.bindLabel':
+    '귀속',
+  'hudChrome.collections.detail.soulbound':
+    '귀속',
+  'hudChrome.collections.detail.tradeable':
+    '거래 가능',
+  'hudChrome.collections.detail.sellLabel':
+    '상인 지불액',
+  'hudChrome.collections.detail.noSell':
+    '판매 불가',
+  'hudChrome.collections.detail.setLabel':
+    '수집함',
+  'hudChrome.collections.detail.marketLabel':
+    '월드 마켓',
+  'hudChrome.collections.detail.marketNone':
+    '등록된 물품 없음',
+  'hudChrome.collections.detail.marketChecking':
+    '확인 중…',
+  'hudChrome.collections.detail.marketAtMerchant':
+    '상인에게서 확인',
+  'hudChrome.collections.detail.exchangeLabel':
+    '$WOC 거래소',
+  'hudChrome.collections.detail.exchangeNone':
+    '등록된 물품 없음',
+  'hudChrome.collections.detail.exchangeUnavailable':
+    '이 클라이언트에서는 사용할 수 없습니다',
+  'hudChrome.collections.detail.honorPrice':
+    '명예 {amount}',
+  'hudChrome.collections.detail.marksPrice':
+    '영웅의 징표 {amount}',
+  'hudChrome.options.showPetNames':
+    '펫 이름 표시',
+  'hudChrome.warfareShop.companions':
+    '동료',
+  'itemUi.kind.buddy':
+    '버디',
+  'hudChrome.collections.buddyLore.alon':
+    '어떤 지도에도 없는 길에서 온 여행자의 마스코트로, 일이 틀어지는 곳이면 어디든 나타난다. 지켜보고, 고개를 끄덕이고, 도움은 전혀 주지 않는다.',
+  'hudChrome.collections.buddyLore.alpaca':
+    '게일크레스트의 무리는 털과 성정 때문에 이들을 기른다. 폭풍 속에서 이보다 침착한 짐승은 없다. 이 녀석은 여정마다 정확히 한 사람에게 침을 뱉는다.',
+  'hudChrome.collections.buddyLore.ansem':
+    '문과 어둠에 대해 말하지만 그 이상은 결코 말하지 않는다. 밤꽃 평원의 신도들은 자기네 것이라 주장하지만, 의식을 치를 때마다 어디론가 사라진다.',
+  'hudChrome.collections.buddyLore.bull':
+    '개만 한 크기의 이스트브룩 골짜기 황소로, 사람들이 실내에서 기르기로 한 이유는 오직 그 크기뿐이다. 성질머리는 함께 줄어들지 않았다.',
+  'hudChrome.collections.buddyLore.cate_coin':
+    '깔고 앉은 동전에서 절대 떨어지지 않으며, 무언가 먹는 모습을 본 사람이 아무도 없는 고양이. 이스트브룩 상인들은 아직도 둘 중 어느 쪽이 애완동물인지를 두고 다툰다.',
+  'hudChrome.collections.buddyLore.crimson_claw_crab':
+    '먼바다 해안의 조간대 게로, 물 밖에 나온 지 한참이 지나도 집게가 붉게 남는다. 부두 인부들은 예전에 판자 위에서 이들을 경주시키며 돈을 걸었다.',
+  'hudChrome.collections.buddyLore.crystal_lich':
+    '나이트락시스 자신의 파편으로, 그를 빚어낸 냉기를 아직도 웅웅 울리며 품고 있다. 공격대의 잔해에서 자신을 끄집어낸 자를 따르지만, 그 일을 아직 용서하지는 않았다.',
+  'hudChrome.collections.buddyLore.crystal_tide':
+    '자기 몫의 바다유리 방울을 타고 다니는 조수 정령으로, 이스트브룩 골짜기부터 먼바다 해안까지 저녁거리를 낚던 낚시꾼들이 잔잔한 물에서 건져 올렸다. 자신이 딸려 올라온 물을 그대로 지니고 다니며, 돌아가라는 말은 듣지 않는다.',
+  'hudChrome.collections.buddyLore.ember_fox':
+    '이스트브룩 골짜기의 산울타리에서 온 암여우로, 겨울 덤불 사이로 비치는 숯빛 붉은 털에서 이름을 얻었다. 그곳 사냥꾼들은 몇 세대 전에 새끼 잡기를 포기하고, 대신 먹이를 내놓기 시작했다.',
+  'hudChrome.collections.buddyLore.emerald_wolf':
+    '망령숲의 새끼 늑대로, 숲 바닥까지 거의 닿지 않는 잎새 사이 빛 아래에서는 털이 초록빛을 띤다. 숲이 남긴 고아는 어떤 것이든 관리인들이 거두어 기른다.',
+  'hudChrome.collections.buddyLore.forgemaw':
+    '마지막 샘의 도가니에서 벼려졌으나 끝내 완성되지 못한 것으로, 망치질이 아직 이어지는 동안 이그니바르의 주조장을 제 발로 걸어 나왔다. 오직 영웅 난이도의 공략만이 그를 찾아낸다. 이 용융체는 자신을 만든 화로로 자꾸 돌아가고, 불길을 두 번 살아남은 자를 따라 집까지 온다.',
+  'hudChrome.collections.buddyLore.frog':
+    '마이어펜 습지는 이들을 살지고 태평하게 길러낸다. 갈대밭에서 밤새도록 노래한다. 늪 안내인들은 이 녀석을 태운 배는 절대 좌초하지 않는다고 장담한다.',
+  'hudChrome.collections.buddyLore.frostfire':
+    '서리장막 봉우리에서 온천이 빙원을 뚫고 솟는 자리에 태어났으며, 자신이 어느 쪽에 속하는지 아직도 정하지 못했다. 찬 공기에서는 김을 내고, 따뜻한 곳에서는 몸을 떤다.',
+  'hudChrome.collections.buddyLore.golden_sentinel':
+    '호박빛 가을터의 파수 딱정벌레로, 자라난 수지에 도금되어 금빛을 띤다. 이름이 수지보다 오래되었다. 누군가 수액을 병에 담을 생각을 하기 훨씬 전부터, 그런 부류의 파수꾼들이 그 숲을 지켜왔다.',
+  'hudChrome.collections.buddyLore.kekius':
+    '출처가 분명치 않은 웃는 동행으로, 게일크레스트 경주장이 부적 삼아 거두었다. 이 녀석을 믿고 맹세하던 마구간 네 곳보다 오래 살아남았다.',
+  'hudChrome.collections.buddyLore.loot_goblin':
+    '영웅의 징표를 지닌 사람이라면 누구든 따라다니지만, 훔치다 걸린 적은 단 한 번도 없다. 병참장교 벡스는 그것이 아무것도 증명하지 못한다고 주장한다.',
+  'hudChrome.collections.buddyLore.moss_hare':
+    '버들늪의 산토끼로, 젖은 이탄에 평생 몸을 눕히며 털이 초록으로 물들었다. 늪지 약초사들은 이들을 길조로 여기며, 문간에 온 녀석을 내쫓게 두지 않는다.',
+  'hudChrome.collections.buddyLore.nightfang':
+    '밤꽃 평원의 어린 사냥꾼으로, 제 동족의 기준으로 봐도 유난히 조용하다. 곁을 따르는 것은 그저 함께 있고 싶어서이고, 나방보다 큰 것은 사냥하지 않는다.',
+  'hudChrome.collections.buddyLore.penny_goldspark':
+    '노움 기술자의 견습으로, 시간당 삯을 받지만 구리 한 닢까지 값을 한다. 방어구 제작자 호드는 빚을 갚느라 그녀를 거두었고, 이제는 금화 천 냥을 쥔 사람이면 누구에게든 이 계약을 판다.',
+  'hudChrome.collections.buddyLore.phantom':
+    '망령숲의 고분에서 나온 손바닥만 한 유령으로, 온통 천뿐이고 뼈는 없다. 분명히 닫아둔 배낭 안에 나타나서는 함께 있고 싶다는 이유로 눌러앉는다. 무엇을 원하는지 아무도 알아내지 못했고, 누군가를 겁주려 한 적은 한 번도 없다.',
+  'hudChrome.collections.buddyLore.proud_grunt':
+    '전쟁 보급창의 노병으로, 경례는 지켰으나 계급은 잃었다. 전쟁원수 드레이븐 콜은 그 대가를 알 만큼의 명예를 지닌 병사에게라면 누구에게든 한 명을 내어준다.',
+  'hudChrome.collections.buddyLore.raptor':
+    '드레이크랜드의 부화 개체로, 제가 얼마나 빨리 달릴 수 있는지 깨닫기 전에 팔려 나간다. 새 주인은 하나같이 굶기지 말라는 말을 듣고, 두 번 들을 필요가 있는 사람은 없다.',
+  'hudChrome.collections.buddyLore.rocky':
+    '쏜피크 고지의 너덜지대에 사는 돌껍질 기어다니는 것으로, 느리고 무엇에도 아랑곳하지 않는다. 광부들은 붕락 직전 한순간 딱 멈춰 서는 그 습성 때문에 이들을 기른다.',
+  'hudChrome.collections.buddyLore.skeleton':
+    '망령숲의 고분에서 기어 나와 제 몸의 먼지를 털고는, 그 뒤로 줄곧 사람들을 따라다닌다. 이 뼈가 누구의 것이었는지는 아직 아무도 밝혀내지 못했다.',
+  'hudChrome.collections.buddyLore.solbot':
+    '햇빛을 먹고 도는 작은 자동기계로, 드레이크랜드의 잿더미에 반쯤 묻힌 채 파냈을 때도 여전히 움직이고 있었다. 이를 만든 공방은 외피 어디에도 표시를 남기지 않았다.',
+  'hudChrome.collections.buddyLore.spider':
+    '망령숲의 직조자로, 손바닥만 한 크기에, 자기가 담긴 배낭이라면 어디든 새로 꾸며 놓는다. 그 거미줄은 대신 들어간 실보다 질기다.',
+  'hudChrome.collections.buddyLore.stag':
+    '상록 정원의 혈통으로, 관리인들이 예전에 타던 큰 사슴에서 대를 이어 작게 길러낸 것이다. 손을 들면 여전히 고개를 숙이는데, 이 짐승 자신보다 오래된 버릇이다.',
+  'hudChrome.collections.buddyLore.tiger':
+    '야자 해안의 줄무늬를 지녔으나 야자 해안을 본 적 없는 짐승으로, 옛 동물원이 문을 닫은 뒤로 이 혈통은 줄곧 사육되어 왔다. 오직 호루라기에만 응하고 그 밖의 어떤 것에도 응하지 않는다.',
+  'hudChrome.collections.buddyLore.triple_t':
+    '무언가가 셋인지, 한 가지가 세 번 겹친 것인지. 증언마다 말이 다르고, 정작 이 생물은 셀 수 있을 만큼 가만히 있어 주지 않는다.',
+  'hudChrome.collections.buddyLore.trollface':
+    '망령숲이 내놓고는 도로 거두어들이려 하지 않은, 히죽 웃는 것. 이를 설명하려는 시도는 매번 설명하던 사람이 웃음을 터뜨리고 포기하는 것으로 끝난다.',
+  'hudChrome.collections.buddyLore.tuskhorn_boar':
+    '쏜피크 고지의 혈통으로, 울타리를 무너뜨리지 못하는 멧돼지를 원한 목동들이 다리를 짧게 개량한 것이다. 성질은 그대로 남았다.',
+  'entities.mobs.buddy_emberfall_phoenix.name':
+    '잿불낙하 불사조',
+  'entities.items.whistle_emberfall_phoenix.name':
+    '잿불낙하 불사조의 호루라기',
+  'hudChrome.collections.buddyLore.emberfall_phoenix':
+    '가을마다 타들어가 한 점 잉걸불이 되었다가, 봄이면 제 재에서 다시 솟아오른다. 누구에게 물어도 할 수 있는 말은 그것이 전부다. 둥지를 찾아낸 사람도 없고, 같은 개체를 두 번 붙잡은 사람도 없다.',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '명예로 산 물건은 되돌릴 수 없습니다. 되사기 목록에는 언제나 직접 판 물건만 오릅니다. 동전으로 산 물건은 대개 판매 가격에 되팔 수 있고, 마음이 다시 바뀌면 그 목록에서 되찾을 수 있지만, 워페어 장비는 구매하는 순간 귀속되어 거래도, 우편 발송도, 되팔기도 영영 할 수 없습니다. 그러니 그 목록에 오르는 일도 결코 없습니다. 상점이 굳이 한 번 더 확인을 묻는 이유가 그것이니, 누르기 전에 장비를 찬찬히 읽어 보세요.',
   'guide.arenaPage.rewardsBodyLossShare':

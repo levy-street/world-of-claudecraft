@@ -10,8 +10,8 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 309,
-  "drawDigest": "f78161ea",
+  "draws": 313,
+  "drawDigest": "bd98ebf6",
   "frames": [
     {
       "tick": 0,
@@ -205,8 +205,8 @@
       "state": "4303069e",
       "events": "0316eea8",
       "rng": {
-        "draws": 263,
-        "digest": "d3f0124f"
+        "draws": 267,
+        "digest": "ec09b258"
       },
       "label": "kill",
       "players": [
@@ -460,8 +460,8 @@
       "state": "3aca16f0",
       "events": "cc703ad5",
       "rng": {
-        "draws": 309,
-        "digest": "f78161ea"
+        "draws": 313,
+        "digest": "bd98ebf6"
       },
       "label": "final",
       "players": [

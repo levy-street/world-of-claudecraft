@@ -568,7 +568,11 @@ const allPreloadUrls = characterPreloadUrls(false);
 // and click target do not exist. Weapons and NPC bodies also stay in the gate:
 // the char-select preview builds CharacterVisual DIRECTLY (not through the
 // fail-soft factory), so a missing held-weapon GLB there would throw.
-const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
+// Buddy follower rigs (models/buddies/) join this same lane: they render
+// through the identical generic mob-view fail-soft path (never char-select,
+// never a synchronous must-exist spawn body), so they defer and stream in
+// exactly like a creature does on the constrained iOS profile.
+const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/', 'models/buddies/'];
 // Armory weapon-SKIN models stay out of the gate too (64 of the 78 weapon
 // files), but remain on demand instead of joining the bulk post-entry stream.
 // They are cosmetic replacements for base weapons that always stay in the

@@ -70,21 +70,29 @@ describe('heroic vendor stock: item-level and budget pins', () => {
   // exclusion is extended BY KIND, never by a growing id list: gear on this
   // counter is kind 'armor' and nothing else, so the loop now says what it
   // means instead of naming the rows it happens not to want.
+  //
+  // Re-cut a sixth time, 39 -> 40, by the buddy-companion merge: the Loot
+  // Goblin companion row (content/items.ts whistle_loot_goblin, kind
+  // 'buddy') joined the non-gear slice, so 'buddy' is now a third excluded
+  // kind alongside 'junk' and 'recipe' and the non-gear count grows by one.
   it('every gear offer is a real epic level-20 jewelry item at item level 26', () => {
-    expect(HEROIC_VENDOR_STOCK.length).toBe(39);
+    expect(HEROIC_VENDOR_STOCK.length).toBe(40);
     const gearOffers = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind === 'armor');
     expect(gearOffers.length).toBe(10);
     // The partition is exhaustive: every row is gear, the one material, a
-    // pattern, or a seed. Without this, a row of some FOURTH kind would simply
-    // fall out of every sweep in this file and be pinned by nothing.
+    // pattern, a seed, or the one cosmetic companion. Without this, a row of
+    // some FIFTH kind would simply fall out of every sweep in this file and
+    // be pinned by nothing.
     const nonGear = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind !== 'armor');
     for (const offer of nonGear) {
       expect(
-        ['junk', 'recipe'],
-        `${offer.itemId} is neither gear, a material, a pattern nor a seed`,
+        ['junk', 'recipe', 'buddy'],
+        `${offer.itemId} is neither gear, a material, a pattern, a seed nor the companion`,
       ).toContain(ITEMS[offer.itemId]?.kind);
     }
-    expect(nonGear.length, 'one core plus twenty patterns plus eight seeds').toBe(29);
+    expect(nonGear.length, 'one core plus twenty patterns plus eight seeds plus one buddy').toBe(
+      30,
+    );
     for (const offer of gearOffers) {
       const item = ITEMS[offer.itemId];
       expect(item, offer.itemId).toBeTruthy();
@@ -99,6 +107,20 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       // vendor-gear-binds sweep from silently rebinding it.
       expect(item.soulbound, offer.itemId).toBeUndefined();
     }
+  });
+
+  it('sells the Loot Goblin companion for marks, with no item level and no stats', () => {
+    // The stock's one cosmetic-companion row (content/items.ts
+    // whistle_loot_goblin). It carries no slot, so the item-level index skips
+    // it: a cosmetic can never enter the budget arithmetic the jewelry above
+    // is pinned against.
+    const offer = HEROIC_VENDOR_STOCK.find((o) => o.itemId === 'whistle_loot_goblin');
+    expect(offer?.marks).toBe(100);
+    const item = ITEMS.whistle_loot_goblin;
+    expect(item.kind).toBe('buddy');
+    expect(item.quality).toBe('rare');
+    expect(item.slot).toBeUndefined();
+    expect(itemLevel(item)).toBeUndefined();
   });
 
   it('sells the Wyrmfall Core catch-up row at the ring price point', () => {
@@ -210,12 +232,23 @@ describe('heroic vendor stock: item-level and budget pins', () => {
           (taught?.skillReq ?? 0) >= 125 ? 16 : 12,
         );
       }
-      // The mark family has exactly TWO points and this counter uses only
-      // those: a third price appearing anywhere here is a maintainer decision
-      // over the whole family, not something a content phase takes.
-      expect([...new Set(HEROIC_VENDOR_STOCK.map((o) => o.marks))].sort((a, b) => a - b)).toEqual([
-        12, 16,
-      ]);
+      // The gear/material/pattern/seed mark family has exactly TWO points and
+      // that whole slice uses only those: a third price appearing anywhere in
+      // it is a maintainer decision over the family, not something a content
+      // phase takes. The one COSMETIC row (whistle_loot_goblin) is priced on
+      // its own collection-chase logic (100, see the test above) and is
+      // deliberately excluded from this family check by kind, not folded into
+      // a widened set that would let a future third gear-family price slip in
+      // unnoticed alongside it.
+      expect(
+        [
+          ...new Set(
+            HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind !== 'buddy').map(
+              (o) => o.marks,
+            ),
+          ),
+        ].sort((a, b) => a - b),
+      ).toEqual([12, 16]);
     });
 
     it('every angler row is priced by the RUNG its recipe teaches, 12 below 125 and 16 at it', () => {
@@ -463,7 +496,7 @@ describe('heroic vendor shop view (pure)', () => {
     // The literal, not HEROIC_VENDOR_STOCK.length: both sides of that compare
     // move together, so a vanished row would pass it (the unknown-id drop is
     // what this fixture proves; the row census literal is pinned above).
-    expect(view.rows.length).toBe(39);
+    expect(view.rows.length).toBe(40);
     expect(view.balance).toBe(12);
     const ring = view.rows.find((r) => r.itemId === 'seal_of_the_nine_oaths');
     const neck = view.rows.find((r) => r.itemId === 'yumis_keepsake_locket');

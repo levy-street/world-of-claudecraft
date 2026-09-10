@@ -1299,6 +1299,11 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'highwatch_wallshield',
       'craghorn_staff',
       'icevein_dirk',
+      // Penny Goldspark, the 1000g companion: the one buddy whistle sold for
+      // plain gold at the top of the level range, so gold has a cosmetic sink
+      // that is not gear. Hode keeps her because the forge row is where a
+      // player with that much gold already stands.
+      'whistle_penny_goldspark',
     ],
     greeting: 'Forge is hot and the grindstone is turning. If it cuts, I sell it.',
   },
@@ -1352,7 +1357,12 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: 2.26, // atan2(dx, dz) toward the square at (0, 660)
     color: 0x7d2f3f, // deep war-crimson steel, off every tint the visual manifest reserves
     questIds: [],
-    vendorItems: [...FURY_STOCK],
+    // The canonical WARFARE stock plus the one companion honor buys. Draven
+    // carries it and FURY does not: the whistle is a Highwatch-row prestige
+    // purchase, not part of the mirrored gear list the two must present
+    // identically (the shop window sections it under Companions, see
+    // src/ui/hud/vendor/warfare_vendor_view.ts).
+    vendorItems: [...FURY_STOCK, 'whistle_proud_grunt'],
     dynamic: true,
     warfareVendor: true,
     greeting:
@@ -1411,7 +1421,10 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     // Marla sells Riding Training (the 80g skill purchase, a service entry that
     // delegates to learnRiding) and the Valorsteed reins for riders who have
     // learned. The riding-skill gate (ridingTrained) is enforced in buyItem
-    // (items.ts).
+    // (items.ts). She sells NO buddy whistle (2026-09-04 owner call): the
+    // stables are a mount counter, and every common companion is a drop now
+    // (loot/global_drops.ts rolls the whole common tier at 1.5% a kill). The
+    // three currency companions still have their own vendors in Highwatch.
     vendorItems: ['riding_training', 'reins_valorsteed'],
     greeting:
       'Every rider walks in on two legs, $C. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and the Galecrest wind shows no mercy to a bad seat.',

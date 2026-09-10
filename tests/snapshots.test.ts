@@ -5109,6 +5109,7 @@ const ALL_DELTA_KEYS = [
   'bg',
   'blk',
   'bpsl',
+  'budOwn',
   'buyback',
   'bval',
   'cardDuel',
@@ -5234,6 +5235,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   bags: 'bags',
   bank: 'bankInfo',
   blk: 'blockChance',
+  budOwn: 'ownedBuddies',
   buyback: 'vendorBuyback',
   bval: 'blockValue',
   cbt: 'inCombat',
@@ -6165,6 +6167,23 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.mountKey).toBe('valorsteed');
   });
 
+  it('round-trips the active buddy identity mirror (bud) like mnt', () => {
+    // Entity.buddyKey (wire `bud`, identityFields in server/game.ts) is the
+    // "which buddy is out" mirror every client reads for HUD/UI identity; the
+    // buddy's own body renders through its real owned mob entity, never off
+    // this field, but the field itself must still round-trip like every
+    // other identity mirror (skin, mountKey).
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    server.sim.entities.get(leader.pid)!.buddyKey = 'cate_coin';
+    broadcast(server);
+    const snapshot = lastSnap(fc.sent);
+    expect(snapshot.self.bud).toBe('cate_coin');
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snapshot);
+    expect(client.player.buddyKey).toBe('cate_coin');
+  });
+
   it('flips mst to null when the mobile station expires (server-side tick-domain check)', () => {
     // The expiry arm of the mst self-delta: activeMobileStationCraftsFor
     // resolves active-vs-expired against the SERVER sim's own tickCount, so
@@ -6401,7 +6420,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 94 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 95 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6423,29 +6442,35 @@ describe('delta-key contract pins (anti-drift)', () => {
     // scrape to the direct maybeSerialized form then registers the two
     // capability-gated keys it had been blind to, the stable timer wire's
     // self auras channel and the dungeon entry facing token de
-    // (CAPABILITY_DELTA_KEYS above), for 89.
-    // On the Masterwrought branch the same three bank-storage keys arrived
-    // through the 2026-08-29 v0.41.0 sync (the Materials Vault's owner-only
-    // vault key from bank-storage phase 02, the craft-from-vault cvault key
-    // from phase 04, context-gated, and the always-available owner-only ladder
-    // key bpsl from phase 15, the one bank-family key with NO proximity gate,
-    // emitted for the VIEWING session rather than the spectate anchor), beside
-    // farming's own-plot key fplot, for 87 on that branch (no hpw, no auras,
-    // no de yet). Every release sync conflicts here because each side pins its
-    // own additions alone; the 2026-08-30 v0.41.0 sync carries both arms
-    // (fplot in beside hpw, auras and de), for 90, measured on the merged
-    // tree. The v0.42.0 sync then brings the release's melee-weaving off-hand
-    // bar key offhandWeapon (delta-guarded like weapon/stats: a gear swap, not
-    // a per-tick change; dualWielding rides no key of its own, it is always
-    // exactly offhandWeapon !== null, so the client derives it), for 91,
-    // counted from the merged registry above rather than from either side.
-    // Intentional Gathering PR3 then adds the corpse-harvest preference key
-    // hpref (a gathering-adjacent self scalar, sibling of gprof/tfocus/tslot),
-    // for 92. Intentional Gathering PR4 adds the owner-only tracked-goal
-    // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
-    // into the gprof/tfocus/tslot/hpref cluster), for 94.
-    expect(ALL_DELTA_KEYS).toHaveLength(94);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(94);
+    // (CAPABILITY_DELTA_KEYS above), for 89. The melee-weaving off-hand bar
+    // adds offhandWeapon (delta-guarded like weapon/stats: a gear swap, not a
+    // per-tick change; dualWielding rides no key of its own, it is always
+    // exactly offhandWeapon !== null, so the client derives it), for 90.
+    // 90 upstream keys plus our own budOwn, measured on the merged tree when
+    // the 47c1aacaae conflict markers were resolved, for 91.
+    //
+    // ON THE RELEASE/v0.42.0 SIDE, the same three bank-storage keys arrived
+    // through its own 2026-08-29 v0.41.0 sync (the Materials Vault's
+    // owner-only vault key from bank-storage phase 02, the craft-from-vault
+    // cvault key from phase 04, context-gated, and the always-available
+    // owner-only ladder key bpsl from phase 15), beside farming's own-plot
+    // key fplot, for 87 on that branch (no hpw, no auras, no de yet); the
+    // 2026-08-30 v0.41.0 sync then carried both arms (fplot beside hpw,
+    // auras and de), for 90; the v0.42.0 sync brought the melee-weaving
+    // off-hand bar key offhandWeapon, for 91; Intentional Gathering PR3 then
+    // added the corpse-harvest preference key hpref (a gathering-adjacent
+    // self scalar, sibling of gprof/tfocus/tslot), for 92; Intentional
+    // Gathering PR4 added the owner-only tracked-goal full-view key ggoal
+    // (its own leaf, gathering_goal_wire.ts, not folded into the
+    // gprof/tfocus/tslot/hpref cluster), for 94.
+    //
+    // RESOLVED for the merge of df2ae9880f (PR #3944, release/v0.42.0) into
+    // this branch: the buddy branch's 91 (90 release-parallel keys plus
+    // budOwn) and the release branch's own 94 (the same 90 plus fplot,
+    // offhandWeapon, hpref, ggoal) compose to 95, counted directly off the
+    // merged ALL_DELTA_KEYS array above rather than reconciled by arithmetic.
+    expect(ALL_DELTA_KEYS).toHaveLength(95);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(95);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6599,15 +6624,24 @@ describe('delta-key contract pins (anti-drift)', () => {
     // healPower seam adds the derived Healing Power scalar hpw for 84. Bank
     // Storage Phase 2 then adds bpsl, vault, and cvault, for 87. The
     // maybeSerialized arm of the scrape then surfaces the two capability-gated
-    // direct emits, auras and de, for 89. Farming's own-plot key fplot (the
+    // direct emits, auras and de, for 89. The off-hand bar adds offhandWeapon,
+    // for 90. This branch's owned-buddy key budOwn makes 91.
+    //
+    // ON THE RELEASE/v0.42.0 SIDE: farming's own-plot key fplot (the
     // Masterwrought branch) then makes 90, and the release's off-hand bar key
-    // offhandWeapon makes 91 on the merged tree. Intentional Gathering PR3's
-    // hpref (emitted from the new gathering_self_wire.ts sibling, still
-    // inside the recursive server-tree scrape) makes 92. Intentional
-    // Gathering PR4's ggoal (emitted from the new gathering_goal_wire.ts
-    // sibling, likewise inside the recursive scrape) makes 93.
-    // The candidate self in-combat key cbt brings the combined inventory to 94.
-    expect(scraped.size).toBe(94);
+    // offhandWeapon makes 91 on that branch's own merged tree. Intentional
+    // Gathering PR3's hpref (emitted from the new gathering_self_wire.ts
+    // sibling, still inside the recursive server-tree scrape) makes 92.
+    // Intentional Gathering PR4's ggoal (emitted from the new
+    // gathering_goal_wire.ts sibling, likewise inside the recursive scrape)
+    // makes 93. The candidate self in-combat key cbt brings that branch's
+    // inventory to 94.
+    //
+    // RESOLVED for the merge of df2ae9880f (PR #3944, release/v0.42.0) into
+    // this branch: budOwn (this branch) plus fplot/hpref/ggoal/cbt (the
+    // release side) compose to 95, matching ALL_DELTA_KEYS's own merged
+    // count above.
+    expect(scraped.size).toBe(95);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

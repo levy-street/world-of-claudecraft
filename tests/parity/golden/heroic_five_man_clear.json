@@ -10,8 +10,8 @@
     "awardHeroicMarks on a five-man heroic kill: marksPerParticipant to every participant, plus the gravewyrm_sanctum:heroic daily lockout",
     "class:warrior"
   ],
-  "draws": 62,
-  "drawDigest": "86e69dc4",
+  "draws": 66,
+  "drawDigest": "14e1b909",
   "frames": [
     {
       "tick": 0,
@@ -746,11 +746,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1033,
-      "state": "b1ce9c79",
-      "events": "5fce258b",
+      "state": "ea35bfa6",
+      "events": "9face8f0",
       "rng": {
-        "draws": 62,
-        "digest": "86e69dc4"
+        "draws": 66,
+        "digest": "14e1b909"
       },
       "label": "death",
       "players": [
@@ -960,7 +960,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1542,
+            "damageTaken": 1534,
             "deaths": 1,
             "xpGained": 98
           },
@@ -2004,11 +2004,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1033,
-      "state": "b1ce9c79",
+      "state": "ea35bfa6",
       "events": "741638a5",
       "rng": {
-        "draws": 62,
-        "digest": "86e69dc4"
+        "draws": 66,
+        "digest": "14e1b909"
       },
       "label": "final",
       "players": [
@@ -2218,7 +2218,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1542,
+            "damageTaken": 1534,
             "deaths": 1,
             "xpGained": 98
           },

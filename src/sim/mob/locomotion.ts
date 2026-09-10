@@ -59,6 +59,7 @@ import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
 import { isPinnedInPlace, releasePin } from '../instances/instance_combat_hold';
 import { NYTHRAXIS_BONE_SPIKE_ID, pinNythraxisBoneSpike } from '../nythraxis_bone_spike';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { isBuddyMob, updateBuddyMob } from '../pet/buddy_ai';
 import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
@@ -416,6 +417,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   if (mob.ownerId !== null) {
     if (ctx.isStunned(mob)) return;
+    if (isBuddyMob(mob)) {
+      updateBuddyMob(ctx, mob);
+      return;
+    }
     if (ctx.isDelveCompanionMob(mob)) {
       ctx.updateDelveCompanion(mob);
       return;

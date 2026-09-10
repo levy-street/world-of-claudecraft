@@ -16800,6 +16800,292 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.nameSubmitBusy': 'Куём',
   'hudChrome.perfecting.nameCancel': 'Отмена',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'entities.mobs.buddy_alpaca.name':
+    'Альпака',
+  'entities.mobs.buddy_ansem.name':
+    'Ансем',
+  'entities.mobs.buddy_crimson_claw_crab.name':
+    'Багровоклешневый краб',
+  'entities.mobs.buddy_crystal_lich.name':
+    'Хрустальный лич',
+  'entities.mobs.buddy_crystal_tide.name':
+    'Хрустальный прилив',
+  'entities.mobs.buddy_ember_fox.name':
+    'Тлеющая лисица',
+  'entities.mobs.buddy_emerald_wolf.name':
+    'Изумрудный волк',
+  'entities.mobs.buddy_forgemaw.name':
+    'Горнилозев Расплавленный',
+  'entities.mobs.buddy_frostfire.name':
+    'Ледяное пламя',
+  'entities.mobs.buddy_golden_sentinel.name':
+    'Золотой страж',
+  'entities.mobs.buddy_kekius.name':
+    'Кекиус',
+  'entities.mobs.buddy_loot_goblin.name':
+    'Гоблин-барыга',
+  'entities.mobs.buddy_nightfang.name':
+    'Ночной Клык',
+  'entities.mobs.buddy_penny_goldspark.name':
+    'Пенни Златоискра',
+  'entities.mobs.buddy_phantom.name':
+    'Фантом',
+  'entities.mobs.buddy_proud_grunt.name':
+    'Гордый рубака',
+  'entities.mobs.buddy_raptor.name':
+    'Раптор',
+  'entities.mobs.buddy_rocky.name':
+    'Рокки',
+  'entities.mobs.buddy_skeleton.name':
+    'Скелет',
+  'entities.mobs.buddy_solbot.name':
+    'Солбот',
+  'entities.mobs.buddy_spider.name':
+    'Паук',
+  'entities.mobs.buddy_tiger.name':
+    'Тигр',
+  'entities.mobs.buddy_triple_t.name':
+    'Тройное Т',
+  'entities.mobs.buddy_trollface.name':
+    'Тролльфейс',
+  'entities.mobs.buddy_tuskhorn_boar.name':
+    'Клыкорогий вепрь',
+  'entities.items.whistle_alon.name':
+    'Свисток: Алон',
+  'entities.items.whistle_alpaca.name':
+    'Свисток: Альпака',
+  'entities.items.whistle_ansem.name':
+    'Свисток: Ансем',
+  'entities.items.whistle_bull.name':
+    'Свисток: Бык',
+  'entities.items.whistle_cate_coin.name':
+    'Свисток: Кейт Коин',
+  'entities.items.whistle_crimson_claw_crab.name':
+    'Свисток: Багровоклешневый краб',
+  'entities.items.whistle_crystal_lich.name':
+    'Свисток: Хрустальный лич',
+  'entities.items.whistle_crystal_tide.name':
+    'Свисток: Хрустальный прилив',
+  'entities.items.whistle_ember_fox.name':
+    'Свисток: Тлеющая лисица',
+  'entities.items.whistle_emerald_wolf.name':
+    'Свисток: Изумрудный волк',
+  'entities.items.whistle_forgemaw.name':
+    'Свисток: Горнилозев Расплавленный',
+  'entities.items.whistle_frog.name':
+    'Свисток: Лягушка',
+  'entities.items.whistle_frostfire.name':
+    'Свисток: Ледяное пламя',
+  'entities.items.whistle_golden_sentinel.name':
+    'Свисток: Золотой страж',
+  'entities.items.whistle_kekius.name':
+    'Свисток: Кекиус',
+  'entities.items.whistle_loot_goblin.name':
+    'Свисток: Гоблин-барыга',
+  'entities.items.whistle_moss_hare.name':
+    'Свисток: Моховой заяц',
+  'entities.items.whistle_nightfang.name':
+    'Свисток: Ночной Клык',
+  'entities.items.whistle_penny_goldspark.name':
+    'Свисток: Пенни Златоискра',
+  'entities.items.whistle_phantom.name':
+    'Свисток: Фантом',
+  'entities.items.whistle_proud_grunt.name':
+    'Свисток: Гордый рубака',
+  'entities.items.whistle_raptor.name':
+    'Свисток: Раптор',
+  'entities.items.whistle_rocky.name':
+    'Свисток: Рокки',
+  'entities.items.whistle_skeleton.name':
+    'Свисток: Скелет',
+  'entities.items.whistle_solbot.name':
+    'Свисток: Солбот',
+  'entities.items.whistle_spider.name':
+    'Свисток: Паук',
+  'entities.items.whistle_stag.name':
+    'Свисток: Олень',
+  'entities.items.whistle_tiger.name':
+    'Свисток: Тигр',
+  'entities.items.whistle_triple_t.name':
+    'Свисток: Тройное Т',
+  'entities.items.whistle_trollface.name':
+    'Свисток: Тролльфейс',
+  'entities.items.whistle_tuskhorn_boar.name':
+    'Свисток: Клыкорогий вепрь',
+  'hudChrome.buddyMenu.autolootEnable':
+    'Включить автосбор',
+  'hudChrome.buddyMenu.autolootDisable':
+    'Выключить автосбор',
+  'hudChrome.buddyMenu.autolootHint':
+    'Спутник соберёт добычу с ваших собственных трупов в радиусе 30 ярдов.',
+  'hudChrome.buddyMenu.cancel':
+    'Отмена',
+  'hudChrome.collections.title':
+    'Охота',
+  'hudChrome.collections.close':
+    'Закрыть охоту',
+  'hudChrome.collections.keybindLabel':
+    'Охота',
+  'hudChrome.collections.launcherTitle':
+    'Охота: спутники, транспорт и комплекты',
+  'hudChrome.collections.tabs.buddies':
+    'Спутники',
+  'hudChrome.collections.tabs.mounts':
+    'Транспорт',
+  'hudChrome.collections.state.owned':
+    'Собрано',
+  'hudChrome.collections.state.notOwned':
+    'Не собрано',
+  'hudChrome.collections.state.unavailable':
+    'Пока недоступно',
+  'hudChrome.collections.petKind.beast':
+    'Звери',
+  'hudChrome.collections.petKind.humanoid':
+    'Гуманоиды',
+  'hudChrome.collections.petKind.elemental':
+    'Элементали',
+  'hudChrome.collections.petKind.undead':
+    'Нежить',
+  'hudChrome.collections.petKind.celebrity':
+    'Знаменитости',
+  'hudChrome.collections.armor.cloth':
+    'Ткань',
+  'hudChrome.collections.armor.leather':
+    'Кожа',
+  'hudChrome.collections.stat.strength':
+    'Сила',
+  'hudChrome.collections.stat.agility':
+    'Ловкость',
+  'hudChrome.collections.stat.intellect':
+    'Интеллект',
+  'hudChrome.collections.stat.mixed':
+    'Гибрид',
+  'hudChrome.collections.set.owned':
+    '{owned} из {total} предметов',
+  'hudChrome.collections.set.bonusLabel':
+    'предметов: {pieces}',
+  'hudChrome.collections.set.itemLevel':
+    'ур. предмета {level}',
+  'hudChrome.collections.detail.dropLabel':
+    'Выпадает с',
+  'hudChrome.collections.detail.drop':
+    '{mob} ({location}), {chance}% за убийство',
+  'hudChrome.collections.detail.dropWithHeroic':
+    '{mob} ({location}), {chance}% за убийство, {heroicChance}% в героическом режиме',
+  'hudChrome.collections.detail.heroicDrop':
+    '{mob} ({location}), только героический режим, {chance}% за убийство',
+  'hudChrome.collections.detail.globalDrop':
+    'Любой противник, {chance}% за убийство, один из {count} этой редкости',
+  'hudChrome.collections.detail.fishingDrop':
+    'Рыбалка где угодно, {chance}% за улов',
+  'hudChrome.collections.detail.noSource':
+    'В игре пока нет источника',
+  'hudChrome.collections.detail.noItem':
+    'Пока ни один предмет это не даёт',
+  'hudChrome.collections.detail.bindLabel':
+    'Привязка',
+  'hudChrome.collections.detail.soulbound':
+    'Персональный',
+  'hudChrome.collections.detail.tradeable':
+    'Можно обменять',
+  'hudChrome.collections.detail.sellLabel':
+    'Торговец платит',
+  'hudChrome.collections.detail.noSell':
+    'Нельзя продать',
+  'hudChrome.collections.detail.setLabel':
+    'Собрано',
+  'hudChrome.collections.detail.marketLabel':
+    'Мировой рынок',
+  'hudChrome.collections.detail.marketNone':
+    'Нет лотов',
+  'hudChrome.collections.detail.marketChecking':
+    'Проверка…',
+  'hudChrome.collections.detail.marketAtMerchant':
+    'Показано у торговца',
+  'hudChrome.collections.detail.exchangeLabel':
+    'Биржа $WOC',
+  'hudChrome.collections.detail.exchangeNone':
+    'Нет лотов',
+  'hudChrome.collections.detail.exchangeUnavailable':
+    'Недоступно в этом клиенте',
+  'hudChrome.collections.detail.honorPrice':
+    '{amount} чести',
+  'hudChrome.collections.detail.marksPrice':
+    '{amount} героических знаков',
+  'hudChrome.options.showPetNames':
+    'Показывать имена питомцев',
+  'hudChrome.warfareShop.companions':
+    'Спутники',
+  'itemUi.kind.buddy':
+    'Спутник',
+  'hudChrome.collections.buddyLore.alon':
+    'Талисман путников с дороги, которую не признаёт ни одна карта; появляется везде, где план идёт наперекосяк. Смотрит, одобряет и не помогает совершенно ничем.',
+  'hudChrome.collections.buddyLore.alpaca':
+    'В стадах Гейлкреста их держат ради шерсти и нрава: в бурю никто не сохраняет такого спокойствия. Этот плюётся ровно в одного человека за поездку.',
+  'hudChrome.collections.buddyLore.ansem':
+    'Говорит о дверях и о тьме и больше ни слова не скажет ни о том, ни о другом. Культисты Ночецветья зовут его своим, а он уходит всякий раз, когда они начинают обряд.',
+  'hudChrome.collections.buddyLore.bull':
+    'Бык из Истврукской долины размером с собаку, и это единственная причина, по которой его согласились держать в доме. Нрав вместе с остальным уменьшаться не стал.',
+  'hudChrome.collections.buddyLore.cate_coin':
+    'Кот, который ни за что не расстанется с монетой, на которой сидит, и которого никто никогда не видел за едой. Торговцы Истврука до сих пор спорят, кто из этих двоих чей питомец.',
+  'hudChrome.collections.buddyLore.crimson_claw_crab':
+    'Приливный краб с Дальнего Берега, клешня которого остаётся красной ещё долго после того, как он выйдет из воды. Портовые артели когда-то гоняли их наперегонки по доскам на деньги.',
+  'hudChrome.collections.buddyLore.crystal_lich':
+    'Осколок самого Нитраксиса, всё ещё гудящий тем холодом, что его создал. Он слушается того, кто вытащил его из обломков рейда, и до сих пор этого не простил.',
+  'hudChrome.collections.buddyLore.crystal_tide':
+    'Приливный дух верхом на собственной капле морского стекла, выуженный из тихой воды рыбаками от Истврукской долины до Дальнего Берега, которые ловили себе ужин. Он хранит ту воду, в которой поднялся, и уговорить его вернуться невозможно.',
+  'hudChrome.collections.buddyLore.ember_fox':
+    'Лисица из живых изгородей Истврукской долины, названная за угольно-красную шубу, что просвечивает сквозь зимний подлесок. Тамошние звероловы махнули рукой на её выводки поколения назад и вместо этого начали оставлять им еду.',
+  'hudChrome.collections.buddyLore.emerald_wolf':
+    'Волчонок из Призрачной Чащи; в свете крон, что почти не достаёт до земли, его шерсть кажется зелёной. Стражи выхаживают всех сирот, которых оставляет лес.',
+  'hudChrome.collections.buddyLore.forgemaw':
+    'Выкованный в Горниле Последнего Источника и так и не законченный, он вышел из литейной Игнивара, пока молоты ещё били. Найти его можно только в героическом спуске: расплавленное создание всё возвращается в горн, что его сделал, и уходит домой за тем, кто выжил в огне дважды.',
+  'hudChrome.collections.buddyLore.frog':
+    'Мирефенская топь растит их упитанными и беспечными; они поют всю ночь напролёт из тростников. Болотные проводники божатся, что лодка с такой на борту никогда не садится на мель.',
+  'hudChrome.collections.buddyLore.frostfire':
+    'Рождённый в Морозном Пределе там, где сквозь ледяное поле пробивается горячий источник, он так и не решил, к какой из половин принадлежит. На холоде парит, в тепле дрожит.',
+  'hudChrome.collections.buddyLore.golden_sentinel':
+    'Жук-часовой из Янтарной Пади, позолоченный смолой, в которой вырос. Имя старше смолы: стражи этого рода берегли те рощи задолго до того, как кому-то пришло в голову разливать сок по склянкам.',
+  'hudChrome.collections.buddyLore.kekius':
+    'Смеющийся спутник неясного происхождения, взятый на скаковых дворах Гейлкреста как талисман. Он пережил четыре конюшни, что на него божились.',
+  'hudChrome.collections.buddyLore.loot_goblin':
+    'Он ходит за всяким, у кого есть Героические знаки, и ни разу не был пойман на воровстве. Интендант Векс настаивает, что это ровным счётом ничего не доказывает.',
+  'hudChrome.collections.buddyLore.moss_hare':
+    'Заяц Ивовой Топи, зазеленевший от жизни в мокром торфе. Болотные травники считают их к удаче и не позволят прогнать такого от порога.',
+  'hudChrome.collections.buddyLore.nightfang':
+    'Юный охотник из Ночецветья, тихий даже по меркам своего рода. Он ходит следом ради общества и не охотится ни на что крупнее мотылька.',
+  'hudChrome.collections.buddyLore.penny_goldspark':
+    'Подмастерье гнома-механика, что берёт почасовую плату и отрабатывает каждую медяшку. Бронник Ходе взял её в счёт долга, а теперь продаёт этот уговор всякому, у кого при себе тысяча золотых.',
+  'hudChrome.collections.buddyLore.phantom':
+    'Призрак размером с ладонь из курганов Призрачной Чащи, весь из савана и без единой косточки; заводится в закрытом рюкзаке и остаётся ради компании. Никто не понял, чего он хочет, и он ни разу никого не попытался напугать.',
+  'hudChrome.collections.buddyLore.proud_grunt':
+    'Ветеран военных складов, сохранивший выправку и потерявший чин. Военный маршал Дравен Коул отдаёт такого любому солдату, чьей чести хватает, чтобы понимать, чего это стоило.',
+  'hudChrome.collections.buddyLore.raptor':
+    'Выводок из Земель Драконов, которого продают прежде, чем он поймёт, как быстро умеет бегать. Каждому новому хозяину велят его кормить, и дважды повторять никому не приходится.',
+  'hudChrome.collections.buddyLore.rocky':
+    'Каменнопанцирный ползун с осыпей Терновых высот, медлительный и совершенно невозмутимый. Горняки держат их за то, как они замирают за миг до обвала.',
+  'hudChrome.collections.buddyLore.skeleton':
+    'Он выбрался из курганов Призрачной Чащи, отряхнулся и с тех пор ходит за людьми. Чьи это были кости, так никто и не установил.',
+  'hudChrome.collections.buddyLore.solbot':
+    'Маленький автоматон, питающийся солнцем; его откопали наполовину засыпанным в пепле Земель Драконов, и он всё ещё тикал. Мастерская, что его собрала, не оставила на корпусе ни единого клейма.',
+  'hudChrome.collections.buddyLore.spider':
+    'Ткач из Призрачной Чащи размером с ладонь, который перестраивает по-своему любой рюкзак, где его несут. Паутина крепче тех ниток, что она заменяет.',
+  'hudChrome.collections.buddyLore.stag':
+    'Кровь Вечного Сада, выведенная из тех больших оленей, на которых когда-то ездили стражи. Он до сих пор склоняет голову перед поднятой рукой — по привычке, что старше его самого.',
+  'hudChrome.collections.buddyLore.tiger':
+    'Полосы Пальмового Берега на звере, который Пальмового Берега в глаза не видел: эту линию держат в неволе с тех пор, как закрылись старые зверинцы. Он отзывается на свист и больше ни на что.',
+  'hudChrome.collections.buddyLore.triple_t':
+    'То ли три чего-то, то ли одно и то же трижды. Свидетельства расходятся, а само существо не стоит на месте достаточно долго, чтобы его пересчитать.',
+  'hudChrome.collections.buddyLore.trollface':
+    'Ухмыляющаяся тварь, которую Призрачная Чаща выпустила и обратно брать отказалась. Всякая попытка её описать кончается тем, что описывающий начинает смеяться и бросает.',
+  'hudChrome.collections.buddyLore.tuskhorn_boar':
+    'Порода с Терновых высот, выведенная коротконогой пастухами, которым нужен был вепрь, не способный завалить изгородь. Нрав при этом остался прежним.',
+  'entities.mobs.buddy_emberfall_phoenix.name':
+    'Феникс Пепелопада',
+  'entities.items.whistle_emberfall_phoenix.name':
+    'Свисток: Феникс Пепелопада',
+  'hudChrome.collections.buddyLore.emberfall_phoenix':
+    'Каждую осень он сгорает до уголька и к весне поднимается из собственного пепла — вот и всё, что о нём вообще могут сказать. Гнезда его никто не находил, и дважды одного и того же никто не ловил.',
   'guide.arenaPage.honorFinalNoteSoldBack':
     'Покупки за честь окончательны. Список выкупа у торговца хранит лишь то, что вы продали: купленное за монеты обычно можно продать обратно по цене продажи и, если вы снова передумаете, выкупить из этого списка, но снаряжение Боевой мощи становится персональным в тот же миг, как вы его купили, так что его нельзя ни обменять, ни отправить почтой, ни продать обратно хоть за что-нибудь, и в этот список оно не попадает никогда. Потому магазин и просит подтверждения: прочтите описание вещи, прежде чем нажать.',
   'guide.arenaPage.rewardsBodyLossShare':

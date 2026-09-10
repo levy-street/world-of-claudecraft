@@ -152,6 +152,7 @@ export interface NameplatePainterDeps {
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
   showPlayerNameplates: () => boolean;
+  showPetNames: () => boolean;
   /** The nameplate dot row's SIZE, with 0 meaning off: the showNameplateDots
    *  toggle and the nameplateDotScale slider fold into this one number at the
    *  settings site. A player preference, never a graphics tier. Defaults to the
@@ -171,6 +172,7 @@ export class NameplatePainter {
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
+  private readonly showPetNames: () => boolean;
   private readonly nameplateDotScale: () => number;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   private readonly surface: NameplateCanvasSurface;
@@ -226,6 +228,7 @@ export class NameplatePainter {
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
+    this.showPetNames = deps.showPetNames;
     this.nameplateDotScale = deps.nameplateDotScale ?? nameplateDotScaleSetting;
     this.isHostilePlayer = deps.isHostilePlayer;
     this.surface = new NameplateCanvasSurface(deps.layer);
@@ -247,6 +250,7 @@ export class NameplatePainter {
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
+    const showPetNames = this.showPetNames();
     // Drop the quest-marker snapshot at every full pass so it re-resolves
     // lazily below; throttled passes reuse it (see the field's rationale).
     if (fullPass) this.questMarkerCtx = null;
@@ -284,6 +288,7 @@ export class NameplatePainter {
         showNameplates,
         showOwnNameplate,
         showPlayerNameplates,
+        showPetNames,
         standIn,
       );
       if (plan.hidden) continue;
@@ -666,12 +671,15 @@ export class NameplatePainter {
           level: formatNumber(entity.level, NAMEPLATE_LEVEL_NUMBER_OPTIONS),
         });
     state.levelColor = mobNameColor(entity.level - player.level, entity.dead, state.friendlyPet);
-    state.hpVisible = !entity.dead;
-    // What this body still offers THIS viewer, never the bare lootable flag: a
-    // harvest-only body keeps `lootable` true through its grace window, and a
-    // stranger's owner-locked kill is lootable for someone else. Ordinary loot
-    // wins the satchel; an open harvest with no ordinary loot shows the blade;
-    // neither shows nothing.
+    // hpVisible: a buddy carries no HP of its own (nameplate_view.ts's
+    // isBuddyPet sets plan.noHealthBar), so its plate never draws the bar even
+    // though it is never dead either.
+    state.hpVisible = !entity.dead && !plan.noHealthBar;
+    // marker/markerTone: what this body still offers THIS viewer, never the
+    // bare lootable flag: a harvest-only body keeps `lootable` true through
+    // its grace window, and a stranger's owner-locked kill is lootable for
+    // someone else. Ordinary loot wins the satchel; an open harvest with no
+    // ordinary loot shows the blade; neither shows nothing.
     const corpse = corpseIndicatorFor(entity, player.id, this.viewerPartyIds);
     state.marker = corpse !== 'none' ? corpse : elite && !entity.dead ? '◆' : '';
     state.markerTone = corpse;

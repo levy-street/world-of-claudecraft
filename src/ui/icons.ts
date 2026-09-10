@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { BUDDY_ART_PENDING_ITEM_IDS } from '../sim/content/buddies';
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import {
@@ -5477,14 +5478,30 @@ for (const item of Object.values(ITEMS)) {
 // real, non-weapon item; both sets are served by itemImageUrl and gated on committed art.
 export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 
-// Explicit development-only item-art debt ledger. The Masterwrought completion wave
-// cleared the Ignivar raid's 81 feature entries (content/ignivar_loot.ts), so that spread
-// is currently empty; it stays in the union below as the canonical seam for future parked
-// raid art. Tests reject both unenumerated debt and stale entries after art lands.
+// Items whose painted art has not been commissioned yet. The derivation above deliberately
+// enters EVERY non-weapon item into ITEM_IMAGE_IDS, which is what keeps the filesystem and
+// provenance gates honest, but an id listed here has no committed .webp behind it yet, so
+// itemImageUrl declines it and iconDataUrl composes the procedural recipe instead of pointing
+// an <img> at a file that 404s. Same shape as the i18n `pending` model: the debt is
+// enumerated rather than silent, and it shrinks as art lands.
+//
+// The Masterwrought completion wave cleared the Ignivar raid's 81 feature entries
+// (content/ignivar_loot.ts), so IGNIVAR_ART_PENDING_ITEM_IDS is itself empty; the rest of
+// the buddy whistle set ships art rendered from each buddy's own GLB
+// (scripts/assets/render_buddy_item_icons.mjs), so that debt never entered this ledger at
+// all. BUDDY_ART_PENDING_ITEM_IDS (content/buddies.ts) is the one exception: the newest
+// whistle's GLB is committed but its render needs a headless-Chromium host this repo's
+// sandbox does not have, so it is enumerated honestly rather than shipped as a silent 404.
+// Every spread stays in the union below regardless of whether it is currently empty: it is
+// the canonical seam future parked art (a staged wave, a raid gap) re-pins its membership
+// through, without touching this line. tests/item_icons.test.ts holds the line from both
+// sides: it rejects stale entries after art lands and unenumerated art debt. Do not add to
+// this list merely to silence that failure; commission the art.
 export const ITEM_ART_PENDING = new Set<string>([
   ...IGNIVAR_ART_PENDING_ITEM_IDS,
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   ...NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
+  ...BUDDY_ART_PENDING_ITEM_IDS,
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

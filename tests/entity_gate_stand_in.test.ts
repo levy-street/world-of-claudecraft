@@ -365,6 +365,7 @@ describe('entity gate stand-ins actually stand in', () => {
         false, // mob plates toggled OFF
         false,
         false, // player plates toggled OFF
+        false,
         standIn,
       );
     expect(plan(gated).hidden, 'a gated object must keep a plate').toBe(false);
@@ -497,6 +498,7 @@ describe('entity gate stand-ins actually stand in', () => {
         feast as never,
         viewerAt(dz),
         2,
+        false,
         false,
         false,
         false,

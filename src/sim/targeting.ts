@@ -27,6 +27,7 @@
 
 import { corpseInteractionAvailability } from './corpse_interaction';
 import { deadTargetSelectable } from './dead_target';
+import { isBuddyMob } from './pet/buddy_ai';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { orderTabTargets, stepTabTarget, TAB_QUERY_RADIUS, type TabStep } from './tab_target';
@@ -165,6 +166,13 @@ export class Targeting {
   private isEnemyTargetCandidate(attacker: Entity, target: Entity): boolean {
     if (attacker.dead) return false;
     if (target.id === attacker.id || target.dead) return false;
+    // A cosmetic buddy (src/sim/pet/buddy_ai.ts) is never an enemy target
+    // candidate, checked before the owner-recursion arm below: that arm
+    // would otherwise recurse straight to the owner and hand back "true"
+    // for an opponent's hostile owner, making their buddy Tab-targetable and
+    // AoE-eligible purely by association. Mirrors the isHostileTo exclusion
+    // in sim.ts.
+    if (isBuddyMob(target)) return false;
     if (this.ctx.isHostileTo(attacker, target)) return true;
     if (target.kind === 'mob' && target.ownerId !== null) {
       const owner = this.ctx.entities.get(target.ownerId);

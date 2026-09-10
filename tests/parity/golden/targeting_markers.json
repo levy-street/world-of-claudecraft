@@ -9,8 +9,8 @@
     "targetNearestFriendly + friendlyTabTarget wrap, autoAttack never armed (~9782/9797)",
     "setMarker set/toggle-off/symbol-uniqueness + clearEntityMarker death-strip (~11956/12002)"
   ],
-  "draws": 5,
-  "drawDigest": "763c21d0",
+  "draws": 9,
+  "drawDigest": "a9d22fea",
   "frames": [
     {
       "tick": 0,
@@ -5189,8 +5189,8 @@
       "state": "ebfc7167",
       "events": "02b3b1c1",
       "rng": {
-        "draws": 5,
-        "digest": "763c21d0"
+        "draws": 9,
+        "digest": "a9d22fea"
       },
       "label": "m2-dead",
       "players": [
@@ -5780,8 +5780,8 @@
       "state": "ebfc7167",
       "events": "741638a5",
       "rng": {
-        "draws": 5,
-        "digest": "763c21d0"
+        "draws": 9,
+        "digest": "a9d22fea"
       },
       "label": "final",
       "players": [

@@ -561,6 +561,13 @@ const mergeStringsEn = {
       scroll: 'Scroll',
       bag: 'Bag',
       mount: 'Mount',
+      buddy: 'Buddy',
+      // Presentation split for the mech chroma armor plates (the tradable
+      // cosmetic skins): their KIND stays 'tool' internally, but the tooltip
+      // line reads Skin (item_kind_label.ts owns the split).
+      skin: 'Skin',
+      // 'recipe' itself rides the spread above (itemNames.en.itemUi.kind,
+      // src/ui/i18n.catalog/items.ts), not repeated here.
     },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,

@@ -91,6 +91,7 @@ export interface InputCallbacks {
       | 'targetAuras'
       | 'social'
       | 'arena'
+      | 'collections'
       | 'bgFlag'
       | 'dungeonFinder'
       | 'leaderboard'
@@ -1190,6 +1191,9 @@ export class Input {
         return;
       case 'arena':
         this.cb.onUiKey('arena');
+        return;
+      case 'collections':
+        this.cb.onUiKey('collections');
         return;
       case 'dungeonFinder':
         this.cb.onUiKey('dungeonFinder');

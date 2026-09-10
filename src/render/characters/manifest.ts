@@ -371,6 +371,11 @@ const animal = (attack: string[]): ClipMap => ({
   death: 'Death',
 });
 
+// Every buddy rig (public/models/buddies/) ships exactly Idle + Walk, renamed
+// in-place to this convention (see the buddy_* VISUALS entries below); run
+// and death alias Walk/Idle since a buddy never plays either.
+const BUDDY_CLIPS: ClipMap = { idle: 'Idle', walk: 'Walk', run: 'Walk', attack: [], death: 'Idle' };
+
 // Rideable mounts. The Tripo-lane rigs (bear, toad, griffin) ship clips baked
 // locally by scripts/bake_mount_gaits.mjs (the Tripo quadruped retarget was
 // near-static, 4-5 animated joints), which authors Idle/Walk/Run/Death gait
@@ -1081,6 +1086,7 @@ const CREATURES = 'models/creatures';
 const PROPS = 'models/props';
 const WEAPONS = 'models/weapons';
 const MOUNTS_DIR = 'models/mounts';
+const BUDDIES_DIR = 'models/buddies';
 
 /** Exported for the authored-surface guard (tests/authored_surfaces.test.ts),
  *  which sweeps every shipped held model; render code resolves through
@@ -2338,6 +2344,234 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: animal(['Attack']),
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  // -- buddy follower rigs (src/sim/content/buddies.ts catalog) -------------
+  // Dedicated GLBs, one per BuddyKey (src/render/buddy_visuals.ts maps key ->
+  // visualKey here). Baked textures, no tint: each is a distinct species, not
+  // a recolor. Every source file shipped its idle/walk clips under a
+  // different name per generator (Crab_Idle/Crab_Walk, IDLE/WALK,
+  // Idle_Breathing, ...); scripts/assets (2026-08-28) renamed every one of
+  // them in-place to the same 'Idle'/'Walk' convention the shared Quaternius
+  // rig (mob_fox/mob_critter, animal() below) already uses, so BUDDY_CLIPS
+  // is one shared object instead of nine bespoke ones. No authored
+  // run/attack/death: run/death alias Walk/Idle, the two the rig actually
+  // has, since a buddy never plays them anyway (buddy_ai.ts's heel state is
+  // always moving-at-Walk or idle, never running/attacking/dead) and attack
+  // is empty; tests/character_clipmaps.test.ts only requires a name to
+  // resolve when it is non-empty, so the alias satisfies the gate cheaply.
+  // buddy_ai.ts's owned mob entity goes through the normal generic mob-view
+  // path like any other creature, so these are not lazyPreload (no
+  // preloadMountAssets-style gate exists for them); instead
+  // models/buddies/ joins STREAMED_URL_PREFIXES (assets.ts) so the
+  // constrained iOS profile carves them out of the boot gate and streams
+  // them in after first frame, same as the creature family.
+  buddy_frog: {
+    url: `${BUDDIES_DIR}/frog.glb`,
+    height: 0.35,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_crimson_claw_crab: {
+    url: `${BUDDIES_DIR}/crimson_claw_crab.glb`,
+    height: 0.5,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_golden_sentinel: {
+    url: `${BUDDIES_DIR}/golden_sentinel.glb`,
+    height: 0.9,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_nightfang: {
+    url: `${BUDDIES_DIR}/nightfang.glb`,
+    height: 0.6,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_tuskhorn_boar: {
+    url: `${BUDDIES_DIR}/tuskhorn_boar.glb`,
+    height: 0.55,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_emerald_wolf: {
+    url: `${BUDDIES_DIR}/emerald_wolf.glb`,
+    height: 0.65,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_tiger: {
+    url: `${BUDDIES_DIR}/tiger.glb`,
+    height: 0.7,
+    clips: BUDDY_CLIPS,
+  },
+  // rare
+  buddy_cate_coin: {
+    url: `${BUDDIES_DIR}/cate_coin.glb`,
+    height: 0.4,
+    clips: BUDDY_CLIPS,
+  },
+  // rare
+  buddy_alon: {
+    url: `${BUDDIES_DIR}/alon.glb`,
+    height: 0.6,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_trollface: {
+    url: `${BUDDIES_DIR}/trollface.glb`,
+    height: 0.5,
+    clips: BUDDY_CLIPS,
+  },
+  // epic
+  buddy_ansem: {
+    url: `${BUDDIES_DIR}/ansem.glb`,
+    height: 0.9,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_triple_t: {
+    url: `${BUDDIES_DIR}/triple_t.glb`,
+    height: 0.6,
+    clips: BUDDY_CLIPS,
+  },
+  // rare
+  buddy_kekius: {
+    url: `${BUDDIES_DIR}/kekius.glb`,
+    height: 0.6,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_solbot: {
+    url: `${BUDDIES_DIR}/solbot.glb`,
+    height: 0.6,
+    clips: BUDDY_CLIPS,
+  },
+  // uncommon
+  buddy_frostfire: {
+    url: `${BUDDIES_DIR}/frostfire.glb`,
+    height: 0.6,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_rocky: {
+    url: `${BUDDIES_DIR}/rocky.glb`,
+    height: 0.6,
+    clips: BUDDY_CLIPS,
+  },
+  // rare, the three currency-vendor companions. Humanoid rigs, so they stand
+  // taller than the animal roster above; their source clips shipped as
+  // IDLE/WALK and were renamed in-place by
+  // scripts/assets/normalize_buddy_clips.mjs, which is why they read
+  // BUDDY_CLIPS like every other buddy instead of a bespoke map.
+  buddy_proud_grunt: {
+    url: `${BUDDIES_DIR}/proud_grunt.glb`,
+    height: 0.8,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_loot_goblin: {
+    url: `${BUDDIES_DIR}/loot_goblin.glb`,
+    height: 0.7,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_penny_goldspark: {
+    url: `${BUDDIES_DIR}/penny_goldspark.glb`,
+    height: 0.7,
+    clips: BUDDY_CLIPS,
+  },
+  // common, the beast tier drawn from the shipped creature rigs. Own entries
+  // rather than a MOB_KEYS alias onto mob_stag/mob_bull/...: a buddy has to be
+  // pet-sized (the mob rigs stand 1.4 to 2.1), and the shared BUDDY_SCALE
+  // (content/buddy_mobs.ts) multiplies whatever height is declared here. Same
+  // GLB, same clip vocabulary, `tint: 'entity'` kept so each buddy takes its
+  // own dye like the fox/hare pair above; only idle and walk are ever played,
+  // so the maps are trimmed to what a buddy uses.
+  buddy_stag: {
+    url: `${CREATURES}/stag.glb`,
+    height: 0.75,
+    clips: { idle: 'Idle', walk: 'Walk', run: 'Walk', attack: [], death: 'Idle' },
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  buddy_alpaca: {
+    url: `${CREATURES}/alpaca.glb`,
+    height: 0.7,
+    clips: { idle: 'Idle', walk: 'Walk', run: 'Walk', attack: [], death: 'Idle' },
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  buddy_bull: {
+    url: `${CREATURES}/bull.glb`,
+    // the bull rig ships no plain Idle: grazing IS its idle (see mob_bull).
+    height: 0.75,
+    clips: { idle: 'Eating', walk: 'Walk', run: 'Walk', attack: [], death: 'Eating' },
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  buddy_spider: {
+    url: `${CREATURES}/spider.glb`,
+    height: 0.6,
+    clips: {
+      idle: SPIDER.idle,
+      walk: SPIDER.walk,
+      run: SPIDER.walk,
+      attack: [],
+      death: SPIDER.idle,
+    },
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  buddy_raptor: {
+    url: `${CREATURES}/velociraptor.glb`,
+    height: 0.7,
+    clips: {
+      idle: RAPTOR.idle,
+      walk: RAPTOR.walk,
+      run: RAPTOR.walk,
+      attack: [],
+      death: RAPTOR.idle,
+    },
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  // common, the one undead: the KayKit skeleton rig at pet scale, unarmed (no
+  // `attach`, unlike the skel_* mobs, since a buddy never swings anything).
+  buddy_skeleton: {
+    url: `${ENEMIES}/skeleton_minion.glb`,
+    height: 0.85,
+    clips: { idle: 'Idle', walk: 'Walking_A', run: 'Walking_A', attack: [], death: 'Idle' },
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  // epic, the Nythraxis raid drop. Its own GLB with baked crystal textures, so
+  // no tint, and the shipped Idle/Walk pair is already on the buddy convention.
+  buddy_crystal_lich: {
+    url: `${BUDDIES_DIR}/crystal_lich.glb`,
+    height: 0.9,
+    clips: BUDDY_CLIPS,
+  },
+  // epic, the heroic Crucible drop. Baked molten texture, so no tint.
+  buddy_crystal_tide: {
+    url: `${BUDDIES_DIR}/crystal_tide.glb`,
+    height: 0.8,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_phantom: {
+    url: `${BUDDIES_DIR}/phantom.glb`,
+    height: 0.8,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_forgemaw: {
+    url: `${BUDDIES_DIR}/forgemaw.glb`,
+    height: 0.85,
+    clips: BUDDY_CLIPS,
+    // The rig is authored facing -Z, so without this it heels the owner
+    // back-to-front: chest toward the camera while its owner walks away.
+    yaw: Math.PI,
+  },
+  // epic, no source yet (content/buddies.ts). Baked ember plumage, so no tint.
+  // The shipped clips were IDLE/WALK and were renamed in place to the buddy
+  // convention by scripts/assets/normalize_buddy_clips.mjs, so BUDDY_CLIPS
+  // reads them like every other follower. Authored height 0.75 keeps the bird
+  // inside the 0.55-0.8 band collectionBuddy framing assumes
+  // (characters/preview_framing.ts); the rig is wider than it is tall (wings
+  // out), and `height` normalizes on the vertical, so the wingspan lands near
+  // a mount-free 1.7 units once BUDDY_SCALE multiplies it.
+  buddy_emberfall_phoenix: {
+    url: `${BUDDIES_DIR}/emberfall_phoenix.glb`,
+    height: 0.75,
+    clips: BUDDY_CLIPS,
   },
   // Yumi, the Protect Yumi objective cat familiar (Meshy rig, scale baked by
   // scripts/_bake_meshy_scale.mjs, meshopt + 1024 webp). The GLB ships ONE
@@ -3751,6 +3985,43 @@ const MOB_KEYS: Record<string, string> = {
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
   guardian_tithefiend: 'mob_demonalt',
+  // Buddy followers (src/sim/content/buddy_mobs.ts, real owned mob entities
+  // heeled by src/sim/pet/buddy_ai.ts): ember_fox/moss_hare reuse the shared
+  // Quaternius rig (tint: 'entity' on those VISUALS entries reads the
+  // template's `color` below); the rest point at their own dedicated GLB
+  // (public/models/buddies/), key-for-key with their VISUALS entry.
+  buddy_ember_fox: 'mob_fox',
+  buddy_moss_hare: 'mob_critter',
+  buddy_frog: 'buddy_frog',
+  buddy_crimson_claw_crab: 'buddy_crimson_claw_crab',
+  buddy_golden_sentinel: 'buddy_golden_sentinel',
+  buddy_nightfang: 'buddy_nightfang',
+  buddy_tuskhorn_boar: 'buddy_tuskhorn_boar',
+  buddy_emerald_wolf: 'buddy_emerald_wolf',
+  buddy_tiger: 'buddy_tiger',
+  buddy_cate_coin: 'buddy_cate_coin',
+  buddy_alon: 'buddy_alon',
+  buddy_trollface: 'buddy_trollface',
+  buddy_ansem: 'buddy_ansem',
+  buddy_triple_t: 'buddy_triple_t',
+  buddy_kekius: 'buddy_kekius',
+  buddy_solbot: 'buddy_solbot',
+  buddy_frostfire: 'buddy_frostfire',
+  buddy_rocky: 'buddy_rocky',
+  buddy_proud_grunt: 'buddy_proud_grunt',
+  buddy_loot_goblin: 'buddy_loot_goblin',
+  buddy_penny_goldspark: 'buddy_penny_goldspark',
+  buddy_stag: 'buddy_stag',
+  buddy_alpaca: 'buddy_alpaca',
+  buddy_bull: 'buddy_bull',
+  buddy_spider: 'buddy_spider',
+  buddy_raptor: 'buddy_raptor',
+  buddy_skeleton: 'buddy_skeleton',
+  buddy_crystal_lich: 'buddy_crystal_lich',
+  buddy_forgemaw: 'buddy_forgemaw',
+  buddy_crystal_tide: 'buddy_crystal_tide',
+  buddy_phantom: 'buddy_phantom',
+  buddy_emberfall_phoenix: 'buddy_emberfall_phoenix',
   // Packlord Stampede guardians are transient local templates, not MOBS rows.
   // Give the three summoned beasts distinct existing bodies instead of the
   // generic humanoid bandit fallback.
@@ -3978,17 +4249,24 @@ const NPC_KEYS: Record<string, string> = {
   huntsman_deral: 'npc_scout',
 };
 
+/** The rig a mob TEMPLATE renders through: its per-template override, else its
+ *  family's shared body, else the humanoid fallback. Split out of visualKeyFor
+ *  so a caller holding a template id but no live entity (the Collections
+ *  window's idle preview) resolves the same key the world draws, instead of
+ *  guessing at VISUALS directly and missing every family-keyed mob. */
+export function mobVisualKey(templateId: string): string {
+  const override = MOB_KEYS[templateId];
+  if (override) return override;
+  const family = MOBS[templateId]?.family;
+  return (family && FAMILY_KEYS[family]) || 'mob_bandit';
+}
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
-  if (e.kind === 'mob') {
-    const override = MOB_KEYS[e.templateId];
-    if (override) return override;
-    const family = MOBS[e.templateId]?.family;
-    return (family && FAMILY_KEYS[family]) || 'mob_bandit';
-  }
+  if (e.kind === 'mob') return mobVisualKey(e.templateId);
   // npcs — Brother Aldric recurs in every hub under suffixed ids
   if (e.templateId.startsWith('brother_aldric')) return 'npc_aldric';
   return NPC_KEYS[e.templateId] ?? 'npc_villager';

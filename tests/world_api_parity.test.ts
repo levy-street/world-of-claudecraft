@@ -43,6 +43,7 @@ import { OVERHEAD_EMOTE_IDS, type PlayerClass } from '../src/sim/types';
 import type { IWorldActionBar } from '../src/world_api/action_bar';
 import type { IWorldBank } from '../src/world_api/bank';
 import type { IWorldBattleground } from '../src/world_api/battleground';
+import type { IWorldBuddies } from '../src/world_api/buddies';
 import type { IWorldCardMinigame } from '../src/world_api/card_minigame';
 import type { IWorldChat } from '../src/world_api/chat';
 // The overhead-emote runtime surface the chat facet derives locally (see the
@@ -474,6 +475,10 @@ export const IWORLD_MEMBERS = [
   { name: 'mountRaceStart', kind: 'method' },
   { name: 'mountRaceCancel', kind: 'method' },
   { name: 'mountRaceView', kind: 'method' }, // read-returning
+  // --- cosmetic buddies (IWorldBuddies) ---
+  { name: 'ownedBuddies', kind: 'method' }, // read-returning
+  { name: 'toggleBuddy', kind: 'method' },
+  { name: 'setBuddyAutoloot', kind: 'method' },
   // --- Dungeon Finder facet (IWorldDungeonFinder) ---
   { name: 'dungeonFinderInfo', kind: 'data' },
   { name: 'dungeonFinderBoard', kind: 'data' },
@@ -851,13 +856,19 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // resolvedAbility method and the four Nythraxis data readouts. Counted
     // directly off the resolved IWORLD_MEMBERS literal above (103
     // `kind: 'data'` + 267 `kind: 'method'` = 370, no duplicate names), never
-    // reconciled by arithmetic in the diff. Run `npx vitest run
-    // tests/world_api_parity.test.ts` before merge lands to confirm the
-    // facet-file exhaustiveness checks (AssertNever) also pass on the fully
-    // resolved production tree.
-    expect(IWORLD_MEMBERS.length).toBe(371);
+    // reconciled by arithmetic in the diff.
+    //
+    // RESOLVED for the merge of df2ae9880f (PR #3944, release/v0.42.0) into
+    // this branch (feature/buddy-companion-system): the buddy branch's own
+    // pin (346/95/251, carrying ownedBuddies/toggleBuddy/setBuddyAutoloot)
+    // and the release branch's pin (371/103/268, the class-balance and
+    // Nythraxis members above) compose with no overlap and no kind flips.
+    // Counted directly off the resolved IWORLD_MEMBERS literal above (103
+    // `kind: 'data'` + 271 `kind: 'method'` = 374, no duplicate names), never
+    // reconciled by arithmetic in the diff.
+    expect(IWORLD_MEMBERS.length).toBe(374);
     expect(DATA_MEMBERS.length).toBe(103);
-    expect(METHOD_MEMBERS.length).toBe(268);
+    expect(METHOD_MEMBERS.length).toBe(271);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1100,6 +1111,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
+      'ownedBuddies',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1174,6 +1186,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
+      'setBuddyAutoloot',
       'setDungeonDifficulty',
       'setGuildPledgeSettings',
       'setHarvestPreference',
@@ -1209,6 +1222,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talents',
       'targetEntity',
       'targetNearestFriendly',
+      'toggleBuddy',
       'toggleMounted',
       'toggleWeaponStow',
       'toolEffectSlots',
@@ -1513,6 +1527,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
+      'ownedBuddies',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1568,6 +1583,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
+      'setBuddyAutoloot',
       'setDungeonDifficulty',
       'setGuildPledgeSettings',
       'setHarvestPreference',
@@ -1597,6 +1613,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentPoints',
       'targetEntity',
       'targetNearestFriendly',
+      'toggleBuddy',
       'toggleMounted',
       'toggleWeaponStow',
       'trackGatheringCommission',
@@ -2119,6 +2136,13 @@ const FACET_MOUNTS = [
   'mountRaceView',
 ] as const satisfies readonly (keyof IWorldMounts)[];
 type _ExhaustMounts = AssertNever<Exclude<keyof IWorldMounts, (typeof FACET_MOUNTS)[number]>>;
+
+const FACET_BUDDIES = [
+  'ownedBuddies',
+  'toggleBuddy',
+  'setBuddyAutoloot',
+] as const satisfies readonly (keyof IWorldBuddies)[];
+type _ExhaustBuddies = AssertNever<Exclude<keyof IWorldBuddies, (typeof FACET_BUDDIES)[number]>>;
 const FACET_DUNGEON_FINDER = [
   'dungeonFinderInfo',
   'dungeonFinderBoard',
@@ -2262,6 +2286,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   telemetry: FACET_TELEMETRY,
   professions: FACET_PROFESSIONS,
   mounts: FACET_MOUNTS,
+  buddies: FACET_BUDDIES,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
   reliquary: FACET_RELIQUARY,
@@ -2272,14 +2297,26 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
     // +1 battleground facet (Thornhollow Fields) on the release line; +1
-    // Reliquary facet on the release line; +1 farming facet on this branch:
-    // 34 total. (The v0.38.0 sync hit the silent-count trap here: both sides
+    // Reliquary facet on this branch: 33 total; -1 for the New Eastbrook
+    // program's Vale Cup retirement: 32 total; +1 for the new Buddies
+    // facet (cosmetic followers): 33 total.
+    //
+    // ON THE RELEASE/v0.42.0 SIDE: +1 Reliquary facet, +1 farming facet: 34
+    // total. (The v0.38.0 sync hit the silent-count trap here: both sides
     // moved 32 to 33 independently and git kept a single 33.) The release's
     // own count: +1 Reliquary facet, 33 total; -1 for the New Eastbrook
     // program's Vale Cup retirement, 32 total. The v0.41.0 sync carries both
     // arms (farming in, vale_cup out): 33 total, measured as the facet files
     // on disk minus appearance.ts (the sweep below).
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
+    //
+    // RESOLVED for the merge of df2ae9880f (PR #3944, release/v0.42.0) into
+    // this branch: BOTH arms' totals happened to read 33 for different
+    // reasons (this branch's buddies facet against one base, the release's
+    // farming facet against another), the exact silent-count trap the note
+    // above warns about, so the textually-identical numbers do NOT carry
+    // forward. The merged tree carries both new facets (buddies AND
+    // farming): 34 total, counted directly off FACET_MEMBER_ARRAYS above.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(34);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2358,17 +2395,14 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (370), counted directly off
-    // the resolved literal now that src/world_api/inventory.ts,
-    // src/world_api/professions.ts, and src/world_api/combat.ts are resolved:
-    // the merge carries the professions activeMobileStationCrafts rename plus
-    // the release's four Nythraxis data readouts and the resolvedAbility
-    // method common to both parents. Run `npx vitest run
-    // tests/world_api_parity.test.ts` before merge lands to confirm the
-    // facet arrays actually reconstruct IWORLD_MEMBERS with no gaps or
-    // collisions; this pin and the one above must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(371);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(371);
+    // Mirrors the IWORLD_MEMBERS.length pin above (374, resolved for the
+    // merge of df2ae9880f / PR #3944 / release/v0.42.0 into this branch),
+    // counted directly off the resolved literal now that
+    // src/world_api/inventory.ts, src/world_api/professions.ts, and
+    // src/world_api/combat.ts are resolved: this pin and the one above must
+    // always agree.
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(374);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(374);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

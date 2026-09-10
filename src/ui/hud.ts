@@ -214,6 +214,7 @@ import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
 import { type ClaudiumRail, type ClaudiumSnapshot, ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
+import { buildCollectionsWindow, collectionsPreviewOptions } from './collections/collections_host';
 import { CombatAnnouncer } from './combat_announcer';
 import {
   auraApplyCue,
@@ -569,6 +570,7 @@ import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
+import { buddyMenuHtml, targetFrameMenuKind } from './hud/target_frame_menu';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildCrucibleVendorView } from './hud/vendor/crucible_vendor_view';
 import { renderCrucibleVendorWindow } from './hud/vendor/crucible_vendor_window';
@@ -743,7 +745,9 @@ import {
   petFeedButtonState,
   petSpecialButtonState,
 } from './pet_action_icons';
-import { isControllableOwnedPet, ownedCombatSourceOwnerId } from './pet_entity';
+// isControllableOwnedPet is not imported here: the target-frame menu routing
+// that used it moved to hud/target_frame_menu.ts's targetFrameMenuKind.
+import { ownedCombatSourceOwnerId } from './pet_entity';
 import { findOwnPet, findPetsByOwner, petFrameDescriptorInto } from './pet_frame_view';
 import {
   chatPlayerContextActions,
@@ -3134,6 +3138,7 @@ export class Hud {
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
     $('#mm-wiki')?.addEventListener('click', () => this.openWiki());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
+    $('#mm-collections').addEventListener('click', () => this.toggleCollections());
     $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
@@ -3650,6 +3655,10 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
         // consistent with the toggle / X close path.
         this.arenaWindow.close();
+        break;
+      case 'collections-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.collectionsWindow.close();
         break;
       case 'dungeon-finder-window':
         this.dungeonFinderWindow.close();
@@ -5553,6 +5562,27 @@ export class Hud {
     ...this.windowFocus('#arena-window'),
   });
 
+  // Collections (cold window): the buddy, mount and epic-set catalogs with each
+  // one's source, derived in src/ui/collections/. Its whole deps bag is built
+  // there (collections_host.ts); the idle preview rides the SHARED turntable, so
+  // the window adds no second WebGL context.
+  private readonly collectionsWindow = buildCollectionsWindow({
+    ...this.presentationBag,
+    root: () => $('#collections-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#collections-window'),
+    ...this.windowFocus('#collections-window'),
+    mountPreview: (container, previewKey, kind, tint) =>
+      this.mountSharedPreview(
+        container,
+        collectionsPreviewOptions(previewKey, this.sim.cfg.playerClass, kind, tint),
+      ),
+    exchangeClient: () => this.wocMarketHooks?.client ?? null,
+  });
+
+  // Dungeon Finder (cold window; docs/prd/dungeon-finder.md). Composes the
+  // shared presentation bag for loot icons/tooltips and a narrow map hook for
+  // the non-teleporting "Show on Map" action.
   private readonly dungeonFinderWindow = new DungeonFinderWindow({
     ...this.presentationBag,
     root: () => $('#dungeon-finder-window'),
@@ -7076,6 +7106,7 @@ export class Hud {
     // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
     // one rebuild with fresh t() (self-gated on isOpen).
     this.arenaWindow.relocalize();
+    this.collectionsWindow.relocalize();
     this.bgScoreboard.relocalize();
     this.dungeonFinderWindow.relocalize();
     this.dungeonFinderProposalPopup.relocalize();
@@ -9656,6 +9687,7 @@ export class Hud {
       this.yumiPainter.update(this.sim.arenaInfo);
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
+      if ($('#collections-window').style.display === 'block') this.collectionsWindow.render();
       if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
       if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
       if (this.bgProposalPopup.isOpen) this.bgProposalPopup.render();
@@ -10696,6 +10728,10 @@ export class Hud {
   // band while open. The in-match auto-close + the pinned banner stay here.
   toggleArena(): void {
     this.arenaWindow.toggle();
+  }
+
+  toggleCollections(): void {
+    this.collectionsWindow.toggle();
   }
 
   toggleBattleground(): void {
@@ -16578,6 +16614,8 @@ export class Hud {
       offhand: string | null;
       /** The active Armory weapon-skin cosmetic (null = the item's own model). */
       weaponSkinId: string | null;
+      /** Entity dye for a tinted rig; white (the default) leaves baked art alone. */
+      tint?: number;
       framing: PreviewFramingName;
       /** Compose the turntable from this authored look instead of mounting the
        *  stock class rig. Set for the SELF sheet, whose body must match the one
@@ -16608,7 +16646,13 @@ export class Hud {
       // Mech is class-agnostic; mirror the wearer class's hand layout so the
       // paperdoll matches the in-world render.
       const override = opts.previewKey === 'player_mech' ? mechHeldWeaponOverride(opts.cls) : null;
-      this.charPreview.setVisualKey(opts.previewKey, opts.mainhand, override, opts.offhand);
+      this.charPreview.setVisualKey(
+        opts.previewKey,
+        opts.mainhand,
+        override,
+        opts.offhand,
+        opts.tint,
+      );
     } else {
       this.charPreview.setClass(opts.cls, opts.mainhand, opts.offhand);
     }
@@ -17504,27 +17548,18 @@ export class Hud {
   }
 
   // Open the target-frame unit menu at a viewport point, shared by the desktop
-  // right-click (contextmenu) and the touch double-tap. A friendly player (not
-  // you) gets the social/party menu; your own pet gets the pet menu; a live wild
-  // hostile mob (in a party) gets the raid-marker menu, mirroring Sim.setMarker's
-  // markable criteria so the menu never appears where it would be a no-op.
+  // right-click (contextmenu) and the touch double-tap. WHICH menu a target
+  // opens is targetFrameMenuKind's rule (hud/target_frame_menu.ts); this only
+  // dispatches to the matching opener.
   private openTargetFrameMenuAt(x: number, y: number): void {
     const tid = this.sim.player.targetId;
     const t = tid !== null ? this.sim.entities.get(tid) : null;
-    if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
-      this.openContextMenu(t.id, t.name, x, y);
-    } else if (t && isControllableOwnedPet(t, this.sim.playerId)) {
-      this.openPetMenu(t.id, t.name, t.dead, x, y);
-    } else if (
-      t &&
-      t.kind === 'mob' &&
-      !t.dead &&
-      t.hostile &&
-      t.ownerId === null &&
-      this.sim.partyInfo
-    ) {
-      this.openMarkerMenu(t.id, t.name, x, y);
-    }
+    if (!t) return;
+    const kind = targetFrameMenuKind(t, this.sim.playerId, !!this.sim.partyInfo);
+    if (kind === 'player') this.openContextMenu(t.id, t.name, x, y);
+    else if (kind === 'pet') this.openPetMenu(t.id, t.name, t.dead, x, y);
+    else if (kind === 'buddy') this.openBuddyMenu(t.name, x, y);
+    else if (kind === 'marker') this.openMarkerMenu(t.id, t.name, x, y);
   }
 
   /**
@@ -17914,6 +17949,24 @@ export class Hud {
           );
         }
       });
+    });
+  }
+
+  /** Your own cosmetic buddy's target-frame menu: one row, the autoloot errand
+   *  (src/sim/pet/buddy_autoloot.ts owns its rules). The armed state is read off
+   *  the entity mirror (Entity.buddyAutoloot, terse `budal`) exactly as the rest
+   *  of the HUD reads buddyKey, so the row offers the flip the SERVER would
+   *  make; the write is server-authoritative and lands on the next snapshot. */
+  openBuddyMenu(name: string, x: number, y: number): void {
+    const el = $('#ctx-menu');
+    el.classList.remove(CTX_MENU_PICKER_CLASS);
+    const armed = this.sim.entities.get(this.sim.playerId)?.buddyAutoloot === true;
+    el.innerHTML = buddyMenuHtml(name, armed);
+    el.style.display = 'block';
+    this.placePopupAt(el, x, y, 170, 240);
+    this.keepPopupOnScreen(el);
+    this.bindContextMenuActions((act) => {
+      if (act === 'autoloot') this.sim.setBuddyAutoloot(!armed);
     });
   }
 

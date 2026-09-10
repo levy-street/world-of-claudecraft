@@ -367,18 +367,23 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
-    // The completion wave, the Crucible wave (crucible-set-icons-2026-08-29), and the
+    // The completion wave, the Crucible wave (crucible-set-icons-2026-08-29), the
     // release's Roots' Bramblehide plus Nythraxis gap-fill wave
-    // (roots-bramblehide-icons-2026-09-07) are all fully painted (confirmed on the
-    // merged tree: IGNIVAR_ART_PENDING_ITEM_IDS, BRAMBLEHIDE_ART_PENDING_ITEM_IDS, and
+    // (roots-bramblehide-icons-2026-09-07), and 31 of the 32 buddy whistles
+    // (rendered-from-GLB art, scripts/assets/render_buddy_item_icons.mjs) are
+    // all fully painted (confirmed on the merged tree:
+    // IGNIVAR_ART_PENDING_ITEM_IDS, BRAMBLEHIDE_ART_PENDING_ITEM_IDS, and
     // NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS are each declared empty in
-    // src/sim/content/ignivar_loot.ts / zone3.ts), so the ledger is back to the EMPTY
-    // set: no artless item can hide behind an open wave, and the next commissioned wave
-    // re-pins its exact membership here when it stages.
+    // src/sim/content/ignivar_loot.ts / zone3.ts). The one open debt is the
+    // newest whistle: whistle_emberfall_phoenix's GLB is committed but its
+    // render needs a headless-Chromium host this repo's sandbox does not have
+    // (BUDDY_ART_PENDING_ITEM_IDS, src/sim/content/buddies.ts) -- enumerated
+    // honestly here rather than shipped as a silent 404, and it comes out the
+    // moment that render lands.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual([]);
+    ).toEqual(['whistle_emberfall_phoenix']);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
