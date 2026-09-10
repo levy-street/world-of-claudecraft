@@ -8693,13 +8693,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Нитраксис отмечает Разрывом души {marksHeroic} рейдеров, кроме текущей цели. Через {fuse} сек. каждая метка наносит {damageHeroic} максимального здоровья её носителя как урон тьмой, поделённое между отмеченными рейдерами в радиусе {range} м от него. Метка, сработавшая в одиночку, смертельна.',
   'hudChrome.raidBossGuide.nythraxis.soulRendResponse':
     'Каждый отмеченный рейдер бежит к общей точке сбора и встаёт в пределах {range} м от других меток до истечения {fuse}-секундного таймера. Лекари поднимают здоровье группы, пока метки срабатывают.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Огонь души',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Каждый взрыв Разрыва души оставляет на месте каждой метки лужу лилового огня радиусом {radius} м, которая горит {seconds} сек., нанося {tickNormal} максимального здоровья каждую секунду. Там, где лужи пересекаются, урон наносится от каждой из них. Лужи никогда не появляются в пределах {clearance} м от охранного камня.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Каждый взрыв Разрыва души оставляет одну лужу лилового огня радиусом {radius} м на каждую группу сближенных меток, которая горит {secondsHeroic} сек., нанося {tickHeroic} максимального здоровья каждую секунду. Если лужи пересекаются, урон засчитывается лишь один раз, без наложения. Лужи никогда не появляются в пределах {clearance} м от охранного камня.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Выходите из лиловой лужи сразу после взрыва меток. Выбирайте следующую точку сбора подальше от горящего огня.',
   'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Могильный огонь',
   'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
     'Каждые {everyNormal} сек. от Нитраксиса к одному из рейдеров тянется линия лилового могильного огня, растущая на {speed} м в секунду до {length} м. Каждый метр горит {burnNormal} сек. и наносит {tickNormal} максимального здоровья каждую секунду всем, кто в нём стоит.',
@@ -11519,7 +11512,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Печать связывания (затащите босса на печать, или заплатит весь рейд)',
   'hudChrome.finder.mech.gravefire': 'Могильный огонь (движущаяся огненная линия, уклоняйтесь)',
-  'hudChrome.finder.mech.soulfire': 'Огонь души (взрывы Разрыва души оставляют горящие лужи)',
   'hudChrome.finder.mech.kings_wrath':
     'Королевский гнев (30%: постоянный бонус к урону, ускоренные опасности на полу)',
   'hudChrome.finder.mech.bone_storm': 'Костяная буря (игнорирует угрозу, вращается и таранит рейд)',

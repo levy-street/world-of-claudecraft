@@ -8517,13 +8517,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ナイスラクシスは現在の対象以外のレイドメンバー{marksHeroic}人にソウルレンドの印を付ける。{fuse}秒後、各印は対象者の最大体力の{damageHeroic}を闇ダメージとして与え、その者から{range}ヤード以内にいる印を受けたレイドメンバーの人数で分割される。単独で発動した印は致命的となる。',
   'hudChrome.raidBossGuide.nythraxis.soulRendResponse':
     '印を受けたレイドメンバーは全員、{fuse}秒の導火線が尽きる前に集合地点へ走り、他の印から{range}ヤード以内に立つ。ヒーラーは印が発動する際にグループの体力を満たしておく。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'ソウルファイア',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'ソウルレンドが発動するたびに、各印があった場所に半径{radius}ヤードの紫色の炎の水たまりが残り、{seconds}秒間、毎秒最大体力の{tickNormal}のダメージを与えながら燃え続ける。水たまりが重なる場所ではそれぞれから1回ずつダメージを受ける。水たまりはウォードストーンから{clearance}ヤード以内には出現しない。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'ソウルレンドが発動するたびに、重なり合った印の集団ごとに半径{radius}ヤードの紫色の炎の水たまりが1つだけ残り、{secondsHeroic}秒間、毎秒最大体力の{tickHeroic}のダメージを与えながら燃え続ける。水たまりが重なっても受けるダメージは1回分だけで、重複しない。水たまりはウォードストーンから{clearance}ヤード以内には出現しない。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    '印が発動したらすぐに紫色の水たまりから離れる。次の集合地点は燃えている炎から離れた場所を選ぶこと。',
   'hudChrome.raidBossGuide.nythraxis.gravefireName': '紫炎',
   'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
     '{everyNormal}秒ごとに、ナイスラクシスからレイドメンバーへ向けて紫炎の線が伸びていき、毎秒{speed}ヤードずつ{length}ヤードまで伸びる。伸びた地点はそれぞれ{burnNormal}秒間燃え続け、中に立つ者へ毎秒最大体力の{tickNormal}を与える。',
@@ -11353,7 +11346,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     '拘束の印（ボスを印の上へ引きずり込まないとレイドが代償を払う）',
   'hudChrome.finder.mech.gravefire': '紫炎（避けて進む炎の直線）',
-  'hudChrome.finder.mech.soulfire': 'ソウルファイア（ソウルレンドの爆発が燃える水たまりを残す）',
   'hudChrome.finder.mech.kings_wrath': '王の怒り（体力30%：永続ダメージ増加、床の脅威が加速）',
   'hudChrome.finder.mech.bone_storm': '骨の嵐（ヘイトを無視して旋風攻撃を行い、レイドに突進する）',
   'hudChrome.finder.mech.crown_endures': '王冠不滅（6:00でハードエンレイジ、英雄は5:00）',

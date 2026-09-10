@@ -15948,8 +15948,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Feu sépulcral (une ligne de feu mobile à esquiver)',
   'hudChrome.finder.mech.kings_wrath':
     'Courroux du roi (30% : bonus de dégâts permanent, dangers au sol plus rapides)',
-  'hudChrome.finder.mech.soulfire':
-    "Feu d'âme (les détonations de Déchirure d'âme laissent des flaques brûlantes)",
   'hudChrome.fullTransfer.excluded':
     "Jamais inclus : votre identifiant, votre compte, votre portefeuille ou vos données d'achat. Les dispositions des barres d'action sont enregistrées sur votre compte et le suivent.",
   'hudChrome.fullTransfer.fullSettings': 'Paramètres complets',
@@ -16141,13 +16139,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Chaque membre marqué court vers un point de regroupement et se tient dans les {range} yd des autres marques avant la fin de la mèche de {fuse} s. Les soigneurs remontent le groupe quand les marques se résolvent.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     "Nythraxis marque {marksNormal} membres du raid autres que sa cible actuelle avec Déchirure d'âme. Après {fuse} s, chaque marque inflige tous les points de vie maximum de son porteur en dégâts d'Ombre, divisés par le nombre de membres marqués dans les {range} yd autour de lui.",
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    "Chaque détonation de Déchirure d'âme laisse une flaque de feu violet d'un rayon de {radius} yd par groupe de marques empilées, brûlant pendant {secondsHeroic} s à raison de {tickHeroic} des points de vie maximum chaque seconde. Se tenir là où les flaques se chevauchent ne donne qu'un seul tick, jamais des copies cumulées. Les flaques ne se forment jamais à moins de {clearance} yd d'une pierre de garde.",
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': "Feu d'âme",
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Sortez de la flaque violette dès que les marques explosent. Gardez le prochain point de regroupement libre de feu actif.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    "Chaque détonation de Déchirure d'âme laisse une flaque de feu violet d'un rayon de {radius} yd là où chaque marque se tenait, brûlant pendant {seconds} s à raison de {tickNormal} des points de vie maximum chaque seconde. Se tenir là où les flaques se chevauchent fait subir un tick de chacune. Les flaques ne se forment jamais à moins de {clearance} yd d'une pierre de garde.",
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Glaçons',
   'hudChrome.cosmetics.applied': 'Appliqué',
   'hudChrome.cosmetics.apply': 'Appliquer',

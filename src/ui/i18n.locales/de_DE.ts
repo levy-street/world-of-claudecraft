@@ -15827,8 +15827,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Grabfeuer (eine wandernde Feuerlinie zum Ausweichen)',
   'hudChrome.finder.mech.kings_wrath':
     'Zorn des Königs (30%: dauerhafter Schadensbonus, schnellere Bodengefahren)',
-  'hudChrome.finder.mech.soulfire':
-    'Seelenfeuer (Detonationen von Seelenriss hinterlassen brennende Flächen)',
   'hudChrome.fullTransfer.excluded':
     'Nie enthalten: Eure Anmeldung, Euer Konto, Eure Wallet oder Kaufdaten. Aktionsleistenlayouts werden in Eurem Konto gespeichert und reisen mit.',
   'hudChrome.fullTransfer.fullSettings': 'Vollständige Einstellungen',
@@ -16020,13 +16018,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Jeder markierte Schlachtzügler läuft zu einem Sammelpunkt und steht innerhalb von {range} yd der anderen Markierungen, bevor die {fuse} Sek. lange Zündzeit endet. Heiler bringen die Gruppe hoch, wenn die Markierungen auslösen.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis markiert {marksNormal} Schlachtzügler außer seinem aktuellen Ziel mit Seelenriss. Nach {fuse} Sek. verursacht jede Markierung die volle maximale Gesundheit ihres Trägers als Schattenschaden, geteilt durch die Anzahl markierter Schlachtzügler innerhalb von {range} yd um sie.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Jede Seelenriss-Detonation hinterlässt pro gestapelter Markierungsgruppe eine violette Feuerfläche mit {radius} yd Radius, die {secondsHeroic} Sek. lang brennt und jede Sekunde {tickHeroic} der maximalen Gesundheit verursacht. Wer dort steht, wo Flächen überlappen, erleidet nur einen Tick, nie gestapelte Kopien. Flächen entstehen nie innerhalb von {clearance} yd eines Schutzsteins.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Seelenfeuer',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Lauft aus der violetten Fläche, sobald die Markierungen detonieren. Haltet den nächsten Sammelpunkt frei von aktivem Feuer.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Jede Seelenriss-Detonation hinterlässt dort, wo jede Markierung stand, eine violette Feuerfläche mit {radius} yd Radius, die {seconds} Sek. lang brennt und jede Sekunde {tickNormal} der maximalen Gesundheit verursacht. Wer dort steht, wo Flächen überlappen, erleidet von jeder Fläche einen Tick. Flächen entstehen nie innerhalb von {clearance} yd eines Schutzsteins.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Eiszapfen',
 
   // Release fill: v0.31 farming, corpse harvest, aura tracks, and cosmetics.

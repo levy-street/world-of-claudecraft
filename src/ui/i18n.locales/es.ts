@@ -15811,8 +15811,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Fuego sepulcral (una línea de fuego móvil que hay que esquivar)',
   'hudChrome.finder.mech.kings_wrath':
     'Ira del rey (30%: bonificación de daño permanente, peligros del suelo más rápidos)',
-  'hudChrome.finder.mech.soulfire':
-    'Fuego de almas (las detonaciones de Desgarro de alma dejan charcos ardientes)',
   'hudChrome.fullTransfer.excluded':
     'Nunca se incluye: tu inicio de sesión, cuenta, cartera ni datos de compra. Los diseños de la barra de acción se guardan en tu cuenta y viajan con ella.',
   'hudChrome.fullTransfer.fullSettings': 'Configuración completa',
@@ -16003,13 +16001,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cada miembro marcado corre a un punto de agrupamiento y se coloca a {range} yd o menos de las otras marcas antes de que termine la mecha de {fuse} s. Los sanadores completan la salud del grupo cuando las marcas se resuelven.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis marca con Desgarro de alma a {marksNormal} miembros de la banda que no sean su objetivo actual. Tras {fuse} s, cada marca inflige toda la salud máxima de su portador como daño de las Sombras, dividido entre el número de miembros marcados a {range} yd o menos de él.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Cada detonación de Desgarro de alma deja un charco de fuego morado con {radius} yd de radio por grupo de marcas agrupadas, que arde durante {secondsHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo. Estar donde los charcos se solapan solo aplica un pulso, nunca copias acumuladas. Los charcos nunca aparecen a menos de {clearance} yd de una piedra de resguardo.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Fuego de almas',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Sal del charco morado en cuanto detonen las marcas. Mantén el siguiente punto de agrupamiento libre de fuego activo.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Cada detonación de Desgarro de alma deja un charco de fuego morado con {radius} yd de radio donde estaba cada marca, que arde durante {seconds} s e inflige {tickNormal} de la salud máxima cada segundo. Estar donde los charcos se solapan aplica un pulso de cada uno. Los charcos nunca aparecen a menos de {clearance} yd de una piedra de resguardo.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Carámbanos',
   'abilityUi.cast.sundering': 'Quebrantar',
   'hud.core.mapMarkerLabels.farmPatch': 'Parcelas de cultivo',

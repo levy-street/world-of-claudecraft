@@ -16310,8 +16310,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Fogo sepulcral (uma linha de fogo móvel para esquivar)',
   'hudChrome.finder.mech.kings_wrath':
     'Ira do rei (30%: bônus permanente de dano, perigos no chão mais rápidos)',
-  'hudChrome.finder.mech.soulfire':
-    'Fogo de alma (detonações de Rasgo de alma deixam poças ardentes)',
   'hudChrome.fullTransfer.excluded':
     'Nunca incluídos: login, conta, carteira ou dados de compra. Layouts da barra de ações são salvos na sua conta e viajam com ela.',
   'hudChrome.fullTransfer.fullSettings': 'Configurações completas',
@@ -16501,13 +16499,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Cada raider marcado corre para um ponto de agrupamento e fica a até {range} yd das outras marcas antes da mecha de {fuse} s acabar. Os curadores completam a vida do grupo quando as marcas resolvem.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis marca {marksNormal} raiders que não sejam seu alvo atual com Rasgo de alma. Após {fuse} s, cada marca causa toda a vida máxima do portador como dano de Sombra, dividido pelo número de raiders marcados em até {range} yd dele.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Cada detonação de Rasgo de alma deixa uma poça de fogo roxo com raio de {radius} yd por grupo de marcas agrupadas, queimando por {secondsHeroic} s a {tickHeroic} da vida máxima por segundo. Ficar onde poças se sobrepõem causa apenas um pulso, nunca cópias acumuladas. Poças nunca se formam em até {clearance} yd de uma pedra de proteção.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Fogo de alma',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Saia da poça roxa assim que as marcas detonarem. Mantenha o próximo ponto de agrupamento livre de fogo ativo.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Cada detonação de Rasgo de alma deixa uma poça de fogo roxo com raio de {radius} yd onde cada marca estava, queimando por {seconds} s a {tickNormal} da vida máxima por segundo. Ficar onde poças se sobrepõem causa um pulso de cada uma. Poças nunca se formam em até {clearance} yd de uma pedra de proteção.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Pingentes de gelo',
 
   'entities.abilities.grove_awakening.description':

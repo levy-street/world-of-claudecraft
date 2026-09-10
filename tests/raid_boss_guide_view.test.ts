@@ -29,6 +29,7 @@ import {
   NYTHRAXIS_UNBOUND_HIT_MAX_HP_NORMAL,
 } from '../src/sim/nythraxis_binding_sigil';
 import {
+  NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_NORMAL,
 } from '../src/sim/nythraxis_bone_spike';
@@ -70,10 +71,6 @@ import {
   nythraxisWrathGraveEruptionEvery,
   nythraxisWrathGravefireEvery,
 } from '../src/sim/nythraxis_kings_wrath';
-import {
-  NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC,
-  NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL,
-} from '../src/sim/nythraxis_soulfire';
 import { NYTHRAXIS_BOSS_ID } from '../src/sim/types';
 import { VARKHUL_ANVILS_DECREE_STRIKES } from '../src/sim/varkhul_anvils_decree';
 import {
@@ -184,7 +181,6 @@ describe('raid boss guide view', () => {
       'grave-eruption',
       'binding-sigil',
       'soul-rend',
-      'soulfire',
       'gravefire',
       'deathless-rage',
       'kings-wrath',
@@ -198,7 +194,6 @@ describe('raid boss guide view', () => {
       'grave-eruption',
       'binding-sigil',
       'soul-rend',
-      'soulfire',
       'gravefire',
       'deathless-rage',
       'kings-wrath',
@@ -207,8 +202,9 @@ describe('raid boss guide view', () => {
     ]);
     // Raise Fallen and the heroic court are switched off with the adds
     // (NYTHRAXIS_ADDS_ENABLED), so neither tier lists them.
-    expect(normal.phases.map((phase) => phase.mechanics.length)).toEqual([5, 4, 3]);
-    expect(heroic.phases.map((phase) => phase.mechanics.length)).toEqual([5, 4, 3]);
+    // The Wardstones phase lost its Soulfire row in v0.42.2 (the pools left the fight).
+    expect(normal.phases.map((phase) => phase.mechanics.length)).toEqual([5, 3, 3]);
+    expect(heroic.phases.map((phase) => phase.mechanics.length)).toEqual([5, 3, 3]);
 
     expect(normal.phases.find((phase) => phase.id === 'throne')?.values).toBeUndefined();
     expect(normal.phases.find((phase) => phase.id === 'wardstones')).toMatchObject({
@@ -264,11 +260,8 @@ describe('raid boss guide view', () => {
       flags: ['deadly'],
       iconId: 'raid_nythraxis_gravefire',
     });
-    expect(normalMechanics.find((mechanic) => mechanic.id === 'soulfire')).toMatchObject({
-      roles: ['all'],
-      flags: ['important'],
-      iconId: 'raid_nythraxis_soulfire',
-    });
+    // Soulfire left the fight in v0.42.2, so the guide has no row for it.
+    expect(normalMechanics.find((mechanic) => mechanic.id === 'soulfire')).toBeUndefined();
     expect(normalMechanics.find((mechanic) => mechanic.id === 'kings-wrath')).toMatchObject({
       roles: ['all'],
       flags: ['important'],
@@ -337,7 +330,6 @@ describe('raid boss guide view', () => {
       'grave-eruption',
       'binding-sigil',
       'soul-rend',
-      'soulfire',
       'gravefire',
       'deathless-rage',
       'bone-storm',
@@ -365,10 +357,6 @@ describe('raid boss guide view', () => {
       'soul-rend': {
         summaryKey: `${base}.soulRendSummary`,
         responseKey: `${base}.soulRendResponse`,
-      },
-      soulfire: {
-        summaryKey: `${base}.soulfireSummary`,
-        responseKey: `${base}.soulfireResponse`,
       },
       gravefire: {
         summaryKey: `${base}.gravefireSummary`,
@@ -407,10 +395,6 @@ describe('raid boss guide view', () => {
       'soul-rend': {
         summaryKey: `${base}.soulRendHeroicSummary`,
         responseKey: `${base}.soulRendResponse`,
-      },
-      soulfire: {
-        summaryKey: `${base}.soulfireHeroicSummary`,
-        responseKey: `${base}.soulfireResponse`,
       },
       gravefire: {
         summaryKey: `${base}.gravefireHeroicSummary`,
@@ -523,11 +507,11 @@ describe('raid boss guide view', () => {
     expect(summaryOf(heroic, 'gravefire')).toContain(
       `${pct(NYTHRAXIS_GRAVEFIRE_TICK_MAX_HP_HEROIC)} of maximum health`,
     );
-    expect(summaryOf(normal, 'soulfire')).toContain(
-      `${pct(NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL)} of maximum health`,
+    expect(summaryOf(normal, 'bone-spike')).toContain(
+      `cannot be chosen again for ${NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS} sec`,
     );
-    expect(summaryOf(heroic, 'soulfire')).toContain(
-      `${pct(NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC)} of maximum health`,
+    expect(summaryOf(heroic, 'bone-spike')).toContain(
+      `cannot be chosen again for ${NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS} sec`,
     );
     expect(summaryOf(normal, 'kings-wrath')).toContain(
       `${pct(nythraxisKingsWrathDamageBonus('normal'))} more damage on Normal`,

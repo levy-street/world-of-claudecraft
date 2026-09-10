@@ -15467,8 +15467,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Gravild (en vandrende ildlinje at træde udenom)',
   'hudChrome.finder.mech.kings_wrath':
     'Kongens vrede (30%: permanent skadebonus, hurtigere gulvfarer)',
-  'hudChrome.finder.mech.soulfire':
-    'Sjæleild (detonationer fra Sjæleflængen efterlader brændende søer)',
   'hudChrome.fullTransfer.excluded':
     'Aldrig inkluderet: dit login, din konto, din wallet eller købsdata. Handlingsbjælkelayouts gemmes på din konto og følger med.',
   'hudChrome.fullTransfer.fullSettings': 'Fuldstændige indstillinger',
@@ -15658,13 +15656,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Hver markeret raiddeltager løber til ét samlingspunkt og står inden for {range} yd af de andre mærker, før lunten på {fuse} sek løber ud. Helbredere fylder gruppen op, når mærkerne udløses.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis markerer {marksNormal} raiddeltagere ud over sit nuværende mål med Sjæleflængen. Efter {fuse} sek giver hvert mærke bærerens fulde maksimale sundhed som Skyggeskade, delt med antallet af markerede raiddeltagere inden for {range} yd af dem.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Hver Sjæleflængen-detonation efterlader én sø af lilla ild med {radius} yd radius pr. samlet gruppe af mærker, som brænder i {secondsHeroic} sek med {tickHeroic} af maksimal sundhed hvert sekund. At stå hvor søer overlapper giver kun ét tick, aldrig stakkede kopier. Søer dannes aldrig inden for {clearance} yd af en værnsten.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Sjæleild',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Flyt ud af den lilla sø, så snart mærkerne detonerer. Hold det næste samlingspunkt fri for aktiv ild.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Hver Sjæleflængen-detonation efterlader en sø af lilla ild med {radius} yd radius, hvor hvert mærke stod, som brænder i {seconds} sek med {tickNormal} af maksimal sundhed hvert sekund. At stå hvor søer overlapper giver et tick fra hver enkelt. Søer dannes aldrig inden for {clearance} yd af en værnsten.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Istapper',
   'abilityUi.cast.farming': 'Plantning',
   'abilityUi.cast.sundering': 'Spaltning',

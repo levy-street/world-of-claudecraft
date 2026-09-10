@@ -15683,8 +15683,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Grafvuur (een bewegende vuurlijn om te ontwijken)',
   'hudChrome.finder.mech.kings_wrath':
     'Koningswoede (30%: permanente schadebonus, snellere vloergevaren)',
-  'hudChrome.finder.mech.soulfire':
-    'Zielenvuur (detonaties van Zielenscheur laten brandende poelen achter)',
   'hudChrome.fullTransfer.excluded':
     'Nooit inbegrepen: je login, account, wallet of aankoopgegevens. Actiebalkindelingen worden in je account opgeslagen en reizen mee.',
   'hudChrome.fullTransfer.fullSettings': 'Volledige instellingen',
@@ -15874,13 +15872,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Elke gemarkeerde raider rent naar één stapelpunt en staat binnen {range} yd van de andere markeringen voordat de lont van {fuse} sec eindigt. Healers vullen de groep aan wanneer de markeringen afgaan.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis markeert {marksNormal} raiders behalve zijn huidige doelwit met Zielenscheur. Na {fuse} sec richt elke markering de volledige maximale gezondheid van de drager als Schaduwschade aan, gedeeld door het aantal gemarkeerde raiders binnen {range} yd van hen.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Elke Zielenscheur-detonatie laat één poel paars vuur achter met een straal van {radius} yd per gestapelde groep markeringen, die {secondsHeroic} sec brandt voor {tickHeroic} van maximale gezondheid per seconde. Staan waar poelen overlappen geeft slechts één tik, nooit gestapelde kopieën. Poelen ontstaan nooit binnen {clearance} yd van een wachtsteen.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Zielenvuur',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Ga uit de paarse poel zodra de markeringen detoneren. Houd het volgende stapelpunt vrij van actief vuur.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Elke Zielenscheur-detonatie laat een poel paars vuur achter met een straal van {radius} yd waar elke markering stond, die {seconds} sec brandt voor {tickNormal} van maximale gezondheid per seconde. Staan waar poelen overlappen geeft een tik van elke poel. Poelen ontstaan nooit binnen {clearance} yd van een wachtsteen.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'IJskegels',
   'abilityUi.cast.farming': 'Planten',
   'abilityUi.cast.sundering': 'Splijten',

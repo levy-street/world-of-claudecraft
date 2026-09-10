@@ -16418,8 +16418,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Fuoco sepolcrale (una linea di fuoco in movimento da schivare)',
   'hudChrome.finder.mech.kings_wrath':
     'Ira del re (30%: bonus danni permanente, pericoli a terra più rapidi)',
-  'hudChrome.finder.mech.soulfire':
-    "Fuoco d anime (le detonazioni di Squarcio d'anima lasciano pozze ardenti)",
   'hudChrome.fullTransfer.excluded':
     "Mai inclusi: login, account, portafoglio o dati d'acquisto. Le disposizioni della barra azioni vengono salvate sul tuo account e viaggiano con esso.",
   'hudChrome.fullTransfer.fullSettings': 'Impostazioni complete',
@@ -16611,13 +16609,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ogni membro marchiato corre a un punto di raggruppamento e resta entro {range} yd dagli altri marchi prima che finisca la miccia di {fuse} s. I guaritori riportano su il gruppo mentre i marchi si risolvono.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     "Nythraxis marchia {marksNormal} membri dell'incursione diversi dal suo bersaglio attuale con Squarcio d'anima. Dopo {fuse} s ogni marchio infligge l'intera salute massima del portatore come danni da Ombra, divisi per il numero di membri marchiati entro {range} yd da lui.",
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    "Ogni detonazione di Squarcio d'anima lascia una pozza di fuoco viola con raggio di {radius} yd per gruppo di marchi raggruppati, che brucia per {secondsHeroic} s al ritmo di {tickHeroic} della salute massima ogni secondo. Stare dove le pozze si sovrappongono infligge un solo tick, mai copie accumulate. Le pozze non si formano mai entro {clearance} yd da una pietra di guardia.",
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Fuoco d anime',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Esci dalla pozza viola appena i marchi detonano. Mantieni il prossimo punto di raggruppamento libero dal fuoco attivo.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    "Ogni detonazione di Squarcio d'anima lascia una pozza di fuoco viola con raggio di {radius} yd dove si trovava ogni marchio, che brucia per {seconds} s al ritmo di {tickNormal} della salute massima ogni secondo. Stare dove le pozze si sovrappongono infligge un tick da ciascuna. Le pozze non si formano mai entro {clearance} yd da una pietra di guardia.",
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Ghiaccioli',
 
   'entities.abilities.grove_awakening.description':

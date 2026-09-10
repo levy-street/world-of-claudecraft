@@ -267,7 +267,6 @@ describe('Nythraxis dungeon finder blurbs', () => {
       'grave_eruption',
       'binding_sigil',
       'gravefire',
-      'soulfire',
       'kings_wrath',
       'bone_storm',
       'crown_endures',

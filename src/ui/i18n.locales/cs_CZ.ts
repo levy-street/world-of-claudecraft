@@ -15404,7 +15404,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Hrobový oheň (pohyblivá ohnivá linie, které je třeba uhnout)',
   'hudChrome.finder.mech.kings_wrath':
     'Králův hněv (30%: trvalý bonus k poškození, rychlejší nebezpečí na podlaze)',
-  'hudChrome.finder.mech.soulfire': 'Oheň duší (výbuchy Trhání duše zanechají hořící kaluže)',
   'hudChrome.fullTransfer.excluded':
     'Nikdy se nezahrnuje: tvoje přihlášení, účet, peněženka ani údaje o nákupech. Rozložení akčních lišt se ukládá k účtu a cestuje s ním.',
   'hudChrome.fullTransfer.fullSettings': 'Úplná nastavení',
@@ -15591,13 +15590,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každý označený raider běží na jedno místo ke shromáždění a postaví se do {range} yardů od ostatních značek před koncem odpočtu {fuse} s. Léčitelé doléčí skupinu, než se značky vyhodnotí.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis označí {marksNormal} raiderů mimo svůj aktuální cíl Trháním duše. Po {fuse} s každá značka způsobí plné maximální zdraví svého nositele jako stínové poškození, rozdělené počtem označených raiderů v dosahu {range} yardů od něj.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Každý výbuch Trhání duše zanechá jednu kaluž fialového ohně s poloměrem {radius} yardů za každou seskupenou skupinu značek, která hoří {secondsHeroic} s a každou sekundu způsobuje {tickHeroic} maximálního zdraví. Stání v překryvu kaluží způsobí jen jeden tik, nikdy nasčítané kopie. Kaluže nikdy nevzniknou do {clearance} yardů od ochranného kamene.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Oheň duší',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Jakmile značky vybuchnou, odejdi z fialové kaluže. Udrž další místo shromáždění čisté od aktivního ohně.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Každý výbuch Trhání duše zanechá fialovou ohnivou kaluž s poloměrem {radius} yardů na místě, kde stála každá značka, která hoří {seconds} s a každou sekundu způsobuje {tickNormal} maximálního zdraví. Stání v překryvu kaluží způsobí tik z každé z nich. Kaluže nikdy nevzniknou do {clearance} yardů od ochranného kamene.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Rampouchy',
   'abilityUi.cast.farming': 'Sázení',
   'abilityUi.cast.sundering': 'Rozštěpení',

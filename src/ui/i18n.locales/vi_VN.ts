@@ -15602,7 +15602,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Lửa Mộ (một vệt lửa di chuyển cần né sang bên)',
   'hudChrome.finder.mech.kings_wrath':
     'Cơn Thịnh Nộ Của Vua (30%: cộng sát thương vĩnh viễn, bẫy sàn nhanh hơn)',
-  'hudChrome.finder.mech.soulfire': 'Lửa Linh Hồn (vụ nổ Xé Linh Hồn để lại vũng lửa)',
   'hudChrome.fullTransfer.excluded':
     'Không bao giờ bao gồm: dữ liệu đăng nhập, tài khoản, ví hoặc mua hàng của bạn. Bố cục thanh hành động được lưu vào tài khoản và đi cùng tài khoản đó.',
   'hudChrome.fullTransfer.fullSettings': 'Cài đặt đầy đủ',
@@ -15791,13 +15790,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Mỗi raider bị đánh dấu chạy tới một điểm tụ và đứng trong phạm vi {range} yd của các dấu khác trước khi ngòi {fuse} giây kết thúc. Người hồi máu hồi đầy nhóm khi các dấu kích nổ.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis đánh dấu {marksNormal} raider không phải mục tiêu hiện tại của hắn bằng Xé Linh Hồn. Sau {fuse} giây, mỗi dấu gây toàn bộ máu tối đa của người mang dưới dạng sát thương Bóng Tối, chia theo số raider bị đánh dấu trong phạm vi {range} yd quanh họ.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Mỗi vụ nổ Xé Linh Hồn để lại một vũng lửa tím bán kính {radius} yd cho mỗi nhóm dấu đã tụ lại, cháy trong {secondsHeroic} giây với {tickHeroic} máu tối đa mỗi giây. Đứng nơi các vũng chồng lên nhau chỉ nhận một tick, không bao giờ nhận các bản sao cộng dồn. Vũng không bao giờ xuất hiện trong phạm vi {clearance} yd quanh đá hộ vệ.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Lửa Linh Hồn',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Rời khỏi vũng tím ngay khi các dấu phát nổ. Giữ điểm tụ tiếp theo sạch khỏi lửa đang hoạt động.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Mỗi vụ nổ Xé Linh Hồn để lại một vũng lửa tím bán kính {radius} yd tại nơi từng dấu đứng, cháy trong {seconds} giây với {tickNormal} máu tối đa mỗi giây. Đứng nơi các vũng chồng lên nhau nhận tick từ từng vũng. Vũng không bao giờ xuất hiện trong phạm vi {clearance} yd quanh đá hộ vệ.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Nhũ băng',
   'abilityUi.cast.farming': 'Trồng trọt',
   'abilityUi.cast.sundering': 'Phá hủy',

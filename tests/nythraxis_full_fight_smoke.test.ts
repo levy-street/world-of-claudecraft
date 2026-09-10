@@ -186,7 +186,6 @@ const EXPECTED_DAMAGE = [
   'Binding Sigil',
   'Gravefire',
   'Soul Rend',
-  'Soulfire',
   'Deathless Rage',
   'Unbound',
   'Bone Storm',

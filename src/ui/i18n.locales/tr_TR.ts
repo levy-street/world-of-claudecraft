@@ -15536,7 +15536,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Mezar Ateşi (yana kaçılması gereken ilerleyen ateş çizgisi)',
   'hudChrome.finder.mech.kings_wrath':
     'Kralın Gazabı (30%: kalıcı hasar bonusu, daha hızlı zemin tehlikeleri)',
-  'hudChrome.finder.mech.soulfire': 'Ruh Ateşi (Ruh Yırtma patlamaları yanan havuzlar bırakır)',
   'hudChrome.fullTransfer.excluded':
     'Asla dahil edilmez: giriş, hesap, cüzdan veya satın alma verilerin. Eylem çubuğu düzenleri hesabına kaydedilir ve onunla birlikte taşınır.',
   'hudChrome.fullTransfer.fullSettings': 'Tam Ayarlar',
@@ -15724,13 +15723,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Her işaretli akıncı tek bir toplanma noktasına koşar ve {fuse} sn fitil bitmeden diğer işaretlerin {range} yd içinde durur. Şifacılar işaretler çözülürken grubun canını tamamlar.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis mevcut hedefi dışındaki {marksNormal} akıncıyı Ruh Yırtma ile işaretler. {fuse} sn sonra her işaret, taşıyıcısının tam azami canını Gölge hasarı olarak verir ve yakınlarındaki {range} yd içindeki işaretli akıncı sayısına bölünür.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Her Ruh Yırtma patlaması, üst üste duran işaret grubu başına {radius} yd yarıçaplı bir mor ateş havuzu bırakır; {secondsHeroic} sn boyunca yanar ve her saniye azami canın {tickHeroic} kadarını verir. Havuzların çakıştığı yerde durmak yalnızca bir tik alır, asla üst üste kopyalar değil. Havuzlar bir muhafaza taşının {clearance} yd içinde asla oluşmaz.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Ruh Ateşi',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'İşaretler patlar patlamaz mor havuzdan çıkın. Sonraki toplanma noktasını aktif ateşten temiz tutun.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Her Ruh Yırtma patlaması, her işaretin durduğu yerde {radius} yd yarıçaplı mor ateş havuzu bırakır; {seconds} sn boyunca yanar ve her saniye azami canın {tickNormal} kadarını verir. Havuzların çakıştığı yerde durmak her birinden tik alır. Havuzlar bir muhafaza taşının {clearance} yd içinde asla oluşmaz.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Buz sarkıtları',
   'abilityUi.cast.farming': 'Ekim',
   'abilityUi.cast.sundering': 'Parçalama',

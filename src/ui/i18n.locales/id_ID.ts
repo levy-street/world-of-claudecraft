@@ -15716,7 +15716,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Api Makam (garis api bergerak yang harus disingkirkan)',
   'hudChrome.finder.mech.kings_wrath':
     'Murka Raja (30%: bonus kerusakan permanen, bahaya lantai lebih cepat)',
-  'hudChrome.finder.mech.soulfire': 'Api Jiwa (ledakan Robekan Jiwa meninggalkan kolam terbakar)',
   'hudChrome.fullTransfer.excluded':
     'Tidak pernah disertakan: data login, akun, dompet, atau pembelianmu. Tata letak bilah aksi disimpan ke akunmu dan ikut berpindah bersamanya.',
   'hudChrome.fullTransfer.fullSettings': 'Pengaturan Lengkap',
@@ -15906,13 +15905,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Setiap raider bertanda berlari ke satu titik tumpuk dan berdiri dalam {range} yd dari tanda lain sebelum sumbu {fuse} dtk berakhir. Penyembuh mengisi kesehatan grup saat tanda selesai.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis menandai {marksNormal} raider selain targetnya saat ini dengan Robekan Jiwa. Setelah {fuse} dtk, setiap tanda menghasilkan kesehatan maksimum penuh pembawanya sebagai kerusakan Bayangan, dibagi oleh jumlah raider bertanda dalam {range} yd dari mereka.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Setiap ledakan Robekan Jiwa meninggalkan satu kolam api ungu dengan radius {radius} yd per grup tanda yang bertumpuk, terbakar selama {secondsHeroic} dtk sebesar {tickHeroic} kesehatan maksimum setiap detik. Berdiri di tempat kolam bertumpang tindih hanya menerima satu tick, bukan salinan bertumpuk. Kolam tidak pernah muncul dalam {clearance} yd dari batu pelindung.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Api Jiwa',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Keluar dari kolam ungu segera setelah tanda meledak. Jaga titik tumpuk berikutnya bebas dari api aktif.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Setiap ledakan Robekan Jiwa meninggalkan kolam api ungu dengan radius {radius} yd di tempat setiap tanda berdiri, terbakar selama {seconds} dtk sebesar {tickNormal} kesehatan maksimum setiap detik. Berdiri di tempat kolam bertumpang tindih menerima tick dari masing-masing. Kolam tidak pernah muncul dalam {clearance} yd dari batu pelindung.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Es runcing',
   'abilityUi.cast.farming': 'Menanam',
   'abilityUi.cast.sundering': 'Membelah',

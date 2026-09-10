@@ -3978,9 +3978,9 @@ export const hudChromeStrings = {
         'Tanks swap at {stacks} stacks: the other tank taunts and the cursed tank stays out of the Gravebreaker cone while the stacks fade. Healers prepare the incoming tank before the swap.',
       boneSpikeName: 'Bone Spike',
       boneSpikeSummary:
-        'Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is destroyed.',
+        'Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is destroyed. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
       boneSpikeHeroicSummary:
-        'Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is destroyed.',
+        'Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is destroyed. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
       boneSpikeResponse:
         'Damage dealers switch to the Bone Spikes at once and destroy them to free the impaled raiders. Healers keep the impaled alive while the spikes fall.',
       graveEruptionName: 'Grave Eruption',
@@ -4009,13 +4009,6 @@ export const hudChromeStrings = {
         "Nythraxis marks {marksHeroic} raiders other than his current target with Soul Rend. After {fuse} sec each mark deals {damageHeroic} of its bearer's maximum health as Shadow damage, divided by the number of marked raiders within {range} yd of them. A mark that resolves alone is lethal.",
       soulRendResponse:
         'Every marked raider runs to one stack point and stands within {range} yd of the other marks before the {fuse} sec fuse ends. Healers top the group off as the marks resolve.',
-      soulfireName: 'Soulfire',
-      soulfireSummary:
-        'Every Soul Rend detonation leaves a pool of purple fire with a {radius} yd radius where each mark stood, burning for {seconds} sec at {tickNormal} of maximum health every second. Standing where pools overlap takes a tick from each one. Pools never form within {clearance} yd of a wardstone.',
-      soulfireHeroicSummary:
-        'Every Soul Rend detonation leaves one pool of purple fire with a {radius} yd radius per stacked group of marks, burning for {secondsHeroic} sec at {tickHeroic} of maximum health every second. Standing where pools overlap takes only one tick, never stacked copies. Pools never form within {clearance} yd of a wardstone.',
-      soulfireResponse:
-        'Move out of the purple pool as soon as the marks detonate. Keep the next stack point clear of active fire.',
       gravefireName: 'Gravefire',
       gravefireSummary:
         'Every {everyNormal} sec, a line of violet grave-fire runs from Nythraxis toward a raider, growing {speed} yd every second to {length} yd. Each yard burns for {burnNormal} sec and deals {tickNormal} of maximum health every second to anyone standing in it.',
@@ -7353,7 +7346,7 @@ export const hudChromeStrings = {
       sealbreak_shockwave: 'Sealbreak Shockwave (area burst)',
       gravebreaker: 'Gravebreaker (frontal cone, face it away from the raid)',
       raise_fallen: 'Raise Fallen (periodic waves of adds)',
-      soul_rend: 'Soul Rend (marked players stack together, then leave the fire)',
+      soul_rend: 'Soul Rend (marked players stack together to split the damage)',
       deathless_rage: 'Deathless Rage (interrupted at the wardstones)',
       wardstones: 'Wardstone channels (phase transition)',
       // The swap point spelled here is pinned to NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS
@@ -7363,7 +7356,6 @@ export const hudChromeStrings = {
       grave_eruption: 'Grave Eruption (warning circles that leave burning ground)',
       binding_sigil: 'Binding Sigil (drag the boss onto the sigil or the raid pays)',
       gravefire: 'Gravefire (a traveling line of fire to sidestep)',
-      soulfire: 'Soulfire (Soul Rend detonations leave burning pools)',
       kings_wrath: "King's Wrath (30%: permanent damage bonus, faster floor hazards)",
       bone_storm: 'Bone Storm (he ignores threat, whirls, and charges the raid)',
       crown_endures: 'The Crown Endures (hard enrage at 6:00, heroic 5:00)',

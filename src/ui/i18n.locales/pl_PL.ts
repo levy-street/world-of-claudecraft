@@ -15619,8 +15619,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Grobowy Ogień (wędrująca linia ognia, której trzeba zejść z drogi)',
   'hudChrome.finder.mech.kings_wrath':
     'Gniew Króla (30%: stały bonus obrażeń, szybsze zagrożenia na podłodze)',
-  'hudChrome.finder.mech.soulfire':
-    'Ogień Dusz (detonacje Rozdarcia Duszy zostawiają płonące kałuże)',
   'hudChrome.fullTransfer.excluded':
     'Nigdy nie obejmuje: danych logowania, konta, portfela ani zakupów. Układy pasków akcji są zapisywane na koncie i przenoszą się razem z nim.',
   'hudChrome.fullTransfer.fullSettings': 'Pełne ustawienia',
@@ -15811,13 +15809,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Każdy oznaczony rajder biegnie do jednego punktu zbiórki i staje w promieniu {range} jardów od innych znaków, zanim skończy się bezpiecznik {fuse} sek. Uzdrowiciele dolecza grupę, gdy znaki się rozwiązują.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis oznacza {marksNormal} rajderów innych niż jego obecny cel Rozdarciem Duszy. Po {fuse} sek. każdy znak zadaje pełne maksymalne zdrowie swojego nosiciela jako obrażenia Cienia, podzielone przez liczbę oznaczonych rajderów w promieniu {range} jardów od niego.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Każda detonacja Rozdarcia Duszy zostawia jedną kałużę fioletowego ognia o promieniu {radius} jardów na każdą skupioną grupę znaków, płonącą przez {secondsHeroic} sek. za {tickHeroic} maksymalnego zdrowia co sekundę. Stanie tam, gdzie kałuże się nakładają, daje tylko jeden tik, nigdy zsumowane kopie. Kałuże nigdy nie powstają w promieniu {clearance} jardów od kamienia ochronnego.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Ogień Dusz',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Wyjdźcie z fioletowej kałuży, gdy tylko znaki zdetonują. Utrzymujcie kolejny punkt zbiórki wolny od aktywnego ognia.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Każda detonacja Rozdarcia Duszy zostawia kałużę fioletowego ognia o promieniu {radius} jardów tam, gdzie stał każdy znak, płonącą przez {seconds} sek. za {tickNormal} maksymalnego zdrowia co sekundę. Stanie tam, gdzie kałuże się nakładają, zadaje tik z każdej z nich. Kałuże nigdy nie powstają w promieniu {clearance} jardów od kamienia ochronnego.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Sople lodu',
   'abilityUi.cast.farming': 'Sadzenie',
   'abilityUi.cast.sundering': 'Rozdarcie',

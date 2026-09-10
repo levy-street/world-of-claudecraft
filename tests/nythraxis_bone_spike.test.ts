@@ -11,6 +11,7 @@ import {
 import * as nythraxis from '../src/sim/encounters/nythraxis';
 import {
   isNythraxisImpaled,
+  NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
   NYTHRAXIS_BONE_SPIKE_EVERY_HEROIC,
   NYTHRAXIS_BONE_SPIKE_EVERY_NORMAL,
   NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
@@ -21,7 +22,10 @@ import {
   NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC,
   NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
   nythraxisBoneSpikeCandidates,
+  nythraxisBoneSpikeCooldownIds,
   nythraxisImpaledAuraFor,
+  tickNythraxisBoneSpikeCooldowns,
+  withNythraxisBoneSpikeCooldowns,
 } from '../src/sim/nythraxis_bone_spike';
 import {
   NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
@@ -372,6 +376,182 @@ describe('Nythraxis Bone Spike', () => {
     nythraxis.updateNythraxisEncounter(ctx, boss);
     expect(room().filter((p) => isNythraxisImpaled(p, boss.id))).toHaveLength(2);
     expect(st.boneSpikeTimer).toBeCloseTo(NYTHRAXIS_BONE_SPIKE_EVERY_NORMAL, 5);
+  });
+});
+
+describe('Nythraxis Bone Spike cooldown (one impale per raider per 55 s)', () => {
+  it('pins the per-raider cooldown literally', () => {
+    expect(NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS).toBe(55);
+  });
+
+  it('keeps a raider on cooldown out of the candidate list', () => {
+    const room = [
+      { id: 1, dead: false, auras: [] },
+      { id: 2, dead: false, auras: [] },
+      { id: 3, dead: false, auras: [] },
+    ] as unknown as Entity[];
+    const picked = nythraxisBoneSpikeCandidates(
+      room,
+      9,
+      null,
+      new Set(),
+      () => false,
+      new Set([2]),
+    );
+    expect(picked.map((p) => p.id)).toEqual([1, 3]);
+    // No cooldown set: everyone stays eligible (the default arm).
+    expect(nythraxisBoneSpikeCandidates(room, 9, null, new Set()).map((p) => p.id)).toEqual([
+      1, 2, 3,
+    ]);
+  });
+
+  it('arms the full cooldown per victim, counts it down, and drops it at zero without mutating', () => {
+    const armed = withNythraxisBoneSpikeCooldowns([{ playerId: 4, remaining: 10 }], [4, 7]);
+    expect(armed).toEqual([
+      { playerId: 4, remaining: NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS },
+      { playerId: 7, remaining: NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS },
+    ]);
+    expect(nythraxisBoneSpikeCooldownIds(armed)).toEqual(new Set([4, 7]));
+    const ticked = tickNythraxisBoneSpikeCooldowns(armed, 1);
+    expect(ticked).toEqual([
+      { playerId: 4, remaining: NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - 1 },
+      { playerId: 7, remaining: NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - 1 },
+    ]);
+    // The input list is never touched.
+    expect(armed[0].remaining).toBe(NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS);
+    const expired = tickNythraxisBoneSpikeCooldowns(
+      [
+        { playerId: 4, remaining: 0.5 },
+        { playerId: 7, remaining: 3 },
+      ],
+      1,
+    );
+    expect(expired).toEqual([{ playerId: 7, remaining: 2 }]);
+    expect(nythraxisBoneSpikeCooldownIds(expired)).toEqual(new Set([7]));
+  });
+
+  it('spreads consecutive waves across the raid: nobody is impaled twice inside the cooldown', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const { ctx, boss, st, room, raiders } = setup({ difficulty });
+      const perWave = difficulty === 'heroic' ? 3 : 2;
+      // Nine non-tank raiders: three waves on normal (6 victims), three on heroic (9).
+      const seen: number[] = [];
+      for (let wave = 0; wave < 3; wave++) {
+        st.boneSpikeTimer = DT / 2;
+        nythraxis.updateNythraxisEncounter(ctx, boss);
+        const impaled = raiders.filter((r) => isNythraxisImpaled(r, boss.id)).map((r) => r.id);
+        expect(impaled, `${difficulty} wave ${wave}`).toHaveLength(perWave);
+        for (const id of impaled) expect(seen, `${difficulty} wave ${wave}`).not.toContain(id);
+        seen.push(...impaled);
+        // Free everyone before the next wave so the cooldown, not the impale
+        // aura, is what keeps them out of the next pick.
+        nythraxis.shatterNythraxisBoneSpikes(ctx, boss);
+        expect(raiders.some((r) => isNythraxisImpaled(r, boss.id))).toBe(false);
+      }
+      expect(new Set(seen).size, difficulty).toBe(3 * perWave);
+      const cooling = st.boneSpikeCooldowns ?? [];
+      expect(cooling.map((c) => c.playerId).sort(), difficulty).toEqual([...seen].sort());
+      // The shatter frees the body, never the cooldown.
+      expect(
+        nythraxisBoneSpikeCandidates(room(), boss.id, boss.aggroTargetId, new Set()).map(
+          (p) => p.id,
+        ),
+        difficulty,
+      ).toEqual(expect.arrayContaining(seen));
+      const eligible = nythraxis.nythraxisBoneSpikeEligible(boss, st, room(), difficulty);
+      for (const id of seen)
+        expect(
+          eligible.map((p) => p.id),
+          difficulty,
+        ).not.toContain(id);
+    }
+  });
+
+  it('impales fewer than the wave size, then retries, rather than repeating a cooling raider', () => {
+    const { ctx, boss, st, raiders } = setup();
+    // Eight of the nine raiders are already cooling: only one is eligible.
+    const cooling = raiders.slice(0, 8).map((r) => r.id);
+    st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns([], cooling);
+    st.boneSpikeTimer = DT / 2;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    const impaled = raiders.filter((r) => isNythraxisImpaled(r, boss.id));
+    expect(impaled.map((r) => r.id)).toEqual([raiders[8].id]);
+    expect(st.boneSpikeTimer).toBeCloseTo(NYTHRAXIS_BONE_SPIKE_EVERY_NORMAL, 5);
+    // Everyone cooling: the cast lands on nobody and re-polls in three seconds.
+    nythraxis.shatterNythraxisBoneSpikes(ctx, boss);
+    st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns(
+      [],
+      raiders.map((r) => r.id),
+    );
+    st.boneSpikeTimer = DT / 2;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(raiders.some((r) => isNythraxisImpaled(r, boss.id))).toBe(false);
+    expect(st.boneSpikeTimer).toBe(3);
+  });
+
+  it('counts the cooldown down on the encounter clock and frees the raider at 55 s', () => {
+    const { ctx, boss, st, raiders } = setup();
+    st.boneSpikeTimer = DT / 2;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    const victims = raiders.filter((r) => isNythraxisImpaled(r, boss.id)).map((r) => r.id);
+    expect(victims).toHaveLength(2);
+    nythraxis.shatterNythraxisBoneSpikes(ctx, boss);
+    st.boneSpikeTimer = 999;
+    tickDriver(ctx, boss, 10);
+    for (const entry of st.boneSpikeCooldowns ?? []) {
+      expect(entry.remaining).toBeCloseTo(NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - 10, 3);
+    }
+    tickDriver(ctx, boss, NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - 10);
+    expect(st.boneSpikeCooldowns).toEqual([]);
+    // Back in the pool: with everyone else cooling, the old victims are picked again.
+    const others = raiders.filter((r) => !victims.includes(r.id)).map((r) => r.id);
+    st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns([], others);
+    st.boneSpikeTimer = DT / 2;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(
+      raiders
+        .filter((r) => isNythraxisImpaled(r, boss.id))
+        .map((r) => r.id)
+        .sort(),
+    ).toEqual([...victims].sort());
+  });
+
+  it('keeps counting through a script-locked window (a Deathless Rage cast)', () => {
+    const { ctx, boss, st, raiders } = setup();
+    st.phase = 2;
+    st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns([], [raiders[0].id]);
+    // The Rage cast holds every NEW cast (the spike cast path never runs),
+    // yet the cooldown is measured from the impale, so it keeps counting.
+    nythraxis.startNythraxisDeathlessRage(ctx, boss, st);
+    expect(st.deathlessCastRemaining).toBeGreaterThan(5);
+    tickDriver(ctx, boss, 5);
+    expect(st.deathlessCastRemaining).toBeGreaterThan(0);
+    expect(st.boneSpikeCooldowns?.[0]?.remaining).toBeCloseTo(
+      NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - 5,
+      3,
+    );
+  });
+
+  it('applies the cooldown to the Bone Storm spike as well', () => {
+    const { ctx, boss, st, raiders } = setup();
+    const cooling = raiders.slice(0, 7).map((r) => r.id);
+    st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns([], cooling);
+    const victims = nythraxis.castNythraxisBoneSpike(ctx, boss, st, raiders, 'normal');
+    expect(victims.map((v) => v.id).sort()).toEqual([raiders[7].id, raiders[8].id].sort());
+    for (const v of victims)
+      expect(nythraxisBoneSpikeCooldownIds(st.boneSpikeCooldowns ?? [])).toContain(v.id);
+  });
+
+  it('forgets every cooldown on an encounter reset', () => {
+    const { ctx, boss, st, raiders } = setup();
+    st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns(
+      [],
+      raiders.map((r) => r.id),
+    );
+    nythraxis.resetNythraxisEncounter(ctx, boss);
+    expect(boss.nythraxis).toBeUndefined();
+    const fresh = nythraxis.initNythraxisEncounter(boss);
+    expect(fresh.boneSpikeCooldowns).toEqual([]);
   });
 });
 

@@ -83,10 +83,13 @@ import {
   NYTHRAXIS_IMPALED_TICK_SECONDS,
   nythraxisBoneSpikeCadence,
   nythraxisBoneSpikeCandidates,
+  nythraxisBoneSpikeCooldownIds,
   nythraxisBoneSpikeVictims,
   nythraxisImpaledAuraFor,
   nythraxisImpaledTickMaxHp,
   pinNythraxisBoneSpike,
+  tickNythraxisBoneSpikeCooldowns,
+  withNythraxisBoneSpikeCooldowns,
 } from '../nythraxis_bone_spike';
 import {
   beginNythraxisBoneStorm,
@@ -169,14 +172,6 @@ import {
   nythraxisWrathGravefireEvery,
 } from '../nythraxis_kings_wrath';
 import {
-  admitNythraxisSoulfireTick,
-  igniteNythraxisSoulfire,
-  NYTHRAXIS_SOULFIRE_CAST_ID,
-  nythraxisSoulfireGroupCentroids,
-  nythraxisSoulfireSeconds,
-  nythraxisSoulfireTickMaxHp,
-} from '../nythraxis_soulfire';
-import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
   recordInteractObjectCredit,
@@ -213,6 +208,7 @@ type NythraxisMechanicField =
   | 'dreadCurseTimer'
   | 'boneSpikeTimer'
   | 'boneSpikes'
+  | 'boneSpikeCooldowns'
   | 'eruptionSettleTimer'
   | 'spikeSettleTimer'
   | 'eruptionTimer'
@@ -221,7 +217,6 @@ type NythraxisMechanicField =
   | 'eruptionPoints'
   | 'graveFlames'
   | 'graveFlameSeq'
-  | 'soulfireTickAt'
   | 'gravefireTimer'
   | 'gravefires'
   | 'gravefireSeq'
@@ -248,6 +243,7 @@ export function nythraxisMechanicState(st: NythraxisState): NythraxisMechanicSta
   st.dreadCurseTimer ??= NYTHRAXIS_DREAD_CURSE_EVERY;
   st.boneSpikeTimer ??= NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS;
   st.boneSpikes ??= [];
+  st.boneSpikeCooldowns ??= [];
   st.eruptionSettleTimer ??= 0;
   st.spikeSettleTimer ??= 0;
   st.eruptionTimer ??= NYTHRAXIS_GRAVE_ERUPTION_FIRST_SECONDS;
@@ -256,7 +252,6 @@ export function nythraxisMechanicState(st: NythraxisState): NythraxisMechanicSta
   st.eruptionPoints ??= [];
   st.graveFlames ??= [];
   st.graveFlameSeq ??= 0;
-  st.soulfireTickAt ??= [];
   st.gravefireTimer ??= NYTHRAXIS_GRAVEFIRE_FIRST_SECONDS;
   st.gravefires ??= [];
   st.gravefireSeq ??= 0;
@@ -491,6 +486,7 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       dreadCurseTimer: NYTHRAXIS_DREAD_CURSE_EVERY,
       boneSpikeTimer: NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
       boneSpikes: [],
+      boneSpikeCooldowns: [],
       eruptionSettleTimer: 0,
       spikeSettleTimer: 0,
       eruptionTimer: NYTHRAXIS_GRAVE_ERUPTION_FIRST_SECONDS,
@@ -499,7 +495,6 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       eruptionPoints: [],
       graveFlames: [],
       graveFlameSeq: 0,
-      soulfireTickAt: [],
       gravefireTimer: NYTHRAXIS_GRAVEFIRE_FIRST_SECONDS,
       gravefires: [],
       gravefireSeq: 0,
@@ -609,6 +604,16 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   }
 
   if (st.soulRendLockout > 0) st.soulRendLockout = Math.max(0, st.soulRendLockout - DT);
+  // The per-raider Bone Spike cooldowns are measured from the impale on the
+  // encounter clock: they run through every script-locked window below (the
+  // transition, a Rage cast, a Bound stun, a storm), never only when a cast
+  // could be considered, so a raider comes back on time whatever the fight
+  // was doing meanwhile.
+  {
+    const ms = nythraxisMechanicState(st);
+    if (ms.boneSpikeCooldowns.length > 0)
+      ms.boneSpikeCooldowns = tickNythraxisBoneSpikeCooldowns(ms.boneSpikeCooldowns, DT);
+  }
   // The Crown Endures clock runs from the first encounter tick through every
   // script-locked window (a Rage cast, a Bound stun, a storm), and pauses
   // only for the 70% transition: Brother Aldric's entrance is not the raid's
@@ -1035,10 +1040,35 @@ export function nythraxisStandingInFire(
 }
 
 /**
+ * Everyone a Bone Spike cast may pick right now, every exclusion applied: the
+ * pure roster rules (nythraxisBoneSpikeCandidates), the live-fire check, and
+ * the per-raider cooldown ledger. Draws no rng, so callers and tests can read
+ * the pool without moving the shared stream.
+ */
+export function nythraxisBoneSpikeEligible(
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+  room: readonly Entity[],
+  difficulty: DungeonDifficulty,
+): Entity[] {
+  const ms = nythraxisMechanicState(st);
+  const marked = new Set(st.soulRendMarks.map((mark) => mark.playerId));
+  return nythraxisBoneSpikeCandidates(
+    room,
+    boss.id,
+    boss.aggroTargetId,
+    marked,
+    (player) => nythraxisStandingInFire(st, player, difficulty),
+    nythraxisBoneSpikeCooldownIds(ms.boneSpikeCooldowns),
+  );
+}
+
+/**
  * Impale NYTHRAXIS_BONE_SPIKE_VICTIMS raiders: one shared-stream rng.int per
  * victim (the Soul Rend pick idiom), a stationary spike mob at each victim's
- * feet, the unbreakable impale aura pointing at it, and the callouts. Returns
- * the victims so tests can pin the roster.
+ * feet, the unbreakable impale aura pointing at it, and the callouts. Every
+ * victim starts the per-raider cooldown, so the next waves land elsewhere.
+ * Returns the victims so tests can pin the roster.
  */
 export function castNythraxisBoneSpike(
   ctx: SimContext,
@@ -1048,14 +1078,7 @@ export function castNythraxisBoneSpike(
   difficulty: DungeonDifficulty,
 ): Entity[] {
   const ms = nythraxisMechanicState(st);
-  const marked = new Set(st.soulRendMarks.map((mark) => mark.playerId));
-  const candidates = nythraxisBoneSpikeCandidates(
-    room,
-    boss.id,
-    boss.aggroTargetId,
-    marked,
-    (player) => nythraxisStandingInFire(st, player, difficulty),
-  );
+  const candidates = nythraxisBoneSpikeEligible(boss, st, room, difficulty);
   const victims: Entity[] = [];
   const count = nythraxisBoneSpikeVictims(difficulty);
   while (victims.length < count && candidates.length > 0) {
@@ -1063,6 +1086,10 @@ export function castNythraxisBoneSpike(
     victims.push(candidates.splice(idx, 1)[0]);
   }
   if (victims.length === 0) return victims;
+  ms.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns(
+    ms.boneSpikeCooldowns,
+    victims.map((victim) => victim.id),
+  );
   const template = MOBS[NYTHRAXIS_BONE_SPIKE_ID];
   if (!template) return [];
   const inst = nythraxisClaimedInstance(ctx, boss);
@@ -1336,8 +1363,9 @@ export function updateNythraxisGraveHazards(
       resolveNythraxisGraveEruption(ctx, boss, ms, difficulty, room);
   }
   if (ms.graveFlames.length === 0) return;
-  const graveTick = nythraxisGraveFlameTickMaxHp(difficulty);
-  const soulTick = nythraxisSoulfireTickMaxHp(difficulty);
+  // Every patch in the list is Grave Flame: the Soulfire pools that used to
+  // share it were retired from play in v0.42.2 (nythraxis_soulfire.ts).
+  const tickFrac = nythraxisGraveFlameTickMaxHp(difficulty);
   const kept: typeof ms.graveFlames = [];
   for (const flame of ms.graveFlames) {
     flame.remaining -= DT;
@@ -1345,27 +1373,15 @@ export function updateNythraxisGraveHazards(
     flame.tickTimer -= DT;
     if (flame.tickTimer <= 0) {
       flame.tickTimer += NYTHRAXIS_GRAVE_FLAME_TICK_SECONDS;
-      const soul = flame.kind === 'soul';
-      const tickFrac = soul ? soulTick : graveTick;
       for (const p of room) {
         if (p.dead || !pointInNythraxisCircle(flame, flame.radius, p.pos)) continue;
-        // Heroic Soulfire pools can overlap (separate groups, or a fresh cast
-        // landing atop an older pool's still-burning footprint); this gate is
-        // what keeps that overlap, including staggered per-pool tick timers,
-        // from ever costing a raider more than one tick per second.
-        if (
-          soul &&
-          difficulty === 'heroic' &&
-          !admitNythraxisSoulfireTick(ms.soulfireTickAt, p.id, ctx.time)
-        )
-          continue;
         ctx.dealDamage(
           boss,
           p,
           Math.ceil(p.maxHp * tickFrac),
           false,
           'shadow',
-          soul ? NYTHRAXIS_SOULFIRE_CAST_ID : NYTHRAXIS_GRAVE_FLAME_CAST_ID,
+          NYTHRAXIS_GRAVE_FLAME_CAST_ID,
           'hit',
           true,
           undefined,
@@ -1439,7 +1455,6 @@ export function clearNythraxisGraveHazards(boss: Entity): void {
   ms.eruptionImpactRemaining = 0;
   ms.graveFlames = [];
   ms.gravefires = [];
-  ms.soulfireTickAt = [];
 }
 
 // ----- Gravefire: the traveling line the ranged must sidestep --------------------
@@ -2671,25 +2686,8 @@ export function updateNythraxisSoulRend(
       fx: 'nova',
     });
   }
-  // Every detonation leaves Soulfire where the mark stood (never beside a
-  // wardstone), so the stack point has to rotate: the pool burns as part of
-  // the shared flame list the hazard tick above drains. Heroic groups each
-  // stacked cluster into a single pool at its centroid; Normal is unchanged,
-  // one pool per mark.
-  const ms = nythraxisMechanicState(st);
-  const difficulty = nythraxisDifficulty(ctx, boss);
-  const detonationPoints = marked.map((p) => ({ x: p.pos.x, z: p.pos.z }));
-  const poolPoints =
-    difficulty === 'heroic'
-      ? nythraxisSoulfireGroupCentroids(detonationPoints, NYTHRAXIS_SOUL_REND_STACK_RANGE)
-      : detonationPoints;
-  ms.graveFlameSeq = igniteNythraxisSoulfire(
-    ms.graveFlames,
-    poolPoints,
-    nythraxisWardstones(ctx, boss).map((w) => ({ x: w.pos.x, z: w.pos.z })),
-    ms.graveFlameSeq,
-    nythraxisSoulfireSeconds(difficulty),
-  );
+  // A detonation leaves nothing behind (owner call, 2026-09-11: the Soulfire
+  // pools it used to drop made the fight too hard and are retired from play).
   st.soulRendMarks = [];
 }
 

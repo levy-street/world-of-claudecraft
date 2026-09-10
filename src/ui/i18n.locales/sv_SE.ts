@@ -15497,8 +15497,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gravefire': 'Graveld (en rörlig eldlinje att sidostega)',
   'hudChrome.finder.mech.kings_wrath':
     'Kungens Vrede (30%: permanent skadebonus, snabbare golvfaror)',
-  'hudChrome.finder.mech.soulfire':
-    'Själseld (detonationer av Själsslitning lämnar brinnande pölar)',
   'hudChrome.fullTransfer.excluded':
     'Ingår aldrig: din inloggning, ditt konto, din wallet eller köpdata. Handlingsfältslayouter sparas på ditt konto och följer med.',
   'hudChrome.fullTransfer.fullSettings': 'Fullständiga inställningar',
@@ -15688,13 +15686,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Varje markerad raiddeltagare springer till en samlingspunkt och står inom {range} yd från de andra markeringarna innan stubinen på {fuse} sek tar slut. Helare fyller upp gruppen när markeringarna löses.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis markerar {marksNormal} raiddeltagare utom sitt nuvarande mål med Själsslitning. Efter {fuse} sek orsakar varje markering bärarens fulla maximala hälsa som Skuggskada, delat med antalet markerade raiddeltagare inom {range} yd från dem.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Varje Själsslitningsdetonation lämnar en pöl av lila eld med {radius} yd radie per samlad markeringsgrupp, som brinner i {secondsHeroic} sek med {tickHeroic} av maximal hälsa varje sekund. Att stå där pölar överlappar ger bara en tick, aldrig staplade kopior. Pölar bildas aldrig inom {clearance} yd från en värnsten.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Själseld',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Flytta ut ur den lila pölen så snart markeringarna detonerar. Håll nästa samlingspunkt fri från aktiv eld.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Varje Själsslitningsdetonation lämnar en pöl av lila eld med {radius} yd radie där varje markering stod, som brinner i {seconds} sek med {tickNormal} av maximal hälsa varje sekund. Att stå där pölar överlappar ger en tick från varje pöl. Pölar bildas aldrig inom {clearance} yd från en värnsten.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Istappar',
   'abilityUi.cast.farming': 'Plantering',
   'abilityUi.cast.sundering': 'Klyvning',

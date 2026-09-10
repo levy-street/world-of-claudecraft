@@ -59,6 +59,7 @@ import {
   nythraxisBoundSeconds,
 } from '../sim/nythraxis_binding_sigil';
 import {
+  NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
   NYTHRAXIS_BONE_SPIKE_EVERY_HEROIC,
   NYTHRAXIS_BONE_SPIKE_EVERY_NORMAL,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC,
@@ -126,14 +127,6 @@ import {
   nythraxisWrathGraveEruptionEvery,
   nythraxisWrathGravefireEvery,
 } from '../sim/nythraxis_kings_wrath';
-import {
-  NYTHRAXIS_SOULFIRE_RADIUS,
-  NYTHRAXIS_SOULFIRE_SECONDS_HEROIC,
-  NYTHRAXIS_SOULFIRE_SECONDS_NORMAL,
-  NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC,
-  NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL,
-  NYTHRAXIS_SOULFIRE_WARDSTONE_CLEARANCE,
-} from '../sim/nythraxis_soulfire';
 import { IGNIVAR_BOSS_ID, NYTHRAXIS_ADDS_ENABLED, NYTHRAXIS_BOSS_ID } from '../sim/types';
 import { VARKHUL_ANVILS_DECREE_STRIKES } from '../sim/varkhul_anvils_decree';
 import {
@@ -610,6 +603,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
           victimsHeroic: NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC,
           drainNormal: NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
           drainHeroic: NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC,
+          cooldown: NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
         },
         percentValues: ['drainNormal', 'drainHeroic'],
       },
@@ -720,27 +714,6 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
           damageHeroic: NYTHRAXIS_SOUL_REND_HEROIC_MULT,
         },
         percentValues: ['damageHeroic'],
-      },
-      {
-        id: 'soulfire',
-        iconId: 'raid_nythraxis_soulfire',
-        nameKey: key('nythraxis.soulfireName'),
-        summaryKey: {
-          normal: key('nythraxis.soulfireSummary'),
-          heroic: key('nythraxis.soulfireHeroicSummary'),
-        },
-        responseKey: key('nythraxis.soulfireResponse'),
-        roles: ['all'],
-        flags: ['important'],
-        values: {
-          radius: NYTHRAXIS_SOULFIRE_RADIUS,
-          seconds: NYTHRAXIS_SOULFIRE_SECONDS_NORMAL,
-          secondsHeroic: NYTHRAXIS_SOULFIRE_SECONDS_HEROIC,
-          tickNormal: NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL,
-          tickHeroic: NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC,
-          clearance: NYTHRAXIS_SOULFIRE_WARDSTONE_CLEARANCE,
-        },
-        percentValues: ['tickNormal', 'tickHeroic'],
       },
       {
         id: 'gravefire',

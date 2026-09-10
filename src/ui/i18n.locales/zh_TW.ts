@@ -8183,13 +8183,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '尼思拉克西斯會為{marksHeroic}名非目前目標的團員標記靈魂撕裂。{fuse}秒後，每個標記都會對其承載者造成相當於其最大生命值{damageHeroic}的暗影傷害，並依{range}碼內被標記團員的人數分攤。若標記單獨引爆，將必定致命。',
   'hudChrome.raidBossGuide.nythraxis.soulRendResponse':
     '每名被標記的團員都應在{fuse}秒的引爆倒數結束前，跑到集合點並站在其他標記{range}碼內。治療應在標記引爆時將團隊生命補滿。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': '魂火',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    '每次靈魂撕裂引爆，都會在每個標記所在處留下一灘半徑{radius}碼的紫色烈焰，燃燒{seconds}秒，每秒造成相當於最大生命值{tickNormal}的傷害。火池重疊時，站在裡面會分別承受各灘火池的傷害。火池絕不會在護符石{clearance}碼內形成。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    '每次靈魂撕裂引爆，每一組聚集的標記只會留下一灘半徑{radius}碼的紫色烈焰，燃燒{secondsHeroic}秒，每秒造成相當於最大生命值{tickHeroic}的傷害。火池重疊時只會承受一次傷害，不會疊加。火池絕不會在護符石{clearance}碼內形成。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    '標記引爆後應立刻離開紫色火池。選擇下一個集合點時，務必避開仍在燃燒的火焰。',
   'hudChrome.raidBossGuide.nythraxis.gravefireName': '墓火',
   'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
     '每{everyNormal}秒，一道紫色墓火會從尼思拉克西斯朝一名團員延伸，每秒延長{speed}碼，最長至{length}碼。每一碼都會燃燒{burnNormal}秒，對站在其中的人每秒造成相當於最大生命值{tickNormal}的傷害。',
@@ -10799,7 +10792,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.grave_eruption': '墓穴爆發（警示圈會留下燃燒地面）',
   'hudChrome.finder.mech.binding_sigil': '束縛印記（把首領拖上印記，否則團隊受懲）',
   'hudChrome.finder.mech.gravefire': '墓火（需要側身閃避的移動火線）',
-  'hudChrome.finder.mech.soulfire': '魂火（靈魂撕裂引爆後留下的燃燒火池）',
   'hudChrome.finder.mech.kings_wrath': '國王之怒（30%：永久傷害加成，地面威脅加速）',
   'hudChrome.finder.mech.bone_storm': '骨風暴（無視仇恨，橫掃並衝撞團隊）',
   'hudChrome.finder.mech.crown_endures': '王冠永存（6:00 硬狂暴，英雄難度 5:00）',
