@@ -215,7 +215,25 @@ function applyDrakelandsKitWarmth(mat: THREE.Material): void {
   if (m.color) m.color.multiply(new THREE.Color(1.4, 1.24, 1.1));
   if ('emissive' in m) {
     m.emissive = new THREE.Color(0x462314);
-    m.emissiveIntensity = 0.5;
+    // 24x the constant-era 0.5: riding the atlas (below) multiplies the
+    // floor by the texel, and these baked textures average well under a
+    // tenth of white, so the same intensity read near-black at night. Tuned
+    // against night captures of the Wyrmwatch hub and church so the walls
+    // keep the owner's ember warmth; by day the term stays a modest lift.
+    m.emissiveIntensity = 12;
+    // The floor rides the atlas, never a constant: a flat emissive term
+    // adds the same value to every texel however the face is lit, and on
+    // these dark baked textures that lifted whole buildings to one uniform
+    // slab at dusk and night (the roof edge vanished, the lamp wash could
+    // not shape a wall). Sampling the base colour as the emissive map keeps
+    // the ember warmth where the texture has light to carry it and leaves
+    // the mortar and shadow texels dark. Same recipe as the authored-atlas
+    // creature floor in characters/assets.ts (applyLowReadabilityLift).
+    // Graded at load on a freshly parsed material, before it is ever
+    // compiled or attached, so the added map slot costs no recompile and
+    // needs no gated swap. A piece that ships its own emissive texture (a
+    // baked window glow) keeps it; the atlas route is for the floor only.
+    if (m.map && !m.emissiveMap) m.emissiveMap = m.map;
   }
 }
 
@@ -346,4 +364,5 @@ export const ignivarEnvPropsInternalsForTest = {
   canonicalGeometry,
   shadowCasters: SHADOW_CASTERS,
   prepare: prepareIgnivarEnvProps,
+  applyDrakelandsKitWarmth,
 };
