@@ -441,6 +441,11 @@ import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
+import {
+  classDetailAmountRange,
+  classDisplayDescription,
+  formatClassDetailNumber,
+} from './ui/class_details_format';
 import { classIconUrl } from './ui/class_icon_art';
 import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_view';
 import { isDevGuiCommand } from './ui/dev_command_view';
@@ -666,22 +671,6 @@ const RESOURCE_KEYS = {
   rage: 'classDetails.resources.rage',
   focus: 'classDetails.resources.focus',
 } satisfies Record<string, TranslationKey>;
-
-function classDisplayDescription(className: PlayerClass): string {
-  return tEntity({ kind: 'class', id: className, field: 'description' });
-}
-
-function formatClassDetailNumber(value: number): string {
-  return formatNumber(value, { maximumFractionDigits: 1 });
-}
-
-function classDetailAmountRange(min: number, max: number): string {
-  if (min === max) return formatClassDetailNumber(min);
-  return t('abilityUi.tooltip.damageRange', {
-    min: formatClassDetailNumber(min),
-    max: formatClassDetailNumber(max),
-  });
-}
 
 function readHomepageMusicMuted(): boolean {
   if (typeof window === 'undefined') return false;
@@ -3917,6 +3906,7 @@ async function startGame(
     playerImmobilized: false,
     posX: 0,
     climbing: undefined,
+    leaping: undefined,
     riftFloor: null,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
@@ -4600,6 +4590,7 @@ async function startGame(
     selfMotionGateArgs.playerImmobilized = playerImmobilized();
     selfMotionGateArgs.posX = pe.pos.x;
     selfMotionGateArgs.climbing = pe.climbing;
+    selfMotionGateArgs.leaping = pe.leaping;
     selfMotionGateArgs.riftFloor = net.riftFloor;
     const selfPredictionEnabled =
       !SELF_MOTION_DISABLED && selfMotionPredictionEnabled(selfMotionGateArgs);

@@ -4752,6 +4752,11 @@ export interface ClientMirroredEntityFields {
    *  0..1 through the pull at the snapshot cadence; the visual smooths it. */
   climbing?: boolean;
   climbProgress?: number;
+  /** Mirror of an in-flight Vaulting Charge (heroic_leap): like `climbing`, a
+   *  bare presence bit so the local self-extrapolator knows movement is
+   *  server-owned right now and stops predicting ordinary grounded input
+   *  over the arc (see `leap`, and `src/game/self_motion_gate.ts`). */
+  leaping?: boolean;
 }
 
 export interface Entity extends ClientMirroredEntityFields {

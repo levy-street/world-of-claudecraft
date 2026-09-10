@@ -228,6 +228,7 @@ import {
   trackPendingInputSequence,
   trackPendingInputSequenceRange,
 } from './movement_frame_v2_wire';
+import { applyMovementModeWire } from './movement_mode_wire';
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
@@ -2943,11 +2944,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.mountCastRemaining = w.mcr ?? 0;
       e.mountCastKey = w.mck ?? '';
       e.sitting = !!w.sit;
-      e.riftSliding = !!w.sld;
-      e.climbing = !!w.cl;
-      // Quantized 1..99 progress through the pull (see server snapshot);
-      // undefined when not climbing so the visual falls back to its own clock.
-      e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
+      applyMovementModeWire(e, w);
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;

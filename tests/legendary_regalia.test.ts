@@ -372,10 +372,10 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     }
   });
 
-  it('matches the eqi wire allowlist in server/game.ts and reads only rolled', () => {
+  it('matches the eqi wire allowlist in server/wire_entity.ts and reads only rolled', () => {
     // Source-scrape the eqi projection loop (the item_instance_transfer.test.ts
     // cross-pin) so widening the wire without re-judging this predicate reds.
-    const game = read('server/game.ts');
+    const game = read('server/wire_entity.ts');
     const assigns = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)];
     // no cross-wire: every projected field copies from ITS OWN source field
     for (const m of assigns) expect(m[2], `cross-wired eqi projection: ${m[0]}`).toBe(m[1]);

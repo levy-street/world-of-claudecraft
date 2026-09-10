@@ -1048,7 +1048,12 @@ describe('i18n Localization Key Coverage', () => {
   });
 
   it('should route class-detail damage ranges through localized templates', () => {
-    const source = fs.readFileSync(path.resolve(process.cwd(), 'src/main.ts'), 'utf8');
+    // classDetailAmountRange (the damageRange caller) lives in
+    // src/ui/class_details_format.ts; finisherDamage is still called directly
+    // from the class-details panel in main.ts.
+    const source =
+      fs.readFileSync(path.resolve(process.cwd(), 'src/main.ts'), 'utf8') +
+      fs.readFileSync(path.resolve(process.cwd(), 'src/ui/class_details_format.ts'), 'utf8');
     expect(source).toContain('abilityUi.tooltip.damageRange');
     expect(source).toContain('abilityUi.tooltip.finisherDamage');
     expect(source).not.toContain(' to ${primaryEffect.max}');

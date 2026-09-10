@@ -2,8 +2,8 @@
 // (src/sim/item_instance_transfer.ts): the pipe lock predicate, the public
 // display trim, the payload-matching escrow removal, and the persisted-escrow
 // sanitizer. The trim allowlist is cross-pinned to the eqi wire's projection
-// (server/game.ts identityFields), the enchant_apply_view.test.ts precedent:
-// widen both or neither.
+// (server/wire_entity.ts identityFields), the enchant_apply_view.test.ts
+// precedent: widen both or neither.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -96,7 +96,7 @@ describe('publicInstanceView: the display trim', () => {
     // pin) and assert this module projects the identical key set. `name`
     // joined both sites together (Masterwrought phase 13); the ban list below
     // still holds every non-cosmetic field out by name.
-    const game = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    const game = readFileSync(new URL('../server/wire_entity.ts', import.meta.url), 'utf8');
     const projected = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)].map((m) => m[1]);
     expect(projected.sort()).toEqual(['enchant', 'name', 'perfected', 'rift', 'rolled', 'signer']);
     const transfer = readFileSync(

@@ -812,7 +812,10 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
   // (wornTooltipInstance, cross-pinned below): the moment the eqi allowlist
   // grows a field, both consumers of the one policy must move together.
   it('pins the eqi allowlist the inspect-side trim mirrors', () => {
-    const wire = readFileSync(fileURLToPath(new URL('../server/game.ts', import.meta.url)), 'utf8');
+    const wire = readFileSync(
+      fileURLToPath(new URL('../server/wire_entity.ts', import.meta.url)),
+      'utf8',
+    );
     const block = wire.match(
       /for \(const \[slot, inst\] of Object\.entries\(e\.equippedInstances\)\)[\s\S]*?\n {4}\}/,
     );
@@ -825,7 +828,7 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     // Cosmetic fields plus the Perfected stamp needed for active enchants and
     // collection item levels, plus the Riftbound band payload. Nothing that
     // carries bind state or partial ranks. Confirmed against the resolved
-    // server/game.ts projection loop (signer, enchant, rolled, name,
+    // server/wire_entity.ts projection loop (signer, enchant, rolled, name,
     // perfected, rift).
     expect(projected.sort()).toEqual(['enchant', 'name', 'perfected', 'rift', 'rolled', 'signer']);
     // Syntax-independent backstop: the extractor above only sees dot-notation

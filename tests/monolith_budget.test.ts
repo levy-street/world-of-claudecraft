@@ -1208,7 +1208,13 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Compose the mount cosmetics and practice lesson extractions.
     // Measured combined size; retain zero headroom after the release merge.
-    ceiling: 11332,
+    // Lowered 11332 -> 11323 for the Vaulting Charge (heroic_leap)
+    // self-motion fix: the class-details panel's pure formatting trio
+    // (classDisplayDescription/formatClassDetailNumber/classDetailAmountRange)
+    // moved to src/ui/class_details_format.ts, paying for the two
+    // selfMotionGateArgs.leaping wiring lines this change also added. Exact
+    // count, zero slack.
+    ceiling: 11323,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1423,7 +1429,14 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 10095,
+    // LOWERED 10095 -> 9857 for the Vaulting Charge (heroic_leap) self-motion
+    // fix: the pure per-entity wire encoder (identityFields/dynamicFields/
+    // wireEntity, no GameServer state) moved whole to server/wire_entity.ts,
+    // leaving an import plus a re-export so every existing importer stands;
+    // the new `if (e.leap) out.lp = 1;` bit rides inside the moved
+    // dynamicFields. Measured with wc -l < server/game.ts. Exact count, zero
+    // slack.
+    ceiling: 9857,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1566,7 +1579,13 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // LOWERED 5540 -> 5537 for the Vaulting Charge (heroic_leap) self-motion
+    // fix: the riftSliding/climbing/climbProgress/leaping "server-owned
+    // movement mode" decode trio moved whole to net/movement_mode_wire.ts
+    // (one applyMovementModeWire(e, w) call site), which also paid for the
+    // new leaping bit. Measured with wc -l < src/net/online.ts. Exact count,
+    // zero slack.
+    ceiling: 5537,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

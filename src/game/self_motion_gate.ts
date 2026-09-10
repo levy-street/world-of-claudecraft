@@ -37,6 +37,7 @@ export interface SelfMotionGateArgs {
   playerImmobilized: boolean;
   posX: number;
   climbing: boolean | undefined;
+  leaping: boolean | undefined;
   riftFloor?: RiftFloorView | null;
 }
 
@@ -54,6 +55,12 @@ export function selfMotionPredictionEnabled(args: SelfMotionGateArgs): boolean {
     // A ledge climb is a server-owned scripted move the client does
     // not re-simulate: predicting a fall through it would fight the
     // authoritative pull-up and show the correction as a stutter.
-    args.climbing !== true
+    args.climbing !== true &&
+    // A Vaulting Charge (heroic_leap) arc is the same family: it owns
+    // movement outright while it runs (src/sim/combat/heroic_leap.ts). The
+    // local kernel has no notion of the airborne arc and would keep
+    // predicting ordinary grounded movement over it, so the display never
+    // leaves the ground instead of visibly arcing through the air.
+    args.leaping !== true
   );
 }

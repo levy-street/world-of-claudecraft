@@ -38,6 +38,7 @@ const enabledArgs = (over: Partial<SelfMotionGateArgs> = {}): SelfMotionGateArgs
   playerImmobilized: false,
   posX: OPEN_WORLD_X,
   climbing: undefined,
+  leaping: undefined,
   riftFloor: null,
   ...over,
 });
@@ -82,6 +83,7 @@ describe('selfMotionPredictionEnabled', () => {
       { movementFrozen: true },
       { playerImmobilized: true },
       { climbing: true },
+      { leaping: true },
     ];
     for (const over of cases) {
       expect(selfMotionPredictionEnabled(enabledArgs(over)), JSON.stringify(over)).toBe(false);
@@ -105,5 +107,18 @@ describe('selfMotionPredictionEnabled', () => {
   it('treats only an explicit climbing:true as a climb', () => {
     expect(selfMotionPredictionEnabled(enabledArgs({ climbing: false }))).toBe(true);
     expect(selfMotionPredictionEnabled(enabledArgs({ climbing: undefined }))).toBe(true);
+  });
+
+  it('is off mid-flight on a Vaulting Charge (heroic_leap) leap arc', () => {
+    // Root cause of the "goes under the ground instead of jumping" report: the
+    // local kernel has no notion of the airborne arc and keeps predicting
+    // ordinary grounded movement over it, so the display never leaves the
+    // ground. This must suspend prediction exactly like a ledge climb.
+    expect(selfMotionPredictionEnabled(enabledArgs({ leaping: true }))).toBe(false);
+  });
+
+  it('treats only an explicit leaping:true as an active leap', () => {
+    expect(selfMotionPredictionEnabled(enabledArgs({ leaping: false }))).toBe(true);
+    expect(selfMotionPredictionEnabled(enabledArgs({ leaping: undefined }))).toBe(true);
   });
 });
