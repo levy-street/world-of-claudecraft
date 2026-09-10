@@ -6,7 +6,14 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
-import { manifestUrls, VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import {
+  manifestUrls,
+  NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
+  NYTHRAXIS_BONE_SPIKE_TINT,
+  NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
+  VISUALS,
+  visualKeyFor,
+} from '../src/render/characters/manifest';
 import { MOBS } from '../src/sim/data';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../src/sim/nythraxis_bone_spike';
 
@@ -28,6 +35,13 @@ describe('Nythraxis Bone Spike model', () => {
       url: RELATIVE_URL,
       height: DISPLAY_HEIGHT,
       yaw: 0,
+      // Ember-orange recolour + a tinted lift (v0.42.2): the authored bone
+      // and flagstone atlas read as the boss and the floor under the hall's
+      // violet torchlight (owner playtest), so the spike carries the one hue
+      // no other Nythraxis surface uses. Literal pins: nythraxis_hazard_palette.
+      tint: NYTHRAXIS_BONE_SPIKE_TINT,
+      tintStrength: NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
+      selfIllumination: NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
       // STATIC_PROP: every action parks on the nominal 'Idle' the GLB lacks
       clips: {
         idle: 'Idle',

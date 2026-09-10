@@ -2208,7 +2208,12 @@ function buildTintedClone(
     }
     if (selfIllumination > 0 && std.map && !std.emissiveMap) {
       std.emissiveMap = std.map;
-      std.emissive.set(0xffffff);
+      // The lift follows the albedo the def asked for: a tinted body (the
+      // Bone Spike's ember recolour) glows in its tinted colour, since a
+      // white lift would add the atlas's own hue back and wash the recolour
+      // out; an untinted body keeps the white, atlas-scaled lift it always had.
+      if (tint !== null) std.emissive.copy(mat.color);
+      else std.emissive.set(0xffffff);
       std.emissiveIntensity = selfIllumination;
       std.needsUpdate = true;
     }
