@@ -188,9 +188,9 @@ const maimFollow = bladePose(3, 1.12, [-0.008, -0.015, 0.025], 30, 9, 18);
 const graveLoad = bladePose(3, 0.3, [0, -0.035, -0.03], 0, -11);
 const graveCut = bladePose(3, 0.82, [0, -0.035, 0.04], 0, 19);
 const graveExtract = bladePose(3, 1.14, [0, -0.02, 0.02], 0, 12);
-const bloodLoad = bladePose(2, 0.27, [0.008, -0.018, -0.02], -26, -4, -5, true);
-const bloodCut = bladePose(2, 0.39, [-0.01, -0.02, 0.03], 30, 10, 8, true);
-const bloodPull = bladePose(2, 0.88, [0, -0.01, 0.01], 8, -4, 0, true);
+const bloodLoad = bladePose(2, 0.27, [0.008, -0.035, -0.03], -35, -6, -8, true);
+const bloodCut = bladePose(2, 0.39, [-0.01, -0.04, 0.045], 40, 16, 12, true);
+const bloodPull = bladePose(2, 0.88, [0, -0.022, -0.018], -14, -6, 0, true);
 const victoryLoad = bladePose(2, 0.5, [0, -0.027, -0.025], -18, 7, -5);
 const victoryCross = bladePose(2, 0.42, [0, -0.02, 0.02], 6, 5, 3);
 const victoryCut = bladePose(2, 0.39, [0, -0.015, 0.035], 20, 0, 9);
@@ -676,8 +676,8 @@ const performances = [
       [0, idle],
       [0.075, bloodLoad],
       [0.15, bloodCut],
-      [0.175, bloodCut],
-      [0.3, bloodPull],
+      [0.19, bloodCut],
+      [0.34, bloodPull],
       [0.66, idle],
     ],
   ],

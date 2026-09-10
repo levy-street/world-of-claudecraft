@@ -1,4 +1,5 @@
 import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
+import { bloodlettingBeat } from './bloodletting_choreography';
 import { furyCutSurfacePoint } from './fury_shapes';
 import { physicalContact } from './physical_contact';
 import type { SeqSlot, SequencerHost } from './sequencer';
@@ -33,6 +34,7 @@ const CONTACT_SWEEP = { from: 0, to: 1 };
 /** A single owned blade contact. Native animations provide distinct loading,
  * strike and recovery poses; these surfaces follow their authored cut direction. */
 export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: number): boolean {
+  if (bloodlettingBeat(host, slot, beat)) return true;
   const style = WARRIOR_BLADE_STYLES[slot.abilityId];
   if (!style) return false;
   const profile = meleeImpactProfile(slot.abilityId);

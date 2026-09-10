@@ -20,6 +20,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const textures: Record<string, THREE.Texture> = {
     warrior_power: new Texture(),
     harvest_impact: new Texture(),
+    warrior_bite: new Texture(),
   };
   return { bakedTexture: (kind: string) => textures[kind] ?? null };
 });
@@ -98,11 +99,13 @@ beforeEach(() => {
   vi.mocked(abilityVfxBootTextureDependencies).mockReset().mockReturnValue([]);
 });
 
-it.each<[boolean, 'warrior_power' | 'harvest_impact']>([
+it.each<[boolean, 'warrior_power' | 'harvest_impact' | 'warrior_bite']>([
   [false, 'warrior_power'],
   [true, 'warrior_power'],
   [false, 'harvest_impact'],
   [true, 'harvest_impact'],
+  [false, 'warrior_bite'],
+  [true, 'warrior_bite'],
 ])(
   'prepares a gated remote plume during non-Warrior boot (trimmed=%s, kind=%s)',
   async (trimmed, kind) => {

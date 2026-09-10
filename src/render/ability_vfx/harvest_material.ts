@@ -1,7 +1,7 @@
 /** Shared crest program extension. No extra material, pass or runtime upload.
  * UV.x follows extraction; UV.y crosses each sculpted fold. */
 export const HARVEST_VERTEX = `
-if(uKind>23.5){
+if(uKind>23.5&&uKind<25.5){
   float motionAge=mix(0.32,uAge,uMotion);
   float grow=smoothstep(0.0,0.30,motionAge);
   float erupt=step(24.5,uKind);
@@ -13,7 +13,7 @@ if(uKind>23.5){
 }`;
 
 export const HARVEST_FRAGMENT = `
-if(uKind>23.5){
+if(uKind>23.5&&uKind<25.5){
   float motionAge=mix(0.32,uAge,uMotion);
   float head=clamp(motionAge/0.32,0.0,1.0)*1.18;
   float reveal=1.0-smoothstep(head-0.09,head+0.015,vUv.x);

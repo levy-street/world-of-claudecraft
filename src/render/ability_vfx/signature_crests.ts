@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL, sceneKeyLightUniform } from '../scene_sampling';
+import { BLOODLETTING_FRAGMENT, BLOODLETTING_VERTEX } from './bloodletting_shape';
 import { CrestPrewarm } from './crest_prewarm';
 import { HARVEST_FRAGMENT, HARVEST_VERTEX } from './harvest_material';
 import {
@@ -9,6 +10,7 @@ import {
 } from './production_assets';
 import { buildSignatureShapes, type CrestKind } from './signature_shapes';
 import { STEEL_SWEEP_GLSL } from './steel_sweep';
+import { TWINSTRIKE_FRAGMENT, TWINSTRIKE_VERTEX } from './twinstrike_shape';
 
 /** Prepared crystalline fans, curling water sheets, flame ribbons and torn
  * spectral fins. Eight slots share cached geometry families and one program. */
@@ -105,6 +107,8 @@ export class SignatureCrests {
             p.y+=pressureGround(p.xz);
           }
           ${HARVEST_VERTEX}
+          ${TWINSTRIKE_VERTEX}
+          ${BLOODLETTING_VERTEX}
           vec4 view=modelViewMatrix*vec4(p,1.0); vView=-view.xyz; vNormal=normalize(normalMatrix*normal);
           gl_Position=projectionMatrix*view;
         }`,
@@ -258,6 +262,8 @@ export class SignatureCrests {
             alpha=cut*(edge*.85+tail)*(1.0-smoothstep(.62,1.0,uAge));
           }
           ${HARVEST_FRAGMENT}
+          ${TWINSTRIKE_FRAGMENT}
+          ${BLOODLETTING_FRAGMENT}
           gl_FragColor=vec4(colour,alpha*sceneSoftness(vView.z,0.12));
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
@@ -323,6 +329,8 @@ export class SignatureCrests {
       kind === 'steel_execution';
     const contactSurface =
       kind === 'blood_cut' ||
+      kind === 'twinstrike_cut' ||
+      kind === 'bloodletting_pull' ||
       kind.startsWith('harvest_') ||
       kind === 'shield_contact' ||
       steelBlade ||
@@ -355,7 +363,13 @@ export class SignatureCrests {
     const geometry = this.shapes.get(kind) ?? this.shapes.get('shadow');
     if (geometry) s.mesh.geometry = geometry;
     s.mesh.rotation.set(pitch, angle, 0, 'YXZ');
-    if (kind === 'blood_cut' || kind.startsWith('harvest_') || steelBlade)
+    if (
+      kind === 'blood_cut' ||
+      kind === 'twinstrike_cut' ||
+      kind === 'bloodletting_pull' ||
+      kind.startsWith('harvest_') ||
+      steelBlade
+    )
       s.mesh.rotation.set(0, angle, pitch, 'YXZ');
     s.mesh.position.set(x, y, z);
     s.mesh.scale.set(Math.min(3, radius), Math.min(3, height), Math.min(3, radius));
@@ -434,6 +448,8 @@ export class SignatureCrests {
     u.uAge.value = 0;
     if (kind === 'harvest_cut') u.uKind.value = 24;
     if (kind === 'harvest_eruption') u.uKind.value = 25;
+    if (kind === 'twinstrike_cut') u.uKind.value = 26;
+    if (kind === 'bloodletting_pull') u.uKind.value = 27;
     u.uStorm.value = kind === 'steel_storm' ? 1 : 0;
     u.uFlow.value = 0;
     u.uMotion.value = this.reducedMotion ? 0 : 1;

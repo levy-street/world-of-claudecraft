@@ -54,7 +54,8 @@ export interface AbilityVfxCompileTarget {
 export function abilityVfxBootTextureDependencies(): THREE.Texture[] {
   const power = bakedTexture('warrior_power');
   const harvest = bakedTexture('harvest_impact');
-  return [...(power ? [power] : []), ...(harvest ? [harvest] : [])];
+  const bite = bakedTexture('warrior_bite');
+  return [...(power ? [power] : []), ...(harvest ? [harvest] : []), ...(bite ? [bite] : [])];
 }
 
 // Retain one invisible set so its linked programs stay cached between casts.
@@ -179,6 +180,7 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
     'shout_dust',
     'warrior_power',
     'harvest_impact',
+    'warrior_bite',
     'shockwave',
     'pyroblast',
     'frost_nova',

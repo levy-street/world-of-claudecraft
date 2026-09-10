@@ -13,6 +13,7 @@ import {
   samplePose,
   stripToAnimationsOnly,
 } from './anim/pose_blend.mjs';
+import { createTwinstrikeStance } from './anim/twinstrike_pose.mjs';
 
 const io = await createGlbIO();
 const doc = await io.read('public/models/chars/players/knight.glb');
@@ -39,6 +40,7 @@ for (const donor of donors)
 const keys = [...new Set(donors.flatMap((donor) => [...donor.keys()]))];
 const idle = samplePose(donors[0], 0.3);
 const harvestStance = createHarvestStance(root, idle);
+const twinstrikeStance = createTwinstrikeStance(root, idle);
 const sample = (donor, time) => samplePose(donors[donor], time);
 const q = new Quaternion(),
   offset = new Quaternion(),
@@ -79,10 +81,10 @@ function pose(right, left, turn, lean, spread = 0, torso = idle) {
   }
   return result;
 }
-const rightCoil = pose(sample(1, 0.27), sample(2, 0.28), -32, -6, 8);
-const rightCut = pose(sample(1, 0.38), sample(2, 0.28), 30, 11, 2);
-const leftCoil = pose(sample(1, 0.78), sample(2, 0.32), 36, -3, 14);
-const leftCut = pose(sample(1, 0.88), sample(2, 0.87), -38, 14, 7);
+const rightCoil = pose(sample(1, 0.27), sample(2, 0.28), -38, 3, 8);
+const rightCut = pose(sample(1, 0.38), sample(2, 0.28), 35, 15, 2);
+const leftCoil = pose(sample(1, 0.78), sample(2, 0.32), 42, 4, 14);
+const leftCut = pose(sample(1, 0.88), sample(2, 0.87), -42, 18, 7);
 // Preserve the native torso with the arm chains: the old Idle torso plus chop
 // arms pointed both actual sword blades behind the caster at the impact peak.
 const reapCut = pose(sample(1, 0.38), sample(2, 0.87), 12, 8, 8, sample(2, 0.87));
@@ -138,7 +140,10 @@ for (const [name, beats] of [
       const blended = new Map(
         keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)]),
       );
-      const authored = name === 'Fury_Red_Harvest' ? harvestStance(blended, time) : blended;
+      const authored =
+        name === 'Fury_Red_Harvest'
+          ? harvestStance(blended, time)
+          : twinstrikeStance(blended, time);
       timeline.push([time, (key) => authored.get(key)]);
     }
   }

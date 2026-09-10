@@ -1,9 +1,11 @@
 import * as THREE from 'three';
+import { buildBloodlettingShape } from './bloodletting_shape';
 import { buildFuryCutShape } from './fury_shapes';
 import { buildHarvestShape } from './harvest_shapes';
 import { buildIronguardShape, type IronguardShape } from './ironguard_shapes';
 import { buildRitualSculpture } from './ritual_sculptures';
 import type { Substance } from './signature_core';
+import { buildTwinstrikeShape } from './twinstrike_shape';
 import { buildWarriorArea, type WarriorAreaShape } from './warrior_area_shapes';
 import { warriorAvatarRuptureShape } from './warrior_avatar_rupture';
 import { buildWarriorBlade } from './warrior_blade_shape';
@@ -26,6 +28,8 @@ export type CrestKind =
   | 'blood_cut'
   | 'harvest_cut'
   | 'harvest_eruption'
+  | 'twinstrike_cut'
+  | 'bloodletting_pull'
   | 'shield_contact'
   | 'steel_cut'
   | WarriorHeavyShape
@@ -43,6 +47,8 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
   shapes.set('blood_cut', buildFuryCutShape());
   shapes.set('harvest_cut', buildHarvestShape(false));
   shapes.set('harvest_eruption', buildHarvestShape(true));
+  shapes.set('twinstrike_cut', buildTwinstrikeShape());
+  shapes.set('bloodletting_pull', buildBloodlettingShape());
   shapes.set('shield_contact', buildWarriorShield());
   shapes.set('steel_cut', buildWarriorBlade());
   for (const kind of ['steel_chop', 'steel_counter', 'steel_execution'] as const)

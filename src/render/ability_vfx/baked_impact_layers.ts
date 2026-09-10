@@ -166,7 +166,7 @@ export class BakedImpactLayers {
       !bakedTexture(kind) ||
       // Decoding is not GPU preparation. The new large optional layer stays
       // cold until this renderer's explicit upload has completed successfully.
-      ((kind === 'warrior_power' || kind === 'harvest_impact') &&
+      ((kind === 'warrior_power' || kind === 'harvest_impact' || kind === 'warrior_bite') &&
         !this.textureReady?.(bakedTexture(kind)!)) ||
       ![x, y, z, size, duration, delay, heat, floor, angle, roll, aspect].every(Number.isFinite) ||
       aspect <= 0 ||
@@ -185,7 +185,8 @@ export class BakedImpactLayers {
       kind === 'pyroblast' ||
       kind === 'frost_nova' ||
       kind === 'chain_heal' ||
-      kind === 'harvest_impact';
+      kind === 'harvest_impact' ||
+      kind === 'warrior_bite';
     s.power = kind === 'warrior_power';
     s.reverse = reverse;
     s.roll = roll;
