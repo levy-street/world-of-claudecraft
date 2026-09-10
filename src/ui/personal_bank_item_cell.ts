@@ -24,6 +24,7 @@ import {
   appendMaterialSourcesActionAfter,
   attachMaterialSourcesContextMenu,
   type MaterialSourcesDialogOpener,
+  materialSourcesButtonShown,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
 import { unknownItemIconHtml } from './unknown_item_icon';
@@ -104,8 +105,27 @@ export function buildPersonalBankItemCell(
     return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
   });
   const itemName = parts?.name ?? slot.itemId;
-  attachMaterialSourcesContextMenu(cell, itemName, displayedSources, deps.openMaterialSources);
-  if (!displayedSources || !deps.openMaterialSources) return cell;
+  // The exact-source withdraw session is captured the moment the affordance
+  // fires (right-click on desktop, the touch-only Sources button otherwise),
+  // never from a later render.
+  const withdrawSelection = bankMaterialWithdrawSelection(
+    deps.world(),
+    slot.itemId,
+    slot.slotIndex,
+    () => {
+      deps.hideTooltip();
+      deps.onInventoryChanged();
+      render();
+    },
+  );
+  attachMaterialSourcesContextMenu(
+    cell,
+    itemName,
+    displayedSources,
+    deps.openMaterialSources,
+    withdrawSelection,
+  );
+  if (!displayedSources || !deps.openMaterialSources || !materialSourcesButtonShown()) return cell;
   const wrapper = document.createElement('div');
   wrapper.className = 'material-source-item material-source-item-cell';
   wrapper.appendChild(cell);
@@ -114,11 +134,7 @@ export function buildPersonalBankItemCell(
     itemName,
     displayedSources,
     deps.openMaterialSources,
-    bankMaterialWithdrawSelection(deps.world(), slot.itemId, slot.slotIndex, () => {
-      deps.hideTooltip();
-      deps.onInventoryChanged();
-      render();
-    }),
+    withdrawSelection,
   );
   return wrapper;
 }

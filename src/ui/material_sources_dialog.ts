@@ -45,14 +45,50 @@ export interface MaterialSourcesDialogOptions {
   associatedOwners?: readonly HTMLElement[];
 }
 
-/** Add the shared keyboard/context-menu details entry point to an existing item
- *  row. Touch long-press remains the row's tooltip peek; desktop right-click and
- *  the native Context Menu key open the full uncapped source list. */
+/** Whether the visible per-row "Sources" button is shown at all. Touch layouts
+ *  have no right-click, so the button stays their only door into the full
+ *  source list and the exact-quantity picker; on desktop the same actions ride
+ *  the row's context menu (right-click / the native Context Menu key) and the
+ *  button is withheld so material rows stay as lean as every other row. */
+export function materialSourcesButtonShown(): boolean {
+  return document.body.classList.contains('mobile-touch');
+}
+
+/** Open the shared dialog for one row: the exact-quantity picker when a
+ *  selection factory yields a live session (the caller captured its stack pin
+ *  the moment the affordance fired, so nothing is re-resolved here), or the
+ *  read-only details list otherwise. A factory that returns null means the
+ *  row has left the live inventory, and the affordance REFUSES rather than
+ *  falling back to a stale read-only view. */
+function openMaterialSourcesForRow(
+  open: MaterialSourcesDialogOpener,
+  itemName: string,
+  sources: MaterialComposition,
+  opener: HTMLElement,
+  selectionFactory?: MaterialSourcesSelectionFactory,
+): void {
+  const selection = selectionFactory?.();
+  if (selectionFactory && !selection) return;
+  open({
+    itemName,
+    sources: selection?.sources ?? sources,
+    opener,
+    ...(selection ? { onConfirm: selection.onConfirm } : {}),
+    ...(selection?.associatedOwners ? { associatedOwners: selection.associatedOwners } : {}),
+  });
+}
+
+/** Add the shared keyboard/context-menu entry point to an existing item row.
+ *  Touch long-press remains the row's tooltip peek; desktop right-click and the
+ *  native Context Menu key open the full uncapped source list, or, when
+ *  `selectionFactory` is supplied, the exact-quantity picker (the same session
+ *  the touch-only button opens), so a desktop row needs no extra control. */
 export function attachMaterialSourcesContextMenu(
   element: HTMLElement,
   itemName: string,
   sources: MaterialComposition | undefined,
   open: MaterialSourcesDialogOpener | undefined,
+  selectionFactory?: MaterialSourcesSelectionFactory,
 ): void {
   if (sources === undefined || sources.length === 0 || open === undefined) return;
   element.addEventListener('contextmenu', (event) => {
@@ -65,12 +101,14 @@ export function attachMaterialSourcesContextMenu(
       return;
     }
     event.preventDefault();
-    open({ itemName, sources, opener: element });
+    openMaterialSourcesForRow(open, itemName, sources, element, selectionFactory);
   });
 }
 
-/** Add the same details affordance beside an existing row/cell. The wrapper is
- * one intentional layout item, and each nested button keeps one purpose. */
+/** Add the same details affordance beside an existing row/cell, on touch
+ * layouts only (materialSourcesButtonShown): desktop rows reach it through
+ * attachMaterialSourcesContextMenu instead. The wrapper is one intentional
+ * layout item, and each nested button keeps one purpose. */
 export function appendMaterialSourcesActionAfter(
   element: HTMLElement,
   itemName: string,
@@ -79,6 +117,7 @@ export function appendMaterialSourcesActionAfter(
   selectionFactory?: MaterialSourcesSelectionFactory,
 ): HTMLButtonElement | null {
   if (sources === undefined || sources.length === 0 || open === undefined) return null;
+  if (!materialSourcesButtonShown()) return null;
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn material-sources-action';
@@ -97,15 +136,7 @@ export function appendMaterialSourcesActionAfter(
   );
   button.addEventListener('click', (event) => {
     event.stopPropagation();
-    const selection = selectionFactory?.();
-    if (selectionFactory && !selection) return;
-    open({
-      itemName,
-      sources: selection?.sources ?? sources,
-      opener: button,
-      ...(selection ? { onConfirm: selection.onConfirm } : {}),
-      ...(selection?.associatedOwners ? { associatedOwners: selection.associatedOwners } : {}),
-    });
+    openMaterialSourcesForRow(open, itemName, sources, button, selectionFactory);
   });
   const existingWrapper = element.parentElement?.classList.contains('material-source-item')
     ? element.parentElement

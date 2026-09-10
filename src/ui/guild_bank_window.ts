@@ -65,6 +65,7 @@ import { guildMaterialWithdrawSelection } from './material_source_storage_action
 import {
   appendMaterialSourcesActionAfter,
   attachMaterialSourcesContextMenu,
+  type MaterialSourcesSelectionFactory,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
@@ -550,7 +551,18 @@ export class GuildBankTab {
     // NO filter/sort layer and NO unknown-id drop: every slot renders at its
     // wire index, dormant ones visibly distinct (the carried-forward line).
     for (const slot of model.slots) {
-      const cell = this.buildCell(slot, model.readOnly);
+      // The exact-source withdraw session (absent on a read-only pane and on a
+      // dormant slot, where no withdraw exists) rides both doors into the
+      // dialog: desktop right-click and the touch-only Sources button.
+      const withdrawSelection =
+        model.readOnly || slot.dormant
+          ? undefined
+          : guildMaterialWithdrawSelection(this.deps.world(), slot.itemId, slot.slotIndex, () => {
+              this.deps.hideTooltip();
+              this.deps.onInventoryChanged();
+              this.deps.requestRender();
+            });
+      const cell = this.buildCell(slot, model.readOnly, withdrawSelection);
       const item = knownItemDef(ITEMS, slot.itemId);
       const itemName = item ? itemDisplayName(item) : slot.itemId;
       grid.appendChild(cell);
@@ -559,13 +571,7 @@ export class GuildBankTab {
         itemName,
         materialSourcesForDisplay(slot),
         this.deps.openMaterialSources,
-        model.readOnly || slot.dormant
-          ? undefined
-          : guildMaterialWithdrawSelection(this.deps.world(), slot.itemId, slot.slotIndex, () => {
-              this.deps.hideTooltip();
-              this.deps.onInventoryChanged();
-              this.deps.requestRender();
-            }),
+        withdrawSelection,
       );
     }
     for (let i = 0; i < model.emptyCells; i++) {
@@ -576,7 +582,11 @@ export class GuildBankTab {
     }
   }
 
-  private buildCell(slot: GuildBankSlotModel, readOnly: boolean): HTMLElement {
+  private buildCell(
+    slot: GuildBankSlotModel,
+    readOnly: boolean,
+    withdrawSelection: MaterialSourcesSelectionFactory,
+  ): HTMLElement {
     const item = knownItemDef(ITEMS, slot.itemId);
     const cell = document.createElement('button');
     cell.type = 'button';
@@ -664,6 +674,7 @@ export class GuildBankTab {
       itemName,
       displayedSources,
       this.deps.openMaterialSources,
+      withdrawSelection,
     );
     // Dormant wording outranks every other announcement (the guild-permission
     // lock is the action fact); the player item lock (issue 3042) outranks

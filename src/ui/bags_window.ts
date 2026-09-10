@@ -105,6 +105,7 @@ import {
   appendMaterialSourcesActionAfter,
   closeMaterialSourcesDialogForOwner,
   type MaterialSourcesSelectionFactory,
+  materialSourcesButtonShown,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
@@ -1335,7 +1336,17 @@ export class BagsWindow {
       this.attachRowTooltip(row, item, s);
       const displayedSources = materialSourcesForDisplay(s);
       const sourceSelection = this.storageSourceSelection(s);
-      if (displayedSources && sourceSelection && this.deps.openMaterialSources) {
+      // Touch only (materialSourcesButtonShown): the per-cell button doubled
+      // every material cell's height at an open storage pane. Desktop keeps
+      // right-click as the whole-stack deposit it always was; an exact-source
+      // deposit there is the default-mode "Take out chosen quantity" split
+      // followed by depositing the split stack.
+      if (
+        displayedSources &&
+        sourceSelection &&
+        this.deps.openMaterialSources &&
+        materialSourcesButtonShown()
+      ) {
         const wrapper = document.createElement('div');
         wrapper.className = 'material-source-item material-source-item-cell';
         wrapper.appendChild(row);

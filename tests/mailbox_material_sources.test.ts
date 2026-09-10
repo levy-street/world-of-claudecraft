@@ -76,10 +76,22 @@ function mount(
   return { root, win, openedSources, sent };
 }
 
+/** Desktop right-click on a staged parcel's name (the row the source details
+ *  are attached to): the per-row Sources button exists on touch layouts only
+ *  (material_sources_row_entry.test.ts pins that split). */
+function rightClick(element: Element | null): void {
+  if (!element) return;
+  const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+  Object.defineProperty(event, 'pointerType', { value: 'mouse' });
+  element.dispatchEvent(event);
+}
+
 function openEverySourceAction(root: HTMLElement): void {
-  for (const action of root.querySelectorAll<HTMLButtonElement>('.material-sources-action')) {
-    action.click();
-  }
+  for (const name of root.querySelectorAll<HTMLElement>('.mail-parcel-name')) rightClick(name);
+}
+
+function openFirstSourceAction(root: HTMLElement): void {
+  rightClick(root.querySelector('.mail-parcel-name'));
 }
 
 describe('mailbox material source previews', () => {
@@ -128,10 +140,11 @@ describe('mailbox material source previews', () => {
     const { root, win, openedSources } = mount(inventory);
 
     win.stageParcel('copper_ore');
-    root.querySelector<HTMLButtonElement>('.material-sources-action')?.click();
+    openFirstSourceAction(root);
 
     expect(openedSources).toHaveLength(1);
     expect(sourceCounts(openedSources[0]?.sources)).toEqual({ '-': 1, Ana: 3 });
+    expect(root.querySelector('.material-sources-action')).toBeNull();
   });
 
   it('replans from live inventory without clearing the typed compose form', () => {
@@ -146,7 +159,7 @@ describe('mailbox material source previews', () => {
     win.stageParcel('copper_ore');
     const recipient = root.querySelector('#mail-to') as HTMLInputElement;
     recipient.value = 'Mira';
-    root.querySelector<HTMLButtonElement>('.material-sources-action')?.click();
+    openFirstSourceAction(root);
     expect(sourceCounts(openedSources.at(-1)?.sources)).toEqual({ Ana: 2 });
 
     inventory.splice(0, 1, {
@@ -154,7 +167,7 @@ describe('mailbox material source previews', () => {
       count: 2,
       materialSources: [{ source: { signer: 'Bru' }, count: 2 }],
     });
-    root.querySelector<HTMLButtonElement>('.material-sources-action')?.click();
+    openFirstSourceAction(root);
 
     expect(sourceCounts(openedSources.at(-1)?.sources)).toEqual({ Bru: 2 });
     expect((root.querySelector('#mail-to') as HTMLInputElement).value).toBe('Mira');
@@ -173,8 +186,8 @@ describe('mailbox material source previews', () => {
     ];
     const { root, win, openedSources } = mount(inventory);
     win.stageParcel('copper_ore');
-    const sourceAction = root.querySelector<HTMLButtonElement>('.material-sources-action');
-    sourceAction?.click();
+    const parcelName = root.querySelector<HTMLElement>('.mail-parcel-name');
+    rightClick(parcelName);
     expect(openedSources).toHaveLength(1);
 
     inventory[0] = {
@@ -182,11 +195,12 @@ describe('mailbox material source previews', () => {
       count: 2,
       materialSources: [{ source: { signer: 'Ana' }, count: 1 }],
     };
-    sourceAction?.click();
+    rightClick(parcelName);
     expect(openedSources).toHaveLength(1);
 
     win.relocalize();
-    expect(root.querySelector('.material-sources-action')).toBeNull();
+    rightClick(root.querySelector('.mail-parcel-name'));
+    expect(openedSources).toHaveLength(1);
   });
 
   it('keeps a non-material parcel and its count controls unchanged', () => {
