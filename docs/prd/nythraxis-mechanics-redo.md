@@ -248,10 +248,10 @@ Unbound sigils (compounding boss damage against the clock).
 | Mechanic | Normal | Heroic |
 |---|---|---|
 | Dread Curse | 25% hit, +35% per stack, swap at 2 | 30% hit, +45% per stack, swap at 2 |
-| Bone Spike | every 20 s, 2 victims, 8%/s | every 16 s, 3 victims, 10%/s |
+| Bone Spike | every 24 s, 2 victims, 8%/s, 55 s per-raider cooldown (v0.42.2) | every 20 s, 3 victims, 10%/s, 55 s per-raider cooldown (v0.42.2) |
 | Grave Eruption | every 15 s, 4 circles, 45%, flame 12 s at 6%/s | every 12 s, 6 circles, 75%, flame never goes out (clears at the transition) at 9%/s |
 | Binding Sigil | every 45 s, 10 to 24 yd out, 4 yd, 15 s to bind, +4%/stack, Bound 10 s, Unbound 40%, keeps +20% | every 40 s, 3 yd, 12 s, +5%/stack, Bound 8 s, Unbound 60%, keeps +25%, may land in fire |
-| Soul Rend / Soulfire | 3 marks, 100% split, pools 15 s at 8%/s | 6 marks, 150% split, pools never go out at 12%/s |
+| Soul Rend | 3 marks, 100% split, no pool since v0.42.2 | 6 marks, 150% split, no pool since v0.42.2 |
 | Deathless Rage | 82% on failure (unchanged) | 115% on failure, lethal, court rises (unchanged) |
 | Gravefire | every 12 s, burns 6 s at 10%/s | every 10 s, burns 8 s at 15%/s |
 | Phase 3 Wrath | +20% damage, eruptions every 10 s, Gravefire every 8 s | +25% damage, eruptions every 8 s, Gravefire every 6 s |
@@ -534,3 +534,42 @@ record of how the fight got here.
   off the purple family.
 - **Unchanged by this pass:** Dread Curse (cadence, per-stack hit, duration,
   swap threshold) and every King's Wrath / Crown Endures phase buff.
+
+## 15. Hotfix v0.42.2 (2026-09-11): Soulfire retired, Bone Spike cooldown and recolour
+
+Supersedes only the points named below; sections 1-14 stand as the record.
+Live heroic runs still found the fight too hard after the v0.42.1 spike
+health change, and one raider could be spiked several waves running.
+
+- **Soulfire is retired from play.** A Soul Rend detonation still splits its
+  hit across the stacked marks exactly as before, but leaves NO pool behind on
+  either difficulty. The stack point no longer has to rotate. The `soul` flame
+  kind stays on the wire and in the renderer for now (nothing produces it);
+  removing it end to end is a normal-cycle cleanup. The Raid Boss Guide row,
+  the finder chip, and the guide prose that told the raid to rotate off the
+  fire are gone with it.
+- **Bone Spike per-raider cooldown: 55 s from the impale.** A raider who has
+  just been impaled cannot be picked by any Bone Spike cast (the cadence cast
+  or the mid-storm one) for 55 s, measured from the moment the spike rose,
+  not from the release, and counted on the encounter clock through every
+  script-locked window. Longer than two Normal cadences (48 s) and two Heroic
+  ones (40 s), so consecutive waves spread across the raid. With fewer
+  eligible raiders than the wave size the cast pins the ones it has; with
+  none it re-polls in 3 s as before. The ledger clears on an encounter reset.
+  (`NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS`, `src/sim/nythraxis_bone_spike.ts`.)
+- **Bone Spikes are ember orange.** The authored bone-and-flagstone atlas
+  read as the boss (a bone golem) and the floor under the hall's violet
+  torchlight. The spike now carries a strong ember-orange tint with a tinted
+  self-illumination lift, the one hue no other Nythraxis surface uses: not
+  the purple offensive palette, not the sigil's friendly blue, not Soul
+  Rend's red/green. The tint applies on every graphics tier; the lift is a
+  standard-tier polish. (`mob_nythraxis_bone_spike` in
+  `src/render/characters/manifest.ts`, pinned in
+  `tests/nythraxis_hazard_palette.test.ts`.)
+- **Cadence correction to section 5's table:** the live Bone Spike cadence
+  has been 24 s Normal / 20 s Heroic since the first playtest pass (the table
+  still said 20 / 16); the table now reads the live values.
+- **Unchanged by this pass:** victims per wave (2 / 3), the impale drain
+  (8% / 10% per second), spike health (1,000 on both difficulties since
+  v0.42.1), Grave Eruption, Grave Flame, Gravefire, Binding Sigil, Dread
+  Curse, Deathless Rage, Bone Storm, and every phase buff.
