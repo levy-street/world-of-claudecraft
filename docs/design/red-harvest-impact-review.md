@@ -1,4 +1,4 @@
-# Red Harvest impact rework — 10 September 2026
+# Red Harvest impact rework: 10 September 2026
 
 Tony approved the impact-first proposal. This checkpoint changes Warrior Red Harvest only: a lower planted stance, two opposed cuts, a held two-sword extraction, and a much larger enemy-centred crimson eruption. Damage, cost, contact times (0.15/0.32/0.49 seconds) and Enrage rules are unchanged.
 
