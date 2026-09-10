@@ -106,16 +106,18 @@ describe('RaidBossGuideWindow', () => {
       '/ui/mobs/nythraxis_scourge_of_thornpeak.webp',
     );
     expect(root.querySelectorAll('.rbg-phase')).toHaveLength(3);
-    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(12);
+    // Eleven mechanics since v0.42.2: the Soulfire row left with the pools.
+    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(11);
     expect(root.textContent).toContain('The Throne');
     expect(root.textContent).toContain('The Wardstones');
     expect(root.textContent).toContain("The King's Wrath");
     expect(root.textContent).not.toContain('Raise Fallen');
     expect(root.textContent).not.toContain('The Deathless Court');
+    expect(root.textContent).not.toContain('Soulfire');
 
-    // The heroic tier lists the same twelve: the court is switched off with the adds.
+    // The heroic tier lists the same eleven: the court is switched off with the adds.
     root.querySelector<HTMLButtonElement>('[data-difficulty="heroic"]')?.click();
-    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(12);
+    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(11);
     expect(root.textContent).not.toContain('The Deathless Court');
 
     root.querySelector<HTMLButtonElement>('[data-mechanic="dread-curse"]')?.click();
