@@ -14,6 +14,7 @@ import { ClientWorld } from '../../src/net/online';
 import { FARM_PATCHES } from '../../src/sim/content/farm_patches';
 import { emptyAllocation, emptyModifiers } from '../../src/sim/content/talents';
 import { ALL_RECIPES } from '../../src/sim/data';
+import { freshAccountLedger } from '../../src/sim/account_ledger';
 import { freshDeedStats } from '../../src/sim/deeds';
 import { emptyCraftSkills } from '../../src/sim/professions/wheel';
 import { emptyMoveInput, type PlayerClass } from '../../src/sim/types';
@@ -126,6 +127,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.reliquaryMarks = new Set();
   c.reliquaryRecent = [];
   c.reliquaryObtainCounts = {};
+  c.accountLedger = freshAccountLedger();
   c.renown = 0;
   c.activeTitle = null;
   c.activeBorder = null;
