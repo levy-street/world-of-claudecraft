@@ -3694,7 +3694,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': "Impulso d'Ombra (danno ad area pulsante)",
   'hudChrome.finder.mech.shuddering_stomp': 'Pestata Tremenda (stordimento ad area)',
   'hudChrome.finder.mech.soul_rend':
-    "Squarcio dell'Anima (i giocatori segnati si raggruppano, poi escono dal fuoco)",
+    "Squarcio dell'Anima (i giocatori segnati si raggruppano per dividere il danno)",
   'hudChrome.finder.mech.summons_adds': 'Evoca rinforzi',
   'hudChrome.finder.mech.wardstones':
     'Canalizzazione delle pietre di guardia (transizione di fase)',
@@ -16523,12 +16523,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     "Ogni {everyNormal} s, un sigillo delle antiche protezioni divampa sul pavimento da {minDist} a {maxDist} yd da Nythraxis e lui inizia Ascensione immortale, guadagnando {ascensionNormal} di danni e velocità d'attacco ogni {ascensionEvery} s. Se resta sul sigillo entro {bindNormal} s, viene Vincolato: l'Ascensione viene purificata, è stordito per {stunNormal} s e subisce {vulnerability} danni in più per {boundNormal} s. Altrimenti ogni membro dell'incursione subisce {unboundHitNormal} della salute massima come danni da Ombra e lui mantiene {unboundBonusNormal} danni in più fino al prossimo vincolo.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    "Ogni {everyHeroic} s, Nythraxis impala {victimsHeroic} membri dell'incursione diversi dal suo bersaglio attuale su Spine ossee. Un membro impalato non può agire e perde {drainHeroic} della salute massima ogni secondo finché la sua spina non viene distrutta.",
+    "Ogni {everyHeroic} s, Nythraxis impala {victimsHeroic} membri dell'incursione diversi dal suo bersaglio attuale su Spine ossee. Un membro impalato non può agire e perde {drainHeroic} della salute massima ogni secondo finché la sua spina non viene distrutta. Un giocatore già impalato non può essere scelto di nuovo per {cooldown} s, così le spine si distribuiscono su tutta l'incursione.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Spina ossea',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Gli assaltatori passano subito alle Spine ossee e le distruggono per liberare gli impalati. I guaritori tengono vivi gli impalati mentre le spine cadono.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    "Ogni {everyNormal} s, Nythraxis impala {victimsNormal} membri dell'incursione diversi dal suo bersaglio attuale su Spine ossee. Un membro impalato non può agire e perde {drainNormal} della salute massima ogni secondo finché la sua spina non viene distrutta.",
+    "Ogni {everyNormal} s, Nythraxis impala {victimsNormal} membri dell'incursione diversi dal suo bersaglio attuale su Spine ossee. Un membro impalato non può agire e perde {drainNormal} della salute massima ogni secondo finché la sua spina non viene distrutta. Un giocatore già impalato non può essere scelto di nuovo per {cooldown} s, così le spine si distribuiscono su tutta l'incursione.",
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     "A partire da {first} s dopo l'Ira del re e poi ogni {everyHeroic} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlHeroic} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamHeroic} della salute massima. Lancia Spina ossea {spikeAt} s dopo l'inizio della tempesta, poi Spezzatombe si riattiva {rearm} s dopo la fine.",
   'hudChrome.raidBossGuide.nythraxis.boneStormName': "Tempesta d'ossa",

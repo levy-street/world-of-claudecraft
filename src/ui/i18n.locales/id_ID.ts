@@ -3545,7 +3545,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Denyut Bayangan (kerusakan area berdenyut)',
   'hudChrome.finder.mech.shuddering_stomp': 'Hentakan Gemetar (stun area)',
   'hudChrome.finder.mech.soul_rend':
-    'Robek Jiwa (pemain yang ditandai berkumpul, lalu meninggalkan api)',
+    'Robek Jiwa (pemain yang ditandai berkumpul untuk membagi kerusakan)',
   'hudChrome.finder.mech.summons_adds': 'Memanggil bala bantuan',
   'hudChrome.finder.mech.wardstones': 'Saluran Wardstone (transisi fase)',
   'hudChrome.finder.needs': 'Membutuhkan {roles}',
@@ -15819,12 +15819,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Setiap {everyNormal} dtk, segel pelindung lama menyala di lantai {minDist} sampai {maxDist} yd dari Nythraxis dan ia memulai Kenaikan Tanpa Kematian, mendapat {ascensionNormal} kerusakan dan kecepatan serangan setiap {ascensionEvery} dtk. Jika ia berdiri di segel dalam {bindNormal} dtk, ia Terikat: Kenaikan dipurnikan, ia terkena stun selama {stunNormal} dtk, dan ia menerima {vulnerability} lebih banyak kerusakan selama {boundNormal} dtk. Jika tidak, setiap raider menerima {unboundHitNormal} kesehatan maksimum sebagai kerusakan Bayangan dan ia mempertahankan {unboundBonusNormal} lebih banyak kerusakan sampai pengikatan berikutnya.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Setiap {everyHeroic} dtk, Nythraxis menusuk {victimsHeroic} raider selain targetnya saat ini pada Pancang Tulang. Raider yang tertusuk tidak dapat bertindak dan kehilangan {drainHeroic} kesehatan maksimum setiap detik sampai pancangnya dihancurkan.',
+    'Setiap {everyHeroic} dtk, Nythraxis menusuk {victimsHeroic} raider selain targetnya saat ini pada Pancang Tulang. Raider yang tertusuk tidak dapat bertindak dan kehilangan {drainHeroic} kesehatan maksimum setiap detik sampai pancangnya dihancurkan. Pemain yang sudah pernah dipancang tidak dapat dipilih lagi selama {cooldown} detik, sehingga pancang tersebar ke seluruh raid.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Pancang Tulang',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Para penyerang segera beralih ke Pancang Tulang dan menghancurkannya untuk membebaskan raider yang tertusuk. Penyembuh menjaga yang tertusuk tetap hidup sampai pancang runtuh.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Setiap {everyNormal} dtk, Nythraxis menusuk {victimsNormal} raider selain targetnya saat ini pada Pancang Tulang. Raider yang tertusuk tidak dapat bertindak dan kehilangan {drainNormal} kesehatan maksimum setiap detik sampai pancangnya dihancurkan.',
+    'Setiap {everyNormal} dtk, Nythraxis menusuk {victimsNormal} raider selain targetnya saat ini pada Pancang Tulang. Raider yang tertusuk tidak dapat bertindak dan kehilangan {drainNormal} kesehatan maksimum setiap detik sampai pancangnya dihancurkan. Pemain yang sudah pernah dipancang tidak dapat dipilih lagi selama {cooldown} detik, sehingga pancang tersebar ke seluruh raid.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Mulai {first} dtk setelah Murka Raja dan setiap {everyHeroic} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlHeroic} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamHeroic} kesehatan maksimum. Ia merapal Pancang Tulang {spikeAt} dtk setelah badai dimulai, lalu Penghancur Makam siap lagi {rearm} dtk setelah berakhir.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Badai Tulang',

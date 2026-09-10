@@ -8152,9 +8152,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '坦克应在 {stacks} 层时轮换：另一名坦克嘲讽接怪，被诅咒的坦克则远离碎墓打击的扇形范围，直到层数消退。治疗在轮换前为即将接怪的坦克做好准备。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': '骨刺',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    '每 {everyNormal} 秒，尼思拉克西斯会用骨刺穿刺除当前目标外的 {victimsNormal} 名队员。被穿刺的队员无法行动，每秒损失 {drainNormal} 最大生命值，直到骨刺被摧毁。',
+    '每 {everyNormal} 秒，尼思拉克西斯会用骨刺穿刺除当前目标外的 {victimsNormal} 名队员。被穿刺的队员无法行动，每秒损失 {drainNormal} 最大生命值，直到骨刺被摧毁。已被穿刺过的队员在 {cooldown} 秒内不会再次被选中，因此骨刺会分散到整个团队。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    '每 {everyHeroic} 秒，尼思拉克西斯会用骨刺穿刺除当前目标外的 {victimsHeroic} 名队员。被穿刺的队员无法行动，每秒损失 {drainHeroic} 最大生命值，直到骨刺被摧毁。',
+    '每 {everyHeroic} 秒，尼思拉克西斯会用骨刺穿刺除当前目标外的 {victimsHeroic} 名队员。被穿刺的队员无法行动，每秒损失 {drainHeroic} 最大生命值，直到骨刺被摧毁。已被穿刺过的队员在 {cooldown} 秒内不会再次被选中，因此骨刺会分散到整个团队。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     '输出职业立即转火骨刺并将其摧毁，以解救被穿刺的队员。治疗在骨刺被摧毁前为被穿刺者续命。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': '坟场爆裂',
@@ -10783,7 +10783,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.sealbreak_shockwave': '破印冲击波（范围爆发）',
   'hudChrome.finder.mech.gravebreaker': '碎墓打击（正面扇形，背对团队）',
   'hudChrome.finder.mech.raise_fallen': '亡者复生（周期性召唤小怪）',
-  'hudChrome.finder.mech.soul_rend': '灵魂撕裂（被标记者应集合，然后离开火焰）',
+  'hudChrome.finder.mech.soul_rend': '灵魂撕裂（被标记者集合以分摊伤害）',
   'hudChrome.finder.mech.deathless_rage': '不死之怒（需在护符石处打断）',
   'hudChrome.finder.mech.wardstones': '护符石引导（阶段转换）',
   'hudChrome.finder.mech.dread_curse': '恐惧诅咒（累加坦克轮换减益，2层后轮换）',

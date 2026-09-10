@@ -3656,7 +3656,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Pulso das Sombras (dano em área pulsante)',
   'hudChrome.finder.mech.shuddering_stomp': 'Pisão Estremecedor (atordoamento em área)',
   'hudChrome.finder.mech.soul_rend':
-    'Rasgão de Alma (jogadores marcados se juntam e depois saem do fogo)',
+    'Rasgão de Alma (jogadores marcados se juntam para dividir o dano)',
   'hudChrome.finder.mech.summons_adds': 'Convoca reforços',
   'hudChrome.finder.mech.wardstones': 'Canalizações das pedras de guarda (transição de fase)',
   'hudChrome.finder.needs': 'Precisa de {roles}',
@@ -16413,12 +16413,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'A cada {everyNormal} s, um selo das antigas proteções brilha no chão de {minDist} a {maxDist} yd de Nythraxis e ele inicia Ascensão imortal, ganhando {ascensionNormal} de dano e velocidade de ataque a cada {ascensionEvery} s. Se ele ficar sobre o selo em até {bindNormal} s, fica Vinculado: a Ascensão é purificada, ele fica atordoado por {stunNormal} s e sofre {vulnerability} a mais de dano por {boundNormal} s. Caso contrário, cada raider sofre {unboundHitNormal} da vida máxima como dano de Sombra e ele mantém {unboundBonusNormal} a mais de dano até o próximo vínculo.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'A cada {everyHeroic} s, Nythraxis empala {victimsHeroic} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainHeroic} da vida máxima a cada segundo até que seu espinho seja destruído.',
+    'A cada {everyHeroic} s, Nythraxis empala {victimsHeroic} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainHeroic} da vida máxima a cada segundo até que seu espinho seja destruído. Um jogador que já foi empalado não pode ser escolhido de novo por {cooldown} s, então os espinhos se espalham por toda a raide.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Espinho ósseo',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Os causadores de dano trocam imediatamente para os Espinhos ósseos e os destroem para libertar os empalados. Os curadores mantêm os empalados vivos enquanto os espinhos caem.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'A cada {everyNormal} s, Nythraxis empala {victimsNormal} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainNormal} da vida máxima a cada segundo até que seu espinho seja destruído.',
+    'A cada {everyNormal} s, Nythraxis empala {victimsNormal} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainNormal} da vida máxima a cada segundo até que seu espinho seja destruído. Um jogador que já foi empalado não pode ser escolhido de novo por {cooldown} s, então os espinhos se espalham por toda a raide.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Começando {first} s depois da Ira do rei e a cada {everyHeroic} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlHeroic} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamHeroic} da vida máxima. Ele lança Espinho ósseo {spikeAt} s após o início da tempestade, e então Quebra-túmulos rearma {rearm} s após ela terminar.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Tempestade óssea',

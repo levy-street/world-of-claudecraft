@@ -192,6 +192,10 @@ const EXPECTED_DAMAGE = [
   'Bone Slam',
 ];
 
+// Damage sources the fight must NOT produce any more: Soulfire (the pool a
+// Soul Rend detonation used to leave) was retired from play in v0.42.2.
+const FORBIDDEN_DAMAGE = ['Soulfire'];
+
 const EXPECTED_AURAS = [
   'Dread Curse',
   'Impaled',
@@ -228,6 +232,9 @@ describe('Nythraxis full fight smoke (every mechanic fires)', () => {
         'damage abilities',
       ).toEqual([]);
       expect(missing(EXPECTED_AURAS, report.auras), 'auras').toEqual([]);
+      for (const ability of FORBIDDEN_DAMAGE) {
+        expect(report.damageAbilities.has(ability), `${ability} must not fire`).toBe(false);
+      }
       // The redo fields no adds (owner playtest call 2026-09-04): no guard wave
       // rose and no court followed the landed Rage, on either difficulty. The
       // spikes are the impale mechanic, not adds, and still shatter.

@@ -680,6 +680,22 @@ describe('Nythraxis Gravefire (the traveling line)', () => {
 });
 
 describe('Nythraxis Soul Rend leaves no fire (Soulfire retired in v0.42.2)', () => {
+  it('casts Soul Rend while a sigil is live and owns every applied aura', () => {
+    const { ctx, boss, st } = setup({ phase: 2 });
+    nythraxis.startNythraxisSigil(ctx, boss, st);
+    expect(st.sigil).not.toBeNull();
+    st.soulRendTimer = DT / 2;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(st.sigil).not.toBeNull();
+    expect(st.soulRendMarks.length).toBeGreaterThan(0);
+    for (const mark of st.soulRendMarks) {
+      const aura = ctx.entities
+        .get(mark.playerId)
+        ?.auras.find((candidate) => candidate.id === 'nythraxis_soul_rend');
+      expect(aura?.encounterOwned).toBe(true);
+    }
+  });
+
   for (const difficulty of ['normal', 'heroic'] as const) {
     it(`${difficulty}: a detonation splits its hit and leaves the floor clean`, () => {
       const { sim, ctx, boss, st, raiders, damageBy } = setup({ difficulty, phase: 2 });

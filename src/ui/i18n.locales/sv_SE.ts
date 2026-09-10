@@ -3550,7 +3550,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_nova': 'Skuggnova (områdesburst)',
   'hudChrome.finder.mech.shadow_pulse': 'Skuggpuls (pulserande områdesskada)',
   'hudChrome.finder.mech.shuddering_stomp': 'Darrande trampling (områdeschock)',
-  'hudChrome.finder.mech.soul_rend': 'Själsrift (märkta spelare samlas, sedan lämnar de elden)',
+  'hudChrome.finder.mech.soul_rend': 'Själsrift (märkta spelare samlas för att dela på skadan)',
   'hudChrome.finder.mech.summons_adds': 'Kallar förstärkningar',
   'hudChrome.finder.mech.wardstones': 'Väktarstenarnas kanaler (fasövergång)',
   'hudChrome.finder.needs': 'Behöver {roles}',
@@ -15600,12 +15600,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Var {everyNormal} sek flammar ett sigill från de gamla värnen upp på golvet {minDist} till {maxDist} yd från Nythraxis, och han börjar Dödslös Uppstigning, vilket ger honom {ascensionNormal} skada och anfallshastighet var {ascensionEvery} sek. Om han står på sigillet inom {bindNormal} sek blir han Bunden: Uppstigningen renas, han bedövas i {stunNormal} sek och han tar {vulnerability} mer skada i {boundNormal} sek. Annars tar varje raiddeltagare {unboundHitNormal} av maximal hälsa som Skuggskada och han behåller {unboundBonusNormal} mer skada tills nästa bindning.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Var {everyHeroic} sek spetsar Nythraxis {victimsHeroic} raiddeltagare utom sitt nuvarande mål på Benspett. En spetsad raiddeltagare kan inte agera och förlorar {drainHeroic} av maximal hälsa varje sekund tills spettet förstörs.',
+    'Var {everyHeroic} sek spetsar Nythraxis {victimsHeroic} raiddeltagare utom sitt nuvarande mål på Benspett. En spetsad raiddeltagare kan inte agera och förlorar {drainHeroic} av maximal hälsa varje sekund tills spettet förstörs. En spelare som redan har spetsats kan inte väljas igen på {cooldown} sek, så spetten fördelas över hela raiden.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Benspett',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Skadegörare byter direkt till Benspetten och förstör dem för att befria de spetsade raiddeltagarna. Helare håller de spetsade vid liv medan spetten faller.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Var {everyNormal} sek spetsar Nythraxis {victimsNormal} raiddeltagare utom sitt nuvarande mål på Benspett. En spetsad raiddeltagare kan inte agera och förlorar {drainNormal} av maximal hälsa varje sekund tills spettet förstörs.',
+    'Var {everyNormal} sek spetsar Nythraxis {victimsNormal} raiddeltagare utom sitt nuvarande mål på Benspett. En spetsad raiddeltagare kan inte agera och förlorar {drainNormal} av maximal hälsa varje sekund tills spettet förstörs. En spelare som redan har spetsats kan inte väljas igen på {cooldown} sek, så spetten fördelas över hela raiden.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Från {first} sek in i Kungens Vrede och var {everyHeroic} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlHeroic} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamHeroic} av maximal hälsa. Han kastar Benspett {spikeAt} sek in i stormen, sedan återaktiveras Gravbrytare {rearm} sek efter att den slutar.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Benstorm',

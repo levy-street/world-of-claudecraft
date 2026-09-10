@@ -3654,7 +3654,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Puls Cienia (pulsujące obrażenia obszarowe)',
   'hudChrome.finder.mech.shuddering_stomp': 'Wstrząsające Tupnięcie (ogłuszenie obszarowe)',
   'hudChrome.finder.mech.soul_rend':
-    'Rozdarcie Duszy (oznaczeni gracze zbierają się razem, potem opuszczają ogień)',
+    'Rozdarcie Duszy (oznaczeni gracze zbierają się razem, by podzielić obrażenia)',
   'hudChrome.finder.mech.summons_adds': 'Przywołuje posiłki',
   'hudChrome.finder.mech.wardstones': 'Kanały kamieni wardowych (przejście fazy)',
   'hudChrome.finder.needs': 'Potrzebuje: {roles}',
@@ -15723,12 +15723,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Co {everyNormal} sek. na podłodze od {minDist} do {maxDist} jardów od Nythraxis rozbłyska pieczęć dawnych ochron, a on rozpoczyna Nieśmiertelne Wniebowstąpienie, zyskując {ascensionNormal} obrażeń i szybkości ataku co {ascensionEvery} sek. Jeśli stanie na pieczęci w ciągu {bindNormal} sek., zostaje Spętany: Wniebowstąpienie zostaje oczyszczone, on jest ogłuszony na {stunNormal} sek. i otrzymuje o {vulnerability} więcej obrażeń przez {boundNormal} sek. W przeciwnym razie każdy rajder otrzymuje {unboundHitNormal} maksymalnego zdrowia jako obrażenia Cienia, a on zachowuje o {unboundBonusNormal} więcej obrażeń do następnego wiązania.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Co {everyHeroic} sek. Nythraxis nadziewa {victimsHeroic} rajderów innych niż jego obecny cel na Kościane Kolce. Nadziany rajder nie może działać i traci {drainHeroic} maksymalnego zdrowia co sekundę, dopóki jego kolec nie zostanie zniszczony.',
+    'Co {everyHeroic} sek. Nythraxis nadziewa {victimsHeroic} rajderów innych niż jego obecny cel na Kościane Kolce. Nadziany rajder nie może działać i traci {drainHeroic} maksymalnego zdrowia co sekundę, dopóki jego kolec nie zostanie zniszczony. Gracz, który został już nabity, nie może zostać wybrany ponownie przez {cooldown} s, dzięki czemu kolce rozkładają się na całą grupę rajdową.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Kościany kolec',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Zadający obrażenia natychmiast przełączają się na Kościane Kolce i niszczą je, aby uwolnić nadzianych rajderów. Uzdrowiciele utrzymują nadzianych przy życiu, dopóki kolce nie padną.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Co {everyNormal} sek. Nythraxis nadziewa {victimsNormal} rajderów innych niż jego obecny cel na Kościane Kolce. Nadziany rajder nie może działać i traci {drainNormal} maksymalnego zdrowia co sekundę, dopóki jego kolec nie zostanie zniszczony.',
+    'Co {everyNormal} sek. Nythraxis nadziewa {victimsNormal} rajderów innych niż jego obecny cel na Kościane Kolce. Nadziany rajder nie może działać i traci {drainNormal} maksymalnego zdrowia co sekundę, dopóki jego kolec nie zostanie zniszczony. Gracz, który został już nabity, nie może zostać wybrany ponownie przez {cooldown} s, dzięki czemu kolce rozkładają się na całą grupę rajdową.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyHeroic} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlHeroic} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamHeroic} maksymalnego zdrowia. Rzuca Kościany Kolec {spikeAt} sek. po rozpoczęciu burzy, a Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Kościana Burza',

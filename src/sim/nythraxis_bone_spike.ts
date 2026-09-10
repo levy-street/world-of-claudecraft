@@ -34,6 +34,14 @@ export const NYTHRAXIS_BONE_SPIKE_EVERY_HEROIC = 20;
 export const NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS = 3;
 export const NYTHRAXIS_BONE_SPIKE_RETRY_SECONDS = 1;
 /**
+ * A due cast that finds nobody eligible (everyone but the aggro holder is
+ * marked, impaled, in fire, dead, or still inside their cooldown) re-polls
+ * after this long instead of skipping a whole cadence. A partial wave (one
+ * victim where the difficulty wants two or three) is a real cast and re-arms
+ * the full cadence.
+ */
+export const NYTHRAXIS_BONE_SPIKE_EMPTY_RETRY_SECONDS = 3;
+/**
  * No spike lands in the run-up to Deathless Rage, so the wardstone channelers
  * are free to reach their stones; anyone still impaled when the cast begins
  * is freed by it (the calm window frees everyone).

@@ -3748,7 +3748,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Pulso de Sombra (dano de area pulsante)',
   'hudChrome.finder.mech.shuddering_stomp': 'Pisada Estremecedora (aturdimiento de area)',
   'hudChrome.finder.mech.soul_rend':
-    'Desgarro de alma (los jugadores marcados se agrupan y luego salen del fuego)',
+    'Desgarro de alma (los jugadores marcados se agrupan para repartir el daño)',
   'hudChrome.finder.mech.summons_adds': 'Invoca refuerzos',
   'hudChrome.finder.mech.wardstones': 'Canalizacion de piedras de guardia (transicion de fase)',
   'hudChrome.finder.needs': 'Necesita {roles}',
@@ -15915,12 +15915,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Cada {everyNormal} s, un sigilo de los antiguos resguardos brilla en el suelo de {minDist} a {maxDist} yd de Nythraxis y él inicia Ascensión inmortal, ganando {ascensionNormal} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindNormal} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunNormal} s y recibe {vulnerability} más de daño durante {boundNormal} s. Si no, cada miembro de la banda recibe {unboundHitNormal} de la salud máxima como daño de las Sombras y él conserva {unboundBonusNormal} más de daño hasta la siguiente vinculación.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Cada {everyHeroic} s, Nythraxis empala en Púas óseas a {victimsHeroic} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainHeroic} de su salud máxima cada segundo hasta que se destruye su púa.',
+    'Cada {everyHeroic} s, Nythraxis empala en Púas óseas a {victimsHeroic} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainHeroic} de su salud máxima cada segundo hasta que se destruye su púa. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Púa ósea',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Los combatientes de daño cambian a las Púas óseas de inmediato y las destruyen para liberar a los empalados. Los sanadores mantienen vivos a los empalados mientras caen las púas.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Cada {everyNormal} s, Nythraxis empala en Púas óseas a {victimsNormal} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainNormal} de su salud máxima cada segundo hasta que se destruye su púa.',
+    'Cada {everyNormal} s, Nythraxis empala en Púas óseas a {victimsNormal} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainNormal} de su salud máxima cada segundo hasta que se destruye su púa. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'A partir de {first} s tras la Ira del rey y cada {everyHeroic} s después, Nythraxis inicia Tormenta ósea durante {duration} s. Ignora la amenaza, se mueve a {speed} veces la velocidad normal y realiza {charges} cargas de {chargeSeconds} s cada una. Su remolino inflige {whirlHeroic} de la salud máxima cada segundo en un radio de {radius} yd. Cada carga termina con un Golpe óseo en el mismo radio que inflige {slamHeroic} de la salud máxima. Lanza Púa ósea {spikeAt} s después de empezar la tormenta, y luego Quebrantatumbas vuelve a activarse {rearm} s después de que termine.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Tormenta ósea',

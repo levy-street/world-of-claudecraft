@@ -3534,7 +3534,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Xung Bóng Tối (sát thương vùng theo nhịp)',
   'hudChrome.finder.mech.shuddering_stomp': 'Giậm Chân Rùng Rợn (làm choáng vùng)',
   'hudChrome.finder.mech.soul_rend':
-    'Xé Hồn (người chơi bị đánh dấu phải tập hợp lại, rồi rời khỏi lửa)',
+    'Xé Hồn (người chơi bị đánh dấu tập hợp lại để chia sẻ sát thương)',
   'hudChrome.finder.mech.summons_adds': 'Triệu hồi quân tiếp viện',
   'hudChrome.finder.mech.wardstones': 'Kênh đá hộ mệnh (chuyển giai đoạn)',
   'hudChrome.finder.needs': 'Cần {roles}',
@@ -15704,12 +15704,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Mỗi {everyNormal} giây, một phù ấn của các hộ ấn cổ bùng sáng trên sàn cách Nythraxis {minDist} đến {maxDist} yd và hắn bắt đầu Thăng Hoa Bất Tử, nhận thêm {ascensionNormal} sát thương và tốc độ đánh mỗi {ascensionEvery} giây. Nếu hắn đứng trên phù ấn trong {bindNormal} giây, hắn bị Trói Buộc: Thăng Hoa được thanh tẩy, hắn bị choáng trong {stunNormal} giây, và nhận thêm {vulnerability} sát thương trong {boundNormal} giây. Nếu không, mỗi raider nhận {unboundHitNormal} máu tối đa dưới dạng sát thương Bóng Tối và hắn giữ thêm {unboundBonusNormal} sát thương cho đến lần trói tiếp theo.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Mỗi {everyHeroic} giây, Nythraxis xuyên {victimsHeroic} raider không phải mục tiêu hiện tại của hắn lên Cọc Xương. Raider bị xuyên không thể hành động và mất {drainHeroic} máu tối đa mỗi giây cho đến khi cọc của họ bị phá hủy.',
+    'Mỗi {everyHeroic} giây, Nythraxis xuyên {victimsHeroic} raider không phải mục tiêu hiện tại của hắn lên Cọc Xương. Raider bị xuyên không thể hành động và mất {drainHeroic} máu tối đa mỗi giây cho đến khi cọc của họ bị phá hủy. Người chơi đã bị đâm xuyên sẽ không bị chọn lại trong {cooldown} giây, nhờ đó cọc được phân bổ đều khắp cả đội.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Cọc Xương',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Người gây sát thương lập tức chuyển sang Cọc Xương và phá hủy chúng để giải cứu các raider bị xuyên. Người hồi máu giữ họ sống sót trong lúc các cọc bị hạ.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Mỗi {everyNormal} giây, Nythraxis xuyên {victimsNormal} raider không phải mục tiêu hiện tại của hắn lên Cọc Xương. Raider bị xuyên không thể hành động và mất {drainNormal} máu tối đa mỗi giây cho đến khi cọc của họ bị phá hủy.',
+    'Mỗi {everyNormal} giây, Nythraxis xuyên {victimsNormal} raider không phải mục tiêu hiện tại của hắn lên Cọc Xương. Raider bị xuyên không thể hành động và mất {drainNormal} máu tối đa mỗi giây cho đến khi cọc của họ bị phá hủy. Người chơi đã bị đâm xuyên sẽ không bị chọn lại trong {cooldown} giây, nhờ đó cọc được phân bổ đều khắp cả đội.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Bắt đầu {first} giây sau Cơn Thịnh Nộ Của Vua và mỗi {everyHeroic} giây sau đó, Nythraxis bắt đầu Bão Xương trong {duration} giây. Hắn bỏ qua thù hận, di chuyển nhanh gấp {speed} lần tốc độ thường, và thực hiện {charges} lần lao, mỗi lần kéo dài {chargeSeconds} giây. Vòng xoáy của hắn gây {whirlHeroic} máu tối đa mỗi giây trong phạm vi {radius} yd. Mỗi lần lao kết thúc bằng Cú Nện Xương trong cùng phạm vi, gây {slamHeroic} máu tối đa. Hắn niệm Cọc Xương vào {spikeAt} giây sau khi bão bắt đầu, rồi Phá Mộ tái kích hoạt {rearm} giây sau khi bão kết thúc.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Bão Xương',

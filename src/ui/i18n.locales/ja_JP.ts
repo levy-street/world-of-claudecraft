@@ -8487,9 +8487,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'タンクは{stacks}スタックで交代する：もう一方のタンクが挑発し、呪われたタンクはスタックが消えるまでグレイブブレイカーの扇形範囲外に留まる。ヒーラーは交代前に次のタンクへ備える。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': '骨の棘',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    '{everyNormal}秒ごとに、ナイスラクシスは現在の対象以外のレイドメンバー{victimsNormal}人を骨の棘で串刺しにする。串刺しにされたレイドメンバーは行動不能になり、棘が破壊されるまで毎秒最大体力の{drainNormal}を失う。',
+    '{everyNormal}秒ごとに、ナイスラクシスは現在の対象以外のレイドメンバー{victimsNormal}人を骨の棘で串刺しにする。串刺しにされたレイドメンバーは行動不能になり、棘が破壊されるまで毎秒最大体力の{drainNormal}を失う。一度串刺しにされたレイドメンバーは{cooldown}秒間は再び選ばれないため、棘はレイド全体に分散する。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    '{everyHeroic}秒ごとに、ナイスラクシスは現在の対象以外のレイドメンバー{victimsHeroic}人を骨の棘で串刺しにする。串刺しにされたレイドメンバーは行動不能になり、棘が破壊されるまで毎秒最大体力の{drainHeroic}を失う。',
+    '{everyHeroic}秒ごとに、ナイスラクシスは現在の対象以外のレイドメンバー{victimsHeroic}人を骨の棘で串刺しにする。串刺しにされたレイドメンバーは行動不能になり、棘が破壊されるまで毎秒最大体力の{drainHeroic}を失う。一度串刺しにされたレイドメンバーは{cooldown}秒間は再び選ばれないため、棘はレイド全体に分散する。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'ダメージディーラーは直ちに骨の棘へ切り替え、破壊して串刺しにされたレイドメンバーを解放する。ヒーラーは棘が壊されるまで串刺しにされた者を生かし続ける。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': '墓所の噴出',
@@ -11336,7 +11336,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.sealbreak_shockwave': '封印破りの衝撃波（範囲バースト）',
   'hudChrome.finder.mech.gravebreaker': 'グレイブブレイカー（前方扇形、レイドに向けない）',
   'hudChrome.finder.mech.raise_fallen': '死者蘇生（周期的な増援ウェーブ）',
-  'hudChrome.finder.mech.soul_rend': 'ソウルレンド（対象は集合して炎から離れる）',
+  'hudChrome.finder.mech.soul_rend': 'ソウルレンド（対象は集合してダメージを分担する）',
   'hudChrome.finder.mech.deathless_rage': '不死の憤怒（ウォードストーンで妨害）',
   'hudChrome.finder.mech.wardstones': 'ウォードストーンの詠唱（フェーズ移行）',
   'hudChrome.finder.mech.dread_curse':

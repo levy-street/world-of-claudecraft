@@ -9,6 +9,7 @@ import {
   NORMAL_DUNGEON_TUNING,
 } from '../src/sim/content/dungeon_difficulty';
 import * as nythraxis from '../src/sim/encounters/nythraxis';
+import { NYTHRAXIS_BOUND_STUN_AURA_ID } from '../src/sim/nythraxis_binding_sigil';
 import {
   isNythraxisImpaled,
   NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
@@ -27,6 +28,7 @@ import {
   tickNythraxisBoneSpikeCooldowns,
   withNythraxisBoneSpikeCooldowns,
 } from '../src/sim/nythraxis_bone_spike';
+import { NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS } from '../src/sim/nythraxis_bone_storm';
 import {
   NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
   NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
@@ -516,30 +518,98 @@ describe('Nythraxis Bone Spike cooldown (one impale per raider per 55 s)', () =>
     ).toEqual([...victims].sort());
   });
 
-  it('keeps counting through a script-locked window (a Deathless Rage cast)', () => {
+  // The cooldown is measured from the impale, so it keeps counting through
+  // every window that holds NEW casts (the spike cast path never runs in
+  // any of these): a Deathless Rage cast, the 70% transition, a Bound stun,
+  // and a Bone Storm.
+  const remainingAfter = (st: NonNullable<Entity['nythraxis']>) =>
+    st.boneSpikeCooldowns?.[0]?.remaining;
+
+  it('keeps counting through a Deathless Rage cast', () => {
     const { ctx, boss, st, raiders } = setup();
     st.phase = 2;
     st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns([], [raiders[0].id]);
-    // The Rage cast holds every NEW cast (the spike cast path never runs),
-    // yet the cooldown is measured from the impale, so it keeps counting.
     nythraxis.startNythraxisDeathlessRage(ctx, boss, st);
     expect(st.deathlessCastRemaining).toBeGreaterThan(5);
     tickDriver(ctx, boss, 5);
     expect(st.deathlessCastRemaining).toBeGreaterThan(0);
-    expect(st.boneSpikeCooldowns?.[0]?.remaining).toBeCloseTo(
-      NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - 5,
-      3,
-    );
+    expect(remainingAfter(st)).toBeCloseTo(NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - 5, 3);
   });
 
-  it('applies the cooldown to the Bone Storm spike as well', () => {
+  it('keeps counting through the transition (the early return above the mechanics)', () => {
     const { ctx, boss, st, raiders } = setup();
-    const cooling = raiders.slice(0, 7).map((r) => r.id);
-    st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns([], cooling);
-    const victims = nythraxis.castNythraxisBoneSpike(ctx, boss, st, raiders, 'normal');
-    expect(victims.map((v) => v.id).sort()).toEqual([raiders[7].id, raiders[8].id].sort());
-    for (const v of victims)
-      expect(nythraxisBoneSpikeCooldownIds(st.boneSpikeCooldowns ?? [])).toContain(v.id);
+    st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns([], [raiders[0].id]);
+    boss.hp = Math.floor(boss.maxHp * 0.69);
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(st.phase).toBe('transition');
+    tickDriver(ctx, boss, 3);
+    expect(st.phase).toBe('transition');
+    // One tick entered the transition, three seconds ran inside it.
+    expect(remainingAfter(st)).toBeCloseTo(NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - 3 - DT, 3);
+  });
+
+  it('keeps counting through a Bound stun', () => {
+    const { ctx, boss, st, raiders } = setup();
+    st.phase = 2;
+    st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns([], [raiders[0].id]);
+    ctx.applyAura(boss, {
+      id: NYTHRAXIS_BOUND_STUN_AURA_ID,
+      name: 'Bound',
+      kind: 'stun',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: boss.id,
+      school: 'shadow',
+      encounterOwned: true,
+    });
+    tickDriver(ctx, boss, 4);
+    expect(boss.auras.some((a) => a.id === NYTHRAXIS_BOUND_STUN_AURA_ID)).toBe(true);
+    expect(remainingAfter(st)).toBeCloseTo(NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - 4, 3);
+  });
+
+  it('keeps counting through a Bone Storm, and the storm spike honours and arms it', () => {
+    // Same seed twice: the control run (nobody cooling) proves the storm's own
+    // spike reaches at least one raider in this scenario, so the cooling run's
+    // "no raider impaled" is the cooldown at work, not a slam's fire or the
+    // charge target's aggro keeping everyone out anyway.
+    const runStorm = (coolEveryone: boolean) => {
+      const { ctx, boss, st, raiders, room } = setup();
+      st.phase = 3;
+      st.boneStormTimer = 999;
+      const raiderIds = raiders.map((r) => r.id);
+      if (coolEveryone) st.boneSpikeCooldowns = withNythraxisBoneSpikeCooldowns([], raiderIds);
+      nythraxis.startNythraxisBoneStorm(ctx, boss, st);
+      expect(st.boneStorm).not.toBeNull();
+      tickDriver(ctx, boss, NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS + DT);
+      expect(st.boneStorm?.spikeCast).toBe(true);
+      const impaled = room()
+        .filter((p) => isNythraxisImpaled(p, boss.id))
+        .map((p) => p.id);
+      return { st, raiderIds, impaled };
+    };
+    const control = runStorm(false);
+    expect(control.impaled.some((id) => control.raiderIds.includes(id))).toBe(true);
+
+    const cooled = runStorm(true);
+    // The storm spike consulted the ledger: no cooling raider was pinned.
+    expect(cooled.impaled.filter((id) => cooled.raiderIds.includes(id))).toEqual([]);
+    const ledger = cooled.st.boneSpikeCooldowns ?? [];
+    // Whoever it did pin (the tank, once the storm freed him from threat) was
+    // armed at the full cooldown by the storm path (the ledger ticks at the
+    // top of the update, the cast arms later in the same tick).
+    for (const id of cooled.impaled) {
+      expect(ledger.find((c) => c.playerId === id)?.remaining).toBe(
+        NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
+      );
+    }
+    // And the nine who were cooling kept counting through the storm.
+    for (const id of cooled.raiderIds) {
+      expect(ledger.find((c) => c.playerId === id)?.remaining).toBeCloseTo(
+        NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS - NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS - DT,
+        3,
+      );
+    }
   });
 
   it('forgets every cooldown on an encounter reset', () => {

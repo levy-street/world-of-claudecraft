@@ -3677,7 +3677,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Schattenpuls (pulsierender Flachenschaden)',
   'hudChrome.finder.mech.shuddering_stomp': 'Erschutternder Stampfer (Flachenbetaubung)',
   'hudChrome.finder.mech.soul_rend':
-    'Seelenzerfetzung (markierte Spieler sammeln sich und verlassen dann das Feuer)',
+    'Seelenzerfetzung (markierte Spieler sammeln sich, um den Schaden aufzuteilen)',
   'hudChrome.finder.mech.summons_adds': 'Beschwort Verstarkung',
   'hudChrome.finder.mech.wardstones': 'Schutzstein-Kanale (Phasenubergang)',
   'hudChrome.finder.needs': 'Benotigt {roles}',
@@ -15932,12 +15932,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Alle {everyNormal} Sek. flammt ein Siegel der alten Schutzzauber {minDist} bis {maxDist} yd von Nythraxis entfernt auf dem Boden auf, und er beginnt Todlose Erhebung, wodurch er alle {ascensionEvery} Sek. {ascensionNormal} Schaden und Angriffstempo erhält. Steht er innerhalb von {bindNormal} Sek. auf dem Siegel, wird er gebunden: Die Erhebung wird gebannt, er ist {stunNormal} Sek. betäubt und er erleidet {boundNormal} Sek. lang {vulnerability} mehr Schaden. Andernfalls erleidet jeder Schlachtzügler {unboundHitNormal} der maximalen Gesundheit als Schattenschaden, und er behält bis zur nächsten Bindung {unboundBonusNormal} mehr Schaden.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Alle {everyHeroic} Sek. spießt Nythraxis {victimsHeroic} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainHeroic} der maximalen Gesundheit, bis sein Spieß zerstört ist.',
+    'Alle {everyHeroic} Sek. spießt Nythraxis {victimsHeroic} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainHeroic} der maximalen Gesundheit, bis sein Spieß zerstört ist. Ein bereits aufgespießter Schlachtzügler kann {cooldown} Sek. lang nicht erneut gewählt werden, sodass sich die Spieße über den ganzen Schlachtzug verteilen.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Knochenspieß',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Schadensklassen wechseln sofort auf die Knochenspieße und zerstören sie, um die aufgespießten Schlachtzügler zu befreien. Heiler halten die Aufgespießten am Leben, während die Spieße fallen.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Alle {everyNormal} Sek. spießt Nythraxis {victimsNormal} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainNormal} der maximalen Gesundheit, bis sein Spieß zerstört ist.',
+    'Alle {everyNormal} Sek. spießt Nythraxis {victimsNormal} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainNormal} der maximalen Gesundheit, bis sein Spieß zerstört ist. Ein bereits aufgespießter Schlachtzügler kann {cooldown} Sek. lang nicht erneut gewählt werden, sodass sich die Spieße über den ganzen Schlachtzug verteilen.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyHeroic} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlHeroic} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamHeroic} der maximalen Gesundheit. Er wirkt {spikeAt} Sek. nach Beginn des Sturms Knochenspieß, dann wird Grabbrecher {rearm} Sek. nach seinem Ende wieder bereit.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Knochensturm',

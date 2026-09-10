@@ -340,11 +340,15 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(n.spikeIds.length).toBe(2);
     expect(auras.some((e) => e.name === 'Dread Curse')).toBe(true);
     // Two from the forced slice 1 cast (t = 2.2 s). The mid-storm spike lands
-    // at t = 56.35 s, inside the 55 s per-raider cooldown (v0.42.2), so it may
-    // not re-pick either of them; with the current charge target holding
-    // aggro and the fourth mage standing in a slam's Gravefire, the only
-    // eligible raider is the tank the storm freed from threat: one more
-    // impale, not two, and never a repeat.
+    // at t = 56.35 s: 2.2 + 55 = 57.2 > 56.35, so both first-wave victims are
+    // still inside the per-raider cooldown (v0.42.2) and may not be re-picked;
+    // with the current charge target holding aggro and the fourth mage
+    // standing in a slam's Gravefire, the only eligible raider is the tank the
+    // storm freed from threat: one more impale, not two, and never a repeat.
+    // If a re-timed scenario ever moves the storm spike past 57.2 s, the
+    // first-wave victims become eligible again and this count is the pin that
+    // says so (re-derive it from NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS, never
+    // just bump it).
     const impaled = auras.filter((e) => e.name === 'Impaled') as Array<{ targetId: number }>;
     expect(impaled.length).toBe(3);
     const firstWave = new Set(impaled.slice(0, 2).map((e) => e.targetId));

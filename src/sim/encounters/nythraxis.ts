@@ -73,6 +73,7 @@ import {
   isNythraxisImpaled,
   isNythraxisWardChannelLocked,
   NYTHRAXIS_BONE_SPIKE_CAST_ID,
+  NYTHRAXIS_BONE_SPIKE_EMPTY_RETRY_SECONDS,
   NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS,
   NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
   NYTHRAXIS_BONE_SPIKE_ID,
@@ -998,9 +999,13 @@ export function updateNythraxisBoneSpikeCast(
   const difficulty = nythraxisDifficulty(ctx, boss);
   const victims = castNythraxisBoneSpike(ctx, boss, st, room, difficulty);
   // Nobody eligible (everyone but the aggro holder is marked, impaled, in
-  // fire, or dead): retry shortly instead of skipping a whole cycle, the Soul
-  // Rend hold.
-  ms.boneSpikeTimer = victims.length === 0 ? 3 : nythraxisBoneSpikeCadence(difficulty);
+  // fire, dead, or still inside the per-raider cooldown): retry shortly
+  // instead of skipping a whole cycle, the Soul Rend hold. A partial wave is
+  // a real cast and re-arms the full cadence.
+  ms.boneSpikeTimer =
+    victims.length === 0
+      ? NYTHRAXIS_BONE_SPIKE_EMPTY_RETRY_SECONDS
+      : nythraxisBoneSpikeCadence(difficulty);
   if (victims.length > 0) ms.spikeSettleTimer = NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS;
 }
 

@@ -3502,7 +3502,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Gölge Darbesi (darbeli alan hasarı)',
   'hudChrome.finder.mech.shuddering_stomp': 'Titreyen Çiğneme (alan sersemletmesi)',
   'hudChrome.finder.mech.soul_rend':
-    'Ruh Yırtılması (işaretli oyuncular birlikte kümelenir, sonra ateşten ayrılır)',
+    'Ruh Yırtılması (işaretli oyuncular hasarı bölüşmek için birlikte kümelenir)',
   'hudChrome.finder.mech.summons_adds': 'Takviye çağırır',
   'hudChrome.finder.mech.wardstones': 'Koruma taşı kanalları (faz geçişi)',
   'hudChrome.finder.needs': '{roles} aranıyor',
@@ -15637,12 +15637,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Her {everyNormal} sn, Nythraxis’ten {minDist} ile {maxDist} yd uzaktaki zeminde eski muhafazaların mührü parlar ve Nythraxis Ölümsüz Yükseliş’e başlar; her {ascensionEvery} sn {ascensionNormal} hasar ve saldırı hızı kazanır. {bindNormal} sn içinde mührün üzerinde durursa Bağlanır: Yükseliş arındırılır, {stunNormal} sn sersemletilir ve {boundNormal} sn boyunca {vulnerability} daha fazla hasar alır. Aksi halde her akıncı azami canın {unboundHitNormal} kadarı kadar Gölge hasarı alır ve Nythraxis sonraki bağlamaya kadar {unboundBonusNormal} daha fazla hasarı korur.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Her {everyHeroic} sn, Nythraxis mevcut hedefi dışındaki {victimsHeroic} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainHeroic} kadarını kaybeder.',
+    'Her {everyHeroic} sn, Nythraxis mevcut hedefi dışındaki {victimsHeroic} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainHeroic} kadarını kaybeder. Zaten şişlenmiş bir oyuncu {cooldown} saniye boyunca yeniden seçilemez, böylece dikenler tüm baskına yayılır.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Kemik Dikeni',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Hasar verenler hemen Kemik Dikenlerine geçer ve saplanan akıncıları kurtarmak için onları yok eder. Şifacılar dikenler düşene kadar saplananları hayatta tutar.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Her {everyNormal} sn, Nythraxis mevcut hedefi dışındaki {victimsNormal} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainNormal} kadarını kaybeder.',
+    'Her {everyNormal} sn, Nythraxis mevcut hedefi dışındaki {victimsNormal} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainNormal} kadarını kaybeder. Zaten şişlenmiş bir oyuncu {cooldown} saniye boyunca yeniden seçilemez, böylece dikenler tüm baskına yayılır.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyHeroic} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlHeroic} kadarını verir. Her hücum aynı yarıçapta azami canın {slamHeroic} kadarıyla Kemik Çarpmasıyla biter. Fırtınanın {spikeAt} sn sonrasında Kemik Dikeni kullanır, bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Kemik Fırtınası',

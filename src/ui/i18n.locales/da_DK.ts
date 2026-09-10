@@ -3547,8 +3547,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_nova': 'Skyggeudbrud (omradesudbrud)',
   'hudChrome.finder.mech.shadow_pulse': 'Skyggeimpuls (pulserende omradesskade)',
   'hudChrome.finder.mech.shuddering_stomp': 'Rystende Tramp (omradesbedøvelse)',
-  'hudChrome.finder.mech.soul_rend':
-    'Sjælerivning (markerede spillere samles, og forlader derefter ilden)',
+  'hudChrome.finder.mech.soul_rend': 'Sjælerivning (markerede spillere samles for at dele skaden)',
   'hudChrome.finder.mech.summons_adds': 'Tilkalder forstærkninger',
   'hudChrome.finder.mech.wardstones': 'Vardstenskanaler (faseovergang)',
   'hudChrome.finder.needs': 'Mangler {roles}',
@@ -15570,12 +15569,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Hvert {everyNormal} sek flammer et sigil fra de gamle værn op på gulvet {minDist} til {maxDist} yd fra Nythraxis, og han begynder Dødsløs Opstigning, der giver ham {ascensionNormal} skade og angrebshastighed hvert {ascensionEvery} sek. Hvis han står på sigillet inden for {bindNormal} sek, er han Bundet: Opstigningen renses, han bedøves i {stunNormal} sek, og han tager {vulnerability} mere skade i {boundNormal} sek. Ellers tager hver raiddeltager {unboundHitNormal} af maksimal sundhed som Skyggeskade, og han beholder {unboundBonusNormal} mere skade indtil næste binding.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Hvert {everyHeroic} sek spidder Nythraxis {victimsHeroic} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainHeroic} af maksimal sundhed hvert sekund, indtil spyddet ødelægges.',
+    'Hvert {everyHeroic} sek spidder Nythraxis {victimsHeroic} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainHeroic} af maksimal sundhed hvert sekund, indtil spyddet ødelægges. En spiller, der allerede er blevet spiddet, kan ikke vælges igen i {cooldown} sek., så spyddene fordeles over hele raidet.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Knoglespyd',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Skadesuddelerne skifter straks til Knoglespyddene og ødelægger dem for at befri de spiddede raiddeltagere. Helbredere holder de spiddede i live, mens spyddene falder.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Hvert {everyNormal} sek spidder Nythraxis {victimsNormal} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainNormal} af maksimal sundhed hvert sekund, indtil spyddet ødelægges.',
+    'Hvert {everyNormal} sek spidder Nythraxis {victimsNormal} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainNormal} af maksimal sundhed hvert sekund, indtil spyddet ødelægges. En spiller, der allerede er blevet spiddet, kan ikke vælges igen i {cooldown} sek., så spyddene fordeles over hele raidet.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Fra {first} sek inde i Kongens vrede og hvert {everyHeroic} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlHeroic} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamHeroic} af maksimal sundhed. Han kaster Knoglespyd {spikeAt} sek inde i stormen, derefter genaktiveres Gravbryder {rearm} sek efter den slutter.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Knoglestorm',

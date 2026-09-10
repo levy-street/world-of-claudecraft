@@ -3787,7 +3787,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': "Pulsation d'ombre (dégâts de zone pulsés)",
   'hudChrome.finder.mech.shuddering_stomp': 'Piétinement tremblant (étourdissement de zone)',
   'hudChrome.finder.mech.soul_rend':
-    "Déchirement de l'âme (les joueurs marqués doivent s'écarter et être soignés)",
+    "Déchirement de l'âme (les joueurs marqués se regroupent pour partager les dégâts)",
   'hudChrome.finder.mech.summons_adds': 'Invoque des renforts',
   'hudChrome.finder.mech.wardstones': 'Canaux des pierres de garde (transition de phase)',
   'hudChrome.finder.needs': 'Recherche {roles}',
@@ -16053,12 +16053,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     "Toutes les {everyNormal} s, un sceau des anciennes protections flamboie au sol entre {minDist} et {maxDist} yd de Nythraxis, et il commence Ascension immortelle, gagnant {ascensionNormal} de dégâts et de vitesse d'attaque toutes les {ascensionEvery} s. S'il se tient sur le sceau dans les {bindNormal} s, il est Lié : l'Ascension est purgée, il est étourdi pendant {stunNormal} s, et il subit {vulnerability} de dégâts supplémentaires pendant {boundNormal} s. Sinon, chaque membre du raid subit {unboundHitNormal} des points de vie maximum en dégâts d'Ombre, et il conserve {unboundBonusNormal} de dégâts supplémentaires jusqu au prochain lien.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    "Toutes les {everyHeroic} s, Nythraxis empale {victimsHeroic} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainHeroic} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe.",
+    "Toutes les {everyHeroic} s, Nythraxis empale {victimsHeroic} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainHeroic} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe. Un joueur déjà empalé ne peut pas être choisi de nouveau pendant {cooldown} s, de sorte que les pointes se répartissent sur tout le raid.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': "Pointe d'os",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     "Les DPS passent aussitôt sur les Pointes d'os et les détruisent pour libérer les membres empalés. Les soigneurs gardent les empalés en vie pendant que les pointes tombent.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    "Toutes les {everyNormal} s, Nythraxis empale {victimsNormal} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainNormal} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe.",
+    "Toutes les {everyNormal} s, Nythraxis empale {victimsNormal} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainNormal} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe. Un joueur déjà empalé ne peut pas être choisi de nouveau pendant {cooldown} s, de sorte que les pointes se répartissent sur tout le raid.",
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     "À partir de {first} s après le Courroux du roi, puis toutes les {everyHeroic} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlHeroic} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamHeroic} des points de vie maximum. Il lance Pointe d'os {spikeAt} s après le début de la tempête, puis Brise-tombe se réarme {rearm} s après la fin.",
   'hudChrome.raidBossGuide.nythraxis.boneStormName': "Tempête d'os",

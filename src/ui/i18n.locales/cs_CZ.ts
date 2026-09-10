@@ -3517,7 +3517,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_nova': 'Stínová nova (plošný výbuch)',
   'hudChrome.finder.mech.shadow_pulse': 'Stínový puls (pulzující plošné poškození)',
   'hudChrome.finder.mech.shuddering_stomp': 'Třesoucí dupnutí (plošné ochromení)',
-  'hudChrome.finder.mech.soul_rend': 'Trhání duše (označení hráči se seskupí, pak opustí oheň)',
+  'hudChrome.finder.mech.soul_rend':
+    'Trhání duše (označení hráči se seskupí, aby si rozdělili poškození)',
   'hudChrome.finder.mech.summons_adds': 'Přivolává posily',
   'hudChrome.finder.mech.wardstones': 'Kanály ochranných kamenů (přechod fáze)',
   'hudChrome.finder.needs': 'Potřebuje {roles}',
@@ -15504,12 +15505,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Každých {everyNormal} s vzplane na podlaze {minDist} až {maxDist} yardů od Nythraxise pečeť starých ochran a on začne Nesmrtelný vzestup, který mu každých {ascensionEvery} s přidá {ascensionNormal} poškození a rychlost útoku. Pokud do {bindNormal} s stojí na pečeti, je spoután: Vzestup se očistí, je omráčen na {stunNormal} s a po dobu {boundNormal} s utrpí o {vulnerability} vyšší poškození. Jinak každý raider utrpí {unboundHitNormal} maximálního zdraví jako stínové poškození a on si ponechá o {unboundBonusNormal} vyšší poškození až do dalšího spoutání.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Každých {everyHeroic} s Nythraxis nabodne {victimsHeroic} raiderů mimo svůj aktuální cíl na kostěné bodce. Nabodnutý raider nemůže jednat a každou sekundu ztrácí {drainHeroic} maximálního zdraví, dokud není jeho bodec zničen.',
+    'Každých {everyHeroic} s Nythraxis nabodne {victimsHeroic} raiderů mimo svůj aktuální cíl na kostěné bodce. Nabodnutý raider nemůže jednat a každou sekundu ztrácí {drainHeroic} maximálního zdraví, dokud není jeho bodec zničen. Hráč, který už byl nabodnut, nemůže být znovu vybrán po dobu {cooldown} s, takže se bodce rozloží po celé skupině.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Kostěný bodec',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Útočníci se okamžitě přepnou na kostěné bodce a zničí je, aby osvobodili nabodnuté raidery. Léčitelé drží nabodnuté naživu, než bodce padnou.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Každých {everyNormal} s Nythraxis nabodne {victimsNormal} raiderů mimo svůj aktuální cíl na kostěné bodce. Nabodnutý raider nemůže jednat a každou sekundu ztrácí {drainNormal} maximálního zdraví, dokud není jeho bodec zničen.',
+    'Každých {everyNormal} s Nythraxis nabodne {victimsNormal} raiderů mimo svůj aktuální cíl na kostěné bodce. Nabodnutý raider nemůže jednat a každou sekundu ztrácí {drainNormal} maximálního zdraví, dokud není jeho bodec zničen. Hráč, který už byl nabodnut, nemůže být znovu vybrán po dobu {cooldown} s, takže se bodce rozloží po celé skupině.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Počínaje {first} s po začátku Králova hněvu a pak každých {everyHeroic} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlHeroic} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamHeroic} maximálního zdraví. {spikeAt} s po začátku bouře sesílá Kostěný bodec a Hrobobijec se znovu připraví {rearm} s po jejím konci.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Kostěná bouře',

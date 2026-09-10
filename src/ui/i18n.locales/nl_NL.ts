@@ -3670,7 +3670,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Schaduwpuls (pulserende gebiedsschade)',
   'hudChrome.finder.mech.shuddering_stomp': 'Huiverende Stamp (gebiedsverdoving)',
   'hudChrome.finder.mech.soul_rend':
-    'Zielenscheur (gemarkeerde spelers moeten spreiden en worden genezen)',
+    'Zielenscheur (gemarkeerde spelers groeperen zich om de schade te delen)',
   'hudChrome.finder.mech.summons_adds': 'Roept versterkingen op',
   'hudChrome.finder.mech.wardstones': 'Wardstone-kanalen (faseovergang)',
   'hudChrome.finder.needs': 'Heeft {roles} nodig',
@@ -15786,12 +15786,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
     'Elke {everyNormal} sec licht een zegel van de oude schutspreuken op de vloer op, {minDist} tot {maxDist} yd van Nythraxis, en hij begint Doodloze Verheffing, waardoor hij elke {ascensionEvery} sec {ascensionNormal} schade en aanvalssnelheid krijgt. Als hij binnen {bindNormal} sec op het zegel staat, is hij Gebonden: de Verheffing wordt gezuiverd, hij is {stunNormal} sec verdoofd en hij loopt {boundNormal} sec lang {vulnerability} meer schade op. Anders loopt elke raider {unboundHitNormal} van maximale gezondheid als Schaduwschade op en behoudt hij {unboundBonusNormal} meer schade tot de volgende binding.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Elke {everyHeroic} sec spietst Nythraxis {victimsHeroic} raiders behalve zijn huidige doelwit op Beenderspiezen. Een gespietste raider kan niet handelen en verliest elke seconde {drainHeroic} van maximale gezondheid totdat zijn spies is vernietigd.',
+    'Elke {everyHeroic} sec spietst Nythraxis {victimsHeroic} raiders behalve zijn huidige doelwit op Beenderspiezen. Een gespietste raider kan niet handelen en verliest elke seconde {drainHeroic} van maximale gezondheid totdat zijn spies is vernietigd. Een speler die al is gespietst, kan {cooldown} sec. lang niet opnieuw worden gekozen, zodat de spiesen over de hele raid worden verdeeld.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Beenderspies',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
     'Schadedealers wisselen meteen naar de Beenderspiezen en vernietigen ze om de gespietste raiders te bevrijden. Healers houden de gespietsten in leven terwijl de spiezen vallen.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Elke {everyNormal} sec spietst Nythraxis {victimsNormal} raiders behalve zijn huidige doelwit op Beenderspiezen. Een gespietste raider kan niet handelen en verliest elke seconde {drainNormal} van maximale gezondheid totdat zijn spies is vernietigd.',
+    'Elke {everyNormal} sec spietst Nythraxis {victimsNormal} raiders behalve zijn huidige doelwit op Beenderspiezen. Een gespietste raider kan niet handelen en verliest elke seconde {drainNormal} van maximale gezondheid totdat zijn spies is vernietigd. Een speler die al is gespietst, kan {cooldown} sec. lang niet opnieuw worden gekozen, zodat de spiesen over de hele raid worden verdeeld.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Vanaf {first} sec in Koningswoede en daarna elke {everyHeroic} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlHeroic} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamHeroic} van maximale gezondheid. Hij cast Beenderspies {spikeAt} sec in de storm, daarna wordt Grafbreker {rearm} sec na het einde opnieuw geactiveerd.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Beenderstorm',
