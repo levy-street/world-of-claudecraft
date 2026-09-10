@@ -55,6 +55,11 @@ references. Use only the agents relevant to the diff:
 - `woc_database_performance` for SQL, indexes, query call sites, pool or lock behavior,
   timeout policy, background database work, driver/dependency upgrades, PostgreSQL
   engine/resource/configuration/topology changes, or features that increase stored-data cardinality.
+- `woc_server_hot_path` for per-tick, per-request, per-broadcast, or recurring
+  main-thread server work: a shared read or cache, a growing table or in-memory
+  collection, a snapshot or event payload, a new or changed `selfWireJson` key or the
+  `src/sim/` read it calls, an autosave, sweep, or self-clocked job, or a `world_state`
+  blob write.
 - `woc_security` for server, admin, auth, deployment, secrets, or trust boundaries.
 - `woc_test_coverage` for changed behavior, acceptance criteria, and regression tests.
 - `woc_frontend` for UI, render, CSS, i18n, accessibility, responsive, or fairness work.

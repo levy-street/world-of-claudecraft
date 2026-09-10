@@ -233,6 +233,25 @@ headline rules here:
   `[VERIFY]` rather than asserting it from code.
 - Draw-call / texture / asset budgets respected (`npm run asset:budget`).
 - No new dependency added without a clear need.
+- Server self path: no new or changed `selfWireJson` read (`server/game.ts`, including the
+  `src/sim/` read it calls) whose cost scales with a realm collection (the mail book, the
+  listing book, the order board, any shared board or ledger) without the revision plus
+  cadence gate (`server/CLAUDE.md` "Hot paths"; exemplars `tests/market_wire_cadence.test.ts`,
+  `tests/commission_wire_cadence.test.ts`, `tests/mail_wire_cadence.test.ts`); every per-tick
+  read called small names a real bound (an O(1) per-player field, a content table, a
+  per-player cap, a proximity gate, or that gate); a new self key joins a `SELF_WIRE_PHASES`
+  bucket
+  (`npx vitest run tests/self_wire_phase_breakdown.test.ts`).
+- Recurring server jobs (the autosave, the account-wealth sweep, the retention sweep, any
+  self-clocked loop) and event-driven durability writes (a handler persisting a shared book
+  for one mutation) cost O(what changed), never O(the stored book); no new realm collection
+  persists as one whole-book `world_state` blob on the autosave cadence; the job bills its
+  cost to a profiler phase (the `saves` phase counts only the market and rift shared-blob
+  writers through the serial writers' `onWrite` observer; anything else needs a phase of its own,
+  or it shows up only as unattributed `lateness`).
+- A "cheap" claim for a new snapshot read or recurring job rests on a grown-collection bench
+  (1,000+ seeded rows) or a Tick Profiler capture on a long-lived realm, recorded in the PR.
+  A fresh-world or fresh-bot measurement alone is `[VERIFY]`, never `[PASS]`.
 
 ### 9. Test coverage
 
@@ -280,7 +299,7 @@ headline rules here:
 | `server/`, `src/admin/`, `src/net/`, a deploy/secret file, new SQL/auth/secret/wallet code, or a new `Math.random`/`Date.now`/`performance.now` in `src/sim/` or a pure core | privacy-security-review |
 | `server/*_db.ts` DDL or any persisted JSONB shape (`characters.state`, a `world_state` row incl. market/mail, `accounts.cosmetics`) | migration-safety |
 | SQL or a database call site, schema/indexes, query cadence or cardinality, pool/lock/timeout behavior, scheduled database work, a database driver or Postgres engine/config change, or stored-data growth | database-performance-reviewer |
-| server-side per-tick, per-request, or per-broadcast work: a shared read or cache, a growing table or in-memory collection, a snapshot/event payload, new world-loop work | server-hot-path-reviewer |
+| server-side per-tick, per-request, per-broadcast, or recurring-job work: a shared read or cache, a growing table or in-memory collection, a snapshot/event payload, new world-loop work, a new or changed `selfWireJson` key or the `src/sim/` read it calls, an autosave/sweep/self-clocked job, a `world_state` blob write | server-hot-path-reviewer |
 | `src/world_api.ts` (IWorld), `src/sim/`, `src/net/online.ts`, `server/game.ts` wire/dispatch, or the sim/server i18n matchers | cross-platform-sync |
 | `src/sim/` (determinism, rng draw-order, tick-phase, SimContext seam, move-not-rewrite on a relocation) | architecture-reviewer |
 | `src/ui/`, `src/styles/`, or `src/render/` presentation change (HUD windows/painters, CSS, mobile, graphics tiering) | frontend-seam-reviewer |

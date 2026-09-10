@@ -18,7 +18,10 @@ sessions.
 6. When work adds or changes SQL, a database call site, stored-data growth, scheduled database
    work, pool sizing or admission, transaction or lock scope, or timeout policy; a database
    driver/dependency version, or PostgreSQL engine/resource/configuration/topology, use
-   `woc_database_performance` for a read-only scaling pass.
+   `woc_database_performance` for a read-only scaling pass. When work adds a
+   `selfWireJson` key or changes the `src/sim/` read one calls, a recurring server job, an
+   event-driven durability write, or a `world_state` blob, use `woc_server_hot_path` for
+   the non-SQL budget (the grown-collection rules in `server/CLAUDE.md` "Hot paths").
 
 Do not create planning files until the goal, scope, and important constraints are
 understood. Ask the user when a choice would materially change architecture or product
