@@ -27,7 +27,7 @@ export function drawWarriorGoad(host: SequencerHost, slot: SeqSlot, beat: number
   for (let layer = 0; layer < layers; layer++) {
     const travel = 0.45 + layer * 0.25;
     host.pathRibbon(
-      layer === 0 ? 0xffc994 : 0xdd915c,
+      layer === 0 ? 0xf1eadd : 0x8b98a4,
       layer === 0 ? 0.52 : 0.26,
       0.28,
       (points) => {
@@ -53,38 +53,20 @@ export function drawWarriorGoad(host: SequencerHost, slot: SeqSlot, beat: number
       layer === 0 ? 1 : 0,
     );
   }
-  host.bakedAt?.(
-    'shout_dust',
-    at.x + dx * 0.75,
-    at.y,
-    at.z + dz * 0.75,
-    4.2,
-    0xb69b7e,
-    0xf1c89d,
-    0.32,
-    0,
-    0,
-    Math.atan2(dx, dz),
-  );
-  for (let plume = 0; plume < 2; plume++) {
-    const travel = 1.2 + plume * 1.2;
-    host.bakedAt?.(
-      'shout_dust',
-      at.x + dx * travel,
-      at.y + plume * 0.12,
-      at.z + dz * travel,
-      2.1 + plume * 0.7,
-      0xb69b7e,
-      0xffd1a4,
-      0.28,
-      0,
-      0,
+  const plume =
+    host.crestAt &&
+    host.crestAt(
+      at.x,
+      at.y,
+      at.z,
+      1,
+      1,
+      0x7d8b97,
+      0xf4eee5,
+      'bark_pressure',
       Math.atan2(dx, dz),
-      false,
-      plume * 0.4,
-      1.5,
-    );
-  }
-  host.countPrimitive('taunt', layers + 3);
+      0.29,
+    ) !== false;
+  host.countPrimitive('taunt', layers + (plume ? 1 : 0));
   return true;
 }

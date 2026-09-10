@@ -63,6 +63,13 @@ const WARRIOR_CONTACT_SOURCES: Readonly<Record<string, string>> = {
   mortal_strike: 'Warrior_Maiming_Strike',
   execute: 'Warrior_Early_Grave',
   bloodthirst: 'Warrior_Bloodletting',
+  battle_shout: 'Warrior_Iron_Bellow',
+  demoralizing_shout: 'Warrior_Direhowl',
+  emboldening_roar: 'Warrior_Emboldening_Roar',
+  defiant_bellow: 'Warrior_Defiant_Bellow',
+  rallying_cry: 'Warrior_Valor_Roar',
+  intimidating_shout: 'Warrior_Intimidating_Shout',
+  piercing_howl: 'Warrior_Piercing_Howl',
   victory_rush: 'Warrior_Victory_Rush',
 };
 

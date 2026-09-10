@@ -55,6 +55,7 @@ import { AbilityVfx, AbilityVfxFx, persistentClassVfxPrewarmGroup } from './abil
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
 import * as abilityPreparation from './ability_vfx/primitive_prewarm';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
+import { warriorInsultCue } from './ability_vfx/warrior_insult_core';
 import { isWarriorFuryAuraEvent } from './ability_vfx/warrior_fury_feedback';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_registry';
@@ -7489,13 +7490,12 @@ export class Renderer {
           // authored projectile identity.
           break;
         }
-        // Goad: the warrior audibly swears at the victim - a grawlix bark over
-        // the caster's head, riding the completion cue every client receives,
-        // so other players see the taunt too. Before the claim: the painter
-        // owns the wave/sequence, the bubble is this renderer's own read.
+        // Goad and Defiant Bellow: overhead swearing on the completion cue
+        // every client receives. Before the claim: the painter owns the
+        // pressure sequence; the bubble is this renderer's own read.
         // Pure symbols, so it is i18n-exempt (CLAUDE.md: emojis/symbols need
         // no t() entry) - it must read as swearing in every locale.
-        if (ev.fx === 'selfCast' && ev.ability === 'taunt') {
+        if (warriorInsultCue(ev.fx, ev.ability)) {
           this.showChatBubble(ev.sourceId, '$@#%&*!', false, 1.8);
         }
         // Spec-driven per-ability visuals claim the event first; unknown

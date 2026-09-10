@@ -12,34 +12,34 @@ interface ShoutDesign {
   presence: number;
   lift: number;
 }
-// Presence is the size of the caster's physical voice/dust sculpture, not a
+// Presence is the size of the caster's physical acoustic fronts, not a
 // range claim. Iron Bellow has unlimited party range; recipient state owns it.
 const SHOUTS: Readonly<Record<string, ShoutDesign>> = {
   battle_shout: {
     shape: 'battle_pressure',
-    tint: 0x8f7660,
-    edge: 0xe8c58a,
+    tint: 0x3c434a,
+    edge: 0xf0ddbf,
     presence: 8,
     lift: 0.9,
   },
   rallying_cry: {
     shape: 'rally_pressure',
-    tint: 0xb18c58,
+    tint: 0x53545a,
     edge: 0xffe2a4,
     presence: 10,
     lift: 1.2,
   },
   emboldening_roar: {
     shape: 'embolden_pressure',
-    tint: 0x9f3944,
-    edge: 0xffb17d,
+    tint: 0x531e30,
+    edge: 0xffd4cc,
     presence: 9,
     lift: 1.35,
   },
   defiant_bellow: {
     shape: 'challenge_pressure',
-    tint: 0x7d6757,
-    edge: 0xe39d63,
+    tint: 0x363d48,
+    edge: 0xe8d2b1,
     presence: 10,
     lift: 1.1,
   },
@@ -83,21 +83,22 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
   const facing = host.facingAt?.(slot.casterId) ?? 0;
   let count = 0;
   if (beat === 0) {
-    const mouth = host.anchorOf(slot.casterId, 0.56, mouthPoint);
-    const voiceY =
-      design.shape === 'piercing_pressure' ? host.groundYAt(x, z) + 0.08 : (mouth?.y ?? y + 1.8);
-    const pressure = host.crestAt?.(
-      x,
-      voiceY,
-      z,
-      design.presence / 5,
-      design.lift,
-      design.tint,
-      design.edge,
-      design.shape,
-      facing,
-      0.65,
-    );
+    const mouth = host.anchorOf(slot.casterId, 0.79, mouthPoint);
+    const voiceY = mouth?.y ?? y + 1.8;
+    const pressure = host.crestAt
+      ? host.crestAt(
+          x,
+          voiceY,
+          z,
+          design.presence / 5,
+          design.lift,
+          design.tint,
+          design.edge,
+          design.shape,
+          facing,
+          0.65,
+        )
+      : false;
     // A cold sculpture or a fully occupied pool must still have a large,
     // directed voice silhouette. Borrow the already-pooled ribbon material;
     // preparation is never submitted from a cast.
@@ -113,7 +114,7 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
           (points) => {
             for (let i = 0; i < points.length; i++) {
               const u = i / (points.length - 1);
-              warriorPressurePoint(design.shape, spoke, u, 0.5, pressurePoint);
+              warriorPressurePoint(design.shape, spoke, u, 0.5, pressurePoint, true);
               const forward = (pressurePoint.z * design.presence) / 5;
               const side = (pressurePoint.x * design.presence) / 5;
               const px = x + dx * forward + dz * side;
@@ -140,8 +141,8 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
   const beats = slot.spec.physical?.beats.length ?? 1;
   const outward = (beat + 1) / (beats + 0.4);
   const radius = design.presence * outward;
-  // Four broad volumes cover the surroundings once per cast. Re-emitting a
-  // sheet on every voice beat would self-saturate the shared ten-slot pool.
+  // The air carries the scale. Four brief footing accents show displaced grit
+  // without turning a voice into a bank of airborne dust.
   const lobes = 4;
   for (let lobe = 0; lobe < lobes; lobe++) {
     const a = facing + (lobe * Math.PI * 2) / lobes;
@@ -156,10 +157,10 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
         px,
         ground + 0.08,
         pz,
-        7.2 + design.lift * 0.9,
-        0xd3bb95,
-        design.edge,
-        0.62,
+        3.6 + design.lift * 0.4,
+        0xa3a6a4,
+        0xd4d7d1,
+        0.36,
         lobe * 0.015,
         0,
         a,
@@ -171,31 +172,28 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
         host.fragmentsAt?.('stone_chip', px, ground + 0.08, pz, 0x8b7f6e, 3, 0.95, dx, dz, 0.25);
       count += slot.tier === 0 ? 2 : 1;
     }
-    // Short swept grit trails join the voice to the moving dust front.
-    if (lobe % 2 === 0) {
-      host.pathRibbon(
-        design.edge,
-        0.09 + outward * 0.025,
-        0.26,
-        (points) => {
-          for (let i = 0; i < points.length; i++) {
-            const u = i / (points.length - 1);
-            const side = Math.sin(u * Math.PI) * 0.35 * (lobe === 0 ? 1 : -1);
-            const r = radius * (0.45 + 0.55 * u);
-            const tooth = Math.sin(u * Math.PI) * 0.22;
-            const tx = x + dx * r + dz * side,
-              tz = z + dz * r - dx * side;
-            points[i].set(tx, host.groundYAt(tx, tz) + 0.18 + tooth * design.lift * 0.45, tz);
-          }
-          return points.length;
-        },
-        true,
-        null,
-        false,
-        0,
-      );
-      count++;
-    }
+    host.pathRibbon(
+      design.edge,
+      0.07 + outward * 0.025,
+      0.26,
+      (points) => {
+        for (let i = 0; i < points.length; i++) {
+          const u = i / (points.length - 1);
+          const side = Math.sin(u * Math.PI) * 0.35 * (lobe === 0 ? 1 : -1);
+          const r = radius * (0.45 + 0.55 * u);
+          const tooth = Math.sin(u * Math.PI) * 0.22;
+          const tx = x + dx * r + dz * side,
+            tz = z + dz * r - dx * side;
+          points[i].set(tx, y + 1.75 + tooth * design.lift * 0.6, tz);
+        }
+        return points.length;
+      },
+      true,
+      null,
+      false,
+      0,
+    );
+    count++;
   }
   host.countPrimitive(slot.abilityId, count);
   return true;

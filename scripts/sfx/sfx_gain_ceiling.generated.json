@@ -4235,6 +4235,23 @@
       }
     ]
   },
+  "piercing_howl": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "piercing_howl_1.mp3",
+        "sha256": "64e8edef3de9634d6b5718d5dba6176da79eb425c2431913ce032b9adf033c41",
+        "size": 12582,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "piercing_howl_2.mp3",
+        "sha256": "00d77394ee9996070587605af035e4b9ce61033d79a0f86a88b2e3d1b27f0566",
+        "size": 12582,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "player_death": {
     "ceilingDb": 6.3,
     "tracks": [

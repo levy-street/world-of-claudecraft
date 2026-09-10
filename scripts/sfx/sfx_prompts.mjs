@@ -19,6 +19,7 @@
 // hit (the engine pitch-randomizes and alternates to avoid repetition).
 
 import { FURY_SFX } from './fury_sfx.mjs';
+import { WARRIOR_VOICE_SFX } from './warrior_voice_sfx.mjs';
 import MASTERWORK_SFX from './masterwork_sfx.json' with { type: 'json' };
 import { SIGNATURE_SFX } from './signature_sfx.mjs';
 import { UI_SFX_CATALOG } from './ui_sfx.mjs';
@@ -89,6 +90,7 @@ const mob = (family, who, aggro, attack, death, hurt, idle) => {
 
 export const SFX = [
   ...FURY_SFX,
+  ...WARRIOR_VOICE_SFX,
   ...WARRIOR_CONTACT_SFX,
   ...SIGNATURE_SFX,
   ...MASTERWORK_SFX,

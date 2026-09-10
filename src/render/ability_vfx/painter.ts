@@ -782,7 +782,7 @@ export class AbilityVfx {
         }
         this.spawnRing(ev.sourceId, plan, ev.school);
         if (full?.physical && this.deps.hasGestureClip?.(ev.sourceId, ability))
-          this.deps.triggerAttack(ev.sourceId, ability);
+          this.releaseGesture(ev.sourceId, ability);
         else this.deps.playShoutAnim?.(ev.sourceId);
         if (tier < 2 && full)
           fx.sequenceInstant(

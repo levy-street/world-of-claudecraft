@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "0b04ff3c380805e8d862071e5fd81fa0a74e6105eea83ad54a50be10b08d0a0a",
-  "catalogHash": "1dd6712880426cac661a9c28056e91df495429c2645764fcafcec54b6232733f",
+  "bundleId": "5f8312f3a43ea4f6b3b1ba263ce24d7eca86af0e7f717dd3a6c615489658106a",
+  "catalogHash": "c7c9b5110b6e7920093afa3a12389f7867af585555a4a9a768c6ad7bb75a76dd",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -4670,6 +4670,24 @@
         }
       ],
       "gain": 2.018366,
+      "playbackRate": 1
+    },
+    "piercing_howl": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/piercing_howl_1.mp3?v=64e8edef3de9",
+          "bytes": 12582,
+          "sha256": "64e8edef3de9634d6b5718d5dba6176da79eb425c2431913ce032b9adf033c41"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/piercing_howl_2.mp3?v=00d77394ee99",
+          "bytes": 12582,
+          "sha256": "00d77394ee9996070587605af035e4b9ce61033d79a0f86a88b2e3d1b27f0566"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "player_death": {

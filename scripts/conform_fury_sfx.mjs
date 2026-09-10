@@ -9,24 +9,30 @@ import { FURY_SFX } from './sfx/fury_sfx.mjs';
 import { HARVEST_IMPACT_SFX } from './sfx/harvest_impact_sfx.mjs';
 import { WARRIOR_CONTACT_SFX } from './sfx/warrior_contact_sfx.mjs';
 import { WARRIOR_CONTROL_SFX } from './sfx/warrior_control_sfx.mjs';
+import { WARRIOR_VOICE_SFX } from './sfx/warrior_voice_sfx.mjs';
 
 const reaver = process.argv.includes('--warrior-reaver');
 const controls = process.argv.includes('--warrior-control');
 const contact = reaver || controls || process.argv.includes('--warrior-contact');
 const harvest = process.argv.includes('--red-harvest-impact');
-const sourceCues = harvest
-  ? HARVEST_IMPACT_SFX
-  : controls
-    ? WARRIOR_CONTROL_SFX
-    : contact
-      ? WARRIOR_CONTACT_SFX
-      : FURY_SFX;
+const voice = process.argv.includes('--warrior-voice');
+const sourceCues = voice
+  ? WARRIOR_VOICE_SFX
+  : harvest
+    ? HARVEST_IMPACT_SFX
+    : controls
+      ? WARRIOR_CONTROL_SFX
+      : contact
+        ? WARRIOR_CONTACT_SFX
+        : FURY_SFX;
 const cues = reaver ? sourceCues.filter((cue) => cue.key.includes('_warrior_reaver')) : sourceCues;
-const root = harvest
-  ? 'tmp/harvest-impact-audio'
-  : contact
-    ? 'tmp/warrior-contact-audio'
-    : 'tmp/fury-audio';
+const root = voice
+  ? 'tmp/warrior-voice-audio'
+  : harvest
+    ? 'tmp/harvest-impact-audio'
+    : contact
+      ? 'tmp/warrior-contact-audio'
+      : 'tmp/fury-audio';
 mkdirSync(join(root, 'curated'), { recursive: true });
 const review = [];
 for (const cue of cues)

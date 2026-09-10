@@ -11,6 +11,8 @@ import {
 import { buildSignatureShapes, type CrestKind } from './signature_shapes';
 import { STEEL_SWEEP_GLSL } from './steel_sweep';
 import { TWINSTRIKE_FRAGMENT, TWINSTRIKE_VERTEX } from './twinstrike_shape';
+import { WARRIOR_BARK_FRAGMENT, WARRIOR_BARK_VERTEX } from './warrior_bark_shape';
+import { WARRIOR_VOICE_FRAGMENT, WARRIOR_VOICE_VERTEX } from './warrior_voice_material';
 
 /** Prepared crystalline fans, curling water sheets, flame ribbons and torn
  * spectral fins. Eight slots share cached geometry families and one program. */
@@ -54,7 +56,7 @@ export class SignatureCrests {
       },
       vertexShader: `uniform float uAge,uKind,uMotion,uPressureGround[25]; varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         float pressureGround(vec2 p){
-          vec2 uv=uKind>22.5?p/12.0+0.5:(uKind>20.5 && uKind<21.5)?p/8.0+0.5:uKind>16.5?p/16.0+0.5:vec2(p.x/22.0+0.5,p.y/10.0);
+          vec2 uv=uKind>22.5?p/12.0+0.5:(uKind>20.5 && uKind<21.5)?p/8.0+0.5:uKind>16.5?p/16.0+0.5:p/22.0+0.5;
           vec2 grid=clamp(uv*4.0,vec2(0.0),vec2(3.9999));
           ivec2 cell=ivec2(floor(grid));vec2 f=fract(grid);int i=cell.y*5+cell.x;
           return mix(mix(uPressureGround[i],uPressureGround[i+1],f.x),
@@ -75,12 +77,7 @@ export class SignatureCrests {
             p.x+=(uv.x-0.5)*peel*0.7;
             p.y-=uAge*uAge*uv.y*(0.35+uv.y*0.45)*uMotion;
           }
-          if(uKind>12.5 && uKind<13.5){
-            float advance=mix(0.85,0.12+0.88*(1.0-pow(max(0.0,1.0-uAge),2.0)),uMotion);
-            p.xz*=advance;
-            p.y*=mix(1.0,0.6+0.4*advance,uMotion);
-            p.y+=pressureGround(p.xz);
-          }
+          ${WARRIOR_VOICE_VERTEX}
           if(uKind>13.5 && uKind<14.5){
             p.xy*=0.88+0.12*smoothstep(0.0,0.16,uAge);
             p.x+=sign(p.x)*smoothstep(0.35,1.0,uAge)*0.17*uMotion;
@@ -109,6 +106,7 @@ export class SignatureCrests {
           ${HARVEST_VERTEX}
           ${TWINSTRIKE_VERTEX}
           ${BLOODLETTING_VERTEX}
+          ${WARRIOR_BARK_VERTEX}
           vec4 view=modelViewMatrix*vec4(p,1.0); vView=-view.xyz; vNormal=normalize(normalMatrix*normal);
           gl_Position=projectionMatrix*view;
         }`,
@@ -165,15 +163,7 @@ export class SignatureCrests {
             colour=bloodBody*(1.1+fresnel*0.28)+uAccent*edge*0.34;
             alpha=0.97*coverage*dissolve*smoothstep(0.0,0.1,taper)*(1.0-smoothstep(0.68,1.0,uAge));
           }
-          if(uKind>12.5 && uKind<13.5){
-            float grain=texture2D(uPressureMap,vec2(vUv.x,0.46+vUv.y*0.08)).r;
-            float compression=exp(-vUv.y*9.0);
-            float air=exp(-vUv.y*3.0)*0.12;
-            float ends=smoothstep(0.0,0.08,vUv.x)*(1.0-smoothstep(0.92,1.0,vUv.x));
-            float crackle=0.72+0.28*smoothstep(0.04,0.3,grain);
-            colour=mix(uTint,uAccent,0.8+compression*0.2)*(1.1+compression*0.25);
-            alpha=(compression*0.76+air)*ends*crackle*(1.0-smoothstep(0.35,1.0,uAge));
-          }
+          ${WARRIOR_VOICE_FRAGMENT}
           if(uKind>13.5){
             float bevel=1.0-smoothstep(0.18,0.3,vUv.y);
             vec3 steel=texture2D(uSteelMap,clamp(vSurface,vec2(0.0),vec2(1.0))).rgb;
@@ -264,6 +254,7 @@ export class SignatureCrests {
           ${HARVEST_FRAGMENT}
           ${TWINSTRIKE_FRAGMENT}
           ${BLOODLETTING_FRAGMENT}
+          ${WARRIOR_BARK_FRAGMENT}
           gl_FragColor=vec4(colour,alpha*sceneSoftness(vView.z,0.12));
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
@@ -380,14 +371,14 @@ export class SignatureCrests {
     const ironGround =
       kind.startsWith('iron_') || kind === 'avatar_rupture' || kind === 'leap_rupture';
     const groundSpan = kind === 'leap_rupture' ? 12 : kind === 'avatar_rupture' ? 8 : 16;
-    if ((s.pressure || ironGround) && this.groundY) {
+    if (((s.pressure && kind !== 'bark_pressure') || ironGround) && this.groundY) {
       const cosine = Math.cos(angle),
         sine = Math.sin(angle),
         sourceFloor = this.groundY(x, z);
       for (let row = 0; row < 5; row++)
         for (let column = 0; column < 5; column++) {
           const lx = (column / 4 - 0.5) * (ironGround ? groundSpan : 22) * s.mesh.scale.x;
-          const lz = (ironGround ? (row / 4 - 0.5) * groundSpan : (row / 4) * 10) * s.mesh.scale.z;
+          const lz = (row / 4 - 0.5) * (ironGround ? groundSpan : 22) * s.mesh.scale.z;
           const heightAt = this.groundY(x + lx * cosine + lz * sine, z + lz * cosine - lx * sine);
           ground[row * 5 + column] =
             Number.isFinite(sourceFloor) && Number.isFinite(heightAt)
@@ -450,6 +441,7 @@ export class SignatureCrests {
     if (kind === 'harvest_eruption') u.uKind.value = 25;
     if (kind === 'twinstrike_cut') u.uKind.value = 26;
     if (kind === 'bloodletting_pull') u.uKind.value = 27;
+    if (kind === 'bark_pressure') u.uKind.value = 28;
     u.uStorm.value = kind === 'steel_storm' ? 1 : 0;
     u.uFlow.value = 0;
     u.uMotion.value = this.reducedMotion ? 0 : 1;

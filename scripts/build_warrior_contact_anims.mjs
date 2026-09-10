@@ -14,6 +14,7 @@ import {
 import { warriorControlPerformances } from './anim/warrior_control_poses.mjs';
 import { warriorReadinessPerformances } from './anim/warrior_readiness_poses.mjs';
 import { warriorReaverPerformance } from './anim/warrior_reaver_pose.mjs';
+import { warriorVoicePerformances } from './anim/warrior_voice_poses.mjs';
 
 const io = await createGlbIO();
 const doc = await io.read('public/models/chars/players/knight.glb');
@@ -697,6 +698,7 @@ const performances = [
 performances.push(...warriorControlPerformances(idle, bladePose, openAvatarArms));
 performances.push(...warriorReadinessPerformances(idle, bladePose, openAvatarArms));
 performances.push(warriorReaverPerformance(idle, bladePose));
+performances.push(...warriorVoicePerformances(idle, bladePose, openAvatarArms));
 const clips = [],
   reports = [];
 for (const [name, beats] of performances) {

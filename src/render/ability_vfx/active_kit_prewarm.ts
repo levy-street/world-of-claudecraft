@@ -17,6 +17,7 @@ export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
   'harvest_eruption',
   'twinstrike_cut',
   'bloodletting_pull',
+  'bark_pressure',
   'shield_contact',
   'steel_cut',
   'steel_chop',

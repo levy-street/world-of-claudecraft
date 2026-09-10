@@ -16,6 +16,13 @@ import {
   RECORDED_PROJECTILE_SCHOOLS,
 } from '../src/game/ability_sfx_coverage';
 
+it('lets the Piercing Howl recording carry its whole non-damaging nova', () => {
+  for (const moment of ['release', 'impact'] as const)
+    expect(isAbilityMomentRecorded(moment, {
+      school: 'physical', archetype: 'nova', abilityId: 'piercing_howl',
+    })).toBe(true);
+});
+
 describe('release: the launch whoosh belongs to the recorded proj_ pack', () => {
   it('is recorded for each of the six magic schools Jamie cut a proj_ take for', () => {
     // proj_fire / proj_frost / proj_arcane / proj_shadow / proj_holy /

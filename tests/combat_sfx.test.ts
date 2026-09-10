@@ -317,6 +317,15 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 10 });
   });
 
+  it('gives Piercing Howl one voiced nova without a duplicate shout sound', () => {
+    const ev = {
+      type: 'spellfx' as const, sourceId: 10, targetId: 20,
+      school: 'physical' as const, ability: 'piercing_howl',
+    };
+    expect(spellFxCue({ ...ev, fx: 'nova' })).toEqual({ key: 'piercing_howl', anchorId: 10 });
+    expect(spellFxCue({ ...ev, fx: 'shout' })).toBeNull();
+  });
+
   it('gives Intimidating Shout its own distinct nova cue, not the shared fear_shout', () => {
     expect(
       spellFxCue({

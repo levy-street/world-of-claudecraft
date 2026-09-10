@@ -89,13 +89,15 @@ export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
  *  landed moment while a distinct procedural release still carries the cast),
  *  these override BOTH 'release' and 'impact'. Intimidating Shout is
  *  deliberately absent: it already resolves through FEAR_IMPACT_ABILITIES
- *  above. */
+ *  above. Piercing Howl's separate nova recording now covers its vocal cast
+ *  through the same launch/impact suppression rule. */
 export const SHOUT_CAST_ABILITIES: ReadonlySet<string> = new Set([
   'battle_shout',
   'demoralizing_shout',
   'emboldening_roar',
   'defiant_bellow',
   'rallying_cry',
+  'piercing_howl',
 ]);
 
 /** Ground-zone abilities (groundAoE, effect_dispatch.ts) whose pulse now has a

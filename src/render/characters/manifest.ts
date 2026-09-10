@@ -1375,6 +1375,13 @@ export const VISUALS: Record<string, VisualDef> = {
         shield_slam: 'Warrior_Shieldcrack',
         raging_gale: 'Fury_Twinstrike',
         bloodthirst: 'Warrior_Bloodletting',
+        battle_shout: 'Warrior_Iron_Bellow',
+        demoralizing_shout: 'Warrior_Direhowl',
+        emboldening_roar: 'Warrior_Emboldening_Roar',
+        defiant_bellow: 'Warrior_Defiant_Bellow',
+        rallying_cry: 'Warrior_Valor_Roar',
+        intimidating_shout: 'Warrior_Intimidating_Shout',
+        piercing_howl: 'Warrior_Piercing_Howl',
         // Reaping Arc turns through all surrounding enemies; Revenge is frontal.
         cleave: 'Warrior_Reaping_Arc',
         revenge: 'Warrior_Revenge',
@@ -1418,16 +1425,6 @@ export const VISUALS: Record<string, VisualDef> = {
         die_by_sword: 'Warrior_Sword_Guard',
         // A planted rise carries Avatar's physical transformation.
         avatar: 'Warrior_Avatar',
-        // Piercing Howl's own description calls it "a piercing shout" even
-        // though it carries no castFx (unlike the six castFx:'shout'
-        // abilities below, which the painter's 'shout' case always plays as
-        // the Cheer EMOTE and never reaches attackByAbility at all - adding
-        // an entry for any of those would be dead code, so this batch leaves
-        // them alone). Piercing Howl's own selfCast cue DOES reach the same
-        // gesture path Heroic Leap/berserker_rage/etc use above, and the
-        // painter's shout-emote call right after it is guarded on
-        // isMidOneShot, so it does not stomp this gesture.
-        piercing_howl: 'Spellcast_Raise',
       },
     },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh

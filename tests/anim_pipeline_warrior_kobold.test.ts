@@ -117,27 +117,21 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     expect(map.whirlwind).toBe('Warrior_Bladed_Gyre');
     expect(map.taunt).toBe('Warrior_Goad');
     expect(map.furious_mending).toBe('Warrior_Furious_Mending');
-    expect(map.piercing_howl).toBe('Spellcast_Raise');
+    expect(map.piercing_howl).toBe('Warrior_Piercing_Howl');
     expect(map.storm_bolt).toBe('Warrior_Storm_Bolt');
     expect(map.charge).toBe('Warrior_Rush_Loop');
     expect(map.intervene).toBe('Warrior_Rush_Loop');
-    // Bladestorm belongs to castByAbility; the current six shout performances
-    // use the emote fallback. The painter also supports a native shout override.
+    // Bladestorm remains a channel. All seven voices now have shipped native performances.
     expect(VISUALS.player_warrior.clips.castByAbility?.bladestorm).toBe('Warrior_Bladestorm_Loop');
-    for (const unmappedId of [
-      'bladestorm',
-      'battle_shout',
-      'demoralizing_shout',
-      'emboldening_roar',
-      'defiant_bellow',
-      'rallying_cry',
-      'intimidating_shout',
-    ]) {
-      expect(
-        map[unmappedId],
-        `${unmappedId} currently uses its channel or emote path`,
-      ).toBeUndefined();
-    }
+    expect(map.bladestorm).toBeUndefined();
+    for (const [id, clip] of Object.entries({
+      battle_shout: 'Warrior_Iron_Bellow',
+      demoralizing_shout: 'Warrior_Direhowl',
+      emboldening_roar: 'Warrior_Emboldening_Roar',
+      defiant_bellow: 'Warrior_Defiant_Bellow',
+      rallying_cry: 'Warrior_Valor_Roar',
+      intimidating_shout: 'Warrior_Intimidating_Shout',
+    })) expect(map[id], `${id} owns its native voice performance`).toBe(clip);
   });
 });
 
@@ -253,6 +247,19 @@ describe('heroic_leap and piercing_howl reach triggerAttack through the real sel
         expect(playShoutAnim).toHaveBeenCalledExactlyOnceWith(1);
         expect(triggerAttack).not.toHaveBeenCalled();
       }
+    }
+  });
+
+  it('plays one native Intimidating Shout gesture across both authoritative cast phases', () => {
+    for (const phases of [['shout', 'nova'], ['nova', 'shout']]) {
+      const { painter, triggerAttack, playShoutAnim } = makePainter();
+      for (const fx of phases)
+        expect(painter.handleSpellfx({
+          type: 'spellfx', sourceId: 1, targetId: 1,
+          school: 'physical', fx, ability: 'intimidating_shout',
+        } as never)).toBe(true);
+      expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(1, 'intimidating_shout');
+      expect(playShoutAnim).not.toHaveBeenCalled();
     }
   });
 

@@ -7,17 +7,27 @@ import { join } from 'node:path';
 import { FURY_SFX } from './sfx/fury_sfx.mjs';
 import { HARVEST_IMPACT_SFX } from './sfx/harvest_impact_sfx.mjs';
 import { WARRIOR_CONTACT_SFX } from './sfx/warrior_contact_sfx.mjs';
+import { WARRIOR_VOICE_SFX } from './sfx/warrior_voice_sfx.mjs';
 
 const reaver = process.argv.includes('--warrior-reaver');
 const contact = reaver || process.argv.includes('--warrior-contact');
 const harvest = process.argv.includes('--red-harvest-impact');
-const sourceCues = harvest ? HARVEST_IMPACT_SFX : contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
+const voice = process.argv.includes('--warrior-voice');
+const sourceCues = voice
+  ? WARRIOR_VOICE_SFX
+  : harvest
+    ? HARVEST_IMPACT_SFX
+    : contact
+      ? WARRIOR_CONTACT_SFX
+      : FURY_SFX;
 const cues = reaver ? sourceCues.filter((cue) => cue.key.includes('_warrior_reaver')) : sourceCues;
-const folder = harvest
-  ? 'tmp/harvest-impact-audio'
-  : contact
-    ? 'tmp/warrior-contact-audio'
-    : 'tmp/fury-audio';
+const folder = voice
+  ? 'tmp/warrior-voice-audio'
+  : harvest
+    ? 'tmp/harvest-impact-audio'
+    : contact
+      ? 'tmp/warrior-contact-audio'
+      : 'tmp/fury-audio';
 mkdirSync(join(folder, 'raw'), { recursive: true });
 const ledgerPath = join(folder, 'generation-ledger.json');
 const ledger = existsSync(ledgerPath)
@@ -31,7 +41,7 @@ if (!process.argv.includes('--generate')) {
     JSON.stringify({
       planned: planned.length,
       generatedSeconds: planned.length * 0.5,
-      command: `node scripts/gen_fury_sfx.mjs${contact ? ' --warrior-contact' : ''} --generate`,
+      command: `node scripts/gen_fury_sfx.mjs${voice ? ' --warrior-voice' : harvest ? ' --red-harvest-impact' : contact ? ' --warrior-contact' : ''} --generate`,
     }),
   );
   process.exit(0);

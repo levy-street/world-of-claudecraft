@@ -26,6 +26,32 @@ describe('Warrior surrounding voice sculptures', () => {
     geometry.dispose();
   });
 
+  it.each(WARRIOR_PRESSURE_KINDS)(
+    '%s geometry triangles stay within their own acoustic segment',
+    (kind) => {
+      const geometry = buildWarriorPressure(kind);
+      const positions = geometry.getAttribute('position');
+      const index = geometry.index!;
+      const vertsPerSegment = 20;
+      const idx = index.array;
+      for (let t = 0; t < index.count; t += 3) {
+        const a = idx[t],
+          b = idx[t + 1],
+          c = idx[t + 2];
+        expect(Math.floor(a / vertsPerSegment)).toBe(Math.floor(b / vertsPerSegment));
+        expect(Math.floor(a / vertsPerSegment)).toBe(Math.floor(c / vertsPerSegment));
+      }
+      const pos = positions.array;
+      const xs = Array.from({ length: positions.count }, (_, i) => pos[i * 3]);
+      const zs = Array.from({ length: positions.count }, (_, i) => pos[i * 3 + 2]);
+      expect(xs.some((x, i) => x > 0 && zs[i] > 0)).toBe(true);
+      expect(xs.some((x, i) => x > 0 && zs[i] < 0)).toBe(true);
+      expect(xs.some((x, i) => x < 0 && zs[i] > 0)).toBe(true);
+      expect(xs.some((x, i) => x < 0 && zs[i] < 0)).toBe(true);
+      geometry.dispose();
+    },
+  );
+
   it.each([
     'battle_shout',
     'rallying_cry',
@@ -152,9 +178,9 @@ it('samples independent rotated terrain grids once per pressure birth', () => {
     (child) => child.name === 'signatureCrest' && child.visible,
   ) as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   const grid = mesh.material.uniforms.uPressureGround.value as Float32Array;
-  expect(grid[12]).toBeCloseTo(2);
-  expect(grid[14]).toBeCloseTo(-0.2);
-  expect(grid[22]).toBeCloseTo(4);
+  expect(grid[12]).toBeCloseTo(0);
+  expect(grid[14]).toBeCloseTo(-2.2);
+  expect(grid[22]).toBeCloseTo(4.4);
   // The rotated grid covers the full widened compression front, including its open ends.
   const sampledZ = ground.mock.calls.map((call) => call[1]);
   expect(Math.min(...sampledZ)).toBeCloseTo(-16);
@@ -167,7 +193,7 @@ it('samples independent rotated terrain grids once per pressure birth', () => {
     (child) => child.name === 'signatureCrest' && child.visible,
   )[1] as typeof mesh;
   expect(other.material.uniforms.uPressureGround.value).not.toBe(grid);
-  expect(grid[14]).toBeCloseTo(-0.2);
+  expect(grid[14]).toBeCloseTo(-2.2);
   crests.dispose();
 });
 
@@ -221,7 +247,10 @@ it('keeps a full-size directed primary silhouette when its sculpture is cold', (
     expect(points.at(-1)!.x).toBeGreaterThan(4);
     expect(points[0].x).toBeCloseTo(-points.at(-1)!.x, 10);
     expect(points[0].z).toBeCloseTo(points.at(-1)!.z, 10);
-    expect(points[0].y - host.groundYAt(points[0].x, points[0].z)).toBeCloseTo(0.146, 12);
+    expect(points[0].y - host.groundYAt(points[0].x, points[0].z)).toBeCloseTo(
+      0.79 * 3 + 0.12 * 0.55,
+      12,
+    );
     const front = Math.max(...points.map((p) => p.z));
     expect(front).toBeGreaterThan(previousFront + 4);
     previousFront = front;

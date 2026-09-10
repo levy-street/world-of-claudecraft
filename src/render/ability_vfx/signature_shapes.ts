@@ -8,6 +8,7 @@ import type { Substance } from './signature_core';
 import { buildTwinstrikeShape } from './twinstrike_shape';
 import { buildWarriorArea, type WarriorAreaShape } from './warrior_area_shapes';
 import { warriorAvatarRuptureShape } from './warrior_avatar_rupture';
+import { buildWarriorBark } from './warrior_bark_shape';
 import { buildWarriorBlade } from './warrior_blade_shape';
 import { warriorGyreShape } from './warrior_gyre_shape';
 import { buildWarriorHeavyShape, type WarriorHeavyShape } from './warrior_heavy_shapes';
@@ -30,6 +31,7 @@ export type CrestKind =
   | 'harvest_eruption'
   | 'twinstrike_cut'
   | 'bloodletting_pull'
+  | 'bark_pressure'
   | 'shield_contact'
   | 'steel_cut'
   | WarriorHeavyShape
@@ -49,6 +51,7 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
   shapes.set('harvest_eruption', buildHarvestShape(true));
   shapes.set('twinstrike_cut', buildTwinstrikeShape());
   shapes.set('bloodletting_pull', buildBloodlettingShape());
+  shapes.set('bark_pressure', buildWarriorBark());
   shapes.set('shield_contact', buildWarriorShield());
   shapes.set('steel_cut', buildWarriorBlade());
   for (const kind of ['steel_chop', 'steel_counter', 'steel_execution'] as const)

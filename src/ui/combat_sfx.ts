@@ -113,6 +113,7 @@ const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   psychic_scream: 'fear_shout',
   howl_of_terror: 'fear_shout',
   intimidating_shout: 'intimidating_shout',
+  piercing_howl: 'piercing_howl',
   frost_nova: 'frost_nova',
   flamestrike: 'flamestrike',
 };
@@ -406,7 +407,7 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
     return { key, anchorId: event.sourceId };
   }
   if (event.fx === 'nova') {
-    return { key: novaAbilityCue(event.ability), anchorId: event.targetId };
+    return { key: novaAbilityCue(event.ability), anchorId: event.ability === 'piercing_howl' || event.ability === 'intimidating_shout' ? event.sourceId : event.targetId };
   }
   if (event.fx === 'fearImpact') return { key: 'fear', anchorId: event.targetId };
   if (event.fx === 'ccImpact') {
