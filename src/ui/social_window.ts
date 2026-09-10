@@ -622,19 +622,26 @@ export class SocialWindow {
 
   // Send the pledge-board recruiting settings up through IWorld: the accepting
   // toggle, the level floor (parsed + clamped here for UX; the server clamps
-  // authoritatively), and the board note ('' clears it). A malformed level
-  // falls back to the floor, matching an unset field.
+  // authoritatively), the board note ('' clears it), and the new-player
+  // friendly opt-in. A malformed level falls back to the floor, matching an
+  // unset field.
   private savePledgeSettings(): void {
     const root = this.deps.root();
     const open = root.querySelector('input[data-field="popen"]') as HTMLInputElement | null;
     const level = root.querySelector('input[data-field="pminlvl"]') as HTMLInputElement | null;
     const note = root.querySelector('input[data-field="pnote"]') as HTMLInputElement | null;
-    if (!open || !level || !note) return;
+    const newbie = root.querySelector('input[data-field="pnewbie"]') as HTMLInputElement | null;
+    if (!open || !level || !note || !newbie) return;
     const parsed = Number.parseInt(level.value, 10);
     const minLevel = Number.isFinite(parsed)
       ? Math.min(PLEDGE_MIN_LEVEL_CEIL, Math.max(PLEDGE_MIN_LEVEL_FLOOR, parsed))
       : PLEDGE_MIN_LEVEL_FLOOR;
-    this.deps.world().setGuildPledgeSettings(open.checked, minLevel, note.value);
+    this.deps.world().setGuildPledgeSettings({
+      enabled: open.checked,
+      minLevel,
+      note: note.value,
+      newPlayerFriendly: newbie.checked,
+    });
   }
 
   private friendsHtml(): string {
@@ -820,6 +827,11 @@ export class SocialWindow {
       `<label class="soc-pledge-open"><input type="checkbox" data-field="popen"${s.enabled ? ' checked' : ''}/> ${esc(t('hudChrome.pledge.acceptingLabel'))}</label>` +
       `<label class="soc-pledge-minlvl">${esc(t('hudChrome.pledge.minLevelLabel'))} ` +
       `<input inputmode="numeric" pattern="[0-9]*" maxlength="2" data-field="pminlvl" value="${esc(String(s.minLevel))}" autocomplete="off"/></label>` +
+      // Guild board categories: the new-player-friendly opt-in, with the
+      // board's own sprout glyph so the editor and the signpost chip match.
+      `<label class="soc-pledge-open soc-pledge-category"><input type="checkbox" data-field="pnewbie"${s.newPlayerFriendly ? ' checked' : ''}/> ` +
+      `<span class="soc-pledge-category-icon" aria-hidden="true">${svgIcon('sprout')}</span>${esc(t('hudChrome.pledge.newPlayerFriendlyLabel'))}</label>` +
+      `<div class="soc-pledge-hint">${esc(t('hudChrome.pledge.newPlayerFriendlyHint'))}</div>` +
       `<div class="soc-pledge-note-row">` +
       `<input maxlength="${PLEDGE_NOTE_MAX}" value="${esc(s.note)}" aria-label="${esc(t('hudChrome.pledge.noteLabel'))}" placeholder="${esc(t('hudChrome.pledge.notePlaceholder'))}" data-field="pnote" autocomplete="off" spellcheck="false"/>` +
       `<button type="button" class="btn" data-act="pledge-settings-save">${esc(t('hudChrome.pledge.save'))}</button>` +

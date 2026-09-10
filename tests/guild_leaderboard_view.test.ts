@@ -10,12 +10,15 @@
 // directly. Guilds are server-only, so the offline Sim always lands on `empty`.
 
 import { describe, expect, it } from 'vitest';
+import { PROVING_SHORE_NOTICEBOARD_ID } from '../src/sim/content/noticeboards';
 import { paginateGuildLeaderboard } from '../src/sim/leaderboard_page';
 import {
   buildGuildLeaderboardView,
+  defaultGuildBoardCategory,
   type GuildBoardViewer,
   type GuildLeaderboardInput,
   guildPledgeCell,
+  onlineOfficerRows,
 } from '../src/ui/guild_leaderboard_view';
 import type { GuildLeaderboardEntry, GuildLeaderboardPage } from '../src/world_api';
 
@@ -49,7 +52,56 @@ describe('buildGuildLeaderboardView', () => {
       page: page({ leaders: [], total: 0 }),
       viewer: null,
     });
-    expect(view.kind).toBe('empty');
+    expect(view).toEqual({ kind: 'empty', category: null });
+  });
+
+  it('carries the category the page was read under, on the empty and ranked states alike', () => {
+    const empty = buildGuildLeaderboardView({
+      kind: 'page',
+      page: page({ leaders: [], total: 0 }),
+      viewer: null,
+      category: 'newPlayerFriendly',
+    });
+    expect(empty).toEqual({ kind: 'empty', category: 'newPlayerFriendly' });
+    const ranked = buildGuildLeaderboardView({
+      kind: 'page',
+      page: page(),
+      viewer: null,
+      category: 'newPlayerFriendly',
+    });
+    expect(ranked.kind).toBe('ranked');
+    if (ranked.kind !== 'ranked') return;
+    expect(ranked.category).toBe('newPlayerFriendly');
+  });
+
+  it('derives the new-player-friendly chip and the online officers, in server order', () => {
+    const view = buildGuildLeaderboardView({
+      kind: 'page',
+      page: page({
+        leaders: [
+          entry({
+            name: 'Open Arms',
+            newPlayerFriendly: true,
+            onlineOfficers: [
+              { name: 'Boss', rank: 'leader' },
+              { name: 'Right Hand', rank: 'officer' },
+            ],
+          }),
+          entry({ rank: 2, name: 'Quiet', newPlayerFriendly: false }),
+        ],
+        total: 2,
+      }),
+      viewer: null,
+    });
+    if (view.kind !== 'ranked') throw new Error('expected ranked');
+    expect(view.rows[0]).toMatchObject({
+      newPlayerFriendly: true,
+      onlineOfficers: [
+        { name: 'Boss', rank: 'leader' },
+        { name: 'Right Hand', rank: 'officer' },
+      ],
+    });
+    expect(view.rows[1]).toMatchObject({ newPlayerFriendly: false, onlineOfficers: [] });
   });
 
   it('derives ranked rows, passing every guild field through', () => {
@@ -79,6 +131,8 @@ describe('buildGuildLeaderboardView', () => {
         minLevel: 1,
         note: '',
         pledge: 'none',
+        newPlayerFriendly: false,
+        onlineOfficers: [],
       },
       {
         rank: 2,
@@ -91,6 +145,8 @@ describe('buildGuildLeaderboardView', () => {
         minLevel: 1,
         note: '',
         pledge: 'none',
+        newPlayerFriendly: false,
+        onlineOfficers: [],
       },
     ]);
   });
@@ -221,5 +277,51 @@ describe('guildPledgeCell', () => {
 
   it('a pledge to a DIFFERENT guild leaves this row actionable (re-pledge moves it)', () => {
     expect(guildPledgeCell(row, viewer({ pledgedTo: 'Rivals' }))).toBe('pledge');
+  });
+});
+
+// The trust-boundary re-validation of the served officer list: a malformed
+// row is dropped rather than rendered with an undefined name, the rank is
+// narrowed to the two officer-plus ranks, and the server's order is kept.
+describe('onlineOfficerRows', () => {
+  it('drops malformed rows and unknown ranks (never relabels them), keeping the order', () => {
+    expect(
+      onlineOfficerRows([
+        { name: 'Boss', rank: 'leader' },
+        { name: '', rank: 'officer' },
+        { rank: 'officer' },
+        null,
+        'Stray',
+        { name: 'Odd', rank: 'member' },
+        { name: 'Odder', rank: 7 },
+        { name: 'Right Hand', rank: 'officer' },
+      ]),
+    ).toEqual([
+      { name: 'Boss', rank: 'leader' },
+      { name: 'Right Hand', rank: 'officer' },
+    ]);
+  });
+
+  it('reads an absent or non-array field as nobody online', () => {
+    expect(onlineOfficerRows(undefined)).toEqual([]);
+    expect(onlineOfficerRows('Boss')).toEqual([]);
+    expect(onlineOfficerRows({ name: 'Boss', rank: 'leader' })).toEqual([]);
+  });
+});
+
+// The signpost that opened the window picks the default view: only the
+// Proving Shore's recruits' board opens on the new-player-friendly guilds.
+describe('defaultGuildBoardCategory', () => {
+  it('opens the Proving Shore board on the new-player-friendly guilds', () => {
+    // The literal, not only the shared constant: the sim emits this id on the
+    // noticeboard event, so a rename on one side must fail here.
+    expect(PROVING_SHORE_NOTICEBOARD_ID).toBe('proving_shore_noticeboard');
+    expect(defaultGuildBoardCategory('proving_shore_noticeboard')).toBe('newPlayerFriendly');
+  });
+
+  it('opens every other board, and an unnamed opener, on the whole ranking', () => {
+    expect(defaultGuildBoardCategory('eastbrook_noticeboard')).toBeNull();
+    expect(defaultGuildBoardCategory('fenbridge_noticeboard')).toBeNull();
+    expect(defaultGuildBoardCategory(undefined)).toBeNull();
   });
 });

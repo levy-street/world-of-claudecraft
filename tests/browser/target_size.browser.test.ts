@@ -457,6 +457,80 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
   });
 });
 
+// The signpost guild board's category strip and presence dot (guild board
+// categories): minted the way guild_board_window.ts renders them, inside the
+// #guild-board-window root the window-scoped rules key on.
+function guildBoardControls(): {
+  chip: HTMLElement;
+  showAll: HTMLElement;
+  presence: HTMLElement;
+} {
+  const win = el('div', { id: 'guild-board-window', class: 'window panel' });
+  win.style.display = 'flex';
+  const body = el('div', { class: 'lb-body gb-body' });
+  const strip = el('div', { class: 'gb-filters', role: 'group' });
+  const chip = el('label', { class: 'gb-filter-chip active' });
+  const box = el('input', { type: 'checkbox' });
+  const chipLabel = el('span', { class: 'gb-filter-label' });
+  chipLabel.textContent = 'New player friendly';
+  chip.append(box, chipLabel);
+  strip.appendChild(chip);
+  const empty = el('div', { class: 'lb-empty gb-filter-empty' });
+  const showAll = el('button', { type: 'button', class: 'btn gb-show-all' });
+  showAll.textContent = 'Show all guilds';
+  empty.appendChild(showAll);
+  const row = el('div', { class: 'lb-row lb-row-guild' });
+  const name = el('span', { class: 'lb-name gb-name-cell' });
+  const link = el('button', { type: 'button', class: 'gb-roster-link' });
+  link.textContent = 'Stormcallers';
+  const presence = el('button', { type: 'button', class: 'gb-presence' });
+  presence.appendChild(el('span', { class: 'soc-dot online gb-presence-dot' }));
+  name.append(link, presence);
+  row.appendChild(name);
+  body.append(strip, empty, row);
+  win.appendChild(body);
+  document.body.appendChild(win);
+  return { chip, showAll, presence };
+}
+
+describe('mobile target-size: the guild signpost board (guild board categories)', () => {
+  it('the filter chip and the Show-all button take the 40px floor', () => {
+    const { chip, showAll } = guildBoardControls();
+    expectAtLeastFloor(chip, '#guild-board-window .gb-filter-chip');
+    expectAtLeastFloor(showAll, '#guild-board-window .gb-show-all');
+  });
+
+  it('the presence dot: a 24px visual whose ::after hit extension is LIVE on all four sides', () => {
+    // The dot sits inline in a ranked row, so its visual box keeps the row
+    // rhythm at the SC 2.5.8 24px minimum and the 40px floor rides an
+    // invisible ::after hit extension (the compact tracker chip idiom above).
+    const { presence } = guildBoardControls();
+    const r = presence.getBoundingClientRect();
+    expect(r.width, `dot visual width ${r.width}`).toBeGreaterThanOrEqual(24 - EPSILON);
+    expect(r.height, `dot visual height ${r.height}`).toBeGreaterThanOrEqual(24 - EPSILON);
+    expect(r.height, `dot visual height ${r.height}`).toBeLessThan(TOUCH_FLOOR);
+    const reach =
+      Math.abs(Number.parseFloat(getComputedStyle(presence, '::after').top)) -
+      Number.parseFloat(getComputedStyle(presence).borderTopWidth);
+    expect(reach, 'the ::after reach beyond the border edge').toBe(8);
+    expect(r.height + 2 * reach, 'visual + 2x reach').toBeGreaterThanOrEqual(TOUCH_FLOOR - EPSILON);
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const inside = reach - 1;
+    const outside = reach + 1;
+    expect(document.elementFromPoint(cx, r.top - inside), 'above').toBe(presence);
+    expect(document.elementFromPoint(cx, r.bottom + inside), 'below').toBe(presence);
+    expect(document.elementFromPoint(r.left - inside, cy), 'left').toBe(presence);
+    expect(document.elementFromPoint(r.right + inside, cy), 'right').toBe(presence);
+    expect(document.elementFromPoint(cx, r.top - outside), 'beyond the reach, above').not.toBe(
+      presence,
+    );
+    expect(document.elementFromPoint(cx, r.bottom + outside), 'beyond the reach, below').not.toBe(
+      presence,
+    );
+  });
+});
+
 // Desktop (fine-pointer, non-mobile) target-size: the dense list controls the WCAG row
 // named (bag cells, social rows / tabs) but never measured. Here the mobile 40px floors do
 // NOT apply (no body.mobile-touch class), so each must still clear the 24px SC 2.5.8 absolute
@@ -498,6 +572,19 @@ describe('desktop target-size: dense list controls clear the >=24px SC 2.5.8 flo
     tab.textContent = 'Friends';
     document.body.appendChild(tab);
     expectAtLeastDesktopFloor(tab, '.soc-tab');
+  });
+
+  it('the guild board presence dot clears the 24px floor around its 10px visual', () => {
+    const { presence, chip, showAll } = guildBoardControls();
+    const { w, h } = measure(presence);
+    expect(w, `.gb-presence width ${w} < ${DESKTOP_FLOOR}`).toBeGreaterThanOrEqual(
+      DESKTOP_FLOOR - EPSILON,
+    );
+    expect(h, `.gb-presence height ${h} < ${DESKTOP_FLOOR}`).toBeGreaterThanOrEqual(
+      DESKTOP_FLOOR - EPSILON,
+    );
+    expectAtLeastDesktopFloor(chip, '#guild-board-window .gb-filter-chip');
+    expectAtLeastDesktopFloor(showAll, '#guild-board-window .gb-show-all');
   });
 
   it("The Reliquary's HUD-tracker eye toggle: a ~20px chip whose ::after lifts it to the 36px desktop floor", () => {

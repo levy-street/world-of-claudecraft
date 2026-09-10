@@ -9,11 +9,11 @@ import { WebSocketServer } from 'ws';
 import { bankGrantStorageSlots } from '../src/sim/bank';
 import { DEEDS } from '../src/sim/content/deeds';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
+import { GUILD_BOARD_CATEGORY_PARAM } from '../src/sim/guild_board_category';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
   paginateDevLeaderboard,
-  paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
 import { Sim } from '../src/sim/sim';
@@ -218,7 +218,6 @@ import {
   type TokenScope,
   topArenaRatings,
   topBgRatings,
-  topGuilds,
   topLifetimeXp,
   touchLogin,
   walletForAccount,
@@ -272,6 +271,8 @@ import {
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
 import { guildBankLogCacheStats } from './guild_bank_log';
+import { topGuilds } from './guild_board_db';
+import { guildBoardPresence } from './guild_board_presence';
 import { configurePaidGuildCreateBackgroundGate } from './guild_create_db';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
@@ -323,8 +324,10 @@ import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
 import {
   buildDeedsBoard,
+  buildGuildBoardResponse,
   configureLeaderboardRuntime,
   decodedRouteName,
+  decodeGuildBoardCategory,
   type ReleaseEntry,
   readArenaLeaderboard,
   readProjectStats,
@@ -756,6 +759,7 @@ async function refreshGuildLeaderboard(
     pledgesOpen: r.pledgesEnabled,
     ...(r.pledgeMinLevel > 1 ? { pledgeMinLevel: r.pledgeMinLevel } : {}),
     ...(r.pledgeNote ? { pledgeNote: r.pledgeNote } : {}),
+    ...(r.newPlayerFriendly ? { newPlayerFriendly: true } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
@@ -995,6 +999,9 @@ function bustBoardCaches(): void {
   arenaLeaderboardCache['2v2'] = null;
   bgLeaderboardCache = null;
   deedsBoardCache = null;
+  // The guild board's officer roster (guild_board_presence.ts): a moderated
+  // officer's name must leave the presence tooltip as fast as the boards.
+  guildBoardPresence.bust();
   bustDailyRewardBoardCache();
   // Not a board, but the same delisting-must-be-immediate reasoning: the
   // per-character lifetime-XP rank cache (server/character_rank_cache.ts).
@@ -2351,14 +2358,25 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         const guildEntries = await getGuildLeaderboard(scope);
         const guildPageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
         const guildPage = Number(params.get('page')) || 0;
-        const guildSlice = paginateGuildLeaderboard(guildEntries, guildPage, guildPageSize);
-        return json(res, 200, {
-          realm: REALM,
-          scope,
-          board: 'guilds',
-          metric: 'guildLifetimeXp',
-          ...guildSlice,
-        });
+        // The category filter and the live officer presence ride the shared
+        // served-body builder, so this arm and the RouteDef stay byte-identical.
+        const guildCategory = decodeGuildBoardCategory(
+          params.get(GUILD_BOARD_CATEGORY_PARAM) ?? undefined,
+        );
+        return json(
+          res,
+          200,
+          await buildGuildBoardResponse(
+            REALM,
+            scope,
+            guildEntries,
+            guildPage,
+            guildPageSize,
+            guildCategory,
+            (id) => liveGame().hasSessionForCharacter(id),
+            req,
+          ),
+        );
       }
       // ?board=devs ranks open-source CONTRIBUTORS by merged pull requests, sourced
       // from the cached public GitHub PR stats. The same data for every realm,
@@ -2915,6 +2933,7 @@ configureLeaderboardRuntime({
   perfProfile: () => liveGame().perfProfile(),
   getLeaderboard,
   getGuildLeaderboard,
+  isCharacterOnline: (id) => liveGame().hasSessionForCharacter(id),
   getDevLeaderboard: () => topContributors(),
   getDeedsLeaderboard,
   deedsSelfRank,

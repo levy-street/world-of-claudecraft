@@ -391,6 +391,7 @@ import { runPeriodicSaveFlush } from './periodic_save_flush';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
+import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
@@ -7254,21 +7255,14 @@ export class GameServer {
             .guildPledgeDecide(this.actorFor(session), msg.name, msg.accept)
             .catch(logSocialErr);
         break;
-      case 'guild_pledge_settings':
-        if (
-          typeof msg.enabled === 'boolean' &&
-          typeof msg.minLevel === 'number' &&
-          Number.isFinite(msg.minLevel) &&
-          typeof msg.note === 'string'
-        )
+      case 'guild_pledge_settings': {
+        const settings = parseGuildPledgeSettingsCommand(msg);
+        if (settings)
           void this.social
-            .setGuildPledgeSettings(this.actorFor(session), {
-              enabled: msg.enabled,
-              minLevel: msg.minLevel,
-              note: msg.note,
-            })
+            .setGuildPledgeSettings(this.actorFor(session), settings)
             .catch(logSocialErr);
         break;
+      }
       case 'guild_decline':
         void this.social.guildDecline(this.actorFor(session)).catch(logSocialErr);
         break;

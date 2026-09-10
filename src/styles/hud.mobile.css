@@ -5478,8 +5478,26 @@
   body.mobile-touch .soc-pledge-open,
   body.mobile-touch .soc-my-pledge .btn,
   body.mobile-touch .soc-pledge-note-row .btn,
-  body.mobile-touch .lb-pledge-btn {
+  body.mobile-touch .lb-pledge-btn,
+  body.mobile-touch #guild-board-window .gb-filter-chip,
+  body.mobile-touch #guild-board-window .gb-show-all {
     min-height: 40px;
+  }
+  /* The guild board's presence dot sits inline in a 26px ranked row, where a
+     40px box would break the row rhythm, so its 24px visual keeps the row and
+     the 40px floor rides an invisible ::after hit extension (the compact
+     tracker chip idiom, tests/browser/target_size.browser.test.ts). The
+     legend stays visible on touch: the dot is actionable information and its
+     meaning must not depend on discovering a long-press. */
+  body.mobile-touch #guild-board-window .gb-presence::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
+  /* The scrolling body clips at its edge, so the LAST row's dot keeps its
+     8px reach below the row (the same reach every other row has). */
+  body.mobile-touch #guild-board-window .gb-body {
+    padding-bottom: 8px;
   }
   /* Three 16px digits did not fit the desktop 52px coin box: a five-digit gold
      value scrolled inside it. */

@@ -3,12 +3,8 @@
 // runs without ever constructing the pg pool: the fakes have zero runtime imports,
 // so this suite needs no DATABASE_URL, no mock, and no live Postgres.
 import { describe, expect, it } from 'vitest';
-import type {
-  ArenaLeaderRow,
-  CharacterRow,
-  GuildLeaderRow,
-  LifetimeXpLeaderRow,
-} from '../../../server/db';
+import type { ArenaLeaderRow, CharacterRow, LifetimeXpLeaderRow } from '../../../server/db';
+import type { GuildLeaderRow } from '../../../server/guild_board_db';
 import type { LiveReportTarget } from '../../../server/moderation_db';
 import { FakeCharactersDb, FakeLeaderboardDb, FakeReportsDb } from './fake_db';
 
@@ -139,6 +135,7 @@ describe('FakeLeaderboardDb', () => {
         pledgesEnabled: true,
         pledgeMinLevel: 1,
         pledgeNote: '',
+        newPlayerFriendly: false,
       },
     ];
     db.seedArena(arena);

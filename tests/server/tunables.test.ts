@@ -1018,13 +1018,25 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     for (const decl of [
       'export async function topArenaRatings',
       'export async function topLifetimeXp',
-      'export async function topGuilds',
       'export async function deedsBoardRanked',
     ]) {
       expect(bodyOf(dbSrc, decl)).toContain(
         'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
       );
     }
+    // The guild board's ranked aggregate moved out to server/guild_board_db.ts
+    // (the monolith ratchet) and rides the same raised allowance; its sibling
+    // officer-roster read deliberately takes a tighter bound of its own and a
+    // row cap, so a slow roster degrades to a presence-free page rather than
+    // holding a board request for the heavy allowance twice over.
+    const guildBoardSrc = read('server/guild_board_db.ts');
+    expect(bodyOf(guildBoardSrc, 'export async function topGuilds')).toContain(
+      'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    );
+    const rosterBody = bodyOf(guildBoardSrc, 'export async function topGuildOfficers');
+    expect(rosterBody).toContain('runWithStatementTimeout(GUILD_BOARD_OFFICER_ROSTER_TIMEOUT_MS');
+    expect(rosterBody).toContain('LIMIT $2');
+    expect(guildBoardSrc).toContain('GUILD_BOARD_OFFICER_ROSTER_TIMEOUT_MS = 10_000');
     // Character saves share one owner that bounds BEGIN through COMMIT, rather
     // than the read-only wrapper used by aggregates. Since the pg_cancel
     // wiring, every save path rides db.ts's beginSaveTx wrapper (the ONE

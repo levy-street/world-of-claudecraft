@@ -71,6 +71,12 @@ vi.mock('../../server/db', async (importOriginal) => ({
   deedsBoardRanked: dbMocks.deedsBoardRanked,
   charactersForDeedsBoard: dbMocks.charactersForDeedsBoard,
 }));
+// topGuilds moved whole to server/guild_board_db.ts (the monolith ratchet);
+// the guild-board cases below still drive it through the same hoisted mock.
+vi.mock('../../server/guild_board_db', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../server/guild_board_db')>()),
+  topGuilds: dbMocks.topGuilds,
+}));
 vi.mock('../../server/deeds_db', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../server/deeds_db')>()),
   deedRarityCounts: dbMocks.deedRarityCounts,
@@ -80,14 +86,10 @@ vi.mock('../../server/reliquary_rarity_db', async (importOriginal) => ({
   reliquaryRarityCounts: dbMocks.reliquaryRarityCounts,
 }));
 
-import type {
-  ArenaLeaderRow,
-  DeedsBoardCharacterRow,
-  GuildLeaderRow,
-  LifetimeXpLeaderRow,
-} from '../../server/db';
+import type { ArenaLeaderRow, DeedsBoardCharacterRow, LifetimeXpLeaderRow } from '../../server/db';
 import type { RankedDeedsAccount } from '../../server/deeds_board';
 import type { DeedRarityAggregate } from '../../server/deeds_db';
+import type { GuildLeaderRow } from '../../server/guild_board_db';
 import { ARENA_LEADERBOARD_LIMIT } from '../../server/leaderboard';
 import { boardReadTestSeam } from '../../server/main';
 import { resetPublicReadRateLimits } from '../../server/ratelimit';
@@ -166,6 +168,7 @@ function guildRows(tag: string): GuildLeaderRow[] {
       pledgesEnabled: true,
       pledgeMinLevel: 1,
       pledgeNote: '',
+      newPlayerFriendly: false,
     },
   ];
 }
@@ -493,6 +496,25 @@ describe('stale-serve on error: a refresh failure serves the last-good cache', (
     expect(dbMocks.topLifetimeXp).toHaveBeenCalledTimes(2);
     expect(served).toBe(good);
     expect(served).not.toEqual([]);
+  });
+
+  it('getGuildLeaderboard(realm): the category opt-in rides the cached entry, omitted when off', async () => {
+    // The one line carrying new_player_friendly from the Postgres row into the
+    // served board entry (guild board categories): an opted-in guild wears the
+    // flag, an opted-out one carries no key at all (the pledgeNote treatment).
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-07-11T12:00:00.000Z'));
+    const rows = guildRows('seed');
+    dbMocks.topGuilds.mockResolvedValueOnce([
+      { ...rows[0], name: 'Open Arms', newPlayerFriendly: true },
+      { ...rows[0], name: 'Quiet', newPlayerFriendly: false },
+    ]);
+    const entries = await seam.getGuildLeaderboard('realm');
+    expect(entries.map((e) => [e.name, e.newPlayerFriendly])).toEqual([
+      ['Open Arms', true],
+      ['Quiet', undefined],
+    ]);
+    expect('newPlayerFriendly' in entries[1]).toBe(false);
   });
 
   it('getGuildLeaderboard(realm): serves the previous entries, not []', async () => {

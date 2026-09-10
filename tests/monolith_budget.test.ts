@@ -1423,7 +1423,9 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 10095,
+    // Guild board categories: the guild_pledge_settings dispatch arm's field
+    // validation moved to server/guild_pledge_settings_cmd.ts. Exact count.
+    ceiling: 10089,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1566,7 +1568,10 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // Guild board categories: the board path builder, the page decode and
+    // the pledge-settings frame decode moved to src/net/guild_board_wire.ts.
+    // Exact count.
+    ceiling: 5532,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1715,7 +1720,10 @@ const MONOLITHS: MonolithRow[] = [
     // reach it directly), unlike createCharacterCapped's pure re-export.
     // Exact count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
-    ceiling: 4744,
+    // LOWERED 4744 -> 4670 with guild board categories: topGuilds and its
+    // GuildLeaderRow moved whole to server/guild_board_db.ts beside the new
+    // officer-roster read. Exact count, zero slack.
+    ceiling: 4670,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

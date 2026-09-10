@@ -16,6 +16,7 @@ import type {
   DailyRewardStatus,
   DelveCompanionInfo,
   DelveRunInfo,
+  GuildPledgeSettings,
   LockpickView,
   MountRaceView,
   PlayerProfessionsView,
@@ -9732,9 +9733,8 @@ export class Sim {
     duelMod.duelDecline(this.ctx, pid);
   }
 
-  // Persistent social systems (friends / ignore / guilds) require an account
-  // and database, so they only exist in online play. The offline Sim satisfies
-  // the IWorld surface with inert stubs.
+  // Persistent social systems (friends / ignore / guilds) need an account and a
+  // database, so they exist online only; the offline Sim carries inert stubs.
   realm = '';
   // Offline the player owns the world, so admin-gated dev surfaces are open.
   accountAdmin = true;
@@ -9752,7 +9752,7 @@ export class Sim {
   guildPledge(_name: string): void {}
   guildPledgeWithdraw(): void {}
   guildPledgeDecide(_name: string, _accept: boolean): void {}
-  setGuildPledgeSettings(_enabled: boolean, _minLevel: number, _note: string): void {}
+  setGuildPledgeSettings(_settings: GuildPledgeSettings): void {}
   guildAccept(): void {}
   guildDecline(): void {}
   guildLeave(): void {}

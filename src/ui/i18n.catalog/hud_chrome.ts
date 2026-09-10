@@ -1344,6 +1344,10 @@ export const hudChromeStrings = {
     noteLabel: 'Board note',
     notePlaceholder: 'Tell aspiring members what your guild is looking for',
     save: 'Save',
+    // Guild board categories (src/sim/guild_board_category.ts): the
+    // new-player-friendly opt-in in the same editor, and its helper line.
+    newPlayerFriendlyLabel: 'New player friendly',
+    newPlayerFriendlyHint: "Shown on the recruits' board at the Proving Shore signpost.",
     // The unguilded viewer's own standing pledge (social window guild tab).
     yourPledge: 'Your pledge: {guild}',
     since: 'Pledged {date}',
@@ -5267,6 +5271,26 @@ export const hudChromeStrings = {
     subtitle: 'Guilds of the realm',
     rosterTitle: 'View the roster of {guild}',
     back: 'Back',
+    // The category filter strip above the ranking (one tick box per
+    // category, src/sim/guild_board_category.ts) and the row chip a guild
+    // that opted in wears; the Proving Shore signpost opens with the box
+    // ticked. filterEmpty + showAll are the filtered board's empty state.
+    filters: 'Board filters',
+    newPlayerFriendly: 'New player friendly',
+    newPlayerFriendlyTitle: 'This guild welcomes new players',
+    filterNewPlayersTitle: 'Show only guilds that welcome new players',
+    filterEmpty: 'No guild has opened its doors to new players yet.',
+    showAll: 'Show all guilds',
+    // The live "officers online" dot beside a guild name: the legend in the
+    // filter strip, the tooltip title, and the dot's accessible name
+    // ({names} is a localized list of "Name (Rank)" entries).
+    officersOnline: 'Officers online',
+    officersOnlineLabel: 'Officers online: {names}',
+    // One entry of that list: the officer's name and localized rank.
+    officerEntry: '{name} ({rank})',
+    // The strip's live count line ({count} pre-formatted): a screen reader
+    // hears how many guilds a read (or a filter flip) produced.
+    filterCount: '{count} guilds shown',
     // The 'listings' arm of the noticeboard event opens the signpost popup
     // (src/ui/noticeboard_popup.ts). Guild names and notes are world data,
     // spliced verbatim like player names, never translated.

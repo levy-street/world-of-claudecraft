@@ -36,9 +36,9 @@ import {
   lifetimeXpStanding,
   pool,
   topArenaRatings,
-  topGuilds,
   topLifetimeXp,
 } from '../../server/db';
+import { topGuildOfficers, topGuilds } from '../../server/guild_board_db';
 import { moderateAccount, setOnAccountModerated } from '../../server/moderation_db';
 
 // The one eligibility predicate, pinned as a LITERAL (never the exported
@@ -124,6 +124,20 @@ describe('every ranked board query embeds the fragment', () => {
 
   it('guilds, global arm', async () => {
     await expectExcludes(() => topGuilds(10, { global: true }), 'a.id = c.account_id');
+  });
+
+  it('the guild board officer roster (topGuildOfficers) screens members and is realm-scoped', async () => {
+    // The presence layer's roster (guild board categories, "officers online"):
+    // a banned officer's name must never light a dot even through a stale
+    // roster, so the read embeds the same eligibility fragment as topGuilds.
+    await expectExcludes(() => topGuildOfficers(), 'a.id = c.account_id');
+    const [sql] = await capturedSql(() => topGuildOfficers());
+    // Realm-scoped (presence intersects THIS process's sessions), officer-plus
+    // only, the Guild Master first inside a guild, and an explicit row cap.
+    expect(sql).toContain('WHERE g.realm = $1');
+    expect(sql).toContain("gm.rank IN ('leader', 'officer')");
+    expect(sql).toContain("CASE gm.rank WHEN 'leader' THEN 0 ELSE 1 END");
+    expect(sql).toContain('LIMIT $2');
   });
 
   it('deeds (the Renown roll-up aggregation embeds the fragment at BOTH eligibility sites)', async () => {
@@ -374,6 +388,9 @@ describe('main.ts wiring', () => {
     expect(body).toContain("arenaLeaderboardCache['2v2'] = null");
     expect(body).toContain('deedsBoardCache = null');
     expect(body).toContain('bustDailyRewardBoardCache()');
+    // The guild board's officer roster (guild_board_presence.ts): a moderated
+    // officer's name leaves the presence tooltip as fast as the boards.
+    expect(body).toContain('guildBoardPresence.bust()');
     // Not a board, but the same immediacy: the per-character lifetime-XP rank
     // cache (server/character_rank_cache.ts). A ban/unban changes every OTHER
     // eligible character's ahead/total counts, so the whole cache is dropped

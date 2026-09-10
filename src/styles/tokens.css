@@ -158,6 +158,9 @@
        light panel, and keeps --color-text-overlay light with a text-shadow. */
     --color-gold: var(--gold);
     --color-accent: var(--gold);
+    /* The one home of the online-presence green: the social window's status
+       dot and the guild board's officer dot both read it. */
+    --color-status-online: #46d246;
     --color-text-overlay: #f4eede;
     --text-outline-color: #000000;
     --panel-edge: #08080d;

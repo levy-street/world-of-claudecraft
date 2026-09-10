@@ -2255,6 +2255,199 @@
   #guild-board-window .gb-rank-chip.gb-rank-leader {
     color: var(--gold);
   }
+  /* Guild board categories (src/sim/guild_board_category.ts). The filter
+     strip sits between the title and the column header: one tick-box chip per
+     category (the deed/reliquary filter-chip family's shape and `.active`
+     state, over a real checkbox inside a label so base.css's gold accent and
+     focus ring apply to the box and the chip carries a focus-within ring of
+     its own), an off-screen live count line, and, at the right edge, the
+     presence legend that explains the green dot without a hover. */
+  #guild-board-window .gb-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin: 0 0 6px;
+    padding: 6px 4px 8px;
+    border-bottom: 1px solid var(--color-border-showcase);
+  }
+  #guild-board-window .gb-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 30px;
+    padding: 0 12px 0 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: #ffffff08;
+    color: #e6dcc0;
+    font-size: 12px;
+    cursor: var(--cursor-point);
+    transition:
+      border-color 90ms ease-out,
+      background-color 90ms ease-out,
+      color 90ms ease-out;
+  }
+  #guild-board-window .gb-filter-chip:hover {
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+  #guild-board-window .gb-filter-chip.active {
+    border-color: #6fbf7a;
+    background: #6fbf7a1f;
+    color: #d6f5da;
+  }
+  #guild-board-window .gb-filter-chip:focus-within {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  #guild-board-window .gb-filter-chip input {
+    margin: 0;
+  }
+  /* The live count line: read by assistive tech, never painted (the
+     .ta-own-marker clip idiom). */
+  #guild-board-window .gb-filter-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  #guild-board-window .gb-filter-icon,
+  #guild-board-window .gb-tag-icon,
+  #guild-board-window .soc-pledge-category-icon {
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    color: #8fe09a;
+  }
+  #guild-board-window .gb-filter-icon svg,
+  #guild-board-window .gb-tag-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+  #guild-board-window .gb-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  /* The name cell becomes a flex pair (the roster link + the presence dot)
+     so a long guild name still ellipsizes and the dot never wraps away. The
+     cell itself must NOT clip (the .lb-name base does): the ellipsis moves to
+     the link, and the dot's touch hit extension reaches past the cell box. */
+  #guild-board-window .gb-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: visible;
+  }
+  #guild-board-window .gb-name-cell .gb-roster-link {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* The "officers online" dot: the social window's .soc-dot.online (one
+     green, one home: --color-status-online) inside a real button (keyboard
+     focus opens the shared tooltip) whose box clears the 24px SC 2.5.8
+     desktop floor around the 10px dot. The soft pulse rides the effects tier
+     and the reduced-motion kills below (DESIGN.md 4.6: at most twice a
+     second; here once every two). */
+  #guild-board-window .gb-presence {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: var(--cursor-point);
+  }
+  #guild-board-window .gb-presence:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  #guild-board-window .gb-presence .gb-presence-dot {
+    animation: gb-presence-pulse calc(2s * var(--motion-scale, 1)) ease-in-out infinite;
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  #guild-board-window .gb-presence:hover .gb-presence-dot,
+  #guild-board-window .gb-presence:focus-visible .gb-presence-dot {
+    box-shadow: 0 0 8px var(--color-status-online);
+  }
+  @keyframes gb-presence-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 4px color-mix(in srgb, var(--color-status-online) 53%, transparent);
+    }
+    50% {
+      box-shadow: 0 0 9px color-mix(in srgb, var(--color-status-online) 82%, transparent);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #guild-board-window .gb-presence .gb-presence-dot {
+      animation: none;
+    }
+  }
+  body.reduce-motion #guild-board-window .gb-presence .gb-presence-dot {
+    animation: none;
+  }
+  /* The category chip on the recruiting sub-line: the same green family as
+     the accepting status, read as a tag rather than a status. */
+  #guild-board-window .gb-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 1px 8px 1px 6px;
+    border: 1px solid #6fbf7a66;
+    border-radius: 999px;
+    background: #6fbf7a14;
+    color: #bfeec6;
+    font-size: 11px;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+  /* The filtered board's empty state: the message and the way back. */
+  #guild-board-window .gb-filter-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 22px 8px;
+  }
+  #guild-board-window .gb-show-all {
+    font-size: 11.5px;
+    padding: 6px 14px;
+  }
+  /* The presence tooltip's officer lines (rendered into the shared #tooltip). */
+  #tooltip .gb-presence-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 3px;
+    font-size: 12px;
+  }
+  #tooltip .gb-presence-line .gb-rank-chip {
+    min-width: 76px;
+    font-size: 10.5px;
+    color: var(--color-text-muted);
+  }
+  #tooltip .gb-presence-line .gb-rank-chip.gb-rank-leader {
+    color: var(--gold);
+  }
   #daily-rewards-window {
     top: 24px;
     width: min(1040px, calc(100vw - 40px));
@@ -12247,8 +12440,8 @@
     box-shadow: 0 0 4px #0008;
   }
   .soc-dot.online {
-    background: #46d246;
-    box-shadow: 0 0 5px #46d246aa;
+    background: var(--color-status-online);
+    box-shadow: 0 0 5px color-mix(in srgb, var(--color-status-online) 67%, transparent);
   }
   .soc-dot.combat {
     background: #ff5040;
@@ -12561,6 +12754,27 @@
     padding: 4px 6px;
     font-size: 12px;
     text-align: center;
+  }
+  /* The category opt-in row under the accepting toggle: the board's sprout
+     glyph beside the label, and the muted helper line under it. */
+  .soc-pledge-category {
+    display: flex;
+    margin-top: 4px;
+  }
+  .soc-pledge-category-icon {
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    color: #8fe09a;
+  }
+  .soc-pledge-category-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+  .soc-pledge-hint {
+    margin: 0 0 4px 24px;
+    font-size: 11px;
+    color: var(--color-text-muted);
   }
   .soc-pledge-note-row {
     display: flex;
