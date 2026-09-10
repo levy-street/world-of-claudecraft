@@ -211,6 +211,7 @@ import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
 import { decodeEntityFlairWire } from './entity_flair_wire';
 import { reanchorDecision } from './entity_reanchor';
 import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
+import { openGuardedSocket } from './guarded_socket';
 import { GuildBankLogMirror } from './guild_bank_log_mirror';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
@@ -1896,14 +1897,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
     const wsUrl = this.base
       ? `${this.base.replace(/^http/, 'ws')}/ws`
       : buildWebSocketUrl(location.protocol, location.host);
-    this.ws = new WebSocket(wsUrl);
-    this.ws.onopen = () => {
-      this.ws.send(
+    this.ws = openGuardedSocket(wsUrl, () => this.ws, {
+      auth: () =>
         JSON.stringify(buildWebSocketAuthMessage(this.token, this.characterId, this.clientSeed)),
-      );
-    };
-    this.ws.onmessage = (ev) => this.onMessage(String(ev.data));
-    this.ws.onclose = () => this.socketClosed();
+      message: (data) => this.onMessage(data),
+      close: () => this.socketClosed(),
+    });
   }
 
   // A dropped socket schedules a reconnect with exponential backoff: the

@@ -1566,7 +1566,9 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // RE-PINNED when the guarded-socket sibling took the socket handler wiring
+    // (zombie late-close fix): the file measures 5539. Exact count, zero slack.
+    ceiling: 5539,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
