@@ -339,8 +339,17 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // impaled and freed when their spikes died, and the eruption burst then burned.
     expect(n.spikeIds.length).toBe(2);
     expect(auras.some((e) => e.name === 'Dread Curse')).toBe(true);
-    // Two from the forced slice 1 cast, two more from the mid-storm spike.
-    expect(auras.filter((e) => e.name === 'Impaled').length).toBe(4);
+    // Two from the forced slice 1 cast (t = 2.2 s). The mid-storm spike lands
+    // at t = 56.35 s, inside the 55 s per-raider cooldown (v0.42.2), so it may
+    // not re-pick either of them; with the current charge target holding
+    // aggro and the fourth mage standing in a slam's Gravefire, the only
+    // eligible raider is the tank the storm freed from threat: one more
+    // impale, not two, and never a repeat.
+    const impaled = auras.filter((e) => e.name === 'Impaled') as Array<{ targetId: number }>;
+    expect(impaled.length).toBe(3);
+    const firstWave = new Set(impaled.slice(0, 2).map((e) => e.targetId));
+    expect(firstWave.size).toBe(2);
+    expect(firstWave.has(impaled[2].targetId)).toBe(false);
     const callouts = ev.filter((e) => e.type === 'nythraxisCallout') as Array<{ call: string }>;
     expect(callouts.some((e) => e.call === 'youAreImpaled')).toBe(true);
     expect(callouts.some((e) => e.call === 'spikeBroken')).toBe(true);
@@ -348,9 +357,10 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(damage.some((e) => e.ability === 'Bone Spike')).toBe(true);
     expect(damage.some((e) => e.ability === 'Grave Eruption')).toBe(true);
     expect(damage.some((e) => e.ability === 'Grave Flame')).toBe(true);
-    // Slice 2: Soulfire burned the stacked mages after the Soul Rend detonation,
-    // Gravefire ran at the mages, and the sigil flared and was bound.
-    expect(damage.some((e) => e.ability === 'Soulfire')).toBe(true);
+    // Slice 2: the Soul Rend detonation left no fire (Soulfire retired in
+    // v0.42.2, so no Soulfire tick may appear in the trace), Gravefire ran at
+    // the mages, and the sigil flared and was bound.
+    expect(damage.some((e) => e.ability === 'Soulfire')).toBe(false);
     expect(damage.some((e) => e.ability === 'Gravefire')).toBe(true);
     expect(callouts.some((e) => e.call === 'gravefireTarget')).toBe(true);
     expect(callouts.some((e) => e.call === 'sigilAppears')).toBe(true);

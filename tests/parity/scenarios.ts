@@ -3445,10 +3445,10 @@ function nythraxisFullPull(): Scenario {
       step(20 * 6); // the 5s self-stun expires
 
       // ----- Slice 2, each fired once: Gravefire, then the Binding Sigil (bound) -----
-      // The Soul Rend detonation above already left Soulfire under the stacked
-      // mages, who have been standing in it since (the Soulfire ticks are in
-      // the trace). Gravefire: the one rng.int target pick, then the line runs
-      // at the mages 20 yd out and burns whoever it reaches.
+      // The Soul Rend detonation above left nothing behind (Soulfire retired
+      // in v0.42.2, so the trace carries no Soulfire ticks). Gravefire: the
+      // one rng.int target pick, then the line runs at the mages 20 yd out
+      // and burns whoever it reaches.
       nyx().majorGapTimer = 0;
       nyx().gravefireTimer = DT;
       step(1); // castNythraxisGravefire -> rng.int pick, line ignites at the boss's feet
