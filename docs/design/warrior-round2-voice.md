@@ -21,7 +21,7 @@ The fronts express caster presence, not an exact range boundary: several party e
 
 ## Review and implementation
 
-The first air prototype was rejected for weak visibility. Compression edges were broadened and given a dark contrast band, retaining real geometric gaps rather than filling the effect with smoke. The supportive chest silhouettes were then strengthened after review of the delivered native tracks. Each of the seven new clips retains its equipment sockets, loads the hips and recovers in .57–.72 seconds. All 33 earlier clips remain identical.
+The first air prototype was rejected for weak visibility. Compression edges were broadened and given a dark contrast band, retaining real geometric gaps rather than filling the effect with smoke. The supportive chest silhouettes were then strengthened after review of the delivered native tracks. Each of the seven new clips retains its equipment sockets, loads the hips and recovers in .57 to .72 seconds. All 33 earlier clips remain identical.
 
 Goad now uses the existing authored pressure texture through a new prepared airborne geometry. It does not sample ground height or launch soil from the mouth. Defiant Bellow receives the same once-per-release symbolic swearing as Goad. Intimidating Shout's shout/nova phases share the gesture deduplicator, preventing an animation restart.
 
