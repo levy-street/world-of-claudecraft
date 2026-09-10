@@ -18,8 +18,8 @@ android {
         applicationId "com.worldofclaudecraft"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 56
-        versionName "0.42.1"
+        versionCode 57
+        versionName "0.42.2"
         buildConfigField "long", "PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER", "${playIntegrityCloudProjectNumber}L"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
