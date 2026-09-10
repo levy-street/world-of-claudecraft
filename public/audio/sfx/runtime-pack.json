@@ -1,7 +1,7 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "45b210e3dde2c88cb94a4387357ded22518e6ba770f6855c871bcdafd0867dc4",
+  "bundleId": "0b04ff3c380805e8d862071e5fd81fa0a74e6105eea83ad54a50be10b08d0a0a",
   "catalogHash": "1dd6712880426cac661a9c28056e91df495429c2645764fcafcec54b6232733f",
   "clips": {
     "amb_birds": {
@@ -1556,15 +1556,15 @@
       "variants": [
         {
           "id": "1",
-          "url": "/audio/sfx/impact_warrior_red_harvest_finish_1.mp3?v=1a1750d968ec",
-          "bytes": 6940,
-          "sha256": "1a1750d968ec8f1b028053883c16ff6abaa1d82d2ea55d31bf815f046eeec936"
+          "url": "/audio/sfx/impact_warrior_red_harvest_finish_1.mp3?v=f8d6e04b8062",
+          "bytes": 7567,
+          "sha256": "f8d6e04b8062b29aff2cbacab0ec0f4bef744dee35b99c6c39fbe73713529588"
         },
         {
           "id": "2",
-          "url": "/audio/sfx/impact_warrior_red_harvest_finish_2.mp3?v=61b084ea2b39",
-          "bytes": 6940,
-          "sha256": "61b084ea2b39eef18785db0daf466ff1f797bc882c2914c0e837eb589b013664"
+          "url": "/audio/sfx/impact_warrior_red_harvest_finish_2.mp3?v=51008df3e442",
+          "bytes": 7567,
+          "sha256": "51008df3e442d35ab69ffd8ef3e47796a3222126f3403519ae6058f29ba7f772"
         }
       ],
       "gain": 1,
@@ -1574,15 +1574,15 @@
       "variants": [
         {
           "id": "1",
-          "url": "/audio/sfx/impact_warrior_red_harvest_first_1.mp3?v=031b0bac669c",
+          "url": "/audio/sfx/impact_warrior_red_harvest_first_1.mp3?v=e0a6fc3b6940",
           "bytes": 5686,
-          "sha256": "031b0bac669cc08836614acc2aeca4a4066c52b98cba373c837466963ca90afe"
+          "sha256": "e0a6fc3b69404ce576235df3cfb8792ac5dd31fd28f8c961cce9f38557ca149c"
         },
         {
           "id": "2",
-          "url": "/audio/sfx/impact_warrior_red_harvest_first_2.mp3?v=c396f9fe3859",
+          "url": "/audio/sfx/impact_warrior_red_harvest_first_2.mp3?v=9a6ced4af541",
           "bytes": 5686,
-          "sha256": "c396f9fe38597dc372e0871af8506a1812e1983587bc85f062bfcd0e901304fc"
+          "sha256": "9a6ced4af541af82dbbbc29b1d60b65092ee5604018371ebc8f7b74ed46bc753"
         }
       ],
       "gain": 1,
@@ -1592,15 +1592,15 @@
       "variants": [
         {
           "id": "1",
-          "url": "/audio/sfx/impact_warrior_red_harvest_second_1.mp3?v=9f073bd683fc",
+          "url": "/audio/sfx/impact_warrior_red_harvest_second_1.mp3?v=01fb04e0496b",
           "bytes": 5686,
-          "sha256": "9f073bd683fcc1fff7b9325a27b1fb3544936fe07ee3ceac77e966f6bb25aedf"
+          "sha256": "01fb04e0496ba8744bbb2e58b816851c572a31debabf7fb80652459e9f283006"
         },
         {
           "id": "2",
-          "url": "/audio/sfx/impact_warrior_red_harvest_second_2.mp3?v=f29be1aab1d7",
+          "url": "/audio/sfx/impact_warrior_red_harvest_second_2.mp3?v=76dff31562cc",
           "bytes": 5686,
-          "sha256": "f29be1aab1d722781784645c25f4aebcc469814d977e252368753366adfcfcab"
+          "sha256": "76dff31562ccb23c9a2952132fd8cd8ab60936f3f1af6392f1e2e780551273df"
         }
       ],
       "gain": 1,
@@ -2522,15 +2522,15 @@
       "variants": [
         {
           "id": "1",
-          "url": "/audio/sfx/melee_warrior_red_harvest_release_1.mp3?v=1742e90c41dc",
+          "url": "/audio/sfx/melee_warrior_red_harvest_release_1.mp3?v=680d31bdce1d",
           "bytes": 5059,
-          "sha256": "1742e90c41dc18196869a69aa27163dce0fe77ad1937d0d525cfc5dda7a7e736"
+          "sha256": "680d31bdce1d98cecd20554038687b87e2e82cc3d80b0dda4b424201938c2096"
         },
         {
           "id": "2",
-          "url": "/audio/sfx/melee_warrior_red_harvest_release_2.mp3?v=b97e8b402e65",
+          "url": "/audio/sfx/melee_warrior_red_harvest_release_2.mp3?v=e110a89fe078",
           "bytes": 5059,
-          "sha256": "b97e8b402e6516d57a6937bd8ddb9fc395e90f5387e6fb3b701cd9e21aa51ae4"
+          "sha256": "e110a89fe07846a1f76a3aa0ca22512412b47fa4f3e6fc0d45f8bfde4dc6e661"
         }
       ],
       "gain": 1,

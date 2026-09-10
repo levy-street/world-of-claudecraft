@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { buildFuryCutShape } from './fury_shapes';
+import { buildHarvestShape } from './harvest_shapes';
 import { buildIronguardShape, type IronguardShape } from './ironguard_shapes';
 import { buildRitualSculpture } from './ritual_sculptures';
 import type { Substance } from './signature_core';
@@ -23,6 +24,8 @@ export type CrestKind =
   | 'hook'
   | 'chain'
   | 'blood_cut'
+  | 'harvest_cut'
+  | 'harvest_eruption'
   | 'shield_contact'
   | 'steel_cut'
   | WarriorHeavyShape
@@ -38,6 +41,8 @@ export type CrestKind =
 export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
   const shapes = new Map<CrestKind, THREE.BufferGeometry>();
   shapes.set('blood_cut', buildFuryCutShape());
+  shapes.set('harvest_cut', buildHarvestShape(false));
+  shapes.set('harvest_eruption', buildHarvestShape(true));
   shapes.set('shield_contact', buildWarriorShield());
   shapes.set('steel_cut', buildWarriorBlade());
   for (const kind of ['steel_chop', 'steel_counter', 'steel_execution'] as const)

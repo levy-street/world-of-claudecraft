@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { describe, expect, it, vi } from 'vitest';
 import { furyBeat } from '../src/render/ability_vfx/fury_choreography';
 import { buildFuryCutShape } from '../src/render/ability_vfx/fury_shapes';
+import { buildHarvestShape } from '../src/render/ability_vfx/harvest_shapes';
 import type { SeqSlot, SequencerHost } from '../src/render/ability_vfx/sequencer';
 import {
   createMultiStrikeClip,
@@ -87,24 +88,31 @@ describe('Fury authored performance', () => {
       accent: 0xffd0ac,
     } as SeqSlot;
     furyBeat(host, slot, 0);
-    expect(crest.mock.calls[0][0]).toBeCloseTo(3 - (3 / 5) * 0.65);
-    expect(crest.mock.calls[0][1]).toBeCloseTo(3 * 0.51 + 0.08);
-    const firstWidth = crest.mock.calls[0][3];
+    expect(crest.mock.calls[0][0]).toBeCloseTo(3 - (3 / 5) * 0.25);
+    expect(crest.mock.calls[0][1]).toBeCloseTo(3 * 0.51);
+    const opening = buildHarvestShape(false),
+      ending = buildHarvestShape(true);
+    opening.computeBoundingBox();
+    ending.computeBoundingBox();
+    const firstWidth = opening.boundingBox!.getSize(new THREE.Vector3()).x * crest.mock.calls[0][3];
     const core = vi.mocked(host.pathRibbon).mock.calls[0];
     targetX = 8;
     furyBeat(host, slot, 2);
-    expect(crest.mock.calls[1][0]).toBeCloseTo(8 - (8 / Math.hypot(8, 4)) * 0.65);
-    expect(crest.mock.calls[1][3]).toBeGreaterThan(firstWidth * 1.3);
-    expect(crest.mock.calls).toHaveLength(3);
-    expect(crest.mock.calls[1][10]).toBeCloseTo(-crest.mock.calls[2][10]);
-    expect(crest.mock.calls[1][3]).toBe(crest.mock.calls[2][3]);
+    expect(crest.mock.calls[1][0]).toBeCloseTo(8 - (8 / Math.hypot(8, 4)) * 0.25);
+    const finalSize = ending.boundingBox!.getSize(new THREE.Vector3());
+    expect(finalSize.x * crest.mock.calls[1][3]).toBeGreaterThan(firstWidth * 1.3);
+    expect(finalSize.y * crest.mock.calls[1][4]).toBeGreaterThan(7);
+    expect(crest.mock.calls).toHaveLength(2);
+    expect(crest.mock.calls.map((call) => call[7])).toEqual(['harvest_cut', 'harvest_eruption']);
+    opening.dispose();
+    ending.dispose();
     expect(contact).toHaveBeenCalledTimes(2);
     vi.mocked(host.pathRibbon).mockClear();
     slot.tier = 1;
     furyBeat(host, slot, 0);
     const reducedCore = vi.mocked(host.pathRibbon).mock.calls[0];
     expect(reducedCore.slice(0, 3)).toEqual(core.slice(0, 3));
-    expect(crest.mock.calls.at(-1)![9]).toBe(0.23);
+    expect(crest.mock.calls.at(-1)![9]).toBeLessThanOrEqual(0.17);
   });
 });
 

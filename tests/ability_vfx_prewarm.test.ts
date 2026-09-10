@@ -25,6 +25,8 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const textures = {
     smoke: new Texture(),
     shout_dust: new Texture(),
+    warrior_power: new Texture(),
+    harvest_impact: new Texture(),
     shockwave: new Texture(),
     pyroblast: new Texture(),
     frost_nova: new Texture(),
@@ -55,9 +57,11 @@ vi.mock('../src/render/ability_vfx/simulation_assets', async () => {
 
 import { FLIPBOOK_STYLES } from '../src/render/ability_vfx/fx_textures';
 import {
+  abilityVfxBootTextureDependencies,
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
+import { bakedTexture } from '../src/render/ability_vfx/production_assets';
 
 // The canvas textures are procedurally drawn, so a plain Node run needs a 2D
 // context stub (same shape as the ability-VFX and vfx suites use).
@@ -114,11 +118,13 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     expect(ids).toContain('signature-atlas');
     expect(ids).toContain('production:smoke');
     expect(ids).toContain('production:shout_dust');
+    expect(ids).toContain('production:warrior_power');
+    expect(ids).toContain('production:harvest_impact');
     expect(ids).toContain('production:shockwave');
     for (const key of ['normal', 'motion', 'lighting'])
       expect(ids).toContain(`liquid-surface:${key}`);
     for (const id of ['contact_cut', 'contact_crush', 'contact_pierce']) expect(ids).toContain(id);
-    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 17);
+    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 19);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -139,6 +145,15 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     // No canvas stub installed: constructing the steps must stay inert, since
     // the renderer builds the unit list inside the entry-time manifest loop.
     expect(() => abilityVfxTexturePrewarmSteps()).not.toThrow();
+  });
+});
+
+describe('abilityVfxBootTextureDependencies', () => {
+  it('returns warrior_power and harvest_impact as the two boot texture dependencies', () => {
+    const deps = abilityVfxBootTextureDependencies();
+    expect(deps).toHaveLength(2);
+    expect(deps).toContain(bakedTexture('warrior_power'));
+    expect(deps).toContain(bakedTexture('harvest_impact'));
   });
 });
 

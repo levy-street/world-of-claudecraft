@@ -4,6 +4,7 @@
 import { mkdir } from 'node:fs/promises';
 import { dedup, prune } from '@gltf-transform/functions';
 import { Euler, Quaternion } from 'three';
+import { createHarvestStance } from './anim/harvest_pose.mjs';
 import {
   bakeClip,
   blendValue,
@@ -37,6 +38,7 @@ for (const donor of donors)
   }
 const keys = [...new Set(donors.flatMap((donor) => [...donor.keys()]))];
 const idle = samplePose(donors[0], 0.3);
+const harvestStance = createHarvestStance(root, idle);
 const sample = (donor, time) => samplePose(donors[donor], time);
 const q = new Quaternion(),
   offset = new Quaternion(),
@@ -81,11 +83,15 @@ const rightCoil = pose(sample(1, 0.27), sample(2, 0.28), -32, -6, 8);
 const rightCut = pose(sample(1, 0.38), sample(2, 0.28), 30, 11, 2);
 const leftCoil = pose(sample(1, 0.78), sample(2, 0.32), 36, -3, 14);
 const leftCut = pose(sample(1, 0.88), sample(2, 0.87), -38, 14, 7);
-const reapCoil = pose(sample(1, 0.41), sample(2, 1.08), 12, 8, 8, sample(2, 0.95));
 // Preserve the native torso with the arm chains: the old Idle torso plus chop
 // arms pointed both actual sword blades behind the caster at the impact peak.
 const reapCut = pose(sample(1, 0.38), sample(2, 0.87), 12, 8, 8, sample(2, 0.87));
-const follow = pose(sample(1, 0.37), sample(2, 0.87), 12, -8, 8, sample(2, 0.95));
+const harvestCoil = pose(sample(1, 0.27), sample(2, 0.28), -38, 5, 8);
+const harvestFirst = pose(sample(1, 0.38), sample(2, 0.28), 35, 15, 2);
+const harvestReverse = pose(sample(1, 0.78), sample(2, 0.32), 38, 5, 14);
+const harvestSecond = pose(sample(1, 0.88), sample(2, 0.87), -40, 18, 7);
+const harvestLow = pose(sample(2, 0.87), sample(2, 0.87), -5, 18, 5, sample(2, 0.87));
+const harvestHigh = pose(sample(2, 0.28), sample(2, 0.28), 0, -12, 5, sample(2, 0.28));
 const clips = [];
 for (const [name, beats] of [
   [
@@ -105,16 +111,16 @@ for (const [name, beats] of [
     'Fury_Red_Harvest',
     [
       [0, idle],
-      [0.075, rightCoil],
-      [0.15, rightCut],
-      [0.166, rightCut],
-      [0.245, leftCoil],
-      [0.32, leftCut],
-      [0.337, leftCut],
-      [0.405, reapCoil],
+      [0.075, harvestCoil],
+      [0.15, harvestFirst],
+      [0.166, harvestFirst],
+      [0.245, harvestReverse],
+      [0.32, harvestSecond],
+      [0.337, harvestSecond],
+      [0.42, harvestLow],
       [0.49, reapCut],
-      [0.515, reapCut],
-      [0.585, follow],
+      [0.53, reapCut],
+      [0.595, harvestHigh],
       [0.72, idle],
     ],
   ],
@@ -128,10 +134,12 @@ for (const [name, beats] of [
       const t = step / steps;
       // Ease in/out retains distinct loaded poses without a robotic stop.
       const weight = t * t * (3 - 2 * t);
-      timeline.push([
-        start + (end - start) * t,
-        (key) => blendValue(key, from.get(key), to.get(key), weight),
-      ]);
+      const time = start + (end - start) * t;
+      const blended = new Map(
+        keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)]),
+      );
+      const authored = name === 'Fury_Red_Harvest' ? harvestStance(blended, time) : blended;
+      timeline.push([time, (key) => authored.get(key)]);
     }
   }
   clips.push(

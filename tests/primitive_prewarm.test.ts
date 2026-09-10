@@ -17,8 +17,11 @@ vi.mock('../src/render/ability_vfx/prewarm', () => ({
 }));
 vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const { Texture } = await import('three');
-  const texture = new Texture();
-  return { bakedTexture: () => texture };
+  const textures: Record<string, THREE.Texture> = {
+    warrior_power: new Texture(),
+    harvest_impact: new Texture(),
+  };
+  return { bakedTexture: (kind: string) => textures[kind] ?? null };
 });
 
 function fixture() {
@@ -95,15 +98,20 @@ beforeEach(() => {
   vi.mocked(abilityVfxBootTextureDependencies).mockReset().mockReturnValue([]);
 });
 
-it.each([false, true])(
-  'prepares a gated remote plume during non-Warrior boot (trimmed=%s)',
-  async (trimmed) => {
+it.each<[boolean, 'warrior_power' | 'harvest_impact']>([
+  [false, 'warrior_power'],
+  [true, 'warrior_power'],
+  [false, 'harvest_impact'],
+  [true, 'harvest_impact'],
+])(
+  'prepares a gated remote plume during non-Warrior boot (trimmed=%s, kind=%s)',
+  async (trimmed, kind) => {
     const h = fixture(),
       ready = new WeakSet<THREE.Texture>();
-    const texture = bakedTexture('warrior_power')!;
+    const texture = bakedTexture(kind)!;
     vi.mocked(abilityVfxBootTextureDependencies).mockReturnValue([texture]);
     const pool = new BakedImpactLayers(h.host.scene, (t) => ready.has(t));
-    const spawn = () => pool.spawn('warrior_power', 0, 1, 0, 5, 0xffffff, 0xffffff, 0.3, 0, 1, 0);
+    const spawn = () => pool.spawn(kind, 0, 1, 0, 5, 0xffffff, 0xffffff, 0.3, 0, 1, 0);
     expect(spawn()).toBe(false);
     h.host.texture.mockImplementation((t) => {
       ready.add(t);

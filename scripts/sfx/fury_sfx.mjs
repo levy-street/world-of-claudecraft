@@ -1,4 +1,5 @@
 /** Curated Warrior material recordings, protected from bulk regeneration. */
+import { HARVEST_IMPACT_SFX } from './harvest_impact_sfx.mjs';
 export const FURY_SFX = [
   {
     key: 'melee_warrior_twinstrike_release',
@@ -42,4 +43,11 @@ export const FURY_SFX = [
     prompt:
       'One overwhelming instantaneous two-blade rising cleave landing together: deep physical slam beneath a wide wet ripping slash, sharp steel shear, then a brief falling debris rattle. A huge rage finisher with real body weight. Compact dry close perspective, no booming explosion, no voice, no music, no ambience, no long reverb.',
   },
-].map((cue) => ({ ...cue, custom: true, variants: [{}, {}] }));
+].map(
+  (cue) =>
+    HARVEST_IMPACT_SFX.find((authored) => authored.key === cue.key) ?? {
+      ...cue,
+      custom: true,
+      variants: [{}, {}],
+    },
+);

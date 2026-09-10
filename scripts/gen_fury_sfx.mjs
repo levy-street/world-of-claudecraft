@@ -5,13 +5,19 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { FURY_SFX } from './sfx/fury_sfx.mjs';
+import { HARVEST_IMPACT_SFX } from './sfx/harvest_impact_sfx.mjs';
 import { WARRIOR_CONTACT_SFX } from './sfx/warrior_contact_sfx.mjs';
 
 const reaver = process.argv.includes('--warrior-reaver');
 const contact = reaver || process.argv.includes('--warrior-contact');
-const sourceCues = contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
+const harvest = process.argv.includes('--red-harvest-impact');
+const sourceCues = harvest ? HARVEST_IMPACT_SFX : contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
 const cues = reaver ? sourceCues.filter((cue) => cue.key.includes('_warrior_reaver')) : sourceCues;
-const folder = contact ? 'tmp/warrior-contact-audio' : 'tmp/fury-audio';
+const folder = harvest
+  ? 'tmp/harvest-impact-audio'
+  : contact
+    ? 'tmp/warrior-contact-audio'
+    : 'tmp/fury-audio';
 mkdirSync(join(folder, 'raw'), { recursive: true });
 const ledgerPath = join(folder, 'generation-ledger.json');
 const ledger = existsSync(ledgerPath)
@@ -46,6 +52,7 @@ for (const cue of planned) {
     method: 'POST',
     headers: { 'xi-api-key': key, 'content-type': 'application/json' },
     body: JSON.stringify({
+      model_id: 'eleven_text_to_sound_v2',
       text: cue.prompt,
       duration_seconds: 0.5,
       prompt_influence: 0.45,

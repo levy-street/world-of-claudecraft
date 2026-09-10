@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL, sceneKeyLightUniform } from '../scene_sampling';
 import { CrestPrewarm } from './crest_prewarm';
+import { HARVEST_FRAGMENT, HARVEST_VERTEX } from './harvest_material';
 import {
   warriorBloodTexture,
   warriorPressureTexture,
@@ -97,12 +98,13 @@ export class SignatureCrests {
             float turn=(0.137+0.842*min(1.0,uAge))*6.2831853*uMotion;
             p.xz=mat2(cos(turn),-sin(turn),sin(turn),cos(turn))*p.xz;
           }
-          if(uKind>22.5){
+          if(uKind>22.5 && uKind<23.5){
             float settle=1.0-smoothstep(0.28,1.0,uAge);
             p.y*=mix(1.0,0.72+0.28*sin(min(uAge*5.0,1.0)*1.5707963),uMotion);
             p.y*=mix(1.0,max(0.05,settle),uMotion);
             p.y+=pressureGround(p.xz);
           }
+          ${HARVEST_VERTEX}
           vec4 view=modelViewMatrix*vec4(p,1.0); vView=-view.xyz; vNormal=normalize(normalMatrix*normal);
           gl_Position=projectionMatrix*view;
         }`,
@@ -112,7 +114,7 @@ export class SignatureCrests {
         varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         vec2 groundSteelUv(vec2 p){return 1.0-abs(mod(p*0.24+0.37,2.0)-1.0);}
         void main(){
-          if(((uKind>17.5 && uKind<19.5)||(uKind>20.5 && uKind<21.5)||uKind>22.5) && !gl_FrontFacing)discard;
+          if(((uKind>17.5 && uKind<19.5)||(uKind>20.5 && uKind<21.5)||(uKind>22.5 && uKind<23.5)) && !gl_FrontFacing)discard;
           float fresnel=pow(max(0.0,1.0-abs(dot(normalize(cross(dFdx(vView),dFdy(vView))),normalize(vView)))),3.0);
           float thread=sin(vUv.x*150.0+sin(vUv.y*22.0)*2.0-uAge*8.0*uMotion);
           float ribs=pow(max(0.0,thread),16.0);
@@ -255,6 +257,7 @@ export class SignatureCrests {
             float cut=smoothstep(.0,.12,vUv.x)*(1.0-smoothstep(.9,1.0,vUv.x));
             alpha=cut*(edge*.85+tail)*(1.0-smoothstep(.62,1.0,uAge));
           }
+          ${HARVEST_FRAGMENT}
           gl_FragColor=vec4(colour,alpha*sceneSoftness(vView.z,0.12));
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
@@ -319,7 +322,11 @@ export class SignatureCrests {
       kind === 'steel_counter' ||
       kind === 'steel_execution';
     const contactSurface =
-      kind === 'blood_cut' || kind === 'shield_contact' || steelBlade || kind === 'breach_wedge';
+      kind === 'blood_cut' ||
+      kind.startsWith('harvest_') ||
+      kind === 'shield_contact' ||
+      steelBlade ||
+      kind === 'breach_wedge';
     const authoredSurface =
       contactSurface ||
       kind === 'steel_storm' ||
@@ -348,7 +355,8 @@ export class SignatureCrests {
     const geometry = this.shapes.get(kind) ?? this.shapes.get('shadow');
     if (geometry) s.mesh.geometry = geometry;
     s.mesh.rotation.set(pitch, angle, 0, 'YXZ');
-    if (kind === 'blood_cut' || steelBlade) s.mesh.rotation.set(0, angle, pitch, 'YXZ');
+    if (kind === 'blood_cut' || kind.startsWith('harvest_') || steelBlade)
+      s.mesh.rotation.set(0, angle, pitch, 'YXZ');
     s.mesh.position.set(x, y, z);
     s.mesh.scale.set(Math.min(3, radius), Math.min(3, height), Math.min(3, radius));
     if (kind === 'chain') s.mesh.scale.set(height, height, radius);
@@ -424,6 +432,8 @@ export class SignatureCrests {
                                               ? 6
                                               : 2;
     u.uAge.value = 0;
+    if (kind === 'harvest_cut') u.uKind.value = 24;
+    if (kind === 'harvest_eruption') u.uKind.value = 25;
     u.uStorm.value = kind === 'steel_storm' ? 1 : 0;
     u.uFlow.value = 0;
     u.uMotion.value = this.reducedMotion ? 0 : 1;

@@ -233,6 +233,7 @@ export interface RibbonPoint {
 }
 
 export class AbilityVfxRibbons {
+  private arcAdmissionCursor = 0;
   private readonly arcCurve = new THREE.CatmullRomCurve3();
   private readonly arcSmooth = allocPts(34);
   private geo = new THREE.BufferGeometry();
@@ -476,10 +477,20 @@ export class AbilityVfxRibbons {
   // selects among active slots with priority <= incomingPriority, choosing
   // lowest priority first and oldest normalized age (age/life) as a tie-break.
   private chooseArcSlot(incomingPriority: 0 | 1, preserveActive: boolean): ArcSlot | null {
-    for (const arc of this.arcs) if (!arc.active) return arc;
+    for (let offset = 0; offset < this.arcs.length; offset++) {
+      const index = (this.arcAdmissionCursor + offset) % this.arcs.length;
+      const arc = this.arcs[index];
+      if (!arc.active) {
+        this.arcAdmissionCursor = (index + 1) % this.arcs.length;
+        return arc;
+      }
+    }
     if (preserveActive) return null;
     let best: ArcSlot | null = null;
-    for (const a of this.arcs) {
+    // Rotate equal-age admission so several contacts born in one update do
+    // not repeatedly overwrite the same freshly admitted ribbon.
+    for (let offset = 0; offset < this.arcs.length; offset++) {
+      const a = this.arcs[(this.arcAdmissionCursor + offset) % this.arcs.length];
       if (a.priority > incomingPriority) continue;
       if (!best) {
         best = a;
@@ -495,6 +506,7 @@ export class AbilityVfxRibbons {
         if (normAge > bestNormAge) best = a;
       }
     }
+    if (best) this.arcAdmissionCursor = (this.arcs.indexOf(best) + 1) % this.arcs.length;
     return best;
   }
 

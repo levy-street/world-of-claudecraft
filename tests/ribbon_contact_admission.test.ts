@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { abilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
+import { harvestBeat } from '../src/render/ability_vfx/harvest_choreography';
 import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
 import type { SeqSlot, SequencerHost } from '../src/render/ability_vfx/sequencer';
 import { drawWarriorShout } from '../src/render/ability_vfx/warrior_shouts';
@@ -78,6 +79,60 @@ const sampleAt = (x: number) => (out: THREE.Vector3) => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+it('retains both Harvest extraction ribbons and receiving seams under same-frame saturation', () => {
+  installCanvasStub();
+  const { ribbons, probe } = makeRibbons();
+  try {
+    for (let i = 0; i < ARC_SLOTS; i++)
+      ribbons.spawnPath(0x668899, 0.1, 1, simpleFill, true, null, false, false, 1);
+    const host = new Proxy(
+      {
+        anchorOf: (id: number, fraction: number, out: THREE.Vector3) =>
+          Object.assign(out, { x: id === 1 ? 0 : 4, y: fraction * 2, z: 0 }),
+        crestAt: () => false,
+        bakedAt: () => false,
+        pathRibbon: ((colour, width, life, fill, brushed, motion, preserve, priority, sweep) =>
+          ribbons.spawnPath(
+            colour,
+            width,
+            life,
+            fill,
+            brushed,
+            motion,
+            preserve,
+            false,
+            priority,
+            sweep,
+          )) as SequencerHost['pathRibbon'],
+      },
+      { get: (target, key) => Reflect.get(target, key) ?? vi.fn() },
+    ) as unknown as SequencerHost;
+    harvestBeat(
+      host,
+      {
+        abilityId: 'red_harvest',
+        casterId: 1,
+        targetId: 2,
+        tier: 0,
+        componentOutcomes: 21,
+        spec: WARRIOR_VFX_FULL_SPECS.red_harvest,
+      } as SeqSlot,
+      2,
+    );
+    const extractions = () =>
+      probe.arcs.filter(
+        (a) =>
+          a.active && Math.max(...a.pts.map((p) => p.y)) - Math.min(...a.pts.map((p) => p.y)) > 7.5,
+      );
+    expect(extractions()).toHaveLength(2);
+    expect(probe.arcs.filter((a) => a.active && a.life < 1)).toHaveLength(4);
+    ribbons.update(1 / 60, CAM);
+    expect(extractions()).toHaveLength(2);
+  } finally {
+    ribbons.dispose();
+  }
 });
 
 describe('ribbon contact admission', () => {

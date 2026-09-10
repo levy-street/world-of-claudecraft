@@ -13,6 +13,8 @@ import { WARRIOR_PRESSURE_KINDS } from './warrior_shout_shapes';
 
 export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
   'blood_cut',
+  'harvest_cut',
+  'harvest_eruption',
   'shield_contact',
   'steel_cut',
   'steel_chop',
@@ -75,6 +77,14 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
       run: () => {
         const texture = bakedTexture('warrior_power');
         if (!texture) throw new Error('Active Warrior power texture was not loaded');
+        state.host.texture(texture);
+      },
+    },
+    {
+      id: 'upload-big:active-harvest-impact',
+      run: () => {
+        const texture = bakedTexture('harvest_impact');
+        if (!texture) throw new Error('Red Harvest impact texture was not loaded');
         state.host.texture(texture);
       },
     },

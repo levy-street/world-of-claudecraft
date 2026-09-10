@@ -194,9 +194,12 @@ it('attributes contacts to the correct target when primary and secondary events 
     // weaponTrail fires from the primary slot's physicalRelease only (both hands = 2 calls).
     expect(host.weaponTrail, `${id}: primary-only weaponTrail`).toHaveBeenCalledTimes(2);
 
-    // shakeAt fires on primary hits only; secondary furyBeat path omits it.
+    // Red Harvest reserves its camera impulse for a successful final primary
+    // contact. A missed/absorbed finale must not invent a camera impact.
     const shakes = vi.mocked(host.shakeAt!).mock.calls;
-    expect(shakes.length, `${id}: shake count matches primary hit count`).toBe(t2HitBeats.length);
+    expect(shakes.length, `${id}: shake count matches primary hit count`).toBe(
+      id === 'red_harvest' ? t2HitBeats.filter((beat) => beat === 2).length : t2HitBeats.length,
+    );
     for (const s of shakes) expect(s[0], `${id}: shake x at target 2`).toBeCloseTo(2, 1);
   }
 });

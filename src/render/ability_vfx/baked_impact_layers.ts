@@ -166,7 +166,8 @@ export class BakedImpactLayers {
       !bakedTexture(kind) ||
       // Decoding is not GPU preparation. The new large optional layer stays
       // cold until this renderer's explicit upload has completed successfully.
-      (kind === 'warrior_power' && !this.textureReady?.(bakedTexture(kind)!)) ||
+      ((kind === 'warrior_power' || kind === 'harvest_impact') &&
+        !this.textureReady?.(bakedTexture(kind)!)) ||
       ![x, y, z, size, duration, delay, heat, floor, angle, roll, aspect].every(Number.isFinite) ||
       aspect <= 0 ||
       size <= 0 ||
@@ -180,7 +181,11 @@ export class BakedImpactLayers {
     s.duration = Math.min(3, duration);
     s.size = Math.min(9, size);
     s.ground = kind === 'shockwave';
-    s.authored = kind === 'pyroblast' || kind === 'frost_nova' || kind === 'chain_heal';
+    s.authored =
+      kind === 'pyroblast' ||
+      kind === 'frost_nova' ||
+      kind === 'chain_heal' ||
+      kind === 'harvest_impact';
     s.power = kind === 'warrior_power';
     s.reverse = reverse;
     s.roll = roll;
@@ -246,6 +251,7 @@ export class BakedImpactLayers {
                 : 0.5,
     );
     s.mesh.userData.heat = u.uHeat.value;
+    if (kind === 'harvest_impact') u.uPivot.value.set(0.5, 0.5 + 0.45 / 7.8);
     return true;
   }
   update(dt: number, camera: THREE.Quaternion, reducedMotion: boolean): void {

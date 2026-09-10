@@ -114,10 +114,11 @@ export function physicalRelease(host: SequencerHost, slot: SeqSlot): void {
   drawHarvestRelease(host, slot);
   if (p.weapon !== undefined) {
     const duration = physicalBeatTime(p, p.beats.length - 1) + 0.3;
+    const trailColour = slot.abilityId === 'red_harvest' ? 0xff8990 : slot.accent;
     if (p.weapon === 'both' || p.weapon === 0)
-      host.weaponTrail?.(slot.casterId, 0, slot.accent, p.width * 0.85, duration);
+      host.weaponTrail?.(slot.casterId, 0, trailColour, p.width * 0.85, duration);
     if (p.weapon === 'both' || p.weapon === 1)
-      host.weaponTrail?.(slot.casterId, 1, slot.accent, p.width * 0.75, duration);
+      host.weaponTrail?.(slot.casterId, 1, trailColour, p.width * 0.75, duration);
   }
   host.presentationMoment?.(slot.abilityId, 'release', slot.casterId);
   host.abilityAudio?.('release', slot.spec.palette, p.weight, at.x, at.y, at.z, {
