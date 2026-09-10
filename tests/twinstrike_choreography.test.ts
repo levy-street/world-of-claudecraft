@@ -44,7 +44,8 @@ it('opposes the two blade planes and gives the second confirmed contact more wei
   twinstrikeBeat(host, slot, 1);
   const crests = vi.mocked(host.crestAt!).mock.calls;
   expect(crests).toHaveLength(2);
-  expect(crests[0][10] * crests[1][10]).toBeLessThan(0);
+  expect(crests[0][10]).toBeLessThan(0);
+  expect(crests[1][10]).toBeGreaterThan(0);
   const contacts = vi.mocked(host.contact!).mock.calls;
   expect(contacts.map((c) => c[5])).toEqual([0, 1]);
   expect(contacts[1][3]).toBeGreaterThan(contacts[0][3]);
