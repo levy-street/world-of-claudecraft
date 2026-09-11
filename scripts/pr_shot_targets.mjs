@@ -6924,6 +6924,111 @@ export const TARGETS = [
     },
   },
   {
+    key: 'party-role-sort-wolf-druid',
+    label:
+      'Raid frames sorted by role: a Wildfang druid in Wolf Form groups with the damage dealers',
+    when: ['party_frame_info.ts'],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Ironhide' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Ironhide', mobile: true },
+    ],
+    // A small raid on the PartyMachine (same struct as the class-color raid
+    // variant) with two real tanks in the strip (a paladin and a warrior; the
+    // local player is never a row of its own) and a
+    // Wildfang druid shifted into Wolf Form. The strip is switched to role
+    // order through the settings store the option row writes. Before the fix
+    // the druid's tank spec role split the two tanks apart; after it the druid
+    // sits with the damage dealers and the tanks are adjacent.
+    async capture(page, variant) {
+      if (!variant?.mobile) {
+        const vp = page.viewport() ?? { width: 1600, height: 900 };
+        await page.setViewport({ ...vp, deviceScaleFactor: 2 });
+      }
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const settings = window.__game?.hud?.optionsHooks?.settings;
+        try {
+          settings?.set('partyFrameSort', 1);
+        } catch {}
+        const me = sim.primaryId;
+        const p = sim.player;
+        const pm = sim.party;
+        const roster = [
+          ['Brightoak', 'druid', 'tank', true],
+          ['Aurelius', 'paladin', 'tank', false],
+          ['Thorgar', 'warrior', 'tank', false],
+          ['Selene', 'priest', 'healer', false],
+          ['Nightblade', 'rogue', 'dps', false],
+          ['Emberlyn', 'mage', 'dps', false],
+        ];
+        const pids = roster.map(([name, cls, role, wolf], i) => {
+          const pid = sim.addPlayer(cls, name);
+          const meta = sim.players.get(pid);
+          if (meta) meta.talentMods.role = role;
+          const e = sim.entities.get(pid);
+          if (e) {
+            e.pos = { x: p.pos.x + (i % 5) * 2 - 4, y: p.pos.y, z: p.pos.z + 2 };
+            e.prevPos = { ...e.pos };
+            if (wolf) {
+              e.auras.push({
+                id: 'cat_form',
+                name: 'Wolf Form',
+                kind: 'form_cat',
+                remaining: 3600,
+                duration: 3600,
+                value: 0.71,
+                sourceId: e.id,
+                school: 'nature',
+              });
+            }
+          }
+          return pid;
+        });
+        const members = [me, ...pids];
+        const party = {
+          id: pm.nextPartyId++,
+          leader: me,
+          members,
+          raid: true,
+          raidGroups: new Map(members.map((pid) => [pid, 1])),
+          lootStrategies: {},
+        };
+        pm.parties.set(party.id, party);
+        for (const q of members) pm.partyByPid.set(q, party.id);
+      });
+      await wait(1500);
+      await page.evaluate(() => {
+        window.__game.hud.closeLootSettings?.();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        const loot = document.querySelector('#loot-settings-window');
+        if (loot) loot.style.display = 'none';
+      });
+      // Both form factors default to COLLAPSED (party_collapse.ts): the desktop
+      // header button and the mobile chip each hide the rows until tapped, so
+      // expand through the real control or the shot has no rows in it.
+      await page.evaluate((mobile) => {
+        const sel = mobile ? '#party-chip' : '#party-frame-header';
+        const ctl = document.querySelector(sel);
+        if (ctl && ctl.getAttribute('aria-expanded') !== 'true') {
+          ctl.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }
+      }, Boolean(variant?.mobile));
+      await wait(800);
+      // Echo the painted order so the capture log doubles as the proof of the
+      // sort (the rig forwards page console lines).
+      await page.evaluate(() => {
+        const names = [...document.querySelectorAll('#party-frames .pfm-name-text')]
+          .map((el) => el.textContent?.trim())
+          .filter(Boolean);
+        console.log(`party rows: ${names.join(' | ')}`);
+      });
+      return variant?.mobile ? {} : { clip: '#party-frames' };
+    },
+  },
+  {
     key: 'char-window',
     label: 'Character window',
     when: ['ui/char_window', 'ui/char_view', 'ui/stat_tooltip_view'],

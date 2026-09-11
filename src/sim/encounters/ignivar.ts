@@ -84,6 +84,7 @@ import {
   IGNIVAR_DIALOGUE_GAP_SECONDS,
   ignivarDefeatYell,
 } from './ignivar_dialogue';
+import { resolveLivingTarget } from './living_target';
 import { walkEncounterActorTo } from './scripted_walk';
 
 export const IGNIVAR_BRAND_AURA_ID = 'ignivar_brand_of_the_pyre';
@@ -221,16 +222,6 @@ function tankIds(ctx: SimContext): Set<number> {
     if (meta.talentMods.role === 'tank') result.add(meta.entityId);
   }
   return result;
-}
-
-function resolveLivingTarget(boss: Entity, players: readonly Entity[]): Entity | null {
-  const current =
-    boss.aggroTargetId === null
-      ? null
-      : (players.find((player) => player.id === boss.aggroTargetId && !player.dead) ?? null);
-  const target = current ?? players.find((player) => !player.dead) ?? null;
-  boss.aggroTargetId = target?.id ?? null;
-  return target;
 }
 
 function conduitEntities(ctx: SimContext, boss: Entity): Map<IgnivarConduitId, Entity> {

@@ -6,7 +6,7 @@ import { rewindHealAmount } from './combat/rewind';
 import { MENDING_CURRENT_ID } from './combat/shaman_spiritmend';
 import type { Role } from './content/talents';
 import type { SimContext } from './sim_context';
-import type { AbilityEffect, Aura, Entity } from './types';
+import type { AbilityEffect, Aura, Entity, PlayerClass } from './types';
 import { PARTY_MEMBER_AURA_CAP } from './types';
 
 export interface PartyFrameAuraSummary {
@@ -151,7 +151,14 @@ export function partyFrameIncomingHeals(
   return incoming;
 }
 
-export function partyFrameRole(role: Role | null): Role {
+/** The role a party/raid frame shows for a member. The spec role is the
+ * baseline, with one form-aware exception: a tank-spec druid (Wildfang) in
+ * Wolf Form (the `form_cat` shapeshift aura) is a melee damage dealer, so the
+ * role-sorted raid strip groups it with the damage dealers and keeps the real
+ * tanks adjacent. Bruin Form and caster form keep the spec role. Both hosts
+ * (offline collectPartyInfo and the server party wire) resolve through here. */
+export function partyFrameRole(role: Role | null, cls: PlayerClass, auras: readonly Aura[]): Role {
+  if (role === 'tank' && cls === 'druid' && auras.some((a) => a.kind === 'form_cat')) return 'dps';
   return role ?? 'dps';
 }
 
@@ -190,7 +197,7 @@ export function collectPartyInfo(ctx: SimContext): PartyInfo | null {
               inCombat: e.inCombat ? 1 : 0,
               group: party.raidGroups.get(mPid) ?? 1,
               absorb: partyFrameAbsorb(e.auras),
-              role: partyFrameRole(meta.talentMods.role),
+              role: partyFrameRole(meta.talentMods.role, meta.cls, e.auras),
               // Effective health Rewind could currently restore to this member
               // (combat/rewind.ts); 0 for members with no recent recorded loss.
               rewind: rewindHealAmount(damageTakenWithin(e, ctx.tickCount), e.hp, e.maxHp),

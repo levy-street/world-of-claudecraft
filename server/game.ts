@@ -9056,7 +9056,7 @@ export class GameServer {
             inCombat: e.inCombat ? 1 : 0,
             group: party.raidGroups.get(mPid) ?? 1,
             absorb: partyFrameAbsorb(e.auras),
-            role: partyFrameRole(meta.talentMods.role),
+            role: partyFrameRole(meta.talentMods.role, meta.cls, e.auras),
             // Effective health Rewind could currently restore to this member
             // (combat/rewind.ts); 0 for members with no recent recorded loss.
             rewind: rewindHealAmount(damageTakenWithin(e, this.sim.tickCount), e.hp, e.maxHp),

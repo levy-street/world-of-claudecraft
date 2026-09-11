@@ -2328,6 +2328,34 @@ describe('Ignivar encounter', () => {
     expect(boss.wanderTarget).toBeNull();
   });
 
+  it('re-seats on the highest-threat raider, not the lowest entity id, when the tank leaves the claim', () => {
+    const { sim, boss } = claimedEncounter(994);
+    // The Wolf Form druid spawns first (lowest entity id after the tank) and
+    // sits low on the hate table; the rogue joined later and has far more.
+    const druid = addEncounterPlayer(sim, boss, 'Wolf Druid', 'druid');
+    const rogue = addEncounterPlayer(sim, boss, 'Rogue', 'rogue');
+    expect(druid.id).toBeLessThan(rogue.id);
+    boss.threat.set(sim.player.id, 9000);
+    boss.threat.set(druid.id, 120);
+    boss.threat.set(rogue.id, 4500);
+    boss.swingTimer = 999;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(boss.aggroTargetId).toBe(sim.player.id);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    boss.ignivar.brandTimer = 999;
+    boss.ignivar.frontalTimer = 999;
+    boss.ignivar.overlapTimer = 999;
+    boss.ignivar.forgeStrikeTimer = 999;
+
+    // A knockback carried the tank outside the arena claim: the encounter can
+    // no longer use it as the living target.
+    sim.player.pos = { x: boss.pos.x + 100000, y: boss.pos.y, z: boss.pos.z + 100000 };
+    sim.player.prevPos = { ...sim.player.pos };
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    expect(boss.aggroTargetId).toBe(rogue.id);
+  });
+
   it('chases the tank between mechanics when the tank moves out of melee', () => {
     const { sim, boss } = claimedEncounter(991);
     const destination = {
