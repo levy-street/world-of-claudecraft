@@ -356,3 +356,151 @@ describe('updateSelfRenderPosition predictor path', () => {
     expect(state.predictor).toBe(built);
   });
 });
+
+describe('updateSelfRenderPosition teleport rule', () => {
+  // The self pose handoff (predictor to fallback, fallback to predictor, a v2
+  // reconcile residual) captures the gap between the drawn pose and the new
+  // target and decays it so the camera glides instead of stepping. A gap only a
+  // teleport could explain (dungeon exit, hearth, graveyard release, rift or
+  // delve exit) must NOT glide: gliding it drew the body flying across the map
+  // for a third of a second. Same six-yard rule every other display smoother
+  // uses (self_motion.ts, camera_boom_core.ts, step_smooth_core.ts).
+  const TELEPORT = Math.sqrt(SELF_MOTION_SNAP_DIST_SQ) * 100;
+  const runPredicted = (state: SelfRenderPositionState, player: Entity): Vec3Like =>
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, frame(), false);
+
+  it('snaps when the predictor re-adopts a teleported anchor instead of capturing the gap', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 0 });
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+    expect(state.position.x).toBe(10);
+    state.predictor = stubPredictor(() => ({ x: 10 + TELEPORT, y: 3, z: -TELEPORT }));
+    runPredicted(
+      state,
+      playerAt({ x: 10 + TELEPORT, y: 3, z: -TELEPORT }, { x: 10 + TELEPORT, y: 3, z: -TELEPORT }),
+    );
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual({ x: 10 + TELEPORT, y: 3, z: -TELEPORT });
+    expect(state.active).toBe(true);
+  });
+
+  it('snaps an active predictor whose output jumps a teleport in one frame', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    let predicted: Vec3Like = { x: 1, y: 0, z: 0 };
+    state.predictor = stubPredictor(() => predicted);
+    runPredicted(state, player);
+    predicted = { x: 1.2, y: 0, z: 0 };
+    runPredicted(state, player);
+    expect(state.position.x).toBeCloseTo(1.2, 10);
+    predicted = { x: TELEPORT, y: 0, z: 0 };
+    runPredicted(state, player);
+    expect(state.position.x).toBe(TELEPORT);
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+  });
+
+  it('drops a teleport-sized v2 reconcile residual instead of decaying it', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    updateSelfRenderPosition(
+      state,
+      player,
+      SEED,
+      1,
+      FRAME_DT,
+      0,
+      { kind: 'reconciled', position: { x: 0, y: 0, z: 0 }, residual: null },
+      false,
+    );
+    updateSelfRenderPosition(
+      state,
+      player,
+      SEED,
+      1,
+      FRAME_DT,
+      0,
+      {
+        kind: 'reconciled',
+        position: { x: TELEPORT, y: 2, z: 0 },
+        residual: { x: -TELEPORT, y: -2, z: 0 },
+      },
+      false,
+    );
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual({ x: TELEPORT, y: 2, z: 0 });
+  });
+
+  it('still glides a sub-threshold reconcile residual', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    const decay = Math.exp(-HANDOFF_RATE * FRAME_DT);
+    updateSelfRenderPosition(
+      state,
+      player,
+      SEED,
+      1,
+      FRAME_DT,
+      0,
+      { kind: 'reconciled', position: { x: 0, y: 0, z: 0 }, residual: null },
+      false,
+    );
+    updateSelfRenderPosition(
+      state,
+      player,
+      SEED,
+      1,
+      FRAME_DT,
+      0,
+      { kind: 'reconciled', position: { x: 2, y: 0, z: 0 }, residual: { x: -2, y: 0, z: 0 } },
+      false,
+    );
+    expect(state.position.x).toBeCloseTo(2 - 2 * decay, 10);
+  });
+
+  it('snaps the fallback handoff when the predictor drops out across a teleport', () => {
+    const state = createSelfRenderPositionState();
+    state.predictor = stubPredictor(() => ({ x: 5, y: 0, z: 5 }));
+    runPredicted(state, playerAt({ x: 5, y: 0, z: 5 }, { x: 5, y: 0, z: 5 }));
+    expect(state.active).toBe(true);
+    // Prediction suspends on the teleport frame (override epoch bump) while the
+    // authoritative segment already sits at the destination.
+    state.predictor = stubPredictor(() => null);
+    const far = { x: 5 + TELEPORT, y: 1, z: 5 };
+    runPredicted(state, playerAt(far, far));
+    expect(state.active).toBe(false);
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual(far);
+  });
+
+  it('snaps a mid-decay fallback pose when the authoritative segment teleports', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    updateSelfRenderPosition(
+      state,
+      player,
+      SEED,
+      1,
+      FRAME_DT,
+      0.2,
+      { kind: 'reconciled', position: { x: 1.4, y: 0, z: 0 }, residual: null },
+      false,
+    );
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+    expect(state.offset.x).toBeGreaterThan(0);
+    const far = { x: -TELEPORT, y: 0, z: 0 };
+    updateSelfRenderPosition(state, playerAt(far, far), SEED, 1, FRAME_DT, 0.2, null, false);
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual(far);
+  });
+
+  it('keeps gliding a handoff gap under the threshold', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 0 });
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+    state.predictor = stubPredictor(() => ({ x: 5, y: 0, z: 0 }));
+    const decay = Math.exp(-HANDOFF_RATE * FRAME_DT);
+    runPredicted(state, player);
+    expect(state.offset.x).toBeCloseTo(5 * decay, 10);
+    expect(state.position.x).toBeCloseTo(5 + 5 * decay, 10);
+  });
+});

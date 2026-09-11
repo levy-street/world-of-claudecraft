@@ -6,6 +6,7 @@
 
 import type { Entity } from '../sim/types';
 import {
+  SELF_MOTION_SNAP_DIST_SQ,
   type SelfMotionFrame,
   SelfMotionPredictor,
   updateSelfRenderFallback,
@@ -27,6 +28,26 @@ function decayOffset(offset: Vec3Like, dt: number, maxDistance = Number.POSITIVE
   offset.x *= 1 - appliedShare;
   offset.y *= 1 - appliedShare;
   offset.z *= 1 - appliedShare;
+}
+
+/**
+ * The handoff-offset teleport rule. The offset exists to hide a SMALL gap
+ * between the drawn pose and the pose that takes over (a predictor lead, a
+ * reconcile correction), decayed so the camera glides instead of stepping.
+ * A gap no real motion could open in one frame is a teleport (dungeon exit,
+ * hearth, graveyard release, rift or delve exit, unstuck) and must never be
+ * glided: decaying it drew the body flying across the map. Same six-yard rule
+ * every other display smoother applies (self_motion.ts SELF_MOTION_SNAP_DIST_SQ,
+ * camera_boom_core.ts BOOM_SNAP_DIST, step_smooth_core.ts STEP_SMOOTH_SNAP).
+ */
+export function isTeleportGap(dx: number, dy: number, dz: number): boolean {
+  return dx * dx + dy * dy + dz * dz > SELF_MOTION_SNAP_DIST_SQ;
+}
+
+function clearOffset(offset: Vec3Like): void {
+  offset.x = 0;
+  offset.y = 0;
+  offset.z = 0;
 }
 
 export interface ReconciledSelfPrediction {
@@ -116,19 +137,31 @@ export function updateSelfRenderPosition(
       // remove). The only discontinuity is the handoff frame from the
       // lead-smoothing path below: capture that gap once as an offset and
       // decay it, so the camera glides instead of stepping.
-      if (authoritativeDiscontinuity) {
-        state.offset.x = 0;
-        state.offset.y = 0;
-        state.offset.z = 0;
+      // A teleport is not a handoff: when the new pose sits a teleport away
+      // from the drawn one (the predictor re-adopted a jumped anchor, or a
+      // v2 reconcile replayed onto a jumped acknowledgement), adopt it
+      // outright, residual included, exactly like an authoritative
+      // discontinuity.
+      const discontinuity =
+        authoritativeDiscontinuity ||
+        (state.ready &&
+          isTeleportGap(
+            state.position.x - predicted.x,
+            state.position.y - predicted.y,
+            state.position.z - predicted.z,
+          ));
+      if (discontinuity) {
+        clearOffset(state.offset);
       } else if (state.ready && !state.active) {
         state.offset.x = state.position.x - predicted.x;
         state.offset.y = state.position.y - predicted.y;
         state.offset.z = state.position.z - predicted.z;
       }
-      if (reconciled.kind === 'reconciled' && reconciled.residual) {
-        state.offset.x += reconciled.residual.x;
-        state.offset.y += reconciled.residual.y;
-        state.offset.z += reconciled.residual.z;
+      const residual = reconciled.kind === 'reconciled' ? reconciled.residual : null;
+      if (residual && !discontinuity && !isTeleportGap(residual.x, residual.y, residual.z)) {
+        state.offset.x += residual.x;
+        state.offset.y += residual.y;
+        state.offset.z += residual.z;
       }
       decayOffset(state.offset, dt);
       state.position.x = predicted.x + state.offset.x;
@@ -145,17 +178,23 @@ export function updateSelfRenderPosition(
   const px = p.prevPos.x + (p.pos.x - p.prevPos.x) * playerAlpha;
   const py = p.prevPos.y + (p.pos.y - p.prevPos.y) * playerAlpha;
   const pz = p.prevPos.z + (p.pos.z - p.prevPos.z) * playerAlpha;
-  if (authoritativeDiscontinuity) {
-    state.offset.x = 0;
-    state.offset.y = 0;
-    state.offset.z = 0;
+  // The same teleport rule as the predictor path: a handoff gap (prediction
+  // suspending on the teleport frame) or a mid-decay target jump of teleport
+  // size adopts the authoritative pose outright instead of rewinding toward
+  // it at MAX_SELF_REWIND_YD_PER_SEC.
+  const discontinuity =
+    authoritativeDiscontinuity ||
+    (state.ready &&
+      isTeleportGap(state.position.x - px, state.position.y - py, state.position.z - pz));
+  if (discontinuity) {
+    clearOffset(state.offset);
   } else if (state.ready && predictorWasActive) {
     state.offset.x = state.position.x - px;
     state.offset.y = state.position.y - py;
     state.offset.z = state.position.z - pz;
   }
   if (
-    !authoritativeDiscontinuity &&
+    !discontinuity &&
     (predictorWasActive || state.offset.x !== 0 || state.offset.y !== 0 || state.offset.z !== 0)
   ) {
     const previousX = state.position.x;
@@ -194,7 +233,7 @@ export function updateSelfRenderPosition(
     state.ready,
     dt,
     selfAlphaLead > 0,
-    authoritativeDiscontinuity,
+    discontinuity,
   );
   state.ready = true;
   return state.position;
