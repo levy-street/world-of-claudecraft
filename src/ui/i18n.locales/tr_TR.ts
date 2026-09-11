@@ -15533,7 +15533,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.deathless_court':
     'Ölümsüz Saray (yalnız heroic, kraliyet sarayı Ölümsüz Öfke’den sonra ayağa kalkar)',
   'hudChrome.finder.mech.grave_eruption': 'Mezar Patlaması (yanan zemin bırakan uyarı çemberleri)',
-  'hudChrome.finder.mech.gravefire': 'Mezar Ateşi (yana kaçılması gereken ilerleyen ateş çizgisi)',
   'hudChrome.finder.mech.kings_wrath':
     'Kralın Gazabı (30%: kalıcı hasar bonusu, daha hızlı zemin tehlikeleri)',
   'hudChrome.fullTransfer.excluded':
@@ -15630,19 +15629,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Kapalı',
   'hudChrome.options.shaderWarmOn': 'Açık',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    'Her {everyHeroic} sn, Nythraxis’ten {minDist} ile {maxDist} yd uzaktaki zeminde eski muhafazaların mührü parlar ve Nythraxis Ölümsüz Yükseliş’e başlar; her {ascensionEvery} sn {ascensionHeroic} hasar ve saldırı hızı kazanır. {bindHeroic} sn içinde mührün üzerinde durursa Bağlanır: Yükseliş arındırılır, {stunHeroic} sn sersemletilir ve {boundHeroic} sn boyunca {vulnerability} daha fazla hasar alır. Aksi halde her akıncı azami canın {unboundHitHeroic} kadarı kadar Gölge hasarı alır ve Nythraxis sonraki bağlamaya kadar {unboundBonusHeroic} daha fazla hasarı korur.',
+    'Her {everyHeroic} sn, Nythraxis’in solunda ya da sağında (baskın açısından, her seferinde diğer tarafta) {sideOffset} yd uzaktaki zeminde eski muhafazaların mührü parlar ve Nythraxis Ölümsüz Yükseliş’e başlar; her {ascensionEvery} sn {ascensionHeroic} hasar ve saldırı hızı kazanır. {bindHeroic} sn içinde mührün üzerinde durursa Bağlanır: Yükseliş arındırılır, {stunHeroic} sn sersemletilir ve {boundHeroic} sn boyunca {vulnerability} daha fazla hasar alır. Aksi halde her akıncı azami canın {unboundHitHeroic} kadarı kadar Gölge hasarı alır ve Nythraxis sonraki bağlamaya kadar {unboundBonusHeroic} daha fazla hasarı korur.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Bağlama Mührü',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'Tank, akının geride bıraktığı ateş ne olursa olsun Nythraxis’i hemen mührün üzerine sürükler. Yakın dövüş sürüklemeyi takip eder, menzilliler yeni Mezarparçalayan konisinin dışında kalır. O Bağlıyken herkes onu yakar.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    'Her {everyNormal} sn, Nythraxis’ten {minDist} ile {maxDist} yd uzaktaki zeminde eski muhafazaların mührü parlar ve Nythraxis Ölümsüz Yükseliş’e başlar; her {ascensionEvery} sn {ascensionNormal} hasar ve saldırı hızı kazanır. {bindNormal} sn içinde mührün üzerinde durursa Bağlanır: Yükseliş arındırılır, {stunNormal} sn sersemletilir ve {boundNormal} sn boyunca {vulnerability} daha fazla hasar alır. Aksi halde her akıncı azami canın {unboundHitNormal} kadarı kadar Gölge hasarı alır ve Nythraxis sonraki bağlamaya kadar {unboundBonusNormal} daha fazla hasarı korur.',
+    'Her {everyNormal} sn, Nythraxis’in solunda ya da sağında (baskın açısından, her seferinde diğer tarafta) {sideOffset} yd uzaktaki zeminde eski muhafazaların mührü parlar ve Nythraxis Ölümsüz Yükseliş’e başlar; her {ascensionEvery} sn {ascensionNormal} hasar ve saldırı hızı kazanır. {bindNormal} sn içinde mührün üzerinde durursa Bağlanır: Yükseliş arındırılır, {stunNormal} sn sersemletilir ve {boundNormal} sn boyunca {vulnerability} daha fazla hasar alır. Aksi halde her akıncı azami canın {unboundHitNormal} kadarı kadar Gölge hasarı alır ve Nythraxis sonraki bağlamaya kadar {unboundBonusNormal} daha fazla hasarı korur.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Her {everyHeroic} sn, Nythraxis mevcut hedefi dışındaki {victimsHeroic} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainHeroic} kadarını kaybeder. Zaten şişlenmiş bir oyuncu {cooldown} saniye boyunca yeniden seçilemez, böylece dikenler tüm baskına yayılır.',
+    'Her {everyHeroic} sn, Nythraxis mevcut hedefi dışındaki {victimsHeroic} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainHeroic} kadarını kaybeder. Bir diken, kimden gelirse gelsin {hitsHeroic} vuruştan sonra parçalanır; verilen hasar fark etmez. Zaten şişlenmiş bir oyuncu {cooldown} saniye boyunca yeniden seçilemez, böylece dikenler tüm baskına yayılır.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Kemik Dikeni',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'Hasar verenler hemen Kemik Dikenlerine geçer ve saplanan akıncıları kurtarmak için onları yok eder. Şifacılar dikenler düşene kadar saplananları hayatta tutar.',
+    "En yakındaki kişi Kemik Dikeni'ne vurur: kimden gelirse gelsin birkaç vuruş onu parçalar, hasar fark etmez. Şifacılar dikenler yıkılana dek şişlenenleri hayatta tutar.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Her {everyNormal} sn, Nythraxis mevcut hedefi dışındaki {victimsNormal} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainNormal} kadarını kaybeder. Zaten şişlenmiş bir oyuncu {cooldown} saniye boyunca yeniden seçilemez, böylece dikenler tüm baskına yayılır.',
+    'Her {everyNormal} sn, Nythraxis mevcut hedefi dışındaki {victimsNormal} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainNormal} kadarını kaybeder. Bir diken, kimden gelirse gelsin {hitsNormal} vuruştan sonra parçalanır; verilen hasar fark etmez. Zaten şişlenmiş bir oyuncu {cooldown} saniye boyunca yeniden seçilemez, böylece dikenler tüm baskına yayılır.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyHeroic} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlHeroic} kadarını verir. Her hücum aynı yarıçapta azami canın {slamHeroic} kadarıyla Kemik Çarpmasıyla biter. Fırtınanın {spikeAt} sn sonrasında Kemik Dikeni kullanır, bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Kemik Fırtınası',
@@ -15688,23 +15687,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Tanklar Nythraxis’in yüzünü akından uzağa tutar. Diğer herkes arkasında veya yanında kalır ve koninin içinden asla geçmez.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     'Her {seconds} sn, Nythraxis bir sonraki isabet eden savuruşunu yükler. Hedefi yalnızca savuruşun kendisini alır, ama önündeki {arc} derecelik koni içinde {range} yd mesafedeki herkes bu savuruşun {splash} kadarını kendi zırhlarıyla azaltılan Fiziksel hasar olarak alır.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    'Her {everyHeroic} sn, Nythraxis’ten bir akıncıya doğru mor bir mezar ateşi çizgisi ilerler, her saniye {speed} yd büyüyerek {length} yd olur. Her yard {burnHeroic} sn yanar ve içinde duran herkese her saniye azami canın {tickHeroic} kadarını verir.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Mezar Ateşi',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Çizgi gelirken yana kaç: dardır ve asla dönmez. Menzilli akıncılar tek yerde durmak yerine hareket etmeyi sürdürür.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    'Her {everyNormal} sn, Nythraxis’ten bir akıncıya doğru mor bir mezar ateşi çizgisi ilerler, her saniye {speed} yd büyüyerek {length} yd olur. Her yard {burnNormal} sn yanar ve içinde duran herkese her saniye azami canın {tickNormal} kadarını verir.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Kralın Gazabı',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Kaçınılmaz hasar için kalan savunma bekleme sürelerini kullanın. Akın savaşı bitirirken önceki her mekaniği temiz tutun.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis savaşın kalanı boyunca Normal’de {bonusNormal}, Heroic’te {bonusHeroic} daha fazla hasar verir. Mezar Patlaması her {eruptionEveryNormal} sn ({eruptionEveryHeroic} Heroic’te), Mezar Ateşi her {gravefireEveryNormal} sn ({gravefireEveryHeroic} Heroic’te) olur.',
+    'Nythraxis savaşın kalanı boyunca Normal’de {bonusNormal}, Heroic’te {bonusHeroic} daha fazla hasar verir. Mezar Patlaması her {eruptionEveryNormal} sn ({eruptionEveryHeroic} Heroic’te) olur.',
   'hudChrome.raidBossGuide.nythraxis.overview':
     'Başrahip Malric kralının ölmesine izin vermeyi reddetti ve Nythraxis’i ayağa kaldıran ayin tüm sarayı mahzene bağladı. Karşılaşma disiplinli tank değişimini, Kemik Dikenlerine hızlı geçişleri, yanan zeminden uzak hareketi ve Taht düştüğünde koordineli muhafaza taşı kanalını sınar.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'Kralın Gazabı',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    '{health} canda Nythraxis Kralın Gazabıyla kükrer ve savaşın kalanı boyunca Normal’de {bonusNormal}, Heroic’te {bonusHeroic} hasar kazanır. Mezar Patlaması her {eruptionEveryNormal} sn’ye ({eruptionEveryHeroic} Heroic’te), Mezar Ateşi her {gravefireEveryNormal} sn’ye ({gravefireEveryHeroic} Heroic’te) sıklaşır. Diğer her mekanik ritmini korur.',
+    '{health} canda Nythraxis Kralın Gazabıyla kükrer ve savaşın kalanı boyunca Normal’de {bonusNormal}, Heroic’te {bonusHeroic} hasar kazanır. Mezar Patlaması her {eruptionEveryNormal} sn’ye ({eruptionEveryHeroic} Heroic’te) sıklaşır. Diğer her mekanik ritmini korur.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'Taht',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     'Nythraxis taht odasını yüklü önden yarma, Dehşet Laneti tank değişimi, akıncıları saplayan Kemik Dikenleri ve yanan zemin bırakan Mezar Patlamalarıyla tutar.',

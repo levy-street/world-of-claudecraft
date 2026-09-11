@@ -15463,7 +15463,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Det Dødsløse Hof (kun heroic, kongehofet rejser sig efter Dødsløs Rasen)',
   'hudChrome.finder.mech.grave_eruption':
     'Gravudbrud (advarselscirkler, der efterlader brændende jord)',
-  'hudChrome.finder.mech.gravefire': 'Gravild (en vandrende ildlinje at træde udenom)',
   'hudChrome.finder.mech.kings_wrath':
     'Kongens vrede (30%: permanent skadebonus, hurtigere gulvfarer)',
   'hudChrome.fullTransfer.excluded':
@@ -15562,19 +15561,19 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Fra',
   'hudChrome.options.shaderWarmOn': 'Til',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    'Hvert {everyHeroic} sek flammer et sigil fra de gamle værn op på gulvet {minDist} til {maxDist} yd fra Nythraxis, og han begynder Dødsløs Opstigning, der giver ham {ascensionHeroic} skade og angrebshastighed hvert {ascensionEvery} sek. Hvis han står på sigillet inden for {bindHeroic} sek, er han Bundet: Opstigningen renses, han bedøves i {stunHeroic} sek, og han tager {vulnerability} mere skade i {boundHeroic} sek. Ellers tager hver raiddeltager {unboundHitHeroic} af maksimal sundhed som Skyggeskade, og han beholder {unboundBonusHeroic} mere skade indtil næste binding.',
+    'Hvert {everyHeroic} sek flammer et sigil fra de gamle værn op på gulvet {sideOffset} yd til venstre eller højre for Nythraxis set fra raidet, skiftevis for hvert kast, og han begynder Dødsløs Opstigning, der giver ham {ascensionHeroic} skade og angrebshastighed hvert {ascensionEvery} sek. Hvis han står på sigillet inden for {bindHeroic} sek, er han Bundet: Opstigningen renses, han bedøves i {stunHeroic} sek, og han tager {vulnerability} mere skade i {boundHeroic} sek. Ellers tager hver raiddeltager {unboundHitHeroic} af maksimal sundhed som Skyggeskade, og han beholder {unboundBonusHeroic} mere skade indtil næste binding.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Bindingssigil',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'Tanken trækker straks Nythraxis hen på sigillet, gennem hvilken ild raidet end har efterladt. Nærkampsspillere følger trækket, og afstandsspillere holder sig ude af den nye Gravbryder-kegle. Alle brænder ham ned, mens han er Bundet.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    'Hvert {everyNormal} sek flammer et sigil fra de gamle værn op på gulvet {minDist} til {maxDist} yd fra Nythraxis, og han begynder Dødsløs Opstigning, der giver ham {ascensionNormal} skade og angrebshastighed hvert {ascensionEvery} sek. Hvis han står på sigillet inden for {bindNormal} sek, er han Bundet: Opstigningen renses, han bedøves i {stunNormal} sek, og han tager {vulnerability} mere skade i {boundNormal} sek. Ellers tager hver raiddeltager {unboundHitNormal} af maksimal sundhed som Skyggeskade, og han beholder {unboundBonusNormal} mere skade indtil næste binding.',
+    'Hvert {everyNormal} sek flammer et sigil fra de gamle værn op på gulvet {sideOffset} yd til venstre eller højre for Nythraxis set fra raidet, skiftevis for hvert kast, og han begynder Dødsløs Opstigning, der giver ham {ascensionNormal} skade og angrebshastighed hvert {ascensionEvery} sek. Hvis han står på sigillet inden for {bindNormal} sek, er han Bundet: Opstigningen renses, han bedøves i {stunNormal} sek, og han tager {vulnerability} mere skade i {boundNormal} sek. Ellers tager hver raiddeltager {unboundHitNormal} af maksimal sundhed som Skyggeskade, og han beholder {unboundBonusNormal} mere skade indtil næste binding.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Hvert {everyHeroic} sek spidder Nythraxis {victimsHeroic} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainHeroic} af maksimal sundhed hvert sekund, indtil spyddet ødelægges. En spiller, der allerede er blevet spiddet, kan ikke vælges igen i {cooldown} sek., så spyddene fordeles over hele raidet.',
+    'Hvert {everyHeroic} sek spidder Nythraxis {victimsHeroic} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainHeroic} af maksimal sundhed hvert sekund, indtil spyddet ødelægges. Et spyd splintres efter {hitsHeroic} træffere fra hvem som helst, uanset hvor meget de gør. En spiller, der allerede er blevet spiddet, kan ikke vælges igen i {cooldown} sek., så spyddene fordeles over hele raidet.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Knoglespyd',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'Skadesuddelerne skifter straks til Knoglespyddene og ødelægger dem for at befri de spiddede raiddeltagere. Helbredere holder de spiddede i live, mens spyddene falder.',
+    'Den nærmeste slår på Knoglespyddet: et par træffere fra hvem som helst splintrer det, uanset skaden. Healere holder de spiddede i live, mens spyddene falder.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Hvert {everyNormal} sek spidder Nythraxis {victimsNormal} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainNormal} af maksimal sundhed hvert sekund, indtil spyddet ødelægges. En spiller, der allerede er blevet spiddet, kan ikke vælges igen i {cooldown} sek., så spyddene fordeles over hele raidet.',
+    'Hvert {everyNormal} sek spidder Nythraxis {victimsNormal} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainNormal} af maksimal sundhed hvert sekund, indtil spyddet ødelægges. Et spyd splintres efter {hitsNormal} træffere fra hvem som helst, uanset hvor meget de gør. En spiller, der allerede er blevet spiddet, kan ikke vælges igen i {cooldown} sek., så spyddene fordeles over hele raidet.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Fra {first} sek inde i Kongens vrede og hvert {everyHeroic} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlHeroic} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamHeroic} af maksimal sundhed. Han kaster Knoglespyd {spikeAt} sek inde i stormen, derefter genaktiveres Gravbryder {rearm} sek efter den slutter.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Knoglestorm',
@@ -15620,23 +15619,16 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Tanks holder Nythraxis vendt væk fra raidet. Alle andre står bag eller ved siden af ham og krydser aldrig keglen.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     'Hvert {seconds} sek oplader Nythraxis sit næste træffende sving. Hans mål tager kun selve svinget, men alle andre inden for {range} yd i den {arc} graders kegle foran ham tager {splash} af det sving som fysisk skade, reduceret af deres egen rustning.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    'Hvert {everyHeroic} sek løber en linje af violet gravild fra Nythraxis mod en raiddeltager og vokser {speed} yd hvert sekund til {length} yd. Hver yard brænder i {burnHeroic} sek og giver {tickHeroic} af maksimal sundhed hvert sekund til alle, der står i den.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Gravild',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Træd til siden for linjen, når den kommer: den er smal og drejer aldrig. Afstandsspillere bliver ved med at bevæge sig i stedet for at stå ét sted.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    'Hvert {everyNormal} sek løber en linje af violet gravild fra Nythraxis mod en raiddeltager og vokser {speed} yd hvert sekund til {length} yd. Hver yard brænder i {burnNormal} sek og giver {tickNormal} af maksimal sundhed hvert sekund til alle, der står i den.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Kongens vrede',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Brug resterende defensive nedkølinger til uundgåelig skade. Hold alle tidligere mekanikker rene, mens raidet afslutter kampen.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis giver {bonusNormal} mere skade på Normal eller {bonusHeroic} på Heroic resten af kampen. Gravudbrud sker hvert {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic), og Gravild hvert {gravefireEveryNormal} sek ({gravefireEveryHeroic} på Heroic).',
+    'Nythraxis giver {bonusNormal} mere skade på Normal eller {bonusHeroic} på Heroic resten af kampen. Gravudbrud sker hvert {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic).',
   'hudChrome.raidBossGuide.nythraxis.overview':
     'Ypperstepræst Malric nægtede at lade sin konge dø, og riten, der rejste Nythraxis, bandt hele hoffet til krypten. Mødet tester et disciplineret tankskifte, hurtige skift til Knoglespyd, bevægelse væk fra brændende jord og en koordineret værnsten-kanalisering, når Tronen falder.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'Kongens vrede',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    'Ved {health} sundhed brøler Nythraxis i Kongens vrede og får {bonusNormal} skade på Normal eller {bonusHeroic} på Heroic resten af kampen. Gravudbrud strammes til hvert {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic), og Gravild til hvert {gravefireEveryNormal} sek ({gravefireEveryHeroic} på Heroic). Alle andre mekanikker beholder deres rytme.',
+    'Ved {health} sundhed brøler Nythraxis i Kongens vrede og får {bonusNormal} skade på Normal eller {bonusHeroic} på Heroic resten af kampen. Gravudbrud strammes til hvert {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic). Alle andre mekanikker beholder deres rytme.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'Tronen',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     'Nythraxis holder sin tronsal med en opladet frontal kløvning, tankskiftet fra Rædselsforbandelse, Knoglespyd der spidder raiddeltagere, og Gravudbrud der efterlader brændende jord.',

@@ -15945,7 +15945,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'La Cour immortelle (héroïque uniquement, la cour royale se relève après Rage immortelle)',
   'hudChrome.finder.mech.grave_eruption':
     "Éruption sépulcrale (cercles d'avertissement qui laissent un sol brûlant)",
-  'hudChrome.finder.mech.gravefire': 'Feu sépulcral (une ligne de feu mobile à esquiver)',
   'hudChrome.finder.mech.kings_wrath':
     'Courroux du roi (30% : bonus de dégâts permanent, dangers au sol plus rapides)',
   'hudChrome.fullTransfer.excluded':
@@ -16046,19 +16045,19 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Désactivé',
   'hudChrome.options.shaderWarmOn': 'Activé',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    "Toutes les {everyHeroic} s, un sceau des anciennes protections flamboie au sol entre {minDist} et {maxDist} yd de Nythraxis, et il commence Ascension immortelle, gagnant {ascensionHeroic} de dégâts et de vitesse d'attaque toutes les {ascensionEvery} s. S'il se tient sur le sceau dans les {bindHeroic} s, il est Lié : l'Ascension est purgée, il est étourdi pendant {stunHeroic} s, et il subit {vulnerability} de dégâts supplémentaires pendant {boundHeroic} s. Sinon, chaque membre du raid subit {unboundHitHeroic} des points de vie maximum en dégâts d'Ombre, et il conserve {unboundBonusHeroic} de dégâts supplémentaires jusqu au prochain lien.",
+    "Toutes les {everyHeroic} s, un sceau des anciennes protections flamboie au sol à {sideOffset} yd à gauche ou à droite de Nythraxis (du point de vue du raid), en changeant de côté à chaque lancement, et il commence Ascension immortelle, gagnant {ascensionHeroic} de dégâts et de vitesse d'attaque toutes les {ascensionEvery} s. S'il se tient sur le sceau dans les {bindHeroic} s, il est Lié : l'Ascension est purgée, il est étourdi pendant {stunHeroic} s, et il subit {vulnerability} de dégâts supplémentaires pendant {boundHeroic} s. Sinon, chaque membre du raid subit {unboundHitHeroic} des points de vie maximum en dégâts d'Ombre, et il conserve {unboundBonusHeroic} de dégâts supplémentaires jusqu au prochain lien.",
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Sceau de lien',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     "Le tank fait aussitôt glisser Nythraxis sur le sceau, à travers tout feu laissé par le raid. Les combattants de mêlée suivent le déplacement et les distances restent hors du nouveau cône de Brise-tombe. Tout le monde le brûle pendant qu'il est Lié.",
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    "Toutes les {everyNormal} s, un sceau des anciennes protections flamboie au sol entre {minDist} et {maxDist} yd de Nythraxis, et il commence Ascension immortelle, gagnant {ascensionNormal} de dégâts et de vitesse d'attaque toutes les {ascensionEvery} s. S'il se tient sur le sceau dans les {bindNormal} s, il est Lié : l'Ascension est purgée, il est étourdi pendant {stunNormal} s, et il subit {vulnerability} de dégâts supplémentaires pendant {boundNormal} s. Sinon, chaque membre du raid subit {unboundHitNormal} des points de vie maximum en dégâts d'Ombre, et il conserve {unboundBonusNormal} de dégâts supplémentaires jusqu au prochain lien.",
+    "Toutes les {everyNormal} s, un sceau des anciennes protections flamboie au sol à {sideOffset} yd à gauche ou à droite de Nythraxis (du point de vue du raid), en changeant de côté à chaque lancement, et il commence Ascension immortelle, gagnant {ascensionNormal} de dégâts et de vitesse d'attaque toutes les {ascensionEvery} s. S'il se tient sur le sceau dans les {bindNormal} s, il est Lié : l'Ascension est purgée, il est étourdi pendant {stunNormal} s, et il subit {vulnerability} de dégâts supplémentaires pendant {boundNormal} s. Sinon, chaque membre du raid subit {unboundHitNormal} des points de vie maximum en dégâts d'Ombre, et il conserve {unboundBonusNormal} de dégâts supplémentaires jusqu au prochain lien.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    "Toutes les {everyHeroic} s, Nythraxis empale {victimsHeroic} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainHeroic} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe. Un joueur déjà empalé ne peut pas être choisi de nouveau pendant {cooldown} s, de sorte que les pointes se répartissent sur tout le raid.",
+    "Toutes les {everyHeroic} s, Nythraxis empale {victimsHeroic} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainHeroic} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe. Une pointe se brise après {hitsHeroic} coups portés par n'importe qui, quels que soient leurs dégâts. Un joueur déjà empalé ne peut pas être choisi de nouveau pendant {cooldown} s, de sorte que les pointes se répartissent sur tout le raid.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': "Pointe d'os",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    "Les DPS passent aussitôt sur les Pointes d'os et les détruisent pour libérer les membres empalés. Les soigneurs gardent les empalés en vie pendant que les pointes tombent.",
+    "Le plus proche frappe la Pointe d'os : quelques coups de n'importe qui la brisent, quels que soient les dégâts. Les soigneurs gardent les empalés en vie pendant que les pointes tombent.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    "Toutes les {everyNormal} s, Nythraxis empale {victimsNormal} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainNormal} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe. Un joueur déjà empalé ne peut pas être choisi de nouveau pendant {cooldown} s, de sorte que les pointes se répartissent sur tout le raid.",
+    "Toutes les {everyNormal} s, Nythraxis empale {victimsNormal} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainNormal} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe. Une pointe se brise après {hitsNormal} coups portés par n'importe qui, quels que soient leurs dégâts. Un joueur déjà empalé ne peut pas être choisi de nouveau pendant {cooldown} s, de sorte que les pointes se répartissent sur tout le raid.",
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     "À partir de {first} s après le Courroux du roi, puis toutes les {everyHeroic} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlHeroic} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamHeroic} des points de vie maximum. Il lance Pointe d'os {spikeAt} s après le début de la tempête, puis Brise-tombe se réarme {rearm} s après la fin.",
   'hudChrome.raidBossGuide.nythraxis.boneStormName': "Tempête d'os",
@@ -16104,23 +16103,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les tanks gardent Nythraxis tourné à l'opposé du raid. Tous les autres restent derrière ou à côté de lui et ne traversent jamais le cône.",
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     "Toutes les {seconds} s, Nythraxis charge sa prochaine attaque réussie. Sa cible ne subit que l'attaque elle-même, mais tous les autres personnages dans les {range} yd du cône frontal de {arc} degrés subissent {splash} de cette attaque en dégâts physiques, réduits par leur propre armure.",
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    "Toutes les {everyHeroic} s, une ligne de feu sépulcral violet part de Nythraxis vers un membre du raid, grandissant de {speed} yd chaque seconde jusqu'à {length} yd. Chaque yard brûle pendant {burnHeroic} s et inflige {tickHeroic} des points de vie maximum chaque seconde à quiconque s'y tient.",
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Feu sépulcral',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Décalez-vous de la ligne quand elle arrive : elle est étroite et ne tourne jamais. Les joueurs à distance continuent de bouger au lieu de rester au même endroit.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    "Toutes les {everyNormal} s, une ligne de feu sépulcral violet part de Nythraxis vers un membre du raid, grandissant de {speed} yd chaque seconde jusqu'à {length} yd. Chaque yard brûle pendant {burnNormal} s et inflige {tickNormal} des points de vie maximum chaque seconde à quiconque s'y tient.",
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Courroux du roi',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Utilisez les temps de recharge défensifs restants pour les dégâts inévitables. Gardez toutes les mécaniques précédentes propres pendant que le raid termine le combat.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis inflige {bonusNormal} de dégâts supplémentaires en normal ou {bonusHeroic} en héroïque pour le reste du combat. Éruption sépulcrale survient toutes les {eruptionEveryNormal} s ({eruptionEveryHeroic} en héroïque) et Feu sépulcral toutes les {gravefireEveryNormal} s ({gravefireEveryHeroic} en héroïque).',
+    'Nythraxis inflige {bonusNormal} de dégâts supplémentaires en normal ou {bonusHeroic} en héroïque pour le reste du combat. Éruption sépulcrale survient toutes les {eruptionEveryNormal} s ({eruptionEveryHeroic} en héroïque).',
   'hudChrome.raidBossGuide.nythraxis.overview':
     "Le grand prêtre Malric a refusé de laisser mourir son roi, et le rite qui a relevé Nythraxis a lié toute la cour à la crypte. La rencontre met à l'épreuve un échange de tanks discipliné, des bascules rapides sur les Pointes d'os, les déplacements hors du sol brûlant, et une canalisation coordonnée des pierres de garde une fois le Trône tombé.",
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'Le Courroux du roi',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    'À {health} points de vie, Nythraxis rugit dans le Courroux du roi et gagne {bonusNormal} de dégâts en normal ou {bonusHeroic} en héroïque pour le reste du combat. Éruption sépulcrale se resserre à toutes les {eruptionEveryNormal} s ({eruptionEveryHeroic} en héroïque) et Feu sépulcral à toutes les {gravefireEveryNormal} s ({gravefireEveryHeroic} en héroïque). Toutes les autres mécaniques gardent leur cadence.',
+    'À {health} points de vie, Nythraxis rugit dans le Courroux du roi et gagne {bonusNormal} de dégâts en normal ou {bonusHeroic} en héroïque pour le reste du combat. Éruption sépulcrale se resserre à toutes les {eruptionEveryNormal} s ({eruptionEveryHeroic} en héroïque). Toutes les autres mécaniques gardent leur cadence.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'Le Trône',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     "Nythraxis tient sa salle du trône avec un cleave frontal chargé, l échange de tanks de Malédiction funeste, des Pointes d'os qui empalent les membres du raid, et des Éruptions sépulcrales qui laissent un sol brûlant.",

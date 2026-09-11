@@ -31,9 +31,30 @@ describe('Nythraxis raid boss guide prose: second playtest tuning', () => {
     expect(nythraxis.graveEruptionSummary).toContain('{flameNormal}');
   });
 
-  it('reads every offensive Nythraxis fire as purple on both difficulties', () => {
-    expect(nythraxis.gravefireSummary).toMatch(/violet grave-fire/i);
-    expect(nythraxis.gravefireHeroicSummary).toMatch(/violet grave-fire/i);
+  it('says nothing about Gravefire anywhere in the guide: the line is gone from the fight', () => {
+    expect(Object.keys(nythraxis).some((k) => /gravefire/i.test(k))).toBe(false);
+    for (const [k, prose] of Object.entries(nythraxis)) {
+      expect(prose, k).not.toMatch(/gravefire|grave-fire/i);
+    }
+    expect(hudChromeStrings.finder.mech).not.toHaveProperty('gravefire');
+  });
+
+  it('tells the raid a spike is a ward: hits to shatter on both difficulties', () => {
+    expect(nythraxis.boneSpikeSummary).toContain('{hitsNormal}');
+    expect(nythraxis.boneSpikeHeroicSummary).toContain('{hitsHeroic}');
+    for (const prose of [nythraxis.boneSpikeSummary, nythraxis.boneSpikeHeroicSummary]) {
+      expect(prose).toMatch(/hits from anyone, whatever the hits deal/i);
+    }
+    expect(nythraxis.boneSpikeResponse).toMatch(/hits from anyone/i);
+  });
+
+  it("places the sigil beside the boss on the raid's left or right, alternating", () => {
+    for (const prose of [nythraxis.bindingSigilSummary, nythraxis.bindingSigilHeroicSummary]) {
+      expect(prose).toContain('{sideOffset}');
+      expect(prose).not.toMatch(/\{minDist\}|\{maxDist\}/);
+      expect(prose).toMatch(/left or right/i);
+      expect(prose).toMatch(/switching sides every cast/i);
+    }
   });
 
   it('tells the raid about the per-raider Bone Spike cooldown on both difficulties', () => {

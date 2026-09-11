@@ -15494,7 +15494,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.deathless_court':
     'Det Dödslösa Hovet (endast heroic, kungahovet reser sig efter Dödslöst Raseri)',
   'hudChrome.finder.mech.grave_eruption': 'Gravutbrott (varningscirklar som lämnar brinnande mark)',
-  'hudChrome.finder.mech.gravefire': 'Graveld (en rörlig eldlinje att sidostega)',
   'hudChrome.finder.mech.kings_wrath':
     'Kungens Vrede (30%: permanent skadebonus, snabbare golvfaror)',
   'hudChrome.fullTransfer.excluded':
@@ -15593,19 +15592,19 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Av',
   'hudChrome.options.shaderWarmOn': 'På',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    'Var {everyHeroic} sek flammar ett sigill från de gamla värnen upp på golvet {minDist} till {maxDist} yd från Nythraxis, och han börjar Dödslös Uppstigning, vilket ger honom {ascensionHeroic} skada och anfallshastighet var {ascensionEvery} sek. Om han står på sigillet inom {bindHeroic} sek blir han Bunden: Uppstigningen renas, han bedövas i {stunHeroic} sek och han tar {vulnerability} mer skada i {boundHeroic} sek. Annars tar varje raiddeltagare {unboundHitHeroic} av maximal hälsa som Skuggskada och han behåller {unboundBonusHeroic} mer skada tills nästa bindning.',
+    'Var {everyHeroic} sek flammar ett sigill från de gamla värnen upp på golvet {sideOffset} yd till vänster eller höger om Nythraxis (sett från raiden), växelvis för varje kast, och han börjar Dödslös Uppstigning, vilket ger honom {ascensionHeroic} skada och anfallshastighet var {ascensionEvery} sek. Om han står på sigillet inom {bindHeroic} sek blir han Bunden: Uppstigningen renas, han bedövas i {stunHeroic} sek och han tar {vulnerability} mer skada i {boundHeroic} sek. Annars tar varje raiddeltagare {unboundHitHeroic} av maximal hälsa som Skuggskada och han behåller {unboundBonusHeroic} mer skada tills nästa bindning.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Bindningssigill',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'Tanken drar Nythraxis till sigillet direkt, genom vilken eld raiden än har lämnat. Närstrid följer dragningen och distansspelare håller sig borta från den nya Gravbrytarkonen. Alla bränner ner honom medan han är Bunden.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    'Var {everyNormal} sek flammar ett sigill från de gamla värnen upp på golvet {minDist} till {maxDist} yd från Nythraxis, och han börjar Dödslös Uppstigning, vilket ger honom {ascensionNormal} skada och anfallshastighet var {ascensionEvery} sek. Om han står på sigillet inom {bindNormal} sek blir han Bunden: Uppstigningen renas, han bedövas i {stunNormal} sek och han tar {vulnerability} mer skada i {boundNormal} sek. Annars tar varje raiddeltagare {unboundHitNormal} av maximal hälsa som Skuggskada och han behåller {unboundBonusNormal} mer skada tills nästa bindning.',
+    'Var {everyNormal} sek flammar ett sigill från de gamla värnen upp på golvet {sideOffset} yd till vänster eller höger om Nythraxis (sett från raiden), växelvis för varje kast, och han börjar Dödslös Uppstigning, vilket ger honom {ascensionNormal} skada och anfallshastighet var {ascensionEvery} sek. Om han står på sigillet inom {bindNormal} sek blir han Bunden: Uppstigningen renas, han bedövas i {stunNormal} sek och han tar {vulnerability} mer skada i {boundNormal} sek. Annars tar varje raiddeltagare {unboundHitNormal} av maximal hälsa som Skuggskada och han behåller {unboundBonusNormal} mer skada tills nästa bindning.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Var {everyHeroic} sek spetsar Nythraxis {victimsHeroic} raiddeltagare utom sitt nuvarande mål på Benspett. En spetsad raiddeltagare kan inte agera och förlorar {drainHeroic} av maximal hälsa varje sekund tills spettet förstörs. En spelare som redan har spetsats kan inte väljas igen på {cooldown} sek, så spetten fördelas över hela raiden.',
+    'Var {everyHeroic} sek spetsar Nythraxis {victimsHeroic} raiddeltagare utom sitt nuvarande mål på Benspett. En spetsad raiddeltagare kan inte agera och förlorar {drainHeroic} av maximal hälsa varje sekund tills spettet förstörs. Ett spett splittras efter {hitsHeroic} träffar från vem som helst, oavsett hur mycket skada de gör. En spelare som redan har spetsats kan inte väljas igen på {cooldown} sek, så spetten fördelas över hela raiden.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Benspett',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'Skadegörare byter direkt till Benspetten och förstör dem för att befria de spetsade raiddeltagarna. Helare håller de spetsade vid liv medan spetten faller.',
+    'Den som står närmast slår på Benspettet: några träffar från vem som helst splittrar det, oavsett skadan. Healers håller de spetsade vid liv medan spetten faller.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Var {everyNormal} sek spetsar Nythraxis {victimsNormal} raiddeltagare utom sitt nuvarande mål på Benspett. En spetsad raiddeltagare kan inte agera och förlorar {drainNormal} av maximal hälsa varje sekund tills spettet förstörs. En spelare som redan har spetsats kan inte väljas igen på {cooldown} sek, så spetten fördelas över hela raiden.',
+    'Var {everyNormal} sek spetsar Nythraxis {victimsNormal} raiddeltagare utom sitt nuvarande mål på Benspett. En spetsad raiddeltagare kan inte agera och förlorar {drainNormal} av maximal hälsa varje sekund tills spettet förstörs. Ett spett splittras efter {hitsNormal} träffar från vem som helst, oavsett hur mycket skada de gör. En spelare som redan har spetsats kan inte väljas igen på {cooldown} sek, så spetten fördelas över hela raiden.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Från {first} sek in i Kungens Vrede och var {everyHeroic} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlHeroic} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamHeroic} av maximal hälsa. Han kastar Benspett {spikeAt} sek in i stormen, sedan återaktiveras Gravbrytare {rearm} sek efter att den slutar.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Benstorm',
@@ -15651,23 +15650,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tankar håller Nythraxis vänd bort från raiden. Alla andra står bakom eller bredvid honom och korsar aldrig konen.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     'Var {seconds} sek laddar Nythraxis sin nästa träffade sving. Hans mål tar bara själva svingen, men alla andra inom {range} yd i den {arc} grader breda konen framför honom tar {splash} av den svingen som fysisk skada, minskad av deras egen rustning.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    'Var {everyHeroic} sek löper en linje av violett graveld från Nythraxis mot en raiddeltagare och växer {speed} yd varje sekund till {length} yd. Varje yard brinner i {burnHeroic} sek och orsakar {tickHeroic} av maximal hälsa varje sekund för alla som står i den.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Graveld',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Sidostega linjen när den kommer: den är smal och svänger aldrig. Distansspelare fortsätter röra sig i stället för att stå på samma plats.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    'Var {everyNormal} sek löper en linje av violett graveld från Nythraxis mot en raiddeltagare och växer {speed} yd varje sekund till {length} yd. Varje yard brinner i {burnNormal} sek och orsakar {tickNormal} av maximal hälsa varje sekund för alla som står i den.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Kungens Vrede',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Använd återstående defensiva nedkylningar för oundviklig skada. Håll varje tidigare mekanik ren medan raiden avslutar striden.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis orsakar {bonusNormal} mer skada på Normal eller {bonusHeroic} på Heroic resten av striden. Gravutbrott sker var {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic) och Graveld var {gravefireEveryNormal} sek ({gravefireEveryHeroic} på Heroic).',
+    'Nythraxis orsakar {bonusNormal} mer skada på Normal eller {bonusHeroic} på Heroic resten av striden. Gravutbrott sker var {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic).',
   'hudChrome.raidBossGuide.nythraxis.overview':
     'Överstepräst Malric vägrade låta sin kung dö, och riten som reste Nythraxis band hela hovet till kryptan. Mötet prövar ett disciplinerat tankbyte, snabba byten till Benspett, rörelse bort från brinnande mark och samordnad kanalisering av värnstenar när Tronen faller.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'Kungens Vrede',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    'Vid {health} hälsa ryter Nythraxis i Kungens Vrede och får {bonusNormal} skada på Normal eller {bonusHeroic} på Heroic resten av striden. Gravutbrott tätnar till var {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic) och Graveld till var {gravefireEveryNormal} sek ({gravefireEveryHeroic} på Heroic). Varje annan mekanik behåller sin rytm.',
+    'Vid {health} hälsa ryter Nythraxis i Kungens Vrede och får {bonusNormal} skada på Normal eller {bonusHeroic} på Heroic resten av striden. Gravutbrott tätnar till var {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic). Varje annan mekanik behåller sin rytm.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'Tronen',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     'Nythraxis håller sin tronsal med en laddad frontal klyvning, tankbytet för Skräckförbannelse, Benspett som spetsar raiddeltagare och Gravutbrott som lämnar brinnande mark.',
