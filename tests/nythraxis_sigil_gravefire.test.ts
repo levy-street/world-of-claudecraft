@@ -203,7 +203,7 @@ function expectNythraxisCleanup(
 }
 
 describe('Nythraxis Binding Sigil (the pull)', () => {
-  it('flares a sigil on open floor inside the ring band, clear of every wardstone', () => {
+  it("flares a sigil on the raid's-right platform, clear of every wardstone", () => {
     expect(NYTHRAXIS_SIGIL_SIDE_OFFSET).toBe(30);
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, wards, callouts } = setup({ difficulty });
@@ -325,6 +325,35 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     expect(normalSigil.z).toBeCloseTo(normal.boss.spawnPos.z, 6);
     expect(heroicSigil.x).toBeCloseTo(heroic.boss.spawnPos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
     expect(heroicSigil.z).toBeCloseTo(heroic.boss.spawnPos.z, 6);
+  });
+
+  it('remembers the platform it actually landed on, so the next cast alternates from there', () => {
+    // Normal: fire on the asked (right) platform sends the first sigil left.
+    const { ctx, boss, st } = setup();
+    st.graveFlames = [
+      {
+        seq: 0,
+        kind: 'grave' as const,
+        x: boss.spawnPos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET,
+        z: boss.spawnPos.z,
+        radius: 3,
+        remaining: 10,
+        tickTimer: 1,
+      },
+    ];
+    st.sigilTimer = DT / 2;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(st.sigil!.x).toBeCloseTo(boss.spawnPos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(st.sigilSide).toBe(1);
+    // The fire burns out and the sigil resolves: the next cast goes RIGHT,
+    // never back onto the platform he was just bound on.
+    st.graveFlames = [];
+    nythraxis.clearNythraxisSigil(boss);
+    st.sigilTimer = DT / 2;
+    st.majorGapTimer = 0;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(st.sigil!.x).toBeCloseTo(boss.spawnPos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(st.sigilSide).toBe(-1);
   });
 
   it('climbs Deathless Ascension every two seconds while the sigil stands', () => {

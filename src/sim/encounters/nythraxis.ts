@@ -67,6 +67,7 @@ import {
   nythraxisSigilNextSide,
   nythraxisSigilPlacement,
   nythraxisSigilRadius,
+  nythraxisSigilSideOf,
   nythraxisUnboundDamageBonus,
   nythraxisUnboundHitMaxHp,
 } from '../nythraxis_binding_sigil';
@@ -1584,15 +1585,17 @@ export function startNythraxisSigil(
   const castKey = (Math.imul(ctx.tickCount, 0x9e3779b1) ^ boss.id ^ 0x5161) >>> 0;
   // On the flanking platform to the raid's left or right of the SPAWN,
   // alternating every cast (the platforms are fixed spots, wherever he is).
-  const side = nythraxisSigilNextSide(ms.sigilSide);
-  ms.sigilSide = side;
+  const anchor = { x: boss.spawnPos.x, z: boss.spawnPos.z };
   const point = nythraxisSigilPlacement(
-    { x: boss.spawnPos.x, z: boss.spawnPos.z },
-    side,
+    anchor,
+    nythraxisSigilNextSide(ms.sigilSide),
     nythraxisSigilRadius(difficulty),
     nythraxisSigilFloor(ctx, boss, ms),
     nythraxisSigilMayLandInFire(difficulty),
   );
+  // Remember the platform it actually landed on (a warded or burning one
+  // sends it across), so the next cast alternates from there.
+  ms.sigilSide = nythraxisSigilSideOf(anchor, point);
   ms.sigil = {
     castKey,
     x: point.x,

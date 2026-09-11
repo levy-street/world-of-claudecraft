@@ -182,6 +182,19 @@ export function nythraxisSigilNextSide(previous: NythraxisSigilSide | null): Nyt
   return previous === null ? -1 : previous === 1 ? -1 : 1;
 }
 
+/**
+ * The side of the anchor a placed sigil sits on: what the next cast
+ * alternates from. The driver stores this, not the side it asked for, so a
+ * blocked-platform crossover is remembered and the following cast goes to
+ * the other platform instead of repeating the one he was just bound on.
+ */
+export function nythraxisSigilSideOf(
+  anchor: NythraxisSigilPoint,
+  point: NythraxisSigilPoint,
+): NythraxisSigilSide {
+  return point.x > anchor.x ? 1 : -1;
+}
+
 /** True when a sigil of `radius` at `point` obeys every placement rule. */
 export function nythraxisSigilPlacementValid(
   point: NythraxisSigilPoint,

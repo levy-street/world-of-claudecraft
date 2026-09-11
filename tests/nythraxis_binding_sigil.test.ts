@@ -25,6 +25,7 @@ import {
   nythraxisSigilPlacement,
   nythraxisSigilPlacementValid,
   nythraxisSigilRadius,
+  nythraxisSigilSideOf,
   nythraxisUnboundDamageBonus,
   nythraxisUnboundHitMaxHp,
 } from '../src/sim/nythraxis_binding_sigil';
@@ -85,6 +86,18 @@ describe('Nythraxis Binding Sigil', () => {
     const left = nythraxisSigilCandidate(BOSS, 1);
     expect(right.x - BOSS.x).toBe(-(left.x - BOSS.x));
     expect(right.z).toBe(left.z);
+  });
+
+  it('reads the side a placed sigil sits on, so a crossover is what the next cast alternates from', () => {
+    expect(nythraxisSigilSideOf(BOSS, nythraxisSigilCandidate(BOSS, 1))).toBe(1);
+    expect(nythraxisSigilSideOf(BOSS, nythraxisSigilCandidate(BOSS, -1))).toBe(-1);
+    // A fire-forced crossover: asked right, landed left, remembered as left,
+    // so the next side is right again rather than left twice.
+    const fireOnRight = { ...OPEN, fires: [{ ...nythraxisSigilCandidate(BOSS, -1), radius: 3 }] };
+    const landed = nythraxisSigilPlacement(BOSS, -1, 4, fireOnRight, false);
+    const landedSide = nythraxisSigilSideOf(BOSS, landed);
+    expect(landedSide).toBe(1);
+    expect(nythraxisSigilNextSide(landedSide)).toBe(-1);
   });
 
   it("alternates sides every cast, starting on the raid's right (world -x)", () => {
@@ -148,7 +161,13 @@ describe('Nythraxis Binding Sigil', () => {
     expect(nythraxisSigilPlacement(BOSS, -1, 4, both, false)).toEqual(right);
     // Both platforms burning on Normal: the asked one, fire and all (a cast
     // must land somewhere; flagged for the owner).
-    const bothFire = { ...OPEN, fires: [{ ...right, radius: 3 }, { ...left, radius: 3 }] };
+    const bothFire = {
+      ...OPEN,
+      fires: [
+        { ...right, radius: 3 },
+        { ...left, radius: 3 },
+      ],
+    };
     expect(nythraxisSigilPlacement(BOSS, -1, 4, bothFire, false)).toEqual(right);
     const nowhere = nythraxisSigilPlacement(BOSS, 1, 4, { ...OPEN, openFloor: () => false }, false);
     expect(nowhere).toEqual(left);

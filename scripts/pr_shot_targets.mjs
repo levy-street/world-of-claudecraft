@@ -15812,7 +15812,7 @@ export const TARGETS = [
   {
     key: 'nythraxis-sigil-side',
     label:
-      "Nythraxis arena: the Binding Sigil beside the boss on the raid's right, and a " +
+      "Nythraxis arena: the Binding Sigil on the flanking platform to the raid's right, and a " +
       'targeted ward spike whose health bar reads as hits remaining',
     when: [
       'sim/nythraxis_binding_sigil',
@@ -15921,10 +15921,10 @@ export const TARGETS = [
         if (spike) player.targetId = spike.id;
         const bx = boss.pos.x;
         const bz = boss.pos.z;
-        // High and wide from behind the raid so the sigil (22 yd to the
-        // raid's right of the boss, world -x, which reads on the screen's
-        // right when looking up the hall), the spike line, and the boss
-        // share one frame.
+        // High and wide from behind the raid so the sigil (on the flanking
+        // platform 30 yd to the raid's right of the spawn, world -x, which
+        // reads on the screen's right when looking up the hall), the spike
+        // line, and the boss share one frame.
         player.pos = { x: bx - 10, y: player.pos.y, z: bz - 40 };
         player.prevPos = { ...player.pos };
         player.facing = Math.atan2(bx - player.pos.x, bz - player.pos.z);

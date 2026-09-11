@@ -4,6 +4,7 @@
 // their driver by hand and assert on entities, auras, events, and readouts.
 
 import { describe, expect, it } from 'vitest';
+import { dealDamage } from '../src/sim/combat/damage';
 import {
   HEROIC_DUNGEON_TUNING,
   NORMAL_DUNGEON_TUNING,
@@ -259,6 +260,54 @@ describe('Nythraxis Bone Spike', () => {
       NORMAL_DUNGEON_TUNING.nythraxis_boss_arena.healthMultiplier,
     );
     expect(NORMAL_DUNGEON_TUNING.nythraxis_boss_arena.healthMultiplier).toBe(2.0);
+  });
+
+  it('keeps a ward hit an original attack: Crafted Momentum charges still advance', () => {
+    const { ctx, boss, st, room, raiders, spikes } = setup();
+    const [victim] = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), 'normal');
+    const spike = spikes()[0];
+    const mage = raiders.slice(2).find((r) => r.id !== victim.id)!;
+    mage.craftedCollectionId = 'crucible_caster_cloth';
+    mage.inCombat = true;
+    const chargesId = 'crafted_collection_crucible_caster_cloth_charges';
+    const charges = () =>
+      mage.auras.find(
+        (a: { id: string; remaining: number }) => a.id === chargesId && a.remaining > 0,
+      )?.value ?? 0;
+    const expireRate = () => {
+      for (const a of mage.auras) if (a.id.endsWith('_rate')) a.remaining = 0;
+    };
+    expect(charges()).toBe(0);
+    // A one-point Fireball on the ward: one point off the pool, one charge on
+    // (the amount is pinned; the provenance is the player's own hit).
+    expect(ctx.dealDamage(mage, spike, 1, false, 'fire', 'Fireball', 'hit')).toBe(1);
+    expect(spike.hp).toBe(nythraxisBoneSpikeHits('normal') - 1);
+    expect(charges()).toBe(1);
+    // A REAL copy (an already-final redirect share) still earns nothing.
+    expireRate();
+    expect(
+      dealDamage(
+        ctx,
+        mage,
+        spike,
+        1,
+        false,
+        'fire',
+        'Fireball',
+        'hit',
+        false,
+        undefined,
+        true,
+        false,
+        true,
+      ),
+    ).toBe(1);
+    expect(charges()).toBe(1);
+    // The same hit on the boss is the positive control: the ward path and
+    // the boss path earn the charge alike.
+    expireRate();
+    ctx.dealDamage(mage, boss, 100, false, 'fire', 'Fireball', 'hit');
+    expect(charges()).toBe(2);
   });
 
   it('counts every player or pet hit as one, whatever it deals, and shatters on the last', () => {

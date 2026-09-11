@@ -210,13 +210,20 @@ export function dealDamage(
 ): number {
   if (resolution) resolution.landedHpLoss = 0;
   if (resolvedHpLoss) alreadyFinal = true;
+  // Provenance for proc accounting (crafted collections): a copy or redirect
+  // share must never earn a second charge, but a ward-normalized ORIGINAL hit
+  // below is still the player's own attack. Captured before the ward rule
+  // turns on the modifier bypass, so the two decisions stay separate.
+  const copiedHit = alreadyFinal;
   if (target.dead) return 0;
   if (target.damageImmune) return 0;
   // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
   // pet hit lands exactly one point, whatever it would have dealt, and the
   // spike's pool is its hit count. Resolved like an exact copy so no source
   // mod, target amp, absorb, or crit multiplier can move it off one; the
-  // crit ROLL itself is kept, so crit procs and counters still fire.
+  // crit ROLL itself is kept, and the hit keeps its original-attack
+  // provenance (copiedHit above), so proc accounting still sees the
+  // player's own hit.
   if (nythraxisBoneSpikeWardHit(source, target)) {
     amount = NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE;
     resolvedHpLoss = true;
@@ -1076,7 +1083,7 @@ export function dealDamage(
   }
 
   if (source && source.id !== target.id) ctx.enterCombat(source, target);
-  onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, alreadyFinal);
+  onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, copiedHit);
   if (direct) ctx.refreshMobLeashFromAction(source, target);
 
   // classic threat: damage (and the ability's flat bonus) lands on the mob's
