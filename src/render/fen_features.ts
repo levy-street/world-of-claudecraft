@@ -5,6 +5,14 @@
 // pieces are GPU-instanced from five optimized GLBs (the flower-bed
 // fidelity recipe; scripts/assets/build_willowfen_props.mjs). Same contract
 // as the sibling realm modules: build once, update(time) animates gently.
+//
+// Every family is instanced per XZ cell (zone_feature_cells_core.ts), one
+// cull group per (family, cell), so the renderer's zone-feature sweep can hide
+// the cells the fog has swallowed instead of the whole zone at once: as one
+// mesh per family the fen's footprint edge sat inside the low fog from
+// Eastbrook and 1.49M fully fogged triangles were submitted every frame. The
+// dressing cells carry their apparent-size reach on every profile, and the
+// willows stay one whole group (fenFeaturesBuildOptions).
 import * as THREE from 'three';
 import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from '../sim/content/willowfen';
 import { fenWillowSpots } from '../sim/fen_willows';
@@ -17,12 +25,56 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { GFX } from './gfx';
+import { GFX, ZONE_FEATURE_CELL_SIZE } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
 import { thinLeanDressing } from './zone_dressing_lod_core';
+import { partitionByCell } from './zone_feature_cells_core';
+import { ZONE_FEATURE_EXTENT_KEY } from './zone_feature_sweep';
 
 export interface FenFeaturesView {
   group: THREE.Group;
+  /** One group per (family, cell), registered with the distance cull; the
+   *  parent group alone (one whole-zone footprint, today's layout) when the
+   *  build keeps whole meshes. */
+  cullGroups: THREE.Group[];
   update(time: number): void;
+}
+
+export interface FenFeaturesBuildOptions {
+  /** XZ cell size in yd; 0 keeps each family as one whole mesh straight
+   *  under the parent group, the pre-split scene graph byte for byte. */
+  cellSize: number;
+}
+
+/** The live build options: cells for every family with their reach, on every
+ *  profile.
+ *
+ *  The reach was once gated to the far-vista arm, on the premise that the
+ *  classic arm's fog owns the far end. That premise is false for the
+ *  constrained-memory profiles (phone class, and any touch device in a window
+ *  under 760 px tall): they run the classic arm with a fog that eases out to
+ *  700 yd, so the fen sits INSIDE it, the cells shed nothing, and the split
+ *  cost 19 draws for 2 percent fewer triangles (measured on an Iris Xe at
+ *  medium, both arms of one build, 2026-09-08). Applying the reach everywhere
+ *  fixes that cohort and removes the arm decision from this build: the reach
+ *  can only ever hide and the cull distance still applies on top, so the
+ *  stricter of the two decides: at low (fog 340) the fog is stricter for the
+ *  lily rafts, whose reach is 406, and the reach is stricter for the reeds,
+ *  mushrooms and logs, whose models put theirs at 224 to 287.
+ *
+ *  The willows split like every other family and are simply never SIZED (the
+ *  collider rule): keeping them whole was measured and is worse, because the
+ *  family's own footprint then reaches inside the low tier's fog from
+ *  Eastbrook and drags all 54 trees with it (615,276 triangles against none).
+ *
+ *  Nothing here reads a tier, a memory profile or the far-field policy: the
+ *  build is one shape everywhere, and which of the reach or the cull distance
+ *  sheds a cell is the sweep's decision, per frame, per group.
+ *
+ *  `?fencells=off` builds today's whole layout on any session (both arms of
+ *  one build for the scene census). */
+export function fenFeaturesBuildOptions(): FenFeaturesBuildOptions {
+  return { cellSize: renderLayerDisabled('fencells') ? 0 : ZONE_FEATURE_CELL_SIZE };
 }
 
 const FEN_ZMIN = 180;
@@ -46,6 +98,18 @@ for (const key of Object.keys(FEN_PROP_URLS) as FenPropKey[]) {
   );
 }
 
+/** Test seam: stand-in scenes for the deferred GLBs, so the real build runs
+ *  in Node (tests/fen_features_cells.test.ts). */
+export const fenFeaturesInternalsForTest = {
+  familyKeys: Object.keys(FEN_PROP_URLS) as FenPropKey[],
+  seedPropScene(key: FenPropKey, scene: THREE.Group): void {
+    propScenes[key] = scene;
+  },
+  resetPropScenes(): void {
+    for (const key of Object.keys(FEN_PROP_URLS) as FenPropKey[]) delete propScenes[key];
+  },
+};
+
 interface Placement {
   x: number;
   y: number;
@@ -57,7 +121,12 @@ interface Placement {
 
 // bake a loaded scene into (geometry, material) parts: world matrices
 // applied, the whole model re-based so xz is centered and min-y sits at 0
-function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THREE.Material }[] {
+interface ExtractedModel {
+  parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[];
+  /** The model's largest world-space dimension at unit scale (yd). */
+  extent: number;
+}
+function extractParts(scene: THREE.Group): ExtractedModel {
   scene.updateMatrixWorld(true);
   const parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[] = [];
   scene.traverse((o) => {
@@ -79,17 +148,55 @@ function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THR
     p.geo.computeBoundingBox();
     p.geo.computeBoundingSphere();
   }
-  return parts;
+  const size = box.getSize(new THREE.Vector3());
+  return { parts, extent: Math.max(size.x, size.y, size.z) };
 }
 
-export function buildFenFeatures(seed: number): FenFeaturesView {
+// One geometry OBJECT per cell over the family's shared vertex data: three
+// keys its vertex-array binding on geometry.id and caches the instanceMatrix
+// in it, so cells of one family sharing a single geometry would re-run the
+// attribute setup on every consecutive draw. Distinct objects over the same
+// attribute objects give each cell its own binding at zero vertex memory
+// (the GPU buffers are cached per attribute, not per geometry).
+//
+// The trade is the other way round for the driver: one binding per cell
+// instead of one per family. That was measured a win on ANGLE GL; whether it
+// is one on ANGLE Vulkan, where vertex-state changes have their own price, is
+// what `?fencellgeo=off` exists to answer. Off, every cell of a family shares
+// the family's geometry and three re-runs the attribute setup between them.
+//
+// Dispose contract: a wrapper is never disposed on its own. three answers a
+// dispose on any one of them by deleting the SHARED attribute buffers, and
+// every sibling cell would silently re-upload on its next draw. The fen has
+// no teardown today (built once, never evicted); a future release path
+// disposes the family's source geometry once, not the cells.
+function cellGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
+  if (renderLayerDisabled('fencellgeo')) return source;
+  const geo = new THREE.BufferGeometry();
+  if (source.index) geo.setIndex(source.index);
+  for (const name of Object.keys(source.attributes)) {
+    geo.setAttribute(name, source.attributes[name]);
+  }
+  geo.groups = source.groups.map((g) => ({ ...g }));
+  geo.setDrawRange(source.drawRange.start, source.drawRange.count);
+  geo.boundingBox = source.boundingBox ? source.boundingBox.clone() : null;
+  geo.boundingSphere = source.boundingSphere ? source.boundingSphere.clone() : null;
+  return geo;
+}
+
+export function buildFenFeatures(
+  seed: number,
+  options: FenFeaturesBuildOptions = fenFeaturesBuildOptions(),
+): FenFeaturesView {
   const group = new THREE.Group();
   group.name = 'fen-features';
+  const cullGroups: THREE.Group[] = [];
 
   const instance = (
     geo: THREE.BufferGeometry,
     material: THREE.Material,
     spots: readonly Placement[],
+    parent: THREE.Group,
     tinted = false,
   ) => {
     if (spots.length === 0) return;
@@ -111,15 +218,52 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.computeBoundingSphere();
-    group.add(mesh);
+    parent.add(mesh);
   };
 
-  // instance every part of a loaded prop model at the given placements
-  const instanceProp = (key: FenPropKey, spots: readonly Placement[]): void => {
+  // instance every part of a loaded prop model at the given placements, one
+  // cull group per cell of the family (whole meshes under the parent when
+  // the family does not split); a dressing cell under the apparent-size
+  // reach carries its largest instance's extent, so a one-off giant keeps
+  // its whole cell out to the horizon and a clump of small ones sheds where
+  // it is a few pixels
+  const instanceProp = (
+    key: FenPropKey,
+    spots: readonly Placement[],
+    split: boolean,
+    sizeReach = false,
+  ): void => {
     const scene = propScenes[key];
     if (!scene || spots.length === 0) return;
-    for (const part of extractParts(scene)) {
-      instance(part.geo, part.mat, spots);
+    const { parts, extent } = extractParts(scene);
+    if (!split) {
+      // a whole family in a split build still gets its own cull group (the
+      // distance rule must keep applying to it); in a whole build the meshes
+      // sit straight under the parent, the pre-split scene graph
+      let parent = group;
+      if (options.cellSize > 0) {
+        parent = new THREE.Group();
+        parent.name = `fen-features:${key}:whole`;
+        group.add(parent);
+        cullGroups.push(parent);
+      }
+      for (const part of parts) instance(part.geo, part.mat, spots, parent);
+      return;
+    }
+    for (const cell of partitionByCell(spots, options.cellSize)) {
+      const cellGroup = new THREE.Group();
+      cellGroup.name = `fen-features:${key}:${cell.key}`;
+      for (const part of parts) {
+        instance(cellGeometry(part.geo), part.mat, cell.spots, cellGroup);
+      }
+      if (cellGroup.children.length === 0) continue;
+      if (sizeReach) {
+        let maxScale = 0;
+        for (const sp of cell.spots) maxScale = Math.max(maxScale, sp.s);
+        cellGroup.userData[ZONE_FEATURE_EXTENT_KEY] = extent * maxScale;
+      }
+      group.add(cellGroup);
+      cullGroups.push(cellGroup);
     }
   };
 
@@ -127,9 +271,12 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
   // interaction, so a lean session draws an evenly thinned band of it (these
   // models are 5,000 to 11,400 triangles EACH, the largest triangle bucket a
   // town frame pays). The willows below never come through here: their trunks
-  // are the sim's own colliders.
+  // are the sim's own colliders. The thin runs over the WHOLE family before
+  // the cell split, so the surviving set does not depend on the cell size.
+  const split = options.cellSize > 0;
   const instanceDressing = (key: FenPropKey, spots: readonly Placement[]): void => {
-    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage));
+    // sized: a dressing family opts into the apparent-size reach
+    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage), split, true);
   };
 
   const hub = WILLOWFEN_ZONE.hub;
@@ -181,9 +328,13 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
   // --- the willows: instanced at the shared sim placements (fenWillowSpots
   // in sim/fen_willows.ts), so every trunk the renderer draws is exactly a
   // trunk the sim's colliders block ---
+  // Split like the dressing, but NEVER given the apparent-size reach: the
+  // trunks are the sim's colliders, so only the distance rule may hide them
+  // (their size would carry them past every cull horizon anyway).
   instanceProp(
     'willow',
     fenWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
+    split,
   );
 
   // --- the water lilies: modeled lily rafts drifting on every pool ---
@@ -281,6 +432,7 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
 
   return {
     group,
+    cullGroups: split ? cullGroups : [group],
     update(): void {
       // everything modeled sits still; the fen's motion is the water's
     },

@@ -1052,6 +1052,123 @@ async function triggerRowBreakdown(page, rowSelector, variant) {
 }
 
 export const TARGETS = [
+  {
+    key: 'fen-features-cull',
+    label:
+      'Willowfen dressing under the per-cell cull: expected visually identical on both tiers, judged on the census readout',
+    when: [
+      'render/fen_features',
+      'render/zone_feature_cells_core',
+      'render/zone_feature_sweep',
+      'render/zone_feature_visibility_core',
+    ],
+    variants: [
+      // Eastbrook, facing the fen: on low every fen cell is past the 340 yd fog
+      // or past its own apparent-size reach, so the frame must not change while
+      // the submitted triangles drop.
+      {
+        key: 'eastbrook-facing-fen-low',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: 0, z: -14, facing: -0.764 },
+      },
+      // The Bridgemere hub inside the fen: the cells behind the camera are
+      // frustum-culled now, nothing in view moves.
+      {
+        key: 'bridgemere-hub-low',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: -360, z: 362, facing: 0 },
+      },
+      // Medium: the dressing cells shed by apparent size (a raft below 8 px at
+      // the reference view) in clear air rather than behind fog, so this is the
+      // pair where a shed would show if it were ever visible. It is not: judge
+      // it on the census readout, like the low pair.
+      {
+        key: 'eastbrook-facing-fen-medium',
+        beforeLoad: seedMediumGraphicsPreset,
+        spot: { x: 0, z: -14, facing: -0.764 },
+      },
+      {
+        key: 'bridgemere-hub-medium',
+        beforeLoad: seedMediumGraphicsPreset,
+        spot: { x: -360, z: 362, facing: 0 },
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      // Midday through the render-only override the /daynight dev command
+      // drives (the reliquary targets' idiom), set BEFORE the teleport so the
+      // grade has the whole streaming wait to settle: both arms of a pair
+      // share one light and the far clutter is judged in full daylight.
+      await page.evaluate(async () => {
+        const clock = await import('/src/render/day_night_clock.ts');
+        clock.setDayNightPhaseOverride(0.5);
+      });
+      const staged = await page.evaluate((spot) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        player.pos.x = spot.x;
+        player.pos.z = spot.z;
+        player.prevPos = { ...player.pos };
+        player.facing = spot.facing;
+        game.input.camYaw = player.facing;
+        game.input.camDist = 9;
+        // A fixed pitch as well: the chase boom otherwise settles a little
+        // differently per run and the pair stops comparing frame to frame.
+        game.input.camPitch = 0.35;
+        sim.rebucket?.(player);
+        // Wandering hostiles walk into the frame and aggro the player mid-shot
+        // (a wolf pack at the Eastbrook spot); relocate every mob nearby, the
+        // weapon-vfx target's idiom, so the pair compares scenery to scenery.
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.id === player.id) continue;
+          const dx = e.pos.x - player.pos.x;
+          const dz = e.pos.z - player.pos.z;
+          if (dx * dx + dz * dz > 90 * 90) continue;
+          e.pos.x += 400;
+          if (e.prevPos) {
+            e.prevPos.x = e.pos.x;
+            e.prevPos.y = e.pos.y;
+            e.prevPos.z = e.pos.z;
+          }
+          if (e.spawnPos) e.spawnPos = { ...e.pos };
+          if (e.leashAnchor) e.leashAnchor = { ...e.pos };
+          sim.rebucket?.(e);
+        }
+        player.inCombat = false;
+        player.combatTimer = 0;
+        player.hp = player.maxHp ?? player.hp;
+        return { ok: true };
+      }, variant.spot);
+      if (!staged.ok) throw new Error(staged.reason);
+      // Crossing the world raises the streaming veil; the fen itself is built by
+      // the background zone prepare a few seconds after the reveal.
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 8);
+      await wait(8000);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
   ...masterwroughtReviewTargets({
     beforeLoad: lowGraphicsSeed,
     dismissOverlays: dismissEntryOverlays,

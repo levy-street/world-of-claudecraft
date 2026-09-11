@@ -44,6 +44,22 @@ describe('runBackgroundPrewarm', () => {
     expect(groups.map((entry) => entry.visible)).toEqual([true, false]);
   });
 
+  it('keeps a reveal that lands inside the window (a gated attach settling)', async () => {
+    // A lazily built zone feature arrives hidden by its own gated attach and
+    // that gate reveals it when its programs link, which can happen while the
+    // prewarm window is open. The captured "hidden" must not clobber it: the
+    // Willowfen dressing stayed invisible for good this way once its parent
+    // group was no longer rewritten by the per-frame distance cull.
+    const groups = [group(1), group(1)];
+    groups[0].visible = false; // gate pending at capture
+    groups[1].visible = false;
+    await withHiddenPrewarmGroups(groups, async () => {
+      expect(groups.map((entry) => entry.visible)).toEqual([false, false]);
+      groups[0].visible = true; // the gate's reveal, mid-window
+    });
+    expect(groups.map((entry) => entry.visible)).toEqual([true, false]);
+  });
+
   it('restores hidden-group state when awaited compilation fails', async () => {
     const groups = [group(1), group(1)];
     groups[1].visible = false;

@@ -157,3 +157,81 @@ export function hasUnseededInstanceMatrix(array: ArrayLike<number>, count: numbe
   }
   return false;
 }
+
+// The apparent-size reach: how far a feature cull group may sit before its
+// LARGEST instance is too small on screen to be worth its draw.
+//
+// WHY THIS EXISTS. A zone feature is culled against the session's cull
+// distance, and on several profiles that distance is far enough to draw
+// clutter nobody can resolve: the far-vista arm culls at the detail horizon
+// (700 to 850 yd) with the scene fog parked past 924, and the constrained
+// memory profiles run the classic arm with a fog that eases out to 700. On
+// both, a 6,000-triangle lily raft five yards across is drawn at 500 yd as a
+// 6-pixel blob, and the Willowfen's four clutter families were 1.67M of the
+// 2.34M fen triangles submitted from Eastbrook at medium. The props layer
+// draws a far bake at that distance and foliage draws impostors; the bespoke
+// dressing had no far representation at all. The rule below is size-driven,
+// never a per-family table: a group's reach is the distance at which its largest
+// instance spans ZONE_FEATURE_MIN_APPARENT_PX at a fixed reference view (720
+// px tall, the 60 degree base FOV), so a giant one-off model pulls its whole
+// group out to the horizon with nothing to write anywhere, and a small clump
+// fades where it is a few pixels. The reference is a constant on purpose: a
+// live viewport or FOV would make what is drawn depend on the window, and
+// the shed must be as static as any other tier knob.
+//
+// Cosmetic by construction: everything hidden is below the pixel threshold.
+// Modules apply it to dressing only; a family whose placements are the sim's
+// colliders keeps the distance rule alone (docs/design/graphics-settings-
+// fairness.md).
+
+/** The reference view the pixel threshold is measured at. */
+export const ZONE_FEATURE_REF_VIEWPORT_HEIGHT_PX = 720;
+export const ZONE_FEATURE_REF_FOV_DEG = 60;
+/** Pixels per radian at the reference view (the focal length in pixels). */
+export const ZONE_FEATURE_REF_PX_PER_RAD =
+  ZONE_FEATURE_REF_VIEWPORT_HEIGHT_PX / 2 / Math.tan((ZONE_FEATURE_REF_FOV_DEG * Math.PI) / 360);
+/**
+ * Below this apparent size (px) at the reference view a group is shed. 8 is
+ * the art decision: a 5 yd lily raft then sheds at about 390 yd (429 with
+ * the band), a 3 yd mushroom clump at 235, both unfogged on the vista arm,
+ * where a raft at that distance is a blob a few pixels wide; a 12 yd willow
+ * or any one-off giant reaches past every cull horizon and is never shed.
+ * Two consequences of the fixed reference: a 1440p or 2160p client sees the
+ * object at 16 or 24 px when it goes (a visible pop, which the band keeps
+ * from flapping but does not hide), and a smaller window sees it go earlier
+ * than its own pixels would say. Retune here, never per family.
+ */
+export const ZONE_FEATURE_MIN_APPARENT_PX = 8;
+/** Relative band above the reach inside which a shown group stays shown. */
+export const ZONE_FEATURE_REACH_HYSTERESIS = 0.1;
+
+/**
+ * The reach (yd) for a group whose largest instance spans `extentYd`. A
+ * non-positive or non-finite extent means no reach (Infinity): fail open,
+ * the distance rule alone decides.
+ */
+export function zoneFeatureReach(
+  extentYd: number,
+  minApparentPx = ZONE_FEATURE_MIN_APPARENT_PX,
+): number {
+  if (!Number.isFinite(extentYd) || extentYd <= 0) return Number.POSITIVE_INFINITY;
+  return (extentYd * ZONE_FEATURE_REF_PX_PER_RAD) / minApparentPx;
+}
+
+/**
+ * Whether a group is inside its reach this frame, with hysteresis: a shown
+ * group stays shown until its footprint edge passes the reach by the band,
+ * a hidden one comes back once inside the reach. A null footprint or an
+ * infinite reach keeps the group in reach.
+ */
+export function isZoneFeatureInReach(
+  footprint: FeatureFootprint | null,
+  camX: number,
+  camZ: number,
+  reach: number,
+  wasInReach: boolean,
+): boolean {
+  if (!footprint || !Number.isFinite(reach)) return true;
+  const edge = featureEdgeDistance(footprint, camX, camZ);
+  return wasInReach ? edge <= reach * (1 + ZONE_FEATURE_REACH_HYSTERESIS) : edge < reach;
+}
