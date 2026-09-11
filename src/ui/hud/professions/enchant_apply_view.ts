@@ -37,7 +37,6 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { ENCHANTS, type EnchantDef } from '../../../sim/content/enchants';
-import { RIFT_GEAR_ITEM_ID_SET } from '../../../sim/content/rift/items';
 import { ITEMS } from '../../../sim/data';
 import { countRawInSlots } from '../../../sim/item_lock';
 import { isEnchantKnown } from '../../../sim/professions/enchant_formula';
@@ -729,9 +728,6 @@ export function enchantTargets(
   inventory.forEach((slot) => {
     const def = ITEMS[slot.itemId];
     if (!def || def.slot !== enchant.itemSlot) return;
-    // Riftbound bands are forge-only (the sim refuses them by id with
-    // rift_gear); never offer a row the apply can only deny.
-    if (RIFT_GEAR_ITEM_ID_SET.has(slot.itemId)) return;
     if (!copyMeetsPerfectedGate(enchant, slot.instance)) return;
     // Both halves of the sim's bagged verdict: the copy carries the marker AND
     // the copy the sim would judge for THIS row's arm does (the plain apply's
@@ -865,7 +861,6 @@ export function wornEnchantTargets(
     if (!itemId) continue;
     const def = ITEMS[itemId];
     if (!def || def.slot !== enchant.itemSlot) continue;
-    if (RIFT_GEAR_ITEM_ID_SET.has(itemId)) continue; // forge-only, see enchantTargets
     const instance = equippedInstances[slot];
     if (!copyMeetsPerfectedGate(enchant, instance)) continue;
     if (instance && isEnchantedInstance(instance)) {

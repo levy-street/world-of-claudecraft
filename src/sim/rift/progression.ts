@@ -3,6 +3,7 @@
 // shells; everything a band grants lives in ItemInstancePayload.rift, and the
 // ladder that prices it is rift/band_ladder.ts.
 
+import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import {
   RIFT_ESSENCE_ITEM_ID,
   RIFT_GEM_IDS,
@@ -63,8 +64,9 @@ export interface RiftForgeResult {
 }
 
 /** The three class shells, each a stat-free ItemDef; the copy's rift record
- *  prices the ring (band_ladder.ts). Bands are forge-only: the enchanting
- *  profession refuses them by id (professions/enchanting.ts). */
+ *  prices the ring (band_ladder.ts). A band also takes an ordinary ring
+ *  enchant (professions/enchanting.ts) at any rung: the marker rides the
+ *  rebuild and its bonus is re-added on top of the ladder line every time. */
 const SHELL_STATS: Readonly<Record<string, RiftBandShell>> = {
   riftbound_band_of_might: { primary: 'str', secondary: 'sta' },
   riftbound_band_of_insight: { primary: 'int', secondary: 'spi' },
@@ -77,15 +79,45 @@ function shellItemIdForClass(cls: PlayerClass): string {
   return 'riftbound_band_of_insight';
 }
 
+/** The enchant a band copy may carry: a known enchant whose slot kind is the
+ *  shell's own (a ring enchant) and that the apply could have admitted on a
+ *  band (never a requiresPerfected enchant: a band is never Perfected), read
+ *  off the copy's top-level marker, the same field every other enchanted copy
+ *  carries (isEnchantedInstance). Any other marker (unknown id, an enchant for
+ *  another slot, a Perfected-only enchant) is not a band enchant and is
+ *  dropped by the rebuild. The bonus is re-priced from the live ENCHANTS table
+ *  at every rebuild, the same way the ladder line is (docs/design/rift-mode.md). */
+function riftBandEnchant(itemId: string, instance: ItemInstancePayload): EnchantDef | undefined {
+  if (instance.enchant === undefined) return undefined;
+  const enchant = ENCHANTS[instance.enchant];
+  if (!enchant || enchant.itemSlot !== ITEMS[itemId]?.slot) return undefined;
+  return enchant.requiresPerfected === true ? undefined : enchant;
+}
+
 /** Rebuild the copy's rolled aggregate from its bounded progression inputs
- *  (tier, upgradeLevel, gems). The rolled block is never trusted from JSONB or
- *  the wire; this is the ONLY writer, so a band's stats can never drift from
- *  what the ladder prices for its item level. */
+ *  (tier, upgradeLevel, gems) plus the enchant marker's bonus, summed
+ *  additively on top of the ladder line exactly as enchantedPayloadFor sums it
+ *  on any other copy. The rolled block is never trusted from JSONB or the
+ *  wire; this is the ONLY writer, so a band's stats can never drift from what
+ *  the ladder prices for its item level, and an apply's additive mint equals
+ *  this rebuild by construction (pinned in tests/professions_enchanting.test.ts). */
 function rebuildRolledStats(itemId: string, instance: ItemInstancePayload): void {
   const rift = instance.rift;
   const shell = SHELL_STATS[itemId];
   if (!rift || !shell) return;
-  const stats = riftBandRolledStats(shell, rift.tier, rift.upgradeLevel, rift.gems);
+  const stats: Record<string, number> = riftBandRolledStats(
+    shell,
+    rift.tier,
+    rift.upgradeLevel,
+    rift.gems,
+  );
+  const enchant = riftBandEnchant(itemId, instance);
+  if (enchant) {
+    for (const [stat, value] of Object.entries(enchant.statBonus)) {
+      if (value === undefined) continue;
+      stats[stat] = (stats[stat] ?? 0) + value;
+    }
+  }
   instance.rolled = { ...(instance.rolled ?? {}), quality: 'epic', stats };
 }
 
@@ -93,9 +125,11 @@ const RIFT_TIERS: readonly RiftTier[] = ['C', 'B', 'A', 'S'];
 
 /** Rebuild a persisted copy from bounded progression inputs; rolled stats are
  *  never trusted from JSONB. Every band a player has ever been handed loads
- *  (tier, upgrade level, and socketed gems are all that is read; the legacy
- *  `baseStats` and `enchant` fields of the pre-ladder payload are ignored and
- *  dropped, and an over-socketed gem list is truncated to the rank's sockets),
+ *  (tier, upgrade level, socketed gems, and a valid top-level ring-enchant
+ *  marker are all that is read; the legacy `baseStats` and `rift.enchant`
+ *  fields of the pre-ladder payload are ignored and dropped, an unknown or
+ *  wrong-slot enchant marker is dropped, and an over-socketed gem list is
+ *  truncated to the rank's sockets),
  *  so a ladder retune resizes existing bands at load instead of voiding them.
  *  Null is reserved for a copy that is not a band at all: an unknown shell id,
  *  a tier or upgrade level outside the ladder, or no source event. */
@@ -127,6 +161,9 @@ export function sanitizeRiftGearInstance(
     // The player item lock (item_lock.ts) is the owner's own safety mark and
     // rides the rebuild; every other per-copy field is re-derived below.
     ...(input.locked === true && { locked: true }),
+    // The ring enchant (if any) rides the rebuild; its bonus is re-priced on
+    // top of the ladder line by rebuildRolledStats below.
+    ...(riftBandEnchant(itemId, input) && { enchant: input.enchant }),
     rolled: { quality: 'epic', stats: {} },
     rift: {
       sourceEventId: source.sourceEventId,

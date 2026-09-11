@@ -7171,8 +7171,6 @@ export type SimEvent = { pid?: number } & (
         // Enchanting skill.
         | 'not_perfected'
         | 'insufficient_skill'
-        // A Riftbound band: forge-only gear (professions/enchanting.ts).
-        | 'rift_gear'
         | 'busy';
     }
   // Outcome of applying a loadout's saved gear set. TEXT-FREE on purpose: the sim

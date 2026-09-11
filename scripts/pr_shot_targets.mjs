@@ -11957,6 +11957,17 @@ export const TARGETS = [
       { key: 'targets-heroic-mobile', targets: true, heroicPair: true, mobile: true },
       { key: 'targets-rings', targets: true, rings: true, drill: 'Ring' },
       { key: 'targets-rings-mobile', targets: true, rings: true, drill: 'Ring', mobile: true },
+      // Riftbound bands take ring enchants at every rung: a worn S band and a
+      // bagged upgraded, gemmed band both list as plain target rows (they were
+      // once refused by id and never offered).
+      { key: 'targets-riftband', targets: true, riftBand: true, drill: 'Ring' },
+      {
+        key: 'targets-riftband-mobile',
+        targets: true,
+        riftBand: true,
+        drill: 'Ring',
+        mobile: true,
+      },
       // The #2415 replace flow: already-enchanted copies list as FLAGGED
       // replace rows (worn and bagged families both, the meta naming the
       // enchant a confirm would destroy), and accepting one runs the
@@ -12009,10 +12020,21 @@ export const TARGETS = [
           wantsHeroicPair,
           wantsRings,
           wantsSameEnchant,
+          wantsRiftBand,
         ) => {
           const game = window.__game;
           const sim = game?.sim;
           if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
+          if (wantsRiftBand) {
+            // The dev kit mints two maxed (essenced, gemmed) S bands on the
+            // fingers through the real rift path (the band tooltip target's
+            // idiom); unequipping one gives a WORN band and a BAGGED band.
+            sim.setPlayerLevel?.(20);
+            sim.chat?.('/dev bis prot');
+            sim.unequipItem?.('ring2');
+            sim.addItem('arcane_dust', 6);
+            return { ok: true, itemName: 'Chime Dust' };
+          }
           if (wantsSameEnchant) {
             // The QoL re-apply scene: a WORN copy and a BAGGED copy both
             // already carrying enchant_weapon_might, the same enchant the
@@ -12133,6 +12155,7 @@ export const TARGETS = [
         Boolean(variant?.heroicPair),
         Boolean(variant?.rings),
         Boolean(variant?.sameEnchant),
+        Boolean(variant?.riftBand),
       );
       if (!staged.ok) throw new Error(staged.reason);
       await page.evaluate(() => {

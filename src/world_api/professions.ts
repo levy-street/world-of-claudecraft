@@ -201,7 +201,8 @@ export interface ApplyEnchantResultView {
     // above the applier's flat Enchanting skill.
     | 'not_perfected'
     | 'insufficient_skill'
-    // A Riftbound band: forge-only, refused by id (professions/enchanting.ts).
+    // Retired: bands now take ring enchants (rift/progression.ts carries the
+    // marker through the rebuild). Kept so an older server's reply still maps.
     | 'rift_gear'
     | 'busy';
 }

@@ -292,10 +292,10 @@ describe('apply-enchant admission matches its resolver (shared gates)', () => {
       },
     },
     {
-      // Riftbound bands are forge-only: refused by id on both halves so a
-      // doomed cast never starts (a ring enchant would otherwise admit it).
-      name: 'a Riftbound band (forge-only gear)',
-      expected: 'rift_gear',
+      // Riftbound bands take ring enchants at every rung (the enchant rides
+      // the rift rebuild), so both halves admit a held band.
+      name: 'a Riftbound band (admitted at every rung)',
+      expected: null,
       itemId: 'riftbound_band_of_might',
       enchantId: 'enchant_ring_spirit',
       setup: (sim, _meta, pid) => {

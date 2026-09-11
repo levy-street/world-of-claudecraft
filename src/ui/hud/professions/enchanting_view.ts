@@ -78,6 +78,8 @@ export interface ApplyEnchantResultEvent {
     // confirmed identical-enchant-id re-apply is a normal replace, not a
     // deny (professions/enchanting.ts).
     | 'already_enchanted'
+    // Retired sim deny (bands take ring enchants since the rift rebuild
+    // carries the marker); kept so an older server's reply still renders.
     | 'rift_gear'
     // Masterwrought phase 10, the Lucent tier's two gates: the Perfected-only
     // enchant aimed at an ordinary copy, and an enchant above the applier's

@@ -6974,8 +6974,8 @@ export const hudChromeStrings = {
     // it: how a piece becomes Perfected is the Perfecting stage's own copy.
     notPerfected: 'Only a Perfected item can bear that enchant.',
     enchantSkillTooLow: 'Your Enchanting skill is too low for that enchant.',
-    // Riftbound bands are forge-only (rift/band_ladder.ts); the enchanting
-    // profession refuses them by id.
+    // Retired deny: bands take ring enchants now (rift/progression.ts). The
+    // string stays so an older server's rift_gear reply still renders.
     riftGear: 'Riftbound bands take Rift gems, not enchants.',
     replaceTag: 'Replaces {enchant}',
     sameEnchantTag: 'Already applied',
