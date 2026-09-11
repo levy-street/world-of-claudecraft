@@ -5,8 +5,9 @@
 // charges living, non-impaled raiders in sequence: one target per charge
 // window, at NYTHRAXIS_BONE_STORM_SPEED_MULT times his move speed. When he
 // reaches a target (or the window runs out) he Bone Slams everyone around him
-// and a Gravefire line runs on down the charge direction, then he whirls in
-// place until the next window opens. One Bone Spike cast lands mid-storm. When
+// (since v0.42.2 no fire line runs on down the charge direction), then he
+// whirls in place until the next window opens. One Bone Spike cast lands
+// mid-storm. When
 // the storm ends the threat table is intact, the top-threat tank picks him up,
 // and Gravebreaker re-arms shortly after.
 //

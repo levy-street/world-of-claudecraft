@@ -219,7 +219,9 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     // mechanics redo, 2026-09-04; was the shared 2.0 for 120,000). Adds and
     // the Bone Spikes keep the shared multiplier; the heroic row's
     // nythraxis_bone_spike override deliberately MIRRORS this 2.0 (same
-    // 1,000 pool on both difficulties), so retune the two together.
+    // template pool), but since v0.42.2 a spike is a ward whose pool is its
+    // HIT COUNT, set at spawn (nythraxis_bone_spike.ts nythraxisBoneSpikeHits);
+    // this multiplier no longer decides anything a player sees.
     healthMultiplierByMob: {
       // 120,000 after the first playtest (2026-09-04; the redo tried 160,000).
       nythraxis_scourge_of_thornpeak: 120_000 / 60_000,

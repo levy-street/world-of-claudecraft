@@ -1,9 +1,8 @@
 // Pins the English Nythraxis Raid Boss Guide prose (src/ui/i18n.catalog/hud_chrome.ts)
-// against the second playtest tuning pass: heroic Grave Flame and Soulfire burn out on
-// a finite timer (no more "permanent" floor fire), heroic Soulfire pools group by the
-// Soul Rend stack point instead of overlapping into stacked damage (Normal keeps one
-// pool per marked raider and still stacks overlapping ticks, unchanged), and every
-// offensive Nythraxis effect reads purple on both difficulties.
+// against the live mechanics: heroic Grave Flame burns out on a finite timer (no more
+// "permanent" floor fire), every offensive Nythraxis effect reads purple on both
+// difficulties, Soulfire is gone from the guide because it is gone from the fight
+// (v0.42.2), and Bone Spike tells the raid about its per-raider cooldown.
 
 import { describe, expect, it } from 'vitest';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
@@ -17,39 +16,58 @@ describe('Nythraxis raid boss guide prose: second playtest tuning', () => {
     expect(nythraxis.graveEruptionHeroicSummary).not.toMatch(/never goes? out/i);
   });
 
-  it('describes heroic Soulfire as a finite burn, not a permanent floor fire', () => {
-    expect(nythraxis.soulfireHeroicSummary).toContain('{secondsHeroic}');
-    expect(nythraxis.soulfireHeroicSummary).not.toMatch(/rest of the phase/i);
-    expect(nythraxis.soulfireHeroicSummary).not.toMatch(/never go(es)? out/i);
+  it('says nothing about Soulfire anywhere in the guide: the pools are gone from the fight', () => {
+    // The row itself is gone (no key), and no other row still tells the raid
+    // to rotate off, leave, or avoid Soul Rend fire.
+    expect(Object.keys(nythraxis).some((k) => /soulfire/i.test(k))).toBe(false);
+    for (const [k, prose] of Object.entries(nythraxis)) {
+      expect(prose, k).not.toMatch(/soulfire/i);
+    }
+    expect(nythraxis.soulRendResponse).not.toMatch(/fire|pool/i);
+    expect(hudChromeStrings.finder.mech).not.toHaveProperty('soulfire');
   });
 
-  it('groups Soulfire into one pool per stacked mark group on Heroic only', () => {
-    expect(nythraxis.soulfireHeroicSummary).toMatch(/one pool.*per stacked group/i);
-    expect(nythraxis.soulfireHeroicSummary).toMatch(/only one tick/i);
-  });
-
-  it('keeps Normal Soulfire one pool per mark, with overlapping pools still stacking', () => {
-    expect(nythraxis.soulfireSummary).not.toMatch(/per stacked group/i);
-    expect(nythraxis.soulfireSummary).not.toMatch(/only one tick/i);
-    expect(nythraxis.soulfireSummary).toMatch(/pool of purple fire .* where each mark stood/i);
-    expect(nythraxis.soulfireSummary).toMatch(/tick from each one/i);
-  });
-
-  it('leaves Normal Grave Flame prose untouched by the heroic-only Soulfire fix', () => {
+  it('leaves Normal Grave Flame prose untouched', () => {
     expect(nythraxis.graveEruptionSummary).toContain('{flameNormal}');
   });
 
-  it('reads every offensive Nythraxis fire as purple on both difficulties', () => {
-    expect(nythraxis.soulfireSummary).toMatch(/purple fire/i);
-    expect(nythraxis.soulfireHeroicSummary).toMatch(/purple fire/i);
-    expect(nythraxis.gravefireSummary).toMatch(/violet grave-fire/i);
-    expect(nythraxis.gravefireHeroicSummary).toMatch(/violet grave-fire/i);
+  it('says nothing about Gravefire anywhere in the guide: the line is gone from the fight', () => {
+    expect(Object.keys(nythraxis).some((k) => /gravefire/i.test(k))).toBe(false);
+    for (const [k, prose] of Object.entries(nythraxis)) {
+      expect(prose, k).not.toMatch(/gravefire|grave-fire/i);
+    }
+    expect(hudChromeStrings.finder.mech).not.toHaveProperty('gravefire');
+  });
+
+  it('tells the raid a spike is a ward: hits to shatter on both difficulties', () => {
+    expect(nythraxis.boneSpikeSummary).toContain('{hitsNormal}');
+    expect(nythraxis.boneSpikeHeroicSummary).toContain('{hitsHeroic}');
+    for (const prose of [nythraxis.boneSpikeSummary, nythraxis.boneSpikeHeroicSummary]) {
+      expect(prose).toMatch(/hits from anyone, whatever the hits deal/i);
+    }
+    expect(nythraxis.boneSpikeResponse).toMatch(/hits from anyone/i);
+  });
+
+  it("places the sigil beside the boss on the raid's left or right, alternating", () => {
+    for (const prose of [nythraxis.bindingSigilSummary, nythraxis.bindingSigilHeroicSummary]) {
+      expect(prose).toContain('{sideOffset}');
+      expect(prose).not.toMatch(/\{minDist\}|\{maxDist\}/);
+      expect(prose).toMatch(/left or right/i);
+      expect(prose).toMatch(/switching sides every cast/i);
+    }
+  });
+
+  it('tells the raid about the per-raider Bone Spike cooldown on both difficulties', () => {
+    for (const prose of [nythraxis.boneSpikeSummary, nythraxis.boneSpikeHeroicSummary]) {
+      expect(prose).toContain('{cooldown}');
+      expect(prose).toMatch(/cannot be chosen again for \{cooldown\} sec/i);
+    }
   });
 
   it('directs the Soul Rend finder chip to stack, not spread, matching the live stack-damage-split mechanic', () => {
     const soulRendChip = hudChromeStrings.finder.mech.soul_rend;
     expect(soulRendChip).toMatch(/stack together/i);
-    expect(soulRendChip).toMatch(/leave the fire/i);
-    expect(soulRendChip).not.toMatch(/spread/i);
+    expect(soulRendChip).toMatch(/split the damage/i);
+    expect(soulRendChip).not.toMatch(/fire|spread/i);
   });
 });

@@ -15,6 +15,8 @@ const CALLOUT_KEYS = {
   sigilAppears: 'hudChrome.nythraxisCallout.sigilAppears',
   sigilBound: 'hudChrome.nythraxisCallout.sigilBound',
   sigilUnbound: 'hudChrome.nythraxisCallout.sigilUnbound',
+  // Dormant since v0.42.2: the encounter no longer emits this call (Gravefire
+  // was retired from play); the key, cue, and fills stay until the plumbing sweep.
   gravefireTarget: 'hudChrome.nythraxisCallout.gravefireTarget',
   kingsWrath: 'hudChrome.nythraxisCallout.kingsWrath',
   boneStormBegins: 'hudChrome.nythraxisCallout.boneStormBegins',

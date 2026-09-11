@@ -38,6 +38,10 @@ import { isImmuneInPlace } from '../instances/instance_combat_hold';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
+import {
+  NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
+  nythraxisBoneSpikeWardHit,
+} from '../nythraxis_bone_spike';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
@@ -206,8 +210,25 @@ export function dealDamage(
 ): number {
   if (resolution) resolution.landedHpLoss = 0;
   if (resolvedHpLoss) alreadyFinal = true;
+  // Provenance for proc accounting (crafted collections): a copy or redirect
+  // share must never earn a second charge, but a ward-normalized ORIGINAL hit
+  // below is still the player's own attack. Captured before the ward rule
+  // turns on the modifier bypass, so the two decisions stay separate.
+  const copiedHit = alreadyFinal;
   if (target.dead) return 0;
   if (target.damageImmune) return 0;
+  // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
+  // pet hit lands exactly one point, whatever it would have dealt, and the
+  // spike's pool is its hit count. Resolved like an exact copy so no source
+  // mod, target amp, absorb, or crit multiplier can move it off one; the
+  // crit ROLL itself is kept, and the hit keeps its original-attack
+  // provenance (copiedHit above), so proc accounting still sees the
+  // player's own hit.
+  if (nythraxisBoneSpikeWardHit(source, target)) {
+    amount = NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+  }
   // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
   // owner has the gating quest active/ready may harm it; other hits are a no-op.
   if (questGateBlocksDamage(ctx.players, source, target)) return 0;
@@ -1062,7 +1083,7 @@ export function dealDamage(
   }
 
   if (source && source.id !== target.id) ctx.enterCombat(source, target);
-  onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, alreadyFinal);
+  onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, copiedHit);
   if (direct) ctx.refreshMobLeashFromAction(source, target);
 
   // classic threat: damage (and the ability's flat bonus) lands on the mob's

@@ -5685,6 +5685,12 @@ export interface NythraxisBoneSpike {
   tickTimer: number;
 }
 
+/** One raider's Bone Spike cooldown: seconds until a cast may pick them again. */
+export interface NythraxisBoneSpikeCooldown {
+  playerId: number;
+  remaining: number;
+}
+
 export interface NythraxisEncounterState {
   phase: 1 | 'transition' | 2 | 3 | 'dead';
   introSpoken: boolean;
@@ -5715,9 +5721,11 @@ export interface NythraxisEncounterState {
   // Dread Curse (the tank swap, both difficulties): only the cadence lives
   // here; the stacks live on the victim's aura (nythraxis_dread_curse.ts).
   dreadCurseTimer?: number;
-  // Bone Spike cadence and the live spike/victim pairs (nythraxis_bone_spike.ts).
+  // Bone Spike cadence, the live spike/victim pairs, and the per-raider
+  // cooldown ledger that spreads waves across the raid (nythraxis_bone_spike.ts).
   boneSpikeTimer?: number;
   boneSpikes?: NythraxisBoneSpike[];
+  boneSpikeCooldowns?: NythraxisBoneSpikeCooldown[];
   // Spikes and fire never overlap: seconds left in the settle window after an
   // eruption lands (spikes hold) and after a spike wave (eruptions hold).
   eruptionSettleTimer?: number;
@@ -5729,8 +5737,9 @@ export interface NythraxisEncounterState {
   eruptionCastKey?: number;
   eruptionImpactRemaining?: number;
   eruptionPoints?: { x: number; z: number }[];
-  // Every burning patch, Grave Flame and Soulfire alike (kind tells them
-  // apart; nythraxis_soulfire.ts pushes the Soul Rend pools into this list).
+  // Every burning patch. In play these are all Grave Flame; the 'soul' kind
+  // (the Soulfire pools Soul Rend used to leave) was retired from play in
+  // v0.42.2 and survives only so the wire and renderer keep their shape.
   graveFlames?: {
     seq: number;
     kind: 'grave' | 'soul';
@@ -5741,12 +5750,6 @@ export interface NythraxisEncounterState {
     tickTimer: number;
   }[];
   graveFlameSeq?: number;
-  // Heroic-only: the last boss-clock time (ctx.time) each player took a
-  // Soulfire tick, so standing in more than one heroic pool, or catching two
-  // staggered Soul Rend casts, never yields more than one normal-strength
-  // tick per second (nythraxis_soulfire.ts admitNythraxisSoulfireTick owns
-  // the gate; encounters/nythraxis.ts is the sole reader/writer).
-  soulfireTickAt?: { playerId: number; at: number }[];
   // Gravefire: the cadence and the live traveling lines (nythraxis_gravefire.ts).
   gravefireTimer?: number;
   gravefires?: {
@@ -5763,6 +5766,10 @@ export interface NythraxisEncounterState {
   // gap timer that keeps the body-owning majors (Deathless Rage, the sigil
   // drag) from overlapping (nythraxis_binding_sigil.ts).
   sigilTimer?: number;
+  // The side the LAST sigil landed on (+1 world +x, the raid's left facing
+  // the dais; -1 world -x, its right); null before the first cast. The next
+  // cast takes the other side.
+  sigilSide?: 1 | -1 | null;
   sigil?: {
     castKey: number;
     x: number;

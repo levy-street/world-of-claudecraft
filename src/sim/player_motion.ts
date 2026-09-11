@@ -537,11 +537,12 @@ function stepInstancedRegion(
     // step-out onto a low standable lip. (Off-world this branch only ever runs
     // in an instanced interior, where waterLevelAt is -Infinity and the ridden
     // surface IS the terrain; the open world runs the physics kernel.)
-    // A rise within MAX_STEP_HEIGHT is a STRIDE, never a wall: the only
-    // interior elevation is the boss dais, a single discrete plateau, so the
-    // step allowance cannot ladder the way a per-tick allowance on continuous
-    // terrain would (the open-world kerb rule, applied to the one kerb
-    // interiors have).
+    // A rise within MAX_STEP_HEIGHT is a STRIDE, never a wall: interior
+    // elevation is a few discrete, non-overlapping plateaus (the boss dais,
+    // the Nythraxis flanking platforms; daisLiftAt returns the first hit, so
+    // they never stack), so the step allowance cannot ladder the way a
+    // per-tick allowance on continuous terrain would (the open-world kerb
+    // rule, applied to the kerbs interiors have).
     if (p.onGround && !swimming) {
       // ride heights clamp to the STEP's waterline (the higher of both ends'),
       // so stepping back into a water body from the submerged bed just outside
