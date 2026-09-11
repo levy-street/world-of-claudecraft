@@ -976,31 +976,45 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   // default source. Re-cut 2026-09-02 from the launch appends (one robe group
   // plus one weapon group per boss, plus Varkhul's shield group); from here the
   // partition is APPEND-only, never reorder.
+  // Crucible of the Last Spring (docs/prd/ignivar-raid-loot.md, "Boss loot
+  // tables"): a Heroic kill pays TWO guaranteed groups here, on top of the
+  // boss's shared sigil slot. The exclusive slot is gear only (marquee
+  // weapons, and Varkhul's shields); the Robe sigil has its OWN guaranteed
+  // group, appended after it. Re-cut 2026-09-11: the Robes used to share the
+  // exclusive slot, so a Heroic kill could roll a second sigil and no weapon
+  // (the same two-sigil haul Normal pays). Draw order is parity-sensitive on
+  // a heroic claim: the exclusive group keeps its position, the Robe group
+  // draws after it, entries APPEND, never reorder.
   [IGNIVAR_BOSS_ID]: [
-    // Robes 0.50 / marquee weapons 0.50; Anvil 0.34 / Ember 0.33 / Tempest 0.33.
-    { itemId: 'sigil_anvil_chest', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'sigil_ember_chest', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'sigil_tempest_chest', chance: 0.16, rollGroup: 'ignivar_h_exclusive' },
+    // Marquee weapons, one guaranteed: Anvil 0.34 / Ember 0.33 / Tempest 0.33.
     // Three weapons, not four: the Emberflight Longbow was pulled from the
     // tier (bows wait for the hunter ranged-slot rework; maintainer decision
     // 2026-08-28), and the hunter ranged marquee returns with that rework.
-    { itemId: 'forgefathers_warhammer', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'anvilguard_blade', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'springtouched_crozier', chance: 0.16, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'forgefathers_warhammer', chance: 0.34, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'anvilguard_blade', chance: 0.33, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'springtouched_crozier', chance: 0.33, rollGroup: 'ignivar_h_exclusive' },
+    // The Robe sigil, one guaranteed per Heroic kill: Anvil 0.34 / Ember 0.33
+    // / Tempest 0.33, the same family balance as the merged sigil slot.
+    { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'ignivar_h_robe' },
+    { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'ignivar_h_robe' },
+    { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'ignivar_h_robe' },
   ],
   [VARKHUL_BOSS_ID]: [
-    // Robes 0.35 / shields 0.30 / marquee weapons 0.35. Emberward keeps its
-    // ABSOLUTE 3 percent per heroic kill inside the shield share (the two epic
-    // shields split the remaining 0.27 evenly), so the legendary's odds did not
-    // move with the re-cut and the group still adds no extra heroic rng draw.
-    { itemId: 'sigil_anvil_chest', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'sigil_ember_chest', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'sigil_tempest_chest', chance: 0.11, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'bulwark_of_the_inner_crucible', chance: 0.135, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'ember_wardens_barrier', chance: 0.135, rollGroup: 'varkhul_h_exclusive' },
+    // Shields 0.50 / marquee weapons 0.50 (the Robes' former 0.35 returned to
+    // the gear it displaced, split evenly). Emberward keeps its ABSOLUTE 3
+    // percent per heroic kill inside the shield share (the two epic shields
+    // split the remaining 0.47 evenly), so the legendary's odds did not move
+    // with either re-cut. Every weight is chosen so the group sums to
+    // EXACTLY 1 in floating point (pinned by tests/ignivar_loot.test.ts).
+    { itemId: 'bulwark_of_the_inner_crucible', chance: 0.235, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'ember_wardens_barrier', chance: 0.235, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'heart_of_the_end_greatblade', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'forgefire_spire', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'staff_of_the_last_spring', chance: 0.11, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'heart_of_the_end_greatblade', chance: 0.17, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'forgefire_spire', chance: 0.17, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'staff_of_the_last_spring', chance: 0.16, rollGroup: 'varkhul_h_exclusive' },
+    // The Robe sigil, one guaranteed per Heroic kill (see Ignivar above).
+    { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'varkhul_h_robe' },
+    { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'varkhul_h_robe' },
+    { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'varkhul_h_robe' },
   ],
 };

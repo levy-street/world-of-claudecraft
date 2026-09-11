@@ -7002,6 +7002,36 @@ export const TARGETS = [
     },
   },
   {
+    key: 'loot-explorer-crucible-heroic',
+    label: 'Loot Explorer: Encounters tab searched to the Crucible Robe sigils (Heroic odds)',
+    when: ['sim/content/heroic_loot'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.getElementById('tutorial-greeting')?.remove();
+        window.__game?.hud?.toggleLootExplorer?.();
+      });
+      const opened = await pollForSize(page, '#loot-explorer-window');
+      if (!opened) throw new Error('loot explorer window did not open');
+      await page.evaluate(() => {
+        const el = document.querySelector('#loot-explorer-window');
+        el?.querySelector('.loot-explorer-tab[data-tab="encounters"]')?.click();
+        const input = el?.querySelector('input[data-search]');
+        if (input) {
+          input.value = 'Robe Sigil';
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+      await wait(400);
+      return { clip: '#loot-explorer-window' };
+    },
+  },
+  {
     key: 'reliquary-overview-fresh',
     label: 'The Reliquary: fresh-character Overview (strip hints + shelf cards)',
     when: ['ui/reliquary_view', 'ui/reliquary_window'],
