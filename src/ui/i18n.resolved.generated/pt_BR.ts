@@ -4273,7 +4273,7 @@ export const pt_BR: EnTranslations = {
       "enchant_lucent_infusion": "Infusão Luminosa"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Seus ataques corpo a corpo que acertarem podem conceder 50 de Força por 15 s e curar 200 de vida. Modificadores de cura se aplicam. Cada golpe tem 1% de chance por 0,6 s da velocidade-base da arma. Não há recarga interna. Cada mão tem seu próprio benefício; novos acionamentos renovam o benefício daquela mão. Ataques à distância não acionam este efeito. Forma de Lobo usa sua velocidade-base de ataque de 1 s."
+      "enchant_weapon_lastflame_zeal": "Seus ataques corpo a corpo que acertarem podem conceder 50 de Força por 15 s e curar 200 de vida. Modificadores de cura se aplicam. Cada golpe tem 1% de chance por 0,6 s da velocidade-base da arma. Não há recarga interna. As duas mãos compartilham um único benefício; qualquer acionamento o renova e ele nunca acumula. Ataques à distância não acionam este efeito. Forma de Lobo usa sua velocidade-base de ataque de 1 s."
     },
     "professions": {
       "title": "Profissões",

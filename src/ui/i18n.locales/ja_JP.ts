@@ -113,7 +113,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.formula_lastflame_zeal.name': '製法書：最後の炎の熱情',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '最後の炎の熱情',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    '命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。左右の手にそれぞれ独立した強化があり、同じ手で再発動するとその持続時間が更新される。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。',
+    '命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。',
   'hudChrome.enchanting.recipeNotLearned': 'この付呪を施すには、先に製法書で習得してください。',
   'hudChrome.pattern.teachesEnchant': '使用：{enchant}の付与方法を習得する。',
   'hudChrome.barEditor.pageTab': 'ページ{page}',

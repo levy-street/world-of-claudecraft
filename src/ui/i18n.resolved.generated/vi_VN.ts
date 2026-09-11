@@ -4273,7 +4273,7 @@ export const vi_VN: EnTranslations = {
       "enchant_lucent_infusion": "Truyền lực Lấp lánh"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Các đòn đánh cận chiến trúng đích có thể tăng 50 Sức mạnh trong 15 giây và hồi 200 máu cho bạn. Áp dụng các hiệu chỉnh hồi phục. Mỗi đòn có xác suất 1% cho mỗi 0,6 giây tốc độ cơ bản của vũ khí ra đòn. Không có hồi chiêu nội tại. Mỗi tay có buff riêng; kích hoạt lặp lại làm mới buff của tay đó. Đòn đánh tầm xa không kích hoạt hiệu ứng này. Dạng Sói thay vào đó dùng tốc độ vung cơ bản 1 giây."
+      "enchant_weapon_lastflame_zeal": "Các đòn đánh cận chiến trúng đích có thể tăng 50 Sức mạnh trong 15 giây và hồi 200 máu cho bạn. Áp dụng các hiệu chỉnh hồi phục. Mỗi đòn có xác suất 1% cho mỗi 0,6 giây tốc độ cơ bản của vũ khí ra đòn. Không có hồi chiêu nội tại. Cả hai tay dùng chung một buff; mọi lần kích hoạt đều làm mới buff này và nó không bao giờ cộng dồn. Đòn đánh tầm xa không kích hoạt hiệu ứng này. Dạng Sói thay vào đó dùng tốc độ vung cơ bản 1 giây."
     },
     "professions": {
       "title": "Nghề nghiệp",

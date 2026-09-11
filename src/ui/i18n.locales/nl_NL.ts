@@ -15969,7 +15969,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Volg {count} vervaardigingen van {name} als je verzameldoel',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Je rake melee-aanvallen kunnen 50 Kracht geven gedurende 15 sec en je 200 gezondheid genezen. Genezingsmodificatoren gelden. Elke treffer heeft een kans van 1% per 0,6 sec van de basissnelheid van het gebruikte wapen. Geen interne afkoeltijd. Elke hand heeft zijn eigen versterking; herhaalde activeringen vernieuwen die hand. Aanvallen op afstand activeren dit effect niet. Wolfs gedaante gebruikt in plaats daarvan zijn basisslagsnelheid van 1 sec.',
+    'Je rake melee-aanvallen kunnen 50 Kracht geven gedurende 15 sec en je 200 gezondheid genezen. Genezingsmodificatoren gelden. Elke treffer heeft een kans van 1% per 0,6 sec van de basissnelheid van het gebruikte wapen. Geen interne afkoeltijd. Beide handen delen één versterking; elke activering vernieuwt die en ze stapelt nooit. Aanvallen op afstand activeren dit effect niet. Wolfs gedaante gebruikt in plaats daarvan zijn basisslagsnelheid van 1 sec.',
   'hudChrome.enchantName.enchant_chest_armor': 'Borstinscriptie: Versterking',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Borstinscriptie: Grotere Uithouding',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Borstinscriptie: Lichtende Uithouding',

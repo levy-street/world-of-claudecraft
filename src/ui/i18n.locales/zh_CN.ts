@@ -113,7 +113,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.formula_lastflame_zeal.name': '配方：末焰热忱',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '末焰热忱',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    '命中的近战攻击有几率使你获得50点力量，持续15秒，并为你恢复200点生命值。治疗加成与减益生效。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手各有独立增益；同一只手再次触发会刷新其增益。远程攻击不会触发此效果。狼形态改用其1秒的基础挥击速度。',
+    '命中的近战攻击有几率使你获得50点力量，持续15秒，并为你恢复200点生命值。治疗加成与减益生效。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手共享同一个增益；任一只手触发都会刷新该增益，且永不叠加。远程攻击不会触发此效果。狼形态改用其1秒的基础挥击速度。',
   'hudChrome.enchanting.recipeNotLearned': '施加此附魔前，请先学习配方。',
   'hudChrome.pattern.teachesEnchant': '使用：教你如何施加{enchant}。',
   'hudChrome.barEditor.pageTab': '第{page}页',

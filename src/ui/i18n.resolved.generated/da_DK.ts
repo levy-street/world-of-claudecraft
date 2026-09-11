@@ -4273,7 +4273,7 @@ export const da_DK: EnTranslations = {
       "enchant_lucent_infusion": "Lysende infusion"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Dine træffende nærkampsangreb kan give 50 Styrke i 15 sekunder og helbrede dig for 200 helbred. Helbredelsesmodifikatorer gælder. Hvert træf ruller 1 % pr. 0,6 sekunder af det angribende våbens grundhastighed. Ingen intern nedkøling. Hver hånd har sin egen styrkelse, og gentagne udløsninger fornyer den hånd. Afstandsangreb udløser ikke effekten. Ulveform bruger sin grundsvinghastighed på 1 sekund."
+      "enchant_weapon_lastflame_zeal": "Dine træffende nærkampsangreb kan give 50 Styrke i 15 sekunder og helbrede dig for 200 helbred. Helbredelsesmodifikatorer gælder. Hvert træf ruller 1 % pr. 0,6 sekunder af det angribende våbens grundhastighed. Ingen intern nedkøling. Begge hænder deler én styrkelse; enhver udløsning fornyer den, og den stables aldrig. Afstandsangreb udløser ikke effekten. Ulveform bruger sin grundsvinghastighed på 1 sekund."
     },
     "professions": {
       "title": "Erhverv",

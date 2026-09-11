@@ -74,7 +74,9 @@ This is a reference-fixture correction, not a relaxation of raid balance bounds.
   catalyst or Wyrmfall Core is layered onto these raid recipes.
 - Last Flame's Zeal grants 50 Strength for 15 seconds and 200 healing,
   using one nominal proc per minute based on the striking weapon's base speed.
-  No internal cooldown; independent mainhand/offhand auras, same-hand refresh.
+  No internal cooldown; each hand rolls at its own weapon speed, but both feed one
+  shared aura that any trigger refreshes and that never stacks (v0.42.2 fix: the
+  per-hand aura ids let a dual-wielder run two copies for 100 Strength).
   Melee weapon attacks qualify, ranged shots do not borrow the melee enchant.
 - Combat effects must have explicit trigger, scaling, cap, duration, and reset
   rules, and tooltips must describe the implemented result.

@@ -116,7 +116,9 @@ export interface EnchantDef {
   /** Absent means the existing always-known tier. Drop formulas teach this id. */
   acquisition?: 'drop';
   description?: string;
-  /** Per-hand melee proc. Chance uses the striking weapon's unmodified speed. */
+  /** Melee proc rolled per hand (chance uses the striking weapon's unmodified
+   *  speed) that feeds ONE shared buff: a second trigger from either hand
+   *  refreshes it, never stacks a second copy (combat/equip_procs.ts). */
   weaponProc?: { ppm: number; strength: number; duration: number; heal: number };
 }
 
@@ -134,7 +136,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
     statBonus: {},
     weaponProc: { ppm: 1, strength: 50, duration: 15, heal: 200 },
     description:
-      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Each hand has its own buff; repeated triggers refresh that hand. Ranged attacks do not trigger this effect. Wolf Form uses its 1 sec base swing speed instead.",
+      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Wolf Form uses its 1 sec base swing speed instead.",
   },
   enchant_weapon_might: {
     id: 'enchant_weapon_might',

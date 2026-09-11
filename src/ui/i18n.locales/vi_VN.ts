@@ -15887,7 +15887,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Theo dõi {count} lần chế tạo {name} làm mục tiêu thu thập',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Các đòn đánh cận chiến trúng đích có thể tăng 50 Sức mạnh trong 15 giây và hồi 200 máu cho bạn. Áp dụng các hiệu chỉnh hồi phục. Mỗi đòn có xác suất 1% cho mỗi 0,6 giây tốc độ cơ bản của vũ khí ra đòn. Không có hồi chiêu nội tại. Mỗi tay có buff riêng; kích hoạt lặp lại làm mới buff của tay đó. Đòn đánh tầm xa không kích hoạt hiệu ứng này. Dạng Sói thay vào đó dùng tốc độ vung cơ bản 1 giây.',
+    'Các đòn đánh cận chiến trúng đích có thể tăng 50 Sức mạnh trong 15 giây và hồi 200 máu cho bạn. Áp dụng các hiệu chỉnh hồi phục. Mỗi đòn có xác suất 1% cho mỗi 0,6 giây tốc độ cơ bản của vũ khí ra đòn. Không có hồi chiêu nội tại. Cả hai tay dùng chung một buff; mọi lần kích hoạt đều làm mới buff này và nó không bao giờ cộng dồn. Đòn đánh tầm xa không kích hoạt hiệu ứng này. Dạng Sói thay vào đó dùng tốc độ vung cơ bản 1 giây.',
   'hudChrome.enchantName.enchant_chest_armor': 'Khắc Ngực: Gia cố',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Khắc Ngực: Sức bền Cường hóa',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Khắc Ngực: Sức bền Lấp lánh',

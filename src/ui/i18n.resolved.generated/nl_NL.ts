@@ -4273,7 +4273,7 @@ export const nl_NL: EnTranslations = {
       "enchant_lucent_infusion": "Lichtende infusie"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Je rake melee-aanvallen kunnen 50 Kracht geven gedurende 15 sec en je 200 gezondheid genezen. Genezingsmodificatoren gelden. Elke treffer heeft een kans van 1% per 0,6 sec van de basissnelheid van het gebruikte wapen. Geen interne afkoeltijd. Elke hand heeft zijn eigen versterking; herhaalde activeringen vernieuwen die hand. Aanvallen op afstand activeren dit effect niet. Wolfs gedaante gebruikt in plaats daarvan zijn basisslagsnelheid van 1 sec."
+      "enchant_weapon_lastflame_zeal": "Je rake melee-aanvallen kunnen 50 Kracht geven gedurende 15 sec en je 200 gezondheid genezen. Genezingsmodificatoren gelden. Elke treffer heeft een kans van 1% per 0,6 sec van de basissnelheid van het gebruikte wapen. Geen interne afkoeltijd. Beide handen delen één versterking; elke activering vernieuwt die en ze stapelt nooit. Aanvallen op afstand activeren dit effect niet. Wolfs gedaante gebruikt in plaats daarvan zijn basisslagsnelheid van 1 sec."
     },
     "professions": {
       "title": "Beroepen",

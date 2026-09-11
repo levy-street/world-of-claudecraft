@@ -218,16 +218,37 @@ describe("Last Flame's Zeal", () => {
     );
   });
 
-  it('distinguishes identical weapons by hand, stacking at most two buffs and refreshing one hand', () => {
+  it('both hands share ONE buff: an off-hand trigger refreshes it instead of stacking a second', () => {
+    // The live bug: the aura id carried the striking hand, so a dual-wielder
+    // with both weapons enchanted stacked two 50 Strength buffs (100 total).
+    // The buff is keyed by the enchant alone now, so the harness's same-id
+    // replacement (the Sim's refresh rule) collapses both hands onto one aura.
     const { ctx, raw, wielder, target } = harness();
     runWeaponProcs(ctx, wielder, target, 'weaponHit', wielder.mainhandItemId, 'mainhand');
-    runWeaponProcs(ctx, wielder, target, 'weaponHit', wielder.offhandItemId, 'offhand');
     wielder.auras[0].remaining = 1;
-    runWeaponProcs(ctx, wielder, target, 'weaponHit', wielder.mainhandItemId, 'mainhand');
-    expect(wielder.auras).toHaveLength(2);
-    expect(wielder.auras.every((aura) => aura.remaining === 15)).toBe(true);
-    expect(wielder.auras.reduce((total, aura) => total + aura.value, 0)).toBe(100);
-    expect(raw.rng.chance).toHaveBeenCalledTimes(3);
+    runWeaponProcs(ctx, wielder, target, 'weaponHit', wielder.offhandItemId, 'offhand');
+    expect(wielder.auras).toHaveLength(1);
+    expect(wielder.auras[0]).toMatchObject({
+      id: ENCHANT,
+      kind: 'buff_str',
+      value: 50,
+      remaining: 15,
+      duration: 15,
+    });
+    expect(wielder.auras.reduce((total, aura) => total + aura.value, 0)).toBe(50);
+    expect(raw.rng.chance).toHaveBeenCalledTimes(2);
+    // The refreshing trigger still heals: the 200 heal is per trigger, not per
+    // fresh application, so both hands' procs healed once each.
+    expect(raw.applyHeal).toHaveBeenCalledTimes(2);
+    expect(raw.applyHeal).toHaveBeenLastCalledWith(
+      wielder,
+      wielder,
+      200,
+      "Last Flame's Zeal",
+      ENCHANT,
+      false,
+      false,
+    );
   });
 
   it.each([
@@ -265,9 +286,10 @@ describe("Last Flame's Zeal", () => {
         expect(chance).toHaveBeenLastCalledWith(probability);
         expect(next).toHaveBeenCalledTimes(4);
         expect(source.stats.str - beforeStr).toBe(procs ? 50 : 0);
+        // One buff id for both hands (no per-hand suffix), so the two never stack.
         expect(
           source.auras.filter((aura) => aura.id.startsWith(ENCHANT)).map((aura) => aura.id),
-        ).toEqual(procs ? [`${ENCHANT}_${hand}`] : []);
+        ).toEqual(procs ? [ENCHANT] : []);
       } finally {
         next.mockRestore();
         chance.mockRestore();
@@ -275,10 +297,17 @@ describe("Last Flame's Zeal", () => {
     },
   );
 
-  it('different-speed real hands grant exactly 100 Strength and refresh only their own aura', () => {
-    const { source, target, ctx } = differentSpeedHands();
+  it('different-speed real hands share one 50 Strength buff that either hand refreshes', () => {
+    const { sim, source, target, ctx } = differentSpeedHands();
     const beforeStr = source.stats.str;
     const beforeAp = source.attackPower;
+    const zeal = () => source.auras.find((aura) => aura.id === ENCHANT);
+    const zealEvents = () =>
+      sim.events.flatMap((event) =>
+        event.type === 'aura' && event.abilityId === ENCHANT && event.gained
+          ? [event.refresh === true]
+          : [],
+      );
     const next = vi.spyOn(ctx.rng, 'next');
     const chance = vi.spyOn(ctx.rng, 'chance');
     const strike = (hand: 'mainhand' | 'offhand', probability: number) => {
@@ -304,29 +333,28 @@ describe("Last Flame's Zeal", () => {
     try {
       strike('mainhand', 0.041666666666666664);
       expect(source.stats.str - beforeStr).toBe(50);
+      expect(zeal()).toMatchObject({ value: 50, duration: 15, remaining: 15 });
       for (let tick = 0; tick < 20; tick++) updateAuras(ctx, source);
+      expect(zeal()?.remaining).toBeCloseTo(14);
+      // The off-hand trigger REFRESHES the one shared buff: still exactly 50
+      // Strength (100 attack power), one buff_str aura, timer back at 15 s.
       strike('offhand', 0.030000000000000002);
-      expect(source.stats.str - beforeStr).toBe(100);
-      expect(source.attackPower - beforeAp).toBe(200);
-      expect(source.auras.filter((aura) => aura.kind === 'buff_str')).toHaveLength(2);
-      const main = source.auras.find((aura) => aura.id === `${ENCHANT}_mainhand`);
-      const off = source.auras.find((aura) => aura.id === `${ENCHANT}_offhand`);
-      expect(main).toMatchObject({ value: 50, duration: 15 });
-      expect(main?.remaining).toBeCloseTo(14);
-      expect(off).toMatchObject({ value: 50, duration: 15, remaining: 15 });
-      for (let tick = 0; tick < 20; tick++) updateAuras(ctx, source);
-      const offRemaining = off?.remaining;
-      strike('mainhand', 0.041666666666666664);
-      expect(source.stats.str - beforeStr).toBe(100);
-      expect(source.auras.filter((aura) => aura.kind === 'buff_str')).toHaveLength(2);
-      expect(source.auras.find((aura) => aura.id === `${ENCHANT}_mainhand`)?.remaining).toBe(15);
-      expect(source.auras.find((aura) => aura.id === `${ENCHANT}_offhand`)?.remaining).toBe(
-        offRemaining,
-      );
-      for (let tick = 0; tick < 281; tick++) updateAuras(ctx, source);
       expect(source.stats.str - beforeStr).toBe(50);
-      expect(source.auras.some((aura) => aura.id === `${ENCHANT}_offhand`)).toBe(false);
+      expect(source.attackPower - beforeAp).toBe(100);
+      expect(source.auras.filter((aura) => aura.kind === 'buff_str')).toHaveLength(1);
+      expect(zeal()).toMatchObject({ id: ENCHANT, value: 50, duration: 15, remaining: 15 });
+      // Parse fidelity: the second trigger is reported as a refresh of the
+      // same aura, never as a second application.
+      expect(zealEvents()).toEqual([false, true]);
       for (let tick = 0; tick < 20; tick++) updateAuras(ctx, source);
+      expect(zeal()?.remaining).toBeCloseTo(14);
+      strike('mainhand', 0.041666666666666664);
+      expect(source.stats.str - beforeStr).toBe(50);
+      expect(source.auras.filter((aura) => aura.kind === 'buff_str')).toHaveLength(1);
+      expect(zeal()?.remaining).toBe(15);
+      expect(zealEvents()).toEqual([false, true, true]);
+      for (let tick = 0; tick < 301; tick++) updateAuras(ctx, source);
+      expect(zeal()).toBeUndefined();
       expect(source.stats.str).toBe(beforeStr);
       expect(source.attackPower).toBe(beforeAp);
     } finally {
@@ -419,7 +447,7 @@ describe("Last Flame's Zeal", () => {
       expect(target.dead).toBe(hp === 1);
       expect(source.hp - beforeHp).toBe(200);
       expect(source.stats.str - beforeStr).toBe(50);
-      expect(source.auras.find((aura) => aura.id === `${ENCHANT}_mainhand`)).toMatchObject({
+      expect(source.auras.find((aura) => aura.id === ENCHANT)).toMatchObject({
         kind: 'buff_str',
         value: 50,
         remaining: 15,
@@ -456,7 +484,7 @@ describe("Last Flame's Zeal", () => {
           killed: target.dead,
           healed: source.hp - beforeHp,
           strength: source.stats.str,
-          remaining: source.auras.find((aura) => aura.id === `${ENCHANT}_mainhand`)?.remaining ?? 0,
+          remaining: source.auras.find((aura) => aura.id === ENCHANT)?.remaining ?? 0,
         });
         for (let tick = 0; tick < 60; tick++) {
           sim.time += DT;
@@ -466,7 +494,7 @@ describe("Last Flame's Zeal", () => {
       for (let tick = 0; tick < 301; tick++) updateAuras(ctx, source);
       return {
         timeline,
-        activeAfterExpiry: source.auras.some((aura) => aura.id === `${ENCHANT}_mainhand`),
+        activeAfterExpiry: source.auras.some((aura) => aura.id === ENCHANT),
         rngTail: Array.from({ length: 8 }, () => ctx.rng.next()),
       };
     }

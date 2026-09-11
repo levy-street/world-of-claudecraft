@@ -15749,7 +15749,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Spor {count} fremstillinger af {name} som dit samlemål',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Dine træffende nærkampsangreb kan give 50 Styrke i 15 sekunder og helbrede dig for 200 helbred. Helbredelsesmodifikatorer gælder. Hvert træf ruller 1 % pr. 0,6 sekunder af det angribende våbens grundhastighed. Ingen intern nedkøling. Hver hånd har sin egen styrkelse, og gentagne udløsninger fornyer den hånd. Afstandsangreb udløser ikke effekten. Ulveform bruger sin grundsvinghastighed på 1 sekund.',
+    'Dine træffende nærkampsangreb kan give 50 Styrke i 15 sekunder og helbrede dig for 200 helbred. Helbredelsesmodifikatorer gælder. Hvert træf ruller 1 % pr. 0,6 sekunder af det angribende våbens grundhastighed. Ingen intern nedkøling. Begge hænder deler én styrkelse; enhver udløsning fornyer den, og den stables aldrig. Afstandsangreb udløser ikke effekten. Ulveform bruger sin grundsvinghastighed på 1 sekund.',
   'hudChrome.enchantName.enchant_chest_armor': 'Brystetsning: Forstærkning',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Brystetsning: Større udholdenhed',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Brystetsning: Lysende udholdenhed',
