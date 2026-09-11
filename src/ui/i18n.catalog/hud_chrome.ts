@@ -1631,6 +1631,19 @@ export const hudChromeStrings = {
     // "Mark" is this catalog's own term for the target (unitFrame.targetLabel,
     // targetAnnounce), which also keeps the value NON-WORDY for the M16 guard.
     targetPet: 'Pet: Mark',
+    // The party target hotkeys (F1..F10 by default): yourself, then the party
+    // frame rows top to bottom. Wordy (M16): the five non-Latin fills land in
+    // this same change.
+    targetSelf: 'Target Self',
+    targetParty1: 'Target Party Member 1',
+    targetParty2: 'Target Party Member 2',
+    targetParty3: 'Target Party Member 3',
+    targetParty4: 'Target Party Member 4',
+    targetParty5: 'Target Party Member 5',
+    targetParty6: 'Target Party Member 6',
+    targetParty7: 'Target Party Member 7',
+    targetParty8: 'Target Party Member 8',
+    targetParty9: 'Target Party Member 9',
     // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
     mount: 'Mount / Dismount',
     // Mouse buttons are bindable pseudo-keys (src/game/mouse_binds.ts). The note

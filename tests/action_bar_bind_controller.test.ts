@@ -106,10 +106,10 @@ describe('ActionBarBindController', () => {
     r.ctl.begin();
     expect(r.keybinds.codeAt('slot4', 0)).not.toBeNull(); // occupied by its default
     r.ctl.selectSlot(4);
-    r.latest()('F9');
+    r.latest()('F11');
     expect(r.dialogs).toHaveLength(0);
-    expect(r.keybinds.codeAt('slot4', 0)).toBe('F9');
-    expect(r.status()).toBe(t('hudChrome.actionBar.boundToKey', { key: 'F9' }));
+    expect(r.keybinds.codeAt('slot4', 0)).toBe('F11');
+    expect(r.status()).toBe(t('hudChrome.actionBar.boundToKey', { key: 'F11' }));
   });
 
   it('a reserved key is refused with no prompt and no label', () => {
@@ -130,11 +130,11 @@ describe('ActionBarBindController', () => {
     const first = r.latest();
     const before2 = r.keybinds.codeAt('slot2', 0);
     r.ctl.selectSlot(6);
-    first('F10');
+    first('F12');
     expect(r.keybinds.codeAt('slot2', 0)).toBe(before2);
-    expect(r.keybinds.codeAt('slot6', 0)).not.toBe('F10');
-    r.latest()('F10');
-    expect(r.keybinds.codeAt('slot6', 0)).toBe('F10');
+    expect(r.keybinds.codeAt('slot6', 0)).not.toBe('F12');
+    r.latest()('F12');
+    expect(r.keybinds.codeAt('slot6', 0)).toBe('F12');
   });
 
   it('Done clears a pending capture only when a slot was selected, and removes the banner', () => {
@@ -169,8 +169,8 @@ describe('ActionBarBindController', () => {
     const r = rig();
     r.ctl.begin();
     r.ctl.selectSlot(1);
-    r.latest()('F9');
-    expect(r.keybinds.codeAt('slot1', 0)).toBe('F9');
+    r.latest()('F11');
+    expect(r.keybinds.codeAt('slot1', 0)).toBe('F11');
     r.ctl.selectSlot(2);
     const resetButton = r
       .banner()

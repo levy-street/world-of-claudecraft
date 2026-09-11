@@ -1223,7 +1223,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-measured at the release/v0.43.0 sync that brought PR 3778 in: the
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
-    ceiling: 11321,
+    // The targeting callbacks and the pad targeting arm moved to
+    // src/game/targeting_actions.ts with the party target hotkeys (18 lines
+    // out), re-measured on the merged tree after the release sync: 11303,
+    // zero headroom.
+    ceiling: 11303,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
