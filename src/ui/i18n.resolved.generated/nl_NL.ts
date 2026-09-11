@@ -62,6 +62,7 @@ export const nl_NL: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Kerker",
+      "town": "Town",
       "difficulty": "Moeilijkheidsgraad",
       "name": "Naam",
       "spec": "Spec",
@@ -159,6 +160,10 @@ export const nl_NL: EnTranslations = {
       "teleport": {
         "label": "Teleporteren",
         "description": "Ga naar exacte coördinaten in de wereld."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Kerker binnengaan",

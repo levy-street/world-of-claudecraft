@@ -125,6 +125,7 @@ export const en = {
       x: 'X',
       z: 'Z',
       dungeon: 'Dungeon',
+      town: 'Town',
       difficulty: 'Difficulty',
       name: 'Name',
       spec: 'Spec',
@@ -197,6 +198,7 @@ export const en = {
           'Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted.',
       },
       teleport: { label: 'Teleport', description: 'Move to exact world coordinates.' },
+      town: { label: 'Town hub', description: 'Teleport to a town hub by name.' },
       dungeon: {
         label: 'Enter dungeon',
         description: 'Enter a dungeon with dev gate bypass.',

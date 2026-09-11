@@ -62,6 +62,7 @@ export const ko_KR: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "던전",
+      "town": "Town",
       "difficulty": "난이도",
       "name": "이름",
       "spec": "전문화",
@@ -159,6 +160,10 @@ export const ko_KR: EnTranslations = {
       "teleport": {
         "label": "순간이동",
         "description": "정확한 세계 좌표로 이동합니다."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "던전 입장",

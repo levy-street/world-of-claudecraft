@@ -3,8 +3,10 @@ import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
-import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
+import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
+import { displacePlayerForDev } from './dev/dev_displace';
+import { devTownList, resolveDevTown } from './dev/town_teleport';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
 import {
@@ -23,7 +25,6 @@ import {
 } from './nythraxis_dev_raid';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
-import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
@@ -160,12 +161,53 @@ export function handleDevChat(
   if (teleportMatch) {
     const entity = ctx.entities.get(pid);
     if (entity) {
-      cancelProfessionSessionOnDisplacement(ctx, entity);
-      const pos = ctx.groundPos(Number(teleportMatch[1]), Number(teleportMatch[2]));
-      entity.pos = pos;
-      entity.prevPos = { ...pos };
-      ctx.rebucket(entity);
+      const pos = displacePlayerForDev(
+        ctx,
+        entity,
+        Number(teleportMatch[1]),
+        Number(teleportMatch[2]),
+      );
       emitDevLog(ctx, pid, `[dev] Teleported to ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`);
+    }
+    return null;
+  }
+
+  // /dev town [name]: jump to a settlement by name ("/dev town eastbrook",
+  // "/dev town dawnrest camp", or a zone id). "/dev tp <name>" is an alias so
+  // the coordinate form and the named form share one verb. The destination
+  // set is CLOSED (every zone's hub record, nothing else), unknown names
+  // refuse without moving anyone, and no argument prints the list. Rides the
+  // same ctx.devCommands gate as every other branch here.
+  const townVerb = /^\/(?:dev\s+town|devtown)(?:\s+(.+?))?\s*$/i.exec(raw);
+  const townMatch = townVerb ?? /^\/(?:dev\s+tp|devtp)\s+(\S.*?)\s*$/i.exec(raw);
+  if (townMatch) {
+    const zones = getActiveWorldContent().zones;
+    const query = townMatch[1] ?? '';
+    if (!query.trim()) {
+      ctx.error(pid, `[dev] Towns: ${devTownList(zones)}. Usage: /dev town <name>.`);
+      return null;
+    }
+    // On the tp alias only, a numeric-looking argument is a half-typed
+    // coordinate pair, not a town name: answer with the tp usage rather than
+    // an unknown-town refusal. The town verb never guards, so a hub whose
+    // name slugs to digits stays reachable by name through /dev town.
+    if (!townVerb && /^[-+\d.\s]+$/.test(query)) {
+      ctx.error(pid, '[dev] Usage: /dev tp <x> <z>, or /dev tp <town> (/dev town <name>).');
+      return null;
+    }
+    const town = resolveDevTown(zones, query);
+    if (!town) {
+      ctx.error(pid, `[dev] Unknown town '${query.trim()}'. Towns: ${devTownList(zones)}.`);
+      return null;
+    }
+    const entity = ctx.entities.get(pid);
+    if (entity) {
+      const pos = displacePlayerForDev(ctx, entity, town.x, town.z);
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Teleported to ${town.name} (${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}).`,
+      );
     }
     return null;
   }
@@ -303,13 +345,9 @@ export function handleDevChat(
       const leveled = entity.level < gate;
       if (leveled) ctx.setPlayerLevel(gate, pid);
       meta.copper += 100 * 10000;
-      // Every teleport, the dev ones included, runs the one session teardown
-      // (the same call /dev tp makes above).
-      cancelProfessionSessionOnDisplacement(ctx, entity);
-      const pos = ctx.groundPos(marla.pos.x + 2, marla.pos.z + 1);
-      entity.pos = pos;
-      entity.prevPos = { ...pos };
-      ctx.rebucket(entity);
+      // Every dev teleport runs the one displacement (the same call /dev tp
+      // and /dev town make above), session teardown included.
+      displacePlayerForDev(ctx, entity, marla.pos.x + 2, marla.pos.z + 1);
       const levelNote = leveled ? `level ${gate}, ` : '';
       emitDevLog(
         ctx,
@@ -1069,7 +1107,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

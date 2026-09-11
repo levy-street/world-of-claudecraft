@@ -62,6 +62,7 @@ export const tr_TR: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Zindan",
+      "town": "Town",
       "difficulty": "Zorluk",
       "name": "Ad",
       "spec": "Uzmanlık",
@@ -159,6 +160,10 @@ export const tr_TR: EnTranslations = {
       "teleport": {
         "label": "Işınlan",
         "description": "Kesin dünya koordinatlarına git."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Zindana gir",

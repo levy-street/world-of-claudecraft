@@ -62,6 +62,7 @@ export const ja_JP: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "ダンジョン",
+      "town": "Town",
       "difficulty": "難易度",
       "name": "名前",
       "spec": "スペック",
@@ -159,6 +160,10 @@ export const ja_JP: EnTranslations = {
       "teleport": {
         "label": "テレポート",
         "description": "正確なワールド座標へ移動します。"
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "ダンジョンに入る",

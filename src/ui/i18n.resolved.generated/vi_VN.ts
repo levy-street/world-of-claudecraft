@@ -62,6 +62,7 @@ export const vi_VN: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Hầm Ngục",
+      "town": "Town",
       "difficulty": "Độ Khó",
       "name": "Tên",
       "spec": "Chuyên Môn",
@@ -159,6 +160,10 @@ export const vi_VN: EnTranslations = {
       "teleport": {
         "label": "Dịch chuyển",
         "description": "Di chuyển đến tọa độ chính xác trong thế giới."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Vào hầm ngục",
