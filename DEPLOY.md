@@ -827,7 +827,14 @@ For off-box safety, sync the directory to S3 occasionally:
   scene class, suggestion id, and on the reports counter and the frame p95
   histogram the host `runtime`: `web` or `desktop-shell`, the Electron
   client, which no other label can tell from a Chrome tab; its SQL twin is the
-  `desktop_shell` column). The whole family follows the exporter's
+  `desktop_shell` column; adding the label changed those two families'
+  series identity, so a dashboard or rule matching their exact label set
+  needs `sum without (runtime)` or a `runtime` selector from that deploy on).
+  From the same deploy, `fps_avg` from browser sessions steps UP for a
+  measurement reason: the hidden-time ledger behind it now also discounts a
+  background tab, where it used to discount only a minimized desktop window;
+  `raw_summary.visibleSeconds` beside `seconds` is the discriminator, and its
+  absence means an older client. The whole family follows the exporter's
   zero-backfill design above: every counter cross product registers at zero and
   every histogram series is pre-seeded at boot (roughly 600 always-present
   samples), so the jank-share ratio reads 0% rather than "no data" for a
@@ -854,6 +861,12 @@ For off-box safety, sync the directory to S3 occasionally:
   `raw_summary.dropped`, so a key that is absent AND unlisted there was never
   sent, and the small diagnostic keys (`windows`, `bootPhases`, `shaderWarm`,
   `postRevealLinks`, `rendererDrawingBuffer`, `browser`) survive on every row.
+  `woc_client_raw_summary_shed_total{rung}` counts stored reports by the
+  deepest rung reached (`none` when the blob fit), the readout for "did a
+  client shape start blowing the cap" and for sizing a cap change. Size the
+  `client_perf_reports` retention on the cap times the report rate: since the
+  ladder, a stored row carries up to the whole cap where the old whole-blob
+  drop left most heavy rows at a few bytes.
 - **Multi-realm scraping**: one server process hosts exactly one realm, and no
   exported series carries a `realm` label (pinned by the exporter tests; the
   DB-backed business family filters on the realm in its queries instead). Give

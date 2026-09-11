@@ -2518,6 +2518,29 @@ describe('world-entry raw summary blocks', () => {
   });
 });
 
+describe('raw summary markers are server-authored', () => {
+  it('strips a client-posted truncated or dropped marker from an under-cap report', async () => {
+    // A row that READS as shed must have been shed here: otherwise a beacon
+    // could post `{truncated: true, dropped: ['windows']}` and every fleet
+    // query on `dropped` would count it.
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'posted-markers',
+          rawSummary: { truncated: true, dropped: ['windows'], seconds: 5 },
+        },
+        { remoteAddress: '203.0.113.140' },
+      ),
+      res,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].rawSummary).toEqual({
+      seconds: 5,
+    });
+  });
+});
+
 describe('desktop shell marker', () => {
   const ELECTRON_UA =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +

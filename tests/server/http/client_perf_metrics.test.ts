@@ -34,6 +34,7 @@ import {
   CLIENT_PERF_RUNTIMES,
   CLIENT_PERF_SCENE_CLASSES,
   CLIENT_PERF_SHADER_WARM_REFUSALS,
+  CLIENT_PERF_SHED_RUNGS,
   CLIENT_PERF_SUGGESTION_IDS,
   CLIENT_PERF_WORST10S_BUCKETS_SECONDS,
   type ClientPerfSample,
@@ -44,9 +45,11 @@ import {
   registerClientPerfMetrics,
   setClientPerfMetricsSink,
   shaderWarmRefusalLabel,
+  WOC_CLIENT_RAW_SUMMARY_SHED_TOTAL,
   WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
 } from '../../../server/http/client_perf_metrics';
 import { handlePerfReport, perfReportInternalsForTest } from '../../../server/perf_report';
+import { RAW_SUMMARY_SHED_RUNG_IDS } from '../../../server/perf_report_shed';
 
 function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
   return {
@@ -67,6 +70,7 @@ function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
     shaderWarmWorkerActive: true,
     shaderWarmRefusal: '',
     desktopShell: false,
+    rawSummary: {},
     ...overrides,
   };
 }
@@ -135,6 +139,10 @@ describe('vocabulary pins', () => {
     expect([...CLIENT_PERF_GFX_TIERS]).toEqual(['low', 'medium', 'high', 'ultra', 'insane']);
     expect([...CLIENT_PERF_DEVICE_CLASSES]).toEqual(['desktop', 'mobile']);
     expect([...CLIENT_PERF_RUNTIMES]).toEqual(['web', 'desktop-shell']);
+    // The shed vocabulary is the ladder's own rung list, bracketed.
+    expect([...CLIENT_PERF_SHED_RUNGS]).toEqual(['none', ...RAW_SUMMARY_SHED_RUNG_IDS, 'other']);
+    expect(CLIENT_PERF_SHED_RUNGS).toContain('rendererPrewarmSummary.lists');
+    expect(WOC_CLIENT_RAW_SUMMARY_SHED_TOTAL).toBe('woc_client_raw_summary_shed_total');
     expect([...CLIENT_PERF_GPU_FAMILIES]).toEqual([
       'nvidia',
       'amd',
@@ -432,10 +440,50 @@ describe('registerClientPerfMetrics', () => {
         /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop",backend="d3d11",runtime="web"\} (\d+)$/m,
       ),
     ).toBe(2);
-    // Runtime-blind families carry no such label.
-    expect(text).not.toMatch(/^woc_client_fps_avg_count\{[^}]*runtime=/m);
-    expect(text).not.toMatch(/^woc_client_jank_reports_total\{[^}]*runtime=/m);
-    expect(text).not.toMatch(/^woc_client_context_losses_total\{[^}]*runtime=/m);
+    // Exactly two families carry the label: the bound over the whole
+    // exposition, so a runtime label added to any other family reds here.
+    const labeled = new Set(
+      text
+        .split('\n')
+        .filter((line) => line.includes('runtime="'))
+        .map((line) => line.slice(0, line.indexOf('{'))),
+    );
+    expect([...labeled].sort()).toEqual([
+      'woc_client_frame_p95_seconds_bucket',
+      'woc_client_frame_p95_seconds_count',
+      'woc_client_frame_p95_seconds_sum',
+      'woc_client_reports_total',
+    ]);
+  });
+
+  it('counts stored reports by the deepest raw summary shed rung, folded to the vocabulary', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+    sink.perfReportStored(sample({ rawSummary: { seconds: 1 } }));
+    sink.perfReportStored(
+      sample({
+        rawSummary: {
+          truncated: true,
+          dropped: ['rendererPrewarmSummary.lists', 'rendererFoliage'],
+        },
+      }),
+    );
+    sink.perfReportStored(sample({ rawSummary: { truncated: true, dropped: ['not-a-rung'] } }));
+    sink.perfReportStored(sample({ rawSummary: { truncated: true, dropped: [] } }));
+
+    const text = await registry.metrics();
+    const count = (rung: string): number =>
+      value(
+        text,
+        new RegExp(`^woc_client_raw_summary_shed_total\\{rung="${rung}"\\} (\\d+)$`, 'm'),
+      );
+    expect(count('none')).toBe(2);
+    expect(count('rendererFoliage')).toBe(1);
+    expect(count('rendererPrewarmSummary.lists')).toBe(0);
+    expect(count('other')).toBe(1);
+    // Pre-seeded for every rung, so a healthy fleet reads zeros, not gaps.
+    for (const rung of CLIENT_PERF_SHED_RUNGS) expect(count(rung)).toBeGreaterThanOrEqual(0);
+    expect(text).not.toMatch(/rung="not-a-rung"/);
   });
 
   it('bounds the backend label: the series count is fixed and no report can grow it', async () => {

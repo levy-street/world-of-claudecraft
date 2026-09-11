@@ -47,6 +47,9 @@ import { Counter, Histogram, type Registry } from 'prom-client';
 // suggestion-id catalog (which would cycle perf_report <-> this module) the
 // real vocabulary can be the one source here.
 import { GL_BACKEND_LABELS, type GlBackend } from '../gl_backend';
+// Same rule: perf_report_shed.ts imports nothing, so the rung vocabulary is
+// imported rather than copied.
+import { RAW_SUMMARY_SHED_RUNG_IDS } from '../perf_report_shed';
 
 /** The five graphics tiers the ingest allowlist admits (perf_report.ts gfxTier). */
 export const CLIENT_PERF_GFX_TIERS = ['low', 'medium', 'high', 'ultra', 'insane'] as const;
@@ -186,6 +189,29 @@ export const WOC_CLIENT_LONG_TASK_P95_SECONDS = 'woc_client_long_task_p95_second
 export const WOC_CLIENT_EFFECTIVE_RENDER_SCALE = 'woc_client_effective_render_scale';
 export const WOC_CLIENT_CONTEXT_LOSSES_TOTAL = 'woc_client_context_losses_total';
 export const WOC_CLIENT_SUGGESTIONS_TOTAL = 'woc_client_suggestions_total';
+// How far the raw_summary shed ladder went on each stored gameplay report,
+// labeled by the DEEPEST rung reached ('none' when the blob fit). The only
+// fleet-wide readout of the ladder: it says whether a client shape started
+// blowing the cap, and how much of a raise a rung would buy.
+export const WOC_CLIENT_RAW_SUMMARY_SHED_TOTAL = 'woc_client_raw_summary_shed_total';
+
+/** The shed-depth label vocabulary: 'none' plus every rung id, in ladder
+ *  order, plus 'other' for a stored row whose marker this server's ladder
+ *  does not know (a newer binary's rung, read by an older exporter). */
+export const CLIENT_PERF_SHED_RUNGS = ['none', ...RAW_SUMMARY_SHED_RUNG_IDS, 'other'] as const;
+export type ClientPerfShedRung = (typeof CLIENT_PERF_SHED_RUNGS)[number];
+
+/** The deepest rung a stored raw_summary records, folded to the vocabulary. */
+export function shedRungLabel(rawSummary: unknown): ClientPerfShedRung {
+  if (!rawSummary || typeof rawSummary !== 'object') return 'none';
+  const dropped = (rawSummary as { dropped?: unknown }).dropped;
+  if (!Array.isArray(dropped) || dropped.length === 0) return 'none';
+  const deepest = dropped[dropped.length - 1];
+  return typeof deepest === 'string' &&
+    (RAW_SUMMARY_SHED_RUNG_IDS as readonly string[]).includes(deepest)
+    ? (deepest as ClientPerfShedRung)
+    : 'other';
+}
 // The shader-warm cut of the SAME stored reports woc_client_reports_total
 // counts, under its own name because its labels are a different question
 // (is the warm-up worker alive on this client, and why not) rather than a
@@ -239,6 +265,7 @@ export interface ClientPerfSample {
   suggestionIds: string[];
   shaderWarmWorkerActive: boolean;
   shaderWarmRefusal: string;
+  rawSummary: Record<string, unknown>;
 }
 
 /**
@@ -435,6 +462,12 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     labelNames: ['suggestion'] as const,
     registers: [registry],
   });
+  const shed = new Counter({
+    name: WOC_CLIENT_RAW_SUMMARY_SHED_TOTAL,
+    help: 'Stored gameplay perf reports by the deepest raw_summary shed-ladder rung reached (none when the blob fit the cap).',
+    labelNames: ['rung'] as const,
+    registers: [registry],
+  });
 
   // The exporter's zero-backfill design, whole family (game_metrics.ts: "Prom
   // counters cannot backfill a scrape", histograms pre-seeded with .zero()):
@@ -448,11 +481,13 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   // not a client ever reports it: the backend label multiplies exactly two
   // series families and the runtime label the same two plus the reports
   // counter. frame_p95 is 5 tiers x 2 devices x 7 backends x 2 runtimes = 140
-  // series, reports is 5 x 2 x 6 families x 2 runtimes = 120, and
-  // context_losses is 6 os x 7 backends = 42. Every vocabulary is closed and
-  // none grows with fleet size, players, or hardware; adding a backend value
-  // is a source edit in gl_backend.ts, and the runtime is a stored boolean,
-  // never a thing a beacon can mint.
+  // label sets (a histogram exports its buckets, sum and count per label set,
+  // so about twelve lines each), reports is 5 x 2 x 6 families x 2 runtimes
+  // = 120, context_losses is 6 os x 7 backends = 42, and the shed counter is
+  // one series per rung. Every vocabulary is closed and none grows with fleet
+  // size, players, or hardware; adding a backend value is a source edit in
+  // gl_backend.ts, a rung is a source edit in perf_report_shed.ts, and the
+  // runtime is a stored boolean, never a thing a beacon can mint.
   for (const gfxTier of CLIENT_PERF_GFX_TIERS) {
     for (const device of CLIENT_PERF_DEVICE_CLASSES) {
       const tierDevice = { gfx_tier: gfxTier, device };
@@ -482,6 +517,7 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     }
   }
   for (const suggestion of CLIENT_PERF_SUGGESTION_IDS) suggestions.inc({ suggestion }, 0);
+  for (const rung of CLIENT_PERF_SHED_RUNGS) shed.inc({ rung }, 0);
 
   return {
     perfReportStored(sample: ClientPerfSample): void {
@@ -524,6 +560,7 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         renderScale.observe({ gfx_tier: gfxTier }, observedOrZero(sample.effectiveRenderScale));
         const lost = Math.floor(observedOrZero(sample.contextLostCount));
         if (lost > 0) contextLosses.inc({ os: osIn(sample.osFamily), backend }, lost);
+        shed.inc({ rung: shedRungLabel(sample.rawSummary) });
         for (const id of sample.suggestionIds) {
           // The ingest allowlist already filtered these; membership is re-checked
           // so a direct caller cannot mint a label value.

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { shaderWarmToken } from '../server/perf_report_entry_blocks';
+import { RAW_SUMMARY_KNOWN_KEYS } from '../server/perf_report_shed';
 import { loadSpan, resetLoadProfile } from '../src/game/load_profiler';
 import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
 import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
@@ -1473,6 +1474,22 @@ describe('perf reporter suggestion ids', () => {
     snap.renderer!.glRenderer = 'Google SwiftShader';
     const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
     expect(body.suggestionIds).toEqual(['hardware-acceleration']);
+  });
+
+  it('sends only raw summary keys the server ladder knows, so no field is shed as unlisted', () => {
+    // The ingest sheds an unknown key first on every oversized report, and
+    // nearly every first report is oversized: a client field added without
+    // its server-side entry would vanish from the fleet under the anonymous
+    // 'unlisted' rung. This is the lockstep pin.
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      new Settings(),
+      'sess1',
+      42,
+    )!;
+    for (const key of Object.keys(body.rawSummary as Record<string, unknown>)) {
+      expect(RAW_SUMMARY_KNOWN_KEYS, key).toContain(key);
+    }
   });
 
   it('carries the desktop shell flag as a top-level field, false for a browser tab', () => {
