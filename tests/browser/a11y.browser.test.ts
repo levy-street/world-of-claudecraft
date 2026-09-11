@@ -1495,6 +1495,9 @@ describe('axe: reliquary window search, filters, and relic grid', () => {
       player: { name: 'AxeTester' },
       deedStats: { itemsDiscovered: new Set<string>() },
       reliquaryMarks: new Set<string>(),
+      // The account ledger halves (src/sim/account_ledger.ts) every real world carries.
+      reliquaryAccountFinds: new Map<string, never[]>(),
+      accountDeeds: new Map<string, never[]>(),
       reliquaryRecent: [] as string[],
       reliquaryFirstFind: {},
       ownedMounts: () => [] as string[],

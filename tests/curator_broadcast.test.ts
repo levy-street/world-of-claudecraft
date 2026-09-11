@@ -785,6 +785,7 @@ describe('GameServer.refreshCuratorStanding (real ownership resolution)', () => 
 // vacuously over an empty corpus).
 const SERVER_ROOT = fileURLToPath(new URL('../server', import.meta.url));
 const GAME_SRC = fileURLToPath(new URL('../server/game.ts', import.meta.url));
+const STANDING_SRC = fileURLToPath(new URL('../server/curator_standing.ts', import.meta.url));
 
 /** Strip block and line comments (keeping a `://` in a URL intact) before any
  *  bound below counts anything. Without it, prose describing a write this code
@@ -841,16 +842,24 @@ describe('Curator standing is server authority, never a client claim', () => {
     const writes = serverCode.match(CURATOR_WRITE) ?? [];
     expect(writes, 'only refreshCuratorStanding may write a Curator standing').toHaveLength(6);
 
+    // The stamp moved whole into server/curator_standing.ts (the monolith
+    // ratchet); game.ts's refresher only resolves the entity and meta and
+    // delegates, so it holds NO write of its own.
     const game = codeOnly(readFileSync(GAME_SRC, 'utf8'));
-    const start = game.indexOf('private refreshCuratorStanding(');
-    const end = game.indexOf('private async refreshAllHolderTiers(');
+    const refresherStart = game.indexOf('private refreshCuratorStanding(');
+    const refresherEnd = game.indexOf('private async refreshAllHolderTiers(');
+    expect(refresherStart).toBeGreaterThan(0);
+    expect(refresherEnd).toBeGreaterThan(refresherStart);
+    expect(game.slice(refresherStart, refresherEnd).match(CURATOR_WRITE) ?? []).toHaveLength(0);
+    const standing = codeOnly(readFileSync(STANDING_SRC, 'utf8'));
+    const start = standing.indexOf('export function stampCuratorStanding(');
+    const end = standing.length;
     expect(start).toBeGreaterThan(0);
-    expect(end).toBeGreaterThan(start);
     // Counting the writes INSIDE the refresher, rather than checking each
     // whole-tree match is a substring of it, is what makes containment
     // decisive: three identical `curatorRank =` strings anywhere else in the
     // tree satisfy a substring check while sitting outside the refresher.
-    expect(game.slice(start, end).match(CURATOR_WRITE) ?? []).toHaveLength(6);
+    expect(standing.slice(start, end).match(CURATOR_WRITE) ?? []).toHaveLength(6);
   });
 
   it('the terse wire keys are WRITE-ONLY on the server', () => {

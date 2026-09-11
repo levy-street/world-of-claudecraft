@@ -1078,9 +1078,14 @@ export const TARGETS = [
         const meta = sim?.players?.get?.(sim.playerId);
         if (!sim || !meta) return { ok: false, reason: 'no sim' };
         const alt = { characterId: 99, name: 'Bram', cls: 'mage', day: '2026-09-01' };
-        for (const id of ['dgn_deepward', 'col_discovery_250']) {
-          const list = meta.accountLedger.deeds.get(id) ?? [];
-          meta.accountLedger.deeds.set(id, [alt, ...list]);
+        // A pre-ledger build (the BEFORE) has no ledger: the stamp is inert there
+        // and the Book opens as it always did.
+        const ledger = meta.accountLedger;
+        if (ledger) {
+          for (const id of ['dgn_deepward', 'col_discovery_250']) {
+            const list = ledger.deeds.get(id) ?? [];
+            ledger.deeds.set(id, [alt, ...list]);
+          }
         }
         window.__game?.hud?.openDeeds?.('dungeon');
         return { ok: true };
@@ -1132,7 +1137,9 @@ export const TARGETS = [
         const meta = sim?.players?.get?.(sim.playerId);
         if (!meta) return;
         const alt = { characterId: 99, name: 'Bram', cls: 'mage', day: '2026-09-01' };
-        for (const id of ids) meta.accountLedger.relics.set(`item:${id}`, [alt]);
+        // Inert on a pre-ledger build (the BEFORE), exactly like the Book target.
+        const ledger = meta.accountLedger;
+        if (ledger) for (const id of ids) ledger.relics.set(`item:${id}`, [alt]);
       });
       // Re-enter the page through the real navigation so the shot is the
       // rebuilt detail, not a slow-band race.
