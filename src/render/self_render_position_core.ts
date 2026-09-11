@@ -37,11 +37,11 @@ function decayOffset(offset: Vec3Like, dt: number, maxDistance = Number.POSITIVE
  * A gap no real motion could open in one frame is a teleport (dungeon exit,
  * hearth, graveyard release, rift or delve exit, unstuck) and must never be
  * glided: decaying it drew the body flying across the map. Same six-yard rule
- * every other display smoother applies (self_motion.ts SELF_MOTION_SNAP_DIST_SQ,
- * camera_boom_core.ts BOOM_SNAP_DIST, step_smooth_core.ts STEP_SMOOTH_SNAP), and
- * the same margin: the fastest plausible mover (23.1 yd/s, entity_reanchor.ts)
- * over the main loop's 0.25 s frame clamp covers 5.8 yd, so one frame of real
- * motion never trips it.
+ * the other whole-pose smoothers apply (self_motion.ts SELF_MOTION_SNAP_DIST_SQ,
+ * camera_boom_core.ts BOOM_SNAP_DIST; the step smoother's STEP_SMOOTH_SNAP is a
+ * separate, tighter vertical-only rule), and the same margin: the fastest
+ * plausible mover (23.1 yd/s, entity_reanchor.ts) over the main loop's 0.25 s
+ * frame clamp covers 5.8 yd, so one frame of real motion never trips it.
  */
 export function isTeleportGap(dx: number, dy: number, dz: number): boolean {
   return dx * dx + dy * dy + dz * dz > SELF_MOTION_SNAP_DIST_SQ;
@@ -50,10 +50,14 @@ export function isTeleportGap(dx: number, dy: number, dz: number): boolean {
 /**
  * Did the pose the display is anchored to jump a teleport this frame? Both
  * paths draw `position = target + offset`, so `position - offset` is last
- * frame's target and the gap to the new one is the AUTHORITATIVE jump alone.
- * Measuring from the drawn pose instead would count the decaying offset too,
- * and a legitimately accumulated offset (handoff plus a run of reconcile
- * residuals) could then read as a teleport and pop.
+ * frame's target on x and z, and the gap to the new one is the AUTHORITATIVE
+ * jump alone. Measuring from the drawn pose instead would count the decaying
+ * offset too, and a legitimately accumulated offset (handoff plus a run of
+ * reconcile residuals) could then read as a teleport and pop. Two small
+ * display terms do ride along in `position`: the renderer writes the step
+ * smoother's y back into it (bounded by STEP_SMOOTH_MAX_LAG), and on the plain
+ * fallback path it is the lead-smoothed pose; both stay well inside the margin
+ * above, so neither can turn real motion into a snap.
  */
 function targetJumpedTeleport(
   state: SelfRenderPositionState,

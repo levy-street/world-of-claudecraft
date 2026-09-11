@@ -365,13 +365,14 @@ describe('updateSelfRenderPosition teleport rule', () => {
   // target and decays it so the camera glides instead of stepping. A gap only a
   // teleport could explain (dungeon exit, hearth, graveyard release, rift or
   // delve exit) must NOT glide: gliding it drew the body flying across the map
-  // for a third of a second. Same six-yard rule every other display smoother
-  // uses (self_motion.ts, camera_boom_core.ts, step_smooth_core.ts).
+  // for a third of a second. Same six-yard rule the other whole-pose smoothers
+  // use (self_motion.ts, camera_boom_core.ts; step_smooth_core.ts keeps its own
+  // tighter vertical-only rule).
   const TELEPORT = Math.sqrt(SELF_MOTION_SNAP_DIST_SQ) * 100;
   const runPredicted = (state: SelfRenderPositionState, player: Entity): Vec3Like =>
     updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, frame(), false);
 
-  it('snaps when the predictor re-adopts a teleported anchor instead of capturing the gap', () => {
+  it('snaps the fallback-to-predictor handoff across a teleport instead of capturing the gap', () => {
     const state = createSelfRenderPositionState();
     const player = playerAt({ x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 0 });
     updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
@@ -405,8 +406,10 @@ describe('updateSelfRenderPosition teleport rule', () => {
     expect(state.position).toEqual({ x: TELEPORT, y: 0, z: 0 });
   });
 
-  it('snaps the plain fallback pose (no predictor ever active) across a teleport', () => {
+  it('keeps the inherited plain-fallback snap (no predictor ever active) across a teleport', () => {
     // The offline / prediction-off shape: no offset in flight, smoothing on.
+    // updateSelfRenderFallback already snapped here before the rule existed;
+    // pinned so the shared `discontinuity` flag can never regress that arm.
     const state = createSelfRenderPositionState();
     const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
     updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);

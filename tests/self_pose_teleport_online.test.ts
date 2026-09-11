@@ -39,6 +39,11 @@ import { createOnlineHarness, type FrameRecord } from './helpers/online_harness'
 // distance. The pinned property: once the mirror has arrived, the drawn pose is
 // at the destination within a frame, and no frame ever draws a pose out in the
 // gap between departure and arrival.
+//
+// Only the wire v2 arm is the regression pin (the base core fails it with eight
+// in-gap frames). On wire v1 the predictor stays active across the teleport and
+// re-seats itself, so the base core never captured an offset there; that arm is
+// kept as a guard that the rule stays inert on the path that never needed it.
 
 const TELEPORT_AT_MS = 1200;
 const RUN_MS = 2600;
