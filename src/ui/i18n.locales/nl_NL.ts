@@ -3984,7 +3984,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.title': 'Stadsfocus',
   'hudChrome.townFocus.townOnlyHint':
     'Focus kan alleen worden gewijzigd terwijl je in de stad bent.',
-  'hudChrome.archetypeTitle.label': 'Titel',
   'hudChrome.archetypeTitle.none': 'Geen',
   'entities.itemSets.crownforged.bonus4':
     'Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.',
@@ -10399,7 +10398,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Kruidenkunde',
   'hudChrome.gathering.logging': 'Houtkap',
   'hudChrome.gathering.mining': 'Mijnbouw',
-  'hudChrome.gathering.title': 'Verzamelen',
   'hudChrome.corpseHarvest.title': 'Oogsten',
   'hudChrome.corpseHarvest.harvestButton': 'Oogsten',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Dit kadaver is al geoogst.',
@@ -10665,7 +10663,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.training_dummy.name': 'Oefenpop',
   'entities.mobs.hub_training_dummy.name': 'Oefenpop',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Liefhebberij',
   'hudChrome.auraEffect.armorPct': 'Vermindert pantser met {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Vermindert pantser met {pct}% ({stacks} stapels)',
   'hudChrome.auraEffect.increasePct.allStats': 'Verhoogt alle statistieken met {pct}%',

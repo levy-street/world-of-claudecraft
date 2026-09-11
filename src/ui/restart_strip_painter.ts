@@ -31,7 +31,7 @@ export function buildRestartStrip(
 ): HTMLElement | null {
   if (state === 'hidden') return null;
   const strip = document.createElement('div');
-  strip.className = 'restart-strip';
+  strip.className = 'restart-strip ui-panel-strong';
 
   const status = document.createElement('div');
   status.className = 'restart-strip-status';
@@ -43,7 +43,7 @@ export function buildRestartStrip(
 
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'btn restart-strip-btn';
+  button.className = 'btn restart-strip-btn ui-btn ui-btn--red';
   button.dataset.restartGame = '';
   // Focus identity for a rebuild-crossing restore (focus_restore.ts): the
   // Graphics panel wipes its subtree on any setting change, and this key is how

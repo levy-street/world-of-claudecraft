@@ -565,6 +565,7 @@ interface ScannedPainter {
 // pooled node, both at build; fct also forces ONE documented offsetWidth reflow to restart
 // the float animation on a recycled node.
 const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
+  { file: 'micro_menu_state_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'xp_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
@@ -795,6 +796,9 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: {},
     reflowAllow: { getComputedStyle: 1 },
   },
+  // the minimap rim day/night dial: canvas-only, self-throttled to ~1Hz off the
+  // caller's clock; like minimap it caches its one --color-daynight-* resolve
+  { file: 'day_night_dial_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'dungeon_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
@@ -1200,11 +1204,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   // A body/wrap rect pair, read once when the mail body is laid out to fit.
   { file: 'mailbox_window.ts', reflowAllow: { '.getBoundingClientRect': 2 }, driverAllow: {} },
-  // The trigger + popover rect pair that positions a filter popover, plus the two border
-  // widths its height clamp needs. Per open, not per row.
+  // The trigger + popover rect pair that positions a filter popover, the scrolling
+  // `.mkt-controls` rect the clamp intersects with (that column clips in its own right,
+  // and a menu placed against the window alone rendered above its top edge), plus the
+  // two border widths its height clamp needs and the controls column's own overflow
+  // (mobile gives that scroller up, so there it must not constrain the menu at all).
+  // Per open, not per row.
   {
     file: 'market_window.ts',
-    reflowAllow: { '.getBoundingClientRect': 2, getComputedStyle: 2, '.scrollTop': 2 },
+    reflowAllow: { '.getBoundingClientRect': 3, getComputedStyle: 3, '.scrollTop': 2 },
     driverAllow: {},
   },
   // The bug-report submit path schedules its screenshot capture off the critical

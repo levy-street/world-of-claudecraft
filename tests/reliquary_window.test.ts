@@ -82,16 +82,15 @@ describe('painter hygiene', () => {
     expect(trackerView).toContain('RELIQUARY_TRACK_CAP');
   });
 
-  it('dims the at-cap pin in BOTH refusal spellings and excludes it from hover', () => {
+  it('dims the at-cap pin in BOTH refusal spellings and uses the shared button hover', () => {
     // The control no longer carries native disabled, so the whole "refused
     // looks refused" affordance rests on the attribute selector.
     const reliquaryCss = sectionCss('reliquary');
     expect(reliquaryCss).toMatch(
       /\.reliquary-pin:disabled,\s*\.reliquary-pin\[aria-disabled="true"\] \{\s*opacity: 0\.5;/,
     );
-    expect(reliquaryCss).toContain(
-      '.reliquary-pin:hover:not(:disabled):not([aria-disabled="true"])',
-    );
+    // Grammar migration: ui-btn now owns hover while this section keeps the refusal state.
+    expect(painter).toContain('class="reliquary-pin ui-btn${pinned');
   });
 
   it('elides slow-band repaints through the pure refresh signature', () => {
@@ -310,7 +309,10 @@ describe('painter hygiene', () => {
     // empty list. The row stays a button INSIDE its own <li>.
     expect(painter).toMatch(/<ul class="reliquary-page-list" role="list"/);
     expect(painter).toContain('<li class="reliquary-page-item">');
-    expect(painter).toMatch(/<li class="reliquary-page-item">[\s\S]*?class="reliquary-page-row"/);
+    // Grammar migration: the row retains its list semantics and adopts the shared card surface.
+    expect(painter).toMatch(
+      /<li class="reliquary-page-item">[\s\S]*?class="reliquary-page-row ui-card"/,
+    );
     // list-style: none drops list semantics in Safari VoiceOver; the explicit
     // role above is the counterweight and must not be dropped with the ul.
     expect(components).toMatch(/\.reliquary-page-list \{[^}]*list-style: none;[^}]*\}/);
@@ -1398,9 +1400,13 @@ describe('styles and architecture registration', () => {
     // transform: a scale on hover/focus is banned in this family.
     expect(reliquaryCss).toContain('.reliquary-cell:hover');
     expect(reliquaryCss).not.toMatch(/:(?:hover|focus-visible) \{[^}]*transform:/);
-    // Everything that IS clickable keeps its pointer and a hover state.
-    for (const clickable of ['.reliquary-nav', '.reliquary-page-row', '.reliquary-filter-chip']) {
-      expect(reliquaryCss, clickable).toContain(`${clickable}:hover`);
+    // Grammar migration: shared primitives own pointer and hover for every clickable surface.
+    for (const primitiveClass of [
+      'class="reliquary-nav ui-seg-tab',
+      'class="reliquary-page-row ui-card',
+      'class="reliquary-filter-chip ui-chip',
+    ]) {
+      expect(painter, primitiveClass).toContain(primitiveClass);
     }
   });
 
@@ -1455,7 +1461,8 @@ describe('styles and architecture registration', () => {
     expect(optOut).toContain('background: none');
     // The painter's side of the join: class + hook on the SAME span, one arm
     // per reason through the exhaustive record.
-    expect(painter).toContain('class="reliquary-complete-badge" ${chip.attr}="1"');
+    // Grammar migration: the reason badge keeps its hook and adopts the shared chip surface.
+    expect(painter).toMatch(/class="reliquary-complete-badge ui-chip" \$\{chip\.attr\}="1"/);
     expect(painter).toContain("attr: 'data-retired'");
     expect(painter).toContain("attr: 'data-personal'");
   });

@@ -2,16 +2,14 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { stripComments } from './helpers/strip_comments';
 
-// The desktop player frame is a fixed-width box whose CHILDREN zoom with the
+// The desktop player frame is a dimensioned box whose CHILDREN zoom with the
 // Player Frame Scale slider (--player-frame-scale), so the box must carry the
-// same factor or box and content disagree: at scale 0.75 the 612px box held a
-// 432px content row, the yellow unlock outline overhung the bars by 90px per
-// side, and a drag could not bring the visible frame within 188px of the
-// screen edge (the clamp stops the BOX at the edge, not the content). The
+// same factor or box and content disagree: an unscaled box leaves an invisible
+// band around the smaller content and the yellow unlock outline. The drag clamp
+// then stops the BOX at the edge instead of the content. The
 // detached seat must also keep the docked centring: pf-detached used to flip
 // justify-content to flex-start, so the first grab of a docked frame slid the
-// visible content to the box's left edge (85px at scale 0.75, 18px even at the
-// default scale 1), which read as the frame jumping sideways under the cursor.
+// visible content to the box's left edge and read as a sideways jump.
 // This pins the width factor on both seats, their agreement, and the centring.
 
 // Stripped so a pin can never match commented-out CSS. The shared helper fits
@@ -29,15 +27,15 @@ function ruleBlock(selector: string, from = 0): string {
   return hudCss.slice(start, hudCss.indexOf('}', start));
 }
 
-/** The `var(--player-frame-width, <n>px) * var(--player-frame-scale, 1)` width
+/** The token-backed player width times `var(--player-frame-scale, 1)`
  *  a block declares: the playerFrameWidth setting (the interface editor's
- *  dimension drags) times the children zoom, with the stock fallback px. */
-function boxWidthPx(block: string): number {
+ *  dimension drags) times the children zoom, with the shared frame fallback. */
+function boxWidth(block: string): string {
   const m = block.match(
-    /width: calc\(var\(--player-frame-width, (\d+)px\) \* var\(--player-frame-scale, 1\)\);/,
+    /width: calc\(var\(--player-frame-width, var\(--unit-frame-w\)\) \* var\(--player-frame-scale, 1\)\);/,
   );
   expect(m).not.toBeNull();
-  return Number((m as RegExpMatchArray)[1]);
+  return (m as RegExpMatchArray)[0];
 }
 
 describe('player frame box tracks the Player Frame Scale zoom', () => {
@@ -49,14 +47,14 @@ describe('player frame box tracks the Player Frame Scale zoom', () => {
 
   it('scales the docked box by the same factor the children zoom by', () => {
     const docked = ruleBlock('#player-frame {');
-    expect(boxWidthPx(docked)).toBe(612);
+    expect(boxWidth(docked)).toContain('var(--unit-frame-w)');
     expect(docked).toContain('justify-content: center;');
   });
 
   it('keeps the detached seat the same width and centring as the docked one', () => {
     const detached = ruleBlock('#player-frame.pf-detached {');
     // Same width on both seats, or the box resizes the moment a drag starts.
-    expect(boxWidthPx(detached)).toBe(boxWidthPx(ruleBlock('#player-frame {')));
+    expect(boxWidth(detached)).toBe(boxWidth(ruleBlock('#player-frame {')));
     // Same centring, or the content jumps to the box edge on the first grab.
     expect(detached).toContain('justify-content: center;');
   });

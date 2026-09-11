@@ -8,6 +8,8 @@ export * from './craft_celebration_text_view';
 export * from './craft_celebration_view';
 export * from './craft_denial_line_view';
 export * from './craft_name_view';
+export * from './craft_row_chip_text';
+export * from './craft_row_labels';
 export * from './crafting_deny_core';
 export * from './crafting_tab_pref';
 export * from './crafting_view';

@@ -229,10 +229,12 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     renderVendorWindow(el, 'Vendor', view, deps());
 
     const grids = el.querySelectorAll('.vendor-goods-grid');
-    expect(grids.length).toBe(1);
+    // W10: the board keeps a dedicated two-socket buyback rail even when empty.
+    expect(grids.length).toBe(2);
     const rows = grids[0].querySelectorAll('.vendor-item');
     expect(rows.length).toBe(2);
     for (const row of rows) expect(row.parentElement).toBe(grids[0]);
+    expect(grids[1].querySelectorAll('.vendor-buyback-empty')).toHaveLength(2);
   });
 
   it('appends buyback rows as children of their own .vendor-goods-grid', () => {
@@ -526,7 +528,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     expect(row.hasAttribute('aria-label')).toBe(true);
   });
 
-  it('appends no empty .vendor-goods-grid when both sections are empty', () => {
+  it('keeps two empty buyback sockets when both sections are empty', () => {
     const view: VendorView = {
       goods: [],
       buyback: [],
@@ -537,8 +539,9 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
-    expect(el.querySelectorAll('.vendor-goods-grid').length).toBe(0);
-    // The empty-buyback state message still renders in its place.
+    // W10: empty shops still expose the board's two buyback socket positions.
+    expect(el.querySelectorAll('.vendor-goods-grid')).toHaveLength(1);
+    expect(el.querySelectorAll('.vendor-buyback-empty .ui-socket.empty')).toHaveLength(2);
     expect(el.querySelector('.vendor-empty')).not.toBeNull();
   });
 });
@@ -811,7 +814,8 @@ describe('#vendor-window desktop width cap: divides by --window-scale and clears
   });
 
   it('floors the width at 400px so it never regresses below the pre-PR fixed window', () => {
-    expect(normalized).toMatch(/width: max\( 400px, min\( 860px,/);
+    // W10: the approved compact two-column board caps the desktop shell at 560px.
+    expect(normalized).toMatch(/width: max\( 400px, min\( 560px,/);
   });
 
   it('caps the width so it clears the #bags left edge at any viewport/scale (round 5 review, PR #2101)', () => {
@@ -824,7 +828,8 @@ describe('#vendor-window desktop width cap: divides by --window-scale and clears
     for (const scale of [0.8, 1, 1.25, 1.4]) {
       for (const vw of [700, 900, 1024, 1100, 1280, 1400, 1600, 1920, 2560]) {
         const authorVw = vw / scale;
-        const width = Math.max(400, Math.min(860, 0.5 * authorVw + barHalf - 362));
+        // W10: mirror the compact 560px cap used by the source rule above.
+        const width = Math.max(400, Math.min(560, 0.5 * authorVw + barHalf - 362));
         const vendorRightEdge = authorVw / 2 + width / 2;
         const bagsLeftEdge = 0.75 * authorVw + (barHalf - 50) / 2 - 155;
         // Small viewports keep the 400px floor: #bags is bottom-anchored and

@@ -93,7 +93,7 @@ export function wocBrowseStripHtml(opts: {
   const subcategorySelect =
     opts.category === 'weapon' || opts.category === 'armor'
       ? `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterSubcategory'))}` +
-        `<select data-field="filter-subcategory" ${FOCUS_KEY_ATTR}="wm-filter-subcategory">` +
+        `<select class="ui-input" data-field="filter-subcategory" ${FOCUS_KEY_ATTR}="wm-filter-subcategory">` +
         subcategoryOption('', t('hudChrome.wocMarket.filterAny')) +
         (opts.category === 'weapon'
           ? BROWSE_WEAPON_TYPES.map((w) => subcategoryOption(w, weaponTypeLabel(w))).join('')
@@ -104,7 +104,7 @@ export function wocBrowseStripHtml(opts: {
     opts.showSort === false
       ? ''
       : `<label class="wm-sort">${esc(t('hudChrome.wocMarket.sortLabel'))}` +
-        `<select data-field="sort" ${FOCUS_KEY_ATTR}="wm-sort">` +
+        `<select class="ui-input" data-field="sort" ${FOCUS_KEY_ATTR}="wm-sort">` +
         sortOption('ending', t('hudChrome.wocMarket.sortEnding')) +
         sortOption('newest', t('hudChrome.wocMarket.sortNewest')) +
         sortOption('price_asc', t('hudChrome.wocMarket.sortPriceAsc')) +
@@ -114,7 +114,7 @@ export function wocBrowseStripHtml(opts: {
     `<div class="wm-pager">` +
     sortSelect +
     `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterCategory'))}` +
-    `<select data-field="filter-category" ${FOCUS_KEY_ATTR}="wm-filter-category">` +
+    `<select class="ui-input" data-field="filter-category" ${FOCUS_KEY_ATTR}="wm-filter-category">` +
     categoryOption('', t('hudChrome.wocMarket.filterAny')) +
     categoryOption('weapon', t('hudChrome.wocMarket.filterCategoryWeapon')) +
     categoryOption('armor', t('hudChrome.wocMarket.filterCategoryArmor')) +
@@ -122,7 +122,7 @@ export function wocBrowseStripHtml(opts: {
     `</select></label>` +
     subcategorySelect +
     `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterQuality'))}` +
-    `<select data-field="filter-quality" ${FOCUS_KEY_ATTR}="wm-filter-quality">` +
+    `<select class="ui-input" data-field="filter-quality" ${FOCUS_KEY_ATTR}="wm-filter-quality">` +
     qualityOption('', t('hudChrome.wocMarket.filterAny')) +
     opts.qualityOptions
       .map((q) =>
@@ -134,19 +134,19 @@ export function wocBrowseStripHtml(opts: {
       .join('') +
     `</select></label>` +
     `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterFormat'))}` +
-    `<select data-field="filter-format" ${FOCUS_KEY_ATTR}="wm-filter-format">` +
+    `<select class="ui-input" data-field="filter-format" ${FOCUS_KEY_ATTR}="wm-filter-format">` +
     formatOption('', t('hudChrome.wocMarket.filterAny')) +
     formatOption('auction', t('hudChrome.wocMarket.filterFormatAuction')) +
     formatOption('buy_now', t('hudChrome.wocMarket.filterFormatBuyNow')) +
     `</select></label>` +
     `<label class="wm-sort wm-filter-item">${esc(t('hudChrome.wocMarket.filterItemLabel'))}` +
-    `<input type="text" data-field="filter-item" ${FOCUS_KEY_ATTR}="wm-filter-item" ` +
+    `<input type="text" class="ui-input" data-field="filter-item" ${FOCUS_KEY_ATTR}="wm-filter-item" ` +
     `value="${esc(opts.itemQuery)}" placeholder="${esc(
       t('hudChrome.wocMarket.filterItemPlaceholder'),
     )}" /></label>` +
-    `<button type="button" data-action="page-prev" ${FOCUS_KEY_ATTR}="wm-page-prev" ${opts.page <= 0 ? 'disabled' : ''} aria-label="${esc(t('hudChrome.wocMarket.pagePrev'))}">${svgIcon('prev')}</button>` +
+    `<button type="button" class="ui-btn" data-action="page-prev" ${FOCUS_KEY_ATTR}="wm-page-prev" ${opts.page <= 0 ? 'disabled' : ''} aria-label="${esc(t('hudChrome.wocMarket.pagePrev'))}">${svgIcon('prev')}</button>` +
     `<span>${esc(t('hudChrome.wocMarket.pageNumber', { current: formatNumber(opts.page + 1) }))}</span>` +
-    `<button type="button" data-action="page-next" ${FOCUS_KEY_ATTR}="wm-page-next" ${opts.hasMore ? '' : 'disabled'} aria-label="${esc(t('hudChrome.wocMarket.pageNext'))}">${svgIcon('next')}</button>` +
+    `<button type="button" class="ui-btn" data-action="page-next" ${FOCUS_KEY_ATTR}="wm-page-next" ${opts.hasMore ? '' : 'disabled'} aria-label="${esc(t('hudChrome.wocMarket.pageNext'))}">${svgIcon('next')}</button>` +
     `</div>`
   );
 }
@@ -276,7 +276,7 @@ export function wocMarketBannersHtml(args: {
 }): string {
   const banners =
     (args.paused
-      ? `<div class="wm-banner wm-banner-paused">${esc(t('hudChrome.wocMarket.pausedBanner'))}</div>`
+      ? `<div class="wm-banner wm-banner-paused ui-card">${esc(t('hudChrome.wocMarket.pausedBanner'))}</div>`
       : '') + wocWalletCardHtml(args.wallet, args.tokensPerUsd ?? null);
   return banners === '' ? '' : `<div class="wm-strip">${banners}</div>`;
 }
@@ -303,12 +303,12 @@ function wocWalletCardHtml(
       `${FOCUS_KEY_ATTR}="wm-wallet-dismiss" aria-label="${esc(t('hudChrome.wocMarket.walletCardDismiss'))}">${svgIcon('close')}</button>`
     : '';
   return (
-    `<div class="wm-banner wm-banner-wallet" data-wallet-kind="${esc(wallet.kind)}">` +
+    `<div class="wm-banner wm-banner-wallet ui-card" data-wallet-kind="${esc(wallet.kind)}">` +
     `<strong>${esc(t('hudChrome.wocStore.wallet.title'))}</strong>` +
     dismiss +
     `<p>${esc(t(bodyKey))}</p>` +
     balance +
-    `<button type="button" data-action="connect-wallet" ${FOCUS_KEY_ATTR}="wm-connect-wallet">${esc(
+    `<button type="button" class="ui-btn" data-action="connect-wallet" ${FOCUS_KEY_ATTR}="wm-connect-wallet">${esc(
       t(sharedKeys.actionKey),
     )}</button></div>`
   );
@@ -363,14 +363,14 @@ export function wocMarketFootHtml(args: {
         )}</div>`
       : '';
   const notice = args.notice
-    ? `<div class="wm-notice ${args.notice.error ? 'wm-notice-error' : ''}" role="status">${
+    ? `<div class="wm-notice ui-card ${args.notice.error ? 'wm-notice-error' : ''}" role="status">${
         args.notice.error ? svgIcon('alert') : ''
       }<span>${esc(args.notice.text)}</span></div>`
     : '';
   const busy =
     args.busyText === null
       ? ''
-      : `<div class="wm-busy" role="status">${wocSpinnerHtml()}<span>${esc(args.busyText)}</span></div>`;
+      : `<div class="wm-busy ui-card" role="status">${wocSpinnerHtml()}<span>${esc(args.busyText)}</span></div>`;
   return `<div class="wm-foot">${rate}${notice}${busy}</div>`;
 }
 
@@ -409,10 +409,10 @@ export function wocBidDisclosuresHtml(args: {
   usd(cents: number): string;
 }): string {
   return (
-    `<button type="button" class="wm-terms-toggle" data-action="toggle-bid-terms" ` +
+    `<button type="button" class="wm-terms-toggle ui-btn" data-action="toggle-bid-terms" ` +
     `aria-expanded="${args.open ? 'true' : 'false'}" aria-controls="wm-bid-terms" ` +
     `${FOCUS_KEY_ATTR}="wm-bid-terms-toggle">${esc(t('hudChrome.wocMarket.bidTermsToggle'))}</button>` +
-    `<div class="wm-disclosures" id="wm-bid-terms"${args.open ? '' : ' hidden'}>` +
+    `<div class="wm-disclosures ui-well" id="wm-bid-terms"${args.open ? '' : ' hidden'}>` +
     `<p class="wm-note">${esc(
       t('hudChrome.wocMarket.bidBondNote', {
         bond: args.usd(args.bondCents),
@@ -456,11 +456,11 @@ export function wocBuyNowHtml(args: {
   usd(cents: number): string;
 }): string {
   return (
-    `<div class="wm-disclosures">` +
+    `<div class="wm-disclosures ui-well">` +
     `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowNote'))}</p>` +
     (args.locked ? `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowLockedTip'))}</p>` : '') +
     `</div>` +
-    `<button type="button" class="wm-primary" data-action="buy-now" data-listing="${args.listingId}" ` +
+    `<button type="button" class="wm-primary ui-btn ui-btn--gold" data-action="buy-now" data-listing="${args.listingId}" ` +
     `${args.disabled ? 'disabled' : ''} ` +
     `aria-label="${esc(
       t('hudChrome.wocMarket.buyNowAria', {
@@ -519,7 +519,7 @@ export function wocSellerPaneHtml(args: {
   // creation date was dropped as an unspecced account-age disclosure.
   return (
     `<div class="wm-seller-pane">` +
-    `<button type="button" data-action="seller-back" ${FOCUS_KEY_ATTR}="wm-seller-back">${esc(
+    `<button type="button" class="ui-btn" data-action="seller-back" ${FOCUS_KEY_ATTR}="wm-seller-back">${esc(
       t('hudChrome.wocMarket.sellerBack'),
     )}</button>` +
     `<h3>${esc(t('hudChrome.wocMarket.sellerTitle', { name: args.name }))}${guildTagHtml(
@@ -574,17 +574,17 @@ export function wocQuoteFaceHtml(args: {
           }),
         )}</p>`;
   return (
-    `<div class="wm-quote"><h3>${esc(t('hudChrome.wocMarket.quoteTitle'))}</h3>` +
+    `<div class="wm-quote ui-card"><h3>${esc(t('hudChrome.wocMarket.quoteTitle'))}</h3>` +
     `<p>${esc(args.title)}</p>${legs}${countdown}${dueLine}` +
     `<p class="wm-note">${esc(t('hudChrome.wocMarket.quoteFixedNote'))}</p>` +
     `<div class="wm-quote-actions">` +
-    `<button type="button" class="wm-primary" data-action="quote-sign" ${expired || args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-sign">${esc(
+    `<button type="button" class="wm-primary ui-btn ui-btn--gold" data-action="quote-sign" ${expired || args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-sign">${esc(
       t('hudChrome.wocMarket.quoteSign'),
     )}</button>` +
-    `<button type="button" data-action="quote-refresh" ${args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-refresh">${esc(
+    `<button type="button" class="ui-btn" data-action="quote-refresh" ${args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-refresh">${esc(
       t('hudChrome.wocMarket.quoteRefresh'),
     )}</button>` +
-    `<button type="button" data-action="quote-cancel" ${args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-cancel">${esc(
+    `<button type="button" class="ui-btn" data-action="quote-cancel" ${args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-cancel">${esc(
       t('hudChrome.wocMarket.quoteCancel'),
     )}</button></div></div>`
   );

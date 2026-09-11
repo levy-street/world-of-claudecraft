@@ -195,6 +195,7 @@ describe('ChatGeometryController interface unlock', () => {
     harness.controller.init();
     const moveBtn = harness.wrap.querySelector('.chat-move-btn');
     expect(moveBtn, 'the arrange-mode keyboard move button exists').toBeTruthy();
+    expect(moveBtn?.classList.contains('ui-disc')).toBe(true);
     expect(moveBtn?.getAttribute('aria-keyshortcuts')).toBe(
       'ArrowUp ArrowDown ArrowLeft ArrowRight',
     );

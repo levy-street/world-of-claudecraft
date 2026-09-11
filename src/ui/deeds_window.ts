@@ -374,9 +374,9 @@ export class DeedsWindow {
 
     const model = this.buildModel();
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hudChrome.deeds.title'))}</span>` +
-      `<input type="search" class="deed-search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.deeds.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.deeds.searchAria'))}">` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.deeds.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.deeds.title'))}</span>` +
+      `<input type="search" class="deed-search ui-input" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.deeds.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.deeds.searchAria'))}">` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.deeds.close'))}">${svgIcon('close')}</button></div>` +
       this.summaryHtml(model) +
       `<div class="deeds-body">${this.railHtml(model)}<div class="deeds-scroll">${this.contentHtml(model)}</div></div>` +
       this.filterBarHtml();
@@ -479,12 +479,11 @@ export class DeedsWindow {
       `<div class="deeds-summary">` +
       `<span class="deeds-renown">${esc(t('hudChrome.deeds.renownLabel'))} <b>${this.fmt(s.renown)}</b></span>` +
       `<span class="deeds-count">${esc(t('hudChrome.deeds.countLabel', { earned, total }))}</span>` +
-      `<span class="deeds-pct" role="img" aria-label="${esc(t('hudChrome.deeds.completionAria', { earned, total }))}">` +
-      `<span class="deed-bar deeds-completion"><span class="deed-bar-fill" style="width:${pct}%"></span></span> ${esc(pctText)}</span>` +
+      `<span class="deed-bar deeds-completion ui-bar" role="img" aria-label="${esc(t('hudChrome.deeds.completionAria', { earned, total }))}"><span class="deed-bar-fill ui-bar-fill" style="width:${pct}%"></span></span>` +
+      `<span class="deeds-pct">${esc(pctText)}</span>` +
       // The scope disclosure the ranked-surface rule asks of a re-scoped count
       // (docs/design/deeds.md): Renown and the earned pair are account-wide.
-      `<span class="deeds-scope-note" data-scope-note tabindex="0">${esc(t('hudChrome.deeds.accountScopeNote'))}</span>` +
-      `</div>`;
+      `<span class="deeds-scope-note" data-scope-note tabindex="0">${esc(t('hudChrome.deeds.accountScopeNote'))}</span>`;
     if (s.recent.length > 0) {
       const crests = s.recent
         .map(
@@ -493,7 +492,7 @@ export class DeedsWindow {
             // carries the accessible name (the strip has no adjacent visible
             // text); the crest img inside stays alt="" so the deed is not
             // announced twice.
-            `<button type="button" class="deeds-recent-item" data-recent="${esc(r.id)}" aria-label="${esc(t('hudChrome.deeds.recentJumpAria', { name: deedName(r.id) }))}" title="${esc(deedName(r.id))}">` +
+            `<button type="button" class="deeds-recent-item ui-chip" data-recent="${esc(r.id)}" aria-label="${esc(t('hudChrome.deeds.recentJumpAria', { name: deedName(r.id) }))}" title="${esc(deedName(r.id))}">` +
             `<img class="deed-crest deed-crest-mini" src="${iconDataUrl('crest', r.crestId, DEED_CREST_SIZE)}" alt=""></button>`,
         )
         .join('');
@@ -511,9 +510,9 @@ export class DeedsWindow {
             )}</span></span>`,
         )
         .join('');
-      html += `<div class="deeds-nearest"><span class="deeds-strip-label">${esc(t('hudChrome.deeds.nearestLabel'))}</span>${rows}</div>`;
+      html += `<div class="deeds-nearest ui-card"><span class="deeds-strip-label">${esc(t('hudChrome.deeds.nearestLabel'))}</span>${rows}</div>`;
     }
-    return html;
+    return `${html}</div>`;
   }
 
   private railHtml(model: DeedsViewModel): string {
@@ -522,7 +521,7 @@ export class DeedsWindow {
         const label = t(CATEGORY_LABEL_KEYS[c.category]);
         const on = this.category === c.category;
         return (
-          `<button type="button" class="deeds-cat${on ? ' active' : ''}" data-cat="${c.category}" aria-pressed="${on}" aria-label="${esc(
+          `<button type="button" class="deeds-cat ui-seg-tab${on ? ' active is-on' : ''}" data-cat="${c.category}" aria-pressed="${on}" aria-label="${esc(
             t('hudChrome.deeds.categoryCountAria', {
               category: label,
               earned: this.fmt(c.earned),
@@ -537,9 +536,10 @@ export class DeedsWindow {
     // The shelf holds both worn cosmetics, so the rail names both: a player
     // hunting for the border picker must be able to see where it lives.
     const titlesRow =
-      `<button type="button" class="deeds-cat deeds-cat-titles${titlesOn ? ' active' : ''}" data-cat="titles" aria-pressed="${titlesOn}">` +
+      `<span class="deeds-cat-divider ui-divider" aria-hidden="true"></span>` +
+      `<button type="button" class="deeds-cat deeds-cat-titles ui-seg-tab${titlesOn ? ' active is-on' : ''}" data-cat="titles" aria-pressed="${titlesOn}">` +
       `<span class="deeds-cat-name">${esc(t('hudChrome.deeds.cosmeticsSection'))}</span></button>`;
-    return `<nav class="deeds-rail" aria-label="${esc(t('hudChrome.deeds.categoriesAria'))}">${rows}${titlesRow}</nav>`;
+    return `<nav class="deeds-rail ui-seg" aria-label="${esc(t('hudChrome.deeds.categoriesAria'))}">${rows}${titlesRow}</nav>`;
   }
 
   private contentHtml(model: DeedsViewModel): string {
@@ -567,27 +567,27 @@ export class DeedsWindow {
     const chips: string[] = [];
     if (entry.feat)
       chips.push(
-        `<span class="deed-chip deed-feat">${esc(t('hudChrome.deeds.featRibbon'))}</span>`,
+        `<span class="deed-chip deed-feat ui-chip">${esc(t('hudChrome.deeds.featRibbon'))}</span>`,
       );
     if (entry.hiddenBadge)
       chips.push(
-        `<span class="deed-chip deed-hidden">${esc(t('hudChrome.deeds.hiddenBadge'))}</span>`,
+        `<span class="deed-chip deed-hidden ui-chip">${esc(t('hudChrome.deeds.hiddenBadge'))}</span>`,
       );
     if (entry.titleReward)
       chips.push(
-        `<span class="deed-chip deed-title-chip">${esc(t('hudChrome.deeds.titleChip'))}</span>`,
+        `<span class="deed-chip deed-title-chip ui-chip">${esc(t('hudChrome.deeds.titleChip'))}</span>`,
       );
     // Deliberate family reuse: the border chip wears the shipped
     // deed-title-chip class rather than a bespoke one, so the two worn-cosmetic
     // rewards read as one family on a card and neither can drift in styling.
     if (entry.borderReward)
       chips.push(
-        `<span class="deed-chip deed-title-chip">${esc(t('hudChrome.deeds.borderChip'))}</span>`,
+        `<span class="deed-chip deed-title-chip ui-chip">${esc(t('hudChrome.deeds.borderChip'))}</span>`,
       );
     // Feats carry no Renown chip (they are zero Renown by rule).
     if (!entry.feat)
       chips.push(
-        `<span class="deed-chip deed-renown">${esc(t('hudChrome.deeds.renownChip', { renown: this.fmt(entry.renown) }))}</span>`,
+        `<span class="deed-chip deed-renown ui-chip">${esc(t('hudChrome.deeds.renownChip', { renown: this.fmt(entry.renown) }))}</span>`,
       );
     let body =
       `<div class="deed-head"><span class="deed-name">${esc(name)}</span>${chips.join('')}</div>` +
@@ -604,7 +604,7 @@ export class DeedsWindow {
             current: this.fmt(entry.progress.current),
             target: this.fmt(entry.progress.target),
           }),
-        )}"><span class="deed-bar"><span class="deed-bar-fill" style="width:${pct}%"></span></span>` +
+        )}"><span class="deed-bar ui-bar"><span class="deed-bar-fill ui-bar-fill" style="width:${pct}%"></span></span>` +
         `<span class="deed-progress-text">${esc(progressText)}</span></div>`;
     }
     // Rarity line: only once a value exists for THIS deed (absent data means
@@ -669,11 +669,11 @@ export class DeedsWindow {
       const fullNote = atCap
         ? ` disabled title="${esc(t('hudChrome.deeds.watchFull', { cap: this.fmt(DEED_WATCH_CAP) }))}"`
         : '';
-      foot += `<button type="button" class="deed-watch${entry.watched ? ' watching' : ''}" data-watch="${esc(entry.id)}" aria-pressed="${entry.watched}" aria-label="${esc(aria)}"${fullNote}>${esc(label)}</button>`;
+      foot += `<button type="button" class="deed-watch ui-btn${entry.watched ? ' watching' : ''}" data-watch="${esc(entry.id)}" aria-pressed="${entry.watched}" aria-label="${esc(aria)}"${fullNote}>${esc(label)}</button>`;
     }
     if (foot !== '') foot = `<div class="deed-foot">${foot}</div>`;
     return (
-      `<div class="deed-card${entry.earned ? ' earned' : ' unearned'}" data-deed="${esc(entry.id)}">` +
+      `<div class="deed-card ui-card${entry.earned ? ' earned' : ' unearned'}" data-deed="${esc(entry.id)}">` +
       `<img class="deed-crest${entry.earned ? '' : ' desat'}" src="${iconDataUrl('crest', entry.crestId, DEED_CREST_SIZE)}" alt="">` +
       `<div class="deed-main">${body}${foot}</div></div>`
     );
@@ -805,7 +805,7 @@ export class DeedsWindow {
   private filterBarHtml(): string {
     const chips = DEED_FILTERS.map((filter) => {
       const on = this.filter === filter;
-      return `<button type="button" class="deed-filter-chip${on ? ' active' : ''}" data-filter="${filter}" aria-pressed="${on}">${esc(t(FILTER_LABEL_KEYS[filter]))}</button>`;
+      return `<button type="button" class="deed-filter-chip ui-chip${on ? ' active' : ''}" data-filter="${filter}" aria-pressed="${on}">${esc(t(FILTER_LABEL_KEYS[filter]))}</button>`;
     }).join('');
     return `<div class="deeds-filterbar" role="group" aria-label="${esc(t('hudChrome.deeds.filterGroupAria'))}">${chips}</div>`;
   }

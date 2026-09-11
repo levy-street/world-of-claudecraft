@@ -460,6 +460,26 @@ describe('market_window: behavior preserved through the core', () => {
     expect(rule).toContain(`max-height: ${preferred}px`);
   });
 
+  // `.mkt-controls` scrolls (overflow-y: auto), so it is a clipping ancestor in its
+  // own right and starts well below the window's top edge. Clamping to the window
+  // alone let a flipped-up menu render above the column, where its first option was
+  // invisible and hit-testing reached the window title. The geometry itself is
+  // pinned in tests/dropdown_position.test.ts.
+  it('clamps a filter menu to the scrolling controls column, not just the window', () => {
+    expect(componentsCss.match(/\.mkt-controls\s*\{[^}]*\}/)?.[0]).toContain('overflow-y: auto');
+    expect(painterCode).toContain('import { computeDropdownPlacement, dropdownClipBounds }');
+    expect(painterCode).toContain("trigger.closest<HTMLElement>('.mkt-controls')");
+    // Mobile gives that scroller up (overflow-y: visible, the whole sheet scrolls),
+    // so the column must not constrain the menu there.
+    expect(mobileCss.match(/body\.mobile-touch \.mkt-controls\s*\{[^}]*\}/)?.[0]).toContain(
+      'overflow-y: visible',
+    );
+    expect(painterCode).toContain("getComputedStyle(controls).overflowY !== 'visible'");
+    expect(painterCode).toContain('dropdownClipBounds(');
+    expect(painterCode).toContain('containerTop: clip.top,');
+    expect(painterCode).toContain('containerBottom: clip.bottom,');
+  });
+
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {
     // Buy now lands behind the confirm prompt (the id it sends is the one the
     // prompt captured and rechecked); the behavior itself is driven end to end in
@@ -560,7 +580,12 @@ describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
     const at = painterCode.indexOf("from './market_armor_badge'");
     expect(at, 'the badge helpers must come from the shared module').toBeGreaterThan(-1);
     const importStmt = painterCode.slice(painterCode.lastIndexOf('import', at), at);
-    for (const named of ['marketArmorBadge', 'marketArmorPips', 'marketHeroicStar']) {
+    for (const named of [
+      'isHeroicItem',
+      'marketArmorBadge',
+      'marketArmorPips',
+      'marketHeroicStar',
+    ]) {
       expect(importStmt, `${named} comes from market_armor_badge`).toContain(named);
     }
     expect(painter).toContain('const armorBadge = marketArmorBadge(item);');

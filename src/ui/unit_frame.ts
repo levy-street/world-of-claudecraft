@@ -145,13 +145,13 @@ export interface UnitFrameView {
   borderSlug: string;
   portraitKey: string;
   /** The absorb-shield overlay fraction (hp + absorb) / maxHp, clamped by
-   *  absorbBarView; equals hpFrac when there is no shield. Kept for the player /
-   *  target painter's left-filled overlay. */
+   *  absorbBarView; equals hpFrac when there is no shield. Kept for call sites
+   *  and tests that read the shield's right edge. */
   absorbFrac: number;
-  /** The left edge of the visible shield segment (party frames' positioned
-   *  segment; the player/target painter ignores it). */
+  /** The left edge of the visible shield segment: where the painter seats the
+   *  hatched overlay, so the hatch never lies over plain health. */
   absorbStartFrac: number;
-  /** The width of the visible shield segment. */
+  /** The width of the visible shield segment; 0 when there is no shield. */
   absorbSizeFrac: number;
   /** The shield reaches/passes the bar's right edge (fully shielded). */
   absorbOvershield: boolean;
@@ -212,6 +212,18 @@ export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
   if (kind === 'focus') return 'focus';
   // 'mana' or null: the player's default branch, byte-identical to the old ternary.
   return 'mana';
+}
+
+/**
+ * The absorb overlay's transform: the hatched shield segment ONLY, seated at its
+ * own left edge. A bar with no shield collapses to zero width, so a healthy unit
+ * shows the plain health gradient instead of a hatch laid over the whole bar.
+ * `scale` is the caller's already-formatted scaleX for the segment's width, so a
+ * party row keeps its quantized precision.
+ */
+export function absorbSegmentTransform(startFrac: number, sizeFrac: number, scale: string): string {
+  if (sizeFrac <= 0) return scale;
+  return `translateX(${startFrac * 100}%) ${scale}`;
 }
 
 /**

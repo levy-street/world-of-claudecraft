@@ -25,7 +25,7 @@ const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.me
 
 describe('social_window: .soc-body layout never uses CSS multicol', () => {
   // Regression for a review finding on the wide-landscape relayout: `.soc-body` is a
-  // flex item inside `#social-window`, which has a DEFINED height (`height: 480px`). A
+  // flex item inside `#social-window`, which has a DEFINED height (`height: 640px`). A
   // multicol container (`columns:`/`column-count:`) with a bounded, non-auto block size
   // does not grow vertically: it spills rows past the box into extra INLINE columns
   // instead, and `overflow-x: hidden` (also set here) clips them with no scroll path to
@@ -91,8 +91,8 @@ describe('social_window: WAI-ARIA tabs', () => {
     expect(painter).toContain('tabStripModel(');
     expect(painter).toContain('wireTabStrip(');
     expect(painter).toContain("panelId: 'soc-body-panel'");
-    expect(painter).toContain("stripClass: 'soc-tabs'");
-    expect(painter).toContain("tabClass: 'soc-tab'");
+    expect(painter).toContain("stripClass: 'soc-tabs ui-tabs'");
+    expect(painter).toContain("tabClass: 'soc-tab ui-tab'");
     expect(painter).toContain("selectedClass: 'on'");
     for (const id of ['friends', 'guild', 'ignore', 'block', 'raid']) {
       expect(painter).toContain(`{ id: '${id}',`);
@@ -445,7 +445,7 @@ describe('social_window: guild roster expansion (source pins)', () => {
     // One .soc-add.soc-leave row holds both: the leader-only expand button first
     // (pushed to the start edge by .soc-foot-start), the disband or leave button last.
     expect(painter).toContain('foot += `<div class="soc-add soc-leave">${expand}${leave}</div>`;');
-    expect(painter).toContain('class="btn soc-foot-start" data-act="guild-expand"');
+    expect(painter).toContain('class="btn ui-btn soc-foot-start" data-act="guild-expand"');
     expect(painter).not.toContain('<div class="soc-add soc-leave"><button');
     expect(componentsCss).toContain(
       '.soc-add.soc-leave .soc-foot-start {\n    margin-right: auto;\n  }',

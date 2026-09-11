@@ -46,6 +46,7 @@ describe('HUD_FRAME_SPECS', () => {
       'paladinDevotion',
       'doomMeter',
       'procOverlay',
+      'talkingHead',
       'damageMeter',
       'deedTracker',
       'delveTracker',
@@ -82,6 +83,7 @@ describe('HUD_FRAME_SPECS', () => {
       'paladin-devotion-frame',
       'warlock-doom-frame',
       'proc-overlay',
+      'talking-head',
       'meters-window',
       'deed-tracker',
       'delve-tracker',
@@ -98,6 +100,21 @@ describe('HUD_FRAME_SPECS', () => {
     // A duplicated storage key would make two frames overwrite each other's
     // saved box, which is silent and only shows up after a reload.
     expect(new Set(HUD_FRAME_STORAGE_KEYS).size).toBe(HUD_FRAME_SPECS.length);
+    // Plateless rows use the 596px rail width, while three rows keep the 150px stack height.
+    expect(
+      Object.fromEntries(
+        HUD_FRAME_SPECS.filter((spec) =>
+          ['actionBar1', 'actionBar2', 'actionBar3', 'actionBarGroup', 'xpBar'].includes(spec.id),
+        ).map((spec) => [spec.id, spec.fallbackSize]),
+      ),
+    ).toEqual({
+      actionBar1: { w: 596, h: 46 },
+      actionBar2: { w: 596, h: 46 },
+      actionBar3: { w: 596, h: 46 },
+      actionBarGroup: { w: 596, h: 150 },
+      // 14px: the XP rail was thickened so its in-rail percent readout fits.
+      xpBar: { w: 596, h: 14 },
+    });
     // The FULL key list, pinned as literals in spec order: these are persisted
     // player data (localStorage), so renaming any one of them orphans every
     // player's saved layout for that frame with no other test failing. A new
@@ -127,6 +144,7 @@ describe('HUD_FRAME_SPECS', () => {
       // positions are player data; renaming the key orphans saved layouts).
       'woc_warlock_doom_frame_pos',
       'woc_hud_frame_proc_overlay',
+      'woc_hud_frame_talking_head',
       'woc_hud_frame_meters',
       'woc_hud_frame_deed_tracker',
       'woc_hud_frame_delve_tracker',

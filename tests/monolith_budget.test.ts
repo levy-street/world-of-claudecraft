@@ -450,15 +450,16 @@ const MONOLITHS: MonolithRow[] = [
     // The aura-tracks release sync (186dd8fe7f) composes its system-text
     // extraction with the OSSBrain long-press and tooltip modules. The
     // measured combined count is below both parent pins (18574 / 18489).
-    // Compose the mount cosmetics and practice lesson extractions.
-    // Measured combined size; retain zero headroom after the release merge.
-    // LOWERED for the coin-icon money readout extraction (moneyHtml moved out
-    // to src/ui/money_html.ts so the social tab's roster confirm shares it);
-    // the coordinator keeps three one-line deps wirings. Exact count, zero slack.
-    // LOWERED 18461 -> 18455 at the account-wide Book of Deeds / Reliquary change:
-    // the character-sheet refresh signature parts moved into
-    // charSheetRefreshSigFor (src/ui/char_sheet_sig_core.ts).
-    ceiling: 18455,
+    // Re-measured at the release/v0.43.0 sync: the review-fix batches
+    // and the release's own extractions both landed; wc -l on the merged tree.
+    // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
+    // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
+    // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
+    // Re-measured at the second release/v0.43.0 sync of the account-wide Book
+    // of Deeds / Reliquary change: the release's interface-redesign merge and
+    // this branch's charSheetRefreshSigFor extraction compose to 18343 by
+    // wc -l, below both parent pins (18455 / 18350). Exact count, zero slack.
+    ceiling: 18343,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -470,7 +471,11 @@ const MONOLITHS: MonolithRow[] = [
     // release-side import/export panel composed with the batch settings rows.
     // Measured with wc -l on the merged tree. Exact count, zero headroom.
     file: 'src/ui/options_window.ts',
-    ceiling: 2843,
+    // LOWERED 2955 -> 2840 on the redesign review: the Interface panel's three
+    // bespoke rows (the chat timestamp pair, the chat-window reset, the Unlock
+    // Interface action) moved to src/ui/options_interface_rows.ts. Exact count,
+    // zero slack.
+    ceiling: 2840,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1223,7 +1228,10 @@ const MONOLITHS: MonolithRow[] = [
     // Compose the mount cosmetics and practice lesson extractions.
     // Measured combined size; retain zero headroom after the release merge.
     // Weapon-coat amounts now share src/ui/ability_imbue_text.ts with live tooltips.
-    ceiling: 11327,
+    // Re-measured at the release/v0.43.0 sync that brought PR 3778 in: the
+    // release count 11327 minus the redesign's own 6 extracted lines = 11321
+    // (exact wc -l on the merged tree, zero headroom).
+    ceiling: 11321,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -2108,7 +2116,10 @@ const MONOLITHS: MonolithRow[] = [
     // another method cluster here.
     file: 'src/ui/hud/professions/professions_window.ts',
     // Harvest entry chrome and bindings now live in a sibling controller.
-    ceiling: 836,
+    // LOWERED 847 -> 824 on the redesign review: the craft row's role and
+    // ceiling chip labels and its next-unlock line moved to
+    // src/ui/hud/professions/craft_row_labels.ts. Exact count, zero slack.
+    ceiling: 824,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
   },
   {
@@ -2121,7 +2132,10 @@ const MONOLITHS: MonolithRow[] = [
     // apex-channel-to-translation-key table moved to apex_recipe_view.ts.
     // Exact count, zero slack.
     file: 'src/ui/hud/professions/crafting_window.ts',
-    ceiling: 766,
+    // LOWERED 771 -> 747 on the redesign review: the difficulty label table and
+    // the cast-duration chip text moved to
+    // src/ui/hud/professions/craft_row_chip_text.ts. Exact count, zero slack.
+    ceiling: 747,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
   },
 ];

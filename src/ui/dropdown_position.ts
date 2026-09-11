@@ -29,3 +29,30 @@ export function computeDropdownPlacement(input: DropdownPlacementInput): Dropdow
   const maxHeight = Math.max(input.minHeight, Math.min(input.preferredMaxHeight, space));
   return { side, maxHeight };
 }
+
+/** One vertical clip band, in viewport coordinates. */
+export interface DropdownClipBand {
+  top: number;
+  bottom: number;
+}
+
+/**
+ * The band a dropdown may actually occupy: the INTERSECTION of every clipping
+ * ancestor between the trigger and the window root.
+ *
+ * The World Market's filter selects sit inside `.mkt-controls`, which scrolls
+ * (`overflow-y: auto`) and therefore clips in its own right. Measuring only the
+ * outer window let a flipped-up menu render above the controls column's top edge,
+ * where the first option was invisible and unclickable even though the window had
+ * room. Bands are taken in order and clamped, so an empty or inverted result still
+ * returns a band (bottom pinned to top) rather than NaN.
+ */
+export function dropdownClipBounds(bands: readonly DropdownClipBand[]): DropdownClipBand {
+  let top = Number.NEGATIVE_INFINITY;
+  let bottom = Number.POSITIVE_INFINITY;
+  for (const band of bands) {
+    top = Math.max(top, band.top);
+    bottom = Math.min(bottom, band.bottom);
+  }
+  return { top, bottom: Math.max(top, bottom) };
+}

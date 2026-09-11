@@ -149,8 +149,8 @@ export class BgProposalPopup {
     const actions =
       view.myResponse === 'pending'
         ? `<div class="bgp-actions">` +
-          `<button type="button" class="btn bgp-accept" data-bgp="accept">${svgIcon('check')}${esc(t('hudChrome.bgOffer.accept'))}</button>` +
-          `<button type="button" class="btn bgp-decline" data-bgp="decline">${svgIcon('close')}${esc(t('hudChrome.bgOffer.decline'))}</button></div>`
+          `<button type="button" class="btn bgp-accept ui-btn ui-btn--red" data-bgp="accept">${svgIcon('check')}${esc(t('hudChrome.bgOffer.accept'))}</button>` +
+          `<button type="button" class="btn bgp-decline ui-btn" data-bgp="decline">${svgIcon('close')}${esc(t('hudChrome.bgOffer.decline'))}</button></div>`
         : `<div class="bgp-waiting">${esc(t('hudChrome.bgOffer.acceptedWait'))}</div>`;
     // A backfill is a materially different offer: a live match, a scoreline the
     // joiner had no part in, and no rating either way. The chat line says so

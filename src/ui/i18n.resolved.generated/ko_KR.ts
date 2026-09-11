@@ -902,6 +902,7 @@ export const ko_KR: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "퀘스트 추적기 접기",
       "expandHint": "퀘스트 추적기 펼치기"
     },
@@ -1266,6 +1267,9 @@ export const ko_KR: EnTranslations = {
       "previous": "이전 측정",
       "runLabel": "{index}번째 연습",
       "runSummary": "{time} 동안 {total}"
+    },
+    "talkingHead": {
+      "label": "대화"
     },
     "hubLesson": {
       "target": "먼저 허수아비를 대상으로 삼으세요.",
@@ -1729,6 +1733,9 @@ export const ko_KR: EnTranslations = {
     },
     "controller": {
       "title": "컨트롤러",
+      "device": "연결된 장치",
+      "deviceConnected": "연결됨",
+      "deviceDisconnected": "컨트롤러가 감지되지 않음",
       "glyphStyle": "버튼 표시",
       "glyphStyleAuto": "자동",
       "glyphStyleXbox": "Xbox",
@@ -2115,6 +2122,22 @@ export const ko_KR: EnTranslations = {
       "showPlaytimeAria": "플레이 시간 표시",
       "hidePlaytimeAria": "플레이 시간 숨기기"
     },
+    "charSidebar": {
+      "label": "캐릭터 세부 정보",
+      "subtitle": "레벨 {level} {className} . {archetype} . 취미: {hobby}",
+      "subtitleNoHobby": "레벨 {level} {className} . {archetype}",
+      "stats": "능력치",
+      "progression": "진행도",
+      "skills": "기술",
+      "gathering": "채집",
+      "crafting": "제작",
+      "openProfessions": "전문 기술 열기"
+    },
+    "questLog": {
+      "completed": "완료됨",
+      "zoneSummary": "{count}개（완료 {ready}개）",
+      "shiftHint": "Shift를 누른 채 퀘스트를 클릭하면 채팅에 링크됩니다."
+    },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
@@ -2357,6 +2380,7 @@ export const ko_KR: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "버그 신고",
+      "online": "온라인",
       "realm": "월드",
       "character": "캐릭터",
       "position": "좌표",
@@ -3234,6 +3258,7 @@ export const ko_KR: EnTranslations = {
       "lock": "플레이어 프레임 고정"
     },
     "partyFrames": {
+      "header": "파티",
       "section": "파티 및 공격대 프레임",
       "optionsSection": "파티 프레임 옵션",
       "unlock": "파티 및 공격대 프레임 이동",
@@ -4018,7 +4043,6 @@ export const ko_KR: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "채집",
       "mining": "채광",
       "logging": "벌목",
       "herbalism": "약초학",
@@ -4202,9 +4226,7 @@ export const ko_KR: EnTranslations = {
       "noviceBody": "작물을 수확할 때마다 농사 숙련도가 올라갑니다. 아무 작물밭에나 씨앗을 심어 시작하세요."
     },
     "archetypeTitle": {
-      "label": "칭호",
-      "none": "없음",
-      "hobbyLabel": "취미"
+      "none": "없음"
     },
     "archetypePair": {
       "engineering+alchemy": "폭격수",
@@ -4374,7 +4396,9 @@ export const ko_KR: EnTranslations = {
       "hobbyLabel": "취미: {craft}",
       "majorsLabel": "주 전공: {a}, {b}",
       "pairsHeld": "보유한 조합: {count}",
-      "returnsLabel": "복귀: {count}"
+      "returnsLabel": "복귀: {count}",
+      "retentionFooter": "전문 기술 재설정 시 숙련도의 60%가 유지됩니다.",
+      "tutorialLink": "전문 기술 튜토리얼"
     },
     "crafting": {
       "title": "제작",
@@ -4409,6 +4433,7 @@ export const ko_KR: EnTranslations = {
       "vaultUnreachable": "여기에서는 재료 보관소를 사용할 수 없습니다.",
       "craftFeeLine": "제작 수수료: 개당 {fee}",
       "empty": "알려진 제작법이 없습니다.",
+      "materialsFooter": "보관함의 재료는 자동으로 사용됩니다. 작업대에서 더 많은 제작법을 배우세요.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",
       "craftedToastQty": "제작 완료:{name} x{qty}",
@@ -4510,6 +4535,9 @@ export const ko_KR: EnTranslations = {
       "commissionToggleHint": "거래로 처음 받는 캐릭터에게 귀속됩니다.",
       "commissionUnbound": "주문 제작품: 첫 수령인에게 귀속됩니다",
       "commissionBound": "주문 제작품: 수령인에게 귀속되어 있습니다"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "상인은 일반 상품을 보충하며, 플레이어 매물은 판매자가 정한 가격으로 함께 표시됩니다."
     },
     "itemMenu": {
       "use": "사용",
@@ -5134,6 +5162,33 @@ export const ko_KR: EnTranslations = {
       "toInstance": "인스턴스 지도",
       "toggleAria": "세계 지도, 지역 지도, 인스턴스 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
+    },
+    "mapAtlas": {
+      "level": "레벨 {level}",
+      "landmarkCount": "랜드마크 {count}개",
+      "filtersAria": "지도 레이어",
+      "filters": {
+        "quests": "퀘스트",
+        "gather": "채집",
+        "dungeons": "던전",
+        "services": "시설",
+        "players": "플레이어"
+      },
+      "trackedQuests": "추적 중인 퀘스트",
+      "noTrackedQuests": "추적 중인 퀘스트 없음",
+      "availableNearby": "근처에서 받을 수 있음",
+      "noNearbyQuests": "근처에 받을 수 있는 퀘스트 없음",
+      "distance": "{distance}야드",
+      "showRoute": "경로 표시",
+      "untrack": "추적 해제",
+      "track": "추적",
+      "legend": {
+        "dungeon": "던전",
+        "ore": "광석",
+        "herb": "약초",
+        "mail": "우편",
+        "passage": "통로"
+      }
     },
     "arenaGate": {
       "minLevelNote": "레벨 {level} 필요"
@@ -6080,6 +6135,7 @@ export const ko_KR: EnTranslations = {
       "framesMoveBodyEditFrames": "내 프레임과 대상 프레임, 파티 프레임은 모두 옮길 수 있습니다. 각 프레임 모서리에는 작은 이동 버튼이 하나씩 있습니다. 잠금을 풀고 원하는 자리로 끌어다 놓은 다음 다시 잠그면, 잘못 누른 클릭에 프레임이 밀려나지 않습니다. 인터페이스 옵션의 프레임 탭 맨 위에 있는 프레임 편집은 그 세 프레임과 함께 나머지 인터페이스도 한 번에 풀어 줍니다. 행동 단축바와 시전 바, 공격 속도 바, 경험치 바, 미니맵, 버튼 열, 소환수 프레임, 태세 바, 강화 효과와 약화 효과 줄, 그리고 찜 목록 알림 칩까지, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다. 자리가 마음에 들지 않게 되었다면 같은 프레임 탭 맨 아래의 기본값 복원으로 전부 처음 자리로 되돌릴 수 있습니다.",
       "framesGovernedExtra": "\"프레임 편집\"은 그 아래 쌓이는 추적기 무리(추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 지금 들어와 있는 탐굴, 참여 중인 균열, 그리고 추적 중인 제작법이나 의뢰)와 소환수 프레임 옆 소환수 행동 단축바, 주변 적에게 건 약화 효과를 모아 보여주는 \"대상 디버프\" 프레임, 성기사의 \"헌신\" 메달, 흑마법사의 \"고통 자원 막대\", 주문 발동 오버레이, 이도류일 때의 보조 무기 공격 속도 바, 그리고 탭으로 나뉜 피해 측정기 창까지 함께 풀어 주며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
       "framesGovernedAuraTracks": "\"프레임 편집\"은 같은 인터페이스 옵션의 전투 탭에서 켠 선택형 오라 트랙 여섯 개, 곧 \"내 버프\" 트랙, \"방어 재사용 대기시간\" 트랙, \"내 보호막\" 트랙, \"공격 재사용 대기시간\" 트랙, \"이동 및 은신\" 트랙, \"아군에게 건 내 버프\" 트랙도 함께 풀어 줍니다. 모든 트랙은 기본적으로 꺼져 있으며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
+      "framesGovernedTalkingHead": "프레임 편집은 대화 패널도 해제합니다. 대화 패널은 말하는 NPC가 시야 밖에 있을 때 그 NPC의 대사를 담으며, 해제된 동안에는 자신의 이름 칩을 표시합니다.",
       "barsTitle": "바와 시간 표시, 전투 문자",
       "barsBody": "주문을 시전하거나 정신을 집중할 때마다 화면 한가운데, 행동 단축바 바로 위에 시전 바가 나타나 주문 이름과 남은 시간을 알려 줍니다. 대상도 자기 프레임에 시전 바를 가지므로, 무엇이 날아오는지 보고 답할 수 있습니다.\n\n시전 바 아래에는 가느다란 공격 속도 바가 있어 무기를 휘두르는 사이를 채웁니다. 근접이나 원거리 공격자는 다음 자동 공격이 언제 들어가는지 볼 수 있습니다.\n\n경험치 바는 행동 단축바 아래를 가로질러 화면 전체 폭으로 이어지며 눈금으로 나뉘어 있고, 밝게 표시된 구간이 쌓아 둔 휴식 경험치를 보여 줍니다.\n\n물속으로 헤엄쳐 들어가면 화면 위쪽에 파란 호흡 바가 나타납니다. 머리가 잠겨 있는 동안 줄어들고, 다 떨어져 익사가 시작되면 붉게 깜빡이며, 물 위로 올라오는 순간 빠르게 다시 찹니다. 스페이스로 위로 헤엄치고, 기본값이 Ctrl인 아래로 헤엄치기 키로 더 깊이 내려갑니다.\n\n피해와 치유는 맞은 대상 위로 작은 숫자가 되어 떠오르므로, 글을 읽지 않고도 전투를 읽어 낼 수 있습니다. 채팅창의 전투 탭에는 온전한 기록이 글로 남습니다.",
       "aurasTitle": "강화 효과와 약화 효과",

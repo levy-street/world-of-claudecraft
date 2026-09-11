@@ -3955,7 +3955,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'Du musst in der Stadt sein, um deinen Fokus festzulegen.',
   'hudChrome.townFocus.saveButton': 'Fokus speichern',
   'hudChrome.townFocus.title': 'Stadtfokus',
-  'hudChrome.archetypeTitle.label': 'Titel',
   'hudChrome.archetypeTitle.none': 'Keiner',
   'entities.itemSets.crownforged.bonus4':
     'Eure kritischen Waffentreffer zersplittern das Ziel mit Knochensplitter und lassen es 12 Sek. lang alle 2 Sek. 8 Schaden bluten. Stapelt sich bis zu 3-mal.',
@@ -10334,7 +10333,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Kräuterkunde',
   'hudChrome.gathering.logging': 'Holzfällen',
   'hudChrome.gathering.mining': 'Bergbau',
-  'hudChrome.gathering.title': 'Sammeln',
   'errors.api.accountSessionLimit': 'Zu viele Charaktere dieses Kontos sind bereits in der Welt.',
   'errors.api.crossSiteOrigin': 'Anfrage aus Sicherheitsgründen blockiert.',
   'errors.api.unsupportedMediaType': 'Nicht unterstütztes Anfrageformat.',
@@ -10653,7 +10651,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hub_training_dummy.name': 'Trainingspuppe',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': 'Wasserelementar',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Freizeit',
   'hudChrome.auraEffect.armorPct': 'Verringert Rüstung um {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Verringert Rüstung um {pct}% ({stacks} Stapel)',
   'hudChrome.auraEffect.increasePct.allStats': 'Erhöht alle Attribute um {pct}%',

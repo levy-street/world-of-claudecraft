@@ -463,7 +463,14 @@ describe('woc_market_window: every class it emits is actually styled', () => {
   // Comments are STRIPPED before harvesting selectors: these sheets name plenty
   // of classes in prose, and crediting a class as styled because a comment
   // mentions it would let a rename be "verified" by documentation.
-  const sheets = ['components.css', 'hud.css', 'base.css', 'layout.css', 'hud.mobile.css']
+  const sheets = [
+    'library.css',
+    'components.css',
+    'hud.css',
+    'base.css',
+    'layout.css',
+    'hud.mobile.css',
+  ]
     .map((f) => readFileSync(new URL(`../src/styles/${f}`, import.meta.url), 'utf8'))
     .join('\n')
     .replace(/\/\*[\s\S]*?\*\//g, ' ');
@@ -501,7 +508,7 @@ describe('woc_market_window: every class it emits is actually styled', () => {
       }
     }
     for (const key of ['stripClass', 'tabClass', 'selectedClass']) {
-      for (const m of painter.matchAll(new RegExp(`${key}: '([^']+)'`, 'g'))) found.add(m[1]);
+      for (const m of painter.matchAll(new RegExp(`${key}: '([^']+)'`, 'g'))) add(m[1]);
     }
     // The badge states are built by concatenating a view-model enum onto a
     // prefix, so no literal for either spelling exists in this file at all.
@@ -519,20 +526,15 @@ describe('woc_market_window: every class it emits is actually styled', () => {
     expect(emitted().length).toBeGreaterThanOrEqual(50);
   });
 
-  it('keeps the stateful tab and primary rules above the window-wide button rule', () => {
-    // A specificity trap that already bit once. The window-wide chrome rule is
-    // `#woc-market-window button:not(.x-btn)`, and :not() carries its argument's
-    // specificity, making it (1,1,1). A plain `#woc-market-window .wm-tab-selected`
-    // is (1,1,0), so it LOSES however late it sits, and the selected tab silently
-    // stopped reading as selected: state a player navigates by, erased by a rule
-    // added to fix something else. Writing them as `button.<class>` ties the
-    // specificity so source order decides, and they come later.
+  it('keeps the Exchange geometry hooks after the window-wide button rule', () => {
+    // Shared ui primitives own the look; these hooks retain Exchange geometry
+    // and must continue to outrank the window-wide sizing rule.
     const css = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
     for (const cls of ['wm-tab', 'wm-tab-selected', 'wm-primary']) {
       expect(css, `${cls} must be scoped as button.${cls}`).toContain(
         `#woc-market-window button.${cls}`,
       );
-      // And never as the bare class, which is the losing form.
+      // And never as the bare class, which would lose the scoped geometry.
       expect(css.includes(`#woc-market-window .${cls} {`), `bare .${cls} rule loses`).toBe(false);
     }
     // Order still has to hold: the generic rule must come FIRST. Both anchors
@@ -566,8 +568,8 @@ describe('woc_market_window: every class it emits is actually styled', () => {
     // .panel-title + .x-btn + the close glyph are what every other window uses
     // and the only close markup base.css styles; the invented .window-header /
     // .window-close pair is what produced the unstyled header.
-    expect(painter).toContain('<div class="panel-title">');
-    expect(painter).toContain('class="x-btn" data-close');
+    expect(painter).toContain('<div class="panel-title ui-win-head">');
+    expect(painter).toContain('class="x-btn ui-x-btn" data-close');
     expect(painter).toContain("svgIcon('close')");
     // Matched as MARKUP, not as bare text: the painter's own comment names both
     // retired classes to explain why they went away.
@@ -787,7 +789,7 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
     // A real cell, so the shared stats tooltip still attaches to it.
     expect(sell).toContain('`sell:${selected.index}`');
     // The clear button reuses the shared .x-btn chrome family and its close glyph.
-    expect(sell).toContain('class="x-btn wm-combo-clear"');
+    expect(sell).toContain('class="x-btn ui-x-btn wm-combo-clear"');
     expect(sell).toContain('data-action="sell-clear"');
     expect(sell).toContain("svgIcon('close')");
   });
@@ -1891,7 +1893,7 @@ describe('woc_market_window: the Activity tab is an honest, actionable ledger (H
     expect(detailSrc).toContain('d.row.mine && canCancelListing(d.row)');
     expect(activity).toContain('data-action="cancel-listing"');
     // Focus survives the poll rebuild (the window-family focus-key contract).
-    expect(activity).toContain(`wm-activity-cancel-\${l.id}`);
+    expect(activity).toContain(`wm-activity-cancel-\${esc(l.id)}`);
   });
 });
 

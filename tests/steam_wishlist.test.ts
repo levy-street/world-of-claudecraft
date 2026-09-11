@@ -249,10 +249,9 @@ describe('steam wishlist styling stays quiet', () => {
   it('never fills with Steam blue or the reserved gold, only edges with it on hover and focus', () => {
     const hud = hudCss();
     const shell = shellCss();
-    for (const [name, raw] of [
-      ['hud.css', hud],
-      ['shell.css', shell],
-    ] as const) {
+    expect(hud).not.toContain('#66c0f4');
+    expect(hud).toContain('border-color: var(--color-steam-accent);');
+    for (const [name, raw] of [['shell.css', shell]] as const) {
       // Comments name the colour too; only declarations are being audited here.
       const css = raw.replace(/\/\*[\s\S]*?\*\//g, (c) => ' '.repeat(c.length));
       const uses = [...css.matchAll(/#66c0f4/g)];

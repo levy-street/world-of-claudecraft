@@ -17,7 +17,7 @@ const indexHtml = readFileSync(join(repoRoot, 'index.html'), 'utf8');
 const playHtml = readFileSync(join(repoRoot, 'play.html'), 'utf8');
 
 function wrapperMarkup(html: string): string {
-  const start = html.indexOf('<div id="right-tracker-stack">');
+  const start = html.indexOf('<div id="right-tracker-stack"');
   if (start < 0) return '';
   // Walk to the wrapper's own matching close so the slice cannot run past it
   // into sibling markup (a fixed window would keep containing a tracker that

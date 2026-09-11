@@ -487,6 +487,8 @@ describe('bare containment reads of the active element stay out of repaint ladde
     'focus_manager.ts': 'the Tab trap itself (armed while focus is inside the root)',
     'focus_restore.ts': 'the helper',
     'hud/vendor/buy_quantity_prompt_window.ts': 'do-not-steal-focus check, never focuses anything',
+    'map_sidebar_controller.ts':
+      'focus capture before the atlas rail innerHTML swap; restores by data-map-* identity only',
     'spellbook_window.ts':
       'dataset/class-keyed read with no Close rung; a parked root resolves nothing',
   };

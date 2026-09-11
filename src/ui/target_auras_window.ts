@@ -13,10 +13,10 @@ const VISIBLE_STORAGE_KEY = 'woc_target_auras_visible';
 const VISIBLE_ROWS_STORAGE_KEY = 'woc_target_auras_visible_rows';
 const SHOW_SOURCES_STORAGE_KEY = 'woc_target_auras_show_sources';
 const OPACITY_STORAGE_KEY = 'woc_target_auras_opacity';
-const DEFAULT_WIDTH = 220;
-const SINGLE_FILTER_WIDTH = 140;
+const DEFAULT_WIDTH = 400;
+const SINGLE_FILTER_WIDTH = 400;
 const DEFAULT_HEIGHT = 240;
-const DEFAULT_VISIBLE_ROWS = 12;
+const DEFAULT_VISIBLE_ROWS = 4;
 const MIN_VISIBLE_ROWS = 3;
 const MAX_VISIBLE_ROWS = 24;
 const DEFAULT_OPACITY = 100;
@@ -29,7 +29,7 @@ const SOURCE_ROW_MIN_HEIGHT = 36;
 const SOURCE_ROW_FLUID_CQW = 8.5;
 const SOURCE_ROW_MAX_HEIGHT = 46;
 const ROW_GAP = 3;
-const FRAME_CHROME_HEIGHT = 66;
+const FRAME_CHROME_HEIGHT = 95;
 const CONFIG_WIDTH = 150;
 const MOBILE_CONFIG_WIDTH = 232;
 const CONFIG_VIEWPORT_MARGIN = 8;
@@ -143,13 +143,12 @@ export class TargetAurasWindow {
         this.persistFilter();
         this.refreshFilterButtons();
         this.applyFilterWidth();
-        if (this.rowsConfigOpen) this.positionVisibleRowsControl();
       });
     }
     const titleEl = root.querySelector('.panel-title') as HTMLElement;
     const rowsConfigButton = doc.createElement('button');
     rowsConfigButton.type = 'button';
-    rowsConfigButton.className = 'ta-rows-config-btn';
+    rowsConfigButton.className = 'ta-rows-config-btn ui-icon-btn ui-icon-btn--micro';
     titleEl.appendChild(rowsConfigButton);
     this.rowsConfigButton = rowsConfigButton;
     rowsConfigButton.addEventListener('click', (event) => {
@@ -161,23 +160,23 @@ export class TargetAurasWindow {
     });
 
     const visibleRowsControl = doc.createElement('div');
-    visibleRowsControl.className = 'ta-visible-rows-control';
+    visibleRowsControl.className = 'ta-visible-rows-control ui-card';
     visibleRowsControl.id = 'target-auras-visible-rows-control';
     const fewerRowsButton = this.createRowsButton('ta-visible-rows-less', '\u2212');
     const visibleRowsValue = doc.createElement('span');
-    visibleRowsValue.className = 'ta-visible-rows-value';
+    visibleRowsValue.className = 'ta-visible-rows-value ui-num';
     const moreRowsButton = this.createRowsButton('ta-visible-rows-more', '+');
     const sourceToggleButton = this.createRowsButton('ta-source-toggle', '');
     const opacityControl = doc.createElement('label');
     opacityControl.className = 'ta-opacity-control';
     const opacityInput = doc.createElement('input');
-    opacityInput.className = 'ta-opacity-slider';
+    opacityInput.className = 'ta-opacity-slider ui-range';
     opacityInput.type = 'range';
     opacityInput.min = String(MIN_OPACITY);
     opacityInput.max = String(MAX_OPACITY);
     opacityInput.step = '5';
     const opacityValue = doc.createElement('span');
-    opacityValue.className = 'ta-opacity-value';
+    opacityValue.className = 'ta-opacity-value ui-num';
     opacityControl.append(opacityInput, opacityValue);
     const filtersEl = root.querySelector('.ta-filters') as HTMLElement;
     visibleRowsControl.append(
@@ -232,7 +231,7 @@ export class TargetAurasWindow {
 
     const moveButton = doc.createElement('button');
     moveButton.type = 'button';
-    moveButton.className = 'ta-move-btn';
+    moveButton.className = 'ta-move-btn ui-icon-btn ui-icon-btn--micro';
     titleEl.appendChild(moveButton);
     this.moveButton = moveButton;
     moveButton.addEventListener('click', (event) => {
@@ -372,7 +371,7 @@ export class TargetAurasWindow {
   private createRowsButton(className: string, text: string): HTMLButtonElement {
     const button = this.deps.document.createElement('button');
     button.type = 'button';
-    button.className = `ta-visible-rows-step ${className}`;
+    button.className = `ta-visible-rows-step ${className} ui-icon-btn ui-icon-btn--micro`;
     button.textContent = text;
     return button;
   }
@@ -484,6 +483,7 @@ export class TargetAurasWindow {
       const active = button.dataset.auraFilter === this.filter;
       this.deps.writers.setAttr(button, 'aria-pressed', active ? 'true' : 'false');
       this.deps.writers.toggleClass(button, 'on', active);
+      this.deps.writers.toggleClass(button, 'is-on', active);
     }
     for (const filter of ['all', 'debuffs', 'buffs'] as const) {
       this.deps.writers.toggleClass(this.deps.root, `ta-filter-${filter}`, filter === this.filter);
@@ -629,21 +629,21 @@ export class TargetAurasWindow {
   private createRow(container: HTMLElement): PooledRow {
     const { document: doc } = this.deps;
     const el = doc.createElement('div');
-    el.className = 'ta-row';
+    el.className = 'ta-row ui-card';
     el.tabIndex = 0;
     const fill = doc.createElement('div');
     fill.className = 'ta-fill';
     const icon = doc.createElement('div');
     icon.className = 'ta-icon';
     const stacks = doc.createElement('span');
-    stacks.className = 'ta-stacks';
+    stacks.className = 'ta-stacks ui-num';
     icon.appendChild(stacks);
     const name = doc.createElement('span');
     name.className = 'ta-name';
     const source = doc.createElement('span');
-    source.className = 'ta-source';
+    source.className = 'ta-source ui-meta ui-muted';
     const time = doc.createElement('span');
-    time.className = 'ta-time';
+    time.className = 'ta-time ui-num';
     const ownMarker = doc.createElement('span');
     ownMarker.className = 'ta-own-marker';
     ownMarker.textContent = this.deps.ownAuraLabel();

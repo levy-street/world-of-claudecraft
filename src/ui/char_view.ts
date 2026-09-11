@@ -37,30 +37,51 @@ export interface PaperdollSlot {
 export interface PaperdollView {
   left: PaperdollSlot[];
   right: PaperdollSlot[];
+  weapons: PaperdollSlot[];
 }
 
-// Two balanced 6/6 columns flanking the model, like the classic character sheet:
-// the left column holds head/neck/shoulder/chest plus both weapon hands (mainhand
-// then offhand); the right column holds the hands/waist/legs/feet quartet with the
-// two ring slots at the bottom. The 6/6 split (offhand under mainhand rather than
-// at the tail of the right column) keeps the two bands even on either side of the
-// fixed-width model stage; the inspect window inherits it via buildPaperdollView.
+export type CharacterSidebarTab = 'stats' | 'progression' | 'skills';
+
+export const CHARACTER_SIDEBAR_TABS: readonly CharacterSidebarTab[] = [
+  'stats',
+  'progression',
+  'skills',
+];
+
+export interface CharacterSidebarView {
+  selected: CharacterSidebarTab;
+  tabs: Array<{ id: CharacterSidebarTab; selected: boolean }>;
+}
+
+export function buildCharacterSidebarView(selected: string | null): CharacterSidebarView {
+  const resolved = CHARACTER_SIDEBAR_TABS.includes(selected as CharacterSidebarTab)
+    ? (selected as CharacterSidebarTab)
+    : 'stats';
+  return {
+    selected: resolved,
+    tabs: CHARACTER_SIDEBAR_TABS.map((id) => ({ id, selected: id === resolved })),
+  };
+}
+
+// Two balanced 5/5 armor columns flank the model and the two weapon hands sit in
+// their own row under it (mainhand then offhand), like the classic character
+// sheet: the left column runs head to hands, the right column waist to rings.
+// The inspect window inherits the split via buildPaperdollView.
 export const PAPERDOLL_LEFT_SLOTS: readonly EquipSlot[] = [
   'helmet',
   'neck',
   'shoulder',
   'chest',
-  'mainhand',
-  'offhand',
+  'gloves',
 ];
 export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
-  'gloves',
   'waist',
   'legs',
   'feet',
   'ring1',
   'ring2',
 ];
+export const PAPERDOLL_WEAPON_SLOTS: readonly EquipSlot[] = ['mainhand', 'offhand'];
 
 /**
  * Build the paperdoll view from the player's equipment and the item table. A
@@ -84,5 +105,9 @@ export function buildPaperdollView(
       const instance = item ? wornTooltipInstance(instances?.[slot]) : undefined;
       return { slot, item, instance: instance ?? null };
     });
-  return { left: column(PAPERDOLL_LEFT_SLOTS), right: column(PAPERDOLL_RIGHT_SLOTS) };
+  return {
+    left: column(PAPERDOLL_LEFT_SLOTS),
+    right: column(PAPERDOLL_RIGHT_SLOTS),
+    weapons: column(PAPERDOLL_WEAPON_SLOTS),
+  };
 }

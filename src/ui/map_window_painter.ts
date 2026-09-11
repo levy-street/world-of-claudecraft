@@ -60,6 +60,7 @@ import {
   stationMarkerArtId,
 } from './map_marker_icon_art';
 import type { MapMarkerProfile } from './map_marker_profile_core';
+import type { MapAtlasFilters, MapAtlasRoute } from './map_sidebar_view';
 import {
   buildOverworldMapModel,
   type MapAllyMarker,
@@ -78,6 +79,7 @@ import {
   type MapViewRect,
   type OverworldMapModel,
 } from './map_window_view';
+import { sharedQuestTracking } from './quest_tracking_core';
 import { TextSpriteCache, type TextSpriteStyle } from './text_sprite_cache';
 
 // Label / title typography (Georgia, matching the inline site verbatim).
@@ -460,6 +462,10 @@ export interface MapPaintOptions {
   center: { x: number; z: number } | null;
   /** Dungeon Finder "Show on Map" highlight in world coords, or null. */
   ping?: { x: number; z: number } | null;
+  /** Player-controlled atlas layers. */
+  filters?: Readonly<MapAtlasFilters>;
+  /** Selected atlas quest route in world coordinates. */
+  route?: MapAtlasRoute | null;
 }
 
 /** What the painter reports back so Hud can update its drag state + cursor,
@@ -554,6 +560,9 @@ export class MapWindowPainter {
       decorations,
       ping: opts.ping ?? null,
       markerProfile: profile,
+      filters: opts.filters,
+      route: opts.route,
+      untrackedQuestIds: sharedQuestTracking().untrackedIds(),
     });
     const colors = this.resolveColors();
     this.draw(ctx, model, opts.zoneBg, opts.canvasSize, colors, profile);
@@ -612,6 +621,18 @@ export class MapWindowPainter {
 
     // The castle plans, over the terrain and under the quest / label layers.
     if (model.castles.length > 0) this.drawCastlePlan(ctx, model.castles, colors);
+
+    if (model.route) {
+      ctx.save();
+      ctx.strokeStyle = colors.ping;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath();
+      ctx.moveTo(model.route.from.mx, model.route.from.my);
+      ctx.lineTo(model.route.to.mx, model.route.to.my);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     // Active-quest objective areas: translucent blue blobs (classic quest-POI
     // style) over where each objective's targets live, drawn under the title /

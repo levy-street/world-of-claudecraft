@@ -14,35 +14,39 @@ const RIM_WIDGETS = ['#raid-lockout', '#mail-indicator', '#market-indicator'] as
 
 const MARKUP = `
 <div id="minimap-wrap">
-  <div id="zone-label">Eastbrook Vale</div>
+  <div id="zone-label" class="ui-cin ui-outline">Eastbrook Vale</div>
   <div id="minimap-disc">
     <canvas id="minimap" width="162" height="162" aria-hidden="true"></canvas>
-    <button id="raid-lockout" type="button" aria-label="Raid Lockouts"></button>
-    <button id="mail-indicator" type="button" data-icon="mail" aria-label="Mail">
-      <span class="mail-indicator-count">2</span>
+    <button id="raid-lockout" class="ui-disc" type="button" aria-label="Raid Lockouts"></button>
+    <button id="mail-indicator" class="ui-disc" type="button" data-icon="mail" aria-label="Mail">
+      <span class="mail-indicator-count ui-badge ui-badge--corner">2</span>
     </button>
-    <button id="market-indicator" type="button" data-icon="market" aria-label="Market"></button>
-    <canvas id="minimap-daynight" width="88" height="88" aria-hidden="true"></canvas>
+    <button id="market-indicator" class="ui-disc" type="button" data-icon="market" aria-label="Market"></button>
+    <canvas id="minimap-daynight" class="ui-disc" width="88" height="88" aria-hidden="true"></canvas>
   </div>
-  <div id="minimap-clock">12:00</div>
-  <div id="minimap-coords" role="status" aria-label="Coordinates">0, 0</div>
-  <div id="compass" role="img" aria-label="Heading">
+  <button id="minimap-clock" class="ui-cin ui-num" type="button">12:00</button>
+  <div id="compass" class="ui-outline" role="img" aria-label="Heading">
     <div id="compass-strip"><div id="compass-track"></div></div>
     <div id="compass-center"></div>
-    <div id="compass-heading">N</div>
+    <div id="compass-heading" class="ui-cin">N</div>
   </div>
-  <div id="minimap-zoom">
-    <button type="button" class="minimap-zoom-btn" id="minimap-zoom-out">-</button>
-    <span id="minimap-zoom-label">1x</span>
-    <button type="button" class="minimap-zoom-btn" id="minimap-zoom-in">+</button>
+  <div id="minimap-coords" class="ui-chip ui-num" role="status" aria-label="Coordinates">0, 0</div>
+  <div id="minimap-zoom" role="group" aria-label="Minimap zoom">
+    <button type="button" class="minimap-zoom-btn ui-disc ui-cin" id="minimap-zoom-out">-</button>
+    <span id="minimap-zoom-label" class="ui-disc ui-num">1x</span>
+    <button type="button" class="minimap-zoom-btn ui-disc ui-cin" id="minimap-zoom-in">+</button>
   </div>
 </div>`;
 
-function mountMinimap(): void {
+function mountMinimap(zoneTitle?: string): void {
   const ui = document.createElement('div');
   ui.id = 'ui';
   ui.innerHTML = MARKUP;
   document.body.appendChild(ui);
+  if (zoneTitle !== undefined) {
+    const label = ui.querySelector<HTMLElement>('#zone-label');
+    if (label) label.textContent = zoneTitle;
+  }
   // The same two steps HUD init runs on this cluster: the envelope and coin take
   // their glyph from [data-icon], the lockout badge from an svgIcon() write, and
   // all three ship hidden until their state goes live. The glyph is load-bearing
@@ -148,4 +152,47 @@ describe('minimap rim satellites stay on the disc', () => {
       }
     },
   );
+});
+
+// The clock medallion and the zoom discs are absolutely positioned in the seat
+// between the ring's lower edge and the compass strip. They hang off the wrap's
+// BOTTOM, not its top, precisely so a zone title that wraps to two lines (every
+// long localized zone name does) moves them WITH the ring instead of letting the
+// ring slide down over them. A top offset passes the single-line case and fails
+// only in the locales nobody screenshots, so it is pinned here in real layout.
+describe('minimap lower-arc controls follow the ring', () => {
+  it.each([
+    { label: 'one-line zone title', zone: 'Eastbrook Vale' },
+    { label: 'wrapped zone title', zone: 'Thornhollow Fields of the Long Reckoning' },
+  ])('$label', async ({ label, zone }) => {
+    await page.viewport(1280, 720);
+    document.body.className = 'game-active';
+    mountMinimap(zone);
+
+    const disc = document.querySelector('#minimap-disc') as HTMLElement;
+    const clock = document.querySelector('#minimap-clock') as HTMLElement;
+    const zoom = document.querySelector('#minimap-zoom') as HTMLElement;
+    const compass = document.querySelector('#compass') as HTMLElement;
+    const discRect = disc.getBoundingClientRect();
+    const clockRect = clock.getBoundingClientRect();
+    const zoomRect = zoom.getBoundingClientRect();
+    const compassRect = compass.getBoundingClientRect();
+
+    // The zone title actually wraps in the second case, so the two rows are not
+    // measuring the same layout twice.
+    const label2 = document.querySelector('#zone-label') as HTMLElement;
+    const wrapped = label2.getBoundingClientRect().height > 20;
+    expect(wrapped, `${label}: zone title wrapping`).toBe(zone !== 'Eastbrook Vale');
+
+    // Straddles the ring's lower edge: the medallion's box crosses it.
+    expect(clockRect.top, `${label}: clock top above the ring edge`).toBeLessThan(discRect.bottom);
+    expect(clockRect.bottom, `${label}: clock bottom below the ring edge`).toBeGreaterThan(
+      discRect.bottom,
+    );
+    // The zoom discs hug the arc under the medallion, clear of both.
+    expect(zoomRect.top, `${label}: zoom below the clock`).toBeGreaterThanOrEqual(clockRect.bottom);
+    expect(zoomRect.bottom, `${label}: zoom above the compass`).toBeLessThanOrEqual(
+      compassRect.top,
+    );
+  });
 });

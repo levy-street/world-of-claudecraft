@@ -215,7 +215,7 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
       const style = getComputedStyle(harvest);
       return [style.filter, style.opacity, style.boxShadow, style.cursor];
     };
-    await expect.poll(() => getComputedStyle(harvest).filter).toBe('brightness(1.25)');
+    await expect.poll(() => getComputedStyle(harvest).filter).toBe('brightness(1.12)');
     const readyAppearance = appearance();
     for (let cycle = 0; cycle < 3; cycle++) {
       let reply!: (info: CorpseHarvestInfo) => void;
@@ -302,7 +302,7 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
     await userEvent.click(fangRow);
     expect(h.world.setHarvestPreference).not.toHaveBeenCalled();
 
-    const cancelBtn = button(h.harvestPreferenceRoot, '.btn-secondary');
+    const cancelBtn = button(h.harvestPreferenceRoot, '[data-focus-key="cancel"]');
     await userEvent.click(cancelBtn);
 
     expect(h.world.setHarvestPreference).not.toHaveBeenCalled();
@@ -403,14 +403,16 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
       button(h.harvestPreferenceRoot, '.harvest-preference-actions .btn'),
     );
     await userEvent.keyboard('[Tab]');
-    expect(document.activeElement).toBe(button(h.harvestPreferenceRoot, '.btn-secondary'));
+    expect(document.activeElement).toBe(
+      button(h.harvestPreferenceRoot, '[data-focus-key="cancel"]'),
+    );
   });
 
   it('returns focus to the corpse body Change control on Cancel', async () => {
     const h = mount(false, SETTLED_ALL);
     await openChange(h);
     const changeBtn = button(h.lootRoot, '.corpse-harvest-change-btn');
-    await userEvent.click(button(h.harvestPreferenceRoot, '.btn-secondary'));
+    await userEvent.click(button(h.harvestPreferenceRoot, '[data-focus-key="cancel"]'));
     expect(document.activeElement).toBe(changeBtn);
   });
 
@@ -438,7 +440,7 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
       await openChange(h);
       for (const row of radioRows(h.harvestPreferenceRoot)) expectTouchable(row);
       expectTouchable(button(h.harvestPreferenceRoot, '.harvest-preference-actions .btn'));
-      expectTouchable(button(h.harvestPreferenceRoot, '.btn-secondary'));
+      expectTouchable(button(h.harvestPreferenceRoot, '[data-focus-key="cancel"]'));
     },
   );
 

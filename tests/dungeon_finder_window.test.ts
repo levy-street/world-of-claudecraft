@@ -64,8 +64,9 @@ describe('dungeon finder window painter (source contract)', () => {
     // screen reader under role=tablist / role=listbox than under a labelled group.
     expect(src).not.toContain('role="tablist"');
     expect(src).not.toContain('role="listbox"');
-    expect(src).toContain('class="df-tabs" role="group"');
-    expect(src).toContain('class="df-rail" role="group"');
+    // W12: shared visual primitives sit beside legacy group hooks without changing roles.
+    expect(src).toContain('class="df-tabs ui-seg" role="group"');
+    expect(src).toContain('class="df-rail ui-panel-soft" role="group"');
   });
 
   it('composes every localizable sentence from tokens, never from a concat', () => {

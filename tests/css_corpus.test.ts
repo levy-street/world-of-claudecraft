@@ -212,6 +212,7 @@ const INDEX_SECTIONS = [
   // The set-divided WARFARE quartermaster shop (components.css); loads in both
   // entries, so it is not a PLAY_OMITS row.
   'WARFARE quartermaster shop',
+  'ui library (shared primitives)',
 ];
 
 // The two index-only sections play.html does not ship, so its count is 58 (plus the
@@ -223,12 +224,12 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 70 index + 68 play sections, no duplicate names', () => {
-    expect(INDEX_SECTIONS.length).toBe(70);
-    expect(PLAY_SECTIONS.length).toBe(68);
-    expect(MANIFEST.length).toBe(70);
-    expect(new Set(INDEX_SECTIONS).size).toBe(70);
-    expect(new Set(PLAY_SECTIONS).size).toBe(68);
+  it('pins a non-vacuous manifest: 71 index + 69 play sections, no duplicate names', () => {
+    expect(INDEX_SECTIONS.length).toBe(71);
+    expect(PLAY_SECTIONS.length).toBe(69);
+    expect(MANIFEST.length).toBe(71);
+    expect(new Set(INDEX_SECTIONS).size).toBe(71);
+    expect(new Set(PLAY_SECTIONS).size).toBe(69);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {
@@ -335,15 +336,21 @@ describe('css_corpus per-file brace balance', () => {
     // Consumes the ONE read at the top of the file (this used to be a second,
     // separately-flat readdirSync, so the two could drift, #2502).
     //
-    // The vacuity floor sits at the live module count, 10, which an empty OR a
+    // The vacuity floor sits at the live module count, 11, which an empty OR a
     // truncated scan cannot clear: the `> 0` floor it replaces was satisfied by a
     // single sheet, so a walk that lost the other nine, or that returned only the
     // one file whose name survived a filter typo, passed while checking almost
-    // nothing. The names pin that the 10 are the real modules.
+    // nothing. The names pin that the 11 are the real modules.
     const names = STYLE_SHEETS.map((sheet) => sheet.file);
-    expect(names.length).toBeGreaterThanOrEqual(10);
+    expect(names.length).toBeGreaterThanOrEqual(11);
     expect(names).toEqual(
-      expect.arrayContaining(['index.css', 'components.css', 'hud.mobile.css', 'tokens.css']),
+      expect.arrayContaining([
+        'index.css',
+        'components.css',
+        'hud.mobile.css',
+        'tokens.css',
+        'library.css',
+      ]),
     );
     for (const { file, css } of STYLE_SHEETS) {
       expect(braceBalance(css), `src/styles/${file} must have balanced braces`).toBe(0);

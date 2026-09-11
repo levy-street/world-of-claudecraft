@@ -128,7 +128,7 @@ describe(':focus-visible ring is steady and visible (the FB lesson)', () => {
     // it @imports, and the two per-entry .extra.css). The block floor above cannot
     // tell a full scan from one that lost a sheet or a whole subtree, since
     // components.css alone clears it.
-    expect(files.length).toBeGreaterThanOrEqual(10);
+    expect(files.length).toBeGreaterThanOrEqual(11);
   });
 
   it('never animates / blurs / transitions the drawn outline ring on any :focus-visible block', () => {

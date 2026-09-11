@@ -902,6 +902,7 @@ export const pt_BR: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Recolher missões",
       "expandHint": "Expandir missões"
     },
@@ -1266,6 +1267,9 @@ export const pt_BR: EnTranslations = {
       "previous": "Rodadas anteriores",
       "runLabel": "Rodada {index}",
       "runSummary": "{total} em {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Mire no boneco para começar.",
@@ -1729,6 +1733,9 @@ export const pt_BR: EnTranslations = {
     },
     "controller": {
       "title": "Controle",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Ícones dos Botões",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -2115,6 +2122,22 @@ export const pt_BR: EnTranslations = {
       "showPlaytimeAria": "Mostrar tempo jogado",
       "hidePlaytimeAria": "Ocultar tempo jogado"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "Do seu {value} de {stat}:",
       "names": {
@@ -2357,6 +2380,7 @@ export const pt_BR: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Relatar um erro",
+      "online": "Online",
       "realm": "Mundo",
       "character": "Personagem",
       "position": "Posição",
@@ -3234,6 +3258,7 @@ export const pt_BR: EnTranslations = {
       "lock": "Travar quadro do jogador"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Quadros de grupo e raide",
       "optionsSection": "Opções de Quadros de Grupo",
       "unlock": "Mover quadros de grupo e raide",
@@ -4018,7 +4043,6 @@ export const pt_BR: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Coleta",
       "mining": "Mineração",
       "logging": "Lenharia",
       "herbalism": "Herborismo",
@@ -4202,9 +4226,7 @@ export const pt_BR: EnTranslations = {
       "noviceBody": "A habilidade de Agricultura cresce toda vez que você colhe um cultivo. Semeie uma semente em qualquer canteiro para começar."
     },
     "archetypeTitle": {
-      "label": "Título",
-      "none": "Nenhum",
-      "hobbyLabel": "Passatempo"
+      "none": "Nenhum"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardeiro",
@@ -4374,7 +4396,9 @@ export const pt_BR: EnTranslations = {
       "hobbyLabel": "Passatempo: {craft}",
       "majorsLabel": "Majores: {a} e {b}",
       "pairsHeld": "Pares mantidos: {count}",
-      "returnsLabel": "Retorna: {count}"
+      "returnsLabel": "Retorna: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "Artesanato",
@@ -4409,6 +4433,7 @@ export const pt_BR: EnTranslations = {
       "vaultUnreachable": "O Depósito de Materiais está fora de alcance aqui.",
       "craftFeeLine": "Taxa de criação: {fee} cada",
       "empty": "Nenhuma receita conhecida ainda.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Artesanato {name}",
       "craftedToast": "Feito: {name}",
       "craftedToastQty": "Feito: {name} x{qty}",
@@ -4510,6 +4535,9 @@ export const pt_BR: EnTranslations = {
       "commissionToggleHint": "Vincula ao primeiro personagem que a receber em uma negociação.",
       "commissionUnbound": "Peça por encomenda: vincula ao primeiro destinatário",
       "commissionBound": "Peça por encomenda: vinculada ao seu destinatário"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Usar",
@@ -5134,6 +5162,33 @@ export const pt_BR: EnTranslations = {
       "toInstance": "Mapa de instância",
       "toggleAria": "Alternar entre o mapa do mundo, o mapa da zona e o mapa da instância",
       "levels": "Níveis {min} a {max}"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Requer nível {level}"
@@ -6080,6 +6135,7 @@ export const pt_BR: EnTranslations = {
       "framesMoveBodyEditFrames": "Seu quadro, o quadro do alvo e os quadros do grupo podem ser movidos. Cada um traz um pequeno botão de mover no canto: desbloqueie-o, arraste o quadro para onde quiser e bloqueie-o outra vez para que um clique perdido não o desloque. Editar Quadros, no alto da aba Quadros nas opções de Interface, libera o restante da interface de uma vez, junto com esses três quadros: barras de ação, barra de lançamento, barra de golpe, barra de experiência, minimapa, trilho de botões, quadro do mascote, barra de postura, linhas de benefícios e debilitações e chip de Lembrete da Lista de Desejos, cada um usando um chip de nome enquanto está liberado. Se eles acabarem em um lugar que você não queira, Restaurar Padrões, no rodapé da mesma aba Quadros, devolve todos ao ponto inicial.",
       "framesGovernedExtra": "Editar Quadros também libera a pilha de rastreadores abaixo, seus atributos e objetivos de missões rastreadas, seu progresso de feitos, suas páginas do Relicário, a incursão em que você está, qualquer fenda da qual participa e a receita ou encomenda que rastreia, além da barra de ação do mascote ao lado do quadro dele, o quadro de pontos do Alvo para suas debilitações em inimigos próximos, o medalhão de Devoção do paladino, a Barra de Aflição do bruxo, a sobreposição de ativações de feitiço, o cronômetro do golpe da mão secundária para quem usa duas armas e a janela de medidores de dano com abas, cada um usando seu próprio chip de nome quando está liberado.",
       "framesGovernedAuraTracks": "Editar Quadros também libera as seis trilhas de aura opcionais depois que você as ativa na aba Combate das mesmas opções de Interface: trilha Meus Benefícios, trilha Recargas Defensivas, trilha Meus Escudos, trilha Recargas Ofensivas, trilha Movimento e Furtividade e trilha Meus Benefícios nos Aliados. Todas as trilhas começam desligadas, e cada uma usa seu próprio chip de nome quando está liberada.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
       "aurasTitle": "Benefícios e penalidades",

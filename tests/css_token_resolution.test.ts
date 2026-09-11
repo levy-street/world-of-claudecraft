@@ -51,12 +51,10 @@ const KNOWN_UNDECLARED = [
   // marketplace pass neither owns nor captured. Owed by the DESIGN.md chrome
   // retune, WITH a Dungeon Finder before/after (desktop and 900x420).
   '--panel-border',
-  '--color-bg-deep', // hud.css: the boss level chip and the spectate badge
   '--color-text', // components.css / hud.css: the generic text alias never minted
   '--color-text-primary', // shell.css: the pre-game shell's alias
   '--cursor-pointer', // components.css: the cursor family spells --cursor-point
   '--dev-outline', // hud.css: a dev overlay outline never tokenized
-  '--shadow-panel', // hud.css: the spectate badge shadow
 ].sort();
 
 describe('css_token_resolution: every var() read names a declared custom property', () => {

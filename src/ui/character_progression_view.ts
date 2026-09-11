@@ -48,13 +48,13 @@ export function talentSummaryHtml(sim: IWorld): string {
   const sp = ct.specs.find((s) => s.id === sim.talentSpec);
   const specName = sp
     ? esc(tTalent({ kind: 'talentSpec', spec: sp, field: 'name' }))
-    : t('game.talents.noSpec');
-  let html = `<div class="char-progression"><div class="cp-title">${t('game.talents.specTab')}</div>`;
-  html += `<div class="char-stats cp-stats"><span>${t('game.talents.specTab')}: <b>${specName}</b></span>`;
-  if (sp) html += `<span>${t('game.talents.role')}: <b>${roleLabel(sp.role)}</b></span>`;
+    : esc(t('game.talents.noSpec'));
+  let html = `<div class="char-progression ui-card"><div class="cp-title">${esc(t('game.talents.specTab'))}</div>`;
+  html += `<div class="char-stats cp-stats"><span>${esc(t('game.talents.specTab'))}: <b>${specName}</b></span>`;
+  if (sp) html += `<span>${esc(t('game.talents.role'))}: <b>${esc(roleLabel(sp.role))}</b></span>`;
   html += `</div>`;
   if (sp)
-    html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.talents.mastery')}:</span> <b style="color:var(--gold)">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b> <span class="cp-none">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}</span></div>`;
+    html += `<div class="cp-milestones"><span class="cp-ms-label">${esc(t('game.talents.mastery'))}:</span> <b style="color:var(--gold)">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b> <span class="cp-none">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}</span></div>`;
   return `${html}</div>`;
 }
 
@@ -92,25 +92,27 @@ export function progressionHtml(sim: IWorld, level: number): string {
   if (sim.prestigeRank > 0)
     html += `<span>${t('game.progression.prestigeRank')}: <b>&#9733; ${sim.prestigeRank}</b></span>`;
   html += `</div>`;
-  html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.progression.milestones')}:</span> ${badges || `<span class="cp-none">${t('game.progression.none')}</span>`}</div>`;
+  html += `<div class="cp-milestones ui-card"><span class="cp-ms-label">${t('game.progression.milestones')}:</span> ${badges || `<span class="cp-none">${t('game.progression.none')}</span>`}</div>`;
   // The active Book of Deeds title line; the button opens the Book (its
   // Titles section is one click away). Title text is deed content localized
   // through deed_i18n, never a raw id.
   const activeTitleText = sim.activeTitle ? deedTitleText(sim.activeTitle) : '';
-  html += `<div class="cp-milestones"><span class="cp-ms-label">${t('hudChrome.deeds.charTitleLabel')}:</span> ${
+  html += `<div class="cp-milestones ui-card"><span class="cp-ms-label">${t('hudChrome.deeds.charTitleLabel')}:</span> ${
     activeTitleText !== ''
       ? `<b class="cp-active-title">${esc(activeTitleText)}</b>`
       : `<span class="cp-none">${t('hudChrome.deeds.charTitleNone')}</span>`
-  } <button type="button" class="btn cp-deeds-btn" data-act="open-deeds">${t('hudChrome.deeds.charOpenBook')}</button></div>`;
+  } <button type="button" class="cp-deeds-btn ui-btn" data-act="open-deeds">${t('hudChrome.deeds.charOpenBook')}</button></div>`;
   // Labeled Reliquary completion pair + Curator rank (character-scoped;
   // pure core paints the chrome; open button wires through CharWindow).
-  html += reliquarySheetProgressionHtml(buildReliquarySheetModel(sim));
+  html += reliquarySheetProgressionHtml(buildReliquarySheetModel(sim))
+    .replace('class="cp-milestones cp-reliquary"', 'class="cp-milestones cp-reliquary ui-card"')
+    .replace('class="btn cp-deeds-btn"', 'class="cp-deeds-btn ui-btn"');
   if (level >= MAX_LEVEL) {
     // The button reflects the server's authoritative prestige gate (post-cap
     // XP earned). It's disabled (and the requirement shown) until eligible;
     // the server re-checks regardless, so a forged click does nothing.
     const ready = canPrestige(level, sim.lifetimeXp, sim.prestigeRank);
-    html += `<div class="cp-actions"><button class="btn" data-act="prestige"${ready ? '' : ' disabled'}>${t('game.prestige.action')}${sim.prestigeRank > 0 ? ` (&#9733; ${sim.prestigeRank})` : ''}</button>`;
+    html += `<div class="cp-actions ui-card"><button class="ui-btn ui-btn--gold" data-act="prestige"${ready ? '' : ' disabled'}>${t('game.prestige.action')}${sim.prestigeRank > 0 ? ` (&#9733; ${sim.prestigeRank})` : ''}</button>`;
     if (!ready)
       html += `<span class="cp-hint">${formatXp(xpUntilNextPrestige(sim.lifetimeXp, sim.prestigeRank))} ${t('game.prestige.needXp')}</span>`;
     html += `</div>`;

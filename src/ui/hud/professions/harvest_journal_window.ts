@@ -331,8 +331,8 @@ export class HarvestJournalWindow {
       root.appendChild(this.liveStatusNode());
     }
     content.innerHTML =
-      `<div class="panel-title"><span id="harvest-journal-title">${esc(t('hudChrome.harvestJournal.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close data-focus-key="harvestJournalClose" aria-label="${esc(t('hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title" id="harvest-journal-title">${esc(t('hudChrome.harvestJournal.title'))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="harvestJournalClose" aria-label="${esc(t('hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="hj-body">${this.bodyHtml(view, nowMs)}</div>`;
     this.collectCountdownCells(content, nowMs);
     this.announceReadyFlips(view);
@@ -434,7 +434,7 @@ export class HarvestJournalWindow {
         ? `${stageStepsHtml(row.stage)}<span class="hj-stage">${esc(t(STAGE_LABEL_KEYS[row.stage]))}</span>`
         : '';
     return (
-      `<li class="hj-row hj-${esc(row.timer.kind)}">` +
+      `<li class="hj-row ui-card hj-${esc(row.timer.kind)}">` +
       `<span class="hj-crop">${esc(itemName(row.produceItemId))}</span>` +
       `<span class="hj-bed">${esc(bedText(row))}</span>` +
       `<span class="hj-state">${time}${stage}</span>` +
@@ -455,6 +455,6 @@ export class HarvestJournalWindow {
     if (chips.length === 0) {
       return `<span class="hj-care-none">${esc(t('hudChrome.harvestJournal.careNone'))}</span>`;
     }
-    return chips.map((chip) => `<span class="hj-care-chip">${esc(chip)}</span>`).join('');
+    return chips.map((chip) => `<span class="hj-care-chip ui-chip">${esc(chip)}</span>`).join('');
   }
 }

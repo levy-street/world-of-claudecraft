@@ -80,7 +80,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     elementId: 'actionbar',
     storageKey: 'woc_hud_frame_actionbar',
     labelKey: 'hudChrome.interfaceUnlock.frameNames.actionBar1',
-    fallbackSize: { w: 612, h: 46 },
+    fallbackSize: { w: 596, h: 46 },
     detachToUiRoot: true,
   },
   {
@@ -88,7 +88,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     elementId: 'actionbar2',
     storageKey: 'woc_hud_frame_actionbar2',
     labelKey: 'hudChrome.interfaceUnlock.frameNames.actionBar2',
-    fallbackSize: { w: 612, h: 46 },
+    fallbackSize: { w: 596, h: 46 },
     detachToUiRoot: true,
   },
   {
@@ -96,7 +96,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     elementId: 'actionbar3',
     storageKey: 'woc_hud_frame_actionbar3',
     labelKey: 'hudChrome.interfaceUnlock.frameNames.actionBar3',
-    fallbackSize: { w: 612, h: 46 },
+    fallbackSize: { w: 596, h: 46 },
     detachToUiRoot: true,
   },
   // The whole action-bar block as ONE frame, live only while the "Combine
@@ -107,7 +107,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     elementId: 'actionbar-group',
     storageKey: 'woc_hud_frame_actionbar_group',
     labelKey: 'hudChrome.interfaceUnlock.frameNames.actionBarGroup',
-    fallbackSize: { w: 612, h: 150 },
+    fallbackSize: { w: 596, h: 150 },
     detachToUiRoot: true,
   },
   {
@@ -163,7 +163,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     elementId: 'pet-frame',
     storageKey: 'woc_hud_frame_pet',
     labelKey: 'hudChrome.unitFrame.petLabel',
-    fallbackSize: { w: 180, h: 54 },
+    fallbackSize: { w: 278, h: 60 },
     detachToUiRoot: true,
   },
   // The pet ACTION bar, the command half of #pet-cluster. Its own row rather
@@ -194,7 +194,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     elementId: 'xpbar',
     storageKey: 'woc_hud_frame_xpbar',
     labelKey: 'hudChrome.interfaceUnlock.frameNames.xpBar',
-    fallbackSize: { w: 612, h: 12 },
+    fallbackSize: { w: 596, h: 14 },
     detachToUiRoot: true,
   },
   // The buff and debuff rows are independent frames (each placed on its own).
@@ -304,6 +304,17 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     storageKey: 'woc_hud_frame_proc_overlay',
     labelKey: 'hudChrome.interfaceUnlock.frameNames.procOverlay',
     fallbackSize: { w: 300, h: 232 },
+    detachToUiRoot: false,
+  },
+  // The Talking Head (an NPC line while the speaker is off screen): a #ui child
+  // with a stock seat a fifth of the way down the screen; the chip reuses the
+  // panel's own accessible name.
+  {
+    id: 'talkingHead',
+    elementId: 'talking-head',
+    storageKey: 'woc_hud_frame_talking_head',
+    labelKey: 'hudChrome.talkingHead.label',
+    fallbackSize: { w: 596, h: 72 },
     detachToUiRoot: false,
   },
   // The tabbed combat meter (#meters-window). Its two pop-out windows (heal,

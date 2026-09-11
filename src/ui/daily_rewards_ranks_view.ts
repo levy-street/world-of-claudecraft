@@ -36,7 +36,7 @@ export function dailyRewardsLeaderboardHtml(status: DailyRewardStatus): string {
               `<div class="dr-rank${row.me ? ' mine' : ''}"><span>${row.rank}</span><b>${esc(row.name)}</b><strong>${formatNumber(row.points, { maximumFractionDigits: 0 })}</strong></div>`,
           )
           .join('');
-  return `<section class="dr-section"><h3>${esc(t('hudChrome.dailyRewards.leaderboard'))}</h3>${total}<div class="dr-ranks dr-leaderboard-ranks">${rows}</div></section>`;
+  return `<section class="dr-section ui-card"><h3>${esc(t('hudChrome.dailyRewards.leaderboard'))}</h3>${total}<div class="dr-ranks dr-leaderboard-ranks">${rows}</div></section>`;
 }
 
 /** The last ten payouts, newest first as the wire sends them. */
@@ -53,5 +53,5 @@ export function dailyRewardsHistoryHtml(history: DailyRewardHistory): string {
             return `<div class="dr-rank"><span>${esc(row.day)} #${row.rank}</span><b>${esc(row.name)}</b><strong>${esc(prize)}</strong></div>`;
           })
           .join('');
-  return `<section class="dr-section"><h3>${esc(t('hudChrome.dailyRewards.history'))}</h3><div class="dr-ranks">${rows}</div></section>`;
+  return `<section class="dr-section ui-card"><h3>${esc(t('hudChrome.dailyRewards.history'))}</h3><div class="dr-ranks">${rows}</div></section>`;
 }

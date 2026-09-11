@@ -902,6 +902,7 @@ export const zh_TW: EnTranslations = {
     },
     "questTracker": {
       "count": "（{count}）",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "收合任務追蹤器",
       "expandHint": "展開任務追蹤器"
     },
@@ -1266,6 +1267,9 @@ export const zh_TW: EnTranslations = {
       "previous": "先前的測試",
       "runLabel": "第 {index} 次練習",
       "runSummary": "{time} 內 {total}"
+    },
+    "talkingHead": {
+      "label": "對話"
     },
     "hubLesson": {
       "target": "先將假人設為目標。",
@@ -1729,6 +1733,9 @@ export const zh_TW: EnTranslations = {
     },
     "controller": {
       "title": "手把",
+      "device": "已連接裝置",
+      "deviceConnected": "已連接",
+      "deviceDisconnected": "未偵測到手把",
       "glyphStyle": "按鍵標籤",
       "glyphStyleAuto": "自動",
       "glyphStyleXbox": "Xbox",
@@ -2115,6 +2122,22 @@ export const zh_TW: EnTranslations = {
       "showPlaytimeAria": "顯示遊戲時長",
       "hidePlaytimeAria": "隱藏遊戲時長"
     },
+    "charSidebar": {
+      "label": "角色詳情",
+      "subtitle": "{level}級 {className} . {archetype} . 興趣：{hobby}",
+      "subtitleNoHobby": "{level}級 {className} . {archetype}",
+      "stats": "屬性",
+      "progression": "進度",
+      "skills": "技能",
+      "gathering": "採集",
+      "crafting": "製作",
+      "openProfessions": "開啟專業"
+    },
+    "questLog": {
+      "completed": "已完成",
+      "zoneSummary": "{count}個（{ready}個可交付）",
+      "shiftHint": "按住 Shift 點擊任務可將其連結到聊天中。"
+    },
     "statInfo": {
       "fromYour": "來自你的 {value} 點{stat}：",
       "names": {
@@ -2357,6 +2380,7 @@ export const zh_TW: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "回報錯誤",
+      "online": "線上",
       "realm": "世界",
       "character": "角色",
       "position": "座標",
@@ -3234,6 +3258,7 @@ export const zh_TW: EnTranslations = {
       "lock": "鎖定玩家框"
     },
     "partyFrames": {
+      "header": "隊伍",
       "section": "隊伍和團隊框體",
       "optionsSection": "隊伍框體選項",
       "unlock": "移動隊伍和團隊框體",
@@ -4018,7 +4043,6 @@ export const zh_TW: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "採集",
       "mining": "採礦",
       "logging": "伐木",
       "herbalism": "藥草學",
@@ -4202,9 +4226,7 @@ export const zh_TW: EnTranslations = {
       "noviceBody": "每收成一次作物，耕作技能都會提升。在任意田畦播下種子即可開始。"
     },
     "archetypeTitle": {
-      "label": "稱號",
-      "none": "無",
-      "hobbyLabel": "愛好"
+      "none": "無"
     },
     "archetypePair": {
       "engineering+alchemy": "爆破師",
@@ -4374,7 +4396,9 @@ export const zh_TW: EnTranslations = {
       "hobbyLabel": "嗜好：{craft}",
       "majorsLabel": "主修：{a}和{b}",
       "pairsHeld": "已持有組合：{count}",
-      "returnsLabel": "回歸：{count}"
+      "returnsLabel": "回歸：{count}",
+      "retentionFooter": "重置專業後保留60%的技能。",
+      "tutorialLink": "專業教學"
     },
     "crafting": {
       "title": "製作",
@@ -4409,6 +4433,7 @@ export const zh_TW: EnTranslations = {
       "vaultUnreachable": "此處無法使用材料倉庫。",
       "craftFeeLine": "製作費：每件 {fee}",
       "empty": "尚無已知配方。",
+      "materialsFooter": "保管庫中的材料會自動取用。可在製作站學習更多配方。",
       "resultAria": "製作{name}",
       "craftedToast": "已製作:{name}",
       "craftedToastQty": "已製作:{name} x{qty}",
@@ -4510,6 +4535,9 @@ export const zh_TW: EnTranslations = {
       "commissionToggleHint": "將綁定給交易中第一個收到它的角色。",
       "commissionUnbound": "委託製品：將綁定給第一位收貨人",
       "commissionBound": "委託製品：已綁定給收貨人"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "商人會補充普通商品；玩家上架的物品會以其要價並列顯示。"
     },
     "itemMenu": {
       "use": "使用",
@@ -5134,6 +5162,33 @@ export const zh_TW: EnTranslations = {
       "toInstance": "副本地圖",
       "toggleAria": "在世界地圖、地區地圖與副本地圖之間切換",
       "levels": "等級 {min} 至 {max}"
+    },
+    "mapAtlas": {
+      "level": "等級 {level}",
+      "landmarkCount": "{count} 個地標",
+      "filtersAria": "地圖圖層",
+      "filters": {
+        "quests": "任務",
+        "gather": "採集",
+        "dungeons": "地城",
+        "services": "服務",
+        "players": "玩家"
+      },
+      "trackedQuests": "追蹤中的任務",
+      "noTrackedQuests": "沒有追蹤中的任務",
+      "availableNearby": "附近可接任務",
+      "noNearbyQuests": "附近沒有可接任務",
+      "distance": "{distance} 碼",
+      "showRoute": "顯示路線",
+      "untrack": "取消追蹤",
+      "track": "追蹤",
+      "legend": {
+        "dungeon": "地城",
+        "ore": "礦石",
+        "herb": "草藥",
+        "mail": "信箱",
+        "passage": "通道"
+      }
     },
     "arenaGate": {
       "minLevelNote": "需要等級 {level}"
@@ -6080,6 +6135,7 @@ export const zh_TW: EnTranslations = {
       "framesMoveBodyEditFrames": "你自己的框架、目標框架與隊伍框架全都可以移動。每個框架的角落都帶著一顆小小的移動按鈕：解除鎖定，把框架拖到你要的位置，再重新鎖上，這樣一次失手的點擊就無法把它挪走。「介面」選項中「頭像框」分頁最上方的「編輯框體」，則會一口氣鬆開其餘的整個介面，連同這三個框架一起：動作列、施法條、揮擊條、經驗條、小地圖、按鈕列、寵物框架、姿態列、增益與減益列，以及「願望清單提醒」小標籤，每一個在鬆開期間都掛著一枚名稱標籤。萬一它們跑到你會後悔的地方，同一個「頭像框」分頁底部的「恢復預設」會把它們全部彈回原本的位置。",
       "framesGovernedExtra": "「編輯框體」也會一併鬆開下方那疊追蹤面板(你追蹤中的任務與它們的目標、你的功績進度、你的聖物庫頁面、你所在的秘探、你正參與的任何裂隙，以及你正在追蹤的配方或委託)、寵物框架旁的寵物動作列、顯示你對附近敵人所施減益的「目標減益」框架、聖騎士的「虔誠」勳章、術士的「痛苦資源條」、法術觸發浮層、雙持武器時的副手揮擊條，以及附分頁的傷害統計視窗，每一個在鬆開期間都掛著一枚名稱標籤。",
       "framesGovernedAuraTracks": "「編輯框體」也會鬆開六條可選的光環軌道，前提是你已在同一「介面」選項的「戰鬥」分頁中開啟它們：「我的增益」軌道、「防禦性冷卻」軌道、「我的護盾」軌道、「攻擊性冷卻」軌道、「移動與潛行」軌道，以及「我給隊友的增益」軌道。所有軌道預設關閉，每一條在鬆開期間都掛著一枚名稱標籤。",
+      "framesGovernedTalkingHead": "「編輯框體」也會解鎖對話面板：當某個 NPC 不在你的視野內時，它承載該 NPC 說出的台詞；處於解鎖狀態時它會顯示自己的名稱標籤。",
       "barsTitle": "各種條、計時與戰鬥文字",
       "barsBody": "你的施法條會在你施法或引導時出現在畫面中央、動作列的正上方，上頭帶著法術的名稱與剩餘時間。你的目標在自己的框架上也有一條施法條，讓你看清接下來要來的是什麼，並做出回應。\n\n施法條下方還有一條細細的揮擊條，會在兩次武器揮擊之間逐漸填滿，讓近戰或遠程攻擊者看出下一次自動攻擊何時落下。\n\n你的經驗條橫貫動作列下方的整個寬度，切分成一段一段，其中較亮的一段顯示你已經存下的充分休息經驗。\n\n潛到水面下時，畫面上方會出現一條藍色的呼吸條。頭部沒入水中時它會逐漸消耗，耗盡並開始溺水時會閃成紅色，而你一浮出水面便會迅速回滿。空白鍵讓你往上游，下潛鍵（預設是 Ctrl）則帶你潛得更深。\n\n傷害與治療會化作小小的數字，從它們落下之處往上浮起，讓你不必讀文字也能看懂一場戰鬥。聊天框中的「戰鬥」分頁則保留完整的文字紀錄。",
       "aurasTitle": "增益與減益",

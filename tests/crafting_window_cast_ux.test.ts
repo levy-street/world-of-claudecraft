@@ -553,6 +553,35 @@ describe('renderCraftingWindow vault-draw suffix (Phase 04)', () => {
   });
 });
 
+// W20: the painter still stamps `.casting` on the row mid-cast, but the rule that
+// tinted the chip was deleted, so a casting row looked exactly like an
+// unaffordable one (both land on ui-btn--dis).
+describe('crafting: the casting row keeps a visible cue', () => {
+  const painter = readFileSync(
+    resolve(__dirname, '../src/ui/hud/professions/crafting_window.ts'),
+    'utf8',
+  );
+  const styles = readFileSync(resolve(__dirname, '../src/styles/components.css'), 'utf8');
+
+  it('still stamps the casting class on the row', () => {
+    expect(painter).toContain(
+      "`vendor-item crafting-recipe-btn${btnState === 'casting' ? ' casting' : ''}`",
+    );
+  });
+
+  it('paints the chip apart from a merely disabled one', () => {
+    const at = styles.indexOf('\n  .crafting-recipe-btn.casting .crafting-craft-chip {');
+    expect(at, 'components.css has no casting-chip rule').toBeGreaterThan(-1);
+    const body = styles.slice(at, styles.indexOf('}', at));
+    // ui-btn--dis dims the chip to opacity .5; the casting row lifts it back and
+    // adds the gold rim, so the two disabled states are not one look.
+    expect(body).toContain('opacity: 1;');
+    expect(body).toContain('box-shadow: inset 0 0 0 1px var(--gold);');
+    const library = readFileSync(resolve(__dirname, '../src/styles/library.css'), 'utf8');
+    expect(library).toMatch(/\.ui-btn--dis \{[^}]*opacity: 0\.5;/);
+  });
+});
+
 describe('crafting reagent entries never break mid-entry (the wiki twin rule, Phase 18)', () => {
   // One reagent entry (name plus its have/required count) is an inline-block
   // with nowrap, so a long name wraps the reagent LIST between entries rather

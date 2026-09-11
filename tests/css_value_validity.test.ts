@@ -54,9 +54,15 @@ describe('src/styles CSS value validity', () => {
     // extension filter fails here rather than covering less quietly. The names pin
     // that the 10 are the real modules and not 10 of something else.
     const names = SHEETS.map((s) => s.file);
-    expect(names.length).toBeGreaterThanOrEqual(10);
+    expect(names.length).toBeGreaterThanOrEqual(11);
     expect(names).toEqual(
-      expect.arrayContaining(['index.css', 'index.extra.css', 'play.extra.css', 'tokens.css']),
+      expect.arrayContaining([
+        'index.css',
+        'index.extra.css',
+        'play.extra.css',
+        'tokens.css',
+        'library.css',
+      ]),
     );
   });
 

@@ -1,0 +1,1308 @@
+/* library.css: the interface primitive library, @layer library (between layout
+   and components in the src/styles/index.css order). One reusable class family
+   per primitive the approved redesign boards compose: surfaces, window head,
+   buttons, keycap, badge, bars (flat, bevelled, cast ribbon, XP rail), sockets,
+   auras, portrait and medal, tabs, form controls, chips, dividers.
+
+   Contract (src/ui/library/CLAUDE.md, pinned by tests/ui_library.test.ts and
+   tests/css_raw_color_ratchet.test.ts): every value here is a token from
+   tokens.css or theme.ts; this sheet carries no literal color. New UI composes
+   these classes (or a documented variant of them) before writing bespoke chrome;
+   a component section in hud.css / components.css may set geometry (size, place,
+   margins) on a primitive but never re-declares its look: a later layer beats this
+   one on any property both declare, so a legacy rule that keeps a background or
+   border would silently defeat every state variant here. Adopting a primitive
+   means deleting those declarations from the legacy section. Sockets are
+   parametric: a species class sets --ui-socket-size, the recipe reads it. */
+@layer library {
+  /* ---------- ui library (shared primitives) ---------- */
+
+  /* Type helpers: Cinzel titles with the house tracking and shadow, tabular
+     numerals, and the outline shadow for text floating over the world. */
+  .ui-cin {
+    font-family: var(--font-display);
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+  }
+  .ui-num {
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-outline {
+    text-shadow: var(--outline-shadow);
+  }
+  /* A heading minted as a button must not fall back to the UA's black button
+     text: neither type helper carries a colour, so the button takes its host's,
+     the way the same heading written as a div already does. */
+  button.ui-cin,
+  button.ui-outline {
+    color: inherit;
+  }
+  .ui-h {
+    font-family: var(--font-display);
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--color-accent);
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .ui-meta {
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 500;
+  }
+  .ui-muted {
+    color: var(--color-text-muted);
+  }
+  .ui-faint {
+    color: var(--color-text-faint);
+  }
+  .ui-soft {
+    color: var(--color-text-secondary);
+  }
+
+  /* Surfaces: the three-layer gold edge (keyline, structural border, glint) on
+     the panel gradient at its three alphas, plus the double-ringed window. */
+  .ui-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    outline: 1px solid var(--color-keyline);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-panel);
+    color: var(--color-text-light);
+  }
+  .ui-panel-soft {
+    background: var(--panel-bg-soft);
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    outline: 1px solid color-mix(in srgb, var(--color-keyline) 70%, transparent);
+    border-radius: var(--radius-panel);
+    box-shadow:
+      0 2px 12px color-mix(in srgb, var(--color-keyline) 50%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-glint) 10%, transparent);
+    color: var(--color-text-light);
+  }
+  .ui-panel-strong {
+    background: var(--panel-bg-strong);
+    border: 1px solid var(--border);
+    outline: 1px solid var(--color-keyline);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-panel);
+    color: var(--color-text-light);
+  }
+  .ui-window {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    outline: 1px solid var(--color-keyline);
+    border-radius: var(--radius-window);
+    box-shadow: var(--shadow-window);
+    color: var(--color-text-light);
+    overflow: hidden;
+  }
+  .ui-win-head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 10px;
+    height: var(--win-head-h);
+    padding: 0 var(--spacing-sm) 0 var(--window-pad, 12px);
+    background: linear-gradient(180deg, var(--color-panel-hi), var(--panel-base));
+    border-bottom: 1px solid var(--color-border-showcase);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-glint) 14%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, var(--color-keyline) 60%, transparent);
+  }
+  .ui-win-title {
+    font-family: var(--font-display);
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--color-accent);
+    font-size: 16px;
+    line-height: 22px;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ui-win-sub {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-text-muted);
+    margin-left: var(--spacing-sm);
+  }
+  .ui-win-art {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--color-keyline) 65%, transparent));
+  }
+  .ui-win-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  .ui-x-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 24px;
+    color: var(--color-chrome-glyph);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-xs);
+    background: var(--color-chrome-ground);
+    font-size: 13px;
+    cursor: var(--cursor-point);
+  }
+  .ui-x-btn:hover {
+    color: var(--color-white);
+    border-color: var(--gold-dim);
+  }
+  .ui-x-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  /* Window shell: a window that owns a .ui-win-body stops scrolling itself and
+     becomes a column of head, optional tab strip, ONE scrolling body and an
+     optional pinned foot, so an action or confirm row (Apply, Reset, Submit)
+     stays reachable however long the body runs. The window still needs an inline
+     `display: flex` from its open path: a `.window` is shown by an inline
+     style.display no stylesheet rule can outrank (the .window-fill family in
+     components.css opts in the same way), so declaring display here would only
+     make every closed window visible. The gutter is one value, --window-pad:
+     the head's inline start, the body's padding and the foot's buttons all sit
+     on it. */
+  .ui-window:has(> .ui-win-body) {
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+  /* The head is chrome again, not a sticky strip inside a padded scrollport:
+     the shell already keeps it in view, so the negative margins that countered
+     the window padding and the sticky offset both go. It stays positioned, so a
+     head control a host rule places absolutely still resolves against the head. */
+  .ui-window:has(> .ui-win-body) > .ui-win-head {
+    position: relative;
+    top: auto;
+    margin: 0;
+    border-radius: 0;
+    padding: 0 var(--spacing-sm) 0 var(--window-pad, 12px);
+  }
+  .ui-win-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--window-pad, 12px);
+  }
+  .ui-win-foot {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--window-pad, 12px);
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .ui-well {
+    background: var(--color-bg-input);
+    border: 1px solid var(--color-keyline);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-well);
+  }
+  .ui-card {
+    background: color-mix(in srgb, var(--color-keyline) 28%, transparent);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-card);
+    color: var(--color-text);
+  }
+  /* A card minted as a button must not fall back to the UA's black button text. */
+  button.ui-card {
+    font: inherit;
+    text-align: inherit;
+  }
+  .ui-card-tile {
+    background: linear-gradient(160deg, var(--color-card-hi), var(--color-card-lo));
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-card);
+    color: var(--color-text-on-ink);
+  }
+  /* A card that IS the control answers the pointer with the same brightness
+     lift the vendor rows carry; a plain informational card does not. */
+  button.ui-card:hover:where(:not(:disabled)),
+  .ui-card[role="button"]:hover {
+    filter: brightness(1.06);
+  }
+  .ui-divider {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--gold) 35%, transparent),
+      transparent
+    );
+  }
+  .ui-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 30px;
+    padding: 0 14px 0 var(--spacing-sm);
+    background: color-mix(in srgb, var(--color-ink-deep) 80%, transparent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-keyline) 60%, transparent);
+    font-size: 13px;
+    color: var(--color-text-on-ink-soft);
+  }
+
+  /* Buttons. The standard button is a socket-filled Cinzel plate; the gold
+     variant is the one call-to-action a surface may carry; red is the primary
+     action; the selected state reads aria-pressed so a toggle needs no class. */
+  .ui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    height: var(--btn-h);
+    padding: 0 14px;
+    border: 2px solid var(--color-control-border);
+    border-radius: var(--radius-card);
+    background: var(--socket-fill);
+    color: var(--color-text-light);
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 9%, transparent),
+      var(--shadow-lift);
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+    transition: transform var(--dur-press);
+  }
+  /* :where() keeps the disabled guard at zero specificity, so the state rules
+     below still win the ties they won before. */
+  .ui-btn:hover:where(:not(:disabled)) {
+    border-color: var(--gold-dim);
+    filter: brightness(1.12);
+  }
+  .ui-btn:active {
+    transform: translateY(1px);
+  }
+  .ui-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .ui-btn--lg {
+    height: var(--btn-h-lg);
+    padding: 0 18px;
+    font-size: 13px;
+  }
+  .ui-btn--gold {
+    background: var(--btn-fill-gold);
+    border-color: var(--gold-dim);
+    color: var(--color-text-on-gold-btn);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-glint) 28%, transparent),
+      0 0 calc(10px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 28%, transparent),
+      var(--shadow-lift);
+  }
+  .ui-btn--red {
+    background: var(--btn-fill-red);
+    border-color: var(--color-btn-red-border);
+    color: var(--color-text-on-red);
+  }
+  .ui-btn--on,
+  .ui-btn[aria-pressed="true"] {
+    background: var(--btn-fill-selected);
+    border-color: var(--gold-dim);
+    color: var(--color-text-on-medal);
+  }
+  .ui-btn:disabled,
+  .ui-btn--dis {
+    opacity: 0.5;
+    cursor: default;
+    filter: none;
+    transform: none;
+  }
+  /* The options plate toggle: a short red button that reads On / Off. */
+  .ui-btn--plate {
+    height: 26px;
+    min-width: 96px;
+    padding: 0 14px;
+    font-size: 11px;
+  }
+  .ui-btn--plate.is-off,
+  .ui-btn--plate[aria-pressed="false"] {
+    filter: grayscale(0.6) brightness(0.8);
+  }
+  .ui-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-btn-w);
+    height: var(--icon-btn-h);
+    border: 2px solid var(--color-control-border);
+    border-radius: var(--radius-card);
+    background: var(--socket-fill);
+    color: var(--color-text-muted);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 9%, transparent),
+      var(--shadow-lift);
+    cursor: var(--cursor-point);
+  }
+  .ui-icon-btn > img,
+  .ui-icon-btn > .ui-icon-art {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--color-keyline) 65%, transparent));
+  }
+  .ui-icon-btn--micro {
+    width: var(--micro-btn-w);
+    height: var(--micro-btn-h);
+  }
+  .ui-icon-btn:hover:where(:not(:disabled)) {
+    border-color: var(--gold-dim);
+    color: var(--color-text-light);
+  }
+  .ui-icon-btn.is-on,
+  .ui-icon-btn[aria-pressed="true"] {
+    border-color: var(--gold);
+    box-shadow:
+      var(--glow-gold-soft),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 9%, transparent);
+  }
+  .ui-icon-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .ui-disc {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--disc-size);
+    height: var(--disc-size);
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: radial-gradient(circle at 50% 30%, var(--color-socket-hi), var(--panel-base));
+    color: var(--color-text-muted);
+    box-shadow:
+      0 1px 3px color-mix(in srgb, var(--color-keyline) 65%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 8%, transparent);
+    cursor: var(--cursor-point);
+  }
+  .ui-disc:hover:where(:not(:disabled)) {
+    color: var(--color-accent);
+    border-color: var(--gold-dim);
+  }
+  .ui-disc:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  /* Keycaps and badges: one keycap wherever a binding is shown, one badge for
+     every notification count. */
+  .ui-keycap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--keycap-min-w);
+    height: var(--keycap-h);
+    padding: 0 var(--spacing-xs);
+    border: 1px solid var(--color-socket-rim);
+    border-radius: var(--radius-xs);
+    background: var(--color-ink);
+    color: var(--color-text-on-ink-soft);
+    font-family: var(--font-ui);
+    font-size: 10px;
+    line-height: 12px;
+    font-weight: 700;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-white) 8%, transparent);
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-keycap--round {
+    width: 20px;
+    height: 20px;
+    min-width: 0;
+    padding: 0;
+    border-radius: 50%;
+    border-color: var(--gold-dim);
+    background: var(--socket-fill);
+    color: var(--color-accent);
+    font-size: 11px;
+  }
+  .ui-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--badge-size);
+    height: var(--badge-size);
+    padding: 0 var(--spacing-xs);
+    border-radius: calc(var(--badge-size) / 2);
+    background: var(--color-danger);
+    border: 1px solid var(--color-glint);
+    color: var(--color-white);
+    font-size: 10px;
+    line-height: 12px;
+    font-weight: 700;
+    box-shadow: 0 1px 2px var(--color-keyline);
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-badge--corner {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+  }
+
+  /* Bars. .ui-bar is the flat track (party rows, nameplates, window meters);
+     .ui-bevel is the notched, segmented unit-frame bar whose fill color comes
+     from --bar-color; .ui-cast is the double-pointed cast ribbon; .ui-rail is
+     the bronze XP rail exactly the width of the twelve-socket action row. */
+  .ui-bar {
+    position: relative;
+    height: var(--bar-h);
+    background: var(--color-bar-track);
+    border: 1px solid var(--color-keyline);
+    border-radius: var(--radius-2xs);
+    overflow: hidden;
+  }
+  .ui-bar-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background-color: var(--bar-color, var(--color-hp));
+    background-image: var(--bar-gloss);
+  }
+  .ui-bar-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    line-height: var(--bar-h);
+    font-weight: 700;
+    color: var(--color-white);
+    text-shadow: 1px 1px 1px var(--color-keyline);
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-bar--hp {
+    --bar-color: var(--color-hp);
+  }
+  .ui-bar--mana {
+    --bar-color: var(--color-mana);
+  }
+  .ui-bar--rage {
+    --bar-color: var(--color-rage);
+  }
+  .ui-bar--energy {
+    --bar-color: var(--color-energy);
+  }
+  .ui-bar--focus {
+    --bar-color: var(--color-focus);
+  }
+  .ui-bevel {
+    position: relative;
+    height: var(--bar-h-hp);
+    clip-path: polygon(0 0, 100% 0, calc(100% - var(--bar-notch)) 50%, 100% 100%, 0 100%);
+    background: var(--bar-well-fill);
+    box-shadow: inset 0 1px 2px color-mix(in srgb, var(--color-keyline) 90%, transparent);
+  }
+  .ui-bevel--mirror {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--bar-notch) 50%);
+  }
+  .ui-bevel--res {
+    height: var(--bar-h-res);
+  }
+  .ui-bevel--res.is-empty {
+    height: var(--bar-h-res-empty);
+  }
+  .ui-bevel-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bar-color, var(--color-hp)) 65%, var(--color-white)) 0%,
+      var(--bar-color, var(--color-hp)) 45%,
+      color-mix(in srgb, var(--bar-color, var(--color-hp)) 65%, var(--color-keyline)) 100%
+    );
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-white) 40%, transparent);
+  }
+  .ui-bevel--mirror .ui-bevel-fill {
+    inset: 0 0 0 auto;
+  }
+  .ui-bevel-ticks {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    pointer-events: none;
+  }
+  .ui-bevel-ticks > span {
+    flex: 1;
+    border-right: 1px solid color-mix(in srgb, var(--color-keyline) 50%, transparent);
+  }
+  .ui-bevel-ticks > span:last-child {
+    border-right: none;
+  }
+  .ui-bevel-edge {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-keyline) 90%, transparent),
+      inset 0 0 0 2px color-mix(in srgb, var(--color-glint) 12%, transparent);
+  }
+  .ui-bevel-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-white);
+    text-shadow:
+      1px 1px 1px var(--color-keyline),
+      0 0 3px var(--color-keyline);
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-ribbon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 10px 0 30px;
+    clip-path: polygon(0 0, 100% 0, calc(100% - var(--bar-notch)) 50%, 100% 100%, 0 100%);
+    background: var(--ribbon-bg);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-glint) 18%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, var(--gold-dim) 35%, transparent);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: var(--color-accent);
+    text-shadow: var(--title-shadow);
+    white-space: nowrap;
+  }
+  .ui-ribbon--mirror {
+    padding: 0 30px 0 10px;
+    justify-content: flex-end;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--bar-notch) 50%);
+  }
+  .ui-ribbon--hostile {
+    color: var(--color-hostile);
+  }
+  .ui-ribbon--friendly {
+    color: var(--color-friendly);
+  }
+  .ui-ribbon-tag {
+    margin-left: 6px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    opacity: 0.9;
+  }
+  .ui-cast {
+    position: relative;
+    width: var(--castbar-w);
+    height: var(--castbar-h);
+    clip-path: polygon(
+      var(--castbar-point) 0,
+      calc(100% - var(--castbar-point)) 0,
+      100% 50%,
+      calc(100% - var(--castbar-point)) 100%,
+      var(--castbar-point) 100%,
+      0 50%
+    );
+    background: var(--color-cast-track);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .ui-cast-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--castbar-fill);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-white) 35%, transparent);
+  }
+  .ui-cast--hostile .ui-cast-fill {
+    background: var(--castbar-fill-hostile);
+  }
+  .ui-cast--channel .ui-cast-fill {
+    background: var(--castbar-fill-channel);
+  }
+  .ui-cast--consume .ui-cast-fill {
+    background: var(--castbar-fill-consume);
+  }
+  .ui-cast-edge {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-keyline) 90%, transparent),
+      inset 0 0 0 2px color-mix(in srgb, var(--color-glint) 18%, transparent);
+  }
+  .ui-cast-icon {
+    position: absolute;
+    left: 10px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-xs);
+    overflow: hidden;
+    border: 1px solid var(--color-keyline);
+  }
+  .ui-cast-label {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 11px;
+    line-height: var(--castbar-h);
+    letter-spacing: 0.5px;
+    color: var(--color-white);
+    text-shadow: var(--title-shadow);
+  }
+  .ui-cast-timer {
+    position: absolute;
+    top: 0;
+    right: 14px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    line-height: var(--castbar-h);
+    color: var(--color-white);
+    text-shadow: var(--title-shadow);
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-rail {
+    position: relative;
+    width: var(--action-rail-w);
+    height: var(--xp-rail-h);
+    background: color-mix(in srgb, var(--color-bg-input) 80%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--gold-dim) 55%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-dim) 55%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-keyline) 70%, transparent);
+  }
+  .ui-rail-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--xp-fill);
+    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-xp) 45%, transparent);
+  }
+  .ui-rail-rested {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: var(--xp-rested-fill);
+    opacity: 0.5;
+  }
+  .ui-rail-ticks {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    pointer-events: none;
+  }
+  .ui-rail-ticks > span,
+  .ui-rail-ticks > i {
+    flex: 1;
+    border-right: 1px solid color-mix(in srgb, var(--color-keyline) 40%, transparent);
+  }
+  /* Inside the rail, centred: the readout rides the bar itself rather than
+     hanging above it, so it never competes with the action row for the band
+     between them. The outline shadow keeps it legible over both the fill and
+     the empty well. */
+  .ui-rail-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    line-height: 1;
+    color: var(--color-text-light);
+    text-shadow: var(--outline-shadow);
+    font-variant-numeric: tabular-nums;
+  }
+  /* The detail form (current / total, plus rested) the rail swaps to on hover or
+     keyboard focus. Hiding the label and revealing only this pseudo keeps ONE
+     labelled element for assistive tech and costs no second painter write. */
+  .ui-rail-label::after {
+    content: attr(data-total);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+  }
+  .ui-rail:hover .ui-rail-label,
+  .ui-rail:focus-within .ui-rail-label {
+    visibility: hidden;
+  }
+  .ui-rail:hover .ui-rail-label::after,
+  .ui-rail:focus-within .ui-rail-label::after {
+    visibility: visible;
+  }
+
+  /* Sockets: the forged action cell. Species set --ui-socket-size; states are
+     is-* classes so a painter toggles one class per state. The action bar's
+     pinned painter classes (empty, used, proc, oor, unusable) are accepted as
+     aliases so the bar adopts the family without renaming its contract. */
+  .ui-socket {
+    --ui-socket-size: var(--socket-size);
+    position: relative;
+    width: var(--ui-socket-size);
+    height: var(--ui-socket-size);
+    border: 2px solid var(--color-socket-rim);
+    border-radius: var(--radius-socket);
+    background: var(--socket-fill);
+    box-shadow: var(--shadow-socket);
+    color: var(--color-white);
+  }
+  .ui-socket--bag {
+    --ui-socket-size: var(--socket-size-bag);
+  }
+  .ui-socket--bank {
+    --ui-socket-size: var(--socket-size-bank);
+  }
+  .ui-socket--stance {
+    --ui-socket-size: var(--socket-size-stance);
+  }
+  /* The stance socket keeps its own coarse-pointer size token so a touch device
+     can grow the box (not a hit extension) independently of the desktop row. */
+  @media (pointer: coarse) {
+    .ui-socket--stance {
+      --ui-socket-size: var(--socket-size-stance-coarse);
+    }
+  }
+  .ui-socket--stance > img,
+  .ui-socket--stance > .ui-socket-art {
+    border-radius: calc(var(--radius-cell) - 2px);
+    inset: var(--spacing-2xs);
+    width: calc(100% - 2 * var(--spacing-2xs));
+    height: calc(100% - 2 * var(--spacing-2xs));
+  }
+  .ui-socket > img,
+  .ui-socket > .ui-socket-art {
+    position: absolute;
+    inset: var(--socket-art-inset);
+    width: calc(100% - 2 * var(--socket-art-inset));
+    height: calc(100% - 2 * var(--socket-art-inset));
+    border-radius: calc(var(--radius-socket) - 2px);
+    object-fit: cover;
+    background-size: cover;
+  }
+  .ui-socket.is-empty,
+  .ui-socket.empty {
+    background: var(--socket-fill-empty);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-keyline) 60%, transparent),
+      inset 0 0 12px color-mix(in srgb, var(--color-keyline) 70%, transparent);
+  }
+  .ui-socket.is-used,
+  .ui-socket.used,
+  .ui-socket.is-on {
+    border-color: var(--gold-dim);
+    box-shadow:
+      0 0 0 1px var(--color-keyline),
+      var(--glow-gold),
+      inset 0 0 0 1px color-mix(in srgb, var(--gold) 50%, transparent);
+  }
+  .ui-socket.is-proc,
+  .ui-socket.proc {
+    border-color: var(--color-proc-rim);
+    box-shadow:
+      0 0 0 1px var(--color-keyline),
+      0 0 calc(14px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-proc-glow) 90%, transparent),
+      inset 0 0 calc(6px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-proc-glow) 40%, transparent);
+  }
+  .ui-socket.is-oor > img,
+  .ui-socket.is-oor > .ui-socket-art,
+  .ui-socket.oor > img,
+  .ui-socket.oor > .ui-socket-art {
+    filter: brightness(0.5) saturate(0.35);
+  }
+  .ui-socket.is-unusable > img,
+  .ui-socket.is-unusable > .ui-socket-art,
+  .ui-socket.unusable > img,
+  .ui-socket.unusable > .ui-socket-art {
+    filter: grayscale(1) brightness(0.45);
+  }
+  .ui-socket:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .ui-socket-key {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    z-index: 2;
+    min-width: 15px;
+    height: 14px;
+    padding: 0 3px;
+    border-radius: var(--radius-sm) 0 var(--radius-sm) 0;
+    background: color-mix(in srgb, var(--color-ink-deep) 85%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-glint) 18%, transparent);
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 12px;
+    color: var(--color-text-on-ink-soft);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-socket-count {
+    position: absolute;
+    right: 3px;
+    bottom: 1px;
+    z-index: 2;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-white);
+    text-shadow: var(--title-shadow);
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-socket-cd {
+    position: absolute;
+    inset: var(--socket-art-inset);
+    border-radius: calc(var(--radius-socket) - 2px);
+    background: conic-gradient(
+      transparent 0 calc(100% - var(--cd-fill, 0%)),
+      color-mix(in srgb, var(--color-keyline) 85%, transparent) calc(100% - var(--cd-fill, 0%))
+    );
+    pointer-events: none;
+  }
+  .ui-socket-cd-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 17px;
+    color: var(--color-accent);
+    text-shadow:
+      0 0 4px var(--color-keyline),
+      1px 1px 1px var(--color-keyline);
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+  }
+
+  /* Auras: the 28px chip with a corner stack badge and a timer line below; the
+     player's own debuffs on the target wear the 30px gold-rimmed variant. */
+  .ui-aura {
+    position: relative;
+    width: var(--aura-size);
+    height: var(--aura-size);
+    border: 1px solid var(--color-socket-rim);
+    border-radius: var(--radius-sm);
+    background: var(--color-ink);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--color-keyline) 60%, transparent);
+  }
+  .ui-aura--own {
+    width: var(--aura-size-own);
+    height: var(--aura-size-own);
+    border-color: var(--gold-dim);
+  }
+  .ui-aura > img,
+  .ui-aura > .ui-aura-art {
+    position: absolute;
+    inset: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    border-radius: var(--radius-xs);
+    object-fit: cover;
+    background-size: cover;
+  }
+  .ui-aura > .ui-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 14px;
+    height: 14px;
+    padding: 0 3px;
+    font-size: 9px;
+  }
+  .ui-aura-time {
+    font-size: 10px;
+    line-height: 12px;
+    color: var(--color-text-secondary);
+    text-align: center;
+    font-weight: 700;
+    margin-top: var(--spacing-2xs);
+    text-shadow: 1px 1px 1px var(--color-keyline);
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-aura--debuff + .ui-aura-time,
+  .ui-aura-time--debuff {
+    color: var(--color-hostile);
+  }
+
+  /* Portrait disc, level medal and combat badge (the unit-frame trio). */
+  .ui-portrait-wrap {
+    position: relative;
+    width: var(--portrait-size);
+    height: var(--portrait-size);
+    flex-shrink: 0;
+  }
+  .ui-portrait {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    outline: 1px solid var(--color-keyline);
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-portrait-hi),
+      var(--color-portrait-lo)
+    );
+    box-shadow:
+      0 3px 10px color-mix(in srgb, var(--color-keyline) 80%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 35%, transparent),
+      inset 0 0 14px color-mix(in srgb, var(--color-keyline) 70%, transparent);
+    overflow: hidden;
+  }
+  .ui-portrait--hostile {
+    border-color: var(--color-hostile-rim);
+  }
+  .ui-portrait > img,
+  .ui-portrait > canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .ui-medal {
+    position: absolute;
+    left: -4px;
+    bottom: -4px;
+    z-index: 5;
+    width: var(--level-chip-size);
+    height: var(--level-chip-size);
+    border-radius: 50%;
+    background: var(--medal-fill);
+    border: 2px solid var(--gold-dim);
+    color: var(--color-text-on-medal);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 1px var(--color-keyline);
+    box-shadow: 0 0 0 1px var(--color-keyline);
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-medal--right {
+    left: auto;
+    right: -4px;
+  }
+  .ui-medal--stud {
+    width: 14px;
+    height: 14px;
+    border-width: 1px;
+    border-radius: 0;
+    transform: rotate(45deg);
+    box-shadow:
+      0 0 0 1px var(--color-keyline),
+      0 0 6px color-mix(in srgb, var(--gold) 40%, transparent);
+  }
+  .ui-combat-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    z-index: 5;
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--color-hostile);
+    border-radius: var(--radius-card);
+    background: var(--color-combat-badge-ground);
+    box-shadow: var(--art-shadow-sm);
+  }
+  .ui-combat-badge--left {
+    right: auto;
+    left: -6px;
+  }
+
+  /* Tabs: the raised strip that merges with the panel below it. Selection reads
+     aria-selected (the tab_strip_painter contract); .is-on is the static twin. */
+  .ui-tabs {
+    display: flex;
+    gap: var(--spacing-2xs);
+    align-items: flex-end;
+  }
+  .ui-tab {
+    display: inline-flex;
+    align-items: center;
+    height: var(--tab-h);
+    padding: 0 12px;
+    color: var(--color-text-muted);
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    border: 1px solid var(--color-tab-off-border);
+    border-bottom: none;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    background: linear-gradient(var(--color-tab-off-hi), var(--color-tab-off-lo));
+    cursor: var(--cursor-point);
+  }
+  .ui-tab:hover:where(:not(:disabled)) {
+    color: var(--color-text-light);
+  }
+  .ui-tab[aria-selected="true"],
+  .ui-tab.is-on {
+    color: var(--color-text-on-tab-on);
+    background: linear-gradient(var(--color-tab-on-hi), var(--color-tab-on-lo));
+    border-color: var(--border);
+  }
+  .ui-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  .ui-tab > .ui-badge {
+    margin-left: 5px;
+    min-width: 14px;
+    height: 14px;
+    font-size: 9px;
+  }
+  .ui-tab--add {
+    padding: 0 var(--spacing-sm);
+    border: none;
+    background: none;
+    font-size: 15px;
+    color: var(--color-text-muted);
+  }
+  /* The segmented plate strip (character sidebar, options views): equal plates
+     side by side rather than raised tabs. */
+  .ui-seg {
+    display: flex;
+    gap: var(--spacing-xs);
+  }
+  .ui-seg-tab {
+    flex: 1 1 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px var(--spacing-xs);
+    color: var(--color-text-muted);
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    border: 1px solid var(--color-tab-off-border);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(var(--color-tab-off-hi), var(--color-tab-off-lo));
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-white) 6%, transparent);
+    cursor: var(--cursor-point);
+  }
+  .ui-seg-tab[aria-selected="true"],
+  .ui-seg-tab.is-on {
+    color: var(--color-text-on-tab-on);
+    background: linear-gradient(var(--color-tab-on-hi), var(--color-tab-on-lo));
+    border-color: var(--border);
+  }
+  .ui-seg-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  /* Form controls: the sunken input, the gold-check box, the switch toggle and
+     the thin gold range. Native inputs keep base.css; these dress custom ones. */
+  .ui-input {
+    display: flex;
+    align-items: center;
+    height: var(--input-h);
+    padding: 0 10px;
+    background: var(--color-bg-input);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-on-ink);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    box-shadow: inset 0 1px 4px color-mix(in srgb, var(--color-keyline) 60%, transparent);
+  }
+  .ui-input::placeholder {
+    color: var(--color-text-muted);
+  }
+  .ui-input:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .ui-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    background: var(--color-bg-input);
+    color: var(--color-accent);
+    cursor: var(--cursor-point);
+  }
+  .ui-check:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .ui-toggle {
+    position: relative;
+    display: inline-block;
+    width: var(--toggle-w);
+    height: var(--toggle-h);
+    border-radius: calc(var(--toggle-h) / 2);
+    background: var(--color-bg-input);
+    border: 1px solid var(--color-control-border);
+    box-shadow: inset 0 1px 3px color-mix(in srgb, var(--color-keyline) 70%, transparent);
+    cursor: var(--cursor-point);
+  }
+  .ui-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, var(--color-glint), var(--gold-dim));
+    box-shadow: 0 1px 2px var(--color-keyline);
+    transition: left var(--dur-fast) var(--transition-ease);
+  }
+  .ui-toggle[aria-checked="true"],
+  .ui-toggle.is-on {
+    background: var(--color-medal-hi);
+    border-color: var(--gold-dim);
+  }
+  .ui-toggle[aria-checked="true"] > .ui-toggle-thumb,
+  .ui-toggle.is-on > .ui-toggle-thumb {
+    left: calc(100% - 19px);
+  }
+  .ui-toggle:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .ui-range {
+    position: relative;
+    height: var(--range-h);
+    background: var(--color-bg-input);
+    border-radius: var(--radius-2xs);
+    border: 1px solid var(--color-keyline);
+  }
+  .ui-range-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--gold);
+    border-radius: var(--radius-2xs);
+  }
+  .ui-range-thumb {
+    position: absolute;
+    top: 50%;
+    width: var(--range-thumb);
+    height: var(--range-thumb);
+    margin: calc(-1 * var(--range-thumb) / 2) 0 0 calc(-1 * var(--range-thumb) / 2);
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, var(--color-glint), var(--color-gold-700));
+    border: 1px solid var(--color-keyline);
+    box-shadow:
+      0 0 0 2px var(--panel-base),
+      0 0 0 3px var(--border);
+  }
+  .ui-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--stat-row-h);
+    font-size: 13px;
+    line-height: 17px;
+  }
+  .ui-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    height: 22px;
+    padding: 0 var(--spacing-sm);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border-showcase);
+    background: color-mix(in srgb, var(--color-keyline) 40%, transparent);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .ui-chip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .ui-chip.is-on,
+  .ui-chip[aria-pressed="true"] {
+    border-color: var(--gold-dim);
+    color: var(--color-text-on-medal);
+    background: var(--btn-fill-selected);
+  }
+  /* Same rule as the cards: only an actionable chip lifts on hover. */
+  button.ui-chip:hover:where(:not(:disabled)),
+  .ui-chip[role="button"]:hover {
+    filter: brightness(1.06);
+  }
+  .ui-money {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .ui-money-coin {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    font-weight: 700;
+  }
+  .ui-money-coin > img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--color-keyline) 65%, transparent));
+  }
+
+  /* Motion and forced-colors: the toggle thumb and the button press offset are
+     the only transitions here and both drop under reduced motion (the pressed
+     state still lands, it just lands instantly); edges survive a forced palette
+     as real borders. */
+  @media (prefers-reduced-motion: reduce) {
+    .ui-toggle-thumb,
+    .ui-btn {
+      transition: none;
+    }
+  }
+  body.reduce-motion .ui-toggle-thumb,
+  body.reduce-motion .ui-btn {
+    transition: none;
+  }
+  @media (forced-colors: active) {
+    .ui-panel,
+    .ui-panel-soft,
+    .ui-panel-strong,
+    .ui-window,
+    .ui-socket,
+    .ui-aura,
+    .ui-btn,
+    .ui-icon-btn,
+    .ui-disc,
+    .ui-tab,
+    .ui-seg-tab,
+    .ui-input,
+    .ui-check,
+    .ui-toggle {
+      border: 1px solid CanvasText;
+      box-shadow: none;
+    }
+    .ui-bar-fill,
+    .ui-bevel-fill,
+    .ui-cast-fill,
+    .ui-rail-fill,
+    .ui-range-fill {
+      background: Highlight;
+    }
+  }
+}

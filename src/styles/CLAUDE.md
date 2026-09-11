@@ -18,6 +18,7 @@ that order. Modules, in cascade order:
 | `tokens` | `tokens.css` | `:root` design tokens + `--color-*` / `--fx-*` defaults |
 | `base` | `base.css` | element + reset + base-tier glyph styling + the a11y skip/forced-colors/print sections |
 | `layout` | `layout.css` | the generic `.window` centering/shell |
+| `library` | `library.css` | the interface primitive library (`ui-*` families: surfaces, window head, buttons, keycap, badge, bars, sockets, auras, portrait, tabs, form controls, chips); token-only, contract in `src/ui/library/CLAUDE.md` |
 | `components` | `hud.css`, `components.css` | in-world HUD chrome; feature-window bodies (BOTH target `@layer components`; `components.css` is imported last so its window bodies win same-layer ties) |
 | `hud` | (reserved, empty) | declared in the order but unused; `hud.css` targets `@layer components`, not this slot |
 | `shell` | `shell.css` | desktop pre-game shell + char-select |
@@ -48,6 +49,19 @@ re-make the decision at those reads (the reasoning is written there) rather than
 the throw (#2499, #2502).
 
 ## Where new CSS lands (the seam) + the mobile-coverage invariant
+- **Compose the library first.** Every new surface, window, frame, bar, button, chip or
+  control starts from a `ui-*` primitive in `library.css` (`src/ui/library/CLAUDE.md` names
+  them all and is pinned to the sheet by `tests/ui_library.test.ts`). A component section
+  sets geometry on a primitive; it never re-declares the primitive's look, because a later
+  layer beats `library` on any property both declare and would silently defeat the state
+  variants. Adopting a primitive on a shipped surface means deleting those declarations
+  from its legacy section in the same change.
+- **No raw color in component CSS.** Colors have one home: `tokens.css` (static values,
+  sizes, radii, durations, composites) and `src/ui/theme.ts` (preset-aware derivations).
+  `tests/css_raw_color_ratchet.test.ts` pins a literal ceiling per sheet that may only come
+  down, `library.css` at zero, and every tokenized section (by ten-dash banner) at zero.
+  Never rename, merge or delete an existing ten-dash banner (the corpus manifest pins them);
+  a new banner is a manifest edit in the same change.
 - **New feature-window body rules:** a new ten-dash banner section in `components.css`
   (inside `@layer components`); in-world HUD chrome in `hud.css`; pre-game shell in
   `shell.css`; mobile-touch overrides in `hud.mobile.css`. Never grow the `.extra` files
@@ -141,11 +155,13 @@ the throw (#2499, #2502).
   JS is i18n-data-dominated; lazy-loading the two heaviest cold windows saved ~1.5% gzip
   with zero FPS impact). There is NO bundle-budget gate and NO lazy-loaded window; do not
   re-attempt without new evidence.
-- **Interface overhaul (LANDED then REVERTED):** the PR #1736 window-frame grammar
-  (`window_frame.ts`, `.window-frame` chrome, the `--z-*` / drawer / sheet / tooltip /
+- **Interface overhaul, first attempt (LANDED then REVERTED):** the PR #1736 window-frame
+  grammar (`window_frame.ts`, `.window-frame` chrome, the `--z-*` / drawer / sheet / tooltip /
   `--color-scrim` token groups) was reverted in PR #1788; `src/styles` history is dense with
-  frame-grammar commits whose code no longer exists. Do not re-land pieces of it piecemeal;
-  a coordinated re-land is staged separately, ask the maintainer.
+  frame-grammar commits whose code no longer exists. The coordinated re-land is the
+  maintainer-approved interface redesign that introduced `library.css` and the library
+  tokens (the approved boards are the reference, `DESIGN.md`); do not resurrect the #1736
+  pieces themselves.
 
 ## Pointers
 Root `CLAUDE.md` (repo-wide invariants incl gameplay-neutral graphics) ·

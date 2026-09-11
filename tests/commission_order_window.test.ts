@@ -5,7 +5,7 @@
 // action button fires the matching deps callback with the row's order id.
 
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { buildCommissionOrderBoardModel } from '../src/ui/hud/professions/commission_order_view';
@@ -141,6 +141,52 @@ describe('renderCommissionOrderWindow', () => {
     renderCommissionOrderWindow(el, buildCommissionOrderBoardModel([], [], ITEMS), d);
     (el.querySelector('[data-close]') as HTMLButtonElement).click();
     expect(d.onClose).toHaveBeenCalledOnce();
+  });
+});
+
+// W20: the recipe picker moved from the shared .hud-select class onto .ui-input,
+// which carries no <select> chrome, so the control lost appearance: none, the
+// gold caret, the dark option list, the forced-colors fallback and the 40px
+// coarse-pointer floor and rendered as raw OS chrome inside the HUD.
+describe('commission board: the recipe picker keeps its select chrome', () => {
+  const components = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+  const ruleBody = (selector: string, from = 0): string => {
+    const at = components.indexOf(`${selector} {`, from);
+    expect(at, `components.css has no rule for ${selector}`).toBeGreaterThan(-1);
+    const open = components.indexOf('{', at);
+    return components.slice(open + 1, components.indexOf('}', open));
+  };
+
+  it('is still a native <select> on the library input', () => {
+    const el = document.createElement('div');
+    const model = buildCommissionOrderBoardModel(
+      [],
+      [{ id: SWORD_RECIPE, resultItemId: SWORD }],
+      ITEMS,
+    );
+    renderCommissionOrderWindow(el, model, deps());
+    const select = el.querySelector('#cob-recipe');
+    expect(select?.tagName).toBe('SELECT');
+    expect(select?.classList.contains('ui-input')).toBe(true);
+  });
+
+  it('suppresses the OS chrome and draws the token caret', () => {
+    const base = ruleBody('\n  #cob-recipe');
+    expect(base).toContain('appearance: none;');
+    expect(base).toContain('-webkit-appearance: none;');
+    expect(base).toContain('linear-gradient(45deg, transparent 50%, var(--gold) 50%)');
+    expect(ruleBody('\n  #cob-recipe option')).toContain('background: var(--color-bg-dark);');
+  });
+
+  it('keeps the coarse-pointer floor and the forced-colors fallback', () => {
+    const coarse = components.indexOf('@media (pointer: coarse) {\n    #cob-recipe {');
+    expect(coarse, 'no coarse-pointer floor').toBeGreaterThan(-1);
+    expect(ruleBody('\n    #cob-recipe', coarse)).toContain('min-height: 40px;');
+    const forced = components.indexOf('@media (forced-colors: active) {\n    #cob-recipe {');
+    expect(forced, 'no forced-colors fallback').toBeGreaterThan(-1);
+    const body = ruleBody('\n    #cob-recipe', forced);
+    expect(body).toContain('appearance: auto;');
+    expect(body).toContain('background-image: none;');
   });
 });
 

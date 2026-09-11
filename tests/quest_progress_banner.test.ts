@@ -65,7 +65,7 @@ describe('QuestProgressBanner', () => {
       'Forest Wolf slain: 1/8',
       'Forest Wolf slain: 2/8',
     ]);
-    expect(host.children[0].className).toBe('quest-banner-line');
+    expect(host.children[0].className).toBe('quest-banner-line ui-cin');
   });
 
   it('drops the OLDEST line when the stack overflows maxLines', () => {

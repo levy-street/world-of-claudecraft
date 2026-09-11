@@ -74,7 +74,7 @@ describe('per-entry CSS wiring + #rotate-device gate', () => {
     // a different cascade slot. A dotted name (e.g. "hud.mobile") would be a SUBLAYER of the
     // early "hud" layer and lose to shell, the exact trap fixed here.
     const ORDER =
-      '@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;';
+      '@layer tokens, base, layout, library, components, hud, shell, hud-mobile, index-extra, play-extra;';
     for (const [name, css] of [
       ['barrel', barrel],
       ['index.extra.css', indexExtra],

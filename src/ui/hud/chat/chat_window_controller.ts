@@ -1,6 +1,6 @@
 import { CTX_MENU_PICKER_CLASS } from '../../bag_item_action_menu';
 import { esc } from '../../esc';
-import { type TranslationKey, t } from '../../i18n';
+import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { blurIfPointerClick } from '../../pointer_blur';
 import { rovingTarget } from '../../roving_index';
 import { tryEncodeItemLink, tryEncodeQuestLink } from '../quest/quest_link';
@@ -88,6 +88,7 @@ export class ChatWindowController {
   // select it, and re-latched (never cleared) across a renderTabs() rebuild
   // so a tab moved by drag or reorder stays the keyboard focus target.
   private rovingChatTab: ChatTabId | null = null;
+  private readonly unreadTabs = new Map<ChatOpenTab, number>();
 
   constructor(private readonly deps: ChatWindowControllerDeps) {}
 
@@ -130,6 +131,10 @@ export class ChatWindowController {
   hideIfFiltered(element: HTMLElement, channel: string): void {
     const filter = this.filterTab();
     if (filter !== null && channel !== filter) element.classList.add('chat-hidden');
+    if (!isChatOpenTab(channel) || !this.chatTabs.includes(channel)) return;
+    if (channel === this.activeChatTab) return;
+    this.unreadTabs.set(channel, (this.unreadTabs.get(channel) ?? 0) + 1);
+    this.paintUnreadBadge(channel);
   }
 
   applyInputPresentation(): void {
@@ -253,10 +258,11 @@ export class ChatWindowController {
     const makeTab = (id: ChatTabId, label: string): HTMLButtonElement => {
       const button = this.deps.document.createElement('button');
       button.type = 'button';
-      button.className = 'chat-tab';
+      button.className = 'chat-tab ui-tab';
       button.dataset.tab = id;
       button.setAttribute('role', 'tab');
       button.textContent = label;
+      if (isChatOpenTab(id)) this.paintUnreadBadge(id, button);
       // Selecting a tab restyles in place (no strip rebuild), so a mouse click
       // would leave the tab focused and the next unshielded Space would natively
       // re-click it. Pointer-only blur; keyboard selection (a native Enter click,
@@ -324,7 +330,7 @@ export class ChatWindowController {
     }
     const add = this.deps.document.createElement('button');
     add.type = 'button';
-    add.className = 'chat-tab chat-tab-add';
+    add.className = 'chat-tab chat-tab-add ui-tab ui-tab--add';
     add.textContent = '+';
     add.setAttribute('aria-label', t('hud.core.chatChannels.add'));
     add.title = t('hud.core.chatChannels.add');
@@ -445,6 +451,10 @@ export class ChatWindowController {
 
   private selectTab(tab: ChatTabId, persist = true): void {
     this.activeChatTab = tab;
+    if (isChatOpenTab(tab)) {
+      this.unreadTabs.delete(tab);
+      this.paintUnreadBadge(tab);
+    }
     // Latch the roving tabindex to the tab that was just activated (click or
     // Enter/Space), matching APG and the rest of this HUD (daily rewards,
     // tab_strip_painter): the selected tab is always the roving stop, so a
@@ -478,6 +488,7 @@ export class ChatWindowController {
     const index = this.chatTabs.indexOf(channel);
     if (index < 0) return;
     this.chatTabs.splice(index, 1);
+    this.unreadTabs.delete(channel);
     if (this.activeChatTab === channel) this.activeChatTab = 'all';
     if (this.rovingChatTab === channel) this.rovingChatTab = null;
     this.renderTabs();
@@ -560,6 +571,23 @@ export class ChatWindowController {
   private presentInput(input: HTMLTextAreaElement | HTMLInputElement): void {
     input.placeholder = this.activePlaceholder();
     input.style.color = chatInputTint(this.inputTintTarget()) ?? '';
+  }
+
+  private paintUnreadBadge(tab: ChatOpenTab, target?: HTMLButtonElement): void {
+    const button =
+      target ??
+      Array.from(
+        this.requireElement('chatlog-tabs').querySelectorAll<HTMLButtonElement>('.chat-tab'),
+      ).find((candidate) => candidate.dataset.tab === tab);
+    if (!button) return;
+    button.querySelector<HTMLElement>('.ui-badge')?.remove();
+    const count = this.unreadTabs.get(tab) ?? 0;
+    if (count === 0) return;
+    const badge = this.deps.document.createElement('span');
+    badge.className = 'ui-badge';
+    badge.setAttribute('aria-hidden', 'true');
+    badge.textContent = formatNumber(count, { maximumFractionDigits: 0, useGrouping: false });
+    button.append(badge);
   }
 
   private insertLink(display: string, token: string): void {

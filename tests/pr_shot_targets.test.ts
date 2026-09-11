@@ -670,7 +670,7 @@ describe('classifyDiff', () => {
     expect(windowSrc).toContain('aria-disabled="true"');
     expect(script).toContain("getAttribute('aria-disabled') === 'true'");
     expect(script).toContain("getAttribute('aria-pressed') === 'true'");
-    expect(windowSrc).toContain('class="reliquary-page-row" data-page=');
+    expect(windowSrc).toContain('class="reliquary-page-row ui-card" data-page=');
     expect(script).toContain('.reliquary-page-row');
     // And the routing: both halves of the tracker pair reach the target.
     for (const path of [

@@ -55,12 +55,12 @@ export class DeedTrackerPainter {
     // button tab stop; update() keeps its disclosure/dialog a11y in sync with
     // the collapse and chip state, and the decorative glyphs stay aria-hidden.
     const lineHtml =
-      `<div class="dt-line" style="display:none"><span class="dt-name"></span>` +
-      `<span class="dt-bar" aria-hidden="true"><span class="dt-bar-fill"></span></span>` +
-      `<span class="dt-count"></span></div>`;
+      `<div class="dt-line" style="display:none"><span class="dt-name ui-cin"></span>` +
+      `<span class="dt-bar ui-bar" aria-hidden="true"><span class="dt-bar-fill ui-bar-fill"></span></span>` +
+      `<span class="dt-count ui-num"></span></div>`;
     this.root.innerHTML =
-      `<button type="button" class="dt-header" aria-controls="deed-watch-list">` +
-      `<span class="dt-chevron" aria-hidden="true"></span><span class="dt-label"></span><span class="dt-tally"></span></button>` +
+      `<button type="button" class="dt-header ui-cin" aria-controls="deed-watch-list">` +
+      `<span class="dt-chevron" aria-hidden="true"></span><span class="dt-label"></span><span class="dt-tally ui-num"></span></button>` +
       `<div class="dt-list" id="deed-watch-list">${lineHtml.repeat(DEED_WATCH_CAP)}</div>`;
     this.header = this.root.querySelector('.dt-header') as HTMLElement;
     this.chevron = this.root.querySelector('.dt-chevron') as HTMLElement;

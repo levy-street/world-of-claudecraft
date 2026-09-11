@@ -737,6 +737,11 @@ export const guideStrings = {
     // five non-Latin fills land in this same change.
     framesGovernedAuraTracks:
       'Edit Frames also loosens the six opt-in aura tracks once you have switched them on from the Combat tab of the same Interface options: the My Buffs track, the Defensive Cooldowns track, the My Shields track, the Offensive Cooldowns track, the Movement and Stealth track, and the My Buffs on Allies track. Every track is off by default, and each wears its own name chip while it is loose.',
+    // The Talking Head (src/ui/hud/talking_head/) joined HUD_FRAME_SPECS with the
+    // interface redesign: an NPC's line while the speaker is out of view. Own key
+    // for the same reason as the aura tracks. Wordy (M16): non-Latin fills ride along.
+    framesGovernedTalkingHead:
+      "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
 
     barsTitle: 'Bars, timers, and combat text',
     barsBody:

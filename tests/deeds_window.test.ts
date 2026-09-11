@@ -281,11 +281,11 @@ describe('hud wiring', () => {
     const plateIdx = hudCss.indexOf('#banner.banner-deed');
     expect(plateIdx).toBeGreaterThan(-1);
     const plate = hudCss.slice(plateIdx, hudCss.indexOf('}', plateIdx));
-    expect(plate).toMatch(/color:\s*var\(--color-deed-banner-text\)/);
-    expect(plate).toMatch(/border:[^;]*var\(--color-deed-banner-border\)/);
-    expect(plate).toMatch(/background:\s*var\(--color-deed-banner-bg\)/);
-    // The decorative lift sheds with the graphics tier like its neighbours.
-    expect(plate).toMatch(/box-shadow:[^;]*var\(--fx-shadow/);
+    // The redesign delegates the look declarations to ui-panel-strong while this
+    // host rule supplies the deed-specific primitive inputs.
+    expect(plate).toMatch(/--color-text-light:\s*var\(--color-deed-banner-text\)/);
+    expect(plate).toMatch(/--border:\s*var\(--color-deed-banner-border\)/);
+    expect(plate).toMatch(/--panel-bg-strong:\s*var\(--color-deed-banner-bg\)/);
     // Tokens carry real values, and the deed text colour is NOT the level-up
     // gold: aliasing it to --gold would keep every other pin green while
     // erasing the entire point of the variant.
@@ -307,6 +307,29 @@ describe('hud wiring', () => {
     // than the landscape block's plain `body.mobile-touch #banner`, so a
     // second copy inside the media query would be dead CSS.
     expect(hudMobile.match(/body\.mobile-touch #banner\.banner-deed/g)?.length).toBe(1);
+  });
+
+  // The lift used to be a bespoke --fx-shadow box-shadow on this rule, so it shed
+  // with the graphics tier. Adopting the shared panel recipe moved it to
+  // --shadow-panel, and NOTHING recorded either half of that swap. Both halves
+  // are pinned here, including the honest consequence: --shadow-panel carries no
+  // --fx-shadow term, so the deed plate's lift is tier-independent today. If the
+  // tier contract is wanted back, it belongs in the token, not in this rule.
+  it('draws the deed plate lift from the shared --shadow-panel token, which is tier-independent', () => {
+    const tokensCss = read('../src/styles/tokens.css');
+    const platedIdx = hudCss.indexOf('#banner.banner-deed,\n  #banner.banner-skill {');
+    expect(platedIdx, 'no shared plated rule for the deed and skill banners').toBeGreaterThan(-1);
+    const plated = hudCss.slice(platedIdx, hudCss.indexOf('}', platedIdx));
+    expect(plated).toContain('box-shadow: var(--shadow-panel);');
+    // No bespoke shadow survives on the rule: the token is the single source.
+    expect(plated).not.toMatch(/box-shadow:[^;]*--fx-shadow/);
+    const shadowPanel = tokensCss.match(/--shadow-panel:([\s\S]*?);\n/);
+    expect(shadowPanel, '--shadow-panel missing from tokens.css').toBeTruthy();
+    expect(shadowPanel?.[1]).toContain('--color-keyline');
+    expect(
+      shadowPanel?.[1].includes('--fx-shadow'),
+      '--shadow-panel gained an --fx-shadow term: update this pin and the comment above it',
+    ).toBe(false);
   });
 
   // The two source pins above prove hud.ts PASSES 'deed' and that showBanner
@@ -551,7 +574,9 @@ describe('hud wiring', () => {
     // The strip crest is a jump button: the accessible name rides the button
     // (aria-label + title from the deed name), and the crest img inside stays
     // alt="" so the deed is not announced twice.
-    expect(painter).toMatch(/deeds-recent-item" data-recent="\$\{esc\(r\.id\)\}"/);
+    // Re-pinned: the crest jump button now also carries the ui-chip primitive,
+    // so the class attribute no longer ends at the legacy class name.
+    expect(painter).toMatch(/deeds-recent-item ui-chip" data-recent="\$\{esc\(r\.id\)\}"/);
     expect(painter).toMatch(
       /aria-label="\$\{esc\(t\('hudChrome\.deeds\.recentJumpAria', \{ name: deedName\(r\.id\) \}\)\)\}"/,
     );
@@ -614,8 +639,8 @@ describe('entry HTMLs', () => {
     // the painter then skips the ring silently: an index-only edit would ship a
     // border that never appears for online players (the /play shared-entry trap).
     for (const html of [indexHtml, playHtml]) {
-      expect(html).toContain('class="portrait-wrap" id="pf-portrait-wrap"');
-      expect(html).toContain('class="portrait-wrap" id="tf-portrait-wrap"');
+      expect(html).toContain('class="portrait-wrap ui-portrait-wrap" id="pf-portrait-wrap"');
+      expect(html).toContain('class="portrait-wrap ui-portrait-wrap" id="tf-portrait-wrap"');
     }
   });
 
@@ -667,7 +692,7 @@ describe('tracker accessibility (quest-tracker contract)', () => {
 
   it('hides the decorative glyphs from assistive tech (dt-count text carries the numbers)', () => {
     expect(tracker).toMatch(/dt-chevron" aria-hidden="true"/);
-    expect(tracker).toMatch(/dt-bar" aria-hidden="true"/);
+    expect(tracker).toMatch(/dt-bar ui-bar" aria-hidden="true"/);
   });
 
   it('arms Enter/Space on #deed-tracker, stopped before the game binds hijack them', () => {
@@ -686,7 +711,7 @@ describe('tracker accessibility (quest-tracker contract)', () => {
 
   it('paints the gold focus ring on the focused header', () => {
     expect(hudCss).toMatch(
-      /#deed-tracker \.dt-header:focus-visible \{\s*outline: 2px solid var\(--gold\);\s*outline-offset: 2px;\s*border-radius: 2px;\s*\}/,
+      /#deed-tracker \.dt-header:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);\s*outline-offset: 2px;\s*\}/,
     );
   });
 });
@@ -1129,8 +1154,6 @@ describe('chrome keys and CSS floors', () => {
 });
 
 describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
-  const buttonEl = (): HTMLElement => document.createElement('button');
-
   it('adds the Book of Deeds window to the guard array, keeping the shared guard body', () => {
     // The Book is a non-modal overlay, so canUseGameKeys() stays true while a
     // Book button has focus: without the guard, Space jumps the character and

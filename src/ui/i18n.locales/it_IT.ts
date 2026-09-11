@@ -3975,7 +3975,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ogni {points} punti su un componente aumentano il suo livello di raccolta di un grado, fino a {steps} gradi; meno di {points} punti aumentano comunque la resa.',
   'hudChrome.townFocus.title': 'Priorità della città',
   'hudChrome.townFocus.townOnlyHint': 'Il focus puo essere modificato solo mentre sei in citta.',
-  'hudChrome.archetypeTitle.label': 'Titolo',
   'hudChrome.archetypeTitle.none': 'Nessuno',
   'entities.itemSets.crownforged.bonus4':
     'I colpi critici della tua arma scheggiano il bersaglio con Scheggiaossa, facendolo sanguinare per 8 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte.',
@@ -10520,7 +10519,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.herbalism': 'Richiede una falce da erbalismo di livello {tier}',
   'hudChrome.gathering.tierRequired.logging': "Richiede un'ascia da taglio di livello {tier}",
   'hudChrome.gathering.tierRequired.mining': 'Richiede un piccone da estrazione di livello {tier}',
-  'hudChrome.gathering.title': 'Raccolta',
   'hudChrome.gathering.toolTierUnmet.herbalism':
     "Hai bisogno di una falce da erbalismo di livello {tier} per raccogliere quest'aiuola.",
   'hudChrome.gathering.toolTierUnmet.logging':
@@ -10890,7 +10888,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willow_sprite.name': 'Folletto del Salice',
   'entities.mobs.wood_wraith.name': 'Spettro del Bosco',
   'entities.mobs.wreck_thief.name': 'Ladro dei Relitti',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Passatempo',
   'hudChrome.auraEffect.armorPct': "Riduce l'armatura del {pct}%",
   'hudChrome.auraEffect.armorPctStacks': "Riduce l'armatura del {pct}% ({stacks} accumuli)",
   'hudChrome.auraEffect.increasePct.allStats': 'Aumenta tutti gli attributi del {pct}%',

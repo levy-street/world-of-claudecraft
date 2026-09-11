@@ -62,7 +62,7 @@ export function renderGatheringSourceDetail(container: HTMLElement, itemId: stri
   if (view.kind === 'unknown') return;
 
   const root = document.createElement('div');
-  root.className = 'harvest-preference-source';
+  root.className = 'harvest-preference-source ui-card';
 
   const heading = document.createElement('div');
   heading.className = 'harvest-preference-source-title';

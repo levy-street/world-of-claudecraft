@@ -39,7 +39,7 @@ function playerFrameScaleFactor(from = 0): string {
   const m = mobileCss
     .slice(from)
     .match(
-      /#player-frame \{[^}]*?transform: translateX\(-50%\) scale\(calc\(([0-9.]+) \* var\(--mobile-chrome-scale, 1\)\)\);/,
+      /#player-frame \{[^}]*?transform: translateX\(-50%\)\s*scale\(\s*calc\(\s*([0-9.]+|var\([a-z-]+\))\s*\*\s*var\(--mobile-chrome-scale, 1\)\s*\)\s*\);/,
     );
   expect(m).not.toBeNull();
   return (m as RegExpMatchArray)[1];
@@ -47,7 +47,9 @@ function playerFrameScaleFactor(from = 0): string {
 
 /** The `300px * <f>` width factor a bar block declares. */
 function barWidthFactor(block: string): string {
-  const m = block.match(/width: calc\(300px \* ([0-9.]+) \* var\(--mobile-chrome-scale, 1\)\);/);
+  const m = block.match(
+    /width: calc\(\s*300px\s*\*\s*([0-9.]+|var\([a-z-]+\))\s*\*\s*var\(--mobile-chrome-scale, 1\)\s*\);/,
+  );
   expect(m).not.toBeNull();
   return (m as RegExpMatchArray)[1];
 }
@@ -112,7 +114,7 @@ describe('mobile swing/cast bar anchoring (issue 1577 (6))', () => {
     // The drop is measured from the SAME row line the player frame's top sits on,
     // so it has to clear that frame's own rendered height or the two overlap.
     const drop = mobileCss.match(
-      /--mobile-pet-frame-drop: calc\(65px \* 0\.6 \* var\(--mobile-chrome-scale, 1\) \+ (\d+)px\)/,
+      /--mobile-pet-frame-drop: calc\(\s*65px\s*\*\s*var\(--mobile-unit-frame-scale-landscape\)\s*\*\s*var\(--mobile-chrome-scale, 1\)\s*\+\s*(\d+)px\s*\)/,
     );
     expect(
       drop,

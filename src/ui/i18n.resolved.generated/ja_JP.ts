@@ -902,6 +902,7 @@ export const ja_JP: EnTranslations = {
     },
     "questTracker": {
       "count": "（{count}）",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "クエストトラッカーを折りたたむ",
       "expandHint": "クエストトラッカーを展開する"
     },
@@ -1266,6 +1267,9 @@ export const ja_JP: EnTranslations = {
       "previous": "これまでの計測",
       "runLabel": "{index}回目の練習",
       "runSummary": "{time} で {total}"
+    },
+    "talkingHead": {
+      "label": "会話"
     },
     "hubLesson": {
       "target": "まずダミーを標的にしよう。",
@@ -1729,6 +1733,9 @@ export const ja_JP: EnTranslations = {
     },
     "controller": {
       "title": "コントローラー",
+      "device": "接続中のデバイス",
+      "deviceConnected": "接続済み",
+      "deviceDisconnected": "コントローラーが見つかりません",
       "glyphStyle": "ボタン表示",
       "glyphStyleAuto": "自動",
       "glyphStyleXbox": "Xbox",
@@ -2115,6 +2122,22 @@ export const ja_JP: EnTranslations = {
       "showPlaytimeAria": "プレイ時間を表示",
       "hidePlaytimeAria": "プレイ時間を非表示"
     },
+    "charSidebar": {
+      "label": "キャラクター詳細",
+      "subtitle": "レベル{level} {className} . {archetype} . 趣味：{hobby}",
+      "subtitleNoHobby": "レベル{level} {className} . {archetype}",
+      "stats": "能力値",
+      "progression": "進行状況",
+      "skills": "スキル",
+      "gathering": "採集",
+      "crafting": "製作",
+      "openProfessions": "職業を開く"
+    },
+    "questLog": {
+      "completed": "完了済み",
+      "zoneSummary": "{count}件（{ready}件完了）",
+      "shiftHint": "Shiftキーを押しながらクエストをクリックするとチャットにリンクできます。"
+    },
     "statInfo": {
       "fromYour": "あなたの{stat}{value}による効果:",
       "names": {
@@ -2357,6 +2380,7 @@ export const ja_JP: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "バグを報告",
+      "online": "オンライン",
       "realm": "ワールド",
       "character": "キャラクター",
       "position": "座標",
@@ -3234,6 +3258,7 @@ export const ja_JP: EnTranslations = {
       "lock": "プレイヤーフレームを固定"
     },
     "partyFrames": {
+      "header": "パーティ",
       "section": "パーティ・レイドフレーム",
       "optionsSection": "パーティフレーム設定",
       "unlock": "パーティ・レイドフレームを移動",
@@ -4018,7 +4043,6 @@ export const ja_JP: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "採集",
       "mining": "採掘",
       "logging": "伐採",
       "herbalism": "薬草学",
@@ -4202,9 +4226,7 @@ export const ja_JP: EnTranslations = {
       "noviceBody": "作物を収穫するたびに農耕スキルが上がります。どの作物畑でもよいので、種をまいて始めましょう。"
     },
     "archetypeTitle": {
-      "label": "称号",
-      "none": "なし",
-      "hobbyLabel": "趣味"
+      "none": "なし"
     },
     "archetypePair": {
       "engineering+alchemy": "爆破師",
@@ -4374,7 +4396,9 @@ export const ja_JP: EnTranslations = {
       "hobbyLabel": "趣味：{craft}",
       "majorsLabel": "主専攻：{a}と{b}",
       "pairsHeld": "保持している組み合わせ：{count}",
-      "returnsLabel": "復帰：{count}"
+      "returnsLabel": "復帰：{count}",
+      "retentionFooter": "リスペック時はスキルの60%を保持します。",
+      "tutorialLink": "専門技能チュートリアル"
     },
     "crafting": {
       "title": "製作",
@@ -4409,6 +4433,7 @@ export const ja_JP: EnTranslations = {
       "vaultUnreachable": "ここでは素材保管庫を利用できません。",
       "craftFeeLine": "製作手数料：1個あたり {fee}",
       "empty": "既知のレシピはありません。",
+      "materialsFooter": "保管庫の素材は自動的に使用されます。ステーションでさらにレシピを習得できます。",
       "resultAria": "{name}を製作",
       "craftedToast": "製作しました:{name}",
       "craftedToastQty": "製作しました:{name} x{qty}",
@@ -4510,6 +4535,9 @@ export const ja_JP: EnTranslations = {
       "commissionToggleHint": "取引で最初に受け取ったキャラクターにバインドされます。",
       "commissionUnbound": "受注品：最初の受取人にバインドされる",
       "commissionBound": "受注品：受取人にバインド済み"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "商人はコモンの商品を補充し、プレイヤーの出品は希望価格でその隣に並びます。"
     },
     "itemMenu": {
       "use": "使用する",
@@ -5134,6 +5162,33 @@ export const ja_JP: EnTranslations = {
       "toInstance": "インスタンスマップ",
       "toggleAria": "ワールドマップ、ゾーンマップ、インスタンスマップを切り替える",
       "levels": "レベル {min} から {max}"
+    },
+    "mapAtlas": {
+      "level": "レベル {level}",
+      "landmarkCount": "ランドマーク {count} 個",
+      "filtersAria": "マップレイヤー",
+      "filters": {
+        "quests": "クエスト",
+        "gather": "採集",
+        "dungeons": "ダンジョン",
+        "services": "施設",
+        "players": "プレイヤー"
+      },
+      "trackedQuests": "追跡中のクエスト",
+      "noTrackedQuests": "追跡中のクエストはありません",
+      "availableNearby": "近くの受注可能クエスト",
+      "noNearbyQuests": "近くに受注可能なクエストはありません",
+      "distance": "{distance}ヤード",
+      "showRoute": "ルートを表示",
+      "untrack": "追跡を解除",
+      "track": "追跡",
+      "legend": {
+        "dungeon": "ダンジョン",
+        "ore": "鉱石",
+        "herb": "薬草",
+        "mail": "郵便",
+        "passage": "通路"
+      }
     },
     "arenaGate": {
       "minLevelNote": "レベル {level} が必要です"
@@ -6080,6 +6135,7 @@ export const ja_JP: EnTranslations = {
       "framesMoveBodyEditFrames": "自分のフレーム、ターゲットフレーム、パーティフレームは、いずれも移動できます。どれも隅に小さな移動ボタンを備えているので、固定を外し、好きな位置へドラッグし、もう一度固定すれば、うっかりクリックしてもずれません。オプションの「インターフェース」にある「フレーム」タブの先頭の「フレーム編集」を使うと、インターフェースの残りの部分もいっせいに動かせるようになり、この3つのフレームもそれに含まれます。アクションバー、キャストバー、スイングバー、経験値バー、ミニマップ、ボタンレール、ペットフレーム、スタンスバー、バフとデバフの列、そして「ウィッシュリストの通知」のチップが対象で、動かせる間はそれぞれに名前のチップが付きます。置き場所を悔やむことになったら、同じ「フレーム」タブの末尾にある「初期設定に戻す」で、すべて元の場所へ戻せます。",
       "framesGovernedExtra": "「フレーム編集」は、その下に積み重なるトラッカー群(追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、潜っているデルヴ、参加中のリフト、そして追跡中のレシピまたは依頼)、ペットフレーム脇のペットアクションバー、周囲の敵にかけた継続的なデバフをまとめて表示する「ターゲットデバフ」フレーム、パラディンの「献身」の記章、ウォーロックの「苦痛リソースバー」、スペル発動オーバーレイ、二刀流時のオフハンド用スイングバー、そしてタブ式のダメージメーターウィンドウも緩めます。緩んでいる間はそれぞれに名前のチップが付きます。",
       "framesGovernedAuraTracks": "「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。",
+      "framesGovernedTalkingHead": "「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。",
       "barsTitle": "バー、タイマー、戦闘テキスト",
       "barsBody": "詠唱やチャネルを行うと、画面中央、アクションバーのすぐ上にキャストバーが現れ、呪文の名前と残り時間を伝えます。ターゲットにもそのフレーム上に専用のキャストバーが出るので、何が来るのかを見て応じられます。\n\nキャストバーの下には細いスイングバーがあり、武器を振るたびに満ちていきます。近接や遠隔で戦う人は、次の自動攻撃がいつ当たるのかを見て取れます。\n\n経験値バーはアクションバーの下を画面幅いっぱいに走り、区切りが刻まれ、明るく伸びた部分が蓄えている休息経験値を示します。\n\n水中を泳ぐと、画面上部に青い息バーが現れます。頭が沈んでいる間は減り続け、尽きて溺れ始めると赤く点滅し、水面に出た瞬間に素早く戻ります。スペースで浮上し、初期設定でCtrlの「潜水」キーを押せばさらに深く潜れます。\n\nダメージと回復は、当たった相手の上に小さな数字となって浮かび上がるので、文字を読まなくても戦いの流れがつかめます。書かれた記録はすべて、チャットボックスの「戦闘」タブに残ります。",
       "aurasTitle": "バフとデバフ",

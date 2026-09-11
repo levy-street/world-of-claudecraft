@@ -55,6 +55,11 @@ import {
   STABLE_MAP_NAVIGATION_LANDMARKS,
 } from './map_navigation_landmarks_core';
 import { questNumbersByLog } from './map_quest_list_view';
+import {
+  DEFAULT_MAP_ATLAS_FILTERS,
+  type MapAtlasFilters,
+  type MapAtlasRoute,
+} from './map_sidebar_view';
 
 // World-map zoom band. zoom 1 = the whole current zone framed square;
 // MAP_MAX_ZOOM is a close local view. The view scales uniformly between the two,
@@ -782,6 +787,8 @@ export interface OverworldMapModel {
   detail: MapDetail | null;
   /** Canvas-space "Show on Map" highlight, or null when absent / out of view. */
   ping: { mx: number; my: number } | null;
+  /** Canvas-space route from the player to the selected quest objective. */
+  route: { from: { mx: number; my: number }; to: { mx: number; my: number } } | null;
   /** When the player is inside a rift, its floor name + C/B/A/S rank (rank null
    *  for dev-portal runs), so the painter can show this instead of the
    *  overworld zone title. Mirrors MinimapModel.rift; null outside a rift. */
@@ -806,8 +813,17 @@ export interface OverworldMapInput {
   decorations: readonly Decoration[];
   /** Dungeon Finder "Show on Map" highlight in world coords, or null. */
   ping?: { x: number; z: number } | null;
+  /** Selected atlas quest route in world coordinates, or null. */
+  route?: MapAtlasRoute | null;
   /** Responsive marker profile, resolved once by the painter per redraw. */
   markerProfile?: MapMarkerProfile;
+  /** Player-controlled atlas layers. Omitted by legacy callers and tests to
+   *  preserve the complete shipped map. */
+  filters?: Readonly<MapAtlasFilters>;
+  /** Quests this client has untracked (quest_tracking_core): their gold objective
+   *  badges leave the map, exactly as their rows leave the atlas rail and the HUD
+   *  tracker. The quest itself stays accepted and keeps its acceptance number. */
+  untrackedQuestIds?: ReadonlySet<string>;
 }
 
 /** Which world-map surface the player's POSITION selects: rift, delve, battleground,
@@ -831,6 +847,7 @@ export function mapWindowMode(world: IWorld): MapWindowMode {
  */
 export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapModel {
   const { world, props, zone, zoom, center, canvasSize: S, decorations } = input;
+  const filters = input.filters ?? DEFAULT_MAP_ATLAS_FILTERS;
   const landmarkPlacement = MAP_LANDMARK_PLACEMENT_BY_PROFILE[input.markerProfile ?? 'standard'];
   const p = world.player;
 
@@ -912,6 +929,12 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     input.ping.z <= region.maxZ
       ? toMap(input.ping.x, input.ping.z)
       : null;
+  const route = input.route
+    ? {
+        from: toMap(p.pos.x, p.pos.z),
+        to: toMap(input.route.x, input.route.z),
+      }
+    : null;
   const detail =
     spanX < DETAIL_SPAN ? buildDetail(region, toMap, inZone, S / spanX, decorations, props) : null;
 
@@ -938,10 +961,16 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // map rect (inView) like every other grid-map marker; radius scales with zoom.
   // Each area carries its quests' acceptance-order numbers for the badges.
   const questNumbers = questNumbersByLog(world.questLog);
+  // Numbering stays over the WHOLE log so an untracked quest leaves a gap rather
+  // than renumbering the badges after it; only the DRAWING is filtered.
+  const untrackedQuests = input.untrackedQuestIds;
   const questAreas: MapQuestAreaMarker[] = [];
-  for (const area of questObjectiveAreas(world.questLog)) {
+  for (const area of filters.quests ? questObjectiveAreas(world.questLog) : []) {
     if (!inZone(area.center.x, area.center.z) || !inView(area.center.x, area.center.z)) continue;
-    const objectives = area.objectives;
+    const objectives =
+      untrackedQuests === undefined || untrackedQuests.size === 0
+        ? area.objectives
+        : area.objectives.filter((ref) => !untrackedQuests.has(ref.questId));
     if (objectives.length === 0) continue;
     const numbers: number[] = [];
     for (const ref of objectives) {
@@ -955,7 +984,9 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
 
   // Dungeon portals owned by the current zone (shown at every zoom).
   const portals: MapPortalMarker[] = [];
-  for (const portal of overworldDungeonPortals(DUNGEON_LIST, zone.zMin, zone.zMax)) {
+  for (const portal of filters.dungeons
+    ? overworldDungeonPortals(DUNGEON_LIST, zone.zMin, zone.zMax)
+    : []) {
     if (!inZone(portal.x, portal.z) || !inView(portal.x, portal.z)) continue;
     const { mx, my } = toMap(portal.x, portal.z);
     portals.push({ mx, my, dungeonId: portal.id });
@@ -972,7 +1003,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const gatherNodes: MapGatherNodeMarker[] = [];
   let bestToolTiers: Map<GatheringProfessionId, number> | null = null;
   let proficiency: Readonly<Record<string, number>> | undefined;
-  for (const node of GATHER_NODES) {
+  for (const node of filters.gather ? GATHER_NODES : []) {
     if (node.zoneId !== zone.id) continue;
     if (!inView(node.pos.x, node.pos.z)) continue;
     bestToolTiers ??= new Map();
@@ -1008,11 +1039,10 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const npcs: MapNpcMarker[] = [];
   const blocked = world.craftingIdentity?.cadenceBlockedQuests;
   const cadenceBlocked = blocked && blocked.length > 0 ? new Set(blocked) : undefined;
-  for (const marker of questGiverNpcMarkers(
-    (q) => world.questState(q),
-    world.questsDone,
-    cadenceBlocked,
-  )) {
+  const questNpcMarkers = filters.quests
+    ? questGiverNpcMarkers((q) => world.questState(q), world.questsDone, cadenceBlocked)
+    : [];
+  for (const marker of questNpcMarkers) {
     if (!inZone(marker.pos.x, marker.pos.z) || !inView(marker.pos.x, marker.pos.z)) continue;
     const { mx, my } = toMap(marker.pos.x, marker.pos.z);
     npcs.push({ mx, my, kind: marker.kind, quests: marker.quests });
@@ -1097,7 +1127,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     services.push(marker);
     landmarks.push(marker);
   };
-  for (const service of world.civicServicePlacements) {
+  for (const service of filters.services ? world.civicServicePlacements : []) {
     appendService(service.x, service.z, service.kind);
   }
 
@@ -1110,7 +1140,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // closer zoom the authored distance exceeds the threshold and no nudge
   // occurs.
   const stations: MapStationMarker[] = [];
-  for (const station of world.stationPlacements) {
+  for (const station of filters.services ? world.stationPlacements : []) {
     if (station.zoneId !== zone.id || !inVisibleRegion(station.pos.x, station.pos.z)) continue;
     const projected = toMap(station.pos.x, station.pos.z);
     const placed = placeLandmarkBadge(
@@ -1180,7 +1210,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const party: MapPartyMarker[] = [];
   const partyNames = new Set<string>();
   const partyInfo = world.partyInfo;
-  if (labels && partyInfo) {
+  if (filters.players && labels && partyInfo) {
     for (const m of partyInfo.members) {
       if (m.pid === p.id) continue;
       partyNames.add(m.name);
@@ -1199,7 +1229,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // same double dot.
   const allies: MapAllyMarker[] = [];
   const social = world.socialInfo;
-  if (labels && social) {
+  if (filters.players && labels && social) {
     const selfName = p.name;
     const drawn = new Set<number>();
     const plotAlly = (m: FriendInfo, kind: 'friend' | 'guild'): void => {
@@ -1241,6 +1271,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     party,
     detail,
     ping,
+    route,
     rift,
   };
 }

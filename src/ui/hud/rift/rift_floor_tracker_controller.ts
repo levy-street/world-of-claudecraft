@@ -62,12 +62,12 @@ export class RiftFloorTrackerController {
     const timerLine =
       model.timerSeconds === null
         ? ''
-        : `<div class="rt-obj">${esc(
+        : `<div class="rt-obj ui-meta ui-num">${esc(
             t('hudChrome.riftTracker.closesIn', { time: this.clockText(model.timerSeconds) }),
           )}</div>`;
     element.innerHTML =
-      `<div class="rt-header">${esc(t('hudChrome.riftTracker.title'))}</div>` +
-      `<div class="rt-obj">${esc(floorLine)}</div>` +
+      `<div class="rt-header ui-cin">${esc(t('hudChrome.riftTracker.title'))}</div>` +
+      `<div class="rt-obj ui-meta ui-num">${esc(floorLine)}</div>` +
       timerLine;
   }
 

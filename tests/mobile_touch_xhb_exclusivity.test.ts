@@ -246,16 +246,22 @@ describe('the lift composes into the mobile #player-frame/#castbar transform in 
   it('composes the lift into #castbar (the only #castbar transform rule in this file)', () => {
     const body = ruleBody('body\\.mobile-touch\\.xhb-mode #castbar');
     expect(body).toContain('translateX(-50%)');
-    expect(body).toContain('translateY(calc(-1 * var(--xhb-lift, 56px)))');
+    expect(body).toContain(
+      'translateY(calc(-1 * var(--xhb-lift, var(--mobile-xhb-lift-fallback))))',
+    );
   });
 
-  it('composes the lift into the PORTRAIT #player-frame scale (0.82)', () => {
+  it('composes the lift into the PORTRAIT #player-frame scale (the portrait factor)', () => {
     const body = ruleBody('body\\.mobile-touch\\.xhb-mode #player-frame');
-    expect(body).toContain('translateY(calc(-1 * var(--xhb-lift, 56px)))');
-    expect(body).toContain('scale(calc(0.82 * var(--mobile-chrome-scale, 1)))');
+    expect(body).toContain(
+      'translateY(calc(-1 * var(--xhb-lift, var(--mobile-xhb-lift-fallback))))',
+    );
+    expect(body).toContain(
+      'scale(calc(var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1)))',
+    );
   });
 
-  it('ALSO composes the lift into the LANDSCAPE #player-frame scale (0.6): the touch HUD is landscape-only, so this is the rule that actually governs real play, not the portrait one above', () => {
+  it('ALSO composes the lift into the LANDSCAPE #player-frame scale (the landscape factor): the touch HUD is landscape-only, so this is the rule that actually governs real play, not the portrait one above', () => {
     const landscapeOpenAt = hudMobileCss.indexOf('@media (orientation: landscape) {');
     const bothRules = [
       ...hudMobileCss.matchAll(/body\.mobile-touch\.xhb-mode #player-frame \{([^}]*)\}/g),
@@ -270,7 +276,20 @@ describe('the lift composes into the mobile #player-frame/#castbar transform in 
       'no xhb-mode #player-frame override found after the landscape media open',
     ).toBeTruthy();
     const body = landscapeRule?.[1] ?? '';
-    expect(body).toContain('translateY(calc(-1 * var(--xhb-lift, 56px)))');
-    expect(body).toContain('scale(calc(0.6 * var(--mobile-chrome-scale, 1)))');
+    expect(body).toContain(
+      'translateY(calc(-1 * var(--xhb-lift, var(--mobile-xhb-lift-fallback))))',
+    );
+    expect(body).toContain(
+      'scale(calc(var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1)))',
+    );
+  });
+
+  // The three rules above pin TOKEN NAMES, which a token redefinition would sail
+  // through: the literal factors and the lift term have to be pinned somewhere,
+  // and this sheet declares all three.
+  it('pins the literal values behind the two unit-frame scale tokens and the lift fallback', () => {
+    expect(hudMobileCss).toContain('--mobile-unit-frame-scale: 0.92;');
+    expect(hudMobileCss).toContain('--mobile-unit-frame-scale-landscape: 0.7;');
+    expect(hudMobileCss).toContain('--mobile-xhb-lift-fallback: calc(var(--socket-size) + 10px);');
   });
 });

@@ -18,12 +18,15 @@ const RESTED_LEFT_PROP = 'left';
 const RESTED_WIDTH_PROP = 'width';
 const XP_OVERFLOW_CLASS = 'overflow';
 const XP_RESTED_CLASS = 'rested';
-// The always-visible percent (hud.css #xpbar::after / mobile's
-// #player-frame::after both read it via attr()), so showing it needs no new
-// DOM element or constructor param: it rides the already-cached bar and
-// player-frame refs through the existing multi-slot attr writer, the same
-// two-target shape --xp-fill already uses (desktop bar + the mobile ring).
+// The desktop rail label stays visible while the mobile #player-frame::after
+// reads this via attr(). It rides the already-cached bar and player-frame refs
+// through the existing multi-slot attr writer, the same two-target shape
+// --xp-fill already uses (desktop bar plus the mobile ring).
 const PERCENT_ATTR = 'data-percent';
+// The rail label's hover form (current / total, plus rested), read by the
+// .ui-rail-label::after content rule. The label element itself carries the
+// always-visible percent, so one element covers both states.
+const TOTAL_ATTR = 'data-total';
 // Width percent precision (e.g. "62.5%"); --xp-fill keeps four decimals.
 const PERCENT_FRACTION_DIGITS = 1;
 const XP_FILL_FRACTION_DIGITS = 4;
@@ -51,7 +54,8 @@ export class XpBarPainter {
       RESTED_WIDTH_PROP,
       `${(view.restedFrac * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`,
     );
-    this.writers.setText(this.label, view.label);
+    this.writers.setText(this.label, view.percentText);
+    this.writers.setAttr(this.label, TOTAL_ATTR, view.label);
     this.writers.setAttr(this.bar, PERCENT_ATTR, view.percentText);
     this.writers.setAttr(this.playerFrame, PERCENT_ATTR, view.percentText);
     this.writers.toggleClass(this.bar, XP_OVERFLOW_CLASS, view.postCap);

@@ -913,7 +913,7 @@ describe('tracker chrome', () => {
       expect(deed).toBeGreaterThan(-1);
       expect(reliquary).toBeGreaterThan(deed);
       // Inside the one positioned wrapper, never a free-floating overlay.
-      const stack = html.indexOf('<div id="right-tracker-stack">');
+      const stack = html.indexOf('<div id="right-tracker-stack"');
       expect(stack).toBeGreaterThan(-1);
       expect(reliquary).toBeGreaterThan(stack);
     }
@@ -967,7 +967,7 @@ describe('tracker chrome', () => {
 
   it('paints the gold focus ring on the focused header', () => {
     expect(hudCss).toMatch(
-      /#reliquary-tracker \.dt-header:focus-visible \{\s*outline: 2px solid var\(--gold\);\s*outline-offset: 2px;\s*border-radius: 2px;\s*\}/,
+      /#reliquary-tracker \.dt-header:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);\s*outline-offset: 2px;\s*\}/,
     );
   });
 

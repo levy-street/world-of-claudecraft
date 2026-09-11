@@ -34,6 +34,7 @@ import { itemDisplayName, tEntity } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
+import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 import type { WarfareShopOffer, WarfareShopSection, WarfareShopView } from './warfare_vendor_view';
@@ -75,7 +76,7 @@ function appendOfferTile(
   const { itemId, item, honor, affordable, owned } = offer;
   const tile = document.createElement('button');
   tile.type = 'button';
-  tile.className = owned ? 'vendor-item warfare-owned' : 'vendor-item';
+  tile.className = owned ? 'vendor-item ui-card warfare-owned' : 'vendor-item ui-card';
   tile.disabled = !affordable;
   // Keyed on the SECTION plus the item id so the restore ladder can never land
   // on a same-named tile in another section (the sectioned window's version of
@@ -95,7 +96,7 @@ function appendOfferTile(
   const ownedMark = owned
     ? `<span class="vi-sub">${esc(t('hudChrome.warfareShop.owned'))}</span>`
     : '';
-  tile.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${ownedMark}</span><span class="vi-price"><span class="warfare-price${affordable ? '' : ' unaffordable'}">${currencyIconHtml('honor')}${esc(price)}</span></span>`;
+  tile.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item)}</span><span class="vi-name" style="color:${itemNameColor(item)}">${esc(itemName)}${ownedMark}</span><span class="vi-price ui-money"><span class="warfare-price${affordable ? '' : ' unaffordable'}">${currencyIconHtml('honor')}${esc(price)}</span></span>`;
   tile.addEventListener('click', () => deps.onBuy(itemId));
   deps.attachTooltip(
     tile,
@@ -129,7 +130,7 @@ export function renderWarfareVendorWindow(
 
   const title = t('itemUi.vendor.goodsTitle', { name: vendorName });
   markDialogRoot(el, { label: title });
-  el.innerHTML = `<div class="panel-title"><span>${esc(title)}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(title)}</span><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
   const balance = document.createElement('div');
   balance.className = 'warfare-balance';

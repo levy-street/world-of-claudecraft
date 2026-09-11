@@ -156,11 +156,13 @@ describe('OptionsWindow restart strip', () => {
 
     const shown = strip(root);
     expect(shown).not.toBeNull();
+    expect(shown?.classList.contains('ui-panel-strong')).toBe(true);
     expect(shown?.dataset.restartStrip).toBe('ready');
     expect(shown?.querySelector('.restart-strip-status')?.textContent).toBe(
       t('hudChrome.options.restartPending'),
     );
     expect(stripButton(root)?.textContent).toBe(t('hudChrome.options.restartGame'));
+    expect(stripButton(root)?.classList.contains('ui-btn--red')).toBe(true);
     expect(stripButton(root)?.disabled).toBe(false);
     // The in-page Apply is untouched: still there, still nothing to apply.
     const apply = root.querySelector<HTMLButtonElement>('[data-graphics-apply]');

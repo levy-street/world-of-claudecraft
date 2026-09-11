@@ -640,6 +640,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastHash retains the text-independent marker summary signature, while lastLanguage is compared against getLanguage() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized label on the next map paint, so the gate is explicitly locale-aware rather than a stale-language hazard.',
   },
   {
+    file: 'map_sidebar_controller.ts',
+    memos: ['lastHtml', 'lastSig'],
+    reason:
+      'lastHtml retains the last BUILT rail html, which embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the atlas rail repaints by itself on its next update. Write-elision, not a data signature. lastSig is the same elision one step earlier (it skips the markup mint, not just the DOM write) and it is explicitly locale-aware: mapSidebarSignature folds getI18nRevision() into the compared string, so a locale switch moves it exactly like lastHtml does and the rail cannot hold stale text.',
+  },
+  {
     file: 'hud/quest/quest_tracker_controller.ts',
     memos: ['lastHtml'],
     reason:
@@ -869,12 +875,14 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     reason:
       "lastZoneId retains the committed zone id and is moved only by zoneAt flipping under the player, but everything localized behind it is a one-shot TRANSITION event, not a standing surface: the 2600ms zone banner (zoneDisplayName), the enteringZone chat line and the zone welcome line, all of which are history the moment they fire, exactly like any other chat log row. The persistent zone name is a different write entirely: MinimapPainter puts it on #zone-label through the write-elision facet (writers.setText with localizeZone), which compares the resolved string, so it repaints itself on the next minimap tick. The memo's two remaining reads only pick which ZoneDef's cached terrain raster to blit, which carries no text at all.",
   },
-  {
-    file: 'hud.ts',
-    memos: ['targetDiscordSig'],
-    reason:
-      "the target frame's flair line (the staff role tag, the Discord rank rung, the dev rung, and the [AI] mark plus its screen-reader label). Every other field in the signature is identity data a locale switch cannot move, so keyed on identity alone the line sat in the PREVIOUS locale until that player's flair happened to change; the rebuild itself was always correct, it just never ran, so the fix is the key rather than a fan-out arm. The value is built by targetFlairSignature (src/ui/target_flair_line_view.ts), with getLanguage() read into TargetFlairLineInput.language at the call site and leading the signature, and its paired suite drives the difference across two locales on byte-identical identity data.",
-  },
+  // The target frame's flair line USED to hold a row here (hud.ts's
+  // targetDiscordSig). Its decisions now live in the pure
+  // src/ui/target_flair_line_view.ts core, which targetFlairLineHtml resolves
+  // through t() and targetFlairSignature keys on the ACTIVE LOCALE, and the
+  // cold adapter (src/ui/target_discord_controller.ts) emits no text of its
+  // own. The language claim is therefore checked by that core's own paired
+  // suite, which drives two locales across byte-identical identity data,
+  // rather than by a coordinator row here.
 ];
 
 /**
@@ -908,11 +916,6 @@ const LANGUAGE_KEYED: ReadonlyArray<{
   readonly memo: string;
   readonly why: string;
 }> = [
-  {
-    file: 'hud.ts',
-    memo: 'targetDiscordSig',
-    why: "the target frame's flair line (the role tag, the Discord rank rung, the dev rung, and the [AI] mark plus its screen-reader label). Every other field in the signature is identity data a locale switch cannot move, so keyed on identity alone the line sat in the PREVIOUS locale until that player's flair happened to change; the rebuild itself was always correct, it just never ran, so the fix is the key rather than a fan-out arm. The value is built by targetFlairSignature (src/ui/target_flair_line_view.ts), whose paired suite drives the difference across two locales on byte-identical identity data",
-  },
   {
     file: 'market_window.ts',
     memo: 'searchEcho',

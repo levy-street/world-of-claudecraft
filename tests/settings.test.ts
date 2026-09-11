@@ -1,9 +1,11 @@
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   clickMoveButtonLabel,
   normalizeClickMoveButton,
   SETTING_RANGES,
   Settings,
+  UNIT_FRAME_STOCK_WIDTH,
 } from '../src/game/settings';
 
 function installStorage(): void {
@@ -98,6 +100,44 @@ describe('Settings', () => {
     expect(settings.get('gamepadReticleSpeed')).toBe(1);
     expect(settings.set('gamepadReticleSpeed', 99)).toBe(2);
     expect(settings.set('gamepadReticleSpeed', 0)).toBe(0.5);
+  });
+
+  it('ships both unit frame widths at the whole-frame stock and migrates the legacy stocks', () => {
+    // Both vars now drive the WHOLE frame (hud.css derives the bars panel as the
+    // width minus 46px), so the defaults must be the --unit-frame-w stock: main.ts
+    // stamps every persisted value onto the root, so a stale default ships as-is
+    // and the CSS fallback never gets a chance to correct it.
+    expect(UNIT_FRAME_STOCK_WIDTH).toBe(278);
+    expect(SETTING_RANGES.playerFrameWidth).toEqual({ min: 200, max: 460, def: 278 });
+    expect(SETTING_RANGES.targetFrameWidth).toEqual({ min: 200, max: 460, def: 278 });
+    // The editor must be able to REACH the stock from either edge drag.
+    expect(SETTING_RANGES.playerFrameWidth.min).toBeLessThan(UNIT_FRAME_STOCK_WIDTH);
+    expect(SETTING_RANGES.targetFrameWidth.min).toBeLessThan(UNIT_FRAME_STOCK_WIDTH);
+
+    // The constant's doc comment claims it MIRRORS --unit-frame-w, and the legacy
+    // rescue in settings.ts keys off the exact stock, so the two homes have to
+    // agree: read the sheet rather than trusting the prose.
+    const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+    expect(tokensCss).toContain(`--unit-frame-w: ${UNIT_FRAME_STOCK_WIDTH}px;`);
+
+    // A player carrying the retired stocks (612 full row / 190 bars panel) is
+    // re-stamped to the new stock rather than keeping a frame they never chose.
+    localStorage.setItem(
+      'woc_settings',
+      JSON.stringify({ playerFrameWidth: 612, targetFrameWidth: 190 }),
+    );
+    const migrated = new Settings();
+    expect(migrated.get('playerFrameWidth')).toBe(278);
+    expect(migrated.get('targetFrameWidth')).toBe(278);
+
+    // A width the player actually dragged is kept, clamped to the new range.
+    localStorage.setItem(
+      'woc_settings',
+      JSON.stringify({ playerFrameWidth: 320, targetFrameWidth: 900 }),
+    );
+    const kept = new Settings();
+    expect(kept.get('playerFrameWidth')).toBe(320);
+    expect(kept.get('targetFrameWidth')).toBe(460);
   });
 
   it('keeps graphicsDefaultApplied false through an unrelated save and clears it on reset', () => {

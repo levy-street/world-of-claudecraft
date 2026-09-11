@@ -603,9 +603,9 @@ export class ReliquaryWindow {
     // browse-mode AT reading a false "tracker is full" state on every open.
     this.anyAtCap = false;
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hudChrome.reliquary.title'))}</span>` +
-      `<input type="search" class="reliquary-search" data-focus-key="search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.reliquary.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.reliquary.searchAria'))}">` +
-      `<button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.reliquary.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.reliquary.title'))}</span>` +
+      `<input type="search" class="reliquary-search ui-input" data-focus-key="search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.reliquary.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.reliquary.searchAria'))}">` +
+      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.reliquary.close'))}">${svgIcon('close')}</button></div>` +
       this.summaryHtml(model) +
       `<div class="reliquary-body">${this.railHtml(model)}<div class="reliquary-scroll">${this.contentHtml(model, flash)}</div></div>`;
 
@@ -936,10 +936,10 @@ export class ReliquaryWindow {
    * and a single declaration in one rule now covers every bar.
    */
   private barHtml(pct: number, extraClass = ''): string {
-    const cls = extraClass === '' ? 'reliquary-bar' : `reliquary-bar ${extraClass}`;
+    const cls = extraClass === '' ? 'reliquary-bar ui-bar' : `reliquary-bar ui-bar ${extraClass}`;
     return (
       `<span class="${cls}">` +
-      `<span class="reliquary-bar-fill" style="--reliquary-fill:${pct}%"></span></span>`
+      `<span class="reliquary-bar-fill ui-bar-fill" style="--reliquary-fill:${pct}%"></span></span>`
     );
   }
 
@@ -1014,12 +1014,12 @@ export class ReliquaryWindow {
                 total: this.fmt(s.total),
               });
         return (
-          `<button type="button" class="reliquary-nav${on ? ' active' : ''}" data-nav="${esc(s.id)}" data-focus-key="${esc(`nav:${s.id}`)}" aria-pressed="${on}" aria-label="${esc(aria)}">` +
+          `<button type="button" class="reliquary-nav ui-seg-tab${on ? ' active is-on' : ''}" data-nav="${esc(s.id)}" data-focus-key="${esc(`nav:${s.id}`)}" aria-pressed="${on}" aria-label="${esc(aria)}">` +
           `<span class="reliquary-nav-name">${esc(label)}</span>${count}</button>`
         );
       })
       .join('');
-    return `<nav class="reliquary-rail" aria-label="${esc(t('hudChrome.reliquary.shelvesAria'))}">${rows}</nav>`;
+    return `<nav class="reliquary-rail ui-seg" aria-label="${esc(t('hudChrome.reliquary.shelvesAria'))}">${rows}</nav>`;
   }
 
   private contentHtml(model: ReliquaryViewModel, flash: ReadonlySet<string>): string {
@@ -1164,10 +1164,10 @@ export class ReliquaryWindow {
       `${this.cellIconHtml(find, this.cellQuality(find))}</span>` +
       `<span class="reliquary-recent-name">${esc(name)}</span>`;
     if (find.pageId === null) {
-      return `<span class="reliquary-recent-item" data-recent-name="${esc(name)}">${body}</span>`;
+      return `<span class="reliquary-recent-item ui-chip" data-recent-name="${esc(name)}">${body}</span>`;
     }
     return (
-      `<button type="button" class="reliquary-recent-item" data-page="${esc(find.pageId)}" ` +
+      `<button type="button" class="reliquary-recent-item ui-chip" data-page="${esc(find.pageId)}" ` +
       `data-recent-name="${esc(name)}" data-focus-key="${esc(`recent:${find.kind}:${find.id}`)}" ` +
       `aria-label="${esc(t('hudChrome.reliquary.recentJumpAria', { name }))}">${body}</button>`
     );
@@ -1192,7 +1192,7 @@ export class ReliquaryWindow {
         // from the model's raw catalog English.
         const name = reliquaryPageName(n.pageId);
         return (
-          `<button type="button" class="reliquary-nearly-row" data-page="${esc(n.pageId)}" data-focus-key="${esc(`nearly:${n.pageId}`)}" aria-label="${esc(
+          `<button type="button" class="reliquary-nearly-row ui-card" data-page="${esc(n.pageId)}" data-focus-key="${esc(`nearly:${n.pageId}`)}" aria-label="${esc(
             t('hudChrome.reliquary.nearlyJumpAria', {
               name,
               owned: this.fmt(n.owned),
@@ -1252,7 +1252,7 @@ export class ReliquaryWindow {
         // of the pair); aria-describedby folds it back in after the name.
         const recentDomId = `reliquary-shelf-recent-${card.shelf}`;
         return (
-          `<button type="button" class="reliquary-shelf-card" data-nav="${esc(card.shelf)}" ` +
+          `<button type="button" class="reliquary-shelf-card ui-card" data-nav="${esc(card.shelf)}" ` +
           `data-focus-key="${esc(`card:${card.shelf}`)}" aria-label="${esc(
             t('hudChrome.reliquary.shelfOpenAria', { name, owned, total }),
           )}"${latest !== null ? ` aria-describedby="${esc(recentDomId)}"` : ''}>` +
@@ -1292,13 +1292,13 @@ export class ReliquaryWindow {
             ? `<span class="reliquary-clears">${esc(t('hudChrome.reliquary.clearsLabel', { count: this.fmt(page.clears) }))}</span>`
             : '';
         const done = page.complete
-          ? `<span class="reliquary-complete-badge">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
+          ? `<span class="reliquary-complete-badge ui-chip">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
           : '';
         const desc = reliquaryPageDesc(page.pageId);
         const sub = desc === '' ? '' : `<span class="reliquary-page-sub">${esc(desc)}</span>`;
         return (
           `<li class="reliquary-page-item">` +
-          `<button type="button" class="reliquary-page-row" data-page="${esc(page.pageId)}" data-focus-key="${esc(`page:${page.pageId}`)}">` +
+          `<button type="button" class="reliquary-page-row ui-card" data-page="${esc(page.pageId)}" data-focus-key="${esc(`page:${page.pageId}`)}">` +
           `<span class="reliquary-page-main">` +
           `<span class="reliquary-page-name">${esc(reliquaryPageName(page.pageId))}</span>${sub}` +
           `</span>` +
@@ -1337,7 +1337,7 @@ export class ReliquaryWindow {
       name,
     });
     return (
-      `<button type="button" class="reliquary-pin${pinned ? ' pinned' : ''}" data-pin="${esc(pageId)}" ` +
+      `<button type="button" class="reliquary-pin ui-btn${pinned ? ' pinned' : ''}" data-pin="${esc(pageId)}" ` +
       `data-focus-key="${esc(`pin:${pageId}`)}" aria-pressed="${pinned}" aria-label="${esc(aria)}"` +
       `${atCap ? ' aria-disabled="true" aria-describedby="reliquary-pin-cap-note"' : ''}>${esc(label)}</button>`
     );
@@ -1367,7 +1367,7 @@ export class ReliquaryWindow {
       personal: { attr: 'data-personal', key: 'hudChrome.reliquary.personalLabel' },
     } as const satisfies Record<'retired' | 'personal', { attr: string; key: string }>;
     const chip = chips[reason];
-    return `<span class="reliquary-complete-badge" ${chip.attr}="1">${esc(t(chip.key))}</span>`;
+    return `<span class="reliquary-complete-badge ui-chip" ${chip.attr}="1">${esc(t(chip.key))}</span>`;
   }
 
   private pageDetailHtml(
@@ -1404,7 +1404,7 @@ export class ReliquaryWindow {
       ? `<p class="reliquary-account-scope" data-account-scope="1">${esc(t('hudChrome.reliquary.accountScopeNote'))}</p>`
       : '';
     const done = page.illuminated
-      ? `<span class="reliquary-complete-badge reliquary-page-illuminated">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
+      ? `<span class="reliquary-complete-badge reliquary-page-illuminated ui-chip">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
       : '';
     // A page tells you what it is: the authored blurb, localized through the
     // reliquary_i18n channel (English fallback until the release locale fill).
@@ -1449,8 +1449,8 @@ export class ReliquaryWindow {
       // same page paints the standing illuminated treatment instead of the
       // arrival. Reduced motion is the stylesheet's job (a static bright frame),
       // which is why the gate above never asks the browser about it.
-      `<section class="reliquary-page-detail${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}${celebrate ? ' reliquary-page-celebrate' : ''}">` +
-      `<button type="button" class="reliquary-back" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
+      `<section class="reliquary-page-detail ui-card${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}${celebrate ? ' reliquary-page-celebrate' : ''}">` +
+      `<button type="button" class="reliquary-back ui-btn" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
       // tabindex -1 + a focus key: spotlightPage parks the reading position
       // here on a deep link, and the key is what lets a fetch-driven or
       // slow-band rebuild RESTORE that position instead of dropping a
@@ -1508,7 +1508,7 @@ export class ReliquaryWindow {
     const chips = RELIQUARY_OWNED_FILTERS.map((filter) => {
       const on = this.ownedFilter === filter;
       return (
-        `<button type="button" class="reliquary-filter-chip${on ? ' active' : ''}" ` +
+        `<button type="button" class="reliquary-filter-chip ui-chip${on ? ' active' : ''}" ` +
         `data-filter="${esc(filter)}" data-focus-key="${esc(`filter:${filter}`)}" aria-pressed="${on}">` +
         `${esc(t(labels[filter]))}</button>`
       );
@@ -1550,7 +1550,7 @@ export class ReliquaryWindow {
       // The flash rides the same one-shot as the celebration: a class composed
       // into this rebuild only, so a filter click or the next slow band paints
       // the settled cell.
-      `<div class="reliquary-cell reliquary-cell--${stateClass} q-${esc(quality)}${flash ? ' reliquary-cell-flash' : ''}" role="listitem" tabindex="${index === activeIndex ? '0' : '-1'}" ` +
+      `<div class="reliquary-cell ui-card-tile reliquary-cell--${stateClass} q-${esc(quality)}${flash ? ' reliquary-cell-flash' : ''}" role="listitem" tabindex="${index === activeIndex ? '0' : '-1'}" ` +
       `data-cell-id="${esc(cell.id)}" data-cell-kind="${esc(cell.kind)}" data-cell-owned="${cell.owned ? '1' : '0'}" ` +
       `${opaqueArt ? 'data-cell-art="opaque" ' : ''}` +
       // data-cell-source marks cells with at least one RESOLVABLE source line,

@@ -68,6 +68,9 @@ describe('DeedTrackerPainter: collapse header live sync', () => {
     const root = document.createElement('div');
     const painter = new DeedTrackerPainter({ root: () => root, writers: liveWriters() });
     const header = root.querySelector('.dt-header') as HTMLElement;
+    expect(header.classList.contains('ui-cin')).toBe(true);
+    expect(root.querySelector('.dt-bar')?.classList.contains('ui-bar')).toBe(true);
+    expect(root.querySelector('.dt-bar-fill')?.classList.contains('ui-bar-fill')).toBe(true);
     const list = root.querySelector('.dt-list') as HTMLElement;
 
     // The static skeleton carries the aria-controls -> watch-list wiring once.

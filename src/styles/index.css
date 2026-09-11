@@ -7,8 +7,9 @@
 
    The tokens and base layers hold the design tokens and base resets; hud.css sits in
    the components layer (the in-world HUD chrome). layout.css holds the shared .window
-   shell (in @layer layout) and components.css holds the feature-window bodies (in
-   @layer components). The remaining layers fill against this fixed order, so no later
+   shell (in @layer layout), library.css the interface primitive library (in
+   @layer library, so a component section can still tune a primitive for its host),
+   and components.css holds the feature-window bodies (in @layer components). The remaining layers fill against this fixed order, so no later
    CSS change re-litigates the cascade. The only intentionally-empty barrel layer is
    the reserved `hud` slot (hud.css and components.css both target @layer components,
    see below); index-extra and play-extra are filled per entry by the .extra files,
@@ -35,11 +36,12 @@
    SUBLAYER separator, so "hud.mobile" would be the "mobile" sublayer of the early
    "hud" layer (and would lose to shell). hud-mobile / index-extra / play-extra are
    top-level layers placed exactly where this declaration puts them. */
-@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
+@layer tokens, base, layout, library, components, hud, shell, hud-mobile, index-extra, play-extra;
 
 @import "./tokens.css";
 @import "./base.css";
 @import "./layout.css";
+@import "./library.css";
 @import "./hud.css";
 @import "./components.css";
 @import "./hud.gathering-goal.css";

@@ -202,11 +202,16 @@ describe('mobile window layout CSS', () => {
     }`);
   });
 
-  it('reduces the shared market control grid to one column on mobile touch', () => {
-    // Search and filters share the desktop grid, so mobile changes the column definition
-    // directly. No nested flex basis may return and turn a control width into its height.
+  it('stacks the market browse sidebar above the listing body on mobile touch', () => {
+    // W13: the desktop layout is a 200px sidebar beside #market-body. Mobile
+    // collapses that grid to one column so the sidebar stacks above the body, and
+    // the sidebar drops its own scroller because the whole sheet scrolls.
+    // No nested flex basis may return and turn a control width into its height.
     expect(mobileCss).toMatch(
-      /body\.mobile-touch \.mkt-controls \{[^}]*grid-template-columns: 1fr;[^}]*align-items: stretch;/,
+      /body\.mobile-touch \.mkt-layout \{[^}]*grid-template-columns: minmax\(0, 1fr\);/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.mkt-controls \{[^}]*align-items: stretch;[^}]*overflow-y: visible;/,
     );
     expect(mobileCss).toMatch(
       /body\.mobile-touch \.mkt-search \{[^}]*max-width: none;[^}]*min-height: 40px;/,
@@ -381,5 +386,87 @@ describe('mobile window layout CSS', () => {
     expect(indicator?.[1]).toContain('white-space: nowrap;');
     expect(indicator?.[1]).toContain('overflow: hidden;');
     expect(indicator?.[1]).toContain('text-overflow: ellipsis;');
+  });
+
+  it('resets height on every mobile rule that pins BOTH the top and the bottom edge', () => {
+    // The bug class this catches, found live on the redesign integration branch:
+    // a desktop window gains a fixed `height` (#bags 560px, #char-window 720px,
+    // #deeds-window 680px all did), the mobile sheet pins all four edges and
+    // clears `max-height` to let that pin drive the height, and the box is now
+    // over-constrained. CSS resolves that by DROPPING `bottom`, so the sheet
+    // renders at its desktop height off the bottom of a 390px landscape phone
+    // with its footer unreachable. tests/mobile_window_coverage.test.ts cannot
+    // see it: a pin rule exists, it just no longer wins.
+    //
+    // The rule: if a mobile rule pins top AND bottom to real values, it must say
+    // what the height is, and `height: auto` is the right answer for a sheet.
+    const offenders: string[] = [];
+    let seen = 0;
+    // Hand-scan rather than a regex: the sheet nests rules inside @layer and
+    // @media, and a regex that walks braces blindly reads an at-rule preamble as
+    // a selector and then misses most of the real rules under it.
+    for (let i = 0; i < mobileCss.length; i += 1) {
+      if (mobileCss[i] !== '{') continue;
+      let depth = 1;
+      let end = i + 1;
+      while (end < mobileCss.length && depth > 0) {
+        if (mobileCss[end] === '{') depth += 1;
+        else if (mobileCss[end] === '}') depth -= 1;
+        end += 1;
+      }
+      const body = mobileCss.slice(i + 1, end - 1);
+      // Only leaf rules carry declarations; an at-rule block holds more rules.
+      if (body.includes('{')) continue;
+      const head = mobileCss.slice(0, i);
+      const selector = head
+        .slice(Math.max(head.lastIndexOf('}'), head.lastIndexOf('{')) + 1)
+        .trim();
+      if (!selector.includes('body.mobile-touch')) continue;
+      const pinned = (prop: string) => {
+        const hit = new RegExp(`(?<![-\\w])${prop}:\\s*([^;]+);`).exec(body);
+        return hit ? !/^auto\b/.test(hit[1].trim()) : false;
+      };
+      if (!pinned('top') || !pinned('bottom')) continue;
+      seen += 1;
+      if (!/(?<![-\w])height:/.test(body)) offenders.push(selector.replace(/\s+/g, ' '));
+    }
+    // Anti-vacuity: the sheet really does carry a family of these pins, so an
+    // empty offender list means the rules were checked, not that none matched.
+    expect(seen, 'the sheet pins opposing edges on the mobile sheets').toBeGreaterThanOrEqual(8);
+    expect(offenders, 'add `height: auto` so the four-edge pin drives the box').toEqual([]);
+  });
+});
+
+// W20: the desktop sheet gave `.ql-cols` a `height: calc(100% - var(--win-head-h))`
+// and `#spellbook .spell-list` a height plus `overflow-y: auto`, which turns each
+// into its own bounded scroller. The touch sheet's model is a SINGLE outer scroll
+// (the sheet itself), so both are released back to their content height here.
+describe('mobile: the sheet stays the single scroller', () => {
+  const body = (selector: string): string => {
+    const at = mobileCss.indexOf(`${selector} {`);
+    expect(at, `hud.mobile.css declares no rule for ${selector}`).toBeGreaterThan(-1);
+    return mobileCss.slice(at, mobileCss.indexOf('}', at));
+  };
+
+  it('releases the quest-log columns from the desktop height cap', () => {
+    const rule = body('body.mobile-touch #quest-log-window .ql-cols');
+    expect(rule).toContain('height: auto;');
+  });
+
+  it('releases the spellbook list from its own bounded scroll', () => {
+    const rule = body('body.mobile-touch #spellbook .spell-list');
+    expect(rule).toContain('height: auto;');
+    expect(rule).toContain('overflow-y: visible;');
+  });
+
+  it('still has desktop rules worth overriding (anti-vacuity)', () => {
+    const components = readFileSync(
+      new URL('../src/styles/components.css', import.meta.url),
+      'utf8',
+    );
+    expect(components).toContain('#spellbook .spell-list {');
+    expect(components).toMatch(
+      /#quest-log-window \.ql-cols \{[^}]*height: calc\(100% - var\(--win-head-h\)\)/,
+    );
   });
 });

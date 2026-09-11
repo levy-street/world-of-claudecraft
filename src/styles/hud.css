@@ -400,9 +400,9 @@
     top: 0;
     max-width: 220px;
     pointer-events: none;
-    background: rgba(252, 250, 240, 0.93);
-    color: #1d1610;
-    border: 1px solid #8a7a55;
+    background: color-mix(in srgb, var(--color-white) 93%, transparent);
+    color: var(--color-chrome-ground);
+    border: 1px solid var(--color-text-faint);
     border-radius: 10px;
     padding: 4px 9px;
     font-size: 12px;
@@ -414,8 +414,8 @@
   }
   .chat-bubble.yell {
     font-weight: bold;
-    color: #7a1408;
-    border-color: #c43a2a;
+    color: var(--color-hostile-rim);
+    border-color: var(--color-hostile);
   }
 
   /* ---------- new-adventurer tutorial ---------- */
@@ -485,23 +485,51 @@
      and landed in the top-left corner (CX: "why is the narrator's voice up in
      the top left lol"). It is a subtitle, so it sits where subtitles sit:
      low-center, above the movement bubble, clear of the unit frames. */
-  .tut-voice {
+  /* Talking Head (src/ui/hud/talking_head/): an NPC line spoken to the player
+     while the speaker is off screen, where a world bubble would go unseen. Its
+     stock seat is a fifth of the way down the screen, centred, between the
+     quest banner lane and the level banner, where a line appearing is noticed;
+     it is a movable HUD frame (HUD_FRAME_SPECS talkingHead), so a saved spot
+     outranks this seat. */
+  .talking-head {
     position: absolute;
     left: 50%;
-    bottom: 33%;
-    transform: translateX(-50%);
-    max-width: min(46rem, 76vw);
-    text-align: center;
-    text-wrap: balance;
-    pointer-events: none;
-    font-size: 15px;
-    font-style: italic;
-    line-height: 1.45;
-    color: var(--gold-dim);
-    text-shadow:
-      0 2px 6px #000,
-      0 0 14px #000c;
+    top: 20%;
+    translate: -50% 0;
     z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: min(var(--action-rail-w), calc(100% - 32px));
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) var(--spacing-sm);
+    pointer-events: none;
+    text-align: left;
+  }
+  #talking-head.hud-frame-detached {
+    translate: none;
+  }
+  .talking-head[hidden] {
+    display: none;
+  }
+  .talking-head .th-portrait-wrap {
+    width: 54px;
+    height: 54px;
+    margin-right: 0;
+  }
+  .talking-head .th-body {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .talking-head .th-name {
+    font-size: 14px;
+    color: var(--color-accent);
+    margin-bottom: 2px;
+  }
+  .talking-head .th-text {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--color-text-light);
+    overflow-wrap: break-word;
   }
   /* The bootcamp card's on-screen keycap chips (bootcamp.ts): the physical
      keys the current lesson asks for, drawn as caps under the body copy. */
@@ -909,15 +937,6 @@
       opacity: 1;
     }
   }
-  /* Phones: the caption rides higher, clear of the touch sticks and the
-     movement bubble, and gives up a little width to the narrower screen. */
-  @media (max-width: 720px) {
-    .tut-voice {
-      bottom: 42%;
-      max-width: 86vw;
-      font-size: 13px;
-    }
-  }
   @media (prefers-reduced-motion: reduce) {
     .tut-card {
       animation: none;
@@ -943,19 +962,22 @@
     top: auto;
     left: auto;
     /* The children zoom with the Player Frame Scale slider (the rule further
-       down), so the box carries the same factor: a fixed 612px box around
-       zoomed content leaves the unlock outline and the drag clamp working a
-       frame edge the player cannot see (90px of dead band per side at 0.75).
+       down), so the box carries the same factor: an unscaled box around zoomed
+       content leaves the unlock outline and the drag clamp working a frame edge
+       the player cannot see.
        The content stays centred, so the locked HUD renders exactly as before
        at every scale; only the invisible box edges move. The base width is
        the playerFrameWidth setting (the interface editor's edge drags), a
        real layout dimension so the bars reflow instead of stretching. */
-    width: calc(var(--player-frame-width, 612px) * var(--player-frame-scale, 1));
+    width: calc(var(--player-frame-width, var(--unit-frame-w)) * var(--player-frame-scale, 1));
     /* Bar thickness for this frame's hp/resource bars (playerFrameHeight):
        .bar and .bar-text read the var, so a height drag thickens the bars at
        crisp text instead of distorting them through a transform. */
-    --uf-bar-height: var(--player-frame-height, 15px);
-    margin: 0 auto 8px;
+    --uf-bar-height: var(--player-frame-height, var(--bar-h-hp));
+    /* The stock seat sits flush with the action bar's LEFT edge (the stack is
+       exactly one action rail wide), and the target frame's stock seat mirrors
+       it on the right edge, so the pair brackets the bar with open middle. */
+    margin: 0 auto var(--unit-frame-bar-gap) 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1276,19 +1298,14 @@
   }
   #player-frame .uf-bars {
     flex: 1;
-    width: auto;
+    width: 232px;
     min-width: 0;
-    /* Rides the playerFrameWidth setting minus the frame's fixed chrome
-       (92px: portrait plus the centring margins), so the bar panel takes the
-       whole width change and the content inset below stays constant. Stock
-       612px - 92px = the historical 520px. */
-    max-width: calc(var(--player-frame-width, 612px) - 92px);
+    /* The setting overrides the 278px unit-frame default. The 46px subtraction
+       accounts for the portrait after its 14px overlap with the bar stack. */
+    max-width: calc(var(--player-frame-width, var(--unit-frame-w)) - 46px);
   }
-  /* How far the player frame's centred content row sits from the left edge of its
-     612px box: (612 - (portrait + the 520px bar column)) / 2. The pet frame hangs
-     beneath with a shorter row, so it cannot reach the same column by centring and
-     pays this inset explicitly instead. Held as one token so the two cannot drift
-     apart; measured against the rendered frames, not derived on paper. */
+  /* The pet cluster keeps its existing action-bar alignment independently of the
+     narrower unit-frame default. */
   #actionbar-stack {
     --unit-frame-content-inset: 18px;
   }
@@ -1304,10 +1321,8 @@
     /* Same width and centring as the docked seat above: the class flips at the
        first grab (MovableFrame applies the position before measuring the grab
        offset), so any difference between the two seats renders as the visible
-       content jumping sideways under the cursor the moment a drag starts
-       (18px at the default scale, 85px at 0.75 back when this was
-       flex-start over a fixed 612px). */
-    width: calc(var(--player-frame-width, 612px) * var(--player-frame-scale, 1));
+       content jumping sideways under the cursor the moment a drag starts. */
+    width: calc(var(--player-frame-width, var(--unit-frame-w)) * var(--player-frame-scale, 1));
     margin: 0;
     justify-content: center;
     z-index: 6;
@@ -1317,7 +1332,7 @@
      spent about 52px of vertical space on what is one subject, and left the health
      strip reading as a satellite of the player frame rather than part of the pet UI.
      Side by side they measure ~294px (two 3-button groups) plus ~270px (portrait +
-     bars), which fits the 612px stack with room to spare.
+     bars), which fits the action-rail-wide stack with room to spare.
 
      The stack is bottom-anchored (#bottom-bar sits at bottom: 6px), so this grows it
      UPWARD: the action bars and the player frame keep their positions and the
@@ -1325,22 +1340,16 @@
      becomes an ordinary flex item; the mobile sheet keeps the two apart instead (see
      hud.mobile.css), because there the command bar belongs under the thumb at the top
      of the screen while the health strip belongs in the bottom-centre column. */
+  /* The pet frame's own row above the player frame, flush with its left edge;
+     the pet command bar seats below the frames beside the stance row. */
   #pet-cluster {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 8px;
-    width: 612px;
+    width: var(--action-rail-w);
     margin: 0 auto;
-    padding-left: var(--unit-frame-content-inset);
-  }
-  /* relative, not static: the docked bar stays an ordinary flex item but is
-     a containing block for its movable-frame chrome (corner button, grip,
-     name chip; the frame is HUD_FRAME_SPECS row 'petBar'). A static bar hung
-     that chrome off #actionbar-stack instead. */
-  #pet-cluster > #petbar {
-    position: relative;
-    margin-bottom: 4px;
+    padding-left: 0;
   }
   /* The health half of the cluster. Hidden until the player actually has a pet; the
      family painter sets the inline display:flex, which outranks the `none` here. It
@@ -1359,9 +1368,16 @@
   #pet-frame > * {
     zoom: var(--player-frame-scale, 1);
   }
+  /* Smaller than the player frame it sits above on pointer layouts: a pet's bars
+     carry less a player acts on, so the frame reads as a satellite, still scaled
+     with it. Touch keeps the full factor: its own scale already sits near the
+     24px target floor the browser suite pins. */
+  body:not(.mobile-touch) #pet-frame > * {
+    zoom: calc(0.8 * var(--player-frame-scale, 1));
+  }
   #pet-frame .uf-bars {
     flex: none;
-    width: 210px;
+    width: 232px;
   }
   #pet-frame:hover {
     outline: 1px solid var(--gold-dim);
@@ -1375,14 +1391,32 @@
   #pet-frame.dead {
     opacity: 0.7;
   }
+  /* The stock seat: mirrored against the docked player frame, half the pair gap
+     right of the screen centre and level with it, so an uncustomized interface
+     shows both unit frames side by side directly above the action bar. Only the
+     default; a persisted position writes inline left/top that outranks this, and
+     resetting the layout clears those and lands back here. */
   #target-frame {
-    left: 12px;
-    top: 12px;
+    /* The box carries the Target Frame Scale like the player frame's box, so
+       zoomed children never overflow it outward; the seat then keeps the scaled
+       right edge on the action bar's right edge. */
+    --target-frame-box-w: calc(
+      var(--target-frame-width, var(--unit-frame-w)) *
+      var(--target-frame-scale, 1)
+    );
+    left: calc(50% + var(--action-rail-w) / 2 - var(--target-frame-box-w));
+    top: calc(
+      100% -
+      var(--unit-frame-seat-offset) -
+      var(--stance-row-lift, 0px) -
+      var(--pet-row-lift, 0px)
+    );
     display: none;
     z-index: 6;
+    width: var(--target-frame-box-w);
     /* Bar thickness for this frame's bars (targetFrameHeight): the nested
        target-of-target frame inherits the var, so its strip thickens in step. */
-    --uf-bar-height: var(--target-frame-height, 15px);
+    --uf-bar-height: var(--target-frame-height, var(--bar-h-hp));
   }
   /* Target Frame Scale (--target-frame-scale, targetFrameScale setting): the
      player frame's twin. Children only, never the drag-positioned frame itself
@@ -1391,15 +1425,39 @@
   #target-frame > :not(.tf-move-btn) {
     zoom: var(--target-frame-scale, 1);
   }
-  /* The target's debuff strip hangs BELOW the frame (WoW-style) instead of
-     living inside the uf-bars panel, where every fresh debuff used to stretch
-     the frame taller. A direct #target-frame child (index.html), absolutely
-     anchored under the frame, wrapping left-to-right from its left edge, and
-     sharing the children-zoom scale above. */
+  /* Every extra action row lifts the docked player frame by one socket row, so
+     the mirrored target seat lifts by the same step and the pair stays level. */
+  body.show-actionbar2 #target-frame,
+  body.show-actionbar3 #target-frame {
+    top: calc(
+      100% -
+      var(--unit-frame-seat-offset) -
+      var(--socket-size) -
+      var(--socket-row-gap) -
+      var(--stance-row-lift, 0px) -
+      var(--pet-row-lift, 0px)
+    );
+  }
+  body.show-actionbar2.show-actionbar3 #target-frame {
+    top: calc(
+      100% -
+      var(--unit-frame-seat-offset) -
+      2 *
+      (var(--socket-size) + var(--socket-row-gap)) -
+      var(--stance-row-lift, 0px) -
+      var(--pet-row-lift, 0px)
+    );
+  }
+  /* The target's debuff strip hangs off the frame instead of living inside the
+     uf-bars panel, where every fresh debuff used to stretch the frame taller. A
+     direct #target-frame child (index.html), absolutely anchored to the frame,
+     wrapping left-to-right from its left edge, and sharing the children-zoom
+     scale above. It sits ABOVE the frame: the stock seat is directly over the
+     action bar, so a strip hanging below would paint across the hotbar. */
   #target-frame > #tf-debuffs {
     position: absolute;
-    top: calc(100% + 6px);
-    left: 0;
+    bottom: calc(100% + 8px);
+    left: 4px;
     display: flex;
     flex-wrap: wrap;
     /* Each icon's duration text hangs 13px BELOW it, out of flow (.buff .dur,
@@ -1423,16 +1481,16 @@
      actually applies; it compounds --target-frame-scale explicitly to stay
      proportional at any scale. Percentage offsets resolve against the unzoomed
      containing block but px lengths are multiplied by the element's zoom, so the
-     gap divides by the same factor to stay a true 18px (clear of the button) at
-     every scale. Shown by its own unit_frame painter only when the
-     target-of-target is known. Portrait + name + hp bar only: no resource rail,
-     cast bar, elite tag, or level chip. A far-right-dragged target frame can push
+     gap divides by the same factor to stay a true 4px at every scale. Shown by
+     its own unit_frame painter only when the target-of-target is known. Portrait,
+     level, name and hp bar only: no resource rail, cast bar or elite tag. A
+     far-right-dragged target frame can push
      the mini offscreen, the same clipping the debuff strip accepts in extreme
      drag positions. */
   #target-frame > #totarget-frame {
     position: absolute;
-    left: calc(100% + 18px / (0.74 * var(--target-frame-scale, 1)));
-    top: 0;
+    left: calc(100% + 4px / (0.74 * var(--target-frame-scale, 1)));
+    top: calc(4px / (0.74 * var(--target-frame-scale, 1)));
     z-index: 7;
     zoom: calc(0.74 * var(--target-frame-scale, 1));
     display: none;
@@ -1440,9 +1498,9 @@
   /* Boss-ranked target: the boss chrome moves the move button further outside
      the corner (top: -18px; right: -30px, below) and the dragon emblem
      overhangs the portrait side by 15px at children-zoom, so the beside-gap
-     widens to a true 36px to clear both. */
+     widens to 22px to clear both. */
   #target-frame.boss > #totarget-frame {
-    left: calc(100% + 36px / (0.74 * var(--target-frame-scale, 1)));
+    left: calc(100% + 22px / (0.74 * var(--target-frame-scale, 1)));
   }
   /* Standard portrait-left orientation: the old right-edge hug flipped the mini
      bars-first; beside the frame it reads like every other unit frame. The
@@ -1454,14 +1512,9 @@
   }
   #target-frame > #totarget-frame .uf-bars {
     order: 2;
-    width: 132px;
-    margin-left: -16px;
+    width: 232px;
+    margin-left: -14px;
     margin-right: 0;
-    border-radius: 11px 6px 6px 11px;
-    padding: 4px 8px 4px 22px;
-  }
-  #totarget-frame .level-chip {
-    display: none;
   }
   /* Movable unit frames: the small corner toggle (built by MovableFrame in
      movable_frame.ts) that unlocks
@@ -1598,6 +1651,7 @@
   #swingbar-offhand.tf-unlocked,
   #paladin-devotion-frame.tf-unlocked,
   #proc-overlay.tf-unlocked,
+  #talking-head.tf-unlocked,
   #meters-window.tf-unlocked {
     cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
@@ -1614,7 +1668,8 @@
   #delve-tracker.tf-unlocked,
   #rift-tracker.tf-unlocked,
   #paladin-devotion-frame.tf-unlocked,
-  #proc-overlay.tf-unlocked {
+  #proc-overlay.tf-unlocked,
+  #talking-head.tf-unlocked {
     pointer-events: auto;
   }
   /* The Target dots tracker and the six aura tracks are click-through in play
@@ -1692,7 +1747,7 @@
   #delve-tracker.hud-frame-detached,
   #rift-tracker.hud-frame-detached,
   .gathering-goal-panel.hud-frame-detached {
-    width: 240px;
+    width: var(--tracker-w);
   }
   #actionbar .tf-move-btn,
   #actionbar2 .tf-move-btn,
@@ -1715,8 +1770,7 @@
   #swingbar-offhand .tf-move-btn,
   #paladin-devotion-frame .tf-move-btn,
   #proc-overlay .tf-move-btn,
-  #meters-window .tf-move-btn,
-  #chatlog-wrap .chat-move-btn {
+  #meters-window .tf-move-btn {
     position: absolute;
     top: -10px;
     right: -10px;
@@ -1751,10 +1805,18 @@
   #paladin-devotion-frame .tf-move-btn:focus-visible,
   #petbar .tf-move-btn:focus-visible,
   #proc-overlay .tf-move-btn:focus-visible,
-  #meters-window .tf-move-btn:focus-visible,
-  #chatlog-wrap .chat-move-btn:focus-visible {
+  #meters-window .tf-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
+  }
+  #chatlog-wrap .chat-move-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    z-index: 21;
   }
   /* The button is built once and hidden until unlocked (the controller also sets
      the `hidden` attribute, which takes it out of the tab order). */
@@ -1766,7 +1828,7 @@
     display: none;
   }
   body.interface-unlocked .chat-move-btn {
-    display: block;
+    display: inline-flex;
   }
   .tf-move-btn-hidden {
     display: none;
@@ -1889,7 +1951,8 @@
   body.interface-unlocked #petbar.tf-unlocked,
   body.interface-unlocked #stancebar.tf-unlocked,
   body.interface-unlocked #paladin-devotion-frame.tf-unlocked,
-  body.interface-unlocked .warlock-doom-frame.tf-unlocked {
+  body.interface-unlocked .warlock-doom-frame.tf-unlocked,
+  body.interface-unlocked #talking-head.tf-unlocked {
     display: flex !important;
     opacity: 0.55;
   }
@@ -2318,21 +2381,13 @@
     position: relative;
     width: 64px;
     height: 64px;
+    margin-right: -4px;
     z-index: 2;
   }
   .portrait {
     width: 60px;
     height: 60px;
-    border-radius: 50%;
-    border: 3px solid var(--border);
-    outline: 1px solid #000;
-    background: radial-gradient(circle at 35% 30%, #3a3a4e, #14141c);
-    box-shadow:
-      0 2px 8px #000c,
-      inset 0 0 12px #0009;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
   }
   /* Display size is fixed by the frame; the canvas backing store is scaled by
      devicePixelRatio in unit_portrait_painter.ts, so this just maps it back to 1:1 CSS px. */
@@ -2364,6 +2419,9 @@
       inset 0 0 2px var(--border-accent-edge, transparent);
     z-index: 2;
     pointer-events: none;
+  }
+  .level-chip {
+    z-index: 3;
   }
   /* The canonical forged seal replaces the old hollow 12-o'clock clasp. It sits
      at the portrait/name joint, not over a bar, and remains below gameplay
@@ -2408,34 +2466,9 @@
       stroke: CanvasText;
     }
   }
-  .level-chip {
-    position: absolute;
-    bottom: -3px;
-    left: -3px;
-    width: 24px;
-    height: 24px;
-    background: radial-gradient(circle at 40% 35%, #4a3a14, #241c08);
-    border: 2px solid var(--gold-dim);
-    border-radius: 50%;
-    color: var(--gold);
-    font-size: 12px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-shadow: 1px 1px 1px #000;
-    z-index: 3;
-  }
   /* painted combat-status crest on the player portrait (classic style) */
   .combat-flash {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 22px;
-    height: 22px;
     display: none;
-    align-items: center;
-    justify-content: center;
     z-index: 4;
     pointer-events: none;
   }
@@ -2443,10 +2476,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    border: 1px solid var(--color-hostile);
-    border-radius: 5px;
     object-fit: cover;
-    box-shadow: var(--art-shadow-sm);
   }
   #player-frame.combat .combat-flash {
     display: flex;
@@ -2457,25 +2487,26 @@
     animation-play-state: var(--fx-ambient-anim, running);
   }
   #player-frame.combat .portrait {
-    border-color: #e74c3c;
+    border-color: var(--color-danger);
     /* Glow: the decorative outer glow scales with --fx-shadow (0 at low, 1 = full
        8px today); the structural inset shadow stays literal. */
     box-shadow:
-      0 0 calc(8px * var(--fx-shadow, 1)) #e74c3c99,
-      inset 0 0 12px #0009;
+      0 0 calc(8px * var(--fx-shadow, 1)) color-mix(in srgb, var(--color-danger) 60%, transparent),
+      inset 0 0 12px color-mix(in srgb, var(--color-keyline) 60%, transparent);
   }
   .uf-bars {
-    width: 190px;
-    margin-left: -8px;
-    padding: 5px 8px 5px 14px;
-    background: var(--panel-bg);
-    border: 2px solid var(--border);
-    outline: 1px solid #000;
-    border-radius: 0 6px 6px 0;
-    box-shadow: 0 2px 10px #000a;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 232px;
+    margin-left: -14px;
+    padding-top: 2px;
   }
   #target-frame .portrait-wrap {
     order: 2;
+  }
+  #target-frame:has(#tf-name.hostile) > .portrait-wrap .ui-portrait {
+    border-color: var(--color-hostile-rim);
   }
   /* The disc sits as a medallion over the bar's right end: enough overlap that
      the circle covers the bar's (rounded) seam-side corners (no poke, no crescent
@@ -2483,16 +2514,9 @@
   #target-frame .uf-bars {
     order: 1;
     margin-left: 0;
-    margin-right: -18px;
-    border-radius: 6px 11px 11px 6px;
-    padding: 5px 26px 5px 8px;
-    /* The targetFrameWidth setting (the interface editor's edge drags): a real
-       layout width over the base .uf-bars 190px, so the bars reflow. */
-    width: var(--target-frame-width, 190px);
-  }
-  #target-frame .level-chip {
-    left: auto;
-    right: -3px;
+    margin-right: -14px;
+    /* The targetFrameWidth setting overrides the shared unit-frame default. */
+    width: calc(var(--target-frame-width, var(--unit-frame-w)) - 46px);
   }
   /* The target's power bar rail is ALWAYS present (classic WoW look): a
      resource-less target (a plain beast) keeps every type class off, its fill
@@ -2626,49 +2650,34 @@
        their height settings (the interface editor's vertical drags); every
        other host (pet frame) keeps the stock 15px fallback. */
     height: var(--uf-bar-height, 15px);
-    background: #1a1a1a;
-    border: 1px solid #000;
-    margin-top: 3px;
-    border-radius: 2px;
     overflow: hidden;
+  }
+  .unitframe .bar.ui-bevel--res {
+    height: var(--bar-h-res);
+  }
+  .unitframe .bar.ui-bevel--res.is-empty {
+    height: var(--bar-h-res-empty);
   }
   .bar-fill {
     position: absolute;
     inset: 0;
     width: 100%;
     transform-origin: left;
-    background-image: linear-gradient(
-      rgba(255, 255, 255, 0.25),
-      rgba(255, 255, 255, 0.02) 45%,
-      rgba(0, 0, 0, 0.15)
-    );
   }
-  .bar-text {
-    position: absolute;
-    inset: 0;
-    text-align: center;
-    font-size: 11px;
-    /* Tracks the var-driven bar thickness above so the text stays vertically
-       centred at any playerFrameHeight / targetFrameHeight. */
-    line-height: var(--uf-bar-height, 15px);
-    color: #fff;
-    text-shadow: 1px 1px 1px #000;
-    font-weight: bold;
+  .hp {
+    --bar-color: var(--color-hp);
   }
-  .hp .bar-fill {
-    background-color: var(--color-hp);
+  .mana {
+    --bar-color: var(--color-mana);
   }
-  .mana .bar-fill {
-    background-color: var(--color-mana);
+  .rage {
+    --bar-color: var(--color-rage);
   }
-  .rage .bar-fill {
-    background-color: var(--color-rage);
+  .energy {
+    --bar-color: var(--color-energy);
   }
-  .energy .bar-fill {
-    background-color: var(--color-energy);
-  }
-  .focus .bar-fill {
-    background-color: var(--color-focus);
+  .focus {
+    --bar-color: var(--color-focus);
   }
   /* Damage-absorb shield overlay (Power Word: Shield, Ice Barrier, …): a hatched
      translucent segment laid over the health bar, extending past current health. */
@@ -2703,20 +2712,14 @@
     --lr-pulse: 1s;
   }
   .bar.low .bar-fill {
-    box-shadow:
-      0 0 5px 1px rgba(150, 205, 255, var(--lr-opacity)),
-      inset 0 0 4px rgba(220, 240, 255, 0.9);
+    box-shadow: var(--shadow-low-resource-mana);
     animation: low-resource-pulse var(--lr-pulse) ease-in-out infinite;
   }
   .bar.energy.low .bar-fill {
-    box-shadow:
-      0 0 5px 1px rgba(255, 225, 110, var(--lr-opacity)),
-      inset 0 0 4px rgba(255, 245, 200, 0.9);
+    box-shadow: var(--shadow-low-resource-energy);
   }
   .bar.focus.low .bar-fill {
-    box-shadow:
-      0 0 5px 1px rgba(255, 180, 70, var(--lr-opacity)),
-      inset 0 0 4px rgba(255, 235, 195, 0.9);
+    box-shadow: var(--shadow-low-resource-focus);
   }
   .low-resource-label {
     display: none;
@@ -2727,19 +2730,17 @@
     font-size: 9px;
     font-weight: bold;
     letter-spacing: 0.5px;
-    color: #eaf4ff;
-    text-shadow:
-      0 0 3px #000,
-      1px 1px 1px #000;
+    color: var(--color-low-resource-mana);
+    text-shadow: var(--outline-shadow);
     text-transform: uppercase;
     pointer-events: none;
     animation: low-resource-pulse var(--lr-pulse, 1s) ease-in-out infinite;
   }
   .bar.energy.low .low-resource-label {
-    color: #fff3c2;
+    color: var(--color-low-resource-energy);
   }
   .bar.focus.low .low-resource-label {
-    color: #ffe0a0;
+    color: var(--color-low-resource-focus);
   }
   @keyframes low-resource-pulse {
     0%,
@@ -2760,6 +2761,13 @@
     .low-resource-label {
       opacity: 1;
     }
+  }
+  body.reduce-motion .bar.low .bar-fill,
+  body.reduce-motion .low-resource-label {
+    animation: none;
+  }
+  body.reduce-motion .low-resource-label {
+    opacity: 1;
   }
   .combo-row {
     display: flex;
@@ -2815,6 +2823,39 @@
     pointer-events: none;
     isolation: isolate;
     filter: drop-shadow(0 2px 2px #000b);
+  }
+  /* Short viewports (a handheld's 800px screen): the medallion steps down so it
+     reads as a gauge beside the frames, not a second portrait. */
+  @media (max-height: 820px) {
+    .paladin-devotion-frame,
+    .paladin-devotion {
+      width: 72px;
+      height: 72px;
+    }
+  }
+  /* Pad mode: the medallion is the cross hotbar's keystone. The bar parts its
+     halves for it (the .xhb devotion-live rules), and the frame seats in that
+     centre column, vertically centred on the bar, at a size that fits between
+     the set pips above and the set-swap chip below. Arranging the interface, or a
+     player-chosen spot (hud-frame-detached), keeps the frame where it is. */
+  body.xhb-mode:not(.interface-unlocked) .paladin-devotion-frame:not(.hud-frame-detached) {
+    left: 50%;
+    top: auto;
+    bottom: calc(var(--xhb-bottom, 18px) + (3 * var(--xhb-cell-live) + 26px) / 2 - 26px);
+    translate: -50% 0;
+    width: 60px;
+    height: 60px;
+    z-index: 7;
+  }
+  body.xhb-mode:not(.interface-unlocked)
+    .paladin-devotion-frame:not(.hud-frame-detached)
+    .paladin-devotion {
+    zoom: 0.625;
+  }
+  body.xhb-mode:not(.interface-unlocked)
+    .paladin-devotion-frame:not(.hud-frame-detached)
+    :is(.paladin-devotion-label, .paladin-ascension-charges) {
+    display: none;
   }
   .paladin-devotion::before,
   .paladin-devotion::after {
@@ -3109,7 +3150,7 @@
     align-items: flex-end;
     /* Clears the last buff row's out-of-flow duration labels (13px) before the
        debuff row starts, with a little breathing room on top. */
-    gap: 20px;
+    gap: 21px;
     max-width: 320px;
     /* The column's empty area must not eat clicks; the strips re-enable it. */
     pointer-events: none;
@@ -3216,16 +3257,19 @@
     display: none;
   }
   .buff {
-    width: 28px;
-    height: 28px;
-    border: 1px solid var(--color-buff);
-    border-radius: 4px;
     position: relative;
     cursor: default;
-    background-color: #10141c;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+  }
+  /* A plain buff keeps its semantic rim. The library aura paints the neutral
+     socket rim, which reads the same as every other socket on the HUD, while
+     the debuff rims below and the own-aura gold above it stayed semantic; this
+     restores the third member of that language. Deliberately below .buff so the
+     debuff, own and cancelable-hover rims that follow still win. */
+  .buff:not(.debuff):not(.own) {
+    border-color: var(--color-buff);
   }
   /* QoL: an aura in its final seconds (auras_view isAuraExpiring) blinks so an
      expiring DoT/buff reads at a glance on the status panels. Opacity floors at
@@ -3252,42 +3296,45 @@
       filter: brightness(1.4);
     }
   }
+  body.reduce-motion .buff.expiring {
+    animation: none;
+    filter: brightness(1.4);
+  }
   /* A debuff reads as harmful at a glance: a thicker border (border-box, so no
      layout shift) tinted by magic school, WoW-style (physical keeps the base red). */
   .buff.debuff {
-    border-color: var(--color-debuff);
+    --aura-school-color: var(--color-debuff);
+    border-color: var(--aura-school-color);
     border-width: 2px;
   }
   .buff.debuff[data-school="fire"] {
-    border-color: var(--color-debuff-fire);
+    --aura-school-color: var(--color-debuff-fire);
   }
   .buff.debuff[data-school="frost"] {
-    border-color: var(--color-debuff-frost);
+    --aura-school-color: var(--color-debuff-frost);
   }
   .buff.debuff[data-school="arcane"] {
-    border-color: var(--color-debuff-arcane);
+    --aura-school-color: var(--color-debuff-arcane);
   }
   .buff.debuff[data-school="shadow"] {
-    border-color: var(--color-debuff-shadow);
+    --aura-school-color: var(--color-debuff-shadow);
   }
   .buff.debuff[data-school="nature"] {
-    border-color: var(--color-debuff-nature);
+    --aura-school-color: var(--color-debuff-nature);
   }
   .buff.debuff[data-school="holy"] {
-    border-color: var(--color-debuff-holy);
+    --aura-school-color: var(--color-debuff-holy);
   }
   /* The LOCAL player's own auras on the target strip (auras_view ownFirst):
      larger and gold-glowed so the dots/hots YOU are maintaining read at a
      glance among other casters'. A debuff keeps its school border tint (the
      size and glow carry the prominence). Extra information only, never less,
      so no graphics tier sheds it (gameplay-neutral-graphics invariant). */
-  .buff.own {
-    width: 34px;
-    height: 34px;
-    box-shadow: 0 0 5px var(--color-primary-dim);
-  }
-  .buff.own:not(.debuff) {
-    border-color: var(--color-primary);
+  .buff.debuff.own {
+    border-color: var(--gold-dim);
+    box-shadow:
+      inset 0 0 0 1px var(--aura-school-color),
+      var(--glow-gold-soft);
   }
   /* The low-tier buff-cap overflow badge (auraVisibleCap, src/game/ui_tier_knobs.ts): a
      dashed "+N" tile standing in for the buff icons the LOW preset sheds past the cap.
@@ -3303,7 +3350,8 @@
     display: none;
     align-items: center;
     justify-content: center;
-    font: 700 12px var(--body-font);
+    font-size: 12px;
+    font-weight: 700;
     color: var(--color-text-muted);
     border-style: dashed;
   }
@@ -3312,7 +3360,7 @@
     cursor: context-menu;
   }
   .buff.cancelable:hover {
-    border-color: var(--color-gold, #d8b56b);
+    border-color: var(--gold-dim);
   }
   .buff .dur {
     position: absolute;
@@ -3320,24 +3368,9 @@
     left: 0;
     right: 0;
     text-align: center;
-    font-size: 10px;
-    color: #eee;
-    text-shadow: 1px 1px 1px #000;
   }
   .buff .stacks {
-    position: absolute;
-    top: -4px;
-    right: -3px;
-    min-width: 13px;
-    height: 13px;
-    padding: 0 2px;
     box-sizing: border-box;
-    text-align: center;
-    font: 700 10px / 12px var(--body-font);
-    color: #fff;
-    background: rgba(8, 8, 12, 0.92);
-    border: 1px solid var(--color-debuff);
-    border-radius: 7px;
   }
 
   /* ---------- target dots ---------- */
@@ -3680,86 +3713,24 @@
     left: 50%;
     transform: translateX(-50%);
     bottom: 260px;
-    width: 300px;
-    height: 24px;
+    width: var(--castbar-w);
+    height: var(--castbar-h);
     display: none;
-    border: 2px solid var(--border);
-    outline: 1px solid #000;
-    border-radius: 4px;
-    background: #100c08;
     overflow: hidden;
   }
   #castbar .fill {
-    height: 100%;
     width: 0%;
-    background: linear-gradient(#ffe48a, #c9941a 60%, #9a6f12);
-    box-shadow: inset 0 1px 0 #fff5;
-  }
-  #castbar.channel .fill {
-    background: linear-gradient(#8ad4ff, #1a74c9 60%, #125a9a);
-  }
-  #castbar .label {
-    position: absolute;
-    inset: 0;
-    text-align: center;
-    font-size: 12px;
-    line-height: 21px;
-    color: #fff;
-    text-shadow: 1px 1px 2px #000;
-    font-family: var(--title-font);
-  }
-  #castbar .timer {
-    position: absolute;
-    top: 0;
-    right: 6px;
-    line-height: 21px;
-    font-size: 11px;
-    color: #fff;
-    text-shadow: 1px 1px 2px #000;
-    font-family: var(--title-font);
-    font-variant-numeric: tabular-nums;
   }
   /* target/boss cast bar, sits under the target name+HP so the raid sees the cast */
   #tf-castbar {
     position: relative;
     width: 100%;
-    height: 22px;
-    margin-top: 4px;
+    height: var(--castbar-h);
     display: none;
-    border: 2px solid var(--border);
-    outline: 1px solid #000;
-    border-radius: 4px;
-    background: #100606;
     overflow: hidden;
   }
   #tf-castbar .fill {
-    height: 100%;
     width: 0%;
-    background: linear-gradient(#ff9a8f, #c93024 60%, #73110d);
-    box-shadow: inset 0 1px 0 #fff5;
-  }
-  #tf-castbar.channel .fill {
-    background: linear-gradient(#ff9a8f, #c93024 60%, #73110d);
-  }
-  #tf-castbar .label {
-    position: absolute;
-    inset: 0;
-    text-align: center;
-    font-size: 12px;
-    line-height: 21px;
-    color: #fff;
-    text-shadow: 1px 1px 2px #000;
-    font-family: var(--title-font);
-  }
-  #tf-castbar .timer {
-    position: absolute;
-    top: 0;
-    right: 6px;
-    line-height: 21px;
-    font-size: 11px;
-    color: #fff0d0;
-    text-shadow: 1px 1px 2px #000;
-    font-variant-numeric: tabular-nums;
   }
   /* Target / target-of-target swing timers: sit in the SAME .uf-bars flex
      flow as #tf-castbar (position: relative, NOT the absolute-positioned
@@ -3774,30 +3745,29 @@
     position: relative;
     width: 100%;
     height: 12px;
-    margin-top: 4px;
     display: none;
     border: 1px solid var(--border);
-    outline: 1px solid #000;
-    border-radius: 3px;
-    background: #0c0a07;
+    outline: 1px solid var(--color-keyline);
+    border-radius: var(--radius-xs);
+    background: var(--color-swing-track);
     overflow: hidden;
   }
   #swingbar-target .fill,
   #swingbar-tot .fill {
     height: 100%;
     width: 0%;
-    box-shadow: inset 0 1px 0 #fff4;
+    box-shadow: var(--edge-glint);
     transition: width 60ms linear;
   }
   #swingbar-target .fill {
-    background: linear-gradient(#c9a3ff, #7c3fd9 60%, #481f8a);
+    background: var(--swing-fill-target);
   }
   #swingbar-tot .fill {
-    background: linear-gradient(#ffb3c6, #d9427c 60%, #8a1f4e);
+    background: var(--swing-fill-tot);
   }
   #swingbar-target.ready .fill,
   #swingbar-tot.ready .fill {
-    background: linear-gradient(#d8e8ff, #8fb6e6 60%, #5b86b8);
+    background: var(--swing-fill-ready);
   }
   #swingbar-target .label,
   #swingbar-tot .label {
@@ -3806,8 +3776,8 @@
     text-align: center;
     font-size: 10px;
     line-height: 12px;
-    color: #fff;
-    text-shadow: 1px 1px 2px #000;
+    color: var(--color-white);
+    text-shadow: var(--title-shadow);
     font-family: var(--title-font);
   }
   /* Swing timers: sit just under the cast bar, steel-on-amber (main-hand) /
@@ -3824,9 +3794,9 @@
     height: 12px;
     display: none;
     border: 1px solid var(--border);
-    outline: 1px solid #000;
-    border-radius: 3px;
-    background: #0c0a07;
+    outline: 1px solid var(--color-keyline);
+    border-radius: var(--radius-xs);
+    background: var(--color-swing-track);
     overflow: hidden;
   }
   #swingbar {
@@ -3839,18 +3809,18 @@
   #swingbar-offhand .fill {
     height: 100%;
     width: 0%;
-    box-shadow: inset 0 1px 0 #fff4;
+    box-shadow: var(--edge-glint);
     transition: width 60ms linear;
   }
   #swingbar .fill {
-    background: linear-gradient(#ffcf7a, #d97b1e 60%, #8a4a10);
+    background: var(--swing-fill-main);
   }
   #swingbar-offhand .fill {
-    background: linear-gradient(#8fe6d6, #1e9d97 60%, #0f5a58);
+    background: var(--swing-fill-offhand);
   }
   #swingbar.ready .fill,
   #swingbar-offhand.ready .fill {
-    background: linear-gradient(#d8e8ff, #8fb6e6 60%, #5b86b8);
+    background: var(--swing-fill-ready);
   }
   #swingbar .label,
   #swingbar-offhand .label {
@@ -3859,8 +3829,8 @@
     text-align: center;
     font-size: 10px;
     line-height: 12px;
-    color: #fff;
-    text-shadow: 1px 1px 1px #000;
+    color: var(--color-white);
+    text-shadow: var(--title-shadow);
     font-family: var(--title-font);
     letter-spacing: 0.5px;
   }
@@ -3873,89 +3843,46 @@
     bottom: 6px;
     text-align: center;
   }
+  /* Aligned to the action row, not to the stack: the rail and the twelve
+     sockets are both --action-rail-w wide, but the stack is as wide as the pet
+     row, so auto margins used to centre the rail eight pixels right of the
+     sockets it belongs to. Zero side margins put both on the stack's left edge.
+     The combined block is its own centred box, so the rail centres with it. */
   #xpbar {
-    width: 612px;
-    height: 10px;
-    background: #14101e;
-    border: 1px solid #000;
-    outline: 1px solid #3a3148;
-    margin: 4px auto 0;
-    position: relative;
-    border-radius: 2px;
-    overflow: hidden;
+    margin: var(--socket-row-gap) 0 0;
+    overflow: visible;
+  }
+  body.combined-action-bars #xpbar {
+    margin-right: auto;
+    margin-left: auto;
   }
   #xpbar .fill {
-    height: 100%;
+    /* The root keeps numeric --xp-fill for the mobile portrait ring. Scope the
+       rail's paint value to the child so the ui-rail recipe can use the same name. */
+    --xp-fill: var(--xp-rail-fill);
     width: 0%;
-    background: linear-gradient(#b85eff, #6a1bb0);
-    transition: background 0.3s;
   }
   /* Rested XP overlay (classic inn-rested bonus): a blue segment ahead of the fill. */
   #xpbar .rested {
-    position: absolute;
-    top: 0;
-    height: 100%;
     left: 0;
     width: 0%;
-    background: linear-gradient(#5fb0ff, #2b6fd0);
-    opacity: 0.5;
   }
   #xpbar.rested {
-    outline-color: #2b6fd0;
-    box-shadow: 0 0 6px #4a9eff55;
-  }
-  #xpbar .ticks {
-    position: absolute;
-    inset: 0;
-    display: flex;
-  }
-  #xpbar .ticks i {
-    flex: 1;
-    border-right: 1px solid #00000055;
+    outline: 1px solid var(--color-xp-rested-deep);
+    box-shadow: var(--glow-xp-rested);
   }
   #xpbar .label {
-    position: absolute;
-    inset: 0;
-    font-size: 10px;
-    color: #fff;
-    text-align: center;
-    line-height: 10px;
-    text-shadow: 1px 1px 1px #000;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  #xpbar:hover .label {
-    opacity: 1;
-  }
-  /* Always-visible percent (new-player-first-hour: the number was hover-only
-     before, invisible on touch entirely since mobile has no hover). Reads the
-     xp_bar_painter data-percent attribute rather than a new DOM element, so it
-     needs no markup change; swaps out for the fuller .label on hover instead
-     of overlapping it. */
-  #xpbar::after {
-    content: attr(data-percent);
-    position: absolute;
-    inset: 0;
-    padding-right: 4px;
-    font-size: 10px;
-    color: #fff;
-    text-align: right;
-    line-height: 10px;
-    text-shadow: 1px 1px 1px #000;
+    white-space: nowrap;
     pointer-events: none;
-    opacity: 1;
-    transition: opacity 0.15s;
-  }
-  #xpbar:hover::after {
-    opacity: 0;
   }
   /* Post-cap overflow bar (Max-Level XP Overflow): gold/prestige tint. */
   #xpbar.overflow {
-    outline-color: #b8902a;
-    box-shadow: 0 0 6px #f5c84355;
+    border-top-color: var(--gold-dim);
+    border-bottom-color: var(--gold-dim);
+    box-shadow: var(--glow-xp-overflow);
   }
   #xpbar.overflow .fill {
-    background: linear-gradient(#ffe27a, #d99a1c);
+    --xp-fill: var(--xp-overflow-fill);
   }
   #actionbar-row {
     display: flex;
@@ -3972,70 +3899,53 @@
     flex-direction: column;
     position: relative;
   }
+  /* The pet command bar seats in the bottom stack between the player frame and
+     the primary bar, the stance row's own seat (both rows can stack), so showing
+     it lifts the docked player frame; body.mobile-pet-active (stamped on every
+     host while a pet is out) lifts the stock target seat by the same row.
+     Relative, not static: the bar is the containing block for its movable-frame
+     chrome (HUD_FRAME_SPECS row 'petBar'). */
   #petbar {
     display: none;
-    position: absolute;
-    left: 0;
-    top: -52px;
-    gap: 6px;
+    position: relative;
+    align-self: flex-start;
+    gap: var(--socket-row-gap);
     padding: 0;
-    margin: 0;
+    margin: 0 0 var(--socket-row-gap);
     background: transparent;
     border: 0;
+    border-radius: 0;
     outline: 0;
     box-shadow: none;
+    color: inherit;
   }
   .petbar-group {
     display: flex;
-    gap: 4px;
-    padding: 4px;
-    border: 2px solid #000;
-    outline: 1px solid #5b4618;
-    border-radius: 6px;
-    background: linear-gradient(170deg, #15131fdd, #09080edd);
-    box-shadow: 0 2px 8px #000c;
+    gap: var(--socket-gap);
   }
   .pet-btn {
-    width: 40px;
-    height: 40px;
+    --ui-socket-size: var(--socket-size-pet);
+    flex: none;
     padding: 0;
-    border: 2px solid #4a3d1d;
-    border-radius: 6px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    color: #f3df9a;
     cursor: var(--cursor-point);
-    position: relative;
     touch-action: manipulation;
     -webkit-touch-callout: none;
     user-select: none;
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
   }
   .pet-btn .icon-label {
-    position: absolute;
-    inset: 1px;
-    border-radius: 4px;
-    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     pointer-events: none;
   }
-  .pet-btn:hover {
-    border-color: var(--gold);
-  }
-  .pet-btn.active {
-    border-color: var(--gold);
-    box-shadow:
-      inset 0 0 0 1px #ffd10066,
-      0 0 6px #ffd10033;
+  .pet-btn:hover:not(:focus-visible),
+  .stance-btn:hover:not(:focus-visible),
+  .action-btn:hover:not(:focus-visible) {
+    outline: 1px solid var(--gold-dim);
+    outline-offset: -1px;
   }
   .pet-btn.autocast {
     border-color: var(--gold);
-    box-shadow:
-      inset 0 0 0 1px color-mix(in srgb, var(--gold) 67%, transparent),
-      0 0 10px color-mix(in srgb, var(--gold) 40%, transparent),
-      0 0 18px color-mix(in srgb, var(--gold) 20%, transparent);
+    box-shadow: var(--glow-pet-autocast);
   }
   @media (forced-colors: active) {
     /* The normal gold glow is flattened by the system palette. Keep autocast
@@ -4069,99 +3979,71 @@
   .pet-btn.disabled,
   .pet-btn.disabled:hover,
   .pet-btn.disabled.active {
-    border-color: #4a3d1d;
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
+    border-color: var(--color-socket-rim);
+    box-shadow: var(--shadow-socket);
   }
   .pet-btn.cooldown.autocast {
     filter: grayscale(0.45) brightness(0.78);
   }
-  .pet-btn .cdtext {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    color: var(--gold);
-    /* Same legible outline as the action bar cdtext (issue 1660). */
-    text-shadow:
-      0 0 4px #000,
-      1px 1px 1px #000,
-      -1px -1px 1px #000,
-      1px -1px 1px #000,
-      -1px 1px 1px #000;
-    font-weight: bold;
-    pointer-events: none;
-  }
-  /* Stance-style choice bar: warrior stances and paladin auras share this exact
-     in-flow row above the action bars (JS flips it to flex when applicable). */
+  /* Stance-style choice bar: warrior stances and paladin auras share this row,
+     a child of the bottom stack between the player frame and the action bars
+     (JS flips it to flex when applicable), so showing it lifts the docked
+     player frame by one row; body.stance-bar-shown lifts the target seat too. */
   #stancebar {
     display: none;
-    margin: 2px 0 0 0;
+    align-self: flex-start;
+    margin: 0 0 var(--socket-row-gap);
     padding: 0;
+  }
+  body.stance-bar-shown {
+    --stance-row-lift: calc(var(--socket-size-stance) + var(--socket-row-gap));
+  }
+  body.mobile-pet-active {
+    --pet-row-lift: calc(var(--socket-size-pet) + var(--socket-row-gap));
   }
   .stancebar-group {
     display: flex;
-    gap: 4px;
+    gap: var(--socket-gap);
   }
   .stance-btn {
-    width: 40px;
-    height: 40px;
+    flex: none;
     padding: 0;
-    position: relative;
-    border: 2px solid #4a3d1d;
-    border-radius: 6px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    color: #f3df9a;
     cursor: var(--cursor-point);
     touch-action: manipulation;
     -webkit-touch-callout: none;
     user-select: none;
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
   }
   .stance-btn .icon-label {
-    position: absolute;
-    inset: 1px;
-    border-radius: 4px;
-    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     pointer-events: none;
   }
-  .stance-btn:hover {
-    border-color: var(--gold);
-  }
-  .stance-btn:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 1px;
-  }
-  .stance-btn.active {
-    border-color: var(--gold);
-    box-shadow:
-      inset 0 0 0 1px #ffd10066,
-      0 0 6px #ffd10033;
-  }
-  /* A third action row adds 58px to the stack. Lift the cast and swing timers
+  /* A third action row adds 52px to the stack. Lift the cast and swing timers
      by the same amount so 720p layouts keep both timers clear of the stack. */
   body.show-actionbar3 #castbar {
-    bottom: 318px;
+    bottom: 312px;
   }
   body.show-actionbar3 #swingbar {
-    bottom: 292px;
+    bottom: 286px;
   }
   body.show-actionbar3 #swingbar-offhand {
-    bottom: 278px;
+    bottom: 272px;
   }
+
   #actionbar,
   #actionbar2,
   #actionbar3 {
     display: flex;
-    gap: 4px;
-    padding: 6px;
+    gap: var(--socket-gap);
+    width: var(--action-rail-w);
+    min-height: var(--socket-size);
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    box-shadow: none;
+    color: inherit;
   }
   /* The optional rows stack above the primary action bar. Tighter bottom padding
      keeps the group compact. Both are off by default; Interface options add
@@ -4171,7 +4053,7 @@
      Mobile uses the paged action ring regardless of these desktop options. */
   #actionbar2,
   #actionbar3 {
-    padding-bottom: 2px;
+    margin-bottom: var(--socket-row-gap);
     display: none;
   }
   body.show-actionbar2 #actionbar2 {
@@ -4198,8 +4080,26 @@
   #actionbar.bar-vertical .bar-toggle,
   #actionbar2.bar-vertical .bar-toggle,
   #actionbar3.bar-vertical .bar-toggle {
-    flex-direction: row;
-    justify-content: center;
+    right: auto;
+    bottom: -28px;
+    left: 50%;
+    width: var(--socket-size);
+    height: 24px;
+    transform: translateX(-50%);
+  }
+  #actionbar.bar-vertical .bar-toggle-btn:first-child,
+  #actionbar2.bar-vertical .bar-toggle-btn:first-child,
+  #actionbar3.bar-vertical .bar-toggle-btn:first-child {
+    top: 0;
+    left: -5px;
+  }
+  #actionbar.bar-vertical .bar-toggle-btn:last-child,
+  #actionbar2.bar-vertical .bar-toggle-btn:last-child,
+  #actionbar3.bar-vertical .bar-toggle-btn:last-child {
+    top: 0;
+    right: -5px;
+    bottom: auto;
+    left: auto;
   }
   /* The combined block follows bar 1's orientation (body class stamped by
      main.ts): vertical bars sit side by side, bottom-aligned so bar 1 keeps
@@ -4220,13 +4120,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: var(--socket-row-gap);
     position: relative;
     /* Sized to the bars, not the stack: a block-level flex child stretches to
        its parent's full width, which drew the arrange-mode outline across the
        whole screen instead of around the combined block. */
     width: fit-content;
     margin: 0 auto;
+  }
+  body.combined-action-bars #actionbar2,
+  body.combined-action-bars #actionbar3 {
+    margin-bottom: 0;
   }
   /* A combined group re-homed onto #ui positions off its own left/top, exactly
      as each bar does when moved on its own. The body-qualified selector is
@@ -4257,107 +4161,98 @@
     padding: 0;
     border: 1px solid var(--gold);
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    background: var(--socket-fill);
     color: var(--gold);
     cursor: var(--cursor-point);
     z-index: 21;
   }
   #actionbar-group .tf-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
-    outline-offset: 1px;
+    outline-offset: 2px;
   }
   /* While combined, only the rows the player has TURNED ON appear inside the
      group, editing or not: the stock body.show-actionbar2/3 rules keep working
      inside the wrapper, and a switched-off row never renders as a placeholder
      (the options note points at the plus/minus buttons for turning more on). */
-  /* The plus/minus optional-row toggle at the end of the primary bar: a slim
-     vertical pair matching the slot chrome. 24x24 per button is the WCAG 2.2
-     SC 2.5.8 absolute target-size floor (src/ui/CLAUDE.md); do not shrink it. */
+  /* The optional-row control floats off the primary row as gold chevrons with
+     the visible row count between them. Each button keeps the WCAG 2.2 24px
+     absolute target-size floor. */
   .bar-toggle {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 2px;
+    position: absolute;
+    right: -28px;
+    bottom: 0;
+    width: 24px;
+    height: var(--socket-size);
   }
   .bar-toggle-btn {
+    position: absolute;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 24px;
     height: 24px;
     padding: 0;
-    line-height: 1;
-    font-size: 13px;
-    font-family: var(--title-font);
-    color: #d8c98f;
-    border: 1px solid #4a3d1d;
-    border-radius: 4px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    color: var(--gold);
+    border: 0;
+    background: transparent;
     cursor: var(--cursor-point);
-    text-shadow: 1px 1px 2px #000;
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
+    filter: drop-shadow(0 1px 1px var(--color-keyline));
+  }
+  .bar-toggle-btn:first-child {
+    top: -5px;
+  }
+  .bar-toggle-btn:last-child {
+    bottom: -5px;
+  }
+  .bar-toggle-btn .ui-icon {
+    width: 14px;
+    height: 14px;
+    transform: rotate(90deg);
+  }
+  .bar-toggle-count {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: var(--gold);
+    font-size: 10px;
+    text-shadow: var(--title-shadow);
+    transform: translate(-50%, -50%);
   }
   .bar-toggle-btn:hover:not(:disabled) {
-    border-color: var(--gold);
-    color: #fff;
+    color: var(--color-glint);
   }
   .bar-toggle-btn:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 1px;
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   .bar-toggle-btn:disabled {
     opacity: 0.35;
     cursor: var(--cursor-arrow);
   }
   .action-btn {
-    width: 46px;
-    height: 46px;
-    position: relative;
-    border: 2px solid #4a3d1d;
-    border-radius: 6px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    color: #fff;
+    flex: none;
+    padding: 0;
     cursor: var(--cursor-point);
-    font-family: var(--title-font);
-    text-shadow: 1px 1px 2px #000;
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
   }
   .action-btn .icon-label {
-    position: absolute;
-    inset: 1px;
-    border-radius: 4px;
-    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     pointer-events: none;
   }
-  .action-btn:hover {
-    border-color: var(--gold);
-  }
   .action-btn:active {
     transform: translateY(1px);
   }
-  .action-btn.used {
-    border-color: var(--color-border-focus);
-    box-shadow:
-      0 0 10px #ffd100aa,
-      inset 0 0 0 1px #ffd10077,
-      inset 0 1px 0 #ffffff28;
-  }
   .action-btn.empty {
-    background: #0d0d13;
     cursor: default;
-    box-shadow: inset 0 0 10px #000;
   }
   /* Issue 2429: the "Hide Unused Action Slots" Interface option (hideUnusedActionSlots,
      applied as this body class by main.ts). A slot with no ability or item bound loses
      its black background, border, and keybind label so an unlearned class's bar reads
      clean instead of a wall of empty squares; the box stays in the flex row (no
      display: none) so it neither shifts a bound neighbor on the extra rows nor disturbs
-     the deliberate slot layout those rows exist for. The .action-btn:hover rule above
-     still applies (border-color: var(--gold)), so the slot stays a discoverable drop
-     target for dragging a new ability or item in. */
+     the deliberate slot layout those rows exist for. The shared hover outline keeps the
+     slot discoverable as a drop target for dragging a new ability or item in. */
   body.hide-unused-action-slots .action-btn.empty {
     background: transparent;
     border-color: transparent;
@@ -4365,55 +4260,6 @@
   }
   body.hide-unused-action-slots .action-btn.empty .keybind {
     display: none;
-  }
-  .action-btn .keybind {
-    position: absolute;
-    top: 1px;
-    right: 3px;
-    font-size: 10px;
-    color: #ddd;
-    font-family: var(--ui-font);
-  }
-  .action-btn .item-count {
-    position: absolute;
-    right: 3px;
-    bottom: 1px;
-    min-width: 10px;
-    text-align: right;
-    font-size: 10px;
-    color: #fff;
-    font-family: var(--ui-font);
-    font-weight: bold;
-    text-shadow: 1px 1px 2px #000;
-  }
-  .action-btn .cdtext {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    color: var(--gold);
-    /* Crisp dark outline plus a soft halo so the gold number stays legible on
-       bright or warm icons, not just a thin 1px shadow that the art swallows. */
-    text-shadow:
-      0 0 4px #000,
-      1px 1px 1px #000,
-      -1px -1px 1px #000,
-      1px -1px 1px #000,
-      -1px 1px 1px #000;
-  }
-  .action-btn .cd-overlay {
-    position: absolute;
-    inset: 0;
-    /* Classic radial clock wipe: the dark wedge covers the remaining cooldown
-       (--cd-fill, written by action_bar_painter) and sweeps away clockwise as it
-       recovers, instead of the old bottom-up height fill. */
-    background: conic-gradient(
-      transparent 0 calc(100% - var(--cd-fill, 0%)),
-      #000d calc(100% - var(--cd-fill, 0%))
-    );
-    border-radius: 4px;
   }
   /* The recharge veil on a charge-pool ability (Twinstrike, Double Charge): a
      spent charge regenerating while the button stays pressable. Same bottom-up
@@ -4426,8 +4272,8 @@
     right: 0;
     bottom: 0;
     height: 0%;
-    background: #0008;
-    border-radius: 0 0 4px 4px;
+    background: color-mix(in srgb, var(--color-keyline) 53%, transparent);
+    border-radius: 0 0 calc(var(--radius-socket) - 2px) calc(var(--radius-socket) - 2px);
     pointer-events: none;
   }
   /* A charge count reads as CHARGES, not an item stack: gold, a step larger
@@ -4440,25 +4286,12 @@
     bottom: 2px;
     font-size: 13px;
     color: var(--gold);
-    text-shadow:
-      -1px -1px 0 #000,
-      1px -1px 0 #000,
-      -1px 1px 0 #000,
-      1px 1px 0 #000,
-      0 0 3px #000;
+    text-shadow: var(--outline-shadow);
     z-index: 1;
   }
-  .action-btn.unusable .icon-label {
-    filter: grayscale(1) brightness(0.5);
-  }
-  .action-btn.oor .icon-label {
-    filter: brightness(0.55) saturate(0.4);
-  }
   .action-btn.queued {
-    border-color: #fff;
-    box-shadow:
-      0 0 9px #ffd100cc,
-      inset 0 1px 0 #ffffff18;
+    border-color: var(--color-white);
+    box-shadow: var(--glow-action-queued);
   }
   /* Armed ground aim: the queued/proc gold family, double so it can never be
      read as the focus-visible ring (which stays the focus token, solid). */
@@ -4471,10 +4304,6 @@
      gold rim on the covered abilities. Actionable info: never gated by a graphics tier; the
      pulse (motion only) stops under reduced motion, the steady glow stays. */
   .action-btn.proc {
-    border-color: #ffd97a;
-    box-shadow:
-      0 0 12px #ffcf40e6,
-      inset 0 0 6px #ffcf4066;
     animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
   }
   @media (forced-colors: active) {
@@ -4487,22 +4316,15 @@
   }
   @keyframes abtn-proc-pulse {
     from {
-      box-shadow:
-        0 0 7px #ffcf40b0,
-        inset 0 0 4px #ffcf4044;
+      box-shadow: var(--glow-action-proc-soft);
     }
     to {
-      box-shadow:
-        0 0 15px #ffcf40f0,
-        inset 0 0 7px #ffcf4088;
+      box-shadow: var(--glow-action-proc-strong);
     }
   }
   .action-btn.empowered {
     border-color: var(--gold);
-    box-shadow:
-      0 0 12px #ffd100dd,
-      inset 0 0 0 1px #fff0a6aa,
-      inset 0 1px 0 #ffffff28;
+    box-shadow: var(--glow-action-empowered);
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
   }
   .action-btn.ascension-spender::after {
@@ -4541,39 +4363,27 @@
   }
   .action-btn.fate-consume-ready,
   .mobile-action-slot.fate-consume-ready {
-    border-color: #76e1cf;
-    outline: 1px solid #a77cff;
+    border-color: var(--color-fate-consume-rim);
+    outline: 1px solid var(--color-fate-consume-outline);
     outline-offset: 1px;
-    box-shadow:
-      0 0 10px rgba(93, 229, 208, 0.9),
-      0 0 20px rgba(129, 73, 218, 0.72),
-      inset 0 0 7px rgba(113, 238, 219, 0.48);
+    box-shadow: var(--glow-action-fate-consume);
     animation: fate-consume-button-pulse 1.05s ease-in-out infinite alternate;
   }
   .action-btn.fate-sentence-ready,
   .mobile-action-slot.fate-sentence-ready {
-    border-color: #ff789d;
-    outline: 1px solid #d99cff;
+    border-color: var(--color-fate-sentence-rim);
+    outline: 1px solid var(--color-fate-sentence-outline);
     outline-offset: 1px;
-    box-shadow:
-      0 0 10px rgba(255, 84, 137, 0.92),
-      0 0 20px rgba(159, 64, 220, 0.76),
-      inset 0 0 7px rgba(255, 102, 153, 0.52);
+    box-shadow: var(--glow-action-fate-sentence);
     animation: fate-sentence-button-pulse 0.92s ease-in-out infinite alternate;
   }
   @keyframes action-empowered-pulse {
     0%,
     100% {
-      box-shadow:
-        0 0 9px #ffd100bb,
-        inset 0 0 0 1px #fff0a688,
-        inset 0 1px 0 #ffffff28;
+      box-shadow: var(--glow-action-empowered-soft);
     }
     50% {
-      box-shadow:
-        0 0 18px #ffd100,
-        inset 0 0 0 1px #fff6c8cc,
-        inset 0 1px 0 #ffffff34;
+      box-shadow: var(--glow-action-empowered-strong);
     }
   }
   @keyframes fate-consume-button-pulse {
@@ -4602,6 +4412,16 @@
       animation: none;
     }
   }
+  body.reduce-motion .action-btn.proc,
+  body.reduce-motion .action-btn.empowered,
+  body.reduce-motion .action-btn.fate-consume-ready,
+  body.reduce-motion .action-btn.fate-sentence-ready,
+  body.reduce-motion .mobile-action-slot.fate-consume-ready,
+  body.reduce-motion .mobile-action-slot.fate-sentence-ready,
+  body.reduce-motion.mobile-touch #mobile-action-ring button.proc,
+  body.reduce-motion.mobile-touch #mobile-action-ring button.empowered {
+    animation: none;
+  }
   @media (forced-colors: active) {
     .action-btn.fate-consume-ready,
     .action-btn.fate-sentence-ready,
@@ -4617,8 +4437,8 @@
     cursor: grab;
   }
   .action-btn.drop-target {
-    border-color: #7fd1ff;
-    box-shadow: 0 0 8px #7fd1ff88;
+    border-color: var(--color-action-drop-target);
+    box-shadow: var(--glow-action-drop-target);
   }
   /* micro-menu: bottom-right, stacked upward, sitting just above the
      Discord/GitHub buttons (both right-aligned to the same edge). Two adjacent
@@ -4678,16 +4498,8 @@
   .micro-btn {
     width: 34px;
     height: 30px;
-    border: 2px solid #4a3d1d;
-    border-radius: 5px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    color: var(--color-text-muted);
     cursor: var(--cursor-point);
-    font-size: 12px;
     font-weight: bold;
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
     position: relative;
   }
   /* hover flyout: the button's background grows leftward to reveal its label.
@@ -4706,19 +4518,16 @@
     overflow: hidden;
     opacity: 0;
     white-space: nowrap;
-    font-family: var(--font-ui);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.3px;
     line-height: 1;
     color: var(--color-text-muted);
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    border: 2px solid #4a3d1d;
+    background: var(--socket-fill);
+    border: 2px solid var(--color-control-border);
     border-right: none;
-    border-radius: 5px 0 0 5px;
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
+    border-radius: var(--radius-card) 0 0 var(--radius-card);
+    box-shadow: var(--edge-glint), var(--shadow-lift);
     pointer-events: none;
     z-index: -1;
     transition:
@@ -4733,16 +4542,16 @@
     opacity: 1;
     padding: 0 18px 0 12px;
   }
-  .micro-btn:hover,
   .micro-btn:hover::before {
-    border-color: var(--gold);
-    color: #fff;
+    border-color: var(--gold-dim);
+    color: var(--color-text-light);
   }
   /* talent button glows while unspent talent points are available */
   .micro-btn.has-points,
   .mobile-btn.has-points {
     border-color: var(--gold);
-    color: #fff;
+    color: var(--color-text-light);
+    box-shadow: var(--glow-gold-soft), var(--edge-glint);
     animation: tal-pulse 1.6s ease-in-out infinite;
     /* Ambient: paused + duration-calmed by the effect-tier tokens. */
     animation-duration: calc(1.6s * var(--motion-scale, 1));
@@ -4751,23 +4560,51 @@
   @keyframes tal-pulse {
     0%,
     100% {
-      box-shadow: 0 0 5px #ffd10066;
+      box-shadow: 0 0 calc(5px * var(--fx-shadow, 1))
+        color-mix(in srgb, var(--gold) 40%, transparent);
     }
     50% {
-      box-shadow: 0 0 12px #ffd100dd;
+      box-shadow: var(--glow-gold);
     }
   }
   .micro-btn .keybind {
     position: absolute;
-    bottom: -1px;
-    right: 2px;
+    bottom: -3px;
+    right: -3px;
+    min-width: 13px;
+    height: 13px;
+    padding: 0 2px;
     font-size: 9px;
-    color: #998;
+    line-height: 11px;
+  }
+  /* Micro-menu count badge (unspent talent points today). Geometry only: the look
+     is the .ui-badge / .ui-badge--corner primitive. The corner default overhangs a
+     34x30 launcher, so it is pulled in like the chest's own count, and it sits above
+     the hover flyout, which tucks itself behind the button at z-index -1. The
+     painter owns the display flip (hidden at zero). */
+  .micro-btn .mm-badge {
+    top: -3px;
+    right: -3px;
+    z-index: 2;
+    min-width: 14px;
+    height: 14px;
+    padding: 0 3px;
+    line-height: 10px;
+    pointer-events: none;
+  }
+  /* Zero is empty text, not a rendered 0: one elided write per badge hides it. */
+  .micro-btn .mm-badge:empty {
+    display: none;
   }
   /* music button: a bigger note with a small diagonal slash when audio is off */
   #mm-music .ui-icon {
     width: 22px;
     height: 22px;
+  }
+  /* Music on is the note's own gold, not the launcher's open-window ring: the
+     ring stays reserved for "this button's window is open". */
+  #mm-music.mm-on {
+    color: var(--gold);
   }
   .micro-btn.mm-muted::after {
     content: "";
@@ -4776,11 +4613,23 @@
     top: 50%;
     width: 17px;
     height: 2px;
-    border-radius: 2px;
-    background: #f0e8d2;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7);
+    border-radius: var(--radius-2xs);
+    background: var(--color-text-light);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-keyline) 70%, transparent);
     transform: translate(-50%, -50%) rotate(-45deg);
     pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .micro-btn.has-points,
+    .mobile-btn.has-points {
+      animation: none;
+      box-shadow: var(--glow-gold-soft), var(--edge-glint);
+    }
+  }
+  body.reduce-motion .micro-btn.has-points,
+  body.reduce-motion .mobile-btn.has-points {
+    animation: none;
+    box-shadow: var(--glow-gold-soft), var(--edge-glint);
   }
   /* Short-viewport rescue: #side-buttons is bottom-anchored and grows upward,
      so on a very short viewport the topmost button in the taller column (the
@@ -4820,14 +4669,11 @@
     width: max-content;
     max-width: 90vw;
     padding: 8px 14px;
-    border: 2px solid var(--color-border-focus);
-    border-radius: 6px;
-    background: linear-gradient(170deg, #15131fee, #09080eee);
-    box-shadow: 0 2px 10px #000c;
-    color: var(--color-text-light);
-    font-family: var(--ui-font);
     text-align: center;
     z-index: 90;
+  }
+  #actionbar-bind-banner .btn.ui-btn {
+    all: revert-layer;
   }
   .actionbar-bind-hint {
     font-size: 13px;
@@ -4846,9 +4692,7 @@
      so it reads clearly mid-capture. */
   .action-btn.bind-selected {
     border-color: var(--gold);
-    box-shadow:
-      0 0 10px #ffd100cc,
-      inset 0 0 0 2px var(--gold);
+    box-shadow: var(--glow-action-bind-selected);
   }
   /* While the mode is active every slot is a click target, whether or not it
      currently holds anything: a dashed hover ring is the only extra affordance
@@ -4865,10 +4709,9 @@
     position: absolute;
     left: 12px;
     bottom: 8px;
-    width: min(370px, calc(50vw - 330px));
+    width: min(var(--chat-w), calc(50vw - 330px));
   }
   #chatlog-tabs {
-    display: flex;
     /* Stay a single clean row as tabs are added: never wrap the "+" to its own
        line. When the tabs outgrow the strip they scroll horizontally instead
        (the scrollbar is hidden for the classic look; wheel-to-horizontal is
@@ -4881,7 +4724,6 @@
        box), so suppress the browser's own touch gesture here. Mobile has no move
        gesture and overrides this to pan-x so overflowed tabs stay swipeable. */
     touch-action: none;
-    gap: 2px;
     margin-left: 6px;
     margin-bottom: -1px;
     position: relative;
@@ -4894,21 +4736,10 @@
     /* keep each tab its natural width and let the strip scroll, never squish */
     flex: 0 0 auto;
     height: 22px;
-    padding: 0 12px;
-    border: 1px solid #3a321d;
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
-    background: linear-gradient(#1c1824, #0d0b13);
-    color: #95886a;
-    cursor: var(--cursor-point);
-    font-family: var(--title-font);
-    font-size: 12px;
-    text-shadow: 1px 1px 1px #000;
   }
-  .chat-tab.active {
-    color: var(--gold);
-    border-color: #6f5a2a;
-    background: linear-gradient(#2a2436, #161220);
+  .chat-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   /* Drag-to-reorder affordance, matching the bags' grab/drop-target language
      (components.css `.bag-item[draggable="true"]` / `.bag-item.drop-target`)
@@ -4922,9 +4753,9 @@
     opacity: 0.45;
   }
   .chat-tab.drop-target {
-    outline: 2px dashed rgba(255, 218, 160, 0.85);
+    outline: 2px dashed var(--color-glint);
     outline-offset: -2px;
-    box-shadow: 0 0 10px rgba(202, 164, 114, 0.45);
+    box-shadow: var(--glow-gold-soft);
   }
   /* "add channel" (+) tab: square, icon-only, slightly de-emphasised. Sticks to
      the right edge so it stays inline and reachable even when the tabs scroll. */
@@ -4932,14 +4763,8 @@
     flex: 0 0 auto;
     position: sticky;
     right: 0;
-    padding: 0;
     width: 26px;
-    font-size: 15px;
     line-height: 1;
-    color: #b6a472;
-  }
-  .chat-tab-add:hover {
-    color: var(--gold);
   }
   /* a channel tab filters the shared chat pane to its own messages */
   .chat-pane .chat-hidden {
@@ -4976,6 +4801,7 @@
   }
   /* corner resize grip, classic diagonal hatch in the frame's bottom-right */
   .chat-resize-grip {
+    appearance: none;
     position: absolute;
     right: 0;
     bottom: 0;
@@ -4984,17 +4810,23 @@
     cursor: nwse-resize;
     z-index: 3;
     opacity: 0.45;
+    padding: 0;
+    border: 0;
     background: linear-gradient(
       135deg,
       transparent 0 45%,
-      #95886a 45% 55%,
+      var(--color-text-muted) 45% 55%,
       transparent 55% 70%,
-      #95886a 70% 80%,
+      var(--color-text-muted) 70% 80%,
       transparent 80%
     );
   }
   .chat-resize-grip:hover {
     opacity: 0.9;
+  }
+  .chat-resize-grip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   body.mobile-touch .chat-resize-grip {
     display: none;
@@ -5010,25 +4842,9 @@
     bottom: calc(100% + 10px);
     width: 100%;
     aspect-ratio: 1000 / 590;
-    border: 2px solid #4a3d1d;
-    border-radius: 5px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
-    overflow: hidden;
+    overflow: visible;
     isolation: isolate;
     container-type: inline-size;
-    transition:
-      border-color 0.12s ease,
-      box-shadow 0.12s ease;
-  }
-  .store-promo-card:hover,
-  .store-promo-card:focus-within {
-    border-color: var(--gold);
-    box-shadow:
-      inset 0 1px 0 #ffffff24,
-      0 3px 8px #000b;
   }
   .store-promo-card-open {
     position: absolute;
@@ -5038,7 +4854,9 @@
     padding: 0;
     border: 0;
     background: transparent;
+    border-radius: inherit;
     cursor: var(--cursor-point);
+    overflow: hidden;
   }
   .store-promo-card-open img {
     width: 100%;
@@ -5048,6 +4866,9 @@
     transition: filter 0.12s ease;
   }
   .store-promo-card-copy {
+    /* The copy sits inside the card's own <button>, which carries no colour, so
+       it needs one of its own or it takes the UA's black over the art. */
+    color: var(--color-text-light);
     position: absolute;
     top: 7%;
     left: 4%;
@@ -5056,13 +4877,9 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    color: #fff;
     text-align: left;
     line-height: 0.98;
     pointer-events: none;
-    text-shadow:
-      0 2px 2px #000,
-      0 0 12px #000;
   }
   .store-promo-card-season {
     font-size: 5.2cqw;
@@ -5083,15 +4900,11 @@
     min-width: 32%;
     max-width: 47%;
     padding: 2.4% 4%;
-    border: 2px solid #d4ae5f;
-    background: #3a2712e8;
-    color: #fff7df;
     font-size: 4.2cqw;
     font-weight: 800;
     line-height: 1;
     text-align: center;
     text-transform: uppercase;
-    text-shadow: 0 1px 2px #000;
     pointer-events: none;
   }
   .store-promo-card-open:hover img,
@@ -5100,7 +4913,7 @@
   }
   .store-promo-card-open:focus-visible {
     outline: 2px solid var(--color-border-focus);
-    outline-offset: -4px;
+    outline-offset: 2px;
   }
   .store-promo-card-close {
     position: absolute;
@@ -5112,9 +4925,7 @@
     padding: 0;
     display: grid;
     place-items: center;
-    font-size: 22px;
     line-height: 1;
-    box-shadow: 0 1px 3px #000c;
   }
   body.mobile-touch .store-promo-card,
   body.native-app .store-promo-card,
@@ -5135,9 +4946,10 @@
     display: block;
   }
   .chat-pane div {
-    text-shadow: 1px 1px 1px #000;
+    text-shadow: 1px 1px 1px var(--color-keyline);
     overflow-wrap: break-word;
     user-select: text;
+    font-variant-numeric: tabular-nums;
   }
   .chat-player-name {
     /* A live player sender stamps --class-color (see hud.ts); everyone else (and any
@@ -5158,14 +4970,14 @@
     outline-offset: 2px;
   }
   .chat-quest-link {
-    color: #ffd100;
+    color: var(--color-accent);
     cursor: var(--cursor-point);
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
   }
   .chat-quest-link:hover {
-    color: #fff176;
+    color: var(--color-glint);
   }
   .chat-quest-link:focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -5206,10 +5018,10 @@
     width: 8px;
   }
   .chat-pane::-webkit-scrollbar-track {
-    background: #0b0b10;
+    background: var(--color-ink-deep);
   }
   .chat-pane::-webkit-scrollbar-thumb {
-    background: #4a3d1d;
+    background: var(--color-socket-rim);
     border-radius: 4px;
   }
   #report-window {
@@ -5232,9 +5044,9 @@
   #report-window select,
   #report-window textarea {
     width: 100%;
-    background: #101018;
-    border: 1px solid #4a3d1d;
-    border-radius: 4px;
+    background: var(--color-bg-input);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
     color: var(--color-text-light);
     padding: 6px;
   }
@@ -5244,7 +5056,7 @@
   }
   .report-error {
     min-height: 16px;
-    color: #ff7a5e;
+    color: var(--color-text-error);
     font-size: 12px;
     margin-top: 6px;
   }
@@ -5261,9 +5073,6 @@
     flex-direction: column;
     gap: 2px;
     margin-bottom: 8px;
-    background: #101018;
-    border: 1px solid #4a3d1d;
-    border-radius: 4px;
     padding: 8px;
   }
   .bug-info-row {
@@ -5290,10 +5099,6 @@
     width: 100%;
     height: 90px;
     resize: none;
-    background: #101018;
-    border: 1px solid #4a3d1d;
-    border-radius: 4px;
-    color: var(--color-text-light);
     padding: 6px;
     font-size: 16px;
   }
@@ -5305,8 +5110,8 @@
     width: 100%;
     max-width: 100%;
     margin-top: 6px;
-    border: 1px solid #4a3d1d;
-    border-radius: 4px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
   }
 
   /* ---------- right tracker stack (quest tracker + delve tracker) ----------
@@ -5321,7 +5126,7 @@
     position: absolute;
     right: 14px;
     top: 262px;
-    width: 240px;
+    width: var(--tracker-w);
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -5357,7 +5162,6 @@
     width: 100%;
     font-size: 12px;
     color: var(--color-text-overlay);
-    text-shadow: 1px 1px 2px #000;
     pointer-events: none;
   }
   /* The header is a <button>: it re-enables pointer events over the otherwise
@@ -5372,14 +5176,13 @@
      pointer. The border-bottom underline shrinks to match: an accepted
      tradeoff over the rail eating the tracker's clicks. */
   #quest-tracker .qt-header {
+    color: var(--color-accent);
     display: flex;
     align-items: center;
     gap: 6px;
     width: fit-content;
     max-width: 100%;
-    font-family: var(--title-font);
     font-size: 14px;
-    color: var(--color-text-overlay);
     text-align: left;
     background: none;
     border: 0;
@@ -5388,15 +5191,13 @@
     padding: 0 0 2px;
     cursor: pointer;
     pointer-events: auto;
-    text-shadow: 1px 1px 2px #000;
   }
   #quest-tracker .qt-header:hover {
-    color: #fff;
+    color: var(--color-text-light);
   }
   #quest-tracker .qt-header:focus-visible {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
-    border-radius: 2px;
   }
   #quest-tracker .qt-chevron {
     font-size: 10px;
@@ -5421,14 +5222,13 @@
   #quest-tracker .qt-title {
     font-weight: bold;
     margin-top: 8px;
-    font-family: var(--title-font);
     width: fit-content;
     max-width: 100%;
     pointer-events: auto;
     cursor: pointer;
   }
   #quest-tracker .qt-title:hover {
-    color: #fff;
+    color: var(--color-text-light);
   }
   /* Bag-hover highlight: matching quest title while a quest stack is hovered
      in bags. Information-add, always-on (no --fx gate). Quest gold wash, not
@@ -5437,36 +5237,43 @@
     color: var(--color-quest-tracker-bag-hover);
     text-shadow:
       0 0 6px color-mix(in srgb, var(--color-quest-tracker-bag-hover) 55%, transparent),
-      1px 1px 2px #000;
+      var(--title-shadow);
   }
   #quest-tracker .qt-title:focus-visible {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
-    border-radius: 2px;
   }
-  /* acceptance-order number, the same gold badge the world map paints */
+  /* acceptance-order number: the ui-badge SHAPE in the map's quest gold, so the
+     tracker chip and the map badge stay the same object. The library has no
+     gold badge variant yet (a ui-badge--gold would replace these three lines),
+     so the host names the three colors on the shared quest-badge tokens. */
   #quest-tracker .qt-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     width: 16px;
+    min-width: 16px;
     height: 16px;
+    padding: 0;
     margin-right: 5px;
-    border-radius: 50%;
     background: var(--color-map-quest-badge-fill);
+    border-color: var(--color-keyline);
     color: var(--color-map-quest-badge-text);
-    border: 1px solid #000;
     font-size: 11px;
-    font-family: var(--ui-font);
-    vertical-align: text-bottom;
     /* dark digit on a gold fill: the tracker's inherited black text-shadow
        only blurs it, so drop it inside the badge */
     text-shadow: none;
+    vertical-align: text-bottom;
   }
   #quest-tracker .qt-obj {
-    color: var(--color-text-overlay);
-    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
     margin-left: 8px;
+  }
+  #quest-tracker .qt-obj-count {
+    flex: none;
+    color: var(--color-text-light);
+  }
+  #quest-tracker .qt-obj.muted {
+    color: var(--color-text-muted);
   }
   #quest-tracker .qt-obj.done,
   .qd-obj.done,
@@ -5477,7 +5284,7 @@
      blue, matching the map/minimap repeat tokens. Plain color classes so the
      marker reads on every graphics tier (fairness invariant). */
   .quest-repeat {
-    color: #0070dd;
+    color: var(--color-quality-rare);
   }
   /* The map tooltip's TAG texts are 13.5px prose over the panel gradient,
      where #0070dd reads 4.07:1 (under the 4.5:1 AA floor for text) and a
@@ -5503,7 +5310,6 @@
     width: 100%;
     font-size: 12px;
     color: var(--color-text-overlay);
-    text-shadow: 1px 1px 2px #000;
     pointer-events: none;
   }
   /* width: fit-content, same rail click-steal rationale as #quest-tracker
@@ -5514,9 +5320,7 @@
     gap: 6px;
     width: fit-content;
     max-width: 100%;
-    font-family: var(--title-font);
     font-size: 14px;
-    color: var(--color-text-overlay);
     text-align: left;
     background: none;
     border: 0;
@@ -5525,15 +5329,13 @@
     padding: 0 0 2px;
     cursor: pointer;
     pointer-events: auto;
-    text-shadow: 1px 1px 2px #000;
   }
   #deed-tracker .dt-header:hover {
-    color: #fff;
+    color: var(--color-text-light);
   }
   #deed-tracker .dt-header:focus-visible {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
-    border-radius: 2px;
   }
   #deed-tracker .dt-chevron {
     font-size: 10px;
@@ -5557,7 +5359,6 @@
   }
   #deed-tracker .dt-name {
     font-weight: bold;
-    font-family: var(--title-font);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -5565,17 +5366,13 @@
     flex: 1 1 auto;
   }
   #deed-tracker .dt-bar {
+    --bar-color: var(--gold);
+
     flex: 0 0 56px;
-    height: 6px;
-    border: 1px solid #3a3325;
-    border-radius: 3px;
-    background: #14110b;
-    overflow: hidden;
+    height: 3px;
   }
   #deed-tracker .dt-bar-fill {
     display: block;
-    height: 100%;
-    background: linear-gradient(#e6c76a, #a8842f);
   }
   #deed-tracker .dt-count {
     font-size: 11px;
@@ -5593,7 +5390,6 @@
     width: 100%;
     font-size: 12px;
     color: var(--color-text-overlay);
-    text-shadow: 1px 1px 2px #000;
     pointer-events: none;
   }
   /* width: fit-content, same rail click-steal rationale as #quest-tracker
@@ -5604,9 +5400,7 @@
     gap: 6px;
     width: fit-content;
     max-width: 100%;
-    font-family: var(--title-font);
     font-size: 14px;
-    color: var(--color-text-overlay);
     text-align: left;
     background: none;
     border: 0;
@@ -5615,15 +5409,13 @@
     padding: 0 0 2px;
     cursor: pointer;
     pointer-events: auto;
-    text-shadow: 1px 1px 2px #000;
   }
   #reliquary-tracker .dt-header:hover {
-    color: #fff;
+    color: var(--color-text-light);
   }
   #reliquary-tracker .dt-header:focus-visible {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
-    border-radius: 2px;
   }
   #reliquary-tracker .dt-chevron {
     font-size: 10px;
@@ -5647,7 +5439,6 @@
   }
   #reliquary-tracker .dt-name {
     font-weight: bold;
-    font-family: var(--title-font);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -5655,17 +5446,13 @@
     flex: 1 1 auto;
   }
   #reliquary-tracker .dt-bar {
+    --bar-color: var(--color-tracker-reliquary);
+
     flex: 0 0 56px;
-    height: 6px;
-    border: 1px solid #3a3325;
-    border-radius: 3px;
-    background: #14110b;
-    overflow: hidden;
+    height: 3px;
   }
   #reliquary-tracker .dt-bar-fill {
     display: block;
-    height: 100%;
-    background: linear-gradient(#e6c76a, #a8842f);
   }
   #reliquary-tracker .dt-count {
     font-size: 11px;
@@ -5676,18 +5463,25 @@
   }
   @keyframes reliquary-tracker-flash {
     from {
-      color: #ffe9a8;
-      text-shadow: 0 0 6px var(--gold);
+      color: var(--color-text-light);
+      text-shadow: 0 0 6px var(--color-tracker-reliquary);
     }
     to {
       color: var(--color-text-overlay);
-      text-shadow: 1px 1px 2px #000;
+      text-shadow: var(--title-shadow);
     }
   }
   @media (prefers-reduced-motion: reduce) {
     #reliquary-tracker .dt-flash {
       animation: none;
+      color: var(--color-text-light);
+      text-shadow: 0 0 6px var(--color-tracker-reliquary);
     }
+  }
+  body.reduce-motion #reliquary-tracker .dt-flash {
+    animation: none;
+    color: var(--color-text-light);
+    text-shadow: 0 0 6px var(--color-tracker-reliquary);
   }
 
   /* ---------- delve tracker ---------- */
@@ -5699,32 +5493,26 @@
     width: 100%;
     font-size: 12px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
     pointer-events: none;
   }
   #delve-tracker:has(> #delve-body:empty) {
     display: none;
   }
   #delve-tracker .dt-header {
-    font-family: var(--title-font);
     font-size: 14px;
-    border-bottom: 1px solid #ffd10044;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
     margin-bottom: 4px;
     padding-bottom: 2px;
   }
   #delve-tracker .dt-title {
     font-weight: bold;
     margin-top: 8px;
-    font-family: var(--title-font);
   }
   #delve-tracker .dt-tier {
-    color: #c9b27a;
-    font-size: 11px;
-    font-weight: normal;
+    height: 18px;
+    padding: 0 6px;
   }
   #delve-tracker .dt-obj {
-    color: #e8e0c8;
-    font-size: 11px;
     margin-left: 8px;
   }
   #delve-tracker .dt-obj.done {
@@ -5744,20 +5532,16 @@
     max-width: calc(100% - 8px);
   }
   #delve-tracker .dt-affix-label {
-    color: #c9b27a;
-    font-size: 11px;
     margin-right: 2px;
   }
   #delve-tracker .dt-affix-icon {
     display: inline-block;
     width: 18px;
     height: 18px;
-    border-radius: 3px;
-    border: 1px solid #0008;
+    border-radius: var(--radius-xs);
+    border: 1px solid color-mix(in srgb, var(--color-keyline) 53%, transparent);
     object-fit: cover;
-    box-shadow:
-      inset 0 0 0 1px #ffffff18,
-      0 1px 3px #0009;
+    box-shadow: var(--edge-glint), var(--shadow-lift);
     cursor: help;
   }
 
@@ -5770,22 +5554,18 @@
     width: 100%;
     font-size: 12px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
     pointer-events: none;
   }
   #rift-tracker:has(> #rift-body:empty) {
     display: none;
   }
   #rift-tracker .rt-header {
-    font-family: var(--title-font);
     font-size: 14px;
-    border-bottom: 1px solid #ffd10044;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
     margin-bottom: 4px;
     padding-bottom: 2px;
   }
   #rift-tracker .rt-obj {
-    color: #e8e0c8;
-    font-size: 11px;
     margin-left: 8px;
     margin-top: 4px;
   }
@@ -5799,25 +5579,25 @@
     width: 100%;
     font-size: 12px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: 1px 1px 2px var(--color-keyline);
     pointer-events: none;
     display: none;
   }
   #practice-tracker .pt-header {
     font-family: var(--title-font);
     font-size: 14px;
-    border-bottom: 1px solid #ffd10044;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
     margin-bottom: 4px;
     padding-bottom: 2px;
   }
   #practice-tracker .pt-live {
     font-family: var(--title-font);
     font-size: 20px;
-    color: #fff4c4;
+    color: var(--color-text-light);
     margin: 2px 0 2px 8px;
   }
   #practice-tracker .pt-obj {
-    color: #e8e0c8;
+    color: var(--color-text-secondary);
     font-size: 11px;
     margin-left: 8px;
     margin-top: 4px;
@@ -5826,23 +5606,23 @@
     display: grid;
     grid-template-columns: auto 1fr;
     column-gap: 6px;
-    color: #e8e0c8;
+    color: var(--color-text-secondary);
     font-size: 11px;
     margin-left: 8px;
     margin-top: 2px;
   }
   #practice-tracker .pt-run-dps {
     text-align: right;
-    color: #fff4c4;
+    color: var(--color-text-light);
   }
   #practice-tracker .pt-run-sum {
     grid-column: 1 / -1;
-    color: #b8b0a0;
+    color: var(--color-text-muted);
     font-size: 10px;
   }
   /* The best finished run so far: the number a new build has to beat. */
   #practice-tracker .pt-best .pt-run-dps {
-    color: #7ee08a;
+    color: var(--color-text-success);
   }
 
   /* ---------- hub lesson coach ---------- */
@@ -5855,12 +5635,12 @@
     width: 100%;
     font-size: 12px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: 1px 1px 2px var(--color-keyline);
     margin-top: 8px;
     display: none;
   }
   #hub-lesson-coach .hlc-line {
-    color: #e8e0c8;
+    color: var(--color-text-secondary);
     line-height: 1.35;
   }
   #hub-lesson-coach .hlc-chip {
@@ -5869,7 +5649,7 @@
     padding: 0 5px;
     border: 1px solid var(--gold);
     border-radius: 3px;
-    color: #fff4c4;
+    color: var(--color-text-light);
     font-family: var(--title-font);
     font-size: 11px;
   }
@@ -5903,7 +5683,7 @@
     padding: 0 5px;
     border: 1px solid var(--gold);
     border-radius: 3px;
-    color: #fff4c4;
+    color: var(--color-text-light);
     font-family: var(--title-font);
     font-size: 11px;
   }
@@ -5921,7 +5701,7 @@
      .hud-frame-detached. Either class turns the panel into the fixed-height
      scrolling column below. */
   .mt-panel {
-    width: 240px;
+    width: var(--tracker-w);
     padding: 8px 10px;
     display: none;
     align-self: flex-end;
@@ -5954,7 +5734,15 @@
     bottom: auto;
   }
   .mt-panel .panel-title {
+    height: 18px;
+    min-height: 18px;
+    padding: 0;
     margin-bottom: 4px;
+  }
+  .mt-panel :is(.ui-disc, .ui-x-btn) {
+    width: 24px;
+    height: 24px;
+    padding: 0;
   }
   /* A framed panel owns its height, so the bar list takes the leftover space and
      scrolls rather than pushing the panel taller than the player sized it. */
@@ -5988,10 +5776,6 @@
   .mt-panel .mt-move-handle button {
     touch-action: auto;
   }
-  .mt-title-label {
-    font-family: var(--title-font);
-    color: var(--gold);
-  }
   body.meter-frame-dragging,
   body.meter-frame-dragging * {
     user-select: none;
@@ -6009,9 +5793,9 @@
     background: linear-gradient(
       135deg,
       transparent 0 45%,
-      #95886a 45% 55%,
+      var(--color-text-muted) 45% 55%,
       transparent 55% 70%,
-      #95886a 70% 80%,
+      var(--color-text-muted) 70% 80%,
       transparent 80%
     );
   }
@@ -6031,50 +5815,27 @@
     touch-action: auto;
   }
   .mt-tab {
-    background: #1a1410;
-    border: 1px solid var(--gold);
-    border-radius: 3px;
-    color: var(--color-text-muted);
-    font-size: 11px;
     padding: 1px 7px;
     cursor: var(--cursor-point);
   }
-  .mt-tab.on {
-    color: var(--gold);
-    border-color: var(--gold-dim);
-    background: #2a2010;
-  }
-  .mt-view {
-    font-size: 12px;
-    color: var(--gold);
-    font-family: var(--title-font);
-    text-shadow: 1px 1px 1px #000;
-  }
   .mt-sub {
-    font-size: 10px;
-    color: #9c8f6e;
     margin: 1px 0 6px;
   }
   /* Empty-state discoverability hint, shown only on the live current segment of
      the damage/healing tabs (meters.ts gates it). Its own element so it is one
      t() string, never concatenated onto .mt-sub. */
   .mt-hint {
-    font-size: 10px;
     line-height: 1.35;
-    color: #8a7d5e;
     margin: 0 0 6px;
   }
   .mt-row {
     position: relative;
     height: 17px;
     margin-bottom: 3px;
-    background: #14100c;
-    border: 1px solid #000;
-    border-radius: 2px;
     overflow: hidden;
   }
   .mt-row.aggro {
-    border-color: #c0392b;
+    border-color: var(--color-danger);
   }
   .mt-fill {
     position: absolute;
@@ -6087,8 +5848,8 @@
     top: 0;
     line-height: 17px;
     font-size: 11px;
-    color: #fff;
-    text-shadow: 1px 1px 1px #000;
+    color: var(--color-white);
+    text-shadow: 1px 1px 1px var(--color-keyline);
     font-weight: bold;
   }
   .mt-num {
@@ -6097,49 +5858,28 @@
     top: 0;
     line-height: 17px;
     font-size: 10px;
-    color: #ffe;
-    text-shadow: 1px 1px 1px #000;
+    color: var(--color-text-light);
+    text-shadow: 1px 1px 1px var(--color-keyline);
   }
   /* Each bar is focusable so its hover breakdown is reachable by keyboard, not
      by pointer only (attachTooltip shows on focusin and on a long-press). */
   .mt-row:focus-visible {
     outline: 2px solid var(--color-border-focus);
-    outline-offset: -1px;
+    outline-offset: 2px;
   }
 
   /* ---------- target aura window ---------- */
   .ta-panel {
-    width: 220px;
+    width: 400px;
     height: var(--ta-preferred-height, 534px);
     max-height: calc(100vh - 16px);
     padding: 3px;
     flex-direction: column;
     container-type: inline-size;
   }
-  /* The panel itself is only a positioning surface. Aura rows provide their
-     own meter-like plates; the outer box stays invisible like the reference
-     layout, including under frosted/custom panel themes. */
-  #target-auras-window {
-    border: 0;
-    outline: 0;
-    border-radius: 0;
-    background: transparent;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    box-shadow: none;
-  }
   .ta-panel .panel-title {
-    min-height: 18px;
     margin-bottom: 4px;
-    padding: 0 1px 2px;
     justify-content: flex-start;
-    border-bottom: 1px dashed color-mix(in srgb, var(--gold-dim) 55%, transparent);
-    background: transparent;
-    opacity: 0.58;
-  }
-  .ta-panel .panel-title:hover,
-  .ta-panel.ta-unlocked .panel-title {
-    opacity: 0.9;
   }
   .ta-panel .ta-title {
     flex: 1 1 auto;
@@ -6169,15 +5909,8 @@
     height: 24px;
     margin-left: auto;
     padding: 0;
-    border: 1px solid color-mix(in srgb, var(--color-text-muted) 42%, transparent);
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--color-bg-input) 72%, transparent);
-    color: var(--color-text-muted);
     cursor: var(--cursor-point);
     opacity: 0.78;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 1px 3px #0009;
   }
   .ta-rows-config-btn {
     position: relative;
@@ -6186,10 +5919,6 @@
     height: 24px;
     margin-left: auto;
     padding: 0;
-    border: 1px solid color-mix(in srgb, var(--color-text-muted) 42%, transparent);
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--color-bg-input) 72%, transparent);
-    color: var(--color-text-muted);
     cursor: var(--cursor-point);
     opacity: 0.78;
   }
@@ -6215,7 +5944,7 @@
   .ta-rows-config-btn:focus-visible,
   .ta-visible-rows-step:focus-visible {
     outline: 2px solid var(--color-border-focus);
-    outline-offset: 1px;
+    outline-offset: 2px;
   }
   .ta-visible-rows-control {
     position: absolute;
@@ -6228,10 +5957,6 @@
     width: min(150px, calc(100vw - 16px));
     gap: 2px;
     padding: 3px;
-    border: 1px solid var(--color-border-showcase);
-    border-radius: 3px;
-    background: var(--color-bg-input);
-    box-shadow: 0 2px 6px #0009;
   }
   .ta-visible-rows-step,
   .ta-visible-rows-value {
@@ -6242,10 +5967,6 @@
   }
   .ta-visible-rows-step {
     padding: 0;
-    border: 1px solid color-mix(in srgb, var(--gold-dim) 60%, transparent);
-    border-radius: 2px;
-    background: color-mix(in srgb, var(--color-bg-dark) 82%, transparent);
-    color: var(--color-text-light);
     cursor: var(--cursor-point);
     font-size: 18px;
     line-height: 1;
@@ -6333,7 +6054,7 @@
   }
   .ta-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
-    outline-offset: 1px;
+    outline-offset: 2px;
   }
   .ta-panel:not(.ta-unlocked) .panel-resize-grip {
     display: none;
@@ -6341,8 +6062,6 @@
   .ta-target {
     margin: 0 0 6px;
     overflow: hidden;
-    color: var(--color-text-muted);
-    font-size: 11px;
     line-height: 16px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -6365,9 +6084,6 @@
     line-height: 16px;
     text-overflow: clip;
     white-space: nowrap;
-  }
-  .ta-filters .mt-tab.on {
-    background: color-mix(in srgb, var(--gold-dim) 22%, transparent);
   }
   .ta-section {
     display: flex;
@@ -6457,9 +6173,6 @@
     height: var(--ta-row-height);
     margin-bottom: 3px;
     overflow: hidden;
-    border: 1px solid var(--color-border-showcase);
-    border-radius: 2px;
-    background: var(--color-bg-input);
     opacity: var(--ta-row-opacity, 1);
   }
   .ta-row.own {
@@ -6541,8 +6254,6 @@
     grid-row: 2;
     overflow: hidden;
     padding-left: 5px;
-    color: var(--color-text-muted);
-    font-size: clamp(9.5px, 2.3cqw, 11px);
     line-height: 14px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -6581,14 +6292,14 @@
     top: 50%;
     width: 6px;
     height: 6px;
-    border: 1px solid #fff2b0;
+    border: 1px solid var(--color-glint);
     background: var(--gold);
-    box-shadow: 0 0 4px #000;
+    box-shadow: 0 0 calc(4px * var(--fx-shadow, 1)) var(--color-keyline);
     transform: translateY(-50%) rotate(45deg);
   }
   .ta-row:focus-visible {
     outline: 2px solid var(--color-border-focus);
-    outline-offset: -2px;
+    outline-offset: 2px;
   }
   @media (prefers-reduced-motion: no-preference) {
     .ta-row.expiring .ta-icon {
@@ -6598,6 +6309,10 @@
   /* Expiry remains visible on Low without keeping a compositor animation alive
      for every expiring target aura. Full tiers retain the blink above. */
   :root[data-fx-level="low"] .ta-row.expiring .ta-icon {
+    animation: none;
+    filter: brightness(1.4);
+  }
+  body.reduce-motion .ta-row.expiring .ta-icon {
     animation: none;
     filter: brightness(1.4);
   }
@@ -6628,7 +6343,7 @@
     left: 0;
     top: 0;
     bottom: 0;
-    background: #ffffff14;
+    background: color-mix(in srgb, var(--color-white) 8%, transparent);
     border-radius: 2px;
   }
   #tooltip .mt-tip-name {
@@ -6687,46 +6402,47 @@
     text-align: center;
   }
   #zone-label {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--gold);
-    font-family: var(--title-font);
-    text-shadow: 1px 1px 3px #000;
-    margin-bottom: 3px;
-    letter-spacing: 0.5px;
+    margin-bottom: 8px;
   }
   #minimap {
+    display: block;
     border-radius: 50%;
     border: 4px solid var(--border);
     box-shadow:
-      0 0 14px #000c,
-      inset 0 0 20px #0008;
+      0 0 calc(14px * var(--fx-shadow, 1)) color-mix(in srgb, var(--color-keyline) 75%, transparent),
+      inset 0 0 20px color-mix(in srgb, var(--color-keyline) 53%, transparent);
   }
-  /* Digital clock pinned to the bottom of the minimap ring, classic style. */
+  /* The board's clock medallion straddles the ring's lower edge. It is anchored
+     from the wrap's BOTTOM, not its top: a zone name that wraps to two lines
+     grows the whole column downward, so a top offset would drift into the ring
+     while a bottom offset moves with it. */
   #minimap-clock {
     position: absolute;
     left: 50%;
-    bottom: -3px;
+    bottom: 97px;
     transform: translateX(-50%);
     min-width: 52px;
     padding: 1px 8px;
+    appearance: none;
     cursor: pointer;
     user-select: none;
-    font-family: var(--font-ui);
     font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.4px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
-    background: radial-gradient(circle at 50% 30%, #2c2c3a, #14141d);
-    border: 2px solid var(--border);
+    background: var(--socket-fill);
+    border: 2px solid var(--color-control-border);
     border-radius: 8px;
-    box-shadow:
-      0 2px 4px #0009,
-      inset 0 1px 0 #ffffff14;
+    box-shadow: var(--edge-glint), var(--shadow-lift);
   }
   #minimap-clock:hover {
-    color: #fff;
-    border-color: #c9a86a;
+    color: var(--color-text-light);
+    border-color: var(--gold-dim);
+  }
+  #minimap-clock:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   /* day/night dial: a satellite disc on the top-right rim of the minimap
      (mirrors the #raid-lockout button placement), showing the world day/night
@@ -6739,44 +6455,46 @@
     z-index: 3;
     width: 44px;
     height: 44px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    background: #14141d;
-    box-shadow:
-      0 1px 3px #000a,
-      inset 0 0 6px #0007;
     pointer-events: none;
   }
   #minimap-coords {
-    margin-top: 4px;
+    margin-top: 6px;
     display: inline-block;
-    padding: 1px 8px;
     font-size: 11px;
-    font-variant-numeric: tabular-nums;
-    color: #e8d9b0;
-    background: #0008;
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    text-shadow: 1px 1px 2px #000;
     letter-spacing: 0.3px;
   }
 
-  /* heading compass, a horizontal rose strip beneath the minimap */
+  /* heading compass, a horizontal rose strip beneath the minimap. The top
+     margin is the seat the bottom-anchored clock medallion and zoom discs
+     occupy between the ring and this strip. */
   #compass {
     position: relative;
     width: 162px;
-    margin: 5px auto 0;
+    margin: 42px auto 0;
   }
   #compass-strip {
     position: relative;
     height: 18px;
     overflow: hidden;
-    border: 2px solid var(--border);
-    border-radius: 5px;
-    background: linear-gradient(#1c1a14, #100f0b);
-    box-shadow: inset 0 0 8px #000a;
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    border: 2px solid var(--color-control-border);
+    border-radius: var(--radius-card);
+    background: linear-gradient(var(--color-chrome-ground), var(--color-ink-deep));
+    box-shadow: inset 0 0 calc(8px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-keyline) 65%, transparent);
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-keyline) 18%,
+      var(--color-keyline) 82%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-keyline) 18%,
+      var(--color-keyline) 82%,
+      transparent
+    );
   }
   #compass-track {
     position: absolute;
@@ -6786,10 +6504,8 @@
     position: absolute;
     top: 50%;
     transform: translate(-50%, -50%);
-    font-family: var(--title-font);
     font-size: 11px;
-    color: #b9ad86;
-    text-shadow: 1px 1px 2px #000;
+    color: var(--color-text-muted);
     pointer-events: none;
     white-space: nowrap;
   }
@@ -6809,62 +6525,48 @@
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-top: 6px solid var(--gold);
-    filter: drop-shadow(0 1px 1px #000);
+    filter: drop-shadow(
+      0 1px calc(1px * var(--fx-shadow, 1))
+        color-mix(in srgb, var(--color-keyline) 75%, transparent)
+    );
   }
   #compass-heading {
     margin-top: 2px;
-    font-family: var(--title-font);
     font-size: 12px;
     color: var(--gold);
-    letter-spacing: 1px;
-    text-shadow: 1px 1px 2px #000;
   }
-  /* minimap zoom control: a compact gold pill pinned to the bottom rim of the
-     round minimap. Vertical centre holds the live zoom readout (e.g. "2×"). */
+  /* minimap zoom control: three compact discs hugging the ring's lower arc,
+     under the clock medallion. Vertical centre holds the live zoom readout
+     (e.g. "2x"). Bottom-anchored for the same reason as the medallion. */
   #minimap-zoom {
     position: absolute;
     left: 50%;
-    bottom: -6px;
+    bottom: 65px;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     gap: 4px;
-    padding: 1px 4px;
     z-index: 2;
-    background: radial-gradient(circle at 50% 30%, #2c2c3a, #15151f);
-    border: 1px solid #4a3d1d;
-    border-radius: 9px;
-    box-shadow: 0 1px 3px #000a;
   }
   .minimap-zoom-btn {
-    width: 17px;
-    height: 17px;
+    --disc-size: 22px;
+
     padding: 0;
     line-height: 1;
     font-size: 14px;
     font-weight: bold;
-    color: var(--color-text-muted);
-    background: none;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    font-family: var(--title-font);
-  }
-  .minimap-zoom-btn:hover:not(:disabled) {
-    color: #fff;
-    background: #ffffff1a;
   }
   .minimap-zoom-btn:disabled {
     opacity: 0.3;
     cursor: default;
   }
   #minimap-zoom-label {
+    --disc-size: 24px;
+
     min-width: 24px;
     font-size: 11px;
     color: var(--gold);
-    font-family: var(--title-font);
-    text-shadow: 1px 1px 2px #000;
-    letter-spacing: 0.3px;
+    cursor: default;
   }
 
   /* wraps the round minimap canvas so the raid-lockout badge can anchor to the
@@ -6874,63 +6576,56 @@
     display: inline-block;
     line-height: 0;
   }
-  /* Hand-gilded ring around the round minimap disc, reusing the Performance
-     Overlay's gilt-gradient technique (#2196, perf_ornament_svg.ts /
-     applyMinimapOrnamentVars, called once at boot). A circular disc needs no
-     mask geometry the way that window's straight edges/corners did: the ring
-     is simply a same-shape ::before sized a few px larger than the canvas,
-     painted BEHIND it (negative z-index), so the canvas's own fully opaque
-     pixels cover the center and only the extra outer band reads as the ring.
-     No layout change: the ring lives outside #minimap-disc's own box (which
-     stays exactly canvas-sized), so the rim badges below keep their existing
-     positions and z-index: 3 stacks safely above this ring. */
+  /* The board's conic-bronze bezel, painted BEHIND the canvas and outside the
+     disc's own layout box (inset -6px, z-index -1), so the canvas covers the
+     centre and only the outer band reads as a ring: the four guarded rim seats
+     do not move. Three layers, each a real axis of variation:
+       1) the deterministic 9-stop conic bronze from the board, which replaces
+          the generated `--minimap-gilt` tone ramp as the ring's base metal;
+       2) `--minimap-speckle` (minimap_gilded_ornament.ts), the seeded field of
+          dark tarnish spots that keeps the ring reading as hand-gilded rather
+          than printed. `hard-light` (not `overlay`) decides multiply-vs-screen
+          from the SOURCE, so a dark spot consistently darkens whatever tone it
+          lands on. The low effect tier resolves this token to `none`, which is
+          how the expensive layer (an SVG data URI) is still shed there;
+       3) the board's soft directional sheen on top.
+     The -6px inset is load-bearing: minimap_gilded_ornament.ts's SPECKLE_R_MIN
+     is tuned to the band that inset leaves visible. */
   #minimap-disc::before {
     content: "";
     position: absolute;
-    /* Thin: matches a real gold ring's proportions (and this element's own
-       pre-ornament width), not a thick painted band. An earlier pass widened
-       this to make the texture easier to see and overshot into "thick single
-       color border" territory; the fix was better texture, not more width.
-       -6px (not the -5px this narrowly missed) also gives the dark tarnish
-       speckles (minimap_gilded_ornament.ts) enough visible band width to
-       render as more than sub-pixel dots. */
     inset: -6px;
     z-index: -1;
     border-radius: 50%;
-    /* Not a stack of discrete color BANDS (an earlier pass read as a
-       striped/layered ring once actually compared against the reference):
-       real hand-gilded gold reads as textured because of slight dark
-       tarnish spotting across the surface, not because the metal is
-       painted in rings. Three layers, each a real axis of variation:
-       1) `--minimap-gilt` (#2196's perfGiltGradientBackground(), reused
-          as-is): hand-applied, uneven tone BY ANGLE around the ring;
-       2) `--minimap-speckle` (minimap_gilded_ornament.ts,
-          minimapGiltSpeckleBackground(), reusing that same file's seeded
-          mulberry32 PRNG): a sparse field of small dark tarnish spots
-          (weighted heavily toward the dark end of the gold ramp, matching
-          the reference's brass-with-dark-spotting look, not bright
-          flecks). `hard-light` (not `overlay`) blends it into (1):
-          hard-light's multiply-vs-screen choice is decided by the SOURCE
-          (this speckle layer), so a dark spot consistently darkens
-          wherever it sits; overlay decides by the BACKDROP instead, which
-          read as washed out against the gilt gradient's own swings. The
-          spots read as tarnish IN the metal, not decals on top of it;
-       3) a soft directional sheen on top (normal blend; the same
-          `radial-gradient(circle at 50% 30%, ...)` fake-3D highlight
-          convention this file already uses on #minimap-clock/#raid-lockout/
-          #minimap-zoom). */
     background:
-      radial-gradient(circle at 50% 20%, #fff8df50, transparent 55%), var(--minimap-speckle),
-      var(--minimap-gilt);
+      radial-gradient(
+        circle at 50% 20%,
+        color-mix(in srgb, var(--color-glint) 35%, transparent),
+        transparent 55%
+      ),
+      var(--minimap-speckle),
+      conic-gradient(
+        from 18deg,
+        var(--color-bronze-dark),
+        var(--color-glint) 9%,
+        var(--color-bronze-light) 17%,
+        var(--color-bronze-dark) 31%,
+        var(--color-bronze-light) 46%,
+        var(--color-glint) 53%,
+        var(--color-bronze-dark) 68%,
+        var(--color-bronze-light) 83%,
+        var(--color-bronze-dark)
+      );
     background-size:
       auto,
       100% 100%,
       auto;
     background-blend-mode: normal, hard-light, normal;
     box-shadow:
-      inset 0 0 0 1px #fff2c440,
-      inset 0 0 2px 1px #00000060,
-      0 1px 3px #000a;
+      inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 25%, transparent),
+      inset 0 0 2px 1px color-mix(in srgb, var(--color-keyline) 38%, transparent),
+      0 1px calc(3px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-keyline) 65%, transparent);
     pointer-events: none;
   }
   /* raid-lockout badge: a small satellite button hugging the bottom-left rim of
@@ -6941,43 +6636,19 @@
     left: 10px;
     bottom: 10px;
     z-index: 3;
-    width: 26px;
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 28px;
+    height: 28px;
     padding: 0;
-    cursor: pointer;
-    border-radius: 50%;
-    background: radial-gradient(circle at 50% 30%, #2c2c3a, #15151f);
-    border: 1px solid #4a3d1d;
-    box-shadow: 0 1px 3px #000a;
-    color: #8c8472;
-    transition:
-      color 0.2s,
-      border-color 0.2s,
-      box-shadow 0.2s;
   }
   #raid-lockout svg {
     width: 15px;
     height: 15px;
     display: block;
   }
-  #raid-lockout:hover,
-  #raid-lockout:focus-visible {
-    color: #d8c89a;
-    border-color: #c9a86a;
-    outline: none;
-  }
-  #raid-lockout:focus-visible {
-    box-shadow: 0 0 0 2px var(--gold);
-  }
   #raid-lockout.locked {
     color: var(--gold);
-    border-color: #c9a86a;
-    box-shadow:
-      0 0 8px #c9a86a66,
-      0 1px 3px #000a;
+    border-color: var(--gold-dim);
+    box-shadow: var(--glow-gold-soft), var(--edge-glint);
   }
   /* The store chest occupies a normal menu slot, including compact mode. */
   #daily-rewards-button {
@@ -7006,7 +6677,17 @@
     display: block;
     object-fit: contain;
     pointer-events: none;
-    filter: drop-shadow(0 1px 2px #000b);
+    filter: drop-shadow(0 1px 2px color-mix(in srgb, var(--color-keyline) 70%, transparent));
+  }
+  /* The ready count rides the shared corner badge, pulled in to the 34x30 launcher. */
+  #daily-rewards-button .daily-reward-count {
+    top: -2px;
+    right: -2px;
+    z-index: 2;
+    display: none;
+  }
+  #daily-rewards-button.spin-ready .daily-reward-count {
+    display: inline-flex;
   }
   #daily-rewards-button:hover,
   #daily-rewards-button:focus-visible {
@@ -7014,17 +6695,31 @@
     filter: brightness(1.1);
   }
   #daily-rewards-button:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 3px;
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   @keyframes daily-rewards-icon-pulse {
     0%,
     100% {
-      filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 4px #ffd56d55) brightness(1);
+      filter: drop-shadow(
+          0 2px calc(2px * var(--fx-shadow, 1))
+            color-mix(in srgb, var(--color-keyline) 70%, transparent)
+        )
+        drop-shadow(
+          0 0 calc(4px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 35%, transparent)
+        )
+        brightness(1);
     }
     50% {
-      filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 14px #ffe08acc) brightness(1.16)
-        saturate(1.12);
+      filter: drop-shadow(
+          0 2px calc(2px * var(--fx-shadow, 1))
+            color-mix(in srgb, var(--color-keyline) 70%, transparent)
+        )
+        drop-shadow(
+          0 0 calc(14px * var(--fx-shadow, 1))
+            color-mix(in srgb, var(--color-glint) 80%, transparent)
+        )
+        brightness(1.16) saturate(1.12);
     }
   }
   /* the lockout panel rows inside the shared tooltip box */
@@ -7039,7 +6734,7 @@
     line-height: 1.5;
   }
   .rl-row .rl-name {
-    color: #e8dcc0;
+    color: var(--color-text-secondary);
   }
   .rl-row .rl-time {
     color: var(--gold);
@@ -7047,7 +6742,7 @@
   }
   .rl-empty {
     font-size: 12px;
-    color: #b8c8a0;
+    color: var(--color-text-success);
   }
 
   /* ---------- community HUD ---------- */
@@ -7074,6 +6769,8 @@
     align-items: center;
     gap: 4px;
   }
+  /* The tray plate stays fixed dark on every preset: it floats over the world,
+     not over a themed panel, so its ink is fixed too (see the chip below). */
   .community-link {
     width: 34px;
     height: 30px;
@@ -7082,51 +6779,29 @@
     justify-content: center;
     color: var(--color-text-muted);
     text-decoration: none;
-    border: 2px solid #4a3d1d;
-    border-radius: 5px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
+    border: 2px solid var(--color-socket-rim);
+    border-radius: var(--radius-card);
+    background: var(--chrome-plate-fixed);
+    box-shadow: var(--edge-glint), var(--shadow-lift);
     transition:
-      color 0.15s,
-      border-color 0.15s;
+      color var(--dur-frame) ease,
+      border-color var(--dur-frame) ease;
   }
-  .community-link:hover {
-    color: #fff;
-    border-color: #7f8cff;
-  } /* Discord brand */
-  .community-link.github:hover {
-    color: #fff;
-    border-color: #e4e4ea;
-  } /* GitHub brand */
   .community-link svg {
     width: 18px;
     height: 18px;
     flex: none;
     display: block;
   }
+  /* The tray toggle is a ui-disc; only its glyph needs a size here (the summary
+     itself is display:none on desktop, where the tray is always open). */
+  .community-toggle .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
   .community-link span {
     display: none;
   }
-  /* Donate is the one labelled community button, show its text and auto-width to fit. */
-  .community-link.donate {
-    width: auto;
-    gap: 6px;
-    padding: 0 11px;
-    font-family: var(--font-ui);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-  }
-  .community-link.donate span {
-    display: inline;
-    line-height: 1;
-  }
-  .community-link.donate:hover {
-    color: #fff;
-    border-color: #ff6b8b;
-  } /* Donate */
   body.native-app .donate-cta,
   body.native-app .community-link.donate,
   body.native-app .social-link.donate,
@@ -7156,7 +6831,7 @@
        - its only motion is a single slow sheen that crosses the plate about once
          every 14 seconds and spends the rest of the cycle parked off the left
          edge, so it registers peripherally and never asks to be looked at.
-     Steam's own #66c0f4 arrives on hover and keyboard focus only, identifying the
+     Steam's own accent token arrives on hover and keyboard focus only, identifying the
      destination the way each sibling link's brand colour already does. */
   .community-link.steam-wishlist-chip {
     position: relative;
@@ -7171,7 +6846,7 @@
     /* The plate itself is fixed dark across themes, so the ink is fixed too.
        Parchment's repaired themed token is dark brown for light panels and
        fails here; this muted silver holds above 7:1 on both gradient stops. */
-    color: #b8bcc8;
+    color: var(--color-chrome-plate-ink);
   }
   .community-link.steam-wishlist-chip span {
     display: inline;
@@ -7193,7 +6868,7 @@
     background: linear-gradient(
       100deg,
       transparent 36%,
-      rgb(255 238 190 / 22%) 50%,
+      color-mix(in srgb, var(--color-glint) 22%, transparent) 50%,
       transparent 64%
     );
     transform: translateX(-140%);
@@ -7212,8 +6887,16 @@
   }
   .community-link.steam-wishlist-chip:hover,
   .community-link.steam-wishlist-chip:focus-visible {
-    color: #fff;
-    border-color: #66c0f4;
+    color: var(--color-text-light);
+    border-color: var(--color-steam-accent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .community-link.steam-wishlist-chip::after {
+      animation: none;
+    }
+  }
+  body.reduce-motion .community-link.steam-wishlist-chip::after {
+    animation: none;
   }
   /* Two audiences never see the reminder: a player already inside the Steam
      build of the desktop app (body.steam-build, stamped from the shell's own
@@ -7460,7 +7143,7 @@
     position: absolute;
     font-weight: bold;
     pointer-events: none;
-    text-shadow: 1px 1px 3px #000;
+    text-shadow: var(--outline-shadow);
     animation: fct-rise 1.1s ease-out forwards;
     font-size: 17px;
     /* Centering uses the individual `translate` property (not the `transform` shorthand) so
@@ -7469,7 +7152,8 @@
        properties keep separate keyframe intervals, so the motion is byte-identical to
        the prior margin-top rise + transform scale pop. */
     translate: -50% -50%;
-    font-family: var(--title-font);
+    font-family: var(--font-display);
+    letter-spacing: 0.5px;
     z-index: 5;
   }
   .fct.crit {
@@ -7525,41 +7209,47 @@
      a landed hit blunted) vs taken (#7ec8e3, a cooler steel blue, a landed block you made);
      heal (#3ce63c); xp (#d9a3ff); rested xp (#6db8ff); Honor (#ffd100); the self note
      (#ff8c66). Crit stays the separate .fct.crit class. */
-  .fct-miss-self,
-  .fct-dodge-self {
-    color: #bbb;
+  .fct-miss-self {
+    color: var(--color-fct-miss-self);
   }
-  .fct-miss-other,
-  .fct-dodge-other,
+  .fct-dodge-self {
+    color: var(--color-fct-dodge-self);
+  }
+  .fct-miss-other {
+    color: var(--color-fct-miss-other);
+  }
+  .fct-dodge-other {
+    color: var(--color-fct-dodge-other);
+  }
   .fct-damage-done-auto {
-    color: #fff;
+    color: var(--color-fct-damage-done-auto);
   }
   .fct-damage-done-ability {
-    color: #ffe97a;
+    color: var(--color-fct-damage-done-ability);
   }
   .fct-damage-taken {
-    color: #ff5544;
+    color: var(--color-fct-damage-taken);
   }
   .fct-damage-done-block {
-    color: #b8c4d9;
+    color: var(--color-fct-damage-done-block);
   }
   .fct-damage-taken-block {
-    color: #7ec8e3;
+    color: var(--color-fct-damage-taken-block);
   }
   .fct-absorb {
-    color: #9fd7ff;
+    color: var(--color-fct-absorb);
   }
   .fct-heal {
-    color: #3ce63c;
+    color: var(--color-fct-heal);
   }
   .fct-xp {
-    color: #d9a3ff;
+    color: var(--color-fct-xp);
     font-size: calc(20px * var(--fct-scale, 1));
     animation-name: fct-xp-pop;
     animation-duration: 1.6s;
   }
   .fct-rested-xp {
-    color: #6db8ff;
+    color: var(--color-fct-rested-xp);
     font-size: calc(20px * var(--fct-scale, 1));
     animation-name: fct-xp-pop;
     animation-duration: 1.6s;
@@ -7588,10 +7278,16 @@
     animation-name: fct-rise;
   }
   .fct-honor {
-    color: #ffd100;
+    color: var(--color-fct-honor);
   }
   .fct-self-note {
-    color: #ff8c66;
+    color: var(--color-fct-self-note);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fct {
+      animation: none !important;
+      opacity: 1;
+    }
   }
 
   /* ---------- Interface & Comfort settings ----------
@@ -7629,9 +7325,25 @@
   #chatlog-frame {
     background: linear-gradient(
       170deg,
-      color-mix(in srgb, var(--panel-base) calc(var(--chat-opacity, 0.95) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--panel-edge) calc(var(--chat-opacity, 0.95) * 100%), transparent) 100%
+      color-mix(
+          in srgb,
+          var(--panel-base) calc(var(--chat-opacity, 1) * var(--chat-soft, 0.74) * 100%),
+          transparent
+        )
+        0%,
+      color-mix(
+          in srgb,
+          var(--panel-edge) calc(var(--chat-opacity, 1) * var(--chat-soft, 0.74) * 100%),
+          transparent
+        )
+        100%
     );
+  }
+  #chatlog-wrap:hover #chatlog-frame,
+  #chatlog-wrap:focus-within #chatlog-frame,
+  body:has(#chat-input:hover) #chatlog-frame,
+  body:has(#chat-input:focus) #chatlog-frame {
+    --chat-soft: 1;
   }
   /* HUD Opacity (--hud-opacity), fades frames/windows as a whole. */
   .panel,
@@ -7904,9 +7616,9 @@
     border-radius: 14px;
     padding: 6px 12px;
     box-shadow:
-      0 4px 24px #000b,
-      0 0 0 2px #ff3df055;
-    background: #140a1cdd;
+      0 4px 24px color-mix(in srgb, var(--color-keyline) 73%, transparent),
+      0 0 0 2px color-mix(in srgb, var(--color-xp) 33%, transparent);
+    background: color-mix(in srgb, var(--color-xp-deep) 25%, var(--color-bg-deep));
   }
   #fiesta-score .fs-team {
     display: flex;
@@ -7922,21 +7634,21 @@
     height: 42px;
     border-radius: 9px;
     overflow: hidden;
-    border: 2px solid #ffffff33;
-    background: #0008;
+    border: 2px solid color-mix(in srgb, var(--color-white) 20%, transparent);
+    background: color-mix(in srgb, var(--color-keyline) 53%, transparent);
     transition:
       filter 0.2s,
       border-color 0.2s;
   }
   #fiesta-score .fs-team.mine .fp {
-    border-color: #1b9fff88;
+    border-color: color-mix(in srgb, var(--color-team-blue) 53%, transparent);
   }
   #fiesta-score .fs-team.theirs .fp {
-    border-color: #ff2d6688;
+    border-color: color-mix(in srgb, var(--color-team-red) 53%, transparent);
   }
   #fiesta-score .fp.me {
-    border-color: #ffd24a;
-    box-shadow: 0 0 10px #ffd24a99;
+    border-color: var(--gold);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--gold) 60%, transparent);
   }
   #fiesta-score .fp.down {
     filter: grayscale(1) brightness(0.5);
@@ -7953,10 +7665,10 @@
     bottom: 0;
     font-size: 13px;
     font-weight: 900;
-    color: #fff;
+    color: var(--color-white);
     text-shadow:
-      0 0 4px #000,
-      1px 1px 2px #000;
+      0 0 4px var(--color-keyline),
+      var(--title-shadow);
     padding: 0 2px;
   }
   #fiesta-score .fs-core {
@@ -7967,18 +7679,18 @@
   #fiesta-score .fs-num {
     font-size: 40px;
     font-weight: 900;
-    color: #fff;
+    color: var(--color-white);
     text-shadow:
-      0 0 14px #000,
-      1px 1px 2px #000;
+      0 0 14px var(--color-keyline),
+      var(--title-shadow);
     min-width: 42px;
     text-align: center;
   }
   #fiesta-score .fs-num.mine {
-    color: #6bc2ff;
+    color: var(--color-xp-rested);
   }
   #fiesta-score .fs-num.theirs {
-    color: #ff7090;
+    color: var(--color-hostile);
   }
   #fiesta-score .fs-mid {
     display: flex;
@@ -7992,7 +7704,7 @@
     font-size: 13px;
     letter-spacing: 2px;
     font-weight: 800;
-    background: linear-gradient(90deg, #ff3df0, #ffd24a, #1b9fff);
+    background: linear-gradient(90deg, var(--color-xp), var(--gold), var(--color-info));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -8005,16 +7717,16 @@
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    background: #ffffff22;
-    box-shadow: inset 0 0 0 1px #ffffff44;
+    background: color-mix(in srgb, var(--color-white) 13%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-white) 27%, transparent);
   }
   #fiesta-score .fw-dot.on {
-    background: #ffd24a;
-    box-shadow: 0 0 8px #ffd24a;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
   }
   #fiesta-score .fs-limit {
     font-size: 10px;
-    color: #cbbcd8;
+    color: var(--color-text-secondary);
     letter-spacing: 0.5px;
   }
   #fiesta-score.flash-mine {
@@ -8026,25 +7738,25 @@
   @keyframes fiesta-flash-mine {
     0% {
       box-shadow:
-        0 4px 20px #000a,
-        0 0 0 6px #1b9fffcc;
+        0 4px 20px color-mix(in srgb, var(--color-keyline) 63%, transparent),
+        0 0 0 6px color-mix(in srgb, var(--color-team-blue) 80%, transparent);
     }
     100% {
       box-shadow:
-        0 4px 20px #000a,
-        0 0 0 2px #ff3df055;
+        0 4px 20px color-mix(in srgb, var(--color-keyline) 63%, transparent),
+        0 0 0 2px color-mix(in srgb, var(--color-xp) 33%, transparent);
     }
   }
   @keyframes fiesta-flash-theirs {
     0% {
       box-shadow:
-        0 4px 20px #000a,
-        0 0 0 6px #ff2d66cc;
+        0 4px 20px color-mix(in srgb, var(--color-keyline) 63%, transparent),
+        0 0 0 6px color-mix(in srgb, var(--color-team-red) 80%, transparent);
     }
     100% {
       box-shadow:
-        0 4px 20px #000a,
-        0 0 0 2px #ff3df055;
+        0 4px 20px color-mix(in srgb, var(--color-keyline) 63%, transparent),
+        0 0 0 2px color-mix(in srgb, var(--color-xp) 33%, transparent);
     }
   }
 
@@ -8065,24 +7777,24 @@
   #fiesta-respawn .fr-title {
     font-size: 24px;
     font-weight: 800;
-    color: #ff5a7a;
+    color: var(--color-hostile);
     letter-spacing: 2px;
     text-shadow:
-      0 0 16px #000,
-      2px 2px 4px #000;
+      0 0 16px var(--color-keyline),
+      2px 2px 4px var(--color-keyline);
   }
   #fiesta-respawn .fr-count {
     font-size: 64px;
     font-weight: 900;
-    color: #fff;
+    color: var(--color-white);
     line-height: 1;
     text-shadow:
-      0 0 24px #ff3df0aa,
-      2px 2px 6px #000;
+      0 0 24px color-mix(in srgb, var(--color-xp) 67%, transparent),
+      2px 2px 6px var(--color-keyline);
   }
   #fiesta-respawn .fr-sub {
     font-size: 14px;
-    color: #d8c8e8;
+    color: var(--color-text-secondary);
     letter-spacing: 1px;
   }
 
@@ -8101,11 +7813,11 @@
     font-family: var(--title-font);
     font-size: 16px;
     font-weight: 800;
-    color: #ffd24a;
+    color: var(--gold);
     letter-spacing: 1px;
     text-shadow:
-      0 0 10px #000,
-      1px 1px 2px #000;
+      0 0 10px var(--color-keyline),
+      var(--title-shadow);
   }
   #fiesta-augments .fa-tier {
     font-size: 12px;
@@ -8115,16 +7827,16 @@
     vertical-align: middle;
   }
   #fiesta-augments .fa-tier.silver {
-    background: #9aa7b3;
-    color: #1a1f24;
+    background: var(--color-quality-poor);
+    color: var(--color-ink);
   }
   #fiesta-augments .fa-tier.gold {
-    background: #ffcb45;
-    color: #3a2a00;
+    background: var(--gold);
+    color: var(--color-medal-ink);
   }
   #fiesta-augments .fa-tier.prismatic {
-    background: linear-gradient(90deg, #ff3df0, #1b9fff, #ffd24a);
-    color: #fff;
+    background: linear-gradient(90deg, var(--color-xp), var(--color-info), var(--gold));
+    color: var(--color-white);
   }
   #fiesta-augments .fa-cards {
     display: flex;
@@ -8140,10 +7852,10 @@
     flex-direction: column;
     gap: 8px;
     text-align: left;
-    color: #f3ecff;
-    background: linear-gradient(160deg, #241834f0, #140c1ef5);
-    border: 2px solid #5a4a78;
-    box-shadow: 0 6px 18px #000a;
+    color: var(--color-text-light);
+    background: var(--panel-bg-strong);
+    border: 2px solid color-mix(in srgb, var(--color-xp) 45%, var(--color-border-default));
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--color-keyline) 63%, transparent);
     transition:
       border-color 0.15s,
       box-shadow 0.15s,
@@ -8151,35 +7863,35 @@
   }
   .fa-card:hover,
   .fa-card:focus-visible {
-    border-color: #ffd24a;
+    border-color: var(--gold);
     box-shadow:
-      0 10px 28px #000c,
-      0 0 16px #ffd24a55;
+      0 10px 28px color-mix(in srgb, var(--color-keyline) 75%, transparent),
+      0 0 16px color-mix(in srgb, var(--gold) 33%, transparent);
     translate: 0 -3px;
     outline: none;
   }
   .fa-card.silver {
-    border-color: #8b97a3;
+    border-color: var(--color-quality-poor);
   }
   .fa-card.gold {
-    border-color: #ffcb45;
+    border-color: var(--gold);
   }
   .fa-card.prismatic {
-    border-color: #ff3df0;
+    border-color: var(--color-xp);
     box-shadow:
-      0 6px 18px #000a,
-      0 0 14px #ff3df055;
+      0 6px 18px color-mix(in srgb, var(--color-keyline) 63%, transparent),
+      0 0 14px color-mix(in srgb, var(--color-xp) 33%, transparent);
   }
   .fa-card .fa-name {
     font-family: var(--title-font);
     font-size: 17px;
     font-weight: 800;
-    color: #ffe7a0;
+    color: var(--color-glint);
   }
   .fa-card .fa-desc {
     font-size: 13px;
     line-height: 1.35;
-    color: #d8cce8;
+    color: var(--color-text-secondary);
     flex: 1;
   }
   .fa-card .fa-icon {
@@ -8187,11 +7899,11 @@
     height: 42px;
     display: block;
     border-radius: 9px;
-    background: #0008;
+    background: color-mix(in srgb, var(--color-keyline) 53%, transparent);
     object-fit: cover;
     box-shadow:
-      inset 0 0 0 1px #ffffff22,
-      0 2px 7px #000b;
+      inset 0 0 0 1px color-mix(in srgb, var(--color-white) 13%, transparent),
+      0 2px 7px color-mix(in srgb, var(--color-keyline) 73%, transparent);
   }
   .fa-card .fa-cat {
     font-size: 10px;
@@ -8201,19 +7913,19 @@
     opacity: 0.9;
   }
   .cat-offense {
-    color: #ff5a5a;
+    color: var(--color-hostile);
   }
   .cat-defense {
-    color: #5aa6ff;
+    color: var(--color-xp-rested);
   }
   .cat-sustain {
-    color: #5ce08a;
+    color: var(--color-text-success);
   }
   .cat-mobility {
-    color: #32e0ff;
+    color: var(--color-info);
   }
   .cat-utility {
-    color: #ffd24a;
+    color: var(--gold);
   }
   /* augment-pending indicator */
   #fiesta-pending {
@@ -8229,13 +7941,13 @@
     font-family: var(--title-font);
     font-size: 13px;
     font-weight: 800;
-    color: #ffe7a0;
+    color: var(--color-glint);
     padding: 5px 12px;
     border-radius: 20px;
-    background: #2a1f0edd;
+    background: color-mix(in srgb, var(--color-medal-lo) 87%, transparent);
     box-shadow:
-      0 0 0 1px #ffd24a55,
-      0 3px 12px #0008;
+      0 0 0 1px color-mix(in srgb, var(--gold) 33%, transparent),
+      0 3px 12px color-mix(in srgb, var(--color-keyline) 53%, transparent);
     animation: fpend-pulse 1.4s ease-in-out infinite;
     /* Ambient: paused + duration-calmed by the effect-tier tokens. */
     animation-duration: calc(1.4s * var(--motion-scale, 1));
@@ -8244,7 +7956,7 @@
   #fiesta-pending .fpend-gem {
     width: 18px;
     height: 18px;
-    color: #ffd24a;
+    color: var(--gold);
     display: grid;
     place-items: center;
   }
@@ -8252,22 +7964,22 @@
     width: 10px;
     height: 10px;
     content: "";
-    border: 1px solid #fff0a8;
-    background: linear-gradient(135deg, #fff5bd, #f0a614 55%, #8e4b09);
-    box-shadow: 0 0 7px #ffd24aaa;
+    border: 1px solid var(--color-glint);
+    background: linear-gradient(135deg, var(--color-glint), var(--gold) 55%, var(--color-warning));
+    box-shadow: 0 0 7px color-mix(in srgb, var(--gold) 67%, transparent);
     transform: rotate(45deg);
   }
   @keyframes fpend-pulse {
     0%,
     100% {
       box-shadow:
-        0 0 0 1px #ffd24a55,
-        0 3px 12px #0008;
+        0 0 0 1px color-mix(in srgb, var(--gold) 33%, transparent),
+        0 3px 12px color-mix(in srgb, var(--color-keyline) 53%, transparent);
     }
     50% {
       box-shadow:
-        0 0 10px 2px #ffd24a88,
-        0 3px 12px #0008;
+        0 0 10px 2px color-mix(in srgb, var(--gold) 53%, transparent),
+        0 3px 12px color-mix(in srgb, var(--color-keyline) 53%, transparent);
     }
   }
   /* falling confetti for the killing team */
@@ -8305,14 +8017,14 @@
     transform: translate(-50%, -50%);
     font-family: var(--title-font);
     font-weight: 900;
-    color: var(--fw-color, #ffd24a);
+    color: var(--fw-color, var(--gold));
     pointer-events: none;
     z-index: 19;
     letter-spacing: 2px;
     text-shadow:
-      0 0 18px #000,
-      0 0 8px var(--fw-color, #ffd24a),
-      3px 3px 6px #000;
+      0 0 18px var(--color-keyline),
+      0 0 8px var(--fw-color, var(--gold)),
+      3px 3px 6px var(--color-keyline);
     white-space: nowrap;
     animation: fiesta-word-pop 1.4s cubic-bezier(0.2, 1.4, 0.3, 1) forwards;
   }
@@ -8354,16 +8066,13 @@
      .arena-bracket (arena) bases; see the header note above. */
   @media (prefers-reduced-motion: reduce) {
     .fiesta-word {
-      animation: fiesta-word-fade 1.4s ease-out forwards;
+      animation: none;
+      opacity: 1;
+      transform: translate(-50%, -50%);
     }
-    @keyframes fiesta-word-fade {
-      0%,
-      75% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-      }
+    #fiesta-score .fp,
+    .fa-card {
+      transition: none;
     }
     #fiesta-score.flash-mine,
     #fiesta-score.flash-theirs,
@@ -8373,6 +8082,23 @@
     .fiesta-confetti {
       display: none;
     }
+  }
+  body.reduce-motion .fiesta-word {
+    animation: none;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  body.reduce-motion #fiesta-score .fp,
+  body.reduce-motion .fa-card {
+    transition: none;
+  }
+  body.reduce-motion #fiesta-score.flash-mine,
+  body.reduce-motion #fiesta-score.flash-theirs,
+  body.reduce-motion #fiesta-pending {
+    animation: none;
+  }
+  body.reduce-motion .fiesta-confetti {
+    display: none;
   }
   body.mobile-touch #fiesta-score .fs-num {
     font-size: 26px;
@@ -8409,16 +8135,20 @@
        visible only once the window was dragged aside. 90 matches the
        established "always above the window band" tier (#ctx-menu, hud.css). */
     z-index: 90;
-    color: #ff2020;
+    color: var(--color-text-error);
     font-size: 18px;
     font-weight: bold;
-    font-family: var(--title-font);
-    text-shadow: 1px 1px 3px #000;
+    font-family: var(--font-display);
+    text-shadow: var(--title-shadow);
     opacity: 0;
     transition: opacity 0.4s;
     pointer-events: none;
   }
+  /* Floating world text: the level-up banner is bare gold type over the world
+     with the outline shadow, never a plate. Only the deed and skill variants
+     below carry the strong plate. */
   #banner {
+    --color-text-light: var(--gold);
     position: absolute;
     left: 50%;
     top: 28%;
@@ -8426,18 +8156,17 @@
     width: max-content;
     max-width: calc(100vw - 48px);
     box-sizing: border-box;
-    color: var(--gold);
+    color: var(--color-text-light);
     font-size: 38px;
     font-weight: bold;
     line-height: 1.15;
     text-align: center;
     text-shadow:
-      0 0 18px #00000088,
-      2px 2px 6px #000;
+      0 0 18px color-mix(in srgb, var(--color-keyline) 53%, transparent),
+      2px 2px 6px var(--color-keyline);
     opacity: 0;
     transition: opacity 1.2s;
     pointer-events: none;
-    font-family: var(--title-font);
     letter-spacing: 1px;
     white-space: normal;
     overflow-wrap: anywhere;
@@ -8500,20 +8229,23 @@
      against the level-up's bare oversized gold text. Copy and lifetime are
      untouched: presentation only, never information. */
   #banner.banner-deed {
-    color: var(--color-deed-banner-text);
+    --color-text-light: var(--color-deed-banner-text);
+    --border: var(--color-deed-banner-border);
+    --panel-bg-strong: var(--color-deed-banner-bg);
     font-size: 26px;
     letter-spacing: 0.5px;
     padding: 8px 22px;
-    border: 1px solid var(--color-deed-banner-border);
-    border-radius: 8px;
-    background: var(--color-deed-banner-bg);
-    /* Scales with the graphics tier like every other decorative shadow here:
-       at the low preset --fx-shadow is 0 and the plate sheds its lift with
-       the rest of the HUD instead of keeping a full-blur outlier. */
-    box-shadow: 0 3px calc(14px * var(--fx-shadow, 1)) var(--color-art-shadow);
-    text-shadow:
-      0 0 10px #00000088,
-      1px 1px 4px #000;
+  }
+  /* The two plated variants compose the strong panel recipe themselves; the
+     bare level banner above never does. */
+  #banner.banner-deed,
+  #banner.banner-skill {
+    background: var(--panel-bg-strong);
+    border: 1px solid var(--border);
+    outline: 1px solid var(--color-keyline);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-panel);
+    text-shadow: none;
   }
   /* Gathering skill milestone plate (hud.ts showBanner variant='skill').
      Framed copper craft card with the profession crest: distinct from the
@@ -8521,19 +8253,12 @@
      milestone never steals the "I leveled" reading. Layout comes from the
      variant-agnostic banner-with-art rules above; this class is cosmetic. */
   #banner.banner-skill {
-    color: var(--color-skill-banner-text);
+    --color-text-light: var(--color-skill-banner-text);
+    --border: var(--color-skill-banner-border);
+    --panel-bg-strong: var(--skill-banner-bg);
     font-size: 28px;
     letter-spacing: 0.6px;
     padding: 10px 26px 12px;
-    border: 1px solid var(--color-skill-banner-border);
-    border-radius: 10px;
-    background: var(--skill-banner-bg);
-    box-shadow:
-      0 0 0 1px var(--color-skill-banner-inset) inset,
-      0 4px calc(18px * var(--fx-shadow, 1)) var(--color-art-shadow);
-    text-shadow:
-      0 0 12px #00000099,
-      1px 1px 4px #000;
   }
   #banner.banner-skill .banner-subtext {
     color: var(--color-skill-banner-subtext);
@@ -8571,12 +8296,13 @@
     z-index: 7;
   }
   .quest-banner-line {
-    color: #ffd100;
+    --color-text-light: var(--gold);
+    color: var(--color-text-light);
     font-size: 20px;
     font-weight: bold;
     text-shadow:
-      0 0 10px #00000088,
-      1px 1px 3px #000;
+      0 0 10px color-mix(in srgb, var(--color-keyline) 53%, transparent),
+      1px 1px 3px var(--color-keyline);
     white-space: nowrap;
     opacity: 1;
     transition: opacity 0.4s ease;
@@ -8585,20 +8311,20 @@
     opacity: 0;
   }
   #subzone-banner {
+    --color-text-light: var(--color-white);
     position: absolute;
     left: 50%;
     top: 35%;
     transform: translateX(-50%);
-    color: #fff;
+    color: var(--color-text-light);
     font-size: 22px;
     font-weight: bold;
     text-shadow:
-      0 0 14px #00000088,
-      1px 1px 4px #000;
+      0 0 14px color-mix(in srgb, var(--color-keyline) 53%, transparent),
+      1px 1px 4px var(--color-keyline);
     opacity: 0;
     transition: opacity 1.2s;
     pointer-events: none;
-    font-family: var(--title-font);
     letter-spacing: 1px;
     white-space: nowrap;
   }
@@ -8662,13 +8388,21 @@
   #death-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, #40000077 0%, #300000bb 100%);
+    background: var(--death-overlay-veil);
     display: none;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-    gap: 18px;
     z-index: 30;
+  }
+  .death-panel,
+  .ghost-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    width: min(360px, calc(100vw - 32px));
+    padding: 24px;
+    gap: 12px;
   }
   /* Ghost resurrect prompt: a small, NON-BLOCKING panel shown only when a spirit is in
      reach of its corpse or a Spirit Healer. pointer-events:none on the panel so a ghost
@@ -8679,11 +8413,13 @@
     bottom: 22%;
     transform: translateX(-50%);
     display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
     z-index: 30;
     pointer-events: none;
+  }
+  /* Bare buttons in the world, no plate: a ghost reads the scene through them. */
+  .ghost-panel {
+    padding: 0;
+    gap: 10px;
   }
   #ghost-prompt .btn {
     pointer-events: auto;
@@ -8739,14 +8475,12 @@
     height: 22px;
     padding: 0 5px;
     margin-right: 8px;
-    border: 1px solid #d7ae55;
-    border-radius: 5px;
-    background: #17120d;
-    color: #ffd76a;
-    font: 700 12px / 1 var(--ui-font);
-    box-shadow:
-      inset 0 0 0 1px #000,
-      0 1px 3px #000a;
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--radius-card);
+    background: var(--color-bg-deep);
+    color: var(--color-accent);
+    font: 700 12px / 1 var(--font-ui);
+    box-shadow: var(--shadow-lift);
     vertical-align: middle;
   }
   #death-overlay .btn[disabled],
@@ -8755,10 +8489,10 @@
     cursor: not-allowed;
   }
   #death-overlay h2 {
-    color: #ddd;
-    font-size: 44px;
-    text-shadow: 2px 2px 8px #000;
-    font-family: var(--title-font);
+    --color-accent: var(--color-hostile);
+    color: var(--color-accent);
+    font-size: 22px;
+    margin: 0;
   }
   /* Chrome cluster (chat input, party frames, context menu, prompts, trade window,
      elite target frame): in-world chrome that was never extracted with the
@@ -8775,18 +8509,10 @@
     position: absolute;
     left: 12px;
     bottom: 220px;
-    width: 370px;
+    width: var(--chat-w);
     display: none;
     z-index: 25;
-    background: #0d0d14ee;
-    color: #e8e8e8;
-    border: 2px solid var(--border);
-    outline: 1px solid #000;
-    border-radius: 4px;
-    padding: 7px 10px;
-    font-size: 13px;
     line-height: 1.35;
-    font-family: inherit;
     user-select: text;
     box-sizing: border-box;
     resize: none;
@@ -8794,6 +8520,11 @@
     max-height: 110px;
     white-space: pre-wrap;
     word-break: break-word;
+  }
+  #chat-input:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+    background: var(--panel-bg-strong);
   }
   /* The mobile keyboard-dismiss chevron is hidden by default (desktop AND mobile-when-
      chat-closed); only body.mobile-touch.mobile-chat-open reveals it (hud.mobile.css,
@@ -8824,6 +8555,45 @@
     grid-template-columns: repeat(var(--party-frame-columns, 1), var(--party-frame-width, 170px));
     gap: var(--party-frame-spacing, 4px);
     zoom: var(--party-frame-scale, 1);
+  }
+  #party-frame-header {
+    width: var(--party-row-w);
+    min-height: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 4px 2px;
+    appearance: none;
+    border: 0;
+    border-bottom: 1px solid var(--gold-dim);
+    border-radius: 0;
+    background: transparent;
+    color: var(--gold);
+    font-size: 12px;
+    line-height: 16px;
+    cursor: var(--cursor-point);
+  }
+  #party-frame-header:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  #party-frame-header .ui-icon {
+    margin-left: auto;
+    width: 11px;
+    height: 11px;
+    flex: none;
+    transform: rotate(-90deg);
+  }
+  #party-frame-header .party-frame-header-count {
+    color: var(--color-text-light);
+    font-variant-numeric: tabular-nums;
+    opacity: 0.85;
+  }
+  #party-frames.party-header-collapsed #party-frame-header .ui-icon {
+    transform: none;
+  }
+  #party-frames.party-header-collapsed > :is(.party-rows, .party-boss-guide-button, .party-loot) {
+    display: none;
   }
   .party-boss-guide-button {
     width: 170px;
@@ -9388,9 +9158,9 @@
     overflow: auto;
   }
   .party-frame {
-    --cls: #7fb8ff;
+    --cls: var(--color-party-class-default);
     position: relative;
-    width: var(--party-frame-width, 170px);
+    width: var(--party-frame-width, var(--party-row-w));
     min-height: var(--party-frame-height, 42px);
     box-sizing: border-box;
     padding: 4px 8px 5px;
@@ -9403,21 +9173,48 @@
      unchanged: this profile only rearranges their stable DOM, so mouseover casts,
      absorbs, incoming healing, threat, Rewind, and auras share one implementation. */
   #party-frames.party-style-raid .party-frame {
-    height: var(--party-frame-height, 42px);
-    min-height: var(--party-frame-height, 42px);
+    width: var(--party-raid-cell-w);
+    height: var(--party-raid-cell-h);
+    min-height: var(--party-raid-cell-h);
     padding: 0;
     overflow: hidden;
-    border: 1px solid #050505;
-    border-radius: 2px;
-    background: #101010;
-    box-shadow: inset 0 0 0 1px #ffffff14;
+    border: 1px solid var(--color-party-raid-border);
+    border-radius: var(--radius-2xs);
+    background: var(--color-party-raid-ground);
+    box-shadow: var(--edge-hairline);
+  }
+  #party-frames.party-style-raid .party-rows {
+    grid-template-columns: repeat(var(--party-frame-columns, 1), var(--party-raid-cell-w));
   }
   #party-frames.party-style-raid .party-frame .pfm-name {
     position: absolute;
     inset: 2px 4px 5px;
     z-index: 4;
     min-width: 0;
+    padding-left: 14px;
     pointer-events: none;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-role {
+    display: block;
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    z-index: 5;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-keyline);
+    border-radius: var(--radius-2xs);
+    background: var(--color-party-role-damage);
+    pointer-events: none;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-role.tank {
+    background: var(--color-party-role-tank);
+  }
+  #party-frames.party-style-raid .party-frame .pfm-role.healer {
+    background: var(--color-party-role-healer);
+  }
+  #party-frames.party-style-raid .party-frame .pfm-role.damage {
+    background: var(--color-party-role-damage);
   }
   #party-frames.party-style-raid .party-frame .pfm-name-text {
     overflow: hidden;
@@ -9434,7 +9231,7 @@
   }
   #party-frames.party-style-raid .party-frame .pfm-id {
     min-width: 0;
-    color: #fff;
+    color: var(--color-white);
   }
   #party-frames.party-style-raid .party-frame .pfm-crest {
     display: none;
@@ -9445,8 +9242,8 @@
     height: auto;
     margin: 0;
     border: 0;
-    border-radius: 1px 1px 0 0;
-    background: #171717;
+    border-radius: var(--radius-2xs) var(--radius-2xs) 0 0;
+    background: var(--color-party-raid-track);
   }
   #party-frames.party-style-raid .party-frame .bar.hp .bar-fill {
     background-color: var(--cls);
@@ -9462,11 +9259,11 @@
     height: 3px;
     margin: 0;
     border: 0;
-    border-radius: 0 0 1px 1px;
+    border-radius: 0 0 var(--radius-2xs) var(--radius-2xs);
   }
   #party-frames.party-style-raid .party-frame.pf-hide-resource .bar.hp {
     bottom: 0;
-    border-radius: 1px;
+    border-radius: var(--radius-2xs);
   }
   #party-frames.party-style-raid .party-frame .pfm-auras {
     left: auto;
@@ -9479,7 +9276,7 @@
     flex: 0 0 12px;
     width: 12px;
     height: 12px;
-    box-shadow: 0 1px 2px #000;
+    box-shadow: 0 1px 2px var(--color-keyline);
   }
   .party-loot {
     width: 170px;
@@ -9516,12 +9313,30 @@
     flex-shrink: 0;
   }
   .party-frame .pfm-name {
+    min-height: 14px;
+    box-sizing: border-box;
+    padding-left: 38px;
     font-size: 12px;
     font-family: var(--title-font);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 6px;
+  }
+  .party-frame .pfm-crest {
+    position: absolute;
+    left: 8px;
+    top: 5px;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border: 2px solid var(--cls);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--color-keyline);
+    object-fit: cover;
+  }
+  .party-frame .pfm-role {
+    display: none;
   }
   #loot-settings-window {
     min-width: 220px;
@@ -9567,7 +9382,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-shadow: 1px 1px 1px #000;
+    text-shadow: 1px 1px 1px var(--color-keyline);
   }
   .party-frame .pfm-meta {
     display: flex;
@@ -9582,7 +9397,7 @@
   .party-frame .pf-badge {
     font-size: 10px;
     line-height: 1;
-    filter: drop-shadow(0 0 2px #000);
+    filter: drop-shadow(0 0 2px var(--color-keyline));
   }
   .party-frame :is(.pf-badge, .lead-star) .ui-icon {
     width: 1em;
@@ -9595,17 +9410,15 @@
     animation-play-state: var(--fx-ambient-anim, running);
   }
   .party-frame .bar {
-    /* The hp/resource bars absorb a height drag the way the player and
-       target frames' --uf-bar-height does (partyFrameHeight is the ROW
-       height: the name line plus padding cost about 24px, the remainder
-       splits across the two bars, landing on the stock 9px at the stock
-       42px row). The raid presentation overrides this with its own
-       full-cell bar geometry. */
-    height: max(4px, calc((var(--party-frame-height, 42px) - 24px) / 2));
+    /* Classic rows keep the authored 9px/5px hierarchy at every row height;
+       raid presentation overrides this with full-cell bar geometry. */
+    height: var(--party-res-h);
+    margin-left: 38px;
     margin-top: 2px;
   }
   .party-frame .bar.hp {
     position: relative;
+    height: var(--party-hp-h);
   }
   .party-frame .pfm-hp-text {
     position: absolute;
@@ -9618,7 +9431,7 @@
     font-family: var(--ui-font);
     font-size: 9px;
     line-height: 1;
-    text-shadow: 1px 1px 1px #000;
+    text-shadow: var(--title-shadow);
     pointer-events: none;
   }
   .party-frame .pfm-rewind {
@@ -9653,10 +9466,11 @@
   .party-frame .pfm-pet {
     position: relative;
     height: 5px;
+    margin-left: 38px;
     margin-top: 2px;
-    background: #0c0c14;
-    border: 1px solid #000;
-    border-radius: 2px;
+    background: var(--color-party-pet-track);
+    border: 1px solid var(--color-keyline);
+    border-radius: var(--radius-2xs);
     overflow: hidden;
     cursor: var(--cursor-point);
   }
@@ -9664,15 +9478,21 @@
     height: 100%;
     width: 100%;
     transform-origin: left center;
-    background: linear-gradient(180deg, #6fbf5a, #3f8a33);
+    background: var(--party-pet-fill);
   }
   /* A dead pet is ALWAYS hp 0, so its fill is scaleX(0) and has no pixels: styling
      the fill here rendered nothing and left a dead pet identical to an empty track.
      The dead state goes on the TRACK, which is the part that still has area, so a
      hunter can tell "dead, revive it" from "alive and nearly dead" at a glance. */
   .party-frame .pfm-pet.dead {
-    background: repeating-linear-gradient(135deg, #3a3a3a, #3a3a3a 2px, #262626 2px, #262626 4px);
-    border-color: #555;
+    background: repeating-linear-gradient(
+      135deg,
+      var(--color-party-pet-dead-hi),
+      var(--color-party-pet-dead-hi) 2px,
+      var(--color-party-pet-dead-lo) 2px,
+      var(--color-party-pet-dead-lo) 4px
+    );
+    border-color: var(--color-party-pet-dead-border);
   }
   .party-frame .pfm-pet:hover {
     outline: 1px solid var(--gold-dim);
@@ -9743,7 +9563,8 @@
   }
   /* Glow: decorative combat outer glow scales with --fx-shadow (0 at low). */
   .party-frame.combat {
-    box-shadow: 0 0 calc(7px * var(--fx-shadow, 1)) #e74c3c99;
+    box-shadow: 0 0 calc(7px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-danger) 60%, transparent);
   }
   .party-frame.threat {
     border-color: var(--color-hostile);
@@ -9759,11 +9580,24 @@
     opacity: 0.7;
   }
   .party-frame.dead .pfm-id {
-    color: #888 !important;
+    color: var(--color-text-muted);
     text-shadow: none;
   }
   .party-frame.oor {
-    opacity: 0.45;
+    opacity: 0.55;
+  }
+  .party-frame.is-on {
+    outline: 1px solid var(--gold);
+    outline-offset: 1px;
+  }
+
+  #party-frames:not(.party-style-raid) .party-frame.is-on::after {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: var(--glow-gold-soft);
+    content: "";
+    pointer-events: none;
   }
   .party-frame:hover {
     outline: 1px solid var(--gold-dim);
@@ -9808,15 +9642,15 @@
     font-size: 12.5px;
     color: var(--color-text-light);
     cursor: var(--cursor-point);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
   }
   #ctx-menu .ctx-item:hover {
-    background: #ffffff18;
-    color: #fff;
+    background: color-mix(in srgb, var(--color-glint) 9%, transparent);
+    color: var(--color-white);
   }
   #ctx-menu .ctx-item:focus-visible {
-    background: #ffffff18;
-    color: #fff;
+    background: color-mix(in srgb, var(--color-glint) 9%, transparent);
+    color: var(--color-white);
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
@@ -9975,7 +9809,7 @@
   #chatlog .chat-role-tag {
     font-weight: 700;
     margin-right: 3px;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
   }
   /* Player-menu header. The tag is nested INSIDE .ctx-title-name (the header is a
      flex row with a 9px gap, so a sibling would drift away from the name it
@@ -10087,22 +9921,52 @@
     font-size: 13.5px;
     color: var(--color-text-light);
     margin-bottom: 4px;
-    font-family: Georgia, serif;
+    font-family: var(--font-ui);
   }
   .prompt .prompt-number {
     width: 82px;
     margin: 8px 8px 6px 0;
-    padding: 5px 7px;
-    border: 1px solid #5d4a25;
-    border-radius: 3px;
-    background: #08080d;
-    color: #f4e6bd;
-    font: 12px var(--ui-font);
     text-align: center;
-    box-shadow: inset 0 1px 3px #000;
   }
-  .prompt .prompt-number:focus {
-    outline: 1px solid var(--gold-dim);
+  .prompt .ui-input:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .prompt-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+  }
+  .prompt-actions .btn {
+    margin: 0;
+  }
+  .prompt-timeout {
+    height: 2px;
+    margin-top: var(--spacing-sm);
+    --bar-color: var(--gold-dim);
+  }
+  .prompt-timeout .ui-bar-fill {
+    width: 100%;
+    animation: prompt-timeout var(--prompt-timeout-dur) linear forwards;
+  }
+  @keyframes prompt-timeout {
+    from {
+      width: 100%;
+    }
+    to {
+      width: 0;
+    }
+  }
+  /* A frozen fill lies: it read "most of the time left" until the prompt
+     silently auto-dismissed. With no animation there is no honest readout, so
+     the bar goes away and the prompt text carries the whole message. */
+  @media (prefers-reduced-motion: reduce) {
+    .prompt-timeout {
+      display: none;
+    }
+  }
+  body.reduce-motion .prompt-timeout {
+    display: none;
   }
   /* Touch floor for the .prompt family's action buttons: the three quantity
      prompts (bags discard/sell, bank withdraw/deposit, vendor buy-quantity)
@@ -10150,11 +10014,11 @@
     color: var(--color-text-success);
   }
   .trade-items {
-    min-height: 120px;
-    border: 1px solid var(--color-border-showcase);
-    border-radius: var(--radius-sm);
+    display: flex;
+    min-height: 190px;
+    flex-direction: column;
+    gap: var(--spacing-xs);
     padding: var(--spacing-xs);
-    background: var(--color-bg-input);
   }
   .trade-item {
     display: flex;
@@ -10163,18 +10027,16 @@
     width: 100%;
     font-size: 12px;
     padding: 3px;
-    border: 0;
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: inherit;
-    font-family: var(--ui-font);
     text-align: left;
+  }
+  .trade-item-empty {
+    min-height: 40px;
   }
   .trade-item.mine {
     cursor: var(--cursor-point);
   }
   .trade-item.mine:hover {
-    background: color-mix(in srgb, var(--color-text-light) 8%, transparent);
+    filter: brightness(1.08);
   }
   .trade-empty {
     color: var(--color-text-muted);
@@ -10211,11 +10073,6 @@
   .trade-money input,
   .trade-woc-price {
     width: 80px;
-    background: var(--color-bg-input);
-    color: var(--gold);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 3px 6px;
     user-select: text;
     font-variant-numeric: tabular-nums;
   }
@@ -10351,37 +10208,19 @@
       animation: none;
     }
   }
+  body.reduce-motion .woc-spinner {
+    animation: none;
+  }
   /* The currency switch: a group of two pressed-state toggles under a hairline,
      the pressed one in the accent with a 2px underline (shape as well as tone,
      so it survives forced colours), not the maroon action-button gradient. */
   .trade-woc-modes {
     display: flex;
     gap: var(--spacing-sm);
-    border-bottom: 1px solid var(--color-border-default);
   }
   .trade-woc-arm .btn.trade-woc-mode {
-    margin: 0 0 -1px;
-    padding: 6px 12px;
-    background: transparent;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    border-radius: 0;
-    box-shadow: none;
-    text-shadow: none;
-    color: var(--color-text-muted);
-    font-family: var(--font-ui);
+    margin: 0;
     font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0;
-  }
-  .trade-woc-arm .btn.trade-woc-mode:hover:enabled {
-    color: var(--color-text-light);
-    filter: none;
-    box-shadow: none;
-  }
-  .trade-woc-arm .btn.trade-woc-mode[aria-pressed="true"] {
-    color: var(--color-accent);
-    border-bottom-color: var(--color-accent);
   }
   .trade-woc-arm .btn.trade-woc-mode:disabled {
     filter: none;
@@ -10501,26 +10340,11 @@
     gap: var(--spacing-sm);
   }
   .trade-woc-arm .btn.trade-woc-primary {
-    background: color-mix(in srgb, var(--color-accent) 22%, var(--panel-base));
-    border-color: var(--color-accent);
-    color: var(--color-text-light);
-    text-shadow: none;
-  }
-  .trade-woc-arm .btn.trade-woc-primary:hover:enabled {
-    background: color-mix(in srgb, var(--color-accent) 32%, var(--panel-base));
-  }
-  .trade-woc-arm .btn.trade-woc-quiet {
-    background: transparent;
-    box-shadow: none;
-    text-shadow: none;
-    border-color: var(--color-border-default);
-    color: var(--color-text-muted);
+    align-self: flex-start;
   }
   .trade-woc-arm .btn.trade-woc-quiet:hover:enabled {
     color: var(--color-text-error);
     border-color: var(--color-border-invalid);
-    filter: none;
-    box-shadow: none;
   }
 
   /* ---------- elite target frame ---------- */
@@ -10531,8 +10355,8 @@
   #target-frame.elite > .portrait-wrap .portrait {
     border-color: var(--gold);
     box-shadow:
-      0 0 12px #ffd10066,
-      0 2px 8px #000c;
+      0 0 12px color-mix(in srgb, var(--gold) 40%, transparent),
+      0 2px 8px color-mix(in srgb, var(--color-keyline) 75%, transparent);
   }
   #tf-elite-tag {
     font-size: 9px;
@@ -10570,16 +10394,7 @@
     left: 50%;
     right: auto;
     bottom: -7px;
-    width: 24px;
-    height: 24px;
-    border-color: var(--gold-dim);
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #4a3a14, #241c08);
-    box-shadow:
-      0 0 0 1px var(--color-bg-deep),
-      0 0 7px color-mix(in srgb, var(--gold) 45%, transparent);
     transform: translateX(-50%);
-    text-shadow: 1px 1px 1px #000;
     z-index: 4;
   }
   #target-frame.boss #tf-elite-tag {
@@ -10632,17 +10447,10 @@
     right: 4px;
     bottom: 4px;
     z-index: 3;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    padding: 3px 7px;
-    background: #12100acc;
-    border: 1px solid #cc9a3c88;
-    border-radius: 12px;
-    color: var(--gold);
+    width: 28px;
+    height: 28px;
+    padding: 0;
     appearance: none;
-    cursor: pointer;
-    font: inherit;
     pointer-events: auto;
   }
   #mail-indicator[hidden] {
@@ -10653,8 +10461,7 @@
     height: 14px;
   }
   .mail-indicator-count {
-    font: 700 11px var(--title-font);
-    letter-spacing: 0.4px;
+    pointer-events: none;
   }
   /* ---------- World Market collect indicator ---------- */
   /* The Merchant's coin: sale proceeds or returned items wait for collection.
@@ -10671,29 +10478,14 @@
     left: 4px;
     top: 4px;
     z-index: 3;
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 7px;
-    background: #12100acc;
-    border: 1px solid #cc9a3c88;
-    border-radius: 12px;
-    color: var(--gold);
+    width: 28px;
+    height: 28px;
+    padding: 0;
     appearance: none;
-    cursor: pointer;
-    font: inherit;
     pointer-events: auto;
   }
   #market-indicator[hidden] {
     display: none;
-  }
-  #market-indicator:hover,
-  #market-indicator:focus-visible {
-    color: #d8c89a;
-    border-color: #c9a86a;
-    outline: none;
-  }
-  #market-indicator:focus-visible {
-    box-shadow: 0 0 0 2px var(--gold);
   }
   #market-indicator .ui-icon {
     width: 14px;
@@ -10911,16 +10703,14 @@
     background: conic-gradient(
       from 0deg,
       transparent var(--aura-remaining-ratio, 0%),
-      rgb(0 0 0 / 62%) 0
+      var(--color-aura-overlay-timer-mask) 0
     );
-    color: white;
+    color: var(--color-white);
     font-size: 20px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     line-height: 1;
-    text-shadow:
-      0 1px 2px black,
-      0 0 4px black;
+    text-shadow: var(--outline-shadow);
     pointer-events: none;
   }
   .aura-overlay-move-handle {
@@ -10984,13 +10774,13 @@
     --aura-color: var(--color-aura-rpg-gold);
   }
   .aura-overlay-fire {
-    --aura-color: #ff8a33;
+    --aura-color: var(--color-aura-overlay-fire);
   }
   .aura-overlay-frost {
-    --aura-color: #54d9ff;
+    --aura-color: var(--color-aura-overlay-frost);
   }
   .aura-overlay-arcane {
-    --aura-color: #bd63ff;
+    --aura-color: var(--color-aura-rpg-violet);
   }
   .aura-overlay-paladin {
     --aura-color: var(--color-aura-rpg-gold);
@@ -12204,9 +11994,9 @@
     transform: translateX(-50%);
     width: 240px;
     height: 16px;
-    background: rgba(8, 14, 24, 0.72);
-    border: 1px solid rgba(150, 190, 230, 0.55);
-    border-radius: 4px;
+    background: var(--color-breath-track);
+    border: 1px solid var(--color-breath-border);
+    border-radius: var(--radius-sm);
     overflow: hidden;
     display: none;
     pointer-events: none;
@@ -12218,11 +12008,11 @@
   .breath-bar-fill {
     height: 100%;
     width: 100%;
-    background: linear-gradient(180deg, #6fc2ff 0%, #2f7fd4 100%);
+    background: var(--breath-fill);
     transition: width 0.12s linear;
   }
   .breath-bar.breath-bar-drowning .breath-bar-fill {
-    background: linear-gradient(180deg, #ff7d6f 0%, #c22f2f 100%);
+    background: var(--breath-drowning-fill);
   }
   .breath-bar.breath-bar-drowning {
     animation: breath-drown-pulse 1s ease-in-out infinite;
@@ -12230,10 +12020,10 @@
   @keyframes breath-drown-pulse {
     0%,
     100% {
-      border-color: rgba(255, 120, 100, 0.9);
+      border-color: var(--color-breath-drowning-strong);
     }
     50% {
-      border-color: rgba(255, 60, 40, 0.4);
+      border-color: var(--color-breath-drowning-soft);
     }
   }
   .breath-bar-label {
@@ -12244,23 +12034,35 @@
     justify-content: center;
     font-size: 11px;
     letter-spacing: 0.06em;
-    color: #eaf4ff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    color: var(--color-breath-label);
+    text-shadow: var(--title-shadow);
   }
   body.reduce-motion .breath-bar.breath-bar-drowning {
     animation: none;
+    border-color: var(--color-breath-drowning-strong);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .breath-bar.breath-bar-drowning {
+      animation: none;
+      border-color: var(--color-breath-drowning-strong);
+    }
   }
 
   /* ---------- controller cross hotbar ----------
    The pad's held-trigger bar: a whole set at once, sixteen cells in two halves
    (the left trigger's eight and the right trigger's eight), each half a d-pad
    diamond plus a face diamond. Holding a trigger ARMS a half rather than swapping
-   the contents, so both halves stay readable. Cells carry .action-btn as well, so
-   every icon, cooldown sweep, recharge veil and state class the action bar already
-   styles applies unchanged; only the geometry and the arm treatment live here.
+   the contents, so both halves stay readable. Cells compose the shared socket
+   primitive while retaining every action state written by the action-bar painter.
    The overlay is pointer-events-free: a readout for a controller, never a target. */
   .xhb {
-    --xhb-cell: 40px;
+    /* Cells shrink just enough for the whole bar (twelve cells across plus its
+       gaps, paddings and set rail) to fit the action rail, so the pad bar never
+       runs wider than the XP bar under it or into the chat window. */
+    --xhb-cell: var(
+      --xhb-cell-live,
+      min(var(--socket-size), calc((var(--action-rail-w) - 99px) / 12))
+    );
     /* Fixed, not in the HUD column's flow: the bar comes and goes with the pad, and
      anything in flow here shoves the player frame and XP bar as it does. Out of
      flow it can never move another element. Its BOTTOM sits where the action-bar
@@ -12271,10 +12073,10 @@
     transform: translateX(-50%);
     z-index: 6;
     display: flex;
-    gap: 18px;
+    gap: 6px;
     align-items: center;
     justify-content: center;
-    padding: 6px 12px;
+    padding: 0;
     width: max-content;
     max-width: 100%;
     pointer-events: none;
@@ -12283,41 +12085,85 @@
      carry their own contrast instead (see the outlines below), which is what a
      slab was really buying. */
     background: none;
-    border: 1px solid transparent;
-    border-radius: 8px;
+    border: 0;
+    border-radius: 0;
   }
-  /* One trigger's eight: its d-pad diamond and its face diamond, side by side.
-   Dimmed until that trigger arms it, so the armed half reads at a glance. */
   .xhb-half {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
-    padding: 2px 8px;
-    border-radius: 6px;
-    opacity: 0.5;
-    transition: opacity 120ms ease;
+    padding: 14px 2px 4px;
+    position: relative;
   }
-  .xhb-half.xhb-armed {
+  .xhb-half::before {
+    content: "";
+    position: absolute;
+    inset: -6px -10px;
+    z-index: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at 50% 55%,
+      color-mix(in srgb, var(--gold) 20%, transparent),
+      color-mix(in srgb, var(--gold) 5%, transparent) 55%,
+      transparent 72%
+    );
+    opacity: 0;
+    pointer-events: none;
+  }
+  .xhb-half.xhb-armed::before {
     opacity: 1;
-    background: rgba(255, 209, 0, 0.08);
-  }
-  /* The two halves read as one bar but must not run together. */
-  .xhb-half-right {
-    border-left: 1px solid var(--border);
-  }
-  body.reduce-motion .xhb-half {
-    transition: none;
+    box-shadow: 0 0 calc(24px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--gold) 18%, transparent);
   }
   .xhb-diamond {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: repeat(3, var(--xhb-cell));
     grid-template-rows: repeat(3, var(--xhb-cell));
-    gap: 2px;
+    gap: var(--socket-gap);
   }
+  /* The cell wears .ui-socket, but it also wears .action-btn, whose look lives in
+   the SHARED bottom-cluster section that the desktop bar, the mobile ring, the
+   consumable strip and the stance bar all read. Deleting those declarations there
+   would restyle all four, so the cross hotbar rolls the components layer back to
+   the library one for itself: revert-layer is the host-scoped form of "adopt the
+   primitive". The action states (.used, .proc, .oor, .unusable, .empty) are more
+   specific and survive on purpose, so a cell reads identically to a bar slot. */
   .xhb-slot {
-    width: var(--xhb-cell);
-    height: var(--xhb-cell);
-    position: relative;
+    all: revert-layer;
+    --ui-socket-size: var(--xhb-cell);
+    border-radius: var(--radius-cell);
+    z-index: 1;
+  }
+  .xhb-slot .icon-label {
+    all: revert-layer;
+    border-radius: calc(var(--radius-cell) - 2px);
+  }
+  .xhb-slot .item-count {
+    all: revert-layer;
+    left: 4px;
+    right: auto;
+    bottom: 1px;
+    text-align: left;
+  }
+  .xhb-slot .item-count.charge-count {
+    all: revert-layer;
+    left: 4px;
+    right: auto;
+    bottom: 1px;
+    z-index: 2;
+    font-size: 13px;
+    color: var(--gold);
+    text-shadow: var(--title-shadow);
+  }
+  .xhb-slot .cd-overlay {
+    all: revert-layer;
+    border-radius: calc(var(--radius-cell) - 2px);
+  }
+  .xhb-slot .cdtext {
+    all: revert-layer;
+    font-size: 15px;
   }
   .xhb-slot[data-xhb-point="top"] {
     grid-area: 1 / 2;
@@ -12331,11 +12177,64 @@
   .xhb-slot[data-xhb-point="bottom"] {
     grid-area: 3 / 2;
   }
-  /* The double set: the same bar showing the second sixteen, marked by the accent
-   frame so a player never has to guess which set a press will cast from. */
-  .xhb.xhb-expanded {
-    border-color: var(--gold);
-    box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
+  .xhb-stud {
+    left: 50%;
+    top: 50%;
+    bottom: auto;
+    margin: -7px 0 0 -7px;
+    pointer-events: none;
+  }
+  .xhb-set-rail {
+    z-index: 2;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 0 6px;
+  }
+  /* Paladin variant (devotion-live, stamped by the medallion painter): the halves
+     part by 26px for the medallion and the cells give that width back, so the
+     bar still spans the action rail; the rail column grows so the set pips sit
+     above the medallion and the set-swap chip below it. */
+  #ui.devotion-live {
+    --xhb-cell-live: min(var(--socket-size), calc((var(--action-rail-w) - 125px) / 12));
+  }
+  #ui.devotion-live .xhb {
+    gap: 19px;
+  }
+  #ui.devotion-live .xhb-set-rail {
+    height: calc(3 * var(--xhb-cell) + 8px);
+    justify-content: flex-start;
+  }
+  #ui.devotion-live .xhb-set-swap {
+    margin-top: auto;
+  }
+  .xhb-pip {
+    position: static;
+    width: 11px;
+    height: 11px;
+    border-width: 1px;
+    background: var(--color-ink-deep);
+    box-shadow: 0 0 0 1px var(--color-keyline);
+  }
+  .xhb-set-swap {
+    min-width: 0;
+    height: 14px;
+    padding: 0 4px;
+    font-size: 9px;
+    line-height: 12px;
+  }
+  .xhb-pip[data-xhb-set="0"],
+  .xhb.xhb-expanded .xhb-pip[data-xhb-set="1"] {
+    background: var(--gold);
+    box-shadow:
+      0 0 0 1px var(--color-keyline),
+      0 0 calc(8px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 70%, transparent);
+  }
+  .xhb.xhb-expanded .xhb-pip[data-xhb-set="0"] {
+    background: var(--color-ink-deep);
+    box-shadow: 0 0 0 1px var(--color-keyline);
   }
   /* Pad mode: the cross hotbar IS the hotbar, so the desktop rows stand down rather
    than duplicating it under a bar the player has stopped reading.
@@ -12361,6 +12260,11 @@
   body.xhb-mode #player-frame {
     transform: translateY(calc(-1 * var(--xhb-lift, 56px)));
   }
+  /* The stock target seat is level with the player frame, so it lifts by the
+     same measured amount or the pair splits when the pad bar comes up. */
+  body.xhb-mode #target-frame {
+    transform: translateY(calc(-1 * var(--xhb-lift, 56px)));
+  }
   /* The cast bar rides up with it. It is pinned a fixed distance off the bottom, so
    left alone the frame climbs into it exactly when the bar is tallest (a handheld
    at a larger interface scale), which is the one case the lift has to handle. The
@@ -12380,104 +12284,107 @@
    without a trip to the options panel. Brand-resolved (LT/RT, L2/R2, ZL/ZR). */
   .xhb-trigger {
     position: absolute;
-    top: -9px;
-    left: 10px;
-    padding: 1px 6px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    /* The trigger chips keep a fill of their own. They are two small labels rather
-     than a slab behind sixteen cells, and a chip is what makes LT/RT read as a
-     button name instead of floating text. */
-    background: var(--panel-bg);
-    font-family: var(--ui-font);
+    top: -14px;
+    z-index: 2;
+    height: 20px;
+    min-width: 0;
+    padding: 0 16px;
+    clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+    background: var(--socket-fill);
+    border: 0;
+    border-radius: 0;
     font-size: 11px;
-    font-weight: bold;
-    line-height: 1.3;
     color: var(--gold);
   }
-  .xhb-half {
-    position: relative;
+  .xhb-trigger-left {
+    left: 8px;
+  }
+  .xhb-trigger-right {
+    left: auto;
+    right: 8px;
   }
   .xhb-half.xhb-armed .xhb-trigger {
-    color: var(--gold);
-    border-color: var(--gold);
+    background: linear-gradient(180deg, var(--gold), var(--gold-dim));
+    color: var(--color-medal-ink);
+    box-shadow: 0 0 calc(14px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--gold) 70%, transparent);
   }
-  /* The route to the second set: hold one trigger, tap the other. Sits under the bar
-   so it explains itself without competing with the icons. */
+  /* The bar's one line of prose: the arrange chord at rest, the both-triggers route
+   once a trigger is held, the arrange sentence while editing, and what is in hand
+   while carrying. Unbacked and centred well above the trigger tabs, which is the
+   only band left free once the cells lost their slab: below it covered the XP bar,
+   and beside the tabs it read as a third tab. */
   .xhb-hint {
     position: absolute;
-    /* A CHIP, matching the trigger labels, not a line of prose. The bar already has
-     a language for naming buttons (the bordered LT/RT pills), and loose text beside
-     them read as a debug string rather than part of the interface.
-     Above the bar and pushed to its right shoulder: below, it covered the XP bar,
-     and centred above it sat in the channel between the bar and the player frame. */
     bottom: auto;
-    top: -11px;
-    left: auto;
-    right: 0;
-    transform: none;
-    padding: 1px 6px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--panel-bg);
-    font-family: var(--ui-font);
-    font-size: 10px;
-    font-weight: bold;
-    line-height: 1.3;
-    letter-spacing: 0.04em;
-    color: var(--gold-dim);
-    /* One line, always: wrapped, the longer arrange-mode line ran off the bottom
-     of the screen instead of growing the bar. */
-    white-space: nowrap;
-  }
-  /* The arrange line is a sentence rather than two glyphs, and there is no room
-   for it under the bar, so it sits above one. */
-  .xhb.xhb-editing .xhb-hint {
-    display: block;
-    bottom: auto;
-    top: -16px;
-    /* Centred and un-chipped while arranging: this one is a sentence being read, not
-     a button name the player is meant to stop noticing. */
+    top: -40px;
     left: 50%;
     right: auto;
     transform: translateX(-50%);
     padding: 0;
-    border-color: transparent;
-    background: none;
+    font-size: 10px;
+    letter-spacing: 0.04em;
     color: var(--gold);
-    text-shadow:
-      0 0 3px #000,
-      0 1px 2px #000,
-      1px 0 2px #000,
-      -1px 0 2px #000,
-      0 -1px 2px #000;
+    text-shadow: var(--title-shadow);
+    /* One line, always: wrapped, the longer arrange-mode line ran off the bottom
+     of the screen instead of growing the bar. */
+    white-space: nowrap;
   }
-  .xhb.xhb-expanded .xhb-hint {
-    color: var(--gold);
-    opacity: 1;
+  .xhb.xhb-editing .cd-overlay,
+  .xhb.xhb-editing .cdtext {
+    display: none;
   }
   /* The hardware glyph under each cell, so the mapping reads itself without a trip
    to the options panel. Its own element: the shared action-bar painter owns
    `.keybind` and would overwrite a glyph parked there with the keyboard keycap. */
   .xhb-glyph {
     position: absolute;
-    left: 50%;
-    bottom: -12px;
-    transform: translateX(-50%);
+    left: auto;
+    right: -8px;
+    bottom: -8px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    height: 17px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    background: var(--color-ink-deep);
     font-family: var(--ui-font);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
     line-height: 1;
     white-space: nowrap;
     color: var(--gold);
-    /* A halo, not a drop shadow: the button hints sit over open world now, so they
-     need contrast from every side rather than only below. */
-    text-shadow:
-      0 0 3px #000,
-      0 1px 2px #000,
-      1px 0 2px #000,
-      -1px 0 2px #000,
-      0 -1px 2px #000;
+    text-shadow: none;
+    filter: drop-shadow(var(--art-shadow-sm));
+  }
+  .xhb-glyph-dpad {
+    border-color: var(--gold-dim);
+  }
+  .xhb-glyph-face-a {
+    color: var(--color-pad-a);
+  }
+  .xhb-glyph-face-b {
+    color: var(--color-pad-b);
+  }
+  .xhb-glyph-face-x {
+    color: var(--color-pad-x);
+  }
+  .xhb-glyph-face-y {
+    color: var(--color-pad-y);
+  }
+  /* PlayStation and generic pads name their face buttons in words (Cross, Square),
+   which no 17px disc holds. The disc becomes a pill for those rather than shrinking
+   the type to something unreadable. */
+  .xhb-glyph-long {
+    width: auto;
+    min-width: 17px;
+    padding: 0 4px;
+    border-radius: 9px;
+    font-size: 8px;
+    letter-spacing: -0.2px;
   }
 
   /* The d-pad's UI-navigation highlight. An explicit class, not :focus-visible:
@@ -12486,10 +12393,9 @@
    broken. Drawn from tokens and steady (never transitioned off), matching the
    focus-ring contract in src/ui/CLAUDE.md. */
   .pad-focus {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
-    box-shadow: 0 0 10px rgba(255, 209, 0, 0.45);
-    border-radius: 4px;
+    border-radius: var(--radius-cell);
   }
 
   /* The pad's pointer: a mouse-cursor graphic anchored to whatever the d-pad has
@@ -12508,7 +12414,7 @@
     /* The SAME ornate arrow the mouse uses (--cursor-arrow / CURSOR_HAND), so the
      pad's pointer and the mouse's are one cursor rather than two designs. */
     background: url("/ui/cursors/arrow.png") no-repeat center / contain;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
+    filter: drop-shadow(var(--art-shadow-sm));
   }
 
   /* Pad navigation hides the OS pointer, which would otherwise sit abandoned
@@ -12527,7 +12433,8 @@
    of sixteen: only the half those triggers reach exists, so the other half is
    dropped rather than drawn as an unreachable twin. Without this the bank looks
    identical to an ordinary trigger page and reads as the bar having swapped
-   pages, which is not what happened. */
+   pages, which is not what happened. The set pips say WHICH set; this says which
+   half a press can reach. */
   .xhb.xhb-expanded .xhb-half:not(.xhb-armed) {
     display: none;
   }
@@ -12545,25 +12452,23 @@
     pointer-events: none;
     z-index: 100001;
     background: url("/ui/cursors/arrow.png") no-repeat center / contain;
-    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9));
+    filter: drop-shadow(var(--art-shadow-sm));
   }
 
   /* Edit mode: the bar is pinned open and arrangeable, so it says so rather than
    looking like an ordinary resting bar the player's presses are bouncing off. */
   .xhb.xhb-editing {
     opacity: 1;
-    border-color: var(--gold);
-    box-shadow: 0 0 14px rgba(255, 209, 0, 0.4);
-  }
-  .xhb.xhb-editing .xhb-half {
-    opacity: 1;
   }
   /* The cell an action was lifted from: it reads as a gap the carried thing came
    out of, so the player can see where "put it back" would land. */
   .xhb-slot.xhb-carried {
-    opacity: 0.35;
-    outline: 2px dashed var(--gold);
-    outline-offset: 2px;
+    transform: translateY(-5px);
+    border-color: var(--gold);
+    box-shadow:
+      0 0 0 1px var(--color-keyline),
+      0 0 calc(14px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 85%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--gold) 50%, transparent);
   }
 
   /* The spellbook row whose action the pad is carrying. An action lifted off a CELL
@@ -12571,7 +12476,8 @@
    is the only sign the pick-up worked. */
   .spell-row.spell-carried {
     border-color: var(--gold);
-    box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
+    box-shadow: 0 0 calc(10px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--gold) 35%, transparent);
   }
 
   /* Cross hotbar display presets. The bar's structure never changes: each preset is
@@ -12579,13 +12485,17 @@
    between them mid-session without the bar rebuilding.
    Full is the default and needs no rules of its own. */
 
-  /* Compact: no panel to remove any more, so this preset is purely about the
-   LABELS. They stay on the half a trigger has armed, where they are still saying
-   something, and go everywhere else. */
+  /* Compact: no panel to remove any more, so this preset is about the LABELS and
+   the cells outside the armed half. The labels stay on the half a trigger has
+   armed, where they are still saying something, and go everywhere else; the
+   unarmed cells stay readable but stop competing. */
   body.xhb-compact .xhb-hint,
   body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-glyph,
   body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-trigger {
     display: none;
+  }
+  body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-slot {
+    opacity: 0.45;
   }
 
   /* Minimal: nothing at all until a trigger is held, for a player who knows the
@@ -12597,7 +12507,12 @@
   body.xhb-minimal .xhb:not(.xhb-editing) .xhb-half:not(.xhb-armed) {
     visibility: hidden;
   }
-  body.xhb-minimal .xhb.xhb-editing .xhb-half {
+  body.xhb-minimal .xhb:not(.xhb-editing) .xhb-set-rail {
+    visibility: hidden;
+  }
+  body.xhb-minimal .xhb.xhb-active .xhb-set-rail,
+  body.xhb-minimal .xhb.xhb-editing .xhb-half,
+  body.xhb-minimal .xhb.xhb-editing .xhb-set-rail {
     visibility: visible;
   }
 
@@ -12605,15 +12520,29 @@
    the only way the four read as the same size: measured, no font draws its four
    arrows (or its four triangles) to matching widths. */
   .xhb-glyph-top {
-    transform: translateX(-50%) rotate(0deg);
+    transform: rotate(0deg);
   }
   .xhb-glyph-left {
-    transform: translateX(-50%) rotate(-90deg);
+    transform: rotate(-90deg);
   }
   .xhb-glyph-right {
-    transform: translateX(-50%) rotate(90deg);
+    transform: rotate(90deg);
   }
   .xhb-glyph-bottom {
-    transform: translateX(-50%) rotate(180deg);
+    transform: rotate(180deg);
+  }
+
+  /* Pad mode empties the action rows, so the launcher rail drops into the band
+   they leave rather than floating above an empty strip. The legend line sits
+   under it, which is why the rail stops short of the screen edge. */
+  body.xhb-mode:not(.mobile-touch) #side-buttons {
+    bottom: 26px;
+  }
+  /* A keycap names a key nobody is pressing while the pad is the live input, and
+   the pad's own names for these launchers are on the legend line below. Gated on
+   pad-active, not on xhb-mode: a player who reaches for the keyboard gets the
+   keycaps straight back. */
+  body.xhb-mode.pad-active:not(.mobile-touch) #side-buttons .keybind {
+    display: none;
   }
 }

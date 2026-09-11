@@ -15,17 +15,20 @@
 // kept pids update in place, new pids take a free row or build one. The rows are
 // re-parented in member order into a persistent .party-rows WRAPPER (their own element,
 // one level under #party-frames), and the container's own direct children are ordered
-// chip (mobile only), wrapper, master-loot control. The wrapper is what
-// lets the mobile chip sit alone on its own line: with the rows nested inside it, no
-// member frame can auto-flow beside the chip (the container's mobile column stacks chip,
-// wrapper; the 2-column double-stack lives on the wrapper). The mobile
+// desktop header, chip (mobile only), wrapper, master-loot control. The wrapper
+// lets either disclosure sit alone above the rows; the 2-column mobile grid lives on it. The mobile
 // row-styling rules key on .party-frame:first-of-type / :not(:first-of-type), which now
 // resolve within the wrapper (only member rows live there); appendChild/insertBefore
 // move a node without dropping its keyboard focus or its listeners.
 
 import { formatNumber, t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
-import { createPartyChip, type PartyChip } from './party_chip';
+import {
+  createPartyChip,
+  createPartyFrameHeader,
+  type PartyChip,
+  type PartyFrameHeader,
+} from './party_chip';
 import { partyChipState } from './party_collapse';
 import {
   createPartyRow,
@@ -39,6 +42,7 @@ import {
 import {
   type PartyFrameDisplayConfig,
   type PartyFrameMember,
+  partyFrameHeaderState,
   partyFrameHealthText,
   resolvePartyFrameStyle,
 } from './party_frames';
@@ -64,6 +68,11 @@ const CHIP_PRESENT_CLASS = 'has-party-chip';
 const EXPANDED_CLASS = 'party-expanded';
 const PARTY_PRESENT_CLASS = 'party-present';
 const RAID_STYLE_CLASS = 'party-style-raid';
+const HEADER_COLLAPSED_CLASS = 'party-header-collapsed';
+const TARGET_CLASS = 'is-on';
+const ROLE_TANK_CLASS = 'tank';
+const ROLE_HEALER_CLASS = 'healer';
+const ROLE_DAMAGE_CLASS = 'damage';
 // The chip's aria-expanded attribute name/values (a disclosure control).
 const ARIA_EXPANDED = 'aria-expanded';
 const ARIA_TRUE = 'true';
@@ -93,7 +102,7 @@ export interface PartyFramesPainterDeps {
   /** The localized "Party" chip caption, re-read each update so an in-game language
    *  switch re-localizes it (through the elided setText). Mobile only. */
   chipLabel: () => string;
-  /** Toggle the persisted mobile collapse choice (the chip's tap). The Hud flips +
+  /** Toggle the persisted collapse choice from either disclosure. The Hud flips +
    *  persists its collapsed flag and re-drives setCollapse; a pure USER action, never
    *  gated on data-fx-level / reduce-motion / the governor (party HP is actionable). */
   onToggleCollapse: () => void;
@@ -119,9 +128,13 @@ export class PartyFramesPainter {
   private rowsWrapper: HTMLElement | null = null;
   // The mobile collapse chip, built lazily on the first mobile update and then kept
   // in the DOM (first child of the container) while in a party on mobile. Off mobile
-  // it is never built (desktop party frames are unchanged). Its click toggles the
+  // it is never built. Its click toggles the
   // persisted collapse state through deps.onToggleCollapse.
   private chip: PartyChip | null = null;
+  private header: PartyFrameHeader | null = null;
+  private headerCollapsed = false;
+  private memberCount = 0;
+  private mobile = false;
   // The last-synced expanded flag, so relocalize() can re-emit the chip caption in
   // the new language after an in-game switch (a switch does not flip the collapse
   // state, so the Hud never re-drives setCollapse for it, like the group labels).
@@ -168,15 +181,16 @@ export class PartyFramesPainter {
    * chat-open) inputs, every frame (cheap and fully elided). On mobile in a party it
    * lazily builds the chip, keeps it as the container's first child, and toggles the
    * container's chip-present + expanded classes so CSS shows the chip and reveals or
-   * hides the member rows; on desktop (or out of a party) the chip is
-   * removed and the container carries neither class, so the desktop stack is exactly
-   * as before. While the mobile chat overlay is open the party UI yields entirely (the
+   * hides the member rows. On desktop the same persisted choice drives the unbacked
+   * Party header. While the mobile chat overlay is open the party UI yields entirely (the
    * chip and frames hide), so the chat log / composer own the top-left; the persisted
    * collapse choice is untouched, so closing chat restores it. Every DOM effect routes
    * through the elided writers (class + attr + text), so a steady state (unchanged
    * inputs, the dominant case) writes nothing.
    */
   setCollapse(inParty: boolean, mobile: boolean, collapsed: boolean, chatOpen: boolean): void {
+    this.mobile = mobile;
+    this.headerCollapsed = collapsed;
     const state = partyChipState({ inParty, mobile, collapsed, chatOpen });
     if (state.chipVisible) {
       const chip = this.ensureChip();
@@ -200,11 +214,36 @@ export class PartyFramesPainter {
     // even though the resolver reports framesExpanded=true on desktop (frames always
     // show there). On mobile it reflects the expanded state exactly.
     this.writers.toggleClass(this.container, EXPANDED_CLASS, state.framesExpanded && mobile);
+    this.paintHeader();
   }
 
   private ensureChip(): PartyChip {
     if (!this.chip) this.chip = createPartyChip(this.doc, this.deps.onToggleCollapse);
     return this.chip;
+  }
+
+  private ensureHeader(): PartyFrameHeader {
+    if (!this.header) {
+      this.header = createPartyFrameHeader(this.doc, this.deps.onToggleCollapse);
+    }
+    return this.header;
+  }
+
+  private paintHeader(): void {
+    const state = partyFrameHeaderState(this.memberCount, this.headerCollapsed);
+    const visible = state.visible && !this.mobile;
+    if (visible) {
+      const header = this.ensureHeader();
+      if (header.el.parentNode !== this.container) {
+        this.container.insertBefore(header.el, this.container.firstChild);
+      }
+      this.writers.setText(header.label, t('hudChrome.partyFrames.header'));
+      this.writers.setText(header.count, formatNumber(state.count));
+      this.writers.setAttr(header.el, ARIA_EXPANDED, state.collapsed ? ARIA_FALSE : ARIA_TRUE);
+    } else {
+      this.header?.el.remove();
+    }
+    this.writers.toggleClass(this.container, HEADER_COLLAPSED_CLASS, visible && state.collapsed);
   }
 
   /** Set (or clear with null) the leader-only master-loot control. The Hud rebuilds
@@ -236,7 +275,10 @@ export class PartyFramesPainter {
     leader: number,
     raid: boolean,
     config?: PartyFrameDisplayConfig,
+    targetId?: number | null,
   ): void {
+    this.memberCount = members.length;
+    this.paintHeader();
     this.writers.toggleClass(this.container, PARTY_PRESENT_CLASS, members.length > 0);
     this.writers.toggleClass(
       this.container,
@@ -267,7 +309,7 @@ export class PartyFramesPainter {
       // Update the LIVE slot BEFORE painting so the crest gate + listeners read the
       // current member, never a stale captured one (top-risk 3).
       row.slot.member = m;
-      this.paintRow(row, m, leader, raid, config);
+      this.paintRow(row, m, leader, raid, config, targetId);
       ordered.push(row);
     }
     // Reconcile the DOM order with the MINIMUM number of node moves. A steady-state rebuild
@@ -320,6 +362,7 @@ export class PartyFramesPainter {
         this.container.insertBefore(node, ref);
       }
     };
+    if (this.header && this.header.el.parentNode === this.container) place(this.header.el);
     if (this.chip && this.chip.el.parentNode === this.container) place(this.chip.el);
     place(wrapper);
     if (this.guideControl) place(this.guideControl);
@@ -351,9 +394,13 @@ export class PartyFramesPainter {
     if (this.chip && this.chipShown) {
       this.writers.setText(this.chip.label, this.deps.chipLabel());
     }
+    if (this.header?.el.parentNode === this.container) {
+      this.writers.setText(this.header.label, t('hudChrome.partyFrames.header'));
+      this.writers.setText(this.header.count, formatNumber(this.memberCount));
+    }
   }
 
-  /** Empty the frames (no party): detach every row + the chip.
+  /** Empty the frames (no party): detach every row and both disclosure controls.
    *  Keeps the detached rows in the free list so a re-formed party reuses them. */
   clear(): void {
     for (const [pid, row] of this.pool) {
@@ -374,10 +421,13 @@ export class PartyFramesPainter {
     // stack. The chip node is kept for reuse if a party re-forms on mobile.
     this.chip?.el.remove();
     this.chipShown = false;
+    this.memberCount = 0;
+    this.header?.el.remove();
     this.writers.toggleClass(this.container, CHIP_PRESENT_CLASS, false);
     this.writers.toggleClass(this.container, EXPANDED_CLASS, false);
     this.writers.toggleClass(this.container, PARTY_PRESENT_CLASS, false);
     this.writers.toggleClass(this.container, RAID_STYLE_CLASS, false);
+    this.writers.toggleClass(this.container, HEADER_COLLAPSED_CLASS, false);
   }
 
   private paintRow(
@@ -386,6 +436,7 @@ export class PartyFramesPainter {
     leader: number,
     raid: boolean,
     config?: PartyFrameDisplayConfig,
+    targetId?: number | null,
   ): void {
     // The class-color token + the combat class are the party-only writes the four
     // original writers cannot express (setStyleProp / toggleClass).
@@ -394,6 +445,10 @@ export class PartyFramesPainter {
     this.writers.toggleClass(row.el, COMBAT_CLASS, inCombat);
     this.writers.toggleClass(row.el, THREAT_CLASS, !!m.hasAggro && !m.dead);
     this.writers.toggleClass(row.el, DISCONNECTED_CLASS, m.connected === 0);
+    this.writers.toggleClass(row.el, TARGET_CLASS, m.pid === targetId);
+    this.writers.toggleClass(row.role, ROLE_TANK_CLASS, m.role === 'tank');
+    this.writers.toggleClass(row.role, ROLE_HEALER_CLASS, m.role === 'healer');
+    this.writers.toggleClass(row.role, ROLE_DAMAGE_CLASS, !m.role || m.role === 'dps');
     this.writers.toggleClass(row.el, HIDE_RESOURCE_CLASS, config?.showResource === false);
     this.writers.toggleClass(row.el, HIDE_AURAS_CLASS, config?.showAuras === false);
     // The shared frame (name / level / hp + resource fills / dead + out-of-range

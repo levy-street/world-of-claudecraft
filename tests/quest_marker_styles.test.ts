@@ -112,8 +112,12 @@ describe('quest marker style agreement across surfaces', () => {
   });
 
   it('keeps the gossip glyph on the anchor blue and lifts BOTH tooltip tags to the tag token', () => {
-    // Glyph channel: the gossip row's '!' span stays on the anchor.
-    expect(hudCss).toMatch(new RegExp(`\\.quest-repeat\\s*\\{[^}]*color:\\s*${RARE_BLUE}`, 's'));
+    // Glyph channel: the gossip row's '!' span stays on the anchor. The rule now
+    // names the quality token instead of respelling the hex (the redesign
+    // tokenized this section), so the anchor is pinned in two halves: the rule
+    // reads the token, and the token still resolves to the rare blue.
+    expect(hudCss).toMatch(/\.quest-repeat\s*\{[^}]*color:\s*var\(--color-quality-rare\)/s);
+    expect(tokensCss).toMatch(new RegExp(`--color-quality-rare:\\s*${RARE_BLUE};`));
     // Text channel: one grouped rule routes BOTH tooltip tag spans through
     // the theme-repaired token (with the tokens.css default as fallback).
     // Both arms are #tooltip-scoped deliberately: a future reuse of a tag

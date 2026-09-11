@@ -23,12 +23,14 @@ import {
   stanceBarView,
 } from '../../stance_bar_view';
 import { buildStanceControl, type StanceControl } from './stance_control_controller';
-import { type StanceRadialModel, stanceRadialView } from './stance_radial_core';
+import { stanceRadialView } from './stance_radial_core';
 
 const GROUP_CLASS = 'stancebar-group';
-const BUTTON_CLASS = 'stance-btn';
+const BUTTON_CLASS = 'stance-btn ui-socket ui-socket--stance';
+/** Stamped while the row is up: the stock target-frame seat lifts by one stance row off it. */
+const SHOWN_BODY_CLASS = 'stance-bar-shown';
 const ACTIVE_CLASS = 'active';
-const ICON_CLASS = 'icon-label';
+const ICON_CLASS = 'icon-label ui-socket-art';
 const ARIA_PRESSED_ATTR = 'aria-pressed';
 
 /** The stance-relevant slice of the world, resolved once per frame by Hud. */
@@ -121,6 +123,7 @@ export class StanceBarController {
   private clearRow(): void {
     const { bar } = this.deps;
     bar.style.display = 'none';
+    document.body.classList.remove(SHOWN_BODY_CLASS);
     if (this.lastRowSig !== '') {
       bar.querySelector(`.${GROUP_CLASS}`)?.remove();
       this.lastRowSig = '';
@@ -134,6 +137,7 @@ export class StanceBarController {
       return;
     }
     bar.style.display = 'flex';
+    document.body.classList.add(SHOWN_BODY_CLASS);
     if (model.sig === this.lastRowSig) return;
     this.lastRowSig = model.sig;
     bar.querySelector(`.${GROUP_CLASS}`)?.remove();
@@ -147,7 +151,7 @@ export class StanceBarController {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = BUTTON_CLASS;
-      if (slot.active) btn.classList.add(ACTIVE_CLASS);
+      if (slot.active) btn.classList.add(ACTIVE_CLASS, 'is-on');
       btn.setAttribute(ARIA_PRESSED_ATTR, slot.active ? 'true' : 'false');
       btn.title = name;
       btn.setAttribute('aria-label', name);

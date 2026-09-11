@@ -57,6 +57,11 @@ describe('installPromptDialog: the shared modal recipe', () => {
     try {
       expect(r.prompt.getAttribute('role')).toBe('dialog');
       expect(r.prompt.getAttribute('aria-modal')).toBe('true');
+      expect(r.prompt.classList.contains('ui-panel-strong')).toBe(true);
+      expect(r.input.classList.contains('ui-input')).toBe(true);
+      expect(r.confirm.classList.contains('ui-btn')).toBe(true);
+      expect(r.confirm.classList.contains('ui-btn--red')).toBe(true);
+      expect(r.cancel.classList.contains('ui-btn')).toBe(true);
       const title = r.prompt.querySelector('.prompt-text') as HTMLElement;
       expect(title.id).toMatch(/^test-prompt-title-\d+$/);
       expect(r.prompt.getAttribute('aria-labelledby')).toBe(title.id);

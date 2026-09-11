@@ -6544,6 +6544,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       auraTrack_power: `the ${t('hudChrome.auraTracks.power')} track`,
       auraTrack_utility: `the ${t('hudChrome.auraTracks.utility')} track`,
       auraTrack_friendly: `the ${t('hudChrome.auraTracks.friendly')} track`,
+      talkingHead: 'the Dialogue panel',
     };
     expect(Object.keys(phraseFor).sort()).toEqual(HUD_FRAME_SPECS.map((s) => s.id).sort());
     for (const spec of HUD_FRAME_SPECS) {
@@ -6596,6 +6597,9 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       detail: null,
       ping: null,
       rift: null,
+      // The atlas rail's Show Route projection: a layer the interface page's
+      // prose does not name yet, on the castles/navigation/allies footing above.
+      route: null,
       castles: null,
       navigation: null,
       allies: null,

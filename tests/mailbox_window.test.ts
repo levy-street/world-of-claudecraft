@@ -186,3 +186,64 @@ describe('mailbox_window: house style', () => {
     expect(painter.includes('\u2013'), 'en dash found').toBe(false);
   });
 });
+
+// W20: the Delete rail carried its danger colour only on :hover, which a touch
+// device never enters, so the destructive action looked identical to the safe
+// one there. The cue moved onto the resting state.
+describe('mailbox: the Delete rail is marked at rest', () => {
+  const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
+  const ruleBody = (selector: string): string => {
+    const at = components.indexOf(`\n  ${selector} {`);
+    expect(at, `no rule for ${selector}`).toBeGreaterThan(-1);
+    return components.slice(at, components.indexOf('}', at));
+  };
+
+  it('still stamps the danger class on the Delete button', () => {
+    expect(painter).toContain("del.className = 'mail-action-btn danger ui-btn';");
+  });
+
+  it('colours the danger rail without a hover state', () => {
+    const rest = ruleBody('.mail-action-btn.danger');
+    expect(rest).toContain('color: var(--color-text-error);');
+    expect(rest).toContain('border-color: var(--color-border-invalid);');
+    expect(components).not.toContain('.mail-action-btn.danger:hover');
+  });
+});
+
+// The pinned action rows (W25, the window-shell finding): the reading pane's
+// Reply / Return / Delete row and the send form's Send button must stay in view
+// however long the letter or the field stack runs. Both halves are pinned, the
+// markup that puts the row OUTSIDE the scrollport and the CSS that makes the
+// scrollport absorb the height, because either one alone silently does nothing.
+describe('mailbox_window: the action row never scrolls out of reach', () => {
+  const components = readFileSync(
+    new URL('../src/styles/components.css', import.meta.url),
+    'utf8',
+  ).replace(/\s+/g, ' ');
+
+  it('closes .mail-reading before the action row, so the row is a sibling of the pane', () => {
+    const reading = painter.slice(painter.indexOf('private renderReading('));
+    const paneEnd = reading.indexOf('`</div>` +');
+    const actions = reading.indexOf('class="mail-actions"');
+    expect(paneEnd).toBeGreaterThan(-1);
+    expect(actions).toBeGreaterThan(paneEnd);
+  });
+
+  it('wraps the send form fields in their own scroller with Send pinned below', () => {
+    const send = painter.slice(painter.indexOf('private renderSend('));
+    expect(send).toContain('<div class="mail-send-fields">');
+    expect(send.indexOf('class="mail-send-actions"')).toBeGreaterThan(
+      send.indexOf('class="mail-send-fields"'),
+    );
+  });
+
+  it('stops the pane scrolling and lets the letter / field stack take the height', () => {
+    expect(components).toContain(
+      '#mailbox-body:has(> .mail-reading), #mailbox-body:has(> .mail-send-form) { overflow: hidden; }',
+    );
+    expect(components).toContain(
+      '.mail-reading-body, .mail-send-fields { flex: 1 1 auto; min-height: 0; }',
+    );
+    expect(components).toContain('#mailbox-body > .mail-actions, .mail-send-actions { flex: none;');
+  });
+});

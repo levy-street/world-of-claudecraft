@@ -163,6 +163,10 @@ describe('detachable meter windows', () => {
     expect(
       el('meters-window').querySelector('.mt-tab[data-tab="dmg"]')?.classList.contains('on'),
     ).toBe(true);
+    // W12: the shared segment primitive mirrors the shipped selected tab state.
+    expect(
+      el('meters-window').querySelector('.mt-tab[data-tab="dmg"]')?.classList.contains('is-on'),
+    ).toBe(true);
     // and the damage window itself stays open
     expect(shown('meters-window')).toBe(true);
   });
@@ -178,6 +182,9 @@ describe('detachable meter windows', () => {
     expect(meters.isDetached('heal')).toBe(false);
     expect(
       el('meters-window').querySelector('.mt-tab[data-tab="heal"]')?.classList.contains('on'),
+    ).toBe(true);
+    expect(
+      el('meters-window').querySelector('.mt-tab[data-tab="heal"]')?.classList.contains('is-on'),
     ).toBe(true);
   });
 
@@ -351,6 +358,14 @@ describe('detachable meter windows', () => {
     const detachedRule = css.match(/#meters-window\.hud-frame-detached\s*\{([^}]*)\}/)?.[1] ?? '';
     expect(detachedRule).toContain('left: auto');
     expect(detachedRule).toContain('bottom: auto');
+  });
+
+  it('keeps compact meter controls at a minimum 24px pointer target', () => {
+    const css = readFileSync(join(import.meta.dirname, '..', 'src', 'styles', 'hud.css'), 'utf8');
+    const controls = css.match(/\.mt-panel :is\(\.ui-disc, \.ui-x-btn\)\s*\{([^}]*)\}/)?.[1] ?? '';
+    // W12: the header remains 18px while its controls retain an accessible hit region.
+    expect(controls).toContain('width: 24px');
+    expect(controls).toContain('height: 24px');
   });
 
   it('a framed report on a CLOSED panel latches state without opening it', () => {

@@ -97,6 +97,8 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(calls).toEqual([
       { m: 'setDisplay', args: [BAR, 'block'] },
       { m: 'toggleClass', args: [BAR, 'channel', false] },
+      { m: 'toggleClass', args: [BAR, 'ui-cast--channel', false] },
+      { m: 'toggleClass', args: [BAR, 'ui-cast--consume', false] },
       { m: 'setWidth', args: [FILL, '80.0%'] },
       { m: 'setText', args: [LABEL, 'LOC:fireball'] },
       { m: 'setText', args: [TIMER, timer(0.5)] },
@@ -113,6 +115,8 @@ describe('CastBarPainter: the player instance routes every write through the eli
       PLAYER_OPTS,
     );
     expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'channel', true] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'ui-cast--channel', true] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'ui-cast--consume', false] });
     expect(calls).toContainEqual({ m: 'setText', args: [LABEL, 'LOC:arcane_missiles'] });
   });
 
@@ -124,6 +128,8 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(eat).toEqual([
       { m: 'setDisplay', args: [BAR, 'block'] },
       { m: 'toggleClass', args: [BAR, 'channel', true] },
+      { m: 'toggleClass', args: [BAR, 'ui-cast--channel', false] },
+      { m: 'toggleClass', args: [BAR, 'ui-cast--consume', true] },
       { m: 'setWidth', args: [FILL, '50.0%'] },
       { m: 'setText', args: [LABEL, t('hud.core.eating')] },
       { m: 'setText', args: [TIMER, timer(9)] },
@@ -159,6 +165,8 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(calls).toEqual([
       { m: 'setDisplay', args: [BAR, 'none'] },
       { m: 'toggleClass', args: [BAR, 'channel', false] },
+      { m: 'toggleClass', args: [BAR, 'ui-cast--channel', false] },
+      { m: 'toggleClass', args: [BAR, 'ui-cast--consume', false] },
       { m: 'setWidth', args: [FILL, '0%'] },
       { m: 'setText', args: [LABEL, ''] },
       { m: 'setText', args: [TIMER, ''] },
@@ -178,6 +186,8 @@ describe('CastBarPainter: the target instance (raw label, no eat/drink, display-
     expect(calls).toEqual([
       { m: 'setDisplay', args: [BAR, 'block'] },
       { m: 'toggleClass', args: [BAR, 'channel', false] },
+      { m: 'toggleClass', args: [BAR, 'ui-cast--channel', false] },
+      { m: 'toggleClass', args: [BAR, 'ui-cast--consume', false] },
       { m: 'setWidth', args: [FILL, '50.0%'] },
       { m: 'setText', args: [LABEL, 'nythraxis_deathless_rage'] },
       { m: 'setText', args: [TIMER, timer(5)] },

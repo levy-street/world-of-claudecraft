@@ -19,7 +19,8 @@ describe('leaderboard_window: WCAG chrome (live region + focusable controls + fo
   });
 
   it('gives the close control a real button with an aria-label', () => {
-    expect(code).toContain('class="x-btn" data-close aria-label=');
+    // W12: the legacy hook remains beside the shared close-button primitive.
+    expect(code).toContain('class="x-btn ui-x-btn" data-close aria-label=');
     expect(code).toContain("t('hudChrome.leaderboard.close')");
   });
 
@@ -42,8 +43,9 @@ describe('leaderboard_window: WCAG chrome (live region + focusable controls + fo
   });
 
   it('renders the pager controls as real buttons', () => {
-    expect(code).toContain('class="lb-page-btn" data-leaderboard-page="prev"');
-    expect(code).toContain('class="lb-page-btn" data-leaderboard-page="next"');
+    // W12: both pager controls adopt the shared button primitive beside their hooks.
+    expect(code).toContain('class="lb-page-btn ui-btn" data-leaderboard-page="prev"');
+    expect(code).toContain('class="lb-page-btn ui-btn" data-leaderboard-page="next"');
   });
 
   it('captures + restores the opener focus on open/close (WCAG 2.2 AA focus-return)', () => {
@@ -204,7 +206,10 @@ describe('leaderboard_window: guild board tab (Players / Guilds)', () => {
     // 2. .lb-body is the marked fill child. render() rebuilds the window's whole
     //    innerHTML on every open, tab switch and page change, so the class has to
     //    come from the emitted HTML, not a one-time stamp at open.
-    expect(code).toContain('<div class="lb-body window-fill" id="lb-body-panel" role="tabpanel">');
+    // W12: the shared card primitive now owns the board body's visual surface.
+    expect(code).toContain(
+      '<div class="lb-body window-fill ui-card" id="lb-body-panel" role="tabpanel">',
+    );
   });
 
   it('drives keyboard tab nav through the shared roving core and refocuses the active tab', () => {

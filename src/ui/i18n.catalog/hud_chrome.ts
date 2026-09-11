@@ -590,12 +590,16 @@ export const hudChromeStrings = {
       energy: 'Energy',
     },
   },
-  // On-screen quest tracker. The "(N)" count shown beside the header while the
-  // tracker is collapsed (the number is spliced in via formatNumber), plus the
-  // header button's state-aware hover/title hint (Collapse while expanded,
-  // Expand while collapsed).
+  // On-screen quest tracker. The "(N)" count beside a collapsed deed/Reliquary
+  // header (the number is spliced in via formatNumber), the bare "4 / 8" value
+  // column the quest tracker's counted objective rows carry opposite their
+  // label, plus the header button's state-aware hover/title hint (Collapse
+  // while expanded, Expand while collapsed).
   questTracker: {
     count: '({count})',
+    // Both numbers arrive already localized; a locale that writes the fraction
+    // tight ("4/8") drops the spaces here.
+    objectiveValue: '{current} / {total}',
     collapseHint: 'Collapse quest tracker',
     expandHint: 'Expand quest tracker',
   },
@@ -1394,6 +1398,9 @@ export const hudChromeStrings = {
   // time, beside a real control (a keybind, a tab, a row, the history
   // arrow), never a wall of text. Wordy (M16): the five non-Latin fills
   // land in this same change.
+  talkingHead: {
+    label: 'Dialogue',
+  },
   hubLesson: {
     target: 'Target the dummy to begin.',
     openWindow: 'Open {meters}.',
@@ -2227,6 +2234,9 @@ export const hudChromeStrings = {
   // hardware glyphs in gamepad_map and need no translation.
   controller: {
     title: 'Controller',
+    device: 'Connected Device',
+    deviceConnected: 'Connected',
+    deviceDisconnected: 'No controller detected',
     glyphStyle: 'Button Labels',
     glyphStyleAuto: 'Auto',
     glyphStyleXbox: 'Xbox',
@@ -2256,7 +2266,7 @@ export const hudChromeStrings = {
     crossHotbarResetLayout: 'Reset Cross Hotbar',
     crossHotbarPosition: '{trigger} + {button}',
     crossHotbarOwnsButtons:
-      'The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.',
+      'The triggers modify the cross hotbar while it is on. D-pad directions remain editable here for menus and movement.',
     cancelAction: 'Cancel / Back',
     subcommandsAction: 'Subcommands / Map',
     cycleHudAction: 'Cycle Interface',
@@ -2267,10 +2277,16 @@ export const hudChromeStrings = {
     crossHotbarDisplayMinimal: 'Only While Held',
     crossHotbarArrangeChord: '{bumper} + {button}',
     crossHotbarCarrying: 'Carrying {action}: confirm on a cell to place it, cancel to put it back.',
+    // The button words stay generic (confirm / cancel): both are rebindable and
+    // brand-dependent, and the chord that leaves the mode is the one the player
+    // just pressed to enter it, so the line names what each press DOES instead.
     crossHotbarEditHint:
-      'Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.',
+      'Arranging · d-pad moves · confirm picks up and places · cancel clears a cell',
     crossHotbarEditHelp:
       'Hold the left bumper and press the top face button to arrange the bar with the controller.',
+    // The pad hint strip and the micro-menu legend: a controller's replacement
+    // for the keyboard's implicit key knowledge. The glyph beside each label is
+    // a hardware name from gamepad_map, so only the action words are keyed.
   },
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in
@@ -2690,6 +2706,22 @@ export const hudChromeStrings = {
     showPlaytimeAria: 'Show time played',
     hidePlaytimeAria: 'Hide time played',
   },
+  charSidebar: {
+    label: 'Character details',
+    subtitle: 'Level {level} {className} . {archetype} . Hobby: {hobby}',
+    subtitleNoHobby: 'Level {level} {className} . {archetype}',
+    stats: 'Stats',
+    progression: 'Progression',
+    skills: 'Skills',
+    gathering: 'Gathering',
+    crafting: 'Crafting',
+    openProfessions: 'Open Professions',
+  },
+  questLog: {
+    completed: 'Completed',
+    zoneSummary: '{count} ({ready} ready)',
+    shiftHint: 'Shift-click a quest to link it in chat.',
+  },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
   // The breakdown numbers are recomputed live from the player's current stats
@@ -3038,6 +3070,7 @@ export const hudChromeStrings = {
   // position/screenshot plus a free-text description and posts to the server.
   bugReport: {
     menuButton: 'Report a Bug',
+    online: 'Online',
     realm: 'World',
     character: 'Character',
     position: 'Position',
@@ -4461,6 +4494,7 @@ export const hudChromeStrings = {
     lock: 'Lock player frame',
   },
   partyFrames: {
+    header: 'Party',
     section: 'Party and Raid Frames',
     // The Frames tab's one labelled subsection (options window): every
     // declarative row there tunes the party frames now. Wordy (M16):
@@ -5748,7 +5782,6 @@ export const hudChromeStrings = {
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).
   gathering: {
-    title: 'Gathering',
     mining: 'Mining',
     logging: 'Logging',
     herbalism: 'Herbalism',
@@ -6223,9 +6256,7 @@ export const hudChromeStrings = {
   // fallback, just untitled), and `hobbyLabel` heads the hobby line (#1294).
   // The title NAMES live under archetypePair below, keyed by canonical pair id.
   archetypeTitle: {
-    label: 'Title',
     none: 'None',
-    hobbyLabel: 'Hobby',
   },
   // Pair-named archetype titles (Professions 2.0): one named title per
   // selectable adjacent-pair attunement, keyed by the CANONICAL PAIR ID from
@@ -6495,6 +6526,8 @@ export const hudChromeStrings = {
     majorsLabel: 'Majors: {a} and {b}',
     pairsHeld: 'Pairs held: {count}',
     returnsLabel: 'Returns: {count}',
+    retentionFooter: 'Returns on respec: 60% of skill kept.',
+    tutorialLink: 'Profession tutorial',
   },
   // Crafting window (#1127): the minimal common-tier crafting action, one row
   // per known recipe, a Craft button enabled only when every reagent is held.
@@ -6568,6 +6601,8 @@ export const hudChromeStrings = {
     // the row's Create and Create All controls can submit multi-craft batches.
     craftFeeLine: 'Craft fee: {fee} each',
     empty: 'No recipes known yet.',
+    materialsFooter:
+      'Materials in your vault are drawn automatically. Learn more recipes at the station.',
     resultAria: 'Craft {name}',
     // The SOLE player-visible line for a craft grant (#2430). The grant hub's
     // own 'loot' event no longer prints its "You receive:" line for a craft
@@ -6789,6 +6824,10 @@ export const hudChromeStrings = {
     commissionToggleHint: 'Binds to the first character to receive it in a trade.',
     commissionUnbound: 'Commission piece: binds to the first recipient',
     commissionBound: 'Commission piece: bound to its recipient',
+  },
+  marketWindow: {
+    mixedListingsFooter:
+      'The Merchant restocks common goods; player listings sit beside them at their asking price.',
   },
   // Bag-item context menu verbs (Professions 2.0): the row labels for
   // the right-click / touch action menu (bag_item_context_menu.ts). The first
@@ -7769,6 +7808,39 @@ export const hudChromeStrings = {
     toggleAria: 'Switch between the world map, zone map, and instance map',
     // Hover tooltip over a zone region: its name plus the suggested level band.
     levels: 'Levels {min} to {max}',
+  },
+  // World map atlas rail. These labels name visible filters, quest actions,
+  // region facts, and the compact marker legend; wordy values carry same-change
+  // fills in the five non-Latin runtime overlays.
+  mapAtlas: {
+    level: 'Level {level}',
+    landmarkCount: '{count} landmarks',
+    filtersAria: 'Map layers',
+    filters: {
+      quests: 'Quests',
+      gather: 'Gather',
+      dungeons: 'Dungeons',
+      services: 'Services',
+      players: 'Players',
+    },
+    trackedQuests: 'Tracked quests',
+    noTrackedQuests: 'No tracked quests',
+    availableNearby: 'Available nearby',
+    noNearbyQuests: 'No nearby quests',
+    distance: '{distance} yards',
+    showRoute: 'Show Route',
+    // The tracking pair. Both labels live here because the two controls that
+    // flip local quest tracking share them: the atlas rail's Untrack button and
+    // the quest log's per-quest toggle, which is the way back from untracked.
+    untrack: 'Untrack',
+    track: 'Track',
+    legend: {
+      dungeon: 'Dungeon',
+      ore: 'Ore',
+      herb: 'Herb',
+      mail: 'Mail',
+      passage: 'Passage',
+    },
   },
   // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
   // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note

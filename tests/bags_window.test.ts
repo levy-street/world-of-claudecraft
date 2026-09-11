@@ -155,9 +155,12 @@ describe('bags_window: accessibility contract', () => {
 });
 
 describe('bags_window: load-bearing behaviors preserved', () => {
-  it('uses the branded Claudium icon and matching balance color', () => {
+  it('uses the branded Claudium icon and shared money-row primitives', () => {
     expect(hud).toContain('src="/claudium/icons/claudium_coin_64.webp"');
-    expect(components).toMatch(/\.claudium-launcher\s*\{[^}]*color:\s*#9eeeff;/s);
+    // W7 hands wallet color and interaction paint to the shared button and chip primitives.
+    expect(painter).toContain("'[data-wallet-action], [data-claudium-launcher]'");
+    expect(painter).toContain("control.classList.add('ui-btn')");
+    expect(painter).toContain("classList.add('ui-chip')");
   });
 
   it('reuses bag_filter via buildBagGrid (does not re-derive the filter)', () => {
@@ -778,7 +781,8 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     expect(body).toContain('unknownItemIconHtml(s.itemId)');
     // The cell keeps the shared bag-cell styling at the default rung and its
     // count badge, so an unknown stack reads like a stack, not a hole.
-    expect(body).toContain("row.className = 'bag-item q-common'");
+    // W7 gives fallback stacks the same shared socket ownership as known bag cells.
+    expect(body).toContain("row.className = 'bag-item ui-socket ui-socket--bag q-common'");
     expect(body).toContain('bi-count');
     // The aria channel carries the UNKNOWN signal (the tooltip is hover-only),
     // plus the raw id; the tooltip title is the raw id with the unknown
@@ -950,5 +954,44 @@ describe('bags_window: the bag-bar counter pools readout (phase 08)', () => {
     const rebuilt = root.querySelector('.bag-capacity') as HTMLElement;
     expect(rebuilt).not.toBe(counter);
     expect(document.activeElement).toBe(rebuilt);
+  });
+});
+
+describe('bags_window: the grid fills the window it lives in (W24)', () => {
+  it('lays the sockets out as fluid auto-fill tracks, never a fixed centred count', () => {
+    // The review finding: a fixed six-column band centred in the body left dead
+    // space down both sides of every bag. Tracks now auto-fill the body width
+    // with the bag socket species as the floor, so the grid grows with the
+    // window (and with the wider vendor / bank companion docks).
+    expect(components).toContain(
+      'grid-template-columns: repeat(auto-fill, minmax(var(--socket-size-bag), 1fr));',
+    );
+    expect(components).not.toContain('grid-template-columns: repeat(6, 40px);');
+    // The socket species token itself is unchanged: cells still floor at 40px.
+    expect(tokens).toContain('--socket-size-bag: 40px;');
+  });
+
+  it('sizes the window to its content from the bottom anchor, capped for full bags', () => {
+    // Review round 2: a fixed 560px sheet left a small bag with a tall empty
+    // grid; the window is bottom-anchored, so an auto height grows upward with
+    // the slots and the cap keeps a full bag scrolling inside the viewport.
+    const bags = /\n {2}#bags \{([^}]*)\}/.exec(components)?.[1] ?? '';
+    expect(bags).toContain('height: auto;');
+    expect(bags).toContain('max-height: min(560px, calc(100vh - 18px));');
+    expect(bags).not.toContain('height: 560px;');
+  });
+
+  it('keeps every chrome row at its natural height so the grid is the one scroller', () => {
+    for (const row of ['#bags .panel-title', '#bags .bag-bar', '#bags .bag-filter-bar']) {
+      expect(components).toContain(`${row} {\n    flex: none;\n  }`);
+    }
+    expect(components).toContain('#bags .bag-grid {\n    flex: 1 1 auto;\n    min-height: 0;');
+  });
+
+  it('seats the money block as a ruled footer row pinned to the bottom edge', () => {
+    const money = /#bags \.money \{([^}]*)\}/.exec(components)?.[1] ?? '';
+    expect(money).toContain('flex: none;');
+    expect(money).toContain('border-top: 1px solid var(--color-border-showcase);');
+    expect(money).toContain('padding-top: var(--spacing-sm);');
   });
 });

@@ -840,9 +840,9 @@ export class WocMarketWindow {
     // button carries its accessible name only (the family convention: no
     // native title beside the aria-label).
     const header =
-      `<div class="panel-title">` +
-      `<span id="woc-market-title">${esc(t('hudChrome.wocMarket.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(
+      `<div class="panel-title ui-win-head">` +
+      `<span class="ui-win-title" id="woc-market-title">${esc(t('hudChrome.wocMarket.title'))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(
         t('hudChrome.wocMarket.close'),
       )}">${svgIcon('close')}</button></div>`;
     if (model.kind === 'unavailable') return header;
@@ -861,8 +861,8 @@ export class WocMarketWindow {
       tabStripModel({
         ariaLabel: t('hudChrome.wocMarket.tabsLabel'),
         panelId: 'woc-market-panel',
-        stripClass: 'wm-tabs',
-        tabClass: 'wm-tab',
+        stripClass: 'wm-tabs ui-tabs',
+        tabClass: 'wm-tab ui-tab',
         selectedClass: 'wm-tab-selected',
         selected: model.tab,
         tabs: [
@@ -964,7 +964,7 @@ export class WocMarketWindow {
         const badge =
           r.reserveBadge === null
             ? ''
-            : `<span class="wm-reserve wm-reserve-${r.reserveBadge}"${this.tip(
+            : `<span class="wm-reserve ui-chip wm-reserve-${r.reserveBadge}"${this.tip(
                 `reserve:${r.id}`,
                 t(
                   r.reserveBadge === 'met'
@@ -979,10 +979,10 @@ export class WocMarketWindow {
                 ),
               )}</span>`;
         const mine = r.mine
-          ? `<span class="wm-mine"${this.tip(`mine:${r.id}`, t('hudChrome.wocMarket.yourListingTip'))}>${esc(t('hudChrome.wocMarket.yourListing'))}</span>`
+          ? `<span class="wm-mine ui-chip"${this.tip(`mine:${r.id}`, t('hudChrome.wocMarket.yourListingTip'))}>${esc(t('hudChrome.wocMarket.yourListing'))}</span>`
           : '';
         const locked = r.buyNowLocked
-          ? `<span class="wm-locked"${this.tip(`locked:${r.id}`, t('hudChrome.wocMarket.buyNowLockedTip'))}>${esc(t('hudChrome.wocMarket.buyNowLockedBadge'))}</span>`
+          ? `<span class="wm-locked ui-chip"${this.tip(`locked:${r.id}`, t('hudChrome.wocMarket.buyNowLockedTip'))}>${esc(t('hudChrome.wocMarket.buyNowLockedBadge'))}</span>`
           : '';
         // A buy-now-only listing takes no bids: its price column names the
         // format instead of claiming 'No bids yet' for an auction it is not.
@@ -1021,7 +1021,7 @@ export class WocMarketWindow {
     // while the answer is on its way, so a pressed pager button reads as
     // heard; a background poll never raises the flag (loadBrowse silent arm).
     const table =
-      `<table class="wm-table" aria-busy="${b.loading ? 'true' : 'false'}"><thead><tr>` +
+      `<table class="wm-table ui-card" aria-busy="${b.loading ? 'true' : 'false'}"><thead><tr>` +
       `<th>${esc(t('hudChrome.wocMarket.colItem'))}</th>` +
       `<th>${esc(t('hudChrome.wocMarket.colSeller'))}</th>` +
       `<th>${esc(t('hudChrome.wocMarket.colCurrentBid'))}</th>` +
@@ -1152,19 +1152,19 @@ export class WocMarketWindow {
         // hover stats card still works, with a clear button on the far right
         // (its accessible name is the whole instruction; no native title
         // beside it, the x-btn family convention).
-        `<div class="wm-combo-chosen">` +
+        `<div class="wm-combo-chosen ui-card">` +
         this.itemCellHtml(
           selected.itemId,
           selected.quality,
           `sell:${selected.index}`,
           selected.instance,
         ) +
-        `<button type="button" class="x-btn wm-combo-clear" data-action="sell-clear" ` +
+        `<button type="button" class="x-btn ui-x-btn wm-combo-clear" data-action="sell-clear" ` +
         `data-focus-key="wm-sell-clear" aria-label="${esc(
           t('hudChrome.wocMarket.sellClear', { item: this.itemName(selected.itemId) }),
         )}">${svgIcon('close')}</button>` +
         `</div>`
-      : `<input type="text" class="wm-combo-input" id="${listId}-input" role="combobox" ` +
+      : `<input type="text" class="wm-combo-input ui-input" id="${listId}-input" role="combobox" ` +
         `aria-autocomplete="list" aria-controls="${listId}" aria-expanded="${open}" ` +
         (active >= 0 ? `aria-activedescendant="${listId}-o${active}" ` : '') +
         `autocomplete="off" spellcheck="false" ` +
@@ -1181,7 +1181,7 @@ export class WocMarketWindow {
             t('hudChrome.wocMarket.sellChoose'),
           )}</label>`) +
       `<div class="wm-combo" data-combo>${control}` +
-      `<div class="wm-combo-list" id="${listId}" role="listbox" aria-label="${esc(
+      `<div class="wm-combo-list ui-card" id="${listId}" role="listbox" aria-label="${esc(
         // tPlural, not a flat key: "Choose from 1 items" is what a {count}
         // template produces, and the plural category differs per locale.
         tPlural('hudChrome.plurals.wocMarketSellChoose', matches.length, {
@@ -1221,9 +1221,9 @@ export class WocMarketWindow {
             t('hudChrome.trade.woc.netLine', { net: this.usd(fee.sellerCents) }),
           )}</p>`;
     const form = selected
-      ? `<div class="wm-sell-form">` +
+      ? `<div class="wm-sell-form ui-card">` +
         `<label>${esc(t('hudChrome.wocMarket.sellFormat'))}` +
-        `<select data-field="sell-format" data-focus-key="wm-sell-format">` +
+        `<select class="ui-input" data-field="sell-format" data-focus-key="wm-sell-format">` +
         `<option value="auction" ${this.sellFormat === 'auction' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatAuction'))}</option>` +
         `<option value="buy_now" ${this.sellFormat === 'buy_now' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatBuyNow'))}</option>` +
         `</select></label>` +
@@ -1246,27 +1246,27 @@ export class WocMarketWindow {
         // it for a buy-now instead of asking the seller for a number that is
         // never shown and never bid against.
         (this.sellFormat === 'auction'
-          ? `<label>${esc(t('hudChrome.wocMarket.sellStart'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-start" data-focus-key="wm-sell-start" /></label>` +
-            `<label>${esc(t('hudChrome.wocMarket.sellReserve'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-reserve" data-focus-key="wm-sell-reserve" /></label>` +
+          ? `<label>${esc(t('hudChrome.wocMarket.sellStart'))}<input type="number" class="ui-input" inputmode="decimal" min="0" step="0.25" data-field="sell-start" data-focus-key="wm-sell-start" /></label>` +
+            `<label>${esc(t('hudChrome.wocMarket.sellReserve'))}<input type="number" class="ui-input" inputmode="decimal" min="0" step="0.25" data-field="sell-reserve" data-focus-key="wm-sell-reserve" /></label>` +
             `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellReserveNote'))}</p>` +
-            `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" /></label>` +
+            `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" class="ui-input" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" /></label>` +
             `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellBuyNowAuctionNote'))}</p>`
-          : `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" required /></label>` +
+          : `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" class="ui-input" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" required /></label>` +
             `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellBuyNowNote'))}</p>`) +
-        `<label>${esc(t('hudChrome.wocMarket.sellDuration'))}<select data-field="sell-duration" data-focus-key="wm-sell-duration">${durations}</select></label>` +
+        `<label>${esc(t('hudChrome.wocMarket.sellDuration'))}<select class="ui-input" data-field="sell-duration" data-focus-key="wm-sell-duration">${durations}</select></label>` +
         // The next-highest-bidder fallback describes bidders, so only an
         // auction offers it; on a pure buy-now the absent checkbox reads as
         // false at submit, which is the only value the format can mean.
         (this.sellFormat === 'auction'
-          ? `<label class="wm-offer-next"><input type="checkbox" data-field="sell-offer-next" data-focus-key="wm-sell-offer-next" ${this.sellOfferNext ? 'checked' : ''} /> ${esc(
+          ? `<label class="wm-offer-next"><input type="checkbox" class="ui-check" data-field="sell-offer-next" data-focus-key="wm-sell-offer-next" ${this.sellOfferNext ? 'checked' : ''} /> ${esc(
               t('hudChrome.wocMarket.sellOfferNext'),
             )}</label>`
           : '') +
-        `<div class="wm-disclosures">` +
+        `<div class="wm-disclosures ui-well">` +
         `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellFeeNote'))}</p>` +
         feeLines +
         `</div>` +
-        `<button type="button" class="wm-primary" data-action="sell-submit" ${model.paused || !model.walletLinked || this.busy ? 'disabled' : ''} ` +
+        `<button type="button" class="wm-primary ui-btn ui-btn--gold" data-action="sell-submit" ${model.paused || !model.walletLinked || this.busy ? 'disabled' : ''} ` +
         `aria-label="${esc(t('hudChrome.wocMarket.sellSubmitAria', { item: this.itemName(selected.itemId) }))}" data-focus-key="wm-sell-submit">` +
         `${esc(t('hudChrome.wocMarket.sellSubmit'))}</button></div>`
       : '';

@@ -14,6 +14,7 @@ import type { ResolvedAbility } from '../../../sim/sim';
 import type { AbilityDef, ItemDef } from '../../../sim/types';
 import { formatNumber, t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
+import { isStanceBarAbilityGroup } from '../../stance_bar_view';
 import type { ActionBarSlotElements } from '../action_bar/action_bar_painter';
 import type {
   ActionBarAbility,
@@ -26,6 +27,7 @@ import {
   CROSS_HOTBAR_CELLS,
   type CrossHotbarCell,
   type CrossHotbarHold,
+  type CrossHotbarOverlayAction,
   type CrossHotbarOverlayState,
   crossHotbarOverlayState,
   HIDDEN_CROSS_HOTBAR,
@@ -39,6 +41,7 @@ const CELL_POSITION_ATTR = 'data-xhb-point';
 const CELL_INDEX_ATTR = 'data-xhb-index';
 const HALF_LAYER_ATTR = 'data-xhb-half';
 const GLYPH_CLASS = 'xhb-glyph';
+const GLYPH_LONG_CLASS = 'xhb-glyph-long';
 const TABINDEX_ATTR = 'tabindex';
 // A resting cell is cast by its hardware chord and the overlay takes no pointer,
 // so it is a readout: reachable only while arranging, which is the one act that
@@ -64,6 +67,21 @@ function markCarriedSpellbookRow(abilityId: string | null): void {
 const EMPTY_BAR_STATE = { slots: [], manySpells: false };
 const TRIGGER_CLASS = 'xhb-trigger';
 const HINT_CLASS = 'xhb-hint';
+const STUD_CLASS = 'xhb-stud';
+const SET_RAIL_CLASS = 'xhb-set-rail';
+const SET_PIP_CLASS = 'xhb-pip';
+const SET_ATTR = 'data-xhb-set';
+const SET_COUNT = 2;
+// The set-swap chip under the pips. The pips say which of the two sets is live;
+// this says how to change it, which nothing on the bar said before.
+const SET_SWAP_CLASS = 'xhb-set-swap';
+
+const FACE_GLYPH_CLASS_BY_POINT: Record<CrossHotbarCell['point'], string> = {
+  top: `${GLYPH_CLASS}-face-y`,
+  left: `${GLYPH_CLASS}-face-x`,
+  right: `${GLYPH_CLASS}-face-b`,
+  bottom: `${GLYPH_CLASS}-face-a`,
+};
 
 /** Mint one cell's inner spans, matching the action bar's element contract so the
  *  shared ActionBarPainter can write it unchanged. */
@@ -73,20 +91,20 @@ function buildCell(cell: CrossHotbarCell): ActionBarSlotElements {
   // is allowed to carry it.
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = `action-btn ${CELL_CLASS}`;
+  btn.className = `action-btn ${CELL_CLASS} ui-socket`;
   btn.setAttribute(CELL_POSITION_ATTR, cell.point);
   btn.setAttribute(CELL_INDEX_ATTR, String(cell.index));
   btn.setAttribute(TABINDEX_ATTR, CELL_NOT_TAB_STOP);
   const label = document.createElement('span');
-  label.className = 'icon-label';
+  label.className = 'icon-label ui-socket-art';
   const countEl = document.createElement('span');
-  countEl.className = 'item-count';
+  countEl.className = 'item-count ui-socket-count ui-num';
   const keybindEl = document.createElement('span');
-  keybindEl.className = 'keybind';
+  keybindEl.className = 'keybind ui-socket-key';
   const cdOverlay = document.createElement('div');
-  cdOverlay.className = 'cd-overlay';
+  cdOverlay.className = 'cd-overlay ui-socket-cd';
   const cdText = document.createElement('div');
-  cdText.className = 'cdtext';
+  cdText.className = 'cdtext ui-socket-cd-text ui-num';
   const rechargeOverlay = document.createElement('div');
   rechargeOverlay.className = 'recharge-overlay';
   btn.append(label, countEl, keybindEl, cdOverlay, rechargeOverlay, cdText);
@@ -130,6 +148,28 @@ export function crossHotbarResolvers(
   };
 }
 
+/**
+ * What an untouched cross hotbar is filled from: this character's action bar,
+ * plus the abilities a pad needs that the bar does not carry. Attack leads the
+ * extras because it sits on no hotbar slot to copy (the desktop bar draws it as a
+ * fixed button), so a pad player would otherwise have no auto-attack at all; the
+ * stance-style abilities follow, known at level one yet unbound and so
+ * unreachable on a pad. Lives here rather than inline at the call site so
+ * src/ui/hud.ts carries a call, not a shape (the crossHotbarResolvers pattern).
+ */
+export function crossHotbarSeedActions(
+  bar: readonly CrossHotbarOverlayAction[],
+  known: readonly ResolvedAbility[],
+): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
+  return {
+    bar: bar.map((a) => (a ? { type: a.type, id: a.id } : null)),
+    extras: [
+      CROSS_HOTBAR_ATTACK_ID,
+      ...known.filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup)).map((k) => k.def.id),
+    ],
+  };
+}
+
 export class CrossHotbarController {
   private readonly painter: CrossHotbarPainter;
   private readonly view: ActionBarView;
@@ -138,6 +178,8 @@ export class CrossHotbarController {
   private readonly root: HTMLElement;
   private readonly triggerLabels = new Map<string, HTMLElement>();
   private readonly hint: HTMLElement;
+  private readonly setSwap: HTMLElement;
+  private readonly setSwapChip: HTMLElement;
   private state: CrossHotbarOverlayState = HIDDEN_CROSS_HOTBAR;
   // The hint the bar shows when it is not being arranged, kept so leaving edit
   // mode puts it back without waiting for the next hold to repaint it.
@@ -160,7 +202,7 @@ export class CrossHotbarController {
         half.className = `${HALF_CLASS} ${HALF_CLASS}-${cell.layer}`;
         half.setAttribute(HALF_LAYER_ATTR, cell.layer);
         const trigger = document.createElement('span');
-        trigger.className = `${TRIGGER_CLASS} ${TRIGGER_CLASS}-${cell.layer}`;
+        trigger.className = `${TRIGGER_CLASS} ${TRIGGER_CLASS}-${cell.layer} ui-keycap`;
         half.appendChild(trigger);
         this.triggerLabels.set(cell.layer, trigger);
         halfEls.set(cell.layer, half);
@@ -171,22 +213,49 @@ export class CrossHotbarController {
       if (!cluster) {
         cluster = document.createElement('div');
         cluster.className = `${CLUSTER_CLASS} ${CLUSTER_CLASS}-${cell.cluster}`;
+        const stud = document.createElement('span');
+        stud.className = `${STUD_CLASS} ui-medal ui-medal--stud`;
+        stud.setAttribute('aria-hidden', 'true');
+        cluster.appendChild(stud);
         halfEls.set(clusterKey, cluster);
         half.appendChild(cluster);
       }
       const els = buildCell(cell);
       const glyph = document.createElement('span');
-      glyph.className = GLYPH_CLASS;
+      glyph.className = `${GLYPH_CLASS} ${GLYPH_CLASS}-${cell.cluster}`;
       els.btn.appendChild(glyph);
       // The d-pad four share ONE glyph and differ only by rotation, which is the
       // only way all four come out the same size (no font draws its four arrows
       // alike). The face four keep their letters, which need no turning.
       if (cell.cluster === 'dpad') glyph.classList.add(`${GLYPH_CLASS}-${cell.point}`);
+      else glyph.classList.add(FACE_GLYPH_CLASS_BY_POINT[cell.point]);
       this.glyphs[cell.index] = glyph;
       this.cellEls[cell.index] = els.btn;
       cluster.appendChild(els.btn);
       cells[cell.index] = els;
     }
+    // Which of the two standing sets a press fires from. Decorative-free: the bar
+    // never said this before, and without it the expanded bank and the ordinary
+    // one look identical once the unreachable half is dropped.
+    const setRail = document.createElement('div');
+    setRail.className = SET_RAIL_CLASS;
+    setRail.setAttribute('aria-hidden', 'true');
+    for (let set = 0; set < SET_COUNT; set++) {
+      const pip = document.createElement('span');
+      pip.className = `${SET_PIP_CLASS} ui-medal ui-medal--stud`;
+      pip.setAttribute(SET_ATTR, String(set));
+      setRail.appendChild(pip);
+    }
+    const setSwapChip = document.createElement('span');
+    setSwapChip.className = `${SET_SWAP_CLASS} ui-keycap`;
+    setSwapChip.setAttribute('aria-hidden', 'true');
+    // The glyph rides its OWN span: the writer cache holds one entry per element,
+    // so texting and hiding the same node would evict each other every hold.
+    this.setSwap = document.createElement('span');
+    setSwapChip.appendChild(this.setSwap);
+    this.setSwapChip = setSwapChip;
+    setRail.appendChild(setSwapChip);
+    root.insertBefore(setRail, halfEls.get('right') ?? null);
     this.hint = document.createElement('div');
     this.hint.className = HINT_CLASS;
     root.appendChild(this.hint);
@@ -256,8 +325,14 @@ export class CrossHotbarController {
     if (!hold) return;
     const labels = hold.buttons;
     for (let i = 0; i < this.glyphs.length; i++) {
-      this.writers.setText(this.glyphs[i], labels[i] ?? '');
+      const label = labels[i] ?? '';
+      this.writers.setText(this.glyphs[i], label);
+      this.writers.toggleClass(this.glyphs[i], GLYPH_LONG_CLASS, label.length > 1);
     }
+    // Written here rather than per frame, beside the cell glyphs, for the same
+    // reason: it only moves when the pad's brand or the player's binding does.
+    this.writers.setText(this.setSwap, hold.swap);
+    this.writers.setDisplay(this.setSwapChip, hold.swap ? 'inline-flex' : 'none');
     const bothTriggers = t('hudChrome.controller.crossHotbarPosition', {
       trigger: hold.triggers.left,
       button: hold.triggers.right,

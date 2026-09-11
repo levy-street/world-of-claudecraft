@@ -18,11 +18,17 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
+import { CRAFT_RING } from '../sim/content/professions';
 import { ITEMS } from '../sim/data';
 import { type EquipSlot, type ItemDef, type ItemInstancePayload, isMechWearer } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { STAT_PANELS } from './char_stats_view';
-import { buildPaperdollView, type PaperdollSlot } from './char_view';
+import {
+  buildCharacterSidebarView,
+  buildPaperdollView,
+  type CharacterSidebarTab,
+  type PaperdollSlot,
+} from './char_view';
 import { currencyIconHtml } from './currency_art';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
@@ -34,7 +40,7 @@ import { gatheringProfessionNameKey } from './hud/professions/gathering_professi
 import { buildGatheringProficiencyRows } from './hud/professions/gathering_view';
 import { archetypeImageUrl } from './hud/professions/profession_art';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
-import { iconDataUrl, professionIconUrl } from './icons';
+import { iconDataUrl, professionIconUrl, professionImageUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import { masterwroughtCapReadout } from './masterwrought_cap_view';
@@ -50,6 +56,8 @@ import {
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
+import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
+import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
 import { wornItemCellParts } from './worn_item_cell_view';
 
@@ -77,6 +85,14 @@ const ARCHETYPE_PAIR_TITLE_KEYS: Record<string, TranslationKey> = {
   'weaponcrafting+armorcrafting': 'hudChrome.archetypePair.weaponcrafting+armorcrafting',
   'armorcrafting+engineering': 'hudChrome.archetypePair.armorcrafting+engineering',
 };
+
+const CHARACTER_SIDEBAR_LABEL_KEYS: Record<CharacterSidebarTab, TranslationKey> = {
+  stats: 'hudChrome.charSidebar.stats',
+  progression: 'hudChrome.charSidebar.progression',
+  skills: 'hudChrome.charSidebar.skills',
+};
+
+const charSidebarTabId = (id: CharacterSidebarTab): string => `char-sidebar-tab-${id}`;
 
 // The per-craft display-name table lives in the shared craft_name_view.ts
 // pure core (the material_profession_hint_view Used-by line reads it too, and
@@ -202,6 +218,7 @@ const SHARE_GLYPH =
 
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
+  private sidebarTab: CharacterSidebarTab = 'stats';
 
   constructor(private readonly deps: CharWindowDeps) {
     this.watchComposedPortrait();
@@ -261,6 +278,7 @@ export class CharWindow {
     // fallback stays the exception.
     const focusedControl = focusedWithin(el);
     const focusedAct = focusedControl?.dataset.act ?? null;
+    const focusedTab = focusedControl?.dataset.tab ?? null;
     const hadFocus = focusedControl !== null;
     const world = this.deps.world();
     const p = world.player;
@@ -274,40 +292,57 @@ export class CharWindow {
       ? `<img class="char-archetype-title-crest" src="${esc(archetypeCrestUrl)}" alt="" draggable="false">`
       : '';
     const hobbyCraft = hobbyCraftText(world.hobbyCraft);
-    const hobbyRow =
-      world.hobbyCraft !== null
-        ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
-        : '';
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md', catalog: p.skinCatalog, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${currencyIconHtml('honor')}${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
-    html += `<div class="paperdoll">
-      <div class="equip-col" id="equip-col-left"></div>
-      <div class="char-model-panel">
-        <div id="char-model-preview" class="char-model-preview" role="img" aria-label="${esc(t('hudChrome.character.modelPreview'))}"></div>
-        <div id="char-skin-row" class="skin-row char-skin-row" role="list" aria-label="${esc(t('auth.appearance'))}"></div>
-        <button type="button" class="btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button>
-      </div>
-      <div class="equip-col equip-col-right" id="equip-col-right"></div>
-    </div>`;
-    html += this.masterwroughtSlotsHtml(world);
-    // Stats as the showcase layout: five primary tiles, then the Offense and
-    // Defense panels. The partition + heading keys come from the char_stats_view
-    // pure core; each cell is the same unit-tested stat_tooltip_view cell (colon
-    // dropped, since flex layout separates label from value in tiles and panels).
-    html += `<div class="stat-panels">${STAT_PANELS.map((panel) => {
-      const cells = panel.stats.map((stat) => this.deps.statCellHtml(stat)).join('');
-      const title = panel.titleKey
-        ? `<div class="sp-title">${esc(t(panel.titleKey as TranslationKey))}</div>`
-        : '';
-      const cls = panel.kind === 'tiles' ? 'stat-panel attrs-tiles' : 'stat-panel';
-      return `<div class="${cls}">${title}${cells}</div>`;
-    }).join('')}</div>`;
-    html += this.deps.talentSummaryHtml();
-    html += this.deps.progressionHtml(p.level);
-    html += this.gatheringHtml(world);
-    html += this.playtimeHtml(world);
-    html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
+    const sidebar = buildCharacterSidebarView(this.sidebarTab);
+    this.sidebarTab = sidebar.selected;
+    const subtitle =
+      world.hobbyCraft === null
+        ? t('hudChrome.charSidebar.subtitleNoHobby', {
+            level,
+            className,
+            archetype: archetypeTitle,
+          })
+        : t('hudChrome.charSidebar.subtitle', {
+            level,
+            className,
+            archetype: archetypeTitle,
+            hobby: hobbyCraft,
+          });
+    let html = `<div class="panel-title char-title-portrait ui-win-head">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'sm', catalog: p.skinCatalog, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text ui-win-title" id="char-title">${esc(p.name)}<span class="ui-win-sub char-title-sub">${archetypeCrest}${esc(subtitle)}</span></span><span class="char-honor-balance">${currencyIconHtml('honor')}${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    html += `<div class="char-body"><section class="char-equipment-pane"><div class="paperdoll">
+        <div class="equip-col" id="equip-col-left"></div>
+        <div class="char-model-panel ui-card">
+          <div id="char-model-preview" class="char-model-preview" role="img" aria-label="${esc(t('hudChrome.character.modelPreview'))}"></div>
+          <div id="char-skin-row" class="skin-row char-skin-row" role="list" aria-label="${esc(t('auth.appearance'))}"></div>
+        </div>
+        <div class="equip-col equip-col-right" id="equip-col-right"></div>
+        <div class="equip-row-weapons" id="equip-row-weapons"></div>
+      </div>${this.masterwroughtSlotsHtml(world)}<div class="ui-divider char-footer-divider"></div><footer class="char-footer">${this.playtimeHtml(world)}<div class="pc-share-row"><button type="button" class="btn ui-btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button><button type="button" class="pc-share-btn ui-btn ui-btn--red" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div></footer></section>`;
+    html += `<section class="char-sidebar">${tabStripHtml(
+      tabStripModel({
+        ariaLabel: t('hudChrome.charSidebar.label'),
+        panelId: 'char-sidebar-panel',
+        stripClass: 'char-sidebar-tabs ui-seg',
+        tabClass: 'char-sidebar-tab ui-seg-tab',
+        selectedClass: 'is-selected',
+        tabs: sidebar.tabs.map(({ id }) => ({
+          id,
+          label: t(CHARACTER_SIDEBAR_LABEL_KEYS[id]),
+          buttonId: charSidebarTabId(id),
+        })),
+        selected: sidebar.selected,
+      }),
+      // The panel scrolls (overflow-y: auto) and the Stats tab holds no
+      // focusable content, so it needs its own tab stop plus the selected
+      // tab's label as its name: the WAI-ARIA tabs pattern, and what
+      // axe's scrollable-region-focusable asks for.
+    )}<div id="char-sidebar-panel" class="char-sidebar-panel" role="tabpanel" tabindex="0" aria-labelledby="${esc(charSidebarTabId(sidebar.selected))}">${this.sidebarHtml(world, sidebar.selected)}</div></section></div>`;
     el.innerHTML = html;
     hydratePortraits(el);
+    wireTabStrip(el, 'char-sidebar-tab', (id, focusFollow) => {
+      this.sidebarTab = buildCharacterSidebarView(id).selected;
+      this.render();
+      if (focusFollow) focusActiveTab(el, 'char-sidebar-tab', 'is-selected');
+    });
     el.querySelector('[data-act="prestige"]')?.addEventListener('click', () =>
       this.deps.openPrestige(),
     );
@@ -326,6 +361,10 @@ export class CharWindow {
     el.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
       audio.click();
       this.deps.openPlayerCard();
+    });
+    el.querySelector('[data-act="open-professions"]')?.addEventListener('click', () => {
+      audio.click();
+      document.getElementById('mm-professions')?.click();
     });
     const playtimeEye = el.querySelector<HTMLElement>('[data-act="toggle-playtime"]');
     if (playtimeEye) {
@@ -351,8 +390,10 @@ export class CharWindow {
     const view = buildPaperdollView(world.equipment, ITEMS, world.equipmentInstances);
     const leftCol = el.querySelector('#equip-col-left');
     const rightCol = el.querySelector('#equip-col-right');
+    const weaponsRow = el.querySelector('#equip-row-weapons');
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
+    for (const cell of view.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell));
 
     // A character-sheet rebuild mints new socket nodes, including after the
     // inventory-change path has synchronized the old set. Restore the active
@@ -383,8 +424,50 @@ export class CharWindow {
             (control) => control.dataset.act === focusedAct,
           )
         : undefined;
-      restoreFirstEnabled([sameAct, el.querySelector<HTMLElement>('[data-close]')]);
+      const sameTab = focusedTab
+        ? [...el.querySelectorAll<HTMLElement>('[data-tab]')].find(
+            (control) => control.dataset.tab === focusedTab,
+          )
+        : undefined;
+      restoreFirstEnabled([sameAct, sameTab, el.querySelector<HTMLElement>('[data-close]')]);
     }
+  }
+
+  private sidebarHtml(world: IWorld, selected: CharacterSidebarTab): string {
+    if (selected === 'progression') return this.deps.progressionHtml(world.player.level);
+    if (selected === 'skills') return this.skillsHtml(world);
+    const stats = `<div class="stat-panels">${STAT_PANELS.map((panel) => {
+      const cellClasses = panel.kind === 'tiles' ? 'ui-stat-row ui-card' : 'ui-stat-row';
+      const cells = panel.stats
+        .map((stat) =>
+          this.deps
+            .statCellHtml(stat)
+            .replace('class="stat-cell"', `class="stat-cell ${cellClasses}"`),
+        )
+        .join('');
+      const title = panel.titleKey
+        ? `<div class="sp-title">${esc(t(panel.titleKey as TranslationKey))}</div>`
+        : '';
+      const cls = panel.kind === 'tiles' ? 'stat-panel attrs-tiles' : 'stat-panel ui-card';
+      return `<div class="${cls}">${title}${cells}</div>`;
+    }).join('')}</div>`;
+    return stats + this.deps.talentSummaryHtml();
+  }
+
+  private skillsHtml(world: IWorld): string {
+    const crafting = CRAFT_RING.map((craft) => {
+      const value = Math.max(0, Math.floor(world.craftingIdentity.craftSkills[craft.id] ?? 0));
+      const skill = t('hudChrome.professions.skillValue', {
+        skill: formatNumber(value, { maximumFractionDigits: 0 }),
+        max: formatNumber(craft.maxSkill, { maximumFractionDigits: 0 }),
+      });
+      const iconUrl = professionImageUrl(`prof_${craft.id}`);
+      const icon = iconUrl
+        ? `<img class="char-craft-icon" src="${esc(iconUrl)}" alt="" draggable="false">`
+        : '';
+      return `<span class="char-skill-row${value === 0 ? ' is-empty' : ''}">${icon}<span class="char-skill-copy"><span>${esc(craftNameText(craft.id))}</span><b>${esc(skill)}</b><span class="char-skill-rail" style="--char-skill-pct:${Math.min(100, (value / craft.maxSkill) * 100)}%"><span></span></span></span></span>`;
+    }).join('');
+    return `<div class="char-skills"><section class="char-skill-group ui-card"><h3>${esc(t('hudChrome.charSidebar.gathering'))}</h3>${this.gatheringHtml(world)}</section><section class="char-skill-group ui-card"><h3>${esc(t('hudChrome.charSidebar.crafting'))}</h3><div class="char-skill-list">${crafting}</div></section><button type="button" class="ui-btn ui-btn--gold char-open-professions" data-act="open-professions">${esc(t('hudChrome.charSidebar.openProfessions'))}</button></div>`;
   }
 
   // The "Gathering" section (issue 1124): one row per gathering profession, showing
@@ -409,10 +492,11 @@ export class CharWindow {
           skill: formatNumber(r.displayValue, { maximumFractionDigits: 0 }),
           max: formatNumber(r.maxSkill, { maximumFractionDigits: 0 }),
         });
-        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${esc(skillValue)}</b></span></span>`;
+        const percent = Math.min(100, (r.displayValue / r.maxSkill) * 100);
+        return `<span class="char-gather-row char-skill-row${r.displayValue === 0 ? ' is-empty' : ''}">${icon}<span class="char-skill-copy"><span>${esc(t(key))}</span><b>${esc(skillValue)}</b><span class="char-skill-rail" style="--char-skill-pct:${percent}%"><span></span></span></span></span>`;
       })
       .join('');
-    return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
+    return `<div class="char-stats cp-stats char-skill-list">${items}</div>`;
   }
 
   // The lifetime "Time Played" line (the same running total the /playtime
@@ -432,7 +516,7 @@ export class CharWindow {
     const eyeLabel = t(
       visible ? 'hudChrome.charSheet.hidePlaytimeAria' : 'hudChrome.charSheet.showPlaytimeAria',
     );
-    return `<div class="char-progression char-playtime"><span class="cp-title char-playtime-label">${esc(t('hudChrome.charSheet.playtimeLabel'))}</span><b class="char-playtime-value${visible ? '' : ' char-playtime-value-hidden'}">${esc(value)}</b><button type="button" class="char-playtime-eye" data-act="toggle-playtime" aria-pressed="${visible ? 'false' : 'true'}" aria-label="${esc(eyeLabel)}">${svgIcon(visible ? 'eye' : 'eye-off')}</button></div>`;
+    return `<div class="char-progression char-playtime"><span class="cp-title char-playtime-label">${esc(t('hudChrome.charSheet.playtimeLabel'))}</span><b class="char-playtime-value${visible ? '' : ' char-playtime-value-hidden'}">${esc(value)}</b><button type="button" class="char-playtime-eye ui-x-btn" data-act="toggle-playtime" aria-pressed="${visible ? 'false' : 'true'}" aria-label="${esc(eyeLabel)}">${svgIcon(visible ? 'eye' : 'eye-off')}</button></div>`;
   }
 
   // The Masterwrought slots readout (phase 14): the character-sheet face of
@@ -476,7 +560,7 @@ export class CharWindow {
     const qColor = parts ? parts.color : SLOT_EMPTY_TEXT_COLOR;
     const icon = item
       ? this.deps.itemIcon(item, parts?.quality)
-      : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
+      : `<img class="item-icon ui-socket ui-socket--bag" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
     // The worn Masterwrought mark (phase 14): a small gold diamond beside the
     // slot name, the paperdoll's per-slot half of the cap readout above it.
     // role=img + a t() aria-label because the diamond is CSS-drawn (no glyph
@@ -516,7 +600,10 @@ export class CharWindow {
     if (item) {
       // Soft glow in the item's quality color (derived, no getComputedStyle).
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
-      if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
+      if (iconEl) {
+        iconEl.classList.add('ui-socket', 'ui-socket--bag');
+        iconEl.style.boxShadow = qualityGlowShadow(qColor);
+      }
       this.deps.attachTooltip(row, () => {
         // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark,
         // the phase 13 unique tag): read from IWorld.equipmentInstances, the

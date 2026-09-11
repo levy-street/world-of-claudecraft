@@ -16,6 +16,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Aura } from '../src/sim/types';
 import {
+  absorbSegmentTransform,
   newUnitFrameBuffer,
   type UnitFrameDescriptor,
   unitFrameView,
@@ -369,5 +370,36 @@ describe('unitFrameView: the title decoration pass-through (Book of Deeds)', () 
     const v = unitFrameView(playerDescriptor());
     expect(v.titlePre).toBe('');
     expect(v.titlePost).toBe('');
+  });
+});
+
+describe('absorbSegmentTransform: the shield hatch covers the shield, never the health', () => {
+  it('collapses to zero width with no shield', () => {
+    // The review finding: a healthy unit painted the hatch across the whole health
+    // bar, so the fill read as striped instead of the library health gradient.
+    const v = unitFrameView(playerDescriptor({ absorb: { hp: 600, maxHp: 600, auras: [] } }));
+    expect(v.absorbSizeFrac).toBe(0);
+    expect(
+      absorbSegmentTransform(v.absorbStartFrac, v.absorbSizeFrac, `scaleX(${v.absorbSizeFrac})`),
+    ).toBe('scaleX(0)');
+  });
+
+  it('seats a partial shield at the health edge and sizes it to the shield alone', () => {
+    const v = unitFrameView(
+      playerDescriptor({ absorb: { hp: 300, maxHp: 600, auras: [shield(60)] } }),
+    );
+    expect(
+      absorbSegmentTransform(v.absorbStartFrac, v.absorbSizeFrac, `scaleX(${v.absorbSizeFrac})`),
+    ).toBe('translateX(50%) scaleX(0.1)');
+  });
+
+  it('pins an overshield against the bar right edge', () => {
+    const v = unitFrameView(
+      playerDescriptor({ absorb: { hp: 590, maxHp: 600, auras: [shield(50)] } }),
+    );
+    expect(v.absorbOvershield).toBe(true);
+    expect(
+      absorbSegmentTransform(v.absorbStartFrac, v.absorbSizeFrac, `scaleX(${v.absorbSizeFrac})`),
+    ).toBe('translateX(91.66666666666666%) scaleX(0.08333333333333333)');
   });
 });
