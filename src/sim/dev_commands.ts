@@ -178,9 +178,8 @@ export function handleDevChat(
   // set is CLOSED (every zone's hub record, nothing else), unknown names
   // refuse without moving anyone, and no argument prints the list. Rides the
   // same ctx.devCommands gate as every other branch here.
-  const townMatch =
-    /^\/(?:dev\s+town|devtown)(?:\s+(.+?))?\s*$/i.exec(raw) ??
-    /^\/(?:dev\s+tp|devtp)\s+(\S.*?)\s*$/i.exec(raw);
+  const townVerb = /^\/(?:dev\s+town|devtown)(?:\s+(.+?))?\s*$/i.exec(raw);
+  const townMatch = townVerb ?? /^\/(?:dev\s+tp|devtp)\s+(\S.*?)\s*$/i.exec(raw);
   if (townMatch) {
     const zones = getActiveWorldContent().zones;
     const query = townMatch[1] ?? '';
@@ -188,9 +187,11 @@ export function handleDevChat(
       ctx.error(pid, `[dev] Towns: ${devTownList(zones)}. Usage: /dev town <name>.`);
       return null;
     }
-    // A numeric-looking argument is a half-typed coordinate pair, not a town
-    // name: answer with the tp usage rather than an unknown-town refusal.
-    if (/^[-+\d.\s]+$/.test(query)) {
+    // On the tp alias only, a numeric-looking argument is a half-typed
+    // coordinate pair, not a town name: answer with the tp usage rather than
+    // an unknown-town refusal. The town verb never guards, so a hub whose
+    // name slugs to digits stays reachable by name through /dev town.
+    if (!townVerb && /^[-+\d.\s]+$/.test(query)) {
       ctx.error(pid, '[dev] Usage: /dev tp <x> <z>, or /dev tp <town> (/dev town <name>).');
       return null;
     }

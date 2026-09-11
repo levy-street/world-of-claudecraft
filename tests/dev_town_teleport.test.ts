@@ -51,6 +51,10 @@ describe('dev town resolver (pure)', () => {
     const targets = devTownTargets(ZONES);
     expect(targets.map((target) => target.zoneId)).toEqual(ZONES.map((zone) => zone.id));
     expect(new Set(targets.map((target) => target.id)).size).toBe(ZONES.length);
+    // Hub slugs and zone-id slugs are disjoint namespaces today, so no name
+    // can resolve to two different zones through the two alias arms.
+    const zoneIdSlugs = new Set(ZONES.map((zone) => devTownSlug(zone.id)));
+    for (const target of targets) expect(zoneIdSlugs.has(target.id)).toBe(false);
     for (const target of targets) {
       const hub = hubOf(target.zoneId);
       expect(target.name).toBe(hub.name);
@@ -76,6 +80,31 @@ describe('dev town resolver (pure)', () => {
     expect(resolveDevTown(ZONES, '')).toBeNull();
     expect(resolveDevTown(ZONES, '   ')).toBeNull();
     expect(resolveDevTown(ZONES, '12 34')).toBeNull();
+  });
+
+  it('prefers the hub a name spells over a zone id that happens to match it', () => {
+    // A custom map can name one zone's hub after another zone's id; the town
+    // the tester typed wins regardless of which zone sits first in the array.
+    const first: ZoneDef = {
+      ...ZONES[0],
+      id: 'harbor',
+      hub: { ...ZONES[0].hub, name: 'Old Quay' },
+    };
+    const second: ZoneDef = {
+      ...ZONES[1],
+      id: 'uplands',
+      hub: { ...ZONES[1].hub, name: 'Harbor' },
+    };
+    expect(resolveDevTown([first, second], 'harbor')?.zoneId).toBe('uplands');
+    expect(resolveDevTown([first, second], 'old quay')?.zoneId).toBe('harbor');
+    // A numeric hub name is still reachable by name (the tp-alias digit guard
+    // lives in the command, not here).
+    const numeric: ZoneDef = {
+      ...ZONES[0],
+      id: 'mile_marker',
+      hub: { ...ZONES[0].hub, name: '12' },
+    };
+    expect(resolveDevTown([numeric], '12')?.zoneId).toBe('mile_marker');
   });
 
   it('falls back to the zone id for a custom-map hub with a blank name', () => {
@@ -130,6 +159,14 @@ describe('/dev town', () => {
     const out = texts(sim);
     expect(out.some((text) => text.includes('[dev] Usage: /dev tp <x> <z>'))).toBe(true);
     expect(out.some((text) => text.includes('Unknown town'))).toBe(false);
+
+    // The digit guard is the tp alias's alone: the town verb looks the name
+    // up as typed, so a numeric-named hub on a custom map is never shadowed.
+    sim.chat('/dev town 12.5');
+    expect(playerPos(sim)).toEqual(before);
+    const townOut = texts(sim);
+    expect(townOut.some((text) => text.includes("[dev] Unknown town '12.5'"))).toBe(true);
+    expect(townOut.some((text) => text.includes('Usage: /dev tp'))).toBe(false);
   });
 
   it('accepts the no-space spellings while armed', () => {

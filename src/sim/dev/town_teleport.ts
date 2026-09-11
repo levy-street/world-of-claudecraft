@@ -45,14 +45,18 @@ export function devTownTargets(zones: readonly ZoneDef[]): DevTownTarget[] {
 
 /** Case- and punctuation-insensitive lookup by town slug, display name, or
  *  zone id. Exact matches only: a prefix would let "ever" pick a town the
- *  tester did not name. */
+ *  tester did not name. Hub names win over zone ids: should a custom map
+ *  name a hub after another zone's id, the town the tester typed is the
+ *  one they get, never the zone that happens to sit earlier in the array. */
 export function resolveDevTown(zones: readonly ZoneDef[], query: string): DevTownTarget | null {
   const wanted = devTownSlug(query);
   if (!wanted) return null;
-  for (const target of devTownTargets(zones)) {
-    if (target.id === wanted || devTownSlug(target.zoneId) === wanted) return target;
-  }
-  return null;
+  const targets = devTownTargets(zones);
+  return (
+    targets.find((target) => target.id === wanted) ??
+    targets.find((target) => devTownSlug(target.zoneId) === wanted) ??
+    null
+  );
 }
 
 /** The readout `/dev town` (no argument) and an unknown name print. */
