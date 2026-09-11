@@ -36,6 +36,13 @@ const privateBotDetector = fileURLToPath(
 const botDetectorImpl = existsSync(privateBotDetector)
   ? privateBotDetector
   : fileURLToPath(new URL('server/bot_detector/stub.ts', import.meta.url));
+// `#studio` -> ClaudeCraft Studio (the private authoring tool) when its clone is mounted
+// at src/studio/, else the public stub so the public map editor boots. Mirrors
+// tsconfig.json `paths`; the server bundle never imports it. See src/editor/studio_contract.ts.
+const privateStudio = fileURLToPath(new URL('src/studio/index.ts', import.meta.url));
+const studioImpl = existsSync(privateStudio)
+  ? privateStudio
+  : fileURLToPath(new URL('src/editor/studio_stub.ts', import.meta.url));
 const pkg = JSON.parse(readFileSync(new URL('package.json', import.meta.url), 'utf8')) as {
   version?: string;
 };
@@ -408,7 +415,7 @@ export default defineConfig({
     musicEditorSavePlugin(),
     ...(process.env.WOC_DIAGNOSTICS_CAPTURE === '1' ? [diagnosticsCapturePlugin()] : []),
   ],
-  resolve: { alias: { '#bot-detector': botDetectorImpl } },
+  resolve: { alias: { '#bot-detector': botDetectorImpl, '#studio': studioImpl } },
   define: {
     __APP_VERSION__: JSON.stringify(appVersion),
     __APP_BUILD_ID__: JSON.stringify(appBuildId.slice(0, 12)),

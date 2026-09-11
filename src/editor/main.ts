@@ -5,6 +5,7 @@
 
 import { CAMPS, GROUND_OBJECTS, NPCS, ROADS, ZONES } from '../sim/data';
 import './styles.css';
+import { studioBoot } from '#studio';
 import { ensureLocaleLoaded, getLanguage, languageTag, t } from '../ui/i18n';
 import { EditorApp } from './app';
 
@@ -30,13 +31,20 @@ async function boot(): Promise<void> {
   document.documentElement.lang = tag;
   document.documentElement.dir = isRtl(tag) ? 'rtl' : 'ltr';
   document.title = t('editor.docTitle');
-  const app = new EditorApp(mount, {
+  const world = {
     zones: clone(ZONES),
     camps: clone(CAMPS),
     npcs: clone(NPCS),
     objects: clone(GROUND_OBJECTS),
     roads: clone(ROADS),
-  });
+  };
+  // ClaudeCraft Studio takes the entry over when its private clone is mounted
+  // (src/editor/studio_contract.ts); the public editor is the fallback.
+  if (studioBoot) {
+    await studioBoot({ mount, world });
+    return;
+  }
+  const app = new EditorApp(mount, world);
   // Dev-only handle for debugging and E2E inspection.
   (window as unknown as { __editor?: EditorApp }).__editor = app;
 }

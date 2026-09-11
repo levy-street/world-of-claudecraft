@@ -35,6 +35,8 @@ src/ui/i18n.resolved.sha256
 # private extensions (e.g. bot-detector)
 private/*
 !private/.dockerkeep
+# ClaudeCraft Studio, the private authoring tool, mounts here (see src/editor/studio_contract.ts)
+src/studio/
 
 # test artifacts & screenshots
 tmp/

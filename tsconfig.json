@@ -12,7 +12,8 @@
     "isolatedModules": true,
     "types": ["vite/client", "node"],
     "paths": {
-      "#bot-detector": ["./private/bot_detector/src/index.ts", "./server/bot_detector/stub.ts"]
+      "#bot-detector": ["./private/bot_detector/src/index.ts", "./server/bot_detector/stub.ts"],
+      "#studio": ["./src/studio/index.ts", "./src/editor/studio_stub.ts"]
     }
   },
   "include": ["src", "headless", "tests", "server", "private", "bot"]
