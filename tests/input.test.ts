@@ -381,6 +381,22 @@ describe('Input pet bar chords', () => {
     expect(cb.onTargetParty).toHaveBeenCalledTimes(3);
   });
 
+  it("keeps cancelling a held F-key's auto-repeats without re-firing the action", () => {
+    const { windowListeners, cb } = makeInput();
+    // Keyboard repetition emits further keydown events with repeat=true; each
+    // one would reach the browser's F5 reload unless cancelled, but the target
+    // pick itself fires once per press.
+    const repeat = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F5', repeat: true, preventDefault: repeat });
+    windowListeners.get('keydown')!({ code: 'F5', repeat: true, preventDefault: repeat });
+    expect(repeat).toHaveBeenCalledTimes(2);
+    expect(cb.onTargetParty).not.toHaveBeenCalled();
+    // A repeated unbound F-key is still the browser's.
+    const unbound = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F12', repeat: true, preventDefault: unbound });
+    expect(unbound).not.toHaveBeenCalled();
+  });
+
   it('follows a rebind of a party target hotkey off the F-row', () => {
     const { keybinds, windowListeners, cb } = makeInput();
     expect(keybinds.bind('targetParty9', 0, 'Shift+KeyG')).toBe(true);

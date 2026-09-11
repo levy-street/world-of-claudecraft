@@ -976,6 +976,11 @@ export class Input {
   }
 
   private onKeyDown(e: KeyboardEvent): void {
+    // A bound F-key belongs to the game on EVERY keydown, auto-repeats included:
+    // the repeat early return below would otherwise hand a held key's repeats
+    // back to the browser (F5 reload, F1 help, F3 find, F10 menu focus). Unbound
+    // F-keys stay the browser's; the action itself still fires once per press.
+    if (this.isBoundFKey(e)) e.preventDefault?.();
     if (e.repeat) return;
     if (this.captureCb) {
       e.preventDefault();
@@ -1064,9 +1069,6 @@ export class Input {
       // Edge reserve Ctrl+1..8 outright), but this reclaims the ones that are
       // (Firefox) and is a no-op where there is nothing to cancel.
       if (e.ctrlKey || e.altKey || e.metaKey) e.preventDefault?.();
-      // The F-row is browser accelerators too (F1 help, F3 find, F5 reload, F11
-      // fullscreen); a bound F-key press belongs to the game, so cancel those.
-      if (/^F\d{1,2}$/.test(e.code)) e.preventDefault?.();
       // 'chat' and 'lootExplorer' both autofocus a text input as a side effect
       // of this very keydown (the composer textarea; the loot explorer's
       // search box). Left un-prevented, the browser still delivers the
@@ -1089,6 +1091,20 @@ export class Input {
         this.dispatchEdge(edge);
       }
     }
+  }
+
+  /** True for an F-row key that some action holds, as a held key (bare code) or
+   *  as an edge chord; onKeyDown cancels the browser default for those. */
+  private isBoundFKey(e: KeyboardEvent): boolean {
+    if (!/^F\d{1,2}$/.test(e.code)) return false;
+    if (this.keybinds.heldActionForCode(e.code) !== null) return true;
+    const combo = makeCombo(e.code, {
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      meta: e.metaKey,
+    });
+    return this.keybinds.edgeActionForCombo(combo) !== null;
   }
 
   private onKeyUp(e: KeyboardEvent): void {
