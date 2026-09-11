@@ -4831,6 +4831,21 @@
   body.mobile-touch .crafting-qty-value {
     font-size: 16px;
   }
+  /* The reagent/fee/skill sub-lines inherit the vendor row's 10px .vi-sub
+     base (components.css) with no touch override anywhere else in this
+     window: the reagent line is the part of the card a player actually
+     reads to tell what a recipe needs, and it was legible only by zooming
+     in on a phone. Bump to the same 13px this window already uses for
+     readable body text (.crafting-recipe-name,
+     .crafting-cast-progress-label/timer); overflow-wrap guards a long
+     reagent name the same way .crafting-recipe-name already does for the
+     result name beside it. */
+  body.mobile-touch .crafting-reagent-line,
+  body.mobile-touch .crafting-fee-line,
+  body.mobile-touch .crafting-skill-line {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
   /* Phase 22 retired the mobile-only track override, the full-width Cap wrap,
      and the Cap-header hide with the grid table itself: the rows are the
      professions row family now (name + value line, labeled pill chips), so

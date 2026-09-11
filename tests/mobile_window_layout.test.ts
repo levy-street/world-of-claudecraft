@@ -216,6 +216,15 @@ describe('mobile window layout CSS', () => {
     expect(mobileCss).not.toContain('body.mobile-touch .mkt-filters {');
   });
 
+  it('bumps the crafting reagent/fee/skill sub-lines off the 10px .vi-sub floor on touch', () => {
+    // The reagent list is the part of the recipe card a player actually reads
+    // to tell what a recipe needs; unlike the rest of this window it had no
+    // touch override at all and stayed at the vendor row's 10px base.
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.crafting-reagent-line,\s*body\.mobile-touch \.crafting-fee-line,\s*body\.mobile-touch \.crafting-skill-line \{\s*font-size: 13px;\s*overflow-wrap: anywhere;/,
+    );
+  });
+
   it('floors the money-surface consent controls and the bid field on touch (the Exchange and the trade arm)', () => {
     // A checkbox cannot be 40px without looking broken, so the LABEL is the
     // tap target and carries the floor; the terms link beside it is the
