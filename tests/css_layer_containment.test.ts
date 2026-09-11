@@ -92,6 +92,7 @@ const LAYERED_MODULES: { file: string; layer: string }[] = [
   { file: 'src/styles/tokens.css', layer: 'tokens' },
   { file: 'src/styles/base.css', layer: 'base' },
   { file: 'src/styles/layout.css', layer: 'layout' },
+  { file: 'src/styles/library.css', layer: 'library' },
   { file: 'src/styles/hud.css', layer: 'components' },
   { file: 'src/styles/hud.mobile.css', layer: 'hud-mobile' },
 ];

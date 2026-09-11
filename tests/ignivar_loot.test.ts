@@ -33,10 +33,12 @@ import {
 } from '../src/sim/ignivar_raid_ids';
 import {
   expectedStatBudget,
+  expectedStatTotal,
   itemFromRaid,
   itemLevel,
   itemSourceLevel,
   primaryStatSum,
+  statIdentity,
 } from '../src/sim/item_level';
 import { rollLoot } from '../src/sim/loot/loot_roll';
 import { Rng } from '../src/sim/rng';
@@ -128,10 +130,17 @@ describe('ignivar loot: every gear piece is item level 35 and budget-exact', () 
     };
     for (const item of gearItems()) {
       const isTwoHand = item.kind === 'weapon' && item.hand === 'twohand';
+      // SLOT_BUDGET stays the LINE budget the plan was reviewed against
+      // (unaffected by identity). stamina baseline model: the item's TOTAL
+      // adds the free caster baseline on top of that line, so the line is
+      // priced here and the total is checked against expectedStatBudget,
+      // an independent formula derived from the item's own level and slot.
+      const line =
+        // Two-handers carry the TWOHAND_STAT_MULT premium over the mainhand line.
+        isTwoHand ? 33 : SLOT_BUDGET[item.slot as string];
       const want = expectedStatBudget(item);
       expect(want, `${item.id} has a derivable budget`).toBe(
-        // Two-handers carry the TWOHAND_STAT_MULT premium over the mainhand line.
-        isTwoHand ? 33 : SLOT_BUDGET[item.slot as string],
+        expectedStatTotal(line, statIdentity(item.stats)),
       );
       expect(primaryStatSum(item), `${item.id} stat sum == budget`).toBe(want);
     }

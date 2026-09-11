@@ -327,10 +327,12 @@ describe('inscription catalog outputs', () => {
   });
 
   it('every tome carries EXACTLY its formula budget, derived at the authoring level', () => {
-    // The live budget anchored to its own literal (0/25 match the authored
-    // budgets; the re-leveled rung 50 derives 8 at ilvl 18), hoisted out of
-    // the loop.
-    const LIVE_BUDGET_BY_RUNG: Record<number, number> = { 0: 3, 25: 5, 50: 8 };
+    // The live budget anchored to its own literal: since the stamina baseline
+    // model (src/sim/item_budget.ts), expectedStatBudget is the LINE plus the
+    // free baseline for a caster item, so 0/25 are the authored line plus its
+    // baseline and the re-leveled rung 50 derives 11 (8 line + 3 baseline) at
+    // ilvl 18, hoisted out of the loop.
+    const LIVE_BUDGET_BY_RUNG: Record<number, number> = { 0: 4, 25: 7, 50: 11 };
     let checked = 0;
     for (const recipe of INSCRIPTION_RECIPES) {
       const def = output(recipe);
@@ -344,7 +346,15 @@ describe('inscription catalog outputs', () => {
       const authoredLevel = AUTHORED_LEVEL_BY_RUNG[recipe.skillReq] + bonus;
       const formulaBudget = primaryStatBudget(authoredLevel, def.quality, def.slot);
       expect(formulaBudget, `${def.id} formula budget`).toBe(TOME_BUDGET_BY_RUNG[recipe.skillReq]);
-      expect(primaryStatSum(def), `${def.id} authored stats`).toBe(formulaBudget);
+      // Every tome is a caster item (int/spi, CASTER_ALL lock), so the stamina
+      // baseline model adds its free baseline on top of the line. Rung 50's
+      // authored line (formulaBudget, above) predates the phase 11o re-level
+      // and no longer matches the item's actual live line, so the authored
+      // stats are checked against the LIVE model total (expectedStatBudget,
+      // derived from the item's live source level) rather than formulaBudget
+      // directly; for rungs 0 and 25 the live and authored levels still
+      // coincide, so this is the same number either way.
+      expect(primaryStatSum(def), `${def.id} authored stats`).toBe(expectedStatBudget(def));
       const liveLevel = recipe.level + bonus;
       expect(itemLevel(def), `${def.id} item level`).toBe(liveLevel);
       expect(expectedStatBudget(def), `${def.id} live source index`).toBe(

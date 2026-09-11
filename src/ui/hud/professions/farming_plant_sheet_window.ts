@@ -82,6 +82,10 @@ export interface PlantSheetWindowDeps {
   onVisibilityChange?(): void;
 }
 
+/** The harvest arm's status line id: the body writes it, the pinned control
+ *  in the foot points aria-describedby at it. */
+const HARVEST_STATUS_ID = 'plant-sheet-harvest-status';
+
 export class PlantSheetWindow {
   private openerFocus: HTMLElement | null = null;
   private bedId: string | null = null;
@@ -276,7 +280,11 @@ export class PlantSheetWindow {
     for (const knob of view.knobs) {
       if (!knob.affordable) this.choices[knob.id] = false;
     }
-    this.paintFrame(t('hudChrome.farming.plantSheet.title'), this.bodyHtml(view));
+    this.paintFrame(
+      t('hudChrome.farming.plantSheet.title'),
+      this.bodyHtml(view),
+      this.plantFootHtml(view),
+    );
   }
 
   /** Harvest mode: the frozen planting's produce, its authoritative status, and
@@ -292,20 +300,27 @@ export class PlantSheetWindow {
       return;
     }
     this.paintedStatus = view.status;
-    this.paintFrame(t('hudChrome.corpseHarvest.title'), this.harvestBodyHtml(view));
+    this.paintFrame(
+      t('hudChrome.corpseHarvest.title'),
+      this.harvestBodyHtml(view),
+      this.harvestFootHtml(view),
+    );
   }
 
-  /** The window frame (title bar plus body), shared by both modes, with the
-   *  focus carry across the rebuild. */
-  private paintFrame(title: string, body: string): void {
+  /** The window frame (title bar, scrolling body, pinned action row), shared
+   *  by both modes, with the focus carry across the rebuild. The action row is
+   *  a sibling of the scroller, never its last child, so a long seed list can
+   *  never push Plant (or Harvest) out of reach. */
+  private paintFrame(title: string, body: string, foot: string): void {
     const root = this.deps.root();
     // A whole repaint destroys the subtree, so the focused control is carried
     // across the innerHTML write (the focus_restore contract).
     const focusKey = captureFocusKey(root);
     root.innerHTML =
-      `<div class="panel-title"><span id="plant-sheet-title">${esc(title)}</span>` +
-      `<button type="button" class="x-btn" data-close data-pad-initial-focus data-focus-key="plantSheetClose" aria-label="${esc(t('hudChrome.farming.plantSheet.close'))}" title="${esc(t('hudChrome.farming.plantSheet.close'))}">${svgIcon('close')}</button></div>` +
-      `<div class="ps-body">${body}</div>`;
+      `<div class="panel-title ui-win-head"><span class="ui-win-title" id="plant-sheet-title">${esc(title)}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close data-pad-initial-focus data-focus-key="plantSheetClose" aria-label="${esc(t('hudChrome.farming.plantSheet.close'))}" title="${esc(t('hudChrome.farming.plantSheet.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="ps-body">${body}</div>` +
+      (foot === '' ? '' : `<div class="ps-foot ui-win-foot">${foot}</div>`);
     this.wire(root);
     if (focusKey !== null) {
       // findFocusKey, never a selector the key is spliced into. This sheet's
@@ -420,17 +435,21 @@ export class PlantSheetWindow {
   }
 
   /** The harvest body: the produce name with the authority's status beside it
-   *  (the locked-row shape, so no new CSS), then the Harvest control, described
-   *  by the status so AT hears why a disabled control is disabled. */
+   *  (the locked-row shape, so no new CSS). The Harvest control itself is the
+   *  pinned foot below, described by this status line so AT still hears why a
+   *  disabled control is disabled. */
   private harvestBodyHtml(view: HarvestSheetView): string {
-    const statusId = 'plant-sheet-harvest-status';
     return (
       `<ul class="ps-list" role="list"><li class="ps-locked">` +
       `<span class="ps-name">${esc(itemName(view.produceItemId))}</span>` +
-      `<span class="ps-reason" id="${statusId}">${esc(t(view.statusKey))}</span>` +
-      `</li></ul>` +
-      `<button type="button" class="ps-plant" data-harvest data-focus-key="plantSheetHarvest" aria-describedby="${statusId}"${view.canHarvest ? '' : ' disabled'}>${esc(t('hudChrome.corpseHarvest.harvestButton'))}</button>`
+      `<span class="ps-reason" id="${HARVEST_STATUS_ID}">${esc(t(view.statusKey))}</span>` +
+      `</li></ul>`
     );
+  }
+
+  /** The harvest arm's pinned control (the paintFrame foot). */
+  private harvestFootHtml(view: HarvestSheetView): string {
+    return `<button type="button" class="ps-plant ui-btn ui-btn--gold" data-harvest data-focus-key="plantSheetHarvest" aria-describedby="${HARVEST_STATUS_ID}"${view.canHarvest ? '' : ' disabled'}>${esc(t('hudChrome.corpseHarvest.harvestButton'))}</button>`;
   }
 
   private bodyHtml(view: PlantSheetViewModel): string {
@@ -465,18 +484,25 @@ export class PlantSheetWindow {
       view.knobs.length > 0
         ? `<div class="ps-knobs">${view.knobs.map((knob) => this.knobHtml(knob)).join('')}</div>`
         : '';
-    const plant =
+    const noSeeds =
       view.seedRows.length > 0
-        ? `<button type="button" class="ps-plant" data-plant data-focus-key="plantSheetPlant">${esc(t('hudChrome.farming.plantSheet.plant'))}</button>`
+        ? ''
         : `<div class="prof-empty"><p>${esc(t('hudChrome.farming.plantSheet.empty'))}</p></div>`;
-    return `${seeds}${locked}${knobs}${plant}`;
+    return `${seeds}${locked}${knobs}${noSeeds}`;
+  }
+
+  /** The plant arm's pinned control (the paintFrame foot): present only when
+   *  there is something to sow, so the empty state keeps the body to itself. */
+  private plantFootHtml(view: PlantSheetViewModel): string {
+    if (view.seedRows.length === 0) return '';
+    return `<button type="button" class="ps-plant ui-btn ui-btn--gold" data-plant data-focus-key="plantSheetPlant">${esc(t('hudChrome.farming.plantSheet.plant'))}</button>`;
   }
 
   private seedRowHtml(row: PlantSheetSeedRow, tabStop: boolean): string {
     const name = itemName(row.seedItemId);
     const countId = `plant-sheet-seed-count-${row.cropId}`;
     return (
-      `<li role="none"><button type="button" role="radio" class="ps-seed" data-seed-crop="${esc(row.cropId)}" data-focus-key="seed:${esc(row.cropId)}" aria-checked="${row.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}" aria-describedby="${esc(countId)}" aria-label="${esc(t('hudChrome.farming.plantSheet.sowAria', { name }))}">` +
+      `<li role="none"><button type="button" role="radio" class="ps-seed ui-card" data-seed-crop="${esc(row.cropId)}" data-focus-key="seed:${esc(row.cropId)}" aria-checked="${row.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}" aria-describedby="${esc(countId)}" aria-label="${esc(t('hudChrome.farming.plantSheet.sowAria', { name }))}">` +
       `<span class="ps-name">${esc(name)}</span>` +
       `<span class="ps-count" id="${esc(countId)}">${esc(wholeNumber(row.seedCount))}</span>` +
       `</button></li>`
@@ -509,7 +535,7 @@ export class PlantSheetWindow {
           .join('')
       : `<span class="ps-knob-short">${esc(knob.shortKey === null ? '' : t(knob.shortKey))}</span>`;
     return (
-      `<button type="button" class="ps-knob" data-knob="${esc(knob.id)}" data-focus-key="knob:${esc(knob.id)}" aria-pressed="${this.choices[knob.id] ? 'true' : 'false'}"${knob.affordable ? '' : ' disabled'}>` +
+      `<button type="button" class="ps-knob ui-card" data-knob="${esc(knob.id)}" data-focus-key="knob:${esc(knob.id)}" aria-pressed="${this.choices[knob.id] ? 'true' : 'false'}"${knob.affordable ? '' : ' disabled'}>` +
       `<span class="ps-knob-name">${esc(knobName(knob.id))}</span>${detail}` +
       `</button>`
     );

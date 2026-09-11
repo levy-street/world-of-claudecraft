@@ -337,6 +337,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/ignivar-raid-expansion/',
       '            /docs/screenshots/intentional-gathering-pr1/',
       '            /docs/screenshots/intentional-gathering-pr2/',
+      '            /docs/screenshots/interface-redesign/',
       '            /docs/screenshots/item-art-consistency-2026-08-09/',
       '            /docs/screenshots/market-house-redesign/',
       '            /docs/screenshots/masterwrought-art-completion-2026-09-02/',

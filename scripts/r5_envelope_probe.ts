@@ -721,7 +721,10 @@ export const CASTER_APEX_CHEST_ITEMS: Record<string, string> = Object.freeze({
   chest: 'sunspun_vestments',
 });
 export const CASTER_APEX_CHEST_DELTA: SlotStats = Object.freeze({
-  chest: Object.freeze({ int: 1, spi: 1, sta: CHEST_STA_STEP_PERFECTED }),
+  // The Perfecting delta under the stamina baseline model carries one Stamina
+  // of baseline growth beside int 1 / spi 1 (professions/perfecting_bonus.ts);
+  // the enchant step rides the same slot entry.
+  chest: Object.freeze({ int: 1, spi: 1, sta: CHEST_STA_STEP_PERFECTED + 1 }),
   gloves: Object.freeze({ int: 1 }),
   mainhand: Object.freeze({ int: WEAPON_INT_STEP }),
 });

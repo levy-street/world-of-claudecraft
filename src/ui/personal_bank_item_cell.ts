@@ -57,7 +57,7 @@ export function buildPersonalBankItemCell(
   const cell = document.createElement('button');
   cell.type = 'button';
   const fineMark = bagFineMark(slot.itemId);
-  cell.className = `bank-item q-${slot.qualityKey}${bagRimClasses(null, fineMark)}`;
+  cell.className = `bank-item ui-socket ui-socket--bag q-${slot.qualityKey}${bagRimClasses(null, fineMark)}`;
   cell.style.setProperty(
     '--bank-slot-quality',
     QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR,

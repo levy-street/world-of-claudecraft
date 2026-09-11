@@ -24,20 +24,20 @@ class LootElement extends FakeElement {
       button.dataset.choice = choice[1];
       this.appendChild(button);
     }
-    if (value.includes('class="ml-all"')) {
+    if (value.includes('class="ml-all ui-check"')) {
       const selectAll = this.ownerDocument.createElement('input');
       selectAll.className = 'ml-all';
       (selectAll as unknown as HTMLInputElement).checked = false;
       this.appendChild(selectAll);
     }
-    for (const pick of value.matchAll(/class="ml-pick" value="(\d+)"/g)) {
+    for (const pick of value.matchAll(/class="ml-pick ui-check" value="(\d+)"/g)) {
       const input = this.ownerDocument.createElement('input');
       input.className = 'ml-pick';
       input.value = pick[1];
       (input as unknown as HTMLInputElement).checked = false;
       this.appendChild(input);
     }
-    if (value.includes('class="loot-roll-btn assign ml-roll"')) {
+    if (value.includes('class="loot-roll-btn assign ml-roll ui-btn ui-btn--red"')) {
       const button = this.ownerDocument.createElement('button');
       button.className = 'ml-roll';
       (button as unknown as HTMLButtonElement).disabled = true;
@@ -171,6 +171,17 @@ describe('LootRollController', () => {
 
     expect(test.root.style.display).toBe('flex');
     expect(test.root.querySelectorAll('.loot-roll')).toHaveLength(1);
+    const row = test.root.querySelector<HTMLElement>('.loot-roll');
+    expect(row?.className).toContain('ui-panel-strong');
+    expect(row?.innerHTML).toContain('loot-roll-timer ui-bar');
+    expect(row?.innerHTML).toMatch(/loot-roll-name[^"]*q-uncommon/);
+    // The classic Need / Greed / Pass colour code on a timed, irreversible
+    // choice: Need green (host-scoped, the library has no green variant),
+    // Greed gold, Pass red. Red must never be the Need button.
+    expect(row?.innerHTML).toContain('loot-roll-btn loot-roll-btn--need need ui-btn"');
+    expect(row?.innerHTML).toContain('loot-roll-btn greed ui-btn ui-btn--gold"');
+    expect(row?.innerHTML).toContain('loot-roll-btn pass ui-btn ui-btn--red"');
+    expect(row?.innerHTML).not.toContain('need ui-btn ui-btn--red');
 
     test.setOpen([]);
     test.controller.update(test.now());
@@ -201,6 +212,19 @@ describe('LootRollController', () => {
     expect(test.root.style.display).toBe('flex');
   });
 
+  it('falls back to the common name class for an unknown wire quality', () => {
+    const test = harness();
+    test.controller.showRoll({
+      ...rollEvent(),
+      itemId: 'stale-client-item',
+      quality: 'constructor',
+    } as unknown as Extract<SimEvent, { type: 'lootRoll' }>);
+
+    const row = test.root.querySelector<HTMLElement>('.loot-roll');
+    expect(row?.innerHTML).toMatch(/loot-roll-name[^"]*q-common/);
+    expect(row?.innerHTML).not.toMatch(/loot-roll-name[^"]*q-constructor/);
+  });
+
   it('replaces a master-loot prompt when the server converts the same roll to need-greed', () => {
     const test = harness();
     test.controller.showMasterRoll({
@@ -212,6 +236,10 @@ describe('LootRollController', () => {
       ],
     });
     expect(test.root.querySelector('.master')).not.toBeNull();
+    const master = test.root.querySelector<HTMLElement>('.master');
+    expect(master?.innerHTML).toContain('class="ml-pick ui-check"');
+    expect(master?.innerHTML).toContain('class="ml-all ui-check"');
+    expect(master?.innerHTML).toContain('loot-roll-btn assign ml-roll ui-btn ui-btn--red');
 
     test.controller.showRoll(rollEvent());
 

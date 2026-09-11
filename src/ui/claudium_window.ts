@@ -256,13 +256,13 @@ export class ClaudiumWindow {
 
   private titleHtml(): string {
     return (
-      `<div class="panel-title"><span id="claudium-title">${esc(t('hudChrome.claudium.title'))}</span>` +
+      `<div class="panel-title ui-win-head"><span id="claudium-title" class="ui-win-title">${esc(t('hudChrome.claudium.title'))}</span>` +
       `<span class="cl-refresh-status" data-refresh-status aria-hidden="true">` +
       `<span class="cl-spinner" aria-hidden="true"></span>` +
       `<span class="cl-refresh-error" aria-hidden="true">!</span>` +
       `</span>` +
       `<span class="visually-hidden" data-cl-live-status role="status" aria-live="polite" aria-atomic="true"></span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.claudium.close'))}">${svgIcon('close')}</button></div>`
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.claudium.close'))}">${svgIcon('close')}</button></div>`
     );
   }
 
@@ -356,11 +356,11 @@ export class ClaudiumWindow {
         })
       : t('hudChrome.claudium.balanceUnit', { amount: '--' });
     return (
-      `<div class="cl-balance">` +
+      `<div class="cl-balance ui-card-tile">` +
       `<img class="cl-balance-art" src="/claudium/claudium_coin_hero_3q.webp" alt="">` +
       `<div class="cl-balance-main">` +
       `<span class="cl-balance-label">${esc(t('hudChrome.claudium.balanceLabel'))}</span>` +
-      `<strong class="cl-balance-value">${esc(shown)}</strong>` +
+      `<strong class="cl-balance-value ui-num">${esc(shown)}</strong>` +
       `</div>` +
       this.walletBalancesHtml(view) +
       `</div>`
@@ -387,10 +387,10 @@ export class ClaudiumWindow {
     // The copy table is shared with the $WOC Exchange's card (wallet_card_keys).
     const { bodyKey, actionKey } = walletCardKeys(state.kind);
     return (
-      `<div class="cl-wallet-connect">` +
+      `<div class="cl-wallet-connect ui-card">` +
       `<strong>${esc(t('hudChrome.wocStore.wallet.title'))}</strong>` +
       `<p>${esc(t(bodyKey))}</p>` +
-      `<button type="button" data-claudium-wallet>${esc(t(actionKey))}</button>` +
+      `<button type="button" class="ui-btn" data-claudium-wallet>${esc(t(actionKey))}</button>` +
       `</div>`
     );
   }
@@ -412,7 +412,7 @@ export class ClaudiumWindow {
       Number.isInteger(view.wocDiscountBps) &&
       (view.wocDiscountBps ?? -1) >= 0 &&
       (view.wocDiscountBps ?? 10_000) <= 9000
-        ? `<span class="cl-rail-discount">${esc(
+        ? `<span class="cl-rail-discount ui-chip is-on">${esc(
             t('hudChrome.claudium.railWocDiscount', {
               percent: formatNumber((view.wocDiscountBps ?? 0) / 100, {
                 maximumFractionDigits: 2,
@@ -421,21 +421,21 @@ export class ClaudiumWindow {
           )}</span>`
         : '';
     const railPicker =
-      `<div class="cl-rails" role="group" aria-label="${esc(t('hudChrome.claudium.railLabel'))}">` +
-      `<button type="button" class="cl-rail" data-rail="stripe"${stripeSel} ${view.rails.stripe && !pending ? '' : 'disabled'}>` +
+      `<div class="cl-rails ui-seg" role="group" aria-label="${esc(t('hudChrome.claudium.railLabel'))}">` +
+      `<button type="button" class="cl-rail ui-seg-tab${this.selectedRail === 'stripe' ? ' is-on' : ''}" data-rail="stripe"${stripeSel} ${view.rails.stripe && !pending ? '' : 'disabled'}>` +
       this.railIconHtml('card') +
       `<span>${esc(t('hudChrome.claudium.railStripe'))}</span>` +
       `</button>` +
-      `<button type="button" class="cl-rail cl-rail-woc" data-rail="woc"${wocSel} ${view.rails.woc && !pending ? '' : 'disabled'}>` +
+      `<button type="button" class="cl-rail cl-rail-woc ui-seg-tab${this.selectedRail === 'woc' ? ' is-on' : ''}" data-rail="woc"${wocSel} ${view.rails.woc && !pending ? '' : 'disabled'}>` +
       this.railIconHtml('woc') +
       `<span>${esc(t('hudChrome.claudium.railWoc'))}</span>` +
       wocDiscount +
       `</button>` +
-      `<button type="button" class="cl-rail" data-rail="usdc"${usdcSel} ${view.rails.usdc && !pending ? '' : 'disabled'}>` +
+      `<button type="button" class="cl-rail ui-seg-tab${this.selectedRail === 'usdc' ? ' is-on' : ''}" data-rail="usdc"${usdcSel} ${view.rails.usdc && !pending ? '' : 'disabled'}>` +
       this.railIconHtml('usdc') +
       `<span>${esc(t('hudChrome.claudium.railUsdc'))}</span>` +
       `</button>` +
-      `<button type="button" class="cl-rail" data-rail="sol"${solSel} ${view.rails.sol && !pending ? '' : 'disabled'}>` +
+      `<button type="button" class="cl-rail ui-seg-tab${this.selectedRail === 'sol' ? ' is-on' : ''}" data-rail="sol"${solSel} ${view.rails.sol && !pending ? '' : 'disabled'}>` +
       this.railIconHtml('sol') +
       `<span>${esc(t('hudChrome.claudium.railSol'))}</span>` +
       `</button>` +
@@ -452,9 +452,9 @@ export class ClaudiumWindow {
         const isPending = pending?.rail === this.selectedRail && pending.sku === row.sku;
         const disabled = this.skuDisabled(view, row);
         return (
-          `<button type="button" class="cl-sku cl-pack${isPending ? ' pending' : ''}" data-pack-tier="${index + 1}" data-sku="${esc(row.sku)}" aria-label="${esc(label)}" ${disabled ? 'disabled' : ''}>` +
+          `<button type="button" class="cl-sku cl-pack ui-card-tile${isPending ? ' pending' : ''}" data-pack-tier="${index + 1}" data-sku="${esc(row.sku)}" aria-label="${esc(label)}" ${disabled ? 'disabled' : ''}>` +
           `<span class="cl-pack-art"><img src="${esc(this.packArt(row.claudium))}" alt=""></span>` +
-          `<span class="cl-sku-claudium"><img src="/claudium/icons/claudium_coin_64.webp" alt="">${esc(t('hudChrome.claudium.storeCost', { amount: claudium }))}</span>` +
+          `<span class="cl-sku-claudium ui-money ui-money-coin ui-num"><img src="/claudium/icons/claudium_coin_64.webp" alt="">${esc(t('hudChrome.claudium.storeCost', { amount: claudium }))}</span>` +
           `<span class="cl-sku-usd">${esc(price)}</span>` +
           `<span class="cl-sku-buy">` +
           (isPending

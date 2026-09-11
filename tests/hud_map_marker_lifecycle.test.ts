@@ -333,6 +333,7 @@ function markerHarness(): {
     mapPointHitsScratch: [],
     mapQuestObjectiveScratch: [],
     mapSemanticAccessibility: semanticCore(),
+    mapSidebar: { update() {}, filterState: () => undefined, shownRoute: () => null },
     questGiverTooltipHtml: () => {
       calls.push('npc');
       return '';
@@ -420,6 +421,7 @@ function lifecycleHarness(): {
     mapPointHitsScratch: [],
     mapQuestObjectiveScratch: [],
     mapSemanticAccessibility: semanticCore(),
+    mapSidebar: { update() {}, filterState: () => undefined, shownRoute: () => null },
     mapGatherTipMemo: { nodeId: 'stale' },
     continentRegions: [],
     setDisplay: vi.fn(),

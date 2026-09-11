@@ -6,6 +6,7 @@ import {
   buildPaperdollView,
   PAPERDOLL_LEFT_SLOTS,
   PAPERDOLL_RIGHT_SLOTS,
+  PAPERDOLL_WEAPON_SLOTS,
 } from '../src/ui/char_view';
 import { borderAccent } from '../src/ui/deed_border_view';
 import {
@@ -382,10 +383,10 @@ describe('buildInspectView: gear reuses the char_view paperdoll (no forked slot 
     const m = buildInspectView(base, ITEMS);
     // Identical to the shared core: same arrays, same empty-slot resolution.
     expect(m.gear).toEqual(buildPaperdollView(base.equippedItems, ITEMS));
-    // And the column order IS char_view's 6/6 split (offhand in the left column).
+    // And the column order IS char_view's 5/5 split with the weapon hands in their own row.
     expect(m.gear.left.map((c) => c.slot)).toEqual([...PAPERDOLL_LEFT_SLOTS]);
     expect(m.gear.right.map((c) => c.slot)).toEqual([...PAPERDOLL_RIGHT_SLOTS]);
-    expect(m.gear.left.map((c) => c.slot)).toContain('offhand');
+    expect(m.gear.weapons.map((c) => c.slot)).toEqual([...PAPERDOLL_WEAPON_SLOTS]);
     // Filled vs empty resolution.
     expect(m.gear.left[0].item).toBe(ITEMS.monarch_crown_helm);
     const emptySlots = m.gear.right.filter(
@@ -413,8 +414,8 @@ describe('buildInspectView: gear reuses the char_view paperdoll (no forked slot 
       signer: 'Maker',
     });
     // Slot-keyed, never smeared: the worn mainhand carries no payload.
-    expect(m.gear.left[4].item).toBe(ITEMS.worn_sword);
-    expect(m.gear.left[4].instance).toBeNull();
+    expect(m.gear.weapons[0].item).toBe(ITEMS.worn_sword);
+    expect(m.gear.weapons[0].instance).toBeNull();
     // The def-only negative: no instances input resolves every cell
     // payload-free, byte for byte the old model.
     const defOnly = buildInspectView(base, ITEMS);

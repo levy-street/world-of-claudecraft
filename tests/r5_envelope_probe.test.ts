@@ -81,16 +81,19 @@ describe('the R5 envelope harness', () => {
     const full = furyBody('full');
     const equipped = furyBody('equipped');
 
+    // sta 194 to 198 on 2026-09-10 with the stamina baseline model: the kit's
+    // stamina-free jewelry gained its floor (item_budget.ts); Strength and the
+    // ratings did not move.
     expect(base).toEqual({
       str: 201,
-      sta: 194,
+      sta: 198,
       hitRating: 165,
       critRating: 315,
       hasteRating: 50,
     });
     expect(full).toEqual({
       str: 205,
-      sta: 197,
+      sta: 201,
       hitRating: 165,
       critRating: 315,
       hasteRating: 50,
@@ -124,16 +127,22 @@ describe('the R5 envelope harness', () => {
     const withEnchant = tankBody('consumablesEnchant');
     const full = tankBody('full');
 
-    expect(base).toEqual({ hp: 3532, armor: 3383, sta: 332 });
-    expect(consumables).toEqual({ hp: 3632, armor: 3383, sta: 342 });
-    expect(withEnchant).toEqual({ hp: 3672, armor: 3383, sta: 346 });
-    expect(full).toEqual({ hp: 3672, armor: 3386, sta: 346 });
+    // Re-pinned 2026-09-10 with the stamina baseline model: the reference
+    // picker now scores the class line, so the tank's jewelry is physical
+    // (stamina-bearing) instead of the caster pieces a raw five-stat sum tied
+    // them with; pool 3532 to 3642, stamina 332 to 343, armor 3383 to 3377
+    // (Agility feeds armor and the swapped ring carries less of it). The
+    // consumable and enchant steps ride on top unchanged.
+    expect(base).toEqual({ hp: 3642, armor: 3377, sta: 343 });
+    expect(consumables).toEqual({ hp: 3742, armor: 3377, sta: 353 });
+    expect(withEnchant).toEqual({ hp: 3782, armor: 3377, sta: 357 });
+    expect(full).toEqual({ hp: 3782, armor: 3380, sta: 357 });
 
     const ehp = (body: { hp: number; armor: number }, level: number): number =>
       body.hp / (1 - armorReduction(body.armor, level));
     const expected: Array<[number, number, number, string]> = [
-      [22, 8796, 9149, '4.019'],
-      [23, 8606, 8952, '4.018'],
+      [22, 9060, 9413, '3.899'],
+      [23, 8865, 9210, '3.898'],
     ];
     for (const [level, baseEhp, fullEhp, delta] of expected) {
       const deltaPct = ((ehp(full, level) - ehp(base, level)) / ehp(base, level)) * 100;
@@ -276,13 +285,17 @@ describe('the R5 envelope harness', () => {
     expect(perfectingPart('warhewn_signet'), 'fury equipped ring2 delta').toEqual(
       WAR_EQUIPPED_DELTA.ring2,
     );
+    // The caster chest entry is the Perfecting delta (int 1, spi 1, and the one
+    // Stamina the free baseline grows by across the source bump under the
+    // stamina baseline model) plus the enchant step on the same slot.
     const casterChest = { ...CASTER_APEX_CHEST_DELTA.chest } as Record<string, number>;
-    delete casterChest.sta; // the enchant step rides the same slot entry
+    casterChest.sta = (casterChest.sta ?? 0) - CHEST_STA_STEP_PERFECTED;
     expect(perfectingPart('sunspun_vestments'), 'caster apex chest delta').toEqual(casterChest);
+    expect(perfectingPart('sunspun_vestments').sta, 'the Perfecting baseline growth').toBe(1);
     expect(
       CASTER_APEX_CHEST_DELTA.chest?.sta,
-      'the caster chest sta entry is the Perfected enchant step',
-    ).toBe(CHEST_STA_STEP_PERFECTED);
+      'the caster chest sta entry is the Perfected enchant step plus the baseline growth',
+    ).toBe(CHEST_STA_STEP_PERFECTED + 1);
   });
 
   it('smokes each throughput lane on one seed so a dead or gutted rotation reds', () => {

@@ -156,4 +156,7 @@ public/models/sfx-studio-security-*.glb
 
 # Build artifacts (review 3050: class-directions PDFs land here)
 output/
+
+# task workspaces (git worktrees + design sources; never committed)
+workspaces/
 docs/screenshots/goblin-rocket-sled/

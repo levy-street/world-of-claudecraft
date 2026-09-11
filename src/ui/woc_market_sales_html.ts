@@ -91,7 +91,7 @@ export function wocSalesTableHtml(history: WocHistoryModel, host: WocSalesHtmlHo
   // rows dim while the answer is on its way; a background poll never raises it
   // (the window keeps history out of its silent poll).
   return (
-    `<table class="wm-table wm-sales-table" aria-busy="${history.loading ? 'true' : 'false'}"><thead><tr>` +
+    `<table class="wm-table wm-sales-table ui-card" aria-busy="${history.loading ? 'true' : 'false'}"><thead><tr>` +
     `<th>${esc(t('hudChrome.wocMarket.colItem'))}</th>` +
     `<th>${esc(t('hudChrome.wocMarket.colSeller'))}</th>` +
     `<th>${esc(t('hudChrome.wocMarket.colBuyer'))}</th>` +

@@ -28,10 +28,33 @@ import { Sim } from '../src/sim/sim';
 // helmet heroic_nighttalon_crown -> heroic_bramblehide_crown and feet
 // ashenbark_treads -> heroic_bramblehide_treads (Bramblehide is not
 // spec-restricted at the equip gate). The other nine slots are unchanged.
-const FIXTURE_LOADOUT = {
+// RE-DERIVED 2026-09-10 with the stamina baseline model (src/sim/item_budget.ts):
+// the reference picker now scores only the class LINE plus stamina (a caster
+// piece totals a third more than a physical one of the same tier, so a raw
+// five-stat sum would have dressed every class in healer gear), which means the
+// balance and feral fixtures no longer share one loadout. The balance druid
+// wears caster leather (crucible caster chest and waist, Grovespring, the
+// Thornpeak cowl, caster rings) instead of the Ashveil physical set and a
+// Strength ring it wore by accident of the old sum; the feral and Bruin
+// fixtures keep Ashveil and swap their two caster jewelry slots for Ignivar's
+// Ember Choker and the Seal of the Forgewall. Both are pinned on their own.
+const BALANCE_LOADOUT = {
+  mainhand: 'wand_of_quenched_sparks',
+  helmet: 'heroic_thornpeak_moonhide_cowl',
+  neck: 'heartspring_amulet',
+  shoulder: 'grovespring_shoulder',
+  chest: 'crucible_caster_leather_chest',
+  waist: 'crucible_caster_leather_waist',
+  legs: 'grovespring_legs',
+  gloves: 'grovespring_gloves',
+  feet: 'heroic_bramblehide_treads',
+  ring1: 'circle_of_cinders',
+  ring2: 'loop_of_quiet_springs',
+} as const;
+const FERAL_LOADOUT = {
   mainhand: 'wand_of_quenched_sparks',
   helmet: 'heroic_bramblehide_crown',
-  neck: 'heartspring_amulet',
+  neck: 'ignivars_ember_choker',
   shoulder: 'ashveil_shoulder',
   chest: 'ashveil_chest',
   waist: 'cinderbark_cinch',
@@ -39,7 +62,7 @@ const FIXTURE_LOADOUT = {
   gloves: 'ashveil_gloves',
   feet: 'heroic_bramblehide_treads',
   ring1: 'band_of_marked_strikes',
-  ring2: 'circle_of_cinders',
+  ring2: 'seal_of_the_forgewall',
 } as const;
 
 // MEASURED 2026-09-08 on the merged release catalog (integration dca7476) at
@@ -52,10 +75,17 @@ const FIXTURE_LOADOUT = {
 // src/sim/spec_output_tuning.ts physical offensive +0.15). Bands stay at
 // BAND=0.08 either side of the new measurement; payoff counts are small
 // integers and stay pinned exactly (a moved count is a rotation change).
+// RE-MEASURED 2026-09-10 on the stamina baseline model at the same seeds. The
+// gear moved first (the loadout pins above), and the bands follow it: moongrove
+// in caster leather instead of the Ashveil physical set (damage 3655 to 5956,
+// payoffs 5 to 7), wildfang and bruin with physical jewelry instead of caster
+// jewelry (5896 to 6378 and 2803 to 3082, payoffs 10 to 12 and 3 to 4). The
+// Bruin tank probe below did not leave its bands (snap threat 990.99 to
+// 1003.86) and keeps its 2026-09-08 anchors.
 const LIVE_MOB_MEASURED = {
-  moongrove: { damage: 3655, incomingDamage: 234, threat: 3656, payoffs: 5 },
-  wildfang: { damage: 5896, incomingDamage: 211, threat: 6909.164, payoffs: 10 },
-  bruin: { damage: 2803, incomingDamage: 129, threat: 9357.4175, payoffs: 3 },
+  moongrove: { damage: 5956, incomingDamage: 212, threat: 5957, payoffs: 7 },
+  wildfang: { damage: 6378, incomingDamage: 286, threat: 7473.827, payoffs: 12 },
+  bruin: { damage: 3082, incomingDamage: 131, threat: 10651.925, payoffs: 4 },
 } as const;
 const BRUIN_TANK_MEASURED = {
   wolfIncomingDamage: 220,
@@ -130,14 +160,14 @@ describe('Druid v0.29 balance and live-mob harness', () => {
       14: 'dru_r14_moonfury',
       20: 'dru_r20_improved_hurricane',
     });
-    expect(balanceLive, 'balance live loadout').toEqual(FIXTURE_LOADOUT);
+    expect(balanceLive, 'balance live loadout').toEqual(BALANCE_LOADOUT);
     const feralLive = fixtureEquipment(42_420, 'feral', {
       14: 'dru_r14_savage_fury',
       20: 'dru_r20_improved_hurricane',
     });
-    expect(feralLive, 'feral live loadout').toEqual(FIXTURE_LOADOUT);
+    expect(feralLive, 'feral live loadout').toEqual(FERAL_LOADOUT);
     const tank = fixtureEquipment(42_920, 'feral', {});
-    expect(tank, 'Bruin tank loadout').toEqual(FIXTURE_LOADOUT);
+    expect(tank, 'Bruin tank loadout').toEqual(FERAL_LOADOUT);
   });
 
   it.each(['moongrove', 'wildfang', 'bruin'] as const)(

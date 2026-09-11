@@ -115,7 +115,9 @@ function paint(
 describe('UnitFramePainter: the player instance routes every write through the elided writers', () => {
   it('paints level, hp, absorb, resource type/fill/text and NOTHING else (byte-faithful)', () => {
     const calls = paint(playerDescriptor());
-    // absorb { hp: 300, maxHp: 600, auras: [] } -> fillFrac = 300/600 = 0.5 (no shield).
+    // absorb { hp: 300, maxHp: 600, auras: [] } -> no shield, so the hatched overlay
+    // collapses to zero width and the plain health gradient shows (review finding:
+    // the hatch used to lie over the whole health bar and read as a striped fill).
     // No setDisplay (CSS owns it), no name (static, set at login), no dead/oor
     // (player frame never carries them): exactly the inline block + the absorb /
     // resource-type folds.
@@ -123,12 +125,13 @@ describe('UnitFramePainter: the player instance routes every write through the e
       { m: 'setText', args: [LEVEL, '60'] },
       { m: 'setTransform', args: [HP_FILL, 'scaleX(0.5)'] },
       { m: 'setText', args: [HP_TEXT, '300 / 600'] },
-      { m: 'setTransform', args: [ABSORB, 'scaleX(0.5)'] },
+      { m: 'setTransform', args: [ABSORB, 'scaleX(0)'] },
       { m: 'toggleClass', args: [ABSORB, 'overshield', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'rage', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'energy', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'focus', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'mana', true] },
+      { m: 'toggleClass', args: [RES_CONTAINER, 'is-empty', false] },
       { m: 'setTransform', args: [RES_FILL, 'scaleX(0.8)'] },
       { m: 'setText', args: [RES_TEXT, '80 / 100'] },
     ]);
@@ -150,6 +153,13 @@ describe('UnitFramePainter: the player instance routes every write through the e
     const focus = paint(playerDescriptor({ resourceKind: 'focus' }));
     expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'focus', true] });
     expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'mana', false] });
+  });
+
+  it('shrinks the empty resource rail and restores it when text returns', () => {
+    const empty = paint(playerDescriptor({ resourceKind: 'none', resFrac: 0, resText: '' }));
+    expect(empty).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'is-empty', true] });
+    const filled = paint(playerDescriptor());
+    expect(filled).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'is-empty', false] });
   });
 
   it('folds the absorb overshield toggle onto the elided writers', () => {
@@ -174,8 +184,42 @@ describe('UnitFramePainter: the player instance routes every write through the e
         },
       }),
     );
-    expect(calls).toContainEqual({ m: 'setTransform', args: [ABSORB, 'scaleX(1)'] });
+    // The segment is the shield only: 50/600 wide, seated at the bar's right edge.
+    expect(calls).toContainEqual({
+      m: 'setTransform',
+      args: [ABSORB, 'translateX(91.66666666666666%) scaleX(0.08333333333333333)'],
+    });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [ABSORB, 'overshield', true] });
+  });
+
+  it('seats a partial shield past current health instead of over it', () => {
+    // hp 300 + shield 60 over 600: the hatch starts at the health edge (0.5) and
+    // covers only the 0.1 the shield adds, so the health fill stays unhatched.
+    const calls = paint(
+      playerDescriptor({
+        absorb: {
+          hp: 300,
+          maxHp: 600,
+          auras: [
+            {
+              id: 'power_word_shield',
+              name: 'Power Word: Shield',
+              kind: 'absorb',
+              remaining: 30,
+              duration: 30,
+              value: 60,
+              sourceId: 1,
+              school: 'holy',
+            },
+          ],
+        },
+      }),
+    );
+    expect(calls).toContainEqual({
+      m: 'setTransform',
+      args: [ABSORB, 'translateX(50%) scaleX(0.1)'],
+    });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [ABSORB, 'overshield', false] });
   });
 });
 

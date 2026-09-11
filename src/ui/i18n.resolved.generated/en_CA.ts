@@ -902,6 +902,7 @@ export const en_CA: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Collapse quest tracker",
       "expandHint": "Expand quest tracker"
     },
@@ -1266,6 +1267,9 @@ export const en_CA: EnTranslations = {
       "previous": "Previous runs",
       "runLabel": "Run {index}",
       "runSummary": "{total} in {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Target the dummy to begin.",
@@ -1739,6 +1743,9 @@ export const en_CA: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Button Labels",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -1763,7 +1770,7 @@ export const en_CA: EnTranslations = {
       "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
       "crossHotbarResetLayout": "Reset Cross Hotbar",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.",
+      "crossHotbarOwnsButtons": "The triggers modify the cross hotbar while it is on. D-pad directions remain editable here for menus and movement.",
       "cancelAction": "Cancel / Back",
       "subcommandsAction": "Subcommands / Map",
       "cycleHudAction": "Cycle Interface",
@@ -1774,7 +1781,7 @@ export const en_CA: EnTranslations = {
       "crossHotbarDisplayMinimal": "Only While Held",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
-      "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
+      "crossHotbarEditHint": "Arranging · d-pad moves · confirm picks up and places · cancel clears a cell",
       "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
     },
     "perf": {
@@ -2125,6 +2132,22 @@ export const en_CA: EnTranslations = {
       "showPlaytimeAria": "Show time played",
       "hidePlaytimeAria": "Hide time played"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "From your {value} {stat}:",
       "names": {
@@ -2367,6 +2390,7 @@ export const en_CA: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Report a Bug",
+      "online": "Online",
       "realm": "World",
       "character": "Character",
       "position": "Position",
@@ -3244,6 +3268,7 @@ export const en_CA: EnTranslations = {
       "lock": "Lock player frame"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Party and Raid Frames",
       "optionsSection": "Party Frame Options",
       "unlock": "Move party and raid frames",
@@ -4028,7 +4053,6 @@ export const en_CA: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Gathering",
       "mining": "Mining",
       "logging": "Logging",
       "herbalism": "Herbalism",
@@ -4212,9 +4236,7 @@ export const en_CA: EnTranslations = {
       "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
-      "label": "Title",
-      "none": "None",
-      "hobbyLabel": "Hobby"
+      "none": "None"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardier",
@@ -4384,7 +4406,9 @@ export const en_CA: EnTranslations = {
       "hobbyLabel": "Hobby: {craft}",
       "majorsLabel": "Majors: {a} and {b}",
       "pairsHeld": "Pairs held: {count}",
-      "returnsLabel": "Returns: {count}"
+      "returnsLabel": "Returns: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "Crafting",
@@ -4419,6 +4443,7 @@ export const en_CA: EnTranslations = {
       "vaultUnreachable": "The Materials Vault is out of reach here.",
       "craftFeeLine": "Craft fee: {fee} each",
       "empty": "No recipes known yet.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Craft {name}",
       "craftedToast": "Crafted: {name}",
       "craftedToastQty": "Crafted: {name} x{qty}",
@@ -4520,6 +4545,9 @@ export const en_CA: EnTranslations = {
       "commissionToggleHint": "Binds to the first character to receive it in a trade.",
       "commissionUnbound": "Commission piece: binds to the first recipient",
       "commissionBound": "Commission piece: bound to its recipient"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Use",
@@ -5136,6 +5164,33 @@ export const en_CA: EnTranslations = {
       "toInstance": "Instance map",
       "toggleAria": "Switch between the world map, zone map, and instance map",
       "levels": "Levels {min} to {max}"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Requires level {level}"
@@ -6084,6 +6139,7 @@ export const en_CA: EnTranslations = {
       "framesMoveBodyEditFrames": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. Edit Frames, at the top of the Frames tab in the Interface options, loosens the rest of the interface at once, those three frames with it: the action bars, the cast bar, the swing bar, the experience bar, the minimap, the button rail, the pet frame, the stance bar, the buff and debuff rows, and the Wishlist Reminder chip, each wearing a name chip while it is loose. If they end up somewhere you regret, Reset to Defaults at the foot of that same Frames tab snaps them all back to where they started.",
       "framesGovernedExtra": "Edit Frames also loosens the tracker stack below (your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, any rift you are taking part in, and the recipe or commission you are tracking), the pet action bar beside your pet frame, the Target dots frame for your debuffs across nearby enemies, the paladin's Devotion medallion, the warlock's Affliction Bar, the spell-proc overlay, the off-hand swing timer for dual-wielders, and the tabbed damage meter window, each wearing its own name chip while it is loose.",
       "framesGovernedAuraTracks": "Edit Frames also loosens the six opt-in aura tracks once you have switched them on from the Combat tab of the same Interface options: the My Buffs track, the Defensive Cooldowns track, the My Shields track, the Offensive Cooldowns track, the Movement and Stealth track, and the My Buffs on Allies track. Every track is off by default, and each wears its own name chip while it is loose.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Bars, timers, and combat text",
       "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands. Fighting with a weapon in each hand adds a second bar right below it, filling on its own separate clock, so you can time your abilities between BOTH swings instead of just one.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
       "aurasTitle": "Buffs and debuffs",

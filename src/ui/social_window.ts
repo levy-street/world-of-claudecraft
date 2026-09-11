@@ -31,6 +31,7 @@ import { esc } from './esc';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
+import { classColorCss } from './inspect_view';
 import { moneyHtml } from './money_html';
 import { localizeZone } from './server_i18n';
 import {
@@ -211,22 +212,22 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
   const nameInner = `${esc(m.name)}<span class="rank">${esc(roleLabel(role))}</span>${memberTitleSpan}`;
   const name =
     m.online && !m.self
-      ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
-      : `<span class="soc-name">${nameInner}</span>`;
+      ? `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(m.cls)}" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
+      : `<span class="soc-name" style="--class-color:${classColorCss(m.cls)}">${nameInner}</span>`;
   let actions = m.canWhisper
-    ? `<button type="button" class="soc-x" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${svgIcon('whisper')}</button>`
+    ? `<button type="button" class="soc-x ui-disc" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${svgIcon('whisper')}</button>`
     : '';
   if (m.canTransfer)
-    actions += `<button type="button" class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
+    actions += `<button type="button" class="soc-x ui-disc" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
   if (m.canPromote)
-    actions += `<button type="button" class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">${svgIcon('promote')}</button>`;
+    actions += `<button type="button" class="soc-x ui-disc" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">${svgIcon('promote')}</button>`;
   if (m.canDemote)
-    actions += `<button type="button" class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">${svgIcon('demote')}</button>`;
+    actions += `<button type="button" class="soc-x ui-disc" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">${svgIcon('demote')}</button>`;
   if (m.canKick)
-    actions += `<button type="button" class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
+    actions += `<button type="button" class="soc-x ui-disc" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
   const tip = esc(dotTitle(m.online, m.status, m.zone));
   return (
-    `<div class="soc-row">` +
+    `<div class="soc-row${m.online ? '' : ' is-offline'}">` +
     `<span class="soc-dot ${m.dot === 'off' ? '' : m.dot}" title="${tip}"></span>` +
     `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
     `<span class="soc-meta" title="${tip}">${meta}</span>` +
@@ -388,7 +389,7 @@ export class SocialWindow {
     const realmTag =
       online && w.realm ? ` <span class="soc-realm-tag">- ${esc(w.realm)}</span>` : '';
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hud.social.title'))}${realmTag}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hud.social.title'))}${realmTag}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>` +
       // WAI-ARIA tabs: a real role=tablist / role=tab / role=tabpanel with a
       // roving tabindex (0 on the active tab, -1 on the rest) and aria-selected, built
       // from the shared tab_strip_view core (same markup contract talents_window
@@ -399,8 +400,8 @@ export class SocialWindow {
         tabStripModel({
           ariaLabel: t('hud.social.title'),
           panelId: 'soc-body-panel',
-          stripClass: 'soc-tabs',
-          tabClass: 'soc-tab',
+          stripClass: 'soc-tabs ui-tabs',
+          tabClass: 'soc-tab ui-tab',
           selectedClass: 'on',
           tabs: [
             { id: 'friends', label: t('hud.social.friendsTab') },
@@ -653,18 +654,18 @@ export class SocialWindow {
         const titleText = f.activeTitle ? deedTitleText(f.activeTitle) : '';
         const titleSpan = titleText ? `<span class="soc-title">${esc(titleText)}</span>` : '';
         const name = f.online
-          ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}${titleSpan}</button>`
-          : `<span class="soc-name">${esc(f.name)}${titleSpan}</span>`;
+          ? `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(f.cls)}" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}${titleSpan}</button>`
+          : `<span class="soc-name" style="--class-color:${classColorCss(f.cls)}">${esc(f.name)}${titleSpan}</span>`;
         const whisper = f.online
-          ? `<button type="button" class="soc-x" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
+          ? `<button type="button" class="soc-x ui-disc" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
           : '';
         const tip = esc(dotTitle(f.online, f.status, f.zone));
         return (
-          `<div class="soc-row">` +
+          `<div class="soc-row${f.online ? '' : ' is-offline'}">` +
           `<span class="soc-dot ${f.dot === 'off' ? '' : f.dot}" title="${tip}"></span>` +
           `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(f.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(f.cls) }))}</span></span>` +
           `<span class="soc-meta" title="${tip}">${meta}</span>` +
-          `<span class="soc-actions">${whisper}<button type="button" class="soc-x" data-act="unfriend" data-name="${esc(f.name)}" title="${esc(t('hud.social.removeFriendTitle', { name: f.name }))}">${svgIcon('close')}</button></span>` +
+          `<span class="soc-actions">${whisper}<button type="button" class="soc-x ui-disc" data-act="unfriend" data-name="${esc(f.name)}" title="${esc(t('hud.social.removeFriendTitle', { name: f.name }))}">${svgIcon('close')}</button></span>` +
           `</div>`
         );
       })
@@ -686,7 +687,7 @@ export class SocialWindow {
         (r) =>
           `<div class="soc-row">` +
           `<span class="soc-name">${esc(r.name)}</span>` +
-          `<span class="soc-actions" style="margin-left:auto"><button type="button" class="soc-x" data-act="${act}" data-name="${esc(r.name)}" title="${esc(title(r.name))}">${svgIcon('close')}</button></span>` +
+          `<span class="soc-actions soc-actions-end"><button type="button" class="soc-x ui-disc" data-act="${act}" data-name="${esc(r.name)}" title="${esc(title(r.name))}">${svgIcon('close')}</button></span>` +
           `</div>`,
       )
       .join('');
@@ -732,7 +733,7 @@ export class SocialWindow {
     // The persisted "hide offline" toggle: a pressed-state button (a single click event
     // through the delegated body handler, unlike a label+checkbox that double-fires).
     const toggle =
-      `<button type="button" class="soc-hide-offline${this.hideOffline ? ' on' : ''}" data-act="toggle-hide-offline" aria-pressed="${this.hideOffline ? 'true' : 'false'}" title="${esc(t('hudChrome.social.hideOfflineTitle'))}">` +
+      `<button type="button" class="soc-hide-offline ui-btn${this.hideOffline ? ' on' : ''}" data-act="toggle-hide-offline" aria-pressed="${this.hideOffline ? 'true' : 'false'}" title="${esc(t('hudChrome.social.hideOfflineTitle'))}">` +
       `<span class="soc-hide-box" aria-hidden="true"></span>${esc(t('hudChrome.social.hideOffline'))}</button>`;
     // Online-first grouping with per-group count headers; the offline group (header +
     // rows) is suppressed when the toggle is on. Empty groups emit no header.
@@ -770,12 +771,12 @@ export class SocialWindow {
     const inputLabel = esc(t('hudChrome.social.billboard.inputLabel'));
     const edit = g.canEditMotd
       ? `<div class="soc-billboard-edit">` +
-        `<input maxlength="${GUILD_MOTD_MAX}" value="${esc(g.motd)}" aria-label="${inputLabel}" placeholder="${esc(t('hudChrome.social.billboard.placeholder'))}" data-field="gmotd" autocomplete="off" spellcheck="false"/>` +
-        `<button type="button" class="btn" data-act="gmotd-save">${esc(t('hudChrome.social.billboard.save'))}</button>` +
+        `<input class="ui-input" maxlength="${GUILD_MOTD_MAX}" value="${esc(g.motd)}" aria-label="${inputLabel}" placeholder="${esc(t('hudChrome.social.billboard.placeholder'))}" data-field="gmotd" autocomplete="off" spellcheck="false"/>` +
+        `<button type="button" class="btn ui-btn" data-act="gmotd-save">${esc(t('hudChrome.social.billboard.save'))}</button>` +
         `</div>`
       : '';
     return (
-      `<div class="soc-billboard">` +
+      `<div class="soc-billboard ui-card">` +
       `<div class="soc-billboard-label">${esc(t('hudChrome.social.billboard.label'))}</div>` +
       message +
       setBy +
@@ -798,10 +799,10 @@ export class SocialWindow {
       guild: `<span class="guild-tier-${pledge.tier}">${esc(pledge.guildName)}</span>`,
     });
     return (
-      `<div class="soc-my-pledge">` +
+      `<div class="soc-my-pledge ui-card">` +
       `<span class="soc-my-pledge-line">${line}</span>` +
       `<span class="soc-my-pledge-since">${esc(t('hudChrome.pledge.since', { date: formatDateTime(new Date(pledge.sinceMs), { dateStyle: 'medium' }) }))}</span>` +
-      `<button type="button" class="btn" data-act="pledge-withdraw">${esc(t('hudChrome.pledge.withdraw'))}</button>` +
+      `<button type="button" class="btn ui-btn" data-act="pledge-withdraw">${esc(t('hudChrome.pledge.withdraw'))}</button>` +
       `</div>`
     );
   }
@@ -815,14 +816,14 @@ export class SocialWindow {
     if (!panel) return `<div class="soc-empty">${esc(t('hud.social.noGuild'))}</div>`;
     const s = panel.settings;
     const settings =
-      `<div class="soc-pledge-settings">` +
+      `<div class="soc-pledge-settings ui-card">` +
       `<div class="soc-billboard-label">${esc(t('hudChrome.pledge.settings'))}</div>` +
-      `<label class="soc-pledge-open"><input type="checkbox" data-field="popen"${s.enabled ? ' checked' : ''}/> ${esc(t('hudChrome.pledge.acceptingLabel'))}</label>` +
+      `<label class="soc-pledge-open"><input class="ui-check" type="checkbox" data-field="popen"${s.enabled ? ' checked' : ''}/> ${esc(t('hudChrome.pledge.acceptingLabel'))}</label>` +
       `<label class="soc-pledge-minlvl">${esc(t('hudChrome.pledge.minLevelLabel'))} ` +
-      `<input inputmode="numeric" pattern="[0-9]*" maxlength="2" data-field="pminlvl" value="${esc(String(s.minLevel))}" autocomplete="off"/></label>` +
+      `<input class="ui-input" inputmode="numeric" pattern="[0-9]*" maxlength="2" data-field="pminlvl" value="${esc(String(s.minLevel))}" autocomplete="off"/></label>` +
       `<div class="soc-pledge-note-row">` +
-      `<input maxlength="${PLEDGE_NOTE_MAX}" value="${esc(s.note)}" aria-label="${esc(t('hudChrome.pledge.noteLabel'))}" placeholder="${esc(t('hudChrome.pledge.notePlaceholder'))}" data-field="pnote" autocomplete="off" spellcheck="false"/>` +
-      `<button type="button" class="btn" data-act="pledge-settings-save">${esc(t('hudChrome.pledge.save'))}</button>` +
+      `<input class="ui-input" maxlength="${PLEDGE_NOTE_MAX}" value="${esc(s.note)}" aria-label="${esc(t('hudChrome.pledge.noteLabel'))}" placeholder="${esc(t('hudChrome.pledge.notePlaceholder'))}" data-field="pnote" autocomplete="off" spellcheck="false"/>` +
+      `<button type="button" class="btn ui-btn" data-act="pledge-settings-save">${esc(t('hudChrome.pledge.save'))}</button>` +
       `</div></div>`;
     if (panel.rows.length === 0)
       return settings + `<div class="soc-empty">${esc(t('hudChrome.pledge.empty'))}</div>`;
@@ -831,11 +832,11 @@ export class SocialWindow {
         const since = formatDateTime(new Date(p.sinceMs), { dateStyle: 'medium' });
         return (
           `<div class="soc-row">` +
-          `<span class="soc-id"><span class="soc-name">${esc(p.name)}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(p.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(p.cls) }))}</span></span>` +
+          `<span class="soc-id"><span class="soc-name" style="--class-color:${classColorCss(p.cls)}">${esc(p.name)}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(p.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(p.cls) }))}</span></span>` +
           `<span class="soc-meta">${esc(t('hudChrome.pledge.since', { date: since }))}</span>` +
           `<span class="soc-actions">` +
-          `<button type="button" class="soc-x soc-pledge-accept" data-act="pledge-accept" data-name="${esc(p.name)}" title="${esc(t('hudChrome.pledge.acceptTitle', { name: p.name }))}">${svgIcon('check')}</button>` +
-          `<button type="button" class="soc-x" data-act="pledge-reject" data-name="${esc(p.name)}" title="${esc(t('hudChrome.pledge.rejectTitle', { name: p.name }))}">${svgIcon('close')}</button>` +
+          `<button type="button" class="soc-x soc-pledge-accept ui-disc" data-act="pledge-accept" data-name="${esc(p.name)}" title="${esc(t('hudChrome.pledge.acceptTitle', { name: p.name }))}">${svgIcon('check')}</button>` +
+          `<button type="button" class="soc-x ui-disc" data-act="pledge-reject" data-name="${esc(p.name)}" title="${esc(t('hudChrome.pledge.rejectTitle', { name: p.name }))}">${svgIcon('close')}</button>` +
           `</span></div>`
         );
       })
@@ -847,7 +848,7 @@ export class SocialWindow {
     const w = this.deps.world();
     const view = raidView(w.partyInfo, w.playerId);
     if (!view.raid) {
-      return `<div class="soc-empty">${esc(t('hud.social.raidEmpty'))}${view.canConvert ? `<div class="soc-empty-action"><button type="button" class="soc-x" data-act="convert-raid">${esc(t('hud.chat.context.convertToRaid'))}</button></div>` : ''}</div>`;
+      return `<div class="soc-empty">${esc(t('hud.social.raidEmpty'))}${view.canConvert ? `<div class="soc-empty-action"><button type="button" class="soc-x ui-btn" data-act="convert-raid">${esc(t('hud.chat.context.convertToRaid'))}</button></div>` : ''}</div>`;
     }
     const groupHtml = (grp: NonNullable<typeof view.groups>[number]): string => {
       const rows =
@@ -855,11 +856,11 @@ export class SocialWindow {
           .map((m) => {
             const move =
               m.moveTo !== null
-                ? `<button type="button" class="soc-x" data-act="raid-move" data-pid="${m.pid}" data-group="${m.moveTo}" title="${esc(t('hud.social.raidMoveToGroup', { group: formatNumber(m.moveTo, { maximumFractionDigits: 0 }) }))}">${esc(formatNumber(m.moveTo, { maximumFractionDigits: 0 }))}</button>`
+                ? `<button type="button" class="soc-x ui-disc" data-act="raid-move" data-pid="${m.pid}" data-group="${m.moveTo}" title="${esc(t('hud.social.raidMoveToGroup', { group: formatNumber(m.moveTo, { maximumFractionDigits: 0 }) }))}">${esc(formatNumber(m.moveTo, { maximumFractionDigits: 0 }))}</button>`
                 : '';
             return (
               `<div class="soc-row raid-row">` +
-              `<span class="soc-id"><span class="soc-name">${esc(m.name)}${m.isLead ? `<span class="rank">${esc(t('hud.social.raidLeader'))}</span>` : ''}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
+              `<span class="soc-id"><span class="soc-name" style="--class-color:${classColorCss(m.cls)}">${esc(m.name)}${m.isLead ? `<span class="rank">${esc(t('hud.social.raidLeader'))}</span>` : ''}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
               `<span class="soc-meta">${esc(formatNumber(m.hpPct, { maximumFractionDigits: 0 }))}%</span>` +
               (move ? `<span class="soc-actions">${move}</span>` : '') +
               `</div>`
@@ -871,7 +872,7 @@ export class SocialWindow {
     if (!view.groups) return '';
     const [g1, g2] = view.groups;
     const footer = view.canUnconvert
-      ? `<div class="soc-empty-action"><button type="button" class="soc-x" data-act="convert-party">${esc(t('hud.chat.context.convertToParty'))}</button></div>`
+      ? `<div class="soc-empty-action"><button type="button" class="soc-x ui-btn" data-act="convert-party">${esc(t('hud.chat.context.convertToParty'))}</button></div>`
       : '';
     return `<div class="raid-groups">${groupHtml(g1)}${groupHtml(g2)}</div>${footer}`;
   }
@@ -936,15 +937,15 @@ export class SocialWindow {
     const expand =
       roster && guild.rank === 'leader'
         ? roster.nextRosterPrice === null
-          ? `<button class="btn soc-foot-start" data-act="guild-expand" disabled>${esc(t('hudChrome.social.roster.maxed'))}</button>`
-          : `<button class="btn soc-foot-start" data-act="guild-expand">${esc(t('hudChrome.social.roster.expand'))}</button>`
+          ? `<button class="btn ui-btn soc-foot-start" data-act="guild-expand" disabled>${esc(t('hudChrome.social.roster.maxed'))}</button>`
+          : `<button class="btn ui-btn soc-foot-start" data-act="guild-expand">${esc(t('hudChrome.social.roster.expand'))}</button>`
         : '';
     // classic MMOs: a Guild Master with other members can't just leave (they disband,
     // or hand over leadership via the crown action). Everyone else can leave.
     const leave =
       guild.rank === 'leader' && guild.members.length > 1
-        ? `<button class="btn" data-act="guild-disband">${esc(t('hud.social.disbandGuild'))}</button>`
-        : `<button class="btn" data-act="guild-leave">${esc(t('hud.social.leaveGuild'))}</button>`;
+        ? `<button class="btn ui-btn ui-btn--red" data-act="guild-disband">${esc(t('hud.social.disbandGuild'))}</button>`
+        : `<button class="btn ui-btn ui-btn--red" data-act="guild-leave">${esc(t('hud.social.leaveGuild'))}</button>`;
     foot += `<div class="soc-add soc-leave">${expand}${leave}</div>`;
     return foot;
   }
@@ -966,8 +967,8 @@ export class SocialWindow {
       (suggest
         ? `<div class="soc-suggest" id="${listId}" data-for="${field}" role="listbox"></div>`
         : '') +
-      `<input maxlength="${maxlen}" aria-label="${esc(placeholder)}" placeholder="${esc(placeholder)}" data-field="${field}"${suggest ? ` data-suggest="1" role="combobox" aria-autocomplete="list" aria-controls="${listId}" aria-expanded="false"` : ''} autocomplete="off" spellcheck="false"/>` +
-      `<button class="btn" data-act="${act}">${esc(label)}</button></div>`
+      `<input class="ui-input" maxlength="${maxlen}" aria-label="${esc(placeholder)}" placeholder="${esc(placeholder)}" data-field="${field}"${suggest ? ` data-suggest="1" role="combobox" aria-autocomplete="list" aria-controls="${listId}" aria-expanded="false"` : ''} autocomplete="off" spellcheck="false"/>` +
+      `<button class="btn ui-btn" data-act="${act}">${esc(label)}</button></div>`
     );
   }
 

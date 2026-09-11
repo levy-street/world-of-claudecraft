@@ -71,6 +71,8 @@ describe('RiftFloorTrackerController', () => {
     expect(tracker.element.style.display).toBe('block');
     expect(tracker.element.innerHTML).toContain('2');
     expect(tracker.element.innerHTML).toContain('5');
+    expect(tracker.element.innerHTML).toContain('class="rt-header ui-cin"');
+    expect(tracker.element.innerHTML).toContain('class="rt-obj ui-meta ui-num"');
   });
 
   it('degrades to floor-progress-only for a dev-spawned rift (no timer line)', () => {

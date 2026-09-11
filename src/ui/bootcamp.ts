@@ -45,6 +45,7 @@ import type { Renderer } from '../render/renderer';
 import { BOOTCAMP_COURSE_CHECKPOINTS, isOnProvingShore } from '../sim/content/proving_shore';
 import { GAUNTLET_QUEST_ID } from '../sim/tutorial/gauntlet_run';
 import { startingAttackFor } from '../sim/tutorial/starting_attack';
+import type { Entity } from '../sim/types';
 import { groundHeight, WATER_LEVEL } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
 import type { IWorld } from '../world_api';
@@ -88,6 +89,12 @@ import {
   VEER_OFF_YD,
 } from './coach_prompt_view';
 import { tEntity } from './entity_i18n';
+import {
+  panelLineDurationMs,
+  routeSpeech,
+  speakerInView,
+  TalkingHeadController,
+} from './hud/talking_head';
 import { type TranslationKey, t } from './i18n';
 import { iconDataUrl } from './icons';
 import {
@@ -107,6 +114,9 @@ const GLOW_TARGET_LIFT = 2;
 
 /** The Attack toggle's icon id (hud.ts resolves ATTACK_ICON_KEY to it). */
 const AUTO_ATTACK_ICON_ID = 'attack';
+const ODO_NPC_ID = 'ferryman_odo';
+/** Where a bubble anchors over a speaker: about head height on a standing NPC. */
+const SPEAKER_HEAD_LIFT = 2.4;
 
 interface CoachGamepadBindings {
   entries(): GamepadBindingEntry[];
@@ -149,6 +159,9 @@ export class BootcampOverlay {
   private deathPhase: DeathLessonPhase = 'alive';
 
   private root: HTMLElement | null = null;
+  private lastWorld: IWorld | null = null;
+  private lastRenderer: Renderer | null = null;
+  private readonly talkingHead = new TalkingHeadController();
   private lastFocus: CoachFocus | null = null;
   // The floating interact bubble (coach_prompt_view.ts): shown only while
   // standing in interact reach of the coach's current target, so the one
@@ -182,6 +195,8 @@ export class BootcampOverlay {
     const p = world.player;
     if (!p) return;
     if (world.playerId < 0 || p.id !== world.playerId) return;
+    this.lastWorld = world;
+    this.lastRenderer = renderer;
 
     const onIsland = isOnProvingShore(p.pos?.x ?? 0, p.pos?.z ?? 0);
     const focus = onIsland ? coachFocus((questId) => railQuestState(world, questId)) : null;
@@ -255,6 +270,7 @@ export class BootcampOverlay {
     this.paintObjectiveGlow(world, renderer);
     this.applyUiGlow(world);
     this.updateGuideVoice(world, focus);
+    this.rerouteLiveCaption();
   }
 
   // ---- Ferryman Odo's guiding voice --------------------------------------
@@ -272,8 +288,6 @@ export class BootcampOverlay {
   private guideOffPathSince: number | null = null;
   private guideLastNudgeAt = 0;
   private guideNudges = 0;
-  private captionEl: HTMLElement | null = null;
-  private captionTimer: ReturnType<typeof setTimeout> | null = null;
 
   private updateGuideVoice(world: IWorld, focus: CoachFocus | null): void {
     if (!this.engaged) return;
@@ -358,22 +372,69 @@ export class BootcampOverlay {
     this.showCaption(t(line.caption));
   }
 
+  // Odo's line reaches the player the way NPC speech does in the world: a chat
+  // bubble over him while he is on screen and near, the Talking Head panel
+  // (portrait, name, line) above the action bar when he is not.
   private showCaption(text: string): void {
-    this.ensureDom();
-    if (!this.root) return;
-    if (!this.captionEl) {
-      const el = document.createElement('div');
-      el.className = 'tut-voice';
-      this.root.appendChild(el);
-      this.captionEl = el;
+    const odoName = tEntity({ kind: 'npc', id: ODO_NPC_ID, field: 'name' });
+    const speaker = this.findSpeaker(ODO_NPC_ID);
+    const route = routeSpeech(speaker !== null && this.speakerVisible(speaker));
+    if (route === 'bubble' && speaker && this.lastRenderer) {
+      this.talkingHead.hide();
+      this.liveBubble = { text, until: performance.now() + panelLineDurationMs(text) };
+      this.lastRenderer.showChatBubble(speaker.id, text, false);
+      return;
     }
-    const odo = tEntity({ kind: 'npc', id: 'ferryman_odo', field: 'name' });
-    this.captionEl.textContent = `${odo}: "${text}"`;
-    this.captionEl.style.display = '';
-    if (this.captionTimer) clearTimeout(this.captionTimer);
-    this.captionTimer = setTimeout(() => {
-      if (this.captionEl) this.captionEl.style.display = 'none';
-    }, 8000);
+    this.liveBubble = null;
+    this.talkingHead.say({ speakerId: ODO_NPC_ID, speakerName: odoName, text });
+  }
+
+  // The line currently riding a chat bubble, with the reading time it was
+  // given. Odo walks his own route, so a line routed while he was on screen can
+  // outlive the sight of him.
+  private liveBubble: { text: string; until: number } | null = null;
+
+  // Odo leaving view mid-line would strand the bubble unread, so the rest of
+  // the line moves to the panel. The panel starts its own reading clock: the
+  // player is only now reading it there.
+  private rerouteLiveCaption(): void {
+    const live = this.liveBubble;
+    if (!live) return;
+    if (performance.now() >= live.until) {
+      this.liveBubble = null;
+      return;
+    }
+    const speaker = this.findSpeaker(ODO_NPC_ID);
+    if (speaker !== null && this.speakerVisible(speaker)) return;
+    this.liveBubble = null;
+    this.talkingHead.say({
+      speakerId: ODO_NPC_ID,
+      speakerName: tEntity({ kind: 'npc', id: ODO_NPC_ID, field: 'name' }),
+      text: live.text,
+    });
+  }
+
+  private findSpeaker(templateId: string): Entity | null {
+    const world = this.lastWorld;
+    if (!world) return null;
+    for (const e of world.entities.values()) {
+      if (e.kind === 'npc' && e.templateId === templateId) return e;
+    }
+    return null;
+  }
+
+  private speakerVisible(speaker: Entity): boolean {
+    const world = this.lastWorld;
+    const renderer = this.lastRenderer;
+    const p = world?.player;
+    if (!world || !renderer || !p) return false;
+    const headY = groundHeight(speaker.pos.x, speaker.pos.z, world.cfg.seed) + SPEAKER_HEAD_LIFT;
+    return speakerInView({
+      anchor: renderer.worldToScreen(speaker.pos.x, headY, speaker.pos.z),
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      distanceYd: Math.hypot(speaker.pos.x - p.pos.x, speaker.pos.z - p.pos.z),
+    });
   }
 
   // Toggle the press-this-next glow (.qd-coach) on whichever window controls
@@ -960,8 +1021,7 @@ export class BootcampOverlay {
     // lookup (the v0.40 crossing freeze).
     this.prompt?.remove();
     this.glowEl?.remove();
-    this.captionEl?.remove();
-    this.captionEl = null;
+    this.talkingHead.hide();
     this.root = null;
     this.prompt = null;
     this.glowEl = null;
@@ -995,9 +1055,8 @@ export class BootcampOverlay {
     ]) {
       for (const el of document.querySelectorAll<HTMLElement>(sel)) el.classList.remove('qd-coach');
     }
-    if (this.captionTimer) clearTimeout(this.captionTimer);
-    this.captionTimer = null;
-    this.captionEl = null;
+    this.talkingHead.hide();
+    this.liveBubble = null;
     this.guidePrevStation = null;
     this.guidePrevCounts = -1;
     this.guideOffPathSince = null;

@@ -13,7 +13,14 @@ import {
   recipeById,
 } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
-import { PRIMARY_STATS, primaryStatBudget } from '../src/sim/item_budget';
+import {
+  expectedStatTotal,
+  PRIMARY_STATS,
+  primaryStatBudget,
+  staminaBaseline,
+  statIdentity,
+  tierDeltaStats,
+} from '../src/sim/item_budget';
 import {
   isItemLevelEligible,
   itemSourceLevel,
@@ -190,16 +197,22 @@ describe('masterworkBonusStats (the baked tier-delta budget)', () => {
       slot: vestments.slot,
       stats: vestments.stats,
     });
-    // Literal pin: the 2-point delta lands one point on each profile stat
-    // (largest-remainder over the def's int 2 / spi 1 identity).
-    expect(record).toEqual({ int: 1, spi: 1 });
-    // The record sums to EXACTLY the budget delta from the shared budget
-    // primitives, with both sides of the delta pinned as literals so a drift
-    // in either the baker or the budget curve trips this test.
+    // Literal pin: the 2-point line delta lands one point on each offense
+    // stat (largest-remainder over the def's int 2 / spi 1 identity), and the
+    // stamina baseline model adds the baseline's growth across the bump
+    // (round(3/3) = 1 to round(5/3) = 2) as one Stamina.
+    expect(record).toEqual({ int: 1, spi: 1, sta: 1 });
+    // The record sums to EXACTLY the line delta plus the baseline delta from
+    // the shared budget primitives, with both sides of the line delta pinned
+    // as literals so a drift in either the baker or the budget curve trips
+    // this test.
     expect(primaryStatBudget(9, 'rare', 'chest')).toBe(5);
     expect(primaryStatBudget(9, 'uncommon', 'chest')).toBe(3);
+    expect(staminaBaseline(5) - staminaBaseline(3)).toBe(1);
     expect(statSum(record)).toBe(
-      primaryStatBudget(9, 'rare', 'chest') - primaryStatBudget(9, 'uncommon', 'chest'),
+      primaryStatBudget(9, 'rare', 'chest') -
+        primaryStatBudget(9, 'uncommon', 'chest') +
+        (staminaBaseline(5) - staminaBaseline(3)),
     );
     // Distribution stays on the def's own profile keys, nothing else.
     for (const key of Object.keys(record!)) {
@@ -270,10 +283,13 @@ describe('masterworkBonusStats (the baked tier-delta budget)', () => {
   });
 
   it('an absent quality reads as common and bumps to uncommon', () => {
-    // level 10 chest: uncommon budget 4 minus common budget 0, all on str.
+    // level 10 chest: uncommon budget 4 minus common budget 0. A common base has a
+    // zero floor, so it is on the model; the uncommon line it lands on carries a
+    // floor of 1, and the tier delta moves that one point from Strength to
+    // Stamina (item_budget.ts tierDeltaStats, the stamina baseline model).
     expect(
       masterworkBonusStats({ level: 10, quality: undefined, slot: 'chest', stats: { str: 4 } }),
-    ).toEqual({ str: 4 });
+    ).toEqual({ str: 3, sta: 1 });
   });
 
   it('returns null when the tier delta rounds to a zero budget', () => {
@@ -296,7 +312,10 @@ describe('masterworkBonusStats (the baked tier-delta budget)', () => {
 // masterwork's own bumped quality and the item's registered band level
 // (itemSourceLevel: the recipe's own level for a pure crafted output, the
 // strongest source for a dual-source output like boundstone_helm, which also
-// drops in the level-20 dungeon).
+// drops in the level-20 dungeon). Under the stamina baseline model
+// (item_budget.ts) that readout is the LINE; the total a raid piece carries is
+// expectedStatTotal of it for the piece's identity (a caster piece adds its free
+// baseline), and the masterwork total is compared against that, like for like.
 describe('masterwork stays strictly below the raid-loot band (acceptance bound)', () => {
   // The existing raid legendary gained a one-use quest crafting route, not
   // ordinary recipe power. Keep the exception identity-specific: any other
@@ -340,18 +359,28 @@ describe('masterwork stays strictly below the raid-loot band (acceptance bound)'
         const ladder = MASTERWORK_QUALITY_LADDER as readonly string[];
         const idx = ladder.indexOf(def.quality ?? 'common');
         const twoAbove = MASTERWORK_QUALITY_LADDER[Math.min(idx + 2, ladder.length - 1)];
-        bonusSum =
-          primaryStatBudget(recipe.level, twoAbove, def.slot) -
-          primaryStatBudget(recipe.level, def.quality, def.slot);
+        // The same model-aware tier delta the bake uses, walked two rungs: a
+        // caster profile's stamina baseline grows with the line it rides.
+        const profile: Partial<CoreStats> = {};
+        for (const stat of PRIMARY_STATS) {
+          if ((def.stats?.[stat] ?? 0) > 0) profile[stat] = def.stats?.[stat];
+        }
+        const twoStep = tierDeltaStats(
+          profile,
+          primaryStatBudget(recipe.level, def.quality, def.slot),
+          primaryStatBudget(recipe.level, twoAbove, def.slot),
+        );
+        bonusSum = twoStep ? statSum(twoStep) : 0;
       }
     }
     const band = itemSourceLevel(def.id);
     expect(band, `${recipe.id}: crafted output must have a registered source level`).toBeDefined();
-    const floor = primaryStatBudget(
+    const floorLine = primaryStatBudget(
       (band ?? 0) + (QUALITY_ILVL_BONUS[bandQuality] ?? 0) + RAID_ILVL_BONUS,
       bandQuality,
       def.slot,
     );
+    const floor = expectedStatTotal(floorLine, statIdentity(def.stats));
     return { recipeId: recipe.id, itemId: def.id, total: defSum + bonusSum, floor };
   }
 
@@ -411,19 +440,23 @@ describe('masterwork stays strictly below the raid-loot band (acceptance bound)'
 
   it('pins the concrete numbers for a hub rare-def recipe and a common-band recipe (drift tripwires)', () => {
     // Even if no content change ever crosses the bound, these two literal rows
-    // trip on any budget/tuning drift. wardweave_cowl: rare helmet, band 17
-    // since the masterwrought Phase 11o re-level (20 before it), def sum 11
-    // plus the baked epic-minus-rare delta 2 at level 17, against raid floor
-    // primaryStatBudget(17 + 6 + 3, 'epic', 'helmet') = 15 (margin 2).
-    // eastbrook_ritual_vestments: uncommon chest, band 9, def sum
-    // 3 plus delta 2, against primaryStatBudget(9 + 3 + 3, 'rare', 'chest')
-    // = 8 (margin 3).
+    // trip on any budget/tuning drift. Both are caster pieces, so under the
+    // stamina baseline model their def sum carries the free baseline and the
+    // raid floor is the raid line's model total. wardweave_cowl: rare helmet,
+    // band 17 since the masterwrought Phase 11o re-level (20 before it), def
+    // sum 14 (int 7, spi 4, sta 3) plus the baked epic-minus-rare delta 2 at
+    // level 17 (the baseline does not grow across that bump), against raid
+    // floor expectedStatTotal(primaryStatBudget(17 + 6 + 3, 'epic', 'helmet')
+    // = 15, caster) = 20 (margin 4). eastbrook_ritual_vestments: uncommon
+    // chest, band 9, def sum 4 (int 2, spi 1, sta 1) plus delta 3 (line 2,
+    // baseline 1), against expectedStatTotal(primaryStatBudget(9 + 3 + 3,
+    // 'rare', 'chest') = 8, caster) = 11 (margin 4).
     const cowl = boundRow(recipeById('recipe_wardweave_cowl')!, 1);
-    expect(cowl.total).toBe(13);
-    expect(cowl.floor).toBe(15);
+    expect(cowl.total).toBe(16);
+    expect(cowl.floor).toBe(20);
     const vestments = boundRow(recipeById('recipe_eastbrook_ritual_vestments')!, 1);
-    expect(vestments.total).toBe(5);
-    expect(vestments.floor).toBe(8);
+    expect(vestments.total).toBe(7);
+    expect(vestments.floor).toBe(11);
     // A NON-helmet 11o mover, because the helmet is the one slot whose baked
     // epic-minus-rare delta is invariant across the re-level (2 at 20 and at
     // 15). Legs shrink hardest: thoriumscale_leggings, def sum 12, delta 1
@@ -555,8 +588,10 @@ describe('draw-order determinism over a real Sim', () => {
     expect(a.inventory.vestments).toBe(3);
     expect(a.instances).toEqual([
       null,
-      { signer: a.playerName, rolled: { masterwork: true, stats: { int: 1, spi: 1 } } },
-      { signer: a.playerName, rolled: { masterwork: true, stats: { int: 1, spi: 1 } } },
+      // The baked record carries the stamina baseline's growth across the bump
+      // (item_budget.ts, the stamina baseline model) beside the line delta.
+      { signer: a.playerName, rolled: { masterwork: true, stats: { int: 1, spi: 1, sta: 1 } } },
+      { signer: a.playerName, rolled: { masterwork: true, stats: { int: 1, spi: 1, sta: 1 } } },
     ]);
   });
 });

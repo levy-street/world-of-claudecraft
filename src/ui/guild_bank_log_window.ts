@@ -208,7 +208,7 @@ export class GuildBankLogPane {
     tools.className = 'gbank-log-tools';
     const input = document.createElement('input');
     input.type = 'search';
-    input.className = 'bag-search gbank-log-search';
+    input.className = 'bag-search ui-input gbank-log-search';
     input.placeholder = t('hudChrome.bank.logSearchPlaceholder');
     input.setAttribute('aria-label', t('hudChrome.bank.logSearchAria'));
     input.autocomplete = 'off';
@@ -230,7 +230,7 @@ export class GuildBankLogPane {
     for (const filter of filters) {
       const chip = document.createElement('button');
       chip.type = 'button';
-      chip.className = `gbank-log-filter${filter.selected ? ' on' : ''}`;
+      chip.className = `gbank-log-filter ui-chip${filter.selected ? ' on' : ''}`;
       chip.dataset.kind = filter.kind;
       chip.setAttribute('aria-pressed', filter.selected ? 'true' : 'false');
       chip.textContent = t(FILTER_KEY[filter.kind]);
@@ -251,7 +251,7 @@ export class GuildBankLogPane {
     if (footer === 'older') {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'gbank-log-older';
+      btn.className = 'gbank-log-older ui-btn';
       btn.textContent = t('hudChrome.bank.logOlder');
       btn.addEventListener('click', () => this.deps.loadOlder());
       foot.appendChild(btn);

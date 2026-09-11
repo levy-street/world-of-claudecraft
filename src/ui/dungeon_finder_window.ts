@@ -359,8 +359,8 @@ export class DungeonFinderWindow {
 
   private titleHtml(): string {
     return (
-      `<div class="panel-title"><span id="dfinder-title">${esc(t('hudChrome.finder.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.finder.close'))}">${svgIcon('close')}</button></div>`
+      `<div class="panel-title ui-win-head"><span id="dfinder-title" class="ui-win-title">${esc(t('hudChrome.finder.title'))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.finder.close'))}">${svgIcon('close')}</button></div>`
     );
   }
 
@@ -369,7 +369,7 @@ export class DungeonFinderWindow {
     // aria-pressed buttons with no role=tab / aria-selected children and no
     // arrow-key roving focus, and a half-applied tablist reads worse to a screen
     // reader than none. Same reasoning for the catalogue rail below.
-    const tabs = `<div class="df-tabs" role="group" aria-label="${esc(t('hudChrome.finder.title'))}">${(
+    const tabs = `<div class="df-tabs ui-seg" role="group" aria-label="${esc(t('hudChrome.finder.title'))}">${(
       [
         ['catalogue', 'hudChrome.finder.tabCatalogue', 'skull'],
         ['queue', 'hudChrome.finder.tabQueue', 'social'],
@@ -378,7 +378,7 @@ export class DungeonFinderWindow {
     )
       .map(
         ([tab, key, icon]) =>
-          `<button type="button" class="df-tab${view.tab === tab ? ' active' : ''}" data-tab="${tab}" aria-pressed="${view.tab === tab ? 'true' : 'false'}">${svgIcon(icon)}${esc(t(key))}</button>`,
+          `<button type="button" class="df-tab ui-seg-tab${view.tab === tab ? ' active is-on' : ''}" data-tab="${tab}" aria-pressed="${view.tab === tab ? 'true' : 'false'}">${svgIcon(icon)}${esc(t(key))}</button>`,
       )
       .join('')}</div>`;
     const proposal = view.queue.proposal ? this.proposalHtml(view.queue) : '';
@@ -397,7 +397,7 @@ export class DungeonFinderWindow {
     rows: FinderActivityRowView[],
     detail: FinderActivityDetailView | null,
   ): string {
-    const rail = `<div class="df-rail" role="group" aria-label="${esc(
+    const rail = `<div class="df-rail ui-panel-soft" role="group" aria-label="${esc(
       t('hudChrome.finder.tabCatalogue'),
     )}">${rows.map((r) => this.rowHtml(r)).join('')}</div>`;
     const detailHtml = `<div class="df-detail">${detail ? this.detailHtml(detail) : ''}</div>`;
@@ -413,7 +413,7 @@ export class DungeonFinderWindow {
         : '';
     const blocked = r.blocked ? `<span class="df-blocked">${esc(this.blockedLabel(r))}</span>` : '';
     return (
-      `<button type="button" class="df-row${r.selected ? ' active' : ''}${r.eligible ? '' : ' ineligible'}" data-row="${esc(r.id)}" aria-pressed="${r.selected ? 'true' : 'false'}">` +
+      `<button type="button" class="df-row ui-card${r.selected ? ' active' : ''}${r.eligible ? '' : ' ineligible'}" data-row="${esc(r.id)}" aria-pressed="${r.selected ? 'true' : 'false'}">` +
       `<img class="df-row-icon" src="${esc(r.portraitUrl)}" width="30" height="30" loading="lazy" decoding="async" alt="">` +
       `<span class="df-row-text"><span class="df-row-name">${esc(name)} ${badge}</span>` +
       `<span class="df-row-meta">${esc(this.levelsLabel(r.minLevel, r.maxLevel))} · ${esc(
@@ -424,7 +424,7 @@ export class DungeonFinderWindow {
 
   private detailHtml(d: FinderActivityDetailView): string {
     const name = dungeonDisplayName(d.dungeonId);
-    const back = `<button type="button" class="btn df-back" data-back>${esc(t('hudChrome.finder.back'))}</button>`;
+    const back = `<button type="button" class="btn df-back ui-btn" data-back>${esc(t('hudChrome.finder.back'))}</button>`;
     const finalEnc = d.encounters.find((e) => e.final) ?? d.encounters[d.encounters.length - 1];
     const headIcon = finalEnc
       ? `<img class="df-detail-icon" src="${esc(finalEnc.portraitUrl)}" width="40" height="40" loading="lazy" decoding="async" alt="">`
@@ -463,7 +463,7 @@ export class DungeonFinderWindow {
         ? `<div class="df-meta-row">${esc(t('hudChrome.finder.heroicMarks', { count: num(d.heroicMarks) }))}</div>`
         : '';
     const meta =
-      `<div class="df-meta">` +
+      `<div class="df-meta ui-card">` +
       `<div class="df-meta-row">${esc(this.levelsLabel(d.minLevel, d.maxLevel))} · ${esc(
         tPlural('hudChrome.plurals.finderPartySize', d.size, { count: num(d.size) }),
       )}</div>` +
@@ -473,7 +473,7 @@ export class DungeonFinderWindow {
       marks +
       `<div class="df-meta-row df-entrance">${esc(
         t('hudChrome.finder.entrance', { zone: zoneDisplayName(d.entrance.zoneId) }),
-      )} <button type="button" class="btn df-map-btn" data-showmap>${esc(t('hudChrome.finder.showOnMap'))}</button></div>` +
+      )} <button type="button" class="btn df-map-btn ui-btn" data-showmap>${esc(t('hudChrome.finder.showOnMap'))}</button></div>` +
       `</div>`;
     const encounters =
       `<div class="df-sub">${esc(t('hudChrome.finder.encounters'))}</div>` +
@@ -488,14 +488,14 @@ export class DungeonFinderWindow {
       e.summoned ? t('hudChrome.finder.summoned') : null,
     ]
       .filter((f): f is string => f !== null)
-      .map((f) => `<span class="df-flag">${esc(f)}</span>`)
+      .map((f) => `<span class="df-flag ui-chip">${esc(f)}</span>`)
       .join('');
     const mechanics =
       e.mechanics.length > 0
         ? `<div class="df-mechanics">${e.mechanics
             .map(
               (m) =>
-                `<span class="df-chip">${esc(t(`hudChrome.finder.mech.${m}` as TranslationKey))}</span>`,
+                `<span class="df-chip ui-chip">${esc(t(`hudChrome.finder.mech.${m}` as TranslationKey))}</span>`,
             )
             .join('')}</div>`
         : '';
@@ -519,9 +519,11 @@ export class DungeonFinderWindow {
         : '',
     ].join('');
     const money =
-      e.copper > 0 ? `<div class="df-loot-money">${this.deps.moneyHtml(e.copper)}</div>` : '';
+      e.copper > 0
+        ? `<div class="df-loot-money ui-money">${this.deps.moneyHtml(e.copper)}</div>`
+        : '';
     return (
-      `<div class="df-encounter">` +
+      `<div class="df-encounter ui-card">` +
       `<img class="df-portrait" src="${esc(e.portraitUrl)}" width="64" height="64" loading="lazy" decoding="async" alt="">` +
       `<div class="df-encounter-body"><div class="df-encounter-name">${esc(name)}${flags}</div>` +
       mechanics +
@@ -561,11 +563,11 @@ export class DungeonFinderWindow {
     const answer =
       p.myResponse === 'pending'
         ? `<div class="df-proposal-actions">` +
-          `<button type="button" class="btn df-accept" data-act="accept">${esc(t('hudChrome.finder.accept'))}</button>` +
-          `<button type="button" class="btn df-decline" data-act="decline">${esc(t('hudChrome.finder.decline'))}</button></div>`
+          `<button type="button" class="btn df-accept ui-btn ui-btn--red" data-act="accept">${esc(t('hudChrome.finder.accept'))}</button>` +
+          `<button type="button" class="btn df-decline ui-btn" data-act="decline">${esc(t('hudChrome.finder.decline'))}</button></div>`
         : `<div class="df-note">${esc(t('hudChrome.finder.acceptedWait'))}</div>`;
     return (
-      `<div class="df-proposal" role="alert">` +
+      `<div class="df-proposal ui-panel" role="alert">` +
       `<div class="df-proposal-title">${esc(t('hudChrome.finder.proposalTitle', { name }))} ${this.difficultyBadge(p.difficulty)}</div>` +
       `<div class="df-proposal-meta">${this.roleIcon(p.role)}${esc(t('hudChrome.finder.proposalRole', { role: this.roleLabel(p.role) }))}` +
       ` · <span data-df-clock="accepted"></span> · <span data-df-clock="remaining"></span></div>` +
@@ -583,7 +585,7 @@ export class DungeonFinderWindow {
       q.roles
         .map(
           (r) =>
-            `<button type="button" class="df-role${r.selected ? ' active' : ''}" data-role="${r.role}" aria-pressed="${r.selected ? 'true' : 'false'}"${r.eligible ? '' : ' disabled'}>${this.roleIcon(r.role)}${esc(this.roleLabel(r.role))}</button>`,
+            `<button type="button" class="df-role ui-chip${r.selected ? ' active' : ''}" data-role="${r.role}" aria-pressed="${r.selected ? 'true' : 'false'}"${r.eligible ? '' : ' disabled'}>${this.roleIcon(r.role)}${esc(this.roleLabel(r.role))}</button>`,
         )
         .join('') +
       `</div>`;
@@ -597,16 +599,16 @@ export class DungeonFinderWindow {
         .map((o) => {
           const name = dungeonDisplayName(o.dungeonId);
           const disabled = !o.eligible || q.queued;
-          return `<button type="button" class="df-opt${o.checked ? ' active' : ''}" data-opt="${esc(o.id)}" role="checkbox" aria-checked="${o.checked ? 'true' : 'false'}"${disabled ? ' disabled' : ''}>${esc(name)} ${this.difficultyBadge(o.difficulty)}</button>`;
+          return `<button type="button" class="df-opt ui-card${o.checked ? ' active' : ''}" data-opt="${esc(o.id)}" role="checkbox" aria-checked="${o.checked ? 'true' : 'false'}"${disabled ? ' disabled' : ''}>${esc(name)} ${this.difficultyBadge(o.difficulty)}</button>`;
         })
         .join('') +
       `</div>`;
     const status = q.queued
       ? `<div class="df-queue-status">${svgIcon('social')} <span data-df-clock="waited"></span></div>` +
-        `<button type="button" class="btn leave" data-act="leavequeue">${esc(t('hudChrome.finder.leaveQueue'))}</button>`
+        `<button type="button" class="btn leave ui-btn ui-btn--red" data-act="leavequeue">${esc(t('hudChrome.finder.leaveQueue'))}</button>`
       : q.onCooldown
         ? `<div class="df-note df-warn" data-df-clock="cooldown"></div>`
-        : `<button type="button" class="btn df-join" data-act="join"${q.canQueue ? '' : ' disabled'}>${esc(t('hudChrome.finder.joinQueue'))}</button>`;
+        : `<button type="button" class="btn df-join ui-btn ui-btn--red" data-act="join"${q.canQueue ? '' : ' disabled'}>${esc(t('hudChrome.finder.joinQueue'))}</button>`;
     const travel = `<div class="df-note">${esc(t('hudChrome.finder.travelNote'))}</div>`;
     return `${roles}${leaderNote}${options}<div class="df-footer">${status}</div>${travel}`;
   }
@@ -638,21 +640,21 @@ export class DungeonFinderWindow {
     const options = b.createOptions
       .map(
         (o) =>
-          `<button type="button" class="df-opt df-createopt${o.id === selected ? ' active' : ''}" data-createopt="${esc(o.id)}" role="radio" aria-checked="${o.id === selected ? 'true' : 'false'}">${esc(dungeonDisplayName(o.dungeonId))} ${this.difficultyBadge(o.difficulty)}</button>`,
+          `<button type="button" class="df-opt df-createopt ui-card${o.id === selected ? ' active' : ''}" data-createopt="${esc(o.id)}" role="radio" aria-checked="${o.id === selected ? 'true' : 'false'}">${esc(dungeonDisplayName(o.dungeonId))} ${this.difficultyBadge(o.difficulty)}</button>`,
       )
       .join('');
     const tags = b.tags
       .map(
         (tag) =>
-          `<button type="button" class="df-chip df-tag${this.stagedTags.has(tag) ? ' active' : ''}" data-tag="${tag}" role="checkbox" aria-checked="${this.stagedTags.has(tag) ? 'true' : 'false'}">${esc(this.tagLabel(tag))}</button>`,
+          `<button type="button" class="df-chip df-tag ui-chip${this.stagedTags.has(tag) ? ' active is-on' : ''}" data-tag="${tag}" role="checkbox" aria-checked="${this.stagedTags.has(tag) ? 'true' : 'false'}">${esc(this.tagLabel(tag))}</button>`,
       )
       .join('');
     return (
-      `<div class="df-create"><div class="df-sub">${esc(t('hudChrome.finder.publishListing'))}</div>` +
+      `<div class="df-create ui-card"><div class="df-sub">${esc(t('hudChrome.finder.publishListing'))}</div>` +
       `<div class="df-sub">${esc(t('hudChrome.finder.activity'))}</div>` +
       `<div class="df-options" role="radiogroup">${options}</div>` +
       `<div class="df-create-tags">${tags}</div>` +
-      `<button type="button" class="btn df-create-btn" data-act="create">${esc(t('hudChrome.finder.publish'))}</button></div>`
+      `<button type="button" class="btn df-create-btn ui-btn ui-btn--red" data-act="create">${esc(t('hudChrome.finder.publish'))}</button></div>`
     );
   }
 
@@ -664,10 +666,10 @@ export class DungeonFinderWindow {
         ? mine.applicants.map((a) => this.applicantHtml(a)).join('')
         : `<div class="df-note">${esc(t('hudChrome.finder.noApplicants'))}</div>`;
     return (
-      `<div class="df-mine"><div class="df-sub">${esc(t('hudChrome.finder.yourListing'))}</div>` +
-      `<div class="df-mine-tags">${mine.tags.map((tag) => `<span class="df-chip">${esc(this.tagLabel(tag))}</span>`).join('')}</div>` +
+      `<div class="df-mine ui-card"><div class="df-sub">${esc(t('hudChrome.finder.yourListing'))}</div>` +
+      `<div class="df-mine-tags">${mine.tags.map((tag) => `<span class="df-chip ui-chip">${esc(this.tagLabel(tag))}</span>`).join('')}</div>` +
       `<div class="df-sub">${esc(t('hudChrome.finder.applicants'))}</div>${applicants}` +
-      `<button type="button" class="btn leave" data-act="closelisting">${esc(t('hudChrome.finder.closeListing'))}</button></div>`
+      `<button type="button" class="btn leave ui-btn ui-btn--red" data-act="closelisting">${esc(t('hudChrome.finder.closeListing'))}</button></div>`
     );
   }
 
@@ -682,8 +684,8 @@ export class DungeonFinderWindow {
         }),
       )} · ${roles}</span>` +
       `<span class="df-app-actions">` +
-      `<button type="button" class="btn df-accept" data-appacc="${a.pid}" aria-label="${esc(t('hudChrome.finder.acceptApplicantAria', { name: a.name }))}">${esc(t('hudChrome.finder.accept'))}</button>` +
-      `<button type="button" class="btn df-decline" data-appdec="${a.pid}" aria-label="${esc(t('hudChrome.finder.declineApplicantAria', { name: a.name }))}">${esc(t('hudChrome.finder.decline'))}</button>` +
+      `<button type="button" class="btn df-accept ui-btn ui-btn--red" data-appacc="${a.pid}" aria-label="${esc(t('hudChrome.finder.acceptApplicantAria', { name: a.name }))}">${esc(t('hudChrome.finder.accept'))}</button>` +
+      `<button type="button" class="btn df-decline ui-btn" data-appdec="${a.pid}" aria-label="${esc(t('hudChrome.finder.declineApplicantAria', { name: a.name }))}">${esc(t('hudChrome.finder.decline'))}</button>` +
       `</span></div>`
     );
   }
@@ -719,15 +721,15 @@ export class DungeonFinderWindow {
       )
       .join('');
     const tags = l.tags
-      .map((tag) => `<span class="df-chip">${esc(this.tagLabel(tag))}</span>`)
+      .map((tag) => `<span class="df-chip ui-chip">${esc(this.tagLabel(tag))}</span>`)
       .join('');
     const action = l.mine
-      ? `<span class="df-chip">${esc(t('hudChrome.finder.yourListing'))}</span>`
+      ? `<span class="df-chip ui-chip">${esc(t('hudChrome.finder.yourListing'))}</span>`
       : l.applied
-        ? `<button type="button" class="btn leave" data-act="withdraw">${esc(t('hudChrome.finder.withdraw'))}</button>`
-        : `<button type="button" class="btn df-apply" data-apply="${l.id}"${l.canApply ? '' : ' disabled'}>${esc(t('hudChrome.finder.apply'))}</button>`;
+        ? `<button type="button" class="btn leave ui-btn ui-btn--red" data-act="withdraw">${esc(t('hudChrome.finder.withdraw'))}</button>`
+        : `<button type="button" class="btn df-apply ui-btn ui-btn--red" data-apply="${l.id}"${l.canApply ? '' : ' disabled'}>${esc(t('hudChrome.finder.apply'))}</button>`;
     return (
-      `<div class="df-listing"><div class="df-listing-head"><span class="df-listing-name">${esc(name)} ${this.difficultyBadge(l.difficulty)}</span>` +
+      `<div class="df-listing ui-card"><div class="df-listing-head"><span class="df-listing-name">${esc(name)} ${this.difficultyBadge(l.difficulty)}</span>` +
       `<span class="df-listing-size">${esc(
         t('hudChrome.finder.slots', { size: num(l.size), capacity: num(l.capacity) }),
       )}</span></div>` +
@@ -741,7 +743,7 @@ export class DungeonFinderWindow {
   // --- shared label helpers -----------------------------------------------------
 
   private difficultyBadge(d: DungeonDifficulty): string {
-    return `<span class="df-badge${d === 'heroic' ? ' heroic' : ''}">${esc(this.difficultyLabel(d))}</span>`;
+    return `<span class="df-badge ui-chip${d === 'heroic' ? ' heroic' : ''}">${esc(this.difficultyLabel(d))}</span>`;
   }
 
   private difficultyLabel(d: DungeonDifficulty): string {

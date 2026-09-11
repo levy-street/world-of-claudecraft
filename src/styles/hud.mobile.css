@@ -28,8 +28,18 @@
      below always resolves to none in the browser and this token's `8px` is the
      translucent-panel look on a device that would otherwise pay the blur cost. */
   body.mobile-touch {
-    --mobile-glass-bg: linear-gradient(160deg, #201d13b8, #0b0a08c7);
-    --mobile-glass-border: #cba43d8c;
+    /* The glass chrome's two ground stops and its gold edge. Every rule below
+       composes its own translucency from these with color-mix, so an alpha
+       variant never reintroduces a literal. */
+    --color-mobile-glass-hi: #201d13;
+    --color-mobile-glass-lo: #0b0a08;
+    --color-mobile-glass-edge: #cba43d;
+    --mobile-glass-bg: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--color-mobile-glass-hi) 72%, transparent),
+      color-mix(in srgb, var(--color-mobile-glass-lo) 78%, transparent)
+    );
+    --mobile-glass-border: color-mix(in srgb, var(--color-mobile-glass-edge) 55%, transparent);
     --mobile-glass-blur: 8px;
     /* Mobile chrome-scale: shrink the persistent HUD chrome (unit frames, minimap,
        cast/swing bars, buff/debuff, party, the thumb clusters) to 0.85x so more of
@@ -39,6 +49,109 @@
        floor is never scaled: where 0.85x would dip a control under 40px, the calc is
        clamped with max()/clamp() so the effective size holds at 40px. */
     --mobile-chrome-scale: 0.85;
+    /* The stock unit-frame factor on top of the chrome scale, portrait and
+       landscape (the orientation the touch HUD actually plays in). Review round
+       3 raised both a step: the frames read too small at the board factors. */
+    --mobile-unit-frame-scale: 0.92;
+    --mobile-unit-frame-scale-landscape: 0.7;
+
+    /* W13 additions (mobile touch HUD). Every mobile-only value the touch rules
+       need is declared here, so no rule in this sheet carries a raw color and an
+       alpha variant is a color-mix on one of these stops. */
+    /* The cool ground stops every round touch button shares (ring buttons, radial
+       petals, strip items, bar-editor cells, the Quick Actions seat). */
+    --color-mobile-btn-hi: #2d3048;
+    --color-mobile-btn-lo: #11121e;
+    /* The warm ground stops a release-to-cancel target uses so it reads apart. */
+    --color-mobile-cancel-hi: #3a2430;
+    --color-mobile-cancel-lo: #16101a;
+    /* Round touch button faces at the translucencies the tiers ship. */
+    --mobile-btn-fill: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-mobile-btn-hi) 85%, transparent),
+      color-mix(in srgb, var(--color-mobile-btn-lo) 85%, transparent) 72%
+    );
+    --mobile-btn-fill-strong: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-mobile-btn-hi) 91%, transparent),
+      color-mix(in srgb, var(--color-mobile-btn-lo) 91%, transparent) 72%
+    );
+    --mobile-btn-fill-editor: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-mobile-btn-hi) 88%, transparent),
+      color-mix(in srgb, var(--color-mobile-btn-lo) 88%, transparent) 72%
+    );
+    --mobile-btn-fill-glass: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-mobile-btn-hi) 75%, transparent),
+      color-mix(in srgb, var(--color-mobile-btn-lo) 76%, transparent) 72%
+    );
+    --mobile-cancel-fill: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-mobile-cancel-hi) 91%, transparent),
+      color-mix(in srgb, var(--color-mobile-cancel-lo) 91%, transparent) 72%
+    );
+    /* Cool ink for an ability face, warm ink and rim for a control seat. */
+    --color-mobile-btn-ink: #eee8ff;
+    --color-mobile-btn-warm: #ffdf9c;
+    --color-mobile-btn-warm-rim: #8b4e2c;
+    --color-mobile-btn-caption: #d8b98a;
+    --color-mobile-seat-caption: #bfb28a;
+    /* The shared top glint and drop lift every round touch button carries. */
+    --mobile-btn-edge: inset 0 1px 0 color-mix(in srgb, var(--color-white) 8%, transparent);
+    --mobile-btn-shadow: 0 2px 8px color-mix(in srgb, var(--color-keyline) 60%, transparent);
+    /* The local band that dims the world under an open strip or radial: one
+       stop, two translucencies, never a full-screen scrim. */
+    --color-mobile-dim-band: #05050c;
+    --mobile-dim-band-near: color-mix(in srgb, var(--color-mobile-dim-band) 69%, transparent);
+    --mobile-dim-band-far: color-mix(in srgb, var(--color-mobile-dim-band) 50%, transparent);
+    /* The movement wheel's rim, ground stops, knob and engaged halo. */
+    --color-mobile-joy-rim: #b7a35a;
+    --color-mobile-joy-hi: #1b1b29;
+    --color-mobile-joy-mid: #0b0b12;
+    --color-mobile-joy-lo: #050508;
+    --color-mobile-joy-knob-rim: #e3d475;
+    --color-mobile-joy-knob-hi: #867ab6;
+    --color-mobile-joy-knob-lo: #1d1d2b;
+    --color-mobile-joy-glow: #e3c66a;
+    --color-mobile-joy-label: #c8b888;
+    --mobile-joy-shadow:
+      0 3px 18px color-mix(in srgb, var(--color-keyline) 53%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 7%, transparent),
+      inset 0 0 26px color-mix(in srgb, var(--color-keyline) 53%, transparent);
+    /* The autorun lock target's face and its two ink states. */
+    --color-mobile-autorun-hi: #57451c;
+    --color-mobile-autorun-lo: #161108;
+    --color-mobile-autorun-ink: #f6e7ad;
+    --color-mobile-autorun-ink-locked: #fff7c7;
+    --color-mobile-autorun-rim: #d8c46b;
+    /* Socket species that sit under the 40x40 coarse-pointer floor on desktop are
+       re-pinned to it here. The TOKEN moves, not the class, so each socket's art,
+       key chip and count all scale with the cell instead of overflowing it.
+       W1 companion: pet commands are 36px on desktop.
+       The bank/vault cell is 32px on desktop, and the library socket recipe now
+       outranks the older .bag-socket 40px rule, so it needs the same re-pin. */
+    --socket-size-pet: 40px;
+    --socket-size-bank: 40px;
+    /* The lift the bottom-centre column applies BEFORE cross_hotbar_wiring's
+       measured --xhb-lift lands (one rAF after the bar turns on). Derived from
+       the cross-hotbar cell (W14 grew it from 40px to --socket-size) plus that
+       wiring's own LIFT_GAP_PX, so the guess tracks the bar it has to clear. */
+    --mobile-xhb-lift-fallback: calc(var(--socket-size) + 10px);
+    /* The landscape wheel keeps a lighter rim than the portrait one. */
+    --color-mobile-joy-rim-landscape: #d2bd6a;
+    /* The preflight and chat-peek chrome's warmer gold edge. */
+    --color-mobile-chrome-edge: #c9a84d;
+    /* Cooldown and charge numerals carry their own halo so the numeral stays
+       legible on any icon; identical on every tier and preset. */
+    --mobile-cdtext-shadow:
+      0 0 4px var(--color-keyline), 1px 1px 1px var(--color-keyline),
+      -1px -1px 1px var(--color-keyline), 1px -1px 1px var(--color-keyline),
+      -1px 1px 1px var(--color-keyline);
+    --mobile-count-outline:
+      -1px -1px 0 var(--color-keyline), 1px -1px 0 var(--color-keyline),
+      -1px 1px 0 var(--color-keyline), 1px 1px 0 var(--color-keyline),
+      0 0 3px var(--color-keyline);
   }
   /* ---------- mobile touch controls (runtime-gated with body.mobile-touch + game-active) ---------- */
   #mobile-controls {
@@ -215,12 +328,14 @@
     border-radius: 50%;
     pointer-events: auto;
     touch-action: none;
-    border: 2px solid #b7a35a80;
-    background: radial-gradient(circle at 50% 50%, #1b1b2960 0%, #0b0b1280 62%, #0505089a 100%);
-    box-shadow:
-      0 3px 18px #0008,
-      inset 0 1px 0 #ffffff12,
-      inset 0 0 26px #0008;
+    border: 2px solid color-mix(in srgb, var(--color-mobile-joy-rim) 50%, transparent);
+    background: radial-gradient(
+      circle at 50% 50%,
+      color-mix(in srgb, var(--color-mobile-joy-hi) 38%, transparent) 0%,
+      color-mix(in srgb, var(--color-mobile-joy-mid) 50%, transparent) 62%,
+      color-mix(in srgb, var(--color-mobile-joy-lo) 60%, transparent) 100%
+    );
+    box-shadow: var(--mobile-joy-shadow);
     opacity: 0.4;
     transition: opacity 0.18s ease;
     /* Joystick Size setting: grow/shrink from the anchored bottom corner so the
@@ -242,7 +357,7 @@
     position: absolute;
     inset: 32px;
     border-radius: 50%;
-    border: 1px solid #ffffff18;
+    border: 1px solid color-mix(in srgb, var(--color-white) 9%, transparent);
   }
   /* Floating move joystick: a lower-left capture zone lets the thumb land
      anywhere; the joystick rests dimmed at home until touched, then springs to
@@ -308,10 +423,9 @@
   body.mobile-touch #mobile-move-joystick.active {
     border-color: var(--gold);
     box-shadow:
-      0 3px 18px #0008,
-      inset 0 1px 0 #ffffff12,
-      inset 0 0 26px #0008,
-      0 0 16px 3px #e3c66a55;
+      var(--mobile-joy-shadow),
+      0 0 calc(16px * var(--fx-shadow, 1)) 3px
+      color-mix(in srgb, var(--color-mobile-joy-glow) 33%, transparent);
   }
   body.mobile-touch #mobile-autorun-target {
     position: absolute;
@@ -319,14 +433,18 @@
     top: -104px;
     width: 48px;
     height: 48px;
-    border: 2px solid #b7a35a00;
+    border: 2px solid transparent;
     border-radius: 50%;
-    color: #f6e7ad;
-    background: radial-gradient(circle at 35% 30%, #57451ccf, #161108e8 72%);
+    color: var(--color-mobile-autorun-ink);
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-mobile-autorun-hi) 81%, transparent),
+      color-mix(in srgb, var(--color-mobile-autorun-lo) 91%, transparent) 72%
+    );
     box-shadow:
-      0 0 0 1px #0009,
-      inset 0 1px 0 #ffffff20,
-      0 0 16px #0008;
+      0 0 0 1px color-mix(in srgb, var(--color-keyline) 60%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 13%, transparent),
+      0 0 calc(16px * var(--fx-shadow, 1)) color-mix(in srgb, var(--color-keyline) 53%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -347,18 +465,19 @@
   body.mobile-touch #mobile-autorun-target.locked {
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
-    border-color: #d8c46bb8;
+    border-color: color-mix(in srgb, var(--color-mobile-autorun-rim) 72%, transparent);
   }
   body.mobile-touch #mobile-autorun-target.locked {
     top: 50%;
     z-index: 1;
     transform: translate(-50%, -50%) scale(1);
-    color: #fff7c7;
+    color: var(--color-mobile-autorun-ink-locked);
     border-color: var(--gold);
     box-shadow:
-      0 0 0 1px #0009,
-      inset 0 1px 0 #ffffff24,
-      0 0 18px #e3c66a99;
+      0 0 0 1px color-mix(in srgb, var(--color-keyline) 60%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 14%, transparent),
+      0 0 calc(18px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-mobile-joy-glow) 60%, transparent);
   }
   @media (prefers-reduced-motion: reduce) {
     body.mobile-touch #mobile-autorun-target {
@@ -387,24 +506,19 @@
   }
   @keyframes mobile-recenter-pulse {
     0% {
-      box-shadow:
-        0 3px 18px #0008,
-        inset 0 1px 0 #ffffff12,
-        inset 0 0 26px #0008;
-      border-color: #b7a35a80;
+      box-shadow: var(--mobile-joy-shadow);
+      border-color: color-mix(in srgb, var(--color-mobile-joy-rim) 50%, transparent);
     }
     45% {
       box-shadow:
-        0 0 22px 4px #e3d47588,
-        inset 0 0 26px #0008;
-      border-color: #e3d475e0;
+        0 0 calc(22px * var(--fx-shadow, 1)) 4px
+        color-mix(in srgb, var(--color-mobile-joy-knob-rim) 53%, transparent),
+        inset 0 0 26px color-mix(in srgb, var(--color-keyline) 53%, transparent);
+      border-color: color-mix(in srgb, var(--color-mobile-joy-knob-rim) 88%, transparent);
     }
     100% {
-      box-shadow:
-        0 3px 18px #0008,
-        inset 0 1px 0 #ffffff12,
-        inset 0 0 26px #0008;
-      border-color: #b7a35a80;
+      box-shadow: var(--mobile-joy-shadow);
+      border-color: color-mix(in srgb, var(--color-mobile-joy-rim) 50%, transparent);
     }
   }
   body.mobile-touch .mobile-stick {
@@ -415,11 +529,15 @@
     height: 62px;
     margin: -31px 0 0 -31px;
     border-radius: 50%;
-    border: 2px solid #e3d475b8;
-    background: radial-gradient(circle at 35% 30%, #867ab6aa, #1d1d2b9a 70%);
+    border: 2px solid color-mix(in srgb, var(--color-mobile-joy-knob-rim) 72%, transparent);
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-mobile-joy-knob-hi) 67%, transparent),
+      color-mix(in srgb, var(--color-mobile-joy-knob-lo) 60%, transparent) 70%
+    );
     box-shadow:
-      0 2px 10px #0009,
-      inset 0 1px 0 #ffffff1c;
+      0 2px 10px color-mix(in srgb, var(--color-keyline) 60%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 11%, transparent);
     transition: transform 0.06s linear;
   }
   body.mobile-touch .mobile-joy-label {
@@ -429,8 +547,8 @@
     bottom: -18px;
     text-align: center;
     font-size: 9px;
-    color: #c8b888;
-    text-shadow: 1px 1px 2px #000;
+    color: var(--color-mobile-joy-label);
+    text-shadow: var(--title-shadow);
   }
   /* The menu control's seat. The five-button row it replaces sat alone at
      TOP-LEFT, 365 to 443px from the nearer thumb: the least reachable chrome in
@@ -485,19 +603,17 @@
   body.mobile-touch .mobile-btn {
     width: 58px;
     height: 54px;
-    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border: 1px solid var(--mobile-glass-border);
     border-radius: 50%;
-    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    background: var(--mobile-glass-bg);
     -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
     backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    color: #eee8ff;
+    color: var(--color-mobile-btn-ink);
     cursor: var(--cursor-point);
     font-size: 22px;
     font-weight: bold;
-    text-shadow: 1px 1px 2px #000;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    text-shadow: var(--title-shadow);
+    box-shadow: var(--mobile-btn-edge), var(--mobile-btn-shadow);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -524,11 +640,11 @@
   body.mobile-touch .mobile-btn:active {
     transform: translateY(1px);
     border-color: var(--gold);
-    color: #fff;
+    color: var(--color-white);
   }
   body.mobile-touch .mobile-btn.is-on {
     border-color: var(--gold);
-    color: #fff;
+    color: var(--color-white);
   }
   body.mobile-touch .mobile-btn:not(.is-on)#mobile-haptics {
     opacity: 0.55;
@@ -538,7 +654,7 @@
     margin-top: 1px;
     font-size: 8px;
     font-family: var(--ui-font);
-    color: #bfb28a;
+    color: var(--color-mobile-seat-caption);
   }
 
   /* ---------- mobile window backdrop ---------- */
@@ -563,7 +679,7 @@
     position: fixed;
     inset: 0;
     z-index: 85;
-    background: rgba(3, 4, 7, 0.55);
+    background: color-mix(in srgb, var(--color-touch-scrim) 55%, transparent);
     pointer-events: auto;
   }
 
@@ -699,14 +815,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #2d3048d8, #11121ed8 72%);
-    color: #eee8ff;
+    background: var(--mobile-btn-fill);
+    color: var(--color-mobile-btn-ink);
     cursor: var(--cursor-point);
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    box-shadow: var(--mobile-btn-edge), var(--mobile-btn-shadow);
   }
   /* Primary attack toggle: bottom-right anchor of the cluster, largest button. */
   body.mobile-touch #mobile-action-attack {
@@ -714,8 +828,8 @@
     bottom: 0;
     width: var(--mobile-ring-attack-size);
     height: var(--mobile-ring-attack-size);
-    color: #ffdf9c;
-    border-color: #8b4e2c;
+    color: var(--color-mobile-btn-warm);
+    border-color: var(--color-mobile-btn-warm-rim);
   }
   /* The 5 paged action buttons: one clean quarter-circle crescent left-and-up
      of the attack button (pure CSS positioning, no JS layout). Each button's
@@ -872,14 +986,14 @@
   body.mobile-touch #mobile-action-ring #mobile-jump {
     width: var(--mobile-ring-secondary-size);
     height: var(--mobile-ring-secondary-size);
-    color: #ffdf9c;
-    border-color: #8b4e2c;
+    color: var(--color-mobile-btn-warm);
+    border-color: var(--color-mobile-btn-warm-rim);
   }
   body.mobile-touch #mobile-target-cycle:active,
   body.mobile-touch #mobile-action-ring #mobile-interact:active,
   body.mobile-touch #mobile-action-ring #mobile-jump:active {
     border-color: var(--gold);
-    color: #fff;
+    color: var(--color-white);
   }
   body.mobile-touch #mobile-target-cycle .ui-icon,
   body.mobile-touch #mobile-action-ring #mobile-interact .ui-icon,
@@ -894,7 +1008,7 @@
     margin-top: 1px;
     font-size: 8px;
     font-family: var(--ui-font);
-    color: #d8b98a;
+    color: var(--color-mobile-btn-caption);
   }
   /* Page-cycle toggle: the gold swap badge at the hollow trio's 90deg seat
      (due up over the attack centre on the --mobile-ring-hollow circle, to the
@@ -915,8 +1029,8 @@
     width: var(--mobile-ring-toggle-size);
     height: var(--mobile-ring-toggle-size);
     font-family: var(--ui-font);
-    color: #ffdf9c;
-    border-color: #8b4e2c;
+    color: var(--color-mobile-btn-warm);
+    border-color: var(--color-mobile-btn-warm-rim);
     /* The face text is a localized template (hudChrome.mobile.actionPageIndicator),
        and the English value is a bare digit but a locale is free to translate it
        into a real word (issue #2975: ja_JP appends "ページ"). Without a clip, a
@@ -928,7 +1042,7 @@
     font-size: 20px;
     font-weight: bold;
     line-height: 1;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
     /* Keep the page number readable first (see the ordering note above) and
        clip anything a locale appends after it to one line instead of wrapping
        into the circular badge's clipped overflow. */
@@ -942,11 +1056,11 @@
     width: 15px;
     height: 15px;
     margin-top: 2px;
-    color: #d8b98a;
+    color: var(--color-mobile-btn-caption);
   }
   body.mobile-touch #mobile-action-page-toggle:active {
     border-color: var(--gold);
-    color: #fff;
+    color: var(--color-white);
   }
   /* Cooldown sweep + used-flash + state dimming reuse the SAME classes/structure
      as .action-btn (cd-overlay conic-gradient clock wipe, .empty/.unusable/.oor/.queued),
@@ -968,7 +1082,7 @@
   body.mobile-touch #mobile-action-attack .ui-icon {
     width: 44%;
     height: 44%;
-    color: #ffdf9c;
+    color: var(--color-mobile-btn-warm);
   }
   /* Vale Cup remaps the fixed primary seat to the first sport move. The shared
      action-bar painter marks that state as an ability, so the painted move can
@@ -984,7 +1098,7 @@
        away clockwise. Circular to match the round ring button. */
     background: conic-gradient(
       transparent 0 calc(100% - var(--cd-fill, 0%)),
-      #000a calc(100% - var(--cd-fill, 0%))
+      color-mix(in srgb, var(--color-keyline) 67%, transparent) calc(100% - var(--cd-fill, 0%))
     );
     border-radius: 50%;
     pointer-events: none;
@@ -1006,12 +1120,7 @@
     font-size: 15px;
     font-weight: bold;
     /* Legible outline on any icon (issue 1660), matching the desktop cdtext. */
-    text-shadow:
-      0 0 4px #000,
-      1px 1px 1px #000,
-      -1px -1px 1px #000,
-      1px -1px 1px #000,
-      -1px 1px 1px #000;
+    text-shadow: var(--mobile-cdtext-shadow);
     pointer-events: none;
   }
   body.mobile-touch #mobile-action-ring button .item-count {
@@ -1020,7 +1129,7 @@
     bottom: 2px;
     font-size: 11px;
     font-weight: bold;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
     pointer-events: none;
   }
   /* The recharge veil (charge-pool abilities): the faint bottom-up curtain,
@@ -1031,7 +1140,7 @@
     right: 0;
     bottom: 0;
     height: 0;
-    background: #0008;
+    background: color-mix(in srgb, var(--color-keyline) 53%, transparent);
     pointer-events: none;
   }
   /* Charge counts read as charges (gold, outlined, no plate), mirroring the
@@ -1041,12 +1150,7 @@
     bottom: 2px;
     font-size: 13px;
     color: var(--gold);
-    text-shadow:
-      -1px -1px 0 #000,
-      1px -1px 0 #000,
-      -1px 1px 0 #000,
-      1px 1px 0 #000,
-      0 0 3px #000;
+    text-shadow: var(--mobile-count-outline);
     z-index: 1;
   }
   body.mobile-touch #mobile-action-ring button .keybind {
@@ -1104,8 +1208,8 @@
     height: 100%;
     background: radial-gradient(
       circle at var(--radial-x, 50%) var(--radial-y, 50%),
-      #05050cb0 0%,
-      #05050c80 calc(var(--radial-petal-size) * 1.9),
+      var(--mobile-dim-band-near) 0%,
+      var(--mobile-dim-band-far) calc(var(--radial-petal-size) * 1.9),
       transparent calc(var(--radial-petal-size) * 2.6)
     );
     pointer-events: none;
@@ -1140,13 +1244,11 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #2d3048e8, #11121ee8 72%);
-    color: #eee8ff;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    background: var(--mobile-btn-fill-strong);
+    color: var(--color-mobile-btn-ink);
+    box-shadow: var(--mobile-btn-edge), var(--mobile-btn-shadow);
   }
   /* The petal the drag currently points at, and the cancel target while the
      finger is back at the anchor: a steady border + glow, never a scale
@@ -1159,8 +1261,8 @@
       inset 0 0 8px color-mix(in srgb, var(--gold) 33%, transparent);
   }
   body.mobile-touch #mobile-action-radial-cancel {
-    border-color: #8b4e2c;
-    background: radial-gradient(circle at 35% 30%, #3a2430e8, #16101ae8 72%);
+    border-color: var(--color-mobile-btn-warm-rim);
+    background: var(--mobile-cancel-fill);
   }
   /* One icon size across the ring and both overlays: 22px, never a percentage
      of the circle (that scaled the glyph per tier and read as a different
@@ -1168,7 +1270,7 @@
   body.mobile-touch #mobile-action-radial-cancel .ui-icon {
     width: 22px;
     height: 22px;
-    color: #ffdf9c;
+    color: var(--color-mobile-btn-warm);
   }
   /* The petal internals mirror the ring button's exactly (same painter, same
      ActionBarState), so a petal reads as the same control the ring shows. */
@@ -1184,7 +1286,7 @@
     inset: 0;
     background: conic-gradient(
       transparent 0 calc(100% - var(--cd-fill, 0%)),
-      #000a calc(100% - var(--cd-fill, 0%))
+      color-mix(in srgb, var(--color-keyline) 67%, transparent) calc(100% - var(--cd-fill, 0%))
     );
     border-radius: 50%;
     pointer-events: none;
@@ -1195,19 +1297,14 @@
     right: 0;
     bottom: 0;
     height: 0;
-    background: #0008;
+    background: color-mix(in srgb, var(--color-keyline) 53%, transparent);
     pointer-events: none;
   }
   body.mobile-touch .mobile-action-petal .cdtext {
     position: relative;
     font-size: 15px;
     font-weight: bold;
-    text-shadow:
-      0 0 4px #000,
-      1px 1px 1px #000,
-      -1px -1px 1px #000,
-      1px -1px 1px #000,
-      -1px 1px 1px #000;
+    text-shadow: var(--mobile-cdtext-shadow);
     pointer-events: none;
   }
   body.mobile-touch .mobile-action-petal .item-count {
@@ -1216,7 +1313,7 @@
     bottom: 2px;
     font-size: 11px;
     font-weight: bold;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
     pointer-events: none;
   }
   body.mobile-touch .mobile-action-petal .keybind {
@@ -1233,7 +1330,7 @@
     opacity: 0.6;
   }
   body.mobile-touch .mobile-action-petal.oor {
-    border-color: #a33;
+    border-color: var(--color-action-oor-rim);
   }
   /* Tap mode (settings.touchTapMenus) and assistive activation: the petals become
      a persistent focusable menu, so they take pointer events the drag path
@@ -1278,7 +1375,7 @@
     width: var(--menu-btn-size);
     height: var(--menu-btn-size);
     pointer-events: auto;
-    border-color: #8b4e2c;
+    border-color: var(--color-mobile-btn-warm-rim);
   }
   /* Left-handed mirrors the ring to the left, so the control mirrors with it:
      the identical expression on the opposite edge, matching every other ring
@@ -1352,8 +1449,8 @@
     height: 100%;
     background: radial-gradient(
       circle at var(--radial-x, 50%) var(--radial-y, 50%),
-      #05050cb0 0%,
-      #05050c80 calc(var(--radial-petal-size) * 1.9),
+      var(--mobile-dim-band-near) 0%,
+      var(--mobile-dim-band-far) calc(var(--radial-petal-size) * 1.9),
       transparent calc(var(--radial-petal-size) * 2.6)
     );
     pointer-events: none;
@@ -1372,13 +1469,11 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #2d3048e8, #11121ee8 72%);
-    color: #eee8ff;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    background: var(--mobile-btn-fill-strong);
+    color: var(--color-mobile-btn-ink);
+    box-shadow: var(--mobile-btn-edge), var(--mobile-btn-shadow);
   }
   body.mobile-touch .mobile-stance-petal .icon-label {
     position: absolute;
@@ -1397,13 +1492,13 @@
       inset 0 0 8px color-mix(in srgb, var(--gold) 33%, transparent);
   }
   body.mobile-touch #mobile-stance-cancel {
-    border-color: #8b4e2c;
-    background: radial-gradient(circle at 35% 30%, #3a2430e8, #16101ae8 72%);
+    border-color: var(--color-mobile-btn-warm-rim);
+    background: var(--mobile-cancel-fill);
   }
   body.mobile-touch #mobile-stance-cancel .ui-icon {
     width: 22px;
     height: 22px;
-    color: #ffdf9c;
+    color: var(--color-mobile-btn-warm);
   }
   /* Tap mode (settings.touchTapMenus) and assistive activation: the petals become
      a persistent focusable menu, so they take pointer events the drag path
@@ -1475,8 +1570,8 @@
     background: linear-gradient(
       to right,
       transparent 0,
-      #05050cb0 var(--strip-dim-anchor-fade),
-      #05050c80 45%,
+      var(--mobile-dim-band-near) var(--strip-dim-anchor-fade),
+      var(--mobile-dim-band-far) 45%,
       transparent 100%
     );
     /* The band has no soft edge of its own along the cross axis, so the mask
@@ -1484,11 +1579,17 @@
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent 0%,
-      #000 34%,
-      #000 66%,
+      var(--color-keyline) 34%,
+      var(--color-keyline) 66%,
       transparent 100%
     );
-    mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 66%, transparent 100%);
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--color-keyline) 34%,
+      var(--color-keyline) 66%,
+      transparent 100%
+    );
     pointer-events: none;
   }
   /* One gradient, mirrored in place rather than a second copy of it: the scale is
@@ -1513,13 +1614,11 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #2d3048e8, #11121ee8 72%);
-    color: #eee8ff;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    background: var(--mobile-btn-fill-strong);
+    color: var(--color-mobile-btn-ink);
+    box-shadow: var(--mobile-btn-edge), var(--mobile-btn-shadow);
   }
   /* The item the drag is over, and the cancel X while the finger is back in the
      seat's band: a steady border + glow, never a scale transform (the
@@ -1535,8 +1634,8 @@
      item once the row is open: releasing where the gesture started is the way
      out, so the target is a place the thumb never had to leave. */
   body.mobile-touch #mobile-consumable-cancel {
-    border-color: #8b4e2c;
-    background: radial-gradient(circle at 35% 30%, #3a2430e8, #16101ae8 72%);
+    border-color: var(--color-mobile-btn-warm-rim);
+    background: var(--mobile-cancel-fill);
   }
   /* One icon size for the seat and the row: 22px, the ring's size, NOT the 27px
      the top-row .mobile-btn paints art at (that size is calibrated for a 58x54
@@ -1547,7 +1646,7 @@
   body.mobile-touch #mobile-consumable-seat .ui-icon-art {
     width: 22px;
     height: 22px;
-    color: #ffdf9c;
+    color: var(--color-mobile-btn-warm);
   }
   /* The row's internals mirror the ring button's exactly (same painter, same
      ActionBarState), so an item reads as the same control the seat shows. */
@@ -1563,7 +1662,7 @@
     inset: 0;
     background: conic-gradient(
       transparent 0 calc(100% - var(--cd-fill, 0%)),
-      #000a calc(100% - var(--cd-fill, 0%))
+      color-mix(in srgb, var(--color-keyline) 67%, transparent) calc(100% - var(--cd-fill, 0%))
     );
     border-radius: 50%;
     pointer-events: none;
@@ -1574,19 +1673,14 @@
     right: 0;
     bottom: 0;
     height: 0;
-    background: #0008;
+    background: color-mix(in srgb, var(--color-keyline) 53%, transparent);
     pointer-events: none;
   }
   body.mobile-touch .mobile-consumable-item .cdtext {
     position: relative;
     font-size: 15px;
     font-weight: bold;
-    text-shadow:
-      0 0 4px #000,
-      1px 1px 1px #000,
-      -1px -1px 1px #000,
-      1px -1px 1px #000,
-      -1px 1px 1px #000;
+    text-shadow: var(--mobile-cdtext-shadow);
     pointer-events: none;
   }
   body.mobile-touch .mobile-consumable-item .item-count {
@@ -1595,7 +1689,7 @@
     bottom: 2px;
     font-size: 11px;
     font-weight: bold;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
     pointer-events: none;
   }
   body.mobile-touch .mobile-consumable-item .keybind {
@@ -1670,13 +1764,11 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #2d3048e8, #11121ee8 72%);
-    color: #eee8ff;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    background: var(--mobile-btn-fill-strong);
+    color: var(--color-mobile-btn-ink);
+    box-shadow: var(--mobile-btn-edge), var(--mobile-btn-shadow);
   }
   /* The item the drag is over, and the cancel X while the finger is back in the
      anchor's band: a steady border + glow, never a scale transform (the
@@ -1692,8 +1784,8 @@
      row once it is open: releasing where the gesture started is the way out, so
      the target is a place the thumb never had to leave. */
   body.mobile-touch #mobile-menu-cancel {
-    border-color: #8b4e2c;
-    background: radial-gradient(circle at 35% 30%, #3a2430e8, #16101ae8 72%);
+    border-color: var(--color-mobile-btn-warm-rim);
+    background: var(--mobile-cancel-fill);
   }
   /* One icon size across the strip: 22px, the ring's size, NOT the 27px the
      top-row .mobile-btn paints art at (that size is calibrated for a 58x54 box
@@ -1702,7 +1794,7 @@
   body.mobile-touch #mobile-menu-strip .ui-icon-art {
     width: 22px;
     height: 22px;
-    color: #ffdf9c;
+    color: var(--color-mobile-btn-warm);
   }
   /* ONE caption for the LIVE item instead of a permanent label per item: 8px
      captions at this pitch collide and clip ("Characte"), and they name things
@@ -1745,11 +1837,12 @@
       border: 3px double Highlight;
     }
   }
-  /* The width of #target-frame's content row: its 190px .uf-bars, the -18px
-     medallion overlap, and the 64px .portrait-wrap. Held here because the
+  /* The width of #target-frame's content row. The authored unit frame is built
+     so that row EQUALS the frame width: the bars are --unit-frame-w minus 46px,
+     the portrait is 60px, and the two overlap by 14px. Held here because the
      quest strip's anchor is derived from it, so the two cannot drift apart. */
   body.mobile-touch {
-    --target-frame-content-width: 236px;
+    --target-frame-content-width: var(--unit-frame-w);
   }
   /* The quest strip's CONSTANT anchor. The strip is seated as though the player
      always had a target: just past where #target-frame's own STATIC seat ends,
@@ -1768,7 +1861,7 @@
         max(20px, calc(env(safe-area-inset-left) + 10px)) +
         var(--target-frame-content-width) *
         var(--target-frame-scale, 1) *
-        0.82 *
+        var(--mobile-unit-frame-scale) *
         var(--mobile-chrome-scale, 1)
       ) +
       11px
@@ -1796,7 +1889,7 @@
        bright sky and dark ground alike; a single drop shadow only darkens one
        side. Declared once and INHERITED, so the title, the objective lines, the
        counter hint and the chevrons carry it at every tier. */
-    --quest-strip-text-shadow: 1px 1px 3px #000, -1px -1px 3px #000;
+    --quest-strip-text-shadow: 1px 1px 3px var(--color-keyline), -1px -1px 3px var(--color-keyline);
     position: absolute;
     left: var(--quest-strip-anchor-left);
     top: 6px;
@@ -1910,7 +2003,7 @@
   @keyframes quest-strip-arrow-flash {
     0% {
       opacity: 1;
-      color: #fff;
+      color: var(--color-white);
     }
     100% {
       opacity: 0.65;
@@ -1963,29 +2056,31 @@
     opacity: 0.6;
   }
   body.mobile-touch #mobile-action-ring button.oor {
-    border-color: #a33;
+    border-color: var(--color-action-oor-rim);
   }
   body.mobile-touch #mobile-action-ring button.queued {
     border-color: var(--gold);
     box-shadow:
-      0 0 12px #ffd100aa,
-      inset 0 0 0 1px #ffd10077;
+      0 0 calc(12px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 67%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--gold) 47%, transparent);
   }
   /* The shared painter toggles the same proc class on desktop and touch.
      Keep the actionable steady glow even when reduced motion stops the pulse
      (the grouped reduced-motion and forced-colors overrides live below). */
   body.mobile-touch #mobile-action-ring button.proc {
-    border-color: #ffd97a;
+    border-color: var(--color-proc-rim);
     box-shadow:
-      0 0 12px #ffcf40e6,
-      inset 0 0 6px #ffcf4066;
+      0 0 calc(12px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-proc-glow) 90%, transparent),
+      inset 0 0 calc(6px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-proc-glow) 40%, transparent);
     animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
   }
   body.mobile-touch #mobile-action-ring button.empowered {
     border-color: var(--gold);
     box-shadow:
-      0 0 14px #ffd100dd,
-      inset 0 0 0 1px #fff0a6aa;
+      0 0 calc(14px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 87%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 67%, transparent);
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
   }
   body.mobile-touch #mobile-action-ring button.ascension-spender::after {
@@ -2066,8 +2161,8 @@
     -webkit-backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
     backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
     box-shadow:
-      0 8px 28px #000d,
-      inset 0 1px 0 #ffffff12;
+      0 8px 28px color-mix(in srgb, var(--color-keyline) 87%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 7%, transparent);
     /* Centre-screen modal (the More button lives in the top-left trio now, so
        the menu opens under the middle of the screen instead of stacking on the
        trigger): cap to the safe viewport so short landscape phones can
@@ -2153,7 +2248,7 @@
     display: inline;
     margin: 0;
     font-size: 9px;
-    color: #e6d8ae;
+    color: var(--color-text-secondary);
   }
   /* The Steam wishlist reminder is the one tray entry that is a link rather
      than a wired button (index.html says why), so it needs the anchor reset its
@@ -2179,8 +2274,8 @@
   body.mobile-touch #mobile-extra-controls .mobile-btn.active {
     border-color: var(--gold);
     box-shadow:
-      0 0 8px #ffd10066,
-      inset 0 0 6px #ffd10033;
+      0 0 calc(8px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 40%, transparent),
+      inset 0 0 calc(6px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 20%, transparent);
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn.active .mobile-label {
     color: var(--gold);
@@ -2197,8 +2292,8 @@
     width: 24px;
     height: 2px;
     border-radius: 2px;
-    background: #f0e8d2;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7);
+    background: var(--color-text-overlay);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-keyline) 70%, transparent);
     transform: translate(-50%, -50%) rotate(-45deg);
     pointer-events: none;
   }
@@ -2258,26 +2353,34 @@
     border-radius: 50%;
     background: conic-gradient(
       from var(--xp-ring-start),
-      #b85eff 0deg calc(var(--xp-fill, 0) * 360deg),
-      rgba(125, 88, 158, 0.34) calc(var(--xp-fill, 0) * 360deg) var(--xp-ring-arc),
+      var(--color-xp) 0deg calc(var(--xp-fill, 0) * 360deg),
+      color-mix(in srgb, var(--color-xp-deep) 34%, transparent) calc(var(--xp-fill, 0) * 360deg)
+        var(--xp-ring-arc),
       transparent var(--xp-ring-arc) 360deg
     );
-    box-shadow: 0 0 8px rgba(184, 94, 255, 0.28);
+    box-shadow: 0 0 calc(8px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-xp) 28%, transparent);
     -webkit-mask: radial-gradient(
       farthest-side,
       transparent calc(100% - 7px),
-      #000 calc(100% - 6px)
+      var(--color-keyline) calc(100% - 6px)
     );
-    mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+    mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 7px),
+      var(--color-keyline) calc(100% - 6px)
+    );
   }
   body.mobile-touch #player-frame:has(#xpbar.overflow)::before {
     background: conic-gradient(
       from var(--xp-ring-start),
-      #ffe27a 0deg calc(var(--xp-fill, 0) * 360deg),
-      rgba(184, 144, 42, 0.34) calc(var(--xp-fill, 0) * 360deg) var(--xp-ring-arc),
+      var(--color-xp-overflow) 0deg calc(var(--xp-fill, 0) * 360deg),
+      color-mix(in srgb, var(--color-xp-overflow-deep) 34%, transparent)
+        calc(var(--xp-fill, 0) * 360deg) var(--xp-ring-arc),
       transparent var(--xp-ring-arc) 360deg
     );
-    box-shadow: 0 0 9px rgba(245, 200, 67, 0.34);
+    box-shadow: 0 0 calc(9px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-xp-overflow-glow) 34%, transparent);
   }
   /* The always-visible XP percent (new-player-first-hour): touch has no
      hover at all and #xpbar itself (plus its .label) is hidden here, so the
@@ -2294,9 +2397,9 @@
     width: 73px;
     z-index: 2;
     font-size: 9px;
-    color: #fff;
+    color: var(--color-white);
     text-align: center;
-    text-shadow: 1px 1px 1px #000;
+    text-shadow: 1px 1px 1px var(--color-keyline);
     pointer-events: none;
   }
   body.mobile-touch #xpbar .fill,
@@ -2321,7 +2424,7 @@
        viewport bottom, because that line is where the player frame's top now
        sits: a raw inset would have to guess the frame's scaled height. */
     bottom: calc(var(--mobile-button-row-lift) + 6px);
-    width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
+    width: calc(300px * var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1));
     min-width: 0;
     height: 6px;
     transform: translateX(-50%);
@@ -2341,7 +2444,8 @@
      add it, or the bar stays parked on the button row's line while the XHB
      visibly claims the same band. */
   body.mobile-touch.xhb-mode #castbar {
-    transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)));
+    transform: translateX(-50%)
+      translateY(calc(-1 * var(--xhb-lift, var(--mobile-xhb-lift-fallback))));
   }
   /* The swing timer had no mobile seat at all (unlike #castbar above): it fell
      back to the desktop `bottom: 234px` fixed value, which on a short mobile
@@ -2353,7 +2457,7 @@
     position: fixed;
     left: 50%;
     bottom: calc(var(--mobile-button-row-lift) + 15px);
-    width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
+    width: calc(300px * var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1));
     min-width: 0;
     height: 5px;
     transform: translateX(-50%);
@@ -2372,7 +2476,7 @@
     position: fixed;
     left: 50%;
     bottom: calc(var(--mobile-button-row-lift) + 23px);
-    width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
+    width: calc(300px * var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1));
     min-width: 0;
     height: 5px;
     transform: translateX(-50%);
@@ -2409,6 +2513,13 @@
      independent fixed seat the rules below give it. */
   body.mobile-touch #pet-cluster {
     display: contents;
+  }
+  /* The touch stack has no seat above the frames, so the panel takes the
+     quest-banner lane under the top edge, clear of the sticks and the ring. */
+  body.mobile-touch .talking-head {
+    position: fixed;
+    top: max(56px, env(safe-area-inset-top));
+    width: min(520px, calc(100vw - 120px));
   }
   /* Issue: on a narrow landscape phone the true-centered pet bar can reach far
      enough left to sit on top of the #mobile-combat-controls row (Chat/Social/
@@ -2757,7 +2868,7 @@
     border: none;
     outline: none;
     box-shadow:
-      0 0 12px #00000080,
+      0 0 12px color-mix(in srgb, var(--color-keyline) 50%, transparent),
       0 0 0 1px color-mix(in srgb, var(--gold-dim) 35%, transparent);
   }
   body.mobile-touch #chatlog-wrap {
@@ -2810,7 +2921,12 @@
      panel width. It FLOWS in the flex column (not absolutely positioned / docked); order
      -1 keeps it first even if it were inserted elsewhere. Reset the base composer's
      absolute seat + chevron padding, and force off iOS Safari's native light textarea
-     appearance so it stays a dark panel bar (not a white box). */
+     appearance so it stays a dark panel bar (not a white box).
+     GEOMETRY ONLY (W5 companion): #chat-input carries .ui-input, and this rule sits
+     in a later layer than @layer library, so any look declaration here would silently
+     beat the primitive and its focus/placeholder states. The ground, rim, radius and
+     ink all come from .ui-input; only the seat, the touch height and the platform
+     appearance reset live here. */
   body.mobile-touch.mobile-chat-open #chat-input {
     position: static;
     order: -1;
@@ -2827,10 +2943,6 @@
     box-sizing: border-box;
     -webkit-appearance: none;
     appearance: none;
-    background: #0d0d14f2;
-    color: #e8e8e8;
-    border: 1px solid var(--gold-dim, #6f5a2a);
-    border-radius: 8px;
   }
   /* Mobile chat resize handle (hud.ts creates it as a BODY-LEVEL element): a visible grab
      bar pinned to the open panel's bottom edge via the SAME --mobile-chat-bottom var, so it
@@ -2860,18 +2972,18 @@
     cursor: ns-resize;
     pointer-events: auto;
     border-radius: 0 0 8px 8px;
-    background: color-mix(in srgb, var(--panel-base, #14121c) 82%, transparent);
-    box-shadow: inset 0 1px 0 #ffffff10;
+    background: color-mix(in srgb, var(--panel-base) 82%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-white) 6%, transparent);
   }
   body.mobile-touch.mobile-chat-open .chat-mobile-resize::before {
     content: "";
     width: 56px;
     height: 6px;
     border-radius: 3px;
-    background: var(--gold-dim, #6f5a2a);
+    background: var(--gold-dim);
     box-shadow:
-      0 0 0 1px #00000066,
-      inset 0 1px 0 #ffffff33;
+      0 0 0 1px color-mix(in srgb, var(--color-keyline) 40%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 20%, transparent);
   }
   /* The tab strip keeps its natural height; the log frame fills the rest of the panel
      (the ~4-line strip cap only applies while closed or peeking). */
@@ -2906,7 +3018,8 @@
     border-color: var(--gold);
     box-shadow:
       0 0 0 1px var(--gold),
-      0 0 10px #c9a84d66;
+      0 0 calc(10px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-mobile-chrome-edge) 40%, transparent);
   }
   /* Issue 1577 round 2 (6): cap the visible chat history to about 4 lines on
      mobile (it scrolls for more) so the log stays a compact strip instead of a
@@ -3023,7 +3136,8 @@
     margin: 0;
     display: flex;
     justify-content: flex-start;
-    transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform: translateX(-50%)
+      scale(calc(var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1)));
     transform-origin: center top;
   }
   /* xhb-mode's lift (hud.css's body.xhb-mode #player-frame, translateY only)
@@ -3035,8 +3149,9 @@
      override further down (0.6, not 0.82) that needs the identical
      treatment; see the matching rule inside @media (orientation: landscape). */
   body.mobile-touch.xhb-mode #player-frame {
-    transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)))
-      scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform: translateX(-50%)
+      translateY(calc(-1 * var(--xhb-lift, var(--mobile-xhb-lift-fallback))))
+      scale(calc(var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1)));
   }
   body.mobile-touch .warlock-doom-frame {
     position: fixed;
@@ -3080,10 +3195,15 @@
      floor. With the portrait the visible frame is ~48px rendered at this scale, so
      the tap area is the floor without an invisible band over the world. */
   body.mobile-touch {
-    /* Portrait scale (0.82): the frame renders ~53px, so the drop clears it with
+    /* Portrait: the 65px frame at the portrait factor, so the drop clears it with
        a 4px gap. The landscape media block below re-tunes it for that tier's
-       0.6 frame scale. */
-    --mobile-pet-frame-drop: calc(53px * var(--mobile-chrome-scale, 1) + 4px);
+       own factor. */
+    --mobile-pet-frame-drop: calc(
+      65px *
+      var(--mobile-unit-frame-scale) *
+      var(--mobile-chrome-scale, 1) +
+      4px
+    );
     /* RULED (qr-19-mobile-pet-frame-combo-overlap, 2026-09-01): the combo-row overlap
        raised against this constant is UNREACHABLE, so the drop stays as written and takes
        no class-conditional term. Checked live: the combo row paints only for resourceType
@@ -3110,12 +3230,13 @@
     margin: 0;
     justify-content: flex-start;
     /* The desktop rule pays --unit-frame-content-inset because the desktop player
-       frame CENTRES its content in a 612px box. The mobile player frame is
+       frame CENTRES its content in its --unit-frame-w box. The mobile player frame is
        flex-start with no inset, so inheriting it here pushes this strip about 18px
        right of the frame it hangs under. Reset, do not inherit. */
     padding-left: 0;
     zoom: 1;
-    transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform: translateX(-50%)
+      scale(calc(var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1)));
     transform-origin: center top;
   }
   body.mobile-touch #pet-frame .uf-bars {
@@ -3129,12 +3250,12 @@
   /* Independent Devotion medallion: compact enough for the phone battlefield,
      but no longer attached to or covering the player portrait. */
   body.mobile-touch .paladin-devotion-frame {
-    width: 72px;
-    height: 72px;
+    width: 56px;
+    height: 56px;
   }
   body.mobile-touch .paladin-devotion {
-    width: 72px;
-    height: 72px;
+    width: 56px;
+    height: 56px;
   }
   body.mobile-touch .paladin-ascension-charges {
     top: -4px;
@@ -3161,7 +3282,7 @@
   body.mobile-touch #target-frame {
     left: max(20px, calc(env(safe-area-inset-left) + 10px));
     top: max(8px, env(safe-area-inset-top));
-    transform: scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform: scale(calc(var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
   }
   /* The desktop interface editor's frame-dimension settings
@@ -3172,12 +3293,12 @@
      mobile. Pin the vars back to their stock values so a desktop drag cannot
      widen or thicken these frames into the touch surfaces beside them. */
   body.mobile-touch #player-frame {
-    --player-frame-width: 612px;
-    --uf-bar-height: 15px;
+    --player-frame-width: var(--unit-frame-w);
+    --uf-bar-height: var(--bar-h);
   }
   body.mobile-touch #target-frame {
-    --target-frame-width: 190px;
-    --uf-bar-height: 15px;
+    --target-frame-width: var(--unit-frame-w);
+    --uf-bar-height: var(--bar-h);
   }
   /* Target of Target on mobile: a DELIBERATE placement, not fallthrough.
      showTargetOfTarget is a user-chosen HUD option (reachable from the mobile
@@ -3188,8 +3309,8 @@
      above it, the aura strip wraps below the frame, party frames stack under
      the strip), so the mini fits without contesting any touch surface. */
   body.mobile-touch #target-frame > #totarget-frame {
-    left: calc(100% + 18px / (0.74 * var(--target-frame-scale, 1)));
-    top: 0;
+    left: calc(100% + 4px / (0.74 * var(--target-frame-scale, 1)));
+    top: calc(4px / (0.74 * var(--target-frame-scale, 1)));
   }
   /* Issue 1577 (1): party frames used to stack in a single column no matter the
      size, so a full party ate more vertical space than a landscape phone can
@@ -3302,7 +3423,7 @@
     /* Mobile border restyle: keeps the interior shading, adds the same
        double-line hairline treatment as the other mobile windows above. */
     box-shadow:
-      inset 0 0 10px rgba(0, 0, 0, 0.35),
+      inset 0 0 10px color-mix(in srgb, var(--color-keyline) 35%, transparent),
       inset 0 0 0 1px var(--gold-dim);
   }
   /* Issue 1577 round 2 (1): the party frame's opaque black panel (the shared
@@ -3312,7 +3433,12 @@
      the world instead of blacking it out. Mobile only; desktop .uf-bars keeps
      its solid panel. */
   body.mobile-touch #party-frames .party-frame .uf-bars {
-    background: linear-gradient(170deg, #15151f66 0%, #0b0b1266 60%, #08080d66 100%);
+    background: linear-gradient(
+      170deg,
+      color-mix(in srgb, var(--panel-base) 40%, transparent) 0%,
+      color-mix(in srgb, var(--color-ink-deep) 40%, transparent) 60%,
+      color-mix(in srgb, var(--color-bg-dark) 40%, transparent) 100%
+    );
     -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
     backdrop-filter: blur(var(--mobile-glass-blur, 8px));
   }
@@ -3330,6 +3456,7 @@
   }
   body.mobile-touch #party-frames .party-frame .pfm-name {
     min-height: 14px;
+    padding-left: 0;
     gap: 3px;
     font-size: 10px;
     line-height: 1.1;
@@ -3340,11 +3467,24 @@
     min-width: 0;
   }
   body.mobile-touch #party-frames .pfm-crest {
+    position: static;
+    left: auto;
+    top: auto;
     width: 12px;
     height: 12px;
     margin-right: 2px;
+    border: 0;
     border-radius: 2px;
+    box-shadow: none;
     flex: 0 0 auto;
+  }
+  /* The desktop row reserves a 38px gutter for that absolute crest. The mobile
+     crest is a 12px INLINE glyph inside .pfm-id, so every gutter the classic
+     row now pays (name padding, bar and pet indents) is reset here or the whole
+     112px row loses a third of its width to empty space. */
+  body.mobile-touch #party-frames .party-frame .pfm-pet,
+  body.mobile-touch #party-frames .party-frame .bar {
+    margin-left: 0;
   }
   body.mobile-touch #party-frames .party-frame .pfm-meta {
     gap: 2px;
@@ -3415,23 +3555,21 @@
        member frame in the expanded stack. */
     margin: 0 0 5px;
     padding: 6px 12px;
-    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border: 1px solid var(--mobile-glass-border);
     border-radius: 8px;
-    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    background: var(--mobile-glass-bg);
     -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
     backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    color: #d8b98a;
+    color: var(--color-mobile-btn-caption);
     cursor: var(--cursor-point);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.3px;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    box-shadow: var(--mobile-btn-edge), var(--mobile-btn-shadow);
   }
   body.mobile-touch #party-chip:active {
     border-color: var(--gold);
-    color: #fff;
+    color: var(--color-white);
   }
   body.mobile-touch #party-chip .ui-icon {
     width: 11px;
@@ -3451,7 +3589,7 @@
      stack is unchanged. */
   body.mobile-touch #party-frames.party-expanded #party-chip {
     border-color: var(--gold-dim);
-    color: #ffdf9c;
+    color: var(--color-mobile-btn-warm);
   }
   body.mobile-touch #party-frames.party-expanded #party-chip .ui-icon {
     transform: rotate(90deg);
@@ -3721,11 +3859,27 @@
   body.mobile-touch #compass {
     order: 3;
   }
+  /* The clock is an interactive control now (it toggles 12/24-hour), so it
+     needs the coarse-pointer floor as well as its column seat. Same invisible
+     hit extension the compact tracker chips use: the visual pill stays small
+     under the map, and a ::after rectangle reaches the 40px reach around it
+     rather than inflating the pill itself. The pill is position: relative so the
+     ::after can hang off it, which means the desktop rule's left / bottom would
+     otherwise apply as FLOW offsets and shove it right and up; both are reset to
+     auto, and margin auto is what centres it in the column. */
   body.mobile-touch #minimap-clock {
-    position: static;
+    position: relative;
+    left: auto;
+    bottom: auto;
     order: 4;
     transform: none;
     margin: 5px auto 0;
+  }
+  body.mobile-touch #minimap-clock::after {
+    content: "";
+    position: absolute;
+    inset: -11px -8px;
+    pointer-events: auto;
   }
   /* Each satellite keeps the disc corner it claims on desktop; only its size and
      the counter-scale change, so a phone shows the same badge-on-the-rim cluster. */
@@ -3830,9 +3984,9 @@
     width: min(280px, calc(100vw - 360px));
     padding: 8px;
     margin: 0;
-    border: 1px solid #776344;
+    border: 1px solid var(--border);
     border-radius: 6px;
-    background: #100d09e8;
+    background: var(--panel-bg-strong);
     font-size: 11px;
   }
   body.mobile-touch #hub-lesson-coach .hlc-ack,
@@ -4170,10 +4324,10 @@
   body.mobile-touch .window.panel {
     border-color: var(--border);
     box-shadow:
-      0 0 0 1px #000c,
+      0 0 0 1px color-mix(in srgb, var(--color-keyline) 80%, transparent),
       inset 0 0 0 1px var(--gold-dim),
-      inset 0 1px 0 #ffffff1f,
-      0 3px 14px #000a;
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 12%, transparent),
+      0 3px 14px color-mix(in srgb, var(--color-keyline) 67%, transparent);
   }
   /* The mobile close button is a 40x40 touch target pinned in the header's
      top-right corner (absolute, see the .window > .panel-title shell rule in
@@ -4246,7 +4400,11 @@
     min-height: 190px;
     padding: 18px;
     background:
-      linear-gradient(90deg, rgb(3 10 16 / 96%), rgb(4 17 27 / 76%)),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-woc-store-hero-hi) 96%, transparent),
+        color-mix(in srgb, var(--color-woc-store-hero-lo) 76%, transparent)
+      ),
       url("/claudium/claudium_coin_hero_3q.webp") 100% 50% / 190px auto no-repeat;
   }
   body.mobile-touch .woc-store-balance {
@@ -4492,9 +4650,9 @@
     box-sizing: border-box;
     overflow: hidden;
   }
-  /* The shared harvest-preference picker's Apply/Cancel ride the plain .btn
-     shape, whose desktop 6px/16px padding falls short of the 40px touch
-     floor; the picker's own radio rows already clear it unconditionally
+  /* The shared harvest-preference picker's Apply/Cancel ride the .ui-btn
+     plate, whose 32px desktop height falls short of the 40px touch floor;
+     the picker's own radio rows already clear it unconditionally
      (components.css min-height:40px). */
   body.mobile-touch #harvest-preference-window .btn {
     min-height: 40px;
@@ -4527,7 +4685,6 @@
     }
     body.mobile-touch .harvest-preference-header {
       margin-bottom: var(--spacing-sm);
-      padding-bottom: var(--spacing-sm);
     }
     body.mobile-touch .harvest-preference-actions {
       margin-top: var(--spacing-sm);
@@ -5030,11 +5187,21 @@
     overflow-y: visible;
     min-height: 0;
   }
-  /* The desktop grid shares columns between search and every filter. The mobile sheet
-     deliberately reduces that same grid to one full-width control per row. */
+  /* The desktop layout is a two-column grid: a 200px browse sidebar
+     (`.mkt-controls`) beside `#market-body`. A phone has no room for a column
+     pair, so the layout collapses to one column and the sidebar stacks ABOVE
+     the listing body, keeping the search box the first thing under the tabs. */
+  body.mobile-touch .mkt-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* The sidebar gives up its own scroller here: the WHOLE sheet scrolls (see the
+     #market-window rule above), so a nested scroller would strand the filters
+     under a second fold. Full-width, one control per row. */
   body.mobile-touch .mkt-controls {
-    grid-template-columns: 1fr;
     align-items: stretch;
+    min-height: 0;
+    overflow-y: visible;
+    padding-right: 0;
   }
   body.mobile-touch .mkt-search {
     max-width: none;
@@ -5215,6 +5382,14 @@
   body.mobile-touch #trade-window .trade-items {
     min-height: 84px;
   }
+  /* min-height is a FLOOR, so the desktop empty-slot floor (40px on each of the
+     four padded rows) would defeat the shrink above from the content side and
+     put the arm and the Accept row back under the fold. An EMPTY well is not a
+     tap target (only .trade-item.mine is, and it keeps its own 40px floor
+     below), so the placeholder rows shrink instead. */
+  body.mobile-touch #trade-window .trade-item-empty {
+    min-height: 28px;
+  }
   /* The window's Accept / Cancel row sticks to the sheet's bottom edge, so the
      commit control is reachable however long the arm's face runs. The sheet
      scrolls behind it, so it also reserves its own height as scroll padding:
@@ -5361,6 +5536,11 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: max(10px, env(safe-area-inset-bottom));
     width: auto;
+    /* With opposing edges both pinned here, a non-auto height would
+       over-constrain the box and the browser would drop `bottom`, so the sheet
+       ran off a landscape phone with no way to scroll to its footer. The edge
+       pin IS the height on touch. */
+    height: auto;
     transform: none;
     max-height: none;
     /* The base .window max-width clamp divides by --window-scale, not --ui-scale,
@@ -5419,20 +5599,28 @@
     grid-template-columns: 1fr;
   }
   body.mobile-touch .raid-group {
-    border-top: 1px solid #3d3218;
+    border-top: 1px solid var(--color-border-showcase);
     padding-top: 6px;
   }
   body.mobile-touch .raid-group:first-child {
     border-top: 0;
     padding-top: 0;
   }
-  /* The desktop landscape grid auto-fills up to 4 tiles per row (fewer once the
-     window's own width cap shrinks it to avoid the bags column, see the
-     #vendor-window comment in components.css); a touch viewport is narrower
-     and the tap-target floor below needs the room, so collapse to 2 columns
-     (still several per row, never a single portrait list again). */
+  /* Two columns, stated here rather than inherited: the desktop grid authors
+     the same pair today, but a touch viewport is narrower and the tap-target
+     floor below needs the room, so the touch sheet owns the number instead of
+     tracking whatever the desktop window's width cap resolves to. */
   body.mobile-touch .vendor-goods-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* The bank/vault cell is authored at 32px on its own class (not through the
+     socket species token), which is under the 40x40 coarse floor every control
+     in this pane keeps. Re-pin all three axes off the mobile species token so
+     the row still measures as one cell. */
+  body.mobile-touch .bank-socket {
+    flex-basis: var(--socket-size-bank);
+    width: var(--socket-size-bank);
+    height: var(--socket-size-bank);
   }
   /* The corpse choice can open over the Professions sheet (z 95).
      Keep it above that sheet even after the shared window manager writes its
@@ -5563,6 +5751,11 @@
     bottom: 0;
     transform: none;
     width: auto;
+    /* The desktop sheet carries a FIXED height now. With opposing edges both
+       pinned here, a non-auto height over-constrains the box and the browser
+       drops `bottom`, so the sheet would run off a landscape phone with no way
+       to scroll to its footer. The edge pin IS the height on touch. */
+    height: auto;
     max-width: none;
     max-height: none;
     box-sizing: border-box;
@@ -5581,6 +5774,11 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: calc(72px + env(safe-area-inset-bottom));
     width: auto;
+    /* The desktop sheet carries a FIXED height now. With opposing edges both
+       pinned here, a non-auto height over-constrains the box and the browser
+       drops `bottom`, so the sheet would run off a landscape phone with no way
+       to scroll to its footer. The edge pin IS the height on touch. */
+    height: auto;
     max-width: none;
     max-height: none;
     transform: none;
@@ -5732,6 +5930,9 @@
   }
   body.mobile-touch .equip-col-right .equip-slot .equip-unequip-btn {
     right: calc(50% - 80px);
+  }
+  body.mobile-touch .equip-row-weapons .equip-slot .equip-unequip-btn {
+    left: calc(50% - 80px);
   }
   /* Stat panels: 2-column grid, 16px tile numerals. */
   body.mobile-touch .stat-panels {
@@ -5918,6 +6119,11 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: calc(72px + env(safe-area-inset-bottom));
     width: auto;
+    /* The desktop sheet carries a FIXED height now. With opposing edges both
+       pinned here, a non-auto height over-constrains the box and the browser
+       drops `bottom`, so the sheet would run off a landscape phone with no way
+       to scroll to its footer. The edge pin IS the height on touch. */
+    height: auto;
     max-width: none;
     max-height: none;
     transform: none;
@@ -5956,6 +6162,15 @@
   body.mobile-touch.vendor-open #vendor-window .panel-title .x-btn {
     display: none;
   }
+  /* The death and ghost panels are authored at min(360px, 100vw - 32px), but
+     they live inside #ui, which carries zoom: var(--ui-scale). A raw vw length
+     is measured before that zoom, so at any UI Scale other than 1 the panel
+     mis-sizes against the real viewport. Divide it out, the way every other
+     mobile width in this sheet does. */
+  body.mobile-touch .death-panel,
+  body.mobile-touch .ghost-panel {
+    width: min(360px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));
+  }
   body.mobile-touch #prompt-stack {
     position: fixed;
     left: max(10px, env(safe-area-inset-left));
@@ -5973,6 +6188,16 @@
     box-sizing: border-box;
     pointer-events: auto;
   }
+  /* The actions row is a flex row now, and a flex row does not wrap: a locale
+     with two long verbs used to fall onto a second line inside this 340px
+     sheet and now runs off its edge instead. Let it wrap, and let each button
+     take the full width when it does, so both stay whole and tappable. */
+  body.mobile-touch #prompt-stack .prompt-actions {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch #prompt-stack .prompt-actions .btn {
+    flex: 1 1 auto;
+  }
   /* The bank docks its bags companion side by side on touch exactly like the
      vendor cluster: a divided full-height panel split 50/50 at the viewport
      centre. This standalone block is also the neutralizer for the desktop
@@ -5989,6 +6214,11 @@
        vendor-split rule that change deliberately kept. */
     bottom: max(10px, env(safe-area-inset-bottom));
     width: auto;
+    /* The desktop sheet may carry a fixed height. With opposing edges both
+       pinned here, a non-auto height over-constrains the box and the browser
+       drops `bottom`, so the sheet would run off a landscape phone with no way
+       to scroll to its footer. The edge pin IS the height on touch. */
+    height: auto;
     transform: none;
     max-height: none;
     /* Drop the base .window max-width clamp (it divides by --window-scale, not
@@ -6012,6 +6242,11 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: calc(72px + env(safe-area-inset-bottom));
     width: auto;
+    /* The desktop sheet carries a FIXED height now. With opposing edges both
+       pinned here, a non-auto height over-constrains the box and the browser
+       drops `bottom`, so the sheet would run off a landscape phone with no way
+       to scroll to its footer. The edge pin IS the height on touch. */
+    height: auto;
     max-width: none;
     max-height: none;
     transform: none;
@@ -6392,6 +6627,12 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: max(10px, env(safe-area-inset-bottom));
     width: auto;
+    /* The desktop sheet is a FIXED 940x680 box now. With all four edges pinned
+       here, a non-auto height over-constrains the box and the browser drops
+       `bottom`, so the window would render 680px tall off the bottom of a
+       390px landscape phone with no way to scroll it. The four-edge pin is the
+       height on touch; max-height: none is safe only because of this line. */
+    height: auto;
     transform: none;
     max-width: none;
     max-height: none;
@@ -6442,7 +6683,7 @@
     border-radius: 4px;
   }
   body.mobile-touch #deeds-window .deeds-cat-titles.active {
-    border-top-color: #6a5320;
+    border-top-color: var(--border);
   }
   /* The recent-strip jump buttons keep the 40px touch floor on EVERY touch
      device (unconditional, not just short-landscape phones: a landscape
@@ -6535,8 +6776,8 @@
     font-size: 11px;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    background: radial-gradient(circle at 50% 30%, #2c2c3a, #14141d);
-    box-shadow: 0 2px 4px #0009;
+    background: var(--chrome-plate-fixed);
+    box-shadow: var(--shadow-lift);
   }
   /* The 40px coarse-pointer floor (DESIGN.md 13.5) rides an invisible hit
      extension (DESIGN.md 10.1, the char-playtime-eye idiom): a 24px visual
@@ -6574,6 +6815,7 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: max(10px, env(safe-area-inset-bottom));
     width: auto;
+    height: auto;
     transform: none;
     max-width: none;
     max-height: none;
@@ -6595,6 +6837,11 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: max(10px, env(safe-area-inset-bottom));
     width: auto;
+    /* The desktop sheet may carry a fixed height. With opposing edges both
+       pinned here, a non-auto height over-constrains the box and the browser
+       drops `bottom`, so the sheet would run off a landscape phone with no way
+       to scroll to its footer. The edge pin IS the height on touch. */
+    height: auto;
     transform: none;
     max-width: none;
     max-height: none;
@@ -6691,6 +6938,11 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: max(10px, env(safe-area-inset-bottom));
     width: auto;
+    /* The desktop sheet may carry a fixed height. With opposing edges both
+       pinned here, a non-auto height over-constrains the box and the browser
+       drops `bottom`, so the sheet would run off a landscape phone with no way
+       to scroll to its footer. The edge pin IS the height on touch. */
+    height: auto;
     transform: none;
     max-width: none;
     max-height: none;
@@ -6732,6 +6984,11 @@
     top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
     bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
     width: auto;
+    /* With opposing edges both pinned, a non-auto height over-constrains the
+       box and the browser drops `bottom`, so the sheet would run off a
+       landscape phone. The edge pin IS the height on touch (the professions
+       sheet precedent above). */
+    height: auto;
     transform: none;
     max-width: none;
     max-height: none;
@@ -6804,6 +7061,11 @@
     top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
     bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
     width: auto;
+    /* With opposing edges both pinned, a non-auto height over-constrains the
+       box and the browser drops `bottom`, so the sheet would run off a
+       landscape phone. The edge pin IS the height on touch (the professions
+       sheet precedent above). */
+    height: auto;
     transform: none;
     max-width: none;
     max-height: none;
@@ -7068,11 +7330,18 @@
     font-size: 16px;
   }
   /* Desktop lays the spell list out as a landscape grid; touch stays a single
-     scrollable column so the existing 40x40px tap targets below keep working. */
+     column so the existing 40x40px tap targets below keep working. The desktop
+     rule's `height: calc(100% - var(--win-head-h))` plus `overflow-y: auto`
+     would make the list its own bounded scroller inside the sheet, a second
+     nested scroll region the touch model does not have: the sheet's own
+     overflow-y (mobile sheet base) is the single scroll here, so the list
+     grows to its content instead. */
   body.mobile-touch #spellbook .spell-list {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    height: auto;
+    overflow-y: visible;
   }
   body.mobile-touch #spellbook .spell-row {
     min-height: 52px;
@@ -7085,18 +7354,18 @@
     align-items: center;
     justify-content: center;
     flex: 0 0 40px;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 7px;
-    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
+    background: var(--mobile-btn-fill-editor);
     color: var(--gold);
     font: 700 22px / 1 var(--ui-font);
     box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 6px #0008;
+      var(--mobile-btn-edge),
+      0 2px 6px color-mix(in srgb, var(--color-keyline) 53%, transparent);
   }
   body.mobile-touch #spellbook .spell-hotbar-toggle.remove {
-    color: #ffcf9c;
-    border-color: #8b4e2c;
+    color: var(--color-mobile-btn-warm);
+    border-color: var(--color-mobile-btn-warm-rim);
   }
   body.mobile-touch #spellbook .spell-hotbar-toggle:disabled {
     opacity: 0.45;
@@ -7116,10 +7385,10 @@
     align-self: center;
     margin-inline-start: 4px;
     padding: 2px 6px;
-    border: 1px solid #4a3d1d;
+    border: 1px solid var(--color-socket-rim);
     border-radius: 4px;
     font-size: 10px;
-    color: #c8b888;
+    color: var(--color-mobile-joy-label);
     white-space: nowrap;
   }
   /* ---------- bar editor (touch slot binding) ---------- */
@@ -7137,10 +7406,10 @@
   body.mobile-touch #bar-editor .bar-editor-tab {
     flex: 1 1 0;
     min-height: 40px;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 7px;
-    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
-    color: #c8b888;
+    background: var(--mobile-btn-fill-editor);
+    color: var(--color-mobile-joy-label);
     font: 600 14px / 1 var(--ui-font);
   }
   body.mobile-touch #bar-editor .bar-editor-tab.active {
@@ -7156,7 +7425,7 @@
   }
   body.mobile-touch #bar-editor .bar-editor-head {
     font-size: 10px;
-    color: #c8b888;
+    color: var(--color-mobile-joy-label);
     text-align: center;
     white-space: nowrap;
   }
@@ -7169,17 +7438,18 @@
     gap: 2px;
     min-height: 52px;
     padding: 3px;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 7px;
-    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
-    color: #e8dcc0;
+    background: var(--mobile-btn-fill-editor);
+    color: var(--color-text-secondary);
     overflow: hidden;
   }
   /* The picked-up cell for a pending swap: a steady border, never a scale
      transform (the motion-sickness rule in src/ui/CLAUDE.md). */
   body.mobile-touch #bar-editor .bar-editor-cell[aria-pressed="true"] {
     border-color: var(--gold);
-    box-shadow: 0 0 8px #d9b45c88;
+    box-shadow: 0 0 calc(8px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-gold-500) 53%, transparent);
   }
   body.mobile-touch #bar-editor .bar-editor-cell.empty {
     opacity: 0.75;
@@ -7215,10 +7485,10 @@
     min-width: 88px;
     min-height: 40px;
     padding: 0 12px;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 7px;
-    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
-    color: #c8b888;
+    background: var(--mobile-btn-fill-editor);
+    color: var(--color-mobile-joy-label);
     font: 600 14px / 1 var(--ui-font);
   }
   body.mobile-touch #bar-editor .bar-editor-clear.active {
@@ -7231,7 +7501,7 @@
   body.mobile-touch #bar-editor .bar-editor-caption {
     margin-top: 10px;
     font-size: 12px;
-    color: #c8b888;
+    color: var(--color-mobile-joy-label);
     text-align: center;
   }
   /* The spellbook's touch-only assign control, beside the +/- toggle: it opens
@@ -7245,9 +7515,9 @@
     justify-content: center;
     flex: 0 0 40px;
     margin-inline-end: 4px;
-    border: 2px solid #4a3d1d;
+    border: 2px solid var(--color-socket-rim);
     border-radius: 7px;
-    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
+    background: var(--mobile-btn-fill-editor);
     color: var(--gold);
   }
   body.mobile-touch #spellbook .spell-hotbar-assign .ui-icon {
@@ -7271,9 +7541,14 @@
   body.mobile-touch #quest-log-window .ql-empty {
     font-size: 16px;
   }
+  /* height: auto is what keeps the row unbounded here: the components-layer
+     rule caps it at `calc(100% - var(--win-head-h))`, which on the sheet would
+     clip the columns instead of letting the sheet scroll them (see the
+     single-outer-scroll note below). */
   body.mobile-touch #quest-log-window .ql-cols {
     gap: var(--spacing-sm);
     min-width: 0;
+    height: auto;
   }
   body.mobile-touch #quest-log-window .ql-list {
     width: min(42%, 220px);
@@ -7732,7 +8007,11 @@
     justify-content: center;
     padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right))
       max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
-    background: radial-gradient(circle at 50% 42%, #12172bf2, #030407f8 74%);
+    background: radial-gradient(
+      circle at 50% 42%,
+      color-mix(in srgb, var(--color-preflight-ground) 95%, transparent),
+      color-mix(in srgb, var(--color-touch-scrim) 97%, transparent) 74%
+    );
     pointer-events: auto;
   }
   #mobile-preflight .preflight-panel {
@@ -7740,12 +8019,16 @@
     max-height: min(520px, 88vh);
     overflow: auto;
     padding: 22px 22px 20px;
-    border: 1px solid #c9a84d88;
+    border: 1px solid color-mix(in srgb, var(--color-mobile-chrome-edge) 53%, transparent);
     border-radius: 8px;
-    background: linear-gradient(180deg, #171a25f7, #0a0b10fa);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-preflight-panel-hi) 97%, transparent),
+      color-mix(in srgb, var(--color-ink-deep) 98%, transparent)
+    );
     box-shadow:
-      0 18px 60px #000d,
-      inset 0 1px 0 #ffffff14;
+      0 18px 60px color-mix(in srgb, var(--color-keyline) 87%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 8%, transparent);
     color: var(--color-text-light);
     text-align: left;
   }
@@ -7759,7 +8042,7 @@
   }
   #mobile-preflight-detail {
     margin: 0 0 14px;
-    color: #f0dfab;
+    color: var(--color-preflight-heading);
     font-size: 13px;
     line-height: 1.45;
     text-align: center;
@@ -7767,7 +8050,7 @@
   #mobile-preflight-steps {
     margin: 0 0 18px 18px;
     padding: 0;
-    color: #cfc09a;
+    color: var(--color-preflight-body);
     font-size: 12px;
     line-height: 1.55;
   }
@@ -7785,11 +8068,15 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: radial-gradient(circle at 50% 45%, #161826f0, #040509f6);
-    color: #f5e7b2;
+    background: radial-gradient(
+      circle at 50% 45%,
+      color-mix(in srgb, var(--color-rotate-gate-hi) 94%, transparent),
+      color-mix(in srgb, var(--color-rotate-gate-lo) 96%, transparent)
+    );
+    color: var(--color-rotate-gate-ink);
     font-family: var(--title-font);
     padding: 28px;
-    text-shadow: 1px 1px 3px #000;
+    text-shadow: 1px 1px 3px var(--color-keyline);
     pointer-events: auto;
   }
   #rotate-device .rotate-icon {
@@ -7914,7 +8201,7 @@
       height: 128px;
       bottom: calc(15px + env(safe-area-inset-bottom));
       opacity: 0.72;
-      border-color: #d2bd6a66;
+      border-color: color-mix(in srgb, var(--color-mobile-joy-rim-landscape) 40%, transparent);
     }
     body.mobile-touch #mobile-move-joystick {
       left: max(24px, calc(env(safe-area-inset-left) + 12px));
@@ -7942,13 +8229,13 @@
     body.mobile-touch .mobile-joy-label {
       bottom: -15px;
       font-size: 8px;
-      color: #d7c987aa;
+      color: color-mix(in srgb, var(--color-mobile-joy-label) 67%, transparent);
     }
     body.mobile-touch .mobile-btn {
       width: 54px;
       height: 48px;
       font-size: 20px;
-      background: radial-gradient(circle at 35% 30%, #2d3048bf, #11121ec2 72%);
+      background: var(--mobile-btn-fill-glass);
     }
     body.mobile-touch #mobile-extra-controls {
       left: 50%;
@@ -8145,25 +8432,29 @@
       -webkit-mask: radial-gradient(
         farthest-side,
         transparent calc(100% - 7px),
-        #000 calc(100% - 6px)
+        var(--color-keyline) calc(100% - 6px)
       );
-      mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+      mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 7px),
+        var(--color-keyline) calc(100% - 6px)
+      );
     }
     body.mobile-touch #castbar {
       /* The seat itself rides the shared button-row token from the base rule and
          needs no landscape notch; only the width, which matches the landscape
          #player-frame's rendered width (300px * 0.6 below), changes here. */
-      width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
+      width: calc(300px * var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1));
       min-width: 0;
       height: 5px;
     }
     body.mobile-touch #swingbar {
-      width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
+      width: calc(300px * var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1));
       min-width: 0;
       height: 4px;
     }
     body.mobile-touch #swingbar-offhand {
-      width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
+      width: calc(300px * var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1));
       min-width: 0;
       height: 4px;
     }
@@ -8176,13 +8467,19 @@
        invert their visual hierarchy; the landscape tier trades size for the
        shorter viewport everywhere, and this follows the established baseline.
        The drop is the player frame's own rendered height at this scale
-       (65px * 0.6 * chrome-scale) plus a 4px gap, so the pet strip starts where
+       (65px times the landscape frame factor and the chrome scale) plus a 4px gap, so the pet strip starts where
        its owner ends. */
     body.mobile-touch {
-      --mobile-pet-frame-drop: calc(65px * 0.6 * var(--mobile-chrome-scale, 1) + 4px);
+      --mobile-pet-frame-drop: calc(
+        65px *
+        var(--mobile-unit-frame-scale-landscape) *
+        var(--mobile-chrome-scale, 1) +
+        2px
+      );
     }
     body.mobile-touch #pet-frame {
-      transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+      transform: translateX(-50%)
+        scale(calc(var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1)));
     }
     body.mobile-touch #petbar {
       top: max(6px, env(safe-area-inset-top));
@@ -8223,15 +8520,17 @@
     body.mobile-touch #player-frame {
       left: 50%;
       width: 300px;
-      transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+      transform: translateX(-50%)
+        scale(calc(var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1)));
     }
     /* Landscape's own scale (0.6, not the portrait rule's 0.82 above) needs the
        SAME composed lift, or a pad paired on the landscape-only touch HUD (the
        only orientation it ever runs in) gets the un-lifted frame regardless of
        the portrait-scoped fix. */
     body.mobile-touch.xhb-mode #player-frame {
-      transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)))
-        scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+      transform: translateX(-50%)
+        translateY(calc(-1 * var(--xhb-lift, var(--mobile-xhb-lift-fallback))))
+        scale(calc(var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1)));
     }
     body.mobile-touch #player-frame .uf-bars {
       width: 224px;
@@ -8240,7 +8539,9 @@
     body.mobile-touch #target-frame {
       left: max(6px, env(safe-area-inset-left));
       top: max(6px, env(safe-area-inset-top));
-      transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+      transform: scale(
+        calc(var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1))
+      );
     }
     /* The quest strip's anchor tracks this tier's target seat: same derivation
        as the portrait one, reading THIS rule's left literal and scale. */
@@ -8251,7 +8552,7 @@
           max(6px, env(safe-area-inset-left)) +
           var(--target-frame-content-width) *
           var(--target-frame-scale, 1) *
-          0.6 *
+          var(--mobile-unit-frame-scale-landscape) *
           var(--mobile-chrome-scale, 1)
         ) +
         11px
@@ -8310,7 +8611,9 @@
     body.mobile-touch #minimap-wrap {
       right: max(6px, env(safe-area-inset-right));
       top: max(6px, env(safe-area-inset-top));
-      transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+      transform: scale(
+        calc(var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1))
+      );
     }
     body.mobile-touch #meters-window {
       position: fixed;
@@ -8785,7 +9088,7 @@
   body.mobile-touch #dungeon-finder-window .df-footer {
     position: sticky;
     bottom: 0;
-    background: var(--panel-bg, #17120a);
+    background: var(--panel-bg);
     padding: 4px 0;
   }
   /* 40x40 touch floor for every tappable finder control. */

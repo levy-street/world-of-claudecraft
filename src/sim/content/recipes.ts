@@ -4330,8 +4330,9 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //     uncrafted output, valefire_lantern (offhand, uncommon, int 1 spi 1,
 //     item level 7, sellValue 160), is strictly dominated by the trainer's
 //     OWN rows at the same rung and below, recipe_goldleaf_folio (rung 25,
-//     int 3 spi 2, a 150 bill) and recipe_silverleaf_primer (rung 0, int 2
-//     spi 1, a 36 bill): same slot, same CASTER_ALL lock, same quality, more
+//     int 3 spi 2 sta 2, a 150 bill) and recipe_silverleaf_primer (rung 0,
+//     int 2 spi 1 sta 1, a 36 bill): same slot, same CASTER_ALL lock, same
+//     quality, more
 //     stats, cheaper. The only axis the lantern wins is sellValue, so the row
 //     was a fetish sink whose one use was the vendor loop (+24 per craft at
 //     the floor after the sink). No other uncrafted caster offhand sits in

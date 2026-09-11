@@ -150,7 +150,9 @@ describe('mailbox: the typeable parcel quantity field', () => {
     input.value = '2';
     input.dispatchEvent(new Event('change'));
     const restored = document.activeElement as HTMLElement;
-    expect(restored.className).toBe('mail-parcel-qty-input');
+    // W10: the quantity field now composes the shared input primitive.
+    expect(restored.classList.contains('mail-parcel-qty-input')).toBe(true);
+    expect(restored.classList.contains('ui-input')).toBe(true);
     expect(restored.className).not.toContain('remove');
   });
 

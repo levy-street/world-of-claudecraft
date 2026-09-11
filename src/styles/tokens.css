@@ -631,6 +631,503 @@
     --bank-meter-gilt-fill: var(--color-gold-400);
     --bank-meter-gilt-text: var(--color-gold-300);
     --bank-meter-gilt-glow: color-mix(in srgb, var(--color-gold-600) 55%, transparent);
+
+    /* Interface library tokens (src/styles/library.css, src/ui/library/CLAUDE.md).
+       The approved redesign boards keep the shipped classic palette above; these
+       name the values the boards repeat so component CSS composes them instead of
+       spelling a literal. Static entries are dark chrome that stays dark on every
+       preset (socket interiors, wells, keylines, medals); the text and panel
+       entries are the classic outputs of src/ui/theme.ts derivations, which
+       re-emit them per preset. */
+    --color-keyline: #000000;
+    --color-white: #ffffff;
+    --color-ink: #0d0d13;
+    --color-ink-deep: #0b0b10;
+    /* Foregrounds for the fixed-dark surfaces (ink grounds, the red and gold
+       button plates, the selected tab, the medal). theme.ts must never re-emit
+       these: a preset-derived text token on a fixed surface goes dark-on-dark
+       under Parchment. Pinned at AA per preset by tests/ui_library.test.ts. */
+    --color-text-on-ink: #f0ebd8;
+    --color-text-on-ink-soft: #e0dac4;
+    --color-text-on-red: #f0ebd8;
+    --color-text-on-tab-on: #ffd100;
+    --color-text-on-gold-btn: #ffe9a8;
+    --color-text-on-medal: #ffd100;
+    --color-socket-rim: #4a3d1d;
+    --color-socket-hi: #2c2c3a;
+    --color-panel-hi: #1c1c29;
+    --color-chrome-ground: #1a1410;
+    --color-chrome-glyph: #c9b27a;
+    --color-glint: #ffea8c;
+    --color-control-border: #4e3f1d;
+    --color-medal-hi: #4a3a14;
+    --color-medal-lo: #241c08;
+    --color-medal-ink: #3a2b00;
+    --color-window-ring: color-mix(in srgb, var(--border) 40%, var(--color-keyline));
+    --color-bronze-light: #b08a3a;
+    --color-bronze-dark: #3c2f14;
+    --color-hostile-rim: #8b2a22;
+    --color-portrait-hi: #3a3a4e;
+    --color-portrait-lo: #14141c;
+    --color-proc-rim: #ffd97a;
+    --color-proc-glow: #ffcf40;
+    --color-bar-track: #1a1a1a;
+    --color-bar-well-lo: #0a0a0e;
+    --color-bar-well-hi: #17171d;
+    --color-cast-track: #0c0906;
+    --color-swing-track: #0c0a07;
+    --color-combat-badge-ground: #100606;
+    --color-tab-on-hi: #2a2436;
+    --color-tab-on-lo: #161220;
+    --color-tab-off-hi: #1c1824;
+    --color-tab-off-lo: #0d0b13;
+    --color-tab-off-border: #3a321d;
+    --color-card-hi: #17130c;
+    --color-card-lo: #0c0a07;
+    --color-btn-gold-hi: #7a5a1c;
+    --color-btn-gold-lo: #2e2208;
+    --color-btn-red-hi: #7a2a20;
+    --color-btn-red-lo: #4a1a12;
+    --color-btn-red-border: #5a2a1a;
+    --color-info: #45c9ff;
+    --color-warning: #ff9d32;
+    /* --color-info and --color-warning are chat text on the boards: theme.ts
+       re-emits them contrast-repaired per preset (the --color-material-use path). */
+    --color-danger: #e74c3c;
+    --color-xp: #b85eff;
+    --color-xp-deep: #6a1bb0;
+    --color-xp-rested: #5fb0ff;
+    --color-xp-rested-deep: #2b6fd0;
+    --color-bg-deep: var(--color-ink-deep);
+    /* Item quality, mirroring QUALITY_COLOR in src/ui/icons.ts (pinned equal by
+       tests/ui_library.test.ts); the .q-* classes and icons.ts stay the anchors. */
+    --color-quality-poor: #9d9d9d;
+    --color-quality-common: #ffffff;
+    --color-quality-uncommon: #1eff00;
+    --color-quality-rare: #0070dd;
+    --color-quality-epic: #a335ee;
+    --color-quality-legendary: #ff8000;
+    /* Controller face-button glyph tints (the cross hotbar and pad prompts). */
+    --color-pad-a: #5fbf5a;
+    --color-pad-b: #e04b4b;
+    --color-pad-x: #4f8fe0;
+    --color-pad-y: #e6c23a;
+    /* Themed text and surface derivations (classic outputs; theme.ts re-emits
+       --color-socket-hi, --color-panel-hi, --color-glint, --color-control-border,
+       --color-info, --color-warning and the four below per preset). */
+    --color-text-secondary: #e0dac4;
+    --color-text-faint: #897f61;
+    --panel-bg-soft: linear-gradient(
+      170deg,
+      rgba(21, 21, 31, 0.74) 0%,
+      rgba(12, 12, 17, 0.74) 60%,
+      rgba(12, 12, 17, 0.74) 100%
+    );
+    --panel-bg-strong: linear-gradient(
+      170deg,
+      rgba(16, 16, 24, 0.97) 0%,
+      rgba(9, 9, 13, 0.97) 100%
+    );
+    /* Composites: fills and edges the primitives share. */
+    --socket-fill: radial-gradient(circle at 35% 30%, var(--color-socket-hi), var(--panel-base));
+    --socket-fill-empty: color-mix(in srgb, var(--color-ink) 55%, transparent);
+    --medal-fill: radial-gradient(circle at 40% 35%, var(--color-medal-hi), var(--color-medal-lo));
+    --btn-fill-selected: var(--medal-fill);
+    --btn-fill-gold: linear-gradient(
+      180deg,
+      var(--color-btn-gold-hi),
+      var(--color-medal-hi) 60%,
+      var(--color-btn-gold-lo)
+    );
+    --btn-fill-red: linear-gradient(180deg, var(--color-btn-red-hi), var(--color-btn-red-lo));
+    --ribbon-bg: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-panel-hi) 92%, transparent),
+      color-mix(in srgb, var(--color-bg-input) 92%, transparent)
+    );
+    --bar-well-fill: linear-gradient(var(--color-bar-well-lo), var(--color-bar-well-hi));
+    --bar-gloss: linear-gradient(
+      color-mix(in srgb, var(--color-white) 25%, transparent),
+      color-mix(in srgb, var(--color-white) 2%, transparent) 45%,
+      color-mix(in srgb, var(--color-keyline) 15%, transparent)
+    );
+    --xp-fill: linear-gradient(180deg, var(--color-xp), var(--color-xp-deep));
+    --xp-rested-fill: linear-gradient(180deg, var(--color-xp-rested), var(--color-xp-rested-deep));
+    --xp-overflow-fill: linear-gradient(#ffe27a, #d99a1c);
+    --castbar-fill: linear-gradient(#ffe48a, #c9941a 60%, #9a6f12);
+    --castbar-fill-hostile: linear-gradient(#ff9a8f, #c93024 60%, #73110d);
+    --castbar-fill-channel: linear-gradient(#8ad4ff, #1a74c9 60%, #125a9a);
+    --castbar-fill-consume: linear-gradient(#a8e08a, #4f8c3a 60%, #2f5a22);
+    --swing-fill-main: linear-gradient(#ffcf7a, #d97b1e 60%, #8a4a10);
+    --swing-fill-offhand: linear-gradient(#8fe6d6, #1e9d97 60%, #0f5a58);
+    --swing-fill-ready: linear-gradient(#d8e8ff, #8fb6e6 60%, #5b86b8);
+    --swing-fill-target: linear-gradient(#c9a3ff, #7c3fd9 60%, #481f8a);
+    --swing-fill-tot: linear-gradient(#ffb3c6, #d9427c 60%, #8a1f4e);
+    --edge-glint: inset 0 1px 0 color-mix(in srgb, var(--color-glint) 16%, transparent);
+    --edge-hairline: inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 12%, transparent);
+    --shadow-lift: 0 2px 4px color-mix(in srgb, var(--color-keyline) 56%, transparent);
+    --shadow-socket:
+      0 0 0 1px var(--color-keyline),
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 10%, transparent), var(--edge-hairline),
+      0 3px 6px color-mix(in srgb, var(--color-keyline) 60%, transparent);
+    --shadow-panel:
+      0 2px 16px color-mix(in srgb, var(--color-keyline) 75%, transparent),
+      inset 0 0 24px color-mix(in srgb, var(--color-keyline) 38%, transparent), var(--edge-glint);
+    --shadow-window:
+      0 0 0 2px var(--color-window-ring), 0 0 0 3px var(--color-keyline),
+      0 14px 40px color-mix(in srgb, var(--color-keyline) 70%, transparent),
+      inset 0 0 28px color-mix(in srgb, var(--color-keyline) 40%, transparent), var(--edge-glint);
+    --shadow-well:
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 5%, transparent),
+      inset 0 0 14px color-mix(in srgb, var(--color-keyline) 70%, transparent);
+    --glow-gold: 0 0 calc(12px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--gold) 70%, transparent);
+    --glow-gold-soft: 0 0 calc(8px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--gold) 50%, transparent);
+    --title-shadow: 1px 1px 2px var(--color-keyline);
+    --outline-shadow:
+      -1px 0 var(--color-keyline), 1px 0 var(--color-keyline), 0 -1px var(--color-keyline),
+      0 1px var(--color-keyline), 0 0 3px var(--color-keyline);
+    /* Sizes the boards repeat. Sockets are a parametric family: the action size
+       is the default and each species (bag 40, bank socket 32, stance disc 30)
+       sets --ui-socket-size on its own class. */
+    --socket-size: 46px;
+    --socket-gap: 4px;
+    --socket-row-gap: 6px;
+    --socket-art-inset: 1px;
+    --socket-size-bag: 40px;
+    --socket-size-bank: 32px;
+    --socket-size-stance: 40px;
+    --action-rail-w: calc(12 * var(--socket-size) + 11 * var(--socket-gap));
+    --aura-size: 28px;
+    --aura-size-own: 30px;
+    --portrait-size: 60px;
+    --level-chip-size: 24px;
+    --bar-h: 15px;
+    --bar-h-hp: 16px;
+    --bar-h-res: 11px;
+    --bar-h-res-empty: var(--bar-h-res);
+    --bar-notch: 5px;
+    --castbar-w: 300px;
+    --castbar-h: 20px;
+    --castbar-point: 6px;
+    --xp-rail-h: 14px;
+    --win-head-h: 44px;
+    --btn-h: 32px;
+    --btn-h-lg: 38px;
+    --icon-btn-w: 36px;
+    --icon-btn-h: 34px;
+    --micro-btn-w: 34px;
+    --micro-btn-h: 30px;
+    --disc-size: 28px;
+    --keycap-h: 18px;
+    --keycap-min-w: 18px;
+    --badge-size: 16px;
+    --tab-h: 30px;
+    --input-h: 34px;
+    --toggle-w: 44px;
+    --toggle-h: 24px;
+    --range-h: 4px;
+    --range-thumb: 16px;
+    --stat-row-h: 21px;
+    --party-row-w: 170px;
+    --tracker-w: 240px;
+    --chat-w: 370px;
+    --spacing-2xs: 2px;
+    --radius-2xs: 2px;
+    --radius-xs: 3px;
+    --radius-card: 5px;
+    --radius-panel: 6px;
+    --radius-socket: 6px;
+    --radius-cell: 7px;
+    --radius-window: 8px;
+    --radius-pill: 999px;
+    --dur-fast: 90ms;
+    --dur-press: 60ms;
+    --dur-panel: 160ms;
+    --dur-frame: 120ms;
+    /* The invite/trade/duel/ready-check countdown bar. PROMPT_TIMEOUT_MS in
+       src/ui/prompt_dialog.ts is the same duration and dismisses the prompt;
+       tests/prompt_timeout_duration.test.ts pins the two equal. */
+    --prompt-timeout-dur: 28s;
+    /* Dim the live world while the modal options family is open. */
+    --color-options-scrim: color-mix(in srgb, var(--color-keyline) 74%, transparent);
+
+    /* player card canvas */
+    --color-player-card-bg-hi: #2a3a48;
+    --color-player-card-bg-lo: #0b0b12;
+    --color-player-card-chip-ink: #1c1407;
+
+    /* action bars */
+    /* Compact pet commands keep their own socket species without shrinking combat actions. */
+    --socket-size-pet: 36px;
+    /* Desktop XP fill paint stays separate from the driven mobile progress fraction. */
+    --xp-rail-fill: linear-gradient(180deg, var(--color-xp), var(--color-xp-deep));
+    /* Rested XP keeps a blue halo while its actionable segment stays fully saturated. */
+    --glow-xp-rested: 0 0 calc(6px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-xp-rested) 33%, transparent);
+    /* Post-cap XP keeps a gold halo while the overflow fill remains the primary cue. */
+    --glow-xp-overflow: 0 0 calc(6px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--gold) 33%, transparent);
+    /* Pet autocast uses a tier-scaled halo around an invariant gold rim. */
+    --glow-pet-autocast:
+      inset 0 0 0 1px color-mix(in srgb, var(--gold) 67%, transparent),
+      0 0 calc(10px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 40%, transparent),
+      0 0 calc(18px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 20%, transparent);
+    /* Queued actions use a tier-scaled halo around an invariant white rim. */
+    --glow-action-queued:
+      0 0 calc(9px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 80%, transparent),
+      var(--edge-glint);
+    /* The lower proc pulse frame preserves the proc hue at reduced intensity. */
+    --glow-action-proc-soft:
+      0 0 0 1px var(--color-keyline),
+      0 0 calc(7px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-proc-glow) 69%, transparent),
+      inset 0 0 calc(4px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-proc-glow) 27%, transparent);
+    /* The upper proc pulse frame keeps its invariant rim at peak emphasis. */
+    --glow-action-proc-strong:
+      0 0 0 1px var(--color-keyline),
+      0 0 calc(15px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-proc-glow) 94%, transparent),
+      inset 0 0 calc(7px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-proc-glow) 53%, transparent);
+    /* Empowered actions keep a steady gold halo when their pulse is paused. */
+    --glow-action-empowered:
+      0 0 calc(12px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 87%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 67%, transparent), var(--edge-glint);
+    /* The lower empowered pulse frame eases the halo without changing its rim. */
+    --glow-action-empowered-soft:
+      0 0 calc(9px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 73%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 53%, transparent), var(--edge-glint);
+    /* The upper empowered pulse frame strengthens only decorative blur. */
+    --glow-action-empowered-strong:
+      0 0 calc(18px * var(--fx-shadow, 1)) var(--gold),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 80%, transparent), var(--edge-glint);
+    /* Fate consume readiness keeps its teal rim distinct from the violet outline. */
+    --color-fate-consume-rim: #76e1cf;
+    /* Fate consume readiness uses violet as its secondary invariant edge. */
+    --color-fate-consume-outline: #a77cff;
+    /* Fate consume readiness layers tier-scaled teal and violet halos. */
+    --glow-action-fate-consume:
+      0 0 calc(10px * var(--fx-shadow, 1)) color-mix(in srgb, #5de5d0 90%, transparent),
+      0 0 calc(20px * var(--fx-shadow, 1)) color-mix(in srgb, #8149da 72%, transparent),
+      inset 0 0 calc(7px * var(--fx-shadow, 1)) color-mix(in srgb, #71eedb 48%, transparent);
+    /* Fate sentence readiness keeps its rose rim distinct from the violet outline. */
+    --color-fate-sentence-rim: #ff789d;
+    /* Fate sentence readiness uses a lighter violet secondary invariant edge. */
+    --color-fate-sentence-outline: #d99cff;
+    /* Fate sentence readiness layers tier-scaled rose and violet halos. */
+    --glow-action-fate-sentence:
+      0 0 calc(10px * var(--fx-shadow, 1)) color-mix(in srgb, #ff5489 92%, transparent),
+      0 0 calc(20px * var(--fx-shadow, 1)) color-mix(in srgb, #9f40dc 76%, transparent),
+      inset 0 0 calc(7px * var(--fx-shadow, 1)) color-mix(in srgb, #ff6699 52%, transparent);
+    /* Drag targets keep a cyan rim that cannot disappear with shadow quality. */
+    --color-action-drop-target: #7fd1ff;
+    /* Drag targets add a tier-scaled halo around the invariant cyan rim. */
+    --glow-action-drop-target: 0 0 calc(8px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-action-drop-target) 53%, transparent);
+    /* Keybind selection keeps its inset gold ring while decorative blur scales. */
+    --glow-action-bind-selected:
+      0 0 calc(10px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 80%, transparent),
+      inset 0 0 0 2px var(--gold);
+
+    /* unit and party frames */
+    /* Shared authored geometry for the plateless unit-frame family. */
+    --unit-frame-w: 278px;
+    /* Classic party bars keep a readable health-to-resource hierarchy. */
+    --party-hp-h: 9px;
+    --party-res-h: 5px;
+    /* Compact raid cells use one stable board-approved footprint. */
+    --party-raid-cell-w: 122px;
+    --party-raid-cell-h: 42px;
+    /* Party rows fall back to a readable class accent before their live class resolves. */
+    --color-party-class-default: #7fb8ff;
+    /* Raid-cell materials stay flat and darker than classic party panels. */
+    --color-party-raid-border: #050505;
+    --color-party-raid-ground: #101010;
+    --color-party-raid-track: #171717;
+    /* Role swatches remain legible independently of the class-colored health fill. */
+    --color-party-role-tank: #5a8fd8;
+    --color-party-role-healer: #7fdc4f;
+    --color-party-role-damage: #d8563a;
+    /* Party pet tracks and dead-state stripes stay subordinate to member health. */
+    --color-party-pet-track: #0c0c14;
+    --color-party-pet-dead-hi: #3a3a3a;
+    --color-party-pet-dead-lo: #262626;
+    --color-party-pet-dead-border: #555555;
+    /* Live party-pet health fill. */
+    --party-pet-fill: linear-gradient(180deg, #6fbf5a, #3f8a33);
+
+    /* auras and transient HUD */
+    /* Self miss combat text keeps the shipped neutral grey. */
+    --color-fct-miss-self: #bbb;
+    /* Self dodge combat text keeps the shipped neutral grey. */
+    --color-fct-dodge-self: #bbb;
+    /* Other-target miss combat text keeps the shipped parchment white. */
+    --color-fct-miss-other: #fff;
+    /* Other-target dodge combat text keeps the shipped parchment white. */
+    --color-fct-dodge-other: #fff;
+    /* Auto-attack damage text keeps the shipped parchment white. */
+    --color-fct-damage-done-auto: #fff;
+    /* Ability damage text keeps the shipped warm parchment highlight. */
+    --color-fct-damage-done-ability: #ffe97a;
+    /* Incoming damage text keeps the shipped hostile red. */
+    --color-fct-damage-taken: #ff5544;
+    /* Outgoing blocked damage keeps the shipped steel grey. */
+    --color-fct-damage-done-block: #b8c4d9;
+    /* Incoming blocked damage keeps the shipped steel blue. */
+    --color-fct-damage-taken-block: #7ec8e3;
+    /* Absorbed damage text keeps the shipped pale blue. */
+    --color-fct-absorb: #9fd7ff;
+    /* Healing combat text keeps the shipped restorative green. */
+    --color-fct-heal: #3ce63c;
+    /* Experience combat text keeps the shipped violet reward hue. */
+    --color-fct-xp: #d9a3ff;
+    /* Rested experience text keeps the shipped blue reward hue. */
+    --color-fct-rested-xp: #6db8ff;
+    /* Honor combat text keeps the shipped primary gold. */
+    --color-fct-honor: #ffd100;
+    /* Self-note combat text keeps the shipped warm warning hue. */
+    --color-fct-self-note: #ff8c66;
+    /* Fire aura overlays keep their shipped orange school identity. */
+    --color-aura-overlay-fire: #ff8a33;
+    /* Frost aura overlays keep their shipped cyan school identity. */
+    --color-aura-overlay-frost: #54d9ff;
+    /* Aura countdown sweeps retain the shipped translucent ink mask. */
+    --color-aura-overlay-timer-mask: rgb(0 0 0 / 62%);
+    /* The death veil keeps the world visible beneath a hostile red wash. */
+    --death-overlay-veil: radial-gradient(
+      ellipse at center,
+      rgb(64 0 0 / 47%) 0%,
+      rgb(48 0 0 / 73%) 100%
+    );
+    /* Mana warnings retain their dynamic cool halo and inner glint. */
+    --shadow-low-resource-mana:
+      0 0 5px 1px rgb(150 205 255 / var(--lr-opacity)), inset 0 0 4px rgb(220 240 255 / 90%);
+    /* Energy warnings retain their dynamic warm halo and inner glint. */
+    --shadow-low-resource-energy:
+      0 0 5px 1px rgb(255 225 110 / var(--lr-opacity)), inset 0 0 4px rgb(255 245 200 / 90%);
+    /* Focus warnings retain their dynamic amber halo and inner glint. */
+    --shadow-low-resource-focus:
+      0 0 5px 1px rgb(255 180 70 / var(--lr-opacity)), inset 0 0 4px rgb(255 235 195 / 90%);
+    /* Mana warning labels keep their cool parchment tint. */
+    --color-low-resource-mana: #eaf4ff;
+    /* Energy warning labels keep their warm parchment tint. */
+    --color-low-resource-energy: #fff3c2;
+    /* Focus warning labels keep their amber parchment tint. */
+    --color-low-resource-focus: #ffe0a0;
+    /* Breath bars retain their translucent deep-water track. */
+    --color-breath-track: rgb(8 14 24 / 72%);
+    /* Breath bars retain their cool structural rim. */
+    --color-breath-border: rgb(150 190 230 / 55%);
+    /* Breath remaining retains the shipped water-blue gradient. */
+    --breath-fill: linear-gradient(180deg, #6fc2ff 0%, #2f7fd4 100%);
+    /* Drowning breath retains the shipped hostile-red gradient. */
+    --breath-drowning-fill: linear-gradient(180deg, #ff7d6f 0%, #c22f2f 100%);
+    /* The strong drowning pulse keeps its shipped urgent rim. */
+    --color-breath-drowning-strong: rgb(255 120 100 / 90%);
+    /* The soft drowning pulse keeps its shipped ebbing rim. */
+    --color-breath-drowning-soft: rgb(255 60 40 / 40%);
+    /* Breath text keeps its cool high-contrast parchment tint. */
+    --color-breath-label: #eaf4ff;
+
+    /* chat */
+    /* Multiplies the player's chat opacity while the dock is idle. */
+    --chat-soft: 0.74;
+
+    /* right rail */
+    --color-steam-accent: #66c0f4; /* Steam destination accent, restricted to interactive edges. */
+    --color-tracker-reliquary: var(
+      --color-quality-epic
+    ); /* Reliquary progress and collection flash accent. */
+    --color-delve-affix-restless-graves: #8b7355; /* Restless Graves fallback tile. */
+    --color-delve-affix-bad-air: #6a8a6a; /* Bad Air fallback tile. */
+    --color-delve-affix-candleblind: #c9a227; /* Candleblind fallback tile. */
+    --color-delve-affix-old-mechanisms: #7a8a9a; /* Old Mechanisms fallback tile. */
+    --color-delve-affix-flooded-paths: #4a7a9a; /* Flooded Paths fallback tile. */
+    --color-delve-affix-grave-tax: #9a6a4a; /* Grave Tax fallback tile. */
+    --color-delve-affix-unstable-roof: #8a6a5a; /* Unstable Roof fallback tile. */
+    --color-delve-affix-cult-remnants: #7a4a8a; /* Cult Remnants fallback tile. */
+    --color-delve-affix-chapel-candle: #ffd100; /* Chapel Candle fallback tile. */
+    --color-delve-affix-high-water: #2f718c; /* High Water fallback tile. */
+    --color-delve-affix-lively-choir: #5f70a5; /* Lively Choir fallback tile. */
+    --color-delve-affix-belligerent-dead: #6f5a46; /* Belligerent Dead fallback tile. */
+    --color-delve-affix-unknown: #888; /* Accessible neutral tile for future affixes. */
+    /* The community tray's plate is deliberately preset-independent: it floats
+       over the 3D world, and its ink contrast is pinned against these two stops
+       (tests/browser/steam_wishlist.browser.test.ts). */
+    --chrome-plate-fixed: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    --color-chrome-plate-ink: #b8bcc8; /* Muted silver ink for that fixed plate. */
+
+    /* minimap day/night dial */
+    /* Sun disc and rays at the dial's centre by day (resolved by
+       day_night_dial_painter.ts via getComputedStyle, the minimap-token idiom). */
+    --color-daynight-sun: #ffd45a;
+    /* Crescent moon at the dial's centre by night. */
+    --color-daynight-moon: #e2e8f6;
+    /* The "now" pip riding the dial ring, and its halo. */
+    --color-daynight-marker: #fff;
+    /* The pip's outline, so it reads against the bright day arc too. */
+    --color-daynight-marker-outline: #000;
+
+    /* mobile touch HUD */
+    /* Out-of-range actions keep one invariant rim on desktop and touch alike. */
+    --color-action-oor-rim: #a33;
+    /* Post-cap XP's overflow gold, named so the mobile XP ring can read the
+       same stops the desktop rail's --xp-overflow-fill paints. */
+    --color-xp-overflow: #ffe27a;
+    --color-xp-overflow-deep: #b8902a;
+    --color-xp-overflow-glow: #f5c843;
+    /* The touch window scrim: dims the world behind a mobile sheet without
+       hiding it, one stop every mobile backdrop mixes its alpha from. */
+    --color-touch-scrim: #030407;
+    /* The mobile preflight gate and the rotate-device gate: full-screen
+       pre-game surfaces, so their grounds are declared here rather than in the
+       body.mobile-touch block (neither rule is scoped to that class). */
+    --color-preflight-ground: #12172b;
+    --color-preflight-panel-hi: #171a25;
+    --color-preflight-heading: #f0dfab;
+    --color-preflight-body: #cfc09a;
+    --color-rotate-gate-hi: #161826;
+    --color-rotate-gate-lo: #040509;
+    --color-rotate-gate-ink: #f5e7b2;
+    /* The Claudium store hero's cool wash over its coin artwork. */
+    --color-woc-store-hero-hi: #030a10;
+    --color-woc-store-hero-lo: #04111b;
+    /* target size */
+    /* Stance socket on a coarse pointer: the same 40px box, kept as its own
+       token so touch can diverge from the desktop row without a rule rewrite. */
+    --socket-size-stance-coarse: 40px;
+    /* character window stage */
+    /* Scrim under the paperdoll socket columns where they float over the live 3D
+       stage, so slot names and item names stay legible against a lit model. */
+    --color-stage-overlay-scrim: color-mix(in srgb, var(--color-keyline) 66%, transparent);
+    /* Paperdoll stage seats: the skin row (34px swatch plus its padding) and one
+       40px socket row, so the overlay columns can span the height between them. */
+    --paperdoll-skin-row-h: 48px;
+    --paperdoll-weapons-row-h: 40px;
+    --paperdoll-stage-foot-h: calc(
+      var(--paperdoll-skin-row-h) +
+      var(--paperdoll-weapons-row-h) +
+      2 *
+      var(--spacing-sm)
+    );
+
+    /* unit frames */
+    /* Clearance between the stock unit frames and the action bar under them. */
+    --unit-frame-bar-gap: 14px;
+    /* Distance from the bottom of #ui to the TOP of that stock seat: the 6px
+       bottom-bar inset, the XP rail, the action row and its gap, the bar gap,
+       then the docked player frame's 64px height, so the stock target frame
+       lands level with the player frame. */
+    --unit-frame-seat-offset: calc(
+      var(--xp-rail-h) +
+      var(--socket-row-gap) +
+      var(--socket-size) +
+      var(--unit-frame-bar-gap) +
+      70px
+    );
   }
 
   /* Glass is dropped WHOLE-RULE at the low effect tier: a universal removal

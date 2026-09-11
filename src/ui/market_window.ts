@@ -30,7 +30,7 @@ import {
 } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
-import { computeDropdownPlacement } from './dropdown_position';
+import { computeDropdownPlacement, dropdownClipBounds } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import {
@@ -41,6 +41,7 @@ import {
   t,
 } from './i18n';
 import {
+  isHeroicItem,
   marketArmorBadge,
   marketArmorPips,
   marketHeroicStar,
@@ -446,7 +447,7 @@ export class MarketWindow {
   // match every locale's punctuation (e.g. a fullwidth colon in CJK).
   private sellPriceRefHtml(priceRef: number | null): string {
     if (priceRef === null) return esc(t('itemUi.market.lowestPriceNone'));
-    return `<span>${esc(t('itemUi.market.lowestPriceLabel'))}</span><span class="mkt-price">${this.deps.moneyHtml(priceRef)}</span>`;
+    return `<span>${esc(t('itemUi.market.lowestPriceLabel'))}</span><span class="mkt-price ui-money">${this.deps.moneyHtml(priceRef)}</span>`;
   }
 
   render(): void {
@@ -466,7 +467,7 @@ export class MarketWindow {
         : t('itemUi.market.collect');
     };
     const tab = (id: MarketTab) =>
-      `<button type="button" class="mkt-tab${this.tab === id ? ' sel' : ''}" data-tab="${id}" aria-pressed="${this.tab === id ? 'true' : 'false'}">${esc(tabLabel(id))}</button>`;
+      `<button type="button" class="mkt-tab ui-tab${this.tab === id ? ' sel is-on' : ''}" data-tab="${id}" aria-pressed="${this.tab === id ? 'true' : 'false'}">${esc(tabLabel(id))}</button>`;
     // The search box and the type/subtype/rarity dropdowns are all filter controls for
     // the Browse tab, so `.mkt-controls` owns their shared accessible group and responsive
     // grid. The search box lives here (rather than being created inside #market-body by
@@ -476,20 +477,22 @@ export class MarketWindow {
     const controlsHtml =
       this.tab === 'browse'
         ? `<div class="mkt-controls" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
-          `<input type="search" class="mkt-search" placeholder="${esc(t('itemUi.market.searchPlaceholder'))}" aria-label="${esc(t('itemUi.market.searchAria'))}" value="${esc(this.searchQuery)}">` +
+          `<input type="search" class="mkt-search ui-input" placeholder="${esc(t('itemUi.market.searchPlaceholder'))}" aria-label="${esc(t('itemUi.market.searchAria'))}" value="${esc(this.searchQuery)}">` +
           this.renderMarketFilters() +
           this.renderCollapseLowestToggle() +
           `</div>`
         : '';
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('itemUi.market.title'))} <span class="panel-subtitle">${esc(t('itemUi.market.subtitle'))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.market.close'))}">${svgIcon('close')}</button></div>` +
-      `<div class="mkt-tabs">` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('itemUi.market.title'))} <span class="panel-subtitle ui-win-sub">${esc(t('itemUi.market.subtitle'))}</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('itemUi.market.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="mkt-tabs ui-tabs">` +
       tab('browse') +
       tab('sell') +
       tab('collect') +
       `</div>` +
-      controlsHtml +
-      `<div id="market-body"></div>`;
+      `<div class="mkt-layout${this.tab === 'browse' ? '' : ' mkt-layout-wide'}">${controlsHtml}<div id="market-body"></div></div>` +
+      (this.tab === 'browse'
+        ? `<p class="mkt-footer ui-muted">${esc(t('hudChrome.marketWindow.mixedListingsFooter'))}</p>`
+        : '');
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     const searchInput = el.querySelector<HTMLInputElement>('.mkt-search');
     searchInput?.addEventListener('input', () => {
@@ -552,11 +555,31 @@ export class MarketWindow {
       // border-inclusive box.
       const borderTop = Number.parseFloat(getComputedStyle(el).borderTopWidth) || 0;
       const borderBottom = Number.parseFloat(getComputedStyle(el).borderBottomWidth) || 0;
+      // On desktop `.mkt-controls` is a 200px column that SCROLLS, so it clips in
+      // its own right and starts well below the window's own top edge. Measuring
+      // only the window let a flipped-up menu render above the column, where its
+      // first option was invisible and hit-testing reached the window title. On
+      // mobile the same element gives up its scroller (overflow-y: visible, the
+      // whole sheet scrolls instead), so it clips nothing and must NOT constrain
+      // the menu: the computed overflow is what tells the two layouts apart.
+      const controls = trigger.closest<HTMLElement>('.mkt-controls');
+      const controlsRect =
+        controls && getComputedStyle(controls).overflowY !== 'visible'
+          ? controls.getBoundingClientRect()
+          : undefined;
+      const clip = dropdownClipBounds(
+        controlsRect
+          ? [
+              { top: c.top + borderTop, bottom: c.bottom - borderBottom },
+              { top: controlsRect.top, bottom: controlsRect.bottom },
+            ]
+          : [{ top: c.top + borderTop, bottom: c.bottom - borderBottom }],
+      );
       const placement = computeDropdownPlacement({
         triggerTop: t.top,
         triggerBottom: t.bottom,
-        containerTop: c.top + borderTop,
-        containerBottom: c.bottom - borderBottom,
+        containerTop: clip.top,
+        containerBottom: clip.bottom,
         preferredMaxHeight: MKT_MENU_PREFERRED_HEIGHT,
         gap: MKT_MENU_GAP,
         minHeight: MKT_MENU_MIN_HEIGHT,
@@ -802,12 +825,12 @@ export class MarketWindow {
       const effQuality = parts.quality;
       const qColor = marketNameColor(effQuality);
       const row = document.createElement('div');
-      row.className = 'mkt-row';
+      row.className = 'mkt-row ui-card';
       const itemName = parts.name;
       const displayedSources = materialSourcesForDisplay(l);
       const each =
         l.count > 1
-          ? `<br><span class="seller">${esc(t('itemUi.market.each', { money: formatLocalizedMoney(Math.ceil(l.price / l.count)) }))}</span>`
+          ? `<span class="seller">${esc(t('itemUi.market.each', { money: formatLocalizedMoney(Math.ceil(l.price / l.count)) }))}</span>`
           : '';
       const stack =
         l.count > 1
@@ -828,6 +851,9 @@ export class MarketWindow {
       // the bracketed [HEROIC] tooltip tag, so a screen reader reads "Heroic", not
       // "left-bracket HEROIC right-bracket".
       const heroicStar = marketHeroicStar(item, esc(t('hudChrome.itemHeroicLabel')));
+      const heroicLabel = isHeroicItem(item)
+        ? `<span class="mkt-heroic-label ui-chip">${esc(t('hudChrome.itemHeroicLabel'))}</span>`
+        : '';
       // Pattern mark: the third corner of the same family, bottom-left (the two
       // above hold top-left and bottom-right). Reuses the type chip's own word,
       // so the mark and the filter that finds it read the same.
@@ -843,12 +869,12 @@ export class MarketWindow {
         esc(formatLocalizedMoney(l.price, 'long')),
       );
       row.innerHTML =
-        `<span class="mkt-ico">${this.deps.itemIcon(item, effQuality)}${badge}${heroicStar}${patternMark}</span>` +
-        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
+        `<span class="mkt-ico ui-socket ui-socket--bag">${this.deps.itemIcon(item, effQuality)}${badge}${heroicStar}${patternMark}</span>` +
+        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>${heroicLabel}` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
-        `<span class="mkt-price">${priceHtml}${each}</span>`;
+        `<span class="mkt-price ui-money">${priceHtml}${each}</span>`;
       const btn = document.createElement('button');
-      btn.className = `mkt-btn${l.mine ? ' cancel' : ''}`;
+      btn.className = `mkt-btn ui-btn${l.mine ? ' cancel' : ' ui-btn--red'}`;
       btn.textContent = l.mine ? t('itemUi.market.reclaim') : t('itemUi.market.buy');
       btn.setAttribute(
         'aria-label',
@@ -890,9 +916,9 @@ export class MarketWindow {
       const pageNumber = formatNumber(page.page + 1, { maximumFractionDigits: 0 });
       const pageCount = formatNumber(page.pageCount, { maximumFractionDigits: 0 });
       pager.innerHTML =
-        `<button type="button" class="mkt-page-btn" data-market-page="prev"${page.page <= 0 ? ' disabled' : ''} aria-label="${esc(t('itemUi.market.pagePrevAria'))}">${esc(t('itemUi.market.pagePrev'))}</button>` +
+        `<button type="button" class="mkt-page-btn ui-btn" data-market-page="prev"${page.page <= 0 ? ' disabled' : ''} aria-label="${esc(t('itemUi.market.pagePrevAria'))}">${esc(t('itemUi.market.pagePrev'))}</button>` +
         `<span class="mkt-page-info">${esc(t('itemUi.market.pageStatus', { current: pageNumber, total: pageCount }))}</span>` +
-        `<button type="button" class="mkt-page-btn" data-market-page="next"${page.page >= page.pageCount - 1 ? ' disabled' : ''} aria-label="${esc(t('itemUi.market.pageNextAria'))}">${esc(t('itemUi.market.pageNext'))}</button>`;
+        `<button type="button" class="mkt-page-btn ui-btn" data-market-page="next"${page.page >= page.pageCount - 1 ? ' disabled' : ''} aria-label="${esc(t('itemUi.market.pageNextAria'))}">${esc(t('itemUi.market.pageNext'))}</button>`;
       pager.querySelectorAll<HTMLButtonElement>('[data-market-page]').forEach((button) => {
         button.addEventListener('click', () => {
           if (button.disabled) return;
@@ -980,7 +1006,7 @@ export class MarketWindow {
     )}</div>`;
     if (view.state === 'pick-empty') {
       const pick = document.createElement('div');
-      pick.className = 'mkt-sell-pick empty';
+      pick.className = 'mkt-sell-pick ui-card empty';
       pick.textContent = t('itemUi.market.sellPickEmpty');
       body.appendChild(pick);
       return;
@@ -990,7 +1016,7 @@ export class MarketWindow {
       this.sellInstance = null;
       this.pushSellPriceCheck();
       const pick = document.createElement('div');
-      pick.className = 'mkt-sell-pick empty';
+      pick.className = 'mkt-sell-pick ui-card empty';
       pick.textContent = t('itemUi.tooltip.cannotMarket');
       body.appendChild(pick);
       return;
@@ -1005,7 +1031,7 @@ export class MarketWindow {
     const stagedQuality = staged.quality;
     const qColor = marketNameColor(stagedQuality);
     const pick = document.createElement('div');
-    pick.className = 'mkt-sell-pick';
+    pick.className = 'mkt-sell-pick ui-card';
     pick.innerHTML = `${this.deps.itemIcon(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(staged.name)}</span>`;
     // The staged copy's tooltip carries its payload, so a player holding plain
     // AND special copies can see WHICH one is staged (the mail chip precedent).
@@ -1037,18 +1063,18 @@ export class MarketWindow {
     form.className = 'mkt-price-form';
     const qtyRow =
       have > 1
-        ? `<div class="mkt-price-row"><label for="mkt-qty">${esc(t('itemUi.market.quantity'))}</label><input class="coininput" id="mkt-qty" type="number" min="1" max="${have}" value="1"> <span class="mkt-coin-tag">${esc(t('itemUi.market.quantityOf', { count: formatNumber(have, { maximumFractionDigits: 0 }) }))}</span></div>`
+        ? `<div class="mkt-price-row"><label for="mkt-qty">${esc(t('itemUi.market.quantity'))}</label><input class="coininput ui-input" id="mkt-qty" type="number" min="1" max="${have}" value="1"> <span class="mkt-coin-tag">${esc(t('itemUi.market.quantityOf', { count: formatNumber(have, { maximumFractionDigits: 0 }) }))}</span></div>`
         : '';
     form.innerHTML =
       qtyRow +
       `<div class="mkt-price-row"><label>${esc(t('itemUi.market.priceEach'))}</label>` +
-      `<input class="coininput" id="mkt-g" type="number" min="0" value="${suggested.gold}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>` +
-      `<input class="coininput" id="mkt-s" type="number" min="0" max="99" value="${suggested.silver}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>` +
-      `<input class="coininput" id="mkt-c" type="number" min="0" max="99" value="${suggested.copper}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span></div>`;
+      `<input class="coininput ui-input" id="mkt-g" type="number" min="0" value="${suggested.gold}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>` +
+      `<input class="coininput ui-input" id="mkt-s" type="number" min="0" max="99" value="${suggested.silver}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>` +
+      `<input class="coininput ui-input" id="mkt-c" type="number" min="0" max="99" value="${suggested.copper}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span></div>`;
     body.appendChild(form);
 
     const listBtn = document.createElement('button');
-    listBtn.className = 'mkt-list-btn';
+    listBtn.className = 'mkt-list-btn ui-btn ui-btn--gold';
     listBtn.textContent = t('itemUi.market.listButton');
     listBtn.addEventListener('click', () => {
       const root = this.deps.root();
@@ -1100,8 +1126,8 @@ export class MarketWindow {
     body.innerHTML = `<div class="mkt-note">${esc(t('itemUi.market.collectNote'))}</div>`;
     if (view.proceeds > 0) {
       const row = document.createElement('div');
-      row.className = 'mkt-collect';
-      row.innerHTML = `<span>${esc(t('itemUi.market.saleProceeds'))}</span><span class="mkt-price">${this.deps.moneyHtml(view.proceeds)}</span>`;
+      row.className = 'mkt-collect ui-card';
+      row.innerHTML = `<span>${esc(t('itemUi.market.saleProceeds'))}</span><span class="mkt-price ui-money">${this.deps.moneyHtml(view.proceeds)}</span>`;
       body.appendChild(row);
     }
     this.renderCollectSales(body, view.sales, view.salesOmitted);
@@ -1112,7 +1138,7 @@ export class MarketWindow {
       const returnedQuality = returned.quality;
       const qColor = marketNameColor(returnedQuality);
       const row = document.createElement('div');
-      row.className = 'mkt-collect';
+      row.className = 'mkt-collect ui-card';
       const stack =
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
@@ -1122,7 +1148,7 @@ export class MarketWindow {
       body.appendChild(row);
     }
     const btn = document.createElement('button');
-    btn.className = 'mkt-list-btn';
+    btn.className = 'mkt-list-btn ui-btn ui-btn--gold';
     btn.textContent = t('itemUi.market.collectAll');
     btn.addEventListener('click', () => {
       this.deps.world().marketCollect();
@@ -1145,7 +1171,7 @@ export class MarketWindow {
     for (const { item, itemName, count, proceeds, buyerName } of sales) {
       const qColor = marketNameColor(item.quality);
       const row = document.createElement('div');
-      row.className = 'mkt-sale';
+      row.className = 'mkt-sale ui-card';
       const stack =
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
@@ -1163,7 +1189,7 @@ export class MarketWindow {
         `<span class="mkt-collect-item">${this.deps.itemIcon(item, item.quality)}` +
         `<span class="mkt-sale-name"><span style="color:${qColor}">${esc(saleName)}${esc(stack)}</span>` +
         `<span class="mkt-sale-buyer">${esc(t('itemUi.market.saleBuyer', { buyer: buyerName }))}</span></span></span>` +
-        `<span class="mkt-price">${this.deps.moneyHtml(proceeds)}</span>`;
+        `<span class="mkt-price ui-money">${this.deps.moneyHtml(proceeds)}</span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
       list.appendChild(row);
     }
@@ -1288,13 +1314,13 @@ export class MarketWindow {
         // esc() on the value too: every option used to be a source-authored literal, but
         // the bag capacities are derived from content (ITEMS[*].bagSlots), so the reason
         // this interpolation was safe by construction no longer holds on its own.
-        return `<button type="button" class="mkt-select-option${selected ? ' sel' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${esc(option)}">${esc(optionLabel(option))}</button>`;
+        return `<button type="button" class="mkt-select-option ui-chip${selected ? ' sel is-on' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${esc(option)}">${esc(optionLabel(option))}</button>`;
       })
       .join('');
     return (
       `<div class="mkt-filter"><span>${esc(label)}</span><div class="mkt-select" data-market-filter-menu="${menu}">` +
-      `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t('itemUi.market.filterValueAria', { label, value: current }))}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
-      `<div class="mkt-select-menu" role="listbox" hidden>${optionHtml}</div>` +
+      `<button type="button" class="mkt-select-btn ui-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t('itemUi.market.filterValueAria', { label, value: current }))}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
+      `<div class="mkt-select-menu ui-card" role="listbox" hidden>${optionHtml}</div>` +
       `</div></div>`
     );
   }
@@ -1308,7 +1334,7 @@ export class MarketWindow {
     const checked = this.collapseLowest ? ' checked' : '';
     return (
       `<label class="mkt-collapse-toggle">` +
-      `<input type="checkbox" class="mkt-collapse-checkbox"${checked}> ` +
+      `<input type="checkbox" class="mkt-collapse-checkbox ui-check"${checked}> ` +
       `<span>${esc(t('itemUi.market.collapseLowest'))}</span>` +
       `</label>`
     );

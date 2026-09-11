@@ -35,7 +35,13 @@ import {
   TWOHAND_STAT_MULT,
   weaponDpsBudget,
 } from '../src/sim/item_budget';
-import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
+import {
+  checkStaminaModel,
+  expectedStatBudget,
+  itemLevel,
+  primaryStatSum,
+  statIdentity,
+} from '../src/sim/item_level';
 import { requiredLevelFor } from '../src/sim/item_level_req';
 import {
   ARMOR_SECONDARY_BY_TYPE,
@@ -87,7 +93,7 @@ const APEX_ARMOR: Record<
     slot: 'waist',
     armorType: 'mail',
     budget: 15,
-    stats: { int: 9, spi: 6 },
+    stats: { int: 9, spi: 6, sta: 5 }, // stamina baseline model
     rating: ['hasteRating', 40],
     armor: 224,
     armorRef: 'gravescale_girdle',
@@ -109,7 +115,7 @@ const APEX_ARMOR: Record<
     slot: 'feet',
     armorType: 'mail',
     budget: 14,
-    stats: { int: 8, spi: 6 },
+    stats: { int: 8, spi: 6, sta: 5 }, // stamina baseline model
     rating: ['hasteRating', 40],
     armor: 212,
     armorRef: 'tideworn_warboots',
@@ -131,7 +137,7 @@ const APEX_ARMOR: Record<
     slot: 'legs',
     armorType: 'leather',
     budget: 20,
-    stats: { int: 12, spi: 8 },
+    stats: { int: 12, spi: 8, sta: 7 }, // stamina baseline model
     rating: ['hasteRating', 40],
     armor: 132,
     armorRef: 'tidewoven_trousers',
@@ -142,7 +148,7 @@ const APEX_ARMOR: Record<
     slot: 'gloves',
     armorType: 'leather',
     budget: 15,
-    stats: { int: 9, spi: 6 },
+    stats: { int: 9, spi: 6, sta: 5 }, // stamina baseline model
     rating: ['critRating', 40],
     armor: 104,
     armorRef: 'sanctum_prowlers_grips',
@@ -153,7 +159,7 @@ const APEX_ARMOR: Record<
     slot: 'chest',
     armorType: 'cloth',
     budget: 22,
-    stats: { int: 12, spi: 10 },
+    stats: { int: 12, spi: 10, sta: 7 }, // stamina baseline model
     // Haste since Phase 15: Hit converts at twice the rate of crit and haste,
     // and this def clones the caster BiS chest exactly, so Hit here made it
     // the sole source of the scarcest double-value rating in the biggest
@@ -168,7 +174,7 @@ const APEX_ARMOR: Record<
     slot: 'legs',
     armorType: 'cloth',
     budget: 20,
-    stats: { int: 12, spi: 8 },
+    stats: { int: 12, spi: 8, sta: 7 }, // stamina baseline model
     rating: ['hasteRating', 40],
     armor: 72,
     armorRef: 'lunar_choir_leggings',
@@ -179,7 +185,7 @@ const APEX_ARMOR: Record<
     slot: 'gloves',
     armorType: 'cloth',
     budget: 15,
-    stats: { int: 9, spi: 6 },
+    stats: { int: 9, spi: 6, sta: 5 }, // stamina baseline model
     rating: ['critRating', 40],
     armor: 52,
     armorRef: 'shadowpulse_handwraps',
@@ -309,7 +315,10 @@ const APEX_JEWELRY: Record<
     craft: 'jewelcrafting',
     slot: 'neck',
     budget: 14,
-    stats: { int: 8, sta: 6 },
+    // stamina baseline model: the pre-model int:8/sta:6 fell short of the
+    // model's line once the extra stamina above the baseline was charged to
+    // it, so the deficit was filled with Spirit rather than Intellect.
+    stats: { int: 8, sta: 6, spi: 5 },
     rating: ['hasteRating', 25],
     sellValue: 320,
   },
@@ -325,7 +334,9 @@ const APEX_JEWELRY: Record<
     craft: 'jewelcrafting',
     slot: 'ring',
     budget: 13,
-    stats: { int: 8, sta: 5 },
+    // stamina baseline model: same deficit as wyrmfall_pendant, filled with
+    // Spirit for the same reason.
+    stats: { int: 8, sta: 5, spi: 4 },
     rating: ['hasteRating', 25],
     sellValue: 300,
   },
@@ -345,7 +356,10 @@ const APEX_HELD: Record<
   gyrelens_array: {
     craft: 'engineering',
     budget: 16,
-    stats: { int: 10, sta: 6 },
+    // stamina baseline model: the pre-model int:10/sta:6 fell short of the
+    // model's line once the extra stamina above the baseline was charged to
+    // it, so the deficit was filled with Spirit rather than Intellect.
+    stats: { int: 10, sta: 6, spi: 5 },
     rating: ['critRating', 20],
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
     sellValue: 340,
@@ -353,7 +367,11 @@ const APEX_HELD: Record<
   voidbound_grimoire: {
     craft: 'inscription',
     budget: 16,
-    stats: { int: 8, spi: 5, sta: 3 },
+    // stamina baseline model: the pre-model int:8/spi:5/sta:3 sat under both
+    // the baseline (3 short of the floor of 5) and its int+spi line (13 of
+    // 16), so stamina was raised to the baseline and the remaining line
+    // deficit was filled with Spirit, never Intellect.
+    stats: { int: 8, spi: 8, sta: 5 },
     rating: ['hasteRating', 20],
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
     sellValue: 340,
@@ -849,12 +867,15 @@ describe('masterwrought apex budget sweep', () => {
     expect(itemLevel(def)).toBe(31);
     expect(def.masterwrought).toBe(true);
 
-    // Primary sum EQUALS the formula budget AND the literal (two independent
+    // Primary sum EQUALS the model total AND the literal (two independent
     // sources: the def literal here, the formula there; either moving reds).
+    // stamina baseline model: row.budget stays the LINE budget the formula
+    // prices (unaffected by identity); the realized sum is checked against
+    // expectedStatBudget, which adds the free caster baseline on top.
     const { armor, ...primaries } = def.stats as Record<string, number>;
     expect(primaries).toEqual(row.stats);
-    expect(primaryStatSum(def)).toBe(row.budget);
-    expect(primaryStatSum(def)).toBe(primaryStatBudget(31, 'epic', row.slot));
+    expect(primaryStatSum(def)).toBe(expectedStatBudget(def));
+    expect(primaryStatBudget(31, 'epic', row.slot)).toBe(row.budget);
 
     // Exactly ONE rating, at exactly the band's 40, the pinned field. The
     // band tie is live: ARMOR_RATING is what every same-band drop carries,
@@ -1058,17 +1079,26 @@ describe('masterwrought apex budget sweep', () => {
     expectFlaggedIdentity(def, id);
     expect(def.kind).toBe('armor');
     expect(def.slot).toBe(row.slot);
-    // The heroic-vendor jewelry shape law: no armor class, no armor value,
-    // no class lock, and exactly two stats (a primary plus stamina).
+    // The heroic-vendor jewelry shape law: no armor class, no armor value, no
+    // class lock. A physical piece keeps exactly a primary stat plus stamina
+    // (two keys). A caster piece keeps that shape too UNLESS the stamina
+    // baseline model's line target exceeds its authored Intellect, in which
+    // case Spirit fills the gap as a third key (item_budget.ts, "The stamina
+    // baseline model"). Both the identity and the model's line come from the
+    // live def, independent of the row.stats key count being asserted.
     expect((def as { armorType?: string }).armorType).toBeUndefined();
     expect(def.requiredClass).toBeUndefined();
     const { armor, ...primaries } = def.stats as Record<string, number>;
     expect(armor).toBeUndefined();
     expect(primaries).toEqual(row.stats);
-    expect(Object.keys(row.stats)).toHaveLength(2);
+    const identity = statIdentity(def.stats);
+    const model = checkStaminaModel(def.stats, row.budget);
+    const expectedKeyCount =
+      identity === 'caster' && model.expectedLine > (primaries.int ?? 0) ? 3 : 2;
+    expect(Object.keys(row.stats)).toHaveLength(expectedKeyCount);
     expect(row.stats.sta).toBeGreaterThan(0);
-    expect(primaryStatSum(def)).toBe(row.budget);
-    expect(primaryStatSum(def)).toBe(primaryStatBudget(31, 'epic', row.slot));
+    expect(primaryStatSum(def)).toBe(expectedStatBudget(def));
+    expect(primaryStatBudget(31, 'epic', row.slot)).toBe(row.budget);
 
     // Exactly one rating at the jewelry band's 25. heroic_vendor.ts keeps
     // JEWELRY_RATING module-private, so the literal is pinned here with the
@@ -1126,8 +1156,11 @@ describe('masterwrought apex budget sweep', () => {
     const { armor, ...primaries } = def.stats as Record<string, number>;
     expect(armor).toBeUndefined();
     expect(primaries).toEqual(row.stats);
-    expect(primaryStatSum(def)).toBe(row.budget);
-    expect(primaryStatSum(def)).toBe(primaryStatBudget(31, 'epic', 'offhand'));
+    // stamina baseline model: row.budget stays the LINE budget the formula
+    // prices; the realized sum is checked against expectedStatBudget, which
+    // adds the free caster baseline on top.
+    expect(primaryStatSum(def)).toBe(expectedStatBudget(def));
+    expect(primaryStatBudget(31, 'epic', 'offhand')).toBe(row.budget);
 
     // The held/shield band: one rating at 20. Both halves: the literal is
     // the band LAW pin, the wraithfire_orb tie the provenance drift pin.

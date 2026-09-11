@@ -902,6 +902,7 @@ export const pl_PL: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Zwiń śledzenie zadań",
       "expandHint": "Rozwiń śledzenie zadań"
     },
@@ -1266,6 +1267,9 @@ export const pl_PL: EnTranslations = {
       "previous": "Poprzednie biegi",
       "runLabel": "Bieg {index}",
       "runSummary": "{total} w {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Wybierz manekina jako cel, aby zacząć.",
@@ -1739,6 +1743,9 @@ export const pl_PL: EnTranslations = {
     },
     "controller": {
       "title": "Kontroler",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Etykiety przycisków",
       "glyphStyleAuto": "Automatyczne",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2132,22 @@ export const pl_PL: EnTranslations = {
       "showPlaytimeAria": "Pokaż czas gry",
       "hidePlaytimeAria": "Ukryj czas gry"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "Z twoich {value} pkt. cechy {stat}:",
       "names": {
@@ -2367,6 +2390,7 @@ export const pl_PL: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Zgłoś błąd",
+      "online": "Online",
       "realm": "Świat",
       "character": "Postać",
       "position": "Pozycja",
@@ -3244,6 +3268,7 @@ export const pl_PL: EnTranslations = {
       "lock": "Zablokuj ramkę gracza"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Ramki grupy i rajdu",
       "optionsSection": "Opcje ramek drużyny",
       "unlock": "Przenieś ramki grupy i rajdu",
@@ -4028,7 +4053,6 @@ export const pl_PL: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Zbieractwo",
       "mining": "Górnictwo",
       "logging": "Wyrąb",
       "herbalism": "Zielarstwo",
@@ -4212,9 +4236,7 @@ export const pl_PL: EnTranslations = {
       "noviceBody": "Umiejętność Uprawy rośnie za każdym razem, gdy zbierasz roślinę. Aby zacząć, zasiej nasiono na dowolnej grządce."
     },
     "archetypeTitle": {
-      "label": "Tytuł",
-      "none": "Brak",
-      "hobbyLabel": "Pasja"
+      "none": "Brak"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardier",
@@ -4384,7 +4406,9 @@ export const pl_PL: EnTranslations = {
       "hobbyLabel": "Zajęcie dodatkowe: {craft}",
       "majorsLabel": "Kierunki: {a} i {b}",
       "pairsHeld": "Posiadane pary: {count}",
-      "returnsLabel": "Zwroty: {count}"
+      "returnsLabel": "Zwroty: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "Rzemiosło",
@@ -4419,6 +4443,7 @@ export const pl_PL: EnTranslations = {
       "vaultUnreachable": "Skarbiec Materiałów jest tu poza zasięgiem.",
       "craftFeeLine": "Opłata za wytworzenie: {fee} za sztukę",
       "empty": "Nie są jeszcze znane żadne przepisy.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Craft {name}",
       "craftedToast": "Wykonane: {name}",
       "craftedToastQty": "Wykonane: {name} x{qty}",
@@ -4520,6 +4545,9 @@ export const pl_PL: EnTranslations = {
       "commissionToggleHint": "Przywiązuje się do pierwszej postaci, która go otrzyma w transakcji.",
       "commissionUnbound": "Wyrób na zamówienie: przywiązuje się do pierwszego odbiorcy",
       "commissionBound": "Wyrób na zamówienie: przywiązany do odbiorcy"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Użyj",
@@ -5136,6 +5164,33 @@ export const pl_PL: EnTranslations = {
       "toInstance": "Mapa instancji",
       "toggleAria": "Przełącz między mapą świata a mapą strefy",
       "levels": "Poziomy od {min} do {max}"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Wymaga poziomu {level}"
@@ -6084,6 +6139,7 @@ export const pl_PL: EnTranslations = {
       "framesMoveBodyEditFrames": "Możesz przesuwać własną ramkę, ramkę celu i ramki drużyny. Każda ma w rogu mały przycisk przesuwania: odblokuj ją, przeciągnij w wybrane miejsce i zablokuj ponownie, aby przypadkowe kliknięcie jej nie przesunęło. Edycja ramek na górze karty Ramki w opcjach interfejsu odblokowuje naraz resztę interfejsu, w tym te trzy ramki: paski akcji, pasek rzucania, pasek uderzeń, pasek doświadczenia, minimapę, szynę przycisków, ramkę pupila, pasek postawy, wiersze premii i osłabień oraz etykietę przypomnienia listy życzeń. Jeśli trafią w miejsce, którego żałujesz, przycisk Przywróć domyślne na dole tej samej karty Ramki przywraca je wszystkie.",
       "framesGovernedExtra": "Edycja ramek odblokowuje także stos śledzonych elementów poniżej: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, aktywną wyprawę, każdą trwającą szczelinę oraz śledzoną recepturę lub zlecenie. Obejmuje też pasek akcji pupila obok jego ramki, ramkę kropek Celu dla osłabień pobliskich wrogów, medalion Oddania paladyna, Pasek utrapień czarnoksiężnika, nakładkę wyzwalacza zaklęć, zegar uderzeń broni podręcznej dla walczących dwiema broniami oraz okno miernika obrażeń z kartami. Każdy element ma własną etykietę, gdy zostanie odblokowany.",
       "framesGovernedAuraTracks": "Edycja ramek odblokowuje także sześć dobrowolnych ścieżek aur, gdy włączysz je na karcie Walka tych samych opcji interfejsu: ścieżkę Moje premie, ścieżkę defensywnych czasów odnowienia, ścieżkę Moich tarcz, ścieżkę ofensywnych czasów odnowienia, ścieżkę Ruchu i ukrycia oraz ścieżkę Moich premii na sojusznikach. Każda ścieżka jest domyślnie wyłączona i każda nosi własną etykietę, gdy zostanie odblokowana.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Paski, liczniki i tekst walki",
       "barsBody": "Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.",
       "aurasTitle": "Wzmocnienia i osłabienia",

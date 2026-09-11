@@ -16,7 +16,7 @@
 // questLog/questsDone shape is identical for the offline Sim and the online
 // ClientWorld mirror, so the two produce identical models.
 
-import { QUESTS, questRewardItem } from '../../../sim/data';
+import { NPCS, QUESTS, questRewardItem, zoneAt } from '../../../sim/data';
 import type { PlayerClass, QuestProgress } from '../../../sim/types';
 import { questObjectiveRequired } from '../../../sim/types';
 
@@ -26,6 +26,23 @@ export interface QuestLogItem {
   /** state === 'ready' (objectives complete, ready to turn in). */
   ready: boolean;
   selected: boolean;
+}
+
+export interface QuestLogGroup {
+  id: string;
+  zoneId: string | null;
+  count: number;
+  readyCount: number;
+  collapsed: boolean;
+  dimmed: boolean;
+  /**
+   * Whether the group opens to rows. The completed tally has never listed the
+   * quests behind it (the log mirrors only the ACTIVE entries; questsDone is a
+   * bare id set), so it renders as a plain count line: a toggle that opens to
+   * nothing is a disclosure that lies.
+   */
+  expandable: boolean;
+  items: QuestLogItem[];
 }
 
 /** One objective row in the selected quest's detail panel. */
@@ -54,6 +71,7 @@ export interface QuestLogView {
   /** The title summary counts (active = open quests, completed = turned in). */
   summary: { active: number; completed: number };
   items: QuestLogItem[];
+  groups: QuestLogGroup[];
   /** The resolved selection (falls back to the first quest when stale / unset). */
   selectedQuestId: string | null;
   detail: QuestDetailModel | null;
@@ -70,6 +88,7 @@ export interface QuestLogInput {
   playerClass: PlayerClass;
   /** sim.questsDone.size, for the title summary. */
   completedCount: number;
+  collapsedGroupIds?: readonly string[];
 }
 
 /**
@@ -91,6 +110,44 @@ export function buildQuestLogView(input: QuestLogInput): QuestLogView {
     ready: qp.state === 'ready',
     selected: qp.questId === selectedQuestId,
   }));
+  const collapsed = new Set(input.collapsedGroupIds ?? []);
+  const activeGroups = new Map<string, QuestLogGroup>();
+  for (const item of items) {
+    const quest = QUESTS[item.questId];
+    const giver = quest ? NPCS[quest.giverNpcId] : undefined;
+    const zoneId = giver ? zoneAt(giver.pos.x, giver.pos.z).id : null;
+    const id = zoneId ? `zone:${zoneId}` : 'zone:unknown';
+    let group = activeGroups.get(id);
+    if (!group) {
+      group = {
+        id,
+        zoneId,
+        count: 0,
+        readyCount: 0,
+        collapsed: collapsed.has(id),
+        dimmed: false,
+        expandable: true,
+        items: [],
+      };
+      activeGroups.set(id, group);
+    }
+    group.items.push(item);
+    group.count += 1;
+    if (item.ready) group.readyCount += 1;
+  }
+  const groups: QuestLogGroup[] = [
+    ...activeGroups.values(),
+    {
+      id: 'completed',
+      zoneId: null,
+      count: input.completedCount,
+      readyCount: 0,
+      collapsed: false,
+      dimmed: true,
+      expandable: false,
+      items: [],
+    },
+  ];
 
   let detail: QuestDetailModel | null = null;
   if (selectedQuestId) {
@@ -120,6 +177,7 @@ export function buildQuestLogView(input: QuestLogInput): QuestLogView {
   return {
     summary,
     items,
+    groups,
     selectedQuestId,
     detail,
     empty: quests.length === 0,

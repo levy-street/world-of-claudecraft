@@ -996,14 +996,18 @@ describe('masterwork proc (Professions 2.0)', () => {
     // The minted copy: ONE signed instance whose rolled payload is the
     // masterwork marker plus the baked TIER-DELTA stats (the uncommon-to-rare
     // primary budget delta at the recipe's level 9, redistributed over the
-    // def's int/spi profile). New crafts never write rolled.quality.
+    // def's int/spi profile). Since the stamina baseline model
+    // (item_budget.ts's tierDeltaStats, used by masterworkBonusStats), a
+    // caster identity's bake also carries the growth of its free stamina
+    // baseline between the two tiers, one point here. New crafts never write
+    // rolled.quality.
     const slots = meta.inventory.filter((s: any) => s.itemId === 'eastbrook_ritual_vestments');
     expect(slots.length).toBe(1);
     const instance = slots[0].instance;
     expect(instance?.signer).toBe(meta.name);
     expect(instance?.rolled?.masterwork).toBe(true);
     expect(instance?.rolled?.quality).toBeUndefined();
-    expect(instance?.rolled?.stats).toEqual({ int: 1, spi: 1 });
+    expect(instance?.rolled?.stats).toEqual({ int: 1, spi: 1, sta: 1 });
 
     // The IWorld read surface reflects the proc.
     expect(sim.lastMasterwork).toEqual({

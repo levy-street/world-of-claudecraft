@@ -88,7 +88,7 @@ export function wocDetailPaneHtml(model: ReadyModel, host: WocDetailHtmlHost): s
   // cancel-pending listing offers no second Cancel here either.
   const cancel =
     d.row.mine && canCancelListing(d.row)
-      ? `<button type="button" data-action="cancel-listing" data-listing="${d.row.id}" ` +
+      ? `<button type="button" class="ui-btn" data-action="cancel-listing" data-listing="${d.row.id}" ` +
         `aria-label="${esc(t('hudChrome.wocMarket.cancelAria', { item: name }))}" ${FOCUS_KEY_ATTR}="wm-cancel">` +
         `${esc(t('hudChrome.wocMarket.cancelButton'))}</button>`
       : '';
@@ -108,7 +108,7 @@ export function wocDetailPaneHtml(model: ReadyModel, host: WocDetailHtmlHost): s
           : esc(t('hudChrome.wocMarket.detailCurrentBid', { usd: host.usd(d.row.currentCents) }))
       }</p>`;
   return (
-    `<div class="wm-detail"><h3>${esc(t('hudChrome.wocMarket.detailTitle'))}</h3>` +
+    `<div class="wm-detail ui-card"><h3>${esc(t('hudChrome.wocMarket.detailTitle'))}</h3>` +
     `<div class="wm-detail-item">${host.itemCell(d.row.itemId, d.row.quality, `detail:${d.row.id}`, d.row.instance)}</div>` +
     `<p>${esc(t('hudChrome.wocMarket.detailSeller', { name: d.row.sellerName }))}</p>` +
     `<p>${esc(wocEndsAtText(d.row.endsAtMs))}</p>` +
@@ -138,10 +138,10 @@ function bidFormHtml(
   const overBid = overWalletBalance(host.bidEquivalentTokens, host.walletTokens);
   const disabled = model.paused || !model.walletLinked || host.busy || overBid ? 'disabled' : '';
   return (
-    `<div class="wm-bid-form">` +
+    `<div class="wm-bid-form ui-card">` +
     `<p class="wm-min-next">${esc(t('hudChrome.wocMarket.detailMinNext', { usd: host.usd(d.row.minNextBidCents) }))}</p>` +
     `<label>${esc(t('hudChrome.wocMarket.bidLabel'))}` +
-    `<input type="number" inputmode="decimal" min="0" step="0.25" data-field="bid-usd" ${FOCUS_KEY_ATTR}="wm-bid-usd" placeholder="${esc(
+    `<input type="number" class="ui-input" inputmode="decimal" min="0" step="0.25" data-field="bid-usd" ${FOCUS_KEY_ATTR}="wm-bid-usd" placeholder="${esc(
       t('hudChrome.wocMarket.bidPlaceholder'),
     )}" /></label>` +
     // Empty until the server has quoted the typed price, so it never claims a
@@ -178,7 +178,7 @@ function bidFormHtml(
       settlementWindowText: host.countdown(model.settlementWindowSeconds),
       usd: (c) => host.usd(c),
     }) +
-    `<button type="button" class="wm-primary" data-action="place-bid" data-listing="${listingId}" ${disabled} ` +
+    `<button type="button" class="wm-primary ui-btn ui-btn--gold" data-action="place-bid" data-listing="${listingId}" ${disabled} ` +
     `aria-label="${esc(t('hudChrome.wocMarket.bidAria', { item: itemName }))}" ${FOCUS_KEY_ATTR}="wm-bid-submit">` +
     `${esc(t('hudChrome.wocMarket.bidButton'))}</button></div>`
   );
@@ -205,7 +205,7 @@ function confirmFieldsHtml(model: ReadyModel, host: WocDetailHtmlHost): string {
   // row and one size, so they read as one sentence.
   return model.activity?.termsAccepted
     ? ''
-    : `<div class="wm-terms-row"><label class="wm-terms"><input type="checkbox" data-field="accept-terms" ${FOCUS_KEY_ATTR}="wm-terms" ${host.acceptTerms ? 'checked' : ''} /> ${esc(
+    : `<div class="wm-terms-row"><label class="wm-terms"><input type="checkbox" class="ui-check" data-field="accept-terms" ${FOCUS_KEY_ATTR}="wm-terms" ${host.acceptTerms ? 'checked' : ''} /> ${esc(
         t('hudChrome.wocMarket.termsLabel'),
       )}</label> <a class="wm-terms-link" href="${esc(termsUrlFor(host.origin))}" target="_blank" rel="noopener noreferrer">${esc(
         t('hudChrome.wocMarket.termsLink'),

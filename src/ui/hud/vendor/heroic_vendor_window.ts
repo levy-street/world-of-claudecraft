@@ -12,6 +12,7 @@ import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
+import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 import type { HeroicShopView } from './heroic_vendor_view';
@@ -45,7 +46,7 @@ export function renderHeroicVendorWindow(
     : -1;
   const scrollTop = el.scrollTop;
   markDialogRoot(el, { label: t('itemUi.vendor.goodsTitle', { name: vendorName }) });
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
   const balance = document.createElement('div');
   balance.className = 'vendor-section-title';
@@ -65,7 +66,7 @@ export function renderHeroicVendorWindow(
   for (const { itemId, item, marks, affordable } of view.rows) {
     const row = document.createElement('button');
     row.type = 'button';
-    row.className = 'vendor-item';
+    row.className = 'vendor-item ui-card';
     row.disabled = !affordable;
     // Its own focus key so the restore ladder can find the same offer tile
     // across a rebuild (one tile per item id, so the id is the identity).
@@ -73,7 +74,7 @@ export function renderHeroicVendorWindow(
     const itemName = itemDisplayName(item);
     const marksLabel = formatNumber(marks, { maximumFractionDigits: 0 });
     row.setAttribute('aria-label', t('heroicShop.buyAria', { item: itemName, marks: marksLabel }));
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}</span><span class="vi-price${affordable ? '' : ' unaffordable'}">${heroicMarkIconHtml()}${esc(t('delveUi.shop.price', { marks: marksLabel }))}</span>`;
+    row.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item)}</span><span class="vi-name" style="color:${itemNameColor(item)}">${esc(itemName)}</span><span class="vi-price ui-money${affordable ? '' : ' unaffordable'}">${heroicMarkIconHtml()}${esc(t('delveUi.shop.price', { marks: marksLabel }))}</span>`;
     row.addEventListener('click', () => deps.onBuy(itemId));
     deps.attachTooltip(
       row,

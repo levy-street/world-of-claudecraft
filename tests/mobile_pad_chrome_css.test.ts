@@ -75,3 +75,25 @@ describe('body.mobile-touch.xhb-mode stands down the touch gameplay-input chrome
     expect(ruleAt).toBeGreaterThan(layerOpenAt);
   });
 });
+
+// W20: the touch chrome's drop shadows were `#0009` before the token migration.
+// `9` is 0x99, which is 60 percent alpha, not 56; every one of the migrated mixes
+// shipped a fifth of the intended shadow strength short.
+describe('touch chrome shadow alphas match the literals they replaced', () => {
+  it('mixes --color-keyline at 60 percent, the alpha #0009 spells', () => {
+    expect(hudMobileCss).toContain(
+      '--mobile-btn-shadow: 0 2px 8px color-mix(in srgb, var(--color-keyline) 60%, transparent);',
+    );
+    expect(
+      (hudMobileCss.match(/color-mix\(in srgb, var\(--color-keyline\) 60%, transparent\)/g) ?? [])
+        .length,
+      'every #0009 site reads 60 percent',
+    ).toBe(4);
+    expect(hudMobileCss).not.toContain('var(--color-keyline) 56%');
+  });
+
+  it('keeps --color-keyline the pure black those alphas assumed', () => {
+    const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+    expect(tokens).toContain('--color-keyline: #000000;');
+  });
+});

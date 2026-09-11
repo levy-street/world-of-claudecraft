@@ -24,16 +24,16 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from '../../focus_restore';
-import { formatNumber, type TranslationKey, t } from '../../i18n';
+import { formatNumber, t } from '../../i18n';
 import { professionIconUrl } from '../../icons';
 import type { PainterHostPresentation } from '../../painter_host';
 import { toolEffectNameKey } from '../../tool_effect_name';
 import { hasToolEffectCard, toolEffectStandaloneTooltip } from '../../tool_effect_tooltip';
 import { svgIcon } from '../../ui_icons';
 import { craftNameText } from './craft_name_view';
+import { craftCeilingLabel, craftNextUnlockText, craftRoleLabel } from './craft_row_labels';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { archetypeImageUrl } from './profession_art';
-import type { EmpowermentCeiling, ProfessionRole } from './profession_identity_view';
 import {
   type HarvestEntryCallbacks,
   harvestBodyEntryHtml,
@@ -44,7 +44,6 @@ import {
 } from './professions_harvest_entry_controller';
 import {
   buildProfessionsView,
-  type CraftNextUnlock,
   type ProfessionsCraftRow,
   type ProfessionsGatheringRow,
   type ProfessionsViewInput,
@@ -66,19 +65,6 @@ const ROW_ICON_SIZE = 56;
 // (a dropped frame: closed socket, spectate, lane refusal). Comfortably
 // above a live round trip, far below "dead until reopen".
 const SENT_GUARD_REARM_MS = 2000;
-
-const ROLE_LABEL_KEYS: Record<ProfessionRole, TranslationKey> = {
-  major: 'hudChrome.professions.roleMajor',
-  hobby: 'hudChrome.professions.roleHobby',
-  dormant: 'hudChrome.professions.roleDormant',
-  unattuned: 'hudChrome.professions.roleUnattuned',
-};
-
-const CEILING_LABEL_KEYS: Record<EmpowermentCeiling, TranslationKey> = {
-  unlimited: 'hudChrome.professions.ceilingUnlimited',
-  rare: 'hudChrome.professions.ceilingRare',
-  common: 'hudChrome.professions.ceilingCommon',
-};
 
 /**
  * Hud-supplied glue: the shared presentation bag plus the window surface (the
@@ -102,6 +88,9 @@ export interface ProfessionsWindowDeps extends PainterHostPresentation, HarvestE
   consumePeek(): boolean;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** Hud's confirm-first external hop (src/ui/wiki_link.ts), the same one
+   *  #mm-wiki and the Esc-menu row use. */
+  openWiki(): void;
 }
 
 export class ProfessionsWindow {
@@ -225,9 +214,9 @@ export class ProfessionsWindow {
     const model = buildProfessionsView(input);
     const body = model.mode === 'simplified' ? this.simplifiedHtml(model) : this.fullHtml(model);
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hudChrome.professions.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.professions.close'))}">${svgIcon('close')}</button></div>` +
-      `<div class="prof-scroll">${harvestBodyEntryHtml(this.deps.harvestBody !== undefined)}${harvestPreferenceEntryHtml(this.deps.world().harvestPreference, this.deps.openHarvestPreference !== undefined)}${body}</div>`;
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.professions.title'))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.professions.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="prof-scroll">${harvestBodyEntryHtml(this.deps.harvestBody !== undefined)}${harvestPreferenceEntryHtml(this.deps.world().harvestPreference, this.deps.openHarvestPreference !== undefined)}${body}</div><div class="prof-footer"><span class="ui-muted">${esc(t('hudChrome.professions.retentionFooter'))}</span><button type="button" class="prof-wiki-link ui-btn" data-wiki-link data-focus-key="prof:wiki">${esc(t('hudChrome.professions.tutorialLink'))}</button></div>`;
 
     this.wire(el);
     const scroll = el.querySelector('.prof-scroll');
@@ -347,7 +336,7 @@ export class ProfessionsWindow {
       : '';
     return (
       `<p class="prof-identity-paragraph">${esc(paragraph)}</p>` +
-      `<section class="prof-cta"><h3 class="prof-section-header">${esc(t('hudChrome.professions.ctaHeader'))}</h3>` +
+      `<section class="prof-cta ui-card"><h3 class="prof-section-header">${esc(t('hudChrome.professions.ctaHeader'))}</h3>` +
       `<p class="prof-cta-line">${esc(cta)}</p>${tutorial}</section>` +
       // The gathering rows the player has actually WORKED (plus Farming while
       // a crop is in the ground), the same row markup the full mode paints
@@ -404,13 +393,13 @@ export class ProfessionsWindow {
     // (model.switchCost.show, the maintainer copy call): before that there is
     // no archetype to switch from and the line is noise.
     const switchCost = model.switchCost.show
-      ? `<div class="prof-switch-cost">${esc(
+      ? `<div class="prof-switch-cost ui-chip">${esc(
           t('hudChrome.professions.switchCost', {
             cost: this.fmt(model.switchCost.nextSwitchCost),
           }),
         )}</div>`
       : '';
-    return `<section class="prof-identity"><h3 class="prof-section-header">${esc(t('hudChrome.professions.identityHeader'))}</h3>${lines}${switchCost}</section>`;
+    return `<section class="prof-identity ui-card"><h3 class="prof-section-header">${esc(t('hudChrome.professions.identityHeader'))}</h3>${lines}${switchCost}</section>`;
   }
 
   /** The craft wheel: an inline SVG (base circle, attuned-pair arc, hobby
@@ -450,7 +439,7 @@ export class ProfessionsWindow {
     // lineage): an inset card with a warm haze behind the wheel, purely
     // decorative chrome around the same role="img" ring.
     return (
-      `<div class="prof-ring-stage">` +
+      `<div class="prof-ring-stage ui-card">` +
       `<div class="prof-ring" role="img" aria-label="${esc(t('hudChrome.professions.ringAria'))}">` +
       `<svg class="prof-ring-svg" viewBox="-1.25 -1.25 2.5 2.5" aria-hidden="true" focusable="false">${svgParts.join('')}</svg>${nodes}</div></div>`
     );
@@ -466,7 +455,7 @@ export class ProfessionsWindow {
 
   private craftsHtml(model: ProfessionsViewModel): string {
     const rows = model.crafts.map((row) => this.craftRowHtml(row)).join('');
-    return `<section class="prof-crafts"><h3 class="prof-section-header">${esc(t('hudChrome.professions.skillsHeader'))}</h3><ul class="prof-list" role="list">${rows}</ul></section>`;
+    return `<section class="prof-crafts ui-card"><h3 class="prof-section-header">${esc(t('hudChrome.professions.skillsHeader'))}</h3><ul class="prof-list" role="list">${rows}</ul></section>`;
   }
 
   private craftRowHtml(row: ProfessionsCraftRow): string {
@@ -481,7 +470,7 @@ export class ProfessionsWindow {
     // own line below, so long localized names and wide chips can never fight
     // for one baseline.
     return (
-      `<li class="prof-craft-row role-${row.identity.role}">` +
+      `<li class="prof-craft-row ui-card role-${row.identity.role}">` +
       `<img class="prof-craft-icon" src="${professionIconUrl(`prof_${row.identity.craftId}`, ROW_ICON_SIZE)}" alt="" draggable="false">` +
       `<div class="prof-craft-main">` +
       `<div class="prof-craft-head"><span class="prof-craft-name">${esc(name)}</span>` +
@@ -491,24 +480,15 @@ export class ProfessionsWindow {
           max: this.fmt(row.bar.maxSkill),
         }),
       )}</span></div>` +
-      `<div class="prof-craft-chips"><span class="prof-role-badge">${esc(t(ROLE_LABEL_KEYS[row.identity.role]))}</span>` +
-      `<span class="prof-ceiling">${esc(t(CEILING_LABEL_KEYS[row.identity.ceiling]))}</span></div>` +
-      `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span>` +
+      `<div class="prof-craft-chips"><span class="prof-role-badge ui-chip">${esc(craftRoleLabel(row.identity.role))}</span>` +
+      `<span class="prof-ceiling ui-chip">${esc(craftCeilingLabel(row.identity.ceiling))}</span></div>` +
+      `<div class="prof-bar-wrap"><span class="prof-bar ui-bar"><span class="prof-bar-fill ui-bar-fill" style="width:${pct}%"></span></span>` +
       `<span class="prof-pips" role="img" aria-label="${esc(
         t('hudChrome.professions.tierPipAria', { tier: this.fmt(row.bar.tierIndex) }),
       )}">${pips}</span></div>` +
-      `<div class="prof-next">${esc(this.nextUnlockText(row.nextUnlock))}</div>` +
+      `<div class="prof-next">${esc(craftNextUnlockText(row.nextUnlock))}</div>` +
       `</div></li>`
     );
-  }
-
-  private nextUnlockText(unlock: CraftNextUnlock): string {
-    if (unlock.kind === 'mastered') return t('hudChrome.professions.nextUnlockMastered');
-    if (unlock.kind === 'specialized')
-      return t('hudChrome.professions.nextUnlockSpecialized', {
-        points: this.fmt(unlock.pointsRemaining),
-      });
-    return t('hudChrome.professions.nextUnlockTier', { points: this.fmt(unlock.pointsRemaining) });
   }
 
   /** Specialization readout: one line per specialized craft, or the single
@@ -534,7 +514,7 @@ export class ProfessionsWindow {
               threshold: this.fmt(model.crafts[0].perks.specializedSkillThreshold),
             }),
           )}</p>`;
-    return `<section class="prof-perks"><h3 class="prof-section-header">${esc(t('hudChrome.professions.perksHeader'))}</h3>${body}</section>`;
+    return `<section class="prof-perks ui-card"><h3 class="prof-section-header">${esc(t('hudChrome.professions.perksHeader'))}</h3>${body}</section>`;
   }
 
   private nudgesHtml(model: ProfessionsViewModel): string {
@@ -576,7 +556,7 @@ export class ProfessionsWindow {
         if (key === undefined) return '';
         const pct = Math.round(row.bar.fillFraction * 100);
         return (
-          `<li class="prof-gather-row">` +
+          `<li class="prof-gather-row ui-card">` +
           `<img class="prof-craft-icon" src="${professionIconUrl(`gather_${row.professionId}`, ROW_ICON_SIZE)}" alt="" draggable="false">` +
           `<div class="prof-craft-main"><div class="prof-craft-head"><span class="prof-craft-name">${esc(t(key))}</span>` +
           `<span class="prof-skill-value">${esc(
@@ -585,7 +565,7 @@ export class ProfessionsWindow {
               max: this.fmt(row.bar.maxSkill),
             }),
           )}</span></div>` +
-          `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span></div>` +
+          `<div class="prof-bar-wrap"><span class="prof-bar ui-bar"><span class="prof-bar-fill ui-bar-fill" style="width:${pct}%"></span></span></div>` +
           (opts.effects ? this.gatherEffectHtml(row) : '') +
           harvestJournalEntryHtml(row.professionId, this.deps.openHarvestJournal !== undefined) +
           `</div></li>`
@@ -593,7 +573,7 @@ export class ProfessionsWindow {
       })
       .join('');
     if (rows === '') return '';
-    return `<section class="prof-gathering"><h3 class="prof-section-header">${esc(t('hudChrome.professions.gatheringHeader'))}</h3><ul class="prof-list" role="list">${rows}</ul></section>`;
+    return `<section class="prof-gathering ui-card"><h3 class="prof-section-header">${esc(t('hudChrome.professions.gatheringHeader'))}</h3><ul class="prof-list" role="list">${rows}</ul></section>`;
   }
 
   // The slotted tool effect, under its profession's skill bar, plus the
@@ -634,7 +614,7 @@ export class ProfessionsWindow {
               )}</span>`
             : '';
         const recharge = effect.rechargeable
-          ? `${price}<button type="button" class="btn prof-effect-btn" data-recharge-profession="${esc(row.professionId)}" data-focus-key="recharge:${esc(row.professionId)}">${esc(
+          ? `${price}<button type="button" class="prof-effect-btn ui-btn" data-recharge-profession="${esc(row.professionId)}" data-focus-key="recharge:${esc(row.professionId)}">${esc(
               t('hudChrome.professions.toolEffectRechargeButton'),
             )}</button>`
           : '';
@@ -643,7 +623,7 @@ export class ProfessionsWindow {
         // Not hue-gated: the chip IS the second signal.
         const modeChip =
           effect.confirmMode === 'prompt'
-            ? `<span class="prof-effect-mode">${esc(t('hudChrome.professions.toolEffectModePrompt'))}</span>`
+            ? `<span class="prof-effect-mode ui-chip">${esc(t('hudChrome.professions.toolEffectModePrompt'))}</span>`
             : '';
         // data-effect-tip marks the live row for the shared attachTooltip
         // wiring below: the hover card explains the bonus and charge ladder
@@ -669,7 +649,7 @@ export class ProfessionsWindow {
       .map((effectId) => {
         const nameKey = toolEffectNameKey(effectId);
         if (nameKey === undefined) return '';
-        return `<button type="button" class="btn prof-effect-btn" data-slot-profession="${esc(row.professionId)}" data-slot-effect="${esc(effectId)}" data-focus-key="slot:${esc(row.professionId)}:${esc(effectId)}">${esc(
+        return `<button type="button" class="prof-effect-btn ui-btn" data-slot-profession="${esc(row.professionId)}" data-slot-effect="${esc(effectId)}" data-focus-key="slot:${esc(row.professionId)}:${esc(effectId)}">${esc(
           t('hudChrome.professions.toolEffectSlotButton', { effect: t(nameKey) }),
         )}</button>`;
       })
@@ -690,7 +670,7 @@ export class ProfessionsWindow {
       // on the very click that checked it, unrecoverable until reopen.
       const checked = this.slotModePrompt.has(row.professionId) ? ' checked' : '';
       const toggle = row.promptable
-        ? `<label class="prof-effect-mode-toggle"><input type="checkbox" data-slot-mode="${esc(row.professionId)}" data-focus-key="slotmode:${esc(row.professionId)}"${checked}> ` +
+        ? `<label class="prof-effect-mode-toggle"><input type="checkbox" class="ui-check" data-slot-mode="${esc(row.professionId)}" data-focus-key="slotmode:${esc(row.professionId)}"${checked}> ` +
           `${esc(t('hudChrome.professions.toolEffectModeAsk'))}</label>`
         : '';
       html += `<div class="prof-effect-actions">${slotButtons}${toggle}</div>`;
@@ -702,6 +682,14 @@ export class ProfessionsWindow {
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       this.close();
       audio.click();
+    });
+    // The wiki hop is a BUTTON on the shared confirm-first launcher, never a raw
+    // anchor: the desktop shell serves the client from app:// and denies any
+    // non-http navigation, so an anchor is a silent no-op there, and an anchor
+    // also hands the player a ctrl-click straight past the confirm.
+    el.querySelector('[data-wiki-link]')?.addEventListener('click', () => {
+      audio.click();
+      this.deps.openWiki();
     });
     wireHarvestEntries(el, this.deps);
     // Slot/recharge senders: command only, never predicted, and NO repaint

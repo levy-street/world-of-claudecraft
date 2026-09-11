@@ -61,6 +61,37 @@ describe('theme pure core', () => {
     expect(vars['--scrollbar-thumb-hover']).toBe('#6f5a2a');
   });
 
+  it('emits the library text and surface derivations with their classic outputs', () => {
+    // The interface library (src/styles/library.css) reads these four; their
+    // tokens.css defaults are the classic outputs pinned here, and
+    // tests/ui_library.test.ts holds the two homes equal.
+    const vars = themeCssVars(THEME_PRESETS.classic);
+    expect(vars['--color-text-secondary']).toBe('#e0dac4');
+    expect(vars['--color-text-faint']).toBe('#897f61');
+    // the shipped socket highlight and window-head stop land exactly
+    expect(vars['--color-socket-hi']).toBe('#2c2c3a');
+    expect(vars['--color-panel-hi']).toBe('#1c1c29');
+    expect(vars['--color-glint']).toBe('#ffea8c');
+    expect(vars['--color-control-border']).toBe('#4e3f1d');
+    expect(vars['--color-info']).toBe('#45c9ff');
+    expect(vars['--color-warning']).toBe('#ff9d32');
+    expect(vars['--panel-bg-soft']).toBe(
+      'linear-gradient(170deg, rgba(21, 21, 31, 0.74) 0%, rgba(12, 12, 17, 0.74) 60%, rgba(12, 12, 17, 0.74) 100%)',
+    );
+    expect(vars['--panel-bg-strong']).toBe(
+      'linear-gradient(170deg, rgba(16, 16, 24, 0.97) 0%, rgba(9, 9, 13, 0.97) 100%)',
+    );
+  });
+
+  it('lifts the strong panel fill on a light preset instead of sinking it', () => {
+    const vars = themeCssVars(resolveTheme({ preset: 'parchment', custom: {} }));
+    const first = vars['--panel-bg-strong'].match(/rgba\((\d+), (\d+), (\d+)/);
+    expect(first).not.toBeNull();
+    const [r, g, b] = first!.slice(1, 4).map(Number);
+    // lighter than the parchment panel knob #ece0c4 (236, 224, 196)
+    expect(r + g + b).toBeGreaterThan(236 + 224 + 196);
+  });
+
   it('custom overrides win over the preset; absent knobs fall through', () => {
     const knobs = resolveTheme({ preset: 'midnight', custom: { accent: '#abcdef' } });
     expect(knobs.accent).toBe('#abcdef');

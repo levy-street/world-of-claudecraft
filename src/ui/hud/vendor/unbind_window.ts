@@ -17,6 +17,7 @@ import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatMoney, formatNumber, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
+import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
 import { qualityGlowShadow } from '../../quality_glow';
 import { svgIcon } from '../../ui_icons';
@@ -63,7 +64,7 @@ export function renderUnbindWindow(
       )
     : -1;
   const scrollTop = el.scrollTop;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.unbind.title', { name: masterName }))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.unbind.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.unbind.title', { name: masterName }))}</span><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.unbind.close'))}">${svgIcon('close')}</button></div>`;
 
   const intro = document.createElement('div');
   intro.className = 'vi-sub unbind-intro';
@@ -84,7 +85,7 @@ export function renderUnbindWindow(
     const fee = formatMoney(row.feeCopper);
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'vendor-item unbind-row';
+    button.className = 'vendor-item ui-card unbind-row';
     button.disabled = !row.affordable;
     // Its own focus key so the restore ladder can find the same item row
     // across a rebuild (one row per bound item id, so the id is the identity).
@@ -96,11 +97,14 @@ export function renderUnbindWindow(
     // action chip when affordable, plain error-tint price when not).
     const quality = parts.quality;
     const glow = quality ? qualityGlowShadow(QUALITY_COLOR[quality]) : '';
-    const iconHtml = `<span class="crafting-recipe-socket"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item, quality) : ''}</span>`;
+    const iconHtml = `<span class="crafting-recipe-socket ui-socket ui-socket--bag"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item, quality) : ''}</span>`;
     const feeHtml = row.affordable
-      ? `<span class="vi-price-chip">${esc(fee)}</span>`
+      ? `<span class="vi-price-chip ui-chip is-on">${esc(fee)}</span>`
       : `<span class="vi-price unaffordable">${esc(fee)}</span>`;
-    button.innerHTML = `${iconHtml}<span class="vi-name">${esc(name)}${esc(countSuffix)}<span class="vi-sub">${esc(t('hudChrome.unbind.rowSub'))}</span></span>${feeHtml}`;
+    // One cell authority for BOTH halves: the rim above and the name here read
+    // the same instance-effective quality, so a promoted copy can never wear a
+    // legendary rim over a def-tier name.
+    button.innerHTML = `${iconHtml}<span class="vi-name"${row.item ? ` style="color:${itemNameColor({ kind: row.item.kind, quality })}"` : ''}>${esc(name)}${esc(countSuffix)}<span class="vi-sub ui-muted">${esc(t('hudChrome.unbind.rowSub'))}</span></span>${feeHtml}`;
     button.addEventListener('click', () => deps.onUnbind(row.itemId, row.feeCopper));
     if (row.item) {
       const item = row.item;

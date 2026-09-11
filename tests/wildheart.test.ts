@@ -38,7 +38,13 @@ import {
   TWOHAND_STAT_MULT,
   weaponDpsBudget,
 } from '../src/sim/item_budget';
-import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
+import {
+  expectedStatBudget,
+  expectedStatTotal,
+  itemLevel,
+  primaryStatSum,
+  statIdentity,
+} from '../src/sim/item_level';
 import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -373,7 +379,13 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
       expect(item.quality, id).toBe('uncommon');
       expect(item.kind === 'armor' && item.slot === 'legs', id).toBe(true);
       expect(itemLevel(item), id).toBe(21);
-      expect(expectedStatBudget(item), id).toBe(primaryStatBudget(21, 'uncommon', 'legs'));
+      // stamina baseline model: primaryStatBudget stays the LINE budget the
+      // formula prices (unaffected by identity); expectedStatBudget is the
+      // model total, which adds the free caster baseline on top for
+      // sunbone_ritual_sarong's caster identity.
+      expect(expectedStatBudget(item), id).toBe(
+        expectedStatTotal(primaryStatBudget(21, 'uncommon', 'legs'), statIdentity(item.stats)),
+      );
       expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
       return item.kind === 'armor' ? item.armorType : undefined;
     });

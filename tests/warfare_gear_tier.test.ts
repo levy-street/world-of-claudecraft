@@ -26,7 +26,7 @@ import {
 import { ITEMS } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { canEquipItem } from '../src/sim/equipment_rules';
-import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
+import { itemLevel, itemStaminaModel, primaryStatSum } from '../src/sim/item_level';
 import { PVP_DEFENSE_CAP, PVP_OFFENSE_CAP, pvpFractionsFromRatings } from '../src/sim/pvp';
 import type { Entity, EquipSlot, PlayerClass, SetBonusEffect } from '../src/sim/types';
 
@@ -189,6 +189,60 @@ function gearRating(worn: Partial<Record<EquipSlot, string>>): {
   return { offense, defense };
 }
 
+// The WARFARE line as literals, id to [offense line, stamina], read from the
+// catalog on 2026-09-11. The fraction and floor checks below cannot see a line
+// that moves while the floor binds (the stamina floor top-up covers the gap),
+// so every piece is pinned outright; a retune changes this table on purpose.
+const WARFARE_LINES: Record<string, [number, number]> = {
+  furyforged_warhelm: [6, 10],
+  furyforged_warspaulders: [6, 8],
+  furyforged_warplate: [8, 12],
+  furyforged_girdle: [5, 9],
+  furyforged_legguards: [8, 10],
+  furyforged_gauntlets: [5, 9],
+  furyforged_sabatons: [7, 6],
+  stormbound_crown: [11, 6],
+  stormbound_spaulders: [9, 5],
+  stormbound_hauberk: [13, 7],
+  stormbound_waistguard: [9, 5],
+  stormbound_legmail: [11, 7],
+  stormbound_handguards: [9, 5],
+  stormbound_greaves: [10, 5],
+  ashstalker_cowl: [8, 8],
+  ashstalker_shoulderguards: [6, 8],
+  ashstalker_harness: [8, 12],
+  ashstalker_waistband: [5, 9],
+  ashstalker_legguards: [8, 10],
+  ashstalker_grips: [5, 9],
+  ashstalker_treads: [7, 6],
+  cinderweave_cowl: [11, 6],
+  cinderweave_mantle: [9, 5],
+  cinderweave_raiment: [13, 7],
+  cinderweave_cord: [9, 5],
+  cinderweave_legwraps: [11, 7],
+  cinderweave_handwraps: [9, 5],
+  cinderweave_slippers: [10, 5],
+  thornhide_headdress: [11, 6],
+  thornhide_mantle: [9, 5],
+  thornhide_vestment: [13, 7],
+  thornhide_cinch: [9, 5],
+  thornhide_leggings: [11, 7],
+  thornhide_gloves: [9, 5],
+  thornhide_boots: [10, 5],
+  final_oath_medallion: [6, 5],
+  razorwind_torque: [6, 5],
+  cinder_sigil_pendant: [7, 5],
+  iron_vow_band: [4, 6],
+  unbroken_circle: [6, 4],
+  fleetblood_band: [6, 4],
+  last_step_signet: [4, 6],
+  ashen_focus_ring: [7, 4],
+  spellbreakers_seal: [7, 4],
+  final_argument_greatblade: [8, 12],
+  first_blood_razor: [8, 12],
+  emberglass_warstaff: [13, 7],
+};
+
 describe('the WARFARE tier is authored from named fractions', () => {
   it('sits at item level 31 and holds each slot to its authored share of the budget', () => {
     // The three fractions are pinned as SYMBOLS, so a retune that edits the
@@ -203,11 +257,30 @@ describe('the WARFARE tier is authored from named fractions', () => {
 
     for (const id of FURY_STOCK) {
       const item = ITEMS[id];
-      const budget = expectedStatBudget(item) ?? 0;
+      // Ratings and the fraction discount key off the FULL, undiscounted slot
+      // budget (item_level.ts's expectedLineBudget, read here via
+      // itemStaminaModel().budget), never the stamina baseline model's
+      // identity-aware total: every WARFARE piece sits on that model's
+      // FRACTIONAL_BY_DESIGN exemption (built from FURY_STOCK, disjoint from
+      // the drift allowlist), so its line is never corrected and only its
+      // stamina floor is applied (see tests/pvp_honor_gear.test.ts).
+      const model = itemStaminaModel(item);
+      const budget = model?.budget ?? 0;
       const jewelry = item.slot === 'neck' || item.slot === 'ring';
       const fraction = jewelry ? WARFARE_JEWELRY_STAT_FRACTION : WARFARE_STAT_FRACTION;
       expect(itemLevel(item), id).toBe(31);
-      expect(primaryStatSum(item), id).toBe(Math.round(budget * fraction));
+      // The offense line was authored at the fraction target and never touched
+      // by the stamina baseline model; only stamina was topped up where the
+      // fraction-scaled total fell short of the model's floor. Reconstruct both
+      // halves: the untouched line plus whichever is larger of the fraction
+      // target's implied stamina or the floor.
+      const line = model?.line ?? 0;
+      const floor = model?.baseline ?? 0;
+      const fractionTotal = Math.round(budget * fraction);
+      const impliedSta = fractionTotal - line;
+      expect(line, `${id} line within the WARFARE fraction`).toBeLessThanOrEqual(fractionTotal);
+      expect([line, model?.sta ?? 0], `${id} line and stamina`).toEqual(WARFARE_LINES[id]);
+      expect(primaryStatSum(item), id).toBe(line + Math.max(impliedSta, floor));
       expect(item.pvpOffenseRating, id).toBe(Math.round(budget * WARFARE_RATING_FRACTION));
       expect(item.pvpDefenseRating, id).toBe(Math.round(budget * WARFARE_RATING_FRACTION));
     }

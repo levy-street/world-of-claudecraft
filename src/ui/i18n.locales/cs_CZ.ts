@@ -3798,7 +3798,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každých {points} bodů na komponentě zvýší její úroveň sklizně o jeden stupeň, až o {steps} stupňů; méně než {points} bodů přesto zvýší výnos.',
   'hudChrome.townFocus.title': 'Zaměření města',
   'hudChrome.townFocus.townOnlyHint': 'Tato nastavení platí pouze ve vašem domovském městě.',
-  'hudChrome.archetypeTitle.label': 'Titul',
   'hudChrome.archetypeTitle.none': 'Žádný',
   'entities.itemSets.crownforged.bonus4':
     'Kritické zásahy tvé zbraně roztříští cíl efektem Kostitříska a způsobí mu krvácení za 8 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.',
@@ -7043,7 +7042,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.herbalism': 'Vyžaduje bylinkářství úrovně {tier}.',
   'hudChrome.gathering.tierRequired.logging': 'Vyžaduje dřevorubectví úrovně {tier}.',
   'hudChrome.gathering.tierRequired.mining': 'Vyžaduje těžbu úrovně {tier}.',
-  'hudChrome.gathering.title': 'Sběr',
   'hudChrome.gathering.toolTierUnmet.herbalism':
     'K sesbírání tohoto záhonu potřebuješ bylinkářský srp úrovně {tier}.',
   'hudChrome.gathering.toolTierUnmet.logging':
@@ -10481,7 +10479,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.training_dummy.name': 'Cvičný panák',
   'entities.mobs.hub_training_dummy.name': 'Cvičný panák',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Koníček',
   'hudChrome.auraEffect.armorPct': 'Snižuje brnění o {pct} %',
   'hudChrome.auraEffect.armorPctStacks': 'Snižuje brnění o {pct} % ({stacks} stacků)',
   'hudChrome.auraEffect.increasePct.allStats': 'Zvyšuje všechny atributy o {pct} %',

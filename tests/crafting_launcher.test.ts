@@ -169,12 +169,38 @@ describe('side rail height budget', () => {
   // un-hidden at boot on any Discord-enabled build, so it counts as visible
   // for the real-world budget even though the static markup hides it.
   function countVisibleMicroBtns(markup: string): number {
-    const buttons = markup.match(/<button[^>]*class="micro-btn"[^>]*>/g) ?? [];
+    const buttons = markup.match(/<button[^>]*class="[^"]*\bmicro-btn\b[^"]*"[^>]*>/g) ?? [];
     return buttons.filter((b) => {
       if (/id="mm-discord"/.test(b)) return true;
       return !/display:\s*none/.test(b) && !/\shidden(?=[\s>=])/.test(b);
     }).length;
   }
+
+  it('composes every launcher from the micro icon-button and keycap primitives', () => {
+    for (const [name, html] of [
+      ['index.html', indexHtml],
+      ['play.html', playHtml],
+    ] as const) {
+      const markup = wrapperMarkup(html);
+      const buttons = markup.match(/<button[^>]*\bmicro-btn\b[^>]*>/g) ?? [];
+      expect(buttons.length, name).toBeGreaterThan(0);
+      for (const button of buttons) {
+        expect(button, name).toMatch(/\btype="button"/);
+        expect(button, name).toMatch(/class="[^"]*\bui-icon-btn\b[^"]*\bui-icon-btn--micro\b/);
+      }
+      const keycaps = markup.match(/<span[^>]*\bkeybind\b[^>]*>/g) ?? [];
+      expect(keycaps.length, name).toBeGreaterThan(0);
+      for (const keycap of keycaps) expect(keycap, name).toContain('ui-keycap');
+    }
+  });
+
+  it('shows the ready daily-reward count through the shared corner badge primitive', () => {
+    // The Prompts board calls for the ready chest to carry a count, not glow alone.
+    expect(hud).toContain('daily-reward-count ui-badge ui-badge--corner');
+    expect(hudCss).toMatch(
+      /#daily-rewards-button\.spin-ready \.daily-reward-count \{\s*display: inline-flex;/,
+    );
+  });
 
   // The rail's real footprint: two 34px .side-buttons-col columns plus the
   // #side-buttons row gap between them.
@@ -200,6 +226,7 @@ describe('side rail height budget', () => {
     // Explicit widths keep both columns aligned to the standard launcher slot.
     const colRule = /\.side-buttons-col \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
     expect(colRule).toMatch(/width:\s*34px;/);
+    expect(colRule).toMatch(/gap:\s*4px;/);
   });
 
   // Splits the two regimes the rail actually renders in, instead of mixing them:

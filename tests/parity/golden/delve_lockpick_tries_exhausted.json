@@ -163,7 +163,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1021,
-      "state": "be063d57",
+      "state": "e644f799",
       "events": "9be39354",
       "rng": {
         "draws": 3,
@@ -174,7 +174,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1021,
-      "state": "0416b92d",
+      "state": "6b9de47b",
       "events": "82b32424",
       "rng": {
         "draws": 3,
@@ -185,7 +185,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1021,
-      "state": "a2248adf",
+      "state": "1aae1431",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -196,7 +196,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1021,
-      "state": "11763b91",
+      "state": "43601dbf",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -207,7 +207,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1021,
-      "state": "4252c0f7",
+      "state": "ae44a6b9",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -218,7 +218,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1021,
-      "state": "3419705d",
+      "state": "5074f1ab",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -229,7 +229,7 @@
       "tick": 69,
       "time": 3.45,
       "nextId": 1022,
-      "state": "39c9617b",
+      "state": "bd13827d",
       "events": "7e72f7eb",
       "rng": {
         "draws": 5,
@@ -402,7 +402,7 @@
             "armor": 188,
             "int": 11,
             "spi": 12,
-            "sta": 23,
+            "sta": 29,
             "str": 23
           },
           "templateId": "rogue",
@@ -457,7 +457,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1022,
-      "state": "e1f49bc9",
+      "state": "b9c36ed7",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -468,7 +468,7 @@
       "tick": 71,
       "time": 3.55,
       "nextId": 1022,
-      "state": "5486da43",
+      "state": "3ed67a35",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -641,7 +641,7 @@
             "armor": 188,
             "int": 11,
             "spi": 12,
-            "sta": 23,
+            "sta": 29,
             "str": 23
           },
           "templateId": "rogue",

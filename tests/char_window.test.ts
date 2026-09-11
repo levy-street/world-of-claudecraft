@@ -25,7 +25,10 @@ import { svgIcon } from '../src/ui/ui_icons';
 // Vitest's injected filesystem dirname.
 const painter = readFileSync(join(__dirname, '../src/ui/char_window.ts'), 'utf8');
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  document.body.replaceChildren();
+});
 
 describe('char_window: no magic values', () => {
   it('carries no literal color in TS (colors live in tokens/stylesheet)', () => {
@@ -163,7 +166,7 @@ describe('char_window: profession art placements', () => {
     // (the five-icon render test below pins the behavior; this pins the seam).
     expect(painter).toMatch(/professionIconUrl\(`gather_\$\{r\.professionId\}`, 56\)/);
     expect(painter).toContain('class="char-gather-icon"');
-    expect(painter).toContain('class="char-gather-row"');
+    expect(painter).toContain('class="char-gather-row char-skill-row');
   });
 
   it('shows the current pair crest inline without inventing a tiny tooltip target', () => {
@@ -187,6 +190,12 @@ describe('char_window: profession art placements', () => {
       'data:image/png;base64,stub',
     );
     const root = document.createElement('div');
+    document.body.appendChild(root);
+    const professionsLauncher = document.createElement('button');
+    professionsLauncher.id = 'mm-professions';
+    const openProfessions = vi.fn();
+    professionsLauncher.addEventListener('click', openProfessions);
+    document.body.appendChild(professionsLauncher);
     let world = {
       cfg: { playerClass: 'warrior' },
       player: { name: 'Aurelia', level: 60, skin: 0 },
@@ -194,6 +203,7 @@ describe('char_window: profession art placements', () => {
       honor: 187,
       archetypeTitle: 'weaponcrafting+armorcrafting' as string | null,
       hobbyCraft: 'jewelcrafting',
+      craftingIdentity: { craftSkills: { [CRAFT_RING[0].id]: 37 } },
       selectedMount: () => null,
       ownedMounts: () => [],
       selectMount: () => {},
@@ -219,7 +229,7 @@ describe('char_window: profession art placements', () => {
       statCellHtml: () => '',
       statTooltipHtml: () => '',
       talentSummaryHtml: () => '',
-      progressionHtml: () => '',
+      progressionHtml: () => '<div data-progression-test>Progression fixture</div>',
       unequip: vi.fn(),
       beginUnequipDrag: vi.fn(),
       endUnequipDrag: vi.fn(),
@@ -245,6 +255,54 @@ describe('char_window: profession art placements', () => {
     });
 
     win.render();
+    const tabs = [...root.querySelectorAll<HTMLElement>('.char-sidebar-tab')];
+    expect(tabs.map((tab) => [tab.dataset.tab, tab.getAttribute('aria-selected')])).toEqual([
+      ['stats', 'true'],
+      ['progression', 'false'],
+      ['skills', 'false'],
+    ]);
+    // The sidebar panel scrolls and the Stats board holds no focusable
+    // content, so it carries its own tab stop and takes its name from the
+    // selected tab (axe scrollable-region-focusable, WAI-ARIA tabs).
+    const panel = root.querySelector<HTMLElement>('#char-sidebar-panel');
+    expect(panel?.getAttribute('tabindex')).toBe('0');
+    expect(panel?.getAttribute('aria-labelledby')).toBe('char-sidebar-tab-stats');
+    expect(root.querySelector('#char-sidebar-tab-stats')?.getAttribute('data-tab')).toBe('stats');
+    const progressionTab = root.querySelector<HTMLElement>('[data-tab="progression"]');
+    progressionTab?.click();
+    expect(root.querySelector('[data-progression-test]')?.textContent).toBe('Progression fixture');
+    expect(root.querySelector('[data-tab="progression"]')?.getAttribute('aria-selected')).toBe(
+      'true',
+    );
+    // The name follows the selection: a re-render re-points aria-labelledby.
+    expect(root.querySelector('#char-sidebar-panel')?.getAttribute('aria-labelledby')).toBe(
+      'char-sidebar-tab-progression',
+    );
+    // Gathering now lives on the Skills board instead of being duplicated under Stats.
+    const skillsTab = root.querySelector<HTMLElement>('[data-tab="skills"]');
+    skillsTab?.focus();
+    skillsTab?.click();
+    expect(document.activeElement).toBe(root.querySelector('[data-tab="skills"]'));
+    expect(root.querySelector('[data-tab="skills"]')?.getAttribute('aria-selected')).toBe('true');
+    const skillGroups = root.querySelectorAll<HTMLElement>('.char-skill-group');
+    expect(skillGroups).toHaveLength(2);
+    const craftingRows = skillGroups[1].querySelectorAll<HTMLElement>('.char-skill-row');
+    expect(craftingRows).toHaveLength(CRAFT_RING.length);
+    expect(craftingRows[0].classList.contains('is-empty')).toBe(false);
+    expect([...craftingRows].slice(1).every((row) => row.classList.contains('is-empty'))).toBe(
+      true,
+    );
+    expect([...craftingRows].map((row) => row.querySelector('b')?.textContent)).toEqual(
+      CRAFT_RING.map((craft, index) => `${index === 0 ? 37 : 0} / ${craft.maxSkill}`),
+    );
+    expect(skillGroups[1].querySelectorAll('.char-skill-rail')).toHaveLength(CRAFT_RING.length);
+    expect(
+      skillGroups[1]
+        .querySelector<HTMLElement>('.char-skill-rail')
+        ?.style.getPropertyValue('--char-skill-pct'),
+    ).toBe(`${(37 / CRAFT_RING[0].maxSkill) * 100}%`);
+    root.querySelector<HTMLButtonElement>('[data-act="open-professions"]')?.click();
+    expect(openProfessions).toHaveBeenCalledOnce();
     const honorBalance = root.querySelector<HTMLElement>('.char-honor-balance');
     expect(honorBalance?.textContent).toContain('187');
     expect(
@@ -322,6 +380,7 @@ describe('char_window: profession art placements', () => {
       honor: 0,
       archetypeTitle: null,
       hobbyCraft: 'jewelcrafting',
+      craftingIdentity: { craftSkills: {} },
       selectedMount: () => null,
       ownedMounts: () => [],
       selectMount: () => {},
@@ -371,6 +430,8 @@ describe('char_window: profession art placements', () => {
     });
 
     win.render();
+    // Gathering now lives on the Skills board instead of being duplicated under Stats.
+    root.querySelector<HTMLElement>('[data-tab="skills"]')?.click();
     const values = [...root.querySelectorAll('.char-gather-row b')].map((b) => b.textContent);
     // The row renders a BOUNDED "skill / max", never a bare integer. The floor
     // still holds (99.75 and 99.5 read 99, never a fake crossed 100), and
@@ -1210,5 +1271,79 @@ describe('char_window: production worn-tooltip wiring', () => {
     expect(wiring).toContain(
       'wornItemTooltip: (item, instance) => this.itemTooltip(item, false, instance)',
     );
+  });
+});
+
+describe('char_window: the model is the stage and the sockets overlay it (W24)', () => {
+  const css = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+
+  it('flexes the paperdoll into the pane height as a positioning context', () => {
+    // The review finding: a 350px stage in a 634px pane left the sheet with a
+    // dead band under the sockets. The paperdoll now takes the leftover height
+    // and the model panel fills it edge to edge.
+    expect(css).toContain(
+      'body:not(.mobile-touch) #char-window .paperdoll {\n    position: relative;\n    flex: 1 1 auto;\n    min-height: 0;\n  }',
+    );
+    expect(css).toContain(
+      'body:not(.mobile-touch) #char-window .char-model-panel {\n    position: absolute;\n    inset: 0;',
+    );
+  });
+
+  it('floats both socket columns over the stage, one on each outer edge', () => {
+    expect(css).toContain(
+      'body:not(.mobile-touch) #char-window .equip-col {\n    position: absolute;\n    top: var(--spacing-sm);',
+    );
+    expect(css).toMatch(
+      /body:not\(\.mobile-touch\) #char-window \.equip-col:not\(\.equip-col-right\) \{\s*left: var\(--spacing-sm\);/,
+    );
+    expect(css).toMatch(
+      /body:not\(\.mobile-touch\) #char-window \.equip-col-right \{\s*right: var\(--spacing-sm\);/,
+    );
+    // The overlay needs its own scrim token: slot names sit over a lit model.
+    expect(css).toContain('var(--color-stage-overlay-scrim)');
+  });
+
+  it('spreads the socket columns over the stage height and seats the weapons at its bottom centre', () => {
+    // Review round 2: the columns span from the top of the stage down to the
+    // weapons seat and space their rows evenly, and the two weapon hands sit in
+    // their own centred row above the skin row (or at the stage edge without one).
+    expect(css).toContain(
+      'body:not(.mobile-touch) #char-window .equip-col {\n    position: absolute;\n    top: var(--spacing-sm);\n    bottom: var(--paperdoll-stage-foot-h);\n    justify-content: space-evenly;',
+    );
+    expect(css).toContain(
+      'body:not(.mobile-touch) #char-window .equip-row-weapons {\n    position: absolute;\n    left: 50%;\n    bottom: var(--paperdoll-skin-row-h);\n    transform: translateX(-50%);',
+    );
+    expect(css).toContain(
+      'body:not(.mobile-touch) #char-window .paperdoll:has(.char-skin-row:empty) .equip-row-weapons {\n    bottom: var(--spacing-sm);',
+    );
+    // The row is a wrapped full-width line of the shared paperdoll flex row, so
+    // the touch sheet and the inspect window get it in flow for free.
+    expect(css).toContain('.paperdoll {\n    display: flex;\n    flex-wrap: wrap;');
+    expect(css).toContain('.equip-row-weapons {\n    display: flex;\n    justify-content: center;');
+  });
+
+  it('re-anchors the unequip and helm-eye chips to the narrower overlay row unit', () => {
+    // The base anchors assume the 154px flow unit; over the stage the unit is
+    // 114px, so an un-rescoped chip would hang outside the window edge.
+    expect(css).toContain('left: calc(50% - 68px);');
+    expect(css).toContain('right: calc(50% - 68px);');
+  });
+
+  it('leaves the touch sheet in normal flow (the overlay is pointer-only)', () => {
+    // Every stage rule is scoped away from body.mobile-touch: the phone sheet
+    // stacks its paperdoll and would lose the columns entirely out of flow.
+    for (const decl of ['.paperdoll {\n    position: relative;', '.equip-col {\n    position:']) {
+      const at = css.indexOf(decl);
+      expect(at).toBeGreaterThan(-1);
+      expect(css.slice(Math.max(0, at - 60), at)).toContain('body:not(.mobile-touch)');
+    }
+  });
+
+  it('floors the attribute tile so its numeral cannot spill under the tab strip', () => {
+    // The tiles are stretched flex items, so their height is the row's, not
+    // their content's; without the floor the row collapsed to the label line
+    // and the 21px numeral rendered above the tile, over the sidebar tabs.
+    expect(css).toMatch(/\.attrs-tiles \.stat-cell \{[^}]*min-height: 56px;/);
+    expect(css).toMatch(/\.attrs-tiles \.stat-cell \{[^}]*justify-content: center;/);
   });
 });

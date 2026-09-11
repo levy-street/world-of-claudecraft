@@ -442,9 +442,9 @@ export class LeaderboardWindow {
   private titleHtml(realm: string): string {
     const realmTag = realm ? ` &middot; ${esc(realm)}` : '';
     return (
-      `<div class="panel-title"><span id="leaderboard-title">${esc(t('game.leaderboard.title'))} ` +
-      `<span class="lb-subtitle">${esc(t('game.leaderboard.subtitle'))}${realmTag}</span></span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.leaderboard.close'))}">${svgIcon('close')}</button></div>`
+      `<div class="panel-title ui-win-head"><span id="leaderboard-title" class="ui-win-title">${esc(t('game.leaderboard.title'))} ` +
+      `<span class="lb-subtitle ui-win-sub">${esc(t('game.leaderboard.subtitle'))}${realmTag}</span></span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.leaderboard.close'))}">${svgIcon('close')}</button></div>`
     );
   }
 
@@ -456,7 +456,7 @@ export class LeaderboardWindow {
   // src/styles/components.css). It is emitted here, not stamped once at open,
   // because every render() rebuilds the window's innerHTML from scratch.
   private loadingBodyHtml(): string {
-    return `<div class="lb-body window-fill" id="lb-body-panel" role="tabpanel"><div class="lb-loading" role="status" aria-busy="true">${esc(t('game.leaderboard.loading'))}</div></div>`;
+    return `<div class="lb-body window-fill ui-card" id="lb-body-panel" role="tabpanel"><div class="lb-loading" role="status" aria-busy="true">${esc(t('game.leaderboard.loading'))}</div></div>`;
   }
 
   // The Players / Guilds / Daily tab bar. A WAI-ARIA role=tablist with roving
@@ -467,13 +467,13 @@ export class LeaderboardWindow {
     const tab = (board: LeaderboardBoard, label: string): string => {
       const active = this.board === board;
       return (
-        `<button type="button" role="tab" class="lb-tab${active ? ' lb-tab-active' : ''}" ` +
+        `<button type="button" role="tab" class="lb-tab ui-tab${active ? ' lb-tab-active' : ''}" ` +
         `data-leaderboard-tab="${board}" aria-selected="${active ? 'true' : 'false'}" ` +
         `tabindex="${active ? '0' : '-1'}" aria-controls="lb-body-panel">${esc(label)}</button>`
       );
     };
     return (
-      `<div class="lb-tabs" role="tablist" aria-label="${esc(t('hudChrome.leaderboard.tabsLabel'))}">` +
+      `<div class="lb-tabs ui-tabs" role="tablist" aria-label="${esc(t('hudChrome.leaderboard.tabsLabel'))}">` +
       tab('players', t('hudChrome.leaderboard.tabPlayers')) +
       tab('guilds', t('hudChrome.leaderboard.tabGuilds')) +
       tab('deeds', t('hudChrome.deeds.lbTab')) +
@@ -709,9 +709,9 @@ export class LeaderboardWindow {
     const status = t('itemUi.market.pageStatus', { current, total });
     return (
       `<div class="lb-pager">` +
-      `<button type="button" class="lb-page-btn" data-leaderboard-page="prev"${pager.prevDisabled ? ' disabled' : ''}>${esc(t('itemUi.market.pagePrev'))}</button>` +
+      `<button type="button" class="lb-page-btn ui-btn" data-leaderboard-page="prev"${pager.prevDisabled ? ' disabled' : ''}>${esc(t('itemUi.market.pagePrev'))}</button>` +
       `<span class="lb-page-status">${esc(status)}</span>` +
-      `<button type="button" class="lb-page-btn" data-leaderboard-page="next"${pager.nextDisabled ? ' disabled' : ''}>${esc(t('itemUi.market.pageNext'))}</button>` +
+      `<button type="button" class="lb-page-btn ui-btn" data-leaderboard-page="next"${pager.nextDisabled ? ' disabled' : ''}>${esc(t('itemUi.market.pageNext'))}</button>` +
       `</div>`
     );
   }

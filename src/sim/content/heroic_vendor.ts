@@ -56,7 +56,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { int: 7, sta: 4 },
+    stats: { int: 7, sta: 4, spi: 4 },
     hitRating: JEWELRY_RATING, // dps caster: Hit answers the Heroic +3 resist
     sellValue: 4500,
   },
@@ -89,7 +89,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { spi: 6, int: 5 },
+    stats: { spi: 6, int: 5, sta: 4 },
     hasteRating: JEWELRY_RATING, // healer-leaning: haste
     sellValue: 4500,
   },
@@ -100,7 +100,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { int: 6, spi: 5 },
+    stats: { int: 6, spi: 5, sta: 4 },
     hasteRating: JEWELRY_RATING, // caster/healer: uptime
     sellValue: 4500,
   },
@@ -122,7 +122,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'neck',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { int: 7, spi: 5 },
+    stats: { int: 7, spi: 5, sta: 4 },
     critRating: JEWELRY_RATING, // caster throughput
     sellValue: 6000,
   },
@@ -133,7 +133,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'neck',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { str: 6, agi: 6 },
+    stats: { str: 4, agi: 4, sta: 4 },
     hasteRating: JEWELRY_RATING, // hybrid melee: haste (the Hit lane keeps nine_oaths + round_table)
     sellValue: 6000,
   },

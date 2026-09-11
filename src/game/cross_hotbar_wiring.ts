@@ -16,7 +16,8 @@ import {
   type CrossHotbarLayer,
 } from './cross_hotbar';
 import { CrossHotbarBindings } from './cross_hotbar_bindings';
-import { type GamepadKind, gamepadButtonLabel } from './gamepad_map';
+import { type GamepadBindingEntry, labelForGamepadAction } from './gamepad_bindings';
+import { GAMEPAD_CYCLE_SET, type GamepadKind, gamepadButtonLabel } from './gamepad_map';
 
 export interface CrossHotbarHoldInfo {
   /** The armed half, or null for the resting bar (which still shows). */
@@ -30,6 +31,9 @@ export interface CrossHotbarHoldInfo {
   /** The arrange chord's own glyphs, so the way into edit mode is on the bar
    *  rather than only in the options panel. */
   arrange: { bumper: string; button: string };
+  /** The button that changes standing set, for the chip under the set pips. Empty
+   *  when the player has cleared that bind. */
+  swap: string;
 }
 
 /** The HUD surface the overlay is driven through. */
@@ -61,6 +65,13 @@ export interface CrossHotbarPadState {
 export interface CrossHotbarPad extends CrossHotbarPadState {
   setCrossHotbar(on: boolean): void;
   setCrossHotbarExpand(on: boolean): void;
+}
+
+/** The live button layout the bar reads its own glyphs from. Narrowed to the one
+ *  member (the concrete GamepadBindings satisfies it structurally), so the wiring
+ *  never reaches for the store's rebind surface. */
+export interface CrossHotbarPadLayout {
+  entries(): readonly GamepadBindingEntry[];
 }
 
 /** The pad the layout is handed to once it exists. */
@@ -117,12 +128,15 @@ export interface CrossHotbarWiring {
   syncPadMode(pad: CrossHotbarPadState): void;
 }
 
-/** The overlay payload for a held trigger, or null once none is held. */
+/** The overlay payload for a held trigger, or null once none is held. The button
+ *  layout arrives as ENTRIES rather than a fixed glyph: every button the bar
+ *  prints is remappable, so the set-swap chip has to be resolved per call. */
 export function crossHotbarHold(
   bindings: CrossHotbarBindings,
   layer: CrossHotbarLayer | null,
   set: number,
   kind: GamepadKind,
+  entries: readonly GamepadBindingEntry[],
 ): CrossHotbarHoldInfo {
   return {
     layer,
@@ -138,6 +152,7 @@ export function crossHotbarHold(
       bumper: gamepadButtonLabel(CROSS_HOTBAR_ARRANGE_CHORD.bumper, kind),
       button: gamepadButtonLabel(CROSS_HOTBAR_ARRANGE_CHORD.button, kind),
     },
+    swap: labelForGamepadAction(entries, GAMEPAD_CYCLE_SET, kind) ?? '',
   };
 }
 
@@ -147,8 +162,9 @@ export function crossHotbarHold(
 export function crossHotbarResting(
   bindings: CrossHotbarBindings,
   kind: GamepadKind,
+  entries: readonly GamepadBindingEntry[],
 ): CrossHotbarHoldInfo {
-  return crossHotbarHold(bindings, null, CROSS_HOTBAR_PRIMARY_SET, kind);
+  return crossHotbarHold(bindings, null, CROSS_HOTBAR_PRIMARY_SET, kind, entries);
 }
 
 /** The sixteen hardware glyphs under the cells (the left half's eight then the
@@ -269,10 +285,15 @@ function applyPadModeClass(on: boolean): void {
  * `scope` is the character the layout is stored under, the same string `Keybinds`
  * takes, so two characters on one machine never share a pad layout. It is required
  * rather than defaulted, or an unscoped caller shares one key across characters.
+ *
+ * `layout` is the live button layout, asked per call rather than captured: the
+ * player can rebind the set-swap button from the Controller panel mid-session and
+ * the chip under the set pips has to follow.
  */
 export function createCrossHotbar(
   host: () => CrossHotbarOverlayHost,
   scope: string,
+  layout: CrossHotbarPadLayout,
 ): CrossHotbarWiring {
   const bindings = new CrossHotbarBindings(scope);
   let enabled = true;
@@ -287,7 +308,7 @@ export function createCrossHotbar(
       const seed = ui.crossHotbarSeed();
       bindings.seedOnce(seed.bar, seed.extras);
     }
-    ui.setCrossHotbar(on ? crossHotbarResting(bindings, pad.getKind()) : null);
+    ui.setCrossHotbar(on ? crossHotbarResting(bindings, pad.getKind(), layout.entries()) : null);
     if (on) {
       watchBarForLift();
       measureCrossHotbarLift();
@@ -298,10 +319,10 @@ export function createCrossHotbar(
     attach: (pad) => pad.setCrossHotbarBindings(bindings),
     syncPadMode,
     onHold: (layer, set, kind) =>
-      host().setCrossHotbar(crossHotbarHold(bindings, layer, set, kind)),
+      host().setCrossHotbar(crossHotbarHold(bindings, layer, set, kind, layout.entries())),
     padCallbacks: (kind) => ({
       onCrossHotbar: (layer, set) =>
-        host().setCrossHotbar(crossHotbarHold(bindings, layer, set, kind())),
+        host().setCrossHotbar(crossHotbarHold(bindings, layer, set, kind(), layout.entries())),
       onCrossHotbarEdit: (active, carriedFrom, carried) =>
         host().crossHotbarEdit()?.setEditing(active, carriedFrom, carried),
       focusedCrossHotbarCell: () => host().crossHotbarEdit()?.focusedCell() ?? null,

@@ -85,14 +85,16 @@ export function showBuyConfirmPrompt(
   const stack = document.getElementById('prompt-stack');
   if (!stack) return;
   const prompt = document.createElement('div');
-  prompt.className = ['prompt panel bank-buy-prompt', opts.className].filter(Boolean).join(' ');
+  prompt.className = ['prompt panel ui-window bank-buy-prompt', opts.className]
+    .filter(Boolean)
+    .join(' ');
   prompt.innerHTML =
     `<div class="prompt-text">${esc(opts.text)}</div>` +
     (opts.secondaryText !== undefined
       ? `<div class="bank-buy-disclaimer">${esc(opts.secondaryText)}</div>`
       : '');
   const confirm = document.createElement('button');
-  confirm.className = 'btn';
+  confirm.className = 'btn ui-btn ui-btn--red';
   confirm.textContent = opts.confirmLabel;
   // The alternate rail, when there is one. Built with the same .btn treatment
   // and placed AFTER the primary confirm: the two rails are independent
@@ -101,13 +103,13 @@ export function showBuyConfirmPrompt(
   const alt = opts.altConfirm
     ? (() => {
         const button = document.createElement('button');
-        button.className = 'btn bank-buy-alt';
+        button.className = 'btn ui-btn bank-buy-alt';
         button.textContent = opts.altConfirm.label;
         return button;
       })()
     : null;
   const cancel = document.createElement('button');
-  cancel.className = 'btn';
+  cancel.className = 'btn ui-btn';
   cancel.textContent = opts.cancelLabel;
   prompt.append(confirm, ...(alt ? [alt] : []), cancel);
   const { dismiss, dismissAndReturn } = wiring.installPromptDialog(prompt, opener, () => {

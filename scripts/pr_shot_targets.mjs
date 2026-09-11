@@ -608,6 +608,23 @@ async function dismissTutorialGreeting(page) {
   await wait(200);
 }
 
+/** The staged skill some recipes write crosses a profession tier, and the
+ *  first-tier tutorial pops a variable beat LATER than any single dismissal:
+ *  a one-shot clear races it and the shot then shows the tutorial, not the
+ *  window under it. Sweep for the whole settle window instead. */
+async function dismissTutorialGreetingUntilSettled(page, attempts = 8) {
+  for (let i = 0; i < attempts; i++) {
+    await dismissTutorialGreeting(page);
+    const gone = await page.evaluate(
+      () =>
+        !document.getElementById('tutorial-greeting') &&
+        !document.getElementById('profession-tutorial'),
+    );
+    if (gone && i >= 3) return;
+    await wait(300);
+  }
+}
+
 /** Deliberate MEDIUM leg for treatments hidden below the medium effects tier
  *  (renderer gates like gfxTierAtLeast(GFX.effectsTier, 'medium')). Preset 2 is
  *  the LOWEST numeric preset whose tier passes such a gate (gfx.ts
@@ -13335,6 +13352,38 @@ export const TARGETS = [
     },
   },
   {
+    // The shared corpse-harvest preference picker, reached the way a player
+    // reaches it: the Professions window's own preference entry button. The
+    // picker is content inside #harvest-preference-window, so the desktop
+    // clip is that window; mobile clips the HUD to prove the sheet placement.
+    key: 'harvest-preference-picker',
+    label: 'The shared harvest preference picker (radio rows, Apply and Cancel)',
+    when: ['ui/hud/professions/harvest_preference_picker'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, shot) {
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        const el = document.querySelector('#professions-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleProfessions?.();
+      });
+      if (!(await pollForSize(page, '#professions-window'))) {
+        return { skip: 'the professions window never opened' };
+      }
+      await page.evaluate(() => {
+        document.querySelector('#professions-window [data-harvest-preference]')?.click();
+      });
+      if (!(await pollForSize(page, '#harvest-preference-window'))) {
+        return { skip: 'the harvest preference picker never opened' };
+      }
+      await wait(400);
+      return { clip: shot?.mobile ? '#ui' : '#harvest-preference-window' };
+    },
+  },
+  {
     key: 'farm-map-pins',
     label: 'World map farm-patch pins from the Eastbrook garden beds',
     when: [
@@ -14303,10 +14352,9 @@ export const TARGETS = [
       const open = await pollForSize(page, '#perfecting-window');
       if (!open) return { skip: 'the perfecting window never opened (base checkout?)' };
       // The staged skill crossing a tier pops the first-tier profession
-      // tutorial AFTER the entry flow's dismissal already ran; clear it
-      // before the shot (the naming target's precedent).
-      await wait(400);
-      await dismissTutorialGreeting(page);
+      // tutorial AFTER the entry flow's dismissal already ran, on a variable
+      // delay; sweep until it stays gone (the naming target's precedent).
+      await dismissTutorialGreetingUntilSettled(page);
       // Mobile clips the whole HUD so the shot also proves the window fits
       // the 844x390 landscape viewport beside the touch cluster.
       return { clip: shot?.mobile ? '#ui' : '#perfecting-window' };
@@ -14335,7 +14383,7 @@ export const TARGETS = [
       }
       // The staged skill crossing a tier can pop the first-tier profession
       // tutorial over the window; clear it before driving the action button.
-      await dismissTutorialGreeting(page);
+      await dismissTutorialGreetingUntilSettled(page);
       await page.evaluate(() => {
         document.querySelector('#perfecting-window [data-action]')?.click();
       });

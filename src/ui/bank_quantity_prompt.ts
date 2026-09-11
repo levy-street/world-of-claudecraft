@@ -50,13 +50,13 @@ export function showQuantityPrompt(wiring: QuantityPromptWiring, opts: QuantityP
   const stack = document.getElementById('prompt-stack');
   if (!stack) return;
   const prompt = document.createElement('div');
-  prompt.className = `prompt panel ${opts.className}`;
+  prompt.className = `prompt panel ui-window ${opts.className}`;
   const title = document.createElement('div');
   title.className = 'prompt-text';
   title.textContent = opts.titleText;
   prompt.appendChild(title);
   const input = document.createElement('input');
-  input.className = 'prompt-number';
+  input.className = 'prompt-number ui-input';
   input.type = 'number';
   input.setAttribute('aria-label', opts.inputAriaText);
   input.min = '1';
@@ -64,10 +64,10 @@ export function showQuantityPrompt(wiring: QuantityPromptWiring, opts: QuantityP
   input.step = '1';
   input.value = '1';
   const confirm = document.createElement('button');
-  confirm.className = 'btn';
+  confirm.className = 'btn ui-btn ui-btn--red';
   confirm.textContent = opts.confirmText;
   const cancel = document.createElement('button');
-  cancel.className = 'btn';
+  cancel.className = 'btn ui-btn';
   cancel.textContent = opts.cancelText;
   prompt.append(input, confirm, cancel);
   const { dismiss, dismissAndReturn } = wiring.installPromptDialog(prompt, opener, () =>

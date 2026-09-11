@@ -51,14 +51,20 @@ describe('tokens.css - :root seeds (full-Ultra defaults) + glass low/touch drop'
 
 describe('hud.css - glow scales with --fx-shadow (0 at low), structural shadows literal', () => {
   it('multiplies the four decorative outer-glow blurs by --fx-shadow', () => {
-    expect(hudCss).toContain('0 0 calc(8px * var(--fx-shadow, 1)) #e74c3c99'); // player portrait
+    expect(hudCss).toMatch(
+      /0 0 calc\(8px \* var\(--fx-shadow, 1\)\)\s+color-mix\(in srgb, var\(--color-danger\) 60%, transparent\)/,
+    ); // player portrait
     expect(hudCss).toContain('0 0 calc(8px * var(--fx-shadow, 1)) #4fc3ff66'); // rest indicator
     expect(hudCss).toContain('0 0 calc(5px * var(--fx-shadow, 1)) #ff5533aa'); // combo pips
-    expect(hudCss).toContain('0 0 calc(7px * var(--fx-shadow, 1)) #e74c3c99'); // party-frame combat
+    expect(hudCss).toMatch(
+      /0 0 calc\(7px \* var\(--fx-shadow, 1\)\)\s+color-mix\(in srgb, var\(--color-danger\) 60%, transparent\)/,
+    ); // party-frame combat
   });
 
   it('keeps the inset structural shadow literal (not token-scaled)', () => {
-    expect(hudCss).toContain('inset 0 0 12px #0009');
+    expect(hudCss).toMatch(
+      /inset 0 0 12px color-mix\(in srgb, var\(--color-keyline\) 60%, transparent\)/,
+    );
   });
 });
 

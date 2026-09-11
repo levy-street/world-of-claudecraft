@@ -154,14 +154,14 @@ export class TalentsWindow {
     markDialogRoot(root, { label: t('game.talents.title') });
     const cls = this.deps.playerClass();
     const close =
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('game.talents.close'))}">` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('game.talents.close'))}">` +
       `${svgIcon('close')}</button>`;
     if (!talentsFor(cls)) {
       root.innerHTML =
-        `<div class="panel-title"><span>${t('game.talents.title')} <span class="tal-class-name">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
+        `<div class="panel-title ui-win-head"><img class="ui-win-art" src="/ui/chrome/talents.webp" alt="" draggable="false"><span class="ui-win-title">${esc(t('game.talents.title'))}<span class="tal-class-name ui-win-sub">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
         `<div class="tal-empty tal-coming-soon" data-talents-coming-soon>` +
-        `<b>${t('game.talents.comingSoonTitle')}</b>` +
-        `<span>${t('game.talents.comingSoonBody')}</span></div>`;
+        `<b>${esc(t('game.talents.comingSoonTitle'))}</b>` +
+        `<span>${esc(t('game.talents.comingSoonBody'))}</span></div>`;
       root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
       return;
     }
@@ -169,7 +169,7 @@ export class TalentsWindow {
     const allocation = this.deps.currentAllocation();
     const view = buildTalentsView(allocation, cls, this.deps.playerLevel());
     root.innerHTML =
-      `<div class="panel-title"><span>${t('game.talents.title')} <span class="tal-class-name">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
+      `<div class="panel-title ui-win-head"><img class="ui-win-art" src="/ui/chrome/talents.webp" alt="" draggable="false"><span class="ui-win-title">${esc(t('game.talents.title'))}<span class="tal-class-name ui-win-sub">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
       // WAI-ARIA tabs, built from the shared tab_strip_view core (default
       // button tag; the Choices tab carries its picked-count badge via
       // extraHtml, the same markup contract social_window follows).
@@ -177,15 +177,15 @@ export class TalentsWindow {
         tabStripModel({
           ariaLabel: t('game.talents.title'),
           panelId: 'tal-body',
-          stripClass: 'tal-tabs',
-          tabClass: 'tal-tab',
+          stripClass: 'tal-tabs ui-tabs',
+          tabClass: 'tal-tab ui-tab',
           selectedClass: 'active',
           tabs: [
             { id: 'spec', label: t('game.talents.specTab') },
             {
               id: 'rows',
               label: t('hudChrome.talentRows.tab'),
-              extraHtml: `<span class="tt-pts">${formatNumber(view.pickedCount)}/${formatNumber(view.rows.length)}</span>`,
+              extraHtml: `<span class="tt-pts ui-chip">${formatNumber(view.pickedCount)}/${formatNumber(view.rows.length)}</span>`,
             },
           ],
           selected: this.tab,
@@ -237,7 +237,7 @@ export class TalentsWindow {
         field: 'description',
       });
       const panel = document.createElement('div');
-      panel.className = `ts-panel${entry.selected ? ' sel' : ''}`;
+      panel.className = `ts-panel ui-card-tile${entry.selected ? ' sel' : ''}`;
       let html =
         `<div class="ts-panel-head">${specIconHtml(talentSpecIconRef(spec))}` +
         `<div class="ts-panel-title"><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(spec.role)}</div></div></div>` +
@@ -253,13 +253,13 @@ export class TalentsWindow {
         ) as TranslationKey;
         html +=
           `<div class="ts-det-meta">` +
-          `<div class="ts-det-attr"><span class="ts-det-attr-cap">${t('hudChrome.specPanel.primaryAttr')}</span><span class="ts-det-attr-val">${esc(statLabel)}</span></div>` +
-          `<div class="ts-det-cx ts-cx-${info.complexity}"><span class="ts-det-cx-cap">${t('hudChrome.specPanel.complexity')}</span> ${t(cxKey)}</div>` +
+          `<div class="ts-det-attr"><span class="ts-det-attr-cap">${esc(t('hudChrome.specPanel.primaryAttr'))}</span><span class="ts-det-attr-val">${esc(statLabel)}</span></div>` +
+          `<div class="ts-det-cx ts-cx-${info.complexity}"><span class="ts-det-cx-cap">${esc(t('hudChrome.specPanel.complexity'))}</span> ${esc(t(cxKey))}</div>` +
           `</div>`;
       }
       html += `<div class="ts-det-mastery"><b>${esc(masteryName)}</b> - ${esc(masteryDescription)}</div>`;
       if (info?.examples.length) {
-        html += `<div class="ts-ex-block"><div class="ts-det-label">${t('hudChrome.specPanel.exampleAbilities')}</div><div class="ts-ex-list">`;
+        html += `<div class="ts-ex-block"><div class="ts-det-label">${esc(t('hudChrome.specPanel.exampleAbilities'))}</div><div class="ts-ex-list">`;
         for (const id of info.examples) {
           html += `<div class="ts-ex" tabindex="0" data-ability="${esc(id)}"><span class="ts-ex-icon" style="background-image:url(${iconDataUrl('ability', id)})" aria-hidden="true"></span><span class="ts-ex-name">${esc(signatureName(id))}</span></div>`;
         }
@@ -304,7 +304,7 @@ export class TalentsWindow {
       // jumps to the Choices tab. The selected spec's button reads as primary.
       const viewBtn = document.createElement('button');
       viewBtn.type = 'button';
-      viewBtn.className = `btn ts-view-talents${entry.selected ? ' primary' : ''}${info?.examples.length ? ' has-ex' : ''}`;
+      viewBtn.className = `ts-view-talents ui-btn${entry.selected ? ' primary ui-btn--gold' : ''}${info?.examples.length ? ' has-ex' : ''}`;
       viewBtn.textContent = t('hudChrome.specPanel.viewTalents');
       viewBtn.addEventListener('click', (event) => {
         event.stopPropagation();
@@ -335,8 +335,8 @@ export class TalentsWindow {
     if (!view.hasRows) {
       body.innerHTML =
         `<div class="tal-empty tal-coming-soon" data-talents-coming-soon>` +
-        `<b>${t('game.talents.comingSoonTitle')}</b>` +
-        `<span>${t('game.talents.comingSoonBody')}</span></div>`;
+        `<b>${esc(t('game.talents.comingSoonTitle'))}</b>` +
+        `<span>${esc(t('game.talents.comingSoonBody'))}</span></div>`;
       return;
     }
     const wrap = document.createElement('div');
@@ -344,9 +344,9 @@ export class TalentsWindow {
     const soon = t('hudChrome.talentRows.comingSoon');
     for (const row of view.rows) {
       const rowElement = document.createElement('div');
-      rowElement.className = `tal-row${row.unlocked ? '' : ' locked'}`;
+      rowElement.className = `tal-row ui-card${row.unlocked ? '' : ' locked'}`;
       const level = document.createElement('span');
-      level.className = `tal-row-lv${row.unlocked ? '' : ' locked'}`;
+      level.className = `tal-row-lv ui-medal${row.unlocked ? '' : ' locked'}`;
       level.textContent = formatNumber(row.level, { maximumFractionDigits: 0 });
       const options = document.createElement('div');
       options.className = 'tal-row-opts';
@@ -361,7 +361,7 @@ export class TalentsWindow {
         const button = document.createElement('button');
         button.type = 'button';
         button.className =
-          `tal-row-opt${optionVM.picked ? ' picked' : ''}` +
+          `tal-row-opt ui-btn${optionVM.picked ? ' picked ui-btn--gold' : ''}` +
           `${optionVM.pending ? ' pending' : ''}`;
         button.disabled = optionVM.disabled;
         button.dataset.rowLevel = String(row.level);
@@ -381,7 +381,7 @@ export class TalentsWindow {
             `<b>${esc(name)}</b><br><span>${esc(description)}</span>` +
             (optionVM.pending
               ? `<br><i style="color:${TAL_COLOR.choiceDim}">${esc(soon)}</i>`
-              : `<br><i style="color:${TAL_COLOR.hint}">${t('game.talents.cycleHint')}</i>`),
+              : `<br><i style="color:${TAL_COLOR.hint}">${esc(t('game.talents.cycleHint'))}</i>`),
         );
         button.addEventListener('click', () => {
           this.deps.selectRow(
@@ -415,12 +415,18 @@ export class TalentsWindow {
     const active = activeIndex >= 0 ? this.deps.loadouts()[activeIndex] : null;
     const label = active ? active.name : t('hudChrome.talentRows.defaultLoadout');
     return (
-      `<div class="tal-foot">` +
-      `<button type="button" class="tal-loadout-btn" data-act="loadout-menu"` +
+      `<div class="ui-divider"></div><div class="tal-foot">` +
+      `<button type="button" class="tal-loadout-btn ui-btn" data-act="loadout-menu"` +
       ` aria-haspopup="menu" aria-expanded="false">` +
       `<span class="tal-loadout-name">${esc(label)}</span>` +
       `<span class="tal-loadout-caret" aria-hidden="true"></span>` +
       `</button>` +
+      `<span class="tal-foot-actions">` +
+      `<button type="button" class="ui-btn" data-menu-action="save"${_view.valid ? '' : ' disabled'}>${esc(t('game.talents.save'))}</button>` +
+      `<button type="button" class="ui-btn" data-menu-action="import">${esc(t('game.talents.import'))}</button>` +
+      `<button type="button" class="ui-btn" data-menu-action="export">${esc(t('game.talents.export'))}</button>` +
+      `<button type="button" class="ui-btn ui-btn--red" data-menu-action="clear"${_view.pickedCount === 0 ? ' disabled' : ''}>${esc(t('game.talents.clear'))}</button>` +
+      `</span>` +
       `</div>`
     );
   }
@@ -435,6 +441,16 @@ export class TalentsWindow {
       }
       this.openLoadoutMenu(root, btn, view);
     });
+    for (const control of root.querySelectorAll<HTMLButtonElement>('.tal-foot-actions button')) {
+      control.addEventListener('click', () => {
+        this.closeLoadoutMenu(root);
+        this.openLoadoutMenu(root, btn, view);
+        const action = [
+          ...root.querySelectorAll<HTMLButtonElement>('.tal-loadout-menu button'),
+        ].find((candidate) => candidate.dataset.menuAction === control.dataset.menuAction);
+        action?.click();
+      });
+    }
   }
 
   private closeLoadoutMenu(root: HTMLElement): void {
@@ -480,18 +496,19 @@ export class TalentsWindow {
     };
 
     const menu = document.createElement('div');
-    menu.className = 'tal-loadout-menu';
+    menu.className = 'tal-loadout-menu ui-card';
     menu.setAttribute('role', 'menu');
     menu.setAttribute('aria-label', t('game.talents.loadouts'));
 
     const item = (
       label: string,
-      opts: { disabled?: boolean; cls?: string; onPick?: () => void },
+      opts: { action?: string; disabled?: boolean; cls?: string; onPick?: () => void },
     ): HTMLButtonElement => {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = `tal-lo-item${opts.cls ? ` ${opts.cls}` : ''}`;
+      button.className = `tal-lo-item ui-btn${opts.cls ? ` ${opts.cls}` : ''}`;
       button.setAttribute('role', 'menuitem');
+      if (opts.action) button.dataset.menuAction = opts.action;
       button.textContent = label;
       if (opts.disabled) button.disabled = true;
       if (opts.onPick) button.addEventListener('click', opts.onPick);
@@ -516,9 +533,11 @@ export class TalentsWindow {
           this.refreshFromAuthority();
         },
       });
+      pick.setAttribute('role', 'menuitemradio');
+      pick.setAttribute('aria-checked', String(index === activeIndex));
       const del = document.createElement('button');
       del.type = 'button';
-      del.className = 'tal-lo-del';
+      del.className = 'tal-lo-del ui-x-btn';
       del.setAttribute('aria-label', `${t('game.talents.deleteBuild')}: ${loadout.name}`);
       del.innerHTML = svgIcon('close');
       del.addEventListener('click', (event) => {
@@ -540,12 +559,13 @@ export class TalentsWindow {
     });
 
     const sep = document.createElement('div');
-    sep.className = 'tal-lo-sep';
+    sep.className = 'tal-lo-sep ui-divider';
     menu.appendChild(sep);
 
     const active = activeIndex >= 0 ? loadouts[activeIndex] : null;
     menu.appendChild(
       item(t('game.talents.saveBuild'), {
+        action: 'save',
         disabled: !view.valid,
         onPick: () => {
           this.closeLoadoutMenu(root);
@@ -556,7 +576,7 @@ export class TalentsWindow {
     );
     menu.appendChild(
       item(t('game.talents.newBuild'), {
-        cls: 'tal-lo-new',
+        cls: 'tal-lo-new ui-btn--gold',
         disabled: !view.valid,
         onPick: () => {
           this.closeLoadoutMenu(root);
@@ -568,7 +588,7 @@ export class TalentsWindow {
     // "this saves my gear too" is visible before the click rather than after.
     menu.appendChild(
       item(t('hudChrome.talents.newBuildWithGear'), {
-        cls: 'tal-lo-new',
+        cls: 'tal-lo-new ui-btn--gold',
         disabled: !view.valid,
         onPick: () => {
           this.closeLoadoutMenu(root);
@@ -578,6 +598,7 @@ export class TalentsWindow {
     );
     menu.appendChild(
       item(t('game.talents.import'), {
+        action: 'import',
         onPick: () => {
           this.closeLoadoutMenu(root);
           this.deps.inputDialog({
@@ -601,6 +622,7 @@ export class TalentsWindow {
     );
     menu.appendChild(
       item(t('game.talents.export'), {
+        action: 'export',
         onPick: () => {
           this.closeLoadoutMenu(root);
           this.deps.inputDialog({
@@ -617,6 +639,7 @@ export class TalentsWindow {
     );
     menu.appendChild(
       item(t('game.talents.clear'), {
+        action: 'clear',
         disabled: view.pickedCount === 0,
         onPick: () => {
           this.closeLoadoutMenu(root);

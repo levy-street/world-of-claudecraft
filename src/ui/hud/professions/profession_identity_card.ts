@@ -33,7 +33,7 @@ export function renderProfessionIdentityCard(
 ): void {
   const title = t('hudChrome.crafting.identity.title');
   const card = document.createElement('section');
-  card.className = 'profession-identity-card';
+  card.className = 'profession-identity-card ui-card';
   card.setAttribute('role', 'region');
   card.setAttribute('aria-label', title);
 
@@ -86,7 +86,7 @@ export function renderProfessionIdentityCard(
       });
       const chips = identity.uniform
         ? ''
-        : `<div class="prof-craft-chips"><span class="prof-role-badge">${esc(roleText(row.role))}</span><span class="prof-ceiling">${esc(ceilingText(row.ceiling))}</span></div>`;
+        : `<div class="prof-craft-chips"><span class="prof-role-badge ui-chip">${esc(roleText(row.role))}</span><span class="prof-ceiling ui-chip">${esc(ceilingText(row.ceiling))}</span></div>`;
       return `<li class="profession-skill-row prof-craft-row role-${row.role}" aria-label="${esc(detail)}"><div class="prof-craft-main"><div class="prof-craft-head"><span class="prof-craft-name">${esc(label)}</span><span class="prof-skill-value">${esc(formatNumber(row.skill, { maximumFractionDigits: 0 }))}</span></div>${chips}</div></li>`;
     })
     .join('');
@@ -101,7 +101,7 @@ export function renderProfessionIdentityCard(
   // recolors reach the caption pill, exactly as they reach a row's.
   const uniformCaption =
     identity.uniform && skillRows
-      ? `<li class="profession-skill-uniform role-${identity.uniform.role}" aria-hidden="true"><span class="profession-skill-uniform-label">${esc(t('hudChrome.crafting.identity.allCrafts'))}</span><span class="prof-role-badge">${esc(roleText(identity.uniform.role))}</span><span class="prof-ceiling">${esc(ceilingText(identity.uniform.ceiling))}</span></li>`
+      ? `<li class="profession-skill-uniform role-${identity.uniform.role}" aria-hidden="true"><span class="profession-skill-uniform-label">${esc(t('hudChrome.crafting.identity.allCrafts'))}</span><span class="prof-role-badge ui-chip">${esc(roleText(identity.uniform.role))}</span><span class="prof-ceiling ui-chip">${esc(ceilingText(identity.uniform.ceiling))}</span></li>`
       : '';
 
   const tutorial = identity.tutorial

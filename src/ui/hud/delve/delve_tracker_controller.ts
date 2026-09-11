@@ -6,18 +6,18 @@ import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { delveAffixImageUrl } from './delve_affix_art';
 
 const DELVE_AFFIX_COLORS: Record<string, string> = {
-  restless_graves: '#8b7355',
-  bad_air: '#6a8a6a',
-  candleblind: '#c9a227',
-  old_mechanisms: '#7a8a9a',
-  flooded_paths: '#4a7a9a',
-  grave_tax: '#9a6a4a',
-  unstable_roof: '#8a6a5a',
-  cult_remnants: '#7a4a8a',
-  chapel_candle: '#ffd100',
-  high_water: '#2f718c',
-  lively_choir: '#5f70a5',
-  belligerent_dead: '#6f5a46',
+  restless_graves: 'var(--color-delve-affix-restless-graves)',
+  bad_air: 'var(--color-delve-affix-bad-air)',
+  candleblind: 'var(--color-delve-affix-candleblind)',
+  old_mechanisms: 'var(--color-delve-affix-old-mechanisms)',
+  flooded_paths: 'var(--color-delve-affix-flooded-paths)',
+  grave_tax: 'var(--color-delve-affix-grave-tax)',
+  unstable_roof: 'var(--color-delve-affix-unstable-roof)',
+  cult_remnants: 'var(--color-delve-affix-cult-remnants)',
+  chapel_candle: 'var(--color-delve-affix-chapel-candle)',
+  high_water: 'var(--color-delve-affix-high-water)',
+  lively_choir: 'var(--color-delve-affix-lively-choir)',
+  belligerent_dead: 'var(--color-delve-affix-belligerent-dead)',
 };
 
 export interface DelveTrackerControllerDeps {
@@ -108,22 +108,22 @@ export class DelveTrackerController {
                   total: formatNumber(run.rite.total, { maximumFractionDigits: 0 }),
                 })
               : t('delveUi.tracker.riteOpen');
-      riteHint = `<div class="dt-obj dt-hint">-> ${esc(riteText)}</div>`;
+      riteHint = `<div class="dt-obj dt-hint ui-meta">-> ${esc(riteText)}</div>`;
     }
     let exitHint = '';
     if (run.moduleIndex < run.moduleCount - 1) {
       exitHint = run.exitPortalOpen
-        ? `<div class="dt-obj dt-hint">-> ${esc(t('delveUi.tracker.exitHintOpen'))}</div>`
-        : `<div class="dt-obj dt-hint">${esc(t('delveUi.tracker.exitHintLocked'))}</div>`;
+        ? `<div class="dt-obj dt-hint ui-meta">-> ${esc(t('delveUi.tracker.exitHintOpen'))}</div>`
+        : `<div class="dt-obj dt-hint ui-meta">${esc(t('delveUi.tracker.exitHintLocked'))}</div>`;
     }
     element.innerHTML =
-      `<div class="dt-header">${esc(t('delveUi.tracker.title'))}</div>` +
-      `<div class="dt-title">${esc(delveName)} <span class="dt-tier">${esc(tierLabel)}</span>${complete}</div>` +
-      `<div class="dt-obj">- ${esc(moduleLine)}${moduleName ? `: ${esc(moduleName)}` : ''}</div>` +
-      `<div class="dt-obj${run.objective.complete ? ' done' : ''}">- ${esc(t('delveUi.tracker.objective'))}: ${esc(objectiveLine)}</div>` +
+      `<div class="dt-header ui-cin">${esc(t('delveUi.tracker.title'))}</div>` +
+      `<div class="dt-title ui-cin">${esc(delveName)} <span class="dt-tier ui-chip">${esc(tierLabel)}</span>${complete}</div>` +
+      `<div class="dt-obj ui-meta">- ${esc(moduleLine)}${moduleName ? `: ${esc(moduleName)}` : ''}</div>` +
+      `<div class="dt-obj ui-meta${run.objective.complete ? ' done' : ''}">- ${esc(t('delveUi.tracker.objective'))}: ${esc(objectiveLine)}</div>` +
       riteHint +
       exitHint +
-      `<div class="dt-obj">- ${currencyIconHtml('delve_mark')}${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
+      `<div class="dt-obj ui-meta ui-num">- ${currencyIconHtml('delve_mark')}${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
       affixHtml;
     element.querySelectorAll<HTMLElement>('.dt-affix-icon').forEach((icon) => {
       this.attachAffixIcon(icon);
@@ -160,7 +160,8 @@ export class DelveTrackerController {
         const fallback = icon.ownerDocument.createElement('span');
         fallback.className = icon.className;
         fallback.dataset.affix = affixId;
-        fallback.style.background = DELVE_AFFIX_COLORS[affixId] ?? '#888';
+        fallback.style.background =
+          DELVE_AFFIX_COLORS[affixId] ?? 'var(--color-delve-affix-unknown)';
         fallback.setAttribute('role', 'img');
         fallback.tabIndex = 0;
         fallback.setAttribute('aria-label', this.affixLabel(affixId));
@@ -173,13 +174,13 @@ export class DelveTrackerController {
 
   private affixHtml(affixes: readonly string[]): string {
     if (affixes.length === 0) return '';
-    let html = `<div class="dt-affix-row"><span class="dt-affix-label">${esc(t('delveUi.tracker.affix'))}</span>`;
+    let html = `<div class="dt-affix-row"><span class="dt-affix-label ui-meta">${esc(t('delveUi.tracker.affix'))}</span>`;
     for (const affixId of affixes) {
       const imageUrl = delveAffixImageUrl(affixId);
       if (imageUrl) {
         html += `<img class="dt-affix-icon" data-affix="${esc(affixId)}" src="${imageUrl}" alt="" draggable="false" role="img" tabindex="0" aria-label="${esc(this.affixLabel(affixId))}">`;
       } else {
-        const color = DELVE_AFFIX_COLORS[affixId] ?? '#888';
+        const color = DELVE_AFFIX_COLORS[affixId] ?? 'var(--color-delve-affix-unknown)';
         html += `<span class="dt-affix-icon" data-affix="${esc(affixId)}" style="background:${color}" role="img" tabindex="0" aria-label="${esc(this.affixLabel(affixId))}"></span>`;
       }
     }

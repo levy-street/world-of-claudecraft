@@ -64,7 +64,17 @@ describe('controlled Crucible profession balance fixtures', () => {
         (sum, key) => sum + row.stats[key] - base.stats[key],
         0,
       );
-      expect(delta).toBe(row.pair.some((slot) => slot === 'feet') ? 3 : 4);
+      // Perfecting under the stamina baseline model (tierDeltaStats,
+      // item_budget.ts): the line delta (3 on a feet pair, 4 otherwise) plus the
+      // free baseline's growth across the three-level bump for the caster and
+      // healer collections, whose profiles ride the caster line. The chest
+      // baseline grows 8 to 9 and the feet baseline 5 to 6; the waist stays at 6
+      // (line 17 to 19 rounds to the same third). The physical collections keep
+      // the historical line delta exactly.
+      const baselineGrowth = /caster|healer/.test(row.profile)
+        ? row.pair.filter((slot) => slot === 'chest' || slot === 'feet').length
+        : 0;
+      expect(delta).toBe((row.pair.some((slot) => slot === 'feet') ? 3 : 4) + baselineGrowth);
       // No flat armor bonus, but every additional Agility still grants its
       // normal two derived armor points through the real stat fold.
       expect(row.stats.armor - base.stats.armor).toBe(2 * (row.stats.agi - base.stats.agi));

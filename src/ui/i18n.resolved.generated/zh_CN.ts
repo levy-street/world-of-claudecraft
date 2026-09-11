@@ -902,6 +902,7 @@ export const zh_CN: EnTranslations = {
     },
     "questTracker": {
       "count": "（{count}）",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "收起任务追踪器",
       "expandHint": "展开任务追踪器"
     },
@@ -1266,6 +1267,9 @@ export const zh_CN: EnTranslations = {
       "previous": "之前的测试",
       "runLabel": "第 {index} 次练习",
       "runSummary": "{time} 内 {total}"
+    },
+    "talkingHead": {
+      "label": "对话"
     },
     "hubLesson": {
       "target": "先将假人设为目标。",
@@ -1739,6 +1743,9 @@ export const zh_CN: EnTranslations = {
     },
     "controller": {
       "title": "手柄",
+      "device": "已连接设备",
+      "deviceConnected": "已连接",
+      "deviceDisconnected": "未检测到手柄",
       "glyphStyle": "按键标签",
       "glyphStyleAuto": "自动",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2132,22 @@ export const zh_CN: EnTranslations = {
       "showPlaytimeAria": "显示游戏时长",
       "hidePlaytimeAria": "隐藏游戏时长"
     },
+    "charSidebar": {
+      "label": "角色详情",
+      "subtitle": "{level}级 {className} . {archetype} . 爱好：{hobby}",
+      "subtitleNoHobby": "{level}级 {className} . {archetype}",
+      "stats": "属性",
+      "progression": "进度",
+      "skills": "技能",
+      "gathering": "采集",
+      "crafting": "制作",
+      "openProfessions": "打开专业"
+    },
+    "questLog": {
+      "completed": "已完成",
+      "zoneSummary": "{count}个（{ready}个可交付）",
+      "shiftHint": "按住 Shift 点击任务可将其链接到聊天中。"
+    },
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
@@ -2367,6 +2390,7 @@ export const zh_CN: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "报告错误",
+      "online": "在线",
       "realm": "服务器",
       "character": "角色",
       "position": "坐标",
@@ -3244,6 +3268,7 @@ export const zh_CN: EnTranslations = {
       "lock": "锁定玩家框"
     },
     "partyFrames": {
+      "header": "队伍",
       "section": "队伍和团队框体",
       "optionsSection": "队伍框体选项",
       "unlock": "移动队伍和团队框体",
@@ -4028,7 +4053,6 @@ export const zh_CN: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "采集",
       "mining": "采矿",
       "logging": "伐木",
       "herbalism": "草药学",
@@ -4212,9 +4236,7 @@ export const zh_CN: EnTranslations = {
       "noviceBody": "每收成一次作物，耕作技能都会提升。在任意田畦播下种子即可开始。"
     },
     "archetypeTitle": {
-      "label": "称号",
-      "none": "无",
-      "hobbyLabel": "爱好"
+      "none": "无"
     },
     "archetypePair": {
       "engineering+alchemy": "爆破师",
@@ -4384,7 +4406,9 @@ export const zh_CN: EnTranslations = {
       "hobbyLabel": "爱好：{craft}",
       "majorsLabel": "主修：{a}和{b}",
       "pairsHeld": "已持有组合：{count}",
-      "returnsLabel": "回归：{count}"
+      "returnsLabel": "回归：{count}",
+      "retentionFooter": "重置专业后保留60%的技能。",
+      "tutorialLink": "专业教程"
     },
     "crafting": {
       "title": "制作",
@@ -4419,6 +4443,7 @@ export const zh_CN: EnTranslations = {
       "vaultUnreachable": "此处无法使用材料仓库。",
       "craftFeeLine": "制作费：每件 {fee}",
       "empty": "尚无已知配方。",
+      "materialsFooter": "仓库中的材料会自动取用。可在制作站学习更多配方。",
       "resultAria": "制作{name}",
       "craftedToast": "已制作:{name}",
       "craftedToastQty": "已制作:{name} x{qty}",
@@ -4520,6 +4545,9 @@ export const zh_CN: EnTranslations = {
       "commissionToggleHint": "将绑定给交易中第一个收到它的角色。",
       "commissionUnbound": "委托制品：将绑定给第一位收货人",
       "commissionBound": "委托制品：已绑定给收货人"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "商人会补充普通商品；玩家上架的物品会以其要价并列显示。"
     },
     "itemMenu": {
       "use": "使用",
@@ -5136,6 +5164,33 @@ export const zh_CN: EnTranslations = {
       "toInstance": "副本地图",
       "toggleAria": "在世界地图、地区地图和副本地图之间切换",
       "levels": "等级 {min} 到 {max}"
+    },
+    "mapAtlas": {
+      "level": "等级 {level}",
+      "landmarkCount": "{count} 个地标",
+      "filtersAria": "地图图层",
+      "filters": {
+        "quests": "任务",
+        "gather": "采集",
+        "dungeons": "地下城",
+        "services": "服务",
+        "players": "玩家"
+      },
+      "trackedQuests": "追踪中的任务",
+      "noTrackedQuests": "没有追踪中的任务",
+      "availableNearby": "附近可接任务",
+      "noNearbyQuests": "附近没有可接任务",
+      "distance": "{distance} 码",
+      "showRoute": "显示路线",
+      "untrack": "取消追踪",
+      "track": "追踪",
+      "legend": {
+        "dungeon": "地下城",
+        "ore": "矿石",
+        "herb": "草药",
+        "mail": "邮箱",
+        "passage": "通道"
+      }
     },
     "arenaGate": {
       "minLevelNote": "需要等级 {level}"
@@ -6084,6 +6139,7 @@ export const zh_CN: EnTranslations = {
       "framesMoveBodyEditFrames": "你的框体、目标框体和队伍框体都可以移动。每个框体角上都有一个小小的移动按钮：解开它，把框体拖到你想要的位置，再锁上，这样一次误点就挪不动它。界面选项里“头像框”标签页顶部的“编辑框体”会一次松开界面的其余部分，这三个框体也随之一起松开：动作条、施法条、挥击条、经验条、小地图、按钮栏、宠物框体、姿态条、增益行与减益行，还有“愿望单提醒”小标签，松开期间每一件都挂着自己的名牌。如果挪到了让你后悔的地方，同一个“头像框”标签页底部的“恢复默认”会把它们统统弹回最初的位置。",
       "framesGovernedExtra": "“编辑框体”还会一并松开下方的追踪器堆栈(你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你所在的探秘、你正在参与的任何裂隙，以及你正在追踪的配方或委托)、宠物框体旁的宠物动作条、显示你对附近敌人所施减益的“目标减益”框体、圣骑士的“虔诚”勋章、术士的“痛苦资源条”、法术触发浮层、双持武器时的副手挥击条，以及带标签页的伤害统计窗口，松开期间每一件都挂着自己的名牌。",
       "framesGovernedAuraTracks": "“编辑框体”还会松开六条可选的光环轨道，前提是你已在同一“界面”选项的“战斗”页中开启它们：“我的增益”轨道、“防御性冷却”轨道、“我的护盾”轨道、“攻击性冷却”轨道、“移动与潜行”轨道，以及“我给队友的增益”轨道。所有轨道默认关闭，松开期间每一条都挂着自己的名牌。",
+      "framesGovernedTalkingHead": "“编辑框体”也会解锁对话面板：当某个 NPC 不在你的视野内时，它承载该 NPC 说出的台词；处于解锁状态时它会显示自己的名称标签。",
       "barsTitle": "各类条、计时与战斗文字",
       "barsBody": "你施法或引导时，施法条会出现在屏幕中央、动作条正上方，并带着法术的名称与剩余时间。你的目标在它自己的框体上也有一条施法条，好让你看清接下来会发生什么并作出应对。\n\n施法条下方是一条细细的挥击条，它在你两次武器挥击之间填充，让近战或远程攻击者看清下一次自动攻击何时落下。\n\n你的经验条横贯动作条下方的整个宽度，被刻成一段一段，其中较亮的一截表示你已经存下的休息经验。\n\n潜入水下时，屏幕顶部会出现一条蓝色的呼吸条。头没在水里时它会一直下降，耗尽后会闪红并让你开始溺水，而你一浮出水面它就迅速回满。空格键让你上浮，下潜键（默认为 Ctrl）带你潜得更深。\n\n伤害与治疗会以小小的数字从命中之处向上飘起，让你不必读文字也能看懂一场战斗。聊天框里的“战斗”标签页保留着完整的文字记录。",
       "aurasTitle": "增益与减益",

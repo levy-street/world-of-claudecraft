@@ -3957,7 +3957,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Każde {points} punktów na komponencie podnosi poziom zbioru o jeden stopień, do {steps} stopni; mniej niż {points} punktów nadal zwiększa uzysk.',
   'hudChrome.townFocus.title': 'Priorytety miasta',
   'hudChrome.townFocus.townOnlyHint': 'Priorytety można zmieniać tylko w mieście.',
-  'hudChrome.archetypeTitle.label': 'Tytuł',
   'hudChrome.archetypeTitle.none': 'Brak',
   'entities.itemSets.crownforged.bonus4':
     'Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.',
@@ -10450,7 +10449,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Zielarstwo',
   'hudChrome.gathering.logging': 'Wyrąb',
   'hudChrome.gathering.mining': 'Górnictwo',
-  'hudChrome.gathering.title': 'Zbieractwo',
   'errors.api.accountSessionLimit': 'Zbyt wiele postaci na tym koncie jest już w świecie.',
   'errors.api.crossSiteOrigin': 'Żądanie zablokowane ze względów bezpieczeństwa.',
   'errors.api.unsupportedMediaType': 'Nieobsługiwany format żądania.',
@@ -10698,7 +10696,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.training_dummy.name': 'Manekin treningowy',
   'entities.mobs.hub_training_dummy.name': 'Manekin treningowy',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Pasja',
   'hudChrome.auraEffect.armorPct': 'Zmniejsza pancerz o {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Zmniejsza pancerz o {pct}% ({stacks} nałożeń)',
   'hudChrome.auraEffect.increasePct.allStats': 'Zwiększa wszystkie atrybuty o {pct}%',

@@ -95,12 +95,18 @@ describe('heroic loot flair: variant generation', () => {
     });
   });
 
-  it("preserves Moonwrack Robe's 15 primary-stat points in its Heroic variant", () => {
+  it("carries Moonwrack Robe's realized line into its Heroic variant (19 base, 20 heroic)", () => {
+    // stamina baseline model: the base is a drift-allowlisted rare whose line
+    // (int:10/spi:5 = 15) sits three over its ilvl-12 budget of 12, with a
+    // baseline of 4 on top (19). The Heroic variant reads that realized line
+    // rather than inverting the model total, keeps every stat at or above the
+    // base (never an Intellect downgrade in disguise), and places the baseline
+    // of its own 15-point line, 5, for a total of 20.
     const base = ITEMS.moonshroud_robe;
     const variant = ITEMS[heroicVariantId(base.id)];
     expect({ base: primaryStatSum(base), heroic: primaryStatSum(variant) }).toEqual({
-      base: 15,
-      heroic: 15,
+      base: 19,
+      heroic: 20,
     });
   });
 

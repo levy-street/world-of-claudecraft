@@ -570,7 +570,7 @@ export const EVERGARDEN_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 52, sta: 3, spi: 3 },
+    stats: { armor: 52, sta: 3, spi: 5 },
     sellValue: 950,
   },
   fountain_court_mantle: {

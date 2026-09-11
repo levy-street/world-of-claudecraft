@@ -358,6 +358,10 @@ describe('LootWindowController', () => {
 
     expect(test.element.style.display).toBe('block');
     expect(test.element.innerHTML).toContain(`data-item="${itemIds[0]}"`);
+    expect(test.element.querySelector('.panel-title')?.classList.contains('ui-win-head')).toBe(
+      true,
+    );
+    expect(test.element.querySelector('.loot-item-name')?.className).toMatch(/q-/);
     expect(test.element.innerHTML).not.toContain(`data-item="${itemIds[1]}"`);
     expect(test.element.innerHTML).toContain('money:25');
     expect(test.placePopup).toHaveBeenCalledWith(test.element, 285, 270, 260, 280, 10, 10);
@@ -368,6 +372,7 @@ describe('LootWindowController', () => {
     // old "Take All" label promised the harvest too); native title attributes
     // stay empty so touch players are never without the tooltip.
     expect(takeLoot?.textContent).toBe('Take Loot');
+    expect(takeLoot?.classList.contains('ui-btn--red')).toBe(true);
     expect(takeLoot?.title).toBe('');
     expect(harvest?.title).toBe('');
     const tooltipFor = (el: Element | null | undefined) =>

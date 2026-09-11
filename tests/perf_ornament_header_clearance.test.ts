@@ -15,6 +15,9 @@ import { PERF_CORNER_SIZE } from '../src/ui/perf_ornament_svg';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const componentsCss = readFileSync(join(root, 'src/styles/components.css'), 'utf8');
+// The non-scrolling host and the one scrolling child are the shared window shell
+// now (W25), so the two overflow guarantees below are declared in library.css.
+const libraryCss = readFileSync(join(root, 'src/styles/library.css'), 'utf8');
 
 // The same selector can (legitimately) appear as more than one rule block in
 // this file (e.g. `#options-menu.perf-wide` sets `width` in one block and the
@@ -101,7 +104,11 @@ describe('perf overlay ornament host never scrolls with the panel content (issue
     // element (the one the gilded ::before ornament is attached to) inherited
     // that unchanged, the ornament would scroll away with the panel content
     // instead of staying pinned to the window frame.
-    const bodies = ruleBodies(componentsCss, '#options-menu.perf-wide');
+    const bodies = [
+      ...ruleBodies(componentsCss, '#options-menu.perf-wide'),
+      // .perf-scroll carries .ui-win-body, so this selector matches the panel.
+      ...ruleBodies(libraryCss, '.ui-window:has(> .ui-win-body)'),
+    ];
     const overflowDecls = bodies
       .flatMap((b) => [...stripCssComments(b).matchAll(/\boverflow(?:-y)?:\s*([a-z]+)/g)])
       .map((m) => m[1]);
@@ -112,7 +119,10 @@ describe('perf overlay ornament host never scrolls with the panel content (issue
   });
 
   it('the .perf-scroll wrapper is the one that actually scrolls', () => {
-    const bodies = ruleBodies(componentsCss, '#options-menu.perf-wide .perf-scroll');
+    const bodies = [
+      ...ruleBodies(componentsCss, '#options-menu.perf-wide .perf-scroll'),
+      ...ruleBodies(libraryCss, '.ui-win-body'),
+    ];
     const hasScrollY = bodies.some((b) => /overflow-y:\s*(auto|scroll)/.test(stripCssComments(b)));
     expect(hasScrollY, '.perf-scroll must declare overflow-y: auto or scroll').toBe(true);
   });

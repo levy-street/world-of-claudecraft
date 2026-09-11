@@ -578,38 +578,38 @@ describe('FctPainter: static-preset tiering', () => {
   });
 });
 
-// The per-kind colours moved out of TS into hud.css's .fct-<token> rules, so the
-// faithfulness guard for them must live where the colours now are: this asserts each token rule
-// still carries the EXACT hex the live fct() passed. A drift (a heal that is no longer #3ce63c,
-// say) fails here. It reads CSS, never TS, so it reintroduces no hex into the painter.
-describe('FCT colour tokens: the .fct-<token> hex stays byte-faithful to the old fct()', () => {
+// The per-kind colours now read semantic tokens from tokens.css. Pin both ends of that
+// indirection so the component sheet stays literal-free without changing a shipped hue.
+describe('FCT colour tokens: each kind reads its byte-faithful semantic token', () => {
   const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
-  // token -> the exact hex the live per-event fct() passed for that spawn kind.
-  const PINNED: Record<string, string> = {
-    'fct-miss-self': '#bbb',
-    'fct-dodge-self': '#bbb',
-    'fct-miss-other': '#fff',
-    'fct-dodge-other': '#fff',
-    'fct-damage-done-auto': '#fff',
-    'fct-damage-done-ability': '#ffe97a',
-    'fct-damage-taken': '#ff5544',
-    'fct-damage-done-block': '#b8c4d9',
-    'fct-damage-taken-block': '#7ec8e3',
-    'fct-absorb': '#9fd7ff',
-    'fct-heal': '#3ce63c',
-    'fct-xp': '#d9a3ff',
-    'fct-rested-xp': '#6db8ff',
-    'fct-honor': '#ffd100',
-    'fct-self-note': '#ff8c66',
+  const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+  const PINNED: Record<string, readonly [string, string]> = {
+    'fct-miss-self': ['color-fct-miss-self', '#bbb'],
+    'fct-dodge-self': ['color-fct-dodge-self', '#bbb'],
+    'fct-miss-other': ['color-fct-miss-other', '#fff'],
+    'fct-dodge-other': ['color-fct-dodge-other', '#fff'],
+    'fct-damage-done-auto': ['color-fct-damage-done-auto', '#fff'],
+    'fct-damage-done-ability': ['color-fct-damage-done-ability', '#ffe97a'],
+    'fct-damage-taken': ['color-fct-damage-taken', '#ff5544'],
+    'fct-damage-done-block': ['color-fct-damage-done-block', '#b8c4d9'],
+    'fct-damage-taken-block': ['color-fct-damage-taken-block', '#7ec8e3'],
+    'fct-absorb': ['color-fct-absorb', '#9fd7ff'],
+    'fct-heal': ['color-fct-heal', '#3ce63c'],
+    'fct-xp': ['color-fct-xp', '#d9a3ff'],
+    'fct-rested-xp': ['color-fct-rested-xp', '#6db8ff'],
+    'fct-honor': ['color-fct-honor', '#ffd100'],
+    'fct-self-note': ['color-fct-self-note', '#ff8c66'],
   };
 
-  it('declares every descriptor colour token with its pinned hex', () => {
-    for (const [token, hex] of Object.entries(PINNED)) {
-      // Find the selector (it may be grouped with siblings), then assert the colour in its block.
-      const at = css.indexOf(`.${token}`);
-      expect(at, `.${token} selector present in hud.css`).toBeGreaterThanOrEqual(0);
+  it('declares every descriptor token read and preserves its pinned value', () => {
+    for (const [className, [token, value]] of Object.entries(PINNED)) {
+      const at = css.indexOf(`.${className}`);
+      expect(at, `.${className} selector present in hud.css`).toBeGreaterThanOrEqual(0);
       const block = css.slice(at, css.indexOf('}', at)).toLowerCase();
-      expect(block, `.${token} -> color: ${hex}`).toContain(`color: ${hex}`);
+      expect(block, `.${className} -> color: var(--${token})`).toContain(`color: var(--${token})`);
+      expect(tokensCss.toLowerCase()).toMatch(
+        new RegExp(`--${token}:\\s*${value.replace('#', '\\#')}\\s*;`),
+      );
     }
   });
 });

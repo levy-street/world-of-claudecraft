@@ -19,6 +19,7 @@ import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatMoney, formatNumber, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
+import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
 import { qualityGlowShadow } from '../../quality_glow';
 import { svgIcon } from '../../ui_icons';
@@ -69,7 +70,7 @@ export function renderTrainWindow(
       )
     : -1;
   const scrollTop = el.scrollTop;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.training.title', { name: masterName }))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.training.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.training.title', { name: masterName }))}</span><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.training.close'))}">${svgIcon('close')}</button></div>`;
 
   if (view.rows.length === 0) {
     const empty = document.createElement('div');
@@ -98,17 +99,17 @@ export function renderTrainWindow(
         ? 'hudChrome.training.statePending'
         : STATE_LABEL_KEY[row.state],
     );
-    const stateHtml = `<span class="train-state">${esc(stateLabel)}</span>`;
+    const stateHtml = `<span class="train-state ui-chip">${esc(stateLabel)}</span>`;
     // The result icon sits in the crafting card's quality-glow socket (the
     // shared .crafting-recipe-socket family, size-varied by the window CSS).
     const glow = row.item?.quality ? qualityGlowShadow(QUALITY_COLOR[row.item.quality]) : '';
-    const iconHtml = `<span class="crafting-recipe-socket"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item) : ''}</span>`;
+    const iconHtml = `<span class="crafting-recipe-socket ui-socket ui-socket--bag"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item) : ''}</span>`;
 
     let node: HTMLElement;
     if (row.state === 'teachable') {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'vendor-item train-row train-teachable';
+      button.className = 'vendor-item ui-card train-row train-teachable';
       // Disabled while the learn is in flight: the first click's feedback,
       // and the reason a rapid second click can never re-send the command.
       const pending = row.pending === true;
@@ -128,15 +129,15 @@ export function renderTrainWindow(
       // unaffordable one keeps the plain error-tint price so the block stays
       // readable under the disabled opacity (never a desaturated gold chip).
       const feeHtml = row.affordable
-        ? `<span class="vi-price-chip">${esc(fee)}</span>`
+        ? `<span class="vi-price-chip ui-chip is-on">${esc(fee)}</span>`
         : `<span class="vi-price unaffordable">${esc(fee)}</span>`;
-      button.innerHTML = `${iconHtml}<span class="vi-name">${esc(name)}</span>${stateHtml}${feeHtml}`;
+      button.innerHTML = `${iconHtml}<span class="vi-name"${row.item ? ` style="color:${itemNameColor(row.item)}"` : ''}>${esc(name)}</span>${stateHtml}${feeHtml}`;
       button.addEventListener('click', () => deps.onTrain(row.recipeId));
       node = button;
     } else if (row.state === 'locked') {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'vendor-item train-row train-locked';
+      button.className = 'vendor-item ui-card train-row train-locked';
       button.disabled = true;
       const requirementText = row.requirement
         ? t('hudChrome.training.requirement', {
@@ -144,12 +145,12 @@ export function renderTrainWindow(
             skill: formatNumber(row.requirement.skill, { maximumFractionDigits: 0 }),
           })
         : '';
-      button.innerHTML = `${iconHtml}<span class="vi-name">${esc(name)}${requirementText ? `<span class="vi-sub">${esc(requirementText)}</span>` : ''}</span>${stateHtml}<span class="vi-price">${esc(feeLabel(row))}</span>`;
+      button.innerHTML = `${iconHtml}<span class="vi-name"${row.item ? ` style="color:${itemNameColor(row.item)}"` : ''}>${esc(name)}${requirementText ? `<span class="vi-sub ui-muted">${esc(requirementText)}</span>` : ''}</span>${stateHtml}<span class="vi-price">${esc(feeLabel(row))}</span>`;
       node = button;
     } else {
       const div = document.createElement('div');
-      div.className = 'vendor-item train-row train-known';
-      div.innerHTML = `${iconHtml}<span class="vi-name">${esc(name)}</span>${stateHtml}`;
+      div.className = 'vendor-item ui-card train-row train-known';
+      div.innerHTML = `${iconHtml}<span class="vi-name"${row.item ? ` style="color:${itemNameColor(row.item)}"` : ''}>${esc(name)}</span>${stateHtml}`;
       node = div;
     }
     if (row.item) {

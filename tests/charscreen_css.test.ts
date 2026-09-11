@@ -19,21 +19,22 @@ const shell = read('shell.css');
 const mobile = read('hud.mobile.css');
 
 describe('character sheet showcase CSS', () => {
-  it('the window is 740px wide', () => {
-    expect(components).toContain('#char-window { width: 740px; }');
+  it('the window uses the approved 900px two-pane board width', () => {
+    expect(components).toContain('#char-window { width: 900px; height: 720px;');
   });
 
-  it('the model stage is FIXED width (310px) with the 330px min-height (columns flex around it)', () => {
-    // The centering contract hinges on a non-greedy stage: fixed width, so the two
-    // columns own all leftover width. flex:1 here would regress the band centering.
+  it('the character model stage uses the approved compact 180px sidebar-board width', () => {
+    // W7 moves the model into the 520px equipment pane beside a 380px tabbed
+    // sidebar. It remains non-greedy so the mirrored socket columns stay stable.
     expect(components).toContain(
-      '.char-model-panel { flex: 0 0 310px; min-width: 0; min-height: 330px;',
+      '#char-window .char-model-panel { flex: 0 0 180px; min-height: 350px;',
     );
   });
 
-  it('sockets are 44px with a 2px border and radius 7', () => {
+  it('sockets use the approved 40px ui-socket--bag geometry', () => {
+    // The shared socket primitive owns border and radius; this host pin owns size only.
     expect(components).toContain(
-      '.equip-slot .item-icon { width: 44px; height: 44px; flex: 0 0 44px; border-width: 2px; border-radius: 7px;',
+      '.equip-slot .item-icon { width: 40px; height: 40px; flex: 0 0 40px;',
     );
   });
 
@@ -62,14 +63,14 @@ describe('character sheet showcase CSS', () => {
     expect(components).toContain('.stat-panels { display: grid; grid-template-columns: 1fr 1fr;');
     expect(components).toContain('.stat-panel.attrs-tiles { grid-column: 1 / -1;');
     expect(components).toContain(
-      '.attrs-tiles .stat-cell b { color: #fff; font-weight: normal; font-size: 21px;',
+      '.attrs-tiles .stat-cell b { color: var(--color-white); font-weight: normal; font-size: 21px;',
     );
   });
 });
 
 describe('inspect showcase CSS', () => {
   it('the inspect window is 740px wide', () => {
-    expect(shell).toContain('#inspect-window { width: 740px; }');
+    expect(shell).toContain('#inspect-window { width: 740px; overflow-y: auto; }');
   });
 
   it('the model stage takes the inspected player class color via a CSS custom property', () => {
@@ -77,10 +78,10 @@ describe('inspect showcase CSS', () => {
       '#inspect-window .inspect-model-panel { min-height: 400px; border: 1px solid var(--color-border-showcase);',
     );
     expect(shell).toContain(
-      'outline: 1px solid color-mix(in srgb, var(--inspect-class-color, #5a4a20) 38%, transparent);',
+      'outline: 1px solid color-mix(in srgb, var(--inspect-class-color, var(--color-border-default)) 38%, transparent);',
     );
     expect(shell).toContain(
-      'color-mix(in srgb, var(--inspect-class-color, #5a4a20) 15%, transparent),',
+      'color-mix(in srgb, var(--inspect-class-color, var(--color-border-default)) 15%, transparent),',
     );
   });
 

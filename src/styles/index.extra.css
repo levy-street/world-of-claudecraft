@@ -8,7 +8,7 @@
    not supported in-game, so the rotate overlay is shown whenever a touch device
    is game-active in portrait. Layer name is flat (index-extra), NOT dotted, so
    it is a top-level layer placed last by the order below, after hud-mobile. */
-@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
+@layer tokens, base, layout, library, components, hud, shell, hud-mobile, index-extra, play-extra;
 
 @layer index-extra {
   @media (orientation: portrait) {

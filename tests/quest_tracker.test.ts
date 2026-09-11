@@ -42,7 +42,7 @@ describe('questTrackerView', () => {
     expect(v.quests).toHaveLength(2);
     // the acceptance-order number rides through (matches the map badges)
     expect(v.quests.map((q) => q.number)).toEqual([1, 2]);
-    expect(v.quests[0].objectives[0].done).toBe(false); // 0/8
+    expect(v.quests[0].objectives[0]).toMatchObject({ done: false, counted: true }); // 0/8
     expect(v.quests[1].complete).toBe(true);
     expect(v.quests[1].objectives.map((o) => o.done)).toEqual([true, true]); // 6/6, 4/4
   });
@@ -85,6 +85,22 @@ describe('questTrackerView', () => {
       false,
     );
     expect(v.quests[0].objectives[0].done).toBe(true);
+  });
+
+  it('marks single-step objectives as muted rows without a numeric value', () => {
+    const v = questTrackerView(
+      [
+        {
+          id: 'x',
+          number: 1,
+          title: 'X',
+          complete: false,
+          objectives: [{ label: 'Return to Brandt', current: 0, total: 1 }],
+        },
+      ],
+      false,
+    );
+    expect(v.quests[0].objectives[0]).toMatchObject({ done: false, counted: false });
   });
 
   it('does not mutate the caller input and returns distinct copies', () => {

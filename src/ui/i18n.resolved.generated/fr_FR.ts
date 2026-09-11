@@ -902,6 +902,7 @@ export const fr_FR: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Réduire le suivi des quêtes",
       "expandHint": "Développer le suivi des quêtes"
     },
@@ -1266,6 +1267,9 @@ export const fr_FR: EnTranslations = {
       "previous": "Sessions précédentes",
       "runLabel": "Session {index}",
       "runSummary": "{total} en {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Ciblez le mannequin pour commencer.",
@@ -1739,6 +1743,9 @@ export const fr_FR: EnTranslations = {
     },
     "controller": {
       "title": "Manette",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Étiquettes des boutons",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2132,22 @@ export const fr_FR: EnTranslations = {
       "showPlaytimeAria": "Afficher le temps de jeu",
       "hidePlaytimeAria": "Masquer le temps de jeu"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "Grâce à vos {value} en {stat} :",
       "names": {
@@ -2367,6 +2390,7 @@ export const fr_FR: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Signaler un bug",
+      "online": "Online",
       "realm": "Monde",
       "character": "Personnage",
       "position": "Position",
@@ -3244,6 +3268,7 @@ export const fr_FR: EnTranslations = {
       "lock": "Verrouiller le cadre du joueur"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Cadres de groupe et de raid",
       "optionsSection": "Options des cadres de groupe",
       "unlock": "Déplacer les cadres de groupe et de raid",
@@ -4028,7 +4053,6 @@ export const fr_FR: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Récolte",
       "mining": "Minage",
       "logging": "Bûcheronnage",
       "herbalism": "Herboristerie",
@@ -4212,9 +4236,7 @@ export const fr_FR: EnTranslations = {
       "noviceBody": "Votre compétence de culture augmente chaque fois que vous récoltez une culture. Semez une graine dans n’importe quel carré pour commencer."
     },
     "archetypeTitle": {
-      "label": "Titre",
-      "none": "Aucun",
-      "hobbyLabel": "Loisir"
+      "none": "Aucun"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardier",
@@ -4384,7 +4406,9 @@ export const fr_FR: EnTranslations = {
       "hobbyLabel": "Passe-temps : {craft}",
       "majorsLabel": "Majeurs : {a} et {b}",
       "pairsHeld": "Paires détenues : {count}",
-      "returnsLabel": "Retours : {count}"
+      "returnsLabel": "Retours : {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "Artisanat",
@@ -4419,6 +4443,7 @@ export const fr_FR: EnTranslations = {
       "vaultUnreachable": "La Réserve de matériaux est hors de portée ici.",
       "craftFeeLine": "Frais de fabrication : {fee} chacun",
       "empty": "Aucune recette connue pour l'instant.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Artisanat {name}",
       "craftedToast": "Fabriqué$1 {name}",
       "craftedToastQty": "Fabriqué : {name} x{qty}",
@@ -4520,6 +4545,9 @@ export const fr_FR: EnTranslations = {
       "commissionToggleHint": "Se lie au premier personnage qui la reçoit lors d'un échange.",
       "commissionUnbound": "Pièce de commande : se lie au premier destinataire",
       "commissionBound": "Pièce de commande : liée à son destinataire"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Utiliser",
@@ -5136,6 +5164,33 @@ export const fr_FR: EnTranslations = {
       "toInstance": "Carte des instances",
       "toggleAria": "Basculer entre la carte du monde et la carte de la zone",
       "levels": "Niveaux {min} à {max}"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Niveau requis : {level}"
@@ -6084,6 +6139,7 @@ export const fr_FR: EnTranslations = {
       "framesMoveBodyEditFrames": "Votre cadre, votre cadre de cible et vos cadres de groupe peuvent tous être déplacés. Chacun possède un petit bouton de déplacement dans un coin : déverrouillez-le, faites glisser le cadre où vous le souhaitez, puis verrouillez-le afin qu’un clic égaré ne le déplace pas. Modifier les cadres, en haut de l’onglet Cadres des options d’interface, déverrouille tout le reste en même temps : barres d’action, barre d’incantation, barre de frappe, barre d’expérience, minicarte, rail de boutons, cadre du familier, barre de posture, lignes d’améliorations et d’affaiblissements et étiquette de rappel de liste de souhaits. Si le résultat ne vous convient pas, Réinitialiser par défaut, en bas du même onglet, remet tout à sa place.",
       "framesGovernedExtra": "Modifier les cadres déverrouille aussi la pile de suivi ci-dessous (quêtes et objectifs suivis, progression des hauts faits, pages du Reliquaire, l’exploration, la faille et la recette ou commission suivies), la barre d’action du familier, le cadre des points de cible pour vos affaiblissements sur les ennemis proches, le médaillon de Dévotion du paladin, la barre d’affliction du démoniste, la superposition des déclenchements de sorts, le minuteur de frappe de la main secondaire et la fenêtre à onglets des compteurs de dégâts. Chacun porte sa propre étiquette lorsqu’il est déverrouillé.",
       "framesGovernedAuraTracks": "Modifier les cadres déverrouille aussi les six pistes d’auras facultatives après leur activation dans l’onglet Combat des mêmes options d’interface : Mes améliorations, Temps de recharge défensifs, Mes boucliers, Temps de recharge offensifs, Déplacement et furtivité, et Mes améliorations sur les alliés. Chaque piste est désactivée par défaut et porte sa propre étiquette lorsqu’elle est déverrouillée.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Barres, minuteries et texte de combat",
       "barsBody": "Votre barre d'incantation apparaît au milieu de l'écran, juste au-dessus de vos barres d'action, chaque fois que vous incantez ou canalisez, et affiche le nom du sort ainsi que le temps restant. Votre cible dispose de sa propre barre d'incantation sur son cadre, pour que vous puissiez voir ce qui arrive et y répondre.\n\nUne fine barre de cadence se trouve sous votre barre d'incantation et se remplit entre vos coups d'arme, pour qu'un attaquant au corps à corps ou à distance puisse voir quand le prochain coup automatique arrivera.\n\nVotre barre d'expérience s'étend sur toute la largeur sous vos barres d'action, graduée en segments, avec une portion plus claire montrant l'expérience reposée que vous avez accumulée.\n\nNagez sous l'eau et une barre de souffle bleue apparaît en haut de l'écran. Elle se vide tant que votre tête est immergée, clignote en rouge une fois épuisée quand vous commencez à vous noyer, puis se remplit rapidement dès que vous refaites surface. Espace vous fait remonter, et la touche Nager vers le bas, Ctrl par défaut, vous emmène plus profond.\n\nLes dégâts et les soins flottent au-dessus de ce qu'ils ont touché sous forme de petits nombres, pour que vous puissiez lire un combat sans lire de texte. L'onglet Combat de votre fenêtre de discussion conserve le relevé écrit complet.",
       "aurasTitle": "Améliorations et affaiblissements",

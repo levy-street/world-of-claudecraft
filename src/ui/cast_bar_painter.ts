@@ -38,6 +38,9 @@ import type { PainterHostWriters } from './painter_host';
 // The channel class drives the draining (vs filling) fill color via CSS; a channel,
 // a fishing channel, and the eat/drink overlay all use it.
 const CHANNEL_CLASS = 'channel';
+const UI_CHANNEL_CLASS = 'ui-cast--channel';
+const UI_CONSUME_CLASS = 'ui-cast--consume';
+type CastBarStyle = 'cast' | 'channel' | 'consume';
 // The display value when the bar is shown, and the hidden value.
 const SHOWN_DISPLAY = 'block';
 const HIDDEN_DISPLAY = 'none';
@@ -106,7 +109,7 @@ export class CastBarPainter {
   paint(input: CastBarPaintInput): void {
     if (input.cast.visible) {
       this.paintBar(
-        input.cast.channel,
+        input.cast.channel ? 'channel' : 'cast',
         input.cast.fill,
         this.opts.resolveCastLabel(input.cast),
         input.castRemaining,
@@ -116,7 +119,7 @@ export class CastBarPainter {
       // The label is the localized mount name (mountDisplayName), which resolves
       // the mount key through the i18n name map; falls back to the raw key.
       this.paintBar(
-        true,
+        'channel',
         input.mountSummon.fill,
         mountDisplayName(input.mountSummon.mountKey),
         input.mountSummon.remaining,
@@ -125,7 +128,7 @@ export class CastBarPainter {
       // PLAYER-ONLY: the consume overlay uses the channel styling and the localized
       // eat/drink label resolved from the core's stable mode discriminator.
       this.paintBar(
-        true,
+        'consume',
         input.consume.fill,
         t(CONSUME_LABEL_KEYS[input.consume.mode]),
         input.consume.remaining,
@@ -134,6 +137,8 @@ export class CastBarPainter {
       this.writers.setDisplay(this.el.bar, HIDDEN_DISPLAY);
       if (this.opts.clearOnHide) {
         this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, false);
+        this.writers.toggleClass(this.el.bar, UI_CHANNEL_CLASS, false);
+        this.writers.toggleClass(this.el.bar, UI_CONSUME_CLASS, false);
         this.writers.setWidth(this.el.fill, EMPTY_FILL);
         this.writers.setText(this.el.label, '');
         this.writers.setText(this.el.timer, '');
@@ -141,12 +146,13 @@ export class CastBarPainter {
     }
   }
 
-  // Show the bar with a fill/label/timer, in the exact write order of the inline
-  // blocks (display, channel, width, label, timer) so the elided-writer cache keys
-  // line up byte-for-byte and the skip-rate accounting is unchanged.
-  private paintBar(channel: boolean, fill: number, label: string, remaining: number): void {
+  // Show the bar with a fill/label/timer. State classes are written before the
+  // progress and text values so every painter instance follows the same order.
+  private paintBar(style: CastBarStyle, fill: number, label: string, remaining: number): void {
     this.writers.setDisplay(this.el.bar, this.opts.shownDisplay ?? SHOWN_DISPLAY);
-    this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, channel);
+    this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, style !== 'cast');
+    this.writers.toggleClass(this.el.bar, UI_CHANNEL_CLASS, style === 'channel');
+    this.writers.toggleClass(this.el.bar, UI_CONSUME_CLASS, style === 'consume');
     this.writers.setWidth(this.el.fill, `${(fill * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`);
     this.writers.setText(this.el.label, label);
     this.writers.setText(this.el.timer, this.timerText(remaining));

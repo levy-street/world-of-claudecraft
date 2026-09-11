@@ -634,7 +634,7 @@ export class HubLessonController {
     const chipHtml = chip ? `<span class="hlc-chip">${esc(chip)}</span>` : '';
     const ackHtml =
       !wrongRun && (step.kind === 'read-row' || step.kind === 'review-comparison')
-        ? `<button type="button" class="hlc-ack btn">${esc(
+        ? `<button type="button" class="hlc-ack btn ui-btn">${esc(
             t(
               step.kind === 'read-row'
                 ? 'hudChrome.hubLesson.ackContinue'
@@ -644,7 +644,7 @@ export class HubLessonController {
         : '';
     const replayHtml =
       step.kind === 'replay'
-        ? `<button type="button" class="hlc-replay btn">${esc(t('hudChrome.hubLesson.replayAction'))}</button>`
+        ? `<button type="button" class="hlc-replay btn ui-btn">${esc(t('hudChrome.hubLesson.replayAction'))}</button>`
         : '';
     return `<div class="hlc-line">${text}${chipHtml}</div>${ackHtml}${replayHtml}`;
   }

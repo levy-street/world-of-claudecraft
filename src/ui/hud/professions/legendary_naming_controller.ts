@@ -83,7 +83,7 @@ export function openLegendaryNamingDialog(
   label.className = 'pf-name-label';
   label.textContent = t('hudChrome.perfecting.nameLabel', { name: opts.itemName });
   const input = document.createElement('input');
-  input.className = 'pf-name-input';
+  input.className = 'pf-name-input ui-input';
   input.type = 'text';
   input.maxLength = MAX_LEGENDARY_NAME_LENGTH;
   input.autocomplete = 'off';

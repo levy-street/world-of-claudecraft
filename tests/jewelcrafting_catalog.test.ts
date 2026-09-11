@@ -15,10 +15,12 @@ import { JEWELCRAFTING_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
   expectedStatBudget,
+  expectedStatTotal,
   itemLevel,
   primaryStatBudget,
   primaryStatSum,
   QUALITY_ILVL_BONUS,
+  statIdentity,
 } from '../src/sim/item_level';
 import { requiredLevelFor } from '../src/sim/item_level_req';
 import { trainingFeeFor } from '../src/sim/professions/training';
@@ -254,10 +256,10 @@ describe('jewelcrafting catalog outputs', () => {
       // recipe.level while the stat sum stays pinned at the authoring budget.
       const bonus = QUALITY_ILVL_BONUS[def.quality ?? 'common'];
       expect(bonus, `${def.id} quality bump`).toBeGreaterThan(0);
+      const identity = statIdentity(def.stats);
       const authoredLevel = AUTHORED_LEVEL_BY_RUNG[recipe.skillReq] + bonus;
       const formulaBudget = primaryStatBudget(authoredLevel, def.quality, def.slot);
       expect(formulaBudget, `${def.id} formula budget`).toBe(BUDGET_BY_RUNG[recipe.skillReq]);
-      expect(primaryStatSum(def), `${def.id} stat sum`).toBe(formulaBudget);
       // The live source index derives from the shipped recipe level: the
       // tooltip item level and expected budget agree with the live tables,
       // AND the live budget is anchored to its own literal, so this arm
@@ -266,10 +268,23 @@ describe('jewelcrafting catalog outputs', () => {
       // ilvl 18 they diverge (ring 6, neck 7), so the rung-50 literal is
       // slot-keyed.
       const liveLevel = recipe.level + bonus;
-      const liveBudget =
+      const liveLine =
         recipe.skillReq === 50 ? (def.slot === 'neck' ? 7 : 6) : BUDGET_BY_RUNG[recipe.skillReq];
+      // stamina baseline model: a physical output was never touched by the
+      // model (it already met its floor at authoring time, per R6's own
+      // rung-50 quirk of pinning stats to the stale authored level rather
+      // than the re-leveled live one), so its sum stays exactly formulaBudget.
+      // A caster output is rewritten against its LIVE line, so its sum is
+      // that line plus its baseline; at rung 0/25 the live line equals the
+      // authored one and the sum visibly grows, while at rung 50 the smaller
+      // live line's baseline happens to land back on the same authored total.
+      expect(primaryStatSum(def), `${def.id} stat sum`).toBe(
+        identity === 'caster' ? expectedStatTotal(liveLine, identity) : formulaBudget,
+      );
       expect(itemLevel(def), `${def.id} item level`).toBe(liveLevel);
-      expect(expectedStatBudget(def), `${def.id} expected budget`).toBe(liveBudget);
+      expect(expectedStatBudget(def), `${def.id} expected budget`).toBe(
+        expectedStatTotal(liveLine, identity),
+      );
       checked += 1;
     }
     expect(checked).toBe(9);

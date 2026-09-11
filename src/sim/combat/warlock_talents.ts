@@ -373,5 +373,8 @@ export function tickSacrilegiousMarch(ctx: SimContext, player: Entity, aura: Aur
     ability: aura.name,
     kind: 'hit',
   });
-  if (player.hp / player.maxHp <= floor) aura.remaining = 0;
+  // Compare in health units: floorHp is ceiling-rounded, so on a pool that is
+  // not a multiple of five the clamped value sits a hair ABOVE the fraction and
+  // the march would otherwise linger one more tick draining nothing.
+  if (player.hp <= floorHp) aura.remaining = 0;
 }

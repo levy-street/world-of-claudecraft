@@ -29,7 +29,18 @@ describe('Affliction full-BiS five-minute inert-boss balance', () => {
     // 0.096 measured at the 2026-08-30 legendary band (Heartwood's spirit
     // and intellect grew with its ilvl-49 budget, so slightly more pool is
     // left at five minutes); the corridor widens to match.
-    expect(result.manaEndPct).toBeLessThan(0.12);
+    // 0.242 measured 2026-09-11 with the stamina baseline model
+    // (item_budget.ts): the Deathless Heartwood was authored with its stamina
+    // inside its line, so on the caster line the line was filled with Spirit
+    // (25 to 43) and the kit's badge jewelry and Soulflame pieces gained
+    // Spirit the same way; regen up, no Spell Power moved, so a quarter of the
+    // pool survives the window. The corridor widens to 0.30 with the same
+    // headroom the 0.12 line carried over its 0.096 measurement; the pool is
+    // still finite (starvation still binds below).
+    expect(result.manaEndPct).toBeLessThan(0.3);
+    // And a floor under the measured 0.242, so the larger surviving pool is
+    // pinned from both sides rather than left open below.
+    expect(result.manaEndPct).toBeGreaterThan(0.18);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });

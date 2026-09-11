@@ -4488,7 +4488,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.title': 'Priorités de la ville',
   'hudChrome.townFocus.townOnlyHint':
     'Le focus ne peut être modifié que lorsque vous êtes en ville.',
-  'hudChrome.archetypeTitle.label': 'Titre',
   'hudChrome.archetypeTitle.none': 'Aucun',
   'entities.itemSets.crownforged.bonus4':
     "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
@@ -11089,7 +11088,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Herboristerie',
   'hudChrome.gathering.logging': 'Bûcheronnage',
   'hudChrome.gathering.mining': 'Minage',
-  'hudChrome.gathering.title': 'Récolte',
   'errors.api.accountSessionLimit': 'Trop de personnages de ce compte sont déjà dans le monde.',
   'errors.api.crossSiteOrigin': 'Requête bloquée pour des raisons de sécurité.',
   'errors.api.unsupportedMediaType': 'Format de requête non pris en charge.',
@@ -11517,7 +11515,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willow_sprite.name': 'Lutin du saule',
   'entities.mobs.wood_wraith.name': 'Spectre des bois',
   'entities.mobs.wreck_thief.name': "Voleur des champs d'épaves",
-  'hudChrome.archetypeTitle.hobbyLabel': 'Loisir',
   'hudChrome.auraEffect.armorPct': "Réduit l'armure de {pct}%",
   'hudChrome.auraEffect.armorPctStacks': "Réduit l'armure de {pct}% ({stacks} charges)",
   'hudChrome.auraEffect.increasePct.allStats': 'Augmente tous les attributs de {pct}%',

@@ -54,7 +54,9 @@ const EDGE_TOLERANCE_PX = 0.5;
  *  along the row, but the anchor end used to reach full strength at its first
  *  pixel, which drew a hard vertical cut through the control the row grew from. */
 function gradientStops(image: string): string[] {
-  return image.match(/rgba?\([^)]*\)\s+[\d.]+(?:px|%)/g) ?? [];
+  // W13: the dim stops are tokens composed with color-mix() now, so a resolved
+  // stop may serialize as color()/oklab() instead of rgba().
+  return image.match(/(?:rgba?|hsla?|color|oklab|oklch|lab|lch)\([^)]*\)\s+[\d.]+(?:px|%)/g) ?? [];
 }
 
 /** Assert both ends of a row dim ramp, and return the anchor-side ramp length. */
@@ -80,7 +82,8 @@ const PETAL_SCRIM_MARGIN_PX = 20;
  *  rather than recomputed from the authored multiplier. */
 function scrimTransparentRadius(overlay: HTMLElement, petalSize: number): number {
   const image = getComputedStyle(overlay, '::before').backgroundImage;
-  const stops = image.match(/rgba?\([^)]*\)\s+([\d.]+)px/g) ?? [];
+  const stops =
+    image.match(/(?:rgba?|hsla?|color|oklab|oklch|lab|lch)\([^)]*\)\s+([\d.]+)px/g) ?? [];
   const last = stops[stops.length - 1] ?? '';
   const parsed = Number.parseFloat(last.slice(last.lastIndexOf(' ') + 1));
   // The last stop is authored as a multiple of the petal size; if an engine ever

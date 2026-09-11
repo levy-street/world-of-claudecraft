@@ -5,6 +5,7 @@ import {
   type ActionBarVisibility,
   resolveActionBarVisibility,
 } from '../src/ui/hud/action_bar/action_bar_visibility_core';
+import { svgIcon } from '../src/ui/ui_icons';
 
 describe('action bar toggle model', () => {
   it('reveals the secondary row first while both optional rows are hidden', () => {
@@ -54,6 +55,7 @@ interface FakeElement {
   tagName: string;
   type: string;
   className: string;
+  innerHTML: string;
   textContent: string;
   disabled: boolean;
   attributes: Map<string, string>;
@@ -72,6 +74,7 @@ function fakeElement(tagName: string): FakeElement {
     tagName,
     type: '',
     className: '',
+    innerHTML: '',
     textContent: '',
     disabled: false,
     attributes: new Map(),
@@ -112,16 +115,20 @@ function harness(initial?: ActionBarVisibility) {
     tooltip,
   });
   const wrap = container.children[0];
-  const [plus, minus] = wrap.children;
-  return { control, container, wrap, plus, minus, apply, tooltip };
+  const [plus, count, minus] = wrap.children;
+  return { control, container, wrap, plus, count, minus, apply, tooltip };
 }
 
 describe('action bar toggle controller', () => {
-  it('installs the plus/minus pair with localized accessible names and tooltips', () => {
-    const { wrap, plus, minus, tooltip } = harness();
+  it('installs chevrons and a visible-row count with localized accessible names', () => {
+    const { wrap, plus, count, minus, tooltip } = harness();
     expect(wrap.className).toBe('bar-toggle');
-    expect(plus.textContent).toBe('+');
-    expect(minus.textContent).toBe('-');
+    // The redesigned control replaces text glyphs with shared SVG chevrons around the count.
+    expect(plus.innerHTML).toBe(svgIcon('prev'));
+    expect(minus.innerHTML).toBe(svgIcon('next'));
+    expect(count.className).toBe('bar-toggle-count ui-num');
+    expect(count.textContent).toBe('1');
+    expect(count.attributes.get('aria-hidden')).toBe('true');
     for (const btn of [plus, minus]) {
       expect(btn.type).toBe('button');
       expect(btn.className).toBe('bar-toggle-btn');
@@ -150,20 +157,22 @@ describe('action bar toggle controller', () => {
   });
 
   it('applies the next reveal per plus click, following the synced visibility', () => {
-    const { control, plus, apply } = harness();
+    const { control, plus, count, apply } = harness();
     plus.click();
     expect(apply).toHaveBeenCalledWith('showSecondaryActionBar', true);
     control.sync({ secondary: true, third: false });
+    expect(count.textContent).toBe('2');
     plus.click();
     expect(apply).toHaveBeenLastCalledWith('showThirdActionBar', true);
     expect(apply).toHaveBeenCalledTimes(2);
   });
 
   it('hides the topmost row per minus click and applies nothing at the bounds', () => {
-    const { control, plus, minus, apply } = harness();
+    const { control, plus, count, minus, apply } = harness();
     minus.click(); // disabled state guards live in the model, not just the DOM flag
     expect(apply).not.toHaveBeenCalled();
     control.sync({ secondary: true, third: true });
+    expect(count.textContent).toBe('3');
     expect(plus.disabled).toBe(true);
     plus.click();
     expect(apply).not.toHaveBeenCalled();
@@ -173,6 +182,7 @@ describe('action bar toggle controller', () => {
     minus.click();
     expect(apply).toHaveBeenLastCalledWith('showSecondaryActionBar', false);
     control.sync({ secondary: false, third: false });
+    expect(count.textContent).toBe('1');
     expect(apply).toHaveBeenCalledTimes(2);
     expect(minus.disabled).toBe(true);
   });

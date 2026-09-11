@@ -18,16 +18,57 @@ import type { EquipSlot, ItemDef } from '../src/sim/types';
 
 describe('dev bis gear', () => {
   it.each([
-    ['warrior', 'arms', 'crucible_str_mail'],
-    ['warrior', 'prot', 'crucible_tank_mail'],
-    ['paladin', 'holy', 'crucible_healer_mail'],
-    ['shaman', 'elemental', 'crucible_caster_mail'],
-  ])('keeps %s/%s collection picks on their authored role', (cls, spec, collection) => {
+    ['warrior', 'arms', 'crucible_str_mail', false],
+    ['warrior', 'prot', 'crucible_tank_mail', false],
+    ['paladin', 'holy', 'crucible_healer_mail', true],
+    ['shaman', 'elemental', 'crucible_caster_mail', true],
+  ])('keeps %s/%s collection picks on their authored role', (cls, spec, collection, feetToo) => {
     const picks = bestEpicGearFor(cls, spec);
     expect(picks.chest).toBe(`${collection}_chest`);
     expect(picks.waist).toBeDefined();
     expect(ITEMS[picks.waist ?? '']?.masterwrought).toBeFalsy();
-    expect(ITEMS[picks.feet ?? '']?.masterwrought).toBeFalsy();
+    // Under the stamina baseline model the caster and healer collection feet tie
+    // their tier on the class line and win on id order; the physical rows still
+    // take their feet elsewhere. Either way the Masterwrought cap bounds the kit.
+    if (feetToo) expect(picks.feet).toBe(`${collection}_feet`);
+    else expect(ITEMS[picks.feet ?? '']?.masterwrought).toBeFalsy();
+    const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
+    expect(flagged.length).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
+  });
+
+  it('scores the class line, never a raw five-stat sum (stamina baseline model)', () => {
+    // Two synthetic warrior-legal necks: a caster piece with the larger five-stat
+    // total (33) and a physical piece with the smaller one (25). Under the old
+    // raw sum the caster neck would win every warrior kit; the line-aware
+    // scorer counts Strength, Agility and stamina for a warrior and picks the
+    // physical piece. The reverse holds for a mage.
+    const synth: ItemDef[] = [
+      {
+        id: 'test_bis_line_caster_neck',
+        name: 'Test caster neck',
+        kind: 'armor',
+        slot: 'neck',
+        quality: 'epic',
+        stats: { int: 17, spi: 8, sta: 8 },
+        sellValue: 1,
+      } as ItemDef,
+      {
+        id: 'test_bis_line_physical_neck',
+        name: 'Test physical neck',
+        kind: 'armor',
+        slot: 'neck',
+        quality: 'epic',
+        stats: { str: 17, sta: 8 },
+        sellValue: 1,
+      } as ItemDef,
+    ];
+    for (const def of synth) ITEMS[def.id] = def;
+    try {
+      expect(bestEpicGearFor('warrior', 'arms').neck).toBe('test_bis_line_physical_neck');
+      expect(bestEpicGearFor('mage', 'fire').neck).toBe('test_bis_line_caster_neck');
+    } finally {
+      for (const def of synth) delete ITEMS[def.id];
+    }
   });
 
   it('picks a legal epic for every coverable slot, deterministically', () => {
@@ -216,21 +257,25 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
   });
 
   it('pins the reviewed collection entries by class, independently of the cap', () => {
-    // The approved raid collections now enter the live raw-stat reference kit
-    // in mail chests only. The scorer does not model their signature bonuses or
-    // combat ratings, so no other slot is forced into a collection to make an
-    // item-level claim look like measured BiS. Spec-less means no role choice;
-    // the authored class restriction still excludes caster mail for warriors.
+    // The approved raid collections enter the live reference kit where they tie
+    // their tier on the class line and win on id order: mail chests for every
+    // mail class, plus the healer and caster mail feet and the caster leather
+    // waist under the stamina baseline model (the collection pieces sit exactly
+    // on their line, so nothing out-scores them). The scorer does not model their
+    // signature bonuses or combat ratings, so no other slot is forced into a
+    // collection to make an item-level claim look like measured BiS. Spec-less
+    // means the class's first role decides the line; the authored class
+    // restriction still excludes caster mail for warriors.
     const expected: Record<(typeof CLASSES)[number], string[]> = {
       warrior: ['chest:crucible_str_mail_chest'],
-      paladin: ['chest:crucible_healer_mail_chest'],
-      shaman: ['chest:crucible_caster_mail_chest'],
+      paladin: ['chest:crucible_healer_mail_chest', 'feet:crucible_healer_mail_feet'],
+      shaman: ['chest:crucible_caster_mail_chest', 'feet:crucible_caster_mail_feet'],
       hunter: [],
       rogue: [],
       priest: [],
       mage: [],
       warlock: [],
-      druid: [],
+      druid: ['chest:crucible_caster_leather_chest', 'waist:crucible_caster_leather_waist'],
     };
     const flaggedFrom = (picks: Partial<Record<EquipSlot, string>>): string[] =>
       Object.entries(picks)
@@ -346,7 +391,9 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
         sellValue: 1,
       } as ItemDef,
       // Two flagged armor pieces out-scoring the weapon push the flagged
-      // count over the cap and become the kept pair.
+      // count over the cap and become the kept pair. Stamina, not Intellect: the
+      // synthetic class has no dev-kit role, so it scores the physical line, and
+      // stamina is the one stat both lines count.
       {
         id: 'test_bis_mw_chest2',
         name: 'Test test_bis_mw_chest2',
@@ -355,7 +402,7 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
         slot: 'chest',
         quality: 'epic',
         masterwrought: true,
-        stats: { int: 900 },
+        stats: { sta: 900 },
         sellValue: 1,
       } as ItemDef,
       {
@@ -366,7 +413,7 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
         slot: 'legs',
         quality: 'epic',
         masterwrought: true,
-        stats: { int: 800 },
+        stats: { sta: 800 },
         sellValue: 1,
       } as ItemDef,
     ];
@@ -445,7 +492,7 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
         slot: 'chest',
         quality: 'epic',
         masterwrought: true,
-        stats: { int: 900 },
+        stats: { sta: 900 },
         requiredClass: REQ,
         sellValue: 1,
       } as ItemDef,
@@ -528,7 +575,7 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
         slot: 'chest',
         quality: 'epic',
         masterwrought: true,
-        stats: { int: 900 },
+        stats: { sta: 900 },
         requiredClass: REQ,
         sellValue: 1,
       } as ItemDef,

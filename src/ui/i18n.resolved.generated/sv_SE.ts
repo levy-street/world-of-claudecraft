@@ -902,6 +902,7 @@ export const sv_SE: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Fäll ihop uppdragsspåraren",
       "expandHint": "Fäll ut uppdragsspåraren"
     },
@@ -1266,6 +1267,9 @@ export const sv_SE: EnTranslations = {
       "previous": "Tidigare körningar",
       "runLabel": "Körning {index}",
       "runSummary": "{total} på {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Välj träningsdockan som mål för att börja.",
@@ -1739,6 +1743,9 @@ export const sv_SE: EnTranslations = {
     },
     "controller": {
       "title": "Handkontroll",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Knappsymboler",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2132,22 @@ export const sv_SE: EnTranslations = {
       "showPlaytimeAria": "Visa tid spelad",
       "hidePlaytimeAria": "Dölj tid spelad"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "Från dina {value} {stat}:",
       "names": {
@@ -2367,6 +2390,7 @@ export const sv_SE: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Rapportera ett fel",
+      "online": "Online",
       "realm": "Värld",
       "character": "Rollfigur",
       "position": "Position",
@@ -3244,6 +3268,7 @@ export const sv_SE: EnTranslations = {
       "lock": "Lås spelarramen"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Grupp- och raidramar",
       "optionsSection": "Alternativ för gruppramar",
       "unlock": "Flytta grupp- och raidramar",
@@ -4028,7 +4053,6 @@ export const sv_SE: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Insamling",
       "mining": "Gruvdrift",
       "logging": "Skogsavverkning",
       "herbalism": "Örtkunskap",
@@ -4212,9 +4236,7 @@ export const sv_SE: EnTranslations = {
       "noviceBody": "Odlingsfärdigheten ökar varje gång du skördar en gröda. Så ett frö i en valfri odlingsbädd för att börja."
     },
     "archetypeTitle": {
-      "label": "Titel",
-      "none": "Ingen",
-      "hobbyLabel": "Fritidssyssla"
+      "none": "Ingen"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombbärare",
@@ -4384,7 +4406,9 @@ export const sv_SE: EnTranslations = {
       "hobbyLabel": "Hobby: {craft}",
       "majorsLabel": "Huvudämnen: {a} och {b}",
       "pairsHeld": "Par som hålls: {count}",
-      "returnsLabel": "Returnerar: {count}"
+      "returnsLabel": "Returnerar: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "Hantverk",
@@ -4419,6 +4443,7 @@ export const sv_SE: EnTranslations = {
       "vaultUnreachable": "Materialvalvet är utom räckhåll här.",
       "craftFeeLine": "Hantverksavgift: {fee} styck",
       "empty": "Inga recept kända än.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Hantverk {name}",
       "craftedToast": "Tillverkad: {name}",
       "craftedToastQty": "Tillverkad: {name} x{qty}",
@@ -4520,6 +4545,9 @@ export const sv_SE: EnTranslations = {
       "commissionToggleHint": "Binds till den första karaktären som tar emot det i en handel.",
       "commissionUnbound": "Beställningsstycke: binds till den första mottagaren",
       "commissionBound": "Beställningsstycke: bundet till sin mottagare"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Använd",
@@ -5136,6 +5164,33 @@ export const sv_SE: EnTranslations = {
       "toInstance": "Instanskarta",
       "toggleAria": "Växla mellan världskartan, zonkartan och instanskartan",
       "levels": "Nivåer {min} till {max}"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Kräver nivå {level}"
@@ -6084,6 +6139,7 @@ export const sv_SE: EnTranslations = {
       "framesMoveBodyEditFrames": "Din ram, din målram och dina gruppmedlemsramar kan alla flyttas. Varje ram har en liten flyttknapp i hörnet: lås upp den, dra ramen dit du vill och lås den igen så att ett felklick inte kan flytta den. Redigera ramar, högst upp på ramfliken i gränssnittsalternativen, frigör resten av gränssnittet på en gång, tillsammans med dessa tre ramar: åtgärdsraderna, kastningsraden, svängraden, erfarenhetsraden, minimap, knappraden, husdjursramen, stansraden, raderna för förstärkningar och försvagningar samt namnmarkeringen för önskelistepåminnelsen. Var och en får en namnmarkering när den är frigjord. Om de hamnar någonstans du ångrar återställer Återställ standardvärden längst ned på samma ramflik dem alla till där de började.",
       "framesGovernedExtra": "Redigera ramar frigör också spårarstacken nedanför (dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, djupet du befinner dig i, varje spricka du deltar i samt receptet eller beställningen du följer), husdjurets åtgärdsrad bredvid dess ram, Målprickar-ramen för dina försvagningar på fiender i närheten, paladinens Andaktsmedaljong, häxmästarens Lidelsefält, överlägget för besvärjelseprocs, timern för vapenhandens svingar för den som använder två vapen och fönstret med flikar för skademätaren. Var och en får sin egen namnmarkering när den är frigjord.",
       "framesGovernedAuraTracks": "Redigera ramar frigör också de sex frivilliga auraraderna när du har slagit på dem på stridsfliken i samma gränssnittsalternativ: raden Mina förstärkningar, raden Defensiva nedkylningar, raden Mina sköldar, raden Offensiva nedkylningar, raden Rörelse och Smygande samt raden Mina förstärkningar på allierade. Varje rad är avstängd från början och får sin egen namnmarkering när den är frigjord.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Mätare, timer och stridstext",
       "barsBody": "Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.",
       "aurasTitle": "Buffar och debuffar",

@@ -70,7 +70,8 @@ describe('PaladinDevotionPainter', () => {
       { method: 'toggleClass', args: [ROOT, 'ascended', false] },
       { method: 'toggleClass', args: [ROOT, 'last-charge', false] },
     ]);
-    expect(calls.slice(9)).toEqual(
+    // The seven charge pips follow the nine header writes; the host stamp comes after.
+    expect(calls.slice(9, 16)).toEqual(
       CHARGES_ARRAY.map((charge) => ({
         method: 'toggleClass',
         args: [charge, 'on', false],
@@ -97,7 +98,7 @@ describe('PaladinDevotionPainter', () => {
       args: [FILL, '--devotion-scale', '0.300'],
     });
     expect(calls).toContainEqual({ method: 'toggleClass', args: [ROOT, 'ascended', true] });
-    expect(calls.slice(9).map((call) => call.args[2])).toEqual([
+    expect(calls.slice(9, 16).map((call) => call.args[2])).toEqual([
       true,
       true,
       true,
@@ -122,7 +123,7 @@ describe('PaladinDevotionPainter', () => {
       announcement: '',
     });
 
-    expect(calls.slice(9).map((call) => call.args[2])).toEqual([
+    expect(calls.slice(9, 16).map((call) => call.args[2])).toEqual([
       true,
       true,
       true,
@@ -151,6 +152,34 @@ describe('PaladinDevotionPainter', () => {
       method: 'toggleClass',
       args: [ROOT, 'last-charge', true],
     });
+  });
+
+  it('stamps devotion-live on the HUD host while the medallion is shown', () => {
+    const host = { id: 'host' } as unknown as HTMLElement;
+    const frame = { id: 'frame', parentElement: host } as unknown as HTMLElement;
+    const { calls, writers } = recordingWriters();
+    const painter = new PaladinDevotionPainter(writers, frame, ROOT, FILL, LABEL, CHARGES, STATUS);
+    const state = {
+      visible: true,
+      value: 8,
+      fillFrac: 0.4,
+      ready: false,
+      ascended: false,
+      charges: 0,
+      lastCharge: false,
+      label: '8 / 20',
+      ariaValueText: 'Devotion 8 of 20',
+      announcement: '',
+    };
+    painter.paint(state);
+    painter.paint({ ...state, visible: false });
+    const stamps = calls
+      .filter((c) => c.method === 'toggleClass' && c.args[0] === host)
+      .map((c) => c.args.slice(1));
+    expect(stamps).toEqual([
+      ['devotion-live', true],
+      ['devotion-live', false],
+    ]);
   });
 
   it('routes all DOM changes through PainterHost writers', () => {

@@ -902,6 +902,7 @@ export const da_DK: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Fold opgavesporing sammen",
       "expandHint": "Fold opgavesporing ud"
     },
@@ -1266,6 +1267,9 @@ export const da_DK: EnTranslations = {
       "previous": "Tidligere løb",
       "runLabel": "Løb {index}",
       "runSummary": "{total} på {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Vælg træningsdukken som mål for at begynde.",
@@ -1739,6 +1743,9 @@ export const da_DK: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Knapikoner",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2132,22 @@ export const da_DK: EnTranslations = {
       "showPlaytimeAria": "Vis spilletid",
       "hidePlaytimeAria": "Skjul spilletid"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "Fra din {value} {stat}:",
       "names": {
@@ -2367,6 +2390,7 @@ export const da_DK: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Rapportér en fejl",
+      "online": "Online",
       "realm": "Verden",
       "character": "Figur",
       "position": "Position",
@@ -3244,6 +3268,7 @@ export const da_DK: EnTranslations = {
       "lock": "Lås spillerrammen"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Gruppe- og raidrammer",
       "optionsSection": "Indstillinger for gruppens rammer",
       "unlock": "Flyt gruppe- og raidrammer",
@@ -4028,7 +4053,6 @@ export const da_DK: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Indsamling",
       "mining": "Minedrift",
       "logging": "Skovhugst",
       "herbalism": "Urtekundskab",
@@ -4212,9 +4236,7 @@ export const da_DK: EnTranslations = {
       "noviceBody": "Din landbrugsfærdighed vokser hver gang du tager en afgrøde hjem. Så et frø i et vilkårligt havebed for at begynde."
     },
     "archetypeTitle": {
-      "label": "Titel",
-      "none": "Ingen",
-      "hobbyLabel": "Fritid"
+      "none": "Ingen"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardør",
@@ -4384,7 +4406,9 @@ export const da_DK: EnTranslations = {
       "hobbyLabel": "Hobby: {craft}",
       "majorsLabel": "Hovedfag: {a} og {b}",
       "pairsHeld": "Afholdte par: {count}",
-      "returnsLabel": "Returnerer: {count}"
+      "returnsLabel": "Returnerer: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "Håndværk",
@@ -4419,6 +4443,7 @@ export const da_DK: EnTranslations = {
       "vaultUnreachable": "Materialehvælvet er uden for rækkevidde her.",
       "craftFeeLine": "Gebyr: {fee} pr. stk.",
       "empty": "Ingen opskrifter kendt endnu.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Håndværk {name}",
       "craftedToast": "Udformet: {name}",
       "craftedToastQty": "Udformet: {name} x{qty}",
@@ -4520,6 +4545,9 @@ export const da_DK: EnTranslations = {
       "commissionToggleHint": "Bindes til den første karakter, der modtager det i en handel.",
       "commissionUnbound": "Kommissionsstykke: bindes til den første modtager",
       "commissionBound": "Kommissionsstykke: bundet til modtageren"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Brug",
@@ -5136,6 +5164,33 @@ export const da_DK: EnTranslations = {
       "toInstance": "Forekomst kort",
       "toggleAria": "Skift mellem verdenskortet, zonekortet og instanskortet",
       "levels": "Niveauer {min} til {max}"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Kræver niveau {level}"
@@ -6084,6 +6139,7 @@ export const da_DK: EnTranslations = {
       "framesMoveBodyEditFrames": "Din ramme, din målramme og dine gruppesrammer kan alle flyttes. Hver har en lille flyt-knap i hjørnet: lås den op, træk rammen derhen, hvor du vil have den, og lås den igen, så et fejlagtigt klik ikke kan flytte den. Rediger rammer øverst på Rammer-fanen i grænsefladeindstillingerne løsner resten af grænsefladen på én gang, inklusive de tre rammer: handlingslinjerne, besværgelseslinjen, svinglinjen, erfaringslinjen, minikortet, knaprækken, kæledyrsrammen, stillingslinjen, fordel- og debuffrækkerne samt Påmindelse om ønskeliste-brikken, hver med sin egen navnebrik, mens den er løsnet. Hvis de ender et sted, du fortryder, sætter Gendan standarder nederst på samme Rammer-fane dem alle tilbage, hvor de startede.",
       "framesGovernedExtra": "Rediger rammer løsner også sporingsstakken nedenunder (dine sporede opgaver og deres mål, din bedriftstatus, dine Relikvarium-sider, den udgravning du er i, enhver rift du deltager i, og opskriften eller bestillingen du sporer), kæledyrets handlingslinje ved siden af kæledyrsrammen, Mål-prikkerammen for dine debuffs på fjender i nærheden, paladinens Hengivenhedsmedaljon, troldmandens Affektionslinje, besværgelsesproc-overlayet, svingtimeren for sekundærhånd for dobbelthåndsbrugere og det fanebladede skademålervindue, hver med sin egen navnebrik, mens den er løsnet.",
       "framesGovernedAuraTracks": "Rediger rammer løsner også de seks valgfri aurabaner, når du har slået dem til fra Kamp-fanen i de samme grænsefladeindstillinger: Mine fordele-banen, Defensive nedkølinger-banen, Mine skjolde-banen, Offensive nedkølinger-banen, Bevægelse og stealth-banen samt Mine fordele på allierede-banen. Alle baner er slået fra som standard, og hver har sin egen navnebrik, mens den er løsnet.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Bjælker, timere og kamptekst",
       "barsBody": "Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.",
       "aurasTitle": "Forstærkninger og svækkelser",

@@ -216,3 +216,212 @@ export function casterLaneSpTotal(level: number): number {
 export function healerLaneHpTotal(level: number): number {
   return Math.floor(casterLaneSpTotal(level) / HEAL_POWER_PRICE_OF_SP);
 }
+
+// ---------------------------------------------------------------------------
+// The stamina baseline model (2026-09). Every budgeted item carries a FREE
+// stamina line of STAMINA_BASELINE_SHARE of its primary-stat budget, so a caster
+// and a physical piece from the same place give the same health, and the budget
+// itself is spent on offense and resource: Strength/Agility for a physical
+// identity, Intellect/Spirit for a caster one.
+//
+// The two identities meet the budget differently because of how the catalog was
+// authored. A physical item's stamina was always INSIDE its budget (a 25-point
+// chest reads 17 Strength / 8 Stamina), so its offense line is the budget minus
+// the baseline and the baseline is the stamina it already carried. A caster
+// item's third stat was Spirit, the resource stat (17 Intellect / 8 Spirit), so
+// its line is the whole budget and the baseline is added on top. Stamina ABOVE
+// the baseline (tank pieces, shields, bear staves) is bought from the line at
+// STAMINA_PREMIUM points per point; today that is one for one, and the constant
+// exists so pricing tank stamina differently is a one-number decision.
+//
+// tests/item_stamina_baseline.test.ts is the repo-wide guard: every eligible item
+// meets its floor, and every item not on the drift allowlist sits exactly on its
+// line. docs/design/gear-stamina-baseline-2026-09-10.md has the measurements.
+export const STAMINA_BASELINE_SHARE = 1 / 3;
+export const STAMINA_PREMIUM = 1;
+
+export type StatIdentity = 'caster' | 'physical';
+
+// The free stamina an item of this budget carries. Rounded, so a 2-point budget
+// carries 1 and a 4-point budget carries 1; the effective share settles inside
+// 29 to 40 percent from budget 5 upward. Zero-budget items (whites) carry none.
+export function staminaBaseline(budget: number): number {
+  return budget > 0 ? Math.round(budget * STAMINA_BASELINE_SHARE) : 0;
+}
+
+// Which line an item spends its budget on. A piece carrying Intellect or Spirit
+// and NO Strength or Agility is a caster piece. Everything else is priced on the
+// physical line: pure physical pieces, stamina-only and stat-less items, and the
+// rare all-stat hybrid (Heart of the Rift), whose stamina was authored inside its
+// budget like a physical piece and whose line is all four offense stats.
+export function statIdentity(stats: Partial<CoreStats> | undefined): StatIdentity {
+  const casterStats = (stats?.int ?? 0) > 0 || (stats?.spi ?? 0) > 0;
+  const physicalStats = (stats?.str ?? 0) > 0 || (stats?.agi ?? 0) > 0;
+  return casterStats && !physicalStats ? 'caster' : 'physical';
+}
+
+// The primary-stat total (all five attributes) an item of this budget and
+// identity is expected to carry: physical pieces already hold their baseline
+// inside the budget, caster pieces carry it on top.
+export function expectedStatTotal(budget: number, identity: StatIdentity): number {
+  return identity === 'caster' ? budget + staminaBaseline(budget) : budget;
+}
+
+export interface StaminaModelCheck {
+  identity: StatIdentity;
+  budget: number;
+  baseline: number;
+  sta: number;
+  /** Stamina above the baseline, charged to the line at STAMINA_PREMIUM. */
+  extra: number;
+  /** The realized offense/resource line (str+agi or int+spi). */
+  line: number;
+  expectedLine: number;
+  total: number;
+  expectedTotal: number;
+  meetsFloor: boolean;
+  onLine: boolean;
+}
+
+// Where an item stands against the model, for the guard test and tooling.
+export function checkStaminaModel(
+  stats: Partial<CoreStats> | undefined,
+  budget: number,
+): StaminaModelCheck {
+  const s = stats ?? {};
+  const identity = statIdentity(s);
+  const baseline = staminaBaseline(budget);
+  const sta = s.sta ?? 0;
+  const extra = Math.max(0, sta - baseline);
+  const line =
+    identity === 'caster'
+      ? (s.int ?? 0) + (s.spi ?? 0)
+      : (s.str ?? 0) + (s.agi ?? 0) + (s.int ?? 0) + (s.spi ?? 0);
+  const lineBudget = identity === 'caster' ? budget : budget - baseline;
+  const expectedLine = Math.max(0, lineBudget - STAMINA_PREMIUM * extra);
+  let total = 0;
+  for (const k of PRIMARY_STATS) total += s[k] ?? 0;
+  return {
+    identity,
+    budget,
+    baseline,
+    sta,
+    extra,
+    line,
+    expectedLine,
+    total,
+    expectedTotal: expectedStatTotal(budget, identity),
+    meetsFloor: sta >= baseline,
+    onLine: line === expectedLine,
+  };
+}
+
+function pickStats(stats: Partial<CoreStats>, keys: readonly PrimaryStat[]): Partial<CoreStats> {
+  const out: Partial<CoreStats> = {};
+  for (const k of keys) if ((stats[k] ?? 0) > 0) out[k] = stats[k];
+  return out;
+}
+
+// Model-aware normalization for GENERATED items (heroic variants, crucible
+// collection pieces, rift bands): scale a stat profile onto `budget` so the result
+// meets its stamina floor and sits exactly on its line, keeping the profile's
+// offense identity. A physical profile keeps any stamina above the baseline (a
+// tank profile stays a tank profile, paying for it from the line); a caster
+// profile gets the baseline placed and its Intellect/Spirit ratio scaled onto the
+// line. Armor passes through untouched, like normalizePrimaryStats.
+export function normalizeToStaminaModel(
+  stats: Partial<CoreStats>,
+  budget: number,
+): Partial<CoreStats> {
+  const armor = stats.armor !== undefined ? { armor: stats.armor } : {};
+  if (budget <= 0) return { ...armor };
+  const identity = statIdentity(stats);
+  const baseline = staminaBaseline(budget);
+  if (identity === 'physical') {
+    // Ratio-preserving over all five keeps a tank piece's stamina share; only a
+    // profile under the floor is lifted to it and its offense fitted to the line.
+    const scaled = normalizePrimaryStats(stats, budget);
+    if ((scaled.sta ?? 0) >= baseline) return scaled;
+    const offense = normalizePrimaryStats(
+      pickStats(stats, ['str', 'agi', 'int', 'spi']),
+      budget - baseline,
+    );
+    return { ...armor, ...offense, sta: baseline };
+  }
+  // Caster: the line is Intellect/Spirit on the whole budget; stamina is the
+  // baseline plus whatever the profile carries above its share, charged to the line.
+  const provisional = normalizePrimaryStats(stats, expectedStatTotal(budget, identity));
+  const extra = Math.max(0, (provisional.sta ?? 0) - baseline);
+  const lineStats = normalizePrimaryStats(
+    pickStats(stats, ['int', 'spi']),
+    Math.max(0, budget - STAMINA_PREMIUM * extra),
+  );
+  return { ...armor, ...lineStats, sta: baseline + extra };
+}
+
+// The bonus record a tier bump adds ON TOP of an item's own stats (masterwork,
+// Perfecting): the line delta redistributed over the profile's offense identity,
+// plus, for a caster identity, the growth of the free baseline between the two
+// lines. A physical profile keeps the historical behavior exactly (its stamina
+// is inside the line, so the ratio-preserving delta already carries it). Null
+// when the bump adds nothing.
+export function tierDeltaStats(
+  profile: Partial<CoreStats>,
+  lineBefore: number,
+  lineAfter: number,
+): Partial<CoreStats> | null {
+  const delta = lineAfter - lineBefore;
+  if (delta <= 0) return null;
+  if (statIdentity(profile) === 'physical') {
+    const out = normalizePrimaryStats(profile, delta);
+    // Double rounding can leave the bumped piece under the floor of its new
+    // line (a 16-to-17 bump over 11/5 rounds to str 1, sta 0 against a floor of
+    // 6): move what the floor needs from the offense share of the delta. Only
+    // for a base that meets its own floor; a stamina-free profile (a probe
+    // fixture, a drift item) keeps the plain ratio delta rather than spending
+    // the bump on a floor the base never had.
+    const onModel = (profile.sta ?? 0) >= staminaBaseline(lineBefore);
+    let need = onModel ? staminaBaseline(lineAfter) - ((profile.sta ?? 0) + (out.sta ?? 0)) : 0;
+    for (const k of ['str', 'agi', 'int', 'spi'] as const) {
+      if (need <= 0) break;
+      const take = Math.min(out[k] ?? 0, need);
+      if (take > 0) {
+        out[k] = (out[k] ?? 0) - take;
+        out.sta = (out.sta ?? 0) + take;
+        need -= take;
+      }
+    }
+    return out;
+  }
+  const out = normalizePrimaryStats(pickStats(profile, ['int', 'spi']), delta);
+  const staDelta = staminaBaseline(lineAfter) - staminaBaseline(lineBefore);
+  if (staDelta > 0) out.sta = staDelta;
+  return out;
+}
+
+// The line budget an item's stat line realizes: the five-stat total for a
+// physical identity (stamina sits inside it); for a caster identity the offense
+// line plus the premium on stamina above the baseline of that budget. The
+// baseline depends on the budget, so it is solved by iteration; the iterate
+// settles in a step or two for any real item, and on the rare input where it
+// alternates (a one-point line with one stamina: 1, 2, 1, 2) the larger value
+// wins, which is the direction that never prices a piece under what it carries.
+export function realizedLineBudget(stats: Partial<CoreStats>): number {
+  let total = 0;
+  for (const k of PRIMARY_STATS) total += stats[k] ?? 0;
+  if (statIdentity(stats) === 'physical') return total;
+  const line = (stats.int ?? 0) + (stats.spi ?? 0);
+  const sta = stats.sta ?? 0;
+  const seen = new Set<number>();
+  let budget = line;
+  let best = line;
+  for (let i = 0; i < 16; i++) {
+    if (seen.has(budget)) break;
+    seen.add(budget);
+    best = Math.max(best, budget);
+    const next = line + STAMINA_PREMIUM * Math.max(0, sta - staminaBaseline(budget));
+    if (next === budget) return budget;
+    budget = next;
+  }
+  return best;
+}

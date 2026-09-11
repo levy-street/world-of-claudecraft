@@ -902,6 +902,7 @@ export const de_DE: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Quests einklappen",
       "expandHint": "Quests ausklappen"
     },
@@ -1266,6 +1267,9 @@ export const de_DE: EnTranslations = {
       "previous": "Frühere Läufe",
       "runLabel": "Lauf {index}",
       "runSummary": "{total} in {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Visiere die Puppe an, um zu beginnen.",
@@ -1739,6 +1743,9 @@ export const de_DE: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Tastenbeschriftung",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2132,22 @@ export const de_DE: EnTranslations = {
       "showPlaytimeAria": "Spielzeit anzeigen",
       "hidePlaytimeAria": "Spielzeit ausblenden"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "Von deinen {value} Punkten {stat}:",
       "names": {
@@ -2367,6 +2390,7 @@ export const de_DE: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Fehler melden",
+      "online": "Online",
       "realm": "Welt",
       "character": "Charakter",
       "position": "Position",
@@ -3244,6 +3268,7 @@ export const de_DE: EnTranslations = {
       "lock": "Spielerfenster sperren"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Gruppen- und Schlachtzugsrahmen",
       "optionsSection": "Gruppenrahmen-Optionen",
       "unlock": "Gruppen- und Schlachtzugsrahmen verschieben",
@@ -4028,7 +4053,6 @@ export const de_DE: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Sammeln",
       "mining": "Bergbau",
       "logging": "Holzfällen",
       "herbalism": "Kräuterkunde",
@@ -4212,9 +4236,7 @@ export const de_DE: EnTranslations = {
       "noviceBody": "Deine Pflanzenfertigkeit steigt jedes Mal, wenn du eine Pflanze einbringst. Säe einen Samen in einem beliebigen Gartenbeet, um zu beginnen."
     },
     "archetypeTitle": {
-      "label": "Titel",
-      "none": "Keiner",
-      "hobbyLabel": "Freizeit"
+      "none": "Keiner"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardier",
@@ -4384,7 +4406,9 @@ export const de_DE: EnTranslations = {
       "hobbyLabel": "Hobby: {craft}",
       "majorsLabel": "Hauptfächer: {a} und {b}",
       "pairsHeld": "Gehaltene Paare: {count}",
-      "returnsLabel": "Rückgabe: {count}"
+      "returnsLabel": "Rückgabe: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "Basteln",
@@ -4419,6 +4443,7 @@ export const de_DE: EnTranslations = {
       "vaultUnreachable": "Der Materialtresor ist hier außer Reichweite.",
       "craftFeeLine": "Herstellungsgebühr: {fee} je Stück",
       "empty": "Noch keine Rezepte bekannt.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Basteln {name}",
       "craftedToast": "Hergestellt: {name}",
       "craftedToastQty": "Hergestellt: {name} x{qty}",
@@ -4520,6 +4545,9 @@ export const de_DE: EnTranslations = {
       "commissionToggleHint": "Bindet sich an den ersten Charakter, der es im Handel erhält.",
       "commissionUnbound": "Auftragsarbeit: bindet sich an den ersten Empfänger",
       "commissionBound": "Auftragsarbeit: gebunden an den Empfänger"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Verwenden",
@@ -5136,6 +5164,33 @@ export const de_DE: EnTranslations = {
       "toInstance": "Instanzkarte",
       "toggleAria": "Zwischen Weltkarte, Zonenkarte und Instanzkarte wechseln",
       "levels": "Stufe {min} bis {max}"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Erfordert Stufe {level}"
@@ -6084,6 +6139,7 @@ export const de_DE: EnTranslations = {
       "framesMoveBodyEditFrames": "Dein Einheitenrahmen, dein Zielrahmen und deine Gruppenrahmen können alle verschoben werden. Jeder besitzt eine kleine Verschiebeschaltfläche in der Ecke: entsperre ihn, ziehe ihn an die gewünschte Stelle und sperre ihn wieder, damit ein Fehlklick nichts verschiebt. Rahmen bearbeiten oben im Reiter Rahmen der Interfaceoptionen löst den übrigen Bildschirm gleichzeitig mit diesen drei Rahmen: Aktionsleisten, Zauberleiste, Schwungleiste, Erfahrungsleiste, Minikarte, Schaltflächenleiste, Haustierrahmen, Haltungsleiste, Stärkungs- und Schwächungsreihen sowie den Wunschlistenhinweis. Wenn ein Rahmen falsch steht, setzt Auf Standard zurück am Fuß desselben Reiters alle auf ihren Ausgangsort.",
       "framesGovernedExtra": "Rahmen bearbeiten löst außerdem den Trackerstapel darunter: verfolgte Quests und Ziele, Fortschritt im Buch der Taten, Reliquiarseiten, das aktuelle Delve, jeden Riss, an dem du teilnimmst, und das verfolgte Rezept oder die Kommission. Ebenfalls enthalten sind die Haustieraktionsleiste neben dem Haustierrahmen, der Zielpunkte-Rahmen für deine Schwächungen auf nahen Gegnern, das Paladin-Medaillon der Hingabe, die Affliction-Leiste des Hexenmeisters, das Zauberproc-Overlay, der Nebenhandschwungtimer für Beidhänder und das Register-Schadensmeterfenster. Jeder Bereich trägt seinen eigenen Namenschip, sobald er gelöst ist.",
       "framesGovernedAuraTracks": "Rahmen bearbeiten löst außerdem die sechs optionalen Aurenleisten, sobald du sie im Reiter Kampf der Interfaceoptionen einschaltest: Meine Stärkungen, defensive Abklingzeiten, meine Schilde, offensive Abklingzeiten, Bewegung und Verstohlenheit sowie Meine Stärkungen auf Verbündeten. Jede Leiste ist zunächst aus und trägt beim Lösen ihren eigenen Namenschip.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Leisten, Timer und Kampftext",
       "barsBody": "Deine Zauberleiste erscheint in der Mitte des Bildschirms, direkt über deinen Aktionsleisten, sobald du zauberst oder kanalisierst, und zeigt den Namen des Zaubers sowie die verbleibende Zeit. Dein Ziel bekommt eine eigene Zauberleiste auf seinem Fenster, sodass du siehst, was kommt, und darauf reagieren kannst.\n\nEine dünne Schwungleiste liegt unter deiner Zauberleiste und füllt sich zwischen deinen Waffenschwüngen, sodass ein Nah- oder Fernkämpfer sehen kann, wann der nächste automatische Treffer landet.\n\nDeine Erfahrungsleiste läuft über die volle Breite unter deinen Aktionsleisten, in Segmente unterteilt, mit einem helleren Abschnitt, der die ausgeruhte Erfahrung zeigt, die du angesammelt hast.\n\nSchwimme unter Wasser, und am oberen Bildschirmrand erscheint eine blaue Atemleiste. Sie leert sich, während dein Kopf unter Wasser ist, blinkt rot auf, sobald sie aufgebraucht ist und du zu ertrinken beginnst, und füllt sich schnell wieder, sobald du auftauchst. Die Leertaste lässt dich nach oben schwimmen, und die Taste zum Abtauchen, standardmäßig Strg, bringt dich tiefer.\n\nSchaden und Heilung schweben als kleine Zahlen über dem auf, was sie getroffen haben, sodass du einen Kampf lesen kannst, ohne Text lesen zu müssen. Der Kampf-Reiter in deinem Chatfenster führt das vollständige schriftliche Protokoll.",
       "aurasTitle": "Stärkungs- und Schwächungszauber",

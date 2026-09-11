@@ -902,6 +902,7 @@ export const it_IT: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Comprimi il riquadro Missioni",
       "expandHint": "Espandi il riquadro Missioni"
     },
@@ -1266,6 +1267,9 @@ export const it_IT: EnTranslations = {
       "previous": "Sessioni precedenti",
       "runLabel": "Sessione {index}",
       "runSummary": "Totale: {total} in {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Seleziona il manichino per iniziare.",
@@ -1739,6 +1743,9 @@ export const it_IT: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Etichette dei pulsanti",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2132,22 @@ export const it_IT: EnTranslations = {
       "showPlaytimeAria": "Mostra il tempo di gioco",
       "hidePlaytimeAria": "Nascondi il tempo di gioco"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "Dai tuoi {value} punti {stat}:",
       "names": {
@@ -2367,6 +2390,7 @@ export const it_IT: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Segnala un bug",
+      "online": "Online",
       "realm": "Mondo",
       "character": "Personaggio",
       "position": "Posizione",
@@ -3244,6 +3268,7 @@ export const it_IT: EnTranslations = {
       "lock": "Blocca il riquadro del giocatore"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Riquadri gruppo e incursione",
       "optionsSection": "Opzioni riquadro gruppo",
       "unlock": "Sposta i riquadri di gruppo e incursione",
@@ -4028,7 +4053,6 @@ export const it_IT: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Raccolta",
       "mining": "Estrazione mineraria",
       "logging": "Taglio del legname",
       "herbalism": "Erbalismo",
@@ -4212,9 +4236,7 @@ export const it_IT: EnTranslations = {
       "noviceBody": "L’abilità di Agricoltura cresce ogni volta che raccogli una coltura. Semina un seme in un’aiuola per iniziare."
     },
     "archetypeTitle": {
-      "label": "Titolo",
-      "none": "Nessuno",
-      "hobbyLabel": "Passatempo"
+      "none": "Nessuno"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardiere",
@@ -4384,7 +4406,9 @@ export const it_IT: EnTranslations = {
       "hobbyLabel": "Hobby: {craft}",
       "majorsLabel": "Maggiori: {a} e {b}",
       "pairsHeld": "Coppie detenute: {count}",
-      "returnsLabel": "Restituisce: {count}"
+      "returnsLabel": "Restituisce: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "Creazione",
@@ -4419,6 +4443,7 @@ export const it_IT: EnTranslations = {
       "vaultUnreachable": "Il Caveau dei Materiali non è raggiungibile qui.",
       "craftFeeLine": "Tariffa di lavorazione: {fee} ciascuno",
       "empty": "Nessuna ricetta ancora conosciuta.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Crea {name}",
       "craftedToast": "Realizzato: {name}",
       "craftedToastQty": "Realizzato: {name} x{qty}",
@@ -4520,6 +4545,9 @@ export const it_IT: EnTranslations = {
       "commissionToggleHint": "Si lega al primo personaggio che lo riceve in uno scambio.",
       "commissionUnbound": "Pezzo su commissione: si lega al primo destinatario",
       "commissionBound": "Pezzo su commissione: legato al suo destinatario"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Usa",
@@ -5136,6 +5164,33 @@ export const it_IT: EnTranslations = {
       "toInstance": "Mappa delle istanze",
       "toggleAria": "Passa dalla mappa del mondo, alla mappa della zona e alla mappa dell’istanza",
       "levels": "Livelli da {min} a {max}"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Richiede il livello {level}"
@@ -6084,6 +6139,7 @@ export const it_IT: EnTranslations = {
       "framesMoveBodyEditFrames": "Puoi spostare la tua struttura, quella del bersaglio e quelle del gruppo. Ognuna ha un piccolo pulsante di spostamento nell’angolo: sbloccalo, trascina la struttura dove vuoi e bloccalo di nuovo, così un clic accidentale non la muove. Modifica Strutture, in cima alla scheda Strutture delle opzioni Interfaccia, allenta in una volta sola il resto dell’interfaccia, comprese quelle tre strutture: barre delle azioni, barra di lancio, barra dei colpi, barra dell’esperienza, minimappa, barra dei pulsanti, struttura del famiglio, barra della posizione, righe di benefici e debilitazioni e chip del Promemoria Lista dei Desideri, ciascuno con il proprio chip quando è allentato. Se li metti in una posizione scomoda, Ripristina impostazioni predefinite in fondo alla stessa scheda Strutture li riporta tutti al punto di partenza.",
       "framesGovernedExtra": "Modifica Strutture allenta anche la pila di tracciatori sottostante, con le missioni e gli obiettivi tracciati, il progresso delle imprese, le pagine del Reliquiario, la spedizione in corso, lo squarcio a cui partecipi e la ricetta o commissione seguita, oltre alla barra delle azioni del famiglio, ai punti del bersaglio per le tue debilitazioni sui nemici vicini, al medaglione Devozione del paladino, alla Barra Afflizione dello stregone, alla sovrapposizione dei proc degli incantesimi, al timer del colpo della mano secondaria per chi impugna due armi e alla finestra a schede dei misuratori dei danni. Ognuno porta il proprio chip con il nome quando è allentato.",
       "framesGovernedAuraTracks": "Modifica Strutture allenta anche le sei tracce aura opzionali dopo che le hai attivate dalla scheda Combattimento delle stesse opzioni Interfaccia: la traccia I miei benefici, la traccia Recuperi difensivi, la traccia I miei scudi, la traccia Recuperi offensivi, la traccia Movimento e furtività e la traccia I miei benefici sugli alleati. Ogni traccia è disattivata per impostazione predefinita e, quando è allentata, porta il proprio chip con il nome.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Barre, timer e testo di combattimento",
       "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
       "aurasTitle": "Potenziamenti e indebolimenti",

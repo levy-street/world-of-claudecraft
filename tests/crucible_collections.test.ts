@@ -13,7 +13,13 @@ import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
-import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
+import {
+  expectedStatBudget,
+  itemLevel,
+  primaryStatSum,
+  staminaBaseline,
+  statIdentity,
+} from '../src/sim/item_level';
 import { IGNIVAR_BOSS_ID } from '../src/sim/types';
 
 const EXPECTED_PROFILES = [
@@ -56,7 +62,11 @@ describe('Crucible crafted collections', () => {
   });
 
   it('ships useful tradable rank-zero Masterwrought pieces at honest item level 35', () => {
-    const budgets = { chest: 25, waist: 17, feet: 16 };
+    // The shared line budget per slot: physical roles (str/tank/agi) already
+    // hold their stamina inside it, while the caster and healer roles carry
+    // their free stamina baseline on top (item_budget.ts, the stamina
+    // baseline model), so their TOTAL is the line plus that baseline.
+    const lineBudgets = { chest: 25, waist: 17, feet: 16 };
     for (const item of Object.values(CRUCIBLE_COLLECTION_ITEMS)) {
       expect(ITEMS[item.id]).toBe(item);
       expect(item.kind).toBe('armor');
@@ -65,10 +75,35 @@ describe('Crucible crafted collections', () => {
       expect(item.masterwrought).toBe(true);
       expect(item.soulbound).not.toBe(true);
       expect(itemLevel(item)).toBe(35);
-      expect(primaryStatSum(item)).toBe(budgets[item.slot as keyof typeof budgets]);
+      const line = lineBudgets[item.slot as keyof typeof lineBudgets];
+      const expectedTotal =
+        statIdentity(item.stats) === 'caster' ? line + staminaBaseline(line) : line;
+      expect(primaryStatSum(item)).toBe(expectedTotal);
       expect(primaryStatSum(item)).toBe(expectedStatBudget(item));
       expect((item.critRating ?? 0) + (item.hasteRating ?? 0) + (item.hitRating ?? 0)).toBe(85);
     }
+    // The baseline the caster pieces ride, pinned as literals so the generated
+    // totals above are checked against numbers and not the share constant that
+    // produced them.
+    expect([25, 17, 16].map(staminaBaseline)).toEqual([8, 6, 5]);
+    // And the chest lines as literals (stamina baseline model, 2026-09-10): the
+    // caster profile keeps its Intellect and takes its Spirit on the line, the
+    // healer profile its 14:11, the physical profiles their stamina inside the
+    // line. Swapping Intellect and Spirit would pass every check above and reds here.
+    expect(ITEMS.crucible_caster_cloth_chest.stats).toEqual({
+      int: 17,
+      spi: 8,
+      sta: 8,
+      armor: 105,
+    });
+    expect(ITEMS.crucible_healer_cloth_chest.stats).toEqual({
+      int: 14,
+      spi: 11,
+      sta: 8,
+      armor: 105,
+    });
+    expect(ITEMS.crucible_str_mail_chest.stats).toEqual({ str: 17, sta: 8, armor: 380 });
+    expect(ITEMS.crucible_tank_mail_chest.stats).toEqual({ str: 10, sta: 15, armor: 380 });
   });
 
   it('does not leave cat, bear, Stonebound, or conversion healers on the wrong stats', () => {

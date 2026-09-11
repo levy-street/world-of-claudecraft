@@ -3827,7 +3827,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Hvert {points} point på en komponent løfter dens høstniveau et trin, op til {steps} trin; færre end {points} point øger stadig udbyttet.',
   'hudChrome.townFocus.title': 'Byfokus',
   'hudChrome.townFocus.townOnlyHint': 'Fokus kan kun ændres, mens du er i byen.',
-  'hudChrome.archetypeTitle.label': 'Titel',
   'hudChrome.archetypeTitle.none': 'Ingen',
   'entities.itemSets.crownforged.bonus4':
     'Dine kritiske våbenslag splintrer målet med Bensplint og påfører 8 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange.',
@@ -10274,7 +10273,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Urtekundskab',
   'hudChrome.gathering.logging': 'Skovhugst',
   'hudChrome.gathering.mining': 'Minedrift',
-  'hudChrome.gathering.title': 'Indsamling',
   'errors.api.accountSessionLimit': 'For mange karakterer på denne konto er allerede i verdenen.',
   'errors.api.crossSiteOrigin': 'Anmodningen blev blokeret af sikkerhedsmæssige årsager.',
   'errors.api.unsupportedMediaType': 'Anmodningsformatet understøttes ikke.',
@@ -10518,7 +10516,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.training_dummy.name': 'Træningsdukke',
   'entities.mobs.hub_training_dummy.name': 'Træningsdukke',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Fritid',
   'hudChrome.auraEffect.armorPct': 'Reducerer rustning med {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Reducerer rustning med {pct}% ({stacks} stakke)',
   'hudChrome.auraEffect.increasePct.allStats': 'Øger alle attributter med {pct}%',

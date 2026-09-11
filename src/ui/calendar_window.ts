@@ -199,12 +199,12 @@ export class CalendarWindow {
       guildEvents: this.guildEvents(),
     });
     const header =
-      `<div class="panel-title"><span>${esc(t('hudChrome.calendar.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.calendar.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.calendar.title'))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.calendar.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="cal-nav">` +
-      `<button type="button" class="cal-nav-btn" data-cal-nav="-1" aria-label="${esc(t('hudChrome.calendar.prevMonth'))}">${svgIcon('prev')}</button>` +
+      `<button type="button" class="cal-nav-btn ui-icon-btn" data-cal-nav="-1" aria-label="${esc(t('hudChrome.calendar.prevMonth'))}">${svgIcon('prev')}</button>` +
       `<span class="cal-month-title">${esc(this.monthTitle())}</span>` +
-      `<button type="button" class="cal-nav-btn" data-cal-nav="1" aria-label="${esc(t('hudChrome.calendar.nextMonth'))}">${svgIcon('next')}</button>` +
+      `<button type="button" class="cal-nav-btn ui-icon-btn" data-cal-nav="1" aria-label="${esc(t('hudChrome.calendar.nextMonth'))}">${svgIcon('next')}</button>` +
       `</div>`;
     const heads = this.weekdayHeaders()
       .map((h) => `<span class="cal-weekday">${esc(h)}</span>`)
@@ -243,7 +243,10 @@ export class CalendarWindow {
     el.innerHTML =
       header +
       `<div class="cal-grid" role="grid">${heads}${cells}</div>` +
-      `<div class="cal-day-pane" id="cal-day-pane"></div>`;
+      `<div class="cal-day-pane" id="cal-day-pane"></div>` +
+      // The composer sits BELOW the scrolling day pane, not at the end of it: a
+      // busy day used to push Add out of sight (the window-shell rule, library.css).
+      `<div class="cal-day-foot" id="cal-day-foot"></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     el.querySelectorAll<HTMLButtonElement>('[data-cal-nav]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -270,10 +273,12 @@ export class CalendarWindow {
 
   private renderDayPane(cells: CalendarCell[]): void {
     const pane = this.deps.root().querySelector<HTMLElement>('#cal-day-pane');
-    if (!pane) return;
+    const foot = this.deps.root().querySelector<HTMLElement>('#cal-day-foot');
+    if (!pane || !foot) return;
     const cell = cells.find((c) => c.iso === this.selectedIso) ?? null;
     if (!cell) {
       pane.innerHTML = '';
+      foot.innerHTML = '';
       return;
     }
     const guild = this.deps.world().socialInfo?.guild ?? null;
@@ -287,7 +292,7 @@ export class CalendarWindow {
       const keys = SYSTEM_EVENT_TEXT[id];
       if (!keys) continue;
       rows.push(
-        `<div class="cal-event system"><span class="cal-dot system"></span>` +
+        `<div class="cal-event system ui-card"><span class="cal-dot system"></span>` +
           `<span class="cal-event-text"><span class="cal-event-title">${esc(t(keys.title))}</span>` +
           `<span class="cal-event-note">${esc(t(keys.note))}</span></span></div>`,
       );
@@ -302,7 +307,7 @@ export class CalendarWindow {
               timeZone: 'UTC',
             });
       rows.push(
-        `<div class="cal-event guild" data-cal-event="${ev.id}"><span class="cal-dot guild"></span>` +
+        `<div class="cal-event guild ui-card" data-cal-event="${esc(ev.id)}"><span class="cal-dot guild"></span>` +
           `<span class="cal-event-text"><span class="cal-event-title">${esc(ev.title)} <span class="cal-event-when">${esc(when)}</span></span>` +
           (ev.note ? `<span class="cal-event-note">${esc(ev.note)}</span>` : '') +
           (ev.createdBy
@@ -310,7 +315,7 @@ export class CalendarWindow {
             : '') +
           `</span>` +
           (manage
-            ? `<button type="button" class="cal-event-del" data-cal-del="${ev.id}" aria-label="${esc(t('hudChrome.calendar.deleteAria', { title: ev.title }))}">${svgIcon('close')}</button>`
+            ? `<button type="button" class="cal-event-del ui-icon-btn" data-cal-del="${esc(ev.id)}" aria-label="${esc(t('hudChrome.calendar.deleteAria', { title: ev.title }))}">${svgIcon('close')}</button>`
             : '') +
           `</div>`,
       );
@@ -321,28 +326,34 @@ export class CalendarWindow {
         : '';
     const form =
       manage && !cell.isPast
-        ? `<div class="cal-form">` +
+        ? `<div class="cal-form ui-card">` +
           `<span class="cal-form-title">${esc(t('hudChrome.calendar.bookTitle'))}</span>` +
-          `<input id="cal-ev-title" type="text" maxlength="48" placeholder="${esc(t('hudChrome.calendar.titlePlaceholder'))}" aria-label="${esc(t('hudChrome.calendar.titlePlaceholder'))}">` +
-          `<input id="cal-ev-note" type="text" maxlength="160" placeholder="${esc(t('hudChrome.calendar.notePlaceholder'))}" aria-label="${esc(t('hudChrome.calendar.notePlaceholder'))}">` +
+          `<input id="cal-ev-title" class="ui-input" type="text" maxlength="48" placeholder="${esc(t('hudChrome.calendar.titlePlaceholder'))}" aria-label="${esc(t('hudChrome.calendar.titlePlaceholder'))}">` +
+          `<input id="cal-ev-note" class="ui-input" type="text" maxlength="160" placeholder="${esc(t('hudChrome.calendar.notePlaceholder'))}" aria-label="${esc(t('hudChrome.calendar.notePlaceholder'))}">` +
           `<div class="cal-form-row"><label for="cal-ev-hour">${esc(t('hudChrome.calendar.hourLabel'))}</label>` +
-          `<input id="cal-ev-hour" type="number" min="0" max="23" placeholder="${esc(t('hudChrome.calendar.hourAllDay'))}">` +
-          `<button type="button" class="cal-add-btn" id="cal-ev-add">${esc(t('hudChrome.calendar.addButton'))}</button></div>` +
+          `<input id="cal-ev-hour" class="ui-input" type="number" min="0" max="23" placeholder="${esc(t('hudChrome.calendar.hourAllDay'))}">` +
+          `<button type="button" class="cal-add-btn ui-btn ui-btn--red" id="cal-ev-add">${esc(t('hudChrome.calendar.addButton'))}</button></div>` +
           `</div>`
         : guild === null
           ? `<div class="cal-empty">${esc(t('hudChrome.calendar.guildOnlyNote'))}</div>`
           : '';
-    pane.innerHTML = `<div class="cal-day-title">${esc(dayLabel)}</div>${rows.join('')}${empty}${form}`;
+    // The composer is the ONE pinned row; the guild-only note is prose and scrolls
+    // with the day's events.
+    const composing = manage && !cell.isPast;
+    pane.innerHTML =
+      `<div class="cal-day-title">${esc(dayLabel)}</div>${rows.join('')}${empty}` +
+      (composing ? '' : form);
+    foot.innerHTML = composing ? form : '';
     pane.querySelectorAll<HTMLButtonElement>('[data-cal-del]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.deps.world().guildEventRemove(Number(btn.dataset.calDel));
         audio.click();
       });
     });
-    pane.querySelector('#cal-ev-add')?.addEventListener('click', () => {
-      const title = pane.querySelector<HTMLInputElement>('#cal-ev-title')?.value.trim() ?? '';
-      const note = pane.querySelector<HTMLInputElement>('#cal-ev-note')?.value.trim() ?? '';
-      const hourRaw = pane.querySelector<HTMLInputElement>('#cal-ev-hour')?.value ?? '';
+    foot.querySelector('#cal-ev-add')?.addEventListener('click', () => {
+      const title = foot.querySelector<HTMLInputElement>('#cal-ev-title')?.value.trim() ?? '';
+      const note = foot.querySelector<HTMLInputElement>('#cal-ev-note')?.value.trim() ?? '';
+      const hourRaw = foot.querySelector<HTMLInputElement>('#cal-ev-hour')?.value ?? '';
       const hour = hourRaw === '' ? null : Math.max(0, Math.min(23, parseInt(hourRaw, 10) || 0));
       if (!title || !cell.iso) {
         this.deps.showError(t('hudChrome.calendar.result.badInput'));

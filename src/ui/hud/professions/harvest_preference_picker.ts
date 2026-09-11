@@ -135,7 +135,7 @@ export function renderHarvestPreferencePicker(
   root.className = 'harvest-preference';
 
   const header = document.createElement('div');
-  header.className = 'harvest-preference-header';
+  header.className = 'harvest-preference-header ui-win-head';
   const emblem = document.createElement('img');
   emblem.className = 'harvest-preference-emblem';
   emblem.src = iconDataUrl('item', 'field_kit');
@@ -143,7 +143,7 @@ export function renderHarvestPreferencePicker(
   emblem.draggable = false;
   header.appendChild(emblem);
   const title = document.createElement('div');
-  title.className = 'harvest-preference-title';
+  title.className = 'harvest-preference-title ui-win-title';
   title.id = titleId;
   title.textContent = t('hudChrome.harvestPreference.title');
   header.appendChild(title);
@@ -173,14 +173,14 @@ export function renderHarvestPreferencePicker(
 
   const applyButton = document.createElement('button');
   applyButton.type = 'button';
-  applyButton.className = 'btn';
+  applyButton.className = 'btn ui-btn ui-btn--red';
   applyButton.setAttribute(FOCUS_KEY_ATTR, 'apply');
   applyButton.textContent = t('hudChrome.harvestPreference.applyButton');
   applyButton.disabled = draftToken === null;
 
   const cancelButton = document.createElement('button');
   cancelButton.type = 'button';
-  cancelButton.className = 'btn btn-secondary';
+  cancelButton.className = 'btn ui-btn';
   cancelButton.setAttribute(FOCUS_KEY_ATTR, 'cancel');
   cancelButton.textContent = t('hudChrome.harvestPreference.cancelButton');
 
@@ -253,7 +253,7 @@ export function renderHarvestPreferencePicker(
     const button = document.createElement('button');
     button.type = 'button';
     button.setAttribute('role', 'radio');
-    button.className = 'harvest-preference-row';
+    button.className = 'harvest-preference-row ui-card';
     button.dataset.harvestChoice = row.token;
     button.setAttribute(FOCUS_KEY_ATTR, `radio:${row.token}`);
     button.setAttribute('aria-checked', row.token === view.selectedToken ? 'true' : 'false');
@@ -300,7 +300,7 @@ export function renderHarvestPreferencePicker(
   }
 
   const actions = document.createElement('div');
-  actions.className = 'harvest-preference-actions';
+  actions.className = 'harvest-preference-actions ui-win-foot';
   applyButton.addEventListener('click', () => {
     if (!canAct() || draftToken === null) return;
     terminal = true;

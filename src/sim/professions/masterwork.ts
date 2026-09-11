@@ -12,7 +12,12 @@
 // modules. No rng in here either: the caller draws (exactly once) and passes
 // nothing but plain values in.
 
-import { normalizePrimaryStats, PRIMARY_STATS, primaryStatBudget } from '../item_budget';
+import {
+  PRIMARY_STATS,
+  primaryStatBudget,
+  TWOHAND_STAT_MULT,
+  tierDeltaStats,
+} from '../item_budget';
 import type { CoreStats, ItemDef, ItemSlot } from '../types';
 
 // Locked tuning, amended 2026-07-17: base chance at recipe-tier
@@ -103,6 +108,29 @@ export interface MasterworkStatsInput {
   quality: ItemDef['quality'];
   slot: ItemSlot | undefined;
   stats: Partial<CoreStats> | undefined;
+  // The def's own slot weight when its slot alone does not decide it (a worn
+  // offhand: item_budget.ts slotStatMultForItem) and whether it is a two-hander,
+  // so the tier delta is sized on the same line expectedLineBudget prices.
+  slotStatMult?: number;
+  twoHand?: boolean;
+}
+
+// The line budget on each side of the bump, sized the way item_level.ts prices
+// the def (slot weight override and the two-hand multiplier included), or null
+// when no bump exists. Exported so the stamina guard can check a bumped copy
+// against the floor of its new line.
+export function masterworkLineBudgets(
+  input: MasterworkStatsInput,
+): { before: number; after: number } | null {
+  const { level, quality, slot, slotStatMult, twoHand } = input;
+  if (!slot) return null;
+  const bumped = masterworkBumpedQuality(quality);
+  if (!bumped) return null;
+  const mult = twoHand ? TWOHAND_STAT_MULT : 1;
+  return {
+    before: Math.round(primaryStatBudget(level, quality, slot, slotStatMult) * mult),
+    after: Math.round(primaryStatBudget(level, bumped.quality, slot, slotStatMult) * mult),
+  };
 }
 
 /**
@@ -122,7 +150,7 @@ export interface MasterworkStatsInput {
  * the raid-loot band, whose budgets ride the higher raid item level.
  */
 export function masterworkBonusStats(input: MasterworkStatsInput): Partial<CoreStats> | null {
-  const { level, quality, slot, stats } = input;
+  const { quality, slot, stats } = input;
   if (!slot || !stats) return null;
   const bumped = masterworkBumpedQuality(quality);
   if (!bumped) return null;
@@ -135,10 +163,13 @@ export function masterworkBonusStats(input: MasterworkStatsInput): Partial<CoreS
     if (value > 0) primaryProfile[stat] = value;
   }
   if (Object.keys(primaryProfile).length === 0) return null;
-  const bonusBudget =
-    primaryStatBudget(level, bumped.quality, slot) - primaryStatBudget(level, quality, slot);
-  if (bonusBudget <= 0) return null;
-  return normalizePrimaryStats(primaryProfile, bonusBudget);
+  // Model-aware (item_budget.ts, the stamina baseline model): the line delta
+  // goes to the profile's offense identity, and a caster profile also gains the
+  // growth of its free stamina baseline; a physical profile keeps the historical
+  // ratio-preserving delta exactly.
+  const lines = masterworkLineBudgets(input);
+  if (!lines) return null;
+  return tierDeltaStats(primaryProfile, lines.before, lines.after);
 }
 
 /** The per-player masterwork read surface (sim.ts PlayerMeta.lastMasterwork /

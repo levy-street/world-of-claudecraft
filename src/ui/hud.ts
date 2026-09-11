@@ -46,8 +46,6 @@ import {
   onPortraitsReady,
   onPortraitUpdate,
 } from '../render/characters/portrait';
-import { currentDayNightPhase } from '../render/day_night_clock';
-import { globalDayness, skyTintForDayness } from '../render/day_night_core';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
 import {
@@ -246,6 +244,7 @@ import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
+import { DayNightDialPainter } from './day_night_dial_painter';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
 import { deedBorderSlug, deedTargetBorderSlug } from './deed_border_view';
@@ -447,6 +446,7 @@ import {
   type CrossHotbarOverlayAction,
   type CrossHotbarPanelHooks,
   crossHotbarResolvers,
+  crossHotbarSeedActions,
 } from './hud/cross_hotbar';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
@@ -667,6 +667,7 @@ import {
   zoomOutExitsZoneLevel,
 } from './map_pinch_zoom_core';
 import { shouldResetMapPanOnZoneCross, showOnMapPanState } from './map_show_on_map_core';
+import { MapSidebarController } from './map_sidebar_controller';
 import {
   defaultMapLevel,
   type MapLevel,
@@ -689,6 +690,8 @@ import { MarketWindow } from './market_window';
 import { masterwroughtTooltipLines } from './masterwrought_cap_view';
 import { closeMaterialSourcesDialog, openMaterialSourcesDialog } from './material_sources_dialog';
 import { Meters } from './meters';
+import { MicroMenuStatePainter, microMenuWindowOpen } from './micro_menu_state_painter';
+import { createMicroMenuStateView } from './micro_menu_state_view';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
 import {
@@ -777,6 +780,7 @@ import {
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
+import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
@@ -840,7 +844,6 @@ import { openSimpleMenu } from './simple_context_menu';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
-import { isStanceBarAbilityGroup } from './stance_bar_view';
 import {
   type BuffStatSource,
   buildStatTooltip,
@@ -858,12 +861,7 @@ import { localizeSystemText } from './system_text_i18n';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
-import {
-  type TargetFlairLineInput,
-  targetFlairLineHtml,
-  targetFlairLineVisible,
-  targetFlairSignature,
-} from './target_flair_line_view';
+import { TargetDiscordController } from './target_discord_controller';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -1494,9 +1492,11 @@ export class Hud {
   private targetTitlePostEl = appendChildSpan(this.targetNameEl, 'uf-title');
   private targetLevelEl = $('#tf-level');
   private targetDiscordEl = $('#tf-discord');
-  // Diff key for the target-frame Discord line, so its per-frame update only rebuilds
-  // innerHTML (and re-attaches the avatar fallback) when the Discord content changes.
-  private targetDiscordSig = '';
+  private mapSidebar: MapSidebarController;
+  private targetDiscord = new TargetDiscordController(
+    this.targetDiscordEl,
+    () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
+  );
   private targetHpEl = $('#tf-hp');
   private targetHpTextEl = $('#tf-hp-text');
   private targetPortraitEl = $('#tf-portrait') as unknown as HTMLCanvasElement;
@@ -1620,8 +1620,7 @@ export class Hud {
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
-  private dayNightCtx: CanvasRenderingContext2D | null = null;
-  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; ample for the 20-minute cycle
+  private readonly dayNightDial = new DayNightDialPainter();
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display
@@ -2319,6 +2318,12 @@ export class Hud {
       log: (text, color) => this.log(text, color),
       hideTooltip: () => this.hideTooltip(),
     });
+    this.mapSidebar = new MapSidebarController({
+      root: () => $('#map-sidebar'),
+      click: () => audio.click(),
+      onRepaintMap: () => this.repaintOpenMap(),
+      onShowRoute: (route) => this.showFinderOnMap(route.x, route.z),
+    });
     this.fiesta = new FiestaController({
       document,
       world: () => this.sim,
@@ -2720,8 +2725,9 @@ export class Hud {
     this.clockEl = $('#minimap-clock');
     // day/night dial on the minimap rim: a decorative canvas showing the
     // world day/night cycle. Same UI-only wall-clock allowance as the clock above.
-    const dayNightCanvas = document.getElementById('minimap-daynight') as HTMLCanvasElement | null;
-    this.dayNightCtx = dayNightCanvas?.getContext('2d') ?? null;
+    this.dayNightDial.attach(
+      document.getElementById('minimap-daynight') as HTMLCanvasElement | null,
+    );
     // raid-lockout badge on the minimap rim: a lock icon whose hover/tap panel
     // lists the player's raid lockouts (the unlock countdown). Always visible;
     // it lights up (.locked) while any raid is on cooldown. attachTooltip handles
@@ -2753,7 +2759,7 @@ export class Hud {
       this.dailyRewardsButtonEl = dailyRewardsButton;
       this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
       dailyRewardsButton.innerHTML =
-        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
+        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async"><span class="daily-reward-count ui-badge ui-badge--corner" aria-hidden="true">1</span>';
       this.syncDailyRewardsSurfaceLabels();
       dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
@@ -3153,7 +3159,7 @@ export class Hud {
     const styleMusicBtn = () => {
       // keep the note clearly readable when off (a plain tan, not gold) — the
       // slash, not dimming, signals "muted"
-      musicBtn.style.color = music.enabled ? 'var(--gold)' : CHROME_TONE.MUSIC_OFF;
+      musicBtn.classList.toggle('mm-on', music.enabled);
       musicBtn.classList.toggle('mm-muted', !music.enabled);
     };
     styleMusicBtn();
@@ -3815,7 +3821,7 @@ export class Hud {
         resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
         frameLabelKey: 'hudChrome.interfaceUnlock.frameNames.targetFrame',
         draggingBodyClass: 'target-frame-dragging',
-        fallbackSize: { w: 220, h: 92 },
+        fallbackSize: { w: 278, h: 60 },
         isMobileLayout,
         scalable: true,
         resizeMode: 'dimensions',
@@ -3849,7 +3855,7 @@ export class Hud {
         resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
         frameLabelKey: 'hudChrome.interfaceUnlock.frameNames.playerFrame',
         draggingBodyClass: 'player-frame-dragging',
-        fallbackSize: { w: 260, h: 84 },
+        fallbackSize: { w: 278, h: 60 },
         isMobileLayout,
         scalable: true,
         resizeMode: 'dimensions',
@@ -4374,11 +4380,11 @@ export class Hud {
     // language switch); the blocked-state Space guard (stale_chrome_focus.ts) spares it.
     markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') });
     const slots = this.emoteWheelSlots.filter(isOverheadEmoteId).slice(0, EMOTE_WHEEL_LIMIT);
-    el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit" data-edit>${esc(t('hudChrome.emoteWheel.edit'))}</button>`;
+    el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit ui-btn" data-edit>${esc(t('hudChrome.emoteWheel.edit'))}</button>`;
     slots.forEach((id, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'emote-wheel-item';
+      btn.className = 'emote-wheel-item ui-btn';
       btn.dataset.emote = id;
       btn.title = this.emoteLabel(id);
       const icon = document.createElement('img');
@@ -4395,8 +4401,8 @@ export class Hud {
         this.selectEmoteWheelChoice(id);
       });
       const angle = -Math.PI / 2 + (i / Math.max(1, slots.length)) * Math.PI * 2;
-      btn.style.left = `${50 + Math.cos(angle) * 39}%`;
-      btn.style.top = `${50 + Math.sin(angle) * 39}%`;
+      btn.style.left = `calc(50% + ${Math.cos(angle) * 92}px)`;
+      btn.style.top = `calc(50% + ${Math.sin(angle) * 92}px)`;
       el.appendChild(btn);
     });
     el.querySelector<HTMLButtonElement>('.emote-wheel-edit')?.addEventListener('click', (ev) => {
@@ -4459,9 +4465,9 @@ export class Hud {
     // An isModalOpen() surface: a dialog root, so the blocked-state Space guard
     // (src/game/stale_chrome_focus.ts) spares the editor's own buttons.
     markDialogRoot(el, { label: t('hudChrome.emoteEditor.title') });
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
+    el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
     const count = document.createElement('div');
-    count.className = 'emote-editor-count';
+    count.className = 'emote-editor-count ui-h ui-num';
     const grid = document.createElement('div');
     grid.className = 'emote-editor-grid';
     const selected = new Set(this.emoteWheelSlots);
@@ -4480,7 +4486,7 @@ export class Hud {
     for (const def of OVERHEAD_EMOTES) {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'emote-editor-item';
+      btn.className = 'emote-editor-item ui-btn';
       btn.dataset.emote = def.id;
       const icon = document.createElement('img');
       icon.className = 'emote-editor-icon';
@@ -4507,7 +4513,7 @@ export class Hud {
     const footer = document.createElement('div');
     footer.className = 'emote-editor-footer';
     const done = document.createElement('button');
-    done.className = 'btn';
+    done.className = 'btn ui-btn';
     done.textContent = t('hudChrome.emoteEditor.done');
     done.addEventListener('click', () => this.closeEmoteEditor());
     footer.append(count, done);
@@ -4542,6 +4548,12 @@ export class Hud {
       this.hotDomSkippedWrites++;
     },
   );
+  // The micro-menu rail's open-window ring and count badges. The view core owns the
+  // launcher-to-window table; the painter writes only through the elided facet.
+  private readonly microMenuStateView = createMicroMenuStateView((value) =>
+    formatNumber(value, { maximumFractionDigits: 0 }),
+  );
+  private readonly microMenuStatePainter = new MicroMenuStatePainter(this.writerFacet);
   private readonly paladinDevotionView = createPaladinDevotionView(
     (value) => formatNumber(value, { maximumFractionDigits: 0 }),
     (value, max, charges, lastCharge) =>
@@ -5409,6 +5421,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#professions-window'),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
+    openWiki: () => this.openWiki(),
     ...this.windowFocus('#professions-window'),
     openHarvestJournal: () => this.harvestJournalWindow.open(),
     harvestBody: () => this.lootWindow.openHarvestBodyChoice(),
@@ -5998,6 +6011,7 @@ export class Hud {
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
+    showOnMap: (x, z) => this.showFinderOnMap(x, z),
   });
 
   /** The player's own frame portrait.
@@ -7777,18 +7791,18 @@ export class Hud {
     for (let i = 0; i < totalButtons; i++) {
       const container = bars[actionBarRowForSlot(i) - 1];
       const btn = document.createElement('button');
-      btn.className = 'action-btn empty';
+      btn.className = 'action-btn ui-socket empty';
       const label = document.createElement('span');
-      label.className = 'icon-label';
+      label.className = 'icon-label ui-socket-art';
       const countEl = document.createElement('span');
-      countEl.className = 'item-count';
+      countEl.className = 'item-count ui-socket-count';
       const kb = document.createElement('span');
-      kb.className = 'keybind';
+      kb.className = 'keybind ui-socket-key';
       kb.textContent = keyCapLabel(this.keybinds.primaryLabel(`slot${i}`)); // initial keycap; the ActionBarPainter keeps it current each frame
       const cdOverlay = document.createElement('div');
-      cdOverlay.className = 'cd-overlay';
+      cdOverlay.className = 'cd-overlay ui-socket-cd';
       const cdText = document.createElement('div');
-      cdText.className = 'cdtext';
+      cdText.className = 'cdtext ui-socket-cd-text';
       const rechargeOverlay = document.createElement('div');
       rechargeOverlay.className = 'recharge-overlay';
       btn.append(label, countEl, kb, cdOverlay, rechargeOverlay, cdText);
@@ -8080,7 +8094,7 @@ export class Hud {
       (iconKey) => this.actionBarIconBg(iconKey),
     );
 
-    // The plus/minus optional-row toggle rides the end of the primary bar. Its
+    // The chevron optional-row toggle rides the end of the primary bar. Its
     // clicks route the visibility settings through optionsHooks.onSettingChange,
     // so main.ts applySetting stays the one resolver (dependency rule, body
     // classes, persistence) and pushes the result back via setActionBarVisibility.
@@ -8384,9 +8398,9 @@ export class Hud {
       } = {},
     ) => {
       const btn = document.createElement('button');
-      btn.className = 'pet-btn';
+      btn.className = 'pet-btn ui-socket';
       btn.dataset.focusKey = opts.focusKey ?? iconId;
-      if (opts.active) btn.classList.add('active');
+      if (opts.active) btn.classList.add('active', 'is-on');
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
       if (opts.disabled) btn.classList.add('disabled');
@@ -8410,12 +8424,12 @@ export class Hud {
         btn.setAttribute('aria-keyshortcuts', 'Shift+Enter');
       }
       const icon = document.createElement('span');
-      icon.className = 'icon-label';
+      icon.className = 'icon-label ui-socket-art';
       icon.style.backgroundImage = `url(${iconDataUrl('ability', iconId)})`;
       btn.appendChild(icon);
       if (opts.cooldownText) {
         const cdText = document.createElement('span');
-        cdText.className = 'cdtext';
+        cdText.className = 'cdtext ui-socket-cd-text';
         cdText.textContent = opts.cooldownText;
         btn.appendChild(cdText);
       }
@@ -8934,6 +8948,16 @@ export class Hud {
     const talGlow = talentsFor(sim.cfg.playerClass) !== null && tp.spent < tp.total;
     document.getElementById('mm-talents')?.classList.toggle('has-points', talGlow);
     document.getElementById('mobile-talents')?.classList.toggle('has-points', talGlow);
+    // The rail's own state: the gold ring on whichever launcher's window is open,
+    // plus the unspent-point badge. Medium band, elided writes, so a steady rail
+    // costs no DOM mutation.
+    if (mediumHud) {
+      this.microMenuStatePainter.paint(
+        this.microMenuStateView.tick(microMenuWindowOpen, {
+          talentPoints: talGlow ? tp.total - tp.spent : 0,
+        }),
+      );
+    }
 
     // Town Focus (#1143): the minimap button (and, if open, the panel's live
     // gate) only ever shows/works while standing in a town hub. Cheap zone
@@ -9201,7 +9225,7 @@ export class Hud {
         'color',
         tfRoleColor ?? (target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)'),
       );
-      this.updateTargetDiscordLine(target);
+      this.targetDiscord.update(target);
       // Redundant non-color cue for forced-colors (high-contrast) mode, where the OS
       // strips the inline color so a hostile and a friendly name would read identically.
       // The base.css forced-colors block underlines #tf-name.hostile; routed through the
@@ -9736,7 +9760,7 @@ export class Hud {
         this.updateMinimap();
       }
       this.updateClock();
-      this.updateDayNightDial();
+      this.dayNightDial.paint(now);
       this.updateMinimapCoords();
       this.updateCompass();
     }
@@ -10441,100 +10465,7 @@ export class Hud {
   /** Force the minimap day/night dial to redraw on the next tick (the /daynight
    *  dev command calls this so an override shows without the ~1s throttle wait). */
   refreshDayNightDial(): void {
-    this.lastDayNightDrawAt = 0;
-  }
-
-  // Draw the minimap day/night dial: a ring painted with the world sky cycle
-  // (deep navy night, warm dawn/dusk glow, bright day blue), a "now" marker that
-  // sweeps it once per cycle, and a centre sun or moon. Purely visual (the canvas
-  // is aria-hidden) and reads the shared UTC-anchored cycle, so a glance shows the
-  // current time of day and how far the marker sits from the coming day or night.
-  private updateDayNightDial(): void {
-    const ctx = this.dayNightCtx;
-    if (!ctx) return;
-    const now = Date.now();
-    if (now - this.lastDayNightDrawAt < 1000) return; // the marker crawls; ~1Hz is ample
-    this.lastDayNightDrawAt = now;
-
-    const S = 88; // backing resolution (CSS shows it at 44px, so 2x for crispness)
-    const cx = S / 2;
-    const cy = S / 2;
-    const rMid = 34; // ring centreline radius
-    const ringW = 11;
-    const rInner = rMid - ringW / 2 - 2; // centre disc radius
-    // noon (brightest) sits at the top, midnight at the bottom; the marker sweeps
-    // clockwise once per cycle. angle = pi/2 + phase*2pi (canvas y is down).
-    const angleForPhase = (p: number): number => Math.PI / 2 + p * Math.PI * 2;
-    const rgb = (c: readonly [number, number, number]): string =>
-      `rgb(${Math.round(c[0] * 255)}, ${Math.round(c[1] * 255)}, ${Math.round(c[2] * 255)})`;
-
-    ctx.clearRect(0, 0, S, S);
-
-    // the ring: sample the cycle in segments, each an arc of its sky color. The
-    // small angular overlap hides seams between the butt-capped arc segments.
-    const SEG = 60;
-    ctx.lineWidth = ringW;
-    ctx.lineCap = 'butt';
-    for (let i = 0; i < SEG; i++) {
-      const p0 = i / SEG;
-      const p1 = (i + 1) / SEG;
-      ctx.strokeStyle = rgb(skyTintForDayness(globalDayness((p0 + p1) / 2)));
-      ctx.beginPath();
-      ctx.arc(cx, cy, rMid, angleForPhase(p0), angleForPhase(p1) + 0.02);
-      ctx.stroke();
-    }
-
-    const phaseNow = currentDayNightPhase();
-    const daynessNow = globalDayness(phaseNow);
-    const skyNow = skyTintForDayness(daynessNow);
-
-    // centre disc tinted to the current sky, with a sun by day or a moon by night
-    ctx.fillStyle = rgb(skyNow);
-    ctx.beginPath();
-    ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
-    ctx.fill();
-    if (daynessNow >= 0.5) {
-      ctx.fillStyle = MAP_TONE.CLOCK_SUN;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = MAP_TONE.CLOCK_SUN;
-      ctx.lineWidth = 2;
-      for (let i = 0; i < 8; i++) {
-        const a = (i / 8) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * 11.5, cy + Math.sin(a) * 11.5);
-        ctx.lineTo(cx + Math.cos(a) * 15.5, cy + Math.sin(a) * 15.5);
-        ctx.stroke();
-      }
-    } else {
-      // crescent: a pale disc minus an offset disc repainted in the sky color
-      ctx.fillStyle = MAP_TONE.CLOCK_MOON;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 8.8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = rgb(skyNow);
-      ctx.beginPath();
-      ctx.arc(cx + 4.4, cy - 3.2, 8.8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // the "now" marker: a glowing pip riding the ring at the current phase,
-    // sized and haloed so the cycle position reads at a glance
-    const am = angleForPhase(phaseNow);
-    ctx.save();
-    ctx.shadowColor = MAP_TONE.CLOCK_HAND;
-    ctx.shadowBlur = 8;
-    ctx.beginPath();
-    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
-    ctx.fillStyle = MAP_TONE.CLOCK_HAND;
-    ctx.fill();
-    ctx.restore();
-    ctx.beginPath();
-    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = MAP_TONE.CLOCK_HAND_RING;
-    ctx.stroke();
+    this.dayNightDial.invalidate();
   }
 
   // Classic-style coordinate readout pinned under the minimap. Reads only the
@@ -10891,6 +10822,10 @@ export class Hud {
     this.hideTooltip();
   }
 
+  private repaintOpenMap(): void {
+    if ($('#map-window').style.display === 'block') this.updateMapWindow();
+  }
+
   private updateMapWindow(): void {
     const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
     const ctx = require2dContext(canvas);
@@ -10980,6 +10915,7 @@ export class Hud {
       : dungeon
         ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
         : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
+    this.mapSidebar.update(this.sim, zone);
     // Crossing a zone while the map is open starts that zone at its full frame;
     // a pan target from the previous zone must never leak into the new one.
     // shouldResetMapPanOnZoneCross (map_show_on_map_core.ts) is what keeps a
@@ -11003,6 +10939,8 @@ export class Hud {
       zoom: this.mapZoom,
       center: this.mapCenter,
       ping: this.mapPing,
+      filters: this.mapSidebar.filterState(),
+      route: this.mapSidebar.shownRoute(),
     });
     this.mapView = result.view;
     this.mapMarkerInteraction.setOverworld(result);
@@ -14133,7 +14071,7 @@ export class Hud {
 
   log(
     text: string,
-    color: string = HUD_LOG.PLAIN,
+    color = 'var(--color-accent)',
     decorativeIconUrl?: string,
     channel = ERROR_LOG_CHAN,
     announceWhenFiltered = false,
@@ -14195,7 +14133,7 @@ export class Hud {
   private prependTimestamp(div: HTMLElement): void {
     if (!this.chatTimestamps) return;
     const ts = document.createElement('span');
-    ts.className = 'chat-ts';
+    ts.className = 'chat-ts ui-faint ui-num';
     ts.textContent = `${formatChatTimestamp(new Date(), this.chatClock)} `;
     div.appendChild(ts);
   }
@@ -17423,6 +17361,7 @@ export class Hud {
       undefined,
       config,
       pets,
+      this.sim.player.targetId,
     );
     if (sig === this.lastPartySig) return;
     this.lastPartySig = sig;
@@ -17434,7 +17373,7 @@ export class Hud {
       config,
       pets,
     );
-    this.partyFramesPainter.sync(others, info.leader, info.raid, config);
+    this.partyFramesPainter.sync(others, info.leader, info.raid, config, this.sim.player.targetId);
     // Re-dock the Loot Settings panel below the (just re-synced) party frames when their
     // size changes (row count / raid grouping). Gated so the layout measure runs on a real
     // geometry change, not every combat tick; positionLootSettingsPanel honors a manual drag.
@@ -17681,49 +17620,6 @@ export class Hud {
       else if (act === 'kick') this.sim.partyKick(pid);
       else if (act === 'loot-settings') this.openLootSettings();
     });
-  }
-
-  // Fill the target frame's social/badge line: a linked player's nickname (with
-  // PFP), their staff-role tag, Discord rank, and developer badge. Hidden for mobs
-  // and players with no linked flair at all.
-  private updateTargetDiscordLine(target: Entity): void {
-    const el = this.targetDiscordEl;
-    const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
-    // getLanguage() is a real input here, not bookkeeping: four of this line's faces
-    // are localized while every other field is identity data a locale switch never
-    // moves, so keyed on identity alone the line sat in the PREVIOUS locale until that
-    // player's flair happened to change. targetFlairSignature owns that reasoning.
-    // The AI flag rides both the visibility test and the signature: without it an AI
-    // account carrying no Discord or dev flair would never render the line at all.
-    const flair: TargetFlairLineInput = {
-      language: getLanguage(),
-      tier: target.discordTier ?? 0,
-      name: target.discordName ?? '',
-      role: target.discordRole ?? '',
-      avatar: target.discordAvatar ?? '',
-      devIndex: showDevBadges ? (target.devTier ?? 0) : 0,
-      isAi: target.aiAccount === true,
-    };
-    if (target.kind !== 'player' || !targetFlairLineVisible(flair)) {
-      if (this.targetDiscordSig !== '') {
-        this.targetDiscordSig = '';
-        el.classList.remove('show');
-        el.replaceChildren();
-      }
-      return;
-    }
-    // This runs every frame the target frame updates; only rebuild when the line's
-    // content actually changes (else a fresh <img> per frame would re-fetch the
-    // avatar and, on a failing CDN load, flicker between the broken glyph and hidden).
-    const sig = targetFlairSignature(flair);
-    if (sig === this.targetDiscordSig) return;
-    this.targetDiscordSig = sig;
-    el.innerHTML = targetFlairLineHtml(flair);
-    // Hide the external Discord avatar if its CDN image fails to load, so the line
-    // never shows the browser's broken-image placeholder (the nickname stays).
-    const dcAvatar = el.querySelector<HTMLImageElement>('.uf-dc-name img');
-    if (dcAvatar) attachAvatarFallback(dcAvatar);
-    el.classList.add('show');
   }
 
   /** Inspect another player: a profile window with their portrait, name, level
@@ -18193,7 +18089,7 @@ export class Hud {
   ): HTMLElement {
     const stack = $('#prompt-stack');
     const prompt = document.createElement('div');
-    prompt.className = 'prompt panel';
+    prompt.className = 'prompt panel ui-panel-strong';
     prompt.innerHTML = `<div class="prompt-text">${text}</div>`;
     prompt.setAttribute('role', 'alertdialog');
     prompt.setAttribute('aria-modal', 'false');
@@ -18201,11 +18097,11 @@ export class Hud {
     promptText.id = `hud-prompt-title-${this.promptSequence++}`;
     prompt.setAttribute('aria-labelledby', promptText.id);
     const accept = document.createElement('button');
-    accept.className = 'btn';
+    accept.className = 'btn ui-btn ui-btn--red';
     accept.type = 'button';
     accept.textContent = acceptLabel;
     const decline = document.createElement('button');
-    decline.className = 'btn';
+    decline.className = 'btn ui-btn';
     decline.type = 'button';
     decline.textContent = declineLabel;
     accept.addEventListener('click', () => {
@@ -18216,7 +18112,10 @@ export class Hud {
       prompt.remove();
       onDecline();
     });
-    prompt.append(accept, decline);
+    const actions = document.createElement('div');
+    actions.className = 'prompt-actions';
+    actions.append(accept, decline);
+    prompt.append(actions, createPromptTimeoutBar());
     stack.appendChild(prompt);
     if (focusFirst) accept.focus();
     window.setTimeout(() => {
@@ -18224,7 +18123,7 @@ export class Hud {
         prompt.remove();
         onTimeout();
       }
-    }, 28000);
+    }, PROMPT_TIMEOUT_MS);
     return prompt;
   }
 
@@ -18358,17 +18257,7 @@ export class Hud {
   /** What an untouched cross hotbar is filled from: this character's action bar,
    *  plus stance-style abilities, known but unbound and so unreachable on a pad. */
   crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
-    return {
-      bar: this.hotbarActions.map((a) => (a ? { type: a.type, id: a.id } : null)),
-      // Attack leads: it is on no hotbar slot to copy (the desktop bar draws it as
-      // a fixed button), so a pad player would otherwise have no auto-attack at all.
-      extras: [
-        CROSS_HOTBAR_ATTACK_ID,
-        ...this.sim.known
-          .filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
-          .map((k) => k.def.id),
-      ],
-    };
+    return crossHotbarSeedActions(this.hotbarActions, this.sim.known);
   }
 
   /** The bar's own arrange surface, whole rather than proxied method by method. */

@@ -309,7 +309,11 @@ describe('the tracker hands its projection to the strip on touch', () => {
       writers: writers(),
       element,
       document,
-      world: () => ({ questLog }) as Pick<IWorld, 'questLog'>,
+      world: () =>
+        ({ cfg: { playerClass: 'warrior' }, player: { name: 'Adventurer' }, questLog }) as Pick<
+          IWorld,
+          'questLog' | 'cfg' | 'player'
+        >,
       settings: {
         available: () => true,
         collapsed: () => false,

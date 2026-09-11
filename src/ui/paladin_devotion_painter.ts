@@ -5,6 +5,9 @@ const READY_CLASS = 'ready';
 const ASCENDED_CLASS = 'ascended';
 const LAST_CHARGE_CLASS = 'last-charge';
 const CHARGE_ACTIVE_CLASS = 'on';
+/** Stamped on the frame's HUD host while the medallion is live, so the cross
+ *  hotbar can part its halves and seat the medallion as its keystone in pad mode. */
+const HOST_LIVE_CLASS = 'devotion-live';
 
 export class PaladinDevotionPainter {
   constructor(
@@ -15,7 +18,11 @@ export class PaladinDevotionPainter {
     private readonly label: HTMLElement,
     private readonly charges: HTMLCollection,
     private readonly status: HTMLElement,
-  ) {}
+  ) {
+    this.host = frame.parentElement ?? frame;
+  }
+
+  private readonly host: HTMLElement;
 
   paint(state: PaladinDevotionState): void {
     this.writers.setDisplay(this.frame, state.visible ? 'flex' : 'none');
@@ -34,5 +41,6 @@ export class PaladinDevotionPainter {
         state.ascended && index < state.charges,
       );
     }
+    this.writers.toggleClass(this.host, HOST_LIVE_CLASS, state.visible);
   }
 }

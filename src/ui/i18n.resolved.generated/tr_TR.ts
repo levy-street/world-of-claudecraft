@@ -902,6 +902,7 @@ export const tr_TR: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Görev takipçisini daralt",
       "expandHint": "Görev takipçisini genişlet"
     },
@@ -1266,6 +1267,9 @@ export const tr_TR: EnTranslations = {
       "previous": "Önceki koşular",
       "runLabel": "Koşu {index}",
       "runSummary": "{time} içinde {total}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Başlamak için kuklayı hedefle.",
@@ -1739,6 +1743,9 @@ export const tr_TR: EnTranslations = {
     },
     "controller": {
       "title": "Oyun Kolu",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Düğme Etiketleri",
       "glyphStyleAuto": "Otomatik",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2132,22 @@ export const tr_TR: EnTranslations = {
       "showPlaytimeAria": "Oynama süresini göster",
       "hidePlaytimeAria": "Oynama süresini gizle"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "{value} {stat} değerinden:",
       "names": {
@@ -2367,6 +2390,7 @@ export const tr_TR: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Hata Bildir",
+      "online": "Online",
       "realm": "Dünya",
       "character": "Karakter",
       "position": "Konum",
@@ -3100,11 +3124,11 @@ export const tr_TR: EnTranslations = {
       },
       "allStatsPctReduce": "Tüm nitelikleri {pct}% azaltır",
       "increasePct": {
-        "ap": "Saldırı gücünü {pct}% artırır",
-        "armor": "Zırhı {pct}% artırır",
-        "int": "Zekayı {pct}% artırır",
-        "sta": "Dayanıklılığı {pct}% artırır",
-        "allStats": "Tüm nitelikleri {pct}% artırır"
+        "ap": "Saldırı gücünü %{pct} artırır",
+        "armor": "Zırhı %{pct} artırır",
+        "int": "Zekayı %{pct} artırır",
+        "sta": "Dayanıklılığı %{pct} artırır",
+        "allStats": "Tüm nitelikleri %{pct} artırır"
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
@@ -3112,8 +3136,8 @@ export const tr_TR: EnTranslations = {
       "guardianWard": "Seni öldürecek bir sonraki düşman darbesi engellenir ve yerine canın {pct}%'e geri döner",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
-      "armorPct": "Zırhı {pct}% azaltır",
-      "armorPctStacks": "Zırhı {pct}% azaltır ({stacks} istif)",
+      "armorPct": "Zırhı %{pct} azaltır",
+      "armorPctStacks": "Zırhı %{pct} azaltır ({stacks} istif)",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -3244,6 +3268,7 @@ export const tr_TR: EnTranslations = {
       "lock": "Oyuncu çerçevesini kilitle"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Grup ve Akın Çerçeveleri",
       "optionsSection": "Grup Çerçevesi Seçenekleri",
       "unlock": "Grup ve akın çerçevelerini taşı",
@@ -4028,7 +4053,6 @@ export const tr_TR: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Toplama",
       "mining": "Madencilik",
       "logging": "Ağaç kesme",
       "herbalism": "Bitkicilik",
@@ -4212,9 +4236,7 @@ export const tr_TR: EnTranslations = {
       "noviceBody": "Bir ürünü her topladığında Çiftçilik becerin artar. Başlamak için herhangi bir bahçe yatağına tohum ek."
     },
     "archetypeTitle": {
-      "label": "Unvan",
-      "none": "Yok",
-      "hobbyLabel": "Hobi"
+      "none": "Yok"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombacı",
@@ -4384,7 +4406,9 @@ export const tr_TR: EnTranslations = {
       "hobbyLabel": "Hobi: {craft}",
       "majorsLabel": "Ana dallar: {a} ve {b}",
       "pairsHeld": "Düzenlenen çiftler: {count}",
-      "returnsLabel": "İade: {count}"
+      "returnsLabel": "İade: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "işçiliği",
@@ -4419,6 +4443,7 @@ export const tr_TR: EnTranslations = {
       "vaultUnreachable": "Malzeme Kasası burada erişilemez durumda.",
       "craftFeeLine": "Üretim ücreti: her biri {fee}",
       "empty": "Henüz bilinen bir tarif yok.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",
       "craftedToastQty": "Hazırlandı: {name} x{qty}",
@@ -4520,6 +4545,9 @@ export const tr_TR: EnTranslations = {
       "commissionToggleHint": "Ticaret yoluyla alan ilk karaktere bağlanır.",
       "commissionUnbound": "Sipariş parçası: ilk alıcıya bağlanır",
       "commissionBound": "Sipariş parçası: alıcısına bağlı"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Kullan",
@@ -5136,6 +5164,33 @@ export const tr_TR: EnTranslations = {
       "toInstance": "Örnek haritası",
       "toggleAria": "Dünya haritası, bölge haritası ve kopya haritası arasında geçiş yap",
       "levels": "Seviye {min} ile {max} arası"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Seviye {level} gerektirir"
@@ -6084,6 +6139,7 @@ export const tr_TR: EnTranslations = {
       "framesMoveBodyEditFrames": "Çerçeven, hedef çerçeven ve grup çerçevelerin tümü taşınabilir. Her birinin köşesinde küçük bir taşıma düğmesi vardır: kilidini aç, çerçeveyi istediğin yere sürükle ve yanlış bir tıklamanın yerini değiştirememesi için yeniden kilitle. Arayüz seçeneklerindeki Çerçeveler sekmesinin üstündeki Çerçeveleri Düzenle, bu üç çerçeveyle birlikte arayüzün geri kalanını da tek seferde gevşetir: eylem çubuklarını, okuma çubuğunu, savurma çubuğunu, deneyim çubuğunu, mini haritayı, düğme şeridini, evcil hayvan çerçevesini, duruş çubuğunu, takviye ve zayıflatma satırlarını ve İstek Listesi Hatırlatıcısı çipini. Bir yere pişman olursan aynı Çerçeveler sekmesinin altındaki Varsayılanlara Sıfırla hepsini başladıkları yere geri getirir.",
       "framesGovernedExtra": "Çerçeveleri Düzenle, aşağıdaki takipçi yığınını da gevşetir: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, içinde olduğun delve, katıldığın her yarık ve takip ettiğin tarif veya komisyon. Ayrıca evcil hayvan çerçevesinin yanındaki evcil hayvan eylem çubuğu, yakındaki düşmanlardaki zayıflatmaların için Hedef noktaları çerçevesi, paladinin Adanmışlık madalyası, büyücünün Lanet Çubuğu, büyü tetikleme kaplaması, çift elli savaşçılar için yardımcı el savurma sayacı ve sekmeli hasar ölçer penceresi de her biri kendi ad çipini taşırken gevşetilir.",
       "framesGovernedAuraTracks": "Arayüz seçeneklerinin aynı Arayüz sekmesindeki Savaş sekmesinden açtığın altı isteğe bağlı aura izini de Çerçeveleri Düzenle gevşetir: Takviyelerim izi, Savunma Bekleme Süreleri izi, Kalkanlarım izi, Saldırı Bekleme Süreleri izi, Hareket ve Gizlilik izi ve Müttefiklerde Takviyelerim izi. Her iz varsayılan olarak kapalıdır ve gevşekken kendi ad çipini taşır.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
       "aurasTitle": "Takviyeler ve zayıflatmalar",

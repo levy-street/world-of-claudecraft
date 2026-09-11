@@ -19,7 +19,7 @@ describe('desktop player frame sizing', () => {
     // detached seats carry the SAME expression: any difference between the
     // two renders as the content jumping sideways the moment a drag starts.
     const widthExpr =
-      'width: calc(var(--player-frame-width, 612px) * var(--player-frame-scale, 1));';
+      'width: calc(var(--player-frame-width, var(--unit-frame-w)) * var(--player-frame-scale, 1));';
     const docked = ruleBlock('#player-frame {');
     const detached = ruleBlock('#player-frame.pf-detached {');
     expect(docked).toContain(widthExpr);
@@ -29,13 +29,39 @@ describe('desktop player frame sizing', () => {
 });
 
 describe('party frame bar sizing', () => {
-  it('the hp/resource bars absorb a partyFrameHeight drag like the other unit frames', () => {
-    // The row height is the setting; the name line plus padding cost about
-    // 24px and the remainder splits across the two bars, landing on the
-    // stock 9px at the stock 42px row. A fixed bar height here is the bug
-    // the owner reported: rows grew while the health bars stayed 9px.
+  it('keeps the classic HP and resource bars at their authored heights', () => {
     const bar = ruleBlock('.party-frame .bar {');
-    expect(bar).toContain('height: max(4px, calc((var(--party-frame-height, 42px) - 24px) / 2));');
+    const hp = ruleBlock('\n  .party-frame .bar.hp {');
+    expect(bar).toContain('height: var(--party-res-h);');
+    expect(hp).toContain('height: var(--party-hp-h);');
+  });
+
+  it('lays classic rows around a 30px class-ring crest and preserves the target cue', () => {
+    const name = ruleBlock('\n  .party-frame .pfm-name {');
+    const crest = ruleBlock('\n  .party-frame .pfm-crest {');
+    const bar = ruleBlock('\n  .party-frame .bar {');
+    const target = ruleBlock('\n  .party-frame.is-on {');
+    const oor = ruleBlock('\n  .party-frame.oor {');
+    expect(name).toContain('padding-left: 38px;');
+    expect(crest).toContain('width: 30px;');
+    expect(crest).toContain('height: 30px;');
+    expect(crest).toContain('border: 2px solid var(--cls);');
+    expect(bar).toContain('margin-left: 38px;');
+    expect(target).toContain('outline: 1px solid var(--gold);');
+    expect(oor).toContain('opacity: 0.55;');
+  });
+
+  it('keeps the Party N header unbacked and the raid cells at their authored footprint', () => {
+    const header = ruleBlock('#party-frame-header {');
+    const raid = ruleBlock('#party-frames.party-style-raid .party-frame {');
+    const role = ruleBlock('#party-frames.party-style-raid .party-frame .pfm-role {');
+    expect(header).toContain('width: var(--party-row-w);');
+    expect(header).toContain('padding: 0 4px 2px;');
+    expect(header).toContain('background: transparent;');
+    expect(raid).toContain('width: var(--party-raid-cell-w);');
+    expect(raid).toContain('height: var(--party-raid-cell-h);');
+    expect(role).toContain('width: 10px;');
+    expect(role).toContain('height: 10px;');
   });
 });
 
@@ -68,6 +94,34 @@ describe('snap-to-grid alignment overlay', () => {
     expect(overlay).toMatch(
       /#interface-grid-overlay::after\s*\{[\s\S]*?top:\s*calc\(50% - 1px \/ var\(--ui-scale, 1\)\);[\s\S]*?height:\s*calc\(2px \/ var\(--ui-scale, 1\)\);/,
     );
+  });
+});
+
+describe('unit frame bar fills', () => {
+  // The review finding: the player health bar read as a striped fill. hud.css must
+  // leave the fill's LOOK to the library bevel gradient (only --bar-color per power
+  // type), and the hatched absorb overlay must start collapsed so a unit with no
+  // shield shows plain health.
+  it('gives the fills only their power color and no look of their own', () => {
+    const fill = ruleBlock('\n  .bar-fill {');
+    expect(fill).not.toContain('background');
+    for (const [cls, token] of [
+      ['.hp', '--color-hp'],
+      ['.mana', '--color-mana'],
+      ['.rage', '--color-rage'],
+      ['.energy', '--color-energy'],
+      ['.focus', '--color-focus'],
+    ]) {
+      const block = ruleBlock(`\n  ${cls} {`);
+      expect(block).toContain(`--bar-color: var(${token});`);
+      expect(block).not.toContain('background');
+    }
+  });
+
+  it('keeps the absorb hatch collapsed until a shield exists', () => {
+    const absorb = ruleBlock('\n  .bar-absorb {');
+    expect(absorb).toContain('transform: scaleX(0);');
+    expect(absorb).toContain('transform-origin: left;');
   });
 });
 

@@ -9,11 +9,13 @@ import {
 import { ITEMS, MOBS } from '../src/sim/data';
 import { occupiesHand } from '../src/sim/equipment_rules';
 import {
+  expectedLineBudget,
   expectedStatBudget,
   itemFromRaid,
   itemLevel,
   itemScore,
   itemSourceLevel,
+  itemStaminaModel,
   normalizePrimaryStats,
   PRIMARY_STATS,
   primaryStatBudget,
@@ -22,6 +24,7 @@ import {
   RIFT_CLEAR_LOOT_SOURCE_LEVEL,
   RIFT_LEGENDARY_LOOT_SOURCE_LEVEL,
   resetItemLevelCache,
+  statIdentity,
 } from '../src/sim/item_level';
 
 // The showcase tiers wired up in src/sim/content/items.ts: two trios, each one
@@ -114,25 +117,47 @@ describe('item level: showcase tiers are normalized to budget', () => {
     }
   });
 
-  it('items from the same place share one item level and one budget (same tier)', () => {
+  it('items from the same place share one item level and one line budget (same tier)', () => {
     const chestLevels = new Set(CHEST_TRIO.map((id) => itemLevel(ITEMS[id])));
-    const chestBudgets = new Set(CHEST_TRIO.map((id) => primaryStatSum(ITEMS[id])));
+    const chestLines = new Set(CHEST_TRIO.map((id) => expectedLineBudget(ITEMS[id])));
     expect(chestLevels).toEqual(new Set([10]));
-    expect(chestBudgets).toEqual(new Set([6]));
+    expect(chestLines).toEqual(new Set([6]));
+    // Totals diverge by identity: the caster piece (gravewoven_raiment) carries
+    // its stamina baseline on top of the shared line, while the two physical
+    // pieces already hold theirs inside it and so still share one total.
+    const chestTotalsByIdentity = new Map<string, Set<number>>();
+    for (const id of CHEST_TRIO) {
+      const identity = statIdentity(ITEMS[id].stats);
+      const totals = chestTotalsByIdentity.get(identity) ?? new Set<number>();
+      totals.add(primaryStatSum(ITEMS[id]));
+      chestTotalsByIdentity.set(identity, totals);
+    }
+    expect(chestTotalsByIdentity.get('physical')).toEqual(new Set([6]));
+    expect(chestTotalsByIdentity.get('caster')).toEqual(new Set([8]));
 
     const weaponLevels = new Set(WEAPON_TRIO.map((id) => itemLevel(ITEMS[id])));
-    const weaponBudgets = new Set(WEAPON_TRIO.map((id) => primaryStatSum(ITEMS[id])));
+    const weaponLines = new Set(WEAPON_TRIO.map((id) => expectedLineBudget(ITEMS[id])));
     expect(weaponLevels).toEqual(new Set([13]));
-    expect(weaponBudgets).toEqual(new Set([7]));
+    expect(weaponLines).toEqual(new Set([7]));
+    const weaponTotalsByIdentity = new Map<string, Set<number>>();
+    for (const id of WEAPON_TRIO) {
+      const identity = statIdentity(ITEMS[id].stats);
+      const totals = weaponTotalsByIdentity.get(identity) ?? new Set<number>();
+      totals.add(primaryStatSum(ITEMS[id]));
+      weaponTotalsByIdentity.set(identity, totals);
+    }
+    expect(weaponTotalsByIdentity.get('physical')).toEqual(new Set([7]));
+    expect(weaponTotalsByIdentity.get('caster')).toEqual(new Set([9]));
   });
 
   it('normalization preserved each piece stat identity (no attribute swapped in/out)', () => {
     const ident = (id: string) =>
       PRIMARY_STATS.filter((k) => (ITEMS[id].stats?.[k] ?? 0) > 0).sort();
     expect(ident('hollowbone_hauberk')).toEqual(['sta', 'str']);
-    expect(ident('gravewoven_raiment')).toEqual(['int', 'spi']);
+    // Caster pieces now also carry the free stamina baseline as a real stat.
+    expect(ident('gravewoven_raiment')).toEqual(['int', 'spi', 'sta']);
     expect(ident('cryptstalker_jerkin')).toEqual(['agi', 'sta']);
-    expect(ident('gravecaller_staff')).toEqual(['int', 'spi']);
+    expect(ident('gravecaller_staff')).toEqual(['int', 'spi', 'sta']);
   });
 });
 
@@ -301,11 +326,16 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
       if (variant.quality === 'legendary') {
         legendaries++;
         expect(itemLevel(variant), `${variant.id} ilvl`).toBe(53);
-        // The mint keeps its base's line (normalize-to-max): Heartwood's
-        // banded 65, Thronebane's owned 44 plus the heroic seed (49). The 53
-        // label prices the dominant axes, not a fresh stat roll.
+        // The mint keeps its base's line (normalize-to-max), then the stamina
+        // baseline model (item_budget.ts) lands on top of it: Heartwood is
+        // caster identity, so its 65-point line plus a 22-point baseline bands
+        // to 87; Thronebane is on the drift allowlist, so only its stamina
+        // floor was topped up, growing its own 44-point line to a 53-point
+        // total that already clears the heroic mint's target, so the mint
+        // keeps it unchanged. The 53 ilvl label prices the dominant axes, not
+        // a fresh stat roll.
         expect(primaryStatSum(variant), `${variant.id} banded stats`).toBe(
-          variant.id === 'heroic_deathless_heartwood' ? 65 : 49,
+          variant.id === 'heroic_deathless_heartwood' ? 87 : 53,
         );
         continue;
       } else {
@@ -338,7 +368,7 @@ describe('item level: every level-20 item is balanced to budget', () => {
     expect(offBudget, offBudget.join('\n')).toEqual([]);
   });
 
-  it('level-20 items of the same item level + slot + hand share one budget', () => {
+  it('level-20 items of the same item level + slot + hand + identity share one budget', () => {
     const groups = new Map<string, Set<number>>();
     for (const id of Object.keys(ITEMS)) {
       const item = ITEMS[id];
@@ -352,7 +382,12 @@ describe('item level: every level-20 item is balanced to budget', () => {
         : item.kind === 'weapon' && item.hand === 'twohand'
           ? 'twohand'
           : 'onehand';
-      const key = `${itemLevel(item)}:${item.quality}:${item.slot}:${hand}`;
+      // The stamina baseline model (item_budget.ts) makes the TOTAL
+      // identity-dependent: a caster piece carries its baseline on top of the
+      // shared line, a physical piece already holds it inside. Group by
+      // identity too so the check still pins a real shared budget within each.
+      const identity = statIdentity(item.stats);
+      const key = `${itemLevel(item)}:${item.quality}:${item.slot}:${hand}:${identity}`;
       let sums = groups.get(key);
       if (!sums) {
         sums = new Set();
@@ -367,10 +402,14 @@ describe('item level: every level-20 item is balanced to budget', () => {
 
   it('the Nythraxis legendaries carry their landed band budgets', () => {
     // The 2026-08-30 legendary band: Heartwood is BUFFED budget-true to its
-    // ilvl-49 label (65 points); Thronebane keeps its owned 44-point line by
-    // maintainer direction, priced by its weapon axis instead.
-    expect(primaryStatSum(ITEMS.deathless_heartwood)).toBe(65);
-    expect(primaryStatSum(ITEMS.kingsbane_last_oath)).toBe(44);
+    // ilvl-49 label (a 65-point line); Thronebane keeps its owned 44-point
+    // line by maintainer direction, priced by its weapon axis instead. The
+    // stamina baseline model (item_budget.ts) then lands on top: Heartwood is
+    // caster identity and fully on its line, so it bands to 65 + 22 = 87;
+    // Thronebane is on the drift allowlist, so only its stamina floor was
+    // topped up, growing its line total from 44 to 53.
+    expect(primaryStatSum(ITEMS.deathless_heartwood)).toBe(87);
+    expect(primaryStatSum(ITEMS.kingsbane_last_oath)).toBe(53);
   });
 });
 
@@ -498,9 +537,9 @@ describe('item level: crafted gear derives its level from the recipe (content/re
     // live budget is the 11o design, asserted explicitly so a well-meaning
     // re-budget to the new level reads as the nerf it would be.
     const EXPECTED: Record<string, [number, number, number]> = {
-      wardweave_cowl: [20, 11, 10],
-      duskhide_wraps: [18, 9, 7],
-      sootscale_mantle: [20, 10, 8],
+      wardweave_cowl: [20, 14, 13],
+      duskhide_wraps: [18, 11, 9],
+      sootscale_mantle: [20, 13, 11],
     };
     for (const id of CASTER_HUB_IDS) {
       const item = ITEMS[id];
@@ -516,10 +555,21 @@ describe('item level: crafted gear derives its level from the recipe (content/re
     }
   });
 
-  it('matches the existing level-20 rares sharing its slot (helmet 11, gloves 9, shoulder 10)', () => {
-    expect(primaryStatSum(ITEMS.wardweave_cowl)).toBe(primaryStatSum(ITEMS.boundstone_helm));
-    expect(primaryStatSum(ITEMS.duskhide_wraps)).toBe(primaryStatSum(ITEMS.gravewyrm_gauntlets));
-    expect(primaryStatSum(ITEMS.sootscale_mantle)).toBe(primaryStatSum(ITEMS.gravewyrm_mantle));
+  it('matches the existing level-20 rares sharing its slot on their line (helmet 11, gloves 9, shoulder 10)', () => {
+    // The hub pieces are caster identity, so their TOTAL now carries the
+    // stamina baseline on top of the line (item_budget.ts, the stamina
+    // baseline model); the shared-authoring-budget design intent only still
+    // holds on the LINE (Intellect + Spirit), which a physical sibling's
+    // total already equals since its own baseline sits inside its budget.
+    expect(itemStaminaModel(ITEMS.wardweave_cowl)?.line).toBe(
+      primaryStatSum(ITEMS.boundstone_helm),
+    );
+    expect(itemStaminaModel(ITEMS.duskhide_wraps)?.line).toBe(
+      primaryStatSum(ITEMS.gravewyrm_gauntlets),
+    );
+    expect(itemStaminaModel(ITEMS.sootscale_mantle)?.line).toBe(
+      primaryStatSum(ITEMS.gravewyrm_mantle),
+    );
   });
 });
 

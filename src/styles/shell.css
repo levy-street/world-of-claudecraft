@@ -6106,6 +6106,7 @@
      the compact header are inspect-specific. */
   #inspect-window {
     width: 740px;
+    overflow-y: auto;
   }
   /* The rich profile opens with one centered ceremonial mantle: earned identity,
      standing, and honors stay composed above the read-only paperdoll. The remote
@@ -6133,9 +6134,11 @@
     height: 132px;
   }
   .inspect-name {
-    font-family: var(--title-font);
     font-size: 20px;
-    color: #f0ead8;
+  }
+  .inspect-card-remote .inspect-name {
+    font-family: var(--title-font);
+    color: var(--color-text-light);
   }
   /* Largest member of the Deed Heraldry family. The face stays a shallow 60px,
      while the medallion keys into a blackened collar and the granting deed hangs
@@ -6307,12 +6310,7 @@
   .inspect-meta {
     display: inline-block;
     padding: 4px 9px;
-    font-size: 10.5px;
     line-height: 1;
-    color: var(--color-text-muted);
-    border: 1px solid var(--color-border-showcase);
-    border-radius: 999px;
-    background: rgba(0, 0, 0, 0.3);
   }
   .inspect-standing-row {
     display: flex;
@@ -6377,29 +6375,29 @@
     width: 32px;
     height: 32px;
     display: block;
-    filter: drop-shadow(0 1px 2px #000);
+    filter: drop-shadow(0 1px 2px var(--color-keyline));
   }
   /* $WOC holder badge halo on the player card: same static per-tier glow as the
      nameplate (hue via inline --holder-glow, strength from the tokens.css
      tunables), stronger for the two band IV regalia. Only the holder badge opts
      in (via .inspect-holder-halo), never the shared Discord badges. */
   .inspect-holder-badge.inspect-holder-halo {
-    filter: drop-shadow(0 1px 2px #000)
+    filter: drop-shadow(0 1px 2px var(--color-keyline))
       drop-shadow(0 0 var(--holder-halo) var(--holder-glow, transparent));
   }
   .inspect-holder-badge.inspect-holder-halo.inspect-holder-halo-strong {
-    filter: drop-shadow(0 1px 2px #000)
+    filter: drop-shadow(0 1px 2px var(--color-keyline))
       drop-shadow(0 0 var(--holder-halo-strong) var(--holder-glow, transparent));
   }
   /* Contributor (dev-tier) badge halo on the inspect card: same shared strength
      tunables, hue via inline --dev-glow, stronger for the significant tiers. Only
      the dev badge opts in (via .inspect-dev-halo), never the shared Discord badges. */
   .inspect-holder-badge.inspect-dev-halo {
-    filter: drop-shadow(0 1px 2px #000)
+    filter: drop-shadow(0 1px 2px var(--color-keyline))
       drop-shadow(0 0 var(--holder-halo) var(--dev-glow, transparent));
   }
   .inspect-holder-badge.inspect-dev-halo.inspect-dev-halo-strong {
-    filter: drop-shadow(0 1px 2px #000)
+    filter: drop-shadow(0 1px 2px var(--color-keyline))
       drop-shadow(0 0 var(--holder-halo-strong) var(--dev-glow, transparent));
   }
   /* Curator sigil halo on the inspect card: the same shared strength tunable as
@@ -6408,7 +6406,7 @@
      Only the sigil opts in (via .inspect-curator-halo), never the shared Discord
      badges. */
   .inspect-holder-badge.inspect-curator-halo {
-    filter: drop-shadow(0 1px 2px #000)
+    filter: drop-shadow(0 1px 2px var(--color-keyline))
       drop-shadow(0 0 var(--holder-halo) var(--curator-glow, transparent));
   }
   .inspect-holder-text {
@@ -6423,13 +6421,9 @@
     overflow: hidden;
     font-family: var(--title-font);
     font-size: 14px;
-    color: #f0ead8;
+    color: var(--color-text-light);
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-  .inspect-holder-sub {
-    font-size: 11px;
-    color: var(--color-text-muted);
   }
   .inspect-honor-rail .inspect-holder-sub {
     color: color-mix(in srgb, var(--color-text-overlay) 72%, transparent);
@@ -6447,11 +6441,7 @@
     align-items: center;
     gap: 12px;
     margin-bottom: 5px;
-    font-family: var(--title-font);
-    font-size: 13px;
-    color: var(--color-text-muted);
     text-align: center;
-    letter-spacing: 0.08em;
   }
   .inspect-equip-title::before,
   .inspect-equip-title::after {
@@ -6466,6 +6456,13 @@
       transparent
     );
   }
+  /* The armor columns stretch to the stage height and space their rows evenly,
+     so five sockets read as a band beside the tall inspect stage rather than a
+     cluster at its top. */
+  .inspect-paperdoll .equip-col {
+    align-self: stretch;
+    justify-content: space-evenly;
+  }
   /* The model stage takes the inspected player's CLASS color, delivered as the
      --inspect-class-color custom property the painter sets. Fixed width so the
      columns flex around it (the same band-centering contract as the sheet), and
@@ -6473,19 +6470,29 @@
   #inspect-window .inspect-model-panel {
     min-height: 400px;
     border: 1px solid var(--color-border-showcase);
-    outline: 1px solid color-mix(in srgb, var(--inspect-class-color, #5a4a20) 38%, transparent);
+    outline: 1px solid
+      color-mix(in srgb, var(--inspect-class-color, var(--color-border-default)) 38%, transparent);
     outline-offset: -5px;
     box-shadow:
-      0 0 10px 0 color-mix(in srgb, var(--inspect-class-color, #5a4a20) 18%, transparent),
-      inset 0 0 0 1px rgba(0, 0, 0, 0.8),
-      inset 0 0 60px rgba(0, 0, 0, 0.55);
+      0 0 10px 0
+      color-mix(in srgb, var(--inspect-class-color, var(--color-border-default)) 18%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-keyline) 80%, transparent),
+      inset 0 0 60px color-mix(in srgb, var(--color-keyline) 55%, transparent);
     background:
       radial-gradient(
         ellipse 66% 48% at 50% 62%,
-        color-mix(in srgb, var(--inspect-class-color, #5a4a20) 15%, transparent),
+        color-mix(
+          in srgb,
+          var(--inspect-class-color, var(--color-border-default)) 15%,
+          transparent
+        ),
         transparent 74%
       ),
-      linear-gradient(to bottom, rgba(20, 16, 8, 0.22), rgba(0, 0, 0, 0.54));
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-card-hi) 22%, transparent),
+        color-mix(in srgb, var(--color-keyline) 54%, transparent)
+      );
   }
   #inspect-window .inspect-model-panel::after {
     content: "";
@@ -6494,8 +6501,13 @@
     right: 18%;
     bottom: 34px;
     height: 30px;
-    border-top: 1px solid color-mix(in srgb, var(--inspect-class-color, #5a4a20) 32%, transparent);
-    background: radial-gradient(ellipse 50% 50% at 50% 45%, rgba(0, 0, 0, 0.62), transparent 72%);
+    border-top: 1px solid
+      color-mix(in srgb, var(--inspect-class-color, var(--color-border-default)) 32%, transparent);
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 45%,
+      color-mix(in srgb, var(--color-keyline) 62%, transparent),
+      transparent 72%
+    );
     pointer-events: none;
   }
 

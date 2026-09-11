@@ -4,6 +4,21 @@
 
 import { parseStoredJson } from './local_storage_json';
 
+/** The unit frame's whole-row stock width, mirroring --unit-frame-w in tokens.css. */
+export const UNIT_FRAME_STOCK_WIDTH = 278;
+
+/**
+ * Widths persisted under the retired semantics (playerFrameWidth was a 612px full
+ * row around a 520px bars panel, targetFrameWidth was a 190px BARS panel). Both
+ * vars now drive the whole frame, so a stored legacy stock re-stamps to the new
+ * stock instead of shipping a frame the player never chose; a value the player
+ * actually dragged is left to the range clamp.
+ */
+const LEGACY_STOCK_FRAME_WIDTHS: Partial<Record<string, number>> = {
+  playerFrameWidth: 612,
+  targetFrameWidth: 190,
+};
+
 // Camera default is 0.7: the old fixed speed (1.0) was near the top of the
 // reasonable range and drew complaints, so out of the box it's calmer while
 // the slider still reaches 1.25 for players who liked it fast.
@@ -191,14 +206,16 @@ export const SETTING_RANGES = {
   // Real-dimension sizing for the player/target unit frames, the raid-frame
   // model: the interface editor's edge drags write these settings, so the
   // bars RE-LAY-OUT at their crisp text size instead of transform-stretching.
-  // playerFrameWidth is the frame's full row width (--player-frame-width;
-  // stock 612 = the 520px bars panel plus 92px of portrait chrome), while
-  // targetFrameWidth is that frame's bars-panel width (--target-frame-width,
-  // stock 190). The two heights are the hp/resource BAR thickness in px
-  // (--player-frame-height / --target-frame-height, stock 15).
-  playerFrameWidth: { min: 300, max: 900, def: 612 },
+  // BOTH widths are the frame's WHOLE row width (--player-frame-width /
+  // --target-frame-width), stock 278 = the --unit-frame-w design stock; hud.css
+  // derives each bars panel as the width minus 46px of portrait chrome. main.ts
+  // writes every persisted value onto the root, so the CSS var fallback never
+  // applies and these defaults ARE what desktop ships. The two heights are the
+  // hp/resource BAR thickness in px (--player-frame-height /
+  // --target-frame-height, stock 15).
+  playerFrameWidth: { min: 200, max: 460, def: UNIT_FRAME_STOCK_WIDTH },
   playerFrameHeight: { min: 8, max: 30, def: 15 },
-  targetFrameWidth: { min: 100, max: 320, def: 190 },
+  targetFrameWidth: { min: 200, max: 460, def: UNIT_FRAME_STOCK_WIDTH },
   targetFrameHeight: { min: 8, max: 30, def: 15 },
   // Health text on the player frame and on the target (plus target-of-target)
   // frame, same mode table as partyFrameHealthText below; both default to the
@@ -614,6 +631,11 @@ function clampNumeric(key: NumericSettingKey, v: number): number {
   return Math.min(r.max, Math.max(r.min, v));
 }
 
+/** Load-time only: see LEGACY_STOCK_FRAME_WIDTHS. */
+function migrateStoredNumeric(key: NumericSettingKey, v: number): number {
+  return LEGACY_STOCK_FRAME_WIDTHS[key] === v ? SETTING_RANGES[key].def : v;
+}
+
 function defaultTouchInterface(): boolean {
   try {
     if (typeof document !== 'undefined' && document.body.classList.contains('native-app'))
@@ -665,7 +687,10 @@ export class Settings {
     const out = {} as GameSettings;
     for (const key of NUMERIC_KEYS) {
       const v = raw[key];
-      out[key] = typeof v === 'number' ? clampNumeric(key, v) : SETTING_RANGES[key].def;
+      out[key] =
+        typeof v === 'number'
+          ? clampNumeric(key, migrateStoredNumeric(key, v))
+          : SETTING_RANGES[key].def;
     }
     for (const key of BOOL_KEYS) {
       const v = raw[key];

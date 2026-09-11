@@ -602,7 +602,11 @@ describe('skill plate tokens and CSS contract', () => {
   });
 
   it('keeps the plate rules and the variant-agnostic art+subtext layout', () => {
-    expect(hudCss).toMatch(/#banner\.banner-skill\s*\{[^}]*background: var\(--skill-banner-bg\)/);
+    // The redesign routes the skill plate through ui-panel-strong and sets its
+    // variant background through the primitive's host input.
+    expect(hudCss).toMatch(
+      /#banner\.banner-skill\s*\{[^}]*--panel-bg-strong: var\(--skill-banner-bg\)/,
+    );
     expect(hudCss).toMatch(/#banner\.banner-with-art\.has-subtext\s*\{[^}]*flex-direction: row/);
     expect(hudCss).toMatch(
       /#banner\.banner-with-art\.has-subtext \.banner-art-copy\s*\{[^}]*flex-direction: column/,

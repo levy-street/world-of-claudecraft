@@ -402,8 +402,8 @@ export class PerfectingWindow {
     // The rewrite targets the inner shell so the sibling live region never
     // leaves the tree (see root()).
     shell.innerHTML =
-      `<div class="panel-title"><span id="perfecting-title">${esc(t('hudChrome.perfecting.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close data-focus-key="pfClose" aria-label="${esc(t('hudChrome.perfecting.close'))}" title="${esc(t('hudChrome.perfecting.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title" id="perfecting-title">${esc(t('hudChrome.perfecting.title'))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="pfClose" aria-label="${esc(t('hudChrome.perfecting.close'))}" title="${esc(t('hudChrome.perfecting.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="pf-body">${this.bodyHtml(view)}</div>`;
     this.wire(root, view);
     const newScroller = root.querySelector<HTMLElement>('.pf-body');
@@ -684,7 +684,7 @@ export class PerfectingWindow {
     // the same copy the selection anchor follows across a bag shift.
     const focusKey = `cand:${c.identity}`;
     const location = perfectingCandidateLocation(c.ref, candidates);
-    const worn = location ? `<span class="pf-chip">${esc(location)}</span>` : '';
+    const worn = location ? `<span class="pf-chip ui-chip">${esc(location)}</span>` : '';
     // A promoted legend's row leads with its player-chosen name (raw VALUE,
     // esc'd standalone per D13-2) so two promotions of one base item read
     // apart at a glance; the base name rides beneath, the detail-pane shape.
@@ -694,7 +694,7 @@ export class PerfectingWindow {
         ? `<span class="pf-cand-sub">${esc(name)}</span>`
         : '';
     return (
-      `<li role="none"><button type="button" role="radio" class="pf-cand" data-cand-i="${index}" data-focus-key="${esc(focusKey)}" aria-checked="${c.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}">` +
+      `<li role="none"><button type="button" role="radio" class="pf-cand ui-card" data-cand-i="${index}" data-focus-key="${esc(focusKey)}" aria-checked="${c.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}">` +
       `<span class="pf-cand-socket">${icon}</span>` +
       `<span class="pf-cand-main"><span class="pf-cand-names"><span class="pf-name${c.state === 'promoted' ? ' q-legendary' : ''}">${esc(rowName)}</span>${sub}</span>${worn}</span>` +
       `<span class="pf-cand-state">${esc(perfectingCandidateState(c.state, c.rank, c.ranks))}</span>` +
@@ -781,7 +781,7 @@ export class PerfectingWindow {
     const action =
       d.action === 'done'
         ? ''
-        : `<button type="button" class="pf-action" data-action data-focus-key="pfAction"${d.actionEnabled ? '' : ' disabled'}>${esc(actionLabel)}</button>`;
-    return `<div class="pf-detail">${head}${track}${lead}${warning}${mats}${skill}${equipBlocked}${action}</div>`;
+        : `<button type="button" class="pf-action ui-btn ui-btn--gold" data-action data-focus-key="pfAction"${d.actionEnabled ? '' : ' disabled'}>${esc(actionLabel)}</button>`;
+    return `<div class="pf-detail ui-card">${head}${track}${lead}${warning}${mats}${skill}${equipBlocked}${action}</div>`;
   }
 }

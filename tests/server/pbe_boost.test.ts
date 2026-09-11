@@ -1037,9 +1037,14 @@ describe('tank kit identity: the caster-belt tripwire (Phase 18, re-derived on t
   // is exactly the weight that let the recorded offender's 9 int read as
   // identity; the tripwire asks about the stats the kit exists for.
   const PRIMARY_WEIGHT = 0.5;
-  const carriesRoleStat = (role: BoostRole, def: ItemDef): boolean =>
+  const carriesRoleStat = (
+    role: BoostRole,
+    def: ItemDef,
+    ignore: readonly string[] = [],
+  ): boolean =>
     (Object.entries(role.weights) as [keyof NonNullable<ItemDef['stats']>, number][]).some(
-      ([stat, weight]) => weight >= PRIMARY_WEIGHT && (def.stats?.[stat] ?? 0) > 0,
+      ([stat, weight]) =>
+        weight >= PRIMARY_WEIGHT && !ignore.includes(stat) && (def.stats?.[stat] ?? 0) > 0,
     );
 
   it.each(TANK_ROLES)(
@@ -1060,9 +1065,14 @@ describe('tank kit identity: the caster-belt tripwire (Phase 18, re-derived on t
       expect(offender?.slot).toBe('waist');
       expect(canEquipItem(cls, offender)).toBe(true);
       expect(meetsLevelRequirement(BOOST_LEVEL, offender)).toBe(true);
-      expect(carriesRoleStat(role, offender), 'the offender still carries no tank stat').toBe(
-        false,
-      );
+      // Under the stamina baseline model (item_budget.ts) every item carries
+      // stamina, the offender included, so the premise is stated on the tank
+      // OFFENSE stat the role weights at half or more (Strength): the caster
+      // belt still carries none of it, which is what made it an offender.
+      expect(
+        carriesRoleStat(role, offender, ['sta']),
+        'the offender still carries no tank offense stat',
+      ).toBe(false);
       expect(
         roleItemScore(role, waist),
         `${cls}/${roleId}: spiritweld_girdle out-scores the worn waist ${waist.id} again`,

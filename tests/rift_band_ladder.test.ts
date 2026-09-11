@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import { RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { ITEMS } from '../src/sim/data';
-import { primaryStatBudget } from '../src/sim/item_budget';
+import { primaryStatBudget, staminaBaseline } from '../src/sim/item_budget';
 import { itemLevel, primaryStatSum } from '../src/sim/item_level';
 import {
   RIFT_BAND_GEM_SLOTS,
@@ -23,6 +23,7 @@ import type { RiftTier } from '../src/sim/types';
 
 const TIERS: readonly RiftTier[] = ['C', 'B', 'A', 'S'];
 const MIGHT = { primary: 'str', secondary: 'sta' } as const;
+const INSIGHT = { primary: 'int', secondary: 'spi' } as const;
 
 /** The raid ring line the ladder is priced under: an Ignivar epic ring. */
 const RAID_RING_ID = 'seal_of_the_forgewall';
@@ -82,6 +83,33 @@ describe('rift band ladder: primary stats', () => {
         expect(stats.sta ?? 0).toBeGreaterThan(0);
       }
     }
+  });
+
+  it('the caster shell carries the ring budget on its line and the free stamina baseline on top', () => {
+    // The stamina baseline model (item_budget.ts): a physical shell's 3:2 split
+    // already holds its stamina inside the budget; the Insight shell (int/spi)
+    // gets the baseline placed by the model-aware normaliser. Pinned as literals
+    // at the two ends of the ladder so a revert to the plain normaliser reds.
+    const floor = riftBandPrimaryStats(INSIGHT, riftBandItemLevel('C', 0));
+    const maxed = riftBandPrimaryStats(INSIGHT, riftBandItemLevel('S', RIFT_BAND_MAX_UPGRADE));
+    for (const [label, stats, ilvl] of [
+      ['C +0', floor, riftBandItemLevel('C', 0)],
+      ['S max', maxed, riftBandItemLevel('S', RIFT_BAND_MAX_UPGRADE)],
+    ] as const) {
+      const line = primaryStatBudget(ilvl, 'epic', 'ring');
+      expect((stats.int ?? 0) + (stats.spi ?? 0), `${label} line`).toBe(line);
+      expect(stats.sta, `${label} baseline`).toBe(staminaBaseline(line));
+      expect(stats.int ?? 0, `${label} identity`).toBeGreaterThanOrEqual(stats.spi ?? 0);
+    }
+    expect(maxed).toEqual({ int: 8, spi: 6, sta: 5 });
+  });
+
+  it('a maxed S caster band never out-stats the caster raid ring of the same tier', () => {
+    // Same ceiling as the physical check below, on the Insight shell against an
+    // Ignivar caster ring (int 10, spi 5, sta 5), like for like under the model.
+    const maxed = riftBandPrimaryStats(INSIGHT, riftBandItemLevel('S', RIFT_BAND_MAX_UPGRADE));
+    const total = (maxed.int ?? 0) + (maxed.spi ?? 0) + (maxed.sta ?? 0);
+    expect(total).toBeLessThan(primaryStatSum(ITEMS.circle_of_cinders));
   });
 
   it('a maxed S band never out-stats the raid ring it is priced under', () => {

@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1010,
-      "state": "f7d77d1e",
+      "state": "6c9c3066",
       "events": "ee4ebe83",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1010,
-      "state": "ad4c2533",
+      "state": "c7a47ab7",
       "events": "1bd60145",
       "rng": {
         "draws": 66,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1010,
-      "state": "ede0584d",
+      "state": "d8dc3619",
       "events": "cc883821",
       "rng": {
         "draws": 247,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1010,
-      "state": "f4a69a06",
+      "state": "a0d6afde",
       "events": "a4509c69",
       "rng": {
         "draws": 485,
@@ -74,8 +74,8 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1010,
-      "state": "fece7f91",
-      "events": "3abfaa21",
+      "state": "8ad3e6c9",
+      "events": "d7855660",
       "rng": {
         "draws": 756,
         "digest": "b0eecf8d"
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1010,
-      "state": "4d479d8a",
+      "state": "bca018c6",
       "events": "741638a5",
       "rng": {
         "draws": 1041,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 1010,
-      "state": "499030b5",
+      "state": "7b7c805e",
       "events": "940cfa12",
       "rng": {
         "draws": 1178,
@@ -133,7 +133,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 510
+              "damageDealt": 700
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -529,12 +529,12 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 107.15,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1007,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
@@ -558,7 +558,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -580,12 +580,12 @@
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
           "healPower": 6,
-          "hp": 510,
+          "hp": 700,
           "id": 1008,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 510,
+          "maxHp": 700,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "rusty_dagger",
@@ -616,7 +616,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "templateId": "rogue",

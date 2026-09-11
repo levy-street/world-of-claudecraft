@@ -511,7 +511,7 @@ export const WRAITHWOOD_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 52, sta: 3, spi: 3 },
+    stats: { armor: 52, sta: 3, spi: 5 },
     sellValue: 1000,
   },
   mantle_of_the_unhorsed: {
@@ -521,7 +521,7 @@ export const WRAITHWOOD_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 76, sta: 6, spi: 4 },
+    stats: { armor: 76, sta: 6, spi: 7 },
     sellValue: 2400,
   },
 };

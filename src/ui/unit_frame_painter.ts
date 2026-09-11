@@ -39,11 +39,12 @@ import {
   DEED_HERALDRY_WELL_PROP,
 } from './deed_border_view';
 import type { PainterHostWriters } from './painter_host';
-import type { UnitFrameView } from './unit_frame';
+import { absorbSegmentTransform, type UnitFrameView } from './unit_frame';
 
 // The mutually-exclusive resource-type classes the painter toggles on the resource
 // container. Exactly one is on for a live power bar; all are off for `none`.
 const RES_TYPE_CLASSES = ['rage', 'energy', 'focus', 'mana'] as const;
+const EMPTY_RESOURCE_CLASS = 'is-empty';
 // The shield-overlay class (the shield reaches the bar's right edge).
 const OVERSHIELD_CLASS = 'overshield';
 // Frame-state classes target/party need; the player always passes them off.
@@ -212,13 +213,18 @@ export class UnitFramePainter {
     this.writers.setStyleProp(host, DEED_HERALDRY_WELL_PROP, accent ? DEED_HERALDRY_WELL_FILL : '');
   }
 
-  // The shield overlay: a scaleX transform to (hp + absorb)/maxHp plus the
-  // overshield class. Folds the former raw updateAbsorb('#pf-absorb', p) onto the
-  // elided writers; skipped for a frame with no shield bar.
+  // The shield overlay: the hatched SEGMENT the shield actually adds, seated at
+  // its own left edge, plus the overshield class. Folds the former raw
+  // updateAbsorb('#pf-absorb', p) onto the elided writers; skipped for a frame
+  // with no shield bar.
   private paintAbsorb(view: UnitFrameView): void {
     const absorb = this.el.absorb;
     if (!absorb) return;
-    this.writers.setTransform(absorb, this.barScaleX(view.absorbFrac));
+    const size = view.absorbSizeFrac;
+    this.writers.setTransform(
+      absorb,
+      absorbSegmentTransform(view.absorbStartFrac, size, this.barScaleX(size)),
+    );
     this.writers.toggleClass(absorb, OVERSHIELD_CLASS, view.absorbOvershield);
   }
 
@@ -231,6 +237,7 @@ export class UnitFramePainter {
     for (const cls of RES_TYPE_CLASSES) {
       this.writers.toggleClass(res.container, cls, view.resClass === cls);
     }
+    this.writers.toggleClass(res.container, EMPTY_RESOURCE_CLASS, view.resText.length === 0);
     this.writers.setTransform(res.fill, this.barScaleX(view.resFrac));
     if (res.text) this.writers.setText(res.text, view.resText);
   }

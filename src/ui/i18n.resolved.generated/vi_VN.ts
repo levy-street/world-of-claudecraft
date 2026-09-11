@@ -902,6 +902,7 @@ export const vi_VN: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Thu gọn bảng theo dõi nhiệm vụ",
       "expandHint": "Mở rộng bảng theo dõi nhiệm vụ"
     },
@@ -1266,6 +1267,9 @@ export const vi_VN: EnTranslations = {
       "previous": "Các lượt trước",
       "runLabel": "Lượt luyện tập {index}",
       "runSummary": "{total} trong {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Nhắm vào hình nộm để bắt đầu.",
@@ -1739,6 +1743,9 @@ export const vi_VN: EnTranslations = {
     },
     "controller": {
       "title": "Tay Cầm",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Nhãn Nút",
       "glyphStyleAuto": "Tự Động",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2132,22 @@ export const vi_VN: EnTranslations = {
       "showPlaytimeAria": "Hiện thời gian chơi",
       "hidePlaytimeAria": "Ẩn thời gian chơi"
     },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
+    },
     "statInfo": {
       "fromYour": "Từ {value} {stat} của bạn:",
       "names": {
@@ -2367,6 +2390,7 @@ export const vi_VN: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Báo Cáo Lỗi",
+      "online": "Online",
       "realm": "Thế Giới",
       "character": "Nhân vật",
       "position": "Vị Trí",
@@ -3244,6 +3268,7 @@ export const vi_VN: EnTranslations = {
       "lock": "Khóa khung người chơi"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Khung Tổ Đội và Raid",
       "optionsSection": "Tùy Chọn Khung Tổ Đội",
       "unlock": "Di chuyển khung tổ đội và raid",
@@ -4028,7 +4053,6 @@ export const vi_VN: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Thu thập",
       "mining": "Khai mỏ",
       "logging": "Đốn gỗ",
       "herbalism": "Thảo dược học",
@@ -4212,9 +4236,7 @@ export const vi_VN: EnTranslations = {
       "noviceBody": "Kỹ năng trồng trọt tăng mỗi khi bạn thu hoạch cây. Gieo hạt vào bất kỳ luống nào để bắt đầu."
     },
     "archetypeTitle": {
-      "label": "Danh hiệu",
-      "none": "Không có",
-      "hobbyLabel": "Sở Thích"
+      "none": "Không có"
     },
     "archetypePair": {
       "engineering+alchemy": "Chuyên Gia Nổ",
@@ -4384,7 +4406,9 @@ export const vi_VN: EnTranslations = {
       "hobbyLabel": "Sở thích: {craft}",
       "majorsLabel": "Chuyên ngành: {a} và {b}",
       "pairsHeld": "Các cặp được tổ chức: {count}",
-      "returnsLabel": "Trả về: {count}"
+      "returnsLabel": "Trả về: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
     },
     "crafting": {
       "title": "Chế tạo",
@@ -4419,6 +4443,7 @@ export const vi_VN: EnTranslations = {
       "vaultUnreachable": "Kho Nguyên Liệu không thể tiếp cận được ở đây.",
       "craftFeeLine": "Phí chế tạo: {fee} mỗi món",
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
       "craftedToastQty": "Đã chế tác: {name} x{qty}",
@@ -4520,6 +4545,9 @@ export const vi_VN: EnTranslations = {
       "commissionToggleHint": "Ràng buộc với nhân vật đầu tiên nhận nó qua giao dịch.",
       "commissionUnbound": "Đồ ủy thác: ràng buộc với người nhận đầu tiên",
       "commissionBound": "Đồ ủy thác: đã ràng buộc với người nhận"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Sử Dụng",
@@ -5136,6 +5164,33 @@ export const vi_VN: EnTranslations = {
       "toInstance": "Bản đồ sơ thẩm",
       "toggleAria": "Chuyển đổi giữa bản đồ thế giới, bản đồ vùng và bản đồ phiên",
       "levels": "Cấp {min} đến {max}"
+    },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
     },
     "arenaGate": {
       "minLevelNote": "Yêu cầu Cấp {level}"
@@ -6084,6 +6139,7 @@ export const vi_VN: EnTranslations = {
       "framesMoveBodyEditFrames": "Khung của bạn, khung mục tiêu và khung tổ đội đều di chuyển được. Mỗi khung có nút di chuyển nhỏ ở góc: mở khóa, kéo đến nơi muốn đặt rồi khóa lại để cú bấm nhầm không làm nó xê dịch. Chỉnh Khung ở đầu thẻ Khung trong tùy chọn Giao Diện mở khóa phần còn lại của giao diện cùng lúc, gồm cả ba khung trên: thanh hành động, thanh niệm phép, thanh đòn đánh, thanh kinh nghiệm, bản đồ nhỏ, dãy nút, khung thú cưng, thanh tư thế, hàng bùa lợi và bùa hại, cùng nhãn Nhắc Danh Sách Mong Muốn. Mỗi thành phần hiện tên khi mở khóa. Nếu đặt nhầm, Khôi Phục Mặc Định ở cuối cùng thẻ Khung đó đưa tất cả về vị trí ban đầu.",
       "framesGovernedExtra": "Chỉnh Khung cũng mở khóa cụm theo dõi phía dưới (nhiệm vụ và mục tiêu đang theo dõi, tiến độ chiến công, trang Thánh Tích, hang thám hiểm hiện tại, khe nứt đang tham gia, và công thức hoặc đơn đặt chế tác đang theo dõi), thanh hành động cạnh khung thú cưng, khung hiệu ứng theo thời gian trên mục tiêu để xem bùa hại của bạn trên kẻ địch gần đó, huy hiệu Tận Hiến của Thánh Kỵ Sĩ, thanh Thống Khổ của Thuật Sĩ, lớp hiển thị phép được kích hoạt, thanh đếm đòn tay phụ cho người dùng hai vũ khí và cửa sổ thống kê sát thương có thẻ. Mỗi thành phần hiện nhãn tên riêng khi mở khóa.",
       "framesGovernedAuraTracks": "Chỉnh Khung cũng mở khóa sáu thanh hào quang tùy chọn sau khi bạn bật chúng trong thẻ Chiến Đấu của cùng cửa sổ tùy chọn Giao Diện: Bùa Lợi Của Tôi, Hồi Chiêu Phòng Thủ, Lá Chắn Của Tôi, Hồi Chiêu Tấn Công, Di Chuyển Và Tàng Hình, và Bùa Lợi Của Tôi Trên Đồng Minh. Mặc định mọi thanh đều tắt; mỗi thanh hiện nhãn tên riêng khi được mở khóa.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
       "aurasTitle": "Buff và debuff",

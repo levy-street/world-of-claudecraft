@@ -10,6 +10,7 @@
 // Vitest runs in plain Node here (no jsdom), so we hand-roll the minimal DOM the
 // consumer touches, mirroring the stub style of tests/input.test.ts.
 
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PerfOverlay } from '../src/ui/perf_overlay';
 import { defaultPerfOverlayConfig } from '../src/ui/perf_overlay_config';
@@ -155,6 +156,35 @@ describe('PerfOverlay graph sizing', () => {
     // dpr clamped to 2; backing pixels = measured CSS width * dpr.
     expect(canvas.width).toBe(WIDE * 2);
     expect(canvas.height).toBe(26 * 2);
+  });
+});
+
+// W20: the metric chips toggled a `.sel` class whose rule was deleted with the
+// legacy set-choice look, so an ENABLED chip was pixel-identical to a disabled
+// one. They now compose ui-btn and let the library paint the selected state off
+// the aria-pressed the chip already carried.
+describe('perf overlay: the metric chips show their enabled state', () => {
+  const settings = readFileSync(
+    new URL('../src/ui/perf_overlay_settings.ts', import.meta.url),
+    'utf8',
+  );
+  const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
+
+  it('mints the chip on the library button', () => {
+    expect(settings).toContain("btn.className = 'btn ui-btn set-choice-btn';");
+    expect(settings).not.toContain("btn.className = 'btn set-choice-btn';");
+  });
+
+  it('drives the selected fill from aria-pressed', () => {
+    // .ui-btn[aria-pressed="true"] is the selected variant, and the chip's sync()
+    // writes that attribute on every render.
+    expect(settings).toMatch(/btn\.setAttribute\('aria-pressed', String\(on\)\)/);
+    const library = readFileSync(new URL('../src/styles/library.css', import.meta.url), 'utf8');
+    expect(library).toContain('.ui-btn[aria-pressed="true"] {');
+  });
+
+  it('no longer relies on a .set-choice-btn.sel rule that does not exist', () => {
+    expect(components).not.toContain('.set-choice-btn.sel');
   });
 });
 

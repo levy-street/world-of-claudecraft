@@ -199,21 +199,27 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
 
   it('keeps the proc marker visible without animation and in forced-colors mode', () => {
     const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const libraryCss = readFileSync(new URL('../src/styles/library.css', import.meta.url), 'utf8');
     const mobileCss = readFileSync(
       new URL('../src/styles/hud.mobile.css', import.meta.url),
       'utf8',
     );
-    expect(css).toMatch(
-      /\.action-btn\.proc \{[\s\S]*?border-color: #ffd97a;[\s\S]*?0 0 12px #ffcf40e6/,
+    // Proc chrome now belongs to ui-socket; hud.css owns only its animated pulse frames.
+    expect(libraryCss).toMatch(
+      /\.ui-socket\.is-proc,\s*\.ui-socket\.proc \{[\s\S]*?border-color: var\(--color-proc-rim\);[\s\S]*?var\(--color-proc-glow\)/,
     );
+    expect(css).toMatch(/\.action-btn\.proc \{\s*animation: abtn-proc-pulse/);
+    expect(css).toContain('box-shadow: var(--glow-action-proc-soft);');
+    expect(css).toContain('box-shadow: var(--glow-action-proc-strong);');
     expect(css).toMatch(
       /@media \(forced-colors: active\) \{[\s\S]*?\.action-btn\.proc \{[\s\S]*?border: 3px double Highlight;[\s\S]*?outline: 1px solid CanvasText;/,
     );
     expect(css).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.action-btn\.proc,[\s\S]*?animation: none;/,
     );
+    // The ring reads the same proc tokens as the socket primitive; only the blur radius tiers.
     expect(mobileCss).toMatch(
-      /#mobile-action-ring button\.proc \{[\s\S]*?border-color: #ffd97a;[\s\S]*?0 0 12px #ffcf40e6/,
+      /#mobile-action-ring button\.proc \{[\s\S]*?border-color: var\(--color-proc-rim\);[\s\S]*?calc\(12px \* var\(--fx-shadow, 1\)\)[\s\S]*?var\(--color-proc-glow\)/,
     );
     expect(mobileCss).toMatch(
       /@media \(forced-colors: active\) \{[\s\S]*?#mobile-action-ring button\.proc \{[\s\S]*?border: 3px double Highlight;[\s\S]*?outline: 1px solid CanvasText;/,
@@ -226,8 +232,9 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
   it('styles the aiming marker on desktop slots and mobile ring buttons', () => {
     const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
 
+    // The double gold ring distinguishes armed targeting from the steady focus ring.
     expect(css).toMatch(
-      /\.action-btn\.aiming,\s*body\.mobile-touch #mobile-action-ring button\.aiming \{[\s\S]*?outline: 2px solid var\(--color-border-focus\);/,
+      /\.action-btn\.aiming,\s*body\.mobile-touch #mobile-action-ring button\.aiming \{\s*outline: 3px double var\(--gold\);\s*outline-offset: 1px;\s*\}/,
     );
   });
 });

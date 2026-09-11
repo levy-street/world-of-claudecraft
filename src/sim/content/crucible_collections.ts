@@ -1,6 +1,6 @@
 // Raid crafting collections. Each profile has three slot choices and one
 // two-piece signature. Acquisition and budgets are independent of Perfecting.
-import { normalizePrimaryStats, primaryStatBudget } from '../item_budget';
+import { normalizeToStaminaModel, primaryStatBudget } from '../item_budget';
 import type { ProfessionRecipeRecord } from '../professions/types';
 import type {
   ArmorType,
@@ -54,7 +54,7 @@ const PROFILES: readonly Profile[] = [
     role: 'caster',
     armorType: 'mail',
     classes: ['shaman'],
-    primary: { int: 17, sta: 8 },
+    primary: { int: 17, spi: 8 },
   },
   {
     id: 'crucible_healer_mail',
@@ -62,7 +62,7 @@ const PROFILES: readonly Profile[] = [
     role: 'healer',
     armorType: 'mail',
     classes: ['paladin', 'shaman'],
-    primary: { int: 14, spi: 7, sta: 4 },
+    primary: { int: 14, spi: 11 },
   },
   {
     id: 'crucible_agi_leather',
@@ -94,7 +94,7 @@ const PROFILES: readonly Profile[] = [
     role: 'caster',
     armorType: 'leather',
     classes: ['druid'],
-    primary: { int: 17, sta: 8 },
+    primary: { int: 17, spi: 8 },
   },
   {
     id: 'crucible_healer_leather',
@@ -102,7 +102,7 @@ const PROFILES: readonly Profile[] = [
     role: 'healer',
     armorType: 'leather',
     classes: ['druid'],
-    primary: { int: 14, spi: 7, sta: 4 },
+    primary: { int: 14, spi: 11 },
   },
   {
     id: 'crucible_caster_cloth',
@@ -110,7 +110,7 @@ const PROFILES: readonly Profile[] = [
     role: 'caster',
     armorType: 'cloth',
     classes: ['mage', 'priest', 'warlock'],
-    primary: { int: 17, sta: 8 },
+    primary: { int: 17, spi: 8 },
   },
   {
     id: 'crucible_healer_cloth',
@@ -118,7 +118,7 @@ const PROFILES: readonly Profile[] = [
     role: 'healer',
     armorType: 'cloth',
     classes: ['mage', 'priest'],
-    primary: { int: 14, spi: 7, sta: 4 },
+    primary: { int: 14, spi: 11 },
   },
 ];
 const SLOTS = ['chest', 'waist', 'feet'] as const;
@@ -164,7 +164,7 @@ export const CRUCIBLE_COLLECTION_ITEMS: Record<string, ItemDef> = Object.fromEnt
         set: profile.id,
         requiredClass: [...profile.classes],
         stats: {
-          ...normalizePrimaryStats(profile.primary, primaryStatBudget(35, 'epic', slot)),
+          ...normalizeToStaminaModel(profile.primary, primaryStatBudget(35, 'epic', slot)),
           armor: ARMOR[profile.armorType][index],
         },
         critRating: caster || healer ? 25 : 60,

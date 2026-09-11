@@ -30,10 +30,10 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
 
   it('anchors to the right of the frame, top aligned, gap zoom-compensated', () => {
     // Percentage offsets resolve against the unzoomed containing block but px
-    // lengths are multiplied by the element's zoom, so the 18px gap divides by
-    // the zoom factor to stay a true 18px at every targetFrameScale.
-    expect(tot).toContain('left: calc(100% + 18px / (0.74 * var(--target-frame-scale, 1)));');
-    expect(tot).toContain('top: 0;');
+    // lengths are multiplied by the element's zoom, so the 4px gap divides by
+    // the zoom factor to stay a true 4px at every targetFrameScale.
+    expect(tot).toContain('left: calc(100% + 4px / (0.74 * var(--target-frame-scale, 1)));');
+    expect(tot).toContain('top: calc(4px / (0.74 * var(--target-frame-scale, 1)));');
     expect(tot).not.toContain('right:');
   });
 
@@ -47,8 +47,11 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
 
   it('old below-frame anchor (the aura-strip band) must not return', () => {
     expect(hudCss).not.toContain('right: -6px; top: calc(100% + 6px);');
-    // The strip still owns the below-frame band on its own.
-    expect(rule(hudCss, '#target-frame > #tf-debuffs')).toContain('top: calc(100% + 6px);');
+    // Pin moved with the stock target seat: the frame now sits directly above the
+    // action bar, so the strip owns the band ABOVE the frame rather than the one
+    // below it, which would paint across the hotbar.
+    expect(rule(hudCss, '#target-frame > #tf-debuffs')).toContain('bottom: calc(100% + 8px);');
+    expect(rule(hudCss, '#target-frame > #tf-debuffs')).not.toContain('top:');
   });
 
   it('reads portrait-left like every other unit frame (mirror overrides dropped)', () => {
@@ -58,17 +61,18 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
     expect(rule(hudCss, '#target-frame > #totarget-frame .portrait-wrap')).toContain('order: 1;');
     const bars = rule(hudCss, '#target-frame > #totarget-frame .uf-bars');
     expect(bars).toContain('order: 2;');
-    expect(bars).toContain('margin-left: -16px;');
+    expect(bars).toContain('width: 232px;');
+    expect(bars).toContain('margin-left: -14px;');
     expect(bars).toContain('margin-right: 0;');
-    expect(bars).toContain('border-radius: 11px 6px 6px 11px;');
+    expect(bars).not.toContain('border-radius:');
   });
 
   it('boss-ranked target widens the gap past the boss chrome overhangs', () => {
     // The boss move button sits at right: -30px (vs -10px normally) and the
-    // dragon emblem overhangs the portrait side by 15px at children-zoom, so
-    // the mini needs a true 36px gap to clear both.
+    // dragon emblem overhangs the portrait side, so the mini needs a true 22px
+    // gap to clear the art without preserving the old plate spacing.
     const boss = rule(hudCss, '#target-frame.boss > #totarget-frame');
-    expect(boss).toContain('left: calc(100% + 36px / (0.74 * var(--target-frame-scale, 1)));');
+    expect(boss).toContain('left: calc(100% + 22px / (0.74 * var(--target-frame-scale, 1)));');
   });
 
   it('rank chrome binds to the target portrait only, never the mini', () => {
@@ -88,7 +92,11 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
     // the beside-the-frame anchor there as an EXPLICIT rule (verified to fit at
     // 844x390 landscape); hiding or moving it must stay a conscious change here.
     const mobile = rule(hudMobileCss, 'body.mobile-touch #target-frame > #totarget-frame');
-    expect(mobile).toContain('left: calc(100% + 18px / (0.74 * var(--target-frame-scale, 1)));');
-    expect(mobile).toContain('top: 0;');
+    // W13: re-derived against the redesigned desktop seat (4px beside, 4px down,
+    // both divided out of the mini's own zoom) after the unit-frame slice moved
+    // the desktop pair off 18px/0. Mobile restates the desktop offsets so the
+    // later mobile mirror rules cannot win the same-specificity tie.
+    expect(mobile).toContain('left: calc(100% + 4px / (0.74 * var(--target-frame-scale, 1)));');
+    expect(mobile).toContain('top: calc(4px / (0.74 * var(--target-frame-scale, 1)));');
   });
 });

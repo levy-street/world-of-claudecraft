@@ -3976,7 +3976,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.title': 'Trọng Tâm Thị Trấn',
   'hudChrome.townFocus.townOnlyHint':
     'Trọng tâm chỉ có thể thay đổi khi bạn đang ở trong thị trấn.',
-  'hudChrome.archetypeTitle.label': 'Danh hiệu',
   'hudChrome.archetypeTitle.none': 'Không có',
   'entities.itemSets.crownforged.bonus4':
     'Các đòn chí mạng bằng vũ khí của bạn găm Dằm Xương vào mục tiêu, khiến nó chảy máu nhận 8 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.',
@@ -11015,7 +11014,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Thảo dược học',
   'hudChrome.gathering.logging': 'Đốn gỗ',
   'hudChrome.gathering.mining': 'Khai mỏ',
-  'hudChrome.gathering.title': 'Thu thập',
   'errors.api.accountSessionLimit': 'Quá nhiều nhân vật trên tài khoản này đã ở trong thế giới.',
   'errors.api.crossSiteOrigin': 'Yêu cầu đã bị chặn vì lý do bảo mật.',
   'errors.api.unsupportedMediaType': 'Định dạng yêu cầu không được hỗ trợ.',
@@ -11260,7 +11258,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.training_dummy.name': 'Hình Nộm Tập Luyện',
   'entities.mobs.hub_training_dummy.name': 'Hình Nộm Tập Luyện',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Sở Thích',
   'hudChrome.auraEffect.armorPct': 'Giảm giáp đi {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Giảm giáp đi {pct}% ({stacks} tích trữ)',
   'hudChrome.auraEffect.increasePct.allStats': 'Tăng tất cả thuộc tính thêm {pct}%',

@@ -34,7 +34,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1013,
-      "state": "210024c3",
+      "state": "541315ea",
       "events": "891b4619",
       "rng": {
         "draws": 2,
@@ -45,7 +45,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1013,
-      "state": "29c0f874",
+      "state": "9876bb1f",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -56,7 +56,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1013,
-      "state": "bfc2b722",
+      "state": "d23ab7ad",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -67,7 +67,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "09c524b7",
+      "state": "0a953c4e",
       "events": "36cf65da",
       "rng": {
         "draws": 2,
@@ -78,7 +78,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1013,
-      "state": "d4a5f51b",
+      "state": "05388208",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -89,7 +89,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1013,
-      "state": "56d873ce",
+      "state": "9782099f",
       "events": "63142d0e",
       "rng": {
         "draws": 2,
@@ -100,7 +100,7 @@
       "tick": 34,
       "time": 1.7,
       "nextId": 1013,
-      "state": "0132d9bc",
+      "state": "5a5e3efb",
       "events": "ac05480f",
       "rng": {
         "draws": 4,
@@ -832,7 +832,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -891,7 +891,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "templateId": "rogue",
@@ -1052,7 +1052,7 @@
             "armor": 130,
             "int": 79,
             "spi": 59,
-            "sta": 34,
+            "sta": 53,
             "str": 11
           },
           "targetId": 1012,
@@ -1144,7 +1144,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1013,
-      "state": "01354b6b",
+      "state": "1bb00e4a",
       "events": "b8b404b7",
       "rng": {
         "draws": 4,
@@ -1155,7 +1155,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "fbccc499",
+      "state": "4121f430",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1166,7 +1166,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 1013,
-      "state": "6dbddc6e",
+      "state": "4d129d7f",
       "events": "741638a5",
       "rng": {
         "draws": 48,
@@ -1177,7 +1177,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1013,
-      "state": "5cb10491",
+      "state": "e655a7c0",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -1188,7 +1188,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 1013,
-      "state": "fcaedb7d",
+      "state": "6dbc8c9a",
       "events": "741638a5",
       "rng": {
         "draws": 113,
@@ -1199,7 +1199,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1013,
-      "state": "22aaf69c",
+      "state": "d3e20dff",
       "events": "741638a5",
       "rng": {
         "draws": 137,
@@ -1210,7 +1210,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 1013,
-      "state": "07116c9a",
+      "state": "79ce1ebd",
       "events": "741638a5",
       "rng": {
         "draws": 176,
@@ -1221,7 +1221,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1013,
-      "state": "537d8f2f",
+      "state": "1f7a03c4",
       "events": "741638a5",
       "rng": {
         "draws": 221,
@@ -1232,7 +1232,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1013,
-      "state": "d7995872",
+      "state": "303540b5",
       "events": "741638a5",
       "rng": {
         "draws": 268,
@@ -1243,7 +1243,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1013,
-      "state": "35e3f904",
+      "state": "469118f7",
       "events": "741638a5",
       "rng": {
         "draws": 306,
@@ -1254,7 +1254,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 1013,
-      "state": "5270fc5e",
+      "state": "c1b43959",
       "events": "741638a5",
       "rng": {
         "draws": 355,
@@ -1265,7 +1265,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 1013,
-      "state": "faf6d119",
+      "state": "38d522f2",
       "events": "741638a5",
       "rng": {
         "draws": 402,
@@ -1276,7 +1276,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 1013,
-      "state": "2a54462f",
+      "state": "151cc6ce",
       "events": "741638a5",
       "rng": {
         "draws": 455,
@@ -1287,7 +1287,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1013,
-      "state": "9566f78b",
+      "state": "98b355a4",
       "events": "741638a5",
       "rng": {
         "draws": 514,
@@ -1298,7 +1298,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 1013,
-      "state": "bc66b276",
+      "state": "6e6cd757",
       "events": "741638a5",
       "rng": {
         "draws": 566,
@@ -1309,7 +1309,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1013,
-      "state": "39527c2b",
+      "state": "63a5a78e",
       "events": "741638a5",
       "rng": {
         "draws": 608,
@@ -1320,7 +1320,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 1013,
-      "state": "b3bc3f19",
+      "state": "b20748cc",
       "events": "741638a5",
       "rng": {
         "draws": 661,
@@ -1331,7 +1331,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1013,
-      "state": "a80dda08",
+      "state": "3144e749",
       "events": "741638a5",
       "rng": {
         "draws": 717,
@@ -1342,7 +1342,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1013,
-      "state": "c8a56c39",
+      "state": "586f145a",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -1353,7 +1353,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 1013,
-      "state": "e80e911a",
+      "state": "9e2f5997",
       "events": "741638a5",
       "rng": {
         "draws": 828,
@@ -1364,7 +1364,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1014,
-      "state": "b2860fc7",
+      "state": "c53d47ee",
       "events": "29c5e73b",
       "rng": {
         "draws": 885,
@@ -1375,7 +1375,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1014,
-      "state": "b2860fc7",
+      "state": "c53d47ee",
       "events": "741638a5",
       "rng": {
         "draws": 885,
@@ -2107,7 +2107,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -2166,7 +2166,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "templateId": "rogue",
@@ -2327,7 +2327,7 @@
             "armor": 130,
             "int": 79,
             "spi": 59,
-            "sta": 34,
+            "sta": 53,
             "str": 11
           },
           "targetId": 1012,
@@ -2405,7 +2405,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1015,
-      "state": "0db94793",
+      "state": "9bef1646",
       "events": "74ad731e",
       "rng": {
         "draws": 886,
@@ -3140,7 +3140,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -3199,7 +3199,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "templateId": "rogue",
@@ -3360,7 +3360,7 @@
             "armor": 130,
             "int": 79,
             "spi": 59,
-            "sta": 34,
+            "sta": 53,
             "str": 11
           },
           "targetId": 1012,
@@ -3504,7 +3504,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1017,
-      "state": "a5931d2d",
+      "state": "f7e1dde4",
       "events": "a88c5f55",
       "rng": {
         "draws": 888,
@@ -4213,13 +4213,13 @@
           "fallStartY": -2.994172,
           "gcdRemaining": 1.5,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
@@ -4244,7 +4244,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -4303,7 +4303,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "templateId": "rogue",
@@ -4464,7 +4464,7 @@
             "armor": 130,
             "int": 79,
             "spi": 59,
-            "sta": 34,
+            "sta": 53,
             "str": 11
           },
           "targetId": 1012,
@@ -4716,7 +4716,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1018,
-      "state": "0aae268a",
+      "state": "9d171723",
       "events": "f61a67c4",
       "rng": {
         "draws": 893,
@@ -5429,13 +5429,13 @@
           "fallStartY": -2.994172,
           "gcdRemaining": 1.5,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
@@ -5460,7 +5460,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -5526,7 +5526,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "targetId": 1017,
@@ -5688,7 +5688,7 @@
             "armor": 130,
             "int": 79,
             "spi": 59,
-            "sta": 34,
+            "sta": 53,
             "str": 11
           },
           "targetId": 1012,
@@ -6005,7 +6005,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1019,
-      "state": "4a074b02",
+      "state": "ab897fd7",
       "events": "5b66e08c",
       "rng": {
         "draws": 894,
@@ -6722,13 +6722,13 @@
           "fallStartY": -2.994172,
           "gcdRemaining": 1.5,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
@@ -6753,7 +6753,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -6819,7 +6819,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "targetId": 1017,
@@ -7014,7 +7014,7 @@
             "armor": 130,
             "int": 79,
             "spi": 59,
-            "sta": 34,
+            "sta": 53,
             "str": 11
           },
           "targetId": 1012,
@@ -7382,7 +7382,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1020,
-      "state": "2500854e",
+      "state": "00bf75bd",
       "events": "034160e5",
       "rng": {
         "draws": 894,
@@ -8099,13 +8099,13 @@
           "fallStartY": -2.994172,
           "gcdRemaining": 1.5,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
@@ -8130,7 +8130,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -8196,7 +8196,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "targetId": 1017,
@@ -8405,7 +8405,7 @@
             "armor": 130,
             "int": 79,
             "spi": 59,
-            "sta": 34,
+            "sta": 53,
             "str": 11
           },
           "targetId": 1012,
@@ -8814,7 +8814,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1020,
-      "state": "349d8eec",
+      "state": "51e46f13",
       "events": "96e5d864",
       "rng": {
         "draws": 894,
@@ -9531,13 +9531,13 @@
           "fallStartY": -2.994172,
           "gcdRemaining": 1.5,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
@@ -9562,7 +9562,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -9628,7 +9628,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "targetId": 1017,
@@ -9839,7 +9839,7 @@
             "armor": 130,
             "int": 79,
             "spi": 59,
-            "sta": 34,
+            "sta": 53,
             "str": 11
           },
           "targetId": 1012,
@@ -10248,7 +10248,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1020,
-      "state": "349d8eec",
+      "state": "51e46f13",
       "events": "741638a5",
       "rng": {
         "draws": 894,
@@ -10965,13 +10965,13 @@
           "fallStartY": -2.994172,
           "gcdRemaining": 1.5,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
@@ -10996,7 +10996,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -11062,7 +11062,7 @@
             "armor": 370,
             "int": 11,
             "spi": 12,
-            "sta": 36,
+            "sta": 55,
             "str": 36
           },
           "targetId": 1017,
@@ -11273,7 +11273,7 @@
             "armor": 130,
             "int": 79,
             "spi": 59,
-            "sta": 34,
+            "sta": 53,
             "str": 11
           },
           "targetId": 1012,

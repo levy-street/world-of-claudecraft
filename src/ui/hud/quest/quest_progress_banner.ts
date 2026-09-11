@@ -12,7 +12,7 @@
 export const QUEST_BANNER_LINE_MS = 3000;
 export const QUEST_BANNER_FADE_MS = 400;
 export const QUEST_BANNER_MAX_LINES = 3;
-const LINE_CLASS = 'quest-banner-line';
+const LINE_CLASS = 'quest-banner-line ui-cin';
 const FADE_CLASS = 'fade';
 
 export class QuestProgressBanner {
