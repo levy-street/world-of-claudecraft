@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { shaderWarmToken } from '../server/perf_report_entry_blocks';
+import { RAW_SUMMARY_KNOWN_KEYS } from '../server/perf_report_shed';
 import { loadSpan, resetLoadProfile } from '../src/game/load_profiler';
 import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
 import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
@@ -341,6 +342,7 @@ function foliageCostStats(): Pick<
 function snapshot(): PerfSnapshot {
   return {
     seconds: 80,
+    visibleSeconds: 78,
     frames: 4800,
     fps: 60,
     hiddenPresentSkips: 0,
@@ -731,6 +733,10 @@ describe('perf reporter payload', () => {
     // and the counter is the only fleet-visible evidence of that residue. It
     // rides in rawSummary (the no-DDL home), never as a top-level column.
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
+    // The fps denominator rides beside `seconds`: a reader can tell a session
+    // whose fps was discounted for hidden time from one that was diluted.
+    expect((body.rawSummary as { seconds?: number }).seconds).toBe(80);
+    expect((body.rawSummary as { visibleSeconds?: number }).visibleSeconds).toBe(78);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
     // The 3D drawing buffer rides in rawSummary (the no-DDL home): the report's
     // own columns cannot say what a session rasterizes, because `dpr` is the raw
@@ -1468,6 +1474,45 @@ describe('perf reporter suggestion ids', () => {
     snap.renderer!.glRenderer = 'Google SwiftShader';
     const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
     expect(body.suggestionIds).toEqual(['hardware-acceleration']);
+  });
+
+  it('sends only raw summary keys the server ladder knows, so no field is shed as unlisted', () => {
+    // The ingest sheds an unknown key first on every oversized report, and
+    // nearly every first report is oversized: a client field added without
+    // its server-side entry would vanish from the fleet under the anonymous
+    // 'unlisted' rung. This is the lockstep pin.
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      new Settings(),
+      'sess1',
+      42,
+    )!;
+    for (const key of Object.keys(body.rawSummary as Record<string, unknown>)) {
+      expect(RAW_SUMMARY_KNOWN_KEYS, key).toContain(key);
+    }
+  });
+
+  it('carries the desktop shell flag as a top-level field, false for a browser tab', () => {
+    // The shell is Chromium loading the same bundle: browserFamily and buildId
+    // read identical to a Chrome tab, so this flag is the fleet's only
+    // desktop-versus-browser marker (stored as the desktop_shell column).
+    const settings = new Settings();
+    const shell = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      true,
+    )!;
+    expect(shell.desktopShell).toBe(true);
+    const tab = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+    expect(tab.desktopShell).toBe(false);
   });
 
   it('emits integrated-gpu on a bad-frames iGPU session only outside the desktop shell', () => {

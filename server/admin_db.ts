@@ -521,6 +521,7 @@ export interface PerfRawRow {
   deviceMemory: number | null;
   hardwareConcurrency: number;
   mobileTouch: boolean;
+  desktopShell: boolean;
   browserFamily: string;
   osFamily: string;
   glVendor: string;
@@ -746,7 +747,7 @@ export async function clientPerfRaw(
        fps_avg, frame_p95_ms, frame_p99_ms, long_frame_count,
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
-       dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
+       dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch, desktop_shell,
        browser_family, os_family, gl_vendor, gl_renderer_bucket, gl_renderer_raw,
        gl_backend, gl_model, gl_laptop, gpu_hp_adapter, zone_or_scenario, source,
        crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
@@ -791,6 +792,7 @@ export async function clientPerfRaw(
     deviceMemory: r.device_memory,
     hardwareConcurrency: r.hardware_concurrency,
     mobileTouch: r.mobile_touch,
+    desktopShell: r.desktop_shell,
     browserFamily: r.browser_family,
     osFamily: r.os_family,
     glVendor: r.gl_vendor,

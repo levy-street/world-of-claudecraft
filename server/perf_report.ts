@@ -16,6 +16,7 @@ import {
   sanitizeShaderWarm,
   shaderWarmToken,
 } from './perf_report_entry_blocks';
+import { shedRawSummaryToFit, stripReservedRawSummaryKeys } from './perf_report_shed';
 import { stripControlChars, stripJsonControlChars } from './perf_report_text';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
@@ -175,6 +176,14 @@ function browserFamily(userAgent: string): string {
   return 'other';
 }
 
+// The desktop shell's user agent carries the Electron token (src/runtime.ts
+// isElectronRuntime; server/ cannot import it, so this is a deliberate copy,
+// the same pattern as browserFamily above). The fallback for a client older
+// than the desktopShell payload field.
+function isElectronUserAgent(userAgent: string): boolean {
+  return /\bElectron\//.test(userAgent);
+}
+
 function osFamily(userAgent: string): string {
   const ua = userAgent.toLowerCase();
   if (ua.includes('windows')) return 'windows';
@@ -251,8 +260,8 @@ const LONG_TASK_RAW_AGE_MS_MAX = 30 * 60_000;
 // They ride inside raw_summary (JSONB, no DDL) rather than as new typed
 // columns, but still get the same kind of numeric bound the typed frame
 // columns get so a hostile payload cannot inject an absurd number into the
-// admin raw-report reader. Applied unconditionally in rawSummary() (not only
-// on the compact path), unlike compactPrewarmSummary below.
+// admin raw-report reader. Applied unconditionally in rawSummary(), before
+// the byte cap's shed ladder ever runs.
 function sanitizeBrowserSummary(value: unknown): Record<string, unknown> | undefined {
   if (!isRecord(value)) return undefined;
   const longTasks = value.longTasks;
@@ -270,9 +279,9 @@ function sanitizeBrowserSummary(value: unknown): Record<string, unknown> | undef
 // rendererDrawingBuffer: the allocated 3D backing store and the CSS viewport it
 // covers, the only field that says what resolution a session rasterizes at
 // (viewport x dpr is not the allocation). Same JSONB-not-DDL treatment as the
-// longtask block above, and the same reason for a bound: it rides the compact
-// path, where every retained key is copied verbatim, so "four scalars" has to be
-// enforced here rather than trusted. The ceiling is generous against any real
+// longtask block above, and the same reason for a bound: the shed ladder keeps
+// it as a core key copied verbatim, so "four scalars" has to be enforced here
+// rather than trusted. The ceiling is generous against any real
 // panel and MAX_VIEWPORT_DIMS, and only defends the ingest. The flag says
 // whether the governor rasterizes a sub-rect of that allocation, without which
 // a backed-off session reads as if it drew at full size.
@@ -486,6 +495,9 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
     'manifestSkipped',
     'manifestTimedOut',
     'manifestFailed',
+    // Absent-because-unchanged, not absent-because-empty: the client's
+    // emit-on-change gate stamps it when the heavy lists were withheld.
+    'prewarmListsUnchanged',
   ];
   for (const key of scalarKeys) {
     if (value[key] !== undefined) out[key] = value[key];
@@ -498,13 +510,10 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
   // (clamping one would misreport the true count), while these id lists are
   // bounded SAMPLES. A stored count larger than its list length is therefore
   // the documented shape of this signal, not self-contradiction.
-  for (const key of ['partialEntryIds', 'timedOutEntryIds', 'failedEntryIds']) {
+  for (const key of PREWARM_ENTRY_ID_LIST_KEYS) {
     const ids = value[key];
     if (!Array.isArray(ids)) continue;
-    out[key] = ids
-      .slice(0, 24)
-      .filter((id): id is string => typeof id === 'string')
-      .map((id) => textIn(id, 80));
+    out[key] = boundPrewarmEntryIds(ids);
   }
   const entries = Array.isArray(value.entries)
     ? value.entries
@@ -608,11 +617,11 @@ const PREWARM_RESUME_LANES = ['debt', 'cosmetic'] as const;
 // diagnostics, and it is their UNBOUNDED length that is the defect. Individual
 // member fields stay unshaped here on purpose, so a retained member can still
 // carry a long string or a nested object; what bounds THAT is the 16 KB
-// RAW_SUMMARY_MAX_BYTES check below, which runs after these clamps and routes
-// anything over it into compactPrewarmSummary, where every field IS rebuilt
-// through textIn / nullableNumberIn. Storage is therefore bounded in bytes on
-// both paths, and in shape on the compact one.
-// The compact path's own, tighter sample: it exists to fit a report that
+// RAW_SUMMARY_MAX_BYTES shed ladder below (perf_report_shed.ts), whose prewarm
+// rung rebuilds the block through compactPrewarmSummary, where every field IS
+// re-shaped through textIn / nullableNumberIn. Storage is therefore bounded in
+// bytes on every path, and in shape once the ladder reaches that rung.
+// The compact rung's own, tighter sample: it exists to fit a report that
 // already overflowed, so it carries fewer members and fewer fields per member.
 const PREWARM_COMPACT_COMPILE_UNITS_MAX = 6;
 const PREWARM_COMPACT_TRANSITIONS_MAX = 6;
@@ -660,9 +669,29 @@ function rankedCompileUnits(units: unknown[], limit: number): Record<string, unk
 const PREWARM_COMPILE_UNITS_MAX = 12;
 const PREWARM_BUDGET_VARIANTS_MAX = 8;
 const PREWARM_PACING_TRANSITIONS_MAX = 12;
+// The three entry-id lists (bounded SAMPLES beside authoritative counts; see
+// the note in compactPrewarmSummary). Bounded on the verbatim path too, since
+// the shed ladder no longer guarantees an oversized report reaches the compact
+// rung (a stray unknown key is shed first).
+const PREWARM_ENTRY_ID_LIST_KEYS = ['partialEntryIds', 'timedOutEntryIds', 'failedEntryIds'];
+const PREWARM_ENTRY_ID_LIST_MAX = 24;
+const PREWARM_ENTRY_ID_MAX_CHARS = 80;
+
+function boundPrewarmEntryIds(ids: unknown[]): string[] {
+  return ids
+    .slice(0, PREWARM_ENTRY_ID_LIST_MAX)
+    .filter((id): id is string => typeof id === 'string')
+    .map((id) => textIn(id, PREWARM_ENTRY_ID_MAX_CHARS));
+}
 
 /** Bound the client-supplied prewarm diagnostic lists in place. */
 function boundPrewarmDiagnosticLists(prewarm: Record<string, unknown>): void {
+  for (const key of PREWARM_ENTRY_ID_LIST_KEYS) {
+    if (prewarm[key] === undefined) continue;
+    const ids = prewarm[key];
+    if (Array.isArray(ids)) prewarm[key] = boundPrewarmEntryIds(ids);
+    else delete prewarm[key];
+  }
   if (Array.isArray(prewarm.compileUnits)) {
     // Ranked, not sliced: taking the first N here would throw away the slow and
     // failed units before the compact path (or a reader) ever sees them, which
@@ -720,42 +749,6 @@ function sanitizePrewarmResume(value: unknown): Record<string, unknown> | null {
   };
 }
 
-function compactRawSummary(value: Record<string, unknown>): Record<string, unknown> {
-  const out: Record<string, unknown> = { truncated: true };
-  for (const key of [
-    'graphicsConfigVersion',
-    'seconds',
-    'frames',
-    'windows',
-    'mainMs',
-    'rendererPhaseMs',
-    'rendererFoliage',
-    'rendererBudget',
-    'rendererQualityBuckets',
-    // The allocated drawing buffer (four scalars): the only field that says what
-    // resolution a session rasterizes at, since viewport x dpr does not.
-    'rendererDrawingBuffer',
-    'input',
-    'hud',
-    'netPipeline',
-    'heapSawtooth',
-    'browser',
-    // A wedged GPU queue is exactly what a truncated report must still carry:
-    // the block is small and bounded, and it is the whole signal.
-    'rendererGpuQueue',
-    // The world-entry blocks: a handful of bounded fields each, and a slow
-    // entry is exactly the report most likely to overflow into this path.
-    'postRevealLinks',
-    'bootPhases',
-    'shaderWarm',
-  ]) {
-    if (value[key] !== undefined) out[key] = value[key];
-  }
-  const prewarm = compactPrewarmSummary(value.rendererPrewarmSummary ?? value.rendererPrewarm);
-  if (prewarm) out.rendererPrewarmSummary = prewarm;
-  return out;
-}
-
 function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
   try {
@@ -765,6 +758,8 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     // same way a text parameter rejects the character, and this object
     // round-trips client-shaped keys and values that no field clamp here sees.
     const parsed = stripJsonControlChars(JSON.parse(text) as Record<string, unknown>);
+    // Server-authored markers: a client cannot post a row that reads as shed.
+    stripReservedRawSummaryKeys(parsed);
     if (!devTraceAllowed) delete parsed.devTrace;
     const browser = sanitizeBrowserSummary(parsed.browser);
     if (browser) parsed.browser = browser;
@@ -772,7 +767,7 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const gpuQueue = sanitizeGpuQueueSummary(parsed.rendererGpuQueue);
     if (gpuQueue) parsed.rendererGpuQueue = gpuQueue;
     else delete parsed.rendererGpuQueue;
-    // Field-shaped here, BEFORE the byte check, so the compact path's verbatim
+    // Field-shaped here, BEFORE the byte check, so the shed ladder's verbatim
     // copy of the key is bounded by construction.
     const drawingBuffer = sanitizeDrawingBuffer(parsed.rendererDrawingBuffer);
     if (drawingBuffer) parsed.rendererDrawingBuffer = drawingBuffer;
@@ -786,15 +781,15 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const shaderWarm = sanitizeShaderWarm(parsed.shaderWarm);
     if (shaderWarm) parsed.shaderWarm = shaderWarm;
     else delete parsed.shaderWarm;
-    // The prewarm summary rides through verbatim on this path, bounded only by
-    // the body cap, so its client-supplied LISTS are bounded here explicitly.
+    // The prewarm summary rides through verbatim under the cap, bounded only
+    // by the body cap, so its client-supplied LISTS are bounded here explicitly.
     // Without this the resume block's entries and failed-unit ids reach storage
-    // unclamped on every report under the size limit, and the compact path's
-    // sanitizer only ever sees the oversized minority.
+    // unclamped on every report under the size limit, and the shed ladder's
+    // compact rung only ever sees the oversized minority.
     // BOTH prewarm keys, never only the summary: the current client stopped
     // sending the full `rendererPrewarm` twin, but a client older than that
     // change still does (its resume block rides a getter on the live stats
-    // object), the compact path still accepts the key as its fallback, and any
+    // object), the shed ladder still accepts the key as its fallback, and any
     // token holder can post one whatever their client does.
     for (const key of ['rendererPrewarmSummary', 'rendererPrewarm']) {
       const prewarm = parsed[key];
@@ -804,13 +799,11 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
       else delete prewarm.resume;
       boundPrewarmDiagnosticLists(prewarm);
     }
-    const boundedText = JSON.stringify(parsed);
+    // The byte cap as a priority shed ladder (perf_report_shed.ts): the small
+    // diagnostic keys always survive, the big blocks go one rung at a time,
+    // and `dropped` records what went. Never a whole-blob drop.
     const maxBytes = devTraceAllowed ? RAW_SUMMARY_DEV_TRACE_MAX_BYTES : RAW_SUMMARY_MAX_BYTES;
-    if (Buffer.byteLength(boundedText) > maxBytes) {
-      const compact = compactRawSummary(parsed);
-      return Buffer.byteLength(JSON.stringify(compact)) > maxBytes ? { truncated: true } : compact;
-    }
-    return JSON.parse(boundedText) as Record<string, unknown>;
+    return shedRawSummaryToFit(parsed, maxBytes, { compactPrewarm: compactPrewarmSummary });
   } catch {
     return {};
   }
@@ -905,6 +898,9 @@ export async function handlePerfReport(
     deviceMemory: nullableNumberIn(body.deviceMemory, 0, 1024),
     hardwareConcurrency: intIn(body.hardwareConcurrency, 0, 1024, 0),
     mobileTouch: Boolean(body.mobileTouch),
+    // Chromium shell, same bundle, same build id: browser_family stays
+    // 'chrome' for it, and this column is what tells the shell from a tab.
+    desktopShell: Boolean(body.desktopShell) || isElectronUserAgent(userAgent),
     browserFamily: choiceIn(
       body.browserFamily,
       ['chrome', 'safari', 'firefox', 'edge', 'other'],
@@ -963,6 +959,8 @@ export const perfReportInternalsForTest = {
   viewportBucket,
   allowDevTrace,
   rawSummary,
+  compactPrewarmSummary,
+  RAW_SUMMARY_MAX_BYTES,
   shouldStorePerfReport,
   suggestionIdsIn,
   CROWD_BUCKET_LABELS,

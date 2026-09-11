@@ -778,6 +778,7 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   const unstuckDbSrc = read('server/unstuck_db.ts');
   const unstuckRecordsSrc = read('server/unstuck_records.ts');
   const retentionSrc = read('server/play_session_retention_db.ts');
+  const clientPerfDbSrc = read('server/client_perf_reports_db.ts');
   const bankLedgerSrc = read('server/bank_ledger.ts');
 
   // Slice a function BODY: from its declaration to the next top-level export,
@@ -1102,9 +1103,9 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(bodyOf(dbSrc, 'export async function pruneChatLogsBatch')).not.toContain(
       'runWithStatementTimeout',
     );
-    expect(bodyOf(dbSrc, 'export async function pruneClientPerfReportsBatch')).not.toContain(
-      'runWithStatementTimeout',
-    );
+    expect(
+      bodyOf(clientPerfDbSrc, 'export async function pruneClientPerfReportsBatch'),
+    ).not.toContain('runWithStatementTimeout');
   });
 
   it('the play-session retention prunes stay batched on the default allowance', () => {

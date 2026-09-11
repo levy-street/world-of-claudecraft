@@ -19,7 +19,7 @@
 //
 // MODERATION-INVARIANT, so NO BUST WIRE IS OWED (mirrors
 // admin_online_history_cache.ts's reasoning). client_perf_reports is
-// append-only client telemetry (server/db.ts insertClientPerfReport) pruned
+// append-only client telemetry (server/client_perf_reports_db.ts insertClientPerfReport) pruned
 // only by the retention sweep; no moderation action (ban, suspend, mute,
 // jail, rename, account or character delete) reads or writes it, so there is
 // nothing an operator can do that makes an installed snapshot wrong. Its only
