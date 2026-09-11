@@ -2681,6 +2681,18 @@ export const TARGETS = [
         charName: 'Morphalo',
       },
       { key: 'shields-desktop', shot: 'frames', charClass: 'priest', charName: 'Elowen' },
+      // The Chronomancer, the mage healer spec. Its spells are authored with
+      // bespoke effect types and were absent from every track; this plate is the
+      // ally HoT row (Temporal Echo) beside the two output windows, which is the
+      // whole of what the before/after pair has to show.
+      { key: 'chronomancer-desktop', shot: 'frames', charClass: 'mage', charName: 'Sable' },
+      {
+        key: 'chronomancer-mobile',
+        shot: 'frames',
+        mobile: true,
+        charClass: 'mage',
+        charName: 'Sable',
+      },
       { key: 'options-desktop', shot: 'options' },
       { key: 'options-mobile', shot: 'options', mobile: true },
     ],
@@ -2789,12 +2801,20 @@ export const TARGETS = [
       // Cast real abilities rather than injecting auras: a tracker shot whose rows
       // came from a harness write proves the painter and nothing else, and the
       // whole claim of this change is that the SIM's auras reach the right track.
-      await page.evaluate(() => {
+      await page.evaluate((cls) => {
         const game = window.__game;
         const sim = game?.sim;
         const player = sim?.player;
         if (!sim || !player) return;
         sim.setPlayerLevel?.(30, player.id);
+        // The SPEC is picked here rather than beside the casts, and the wait
+        // below is why. Chronomancy is a spec, not the mage default, and
+        // switching one re-grants abilities: that fires the learn-ability
+        // celebration (a full-screen phoenix) and a deed banner across the middle
+        // of the plate. Done late it is still on screen at shutter time, which is
+        // how the first chronomancer capture came back with its Friendly row
+        // behind a bird. Done here it has the same settle the level bump gets.
+        if (cls === 'mage') sim.setSpec?.('arcane');
         player.resource = player.maxResource;
         if (
           ![...sim.entities.values()].some(
@@ -2803,8 +2823,9 @@ export const TARGETS = [
         ) {
           sim.spawnHealerPracticeDummy?.();
         }
-      });
-      await wait(600);
+      }, variant.charClass);
+      // Long enough for the level-up and spec-change celebrations to finish.
+      await wait(variant.charClass === 'mage' ? 6000 : 600);
       // The level bump above grants the ranks; every spell here is learned well
       // under the cap. The GCD is cleared between casts because the recipe stages
       // a STATE rather than simulating a rotation, and the resource is topped up
@@ -2822,7 +2843,19 @@ export const TARGETS = [
           player.resource = player.maxResource;
           sim.castAbility?.(id, player.id);
         };
-        if (cls === 'priest') {
+        if (cls === 'mage') {
+          // The spec was picked in the block above, with time to settle.
+          // The headline row: an ally-targeted mark. Target BEFORE the cast, for
+          // the reason the priest arm below already names.
+          if (ally) {
+            sim.targetEntity?.(ally.id, player.id);
+            cast('temporal_echo');
+          }
+          // The two output windows, so the plate also carries the Offensive
+          // Cooldowns track this spec was equally absent from.
+          cast('temporal_acceleration');
+          cast('perfect_moment');
+        } else if (cls === 'priest') {
           // The POINTS row, then an ally row. The target is set BEFORE the heal,
           // not after: a priest heal with no target lands on the priest, which is
           // how an earlier cut put Renew in the self track and left the friendly
@@ -2858,16 +2891,33 @@ export const TARGETS = [
       const expected =
         variant.charClass === 'priest'
           ? ['#aura-track-shields', '#aura-track-friendly']
-          : ['#aura-track-defensives', '#aura-track-self', '#aura-track-utility'];
-      await page.waitForFunction(
-        (sels) =>
-          sels.every((sel) => {
-            const el = document.querySelector(sel);
-            return el && getComputedStyle(el).display !== 'none';
-          }),
-        { timeout: 25000, polling: 250 },
-        expected,
-      );
+          : variant.charClass === 'mage'
+            ? ['#aura-track-friendly', '#aura-track-power']
+            : ['#aura-track-defensives', '#aura-track-self', '#aura-track-utility'];
+      //
+      // PR_SHOTS_BEFORE=1 turns this into a best-effort wait, for the one run
+      // where an empty track is the POINT: a before/after pair shoots the second
+      // plate against the base tree, where the feature does not exist yet and the
+      // frames it would fill are legitimately hidden. Same reasoning as the
+      // per-key try/catch on the settings above, which already exists so this
+      // recipe can run against a tree that lacks them. It is opt-in and never set
+      // for a normal capture, so the guard above still fails an AFTER plate that
+      // staged nothing, which is the regression it was written for.
+      const beforePlate = process.env.PR_SHOTS_BEFORE === '1';
+      const rowsUp = (sels) =>
+        sels.every((sel) => {
+          const el = document.querySelector(sel);
+          return el && getComputedStyle(el).display !== 'none';
+        });
+      try {
+        await page.waitForFunction(
+          rowsUp,
+          { timeout: beforePlate ? 6000 : 25000, polling: 250 },
+          expected,
+        );
+      } catch (err) {
+        if (!beforePlate) throw err;
+      }
       // CLEAN PLATE, asserted on the selectors that are ACTUALLY up rather than
       // the ones a reader would guess. Two earlier cuts of this check got it
       // wrong in both directions and each mistake is worth naming:

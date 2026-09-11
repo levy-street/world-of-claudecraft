@@ -17,18 +17,21 @@
 // naming them is worth the maintenance.
 
 import { describe, expect, it } from 'vitest';
-import { ABILITIES } from '../src/sim/data';
+import { ABILITIES, MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { AbilityDef, AuraKind, PlayerClass } from '../src/sim/types';
+import type { AbilityDef, AuraKind, Entity, PlayerClass } from '../src/sim/types';
 import { isToggleAuraKind } from '../src/ui/auras_view';
 import {
   AURA_TRACK_CATALOG,
   AURA_TRACK_DURATION_CEILING_SEC,
+  type AuraTrackCategory,
   type AuraTrackEntry,
   auraTrackEntry,
   DEFENSIVE_COOLDOWN_SEC,
 } from '../src/ui/hud/aura_tracks/aura_track_catalog';
 import { AURA_TRACKS } from '../src/ui/hud/aura_tracks/aura_track_descriptors';
+import { createAuraTrackView } from '../src/ui/hud/aura_tracks/aura_track_view';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const abilities = ABILITIES as Record<string, AbilityDef>;
@@ -139,6 +142,11 @@ describe('aura track catalog: what it derives', () => {
       ['sacred_bulwark', 'guard'],
       ['rejuvenation', 'hot'],
       ['renew', 'hot'],
+      // Chronomancy's ally mark. The content models it with its own effect type
+      // rather than `hot` (an echo converts the mage's Arcane damage into healing
+      // instead of ticking a stored total), which is exactly how it fell out of
+      // every track while Wildbloom and Renew sailed through.
+      ['temporal_echo', 'hot'],
       ['power_word_shield', 'absorb'],
       ['ice_barrier', 'absorb'],
       ['sprint', 'utility'],
@@ -216,6 +224,370 @@ describe('aura track catalog: what it derives', () => {
         expect(auraTrackEntry(id), `${id} is live but has no catalog row`).toBeDefined();
       }
     }
+  });
+
+  it('shows a real ally-targeted maintained heal as a Friendly row, whatever effect type it uses', () => {
+    // THE GAP THIS FILE HAD. Every cast in the test above targets the CASTER, so
+    // a spell that only ever lands on somebody else was never exercised at all,
+    // and the friendly track is the one whose whole point is somebody else.
+    // Chronomancy's Temporal Echo went missing from all six tracks that way: the
+    // content models the mark with its own effect type (an echo converts the
+    // mage's Arcane damage into healing on the marked ally rather than ticking a
+    // stored total), so the `type === 'hot'` rule never saw it, while Wildbloom
+    // sailed through. Wildbloom is the control arm here for exactly that reason:
+    // a run where only the mage arm fails is the player report ("the druid's
+    // shows up and the chronomancer's does not") reproduced.
+    //
+    // It drives the REAL selection core over the REAL post-cast entities rather
+    // than stopping at the catalog, because a catalog row nothing paints is the
+    // same bug wearing a green test.
+    const friendly = AURA_TRACKS.find((t) => t.id === 'friendly');
+    expect(friendly).toBeDefined();
+    if (!friendly) return;
+    const casts: ReadonlyArray<readonly [PlayerClass, string | null, string, string]> = [
+      ['druid', null, 'rejuvenation', 'rejuvenation'],
+      ['mage', 'arcane', 'temporal_echo', 'temporal_echo'],
+    ];
+    for (const [playerClass, spec, abilityId, auraId] of casts) {
+      const sim = new Sim({ seed: 11, playerClass, autoEquip: true, world: EMPTY_TEST_WORLD });
+      sim.setPlayerLevel(20);
+      if (spec) expect(sim.setSpec(spec), `${playerClass} could not pick ${spec}`).toBe(true);
+      const player = sim.player;
+      player.resource = player.maxResource;
+      const allyId = sim.addPlayer('warrior', 'Ally');
+      const ally = sim.entities.get(allyId);
+      expect(ally, 'the ally never joined the world').toBeDefined();
+      if (!ally) continue;
+      ally.pos = { ...player.pos };
+      ally.pos.x += 2; // well inside the 30 yd friendly cast range
+      ally.prevPos = { ...ally.pos };
+      const eventsBefore = sim.events.length;
+      sim.targetEntity(allyId);
+      sim.castAbility(abilityId);
+      for (let i = 0; i < 5; i++) sim.tick();
+      const refused = sim.events
+        .slice(eventsBefore)
+        .filter((e) => e.type === 'error')
+        .map((e) => ('text' in e ? e.text : ''));
+      expect(refused, `${playerClass} ${abilityId} was refused`).toEqual([]);
+
+      const live = ally.auras.find((a) => a.id === auraId && a.sourceId === player.id);
+      expect(live, `${abilityId} left no ${auraId} on the ally`).toBeDefined();
+      const entry = auraTrackEntry(auraId);
+      expect(entry, `${auraId} is live on an ally but has no catalog row`).toBeDefined();
+      if (!entry) continue;
+      expect(friendly.accepts(entry, false), `${auraId} is not accepted by Friendly`).toBe(true);
+
+      const view = createAuraTrackView(friendly, {
+        isOwn: (a) => a.sourceId === player.id,
+        isMode: () => false,
+        auraName: (a) => a.name,
+        unitName: (e) => e.name,
+        iconKey: (a) => a.id,
+      });
+      const state = view.tick({
+        player,
+        allies: sim.entities.values(),
+        enabled: true,
+        includeModes: true,
+      });
+      const rows = state.rows.slice(0, state.count).map((r) => `${r.key}|${r.unitName}`);
+      expect(rows, `${abilityId} paints no Friendly row for the ally it marked`).toContain(
+        `${allyId}:${auraId}|${ally.name}`,
+      );
+    }
+  });
+
+  it('tracks the beneficial Hourglass of Suspension without ever tracking its hostile arm', () => {
+    // Hourglass of Suspension is the second half of the same miss: another
+    // bespoke effect type (`temporalHourglass`), so the `stasis` kind that puts
+    // Cold Coffin in a track was never reached and the mage healer's one
+    // immunity button showed nowhere.
+    //
+    // AND IT CARRIES A TRAP THE OTHER SPELLS DO NOT. One cast applies the SAME
+    // aura id with two opposite meanings: `stasis` on the caster or a group ally
+    // (helpful, what this family is for) and `incapacitate` on an enemy
+    // (harmful, which belongs to the enemy-side family in src/ui/hud/target_dots/).
+    // The catalog is keyed by aura id alone, so admitting the id without a
+    // polarity guard would put "Hourglass of Suspension on Forest Wolf" in the
+    // FRIENDLY track, which reads as a heal the mage is maintaining on a mob.
+    // Both arms are asserted here; the hostile one is the whole point.
+    const FLAT_X = 700;
+    const rig = () => {
+      const sim = new Sim({ seed: 147, playerClass: 'mage', world: EMPTY_TEST_WORLD });
+      sim.setPlayerLevel(14);
+      expect(sim.setSpec('arcane'), 'mage could not pick arcane').toBe(true);
+      sim.tick();
+      const mage = sim.player;
+      mage.pos = sim.groundPos(FLAT_X, 0);
+      mage.prevPos = { ...mage.pos };
+      const host = sim as unknown as { rebucket(e: Entity): void };
+      host.rebucket(mage);
+      return { sim, mage };
+    };
+    const rowsFor = (sim: Sim, mage: Entity, trackId: string): string[] => {
+      const descriptor = AURA_TRACKS.find((t) => t.id === trackId);
+      expect(descriptor, `no such track: ${trackId}`).toBeDefined();
+      if (!descriptor) return [];
+      const view = createAuraTrackView(descriptor, {
+        isOwn: (a) => a.sourceId === mage.id,
+        isMode: () => false,
+        auraName: (a) => a.name,
+        unitName: (e) => e.name,
+        iconKey: (a) => a.id,
+      });
+      const state = view.tick({
+        player: mage,
+        allies: sim.entities.values(),
+        enabled: true,
+        includeModes: true,
+      });
+      return state.rows.slice(0, state.count).map((r) => r.key);
+    };
+    const cast = (sim: Sim, mage: Entity, x: number) => {
+      mage.gcdRemaining = 0;
+      mage.resource = mage.maxResource;
+      mage.cooldowns.delete('temporal_hourglass');
+      sim.castAbility('temporal_hourglass', mage.id, { x, z: 0 });
+      for (let i = 0; i < 3; i++) sim.tick();
+    };
+
+    // The helpful arm, on a group ally: a Friendly row, exactly like a HoT.
+    {
+      const { sim, mage } = rig();
+      const allyId = sim.addPlayer('warrior', 'Ally');
+      const ally = sim.entities.get(allyId);
+      expect(ally, 'the ally never joined the world').toBeDefined();
+      if (!ally) return;
+      ally.pos = sim.groundPos(FLAT_X + 8, 0);
+      ally.prevPos = { ...ally.pos };
+      (sim as unknown as { rebucket(e: Entity): void }).rebucket(ally);
+      sim.partyInvite(allyId, mage.id);
+      sim.partyAccept(allyId);
+      cast(sim, mage, ally.pos.x);
+      const live = ally.auras.find((a) => a.id === 'temporal_hourglass');
+      expect(live?.kind, 'the ally did not receive the stasis arm').toBe('stasis');
+      const entry = auraTrackEntry('temporal_hourglass');
+      expect(entry, 'temporal_hourglass is live but has no catalog row').toBeDefined();
+      expect(entry?.category, 'the hourglass stasis is protection, like Cold Coffin').toBe('guard');
+      expect(rowsFor(sim, mage, 'friendly')).toContain(`${allyId}:temporal_hourglass`);
+    }
+
+    // The hostile arm, on a mob: no row, in ANY of the six.
+    {
+      const { sim, mage } = rig();
+      const host = sim as unknown as { nextId: number; addEntity(e: Entity): void };
+      const mob = createMob(host.nextId++, MOBS.forest_wolf, 20, sim.groundPos(FLAT_X + 8, 0));
+      mob.hostile = true;
+      mob.maxHp = 10_000;
+      mob.hp = 10_000;
+      host.addEntity(mob);
+      cast(sim, mage, mob.pos.x);
+      const live = mob.auras.find((a) => a.id === 'temporal_hourglass');
+      expect(live?.kind, 'the mob did not receive the incapacitate arm').toBe('incapacitate');
+      expect(live?.sourceId, "the suspension is the mage's own aura").toBe(mage.id);
+      for (const track of AURA_TRACKS) {
+        expect(
+          rowsFor(sim, mage, track.id),
+          `the hostile suspension leaked into the ${track.id} track`,
+        ).not.toContain(`${mob.id}:temporal_hourglass`);
+      }
+    }
+  });
+
+  it('covers every Chronomancy spell that leaves a trackable helpful aura', () => {
+    // THE AUDIT BEHIND THIS FIX, KEPT AS A PIN. Chronomancy is the mage healer
+    // spec and it had FOUR spells missing at once, every one for the same reason:
+    // the content models them with a bespoke effect type that authors neither a
+    // `hot`/absorb TYPE nor a `kind`, and the catalog classifies by type for
+    // heals and absorbs and by kind for everything else, so an effect authoring
+    // neither fell through both halves of the derivation and joined no track.
+    // A whole spec's buffs were invisible and nothing was red.
+    //
+    // The untracked half is asserted too, with the reason each one is out. An
+    // exclusion nobody can state is how the next spell goes missing quietly.
+    const tracked: ReadonlyArray<readonly [string, AuraTrackCategory]> = [
+      ['temporal_echo', 'hot'],
+      ['temporal_hourglass', 'guard'],
+      ['temporal_acceleration', 'power'],
+      ['perfect_moment', 'power'],
+      ['temporal_barrier', 'absorb'],
+      ['mass_barrier', 'absorb'],
+    ];
+    for (const [id, category] of tracked) {
+      expect(abilities[id], `${id} is no longer a Chronomancy ability`).toBeDefined();
+      const entry = auraTrackEntry(id);
+      expect(entry, `${id} leaves a helpful aura and must be tracked`).toBeDefined();
+      expect(entry?.category, `${id} changed category`).toBe(category);
+      if (!entry) continue;
+      const homes = AURA_TRACKS.filter((t) => t.accepts(entry, true) || t.accepts(entry, false));
+      expect(homes.length, `${id} is in the catalog but no track shows it`).toBeGreaterThan(0);
+    }
+    const untracked: ReadonlyArray<readonly [string, string]> = [
+      // Its group mark IS a `temporal_echo` aura (combat/chronomancy.ts applies
+      // one id for both casts), so it shares that row. A row of its own would be
+      // keyed by an ability id no live aura carries, the ghost class the
+      // "keys every entry by the aura id the sim applies" test exists to catch.
+      ['temporal_cascade', 'its mark is a temporal_echo aura and shares that row'],
+      // A direct heal leaves no aura at all.
+      ['temporal_mend', 'a direct heal, no aura'],
+      // Rewind restores recent damage in one shot; the resurrections put a player
+      // back on their feet. None of the three leaves anything running.
+      ['temporal_rewind', 'an instant restore, no aura'],
+      ['temporal_reversal', 'a resurrection, no aura'],
+      ['collective_reversal', 'a resurrection, no aura'],
+    ];
+    for (const [id, why] of untracked) {
+      expect(abilities[id], `${id} is no longer a Chronomancy ability`).toBeDefined();
+      expect(auraTrackEntry(id), `${id} must stay untracked: ${why}`).toBeUndefined();
+    }
+  });
+
+  it('shows Temporal Cascade group marks as Friendly rows under the echo row', () => {
+    // The group cast is the reason the echo effect types name their aura id
+    // rather than defaulting to the ability id. Cascade marks the target plus its
+    // nearest allies, and every one of those marks must reach the Friendly track
+    // through the SAME catalog row the single-target cast uses.
+    const friendly = AURA_TRACKS.find((t) => t.id === 'friendly');
+    expect(friendly).toBeDefined();
+    if (!friendly) return;
+    const sim = new Sim({
+      seed: 23,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('arcane'), 'mage could not pick arcane').toBe(true);
+    sim.tick();
+    const mage = sim.player;
+    mage.resource = mage.maxResource;
+    const allyIds: number[] = [];
+    for (let i = 0; i < 3; i++) {
+      const id = sim.addPlayer('warrior', `Ally${i}`);
+      const ally = sim.entities.get(id);
+      expect(ally, 'an ally never joined the world').toBeDefined();
+      if (!ally) return;
+      ally.pos = { ...mage.pos };
+      ally.pos.x += 1 + i * 0.4;
+      ally.prevPos = { ...ally.pos };
+      sim.partyInvite(id, mage.id);
+      sim.partyAccept(id);
+      allyIds.push(id);
+    }
+    sim.targetEntity(allyIds[0]);
+    sim.castAbility('temporal_cascade');
+    for (let i = 0; i < 60; i++) sim.tick();
+
+    const marked = allyIds.filter((id) =>
+      sim.entities
+        .get(id)
+        ?.auras.some((a) => a.id === 'temporal_echo' && a.sourceId === mage.id && a.echoGroup),
+    );
+    expect(marked.length, 'Temporal Cascade marked no group ally').toBeGreaterThan(0);
+    const view = createAuraTrackView(friendly, {
+      isOwn: (a) => a.sourceId === mage.id,
+      isMode: () => false,
+      auraName: (a) => a.name,
+      unitName: (e) => e.name,
+      iconKey: (a) => a.id,
+    });
+    const state = view.tick({
+      player: mage,
+      allies: sim.entities.values(),
+      enabled: true,
+      includeModes: true,
+    });
+    const rows = state.rows.slice(0, state.count).map((r) => r.key);
+    for (const id of marked) {
+      expect(rows, `the Cascade mark on ${id} paints no Friendly row`).toContain(
+        `${id}:temporal_echo`,
+      );
+    }
+  });
+
+  it("paints the Chronomancy output windows, and only the caster's copy of a group burst", () => {
+    // THE OTHER HALF OF THE SAME CLAIM. The tests above drive the real selection
+    // core for the ally HoT and the guard; without this the two Offensive rows
+    // would be asserted at the CATALOG level only, and a catalog row nothing
+    // paints is the same bug wearing a green test.
+    //
+    // It also pins the group-burst gate. Temporal Acceleration lands an IDENTICAL
+    // copy on every party member in 40 yd, all expiring on the same tick, so an
+    // ally row carries nothing the caster's own row does not. Ungated, one press
+    // in a raid fills the track to its cap with copies of one buff and pushes the
+    // caster's real cooldowns into the overflow line. The party here is deliberately
+    // large enough that an ungated core would paint several rows, so this fails
+    // loudly rather than by one row.
+    const power = AURA_TRACKS.find((t) => t.id === 'power');
+    expect(power).toBeDefined();
+    if (!power) return;
+    const sim = new Sim({
+      seed: 31,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('arcane'), 'mage could not pick arcane').toBe(true);
+    sim.tick();
+    const mage = sim.player;
+    mage.resource = mage.maxResource;
+    const allyIds: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const id = sim.addPlayer('warrior', `Ally${i}`);
+      const ally = sim.entities.get(id);
+      expect(ally, 'an ally never joined the world').toBeDefined();
+      if (!ally) return;
+      ally.pos = { ...mage.pos };
+      ally.pos.x += 1 + i * 0.4;
+      ally.prevPos = { ...ally.pos };
+      sim.partyInvite(id, mage.id);
+      sim.partyAccept(id);
+      allyIds.push(id);
+    }
+    const cast = (id: string) => {
+      mage.gcdRemaining = 0;
+      mage.resource = mage.maxResource;
+      sim.castAbility(id, mage.id);
+      for (let i = 0; i < 3; i++) sim.tick();
+    };
+    cast('temporal_acceleration');
+    cast('perfect_moment');
+
+    // The auras really landed on the allies: that is what makes the absence of
+    // ally ROWS below a deliberate gate rather than a cast that never went out.
+    const marked = allyIds.filter((id) =>
+      sim.entities
+        .get(id)
+        ?.auras.some((a) => a.id === 'temporal_acceleration' && a.sourceId === mage.id),
+    );
+    expect(marked.length, 'Temporal Acceleration reached no ally at all').toBeGreaterThan(1);
+
+    const view = createAuraTrackView(power, {
+      isOwn: (a) => a.sourceId === mage.id,
+      isMode: () => false,
+      auraName: (a) => a.name,
+      unitName: (e) => e.name,
+      iconKey: (a) => a.id,
+    });
+    const state = view.tick({
+      player: mage,
+      allies: sim.entities.values(),
+      enabled: true,
+      includeModes: true,
+    });
+    const rows = state.rows.slice(0, state.count).map((r) => r.key);
+    expect(rows, 'the caster cannot see their own haste window').toContain(
+      `${mage.id}:temporal_acceleration`,
+    );
+    expect(rows, 'Perfect Moment paints no Offensive row').toContain(`${mage.id}:perfect_moment`);
+    for (const id of marked) {
+      expect(rows, `an identical group-burst copy on ${id} took a row`).not.toContain(
+        `${id}:temporal_acceleration`,
+      );
+    }
+    expect(state.overflow, 'a four-ally party should not overflow the track').toBe(0);
   });
 
   it('honours its by-id exclusions, each of which has a live ability behind it', () => {
