@@ -1404,6 +1404,11 @@ export const pt_BR: EnTranslations = {
       "petDefensive": "Mascote: defensivo",
       "petAggressive": "Mascote: agressivo",
       "targetPet": "Mascote: selecionar",
+      "targetSelf": "Target Self",
+      "targetParty1": "Target Party Member 1",
+      "targetParty2": "Target Party Member 2",
+      "targetParty3": "Target Party Member 3",
+      "targetParty4": "Target Party Member 4",
       "mount": "Montar / Desmontar",
       "mouseHint": "Os botões do mouse também funcionam: pressione o botão do meio (M3) ou um botão lateral (M4, M5) ao atribuir a tecla. Os botões esquerdo e direito continuam reservados para a câmera, o clique para mover e cliques em objetos no mundo."
     },
@@ -5881,6 +5886,8 @@ export const pt_BR: EnTranslations = {
       "attackMove": "Mover e Atacar (somente depois que você ativar a opção)",
       "meters": "Medidores de dano (dano, cura e ameaça)",
       "petMark": "Mascote: selecionar, seleciona seu próprio mascote (o mesmo que clicar em seu retrato)",
+      "targetSelf": "Target yourself",
+      "targetParty": "Target party members 1 to 4, top to bottom as the party frames show them",
       "onBarBinding": "Você também pode atribuir teclas direto pela barra: escolha Editar teclas da barra de ação no painel de Atalhos de Teclado, depois clique em um espaço na barra ativa e pressione a tecla que quiser. Clique em Concluído quando terminar. Isso é exclusivo do computador, já que depende de um teclado físico.",
       "clickMoveNote": "Clique para Mover fica desligado até você ativá-lo: abra o painel de Atalhos de Teclado no menu do jogo, ative Clique para Mover, depois use a linha Botão de Clique para Mover logo abaixo para escolher qual botão do mouse faz o personagem andar (Clique Esquerdo por padrão, ou Clique Direito). Uma vez ativado, clicar em um ponto no chão faz você andar até lá, com um marcador no chão mostrando para onde você está indo. Clicar em uma criatura ou em outro jogador faz você andar até ele e parar dentro do alcance, enquanto esse clique ainda cumpre sua função normal de selecionar ou interagir; se você já estiver perto o suficiente para alcançar o que clicou, você simplesmente interage e permanece onde está. Qualquer uma das teclas de movimento retoma o controle na hora e encerra o trajeto, assim como segurar o botão do mouse para olhar ao redor. Pular não faz isso, então você continua se deslocando durante o pulo, e abrir o menu do jogo apenas pausa o trajeto, que continua quando você fecha o menu."
     },

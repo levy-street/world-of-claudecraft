@@ -37,6 +37,8 @@ const GROUPS: Group[] = [
       { keys: ['Shift+Tab'], label: 'guide.controls.targetPrev' },
       { keys: ['H'], label: 'guide.controls.targetFriendly' },
       { keys: ['J'], label: 'guide.controls.cycleFriendly' },
+      { keys: ['F1'], label: 'guide.controls.targetSelf' },
+      { keys: ['F2', 'F5'], label: 'guide.controls.targetParty' },
       { keys: ['Shift+J'], label: 'guide.controls.targetAuras' },
       { keys: ['F'], label: 'controls.interact' },
       { keys: ['Shift+F'], label: 'guide.controls.bgFlag' },

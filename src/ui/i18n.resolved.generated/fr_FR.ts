@@ -1404,6 +1404,11 @@ export const fr_FR: EnTranslations = {
       "petDefensive": "Familier : défensif",
       "petAggressive": "Familier : agressif",
       "targetPet": "Familier : cibler",
+      "targetSelf": "Target Self",
+      "targetParty1": "Target Party Member 1",
+      "targetParty2": "Target Party Member 2",
+      "targetParty3": "Target Party Member 3",
+      "targetParty4": "Target Party Member 4",
       "mount": "Monter / Descendre",
       "mouseHint": "Les boutons de la souris fonctionnent aussi: appuyez sur le bouton central (M3) ou un bouton de pouce (M4, M5) pendant l'assignation. Les boutons gauche et droit restent réservés à la caméra, au clic pour se déplacer et au clic sur les éléments du monde."
     },
@@ -5881,6 +5886,8 @@ export const fr_FR: EnTranslations = {
       "attackMove": "Déplacement d'attaque (seulement une fois l'option activée)",
       "meters": "Compteurs de dégâts (dégâts, soins et menace)",
       "petMark": "Familier : Marquer, sélectionner votre propre familier (comme cliquer sur son cadre)",
+      "targetSelf": "Target yourself",
+      "targetParty": "Target party members 1 to 4, top to bottom as the party frames show them",
       "onBarBinding": "Vous pouvez aussi assigner directement depuis la barre : choisissez Modifier les touches de la barre d'action dans le panneau Raccourcis clavier, puis cliquez sur un emplacement de la barre active et appuyez sur la touche voulue. Cliquez sur Terminé une fois fini. Cette méthode est réservée à l'ordinateur, car elle nécessite un clavier physique.",
       "clickMoveNote": "Cliquer pour se déplacer est désactivé jusqu'à ce que vous l'activiez : ouvrez le panneau Raccourcis clavier dans le menu du jeu, activez Cliquer pour se déplacer, puis utilisez la ligne Bouton clic pour déplacer en dessous pour choisir quel bouton de la souris se charge de la marche (Clic gauche par défaut, ou Clic droit). Une fois activé, cliquer sur un point du sol vous y envoie en marchant, avec un marqueur au sol indiquant votre destination. Cliquer sur une créature ou un autre joueur vous fait marcher jusqu'à lui et vous arrête à portée, tandis que ce clic continue de remplir son rôle habituel de ciblage ou d'interaction ; si vous êtes déjà assez proche pour atteindre ce que vous avez cliqué, vous interagissez simplement sans bouger. N'importe quelle touche de déplacement reprend aussitôt le contrôle et met fin au trajet, tout comme le fait de maintenir le bouton de la souris pour regarder autour de vous. Sauter ne le fait pas, donc vous continuez de voyager pendant le saut, et ouvrir le menu du jeu ne fait que mettre le trajet en pause, qui reprend quand vous fermez le menu."
     },

@@ -1404,6 +1404,11 @@ export const de_DE: EnTranslations = {
       "petDefensive": "Begleiter: Defensiv",
       "petAggressive": "Begleiter: Aggressiv",
       "targetPet": "Begleiter: Anvisieren",
+      "targetSelf": "Target Self",
+      "targetParty1": "Target Party Member 1",
+      "targetParty2": "Target Party Member 2",
+      "targetParty3": "Target Party Member 3",
+      "targetParty4": "Target Party Member 4",
       "mount": "Aufsitzen / Absitzen",
       "mouseHint": "Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten."
     },
@@ -5881,6 +5886,8 @@ export const de_DE: EnTranslations = {
       "attackMove": "Angriffsbewegung (erst, nachdem du die Option aktiviert hast)",
       "meters": "Schadensanzeigen (Schaden, Heilung und Bedrohung)",
       "petMark": "Begleiter: Markieren, deinen eigenen Begleiter auswählen (dasselbe wie ein Klick auf sein Porträt)",
+      "targetSelf": "Target yourself",
+      "targetParty": "Target party members 1 to 4, top to bottom as the party frames show them",
       "onBarBinding": "Du kannst auch direkt von der Leiste aus belegen: Wähle Aktionsleisten-Tasten bearbeiten in der Tastenbelegung, klicke dann auf einen Platz auf der aktiven Leiste und drücke die gewünschte Taste. Klicke auf Fertig, wenn du fertig bist. Das funktioniert nur auf dem Desktop, da es eine physische Tastatur braucht.",
       "clickMoveNote": "Klicken zum Bewegen ist aus, bis du es einschaltest: Öffne die Tastenbelegung im Spielmenü, schalte Klicken zum Bewegen ein, und nutze dann die Zeile Bewegungstaste darunter, um festzulegen, welche Maustaste das Laufen übernimmt (standardmäßig Linksklick, oder Rechtsklick). Ist es aktiv, schickt dich ein Klick auf eine Stelle am Boden dorthin, mit einer Markierung am Boden, die zeigt, wohin du unterwegs bist. Ein Klick auf ein Wesen oder einen anderen Spieler lässt dich zu ihm laufen und in Reichweite anhalten, während dieser Klick weiterhin seine übliche Aufgabe des Anvisierens oder Interagierens erfüllt; bist du bereits nah genug an dem, was du angeklickt hast, interagierst du einfach und bleibst stehen. Jede der Bewegungstasten übernimmt sofort wieder die Kontrolle und beendet die Reise, ebenso das Gedrückthalten der Maustaste zum Umsehen. Springen tut das nicht, du reist also durch den Hüpfer hindurch weiter, und das Öffnen des Spielmenüs pausiert die Reise nur, die weitergeht, sobald du das Menü schließt."
     },

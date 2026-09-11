@@ -1216,7 +1216,10 @@ const MONOLITHS: MonolithRow[] = [
     // Compose the mount cosmetics and practice lesson extractions.
     // Measured combined size; retain zero headroom after the release merge.
     // Weapon-coat amounts now share src/ui/ability_imbue_text.ts with live tooltips.
-    ceiling: 11327,
+    // The targeting callbacks and the pad targeting arm moved to
+    // src/game/targeting_actions.ts with the party target hotkeys; measured
+    // after formatting, zero headroom.
+    ceiling: 11309,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

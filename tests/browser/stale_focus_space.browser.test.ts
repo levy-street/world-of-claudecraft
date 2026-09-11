@@ -41,6 +41,7 @@ beforeAll(() => {
       onCycleFriendly: () => undefined,
       onPet: () => undefined,
       onTargetPet: () => undefined,
+      onTargetParty: () => undefined,
       onAbility: () => undefined,
       onAbilityDown: () => undefined,
       onAbilityUp: () => undefined,

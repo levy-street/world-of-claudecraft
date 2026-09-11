@@ -60,6 +60,11 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   petDefensive: 'hudChrome.keybinds.petDefensive',
   petAggressive: 'hudChrome.keybinds.petAggressive',
   targetPet: 'hudChrome.keybinds.targetPet',
+  targetSelf: 'hudChrome.keybinds.targetSelf',
+  targetParty1: 'hudChrome.keybinds.targetParty1',
+  targetParty2: 'hudChrome.keybinds.targetParty2',
+  targetParty3: 'hudChrome.keybinds.targetParty3',
+  targetParty4: 'hudChrome.keybinds.targetParty4',
 
   // Reuse the existing window/feature names so these labels localize everywhere
   // without duplicating strings (these two ids were previously absent from the

@@ -383,6 +383,8 @@ export const guideStrings = {
     attackMove: 'Attack Move (only once you switch the option on)',
     meters: 'Damage meters (damage, healing, and threat)',
     petMark: 'Pet: Mark, select your own pet (the same as clicking its frame)',
+    targetSelf: 'Target yourself',
+    targetParty: 'Target party members 1 to 4, top to bottom as the party frames show them',
     onBarBinding:
       'You can also bind straight from the bar: choose Edit action bar keys in the Key Bindings panel, then click a slot on the live bar and press the key you want. Click Done when you are finished. This one is desktop only, since it needs a physical keyboard.',
     clickMoveNote:

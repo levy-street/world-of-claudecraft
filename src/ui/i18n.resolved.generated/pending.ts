@@ -10,6 +10,13 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -23,6 +30,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "es_ES": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -36,6 +50,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "fr_FR": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -49,6 +70,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "fr_CA": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -63,6 +91,13 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -76,6 +111,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "de_DE": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -109,6 +151,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow"
   ],
   "pt_BR": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -127,6 +176,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow"
   ],
   "cs_CZ": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -140,6 +196,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "nl_NL": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -153,6 +216,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "pl_PL": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -166,6 +236,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "id_ID": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -179,6 +256,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "tr_TR": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -192,6 +276,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "sv_SE": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -205,6 +296,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "vi_VN": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",
@@ -218,6 +316,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "da_DK": [
+    "guide.controls.targetParty",
+    "guide.controls.targetSelf",
+    "hudChrome.keybinds.targetParty1",
+    "hudChrome.keybinds.targetParty2",
+    "hudChrome.keybinds.targetParty3",
+    "hudChrome.keybinds.targetParty4",
+    "hudChrome.keybinds.targetSelf",
     "hudChrome.wocMarket.colBuyer",
     "hudChrome.wocMarket.colSalePrice",
     "hudChrome.wocMarket.colSaleType",

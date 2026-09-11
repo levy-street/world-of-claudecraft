@@ -81,6 +81,7 @@ function makeInput(userAgent?: string) {
     onCycleFriendly: vi.fn(),
     onPet: vi.fn(),
     onTargetPet: vi.fn(),
+    onTargetParty: vi.fn(),
     onAbility: vi.fn(),
     onAbilityDown: vi.fn(),
     onAbilityUp: vi.fn(),
@@ -352,6 +353,26 @@ describe('Input pet bar chords', () => {
     });
     expect(cb.onTabPrev).toHaveBeenCalledTimes(1);
     expect(cb.onTab).toHaveBeenCalledTimes(1);
+  });
+
+  it('routes the F-row to the party target hotkeys and keeps the browser off them', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    const f1 = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F1', repeat: false, preventDefault: f1 });
+    expect(cb.onTargetParty).toHaveBeenLastCalledWith(0);
+    // F1 opens browser help and F5 reloads the page: a bound press cancels that.
+    expect(f1).toHaveBeenCalledTimes(1);
+    const f5 = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F5', repeat: false, preventDefault: f5 });
+    expect(cb.onTargetParty).toHaveBeenLastCalledWith(4);
+    expect(f5).toHaveBeenCalledTimes(1);
+    expect(cb.onTargetParty).toHaveBeenCalledTimes(2);
+    // An unbound F-key stays the browser's.
+    const f9 = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F9', repeat: false, preventDefault: f9 });
+    expect(f9).not.toHaveBeenCalled();
+    expect(cb.onTargetParty).toHaveBeenCalledTimes(2);
   });
 
   it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {

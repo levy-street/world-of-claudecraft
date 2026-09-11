@@ -108,6 +108,22 @@ describe('registry', () => {
         defaults: [code],
       })),
     );
+    // The party target hotkeys own the F-row: F1 yourself, F2..F5 the party
+    // frame rows top to bottom (input.ts cancels the browser's F-key defaults).
+    expect(BIND_ACTIONS.find((a) => a.id === 'targetSelf')).toMatchObject({
+      label: 'Target Self',
+      category: 'Targeting',
+      kind: 'edge',
+      defaults: ['F1'],
+    });
+    for (let n = 1; n <= 4; n++) {
+      expect(BIND_ACTIONS.find((a) => a.id === `targetParty${n}`)).toMatchObject({
+        label: `Target Party Member ${n}`,
+        category: 'Targeting',
+        kind: 'edge',
+        defaults: [`F${n + 1}`],
+      });
+    }
     // Discord is a rebindable Interface window toggle (default U).
     const discord = BIND_ACTIONS.find((a) => a.id === 'discord');
     expect(discord?.category).toBe('Interface');

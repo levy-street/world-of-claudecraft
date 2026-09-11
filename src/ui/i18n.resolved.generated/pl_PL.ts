@@ -1404,6 +1404,11 @@ export const pl_PL: EnTranslations = {
       "petDefensive": "Zwierzę: Obronne",
       "petAggressive": "Zwierzę: Agresywne",
       "targetPet": "Zwierzę: Obierz",
+      "targetSelf": "Target Self",
+      "targetParty1": "Target Party Member 1",
+      "targetParty2": "Target Party Member 2",
+      "targetParty3": "Target Party Member 3",
+      "targetParty4": "Target Party Member 4",
       "mount": "Dosiądź / Zsiądź",
       "mouseHint": "Przyciski myszy też działają: podczas przypisywania naciśnij środkowy przycisk (M3) lub boczny przycisk (M4, M5). Lewy i prawy przycisk pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania obiektów w świecie."
     },
@@ -5881,6 +5886,8 @@ export const pl_PL: EnTranslations = {
       "attackMove": "Ruch z atakiem (dopiero po włączeniu tej opcji)",
       "meters": "Liczniki obrażeń (obrażenia, leczenie i zagrożenie)",
       "petMark": "Zwierzę: Zaznacz, wybierz własne zwierzę (to samo co kliknięcie jego ramki)",
+      "targetSelf": "Target yourself",
+      "targetParty": "Target party members 1 to 4, top to bottom as the party frames show them",
       "onBarBinding": "Możesz też przypisywać klawisze wprost z paska: wybierz Edytuj klawisze paska akcji w panelu Przypisań klawiszy, a następnie kliknij slot na aktywnym pasku i naciśnij klawisz, którego chcesz użyć. Po zakończeniu kliknij Gotowe. Ta metoda działa tylko na komputerze, ponieważ wymaga fizycznej klawiatury.",
       "clickMoveNote": "Ruch kliknięciem jest wyłączony, dopóki go nie włączysz: otwórz panel Przypisań klawiszy w menu gry, włącz Ruch kliknięciem, a następnie w wierszu Przycisk ruchu kliknięciem poniżej wybierz, który przycisk myszy odpowiada za chodzenie (domyślnie Lewy przycisk, albo Prawy przycisk). Gdy jest włączony, kliknięcie punktu na ziemi wysyła cię tam pieszo, ze znacznikiem na ziemi pokazującym cel. Kliknięcie stworzenia lub innego gracza prowadzi cię do niego i zatrzymuje w zasięgu, podczas gdy to samo kliknięcie wciąż wykonuje swoją zwykłą pracę namierzania lub interakcji; jeśli jesteś już wystarczająco blisko tego, co kliknąłeś, po prostu wchodzisz w interakcję i zostajesz na miejscu. Każdy z klawiszy ruchu natychmiast przejmuje kontrolę i kończy podróż, podobnie jak przytrzymanie przycisku myszy, by się rozglądać. Skakanie tego nie robi, więc kontynuujesz podróż przez podskok, a otwarcie menu gry tylko wstrzymuje podróż, która wraca po zamknięciu menu."
     },

@@ -1404,6 +1404,11 @@ export const id_ID: EnTranslations = {
       "petDefensive": "Peliharaan: Defensif",
       "petAggressive": "Peliharaan: Agresif",
       "targetPet": "Peliharaan: Bidik",
+      "targetSelf": "Target Self",
+      "targetParty1": "Target Party Member 1",
+      "targetParty2": "Target Party Member 2",
+      "targetParty3": "Target Party Member 3",
+      "targetParty4": "Target Party Member 4",
       "mount": "Naiki / Turun",
       "mouseHint": "Tombol tetikus juga berfungsi: tekan tombol tengah (M3) atau tombol ibu jari (M4, M5) saat mengikat. Tombol kiri dan kanan tetap dicadangkan untuk kamera, Klik untuk Bergerak, dan mengeklik sesuatu di dunia."
     },
@@ -5881,6 +5886,8 @@ export const id_ID: EnTranslations = {
       "attackMove": "Serang Bergerak (hanya setelah kamu mengaktifkan opsinya)",
       "meters": "Meter kerusakan (kerusakan, penyembuhan, dan ancaman)",
       "petMark": "Peliharaan: Tandai, pilih peliharaanmu sendiri (sama seperti mengklik bingkainya)",
+      "targetSelf": "Target yourself",
+      "targetParty": "Target party members 1 to 4, top to bottom as the party frames show them",
       "onBarBinding": "Kamu juga bisa mengikat tombol langsung dari bilahnya: pilih Ubah tombol bilah aksi di panel Pengaturan Tombol, lalu klik sebuah slot di bilah yang aktif dan tekan tombol yang kamu inginkan. Klik Selesai saat kamu sudah selesai. Fitur ini hanya untuk desktop, karena membutuhkan papan ketik fisik.",
       "clickMoveNote": "Klik untuk Bergerak nonaktif sampai kamu menyalakannya: buka panel Pengaturan Tombol di menu permainan, nyalakan Klik untuk Bergerak, lalu gunakan baris Tombol Klik untuk Bergerak di bawahnya untuk memilih tombol mouse mana yang akan menjalankanmu (Klik Kiri secara bawaan, atau Klik Kanan). Setelah aktif, mengklik sebuah titik di tanah akan membuatmu berjalan ke sana, dengan penanda di tanah menunjukkan tujuanmu. Mengklik seekor makhluk atau pemain lain akan membuatmu berjalan mendekatinya dan berhenti dalam jangkauan, sementara klik itu tetap menjalankan tugas biasanya untuk menargetkan atau berinteraksi; jika kamu sudah cukup dekat untuk menjangkau apa yang kamu klik, kamu langsung berinteraksi dan tetap di tempatmu. Salah satu tombol pergerakan mana pun akan langsung mengambil alih kendali dan mengakhiri perjalanan itu, begitu pula menahan tombol mouse untuk melihat sekeliling. Melompat tidak demikian, sehingga kamu tetap melanjutkan perjalanan melewati lompatan itu, dan membuka menu permainan hanya menjeda perjalanan, yang akan berlanjut saat kamu menutup menunya."
     },

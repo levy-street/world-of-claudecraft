@@ -8,7 +8,13 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
-import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
+import {
+  comboCode,
+  isModifierCode,
+  type Keybinds,
+  makeCombo,
+  partyTargetActionSlot,
+} from './keybinds';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
 import {
   inForcedPointerLockCooldown,
@@ -70,6 +76,9 @@ export interface InputCallbacks {
   // Select your own pet (Ctrl+6 by default). Separate from onPet: this targets the
   // pet rather than commanding it, so it belongs with the targeting callbacks above.
   onTargetPet(): void;
+  // A party target hotkey (F1..F5 by default): slot 0 is yourself, 1..4 the
+  // party frame rows top to bottom (src/ui/party_target_hotkeys_core.ts).
+  onTargetParty(slot: number): void;
   onAbility(slot: number): void;
   // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
   // shoot) and release to fire. A tap is a down immediately followed by an up.
@@ -1055,6 +1064,9 @@ export class Input {
       // Edge reserve Ctrl+1..8 outright), but this reclaims the ones that are
       // (Firefox) and is a no-op where there is nothing to cancel.
       if (e.ctrlKey || e.altKey || e.metaKey) e.preventDefault?.();
+      // The F-row is browser accelerators too (F1 help, F3 find, F5 reload, F11
+      // fullscreen); a bound F-key press belongs to the game, so cancel those.
+      if (/^F\d{1,2}$/.test(e.code)) e.preventDefault?.();
       // 'chat' and 'lootExplorer' both autofocus a text input as a side effect
       // of this very keydown (the composer textarea; the loot explorer's
       // search box). Left un-prevented, the browser still delivers the
@@ -1115,6 +1127,11 @@ export class Input {
   private dispatchEdge(action: string): void {
     if (action.startsWith('slot')) {
       this.cb.onAbility(Number(action.slice(4)));
+      return;
+    }
+    const partySlot = partyTargetActionSlot(action);
+    if (partySlot !== null) {
+      this.cb.onTargetParty(partySlot);
       return;
     }
     switch (action) {
