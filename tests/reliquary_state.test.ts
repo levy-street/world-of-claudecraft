@@ -2408,17 +2408,25 @@ describe('Reliquary ownership snapshot liveness', () => {
     // noteReliquaryMark builds its ownership snapshot BEFORE marks.add and
     // hands the SAME object to emitReliquaryUnlock and syncCuratorRankDeeds,
     // which need the post-add view. That is correct only while
-    // characterReliquaryOwnership returns live references for these three
-    // surfaces: a future defensive copy (an entirely safe-looking change)
-    // would kill page-completion illumination and rank deeds on the MARK path
-    // silently, with the whole suite green, because every illumination test
-    // drives the ITEM path where the ledger write precedes the snapshot.
+    // characterReliquaryOwnership answers LIVE for these three surfaces (the
+    // account-union lookups read the character's own Set and the ledger at
+    // query time, never a copy): a future defensive copy (an entirely
+    // safe-looking change) would kill page-completion illumination and rank
+    // deeds on the MARK path silently, with the whole suite green, because
+    // every illumination test drives the ITEM path where the ledger write
+    // precedes the snapshot.
     const sim = makeSim();
     const { meta } = primary(sim);
     const ownership = characterReliquaryOwnership(meta);
-    expect(ownership.marks).toBe(meta.reliquary.marks);
-    expect(ownership.itemsDiscovered).toBe(meta.deedStats.itemsDiscovered);
-    expect(ownership.deedsEarned).toBe(meta.deedsEarned);
+    expect(ownership.marks.has('gather_event:pristine_vein')).toBe(false);
+    expect(ownership.itemsDiscovered.has('cryptbone_helm')).toBe(false);
+    expect(ownership.deedsEarned.has('soc_meet_bursar')).toBe(false);
+    meta.reliquary.marks.add('gather_event:pristine_vein');
+    meta.deedStats.itemsDiscovered.add('cryptbone_helm');
+    meta.deedsEarned.set('soc_meet_bursar', '2026-09-01');
+    expect(ownership.marks.has('gather_event:pristine_vein')).toBe(true);
+    expect(ownership.itemsDiscovered.has('cryptbone_helm')).toBe(true);
+    expect(ownership.deedsEarned.has('soc_meet_bursar')).toBe(true);
   });
 
   it('a MARK that completes its page illuminates it (the liveness in behavior)', () => {

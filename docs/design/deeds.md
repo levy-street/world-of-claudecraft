@@ -233,11 +233,22 @@ The Book of Deeds is shared across every character on an account, and every
 earned deed remembers which characters earned it. The mechanism is the
 account ledger (`src/sim/account_ledger.ts`), and its scope model is fixed:
 
-- **The grant lane stays per character.** The evaluator decides from the
-  acting character's own state, so a character is listed as an earner only
-  for what it accomplished itself. A rank bridge or completion-ladder deed an
-  alt earned shows as earned (by the alt); it is never re-granted to the
-  reader from the union.
+- **The evaluator stays per character, with one account-wide family.** Every
+  deed whose trigger is an accomplishment (a kill, a quest, a craft, a level)
+  is decided from the acting character's own state, so its earners all did
+  the thing themselves. The Reliquary-derived deeds (Curator rank bridges,
+  the completion ladder, Illumination) are the exception, by maintainer
+  ruling and matching jgyy's PR #3933: they are decided over the ACCOUNT
+  union (`characterReliquaryOwnership` returns it) and granted to every
+  character on the account. The character whose find tipped the read earns
+  them in its fill chain, a live sibling in the same tick
+  (`syncAccountRelicGrants`, re-run by the server fan-out when a sibling's
+  ledger grows), and an offline alt at its next join (the join retro,
+  retro-flagged, no live banner). Each recipient is recorded as an earner in
+  its own right, so the card lists every character that holds the deed.
+  A relic an alt already found moves no rank count when this character finds
+  it too, so no rank crossing is faked (`tests/account_ledger_sim.test.ts`,
+  `tests/account_ledger_wire.test.ts`).
 - **The display lane is account-wide.** The Book's earned state, header pair,
   category counts, Renown, recent strip, and the title and border pickers all
   read the union of `deedsEarned` and the ledger (`IWorldDeeds.accountDeeds`),
@@ -279,12 +290,13 @@ account ledger (`src/sim/account_ledger.ts`), and its scope model is fixed:
 
 ## Deliberately deferred (do not "fix" these by shipping them)
 
-- **Account-level GRANTS** (`prog_three_paths`, `prog_ninefold`, and the
-  seven server-assisted `feat_*` world/realm firsts): the Book is account-wide
-  for display and cosmetics through the account ledger above, but the
-  evaluator is still strictly per-character and `server/deeds_records.ts` is
-  observer-only; a deed whose trigger reads ACROSS characters still needs an
-  account-level grant lane.
+- **Account-level GRANTS beyond the Reliquary family** (`prog_three_paths`,
+  `prog_ninefold`, and the seven server-assisted `feat_*` world/realm
+  firsts): the Book is account-wide for display and cosmetics through the
+  account ledger above, and the Reliquary-derived deeds grant from the union,
+  but the evaluator is otherwise strictly per-character and
+  `server/deeds_records.ts` is observer-only; a deed whose trigger reads
+  ACROSS characters' accomplishments still needs an account-level grant lane.
 - **`prog_ringwright`**: every ring craft now has a live gain path (the
   Masterwrought phase 06 inscription catalog closed the last gap, and its
   milestone and Grandmaster deeds shipped with it), so the old

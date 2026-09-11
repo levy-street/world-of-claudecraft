@@ -21,9 +21,8 @@ import {
   CURATOR_RANK_DEFS,
   catalogRankOwned,
   characterReliquaryOwnership,
-  curatorRankFromOwned,
   noteReliquaryMark,
-  RELIQUARY_COMPLETION_DEED_IDS,
+  pageCompletion,
   RELIQUARY_PAGES_BY_ID,
   seedAccountLedgerSelf,
   selfRelicKeys,
@@ -162,52 +161,73 @@ describe('the cosmetic validators are account-wide', () => {
   });
 });
 
-describe('display lane unions the ledger, grant lane stays character-scoped', () => {
-  it('Sim facet completion counts an alt-found relic; the character-scoped rank surface does not', () => {
+describe('both lanes read the account union: display, and the Reliquary-derived grants', () => {
+  it('Sim facet completion counts an alt-found relic, and so does the grant-lane ownership read', () => {
     const { sim, meta } = makeSim();
     expect(sim.reliquaryPageCompletion(PAGE_ID)?.owned).toBe(0);
     recordAccountRelic(meta.accountLedger, accountRelicKey('item', CATALOGUE_RELIC), ALT);
     expect(sim.reliquaryPageCompletion(PAGE_ID)?.owned).toBe(1);
     expect(sim.reliquaryCuratorRank()).toBe(1);
     expect(sim.reliquaryAccountFinds.get('item:cryptbone_helm')).toEqual([ALT]);
-    // The character's own surfaces are untouched: no invented discovery.
+    // The character's own discovery set is untouched: the union, never a copy.
     expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
-    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(0);
+    // Both ownership reads are the same union now (the maintainer ruling).
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(1);
     expect(catalogRankOwned(accountReliquaryOwnership(meta))).toBe(1);
   });
 
-  it('an alt filling the whole Hollow Crypt page shows it complete here without granting this character its rank or illumination deeds', () => {
-    const { sim, meta } = makeSim();
-    for (const relic of RELIQUARY_PAGES_BY_ID[PAGE_ID].relics) {
+  it('an alt logging in receives the deeds the account already qualifies for, retro-flagged and recorded under its own name', () => {
+    // The alt (Bram) found every Thunzharr relic; this character (id 42)
+    // joins with that ledger and has found nothing itself.
+    const ledger = freshAccountLedger();
+    for (const relic of RELIQUARY_PAGES_BY_ID[FLAGSHIP_PAGE].relics) {
       if (relic.kind === 'item') {
-        recordAccountRelic(meta.accountLedger, accountRelicKey('item', relic.itemId), ALT);
+        recordAccountRelic(ledger, accountRelicKey('item', relic.itemId), ALT);
       }
     }
-    const page = sim.reliquaryPageCompletion(PAGE_ID)!;
+    recordAccountDeed(ledger, FLAGSHIP_DEED, ALT);
+    const { sim, meta } = makeSim({ ledger });
+    // The union (this second player's grant-lane read, not the sandbox
+    // primary's facet) completes the page.
+    const page = pageCompletion(
+      RELIQUARY_PAGES_BY_ID[FLAGSHIP_PAGE],
+      characterReliquaryOwnership(meta),
+    );
     expect(page.complete).toBe(true);
-    expect(page.owned).toBe(page.total);
-    const accountRank = curatorRankFromOwned(catalogRankOwned(accountReliquaryOwnership(meta)));
-    expect(sim.reliquaryCuratorRank()).toBe(accountRank);
-    expect(accountRank).toBeGreaterThanOrEqual(1);
-    sim.tick();
-    // The grant lane is character-scoped: this character found nothing, so no
-    // rank bridge and no completion-ladder deed lands on it (the alt's own
-    // grants are listed under the alt in the account's Book).
+    // The join retro granted the Illumination deed to this character too, and
+    // the ledger now lists BOTH characters as earners, the alt first.
+    expect(meta.deedsEarned.has(FLAGSHIP_DEED)).toBe(true);
+    expect(meta.accountLedger.deeds.get(FLAGSHIP_DEED)?.map((e) => e.characterId)).toEqual([
+      99, 42,
+    ]);
+    // The Illumination title is a catalogued fill: nine relics plus it is ten
+    // owned, so the rank 2 bridge lands in the same pass (recorded too) and
+    // nothing above it is invented. The own discovery set stays empty of relics.
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
+    expect(meta.accountLedger.deeds.get('col_reliquary_rank_2')?.map((e) => e.characterId)).toEqual(
+      [42],
+    );
     for (const def of CURATOR_RANK_DEFS) {
-      if (def.deedId) expect(meta.deedsEarned.has(def.deedId), def.deedId).toBe(false);
+      if (def.rank >= 3 && def.deedId) {
+        expect(meta.deedsEarned.has(def.deedId), def.deedId).toBe(false);
+      }
     }
-    for (const id of RELIQUARY_COMPLETION_DEED_IDS) {
-      expect(meta.deedsEarned.has(id), id).toBe(false);
-    }
+    const relics = RELIQUARY_PAGES_BY_ID[FLAGSHIP_PAGE].relics;
+    expect(
+      relics.some((r) => r.kind === 'item' && meta.deedStats.itemsDiscovered.has(r.itemId)),
+    ).toBe(false);
+    // The retro grant drained as a retro event (no live banner).
+    const evs = sim
+      .tick()
+      .filter(
+        (ev): ev is Extract<SimEvent, { type: 'deedUnlocked' }> =>
+          ev.type === 'deedUnlocked' && ev.deedId === FLAGSHIP_DEED,
+      );
+    expect(evs).toHaveLength(1);
+    expect(evs[0].retro).toBe(true);
   });
 
-  it('a fill chain on THIS character that completes a flagship page only through the union grants no illumination deed', () => {
-    // Decisive form (review): the rank bridge and the completion ladder run
-    // INSIDE the fill chain, so the acting character must actually discover
-    // something. The alt owns every Thunzharr relic but the last; this
-    // character finds the last one, the union completes the page, and the
-    // flagship illumination deed still must not land here (a per-character
-    // grant lane reads one own fill, not a whole page).
+  it('a fill on THIS character that completes a flagship page through the union grants the illumination deed, with this character recorded', () => {
     const { sim, meta } = makeSim();
     sim.tick();
     const relics = RELIQUARY_PAGES_BY_ID[FLAGSHIP_PAGE].relics.filter((r) => r.kind === 'item');
@@ -220,28 +240,54 @@ describe('display lane unions the ledger, grant lane stays character-scoped', ()
       }
     }
     expect(sim.reliquaryPageCompletion(FLAGSHIP_PAGE)?.complete).toBe(false);
-    markItemDiscovered(sim.ctx, meta, last.itemId);
-    sim.tick();
-    // The union completes the page for the display lane...
-    expect(sim.reliquaryPageCompletion(FLAGSHIP_PAGE)?.complete).toBe(true);
-    // ...but the grant lane saw ONE own fill: no illumination deed, no rank
-    // bridge above rank 1 (which has no deed), and the alt-only entries stayed
-    // out of this character's own discovery set.
     expect(meta.deedsEarned.has(FLAGSHIP_DEED)).toBe(false);
-    for (const def of CURATOR_RANK_DEFS) {
-      if (def.deedId) expect(meta.deedsEarned.has(def.deedId), def.deedId).toBe(false);
-    }
-    // Of the page's relics, only the one this character found is in its own set
-    // (the sandbox character already knows its starter gear, so no bare size).
-    expect(relics.filter((r) => meta.deedStats.itemsDiscovered.has(r.itemId))).toEqual([last]);
-    // Control: the same fills on this character's OWN surfaces do grant it.
-    const own = makeSim();
-    own.sim.tick();
+    markItemDiscovered(sim.ctx, meta, last.itemId);
+    // The fill chain read the union: the page completed and the Illumination
+    // deed landed on the finder, live (not retro), recorded under its name.
+    expect(sim.reliquaryPageCompletion(FLAGSHIP_PAGE)?.complete).toBe(true);
+    expect(meta.deedsEarned.has(FLAGSHIP_DEED)).toBe(true);
+    expect(meta.accountLedger.deeds.get(FLAGSHIP_DEED)?.map((e) => e.characterId)).toEqual([0]);
+    const evs = sim
+      .tick()
+      .filter((ev) => ev.type === 'deedUnlocked' && ev.deedId === FLAGSHIP_DEED);
+    expect(evs).toHaveLength(1);
+    expect((evs[0] as { retro?: boolean }).retro).toBeUndefined();
+  });
+
+  it('a relic an alt already holds does not fake a rank crossing when this character finds it too', () => {
+    // Eight alt-found relics (the page one short of complete, so no ladder
+    // title moves the count) put the account at Curator rank 1; this
+    // character finding one of the SAME eight moves no count, so no rank-up
+    // rides the unlock event and no deed lands.
+    const { sim, meta } = makeSim();
+    sim.tick();
+    const relics = RELIQUARY_PAGES_BY_ID[FLAGSHIP_PAGE].relics.slice(0, -1);
     for (const relic of relics) {
-      if (relic.kind === 'item') markItemDiscovered(own.sim.ctx, own.meta, relic.itemId);
+      if (relic.kind === 'item') {
+        recordAccountRelic(meta.accountLedger, accountRelicKey('item', relic.itemId), ALT);
+      }
     }
-    own.sim.tick();
-    expect(own.meta.deedsEarned.has(FLAGSHIP_DEED)).toBe(true);
+    const first = relics[0];
+    if (first.kind !== 'item') throw new Error('expected an item relic');
+    const before = catalogRankOwned(characterReliquaryOwnership(meta));
+    expect(before).toBe(relics.length);
+    const deedsBefore = meta.deedsEarned.size;
+    markItemDiscovered(sim.ctx, meta, first.itemId);
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(before);
+    expect(meta.deedsEarned.size).toBe(deedsBefore);
+    // This character is now the relic's SECOND finder on the ledger.
+    expect(
+      meta.accountLedger.relics
+        .get(accountRelicKey('item', first.itemId))
+        ?.map((e) => e.characterId),
+    ).toEqual([99, 0]);
+    const unlock = sim
+      .tick()
+      .find((ev) => ev.type === 'reliquaryUnlock' && ev.itemId === first.itemId) as
+      | { curatorRank?: number }
+      | undefined;
+    expect(unlock).toBeDefined();
+    expect(unlock?.curatorRank).toBeUndefined();
   });
 
   it('accountDeeds exposes the ledger deed half and marks/mounts union through the account surfaces', () => {

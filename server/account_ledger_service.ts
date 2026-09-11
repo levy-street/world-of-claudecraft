@@ -35,6 +35,10 @@ export interface AccountLedgerHost {
   sim(): LedgerSim;
   /** Every live session, any account (the service filters by accountId). */
   sessions(): Iterable<LedgerSession>;
+  /** Re-run the account-derived Reliquary grant syncs for a live character
+   *  whose ledger just grew (syncAccountRelicGrants over the union), so the
+   *  deeds the account now qualifies for land on it in the same tick. */
+  syncAccountGrants(pid: number): void;
 }
 
 function earnerFor(
@@ -77,6 +81,7 @@ export class AccountLedgerService {
       if (!ledger) continue;
       if (apply(ledger)) {
         live.selfHeavyDirty = true;
+        this.host.syncAccountGrants(live.pid);
         changed++;
       }
     }

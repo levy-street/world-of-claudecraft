@@ -24,6 +24,7 @@ function rig() {
     sessions.push(s);
     return s;
   };
+  const synced: number[] = [];
   const host: AccountLedgerHost = {
     sim: () => ({
       meta: (pid: number) => {
@@ -32,15 +33,16 @@ function rig() {
       },
     }),
     sessions: () => sessions,
+    syncAccountGrants: (pid) => synced.push(pid),
   };
-  return { service: new AccountLedgerService(host), ledgers, add };
+  return { service: new AccountLedgerService(host), ledgers, add, synced };
 }
 
 const DAY = '2026-09-10';
 
 describe('AccountLedgerService', () => {
   it('copies the actor entry to same-account siblings only, marking each heavy-dirty', () => {
-    const { service, ledgers, add } = rig();
+    const { service, ledgers, add, synced } = rig();
     const actor = add(1, 7, 42);
     const alt = add(2, 7, 43);
     const stranger = add(3, 8, 99);
@@ -61,10 +63,12 @@ describe('AccountLedgerService', () => {
     expect(stranger.selfHeavyDirty).toBe(false);
     // The actor's own session is never re-marked (its ledger already has it).
     expect(actor.selfHeavyDirty).toBe(false);
+    // The grant syncs ran for the sibling whose ledger grew, and only there.
+    expect(synced).toEqual([2]);
   });
 
   it('is idempotent: a repeat changes no sibling and re-marks nobody', () => {
-    const { service, ledgers, add } = rig();
+    const { service, ledgers, add, synced } = rig();
     const actor = add(1, 7, 42);
     const alt = add(2, 7, 43);
     recordAccountRelic(ledgers.get(1)!, 'item:cryptbone_helm', {
@@ -78,6 +82,8 @@ describe('AccountLedgerService', () => {
     expect(service.noteRelicFound(actor, 'item:cryptbone_helm')).toBe(0);
     expect(alt.selfHeavyDirty).toBe(false);
     expect(ledgers.get(2)!.relics.get('item:cryptbone_helm')).toHaveLength(1);
+    // One sync per real growth, never per repeat.
+    expect(synced).toEqual([2]);
   });
 
   it('copies nothing when the actor ledger has no entry for that key or character', () => {

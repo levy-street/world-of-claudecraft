@@ -52,6 +52,7 @@ import {
 } from '../src/sim/account_ledger';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { grantDeed, markItemDiscovered } from '../src/sim/deeds';
+import { RELIQUARY_PAGES_BY_ID } from '../src/sim/reliquary';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { bareClient } from './helpers/bare_client';
@@ -59,6 +60,8 @@ import { bareClient } from './helpers/bare_client';
 const CATALOGUE_RELIC = 'cryptbone_helm';
 const PAGE_ID = 'conquerors_hollow_crypt';
 const TITLE_DEED = DEED_ORDER.find((id) => DEEDS[id].reward?.kind === 'title')!;
+const FLAGSHIP_DEED = 'col_reliquary_illum_thunzharr';
+const FLAGSHIP_PAGE = 'conquerors_thunzharr';
 const insertMock = vi.mocked(insertAccountRelicFinds);
 
 function fakeWs() {
@@ -165,6 +168,48 @@ describe('account ledger over the wire', () => {
     expect(client.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
     expect(client.reliquaryPageCompletion(PAGE_ID)?.owned).toBe(1);
     expect(client.reliquaryCuratorRank()).toBe(1);
+  });
+
+  it('a live sibling receives the account-derived deed in the same tick and is recorded as an earner', () => {
+    // Bram (an alt, GM-joined past the per-account cap) has found every
+    // Thunzharr relic but one; Hilda finds the last. The union completes the
+    // page for both, the Illumination deed lands on Hilda in her fill chain
+    // and on Bram through the fan-out's grant sync, and each is recorded on
+    // both ledgers.
+    const server = new GameServer();
+    const fwA = fakeWs();
+    const fwB = fakeWs();
+    const a = joinAt(server, fwA, 7, 42, 'Hilda');
+    const b = joinAt(server, fwB, 7, 43, 'Bram', null, undefined, true);
+    tickThrough(server);
+    const sim = server.sim as Sim;
+    const metaA = sim.players.get(a.pid)!;
+    const metaB = sim.players.get(b.pid)!;
+    const relics = RELIQUARY_PAGES_BY_ID[FLAGSHIP_PAGE].relics.filter((r) => r.kind === 'item');
+    const last = relics[relics.length - 1];
+    if (last.kind !== 'item') throw new Error('expected an item relic');
+    for (const relic of relics.slice(0, -1)) {
+      if (relic.kind === 'item') markItemDiscovered(sim.ctx, metaB, relic.itemId);
+    }
+    tickThrough(server); // Bram's finds reach Hilda's ledger
+    expect(metaA.accountLedger.relics.size).toBe(relics.length - 1);
+    expect(metaA.deedsEarned.has(FLAGSHIP_DEED)).toBe(false);
+    expect(metaB.deedsEarned.has(FLAGSHIP_DEED)).toBe(false);
+
+    markItemDiscovered(sim.ctx, metaA, last.itemId);
+    // Hilda's own fill chain granted her the deed at once...
+    expect(metaA.deedsEarned.has(FLAGSHIP_DEED)).toBe(true);
+    tickThrough(server); // ...and the fan-out's grant sync gave it to Bram
+    expect(metaB.deedsEarned.has(FLAGSHIP_DEED)).toBe(true);
+    tickThrough(server); // Bram's grant fans back so both ledgers list both
+    for (const meta of [metaA, metaB]) {
+      expect(
+        meta.accountLedger.deeds
+          .get(FLAGSHIP_DEED)
+          ?.map((e) => e.characterId)
+          .sort(),
+      ).toEqual([42, 43]);
+    }
   });
 
   it('a stranger account learns nothing', () => {

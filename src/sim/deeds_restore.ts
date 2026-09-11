@@ -14,7 +14,7 @@ import {
   setActiveTitle,
   unionLegacyMilestones,
 } from './deeds';
-import { restoreReliquaryState, seedAccountLedgerSelf } from './reliquary';
+import { restoreReliquaryState, seedAccountLedgerSelf, syncAccountRelicGrants } from './reliquary';
 import type { CharacterState, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
@@ -58,7 +58,9 @@ export function restoreBookOfDeeds(meta: PlayerMeta, player: Entity, s: Characte
  * its own restored state proves, so the union the books read never lacks the
  * character reading it (a blob predating the ledger, or a host that handed in
  * no ledger at all); silent and idempotent, and the server reconciles the
- * same keys into its tables.
+ * same keys into its tables. Then the account-derived grant syncs run over
+ * the union, so an alt logging in receives the Reliquary deeds the account
+ * already qualifies for.
  */
 export function runBookOfDeedsJoinRetro(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   seedItemDiscovery(ctx, meta);
@@ -67,4 +69,10 @@ export function runBookOfDeedsJoinRetro(ctx: SimContext, meta: PlayerMeta, playe
   ctx.deedDirtyPids.delete(player.id);
   ctx.deedDirtyKeys.delete(player.id);
   seedAccountLedgerSelf(ctx, meta);
+  // The account's Reliquary-derived deeds (rank bridges, completion ladder,
+  // Illumination) land on this character too, retro-flagged like every other
+  // join grant, and recorded under its own name.
+  syncAccountRelicGrants(ctx, meta, RETRO);
 }
+
+const RETRO = { retro: true } as const;

@@ -445,7 +445,10 @@ export function onItemDiscovered(
   const ownership = characterReliquaryOwnership(meta);
   // Account ledger: this character is now a finder of the relic (the
   // catalogued-item cell fills account-wide from here). Idempotent, so the
-  // join seed's re-walk of held items is a no-op after the first record.
+  // join seed's re-walk of held items is a no-op after the first record. The
+  // union already held the relic when an alt found it first, in which case
+  // this add moved no count and must not fake a rank crossing below.
+  const alreadyOnAccount = meta.accountLedger.relics.has(accountRelicKey('item', itemId));
   recordRelic(ctx, meta, 'item', itemId, opts);
   // Rank is character-durable catalogued fills (items + marks + mounts + titles;
   // never account skins). Prior count is owned - 1 only when this discover
@@ -456,7 +459,7 @@ export function onItemDiscovered(
   // that fires a rank-up banner for a rank the player already held (the
   // riftbound bands are the live-mintable case).
   const owned = catalogRankOwned(ownership);
-  const scored = relicFillScoresForRank('item', itemId);
+  const scored = relicFillScoresForRank('item', itemId) && !alreadyOnAccount;
   const previousRank = curatorRankFromOwned(scored ? Math.max(0, owned - 1) : owned);
   const newRank = curatorRankFromOwned(owned);
   const rankedUp = newRank > previousRank ? newRank : undefined;
@@ -651,11 +654,13 @@ export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: str
   // excludeFromCompletion page must not fake a threshold crossing (the item
   // path's riftbound-band defect, fixed in the same change as this guard).
   const previousOwned = catalogRankOwned(ownership);
+  const alreadyOnAccount = meta.accountLedger.relics.has(accountRelicKey('mark', markId));
   meta.reliquary.marks.add(markId);
   pushRecent(meta.reliquary, markId);
   bumpReliquaryWireRev(meta.reliquary);
   recordRelic(ctx, meta, 'mark', markId);
-  const newOwned = relicFillScoresForRank('mark', markId) ? previousOwned + 1 : previousOwned;
+  const newOwned =
+    relicFillScoresForRank('mark', markId) && !alreadyOnAccount ? previousOwned + 1 : previousOwned;
   const previousRank = curatorRankFromOwned(previousOwned);
   const newRank = curatorRankFromOwned(newOwned);
   const rankedUp = newRank > previousRank ? newRank : undefined;
@@ -1343,21 +1348,42 @@ export interface ReliquaryOwnershipSurfaces {
 }
 
 export function characterReliquaryOwnership(meta: PlayerMeta): ReliquaryOwnershipSurfaces {
-  return {
-    itemsDiscovered: meta.deedStats.itemsDiscovered,
-    marks: meta.reliquary.marks,
-    ownedMounts: new Set(ownedMountKeys(meta)),
-    deedsEarned: meta.deedsEarned,
-  };
+  // The GRANT lane reads the ACCOUNT (the maintainer ruling, matching PR
+  // #3933's model): a relic any character on the account found scores here
+  // exactly as one this character found, so the Curator rank bridges, the
+  // completion ladder, and Illumination are granted to every character on the
+  // account, each recorded as an earner in its own right (grantDeed appends
+  // the acting character to the ledger). The alts that are offline receive
+  // the same grants at their next join (runBookOfDeedsJoinRetro) and a live
+  // sibling receives them in the same tick (syncAccountRelicGrants, driven by
+  // the server's AccountLedgerService fan-out).
+  return accountReliquaryOwnership(meta);
 }
 
 /**
- * ACCOUNT-scoped ownership for the display lane (the Reliquary window, the
- * inspect card's Curator standing): every character-durable surface is the
- * union of this character's own state and the account ledger
- * (src/sim/account_ledger.ts). Never used by a grant path: rank bridges and
- * completion-ladder deeds stay decided over characterReliquaryOwnership so a
- * character is listed as an earner only for what it did itself.
+ * Re-run the two account-derived grant syncs for a character whose account
+ * ledger just grew (a sibling's find or earn reached it): the rank bridges and
+ * the completion ladder read the union, so the deeds the account now
+ * qualifies for land on this character too, recorded under its own name.
+ * Idempotent (grantDeed no-ops on an earned deed); a missing meta is a no-op.
+ */
+export function syncAccountRelicGrants(
+  ctx: SimContext,
+  meta: PlayerMeta | null | undefined,
+  opts?: Readonly<{ retro?: boolean }>,
+): void {
+  if (!meta) return;
+  const ownership = characterReliquaryOwnership(meta);
+  maybeSyncCuratorRankDeeds(ctx, meta, opts, ownership);
+  syncReliquaryCompletionDeeds(ctx, meta, opts, ownership);
+}
+
+/**
+ * ACCOUNT-scoped ownership: every character-durable surface is the union of
+ * this character's own state and the account ledger
+ * (src/sim/account_ledger.ts). Both lanes read it: the display lane (the
+ * Reliquary window, the inspect card's Curator standing) and, through
+ * characterReliquaryOwnership, the grant lane.
  */
 export function accountReliquaryOwnership(meta: PlayerMeta): ReliquaryOwnershipSurfaces {
   const ledger = meta.accountLedger;

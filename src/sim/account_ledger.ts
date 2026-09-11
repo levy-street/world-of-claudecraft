@@ -4,14 +4,18 @@
 // (a relic), in the order they did.
 //
 // Scope model, stated once:
-// - The GRANT lane stays per character. The deeds evaluator (deeds.ts) and the
-//   Reliquary fill paths (reliquary.ts) still decide from the acting
-//   character's own state, so a character is listed as an earner only when it
-//   accomplished the thing itself. Nothing here can grant, deny, or mutate a
-//   deed or a relic fill.
-// - The DISPLAY and ownership lane is account-wide. The two books, the
-//   cosmetic pickers (titles, borders), completion meters and Curator rank all
-//   read the UNION of the character's own state and this ledger.
+// - Ownership is account-wide. The two books, the cosmetic pickers (titles,
+//   borders), completion meters and Curator rank all read the UNION of the
+//   character's own state and this ledger.
+// - The Reliquary-derived deeds (Curator rank bridges, the completion ladder,
+//   Illumination) are granted from that union to EVERY character on the
+//   account (the maintainer ruling, the model of jgyy's pull request 3933):
+//   the character whose find tipped the read earns them at once, a live
+//   sibling in the same tick (the server's fan-out re-runs the grant syncs),
+//   an offline alt at its next join (the join retro), and each of them is
+//   recorded here as an earner in its own right. Every other deed stays a
+//   per-character accomplishment. Nothing in this module grants, denies, or
+//   mutates a deed or a relic fill.
 //
 // The ledger is INPUT to the sim, never sim-derived truth: the server loads it
 // from the character_deeds and account_relic_finds tables at join

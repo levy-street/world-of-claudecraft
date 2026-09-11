@@ -66,6 +66,7 @@ import {
   curatorRankFromOwned,
   reliquaryWireJson,
   selfRelicKeys,
+  syncAccountRelicGrants,
 } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
@@ -1597,10 +1598,10 @@ export class GameServer {
     sessions: () => this.clients.values(),
     resyncQuests: (session) => this.resyncQuests(session as ClientSession),
   });
-  // Account ledger live fan-out to the account's other sessions (account_ledger_service.ts).
   private readonly ledger = new AccountLedgerService({
     sim: () => this.sim,
     sessions: () => this.clients.values(),
+    syncAccountGrants: (pid) => syncAccountRelicGrants(this.sim.ctx, this.sim.meta(pid)),
   });
   private readonly bankVaultLedgerGuardCoordinator: BankVaultLedgerGuardCoordinator =
     createBankVaultLedgerGuardCoordinator(() => Date.now() / 1000, {
