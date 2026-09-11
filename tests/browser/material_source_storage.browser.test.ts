@@ -81,9 +81,37 @@ function mount(width: number, height: number) {
   return { root, withdraw };
 }
 
+function rightClick(element: Element): void {
+  const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+  Object.defineProperty(event, 'pointerType', { value: 'mouse' });
+  element.dispatchEvent(event);
+}
+
 describe('material source actions in the real bank window', () => {
+  it('desktop grows no per-cell button: right-click opens the same picker', async () => {
+    await page.viewport(1280, 720);
+    const { root, withdraw } = mount(1280, 720);
+    const cell = root.querySelector<HTMLElement>('.bank-item:not(.empty)')!;
+    expect(cell).not.toBeNull();
+    expect(root.querySelector('.material-sources-action')).toBeNull();
+    expect(root.querySelector('.material-source-item-cell')).toBeNull();
+    // The cell is a plain grid item again: same footprint as an empty square.
+    const empty = root.querySelector<HTMLElement>('.bank-item.empty')!;
+    expect(
+      Math.abs(cell.getBoundingClientRect().height - empty.getBoundingClientRect().height),
+    ).toBeLessThanOrEqual(1);
+    await page.screenshot({
+      path: '../../docs/screenshots/intentional-gathering-pr2/bank-1280x720.png',
+    });
+    rightClick(cell);
+    expect(withdraw).not.toHaveBeenCalled();
+    expect(
+      document.querySelectorAll('#material-sources-dialog .material-sources-row'),
+    ).toHaveLength(2);
+    expect(document.querySelectorAll('#material-sources-dialog input')).toHaveLength(2);
+  });
+
   for (const [width, height] of [
-    [1280, 720],
     [844, 390],
     [390, 844],
   ]) {
@@ -142,7 +170,7 @@ describe('material source actions in the real bank window', () => {
   it('removes its source prompt when the bank is force-closed', async () => {
     await page.viewport(1280, 720);
     const { root } = mount(1280, 720);
-    root.querySelector<HTMLButtonElement>('.material-sources-action')!.click();
+    rightClick(root.querySelector<HTMLElement>('.bank-item:not(.empty)')!);
     expect(document.getElementById('material-sources-dialog')).not.toBeNull();
     bank!.close();
     expect(document.getElementById('material-sources-dialog')).toBeNull();
