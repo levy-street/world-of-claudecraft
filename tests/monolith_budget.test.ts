@@ -455,7 +455,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
     // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
     // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
-    ceiling: 18350,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 18386,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -851,7 +854,10 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Restored per-ability resurrection school lookup removes one line.
-    ceiling: 12851,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 14912,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1024,7 +1030,10 @@ const MONOLITHS: MonolithRow[] = [
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 11879,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 12124,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1223,7 +1232,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-measured at the release/v0.43.0 sync that brought PR 3778 in: the
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
-    ceiling: 11321,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 11644,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1438,7 +1450,10 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 10095,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 10102,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1581,7 +1596,10 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 5543,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1593,7 +1611,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
     // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
     // Pure location/rift routing moved to music_zones.ts; floor streams reuse the director.
-    ceiling: 4850,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 5178,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -1615,7 +1636,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the castle pad chain and the Last Spring bank left with the castle (keep_site.ts holds the new pad). Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 5216,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 5727,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -1802,7 +1826,10 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered after extracting the world trees' camera-occluder fade (the
     // hideable records, the trunk hit test, the gated instance/ghost swap)
     // into src/render/tree_hide_fade.ts.
-    ceiling: 3996,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 4113,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -1870,7 +1897,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the keep wall-ledge and parapet loops retired and the Wildheart static set moved beside its field data. Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 2548,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 3383,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -1908,7 +1938,10 @@ const MONOLITHS: MonolithRow[] = [
     // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
     // the record: ours 2804, the release 2433. Measured on the merged tree,
     // never reconciled by arithmetic. Exact merged count, zero slack.
-    ceiling: 2432,
+    // BRANCH feature/deepglass: re-pinned at the Deepglass port (the Studio fork's
+    // map runtime lands here); extraction behind the file's seam is owed before the
+    // release merge. See docs/deepglass-branch.md.
+    ceiling: 2551,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

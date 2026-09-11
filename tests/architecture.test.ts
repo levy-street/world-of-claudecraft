@@ -2554,6 +2554,10 @@ const UI_DOM_MODULES = [
   'src/ui/native_select_hold.ts',
   'src/ui/native_update_prompt.ts',
   'src/ui/noticeboard_popup.ts',
+  // Backing-store DPR helper for the map canvases (reads window.devicePixelRatio).
+  'src/ui/canvas_dpr.ts',
+  'src/ui/deepglass_hud.ts',
+  'src/ui/plot_sign_popup.ts',
   'src/ui/realm_builder_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
