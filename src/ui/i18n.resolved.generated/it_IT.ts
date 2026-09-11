@@ -1409,6 +1409,11 @@ export const it_IT: EnTranslations = {
       "targetParty2": "Target Party Member 2",
       "targetParty3": "Target Party Member 3",
       "targetParty4": "Target Party Member 4",
+      "targetParty5": "Target Party Member 5",
+      "targetParty6": "Target Party Member 6",
+      "targetParty7": "Target Party Member 7",
+      "targetParty8": "Target Party Member 8",
+      "targetParty9": "Target Party Member 9",
       "mount": "Monta / Smonta",
       "mouseHint": "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo."
     },
@@ -5887,7 +5892,7 @@ export const it_IT: EnTranslations = {
       "meters": "Misuratori danni (danno, cura e minaccia)",
       "petMark": "Famiglio: bersaglia, seleziona il tuo famiglio (equivale a cliccare sul suo riquadro)",
       "targetSelf": "Target yourself",
-      "targetParty": "Target party members 1 to 4, top to bottom as the party frames show them",
+      "targetParty": "Target party members 1 to 9, top to bottom as the party frames show them",
       "onBarBinding": "Puoi anche associare i tasti direttamente dalla barra: scegli Modifica i tasti della barra delle azioni nel pannello Comandi da tastiera, poi clicca uno slot sulla barra attiva e premi il tasto che vuoi. Clicca Fatto quando hai finito. Questa opzione è solo desktop, perché richiede una tastiera fisica.",
       "clickMoveNote": "Clicca per muoverti è disattivato finché non lo attivi: apri il pannello Comandi da tastiera nel menu di gioco, attiva Clicca per muoverti, poi usa la riga Pulsante clic per muovere sotto di esso per scegliere quale pulsante del mouse cammina (Clic sinistro per impostazione predefinita, oppure Clic destro). Una volta attivato, cliccare un punto sul terreno ti fa camminare fin lì, con un indicatore a terra che mostra dove sei diretto. Cliccare una creatura o un altro giocatore ti fa camminare verso di loro fermandoti a portata, mentre quel clic svolge comunque il suo compito abituale di bersagliare o interagire; se sei già abbastanza vicino da raggiungere ciò su cui hai cliccato, interagisci semplicemente e resti dove sei. Uno qualsiasi dei tasti di movimento riprende subito il controllo e termina il tragitto, e lo stesso fa tenere premuto il pulsante del mouse per guardarti intorno. Saltare no, quindi continui il viaggio anche durante il balzo, e aprire il menu di gioco mette solo in pausa il tragitto, che riprende quando chiudi il menu."
     },

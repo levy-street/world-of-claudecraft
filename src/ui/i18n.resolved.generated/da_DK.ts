@@ -1409,6 +1409,11 @@ export const da_DK: EnTranslations = {
       "targetParty2": "Target Party Member 2",
       "targetParty3": "Target Party Member 3",
       "targetParty4": "Target Party Member 4",
+      "targetParty5": "Target Party Member 5",
+      "targetParty6": "Target Party Member 6",
+      "targetParty7": "Target Party Member 7",
+      "targetParty8": "Target Party Member 8",
+      "targetParty9": "Target Party Member 9",
       "mount": "Stig op / Stig af",
       "mouseHint": "Museknapper virker også: tryk på midterknappen (M3) eller en tommelfingerknap (M4, M5), mens du binder. Venstre og højre er fortsat forbeholdt kameraet, klik for at flytte og at klikke på ting i verden."
     },
@@ -5887,7 +5892,7 @@ export const da_DK: EnTranslations = {
       "meters": "Skadesmålere (skade, helbredelse og trussel)",
       "petMark": "Kæledyr: Marker, vælg dit eget kæledyr (det samme som at klikke på dets ramme)",
       "targetSelf": "Target yourself",
-      "targetParty": "Target party members 1 to 4, top to bottom as the party frames show them",
+      "targetParty": "Target party members 1 to 9, top to bottom as the party frames show them",
       "onBarBinding": "Du kan også binde direkte fra bjælken: vælg Rediger handlingsbjælkens taster i panelet Tastebindinger, klik derefter på en plads på den aktive bjælke, og tryk på den tast, du ønsker. Klik på Færdig, når du er færdig. Denne er kun til computer, da den kræver et fysisk tastatur.",
       "clickMoveNote": "Klik for at flytte er slået fra, indtil du slår det til: åbn panelet Tastebindinger i spilmenuen, slå Klik for at flytte til, og brug så rækken Museknap til klikflytning nedenunder til at vælge, hvilken museknap der klarer gangen (venstreklik som standard, eller højreklik). Når det er slået til, sender et klik på et sted på jorden dig gående derhen, med en markør på jorden, der viser, hvor du er på vej hen. At klikke på en skabning eller en anden spiller går dig hen til dem og stopper inden for rækkevidde, mens klikket stadig gør sit sædvanlige arbejde med at målrette eller interagere; er du allerede tæt nok på til at nå det, du klikkede på, interagerer du blot og bliver stående. Enhver af bevægelsestasterne tager straks kontrollen tilbage og afslutter turen, og det samme gør det at holde museknappen nede for at kigge rundt. Det gør et hop ikke, så du fortsætter rejsen gennem hoppet, og det kun at åbne spilmenuen sætter turen på pause, som fortsætter, når du lukker menuen."
     },

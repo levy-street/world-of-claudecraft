@@ -1,8 +1,8 @@
-// The party target hotkeys (F1..F5 by default): which unit each key selects.
-// F1 is always the local player. F2..F5 walk the party frames top to bottom in
+// The party target hotkeys (F1..F10 by default): which unit each key selects.
+// F1 is always the local player. F2..F10 walk the party frames top to bottom in
 // the SAME order the frames paint (selectPartyFrameMembers: the persisted sort
 // mode, raid group order), so the key a healer presses matches the row they are
-// looking at. The player's own row never takes an F2..F5 slot, even with the
+// looking at. The player's own row never takes an F2..F10 slot, even with the
 // Show Self option on: F1 already owns it, and a self row shifting every ally
 // down one key would make the keys depend on a display toggle.
 //
@@ -12,8 +12,8 @@
 import type { PartyInfo } from '../world_api';
 import { type PartyFrameDisplayConfig, selectPartyFrameMembers } from './party_frames';
 
-/** How many ally slots the F-row carries (F2..F5); F1 is the self slot 0. */
-export const PARTY_TARGET_HOTKEY_SLOTS = 4;
+/** How many ally slots the F-row carries (F2..F10); F1 is the self slot 0. */
+export const PARTY_TARGET_HOTKEY_SLOTS = 9;
 
 /**
  * The entity id a party target hotkey selects, or null when the slot has no

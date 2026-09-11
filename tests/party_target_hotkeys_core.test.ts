@@ -1,4 +1,4 @@
-// The party target hotkeys (F1..F5 by default): F1 is always yourself, F2..F5
+// The party target hotkeys (F1..F10 by default): F1 is always yourself, F2..F10
 // follow the party frame rows top to bottom (src/ui/party_target_hotkeys_core.ts),
 // and the keyboard + pad arms in src/game/targeting_actions.ts route the bound
 // action ids to IWorld.targetEntity.
@@ -47,15 +47,15 @@ const settingsWith = (sort: number, showSelf = false) => ({
 });
 
 describe('partyTargetActionSlot', () => {
-  it('names slot 0 for Target Self and 1..4 for the party member rows', () => {
+  it('names slot 0 for Target Self and 1..9 for the party member rows', () => {
     expect(partyTargetActionSlot('targetSelf')).toBe(0);
     expect(partyTargetActionSlot('targetParty1')).toBe(1);
-    expect(partyTargetActionSlot('targetParty4')).toBe(4);
-    expect(PARTY_TARGET_HOTKEY_SLOTS).toBe(4);
+    expect(partyTargetActionSlot('targetParty9')).toBe(9);
+    expect(PARTY_TARGET_HOTKEY_SLOTS).toBe(9);
   });
 
   it('is null for every other action id, including out-of-row party numbers', () => {
-    expect(partyTargetActionSlot('targetParty5')).toBeNull();
+    expect(partyTargetActionSlot('targetParty10')).toBeNull();
     expect(partyTargetActionSlot('targetParty0')).toBeNull();
     expect(partyTargetActionSlot('targetFriendly')).toBeNull();
     expect(partyTargetActionSlot('slot1')).toBeNull();
@@ -100,6 +100,13 @@ describe('partyHotkeyTargetId', () => {
     expect([1, 2, 3].map((s) => partyHotkeyTargetId(s, info, ME, AT, byName))).toEqual([9, 2, 4]);
   });
 
+  it('reaches the ninth ally on the last key of a full raid', () => {
+    const allies = [2, 3, 4, 5, 6, 7, 8, 9, 10].map((pid) => member(pid));
+    const info = party([member(ME), ...allies], true);
+    expect(partyHotkeyTargetId(9, info, ME, AT)).toBe(10);
+    expect(partyHotkeyTargetId(1, info, ME, AT)).toBe(2);
+  });
+
   it('orders a raid by group first, like the raid frames', () => {
     const info = party(
       [member(ME), member(4, { group: 2 }), member(9, { group: 1 }), member(2, { group: 2 })],
@@ -113,7 +120,7 @@ describe('partyHotkeyTargetId', () => {
     const info = party([member(ME), member(4)]);
     expect(partyHotkeyTargetId(1, info, ME, AT)).toBe(4);
     expect(partyHotkeyTargetId(2, info, ME, AT)).toBeNull();
-    expect(partyHotkeyTargetId(5, info, ME, AT)).toBeNull();
+    expect(partyHotkeyTargetId(10, info, ME, AT)).toBeNull();
     expect(partyHotkeyTargetId(-1, info, ME, AT)).toBeNull();
     expect(partyHotkeyTargetId(1.5, info, ME, AT)).toBeNull();
   });

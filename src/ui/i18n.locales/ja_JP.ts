@@ -10865,6 +10865,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.targetParty2': 'パーティメンバー2をターゲット',
   'hudChrome.keybinds.targetParty3': 'パーティメンバー3をターゲット',
   'hudChrome.keybinds.targetParty4': 'パーティメンバー4をターゲット',
+  'hudChrome.keybinds.targetParty5': 'パーティメンバー5をターゲット',
+  'hudChrome.keybinds.targetParty6': 'パーティメンバー6をターゲット',
+  'hudChrome.keybinds.targetParty7': 'パーティメンバー7をターゲット',
+  'hudChrome.keybinds.targetParty8': 'パーティメンバー8をターゲット',
+  'hudChrome.keybinds.targetParty9': 'パーティメンバー9をターゲット',
   'hudChrome.keybinds.petTaunt': 'ペット：挑発',
   'hudChrome.keybinds.petDefensive': 'ペット：防御',
   'hudChrome.keybinds.petAggressive': 'ペット：攻撃的',
@@ -14664,7 +14669,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ペット：マーク。自分のペットを選択します（フレームをクリックするのと同じです）',
   'guide.controls.targetSelf': '自分自身をターゲットにする',
   'guide.controls.targetParty':
-    'パーティメンバー1から4をターゲットにする（パーティフレームに表示される順に上から下へ）',
+    'パーティメンバー1から9をターゲットにする（パーティフレームに表示される順に上から下へ）',
   'guide.controls.swimDown': '水中で潜る（長押し）',
   'guide.controls.swimNote':
     '水泳では2つのキーを使います。スペースを押し続けると浮上し、左Ctrlで沈みます。泳ぎながらカメラを下に向けても潜れるので、視点で深さを操れます。左Ctrlは初期設定の中で唯一それ自体が修飾キーであり、キー割り当て中に修飾キー単体の入力は無視されるため、「潜る」を割り当て直すときは修飾キー以外を選んでください。',

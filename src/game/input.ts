@@ -76,7 +76,7 @@ export interface InputCallbacks {
   // Select your own pet (Ctrl+6 by default). Separate from onPet: this targets the
   // pet rather than commanding it, so it belongs with the targeting callbacks above.
   onTargetPet(): void;
-  // A party target hotkey (F1..F5 by default): slot 0 is yourself, 1..4 the
+  // A party target hotkey (F1..F10 by default): slot 0 is yourself, 1..9 the
   // party frame rows top to bottom (src/ui/party_target_hotkeys_core.ts).
   onTargetParty(slot: number): void;
   onAbility(slot: number): void;

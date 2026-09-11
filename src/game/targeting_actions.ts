@@ -34,7 +34,7 @@ export type PartyFrameSettingsReader =
   | { get(key: PartyFrameSettingKey): number | boolean | undefined }
   | undefined;
 
-/** Select the unit a party target hotkey slot names (0 = self, 1..4 = the party
+/** Select the unit a party target hotkey slot names (0 = self, 1..9 = the party
  *  frame rows). Returns false when the slot is empty, so nothing is retargeted
  *  and the current target stays. */
 export function targetPartyHotkey(

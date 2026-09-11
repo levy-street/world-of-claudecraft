@@ -11019,6 +11019,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.targetParty2': 'Выбрать участника группы 2',
   'hudChrome.keybinds.targetParty3': 'Выбрать участника группы 3',
   'hudChrome.keybinds.targetParty4': 'Выбрать участника группы 4',
+  'hudChrome.keybinds.targetParty5': 'Выбрать участника группы 5',
+  'hudChrome.keybinds.targetParty6': 'Выбрать участника группы 6',
+  'hudChrome.keybinds.targetParty7': 'Выбрать участника группы 7',
+  'hudChrome.keybinds.targetParty8': 'Выбрать участника группы 8',
+  'hudChrome.keybinds.targetParty9': 'Выбрать участника группы 9',
   'hudChrome.keybinds.petTaunt': 'Питомец: провокация',
   'hudChrome.keybinds.petDefensive': 'Питомец: защита',
   'hudChrome.keybinds.petAggressive': 'Питомец: агрессия',
@@ -14925,7 +14930,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.petMark':
     'Питомец: «Метка», выбрать собственного питомца (то же, что щёлкнуть по его рамке)',
   'guide.controls.targetSelf': 'Выбрать себя целью',
-  'guide.controls.targetParty': 'Выбрать участников группы с 1 по 4 (сверху вниз, как их показывают рамки группы)',
+  'guide.controls.targetParty': 'Выбрать участников группы с 1 по 9 (сверху вниз, как их показывают рамки группы)',
   'guide.controls.swimDown': 'Погружение под воду (удерживать)',
   'guide.controls.swimNote':
     'Плавание держится на двух клавишах: удерживайте пробел, чтобы подниматься, и LCtrl, чтобы опускаться. Если направить камеру вниз и плыть вперёд, вы тоже уйдёте на глубину, так что вести её можно и одним взглядом. LCtrl — единственная стандартная привязка, которая сама по себе является клавишей-модификатором, а одиночное нажатие модификатора при назначении игнорируется, поэтому, переназначая погружение, выбирайте клавишу, не являющуюся модификатором.',

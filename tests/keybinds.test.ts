@@ -108,7 +108,7 @@ describe('registry', () => {
         defaults: [code],
       })),
     );
-    // The party target hotkeys own the F-row: F1 yourself, F2..F5 the party
+    // The party target hotkeys own the F-row: F1 yourself, F2..F10 the party
     // frame rows top to bottom (input.ts cancels the browser's F-key defaults).
     expect(BIND_ACTIONS.find((a) => a.id === 'targetSelf')).toMatchObject({
       label: 'Target Self',
@@ -116,7 +116,7 @@ describe('registry', () => {
       kind: 'edge',
       defaults: ['F1'],
     });
-    for (let n = 1; n <= 4; n++) {
+    for (let n = 1; n <= 9; n++) {
       expect(BIND_ACTIONS.find((a) => a.id === `targetParty${n}`)).toMatchObject({
         label: `Target Party Member ${n}`,
         category: 'Targeting',
@@ -1107,7 +1107,7 @@ describe('every bind action has a localized label key', () => {
 describe('Keybinds.findBindConflict', () => {
   it('reports nothing for a key no other action holds', () => {
     const kb = new Keybinds();
-    expect(kb.findBindConflict('interact', 0, 'F9')).toBeNull();
+    expect(kb.findBindConflict('interact', 0, 'F12')).toBeNull();
   });
 
   it('names the action a rebind would steal the key from, and its slot', () => {

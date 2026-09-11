@@ -1409,6 +1409,11 @@ export const tr_TR: EnTranslations = {
       "targetParty2": "Target Party Member 2",
       "targetParty3": "Target Party Member 3",
       "targetParty4": "Target Party Member 4",
+      "targetParty5": "Target Party Member 5",
+      "targetParty6": "Target Party Member 6",
+      "targetParty7": "Target Party Member 7",
+      "targetParty8": "Target Party Member 8",
+      "targetParty9": "Target Party Member 9",
       "mount": "Bin / İn",
       "mouseHint": "Fare düğmeleri de işe yarar: atama yaparken orta düğmeye (M3) veya bir yan düğmeye (M4, M5) bas. Sol ve sağ düğmeler kamera, tıklayarak hareket ve dünyadaki nesnelere tıklamak için ayrılmıştır."
     },
@@ -5887,7 +5892,7 @@ export const tr_TR: EnTranslations = {
       "meters": "Hasar sayaçları (hasar, iyileştirme ve tehdit)",
       "petMark": "Yoldaş: Hedefle, kendi yoldaşını seç (çerçevesine tıklamakla aynı)",
       "targetSelf": "Target yourself",
-      "targetParty": "Target party members 1 to 4, top to bottom as the party frames show them",
+      "targetParty": "Target party members 1 to 9, top to bottom as the party frames show them",
       "onBarBinding": "Doğrudan çubuktan da atama yapabilirsiniz: Tuş Atamaları panelinde Eylem çubuğu tuşlarını düzenle’yi seçin, ardından canlı çubukta bir yuvaya tıklayıp istediğiniz tuşa basın. Bitirdiğinizde Bitti’ye tıklayın. Bu, fiziksel bir klavye gerektirdiğinden yalnızca masaüstünde kullanılabilir.",
       "clickMoveNote": "Tıklayarak Hareket, siz açana kadar kapalıdır: oyun menüsündeki Tuş Atamaları panelini açın, Tıklayarak Hareket’i açın, ardından hangi fare düğmesinin yürüteceğini seçmek için altındaki Tıkla-Hareket Et Düğmesi satırını kullanın (varsayılan olarak Sol Tık, ya da Sağ Tık). Açık olduğunda, yerdeki bir noktaya tıklamak sizi oraya doğru yürütür ve yerde nereye gittiğinizi gösteren bir işaretçi belirir. Bir yaratığa ya da başka bir oyuncuya tıklamak sizi onlara doğru yürütüp menzilde durdurur, ve bu tıklama yine de hedefleme ya da etkileşim gibi olağan işini yapar; tıkladığınız şeye zaten yeterince yakınsanız, sadece etkileşime girer ve olduğunuz yerde kalırsınız. Hareket tuşlarından herhangi biri kontrolü doğrudan geri alır ve yolculuğu sonlandırır, etrafa bakmak için fare düğmesini basılı tutmak da öyle. Zıplamak bunu yapmaz, bu yüzden sıçrama boyunca yolculuğa devam edersiniz, ve oyun menüsünü açmak yalnızca yolculuğu duraklatır, menüyü kapattığınızda ise devam eder."
     },

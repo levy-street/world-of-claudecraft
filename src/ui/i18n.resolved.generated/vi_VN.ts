@@ -1409,6 +1409,11 @@ export const vi_VN: EnTranslations = {
       "targetParty2": "Target Party Member 2",
       "targetParty3": "Target Party Member 3",
       "targetParty4": "Target Party Member 4",
+      "targetParty5": "Target Party Member 5",
+      "targetParty6": "Target Party Member 6",
+      "targetParty7": "Target Party Member 7",
+      "targetParty8": "Target Party Member 8",
+      "targetParty9": "Target Party Member 9",
       "mount": "Cưỡi Thú / Xuống Thú",
       "mouseHint": "Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới."
     },
@@ -5887,7 +5892,7 @@ export const vi_VN: EnTranslations = {
       "meters": "Bảng thống kê (sát thương, hồi máu, và đe dọa)",
       "petMark": "Thú Cưng: Đánh Dấu, chọn thú cưng của chính bạn (giống hệt việc bấm vào khung của nó)",
       "targetSelf": "Target yourself",
-      "targetParty": "Target party members 1 to 4, top to bottom as the party frames show them",
+      "targetParty": "Target party members 1 to 9, top to bottom as the party frames show them",
       "onBarBinding": "Bạn cũng có thể gán phím trực tiếp từ thanh hành động: chọn Sửa phím thanh hành động trong bảng Gán Phím, rồi bấm vào một ô trên thanh đang hiển thị và nhấn phím bạn muốn. Bấm Xong khi hoàn tất. Cách này chỉ dùng được trên máy tính, vì nó cần một bàn phím vật lý.",
       "clickMoveNote": "Bấm Để Di Chuyển mặc định tắt cho đến khi bạn bật nó lên: mở bảng Gán Phím trong menu trò chơi, bật Bấm Để Di Chuyển, rồi dùng dòng Nút Bấm Để Di Chuyển bên dưới để chọn nút chuột nào đảm nhận việc đi bộ (Nhấp Trái theo mặc định, hoặc Nhấp Phải). Khi đã bật, bấm vào một điểm trên mặt đất sẽ đưa bạn đi bộ tới đó, kèm một dấu hiệu trên mặt đất cho biết bạn đang hướng tới đâu. Bấm vào một sinh vật hoặc người chơi khác sẽ đưa bạn đi tới gần họ rồi dừng lại trong tầm, trong khi cú bấm đó vẫn làm nhiệm vụ thường lệ là chọn mục tiêu hoặc tương tác; nếu bạn đã đủ gần để chạm tới thứ vừa bấm, bạn chỉ đơn giản tương tác và đứng nguyên tại chỗ. Bất kỳ phím di chuyển nào cũng lập tức giành lại quyền điều khiển và kết thúc chuyến đi, và giữ nút chuột để nhìn quanh cũng vậy. Nhảy thì không, nên bạn vẫn tiếp tục di chuyển xuyên qua cú nhảy, còn mở menu trò chơi chỉ tạm dừng chuyến đi, và nó tiếp tục khi bạn đóng menu lại."
     },

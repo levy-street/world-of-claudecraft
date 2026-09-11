@@ -92,8 +92,10 @@ function makeInput(userAgent?: string) {
     canUseGameKeys: () => gameKeysAllowed,
     isCameraLocked: () => cameraLocked,
   };
-  const input = new Input(canvas as any, cb, new Keybinds());
+  const keybinds = new Keybinds();
+  const input = new Input(canvas as any, cb, keybinds);
   return {
+    keybinds,
     canvas,
     canvasListeners,
     windowListeners,
@@ -367,12 +369,30 @@ describe('Input pet bar chords', () => {
     windowListeners.get('keydown')!({ code: 'F5', repeat: false, preventDefault: f5 });
     expect(cb.onTargetParty).toHaveBeenLastCalledWith(4);
     expect(f5).toHaveBeenCalledTimes(1);
-    expect(cb.onTargetParty).toHaveBeenCalledTimes(2);
+    const f10 = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F10', repeat: false, preventDefault: f10 });
+    expect(cb.onTargetParty).toHaveBeenLastCalledWith(9);
+    expect(f10).toHaveBeenCalledTimes(1);
+    expect(cb.onTargetParty).toHaveBeenCalledTimes(3);
     // An unbound F-key stays the browser's.
-    const f9 = vi.fn();
-    windowListeners.get('keydown')!({ code: 'F9', repeat: false, preventDefault: f9 });
-    expect(f9).not.toHaveBeenCalled();
-    expect(cb.onTargetParty).toHaveBeenCalledTimes(2);
+    const f12 = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F12', repeat: false, preventDefault: f12 });
+    expect(f12).not.toHaveBeenCalled();
+    expect(cb.onTargetParty).toHaveBeenCalledTimes(3);
+  });
+
+  it('follows a rebind of a party target hotkey off the F-row', () => {
+    const { keybinds, windowListeners, cb } = makeInput();
+    expect(keybinds.bind('targetParty9', 0, 'Shift+KeyG')).toBe(true);
+    windowListeners.get('keydown')!({ code: 'F10', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onTargetParty).not.toHaveBeenCalled();
+    windowListeners.get('keydown')!({
+      code: 'KeyG',
+      shiftKey: true,
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+    expect(cb.onTargetParty).toHaveBeenLastCalledWith(9);
   });
 
   it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {
