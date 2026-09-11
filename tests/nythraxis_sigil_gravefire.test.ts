@@ -204,6 +204,7 @@ function expectNythraxisCleanup(
 
 describe('Nythraxis Binding Sigil (the pull)', () => {
   it('flares a sigil on open floor inside the ring band, clear of every wardstone', () => {
+    expect(NYTHRAXIS_SIGIL_SIDE_OFFSET).toBe(30);
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, wards, callouts } = setup({ difficulty });
       st.sigilTimer = DT / 2;
@@ -267,6 +268,7 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     expect(st.sigilSide).toBe(1);
     expect(second.x).toBeCloseTo(boss.spawnPos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
     expect(second.z).toBeCloseTo(boss.spawnPos.z, 6);
+    expect(dungeonFloorLift(second.x, second.z)).toBe(DAIS_HEIGHT);
   });
 
   it('places several driver casts on real open arena floor with two yard bounds clearance', () => {

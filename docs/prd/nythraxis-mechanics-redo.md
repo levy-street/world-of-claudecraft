@@ -617,9 +617,15 @@ only the points named below.
   rather than the boss's current position, so the two stages are fixed
   spots the raid can learn wherever he has been dragged. A blocked platform
   (wardstone, Normal fire) sends the sigil to the other one; when both are
-  blocked it takes the asked one, never the anchor itself. The 22 yd
-  open-floor placement and its same-side ladder from the first cut of this
-  pass are gone.
+  blocked it takes the asked one, never the anchor itself (on Normal that
+  last resort can sit in fire when both platforms burn: a cast must land
+  somewhere). The 22 yd open-floor placement and its same-side ladder from
+  the first cut of this pass are gone. Flat one-sample ground cues (the
+  flame patch, the sigil, the cage, the generic AoE ring) read the tallest
+  interior plateau under their footprint (`groundCueY` in
+  `src/render/dais_lift.ts`), so a ring straddling a platform rim draws on
+  the block tops instead of vanishing under them; per-vertex draped cues
+  (the eruption warning, the Soul Rend marker) needed nothing.
 - **Unchanged by this pass:** the spike cadence, victims per wave, the impale
   drain, the 55 s per-raider cooldown, Grave Eruption and Grave Flame, Dread
   Curse, Deathless Rage, the sigil's cadence, radius, bind window, Ascension

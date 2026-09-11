@@ -62,7 +62,9 @@ export const NYTHRAXIS_SIGIL_EVERY_HEROIC = 40;
  * platforms, the crypt's raised dais reused in line with the boss's SPAWN
  * and NYTHRAXIS_SIGIL_SIDE_OFFSET yd to the raid's left and right of it
  * (dungeon_layout.ts NYTHRAXIS_LAYOUT.platforms owns the geometry; this
- * reads the same offset so the two can never drift). Sides alternate every
+ * reads the same offset so the x can never drift, and the shared z, the
+ * spawn's, is pinned by tests/dungeon_parkour.test.ts and the driver's
+ * floor-lift assertion). Sides alternate every
  * cast, so the tank always knows which way the drag goes; the anchor is the
  * spawn, not the boss's current position, so the platforms are fixed spots
  * the raid can learn.
@@ -195,7 +197,10 @@ export function nythraxisSigilPlacementValid(
  * when it does not (a wardstone or, on Normal, live fire on the asked one);
  * the asked platform regardless when neither does, so a cast never silently
  * vanishes and never falls back onto the anchor itself (a sigil under the
- * spawn would bind him for free at the pull). `anchor` is the boss's spawn.
+ * spawn would bind him for free at the pull). On Normal that last resort
+ * can sit in live fire when BOTH platforms burn: a cast must land
+ * somewhere, and a burning stage is the tank's to time, not a silent skip
+ * (flagged for the owner in the v0.42.2 PR). `anchor` is the boss's spawn.
  */
 export function nythraxisSigilPlacement(
   anchor: NythraxisSigilPoint,

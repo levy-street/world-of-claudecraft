@@ -38,15 +38,21 @@ export interface DaisBlockSink {
 }
 
 export const DAIS_BLOCK_KIND = 'floor_foundation_allsides';
-/** Grid pitch of the blocks and the half-extent the disc is clipped from. */
+/** Grid pitch of the blocks. */
 export const DAIS_BLOCK_PITCH = 4;
-export const DAIS_BLOCK_HALF_EXTENT = 16;
 export const DAIS_BLOCK_FOOTPRINT_SCALE = 1.85;
+
+/** The grid half-extent that covers a disc of radius `r`: the loop clips
+ *  to the disc, so any radius is covered in full and a wider dais never
+ *  turns into a square. */
+export function daisBlockHalfExtent(r: number): number {
+  return Math.ceil(r / DAIS_BLOCK_PITCH) * DAIS_BLOCK_PITCH;
+}
 
 /** Stacks the block disc centred on `d` into the sink. */
 export function stackDaisBlocks(sink: DaisBlockSink, d: DaisDiscLike): void {
   const quarter = Math.PI / 2;
-  const half = DAIS_BLOCK_HALF_EXTENT;
+  const half = daisBlockHalfExtent(d.r);
   for (let x = -half; x <= half; x += DAIS_BLOCK_PITCH) {
     for (let z = -half; z <= half; z += DAIS_BLOCK_PITCH) {
       if (Math.hypot(x, z) > d.r) continue;

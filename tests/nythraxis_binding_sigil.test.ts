@@ -67,6 +67,10 @@ describe('Nythraxis Binding Sigil', () => {
       [-30, NYTHRAXIS_LAYOUT.dais.z],
       [30, NYTHRAXIS_LAYOUT.dais.z],
     ]);
+    expect(NYTHRAXIS_LAYOUT.platforms).toEqual([
+      { x: -30, z: 96, r: 9.5 },
+      { x: 30, z: 96, r: 9.5 },
+    ]);
     expect(NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE).toBe(6);
   });
 
@@ -127,6 +131,13 @@ describe('Nythraxis Binding Sigil', () => {
     // A wardstone on the asked platform sends the sigil across.
     const wardOnRight = { ...OPEN, wardstones: [right] };
     expect(nythraxisSigilPlacement(BOSS, -1, 4, wardOnRight, false)).toEqual(left);
+    // ... and mirrored: a ward on the asked LEFT platform sends it right.
+    expect(nythraxisSigilPlacement(BOSS, 1, 4, { ...OPEN, wardstones: [left] }, false)).toEqual(
+      right,
+    );
+    // Closed floor on the asked side alone crosses the same way.
+    const rightClosed = { ...OPEN, openFloor: (p: { x: number }) => p.x > BOSS.x };
+    expect(nythraxisSigilPlacement(BOSS, -1, 4, rightClosed, false)).toEqual(left);
     // Fire on the asked platform does the same on Normal, and nothing on Heroic.
     const fireOnRight = { ...OPEN, fires: [{ ...right, radius: 3 }] };
     expect(nythraxisSigilPlacement(BOSS, -1, 4, fireOnRight, false)).toEqual(left);
@@ -135,6 +146,10 @@ describe('Nythraxis Binding Sigil', () => {
     // the boss, which would bind him for free.
     const both = { ...OPEN, wardstones: [right, left] };
     expect(nythraxisSigilPlacement(BOSS, -1, 4, both, false)).toEqual(right);
+    // Both platforms burning on Normal: the asked one, fire and all (a cast
+    // must land somewhere; flagged for the owner).
+    const bothFire = { ...OPEN, fires: [{ ...right, radius: 3 }, { ...left, radius: 3 }] };
+    expect(nythraxisSigilPlacement(BOSS, -1, 4, bothFire, false)).toEqual(right);
     const nowhere = nythraxisSigilPlacement(BOSS, 1, 4, { ...OPEN, openFloor: () => false }, false);
     expect(nowhere).toEqual(left);
     expect(Math.hypot(nowhere.x - BOSS.x, nowhere.z - BOSS.z)).toBe(NYTHRAXIS_SIGIL_SIDE_OFFSET);

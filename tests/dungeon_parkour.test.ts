@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { groundCueY } from '../src/render/dais_lift';
 import { supportHeightAt } from '../src/sim/colliders';
 import { DELVE_BAND_X_MIN, DUNGEON_FLOOR_Y, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
@@ -79,16 +80,23 @@ describe('the boss dais is real elevation', () => {
     for (const platform of NYTHRAXIS_LAYOUT.platforms ?? []) {
       expect(daisLiftAt(NYTHRAXIS_LAYOUT, platform.x, platform.z)).toBe(DAIS_HEIGHT);
       expect(daisLiftAt(NYTHRAXIS_LAYOUT, platform.x + platform.r + 0.01, platform.z)).toBe(0);
+      // Edge inclusive, like the dais.
+      expect(daisLiftAt(NYTHRAXIS_LAYOUT, platform.x + platform.r, platform.z)).toBe(DAIS_HEIGHT);
     }
     expect(NYTHRAXIS_LAYOUT.platforms).toHaveLength(2);
     // The crypt's raised dais object reused, radius included.
     for (const platform of NYTHRAXIS_LAYOUT.platforms ?? []) {
       expect(platform.r).toBe(CRYPT_LAYOUT.dais.r);
     }
+    // In line with the boss spawn, which the sigil anchors on: the shared
+    // z lives in three files, so it is pinned here.
+    expect(DUNGEONS.nythraxis_boss_arena.spawns.map((s) => [s.x, s.z])).toEqual([[0, 96]]);
+    expect(NYTHRAXIS_LAYOUT.platforms?.map((pl) => pl.z)).toEqual([96, 96]);
   });
 
   it('stands the raid on the flanking platforms in world coordinates', () => {
     const o = instanceOrigin(DUNGEONS.nythraxis_boss_arena.index, 0);
+    expect(NYTHRAXIS_LAYOUT.platforms).toHaveLength(2);
     for (const platform of NYTHRAXIS_LAYOUT.platforms ?? []) {
       expect(groundHeight(o.x + platform.x, o.z + platform.z, SEED)).toBeCloseTo(
         DUNGEON_FLOOR_Y + DAIS_HEIGHT,
@@ -97,6 +105,24 @@ describe('the boss dais is real elevation', () => {
     }
     const d = NYTHRAXIS_LAYOUT.dais;
     expect(groundHeight(o.x + d.x, o.z + d.z, SEED)).toBeCloseTo(DUNGEON_FLOOR_Y, 6);
+  });
+
+  it('lifts a flat ground cue straddling a platform rim onto the block tops', () => {
+    const o = instanceOrigin(DUNGEONS.nythraxis_boss_arena.index, 0);
+    const platform = (NYTHRAXIS_LAYOUT.platforms ?? [])[0];
+    const ground = (x: number, z: number) => groundHeight(x, z, SEED);
+    const top = DUNGEON_FLOOR_Y + DAIS_HEIGHT;
+    // A 3 yd flame patch centred 1 yd outside the rim: floor under its
+    // centre, blocks under a third of it. It draws at the block tops.
+    const cx = o.x + platform.x + platform.r + 1;
+    const cz = o.z + platform.z;
+    expect(groundHeight(cx, cz, SEED)).toBeCloseTo(DUNGEON_FLOOR_Y, 6);
+    expect(groundCueY(ground, cx, cz, 3)).toBeCloseTo(top, 6);
+    // Centred on the blocks near the rim: on the blocks, no sinking for the
+    // floor beside them.
+    expect(groundCueY(ground, o.x + platform.x + platform.r - 1, cz, 3)).toBeCloseTo(top, 6);
+    // Clear of the rim by more than the radius: plain floor, as before.
+    expect(groundCueY(ground, cx + 2.5, cz, 3)).toBeCloseTo(DUNGEON_FLOOR_Y, 6);
   });
 
   it('groundHeight stands everything on the stage, in world coordinates', () => {
