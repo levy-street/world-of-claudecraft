@@ -341,6 +341,7 @@ function foliageCostStats(): Pick<
 function snapshot(): PerfSnapshot {
   return {
     seconds: 80,
+    visibleSeconds: 78,
     frames: 4800,
     fps: 60,
     hiddenPresentSkips: 0,
@@ -731,6 +732,10 @@ describe('perf reporter payload', () => {
     // and the counter is the only fleet-visible evidence of that residue. It
     // rides in rawSummary (the no-DDL home), never as a top-level column.
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
+    // The fps denominator rides beside `seconds`: a reader can tell a session
+    // whose fps was discounted for hidden time from one that was diluted.
+    expect((body.rawSummary as { seconds?: number }).seconds).toBe(80);
+    expect((body.rawSummary as { visibleSeconds?: number }).visibleSeconds).toBe(78);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
     // The 3D drawing buffer rides in rawSummary (the no-DDL home): the report's
     // own columns cannot say what a session rasterizes, because `dpr` is the raw

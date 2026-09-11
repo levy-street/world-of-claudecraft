@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { PerfMonitor } from '../src/game/perf';
+import { createPerfMonitor, PerfMonitor } from '../src/game/perf';
 import type { NetPipelineSummary } from '../src/net/net_pipeline_stats';
 import {
   armLiveProgramWatch,
@@ -188,6 +188,143 @@ describe('hidden present skips', () => {
     perf.setFrameSampling(true);
     perf.finishTime('sim', perf.startTime());
     expect(perf.snapshot(2000).mainMs.sim.count).toBe(1);
+  });
+});
+
+describe('page visibility arm of the hidden-time ledger', () => {
+  it('discounts a background-tab span from the cumulative fps (the browser dilution)', () => {
+    // The fleet defect: 2 min visible at 60 fps, 2 h in a background tab (rAF
+    // paused, no frames, wall seconds running), 1 min visible at 60 fps. The
+    // cumulative fps read 1.5 because only the desktop shell fed the ledger.
+    const perf = new PerfMonitor(null);
+    const t0 = performance.now();
+    for (let i = 0; i < 7200; i++) perf.frame(1 / 60, t0 + (i * 1000) / 60);
+    perf.setPageHidden(true, t0 + 120_000);
+    perf.setPageHidden(false, t0 + 7_320_000);
+    for (let i = 0; i < 3600; i++) perf.frame(1 / 60, t0 + 7_320_000 + (i * 1000) / 60);
+    const snap = perf.snapshot(t0 + 7_380_000);
+    expect(snap.frames).toBe(10_800);
+    expect(snap.seconds).toBeCloseTo(7380, 0);
+    expect(snap.visibleSeconds).toBeCloseTo(180, 0);
+    expect(snap.fps).toBeGreaterThan(58);
+    expect(snap.fps).toBeLessThan(62);
+  });
+
+  it('masks the gate arm while the page is hidden, so a stray frame cannot close the span', () => {
+    // main.ts writes setFrameSampling(gate.render) every frame, true on web
+    // whatever the tab state. A rAF that fires mid-hidden (or right at the
+    // restore, before the visibility event) must not end the hidden span.
+    const perf = new PerfMonitor(null);
+    const t0 = performance.now();
+    for (let i = 0; i < 100; i++) perf.frame(0.016, t0 + i * 16);
+    perf.setPageHidden(true, t0 + 10_000);
+    perf.setFrameSampling(true, t0 + 60_000);
+    perf.setPageHidden(false, t0 + 110_000);
+    const snap = perf.snapshot(t0 + 110_000);
+    expect(snap.visibleSeconds).toBeCloseTo(10, 0);
+    expect(snap.fps).toBeGreaterThan(8);
+    expect(snap.fps).toBeLessThan(12);
+  });
+
+  it('composes with the gate arm: hidden by either source is hidden', () => {
+    const perf = new PerfMonitor(null);
+    const t0 = performance.now();
+    for (let i = 0; i < 100; i++) perf.frame(0.016, t0 + i * 16);
+    perf.setFrameSampling(false, t0 + 10_000);
+    perf.setPageHidden(true, t0 + 20_000);
+    perf.setFrameSampling(true, t0 + 30_000); // still page-hidden: span stays open
+    perf.setPageHidden(false, t0 + 110_000);
+    const snap = perf.snapshot(t0 + 110_000);
+    expect(snap.visibleSeconds).toBeCloseTo(10, 0);
+    expect(snap.fps).toBeGreaterThan(8);
+    expect(snap.fps).toBeLessThan(12);
+  });
+
+  it('composes the other way too: the page going visible under a hidden gate keeps the span open', () => {
+    const perf = new PerfMonitor(null);
+    const t0 = performance.now();
+    for (let i = 0; i < 100; i++) perf.frame(0.016, t0 + i * 16);
+    perf.setPageHidden(true, t0 + 10_000);
+    perf.setFrameSampling(false, t0 + 20_000);
+    perf.setPageHidden(false, t0 + 30_000); // gate still hidden: span stays open
+    perf.setFrameSampling(true, t0 + 110_000);
+    const snap = perf.snapshot(t0 + 110_000);
+    expect(snap.visibleSeconds).toBeCloseTo(10, 0);
+    expect(snap.fps).toBeGreaterThan(8);
+    expect(snap.fps).toBeLessThan(12);
+  });
+
+  it('counts a frame that arrives while the page is hidden as a skip, never in fps', () => {
+    // A captured or screen-shared background tab keeps its rAF alive: those
+    // frames must not feed the numerator while the denominator is frozen, or
+    // the session fps inflates without bound.
+    const perf = new PerfMonitor(null);
+    const t0 = performance.now();
+    for (let i = 0; i < 100; i++) perf.frame(0.016, t0 + i * 16);
+    perf.setPageHidden(true, t0 + 10_000);
+    for (let i = 0; i < 6000; i++) perf.frame(0.016, t0 + 10_000 + i * 16);
+    perf.setPageHidden(false, t0 + 110_000);
+    const snap = perf.snapshot(t0 + 110_000);
+    expect(snap.frames).toBe(100);
+    expect(snap.hiddenPresentSkips).toBe(6000);
+    expect(snap.fps).toBeGreaterThan(8);
+    expect(snap.fps).toBeLessThan(12);
+  });
+
+  it('records no bucket sample while the page is hidden', () => {
+    const perf = new PerfMonitor(null);
+    perf.setPageHidden(true);
+    perf.finishTime('sim', perf.startTime());
+    expect(perf.snapshot(1000).mainMs.sim.count).toBe(0);
+    perf.setPageHidden(false);
+    perf.finishTime('sim', perf.startTime());
+    expect(perf.snapshot(2000).mainMs.sim.count).toBe(1);
+  });
+
+  it('re-opens the span from the new epoch on a reset while page-hidden', () => {
+    const perf = new PerfMonitor(null);
+    perf.setPageHidden(true, performance.now());
+    perf.reset();
+    const snap = perf.snapshot(performance.now() + 50_000);
+    expect(snap.seconds).toBeGreaterThan(49);
+    expect(snap.visibleSeconds).toBeLessThan(1);
+  });
+
+  it('reports visibleSeconds equal to seconds when nothing was ever hidden', () => {
+    const perf = new PerfMonitor(null);
+    const snap = perf.snapshot(performance.now() + 30_000);
+    expect(snap.visibleSeconds).toBe(snap.seconds);
+    expect(snap.visibleSeconds).toBeCloseTo(30, 0);
+  });
+
+  it('binds the page arm in the factory: a monitor created behind a hidden page starts hidden', () => {
+    // The wiring, not the ledger: createPerfMonitor is what main.ts calls,
+    // and every other case here drives setPageHidden by hand.
+    const listeners: Array<() => void> = [];
+    const doc = (globalThis as any).document;
+    doc.visibilityState = 'hidden';
+    doc.addEventListener = (_type: string, listener: () => void) => listeners.push(listener);
+    doc.removeEventListener = () => {};
+    const perf = createPerfMonitor(null);
+    expect(listeners).toHaveLength(1);
+    const hidden = perf.snapshot(performance.now() + 50_000);
+    expect(hidden.seconds).toBeGreaterThan(49);
+    expect(hidden.visibleSeconds).toBeLessThan(1);
+    doc.visibilityState = 'visible';
+    for (const listener of listeners) listener();
+    const t1 = performance.now();
+    for (let i = 0; i < 600; i++) perf.frame(1 / 60, t1 + (i * 1000) / 60);
+    const restored = perf.snapshot(t1 + 10_000);
+    expect(restored.frames).toBe(600);
+    expect(restored.fps).toBeGreaterThan(55);
+  });
+
+  it('tolerates a document without event listeners in the factory (the ledger keeps its gate arm)', () => {
+    const doc = (globalThis as any).document;
+    doc.addEventListener = () => {
+      throw new Error('no listeners here');
+    };
+    expect(() => createPerfMonitor(null)).not.toThrow();
   });
 });
 

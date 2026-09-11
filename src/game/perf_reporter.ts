@@ -646,6 +646,10 @@ function payloadFromSnapshot(
       // the only fleet-visible proof the skip is working. Rides in rawSummary
       // (the no-DDL home, like the longtask block below), not as a column.
       hiddenPresentSkips: snapshot.hiddenPresentSkips,
+      // The fps denominator itself (wall seconds minus hidden time, both
+      // arms): beside `seconds` it says how much of the session the
+      // cumulative fps actually covers.
+      visibleSeconds: snapshot.visibleSeconds,
       windows: snapshot.windows,
       mainMs: snapshot.mainMs,
       rendererPhaseMs: renderer.phaseMs,

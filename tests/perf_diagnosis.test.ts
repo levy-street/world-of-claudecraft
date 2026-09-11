@@ -13,6 +13,7 @@ function digest(value = 0) {
 function baseSnapshot(): PerfSnapshot {
   return {
     seconds: 20,
+    visibleSeconds: 20,
     frames: 1200,
     hiddenPresentSkips: 0,
     fps: 60,
