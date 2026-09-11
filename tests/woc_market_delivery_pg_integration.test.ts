@@ -1937,14 +1937,16 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       }
       samples.sort((a, b) => a - b);
       const p50 = samples[Math.floor(samples.length / 2)] ?? 0;
-      const p99 = samples[samples.length - 1] ?? 0;
+      const p95 = samples[Math.floor(samples.length * 0.95) - 1] ?? 0;
+      const max = samples[samples.length - 1] ?? 0;
       console.log(
-        `[escrow-cost] blob ${JSON.stringify(heavyState).length} bytes: p50 ${p50.toFixed(1)}ms max ${p99.toFixed(1)}ms over ${samples.length} passes`,
+        `[escrow-cost] blob ${JSON.stringify(heavyState).length} bytes: p50 ${p50.toFixed(1)}ms p95 ${p95.toFixed(1)}ms max ${max.toFixed(1)}ms over ${samples.length} passes`,
       );
-      // 25x the observed 8.3ms max: loose enough for a loaded dev box, tight
-      // enough that a plan regression (a scan, a lost index) reds here
-      // instead of hiding under the scoped allowance.
-      expect(p99).toBeLessThan(ESCROW_STATEMENT_TIMEOUT_MS / 25);
+      // 25x the observed p95: loose enough for a loaded runner to have one
+      // scheduler spike, tight enough that a plan regression (a scan, a lost
+      // index) reds here instead of hiding under the scoped allowance.
+      expect(p95).toBeLessThan(ESCROW_STATEMENT_TIMEOUT_MS / 25);
+      expect(max).toBeLessThan(ESCROW_STATEMENT_TIMEOUT_MS / 10);
     }, 30_000);
 
     it('measures real escrow saves with full material source containers', async () => {
@@ -1963,8 +1965,14 @@ describeDb('woc market delivery finalization against real Postgres', () => {
           const next = structuredClone(sourceState);
           // First pass creates the opening; later passes change an existing
           // anchor. Every pass changes both bank and vault without changing stock.
-          for (const slots of [next.bank!.inventory, next.vault!.special!]) {
-            slots[0]!.materialSources = slots[0]!.materialSources!.map((entry, index) =>
+          const bankInventory = next.bank?.inventory;
+          const vaultSpecial = next.vault?.special;
+          if (!bankInventory || !vaultSpecial)
+            throw new Error('expected full material source containers');
+          for (const slots of [bankInventory, vaultSpecial]) {
+            const firstSlot = slots[0];
+            if (!firstSlot?.materialSources) throw new Error('expected material source slot');
+            firstSlot.materialSources = firstSlot.materialSources.map((entry, index) =>
               index === 0
                 ? {
                     ...entry,

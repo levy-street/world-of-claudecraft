@@ -34,7 +34,8 @@ import {
 import { capturePerfectItemRef } from '../src/sim/professions/perfecting_copy';
 import { Sim } from '../src/sim/sim';
 import type { EquipSlot, InvSlot, ItemInstancePayload } from '../src/sim/types';
-import { NAME_SUBMIT_LOCK_MS, PerfectingWindow } from '../src/ui/hud/professions/index';
+import { NAME_SUBMIT_LOCK_MS } from '../src/ui/hud/professions/legendary_naming_controller';
+import { PerfectingWindow } from '../src/ui/hud/professions/perfecting_window';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -843,10 +844,11 @@ describe('the aria-busy send-once lifecycle', () => {
     const radio = root().querySelector('[role="radio"]') as HTMLElement;
     const candidate = thunks.find((entry) => entry.el === radio);
     expect(candidate).toBeDefined();
+    if (!candidate) throw new Error('expected tooltip thunk for selected perfecting candidate');
     // The mirrors move WITHOUT a repaint; hovering now must show the new
     // payload (an eager render-time resolve would serve the stale rank).
     world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 2 } };
-    expect(candidate!.resolve()).toBe('tip:2');
+    expect(candidate.resolve()).toBe('tip:2');
     win.close();
   });
 

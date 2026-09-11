@@ -683,7 +683,7 @@
   }
   .wallet-mini:focus-visible {
     color: var(--color-text-light);
-    border-color: var(--color-border-focus);
+    border-color: var(--gold);
     outline: none;
   }
   #btn-wallet-unlink:hover,
