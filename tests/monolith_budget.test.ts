@@ -1897,7 +1897,10 @@ const MONOLITHS: MonolithRow[] = [
     // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
     // the record: ours 2804, the release 2433. Measured on the merged tree,
     // never reconciled by arithmetic. Exact merged count, zero slack.
-    ceiling: 2432,
+    // Lowered again after the dais foundation-block stacking (and its
+    // per-position hash) moved to src/render/dais_blocks_core.ts for the
+    // Nythraxis flanking platforms (v0.42.2). Exact count, zero slack.
+    ceiling: 2420,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

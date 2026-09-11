@@ -78,6 +78,25 @@ describe('resolveDirectPickEntityId', () => {
     expect(resolveDirectPickEntityId([20, 10], map)).toBeNull();
   });
 
+  it('selects the ward spike first in a spike-over-raider stack, then cycles to the raider', () => {
+    // A Nythraxis Bone Spike (click capsule 2.6, v0.42.2) always contains the
+    // raider it pins. The first click takes the nearest live hit, the spike;
+    // a second click on the same stack advances to the impaled raider, so a
+    // world click can still reach them (the raid frames reach them at once).
+    const map = entities([
+      { id: 30, kind: 'mob', dead: false, lootable: false },
+      { id: 31, kind: 'player', dead: false, lootable: false },
+    ]);
+    expect(resolveDirectPickEntityId([30, 31], map, null)).toBe(30);
+    expect(resolveDirectPickEntityId([30, 31], map, 30)).toBe(31);
+    // A shattered spike no longer stands in the way.
+    const shattered = entities([
+      { id: 30, kind: 'mob', dead: true, lootable: false },
+      { id: 31, kind: 'player', dead: false, lootable: false },
+    ]);
+    expect(resolveDirectPickEntityId([30, 31], shattered, null)).toBe(31);
+  });
+
   it('keeps a dead player directly pickable for combat resurrection targeting', () => {
     const map = entities([{ id: 30, kind: 'player', dead: true, lootable: false }]);
     expect(resolveDirectPickEntityId([30], map)).toBe(30);

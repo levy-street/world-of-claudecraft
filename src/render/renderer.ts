@@ -223,7 +223,7 @@ import {
   movingHoldoutActive,
   showsStaticFarMesh,
 } from './crowd_lod';
-import { daisVisualLift } from './dais_lift';
+import { daisVisualLift, groundCueY } from './dais_lift';
 import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
 import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
@@ -2949,7 +2949,7 @@ export class Renderer {
           const lz = z - rf.origin.z;
           const raised = floor.style.daisRaised ?? dungeonDaisHasRaisedPlatform(floor.style.kit);
           return (
-            base + riftLiftAt(floor, lx, lz) + daisVisualLift(floor.layout.dais, raised, lx, lz)
+            base + riftLiftAt(floor, lx, lz) + daisVisualLift(floor.layout, raised, lx, lz)
           );
         }
         return base;
@@ -12780,7 +12780,7 @@ export class Renderer {
     if (this.aoeRings.length === 0) return;
     const slot = this.aoeRings[this.aoeRingNext];
     this.aoeRingNext = (this.aoeRingNext + 1) % this.aoeRings.length;
-    const y = groundHeight(x, z, this.sim.cfg.seed) + 0.12; // lift to avoid z-fighting
+    const y = groundCueY(this.groundSample, x, z, radius) + 0.12; // lift to avoid z-fighting
     slot.ring.position.set(x, y, z);
     slot.radius = radius;
     slot.elapsed = 0;

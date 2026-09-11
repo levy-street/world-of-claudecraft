@@ -16298,7 +16298,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Selo vinculante (arraste o chefe até o selo ou a raide paga o preço)',
   'hudChrome.finder.mech.bone_spike':
-    'Espinho ósseo (raiders empalados drenam até o espinho ser destruído)',
+    'Espinho ósseo (jogadores empalados perdem vida até que alguém despedace o espinho com alguns acertos)',
   'hudChrome.finder.mech.bone_storm':
     'Tempestade óssea (ele ignora ameaça, gira e avança contra a raide)',
   'hudChrome.finder.mech.crown_endures':
@@ -16307,7 +16307,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A Corte imortal (somente heroico, a corte real se ergue após Fúria imortal)',
   'hudChrome.finder.mech.grave_eruption':
     'Erupção sepulcral (círculos de aviso que deixam chão ardente)',
-  'hudChrome.finder.mech.gravefire': 'Fogo sepulcral (uma linha de fogo móvel para esquivar)',
   'hudChrome.finder.mech.kings_wrath':
     'Ira do rei (30%: bônus permanente de dano, perigos no chão mais rápidos)',
   'hudChrome.fullTransfer.excluded':
@@ -16406,19 +16405,19 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Desligado',
   'hudChrome.options.shaderWarmOn': 'Ligado',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    'A cada {everyHeroic} s, um selo das antigas proteções brilha no chão de {minDist} a {maxDist} yd de Nythraxis e ele inicia Ascensão imortal, ganhando {ascensionHeroic} de dano e velocidade de ataque a cada {ascensionEvery} s. Se ele ficar sobre o selo em até {bindHeroic} s, fica Vinculado: a Ascensão é purificada, ele fica atordoado por {stunHeroic} s e sofre {vulnerability} a mais de dano por {boundHeroic} s. Caso contrário, cada raider sofre {unboundHitHeroic} da vida máxima como dano de Sombra e ele mantém {unboundBonusHeroic} a mais de dano até o próximo vínculo.',
+    'A cada {everyHeroic} s, um selo das antigas proteções brilha em uma das duas plataformas que ladeiam o trono, a {sideOffset} yd à esquerda ou à direita (do ponto de vista da raide) de onde Nythraxis estava no início do combate, alternando o lado a cada conjuração e ele inicia Ascensão imortal, ganhando {ascensionHeroic} de dano e velocidade de ataque a cada {ascensionEvery} s. Se ele ficar sobre o selo em até {bindHeroic} s, fica Vinculado: a Ascensão é purificada, ele fica atordoado por {stunHeroic} s e sofre {vulnerability} a mais de dano por {boundHeroic} s. Caso contrário, cada raider sofre {unboundHitHeroic} da vida máxima como dano de Sombra e ele mantém {unboundBonusHeroic} a mais de dano até o próximo vínculo.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Selo vinculante',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'O tank arrasta Nythraxis para o selo imediatamente, atravessando qualquer fogo deixado pela raide. Os corpo a corpo acompanham o arraste e os de longo alcance ficam fora do novo cone de Quebra-túmulos. Todos queimam o chefe enquanto ele está Vinculado.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    'A cada {everyNormal} s, um selo das antigas proteções brilha no chão de {minDist} a {maxDist} yd de Nythraxis e ele inicia Ascensão imortal, ganhando {ascensionNormal} de dano e velocidade de ataque a cada {ascensionEvery} s. Se ele ficar sobre o selo em até {bindNormal} s, fica Vinculado: a Ascensão é purificada, ele fica atordoado por {stunNormal} s e sofre {vulnerability} a mais de dano por {boundNormal} s. Caso contrário, cada raider sofre {unboundHitNormal} da vida máxima como dano de Sombra e ele mantém {unboundBonusNormal} a mais de dano até o próximo vínculo.',
+    'A cada {everyNormal} s, um selo das antigas proteções brilha em uma das duas plataformas que ladeiam o trono, a {sideOffset} yd à esquerda ou à direita (do ponto de vista da raide) de onde Nythraxis estava no início do combate, alternando o lado a cada conjuração e ele inicia Ascensão imortal, ganhando {ascensionNormal} de dano e velocidade de ataque a cada {ascensionEvery} s. Se ele ficar sobre o selo em até {bindNormal} s, fica Vinculado: a Ascensão é purificada, ele fica atordoado por {stunNormal} s e sofre {vulnerability} a mais de dano por {boundNormal} s. Caso contrário, cada raider sofre {unboundHitNormal} da vida máxima como dano de Sombra e ele mantém {unboundBonusNormal} a mais de dano até o próximo vínculo.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'A cada {everyHeroic} s, Nythraxis empala {victimsHeroic} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainHeroic} da vida máxima a cada segundo até que seu espinho seja destruído. Um jogador que já foi empalado não pode ser escolhido de novo por {cooldown} s, então os espinhos se espalham por toda a raide.',
+    'A cada {everyHeroic} s, Nythraxis empala {victimsHeroic} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainHeroic} da vida máxima a cada segundo até que seu espinho seja destruído. Um espinho se despedaça após {hitsHeroic} acertos de qualquer um, não importa o dano causado. Um jogador que já foi empalado não pode ser escolhido de novo por {cooldown} s, então os espinhos se espalham por toda a raide.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Espinho ósseo',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'Os causadores de dano trocam imediatamente para os Espinhos ósseos e os destroem para libertar os empalados. Os curadores mantêm os empalados vivos enquanto os espinhos caem.',
+    'Quem estiver mais perto ataca o Espinho ósseo: alguns acertos de qualquer um o despedaçam, não importa o dano. Os curandeiros mantêm os empalados vivos enquanto os espinhos caem.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'A cada {everyNormal} s, Nythraxis empala {victimsNormal} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainNormal} da vida máxima a cada segundo até que seu espinho seja destruído. Um jogador que já foi empalado não pode ser escolhido de novo por {cooldown} s, então os espinhos se espalham por toda a raide.',
+    'A cada {everyNormal} s, Nythraxis empala {victimsNormal} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainNormal} da vida máxima a cada segundo até que seu espinho seja destruído. Um espinho se despedaça após {hitsNormal} acertos de qualquer um, não importa o dano causado. Um jogador que já foi empalado não pode ser escolhido de novo por {cooldown} s, então os espinhos se espalham por toda a raide.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Começando {first} s depois da Ira do rei e a cada {everyHeroic} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlHeroic} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamHeroic} da vida máxima. Ele lança Espinho ósseo {spikeAt} s após o início da tempestade, e então Quebra-túmulos rearma {rearm} s após ela terminar.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Tempestade óssea',
@@ -16464,23 +16463,16 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Os tanks mantêm Nythraxis virado para longe da raide. Todos os outros ficam atrás ou ao lado dele e nunca cruzam o cone.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     'A cada {seconds} s, Nythraxis carrega seu próximo golpe acertado. O alvo dele sofre apenas o golpe em si, mas todos os outros em até {range} yd dentro do cone frontal de {arc} graus sofrem {splash} desse golpe como dano físico, reduzido pela própria armadura.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    'A cada {everyHeroic} s, uma linha de fogo sepulcral violeta corre de Nythraxis até um raider, crescendo {speed} yd por segundo até {length} yd. Cada jarda queima por {burnHeroic} s e causa {tickHeroic} da vida máxima por segundo a quem ficar nela.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Fogo sepulcral',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Desvie da linha quando ela vier: ela é estreita e nunca vira. Raiders de longo alcance continuam se movendo em vez de ficar parados.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    'A cada {everyNormal} s, uma linha de fogo sepulcral violeta corre de Nythraxis até um raider, crescendo {speed} yd por segundo até {length} yd. Cada jarda queima por {burnNormal} s e causa {tickNormal} da vida máxima por segundo a quem ficar nela.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Ira do rei',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Use recargas defensivas restantes para dano inevitável. Mantenha todas as mecânicas anteriores limpas enquanto a raide termina a luta.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis causa {bonusNormal} a mais de dano no normal ou {bonusHeroic} no heroico pelo resto da luta. Erupção sepulcral ocorre a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} no heroico) e Fogo sepulcral a cada {gravefireEveryNormal} s ({gravefireEveryHeroic} no heroico).',
+    'Nythraxis causa {bonusNormal} a mais de dano no normal ou {bonusHeroic} no heroico pelo resto da luta. Erupção sepulcral ocorre a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} no heroico).',
   'hudChrome.raidBossGuide.nythraxis.overview':
     'O alto sacerdote Malric se recusou a deixar seu rei morrer, e o rito que ergueu Nythraxis vinculou toda a corte à cripta. O encontro testa uma troca disciplinada de tanks, trocas rápidas para Espinhos ósseos, movimentação para fora do chão em chamas e uma canalização coordenada das pedras de proteção quando o Trono cai.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'A Ira do rei',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    'Com {health} de vida, Nythraxis ruge na Ira do rei e ganha {bonusNormal} de dano no normal ou {bonusHeroic} no heroico pelo resto da luta. Erupção sepulcral acelera para a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} no heroico) e Fogo sepulcral para a cada {gravefireEveryNormal} s ({gravefireEveryHeroic} no heroico). Todas as outras mecânicas mantêm sua cadência.',
+    'Com {health} de vida, Nythraxis ruge na Ira do rei e ganha {bonusNormal} de dano no normal ou {bonusHeroic} no heroico pelo resto da luta. Erupção sepulcral acelera para a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} no heroico). Todas as outras mecânicas mantêm sua cadência.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'O Trono',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     'Nythraxis mantém sua sala do trono com um cleave frontal carregado, a troca de tanks de Maldição temível, Espinhos ósseos que empalam raiders e Erupções sepulcrais que deixam chão ardente.',

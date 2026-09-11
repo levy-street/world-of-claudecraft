@@ -53,7 +53,7 @@ import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_cor
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { fitAuthoredWallSegment } from './authored_walls_core';
-import { DAIS_PLATFORM_HEIGHT } from './dais_lift';
+import { hash2, stackDaisBlocks } from './dais_blocks_core';
 import { buildDawnholdDressing, ensureDawnholdDressing } from './dawnhold_dressing';
 import {
   placeLitanyMarshDressing,
@@ -455,12 +455,6 @@ if (typeof window !== 'undefined') registerDeferredPreload(() => ensureDungeonAs
 // ---------------------------------------------------------------------------
 // Deterministic placement helpers
 // ---------------------------------------------------------------------------
-
-// stable per-position hash (same trick as the prop jitter elsewhere)
-function hash2(a: number, b: number): number {
-  const s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
-  return s - Math.floor(s);
-}
 
 // kinds that throw shadows from the outdoor sun shaft (point lights don't
 // cast); floors + dais receive
@@ -2090,6 +2084,13 @@ export class DungeonInteriors {
   ): void {
     const d = layout.dais;
     const glow = (torch ?? TORCH_COLORS[variant]).light;
+    // Flanking platforms (DungeonLayout.platforms, the Nythraxis sigil stages)
+    // are the raised dais object reused: always stacked, glow pooled on top,
+    // no rim decor. The sim lifts its floor to match (daisLiftAt).
+    for (const platform of layout.platforms ?? []) {
+      stackDaisBlocks(p, platform);
+      this.addTorchGlow(group, platform.x, platform.z, glow, 0.68, 1.6);
+    }
     // The arena and Nythraxis raid keep flat fighting floors: no raised platform
     // or rim clutter to visually disagree with the walkable sim collision. A rift
     // style can force either shape (daisRaisedOverride) independent of the kit.
@@ -2098,20 +2099,7 @@ export class DungeonInteriors {
       this.addTorchGlow(group, d.x, d.z, glow, 0.07, 2.4);
       return;
     }
-    const quarter = Math.PI / 2;
-    for (let x = -16; x <= 16; x += 4) {
-      for (let z = -16; z <= 16; z += 4) {
-        if (Math.hypot(x, z) > d.r) continue;
-        const rot = Math.floor(hash2(x, z) * 4) * quarter;
-        // y-scale = DAIS_PLATFORM_HEIGHT / 2 (2u blocks): ground cues (the
-        // death-zone danger ring) lift by the same shared constant.
-        p.add('floor_foundation_allsides', d.x + x, 0, d.z + z, rot, [
-          1.85,
-          DAIS_PLATFORM_HEIGHT / 2,
-          1.85,
-        ]);
-      }
-    }
+    stackDaisBlocks(p, d);
     // ritual glow pooled on the dais top so the boss stage never reads as a
     // black slab (torch pillars stop short of the back chamber)
     this.addTorchGlow(group, d.x, d.z, glow, 0.68, 1.6);

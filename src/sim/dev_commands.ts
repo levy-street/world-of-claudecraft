@@ -950,7 +950,7 @@ export function handleDevChat(
       emitDevLog(
         ctx,
         pid,
-        `[dev] Nythraxis raid ${result.reused ? 'reset' : 'ready'} (${result.difficulty === 'heroic' ? 'Heroic' : 'Normal'}): ${result.allies} stationary, invulnerable allies spread across the hall. Pull him, then /dev nyx <curse|spike|eruption|sigil|gravefire|rend|rage|storm|wards|phase2|phase3|enrage [sec]> forces a mechanic.`,
+        `[dev] Nythraxis raid ${result.reused ? 'reset' : 'ready'} (${result.difficulty === 'heroic' ? 'Heroic' : 'Normal'}): ${result.allies} stationary, invulnerable allies spread across the hall. Pull him, then /dev nyx <curse|spike|eruption|sigil|rend|rage|storm|wards|phase2|phase3|enrage [sec]> forces a mechanic.`,
       );
     }
     return null;
@@ -961,7 +961,7 @@ export function handleDevChat(
     if (!isNythraxisDevMechanic(verb)) {
       ctx.error(
         pid,
-        '[dev] Usage: /dev nyx <curse|spike|eruption|sigil|gravefire|rend|rage|storm|wards|phase2|phase3|enrage [sec]>.',
+        '[dev] Usage: /dev nyx <curse|spike|eruption|sigil|rend|rage|storm|wards|phase2|phase3|enrage [sec]>.',
       );
       return null;
     }

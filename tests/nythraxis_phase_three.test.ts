@@ -148,7 +148,7 @@ describe("Nythraxis The King's Wrath (phase 3 entry)", () => {
     expect(st.phase).toBe(3);
   });
 
-  it('tightens Grave Eruption to 10 s (heroic 8) and Gravefire to 8 s (heroic 6)', () => {
+  it('tightens Grave Eruption to 10 s (heroic 8); Gravefire is retired and never lights', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, raiders } = setup({ difficulty });
       st.eruptionTimer = DT / 2;
@@ -158,7 +158,7 @@ describe("Nythraxis The King's Wrath (phase 3 entry)", () => {
       teleport(sim, raiders[0], boss.pos.x + 20, boss.pos.z, boss.pos.y);
       st.gravefireTimer = DT / 2;
       nythraxis.updateNythraxisEncounter(ctx, boss);
-      expect(st.gravefireTimer, difficulty).toBe(difficulty === 'heroic' ? 6 : 8);
+      expect(st.gravefires, difficulty).toEqual([]);
     }
   });
 
@@ -202,7 +202,7 @@ describe('Nythraxis Bone Storm', () => {
     expect(charged[0].pid).toBe(st.boneStorm!.chargeTargetId);
   });
 
-  it('slams on arrival, lights a Gravefire down the charge, and whirls 10% (heroic 20%) inside 9 yd', () => {
+  it('slams on arrival (no Gravefire line since v0.42.2) and whirls 10% (heroic 20%) inside 9 yd', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, tank, raiders, damageBy } = setup({ difficulty });
       // A storm already running with the tank as its charge, 3 yd away (reached
@@ -232,10 +232,8 @@ describe('Nythraxis Bone Storm', () => {
         Math.ceil(tank.maxHp * (difficulty === 'heroic' ? 0.55 : 0.35)),
       );
       expect(storm.slammed, difficulty).toBe(true);
-      // The line runs on in the charge direction (+x here).
-      expect(st.gravefires, difficulty).toHaveLength(1);
-      expect(st.gravefires![0].dirX, difficulty).toBeCloseTo(1, 6);
-      expect(st.gravefires![0].dirZ, difficulty).toBeCloseTo(0, 6);
+      // No line runs on down the charge any more (Gravefire retired, v0.42.2).
+      expect(st.gravefires, difficulty).toEqual([]);
       // He whirls in place until the next window: one tick a second, 10% max hp.
       tickDriver(ctx, boss, 1);
       const whirls = damageBy(NYTHRAXIS_BONE_STORM_CAST_ID) as {
@@ -249,14 +247,9 @@ describe('Nythraxis Bone Storm', () => {
       expect(whirls[0].amount, difficulty).toBe(
         Math.ceil(tank.maxHp * (difficulty === 'heroic' ? 0.2 : 0.1)),
       );
-      // The slam's Gravefire line ran through the tank too (3 yd along it).
-      const burned = (
-        damageBy(NYTHRAXIS_GRAVEFIRE_CAST_ID) as { targetId: number; amount: number }[]
-      )
-        .filter((e) => e.targetId === tank.id)
-        .reduce((sum, e) => sum + e.amount, 0);
-      expect(burned, difficulty).toBeGreaterThan(0);
-      expect(tankHp - tank.hp, difficulty).toBe(slams[0].amount + whirls[0].amount + burned);
+      // The slam's line used to burn the tank too; nothing does now.
+      expect(damageBy(NYTHRAXIS_GRAVEFIRE_CAST_ID), difficulty).toEqual([]);
+      expect(tankHp - tank.hp, difficulty).toBe(slams[0].amount + whirls[0].amount);
       expect(raiders[0].hp, difficulty).toBe(outsideHp);
     }
   });
@@ -370,7 +363,7 @@ describe('Nythraxis Bone Storm', () => {
 });
 
 describe('Nythraxis Bone Storm vs other majors (same-tick admission overlap)', () => {
-  it('blocks Deathless Rage, Soul Rend, and Gravefire admission the tick Bone Storm begins', () => {
+  it('blocks Deathless Rage and Soul Rend admission the tick Bone Storm begins', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       // Exact repro: Bone Storm and Deathless Rage simultaneously due, with
       // none of Rage's own gates holding it back (no live Soul Rend marks, no
@@ -396,16 +389,6 @@ describe('Nythraxis Bone Storm vs other majors (same-tick admission overlap)', (
         nythraxis.updateNythraxisEncounter(ctx, boss);
         expect(st.boneStorm, `${difficulty} storm`).not.toBeNull();
         expect(st.soulRendMarks, `${difficulty} soul rend`).toHaveLength(0);
-      }
-      // Gravefire simultaneously due: must not light alongside a newly-begun
-      // storm either.
-      {
-        const { ctx, boss, st } = setup({ difficulty });
-        st.boneStormTimer = DT / 2;
-        st.gravefireTimer = DT / 2;
-        nythraxis.updateNythraxisEncounter(ctx, boss);
-        expect(st.boneStorm, `${difficulty} storm`).not.toBeNull();
-        expect(st.gravefires, `${difficulty} gravefire`).toHaveLength(0);
       }
     }
   });

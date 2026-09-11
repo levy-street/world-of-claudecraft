@@ -3963,7 +3963,7 @@ export const hudChromeStrings = {
         'At {health} health, Shuddering Stomp holds the raid still while Brother Aldric arrives and lights the wardstones. Every spike shatters and the floor stops burning, then Soul Rend and Deathless Rage join the Throne mechanics.',
       phaseKingsWrathName: "The King's Wrath",
       phaseKingsWrathSummary:
-        "At {health} health, Nythraxis roars in The King's Wrath and gains {bonusNormal} damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption tightens to every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic) and Gravefire to every {gravefireEveryNormal} sec ({gravefireEveryHeroic} on Heroic). Every other mechanic keeps its cadence.",
+        "At {health} health, Nythraxis roars in The King's Wrath and gains {bonusNormal} damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption tightens to every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic). Every other mechanic keeps its cadence.",
       gravebreakerName: 'Gravebreaker',
       gravebreakerSummary:
         'Every {seconds} sec, Nythraxis charges his next landed swing. His target takes only the swing itself, but everyone else within {range} yd inside the {arc} degree cone in front of him takes {splash} of that swing as Physical damage, reduced by their own armor.',
@@ -3978,11 +3978,11 @@ export const hudChromeStrings = {
         'Tanks swap at {stacks} stacks: the other tank taunts and the cursed tank stays out of the Gravebreaker cone while the stacks fade. Healers prepare the incoming tank before the swap.',
       boneSpikeName: 'Bone Spike',
       boneSpikeSummary:
-        'Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is destroyed. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
+        'Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is shattered. A spike shatters after {hitsNormal} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
       boneSpikeHeroicSummary:
-        'Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is destroyed. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
+        'Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is shattered. A spike shatters after {hitsHeroic} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
       boneSpikeResponse:
-        'Damage dealers switch to the Bone Spikes at once and destroy them to free the impaled raiders. Healers keep the impaled alive while the spikes fall.',
+        'Whoever is nearest hits the Bone Spike: a few hits from anyone shatter it, whatever they deal. Healers keep the impaled alive while the spikes fall.',
       graveEruptionName: 'Grave Eruption',
       graveEruptionSummary:
         'Every {everyNormal} sec, skeletal hands mark {countNormal} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstNormal} of maximum health as Shadow damage, then burns as Grave Flame for {flameNormal} sec, dealing {tickNormal} of maximum health every second to anyone standing in it.',
@@ -3992,9 +3992,9 @@ export const hudChromeStrings = {
         'Step out of every warning circle before it erupts and stay off the burning ground. Tanks pull Nythraxis clear of the flames so melee keeps room to work.',
       bindingSigilName: 'Binding Sigil',
       bindingSigilSummary:
-        'Every {everyNormal} sec, a sigil of the old wards flares on the floor {minDist} to {maxDist} yd from Nythraxis and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.',
+        "Every {everyNormal} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.",
       bindingSigilHeroicSummary:
-        'Every {everyHeroic} sec, a sigil of the old wards flares on the floor {minDist} to {maxDist} yd from Nythraxis and he begins Deathless Ascension, gaining {ascensionHeroic} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindHeroic} sec he is Bound: the Ascension is purged, he is stunned for {stunHeroic} sec, and he takes {vulnerability} more damage for {boundHeroic} sec. Otherwise every raider takes {unboundHitHeroic} of maximum health as Shadow damage and he keeps {unboundBonusHeroic} more damage until the next binding.',
+        "Every {everyHeroic} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionHeroic} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindHeroic} sec he is Bound: the Ascension is purged, he is stunned for {stunHeroic} sec, and he takes {vulnerability} more damage for {boundHeroic} sec. Otherwise every raider takes {unboundHitHeroic} of maximum health as Shadow damage and he keeps {unboundBonusHeroic} more damage until the next binding.",
       bindingSigilResponse:
         'The tank drags Nythraxis onto the sigil at once, through whatever fire the raid left behind. Melee follow the drag and ranged stay out of the new Gravebreaker cone. Everyone burns him while he is Bound.',
       raiseFallenName: 'Raise Fallen',
@@ -4009,13 +4009,6 @@ export const hudChromeStrings = {
         "Nythraxis marks {marksHeroic} raiders other than his current target with Soul Rend. After {fuse} sec each mark deals {damageHeroic} of its bearer's maximum health as Shadow damage, divided by the number of marked raiders within {range} yd of them. A mark that resolves alone is lethal.",
       soulRendResponse:
         'Every marked raider runs to one stack point and stands within {range} yd of the other marks before the {fuse} sec fuse ends. Healers top the group off as the marks resolve.',
-      gravefireName: 'Gravefire',
-      gravefireSummary:
-        'Every {everyNormal} sec, a line of violet grave-fire runs from Nythraxis toward a raider, growing {speed} yd every second to {length} yd. Each yard burns for {burnNormal} sec and deals {tickNormal} of maximum health every second to anyone standing in it.',
-      gravefireHeroicSummary:
-        'Every {everyHeroic} sec, a line of violet grave-fire runs from Nythraxis toward a raider, growing {speed} yd every second to {length} yd. Each yard burns for {burnHeroic} sec and deals {tickHeroic} of maximum health every second to anyone standing in it.',
-      gravefireResponse:
-        'Sidestep the line as it comes: it is narrow and never turns. Ranged raiders keep moving instead of standing in one spot.',
       deathlessRageName: 'Deathless Rage',
       deathlessRageSummary:
         'Every {every} sec, Nythraxis casts Deathless Rage for {cast} sec. While he casts, each lit wardstone can be channeled by one raider for {channel} sec. If three different raiders each complete a wardstone before the cast ends, the Rage is interrupted and Nythraxis is stunned for {stun} sec. Otherwise every raider takes {damageNormal} of maximum health as Shadow damage.',
@@ -4030,7 +4023,7 @@ export const hudChromeStrings = {
         "Tanks pick up Aldren and turn his cleave away from the raid. Stun or silence Malric the moment Malric's Mending begins and kill him first, then root or stun Voss off the healers, since he cannot be taunted, and finish him next.",
       kingsWrathName: "King's Wrath",
       kingsWrathSummary:
-        'Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic) and Gravefire every {gravefireEveryNormal} sec ({gravefireEveryHeroic} on Heroic).',
+        'Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic).',
       kingsWrathResponse:
         'Use remaining defensive cooldowns for unavoidable damage. Keep every earlier mechanic clean while the raid finishes the fight.',
       boneStormName: 'Bone Storm',
@@ -7352,10 +7345,10 @@ export const hudChromeStrings = {
       // The swap point spelled here is pinned to NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS
       // by tests/nythraxis_callout.test.ts (the finder chips take no values).
       dread_curse: 'Dread Curse (stacking tank-swap debuff, swap at 2 stacks)',
-      bone_spike: 'Bone Spike (impaled raiders drain until the spike is destroyed)',
+      bone_spike:
+        'Bone Spike (impaled raiders drain until anyone shatters the spike with a few hits)',
       grave_eruption: 'Grave Eruption (warning circles that leave burning ground)',
       binding_sigil: 'Binding Sigil (drag the boss onto the sigil or the raid pays)',
-      gravefire: 'Gravefire (a traveling line of fire to sidestep)',
       kings_wrath: "King's Wrath (30%: permanent damage bonus, faster floor hazards)",
       bone_storm: 'Bone Storm (he ignores threat, whirls, and charges the raid)',
       crown_endures: 'The Crown Endures (hard enrage at 6:00, heroic 5:00)',
