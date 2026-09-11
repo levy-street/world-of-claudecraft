@@ -6,6 +6,7 @@ import {
   MAX_SELF_REWIND_YD_PER_SEC,
   noteSelfIdentity,
   type SelfRenderPositionState,
+  type SelfRenderPrediction,
   selfSnapshotAlpha,
   updateSelfRenderPosition,
 } from '../src/render/self_render_position_core';
@@ -491,6 +492,41 @@ describe('updateSelfRenderPosition teleport rule', () => {
     updateSelfRenderPosition(state, playerAt(far, far), SEED, 1, FRAME_DT, 0.2, null, false);
     expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
     expect(state.position).toEqual(far);
+  });
+
+  it('never mistakes an accumulated sub-threshold offset for a teleport', () => {
+    // A run of reconcile residuals stacks the shared offset well past six
+    // yards while the predicted pose itself barely moves: the rule measures
+    // the AUTHORITATIVE jump (last target to new target), never the drawn pose,
+    // so the offset keeps decaying instead of popping to zero.
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    const reconciled = (x: number, residualX: number | null): SelfRenderPrediction => ({
+      kind: 'reconciled',
+      position: { x, y: 0, z: 0 },
+      residual: residualX === null ? null : { x: residualX, y: 0, z: 0 },
+    });
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0, reconciled(0, null), false);
+    let previous = state.position.x;
+    let peakOffset = 0;
+    for (let frameIndex = 1; frameIndex <= 12; frameIndex++) {
+      // The head is corrected 2 yd back each frame; the drawn pose leads it.
+      updateSelfRenderPosition(
+        state,
+        player,
+        SEED,
+        1,
+        FRAME_DT,
+        0,
+        reconciled(-2 * frameIndex, 2),
+        false,
+      );
+      expect(state.offset.x).toBeGreaterThan(0);
+      expect(Math.abs(state.position.x - previous)).toBeLessThan(2);
+      previous = state.position.x;
+      peakOffset = Math.max(peakOffset, state.offset.x);
+    }
+    expect(peakOffset).toBeGreaterThan(Math.sqrt(SELF_MOTION_SNAP_DIST_SQ));
   });
 
   it('keeps gliding a handoff gap under the threshold', () => {

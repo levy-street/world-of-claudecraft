@@ -38,10 +38,37 @@ function decayOffset(offset: Vec3Like, dt: number, maxDistance = Number.POSITIVE
  * hearth, graveyard release, rift or delve exit, unstuck) and must never be
  * glided: decaying it drew the body flying across the map. Same six-yard rule
  * every other display smoother applies (self_motion.ts SELF_MOTION_SNAP_DIST_SQ,
- * camera_boom_core.ts BOOM_SNAP_DIST, step_smooth_core.ts STEP_SMOOTH_SNAP).
+ * camera_boom_core.ts BOOM_SNAP_DIST, step_smooth_core.ts STEP_SMOOTH_SNAP), and
+ * the same margin: the fastest plausible mover (23.1 yd/s, entity_reanchor.ts)
+ * over the main loop's 0.25 s frame clamp covers 5.8 yd, so one frame of real
+ * motion never trips it.
  */
 export function isTeleportGap(dx: number, dy: number, dz: number): boolean {
   return dx * dx + dy * dy + dz * dz > SELF_MOTION_SNAP_DIST_SQ;
+}
+
+/**
+ * Did the pose the display is anchored to jump a teleport this frame? Both
+ * paths draw `position = target + offset`, so `position - offset` is last
+ * frame's target and the gap to the new one is the AUTHORITATIVE jump alone.
+ * Measuring from the drawn pose instead would count the decaying offset too,
+ * and a legitimately accumulated offset (handoff plus a run of reconcile
+ * residuals) could then read as a teleport and pop.
+ */
+function targetJumpedTeleport(
+  state: SelfRenderPositionState,
+  tx: number,
+  ty: number,
+  tz: number,
+): boolean {
+  return (
+    state.ready &&
+    isTeleportGap(
+      state.position.x - state.offset.x - tx,
+      state.position.y - state.offset.y - ty,
+      state.position.z - state.offset.z - tz,
+    )
+  );
 }
 
 function clearOffset(offset: Vec3Like): void {
@@ -144,12 +171,7 @@ export function updateSelfRenderPosition(
       // discontinuity.
       const discontinuity =
         authoritativeDiscontinuity ||
-        (state.ready &&
-          isTeleportGap(
-            state.position.x - predicted.x,
-            state.position.y - predicted.y,
-            state.position.z - predicted.z,
-          ));
+        targetJumpedTeleport(state, predicted.x, predicted.y, predicted.z);
       if (discontinuity) {
         clearOffset(state.offset);
       } else if (state.ready && !state.active) {
@@ -182,10 +204,7 @@ export function updateSelfRenderPosition(
   // suspending on the teleport frame) or a mid-decay target jump of teleport
   // size adopts the authoritative pose outright instead of rewinding toward
   // it at MAX_SELF_REWIND_YD_PER_SEC.
-  const discontinuity =
-    authoritativeDiscontinuity ||
-    (state.ready &&
-      isTeleportGap(state.position.x - px, state.position.y - py, state.position.z - pz));
+  const discontinuity = authoritativeDiscontinuity || targetJumpedTeleport(state, px, py, pz);
   if (discontinuity) {
     clearOffset(state.offset);
   } else if (state.ready && predictorWasActive) {
