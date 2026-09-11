@@ -487,6 +487,9 @@ describe('the reachability predicate', () => {
     expect(zeroCamp).toEqual([
       // Hatched from a dragonkin_brood_egg (content/drakelands.ts broodEgg.hatchMobId).
       'dragonkin_whelp',
+      // FORK: Scorching Wastes roamers spawned by the zone's own roster, not a camp.
+      'duskmane_prowler',
+      'glasscarab',
       // Summon-only Proving Shore miniboss (interactions/crab_summon.ts).
       'mister_crabs',
       // The Wildheart Basin open-field DungeonDef roster (content/wildheart.ts WILDHEART_SPAWN_LIST).
@@ -509,9 +512,24 @@ describe('the reachability predicate', () => {
     expect(isDelvePos(DELVE_BAND_X_MIN), 'DELVE_BAND_X_MIN is a delve position').toBe(true);
     expect(isRiftPos(RIFT_X_MIN), 'RIFT_X_MIN is a rift position').toBe(true);
     const planeCamps: CampDef[] = [
-      { mobId: 'synthetic_dungeon', center: { x: dungeon.x, z: dungeon.z }, radius: 4, count: 1 },
-      { mobId: 'synthetic_delve', center: { x: DELVE_BAND_X_MIN, z: 0 }, radius: 4, count: 1 },
-      { mobId: 'synthetic_rift', center: { x: RIFT_X_MIN, z: 0 }, radius: 4, count: 1 },
+      {
+        mobId: 'synthetic_dungeon',
+        center: { x: dungeon.x, z: dungeon.z },
+        radius: 4,
+        count: 1,
+      },
+      {
+        mobId: 'synthetic_delve',
+        center: { x: DELVE_BAND_X_MIN, z: 0 },
+        radius: 4,
+        count: 1,
+      },
+      {
+        mobId: 'synthetic_rift',
+        center: { x: RIFT_X_MIN, z: 0 },
+        radius: 4,
+        count: 1,
+      },
     ];
     for (const camp of planeCamps) {
       expect(isInstancePlanePosition(camp.center.x), camp.mobId).toBe(true);
@@ -621,7 +639,12 @@ describe('the predicate has teeth: instance-only carriers cannot carry a family'
       mob.maxLevel = zone.levelRange[1];
       mob.componentTags = [tag];
       mobs[mob.id] = mob;
-      camps.push({ mobId: mob.id, center: { x: zone.hub.x, z: zone.hub.z }, radius: 4, count: 1 });
+      camps.push({
+        mobId: mob.id,
+        center: { x: zone.hub.x, z: zone.hub.z },
+        radius: 4,
+        count: 1,
+      });
     }
     return { mobs, camps, zones: ZONES, zoneOf: zoneAt };
   }
@@ -688,7 +711,12 @@ describe('the predicate has teeth: instance-only carriers cannot carry a family'
     const mobs = { ...world.mobs, [mob.id]: mob };
     const camps = [
       ...world.camps,
-      { mobId: mob.id, center: { x: origin.x, z: origin.z }, radius: 4, count: 1 },
+      {
+        mobId: mob.id,
+        center: { x: origin.x, z: origin.z },
+        radius: 4,
+        count: 1,
+      },
     ];
     const planeWorld = { ...world, mobs, camps };
     const short = floorShortfalls([TAG], planeWorld);
@@ -816,7 +844,10 @@ describe('the never-mapped synthetic families the corpse-harvest corpus uses', (
     expect(MOBS.warlock_voidwalker.componentTags).toBeUndefined();
     expect(() =>
       withRetaggedTemplates(
-        { warlock_imp: [UNMAPPED_FAMILY], warlock_voidwalker: [UNMAPPED_FAMILY_2] },
+        {
+          warlock_imp: [UNMAPPED_FAMILY],
+          warlock_voidwalker: [UNMAPPED_FAMILY_2],
+        },
         () => {
           expect(MOBS.warlock_imp.componentTags).toEqual([UNMAPPED_FAMILY]);
           expect(MOBS.warlock_voidwalker.componentTags).toEqual([UNMAPPED_FAMILY_2]);

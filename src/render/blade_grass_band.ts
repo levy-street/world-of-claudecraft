@@ -27,6 +27,9 @@ import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/wo
 import { clusterGeometry, clusterPlacementPad, mulberry32 } from './blade_grass';
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
+import { grassClearedAt } from '../sim/grass_clear';
+import { terrainCutAtHeight } from '../sim/world';
+import { activateDenseSlot, type DenseSlotState, deactivateDenseSlot } from './blade_grass_dense_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
@@ -189,10 +192,16 @@ export function buildBladeGrassBand(
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
       ok = r1 < (0.44 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
       if (ok) ok = roadDistance(x, z) > 2.4;
+      // The maker's painted no-grass discs, same as the near carpet: a city
+      // floor has to be clear in BOTH bands or the meadow reappears the moment
+      // the player steps back from it.
+      if (ok) ok = !grassClearedAt(getActiveWorldContent().grassClear, x, z);
       if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
       if (ok) {
         const h = terrainHeight(x, z, seed);
         ok = h > WATER_LEVEL + 1.4;
+        // no band tufts floating over a boolean cut (mirrors the near carpet)
+        if (ok) ok = !terrainCutAtHeight(x, z, h);
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
           const lushHere = 0.5 + lush * 0.6;

@@ -186,6 +186,13 @@ describe('absorbBonus', () => {
   });
 });
 
+describe('absorbBonus', () => {
+  it('adds the authored fraction of Spell Power to a shield', () => {
+    expect(absorbBonus(123, 0.5)).toBe(62);
+    expect(absorbBonus(80, 0)).toBe(0);
+  });
+});
+
 describe('hotTickBonus', () => {
   it('splits the total DoT coefficient across HoT ticks off DOUBLE Spell Power', () => {
     const sp = 150;

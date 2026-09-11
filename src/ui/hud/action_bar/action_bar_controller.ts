@@ -1,3 +1,4 @@
+import { DEEPBALL_KIT } from '../../../sim/deepglass/abilities';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
 import {
@@ -44,7 +45,7 @@ import {
 
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
-export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth';
+export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth' | 'deepball';
 
 const FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']);
 
@@ -56,6 +57,12 @@ export interface ActionBarControllerDeps {
   talentSpec(): string | null;
   knownAbilityIds(): readonly string[];
   hasAura(kind: string): boolean;
+  /** In a live deepball bout (docs/prd/deepglass.md): the whole bar swaps to
+   *  the four class-agnostic sport moves for the duration. OPTIONAL, so every
+   *  upstream test stub and any host that has never heard of the arena still
+   *  types and reads as "not in a bout" (the ZoneBuildPool.setContent?()
+   *  precedent). */
+  isInDeepballBout?(): boolean;
   showAttackButton(): boolean;
   // The input-surface profile this controller arranges (the desktop keyboard
   // row or the touch ring), read LIVE like every sibling dep because the
@@ -273,6 +280,7 @@ export class ActionBarController {
   }
 
   resolveActiveForm(): HotbarForm {
+    if (this.deps.isInDeepballBout?.()) return 'deepball';
     if (this.deps.playerClass === 'druid') {
       if (this.deps.hasAura('form_bear')) return 'bear';
       if (this.deps.hasAura('form_cat')) {
@@ -555,6 +563,10 @@ export class ActionBarController {
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
     // Passives never castable: keep them off every seeded/form kit bar too.
     if (!this.isAbilityPlacementAllowed(id)) return false;
+    // The deepball bar holds the bout kit and nothing else, and no other bar
+    // ever holds a dg_* id (they are uncastable outside the bell).
+    if (form === 'deepball') return DEEPBALL_KIT.includes(id);
+    if (DEEPBALL_KIT.includes(id)) return false;
     if (this.isStealthForm(form)) return false;
     if (form === 'bear' || form === 'cat') {
       return ABILITIES[id]?.requiresForm === form || FORM_TOGGLE_IDS.has(id);

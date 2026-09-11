@@ -13,11 +13,13 @@ import {
 import { inDawnholdBailey } from '../sim/dawnhold_layout';
 import { ROCK_SINK_UNITS, rockHeightOf } from '../sim/decoration_dims';
 import { galeDeckSurface } from '../sim/gale_harbor';
+import { grassClearedAt } from '../sim/grass_clear';
 import type { BiomeId } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import {
   generateDecorations,
   roadDistance,
+  terrainCutAtHeight,
   terrainHeight,
   WATER_LEVEL,
   zoneBiomeAt,
@@ -588,6 +590,11 @@ export interface FoliageView {
   ): void;
   setGrassQuality(level: number): void;
   setModelQuality(level: number): void;
+  /** Rebuild the procedural grass (editor: after a grass-clear brush edit) so
+   *  scrubbed tufts disappear without a full engine reload. */
+  rebuildGrass(): void;
+  /** Region-scoped variant: drop only the grass chunks under a terrain edit. */
+  rebuildGrassRegion(minX: number, minZ: number, maxX: number, maxZ: number): void;
   perfStats(out?: FoliagePerfStats): FoliagePerfStats;
   /** Arm the bucket first-reveal compile gate. Armed at WORLD ENTRY, never
    *  under the curtain: the initial frame links what it draws anyway
@@ -1508,6 +1515,19 @@ function buildShadowCasters(
   return { mesh, row };
 }
 
+// Editable placements' far-sprite mirrors (foliage_far_placements_core.ts),
+// set by the host before the foliage build; the setSwayDisabledAssets idiom.
+let farPlacementDecos: Decoration[] = [];
+export function setFoliageFarPlacements(decos: Decoration[]): void {
+  farPlacementDecos = decos;
+}
+/** Whether this host runs placement far-sprites (game boots do; the editor
+ *  viewport deliberately does not) — placed_assets caps real foliage models
+ *  at the sprite handoff ONLY when a sprite actually takes over. */
+export function foliageFarPlacementsActive(): boolean {
+  return farPlacementDecos.length > 0;
+}
+
 function placeSpecies(
   parent: THREE.Group,
   seed: number,
@@ -1545,9 +1565,14 @@ function placeSpecies(
     const { treeDetailFar, treeFillFar } = lodDists();
     const coreItems: Decoration[] = [];
     const nearFillItems: Decoration[] = [];
+    // farOnly records (editable placements' mirrors) contribute a SPRITE and
+    // nothing else: the near real model is the placement itself.
+    const farOnlyItems: Decoration[] = [];
+    const realList: Decoration[] = [];
+    for (const d of list) (d.farOnly ? farOnlyItems : realList).push(d);
     const coreRatio = GFX.leanFoliage ? 0.42 : 0.5;
-    for (const d of list) {
-      if (list.length < 4 || hashAt(d.x, d.z, spec.salt + 91) < coreRatio) coreItems.push(d);
+    for (const d of realList) {
+      if (realList.length < 4 || hashAt(d.x, d.z, spec.salt + 91) < coreRatio) coreItems.push(d);
       else nearFillItems.push(d);
     }
     const lodGroups = [
@@ -1576,37 +1601,37 @@ function placeSpecies(
     // treeFillFar; their sprites now carry the density to the fog wall.
     if (impostorBucket && spec.impostorRows) {
       const row = spec.impostorRows[subset[gi]];
-      for (const group of handlesByLod) {
-        for (const d of group.items) {
-          const y = terrainHeight(d.x, d.z, seed);
-          const s = d.scale * spec.baseScale;
-          const heightJitter = 1 + (hashAt(d.x, d.z, 31) - 0.5) * 0.18;
-          const yaw = d.variant * 2.1 + hashAt(d.x, d.z, 11) * Math.PI * 2;
-          const tintHex =
-            spec.spriteTint === 'trunk'
-              ? TRUNK_TINT[d.biome]
-              : typeof spec.leafTint === 'number'
-                ? spec.leafTint
-                : spec.leafTint[d.biome];
-          impostorBucket.add(
-            row,
+      const addSprite = (d: Decoration): void => {
+        const y = terrainHeight(d.x, d.z, seed);
+        const s = d.scale * spec.baseScale;
+        const heightJitter = 1 + (hashAt(d.x, d.z, 31) - 0.5) * 0.18;
+        const yaw = d.variant * 2.1 + hashAt(d.x, d.z, 11) * Math.PI * 2;
+        const tintHex =
+          spec.spriteTint === 'trunk'
+            ? TRUNK_TINT[d.biome]
+            : typeof spec.leafTint === 'number'
+              ? spec.leafTint
+              : spec.leafTint[d.biome];
+        impostorBucket.add(
+          row,
+          d.x,
+          y - spec.sink * s,
+          d.z,
+          yaw,
+          s,
+          heightJitter,
+          softTint(
             d.x,
-            y - spec.sink * s,
             d.z,
-            yaw,
-            s,
-            heightJitter,
-            softTint(
-              d.x,
-              d.z,
-              tintHex,
-              c,
-              spec.spriteTint === 'trunk' ? BARK_TINT_SOFTEN : leafSoften(d.biome),
-              spec.spriteTint === 'trunk' ? 0.5 : 1,
-            ),
-          );
-        }
-      }
+            tintHex,
+            c,
+            spec.spriteTint === 'trunk' ? BARK_TINT_SOFTEN : leafSoften(d.biome),
+            spec.spriteTint === 'trunk' ? 0.5 : 1,
+          ),
+        );
+      };
+      for (const group of handlesByLod) for (const d of group.items) addSprite(d);
+      for (const d of farOnlyItems) addSprite(d);
     }
     for (const part of spec.sets[subset[gi]]) {
       const { barkFar } = lodDists();
@@ -1681,6 +1706,29 @@ function placeSpecies(
   });
 }
 
+// ---- editor zone isolate ----------------------------------------------------
+// Procedural foliage is generated ONCE for the whole world at engine build and
+// bucketed into world-spanning bands, so nothing downstream can cull it to a
+// zone: a bucket's bounding sphere is ~300 yd across and overlaps everything.
+// The editor's isolate mode therefore cuts it where it is born. Module state
+// on purpose, the same shape as setSwayDisabledAssets: the editor sets it and
+// rebuilds the engine, the shipped game never touches it.
+let foliageBounds: { minX: number; maxX: number; minZ: number; maxZ: number } | null = null;
+
+/** Editor-only: restrict generated trees, rocks and ground dressing to a world
+ *  rect (null = the whole world). Takes effect at the next engine build. */
+export function setFoliageBounds(
+  rect: { minX: number; maxX: number; minZ: number; maxZ: number } | null,
+): void {
+  foliageBounds = rect ? { ...rect } : null;
+}
+
+function outsideFoliageBounds(x: number, z: number): boolean {
+  const b = foliageBounds;
+  if (!b) return false;
+  return x < b.minX || x >= b.maxX || z < b.minZ || z >= b.maxZ;
+}
+
 function buildTrees(
   parent: THREE.Group,
   seed: number,
@@ -1694,8 +1742,16 @@ function buildTrees(
   // the pine; the realm keeps its oaks, topiary, and specimen elders)
   const decos = generateDecorations(seed).filter(
     (d) =>
-      !inParterrePlot(d.x, d.z, 6) && !(d.kind === 'tree' && zoneBiomeAt(d.x, d.z) === 'garden'),
+      !outsideFoliageBounds(d.x, d.z) &&
+      !inParterrePlot(d.x, d.z, 6) &&
+      !(d.kind === 'tree' && zoneBiomeAt(d.x, d.z) === 'garden'),
   );
+  // Editable placements' far mirrors (sprite lane only; the placement's own
+  // model is the near representation). Curation filters deliberately skipped:
+  // a placement is the maker's explicit choice, wherever it stands.
+  for (const d of farPlacementDecos) {
+    if (!outsideFoliageBounds(d.x, d.z)) decos.push(d);
+  }
   const sourceDecos = !GFX.leanFoliage
     ? decos
     : decos.filter((d) => survivesLeanDecimation(d, hashAt(d.x, d.z, 83), GFX.standardMaterials));
@@ -1840,15 +1896,25 @@ function buildTrees(
 
   for (const bucket of buckets.values()) {
     const { items } = bucket;
-    const pines = items.filter((d) => d.kind === 'tree');
+    // A farOnly record names its model outright (farSpecies): the biome/hash
+    // routing below is for procedural records that never chose one.
+    const pines = items.filter((d) => (d.farSpecies ? d.farSpecies === 'pine' : d.kind === 'tree'));
     const gnarled = (d: Decoration) => d.biome === 'marsh' || d.biome === 'dusk';
-    const oaks = items.filter((d) => d.kind === 'tree2' && !gnarled(d));
-    const swamps = items.filter((d) => d.kind === 'tree2' && gnarled(d));
+    const oaks = items.filter((d) =>
+      d.farSpecies ? d.farSpecies === 'oak' : d.kind === 'tree2' && !gnarled(d),
+    );
+    const swamps = items.filter((d) => !d.farSpecies && d.kind === 'tree2' && gnarled(d));
     // marsh swamp trees split between twisted (mossy) and dead (bare) models;
     // the dusk realm's tree2 elders are all twisted, never dead: the Hollow
     // is ancient, not rotting
-    const twisteds = swamps.filter((d) => d.biome === 'dusk' || hashAt(d.x, d.z, 19) >= 0.35);
-    const deads = swamps.filter((d) => d.biome !== 'dusk' && hashAt(d.x, d.z, 19) < 0.35);
+    const twisteds = [
+      ...swamps.filter((d) => d.biome === 'dusk' || hashAt(d.x, d.z, 19) >= 0.35),
+      ...items.filter((d) => d.farSpecies === 'twisted'),
+    ];
+    const deads = [
+      ...swamps.filter((d) => d.biome !== 'dusk' && hashAt(d.x, d.z, 19) < 0.35),
+      ...items.filter((d) => d.farSpecies === 'dead'),
+    ];
     const rocks = items.filter((d) => d.kind === 'rock');
 
     let minX = Infinity,
@@ -1935,8 +2001,36 @@ function buildTrees(
         else groups.set(geo, [r]);
       }
       for (const [geo, list] of groups) {
-        const rockMesh = new THREE.InstancedMesh(geo, rockMat, list.length);
-        list.forEach((r, i) => {
+        // farOnly rocks (editable placements' mirrors) sprite below and skip
+        // the real instanced mesh: the placement is the near model.
+        const realRocks = list.filter((r) => !r.farOnly);
+        if (rockSprites && rockRows) {
+          for (const r of list.filter((rr) => rr.farOnly)) {
+            const y = terrainHeight(r.x, r.z, seed);
+            const h1 = hashAt(r.x, r.z, 8),
+              h2 = hashAt(r.x, r.z, 9),
+              h3 = hashAt(r.x, r.z, 10);
+            const sxz1 = r.scale * 0.62 * (0.85 + h2 * 0.5);
+            const sxz2 = r.scale * 0.62 * (0.85 + h1 * 0.45);
+            const nativeTop = rockNativeHeight(geo);
+            const sy = rockHeightOf(r, seed) / Math.max(0.1, nativeTop - ROCK_SINK_UNITS);
+            const pick = groupPick(r);
+            const widthScale = (sxz1 + sxz2) / 2;
+            rockSprites.add(
+              rockRows[pick.snow ? 'snow' : 'moss'][pick.index],
+              r.x,
+              y - ROCK_SINK_UNITS * sy,
+              r.z,
+              r.variant * 1.7 + h3 * 2.0,
+              widthScale,
+              sy / Math.max(widthScale, 1e-4),
+              c,
+            );
+          }
+        }
+        if (realRocks.length === 0) continue;
+        const rockMesh = new THREE.InstancedMesh(geo, rockMat, realRocks.length);
+        realRocks.forEach((r, i) => {
           const y = terrainHeight(r.x, r.z, seed);
           const h1 = hashAt(r.x, r.z, 8),
             h2 = hashAt(r.x, r.z, 9),
@@ -2236,6 +2330,13 @@ function tooSteep(x: number, z: number, seed: number): boolean {
 function generateDressing(seed: number): DressingSpot[] {
   const out: DressingSpot[] = [];
   const activeContent = getActiveWorldContent();
+  // The render-side twin of sim/ground_dressing.ts generateGroundDressing, and
+  // it needs that module's decorationsMode gate for the same reason: the
+  // editor's "make foliage editable" converts BOTH scatters into placements
+  // and then sets decorationsMode 'empty'. Only the sim copy honoured it, so
+  // the drawn bushes and ferns stayed behind as uneditable ghosts of the
+  // placements now sitting on top of them.
+  if (activeContent.decorationsMode === 'empty') return out;
   const xHalf = WORLD_MAX_X - 16;
   const step = dressStep();
   const scaleBoost = GFX.denseDressing ? DRESS_LOW_SCALE_BOOST : 1;
@@ -2252,7 +2353,9 @@ function generateDressing(seed: number): DressingSpot[] {
       const z = gz + (hashAt(gx, gz, 43) - 0.5) * step;
       if (insideDressingExclusion(activeContent.zones, activeContent.camps, x, z)) continue;
       if (roadDistance(x, z) < 4) continue;
-      if (terrainHeight(x, z, seed) < WATER_LEVEL + 1.2) continue;
+      const dressH = terrainHeight(x, z, seed);
+      if (dressH < WATER_LEVEL + 1.2) continue;
+      if (terrainCutAtHeight(x, z, dressH)) continue;
       if (tooSteep(x, z, seed)) continue;
       // no scrub in the worked stable yard or up through the harbor decks
       if (biome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
@@ -2319,6 +2422,7 @@ function buildDressing(
     : null;
   const buckets = new Map<string, DressingSpot[]>();
   for (const spot of generateDressing(seed)) {
+    if (outsideFoliageBounds(spot.x, spot.z)) continue;
     const key = `${Math.floor((spot.z - WORLD_MIN_Z) / BUCKET_DEPTH)}:${spot.x < 0 ? 0 : 1}`;
     const list = buckets.get(key);
     if (list) list.push(spot);
@@ -2432,6 +2536,13 @@ interface GrassRing {
     dt: number,
   ): void;
   setQuality(level: number): void;
+  /** Drop every built chunk so the next update re-scans against the current
+   *  grass-clear mask (editor brush edits). */
+  invalidate(): void;
+  /** Drop only the chunks intersecting a world-space rect, so a terrain edit
+   *  (a sculpt, a boolean cut) re-scans the grass under it without paying a
+   *  whole-ring rebuild. */
+  invalidateRegion(minX: number, minZ: number, maxX: number, maxZ: number): void;
   perfStats(out?: FoliagePerfStats): FoliagePerfStats;
 }
 
@@ -3033,9 +3144,14 @@ function buildGrassRing(
         if (r > density) continue;
         const h = terrainHeight(x, z, seed);
         if (foliageShoreSkip(x, z, h, seed)) continue;
+        // no tufts floating over a boolean cut's opening
+        if (terrainCutAtHeight(x, z, h)) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
         if (insideGrassHubExclusion(activeContent.zones, x, z)) continue;
+        // The maker's painted no-grass discs. Third and last consumer of the
+        // layer (sim/grass_clear.ts), which until now had none at all.
+        if (grassClearedAt(activeContent.grassClear, x, z)) continue;
         if (roadDistance(x, z) < 3.2) continue;
         if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
         // the stable yard is worked dirt; deck planks grow nothing through
@@ -3114,6 +3230,7 @@ function buildGrassRing(
             const fz = z + (hashAt(i, j + rep, 8) - 0.5) * (1.4 + rep * 1.3);
             const fh = terrainHeight(fx, fz, seed);
             if (foliageShoreSkip(fx, fz, fh, seed)) continue;
+            if (terrainCutAtHeight(fx, fz, fh)) continue;
             if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) continue;
             // a band-edge bloom must not stray into the worked yard
             if (tuftBiome === 'gale' && inStableYard(fx, fz)) continue;
@@ -3152,6 +3269,7 @@ function buildGrassRing(
             if (mdx * mdx + mdz * mdz >= mw.r * mw.r) continue;
             const fh = terrainHeight(fx, fz, seed);
             if (foliageShoreSkip(fx, fz, fh, seed)) continue;
+            if (terrainCutAtHeight(fx, fz, fh)) continue;
             if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) continue;
             const fs = 0.55 + hashAt(i + rep, j, 17) * 0.5;
             q.setFromAxisAngle(up, hashAt(i, j + rep, 18) * 12.4);
@@ -3184,6 +3302,7 @@ function buildGrassRing(
             if (tint < 0) continue;
             const fh = terrainHeight(fx, fz, seed);
             if (foliageShoreSkip(fx, fz, fh, seed) || tooSteep(fx, fz, seed)) continue;
+            if (terrainCutAtHeight(fx, fz, fh)) continue;
             const fs = 0.6 + hashAt(i + rep, j, 17) * 0.4;
             q.setFromAxisAngle(up, hashAt(i, j, 18 + rep) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
@@ -3471,6 +3590,25 @@ function buildGrassRing(
       quality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
       uniforms.uFadeFar.value = activeRadius();
     },
+    // Editor: the grass-clear mask is read while a chunk is built, so scrubbed
+    // tufts only disappear once every cached chunk is dropped and re-scanned.
+    invalidate(): void {
+      for (const chunk of [...chunks.values()]) disposeChunk(chunk);
+      buildQueue.length = 0;
+    },
+    invalidateRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {
+      // One cell of margin: a tuft leans and a cut's rim band flares slightly
+      // past the raw region box.
+      for (const chunk of [...chunks.values()]) {
+        const cMinX = chunk.cx * GRASS_CHUNK_SIZE - 2;
+        const cMinZ = chunk.cz * GRASS_CHUNK_SIZE - 2;
+        const cMaxX = cMinX + GRASS_CHUNK_SIZE + 4;
+        const cMaxZ = cMinZ + GRASS_CHUNK_SIZE + 4;
+        if (cMinX <= maxX && cMaxX >= minX && cMinZ <= maxZ && cMaxZ >= minZ) {
+          disposeChunk(chunk);
+        }
+      }
+    },
     update(
       px: number,
       pz: number,
@@ -3745,6 +3883,8 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
     ? {
         update(): void {},
         setQuality(): void {},
+        invalidate(): void {},
+        invalidateRegion(): void {},
         perfStats(out?: FoliagePerfStats): FoliagePerfStats {
           return emptyGrassStats(false, 0, out);
         },
@@ -3765,6 +3905,12 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
     },
     setModelQuality(level: number): void {
       modelQuality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
+    },
+    rebuildGrass(): void {
+      grass.invalidate();
+    },
+    rebuildGrassRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {
+      grass.invalidateRegion(minX, minZ, maxX, maxZ);
     },
     update(
       px: number,

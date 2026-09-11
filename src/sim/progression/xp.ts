@@ -21,6 +21,8 @@ const RESTED_SECONDS_PER_GAME_HOUR = 60; // 1 in-game hour = 60 sim seconds
 const RESTED_FILL_FRACTION = 0.05; // a full "bubble" = 5% of the level's XP-to-level
 const RESTED_FILL_HOURS = 8; // accrued per this many in-game hours of resting
 const RESTED_CAP_LEVELS = 1.5; // pool clamps to 1.5 levels of XP, the classic-era cap
+const RESTED_INN_PADDING = 2; // yards of slack around an editor-placed inn that still counts as resting
+
 // True while the player is standing in (or just beside) an inn footprint and
 // out of combat — the classic "resting" state that accrues rested XP.
 // Two inn sources: the authored BuildingDef inns of the active world, and the
@@ -37,6 +39,22 @@ export function isResting(
   for (const b of buildings) {
     if (b.kind !== 'inn') continue;
     if (buildingContainsRestPoint(b, p.pos.x, p.pos.z, buildingRestPadding(b))) return true;
+  }
+  // Editor-authored inns: an inn dropped as a world prop through the editor lives
+  // in `placements`, not `props.buildings`, so it needs its own footprint test.
+  for (const placed of getActiveWorldContent().placements ?? []) {
+    if (placed.worldPropKind !== 'inn' || !placed.worldPropWidth) continue;
+    const w = (placed.worldPropWidth ?? 0) * placed.scale * (placed.scaleX ?? 1);
+    const d = (placed.worldPropDepth ?? 0) * placed.scale * (placed.scaleZ ?? 1);
+    // Point-in-rotated-rect: bring the player into the inn's local frame.
+    const dx = p.pos.x - placed.x;
+    const dz = p.pos.z - placed.z;
+    const cos = Math.cos(-placed.rotY);
+    const sin = Math.sin(-placed.rotY);
+    const lx = dx * cos - dz * sin;
+    const lz = dx * sin + dz * cos;
+    if (Math.abs(lx) <= w / 2 + RESTED_INN_PADDING && Math.abs(lz) <= d / 2 + RESTED_INN_PADDING)
+      return true;
   }
   for (const b of kitBuildings) {
     if (b.kind !== 'inn') continue;

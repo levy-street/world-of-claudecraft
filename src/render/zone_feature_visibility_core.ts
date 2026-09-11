@@ -139,6 +139,26 @@ export function isZoneFeatureShadowCasting(
 }
 
 /**
+ * Does this footprint touch a world rect? The editor's zone-isolate mode asks
+ * this so a feature belonging to another zone leaves the scene entirely, even
+ * while it sits within the camera's draw distance — the distance test above
+ * cannot express "not this zone". A group with no measurable footprint stays
+ * visible, same fail-open rule as the distance test.
+ */
+export function isZoneFeatureInRect(
+  footprint: FeatureFootprint | null,
+  rect: { minX: number; maxX: number; minZ: number; maxZ: number },
+): boolean {
+  if (!footprint) return true;
+  return (
+    footprint.centerX - footprint.halfX < rect.maxX &&
+    footprint.centerX + footprint.halfX > rect.minX &&
+    footprint.centerZ - footprint.halfZ < rect.maxZ &&
+    footprint.centerZ + footprint.halfZ > rect.minZ
+  );
+}
+
+/**
  * True when an InstancedMesh buffer still holds a factory all-zero matrix.
  * Footprints are measured ONCE at attach, so one unseeded instance silently
  * poisons the measurement: the realm-flora seabird flock (placed only by its

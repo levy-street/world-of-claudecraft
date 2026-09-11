@@ -173,7 +173,13 @@ describe('registry', () => {
       }
     }
     const collisions = [...owners.entries()].filter(([, ids]) => ids.length > 1);
-    expect(collisions).toEqual([['KeyA', ['turnLeft', 'attackMove']]]);
+    // FORK: the Deepball burners (boost, a HELD Movement bind) deliberately share
+    // KeyF with interact (an edge bind): the bell has no interactables, so the
+    // two never fire together (src/game/keybinds.ts, the boost entry).
+    expect(collisions).toEqual([
+      ['KeyA', ['turnLeft', 'attackMove']],
+      ['KeyF', ['boost', 'interact']],
+    ]);
   });
 });
 
@@ -466,7 +472,10 @@ describe('snapshot / importBindings (hotkey setup export + import)', () => {
     expect(kb.codeAt('strafeLeft', 0)).toBe(null);
     // A string that is not a combo (no keydown could ever produce it) is skipped,
     // so a crafted code cannot park garbage in a slot or reach a DOM lookup.
-    kb.importBindings({ slot3: ['Digit1"]', 'shift+KeyA'], slot4: ['Ctrl+Shift+KeyA', null] });
+    kb.importBindings({
+      slot3: ['Digit1"]', 'shift+KeyA'],
+      slot4: ['Ctrl+Shift+KeyA', null],
+    });
     expect(kb.codeAt('slot3', 0)).toBe(null);
     expect(kb.codeAt('slot3', 1)).toBe(null);
     expect(kb.codeAt('slot4', 0)).toBe('Ctrl+Shift+KeyA');
@@ -882,15 +891,25 @@ describe('modifier combos', () => {
     expect(makeCombo('KeyF', { ctrl: true, alt: false, shift: true })).toBe('Ctrl+Shift+KeyF');
     // Meta (Cmd on macOS / Win key) folds in last, so Cmd+1 is its own chord; a
     // bare 1 stays byte-identical because an omitted/false meta changes nothing.
-    expect(makeCombo('Digit1', { ctrl: false, alt: false, shift: false, meta: true })).toBe(
-      'Meta+Digit1',
-    );
+    expect(
+      makeCombo('Digit1', {
+        ctrl: false,
+        alt: false,
+        shift: false,
+        meta: true,
+      }),
+    ).toBe('Meta+Digit1');
     expect(makeCombo('KeyA', { ctrl: true, alt: false, shift: true, meta: true })).toBe(
       'Ctrl+Shift+Meta+KeyA',
     );
-    expect(makeCombo('Digit1', { ctrl: false, alt: false, shift: false, meta: false })).toBe(
-      'Digit1',
-    );
+    expect(
+      makeCombo('Digit1', {
+        ctrl: false,
+        alt: false,
+        shift: false,
+        meta: false,
+      }),
+    ).toBe('Digit1');
   });
 
   it('splits a combo back into its code and modifiers', () => {
@@ -904,8 +923,18 @@ describe('modifier combos', () => {
       shift: true,
       meta: false,
     });
-    expect(comboMods('Digit1')).toEqual({ ctrl: false, alt: false, shift: false, meta: false });
-    expect(comboMods('Meta+Digit1')).toEqual({ ctrl: false, alt: false, shift: false, meta: true });
+    expect(comboMods('Digit1')).toEqual({
+      ctrl: false,
+      alt: false,
+      shift: false,
+      meta: false,
+    });
+    expect(comboMods('Meta+Digit1')).toEqual({
+      ctrl: false,
+      alt: false,
+      shift: false,
+      meta: true,
+    });
   });
 
   it('identifies the bare modifier keys', () => {

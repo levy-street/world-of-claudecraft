@@ -72,7 +72,14 @@ import {
 } from './game/discord_login_choice';
 import { desktopPresenceOnFrame } from './game/discord_presence';
 import { cycleHudFocus } from './game/dpad_focus_nav';
-import { takeEditorPlaytestRequest } from './game/editor_playtest';
+import { mountPlaytestReturnButton, takeEditorPlaytestRequest } from './game/editor_playtest';
+import { mountPlaytestDevPanel } from './game/playtest_dev_panel';
+import { DEEPGLASS_DEFAULT_PER_SIDE, startDeepglassMatch } from './sim/deepglass/match';
+import { DEEPGLASS_MAP_ENTRY } from './sim/deepglass/world';
+
+/** Late afternoon. See the pin in startOffline. */
+const DEEPGLASS_HOUR = 0.62;
+
 import {
   clearEntryProbe,
   ENTRY_PROBE_STABLE_MS,
@@ -126,7 +133,7 @@ import {
   shouldDeferPickedCorpseToGatherNode,
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
-import { Keybinds } from './game/keybinds';
+import { Keybinds, keyLabel } from './game/keybinds';
 import {
   type KeyboardTurnArgs,
   newKeyboardTurnState,
@@ -159,7 +166,7 @@ import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mobilePlatform, mobilePreflightCopy } from './game/mobile_preflight';
 import { mouselookReleaseFacing } from './game/mouselook_release';
-import { diagonalMovementVisualFacing } from './game/movement_visual';
+import { diagonalMovementVisualOffset, easeMovementVisualOffset } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
@@ -175,6 +182,20 @@ import { createPadTargetPick } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
+import {
+  deepglassTravelUrl,
+  overworldTravelUrl,
+  takePortalHandoff,
+  writePortalHandoff,
+} from './game/portal_travel';
+import {
+  beginPortalCast,
+  PORTAL_CAST_SECONDS,
+  type PortalState,
+  portalSpotBeside,
+  shouldEnterPortal,
+  tickPortal,
+} from './game/portal_travel_core';
 import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { startRealmBuilderRollLoad } from './game/realm_builder_boot';
@@ -316,7 +337,6 @@ import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { battlegroundAssetPrewarm } from './render/battleground';
 import {
   CharacterPreview,
-  npcLookFor,
   type PreviewAppearance,
   setModularLookProvider,
 } from './render/characters';
@@ -338,6 +358,8 @@ import {
   type ModularLook,
   normalizeAppearance,
 } from './render/characters/modular';
+import { npcEntityLookFor } from './render/characters/npc_look_provider';
+import { isPortalWizardTemplate } from './render/characters/npc_looks';
 import {
   armorSetSourceFor,
   charselectLook,
@@ -350,7 +372,12 @@ import {
 } from './render/characters/portrait';
 import { attachContextRecoveryHandlers } from './render/context_loss_recovery';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
-import { installWebGLContextRelease } from './render/context_release';
+import {
+  installWebGLContextRelease,
+  registerPageTeardown,
+  retirePageAndReplace,
+} from './render/context_release';
+import { setDayNightPhaseOverride, setLunarPhaseOverride } from './render/day_night_clock';
 import {
   activateGfxProfile,
   captureGfxCapabilities,
@@ -386,10 +413,12 @@ import {
   ZONES,
 } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
+import { publishedMapBySlug } from './sim/maps/index.generated';
 import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { isSubmerged } from './sim/player_motion';
+import { DEEPGLASS_PORTAL_WIZARD_NPC_ID, portalWizardStop } from './sim/portal_wizard';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
@@ -445,6 +474,8 @@ import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { classIconUrl } from './ui/class_icon_art';
 import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_view';
+import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
+import { setDeepglassHintKeys } from './ui/deepglass_hud';
 import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
 import {
@@ -604,6 +635,14 @@ registerShaderWarmSetting(() => settingsForShellReflection().get('shaderWarm'));
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
 installWebGLContextRelease();
+// Close the audio engines with the page, exactly as the editor does: browsers
+// cap live AudioContexts the same way they cap GL contexts, and the portal's
+// world swaps (overworld <-> Deepglass, see src/game/portal_travel.ts) would
+// otherwise stack a fresh music + sfx context pair on every trip.
+registerPageTeardown(() => {
+  music.close();
+  audio.close();
+});
 // World-only GLB textures (props, dungeon, biome, ...) drop their CPU-side
 // transcoded mip chains after GPU upload. Only the GAME entry opts in: here,
 // every renderer that can draw those categories is the world renderer, whose
@@ -1451,11 +1490,13 @@ async function startGame(
     // hostile or stale payloads clamp to a valid body.
     // Non-players compose too: NPCs resolve authored looks by templateId
     // (static data on every host; the why lives in characters/npc_looks.ts).
-    setModularLookProvider((e) =>
-      e.kind === 'player'
-        ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
-        : npcLookFor(e.templateId, e.kind),
-    );
+    setModularLookProvider((e) => {
+      if (e.kind === 'player') return inWorldLookFor(e, armorSetForEntity(e.id === world.playerId));
+      // FORK: the non-player half (runtime-composed fork looks + NPC_LOOKS)
+      // is shared with the Studio viewport via npc_look_provider.ts, so the
+      // two hosts cannot drift.
+      return npcEntityLookFor(e);
+    });
     // No helmet re-assert here on purpose. The preference is per CHARACTER
     // now: set from the creator's toggle at creation, changed by the paperdoll
     // eye afterwards, and serialized into that character's own saved state.
@@ -2018,6 +2059,110 @@ async function startGame(
     entryDiagnostics.checkpoint(open ? 'quest-dialog-open' : 'quest-dialog-closed');
     syncOverlayDiagnostics();
   };
+  // The steward's passage. The Deepglass is its own world rather than a corner
+  // of this one, so "teleport me there" is a world BOOT: hand the arena slug and
+  // a bout size to the same ?map= path the dev URL uses, and the arrival hook
+  // below calls the whistle as soon as the player is in the water.
+  hud.onTravelToDeepglass = () => {
+    // No range check here: the row only exists inside HER open dialog, and
+    // opening a dialog already required standing next to her.
+    hud.closeQuestDialog();
+    const url = new URL(window.location.href);
+    url.searchParams.set('map', DEEPGLASS_MAP_ENTRY.slug);
+    url.searchParams.set('bout', String(DEEPGLASS_DEFAULT_PER_SIDE));
+    // retirePageAndReplace, not location.assign: the departing overworld
+    // document is huge, and a plain assign leaves it bfcache-eligible with its
+    // map, decoded models and JS heap retained behind the arena.
+    retirePageAndReplace(url.toString());
+  };
+  // Baldemar's gate (src/game/portal_travel_core.ts owns the machine; the
+  // renderer owns the prop). The gossip row starts the cast; the frame loop
+  // below ticks it open, watches for the walk-in, and swaps the world.
+  let wizardPortalState: PortalState | null = null;
+  hud.onSummonWizardPortal = (npcId) => {
+    hud.closeQuestDialog();
+    const wizard = world.entities.get(npcId);
+    if (wizard?.kind !== 'npc' || !isPortalWizardTemplate(wizard.templateId)) return;
+    const dest = wizard.templateId === DEEPGLASS_PORTAL_WIZARD_NPC_ID ? 'overworld' : 'deepglass';
+    // The round trip's memory: leaving a town remembers that town; leaving
+    // the bell aims at wherever the outbound leg began (null = world start).
+    const originStopId = dest === 'deepglass' ? wizard.templateId : portalArrivalOrigin;
+    const spot = portalSpotBeside(wizard.pos.x, wizard.pos.z, wizard.facing);
+    wizardPortalState = beginPortalCast(spot, dest, originStopId);
+    renderer.playWizardCast(npcId, PORTAL_CAST_SECONDS, spot.x, spot.z);
+    sfx.playAt('cast_arcane', wizard.pos.x, wizard.pos.y, wizard.pos.z);
+  };
+  const beginPortalTravel = (state: PortalState): void => {
+    // The curtain first, then the swap on the next paint: the walk-in must
+    // read as "stepped through" rather than a frozen frame of town.
+    gameInputReady = false;
+    sfx.unloop(WIZARD_PORTAL_LOOP_ID);
+    sfx.playAt('blink', state.spot.x, world.player.pos.y, state.spot.z);
+    showLoadingScreen(t('loading.world'));
+    writePortalHandoff({
+      v: 1,
+      dest: state.dest,
+      cls: world.cfg.playerClass,
+      name: world.player.name,
+      originStopId: state.originStopId,
+    });
+    void nextPaint().then(() => {
+      retirePageAndReplace(
+        state.dest === 'deepglass'
+          ? deepglassTravelUrl(window.location.href)
+          : overworldTravelUrl(window.location.href),
+      );
+    });
+  };
+  const tickWizardPortal = (dt: number): void => {
+    if (!wizardPortalState) return;
+    const tick = tickPortal(wizardPortalState, dt);
+    wizardPortalState = tick.state;
+    if (tick.justOpened && tick.state) {
+      const { spot } = tick.state;
+      const y = world.player.pos.y;
+      renderer.openWizardPortal(spot.x, spot.z, spot.facing);
+      sfx.playAt('blink', spot.x, y, spot.z);
+      // The open gate hums: the dungeon ambience bed is the one shipped
+      // magical loop, quiet and close-range so it reads as the portal's own.
+      sfx.loop(WIZARD_PORTAL_LOOP_ID, 'amb_dungeon', 0.5, spot.x, y, spot.z, 22, false, 3);
+      hud.log(t('hudChrome.portalWizard.portalOpen'));
+    }
+    if (tick.expired) {
+      renderer.closeWizardPortal();
+      sfx.unloop(WIZARD_PORTAL_LOOP_ID);
+    }
+    if (
+      tick.state &&
+      shouldEnterPortal(tick.state, world.player.pos.x, world.player.pos.z) &&
+      !world.player.dead
+    ) {
+      wizardPortalState = null;
+      renderer.closeWizardPortal();
+      beginPortalTravel(tick.state);
+    }
+  };
+  // The marshal's fixture card. Straight into the match driver rather than
+  // through `/deepglass N`: that command lives behind `ctx.devCommands`
+  // (import.meta.env.DEV), so in a shipped build it does nothing at all — which
+  // is exactly why the steward's row boots a URL instead of typing it. The
+  // arena is offline-only (it boots through startOffline), so offlineSim is
+  // always there; the guard is for the type, not for a case that happens.
+  hud.onStartDeepglassBout = (perSide) => {
+    hud.closeQuestDialog();
+    if (offlineSim) startDeepglassMatch(offlineSim.ctx, offlineSim.playerId, perSide);
+  };
+  // The arena's control hint reads the player's OWN bindings through this, so
+  // rebinding the burners (or the ball camera) renames the key on the strip
+  // instead of leaving it advertising a default nobody is pressing.
+  setDeepglassHintKeys(() => ({
+    boost: keyLabel(keybinds.codeAt('boost', 0)),
+    up: keyLabel(keybinds.codeAt('jump', 0)),
+    down: keyLabel(keybinds.codeAt('dive', 0)),
+    // The air brake is not its own action: it is "back with no forward" in the
+    // flight pass, so the key to advertise is Move Backward's.
+    brake: keyLabel(keybinds.codeAt('back', 0)),
+  }));
   stopMobileMoreDiagnostics?.();
   stopMobileMoreDiagnostics = watchMobileMoreState(document.body, (open) => {
     syncOverlayDiagnostics();
@@ -2125,6 +2270,10 @@ async function startGame(
         padTargetPick.interact();
         break;
       }
+      case 'ballMarker':
+        // FORK (Deepball): the pad's edge press toggles the marker like the key.
+        input.ballMarker = !input.ballMarker;
+        break;
       case 'bags':
         hud.toggleBags();
         break;
@@ -3372,6 +3521,11 @@ async function startGame(
       hud.confirmToolEffectUse(prompt, proceed),
   };
   function interactKey(preferNpcId?: number | null): void {
+    // Inside the Deepglass bell, F is the burner throttle — it is HELD for
+    // seconds at a time. Running the nearby-interaction scan off it popped
+    // "there is nothing to interact with" over and over mid-flight. Nothing in
+    // the bell is interactable anyway: the whole bout is the ball and the pack.
+    if (world.player.dgFlight) return;
     if (shouldRouteInteractToBgFlag(world.bgInfo, world.player, world.entities)) {
       world.bgFlagAction();
       return;
@@ -3915,6 +4069,13 @@ async function startGame(
     riftFloor: null,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
+    // Deepball changes how the camera is READ, so the flag that switches it has
+    // to be refreshed before anything reads a move frame this tick. Inside the
+    // bell the camera's pitch is a continuous AIM the flight pass thrusts along
+    // (src/sim/deepglass/flight.ts), and the swim dive/surface bands stop writing
+    // the vertical axis, because Space and Ctrl own it there. The ball marker
+    // rides along: the renderer never reads Input itself.
+    input.deepballFlight = world.player.dgFlight === true;
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
     // When click-to-move ends, the player's facing snaps from the (camera-lagging)
@@ -4234,11 +4395,28 @@ async function startGame(
     getPredLeadMs: () => renderer.selfMotionLeadMs,
     getApm: () => inputMeter.apm(performance.now()),
   });
+
+  /**
+   * The drawn yaw offset for diagonal travel, EASED.
+   *
+   * The offset itself is a step function (0 / +-45 degrees), so applying it raw
+   * snapped the model between headings every time a strafe joined or left the
+   * run — most visible flicking between A and D. The state lives here because
+   * this is where the frame delta is; the easing itself is pure
+   * (game/movement_visual.ts) and tested there.
+   */
+  let visualTurnOffset = 0;
   function visualFacingFor(
     mi: ReturnType<typeof input.readMoveInput>,
     baseFacing: number,
+    dt: number,
   ): number | null {
-    return !movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null;
+    const target = movementFrozen() ? null : diagonalMovementVisualOffset(mi);
+    visualTurnOffset = easeMovementVisualOffset(visualTurnOffset, target ?? 0, dt);
+    // Settled back on the base heading with nothing asking for an offset: hand
+    // back null so the classic presentation owns the facing outright.
+    if (target === null && Math.abs(visualTurnOffset) < 0.002) return null;
+    return baseFacing + visualTurnOffset;
   }
   const perfNetworkStats = {
     connected: false,
@@ -4317,6 +4495,8 @@ async function startGame(
       syncPerfOverlay(frameDt, now);
       syncOverlayDiagnostics();
     }
+    // Baldemar's gate: tick the cast open, watch for the walk-in.
+    tickWizardPortal(frameDt);
 
     // Freeze movement while the game menu is up, during the first-spawn intro,
     // the camera prompt, and through the race countdown. The sim independently
@@ -4486,8 +4666,11 @@ async function startGame(
       if (gate.render) syncGroundAimReticle();
       perf.setNetwork(null);
       const offlineRenderFacing =
-        visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
-        movementFacing;
+        visualFacingFor(
+          input.readMoveInput(),
+          movementFacing ?? offlineSim.player.facing,
+          frameDt,
+        ) ?? movementFacing;
       const offlineAlpha = acc / DT;
       const offlineViews = renderer.views.size;
       // A hidden frame's draw is not timed (it never ran); the world draw is
@@ -4580,7 +4763,7 @@ async function startGame(
     const netFacing = foreignFacing ?? kbTurn.wireFacing;
     const localFacing = netFacing ?? kbFacing;
     const onlineRenderFacing =
-      visualFacingFor(resolved.mi, localFacing ?? interpServerFacing) ?? localFacing;
+      visualFacingFor(resolved.mi, localFacing ?? interpServerFacing, frameDt) ?? localFacing;
     const turnEngageEdge =
       kbFacing !== null &&
       (resolved.mi.turnLeft || resolved.mi.turnRight) &&
@@ -5169,6 +5352,19 @@ async function startGame(
 
 // Offline names go straight into innerHTML paths (quest $N text, char window
 // title), so enforce the server's character-name rule client-side too:
+/** The looping hum id of Baldemar's open gate (sfx.loop cross-fade key). */
+const WIZARD_PORTAL_LOOP_ID = 'wizard-portal';
+/**
+ * The town stop the current Deepglass session arrived FROM, read by the bell
+ * self's gate to aim the way home. Set once at boot from the consumed portal
+ * handoff; null for a session that arrived by URL (the return then lands at
+ * the world start).
+ */
+let portalArrivalOrigin: string | null = null;
+function setPortalArrivalOrigin(stopId: string): void {
+  portalArrivalOrigin = stopId;
+}
+
 // strip anything outside [A-Za-z' -], then require /^[A-Za-z][A-Za-z' -]{1,15}$/.
 function sanitizeOfflineName(raw: string): string {
   const stripped = raw
@@ -5184,6 +5380,7 @@ async function startOffline(
   skin = 0,
   world?: WorldContent,
   seedOverride?: number,
+  playerStartOverride?: { x: number; z: number },
 ): Promise<void> {
   stopShaderWarmup();
   if (!(await prepareWorldEntry())) return;
@@ -5197,13 +5394,18 @@ async function startOffline(
     'sim-build',
     () =>
       new Sim(
-        offlineWorldConfig({
-          playerClass,
-          name,
-          world,
-          seedOverride,
-          devCommands: import.meta.env.DEV,
-        }),
+        {
+          ...offlineWorldConfig({
+            playerClass,
+            name,
+            world,
+            seedOverride,
+            devCommands: import.meta.env.DEV,
+          }),
+          // Baldemar's return trip lands at the departed town square rather than
+          // the world's own start (src/game/portal_travel.ts).
+          playerStartOverride,
+        },
       ),
   );
   sim.setPlayerSkin(sim.playerId, skin);
@@ -5268,9 +5470,36 @@ async function startOffline(
     for (const id of usable) sim.addItem(id, 1, sim.playerId);
     if (usable[0]) sim.equipItem(usable[0], sim.playerId);
   }
+  // The steward's booking: ?bout=N alongside ?map=deepglass calls the whistle
+  // the moment the arena is up, so her passage lands you IN a match rather than
+  // on the plaza next to a chat hint. Deliberately NOT routed through the
+  // /deepglass dev command — that is gated on a DEV build, and the steward is
+  // shipped content.
+  // The Deepglass keeps its own hour. It is an event venue with a stadium, a
+  // lit bell and sixteen crystal pylons — what it must never be is whatever the
+  // real UTC clock happens to say, because half of that clock is a night that
+  // renders the whole arena as a black shape against a black sky. Pinned to
+  // late afternoon: the sun is low enough to rim the pylons and the cornice,
+  // and high enough to read the architecture. The dev `/time` command still
+  // overrides this afterwards for anyone who wants to look at it at midnight.
+  if (world?.presentationMode === 'deepglass') setDayNightPhaseOverride(DEEPGLASS_HOUR);
+
+  const bout = boutSizeFromUrl(world);
+  if (bout !== null) startDeepglassMatch(sim.ctx, sim.playerId, bout);
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true);
+}
+
+/** The bout size booked on the URL, or null when this is not the arena or no
+ *  booking was made. Clamped to the roster the layout can actually seat. */
+function boutSizeFromUrl(world: WorldContent | undefined): number | null {
+  if (world?.presentationMode !== 'deepglass') return null;
+  const raw = new URLSearchParams(window.location.search).get('bout');
+  if (raw === null) return null;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n)) return DEEPGLASS_DEFAULT_PER_SIDE;
+  return Math.max(1, Math.min(5, n));
 }
 
 // ---------------------------------------------------------------------------
@@ -11302,14 +11531,110 @@ const diagnosticsAutoOffline =
   import.meta.env.DEV &&
   startupParams.get('diagnostics') === '1' &&
   startupParams.get('diagnosticsAuto') === '1';
+// Studio-published map boot: ?map=<slug> resolves through the generated
+// registry (src/sim/maps/index.generated.ts) and boots offline into that
+// world, exactly like a playtest but from committed repo content. An unknown
+// slug falls through to the normal home flow.
+const publishedMapSlug = editorPlaytest ? null : startupParams.get('map');
+// The Deepglass arena is built programmatically rather than published from
+// Studio, so it is resolved BEFORE the generated registry. Keeping it out of
+// index.generated.ts means a Studio republish can never clobber it.
+// The registry is consulted FIRST, including for the arena's own slug: opening
+// the Deepglass in Studio and publishing it back has to be what actually boots,
+// or every tweak a maker makes is silently ignored. The programmatic arena is
+// the FALLBACK, so an unpublished install still gets the built-in venue and a
+// Studio republish of some other map can never clobber it.
+const publishedMap = !publishedMapSlug
+  ? undefined
+  : (publishedMapBySlug(publishedMapSlug) ??
+    (publishedMapSlug === DEEPGLASS_MAP_ENTRY.slug ? DEEPGLASS_MAP_ENTRY : undefined));
+
+/**
+ * Start the audio engines on the first user gesture.
+ *
+ * The launcher's Play button calls audio/music/sfx `init()` directly, because a
+ * click IS the gesture the AudioContext policy wants. The URL entry points have
+ * no such click: `?map=<slug>` and the editor playtest boot straight into the
+ * world on page load, so they never called init at all and the whole session ran
+ * SILENT — no music, no footsteps, no combat, and (the way this was found) no
+ * deepball whistle. Creating a context here at load would be worse than useless:
+ * Chrome refuses to start it and logs a warning for every attempt.
+ *
+ * So: wait for the first real gesture and init then. `once` plus `capture` so it
+ * costs one listener and fires no matter what swallows the event, and all three
+ * engines go together because they share the same policy and the same trigger.
+ */
+function initAudioOnFirstGesture(): void {
+  if (typeof window === 'undefined') return;
+  const start = (): void => {
+    audio.init();
+    music.init();
+    sfx.init();
+  };
+  for (const type of ['pointerdown', 'keydown', 'touchend'] as const) {
+    window.addEventListener(type, start, { once: true, capture: true });
+  }
+}
+// Baldemar's handoff: the one-shot transfer his portals write immediately
+// before the page swap (src/game/portal_travel.ts). Consumed exactly once
+// here, whatever branch boots, so a plain reload never replays a stale trip.
+// It carries the character (offline characters are not otherwise persisted)
+// and the town the outbound trip left from, so the round trip keeps both.
+const portalHandoff = takePortalHandoff();
+const handoffClass: PlayerClass | null =
+  portalHandoff && CLASSES[portalHandoff.cls as PlayerClass]
+    ? (portalHandoff.cls as PlayerClass)
+    : null;
+if (portalHandoff?.originStopId) setPortalArrivalOrigin(portalHandoff.originStopId);
 if (editorPlaytest) {
   startSitePresence('home');
+  initAudioOnFirstGesture();
+  // Map-maker playtest chrome: the Back-to-Editor pin and the Dev cheat
+  // drawer (collision wireframe, god mode, speed, badges).
+  mountPlaytestReturnButton();
+  mountPlaytestDevPanel();
   void startOffline(
     editorPlaytest.playerClass,
     editorPlaytest.playerName,
     0,
     editorPlaytest.content,
     editorPlaytest.seed,
+  );
+} else if (publishedMap) {
+  startSitePresence('home');
+  initAudioOnFirstGesture();
+  const viaPortal = portalHandoff?.dest === 'deepglass' && handoffClass !== null;
+  void publishedMap.load().then((world) => {
+    // A portal arrival lands beside Baldemar's self in THIS world — at the
+    // Wardens' Fountain in the middle of Tidehold — rather than at the arena
+    // arrival point half a map away. Read from the world's own npcs table so
+    // moving him in data moves the landing with him.
+    const wizardPos = viaPortal ? world.npcs?.[DEEPGLASS_PORTAL_WIZARD_NPC_ID]?.pos : undefined;
+    void startOffline(
+      viaPortal && handoffClass ? handoffClass : 'warrior',
+      viaPortal && portalHandoff
+        ? sanitizeOfflineName(portalHandoff.name)
+        : publishedMap.name.slice(0, 24) || 'Maker',
+      0,
+      world,
+      publishedMap.seed,
+      wizardPos ? { x: wizardPos.x + 2.5, z: wizardPos.z + 2.5 } : undefined,
+    );
+  });
+} else if (portalHandoff?.dest === 'overworld' && handoffClass !== null) {
+  // The way home: boot straight into the offline overworld, no start screen,
+  // landing beside the wizard whose town the trip left from (or the world
+  // start if the outbound leg began from a URL rather than a town).
+  startSitePresence('home');
+  initAudioOnFirstGesture();
+  const stop = portalHandoff.originStopId ? portalWizardStop(portalHandoff.originStopId) : null;
+  void startOffline(
+    handoffClass,
+    sanitizeOfflineName(portalHandoff.name),
+    0,
+    undefined,
+    undefined,
+    stop ? { x: stop.x + 2.5, z: stop.z + 2.5 } : undefined,
   );
 } else if (diagnosticsAutoOffline) {
   startSitePresence('home');

@@ -928,10 +928,10 @@ describe('Eastbrook town renderer', () => {
     expect(rendererSource.match(/this\.eastbrookTownView\.update\(/g)).toHaveLength(2);
 
     const propsSource = readFileSync(path.join(__dirname, '..', 'src/render/props.ts'), 'utf8');
-    expect(propsSource).toContain('builtInWorld && isEastbrookRebuildBuilding(b)');
-    expect(propsSource).toContain('builtInWorld && isEastbrookRebuildWell(w)');
-    expect(propsSource).toContain('builtInWorld && isEastbrookRebuildStall(s)');
-    expect(propsSource).toContain('builtInWorld && isEastbrookRebuildFence(f)');
+    expect(propsSource).toContain('eastbrookTown && isEastbrookRebuildBuilding(b)');
+    expect(propsSource).toContain('eastbrookTown && isEastbrookRebuildWell(w)');
+    expect(propsSource).toContain('eastbrookTown && isEastbrookRebuildStall(s)');
+    expect(propsSource).toContain('eastbrookTown && isEastbrookRebuildFence(f)');
 
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     expect(view.update.toString()).not.toMatch(/\bnew\s+/);

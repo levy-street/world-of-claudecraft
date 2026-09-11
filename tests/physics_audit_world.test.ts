@@ -57,7 +57,12 @@ const IDLE: MoveInput = {
 };
 
 function makeSim(): Sim {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+  });
   sim.setPlayerLevel(60);
   return sim;
 }
@@ -429,7 +434,10 @@ describe('abilities x collision', () => {
       Math.atan2(-LEGACY_STALL_APPROACH.x, -LEGACY_STALL_APPROACH.z),
     );
     const p = sim.player;
-    sim.castAbility('heroic_leap', p.id, { x: LEGACY_STALL.x, z: LEGACY_STALL.z });
+    sim.castAbility('heroic_leap', p.id, {
+      x: LEGACY_STALL.x,
+      z: LEGACY_STALL.z,
+    });
     for (let i = 0; i < 40 && p.leap; i++) sim.tick();
     expect(p.leap ?? null).toBeNull();
     const g = groundHeight(LEGACY_STALL.x, LEGACY_STALL.z, SEED);
@@ -481,7 +489,10 @@ describe('dungeon deep sweep', () => {
     const sim = makeSim();
     const o = instanceOrigin(DUNGEONS.sunken_bastion.index, 0);
     // Find one r<0.5 slot (crates+barrel) and one r>=0.5 (box+keg).
-    const slots = CRYPT_LAYOUT.tombs.map((t) => ({ t, r: tombSlotRoll(t.x, t.z) }));
+    const slots = CRYPT_LAYOUT.tombs.map((t) => ({
+      t,
+      r: tombSlotRoll(t.x, t.z),
+    }));
     const crateSlot = slots.find((s) => s.r < 0.5);
     const boxSlot = slots.find((s) => s.r >= 0.5);
     expect(crateSlot && boxSlot).toBeTruthy();
@@ -569,7 +580,14 @@ describe('programmatic collider sanity sweeps', () => {
     const cols: Collider[] = [];
     queryOpenWorldColliders(SEED, -240, -240, 240, 900, cols);
     const bad: string[] = [];
+    // The global NPCS table also carries the authored worlds' rosters (the
+    // Deepglass's Tidehold market keeps its stall keepers registered there so
+    // the gossip dialog can resolve them); those are all dynamic, and their
+    // coordinates mean nothing against the overworld's colliders.
+    // Dynamic NPCs are placed by their own spawner at runtime (findSafePos, or
+    // an authored world's reserved-id loop), never at the authored literal.
     for (const npc of Object.values(NPCS)) {
+      if ((npc as { dynamic?: boolean }).dynamic) continue;
       const pos = (npc as { pos?: { x: number; z: number } }).pos;
       if (!pos) continue;
       for (const c of cols) {

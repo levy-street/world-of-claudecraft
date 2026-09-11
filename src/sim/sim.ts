@@ -58,6 +58,7 @@ import {
   placementFloorHeight,
   resolveMovement,
   resolvePosition,
+  seatGroundedAt,
 } from './colliders';
 import { applyAbilityCostTail, resolveAbilityChain } from './combat/ability_resolution';
 import { clearAfflictionState } from './combat/affliction';
@@ -419,6 +420,8 @@ import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
 import type { PetReturnSnapshot } from './pet/pet_return';
+import { SKIN_WIDTH } from './physics';
+import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { floorHeightAt } from './physics/character';
 import {
   isSwimming as isSwimmingImpl,
@@ -633,7 +636,11 @@ import {
   WARFARE_QUARTERMASTER_NPC_ID,
 } from './pvp/warfare_quartermaster';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
-import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
+import {
+  spawnRealmBuilderMonument,
+  spawnTideholdRealmBuilderMonument,
+} from './realm_builder_monument_spawn';
+import { buyPlot as buyPlotImpl, spawnPlotSigns } from './plots';
 import {
   catalogRankOwned,
   catalogRelicCompletion,
@@ -768,6 +775,16 @@ import type { RiftEvent, RiftInstance } from './rift/types';
 // (online.ts) stays byte-identical.
 export { computeQuestState } from './quests/quest_commands';
 
+import { DG_SPECTATOR_IDS } from './content/deepglass_event';
+import { TIDEHOLD_RESIDENTS } from './deepglass/citadel';
+import { spawnTideholdResidents } from './deepglass/citadel_spawn';
+import { spawnDeepglassCrowd } from './deepglass/crowd';
+import * as deepglassMod from './deepglass/match';
+import { spawnDeepglassMarshal, spawnDeepglassSteward } from './deepglass/steward';
+import { DEEPGLASS_MARSHAL } from './deepglass/world';
+import { updateNpcRoute } from './npc_routes';
+import { DEEPGLASS_PORTAL_WIZARD_NPC_ID } from './portal_wizard';
+import { spawnDeepglassPortalWizard, spawnTownPortalWizards } from './portal_wizard_spawn';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
 import { clearAfkOnMove } from './social/away';
@@ -895,7 +912,12 @@ import type { VendorBuyOptions } from './vendor_buy_stack';
 import * as weaponStowMod from './weapon_stow';
 import {
   groundHeight,
+  groundHeightNear,
   nearSteepWalls,
+  onUnderSheet,
+  sheetMouthStepOk,
+  sheetStepMismatch,
+  sheetWallBlocksStep,
   terrainSteepnessAt,
   waterLevel,
   waterLevelAt,
@@ -1402,6 +1424,9 @@ export interface PlayerMeta {
   // so pre-feature saves load cleanly as un-trained. Grandfathered: any save
   // that had mountTrainingFeePaid=true gets ridingTrained=true on load.
   ridingTrained?: boolean;
+  // Tidehold housing plots bought at their signs (sim/plots.ts). Absent until
+  // the first deed.
+  ownedPlots?: string[];
   // PBE boost kit version already applied to this character (server/
   // pbe_boost.ts, PBE_BOOST_ACCOUNTS=1 only). Optional and absent outside the
   // PBE so live saves round-trip byte-equal; the world-join top-up re-kits
@@ -2233,6 +2258,8 @@ export class Sim {
       world: cfg.world,
       perfLap: cfg.perfLap,
       idleMobTickRadius: cfg.idleMobTickRadius ?? 0,
+      // Stays optional like `world`: undefined means "the world's own start".
+      playerStartOverride: cfg.playerStartOverride,
     };
     const activeWorldContent = getActiveWorldContent();
     this.worldContent = cfg.world ?? activeWorldContent;
@@ -2313,6 +2340,11 @@ export class Sim {
       if (npcDef.dynamic) continue; // spawned on demand by its owning system, not surface-placed
       const safe = this.findSafePos(npcDef.pos.x, npcDef.pos.z, waterLevel() + 0.6);
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
+      // An authored patrol (map documents; sanitized by map_doc sanitizeNpc)
+      // rides onto the entity. createNpc deliberately copies only identity
+      // fields, so without this the route survived the document round-trip and
+      // then went nowhere — a maker's patrolling guard stood at his spawn.
+      if (npcDef.route) npc.route = npcDef.route;
       this.addEntity(npc);
       if (npcDef.market) this.market.merchantIds.push(npc.id); // every auctioneer anchors the shared World Market
       if (npcDef.banker) this.bankerIds.push(npc.id); // every bursar is a place to use the bank
@@ -2322,6 +2354,15 @@ export class Sim {
     // Mobs from camps
     for (const camp of worldContent.camps) {
       const template = MOBS[camp.mobId];
+      // An authored map saved against an older build can name a mob this build
+      // no longer ships. Skip that camp rather than tearing the whole Sim down:
+      // the editor has to be able to OPEN a stale document to fix it. Nothing is
+      // drawn from the shared rng before this point in the loop, so skipping
+      // keeps the seed-stable spawn stream intact.
+      if (!template) {
+        console.warn(`sim: camp references unknown mob '${camp.mobId}'; skipping`);
+        continue;
+      }
       // Aquatic/flagged swimmers may wade in the shallows; everyone else
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
@@ -2426,8 +2467,26 @@ export class Sim {
       this.postOffice.mailboxIds.push(box.id);
     }
 
-    // Dungeon entrances + their private instance slots
-    for (const dungeon of DUNGEON_LIST) {
+    // Dungeon entrances + their private instance slots. DUNGEON_LIST is a
+    // static registry with fixed overworld coordinates, so in the Deepglass
+    // arena the doors are the same fixed-coordinate leak sowfieldIsLive()
+    // guards against: eight door entities standing in a world you cannot walk
+    // out of, each building a view (and linking its programs) mid-bout.
+    const isDeepglassArena = this.worldContent.presentationMode === 'deepglass';
+    // Whether the venue's OWN reserved-id spawners should run.
+    //
+    // In the code-built arena every one of these NPCs is `dynamic: true`: the
+    // generic surface loop skips them and the spawners below place them at
+    // reserved ids, which is what keeps the bout's rng draw order stable. But a
+    // Studio DOCUMENT of the same venue carries the roster as ordinary authored
+    // content (editor/shipped_deepglass.ts drops `dynamic` so a maker can see
+    // and move them), and there the surface loop places them itself — so
+    // running the spawners as well stood a second marshal, a second crowd and a
+    // second city beside the first. A def the world places itself is not ours
+    // to spawn.
+    const venueSpawns = (id: string): boolean =>
+      isDeepglassArena && this.worldContent.npcs[id]?.dynamic === true;
+    for (const dungeon of isDeepglassArena ? [] : DUNGEON_LIST) {
       if (dungeon.overworldDoor === false) {
         for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
           this.instances.push(freshInstanceSlot(dungeon.id, i));
@@ -2456,6 +2515,29 @@ export class Sim {
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
 
+    // The Deepglass steward at her Goldcrest berth. Same reserved-id, same
+    // findSafePos: Goldcrest's ground only exists once the city map document is
+    // loaded, so without it she takes the nearest dry land rather than standing
+    // in open water.
+    {
+      const stewardDef = worldContent.npcs.deepglass_steward;
+      if (stewardDef) {
+        const safe = this.findSafePos(stewardDef.pos.x, stewardDef.pos.z, waterLevel() + 0.6);
+        spawnDeepglassSteward(this.ctx, stewardDef, safe);
+      }
+    }
+
+    // The Deepglass marshal, on the causeway inside the arena. Only that world
+    // lists her, so the lookup is the gate — but the arena flag is asserted too,
+    // because a map document that happened to name her must not put a fixture
+    // desk in the middle of the overworld.
+    {
+      const marshalDef = worldContent.npcs[DEEPGLASS_MARSHAL.id];
+      if (marshalDef && venueSpawns(DEEPGLASS_MARSHAL.id)) {
+        spawnDeepglassMarshal(this.ctx, marshalDef);
+      }
+    }
+
     // FURY uses a reserved id and spawns after the rng-driven world roster, so
     // the Honor Quartermaster cannot perturb existing entity ids or replay RNG.
     {
@@ -2466,6 +2548,29 @@ export class Sim {
         this.addEntity(fury);
       }
     }
+
+    // Baldemar the Bald, one self per town square plus the one at the bell.
+    // Same reserved-id, rng-free treatment as every singleton above; see
+    // src/sim/portal_wizard.ts for why he is fifteen NPCs and one joke.
+    {
+      spawnTownPortalWizards(this.ctx, worldContent.npcs, (x, z) =>
+        this.findSafePos(x, z, waterLevel() + 0.6),
+      );
+      const bellSelf = worldContent.npcs[DEEPGLASS_PORTAL_WIZARD_NPC_ID];
+      if (bellSelf && venueSpawns(DEEPGLASS_PORTAL_WIZARD_NPC_ID)) {
+        spawnDeepglassPortalWizard(this.ctx, bellSelf);
+      }
+    }
+
+    // The Deepglass city event: spectators walking the concourse, sitters in
+    // the stands, stallkeepers at the market. Arena only, reserved ids, and
+    // despawned for every bout (src/sim/deepglass/crowd.ts).
+    if (venueSpawns(DG_SPECTATOR_IDS[0])) spawnDeepglassCrowd(this.ctx);
+
+    // Tidehold, the Warden City across the causeway: forty residents on
+    // reserved ids, walked by src/sim/deepglass/citadel_spawn.ts. Arena only,
+    // and rng-free for the same reason the crowd is.
+    if (venueSpawns(TIDEHOLD_RESIDENTS[0].def.id)) spawnTideholdResidents(this.ctx);
 
     // Warmarshal Draven Kole in Highwatch: the same reserved-id, rng-free
     // treatment as Bram and FURY above. See src/sim/pvp/warfare_quartermaster.ts.
@@ -2602,7 +2707,9 @@ export class Sim {
       this.addEntity(board);
     }
 
-    spawnRealmBuilderMonument(this.ctx, this.worldContent.props);
+    spawnRealmBuilderMonument(this, this.worldContent.props);
+    spawnTideholdRealmBuilderMonument(this, this.worldContent.presentationMode);
+    spawnPlotSigns(this, this.worldContent.presentationMode);
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {
@@ -2631,11 +2738,16 @@ export class Sim {
       }
     }
 
-    // Escort NPCs (escort.ts) and the hub practice yard (hub_practice.ts) last
-    // on purpose: rng-free, trailing ids only, so everything above is byte-
-    // identical to a world without them.
-    initEscortsImpl(this.ctx);
-    spawnHubPractice(this.ctx, worldContent);
+    // Escort quest NPCs (src/sim/escort.ts) and the hub practice yard
+    // (hub_practice.ts) last on purpose: rng-free, trailing ids only, so
+    // everything above is byte-identical to a world without them.
+    // Not in the Deepglass arena: both carry fixed overworld coordinates, so
+    // they would leak into Tidehold's world (the escortees' rigs are not in
+    // the arena's preload manifest either).
+    if (!isDeepglassArena) {
+      initEscortsImpl(this.ctx);
+      spawnHubPractice(this.ctx, worldContent);
+    }
   }
 
   private spawnHealerPracticeDummy(): void {
@@ -2664,6 +2776,12 @@ export class Sim {
   // `this.dropEntity` / `this.rebucket` call site resolving unchanged through the seam.
   addEntity(e: Entity): void {
     addEntityToRoster(this.ctx, e);
+  }
+
+  /** Drop one entity by id. Public for the map editor, which swaps authored
+   *  camp mobs and NPCs in a live Sim rather than restarting it. */
+  removeEntity(id: number): void {
+    this.dropEntity(id);
   }
 
   private dropEntity(id: number): void {
@@ -2853,7 +2971,7 @@ export class Sim {
       // while instance/delve exits above retain their established behavior.
       savedPos = this.findSafePos(savedPos.x, savedPos.z, -Infinity, PLAYER_BODY_RADIUS);
     }
-    const playerStart = this.worldContent.playerStart;
+    const playerStart = this.cfg.playerStartOverride ?? this.worldContent.playerStart;
     const startPos = savedPos
       ? this.groundPos(savedPos.x, savedPos.z)
       : this.groundPos(playerStart.x, playerStart.z);
@@ -3401,6 +3519,10 @@ export class Sim {
       // Grandfather: players who already paid the old 100g fee are riding-trained.
       if (s.ridingTrained === true || s.mountTrainingFeePaid === true) meta.ridingTrained = true;
       if (typeof s.pbeBoostKit === 'number') meta.pbeBoostKit = s.pbeBoostKit;
+      if (Array.isArray(s.ownedPlots)) {
+        const plots = s.ownedPlots.filter((id): id is string => typeof id === 'string');
+        if (plots.length > 0) meta.ownedPlots = plots;
+      }
       // Grandfather: players who had q_riding_lessons active in a mid-quest save
       // (state='active' or 'ready') but never received ridingTrained=true are
       // riding-trained because accepting the quest proves they already paid
@@ -3675,12 +3797,12 @@ export class Sim {
   // Returns the new pid, or -1 if the name is blank or already taken (whisper
   // resolution needs a unique name). Never reached in production (the caller runs
   // only when devCommands is on).
-  spawnDevBot(name: string): number {
+  spawnDevBot(name: string, cls: PlayerClass = 'mage'): number {
     const clean = name.trim();
     if (!clean) return -1;
     for (const m of this.players.values())
       if (m.name.toLowerCase() === clean.toLowerCase()) return -1;
-    const pid = this.addPlayer('mage', clean, { bot: true });
+    const pid = this.addPlayer(cls, clean, { bot: true });
     const meta = this.players.get(pid);
     if (meta) meta.isDevBot = true;
     const me = this.entities.get(this.primaryId);
@@ -3691,6 +3813,15 @@ export class Sim {
       this.rebucket(e);
     }
     return pid;
+  }
+
+  // The spawnDevBot counterpart: remove a dev bot ENTIRELY — entity and player
+  // meta — so its name returns to the pool. Deepball's final whistle calls this
+  // through the context seam; dropEntity alone leaked the meta and drained the
+  // roster a seat per bout.
+  removeDevBot(pid: number): void {
+    if (this.players.has(pid)) this.removePlayer(pid);
+    else this.dropEntity(pid);
   }
 
   // /dev vendor: spawn the free-epic Test Quartermaster next to the caller
@@ -4244,6 +4375,7 @@ export class Sim {
       ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       // Absent until riding skill is purchased (back-compat).
       ...(meta.ridingTrained ? { ridingTrained: true } : {}),
+      ...(meta.ownedPlots && meta.ownedPlots.length > 0 ? { ownedPlots: [...meta.ownedPlots] } : {}),
       // Absent outside the PBE (back-compat; server/pbe_boost.ts).
       ...(meta.pbeBoostKit !== undefined ? { pbeBoostKit: meta.pbeBoostKit } : {}),
       craftSkills: { ...meta.craftSkills },
@@ -5781,6 +5913,7 @@ export class Sim {
       notice: sim.notice.bind(sim),
       // Dev-only test-dummy spawner backing "/dev bot <name>" in social/chat.ts.
       spawnDevBot: sim.spawnDevBot.bind(sim),
+      removeDevBot: sim.removeDevBot.bind(sim),
       spawnDevVendor: sim.spawnDevVendor.bind(sim),
       startCascadePlaytest: sim.startCascadePlaytest.bind(sim),
       startDevSandbox: sim.startDevSandbox.bind(sim),
@@ -6227,6 +6360,12 @@ export class Sim {
         lap?.('mob.auras');
       } else if (e.kind === 'npc') {
         cleanseFriendlyNpcAuras(this.ctx, e);
+        // Authored patrols. npc_routes.ts's header has always said friendly
+        // NPCs walk theirs every tick; this is that caller. Parity-safe by the
+        // module's own contract (zero rng, fixed-DT steps), and a world with no
+        // routed NPCs — every shipped world today — takes one undefined check
+        // per NPC and changes nothing.
+        if (e.route) updateNpcRoute(this.ctx, e);
       } else if (e.kind === 'object') {
         if (!e.lootable) {
           e.respawnTimer -= DT;
@@ -6296,6 +6435,12 @@ export class Sim {
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
+    // Deepball at the Deepglass. Like the Vale Cup phase it draws ZERO shared
+    // rng (pure fluid physics, clock-driven currents, pure-function bot aim),
+    // so appending it here cannot fork the draw order. No-ops instantly when
+    // no bout is running, which is every world except the arena.
+    deepglassMod.updateDeepglass(this.ctx);
+    lap?.('deepglass');
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
     // tick-math wave and rune clocks; the one seeded draw is the power-rune
     // face at match START), so its tick position cannot fork the draw order
@@ -6663,23 +6808,29 @@ export class Sim {
     // player in; slopes use the ridden surface (ride_height.ts) plus the shore
     // step-out, matching the movement kernel and the clamp findChargePath
     // already plans with, so a wading-depth ford never ends a charge.
-    const h1 = groundHeight(nx, nz, this.cfg.seed);
+    // groundHeightNear: a charge runs along whatever sheet the body is on —
+    // tube floor, carve floor or the surface — and its own walls stop it.
+    const h1 = groundHeightNear(nx, nz, this.cfg.seed, p.pos.y);
     if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return done(false);
     const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
-    const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
+    const r0 = Math.max(groundHeightNear(p.pos.x, p.pos.z, this.cfg.seed, p.pos.y), wls);
     const r1 = Math.max(h1, wls);
     if (
-      r1 > r0 &&
-      ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
-        (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
-      !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE)
+      (r1 > r0 &&
+        ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
+          (h1 >= wls &&
+            !onUnderSheet(nx, nz, this.cfg.seed, p.pos.y) &&
+            rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
+        !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE) &&
+        !sheetMouthStepOk(this.cfg.seed, p.pos.x, p.pos.z, p.pos.y, nx, nz, r0, r1)) ||
+      sheetWallBlocksStep(this.cfg.seed, p.pos.x, p.pos.z, p.pos.y, nx, nz)
     ) {
       return done(false);
     }
     const resolved = this.resolveMove(p.pos.x, p.pos.z, nx, nz, BODY_RADIUS, p);
     p.pos.x = resolved.x;
     p.pos.z = resolved.z;
-    p.pos.y = groundHeight(resolved.x, resolved.z, this.cfg.seed);
+    p.pos.y = groundHeightNear(resolved.x, resolved.z, this.cfg.seed, p.pos.y);
     p.vy = 0;
     p.onGround = true;
     p.fallStartY = p.pos.y;
@@ -6734,20 +6885,25 @@ export class Sim {
     const step = Math.min(speed * DT, d - FOLLOW_STOP_DIST);
     const nx = p.pos.x + Math.sin(p.facing) * step;
     const nz = p.pos.z + Math.cos(p.facing) * step;
-    const h1 = groundHeight(nx, nz, this.cfg.seed);
+    const h1 = groundHeightNear(nx, nz, this.cfg.seed, p.pos.y);
     if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return true; // don't trail into deep water
     // ridden-surface slopes plus the shore step-out (ride_height.ts), matching
     // the movement kernel: a follower crosses the same fords and climbs the
-    // same low banks its leader just walked.
+    // same low banks its leader just walked — including through cave mouths
+    // and carved tunnels (groundHeightNear + the sheet gates).
     const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
-    const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
+    const r0 = Math.max(groundHeightNear(p.pos.x, p.pos.z, this.cfg.seed, p.pos.y), wls);
     const r1 = Math.max(h1, wls);
     if (
-      r1 > r0 &&
-      step > 1e-5 &&
-      ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
-        (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
-      !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE)
+      (r1 > r0 &&
+        step > 1e-5 &&
+        ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
+          (h1 >= wls &&
+            !onUnderSheet(nx, nz, this.cfg.seed, p.pos.y) &&
+            rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
+        !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE) &&
+        !sheetMouthStepOk(this.cfg.seed, p.pos.x, p.pos.z, p.pos.y, nx, nz, r0, r1)) ||
+      sheetWallBlocksStep(this.cfg.seed, p.pos.x, p.pos.z, p.pos.y, nx, nz)
     ) {
       return true; // wall/cliff
     }
@@ -6756,7 +6912,7 @@ export class Sim {
     const resolved = this.resolveMove(p.pos.x, p.pos.z, nx, nz, BODY_RADIUS, p);
     p.pos.x = resolved.x;
     p.pos.z = resolved.z;
-    p.pos.y = groundHeight(resolved.x, resolved.z, this.cfg.seed);
+    p.pos.y = groundHeightNear(resolved.x, resolved.z, this.cfg.seed, p.pos.y);
     p.vy = 0;
     p.onGround = true;
     p.fallStartY = p.pos.y;
@@ -7294,7 +7450,83 @@ export class Sim {
   // delve bell, mob_swing) and the `(sim as any)` test call sites resolve it
   // on the Sim facade.
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
-    return applyKnockbackImpl(this.ctx, source, target, distance);
+    if (source.id !== target.id && this.isIceBlocked(target)) return 0;
+    if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
+    if (this.cfg.devCommands && this.players.get(target.id)?.devAnchored) return 0;
+    // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
+    // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
+    // and never displaces the victim, so a caster keeps casting through it.
+    distance *= 1 - (target.knockbackResistance ?? 0);
+    if (distance <= 0) return 0;
+    let dx = target.pos.x - source.pos.x;
+    let dz = target.pos.z - source.pos.z;
+    let len = Math.hypot(dx, dz);
+    if (len < 1e-4) {
+      // exactly overlapping: shove along the mob's facing so the direction is stable
+      dx = Math.sin(source.facing);
+      dz = Math.cos(source.facing);
+      len = 1;
+    }
+    const ux = dx / len,
+      uz = dz / len;
+    const STEP = 0.5;
+    let moved = 0;
+    let cx = target.pos.x,
+      cz = target.pos.z;
+    while (moved < distance) {
+      const adv = Math.min(STEP, distance - moved);
+      const nx = cx + ux * adv,
+        nz = cz + uz * adv;
+      const h1 = groundHeightNear(nx, nz, this.cfg.seed, target.pos.y);
+      if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) break; // would land in deep water
+      // ridden-surface slopes (ride_height.ts): a submerged bed bump does not
+      // stop a shove crossing shallow water. No shore step-out here: a forced
+      // displacement conservatively stops at a bank face.
+      const wls = stepWaterLevel(cx, cz, nx, nz, this.cfg.seed);
+      const r0 = Math.max(groundHeightNear(cx, cz, this.cfg.seed, target.pos.y), wls);
+      const r1 = Math.max(h1, wls);
+      if (
+        (r1 > r0 &&
+          ((r1 - r0) / adv > MAX_CLIMB_SLOPE ||
+            (h1 >= wls &&
+              !onUnderSheet(nx, nz, this.cfg.seed, target.pos.y) &&
+              rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE))) ||
+        sheetWallBlocksStep(this.cfg.seed, cx, cz, target.pos.y, nx, nz)
+      ) {
+        break; // would slam into a cliff (or the tunnel's rock wall)
+      }
+      // resolveMove sweeps cx,cz -> nx,nz against static colliders (walls,
+      // pillars, delve module bounds/doors) in small sub-steps, so a thin wall
+      // stops the shove at its face instead of the coarse 0.5yd hop skipping
+      // over it.
+      // Resolved with a SKIN_WIDTH-padded radius (upstream v0.42 knockback.ts):
+      // an unpadded push-out lands the victim at EXACT zero clearance against
+      // the wall, and the swept solver then treats the tangent body as blocked
+      // in every direction, so ordinary movement can no longer pull free.
+      const resolved = this.resolveMove(cx, cz, nx, nz, BODY_RADIUS + SKIN_WIDTH, target);
+      const blocked = Math.hypot(resolved.x - nx, resolved.z - nz) > BODY_RADIUS * 0.25;
+      cx = resolved.x;
+      cz = resolved.z;
+      moved += adv;
+      if (blocked) break; // hit a wall: stop the shove here
+    }
+    if (moved <= 0) return 0;
+    // Support-aware seat: a victim shoved along crate tops stays on them, and
+    // one shoved through a passed-over prop footprint is nudged clear instead
+    // of being embedded at terrain height inside it.
+    const seat = seatGroundedAt(this.cfg.seed, cx, cz, BODY_RADIUS, target.pos.y);
+    target.pos.x = seat.x;
+    target.pos.z = seat.z;
+    // A victim shoved along a tube or carve floor stays on THAT sheet: the
+    // seat helper reads the surface heightfield, which sits a hill above an
+    // underground body.
+    target.pos.y = onUnderSheet(seat.x, seat.z, this.cfg.seed, target.pos.y)
+      ? groundHeightNear(seat.x, seat.z, this.cfg.seed, target.pos.y)
+      : seat.y;
+    target.vy = 0;
+    target.onGround = true;
+    target.fallStartY = target.pos.y;
+    return moved;
   }
 
   // The one funnel every PLAYER-sourced crowd-control application passes
@@ -8072,6 +8304,21 @@ export class Sim {
     if (d < 0.3) return true;
     const desired = angleTo(e.pos, dest);
     e.facing = desired;
+    // An immobile mob turns to face its destination and goes no further. It
+    // must not fall through to the steps below, because every one of them ends
+    // by SNAPPING pos.y to the ground — and it does that even when the
+    // horizontal step is zero, which is what an immobile mob always takes.
+    //
+    // The Tidesow found this. It is an inert mob whose position is owned by the
+    // deepball physics, and once a strike put it in combat the chase arm ran
+    // this every tick and wrote the ball down onto the slate, a hundred feet
+    // under where it was flying. The match restored pos immediately after, so
+    // the ball LOOKED right in the sim — but prevPos had already captured the
+    // floor, and the renderer interpolates prevPos -> pos, so the drawn ball
+    // swept between the slate and its true height every single frame.
+    // The idle-wander arm (mob/locomotion.ts) already carries this exact rule;
+    // chase, flee and evade did not, and this is the one place all four meet.
+    if (speed <= 0) return false;
     const step = Math.min(speed * DT, d);
     const canSwim = this.mobCanSwim(MOBS[e.templateId]);
 
@@ -8118,11 +8365,21 @@ export class Sim {
       // screens next, and only actual wall cells pay for exact heights. This
       // is a NEW gate for these movers, so the finer per-step cliff check
       // players get is not replicated here.
-      if (nearSteepWalls(nx, nz) && terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE) {
+      if (
+        nearSteepWalls(nx, nz) &&
+        terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE &&
+        // Surface steepness is scenery to a mob walking a tunnel beneath it.
+        !onUnderSheet(nx, nz, this.cfg.seed, e.pos.y)
+      ) {
         if (Number.isNaN(h0))
           h0 = ride(e.pos.x, e.pos.z, groundHeight(e.pos.x, e.pos.z, this.cfg.seed));
         if (ride(nx, nz, groundHeight(nx, nz, this.cfg.seed)) > h0) continue;
       }
+      // Cave/carve sheets: a candidate that resolves onto ANOTHER layer (the
+      // surface over the tunnel, or the tunnel under the field) is a teleport,
+      // not a step — and the rock walls are solid for mobs and pets too.
+      if (sheetStepMismatch(this.cfg.seed, e.pos.x, e.pos.z, e.pos.y, nx, nz)) continue;
+      if (sheetWallBlocksStep(this.cfg.seed, e.pos.x, e.pos.z, e.pos.y, nx, nz)) continue;
       // The Great Maze's hedge walls are hard for mobs too (the maze patrol
       // knights pace their dead ends instead of drifting through a hedge).
       // resolveMovePoint now does that on its own: the hedges are real collider
@@ -9134,6 +9391,9 @@ export class Sim {
 
   pickUpObject(objId: number, pid?: number): boolean {
     return interaction.pickUpObject(this.ctx, objId, pid, this.noticeboardDefinitions);
+  }
+  buyPlot(deedId: string, pid?: number): boolean {
+    return buyPlotImpl(this.ctx, deedId, pid);
   }
 
   // Corpse-harvest preference (Intentional Gathering PR3): a stored PLAYER

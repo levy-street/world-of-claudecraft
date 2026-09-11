@@ -47,7 +47,13 @@ class FakeDb implements SocialDb {
     return null;
   }
   async guildPledgeSettings(guildId: number) {
-    return this.pledgeSettingsByGuild.get(guildId) ?? { enabled: true, minLevel: 1, note: '' };
+    return (
+      this.pledgeSettingsByGuild.get(guildId) ?? {
+        enabled: true,
+        minLevel: 1,
+        note: '',
+      }
+    );
   }
   async setGuildPledgeSettings(
     guildId: number,
@@ -67,7 +73,11 @@ class FakeDb implements SocialDb {
   async pledgeOf(charId: number) {
     const p = this.pledges.get(charId);
     if (!p) return null;
-    return { guildId: p.guildId, guildName: this.guilds.get(p.guildId) ?? '', sinceMs: p.sinceMs };
+    return {
+      guildId: p.guildId,
+      guildName: this.guilds.get(p.guildId) ?? '',
+      sinceMs: p.sinceMs,
+    };
   }
   async upsertPledge(charId: number, guildId: number) {
     this.pledges.set(charId, { guildId, sinceMs: 0 });
@@ -92,7 +102,10 @@ class FakeDb implements SocialDb {
   async bumpPledgeLadder(guildId: number, accountId: number) {
     const key = `${guildId}:${accountId}`;
     const prior = this.ladder.get(key);
-    const next = { rejectCount: (prior?.rejectCount ?? 0) + 1, rejectedAtMs: this.nowMs };
+    const next = {
+      rejectCount: (prior?.rejectCount ?? 0) + 1,
+      rejectedAtMs: this.nowMs,
+    };
     this.ladder.set(key, next);
     return next.rejectCount;
   }
@@ -198,9 +211,12 @@ class FakeDb implements SocialDb {
     this.guilds.delete(id);
     for (const [cid, m] of [...this.members]) if (m.guildId === id) this.members.delete(cid);
   }
-  async guildMembership(
-    c: number,
-  ): Promise<{ guildId: number; guildName: string; rank: GuildRank; rosterPages: number } | null> {
+  async guildMembership(c: number): Promise<{
+    guildId: number;
+    guildName: string;
+    rank: GuildRank;
+    rosterPages: number;
+  } | null> {
     const m = this.members.get(c);
     return m
       ? {
@@ -352,7 +368,11 @@ class FakeDb implements SocialDb {
 }
 
 class FakeTransport implements SocialTransport {
-  pledgeStamps: { characterId: number; pledgeGuild: string; guildTier: number }[] = [];
+  pledgeStamps: {
+    characterId: number;
+    pledgeGuild: string;
+    guildTier: number;
+  }[] = [];
   applyPledge(characterId: number, pledgeGuild: string, guildTier: number): void {
     this.pledgeStamps.push({ characterId, pledgeGuild, guildTier });
   }
@@ -367,7 +387,12 @@ class FakeTransport implements SocialTransport {
   // character with no purse entry is "offline" (nothing live to charge).
   purse = new Map<number, number>();
   refunds: { characterId: number; copper: number }[] = [];
-  rosterExpansions: { characterId: number; guildId: number; pages: number; copper: number }[] = [];
+  rosterExpansions: {
+    characterId: number;
+    guildId: number;
+    pages: number;
+    copper: number;
+  }[] = [];
   // The purchase seam, mirroring the real coordinator's arms
   // (server/guild_roster_transport.ts) over the in-memory purse and the fake
   // compare-and-set: a character with no purse entry has no live session,
@@ -1092,7 +1117,9 @@ describe('guilds', () => {
   });
 
   it('runs an injected guild creator only after validation and content screening', async () => {
-    const screened = setup({ isNameOffensive: (name) => name === 'Blocked Banner' });
+    const screened = setup({
+      isNameOffensive: (name) => name === 'Blocked Banner',
+    });
     screened.add(1, 'Aleph');
     const calls: Array<[string, number]> = [];
     const create = async (name: string, leaderId: number) => {
@@ -1791,7 +1818,10 @@ describe('guild membership stamps (onGuildMembershipChanged)', () => {
     // nothing else: no officer-in-A stamp, and B's row keeps its leader rank.
     expect(h.tx.membershipStamps).toEqual([
       { id: 2, membership: null },
-      { id: 2, membership: { guildId: 2, guildName: 'Second Banner', rank: 'leader' } },
+      {
+        id: 2,
+        membership: { guildId: 2, guildName: 'Second Banner', rank: 'leader' },
+      },
     ]);
     expect(await h.db.guildMembership(2)).toMatchObject({
       guildId: 2,
@@ -2002,20 +2032,54 @@ describe('guild calendar events', () => {
     expect(resultsFor(h, 2)).toEqual(['created']);
     const snap = await h.svc.snapshot(3);
     expect(snap.guild?.events.map((e) => e.title)).toEqual(['Fishing derby', 'Crypt night']);
-    expect(snap.guild?.events[1]).toMatchObject({ day: NEXT_WEEK, hour: 20, createdBy: 'Lead' });
+    expect(snap.guild?.events[1]).toMatchObject({
+      day: NEXT_WEEK,
+      hour: 20,
+      createdBy: 'Lead',
+    });
   });
 
   it('refuses a plain member, a non-member, and bad input', async () => {
     const h = await seatedGuild();
-    await h.svc.guildEventCreate(h.actor(3), { day: NEXT_WEEK, hour: 20, title: 'X', note: '' });
+    await h.svc.guildEventCreate(h.actor(3), {
+      day: NEXT_WEEK,
+      hour: 20,
+      title: 'X',
+      note: '',
+    });
     expect(resultsFor(h, 3)).toEqual(['notOfficer']);
     h.add(9, 'Loner');
-    await h.svc.guildEventCreate(h.actor(9), { day: NEXT_WEEK, hour: 20, title: 'X', note: '' });
+    await h.svc.guildEventCreate(h.actor(9), {
+      day: NEXT_WEEK,
+      hour: 20,
+      title: 'X',
+      note: '',
+    });
     expect(resultsFor(h, 9)).toEqual(['notInGuild']);
-    await h.svc.guildEventCreate(h.actor(1), { day: 'not-a-day', hour: 20, title: 'X', note: '' });
-    await h.svc.guildEventCreate(h.actor(1), { day: '1970-02-30', hour: 20, title: 'X', note: '' });
-    await h.svc.guildEventCreate(h.actor(1), { day: '1969-12-01', hour: 20, title: 'X', note: '' });
-    await h.svc.guildEventCreate(h.actor(1), { day: NEXT_WEEK, hour: 20, title: '   ', note: '' });
+    await h.svc.guildEventCreate(h.actor(1), {
+      day: 'not-a-day',
+      hour: 20,
+      title: 'X',
+      note: '',
+    });
+    await h.svc.guildEventCreate(h.actor(1), {
+      day: '1970-02-30',
+      hour: 20,
+      title: 'X',
+      note: '',
+    });
+    await h.svc.guildEventCreate(h.actor(1), {
+      day: '1969-12-01',
+      hour: 20,
+      title: 'X',
+      note: '',
+    });
+    await h.svc.guildEventCreate(h.actor(1), {
+      day: NEXT_WEEK,
+      hour: 20,
+      title: '   ',
+      note: '',
+    });
     expect(resultsFor(h, 1)).toEqual(['badInput', 'badInput', 'badInput', 'badInput']);
     expect((await h.svc.snapshot(1)).guild?.events).toHaveLength(0);
   });
@@ -2221,7 +2285,11 @@ describe('broadcastDeedUnlock', () => {
     // The exact wire shape: ids and the earner's name only. Pinning the FULL
     // object also proves no `text` field rides along (the server never sends
     // English for this event; the client composes the visible line).
-    const expected = { type: 'deedBroadcast', characterName: 'Earner', deedId: 'prog_veteran' };
+    const expected = {
+      type: 'deedBroadcast',
+      characterName: 'Earner',
+      deedId: 'prog_veteran',
+    };
     expect(h.tx.eventsFor(2)).toEqual([expected]);
     expect(h.tx.eventsFor(3)).toEqual([expected]);
     expect(h.tx.eventsFor(4)).toEqual([expected]);
@@ -2391,7 +2459,10 @@ describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
     // Ordering: the membership stamp (the authorization input) landed BEFORE
     // the seed/fee hook, in the same synchronous success arm.
     expect(h.tx.membershipStamps).toEqual([
-      { id: 1, membership: { guildId: 1, guildName: 'Iron Vanguard', rank: 'leader' } },
+      {
+        id: 1,
+        membership: { guildId: 1, guildName: 'Iron Vanguard', rank: 'leader' },
+      },
     ]);
     // Refusals after: duplicate name, already guilded. No further hook calls.
     await expect(h.svc.guildCreate(h.actor(2), 'iron vanguard')).resolves.toBe(false);
@@ -2565,13 +2636,25 @@ describe('guild pledges', () => {
 
   it('refuses a closed guild, an under-level pledger, and a member', async () => {
     const h = await seed();
-    await h.db.setGuildPledgeSettings(h.guildId, { enabled: false, minLevel: 1, note: '' });
+    await h.db.setGuildPledgeSettings(h.guildId, {
+      enabled: false,
+      minLevel: 1,
+      note: '',
+    });
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');
     expect(await h.db.pledgeOf(4)).toBeNull();
-    await h.db.setGuildPledgeSettings(h.guildId, { enabled: true, minLevel: 20, note: '' });
+    await h.db.setGuildPledgeSettings(h.guildId, {
+      enabled: true,
+      minLevel: 20,
+      note: '',
+    });
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');
     expect(await h.db.pledgeOf(4)).toBeNull();
-    await h.db.setGuildPledgeSettings(h.guildId, { enabled: true, minLevel: 1, note: '' });
+    await h.db.setGuildPledgeSettings(h.guildId, {
+      enabled: true,
+      minLevel: 1,
+      note: '',
+    });
     await h.svc.guildPledge(h.actor(3), 'Bookbinders');
     expect(await h.db.pledgeOf(3)).toBeNull();
   });
@@ -2666,11 +2749,17 @@ describe('guild pledges', () => {
     expect(await h.db.pledgeOf(4)).not.toBeNull();
     // Accepting the invite seats them; joining clears any pledge state.
     await h.svc.guildAccept(h.actor(4));
-    expect(await h.db.guildMembership(4)).toMatchObject({ guildName: 'Bookbinders' });
+    expect(await h.db.guildMembership(4)).toMatchObject({
+      guildName: 'Bookbinders',
+    });
     expect(await h.db.pledgeOf(4)).toBeNull();
     // Joining restamps the live pledge tag from durable truth (now empty), so
     // a later guild leave cannot resurface a stale pledged nameplate line.
-    expect(h.tx.pledgeStamps.at(-1)).toEqual({ characterId: 4, pledgeGuild: '', guildTier: 0 });
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({
+      characterId: 4,
+      pledgeGuild: '',
+      guildTier: 0,
+    });
   });
 
   it('accepting an OFFLINE pledger seats them directly, wiping the ladder, no invite involved', async () => {
@@ -2739,7 +2828,9 @@ describe('guild pledges', () => {
     // The officer accepts the still-standing pledge while they are offline:
     // seated directly, found in the guild on next login.
     await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
-    expect(await h.db.guildMembership(4)).toMatchObject({ guildName: 'Bookbinders' });
+    expect(await h.db.guildMembership(4)).toMatchObject({
+      guildName: 'Bookbinders',
+    });
     expect(await h.db.pledgeOf(4)).toBeNull();
   });
 
@@ -2797,7 +2888,9 @@ describe('guild pledges', () => {
     expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
     // The first accept's invite still stands and seats them normally.
     await h.svc.guildAccept(h.actor(4));
-    expect(await h.db.guildMembership(4)).toMatchObject({ guildName: 'Bookbinders' });
+    expect(await h.db.guildMembership(4)).toMatchObject({
+      guildName: 'Bookbinders',
+    });
     expect(await h.db.pledgeOf(4)).toBeNull();
   });
 
@@ -2840,7 +2933,11 @@ describe('guild pledges', () => {
     expect(await h.db.pledgeOf(4)).toBeNull();
     // The live tag restamps from durable truth (now empty) and the pledged
     // guild's officers hear the board row disappear.
-    expect(h.tx.pledgeStamps.at(-1)).toEqual({ characterId: 4, pledgeGuild: '', guildTier: 0 });
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({
+      characterId: 4,
+      pledgeGuild: '',
+      guildTier: 0,
+    });
     expect(h.tx.snapshotCount.get(2) ?? 0).toBeGreaterThan(boardPushes);
   });
 
@@ -2888,12 +2985,20 @@ describe('guild pledges', () => {
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');
     await h.svc.guildPledgeWithdraw(h.actor(4));
     expect(await h.db.pledgeOf(4)).toBeNull();
-    expect(h.tx.pledgeStamps.at(-1)).toEqual({ characterId: 4, pledgeGuild: '', guildTier: 0 });
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({
+      characterId: 4,
+      pledgeGuild: '',
+      guildTier: 0,
+    });
   });
 
   it('officer-plus gates and note truncation on settings', async () => {
     const h = await seed();
-    await h.svc.setGuildPledgeSettings(h.actor(3), { enabled: false, minLevel: 5, note: 'x' });
+    await h.svc.setGuildPledgeSettings(h.actor(3), {
+      enabled: false,
+      minLevel: 5,
+      note: 'x',
+    });
     expect((await h.db.guildPledgeSettings(h.guildId)).enabled).toBe(true);
     await h.svc.setGuildPledgeSettings(h.actor(1), {
       enabled: false,
@@ -3128,7 +3233,10 @@ describe('guild roster expansion', () => {
     expect(rosterEvents(h, 1)).toEqual([{ type: 'guildRosterResult', code: 'retry' }]);
     expect(h.tx.purse.get(1)).toBe(50 * GOLD);
     expect(h.tx.rosterExpansions).toEqual([]);
-    expect(await h.db.guildMembership(1)).toMatchObject({ rank: 'officer', rosterPages: 0 });
+    expect(await h.db.guildMembership(1)).toMatchObject({
+      rank: 'officer',
+      rosterPages: 0,
+    });
   });
 
   it('the invite gate and the atomic seat both honour the bought cap', async () => {

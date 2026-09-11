@@ -2152,6 +2152,82 @@ export class Vfx {
     );
   }
 
+  /** Fluid-pool bubble: a small tinted puff that pops just above the surface. */
+  fluidBubble(x: number, y: number, z: number, color: number, dt: number, rate: number): void {
+    if (!this.emitChance(rate, dt)) return;
+    this.spawn(
+      x,
+      y + 0.08,
+      z,
+      (Math.random() - 0.5) * 0.2,
+      0.5 + Math.random() * 0.5,
+      (Math.random() - 0.5) * 0.2,
+      color,
+      0.16 + Math.random() * 0.18,
+      0.5 + Math.random() * 0.4,
+      2.5,
+      SPR.glowSoft,
+    );
+  }
+
+  /** Fluid-pool smoke/steam: a slow dark puff drifting off the surface. */
+  fluidSmoke(x: number, y: number, z: number, color: number, dt: number, rate: number): void {
+    if (!this.emitChance(rate, dt)) return;
+    this.spawn(
+      x,
+      y + 0.25,
+      z,
+      (Math.random() - 0.5) * 0.4,
+      0.7 + Math.random() * 0.6,
+      (Math.random() - 0.5) * 0.4,
+      color,
+      0.8 + Math.random() * 0.7,
+      2.2 + Math.random() * 1.2,
+      -0.22,
+      SPR.smoke,
+    );
+  }
+
+  /** Lava heat plume: bright embers popping upward off the molten surface plus
+   *  the occasional wobble of hot, glowing air. Buoyant (negative gravity) so
+   *  particles rise and shimmer rather than fall. Rate-gated by the caller. */
+  fluidHeat(x: number, y: number, z: number, dt: number, rate: number): void {
+    if (this.emitChance(rate, dt)) {
+      // Rising ember: mostly deep orange, a few flare white-hot.
+      const blazing = Math.random() < 0.35;
+      this.spawn(
+        x + (Math.random() - 0.5) * 0.5,
+        y + 0.12,
+        z + (Math.random() - 0.5) * 0.5,
+        (Math.random() - 0.5) * 0.5,
+        1.1 + Math.random() * 1.5,
+        (Math.random() - 0.5) * 0.5,
+        blazing ? 0xffe487 : 0xff6a1e,
+        0.09 + Math.random() * 0.12,
+        0.7 + Math.random() * 0.7,
+        -0.55, // buoyant: heat lifts the ember as it fades
+        SPR.flame,
+        (Math.random() - 0.5) * 0.5,
+      );
+    }
+    // Heat shimmer: a faint glowing puff of hot air that swells and drifts up.
+    if (this.emitChance(rate * 0.4, dt)) {
+      this.spawn(
+        x + (Math.random() - 0.5) * 0.9,
+        y + 0.3,
+        z + (Math.random() - 0.5) * 0.9,
+        (Math.random() - 0.5) * 0.3,
+        0.8 + Math.random() * 0.6,
+        (Math.random() - 0.5) * 0.3,
+        0xff8a3a,
+        0.85 + Math.random() * 0.7,
+        1.3 + Math.random() * 0.8,
+        -0.12,
+        SPR.glowSoft,
+      );
+    }
+  }
+
   /**
    * Smoke out of one tailpipe, at a world position, with the pipe's own exit
    * direction.

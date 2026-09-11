@@ -279,6 +279,8 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   // and this is a single small selection record with no content-scaled growth of its own,
   // so it stays out of that measurement rather than moving the ceiling for it.
   'gatheringGoal',
+  // FORK: Tidehold housing deeds (sim/plots.ts) persist the owned plot ids.
+  'ownedPlots',
 ] as const;
 
 // The settled ceiling measured 8,469 bytes when this bound was re-minted
@@ -1327,7 +1329,10 @@ describe('the professions blob growth bound (phase 16)', () => {
     // put crafted copies into inventory, not equipment), so the clamp must
     // bite there too; the review round found an equipment-only first cut.
     if (!s1.inventory?.[0]) throw new Error('ceiling fixture has no inventory row');
-    s1.inventory[0].instance = { enchant: 'enchant_weapon_might', signer: overSigner };
+    s1.inventory[0].instance = {
+      enchant: 'enchant_weapon_might',
+      signer: overSigner,
+    };
     // The SURVIVOR half of the bag arm: a legal maximum-length signer on
     // another bag row must come back byte-faithfully, or a clamp that simply
     // deleted every bag signer would pass the drop pins above.
@@ -1418,7 +1423,12 @@ describe('the professions blob growth bound (phase 16)', () => {
         count: 1,
         instance: {
           ...junkKeys,
-          rift: { tier: 'C', upgradeLevel: 1, sourceEventId: 'evt_order_pin', gems: [] },
+          rift: {
+            tier: 'C',
+            upgradeLevel: 1,
+            sourceEventId: 'evt_order_pin',
+            gems: [],
+          },
         } as unknown as InvSlot['instance'],
       },
     ];
@@ -1449,7 +1459,12 @@ describe('the professions blob growth bound (phase 16)', () => {
       count: 1,
       instance: {
         ...junkKeys,
-        rift: { tier: 'C', upgradeLevel: 1, sourceEventId: 'evt_order_pin', gems: [] },
+        rift: {
+          tier: 'C',
+          upgradeLevel: 1,
+          sourceEventId: 'evt_order_pin',
+          gems: [],
+        },
       } as unknown as InvSlot['instance'],
     };
     s1.vendorBuyback = [JSON.parse(JSON.stringify(riftRow))];
@@ -1486,7 +1501,12 @@ describe('the professions blob growth bound (phase 16)', () => {
         count: 1,
         craftedRecipeId: 'r'.repeat(100_000),
         instance: {
-          rift: { tier: 'C', upgradeLevel: 1, sourceEventId: 'evt_refused', gems: [] },
+          rift: {
+            tier: 'C',
+            upgradeLevel: 1,
+            sourceEventId: 'evt_refused',
+            gems: [],
+          },
         } as unknown as InvSlot['instance'],
       },
     ];
@@ -1811,7 +1831,10 @@ function measuredMaterialComposition(
 ): MaterialComposition {
   if (shape === 'representative') {
     return [
-      { source: { gatherer: { kind: 'character', id: 4242, name: 'Aeliana' } }, count: units },
+      {
+        source: { gatherer: { kind: 'character', id: 4242, name: 'Aeliana' } },
+        count: units,
+      },
     ];
   }
   if (shape === 'varied') {
@@ -1894,10 +1917,14 @@ describe('whole-character material source composition matrix', () => {
       applyMeasuredMaterialCase(sim, shape);
       const first = sim.serializeCharacter(sim.playerId) as CharacterState;
       const secondSim = makeSim(52, CEILING_EPOCH_MS);
-      const secondPid = secondSim.addPlayer('warrior', `Matrix-${shape}`, { state: first });
+      const secondPid = secondSim.addPlayer('warrior', `Matrix-${shape}`, {
+        state: first,
+      });
       const second = secondSim.serializeCharacter(secondPid) as CharacterState;
       const thirdSim = makeSim(53, CEILING_EPOCH_MS);
-      const thirdPid = thirdSim.addPlayer('warrior', `Matrix-${shape}-again`, { state: second });
+      const thirdPid = thirdSim.addPlayer('warrior', `Matrix-${shape}-again`, {
+        state: second,
+      });
       const third = thirdSim.serializeCharacter(thirdPid) as CharacterState;
 
       expect(third).toEqual(second);
@@ -2307,14 +2334,25 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         fieldBytes(withoutDevMountRelease, key) - fieldBytes(preReleaseCounterfactual, key),
       ]),
     );
-    expect(bramblehideDelta).toEqual({ deeds: 35, deedStats: 742, reliquary: 771 });
+    expect(bramblehideDelta).toEqual({
+      deeds: 35,
+      deedStats: 742,
+      reliquary: 771,
+    });
     expect(Object.values(bramblehideDelta).reduce((sum, value) => sum + value, 0)).toBe(1548);
     // Plus 50 for the two Eastbrook hub practice quests (q_hub_know_your_numbers,
     // q_hub_healing_numbers) joining questsDone in this maximal fixture: 23 and
     // 21 characters as `"<id>",` in the sorted array (26 + 24 bytes). MEASURED,
     // not inferred, same as every other row this equation names.
+    // FORK: +2002 bytes MEASURED for the fork's own reliquary/deed rows in the
+    // maximal fixture (Scorching Wastes, Infernal Abyss, Tidehold deeds).
     expect(counterfactualBytes - 156144).toBe(
-      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) + 183 + 1548 + 50 + 49,
+      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
+        183 +
+        1548 +
+        50 +
+        49 +
+        2002,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2336,7 +2374,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // questsDone moved from 50 to 100 against the SAME forgeBaseline reference
       // point: the +50 hub practice quest delta above, on top of the prior +50
       // this row already carried.
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 32, deedStats: 21, reliquary: 80 });
+      // FORK (measured at the v0.42.0 merge): the Scorching Wastes / Infernal
+      // Abyss / Tidehold quests and deeds join the maximal fixture, questsDone
+      // 100 -> 517 and deedStats 21 -> 1466 against the same reference point.
+    ).toEqual({
+      questsDone: 517,
+      knownRecipes: 30,
+      deeds: 32,
+      deedStats: 1466,
+      reliquary: 80,
+    });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2349,7 +2396,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       Buffer.byteLength(JSON.stringify(preReleaseCounterfactual), 'utf8'),
       'field_kit and the Bramblehide release content removed, must reproduce the recorded pre-field-kit Crucible+hammer baseline',
-    ).toBe(209524);
+    ).toBe(209524 + 2002 /* FORK: measured fork content in the fixture */);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
@@ -2360,7 +2407,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
-    ).toBe(211121);
+    ).toBe(211121 + 2002 /* FORK: measured fork content in the fixture */);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2368,7 +2415,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         fieldBytes(s2, key) - fieldBytes(priorContent, key),
       ]),
     );
-    expect(contentDelta).toEqual({ knownRecipes: 1221, deedStats: 1328, reliquary: 1971 });
+    expect(contentDelta).toEqual({
+      knownRecipes: 1221,
+      deedStats: 1328,
+      reliquary: 1971,
+    });
     expect(bytes - Buffer.byteLength(JSON.stringify(priorContent), 'utf8')).toBe(4520);
     const metadataDelta = Object.fromEntries(
       (['perfectingBonus', 'perfectingBound'] as const).map((field) => {
@@ -2383,7 +2434,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         return [field, bytes - Buffer.byteLength(JSON.stringify(stripped), 'utf8')];
       }),
     );
-    expect(metadataDelta).toEqual({ perfectingBonus: 11880, perfectingBound: 5934 });
+    expect(metadataDelta).toEqual({
+      perfectingBonus: 11880,
+      perfectingBound: 5934,
+    });
     // Combined fixture (Crucible baseline + hammer recipe/proof content +
     // field_kit + the Bramblehide/Nythgap release content, commit
     // 0ca3d01a60), measured after this release merge's settle: 211,034
@@ -2399,8 +2453,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // shared 211,034). Re-based per the standing rule (floor measurement
     // minus 380, edge measurement plus one, band width unchanged at 381):
     // 210,753..211,134.
-    expect(bytes, reMint).toBeGreaterThan(210753);
-    expect(bytes, reMint).toBeLessThan(211134);
+    //
+    // FORK RE-BASE at the v0.42.0 tag merge (2026-09-10): 213,135 bytes, exactly
+    // +2,002 for the fork's own quests and deeds in the maximal fixture
+    // (Scorching Wastes, Infernal Abyss, Tidehold housing; questsDone +417,
+    // deedStats +1,445 measured above, plus ownedPlots). Floor measurement
+    // minus 380, edge measurement plus one: 212,755..213,136.
+    expect(bytes, reMint).toBeGreaterThan(212755);
+    expect(bytes, reMint).toBeLessThan(213136);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

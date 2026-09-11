@@ -22,9 +22,19 @@ vi.mock('../server/db', () => ({
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
-  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
-  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
-  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  loadAccountFlair: vi.fn(async () => ({
+    ai: false,
+    streamer: false,
+    links: {},
+  })),
+  markAccountQuestComplete: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+  })),
+  grantAccountMechChroma: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+  })),
   setAccountWeaponSkinLoadout: vi.fn(async () => ({
     completedQuestIds: [],
     mechChromaIds: [],
@@ -55,13 +65,20 @@ const FORGE_MASTER = 'forgemistress_darva';
 const DELIVERY_WINDOW_TICKS = 95 * 20;
 const ONLINE_SUITE_TIMEOUT_MS = 40_000;
 
-type SentMsg = { t: string; list?: SimEvent[]; self?: { cprof?: CraftingIdentityView } };
+type SentMsg = {
+  t: string;
+  list?: SimEvent[];
+  self?: { cprof?: CraftingIdentityView };
+};
 
 function fakeWs(): { sent: SentMsg[]; ws: unknown } {
   const sent: SentMsg[] = [];
   return {
     sent,
-    ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) },
+    ws: {
+      readyState: 1,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    },
   };
 }
 
@@ -94,6 +111,12 @@ function routeOf(server: GameServer): (evs: SimEvent[]) => void {
  *  cannot silently turn a far player into an in-zone recipient. */
 function moveToOtherZone(e: Entity, zoneId: string): void {
   let z = e.pos.z;
+  for (let i = 0; i < 400 && zoneAt(0, z).id === zoneId; i++) z += 50;
+  if (zoneAt(0, z).id === zoneId) {
+    z = e.pos.z;
+    for (let i = 0; i < 400 && zoneAt(0, z).id === zoneId; i++) z -= 50;
+  }
+  expect(zoneAt(0, z).id).not.toBe(zoneId);
   for (let i = 0; i < 400 && zoneAt(e.pos.x, z).id === zoneId; i++) z += 50;
   if (zoneAt(e.pos.x, z).id === zoneId) {
     z = e.pos.z;
@@ -131,7 +154,11 @@ describe('attunement celebration over the live GameServer wire (session routing)
     // Fan out on the LIVE server sim (the quest-effect trigger is pinned offline;
     // this suite owns the wire routing), then run the real pump.
     announceAttunement(
-      (server.sim as unknown as { ctx: Parameters<typeof announceAttunement>[0] }).ctx,
+      (
+        server.sim as unknown as {
+          ctx: Parameters<typeof announceAttunement>[0];
+        }
+      ).ctx,
       so.pid,
       SMITH_PAIR,
     );
@@ -262,7 +289,9 @@ describe('work-order cadence mirror over the live GameServer wire (cprof)', () =
     expect(lapsedFrame.cadenceBlockedQuests).not.toContain(WORK_ORDER);
     // Close the loop client-side: feed the LAST wire frame into the bare
     // client mirror and the quest reads available again.
-    const client = bareClient({ cadenceBlockedQuests: lapsedFrame.cadenceBlockedQuests });
+    const client = bareClient({
+      cadenceBlockedQuests: lapsedFrame.cadenceBlockedQuests,
+    });
     expect(client.questState(WORK_ORDER)).toBe('available');
   });
 });

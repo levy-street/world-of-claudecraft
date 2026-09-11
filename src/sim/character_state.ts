@@ -216,6 +216,9 @@ export interface CharacterState {
   mountTrainingFeePaid?: boolean;
   // Riding skill purchased from Marla (80g). Optional and absent until bought.
   ridingTrained?: boolean;
+  // Tidehold housing plots bought at their signs (sim/plots.ts). Absent until
+  // the first deed, so older saves round-trip byte-equal.
+  ownedPlots?: string[];
   // PBE boost kit version applied (server/pbe_boost.ts); absent outside PBE.
   pbeBoostKit?: number;
   delveMarks?: number;

@@ -20,6 +20,7 @@ import { registerDeferredPreload } from './assets/preload';
 import { buildForgefatherFortress } from './forgefather_fortress';
 import { GFX } from './gfx';
 import { lavaChainPlacements } from './lava_chain_core';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 
 // the Drakelands prop models (built by build_drakelands_props.mjs)
 const EMBER_PROP_URLS = {
@@ -42,7 +43,7 @@ for (const key of Object.keys(EMBER_PROP_URLS) as EmberPropKey[]) {
   );
 }
 
-interface PropPlacement {
+export interface PropPlacement {
   x: number;
   y: number;
   z: number;
@@ -117,6 +118,95 @@ function shardGeo(): THREE.BufferGeometry {
   const geo = new THREE.OctahedronGeometry(1, 0);
   geo.scale(0.38, 1.7, 0.38);
   return geo.toNonIndexed();
+}
+
+/** One den/dressing piece: absolute seat height (the flat-bed rule), target
+ *  footprint, yaw. */
+export interface EmberDressingSpots {
+  hoards: PropPlacement[];
+  eggs: PropPlacement[];
+  lilies: PropPlacement[];
+  crystals: PropPlacement[];
+}
+
+/**
+ * The Drakelands' den dressing spots — dragon hoards, egg clutches, the
+ * ember-lily groves and the small crystal clusters — as ONE pure list shared
+ * by the builder below and the editor's placement promotion, so the promoted
+ * copies land exactly where the world drew them (the fen_willows contract).
+ * Everything seat-height is ABSOLUTE (the flat-bed lowest-probe rule); the
+ * promotion converts to terrain-relative offsets itself.
+ */
+export function emberDressingSpots(seed: number): EmberDressingSpots {
+  const denSeatY = (x: number, z: number, fp: number): number => {
+    const pr = fp * 0.32;
+    let lo = terrainHeight(x, z, seed);
+    for (const [ox, oz] of [
+      [pr, 0],
+      [-pr, 0],
+      [0, pr],
+      [0, -pr],
+    ] as const) {
+      lo = Math.min(lo, terrainHeight(x + ox, z + oz, seed));
+    }
+    return lo;
+  };
+  // The hoard is DOUBLE its old size: footprint area goes as fp squared, so
+  // fp 7 to 9.9 is exactly 2x the ground the gold covers (49 to 98.01), and
+  // the mound grows 7.0 by 6.6 by 2.5 to 9.9 by 9.3 by 3.5. Den B roosted
+  // over an empty patch with only a clutch to its name, so it gets a hoard
+  // of its own on the flattest shelf inside its ring.
+  const hoards = [
+    { x: 417, z: 2262, fp: 9.9, rot: 1.2 },
+    { x: 307, z: 2259, fp: 5.5, rot: -0.7 },
+  ].map((h) => ({ x: h.x, z: h.z, y: denSeatY(h.x, h.z, h.fp) - 0.1, fp: h.fp, rot: h.rot }));
+  const eggs = [
+    { x: 423, z: 2268, y: denSeatY(423, 2268, 4.5) - 0.05, fp: 4.5, rot: 0.4 },
+    { x: 299, z: 2256, y: denSeatY(299, 2256, 4.5) - 0.05, fp: 4.5, rot: 2.6 },
+  ];
+  const lilies: PropPlacement[] = emberLilySpots(seed).map((lily) => ({
+    x: lily.x,
+    z: lily.z,
+    y: lily.y - 0.1,
+    fp: lily.fp,
+    rot: lily.rot,
+  }));
+  const crystals: PropPlacement[] = [];
+  for (let gx = 200; gx <= 530; gx += 12) {
+    for (let gz = 1830; gz <= 2405; gz += 12) {
+      const r = hash2(gx, gz, seed + 811);
+      if (r > 0.2 || r < 0.055) continue; // the grove band belongs to the leaf
+      const x = gx + (hash2(gx + 1, gz, seed + 821) - 0.5) * 9;
+      const z = gz + (hash2(gx, gz + 1, seed + 831) - 0.5) * 9;
+      const y = terrainHeight(x, z, seed);
+      if (y < 1) continue;
+      if (!emberScatterClear(x, z)) continue;
+      crystals.push({
+        x,
+        z,
+        y: y - 0.1,
+        rot: hash2(z, x, seed + 841) * Math.PI * 2,
+        fp: 1.8 + hash2(x, z, seed + 861) * 1.6,
+      });
+    }
+  }
+  // a dense crystal garden on the Bloodglass Fields
+  for (let k = 0; k < 14; k++) {
+    const ang = hash2(k, 3, seed + 871) * Math.PI * 2;
+    const dist = Math.sqrt(hash2(k, 5, seed + 881)) * 26;
+    const x = 270 + Math.sin(ang) * dist;
+    const z = 2270 + Math.cos(ang) * dist;
+    const y = terrainHeight(x, z, seed);
+    if (y < 1 || !emberScatterClear(x, z)) continue;
+    crystals.push({
+      x,
+      z,
+      y: y - 0.1,
+      fp: 2.2 + hash2(k, 7, seed + 891) * 1.8,
+      rot: hash2(k, 11, seed + 895) * Math.PI * 2,
+    });
+  }
+  return { hoards, eggs, lilies, crystals };
 }
 
 export function buildEmberFeatures(seed: number): EmberFeaturesView {
@@ -222,54 +312,26 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
     }
   }
 
-  // --- the dragon dens: the drakes' treasure and their clutches. Each
-  // piece sits on the LOWEST of five terrain probes across its own
-  // footprint (the ember_lilies flat-bed rule) so no rim of a big mound
-  // hangs in air on the den's gentle slope. ---
-  const denSeatY = (x: number, z: number, fp: number): number => {
-    const pr = fp * 0.32;
-    let lo = terrainHeight(x, z, seed);
-    for (const [ox, oz] of [
-      [pr, 0],
-      [-pr, 0],
-      [0, pr],
-      [0, -pr],
-    ] as const) {
-      lo = Math.min(lo, terrainHeight(x + ox, z + oz, seed));
+  // --- the dragon dens: the drakes' treasure and their clutches, plus the
+  // lily groves and crystal clusters below — all from the ONE shared spot
+  // list (emberDressingSpots), and standing down together when the document
+  // owns them as placements (the promoted-scenery contract). The den's gold
+  // point light stands down with its hoard: a warm glow over an empty (or
+  // moved) treasure pile reads as a bug. ---
+  const dressing = emberDressingSpots(seed);
+  const dressingPromoted = activeWorldPromoted('emberDressing');
+  if (!dressingPromoted) {
+    instanceProp('hoard', dressing.hoards);
+    instanceProp('eggs', dressing.eggs);
+    // gold catches the light: a warm point over each hoard so a den reads as
+    // occupied from the approach and stays legible at night
+    for (const h of dressing.hoards) {
+      const light = new THREE.PointLight(0xffb038, h.fp > 7 ? 5 : 4, h.fp * 2.6, 2);
+      light.position.set(h.x, h.y + 0.1 + 2.2, h.z);
+      light.userData.baseIntensity = h.fp > 7 ? 5 : 4;
+      glowLights.push(light);
+      group.add(light);
     }
-    return lo;
-  };
-  // The hoard is DOUBLE its old size: footprint area goes as fp squared, so
-  // fp 7 to 9.9 is exactly 2x the ground the gold covers (49 to 98.01), and
-  // the mound grows 7.0 by 6.6 by 2.5 to 9.9 by 9.3 by 3.5. Den B roosted
-  // over an empty patch with only a clutch to its name, so it gets a hoard
-  // of its own on the flattest shelf inside its ring.
-  const HOARDS = [
-    { x: 417, z: 2262, fp: 9.9, rot: 1.2 },
-    { x: 307, z: 2259, fp: 5.5, rot: -0.7 },
-  ];
-  instanceProp(
-    'hoard',
-    HOARDS.map((h) => ({
-      x: h.x,
-      z: h.z,
-      y: denSeatY(h.x, h.z, h.fp) - 0.1,
-      fp: h.fp,
-      rot: h.rot,
-    })),
-  );
-  instanceProp('eggs', [
-    { x: 423, z: 2268, y: denSeatY(423, 2268, 4.5) - 0.05, fp: 4.5, rot: 0.4 },
-    { x: 299, z: 2256, y: denSeatY(299, 2256, 4.5) - 0.05, fp: 4.5, rot: 2.6 },
-  ]);
-  // gold catches the light: a warm point over each hoard so a den reads as
-  // occupied from the approach and stays legible at night
-  for (const h of HOARDS) {
-    const light = new THREE.PointLight(0xffb038, h.fp > 7 ? 5 : 4, h.fp * 2.6, 2);
-    light.position.set(h.x, denSeatY(h.x, h.z, h.fp) + 2.2, h.z);
-    light.userData.baseIntensity = h.fp > 7 ? 5 : 4;
-    glowLights.push(light);
-    group.add(light);
   }
 
   // --- the ember lilies (giant crystal-flower trees) and small ember
@@ -278,7 +340,7 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
   // builder blocks, and every stem passed the leaf's strict flat-ground
   // gates (a bed on sloped dirt reads as floating). The bed rests at the
   // LOWEST touched terrain point (spot.y), never a mid-slope average. ---
-  {
+  if (!dressingPromoted) {
     const lilySpots: PropPlacement[] = emberLilySpots(seed).map((lily) => ({
       x: lily.x,
       z: lily.z,

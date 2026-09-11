@@ -35,11 +35,27 @@ export interface AnimState {
    *  from the local camera so peers pitch too, and so the pose can never
    *  disagree with the travel it is drawn against. */
   swimPitch: number;
+  /** Radians the body BANKS into its turn, written straight onto the pose
+   *  wrap's roll axis (positive = the body's left side drops, which is the way
+   *  a left-hand turn leans). Derived in the renderer from how fast the DRAWN
+   *  facing is sweeping, so peers bank with no wire traffic and the lean can
+   *  never disagree with the turn it is drawn against. Absent/0 = the old
+   *  bolt-upright turn. */
+  bankRoll?: number;
+  /** Streamlined boost pose: arms out front, legs locked straight, the whole
+   *  body a spear. Only flooded flight sets it (Entity.dgBoosting), and only
+   *  while the burners are actually lit. */
+  gliding?: boolean;
   /** Feet under water but the ground still under them — the band between a dry
    *  stride and a swim. Walking here plays the wade cycle and the sim slows the
    *  body down (player_motion.wadeSpeedMult). */
   wading: boolean;
   sitting: boolean;
+  /** A flying rig that is currently ON THE GROUND (the dragon world boss's
+   *  Groundfall). Drops its hover gap to nothing and lets the visual swap to a
+   *  landed, wings-still clip set. Absent/false for everything that flies for a
+   *  living and everything that never flies at all. */
+  grounded?: boolean;
   /** Engaged with someone right now: a standing body holds its rig's braced
    *  battle stance instead of the relaxed idle (see desiredBaseState). Derived
    *  from the mob's live aggro target, which both hosts carry, so peers brace
@@ -59,6 +75,7 @@ export type BaseState =
   | 'swim'
   | 'swimSurface'
   | 'swimIdle'
+  | 'glide'
   | 'wade'
   | 'sit'
   | 'jump'
@@ -227,12 +244,82 @@ export function advanceSwimPitch(
   verticalSpeed: number,
   swimming: boolean,
   dt: number,
+  fullSpeed = SWIM_PITCH_FULL_SPEED,
+  maxPitch = SWIM_PITCH_MAX,
 ): number {
-  const target = swimming
-    ? clamp(-verticalSpeed / SWIM_PITCH_FULL_SPEED, -1, 1) * SWIM_PITCH_MAX
-    : 0;
+  const target = swimming ? clamp(-verticalSpeed / fullSpeed, -1, 1) * maxPitch : 0;
   const safeCurrent = Number.isFinite(current) ? current : 0;
   return target + (safeCurrent - target) * Math.exp(-SWIM_PITCH_RESPONSE * Math.max(0, dt));
+}
+
+// ---------------------------------------------------------------------------
+// Banking
+//
+// A body that changes heading by rotating on the spot, bolt upright, reads as a
+// turret rather than a swimmer: the turn has no weight to it. Every drawn body
+// now LEANS into its turn, off the rate the DRAWN facing is sweeping at (the
+// same displayed-motion discipline as swimPitch, so peers bank identically with
+// no wire traffic, and a lean can never contradict the turn under it).
+//
+// Two gains, because the same lean means different things in the two media. On
+// land it is a runner's inside lean — small, and only while actually running.
+// In water, and above all in the bell's flooded flight, it is a full airplane
+// bank: the body rolls onto its side to carve, which is most of what makes
+// three-axis flight feel slick instead of like driving a chair.
+// ---------------------------------------------------------------------------
+
+/** Land lean at a full-rate turn, radians. Deliberately small — a runner tips
+ *  in, they do not bank. */
+export const TURN_LEAN_MAX = 0.17;
+/** Swim/flight bank at a full-rate turn, radians (~46 degrees). */
+export const BANK_ROLL_MAX = 0.8;
+/** Yaw rate (rad/s) that earns the full lean. A hard mouse flick beats this many
+ *  times over, which is exactly why the result is clamped. */
+export const BANK_FULL_YAW_RATE = 2.4;
+/** Speed (yd/s) at which the bank reaches full authority. Banking is a function
+ *  of TRAVEL as well as turning: spinning on the spot must not roll the body
+ *  over, or an idle player twirling the camera lies on their side. */
+export const BANK_FULL_SPEED = 7;
+/** Exponential response of the bank follow, per second. Slow enough that mouse
+ *  jitter cannot flutter the body, fast enough to answer a real flick. */
+const BANK_RESPONSE = 5.5;
+
+/**
+ * Ease the drawn body roll toward the bank its turn implies.
+ *
+ * `yawRate` is radians/second of DRAWN heading change, positive = turning left
+ * (the sim's facing grows counter-clockwise: forward is `(sin f, cos f)`, so
+ * increasing `f` sweeps toward +X, which is the body's left). The result is the
+ * radians written straight onto the pose wrap's Z, where positive raises the
+ * body's left side — hence the negation: leaning INTO a left turn drops the
+ * left side. Eases out to level whenever there is no turn to lean into, so
+ * letting go of the stick unwinds instead of snapping.
+ */
+export function advanceBankRoll(
+  current: number,
+  yawRate: number,
+  speed: number,
+  dt: number,
+  maxRoll = BANK_ROLL_MAX,
+): number {
+  const safeRate = Number.isFinite(yawRate) ? yawRate : 0;
+  const safeSpeed = Number.isFinite(speed) ? Math.max(0, speed) : 0;
+  const turn = clamp(safeRate / BANK_FULL_YAW_RATE, -1, 1);
+  const travel = Math.min(1, safeSpeed / BANK_FULL_SPEED);
+  const target = -turn * travel * maxRoll;
+  const safeCurrent = Number.isFinite(current) ? current : 0;
+  return target + (safeCurrent - target) * Math.exp(-BANK_RESPONSE * Math.max(0, dt));
+}
+
+/** Shortest signed yaw delta per second between two DRAWN facings. Wrapping is
+ *  the whole point: without it the +/-PI seam reads as a 360 deg/frame flick and
+ *  slams the body onto its side for a frame. */
+export function yawRateBetween(previous: number, current: number, dt: number): number {
+  if (!(dt > 0) || !Number.isFinite(previous) || !Number.isFinite(current)) return 0;
+  let d = current - previous;
+  while (d > Math.PI) d -= 2 * Math.PI;
+  while (d < -Math.PI) d += 2 * Math.PI;
+  return d / dt;
 }
 
 /** One impact for a fresh contact, a landing, or the wade-to-swim transition. */
@@ -411,9 +498,16 @@ export function desiredBaseState(
   s: AnimState,
   hasWalkBackClip: boolean,
   hasWadeClip = true,
+  hasGlideClip = true,
   hasCombatIdleClip = false,
 ): BaseState {
   if (s.swimming) {
+    // Burners lit: the body stops stroking and streamlines — arms out front,
+    // legs locked. It outranks every other water state, including the idle,
+    // because a boosting body is under thrust whether or not it has picked up
+    // any speed yet. Gated on the LOADED clip for the same reason as wade: a rig
+    // without it would hold a state nothing is playing.
+    if (s.gliding && hasGlideClip) return 'glide';
     // A swimmer who stops treads water rather than stroking on the spot; a
     // swimmer who moves picks the stroke for their depth — surface crawl above
     // the waterline, breaststroke below it. Rigs with one swim clip and no
@@ -456,7 +550,8 @@ export function locomotionTimeScale(
     return clamp(s.speed / DEFAULT_SWIM_REF, 0.55, 1.4);
   }
   // Treading is an idle: it holds its own tempo whatever the body drifts at.
-  if (baseState === 'swimIdle') return null;
+  // The glide is a held POSE — there is no cycle to speed up.
+  if (baseState === 'swimIdle' || baseState === 'glide') return null;
   let timeScale: number;
   if (baseState === 'walk' || baseState === 'walkBack') {
     timeScale = clamp(s.speed / walkRef, 0.6, 1.8);

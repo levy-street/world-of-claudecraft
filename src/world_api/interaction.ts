@@ -49,6 +49,8 @@ export interface IWorldInteraction {
   // `inspectCorpseHarvest` round trip is in flight.
   corpseHarvestInfo(id: number): CorpseHarvestInfo | null | Promise<CorpseHarvestInfo | null>;
   pickUpObject(id: number): WorldInteractionOutcome;
+  /** Buy the Tidehold housing plot whose sign the player stands at (sim/plots.ts). */
+  buyPlot(deedId: string): WorldInteractionOutcome;
   // #1143: the caller's persistent town focus allocation (component type ->
   // points spent). Empty when unset.
   townFocus: Record<string, number>;

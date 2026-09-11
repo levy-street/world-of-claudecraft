@@ -146,6 +146,34 @@ export function shoreDepthAt(x: number, z: number, seed: number): number {
 }
 
 /**
+ * How far below the waterline a DRY vertex's shore-depth attribute may read.
+ *
+ * The sheet's alpha and shore film fade in over the first yard of depth,
+ * interpolated linearly across each cell. The raw depth of a vertex on top of
+ * a sheer cliff is the cliff's whole height (Tidehold's fjord walls put -30 to
+ * -85 next to +50 of open sea), so the zero crossing of that interpolation
+ * lands a third of the way across the cell, out over the water: a straight
+ * band of bare seabed between the sheet's edge and the cliff foot, ~1 yard on
+ * a fine zone plane, 4-5 on a coarse block and up to 20 on an apron cell
+ * ("the water doesn't fit the topo, there are gaps"). Clamping the dry side to
+ * this margin moves the crossing to within a couple of percent of the cliff
+ * vertex, so the sheet runs under the wall and the terrain hides the rest.
+ * Gentle beaches are untouched: a dry vertex a couple of yards inland on a
+ * 5 percent shelf reads about -0.1 and was never near the clamp.
+ * The raw depth still feeds everything that MEANS dry (the tile cull, the gap
+ * sheet decision, the slope finite difference): only the shaded attribute is
+ * clamped. Matches WATER_TILE_KEEP_ABOVE, so a vertex the cull keeps is
+ * exactly a vertex the shader still grades.
+ */
+export const WATER_DRY_DEPTH_CLAMP_YARDS = 0.75;
+
+/** A vertex's shore-depth ATTRIBUTE: the raw depth, floored on the dry side
+ *  (see WATER_DRY_DEPTH_CLAMP_YARDS). */
+export function shoreDepthAttribute(depth: number): number {
+  return depth < -WATER_DRY_DEPTH_CLAMP_YARDS ? -WATER_DRY_DEPTH_CLAMP_YARDS : depth;
+}
+
+/**
  * Per-vertex gate for the swell DISPLACEMENT, baked from a sheet's shore-depth
  * grid: the minimum depth over the vertex's 3x3 grid neighbourhood, less a
  * margin, on the same `clamp(depth * 0.8, 0, 1)` ramp the shader used to apply

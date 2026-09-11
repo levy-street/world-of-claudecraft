@@ -180,7 +180,9 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // no existing shelf row moved.
     // The Crucible crafting tier adds 33 items without moving any old shelf gate.
     expect(Object.keys(CRUCIBLE_COLLECTION_ITEMS)).toHaveLength(33);
-    expect(shelf.length).toBe(515);
+    // FORK: +20 gated equippables (Infernal Abyss, Forgefather, Scorching Wastes
+    // drops), every one deriving the same level-20 gate.
+    expect(shelf.length).toBe(535);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

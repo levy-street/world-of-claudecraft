@@ -10,19 +10,67 @@ import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { ARMOR_SETS, ARMOR_SLOTS, normalizeAppearance } from '../src/render/characters/modular';
 import {
   aldricKeepsHisRig,
+  isDeepglassCrowdTemplate,
+  isDeepglassMarshalTemplate,
+  isPortalWizardTemplate,
   NPC_LOOKS,
   NPC_PROP_SET_IDS,
   npcLookFor,
   npcModularKeyFor,
 } from '../src/render/characters/npc_looks';
 import { NPCS } from '../src/sim/data';
+import { isTideholdTemplate } from '../src/sim/deepglass/citadel';
+
+// FORK: NPCs whose look is composed at RUNTIME rather than authored in
+// NPC_LOOKS — main.ts's look provider consults these before npcLookFor
+// (render/characters/npc_looks.ts, FORK DECLARATIONS): Baldemar's selves, the
+// Deepglass crowd and marshal, and every Tidehold resident.
+function forkRuntimeComposed(id: string): boolean {
+  return (
+    isPortalWizardTemplate(id) ||
+    isDeepglassCrowdTemplate(id) ||
+    isDeepglassMarshalTemplate(id) ||
+    isTideholdTemplate(id)
+  );
+}
+
+// FORK: fork-only NPCs that still render on the fixed NPC rigs (no authored
+// look yet). Shrink this list by authoring rows in NPC_LOOKS; never grow it
+// for an upstream NPC.
+const FORK_FIXED_RIG_NPCS = new Set([
+  // the Scorching Wastes ('scout_maren_wastes' composes via the scout_maren
+  // baseId alias now — the same person recurs there)
+  'caravan_master_saffa',
+  'loremaster_caddis_wastes',
+  'old_haruk',
+  'provisioner_ashka',
+  'forgemaster_derin',
+  'wellwatch_hana',
+  'wellwatch_toma',
+  'drover_pell',
+  'dowser_emrys',
+  'auctioneer_zeph',
+  // the Deepglass fixture desk
+  'deepglass_steward',
+]);
 
 describe('npc looks roster', () => {
   it('covers every NpcDef id except Brother Aldric (every other world NPC composes)', () => {
     const missing = Object.keys(NPCS).filter(
-      (id) => !aldricKeepsHisRig(id) && npcLookFor(id) === null,
+      (id) =>
+        !aldricKeepsHisRig(id) &&
+        !forkRuntimeComposed(id) &&
+        !FORK_FIXED_RIG_NPCS.has(id) &&
+        npcLookFor(id) === null,
     );
     expect(missing).toEqual([]);
+  });
+
+  it('FORK: the fixed-rig exemption list names only NPCs that exist and lack a look', () => {
+    for (const id of FORK_FIXED_RIG_NPCS) {
+      expect(NPCS[id], id).toBeDefined();
+      expect(npcLookFor(id), id).toBeNull();
+    }
   });
 
   // Brother Aldric renders the pre-v0.7 npc_aldric model on purpose (the

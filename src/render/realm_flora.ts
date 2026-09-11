@@ -35,6 +35,7 @@ import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { cloneGeometryForBake } from './geometry_bake_clone';
 import { GFX, surfaceMat } from './gfx';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
 import {
   applySurfaceDetail,
@@ -144,7 +145,7 @@ const CRYSTAL_AREA_TINTS: Record<Area, number[]> = {
   glade: [0xc0a8e8, 0xd0b8e8],
 };
 
-interface Spot {
+export interface Spot {
   x: number;
   z: number;
   y: number;
@@ -155,7 +156,7 @@ interface Spot {
   lean?: { gx: number; gz: number }; // terrain gradient for rooted growth
 }
 
-interface Placements {
+export interface Placements {
   mushrooms: Spot[];
   crystals: Spot[];
   flowers: Spot[];
@@ -167,7 +168,7 @@ interface Placements {
   seaStacks: Spot[];
 }
 
-function placeFlora(seed: number): Placements {
+export function placeFlora(seed: number): Placements {
   const out: Placements = {
     mushrooms: [],
     crystals: [],
@@ -659,7 +660,11 @@ function floraMat(opts: {
       });
 }
 
-export function buildRealmFlora(seed: number): RealmFloraView {
+export function buildRealmFlora(
+  seed: number,
+  // The document may own the giants as placements (jungle_features doctrine).
+  renderGreatTrees = !activeWorldPromoted('greatTrees'),
+): RealmFloraView {
   const group = new THREE.Group();
   group.name = 'realm-flora';
   const glowLights: THREE.PointLight[] = [];
@@ -878,7 +883,11 @@ export function buildRealmFlora(seed: number): RealmFloraView {
       // untextured kit rock: the worn triplanar layer can run a touch
       // stronger here without fighting a palette map (the minerock strength)
       applyWornStone(mat, { strength: 0.6 });
-      instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
+      // Stands down when the document owns the boulders as placements (the
+      // promoted-scenery contract; the promoted copies are the plain kit
+      // rock without the granite regrade — the same rock the catalog places).
+      if (!activeWorldPromoted('realmBoulders'))
+        instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
     }
   }
 
@@ -1081,7 +1090,7 @@ export function buildRealmFlora(seed: number): RealmFloraView {
   // The great tree of Eldershine, rising over the town square. Position and
   // trunk radius come from REALM_PROPS.greatTrees: the same record the sim's
   // collision grid consumes, so the visual and the collider never drift.
-  const treeSpot = REALM_PROPS.greatTrees?.[0];
+  const treeSpot = renderGreatTrees ? REALM_PROPS.greatTrees?.[0] : undefined;
   if (greatTreeScene && treeSpot) {
     const tree = greatTreeScene.clone(true);
     const tx = treeSpot.x,

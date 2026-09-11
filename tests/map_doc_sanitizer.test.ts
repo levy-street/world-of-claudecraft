@@ -7,6 +7,7 @@ import {
   MAX_CAMP_RADIUS,
   MAX_COLLIDE_RADIUS,
   MAX_OBJECT_POSITIONS,
+  MAX_POINT_SOUNDS,
   MAX_STR_ARRAY,
   MAX_WORLD_COORD,
   MAX_ZONE_LAKES,
@@ -122,7 +123,6 @@ describe('npcs', () => {
             questIds: ['q1', 42, 'q2'],
             vendorItems: ['bread', null],
             market: true,
-            banker: true,
             greeting: 'Hello',
             __proto__pollution: 'junk',
           },
@@ -144,7 +144,6 @@ describe('npcs', () => {
       questIds: ['q1', 'q2'],
       vendorItems: ['bread'],
       market: true,
-      banker: true,
       greeting: 'Hello',
     });
   });
@@ -159,7 +158,6 @@ describe('npcs', () => {
     expect(npc?.name).toBe('Villager');
     expect(npc?.questIds).toEqual([]);
     expect(npc?.market).toBeUndefined();
-    expect(npc?.banker).toBeUndefined();
     expect(npc?.dynamic).toBeUndefined();
   });
 });
@@ -338,6 +336,33 @@ describe('non-finite numbers are rejected everywhere', () => {
     });
     expect(doc?.terrainEdits).toHaveLength(1);
     expect(doc?.placements).toHaveLength(1);
+  });
+
+  it('keeps valid sculpt hardness and alpha while clamping untrusted hardness', () => {
+    const doc = sanitizeMapDoc({
+      ...rawDoc(),
+      terrainEdits: [
+        {
+          x: 0,
+          z: 0,
+          radius: 10,
+          delta: 3,
+          falloff: 'smooth',
+          hardness: 2,
+          alpha: 'splatter',
+        },
+      ],
+      decorationExclusions: [
+        'dress:bush:10.000:20.000',
+        'dress:bushFlowers:-3.250:4.500',
+        'dress:grass:0.000:0.000',
+      ],
+    });
+    expect(doc?.terrainEdits[0]).toMatchObject({ hardness: 1, alpha: 'splatter' });
+    expect(doc?.decorationExclusions).toEqual([
+      'dress:bush:10.000:20.000',
+      'dress:bushFlowers:-3.250:4.500',
+    ]);
   });
 });
 
@@ -527,6 +552,9 @@ describe('round trip (the server never stores an unloadable byte)', () => {
       ],
       waterLevel: 3,
       playerStart: { x: 3, z: 4 },
+      propsMode: 'empty',
+      decorationsMode: 'empty',
+      presentationMode: 'blank',
       biomePaint: { cell: 20, cols: 2, rows: 2, originX: 0, originZ: 0, ids: [0, 1, 2, 255] },
     });
     const first = sanitizeMapDoc(nasty);
@@ -539,5 +567,94 @@ describe('round trip (the server never stores an unloadable byte)', () => {
     const second = sanitizeMapDoc(JSON.parse(stored));
     expect(second).not.toBeNull();
     expect(second).toEqual(first);
+  });
+});
+
+describe('point sounds', () => {
+  it('validates + clamps authored point sounds and drops junk', () => {
+    const doc = sanitizeMapDoc({
+      ...rawDoc(),
+      pointSounds: [
+        { x: 5, z: -3, y: 2, sound: 'amb_campfire', volume: 0.7, radius: 30 },
+        { x: 0, z: 0, y: 999, sound: 'x'.repeat(100), volume: 5, radius: 9999 },
+        { x: 1, z: 1 }, // no sound id -> dropped
+        { x: Number.NaN, z: 0, sound: 'a' }, // non-finite coord -> dropped
+        { sound: 'a', x: 2, z: 2, volume: -1, radius: -5 }, // clamped to the floors
+      ],
+    });
+    expect(doc?.pointSounds).toEqual([
+      { x: 5, z: -3, y: 2, sound: 'amb_campfire', volume: 0.7, radius: 30 },
+      { x: 0, z: 0, y: 60, sound: 'x'.repeat(40), volume: 1, radius: 200 },
+      { x: 2, z: 2, y: 2, sound: 'a', volume: 0, radius: 2 },
+    ]);
+  });
+
+  it('caps the count and omits the field when there are none', () => {
+    const many = Array.from({ length: MAX_POINT_SOUNDS + 5 }, (_, i) => ({
+      x: i,
+      z: 0,
+      sound: 'amb_water',
+    }));
+    const doc = sanitizeMapDoc({ ...rawDoc(), pointSounds: many });
+    expect(doc?.pointSounds?.length).toBe(MAX_POINT_SOUNDS);
+    expect(sanitizeMapDoc(rawDoc())?.pointSounds).toBeUndefined();
+  });
+});
+
+describe('lighting sanitizer', () => {
+  it('round-trips a valid authored lighting block, clamped to slider ranges', () => {
+    const doc = sanitizeMapDoc(rawDoc({}));
+    expect(doc?.lighting).toBeUndefined();
+    const lit = sanitizeMapDoc({
+      ...rawDoc({}),
+      lighting: {
+        sunIntensity: 9, // clamps to 6
+        sunColor: 0xffaa33,
+        hemiIntensity: 0.8,
+        skyColor: 0x99bbff,
+        envScale: 1.4,
+        sunAzimuthDeg: 400, // clamps to 360
+        sunElevationDeg: 2, // clamps to 5
+      },
+    });
+    expect(lit?.lighting).toEqual({
+      sunIntensity: 6,
+      sunColor: 0xffaa33,
+      hemiIntensity: 0.8,
+      skyColor: 0x99bbff,
+      envScale: 1.4,
+      sunAzimuthDeg: 360,
+      sunElevationDeg: 5,
+    });
+  });
+
+  it('drops the block when any field is missing or non-finite', () => {
+    const bad = sanitizeMapDoc({
+      ...rawDoc({}),
+      lighting: { sunIntensity: 1, sunColor: Number.POSITIVE_INFINITY },
+    });
+    expect(bad?.lighting).toBeUndefined();
+  });
+
+  it('keeps bounded atmosphere overrides only for zones in the map', () => {
+    const lighting = {
+      sunIntensity: 2,
+      sunColor: 0xffffff,
+      hemiIntensity: 0.5,
+      skyColor: 0xaabbcc,
+      envScale: 1,
+      sunAzimuthDeg: 30,
+      sunElevationDeg: 40,
+    };
+    const doc = sanitizeMapDoc({
+      ...rawDoc(),
+      zoneAtmosphere: {
+        z: { lighting, timeScale: 99, skybox: 'builtin:night' },
+        missing: { timeScale: 0.5 },
+      },
+    });
+    expect(doc?.zoneAtmosphere).toEqual({
+      z: { lighting, timeScale: 2, skybox: 'builtin:night' },
+    });
   });
 });

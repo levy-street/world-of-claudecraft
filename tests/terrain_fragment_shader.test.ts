@@ -120,6 +120,8 @@ describe('insane terrain fragment shader', () => {
       colors: new Float32Array([1, 1, 1, 1, 1, 1, 1, 1, 1]),
       uvs: new Float32Array([0, 0, 1, 0, 0, 1]),
       indices: new Uint16Array([0, 1, 2]),
+      rim: null,
+      clip: null,
     };
     const grassMud = finishChunkGeometry({
       ...common,

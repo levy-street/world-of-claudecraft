@@ -57,7 +57,10 @@ function dampAxis(
 /**
  * Advance the boom pivot toward (tx, ty, tz) over dt seconds. `stiffness`
  * scales both pull rates up (reduced-motion mode passes a large value to make
- * the boom near-rigid without a separate code path).
+ * the boom near-rigid without a separate code path; the Deepglass flight
+ * camera passes one BELOW 1 for the Rocket League "camera stiffness" lag).
+ * `leashScale` widens the trailing caps the same way — a looser spring is
+ * pointless if the leash still snaps the pivot back to a yard behind.
  */
 export function stepCameraBoom(
   s: CameraBoomState,
@@ -66,6 +69,7 @@ export function stepCameraBoom(
   tz: number,
   dt: number,
   stiffness = 1,
+  leashScale = 1,
 ): void {
   const dx = s.x - tx;
   const dy = s.y - ty;
@@ -95,12 +99,14 @@ export function stepCameraBoom(
   const ox = s.x - tx;
   const oz = s.z - tz;
   const horiz = Math.hypot(ox, oz);
-  if (horiz > BOOM_LEASH_XZ) {
-    const k = BOOM_LEASH_XZ / horiz;
+  const leashXZ = BOOM_LEASH_XZ * leashScale;
+  const leashY = BOOM_LEASH_Y * leashScale;
+  if (horiz > leashXZ) {
+    const k = leashXZ / horiz;
     s.x = tx + ox * k;
     s.z = tz + oz * k;
   }
   const oy = s.y - ty;
-  if (oy > BOOM_LEASH_Y) s.y = ty + BOOM_LEASH_Y;
-  else if (oy < -BOOM_LEASH_Y) s.y = ty - BOOM_LEASH_Y;
+  if (oy > leashY) s.y = ty + leashY;
+  else if (oy < -leashY) s.y = ty - leashY;
 }

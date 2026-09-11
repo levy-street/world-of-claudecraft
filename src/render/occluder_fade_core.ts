@@ -5,6 +5,25 @@
 
 /** Opacity an occluding structure settles at while it blocks the view. */
 export const OCCLUDER_FADE_ALPHA = 0.2;
+
+// The editor viewport's free camera has no protagonist to keep readable, so
+// every eye-to-camera ghost fade stands down while it is set: a structure the
+// maker is orbiting must never turn transparent under the cursor. Module
+// state (the setSwayDisabledAssets idiom) checked by every segment hit test —
+// the core ones below and the bespoke prop/tree/roof/arena tests — so `hide`
+// resolves false everywhere and anything mid-fade eases back to opaque
+// through each consumer's normal restore path.
+let fadesDisabled = false;
+
+/** Editor viewport only: stand every occluder fade down (false = game rule). */
+export function setOccluderFadesDisabled(disabled: boolean): void {
+  fadesDisabled = disabled;
+}
+
+/** Whether occluder fades are globally stood down (editor viewport). */
+export function occluderFadesDisabled(): boolean {
+  return fadesDisabled;
+}
 /** Ease rate back to opaque (slower, so reappearing structures read calm). */
 export const OCCLUDER_FADE_IN_RATE = 6;
 // Snap distance: within this of the target the fade completes exactly, so
@@ -61,6 +80,7 @@ export function occluderSegmentHitsBox(
   camY: number,
   camZ: number,
 ): boolean {
+  if (fadesDisabled) return false;
   const eyeInside = Math.abs(eyeX - boxX) < halfW && Math.abs(eyeZ - boxZ) < halfD;
   const camInside = Math.abs(camX - boxX) < halfW && Math.abs(camZ - boxZ) < halfD;
   if ((eyeY < topY && eyeInside) || (camY < topY && camInside)) return true;
@@ -135,6 +155,7 @@ export function occluderSegmentHitsObb(
   camY: number,
   camZ: number,
 ): boolean {
+  if (fadesDisabled) return false;
   const c = Math.cos(rot);
   const s = Math.sin(rot);
   const toLocal = (x: number, z: number): [number, number] => {

@@ -1,6 +1,8 @@
 import { isOnProvingShore } from '../../../sim/content/proving_shore';
 import { DELVES, ITEMS, NPCS, QUESTS, questRewardItem } from '../../../sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
+import { DEEPGLASS_BOUT_SIZES } from '../../../sim/deepglass/world';
+import { DEEPGLASS_PORTAL_WIZARD_NPC_ID } from '../../../sim/portal_wizard';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
 import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
@@ -83,6 +85,17 @@ export interface QuestDialogControllerDeps {
   openMarket(): void;
   openDelveBoard(npcId: number): void;
   openCardDuel(): void;
+  /** Book passage to the Deepglass: the bell is its own world, so this is a
+   *  travel action rather than a window (main.ts boots ?map=deepglass). */
+  travelToDeepglass(): void;
+  /** Blow the whistle on a bout of `perSide` a side, in the world the player is
+   *  already standing in (the marshal only exists inside the arena). */
+  startDeepglassBout(perSide: number): void;
+  /** Ask Baldemar the Bald to open his gate. Not a window: the cast, the
+   *  portal and the walk-in all happen in the world behind the dialog
+   *  (src/game/portal_travel.ts), so the row closes the dialog and hands the
+   *  client the wizard's entity id. */
+  summonWizardPortal(npcId: number): void;
   onOpenChange(open: boolean): void;
   voice: {
     play(key: string): void;
@@ -387,6 +400,9 @@ export class QuestDialogController {
       (delve) => delve.boardNpcId === npc.templateId,
     );
     const hasCardMaster = !!definition?.cardMaster;
+    const hasDeepglass = !!definition?.deepglassSteward;
+    const hasDeepglassBouts = !!definition?.deepglassMarshal;
+    const hasPortalWizard = !!definition?.portalWizard;
     // A farmer NPC (the farming go-live) offers the husk-to-compost trade,
     // the one UI affordance that sends convert_husks; gated on the NpcDef
     // flag like the card master, never on an id. STATIC BY CONTRACT: the row
@@ -407,6 +423,9 @@ export class QuestDialogController {
         hasWarfareVendor,
         hasDelveBoard,
         hasCardMaster,
+        hasDeepglass,
+        hasDeepglassBouts,
+        hasPortalWizard,
         hasTraining,
         hasFarmer,
       })
@@ -515,6 +534,30 @@ export class QuestDialogController {
     if (hasCardMaster) {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-card-duel="1" aria-label="${esc(t('cardDuel.title'))}"><span class="gold">&#9824;</span> ${esc(t('cardDuel.title'))}</button>`;
     }
+    if (hasDeepglass) {
+      html += `<button type="button" class="qd-list-item" data-deepglass="1" aria-label="${esc(t('hudChrome.deepglass.gossipAria'))}"><span class="gold">${svgIcon('ball')}</span> ${esc(t('hudChrome.deepglass.gossip'))}</button>`;
+    }
+    // The marshal's fixture card, inside the arena. One row per side size
+    // rather than a submenu: three options is not a menu worth nesting, and
+    // picking a bout should be one click from "talk to her".
+    if (hasDeepglassBouts) {
+      for (const perSide of DEEPGLASS_BOUT_SIZES) {
+        const n = String(perSide);
+        html += `<button type="button" class="qd-list-item" data-dg-bout="${n}" aria-label="${esc(t('hudChrome.deepglass.boutAria', { n }))}"><span class="gold">${svgIcon('ball')}</span> ${esc(t('hudChrome.deepglass.bout', { n }))}</button>`;
+      }
+    }
+    // Baldemar's gate row. One wizard, two directions: his bell self offers
+    // the way home, every town self offers the way down to the Deepglass.
+    if (hasPortalWizard) {
+      const home = definition?.id === DEEPGLASS_PORTAL_WIZARD_NPC_ID;
+      const label = home
+        ? t('hudChrome.portalWizard.gossipHome')
+        : t('hudChrome.portalWizard.gossipDeepglass');
+      const aria = home
+        ? t('hudChrome.portalWizard.gossipHomeAria')
+        : t('hudChrome.portalWizard.gossipDeepglassAria');
+      html += `<button type="button" class="qd-list-item" data-portal-wizard="1" aria-label="${esc(aria)}"><span class="gold">&#9678;</span> ${esc(label)}</button>`;
+    }
     if (hasFarmer) {
       // The trade's feedback is the sim's own: the farmHusksConverted line
       // and the farmDenied toasts (farm_event_feedback.ts), so the row sends
@@ -547,6 +590,26 @@ export class QuestDialogController {
     this.bindRoute('[data-market]', this.deps.openMarket);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
+    this.bindRoute('[data-deepglass]', this.deps.travelToDeepglass);
+    // Not bindRoute: that binds ONE element (querySelector) and hands the
+    // opener to a successor window. These are three sibling rows and none of
+    // them opens a window — the bout starts in the world behind the dialog — so
+    // each binds itself and the dialog closes normally, returning focus.
+    this.deps.element.querySelectorAll<HTMLElement>('[data-dg-bout]').forEach((item) => {
+      item.addEventListener('click', () => {
+        const perSide = Number(item.dataset.dgBout);
+        this.close();
+        if (Number.isFinite(perSide) && perSide > 0) this.deps.startDeepglassBout(perSide);
+      });
+    });
+    // Same shape as the bout rows: no successor window, the cast and the
+    // portal happen in the world, so bind directly and close.
+    this.deps.element.querySelectorAll<HTMLElement>('[data-portal-wizard]').forEach((item) => {
+      item.addEventListener('click', () => {
+        this.close();
+        this.deps.summonWizardPortal(npc.id);
+      });
+    });
     // The husk trade goes straight to the world (IWorldFarming.convertHusks,
     // both worlds; online it is the convert_husks command): no new dep, no
     // window. The live world is read at click time, never captured at render.

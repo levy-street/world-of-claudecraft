@@ -23,6 +23,8 @@
 // wider than the rock the camera can actually stand inside.
 import * as THREE from 'three';
 import { REALM_PORTALS } from '../sim/content/realm';
+import { getActiveWorldContent } from '../sim/data';
+import { usesOverworldSiteDressing } from '../sim/map_presentation';
 import { hash2 } from '../sim/rng';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -83,6 +85,17 @@ export function buildHollowGates(seed: number): HollowGatesView {
   const group = new THREE.Group();
   group.name = 'hollow-gates';
   const occluders: GateOccluder[] = [];
+  // These two cave mouths stand on REALM_PORTALS' fixed OVERWORLD coordinates,
+  // so on an authored map they land wherever those numbers happen to fall —
+  // for Tidehold, the crystal mouth came up on the island's north quay beside
+  // a warden tower, and Troy asked twice why a dungeon portal was on his city
+  // map (2026-09-09). Site dressing keyed to world coordinates is never an
+  // authored map's content; the same rule already keeps ore veins, camp
+  // braziers and the dungeon doors out (sim/map_presentation.ts). Self-gated
+  // here rather than at the call site so no future caller can reintroduce it.
+  if (!usesOverworldSiteDressing(getActiveWorldContent().presentationMode)) {
+    return { group, update: () => {} };
+  }
   const portal = REALM_PORTALS[0];
   if (!portal) return { group, update: () => {} };
 

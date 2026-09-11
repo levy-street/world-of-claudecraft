@@ -274,6 +274,8 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
     addPlayer(2, 'Bystander', 0); // same zone as the eastbrook node
     addPlayer(3, 'FarAway', 340); // mirefen_marsh: must not receive
     // Instance space: z overlaps the zone strip but x sits past
+    // DUNGEON_X_THRESHOLD (the fork's far instance x-band), so a
+    // dungeon/arena/delve runner is excluded.
     // DUNGEON_X_THRESHOLD (600), so a dungeon/arena/delve runner is excluded.
     addPlayer(4, 'Delver', 0, DUNGEON_X_THRESHOLD + 100);
 
@@ -691,7 +693,11 @@ describe('grant truncation at the command boundary (full bags)', () => {
       for (let f = 0; f < capacity - 3; f++)
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       meta.inventory.push({ itemId: 'copper_ore', count: 15 });
-      meta.inventory.push({ itemId: 'copper_ore', count: 5, instance: { signer: 'Packrat' } });
+      meta.inventory.push({
+        itemId: 'copper_ore',
+        count: 5,
+        instance: { signer: 'Packrat' },
+      });
       delete meta.nodeHarvestReadyAt[nodeId];
       if (!sim.harvestNode(nodeId, undefined, pid)) continue;
       completeCastNow(sim, pid);

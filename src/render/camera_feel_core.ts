@@ -68,6 +68,18 @@ const ease = (current: number, target: number, omega: number, dt: number): numbe
 /**
  * Advance the lead vector and FOV kicks. (vx, vz) is the horizontal DISPLAY
  * velocity in yd/s; `enabled` false (reduced-motion) eases everything home.
+ *
+ * `ref` is the speed the widening is measured AGAINST — the pace at which the
+ * kick starts, with full kick about half again past it. It defaults to
+ * {@link RUN_SPEED} because on land that is what "going fast" means.
+ *
+ * It is a parameter because a fixed reference SATURATES anywhere the player
+ * travels faster than a run. Inside the Deepglass bell a body cruises at 9 yd/s
+ * and boosts to 26, so against the run-speed reference the kick was pinned at
+ * maximum from the first tick of every bout and the FOV therefore said nothing
+ * at all — the same failure the swim pitch had against its own lake-speed
+ * reference (docs/prd/deepglass.md §13). Pass the local cruise speed there and
+ * the widening tracks the burners, which is the one thing it should be saying.
  */
 export function stepCameraFeel(
   s: CameraFeelState,
@@ -75,6 +87,7 @@ export function stepCameraFeel(
   vz: number,
   dt: number,
   enabled = true,
+  ref = RUN_SPEED,
 ): void {
   const step = Math.min(Math.max(dt, 0), MAX_STEP);
   const speed = Math.hypot(vx, vz);
@@ -86,7 +99,8 @@ export function stepCameraFeel(
     targetX = (vx / speed) * lead;
     targetZ = (vz / speed) * lead;
     // Widen only ABOVE base run speed (travel form 1.4x maps to ~full kick).
-    targetKick = SPEED_FOV_MAX * Math.min(1, Math.max(0, (speed - RUN_SPEED) / (RUN_SPEED * 0.45)));
+    const base = Math.max(1e-3, ref);
+    targetKick = SPEED_FOV_MAX * Math.min(1, Math.max(0, (speed - base) / (base * 0.45)));
   }
   s.leadX = ease(s.leadX, targetX, LEAD_OMEGA, step);
   s.leadZ = ease(s.leadZ, targetZ, LEAD_OMEGA, step);

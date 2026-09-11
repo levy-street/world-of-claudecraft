@@ -375,10 +375,12 @@ describe('item webp icons', () => {
     // src/sim/content/ignivar_loot.ts / zone3.ts), so the ledger is back to the EMPTY
     // set: no artless item can hide behind an open wave, and the next commissioned wave
     // re-pins its exact membership here when it stages.
+    // FORK: the three Scorching Wastes counter consumables are the fork's open
+    // art debt (no inventory painting yet); they serve the drawn icon meanwhile.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual([]);
+    ).toEqual(['cactus_pressed_water', 'lastwell_datewine', 'sunbaked_flatbread']);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

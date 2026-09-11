@@ -61,7 +61,10 @@ import type { PainterHostWriters } from './painter_host';
 export const MINIMAP_SIZE = 162;
 // Historical base world scale (px per yard at zoom 1); the zoom multiplier shrinks the
 // world radius shown so markers spread out as you zoom in.
-const MINIMAP_BASE_SCALE = 1.7;
+// Exported alongside MINIMAP_SIZE: the capture-geometry tests project world
+// points through the same px-per-yard the painter draws markers with, so the
+// two have to read one constant rather than each carry a copy.
+export const MINIMAP_BASE_SCALE = 1.7;
 // The circular clip radius is (size / 2 - CLIP_INSET).
 
 // Marker draw dimensions. The tiny procedural family uses silhouette plus color:

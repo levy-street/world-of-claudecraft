@@ -6417,6 +6417,13 @@ export class GameServer {
           typeof msg.id === 'number' && sim.pickUpObject(msg.id, pid),
         );
         break;
+      case 'buyplot':
+        this.sendCommandOutcome(
+          session,
+          msg,
+          typeof msg.plot === 'string' && sim.buyPlot(msg.plot, pid),
+        );
+        break;
       case 'accept':
         if (typeof msg.quest === 'string') {
           sim.acceptQuest(

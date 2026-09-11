@@ -662,6 +662,88 @@ describe('progressive terrain build', () => {
     const overallClosest = Math.min(...all.map(distToPoint));
     expect(earlyClosest).toBeCloseTo(overallClosest, 5);
   });
+
+  it('northern zones build although the zone list ends with a southern column', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+
+    // The built-in ZONES list ends with Farshore Isle, an east COLUMN zone at
+    // z -180..180. renderBounds once read zones[last].zMax as the world's
+    // north edge, capping the whole terrain grid at the southernmost band:
+    // every northern zone owned zero cells, "loaded" instantly with no
+    // chunks, and everything past the first band rendered as bare water.
+    const terrain = buildTerrain(20061);
+    const zone = zoneAt(0, 300); // the second band, north of Farshore's zMax
+    expect(zone.zMax).toBeGreaterThan(200);
+    const task = terrain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await task;
+
+    expect(terrain.isZoneLoaded(zone.id)).toBe(true);
+    const covered = terrain.group.children.some((child) => {
+      const box = new THREE.Box3().setFromObject(child);
+      return box.min.z <= 300 && box.max.z >= 300 && box.min.x <= 0 && box.max.x >= 0;
+    });
+    expect(covered).toBe(true);
+    terrain.cancelStreaming();
+  });
+
+  it('a custom world larger than the built-in footprint builds its margins', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { BUILTIN_WORLD, setActiveWorldContent, zoneAt } = await import('../src/sim/data');
+
+    // A blank 800x800 map: wider than the strip (±180) and reaching south of
+    // every built-in zone band.
+    const world = {
+      ...BUILTIN_WORLD,
+      worldHalfX: 400,
+      zones: [
+        {
+          id: 'blank_world',
+          name: '',
+          zMin: -400,
+          zMax: 400,
+          levelRange: [1, 1] as [number, number],
+          biome: 'vale' as const,
+          hub: { x: 0, z: 0, radius: 8, name: '' },
+          graveyard: { x: 0, z: 0 },
+          lakes: [],
+          pois: [],
+          welcome: '',
+        },
+      ],
+    };
+    setActiveWorldContent(world);
+    try {
+      const terrain = buildTerrain(20061);
+      // This margin position sits outside every built-in zone rect. The sim
+      // clamps it to a built-in zone (zoneAt); ensuring THAT zone must now
+      // also build the margin cells it owns.
+      const margin = { x: 380, z: -380 };
+      const owner = zoneAt(margin.x, margin.z);
+      const task = terrain.ensureZone(owner);
+      await vi.runAllTimersAsync();
+      await task;
+
+      const covered = terrain.group.children.some((child) => {
+        const box = new THREE.Box3().setFromObject(child);
+        return (
+          box.min.x <= margin.x &&
+          box.max.x >= margin.x &&
+          box.min.z <= margin.z &&
+          box.max.z >= margin.z
+        );
+      });
+      expect(covered).toBe(true);
+      terrain.cancelStreaming();
+    } finally {
+      setActiveWorldContent(null);
+    }
+  });
 });
 
 // The outdoor fog clamp reads residency per CHUNK through groundResidency({ x: 0, z: 0 }),

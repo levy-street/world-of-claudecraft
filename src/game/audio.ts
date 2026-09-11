@@ -423,6 +423,12 @@ export class GameAudio {
     this.playFeedback(UI_CUES.fishReel);
   }
 
+  /** Release the audio engine for a page that is going away (the editor's
+   *  pagehide teardown), so a reload/navigation loop cannot leak a context. */
+  close(): void {
+    sfx.close();
+  }
+
   gather(nodeType: GatherNodeType): void {
     this.playFeedback(UI_CUES.gatherByNodeType[nodeType]);
   }

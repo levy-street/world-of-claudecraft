@@ -49,6 +49,11 @@ export function colliderBounds(c: Collider): {
   if (c.type === 'circle') {
     return { minX: c.x - c.r, maxX: c.x + c.r, minZ: c.z - c.r, maxZ: c.z + c.r };
   }
+  // A prism (the fork's authored/carved volume) publishes its own bounding
+  // radius about the anchor, which IS its exact broad-phase extent.
+  if (c.type === 'prism') {
+    return { minX: c.x - c.br, maxX: c.x + c.br, minZ: c.z - c.br, maxZ: c.z + c.br };
+  }
   // Exact AABB of the rotated OBB. The old circumscribed hypot(hw, hd) bound
   // filed a long thin wall (half-length ~75) into every cell of its floor,
   // defeating the cell separation for exactly the collider class rift floors

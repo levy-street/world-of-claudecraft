@@ -6,6 +6,8 @@ import * as THREE from 'three';
 import { isOwnAura } from '../sim/aura_classify';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
+import { dgTeamCss } from '../sim/deepglass/layout';
+import { deepglassMatch } from '../sim/deepglass/match';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
@@ -158,6 +160,16 @@ export interface NameplatePainterDeps {
    *  live setting (nameplate_dot_scale.ts); injectable so a test can drive it. */
   nameplateDotScale?: () => number;
   isHostilePlayer: (e: Entity) => boolean;
+}
+
+/** Which deepball side a pid is on, or null when no bout is running (which is
+ *  every other world, so this costs one null check off the match singleton). */
+function deepglassTeamOf(pid: number): 'A' | 'B' | null {
+  const m = deepglassMatch();
+  if (!m) return null;
+  if (m.teamA.includes(pid)) return 'A';
+  if (m.teamB.includes(pid)) return 'B';
+  return null;
 }
 
 export class NameplatePainter {
@@ -564,7 +576,13 @@ export class NameplatePainter {
       const roleTag = discordRoleTagLabel(entity.discordRole);
       const baseName = roleTag ? `[${roleTag}] ${entity.name}` : entity.name;
       state.name = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ${baseName}` : baseName;
-      state.nameColor = roleColor ?? '#7fb8ff';
+      // Inside a deepball bout the SIDE outranks everything else a plate could
+      // say about a player. Every fighter wears the same chibi rig, so without
+      // this the only thing telling ten identical bodies apart is a name you
+      // have to stop and read — and nobody reads at 26 yd/s. Same two colours as
+      // the aura shell and the score strip (layout.ts DG_TEAM_COLOR).
+      const dgTeam = deepglassTeamOf(entity.id);
+      state.nameColor = dgTeam ? dgTeamCss(dgTeam) : (roleColor ?? '#7fb8ff');
       // A member's line is their guild; a PLEDGE (docs/prd/guild-pledge-board.md)
       // borrows the same line with the localized pledge wording, so an
       // aspiring character never reads as a member. Either way the fill tiers

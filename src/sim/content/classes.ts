@@ -1,3 +1,4 @@
+import { DEEPBALL_ABILITIES } from '../deepglass/abilities';
 import { type AbilityOutputScaling, buildAbilityOutputScaling } from '../ability_output_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import {
@@ -8520,10 +8521,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
   ...TALENT_ABILITIES_V2,
   ...PRIEST_ABILITIES,
 
-  // The Vale Cup sport kit (class-agnostic; docs/prd/vale-cup.md). Merged here
-  // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
-  // resolves sport ids; no class lists them, so abilitiesKnownAt never grants
-  // them outside a match (resolveSportKit is the only entry).
+  // The deepball kit (class-agnostic; docs/prd/deepglass.md). Merged here so
+  // every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
+  // resolves the dg_* ids; no class lists them, so abilitiesKnownAt never grants
+  // them outside a bout (resolveDeepballKit is the only entry).
+  ...DEEPBALL_ABILITIES,
 };
 
 const PALADIN_LEGACY_ABILITY_IDS = [

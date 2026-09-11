@@ -5,6 +5,7 @@
 // and owns the world-layout constants.
 
 import { BASE_ITEMS } from './content/items';
+import { isAuthoredMapPresentation, usesOverworldSiteDressing } from './map_presentation';
 import type {
   CampDef,
   DelveDef,
@@ -41,6 +42,7 @@ import {
   AMBERFALL_ROADS,
   AMBERFALL_ZONE,
 } from './content/amberfall';
+import { DEEPGLASS_EVENT_NPCS } from './content/deepglass_event';
 import {
   BROTHER_HALVEN,
   BROTHER_HALVEN_MARSH,
@@ -124,6 +126,12 @@ import {
   GALECREST_ZONE,
 } from './content/galecrest';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
+// Goldcrest Harbor: the capital-city hub in the west starter-row square. Zone
+// identity only (Scorching Wastes pattern) — all of its content lives in the
+// maker's map document, never in the base world.
+// FORK: GOLDCREST_NPCS carries the Deepglass fixture desk (deepglass_steward,
+// read by sim.ts) and Baldemar's Goldcrest stop, so it joins the roster here.
+import { GOLDCREST_NPCS, GOLDCREST_ZONE } from './content/goldcrest';
 import {
   type GraveyardDef,
   OVERWORLD_GRAVEYARDS,
@@ -131,6 +139,13 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import {
+  INFERNAL_ABYSS_DUNGEON_DEFS,
+  INFERNAL_ABYSS_ITEMS,
+  INFERNAL_ABYSS_MOBS,
+  INFERNAL_ABYSS_QUEST_ORDER,
+  INFERNAL_ABYSS_QUESTS,
+} from './content/infernal_abyss';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -154,6 +169,8 @@ import {
   NIGHTBLOOM_ZONE,
 } from './content/nightbloom';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
+import { DEEPGLASS_BALL_MOB, DEEPGLASS_BALL_TEMPLATE_ID } from './deepglass/abilities';
+import { OBJECTIVE_BOT_MOB, OBJECTIVE_BOT_TEMPLATE_ID } from './content/objective_bots';
 import {
   PALMREACH_CAMPS,
   PALMREACH_ESCORTS,
@@ -209,6 +226,17 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { RIFT_MOBS } from './content/rift/mobs';
+// Scorching Wastes: a CUSTOM-MAP zone (never part of the built-in world).
+// Only its id registries merge here — mobs/npcs/quests/items resolve globally
+// so the custom map's camps and quest chain work — while camps/objects/zone
+// ride the map document itself (the base world must not place any of it).
+import {
+  SCORCHING_ITEMS,
+  SCORCHING_MOBS,
+  SCORCHING_NPCS,
+  SCORCHING_QUEST_ORDER,
+  SCORCHING_QUESTS,
+} from './content/scorching_wastes';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -298,9 +326,12 @@ import {
   ZONE3_ROADS,
   ZONE3_ZONE,
 } from './content/zone3';
+import { TIDEHOLD_NPCS } from './deepglass/citadel';
+import { DEEPGLASS_MARSHAL } from './deepglass/world';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
+import { PORTAL_WIZARD_NPCS } from './portal_wizard';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
 // Delve affix/companion catalogs are consumed by the Sim delve engine; re-export
@@ -367,6 +398,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   FARM_PATTERN_ITEMS,
   ZONE2_ITEMS,
   ZONE3_ITEMS,
+  INFERNAL_ABYSS_ITEMS,
   TEMPLE_ITEMS,
   DELVE_ITEMS,
   HEROIC_VENDOR_ITEMS,
@@ -389,6 +421,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WILDHEART_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
+  SCORCHING_ITEMS,
   IGNIVAR_DROP_ITEMS,
   CRUCIBLE_PROFESSION_ITEMS,
 );
@@ -402,6 +435,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE3_MOBS,
   ...PRACTICE_DUMMY_MOBS,
   ...DUNGEON_MOBS,
+  ...INFERNAL_ABYSS_MOBS,
   ...WARLOCK_PET_MOBS,
   ...NECROMANCY_MOBS,
   ...MAGE_PET_MOBS,
@@ -422,6 +456,15 @@ export const MOBS: Record<string, MobTemplate> = {
   ...EVERGARDEN_MOBS,
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
+  // Scorching Wastes mobs: camp-spawned only by the custom desert map's own
+  // content.camps (the base world has no camps referencing them).
+  ...SCORCHING_MOBS,
+  // The Deepglass Tidesow: an inert, non-hostile ball entity (never camp-spawned;
+  // the match driver in deepglass/match.ts spawns and despawns it).
+  [DEEPGLASS_BALL_TEMPLATE_ID]: DEEPGLASS_BALL_MOB,
+  // The authored-map rehearsal's practice champion: spawned only by
+  // social/map_objective_bots.ts, never by a camp.
+  [OBJECTIVE_BOT_TEMPLATE_ID]: OBJECTIVE_BOT_MOB,
   ...PROVING_SHORE_MOBS,
 };
 
@@ -437,6 +480,35 @@ export const NPCS: Record<string, NpcDef> = {
   ...ZONE2_NPCS,
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
+  // Scorching Wastes expedition roster (dynamic: true — the custom desert map
+  // spawns live copies from its own content.npcs; the base world never places
+  // them). Registered here so quest giver/turn-in ids resolve globally.
+  ...SCORCHING_NPCS,
+  // Goldcrest Harbor, same story: the city rides a map document, so these are
+  // dynamic and the Deepglass steward takes her post through a reserved-id
+  // spawn at world init (sim.ts) rather than the generic placement loop.
+  // The Deepglass match marshal. Same shape as the Scorching roster above: she
+  // is dynamic here so the overworld never places her, and the arena's own
+  // WorldContent re-declares her non-dynamic to put her on the causeway. She is
+  // registered globally because the gossip dialog reads an NPC's flags out of
+  // this table rather than out of the world it is standing in.
+  [DEEPGLASS_MARSHAL.id]: DEEPGLASS_MARSHAL,
+  // Baldemar the Bald, one self per town plus the one at the bell. All dynamic
+  // (reserved-id spawns in sim.ts), registered here so the gossip dialog can
+  // read the portalWizard flag off NPCS[templateId].
+  ...PORTAL_WIZARD_NPCS,
+  // The Deepglass city event (spectators + stallkeepers): dynamic, arena-only
+  // (only the arena's WorldContent lists them), registered so vendor stock and
+  // names resolve by templateId. See src/sim/content/deepglass_event.ts.
+  ...DEEPGLASS_EVENT_NPCS,
+  ...GOLDCREST_NPCS,
+  // Tidehold's residents. Registered globally and DYNAMIC, like the arena's own
+  // roster: the built-in world never surface-places them (these coordinates are
+  // open sky over there), but every lookup that reads NPCS[templateId] — the
+  // nameplate's display name, the gossip dialog's flags, the vendor grid —
+  // resolves through this table rather than through the world an NPC stands in.
+  // Without the row a resident's nameplate reads its raw template id.
+  ...TIDEHOLD_NPCS,
   [FURY_NPC.id]: FURY_NPC,
   brother_halven: BROTHER_HALVEN,
   brother_halven_marsh: BROTHER_HALVEN_MARSH,
@@ -476,6 +548,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE1_QUESTS,
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
+  ...INFERNAL_ABYSS_QUESTS,
   ...TEMPLE_QUESTS,
   ...REALM_QUESTS,
   ...DRAKELANDS_QUESTS,
@@ -488,6 +561,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...EVERGARDEN_QUESTS,
   ...GALECREST_QUESTS,
   ...FARSHORE_QUESTS,
+  ...SCORCHING_QUESTS,
   ...PROVING_SHORE_QUESTS,
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
@@ -497,6 +571,7 @@ export const QUEST_ORDER: string[] = [
   ...ZONE1_QUEST_ORDER,
   ...ZONE2_QUEST_ORDER,
   ...ZONE3_QUEST_ORDER,
+  ...INFERNAL_ABYSS_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
   ...REALM_QUEST_ORDER,
   ...DRAKELANDS_QUEST_ORDER,
@@ -509,6 +584,7 @@ export const QUEST_ORDER: string[] = [
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
+  ...SCORCHING_QUEST_ORDER,
   ...PROVING_SHORE_QUEST_ORDER,
   ...IGNIVAR_RAID_LORE_QUEST_ORDER,
   ...HUB_PRACTICE_QUEST_ORDER,
@@ -577,6 +653,14 @@ export const CAMPS: CampDef[] = [
   // The Eastbrook hub dummy is NOT a camp: it spawns with its sparring master
   // after the player (sim/hub_practice.ts), so it consumes only trailing ids.
 ];
+// NOTE: FROSTVEIL_CAMPS_EXTRA (the Reach rebuild's 41 extra camps) is
+// deliberately NOT registered here. Camps draw from the SHARED world-gen Rng,
+// so adding any camp anywhere advances the stream that every seeded combat
+// test then rolls against — appending them here moves ~9 pinned combat
+// outcomes across the suite. The rebuild ships them on the map document
+// instead (the authored Frostveil .wocmap carries the full roster in
+// content.camps, which replaces this list at playtest). Add the spread here
+// only together with a deliberate re-pin of those seeded goldens.
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
 // like QUESTS.
@@ -607,6 +691,21 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
+
+/**
+ * The gathering veins that exist in the world the player is actually standing
+ * in — `GATHER_NODES` on the shipped overworld, nothing on an authored map.
+ *
+ * Read this, never the raw table, from anything that DRAWS, LISTS or LETS THE
+ * PLAYER TOUCH a vein. The table is pinned to overworld coordinates, so on an
+ * authored map it puts ore and herbs wherever the built-in world happens to
+ * keep them; the minimap had already worked that out on its own while the
+ * renderer went on drawing them, which is how the Deepglass arena ended up
+ * spending 36% of its triangles on ore inside a blitzball stadium.
+ */
+export function activeGatherNodes(): GatherNodeDef[] {
+  return usesOverworldSiteDressing(getActiveWorldContent().presentationMode) ? GATHER_NODES : [];
+}
 
 export const COMMON_RECIPES = [...COMMON_RECIPES_CONTENT, ...TOOL_RECIPES_CONTENT];
 
@@ -746,6 +845,9 @@ export const ZONES: ZoneDef[] = [
   EVERGARDEN_ZONE,
   GALECREST_ZONE,
   FARSHORE_ZONE,
+  // Appended LAST (rng-stream stability: column zones append last regardless
+  // of where their band sits — see the WORLD_MIN_Z comment above).
+  GOLDCREST_ZONE,
   PROVING_SHORE_ZONE,
 ];
 
@@ -839,11 +941,67 @@ export function setActiveWorldContent(world: WorldContent | null): void {
   contentGeneration++;
 }
 
+// The active content was mutated IN PLACE (the editor sculpts into the shared
+// terrainEdits array, paints into the shared biomePaint grid). Nothing on this
+// thread needs telling — it reads the live objects — but every consumer that
+// keys a derived copy on the generation does: the zone-build workers mesh from
+// a structured clone shipped on generation change (render/zone_build_pool.ts),
+// so without this bump a camera-LOD re-mesh after a sculpt stroke rebuilt the
+// chunk from the STALE clone and the old terrain came back as the camera moved.
+export function touchActiveWorldContent(): void {
+  contentGeneration++;
+}
+
 // Zone containing a world position (overworld only; clamps to the world
 // edges). Zones are rectangles: z picks the band (stacked south to north,
 // as always) and x picks the column within it. Every zone without an
 // explicit x-range spans the original full-width strip, so a one-column
 // world behaves exactly as before.
+// The world's northmost zone, for clamping beyond the north end (append
+// order stopped meaning stack order when the first column landed).
+const NORTHMOST_ZONE: ZoneDef = ZONES.reduce((a, b) => (b.zMax > a.zMax ? b : a));
+
+/** The zone list the MAP UI resolves against: the ACTIVE world's zones on an
+ *  authored map (blank/imported/Collision Master scratch — those worlds are
+ *  standalone spaces, never the shipped grid), the shipped ZONES otherwise.
+ *  Authored docs always project at least one zone (custom_map.ts), but guard
+ *  the empty list so a hand-rolled test world cannot strand the fallbacks.
+ *
+ *  IMPORTANT: engine internals (zone streaming, palettes, sky, rosters) keep
+ *  resolving through the plain builtin `zoneAt` below — the terrain streamer
+ *  can only build SHIPPED zones, and feeding it an authored zone leaves the
+ *  map with no ground at all. Only the map window / minimap / zone-label
+ *  surfaces opt into the active list via `activeZoneAt`. */
+export function activeZoneList(): readonly ZoneDef[] {
+  const w = activeWorld;
+  // ANY custom world's own zones win (an authored slate, or a standard-world
+  // doc whose maker re-zoned bands — e.g. the Scorching Wastes desert): its
+  // biomes must drive terrain texturing and the map UI. The shipped world
+  // (identity check) keeps the static list.
+  if (w !== BUILTIN_WORLD && w.zones.length > 0) {
+    return w.zones;
+  }
+  return ZONES;
+}
+
+/** A zone's x-bounds. Zones without an explicit x-range span the whole world:
+ *  the shipped strip for shipped zones, the map rect (±worldHalfX) for a zone
+ *  OF the active authored world (membership-checked so a builtin ZoneDef never
+ *  picks up a custom map's rect while an authored world is active). */
+export function zoneXBounds(zone: ZoneDef): [number, number] {
+  const w = activeWorld;
+  const halfX =
+    isAuthoredMapPresentation(w.presentationMode) &&
+    w.worldHalfX !== undefined &&
+    w.zones.includes(zone)
+      ? w.worldHalfX
+      : undefined;
+  return [
+    zone.xMin ?? (halfX !== undefined ? -halfX : STRIP_MIN_X),
+    zone.xMax ?? halfX ?? STRIP_MAX_X,
+  ];
+}
+
 // Walks the ACTIVE content's zones, not the builtin const, so every
 // consumer (the fishing rod gate, catch tables, deed credit, chat
 // readouts) resolves the same world the water and terrain reads resolve.
@@ -867,6 +1025,24 @@ export function zoneAt(x: number, z: number): ZoneDef {
     if (z >= zone.zMin && x >= x0 && x < x1) return zone;
   }
   return fallback ?? zones.reduce((a, b) => (b.zMax > a.zMax ? b : a));
+}
+
+/** The map-UI zone lookup: same walk as zoneAt but over the ACTIVE zone list,
+ *  so an authored map's own zones name the label/banner and frame the map
+ *  window. Identical to zoneAt on the shipped world. */
+export function activeZoneAt(x: number, z: number): ZoneDef {
+  const zones = activeZoneList();
+  if (zones === ZONES) return zoneAt(x, z);
+  let fallback: ZoneDef | null = null;
+  let northmost: ZoneDef | null = null;
+  for (const zone of zones) {
+    if (northmost === null || zone.zMax > northmost.zMax) northmost = zone;
+    if (z >= zone.zMax) continue;
+    if (fallback === null || zone.zMax < fallback.zMax) fallback = zone; // southmost band containing z
+    const [x0, x1] = zoneXBounds(zone);
+    if (z >= zone.zMin && x >= x0 && x < x1) return zone;
+  }
+  return fallback ?? northmost ?? NORTHMOST_ZONE;
 }
 
 // Strict rect containment: the zone whose rectangle literally contains (x, z),
@@ -1069,6 +1245,7 @@ export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
+  ...INFERNAL_ABYSS_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
@@ -1083,7 +1260,8 @@ export function dungeonByIndex(index: number): DungeonDef | null {
   return DUNGEON_BY_INDEX[index] ?? null;
 }
 
-// Which dungeon a far-off instance position belongs to, by x-band.
+// Which dungeon a far-off instance position belongs to, by x-band. The arena
+// cuts a finite hole between the Nythraxis and Infernal Abyss bands.
 export function dungeonAt(x: number): DungeonDef | null {
   if (x >= DUNGEON_OVERFLOW_X_BASE - 300) {
     const index = DUNGEON_OVERFLOW_INDEX + Math.round((x - DUNGEON_OVERFLOW_X_BASE) / 600);
@@ -1101,18 +1279,18 @@ export function isDungeonEntryTransition(fromX: number, toX: number): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// The Ashen Coliseum — 1v1 ranked arena. Its match instances live in their own
-// far-off flat-ground x-band, well past the dungeon bands (index 0/1/2 sit at
-// x 900/1500/2100). Like dungeons, x beyond DUNGEON_X_THRESHOLD means flat
-// ground (world.groundHeight) and instance-local collision (sim/colliders.ts);
-// the band split below keeps arena positions from being read as a dungeon.
+// The Ashen Coliseum — 1v1 ranked arena. Its match instances occupy a finite
+// far-off flat-ground band between dungeon indexes 5 and 6. Like dungeons, x
+// beyond DUNGEON_X_THRESHOLD means flat ground and instance-local collision.
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = INSTANCE_X_BASE + 4200; // arena instances share this x; slots stack along z
 // Include the complete west wall plus one yard of routing headroom. Collision,
 // line of sight, camera sweeps, and dungeon lookup all select their instance
 // geometry through this boundary, so using the centreline would leave the
-// arena's entire west half attached to the neighboring dungeon band.
+// arena's entire west half attached to the neighboring dungeon band. Keep the
+// local instance-plane offset (INSTANCE_X_BASE) while taking the full-pit
+// collision bound.
 export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
 export const ARENA_X_MAX = ARENA_X + 150; // x at/after this = past the arena band
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
@@ -1124,7 +1302,7 @@ export function arenaOrigin(slot: number): { x: number; z: number } {
 }
 
 export function isArenaPos(x: number): boolean {
-  return x >= ARENA_X_MIN && x < DELVE_BAND_X_MIN;
+  return x >= ARENA_X_MIN && x < ARENA_X_MAX;
 }
 
 // Nearest arena instance origin to a far-off position, matched by z-band (the
@@ -1172,8 +1350,8 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 // DELVE_X_MIN must stay above the full arena footprint around ARENA_X.
 // ---------------------------------------------------------------------------
 
-// 4800 sits clear of the v0.10.0 layout: the widest dungeon ends west of
-// the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
+// 4800 sits clear of the Infernal Abyss at x=4500 and the arena pit centred at
+// ARENA_X (4200, about 22u half-width). The delve band's
 // west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
 export const DELVE_X_MIN = INSTANCE_X_BASE + 4800;
 // Each delve room is centred at DELVE_X_MIN + index*600. Delve modules use wider

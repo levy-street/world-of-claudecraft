@@ -347,6 +347,9 @@ describe('active-world noticeboard service', () => {
       hd: 0.3,
       rot: 0.25,
       cameraTopY: present.groundPos(118, -76).y + 2.6,
+      // Pass-under floor: a body in a cave tube or carve below the board walks
+      // under its footprint instead of hitting it (sight lines are unaffected).
+      underY: present.groundPos(118, -76).y,
     });
   });
 

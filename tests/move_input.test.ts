@@ -27,8 +27,10 @@ describe('movement input sanitizing', () => {
       strafeLeft: false,
       strafeRight: true,
       jump: false,
+      boost: false,
       dive: false,
       surface: false,
+      swimSteer: undefined,
     });
   });
 
@@ -47,8 +49,10 @@ describe('movement input sanitizing', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: false,
+      boost: false,
       dive: false,
       surface: false,
+      swimSteer: undefined,
     });
     expect(parsed.facing).toBeNull();
   });
@@ -104,8 +108,10 @@ describe('agent movement channel', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: false,
+      boost: false,
       dive: false,
       surface: false,
+      swimSteer: undefined,
     });
     expect(input.controllerFacingOverride()).toBe(8);
 
@@ -142,8 +148,10 @@ describe('agent movement channel', () => {
       strafeLeft: false,
       strafeRight: true,
       jump: false,
+      boost: false,
       dive: false,
       surface: false,
+      swimSteer: undefined,
     });
     expect(client.mouselookFacing).toBeNull();
 

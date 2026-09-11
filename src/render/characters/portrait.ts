@@ -500,9 +500,12 @@ function renderPortraitFrame(
   visual: CharacterVisual,
   visualKey: string,
   framing: PortraitFraming,
+  // FORK: the crowd-atlas blit turns the mount so one look serves several
+  // cells without reading as clones; every other caller leaves it square.
+  yaw = 0,
 ) {
   rig.mount.add(visual.root);
-  rig.mount.rotation.y = 0;
+  rig.mount.rotation.y = yaw;
   // Settle the rig into a stable idle frame before measuring/capturing.
   visual.update(0.4, PORTRAIT_ANIM_STATE, true);
 
@@ -552,6 +555,58 @@ function renderPortraitFrame(
   rig.camera.updateProjectionMatrix();
 
   rig.renderer.render(rig.scene, rig.camera);
+}
+
+/**
+ * Render a composed look and blit it straight into a 2D canvas cell.
+ *
+ * The deepglass crowd atlas bakes dozens of one-off fans; a PNG data-URL per
+ * fan (the capture path above) would cost an encode, a decode and an Image
+ * round-trip each, and none of them are ever shown twice — so this path draws
+ * the rig's canvas directly and caches nothing. `yaw` turns the mount so one
+ * look can serve several cells without reading as clones. Returns false until
+ * the character assets are preloaded; callers retry on a later frame.
+ */
+export function drawModularPortraitInto(
+  ctx: CanvasRenderingContext2D,
+  visualKey: string,
+  look: ModularLook,
+  framing: PortraitFraming,
+  yaw: number,
+  dx: number,
+  dy: number,
+  dw: number,
+  dh: number,
+  hideHeldProps = false,
+): boolean {
+  if (!assetsAreReady) return false;
+  let visual: CharacterVisual | null = null;
+  try {
+    const rig = ensureRig();
+    visual = new CharacterVisual(visualKey, 0xffffff, 0, null, null, null, look);
+    // A spectator holds a pie, not a sword — and framing measures the mounted
+    // object's bounds, so a blade hanging past the feet also shrinks the whole
+    // figure and drags the crop off-centre. Hide every attached held prop
+    // (they are tagged at attach time) BEFORE the frame is measured.
+    if (hideHeldProps) {
+      visual.root.traverse((o) => {
+        if (o.userData?.weaponMesh) o.visible = false;
+      });
+    }
+    renderPortraitFrame(rig, visual, visualKey, framing, yaw);
+    ctx.drawImage(rig.renderer.domElement, dx, dy, dw, dh);
+    return true;
+  } catch (err) {
+    if (import.meta.env?.DEV) console.warn('[portrait] atlas blit failed', err);
+    return false;
+  } finally {
+    const rig = ensureRig();
+    rig.mount.rotation.y = 0;
+    if (visual) {
+      rig.mount.remove(visual.root);
+      visual.dispose();
+    }
+  }
 }
 
 /** Run `cb` once character assets finish preloading (immediately if already

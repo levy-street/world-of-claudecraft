@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { hollowWillowSpots } from '../sim/fen_willows';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import { GFX } from './gfx';
 import { type WaterFloraPlacement, waterFloraRegions } from './water_flora_core';
 import { reusePackedOrmSample } from './water_flora_shader_core';
@@ -176,6 +177,9 @@ export function buildWaterFlora(seed: number): WaterFloraView {
     cullGroups.push(regionGroup);
   };
 
+  // Stands down when the document owns the lake flora as placements (the
+  // promoted-scenery contract); a lean session draws a thinned band.
+  if (!activeWorldPromoted('waterFlora'))
   // The rafts and reeds are pure dressing (no collider, nothing to act on) and
   // each copy is a 6,000 triangle Tripo model, so a lean session draws an
   // evenly thinned band of them. The hollow willows below never thin: their
@@ -188,14 +192,16 @@ export function buildWaterFlora(seed: number): WaterFloraView {
   }
 
   // the Veiled Hollow's willows: drawn from the shared sim list so every
-  // trunk the renderer shows is a trunk the colliders block
-  addRegion('water-flora:hollow-willows', (regionGroup) => {
-    instanceProp(
-      regionGroup,
-      'willow',
-      hollowWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
-    );
-  });
+  // trunk the renderer shows is a trunk the colliders block. Stands down when
+  // the document owns the willows as placements (promoted-scenery contract).
+  if (!activeWorldPromoted('willows'))
+    addRegion('water-flora:hollow-willows', (regionGroup) => {
+      instanceProp(
+        regionGroup,
+        'willow',
+        hollowWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
+      );
+    });
 
   return {
     group,

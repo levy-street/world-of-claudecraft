@@ -26,7 +26,9 @@ import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { activeWorldHasAuthoredTown } from './authored_town_gate';
 import { attachBiomeHaze } from './biome_haze_field';
+import { buildCampfireFlame } from './campfire_flame';
 import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
 import {
   isEastbrookRebuildBuilding,
@@ -46,6 +48,7 @@ import {
   splitKitSurfacesByUv,
 } from './kit_uv_surface_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { occluderFadesDisabled } from './occluder_fade_core';
 import {
   advanceOccluderFade,
   applyOccluderFade,
@@ -420,6 +423,11 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
+
+/** Stall groups built for a Deepglass-arena world, so the renderer can pack
+ *  the city-event market up while a bout runs (cleared on every props build;
+ *  empty everywhere else). */
+export const deepglassStallGroups: THREE.Group[] = [];
 
 const loadedProps = new Map<string, GLTF>();
 const propLoadTasks = new Map<string, Promise<void>>();
@@ -1326,6 +1334,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const fireLights: THREE.PointLight[] = [];
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
+  // The authored-town swap is gated on the town's DATA, not on world identity,
+  // so an editor copy of the built-in world gets the same art the game draws
+  // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
+  // is unchanged.
+  const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
+  const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
@@ -1482,8 +1496,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       );
       continue;
     }
-    if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
-    if (builtInWorld && isFenbridgeRebuildBuilding(b)) continue;
+    if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
+    if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
     // roof Y mirrors the camera collider height in colliders.ts, through the
     // same shared helper, so an authored per-building height override cannot
     // leave the hideable top and the camera top disagreeing.
@@ -1608,9 +1622,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
+  deepglassStallGroups.length = 0;
   activeContent.props.stalls.forEach((s, i) => {
-    if (builtInWorld && isEastbrookRebuildStall(s)) return;
-    if (builtInWorld && isFenbridgeRebuildStall(s)) return;
+    if (eastbrookTown && isEastbrookRebuildStall(s)) return;
+    if (fenbridgeTown && isFenbridgeRebuildStall(s)) return;
     const key = s.x * 7.7 + s.z * 2.3;
     const g = new THREE.Group();
     const standKey: PropKey = i % 2 === 0 ? 'stand1' : 'stand2';
@@ -1630,6 +1645,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.position.set(s.x, ground(s.x, s.z) - 0.06, s.z);
     g.rotation.y = s.rot;
     group.add(shadowed(g));
+    // The Deepglass city-event market packs up for every bout: the renderer
+    // flips these groups with the match phase (the prop half of the crowd
+    // despawn in sim/deepglass/crowd.ts).
+    if (activeContent.presentationMode === 'deepglass') deepglassStallGroups.push(g);
     // Footprint mirrors the collider's true 3.1 x 2.5 box (the old circle
     // overhung the flat sides, so a body pressed to the counter put its eye
     // a hair from the hide surface and the stall vanished at most angles).
@@ -1641,8 +1660,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
 
   // ---- wells ---------------------------------------------------------------
   for (const w of activeContent.props.wells) {
-    if (builtInWorld && isEastbrookRebuildWell(w)) continue;
-    if (builtInWorld && isFenbridgeRebuildWell(w)) continue;
+    if (eastbrookTown && isEastbrookRebuildWell(w)) continue;
+    if (fenbridgeTown && isFenbridgeRebuildWell(w)) continue;
     const g = new THREE.Group();
     const a = propAsset('well');
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
@@ -1689,7 +1708,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const PALISADE_MODULE_LEN = 2.0; // authored length before scaling
   const PALISADE_SEG = 6.4; // target module length in the world
   for (const f of activeContent.props.fences) {
-    if (builtInWorld && isEastbrookRebuildFence(f)) continue;
+    if (eastbrookTown && isEastbrookRebuildFence(f)) continue;
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
     const stone = f.kind === 'stone';
     const palisade = f.kind === 'palisade';
@@ -1746,36 +1765,25 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- campfires: hideable bonfire base + live animated flame + light ------
-  const flamePts = [
-    [0, 0],
-    [0.16, 0.1],
-    [0.27, 0.28],
-    [0.3, 0.45],
-    [0.22, 0.66],
-    [0.1, 0.84],
-    [0.001, 0.95],
-  ].map(([r, y]) => new THREE.Vector2(r, y));
-  const flameGeo = new THREE.LatheGeometry(flamePts, 7);
+  // Shared with the editor's placed campfires (render/campfire_flame.ts), so a
+  // promoted campfire draws the same fire as the world one it came from.
   for (const [x, z] of getActiveWorldContent().props.campfires) {
     const y = ground(x, z);
     const g = new THREE.Group();
     addParts(g, 'bonfire', { y: -0.05, rot: propRand(x, z, 1) * Math.PI * 2, scale: 4.3 });
-    const flame = new THREE.Mesh(
-      flameGeo,
-      new THREE.MeshLambertMaterial({
-        color: 0xffaa33,
-        emissive: 0xff6600,
-        emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
-        transparent: true,
-        opacity: 0.92,
-      }),
-    );
+    // Body + hot core (campfire_flame.ts). The lane below tracks the BODY, as
+    // it tracked the single lathe this replaced; the core rides its transform.
+    const { flame, core } = buildCampfireFlame({
+      emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
+    });
     flame.position.y = 0.16;
     flame.scale.setScalar(1.15);
     g.add(flame);
     flames.push(flame);
     keepLiveMeshes.add(flame);
+    keepLiveMeshes.add(core);
     noShadow.add(flame);
+    noShadow.add(core);
     const light = new THREE.PointLight(0xff8830, 12, 16, 2);
     // Root-level, world-positioned: the light must NOT live inside the hideable
     // campfire group. A parent visibility toggle (fog cull / camera ghost) would
@@ -2292,22 +2300,19 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.26, 0.38, 10), bowlMat);
       bowl.position.y = postH + 0.1;
       bg.add(bowl);
-      const flame = new THREE.Mesh(
-        flameGeo,
-        new THREE.MeshLambertMaterial({
-          color: 0xffaa33,
-          emissive: 0xff6a1e,
-          emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
-          transparent: true,
-          opacity: 0.92,
-        }),
-      );
+      const { flame, core } = buildCampfireFlame({
+        color: 0xffaa33,
+        emissive: 0xff6a1e,
+        emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
+      });
       flame.position.y = postH + 0.28;
       flame.scale.setScalar(0.72);
       bg.add(flame);
       flames.push(flame);
       keepLiveMeshes.add(flame);
+      keepLiveMeshes.add(core);
       noShadow.add(flame);
+      noShadow.add(core);
       const light = new THREE.PointLight(0xff8a3a, 9, 13, 2);
       light.position.y = postH + 0.55;
       light.userData.baseIntensity = 8;
@@ -2747,6 +2752,7 @@ function cameraSegmentHitsFootprint(
   camY: number,
   camZ: number,
 ): boolean {
+  if (occluderFadesDisabled()) return false;
   if (
     (eyeY < h.topY && pointInsideFootprint(h, eyeX, eyeZ)) ||
     (camY < h.topY && pointInsideFootprint(h, camX, camZ))
@@ -2985,6 +2991,12 @@ export function collectBuildingImpostors(seed: number): {
 } {
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
+  // The authored-town swap is gated on the town's DATA, not on world identity,
+  // so an editor copy of the built-in world gets the same art the game draws
+  // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
+  // is unchanged.
+  const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
+  const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
   const used = new Map<string, PropAsset>();
   const instances: BuildingImpostorInstance[] = [];
   const use = (key: PropKey): PropAsset => {
@@ -2994,7 +3006,7 @@ export function collectBuildingImpostors(seed: number): {
   };
   for (const b of activeContent.props.buildings) {
     if (b.landmark) continue;
-    if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
+    if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
     const y = terrainHeight(b.x, b.z, seed);
     if (b.kind === 'chapel') {
       const tower = use('bellTower');

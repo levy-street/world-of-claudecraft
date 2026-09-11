@@ -72,6 +72,7 @@ import {
   CLASSES,
   DUNGEON_X_THRESHOLD,
   dungeonAt,
+  getActiveWorldContent,
   ITEM_SETS,
   ITEMS,
   MOBS,
@@ -84,6 +85,7 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
+import { deepglassMatch } from '../sim/deepglass/match';
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemInstanceLevel, itemScore } from '../sim/item_level';
@@ -793,6 +795,7 @@ import { raidCalloutKey } from './raid_callout';
 import { formatLockoutDuration } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
+import { PlotSignPopup } from './plot_sign_popup';
 import {
   reliquaryIlluminationBroadcastLine,
   reliquaryIlluminationBroadcastRendered,
@@ -1316,6 +1319,15 @@ export class Hud {
   // attack handler then falls back to the fixed attack control.
   onMobileAttackNearest: (() => void) | null = null;
   onQuestDialogStateChange: ((open: boolean) => void) | null = null;
+  /** The Deepglass steward's passage row. Wired by main.ts, which owns the
+   *  world boot the ferry actually needs. */
+  onTravelToDeepglass: (() => void) | null = null;
+  /** The Deepglass marshal's fixture rows. Also wired by main.ts: starting a
+   *  bout is a call into the offline Sim, which the HUD has no handle on. */
+  onStartDeepglassBout: ((perSide: number) => void) | null = null;
+  /** Baldemar the Bald's gate row. Wired by main.ts, which owns the cast, the
+   *  portal presentation and the world swap (src/game/portal_travel.ts). */
+  onSummonWizardPortal: ((npcId: number) => void) | null = null;
   // First-ever landing on the tutorial island (the sim's per-character
   // firstVisit): main.ts wires the arrival camera cinematic here
   // (game/arrival_cinematic.ts). The HUD owns the event arm, not the camera.
@@ -2112,6 +2124,9 @@ export class Hud {
   private bootcamp = new BootcampOverlay();
   private noticeboardPopup = new NoticeboardPopup();
   private realmBuilderPopup = new RealmBuilderPopup();
+  private plotSignPopup = new PlotSignPopup((deedId) => {
+    void this.sim.buyPlot(deedId);
+  });
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -2253,6 +2268,11 @@ export class Hud {
       talentSpec: () => this.sim.talentSpec,
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
+      // Deepball swaps the whole bar for the bout's four moves. Offline it
+      // reads the flight flag straight off the entity rather than a wire
+      // field, which is all the arena event build needs
+      // (docs/prd/deepglass.md).
+      isInDeepballBout: () => (this.sim.player as { dgFlight?: boolean }).dgFlight === true,
       showAttackButton: () => this.optionsHooks?.settings.get('showAttackButton') ?? true,
       // The arrangement profile for this device's interface (desktop or touch),
       // read from the same body.mobile-touch signal every touch-gated path uses.
@@ -2393,6 +2413,9 @@ export class Hud {
       openMarket: () => this.openMarket(),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openCardDuel: () => this.toggleCardDuel(),
+      travelToDeepglass: () => this.onTravelToDeepglass?.(),
+      startDeepglassBout: (perSide: number) => this.onStartDeepglassBout?.(perSide),
+      summonWizardPortal: (npcId: number) => this.onSummonWizardPortal?.(npcId),
       onOpenChange: (open) => this.onQuestDialogStateChange?.(open),
       voice: {
         play: (key) => voice.play(key),
@@ -7113,6 +7136,7 @@ export class Hud {
     this.bootcamp.relocalize(this.sim, this.keybinds);
     this.noticeboardPopup.relocalize();
     this.realmBuilderPopup.relocalize();
+    this.plotSignPopup.relocalize();
     this.guildBoardWindow.relocalize();
     this.riftForgeWindow.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
@@ -8919,6 +8943,15 @@ export class Hud {
         inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
         entities: sim.entities.values(),
         riftFloor: sim.riftFloor,
+        // The bell is a whole world, so presence there is the arming signal —
+        // there is no Sowfield-style footprint to stand in.
+        deepglass:
+          getActiveWorldContent().presentationMode === 'deepglass'
+            ? { inArena: true, phase: deepglassMatch()?.phase ?? null }
+            : null,
+        // The maker's own soundtrack for an authored map (the Studio's "Map
+        // track" and its areas). Absent on the shipped world.
+        mapMusic: getActiveWorldContent().music ?? null,
       });
     }
 
@@ -12343,6 +12376,10 @@ export class Hud {
           break;
         case 'realmBuilder':
           presentRealmBuilder(this.realmBuilderPopup, this.renderer, ev.current, ev.past);
+          break;
+        case 'plotSign':
+          this.plotSignPopup.show(ev.plot);
+          if (ev.plot.ownedByYou) this.log(t('hudChrome.plotSign.boughtLog', { name: ev.plot.name }), HUD_LOG.NEWS);
           break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their

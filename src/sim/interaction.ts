@@ -27,6 +27,7 @@ import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { currentRealmBuilder, pastRealmBuilders } from './content/realm_builders';
 import { corpseInteractionAvailability } from './corpse_interaction';
+import { inspectPlotSign } from './plots';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -61,6 +62,7 @@ import {
   type Entity,
   INTERACT_RANGE,
   OBJECT_RESPAWN,
+  PLOT_SIGN_TEMPLATE_ID,
   REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
   REALM_BUILDER_MONUMENT_TEMPLATE_ID,
 } from './types';
@@ -274,10 +276,11 @@ export function pickUpObject(
   if (obj?.kind !== 'object' || !obj.lootable) return false;
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
   const isRealmBuilderMonument = obj.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID;
+  const isPlotSign = obj.templateId === PLOT_SIGN_TEMPLATE_ID;
   // Preserve the historical no-op for malformed/non-pickup objects. The board
   // and the monument are the intentional lootable objects without an item
   // payload: both are read, never taken.
-  if (!noticeboardDef && !isRealmBuilderMonument && !obj.objectItemId) return false;
+  if (!noticeboardDef && !isRealmBuilderMonument && !isPlotSign && !obj.objectItemId) return false;
   const interactionRange = noticeboardDef?.interactionRadius ?? INTERACT_RANGE;
   if (isRealmBuilderMonument && dist2d(p.pos, obj.pos) > REALM_BUILDER_MONUMENT_INTERACT_RADIUS) {
     ctx.error(meta.entityId, 'Too far away.');
@@ -287,6 +290,7 @@ export function pickUpObject(
     ctx.error(meta.entityId, 'Too far away.');
     return false;
   }
+  if (isPlotSign) return inspectPlotSign(ctx, obj, pid);
   if (isRealmBuilderMonument) {
     // The whole roll travels with the event so the card reads identically
     // offline and online, and so pointing content/realm_builders.ts at a live

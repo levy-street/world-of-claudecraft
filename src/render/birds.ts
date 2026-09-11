@@ -14,6 +14,14 @@ export interface BirdsView {
   update(px: number, pz: number, dt: number): void;
 }
 
+/** Editor overrides for the ambient flock; absent fields keep the shipped look. */
+export interface BirdsConfig {
+  /** Birds in the flock (0 = no birds at all). */
+  count?: number;
+  /** true (default) = V-formation; false = a loose scattered flock. */
+  formation?: boolean;
+}
+
 // Local seeded PRNG — render convention is never to touch Math.random so the
 // flock is reproducible per world seed (mirrors foliage's hashing discipline).
 function mulberry32(seed: number): () => number {
@@ -29,8 +37,8 @@ function mulberry32(seed: number): () => number {
 
 const SPAWN_RADIUS = 120; // where a recycled flock re-enters around the player
 const DESPAWN_RADIUS = 165; // once the flock drifts past this it is recycled
-const ALT_MIN = 54;
-const ALT_MAX = 82;
+const ALT_MIN = 162;
+const ALT_MAX = 246;
 const SPEED_MIN = 5;
 const SPEED_MAX = 9;
 const WING_LEN = 1.7;
@@ -79,7 +87,7 @@ function buildBird(mat: THREE.Material): Bird {
   };
 }
 
-export function buildBirds(seed: number): BirdsView {
+export function buildBirds(seed: number, cfg?: BirdsConfig): BirdsView {
   const rand = mulberry32((seed ^ 0x5f3b21) >>> 0);
   const group = new THREE.Group();
   group.name = 'birds';
@@ -95,16 +103,27 @@ export function buildBirds(seed: number): BirdsView {
     depthWrite: false,
   });
 
-  const count = GFX.standardMaterials ? 14 : 6;
+  const count = Math.max(
+    0,
+    Math.min(40, Math.round(cfg?.count ?? (GFX.standardMaterials ? 14 : 6))),
+  );
+  const formation = cfg?.formation ?? true;
   const birds: Bird[] = [];
   for (let i = 0; i < count; i++) {
     const b = buildBird(mat);
-    // Loose V-formation: pairs fan out behind a leader, left/right alternating.
-    const rank = Math.ceil(i / 2);
-    const side = i % 2 === 0 ? 1 : -1;
-    b.ox = side * rank * (2.4 + rand() * 0.8);
-    b.oz = -rank * (2.6 + rand() * 0.9) - rand() * 1.5;
-    b.oy = (rand() - 0.5) * 3.0;
+    if (formation) {
+      // Loose V-formation: pairs fan out behind a leader, left/right alternating.
+      const rank = Math.ceil(i / 2);
+      const side = i % 2 === 0 ? 1 : -1;
+      b.ox = side * rank * (2.4 + rand() * 0.8);
+      b.oz = -rank * (2.6 + rand() * 0.9) - rand() * 1.5;
+      b.oy = (rand() - 0.5) * 3.0;
+    } else {
+      // Scattered flock: a loose drifting cloud with no leader.
+      b.ox = (rand() - 0.5) * (14 + count);
+      b.oz = (rand() - 0.5) * (14 + count);
+      b.oy = (rand() - 0.5) * 8;
+    }
     b.flapSpeed = 5.5 + rand() * 3.5;
     b.flapPhase = rand() * Math.PI * 2;
     b.bobAmp = 0.4 + rand() * 0.5;

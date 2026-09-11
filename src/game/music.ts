@@ -16,7 +16,12 @@ import type { MusicMixState } from './music_mix_policy';
 import { isMusicMixAudible, musicMixMasterTarget } from './music_mix_policy';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
 import { composeDungeonGravewyrmSanctum } from './music_theme_gravewyrm_sanctum';
-import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
+import {
+  COMBAT_STREAM_URLS,
+  pickCombatTrackIndex,
+  ZONE_STREAM_URLS,
+  zoneStreamUrls,
+} from './music_tracks';
 import type { MusicZone } from './music_zones';
 import { buildIgnivarRaidThemes } from './raid_music_themes';
 
@@ -27,6 +32,7 @@ export {
   riftMusicZoneForTheme,
   shouldResetMusicForDungeonEntry,
 } from './music_zones';
+export { ALL_MUSIC_ZONES, MUSIC_ZONES } from './music_zones';
 
 type Inst =
   | 'strings'
@@ -3578,6 +3584,35 @@ function composeCombat(): Theme {
 const FADE_SECONDS = 2.2;
 const STORAGE_KEY = 'ev_music_on';
 
+/** The sports venues that bring their own soundtrack: a waiting cue for the
+ *  grounds between games and a match cue that takes over at kickoff. Upstream
+ *  v0.40 retired the Vale Cup and deleted the Sowfield's pair with it, so the
+ *  Deepglass bell is the only venue left — the map shape stays because the
+ *  machinery is per-venue and the next arena is a row, not a rewrite. */
+export type MusicVenue = 'deepglass';
+
+/** The cues one venue can be playing. `boss` is the third of them: an arena
+ *  that hosts an encounter as well as a game needs its own theme for it, and
+ *  neither of the other two is right underneath a boss — the grounds cue is
+ *  too idle and the match cue is a sport. A venue that declares no boss file
+ *  simply never arms this track (see applyVenue), so adding one to the next
+ *  arena stays a row rather than a rewrite. */
+export type VenueTrack = 'waiting' | 'match' | 'boss';
+
+const VENUE_MUSIC: Record<MusicVenue, { waiting?: string; match: string; boss?: string }> = {
+  // The Deepglass bell: the grounds cue while you explore Tidehold and the
+  // bell between bouts ("Sunken Coral Sanctuary", Troy's supplied track,
+  // re-encoded to the 192 kbps spec and shipped under the waiting name
+  // 2026-09-07), the arena cue from the whistle to the final horn
+  // (docs/prd/deepglass.md), and the boss theme for a fight held in the bell
+  // rather than a deepball match.
+  deepglass: {
+    waiting: '/audio/deepglass-waiting.mp3',
+    match: '/audio/deepglass-match.mp3',
+    boss: '/audio/deepglass-boss.mp3',
+  },
+};
+
 // All remasters are mastered to one loudness (about -15 LUFS), so streamed
 // cues share a single level through the master gain.
 const STREAM_LEVEL = 0.5;
@@ -4452,6 +4487,22 @@ export class MusicDirector {
   // Boss-fight override: a looped file track routed through the same AudioContext
   // that user gestures already unlock for the procedural soundtrack.
   private bossActive = false;
+  // Sports-venue music: two looped mp3s per venue ('waiting' before a game,
+  // 'match' once one has kicked off) that crossfade against each other and duck
+  // the procedural score while you are at the venue. Same file-track pattern as
+  // the boss loop. The Sowfield (Vale Cup) and the Deepglass bell each bring
+  // their own pair; only one venue can be under you at a time, so the two
+  // crossfade gains are shared and the elements are per venue.
+  /** The stream-keeper interval handle, so close() can clear it: a page that
+   *  navigates away otherwise leaks the scheduler per hop (the editor's
+   *  pagehide teardown, [[woc-editor-playtest-fixes]]). */
+  private timer: number | undefined;
+  private venueEls = new Map<MusicVenue, Partial<Record<VenueTrack, HTMLAudioElement>>>();
+  private venueWaitingGain: GainNode | null = null;
+  private venueMatchGain: GainNode | null = null;
+  private venueBossGain: GainNode | null = null;
+  private venue: MusicVenue = 'deepglass';
+  private venueTrack: VenueTrack | null = null;
 
   get enabled(): boolean {
     return this._enabled;
@@ -4465,6 +4516,9 @@ export class MusicDirector {
       enabled: this._enabled,
       menuPaused: this._menuPaused,
       bossActive: this.bossActive,
+      // FORK: the venue track pair (the Deepglass bell's waiting/match cues)
+      // owns the mix the same way the boss loop does.
+      venueActive: this.venueTrack !== null,
       vol: this._vol,
     };
   }
@@ -4591,6 +4645,158 @@ export class MusicDirector {
     this.bossSource = null;
   }
 
+  /** Drive a sports venue's area music: 'waiting' before a game, 'match' once one
+   *  has kicked off, null when you are away from the venue. `venue` picks the pair
+   *  of files (the Sowfield's or the Deepglass bell's). Idempotent; the HUD calls
+   *  it every frame. Crossfades the two tracks and ducks the procedural score while
+   *  active. */
+  setVenueTrack(venue: MusicVenue, track: VenueTrack | null): void {
+    const enteringOrLeaving = (this.venueTrack === null) !== (track === null);
+    // Only re-point the venue while a track is armed: leaving carries `null`, and
+    // holding the old venue there keeps the fade-out and the delayed pause aimed
+    // at the elements that are actually playing.
+    if (track !== null) this.venue = venue;
+    this.venueTrack = track;
+    this.applyVenue();
+    // Idempotent, so it can run on every call: setStreamTarget early-returns
+    // on a target it already holds.
+    this.applyStreamTargets();
+    if (this.ctx && this.master) {
+      // Re-asserted on EVERY call rather than only on the arming edge. That
+      // edge routinely lands with no AudioContext to duck (the HUD drives this
+      // from the first frame; the context waits for a gesture), and nothing
+      // afterwards used to put the master back down. Arming ducks FAST: a
+      // venue cue fades in over half a second, and a zone theme audibly
+      // fading out under it is the reported "the music switches for a bit".
+      // Releasing stays gentle.
+      const target = this.masterTarget();
+      if (Math.abs(this.master.gain.value - target) > 1e-3) {
+        this.master.gain.setTargetAtTime(target, this.ctx.currentTime, target === 0 ? 0.12 : 0.7);
+      }
+    }
+    // walking away from the venue must revive paused streams now
+    if (enteringOrLeaving && track === null) this.streamKeeper();
+  }
+
+  private ensureVenueElements(
+    venue: MusicVenue,
+  ): Partial<Record<VenueTrack, HTMLAudioElement>> | null {
+    const made = this.venueEls.get(venue);
+    if (made) return made;
+    if (!this.ctx || typeof Audio !== 'function') return null;
+    const sources = VENUE_MUSIC[venue];
+    const set: Partial<Record<VenueTrack, HTMLAudioElement>> = {
+      match: this.makeVenueElement(sources.match, this.venueMatchGain),
+    };
+    // Only a venue that declares a grounds cue streams one: an element built
+    // for a file that is never armed would decode under every match for nothing.
+    if (sources.waiting)
+      set.waiting = this.makeVenueElement(sources.waiting, this.venueWaitingGain);
+    this.venueEls.set(venue, set);
+    return set;
+  }
+
+  /** The venue's boss theme, built on the first engagement rather than at
+   *  arrival (see applyVenue for why this one alone is lazy). Null for a venue
+   *  that declares no boss track. */
+  private ensureVenueBossElement(venue: MusicVenue): HTMLAudioElement | null {
+    const url = VENUE_MUSIC[venue].boss;
+    if (!url) return null;
+    const set = this.ensureVenueElements(venue);
+    if (!set) return null;
+    if (!set.boss) set.boss = this.makeVenueElement(url, this.venueBossGain);
+    return set.boss;
+  }
+
+  private makeVenueElement(url: string, gain: GainNode | null): HTMLAudioElement {
+    const el = new Audio(url);
+    el.loop = true;
+    el.preload = 'auto';
+    try {
+      const src = this.ctx?.createMediaElementSource(el);
+      if (src && gain) src.connect(gain);
+    } catch {
+      /* element already wired or unsupported */
+    }
+    return el;
+  }
+
+  private applyVenue(): void {
+    if (!this.ctx) return;
+    const active = this.venueTrack !== null && this._enabled && !this._menuPaused;
+    const level = 0.5 * this._vol;
+    // A venue that declares no boss theme falls back to its match cue rather
+    // than to silence, so arming 'boss' is safe whatever the venue ships.
+    // ...and a venue with no grounds cue rides its match cue when 'waiting' is
+    // asked for, for the same reason.
+    const sources = VENUE_MUSIC[this.venue];
+    const armed: VenueTrack | null =
+      (this.venueTrack === 'boss' && !sources.boss) ||
+      (this.venueTrack === 'waiting' && !sources.waiting)
+        ? 'match'
+        : this.venueTrack;
+    const bossArmed = active && armed === 'boss';
+    if (active) {
+      resumeWhenAllowed(this.ctx);
+      const set = this.ensureVenueElements(this.venue);
+      // The waiting/match pair BOTH run from arrival and the gains pick which
+      // one you hear, so the whistle crossfades into a track already in
+      // progress. The boss theme is the exception: a fight is an event and
+      // wants its own first bar, and a third stream decoding silently under
+      // every match is a cost this arena can least afford.
+      void set?.waiting?.play().catch(() => {});
+      void set?.match?.play().catch(() => {});
+      if (bossArmed) {
+        const boss = this.ensureVenueBossElement(this.venue);
+        if (boss) {
+          if (boss.paused) {
+            try {
+              boss.currentTime = 0;
+            } catch {
+              /* not seekable yet; it will simply start where it is */
+            }
+          }
+          void boss.play().catch(() => {});
+        }
+      }
+      // A different venue's set shares these gains, so it must not be left
+      // running underneath (only reachable by swapping worlds in place).
+      for (const [id, other] of this.venueEls) {
+        if (id === this.venue) continue;
+        for (const el of Object.values(other)) el.pause();
+      }
+    }
+    const wTarget = active && armed === 'waiting' ? level : 0;
+    const mTarget = active && armed === 'match' ? level : 0;
+    const bTarget = bossArmed ? level : 0;
+    if (this.venueWaitingGain)
+      this.venueWaitingGain.gain.setTargetAtTime(wTarget, this.ctx.currentTime, 0.5);
+    if (this.venueMatchGain)
+      this.venueMatchGain.gain.setTargetAtTime(mTarget, this.ctx.currentTime, 0.5);
+    if (this.venueBossGain)
+      this.venueBossGain.gain.setTargetAtTime(bTarget, this.ctx.currentTime, 0.5);
+    // Only when something is actually left running that should not be: leaving
+    // the venue, or a boss stream still going after the fight. This is called
+    // every frame, so an unconditional timeout here would queue one per frame.
+    const staleBoss = !bossArmed && this.venueEls.get(this.venue)?.boss?.paused === false;
+    if (this.venueEls.size > 0 && (!active || staleBoss)) {
+      // Fade to silence, then pause once we are truly away (guard against a quick
+      // re-entry flipping the track back on before the timeout fires). The boss
+      // stream also stops as soon as it is no longer the armed track, since it
+      // restarts from the top on the next engagement and nothing is lost.
+      window.setTimeout(() => {
+        const leaving = this.venueTrack === null;
+        for (const set of this.venueEls.values()) {
+          if (leaving) {
+            set.waiting?.pause();
+            set.match?.pause();
+          }
+          if (leaving || this.venueTrack !== 'boss') set.boss?.pause();
+        }
+      }, 700);
+    }
+  }
+
   /** Set music volume (0..1). Safe before init(); applied to the master gain. */
   setVolume(v: number): void {
     this._vol = Math.min(1, Math.max(0, v));
@@ -4598,6 +4804,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.2);
     }
     this.applyBossPlayback();
+    this.applyVenue();
     // leaving volume 0 must revive paused streams now, not a tick later
     if (this.streamsAudible()) this.streamKeeper();
   }
@@ -4627,6 +4834,15 @@ export class MusicDirector {
     this.bossGain = ctx.createGain();
     this.bossGain.gain.value = 0;
     this.bossGain.connect(compressor);
+    this.venueWaitingGain = ctx.createGain();
+    this.venueWaitingGain.gain.value = 0;
+    this.venueWaitingGain.connect(compressor);
+    this.venueMatchGain = ctx.createGain();
+    this.venueMatchGain.gain.value = 0;
+    this.venueMatchGain.connect(compressor);
+    this.venueBossGain = ctx.createGain();
+    this.venueBossGain.gain.value = 0;
+    this.venueBossGain.connect(compressor);
 
     // Register both battle themes now (and warm their downloads whenever the
     // mix is audible, see streamKeeper): a fight can start at any moment and
@@ -4637,7 +4853,7 @@ export class MusicDirector {
       const stream = this.makeStream(url);
       if (stream) this.combatStreams.push(stream);
     }
-    window.setInterval(() => this.streamKeeper(), STREAM_KEEPER_MS);
+    this.timer = window.setInterval(() => this.streamKeeper(), STREAM_KEEPER_MS);
     this.streamKeeper();
   }
 
@@ -4669,12 +4885,49 @@ export class MusicDirector {
     stream.el = el;
   }
 
-  private ensureZoneStream(zone: MusicZone): void {
-    if (this.zoneStreams[zone]) return;
-    const url = ZONE_STREAM_URLS[zone];
-    if (!url) return;
+  /** Ensure `zone` has a live stream. `arriving` marks a genuine zone change
+   *  (not a combat handback): only then does a POOLED zone roll a different one
+   *  of its cues, so a capital with two harbor themes varies between visits
+   *  instead of wearing one loop out. Single-track zones are untouched and keep
+   *  resuming mid-track exactly as before. */
+  private ensureZoneStream(zone: MusicZone, arriving = false): void {
+    const urls = zoneStreamUrls(zone);
+    if (urls.length === 0) return;
+    const existing = this.zoneStreams[zone];
+    if (existing && (urls.length === 1 || !arriving)) return;
+    const url = urls.length === 1 ? urls[0] : urls[pickCombatTrackIndex(urls.length, Math.random)];
+    if (existing) {
+      if (existing.url === url) return; // rolled the same cue: keep it playing
+      this.releaseStream(existing);
+      delete this.zoneStreams[zone];
+    }
     const stream = this.makeStream(url);
     if (stream) this.zoneStreams[zone] = stream;
+  }
+
+  /** Tear one zone stream down for good: the swapped-out cue must stop
+   *  buffering behind the one now playing, so this releases the buffered media
+   *  rather than just pausing the playhead. */
+  private releaseStream(stream: StreamTrack): void {
+    const el = stream.el;
+    stream.el = null;
+    stream.target = 0;
+    try {
+      el?.pause();
+    } catch {
+      /* best-effort: the element is being discarded either way */
+    }
+    try {
+      el?.removeAttribute('src');
+      el?.load();
+    } catch {
+      /* older/stubbed elements: pausing already stopped the download */
+    }
+    try {
+      stream.gain.disconnect();
+    } catch {
+      /* already detached */
+    }
   }
 
   /** Each floor owns its whole soundtrack, including pulls and quiet gaps. */
@@ -4702,7 +4955,7 @@ export class MusicDirector {
 
   // Streams are audible only when nothing has the master ducked to zero: the
   // toggle, the menu fade, the volume slider, and the dedicated boss and
-  // Sowfield file tracks (which own the mix while active). While inaudible,
+  // sports-venue file tracks (which own the mix while active). While inaudible,
   // streams pause instead of decoding silence.
   private streamsAudible(): boolean {
     return isMusicMixAudible(this.mixState());
@@ -4770,11 +5023,54 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.3);
     }
     this.applyBossPlayback();
+    this.applyVenue();
     // re-enabling must revive paused streams now, not a keeper tick later
     if (on) this.streamKeeper();
   }
 
   /** Fade out while the game menu is open; does not change the music toggle. */
+  /**
+   * Tear the director down for a page that is going away (the editor's
+   * pagehide teardown). Without this, a navigation ping-pong leaks an audio
+   * thread, the scheduler interval, and the whole layer graph per hop. Nulls
+   * the context so a later init() rebuilds it and re-arms the scheduler.
+   */
+  close(): void {
+    if (this.timer !== undefined) {
+      clearInterval(this.timer);
+      this.timer = undefined;
+    }
+    try {
+      this.bossSource?.stop();
+    } catch {
+      /* already stopped */
+    }
+    this.bossSource = null;
+    for (const el of [
+      this.bossElement,
+      ...Object.values(this.zoneStreams).map((s) => s?.el ?? null),
+      ...this.combatStreams.map((s) => s.el),
+    ]) {
+      if (!el) continue;
+      try {
+        el.pause();
+        el.src = '';
+      } catch {
+        /* best-effort */
+      }
+    }
+    this.bossElement = null;
+    this.zoneStreams = {};
+    this.combatStreams = [];
+    const ctx = this.ctx;
+    this.ctx = null;
+    this.master = null;
+    this.bossGain = null;
+    this.zone = null;
+    this.combat = false;
+    if (ctx) void ctx.close().catch(() => {});
+  }
+
   pauseForMenu(): void {
     if (this._menuPaused) return;
     this._menuPaused = true;
@@ -4784,6 +5080,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
     }
     this.applyBossPlayback();
+    this.applyVenue();
   }
 
   /** Restore playback after closing the game menu. */
@@ -4796,6 +5093,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.35);
     }
     this.applyBossPlayback();
+    this.applyVenue();
     // closing the menu must revive paused streams now, not a keeper tick later
     this.streamKeeper();
   }
@@ -4807,18 +5105,11 @@ export class MusicDirector {
     if (zone === this.zone && combat === this.combat && crucibleFloor === this.crucibleFloor)
       return;
     const combatStarting = combat && !this.combat;
+    const zoneChanging = zone !== this.zone;
     this.setCrucibleFloor(crucibleFloor);
     this.zone = zone;
     this.combat = combat;
-    // Combat music replaces the zone theme rather than layering over it: the
-    // zone is silenced for the duration of combat and fades back in when it
-    // ends. Fade out faster than fade in so instance music does not bleed
-    // into the world.
-    if (!combat && crucibleFloor === null) this.ensureZoneStream(zone);
-    for (const [name, stream] of Object.entries(this.zoneStreams) as [MusicZone, StreamTrack][]) {
-      const target = name === zone && !combat && crucibleFloor === null ? 1 : 0;
-      this.setStreamTarget(stream, target, target > 0 ? FADE_SECONDS / 3 : 0.35);
-    }
+    // The zone/venue/crucible stream targets settle in applyStreamTargets below.
     // Each fight opens on one of the battle themes, chosen at random per
     // fight and restarted from the top so the opening hit lands; the pick
     // then holds for the whole fight, even across a zone border mid-chase.
@@ -4836,13 +5127,48 @@ export class MusicDirector {
         }
       }
     }
+    this.applyStreamTargets(zoneChanging);
+  }
+
+  /**
+   * Point every zone and combat stream at its target for the current zone,
+   * combat flag and venue.
+   *
+   * Combat music replaces the zone theme rather than layering over it: the
+   * zone is silenced for the duration of combat and fades back in when it
+   * ends. Fade out faster than fade in so instance music does not bleed into
+   * the world.
+   *
+   * And a VENUE cue owns the score outright: while one is armed every
+   * procedural stream targets silence and no zone cue is even rolled. Ducking
+   * the master was not enough on its own, twice over. The duck is applied on
+   * the arming edge with a fade, so a zone theme already playing when the
+   * player reached the arena stayed audible under the venue track for the
+   * length of the ramp — heard as the wrong music playing for a second or
+   * two. And the duck is skipped entirely when there is no AudioContext at
+   * that edge, which is the common case: the HUD drives this from the first
+   * frame and the context waits for a gesture. With the targets held at zero
+   * there is nothing queued for any later mix change to uncover, and nothing
+   * downloading that the player could never hear.
+   */
+  private applyStreamTargets(zoneChanging = false): void {
+    if (!this.ctx) return;
+    const venued = this.venueTrack !== null;
+    // A Crucible floor owns the whole mix like a venue track does (upstream's
+    // crucible streams, faded in setCrucibleFloor).
+    const crucible = this.crucibleFloor !== null;
+    // Null before the first update(): no zone is playing yet, so every stream
+    // below simply targets 0, which is exactly right.
+    const zone = this.zone;
+    const inCombat = this.combat;
+    if (zone !== null && !inCombat && !venued && !crucible) this.ensureZoneStream(zone, zoneChanging);
+    for (const [name, stream] of Object.entries(this.zoneStreams) as [MusicZone, StreamTrack][]) {
+      const target = !venued && !crucible && name === zone && !inCombat ? 1 : 0;
+      this.setStreamTarget(stream, target, target > 0 ? FADE_SECONDS / 3 : 0.35);
+    }
     this.combatStreams.forEach((stream, idx) => {
-      const target = combat && idx === this.combatIdx ? 1 : 0;
-      this.setStreamTarget(
-        stream,
-        target,
-        target > 0 || crucibleFloor !== null ? 0.35 : FADE_SECONDS / 3,
-      );
+      const target = !venued && !crucible && inCombat && idx === this.combatIdx ? 1 : 0;
+      this.setStreamTarget(stream, target, target > 0 || crucible ? 0.35 : FADE_SECONDS / 3);
     });
   }
 }

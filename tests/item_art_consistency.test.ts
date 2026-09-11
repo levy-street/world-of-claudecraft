@@ -839,7 +839,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // (14 base pieces + their 14 auto-generated heroic variants) = 1,299. The
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    expect(Object.keys(ITEMS)).toHaveLength(1367); // FORK: +66 items (wastes, abyss, deeds, deepball)
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -996,7 +996,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283.
     expect(new Set(currentOwnerIds).size).toBe(1283);
     expect(shippingIds).toHaveLength(1283);
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    expect(Object.keys(ITEMS)).toHaveLength(1367); // FORK: +66 items (wastes, abyss, deeds, deepball)
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1033,7 +1033,11 @@ describe('item-art consistency accepted-art provenance', () => {
 
     const fieldKitManifest = readJson<{
       targetSets: { items: string[] };
-      assets: Array<{ id: string; acceptedSha256: string; acceptedBytes: number }>;
+      assets: Array<{
+        id: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+      }>;
       review: { sizesInspected: Array<number | string> };
     }>(`${FIELD_KIT_EVIDENCE_DIR}/accepted-art.json`);
     expect(fieldKitManifest.targetSets.items).toEqual(['field_kit']);
@@ -1393,7 +1397,10 @@ describe('item-art consistency accepted-art provenance', () => {
       'supersedes and targetSets.items must name the same item IDs',
     );
     const extraAsset = structuredClone(manifest());
-    extraAsset.assets.push({ ...extraAsset.assets[0], id: 'not_a_replacement_target' });
+    extraAsset.assets.push({
+      ...extraAsset.assets[0],
+      id: 'not_a_replacement_target',
+    });
     expect(() => validateSupersessionGraph(extraAsset)).toThrow(
       'assets and targetSets.items must name the same item IDs',
     );

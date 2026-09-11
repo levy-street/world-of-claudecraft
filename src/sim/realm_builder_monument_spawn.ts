@@ -15,10 +15,17 @@
 // static service that took an id from the sequence would move every parity
 // golden in the suite.
 
+import { TH_MONUMENT } from './deepglass/citadel';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { createGroundObject } from './entity';
-import type { SimContext } from './sim_context';
-import type { ZonePropsDef } from './types';
+import type { Entity, Vec3, ZonePropsDef } from './types';
+
+/** The slice of the sim this spawn needs: no more of it is in scope here. */
+export interface RealmBuilderMonumentSpawnHost {
+  readonly entities: ReadonlyMap<number, Entity>;
+  groundPos(x: number, z: number): Vec3;
+  addEntity(entity: Entity): void;
+}
 
 /**
  * Spawn the monument's inspect entity, if this world is one that drew it.
@@ -27,24 +34,51 @@ import type { ZonePropsDef } from './types';
  * same slot, which is a content bug rather than anything a player can cause.
  */
 export function spawnRealmBuilderMonument(
-  ctx: SimContext,
+  host: RealmBuilderMonumentSpawnHost,
   props: Pick<ZonePropsDef, 'wells'>,
 ): void {
   const def = EASTBROOK_LAYOUT.civic.monument;
   if (!props.wells.some((well) => well.id === def.id)) return;
-  if (ctx.entities.has(def.entityId)) {
-    throw new Error(`Duplicate static service entity id: ${def.entityId}`);
+  spawnRealmBuilderMonumentAt(host, {
+    entityId: def.entityId,
+    name: def.name,
+    x: def.position.x,
+    z: def.position.z,
+    rotation: def.rotation,
+  });
+}
+
+/** One monument's inspect entity at an authored seat. Eastbrook's civic square
+ *  and Tidehold's Fountain Plaza (the Deepglass world) both go through here, so
+ *  every monument in every world is the same object with the same card. */
+export function spawnRealmBuilderMonumentAt(
+  host: RealmBuilderMonumentSpawnHost,
+  seat: { entityId: number; name: string; x: number; z: number; rotation: number },
+): void {
+  if (host.entities.has(seat.entityId)) {
+    throw new Error(`Duplicate static service entity id: ${seat.entityId}`);
   }
-  const monument = createGroundObject(
-    def.entityId,
-    '',
-    def.name,
-    ctx.groundPos(def.position.x, def.position.z),
-  );
-  monument.templateId = def.templateId;
+  const monument = createGroundObject(seat.entityId, '', seat.name, host.groundPos(seat.x, seat.z));
+  monument.templateId = EASTBROOK_LAYOUT.civic.monument.templateId;
   monument.objectItemId = null;
   monument.lootable = true;
-  monument.facing = def.rotation;
-  monument.prevFacing = def.rotation;
-  ctx.addEntity(monument);
+  monument.facing = seat.rotation;
+  monument.prevFacing = seat.rotation;
+  host.addEntity(monument);
+}
+
+/** Tidehold's monument, in the Deepglass world only (its placement is the
+ *  city's; see deepglass/citadel.ts TH_MONUMENT). */
+export function spawnTideholdRealmBuilderMonument(
+  host: RealmBuilderMonumentSpawnHost,
+  presentationMode: string | undefined,
+): void {
+  if (presentationMode !== 'deepglass') return;
+  spawnRealmBuilderMonumentAt(host, {
+    entityId: TH_MONUMENT.entityId,
+    name: EASTBROOK_LAYOUT.civic.monument.name,
+    x: TH_MONUMENT.x,
+    z: TH_MONUMENT.z,
+    rotation: TH_MONUMENT.rotY,
+  });
 }

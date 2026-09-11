@@ -80,6 +80,17 @@ interface ProvenSafeBase {
 /** Bases that are non-negative by provenance rather than by syntax. */
 const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
   {
+    file: 'src/render/campfire_flame.ts',
+    base: 'flameH',
+    sites: 1,
+    // flameH is the layer's normalized height, and it is CLAMPED to [0,1] on
+    // the line above the pow(): transformed.y can go either side of the layer
+    // height on a swaying ring, so the clamp — not the geometry — is what keeps
+    // the base non-negative. The anchor pins the clamp, so the row dies with it.
+    anchor: /float flameH = clamp\(transformed\.y \/ \$\{height\.toFixed\(4\)\}, 0\.0, 1\.0\);/,
+    why: 'flameH is a clamp(..., 0.0, 1.0) one line above the pow()',
+  },
+  {
     file: 'src/render/weapon_vfx.ts',
     base: 'w',
     sites: 1,
@@ -127,6 +138,22 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ability_vfx/shells.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))
   'src/render/characters/armor_dye.ts': 2,
+  // the campfire flame's lick ramp (base is a clamped normalized height)
+  'src/render/campfire_flame.ts': 1,
+  // the goal celebration's shell: a ripple band and a fresnel rim, both clamped
+  'src/render/deepglass_goal_wave.ts': 2,
+  // the crowd cards' card-edge fade and the goal-excite pulse, both clamped
+  'src/render/deepglass_crowd_cards.ts': 2,
+  // the bell glass, the goal burst and the orb glow: three fresnel rims, clamped
+  'src/render/deepglass.ts': 3,
+  // the team aura's fresnel rim, used twice (alpha and the white edge lift)
+  'src/render/deepglass_aura.ts': 2,
+  // the Tidesow speed shell's fresnel rim
+  'src/render/deepglass_ball.ts': 1,
+  // the plume's heat ramp and cross-section falloff, both bases clamped
+  'src/render/jet_fire.ts': 2,
+  // the brazier flame's taper ramp
+  'src/render/placed_assets.ts': 1,
   'src/render/dungeon.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
   'src/render/ignivar_fire_vfx.ts': 10,
@@ -313,7 +340,9 @@ const POW_CALL = /(^|[^.A-Za-z0-9_])pow\s*\(/g;
 function powSites(roots: string[], base: string): PowSite[] {
   const sites: PowSite[] = [];
   for (const root of roots) {
-    for (const entry of sourceFilesUnder(join(base, root), { skipDirectories: SKIPPED_DIRS })) {
+    for (const entry of sourceFilesUnder(join(base, root), {
+      skipDirectories: SKIPPED_DIRS,
+    })) {
       const file = `${root}/${entry.file}`;
       const raw = readFileSync(entry.full, 'utf8');
       if (!raw.includes('pow')) continue;

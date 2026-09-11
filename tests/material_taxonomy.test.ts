@@ -219,38 +219,6 @@ const HONEST_MATERIALS = [
 // derives IN, or add it here as a deliberate non-material with the
 // maintainer's sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
-  'dawnhold_posy',
-  // Masterwrought Phase 13 (2026-08-27): the promotion writ. Rare kind-junk
-  // by decision (it is a consumed capstone, not gear, and rare protects it
-  // from the junk vendor sweep); nothing crafts FROM it (the promotion
-  // consumes it directly through LEGENDARY_PROMOTION_COST), so it is a
-  // deliberate non-material on the harvest_feast footing.
-  'deed_of_making',
-  // Masterwrought phase 11l's second review round removed
-  // emberwing_cinderscale and old_cragmaws_pelt: the two leather trophy
-  // recipes (recipe_cragprowl_belt, recipe_wildgrove_cinch) are their
-  // consumers, so both derive IN through the reagent source table
-  // (HONEST_MATERIALS above); the completeness tripwire below forces the
-  // move.
-  'gleamstag_charm',
-  'guardian_core',
-  'harvest_feast',
-  'last_keep_signet',
-  // Retired premium reins remain inert saved items, with no use or material role.
-  'reins_chimeglass_tortoise',
-  'reins_goblin_rocket_sled',
-  'reins_mech_bird',
-  'reins_rallycart_rxt',
-  'reins_rickshaw_mount',
-  // masterwrought Phase 11k's three apex role feasts: kind 'junk' by the same
-  // tonic precedent harvest_feast set, and nothing crafts FROM any of them, so
-  // all three are deliberate non-materials on the harvest_feast footing above.
-  // Unlike Phase 11i's retired capstone (which sat here while being
-  // unplaceable), each of these IS reachable: professions/feast.ts takes the
-  // item id it is placing since 11k, so a use really does set the table out.
-  'sageleaf_feast',
-  'stonepot_feast',
-  'warspice_feast',
   // Phase 08 removed forgefold_plating, wyrmhide_cording, sunspun_bolt, and
   // wyrmfall_core: the apex armor rows are their consumers, so all four now
   // derive IN through the reagent source table (HONEST_MATERIALS above).
@@ -270,6 +238,52 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   // Flame classifies IN today and its row moved to HONEST_MATERIALS above.
   // The caveat it carried still holds: the moment a live recipe consumes it,
   // reagent derivation owns it and its id leaves that pending list.
+  // FORK: Scorching Wastes / Emberwake / Infernal trophies and keepsakes (non-material by design).
+  'cinder_soaked_veil',
+  'dawnhold_posy',
+  // Masterwrought Phase 13 (2026-08-27): the promotion writ. Rare kind-junk
+  // by decision (it is a consumed capstone, not gear, and rare protects it
+  // from the junk vendor sweep); nothing crafts FROM it (the promotion
+  // consumes it directly through LEGENDARY_PROMOTION_COST), so it is a
+  // deliberate non-material on the harvest_feast footing.
+  'deed_of_making',
+  'duneblade_token',
+  'dunefather_tailspine',
+  'emberwake_heartscale',
+  // Masterwrought phase 11l's second review round removed
+  // emberwing_cinderscale and old_cragmaws_pelt: the two leather trophy
+  // recipes (recipe_cragprowl_belt, recipe_wildgrove_cinch) are their
+  // consumers, so both derive IN through the reagent source table
+  // (HONEST_MATERIALS above); the completeness tripwire below forces the
+  // move.
+  'gleamstag_charm',
+  'guardian_core',
+  'harvest_feast',
+  'heart_of_the_first_ember',
+  'last_keep_signet',
+  'moltenheart_slagcore',
+  'parched_kings_goblet',
+  'prowler_fang',
+  // Retired premium reins remain inert saved items, with no use or material role.
+  'reins_chimeglass_tortoise',
+  'reins_goblin_rocket_sled',
+  'reins_mech_bird',
+  'reins_rallycart_rxt',
+  'reins_rickshaw_mount',
+  // masterwrought Phase 11k's three apex role feasts: kind 'junk' by the same
+  // tonic precedent harvest_feast set, and nothing crafts FROM any of them, so
+  // all three are deliberate non-materials on the harvest_feast footing above.
+  // Unlike Phase 11i's retired capstone (which sat here while being
+  // unplaceable), each of these IS reachable: professions/feast.ts takes the
+  // item id it is placing since 11k, so a use really does set the table out.
+  'sageleaf_feast',
+  'sentinel_core_stone',
+  'stonepot_feast',
+  'sunbleached_bone',
+  'sunglass_shard',
+  'sunspeakers_ash_crown',
+  'warspice_feast',
+  'wastes_relic_cache',
 ] as const;
 
 // The six vendor-buyable crafting staples, ruled IN by name (Q6).
@@ -584,37 +598,65 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
       {
         nodeMaterialTable: {
           ...NODE_MATERIAL_TABLE,
-          ore: { ...NODE_MATERIAL_TABLE.ore, zzz_probe_zone: { ...anyOreRow, itemId: PROBE } },
+          ore: {
+            ...NODE_MATERIAL_TABLE.ore,
+            zzz_probe_zone: { ...anyOreRow, itemId: PROBE },
+          },
         },
       },
     ],
     [
       'fine grade',
-      { materialGrades: { ...MATERIAL_GRADES, [PROBE]: { ...anyGradeRow, fineItemId: PROBE } } },
+      {
+        materialGrades: {
+          ...MATERIAL_GRADES,
+          [PROBE]: { ...anyGradeRow, fineItemId: PROBE },
+        },
+      },
     ],
     [
       'harvest component',
-      { harvestComponentItems: { ...HARVEST_COMPONENT_ITEMS, zzz_probe_part: PROBE } },
+      {
+        harvestComponentItems: {
+          ...HARVEST_COMPONENT_ITEMS,
+          zzz_probe_part: PROBE,
+        },
+      },
     ],
     [
       'pristine specimen',
-      { harvestComponentSpecimens: { ...HARVEST_COMPONENT_SPECIMENS, zzz_probe_part: PROBE } },
+      {
+        harvestComponentSpecimens: {
+          ...HARVEST_COMPONENT_SPECIMENS,
+          zzz_probe_part: PROBE,
+        },
+      },
     ],
     [
       'salvage return',
-      { salvageMaterialByQuality: { ...SALVAGE_MATERIAL_BY_QUALITY, zzz_probe_quality: PROBE } },
+      {
+        salvageMaterialByQuality: {
+          ...SALVAGE_MATERIAL_BY_QUALITY,
+          zzz_probe_quality: PROBE,
+        },
+      },
     ],
     ['farming yield', { farmMaterialItemIds: [...FARM_MATERIAL_ITEM_IDS, PROBE] }],
     [
       'recipe reagent',
-      { recipes: [...ALL_RECIPES, { ...ALL_RECIPES[0], reagents: [{ itemId: PROBE, count: 1 }] }] },
+      {
+        recipes: [...ALL_RECIPES, { ...ALL_RECIPES[0], reagents: [{ itemId: PROBE, count: 1 }] }],
+      },
     ],
     [
       'enchant reagent',
       {
         enchants: {
           ...ENCHANTS,
-          zzz_probe_enchant: { ...anyEnchant, reagents: [{ itemId: PROBE, count: 1 }] },
+          zzz_probe_enchant: {
+            ...anyEnchant,
+            reagents: [{ itemId: PROBE, count: 1 }],
+          },
         },
       },
     ],
@@ -627,7 +669,11 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
   ];
   for (const [source, override] of CASES) {
     it(`a junk-kind id authored only as a ${source} row derives IN`, () => {
-      const derived = deriveMaterialItemIds({ ...BASE, ...override, items: itemsWithProbe });
+      const derived = deriveMaterialItemIds({
+        ...BASE,
+        ...override,
+        items: itemsWithProbe,
+      });
       // Exact both ways with failure locality: the probe joined, nothing else
       // moved, and a red names the id instead of a bare boolean.
       expect([...derived].sort()).toEqual([...HONEST_MATERIALS, PROBE].sort());
@@ -637,7 +683,11 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
   it('the kind filter applies to every source: a non-junk probe derives OUT everywhere', () => {
     const toolProbe: typeof ITEMS = {
       ...ITEMS,
-      [PROBE]: { ...ITEMS.simple_fishing_pole, id: PROBE, name: 'Taxonomy Probe' },
+      [PROBE]: {
+        ...ITEMS.simple_fishing_pole,
+        id: PROBE,
+        name: 'Taxonomy Probe',
+      },
     };
     for (const [source, override] of CASES) {
       expect(
@@ -681,6 +731,8 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     'deepfen_pearl',
     'frayed_prayer_beads',
     'inert_storm_shard',
+    // FORK: infernal_slag (Infernal Abyss poor drop) joins the poor sweep.
+    'infernal_slag',
     'moonpale_scale',
     'mudfin_scale',
     'ogre_toe_ring',
@@ -729,6 +781,8 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     'deepfen_pearl',
     'frayed_prayer_beads',
     'inert_storm_shard',
+    // FORK: + infernal_slag (Infernal Abyss poor drop).
+    'infernal_slag',
     'moonpale_scale',
     'ogre_toe_ring',
     'pale_pearl',
@@ -742,9 +796,9 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
   it('promotes exactly the 5 trophies to common materials and leaves the 16 survivors poor', () => {
     // Length guards first: an emptied literal or set would let the loop below
     // pass vacuously.
-    expect(PRE_11L_POOR_JUNK).toHaveLength(21);
+    expect(PRE_11L_POOR_JUNK).toHaveLength(22); // FORK: + infernal_slag
     expect(PROMOTED_TROPHIES.size).toBe(5);
-    expect(SURVIVING_POOR_JUNK).toHaveLength(16);
+    expect(SURVIVING_POOR_JUNK).toHaveLength(17); // FORK: + infernal_slag
     expect(Object.keys(PROMOTED_SELL_VALUE).sort()).toEqual([...PROMOTED_TROPHIES].sort());
     expect(SURVIVING_POOR_JUNK).toEqual(
       PRE_11L_POOR_JUNK.filter((id) => !PROMOTED_TROPHIES.has(id)),
@@ -773,7 +827,7 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     }
   });
 
-  it('the LIVE poor set is exactly the 16 survivors (a new poor id cannot land unseen)', () => {
+  it('the LIVE poor set is exactly the 17 survivors (a new poor id cannot land unseen)', () => {
     // The frozen-21 loop above only visits ids it already knows, so a poor
     // item authored AFTER the phase 11l boundary would never enter it: this
     // exact-set pin over the whole catalog closes that direction. The

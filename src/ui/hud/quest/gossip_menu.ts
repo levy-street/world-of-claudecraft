@@ -27,6 +27,15 @@ export interface GossipMenuContent {
   hasCrucibleVendor: boolean;
   hasDelveBoard: boolean;
   hasCardMaster: boolean;
+  /** The Deepglass steward's passage row. Her whole menu is this one line, so
+   *  without a field here she would read as empty and close on open. */
+  hasDeepglass: boolean;
+  /** The Deepglass marshal's three fixture rows (1v1/2v2/3v3), inside the
+   *  arena. Same reason as the steward above: they are her entire menu. */
+  hasDeepglassBouts: boolean;
+  /** Baldemar the Bald's "open the way" row. His whole menu is this one line
+   *  plus a greeting, so he closes on open without a field here. */
+  hasPortalWizard: boolean;
   hasTraining: boolean;
   /** A farmer NPC's husk-to-compost trade row (the farming go-live, gated on
    *  the NpcDef farmer flag). Its own field so a farmer with no quest and no
@@ -45,6 +54,9 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasCrucibleVendor &&
     !content.hasDelveBoard &&
     !content.hasCardMaster &&
+    !content.hasDeepglass &&
+    !content.hasDeepglassBouts &&
+    !content.hasPortalWizard &&
     !content.hasTraining &&
     !content.hasFarmer
   );

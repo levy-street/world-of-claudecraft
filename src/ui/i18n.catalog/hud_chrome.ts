@@ -1620,6 +1620,10 @@ export const hudChromeStrings = {
     sheathe: 'Sheathe/Unsheathe Weapon',
     // Swimming: Jump swims up, this swims down.
     dive: 'Swim Down',
+    // Deepball burners (the Deepglass arena); held, F by default.
+    boost: 'Burners (Deepball)',
+    // Deepball ball marker: the HUD pointer that finds the Tidesow. Shift+V.
+    ballMarker: 'Ball Marker (Deepball)',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
     categoryPet: 'Pet',
     petAttack: 'Pet: Attack',
@@ -5311,6 +5315,43 @@ export const hudChromeStrings = {
   // (src/ui/realm_builder_popup.ts), opened by inspecting the statue. Honouree
   // names are world data and splice verbatim like player names, never
   // translated; only this chrome and the Intl-formatted month localize.
+  // Baldemar the Bald, the portal wizard (src/sim/portal_wizard.ts): his
+  // gossip rows and the on-screen hint while his gate stands open.
+  deepglass: {
+    // Steward Aleyn Tidewell's gossip-menu entry, in Goldcrest Harbor: passage
+    // down into the Deepglass bell for a bout of deepball.
+    gossip: 'Take me down to the Deepglass',
+    gossipAria: 'Travel to the Deepglass and start a bout of deepball',
+    // Marshal Yvette Coralwake's fixture rows, at the head of the causeway
+    // inside the arena. One row per side size; {n} is 1, 2 or 3.
+    bout: '{n} a side',
+    boutAria: 'Start a bout of deepball, {n} players a side',
+  },
+  portalWizard: {
+    gossipDeepglass: 'Open the way to the Deepglass',
+    gossipDeepglassAria: 'Ask Baldemar to open a portal to the Deepglass',
+    gossipHome: 'Open the way home',
+    gossipHomeAria: 'Ask Baldemar to open a portal back to your town',
+    // Toast shown while the portal stands open; the walk-in is the action.
+    portalOpen: 'The portal stands open. Step through.',
+  },
+  // Tidehold's housing deeds (src/ui/plot_sign_popup.ts, fork).
+  // The Eastbrook Vale Realm Builder monument's honour roll
+  // (src/ui/realm_builder_popup.ts), opened by inspecting the statue. Honouree
+  // names are world data and splice verbatim like player names, never
+  // translated; only this chrome and the Intl-formatted month localize.
+  plotSign: {
+    title: 'Housing plot for sale',
+    size: '{size} plot, {w} by {d} yards',
+    sizes: { small: 'Small', medium: 'Medium', large: 'Large' },
+    price: 'Asking {price}',
+    purse: 'You carry {purse}.',
+    yours: 'You hold this deed.',
+    sold: 'Sold. {name} holds this deed.',
+    buy: 'Buy for {price}',
+    close: 'Close',
+    boughtLog: 'The deed to {name} is yours.',
+  },
   realmBuilder: {
     title: 'Realm Builder of the Month',
     currentLabel: 'Honoured this month',

@@ -42,13 +42,8 @@ import {
   type WorldContent,
 } from '../src/sim/types';
 
-type AnySim = Sim & Record<string, any>;
-type AnyEntity = Entity & Record<string, any>;
-
-// Dungeon doors, instance slots, and instance mobs all spawn from DUNGEON_LIST
-// (data), not from WorldContent, and no assertion here reads ambient overworld
-// content, so strip camps/npcs/ground objects to keep each Sim and tick cheap
-// (the dot_final_tick subsystem-world pattern).
+// Upstream's fixture: the shipped world minus its camps/NPCs/ground objects, so a
+// dungeon test never pays for the overworld's population.
 const DUNGEON_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
   camps: [],
@@ -56,13 +51,11 @@ const DUNGEON_TEST_WORLD: WorldContent = {
   groundObjects: [],
 };
 
+type AnySim = Sim & Record<string, any>;
+type AnyEntity = Entity & Record<string, any>;
+
 function makeSim(seed = 99): AnySim {
-  return new Sim({
-    seed,
-    playerClass: 'warrior',
-    noPlayer: true,
-    world: DUNGEON_TEST_WORLD,
-  }) as AnySim;
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true }) as AnySim;
 }
 
 function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
@@ -624,8 +617,12 @@ describe('dungeons: heroic difficulty', () => {
 
   it('keeps the cooldown on the claim when every original owner leaves the party', () => {
     const sim = makeSim();
-    const leader = sim.addPlayer('warrior', 'OriginalLeader', { characterId: 193 });
-    const original = sim.addPlayer('warrior', 'OriginalMember', { characterId: 194 });
+    const leader = sim.addPlayer('warrior', 'OriginalLeader', {
+      characterId: 193,
+    });
+    const original = sim.addPlayer('warrior', 'OriginalMember', {
+      characterId: 194,
+    });
     const replacementLeader = sim.addPlayer('warrior', 'ReplacementLeader', {
       characterId: 195,
     });
@@ -726,7 +723,9 @@ describe('dungeons: heroic difficulty', () => {
 
   it('inherits the cooldown from the party claim itself when no member holds a lock', () => {
     const sim = makeSim();
-    const leader = sim.addPlayer('warrior', 'ClaimHolder', { characterId: 210 });
+    const leader = sim.addPlayer('warrior', 'ClaimHolder', {
+      characterId: 210,
+    });
     const member = sim.addPlayer('warrior', 'Second', { characterId: 211 });
     sim.partyInvite(member, leader);
     sim.partyAccept(member);
@@ -788,7 +787,9 @@ describe('dungeons: heroic difficulty', () => {
     // cannot mint a fresh run (the laundering exploit's actual payoff).
     sim.time += 10;
     sim.setDungeonDifficulty('normal', farmer);
-    const helper = sim.addPlayer('warrior', 'CleanHelper', { characterId: 232 });
+    const helper = sim.addPlayer('warrior', 'CleanHelper', {
+      characterId: 232,
+    });
     sim.partyInvite(helper, farmer);
     sim.partyAccept(helper);
     sim.drainEvents();
@@ -811,8 +812,12 @@ describe('dungeons: heroic difficulty', () => {
   it('lets a ghost corpse-run back into the party claim past a partymate reset lock', () => {
     const sim = makeSim();
     const leader = sim.addPlayer('warrior', 'RunLeader', { characterId: 220 });
-    const runner = sim.addPlayer('warrior', 'CorpseGhost', { characterId: 221 });
-    const locked = sim.addPlayer('warrior', 'RecentReset', { characterId: 222 });
+    const runner = sim.addPlayer('warrior', 'CorpseGhost', {
+      characterId: 221,
+    });
+    const locked = sim.addPlayer('warrior', 'RecentReset', {
+      characterId: 222,
+    });
     // The future recruit earns a reset lock on their own solo claim first.
     enterDungeon(sim.ctx, 'hollow_crypt', locked);
     leaveDungeon(sim.ctx, locked);
@@ -1721,7 +1726,6 @@ describe('dungeons: heroic daily lockouts', () => {
       noPlayer: true,
       lockoutNowMs: () => now,
       raidResetMs: () => now + 24 * 3600 * 1000,
-      world: DUNGEON_TEST_WORLD,
     }) as AnySim;
     sim.utcDay = '2026-07-12';
     const pid = sim.addPlayer('warrior', 'Raider');
@@ -3166,7 +3170,9 @@ describe('dungeons: Ignivar linked-room family in Reset All Instances (issue #37
 
   it('reclaims only the lift immediately; a deeper Ignivar room is freed, not preserved, so a difficulty switch cannot skip re-clearing the chain', () => {
     const sim = makeSim();
-    const leader = sim.addPlayer('warrior', 'ClearRaider', { characterId: 502 });
+    const leader = sim.addPlayer('warrior', 'ClearRaider', {
+      characterId: 502,
+    });
     const key = instanceKeyFor(sim.ctx, leader);
     const lift = familyClaim(sim, 'ignivar_forge_lift', key);
     const arena = familyClaim(sim, 'ignivar_raid_arena', key);
@@ -3191,7 +3197,9 @@ describe('dungeons: Ignivar linked-room family in Reset All Instances (issue #37
 
   it("blocks a normal-tier reset while the raid room's own WEEKLY lockout still applies (Ignivar arm)", () => {
     const sim = makeSim();
-    const leader = sim.addPlayer('warrior', 'WeeklyLocked', { characterId: 503 });
+    const leader = sim.addPlayer('warrior', 'WeeklyLocked', {
+      characterId: 503,
+    });
     const key = instanceKeyFor(sim.ctx, leader);
     const lift = familyClaim(sim, 'ignivar_forge_lift', key);
     lift.difficulty = 'heroic';

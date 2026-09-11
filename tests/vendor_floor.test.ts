@@ -515,14 +515,17 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
   // hand-written pairing table alone lets a one-for-one stock swap (a
   // conjured-tier food traded in for a reagent row, say) bypass the ladder
   // with every other arm still green.
-  it('the vendor-stocked foodHp set is exactly the eight classified foods', () => {
+  it('the vendor-stocked foodHp set is exactly the ten classified foods', () => {
     expect(vendorStockedIdsBy(NPCS, (id) => liveMagnitude(id, 'foodHp') !== undefined)).toEqual([
+      // FORK: + the Scorching Wastes counters' two foods (lastwell_datewine, sunbaked_flatbread).
       'baked_bread',
       'brightwood_venison',
       'fenbridge_rye',
+      'lastwell_datewine',
       'roast_mountain_goat',
       'roasted_boar',
       'smoked_eel',
+      'sunbaked_flatbread',
       'tough_jerky',
       'trail_hardtack',
     ]);
@@ -598,6 +601,10 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
       'silvermist_cordial',
       'meltwater_flask',
       'glacier_melt',
+      // FORK: the Scorching Wastes counters (content/scorching_wastes).
+      'cactus_pressed_water',
+      'lastwell_datewine',
+      'sunbaked_flatbread',
     ]);
     expect(stocked).toEqual([...classified].sort());
   });
@@ -708,12 +715,14 @@ describe('no crafted counterpart: the vendor drink line', () => {
     expect(craftedDrinks).toEqual([]);
   });
 
-  it('the vendor-stocked drinkMana set is exactly the five drinks', () => {
+  it('the vendor-stocked drinkMana set is exactly the six drinks', () => {
     const stockedDrinks = vendorStockedIdsBy(
       NPCS,
       (itemId) => liveMagnitude(itemId, 'drinkMana') !== undefined,
     );
     expect(stockedDrinks).toEqual([
+      // FORK: + cactus_pressed_water (Scorching Wastes).
+      'cactus_pressed_water',
       'glacier_melt',
       'marsh_mint_tea',
       'meltwater_flask',
@@ -826,6 +835,18 @@ describe('stock rows: the phase 11n pulls', () => {
       fury: 47,
       stablemaster_marla: 2,
       wardsmith_orun: 3,
+      // FORK vendors: Deepglass stallkeepers, Scorching Wastes, Tidehold market.
+      dg_stallkeeper_favors: 2,
+      dg_stallkeeper_pies: 4,
+      dg_stallkeeper_tonics: 3,
+      forgemaster_derin: 5,
+      provisioner_ashka: 5,
+      th_armourer: 4,
+      th_market_bags: 2,
+      th_market_pies: 4,
+      th_market_reagents: 5,
+      th_market_tonics: 4,
+      th_smith: 3,
     });
   });
 });

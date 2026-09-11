@@ -47,6 +47,7 @@ import {
   shoreWaterGate,
 } from './shore_water_gate_core';
 import { meshTerrainHeight } from './terrain_mesh_height';
+import { paintTintAt } from './terrain_paint_tint';
 import { BIOME_PALETTE, ROCK_SLOPE_START, TERRAIN_TONES } from './terrain_palette';
 
 /** Square far-mesh tile edge, world units. Divisible by every tier spacing.
@@ -754,6 +755,20 @@ export function farGroundColor(
     const alt = softRamp(h, 12, 42, cellRise);
     lerp3(out, TONE.hazyPeak, rim * (FAR_RIM_TINT_BASE + alt * FAR_RIM_TINT_ALT));
     grassW *= 1 - rim * 0.85;
+  }
+
+  // The map's PAINT layer: the same authored ground the near chunks draw
+  // (terrain_paint_tint.ts), so a painted plaza reads stone from a kilometre
+  // out instead of popping from meadow-green when its detail chunks stream in.
+  // One tap — the far mesh's own vertex spacing is coarser than any feather.
+  const paint = paintTintAt(x, z);
+  if (paint) {
+    const t = paint.strength;
+    out[0] += (paint.r - out[0]) * t;
+    out[1] += (paint.g - out[1]) * t;
+    out[2] += (paint.b - out[2]) * t;
+    if (paint.snow > 0) lerp3(out, TONE.snowCap, paint.snow * 0.6);
+    grassW *= 1 - t;
   }
   return grassW;
 }

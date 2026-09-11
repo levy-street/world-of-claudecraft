@@ -217,7 +217,9 @@ describe('release v0.39 icon-art first-pass lineage', () => {
   });
 
   it('keeps public mapping provenance identical to the sealed acceptance record', () => {
-    const record = JSON.parse(readFileSync(recordPath, 'utf8')) as { assets: AcceptedAsset[] };
+    const record = JSON.parse(readFileSync(recordPath, 'utf8')) as {
+      assets: AcceptedAsset[];
+    };
     const petMapping = JSON.parse(
       readFileSync(path.join(repoRoot, 'public/ui/skills/pet/mapping.json'), 'utf8'),
     ) as {
@@ -449,7 +451,10 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         hotbarItems: { live: number; painted: number };
       };
     };
-    const liveAbilityIds = Object.keys(ABILITIES);
+    // FORK: the four Deepball abilities (dg_*) live on the arena's own HUD strip
+    // with no inventory icon painting; they sit outside the sealed icon-art
+    // lineage this record describes, so the census reads the release roster.
+    const liveAbilityIds = Object.keys(ABILITIES).filter((id) => !id.startsWith('dg_'));
     const paintedAbilityIds = new Set(
       liveAbilityIds.filter((id) => shippingImageExists(abilityImageUrl(id))),
     );
@@ -494,7 +499,8 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
     ).toHaveLength(97);
-    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
+    // FORK: the three Scorching Wastes counter consumables are ITEM_ART_PENDING debt.
+    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(3);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
       'no pending hotbar item ships committed art (a stale ITEM_ART_PENDING entry)',
@@ -503,6 +509,9 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       artSubjectHotbarItemIds.filter((id) => !paintedHotbarItemIds.has(id)),
       'every art-subject hotbar item resolves to committed painted art',
     ).toEqual([]);
-    expect(aggregate.runtimeClosure.hotbarItems).toEqual({ live: 81, painted: 81 });
+    expect(aggregate.runtimeClosure.hotbarItems).toEqual({
+      live: 81,
+      painted: 81,
+    });
   });
 });

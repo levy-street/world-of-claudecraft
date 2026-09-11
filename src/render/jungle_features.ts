@@ -21,6 +21,7 @@ import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface JungleFeaturesView {
@@ -242,8 +243,10 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
 
   // --- the palms: the three beach models instanced across the strand, each
   // at the deterministic spot (world.ts) the sim also gives a trunk collider,
-  // so the strand you walk matches the one the sim blocks ---
-  {
+  // so the strand you walk matches the one the sim blocks. Skipped whole when
+  // the document owns the strand as placements: drawing it here as well put a
+  // second, unpickable palm inside every movable one. ---
+  if (!activeWorldPromoted('reachPalms')) {
     const byVariant: ReachPalm[][] = [[], [], []];
     for (const sp of reachPalmSpots(seed)) byVariant[sp.variant]?.push(sp);
     const m = new THREE.Matrix4();
@@ -272,7 +275,9 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
   }
 
   // --- the fallen coconuts: clusters dropped around the palm trunks ---
-  instanceProp('coconuts', reachCoconutSpots(seed));
+  // Stands down when the document owns the coconut clusters as placements.
+  if (!activeWorldPromoted('jungleCoconuts'))
+    instanceProp('coconuts', reachCoconutSpots(seed));
 
   // --- the still water dressing: lily rafts and reeds on the lakes ---
   {
@@ -358,26 +363,33 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     const rootParts: THREE.BufferGeometry[] = [];
     const barkMat = mat(0x6a5a48, 0.92);
     const trees = PALMREACH_PROPS.greatTrees ?? [];
+    // The document may own the giants themselves as placements. Only the TRUNK
+    // stands down then: the buttress roots and the vine curtain are ground
+    // dressing with no placement of their own, and a banyan without them reads
+    // as a plain elder set down on the sand.
+    const trunksArePlacements = activeWorldPromoted('greatTrees');
     if (greatTreeScene) {
       for (const t of trees) {
         const y = terrainHeight(t.x, t.z, seed);
         if (y < WATER_LEVEL) continue;
-        const tree = greatTreeScene.clone(true);
         const scale = t.r * (2.5 + hash2(t.x, t.z, seed + 5201) * 0.5);
-        tree.position.set(t.x, y - 0.2, t.z);
-        tree.scale.setScalar(scale);
-        tree.rotation.y = hash2(t.z, t.x, seed + 5211) * Math.PI * 2;
-        tree.traverse((obj) => {
-          const mesh = obj as THREE.Mesh;
-          if (mesh.isMesh) {
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            mesh.material = Array.isArray(mesh.material)
-              ? mesh.material.map(lushen)
-              : lushen(mesh.material);
-          }
-        });
-        group.add(tree);
+        if (!trunksArePlacements) {
+          const tree = greatTreeScene.clone(true);
+          tree.position.set(t.x, y - 0.2, t.z);
+          tree.scale.setScalar(scale);
+          tree.rotation.y = hash2(t.z, t.x, seed + 5211) * Math.PI * 2;
+          tree.traverse((obj) => {
+            const mesh = obj as THREE.Mesh;
+            if (mesh.isMesh) {
+              mesh.castShadow = true;
+              mesh.receiveShadow = true;
+              mesh.material = Array.isArray(mesh.material)
+                ? mesh.material.map(lushen)
+                : lushen(mesh.material);
+            }
+          });
+          group.add(tree);
+        }
         // the buttress roots: tapered flares leaning into the trunk base,
         // so the giant reads rooted instead of set down
         const roots = 5 + Math.floor(hash2(t.z, t.x, seed + 5271) * 3);

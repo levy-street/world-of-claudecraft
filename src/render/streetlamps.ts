@@ -45,13 +45,14 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { streetlampPlacements } from '../sim/colliders';
 import { getActiveWorldContent } from '../sim/data';
 import { lampFixtureYaw, type PlacedStreetlamp } from '../sim/streetlamp_layout';
-import type { StreetlampStyleId } from '../sim/streetlamp_style';
+import { STREETLAMP_FIXTURE_HEIGHT, type StreetlampStyleId } from '../sim/streetlamp_style';
 import { terrainHeight } from '../sim/world';
 import { attachBiomeHaze } from './biome_haze_field';
 import { GFX } from './gfx';
 import { buildDrapedGlowGeometry, type GlowPatchSite } from './ground_glow_patch';
 import { hasNightLightField, registerStaticNightLights } from './night_light_field';
 import { STREETLAMP_ASSET_DEFS, streetlampAsset } from './streetlamp_assets';
+import { STREETLAMP_FIXTURE } from './streetlamp_fixture.generated';
 import { type StreetlampEmissiveState, updateStreetlampEmissive } from './streetlamp_emissive';
 import { radialGlowTexture } from './textures';
 
@@ -167,6 +168,59 @@ function ironMaterial(): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial 
   return material;
 }
 
+/**
+ * The road light for a world whose DOCUMENT owns the lamps as placements
+ * (promotedScenery.streetlamps): the placed GLBs draw the fixtures, and this
+ * re-anchors each night light on its placement's socket — position, yaw and
+ * scale read off the placement, socket offsets off the build-time measurement
+ * table, so a maker who moves a lamp moves its road light with it (rebound at
+ * the next engine build).
+ */
+function promotedLampNightLights(seed: number) {
+  const content = getActiveWorldContent();
+  if (content.promotedScenery?.streetlamps !== true) return [];
+  const out: {
+    x: number;
+    y: number;
+    z: number;
+    radius: number;
+    r: number;
+    g: number;
+    b: number;
+    intensity: number;
+    flicker: number;
+  }[] = [];
+  for (const placement of content.placements ?? []) {
+    const style = /\/streetlamp_([a-z0-9_]+)\.glb$/.exec(placement.path)?.[1] as
+      | StreetlampStyleId
+      | undefined;
+    if (!style) continue;
+    const fixture = STREETLAMP_FIXTURE[style];
+    const def = STREETLAMP_ASSET_DEFS[style];
+    if (!fixture || !def) continue;
+    // The socket table lives in the fixture's 5.5yd-tall space; the placed
+    // copy renders at unitHeight * placement.scale, so this rescales the
+    // offsets onto the actual model (1.0 at the promoted default scale).
+    const rescale = ((placement.scale || 1) * fixture.unitHeight) / STREETLAMP_FIXTURE_HEIGHT;
+    const [ox, oy, oz] = fixture.socket;
+    const yaw = placement.rotY || 0;
+    const c = Math.cos(yaw);
+    const s = Math.sin(yaw);
+    out.push({
+      x: placement.x + (ox * c + oz * s) * rescale,
+      y: terrainHeight(placement.x, placement.z, seed) + oy * rescale,
+      z: placement.z + (-ox * s + oz * c) * rescale,
+      radius: FIELD_RADIUS,
+      r: def.fieldColor[0],
+      g: def.fieldColor[1],
+      b: def.fieldColor[2],
+      intensity: FIELD_INTENSITY,
+      flicker: FIELD_FLICKER,
+    });
+  }
+  return out;
+}
+
 export function buildStreetlamps(seed = 0): StreetlampsView {
   const group = new THREE.Group();
   group.name = 'streetlamps';
@@ -184,7 +238,10 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
   // planted posts on.
   const placements = streetlampPlacements(seed);
   if (placements.length === 0) {
-    registerStaticNightLights('streetlamps', []);
+    // A document that owns the lamps as placements binds the plan empty
+    // (colliders.ts): the placed GLBs draw the fixtures, so only the road
+    // light is re-registered here, anchored on each placement's own socket.
+    registerStaticNightLights('streetlamps', promotedLampNightLights(seed));
     return { group, glowLights, cullGroups, update: () => undefined };
   }
 

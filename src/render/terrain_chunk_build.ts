@@ -34,11 +34,17 @@ import {
   ZONES,
 } from '../sim/data';
 import { fbm2 } from '../sim/rng';
-import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
-import { impactCraterTerrainBlend } from './impact_terrain';
+import { cutBounds, cutsInRect, cutsSdfAt, inTerrainCut } from '../sim/terrain_cuts';
+import type { TerrainCut } from '../sim/types';
+import { roadDistance, waterLevel, zoneBiomeAt } from '../sim/world';
+import { isBuiltinWorldActive } from '../sim/data';
+import { impactCraterTerrainBlend, type ImpactCraterTerrainBlend } from './impact_terrain';
 import { clamp01 } from './num_clamp';
 import { makeShoreProbe, type ShoreProbe, shoreWaterGate } from './shore_water_gate_core';
+import { buildCutClip, CUT_CELL_KEEP, type CutClipResult } from './terrain_cut_clip_core';
+import { buildCutRim, type CutRimArrays } from './terrain_cut_rim_core';
 import { meshTerrainHeight } from './terrain_mesh_height';
+import { paintTintAt } from './terrain_paint_tint';
 import { BIOME_PALETTE, ROCK_SLOPE_START, TERRAIN_TONES } from './terrain_palette';
 
 const SKIRT_DROP = 0.3;
@@ -68,6 +74,7 @@ const dirtC = new THREE.Color(),
 const dirtDarkC = new THREE.Color(TERRAIN_TONES.dirtDark);
 const rockC = new THREE.Color(TERRAIN_TONES.rock);
 const wetRockC = new THREE.Color(TERRAIN_TONES.wetRock); // dark wet-rock shoreline (peaks/volcano/cave)
+const NO_IMPACT: ImpactCraterTerrainBlend = { ash: 0, scorch: 0, dirt: 0, rock: 0 };
 const impactAshC = new THREE.Color(0x18110d);
 const impactScorchC = new THREE.Color(0x2a160c);
 const hazyPeakC = new THREE.Color(TERRAIN_TONES.hazyPeak); // world-rim mountains, atmospheric
@@ -81,6 +88,8 @@ const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
 const snowCapC = new THREE.Color(TERRAIN_TONES.snowCap);
 const lowSunC = new THREE.Color(0xe7d9a5);
 const lowShadeC = new THREE.Color(0x60745b);
+// Paint-layer scratch (centre-tap bridge: see the paint block below).
+const paintC = new THREE.Color();
 const zonePalettes = ZONES.map((zn) => {
   const p = BIOME_PALETTE[zn.biome];
   return {
@@ -249,7 +258,12 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   paletteAt(x, z);
   const biome = zoneBiomeAt(x, z);
   const w: [number, number, number, number] = [1, 0, 0, 0];
-  const impact = impactCraterTerrainBlend(x, z);
+  // The Mirefen crater's scorch is a built-in-world landmark: an authored map
+  // over its coordinates keeps clean ground (the worker's module copy of the
+  // content is the shipped one, so this reads the same answer on every thread).
+  const impact: ImpactCraterTerrainBlend = isBuiltinWorldActive()
+    ? impactCraterTerrainBlend(x, z)
+    : NO_IMPACT;
 
   // base grass with patchy variation: a coarse fbm layer for dry/lush
   // patches plus a fine one for grain, replacing the old pure-sine tint
@@ -312,10 +326,15 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   // instead), rocky/ashen biomes get a darker wet-rock tint, everywhere else
   // keeps the classic sandy bank. Color and splat weight share one feathered
   // falloff so the shore blends out instead of cutting a razor-hard edge.
+  // The ACTIVE level, not the constant: this band IS the beach, so pinning it
+  // to the built-in waterline painted sand where a custom map has no water and
+  // left its real shoreline bare. The shipped world has no override, so
+  // waterLevel() is WATER_LEVEL there and its ground is byte-identical.
+  //
   // Gated on water actually being there by the same rule the far vista uses
   // (shore_water_gate_core), so a dry inland dip at beach elevation (the Wolf
   // Run basin) reads as plain ground instead of a pale coast.
-  const wl = WATER_LEVEL;
+  const wl = waterLevel();
   let shore = clamp01((wl + 1.6 - h) / 1.6);
   if (shore > 0) shore *= shoreWaterGate(x, z, h, wl, shoreProbeFor(seed));
   if (biome === 'marsh') {
@@ -463,7 +482,9 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     const green = passT * clamp01((Math.abs(x) - 95) / 85);
     const snowline = 1 - green;
     if (green > 0) cTmp.lerp(emberForestC, green * 0.8);
-    const blanket = clamp01((h - (WATER_LEVEL + 1.2)) / 3) * snowline;
+    // Same reason as the shore band: the snow starts just above the waterline,
+    // so it has to be the ACTIVE one or a raised sea leaves a white skirt in it.
+    const blanket = clamp01((h - (waterLevel() + 1.2)) / 3) * snowline;
     cTmp.lerp(snowCapC, 0.8 * blanket);
     snow = Math.max(snow, 0.85 * blanket);
   }
@@ -525,6 +546,43 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   // to never read as a patch, only as regions that feel different.
   const toneDrift = fbm2(x * 0.008, z * 0.008, seed + 97, 2);
   cTmp.multiplyScalar(0.95 + toneDrift * 0.1);
+
+  // The map's PAINT layer, last: an authored ground truth that beats every
+  // natural rule above (dry patches, hub discs, even the snow line). Four
+  // diagonal taps average the cell grid so a painted boundary feathers over
+  // ~3 yards instead of pixelating at the paint cell size. Swatches resolve
+  // to a tint + a splat layer + the shader's snow channel — see
+  // terrain_paint_tint.ts for what this is (and is not) of the fork's full
+  // custom-texture atlas.
+  {
+    // CENTRE tap only: a vertex takes the paint's tint/layer/snow ONLY when
+    // its own position is inside a painted cell. The old four diagonal taps
+    // at +-1.6yd smeared the shifted splat layer BEYOND the painted cells,
+    // and once the fragment paint stopped exactly at the cell border the
+    // smear showed uncovered: a pale rock ring traced around every rock-like
+    // painted region ("painting the cliff around the edges of my texture").
+    // Vertex interpolation into the unpainted neighbours still feathers the
+    // shift across one triangle, and the fragment paint covers everything
+    // inside the cells.
+    const fx = paintTintAt(x, z);
+    if (fx) {
+      // A TEXTURED swatch is rendered by the fragment tile array, which now
+      // covers its cells completely - shifting the vertex tint/splat toward
+      // it here only bleeds one vertex ring PAST the painted cells (splat
+      // weights interpolate across triangles), which showed as a rock rim
+      // around rock-like paint. Colour-only swatches still need the vertex
+      // path (it is their whole render), and Snow-family swatches ride the
+      // dedicated snow channel either way.
+      if (!fx.textured) {
+        paintC.setRGB(fx.r, fx.g, fx.b);
+        cTmp.lerp(paintC, Math.min(1, fx.strength));
+        const pLayer = fx.layer;
+        if (pLayer !== -1) lerpSplat(w, pLayer, Math.min(1, fx.strength));
+      }
+      if (fx.snow > 0) snow = Math.max(snow, fx.snow);
+    }
+  }
+
   // mud rides the dirt layer wherever the marsh palette is active
   const mud = marshWeightAt(x, z);
   if (lowShade) {
@@ -563,9 +621,46 @@ export interface ChunkGeometryArrays {
   splats: Float32Array | null;
   extras: Float32Array | null;
   indices: Uint16Array;
+  /** The skirt band around any boolean cut crossing this chunk, or null when
+   *  none does (every map without cuts, and most chunks of a map with them).
+   *  finishChunkGeometry welds it into the same BufferGeometry at rock splat
+   *  weights, so it draws through the terrain material rather than needing a
+   *  second mesh in the streaming lifecycle. */
+  rim: CutRimArrays | null;
+  /** The fine-clipped surface patch over the cells the cut contour crosses
+   *  (attribute-complete: interpolated from the chunk's own vertices), welded
+   *  beside the rim. Null when no contour crosses the chunk. */
+  clip: CutClipAttrArrays | null;
 }
 
-export interface ChunkGeometryBuildState extends ChunkGeometryArrays {
+/** The clipped boundary patch with the full vertex layout of the chunk it
+ *  belongs to, ready to weld into the same BufferGeometry. */
+export interface CutClipAttrArrays {
+  positions: Float32Array;
+  normals: Float32Array;
+  colors: Float32Array;
+  uvs: Float32Array;
+  splats: Float32Array | null;
+  extras: Float32Array | null;
+  indices: Uint32Array;
+}
+
+/**
+ * The boolean cuts this chunk must honour, plus the patches that undo them.
+ * Both arrays are the DOCUMENT's own (sim/ground_sheets.ts effectiveTerrainCuts
+ * merges the maker's cuts with every self-carving cave's bore), so the quads
+ * this mesher drops and the ground sheet sim movement resolves come from one
+ * evaluator over one list. That is the whole contract: a cut the renderer
+ * honours and the sim does not is an invisible wall.
+ */
+export interface ChunkCutSet {
+  cuts: readonly TerrainCut[];
+  patches?: readonly TerrainCut[];
+}
+
+// The rim and clip are produced AFTER the grid is filled (buildChunkCutFine
+// reads the finished state), so they are not part of the build state itself.
+export interface ChunkGeometryBuildState extends Omit<ChunkGeometryArrays, 'rim' | 'clip'> {
   nx: number;
   nz: number;
   gw: number;
@@ -580,12 +675,43 @@ export interface ChunkGeometryBuildState extends ChunkGeometryArrays {
   /** GFX.lowPlus && !GFX.terrainSplat, resolved by the CALLER: gfx.ts reads
    *  document/navigator, so a worker would resolve a different tier. */
   lowShade: boolean;
+  /** Null on every map with no cuts, which is the fast path the shipped world
+   *  and every unedited document take. */
+  cutSet: ChunkCutSet | null;
+  /** Lazy cache of the fine-clip classification + geometry (see ensureCutClip):
+   *  undefined = not computed yet, null = computed and the cuts never open
+   *  this chunk's surface. */
+  cutClip?: {
+    ci0: number;
+    cj0: number;
+    cw: number;
+    ch: number;
+    result: CutClipResult;
+  } | null;
   sampleCache: Map<number, VertexSample>;
   /** The shared height lattice: (nx+3) x (nz+3) heights covering the vertex
    *  grid plus a one-cell margin ring for the normal stencil, each height
    *  computed once (see ensureHeightRow). */
   heights: Float32Array;
   heightRowDone: Uint8Array;
+}
+
+/** The subset of a cut set that can touch a chunk's rect, or null when none
+ *  can. Null is the mesher's fast path: no per-quad test at all. */
+function narrowCutSet(
+  set: ChunkCutSet | null,
+  minX: number,
+  minZ: number,
+  maxX: number,
+  maxZ: number,
+): ChunkCutSet | null {
+  if (!set) return null;
+  const cuts = cutsInRect(set.cuts, minX, minZ, maxX, maxZ);
+  if (!cuts) return null;
+  // Patches only ever REMOVE a cut, so a patch outside the rect changes
+  // nothing here; narrowing them the same way keeps the inner loop short.
+  const patches = cutsInRect(set.patches, minX, minZ, maxX, maxZ);
+  return patches ? { cuts, patches } : { cuts };
 }
 
 export function beginChunkGeometry(
@@ -597,6 +723,7 @@ export function beginChunkGeometry(
   withSplat: boolean,
   skirtSpan: number,
   lowShade: boolean,
+  cutSet: ChunkCutSet | null = null,
 ): ChunkGeometryBuildState {
   const nx = Math.max(4, Math.round(size / spacing));
   const nz = nx;
@@ -641,6 +768,10 @@ export function beginChunkGeometry(
     splats,
     extras,
     indices,
+    // Narrow to the cuts whose footprint can actually reach this chunk (plus
+    // the skirt ring), so a map with sixty openings does not evaluate all of
+    // them per quad on every chunk in the world.
+    cutSet: narrowCutSet(cutSet, x0 - stepX, z0 - stepZ, x0 + size + stepX, z0 + size + stepZ),
     sampleCache: new Map<number, VertexSample>(),
     heights: new Float32Array((nx + 3) * (nz + 3)),
     heightRowDone: new Uint8Array(nz + 3),
@@ -693,6 +824,88 @@ export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): 
   }
 }
 
+// Target edge length for the fine-clip sub-grid: fine enough that the contour
+// reads smooth, capped so a far-band super-spacing cannot explode the lattice.
+const CUT_CLIP_TARGET = 0.4;
+
+/**
+ * The fine-clip classification + geometry for this chunk's cuts, computed once
+ * on first use (all vertex rows are filled before the first index row in every
+ * build path, so the corner heights are ready). Interior cells only; the skirt
+ * ring keeps the old centre test.
+ */
+export function ensureCutClip(state: ChunkGeometryBuildState): ChunkGeometryBuildState['cutClip'] {
+  if (state.cutClip !== undefined) return state.cutClip;
+  const set = state.cutSet;
+  if (!set) {
+    state.cutClip = null;
+    return null;
+  }
+  const { nx, nz, x0, z0, stepX, stepZ, gw } = state;
+  // Cell window: the union footprint of every cut, one cell of margin, clamped
+  // to the interior grid.
+  let minX = Number.POSITIVE_INFINITY;
+  let minZ = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxZ = Number.NEGATIVE_INFINITY;
+  for (const cut of set.cuts) {
+    const b = cutBounds(cut);
+    minX = Math.min(minX, b.minX);
+    maxX = Math.max(maxX, b.maxX);
+    minZ = Math.min(minZ, b.minZ);
+    maxZ = Math.max(maxZ, b.maxZ);
+  }
+  const ci0 = Math.max(0, Math.floor((minX - x0) / stepX) - 1);
+  const ci1 = Math.min(nx - 1, Math.floor((maxX - x0) / stepX) + 1);
+  const cj0 = Math.max(0, Math.floor((minZ - z0) / stepZ) - 1);
+  const cj1 = Math.min(nz - 1, Math.floor((maxZ - z0) / stepZ) + 1);
+  if (ci1 < ci0 || cj1 < cj0) {
+    state.cutClip = null;
+    return null;
+  }
+  const positions = state.positions;
+  const cornerHeightAt = (ci: number, cj: number): number =>
+    positions[((cj + 1) * gw + ci + 1) * 3 + 1];
+  const fieldAt = (x: number, y: number, z: number): number => {
+    const d = cutsSdfAt(set.cuts, x, y, z);
+    if (!set.patches || set.patches.length === 0) return d;
+    return Math.max(d, -cutsSdfAt(set.patches, x, y, z));
+  };
+  // Carve cuts get NO skirt at all: their cavity mesh is the real wall,
+  // clipped to the same surface, so the ground flows straight into the
+  // interior — a band here just hung inside the opening wearing streaked
+  // surface-projected paint (and its dense sub-lattice quads read as a
+  // "cursed" wireframe ring). A contour segment belongs to a carve when the
+  // carve-only field is (near) zero at its midpoint; depth 0 skips it.
+  const carves = set.cuts.filter((c) => c.carve === true);
+  const rimDepthAt =
+    carves.length === 0
+      ? undefined
+      : (x: number, z: number): number => {
+          const y = meshTerrainHeight(x, z, state.seed);
+          return Math.abs(cutsSdfAt(carves, x, y, z)) <= 0.3 ? 0 : CUT_RIM_DEPTH;
+        };
+  const result = buildCutClip({
+    x0,
+    z0,
+    nx,
+    nz,
+    stepX,
+    stepZ,
+    ci0,
+    cj0,
+    ci1,
+    cj1,
+    sub: Math.max(1, Math.min(16, Math.round(Math.max(stepX, stepZ) / CUT_CLIP_TARGET))),
+    rimDepth: CUT_RIM_DEPTH,
+    rimDepthAt,
+    cornerHeightAt,
+    fieldAt,
+  });
+  state.cutClip = result ? { ci0, cj0, cw: ci1 - ci0 + 1, ch: cj1 - cj0 + 1, result } : null;
+  return state.cutClip;
+}
+
 export function fillChunkIndexRow(state: ChunkGeometryBuildState, gj: number): void {
   const quadsX = state.gw - 1;
   const quadsZ = state.gh - 1;
@@ -717,6 +930,43 @@ export function fillChunkIndexRow(state: ChunkGeometryBuildState, gj: number): v
     const hb = state.positions[b * 3 + 1];
     const hc = state.positions[c * 3 + 1];
     const hd = state.positions[d * 3 + 1];
+    // A boolean cut removes the ground sheet. Interior cells go through the
+    // fine-clip classification (terrain_cut_clip_core.ts): fully-inside cells
+    // drop, contour cells drop here and are re-tessellated CLIPPED to the
+    // contour by buildChunkCutFine, so the opening's edge is smooth at any
+    // spacing instead of a staircase of whole quads. The index buffer keeps
+    // its fixed six-index slot per cell (the tile offsets above depend on it),
+    // so "dropped" is a degenerate triangle. Skirt-ring quads keep the old
+    // centre test: their geometry is border padding, not visible ground.
+    if (state.cutSet) {
+      const i = gi - 1;
+      const j = gj - 1;
+      if (i >= 0 && i < state.nx && j >= 0 && j < state.nz) {
+        const clip = ensureCutClip(state);
+        if (clip) {
+          const ci = i - clip.ci0;
+          const cj = j - clip.cj0;
+          if (
+            ci >= 0 &&
+            ci < clip.cw &&
+            cj >= 0 &&
+            cj < clip.ch &&
+            clip.result.kinds[cj * clip.cw + ci] !== CUT_CELL_KEEP
+          ) {
+            for (let n = 0; n < 6; n++) state.indices[k++] = a;
+            continue;
+          }
+        }
+      } else {
+        const cx = (state.positions[a * 3] + state.positions[d * 3]) / 2;
+        const cz = (state.positions[a * 3 + 2] + state.positions[d * 3 + 2]) / 2;
+        const cy = (ha + hb + hc + hd) / 4;
+        if (inTerrainCut(state.cutSet.cuts, cx, cz, cy, state.cutSet.patches)) {
+          for (let n = 0; n < 6; n++) state.indices[k++] = a;
+          continue;
+        }
+      }
+    }
     if (Math.abs(hb - hc) <= Math.abs(ha - hd)) {
       state.indices[k++] = a;
       state.indices[k++] = c;
@@ -733,4 +983,127 @@ export function fillChunkIndexRow(state: ChunkGeometryBuildState, gj: number): v
       state.indices[k++] = b;
     }
   }
+}
+
+// How far a cut's rim band hangs below the surface. Deep enough that a
+// gameplay camera cannot see under the ground sheet through the opening; past
+// that the cave shell behind it (render/cave_mesh.ts) takes over.
+const CUT_RIM_DEPTH = 6;
+
+/**
+ * The rim band for whatever cuts cross this chunk, or null when none do.
+ * Runs on the chunk's own grid, so the contour lands exactly where the dropped
+ * quads left off, and samples the SAME field as inTerrainCut: patches subtract
+ * from the union (max(cut, -patch)), which is the signed-distance spelling of
+ * "a patch beats every cut it overlaps".
+ */
+export function buildChunkCutRim(state: ChunkGeometryBuildState): CutRimArrays | null {
+  const set = state.cutSet;
+  if (!set) return null;
+  const { seed, nx, nz, x0, z0, stepX, stepZ } = state;
+  const heightAt = (x: number, z: number): number => meshTerrainHeight(x, z, seed);
+  return buildCutRim({
+    x0,
+    z0,
+    nx,
+    nz,
+    stepX,
+    stepZ,
+    depth: CUT_RIM_DEPTH,
+    heightAt,
+    fieldAt: (x, z) => {
+      const y = heightAt(x, z);
+      const d = cutsSdfAt(set.cuts, x, y, z);
+      if (!set.patches || set.patches.length === 0) return d;
+      return Math.max(d, -cutsSdfAt(set.patches, x, y, z));
+    },
+  });
+}
+
+/**
+ * The fine cut geometry for this chunk: the rim band walked on the sub-grid
+ * lattice, and the clipped surface patch over the contour cells with the
+ * chunk's own vertex attributes interpolated across it. Both come from ONE
+ * classification (ensureCutClip), the same one fillChunkIndexRow used to drop
+ * quads, so the three pieces meet without cracks by construction.
+ */
+export function buildChunkCutFine(state: ChunkGeometryBuildState): {
+  rim: CutRimArrays | null;
+  clip: CutClipAttrArrays | null;
+} {
+  const cached = ensureCutClip(state);
+  if (!cached) return { rim: null, clip: null };
+  const surf = cached.result.surf;
+  let clip: CutClipAttrArrays | null = null;
+  if (surf) {
+    const { nx, nz, x0, z0, stepX, stepZ, gw, worldDepth } = state;
+    const count = surf.positions.length / 3;
+    const normals = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const uvs = new Float32Array(count * 2);
+    const splats = state.splats ? new Float32Array(count * 4) : null;
+    const extras = state.extras ? new Float32Array(count * 4) : null;
+    for (let v = 0; v < count; v++) {
+      const x = surf.positions[v * 3];
+      const z = surf.positions[v * 3 + 2];
+      const fx = Math.max(0, Math.min(nx - 1e-9, (x - x0) / stepX));
+      const fz = Math.max(0, Math.min(nz - 1e-9, (z - z0) / stepZ));
+      const ci = fx | 0;
+      const cj = fz | 0;
+      const tx = fx - ci;
+      const tz = fz - cj;
+      const w00 = (1 - tx) * (1 - tz);
+      const w10 = tx * (1 - tz);
+      const w01 = (1 - tx) * tz;
+      const w11 = tx * tz;
+      const v00 = (cj + 1) * gw + ci + 1;
+      const v10 = v00 + 1;
+      const v01 = v00 + gw;
+      const v11 = v01 + 1;
+      const lerp3 = (src: Float32Array, dst: Float32Array): void => {
+        for (let c = 0; c < 3; c++) {
+          dst[v * 3 + c] =
+            src[v00 * 3 + c] * w00 +
+            src[v10 * 3 + c] * w10 +
+            src[v01 * 3 + c] * w01 +
+            src[v11 * 3 + c] * w11;
+        }
+      };
+      lerp3(state.normals, normals);
+      const nlen = Math.hypot(normals[v * 3], normals[v * 3 + 1], normals[v * 3 + 2]);
+      if (nlen > 1e-9) {
+        normals[v * 3] /= nlen;
+        normals[v * 3 + 1] /= nlen;
+        normals[v * 3 + 2] /= nlen;
+      } else {
+        normals[v * 3] = 0;
+        normals[v * 3 + 1] = 1;
+        normals[v * 3 + 2] = 0;
+      }
+      lerp3(state.colors, colors);
+      uvs[v * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
+      uvs[v * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
+      const lerp4 = (src: Float32Array, dst: Float32Array): void => {
+        for (let c = 0; c < 4; c++) {
+          dst[v * 4 + c] =
+            src[v00 * 4 + c] * w00 +
+            src[v10 * 4 + c] * w10 +
+            src[v01 * 4 + c] * w01 +
+            src[v11 * 4 + c] * w11;
+        }
+      };
+      if (splats && state.splats) lerp4(state.splats, splats);
+      if (extras && state.extras) lerp4(state.extras, extras);
+    }
+    clip = {
+      positions: surf.positions,
+      normals,
+      colors,
+      uvs,
+      splats,
+      extras,
+      indices: surf.indices,
+    };
+  }
+  return { rim: cached.result.rim, clip };
 }

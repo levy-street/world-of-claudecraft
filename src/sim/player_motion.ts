@@ -51,6 +51,10 @@ import {
 } from './types';
 import {
   groundHeight,
+  groundHeightAtBody,
+  groundHeightNear,
+  onUnderSheet,
+  sheetCeilingAt,
   terrainDownhill,
   terrainHeight,
   terrainSteepnessAt,
@@ -60,6 +64,9 @@ import {
 
 export const BACKPEDAL_MULT = 0.65;
 export const GRAVITY = 16;
+// Head clearance under a cave/carve ceiling: a jump caps out this far below
+// the rock so the camera and the crown never clip through the roof.
+export const PLAYER_HEAD_CLEARANCE = 1.8;
 export const JUMP_VELOCITY = 6; // apex = v^2/2g ≈ 1.125 yd
 // A mounted rider springs higher so a paddock show-jump reads as clearable: the
 // apex rises to (JUMP_VELOCITY * MOUNT_JUMP_MULT)^2 / 2g ≈ 1.76 yd. Applied in
@@ -168,7 +175,7 @@ export function swimSteerRate(steer: number | undefined): number {
 
 /** True when the body is swimming with its feet BELOW the surface line. */
 export function isSubmerged(e: Entity, seed: number): boolean {
-  const ground = groundHeight(e.pos.x, e.pos.z, seed);
+  const ground = groundHeightAtBody(e.pos.x, e.pos.z, seed, e.pos.y);
   const level = waterLevelAt(e.pos.x, e.pos.z, seed);
   return swimsAt(e.pos.y, ground, level) && e.pos.y < level - 0.75 - SWIM_SUBMERGE_EPS;
 }
@@ -256,7 +263,7 @@ export function jumpMult(e: Entity): number {
 }
 
 export function isSwimming(e: Entity, seed: number): boolean {
-  const ground = groundHeight(e.pos.x, e.pos.z, seed);
+  const ground = groundHeightAtBody(e.pos.x, e.pos.z, seed, e.pos.y);
   return swimsAt(e.pos.y, ground, waterLevelAt(e.pos.x, e.pos.z, seed));
 }
 
@@ -305,6 +312,14 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     if (inp.turnRight) p.facing = normAngle(p.facing - TURN_SPEED * DT);
   }
 
+  // Flooded flight owns this body outright. The deepball match driver runs
+  // deepglassFlightPass for every participant on its own tick (it holds the
+  // match clock, the currents and who is carrying the Tidesow), so the whole
+  // ground/swim pipeline below — gravity, terrain collision, the standoff, the
+  // ledge snap-down — must not also run. Turning still works above, because
+  // yaw is how you aim the pack.
+  if (p.dgFlight) return;
+
   let mx = 0,
     mz = 0; // local: z forward, x strafe-right
   if (inp.forward) mz += 1;
@@ -317,7 +332,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
 
   const hasMoveInput = mx !== 0 || mz !== 0;
   // One terrain sample serves both latches for the whole tick.
-  const swimGround = groundHeight(p.pos.x, p.pos.z, deps.seed);
+  const swimGround = groundHeightAtBody(p.pos.x, p.pos.z, deps.seed, p.pos.y);
   const swimLevel = waterLevelAt(p.pos.x, p.pos.z, deps.seed);
   const swimming = swimsAt(p.pos.y, swimGround, swimLevel);
   const submerged = swimming && p.pos.y < swimLevel - 0.75 - SWIM_SUBMERGE_EPS;
@@ -344,6 +359,15 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // EXACT position (terrainDownhill): genuinely steep ground still strips
   // control and slides, but a flat shoulder the cell memo over-reads keeps
   // control, and the wall/contour gate below still refuses the climb.
+  // A body standing on an AUTHORED floor over bare terrain (bridge deck, box
+  // top, ramp) or on a sheet UNDER the surface (cave tube, carve cavity) is
+  // not standing on the steep cell the memo reads: the surface gradient is
+  // overhead scenery to it. Mirrors the physics kernel's own exemptions.
+  const onAuthoredFloor =
+    p.onGround &&
+    !swimming &&
+    groundHeightNear(p.pos.x, p.pos.z, deps.seed, p.pos.y) >
+      terrainHeight(p.pos.x, p.pos.z, deps.seed) + 0.05;
   // A body CARRIED ABOVE THE RAW GROUND (feet well over the terrain the memo
   // read: a fortress floor plate, a stair tread, a pier deck, or a walk-lift
   // stair band) is not walking the ground the memo read at all, so the strip
@@ -362,6 +386,8 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   const steepFlagged =
     p.onGround &&
     !swimming &&
+    !onAuthoredFloor &&
+    !onUnderSheet(p.pos.x, p.pos.z, deps.seed, p.pos.y) &&
     rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE &&
     p.pos.y <=
       rideHeight(p.pos.x, p.pos.z, terrainHeight(p.pos.x, p.pos.z, deps.seed), deps.seed) +
@@ -548,8 +574,8 @@ function stepInstancedRegion(
       // its footprint is never a wall (real water can continue past a
       // footprint edge into the open sea)
       const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, deps.seed);
-      const g1 = groundHeight(nx, nz, deps.seed);
-      const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls);
+      const g1 = groundHeightAtBody(nx, nz, deps.seed, p.pos.y);
+      const r0 = Math.max(groundHeightAtBody(p.pos.x, p.pos.z, deps.seed, p.pos.y), wls);
       const r1 = Math.max(g1, wls);
       const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
       if (
@@ -572,10 +598,10 @@ function stepInstancedRegion(
       // The mantle allowance mirrors the open world: a floor no higher than
       // the feet plus MANTLE_REACH is something the arc carries onto (the
       // dais rim), not a face to bounce off.
-      const h1 = groundHeight(nx, nz, deps.seed);
+      const h1 = groundHeightAtBody(nx, nz, deps.seed, p.pos.y);
       if (h1 > p.pos.y + MANTLE_REACH) {
         const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, deps.seed);
-        const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls);
+        const r0 = Math.max(groundHeightAtBody(p.pos.x, p.pos.z, deps.seed, p.pos.y), wls);
         const r1 = Math.max(h1, wls);
         const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
         if (
@@ -634,7 +660,7 @@ function verticalPass(
   // recomputed, so the two can never drift).
   mountLocked: boolean,
 ): void {
-  const ground = groundHeight(p.pos.x, p.pos.z, deps.seed);
+  const ground = groundHeightAtBody(p.pos.x, p.pos.z, deps.seed, p.pos.y);
   // The surface the body rests on: the terrain, or a standable prop top
   // (crate, rock) under the feet. Grounded the query is exact (a taller prop
   // beside the body never lifts it); airborne it reaches MANTLE_REACH above
@@ -679,6 +705,16 @@ function verticalPass(
   if (!p.onGround) {
     p.vy -= GRAVITY * DT;
     p.pos.y += p.vy * DT;
+    // Under a cave tube's or carve cavity's ROCK ceiling a jump bumps the
+    // roof instead of carrying the head through it (and then landing the
+    // body on the terrain above its own tunnel). fallStartY is the launch
+    // height, i.e. the sheet the body jumped from, which keeps the ceiling
+    // query on that sheet's cavity.
+    const roof = sheetCeilingAt(p.pos.x, p.pos.z, deps.seed, p.fallStartY);
+    if (roof !== Infinity && p.pos.y + PLAYER_HEAD_CLEARANCE > roof) {
+      p.pos.y = roof - PLAYER_HEAD_CLEARANCE;
+      if (p.vy > 0) p.vy = 0;
+    }
     p.fallStartY = Math.max(p.fallStartY, p.pos.y);
     if (deepWater && p.pos.y <= waterHere - 0.75) {
       // Splashing into deep water breaks the fall — and the harder the hit,
@@ -889,8 +925,16 @@ function standoffPass(
   wishSpeed: number,
   movingOnGround: boolean,
 ): void {
-  const ground = groundHeight(p.pos.x, p.pos.z, deps.seed);
-  if (p.onGround && p.pos.y <= ground + 1e-3 && !isSubmergedAt(p.pos.x, p.pos.z, deps.seed)) {
+  const ground = groundHeightAtBody(p.pos.x, p.pos.z, deps.seed, p.pos.y);
+  if (
+    p.onGround &&
+    p.pos.y <= ground + 1e-3 &&
+    !isSubmergedAt(p.pos.x, p.pos.z, deps.seed) &&
+    // A body walking a tunnel or carve under the hill must not be shoved by
+    // the SURFACE wall gradient overhead (the standoff samples the terrain,
+    // which is scenery to an under-sheet mover).
+    !onUnderSheet(p.pos.x, p.pos.z, deps.seed, p.pos.y)
+  ) {
     const s = terrainWallStandoff(p.pos.x, p.pos.z, deps.seed, BODY_RADIUS, MAX_CLIMB_SLOPE);
     if (s.x !== p.pos.x || s.z !== p.pos.z) {
       const resolved = deps.resolveMove(p.pos.x, p.pos.z, s.x, s.z, BODY_RADIUS, p, false);
@@ -961,7 +1005,7 @@ function standoffPass(
       ) {
         p.pos.x = standX;
         p.pos.z = standZ;
-        p.pos.y = groundHeight(standX, standZ, deps.seed);
+        p.pos.y = groundHeightAtBody(standX, standZ, deps.seed, p.pos.y);
       }
     }
   }

@@ -404,6 +404,10 @@ describe('the density model covers the shipped world', () => {
       .map((t) => t.id)
       .sort();
     expect(noXp).toEqual([
+      // deepglass_ball is the FORK's Tidesow (sim/deepglass/abilities.ts): an
+      // inert ball entity the bout's match driver spawns and despawns, never a
+      // camp; xpMult 0 like the eggs.
+      'deepglass_ball',
       'dragonkin_egg',
       'nythraxis_bone_spike',
       'spider_egg',

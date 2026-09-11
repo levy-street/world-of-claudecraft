@@ -7,6 +7,7 @@ import {
   delveOrigin,
   instanceOrigin,
   riftInstanceOrigin,
+  RIFT_BAND_X_MIN,
   YUMI_BAND_X_MAX,
   YUMI_BAND_X_MIN,
 } from '../src/sim/data';
@@ -22,6 +23,8 @@ describe('telemetry zone id', () => {
   });
 
   it('reports a bounded dungeon-scoped id inside a dungeon band', () => {
+    // Derived from instanceOrigin, never a literal: this fork's INSTANCE_X_BASE
+    // is 99_400, so upstream's hard-coded plane x lands in the overworld here.
     // Derived from the band helper, never a literal x: the atlas-grid world
     // moved every instance band far east of the old single-strip coordinates.
     const crypt = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
@@ -52,6 +55,11 @@ describe('telemetry zone id', () => {
   it('keeps the defensive fallbacks bounded for unmapped instance coordinates', () => {
     // A delve-band slot with no delve record behind it (only indexes 0-1 have
     // content today) still emits a bounded label, never a raw coordinate.
+    // The tail of the delve band, past the last authored room. Upstream v0.40
+    // retired the Vale Cup practice band, so the delve band now meets the rift
+    // band directly and that ceiling is the one to probe under. Derived from
+    // the band constants because this fork ships two delves, not upstream's set.
+    expect(telemetryZoneId(RIFT_BAND_X_MIN - 1, 0)).toBe('delve:unknown');
     // Between the last authored delve slot and the band ceiling: inside the
     // delve band by position, with no delve record behind it.
     const pastLastDelve = delveOrigin(1, 0).x + 300;

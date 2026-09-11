@@ -12,7 +12,7 @@
 // half-thickness is a PARAMETER rather than an import of dungeon_layout's
 // DUNGEON_WALL_HW, so dungeon_layout can depend on this module without a cycle.
 
-import type { Collider } from '../colliders';
+import type { LayoutCollider } from '../colliders';
 
 /** An axis-aligned room, instance-local. Rooms never overlap; two rooms that share
  * an edge line are joined only where an `AuthoredDoor` cuts that edge. */
@@ -43,10 +43,22 @@ export interface AuthoredDoor {
 export interface AuthoredDecor {
   key: string;
   x: number;
+  /** Optional render-only vertical offset. */
+  y?: number;
   z: number;
   yaw: number;
   scale?: number;
+  /** Per-axis scale, for dressing stretched along one axis (the Infernal
+   *  Abyss' lava channels and bridge spans). */
+  scaleX?: number;
+  scaleZ?: number;
+  /** Inner-to-outer radius ratio for ring-shaped dressing. */
+  innerScale?: number;
+  /** Optional movement collision radius. Omit for walkable or hazard dressing. */
   r?: number;
+  /** Optional axis-aligned movement footprint for structural dressing. */
+  hw?: number;
+  hd?: number;
 }
 
 /**
@@ -232,8 +244,11 @@ export function authoredColliders(
   decor: readonly AuthoredDecor[] = [],
   wallHw = 1,
   ledges: readonly AuthoredLedge[] = [],
-): Collider[] {
-  const out: Collider[] = [];
+  // LayoutCollider, not upstream's wider Collider: colliders.ts's
+  // layoutColliders consumer is typed on it, and every shape emitted here
+  // (wall OBBs, decor circles, upstream's ledge shelves) is a member of it.
+): LayoutCollider[] {
+  const out: LayoutCollider[] = [];
   for (const s of authoredWallSegments(rooms, doors)) {
     const mid = (s.a + s.b) / 2;
     const half = (s.b - s.a) / 2;

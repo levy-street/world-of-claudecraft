@@ -5,6 +5,7 @@
 // opacity instead of blanking the view. Three-free on purpose
 // (RENDER_PURE_CORES): a Vitest drives it directly.
 
+import { occluderFadesDisabled } from './occluder_fade_core';
 export interface ArenaWallFootprint {
   x: number;
   z: number;
@@ -85,6 +86,8 @@ export function arenaWallSegmentHits(
   camY: number,
   camZ: number,
 ): boolean {
+  // The editor's viewport turns every camera fade off (occluder_fade_core).
+  if (occluderFadesDisabled()) return false;
   if (
     (eyeY < f.topY && pointInsideArenaWall(f, eyeX, eyeZ)) ||
     (camY < f.topY && pointInsideArenaWall(f, camX, camZ))

@@ -5,6 +5,7 @@ export type MusicZone =
   | 'town_eastbrook'
   | 'town_fenbridge'
   | 'town_highwatch'
+  | 'town_goldcrest'
   | 'vale'
   | 'vale_legacy'
   | 'marsh'
@@ -97,6 +98,69 @@ const RIFT_MUSIC: Record<string, MusicZone> = {
 };
 
 /** Crawl cue for a procedural Rift floor, from RiftFloorView.themeName. */
+/** Every pickable track (the map editor's music tool lists these). Realm and
+ *  rift zones are chosen by the world, never by a maker, so they stay off it. */
+export const MUSIC_ZONES: readonly MusicZone[] = [
+  'town_eastbrook',
+  'town_fenbridge',
+  'town_highwatch',
+  'town_goldcrest',
+  'vale',
+  'vale_legacy',
+  'marsh',
+  'peaks',
+  'farshore',
+  'dungeon_hollow_crypt',
+  'dungeon_sunken_bastion',
+  'dungeon_gravewyrm_sanctum',
+];
+
+// Every id the director can score — the maker-pickable list above plus the
+// biome layers and the world-chosen realm/rift cues. A Record keyed on the
+// union so tsc fails the moment a new MusicZone is added without a row here.
+// Used to validate map-authored track ids at play time (an authored world may
+// legitimately name a biome cue the editor does not offer: the Deepglass asks
+// for 'amber').
+const ALL_MUSIC_ZONE_FLAGS: Record<MusicZone, true> = {
+  town_eastbrook: true,
+  town_fenbridge: true,
+  town_highwatch: true,
+  town_goldcrest: true,
+  vale: true,
+  vale_legacy: true,
+  marsh: true,
+  peaks: true,
+  dusk: true,
+  ember: true,
+  frost: true,
+  amber: true,
+  fen: true,
+  night: true,
+  haunt: true,
+  jungle: true,
+  garden: true,
+  gale: true,
+  farshore: true,
+  proving_shore: true,
+  dungeon_hollow_crypt: true,
+  dungeon_sunken_bastion: true,
+  dungeon_gravewyrm_sanctum: true,
+  rift_frost: true,
+  rift_ember: true,
+  rift_venom: true,
+  rift_bone: true,
+  rift_brute: true,
+  rift_void: true,
+  rift_storm: true,
+  rift_tide: true,
+  ignivar_forge_approach: true,
+  ignivar_raid_arena: true,
+  ignivar_inner_crucible: true,
+};
+export const ALL_MUSIC_ZONES: readonly MusicZone[] = Object.keys(
+  ALL_MUSIC_ZONE_FLAGS,
+) as MusicZone[];
+
 export function riftMusicZoneForTheme(themeName: string): MusicZone {
   return RIFT_MUSIC[themeName] ?? 'rift_void';
 }

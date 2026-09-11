@@ -80,6 +80,7 @@ class FakeAudioContext {
 }
 
 interface FakeStream {
+  url: string;
   el: FakeAudio | null;
   gain: FakeGain;
   target: number;
@@ -91,6 +92,10 @@ interface DirectorInternals {
   timer: number;
   zoneStreams: Partial<Record<string, FakeStream>>;
   combatStreams: FakeStream[];
+  master: FakeGain;
+  venueWaitingGain: FakeGain;
+  venueMatchGain: FakeGain;
+  venueBossGain: FakeGain;
   streamKeeper(): void;
 }
 
@@ -130,6 +135,56 @@ describe('MusicDirector streamed combat / background mix', () => {
     expect(vale?.el?.preload).toBe('auto');
     expect(vale?.el?.play).toHaveBeenCalled();
     for (const combat of internals(director).combatStreams) expect(combat.target).toBe(0);
+  });
+
+  // Goldcrest Harbor is the one zone shipping a PAIR of remasters: it rolls one
+  // per arrival, so the capital does not wear a single loop out over a session.
+  it('opens the capital on the rolled harbor cue', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.9); // second of the two
+    director.update('town_goldcrest', false);
+    const stream = internals(director).zoneStreams.town_goldcrest;
+    expect(stream?.el?.src).toBe('/audio/music/town_goldcrest_2.mp3?v=c616612609d6');
+    expect(stream?.target).toBe(1);
+  });
+
+  it('rolls a different harbor cue on the next visit and drops the old download', () => {
+    const rand = vi.spyOn(Math, 'random').mockReturnValue(0);
+    director.update('town_goldcrest', false);
+    const first = internals(director).zoneStreams.town_goldcrest;
+    // Held separately: releasing the stream nulls its own `el` reference.
+    const firstEl = first?.el;
+    expect(firstEl?.src).toBe('/audio/music/town_goldcrest_1.mp3?v=0cf44456d0f5');
+
+    director.update('vale', false);
+    rand.mockReturnValue(0.9);
+    director.update('town_goldcrest', false);
+
+    const second = internals(director).zoneStreams.town_goldcrest;
+    expect(second).not.toBe(first);
+    expect(second?.el?.src).toBe('/audio/music/town_goldcrest_2.mp3?v=c616612609d6');
+    // The swapped-out cue must stop buffering behind the one now playing.
+    expect(firstEl?.pause).toHaveBeenCalled();
+    expect(first?.el).toBeNull();
+  });
+
+  it('hands the capital back its own cue after a fight instead of re-rolling', () => {
+    const rand = vi.spyOn(Math, 'random').mockReturnValue(0);
+    director.update('town_goldcrest', false);
+    const before = internals(director).zoneStreams.town_goldcrest;
+    director.update('town_goldcrest', true);
+    rand.mockReturnValue(0.9); // would pick the other cue if this re-rolled
+    director.update('town_goldcrest', false);
+
+    expect(internals(director).zoneStreams.town_goldcrest).toBe(before);
+    expect(before?.target).toBe(1);
+  });
+
+  it('keeps a single-track zone on one stream across revisits', () => {
+    director.update('vale', false);
+    const first = internals(director).zoneStreams.vale;
+    director.update('peaks', false);
+    director.update('vale', false);
+    expect(internals(director).zoneStreams.vale).toBe(first);
   });
 
   it('silences the zone stream so ONLY combat music plays in combat (no layering)', () => {
@@ -187,6 +242,151 @@ describe('MusicDirector streamed combat / background mix', () => {
     director.update('vale', false);
     expect(el.currentTime).toBe(55);
     expect(el.play).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('MusicDirector sports-venue tracks', () => {
+  let director: MusicDirector;
+  let timeouts: Array<() => void>;
+
+  beforeEach(() => {
+    timeouts = [];
+    vi.stubGlobal('AudioContext', FakeAudioContext);
+    vi.stubGlobal('Audio', FakeAudio);
+    vi.stubGlobal('window', {
+      setInterval: vi.fn(() => 1),
+      // applyVenue defers the pause behind the fade; run it on demand.
+      setTimeout: vi.fn((fn: () => void) => timeouts.push(fn)),
+    });
+    director = makeDirector();
+  });
+
+  afterEach(() => {
+    clearInterval(internals(director).timer);
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    FakeAudio.instances = [];
+  });
+
+  const venueEls = () =>
+    FakeAudio.instances.filter((el) => /(sowfield|deepglass)-(waiting|match)\.mp3$/.test(el.src));
+  const bySrc = (src: string) => venueEls().find((el) => el.src === src);
+
+  it('streams the Deepglass grounds and match cues as a pair', () => {
+    director.setVenueTrack('deepglass', 'match');
+    // Both cues stream from arrival (the whistle crossfades into a track
+    // already in progress); the grounds cue is Troy's exploration music.
+    expect(venueEls().map((el) => el.src).sort()).toEqual([
+      '/audio/deepglass-match.mp3',
+      '/audio/deepglass-waiting.mp3',
+    ]);
+    const match = bySrc('/audio/deepglass-match.mp3');
+    expect(match?.loop).toBe(true);
+    expect(match?.play).toHaveBeenCalled();
+
+    const gains = internals(director);
+    expect(gains.venueWaitingGain.gain.value).toBe(0);
+    expect(gains.venueMatchGain.gain.value).toBeGreaterThan(0);
+
+    // The venue declares a grounds cue again (restored 2026-09-07): asking
+    // for 'waiting' crossfades from the match cue to it.
+    director.setVenueTrack('deepglass', 'waiting');
+    expect(gains.venueWaitingGain.gain.value).toBeGreaterThan(0);
+    expect(gains.venueMatchGain.gain.value).toBe(0);
+    expect(bySrc('/audio/deepglass-waiting.mp3')).toBeDefined();
+
+    // The venue owns the mix: the procedural score is ducked to silence.
+    expect(gains.master.gain.value).toBe(0);
+  });
+
+  it('never loads the Sowfield pair for a Deepglass bout, and pauses on the way out', () => {
+    director.setVenueTrack('deepglass', 'match');
+    expect(venueEls().some((el) => el.src.includes('sowfield'))).toBe(false);
+
+    director.setVenueTrack('deepglass', null);
+    for (const fn of timeouts) fn();
+    expect(venueEls().every((el) => el.paused)).toBe(true);
+    expect(internals(director).master.gain.value).toBeGreaterThan(0);
+  });
+
+  const bossEl = () =>
+    FakeAudio.instances.find((el) => el.src === '/audio/deepglass-boss.mp3') ?? null;
+
+  it('builds the boss theme only on the first engagement, not on arrival', () => {
+    director.setVenueTrack('deepglass', 'match');
+    // The match cue runs from the whistle; a second stream decoding under
+    // every match is exactly what the lazy path exists to avoid.
+    expect(bossEl()).toBe(null);
+
+    director.setVenueTrack('deepglass', 'boss');
+    const boss = bossEl();
+    expect(boss?.loop).toBe(true);
+    expect(boss?.play).toHaveBeenCalled();
+
+    const gains = internals(director);
+    expect(gains.venueBossGain.gain.value).toBeGreaterThan(0);
+    expect(gains.venueWaitingGain.gain.value).toBe(0);
+    expect(gains.venueMatchGain.gain.value).toBe(0);
+    // The boss theme owns the mix the same way the two game cues do.
+    expect(gains.master.gain.value).toBe(0);
+  });
+
+  it('silences the procedural score outright, not just under the master duck', () => {
+    // The reported bug: a zone theme already playing when the player reached
+    // the arena stayed audible while the master ducked out from under it, so
+    // the wrong music played for a second or two. Now the streams themselves
+    // target silence, which no later mix change can uncover.
+    director.update('vale', false);
+    const s = internals(director);
+    const vale = s.zoneStreams.vale;
+    expect(vale?.target).toBe(1);
+
+    director.setVenueTrack('deepglass', 'match');
+    expect(vale?.target).toBe(0);
+    expect(s.master.gain.value).toBe(0);
+
+    // No NEW zone cue is even rolled while the venue holds the mix: rolling one
+    // starts a multi-MB download of a track that cannot be heard.
+    director.update('town_eastbrook', false);
+    expect(s.zoneStreams.town_eastbrook).toBeUndefined();
+    for (const stream of Object.values(s.zoneStreams)) expect(stream?.target).toBe(0);
+
+    // ...and a fight in the bell must not lift a battle theme over the venue.
+    director.update('town_eastbrook', true);
+    for (const stream of s.combatStreams) expect(stream.target).toBe(0);
+
+    // Leaving hands the score back.
+    director.update('town_eastbrook', false);
+    director.setVenueTrack('deepglass', null);
+    expect(s.master.gain.value).toBeGreaterThan(0);
+    expect(s.zoneStreams.town_eastbrook?.target).toBe(1);
+  });
+
+  it('ducks the master even when the venue armed before there was a context', () => {
+    // The HUD drives setVenueTrack from the first frame; the AudioContext waits
+    // for a gesture. The old edge-only duck was skipped in that window and
+    // nothing afterwards put the master back down.
+    const early = new MusicDirector();
+    early.setVenueTrack('deepglass', 'match'); // no ctx yet: the arming edge is spent
+    early.init();
+    // A later call carries no edge at all, and must still hold the duck.
+    early.setVenueTrack('deepglass', 'match');
+    expect(internals(early).master.gain.value).toBe(0);
+    clearInterval(internals(early).timer);
+  });
+
+  it('stops the boss stream as soon as the fight is over, without leaving the venue', () => {
+    director.setVenueTrack('deepglass', 'boss');
+    const boss = bossEl();
+    expect(boss?.paused).toBe(false);
+
+    director.setVenueTrack('deepglass', 'match');
+    for (const fn of timeouts) fn();
+    expect(boss?.paused).toBe(true);
+    // ...and the game cues are still running: only the boss stream stopped.
+    expect(bySrc('/audio/deepglass-match.mp3')?.paused).toBe(false);
+    expect(internals(director).venueBossGain.gain.value).toBe(0);
+    expect(internals(director).venueMatchGain.gain.value).toBeGreaterThan(0);
   });
 });
 

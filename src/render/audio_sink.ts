@@ -27,6 +27,22 @@ export interface AmbientPointSource {
   readonly z: number;
 }
 
+/** A map-authored looping emitter (the editor's 'sound' tool): any SFX clip
+ *  parked at a world point with its own gain and falloff radius. Distinct from
+ *  AmbientPointSource, whose kind picks a fixed built-in bed. */
+export interface PointSoundSource {
+  readonly id: string;
+  /** SFX clip id to loop (SFX_CLIPS); an unknown id stays silent. */
+  readonly key: string;
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+  /** Peak gain 0..1 at the emitter, before distance falloff. */
+  readonly volume: number;
+  /** Falloff radius in yards: full at the centre, silent at/beyond it. */
+  readonly radius: number;
+}
+
 /** Per-ability audio moments fired by the ability-VFX engine: windup (the
  *  charge bed while a cast is winding up, at the caster), release (cast lets
  *  go, at the caster), impact (at the impact point), pulse (one soft zone
@@ -186,7 +202,16 @@ export interface SpatialAudioSink {
     nearWater: boolean,
     crowd: number,
     points?: readonly AmbientPointSource[],
+    /** Inside the Deepglass bell: the engine drops every open-air bed and
+     *  raises the underwater one instead. Optional, so an engine without the
+     *  bed simply keeps playing the surface ambience. */
+    submerged?: boolean,
   ): void;
+  /** Per-frame state of the map-authored point sounds (the editor's Sound
+   *  tool). Static for a session, so the renderer passes the same resolved
+   *  array every frame; the engine starts the ones in range and stops the ones
+   *  out of it. Optional: an engine without the layer stays silent. */
+  pointSounds?(sources: readonly PointSoundSource[]): void;
   /** One per-ability procedural audio moment at a world position (the 12
    *  palette identities live in src/game/sfx.ts). Optional: an engine without
    *  the synth layer simply stays silent for ability moments. */

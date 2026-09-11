@@ -954,3 +954,24 @@ export const realmBuilderMonumentFxInternalsForTest = {
   groupName: GROUP_NAME,
   nameTexture,
 };
+
+/** The plot sign's pick volume. Its art is a PLACED ASSET (props/plot_sign,
+ *  seated by the ring city), so the interaction entity must draw nothing at
+ *  all: the generic ground-object arm below it would stand a loot crate on the
+ *  sign's own post, which is exactly what shipped for one afternoon. Sized to
+ *  the authored post + board so the click box matches what the player sees. */
+export function buildPlotSignPickBody(): { group: THREE.Group; height: number } {
+  const height = 2.48;
+  const group = new THREE.Group();
+  group.name = 'plotSignPick';
+  const proxy = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.0, 1.0, height, 8, 1, true),
+    new THREE.MeshBasicMaterial(),
+  );
+  proxy.position.y = height / 2;
+  proxy.visible = false;
+  proxy.castShadow = false;
+  proxy.receiveShadow = false;
+  group.add(proxy);
+  return { group, height };
+}

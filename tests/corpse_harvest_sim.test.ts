@@ -35,9 +35,19 @@ vi.mock('../server/db', () => ({
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
-  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
-  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
-  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  loadAccountFlair: vi.fn(async () => ({
+    ai: false,
+    streamer: false,
+    links: {},
+  })),
+  markAccountQuestComplete: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+  })),
+  grantAccountMechChroma: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+  })),
   setAccountWeaponSkinLoadout: vi.fn(async () => ({
     completedQuestIds: [],
     mechChromaIds: [],
@@ -182,7 +192,12 @@ function premiumMaterialUnits(meta: PlayerMeta, itemId?: string, signer?: string
  *  tests. Unchanged from the pre-migration suite: every literal seed here
  *  keeps drawing exactly the same world-gen rng stream it always has. */
 function setup(seed = 11) {
-  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: CORPSE_TEST_WORLD });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: CORPSE_TEST_WORLD,
+  });
   const internals = sim as unknown as SimInternals;
   const a = sim.addPlayer('warrior', 'Alpha');
   const b = sim.addPlayer('warrior', 'Bravo');
@@ -196,7 +211,11 @@ function setup(seed = 11) {
 
   // A dead wolf corpse with profession component tags (hide, fang; see #1140).
   const template = MOBS.forest_wolf;
-  const mob = createMob(9999, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+  const mob = createMob(9999, template, template.maxLevel, {
+    x: 0,
+    y: 0,
+    z: 0,
+  });
   mob.dead = true;
   mob.aiState = 'dead';
   mob.corpseTimer = 9999;
@@ -227,7 +246,12 @@ function placeCoherently(sim: Sim, e: Entity, x: number, z: number): void {
  *  corpse in a later, independent attempt after Alpha's is refused or spent,
  *  which needs Bravo actually reachable. Corpse grounded at Alpha's own spot. */
 function publicSetup(seed = 11) {
-  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: PUBLIC_TEST_WORLD });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: PUBLIC_TEST_WORLD,
+  });
   const a = sim.addPlayer('warrior', 'Alpha');
   const b = sim.addPlayer('warrior', 'Bravo');
   sim.tick();
@@ -367,7 +391,10 @@ function withUnmappedTemplate<T>(body: () => T): T {
 }
 function withMixedTemplates<T>(body: () => T): T {
   return withRetaggedTemplates(
-    { [MIXED_TEMPLATE_ID]: MIXED_TEMPLATE_TAGS, [MIXED2_TEMPLATE_ID]: MIXED2_TEMPLATE_TAGS },
+    {
+      [MIXED_TEMPLATE_ID]: MIXED_TEMPLATE_TAGS,
+      [MIXED2_TEMPLATE_ID]: MIXED2_TEMPLATE_TAGS,
+    },
     body,
   );
 }
@@ -637,7 +664,12 @@ describe('signed Pristine specimens (#1145)', () => {
     // hide behind hide-only coverage. Seed 30's rarity roll clears the
     // signable floor for a single focused component regardless of family
     // (the roll's draw position is identical).
-    const families: { templateId: string; focus: string; plain: string; specimen: string }[] = [
+    const families: {
+      templateId: string;
+      focus: string;
+      plain: string;
+      specimen: string;
+    }[] = [
       {
         templateId: 'webwood_spider',
         focus: 'silk',
@@ -650,12 +682,21 @@ describe('signed Pristine specimens (#1145)', () => {
         plain: 'venom_gland',
         specimen: 'pristine_venom_gland',
       },
-      { templateId: 'wild_boar', focus: 'meat', plain: 'game_meat', specimen: 'prime_cut' },
+      {
+        templateId: 'wild_boar',
+        focus: 'meat',
+        plain: 'game_meat',
+        specimen: 'prime_cut',
+      },
     ];
     for (const f of families) {
       const { sim, internals, a } = setup(30);
       const template = MOBS[f.templateId];
-      const corpse = createMob(7776, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+      const corpse = createMob(7776, template, template.maxLevel, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
       corpse.dead = true;
       corpse.aiState = 'dead';
       corpse.corpseTimer = 9999;
@@ -678,7 +719,11 @@ describe('signed Pristine specimens (#1145)', () => {
   it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 30)', () => {
     const { sim, internals, a } = setup(30);
     const template = MOBS.vale_bandit;
-    const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7775, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -713,7 +758,11 @@ describe('signed Pristine specimens (#1145)', () => {
     const { sim, internals, a } = setup(31);
     const template = MOBS.mudfin_murloc;
     expect(template.componentTags).toEqual(['gills', 'hide']);
-    const corpse = createMob(7774, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7774, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -842,7 +891,11 @@ describe('two-specimen-family harvest capacity contract', () => {
   function addBoarCorpse(internals: SimInternals, id = 8888) {
     const template = MOBS.wild_boar;
     expect(template.componentTags).toEqual(['hide', 'tusk', 'meat']);
-    const boar = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const boar = createMob(id, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     boar.dead = true;
     boar.aiState = 'dead';
     boar.corpseTimer = 9999;
@@ -1011,7 +1064,11 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
       count: 3,
       materialSources: [{ source: { signer: 'Bravo' }, count: 3 }],
     };
-    m.inventory[1] = { itemId: 'wolf_fang', count: 3, instance: { signer: 'Alpha' } };
+    m.inventory[1] = {
+      itemId: 'wolf_fang',
+      count: 3,
+      instance: { signer: 'Alpha' },
+    };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
     grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
@@ -1076,7 +1133,11 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory[0] = { itemId: 'rough_hide', count: 1 };
-    m.inventory[1] = { itemId: 'pristine_hide', count: 2, instance: { signer: 'Bravo' } };
+    m.inventory[1] = {
+      itemId: 'pristine_hide',
+      count: 2,
+      instance: { signer: 'Bravo' },
+    };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
     grantCorpseHarvestOnMob(sim, mob, m, ['hide']);
@@ -1154,14 +1215,23 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
       .drainEvents()
       .find((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
     expect(result?.yields).toEqual([
-      { itemId: 'wolf_fang', qty: signed[0].count, rarity: 'rare', kind: 'signed' },
+      {
+        itemId: 'wolf_fang',
+        qty: signed[0].count,
+        rarity: 'rare',
+        kind: 'signed',
+      },
     ]);
   });
 
   it('the cloth family carries its rolled quantity the same way (seed 31)', () => {
     const { sim, internals, a } = setup(31);
     const template = MOBS.vale_bandit;
-    const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7775, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -1186,7 +1256,11 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     const cap = bagCapacity(m.bags);
     const stack = stackSizeOf(ITEMS.wolf_fang);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
-    m.inventory[1] = { itemId: 'wolf_fang', count: stack - 2, instance: { signer: 'Alpha' } };
+    m.inventory[1] = {
+      itemId: 'wolf_fang',
+      count: stack - 2,
+      instance: { signer: 'Alpha' },
+    };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
     grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
@@ -1214,7 +1288,11 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     const cap = bagCapacity(m.bags);
     const stack = stackSizeOf(ITEMS.wolf_fang);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1, materialSeparated: true };
-    m.inventory[1] = { itemId: 'wolf_fang', count: stack - 6, instance: { signer: 'Alpha' } };
+    m.inventory[1] = {
+      itemId: 'wolf_fang',
+      count: stack - 6,
+      instance: { signer: 'Alpha' },
+    };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
     grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
@@ -1302,10 +1380,19 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     templateId: string,
     components: string[],
     seed: number,
-  ): { inventory: unknown; events: unknown; draws: number; claimedBy: number | null } {
+  ): {
+    inventory: unknown;
+    events: unknown;
+    draws: number;
+    claimedBy: number | null;
+  } {
     const { sim, internals, a } = setup(seed);
     const template = MOBS[templateId];
-    const corpse = createMob(7774, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7774, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -1332,12 +1419,42 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
   // straight through. old_greyjaw (hide/fang/claw) is the same arm one tag map
   // over. forest_wolf tags hide/fang: two tags, so ['hide','hide'] used to
   // clear `>= tagged.length` and spread onto fang instead.
-  const CASES: { templateId: string; tag: string; arm: string; tags: string[] }[] = [
-    { templateId: 'wild_boar', tag: 'hide', arm: 'concentrate', tags: ['hide', 'tusk', 'meat'] },
-    { templateId: 'wild_boar', tag: 'meat', arm: 'concentrate', tags: ['hide', 'tusk', 'meat'] },
-    { templateId: 'old_greyjaw', tag: 'fang', arm: 'concentrate', tags: ['hide', 'fang', 'claw'] },
-    { templateId: 'forest_wolf', tag: 'hide', arm: 'spread threshold', tags: ['hide', 'fang'] },
-    { templateId: 'forest_wolf', tag: 'fang', arm: 'spread threshold', tags: ['hide', 'fang'] },
+  const CASES: {
+    templateId: string;
+    tag: string;
+    arm: string;
+    tags: string[];
+  }[] = [
+    {
+      templateId: 'wild_boar',
+      tag: 'hide',
+      arm: 'concentrate',
+      tags: ['hide', 'tusk', 'meat'],
+    },
+    {
+      templateId: 'wild_boar',
+      tag: 'meat',
+      arm: 'concentrate',
+      tags: ['hide', 'tusk', 'meat'],
+    },
+    {
+      templateId: 'old_greyjaw',
+      tag: 'fang',
+      arm: 'concentrate',
+      tags: ['hide', 'fang', 'claw'],
+    },
+    {
+      templateId: 'forest_wolf',
+      tag: 'hide',
+      arm: 'spread threshold',
+      tags: ['hide', 'fang'],
+    },
+    {
+      templateId: 'forest_wolf',
+      tag: 'fang',
+      arm: 'spread threshold',
+      tags: ['hide', 'fang'],
+    },
   ];
 
   it('covers both arms for real: each row is the corpse shape it claims to be', () => {
@@ -1370,7 +1487,11 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
   it('never mints a second signed Pristine Hide off one claim (seed 277, the issue case)', () => {
     const { sim, internals, a } = setup(277);
     const template = MOBS.wild_boar;
-    const corpse = createMob(7769, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7769, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -1385,7 +1506,11 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
   it('rolls and grants the family ONE time, not once per repeat (seed 31, absolute counts)', () => {
     const { sim, internals, a } = setup(31);
     const template = MOBS.wild_boar;
-    const corpse = createMob(7773, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7773, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -1418,7 +1543,11 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
   it('a repeat inside a MULTI-family pick collapses only its own family', () => {
     const { sim, internals, a } = setup(31);
     const template = MOBS.wild_boar;
-    const corpse = createMob(7772, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7772, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -1465,7 +1594,11 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     const rig = (components: string[]) => {
       const { sim, internals, a } = setup(31);
       const template = MOBS.wild_boar;
-      const corpse = createMob(7771, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+      const corpse = createMob(7771, template, template.maxLevel, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
       corpse.dead = true;
       corpse.aiState = 'dead';
       corpse.corpseTimer = 9999;
@@ -1512,7 +1645,11 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
       for (const components of [['hide', 'hide'], ['hide']]) {
         const rig = setup(153);
         const template = MOBS[templateId];
-        const corpse = createMob(7770, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+        const corpse = createMob(7770, template, template.maxLevel, {
+          x: 0,
+          y: 0,
+          z: 0,
+        });
         corpse.dead = true;
         corpse.aiState = 'dead';
         corpse.corpseTimer = 9999;
@@ -1557,10 +1694,19 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     templateId: string,
     components: string[],
     seed: number,
-  ): { inventory: unknown; events: unknown; draws: number; claimedBy: number | null } {
+  ): {
+    inventory: unknown;
+    events: unknown;
+    draws: number;
+    claimedBy: number | null;
+  } {
     const { sim, internals, a } = setup(seed);
     const template = MOBS[templateId];
-    const corpse = createMob(7754, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7754, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -1867,7 +2013,12 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   // seeds below were hunted against exactly this construction order, and the
   // second addPlayer would shift the world's draw positions.
   function soloRig(seed: number, templateId = 'forest_wolf') {
-    const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: CORPSE_TEST_WORLD });
+    const sim = new Sim({
+      seed,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: CORPSE_TEST_WORLD,
+    });
     const internals = sim as unknown as SimInternals;
     const a = sim.addPlayer('warrior', 'Alpha');
     sim.tick();
@@ -1875,7 +2026,11 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     e.pos = { x: 0, y: 0, z: 0 };
     e.prevPos = { x: 0, y: 0, z: 0 };
     const template = MOBS[templateId];
-    const mob = createMob(9999, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const mob = createMob(9999, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
@@ -2070,7 +2225,12 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
       });
     });
     expect(first.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
-      { type: 'gatherDenied', pid: first.a, surface: 'corpse', requiredTier: 2 },
+      {
+        type: 'gatherDenied',
+        pid: first.a,
+        surface: 'corpse',
+        requiredTier: 2,
+      },
     ]);
     const mirror = soloRig(2);
     mirror.sim.drainEvents();
@@ -2085,7 +2245,12 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
       });
     });
     expect(mirror.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
-      { type: 'gatherDenied', pid: mirror.a, surface: 'corpse', requiredTier: 3 },
+      {
+        type: 'gatherDenied',
+        pid: mirror.a,
+        surface: 'corpse',
+        requiredTier: 3,
+      },
     ]);
   });
 });
@@ -2316,7 +2481,9 @@ describe('legacy per-call components shapes are refused before admission (#2474,
 
   function spawnCorpseAtSession(server: GameServer, session: ClientSession, id: number): Entity {
     const player = expectDefined(server.sim.entities.get(session.pid), 'player entity');
-    const mob = createMob(id, MOBS.forest_wolf, MOBS.forest_wolf.maxLevel, { ...player.pos });
+    const mob = createMob(id, MOBS.forest_wolf, MOBS.forest_wolf.maxLevel, {
+      ...player.pos,
+    });
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
@@ -2331,7 +2498,10 @@ describe('legacy per-call components shapes are refused before admission (#2474,
       label: 'a junk component tag beside a real one (#2504)',
       components: ['hide', 'not_a_real_tag'],
     },
-    { label: 'a pick naming only an unmapped family (#2509)', components: ['claw'] },
+    {
+      label: 'a pick naming only an unmapped family (#2509)',
+      components: ['claw'],
+    },
   ];
 
   for (const [i, shape] of shapes.entries()) {
@@ -2459,7 +2629,11 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     withMixedTemplates(() => {
       const { sim, internals, a } = setup(153);
       const template = MOBS[MIXED_TEMPLATE_ID];
-      const corpse = createMob(7510, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+      const corpse = createMob(7510, template, template.maxLevel, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
       corpse.dead = true;
       corpse.aiState = 'dead';
       corpse.corpseTimer = 9999;
@@ -2501,7 +2675,7 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
       ).toEqual([]);
     }
     const tagged = Object.values(MOBS).filter((m) => (m.componentTags?.length ?? 0) > 0);
-    expect(tagged).toHaveLength(54);
+    expect(tagged).toHaveLength(56); // FORK: +2 tagged mobs (Scorching Wastes)
     // 189, not 188: the Nythraxis Bone Spike (src/sim/content/dungeons.ts) the mechanics
     // redo added ships untagged (a stationary pillar, not a butcherable corpse), so it
     // grows MOBS without touching `tagged`. Full documented chain: tests/gathering.test.ts,
@@ -2510,7 +2684,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // hub_training_dummy and hub_healing_dummy) ship untagged too, the same shape as the
     // Bone Spike above: they are struck or healed, never harvested, so they grow MOBS
     // without touching `tagged` either.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(191);
+    // FORK: 217, not 191: the fork's untagged templates (Deepglass ball and
+    // practice champion, Tidehold and Scorching Wastes residents, the Infernal
+    // and Emberwake encounter mobs) grow MOBS without touching `tagged`.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(217);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(
@@ -2748,7 +2925,11 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       const issued = harvestAt(UNMAPPED_TEMPLATE_ID, [UNMAPPED_FAMILY], 5);
       const { sim: quiet, internals: quietInternals, a: quietA } = setup(5);
       const template = MOBS[UNMAPPED_TEMPLATE_ID];
-      const corpse = createMob(7513, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+      const corpse = createMob(7513, template, template.maxLevel, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
       corpse.dead = true;
       corpse.aiState = 'dead';
       corpse.corpseTimer = 9999;
@@ -2819,7 +3000,8 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // The shipped corpus: every subset of every tagged template. Exact totals
     // are pinned against the shipped catalog, not derived, so a template that
     // gains or loses a mapped tag moves one of them.
-    expect(sweep(Object.keys(MOBS))).toEqual({ spent: 266, refused: 0 });
+    // FORK: 266 + 6 for the Scorching Wastes templates; still nothing refused.
+    expect(sweep(Object.keys(MOBS))).toEqual({ spent: 272, refused: 0 });
     // Both arms still have to be visited, so neither half of the property is
     // vacuous: the refused arm is driven through the three retagged fixtures.
     const fixtures = withFixtureTemplates(() =>
@@ -2882,7 +3064,11 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       }
       return { extracted, unmappedOffered };
     };
-    expect(sweep(Object.keys(MOBS))).toEqual({ extracted: 447, unmappedOffered: 0 });
+    // FORK: 447 + 8 for the Scorching Wastes templates; still nothing unmapped.
+    expect(sweep(Object.keys(MOBS))).toEqual({
+      extracted: 455,
+      unmappedOffered: 0,
+    });
     const fixtures = withFixtureTemplates(() =>
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );
@@ -2930,7 +3116,11 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
   function yieldAt(templateId: string, components: string[] | undefined) {
     const { sim, internals, a } = setup(30);
     const template = MOBS[templateId];
-    const corpse = createMob(7511, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7511, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -2967,13 +3157,25 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     // the widest pick this corpse offers is 2 of 3 at bonus 1.
     { pick: undefined, draws: 4, hide: 2, claw: 5, pristine: 0 },
     { pick: [], draws: 4, hide: 2, claw: 5, pristine: 0 },
-    { pick: ['hide', 'claw', UNMAPPED_FAMILY], draws: 4, hide: 2, claw: 5, pristine: 0 },
+    {
+      pick: ['hide', 'claw', UNMAPPED_FAMILY],
+      draws: 4,
+      hide: 2,
+      claw: 5,
+      pristine: 0,
+    },
     { pick: ['hide', 'claw'], draws: 4, hide: 2, claw: 5, pristine: 0 },
     // Concentrate on one mapped family: bonus 2, and the extra tier shift is
     // what lands the signed pristine_hide.
     { pick: ['hide'], draws: 2, hide: 3, claw: 0, pristine: 1 },
     // Ticking the unmapped box beside Hide costs nothing at all.
-    { pick: ['hide', UNMAPPED_FAMILY], draws: 2, hide: 3, claw: 0, pristine: 1 },
+    {
+      pick: ['hide', UNMAPPED_FAMILY],
+      draws: 2,
+      hide: 3,
+      claw: 0,
+      pristine: 1,
+    },
   ];
 
   for (const c of CASES) {
@@ -3004,7 +3206,11 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     expect(serpent.pristine).toBe(0);
     const { sim, internals, a } = setup(30);
     const template = MOBS.sethrael_palecoil;
-    const corpse = createMob(7511, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    const corpse = createMob(7511, template, template.maxLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
@@ -3024,7 +3230,11 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     const shape = (templateId: string, components: string[] | undefined) => {
       const { sim, internals, a } = setup(31);
       const template = MOBS[templateId];
-      const corpse = createMob(7512, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+      const corpse = createMob(7512, template, template.maxLevel, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
       corpse.dead = true;
       corpse.aiState = 'dead';
       corpse.corpseTimer = 9999;
@@ -3052,7 +3262,13 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
       expect(MOBS[MIXED2_TEMPLATE_ID].componentTags).toEqual([UNMAPPED_FAMILY_2, 'hide']);
     });
 
-    const concentrate = { draws: 2, hide: 3, pristine: 1, scale: 0, claimedByHarvester: true };
+    const concentrate = {
+      draws: 2,
+      hide: 3,
+      pristine: 1,
+      scale: 0,
+      claimedByHarvester: true,
+    };
     expect(boar(undefined)).toEqual(concentrate);
     expect(boar([UNMAPPED_FAMILY_2, 'hide'])).toEqual(boar([]));
     expect(boar(['hide'])).toEqual(concentrate);
@@ -3066,7 +3282,13 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     });
     expect(MOBS.mudfin_murloc.componentTags).toEqual(['gills', 'hide']);
     const murloc = shape('mudfin_murloc', undefined);
-    expect(murloc).toEqual({ draws: 4, hide: 4, pristine: 0, scale: 2, claimedByHarvester: true });
+    expect(murloc).toEqual({
+      draws: 4,
+      hide: 4,
+      pristine: 0,
+      scale: 2,
+      claimedByHarvester: true,
+    });
     const gillsOnly = shape('mudfin_murloc', ['gills']);
     expect(gillsOnly.claimedByHarvester).toBe(true);
     expect(gillsOnly.draws).toBe(2);

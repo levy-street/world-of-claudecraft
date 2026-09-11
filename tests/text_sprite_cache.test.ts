@@ -96,7 +96,10 @@ function startAnchoredMetrics(text: string, font: string): Partial<TextMetrics> 
  *  above the font size, so without this one the floor never wins and could be
  *  deleted with the suite green. */
 function shortInkMetrics(text: string, font: string, align: string): Partial<TextMetrics> {
-  return { ...boundingBoxMetrics(text, font, align), actualBoundingBoxAscent: fontPx(font) * 0.5 };
+  return {
+    ...boundingBoxMetrics(text, font, align),
+    actualBoundingBoxAscent: fontPx(font) * 0.5,
+  };
 }
 
 // Matches the module's own FALLBACK_FONT_PX so a font string with no px size
@@ -172,7 +175,12 @@ function makeFakeSprite(trace: Trace): FakeSprite {
 }
 
 function newTrace(): Trace {
-  return { sprites: [], blits: [], metrics: boundingBoxMetrics, spriteContext: true };
+  return {
+    sprites: [],
+    blits: [],
+    metrics: boundingBoxMetrics,
+    spriteContext: true,
+  };
 }
 
 function installDocument(trace: Trace): void {
@@ -194,7 +202,12 @@ function targetContext(trace: Trace): CanvasRenderingContext2D {
   } as unknown as CanvasRenderingContext2D;
 }
 
-const OUTLINED = { font: 'bold 12px Georgia', fill: 'ink', stroke: 'halo', lineWidth: 3 };
+const OUTLINED = {
+  font: 'bold 12px Georgia',
+  fill: 'ink',
+  stroke: 'halo',
+  lineWidth: 3,
+};
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -275,7 +288,10 @@ describe('text_sprite_cache: rasterize once, blit thereafter', () => {
     installDocument(trace);
     const cache = new TextSpriteCache();
 
-    cache.draw(targetContext(trace), '7', 0, 0, { font: 'bold 12px Georgia', fill: 'gold' });
+    cache.draw(targetContext(trace), '7', 0, 0, {
+      font: 'bold 12px Georgia',
+      fill: 'gold',
+    });
 
     expect(trace.sprites[0].ink.map((i) => i.op)).toEqual(['fill']);
     // No outline means no miter allowance: pad is the antialias slack only, so
@@ -384,20 +400,70 @@ describe('text_sprite_cache: cache identity', () => {
     // Each neighbouring pair concatenates to the same character run; only the
     // field split differs. A key built by fusing the fields (or hashing that
     // fusion) serves the later draw of a pair from the earlier one's sprite.
-    cache.draw(ctx, 'X', 0, 0, { font: 'ab', fill: 'c', stroke: 'd', lineWidth: 2 });
-    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'bc', stroke: 'd', lineWidth: 2 });
-    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'b', stroke: 'cd', lineWidth: 2 });
-    cache.draw(ctx, 'oX', 0, 0, { font: 'a', fill: 'b', stroke: 'cd', lineWidth: 2 });
-    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'b', stroke: 'cdo', lineWidth: 2 });
+    cache.draw(ctx, 'X', 0, 0, {
+      font: 'ab',
+      fill: 'c',
+      stroke: 'd',
+      lineWidth: 2,
+    });
+    cache.draw(ctx, 'X', 0, 0, {
+      font: 'a',
+      fill: 'bc',
+      stroke: 'd',
+      lineWidth: 2,
+    });
+    cache.draw(ctx, 'X', 0, 0, {
+      font: 'a',
+      fill: 'b',
+      stroke: 'cd',
+      lineWidth: 2,
+    });
+    cache.draw(ctx, 'oX', 0, 0, {
+      font: 'a',
+      fill: 'b',
+      stroke: 'cd',
+      lineWidth: 2,
+    });
+    cache.draw(ctx, 'X', 0, 0, {
+      font: 'a',
+      fill: 'b',
+      stroke: 'cdo',
+      lineWidth: 2,
+    });
     expect(trace.sprites).toHaveLength(5);
 
     // And each resolves back to its OWN sprite: the second pass mints nothing
     // and blits the same five sprites in the order the first pass made them.
-    cache.draw(ctx, 'X', 0, 0, { font: 'ab', fill: 'c', stroke: 'd', lineWidth: 2 });
-    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'bc', stroke: 'd', lineWidth: 2 });
-    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'b', stroke: 'cd', lineWidth: 2 });
-    cache.draw(ctx, 'oX', 0, 0, { font: 'a', fill: 'b', stroke: 'cd', lineWidth: 2 });
-    cache.draw(ctx, 'X', 0, 0, { font: 'a', fill: 'b', stroke: 'cdo', lineWidth: 2 });
+    cache.draw(ctx, 'X', 0, 0, {
+      font: 'ab',
+      fill: 'c',
+      stroke: 'd',
+      lineWidth: 2,
+    });
+    cache.draw(ctx, 'X', 0, 0, {
+      font: 'a',
+      fill: 'bc',
+      stroke: 'd',
+      lineWidth: 2,
+    });
+    cache.draw(ctx, 'X', 0, 0, {
+      font: 'a',
+      fill: 'b',
+      stroke: 'cd',
+      lineWidth: 2,
+    });
+    cache.draw(ctx, 'oX', 0, 0, {
+      font: 'a',
+      fill: 'b',
+      stroke: 'cd',
+      lineWidth: 2,
+    });
+    cache.draw(ctx, 'X', 0, 0, {
+      font: 'a',
+      fill: 'b',
+      stroke: 'cdo',
+      lineWidth: 2,
+    });
     expect(trace.sprites).toHaveLength(5);
     expect(cache.size).toBe(5);
     expect(trace.blits).toHaveLength(10);
@@ -418,7 +484,11 @@ describe('text_sprite_cache: cache identity', () => {
     // default), so the stroke level parts them before width gets a say; the
     // width-key collision case is pinned on its own below.
     cache.draw(ctx, '7', 0, 0, { font: 'bold 12px Georgia', fill: 'gold' });
-    cache.draw(ctx, '7', 0, 0, { font: 'bold 12px Georgia', fill: 'gold', stroke: '' });
+    cache.draw(ctx, '7', 0, 0, {
+      font: 'bold 12px Georgia',
+      fill: 'gold',
+      stroke: '',
+    });
 
     expect(trace.sprites).toHaveLength(2);
     expect(trace.sprites[0].ink.map((i) => i.op)).toEqual(['fill']);
@@ -437,7 +507,12 @@ describe('text_sprite_cache: cache identity', () => {
     // the pair. A stroke of '' cannot pin this: the unresolved-token guard
     // refuses to cache it, and '' keys width at lineWidth ?? 1 = 1 anyway.
     const fillOnly = { font: 'bold 12px Georgia', fill: 'gold' };
-    const outlined = { font: 'bold 12px Georgia', fill: 'gold', stroke: '#000', lineWidth: 0 };
+    const outlined = {
+      font: 'bold 12px Georgia',
+      fill: 'gold',
+      stroke: '#000',
+      lineWidth: 0,
+    };
     cache.draw(ctx, '7', 0, 0, fillOnly);
     cache.draw(ctx, '7', 0, 0, outlined);
 
@@ -480,11 +555,21 @@ describe('text_sprite_cache: cache identity', () => {
     const ctx = targetContext(trace);
 
     // What resolveColors returns before the stylesheet applies: '' for every token.
-    cache.draw(ctx, 'AB', 0, 0, { font: 'bold 12px Georgia', fill: '', stroke: '', lineWidth: 3 });
+    cache.draw(ctx, 'AB', 0, 0, {
+      font: 'bold 12px Georgia',
+      fill: '',
+      stroke: '',
+      lineWidth: 3,
+    });
     expect(trace.blits).toHaveLength(1); // still drawn this redraw
     expect(cache.size).toBe(0); // but never frozen in the default black
 
-    cache.draw(ctx, 'AB', 0, 0, { font: 'bold 12px Georgia', fill: '', stroke: '', lineWidth: 3 });
+    cache.draw(ctx, 'AB', 0, 0, {
+      font: 'bold 12px Georgia',
+      fill: '',
+      stroke: '',
+      lineWidth: 3,
+    });
     expect(trace.sprites).toHaveLength(2);
 
     // An unresolved outline alone is enough to refuse the cache.
@@ -576,7 +661,7 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // ally-name term from 150 to 550 and the derived worst case to 785.
     // 800 -> 1300: the ladder's 1,000-seat hard cap took the ally-name term to
     // 1050 and the derived worst case to 1285.
-    expect(TEXT_SPRITE_LIMIT).toBe(1300);
+    expect(TEXT_SPRITE_LIMIT).toBe(1360); // FORK: Tidehold lifts the worst case to 1319
   });
 
   it('stays above the largest label set one redraw can ask for', () => {
@@ -869,7 +954,10 @@ describe('text_sprite_cache: hostile and partial metrics', () => {
         actualBoundingBoxAscent: -5,
         actualBoundingBoxDescent: -5,
       }),
-      () => ({ width: Number.NaN, actualBoundingBoxAscent: Number.POSITIVE_INFINITY }),
+      () => ({
+        width: Number.NaN,
+        actualBoundingBoxAscent: Number.POSITIVE_INFINITY,
+      }),
     ]) {
       const trace = newTrace();
       trace.metrics = metrics;
@@ -938,18 +1026,30 @@ describe('text_sprite_cache: hostile and partial metrics', () => {
     // the sprite, so a mis-parse is a clipped or a bloated label.
     const cases: Array<{ font: string; height: number }> = [
       // A fractional size keeps its fraction: ascent 13.5 -> ceil 14.
-      { font: 'bold 13.5px Georgia', height: 14 + 14 + Math.ceil(13.5 * 0.3) + 14 },
+      {
+        font: 'bold 13.5px Georgia',
+        height: 14 + 14 + Math.ceil(13.5 * 0.3) + 14,
+      },
       // A line-height shorthand takes the SIZE, not the ratio after the slash.
-      { font: 'bold 13px/1.2 Georgia', height: 13 + 14 + Math.ceil(13 * 0.3) + 14 },
+      {
+        font: 'bold 13px/1.2 Georgia',
+        height: 13 + 14 + Math.ceil(13 * 0.3) + 14,
+      },
       // A family whose name contains the units does not win over the real size.
-      { font: 'bold 15px "Px Grotesk"', height: 15 + 14 + Math.ceil(15 * 0.3) + 14 },
+      {
+        font: 'bold 15px "Px Grotesk"',
+        height: 15 + 14 + Math.ceil(15 * 0.3) + 14,
+      },
     ];
     for (const { font, height } of cases) {
       const trace = newTrace();
       trace.metrics = () => ({ width: 20 });
       installDocument(trace);
 
-      new TextSpriteCache().draw(targetContext(trace), 'AB', 100, 50, { ...OUTLINED, font });
+      new TextSpriteCache().draw(targetContext(trace), 'AB', 100, 50, {
+        ...OUTLINED,
+        font,
+      });
 
       expect(trace.sprites[0].height, font).toBe(height);
       vi.unstubAllGlobals();

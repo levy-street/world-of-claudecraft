@@ -11,6 +11,7 @@ import {
   stepOccluderFade,
   withinOccluderFadePrefetch,
 } from './occluder_fade_core';
+import { occluderFadesDisabled } from './occluder_fade_core';
 
 export interface TreeHidePart {
   mesh: THREE.InstancedMesh;
@@ -74,6 +75,8 @@ function cameraSegmentHitsTree(
   camY: number,
   camZ: number,
 ): boolean {
+  // The editor's viewport turns every camera fade off (occluder_fade_core).
+  if (occluderFadesDisabled()) return false;
   if (
     (eyeY < t.topY && pointInsideTree(t, eyeX, eyeZ)) ||
     (camY < t.topY && pointInsideTree(t, camX, camZ))

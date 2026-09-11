@@ -34,13 +34,16 @@
 import {
   type Collider,
   colliderTopAt,
+  insidePrism,
   MANTLE_REACH,
+  passesUnder,
   queryOpenWorldColliders,
   SUPPORT_OVERLAP,
   supportHeightAt,
 } from '../colliders';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel, walkedSteepnessAt } from '../ride_height';
 import { groundHeight, terrainDownhill } from '../world';
+import { onUnderSheet, sheetGroundHeight, sheetMouthStepOk, sheetWallBlocksStep, terrainHeight } from '../world';
 import { overlapCollider, SKIN_WIDTH, sweepCollider } from './sweep';
 
 /**
@@ -154,7 +157,7 @@ function pruneCandidates(x: number, z: number, dx: number, dz: number, reach: nu
   let kept = 0;
   for (let i = 0; i < candidates.length; i++) {
     const c = candidates[i];
-    const ext = c.type === 'circle' ? c.r : Math.hypot(c.hw, c.hd);
+    const ext = c.type === 'circle' ? c.r : c.type === 'prism' ? c.br : Math.hypot(c.hw, c.hd);
     if (c.x + ext < minX || c.x - ext > maxX || c.z + ext < minZ || c.z - ext > maxZ) continue;
     candidates[kept++] = c;
   }
@@ -178,6 +181,15 @@ function supportFromCandidates(x: number, z: number, r: number, maxY: number): n
       const dz = z - c.z;
       const reach = c.r + reachR;
       if (dx * dx + dz * dz >= reach * reach) continue;
+    } else if (c.type === 'prism') {
+      // The support test is a containment question, so a prism answers it with
+      // its real outline rather than a rectangle: standing on an authored deck
+      // must not be granted out past the shape the maker drew.
+      const reach = c.br + reachR;
+      const dx = x - c.x;
+      const dz = z - c.z;
+      if (dx * dx + dz * dz >= reach * reach) continue;
+      if (!insidePrism(c, x, z)) continue;
     } else {
       toLocal(x - c.x, z - c.z, -c.rot);
       if (Math.abs(localPt.x) >= c.hw + reachR || Math.abs(localPt.z) >= c.hd + reachR) continue;
@@ -216,6 +228,13 @@ function blocksAt(
   params: CharacterMoveParams,
 ): boolean {
   if (params.ignoreFences && c.type === 'obb' && c.isFence) return false;
+  // Pass-under, mirroring the legacy sweep's gate exactly: a collider whose
+  // BASE clears the head never blocks — an authored second storey does not
+  // wall the room below it, and a door lintel does not wall its doorway.
+  // Without this the kernel treated every y-banded box as a floor-to-sky
+  // column, which is precisely how the explorable buildings' doorways and
+  // ground floors read as "blocked" while the banded sweep said open.
+  if (passesUnder(c, feetY)) return false;
   if (c.moveTopY === undefined) return true; // full height: buildings, trees, walls
   const lift = !params.grounded && c.standable === true ? MANTLE_REACH : 0;
   return colliderTopAt(c, x, z) > feetY + lift + TOP_EPS;
@@ -239,7 +258,7 @@ function isClear(x: number, z: number, feetY: number, params: CharacterMoveParam
     const c = candidates[i];
     if (!blocksAt(c, x, z, feetY, params)) continue;
     physicsStats.overlaps++;
-    if (overlapCollider(c, x, z, params.radius, push)) return false;
+    if (overlapCollider(c, x, z, params.radius, push, feetY)) return false;
   }
   return true;
 }
@@ -261,7 +280,7 @@ function depenetrate(
       const c = candidates[i];
       if (!blocksAt(c, px, pz, feetY, params)) continue;
       physicsStats.overlaps++;
-      if (!overlapCollider(c, px, pz, params.radius, push)) continue;
+      if (!overlapCollider(c, px, pz, params.radius, push, feetY)) continue;
       px += push.nx * (push.depth + SKIN_WIDTH);
       pz += push.nz * (push.depth + SKIN_WIDTH);
       moved = true;
@@ -337,7 +356,7 @@ export function moveCharacter(
       // eave-clamped face as the wall it is.
       if (!blocksAt(c, px, pz, feetY, params)) continue;
       physicsStats.sweeps++;
-      if (!sweepCollider(c, px, pz, remX, remZ, params.radius, hit)) continue;
+      if (!sweepCollider(c, px, pz, remX, remZ, params.radius, hit, feetY)) continue;
       // A zero-advance contact whose face the motion SEPARATES from is a
       // graze, not an obstruction: a body resting against a deck plate's
       // side while walking directly away used to take this as the nearest
@@ -437,8 +456,12 @@ export function moveCharacter(
   // LANDS on dry ground is judged by the terrain's own steepness. A too-steep
   // bank then yields to the shore step-out onto a low standable lip.
   const wls = stepWaterLevel(x, z, px, pz, params.seed);
-  const rawEnd = groundHeight(px, pz, params.seed);
-  const groundStart = Math.max(groundHeight(x, z, params.seed), wls);
+  // groundHeightNear, not groundHeight: a cave tube floor and a carve cavity
+  // floor are walkable sheets in this fork, and the mover's own height picks
+  // which sheet the step is measured against. On a map with neither this is
+  // groundHeight exactly.
+  const rawEnd = sheetGroundHeight(px, pz, params.seed, feetY);
+  const groundStart = Math.max(sheetGroundHeight(x, z, params.seed, feetY), wls);
   let groundEnd = Math.max(rawEnd, wls);
   const run = Math.hypot(dx, dz);
   const airborneClears = !params.grounded && groundEnd <= feetY;
@@ -460,10 +483,26 @@ export function moveCharacter(
     run > 1e-5
   ) {
     const rise = groundEnd - groundStart;
+    // Stepping onto an AUTHORED walkable surface (ramp deck, plane volume,
+    // box top — any floor that sits ABOVE the bare heightfield) by no more
+    // than one step height is a designed step, not a terrain cliff: the whole
+    // terrain rule is skipped for it. A bridge over a chasm would otherwise
+    // read as the chasm WALL and freeze the body at the deck's entry. Terrain
+    // climbs keep the full rule.
+    const authoredStep =
+      rise <= params.stepHeight && rawEnd > terrainHeight(px, pz, params.seed) + 0.05;
     const unwalkable =
+      !authoredStep &&
       (rise / run > params.maxSlope ||
-        (rawEnd >= wls && walkedSteepnessAt(px, pz, params.seed, rawEnd) > params.maxSlope)) &&
-      !shoreStepOut(x, z, px, pz, params.seed, params.maxSlope);
+        // The SURFACE steepness cell is meaningless to a body walking a
+        // tunnel or carve beneath it: exempt under-sheet movers.
+        (rawEnd >= wls &&
+          !onUnderSheet(px, pz, params.seed, feetY) &&
+          walkedSteepnessAt(px, pz, params.seed, rawEnd) > params.maxSlope)) &&
+      !shoreStepOut(x, z, px, pz, params.seed, params.maxSlope) &&
+      // Walking OUT of a cave mouth / over a carve lip onto ground a small
+      // step above the floor is a doorway, not a cliff.
+      !sheetMouthStepOk(params.seed, x, z, feetY, px, pz, groundStart, groundEnd);
     // NOTE: step-up deliberately does NOT apply to the heightfield. A per-tick
     // step allowance on terrain is a cliff-climbing ladder: at 20 Hz a body
     // covers about 0.35 yd per tick, so allowing a step-height rise each tick
@@ -519,6 +558,18 @@ export function moveCharacter(
     }
   }
 
+  // A carve's rock walls and a tube's shell are solid regardless of the slope
+  // rule above: nothing else stops a below-surface body strafing straight
+  // through the rock beside its own tunnel. Surface walkers skip the test in
+  // one comparison.
+  if (sheetWallBlocksStep(params.seed, x, z, feetY, px, pz)) {
+    blocked = true;
+    px = depen.x;
+    pz = depen.z;
+    feetY = entryFeetY;
+    stepped = 0;
+  }
+
   out.x = px;
   out.z = pz;
   out.y = feetY;
@@ -538,5 +589,9 @@ export function floorHeightAt(
   radius: number,
   maxY: number,
 ): number {
-  return Math.max(groundHeight(x, z, seed), supportHeightAt(seed, x, z, radius, maxY));
+  // groundHeightNear, not groundHeight: a cave or carve floor can sit BELOW
+  // the surface, where maxing against the bare terrain would strand the body
+  // on the roof of its own tunnel. `maxY` (the feet plus the landing
+  // allowance) is the continuity height that picks the sheet.
+  return Math.max(sheetGroundHeight(x, z, seed, maxY), supportHeightAt(seed, x, z, radius, maxY));
 }

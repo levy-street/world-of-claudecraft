@@ -28,7 +28,11 @@ interface CompileGateHarness {
   gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: () => void): void;
   compileGate(target: THREE.Object3D, requiredForEntry?: boolean): Promise<unknown>;
   attachZoneFeature(
-    view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
+    view: {
+      group: THREE.Group;
+      glowLights?: THREE.PointLight[];
+      cullGroups?: THREE.Group[];
+    },
     freeze?: boolean,
   ): void;
 }
@@ -105,7 +109,10 @@ describe('Renderer live shader compile rejection recovery', () => {
     const rig = new THREE.Group();
     const telegraph = new THREE.Group();
     group.add(rig, telegraph);
-    const view = { compilePending: false, visualCompilePending: false } as EntityView;
+    const view = {
+      compilePending: false,
+      visualCompilePending: false,
+    } as EntityView;
 
     const ready = renderer.gateViewOnCompile(view, group, rig);
 
@@ -480,10 +487,11 @@ describe('Renderer live shader compile rejection recovery', () => {
 // program, which is what the per-frame admission can pace; the gate still
 // settles only after the last piece, so a gated reveal is no earlier.
 describe('the compile gate touch tail, per program', () => {
-  function touchHarness(
-    programs: number,
-  ): CompileGateHarness &
-    Record<string, unknown> & { queued: { label?: string; priority?: number }[]; order: string[] } {
+  function touchHarness(programs: number): CompileGateHarness &
+    Record<string, unknown> & {
+      queued: { label?: string; priority?: number }[];
+      order: string[];
+    } {
     const renderer = harness();
     const order: string[] = [];
     const queued: { label?: string; priority?: number }[] = [];
@@ -545,7 +553,9 @@ describe('the compile gate touch tail, per program', () => {
       });
       target.add(new THREE.Mesh(new THREE.BufferGeometry(), material));
     }
-    renderer.webgl = { properties: { get: (queried: unknown) => linked.get(queried) } };
+    renderer.webgl = {
+      properties: { get: (queried: unknown) => linked.get(queried) },
+    };
     renderer.touchTarget = target;
     renderer.queued = queued;
     renderer.order = order;
@@ -756,7 +766,11 @@ describe('the shadow arm compiles a depth twin for every mesh, caster or not', (
   it('restores every swap when the walk throws part-way', async () => {
     const renderer = shadowHarness();
     const compileAsync = vi.fn();
-    renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
+    renderer.webgl = {
+      getRenderTarget: () => null,
+      setRenderTarget: () => {},
+      compileAsync,
+    };
     const first = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
     first.castShadow = false;
     const second = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
@@ -786,7 +800,11 @@ describe('the shadow arm compiles a depth twin for every mesh, caster or not', (
   it('compiles the depth twin of a root whose only mesh is a non-caster (the rig beyond the band)', async () => {
     const renderer = shadowHarness();
     const compileAsync = vi.fn(() => Promise.resolve());
-    renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
+    renderer.webgl = {
+      getRenderTarget: () => null,
+      setRenderTarget: () => {},
+      compileAsync,
+    };
     const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
     mesh.castShadow = false;
     const material = mesh.material;
@@ -803,7 +821,11 @@ describe('the shadow arm compiles a depth twin for every mesh, caster or not', (
   it('compiles nothing for a root without meshes, or whose meshes carry no material', async () => {
     const renderer = shadowHarness();
     const compileAsync = vi.fn(() => Promise.resolve());
-    renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
+    renderer.webgl = {
+      getRenderTarget: () => null,
+      setRenderTarget: () => {},
+      compileAsync,
+    };
     const bare = new THREE.Mesh(new THREE.BufferGeometry());
     bare.material = null as unknown as THREE.Material;
     const root = new THREE.Group();
@@ -836,7 +858,10 @@ describe('the shadow arm compiles a depth twin for every mesh, caster or not', (
     const { seats } = buildFarmPatchProps(1234, FARM_PATCHES);
     // No gate handed in: the attach is bare and synchronous, which is what
     // lets these cases hold the groups without awaiting a settle.
-    const visuals = new FarmPatchVisuals(scene, seats, { burst() {}, groundPuff() {} });
+    const visuals = new FarmPatchVisuals(scene, seats, {
+      burst() {},
+      groundPuff() {},
+    });
     visuals.sync({ myFarmPlots: [], farmNowMs: () => 0, entities, cfg: { seed: 1234 } }, 0.5);
     const tables = scene.children.filter((c) => c.name.startsWith('farmFeast:')) as THREE.Group[];
     expect(tables).toHaveLength(FEAST_SHADOW_CAP + 1);

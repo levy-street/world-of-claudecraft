@@ -3745,6 +3745,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   pickUpObject(id: number): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'pickup', id });
   }
+  buyPlot(deedId: string): Promise<boolean> {
+    return this.cmdWithOutcome({ cmd: 'buyplot', plot: deedId });
+  }
   acceptQuest(questId: string, selection?: string): void {
     if (!this.canSendCommand()) return;
     this.pendingQuestCommands.set(questId, 'accept');

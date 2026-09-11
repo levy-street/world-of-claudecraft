@@ -122,6 +122,12 @@ function battlegroundGeometryHalfExtents(): { x: number; z: number } {
       z = Math.max(z, Math.abs(collider.z) + collider.r);
       continue;
     }
+    if (collider.type === 'prism') {
+      // the fork's Collision Master prisms: their bounding radius bounds them
+      x = Math.max(x, Math.abs(collider.x) + collider.br);
+      z = Math.max(z, Math.abs(collider.z) + collider.br);
+      continue;
+    }
     const cos = Math.cos(collider.rot);
     const sin = Math.sin(collider.rot);
     x = Math.max(

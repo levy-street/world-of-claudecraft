@@ -23,6 +23,7 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   'discard',
   'lock_item',
   'buy',
+  'buyplot', // Tidehold housing deeds (fork): the deed lands in the carried inventory
   'sell',
   'buyback',
   // 'vcup_bet' (a copper debit) sat here until the Vale Cup retired with

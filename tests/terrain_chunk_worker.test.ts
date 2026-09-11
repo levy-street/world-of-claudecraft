@@ -14,7 +14,8 @@ import {
   type TerrainChunkRequest,
   type WaterFillRequest,
 } from '../src/render/zone_build_worker';
-import { isBuiltinWorldActive, setActiveWorldContent } from '../src/sim/data';
+import { BUILTIN_WORLD, isBuiltinWorldActive, setActiveWorldContent } from '../src/sim/data';
+import type { WorldContent } from '../src/sim/types';
 
 // The worker's entry point is a SECOND route to the same geometry, so it can
 // drift from the main-thread one: drop an index row, mis-order the fills, miss
@@ -206,40 +207,37 @@ function useFakeWorkers(): void {
   });
 }
 
-describe('zoneBuildPool custom-world guard', () => {
+// FORK: upstream refuses the pool under a custom world (a worker samples its own
+// built-in copy of the content). The fork SHIPS the content instead — see
+// setContent and 'the worker is told which world it is meshing' below — so an
+// authored map (the Deepglass, every Studio map) keeps off-thread meshing.
+describe('zoneBuildPool under a custom world (fork contract)', () => {
   useFakeWorkers();
 
-  it('hands out the pool on the built-in world, refuses it under a custom one, and recovers', () => {
-    // Positive control first: with workers available the accessor really does
-    // spawn a pool, so the null below can only be the custom-world guard.
+  it('hands out the pool on the built-in world AND under a custom one', () => {
     expect(isBuiltinWorldActive()).toBe(true);
     expect(zoneBuildPool()).not.toBeNull();
     expect(FakeWorker.spawned.length).toBeGreaterThan(0);
-
-    // A worker samples its own module copy of the content (the built-in
-    // world), so the accessor must force the main-thread fallback here.
     setActiveWorldContent({ zones: [], spawns: [] } as never);
-    expect(isBuiltinWorldActive()).toBe(false);
-    const spawnedBefore = FakeWorker.spawned.length;
-    expect(zoneBuildPool()).toBeNull();
-    // The guard short-circuits: it must not spawn a pool it then withholds.
-    expect(FakeWorker.spawned.length).toBe(spawnedBefore);
-
-    setActiveWorldContent(null);
-    expect(isBuiltinWorldActive()).toBe(true);
+    try {
+      expect(isBuiltinWorldActive()).toBe(false);
+      const pool = zoneBuildPool();
+      expect(pool).not.toBeNull();
+      expect(typeof pool?.setContent).toBe('function');
+    } finally {
+      setActiveWorldContent(null);
+    }
     expect(zoneBuildPool()).not.toBeNull();
   });
 
-  it('guards the accessor itself, not a call site (source pin)', () => {
+  it("does not carry upstream's built-in-only guard (source pin)", () => {
     const source = readFileSync(
       path.resolve(__dirname, '../src/render/zone_build_pool.ts'),
       'utf8',
     );
     const accessor = source.slice(source.indexOf('export function zoneBuildPool'));
-    expect(accessor).toContain('if (!isBuiltinWorldActive()) return null;');
-    expect(accessor.indexOf('isBuiltinWorldActive')).toBeLessThan(
-      accessor.indexOf('createZoneBuildPool'),
-    );
+    expect(accessor).not.toContain('if (!isBuiltinWorldActive()) return null;');
+    expect(source).toContain("kind: 'content'");
   });
 });
 
@@ -478,5 +476,88 @@ describe('zoneBuildPool single-worker recovery', () => {
     expect(worker.posted).toHaveLength(2);
     feed(worker, okChunk(worker.posted[1].id));
     expect(await queued).not.toBeNull();
+  });
+});
+
+// The worker owns a SEPARATE copy of src/sim, so `getActiveWorldContent()`
+// there answers with the built-in world whatever the editor loaded. Every
+// content-dependent term the mesher reaches (the author's height stamps first
+// of all) then quietly reverts, and a custom map renders the unedited world
+// under correctly-placed props. These pin the two halves of the seam: the mesh
+// really is content-dependent, and the pool ships the content ahead of the job.
+describe('the worker is told which world it is meshing', () => {
+  const heightsOf = (arrays: { positions: Float32Array }): number[] => {
+    const out: number[] = [];
+    for (let i = 1; i < arrays.positions.length; i += 3) out.push(arrays.positions[i]);
+    return out;
+  };
+
+  it('meshes the active content, not the built-in world', () => {
+    const plain = heightsOf(buildChunkArrays(JOB));
+    const stamped: WorldContent = {
+      ...BUILTIN_WORLD,
+      terrainEdits: [{ x: JOB.x0 + 30, z: JOB.z0 + 30, radius: 40, delta: 12, falloff: 'smooth' }],
+    };
+    setActiveWorldContent(stamped);
+    try {
+      const edited = heightsOf(buildChunkArrays(JOB));
+      expect(edited).not.toEqual(plain);
+      expect(Math.max(...edited) - Math.max(...plain)).toBeGreaterThan(1);
+    } finally {
+      setActiveWorldContent(null);
+    }
+    // ...and back to the built-in world the mesh is byte-identical again, so
+    // the difference above is the content and nothing else.
+    expect(heightsOf(buildChunkArrays(JOB))).toEqual(plain);
+  });
+
+  it('posts the content to a worker before the first job it runs', async () => {
+    const posted: unknown[][] = [];
+    class FakeWorker {
+      onmessage: ((event: { data: unknown }) => void) | null = null;
+      onerror: (() => void) | null = null;
+      readonly log: unknown[] = [];
+      constructor() {
+        posted.push(this.log);
+      }
+      postMessage(message: { kind?: string; id?: number }): void {
+        this.log.push(message);
+        if (message.kind === 'chunk') {
+          queueMicrotask(() =>
+            this.onmessage?.({ data: { id: message.id, ok: false, error: 'stub' } }),
+          );
+        }
+      }
+      terminate(): void {}
+    }
+    const g = globalThis as unknown as { Worker?: unknown };
+    g.Worker = FakeWorker;
+    try {
+      disposeZoneBuildPool();
+      const pool = zoneBuildPool();
+      expect(pool).not.toBeNull();
+      const { id: _id, kind: _kind, ...payload } = JOB;
+      const content: WorldContent = { ...BUILTIN_WORLD, terrainEdits: [] };
+      pool?.setContent?.(9, content);
+      await pool?.buildChunk(payload);
+      const log = posted.find((entry) => entry.length > 0) ?? [];
+      expect((log[0] as { kind: string }).kind).toBe('content');
+      expect((log[0] as { content: WorldContent }).content).toBe(content);
+      expect((log[1] as { kind: string }).kind).toBe('chunk');
+      // A second job against the same generation must not re-ship it.
+      await pool?.buildChunk(payload);
+      expect(log.filter((m) => (m as { kind: string }).kind === 'content')).toHaveLength(1);
+      // Back to the shipped world: null, never a copy of BUILTIN_WORLD, whose
+      // identity is what data.ts checks to tell shipped zones from authored.
+      pool?.setContent?.(10, null);
+      await pool?.buildChunk(payload);
+      const contentMsgs = log.filter((m) => (m as { kind: string }).kind === 'content');
+      expect(contentMsgs).toHaveLength(2);
+      expect((contentMsgs[1] as { content: WorldContent | null }).content).toBeNull();
+      pool?.dispose();
+    } finally {
+      disposeZoneBuildPool();
+      g.Worker = undefined;
+    }
   });
 });

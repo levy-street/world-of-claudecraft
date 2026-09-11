@@ -16,13 +16,42 @@
 // two ways depending on which thread built them. The tier arrives on the
 // request as `lowShade` instead.
 
+import { setActiveWorldContent } from '../sim/data';
+import type { TerrainCut, WorldContent } from '../sim/types';
 import {
   beginChunkGeometry,
+  buildChunkCutFine,
   type ChunkGeometryArrays,
   fillChunkIndexRow,
   fillChunkVertexRow,
 } from './terrain_chunk_build';
-import { shoreDepthAt, shoreSlopeAt } from './water_core';
+import { shoreDepthAt, shoreDepthAttribute, shoreSlopeAt } from './water_core';
+
+/**
+ * The active world content, shipped to the worker so its copy of src/sim reads
+ * the SAME world the main thread does.
+ *
+ * A worker gets its own module instances, so `getActiveWorldContent()` there
+ * answers with the built-in world no matter what the editor loaded. Every
+ * content-dependent term the mesher reaches through world.ts then silently
+ * reverts: the height stamps an author sculpted (applyEditLayer), the zone
+ * biome, the roads, the water level, the biome paint. On a custom map that
+ * renders the UNEDITED world under correctly-placed props — a flat sea floor
+ * with a town floating over it (the Goldcrest report). The pool sends this
+ * before the first job and again whenever the content generation moves.
+ */
+export interface TerrainWorldContentMessage {
+  kind: 'content';
+  generation: number;
+  /**
+   * null = the built-in world, and it must stay null rather than a copy of it.
+   * Several readers (data.ts activeZoneList, and the zone x-bounds it feeds)
+   * tell the shipped world from an authored one by OBJECT IDENTITY, so a
+   * structured clone of BUILTIN_WORLD would read as a custom map and re-bound
+   * its zones. Passing null lets the worker restore its own instance.
+   */
+  content: WorldContent | null;
+}
 
 export interface TerrainChunkRequest {
   kind: 'chunk';
@@ -36,6 +65,12 @@ export interface TerrainChunkRequest {
   skirtSpan: number;
   /** Resolved by the main thread: see the note above about gfx.ts. */
   lowShade: boolean;
+  /** Boolean terrain cuts and the patches that undo them, resolved by the main
+   *  thread off the ACTIVE content (the worker has no world content of its
+   *  own). Plain data, so postMessage structured-clones them; a map with no
+   *  cuts sends nothing and the mesher keeps its old fast path. */
+  cuts?: readonly TerrainCut[];
+  cutPatches?: readonly TerrainCut[];
 }
 
 /** The sheet's vertex positions travel EXPLICITLY rather than being re-derived
@@ -49,7 +84,9 @@ export interface WaterFillRequest {
   seed: number;
 }
 
-export type ZoneBuildRequest = TerrainChunkRequest | WaterFillRequest;
+// FORK: the pool also ships the active world's content ahead of a job (see
+// TerrainWorldContentMessage above), so the worker meshes the SAME world.
+export type ZoneBuildRequest = TerrainChunkRequest | WaterFillRequest | TerrainWorldContentMessage;
 
 export interface WaterFillArrays {
   shoreDepth: Float32Array;
@@ -73,6 +110,25 @@ function transferListFor(arrays: ChunkGeometryArrays): Transferable[] {
   ];
   if (arrays.splats) buffers.push(arrays.splats.buffer);
   if (arrays.extras) buffers.push(arrays.extras.buffer);
+  if (arrays.rim) {
+    buffers.push(
+      arrays.rim.positions.buffer,
+      arrays.rim.normals.buffer,
+      arrays.rim.uvs.buffer,
+      arrays.rim.indices.buffer,
+    );
+  }
+  if (arrays.clip) {
+    buffers.push(
+      arrays.clip.positions.buffer,
+      arrays.clip.normals.buffer,
+      arrays.clip.colors.buffer,
+      arrays.clip.uvs.buffer,
+      arrays.clip.indices.buffer,
+    );
+    if (arrays.clip.splats) buffers.push(arrays.clip.splats.buffer);
+    if (arrays.clip.extras) buffers.push(arrays.clip.extras.buffer);
+  }
   return buffers;
 }
 
@@ -86,6 +142,7 @@ export function buildChunkArrays(job: TerrainChunkRequest): ChunkGeometryArrays 
     job.withSplat,
     job.skirtSpan,
     job.lowShade,
+    job.cuts && job.cuts.length > 0 ? { cuts: job.cuts, patches: job.cutPatches } : null,
   );
   for (let row = 0; row < state.gh; row++) fillChunkVertexRow(state, row);
   for (let row = 0; row < state.gh - 1; row++) fillChunkIndexRow(state, row);
@@ -97,6 +154,7 @@ export function buildChunkArrays(job: TerrainChunkRequest): ChunkGeometryArrays 
     splats: state.splats,
     extras: state.extras,
     indices: state.indices,
+    ...buildChunkCutFine(state),
   };
 }
 
@@ -105,7 +163,7 @@ export function buildWaterFillArrays(job: WaterFillRequest): WaterFillArrays {
   const shoreDepth = new Float32Array(count);
   const shoreSlope = new Float32Array(count);
   for (let i = 0; i < count; i++) {
-    shoreDepth[i] = shoreDepthAt(job.x[i], job.z[i], job.seed);
+    shoreDepth[i] = shoreDepthAttribute(shoreDepthAt(job.x[i], job.z[i], job.seed));
     shoreSlope[i] = shoreSlopeAt(job.x[i], job.z[i], job.seed);
   }
   return { shoreDepth, shoreSlope };
@@ -131,6 +189,12 @@ const workerScope: ZoneBuildWorkerScope | null =
 
 if (workerScope) {
   workerScope.onmessage = (event: MessageEvent<ZoneBuildRequest>) => {
+    if (event.data.kind === 'content') {
+      // No reply: the pool sends this immediately before the job that needs it,
+      // on the same ordered channel, so the job cannot overtake it.
+      setActiveWorldContent(event.data.content);
+      return;
+    }
     const job = event.data;
     try {
       if (job.kind === 'water-fill') {

@@ -10,10 +10,17 @@
 // pool of persistent looping sources for ambience and sustained spell casts.
 
 import { apiUrl } from '../client_origin';
+import type { PointSoundSource } from '../render/audio_sink';
 import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
+import {
+  DEEPGLASS_LOOP_SFX_KEYS,
+  DEEPGLASS_SFX_KEYS,
+  deepglassLoopSamples,
+  deepglassSamples,
+} from './deepglass_audio';
 import {
   advanceInterruptibleMountEngine,
   advanceMountEngine,
@@ -23,6 +30,7 @@ import {
   mountEngineIdleAudible,
   mountEngineLoopActive,
 } from './mount_engine_state';
+
 import {
   SFX_CATALOG_HASH,
   SFX_CLIPS,
@@ -52,7 +60,25 @@ const ABILITY_VOICES = 8;
 const ABILITY_GAIN = 0.34;
 export const REF_DISTANCE = 5; // world units at which a sound is at full volume
 export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
+// Hysteresis past a map point sound's authored radius before its loop is
+// released, so walking the edge does not restart the source every step.
+const POINT_SOUND_CULL = 6;
 const POINT_AMBIENCE_GAIN = 0.18;
+// Every open-air/dungeon bed ambience() can raise. Listed once so the
+// submerged branch can silence the lot without having to stay in step with the
+// biome ladder below it — a bed added there and forgotten here would keep
+// blowing wind through the Deepglass.
+const SURFACE_BEDS = [
+  'amb_dungeon',
+  'amb_crowd',
+  'amb_wind_vale',
+  'amb_birds',
+  'amb_wind_marsh',
+  'amb_wind_peaks',
+  'amb_rain',
+  'amb_snow',
+  'amb_water',
+] as const;
 const COOLDOWN_ENTRY_TTL = 60;
 const COOLDOWN_PRUNE_INTERVAL = 30;
 // The target loop() multiplies by the clip's own manifest gain (1 for this
@@ -171,6 +197,16 @@ export interface PlayOpts {
   // pile up and comb-filter into a metallic ring. 0 (default) plays the clip flat.
   attack?: number; // fade-in seconds (default 0 = instant)
   release?: number; // fade-out seconds; the clip is stopped once it ends
+  /**
+   * How far this sound carries, in world units. Defaults to MAX_DISTANCE, which
+   * is tuned for zone-scale footsteps and combat.
+   *
+   * Overridable because one venue breaks that assumption: the Deepglass bell is
+   * ~98 yd across, so a strike at the far ring is further away than the shared
+   * cutoff and would be SILENT — in an arena where hearing the ball behind you
+   * is half of knowing where it is.
+   */
+  maxDistance?: number;
   /** Fade the clip's OWN TAIL, keeping its full length. The opposite of
    *  `release` above, which truncates: `release: 0.2` on a 2.3s take stops it
    *  0.2s in, correct for a footstep and wrong for anything meant to play out.
@@ -203,6 +239,7 @@ interface PendingLoop {
   y?: number;
   z?: number;
   maxDistance?: number;
+  refDistance?: number;
   // Carries the caller's `immediate` request through the cold-buffer wait so
   // a resumed loop() call (once the buffer finishes loading) still snaps
   // straight to target gain instead of silently falling back to a fade-in.
@@ -338,6 +375,17 @@ class Sfx {
     }
   }
 
+  /** Release the AudioContext for a page that is going away (the editor's
+   *  pagehide teardown). Nulls the context so a later init() rebuilds it. */
+  close(): void {
+    const ctx = this.ctx;
+    this.ctx = null;
+    this.master = null;
+    this.clips = SFX_CLIPS;
+    this.clipsReady = null;
+    if (ctx) void ctx.close().catch(() => {});
+  }
+
   private entry(key: string): SfxEntry | undefined {
     return this.clips[key];
   }
@@ -453,6 +501,25 @@ class Sfx {
         const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
         buffer.getChannelData(0).set(samples);
         this.buffers.set(`mob_water_elemental_${cue}`, buffer);
+      }
+      // Deepball at the Deepglass (game/deepglass_audio.ts). Baked here rather
+      // than generated as clips because the arena is an offline event build and
+      // every cue it needs is a short percussive transient — and because the
+      // bell shipped SILENT, which read as a physics demo rather than a match.
+      for (const [key, cue] of Object.entries(DEEPGLASS_SFX_KEYS)) {
+        const samples = deepglassSamples(cue, ctx.sampleRate);
+        const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+        buffer.getChannelData(0).set(samples);
+        this.buffers.set(key, buffer);
+      }
+      // The two sustained beds (the bell's room tone, the burners under load).
+      // Same bank, separate render path: these are seamless loops, so they
+      // carry no fade at either end.
+      for (const [key, loop] of Object.entries(DEEPGLASS_LOOP_SFX_KEYS)) {
+        const samples = deepglassLoopSamples(loop, ctx.sampleRate);
+        const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+        buffer.getChannelData(0).set(samples);
+        this.buffers.set(key, buffer);
       }
     } catch {
       /* minimal AudioContext stubs may not implement buffer synthesis */
@@ -618,7 +685,8 @@ class Sfx {
     const ctx = this.ctx,
       master = this.master;
     if (!ctx || !master) return false;
-    if (this.tooFar(x, z)) return false;
+    const range = opts?.maxDistance ?? MAX_DISTANCE;
+    if (this.tooFar(x, z, range)) return false;
     const variantIndex = this.nextVariantIndex(key);
     const cacheKey = assetCacheKey(key, variantIndex);
     const buf = this.buffers.get(cacheKey);
@@ -868,8 +936,10 @@ class Sfx {
   // maxDistance defaults to makePanner's own default (the shared MAX_DISTANCE),
   // so every existing caller keeps its current audible range; only a caller
   // that needs its own falloff (pointAmbient's 'forge' branch) passes an
-  // override. refDistance has no caller that overrides it today; add it back
-  // if a future station ambience needs its own near-field radius.
+  // override. refDistance is likewise optional, and is passed by the
+  // map-authored point sounds: a maker's radius IS the whole falloff circle,
+  // so the near field has to scale with it rather than sit at the shared
+  // constant (see pointSounds).
   loop(
     id: string,
     key: string,
@@ -879,6 +949,7 @@ class Sfx {
     z?: number,
     maxDistance?: number,
     immediate = false,
+    refDistance?: number,
   ): void {
     const ctx = this.ctx,
       master = this.master;
@@ -903,7 +974,7 @@ class Sfx {
           this.pendingLoopVariants.delete(id);
           return;
         }
-        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance, immediate });
+        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance, refDistance, immediate });
         this.pendingLoopVariants.set(id, variantIndex);
         if (this.pendingLoopLoads.get(id) !== key) {
           this.pendingLoopLoads.set(id, key);
@@ -929,6 +1000,7 @@ class Sfx {
               pending.z,
               pending.maxDistance,
               pending.immediate,
+              pending.refDistance,
             );
           });
         }
@@ -940,7 +1012,7 @@ class Sfx {
       src.playbackRate.value = this.authoredPlaybackRate(key);
       const g = ctx.createGain();
       g.gain.value = 0;
-      const panner = positional ? this.makePanner(x, y, z, undefined, maxDistance) : null;
+      const panner = positional ? this.makePanner(x, y, z, refDistance, maxDistance) : null;
       if (panner) src.connect(g).connect(panner).connect(master);
       else src.connect(g).connect(master);
       src.start();
@@ -972,7 +1044,8 @@ class Sfx {
       // takes effect on the NEXT frame rather than only for a loop that
       // hasn't started yet.
       const resolvedMax = maxDistance ?? MAX_DISTANCE;
-      if (slot.panner.refDistance !== REF_DISTANCE) slot.panner.refDistance = REF_DISTANCE;
+      const resolvedRef = refDistance ?? REF_DISTANCE;
+      if (slot.panner.refDistance !== resolvedRef) slot.panner.refDistance = resolvedRef;
       if (slot.panner.maxDistance !== resolvedMax) slot.panner.maxDistance = resolvedMax;
     }
     // Only (re)arm the ramp when the target actually changes. loop() is called
@@ -1024,6 +1097,31 @@ class Sfx {
 
   hasLoop(id: string): boolean {
     return this.loops.has(id);
+  }
+
+  /** Bend a live loop's playback rate, ramped rather than stepped.
+   *
+   *  Ambience never needs this — a wind bed has no "harder". A THRUST bed does:
+   *  the deepball burners have to climb with the body they are pushing, and a
+   *  boost that sounds identical at cruise and at 26 yd/s tells the player
+   *  nothing. Silently a no-op for a loop that is not playing yet (a bed can be
+   *  a frame or two behind while its buffer resolves), so callers can set it
+   *  every frame beside loop(). */
+  loopRate(id: string, rate: number): void {
+    const slot = this.loops.get(id);
+    const ctx = this.ctx;
+    if (!slot || !ctx) return;
+    const target = Math.max(0.25, Math.min(4, rate)) * this.authoredPlaybackRate(slot.key);
+    const param = slot.src.playbackRate;
+    if (Math.abs(param.value - target) < 0.005) return;
+    // Ramped where the platform offers it (a stepped playback rate on a live
+    // source is an audible zip), stepped where it does not — minimal
+    // AudioContext stubs implement playbackRate as a plain value.
+    if (typeof param.setTargetAtTime === 'function') {
+      param.setTargetAtTime(target, ctx.currentTime, 0.12);
+    } else {
+      param.value = target;
+    }
   }
 
   /** A fixed-duration ground zone loop (Blizzard's storm): starts `key`
@@ -1723,7 +1821,17 @@ class Sfx {
 
   /** Cross-fade the global ambience loops to match the player's surroundings.
    *  These are continuous background beds, kept well under the foreground
-   *  footstep/jump/combat one-shots so movement always reads clearly over them. */
+   *  footstep/jump/combat one-shots so movement always reads clearly over them.
+   *
+   *  `submerged` is the Deepglass: the player is inside the bell, and none of
+   *  the beds above deal with being under a hundred yards of water. It is
+   *  handled here rather than beside the deepball cues so that ONE function
+   *  still owns which bed is playing — two owners is how you get a ridge wind
+   *  blowing through an underwater arena.
+   *
+   *  `crowd` (0..1) is how full and how loud the nearest stadium reads. It
+   *  raises the open-air murmur below and, when submerged, the muffled bowl
+   *  bed instead — one number, and the bell picks which one you hear. */
   ambience(
     biome: BiomeId,
     inDungeon: boolean,
@@ -1731,10 +1839,26 @@ class Sfx {
     nearWater: boolean,
     crowd = 0,
     points: readonly AmbientPointSource[] = [],
+    submerged = false,
   ): void {
+    this.ambient('dg_ambient', submerged ? 0.42 : 0);
+    // The stands, heard through the glass. Same `crowd` reading that raises
+    // amb_crowd out in the air below, so walking off the causeway and diving
+    // into the bell changes which bed carries the bowl, not whether it is
+    // there. Never zero while a crowd is present: an empty-sounding stadium
+    // full of people is the one thing this cannot be.
+    this.ambient('dg_crowd', submerged && crowd > 0 ? 0.14 + 0.2 * Math.min(1, crowd) : 0);
+    if (submerged) {
+      // Everything else is up in the air, and the air is not down here.
+      for (const key of SURFACE_BEDS) this.ambient(key, 0);
+      for (let i = 0; i < points.length; i++) this.unloop(points[i].id, 0.7);
+      return;
+    }
     this.ambient('amb_dungeon', inDungeon ? 0.3 : 0);
-    // Sowfield crowd murmur (procedural bed): quiet chatter on the grounds,
-    // swelling while a match is live (the renderer passes 0 / ~0.4 / 1).
+    // Open-air crowd murmur (procedural bed): quiet chatter on the grounds,
+    // swelling while a match is live. The Deepglass terrace and causeway raise
+    // it from outside the bell; the muffled dg_crowd bed above takes over the
+    // moment the player is in the water.
     this.ambient('amb_crowd', crowd > 0 ? 0.08 + 0.18 * Math.min(1, crowd) : 0);
     this.ambient('amb_wind_vale', !inDungeon && (biome === 'vale' || biome === 'beach') ? 0.12 : 0);
     this.ambient(
@@ -1842,6 +1966,43 @@ class Sfx {
     };
     blast(196, 0, 0.5);
     blast(261.6, 0.42, 0.9);
+  }
+
+
+  /** Per-frame update of the map-authored point sounds (the editor's Sound
+   *  tool). Each node is one positional loop whose panner falls off over the
+   *  authored radius, so it rides the same pool as world ambience: lazy clip
+   *  loading, the manifest's gain trim, and allocation-free repeat calls all
+   *  come along. Out-of-range nodes release their source rather than sitting
+   *  silent, with a little hysteresis past the radius so a player walking the
+   *  edge does not restart the loop every step. */
+  pointSounds(sources: readonly PointSoundSource[]): void {
+    if (!this.ctx) return;
+    for (let i = 0; i < sources.length; i++) {
+      const s = sources[i];
+      const dx = s.x - this.lx,
+        dz = s.z - this.lz;
+      const cull = s.radius + POINT_SOUND_CULL;
+      if (dx * dx + dz * dz > cull * cull) {
+        if (this.loops.has(s.id) || this.pendingLoops.has(s.id)) this.unloop(s.id, 0.7);
+        continue;
+      }
+      // The authored radius IS the whole falloff circle, so it drives both ends
+      // of the linear distance model: full gain out to a small core, silent at
+      // the edge. Without the matching near field a small emitter would sit at
+      // full volume across most of its own circle.
+      this.loop(
+        s.id,
+        s.key,
+        s.volume,
+        s.x,
+        s.y,
+        s.z,
+        Math.max(1, s.radius),
+        false,
+        Math.max(0.5, s.radius * 0.12),
+      );
+    }
   }
 
   // --- Per-ability procedural combat audio (src/render/ability_vfx) --------

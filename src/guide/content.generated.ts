@@ -2457,6 +2457,27 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     ]
   },
   {
+    "id": "goldcrest_harbor",
+    "name": "Goldcrest Harbor",
+    "min": 1,
+    "max": 60,
+    "biome": "vale",
+    "hub": "Goldcrest",
+    "pois": [
+      "The Grand Gate",
+      "Grand Plaza",
+      "The Goldcrest Exchange",
+      "Market Ward",
+      "Harbor Ward",
+      "Highcrown Citadel",
+      "The Lightspire",
+      "The Gold Light",
+      "The Golden Span"
+    ],
+    "welcome": "Goldcrest Harbor, seat of the World Market. Every road, tide and ledger in the realm meets here.",
+    "families": []
+  },
+  {
     "id": "proving_shore",
     "name": "The Proving Shore",
     "min": 1,
@@ -2517,6 +2538,14 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "min": 20,
     "max": 20,
     "name": "The Wildheart Basin"
+  },
+  {
+    "id": "infernal_abyss",
+    "isRaid": false,
+    "suggestedPlayers": 5,
+    "min": 20,
+    "max": 20,
+    "name": "Molten Abyss"
   },
   {
     "id": "raid",

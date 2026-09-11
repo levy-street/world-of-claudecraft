@@ -1094,6 +1094,55 @@ export const VOICE_ALIAS = {
   // own VOICE_PROMPTS entry, with the rank and the cold Highwatch authority the
   // greeting carries, once an ElevenLabs key is available to design and render it.
   warmarshal_draven_kole: 'fury',
+  // Baldemar the Bald (src/sim/portal_wizard.ts) is ONE character standing in
+  // sixteen places at once, so all sixteen selves share one voice. Like the
+  // Warmarshal above, this is a ROLE match to an existing designed voice (the
+  // Loremaster's dry scholarly tenor is the closest register to a six-hundred-
+  // year-old archmage enjoying his own joke): promote him to his own
+  // VOICE_PROMPTS entry, aged up and with the knowing chuckle the greeting
+  // carries, once an ElevenLabs key is available to design and render it.
+  portal_wizard_eastbrook: 'loremaster_caddis',
+  portal_wizard_fenbridge: 'loremaster_caddis',
+  portal_wizard_highwatch: 'loremaster_caddis',
+  portal_wizard_eldergleam: 'loremaster_caddis',
+  portal_wizard_wyrmwatch: 'loremaster_caddis',
+  portal_wizard_icemantle: 'loremaster_caddis',
+  portal_wizard_lanternmere: 'loremaster_caddis',
+  portal_wizard_bridgemere: 'loremaster_caddis',
+  portal_wizard_moonrest: 'loremaster_caddis',
+  portal_wizard_gallowmere: 'loremaster_caddis',
+  portal_wizard_drifthaven: 'loremaster_caddis',
+  portal_wizard_hedgewick: 'loremaster_caddis',
+  portal_wizard_wickharbor: 'loremaster_caddis',
+  portal_wizard_gullhaven: 'loremaster_caddis',
+  portal_wizard_goldcrest: 'loremaster_caddis',
+  portal_wizard_deepglass: 'loremaster_caddis',
+  // The Deepglass city-event crowd (src/sim/content/deepglass_event.ts):
+  // ambient chatter, so each borrows an existing designed voice in roughly
+  // the right register rather than commissioning twenty-three new ones.
+  dg_spectator_pace1: 'weaver_ottilie',
+  dg_spectator_pace2: 'lampman_cobb',
+  dg_spectator_pace3: 'scout_einna',
+  dg_spectator_pace4: 'gravedigger_mosley',
+  dg_spectator_yard1: 'herbalist_yara',
+  dg_spectator_yard2: 'foreman_odell',
+  dg_spectator_yard3: 'loremother_bryn',
+  dg_spectator_yard4: 'lamplighter_sorrel',
+  dg_spectator_tier1: 'hearthkeeper_maeve',
+  dg_spectator_tier2: 'trader_wilkes',
+  dg_spectator_tier3: 'weaver_amelle',
+  dg_spectator_tier4: 'warden_fenwick',
+  dg_spectator_tier5: 'aurorist_veyla',
+  dg_spectator_tier6: 'tanner_hesk',
+  dg_spectator_tier7: 'lira_dewsong',
+  dg_spectator_tier8: 'widow_tansy',
+  dg_spectator_tier9: 'captain_thessaly',
+  dg_spectator_tier10: 'scout_einna',
+  dg_spectator_tier11: 'weaver_ottilie',
+  dg_spectator_tier12: 'gravedigger_mosley',
+  dg_stallkeeper_pies: 'cook_marlow',
+  dg_stallkeeper_tonics: 'alchemist_verane',
+  dg_stallkeeper_favors: 'wickmother_sorrel',
   // The four farmer NPCs (the farming go-live) borrow ROLE-MATCHED designed
   // voices for now, the Draven Kole precedent: each has its own description
   // in docs/design/npc_voices.md and is promoted to its own VOICE_PROMPTS

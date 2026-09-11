@@ -5,7 +5,7 @@
 // spawn clear zones, walkable path widths between cover, and the Fiesta hazard
 // ring covering the whole pit at bout start.
 import { describe, expect, it } from 'vitest';
-import { arenaCollidersForSlot, type Collider, lineOfSightClear } from '../src/sim/colliders';
+import { arenaCollidersForSlot, type LayoutCollider, lineOfSightClear } from '../src/sim/colliders';
 import { arenaOrigin } from '../src/sim/data';
 import {
   ARENA_LAYOUT,
@@ -33,7 +33,7 @@ const ALL_SPAWNS = [ARENA_SPAWN_A, ARENA_SPAWN_B, ...ARENA_SPAWNS_A_2v2, ...AREN
 
 // Distance from a point to a collider's surface (0 when inside). Arena
 // colliders are circles and rot-0 OBBs only.
-function surfaceDistance(c: Collider, x: number, z: number): number {
+function surfaceDistance(c: LayoutCollider, x: number, z: number): number {
   if (c.type === 'circle') return Math.hypot(x - c.x, z - c.z) - c.r;
   const dx = Math.max(Math.abs(x - c.x) - c.hw, 0);
   const dz = Math.max(Math.abs(z - c.z) - c.hd, 0);
@@ -41,7 +41,7 @@ function surfaceDistance(c: Collider, x: number, z: number): number {
 }
 
 // Surface-to-surface gap between two interior obstacles (circles / rot-0 OBBs).
-function obstacleGap(a: Collider, b: Collider): number {
+function obstacleGap(a: LayoutCollider, b: LayoutCollider): number {
   if (a.type === 'circle' && b.type === 'circle') {
     return Math.hypot(a.x - b.x, a.z - b.z) - a.r - b.r;
   }
@@ -54,16 +54,16 @@ function obstacleGap(a: Collider, b: Collider): number {
 
 // Interior cover only (pillars + stubs + tombs), as colliders, straight from
 // the layout record so the test cannot drift from what layoutColliders derives.
-function coverColliders(layout: DungeonLayout = ARENA_LAYOUT): Collider[] {
+function coverColliders(layout: DungeonLayout = ARENA_LAYOUT): LayoutCollider[] {
   return [
     ...layout.pillars.map(
-      (p): Collider => ({ type: 'circle', x: p.x, z: p.z, r: PILLAR_COLLIDER_R }),
+      (p): LayoutCollider => ({ type: 'circle', x: p.x, z: p.z, r: PILLAR_COLLIDER_R }),
     ),
     ...layout.stubs.map(
-      (s): Collider => ({ type: 'obb', x: s.x, z: s.z, hw: s.hw, hd: s.hd, rot: 0 }),
+      (s): LayoutCollider => ({ type: 'obb', x: s.x, z: s.z, hw: s.hw, hd: s.hd, rot: 0 }),
     ),
     ...layout.tombs.map(
-      (t): Collider => ({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 }),
+      (t): LayoutCollider => ({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 }),
     ),
   ];
 }
@@ -369,8 +369,8 @@ describe('arena slot parity: per-slot colliders', () => {
     expect(arenaCollidersForSlot(3)).toEqual(layoutColliders(DROWNED_COURT_LAYOUT));
     // one representative per map: the Coliseum's centre-diamond post exists
     // only on even slots, the Drowned Court's colonnade only on odd ones
-    const diamond = (c: Collider) => c.type === 'circle' && c.x === 0 && c.z === -4;
-    const colonnade = (c: Collider) => c.type === 'circle' && c.x === 8 && c.z === -6;
+    const diamond = (c: LayoutCollider) => c.type === 'circle' && c.x === 0 && c.z === -4;
+    const colonnade = (c: LayoutCollider) => c.type === 'circle' && c.x === 8 && c.z === -6;
     expect(arenaCollidersForSlot(0).some(diamond)).toBe(true);
     expect(arenaCollidersForSlot(0).some(colonnade)).toBe(false);
     expect(arenaCollidersForSlot(1).some(diamond)).toBe(false);

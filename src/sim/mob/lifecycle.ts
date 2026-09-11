@@ -67,6 +67,19 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.harvestClaimedBy = null;
   mob.ownerId = null;
   mob.hostile = true;
+  // A patroller (editor Mob tool) walks its spawnPos along the route, so it
+  // would otherwise respawn wherever it happened to die. Send it back to the
+  // head of its path and restart the walk. Inert for every routeless mob.
+  if (mob.route && mob.route.points.length >= 2) {
+    mob.spawnPos.x = mob.route.points[0].x;
+    mob.spawnPos.z = mob.route.points[0].z;
+    // Re-seat the home point too: a later evade walks straight at spawnPos, so
+    // it must not keep the height of wherever the patrol died.
+    mob.spawnPos.y = groundHeight(mob.spawnPos.x, mob.spawnPos.z, ctx.cfg.seed);
+    mob.routeIdx = 0;
+    mob.routeDir = 1;
+    mob.routeWaitLeft = 0;
+  }
   mob.pos = { ...mob.spawnPos };
   mob.pos.y = groundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed);
   mob.prevPos = { ...mob.pos };

@@ -385,8 +385,9 @@ describe('the scan premise: one celebration walks the whole roster, one zoneAt p
   // premise of that number the way the cadence constant and the realm cap are of
   // the two records above. tests/professions_zone_rollout.test.ts pins the roster
   // for its own reasons; this one routes a sixteenth zone back to this record.
-  it('the zone list the per-player cost is indexed over holds fifteen entries', () => {
-    expect(ZONES).toHaveLength(15);
+  it('the zone list the per-player cost is indexed over holds sixteen entries', () => {
+    // 15 upstream + the fork's Tidehold (the Warden City).
+    expect(ZONES).toHaveLength(16);
   });
 
   /** Drive `fire` with the fixture's entity reads and zoneAt calls counted. The
@@ -406,7 +407,10 @@ describe('the scan premise: one celebration walks the whole roster, one zoneAt p
     const counted = vi.mocked(zoneAt);
     counted.mockClear();
     fire();
-    return { visits, calls: counted.mock.calls.map(([x, z]) => [x, z] as const) };
+    return {
+      visits,
+      calls: counted.mock.calls.map(([x, z]) => [x, z] as const),
+    };
   }
 
   it('shared prologue: celebrant first, every roster entry once, one zoneAt each', () => {

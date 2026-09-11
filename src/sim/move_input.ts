@@ -8,6 +8,7 @@ const MOVE_FIELDS = [
   ['strafeLeft', 'sl'],
   ['strafeRight', 'sr'],
   ['jump', 'j'],
+  ['boost', 'bo'],
   ['dive', 'dv'],
   ['surface', 'sf'],
 ] as const;
@@ -32,6 +33,16 @@ function sanitizeSwimSteer(raw: Record<string, unknown>): number | undefined {
   return Math.min(1, Math.max(0, value));
 }
 
+/** The deepball aim pitch: signed radians, positive UP. Absent means "no camera
+ *  said anything", which the flight pass reads as the old latched bands. Clamped
+ *  rather than rejected so a wild value from a bad client is merely a steep aim
+ *  and never a NaN in the thrust vector. */
+function sanitizeAimPitch(raw: Record<string, unknown>): number | undefined {
+  const value = raw.aimPitch ?? raw.ap;
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  return Math.min(Math.PI / 2, Math.max(-Math.PI / 2, value));
+}
+
 export function sanitizeMoveInput(raw: unknown): MoveInput {
   const input = emptyMoveInput();
   if (!isRecord(raw)) return input;
@@ -39,6 +50,7 @@ export function sanitizeMoveInput(raw: unknown): MoveInput {
     input[field as MoveField] = isMoveFlag(raw[field]) || isMoveFlag(raw[compact]);
   }
   input.swimSteer = sanitizeSwimSteer(raw);
+  input.aimPitch = sanitizeAimPitch(raw);
   return input;
 }
 

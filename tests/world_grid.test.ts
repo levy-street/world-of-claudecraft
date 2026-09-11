@@ -64,13 +64,19 @@ describe('the continent derives the right border set', () => {
     });
   });
 
-  it('has twelve horizontal borders and sixteen column edges', () => {
+  it('has thirteen horizontal borders and eighteen column edges', () => {
     // the Farshore adds a v-edge against the vale and an h-line under the
     // Galecrest: both are open-sea borders with no isthmus (ferry only); the
     // Proving Shore mirrors both on the east column (v-edge against the
-    // vale, h-line under the Willowfen), open sea with the ferry portal only
-    expect(edges.filter((e) => e.kind === 'h').length).toBe(12);
-    expect(edges.filter((e) => e.kind === 'v').length).toBe(16);
+    // vale, h-line under the Willowfen), open sea with the ferry portal only.
+    //
+    // 12 h / 16 v -> 13 / 18 (2026-08): Goldcrest Harbor moved off the west
+    // starter square (the Proving Shore claimed that rect) to the strip's new
+    // northern band, z 1960..2420. That is one new h-line — its south edge on
+    // the Frostveil — and two new v-edges, its flanks against the Amberfall
+    // and the Drakelands, which both run beside it for the whole band.
+    expect(edges.filter((e) => e.kind === 'h').length).toBe(13);
+    expect(edges.filter((e) => e.kind === 'v').length).toBe(18);
   });
 
   it('every crossing sits where the atlas says', () => {
@@ -118,7 +124,9 @@ describe('the continent derives the right border set', () => {
     for (const z of [2000, 2300]) {
       expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });
     }
-    expect(worldXBoundsAt(2400)).toEqual({ min: 180, max: 540 });
+    // z 2400 is past the Amberfall's 2380 ceiling, so the west column is gone;
+    // the strip is still there because Goldcrest Harbor crowns it to 2420.
+    expect(worldXBoundsAt(2400)).toEqual({ min: -180, max: 540 });
   });
 
   it('reuses frozen row bounds and invalidates them on a content generation change', () => {

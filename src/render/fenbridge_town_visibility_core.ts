@@ -2,6 +2,8 @@
 // side owns scene nodes and material writes; this module decides fog culling
 // and eye-to-camera building occlusion into one caller-owned plan.
 
+import { occluderFadesDisabled } from './occluder_fade_core';
+
 export interface FenbridgeBuildingVisibilityTarget {
   x: number;
   z: number;
@@ -113,6 +115,7 @@ export function fenbridgeCameraSegmentHitsBuilding(
   camY: number,
   camZ: number,
 ): boolean {
+  if (occluderFadesDisabled()) return false;
   if (
     (eyeY < target.topY && pointInsideFootprint(target, eyeX, eyeZ)) ||
     (camY < target.topY && pointInsideFootprint(target, camX, camZ))

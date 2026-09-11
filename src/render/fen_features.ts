@@ -17,6 +17,7 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import { GFX } from './gfx';
 import { thinLeanDressing } from './zone_dressing_lod_core';
 
@@ -82,60 +83,20 @@ function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THR
   return parts;
 }
 
-export function buildFenFeatures(seed: number): FenFeaturesView {
-  const group = new THREE.Group();
-  group.name = 'fen-features';
-
-  const instance = (
-    geo: THREE.BufferGeometry,
-    material: THREE.Material,
-    spots: readonly Placement[],
-    tinted = false,
-  ) => {
-    if (spots.length === 0) return;
-    const mesh = new THREE.InstancedMesh(geo, material, spots.length);
-    const m = new THREE.Matrix4();
-    const q = new THREE.Quaternion();
-    const up = new THREE.Vector3(0, 1, 0);
-    const v = new THREE.Vector3();
-    const sc = new THREE.Vector3();
-    spots.forEach((sp, i) => {
-      q.setFromAxisAngle(up, sp.rot);
-      v.set(sp.x, sp.y, sp.z);
-      sc.set(sp.s, sp.s, sp.s);
-      mesh.setMatrixAt(i, m.compose(v, q, sc));
-      if (tinted && sp.tint !== undefined) mesh.setColorAt(i, new THREE.Color(sp.tint));
-    });
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    mesh.computeBoundingSphere();
-    group.add(mesh);
-  };
-
-  // instance every part of a loaded prop model at the given placements
-  const instanceProp = (key: FenPropKey, spots: readonly Placement[]): void => {
-    const scene = propScenes[key];
-    if (!scene || spots.length === 0) return;
-    for (const part of extractParts(scene)) {
-      instance(part.geo, part.mat, spots);
-    }
-  };
-
-  // The purely decorative families: nothing here carries a collider or an
-  // interaction, so a lean session draws an evenly thinned band of it (these
-  // models are 5,000 to 11,400 triangles EACH, the largest triangle bucket a
-  // town frame pays). The willows below never come through here: their trunks
-  // are the sim's own colliders.
-  const instanceDressing = (key: FenPropKey, spots: readonly Placement[]): void => {
-    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage));
-  };
-
+/** The fen's modeled flora spots — lily rafts, shoreline reeds, mushroom
+ *  clusters and their anchor logs — as ONE pure list shared by the builder
+ *  below and the editor's placement promotion (the fen_willows contract).
+ *  `y` is ABSOLUTE (lilies float at the waterline, not on terrain); the
+ *  promotion converts to terrain-relative offsets itself. */
+export function fenFloraSpots(seed: number): {
+  lilies: Placement[];
+  reeds: Placement[];
+  mushrooms: Placement[];
+  logs: Placement[];
+} {
   const hub = WILLOWFEN_ZONE.hub;
-
-  // --- placement obstacles: authored props and the terrain's own scattered
-  // rocks; nothing modeled may stand on any of them (only trees overlap) ---
+  // placement obstacles: authored props and the terrain's own scattered
+  // rocks; nothing modeled may stand on any of them (only trees overlap)
   const zp = WILLOWFEN_PROPS;
   const zoneProps = {
     campfires: zp.campfires ?? [],
@@ -178,104 +139,163 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
     return true;
   };
 
-  // --- the willows: instanced at the shared sim placements (fenWillowSpots
-  // in sim/fen_willows.ts), so every trunk the renderer draws is exactly a
-  // trunk the sim's colliders block ---
-  instanceProp(
-    'willow',
-    fenWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
-  );
+  // the water lilies: modeled lily rafts drifting on every pool
+  const lilies: Placement[] = [];
+  for (const lake of WILLOWFEN_ZONE.lakes) {
+    const count = 2 + Math.floor(hash2(lake.z, lake.x, seed + 2201) * 3);
+    for (let k = 0; k < count; k++) {
+      const ang = hash2(k * 3, lake.x, seed + 2211) * Math.PI * 2;
+      const dist = Math.sqrt(hash2(lake.z, k * 5, seed + 2221)) * lake.radius * 0.7;
+      const x = lake.x + Math.sin(ang) * dist;
+      const z = lake.z + Math.cos(ang) * dist;
+      if (terrainHeight(x, z, seed) > WATER_LEVEL - 0.7) continue;
+      if (roadDistance(x, z) < 4) continue;
+      lilies.push({
+        x,
+        z,
+        y: WATER_LEVEL + 0.03,
+        s: 3.5 + hash2(lake.x, k + 11, seed + 2241) * 2,
+        rot: hash2(k, lake.x + 7, seed + 2231) * Math.PI * 2,
+      });
+    }
+  }
 
-  // --- the water lilies: modeled lily rafts drifting on every pool ---
-  {
-    const spots: Placement[] = [];
-    for (const lake of WILLOWFEN_ZONE.lakes) {
-      const count = 2 + Math.floor(hash2(lake.z, lake.x, seed + 2201) * 3);
-      for (let k = 0; k < count; k++) {
-        const ang = hash2(k * 3, lake.x, seed + 2211) * Math.PI * 2;
-        const dist = Math.sqrt(hash2(lake.z, k * 5, seed + 2221)) * lake.radius * 0.7;
+  // the river reeds: rooted in the shallows along every shoreline
+  const reeds: Placement[] = [];
+  for (const lake of WILLOWFEN_ZONE.lakes) {
+    const count = 4 + Math.floor(hash2(lake.x + 3, lake.z, seed + 2401) * 3);
+    for (let k = 0; k < count; k++) {
+      const ang = hash2(k * 7, lake.z, seed + 2411) * Math.PI * 2;
+      // walk outward until the shallows band at the waterline is found
+      for (let dist = lake.radius * 0.9; dist < lake.radius * 1.7; dist += 0.6) {
         const x = lake.x + Math.sin(ang) * dist;
         const z = lake.z + Math.cos(ang) * dist;
-        if (terrainHeight(x, z, seed) > WATER_LEVEL - 0.7) continue;
-        if (roadDistance(x, z) < 4) continue;
-        spots.push({
+        const y = terrainHeight(x, z, seed);
+        if (y < WATER_LEVEL - 0.45 || y > WATER_LEVEL + 0.25) continue;
+        if (roadDistance(x, z) < 4) break;
+        reeds.push({
           x,
           z,
-          y: WATER_LEVEL + 0.03,
-          s: 3.5 + hash2(lake.x, k + 11, seed + 2241) * 2,
-          rot: hash2(k, lake.x + 7, seed + 2231) * Math.PI * 2,
+          y: y - 0.1,
+          s: 2.6 + hash2(lake.z, k + 5, seed + 2421) * 1.2,
+          rot: hash2(k, lake.x + 13, seed + 2431) * Math.PI * 2,
         });
+        break;
       }
     }
-    instanceDressing('lilies', spots);
   }
 
-  // --- the river reeds: rooted in the shallows along every shoreline ---
-  {
-    const spots: Placement[] = [];
-    for (const lake of WILLOWFEN_ZONE.lakes) {
-      const count = 4 + Math.floor(hash2(lake.x + 3, lake.z, seed + 2401) * 3);
-      for (let k = 0; k < count; k++) {
-        const ang = hash2(k * 7, lake.z, seed + 2411) * Math.PI * 2;
-        // walk outward until the shallows band at the waterline is found
-        let placed = false;
-        for (let dist = lake.radius * 0.9; dist < lake.radius * 1.7; dist += 0.6) {
-          const x = lake.x + Math.sin(ang) * dist;
-          const z = lake.z + Math.cos(ang) * dist;
-          const y = terrainHeight(x, z, seed);
-          if (y < WATER_LEVEL - 0.45 || y > WATER_LEVEL + 0.25) continue;
-          if (roadDistance(x, z) < 4) break;
-          spots.push({
-            x,
-            z,
-            y: y - 0.1,
-            s: 2.6 + hash2(lake.z, k + 5, seed + 2421) * 1.2,
-            rot: hash2(k, lake.x + 13, seed + 2431) * Math.PI * 2,
-          });
-          placed = true;
-          break;
-        }
-        if (!placed) continue;
+  // mushroom-and-log patches: clumped clusters out on the fen floor
+  const mushrooms: Placement[] = [];
+  const logs: Placement[] = [];
+  for (let gx = -520; gx <= -200; gx += 14) {
+    for (let gz = FEN_ZMIN + 30; gz <= FEN_ZMAX - 60; gz += 14) {
+      // a coarse patch gate: most cells stay empty, the rest clump
+      if (hash2(gx, gz, seed + 2501) > 0.16) continue;
+      const n = 2 + Math.floor(hash2(gz, gx, seed + 2511) * 2);
+      for (let k = 0; k <= n; k++) {
+        const x = gx + (hash2(gx + k, gz, seed + 2521) - 0.5) * 9;
+        const z = gz + (hash2(gx, gz + k, seed + 2531) - 0.5) * 9;
+        const y = terrainHeight(x, z, seed);
+        if (y < WATER_LEVEL + 0.8) continue;
+        if (roadDistance(x, z) < 4.5) continue;
+        if (Math.hypot(x - hub.x, z - hub.z) < 22) continue;
+        if (!clearOfProps(x, z, 0)) continue;
+        if (!clearOfRocks(x, z, 0.6)) continue;
+        // clusters never stand on one another: each keeps its own ground
+        if (mushrooms.some((sp) => Math.hypot(sp.x - x, sp.z - z) < 3.2)) continue;
+        if (logs.some((sp) => Math.hypot(sp.x - x, sp.z - z) < 3.2)) continue;
+        const spot: Placement = {
+          x,
+          z,
+          y: y - 0.08,
+          s: 2.4 + hash2(x, z, seed + 2541) * 1.4,
+          rot: hash2(z, x, seed + 2551) * Math.PI * 2,
+        };
+        // one log anchors some patches; the rest are mushroom clusters
+        if (k === 0 && hash2(gx, gz, seed + 2561) < 0.45) logs.push({ ...spot, s: 3 });
+        else mushrooms.push(spot);
       }
     }
-    instanceDressing('reeds', spots);
   }
 
-  // --- mushroom-and-log patches: clumped clusters out on the fen floor ---
-  {
-    const mushroomSpots: Placement[] = [];
-    const logSpots: Placement[] = [];
-    for (let gx = -520; gx <= -200; gx += 14) {
-      for (let gz = FEN_ZMIN + 30; gz <= FEN_ZMAX - 60; gz += 14) {
-        // a coarse patch gate: most cells stay empty, the rest clump
-        if (hash2(gx, gz, seed + 2501) > 0.16) continue;
-        const n = 2 + Math.floor(hash2(gz, gx, seed + 2511) * 2);
-        for (let k = 0; k <= n; k++) {
-          const x = gx + (hash2(gx + k, gz, seed + 2521) - 0.5) * 9;
-          const z = gz + (hash2(gx, gz + k, seed + 2531) - 0.5) * 9;
-          const y = terrainHeight(x, z, seed);
-          if (y < WATER_LEVEL + 0.8) continue;
-          if (roadDistance(x, z) < 4.5) continue;
-          if (Math.hypot(x - hub.x, z - hub.z) < 22) continue;
-          if (!clearOfProps(x, z, 0)) continue;
-          if (!clearOfRocks(x, z, 0.6)) continue;
-          // clusters never stand on one another: each keeps its own ground
-          if (mushroomSpots.some((sp) => Math.hypot(sp.x - x, sp.z - z) < 3.2)) continue;
-          if (logSpots.some((sp) => Math.hypot(sp.x - x, sp.z - z) < 3.2)) continue;
-          const spot: Placement = {
-            x,
-            z,
-            y: y - 0.08,
-            s: 2.4 + hash2(x, z, seed + 2541) * 1.4,
-            rot: hash2(z, x, seed + 2551) * Math.PI * 2,
-          };
-          // one log anchors some patches; the rest are mushroom clusters
-          if (k === 0 && hash2(gx, gz, seed + 2561) < 0.45) logSpots.push({ ...spot, s: 3 });
-          else mushroomSpots.push(spot);
-        }
-      }
+  return { lilies, reeds, mushrooms, logs };
+}
+
+export function buildFenFeatures(seed: number): FenFeaturesView {
+  const group = new THREE.Group();
+  group.name = 'fen-features';
+
+  const instance = (
+    geo: THREE.BufferGeometry,
+    material: THREE.Material,
+    spots: readonly Placement[],
+    tinted = false,
+  ) => {
+    if (spots.length === 0) return;
+    const mesh = new THREE.InstancedMesh(geo, material, spots.length);
+    const m = new THREE.Matrix4();
+    const q = new THREE.Quaternion();
+    const up = new THREE.Vector3(0, 1, 0);
+    const v = new THREE.Vector3();
+    const sc = new THREE.Vector3();
+    spots.forEach((sp, i) => {
+      q.setFromAxisAngle(up, sp.rot);
+      v.set(sp.x, sp.y, sp.z);
+      sc.set(sp.s, sp.s, sp.s);
+      mesh.setMatrixAt(i, m.compose(v, q, sc));
+      if (tinted && sp.tint !== undefined) mesh.setColorAt(i, new THREE.Color(sp.tint));
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.computeBoundingSphere();
+    group.add(mesh);
+  };
+
+  // instance every part of a loaded prop model at the given placements
+  const instanceProp = (key: FenPropKey, spots: readonly Placement[]): void => {
+    const scene = propScenes[key];
+    if (!scene || spots.length === 0) return;
+    for (const part of extractParts(scene)) {
+      instance(part.geo, part.mat, spots);
     }
+  };
+  // Pure dressing thins on a lean session (upstream's zone_dressing_lod_core).
+  const instanceDressing = (key: FenPropKey, spots: readonly Placement[]): void => {
+    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage));
+  };
+
+  // --- the willows: instanced at the shared sim placements (fenWillowSpots
+  // in sim/fen_willows.ts), so every trunk the renderer draws is exactly a
+  // trunk the sim's colliders block. Stands down when the document owns the
+  // willows as placements (the promoted-scenery contract). ---
+  if (!activeWorldPromoted('willows'))
+    instanceProp(
+      'willow',
+      fenWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
+    );
+
+  // --- the modeled flora — lilies, reeds, mushroom patches and their logs —
+  // from the ONE shared spot list (fenFloraSpots), standing down together
+  // when the document owns them as placements ---
+  if (!activeWorldPromoted('fenFlora')) {
+    const flora = fenFloraSpots(seed);
+    // pure dressing (no collider, nothing to act on; 5-11k triangles each), so
+    // a lean session draws an evenly thinned band — upstream's lean policy
+    // (upstream's instanceDressing seam, pinned by tests/zone_dressing_lod_wiring).
+    {
+      const spots = flora.lilies;
+      instanceDressing('lilies', spots);
+    }
+    {
+      const spots = flora.reeds;
+      instanceDressing('reeds', spots);
+    }
+    const mushroomSpots = flora.mushrooms;
     instanceDressing('mushrooms', mushroomSpots);
+    const logSpots = flora.logs;
     instanceDressing('log', logSpots);
   }
 

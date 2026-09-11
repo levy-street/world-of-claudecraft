@@ -7,6 +7,7 @@ import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { activeWorldHasAuthoredTown } from './authored_town_gate';
 import { buildEastbrookHarbor } from './eastbrook_harbor';
 import {
   applyEastbrookTownSurfaceDetail,
@@ -36,6 +37,7 @@ import {
   occluderFadeRecordFor,
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import {
   buildRealmBuilderMonumentBody,
   buildRealmBuilderMonumentFx,
@@ -1190,7 +1192,12 @@ function buildFromTemplates(
 
   const roofHideTargets: RoofHideTarget[] = [];
   const buildingGroups: THREE.Object3D[] = [];
-  for (const building of EASTBROOK_LAYOUT.buildings) {
+  // The document may own the town's BUILDINGS as placements (the
+  // promoted-scenery contract): only the building loop stands down — the
+  // wells, stalls, fences, streets, wall and harbor stay town-drawn.
+  const buildingsPromoted = activeWorldPromoted('authoredTowns');
+  const buildingList = buildingsPromoted ? [] : EASTBROOK_LAYOUT.buildings;
+  for (const building of buildingList) {
     const kitTemplate = templates.get(building.assetId);
     if (kitTemplate?.raw) {
       const built = buildKitBuilding(building, kitTemplate.raw, groundAt);
@@ -1399,7 +1406,10 @@ export function buildEastbrookTownView(seed: number): EastbrookTownView {
   // root stays isolated, while loader-owned decoded sources can be released and
   // a later same-page switch to the built-in world remains synchronous.
   if (loadedSources.size > 0) prepareTemplates(loadedSources, preparedTemplates, true);
-  if (getActiveWorldContent() !== BUILTIN_WORLD) {
+  // Data-gated, not identity-gated: an editor copy of the built-in world
+  // still carries this town's buildings and must get its real art, or the
+  // kit buildings it replaces draw in Studio instead (authored_town_gate.ts).
+  if (!activeWorldHasAuthoredTown(isEastbrookRebuildBuilding)) {
     return buildFromTemplates(preparedTemplates, () => 0, false, undefined);
   }
   prepareTemplates(loadedSources, preparedTemplates, true);

@@ -29,6 +29,7 @@ import {
   type ArmorLoadout,
   type ArmorSetId,
   type BodyShape,
+  DEFAULT_APPEARANCE,
   type FaceShape,
   fullSet,
   type ModularAppearance,
@@ -36,6 +37,8 @@ import {
   NEUTRAL_BODY,
   NEUTRAL_FACE,
   normalizeAppearance,
+  type OutfitColorway,
+  randomizeAppearance,
 } from './modular';
 
 /** Fixed held-prop sets, one derived `npc_modular_<id>` VisualDef each (see
@@ -2150,6 +2153,7 @@ export function aldricKeepsHisRig(templateId: string): boolean {
  *  across zones under new templateIds). */
 function baseId(templateId: string): string {
   if (templateId === 'scout_maren_highwatch') return 'scout_maren';
+  if (templateId === 'scout_maren_wastes') return 'scout_maren';
   if (templateId === 'brother_halven_marsh') return 'brother_halven';
   return templateId;
 }
@@ -2179,4 +2183,242 @@ export function npcLookFor(templateId: string, kind: EntityKind = 'npc'): Modula
 export function npcModularKeyFor(templateId: string): string {
   const def = NPC_LOOKS[baseId(templateId)];
   return `npc_modular_${def?.props ?? 'none'}`;
+}
+
+// ===========================================================================
+// FORK DECLARATIONS — the Deepglass and Tidehold. Looks composed at runtime
+// (seeded rolls for the crowd and the Warden City's forty residents, two
+// authored faces for Baldemar and the marshal) rather than authored rows in
+// NPC_LOOKS above; main.ts's look provider consults these before npcLookFor.
+// ===========================================================================
+
+/**
+ * Baldemar the Bald, Archmage of the Shining Pate.
+ *
+ * The pate is the point: `hair: 'bald'` is the one style that means no growth
+ * at all, and the mage kit's HEAD slot is deliberately left empty so the hat
+ * never undoes the joke. The wizard beard and bushy brows both ride the hair
+ * material, so the near-white hair HSL is what makes them a white wizard's.
+ * Pointed ears plus the ears slider pushed high read as elf at a glance;
+ * gaunt cheeks, a high brow and a faint smirk finish the six-hundred-year-old
+ * who finds everyone else's hair very funny.
+ */
+export const PORTAL_WIZARD_LOOK: ModularLook = {
+  app: normalizeAppearance({
+    ...DEFAULT_APPEARANCE,
+    hair: 'bald',
+    beard: 'wizard',
+    brows: 'bushy',
+    ears: 'pointed',
+    // White: barely-warm, almost fully desaturated, close to the 0.95 clamp.
+    hairHue: 40,
+    hairSat: 0.03,
+    hairLight: 0.92,
+    lashHue: 40,
+    lashSat: 0.03,
+    lashLight: 0.92,
+    // Pale elven skin, faintly warm so he does not read as a ghost.
+    skinHue: 26,
+    skinSat: 0.3,
+    skinLight: 0.78,
+    // Violet eyes, the arcane school he casts from.
+    eyeHue: 272,
+    eyeSat: 0.55,
+    eyeLight: 0.45,
+    face: {
+      ...NEUTRAL_FACE,
+      ears: 0.9,
+      cheeks: -0.55,
+      chin: -0.2,
+      jaw: -0.3,
+      brow: 0.35,
+      nose: 0.15,
+      smirk: 0.3,
+    },
+    outfit: 'violet',
+  }),
+  // The mage robes, hatless: the head slot stays empty so the pate shines.
+  worn: { ...fullSet('mage'), head: null },
+};
+
+/** True for every self of the portal wizard (portal_wizard_<town>). */
+export function isPortalWizardTemplate(templateId: string): boolean {
+  return templateId.startsWith('portal_wizard_');
+}
+
+/**
+ * Marshal Yvette Coralwake, Keeper of the Whistle: the official you talk to to
+ * call a fixture, standing at the head of the causeway.
+ *
+ * She was rendering as a stock townsperson, which is wrong for the one figure
+ * in the arena with authority. Composed instead as a weathered official: hair
+ * pinned back out of the terrace wind in a sun-bleached blond, a deep-water
+ * tan from a life outdoors, a strong jaw and a flat, unimpressed brow (she has
+ * watched a thousand bouts and is not impressed by yours), and the ranger kit in the
+ * arena's own teal, which reads as a uniform beside the crowd's mixed colours
+ * without dressing her as a soldier. Bare-headed on purpose: the marshal is
+ * the face you look for from across the plaza.
+ */
+export const DEEPGLASS_MARSHAL_LOOK: ModularLook = {
+  app: normalizeAppearance({
+    ...DEFAULT_APPEARANCE,
+    gender: 'female',
+    hair: 'lowbun',
+    beard: 'none',
+    brows: 'flat',
+    ears: 'round',
+    lashes: true,
+    hairHue: 44,
+    hairSat: 0.35,
+    hairLight: 0.62,
+    skinHue: 26,
+    skinSat: 0.44,
+    skinLight: 0.52,
+    eyeHue: 196,
+    eyeSat: 0.5,
+    eyeLight: 0.36,
+    face: {
+      ...NEUTRAL_FACE,
+      jaw: 0.45,
+      chin: 0.3,
+      brow: -0.35,
+      cheeks: 0.2,
+      eyes: -0.15,
+      smirk: -0.2,
+    },
+    outfit: 'teal',
+  }),
+  worn: { ...fullSet('ranger'), head: null },
+};
+
+/** The match marshal (the fixture desk inside the arena). */
+export function isDeepglassMarshalTemplate(templateId: string): boolean {
+  return templateId === DEEPGLASS_MARSHAL_TEMPLATE_ID;
+}
+
+/**
+ * Civilians: NPCs composed from the part library who must NOT be holding a
+ * weapon.
+ *
+ * A composed body inherits its class def's held-weapon layout, so every one of
+ * these would otherwise be born gripping the warrior's sword. A wizard, a
+ * pieman and a stand of cheering spectators are all wrong with a blade in
+ * hand, so createCharacterVisual disarms them at build time.
+ */
+export function isUnarmedCivilianTemplate(templateId: string): boolean {
+  return (
+    isPortalWizardTemplate(templateId) ||
+    isDeepglassCrowdTemplate(templateId) ||
+    templateId === DEEPGLASS_MARSHAL_TEMPLATE_ID
+  );
+}
+
+/** The match marshal's templateId, kept here (rather than imported from the
+ *  sim) so this presentation module stays free of sim imports. */
+const DEEPGLASS_MARSHAL_TEMPLATE_ID = 'deepglass_marshal';
+
+/** True for the Deepglass city-event crowd (spectators + stallkeepers). */
+export function isDeepglassCrowdTemplate(templateId: string): boolean {
+  return templateId.startsWith('dg_spectator_') || templateId.startsWith('dg_stallkeeper_');
+}
+
+// -- the crowd's random-citizen looks ----------------------------------------
+// Each crowd member composes a randomizeAppearance() roll seeded from its own
+// templateId, so the crowd is 23 DIFFERENT people and the same 23 people on
+// every load (no Math.random: the hash is the only entropy). Looks are cached
+// per templateId: a look is identity, and the renderer's pooled visuals key
+// off it staying stable.
+
+/** FNV-1a, then mulberry32: a tiny deterministic string-seeded PRNG. */
+function seededRand(seedText: string): () => number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < seedText.length; i++) {
+    h ^= seedText.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  let a = h >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Civilian-leaning kits: a stadium crowd in full plate would read as an
+ *  invasion, so the knight/paladin sets stay out of the hat. */
+const CROWD_KITS: readonly ArmorSetId[] = ['druid', 'ranger', 'rogue', 'barbarian', 'mage'];
+const CROWD_COLORWAYS: readonly OutfitColorway[] = [
+  'classic',
+  'forest',
+  'teal',
+  'azure',
+  'gold',
+  'rose',
+  'ember',
+  'ivory',
+];
+
+const crowdLookCache = new Map<string, ModularLook>();
+
+export function deepglassCrowdLook(templateId: string): ModularLook {
+  const cached = crowdLookCache.get(templateId);
+  if (cached) return cached;
+  const rand = seededRand(templateId);
+  const gender = rand() < 0.5 ? 'male' : 'female';
+  const app = randomizeAppearance({ ...DEFAULT_APPEARANCE, gender }, rand);
+  app.outfit = CROWD_COLORWAYS[Math.floor(rand() * CROWD_COLORWAYS.length)];
+  const kit = CROWD_KITS[Math.floor(rand() * CROWD_KITS.length)];
+  // Bare heads in the stands: hats/hoods on a whole crowd hide the hair the
+  // randomiser just picked, and the mage hat on a stallkeeper reads wizard.
+  const look: ModularLook = { app, worn: { ...fullSet(kit), head: null } };
+  crowdLookCache.set(templateId, look);
+  return look;
+}
+
+// -- Tidehold: forty residents, forty faces ---------------------------------
+// The Warden City is composed from the same part library the player is, so a
+// walk up the wards passes forty DIFFERENT people rather than forty copies of
+// the stock townsperson rig. The roll is seeded from the template id (no
+// Math.random anywhere), and the ROLE picks the kit and palette so the watch
+// reads as the watch and the Row reads as the Row — a market of citizens in
+// full plate would say the wrong thing about a city at peace.
+
+/** What each role wears. The colourways lean tide-glass: azure and teal for
+ *  anyone the Warden pays, warmer civilian notes for everyone else. */
+const TIDEHOLD_KITS: Record<
+  string,
+  { kits: readonly ArmorSetId[]; ways: readonly OutfitColorway[] }
+> = {
+  warden: { kits: ['paladin'], ways: ['teal'] },
+  captain: { kits: ['knight'], ways: ['azure'] },
+  watch: { kits: ['knight', 'paladin'], ways: ['azure', 'teal'] },
+  noble: { kits: ['mage', 'rogue'], ways: ['ivory', 'gold'] },
+  priest: { kits: ['mage'], ways: ['ivory'] },
+  smith: { kits: ['barbarian'], ways: ['ember'] },
+  trade: { kits: ['rogue', 'ranger', 'druid'], ways: ['classic', 'gold', 'rose', 'forest'] },
+  dock: { kits: ['barbarian', 'ranger'], ways: ['teal', 'classic'] },
+  lamp: { kits: ['mage'], ways: ['azure'] },
+  citizen: { kits: ['druid', 'ranger', 'rogue'], ways: ['classic', 'forest', 'rose', 'ivory'] },
+};
+
+const tideholdLookCache = new Map<string, ModularLook>();
+
+export function tideholdLook(templateId: string, role: string): ModularLook {
+  const cached = tideholdLookCache.get(templateId);
+  if (cached) return cached;
+  const rand = seededRand(`tidehold:${templateId}`);
+  const gender = rand() < 0.5 ? 'male' : 'female';
+  const app = randomizeAppearance({ ...DEFAULT_APPEARANCE, gender }, rand);
+  const spec = TIDEHOLD_KITS[role] ?? TIDEHOLD_KITS.citizen;
+  app.outfit = spec.ways[Math.floor(rand() * spec.ways.length)];
+  const kit = spec.kits[Math.floor(rand() * spec.kits.length)];
+  const worn = fullSet(kit);
+  // Helms ON for the watch — a guard reads as a guard from across a ward —
+  // and OFF for everyone else, so the randomiser's hair is what a player
+  // actually sees on the people they talk to.
+  const helmed = role === 'watch' || role === 'captain';
+  const look: ModularLook = { app, worn: helmed ? worn : { ...worn, head: null } };
+  tideholdLookCache.set(templateId, look);
+  return look;
 }

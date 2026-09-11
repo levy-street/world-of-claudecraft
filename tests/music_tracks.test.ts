@@ -5,8 +5,10 @@ import { describe, expect, it } from 'vitest';
 import type { MusicZone } from '../src/game/music';
 import {
   COMBAT_STREAM_URLS,
-  pickCombatTrackIndex,
+  pickStreamTrackIndex,
+  ZONE_STREAM_POOLS,
   ZONE_STREAM_URLS,
+  zoneStreamUrls,
 } from '../src/game/music_tracks';
 
 const publicDir = path.join(__dirname, '..', 'public');
@@ -126,6 +128,7 @@ describe('remastered soundtrack catalog', () => {
       'town_eastbrook',
       'town_fenbridge',
       'town_highwatch',
+      'town_goldcrest',
       'vale',
       'vale_legacy',
       'marsh',
@@ -148,6 +151,7 @@ describe('remastered soundtrack catalog', () => {
       'ignivar_forge_approach',
       'ignivar_raid_arena',
       'ignivar_inner_crucible',
+      // The Rift crawls, each standing in on its nearest-mood remaster.
       'rift_frost',
       'rift_ember',
       'rift_venom',
@@ -159,19 +163,53 @@ describe('remastered soundtrack catalog', () => {
     ];
     expect(Object.keys(ZONE_STREAM_URLS).sort()).toEqual([...zones].sort());
   });
+
+  // Goldcrest Harbor is the one zone shipping a pair of cues; every other zone
+  // resolves to the single stream so the common path stays untouched.
+  it('resolves the capital to both harbor remasters and everyone else to one', () => {
+    expect(zoneStreamUrls('town_goldcrest')).toEqual([
+      '/audio/music/town_goldcrest_1.mp3?v=0cf44456d0f5',
+      '/audio/music/town_goldcrest_2.mp3?v=c616612609d6',
+    ]);
+    expect(zoneStreamUrls('town_highwatch')).toEqual([
+      '/audio/music/town_highwatch.mp3?v=8daa06e91073',
+    ]);
+  });
+
+  // Same content-hash rule the single-url map is held to above: a pooled
+  // remaster is served through the same immutable static cache, so a swapped-in
+  // file whose URL hash was not updated would be served stale forever.
+  it('ships every pooled remaster on disk, content-hash-versioned', () => {
+    for (const [zone, urls] of Object.entries(ZONE_STREAM_POOLS)) {
+      for (const url of urls ?? []) {
+        expect(url, `zone '${zone}'`).toMatch(/^\/audio\/music\/[a-z0-9_]+\.mp3\?v=[a-f0-9]{12}$/);
+        expect(existsSync(assetPath(url)), `missing pooled asset: ${url}`).toBe(true);
+        const [, requestedHash] = url.split('?v=');
+        expect(requestedHash, `stale cache-bust hash for pooled ${url}`).toBe(assetHash(url));
+      }
+    }
+  });
+
+  // The one-url-per-zone map is still read directly (ensureZoneStream's
+  // fallback, tooling); a pooled zone must resolve there too, not to undefined.
+  it('keeps a pooled zone resolvable through the single-url map', () => {
+    expect(ZONE_STREAM_URLS.town_goldcrest).toBe(
+      '/audio/music/town_goldcrest_1.mp3?v=0cf44456d0f5',
+    );
+  });
 });
 
-describe('pickCombatTrackIndex', () => {
+describe('pickStreamTrackIndex', () => {
   it('spreads uniformly over the catalog', () => {
-    expect(pickCombatTrackIndex(2, () => 0)).toBe(0);
-    expect(pickCombatTrackIndex(2, () => 0.49)).toBe(0);
-    expect(pickCombatTrackIndex(2, () => 0.5)).toBe(1);
-    expect(pickCombatTrackIndex(2, () => 0.99)).toBe(1);
+    expect(pickStreamTrackIndex(2, () => 0)).toBe(0);
+    expect(pickStreamTrackIndex(2, () => 0.49)).toBe(0);
+    expect(pickStreamTrackIndex(2, () => 0.5)).toBe(1);
+    expect(pickStreamTrackIndex(2, () => 0.99)).toBe(1);
   });
 
   it('clamps degenerate rand values into range', () => {
-    expect(pickCombatTrackIndex(2, () => 1)).toBe(1);
-    expect(pickCombatTrackIndex(2, () => -0.5)).toBe(0);
-    expect(pickCombatTrackIndex(0, () => 0.5)).toBe(0);
+    expect(pickStreamTrackIndex(2, () => 1)).toBe(1);
+    expect(pickStreamTrackIndex(2, () => -0.5)).toBe(0);
+    expect(pickStreamTrackIndex(0, () => 0.5)).toBe(0);
   });
 });

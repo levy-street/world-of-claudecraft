@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GATHER_NODES } from '../sim/data';
+import { activeGatherNodes } from '../sim/data';
 import type { GatherNodeDef, GatherNodeType } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -357,11 +357,18 @@ function buildGatherNodesFromTemplates(
 }
 
 export function buildGatherNodes(seed: number): GatherNodesView {
+  // activeGatherNodes(), never the raw table: on an authored map it is empty,
+  // because these veins are pinned to shipped overworld coordinates and would
+  // otherwise erupt wherever the built-in world's ore happens to sit — which
+  // in the Deepglass meant ore and herbs around and inside the stadium, and
+  // 223k triangles a frame to draw them. Building no templates at all also
+  // keeps the node GLBs out of the world-entry decode.
+  const nodes = activeGatherNodes();
   const templates = new Map<GatherNodeType, THREE.Object3D>();
-  for (const node of GATHER_NODES) {
+  for (const node of nodes) {
     if (!templates.has(node.type)) templates.set(node.type, buildNodeTemplate(node.type));
   }
-  return buildGatherNodesFromTemplates(seed, templates, GATHER_NODES);
+  return buildGatherNodesFromTemplates(seed, templates, nodes);
 }
 
 export function gatherNodeIdFromIntersection(

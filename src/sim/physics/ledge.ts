@@ -26,6 +26,7 @@ import {
   type Collider,
   colliderTopAt,
   interiorColliderFrame,
+  prismBox,
   queryOpenWorldColliders,
   supportHeightAt,
 } from '../colliders';
@@ -83,11 +84,14 @@ function fitsOn(x: number, z: number, feetY: number, radius: number): boolean {
       const reach = c.r + radius;
       if (dx * dx + dz * dz < reach * reach) return false;
     } else {
-      const cos = Math.cos(-c.rot);
-      const sin = Math.sin(-c.rot);
-      const lx = (x - c.x) * cos + (z - c.z) * sin;
-      const lz = -(x - c.x) * sin + (z - c.z) * cos;
-      if (Math.abs(lx) < c.hw + radius && Math.abs(lz) < c.hd + radius) return false;
+      // Coarse clearance query: a prism answers with its bounding box, which
+      // only ever refuses a grab the exact outline would have allowed.
+      const b = c.type === 'prism' ? prismBox(c) : c;
+      const cos = Math.cos(-b.rot);
+      const sin = Math.sin(-b.rot);
+      const lx = (x - b.x) * cos + (z - b.z) * sin;
+      const lz = -(x - b.x) * sin + (z - b.z) * cos;
+      if (Math.abs(lx) < b.hw + radius && Math.abs(lz) < b.hd + radius) return false;
     }
   }
   return true;

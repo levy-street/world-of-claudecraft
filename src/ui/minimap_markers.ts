@@ -35,7 +35,20 @@
 
 import type { GatheringProfessionId } from '../sim/content/professions';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
-import { GATHER_NODES, isBgPos, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
+import {
+  activeGatherNodes,
+  activeZoneAt,
+  dungeonAt,
+  GATHER_NODES,
+  getActiveWorldContent,
+  isBgPos,
+  isDelvePos,
+  isYumiMazePos,
+  QUESTS,
+  STATIONS,
+  zoneAt,
+} from '../sim/data';
+import { isAuthoredMapPresentation } from '../sim/map_presentation';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
@@ -180,7 +193,14 @@ const PARTY_DISC_RADIUS_RANGE = 3;
  *  battleground (the same marker set over a cached wall raster; Hud routes it
  *  through paintOverworld, which branches to paintBattleground), or the
  *  overworld minimap (this core). */
-export type MinimapMode = 'rift' | 'delve' | 'yumiMaze' | 'battleground' | 'dungeon' | 'overworld';
+export type MinimapMode =
+  | 'rift'
+  | 'delve'
+  | 'infernalAbyss'
+  | 'yumiMaze'
+  | 'battleground'
+  | 'dungeon'
+  | 'overworld';
 
 /** The NPC quest glyph: turn-in ready ('?') wins over available ('!'), else neutral. */
 export type NpcGlyph = '?' | '!' | '•';
@@ -308,6 +328,7 @@ export function minimapMode(world: IWorld): MinimapMode {
   if (world.riftFloor) return 'rift';
   if (isYumiMazePos(world.player.pos.x)) return 'yumiMaze';
   if (isBgPos(world.player.pos.x)) return 'battleground';
+  if (dungeonAt(world.player.pos.x)?.id === 'infernal_abyss') return 'infernalAbyss';
   if (dungeonMapActive(world)) return 'dungeon';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }
@@ -353,7 +374,9 @@ export function createMinimapMarkers(): MinimapMarkers {
       navigationMarkers.length = 0;
       stableNavigationMarkers.length = 0;
       npcMarkers.length = 0;
-      model.zoneId = zoneAt(p.pos.x, p.pos.z).id;
+      // activeZoneAt: an authored map's own zone names the '#zone-label' (its
+      // maker-typed name, '' until named), the shipped zone otherwise.
+      model.zoneId = activeZoneAt(p.pos.x, p.pos.z).id;
       // Inside a rift the overworld zone (zoneAt reads x/z; rifts displace on x well
       // past any land) is the wrong label; surface the generated rift floor name + rank.
       const rf = world.riftFloor;
@@ -534,6 +557,9 @@ export function createMinimapMarkers(): MinimapMarkers {
 
       // Gatherable world nodes (issue 1124): static content positions (never entities), each
       // classified ready/cooldown for THIS viewer only via nodeHarvestableByMe.
+      // Built-in geography: an authored map has none, so its minimap draws no
+      // phantom node dots where the shipped world's veins happen to sit.
+      const gatherNodes = activeGatherNodes();
       // `locked` memoizes the wield-filtered usable-tool scan per profession,
       // lazily on the first in-rim node: the common no-nearby-node frame
       // skips the scan entirely at the minimap's 10Hz cadence. The memo is a
@@ -544,7 +570,7 @@ export function createMinimapMarkers(): MinimapMarkers {
       // getter copies the live map per access, so reading it per profession
       // would allocate per build. Same lazy shape as the memo itself.
       let proficiency: Readonly<Record<string, number>> | undefined;
-      for (const node of GATHER_NODES) {
+      for (const node of gatherNodes) {
         const dx = -(node.pos.x - p.pos.x) * pxPerYard;
         const dz = -(node.pos.z - p.pos.z) * pxPerYard;
         const dist2 = dx * dx + dz * dz;

@@ -34,26 +34,68 @@ const ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     weapon: { min: 1, max: 2, speed: 1.5, dagger: true },
   },
-  helm: { id: 'helm', name: 'Iron Helm', kind: 'armor', slot: 'helmet', quality: 'rare' },
-  potion: { id: 'potion', name: 'Minor Healing Potion', kind: 'potion', quality: 'common' },
+  helm: {
+    id: 'helm',
+    name: 'Iron Helm',
+    kind: 'armor',
+    slot: 'helmet',
+    quality: 'rare',
+  },
+  potion: {
+    id: 'potion',
+    name: 'Minor Healing Potion',
+    kind: 'potion',
+    quality: 'common',
+  },
   bread: { id: 'bread', name: 'Crusty Bread', kind: 'food', quality: 'common' },
   // A scroll (Masterwrought phase 06 inscription): a timed stamina buff in the
   // elixir exclusivity family (src/sim/types.ts), so it files under the
   // consumable chip beside potions and elixirs.
-  scroll: { id: 'scroll', name: 'Scroll of Stamina', kind: 'scroll', quality: 'common' },
+  scroll: {
+    id: 'scroll',
+    name: 'Scroll of Stamina',
+    kind: 'scroll',
+    quality: 'common',
+  },
   pelt: { id: 'pelt', name: 'Wolf Pelt', kind: 'junk', quality: 'poor' },
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', quality: 'common' },
   // A REAL catalog id: the material chip is honest-taxonomy set membership
   // (src/sim/material_taxonomy.ts), so a synthetic id can never match it.
-  iron_ore: { id: 'iron_ore', name: 'Iron Ore', kind: 'junk', quality: 'common' },
+  iron_ore: {
+    id: 'iron_ore',
+    name: 'Iron Ore',
+    kind: 'junk',
+    quality: 'common',
+  },
   // Its REAL fine grade (MATERIAL_GRADES links the pair), for the grade-family
   // grouping arm of the quality view.
-  fine_iron_ore: { id: 'fine_iron_ore', name: 'Fine Iron Ore', kind: 'junk', quality: 'common' },
+  fine_iron_ore: {
+    id: 'fine_iron_ore',
+    name: 'Fine Iron Ore',
+    kind: 'junk',
+    quality: 'common',
+  },
   // A REAL material whose name sorts BETWEEN 'Fine Iron Ore' and 'Iron Ore',
   // so the grade-family arm is decisive: a plain name order would interleave it.
-  goldleaf_herb: { id: 'goldleaf_herb', name: 'Goldleaf Herb', kind: 'junk', quality: 'common' },
-  keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
-  relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
+  goldleaf_herb: {
+    id: 'goldleaf_herb',
+    name: 'Goldleaf Herb',
+    kind: 'junk',
+    quality: 'common',
+  },
+  keystone: {
+    id: 'keystone',
+    name: 'Crypt Keystone',
+    kind: 'quest',
+    quality: 'common',
+  },
+  relic: {
+    id: 'relic',
+    name: 'Ancient Relic',
+    kind: 'armor',
+    slot: 'chest',
+    quality: 'legendary',
+  },
   reins: {
     id: 'reins',
     name: 'Reins of the Valorsteed',
@@ -96,17 +138,29 @@ function ids(slots: InvSlot[]): string[] {
 
 describe('applyBagFilter: category filtering', () => {
   it('returns everything (insertion order) for "all" + "recent"', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'recent', search: '' });
+    const out = applyBagFilter(INV, lookup, {
+      category: 'all',
+      sort: 'recent',
+      search: '',
+    });
     expect(ids(out)).toEqual(ids(INV));
   });
 
   it('keeps only weapons', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'weapon', sort: 'recent', search: '' });
+    const out = applyBagFilter(INV, lookup, {
+      category: 'weapon',
+      sort: 'recent',
+      search: '',
+    });
     expect(ids(out)).toEqual(['blade', 'dagger']);
   });
 
   it('keeps only armor', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'armor', sort: 'recent', search: '' });
+    const out = applyBagFilter(INV, lookup, {
+      category: 'armor',
+      sort: 'recent',
+      search: '',
+    });
     expect(ids(out)).toEqual(['relic', 'helm']);
   });
 
@@ -115,7 +169,11 @@ describe('applyBagFilter: category filtering', () => {
     // catalog: a timed buff a player filters for in a fight, mirroring the
     // KIND_RANK potion/elixir/scroll run (src/sim/inventory_sort.ts).
     const inv: InvSlot[] = [...INV, { itemId: 'scroll', count: 2 }];
-    const out = applyBagFilter(inv, lookup, { category: 'consumable', sort: 'recent', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'consumable',
+      sort: 'recent',
+      search: '',
+    });
     expect(ids(out)).toEqual(['potion', 'bread', 'scroll']);
   });
 
@@ -129,7 +187,11 @@ describe('applyBagFilter: category filtering', () => {
       { itemId: 'rod', count: 1 },
       { itemId: 'blade', count: 1 },
     ];
-    const out = applyBagFilter(inv, lookup, { category: 'material', sort: 'recent', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'material',
+      sort: 'recent',
+      search: '',
+    });
     expect(ids(out)).toEqual(['iron_ore']);
     expect(matchesCategory(REAL_ITEMS.lastflame_core, 'material')).toBe(true);
   });
@@ -141,12 +203,20 @@ describe('applyBagFilter: category filtering', () => {
       { itemId: 'rod', count: 1 },
       { itemId: 'blade', count: 1 },
     ];
-    const out = applyBagFilter(inv, lookup, { category: 'tool', sort: 'recent', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'tool',
+      sort: 'recent',
+      search: '',
+    });
     expect(ids(out)).toEqual(['rod']);
   });
 
   it('keeps only quest items', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'quest', sort: 'recent', search: '' });
+    const out = applyBagFilter(INV, lookup, {
+      category: 'quest',
+      sort: 'recent',
+      search: '',
+    });
     expect(ids(out)).toEqual(['keystone']);
   });
 
@@ -158,7 +228,11 @@ describe('applyBagFilter: category filtering', () => {
       { itemId: 'reins', count: 1 },
       { itemId: 'potion', count: 1 },
     ];
-    const out = applyBagFilter(inv, lookup, { category: 'mount', sort: 'recent', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'mount',
+      sort: 'recent',
+      search: '',
+    });
     expect(ids(out)).toEqual(['reins']);
   });
 
@@ -168,7 +242,11 @@ describe('applyBagFilter: category filtering', () => {
     // slot. Dropping it from the everything view is how a counted slot turns
     // invisible, the exact failure the phase 11 guard removes.
     const inv: InvSlot[] = [...INV, { itemId: 'ghost', count: 1 }];
-    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'recent', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'all',
+      sort: 'recent',
+      search: '',
+    });
     expect(ids(out)).toEqual([...ids(INV), 'ghost']);
   });
 
@@ -179,7 +257,11 @@ describe('applyBagFilter: category filtering', () => {
     const inv: InvSlot[] = [...INV, { itemId: 'ghost', count: 1 }];
     for (const category of BAG_CATEGORIES) {
       if (category === 'all') continue;
-      const out = applyBagFilter(inv, lookup, { category, sort: 'recent', search: '' });
+      const out = applyBagFilter(inv, lookup, {
+        category,
+        sort: 'recent',
+        search: '',
+      });
       expect(ids(out), category).not.toContain('ghost');
     }
     const searched = applyBagFilter(inv, lookup, {
@@ -193,7 +275,11 @@ describe('applyBagFilter: category filtering', () => {
 
 describe('applyBagFilter: search', () => {
   it('matches a case-insensitive name substring', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'recent', search: 'red' });
+    const out = applyBagFilter(INV, lookup, {
+      category: 'all',
+      sort: 'recent',
+      search: 'red',
+    });
     expect(ids(out)).toEqual(['blade']);
   });
 
@@ -207,7 +293,11 @@ describe('applyBagFilter: search', () => {
   });
 
   it('trims and ignores blank search', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'recent', search: '   ' });
+    const out = applyBagFilter(INV, lookup, {
+      category: 'all',
+      sort: 'recent',
+      search: '   ',
+    });
     expect(out.length).toBe(INV.length);
   });
 });
@@ -217,7 +307,11 @@ describe('applyBagFilter: sorting', () => {
     // Within a quality band the order is the canonical clean-up ladder
     // (weapons, consumables, food, tools, quest), not insertion order: the
     // common band here reads dagger, potion, bread, rod, keystone.
-    const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'quality', search: '' });
+    const out = applyBagFilter(INV, lookup, {
+      category: 'all',
+      sort: 'quality',
+      search: '',
+    });
     expect(ids(out)).toEqual([
       'relic',
       'helm',
@@ -239,7 +333,11 @@ describe('applyBagFilter: sorting', () => {
       { itemId: 'potion', count: 1 },
       { itemId: 'iron_ore', count: 12 },
     ];
-    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'quality', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'all',
+      sort: 'quality',
+      search: '',
+    });
     expect(ids(out)).toEqual(['potion', 'bread', 'iron_ore', 'iron_ore', 'iron_ore']);
     // Fuller stacks lead within the item.
     expect(out.slice(2).map((s) => s.count)).toEqual([20, 12, 7]);
@@ -257,7 +355,11 @@ describe('applyBagFilter: sorting', () => {
       { itemId: 'goldleaf_herb', count: 4 },
       { itemId: 'fine_iron_ore', count: 3 },
     ];
-    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'quality', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'all',
+      sort: 'quality',
+      search: '',
+    });
     expect(ids(out)).toEqual(['bread', 'goldleaf_herb', 'fine_iron_ore', 'iron_ore']);
   });
 
@@ -266,12 +368,20 @@ describe('applyBagFilter: sorting', () => {
       { itemId: 'iron_ore', count: 7 },
       { itemId: 'iron_ore', count: 20 },
     ];
-    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'name', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'all',
+      sort: 'name',
+      search: '',
+    });
     expect(out.map((s) => s.count)).toEqual([20, 7]);
   });
 
   it('sorts by name A to Z', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'name', search: '' });
+    const out = applyBagFilter(INV, lookup, {
+      category: 'all',
+      sort: 'name',
+      search: '',
+    });
     expect(ids(out)).toEqual([
       'relic',
       'bread',
@@ -287,7 +397,11 @@ describe('applyBagFilter: sorting', () => {
 
   it('does not mutate the input array', () => {
     const before = ids(INV);
-    applyBagFilter(INV, lookup, { category: 'all', sort: 'quality', search: '' });
+    applyBagFilter(INV, lookup, {
+      category: 'all',
+      sort: 'quality',
+      search: '',
+    });
     expect(ids(INV)).toEqual(before);
   });
 
@@ -296,7 +410,11 @@ describe('applyBagFilter: sorting', () => {
     // stable-order luck; before the guard this sort dereferenced the missing
     // def through a non-null assertion.
     const inv: InvSlot[] = [{ itemId: 'ghost', count: 1 }, ...INV];
-    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'quality', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'all',
+      sort: 'quality',
+      search: '',
+    });
     expect(ids(out)).toEqual([
       'relic',
       'helm',
@@ -313,7 +431,11 @@ describe('applyBagFilter: sorting', () => {
 
   it('name-sorts an unknown-id slot by its raw id', () => {
     const inv: InvSlot[] = [{ itemId: 'ghost', count: 1 }, ...INV];
-    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'name', search: '' });
+    const out = applyBagFilter(inv, lookup, {
+      category: 'all',
+      sort: 'name',
+      search: '',
+    });
     expect(ids(out)).toEqual([
       'relic',
       'bread',
@@ -331,7 +453,11 @@ describe('applyBagFilter: sorting', () => {
 
 describe('serialize / parse round-trip', () => {
   it('round-trips a valid state', () => {
-    const state: BagFilterState = { category: 'armor', sort: 'name', search: 'iron' };
+    const state: BagFilterState = {
+      category: 'armor',
+      sort: 'name',
+      search: 'iron',
+    };
     expect(parseBagFilter(serializeBagFilter(state))).toEqual(state);
   });
 
@@ -521,6 +647,8 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // consumes the chipped tusk, so it is poor grey trash outside the
     // material set again, All-only exactly as before the phase.
     'chipped_tusk',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'cinder_soaked_veil',
     'cracked_fetish',
     'dawnhold_posy',
     // Masterwrought Phase 13 (2026-08-27): the promotion writ, rare
@@ -529,7 +657,13 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // ruled junk; the Materials chip correctly skips a non-material.
     'deed_of_making',
     'deepfen_pearl',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'duneblade_token',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'dunefather_tailspine',
     'duskweave_bag',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'emberwake_heartscale',
     'foragers_haversack',
     // Formula scrolls follow the existing bag-side kind-'recipe' ruling.
     'formula_lastflame_zeal',
@@ -541,15 +675,23 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // click PLACES (never uses or equips), so no chip predicate claims it;
     // All-only is the honest home (the tonic settlement's shape).
     'harvest_feast',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'heart_of_the_first_ember',
     'inert_storm_shard',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'infernal_slag',
     'last_keep_signet',
     'linen_pouch',
     'loombound_reagent_satchel',
     'mistcallers_duffel',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'moltenheart_slagcore',
     'moonpale_scale',
     'necromancers_reagent_satchel',
     'ogre_toe_ring',
     'pale_pearl',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'parched_kings_goblet',
     // Masterwrought phase 11: the 28 apex patterns. Kind 'recipe' is
     // deliberately All-only in the BAG window (the phase 02 chip-count
     // restraint decision, first to revisit if the chip rail earns another
@@ -613,6 +755,8 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_warspice_feast',
     'pattern_warspice_skewers',
     'pattern_wyrmfall_pendant',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'prowler_fang',
     // Retired premium reins remain inert saved items, with no use or material role.
     'reins_chimeglass_tortoise',
     'reins_goblin_rocket_sled',
@@ -624,12 +768,20 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // harvest_feast and All-only for the same reason: a placeable crafted
     // junk-kind item whose click PLACES rather than uses or equips.
     'sageleaf_feast',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'sentinel_core_stone',
     'silkspun_satchel',
     'soft_down',
     'soggy_boot',
     'soggy_moccasin',
     'stag_antler',
     'stonepot_feast',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'sunbleached_bone',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'sunglass_shard',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'sunspeakers_ash_crown',
     // Masterwrought phase 08: the apex bag joins the bag-kind rows;
     // forgefold_plating, sunspun_bolt, wyrmfall_core, and wyrmhide_cording
     // left this list with their apex consumers (they now derive into the
@@ -640,6 +792,8 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'tangled_weed',
     'travelers_knapsack',
     'warspice_feast',
+    // FORK: Scorching Wastes / Emberwake / Infernal junk (ruled out of every chip).
+    'wastes_relic_cache',
     'wayfarers_backpack',
     'wolfhide_satchel',
   ] as const;

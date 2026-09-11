@@ -15,6 +15,7 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { bakedPalmVariant } from './jungle_features';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 
 export interface FarshoreFeaturesView {
   group: THREE.Group;
@@ -29,6 +30,35 @@ registerDeferredPreload(() =>
   }),
 );
 
+/** The isle's fallen-coconut clusters, shared by the builder below and the
+ *  editor's placement promotion (the reachCoconutSpots twin). */
+export function farshoreCoconutSpots(
+  seed: number,
+): { x: number; y: number; z: number; s: number; rot: number }[] {
+  const spots: { x: number; y: number; z: number; s: number; rot: number }[] = [];
+  for (const sp of farshorePalmSpots(seed)) {
+    if (hash2(sp.x, sp.z, seed + 5601) > 0.5) continue;
+    const n = 1 + Math.floor(hash2(sp.z, sp.x, seed + 5611) * 2);
+    for (let k = 0; k < n; k++) {
+      const ang = hash2(sp.x + k, sp.z, seed + 5621) * Math.PI * 2;
+      const dist = 2.6 + hash2(sp.x, sp.z + k, seed + 5631) * 2.2;
+      const x = sp.x + Math.sin(ang) * dist;
+      const z = sp.z + Math.cos(ang) * dist;
+      const y = terrainHeight(x, z, seed);
+      if (y < WATER_LEVEL + 0.4) continue;
+      if (roadDistance(x, z) < 3) continue;
+      spots.push({
+        x,
+        z,
+        y: y - 0.04,
+        s: 3.0 + hash2(k, sp.x, seed + 5641) * 1.75,
+        rot: hash2(z, x, seed + 5651) * Math.PI * 2,
+      });
+    }
+  }
+  return spots;
+}
+
 export function buildFarshoreFeatures(seed: number): FarshoreFeaturesView {
   const group = new THREE.Group();
   group.name = 'farshore-features';
@@ -39,9 +69,12 @@ export function buildFarshoreFeatures(seed: number): FarshoreFeaturesView {
   const v = new THREE.Vector3();
   const sc = new THREE.Vector3();
 
-  // --- the palms, instanced per variant from the shared sim list ---
+  // --- the palms, instanced per variant from the shared sim list. Stands
+  // down when the document owns them as placements (promoted-scenery
+  // contract) ---
   const byVariant: ReachPalm[][] = [[], [], []];
-  for (const sp of farshorePalmSpots(seed)) byVariant[sp.variant]?.push(sp);
+  if (!activeWorldPromoted('farshorePalms'))
+    for (const sp of farshorePalmSpots(seed)) byVariant[sp.variant]?.push(sp);
   byVariant.forEach((list, variant) => {
     const parts = bakedPalmVariant(variant);
     if (!parts || list.length === 0) return;
@@ -61,8 +94,9 @@ export function buildFarshoreFeatures(seed: number): FarshoreFeaturesView {
     }
   });
 
-  // --- the fallen coconuts, dropped around the trunks ---
-  if (coconutScene) {
+  // --- the fallen coconuts, dropped around the trunks. Stand down when the
+  // document owns the coconut clusters as placements. ---
+  if (coconutScene && !activeWorldPromoted('jungleCoconuts')) {
     coconutScene.updateMatrixWorld(true);
     const parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[] = [];
     coconutScene.traverse((o) => {
@@ -84,27 +118,7 @@ export function buildFarshoreFeatures(seed: number): FarshoreFeaturesView {
       p.geo.computeBoundingBox();
       p.geo.computeBoundingSphere();
     }
-    const spots: { x: number; y: number; z: number; s: number; rot: number }[] = [];
-    for (const sp of farshorePalmSpots(seed)) {
-      if (hash2(sp.x, sp.z, seed + 5601) > 0.5) continue;
-      const n = 1 + Math.floor(hash2(sp.z, sp.x, seed + 5611) * 2);
-      for (let k = 0; k < n; k++) {
-        const ang = hash2(sp.x + k, sp.z, seed + 5621) * Math.PI * 2;
-        const dist = 2.6 + hash2(sp.x, sp.z + k, seed + 5631) * 2.2;
-        const x = sp.x + Math.sin(ang) * dist;
-        const z = sp.z + Math.cos(ang) * dist;
-        const y = terrainHeight(x, z, seed);
-        if (y < WATER_LEVEL + 0.4) continue;
-        if (roadDistance(x, z) < 3) continue;
-        spots.push({
-          x,
-          z,
-          y: y - 0.04,
-          s: 3.0 + hash2(k, sp.x, seed + 5641) * 1.75,
-          rot: hash2(z, x, seed + 5651) * Math.PI * 2,
-        });
-      }
-    }
+    const spots = farshoreCoconutSpots(seed);
     for (const part of parts) {
       if (spots.length === 0) break;
       const mesh = new THREE.InstancedMesh(part.geo, part.mat, spots.length);

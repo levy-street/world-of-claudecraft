@@ -21,6 +21,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { resolvePosition } from '../sim/colliders';
 import { CAMPS, getActiveWorldContent, MOBS, zoneAt } from '../sim/data';
+import { usesOverworldSiteDressing } from '../sim/map_presentation';
 import { propPlacementRoll } from '../sim/prop_layout';
 import { roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
 import {
@@ -268,7 +269,13 @@ export function buildCampBraziers(seed = 0): CampBraziersView {
   const cullGroups: THREE.Group[] = [];
   const poolMeshes: THREE.Mesh[] = [];
 
-  const sites = planCampBraziers(seed);
+  // Camp braziers sit on the shipped world's camps, so an authored map with
+  // its own building inherits campfires wherever those camps happen to fall.
+  // planCampBraziers is a pure core and must stay content-blind, so the gate
+  // lives here (same reasoning as gather_nodes.ts).
+  const sites = usesOverworldSiteDressing(getActiveWorldContent().presentationMode)
+    ? planCampBraziers(seed)
+    : [];
   if (sites.length === 0) {
     return { group, glowLights, flames, cullGroups, update: () => undefined };
   }

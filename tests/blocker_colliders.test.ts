@@ -95,7 +95,15 @@ describe('blocker wall colliders', () => {
 
 describe('placement collideRadius override', () => {
   function placement(collideRadius: number): PlacedAsset {
-    return { path: '/models/props/well.glb', x: 0, z: 60, rotY: 0, scale: 1, collideRadius };
+    return {
+      path: '/models/props/well.glb',
+      x: 0,
+      z: 60,
+      rotY: 0,
+      scale: 1,
+      collideRadius,
+      collideCustom: true,
+    };
   }
 
   it('blocks at the overridden radius, not the scale-derived one', () => {

@@ -152,7 +152,10 @@ export interface AbilityVfxSpellfxEvent {
   school: string;
   fx: string;
   ability?: string;
-  attackAnimation?: 'ranged-shot';
+  // Structural slice: this layer only ever asks "is it a ranged shot?", so it
+  // accepts the full discriminator the sim emits (the fork's bespoke worm-* and
+  // dragon-* boss clips included) rather than re-listing every value.
+  attackAnimation?: 'ranged-shot' | (string & {});
 }
 
 // Structural slice of the point-anchored SimEvent member ('spellfxAt').

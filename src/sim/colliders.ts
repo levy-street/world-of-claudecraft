@@ -1,4 +1,10 @@
 import {
+  authoredPrismsForPath,
+  authoredRampsForPath,
+  type BakedCollisionBox,
+  bakedBoxesForPath,
+} from './asset_collision';
+import {
   BANKER_CHEST_HALF_DEPTH,
   BANKER_CHEST_HALF_WIDTH,
   BANKER_CHEST_TARGET_HEIGHT,
@@ -52,6 +58,9 @@ import {
   STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
+import { usesOverworldSiteDressing } from './map_presentation';
+import type { CollisionPrism } from './mesh_prisms';
+import { invalidatePlacementRamps } from './placement_ramps';
 
 // Re-exported from the extracted cell-index module so existing importers keep
 // their './colliders' path.
@@ -82,6 +91,7 @@ import {
   layoutColliders,
 } from './dungeon_layout';
 import { emberLilySpots } from './ember_lilies';
+import { isAuthoredTownBuildingDef } from './authored_town_buildings';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
@@ -119,7 +129,7 @@ import {
 import { type PlacedStreetlamp, planStreetlamps, styleStreetlampSites } from './streetlamp_layout';
 import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetlamp_style';
 import { townPropPlacements } from './town_props';
-import type { WorldContent } from './types';
+import type { PlacedAsset, WorldContent } from './types';
 import { WILDHEART_COLLIDERS } from './wildheart_field';
 import {
   crossesSealedBorder,
@@ -155,6 +165,24 @@ export interface CircleCollider {
   /** Absolute world-space visual top used by sight checks; movement ignores it. */
   cameraTopY?: number;
   /**
+   * Absolute world-space BASE (the ground the obstacle stands on). A mover
+   * whose head is below it passes underneath — cave tubes run under surface
+   * props, and an authored upper storey does not wall the floor below it.
+   * Absent = height-agnostic (blocker walls, interior wall sets): blocks at
+   * every depth, which is every collider the shipped world builds.
+   */
+  baseY?: number;
+  /**
+   * Pass-under floor for MOVEMENT only (the shipped world's surface props):
+   * a body walking a cave tube or carve sheet below this height passes under
+   * the prop instead of hitting its 2D footprint. Deliberately NOT `baseY`,
+   * which also suppresses the collider in `sightBlockedAt`: the open world has
+   * no terrain occlusion in that model, so a prop standing on a bank is the
+   * only thing blocking a sight line across it, and letting a distant low eye
+   * see under it would let mobs and pets see through the bank.
+   */
+  underY?: number;
+  /**
    * Absolute world-space top of the PHYSICAL obstacle for movement (parkour):
    * a mover whose feet reach this height passes over instead of being walled
    * (see `passesOver`). Distinct from `cameraTopY`, which follows the visual
@@ -180,6 +208,13 @@ export interface CircleCollider {
   passUnderY?: number;
   /** Engine bookkeeping: index into the owning grid's dedupe stamp buffer. */
   gridIndex?: number;
+  /**
+   * Dev attribution: which source emitted this collider (a placement's model
+   * path plus its lane, e.g. "/models/props/inn.glb#prism"). Never read by
+   * gameplay — the playtest Dev panel surfaces it so an invisible wall can
+   * name itself. Absent = a built-in record collider.
+   */
+  src?: string;
 }
 
 export interface ObbCollider {
@@ -191,6 +226,10 @@ export interface ObbCollider {
   rot: number; // yaw, three.js rotation.y convention
   /** Absolute world-space visual top used by sight checks; movement ignores it. */
   cameraTopY?: number;
+  /** See {@link CircleCollider.baseY}. */
+  baseY?: number;
+  /** See {@link CircleCollider.underY}. */
+  underY?: number;
   /** See {@link CircleCollider.moveTopY}. */
   moveTopY?: number;
   /** See {@link CircleCollider.standable}. */
@@ -207,9 +246,71 @@ export interface ObbCollider {
   isFence?: boolean;
   /** See {@link CircleCollider.gridIndex}. */
   gridIndex?: number;
+  /** See {@link CircleCollider.src}. */
+  src?: string;
 }
 
-export type Collider = CircleCollider | ObbCollider;
+/**
+ * A convex banded prism: the shape a Collision Master volume collides as.
+ *
+ * An OBB is a 4-gon prism, so this loses nothing and gains the sections a
+ * rectangle could only approximate — hexagonal rocks, round towers, angled
+ * walls. It exists because the maker's authored volumes ARE the contract:
+ * fitting rectangles to them put a large share of the collider outside the
+ * drawn shape, which in game is an invisible wall short of the thing modelled.
+ */
+export interface PrismCollider {
+  type: 'prism';
+  /** See {@link CircleCollider.passUnderY}. */
+  passUnderY?: number;
+  /** Outline anchor (the placement's world position). */
+  x: number;
+  z: number;
+  /** Convex outline, counter-clockwise, in world yards RELATIVE to (x, z):
+   *  flat u,v pairs. Relative so the anchor alone drives broad-phase bounds. */
+  poly: readonly number[];
+  /** Bounding radius of `poly` about (x, z) — the O(1) narrow-phase reject, so
+   *  a prism costs less than an OBB for every mover that is not touching it. */
+  br: number;
+  /**
+   * LOFT outlines (world yards relative to x,z, same vertex count and
+   * correspondence as `poly`): the authored section at baseY and at moveTopY.
+   * Height-aware consumers interpolate between them at the mover's own feet
+   * height (see prismPolyAt), so a tapered Collision Master volume collides
+   * exactly as drawn instead of as a stack of flat-walled hulls. `poly`
+   * stays the coverage-complete union hull for height-blind consumers.
+   */
+  polyLo?: readonly number[];
+  polyHi?: readonly number[];
+  /** See {@link CircleCollider.cameraTopY}. */
+  cameraTopY?: number;
+  /** See {@link CircleCollider.baseY}. */
+  baseY?: number;
+  /** See {@link CircleCollider.underY}. */
+  underY?: number;
+  /** See {@link CircleCollider.moveTopY}. An authored volume is a real physical
+   *  body, so the parkour solver reads its top exactly like a crate's. */
+  moveTopY?: number;
+  /** See {@link CircleCollider.standable}. This is what lets an authored deck
+   *  (a second storey, a ramp landing) carry a body rather than only block it. */
+  standable?: boolean;
+  /** See {@link CircleCollider.topSlope}. */
+  topSlope?: TopSlope;
+  /** See {@link CircleCollider.gridIndex}. */
+  gridIndex?: number;
+  /** See {@link CircleCollider.src}. */
+  src?: string;
+}
+
+export type Collider = CircleCollider | ObbCollider | PrismCollider;
+
+/**
+ * The collider shape a HAND-AUTHORED layout emits (arena, delves, rifts, the
+ * battleground, interior wall sets, shipped-map imports). Prisms only ever come
+ * from a placement's Collision Master volumes, so layout code can keep reading
+ * `hw`/`hd`/`rot` off anything that is not a circle.
+ */
+export type LayoutCollider = CircleCollider | ObbCollider;
 
 /**
  * A shaped (non-flat) standable top: real roofs pitch. `moveTopY` stays the
@@ -242,7 +343,9 @@ export function colliderTopAt(c: Collider, x: number, z: number): number {
   const s = c.topSlope;
   if (!s) return top;
   let run: number;
-  if (s.kind === 'cone' || c.type === 'circle') {
+  // A prism has no single yaw to measure a ridge across, so a sloped one falls
+  // radially like a cone.
+  if (s.kind === 'cone' || c.type === 'circle' || c.type === 'prism') {
     run = Math.hypot(x - c.x, z - c.z);
   } else {
     const cos = Math.cos(-c.rot);
@@ -341,6 +444,21 @@ function passesOver(c: Collider, mover: MoverHeight | undefined, x: number, z: n
   return colliderTopAt(c, x, z) <= mover.y + (c.standable ? mover.lift : 0) + MOVE_TOP_EPS;
 }
 
+// Pass-under gate: a mover this tall (head height) fits beneath a collider
+// whose base is at least the margin above the head — cave tubes run under
+// surface props/trees/fences without hitting their 2D footprints, and an
+// authored second storey does not wall the floor below. Colliders with no
+// baseY (everything the shipped world builds) block at every depth.
+const MOVER_HEAD_Y = 2.0;
+const UNDER_PASS_MARGIN = 0.4;
+
+export function passesUnder(c: Collider, moverY: number | undefined): boolean {
+  const floor = c.underY ?? c.baseY;
+  return (
+    moverY !== undefined && floor !== undefined && moverY + MOVER_HEAD_Y < floor - UNDER_PASS_MARGIN
+  );
+}
+
 function topY(seed: number, x: number, z: number, height: number): number {
   return groundHeight(x, z, seed) + height;
 }
@@ -350,6 +468,344 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
   const c = Math.cos(rot),
     s = Math.sin(rot);
   return { x: lx * c + lz * s, z: -lx * s + lz * c };
+}
+
+// Scratch for prismPolyAt: consumed immediately by the caller, never held.
+let prismOutlineView: number[] = [];
+
+/**
+ * The prism's effective outline for a body whose FEET are at `feetY`:
+ * the loft interpolated at that height when the prism carries one, else the
+ * union hull. Returns a shared scratch view - consume before the next call.
+ */
+export function prismPolyAt(c: PrismCollider, feetY: number | undefined): readonly number[] {
+  const lo = c.polyLo;
+  const hi = c.polyHi;
+  if (
+    feetY === undefined ||
+    !lo ||
+    !hi ||
+    c.baseY === undefined ||
+    c.moveTopY === undefined ||
+    c.moveTopY - c.baseY < 1e-6 ||
+    lo.length !== hi.length
+  ) {
+    return c.poly;
+  }
+  const t = Math.min(1, Math.max(0, (feetY - c.baseY) / (c.moveTopY - c.baseY)));
+  const n = lo.length;
+  if (prismOutlineView.length !== n) prismOutlineView = new Array(n);
+  for (let i = 0; i < n; i++) {
+    prismOutlineView[i] = lo[i] + (hi[i] - lo[i]) * t;
+  }
+  return prismOutlineView;
+}
+
+/** Row-major 3x3 for the renderer's XYZ euler, so a tilted placement's
+ *  collision leans with the model instead of standing where the untilted asset
+ *  was. Matches THREE.Euler(x, y, z, 'XYZ') exactly. */
+function eulerMatrix(rx: number, ry: number, rz: number): number[] {
+  const cx = Math.cos(rx),
+    sx = Math.sin(rx),
+    cy = Math.cos(ry),
+    sy = Math.sin(ry),
+    cz = Math.cos(rz),
+    sz = Math.sin(rz);
+  return [
+    cy * cz,
+    -cy * sz,
+    sy,
+    cx * sz + sx * sy * cz,
+    cx * cz - sx * sy * sz,
+    -sx * cy,
+    sx * sz - cx * sy * cz,
+    sx * cz + cx * sy * sz,
+    cx * cy,
+  ];
+}
+
+function applyMat(m: readonly number[], x: number, y: number, z: number): Point3 {
+  return {
+    x: m[0] * x + m[1] * y + m[2] * z,
+    y: m[3] * x + m[4] * y + m[5] * z,
+    z: m[6] * x + m[7] * y + m[8] * z,
+  };
+}
+
+interface Point3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+const NO_AUTHORED_PRISMS: readonly CollisionPrism[] = [];
+
+/** Signed area sign of a closed XZ outline; negative means clockwise. */
+function outlineWinding(hull: readonly [number, number][]): number {
+  let signed = 0;
+  for (let i = 0; i < hull.length; i++) {
+    const a = hull[i];
+    const b = hull[(i + 1) % hull.length];
+    signed += a[0] * b[1] - b[0] * a[1];
+  }
+  return signed;
+}
+
+/** Convex hull of an XZ point cloud (monotone chain), for a tilted outline. */
+function convexHullXZ(points: readonly [number, number][]): [number, number][] {
+  if (points.length < 3) return [...points];
+  const pts = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o: [number, number], a: [number, number], b: [number, number]): number =>
+    (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const build = (src: [number, number][]): [number, number][] => {
+    const out: [number, number][] = [];
+    for (const p of src) {
+      while (out.length >= 2 && cross(out[out.length - 2], out[out.length - 1], p) <= 0) out.pop();
+      out.push(p);
+    }
+    out.pop();
+    return out;
+  };
+  return [...build(pts), ...build([...pts].reverse())];
+}
+
+/**
+ * Emit one banded PRISM per authored Collision Master volume of a placement.
+ *
+ * The outline MUST come out counter-clockwise: pushOutPrism reads the interior
+ * as "left of every edge", so a reversed one inverts the collider and makes the
+ * whole world solid except inside it. Rotation preserves winding; a mirroring
+ * scale would not, hence the explicit re-check.
+ */
+function emitPlacementPrisms(
+  out: Collider[],
+  p: PlacedAsset,
+  prisms: readonly CollisionPrism[],
+  base: number,
+): void {
+  const lift = p.y ?? 0;
+  const s = p.scale > 0 ? p.scale : 1;
+  const sx = s * (p.scaleX ?? 1);
+  const sy = s * (p.scaleY ?? 1);
+  const sz = s * (p.scaleZ ?? 1);
+  const tiltX = p.rotX ?? 0;
+  const tiltZ = p.rotZ ?? 0;
+  // A tilted placement leans its collision with the model: every outline corner
+  // goes through the FULL rotation and the leaned prism becomes the convex
+  // shadow of that, banded by the corners' Y span.
+  const m = tiltX !== 0 || tiltZ !== 0 ? eulerMatrix(tiltX, p.rotY, tiltZ) : null;
+  for (const prism of prisms) {
+    const flat: [number, number][] = [];
+    let loY = Infinity;
+    let hiYLocal = -Infinity;
+    for (let i = 0; i < prism.poly.length; i += 2) {
+      const mx = prism.poly[i] * sx;
+      const mz = prism.poly[i + 1] * sz;
+      if (m) {
+        for (const py of [prism.y0 * sy, prism.y1 * sy]) {
+          const w = applyMat(m, mx, py, mz);
+          flat.push([w.x, w.z]);
+          if (w.y < loY) loY = w.y;
+          if (w.y > hiYLocal) hiYLocal = w.y;
+        }
+      } else {
+        const w = rotY(mx, mz, p.rotY);
+        flat.push([w.x, w.z]);
+      }
+    }
+    if (!m) {
+      loY = prism.y0 * sy;
+      hiYLocal = prism.y1 * sy;
+    }
+    const hull = m ? convexHullXZ(flat) : flat;
+    if (hull.length < 3) continue;
+    const flipped = outlineWinding(hull) < 0;
+    if (flipped) hull.reverse();
+    const poly: number[] = [];
+    let br = 0;
+    for (const [hx, hz] of hull) {
+      poly.push(hx, hz);
+      br = Math.max(br, Math.hypot(hx, hz));
+    }
+    // LOFT outlines ride through the same scale + yaw (never the tilt path:
+    // the leaned shadow hull re-orders vertices, breaking the index
+    // correspondence the loft interpolation depends on). Reversed together
+    // with poly so index i keeps matching across all three.
+    let polyLo: number[] | undefined;
+    let polyHi: number[] | undefined;
+    if (!m && prism.polyLo && prism.polyHi && prism.polyLo.length === prism.poly.length) {
+      const mapOutline = (src: readonly number[]): number[] => {
+        const o: number[] = [];
+        for (let i = 0; i < src.length; i += 2) {
+          const w = rotY(src[i] * sx, src[i + 1] * sz, p.rotY);
+          o.push(w.x, w.z);
+        }
+        if (flipped) {
+          const r: number[] = [];
+          for (let i = o.length - 2; i >= 0; i -= 2) r.push(o[i], o[i + 1]);
+          return r;
+        }
+        return o;
+      };
+      polyLo = mapOutline(prism.polyLo);
+      polyHi = mapOutline(prism.polyHi);
+      for (let i = 0; i < polyLo.length; i += 2) {
+        br = Math.max(
+          br,
+          Math.hypot(polyLo[i], polyLo[i + 1]),
+          Math.hypot(polyHi[i], polyHi[i + 1]),
+        );
+      }
+    }
+    const lo = base + lift + loY;
+    const hi = base + lift + hiYLocal;
+    out.push({
+      type: 'prism',
+      x: p.x,
+      z: p.z,
+      poly,
+      br,
+      polyLo,
+      polyHi,
+      cameraTopY: hi,
+      baseY: lo,
+      moveTopY: hi,
+      standable: true,
+    });
+  }
+}
+
+/**
+ * Only a box that can actually be mounted is a support surface. A TALL sliver
+ * (a wall panel, a fence picket) still BLOCKS — blocksAt reads moveTopY — but
+ * it leaves the standable set: supportFromCandidates and floorHeightAt walk
+ * every standable candidate per query, and on a dressed map many baked boxes
+ * are exactly this kind of never-stood-on shape. A LOW box stays standable
+ * whatever its footprint: step-up/mantle onto the top IS how a body crosses a
+ * doorstep course or vaults a rail, and both gates require standable.
+ */
+const STANDABLE_MIN_HALF_EXTENT = 0.22;
+const STANDABLE_LOW_TOP = MANTLE_REACH + 0.35;
+function standableSurface(hw: number, hd: number, topAboveGround: number): boolean {
+  return Math.min(hw, hd) >= STANDABLE_MIN_HALF_EXTENT || topAboveGround <= STANDABLE_LOW_TOP;
+}
+
+/**
+ * Emit one banded OBB per baked box of a placement.
+ *
+ * `baseY` gates walking underneath (a cave tube, the floor below an authored
+ * storey) and `moveTopY`+`standable` make the band's top a real surface, the
+ * same treatment the shipped world gives crates, benches and hut roofs. A box
+ * carries its own `ry` on top of the placement's yaw (hand-edited hitboxes).
+ */
+function emitPlacementBoxes(
+  out: Collider[],
+  p: PlacedAsset,
+  baked: readonly BakedCollisionBox[],
+  base: number,
+): void {
+  const lift = p.y ?? 0;
+  const s = p.scale > 0 ? p.scale : 1;
+  const sx = s * (p.scaleX ?? 1);
+  const sy = s * (p.scaleY ?? 1);
+  const sz = s * (p.scaleZ ?? 1);
+  const tiltX = p.rotX ?? 0;
+  const tiltZ = p.rotZ ?? 0;
+  if (tiltX === 0 && tiltZ === 0) {
+    for (const b of baked) {
+      const off = rotY(b.x * sx, b.z * sz, p.rotY);
+      const lo = base + lift + (b.y - b.hy) * sy;
+      const hi = base + lift + (b.y + b.hy) * sy;
+      // A box with its OWN yaw (hand-edited hitboxes, Collision Master
+      // volumes) has its local axes rotated off the model's, so a per-axis
+      // model scale must be measured through that rotation: hw is the box's
+      // local-X extent as the scaled model actually stretches it, not
+      // b.hx * sx (which silently swapped width and depth on a 90-degree
+      // authored box under a fitted building's scaleX != scaleZ).
+      const bry = (b as { ry?: number }).ry ?? 0;
+      let hw = b.hx * sx;
+      let hd = b.hz * sz;
+      if (bry !== 0 && Math.abs(sx - sz) > 1e-6) {
+        const bc = Math.cos(bry);
+        const bs = Math.sin(bry);
+        hw = b.hx * Math.hypot(bc * sx, bs * sz);
+        hd = b.hz * Math.hypot(bs * sx, bc * sz);
+      }
+      hw = Math.max(0.05, hw);
+      hd = Math.max(0.05, hd);
+      out.push({
+        type: 'obb',
+        x: p.x + off.x,
+        z: p.z + off.z,
+        hw,
+        hd,
+        rot: p.rotY + bry,
+        cameraTopY: hi,
+        baseY: lo,
+        moveTopY: hi,
+        standable: standableSurface(hw, hd, hi - base),
+      });
+    }
+    return;
+  }
+  // Tilted (the gizmo's X/Z rings): each box's 8 corners go through the model's
+  // FULL rotation, then a yaw-OBB is fitted over their XZ shadow with the
+  // corners' Y span as the band — the closest shape this engine's yaw-banded
+  // colliders can represent.
+  const m = eulerMatrix(tiltX, p.rotY, tiltZ);
+  for (const b of baked) {
+    const bry = (b as { ry?: number }).ry ?? 0;
+    const bc = Math.cos(bry);
+    const bs = Math.sin(bry);
+    const corners: Point3[] = [];
+    for (let i = 0; i < 8; i++) {
+      const cxl = (i & 1 ? 1 : -1) * b.hx;
+      const cyl = (i & 2 ? 1 : -1) * b.hy;
+      const czl = (i & 4 ? 1 : -1) * b.hz;
+      const mx = (b.x + cxl * bc + czl * bs) * sx;
+      const mz = (b.z - cxl * bs + czl * bc) * sz;
+      corners.push(applyMat(m, mx, (b.y + cyl) * sy, mz));
+    }
+    // Frame yaw from the box's longest rotated axis shadow (a vertical axis
+    // casts none; the fence convention is rot = atan2(-dz, dx)).
+    const axisX = applyMat(m, bc, 0, -bs);
+    const axisZ = applyMat(m, bs, 0, bc);
+    const dir =
+      Math.hypot(axisX.x, axisX.z) * b.hx >= Math.hypot(axisZ.x, axisZ.z) * b.hz ? axisX : axisZ;
+    const rot = Math.hypot(dir.x, dir.z) > 1e-6 ? Math.atan2(-dir.z, dir.x) : p.rotY;
+    let minU = Infinity;
+    let maxU = -Infinity;
+    let minV = Infinity;
+    let maxV = -Infinity;
+    let loY = Infinity;
+    let hiY = -Infinity;
+    for (const c of corners) {
+      const local = rotY(c.x, c.z, -rot);
+      if (local.x < minU) minU = local.x;
+      if (local.x > maxU) maxU = local.x;
+      if (local.z < minV) minV = local.z;
+      if (local.z > maxV) maxV = local.z;
+      if (c.y < loY) loY = c.y;
+      if (c.y > hiY) hiY = c.y;
+    }
+    const center = rotY((minU + maxU) / 2, (minV + maxV) / 2, rot);
+    const lo = base + lift + loY;
+    const hi = base + lift + hiY;
+    const hw = Math.max(0.05, (maxU - minU) / 2);
+    const hd = Math.max(0.05, (maxV - minV) / 2);
+    out.push({
+      type: 'obb',
+      x: p.x + center.x,
+      z: p.z + center.z,
+      hw,
+      hd,
+      rot,
+      cameraTopY: hi,
+      baseY: lo,
+      moveTopY: hi,
+      standable: standableSurface(hw, hd, hi - base),
+    });
+  }
 }
 
 // default backward offset/radius for a mine's spoil mound behind the timber portal,
@@ -408,7 +864,12 @@ function staticWorldColliders(seed: number): Collider[] {
 
   // Render hideables still block movement while their render subsystem fades
   // whichever one crosses the eye-to-camera segment to 20% opacity.
+  // A document that owns the authored towns' buildings as placements carries
+  // their (baked) collision itself — without this gate a moved town hall
+  // leaves an invisible record collider standing on the square.
+  const townBuildingsPromoted = content.promotedScenery?.authoredTowns === true;
   for (const b of PROPS.buildings) {
+    if (townBuildingsPromoted && isAuthoredTownBuildingDef(b)) continue;
     if (b.kind === 'chapel' && b.assetId === undefined) {
       // The legacy procedural chapel is COMPOSED (render/props.ts): full-height
       // bell tower at the rear, squat entry hall in front. Collide the two
@@ -461,6 +922,9 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: b.d / 2,
       rot: b.rot,
       cameraTopY,
+      // FORK: ground anchor for pass-under — a mover deep in a tube or carve
+      // walks beneath surface props instead of hitting invisible walls.
+      underY: topY(seed, b.x, b.z, 0),
     });
   }
   for (const w of PROPS.wells)
@@ -470,6 +934,7 @@ function staticWorldColliders(seed: number): Collider[] {
       z: w.z,
       r: w.r,
       cameraTopY: topY(seed, w.x, w.z, w.height ?? 3.7),
+      underY: topY(seed, w.x, w.z, 0),
     });
   // the collider runs wider than the data radius: the modeled trunks flare
   // at the base, and the r that sizes the tree understates the bark line
@@ -484,7 +949,12 @@ function staticWorldColliders(seed: number): Collider[] {
   // The Duskfall Passage's cave mouths: each portal side wears a modeled
   // cave (render/hollow_gates.ts); two flank circles and a back circle
   // shape the walk-in so the only way through the rock is the mouth itself.
-  for (const portal of PORTALS) {
+  //
+  // Overworld-only, like the art. These circles sit on fixed world
+  // coordinates, so an authored map inherited three invisible walls wherever
+  // those numbers landed on it — the exact failure invisible decoration
+  // colliders have hit before, and it outlives hiding the mesh.
+  for (const portal of usesOverworldSiteDressing(content.presentationMode) ? PORTALS : []) {
     for (const side of [portal.a, portal.b]) {
       const f = Math.atan2(side.landing.x - side.x, side.landing.z - side.z);
       const fx = Math.sin(f);
@@ -508,24 +978,28 @@ function staticWorldColliders(seed: number): Collider[] {
   }
   // The Willowfen's willows: a trunk collider at the base of every weeping
   // willow, from the same deterministic list the renderer instances the
-  // models from (sim/fen_willows.ts).
-  for (const w of fenWillowSpots(seed))
-    out.push({
-      type: 'circle',
-      x: w.x,
-      z: w.z,
-      r: w.r,
-      cameraTopY: topY(seed, w.x, w.z, 6),
-    });
+  // models from (sim/fen_willows.ts). A document that owns the willows as
+  // placements carries their trunks itself (promotedScenery.willows).
+  const willowsPromoted = content.promotedScenery?.willows === true;
+  if (!willowsPromoted)
+    for (const w of fenWillowSpots(seed))
+      out.push({
+        type: 'circle',
+        x: w.x,
+        z: w.z,
+        r: w.r,
+        cameraTopY: topY(seed, w.x, w.z, 6),
+      });
   // ...and the Veiled Hollow's willows, same one-list contract
-  for (const w of hollowWillowSpots(seed))
-    out.push({
-      type: 'circle',
-      x: w.x,
-      z: w.z,
-      r: w.r,
-      cameraTopY: topY(seed, w.x, w.z, 6),
-    });
+  if (!willowsPromoted)
+    for (const w of hollowWillowSpots(seed))
+      out.push({
+        type: 'circle',
+        x: w.x,
+        z: w.z,
+        r: w.r,
+        cameraTopY: topY(seed, w.x, w.z, 6),
+      });
   // Dawnhold's outside climbing chain: corbelled shelves up each curtain
   // so the wall-walk is reachable by parkour as well as by the flights.
   // These are the only STANDABLE tops the castle has outdoors, because
@@ -570,37 +1044,43 @@ function staticWorldColliders(seed: number): Collider[] {
   }
   // ...and the Drakelands' giant ember lilies: the huge and giant tiers
   // carry a rocky-bed collider (r 0 skirt lilies stay walk-through
-  // dressing), same one-list contract as the willows
-  for (const lily of emberLilySpots(seed)) {
-    if (lily.r <= 0) continue;
-    out.push({
-      type: 'circle',
-      x: lily.x,
-      z: lily.z,
-      r: lily.r,
-      cameraTopY: topY(seed, lily.x, lily.z, lily.fp * 0.55),
-    });
-  }
+  // dressing), same one-list contract as the willows. A document that owns
+  // the Drakelands dressing as placements carries the lily beds itself.
+  if (content.promotedScenery?.emberDressing !== true)
+    for (const lily of emberLilySpots(seed)) {
+      if (lily.r <= 0) continue;
+      out.push({
+        type: 'circle',
+        x: lily.x,
+        z: lily.z,
+        r: lily.r,
+        cameraTopY: topY(seed, lily.x, lily.z, lily.fp * 0.55),
+      });
+    }
   // The Palmreach strand: a slim trunk collider at the base of every beach
   // palm, from the same deterministic list the renderer instances the models
-  // from (world.ts).
-  for (const p of reachPalmSpots(seed))
-    out.push({
-      type: 'circle',
-      x: p.x,
-      z: p.z,
-      r: p.r,
-      cameraTopY: topY(seed, p.x, p.z, 7),
-    });
+  // from (world.ts). A document that owns a stand as placements carries its
+  // trunks itself — without the gate a moved palm leaves an invisible
+  // blocker standing where the world had planted it.
+  if (content.promotedScenery?.reachPalms !== true)
+    for (const p of reachPalmSpots(seed))
+      out.push({
+        type: 'circle',
+        x: p.x,
+        z: p.z,
+        r: p.r,
+        cameraTopY: topY(seed, p.x, p.z, 7),
+      });
   // ...and the Farshore strand's palms, the same one-list contract
-  for (const p of farshorePalmSpots(seed))
-    out.push({
-      type: 'circle',
-      x: p.x,
-      z: p.z,
-      r: p.r,
-      cameraTopY: topY(seed, p.x, p.z, 7),
-    });
+  if (content.promotedScenery?.farshorePalms !== true)
+    for (const p of farshorePalmSpots(seed))
+      out.push({
+        type: 'circle',
+        x: p.x,
+        z: p.z,
+        r: p.r,
+        cameraTopY: topY(seed, p.x, p.z, 7),
+      });
   for (const s of PROPS.stalls) {
     const cameraTopY = topY(seed, s.x, s.z, s.height ?? 3.1);
     if (s.w !== undefined && s.d !== undefined) {
@@ -663,6 +1143,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: bench.d / 2,
       rot: bench.rot,
       cameraTopY: topY(seed, bench.x, bench.z, bench.height),
+      underY: topY(seed, bench.x, bench.z, 0),
       moveTopY: top,
       standable: true,
     });
@@ -755,6 +1236,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: board.depth / 2,
       rot: board.rotation,
       cameraTopY: topY(seed, board.x, board.z, board.height),
+      underY: topY(seed, board.x, board.z, 0),
     });
   }
   // The dedicated Fenbridge renderer is built-in-only. Keep this specialized
@@ -770,6 +1252,7 @@ function staticWorldColliders(seed: number): Collider[] {
         hd: board.depth / 2,
         rot: board.rotation,
         cameraTopY: topY(seed, board.x, board.z, board.height),
+        underY: topY(seed, board.x, board.z, 0),
       });
     }
   }
@@ -860,8 +1343,11 @@ function staticWorldColliders(seed: number): Collider[] {
   // Dungeon door arch jambs (dungeon_door_jambs.ts owns the rule).
   out.push(...dungeonDoorJambColliders(seed, topY));
   // The Forgefather's Isle fortress: the owner's baked exterior pass
-  // (forgefather_fortress.ts owns the ground-standing derivation).
-  out.push(...forgefatherFortressColliders(seed));
+  // (forgefather_fortress.ts owns the ground-standing derivation). Built-in
+  // world only: an authored map reuses these coordinates for its own ground
+  // (the Deepglass's Tidehold market sits where the fortress does), and an
+  // ungated push here put an invisible wall through its stalls.
+  if (content === BUILTIN_WORLD) out.push(...forgefatherFortressColliders(seed));
 
   // Delve entrance portals: the whole slab is a solid one-way threshold
   // (players enter by talking to the warden; leaveDelve drops them mouth-side
@@ -884,7 +1370,14 @@ function staticWorldColliders(seed: number): Collider[] {
   // never block). Post positions/size mirror the render placement.
   for (const m of PROPS.mines) {
     const { x, z, r } = mineMoundFootprint(m);
-    out.push({ type: 'circle', x, z, r, cameraTopY: topY(seed, x, z, r + 0.2) });
+    out.push({
+      type: 'circle',
+      x,
+      z,
+      r,
+      cameraTopY: topY(seed, x, z, r + 0.2),
+      underY: topY(seed, x, z, 0),
+    });
     for (const sx of [-1.45, 1.45]) {
       const post = rotY(sx, 0, m.rot);
       const px = m.x + post.x;
@@ -895,6 +1388,7 @@ function staticWorldColliders(seed: number): Collider[] {
         z: pz,
         r: 0.27,
         cameraTopY: topY(seed, px, pz, 3.4),
+        underY: topY(seed, px, pz, 0),
       });
     }
   }
@@ -913,6 +1407,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: d.hutLocal.hd,
       rot: d.rot,
       cameraTopY: topY(seed, x, z, 2.9),
+      underY: topY(seed, x, z, 0),
       // The hut's roof is a climbable perch: full-height to a walk, a ledge
       // grab away from a jump. house_3's ridge runs along its local z (the
       // OBB depth axis), so the surface falls across |local x| to real eaves
@@ -979,6 +1474,7 @@ function staticWorldColliders(seed: number): Collider[] {
       z: t.z,
       r: 1.5 * t.scale,
       cameraTopY: topY(seed, t.x, t.z, 3.4 * t.scale),
+      underY: topY(seed, t.x, t.z, 0),
     });
   PROPS.crates.forEach(([x, z, stack], i) => {
     // Camp clutter renders as a wooden crate OR (every third) a barrel, with
@@ -995,6 +1491,7 @@ function staticWorldColliders(seed: number): Collider[] {
       r: shape.r,
       cameraTopY: topY(seed, x, z, top),
       moveTopY: topY(seed, x, z, top),
+      underY: topY(seed, x, z, 0),
       standable: true,
     });
   });
@@ -1009,9 +1506,17 @@ function staticWorldColliders(seed: number): Collider[] {
       // jump clears the fire, walking through it stays blocked, and it is
       // deliberately NOT standable (no perching inside the fire).
       moveTopY: topY(seed, x, z, CAMPFIRE_MOVE_TOP),
+      underY: topY(seed, x, z, 0),
     });
   for (const [x, z] of PROPS.mudHuts)
-    out.push({ type: 'circle', x, z, r: 1.1, cameraTopY: topY(seed, x, z, 12.5) });
+    out.push({
+      type: 'circle',
+      x,
+      z,
+      r: 1.1,
+      cameraTopY: topY(seed, x, z, 12.5),
+      underY: topY(seed, x, z, 0),
+    });
   for (const ruin of PROPS.ruinRings) {
     for (let i = 0; i < ruin.columns; i++) {
       const ang = (i / ruin.columns) * Math.PI * 2;
@@ -1031,6 +1536,7 @@ function staticWorldColliders(seed: number): Collider[] {
           z,
           r: 0.6,
           cameraTopY: topY(seed, x, z, sy - 0.1),
+          underY: topY(seed, x, z, 0),
         });
       } else {
         const sy = 1.7 + (i % 3) * 0.85;
@@ -1043,6 +1549,7 @@ function staticWorldColliders(seed: number): Collider[] {
           cameraTopY: top,
           moveTopY: top,
           standable: true,
+          underY: topY(seed, x, z, 0),
         });
       }
     }
@@ -1098,6 +1605,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: halfDepth,
       rot: Math.atan2(-dz, dx),
       cameraTopY: topY(seed, x, z, f.height ?? FENCE_RAIL_HEIGHT),
+      underY: topY(seed, x, z, 0),
       isFence: true,
     });
   }
@@ -1210,15 +1718,132 @@ function staticWorldColliders(seed: number): Collider[] {
   // Editor-placed assets with a collide footprint (custom maps only; the
   // built-in world has no placements). The ONE placement record drives both the
   // renderer and this collider, so what you see is what you collide with.
+  //
+  // Shape resolution, most specific first. A bare circle is the LAST resort:
+  // it is what a placement gets when nothing knows the asset's real footprint,
+  // and for a long stretch it was the only thing emitted here, so every house,
+  // wall and market stall a maker placed blocked as a disc the size of its
+  // widest point. Everything below exists to stop that.
+  //
+  //   p.hitboxes        hand-edited boxes / the fine mesh bake on THIS
+  //                     placement. The maker's own edit, so it wins outright.
+  //   p.collideCustom   the maker deliberately kept the simple radius/shape.
+  //   ramp decks        a walkable deck carries the floor (placement_ramps.ts),
+  //                     so the body must NOT also wall the ramp it belongs to.
+  //   baked boxes       the per-asset table (asset_collision.generated.ts) or a
+  //                     Collision Master override, which is what gives all 1300+
+  //                     catalogue assets a real shape.
+  //   circle / square   the legacy footprint.
   for (const p of content.placements ?? []) {
+    // The opt-in gate, and it must stay FIRST. custom_map.ts only writes
+    // collideRadius when the placement's collision mode is not 'none', so an
+    // absent radius IS the maker's "this one is decoration" — and every shape
+    // below (baked boxes especially) would otherwise hand it collision anyway,
+    // silently breaking the editor's collide toggle and decorationsMode.
     if (!p.collideRadius || p.collideRadius <= 0) continue;
+    // Everything this placement emits gets a dev attribution stamp (see
+    // Collider.src) naming the model path and which lane produced the shape.
+    const srcMark = out.length;
+    const stamp = (lane: string): void => {
+      const src = `${p.path}#${lane}`;
+      for (let i = srcMark; i < out.length; i++) out[i].src = src;
+    };
+    // Detached placements anchor at their frozen ground (they can sit INSIDE a
+    // cave); grounded ones stand on the TERRAIN — the same seat the renderer
+    // (placed_assets.ts) and the asset's own ramp decks (placement_ramps.ts)
+    // use. Not groundHeight: that already includes this placement's own floor
+    // deck, so a building with a walkable ground floor had every box lifted by
+    // the deck height (the tavern's 2F floor boxes sat 0.37yd above the stair
+    // summit and walled the landing). Either way the base gates the pass-under
+    // check, so tubes run beneath surface decor but a rock placed down in the
+    // cave still blocks.
+    const base = p.detached ? (p.groundY ?? 0) : terrainHeight(p.x, p.z, seed);
+    if (p.worldPropKind === 'fence' && p.worldPropWidth) {
+      const width = p.worldPropWidth * p.scale * (p.scaleX ?? 1);
+      const depth = (p.worldPropDepth ?? 0.1) * p.scale * (p.scaleZ ?? 1);
+      out.push({
+        type: 'obb',
+        x: p.x,
+        z: p.z,
+        hw: width / 2 + FENCE_END_PAD,
+        hd: Math.max(FENCE_HALF_DEPTH, depth / 2),
+        rot: p.rotY,
+        cameraTopY: base + (p.y ?? 0) + FENCE_RAIL_HEIGHT,
+        baseY: base + (p.y ?? 0),
+        isFence: true,
+      });
+      stamp('fence');
+      continue;
+    }
+    // Collision Master VOLUMES come first, ahead of every derived shape: the
+    // maker modelled them and the editor draws them as the collision outline,
+    // so they ARE the contract. This takes exactly the placements the baked-box
+    // branch below would have taken (`derived`) — hand-edited hitboxes, a
+    // hand-picked simple footprint and live session ramps still outrank the
+    // asset default — and swaps the rectangle FITTED to each band for the
+    // band's real outline.
+    const derived = !(
+      (p.hitboxes && p.hitboxes.length > 0) ||
+      p.collideCustom ||
+      (p.ramps && p.ramps.length > 0)
+    );
+    const prisms = derived
+      ? authoredPrismsForPath(p.path, p.scale > 0 ? p.scale : 1)
+      : NO_AUTHORED_PRISMS;
+    if (prisms.length > 0) {
+      emitPlacementPrisms(out, p, prisms, base);
+      stamp('prism');
+      continue;
+    }
+    const baked =
+      p.hitboxes && p.hitboxes.length > 0
+        ? p.hitboxes
+        : p.collideCustom || (p.ramps && p.ramps.length > 0)
+          ? null
+          : bakedBoxesForPath(p.path, content.assetCollision);
+    if (baked) {
+      emitPlacementBoxes(out, p, baked, base);
+      stamp(p.hitboxes && p.hitboxes.length > 0 ? 'hitboxes' : 'baked');
+      continue;
+    }
+    // A placement with walkable ramp DECKS is walk-through except for the deck
+    // floor it raises (placement_ramps.ts): the legacy circle below would wall
+    // the player off their own ramp.
+    //
+    // BOTH deck sources count. `p.ramps` is a live Collision Master session
+    // (pre-Lock-In); `authoredRampsForPath` is the SAVED override, and it has to
+    // be checked here too — a stairs placement stamped with a simple footprint
+    // before its ramp was authored reaches this line with `baked` null and used
+    // to pick up a solid circle ("I can't walk up my own ramp, I get stuck").
+    // Hand-edited `hitboxes` are deliberate blockers (a railing) and returned
+    // above, so this never swallows one.
+    if (p.ramps && p.ramps.length > 0) continue;
+    if (authoredRampsForPath(p.path).length > 0) continue;
+    if (!p.collideRadius || p.collideRadius <= 0) continue;
+    const legacyTop = base + Math.max(2.5, p.collideRadius * 2);
+    if (p.collideShape === 'square') {
+      out.push({
+        type: 'obb',
+        x: p.x,
+        z: p.z,
+        hw: p.collideRadius,
+        hd: p.collideRadius,
+        rot: p.rotY,
+        cameraTopY: legacyTop,
+        baseY: base,
+      });
+      stamp('square');
+      continue;
+    }
     out.push({
       type: 'circle',
       x: p.x,
       z: p.z,
       r: p.collideRadius,
-      cameraTopY: topY(seed, p.x, p.z, Math.max(2.5, p.collideRadius * 2)),
+      cameraTopY: legacyTop,
+      baseY: base,
     });
+    stamp('circle');
   }
 
   // Editor-authored invisible blocker walls (custom maps only): one fence-width
@@ -1241,6 +1866,36 @@ function staticWorldColliders(seed: number): Collider[] {
       rot: Math.atan2(-dz, dx),
       cameraTopY: topY(seed, x, z, BLOCKER_WALL_HEIGHT),
     });
+  }
+
+  // Editor-authored collider volumes (custom maps only): the editor's own
+  // collision primitives, placed as reserved 'collider/<kind>' placements and
+  // resolved by sim/collider_volumes.ts. Boxes and walls are full-height OBBs
+  // (a jump never clears one) and spheres are circles. PLANES deliberately emit
+  // nothing here: they do not block, they raise the walkable floor, which
+  // world.groundHeight reads straight off content.colliderVolumes.
+  for (const v of content.colliderVolumes ?? []) {
+    if (v.kind === 'box' || v.kind === 'wall') {
+      out.push({
+        type: 'obb',
+        x: v.x,
+        z: v.z,
+        hw: v.sizeX / 2,
+        hd: v.sizeZ / 2,
+        rot: v.rotY,
+        cameraTopY: topY(seed, v.x, v.z, Math.max(1, v.sizeY)),
+        underY: topY(seed, v.x, v.z, 0),
+      });
+    } else if (v.kind === 'sphere') {
+      out.push({
+        type: 'circle',
+        x: v.x,
+        z: v.z,
+        r: v.sizeX / 2,
+        cameraTopY: topY(seed, v.x, v.z, Math.max(1, v.sizeX)),
+        underY: topY(seed, v.x, v.z, 0),
+      });
+    }
   }
 
   // The banker's strongbox, LAST: its placement algorithm samples the chest
@@ -1440,6 +2095,10 @@ const gridCaches = new WeakMap<WorldContent, Map<number, ColliderGrid>>();
  * call after mutating its placements/props in place). */
 export function invalidateStaticColliders(): void {
   gridCaches.delete(getActiveWorldContent());
+  // Stairs-deck ramps derive from the SAME placements, and they are a separate
+  // cache: bust them together or an edit moves the blockers while the walkable
+  // deck stays where the stairs used to be.
+  invalidatePlacementRamps(getActiveWorldContent());
 }
 
 // colliderBounds moved to collider_cells.ts; imported above.
@@ -1575,7 +2234,29 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
       authoredClearMin: MAX_BODY_RADIUS + Math.max(...Object.values(STREETLAMP_COLLIDER_RADIUS)),
     },
   );
-  return styleStreetlampSites(plan.sites, content.zones);
+  const styled = styleStreetlampSites(plan.sites, content.zones);
+  // Remember the PRISTINE builtin plan for the editor's streetlamp promotion:
+  // planned before any post stands, so nothing self-blocks. A plan computed
+  // against a world that already carries lamps (as colliders or as promoted
+  // placements) drops nearly every site to its own clearance probe.
+  if (content === BUILTIN_WORLD) builtinLampPlanBySeed.set(seed, styled);
+  return styled;
+}
+
+const builtinLampPlanBySeed = new Map<number, PlacedStreetlamp[]>();
+
+/**
+ * The builtin world's streetlamp plan for `seed`, for the editor's promotion
+ * of lamps into editable placements. Cached the first time the pristine
+ * builtin world plans (its grid build, or this call while it is active); null
+ * when it has never planned and the builtin world is not active to plan now —
+ * callers skip the promotion then and retry on a later boot.
+ */
+export function builtinStreetlampPlan(seed: number): readonly PlacedStreetlamp[] | null {
+  const cached = builtinLampPlanBySeed.get(seed);
+  if (cached) return cached;
+  if (getActiveWorldContent() !== BUILTIN_WORLD) return null;
+  return streetlampPlacements(seed);
 }
 
 /**
@@ -1593,6 +2274,14 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
  * never walls off someone you have to walk up to and talk to.
  */
 function addStreetlampColliders(grid: ColliderGrid, seed: number): void {
+  // A world whose DOCUMENT owns the lamps as placements plans none at all:
+  // the placements carry the fixtures, the colliders and (via the renderer's
+  // promoted lane) the night lights, so the one list binds empty and every
+  // consumer of it stands down together.
+  if (getActiveWorldContent().promotedScenery?.streetlamps === true) {
+    streetlampsByGrid.set(grid, []);
+    return;
+  }
   const placements = [...buildStreetlampPlacements(seed), ...forgefatherStreetlampSites()];
   streetlampsByGrid.set(grid, placements);
   if (placements.length === 0) return;
@@ -1732,7 +2421,139 @@ function collidersInCell(grid: ColliderGrid, seed: number, gx: number, gz: numbe
 }
 
 // Push (x,z) out of one collider. Returns the corrected point, or null if clear.
-function pushOut(c: Collider, x: number, z: number, r: number): { x: number; z: number } | null {
+/**
+ * The axis-aligned box that covers a prism's outline. Consumers that can only
+ * reason about rectangles (minimap, the coarse camera sweep) read this rather
+ * than every face.
+ */
+export function prismBox(c: PrismCollider): {
+  x: number;
+  z: number;
+  hw: number;
+  hd: number;
+  rot: number;
+} {
+  let minU = Infinity,
+    maxU = -Infinity,
+    minV = Infinity,
+    maxV = -Infinity;
+  for (let i = 0; i < c.poly.length; i += 2) {
+    const u = c.poly[i];
+    const v = c.poly[i + 1];
+    if (u < minU) minU = u;
+    if (u > maxU) maxU = u;
+    if (v < minV) minV = v;
+    if (v > maxV) maxV = v;
+  }
+  if (minU > maxU) return { x: c.x, z: c.z, hw: c.br, hd: c.br, rot: 0 };
+  return {
+    x: c.x + (minU + maxU) / 2,
+    z: c.z + (minV + maxV) / 2,
+    hw: (maxU - minU) / 2,
+    hd: (maxV - minV) / 2,
+    rot: 0,
+  };
+}
+
+/** Is (x,z) inside the prism's outline (no body-radius inflation)? */
+export function insidePrism(c: PrismCollider, x: number, z: number): boolean {
+  const px = x - c.x;
+  const pz = z - c.z;
+  if (px * px + pz * pz > c.br * c.br) return false;
+  const poly = c.poly;
+  const n = poly.length;
+  for (let i = 0; i < n; i += 2) {
+    const j = (i + 2) % n;
+    const ax = poly[i];
+    const az = poly[i + 1];
+    const ex = poly[j] - ax;
+    const ez = poly[j + 1] - az;
+    if ((px - ax) * ez - (pz - az) * ex > 0) return false;
+  }
+  return true;
+}
+
+/**
+ * Push a body of radius `r` out of a convex prism: the nearest face for a body
+ * outside it, the SHALLOWEST face for one already inside (the exit it is
+ * closest to), so a mover that spawns in a wall walks out the near side rather
+ * than being flung through the far one.
+ */
+function pushOutPrism(
+  c: PrismCollider,
+  x: number,
+  z: number,
+  r: number,
+  feetY?: number,
+): { x: number; z: number } | null {
+  const px = x - c.x;
+  const pz = z - c.z;
+  const reach = c.br + r;
+  if (px * px + pz * pz > reach * reach) return null; // O(1) reject
+  // Height-aware: a lofted prism collides with its authored section at the
+  // mover's own feet height, so a tapered volume feels exactly as drawn.
+  const poly = prismPolyAt(c, feetY);
+  const n = poly.length;
+  let inside = true;
+  let faceD = Number.NEGATIVE_INFINITY;
+  let faceNx = 0;
+  let faceNz = 0;
+  let nearX = 0;
+  let nearZ = 0;
+  let nearD2 = Infinity;
+  for (let i = 0; i < n; i += 2) {
+    const j = (i + 2) % n;
+    const ax = poly[i];
+    const az = poly[i + 1];
+    const ex = poly[j] - ax;
+    const ez = poly[j + 1] - az;
+    const len2 = ex * ex + ez * ez;
+    if (len2 < 1e-12) continue;
+    const len = Math.sqrt(len2);
+    // Counter-clockwise outline: the outward normal of a->b is (ez, -ex).
+    const nx = ez / len;
+    const nz = -ex / len;
+    const d = (px - ax) * nx + (pz - az) * nz;
+    if (d > 0) inside = false;
+    if (d > faceD) {
+      faceD = d;
+      faceNx = nx;
+      faceNz = nz;
+    }
+    let t = ((px - ax) * ex + (pz - az) * ez) / len2;
+    t = t < 0 ? 0 : t > 1 ? 1 : t;
+    const cx = ax + ex * t;
+    const cz = az + ez * t;
+    const d2 = (px - cx) * (px - cx) + (pz - cz) * (pz - cz);
+    if (d2 < nearD2) {
+      nearD2 = d2;
+      nearX = cx;
+      nearZ = cz;
+    }
+  }
+  if (nearD2 === Infinity) return null; // degenerate outline
+  if (inside) {
+    // faceD is negative inside: clear the face by the body radius on top of it.
+    const push = r - faceD;
+    return { x: c.x + px + faceNx * push, z: c.z + pz + faceNz * push };
+  }
+  const dist = Math.sqrt(nearD2);
+  if (dist >= r) return null;
+  if (dist < 1e-6) {
+    return { x: c.x + nearX + faceNx * r, z: c.z + nearZ + faceNz * r };
+  }
+  const k = r / dist;
+  return { x: c.x + nearX + (px - nearX) * k, z: c.z + nearZ + (pz - nearZ) * k };
+}
+
+function pushOut(
+  c: Collider,
+  x: number,
+  z: number,
+  r: number,
+  feetY?: number,
+): { x: number; z: number } | null {
+  if (c.type === 'prism') return pushOutPrism(c, x, z, r, feetY);
   if (c.type === 'circle') {
     const dx = x - c.x,
       dz = z - c.z;
@@ -1773,7 +2594,8 @@ function resolveAgainst(
     for (const c of list) {
       if (ignoreFences && c.type === 'obb' && c.isFence) continue;
       if (passesOver(c, mover, px, pz)) continue;
-      const res = pushOut(c, px, pz, r);
+      if (passesUnder(c, mover?.y)) continue;
+      const res = pushOut(c, px, pz, r, mover?.y);
       if (res) {
         px = res.x;
         pz = res.z;
@@ -2165,6 +2987,8 @@ export function slopeGlueHeight(
         dz = lz - c.z;
       const reach = c.r + reachR;
       if (dx * dx + dz * dz >= reach * reach) continue;
+    } else if (c.type === 'prism') {
+      if (!insidePrism(c, lx, lz)) continue;
     } else {
       const local = rotY(lx - c.x, lz - c.z, -c.rot);
       if (Math.abs(local.x) >= c.hw + reachR || Math.abs(local.z) >= c.hd + reachR) continue;
@@ -2204,6 +3028,10 @@ function bestStandableTop(list: Collider[], x: number, z: number, r: number, max
         dz = z - c.z;
       const reach = c.r + reachR;
       if (dx * dx + dz * dz >= reach * reach) continue;
+    } else if (c.type === 'prism') {
+      // Standing on an authored volume is a containment question: use the real
+      // outline, not a rectangle fitted around it.
+      if (!insidePrism(c, x, z)) continue;
     } else {
       const local = rotY(x - c.x, z - c.z, -c.rot);
       if (Math.abs(local.x) >= c.hw + reachR || Math.abs(local.z) >= c.hd + reachR) continue;
@@ -2380,8 +3208,13 @@ export function isBlocked(
   ignoreFences = false,
   delveModules?: readonly string[],
   riftToken = 0,
+  // Optional mover height, forwarded to the same pass-over / pass-under gates
+  // resolvePosition already applies: without it every query is treated as a
+  // ground-level body, so a banded collider (a felled column, an authored
+  // second storey) reads as a full-height wall to anything asking.
+  mover?: MoverHeight,
 ): boolean {
-  const res = resolvePosition(seed, x, z, r, ignoreFences, delveModules, undefined, riftToken);
+  const res = resolvePosition(seed, x, z, r, ignoreFences, delveModules, mover, riftToken);
   return Math.abs(res.x - x) > 1e-4 || Math.abs(res.z - z) > 1e-4;
 }
 
@@ -2427,6 +3260,9 @@ function sightBlockedAt(
   const overlapsAny = (list: Collider[], lx: number, lz: number, skipLow: boolean): boolean => {
     for (const c of list) {
       if (skipLow && c.cameraTopY !== undefined && c.cameraTopY <= sightY) continue;
+      // Above the eye line the obstacle is not in the way either: an authored
+      // upper storey does not block line of sight along the floor below it.
+      if (c.baseY !== undefined && c.baseY > sightY) continue;
       if (pushOut(c, lx, lz, r) !== null) return true;
     }
     return false;

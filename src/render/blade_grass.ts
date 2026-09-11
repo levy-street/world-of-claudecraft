@@ -3,6 +3,9 @@ import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '..
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
+import { grassClearedAt } from '../sim/grass_clear';
+import { terrainCutAtHeight } from '../sim/world';
+import { activateDenseSlot, type DenseSlotState, deactivateDenseSlot } from './blade_grass_dense_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
@@ -271,10 +274,19 @@ export function buildBladeGrass(
       // the patch structure just modulates it
       ok = r1 < (0.44 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
       if (ok) ok = roadDistance(x, z) > 2.4;
+      // The maker's painted no-grass discs (sim/grass_clear.ts). They had a
+      // spatial index, a document field, an editor brush and a sanitizer — and
+      // no consumer anywhere in the render, so a paved plaza still grew a
+      // meadow through it. This is that consumer: the blade carpet is what
+      // actually shows on a city floor.
+      if (ok) ok = !grassClearedAt(getActiveWorldContent().grassClear, x, z);
       if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
       if (ok) {
         const h = terrainHeight(x, z, seed);
         ok = h > WATER_LEVEL + 1.4;
+        // a boolean cut removes the ground sheet: no carpet floating over the
+        // opening (same evaluator the mesher drops quads with)
+        if (ok) ok = !terrainCutAtHeight(x, z, h);
         // keep the carpet off banks: the same slope band where the terrain
         // shader fades its relief (planar smear territory)
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;

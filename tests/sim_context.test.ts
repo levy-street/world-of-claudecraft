@@ -224,6 +224,7 @@ const CALLBACK_KEYS = [
   'setPlayerLevel',
   'notice',
   'spawnDevBot',
+  'removeDevBot',
   'spawnDevVendor',
   'startCascadePlaytest',
   'startDevSandbox',
@@ -378,7 +379,10 @@ function makeFakeHost() {
     grantDeed: vi.fn(() => true),
     emit: vi.fn(),
     error: vi.fn(),
-    reserveVaultConsumption: vi.fn(() => ({ commit: vi.fn(), cancel: vi.fn() })),
+    reserveVaultConsumption: vi.fn(() => ({
+      commit: vi.fn(),
+      cancel: vi.fn(),
+    })),
     dealDamage: vi.fn(),
     handleDeath: vi.fn(),
     cancelCast: vi.fn(),
@@ -583,6 +587,7 @@ function makeFakeHost() {
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
+    removeDevBot: vi.fn(),
     spawnDevVendor: vi.fn(),
     startCascadePlaytest: vi.fn(),
     startDevSandbox: vi.fn(),
@@ -648,7 +653,11 @@ describe('createSimContext (isolated, fake host)', () => {
     const ctx = createSimContext(host);
     expect(ctx.guildBanks).toBe(host.guildBanks);
     host.guildBanks.set(3, { treasury: 0, inventory: [], purchasedSlots: 0 });
-    expect(ctx.guildBanks.get(3)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
+    expect(ctx.guildBanks.get(3)).toEqual({
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
   });
 
   it('passes every callback through to the host by identity (no rewrapping)', () => {
@@ -746,7 +755,12 @@ describe('Sim.ctx (real seam delegation)', () => {
       const sim = makeSim(7);
       for (let i = 0; i < 40; i++) sim.tick();
       const p = sim.entities.get(sim.primaryId) as Entity;
-      return { time: sim.ctx.time, tick: sim.ctx.tickCount, hp: p.hp, pos: { ...p.pos } };
+      return {
+        time: sim.ctx.time,
+        tick: sim.ctx.tickCount,
+        hp: p.hp,
+        pos: { ...p.pos },
+      };
     };
     expect(run()).toEqual(run());
   });

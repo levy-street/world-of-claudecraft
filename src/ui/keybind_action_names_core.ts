@@ -33,6 +33,9 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   target: 'hud.keybinds.actions.target',
   attackMove: 'hud.keybinds.actions.attackMove',
   interact: 'hud.keybinds.actions.interact',
+  // FORK (Deepball): the burners and the ball marker rows.
+  boost: 'hudChrome.keybinds.boost',
+  ballMarker: 'hudChrome.keybinds.ballMarker',
   char: 'hud.keybinds.actions.char',
   spellbook: 'hud.keybinds.actions.spellbook',
   questlog: 'hud.keybinds.actions.questlog',

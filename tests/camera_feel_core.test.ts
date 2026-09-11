@@ -62,6 +62,29 @@ describe('resolveCameraFov (the player-configured FOV slider)', () => {
     punchCameraFov(s, -200);
     expect(resolveCameraFov(55, s)).toBe(50);
   });
+
+  it('measures the speed widening against a REFERENCE, so a flier does not saturate it', () => {
+    // The Deepglass bug, and the reason `ref` exists. Against the land
+    // reference the kick is already PINNED at maximum by about 10 yd/s — so
+    // across the whole range a flier actually uses (cruise 9, boost 26) the FOV
+    // is a constant and says nothing at all. Against cruise it separates them,
+    // which is the one thing it should be saying: the burners are lit.
+    const settle = (vz: number, ref?: number): number => {
+      const s = createCameraFeel();
+      for (let i = 0; i < 240; i++) stepCameraFeel(s, 0, vz, 1 / 60, true, ref);
+      return cameraFovOffset(s);
+    };
+    const CRUISE = 9;
+    const BOOST = 26;
+    // Land reference: everything from a shade over cruise upward is the same
+    // maxed-out number, so boosting looks exactly like not boosting.
+    expect(settle(11)).toBeCloseTo(settle(BOOST), 2);
+    // Cruise reference: cruising is barely widened, boosting is not.
+    expect(settle(CRUISE, CRUISE)).toBeLessThan(0.5);
+    expect(settle(BOOST, CRUISE)).toBeGreaterThan(settle(CRUISE, CRUISE) + 3);
+    // The default is unchanged for every land caller.
+    expect(settle(RUN_SPEED * 2)).toBeCloseTo(settle(RUN_SPEED * 2, RUN_SPEED), 6);
+  });
 });
 
 describe('landing detector', () => {

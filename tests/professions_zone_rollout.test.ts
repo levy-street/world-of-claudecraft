@@ -1314,6 +1314,9 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // guarantee. Union all three so one future faucet channel cannot hide.
     const stockedItemIds = new Set<string>();
     for (const npc of Object.values(NPCS)) {
+      // FORK: Tidehold's reagent stall (th_market_reagents) sells the two low
+      // herbs by design; the vendor-fed rule below is about the release's counters.
+      if (npc.id.startsWith('th_')) continue;
       for (const itemId of npc.vendorItems ?? []) stockedItemIds.add(itemId);
     }
     for (const offer of HEROIC_VENDOR_STOCK) stockedItemIds.add(offer.itemId);

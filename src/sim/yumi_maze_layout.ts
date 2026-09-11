@@ -14,7 +14,7 @@
 // WallStub rects; sim/colliders.ts turns them into the instance-local OBB set
 // shared by all match slots (the ARENA_COLLIDERS pattern).
 // Sim layer: no three.js imports.
-import type { Collider } from './colliders';
+import type { LayoutCollider } from './colliders';
 import type { WallStub } from './dungeon_layout';
 import { Rng } from './rng';
 
@@ -325,7 +325,7 @@ export function buildYumiMaze(seed: number): YumiMazeLayout {
 }
 
 const layoutCache = new Map<number, YumiMazeLayout>();
-const colliderCache = new Map<number, Collider[]>();
+const colliderCache = new Map<number, LayoutCollider[]>();
 
 /** The memoized maze layout (the fixed competitive map by default). */
 export function yumiMazeLayout(seed: number = YUMI_MAZE_SEED): YumiMazeLayout {
@@ -341,7 +341,7 @@ export function yumiMazeLayout(seed: number = YUMI_MAZE_SEED): YumiMazeLayout {
  * Instance-local collision set (walls + shell as rot-0 OBBs), memoized and
  * shared by every match slot, the ARENA_COLLIDERS pattern.
  */
-export function yumiMazeColliders(seed: number = YUMI_MAZE_SEED): Collider[] {
+export function yumiMazeColliders(seed: number = YUMI_MAZE_SEED): LayoutCollider[] {
   let c = colliderCache.get(seed);
   if (!c) {
     const l = yumiMazeLayout(seed);

@@ -11,6 +11,7 @@
 import { MAGE_PET_MOBS } from '../sim/content/mage_pets';
 import { WARLOCK_PET_MOBS } from '../sim/content/warlock_pets';
 import { ABILITIES, CAMPS, DUNGEON_X_THRESHOLD, MOBS, NPCS, QUESTS, zoneAt } from '../sim/data';
+import type { WorldContent } from '../sim/types';
 
 export interface ZonePrewarmEntity {
   kind: string;
@@ -47,10 +48,19 @@ export function zonePrewarmTemplateIds(
   zoneId: string,
   kind: 'mob' | 'npc',
   liveEntities: Iterable<ZonePrewarmEntity>,
+  // FORK: the ACTIVE world's registries, not the built-in ones (the worldZones
+  // precedent in prewarmInitialScene): an authored standalone map covers the
+  // whole coordinate plane with its own zones, so every built-in camp would
+  // "belong" to one of them and its mob template join the prewarm — a rig
+  // whose assets are not in the map's preload manifest, which the archetype
+  // build then reports as an error every session.
+  world?: Pick<WorldContent, 'camps' | 'npcs'> | null,
 ): string[] {
   const ids = new Set<string>();
+  const camps = world?.camps ?? CAMPS;
+  const npcs = world?.npcs ?? NPCS;
   if (kind === 'mob') {
-    for (const camp of CAMPS) {
+    for (const camp of camps) {
       if (zoneAt(camp.center.x, camp.center.z).id === zoneId) ids.add(camp.mobId);
     }
     // The kill targets of the zone's quests: a summon-only mob (the Proving
@@ -70,7 +80,7 @@ export function zonePrewarmTemplateIds(
     // combat audit). The caller's per-session set pays each rig once.
     for (const templateId of summonableTemplateIds()) ids.add(templateId);
   } else {
-    for (const npc of Object.values(NPCS)) {
+    for (const npc of Object.values(npcs)) {
       if (!npc.dynamic && zoneAt(npc.pos.x, npc.pos.z).id === zoneId) ids.add(npc.id);
     }
   }

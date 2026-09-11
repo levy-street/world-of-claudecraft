@@ -779,6 +779,86 @@ export function radialGlowTexture(): THREE.CanvasTexture {
 
 // Two differently-scaled blobby normal maps for the water shader (scrolled
 // against each other). Real normal-encoded, replaces waterNormalish.
+// ---- FORK DECLARATION (Studio) ---------------------------------------------
+// stoneMaps() is the Rock Generator's masonry surface (src/render/rock_gen.ts,
+// a fork-only file). Upstream deleted it when the shipped world stopped using
+// it, so an upstream-wins merge of this file drops it and rock_gen fails to
+// resolve — restore this block, do not re-invent it. Like every generator in
+// this file it draws from the shared LCG, so keep it a lazily-called function:
+// generating at module scope would shift the look of everything drawn after.
+export function stoneMaps(): SurfaceMaps {
+  const S = 256;
+  interface Block {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    v: number;
+    warm: number;
+  }
+  const blocks: Block[] = [];
+  let y = 0;
+  let row = 0;
+  while (y < S) {
+    // last course stretches to close the tile exactly
+    let h = 16 + Math.floor(rnd() * 16);
+    if (y + h > S - 12) h = S - y;
+    let x = -Math.floor(rnd() * 30) - row * 17;
+    while (x < S) {
+      const w = 22 + Math.floor(rnd() * 34);
+      blocks.push({ x, y, w, h, v: 90 + rnd() * 80, warm: rnd() * 14 - 4 });
+      x += w;
+    }
+    y += h;
+    row++;
+  }
+  const map = makeCanvas(S, (ctx, s) => {
+    ctx.fillStyle = '#6f6f67';
+    ctx.fillRect(0, 0, s, s);
+    for (const b of blocks) {
+      for (const ox of [0, s]) {
+        // blocks only overhang in x; rows tile exactly
+        const v = b.v;
+        ctx.fillStyle = `rgb(${v + b.warm},${v},${v - 8})`;
+        ctx.fillRect(b.x + ox, b.y + 1, b.w - 2, b.h - 2);
+        // weathered face: speckle + a lighter catch along the top edge
+        ctx.fillStyle = 'rgba(255,255,250,0.10)';
+        ctx.fillRect(b.x + ox + 1, b.y + 1, b.w - 4, 2);
+        ctx.fillStyle = 'rgba(20,20,18,0.32)';
+        ctx.fillRect(b.x + ox + 1, b.y + b.h - 5, b.w - 4, 4);
+        for (let i = 0; i < b.w * b.h * 0.02; i++) {
+          const sv = 60 + rnd() * 140;
+          ctx.fillStyle = `rgba(${sv},${sv},${sv - 6},0.18)`;
+          ctx.fillRect(b.x + ox + 1 + rnd() * (b.w - 4), b.y + 2 + rnd() * (b.h - 5), 1.5, 1.5);
+        }
+        ctx.strokeStyle = 'rgba(32,32,30,0.85)';
+        ctx.strokeRect(b.x + ox + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
+      }
+    }
+  });
+  const height = makeRawCanvas(S, (ctx, s) => {
+    ctx.fillStyle = '#383838'; // mortar sits low
+    ctx.fillRect(0, 0, s, s);
+    for (const b of blocks) {
+      for (const ox of [0, s]) {
+        const v = 130 + (b.v - 100) * 1.5;
+        const g = ctx.createLinearGradient(0, b.y, 0, b.y + b.h);
+        g.addColorStop(
+          0,
+          `rgb(${Math.min(255, v + 24)},${Math.min(255, v + 24)},${Math.min(255, v + 24)})`,
+        );
+        g.addColorStop(
+          1,
+          `rgb(${Math.max(0, v - 22)},${Math.max(0, v - 22)},${Math.max(0, v - 22)})`,
+        );
+        ctx.fillStyle = g;
+        ctx.fillRect(b.x + ox + 2, b.y + 2, b.w - 5, b.h - 4);
+      }
+    }
+  });
+  return { map, normalMap: heightToNormal(height, 2.4) };
+}
+
 export function waterNormalMaps(): [THREE.CanvasTexture, THREE.CanvasTexture] {
   const blobby = (count: number, rMin: number, rMax: number): HTMLCanvasElement =>
     makeRawCanvas(256, (ctx, s) => {

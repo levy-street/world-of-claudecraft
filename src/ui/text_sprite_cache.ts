@@ -118,7 +118,7 @@ interface TextInk {
 // 1300: the guild roster ladder (src/sim/guild_roster.ts) carried the derived
 // worst case from 385 to 1285; the next round step keeps a small content margin
 // (the test reddens again the day it is outgrown).
-export const TEXT_SPRITE_LIMIT = 1300;
+export const TEXT_SPRITE_LIMIT = 1360; // FORK: +1 zone (Tidehold) lifts the worst case to 1319
 
 // Slack around the measured ink on every side, so glyph antialiasing is never
 // clipped. The outline's own reach is added on top (see SPRITE_MITER_LIMIT).

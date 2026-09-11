@@ -23,6 +23,24 @@ const DELVE_MODULE_VARIANT: Record<DelveModuleId, DungeonInteriorVariant> = {
   litany_apse: 'delve_marsh_apse',
 };
 
+/** One shared render spec for the live renderer and editor importer. */
+export function delveModuleRenderSpec(moduleId: DelveModuleId): {
+  interior: string;
+  layout: (typeof DELVE_MODULE_LAYOUTS)[DelveModuleId];
+  variant: DungeonInteriorVariant;
+  hazards: (typeof DELVE_MODULES)[string]['hazards'];
+  moduleId: DelveModuleId;
+} {
+  const mod = DELVE_MODULES[moduleId];
+  return {
+    interior: mod?.interior ?? 'crypt',
+    layout: DELVE_MODULE_LAYOUTS[moduleId],
+    variant: DELVE_MODULE_VARIANT[moduleId] ?? 'delve_ossuary',
+    hazards: mod?.hazards,
+    moduleId,
+  };
+}
+
 /** Build one delve module at a world origin (crypt KayKit kit + that module's delve layout). */
 export function buildDelveModule(
   dungeons: DungeonInteriors,
@@ -30,24 +48,18 @@ export function buildDelveModule(
   ox: number,
   oz: number,
 ) {
-  const mod = DELVE_MODULES[moduleId];
-  const interior = mod?.interior ?? 'crypt';
   // Pass the module's own layout so visible geometry matches the collision set
   // sim/colliders.ts derives from the SAME layout. Falling back to the interior
   // default (CRYPT_LAYOUT) was the source of the drifting walls/floor and the
   // out-of-map gaps between modules. The 'delve' variant gives ember-red torches
   // with per-module reliquary dressing.
-  const layout = DELVE_MODULE_LAYOUTS[moduleId];
-  const variant = DELVE_MODULE_VARIANT[moduleId] ?? 'delve_ossuary';
+  const spec = delveModuleRenderSpec(moduleId);
   // Static Blackwater hazard pools (The Drowned Litany) are authored on the module
   // def; the renderer draws a visible pool at each so the sim's damage zone reads.
   // The built group IS returned (the renderer tracks it per z-stacked position: a
   // slot's position is reused run to run with a DIFFERENT randomized module, so a
-  // stale group there must be retirable, not just discarded).
-  return dungeons.buildInterior(interior, ox, oz, {
-    layout,
-    variant,
-    hazards: mod?.hazards,
-    moduleId,
-  });
+  // stale group there must be retirable, not just discarded). The spec above is
+  // the fork's shared record — sim/colliders.ts derives its collision set from
+  // the SAME one — so it is passed straight through rather than rebuilt here.
+  return dungeons.buildInterior(spec.interior, ox, oz, spec);
 }

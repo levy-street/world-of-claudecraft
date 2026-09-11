@@ -1688,6 +1688,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'dungeon_finder.ts',
       'fiesta.ts',
       'fiesta_bots.ts',
+      'map_objective_bots.ts',
+      'map_objectives_run.ts',
       'party.ts',
       'ready_check.ts',
       'trade.ts',
@@ -2109,7 +2111,11 @@ describe('deploy-window aliases for wire-carried renames', () => {
     // bundle-only read proves the catalog really carries the key (fresh read
     // of the round-1 fix).
     expect(
-      tEntityOptional({ kind: 'dungeon', id: 'drowned_temple', field: 'enterText' }),
+      tEntityOptional({
+        kind: 'dungeon',
+        id: 'drowned_temple',
+        field: 'enterText',
+      }),
       'the English catalog carries the enterText row',
     ).toBe(live);
     try {

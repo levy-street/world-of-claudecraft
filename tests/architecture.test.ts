@@ -895,6 +895,15 @@ const RENDER_PURE_CORES = [
   'src/render/characters/morph_union_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
+  // FORK (Studio + Deepglass) pure cores.
+  'src/render/foliage_far_placements_core.ts',
+  'src/render/decal_stream_core.ts',
+  'src/render/deepglass_crowd_fx_core.ts',
+  'src/render/deepglass_goal_wave_core.ts',
+  'src/render/placed_batch_core.ts',
+  'src/render/terrain_cut_clip_core.ts',
+  'src/render/terrain_cut_rim_core.ts',
+  'src/render/cut_cavity_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)

@@ -176,6 +176,7 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/tutorial.ts': 'transient tutorial coachmarks',
   'src/ui/noticeboard_popup.ts': 'transient noticeboard popup card',
   'src/ui/realm_builder_popup.ts': 'transient Realm Builder honour roll card',
+  'src/ui/plot_sign_popup.ts': 'transient Tidehold housing-plot deed card (fork)',
   'src/ui/dev_command_window.ts': 'dev-only command window (a .window, window_drag governs it)',
   'src/ui/hud/professions/perfecting_window.ts':
     'the Perfecting window (a .window.panel, window_drag governs it), minted at runtime like dev_command_window.ts since no markup entry ships it',
@@ -241,7 +242,10 @@ describe('hud_frame_coverage (standing HUD surfaces are movable frames)', () => 
   // test rather than as a describe-scope collection error.
   let built: Array<{ entry: string; harvest: Harvest }> | null = null;
   const entries = () =>
-    (built ??= HTML_ENTRIES.map((entry) => ({ entry, harvest: harvestEntry(read(entry)) })));
+    (built ??= HTML_ENTRIES.map((entry) => ({
+      entry,
+      harvest: harvestEntry(read(entry)),
+    })));
   const frameIds = new Set(HUD_FRAME_SPECS.map((s) => s.elementId));
 
   it('every element in the harvest carries an id', () => {

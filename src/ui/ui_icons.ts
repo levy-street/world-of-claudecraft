@@ -69,6 +69,8 @@ export type UiIconName =
   | 'sort'
   | 'nameplates'
   | 'vibrate'
+  // FORK: the deepball glyph (Deepglass steward + marshal gossip rows)
+  | 'ball'
   | 'lock'
   | 'mail'
   | 'book'
@@ -215,6 +217,10 @@ const ICONS: Record<UiIconName, string> = {
   // phone handset flanked by vibration waves (hand-authored to match the bar glyphs)
   vibrate:
     '<path fill-rule="evenodd" d="M196 80h120a24 24 0 0 1 24 24v304a24 24 0 0 1-24 24H196a24 24 0 0 1-24-24V104a24 24 0 0 1 24-24zm4 40v272h112V120H200z"/><path d="M96 176v160h28V176zM388 176v160h28V176zM40 216v80h26v-80zM446 216v80h26v-80z"/>',
+  // FORK: the deepball glyph (the Tidesow) — a banded sphere with pole lenses.
+  // It came in with the Vale Cup and stayed when upstream retired the minigame:
+  // the Deepglass steward's passage row and the marshal's fixture rows wear it.
+  ball: '<path fill-rule="evenodd" d="M256 64a192 192 0 1 0 0 384 192 192 0 0 0 0-384zm0 40a152 152 0 1 1 0 304 152 152 0 0 1 0-304z"/><path d="M148 148c60 52 60 164 0 216l24 24c72-64 72-200 0-264zM364 148c-60 52-60 164 0 216l-24 24c-72-64-72-200 0-264z"/><path d="M238 160h36v28h-36zM238 324h36v28h-36zM220 238h72v36h-72z"/>',
   // hand-authored padlock — shackle over a solid body (nonzero fill merges them)
   lock: '<path d="M256 96a72 72 0 0 0-72 72v64h40v-64a32 32 0 0 1 64 0v64h40v-64a72 72 0 0 0-72-72zM150 224a26 26 0 0 0-26 26v140a26 26 0 0 0 26 26h212a26 26 0 0 0 26-26V250a26 26 0 0 0-26-26z"/>',
   // hand-authored sealed envelope (frame + flap V), distinct from the solid

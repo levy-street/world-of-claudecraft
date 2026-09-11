@@ -32,24 +32,42 @@ describe('graphics-overhaul integration', () => {
     const removedModule = ['camera', 'collision.ts'].join('_');
     expect(existsSync(path.join(__dirname, '..', 'src/render', removedModule))).toBe(false);
     expect(renderer).toContain(
-      'const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
+      'let cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * camDist;',
     );
     expect(renderer).toContain(
-      'const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);',
+      'let cy = Math.min(eyeY + Math.sin(pose.pitch) * camDist, underwaterCeilingY);',
     );
     expect(renderer).toContain(
-      'const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
+      'let cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * camDist;',
     );
-    expect(renderer).toContain('this.camera.position.set(cx, Math.max(cy, groundY), cz);');
+    // In flooded flight the sphere is the only floor, so the terrain clamp stands
+    // down there (renderer.ts bellBoomLimit); everywhere else it is the ground.
+    expect(renderer).toContain(
+      'this.camera.position.set(cx, dgFlying ? cy : Math.max(cy, groundY), cz);',
+    );
     const chaseCamera = renderer.slice(
-      renderer.indexOf('const px = this.camBoom.x + this.camFeel.leadX;'),
+      renderer.indexOf('let camDist = pose.dist;'),
       renderer.indexOf('// Spatial-audio listener'),
     );
-    expect(chaseCamera).not.toMatch(/pose\.dist\s*[-+*/]?=/);
-    expect(chaseCamera.match(/\bconst cx =/g)).toHaveLength(1);
-    expect(chaseCamera.match(/\bconst cy =/g)).toHaveLength(1);
-    expect(chaseCamera.match(/\bconst cz =/g)).toHaveLength(1);
-    expect(renderer).toContain('resolveCameraFov(this.baseFov, this.camFeel)');
+    // OBJECT obstruction stays opacity-only: no prop, tree or building may pull
+    // the camera in. The ONE exception is a cave tube or carve cavity, whose
+    // rock the camera would otherwise sit outside of (opacity cannot help — the
+    // whole world is on the far side of it), so the distance may be clamped by
+    // cameraSheetMaxDist and by nothing else. Assert exactly that shape: the
+    // solve is written twice (the open-world pose, then the clamped one) and
+    // every re-solve is inside the sheet branch.
+    // Three writes: the open-world pose, the Deepglass bell's glass clamp
+    // (bellBoomLimit: inside the sphere the camera may not poke through the
+    // glass, the one other place the boom is allowed to shorten), and the
+    // cave-sheet re-solve.
+    expect(chaseCamera.match(/\bcamDist\s*=/g)).toHaveLength(3);
+    expect(chaseCamera).toContain('bellBoomLimit(px, eyeY, pz, pose.yaw, pose.pitch)');
+    expect(chaseCamera).toContain('const sheetMax = cameraSheetMaxDist(');
+    expect(chaseCamera).toContain('if (sheetMax < camDist) {');
+    expect(chaseCamera.match(/\bcx\s*=/g)).toHaveLength(2);
+    expect(chaseCamera.match(/\bcy\s*=/g)).toHaveLength(2);
+    expect(chaseCamera.match(/\bcz\s*=/g)).toHaveLength(2);
+    expect(renderer).toContain('resolveCameraFov(this.camFovBase, this.camFeel)');
   });
 
   it('routes reduced motion through every occluder-fade consumer', () => {

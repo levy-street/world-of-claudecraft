@@ -35,6 +35,7 @@ import {
   WATER_SEABED_CLAMP_YARDS,
   type WaterGridRegion,
   waterSheetTilePlan,
+  shoreDepthAttribute,
 } from './water_core';
 import {
   coveredByOtherSheet,
@@ -1098,7 +1099,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
           edgeDepth = shoreDepthAt(cx, cz, seed);
           edgeDepthCache.set(key, edgeDepth);
         }
-        const carried = outside > 0 ? Math.max(edgeDepth, 0) : edgeDepth;
+        const carried = outside > 0 ? Math.max(edgeDepth, 0) : shoreDepthAttribute(edgeDepth);
         deep[i] = carried * (1 - toConstant) + WATER_SEABED_CLAMP_YARDS * toConstant;
       }
       // Slope is the GRADIENT of the depth just filled, so take it by finite
@@ -1377,7 +1378,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       const start = row * columns;
       const end = Math.min(pos.count, start + columns);
       for (let i = start; i < end; i++) {
-        shoreDepth[i] = shoreDepthAt(pos.getX(i), pos.getZ(i), seed);
+        shoreDepth[i] = shoreDepthAttribute(shoreDepthAt(pos.getX(i), pos.getZ(i), seed));
         shoreSlope[i] = shoreSlopeAt(pos.getX(i), pos.getZ(i), seed);
       }
     };
@@ -1602,6 +1603,11 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     setLevel(): void {
       simulation?.reset();
       for (const entry of refits) entry.refit();
+      // The refits re-seat the FRONT sheets only. An underside twin copies its
+      // front's position once, at build, so without this every from-below
+      // ceiling stays at the old waterline: after an editor level change the
+      // surface you swim under sits yards away from the one you see from above.
+      for (const pair of underPairs) pair.under.position.copy(pair.front.position);
     },
     unloadZone(zoneId: string): void {
       // See terrain.ts's unloadZone for why this guard exists: unreachable

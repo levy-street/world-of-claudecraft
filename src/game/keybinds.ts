@@ -147,12 +147,41 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'held',
     defaults: ['ControlLeft'],
   },
+  // Deepball burners. Held, and deliberately on F: it sits under the movement
+  // hand next to nothing else you press while flying, and the bell has no
+  // interactables for F's edge binding to collide with.
+  {
+    id: 'boost',
+    label: 'Burners (Deepball)',
+    category: 'Movement',
+    kind: 'held',
+    defaults: ['KeyF'],
+  },
   {
     id: 'autorun',
     label: 'Toggle Autorun',
     category: 'Movement',
     kind: 'edge',
     defaults: ['KeyR'],
+  },
+  // Deepball ball tracker. A 2.4 yd ball inside a 76 yd sphere is gone the moment
+  // it leaves the screen, and hunting for it with the mouse is the least
+  // interesting thing in the bell — so the HUD marks where it is, and points at
+  // it when it is behind you.
+  //
+  // Deliberately a MARKER and not a tracking camera. In the bell the camera is
+  // also the aim (flight.ts DG_AIM_MAX pitches the thrust along it, and a Shot
+  // leaves down the same line), so a camera that swung itself onto the ball would
+  // take the player's aim with it and there would be no way to place a shot at
+  // all. On by default; the bind is for players who want the view clean. Every
+  // bare letter is claimed by another default, so it sits on the shifted layer of
+  // V (Nameplates) — both are "what the HUD shows me".
+  {
+    id: 'ballMarker',
+    label: 'Ball Marker (Deepball)',
+    category: 'Movement',
+    kind: 'edge',
+    defaults: ['Shift+KeyV'],
   },
   // Targeting / interaction
   {

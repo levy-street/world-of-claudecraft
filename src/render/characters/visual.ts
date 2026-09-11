@@ -55,6 +55,7 @@ import {
   setWeaponsStowed,
   skinEmissiveTexture,
   skinTexture,
+  stripHeldProps,
   type TintedMaterialClaims,
   takeFarBakeBudget,
   tintedFarMaterials,
@@ -330,7 +331,7 @@ const TREAD_PITCH_SCALE = 0.35;
 // wade — so they get a longer crossfade than the land states, where a fast cut
 // reads as responsive.
 const WATER_FADE = 0.34;
-const WATER_STATES = new Set<BaseState>(['swim', 'swimSurface', 'swimIdle', 'wade']);
+const WATER_STATES = new Set<BaseState>(['swim', 'swimSurface', 'swimIdle', 'glide', 'wade']);
 
 /** Crossfade for a base-state edge: longer whenever water is on either side. */
 function waterFade(from: BaseState, to: BaseState): number {
@@ -1239,7 +1240,11 @@ export class CharacterVisual {
     const swimPitch = s.swimPitch * (1 + (TREAD_PITCH_SCALE - 1) * this.treadBlend);
     this.poseWrap.rotation.x =
       (proneAngle + swimPitch) * this.swimBlend + this.lean + CLIMB_BODY_PITCH * climb * climbLevel;
-    this.poseWrap.rotation.z = 0;
+    // Bank into the turn. Already eased and already scaled for the medium by the
+    // renderer (advanceBankRoll), so it lands here as a finished angle — but the
+    // ledge climb owns the whole body while it runs, and a lean mid-haul reads
+    // as the character falling off the wall.
+    this.poseWrap.rotation.z = (s.bankRoll ?? 0) * (1 - climb);
     this.poseWrap.position.y =
       this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
@@ -1678,6 +1683,17 @@ export class CharacterVisual {
    *  when the projectile releases mid-clip. */
   get isMidOneShot(): boolean {
     return this.currentIsOneShot;
+  }
+
+  /** Take the weapons out of this body's hands, permanently.
+   *
+   *  A composed NPC inherits the class def's held-weapon layout, so a
+   *  townsperson built on the warrior body is born holding a sword. The
+   *  civilian NPCs (the Deepglass crowd, its stallkeepers, the portal wizard)
+   *  call this once at build time so a stadium full of spectators is not a
+   *  stadium full of armed spectators. */
+  disarmHeldProps(): void {
+    stripHeldProps(this.model);
   }
 
   /** A channel-start event can arrive just before its authoritative entity
@@ -3272,6 +3288,7 @@ export class CharacterVisual {
       s,
       !!this.action(this.def.clips.walkBack),
       !!this.action(this.def.clips.wade),
+      !!this.action(this.def.clips.glide),
       !!this.action(this.def.clips.combatIdle),
     );
   }
@@ -3503,6 +3520,10 @@ export class CharacterVisual {
           this.action(c.swim) ??
           this.action(c.idle)
         );
+      case 'glide':
+        // desiredBase only reaches this state on a rig that HAS the clip; the
+        // fallbacks exist for the state being held across a body swap.
+        return this.action(c.glide) ?? this.action(c.swim) ?? this.action(c.idle);
       case 'wade':
         return this.action(c.wade) ?? this.action(c.walk) ?? this.action(c.idle);
       case 'sit':
@@ -3880,6 +3901,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.swim,
     c.swimSurface,
     c.swimIdle,
+    c.glide,
     c.wade,
     c.jump,
     c.fall,

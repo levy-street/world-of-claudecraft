@@ -4,6 +4,8 @@
 // It is Three/DOM/i18n-free and writes into a caller-owned plan so the painter
 // can reuse one object across every building and frame.
 
+import { occluderFadesDisabled } from './occluder_fade_core';
+
 export interface EastbrookRoofVisibilityTarget {
   x: number;
   z: number;
@@ -114,6 +116,7 @@ export function eastbrookCameraSegmentHitsRoof(
   camY: number,
   camZ: number,
 ): boolean {
+  if (occluderFadesDisabled()) return false;
   if (
     (eyeY < target.topY && pointInsideRoof(target, eyeX, eyeZ)) ||
     (camY < target.topY && pointInsideRoof(target, camX, camZ))

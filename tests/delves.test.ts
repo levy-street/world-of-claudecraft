@@ -12,11 +12,13 @@ import {
   DELVE_MODULES,
   DELVE_X_MIN,
   DELVES,
+  DUNGEONS,
   delveAt,
   delveModuleZOffset,
   delveOrigin,
   dungeonAt,
   INSTANCE_X_BASE,
+  instanceOrigin,
   isArenaPos,
   isDelvePos,
   MOBS,
@@ -55,7 +57,12 @@ const DELVE_TEST_WORLD: WorldContent = {
 };
 
 function makeSim(cls: 'warrior' | 'warlock' = 'warrior', seed = 42) {
-  return new Sim({ seed, playerClass: cls, autoEquip: true, world: DELVE_TEST_WORLD });
+  return new Sim({
+    seed,
+    playerClass: cls,
+    autoEquip: true,
+    world: DELVE_TEST_WORLD,
+  });
 }
 
 function teleport(sim: Sim, x: number, z: number) {
@@ -88,7 +95,11 @@ function enterReliquaryAs(sim: Sim, pid: number, tier: 'normal' | 'heroic' = 'no
   sim.setPlayerLevel(level, pid);
   const door = DELVES.collapsed_reliquary.doorPos;
   const e = sim.entities.get(pid)!;
-  e.pos = { x: door.x, y: terrainHeight(door.x, door.z, sim.cfg.seed), z: door.z };
+  e.pos = {
+    x: door.x,
+    y: terrainHeight(door.x, door.z, sim.cfg.seed),
+    z: door.z,
+  };
   e.prevPos = { ...e.pos };
   (sim as any).rebucket(e);
   sim.enterDelve('collapsed_reliquary', tier, pid);
@@ -196,19 +207,23 @@ describe('delve spatial band', () => {
     expect(isDelvePos(ARENA_X)).toBe(false);
   });
 
-  it('pins the delve boundary against the arena seam (relocation regression)', () => {
+  it('pins the delve boundary against the dungeon seam (relocation regression)', () => {
     // DELVE_X_MIN moved 3600 -> 4800 when v0.10.0 pushed the arena to x=4200,
-    // and the whole instance plane moved east by INSTANCE_X_BASE when the
-    // world went grid (stage 2). Pin the load-bearing offset and the exact
-    // arena/delve seam so a respacing that re-introduces overlap fails here.
+    // and the whole instance plane moved east by INSTANCE_X_BASE when the world
+    // went grid (stage 2). Infernal Abyss occupies index 6 at INSTANCE_X_BASE +
+    // 4500, between the finite arena band and the delves. Pin the load-bearing
+    // offset and the exact dungeon/delve seam so a respacing that re-introduces
+    // overlap fails here.
     expect(DELVE_X_MIN).toBe(INSTANCE_X_BASE + 4800);
-    // The seam: DELVE_BAND_X_MIN is the first delve x; the x just below it is arena.
-    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(true);
+    // The seam: DELVE_BAND_X_MIN is the first delve x; the x just below it
+    // remains in the Infernal Abyss dungeon band, never the arena.
+    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(false);
     expect(isDelvePos(DELVE_BAND_X_MIN - 1)).toBe(false);
+    expect(dungeonAt(DELVE_BAND_X_MIN - 1)?.id).toBe('infernal_abyss');
     expect(isDelvePos(DELVE_BAND_X_MIN)).toBe(true);
     expect(isArenaPos(DELVE_BAND_X_MIN)).toBe(false);
-    // Keep a real gap between the arena anchor and the delve band.
-    expect(DELVE_BAND_X_MIN - ARENA_X).toBeGreaterThanOrEqual(500);
+    const infernalX = instanceOrigin(DUNGEONS.infernal_abyss.index, 0).x;
+    expect(DELVE_BAND_X_MIN - infernalX).toBeGreaterThanOrEqual(250);
   });
 
   it('a character saved inside a delve relogs at the board door, not a dungeon door (FR-1.6)', () => {
@@ -220,7 +235,12 @@ describe('delve spatial band', () => {
     const state = src.serializeCharacter(src.playerId)!;
     const origin = delveOrigin(0, 0);
     state.pos = { x: origin.x, z: origin.z + 20 }; // deep inside delve slot 0
-    const dst = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const dst = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+    });
     const pid = dst.addPlayer('warrior', 'Relogged', { state });
     const e = (dst as any).entities.get(pid)!;
     const door = DELVES.collapsed_reliquary.doorPos; // Brother Halven board door {-136,112}
@@ -238,16 +258,30 @@ describe('delve spatial band', () => {
     const state = src.serializeCharacter(src.playerId)!;
     // an old-coordinates delve save
     state.pos = { x: 4800, z: -1230 };
-    const dst = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const dst = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+    });
     const pid = dst.addPlayer('warrior', 'LegacyDelver', { state });
     const e = (dst as any).entities.get(pid)!;
     const door = DELVES.collapsed_reliquary.doorPos;
-    expect(Math.abs(e.pos.x - door.x)).toBeLessThan(1);
-    expect(Math.abs(e.pos.z - (door.z - 4))).toBeLessThan(1);
+    // 2yd, not 1: v0.32 makes the delve ARCH a solid collider (prop_layout
+    // DELVE_ARCH_HW/HD), so the ejection now resolves clear of the arch it
+    // used to be allowed to stand inside. Still "at the door", one body width
+    // further out.
+    expect(Math.abs(e.pos.x - door.x)).toBeLessThan(2);
+    expect(Math.abs(e.pos.z - (door.z - 4))).toBeLessThan(2);
     // an old-coordinates dungeon save (index 0 band at x 900)
     const state2 = src.serializeCharacter(src.playerId)!;
     state2.pos = { x: 912, z: -1240 };
-    const dst2 = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const dst2 = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+    });
     const pid2 = dst2.addPlayer('warrior', 'LegacyCrawler', { state: state2 });
     const e2 = (dst2 as any).entities.get(pid2)!;
     expect(e2.pos.x).toBeLessThan(600); // ejected to an overworld door, not stranded
@@ -1136,7 +1170,11 @@ describe('delve reward chest + surface exit flow', () => {
     run.moduleIndex = 0;
     (sim as any).spawnDelveModule(run);
     const origin = run.origin;
-    const boss = createMob(910001, MOBS.deacon_varric, 12, { x: origin.x, y: 0, z: origin.z + 40 });
+    const boss = createMob(910001, MOBS.deacon_varric, 12, {
+      x: origin.x,
+      y: 0,
+      z: origin.z + 40,
+    });
     (sim as any).addEntity(boss);
     (sim as any).dealDamage(sim.player, boss, boss.maxHp + 1, false, 'physical', null, 'hit', true);
     sim.tick();
@@ -1835,7 +1873,11 @@ describe('delve reward chest + surface exit flow', () => {
     expect(sim.resetDay).toBe('');
     sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
     const meta = (sim as any).players.get(sim.playerId);
-    meta.delveDaily = { date: 'pinned', firstClearXp: new Set(['x']), markClears: 2 };
+    meta.delveDaily = {
+      date: 'pinned',
+      firstClearXp: new Set(['x']),
+      markClears: 2,
+    };
     (sim as any).refreshDelveDaily(meta);
     expect(meta.delveDaily.date).toBe('pinned'); // unchanged, no wall-clock read
     expect(meta.delveDaily.markClears).toBe(2);
@@ -2465,7 +2507,13 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     const run = sim.delveRunForPlayer(sim.playerId)!;
     const zBase = delveModuleZOffset(run.modules, run.moduleIndex);
     const h = DELVE_MODULES[moduleId].hazards![hazardIndex];
-    return { x: run.origin.x + h.x, z: run.origin.z + zBase + h.z, r: h.r, run, zBase };
+    return {
+      x: run.origin.x + h.x,
+      z: run.origin.z + zBase + h.z,
+      r: h.r,
+      run,
+      zBase,
+    };
   }
 
   function enterModule(sim: Sim, moduleId: string) {
@@ -2872,10 +2920,26 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
 
   it('every standard Litany room updates its puzzle meshes and advances to the next room', () => {
     const rooms = [
-      { moduleId: 'litany_sluice', kind: 'sluice_valve', template: 'delve_sluice_valve_open' },
-      { moduleId: 'litany_ledger', kind: 'grave_tablet', template: 'delve_grave_tablet_lit' },
-      { moduleId: 'litany_ring', kind: 'corpse_candle', template: 'delve_corpse_candle_lit' },
-      { moduleId: 'litany_choir_loft', kind: 'bell_rope', template: 'delve_bell_rope_pulled' },
+      {
+        moduleId: 'litany_sluice',
+        kind: 'sluice_valve',
+        template: 'delve_sluice_valve_open',
+      },
+      {
+        moduleId: 'litany_ledger',
+        kind: 'grave_tablet',
+        template: 'delve_grave_tablet_lit',
+      },
+      {
+        moduleId: 'litany_ring',
+        kind: 'corpse_candle',
+        template: 'delve_corpse_candle_lit',
+      },
+      {
+        moduleId: 'litany_choir_loft',
+        kind: 'bell_rope',
+        template: 'delve_bell_rope_pulled',
+      },
       { moduleId: 'litany_causeway', kind: null, template: null },
     ] as const;
 
@@ -3369,7 +3433,11 @@ describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
     const bulwark = [...sim.entities.values()].find((e) => e.templateId === 'grave_silt_bulwark')!;
     const heroicTier = DELVES.drowned_litany.tiers.find((t) => t.id === 'heroic')!;
     const spawnLevel = MOBS.grave_silt_bulwark.minLevel + heroicTier.enemyLevelBonus;
-    const base = createMob(880002, MOBS.grave_silt_bulwark, spawnLevel, { x: 0, y: 0, z: 0 });
+    const base = createMob(880002, MOBS.grave_silt_bulwark, spawnLevel, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     expect(bulwark.maxHp).toBe(Math.round(base.maxHp * 1.1));
   });
 
@@ -3861,14 +3929,22 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     expect(run.drownedLitanyRite?.awaitingChoice).toBe(true);
     const reliquary = sim.entities.get(run.drownedLitanyRite!.reliquaryId)!;
     // Stand well outside the plate radius and try to commit remotely.
-    sim.player.pos = { x: reliquary.pos.x + 30, y: reliquary.pos.y, z: reliquary.pos.z + 30 };
+    sim.player.pos = {
+      x: reliquary.pos.x + 30,
+      y: reliquary.pos.y,
+      z: reliquary.pos.z + 30,
+    };
     sim.player.prevPos = { ...sim.player.pos };
     sim.delveRiteChoose('hard');
     expect(run.drownedLitanyRite?.awaitingChoice).toBe(true); // still waiting
     expect(run.drownedLitanyRite?.sequence.length).toBe(0);
     // The prompt opens out to DELVE_INTERACT_RANGE (6yd), so a choose from
     // inside that radius (but off the reliquary itself) must be accepted.
-    sim.player.pos = { x: reliquary.pos.x + 5.5, y: reliquary.pos.y, z: reliquary.pos.z };
+    sim.player.pos = {
+      x: reliquary.pos.x + 5.5,
+      y: reliquary.pos.y,
+      z: reliquary.pos.z,
+    };
     sim.player.prevPos = { ...sim.player.pos };
     sim.delveRiteChoose('hard');
     expect(run.drownedLitanyRite?.awaitingChoice).toBe(false);
@@ -3911,7 +3987,9 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     sim.player.pos = { ...reliquary.pos };
     sim.player.prevPos = { ...reliquary.pos };
 
-    const add = createMob((sim as any).nextId++, MOBS.drowned_cantor, 15, { ...reliquary.pos });
+    const add = createMob((sim as any).nextId++, MOBS.drowned_cantor, 15, {
+      ...reliquary.pos,
+    });
     (sim as any).addEntity(add);
     run.mobIds.push(add.id);
 
@@ -3962,9 +4040,24 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
       };
     };
     // tries = full attempts; mistakesAllowed (tries - 1) is the tolerated wrong touches.
-    expect(cfg('easy')).toEqual({ len: 4, tries: 3, mistakes: 2, playbacks: 3 });
-    expect(cfg('medium')).toEqual({ len: 5, tries: 2, mistakes: 1, playbacks: 2 });
-    expect(cfg('hard')).toEqual({ len: 6, tries: 1, mistakes: 0, playbacks: 1 });
+    expect(cfg('easy')).toEqual({
+      len: 4,
+      tries: 3,
+      mistakes: 2,
+      playbacks: 3,
+    });
+    expect(cfg('medium')).toEqual({
+      len: 5,
+      tries: 2,
+      mistakes: 1,
+      playbacks: 2,
+    });
+    expect(cfg('hard')).toEqual({
+      len: 6,
+      tries: 1,
+      mistakes: 0,
+      playbacks: 1,
+    });
   });
 
   it('shows the sequence the chosen number of times before accepting input', () => {
