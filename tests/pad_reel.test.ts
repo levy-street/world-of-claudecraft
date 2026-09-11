@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { BIND_ACTIONS } from '../src/game/keybinds';
 import { padReelItemId } from '../src/game/pad_reel';
+import { dispatchTargetingAction } from '../src/game/targeting_actions';
 import { ITEMS } from '../src/sim/data';
 import { FISHING_CAST_ID, GATHER_CAST_ID } from '../src/sim/types';
 import { dispatchCollectionAction } from '../src/ui/collection_actions_core';
@@ -104,6 +105,20 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
   it('every offered edge action id routes through the collection dispatcher or a direct case', () => {
     const body = dispatchBody();
     expect(body).toContain('if (dispatchCollectionAction(id, hud)) return;');
+    // The targeting arm (the Tab cycles, the friendly picks, Pet: Mark, the F-row
+    // party hotkeys) lives in src/game/targeting_actions.ts; its dispatcher is
+    // called from the same spot, so an id it claims is routed, not dropped.
+    expect(body).toContain('if (dispatchTargetingAction(id, world, hud, settings)) return;');
+    const targetingWorld = {
+      tabTarget() {},
+      tabTargetPrev() {},
+      targetNearestFriendly() {},
+      friendlyTabTarget() {},
+      targetEntity() {},
+      partyInfo: null,
+      playerId: 1,
+      player: { pos: { x: 0, z: 0 } } as never,
+    };
     const collections = {
       toggleDeeds() {},
       toggleProfessions() {},
@@ -119,6 +134,8 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
       if (action.id === 'jump' || action.id === 'autorun') continue; // gamepad.ts-handled, pinned below
       if (action.id.startsWith('slot')) continue; // the slotN prefix arm, pinned below
       if (dispatchCollectionAction(action.id, collections)) continue;
+      if (dispatchTargetingAction(action.id, targetingWorld, { targetOwnPet() {} }, undefined))
+        continue;
       expect(body.includes(`case '${action.id}'`), `pad dispatch drops '${action.id}'`).toBe(true);
     }
   });
