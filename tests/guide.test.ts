@@ -943,9 +943,11 @@ describe('Guide deeds spoiler safety', () => {
     // table is regenerated centrally) so the account-wide misstatement cannot return.
     expect(guideStrings.deedsPage.howBody).not.toContain('across your whole account');
     expect(guideStrings.deedsPage.howBody).not.toContain('same collection');
-    expect(guideStrings.deedsPage.howBody).toContain('builds a Book of their own');
+    expect(guideStrings.deedsPage.howBody).toContain('shared by every character on your account');
+    // The Book is account-wide since the account ledger (src/sim/account_ledger.ts);
+    // the board still counts each deed once, which the sentence keeps saying.
     expect(guideStrings.deedsPage.howBody).toContain(
-      'only the realm leaderboard gathers your Renown',
+      'The realm leaderboard gathers your Renown the same way, counting each deed just once',
     );
     // The per-category heading is a translator-controlled format, not a hardcoded join.
     expect(t('guide.deedsPage.catHeading' as never, { label: 'Combat', count: '7' })).toBe(

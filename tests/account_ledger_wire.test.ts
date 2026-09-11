@@ -192,9 +192,10 @@ describe('account ledger over the wire', () => {
     expect(insertMock).not.toHaveBeenCalled();
     await (server as any).saveCharacter(a);
     await settle();
-    expect(insertMock).toHaveBeenCalledWith({ realm: REALM, characterId: 42, accountId: 7 }, [
-      `item:${CATALOGUE_RELIC}`,
-    ]);
+    expect(insertMock).toHaveBeenCalledWith(
+      { realm: REALM, characterId: 42, accountId: 7, name: 'Hilda', cls: 'warrior' },
+      [`item:${CATALOGUE_RELIC}`],
+    );
     expect(a.pendingRelicRecords).toEqual([]);
   });
 
@@ -207,9 +208,10 @@ describe('account ledger over the wire', () => {
     });
     joinAt(server, fw, 7, 42, 'Hilda', state);
     await settle();
-    expect(insertMock).toHaveBeenCalledWith({ realm: REALM, characterId: 42, accountId: 7 }, [
-      `item:${CATALOGUE_RELIC}`,
-    ]);
+    expect(insertMock).toHaveBeenCalledWith(
+      { realm: REALM, characterId: 42, accountId: 7, name: 'Hilda', cls: 'warrior' },
+      [`item:${CATALOGUE_RELIC}`],
+    );
   });
 
   it('the ledger handed in at join is the meta ledger, so an alt-earned title survives the restore', () => {

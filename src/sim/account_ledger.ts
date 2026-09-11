@@ -24,6 +24,8 @@
 // Determinism: pure data plus deterministic appends; no clock (the day stamp
 // is the host utcDay every grant already uses) and no randomness.
 
+import { DEEDS } from './content/deeds';
+import { isCataloguedRelicItem, isCataloguedRelicMark, RELIQUARY_PAGES } from './content/reliquary';
 import type { PlayerClass } from './types';
 
 /** One character's entry against a deed or relic: who, and on which utcDay
@@ -190,12 +192,49 @@ function restoreEarners(raw: unknown): AccountEarner[] {
   return out;
 }
 
-function restoreMap(raw: unknown): Map<string, AccountEarner[]> {
+// Catalog bounding (the idea and its "a row for an id a later catalog dropped
+// never reaches a client" rule are jgyy's, from PR #3933's
+// normalizeAccountReliquaryLedger): only ids the live catalog knows survive a
+// decode, so a stale stored row or a hostile payload can never grow the books
+// past the content. The mount set is built lazily from the catalog pages so
+// this module never imports reliquary.ts (which imports this one).
+let catalogMountIds: Set<string> | null = null;
+function isCataloguedMount(mountId: string): boolean {
+  if (catalogMountIds === null) {
+    catalogMountIds = new Set();
+    for (const page of RELIQUARY_PAGES) {
+      for (const relic of page.relics)
+        if (relic.kind === 'mount') catalogMountIds.add(relic.mountId);
+    }
+  }
+  return catalogMountIds.has(mountId);
+}
+
+/** True when the id names a live deed (own key of the DEEDS table, never a
+ *  prototype key). */
+export function isKnownAccountDeedId(deedId: string): boolean {
+  return Object.hasOwn(DEEDS, deedId);
+}
+
+/** True when the relic key names a catalogued relic of its kind. */
+export function isKnownAccountRelicKey(relicKey: string): boolean {
+  const sep = relicKey.indexOf(':');
+  if (sep <= 0) return false;
+  const kind = relicKey.slice(0, sep);
+  const id = relicKey.slice(sep + 1);
+  if (kind === 'item') return isCataloguedRelicItem(id);
+  if (kind === 'mark') return isCataloguedRelicMark(id);
+  if (kind === 'mount') return isCataloguedMount(id);
+  return false;
+}
+
+function restoreMap(raw: unknown, known: (key: string) => boolean): Map<string, AccountEarner[]> {
   const map = new Map<string, AccountEarner[]>();
   if (raw === null || typeof raw !== 'object') return map;
   // Own keys only: the wire is untrusted at the client edge, and a prototype
-  // key must never become a ledger id.
+  // key must never become a ledger id; catalog-bounded on top of that.
   for (const key of Object.keys(raw as Record<string, unknown>)) {
+    if (!known(key)) continue;
     const earners = restoreEarners((raw as Record<string, unknown>)[key]);
     if (earners.length > 0) map.set(key, earners);
   }
@@ -203,11 +242,15 @@ function restoreMap(raw: unknown): Map<string, AccountEarner[]> {
 }
 
 /** Rebuild a ledger from the wire blob. Malformed input degrades to an empty
- *  ledger, never a throw (the mirror keeps working with what it has). */
+ *  ledger, never a throw (the mirror keeps working with what it has), and an
+ *  id the live catalog does not know is dropped. */
 export function restoreAccountLedger(raw: unknown): AccountLedger {
   if (raw === null || typeof raw !== 'object') return freshAccountLedger();
   const wire = raw as Partial<AccountLedgerWire>;
-  return { deeds: restoreMap(wire.d), relics: restoreMap(wire.r) };
+  return {
+    deeds: restoreMap(wire.d, isKnownAccountDeedId),
+    relics: restoreMap(wire.r, isKnownAccountRelicKey),
+  };
 }
 
 // ---------------------------------------------------------------------------

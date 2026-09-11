@@ -14,6 +14,8 @@ import {
   accountRelicLookup,
   earnedByCharacter,
   freshAccountLedger,
+  isKnownAccountDeedId,
+  isKnownAccountRelicKey,
   mergeAccountLedger,
   recordAccountDeed,
   recordAccountRelic,
@@ -98,7 +100,7 @@ describe('wire', () => {
     recordAccountDeed(ledger, 'prog_first_steps', ALICE);
     recordAccountDeed(ledger, 'prog_first_steps', BOB);
     recordAccountRelic(ledger, 'item:cryptbone_helm', BOB);
-    recordAccountRelic(ledger, 'mount:steed', ALICE);
+    recordAccountRelic(ledger, 'mount:valorsteed', ALICE);
     return ledger;
   }
 
@@ -114,7 +116,7 @@ describe('wire', () => {
       },
       r: {
         'item:cryptbone_helm': [[2, 'Bob', 'mage', '2026-09-05']],
-        'mount:steed': [[1, 'Alice', 'warrior', '2026-09-01']],
+        'mount:valorsteed': [[1, 'Alice', 'warrior', '2026-09-01']],
       },
     });
     const restored = restoreAccountLedger(JSON.parse(JSON.stringify(wire)));
@@ -140,20 +142,42 @@ describe('wire', () => {
     expect(restoreAccountLedger({ d: 7, r: [] }).deeds.size).toBe(0);
     const restored = restoreAccountLedger({
       d: {
-        ok: [
+        prog_first_steps: [
           [1, 'Alice', 'warrior', '2026-09-01'],
           [1, 'Alice again', 'warrior', '2026-09-02'], // duplicate character
           ['1', 'Bad', 'mage', ''], // non-numeric id
           [3, 'Short'], // too short
           'garbage',
         ],
-        empty: [['x']],
+        soc_meet_bursar: [['x']],
       },
       r: Object.create({ inherited: [[9, 'Ghost', 'mage', '']] }),
     });
-    expect(restored.deeds.get('ok')).toEqual([ALICE]);
-    expect(restored.deeds.has('empty')).toBe(false);
+    expect(restored.deeds.get('prog_first_steps')).toEqual([ALICE]);
+    expect(restored.deeds.has('soc_meet_bursar')).toBe(false);
     expect(restored.relics.has('inherited')).toBe(false);
+  });
+
+  it('is catalog-bounded on decode (the PR #3933 rule): unknown deeds and relics drop, known kinds stay', () => {
+    const e = [[1, 'Alice', 'warrior', '']];
+    const restored = restoreAccountLedger({
+      d: { not_a_deed: e, prog_first_steps: e },
+      r: {
+        'item:not_an_item': e,
+        'item:cryptbone_helm': e,
+        'mark:gather_event:pristine_vein': e,
+        'mount:valorsteed': e,
+        'mount:not_a_mount': e,
+        'skin:anything': e,
+        nocolon: e,
+      },
+    });
+    expect([...restored.deeds.keys()]).toEqual(['prog_first_steps']);
+    expect([...restored.relics.keys()].sort()).toEqual(
+      ['item:cryptbone_helm', 'mark:gather_event:pristine_vein', 'mount:valorsteed'].sort(),
+    );
+    expect(isKnownAccountDeedId('__proto__')).toBe(false);
+    expect(isKnownAccountRelicKey('item:')).toBe(false);
   });
 });
 

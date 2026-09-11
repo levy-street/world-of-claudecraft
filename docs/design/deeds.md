@@ -253,9 +253,20 @@ account ledger (`src/sim/account_ledger.ts`), and its scope model is fixed:
   and is never serialized into `CharacterState`. Offline the one sandbox
   character fills its own ledger, so both hosts read the same shape
   (`tests/account_ledger_sim.test.ts`, `tests/account_ledger_wire.test.ts`).
-- **Character deletion follows `character_deeds`:** both tables cascade on
-  the character row, so a deleted character's earns leave the account's book
-  exactly as they leave the Renown board today.
+- **Character deletion.** `account_relic_finds` carries no character FK and
+  snapshots the finder's name and class, so a relic find outlives the
+  character that made it (the account keeps its Reliquary; the idea follows
+  jgyy's account-only keying in PR #3933). `character_deeds` still cascades
+  on the character row, so a deleted character's DEED earns leave the
+  account's Book exactly as they leave the Renown board today; lifting that
+  cascade is a schema change for a maintainer.
+- **Decode is catalog-bounded** (also from PR #3933): a stored row or wire
+  entry for a deed or relic the live catalog no longer knows is dropped on the
+  way in, so content removals can never leave a phantom entry in a book.
+- **The public character sheet reads the ledger** (`/c/`, the owner and public
+  JSON sheets): its Reliquary pair is the same account-wide union the window
+  shows, degrading to the character's own fills when the read fails. Its
+  `deeds.earnedCount` stays character-scoped (the table above).
 
 ## Deliberately deferred (do not "fix" these by shipping them)
 

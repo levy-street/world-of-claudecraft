@@ -1967,10 +1967,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacterById(target.characterId);
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank, deedsRecent] = await Promise.all([
+      const [guild, rank, deedsRecent, accountLedger] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
         recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
+        loadAccountLedger(row.account_id).catch(() => undefined),
       ]);
       return json(
         res,
@@ -1983,6 +1984,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           guild,
           rank: toSheetRank(rank),
           deedsRecent,
+          accountLedger,
         }),
       );
     }
@@ -1993,10 +1995,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacter(accountId, Number(ownerSheetMatch[1]));
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank, deedsRecent] = await Promise.all([
+      const [guild, rank, deedsRecent, accountLedger] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
         recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
+        loadAccountLedger(row.account_id).catch(() => undefined),
       ]);
       return json(
         res,
@@ -2009,6 +2012,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           guild,
           rank: toSheetRank(rank),
           deedsRecent,
+          accountLedger,
         }),
       );
     }

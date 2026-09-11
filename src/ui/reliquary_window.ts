@@ -975,7 +975,7 @@ export class ReliquaryWindow {
       `<div class="reliquary-summary${sealClass}"${sealAttr}>` +
       `<span class="reliquary-count">${esc(t('hudChrome.reliquary.countLabel', { owned, total }))}</span>` +
       // The scope disclosure: the count and rank are account-wide.
-      `<span class="reliquary-scope-note">${esc(t('hudChrome.reliquary.sharedScopeNote'))}</span>` +
+      `<span class="reliquary-scope-note" data-scope-note tabindex="0">${esc(t('hudChrome.reliquary.sharedScopeNote'))}</span>` +
       `<span class="reliquary-rank" data-rank="${p.curatorRank}">` +
       `<span class="reliquary-rank-seal" aria-hidden="true"></span>` +
       `${esc(rankLabel)}</span>` +
@@ -1855,6 +1855,15 @@ export class ReliquaryWindow {
   }
 
   private wire(el: HTMLElement, model: ReliquaryViewModel): void {
+    // The scope note's hint rides the shared tooltip seam (jgyy's scope chip
+    // from pull request 3933: a quiet readout whose explanation is one hover away).
+    const scopeNote = el.querySelector<HTMLElement>('[data-scope-note]');
+    if (scopeNote) {
+      this.deps.attachTooltip(
+        scopeNote,
+        () => `<div class="tt-name">${esc(t('hudChrome.reliquary.sharedScopeHint'))}</div>`,
+      );
+    }
     // A slain proof starts on its exact mob portrait, with the authored trophy
     // glyph carried only as a mixed-deploy/decode fallback. Disarm BEFORE the
     // swap and listen once, so even a malformed fallback cannot recurse.

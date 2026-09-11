@@ -483,7 +483,7 @@ export class DeedsWindow {
       `<span class="deed-bar deeds-completion"><span class="deed-bar-fill" style="width:${pct}%"></span></span> ${esc(pctText)}</span>` +
       // The scope disclosure the ranked-surface rule asks of a re-scoped count
       // (docs/design/deeds.md): Renown and the earned pair are account-wide.
-      `<span class="deeds-scope-note">${esc(t('hudChrome.deeds.accountScopeNote'))}</span>` +
+      `<span class="deeds-scope-note" data-scope-note tabindex="0">${esc(t('hudChrome.deeds.accountScopeNote'))}</span>` +
       `</div>`;
     if (s.recent.length > 0) {
       const crests = s.recent
@@ -811,6 +811,15 @@ export class DeedsWindow {
   }
 
   private wire(el: HTMLElement): void {
+    // The scope note's hint rides the shared tooltip seam (the Reliquary
+    // window's sibling, after jgyy's scope chip in pull request 3933).
+    const scopeNote = el.querySelector<HTMLElement>('[data-scope-note]');
+    if (scopeNote) {
+      this.deps.attachTooltip(
+        scopeNote,
+        () => `<div class="tt-name">${esc(t('hudChrome.deeds.accountScopeHint'))}</div>`,
+      );
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       this.close();
       audio.click();

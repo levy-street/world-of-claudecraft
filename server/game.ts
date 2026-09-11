@@ -1135,9 +1135,7 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   // character does not have. Event-ordered; drained by saveCharacter up to
   // the count captured when the blob was serialized.
   pendingDeedRecords: string[];
-  // The Reliquary twin: accountRelicKeys the sim recorded for this character
-  // (relicRecorded events), awaiting the same successful save before they
-  // publish to account_relic_finds. Same durability ordering and drain.
+  // The Reliquary twin (relicRecorded keys), same durability ordering and drain.
   pendingRelicRecords: string[];
   spectating: {
     characterId: number;
@@ -1600,9 +1598,7 @@ export class GameServer {
     sessions: () => this.clients.values(),
     resyncQuests: (session) => this.resyncQuests(session as ClientSession),
   });
-  // The account ledger's live fan-out (server/account_ledger_service.ts): a
-  // deed earned or relic found on one character reaches the account's other
-  // live sessions in the same tick.
+  // Account ledger live fan-out to the account's other sessions (account_ledger_service.ts).
   private readonly ledger = new AccountLedgerService({
     sim: () => this.sim,
     sessions: () => this.clients.values(),
@@ -3599,13 +3595,12 @@ export class GameServer {
     reconcileCharacterDeeds({ characterId, accountId }, [
       ...(this.sim.meta(pid)?.deedsEarned.keys() ?? []),
     ]);
-    // The Reliquary twin of the heal above: replay every relic this
-    // character's live state proves (catalogued items, marks, owned mounts)
-    // into account_relic_finds idempotently, so the account ledger every alt
-    // loads at join lists this character for what it already holds. Same
-    // fire-and-forget contract; resumes skip it with the deeds reconcile.
+    // The Reliquary twin of the heal above: replay the blob-proven relic finds.
     const joinedMeta = this.sim.meta(pid);
-    if (joinedMeta) reconcileAccountRelics({ characterId, accountId }, selfRelicKeys(joinedMeta));
+    if (joinedMeta) {
+      const who = { characterId, accountId, name, cls };
+      reconcileAccountRelics(who, selfRelicKeys(joinedMeta));
+    }
     // Storefront mirror drift heal (the steady-state counterpart to the
     // link-time reconcile): a live achievement push can exhaust its retry
     // ladder and drop, and an already-linked account never re-links, so the
@@ -4512,12 +4507,20 @@ export class GameServer {
           { characterId: session.characterId, accountId: session.accountId },
           session.pendingDeedRecords.splice(0, recordUpTo),
         );
-        // The Reliquary half of the account ledger drains on the same
-        // watermark rule: only finds already inside THIS blob publish.
-        recordRelicFinds(
-          { characterId: session.characterId, accountId: session.accountId },
-          session.pendingRelicRecords.splice(0, relicRecordUpTo),
-        );
+        // The Reliquary half drains on the same watermark rule; the finder's
+        // name and class ride each row so the find outlives the character.
+        const relicMeta = this.sim.meta(session.pid);
+        if (relicMeta) {
+          recordRelicFinds(
+            {
+              characterId: session.characterId,
+              accountId: session.accountId,
+              name: relicMeta.name,
+              cls: relicMeta.cls,
+            },
+            session.pendingRelicRecords.splice(0, relicRecordUpTo),
+          );
+        }
         // Same durability ordering as the deed publish above: the level the bot can
         // read only moved once this write landed. Delta-gated on the SERIALIZED level
         // (never e.level, which a Fiesta bout temporarily raises), so this covers the
@@ -9094,9 +9097,7 @@ export class GameServer {
           const ids = deedUnlocks.get(s);
           if (ids) ids.push(ev.deedId);
           else deedUnlocks.set(s, [ev.deedId]);
-          // Account ledger fan-out: the account's other live sessions list
-          // this character as an earner in the same tick (retro included: a
-          // back-credit is still a fact of the account's book).
+          // Account ledger fan-out to sibling sessions (retro included: still a fact).
           this.ledger.noteDeedEarned(s, ev.deedId);
           // Marquee unlocks fan out to guildmates and followers, and
           // feed-worthy unlocks (titles, borders, the first koi) to the
@@ -9106,11 +9107,8 @@ export class GameServer {
           if (ev.retro !== true) this.fanOutDeedUnlock(s, ev.deedId, now);
         }
       }
-      // Account ledger relic record: the sim appended this character as a
-      // finder (item, mark, or mount). Stage the key for the post-save drain
-      // (the pendingDeedRecords durability rule) and fan the entry out to the
-      // account's other live sessions now. Retro rides too: the on-join seed
-      // pass is how a veteran's existing finds first reach the table.
+      // Account ledger relic record: stage the key for the post-save drain (the
+      // pendingDeedRecords rule) and fan it out to sibling sessions now.
       if (ev.type === 'relicRecorded' && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (s) {

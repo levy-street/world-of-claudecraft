@@ -13,6 +13,12 @@
 // recalcPlayerStats (through characterDerivedStats), zone via zoneAt, spec via
 // the talents specLabel, virtualLevel via the types helper.
 
+import {
+  type AccountLedger,
+  accountDeedLookup,
+  accountRelicLookup,
+  freshAccountLedger,
+} from '../src/sim/account_ledger';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import {
   computeTalentModifiers,
@@ -60,6 +66,12 @@ export interface CharacterSheetInput {
   // ISO timestamp for the sheet; defaults to now(). Pass the row's updated_at
   // when available so the field reflects the character, not the request time.
   updatedAt?: string;
+  // The account ledger (server/account_ledger_db.ts), pre-fetched like
+  // guild/rank so the sheet's Reliquary pair reads ACCOUNT-wide, the same
+  // union the in-game window and the inspect card show (jgyy's public-sheet
+  // read from PR #3933). Absent means the caller fetched none: the pair then
+  // reads the character's own fills only (a degraded, never a wrong, aggregate).
+  accountLedger?: AccountLedger;
 }
 
 export interface MoneySplit {
@@ -312,7 +324,10 @@ export function sheetRecentRelicsFromSaved(saved: CharacterState['reliquary']): 
  * Mount ownership scans bags + bank reins (same bags+bank seam as live
  * ownedMounts); skins are account cosmetics and are deliberately omitted.
  */
-export function sheetReliquaryFromState(state: CharacterState): SheetReliquary {
+export function sheetReliquaryFromState(
+  state: CharacterState,
+  accountLedger?: AccountLedger,
+): SheetReliquary {
   const itemsDiscovered = new Set(state.deedStats?.itemsDiscovered ?? []);
   // Narrow restores: this path wants the marks set and the recent ring, not the
   // whole state, so it no longer rebuilds firstFind and the counts map (and the
@@ -333,7 +348,14 @@ export function sheetReliquaryFromState(state: CharacterState): SheetReliquary {
   const inv = [...(state.inventory ?? []), ...(state.bank?.inventory ?? [])];
   const ownedMounts = new Set(bagOwnedMounts(inv));
   const deedsEarned = new Set(Object.keys(state.deeds ?? {}));
-  const opts = { itemsDiscovered, marks, ownedMounts, deedsEarned };
+  // Account-wide when the ledger rode along: the same union the window reads.
+  const ledger = accountLedger ?? freshAccountLedger();
+  const opts = {
+    itemsDiscovered: accountRelicLookup(itemsDiscovered, ledger, 'item'),
+    marks: accountRelicLookup(marks, ledger, 'mark'),
+    ownedMounts: accountRelicLookup(ownedMounts, ledger, 'mount'),
+    deedsEarned: accountDeedLookup(deedsEarned, ledger),
+  };
   const completion = catalogCharacterCompletion(opts);
   return {
     owned: completion.owned,
@@ -509,7 +531,7 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
     // Character-scoped completion pair, rank, and the capped recent-finds
     // strip (ids + kinds). Never firstFind, never the obtain tally, never the
     // full marks set.
-    reliquary: sheetReliquaryFromState(state),
+    reliquary: sheetReliquaryFromState(state, input.accountLedger),
     rank: rank ?? null,
     profileUrl,
     visibility,

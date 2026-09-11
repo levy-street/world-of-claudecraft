@@ -7452,6 +7452,8 @@ export const hudChromeStrings = {
     foundBy: 'Found by {names}',
     finderWithDate: '{name} ({date})',
     sharedScopeNote: 'Shared by every character on your account',
+    // The note's tooltip (the wording is jgyy's accountWideHint from PR #3933).
+    sharedScopeHint: 'A relic found by any character on your account fills the page here too.',
     unlockToast: 'Relic catalogued: {name}',
     illuminateBanner: 'Page illuminated: {name}',
     illuminateToast: 'Every relic on {name} is filled.',
@@ -7674,6 +7676,8 @@ export const hudChromeStrings = {
     earnedBy: 'Earned by {names}',
     earnerWithDate: '{name} ({date})',
     accountScopeNote: 'Shared by every character on your account',
+    accountScopeHint:
+      'A deed any character on your account accomplishes is earned here too, and the Book names who earned it.',
     featRibbon: 'Feat',
     hiddenBadge: 'Hidden',
     titleChip: 'Title reward',

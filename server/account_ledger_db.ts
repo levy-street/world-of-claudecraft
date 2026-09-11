@@ -11,6 +11,8 @@ import {
   type AccountEarner,
   type AccountLedger,
   freshAccountLedger,
+  isKnownAccountDeedId,
+  isKnownAccountRelicKey,
   recordAccountDeed,
   recordAccountRelic,
 } from '../src/sim/account_ledger';
@@ -24,6 +26,9 @@ export interface RelicFindWho {
   realm: string;
   characterId: number;
   accountId: number;
+  /** Snapshotted onto the row so a find outlives its character (below). */
+  name: string;
+  cls: PlayerClass;
 }
 
 /** Record a character's relic finds in ONE conflict-swallowing statement.
@@ -36,10 +41,11 @@ export async function insertAccountRelicFinds(
 ): Promise<void> {
   if (relicKeys.length === 0) return;
   await pool.query(
-    `INSERT INTO account_relic_finds (realm, character_id, account_id, relic_key)
-     SELECT $1, $2, $3, unnest($4::text[])
+    `INSERT INTO account_relic_finds
+       (realm, character_id, account_id, relic_key, character_name, character_class)
+     SELECT $1, $2, $3, unnest($4::text[]), $5, $6
      ON CONFLICT (character_id, relic_key) DO NOTHING`,
-    [who.realm, who.characterId, who.accountId, [...relicKeys]],
+    [who.realm, who.characterId, who.accountId, [...relicKeys], who.name, who.cls],
   );
 }
 
@@ -79,8 +85,16 @@ export function accountLedgerFromRows(
   relicRows: readonly LedgerRow[],
 ): AccountLedger {
   const ledger = freshAccountLedger();
-  for (const row of deedRows) recordAccountDeed(ledger, String(row.key), earnerOf(row));
-  for (const row of relicRows) recordAccountRelic(ledger, String(row.key), earnerOf(row));
+  // Catalog-bounded on the way out (jgyy's rule from PR #3933): a row for an
+  // id a later catalog dropped never reaches a client.
+  for (const row of deedRows) {
+    const id = String(row.key);
+    if (isKnownAccountDeedId(id)) recordAccountDeed(ledger, id, earnerOf(row));
+  }
+  for (const row of relicRows) {
+    const key = String(row.key);
+    if (isKnownAccountRelicKey(key)) recordAccountRelic(ledger, key, earnerOf(row));
+  }
   return ledger;
 }
 
@@ -99,10 +113,17 @@ export async function loadAccountLedger(accountId: number): Promise<AccountLedge
         ORDER BY d.earned_at ASC, d.id ASC`,
       [accountId],
     ),
+    // LEFT JOIN plus the row's own snapshot: a live character shows its current
+    // name (renames follow), a deleted one keeps the name it found the relic
+    // under, so the account's Reliquary never loses a find with its finder
+    // (survival is jgyy's point from PR #3933; character_deeds still cascades).
     pool.query(
-      `SELECT f.relic_key AS key, f.character_id, c.name, c.class, f.found_at AS at
+      `SELECT f.relic_key AS key, f.character_id,
+              COALESCE(c.name, f.character_name) AS name,
+              COALESCE(c.class, f.character_class) AS class,
+              f.found_at AS at
          FROM account_relic_finds f
-         JOIN characters c ON c.id = f.character_id
+         LEFT JOIN characters c ON c.id = f.character_id
         WHERE f.account_id = $1
         ORDER BY f.found_at ASC, f.id ASC`,
       [accountId],
@@ -112,13 +133,17 @@ export async function loadAccountLedger(accountId: number): Promise<AccountLedge
 }
 
 // The account_relic_finds DDL, this domain's own *_SCHEMA. FK-references
-// characters(id) and accounts(id), so ensureSchema (server/db.ts) applies it
-// after SCHEMA beside DEEDS_SCHEMA, unconditionally (idempotent).
+// accounts(id), so ensureSchema (server/db.ts) applies it after SCHEMA beside
+// DEEDS_SCHEMA, unconditionally (idempotent).
 export const ACCOUNT_LEDGER_SCHEMA = `
 -- The Reliquary half of the account ledger (src/sim/account_ledger.ts): one
--- row per (character, relic) the sim decided the character found, the exact
--- sibling of character_deeds. relic_key is the sim's accountRelicKey
--- ('item:<id>', 'mark:<id>', 'mount:<key>'). An OBSERVER index of the sim's
+-- row per (character, relic) the sim decided the character found, the
+-- character_deeds sibling with ONE deliberate difference: no FK on the
+-- character row, plus a name and class snapshot, so a find outlives the
+-- character that made it (the account keeps its Reliquary when a character
+-- is deleted; jgyy's account-only keying in PR #3933 made the same call).
+-- relic_key is the sim's accountRelicKey ('item:<id>', 'mark:<id>',
+-- 'mount:<key>'). An OBSERVER index of the sim's
 -- decisions (server/account_ledger_records.ts), never an authority: membership
 -- truth stays the character state blob, and the login reconcile replays the
 -- blob's proven finds idempotently. UNIQUE (character_id, relic_key) is the
@@ -127,9 +152,11 @@ export const ACCOUNT_LEDGER_SCHEMA = `
 CREATE TABLE IF NOT EXISTS account_relic_finds (
   id BIGSERIAL PRIMARY KEY,
   realm TEXT NOT NULL,
-  character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  character_id INT NOT NULL,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
   relic_key TEXT NOT NULL,
+  character_name TEXT NOT NULL,
+  character_class TEXT NOT NULL,
   found_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (character_id, relic_key)
 );

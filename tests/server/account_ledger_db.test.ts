@@ -30,28 +30,35 @@ beforeEach(() => {
 
 describe('insertAccountRelicFinds', () => {
   it('inserts the whole key set in ONE conflict-swallowing statement with explicit realm', async () => {
-    await insertAccountRelicFinds({ realm: REALM, characterId: 42, accountId: 7 }, [
-      'item:cryptbone_helm',
-      'mark:gather_event:pristine_vein',
-    ]);
+    await insertAccountRelicFinds(
+      { realm: REALM, characterId: 42, accountId: 7, name: 'Hilda', cls: 'warrior' },
+      ['item:cryptbone_helm', 'mark:gather_event:pristine_vein'],
+    );
     expect(dbMock.query).toHaveBeenCalledTimes(1);
     const [sql, params] = dbMock.query.mock.calls[0];
     expect(sql).toContain('INSERT INTO account_relic_finds');
-    expect(sql).toContain('(realm, character_id, account_id, relic_key)');
-    expect(sql).toContain('unnest($4::text[])');
+    expect(sql).toContain(
+      '(realm, character_id, account_id, relic_key, character_name, character_class)',
+    );
+    expect(sql).toContain('unnest($4::text[]), $5, $6');
     // The idempotence backbone: a replayed (character, relic) pair is a no-op.
     expect(sql).toContain('ON CONFLICT (character_id, relic_key) DO NOTHING');
-    expect(sql).not.toContain('$5');
+    expect(sql).not.toContain('$7');
     expect(params).toEqual([
       REALM,
       42,
       7,
       ['item:cryptbone_helm', 'mark:gather_event:pristine_vein'],
+      'Hilda',
+      'warrior',
     ]);
   });
 
   it('an empty key set never reaches SQL', async () => {
-    await insertAccountRelicFinds({ realm: REALM, characterId: 42, accountId: 7 }, []);
+    await insertAccountRelicFinds(
+      { realm: REALM, characterId: 42, accountId: 7, name: 'Hilda', cls: 'warrior' },
+      [],
+    );
     expect(dbMock.query).not.toHaveBeenCalled();
   });
 });
@@ -106,6 +113,14 @@ describe('loadAccountLedger', () => {
     });
     const ledger = await loadAccountLedger(7);
     expect(dbMock.query).toHaveBeenCalledTimes(2);
+    // The relic read LEFT JOINs and falls back to the row's own name/class
+    // snapshot, so a deleted character keeps its finds (the PR #3933 point).
+    const relicSql = dbMock.query.mock.calls
+      .map((c) => c[0] as string)
+      .find((q) => q.includes('FROM account_relic_finds'));
+    expect(relicSql).toContain('LEFT JOIN characters c ON c.id = f.character_id');
+    expect(relicSql).toContain('COALESCE(c.name, f.character_name) AS name');
+    expect(relicSql).toContain('COALESCE(c.class, f.character_class) AS class');
     for (const [sql, params] of dbMock.query.mock.calls) {
       expect(sql).toContain('JOIN characters c ON c.id =');
       expect(sql).toMatch(/WHERE \w\.account_id = \$1/);
@@ -121,10 +136,21 @@ describe('loadAccountLedger', () => {
     ]);
   });
 
-  it('accountLedgerFromRows dedupes a character repeated by a lookalike row', () => {
-    const row = { key: 'd', character_id: 1, name: 'A', class: 'warrior', at: '2026-09-01' };
-    const ledger = accountLedgerFromRows([row, { ...row, at: '2026-09-02' }], []);
-    expect(ledger.deeds.get('d')).toEqual([
+  it('accountLedgerFromRows dedupes a repeated character and drops ids the catalog no longer knows', () => {
+    const row = {
+      key: 'prog_first_steps',
+      character_id: 1,
+      name: 'A',
+      class: 'warrior',
+      at: '2026-09-01',
+    };
+    const ledger = accountLedgerFromRows(
+      [row, { ...row, at: '2026-09-02' }, { ...row, key: 'retired_deed' }],
+      [{ ...row, key: 'item:retired_relic' }],
+    );
+    expect(ledger.deeds.has('retired_deed')).toBe(false);
+    expect(ledger.relics.size).toBe(0);
+    expect(ledger.deeds.get('prog_first_steps')).toEqual([
       { characterId: 1, name: 'A', cls: 'warrior', day: '2026-09-01' },
     ]);
   });
@@ -137,14 +163,17 @@ describe('account_relic_finds DDL', () => {
   );
   const block = ACCOUNT_LEDGER_SCHEMA.slice(start, end);
 
-  it('exists as the character_deeds sibling: explicit realm, cascading owners, the idempotence backbone, the account index', () => {
+  it('exists as the character_deeds sibling: explicit realm, account cascade only, the idempotence backbone, the account index', () => {
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     expect(block).toMatch(/realm TEXT NOT NULL,/);
     expect(block).not.toMatch(/realm TEXT NOT NULL DEFAULT/);
-    expect(block).toContain(
-      'character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE',
-    );
+    // No character FK on purpose (a find outlives its character), and the
+    // finder snapshot columns that make that survivable.
+    expect(block).toContain('character_id INT NOT NULL,');
+    expect(block).not.toContain('REFERENCES characters(id)');
+    expect(block).toContain('character_name TEXT NOT NULL');
+    expect(block).toContain('character_class TEXT NOT NULL');
     expect(block).toContain('account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE');
     expect(block).toContain('relic_key TEXT NOT NULL');
     expect(block).toContain('found_at TIMESTAMPTZ NOT NULL DEFAULT now()');

@@ -10,52 +10,64 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "es_ES": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "fr_FR": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "fr_CA": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "de_DE": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "zh_CN": [],
@@ -63,76 +75,94 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "nl_NL": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "pl_PL": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "id_ID": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "tr_TR": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "sv_SE": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "vi_VN": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ],
   "da_DK": [
+    "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
     "hudChrome.deeds.earnedBy",
     "hudChrome.deeds.earnerWithDate",
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
+    "hudChrome.reliquary.sharedScopeHint",
     "hudChrome.reliquary.sharedScopeNote"
   ]
 };

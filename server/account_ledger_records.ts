@@ -11,29 +11,31 @@
 // reconcile replays the blob's proven finds (selfRelicKeys) on every join so a
 // row a transient insert failure dropped is re-created next login.
 
+import type { PlayerClass } from '../src/sim/types';
 import { insertAccountRelicFinds } from './account_ledger_db';
 import { REALM } from './realm';
 
 let tail: Promise<void> = Promise.resolve();
 
+/** The finder identity every row carries: ids for the joins, name and class
+ *  snapshotted so the find outlives the character. */
+export interface RelicRecordWho {
+  characterId: number;
+  accountId: number;
+  name: string;
+  cls: PlayerClass;
+}
+
 /** Mirror a batch of sim-decided relic finds into account_relic_finds in ONE
  *  insert, fire-and-forget. The post-save drain uses this (the
  *  recordDeedUnlocks durability ordering: only finds already inside a landed
  *  blob publish). An empty slice never touches the tail. */
-export function recordRelicFinds(
-  who: { characterId: number; accountId: number },
-  relicKeys: readonly string[],
-): void {
+export function recordRelicFinds(who: RelicRecordWho, relicKeys: readonly string[]): void {
   if (relicKeys.length === 0) return;
   const keys = [...relicKeys];
   try {
     tail = tail
-      .then(() =>
-        insertAccountRelicFinds(
-          { realm: REALM, characterId: who.characterId, accountId: who.accountId },
-          keys,
-        ),
-      )
+      .then(() => insertAccountRelicFinds({ realm: REALM, ...who }, keys))
       .catch((err) => {
         console.error('account_relic_finds write failed:', err);
       });
@@ -47,10 +49,7 @@ export function recordRelicFinds(
  *  the SAME FIFO tail as live finds so it never races them. Heals a dropped
  *  row and backfills a veteran whose blob predates the table. Fire-and-forget,
  *  fully guarded; an empty set never touches the tail. */
-export function reconcileAccountRelics(
-  who: { characterId: number; accountId: number },
-  relicKeys: readonly string[],
-): void {
+export function reconcileAccountRelics(who: RelicRecordWho, relicKeys: readonly string[]): void {
   recordRelicFinds(who, relicKeys);
 }
 
