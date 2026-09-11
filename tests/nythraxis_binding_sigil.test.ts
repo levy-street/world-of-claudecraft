@@ -3,14 +3,13 @@
 // the placement rules, the fallbacks, the bind test, and the readout.
 
 import { describe, expect, it } from 'vitest';
+import { NYTHRAXIS_LAYOUT, NYTHRAXIS_PLATFORM_SIDE_OFFSET } from '../src/sim/dungeon_layout';
 import {
   activeNythraxisBindingSigils,
   NYTHRAXIS_ASCENSION_EVERY,
   NYTHRAXIS_BOUND_VULNERABILITY,
   NYTHRAXIS_SIGIL_FIRST_SECONDS,
-  NYTHRAXIS_SIGIL_SIDE_NUDGES_Z,
   NYTHRAXIS_SIGIL_SIDE_OFFSET,
-  NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR,
   NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE,
   type NythraxisSigilFloor,
   nythraxisAscensionPerStack,
@@ -60,33 +59,28 @@ describe('Nythraxis Binding Sigil', () => {
       false,
       true,
     ]);
-    // v0.42.2: beside the boss on the raid's left or right, not a hash ring.
-    expect([NYTHRAXIS_SIGIL_SIDE_OFFSET, NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR]).toEqual([22, 16]);
-    expect(NYTHRAXIS_SIGIL_SIDE_NUDGES_Z).toEqual([0, 6, -6, 12, -12, 18, -18]);
+    // v0.42.2: on the flanking platforms 30 yd to the raid's left or right of
+    // the spawn, the same offset the arena layout builds them at.
+    expect(NYTHRAXIS_SIGIL_SIDE_OFFSET).toBe(30);
+    expect(NYTHRAXIS_SIGIL_SIDE_OFFSET).toBe(NYTHRAXIS_PLATFORM_SIDE_OFFSET);
+    expect(NYTHRAXIS_LAYOUT.platforms?.map((pl) => [pl.x, pl.z])).toEqual([
+      [-30, NYTHRAXIS_LAYOUT.dais.z],
+      [30, NYTHRAXIS_LAYOUT.dais.z],
+    ]);
     expect(NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE).toBe(6);
   });
 
-  it('lays the side ladder: the offset spot first, z nudges next, then the near offset', () => {
+  it('lands on the platform centre on the asked side of the spawn, mirrored across it', () => {
     for (const side of [1, -1] as const) {
-      const first = nythraxisSigilCandidate(0, BOSS, side);
-      expect(first).toEqual({ x: BOSS.x + side * NYTHRAXIS_SIGIL_SIDE_OFFSET, z: BOSS.z });
-      NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.forEach((nudge, attempt) => {
-        expect(nythraxisSigilCandidate(attempt, BOSS, side)).toEqual({
-          x: BOSS.x + side * NYTHRAXIS_SIGIL_SIDE_OFFSET,
-          z: BOSS.z + nudge,
-        });
-        expect(
-          nythraxisSigilCandidate(attempt + NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.length, BOSS, side),
-        ).toEqual({ x: BOSS.x + side * NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR, z: BOSS.z + nudge });
+      expect(nythraxisSigilCandidate(BOSS, side)).toEqual({
+        x: BOSS.x + side * NYTHRAXIS_SIGIL_SIDE_OFFSET,
+        z: BOSS.z,
       });
     }
-    // The two sides mirror each other across the boss in x and share z.
-    for (let attempt = 0; attempt < NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.length * 2; attempt++) {
-      const right = nythraxisSigilCandidate(attempt, BOSS, -1);
-      const left = nythraxisSigilCandidate(attempt, BOSS, 1);
-      expect(right.x - BOSS.x).toBe(-(left.x - BOSS.x));
-      expect(right.z).toBe(left.z);
-    }
+    const right = nythraxisSigilCandidate(BOSS, -1);
+    const left = nythraxisSigilCandidate(BOSS, 1);
+    expect(right.x - BOSS.x).toBe(-(left.x - BOSS.x));
+    expect(right.z).toBe(left.z);
   });
 
   it("alternates sides every cast, starting on the raid's right (world -x)", () => {
@@ -125,46 +119,25 @@ describe('Nythraxis Binding Sigil', () => {
     ).toBe(true);
   });
 
-  it('picks the first valid ladder spot, then falls back to open floor, then to the primary spot', () => {
-    const first = nythraxisSigilCandidate(0, BOSS, 1);
-    expect(nythraxisSigilPlacement(BOSS, 1, 4, OPEN, false)).toEqual(first);
-    // A wardstone on the primary spot pushes the pick down the ladder, same side.
-    const blockedFirst = { ...OPEN, wardstones: [first] };
-    const pick = nythraxisSigilPlacement(BOSS, 1, 4, blockedFirst, false);
-    expect(pick).not.toEqual(first);
-    expect(pick.x).toBe(first.x);
-    expect(nythraxisSigilPlacementValid(pick, 4, blockedFirst, false)).toBe(true);
-    // Fire everywhere on normal: fall back to open floor rather than vanish.
-    const everywhereFire = { ...OPEN, fires: [{ x: BOSS.x, z: BOSS.z, radius: 1000 }] };
-    expect(nythraxisSigilPlacement(BOSS, 1, 4, everywhereFire, false)).toEqual(first);
-    // No open floor at all: the sigil still lands on the primary side spot,
-    // never under the boss, which would bind him for free.
+  it('takes the asked platform, the other platform when it is blocked, and the asked one when both are', () => {
+    const right = nythraxisSigilCandidate(BOSS, -1);
+    const left = nythraxisSigilCandidate(BOSS, 1);
+    expect(nythraxisSigilPlacement(BOSS, -1, 4, OPEN, false)).toEqual(right);
+    expect(nythraxisSigilPlacement(BOSS, 1, 4, OPEN, false)).toEqual(left);
+    // A wardstone on the asked platform sends the sigil across.
+    const wardOnRight = { ...OPEN, wardstones: [right] };
+    expect(nythraxisSigilPlacement(BOSS, -1, 4, wardOnRight, false)).toEqual(left);
+    // Fire on the asked platform does the same on Normal, and nothing on Heroic.
+    const fireOnRight = { ...OPEN, fires: [{ ...right, radius: 3 }] };
+    expect(nythraxisSigilPlacement(BOSS, -1, 4, fireOnRight, false)).toEqual(left);
+    expect(nythraxisSigilPlacement(BOSS, -1, 4, fireOnRight, true)).toEqual(right);
+    // Both blocked (or no open floor at all): the asked platform, never under
+    // the boss, which would bind him for free.
+    const both = { ...OPEN, wardstones: [right, left] };
+    expect(nythraxisSigilPlacement(BOSS, -1, 4, both, false)).toEqual(right);
     const nowhere = nythraxisSigilPlacement(BOSS, 1, 4, { ...OPEN, openFloor: () => false }, false);
-    expect(nowhere).toEqual(first);
+    expect(nowhere).toEqual(left);
     expect(Math.hypot(nowhere.x - BOSS.x, nowhere.z - BOSS.z)).toBe(NYTHRAXIS_SIGIL_SIDE_OFFSET);
-    // The other side mirrors.
-    expect(nythraxisSigilPlacement(BOSS, -1, 4, OPEN, false)).toEqual(
-      nythraxisSigilCandidate(0, BOSS, -1),
-    );
-    // Every rung at the full offset blocked by a wardstone: the pick steps in
-    // to the near offset on the same side, at the boss's own z.
-    const outerBlocked = {
-      ...OPEN,
-      wardstones: NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.map((_, attempt) =>
-        nythraxisSigilCandidate(attempt, BOSS, 1),
-      ),
-    };
-    expect(nythraxisSigilPlacement(BOSS, 1, 4, outerBlocked, false)).toEqual({
-      x: BOSS.x + NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR,
-      z: BOSS.z,
-    });
-    // The whole asked side closed (the boss parked against that wall): the
-    // mirrored ladder on the other side lands the sigil instead of stranding
-    // the bind on an unreachable point.
-    const rightWall = { ...OPEN, openFloor: (p: { x: number }) => p.x < BOSS.x + 1 };
-    expect(nythraxisSigilPlacement(BOSS, 1, 4, rightWall, false)).toEqual(
-      nythraxisSigilCandidate(0, BOSS, -1),
-    );
   });
 
   it('binds when the boss stands inside the radius, edge inclusive', () => {

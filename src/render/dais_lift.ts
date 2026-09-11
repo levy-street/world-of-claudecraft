@@ -12,17 +12,39 @@
 /** Visual height of the raised dais (2u foundation blocks at 0.3 y-scale). */
 export const DAIS_PLATFORM_HEIGHT = 0.6;
 
+/** The dais facts the lift reads off a DungeonLayout (or a rift floor's). */
+export interface DaisLiftLayout {
+  dais: DaisDisc | null | undefined;
+  /** Flanking platforms (DungeonLayout.platforms): always raised. */
+  platforms?: readonly DaisDisc[] | null;
+}
+
+interface DaisDisc {
+  x: number;
+  z: number;
+  r: number;
+}
+
 /** The extra visual height at an instance-local point: DAIS_PLATFORM_HEIGHT
- * on a RAISED dais, else 0. `raised` is the placeDais decision
- * (style.daisRaised override, else the variant default). */
+ * on a RAISED dais or on any flanking platform, else 0. `raised` is the
+ * placeDais decision (style.daisRaised override, else the variant default);
+ * the platforms ignore it. */
 export function daisVisualLift(
-  dais: { x: number; z: number; r: number } | null | undefined,
+  layout: DaisLiftLayout | null | undefined,
   raised: boolean,
   localX: number,
   localZ: number,
 ): number {
-  if (!dais || !raised) return 0;
-  const dx = localX - dais.x;
-  const dz = localZ - dais.z;
-  return dx * dx + dz * dz <= dais.r * dais.r ? DAIS_PLATFORM_HEIGHT : 0;
+  if (!layout) return 0;
+  if (layout.dais && raised && insideDisc(layout.dais, localX, localZ)) return DAIS_PLATFORM_HEIGHT;
+  for (const platform of layout.platforms ?? []) {
+    if (insideDisc(platform, localX, localZ)) return DAIS_PLATFORM_HEIGHT;
+  }
+  return 0;
+}
+
+function insideDisc(disc: DaisDisc, lx: number, lz: number): boolean {
+  const dx = lx - disc.x;
+  const dz = lz - disc.z;
+  return dx * dx + dz * dz <= disc.r * disc.r;
 }

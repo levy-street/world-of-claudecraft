@@ -11,12 +11,22 @@ import { generateRiftFloor, isSetPieceSeed, riftFloorCount } from '../src/sim/ri
 // shared math and that the case is live rift content.
 
 describe('rift death-zone ring: raised dais lift', () => {
+  it('lifts on a flanking platform whatever the dais decision is', () => {
+    const platforms = [{ x: -30, z: 96, r: 9.5 }];
+    const layout = { dais: { x: 0, z: 96, r: 10 }, platforms };
+    expect(daisVisualLift(layout, false, -30, 96)).toBe(DAIS_PLATFORM_HEIGHT);
+    expect(daisVisualLift(layout, false, 0, 96)).toBe(0);
+    expect(daisVisualLift(layout, false, -30, 96 + 9.51)).toBe(0);
+    expect(daisVisualLift({ dais: null, platforms }, true, -30, 96)).toBe(DAIS_PLATFORM_HEIGHT);
+  });
+
   it('lifts by the platform height on a raised dais, nowhere else', () => {
     const dais = { x: 0, z: 40, r: 10 };
-    expect(daisVisualLift(dais, true, 0, 40)).toBe(DAIS_PLATFORM_HEIGHT);
-    expect(daisVisualLift(dais, true, 0, 49.9)).toBe(DAIS_PLATFORM_HEIGHT);
-    expect(daisVisualLift(dais, true, 0, 50.5)).toBe(0);
-    expect(daisVisualLift(dais, false, 0, 40)).toBe(0);
+    expect(daisVisualLift({ dais }, true, 0, 40)).toBe(DAIS_PLATFORM_HEIGHT);
+    expect(daisVisualLift({ dais }, true, 0, 49.9)).toBe(DAIS_PLATFORM_HEIGHT);
+    expect(daisVisualLift({ dais }, true, 0, 50.5)).toBe(0);
+    expect(daisVisualLift({ dais }, false, 0, 40)).toBe(0);
+    expect(daisVisualLift({ dais: null }, true, 0, 40)).toBe(0);
     expect(daisVisualLift(null, true, 0, 40)).toBe(0);
     expect(daisVisualLift(undefined, true, 0, 40)).toBe(0);
   });

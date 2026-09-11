@@ -47,7 +47,7 @@ major.
 | `/dev nyx curse` | Dread Curse hits you (you must be in melee reach); at 2 stacks the swap callout |
 | `/dev nyx spike` | Two bots (three on heroic) impaled with a spike through them; hit the spikes. A spike is a ward (v0.42.2): 4 hits on normal, 6 on heroic, from anyone, each hit counting one whatever it deals, and its health bar reads as hits remaining. Cast it again inside 55 s: the same bots are never re-picked (the per-raider cooldown) |
 | `/dev nyx eruption` | Purple warning rings under bots, the burst, then purple Grave Flame (12 s normal, 8 s heroic) |
-| `/dev nyx sigil` | The sigil flares 22 yd to the raid's left or right of the boss (alternating each cast, v0.42.2); drag him onto it |
+| `/dev nyx sigil` | The sigil flares on one of the two platforms flanking the throne, 30 yd to the raid's left or right of where the boss spawned (alternating each cast, v0.42.2); drag him up onto it |
 | `/dev nyx phase2` | Health to 69%: the stomp, Brother Aldric's entrance, the wardstones light |
 | `/dev nyx rend` | Three bots (six) marked; the split hit lands when the marks expire and leaves NO fire (Soulfire retired in v0.42.2) |
 | `/dev nyx rage` | Deathless Rage cast; then `/dev nyx wards` makes three bots complete the wardstones (interrupt + stun), or wait and eat the 82% (115%) |
@@ -81,9 +81,11 @@ raid re-forms it at the other difficulty.
   a click anywhere near the spike targets the spike, not the impaled raider.
 - Gravefire is gone (v0.42.2): no line ever runs from the boss and the Bone
   Slam leaves no line behind it. Any traveling fire line is a regression.
-- The Binding Sigil lands beside the boss, 22 yd to the raid's left or right,
-  switching sides every cast (v0.42.2): the tank should always know which way
-  the drag goes.
+- The Binding Sigil lands on one of the two flanking platforms, 30 yd to the
+  raid's left or right of where the boss spawned, switching sides every cast
+  (v0.42.2): the tank should always know which way the drag goes. The
+  platforms are real elevation (the crypt's raised dais reused), so bodies
+  stand on the blocks and the sigil decal sits on top of them, never under.
 - Bone Spikes read ember orange (v0.42.2), the one hue nothing else in the
   hall uses: against the bone-white boss, the grey flagstones, and the purple
   fire a spike should be findable at a glance from across the room, on the

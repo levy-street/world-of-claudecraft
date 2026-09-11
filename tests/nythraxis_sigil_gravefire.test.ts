@@ -6,7 +6,8 @@
 
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { dungeonInstanceAt } from '../src/sim/dungeon_floor';
+import { dungeonFloorLift, dungeonInstanceAt } from '../src/sim/dungeon_floor';
+import { DAIS_HEIGHT } from '../src/sim/dungeon_layout';
 import * as nythraxis from '../src/sim/encounters/nythraxis';
 import {
   NYTHRAXIS_ASCENSION_AURA_ID,
@@ -209,12 +210,13 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
       nythraxis.updateNythraxisEncounter(ctx, boss);
       const sigil = st.sigil!;
       expect(sigil, difficulty).toBeTruthy();
-      // The first cast lands on the raid's right (world -x, see
-      // nythraxisSigilNextSide), the side offset out along the hall's x axis
-      // at the boss's own z (v0.42.2).
-      expect(sigil.x, difficulty).toBeCloseTo(boss.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
-      expect(sigil.z, difficulty).toBeCloseTo(boss.pos.z, 6);
+      // The first cast lands on the raid's-right platform (world -x, see
+      // nythraxisSigilNextSide): the side offset out from the SPAWN along the
+      // hall's x axis, at the spawn's z, wherever the boss has walked (v0.42.2).
+      expect(sigil.x, difficulty).toBeCloseTo(boss.spawnPos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+      expect(sigil.z, difficulty).toBeCloseTo(boss.spawnPos.z, 6);
       expect(st.sigilSide, difficulty).toBe(-1);
+      expect(dungeonFloorLift(sigil.x, sigil.z), difficulty).toBe(DAIS_HEIGHT);
       for (const ward of wards()) {
         expect(flat(ward.pos, sigil), difficulty).toBeGreaterThanOrEqual(
           NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE,
@@ -246,29 +248,25 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     expect(b.st.sigil).toEqual(a.st.sigil);
   });
 
-  it('alternates sides across casts and routes around a wardstone through the real driver', () => {
-    const { sim, ctx, boss, st, wards } = setup();
-    // Park the boss so the raid's-right (world -x) primary spot sits ON a
-    // wardstone (the western stone at local (-30, 74)): the pick walks the
-    // ladder on the same side instead of landing on the stone.
-    const west = wards().find((w) => w.pos.x < boss.spawnPos.x - 10)!;
-    teleport(sim, boss, west.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, west.pos.z, boss.pos.y);
+  it('alternates platforms across casts, anchored on the spawn, wherever the boss stands', () => {
+    const { sim, ctx, boss, st } = setup();
+    // Walk the boss well off the dais: the platforms do not follow him.
+    teleport(sim, boss, boss.spawnPos.x + 14, boss.spawnPos.z - 30, boss.pos.y);
     st.sigilTimer = DT / 2;
     nythraxis.updateNythraxisEncounter(ctx, boss);
     const first = st.sigil!;
-    expect(first).toBeTruthy();
     expect(st.sigilSide).toBe(-1);
-    expect(first.x).toBeCloseTo(boss.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
-    expect(first.z).not.toBeCloseTo(boss.pos.z, 3);
-    for (const ward of wards()) expect(flat(ward.pos, first)).toBeGreaterThanOrEqual(6);
-    // The next cast takes the other side.
+    expect(first.x).toBeCloseTo(boss.spawnPos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(first.z).toBeCloseTo(boss.spawnPos.z, 6);
+    // The next cast takes the other platform.
     nythraxis.clearNythraxisSigil(boss);
     st.sigilTimer = DT / 2;
     st.majorGapTimer = 0;
     nythraxis.updateNythraxisEncounter(ctx, boss);
     const second = st.sigil!;
     expect(st.sigilSide).toBe(1);
-    expect(second.x).toBeCloseTo(boss.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(second.x).toBeCloseTo(boss.spawnPos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(second.z).toBeCloseTo(boss.spawnPos.z, 6);
   });
 
   it('places several driver casts on real open arena floor with two yard bounds clearance', () => {
@@ -300,17 +298,15 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
   });
 
   it('threads normal fire exclusion and heroic fire allowance through the driver', () => {
-    // One Grave Flame patch ON the primary side spot: normal walks the ladder
-    // to a spot clear of it (the 6 yd nudges are inside flame radius plus
-    // sigil radius, so the 12 yd nudge is the first clear one); heroic may
-    // land in fire and takes the primary spot as-is.
+    // One Grave Flame patch ON the asked (right) platform: Normal crosses to
+    // the left platform; Heroic may land in fire and takes the right one.
     const normal = setup();
     const heroic = setup({ difficulty: 'heroic' });
     const flameAt = (boss: Entity) => ({
       seq: 0,
       kind: 'grave' as const,
-      x: boss.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET,
-      z: boss.pos.z,
+      x: boss.spawnPos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET,
+      z: boss.spawnPos.z,
       radius: 3,
       remaining: 10,
       tickTimer: 1,
@@ -323,18 +319,10 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     nythraxis.updateNythraxisEncounter(heroic.ctx, heroic.boss);
     const normalSigil = normal.st.sigil!;
     const heroicSigil = heroic.st.sigil!;
-    expect(normalSigil).toBeTruthy();
-    expect(heroicSigil).toBeTruthy();
-    const normalFlame = normal.st.graveFlames[0];
-    expect(normalSigil.x).toBeCloseTo(normalFlame.x, 6);
-    // The ladder walks +6, -6, +12 in that order: +12 is the first clear rung.
-    expect(normalSigil.z - normalFlame.z).toBeCloseTo(12, 6);
-    expect(flat(normalSigil, normalFlame)).toBeGreaterThanOrEqual(
-      3 + nythraxisSigilRadius('normal'),
-    );
-    const heroicFlame = heroic.st.graveFlames[0];
-    expect(heroicSigil.x).toBeCloseTo(heroicFlame.x, 6);
-    expect(heroicSigil.z).toBeCloseTo(heroicFlame.z, 6);
+    expect(normalSigil.x).toBeCloseTo(normal.boss.spawnPos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(normalSigil.z).toBeCloseTo(normal.boss.spawnPos.z, 6);
+    expect(heroicSigil.x).toBeCloseTo(heroic.boss.spawnPos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(heroicSigil.z).toBeCloseTo(heroic.boss.spawnPos.z, 6);
   });
 
   it('climbs Deathless Ascension every two seconds while the sigil stands', () => {

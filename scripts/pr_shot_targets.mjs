@@ -15925,13 +15925,13 @@ export const TARGETS = [
         // raid's right of the boss, world -x, which reads on the screen's
         // right when looking up the hall), the spike line, and the boss
         // share one frame.
-        player.pos = { x: bx - 6, y: player.pos.y, z: bz - 34 };
+        player.pos = { x: bx - 10, y: player.pos.y, z: bz - 40 };
         player.prevPos = { ...player.pos };
         player.facing = Math.atan2(bx - player.pos.x, bz - player.pos.z);
         sim.rebucket(player);
         game.input.camYaw = player.facing;
-        game.input.camDist = 30;
-        game.input.camPitch = 0.55;
+        game.input.camDist = 36;
+        game.input.camPitch = 0.6;
       });
       await awaitWorldPainted(page);
       await wait(1500);

@@ -1582,11 +1582,12 @@ export function startNythraxisSigil(
   const ms = nythraxisMechanicState(st);
   const difficulty = nythraxisDifficulty(ctx, boss);
   const castKey = (Math.imul(ctx.tickCount, 0x9e3779b1) ^ boss.id ^ 0x5161) >>> 0;
-  // Beside the boss on the raid's left or right, alternating every cast.
+  // On the flanking platform to the raid's left or right of the SPAWN,
+  // alternating every cast (the platforms are fixed spots, wherever he is).
   const side = nythraxisSigilNextSide(ms.sigilSide);
   ms.sigilSide = side;
   const point = nythraxisSigilPlacement(
-    { x: boss.pos.x, z: boss.pos.z },
+    { x: boss.spawnPos.x, z: boss.spawnPos.z },
     side,
     nythraxisSigilRadius(difficulty),
     nythraxisSigilFloor(ctx, boss, ms),

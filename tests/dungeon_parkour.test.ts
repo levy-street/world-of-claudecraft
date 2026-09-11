@@ -71,8 +71,32 @@ describe('the boss dais is real elevation', () => {
   it('lifts the interior floor only inside a raised dais', () => {
     expect(daisLiftAt(CRYPT_LAYOUT, CRYPT_LAYOUT.dais.x, CRYPT_LAYOUT.dais.z)).toBe(DAIS_HEIGHT);
     expect(daisLiftAt(CRYPT_LAYOUT, 0, 40)).toBe(0);
-    // Flat fighting floors stay flat: the raid room draws no platform.
+    // The raid room's own dais stays flat, but its two flanking platforms
+    // (the crypt's dais object reused, v0.42.2) are real elevation whatever
+    // daisRaised says: the sigil stages the tank drags him onto.
     expect(daisLiftAt(NYTHRAXIS_LAYOUT, 0, NYTHRAXIS_LAYOUT.dais.z)).toBe(0);
+    expect(NYTHRAXIS_LAYOUT.daisRaised).toBeUndefined();
+    for (const platform of NYTHRAXIS_LAYOUT.platforms ?? []) {
+      expect(daisLiftAt(NYTHRAXIS_LAYOUT, platform.x, platform.z)).toBe(DAIS_HEIGHT);
+      expect(daisLiftAt(NYTHRAXIS_LAYOUT, platform.x + platform.r + 0.01, platform.z)).toBe(0);
+    }
+    expect(NYTHRAXIS_LAYOUT.platforms).toHaveLength(2);
+    // The crypt's raised dais object reused, radius included.
+    for (const platform of NYTHRAXIS_LAYOUT.platforms ?? []) {
+      expect(platform.r).toBe(CRYPT_LAYOUT.dais.r);
+    }
+  });
+
+  it('stands the raid on the flanking platforms in world coordinates', () => {
+    const o = instanceOrigin(DUNGEONS.nythraxis_boss_arena.index, 0);
+    for (const platform of NYTHRAXIS_LAYOUT.platforms ?? []) {
+      expect(groundHeight(o.x + platform.x, o.z + platform.z, SEED)).toBeCloseTo(
+        DUNGEON_FLOOR_Y + DAIS_HEIGHT,
+        6,
+      );
+    }
+    const d = NYTHRAXIS_LAYOUT.dais;
+    expect(groundHeight(o.x + d.x, o.z + d.z, SEED)).toBeCloseTo(DUNGEON_FLOOR_Y, 6);
   });
 
   it('groundHeight stands everything on the stage, in world coordinates', () => {

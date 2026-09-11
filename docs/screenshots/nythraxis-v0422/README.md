@@ -51,8 +51,9 @@ frame shows its pool.
 What the images show: before, the target frame reads `1000 / 1000` (the spike's
 health pool) and the sigil sits wherever its hash spot fell (here far back near
 the wall to the raid's right); after, the target frame reads `4 / 4` (the ward's
-hit count on Normal) and the sigil flares 22 yd beside the boss on the raid's
-right (world -x, which is the screen's right looking up the hall). The images do
+hit count on Normal) and the sigil flares on the flanking platform 30 yd to the
+raid's right of the spawn (world -x, which is the screen's right looking up the
+hall), the crypt's raised dais reused on both sides of the throne. The images do
 not measure the click capsule (a picking radius, not a drawn thing), the hit rule
 itself, or the Gravefire retirement (an absence).
 

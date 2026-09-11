@@ -250,7 +250,7 @@ Unbound sigils (compounding boss damage against the clock).
 | Dread Curse | 25% hit, +35% per stack, swap at 2 | 30% hit, +45% per stack, swap at 2 |
 | Bone Spike | every 24 s, 2 victims, 8%/s, 4 hits to shatter, 55 s per-raider cooldown (v0.42.2) | every 20 s, 3 victims, 10%/s, 6 hits to shatter, 55 s per-raider cooldown (v0.42.2) |
 | Grave Eruption | every 15 s, 4 circles, 45%, flame 12 s at 6%/s | every 12 s, 6 circles, 75%, flame never goes out (clears at the transition) at 9%/s |
-| Binding Sigil | every 45 s, 22 yd to the raid's left or right (alternating, v0.42.2), 4 yd, 15 s to bind, +4%/stack, Bound 10 s, Unbound 40%, keeps +20% | every 40 s, same placement, 3 yd, 12 s, +5%/stack, Bound 8 s, Unbound 60%, keeps +25%, may land in fire |
+| Binding Sigil | every 45 s, on one of the two flanking platforms 30 yd to the raid's left or right of the spawn (alternating, v0.42.2), 4 yd, 15 s to bind, +4%/stack, Bound 10 s, Unbound 40%, keeps +20% | every 40 s, same placement, 3 yd, 12 s, +5%/stack, Bound 8 s, Unbound 60%, keeps +25%, may land in fire |
 | Soul Rend | 3 marks, 100% split, no pool since v0.42.2 | 6 marks, 150% split, no pool since v0.42.2 |
 | Deathless Rage | 82% on failure (unchanged) | 115% on failure, lethal, court rises (unchanged) |
 | Gravefire | retired from play in v0.42.2 (no line, no slam line) | retired from play in v0.42.2 |
@@ -603,17 +603,23 @@ only the points named below.
   Soulfire; the Raid Boss Guide row, the finder chip, and the `/dev nyx
   gravefire` poke are gone. Bone Storm is now the whirl, the charges, and the
   slam burst alone.
-- **The Binding Sigil lands beside the boss on the raid's left or right.** No
-  more hash ring 12 to 30 yd out: the sigil lands 22 yd from the boss along
-  the hall's x axis (the open floor between the dais and the pillar rows),
-  at his own z, alternating sides every cast starting on the raid's right.
-  A blocked spot (pillar, tomb, wardstone, Normal fire) walks a fixed ladder
-  on the same side (z nudges of 6, 12, 18 yd, then the same at 16 yd out);
-  the last resort is the primary spot itself, never under the boss. The
-  arena has no raised platforms in the sim (a flat fighting floor by
-  design), so "on platforms" is read as this open floor; if the intent was
-  the tomb alcoves along the walls, `NYTHRAXIS_SIGIL_SIDE_OFFSET` is the one
-  constant to move.
+- **The Binding Sigil lands on one of the two platforms flanking the throne.**
+  No more hash ring 12 to 30 yd out: the Abandoned Crypt's raised boss dais
+  (`CRYPT_LAYOUT.dais`, the `DAIS_HEIGHT` foundation-block disc with a
+  walkable floor lift and no obstacle collider) is reused twice in the raid
+  layout (`NYTHRAXIS_LAYOUT.platforms`), in line with where Nythraxis spawns
+  and `NYTHRAXIS_PLATFORM_SIDE_OFFSET` (30 yd) to the raid's left and right
+  of him. The sim lifts its floor on them (`daisLiftAt`) and the renderer
+  stacks the same blocks (`src/render/dais_blocks_core.ts`) with the ritual
+  glow pooled on top, so a sigil drawn at ground height sits on the blocks,
+  never under them. The sigil lands on the platform centre, alternating
+  sides every cast starting on the raid's right, anchored on the SPAWN
+  rather than the boss's current position, so the two stages are fixed
+  spots the raid can learn wherever he has been dragged. A blocked platform
+  (wardstone, Normal fire) sends the sigil to the other one; when both are
+  blocked it takes the asked one, never the anchor itself. The 22 yd
+  open-floor placement and its same-side ladder from the first cut of this
+  pass are gone.
 - **Unchanged by this pass:** the spike cadence, victims per wave, the impale
   drain, the 55 s per-raider cooldown, Grave Eruption and Grave Flame, Dread
   Curse, Deathless Rage, the sigil's cadence, radius, bind window, Ascension

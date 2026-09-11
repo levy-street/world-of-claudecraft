@@ -2949,7 +2949,7 @@ export class Renderer {
           const lz = z - rf.origin.z;
           const raised = floor.style.daisRaised ?? dungeonDaisHasRaisedPlatform(floor.style.kit);
           return (
-            base + riftLiftAt(floor, lx, lz) + daisVisualLift(floor.layout.dais, raised, lx, lz)
+            base + riftLiftAt(floor, lx, lz) + daisVisualLift(floor.layout, raised, lx, lz)
           );
         }
         return base;
