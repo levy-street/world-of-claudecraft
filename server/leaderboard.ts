@@ -24,7 +24,6 @@
 // registry.ts can spread while the handlers still reach main.ts state.
 
 import type * as http from 'node:http';
-import type { AccountLedger } from '../src/sim/account_ledger';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -41,7 +40,8 @@ import type {
   GuildLeaderboardEntry,
   LeaderboardEntry,
 } from '../src/world_api';
-import { loadAccountLedger } from './account_ledger_db';
+import type { AccountLedgerKeys } from './account_ledger_db';
+import { accountLedgerKeysFor } from './account_ledger_keys_cache';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   type ArenaLeaderRow,
@@ -428,7 +428,7 @@ interface PublicSheetDb {
   recentDeedsForCharacter(characterId: number, limit: number): Promise<RecentDeedRow[]>;
   /** The account ledger behind the sheet's account-wide Reliquary pair;
    *  optional so a fake bundle without it reads the character's own fills. */
-  loadAccountLedger?(accountId: number): Promise<AccountLedger>;
+  loadAccountLedgerKeys?(accountId: number): Promise<AccountLedgerKeys>;
 }
 
 /** The non-DB inputs the public sheet needs (realm, share origin, rank shaper). */
@@ -458,7 +458,7 @@ export async function readPublicSheet(
     db.lifetimeXpRankForCharacter(row.id),
     db.recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
     // Cosmetic aggregate: a failed ledger read degrades to the character's own fills.
-    db.loadAccountLedger?.(row.account_id).catch(() => undefined),
+    db.loadAccountLedgerKeys?.(row.account_id).catch(() => undefined),
   ]);
   return {
     status: 200,
@@ -491,7 +491,7 @@ const REAL_DB_READS = {
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
   recentDeedsForCharacter,
-  loadAccountLedger,
+  loadAccountLedgerKeys: accountLedgerKeysFor,
 };
 let dbReads = REAL_DB_READS;
 

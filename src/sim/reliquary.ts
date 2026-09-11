@@ -20,6 +20,7 @@ import {
   accountDeedLookup,
   accountRelicKey,
   accountRelicLookup,
+  isKnownAccountRelicKey,
   recordAccountDeed,
   recordAccountRelic,
   selfEarner,
@@ -1383,6 +1384,9 @@ function recordRelic(
   opts?: Readonly<{ retro?: boolean }>,
 ): void {
   const key = accountRelicKey(kind, id);
+  // Catalog-bounded like both read paths: an uncatalogued mount or mark never
+  // lands an entry the online mirror would drop or a row no reader loads.
+  if (!isKnownAccountRelicKey(key)) return;
   if (!recordAccountRelic(meta.accountLedger, key, selfEarner(meta, ctx.utcDay))) return;
   ctx.emit({
     type: 'relicRecorded',
@@ -1406,7 +1410,7 @@ export function selfRelicKeys(meta: PlayerMeta): string[] {
   }
   for (const markId of meta.reliquary.marks) keys.push(accountRelicKey('mark', markId));
   for (const mountKey of ownedMountKeys(meta)) keys.push(accountRelicKey('mount', mountKey));
-  return keys;
+  return keys.filter(isKnownAccountRelicKey);
 }
 
 /**

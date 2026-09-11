@@ -32,6 +32,7 @@ vi.mock('../server/db', () => ({
 vi.mock('../server/account_ledger_db', () => ({
   insertAccountRelicFinds: vi.fn(async () => {}),
   loadAccountLedger: vi.fn(async () => ({ deeds: new Map(), relics: new Map() })),
+  loadAccountLedgerKeys: vi.fn(async () => ({ deeds: new Set(), relics: new Set() })),
 }));
 
 vi.mock('../server/deeds_db', () => ({

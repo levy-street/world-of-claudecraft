@@ -13,6 +13,7 @@
 
 import type { PlayerClass } from '../src/sim/types';
 import { insertAccountRelicFinds } from './account_ledger_db';
+import { bustAccountLedgerKeys } from './account_ledger_keys_cache';
 import { REALM } from './realm';
 
 let tail: Promise<void> = Promise.resolve();
@@ -36,6 +37,8 @@ export function recordRelicFinds(who: RelicRecordWho, relicKeys: readonly string
   try {
     tail = tail
       .then(() => insertAccountRelicFinds({ realm: REALM, ...who }, keys))
+      // The public sheet's cached ledger view learns the row on its next read.
+      .then(() => bustAccountLedgerKeys(who.accountId))
       .catch((err) => {
         console.error('account_relic_finds write failed:', err);
       });

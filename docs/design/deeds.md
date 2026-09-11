@@ -253,6 +253,15 @@ account ledger (`src/sim/account_ledger.ts`), and its scope model is fixed:
   and is never serialized into `CharacterState`. Offline the one sandbox
   character fills its own ledger, so both hosts read the same shape
   (`tests/account_ledger_sim.test.ts`, `tests/account_ledger_wire.test.ts`).
+- **Watching stays per character.** A deed an alt earned reads as earned in
+  this character's Book, but it stays watchable here and the HUD tracker keeps
+  tracking it (`watchable` and the prune read `deedsEarned`, not the union):
+  this character can still earn it and be listed as an earner too.
+- **The public sheets read an ids-only, cached view.** `/c/`, the public JSON
+  sheet, and the owner sheet take `accountLedgerKeysFor`
+  (`server/account_ledger_keys_cache.ts`, a keyed single-flight TTL cache the
+  two record observers bust when a row lands), so no earner detail enters an
+  anonymous handler and no request re-walks the account's rows.
 - **Character deletion.** `account_relic_finds` carries no character FK and
   snapshots the finder's name and class, so a relic find outlives the
   character that made it (the account keeps its Reliquary; the idea follows

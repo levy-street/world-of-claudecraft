@@ -36,6 +36,10 @@ const PAGE_ID = 'conquerors_hollow_crypt';
 const MARK_ID = 'gather_event:pristine_vein';
 const MOUNT_KEY = RELIQUARY_HORIZON_MOUNTS[0];
 const TITLE_DEED = DEED_ORDER.find((id) => DEEDS[id].reward?.kind === 'title')!;
+// The flagship page whose full illumination grants a completion-ladder deed
+// (RELIQUARY_ILLUMINATION_DEED_PAGES); its relics are all items.
+const FLAGSHIP_DEED = 'col_reliquary_illum_thunzharr';
+const FLAGSHIP_PAGE = 'conquerors_thunzharr';
 const BORDER_DEED = DEED_ORDER.find((id) => DEEDS[id].reward?.kind === 'border')!;
 
 const ALT: AccountEarner = { characterId: 99, name: 'Bram', cls: 'mage', day: '2026-09-01' };
@@ -195,6 +199,49 @@ describe('display lane unions the ledger, grant lane stays character-scoped', ()
     for (const id of RELIQUARY_COMPLETION_DEED_IDS) {
       expect(meta.deedsEarned.has(id), id).toBe(false);
     }
+  });
+
+  it('a fill chain on THIS character that completes a flagship page only through the union grants no illumination deed', () => {
+    // Decisive form (review): the rank bridge and the completion ladder run
+    // INSIDE the fill chain, so the acting character must actually discover
+    // something. The alt owns every Thunzharr relic but the last; this
+    // character finds the last one, the union completes the page, and the
+    // flagship illumination deed still must not land here (a per-character
+    // grant lane reads one own fill, not a whole page).
+    const { sim, meta } = makeSim();
+    sim.tick();
+    const relics = RELIQUARY_PAGES_BY_ID[FLAGSHIP_PAGE].relics.filter((r) => r.kind === 'item');
+    expect(relics.length).toBeGreaterThan(2);
+    const last = relics[relics.length - 1];
+    if (last.kind !== 'item') throw new Error('flagship page ends in a non-item relic');
+    for (const relic of relics.slice(0, -1)) {
+      if (relic.kind === 'item') {
+        recordAccountRelic(meta.accountLedger, accountRelicKey('item', relic.itemId), ALT);
+      }
+    }
+    expect(sim.reliquaryPageCompletion(FLAGSHIP_PAGE)?.complete).toBe(false);
+    markItemDiscovered(sim.ctx, meta, last.itemId);
+    sim.tick();
+    // The union completes the page for the display lane...
+    expect(sim.reliquaryPageCompletion(FLAGSHIP_PAGE)?.complete).toBe(true);
+    // ...but the grant lane saw ONE own fill: no illumination deed, no rank
+    // bridge above rank 1 (which has no deed), and the alt-only entries stayed
+    // out of this character's own discovery set.
+    expect(meta.deedsEarned.has(FLAGSHIP_DEED)).toBe(false);
+    for (const def of CURATOR_RANK_DEFS) {
+      if (def.deedId) expect(meta.deedsEarned.has(def.deedId), def.deedId).toBe(false);
+    }
+    // Of the page's relics, only the one this character found is in its own set
+    // (the sandbox character already knows its starter gear, so no bare size).
+    expect(relics.filter((r) => meta.deedStats.itemsDiscovered.has(r.itemId))).toEqual([last]);
+    // Control: the same fills on this character's OWN surfaces do grant it.
+    const own = makeSim();
+    own.sim.tick();
+    for (const relic of relics) {
+      if (relic.kind === 'item') markItemDiscovered(own.sim.ctx, own.meta, relic.itemId);
+    }
+    own.sim.tick();
+    expect(own.meta.deedsEarned.has(FLAGSHIP_DEED)).toBe(true);
   });
 
   it('accountDeeds exposes the ledger deed half and marks/mounts union through the account surfaces', () => {

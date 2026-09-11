@@ -13,12 +13,7 @@
 // recalcPlayerStats (through characterDerivedStats), zone via zoneAt, spec via
 // the talents specLabel, virtualLevel via the types helper.
 
-import {
-  type AccountLedger,
-  accountDeedLookup,
-  accountRelicLookup,
-  freshAccountLedger,
-} from '../src/sim/account_ledger';
+import { accountDeedLookup, accountRelicLookup, type HasLookup } from '../src/sim/account_ledger';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import {
   computeTalentModifiers,
@@ -71,8 +66,18 @@ export interface CharacterSheetInput {
   // union the in-game window and the inspect card show (jgyy's public-sheet
   // read from PR #3933). Absent means the caller fetched none: the pair then
   // reads the character's own fills only (a degraded, never a wrong, aggregate).
-  accountLedger?: AccountLedger;
+  accountLedger?: AccountLedgerLookup;
 }
+
+/** The account ledger as the sheet needs it: membership only. The join-time
+ *  AccountLedger (Maps) satisfies it; the sheets pass the cached ids-only
+ *  AccountLedgerKeys (Sets) so earner detail never enters a public handler. */
+export interface AccountLedgerLookup {
+  deeds: HasLookup;
+  relics: HasLookup;
+}
+
+const NO_LEDGER: AccountLedgerLookup = { deeds: new Set<string>(), relics: new Set<string>() };
 
 export interface MoneySplit {
   gold: number;
@@ -326,7 +331,7 @@ export function sheetRecentRelicsFromSaved(saved: CharacterState['reliquary']): 
  */
 export function sheetReliquaryFromState(
   state: CharacterState,
-  accountLedger?: AccountLedger,
+  accountLedger?: AccountLedgerLookup,
 ): SheetReliquary {
   const itemsDiscovered = new Set(state.deedStats?.itemsDiscovered ?? []);
   // Narrow restores: this path wants the marks set and the recent ring, not the
@@ -349,7 +354,7 @@ export function sheetReliquaryFromState(
   const ownedMounts = new Set(bagOwnedMounts(inv));
   const deedsEarned = new Set(Object.keys(state.deeds ?? {}));
   // Account-wide when the ledger rode along: the same union the window reads.
-  const ledger = accountLedger ?? freshAccountLedger();
+  const ledger = accountLedger ?? NO_LEDGER;
   const opts = {
     itemsDiscovered: accountRelicLookup(itemsDiscovered, ledger, 'item'),
     marks: accountRelicLookup(marks, ledger, 'mark'),

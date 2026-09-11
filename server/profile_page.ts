@@ -8,7 +8,7 @@
 // pos), so the page leaks nothing the public JSON wouldn't.
 
 import type * as http from 'node:http';
-import { loadAccountLedger } from './account_ledger_db';
+import { accountLedgerKeysFor } from './account_ledger_keys_cache';
 import { avatarPng, isPlayerClass, isValidSkin } from './avatar';
 import {
   type CharacterSheet,
@@ -94,7 +94,7 @@ export async function handleProfilePage(
       guildNameForCharacter(row.id),
       lifetimeXpRankForCharacter(row.id),
       // Cosmetic aggregate: a failed ledger read degrades to the character's own fills.
-      loadAccountLedger(row.account_id).catch(() => undefined),
+      accountLedgerKeysFor(row.account_id).catch(() => undefined),
     ]);
     const sheet = characterSheet({
       row,

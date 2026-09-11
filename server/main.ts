@@ -49,6 +49,8 @@ import {
   verifyLoginTwoFactor,
 } from './account';
 import { loadAccountLedger } from './account_ledger_db';
+import { accountLedgerKeysFor } from './account_ledger_keys_cache';
+import { relicRecordsIdle } from './account_ledger_records';
 import {
   configureTopWealthHolders,
   startAccountWealthSweep,
@@ -1971,7 +1973,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
         recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
-        loadAccountLedger(row.account_id).catch(() => undefined),
+        accountLedgerKeysFor(row.account_id).catch(() => undefined),
       ]);
       return json(
         res,
@@ -1999,7 +2001,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
         recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
-        loadAccountLedger(row.account_id).catch(() => undefined),
+        accountLedgerKeysFor(row.account_id).catch(() => undefined),
       ]);
       return json(
         res,
@@ -4249,6 +4251,10 @@ export async function startServer(): Promise<http.Server> {
     // go missing until that character's next login (the join reconcile is the
     // only heal). Rejections log inside the writer, so the drain never throws.
     await deedRecordsIdle();
+    // The account ledger's relic FIFO (account_relic_finds) drains on the same
+    // reasoning: a queued insert rejected by pool.end() would wait for the
+    // finder's next login reconcile while its alts miss the find.
+    await relicRecordsIdle();
     // Drain the progress-events FIFO (level_up_events / ftue_events) as well:
     // unlike deeds these rows have no reconcile heal path, so a row dropped by
     // pool.end() is gone. Rejections log inside the writer; never throws.

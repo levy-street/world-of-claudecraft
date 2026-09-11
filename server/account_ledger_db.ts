@@ -132,6 +132,38 @@ export async function loadAccountLedger(accountId: number): Promise<AccountLedge
   return accountLedgerFromRows(deeds.rows as LedgerRow[], relics.rows as LedgerRow[]);
 }
 
+/** The public sheet's ledger view: the account's deed ids and relic keys,
+ *  nothing else (no names, classes, ids, or days cross into the anonymous
+ *  handlers). Two DISTINCT reads over the account indexes, no character join,
+ *  catalog-bounded on the way out; served through the TTL cache in
+ *  server/account_ledger_keys_cache.ts, never per request. */
+export interface AccountLedgerKeys {
+  deeds: ReadonlySet<string>;
+  relics: ReadonlySet<string>;
+}
+
+export async function loadAccountLedgerKeys(accountId: number): Promise<AccountLedgerKeys> {
+  const [deeds, relics] = await Promise.all([
+    pool.query('SELECT DISTINCT deed_id AS key FROM character_deeds WHERE account_id = $1', [
+      accountId,
+    ]),
+    pool.query('SELECT DISTINCT relic_key AS key FROM account_relic_finds WHERE account_id = $1', [
+      accountId,
+    ]),
+  ]);
+  const deedIds = new Set<string>();
+  for (const row of deeds.rows as { key: unknown }[]) {
+    const id = String(row.key);
+    if (isKnownAccountDeedId(id)) deedIds.add(id);
+  }
+  const relicKeys = new Set<string>();
+  for (const row of relics.rows as { key: unknown }[]) {
+    const key = String(row.key);
+    if (isKnownAccountRelicKey(key)) relicKeys.add(key);
+  }
+  return { deeds: deedIds, relics: relicKeys };
+}
+
 // The account_relic_finds DDL, this domain's own *_SCHEMA. FK-references
 // accounts(id), so ensureSchema (server/db.ts) applies it after SCHEMA beside
 // DEEDS_SCHEMA, unconditionally (idempotent).

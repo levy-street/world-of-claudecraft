@@ -943,7 +943,7 @@ export class DeedsWindow {
    *  HUD tracker. */
   private pruneWatchedIfStale(): void {
     this.ensureWatchLoaded();
-    const result = pruneWatched(this.watchedSet, this.earnedUnion(), DEEDS);
+    const result = pruneWatched(this.watchedSet, this.deps.world().deedsEarned, DEEDS);
     if (!result.changed) return;
     this.watchedSet = new Set(result.watched);
     this.watchRev++;

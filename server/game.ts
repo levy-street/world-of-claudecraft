@@ -9381,10 +9381,12 @@ export class GameServer {
               ) {
                 return;
               }
-              mine.push(fragments[i]);
               // a sim-driven change to a heavy self field (loot, level-up, quest
               // credit, ...) refreshes those fields on the next snapshot
               if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;
+              // relicRecorded has no client consumer (the acct key is the authority): never ship it.
+              if (ev.type === 'relicRecorded') return;
+              mine.push(fragments[i]);
               // A match concluding (win, loss, draw, or forfeit) changes rating
               // and standings on the throttled `arena` self key (ARENA_WIRE_HZ):
               // force it fresh next snapshot instead of leaving the Arena

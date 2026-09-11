@@ -12,8 +12,8 @@
 // ACCOUNT-wide (accountReliquaryOwnership): the inspect card's standing is
 // the same union the Reliquary window shows its owner. That is NOT a promise
 // inspect and /c/ agree at every instant: this reads LIVE meta, the public
-// sheet reads the PERSISTED per-character blob, so /c/ lags live meta until
-// the next save and reads the character's own fills only.
+// sheet reads the PERSISTED per-character blob plus a TTL-cached ledger key
+// read, so /c/ lags live meta until the next save and the next cache turn.
 //
 // Unranked reads as ABSENT, not zero: an owned count of 0 clears all three
 // fields so a fresh character's identity record carries no standing at all.

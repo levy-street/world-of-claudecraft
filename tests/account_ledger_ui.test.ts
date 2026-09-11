@@ -104,7 +104,8 @@ describe('Book of Deeds view core over the account ledger', () => {
     expect(title.earned).toBe(true);
     expect(title.earnedDay).toBe('2026-09-01');
     expect(title.earners).toEqual([ALT]);
-    expect(title.watchable).toBe(false);
+    // Watch stays keyed on own progress: alt-earned is still watchable here.
+    expect(title.watchable).toBe(true);
     expect(model.entries.find((e) => e.id === 'hid_secret')?.earned).toBe(true);
     // Header pair, category count, title picker all count the union.
     expect(model.summary.earned).toBe(2);

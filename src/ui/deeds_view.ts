@@ -408,7 +408,9 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
       earners: input.accountDeeds?.get(id) ?? [],
       renown: def.renown,
       progress,
-      watchable: !earned,
+      // Watch stays keyed on THIS character's own progress: a deed an alt earned
+      // reads earned, but this character can still earn it and be listed too.
+      watchable: !input.deedsEarned.has(id),
       watched: input.watched.has(id),
       feat,
       hiddenBadge: def.hidden === true,

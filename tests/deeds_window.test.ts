@@ -116,9 +116,9 @@ describe('painter hygiene', () => {
     const start = painter.indexOf('private pruneWatchedIfStale(');
     expect(start).toBeGreaterThan(-1);
     const body = painter.slice(start, painter.indexOf('private ensureWatchLoaded(', start));
-    // The prune reads the ACCOUNT-wide earned map (own earns plus every alt's),
-    // so a deed an alt just earned leaves the watchlist too.
-    expect(body).toContain('pruneWatched(this.watchedSet, this.earnedUnion(), DEEDS)');
+    // The prune stays keyed on THIS character's own earns: a deed an alt earned
+    // is still watchable and trackable here (the jump category reads the union).
+    expect(body).toContain('pruneWatched(this.watchedSet, this.deps.world().deedsEarned, DEEDS)');
     expect(painter).toContain(
       'accountEarnedDays(world.deedsEarned, { deeds: world.accountDeeds })',
     );

@@ -55,7 +55,6 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
-import { accountDeedLookup } from '../sim/account_ledger';
 import { isOwnAura } from '../sim/aura_classify';
 import { bagPools } from '../sim/bags';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
@@ -16081,7 +16080,7 @@ export class Hud {
     const view = buildDeedTrackerViewInto(
       this.deedTrackerView,
       this.deedsWindow.watched,
-      accountDeedLookup(this.sim.deedsEarned, { deeds: this.sim.accountDeeds }),
+      this.sim.deedsEarned,
       this.sim.deedStats,
       DEEDS,
       collapsed,

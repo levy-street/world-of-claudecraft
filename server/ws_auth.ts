@@ -15,7 +15,7 @@ import { randomUUID } from 'node:crypto';
 import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
-import type { AccountLedger } from '../src/sim/account_ledger';
+import { type AccountLedger, freshAccountLedger } from '../src/sim/account_ledger';
 import {
   type BankBonusSource,
   DUNGEON_ENTRY_FACING_WIRE_VERSION,
@@ -361,7 +361,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       // state the join hands the sim, so one round trip covers the pair.
       const [accountCosmetics, accountLedger] = await Promise.all([
         loadAccountCosmetics(accountId),
-        loadAccountLedger(accountId),
+        // A cosmetic table must never gate login: a failed read joins with a
+        // fresh ledger (the sim's own default) and the next join retries.
+        loadAccountLedger(accountId).catch(() => freshAccountLedger()),
       ]);
       const joinMeta = {
         ...meta,
