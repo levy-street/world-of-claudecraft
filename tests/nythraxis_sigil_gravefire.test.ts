@@ -14,11 +14,9 @@ import {
   NYTHRAXIS_BOUND_AURA_ID,
   NYTHRAXIS_BOUND_STUN_AURA_ID,
   NYTHRAXIS_SIGIL_FLOOR_CLEARANCE,
-  NYTHRAXIS_SIGIL_MAX_DIST,
-  NYTHRAXIS_SIGIL_MIN_DIST,
+  NYTHRAXIS_SIGIL_SIDE_OFFSET,
   NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE,
   NYTHRAXIS_UNBOUND_AURA_ID,
-  nythraxisSigilCandidate,
   nythraxisSigilRadius,
 } from '../src/sim/nythraxis_binding_sigil';
 import {
@@ -211,9 +209,11 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
       nythraxis.updateNythraxisEncounter(ctx, boss);
       const sigil = st.sigil!;
       expect(sigil, difficulty).toBeTruthy();
-      const d = flat(sigil, boss.pos);
-      expect(d, difficulty).toBeGreaterThanOrEqual(NYTHRAXIS_SIGIL_MIN_DIST - 1e-6);
-      expect(d, difficulty).toBeLessThanOrEqual(NYTHRAXIS_SIGIL_MAX_DIST + 1e-6);
+      // The first cast lands on the raid's right, the side offset out along
+      // the hall's x axis at the boss's own z (v0.42.2).
+      expect(sigil.x, difficulty).toBeCloseTo(boss.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+      expect(sigil.z, difficulty).toBeCloseTo(boss.pos.z, 6);
+      expect(st.sigilSide, difficulty).toBe(1);
       for (const ward of wards()) {
         expect(flat(ward.pos, sigil), difficulty).toBeGreaterThanOrEqual(
           NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE,
@@ -245,19 +245,29 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     expect(b.st.sigil).toEqual(a.st.sigil);
   });
 
-  it('routes around the nearby Threshold Wardstone through the real driver', () => {
+  it('alternates sides across casts and routes around a wardstone through the real driver', () => {
     const { sim, ctx, boss, st, wards } = setup();
-    teleport(sim, boss, boss.spawnPos.x, boss.spawnPos.z - 16, boss.pos.y);
+    // Park the boss so the raid's-right primary spot sits ON a wardstone
+    // (the eastern stone at local (30, 74)): the pick walks the ladder on the
+    // same side instead of landing on the stone.
+    const east = wards().find((w) => w.pos.x > boss.spawnPos.x + 10)!;
+    teleport(sim, boss, east.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, east.pos.z, boss.pos.y);
     st.sigilTimer = DT / 2;
     nythraxis.updateNythraxisEncounter(ctx, boss);
-    const sigil = st.sigil!;
-    expect(sigil).toBeTruthy();
-    for (const ward of wards()) expect(flat(ward.pos, sigil)).toBeGreaterThanOrEqual(6);
-    expect(
-      Array.from({ length: 48 }, (_, i) =>
-        nythraxisSigilCandidate(sigil.castKey, i, boss.pos),
-      ).some((candidate) => wards().some((ward) => flat(ward.pos, candidate) < 6)),
-    ).toBe(true);
+    const first = st.sigil!;
+    expect(first).toBeTruthy();
+    expect(st.sigilSide).toBe(1);
+    expect(first.x).toBeCloseTo(boss.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(first.z).not.toBeCloseTo(boss.pos.z, 3);
+    for (const ward of wards()) expect(flat(ward.pos, first)).toBeGreaterThanOrEqual(6);
+    // The next cast takes the other side.
+    nythraxis.clearNythraxisSigil(boss);
+    st.sigilTimer = DT / 2;
+    st.majorGapTimer = 0;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    const second = st.sigil!;
+    expect(st.sigilSide).toBe(-1);
+    expect(second.x).toBeCloseTo(boss.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
   });
 
   it('places several driver casts on real open arena floor with two yard bounds clearance', () => {
@@ -289,53 +299,40 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
   });
 
   it('threads normal fire exclusion and heroic fire allowance through the driver', () => {
+    // One Grave Flame patch ON the primary side spot: normal walks the ladder
+    // to a spot clear of it (the 6 yd nudges are inside flame radius plus
+    // sigil radius, so the 12 yd nudge is the first clear one); heroic may
+    // land in fire and takes the primary spot as-is.
     const normal = setup();
-    const normalWithoutFire = setup();
     const heroic = setup({ difficulty: 'heroic' });
-    normalWithoutFire.st.sigilTimer = DT / 2;
-    nythraxis.updateNythraxisEncounter(normalWithoutFire.ctx, normalWithoutFire.boss);
-    const openPlacement = normalWithoutFire.st.sigil!;
-    const openAngle = Math.atan2(
-      openPlacement.x - normalWithoutFire.boss.pos.x,
-      openPlacement.z - normalWithoutFire.boss.pos.z,
-    );
-    const gapAngle = openAngle + Math.PI;
-    let seq = 0;
-    const flames = [] as NonNullable<typeof normal.st.graveFlames>;
-    for (const radius of [12, 16, 20, 24, 28, 30]) {
-      for (let degrees = 0; degrees < 360; degrees += 15) {
-        const angle = (degrees * Math.PI) / 180;
-        const fromGap = Math.abs(
-          Math.atan2(Math.sin(angle - gapAngle), Math.cos(angle - gapAngle)),
-        );
-        if (fromGap < Math.PI / 5) continue;
-        flames.push({
-          seq: seq++,
-          kind: 'grave',
-          x: normal.boss.pos.x + Math.sin(angle) * radius,
-          z: normal.boss.pos.z + Math.cos(angle) * radius,
-          radius: 3,
-          remaining: 10,
-          tickTimer: 1,
-        });
-      }
-    }
-    normal.st.graveFlames = flames.map((flame) => ({ ...flame }));
-    heroic.st.graveFlames = flames.map((flame) => ({ ...flame }));
-    expect(normal.ctx.tickCount).toBe(heroic.ctx.tickCount);
+    const flameAt = (boss: Entity) => ({
+      seq: 0,
+      kind: 'grave' as const,
+      x: boss.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET,
+      z: boss.pos.z,
+      radius: 3,
+      remaining: 10,
+      tickTimer: 1,
+    });
+    normal.st.graveFlames = [flameAt(normal.boss)];
+    heroic.st.graveFlames = [flameAt(heroic.boss)];
     normal.st.sigilTimer = DT / 2;
     heroic.st.sigilTimer = DT / 2;
     nythraxis.updateNythraxisEncounter(normal.ctx, normal.boss);
     nythraxis.updateNythraxisEncounter(heroic.ctx, heroic.boss);
     const normalSigil = normal.st.sigil!;
+    const heroicSigil = heroic.st.sigil!;
     expect(normalSigil).toBeTruthy();
-    for (const flame of normal.st.graveFlames!) {
-      expect(flat(flame, normalSigil)).toBeGreaterThanOrEqual(
-        flame.radius + nythraxisSigilRadius('normal'),
-      );
-    }
-    expect(normalSigil).not.toMatchObject({ x: openPlacement.x, z: openPlacement.z });
-    expect(heroic.st.sigil).toMatchObject({ x: openPlacement.x, z: openPlacement.z });
+    expect(heroicSigil).toBeTruthy();
+    const normalFlame = normal.st.graveFlames[0];
+    expect(normalSigil.x).toBeCloseTo(normalFlame.x, 6);
+    expect(Math.abs(normalSigil.z - normalFlame.z)).toBeCloseTo(12, 6);
+    expect(flat(normalSigil, normalFlame)).toBeGreaterThanOrEqual(
+      3 + nythraxisSigilRadius('normal'),
+    );
+    const heroicFlame = heroic.st.graveFlames[0];
+    expect(heroicSigil.x).toBeCloseTo(heroicFlame.x, 6);
+    expect(heroicSigil.z).toBeCloseTo(heroicFlame.z, 6);
   });
 
   it('climbs Deathless Ascension every two seconds while the sigil stands', () => {
@@ -461,19 +458,16 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     expect(st.sigil).not.toBeNull();
   });
 
-  it('holds due Gravefire and Sigil casts through Deathless Rage and its major gap', () => {
+  it('holds a due Sigil cast through Deathless Rage and its major gap', () => {
     const { ctx, boss, st } = setup({ phase: 2 });
     nythraxis.startNythraxisDeathlessRage(ctx, boss, st);
-    st.gravefireTimer = DT / 2;
     st.sigilTimer = DT / 2;
     tickDriver(ctx, boss, 3);
-    expect(st.gravefires).toEqual([]);
     expect(st.sigil).toBeNull();
     st.deathlessCastRemaining = DT;
     nythraxis.updateNythraxisEncounter(ctx, boss);
     expect(st.majorGapTimer).toBe(6);
     tickDriver(ctx, boss, 6 + DT);
-    expect(st.gravefires!.length).toBeGreaterThan(0);
     expect(st.sigil).not.toBeNull();
   });
 
@@ -497,11 +491,12 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     st.boneSpikeTimer = DT / 2;
     st.eruptionTimer = DT / 2;
     st.sigilTimer = DT / 2;
-    st.gravefireTimer = DT / 2;
     st.soulRendTimer = DT / 2;
     // The Rage stays out of its spike lead here: an imminent Rage would (by
     // design) hold the spike cast this test wants to see resume.
     st.deathlessTimer = NYTHRAXIS_BONE_SPIKE_RAGE_LEAD_SECONDS + 20;
+    // A staged (dormant-kind) line keeps ticking through the stun like any
+    // live hazard, even though nothing in play ignites one since v0.42.2.
     st.gravefires = [
       {
         seq: 0,
@@ -543,7 +538,8 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     // the eruption for its settle window, then it arms.
     expect(st.eruptionPoints).toEqual([]);
     expect(st.spikeSettleTimer).toBeGreaterThan(0);
-    expect(st.gravefires!.length).toBeGreaterThan(1);
+    // No new line joins the staged one: Gravefire casts are retired (v0.42.2).
+    expect(st.gravefires).toHaveLength(1);
     expect(st.soulRendMarks.length).toBeGreaterThan(0);
     tickSim(sim, NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS);
     expect(st.eruptionPoints!.length).toBeGreaterThan(0);
@@ -577,105 +573,32 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
   });
 });
 
-describe('Nythraxis Gravefire (the traveling line)', () => {
-  it('runs a line from the boss at a raider who is not the aggro holder, only in phase two', () => {
-    const { ctx, boss, st, tank, callouts, sim, room } = setup({ phase: 1 });
-    st.gravefireTimer = DT / 2;
-    tickDriver(ctx, boss, 1);
-    expect(st.gravefires).toHaveLength(0);
-    st.phase = 2;
-    st.gravefireTimer = DT / 2;
-    nythraxis.updateNythraxisEncounter(ctx, boss);
-    // The phase-2 block ran (Soul Rend's cadence moved), the room is full, and
-    // the cast re-armed its cadence.
-    expect(st.soulRendTimer).toBeLessThan(999);
-    expect(room().length).toBe(10);
-    expect(st.gravefireTimer).toBe(12);
-    expect(boss.nythraxis).toBe(st);
-    expect(st.gravefireSeq).toBe(1);
-    expect(st.gravefires).toHaveLength(1);
-    const line = st.gravefires![0];
-    expect(line.x).toBeCloseTo(boss.pos.x);
-    expect(line.z).toBeCloseTo(boss.pos.z);
-    const target = callouts('gravefireTarget');
-    expect(target).toHaveLength(1);
-    expect(target[0].pid).not.toBe(tank.id);
-    const victim = ctx.entities.get(target[0].pid!)!;
-    // The line points at where the target stood.
-    const along = (victim.pos.x - line.x) * line.dirX + (victim.pos.z - line.z) * line.dirZ;
-    const across = Math.abs(
-      (victim.pos.x - line.x) * line.dirZ - (victim.pos.z - line.z) * line.dirX,
-    );
-    expect(along).toBeGreaterThan(0);
-    expect(across).toBeLessThan(1e-6);
-    expect(st.gravefireTimer).toBe(12);
-    expect(sim.activeNythraxisGravefires).toHaveLength(1);
-  });
+describe('Nythraxis Gravefire never lands in play (retired in v0.42.2)', () => {
+  for (const difficulty of ['normal', 'heroic'] as const) {
+    it(`${difficulty}: a due cadence timer lights no line, calls nobody out, and burns nobody`, () => {
+      const { sim, ctx, boss, st, raiders, callouts, damageBy } = setup({ difficulty, phase: 2 });
+      teleport(sim, raiders[0], boss.pos.x + 20, boss.pos.z, boss.pos.y);
+      const timer = 0.01;
+      st.gravefireTimer = timer;
+      tickDriver(ctx, boss, 10);
+      // Nothing consumes the timer any more: no cast path reads it.
+      expect(st.gravefireTimer).toBe(timer);
+      expect(st.gravefires).toEqual([]);
+      expect(sim.activeNythraxisGravefires).toEqual([]);
+      expect(callouts('gravefireTarget')).toEqual([]);
+      expect(damageBy(NYTHRAXIS_GRAVEFIRE_CAST_ID)).toEqual([]);
+    });
+  }
 
-  it('burns whoever stands in the lit window once a second and stops once it burns out', () => {
-    for (const difficulty of ['normal', 'heroic'] as const) {
-      const { sim, ctx, boss, st, raiders, tank, damageBy } = setup({ difficulty, phase: 2 });
-      const victim = raiders[4];
-      // Park everyone else far to the side, and the tank beside the boss instead of
-      // in front of him, so only the victim can stand on the line.
-      for (const r of raiders)
-        if (r !== victim) teleport(sim, r, boss.pos.x + 80, boss.pos.z - 20, boss.pos.y);
-      teleport(sim, tank, boss.pos.x + 6, boss.pos.z, boss.pos.y);
-      teleport(sim, victim, boss.pos.x, boss.pos.z - 25, boss.pos.y);
-      nythraxis.castNythraxisGravefire(ctx, boss, st, victim);
-      const hp0 = victim.hp;
-      // The head needs just over 2 s to reach 25 yd, so the 2 s tick misses and
-      // the first burn lands on the 3 s tick.
-      tickDriver(ctx, boss, 2.9);
-      expect(victim.hp, difficulty).toBe(hp0);
-      tickDriver(ctx, boss, 0.2);
-      const tick = difficulty === 'heroic' ? 0.15 : 0.1;
-      expect(hp0 - victim.hp, difficulty).toBe(Math.ceil(victim.maxHp * tick));
-      expect(damageBy(NYTHRAXIS_GRAVEFIRE_CAST_ID), difficulty).toHaveLength(1);
-      // Side-stepping past the half-width is safe.
-      teleport(
-        sim,
-        victim,
-        boss.pos.x + NYTHRAXIS_GRAVEFIRE_HALF_WIDTH + 0.2,
-        boss.pos.z - 25,
-        boss.pos.y,
-      );
-      const hp1 = victim.hp;
-      tickDriver(ctx, boss, 2);
-      expect(victim.hp, difficulty).toBe(hp1);
-      tickDriver(ctx, boss, difficulty === 'heroic' ? 8 : 6);
-      expect(st.gravefires, difficulty).toHaveLength(0);
-      expect(sim.activeNythraxisGravefires, difficulty).toHaveLength(0);
-    }
-  });
-
-  it('never runs at an impaled raider or a wardstone channeler', () => {
-    const { ctx, boss, st, room, raiders, tank } = setup({ phase: 2 });
-    const victims = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), 'normal');
-    const channeler = raiders.find((r) => !victims.includes(r))!;
-    st.wardChannels = [{ objectId: 1, playerId: channeler.id, remaining: 5, complete: false }];
-    // Kill everyone else so the pick is forced onto the protected set if it were allowed.
-    for (const r of raiders) {
-      if (victims.includes(r) || r === channeler) continue;
-      r.hp = 0;
-      r.dead = true;
-    }
-    st.gravefireTimer = DT / 2;
-    nythraxis.updateNythraxisEncounter(ctx, boss);
-    expect(st.gravefires).toHaveLength(0);
-    expect(st.gravefireTimer).toBe(3);
-    expect(victims.every((v) => isNythraxisImpaled(v, boss.id))).toBe(true);
-    expect(tank.dead).toBe(false);
-  });
-
-  it('replays the same target and line for the same seed', () => {
-    const a = setup({ phase: 2 });
-    const b = setup({ phase: 2 });
-    a.st.gravefireTimer = DT / 2;
-    b.st.gravefireTimer = DT / 2;
-    nythraxis.updateNythraxisEncounter(a.ctx, a.boss);
-    nythraxis.updateNythraxisEncounter(b.ctx, b.boss);
-    expect(b.st.gravefires).toEqual(a.st.gravefires);
+  it('the Bone Slam no longer runs a line down the charge', () => {
+    const { sim, ctx, boss, st, tank, damageBy } = setup({ difficulty: 'normal', phase: 2 });
+    st.phase = 3;
+    teleport(sim, tank, boss.pos.x + 3, boss.pos.z, boss.pos.y);
+    nythraxis.startNythraxisBoneStorm(ctx, boss, st);
+    tickDriver(ctx, boss, 3);
+    expect(st.boneStorm?.slammed).toBe(true);
+    expect(st.gravefires).toEqual([]);
+    expect(damageBy(NYTHRAXIS_GRAVEFIRE_CAST_ID)).toEqual([]);
   });
 });
 

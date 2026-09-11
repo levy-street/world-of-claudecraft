@@ -8,8 +8,9 @@ import {
   NYTHRAXIS_ASCENSION_EVERY,
   NYTHRAXIS_BOUND_VULNERABILITY,
   NYTHRAXIS_SIGIL_FIRST_SECONDS,
-  NYTHRAXIS_SIGIL_MAX_DIST,
-  NYTHRAXIS_SIGIL_MIN_DIST,
+  NYTHRAXIS_SIGIL_SIDE_NUDGES_Z,
+  NYTHRAXIS_SIGIL_SIDE_OFFSET,
+  NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR,
   NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE,
   type NythraxisSigilFloor,
   nythraxisAscensionPerStack,
@@ -21,6 +22,7 @@ import {
   nythraxisSigilCandidate,
   nythraxisSigilId,
   nythraxisSigilMayLandInFire,
+  nythraxisSigilNextSide,
   nythraxisSigilPlacement,
   nythraxisSigilPlacementValid,
   nythraxisSigilRadius,
@@ -58,19 +60,38 @@ describe('Nythraxis Binding Sigil', () => {
       false,
       true,
     ]);
-    expect([NYTHRAXIS_SIGIL_MIN_DIST, NYTHRAXIS_SIGIL_MAX_DIST]).toEqual([12, 30]);
+    // v0.42.2: beside the boss on the raid's left or right, not a hash ring.
+    expect([NYTHRAXIS_SIGIL_SIDE_OFFSET, NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR]).toEqual([22, 16]);
+    expect(NYTHRAXIS_SIGIL_SIDE_NUDGES_Z).toEqual([0, 6, -6, 12, -12, 18, -18]);
     expect(NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE).toBe(6);
   });
 
-  it('draws every hash candidate inside the ring band around the boss, deterministically', () => {
-    for (let attempt = 0; attempt < 48; attempt++) {
-      const p = nythraxisSigilCandidate(77, attempt, BOSS);
-      const d = Math.hypot(p.x - BOSS.x, p.z - BOSS.z);
-      expect(d).toBeGreaterThanOrEqual(NYTHRAXIS_SIGIL_MIN_DIST - 1e-9);
-      expect(d).toBeLessThanOrEqual(NYTHRAXIS_SIGIL_MAX_DIST + 1e-9);
+  it('lays the side ladder: the offset spot first, z nudges next, then the near offset', () => {
+    for (const side of [1, -1] as const) {
+      const first = nythraxisSigilCandidate(0, BOSS, side);
+      expect(first).toEqual({ x: BOSS.x + side * NYTHRAXIS_SIGIL_SIDE_OFFSET, z: BOSS.z });
+      NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.forEach((nudge, attempt) => {
+        expect(nythraxisSigilCandidate(attempt, BOSS, side)).toEqual({
+          x: BOSS.x + side * NYTHRAXIS_SIGIL_SIDE_OFFSET,
+          z: BOSS.z + nudge,
+        });
+        expect(
+          nythraxisSigilCandidate(attempt + NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.length, BOSS, side),
+        ).toEqual({ x: BOSS.x + side * NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR, z: BOSS.z + nudge });
+      });
     }
-    expect(nythraxisSigilCandidate(77, 3, BOSS)).toEqual(nythraxisSigilCandidate(77, 3, BOSS));
-    expect(nythraxisSigilCandidate(77, 3, BOSS)).not.toEqual(nythraxisSigilCandidate(78, 3, BOSS));
+    // No hash, no rng: the same inputs always give the same spot, and the two
+    // sides mirror each other across the boss.
+    expect(nythraxisSigilCandidate(3, BOSS, 1)).toEqual(nythraxisSigilCandidate(3, BOSS, 1));
+    expect(nythraxisSigilCandidate(3, BOSS, -1).x - BOSS.x).toBe(
+      -(nythraxisSigilCandidate(3, BOSS, 1).x - BOSS.x),
+    );
+  });
+
+  it("alternates sides every cast, starting on the raid's right", () => {
+    expect(nythraxisSigilNextSide(null)).toBe(1);
+    expect(nythraxisSigilNextSide(1)).toBe(-1);
+    expect(nythraxisSigilNextSide(-1)).toBe(1);
   });
 
   it('rejects blocked floor, wardstone clearance, and (on normal) live fire', () => {
@@ -103,23 +124,26 @@ describe('Nythraxis Binding Sigil', () => {
     ).toBe(true);
   });
 
-  it('picks the first valid candidate, then falls back to the first ring candidate', () => {
-    const first = nythraxisSigilCandidate(5, 0, BOSS);
-    expect(nythraxisSigilPlacement(5, BOSS, 4, OPEN, false)).toEqual(first);
-    // A wardstone on the first candidate pushes the pick to the next valid one.
+  it('picks the first valid ladder spot, then falls back to open floor, then to the primary spot', () => {
+    const first = nythraxisSigilCandidate(0, BOSS, 1);
+    expect(nythraxisSigilPlacement(BOSS, 1, 4, OPEN, false)).toEqual(first);
+    // A wardstone on the primary spot pushes the pick down the ladder, same side.
     const blockedFirst = { ...OPEN, wardstones: [first] };
-    const pick = nythraxisSigilPlacement(5, BOSS, 4, blockedFirst, false);
+    const pick = nythraxisSigilPlacement(BOSS, 1, 4, blockedFirst, false);
     expect(pick).not.toEqual(first);
+    expect(pick.x).toBe(first.x);
     expect(nythraxisSigilPlacementValid(pick, 4, blockedFirst, false)).toBe(true);
     // Fire everywhere on normal: fall back to open floor rather than vanish.
     const everywhereFire = { ...OPEN, fires: [{ x: BOSS.x, z: BOSS.z, radius: 1000 }] };
-    expect(nythraxisSigilPlacement(5, BOSS, 4, everywhereFire, false)).toEqual(first);
-    // No open floor at all: the sigil still lands in the ring band (the first
-    // candidate), never under the boss, which would bind him for free.
-    const nowhere = nythraxisSigilPlacement(5, BOSS, 4, { ...OPEN, openFloor: () => false }, false);
+    expect(nythraxisSigilPlacement(BOSS, 1, 4, everywhereFire, false)).toEqual(first);
+    // No open floor at all: the sigil still lands on the primary side spot,
+    // never under the boss, which would bind him for free.
+    const nowhere = nythraxisSigilPlacement(BOSS, 1, 4, { ...OPEN, openFloor: () => false }, false);
     expect(nowhere).toEqual(first);
-    expect(Math.hypot(nowhere.x - BOSS.x, nowhere.z - BOSS.z)).toBeGreaterThanOrEqual(
-      NYTHRAXIS_SIGIL_MIN_DIST - 1e-9,
+    expect(Math.hypot(nowhere.x - BOSS.x, nowhere.z - BOSS.z)).toBe(NYTHRAXIS_SIGIL_SIDE_OFFSET);
+    // The other side mirrors.
+    expect(nythraxisSigilPlacement(BOSS, -1, 4, OPEN, false)).toEqual(
+      nythraxisSigilCandidate(0, BOSS, -1),
     );
   });
 

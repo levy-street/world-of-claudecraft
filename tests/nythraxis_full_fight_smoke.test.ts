@@ -170,7 +170,6 @@ const EXPECTED_CALLOUTS = [
   'sigilAppears',
   'sigilBound',
   'sigilUnbound',
-  'gravefireTarget',
   'kingsWrath',
   'boneStormBegins',
   'boneStormCharge',
@@ -184,7 +183,6 @@ const EXPECTED_DAMAGE = [
   'Grave Eruption',
   'Grave Flame',
   'Binding Sigil',
-  'Gravefire',
   'Soul Rend',
   'Deathless Rage',
   'Unbound',
@@ -193,8 +191,9 @@ const EXPECTED_DAMAGE = [
 ];
 
 // Damage sources the fight must NOT produce any more: Soulfire (the pool a
-// Soul Rend detonation used to leave) was retired from play in v0.42.2.
-const FORBIDDEN_DAMAGE = ['Soulfire'];
+// Soul Rend detonation used to leave) and Gravefire (the line the boss and
+// the Bone Slam used to spit out) were retired from play in v0.42.2.
+const FORBIDDEN_DAMAGE = ['Soulfire', 'Gravefire'];
 
 const EXPECTED_AURAS = [
   'Dread Curse',

@@ -16,6 +16,9 @@ import {
   NYTHRAXIS_BONE_SPIKE_EVERY_HEROIC,
   NYTHRAXIS_BONE_SPIKE_EVERY_NORMAL,
   NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
+  NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
+  NYTHRAXIS_BONE_SPIKE_HITS_HEROIC,
+  NYTHRAXIS_BONE_SPIKE_HITS_NORMAL,
   NYTHRAXIS_BONE_SPIKE_ID,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_NORMAL,
@@ -24,6 +27,8 @@ import {
   NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
   nythraxisBoneSpikeCandidates,
   nythraxisBoneSpikeCooldownIds,
+  nythraxisBoneSpikeHits,
+  nythraxisBoneSpikeWardHit,
   nythraxisImpaledAuraFor,
   tickNythraxisBoneSpikeCooldowns,
   withNythraxisBoneSpikeCooldowns,
@@ -210,7 +215,10 @@ describe('Nythraxis Bone Spike', () => {
     const [victim] = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), 'normal');
     const spike = spikes().find((s) => s.id === victim.auras[0]?.value2) ?? spikes()[0];
     const killer = raiders.find((r) => r.id !== victim.id)!;
-    ctx.dealDamage(killer, spike, spike.hp + 1, false, 'physical', null, 'hit');
+    // A ward: one hit per point, so it takes the full hit count to shatter.
+    for (let hit = 0; hit < nythraxisBoneSpikeHits('normal'); hit++) {
+      ctx.dealDamage(killer, spike, spike.hp + 1, false, 'physical', null, 'hit');
+    }
     expect(spike.dead).toBe(true);
     nythraxis.updateNythraxisEncounter(ctx, boss);
     expect(isNythraxisImpaled(victim, boss.id)).toBe(false);
@@ -227,25 +235,81 @@ describe('Nythraxis Bone Spike', () => {
     expect(inst?.mobIds).not.toContain(spike.id);
   });
 
-  it('pins the spike health pool the tuning tables promise: 1000 on both difficulties', () => {
-    // Heroic spikes carry the NORMAL pool (owner call, 2026-09-10): heroic
-    // already pins one more raider, casts sooner, drains faster, and spawns at
-    // level 22, so a bigger pool compounded into an overtuned check.
+  it('is a ward: its pool IS the hit count, 4 on normal and 6 on heroic', () => {
+    // v0.42.2 (owner call): a spike takes hits to clear, not damage, like a
+    // League ward. The health pool the difficulty tables used to size (1,000
+    // since v0.42.1) is replaced at spawn by the hit count, so the health bar
+    // reads as hits remaining.
+    expect([NYTHRAXIS_BONE_SPIKE_HITS_NORMAL, NYTHRAXIS_BONE_SPIKE_HITS_HEROIC]).toEqual([4, 6]);
+    expect(NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE).toBe(1);
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { ctx, boss, st, room, spikes } = setup({ difficulty });
       nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), difficulty);
       const spike = spikes()[0];
-      expect(spike.maxHp, difficulty).toBe(1000);
+      expect(spike.maxHp, difficulty).toBe(nythraxisBoneSpikeHits(difficulty));
       expect(spike.hp, difficulty).toBe(spike.maxHp);
     }
-    // The heroic pool comes from an explicit per-mob override that mirrors the
-    // normal table's shared multiplier: a deleted override would fall through
-    // to the raid-wide 3.2x, so the literal is pinned beside the spawn check.
+    // The per-mob multiplier override still mirrors normal's shared 2.0 so the
+    // template pool stays sane if the hit rule is ever lifted; it no longer
+    // decides anything at spawn.
     const heroicArena = HEROIC_DUNGEON_TUNING.nythraxis_boss_arena;
     expect(heroicArena.healthMultiplierByMob?.nythraxis_bone_spike).toBe(
       NORMAL_DUNGEON_TUNING.nythraxis_boss_arena.healthMultiplier,
     );
-    expect(NORMAL_DUNGEON_TUNING.nythraxis_boss_arena.healthMultiplier).toBe(2.0);
+  });
+
+  it('counts every player or pet hit as one, whatever it deals, and shatters on the last', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const { ctx, boss, st, room, raiders, spikes } = setup({ difficulty });
+      const [victim] = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), difficulty);
+      const spike = spikes()[0];
+      const hits = nythraxisBoneSpikeHits(difficulty);
+      const others = raiders.filter((r) => r.id !== victim.id);
+      // A 1-point poke and a 5,000-point crit each take exactly one hit off.
+      expect(ctx.dealDamage(others[0], spike, 1, false, 'physical', null, 'hit')).toBe(1);
+      expect(spike.hp, difficulty).toBe(hits - 1);
+      ctx.dealDamage(others[1], spike, 5000, true, 'fire', 'Fireball', 'hit');
+      expect(spike.hp, difficulty).toBe(hits - 2);
+      // A DoT tick (not direct) from a third raider counts too: hits from anyone.
+      ctx.dealDamage(
+        others[2],
+        spike,
+        250,
+        false,
+        'shadow',
+        'Corruption',
+        'hit',
+        false,
+        undefined,
+        false,
+      );
+      expect(spike.hp, difficulty).toBe(hits - 3);
+      // The remaining hits, from whoever is nearest, shatter it and free the raider.
+      for (let i = 3; i < hits; i++) {
+        expect(spike.dead, `${difficulty} before hit ${i + 1}`).toBe(false);
+        ctx.dealDamage(others[i % others.length], spike, 3, false, 'physical', null, 'hit');
+      }
+      expect(spike.dead, difficulty).toBe(true);
+      nythraxis.updateNythraxisEncounter(ctx, boss);
+      expect(isNythraxisImpaled(victim, boss.id), difficulty).toBe(false);
+    }
+  });
+
+  it('only a player or a player-owned pet lands a ward hit; the rule is scoped to live spikes', () => {
+    const { ctx, boss, st, room, raiders, spikes } = setup();
+    const [victim] = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), 'normal');
+    const spike = spikes()[0];
+    const other = raiders.find((r) => r.id !== victim.id)!;
+    expect(nythraxisBoneSpikeWardHit(other, spike)).toBe(true);
+    const pet = { kind: 'mob', ownerId: other.id, dead: false } as unknown as Entity;
+    expect(nythraxisBoneSpikeWardHit(pet, spike)).toBe(true);
+    // The boss (a wild mob) is not a ward hitter, and a raider is not a ward.
+    expect(nythraxisBoneSpikeWardHit(boss, spike)).toBe(false);
+    expect(nythraxisBoneSpikeWardHit(other, victim)).toBe(false);
+    expect(nythraxisBoneSpikeWardHit(null, spike)).toBe(false);
+    // A dead spike is no longer a ward.
+    spike.dead = true;
+    expect(nythraxisBoneSpikeWardHit(other, spike)).toBe(false);
   });
 
   it('frees a victim who dies impaled, so a resurrection never brings the pin back', () => {

@@ -38,6 +38,10 @@ import { isImmuneInPlace } from '../instances/instance_combat_hold';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
+import {
+  NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
+  nythraxisBoneSpikeWardHit,
+} from '../nythraxis_bone_spike';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
@@ -208,6 +212,16 @@ export function dealDamage(
   if (resolvedHpLoss) alreadyFinal = true;
   if (target.dead) return 0;
   if (target.damageImmune) return 0;
+  // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
+  // pet hit lands exactly one point, whatever it would have dealt, and the
+  // spike's pool is its hit count. Resolved like an exact copy so no source
+  // mod, target amp, absorb, or crit multiplier can move it off one.
+  if (nythraxisBoneSpikeWardHit(source, target)) {
+    amount = NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE;
+    crit = false;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+  }
   // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
   // owner has the gating quest active/ready may harm it; other hits are a no-op.
   if (questGateBlocksDamage(ctx.players, source, target)) return 0;

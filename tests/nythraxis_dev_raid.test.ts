@@ -145,8 +145,11 @@ describe('/dev nythraxisraid', () => {
     sim.tick();
     expect(st.sigil).not.toBeNull();
     // A phase 2 mechanic is refused in phase 1 with a pointer to the phase jump.
-    say('/dev nyx gravefire');
+    say('/dev nyx rend');
     expect(errors().some((e) => /phase 2 mechanic/.test(e.text ?? ''))).toBe(true);
+    // Gravefire left the fight in v0.42.2: no poke for it any more.
+    say('/dev nyx gravefire');
+    expect(st.gravefires).toEqual([]);
     // Phase jump: 69% health starts the transition, which then holds every poke.
     say('/dev nyx phase2');
     sim.tick();
@@ -156,9 +159,6 @@ describe('/dev nythraxisraid', () => {
     for (let i = 0; i < 20 * 26 && st.phase === 'transition'; i++) sim.tick();
     expect(st.phase).toBe(2);
     // Phase 2 mechanics on demand, and the wards completed by three bots.
-    say('/dev nyx gravefire');
-    sim.tick();
-    expect(st.gravefires!.length).toBe(1);
     say('/dev nyx rend');
     sim.tick();
     expect(st.soulRendMarks.length).toBe(3);

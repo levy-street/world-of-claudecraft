@@ -57,6 +57,18 @@ export const NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC = 3;
  * heroic ones (40 s), so a raider sits out at least the next two waves.
  */
 export const NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS = 55;
+/**
+ * A spike is a ward (owner call, 2026-09-11, the League of Legends idiom): it
+ * takes HITS to clear, not damage. Its health pool IS the hit count, so the
+ * health bar reads as hits remaining, and every damaging hit from any player
+ * or player-owned pet, whatever it would have dealt (a poke, a crit, a DoT
+ * tick), lands exactly NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE. The rule is applied
+ * at the one damage funnel (combat/damage.ts dealDamage) through
+ * nythraxisBoneSpikeWardHit below.
+ */
+export const NYTHRAXIS_BONE_SPIKE_HITS_NORMAL = 4;
+export const NYTHRAXIS_BONE_SPIKE_HITS_HEROIC = 6;
+export const NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE = 1;
 export const NYTHRAXIS_IMPALED_TICK_SECONDS = 1;
 export const NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL = 0.08;
 export const NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC = 0.1;
@@ -74,6 +86,35 @@ export function nythraxisBoneSpikeVictims(difficulty: DungeonDifficulty): number
   return difficulty === 'heroic'
     ? NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC
     : NYTHRAXIS_BONE_SPIKE_VICTIMS_NORMAL;
+}
+
+export function nythraxisBoneSpikeHits(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? NYTHRAXIS_BONE_SPIKE_HITS_HEROIC
+    : NYTHRAXIS_BONE_SPIKE_HITS_NORMAL;
+}
+
+/** True for a live Bone Spike mob. */
+export function isNythraxisBoneSpike(entity: Entity | null | undefined): boolean {
+  return (
+    !!entity &&
+    entity.kind === 'mob' &&
+    entity.templateId === NYTHRAXIS_BONE_SPIKE_ID &&
+    !entity.dead
+  );
+}
+
+/**
+ * True when `source` hitting `target` is a ward hit: the target is a live
+ * spike and the source is a player or a player-owned pet ("hits from
+ * anyone"). Wild mobs, the boss included, never chip a spike this way.
+ */
+export function nythraxisBoneSpikeWardHit(
+  source: Entity | null | undefined,
+  target: Entity,
+): boolean {
+  if (!source || !isNythraxisBoneSpike(target)) return false;
+  return source.kind === 'player' || (source.kind === 'mob' && source.ownerId !== null);
 }
 
 export function nythraxisImpaledTickMaxHp(difficulty: DungeonDifficulty): number {

@@ -11,7 +11,6 @@
 //
 // `src/sim`-pure: no rng stream, no wall clock, no DOM.
 
-import { hash2 } from './rng';
 import type { DungeonDifficulty } from './types';
 
 export interface NythraxisSigilPoint {
@@ -54,8 +53,20 @@ export const NYTHRAXIS_UNBOUND_CAST_ID = 'Unbound';
 export const NYTHRAXIS_SIGIL_FIRST_SECONDS = 30;
 export const NYTHRAXIS_SIGIL_EVERY_NORMAL = 45;
 export const NYTHRAXIS_SIGIL_EVERY_HEROIC = 40;
-export const NYTHRAXIS_SIGIL_MIN_DIST = 12;
-export const NYTHRAXIS_SIGIL_MAX_DIST = 30;
+/**
+ * Where a sigil lands (owner call, 2026-09-11): beside the boss on the raid's
+ * left or right, NYTHRAXIS_SIGIL_SIDE_OFFSET yd out along the hall's x axis,
+ * alternating sides every cast, so the tank always knows which way the drag
+ * goes. The hall's open floor between the dais (r 10) and the pillar rows
+ * (x 32) is where the offset lands; a blocked spot walks the fallback ladder
+ * below (nudges along z, then closer in) before the placement gives up.
+ */
+export const NYTHRAXIS_SIGIL_SIDE_OFFSET = 22;
+/** The closer-in fallback offset when the primary spot is blocked. */
+export const NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR = 16;
+/** Fallback nudges along the hall axis, tried in this order at each offset. */
+export const NYTHRAXIS_SIGIL_SIDE_NUDGES_Z: readonly number[] = [0, 6, -6, 12, -12, 18, -18];
+export type NythraxisSigilSide = 1 | -1;
 export const NYTHRAXIS_SIGIL_RADIUS_NORMAL = 4;
 export const NYTHRAXIS_SIGIL_RADIUS_HEROIC = 3;
 export const NYTHRAXIS_SIGIL_BIND_SECONDS_NORMAL = 15;
@@ -82,8 +93,6 @@ export const NYTHRAXIS_UNBOUND_DAMAGE_BONUS_NORMAL = 0.2;
 export const NYTHRAXIS_UNBOUND_DAMAGE_BONUS_HEROIC = 0.25;
 /** Unbound is a standing bonus; it is removed by the next successful binding. */
 export const NYTHRAXIS_UNBOUND_AURA_SECONDS = 600;
-
-const SIGIL_CANDIDATES = 48;
 
 export function nythraxisSigilCadence(difficulty: DungeonDifficulty): number {
   return difficulty === 'heroic' ? NYTHRAXIS_SIGIL_EVERY_HEROIC : NYTHRAXIS_SIGIL_EVERY_NORMAL;
@@ -146,19 +155,27 @@ export interface NythraxisSigilFloor {
   fires: readonly (NythraxisSigilPoint & { radius: number })[];
 }
 
-/** The `attempt`-th hash candidate: a ring band around the boss's current position. */
+/**
+ * The `attempt`-th candidate on the given side: the primary offset with each
+ * z nudge in order, then the near offset with the same nudges. No hash and no
+ * rng: the spot is a fixed function of the boss's position and the side, so
+ * the raid can learn it.
+ */
 export function nythraxisSigilCandidate(
-  castKey: number,
   attempt: number,
   boss: NythraxisSigilPoint,
+  side: NythraxisSigilSide,
 ): NythraxisSigilPoint {
-  const angle = hash2(castKey, attempt, 0x51611a) * Math.PI * 2;
-  const band = hash2(castKey, attempt, 0xb1ad1e);
-  const distance = Math.sqrt(
-    NYTHRAXIS_SIGIL_MIN_DIST ** 2 +
-      band * (NYTHRAXIS_SIGIL_MAX_DIST ** 2 - NYTHRAXIS_SIGIL_MIN_DIST ** 2),
-  );
-  return { x: boss.x + Math.sin(angle) * distance, z: boss.z + Math.cos(angle) * distance };
+  const nudges = NYTHRAXIS_SIGIL_SIDE_NUDGES_Z;
+  const offset =
+    attempt < nudges.length ? NYTHRAXIS_SIGIL_SIDE_OFFSET : NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR;
+  const nudge = nudges[attempt % nudges.length];
+  return { x: boss.x + side * offset, z: boss.z + nudge };
+}
+
+/** The side the next cast lands on: the raid's right (+x) first, then alternating. */
+export function nythraxisSigilNextSide(previous: NythraxisSigilSide | null): NythraxisSigilSide {
+  return previous === null ? 1 : previous === 1 ? -1 : 1;
 }
 
 /** True when a sigil of `radius` at `point` obeys every placement rule. */
@@ -178,20 +195,21 @@ export function nythraxisSigilPlacementValid(
  * sigil is never under the boss (that would bind him for free on the spot).
  */
 export function nythraxisSigilPlacement(
-  castKey: number,
   boss: NythraxisSigilPoint,
+  side: NythraxisSigilSide,
   radius: number,
   floor: NythraxisSigilFloor,
   allowFire: boolean,
 ): NythraxisSigilPoint {
   let fallback: NythraxisSigilPoint | null = null;
-  for (let attempt = 0; attempt < SIGIL_CANDIDATES; attempt++) {
-    const candidate = nythraxisSigilCandidate(castKey, attempt, boss);
+  const candidates = NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.length * 2;
+  for (let attempt = 0; attempt < candidates; attempt++) {
+    const candidate = nythraxisSigilCandidate(attempt, boss, side);
     const open = floor.openFloor(candidate);
     if (open && nythraxisSigilClearOfHazards(candidate, radius, floor, allowFire)) return candidate;
     if (!fallback && open) fallback = candidate;
   }
-  return fallback ?? nythraxisSigilCandidate(castKey, 0, boss);
+  return fallback ?? nythraxisSigilCandidate(0, boss, side);
 }
 
 /** The wardstone and (on normal) fire rules alone, floor already checked. */
