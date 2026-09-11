@@ -686,6 +686,9 @@ function makeRig(seed: { recent?: string[]; marks?: string[] } = {}): ArtRig {
         player: { name: 'Artwright' },
         deedStats: { itemsDiscovered: new Set<string>() },
         reliquaryMarks: marks,
+        // The account ledger halves every real world carries (src/sim/account_ledger.ts).
+        reliquaryAccountFinds: new Map(),
+        accountDeeds: new Map(),
         reliquaryRecent: recent,
         reliquaryFirstFind: {},
         ownedMounts: () => [],

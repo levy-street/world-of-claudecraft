@@ -198,6 +198,10 @@ export const HEAVY_SELF_EVENTS = new Set<string>([
   // Phase 18 the event is NOT presentation-only: detectActivity derives the
   // illumination marquee fan-out from its illuminatedPageId field.
   'reliquaryUnlock',
+  // The account ledger (`acct`) gains a finder entry for the acting character.
+  // Item and mark finds already ride behind reliquaryUnlock; this membership
+  // carries the mount-reins arm, which has no unlock event of its own.
+  'relicRecorded',
   'questAccepted',
   'questProgress',
   'questReady',

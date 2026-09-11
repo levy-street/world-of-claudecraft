@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { freshAccountLedger } from '../src/sim/account_ledger';
 
 // Mocked-db GameServer harness (see tests/character_lease_game.test.ts). Only the
 // db exports game.ts touches on the join / dispatch / broadcast paths are stubbed;
@@ -472,6 +473,7 @@ describe('the auth handshake: a queued write that settles between the row reads 
       permissionsForRoles: () => new Set<string>(),
       metaRequestUserData: () => ({}),
       metaEventSourceUrl: () => undefined,
+      loadAccountLedger: async () => freshAccountLedger(),
       loadAccountCosmetics: async () => ({ completedQuestIds: [], mechChromaIds: [] }),
       isConnectionRefused: () => false,
       bufferHandshakeMessages: () => () => {},

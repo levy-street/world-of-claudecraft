@@ -1069,6 +1069,108 @@ async function triggerRowBreakdown(page, rowSelector, variant) {
 }
 
 export const TARGETS = [
+  // The account ledger (src/sim/account_ledger.ts): both books read the union
+  // of the character's own state and what the account's other characters
+  // earned or found. The capture stamps an ALT's entries straight onto the
+  // live ledger (never onto the character's own deedsEarned / itemsDiscovered),
+  // exactly what the server hands the sim for a sibling character's record, so
+  // the earned card and the owned cells paint from the ledger alone and name
+  // the alt. On a pre-ledger build the stamp is inert, which is the BEFORE.
+  // The half-page stamp idea is jgyy's (PR #3933's reliquary-account-ledger
+  // target), adapted to this ledger's keyed shape.
+  {
+    key: 'account-ledger-deeds',
+    label: 'The Book of Deeds: a deed an ALT on the account earned, with its earner named',
+    when: ['sim/account_ledger', 'sim/deeds_restore', 'net/book_wire', 'server/account_ledger'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      const seeded = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.get?.(sim.playerId);
+        if (!sim || !meta) return { ok: false, reason: 'no sim' };
+        const alt = { characterId: 99, name: 'Bram', cls: 'mage', day: '2026-09-01' };
+        // A pre-ledger build (the BEFORE) has no ledger: the stamp is inert there
+        // and the Book opens as it always did.
+        const ledger = meta.accountLedger;
+        if (ledger) {
+          for (const id of ['dgn_deepward', 'col_discovery_250']) {
+            const list = ledger.deeds.get(id) ?? [];
+            ledger.deeds.set(id, [alt, ...list]);
+          }
+        }
+        window.__game?.hud?.openDeeds?.('dungeon');
+        return { ok: true };
+      });
+      if (!seeded.ok) throw new Error(`account ledger deeds seeding failed: ${seeded.reason}`);
+      const opened = await pollForSize(page, '#deeds-window');
+      if (!opened) throw new Error('deeds window did not open');
+      // The Earned filter through the real chip, so the alt-earned cards (and
+      // their "Earned by" foot) lead the list instead of sitting below the clip.
+      await page.evaluate(() => {
+        document.querySelector('#deeds-window [data-filter="earned"]')?.click();
+      });
+      await wait(400);
+      return { clip: '#deeds-window' };
+    },
+  },
+  {
+    key: 'account-ledger-reliquary',
+    label: 'The Reliquary: a page half-filled by an ALT on the account, finders in the tooltip',
+    when: ['sim/account_ledger', 'net/book_wire', 'server/account_ledger'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      const pageIds = await openReliquaryConquerorsShelf(page);
+      if (pageIds.length === 0) throw new Error('reliquary shelf listed no pages');
+      const pick = await page.evaluate((ids) => {
+        const sim = window.__game?.sim;
+        for (const id of ids) {
+          const c = sim?.reliquaryPageCompletion?.(id);
+          if (c && c.total >= 4 && c.total <= 14) return id;
+        }
+        return ids[0];
+      }, pageIds);
+      await page.evaluate((id) => {
+        document.querySelector(`#reliquary-window [data-page="${id}"]`)?.click();
+      }, pick);
+      await wait(250);
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#reliquary-window .reliquary-cell')].filter(
+          (c) => c.dataset.cellKind === 'item',
+        );
+        const ids = cells
+          .slice(0, Math.ceil(cells.length / 2))
+          .map((c) => c.dataset.cellId)
+          .filter(Boolean);
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.get?.(sim.playerId);
+        if (!meta) return;
+        const alt = { characterId: 99, name: 'Bram', cls: 'mage', day: '2026-09-01' };
+        // Inert on a pre-ledger build (the BEFORE), exactly like the Book target.
+        const ledger = meta.accountLedger;
+        if (ledger) for (const id of ids) ledger.relics.set(`item:${id}`, [alt]);
+      });
+      // Re-enter the page through the real navigation so the shot is the
+      // rebuilt detail, not a slow-band race.
+      await page.evaluate(() => {
+        document.querySelector('#reliquary-window [data-back]')?.click();
+      });
+      await wait(250);
+      await page.evaluate((id) => {
+        document.querySelector(`#reliquary-window [data-page="${id}"]`)?.click();
+      }, pick);
+      await wait(400);
+      return { clip: '#reliquary-window' };
+    },
+  },
   ...masterwroughtReviewTargets({
     beforeLoad: lowGraphicsSeed,
     dismissOverlays: dismissEntryOverlays,

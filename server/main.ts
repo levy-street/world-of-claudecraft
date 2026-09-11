@@ -48,6 +48,9 @@ import {
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
+import { loadAccountLedger } from './account_ledger_db';
+import { accountLedgerKeysFor } from './account_ledger_keys_cache';
+import { relicRecordsIdle } from './account_ledger_records';
 import {
   configureTopWealthHolders,
   startAccountWealthSweep,
@@ -1966,10 +1969,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacterById(target.characterId);
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank, deedsRecent] = await Promise.all([
+      const [guild, rank, deedsRecent, accountLedger] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
         recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
+        accountLedgerKeysFor(row.account_id).catch(() => undefined),
       ]);
       return json(
         res,
@@ -1982,6 +1986,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           guild,
           rank: toSheetRank(rank),
           deedsRecent,
+          accountLedger,
         }),
       );
     }
@@ -1992,10 +1997,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacter(accountId, Number(ownerSheetMatch[1]));
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank, deedsRecent] = await Promise.all([
+      const [guild, rank, deedsRecent, accountLedger] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
         recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
+        accountLedgerKeysFor(row.account_id).catch(() => undefined),
       ]);
       return json(
         res,
@@ -2008,6 +2014,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           guild,
           rank: toSheetRank(rank),
           deedsRecent,
+          accountLedger,
         }),
       );
     }
@@ -3797,6 +3804,7 @@ export async function startServer(): Promise<http.Server> {
     metaRequestUserData,
     metaEventSourceUrl,
     loadAccountCosmetics,
+    loadAccountLedger,
     isConnectionRefused,
     bufferHandshakeMessages,
     requestMetadata,
@@ -4243,6 +4251,10 @@ export async function startServer(): Promise<http.Server> {
     // go missing until that character's next login (the join reconcile is the
     // only heal). Rejections log inside the writer, so the drain never throws.
     await deedRecordsIdle();
+    // The account ledger's relic FIFO (account_relic_finds) drains on the same
+    // reasoning: a queued insert rejected by pool.end() would wait for the
+    // finder's next login reconcile while its alts miss the find.
+    await relicRecordsIdle();
     // Drain the progress-events FIFO (level_up_events / ftue_events) as well:
     // unlike deeds these rows have no reconcile heal path, so a row dropped by
     // pool.end() is gone. Rejections log inside the writer; never throws.

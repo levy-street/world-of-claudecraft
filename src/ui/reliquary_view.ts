@@ -16,6 +16,7 @@
 // the deeds_view searchText idiom), never on the raw catalog English the models
 // carry, so a player searches the names their own client shows them.
 
+import { type AccountEarner, accountRelicKey } from '../sim/account_ledger';
 import { DEEDS } from '../sim/content/deeds';
 import { type DelveShopGate, delveShopGateForItem } from '../sim/content/delves';
 import {
@@ -344,6 +345,13 @@ export interface ReliquaryViewInput {
   /** Title ownership via deeds earned (deeds with title rewards only). */
   deedsEarned?: { has(id: string): boolean };
   /**
+   * The account ledger's relic half (IWorldReliquary.reliquaryAccountFinds):
+   * accountRelicKey -> the characters on the account that found it. Names the
+   * finders on an owned item / mark / mount cell; it never decides ownership
+   * here (the painter unions ownership into the lookups above).
+   */
+  accountFinds?: ReadonlyMap<string, readonly AccountEarner[]>;
+  /**
    * Lowercased search needle; '' (or absent) means no search. Matching runs
    * against the LOCALIZED display text the painter injects below, never the
    * raw catalog English on the models: a player searching in their own
@@ -468,6 +476,13 @@ export interface ReliquaryGridCellModel {
    * and a length test agree.
    */
   sourcePlans?: readonly ReliquarySourceLinePlan[];
+  /**
+   * Every character on the account that found this owned item / mark / mount
+   * relic, first finder first (the account ledger). Undefined for a missing
+   * cell, a skin or title cell, or when the ledger names nobody; never an
+   * empty list, so a truthiness test and a length test agree.
+   */
+  finders?: readonly AccountEarner[];
 }
 
 /** Full page view: header progress plus ordered grid cells. */
@@ -529,6 +544,20 @@ export interface ReliquaryViewModel {
    */
   recentEmptiedBySearch: boolean;
   nearlyEmptiedBySearch: boolean;
+}
+
+/** Repaint digest over the account ledger: the total finder plus earner count
+ *  across every entry, so an alt's new find or earn (a new key OR a new name
+ *  on a known key) repaints an open window. Entries only grow, so climbs never
+ *  cancel. O(entries) per slow-band poll. */
+export function accountLedgerDigest(
+  finds: ReadonlyMap<string, readonly AccountEarner[]>,
+  deeds: ReadonlyMap<string, readonly AccountEarner[]>,
+): number {
+  let digest = 0;
+  for (const list of finds.values()) digest += list.length;
+  for (const list of deeds.values()) digest += list.length;
+  return digest;
 }
 
 function ownershipOpts(input: ReliquaryViewInput) {
@@ -651,6 +680,7 @@ export function buildReliquaryPageCells(
     deedsEarned?: { has(id: string): boolean };
     firstFind?: ReliquaryFirstFindLookup;
     obtainCounts?: ReliquaryObtainCountLookup;
+    accountFinds?: ReadonlyMap<string, readonly AccountEarner[]>;
   },
 ): ReliquaryGridCellModel[] {
   const cells: ReliquaryGridCellModel[] = [];
@@ -664,6 +694,12 @@ export function buildReliquaryPageCells(
       owned,
       index: i,
     };
+    // Finders ride only the three ledger-recorded kinds; skins are account
+    // cosmetics with no finder and a title's earners live on its deed card.
+    if (owned && (relic.kind === 'item' || relic.kind === 'mark' || relic.kind === 'mount')) {
+      const finders = opts.accountFinds?.get(accountRelicKey(relic.kind, id));
+      if (finders !== undefined && finders.length > 0) cell.finders = finders;
+    }
     // Slot hints first, then the page default, through the ONE implementation of
     // that precedence (reliquaryRelicSource). It takes the INJECTED page def,
     // never a catalog lookup by id, so a synthetic test page resolves its own
@@ -861,6 +897,7 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
           ...opts,
           firstFind: input.firstFind,
           obtainCounts: input.obtainCounts,
+          accountFinds: input.accountFinds,
         });
         const visible = cells.filter(
           (cell) =>

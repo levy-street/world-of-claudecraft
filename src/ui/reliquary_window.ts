@@ -24,6 +24,7 @@
 // module injects.
 
 import { audio } from '../game/audio';
+import { accountDeedLookup, accountRelicLookup } from '../sim/account_ledger';
 import { mountDef } from '../sim/content/mounts';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
@@ -33,7 +34,16 @@ import { deedName } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
-import { formatNumber, getLanguage, languageTag, type TranslationKey, t, tPlural } from './i18n';
+import {
+  formatDateTime,
+  formatList,
+  formatNumber,
+  getLanguage,
+  languageTag,
+  type TranslationKey,
+  t,
+  tPlural,
+} from './i18n';
 import { iconDataUrl } from './icons';
 import { knownItemDef, ownEntry } from './known_item';
 import { ReannounceMarker } from './live_region_reannounce';
@@ -57,6 +67,7 @@ import {
   toggleReliquaryPin,
 } from './reliquary_tracker_view';
 import {
+  accountLedgerDigest,
   buildReliquaryView,
   CURATOR_BORDER_REWARD,
   CURATOR_RANK_NAME_KEYS,
@@ -572,7 +583,11 @@ export class ReliquaryWindow {
     const world = this.deps.world();
     const viewInput: ReliquaryViewInput = {
       ...input,
-      ownedMounts: new Set(world.ownedMounts()),
+      ownedMounts: accountRelicLookup(
+        new Set(world.ownedMounts()),
+        { relics: world.reliquaryAccountFinds },
+        'mount',
+      ),
       weaponSkins: new Set(world.accountCosmetics.weaponSkinIds),
     };
     const model = buildReliquaryView(viewInput);
@@ -808,10 +823,15 @@ export class ReliquaryWindow {
     // Horizons ownership: live seams only (no parallel discovery set).
     // Mounts = ownedMounts(); skins = account cosmetics (empty offline/stub);
     // titles = deedsEarned for deeds with title rewards.
+    // ACCOUNT-WIDE ownership: each character-durable lookup is this
+    // character's own surface unioned with the account ledger's finders (the
+    // Sim / ClientWorld completion reads use the identical union).
+    const ledger = { relics: world.reliquaryAccountFinds, deeds: world.accountDeeds };
     return {
       pages: RELIQUARY_PAGES,
-      itemsDiscovered: world.deedStats.itemsDiscovered,
-      marks: world.reliquaryMarks,
+      itemsDiscovered: accountRelicLookup(world.deedStats.itemsDiscovered, ledger, 'item'),
+      marks: accountRelicLookup(world.reliquaryMarks, ledger, 'mark'),
+      accountFinds: world.reliquaryAccountFinds,
       recent: world.reliquaryRecent,
       nav: this.nav,
       pageId: this.pageId,
@@ -845,7 +865,7 @@ export class ReliquaryWindow {
       // a rebuild actually walks the cells (and by the digest below, which
       // folds it in place).
       obtainCounts: world.reliquaryObtainCounts,
-      deedsEarned: world.deedsEarned,
+      deedsEarned: accountDeedLookup(world.deedsEarned, ledger),
     };
   }
 
@@ -903,7 +923,10 @@ export class ReliquaryWindow {
       // the window is open (today unreachable, the options window closes
       // others, but that is a coincidence not a contract) would strand the
       // eye's pressed state until an unrelated repaint.
-    })}|r${this.rarityGen}|t${this.deps.trackerShown() ? 1 : 0}`;
+    })}|r${this.rarityGen}|t${this.deps.trackerShown() ? 1 : 0}|a${accountLedgerDigest(
+      world.reliquaryAccountFinds,
+      world.accountDeeds,
+    )}`;
   }
 
   /**
@@ -951,6 +974,8 @@ export class ReliquaryWindow {
     return (
       `<div class="reliquary-summary${sealClass}"${sealAttr}>` +
       `<span class="reliquary-count">${esc(t('hudChrome.reliquary.countLabel', { owned, total }))}</span>` +
+      // The scope disclosure: the count and rank are account-wide.
+      `<span class="reliquary-scope-note" data-scope-note tabindex="0">${esc(t('hudChrome.reliquary.sharedScopeNote'))}</span>` +
       `<span class="reliquary-rank" data-rank="${p.curatorRank}">` +
       `<span class="reliquary-rank-seal" aria-hidden="true"></span>` +
       `${esc(rankLabel)}</span>` +
@@ -1711,6 +1736,29 @@ export class ReliquaryWindow {
    * is interpolated through formatNumber: selecting on that formatted string
    * would collapse every locale onto .other.
    */
+  /** The account ledger's finders for an owned cell: every character on the
+   *  account that found the relic, each with its find date where one is
+   *  recorded. No line when the ledger names nobody (a skin, a title, or a
+   *  host with no ledger). */
+  private foundByLineHtml(cell: ReliquaryGridCellModel): string {
+    const finders = cell.finders;
+    if (finders === undefined) return '';
+    const names = finders.map((finder) =>
+      finder.day === ''
+        ? finder.name
+        : t('hudChrome.reliquary.finderWithDate', {
+            name: finder.name,
+            date: formatDateTime(new Date(`${finder.day}T00:00:00Z`), {
+              dateStyle: 'medium',
+              timeZone: 'UTC',
+            }),
+          }),
+    );
+    return `<div class="tt-line">${esc(
+      t('hudChrome.reliquary.foundBy', { names: formatList(names) }),
+    )}</div>`;
+  }
+
   private obtainedLineHtml(cell: ReliquaryGridCellModel): string {
     const count = cell.obtainedCount;
     if (count === undefined) return '';
@@ -1779,6 +1827,7 @@ export class ReliquaryWindow {
         }),
       )}</div>`;
     }
+    body += this.foundByLineHtml(cell);
     body += this.obtainedLineHtml(cell);
     // Owned item relics also get the full item tooltip body (stats are catalog
     // truth, not invented power) so the museum reads like other item surfaces.
@@ -1795,6 +1844,7 @@ export class ReliquaryWindow {
             }),
           )}</div>`;
         }
+        html += this.foundByLineHtml(cell);
         html += this.obtainedLineHtml(cell);
         html += this.rarityLineHtml(cell);
         return html;
@@ -1805,6 +1855,15 @@ export class ReliquaryWindow {
   }
 
   private wire(el: HTMLElement, model: ReliquaryViewModel): void {
+    // The scope note's hint rides the shared tooltip seam (jgyy's scope chip
+    // from pull request 3933: a quiet readout whose explanation is one hover away).
+    const scopeNote = el.querySelector<HTMLElement>('[data-scope-note]');
+    if (scopeNote) {
+      this.deps.attachTooltip(
+        scopeNote,
+        () => `<div class="tt-name">${esc(t('hudChrome.reliquary.sharedScopeHint'))}</div>`,
+      );
+    }
     // A slain proof starts on its exact mob portrait, with the authored trophy
     // glyph carried only as a mixed-deploy/decode fallback. Disarm BEFORE the
     // swap and listen once, so even a malformed fallback cannot recurse.

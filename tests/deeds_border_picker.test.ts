@@ -73,6 +73,8 @@ function makeWindow(state: WorldState, opts: { peek?: boolean } = {}): Harness {
     world: () =>
       ({
         deedsEarned: state.deedsEarned,
+        // The account ledger half every real world carries (src/sim/account_ledger.ts).
+        accountDeeds: new Map(),
         deedStats: stats,
         renown: 0,
         activeTitle: state.activeTitle,

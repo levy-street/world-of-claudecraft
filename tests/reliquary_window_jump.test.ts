@@ -99,6 +99,8 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
         ownedMounts: () => [],
         accountCosmetics: { weaponSkinIds: [] },
         deedsEarned: new Map<string, string>(),
+        accountDeeds: new Map<string, readonly never[]>(),
+        reliquaryAccountFinds: new Map<string, readonly never[]>(),
         reliquaryPageClearCount: () => undefined,
         reliquaryCatalogCompletion: () => ({ owned: 0, total: 100 }),
         reliquaryCuratorRank: () => 0,

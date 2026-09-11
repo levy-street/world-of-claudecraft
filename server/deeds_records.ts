@@ -24,6 +24,7 @@ import { FISHING_RARE_ID } from '../src/sim/content/items';
 import { ITEMS } from '../src/sim/data';
 import type { DeedDef } from '../src/sim/types';
 import type { DeedsRarity } from '../src/world_api';
+import { bustAccountLedgerKeys } from './account_ledger_keys_cache';
 import { insertCharacterDeed, insertCharacterDeeds } from './deeds_db';
 // Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
 // barrels): this module rides in game.ts's graph, and the barrels would drag
@@ -136,6 +137,8 @@ export function recordDeedUnlock(
         // shared mega-bus: Steam and Epic are independent.
         onSteamDeedRecorded(who.accountId, deedId);
         onEpicDeedRecorded(who.accountId, deedId);
+        // The public sheet's cached account-ledger view learns the row now.
+        bustAccountLedgerKeys(who.accountId);
       })
       .catch((err) => {
         console.error('character_deeds write failed:', err);
@@ -191,6 +194,7 @@ export function recordDeedUnlocks(
           onSteamDeedRecorded(who.accountId, id);
           onEpicDeedRecorded(who.accountId, id);
         }
+        bustAccountLedgerKeys(who.accountId);
       })
       .catch((err) => {
         console.error('character_deeds batch write failed:', err);
@@ -230,6 +234,7 @@ export function reconcileCharacterDeeds(
           deedIds,
         ),
       )
+      .then(() => bustAccountLedgerKeys(who.accountId))
       .catch((err) => {
         console.error('character_deeds reconcile failed:', err);
       });

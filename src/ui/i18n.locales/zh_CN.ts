@@ -6425,7 +6425,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '壮举自成一类：它们是传承与世界首创的记录，是那些与逝去纪元相关、或只会发生一次的功绩。它们不带来任何名望，也不计入完成度，将作为对往昔功业的纪念被永久保存。',
   'guide.deedsPage.featsHeading': '壮举',
   'guide.deedsPage.howBody':
-    '功绩以单个角色为单位逐一赢得并留存，因此你所扮演的每一位英雄都会各自积累自己的功绩之书；只有王国的排行榜才会汇总你所扮演的所有角色的名望，且每个功绩只计一次。每个功绩都在游戏内的功绩之书中清楚写明它的要求，让你始终知道该追求什么；你还可以对心仪的功绩设置追踪，让它们在你游玩时时刻不离视线。少数功绩会保持隐秘，只有在你赢得它们之后才会揭晓。这本书还讲求诚实：凡是你过往的记录足以证明的，它都会当场记上，因此老玩家绝不会翻开一页空白；只有计数类的功绩才从零开始累计。',
+    '功业由每个角色各自完成，但功业之书由账号内所有角色共享：任一角色完成的功业对所有角色都算达成，书中会记下是谁在何时完成的，它奖励的称号或边框也可由你的任何角色佩戴。领域排行榜以同样的方式汇总你的声望，每项功业只计一次。每项功业都在游戏内的功业之书中清楚写明要求，让你始终知道该追求什么，还可以把想要的功业加入关注，在游玩时随时留意。少数功业保持隐秘，只有在你达成后才会显现。这本书也会保持诚实：凡是你过去的记录能够证明的，都会当场记入，因此老玩家翻开时绝不会是空白一页；只有计数类功业会重新开始计数。',
   'guide.deedsPage.howHeading': '功绩如何运作',
   'guide.deedsPage.intro':
     '功绩之书记录着你在这个世界所做的一切，从走出新手山谷的第一步，到王国所能提供的最艰难的战斗。一边游玩一边赢得功绩，佩戴它们授予的头衔，看着你的名望不断攀升。',
@@ -6486,7 +6486,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '圣物库是你已收录的独特战利品博物馆：地下城追逐装备、专业奖杯、坐骑、武器外观与头衔。它与功绩之书的关系，就像奖杯厅与成就簿的关系。',
   'guide.reliquaryPage.howHeading': '收藏如何运作',
   'guide.reliquaryPage.howBody':
-    '在游戏中打开圣物库（默认 Shift+X）。每个架上有多页独特圣物。角色首次获得该件时填满剪影；一页上的圣物全部填满时点亮该页。少数页面标注“绝版”或“专属”：它们不计入达成，不会阻碍书架或全库的完成。实时发现会弹出提示并刷新已打开的窗口；进度按角色计算，武器外观除外（账号外观）。',
+    '在游戏中打开圣物库（默认 Shift+X）。每个架上有多页独特圣物。账号内任一角色首次获得该件时填满剪影；一页上的圣物全部填满时点亮该页。少数页面标注“绝版”或“专属”：它们不计入达成，不会阻碍书架或全库的完成。实时发现会弹出提示并刷新已打开的窗口；进度由账号内所有角色共享，一个角色找到的圣物会为所有角色填满该页。',
   'guide.reliquaryPage.ranksHeading': '策展人等级',
   'guide.reliquaryPage.ranksBody':
     '策展人等级随已收录的独特圣物上升，仅授予装饰性头衔与边框。不会提供战斗强度、掉落率或保底。账号武器外观不计策展人等级，因此声望保持角色持久。绝版与专属页面上的圣物同样不计入等级。',
@@ -10853,6 +10853,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.progressAria': '进度：{current}/{target}',
   'hudChrome.deeds.renownChip': '{renown} 名望',
   'hudChrome.deeds.earnedDate': '获得于 {date}',
+  'hudChrome.deeds.earnedBy': '由 {names} 获得',
+  'hudChrome.deeds.earnerWithDate': '{name}（{date}）',
+  'hudChrome.deeds.accountScopeNote': '账号下所有角色共享',
+  'hudChrome.deeds.accountScopeHint':
+    '账号内任一角色完成的功业在此同样算达成，且书中会记下是谁完成的。',
   'hudChrome.deeds.hiddenBadge': '隐藏',
   'hudChrome.deeds.titleChip': '头衔奖励',
   'hudChrome.deeds.borderChip': '边框奖励',
@@ -12038,6 +12043,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.ownedTooltipStatus': '已收录于圣物库',
   'hudChrome.reliquary.missingTooltipStatus': '尚未获得',
   'hudChrome.reliquary.firstFindClears': '首次获得于第 {count} 次通关',
+  'hudChrome.reliquary.foundBy': '由 {names} 发现',
+  'hudChrome.reliquary.finderWithDate': '{name}（{date}）',
+  'hudChrome.reliquary.sharedScopeNote': '账号下所有角色共享',
+  'hudChrome.reliquary.sharedScopeHint': '账号内任一角色找到的圣物也会在此填满该页。',
   'hudChrome.reliquary.unlockToast': '圣物已收录：{name}',
   'hudChrome.reliquary.illuminateBanner': '页面已点亮：{name}',
   'hudChrome.reliquary.illuminateToast': '{name} 上的每一件圣物均已填满。',

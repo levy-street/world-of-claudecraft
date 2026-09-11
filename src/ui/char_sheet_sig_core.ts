@@ -75,6 +75,29 @@
  * fixed six-element array through JSON.stringify), so a latch comparing two
  * signatures moves exactly when one of the six moves.
  */
+/** The six-plus-one part reads off a live world, so the HUD latch is one call
+ *  (the ownedMounts() copy is the one non-O(1) read; see the header). */
+export function charSheetRefreshSigFor(world: {
+  activeTitle: string | null;
+  activeBorder: string | null;
+  deedsEarned: { size: number };
+  deedStats: { itemsDiscovered: { size: number } };
+  reliquaryMarks: { size: number };
+  ownedMounts(): readonly string[];
+  reliquaryAccountFinds: { size: number };
+  accountDeeds: { size: number };
+}): string {
+  return charSheetRefreshSig({
+    activeTitle: world.activeTitle,
+    activeBorder: world.activeBorder,
+    deedsEarned: world.deedsEarned.size,
+    itemsDiscovered: world.deedStats.itemsDiscovered.size,
+    marks: world.reliquaryMarks.size,
+    mounts: world.ownedMounts().length,
+    accountEntries: world.reliquaryAccountFinds.size + world.accountDeeds.size,
+  });
+}
+
 export function charSheetRefreshSig(parts: {
   activeTitle: string | null;
   activeBorder: string | null;
@@ -86,6 +109,10 @@ export function charSheetRefreshSig(parts: {
   marks: number;
   /** ownedMounts().length: Horizons mount relics behind the pair. */
   mounts: number;
+  /** reliquaryAccountFinds.size + accountDeeds.size: the account ledger halves
+   *  behind the account-wide pair and border row. Optional so a host with no
+   *  ledger signs exactly as before. */
+  accountEntries?: number;
 }): string {
   return JSON.stringify([
     parts.activeTitle,
@@ -94,5 +121,6 @@ export function charSheetRefreshSig(parts: {
     parts.itemsDiscovered,
     parts.marks,
     parts.mounts,
+    parts.accountEntries ?? 0,
   ]);
 }

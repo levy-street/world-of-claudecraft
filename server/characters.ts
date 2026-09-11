@@ -50,6 +50,7 @@ import type { PlayerClass } from '../src/sim/types';
 // action_bar.ts pattern). The renderer owns what the values MEAN; the server
 // only guarantees the stored document is small and well shaped.
 import { sanitizeAppearance } from '../src/world_api/appearance';
+import { accountLedgerKeysFor } from './account_ledger_keys_cache';
 import { normalizeCharName, offensiveName } from './auth';
 import {
   characterDeleteClientGone,
@@ -248,6 +249,7 @@ function useRuntime(): CharactersRuntime {
 const REAL_CHARACTERS_DB = {
   accountAndScopeForToken,
   loadAccountCosmetics,
+  loadAccountLedgerKeys: accountLedgerKeysFor,
   moderationStatusForAccount,
   listCharacters,
   getCharacter,
@@ -787,10 +789,13 @@ async function standingHandler(ctx: Ctx): Promise<void> {
 async function ownerSheetHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const row = ownedCharacter(ctx);
-  const [guild, rank, deedsRecent] = await Promise.all([
+  const [guild, rank, deedsRecent, accountLedger] = await Promise.all([
     charactersDb.guildNameForCharacter(row.id),
     charactersDb.lifetimeXpRankForCharacter(row.id),
     charactersDb.recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
+    // A cosmetic aggregate must never 500 the sheet: a failed ledger read
+    // degrades the pair to the character's own fills.
+    charactersDb.loadAccountLedgerKeys(row.account_id).catch(() => undefined),
   ]);
   json(
     ctx.res,
@@ -803,6 +808,7 @@ async function ownerSheetHandler(ctx: Ctx): Promise<void> {
       guild,
       rank: toSheetRank(rank),
       deedsRecent,
+      accountLedger,
     }),
   );
 }

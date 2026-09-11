@@ -6266,6 +6266,14 @@ export type SimEvent = { pid?: number } & (
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
+  // Account ledger relic record (always personal: emitted with pid). Fired
+  // when the acting character is appended as a finder of a catalogued relic
+  // (an item, an authored mark, or a mount) on its account ledger
+  // (src/sim/account_ledger.ts). `key` is the accountRelicKey. Never English;
+  // NOT presentation: the client ignores it (the heavy `acct` self key is the
+  // membership authority), the server persists the row and fans the entry out
+  // to the account's other live sessions. `retro` marks the on-join seed pass.
+  | { type: 'relicRecorded'; key: string; retro?: boolean }
   // Reliquary first fill (always personal: emitted with pid). Id-only: exactly
   // one of itemId / markId is set for a catalogued relic or authored mark.
   // pageIds list pages that list the relic; illuminatedPageId is set when a

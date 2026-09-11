@@ -193,7 +193,7 @@ import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
 import { castDisplayName, targetCastDisplayLabel } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
-import { charSheetRefreshSig } from './char_sheet_sig_core';
+import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
@@ -16424,14 +16424,7 @@ export class Hud {
   // synchronous; online the atitle/aborder echo and the snapshot's ownership
   // fields land well inside one band), and render() rebuilds every row fresh.
   private refreshCharSheetIfChanged(): void {
-    const sig = charSheetRefreshSig({
-      activeTitle: this.sim.activeTitle,
-      activeBorder: this.sim.activeBorder,
-      deedsEarned: this.sim.deedsEarned.size,
-      itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
-      marks: this.sim.reliquaryMarks.size,
-      mounts: this.sim.ownedMounts().length,
-    });
+    const sig = charSheetRefreshSigFor(this.sim);
     if (sig === this.lastCharSheetSig) return;
     this.lastCharSheetSig = sig;
     this.charWindow.renderIfOpen();

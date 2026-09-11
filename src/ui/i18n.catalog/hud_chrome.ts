@@ -7485,6 +7485,14 @@ export const hudChromeStrings = {
     // slot would invalidate every shipped overlay fill, so the two meanings
     // coexist and this note is the guard.
     firstFindClears: 'First found on clear {count}',
+    // The account-wide Reliquary (src/sim/account_ledger.ts): which characters
+    // on the account found the relic (owned-cell tooltip), and the summary
+    // band's scope disclosure beside the count.
+    foundBy: 'Found by {names}',
+    finderWithDate: '{name} ({date})',
+    sharedScopeNote: 'Shared by every character on your account',
+    // The note's tooltip (the wording is jgyy's accountWideHint from PR #3933).
+    sharedScopeHint: 'A relic found by any character on your account fills the page here too.',
     unlockToast: 'Relic catalogued: {name}',
     illuminateBanner: 'Page illuminated: {name}',
     illuminateToast: 'Every relic on {name} is filled.',
@@ -7700,6 +7708,15 @@ export const hudChromeStrings = {
     progressAria: 'Progress: {current} of {target}',
     renownChip: '{renown} Renown',
     earnedDate: 'Earned {date}',
+    // The account-wide Book (src/sim/account_ledger.ts): which characters on
+    // the account earned the deed, each with its earn date where one is
+    // recorded (deeds_window.ts card foot), and the summary band's scope
+    // disclosure (the ranked-surface rule: a re-scoped count names its scope).
+    earnedBy: 'Earned by {names}',
+    earnerWithDate: '{name} ({date})',
+    accountScopeNote: 'Shared by every character on your account',
+    accountScopeHint:
+      'A deed any character on your account accomplishes is earned here too, and the Book names who earned it.',
     featRibbon: 'Feat',
     hiddenBadge: 'Hidden',
     titleChip: 'Title reward',

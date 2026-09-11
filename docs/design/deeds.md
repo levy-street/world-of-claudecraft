@@ -150,9 +150,9 @@ and it surfaces as Renown, never as a count.
 
 | Readout | Set | Scope |
 |---|---|---|
-| Book of Deeds header pair (earned/total) | Completion | Character |
-| Book of Deeds category counts | Visible deeds per display bucket (the Feats shelf shows its own bucket) | Character |
-| Book of Deeds Renown stat | Scoring set, summed (the evaluator's denormalized sum) | Character |
+| Book of Deeds header pair (earned/total) | Completion | Account (own earns unioned with the account ledger; labeled by `hudChrome.deeds.accountScopeNote`) |
+| Book of Deeds category counts | Visible deeds per display bucket (the Feats shelf shows its own bucket) | Account |
+| Book of Deeds Renown stat | Scoring set, summed (the evaluator's own sum plus the Renown of every deed only an alt earned) | Account |
 | Character sheet `deeds.earnedCount` (JSON sheet + companion OAuth) | Completion | Character |
 | Renown board score | Scoring set, summed | Account |
 | Renown board tie-break | Scoring set, max over each deed's earliest earn | Account |
@@ -227,12 +227,76 @@ completionist trap that drags veterans back through the tutorial. If the
 island ever gains real conquerable content (a rare, a delve), that content
 authors deeds like any other.
 
+## The account ledger (the Book is account-wide)
+
+The Book of Deeds is shared across every character on an account, and every
+earned deed remembers which characters earned it. The mechanism is the
+account ledger (`src/sim/account_ledger.ts`), and its scope model is fixed:
+
+- **The evaluator stays per character, with one account-wide family.** Every
+  deed whose trigger is an accomplishment (a kill, a quest, a craft, a level)
+  is decided from the acting character's own state, so its earners all did
+  the thing themselves. The Reliquary-derived deeds (Curator rank bridges,
+  the completion ladder, Illumination) are the exception, by maintainer
+  ruling and matching jgyy's PR #3933: they are decided over the ACCOUNT
+  union (`characterReliquaryOwnership` returns it) and granted to every
+  character on the account. The character whose find tipped the read earns
+  them in its fill chain, a live sibling in the same tick
+  (`syncAccountRelicGrants`, re-run by the server fan-out when a sibling's
+  ledger grows), and an offline alt at its next join (the join retro,
+  retro-flagged, no live banner). Each recipient is recorded as an earner in
+  its own right, so the card lists every character that holds the deed.
+  A relic an alt already found moves no rank count when this character finds
+  it too, so no rank crossing is faked (`tests/account_ledger_sim.test.ts`,
+  `tests/account_ledger_wire.test.ts`).
+- **The display lane is account-wide.** The Book's earned state, header pair,
+  category counts, Renown, recent strip, and the title and border pickers all
+  read the union of `deedsEarned` and the ledger (`IWorldDeeds.accountDeeds`),
+  and each card names its earners with their earn dates
+  (`hudChrome.deeds.earnedBy`). The sim's title and border validators accept
+  any deed on the ledger, so a cosmetic an alt earned is wearable everywhere.
+- **The ledger is input, not sim truth.** The server assembles it per join
+  from `character_deeds` (deeds) and `account_relic_finds` (relics, the
+  Reliquary half) joined to `characters` for names (`loadAccountLedger`,
+  `server/account_ledger_db.ts`), hands it to `Sim.addPlayer`, and fans a
+  live earn out to the account's other sessions in the same tick
+  (`server/account_ledger_service.ts`). It rides the heavy `acct` self key
+  and is never serialized into `CharacterState`. Offline the one sandbox
+  character fills its own ledger, so both hosts read the same shape
+  (`tests/account_ledger_sim.test.ts`, `tests/account_ledger_wire.test.ts`).
+- **Watching stays per character.** A deed an alt earned reads as earned in
+  this character's Book, but it stays watchable here and the HUD tracker keeps
+  tracking it (`watchable` and the prune read `deedsEarned`, not the union):
+  this character can still earn it and be listed as an earner too.
+- **The public sheets read an ids-only, cached view.** `/c/`, the public JSON
+  sheet, and the owner sheet take `accountLedgerKeysFor`
+  (`server/account_ledger_keys_cache.ts`, a keyed single-flight TTL cache the
+  two record observers bust when a row lands), so no earner detail enters an
+  anonymous handler and no request re-walks the account's rows.
+- **Character deletion.** `account_relic_finds` carries no character FK and
+  snapshots the finder's name and class, so a relic find outlives the
+  character that made it (the account keeps its Reliquary; the idea follows
+  jgyy's account-only keying in PR #3933). `character_deeds` still cascades
+  on the character row, so a deleted character's DEED earns leave the
+  account's Book exactly as they leave the Renown board today; lifting that
+  cascade is a schema change for a maintainer.
+- **Decode is catalog-bounded** (also from PR #3933): a stored row or wire
+  entry for a deed or relic the live catalog no longer knows is dropped on the
+  way in, so content removals can never leave a phantom entry in a book.
+- **The public character sheet reads the ledger** (`/c/`, the owner and public
+  JSON sheets): its Reliquary pair is the same account-wide union the window
+  shows, degrading to the character's own fills when the read fails. Its
+  `deeds.earnedCount` stays character-scoped (the table above).
+
 ## Deliberately deferred (do not "fix" these by shipping them)
 
-- **Account-level deeds** (`prog_three_paths`, `prog_ninefold`, and the
-  seven server-assisted `feat_*` world/realm firsts): the v1 evaluator is
-  strictly per-character and `server/deeds_records.ts` is observer-only; an
-  account-level grant lane must exist first.
+- **Account-level GRANTS beyond the Reliquary family** (`prog_three_paths`,
+  `prog_ninefold`, and the seven server-assisted `feat_*` world/realm
+  firsts): the Book is account-wide for display and cosmetics through the
+  account ledger above, and the Reliquary-derived deeds grant from the union,
+  but the evaluator is otherwise strictly per-character and
+  `server/deeds_records.ts` is observer-only; a deed whose trigger reads
+  ACROSS characters' accomplishments still needs an account-level grant lane.
 - **`prog_ringwright`**: every ring craft now has a live gain path (the
   Masterwrought phase 06 inscription catalog closed the last gap, and its
   milestone and Grandmaster deeds shipped with it), so the old

@@ -248,6 +248,13 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
 // drift and large nested blobs while their inputs stay pinned.
 export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'characterId', // DB id; not sim-deterministic offline
+  // The account ledger (src/sim/account_ledger.ts): host-loaded INPUT (the
+  // server's account tables; empty in this harness) plus the acting
+  // character's own appends, which are a pure function of sampled state
+  // (deedsEarned, itemsDiscovered, marks, owned mounts) stamped with utcDay.
+  // Sampling it would repeat those surfaces per frame with no gameplay signal;
+  // the relicRecorded events it emits ride the event digest already.
+  'accountLedger',
   'name', // identity
   'skin', // appearance
   'skinCatalog',

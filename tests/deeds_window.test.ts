@@ -116,7 +116,12 @@ describe('painter hygiene', () => {
     const start = painter.indexOf('private pruneWatchedIfStale(');
     expect(start).toBeGreaterThan(-1);
     const body = painter.slice(start, painter.indexOf('private ensureWatchLoaded(', start));
+    // The prune stays keyed on THIS character's own earns: a deed an alt earned
+    // is still watchable and trackable here (the jump category reads the union).
     expect(body).toContain('pruneWatched(this.watchedSet, this.deps.world().deedsEarned, DEEDS)');
+    expect(painter).toContain(
+      'accountEarnedDays(world.deedsEarned, { deeds: world.accountDeeds })',
+    );
     expect(body).toContain('this.watchRev++;');
     expect(body).toContain('this.persistWatched();');
     expect(body).toContain('this.deps.onWatchChanged();');
@@ -588,7 +593,8 @@ describe('hud wiring', () => {
     expect(progressionView).toMatch(
       /class="ms-badge ms-deed-border\$\{worn \? ' ms-active' : ''\}"/,
     );
-    expect(progressionView).toMatch(/reward\?\.kind === 'border' && sim\.deedsEarned\.has\(id\)/);
+    // Account-wide: the badge row filters through the ledger union.
+    expect(progressionView).toMatch(/reward\?\.kind === 'border' && earnedBorders\.has\(id\)/);
     // The WORN badge is state, not decoration: it is picked by comparing deed
     // ids against the facet read, and it says so in its own LABEL rather than
     // leaning on the ms-active colour alone (WCAG 1.4.1).

@@ -126,12 +126,16 @@ describe('painter hygiene', () => {
     expect(code).toContain('firstFind: world.reliquaryFirstFind');
     // Phase 7: profession mark ownership must feed the pure model (owned vs
     // missing cells). Dropping this leaves every mark painted missing.
-    expect(code).toContain('marks: world.reliquaryMarks');
+    // Account-wide (src/sim/account_ledger.ts): every character-durable
+    // lookup is the character's own surface unioned with the account ledger.
+    expect(code).toContain("marks: accountRelicLookup(world.reliquaryMarks, ledger, 'mark')");
     expect(code).toContain('marksSize: world.reliquaryMarks.size');
     // Phase 8: Horizons ownership from live seams only.
-    expect(code).toContain('ownedMounts: new Set(world.ownedMounts())');
+    expect(code).toContain('ownedMounts: accountRelicLookup(');
+    expect(code).toContain('new Set(world.ownedMounts())');
     expect(code).toContain('weaponSkins: new Set(world.accountCosmetics.weaponSkinIds)');
-    expect(code).toContain('deedsEarned: world.deedsEarned');
+    expect(code).toContain('deedsEarned: accountDeedLookup(world.deedsEarned, ledger)');
+    expect(code).toContain('accountFinds: world.reliquaryAccountFinds');
   });
 
   it('paints profession mark cells with quality silhouettes', () => {
@@ -210,7 +214,10 @@ describe('painter hygiene', () => {
     // guard exists to catch, and fails the exact-match below.
     const code = stripComments(painter);
     const nameReads = [...code.matchAll(/[\w.]*\.name\b/g)].map((m) => m[0]);
-    expect(nameReads).toEqual(['world.player.name']);
+    // The two finder.name reads are the account ledger's CHARACTER names on an
+    // owned cell's "Found by" line (foundByLineHtml): identity strings, never
+    // translatable text, listed here in full like the pin-store read.
+    expect(nameReads).toEqual(['finder.name', 'finder.name', 'world.player.name']);
     expect(code).toContain('reliquaryPageName(');
     expect(code).toContain('reliquaryRelicDisplayName(');
   });
@@ -222,7 +229,12 @@ describe('painter hygiene', () => {
       ['sim', simSrc],
       ['online', onlineSrc],
     ] as const) {
-      expect(src, name).toContain('reliquaryOwnershipOpts');
+      // Account-wide union (src/sim/account_ledger.ts) through the ONE shared
+      // helper on both hosts, so the completion reads answer identically for
+      // the same scripted state.
+      expect(src, name).toMatch(
+        /accountReliquaryOwnershipOpts\(this\.(primary\.)?accountLedger, \{/,
+      );
       expect(src, name).toContain('ownedMounts: this.ownedMounts()');
       expect(src, name).toContain('weaponSkinIds: this.accountCosmetics.weaponSkinIds');
       expect(src, name).toMatch(/deedsEarned: this\.(primary\.)?deedsEarned/);

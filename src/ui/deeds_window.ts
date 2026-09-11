@@ -8,6 +8,7 @@
 // imports Hud and never hardcodes the window id).
 
 import { audio } from '../game/audio';
+import { accountEarnedDays } from '../sim/account_ledger';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { DEEDS_RECENT_CAP } from '../sim/deeds';
 import type { DeedsRarity, IWorld } from '../world_api';
@@ -21,6 +22,7 @@ import {
 } from './deed_border_view';
 import { deedDesc, deedName, deedTitleText } from './deed_i18n';
 import {
+  accountDeedsDigest,
   buildDeedsView,
   DEED_DISPLAY_CATEGORIES,
   DEED_FILTERS,
@@ -276,7 +278,7 @@ export class DeedsWindow {
     // shares the masking predicate with buildDeedsView, so the two cannot
     // drift): null means an unknown or still-masked deed, and the Book opens
     // wherever it was, unfocused.
-    const jump = deedJumpCategory(DEEDS, this.deps.world().deedsEarned, deedId);
+    const jump = deedJumpCategory(DEEDS, this.earnedUnion(), deedId);
     if (jump !== null) {
       this.category = jump;
       this.filter = 'all';
@@ -320,6 +322,7 @@ export class DeedsWindow {
     return deedsRefreshSig({
       renown: world.renown,
       earnedCount: world.deedsEarned.size,
+      accountDigest: accountDeedsDigest(world.accountDeeds),
       activeTitle: world.activeTitle,
       activeBorder: world.activeBorder,
       filter: this.filter,
@@ -435,12 +438,20 @@ export class DeedsWindow {
     card.classList.add('deed-card-flash');
   }
 
+  /** The account-wide earned map (own earns plus every alt's), for the two
+   *  callers that take an earned map rather than the whole view input. */
+  private earnedUnion(): ReadonlyMap<string, string> {
+    const world = this.deps.world();
+    return accountEarnedDays(world.deedsEarned, { deeds: world.accountDeeds });
+  }
+
   private buildModel(): DeedsViewModel {
     const world = this.deps.world();
     const tag = languageTag(getLanguage());
     this.ensureWatchLoaded();
     return buildDeedsView({
       deedsEarned: world.deedsEarned,
+      accountDeeds: world.accountDeeds,
       deedStats: world.deedStats,
       renown: world.renown,
       activeTitle: world.activeTitle,
@@ -469,7 +480,10 @@ export class DeedsWindow {
       `<span class="deeds-renown">${esc(t('hudChrome.deeds.renownLabel'))} <b>${this.fmt(s.renown)}</b></span>` +
       `<span class="deeds-count">${esc(t('hudChrome.deeds.countLabel', { earned, total }))}</span>` +
       `<span class="deed-bar deeds-completion ui-bar" role="img" aria-label="${esc(t('hudChrome.deeds.completionAria', { earned, total }))}"><span class="deed-bar-fill ui-bar-fill" style="width:${pct}%"></span></span>` +
-      `<span class="deeds-pct">${esc(pctText)}</span>`;
+      `<span class="deeds-pct">${esc(pctText)}</span>` +
+      // The scope disclosure the ranked-surface rule asks of a re-scoped count
+      // (docs/design/deeds.md): Renown and the earned pair are account-wide.
+      `<span class="deeds-scope-note" data-scope-note tabindex="0">${esc(t('hudChrome.deeds.accountScopeNote'))}</span>`;
     if (s.recent.length > 0) {
       const crests = s.recent
         .map(
@@ -626,6 +640,26 @@ export class DeedsWindow {
       });
       foot += `<span class="deed-earned-date">${esc(t('hudChrome.deeds.earnedDate', { date }))}</span>`;
     }
+    // The account ledger's earners: every character on the account that
+    // accomplished this deed, each with its own date where one is recorded.
+    // Always listed when known (the Book is account-wide, so the reader may
+    // not be the earner); the same muted-fact role as the date beside it.
+    if (entry.earners.length > 0) {
+      const names = entry.earners.map((earner) =>
+        earner.day === ''
+          ? earner.name
+          : t('hudChrome.deeds.earnerWithDate', {
+              name: earner.name,
+              date: formatDateTime(new Date(`${earner.day}T00:00:00Z`), {
+                dateStyle: 'medium',
+                timeZone: 'UTC',
+              }),
+            }),
+      );
+      foot += `<span class="deed-earned-date deed-earned-by">${esc(
+        t('hudChrome.deeds.earnedBy', { names: formatList(names) }),
+      )}</span>`;
+    }
     if (entry.watchable) {
       const atCap = !entry.watched && this.watchedSet.size >= DEED_WATCH_CAP;
       const label = t(entry.watched ? 'hudChrome.deeds.unwatch' : 'hudChrome.deeds.watch');
@@ -777,6 +811,15 @@ export class DeedsWindow {
   }
 
   private wire(el: HTMLElement): void {
+    // The scope note's hint rides the shared tooltip seam (the Reliquary
+    // window's sibling, after jgyy's scope chip in pull request 3933).
+    const scopeNote = el.querySelector<HTMLElement>('[data-scope-note]');
+    if (scopeNote) {
+      this.deps.attachTooltip(
+        scopeNote,
+        () => `<div class="tt-name">${esc(t('hudChrome.deeds.accountScopeHint'))}</div>`,
+      );
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       this.close();
       audio.click();

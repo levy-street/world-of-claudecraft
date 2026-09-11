@@ -18,6 +18,7 @@
 //   (src/sim/deeds_completion.ts), the one definition of "deeds completed"
 //   every surface consumes; the Renown leaderboard displays no deed count.
 
+import { type AccountEarner, accountEarnedDays } from '../sim/account_ledger';
 import { countsTowardCompletion } from '../sim/deeds_completion';
 import type { DeedDef, DeedStats, DeedTrigger } from '../sim/types';
 import type { DeedsRarity } from '../world_api';
@@ -206,9 +207,27 @@ export type DeedsFilter = (typeof DEED_FILTERS)[number];
 /** How complete a 'nearly done' deed must be to pass that filter arm. */
 export const DEED_NEARLY_FRACTION = 0.5;
 
+const NO_ACCOUNT_DEEDS: ReadonlyMap<string, readonly AccountEarner[]> = new Map();
+
+/** Repaint digest over the account ledger's deed half: the total earner count
+ *  across every deed, so both a new deed and a new earner on a known deed move
+ *  it (entries only ever grow, so climbs never cancel). O(deeds) per poll. */
+export function accountDeedsDigest(
+  accountDeeds: ReadonlyMap<string, readonly AccountEarner[]>,
+): number {
+  let digest = 0;
+  for (const earners of accountDeeds.values()) digest += earners.length;
+  return digest;
+}
+
 export interface DeedsViewInput {
   // The IWorldDeeds facet reads (identical shapes offline and online).
   deedsEarned: ReadonlyMap<string, string>;
+  // The account ledger's deed half (IWorldDeeds.accountDeeds): the Book is
+  // account-wide, so a deed is earned when it is in deedsEarned OR here, and
+  // its card names every earner. Optional so a host or test with no ledger
+  // reads exactly as the per-character Book did.
+  accountDeeds?: ReadonlyMap<string, readonly AccountEarner[]>;
   deedStats: Readonly<DeedStats>;
   renown: number;
   activeTitle: string | null;
@@ -281,8 +300,12 @@ export interface DeedEntryModel {
   id: string;
   earned: boolean;
   // The utcDay earned ('YYYY-MM-DD'); null when unearned or when the host set
-  // no calendar ('' on the wire), which hides the date line entirely.
+  // no calendar ('' on the wire), which hides the date line entirely. For a
+  // deed only an alt earned this is the first account earner's day.
   earnedDay: string | null;
+  // Every character on the account that earned this deed, first earner first
+  // (the account ledger); empty when the host has no ledger or none earned.
+  earners: readonly AccountEarner[];
   renown: number;
   progress: DeedProgress | null;
   watchable: boolean;
@@ -340,11 +363,16 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
   const borders: DeedBorderOption[] = [{ id: null, active: input.activeBorder === null }];
   let earnedCount = 0;
   let visibleTotal = 0;
+  // The account-wide earned map: this character's own earns plus every deed an
+  // alt earned (first account day). Every earned/unearned read below uses it.
+  const earnedDays = accountEarnedDays(input.deedsEarned, {
+    deeds: input.accountDeeds ?? NO_ACCOUNT_DEEDS,
+  });
 
   for (const id of input.order) {
     const def = input.deeds[id];
     if (!def) continue;
-    const earned = input.deedsEarned.has(id);
+    const earned = earnedDays.has(id);
     // Hidden masking: no entry, no counts, no search hits until earned.
     if (def.hidden && !earned) continue;
     const feat = def.feat === true;
@@ -372,14 +400,17 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
     const progress = earned ? null : deedProgress(def.trigger, input.deedStats);
     if (!matchesFilter(input.filter, earned, progress)) continue;
     if (input.search !== '' && !input.searchText(id).includes(input.search)) continue;
-    const day = input.deedsEarned.get(id) ?? '';
+    const day = earnedDays.get(id) ?? '';
     entries.push({
       id,
       earned,
       earnedDay: earned && day !== '' ? day : null,
+      earners: input.accountDeeds?.get(id) ?? [],
       renown: def.renown,
       progress,
-      watchable: !earned,
+      // Watch stays keyed on THIS character's own progress: a deed an alt earned
+      // reads earned, but this character can still earn it and be listed too.
+      watchable: !input.deedsEarned.has(id),
       watched: input.watched.has(id),
       feat,
       hiddenBadge: def.hidden === true,
@@ -392,7 +423,7 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
 
   const focus = input.focusDeedId ?? null;
   return {
-    summary: buildSummary(input, earnedCount, visibleTotal),
+    summary: buildSummary(input, earnedCount, visibleTotal, earnedDays),
     categories: DEED_DISPLAY_CATEGORIES.map((category) => {
       const c = counts.get(category) ?? { earned: 0, visible: 0 };
       return { category, earned: c.earned, visible: c.visible };
@@ -425,7 +456,18 @@ function buildSummary(
   input: DeedsViewInput,
   earned: number,
   visibleTotal: number,
+  earnedDays: ReadonlyMap<string, string>,
 ): DeedsSummaryModel {
+  // Account Renown: this character's own denormalized sum plus the Renown of
+  // every deed only an alt earned (the same per-deed sum recomputeRenown
+  // folds, so with no ledger this is exactly input.renown). Account-scoped, and
+  // the summary band says so (hudChrome.deeds.accountScopeNote).
+  let renown = input.renown;
+  for (const id of earnedDays.keys()) {
+    if (input.deedsEarned.has(id)) continue;
+    const def = input.deeds[id];
+    if (def) renown += def.renown;
+  }
   // Recent unlocks, three recency signals merged strongest-first with dedup:
   //  1. this session's unlocks, newest first (exact, both hosts, instant);
   //  2. the host's fetched newest-first order (exact, survives relog);
@@ -436,7 +478,7 @@ function buildSummary(
   const orderIndex = new Map<string, number>();
   for (let i = 0; i < input.order.length; i++) orderIndex.set(input.order[i], i);
   const dayFallback: { id: string; day: string; index: number }[] = [];
-  for (const [id, day] of input.deedsEarned) {
+  for (const [id, day] of earnedDays) {
     const def = input.deeds[id];
     if (!def) continue;
     dayFallback.push({ id, day, index: orderIndex.get(id) ?? 0 });
@@ -447,7 +489,7 @@ function buildSummary(
   const pushRecent = (id: string): void => {
     // Own-property check, not a bare index read: the fetched recentOrder is
     // wire data whose ids could name prototype keys (the known_item doctrine).
-    if (seen.has(id) || !input.deedsEarned.has(id) || !Object.hasOwn(input.deeds, id)) return;
+    if (seen.has(id) || !earnedDays.has(id) || !Object.hasOwn(input.deeds, id)) return;
     seen.add(id);
     recent.push(id);
   };
@@ -459,7 +501,7 @@ function buildSummary(
   const nearest: { id: string; progress: DeedProgress; fraction: number; index: number }[] = [];
   for (const id of input.order) {
     const def = input.deeds[id];
-    if (!def || def.feat || input.deedsEarned.has(id)) continue;
+    if (!def || def.feat || earnedDays.has(id)) continue;
     if (def.hidden) continue;
     const progress = deedProgress(def.trigger, input.deedStats);
     if (!progress) continue;
@@ -470,14 +512,14 @@ function buildSummary(
   nearest.sort((a, b) => (a.fraction === b.fraction ? a.index - b.index : b.fraction - a.fraction));
 
   return {
-    renown: input.renown,
+    renown,
     earned,
     visibleTotal,
     completion: visibleTotal > 0 ? earned / visibleTotal : 0,
     recent: recent.slice(0, 5).map((id) => ({
       id,
       crestId: deedCrestId(id, input.deeds[id].category),
-      earnedDay: input.deedsEarned.get(id) ?? '',
+      earnedDay: earnedDays.get(id) ?? '',
     })),
     nearest: nearest.slice(0, 3).map((entry) => ({ id: entry.id, progress: entry.progress })),
   };
@@ -578,7 +620,9 @@ export function makeDeedTrackerView(): DeedTrackerView {
 export function buildDeedTrackerViewInto(
   out: DeedTrackerView,
   watched: ReadonlySet<string>,
-  deedsEarned: ReadonlyMap<string, string>,
+  // Any earned lookup: the per-character map, or the account-wide union the
+  // HUD hands in (accountDeedLookup) so an alt's earn drops the row too.
+  deedsEarned: { has(id: string): boolean },
   stats: Readonly<DeedStats>,
   deeds: Readonly<Record<string, DeedDef>>,
   collapsed: boolean,
@@ -676,6 +720,10 @@ export function buildDeedUnlockPlan(
 export interface DeedsRefreshSigParts {
   renown: number;
   earnedCount: number;
+  // accountDeedsDigest over the account ledger: an alt's earn (a new id OR a
+  // new earner on a known id) repaints an open Book. Optional so a host with
+  // no ledger signs exactly as before.
+  accountDigest?: number;
   activeTitle: string | null;
   activeBorder: string | null;
   filter: DeedsFilter;
@@ -691,6 +739,7 @@ export function deedsRefreshSig(parts: DeedsRefreshSigParts): string {
   return JSON.stringify([
     parts.renown,
     parts.earnedCount,
+    parts.accountDigest ?? 0,
     parts.activeTitle,
     parts.activeBorder,
     parts.filter,

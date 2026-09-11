@@ -455,7 +455,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
     // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
     // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
-    ceiling: 18350,
+    // Re-measured at the second release/v0.43.0 sync of the account-wide Book
+    // of Deeds / Reliquary change: the release's interface-redesign merge and
+    // this branch's charSheetRefreshSigFor extraction compose to 18343 by
+    // wc -l, below both parent pins (18455 / 18350). Exact count, zero slack.
+    ceiling: 18343,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1024,7 +1028,11 @@ const MONOLITHS: MonolithRow[] = [
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 11879,
+    // LOWERED 11879 -> 11867 at the account-wide Book of Deeds / Reliquary change:
+    // the deeds restore and join-retro passes moved whole into
+    // src/sim/deeds_restore.ts and the ownership union into
+    // accountReliquaryOwnershipOpts (src/sim/reliquary.ts).
+    ceiling: 11867,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1438,7 +1446,10 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 10095,
+    // LOWERED 10095 -> 10082 at the account-wide Book of Deeds / Reliquary change:
+    // the Book heavy keys moved into server/deeds_wire.ts and the Curator
+    // standing stamp into server/curator_standing.ts.
+    ceiling: 10082,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1581,7 +1592,10 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // LOWERED 5540 -> 5524 at the account-wide Book of Deeds / Reliquary change:
+    // the deeds / Reliquary / account-ledger self-decode moved whole into
+    // src/net/book_wire.ts (the applyMaterialInventoryWire precedent).
+    ceiling: 5524,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1730,7 +1744,11 @@ const MONOLITHS: MonolithRow[] = [
     // reach it directly), unlike createCharacterCapped's pure re-export.
     // Exact count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
-    ceiling: 4744,
+    // LOWERED 4744 -> 4715 at the account-wide Book of Deeds / Reliquary change:
+    // the character_deeds DDL moved into DEEDS_SCHEMA (server/deeds_db.ts) and
+    // the new account_relic_finds DDL landed as ACCOUNT_LEDGER_SCHEMA
+    // (server/account_ledger_db.ts), both applied by ensureSchema.
+    ceiling: 4715,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
