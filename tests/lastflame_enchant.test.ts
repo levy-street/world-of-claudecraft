@@ -237,6 +237,18 @@ describe("Last Flame's Zeal", () => {
     });
     expect(wielder.auras.reduce((total, aura) => total + aura.value, 0)).toBe(50);
     expect(raw.rng.chance).toHaveBeenCalledTimes(2);
+    // The refreshing trigger still heals: the 200 heal is per trigger, not per
+    // fresh application, so both hands' procs healed once each.
+    expect(raw.applyHeal).toHaveBeenCalledTimes(2);
+    expect(raw.applyHeal).toHaveBeenLastCalledWith(
+      wielder,
+      wielder,
+      200,
+      "Last Flame's Zeal",
+      ENCHANT,
+      false,
+      false,
+    );
   });
 
   it.each([
