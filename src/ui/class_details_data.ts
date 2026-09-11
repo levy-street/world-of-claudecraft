@@ -232,7 +232,7 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     affliction: {
       primaryStat: 'int',
       complexity: 'high',
-      examples: ['siphon_life', 'corruption', 'curse_of_agony', 'drain_life'],
+      examples: ['evil_eye', 'needle_of_fate', 'sentence', 'litany_of_guilt'],
     },
     demonology: {
       primaryStat: 'int',
