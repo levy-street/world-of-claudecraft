@@ -6,6 +6,7 @@
 // description style the tooltip's other def-driven use lines share.
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { FARM_CROPS, FARM_FINE_PRODUCE_ITEM_IDS } from '../src/sim/content/farm_crops';
 import { ITEMS, MOBS } from '../src/sim/data';
 import {
   ARMOR_SECONDARY_BY_TYPE,
@@ -42,6 +43,9 @@ const ENCHANTING_IDS = [
 // Derived from the live grade table rather than restated, so a tenth gathered
 // material cannot ship with a tooltip that says nothing about its grade.
 const FINE_IDS = Object.values(MATERIAL_GRADES).map((row) => row.fineItemId);
+// The twelve farm fine twins, derived from the crop catalog the same way, so
+// a new crop cannot ship a twin whose tooltip says nothing about its grade.
+const FARM_FINE_IDS = [...FARM_FINE_PRODUCE_ITEM_IDS];
 // The Masterwrought skill-75 intermediates (Phase 07): nine share one
 // craft-free lead; the catalyst carries its own line stating the daily limit.
 const MASTERWROUGHT_IDS = [
@@ -78,6 +82,7 @@ const TROPHY_HINT_IDS = adoptedTrophyIds(ITEMS);
 const EXPECTED_IDS = [
   ...ENCHANTING_IDS,
   ...FINE_IDS,
+  ...FARM_FINE_IDS,
   ...MASTERWROUGHT_IDS,
   ...FARM_SUPPLY_HINT_IDS,
   ...PROMOTION_WRIT_HINT_IDS,
@@ -89,6 +94,7 @@ describe('material_hint_view', () => {
   it('covers exactly the enchanting materials, fine grades, masterwrought intermediates, farm supplies, and the promotion writ, no more and no less', () => {
     expect(Object.keys(MATERIAL_HINT_KEYS).slice().sort()).toEqual(EXPECTED_IDS);
     expect(FINE_IDS).toHaveLength(9);
+    expect(FARM_FINE_IDS).toHaveLength(12);
     expect(MASTERWROUGHT_IDS).toHaveLength(10);
   });
 
@@ -127,6 +133,31 @@ describe('material_hint_view', () => {
     expect(line).toContain('Fine grade.');
     expect(line).toContain('above the material');
     expect(line).toContain('ordinary version');
+  });
+
+  it('every farm fine twin carries the one shared farm hint, and its plain produce carries none', () => {
+    // The Bronze Hoe report: a player holding Vale Wheat against a Fine Vale
+    // Wheat bill had no in-game way to learn what the fine twin is or where
+    // it comes from. One key for all twelve, distinct from the node grades'
+    // key because the sentence differs on exactly the two points that make
+    // the twins a different ladder: the harvest roll mints them, and they
+    // never stand in for the ordinary grade.
+    const keys = new Set(FARM_FINE_IDS.map((id) => materialHintKey(id)));
+    expect(keys.size, 'the twelve twins must share exactly one key').toBe(1);
+    expect([...keys][0]).toBe('hudChrome.materialHint.fineFarmGrade');
+    expect([...keys][0]).not.toBe(materialHintKey('fine_copper_ore'));
+    for (const crop of Object.values(FARM_CROPS)) {
+      expect(materialHintKey(crop.produceItemId), crop.produceItemId).toBeUndefined();
+      expect(materialHintKey(crop.seedItemId), crop.seedItemId).toBeUndefined();
+    }
+    const line = materialHintLine('fine_vale_wheat');
+    expect(line).toContain('class="tt-desc"');
+    expect(line).toContain('Fine grade.');
+    expect(line).toContain('harvest');
+    expect(line).toContain('Farming skill');
+    expect(line).toContain('never counts');
+    // Craft-free lead, like fineGrade: the Used-by line still renders beside it.
+    expect(line).not.toContain('Enchanting reagent.');
   });
 
   it('covers every material the sim can actually yield or consume', () => {

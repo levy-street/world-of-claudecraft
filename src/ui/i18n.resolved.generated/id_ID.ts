@@ -3473,6 +3473,7 @@ export const id_ID: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Bahan masakan. Harus dimasak sebelum dimakan.",
       "usedBy": "Digunakan oleh {crafts}.",
       "arcaneDust": "Reagen kerajinan. Diperoleh dengan membongkar perlengkapan biasa dan tidak biasa.",
@@ -4430,6 +4431,7 @@ export const id_ID: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(menghabiskan {count} bahan halus)",
       "reagentVaultDraw": "(mengambil {count} dari brankasmu)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "Brankas Material tidak terjangkau di sini.",
       "craftFeeLine": "Biaya kerajinan: {fee} per buah",
       "empty": "Belum ada resep yang diketahui.",

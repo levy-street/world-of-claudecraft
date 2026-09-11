@@ -3473,6 +3473,7 @@ export const zh_TW: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。",
+      "fineFarmGrade": "優質品級。收穫時部分產物會成為優質品，農藝技能越高，或裝有充能的匠人之眼時更常出現。需要優質品級時普通農產品一律不算數，需要普通農產品時優質品級也一律不算數。",
       "cookingCatch": "烹飪材料。必須先烹飪後才能食用。",
       "usedBy": "用於 {crafts}。",
       "arcaneDust": "製作材料。分解普通和優秀品質的裝備可得。",
@@ -4430,6 +4431,7 @@ export const zh_TW: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 個優質品級）",
       "reagentVaultDraw": "（從材料倉庫取用 {count}）",
+      "reagentOrdinaryHeld": "（持有{name} {count} 個，但此處只有優質品級才算數）",
       "vaultUnreachable": "此處無法使用材料倉庫。",
       "craftFeeLine": "製作費：每件 {fee}",
       "empty": "尚無已知配方。",

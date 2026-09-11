@@ -2116,8 +2116,11 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/ui/hud/professions/crafting_window.ts',
     // LOWERED 771 -> 747 on the redesign review: the difficulty label table and
     // the cast-duration chip text moved to
-    // src/ui/hud/professions/craft_row_chip_text.ts. Exact count, zero slack.
-    ceiling: 747,
+    // src/ui/hud/professions/craft_row_chip_text.ts.
+    // LOWERED 747 -> 738 at the Bronze Hoe ordinary-grade note: the three
+    // reagent-line suffix formatters moved to reagent_suffix_view.ts.
+    // Exact count, zero slack.
+    ceiling: 738,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
   },
 ];

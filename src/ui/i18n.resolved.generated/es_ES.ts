@@ -3473,6 +3473,7 @@ export const es_ES: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Calidad fina. Recolectada de una veta de nivel completo con una herramienta de rango superior al material, y cuenta como la versión ordinaria dondequiera que se pida una.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Ingrediente de cocina. Debe cocinarse antes de comerlo.",
       "usedBy": "Usado en: {crafts}.",
       "arcaneDust": "Reactivo de fabricación. Se obtiene al desencantar equipo común y poco común.",
@@ -4430,6 +4431,7 @@ export const es_ES: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(gasta {count} de calidad fina)",
       "reagentVaultDraw": "(saca {count} de tu bóveda)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "La Bóveda de Materiales está fuera de alcance aquí.",
       "craftFeeLine": "Tarifa de elaboración: {fee} cada uno",
       "empty": "Aún no se conocen recetas.",

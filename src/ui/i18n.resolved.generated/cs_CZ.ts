@@ -3473,6 +3473,7 @@ export const cs_CZ: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Kuchařská ingredience. Před snědením ji musíš uvařit.",
       "usedBy": "Používá se v: {crafts}.",
       "arcaneDust": "Výrobní činidlo. Získává se rozčarováním běžné a neobvyklé výbavy.",
@@ -4430,6 +4431,7 @@ export const cs_CZ: EnTranslations = {
       "reagentLine": "{name} x{have}/{required}",
       "reagentFineSub": "(spotřebuje {count} jemné jakosti)",
       "reagentVaultDraw": "(čerpá {count} z tvého trezoru)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "Trezor materiálů je tady mimo dosah.",
       "craftFeeLine": "Poplatek za výrobu: {fee} za kus",
       "empty": "Zatím nejsou známy žádné recepty.",

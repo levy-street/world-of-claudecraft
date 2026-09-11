@@ -319,6 +319,7 @@ const UI_PURE_CORES = [
   'src/ui/entity_display_core.ts',
   'src/ui/hud/professions/disenchant_yield_view.ts',
   'src/ui/hud/professions/material_hint_view.ts',
+  'src/ui/hud/professions/reagent_suffix_view.ts',
   'src/ui/hud/professions/material_profession_hint_view.ts',
   'src/ui/hud/professions/craft_denial_line_view.ts',
   'src/ui/hud/professions/elixir_tooltip_view.ts',

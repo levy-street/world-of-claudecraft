@@ -3473,6 +3473,7 @@ export const vi_VN: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Phẩm cấp hảo hạng. Thu được từ mạch đủ bậc bằng công cụ xếp trên nguyên liệu, và được tính như bản thường ở bất cứ đâu cần đến.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Nguyên liệu nấu ăn. Phải nấu chín trước khi ăn.",
       "usedBy": "Được dùng bởi {crafts}.",
       "arcaneDust": "Nguyên liệu chế tác. Thu được khi giải phép trang bị phổ thông và khác thường.",
@@ -4430,6 +4431,7 @@ export const vi_VN: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(tiêu tốn {count} hảo hạng)",
       "reagentVaultDraw": "(lấy {count} từ kho của bạn)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "Kho Nguyên Liệu không thể tiếp cận được ở đây.",
       "craftFeeLine": "Phí chế tạo: {fee} mỗi món",
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",

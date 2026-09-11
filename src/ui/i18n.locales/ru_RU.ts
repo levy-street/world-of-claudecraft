@@ -10906,6 +10906,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '(потратит отборный сорт: {count})',
   'hudChrome.crafting.reagentVaultDraw': '(возьмёт из хранилища материалов: {count})',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '(у вас {name}: {count}, но здесь засчитывается только отборный сорт)',
   'hudChrome.crafting.vaultUnreachable': 'Хранилище материалов здесь недоступно.',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Свернуть полосы Protect Yumi',
@@ -13826,6 +13828,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.meat': 'Мясо',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (зачаровано)',
   'hudChrome.materialHint.cookingCatch': 'Ингредиент для готовки. Сначала нужно приготовить.',
+  'hudChrome.materialHint.fineFarmGrade':
+    'Отборный сорт. Часть урожая выходит отборной, чаще при высоком навыке фермерства или с заряженным Глазом ремесленника. Обычные продукты никогда не засчитываются там, где нужен отборный сорт, а отборный сорт никогда не засчитывается там, где нужны обычные продукты.',
   'hudChrome.materialHint.fineGrade':
     'Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.',
   'hudChrome.materialHint.arcaneDust':

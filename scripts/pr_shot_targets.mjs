@@ -5155,6 +5155,13 @@ export const TARGETS = [
         selectTab: 'weaponcrafting',
       },
       { key: 'mobile-vault-note', vaultNote: 'after', mobile: true, selectTab: 'weaponcrafting' },
+      // The ordinary-grade note (the Bronze Hoe report): seven Vale Wheat in
+      // the bags against recipe_bronze_hoe's Fine Vale Wheat bill. The row is
+      // short (farm twins never substitute) and the note beside the 0/4 says
+      // the plain wheat is what the player holds and why it does not count.
+      // BEFORE is the same scene on the base checkout (no note).
+      { key: 'desktop-ordinary-held', ordinaryHeld: true, selectTab: 'engineering' },
+      { key: 'mobile-ordinary-held', ordinaryHeld: true, mobile: true, selectTab: 'engineering' },
       { key: 'desktop-identity-attuned', identity: true, selectTab: 'alchemy' },
       { key: 'mobile-identity-attuned', identity: true, mobile: true, selectTab: 'alchemy' },
       {
@@ -5250,6 +5257,20 @@ export const TARGETS = [
               } catch {}
             }
           }
+          if (staging.ordinaryHeld) {
+            // The Bronze Hoe report: plain wheat and the quest hoe in the bags,
+            // the tier-0 engineering recipe known, no fine wheat at all.
+            for (const [id, n] of [
+              ['vale_wheat', 7],
+              ['garden_hoe', 1],
+            ]) {
+              try {
+                sim?.addItem(id, n);
+              } catch {}
+            }
+            const meta = sim?.players?.get(sim.primaryId);
+            if (meta) meta.knownRecipes.add('recipe_bronze_hoe');
+          }
           if (staging.identity) {
             // The identity-card framings (phase 22): stub the IWorld read with
             // the professions target's cap-legal attuned Smith, so the card
@@ -5307,7 +5328,8 @@ export const TARGETS = [
           // pair. NAMED HERE because this reduced object is the whole staging
           // contract: an unnamed variant flag is silently dropped (the
           // recorded first-capture gotcha).
-          vaultNote: variant?.vaultNote ?? null,
+          // The Bronze Hoe ordinary-grade note (named here for the same reason).
+          ordinaryHeld: Boolean(variant?.ordinaryHeld),
         },
       );
       // A first-open crafting window with several icon-bearing recipe rows takes
@@ -5403,6 +5425,18 @@ export const TARGETS = [
           document
             .querySelector('#crafting-window .vendor-section-title')
             ?.scrollIntoView({ block: 'start' });
+        });
+        await wait(300);
+      }
+      if (open && variant?.ordinaryHeld) {
+        // The subject is the Bronze Hoe row (skill 0, listed below the six
+        // default engineering rows): bring it to the top of the pane so the
+        // reagent line with the note is the shot on both form factors.
+        await page.evaluate(() => {
+          const row = [...document.querySelectorAll('#crafting-window .crafting-recipe-item')].find(
+            (el) => el.textContent?.includes('Bronze Hoe'),
+          );
+          row?.scrollIntoView({ block: 'start' });
         });
         await wait(300);
       }

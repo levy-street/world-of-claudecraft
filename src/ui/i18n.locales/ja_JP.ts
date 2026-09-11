@@ -10753,6 +10753,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '（上質な等級を{count}個消費）',
   'hudChrome.crafting.reagentVaultDraw': '（素材保管庫から{count}個使用）',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '（{name}を{count}個所持していますが、ここでは上質な等級のみが数えられます）',
   'hudChrome.crafting.vaultUnreachable': 'ここでは素材保管庫を利用できません。',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumiのバーを折りたたむ',
@@ -13594,6 +13596,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.meat': '肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
   'hudChrome.materialHint.cookingCatch': '料理材料。食べる前に調理が必要です。',
+  'hudChrome.materialHint.fineFarmGrade':
+    '上質な等級。収穫の一部が上質として実り、農業スキルが高いほど、または職人の眼をチャージしているほど出やすくなります。上質な等級が必要な場面で通常の農作物は決して数えられず、通常の農作物が必要な場面で上質な等級も決して数えられません。',
   'hudChrome.materialHint.fineGrade':
     '上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。',
   'hudChrome.materialHint.arcaneDust': '生産の材料。一般と良質の装備を魔力分解して得られる。',

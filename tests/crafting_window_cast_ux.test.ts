@@ -537,7 +537,7 @@ describe('renderCraftingWindow vault-draw suffix (Phase 04)', () => {
     // duplicates (divergence hooks under the rule of three); each is pinned
     // to the same token so a silent drop of either one reds by name.
     const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
-    for (const cls of ['.crafting-fine-sub', '.crafting-vault-draw']) {
+    for (const cls of ['.crafting-fine-sub', '.crafting-vault-draw', '.crafting-ordinary-held']) {
       const at = css.indexOf(`${cls} {`);
       expect(at, `${cls} rule missing from components.css`).toBeGreaterThan(-1);
       const body = css.slice(at, css.indexOf('}', at));

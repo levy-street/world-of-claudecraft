@@ -3473,6 +3473,7 @@ export const pl_PL: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Gatunek wyborny. Zebrany z żyły o pełnym poziomie narzędziem wyższej rangi niż sam materiał; liczy się jako zwykła wersja wszędzie tam, gdzie jest ona wymagana.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Składnik kuchenny. Wymaga ugotowania przed zjedzeniem.",
       "usedBy": "Używane w: {crafts}.",
       "arcaneDust": "Odczynnik rzemieślniczy. Oczarowany z pospolitego i niezwykłego wyposażenia.",
@@ -4430,6 +4431,7 @@ export const pl_PL: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(zużywa {count} gatunku wybornego)",
       "reagentVaultDraw": "(pobiera {count} ze skarbca)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "Skarbiec Materiałów jest tu poza zasięgiem.",
       "craftFeeLine": "Opłata za wytworzenie: {fee} za sztukę",
       "empty": "Nie są jeszcze znane żadne przepisy.",

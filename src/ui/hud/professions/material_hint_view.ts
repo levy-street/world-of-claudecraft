@@ -29,6 +29,7 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
+import { FARM_FINE_PRODUCE_ITEM_IDS } from '../../../sim/content/farm_crops';
 import { esc } from '../../esc';
 import { type TranslationKey, t } from '../../i18n';
 
@@ -51,6 +52,14 @@ export const MATERIAL_HINT_KEYS: Readonly<Record<string, TranslationKey>> = {
   fine_silverleaf_herb: 'hudChrome.materialHint.fineGrade',
   fine_goldleaf_herb: 'hudChrome.materialHint.fineGrade',
   fine_sunpetal_herb: 'hudChrome.materialHint.fineGrade',
+  // The twelve farm fine twins (content/farm_crops.ts fineProduceItemId)
+  // share one lead the same way, DERIVED from the crop catalog so a new crop
+  // cannot ship a twin with no line. They are not MATERIAL_GRADES rows (the
+  // harvest roll mints them, and they substitute in neither direction), so
+  // the sentence differs from fineGrade's on exactly those two points.
+  ...Object.fromEntries(
+    [...FARM_FINE_PRODUCE_ITEM_IDS].map((id) => [id, 'hudChrome.materialHint.fineFarmGrade']),
+  ),
   // The nine Masterwrought skill-75 intermediates (Phase 07) share one
   // craft-free lead the same way the fine grades do: they are kind 'junk'
   // with no def-level use. Phase 08 landed the armor-craft consumers, so
