@@ -9997,7 +9997,7 @@
     font-weight: 400;
     padding: 1px 8px;
     border-radius: var(--radius-sm);
-    border: 1px solid #4d3d1a;
+    border: 1px solid var(--color-border-default);
     color: var(--color-text-muted);
   }
   /* The HUD-tracker eye at the summary's right edge: a pressed toggle (the
