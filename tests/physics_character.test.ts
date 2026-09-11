@@ -124,7 +124,8 @@ function findStrideableStone(): { x: number; z: number; scale: number } | undefi
       const cz = c.z ?? 0;
       if (Math.hypot(cx - d.x, cz - d.z) <= 0.25) return false; // the stone itself
       if (cz < d.z - 3 || cz > d.z + 2) return false; // outside the walk
-      const reach = (c.type === 'circle' ? c.r : Math.hypot(c.hw, c.hd)) + 0.6;
+      const reach =
+        (c.type === 'circle' ? c.r : c.type === 'obb' ? Math.hypot(c.hw, c.hd) : c.br) + 0.6;
       return Math.abs(cx - d.x) < reach;
     });
     if (blocksCorridor) continue;

@@ -16,7 +16,7 @@
 // are all functions of two numbers the mesh carries.
 //
 // What replaced what. The old burners were the jetpack GLB's own `fire.*` cones
-// — a straight taper with a circular section — lit by a gas-ring shader that
+//, a straight taper with a circular section, lit by a gas-ring shader that
 // guttered on a timer. It read as an orange traffic cone, and the gutter (right
 // for a pilot light) read as a pack failing whenever the throttle was open. The
 // four parts now do different jobs and are driven apart:
@@ -58,7 +58,7 @@ export type PlumePart = 'wash' | 'core' | 'veil' | 'tail';
 export interface PlumeDrive {
   /** Smoothed throttle, 0..1. Length, width and brightness all ride this. */
   heat: { value: number };
-  /** Throttle genuinely OPEN, 0..1 — hotter and whiter, not merely bigger. */
+  /** Throttle genuinely OPEN, 0..1, hotter and whiter, not merely bigger. */
   burn: { value: number };
   /** The shove: a spike on ignition and on any hard change of direction. */
   surge: { value: number };
@@ -198,7 +198,7 @@ const VERT = /* glsl */ `
 
 // NO `precision` line here, however conventional it looks. Three prepends its
 // own precision prefix to BOTH stages of a ShaderMaterial, and every uniform
-// this pair shares — uTime, uHeat, uBurn, uSurge, uPhase — is declared in both.
+// this pair shares, uTime, uHeat, uBurn, uSurge, uPhase, is declared in both.
 // Overriding the fragment stage to mediump makes those declarations disagree,
 // and GLSL will not link a program whose uniform precisions differ. The failure
 // is silent in the ordinary way: the shaders both COMPILE, the link fails, and
@@ -247,7 +247,7 @@ const FRAG = /* glsl */ `
     float shape = mix(shell, across, uRibbon);
 
     // Shock diamonds. Two cycles down the core, matched to the pinches already
-    // in its profile, and brightest where the jet is NARROWEST — which is where
+    // in its profile, and brightest where the jet is NARROWEST, which is where
     // a real mach disc sits.
     float band = 1.0 + uBand * (-cos(v * 12.566) * 0.5 + 0.5) * (0.45 + 0.55 * uBurn);
 
@@ -271,7 +271,7 @@ const FRAG = /* glsl */ `
  * Build one burner's four materials, all sharing `drive`.
  *
  * `phase` offsets the flicker and the turbulence so the two burners on a pack
- * never churn in lockstep — pass 0 and 0.5.
+ * never churn in lockstep, pass 0 and 0.5.
  */
 export function createPlumeMaterials(
   drive: PlumeDrive,
@@ -347,7 +347,7 @@ function toFloat(
  * second UV set over under a name of our own (GLTFLoader parks TEXCOORD_1 on
  * whichever attribute name the three build of the day uses, and a
  * ShaderMaterial only declares the extra sets behind defines). Once, on the
- * template, before anything clones it — clones share these buffers.
+ * template, before anything clones it, clones share these buffers.
  */
 export function preparePlumeGeometry(root: THREE.Object3D): void {
   // Guarded per geometry, not per mesh: baking a node matrix twice would apply
@@ -389,7 +389,7 @@ export function preparePlumeGeometry(root: THREE.Object3D): void {
     geo.computeBoundingSphere();
     // The vertex shader stretches and wobbles the plume outside the bounds the
     // rest pose implies, so the sphere is padded rather than the culling
-    // switched off — a plume behind the camera is 8 additive draws of pure
+    // switched off, a plume behind the camera is 8 additive draws of pure
     // overdraw per wearer, and there can be ten of them in a bout.
     if (geo.boundingSphere) geo.boundingSphere.radius *= 1.75;
   });

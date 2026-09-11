@@ -30,12 +30,21 @@ function walk(dir) {
 // Flat-named packs (dungeon: 379 assets in one folder) get a subcategory from
 // their leaf naming family instead of a subfolder. Ordered: first match wins.
 const NAME_FAMILIES = [
-  ['structure', /^(wall|floor|stairs|arch|pillar|column|fence|barrier|post|scaffold|path|door|gate|window|roof|beam|platform|bridge)/i],
-  ['furniture', /^(table|bed|bookcase|bench|shelf|shelves|bar|bartop|chair|stool|throne|desk|cabinet|counter)/i],
+  [
+    'structure',
+    /^(wall|floor|stairs|arch|pillar|column|fence|barrier|post|scaffold|path|door|gate|window|roof|beam|platform|bridge)/i,
+  ],
+  [
+    'furniture',
+    /^(table|bed|bookcase|bench|shelf|shelves|bar|bartop|chair|stool|throne|desk|cabinet|counter)/i,
+  ],
   ['containers', /^(chest|crate|barrel|box|bucket|coffin|pot|sack|basket|cauldron)/i],
   ['lighting', /^(candle|torch|lantern|lamp|brazier|chandelier|sconce)/i],
   ['nature', /^(tree|trunk|rock|rocks|bone|bones|pumpkin|mushroom|log|stump|vine|root)/i],
-  ['decor', /^(banner|plate|bottle|book|sign|coin|sword|shield|skull|grave|gravemarker|statue|rug|curtain|candy|lollipop|cake|present)/i],
+  [
+    'decor',
+    /^(banner|plate|bottle|book|sign|coin|sword|shield|skull|grave|gravemarker|statue|rug|curtain|candy|lollipop|cake|present)/i,
+  ],
 ];
 
 function nameFamily(leaf) {
@@ -74,7 +83,11 @@ function prefabPieceEntries() {
   const dir = join(root, 'data', 'prefab_pieces');
   if (!existsSync(dir)) return [];
   const out = [];
-  const pretty = (s) => s.replace(/[_-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()).trim();
+  const pretty = (s) =>
+    s
+      .replace(/[_-]+/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim();
   for (const file of readdirSync(dir).sort()) {
     if (!file.endsWith('.json')) continue;
     const m = JSON.parse(readFileSync(join(dir, file), 'utf8'));
@@ -102,8 +115,9 @@ function prefabPieceEntries() {
   return out;
 }
 
-const entries = [...walk(modelsDir).map(toEntry), ...prefabPieceEntries()]
-  .sort((a, b) => a.id.localeCompare(b.id));
+const entries = [...walk(modelsDir).map(toEntry), ...prefabPieceEntries()].sort((a, b) =>
+  a.id.localeCompare(b.id),
+);
 
 const byCat = {};
 for (const e of entries) {

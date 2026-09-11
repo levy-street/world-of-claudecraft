@@ -885,7 +885,7 @@ export function buildRealmFlora(
       applyWornStone(mat, { strength: 0.6 });
       // Stands down when the document owns the boulders as placements (the
       // promoted-scenery contract; the promoted copies are the plain kit
-      // rock without the granite regrade — the same rock the catalog places).
+      // rock without the granite regrade, the same rock the catalog places).
       if (!activeWorldPromoted('realmBoulders'))
         instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
     }

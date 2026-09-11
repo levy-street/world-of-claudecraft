@@ -1,11 +1,11 @@
-// GENERATES src/render/prop_natural_size.generated.ts — the world-space size of
+// GENERATES src/render/prop_natural_size.generated.ts, the world-space size of
 // every PROP_ASSET_DEFS model at scale 1.
 //
 // props.ts draws decorProps at the model's OWN units (propAsset bakes the def's
 // yaw into the geometry and applies the record's `scale` on top), while the
 // editor's placement pipeline normalizes a catalogue GLB to
 // targetHeightFor(path) first. Promoting a decorProp to a placement therefore
-// needs the natural size to convert between the two — without it a flower bed
+// needs the natural size to convert between the two, without it a flower bed
 // promoted from the world lands at a different size than the game draws.
 //
 // The bbox is computed from the GLB itself: POSITION accessor min/max per

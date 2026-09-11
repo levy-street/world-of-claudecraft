@@ -14,10 +14,9 @@ const BUILDINGS = ['castle', 'castle_b', 'hall', 'bank', 'market', 'smithy', 'ta
 
 describe('Tidehold building decks', () => {
   it('put the main floor deck on the model floor, measured from the model base', async () => {
-    const overrides = JSON.parse(readFileSync('data/asset_collision_overrides.json', 'utf8')) as Record<
-      string,
-      { ramps?: { hx: number; hz: number; y0: number; y1: number }[] }
-    >;
+    const overrides = JSON.parse(
+      readFileSync('data/asset_collision_overrides.json', 'utf8'),
+    ) as Record<string, { ramps?: { hx: number; hz: number; y0: number; y1: number }[] }>;
     for (const b of BUILDINGS) {
       const m = await measureFloors(`public/models/tidehold/${b}.glb`);
       const norm = 2.2 / m.maxDim;
@@ -29,7 +28,10 @@ describe('Tidehold building decks', () => {
       const floor = m.floors[0].y;
       // within a foot of the boards: a deck under the floor sinks the player,
       // one far above floats them.
-      expect(Math.abs(deck - floor), `${b}: deck ${deck.toFixed(2)} vs floor ${floor.toFixed(2)}`).toBeLessThan(0.2);
+      expect(
+        Math.abs(deck - floor),
+        `${b}: deck ${deck.toFixed(2)} vs floor ${floor.toFixed(2)}`,
+      ).toBeLessThan(0.2);
     }
   }, 60000);
 });

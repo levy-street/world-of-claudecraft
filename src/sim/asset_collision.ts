@@ -107,7 +107,7 @@ export function prismsForAssetId(assetId: string, worldScale = 1): readonly Coll
     const wanted = solid.map((m) => meshToPrisms(m, MAX_MESH_PRISMS, bucket));
     const totalWanted = wanted.reduce((n, p) => n + Math.max(1, p.length), 0);
     const assetBudget = MAX_ASSET_PRISMS;
-    let prisms: CollisionPrism[] = [];
+    const prisms: CollisionPrism[] = [];
     if (totalWanted <= assetBudget) {
       for (const p of wanted) prisms.push(...p);
     } else {

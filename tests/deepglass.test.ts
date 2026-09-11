@@ -16,8 +16,8 @@ import {
   DG_BALL_MAX_SPEED,
   DG_BALL_RADIUS,
   DG_BALL_SPIN_MAX,
-  DG_KICKOFF_UP_SPEED,
   DG_BODY_RADIUS,
+  DG_KICKOFF_UP_SPEED,
   DG_TRAP_DEAD,
   DG_TRAP_MAX,
   DG_VOLLEY_MIN_SPEED,
@@ -62,14 +62,15 @@ import {
   DEEPGLASS_RADIUS,
   DEEPGLASS_TOP_Y,
   DG_ARENA_SCALE,
-  DG_RING_OFFSET,
   DG_BOOST_PADS,
   DG_HOLE_PASS_R,
   DG_HOLE_R,
   DG_POCKET_DEPTH,
   DG_POWERUP_SITES,
+  DG_RESPAWN_B,
   DG_RING_EAST_X,
   DG_RING_MOUTH_R,
+  DG_RING_OFFSET,
   DG_RING_RADIUS,
   DG_RING_WEST_X,
   DG_SPAWNS_A,
@@ -79,19 +80,18 @@ import {
   ringCentreFor,
   targetRingFor,
   type Vec3,
-  DG_RESPAWN_B,
 } from '../src/sim/deepglass/layout';
 import {
   DG_COUNTDOWN,
+  DG_MATCH_DURATION,
   DG_RESPAWN_CHARGE,
   DG_RESPAWN_SECONDS,
-  DG_MATCH_DURATION,
   deepballMove,
+  deepglassLastBeam,
   deepglassMatch,
   endDeepglassMatch,
   startDeepglassMatch,
   updateDeepglass,
-  deepglassLastBeam,
 } from '../src/sim/deepglass/match';
 import { buildDeepglassWorld } from '../src/sim/deepglass/world';
 import { Sim } from '../src/sim/sim';
@@ -157,7 +157,7 @@ describe('Deepglass geometry', () => {
     expect(DG_BALL_RADIUS).toBe(1.68);
     expect(DEEPGLASS_RADIUS).toBeCloseTo(38 * DG_ARENA_SCALE, 6);
     // The holes ride the glass itself, so their planes hug the bell whatever
-    // the scale — always inside the sphere, always outside the play clamp.
+    // the scale, always inside the sphere, always outside the play clamp.
     expect(DG_RING_OFFSET).toBeLessThan(DEEPGLASS_RADIUS);
     expect(DG_RING_OFFSET).toBeGreaterThan(DEEPGLASS_PLAY_R);
     // Every spawn, pad and powerup rode the scale rather than being left behind
@@ -199,7 +199,7 @@ describe('Deepglass geometry', () => {
     expect(escapedThroughHole(ball({ x: DG_RING_EAST_X + 0.5, y, z, vx: 20 }))).toBe('A');
     // Out through the west hole: team B scores.
     expect(escapedThroughHole(ball({ x: DG_RING_WEST_X - 0.5, y, z, vx: -20 }))).toBe('B');
-    // Same depth but wide of the hole's pass cylinder: no goal — that ball
+    // Same depth but wide of the hole's pass cylinder: no goal, that ball
     // meets glass and reflectOffBell banks it back into play.
     expect(
       escapedThroughHole(ball({ x: DG_RING_EAST_X + 0.5, y: y + DG_HOLE_PASS_R + 1, z, vx: 20 })),
@@ -318,7 +318,7 @@ describe('hit registration', () => {
 
   it('catches a ball that crosses a body BETWEEN two ticks', () => {
     // The bug this whole path exists for: at the old 55 yd/s cap a struck ball
-    // travelled 2.75 yd per tick — wider than the contact sphere — so an
+    // travelled 2.75 yd per tick, wider than the contact sphere, so an
     // end-of-tick sample could have it in front of a fighter one tick and
     // behind them the next, with no sample ever seeing a touch.
     const body = stander();
@@ -390,7 +390,7 @@ describe('hit registration', () => {
   it('hands a fast loose ball to whoever flies onto it, and keeps it', () => {
     // Fly onto a loose ball at boost pace: the first contact is a trap that
     // brings the ball down to something carryable, and the NEXT one is a
-    // carry — so the payoff for a good run is possession at pace, not a ball
+    // carry, so the payoff for a good run is possession at pace, not a ball
     // that stalls behind you the moment you touch it.
     const runner: DgContactBody = {
       prev: { x: DEEPGLASS_CENTER.x - 24 * DT, y: DEEPGLASS_CENTER.y, z: DEEPGLASS_CENTER.z },
@@ -505,8 +505,7 @@ describe('flooded flight', () => {
   }
 
   it('spools up: slow off the mark, quick once it is wound out', () => {
-    // The feel the mode is built around. A standing start must NOT be instant —
-    // the pack takes a beat to bite — and the same body a second later must be
+    // The feel the mode is built around. A standing start must NOT be instant,     // the pack takes a beat to bite, and the same body a second later must be
     // travelling much faster off the same input.
     const e = flier();
     const sample = (ticks: number): number => {
@@ -526,8 +525,8 @@ describe('flooded flight', () => {
   });
 
   it('glides down gradually once the sticks are released', () => {
-    // Off the throttle at boost pace, a body must COAST — still travelling well
-    // a second later — rather than braking to a stop in place.
+    // Off the throttle at boost pace, a body must COAST, still travelling well
+    // a second later, rather than braking to a stop in place.
     const e = runwayFlier();
     for (let t = 0; t < 24; t++) {
       deepglassFlightPass(e, input({ forward: true, boost: true }), false, ZERO);
@@ -559,7 +558,7 @@ describe('flooded flight', () => {
     // Measured along the ORIGINAL heading, not as a speed magnitude: with the
     // air brake in, a reversing body can cross from +1.5 to -1.4 yd/s inside one
     // tick, so a "speed under half a yard" window is a window a hard enough
-    // brake jumps clean over — the test would then run on forever while the body
+    // brake jumps clean over, the test would then run on forever while the body
     // accelerated away backwards.
     const heading = { x: runUp.vx / cruise, y: runUp.vy / cruise, z: runUp.vz / cruise };
     const along = (): number => runUp.vx * heading.x + runUp.vy * heading.y + runUp.vz * heading.z;
@@ -741,7 +740,7 @@ describe('a live bout', () => {
     for (let t = 0; t < 3000; t++) {
       updateDeepglass(sim.ctx);
       if (!deepglassMatch()) break;
-      // The players can NEVER leave — not even through the goal holes, which
+      // The players can NEVER leave, not even through the goal holes, which
       // only the ball may use.
       for (const pid of [...m.teamA, ...m.teamB]) {
         const e = sim.entities.get(pid);
@@ -1362,7 +1361,7 @@ describe('the Tidesow curls', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Contact continuity — the cliff that made a touch's outcome double for no
+// Contact continuity, the cliff that made a touch's outcome double for no
 // visible reason.
 // ---------------------------------------------------------------------------
 describe('contact is continuous', () => {
@@ -1448,7 +1447,7 @@ describe('contact is continuous', () => {
 });
 
 // ---------------------------------------------------------------------------
-// The roster. What is being tested here is not that the bots are GOOD — it is
+// The roster. What is being tested here is not that the bots are GOOD, it is
 // that they are ignorant in the specific ways a player is, because that is what
 // "they do not feel like bots" is made of.
 // ---------------------------------------------------------------------------

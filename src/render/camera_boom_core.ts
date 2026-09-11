@@ -59,7 +59,7 @@ function dampAxis(
  * scales both pull rates up (reduced-motion mode passes a large value to make
  * the boom near-rigid without a separate code path; the Deepglass flight
  * camera passes one BELOW 1 for the Rocket League "camera stiffness" lag).
- * `leashScale` widens the trailing caps the same way — a looser spring is
+ * `leashScale` widens the trailing caps the same way, a looser spring is
  * pointless if the leash still snaps the pivot back to a yard behind.
  */
 export function stepCameraBoom(

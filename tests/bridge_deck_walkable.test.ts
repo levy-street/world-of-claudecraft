@@ -4,7 +4,7 @@
 // made every part of it solid: a deck slab, two end abutments, and two side
 // railings. At any real placement scale the abutments stand several yards tall
 // across both approaches, so running at the bridge stopped you dead and the
-// deck was never reachable — the same "I can't walk up my own ramp" shape the
+// deck was never reachable, the same "I can't walk up my own ramp" shape the
 // stairs convention exists to avoid, one asset at a time.
 //
 // The deck is now an authored walkable ramp deck (sim/placement_ramps.ts) and
@@ -15,8 +15,8 @@ import { describe, expect, it } from 'vitest';
 import { colliderInternalsForTest } from '../src/sim/colliders';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { placementRampFloorAt } from '../src/sim/placement_ramps';
-import { groundHeight, terrainHeight } from '../src/sim/world';
 import type { WorldContent } from '../src/sim/types';
+import { groundHeight, terrainHeight } from '../src/sim/world';
 
 const SEED = 20061;
 // A real placement from an authored map: detached (frozen seat) and scaled up,
@@ -60,10 +60,7 @@ describe('Bridge_01 deck', () => {
         .staticWorldColliders(SEED)
         .filter(
           (c) =>
-            Math.hypot(
-              (c as { x: number }).x - BRIDGE.x,
-              (c as { z: number }).z - BRIDGE.z,
-            ) < 12,
+            Math.hypot((c as { x: number }).x - BRIDGE.x, (c as { z: number }).z - BRIDGE.z) < 12,
         );
       // Only the two railings collide, and neither is a tall approach blocker:
       // a band this shallow is a rail you brush, not a wall you stop against.

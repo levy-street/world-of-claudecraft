@@ -2,19 +2,19 @@
 //
 // Scoped to the OFFLINE event build. The match lives in a module singleton
 // rather than on Sim, so nothing in the Sim class, its serialization or the
-// online wire has to know deepball exists yet — the Vale Cup integration
+// online wire has to know deepball exists yet, the Vale Cup integration
 // (docs/prd/deepglass.md section 8) is what moves this onto ctx.vcup.
 //
 // Determinism: no rng anywhere on this path. Bot aim error is a pure function
 // of tick and pid (the vale_cup_bots precedent), currents come off the match
 // clock, and everything else is arithmetic.
 
-import { DEEPGLASS_BALL_TEMPLATE_ID, resolveDeepballKit } from './abilities';
 import { abilitiesKnownAt, MOBS } from '../data';
 import { createMob } from '../entity';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity, type MoveInput } from '../types';
 import { terrainHeight } from '../world';
+import { DEEPGLASS_BALL_TEMPLATE_ID, resolveDeepballKit } from './abilities';
 import {
   applyBodyContact,
   DG_BALL_RADIUS,
@@ -60,14 +60,14 @@ import {
   DG_PAD_RADIUS,
   DG_POWERUP_RADIUS,
   DG_POWERUP_SITES,
+  DG_RESPAWN_A,
+  DG_RESPAWN_B,
   DG_SPAWNS_A,
   DG_SPAWNS_B,
   type DgBoostPad,
   ringCentreFor,
   targetRingFor,
   type Vec3,
-  DG_RESPAWN_A,
-  DG_RESPAWN_B,
 } from './layout';
 import { DG_ARRIVAL } from './world';
 
@@ -83,8 +83,7 @@ export const DG_GOAL_CELEBRATE = 4; // s of celebration per goal
 export const DG_SCORE_CAP = 5; // first to this ends it early
 export const DG_PLAY_RADIUS = 3.2; // yd from the ball you can strike it
 export const DG_PAD_RESPAWN_TICKS = Math.round(7 / DT);
-/** The five full vents are worth waiting for, so they take longer to relight —
- *  which is what makes holding the middle mean something. */
+/** The five full vents are worth waiting for, so they take longer to relight,  *  which is what makes holding the middle mean something. */
 export const DG_BIG_PAD_RESPAWN_TICKS = Math.round(13 / DT);
 export const DG_POWERUP_RESPAWN_TICKS = Math.round(22 / DT);
 /**
@@ -92,8 +91,8 @@ export const DG_POWERUP_RESPAWN_TICKS = Math.round(22 / DT);
  *
  * The first roster read the ball's true position and velocity every tick, which
  * in a 3D bell is an enormous edge, and the handicap here was what stood in for
- * fallibility. The brains in ./bots.ts are fallible for real now — they work off
- * a belief that lags and errs — so the body handicap can come back up: it is
+ * fallibility. The brains in ./bots.ts are fallible for real now, they work off
+ * a belief that lags and errs, so the body handicap can come back up: it is
  * there to leave a human room on a straight race, not to hide the AI.
  */
 export const DG_BOT_SPEED_SCALE = 0.9;
@@ -174,7 +173,7 @@ export interface DgMatch {
   possessionA: number;
   possessionB: number;
   /** Bout tallies. Cheap, and they are what makes the roster's behaviour
-   *  measurable instead of a matter of opinion — a tuning pass on the bots reads
+   *  measurable instead of a matter of opinion, a tuning pass on the bots reads
    *  these rather than watching and guessing. */
   stats: DgMatchStats;
   /** Ticks left in the wall-pinch window after a body contact: a bank off
@@ -184,7 +183,7 @@ export interface DgMatch {
   /**
    * Varies the bots' aim between bouts. Their error is a pure function of
    * (tick, pid) for determinism, which meant every bout from a fresh Sim played
-   * out IDENTICALLY — same score, same goal times, to the tick. Salting with the
+   * out IDENTICALLY, same score, same goal times, to the tick. Salting with the
    * sim tick at kickoff keeps the tick path rng-free (this is read once, at
    * start) while making no two bouts the same.
    */
@@ -201,7 +200,7 @@ export function deepglassMatch(): DgMatch | null {
 // Lifecycle
 // ---------------------------------------------------------------------------
 
-/** Bot classes, for VISUAL variety only — deepball moves are class-agnostic and
+/** Bot classes, for VISUAL variety only, deepball moves are class-agnostic and
  *  the truce floors every combat stat, so class here is purely who you look
  *  like. The two pet classes are out so no wolf or demon paddles onto the
  *  pitch. Every bot used to be a mage (spawnDevBot's default), which is why a
@@ -428,7 +427,7 @@ export function startDeepglassMatch(
  * Set a body back down on solid ground after the bell lets go of it.
  *
  * Two things matter and both were missing. The body has to land on the actual
- * terrain height rather than keep the bell's mid-air Y — and `fallStartY` has
+ * terrain height rather than keep the bell's mid-air Y, and `fallStartY` has
  * to be reset with it, because the fall-damage rule is "how far below your
  * highest point did you land", and a body released at y=41 measured its fall
  * from up there and died on impact the instant it was handed back to ordinary
@@ -471,7 +470,7 @@ export function endDeepglassMatch(ctx: SimContext): void {
   }
   if (active.ball) ctx.dropEntity(active.ball.entityId);
   // Dev build: the bots are ordinary dev-spawn players. Removed FULLY (entity
-  // and player meta) — dropEntity alone left the meta behind, which burned the
+  // and player meta), dropEntity alone left the meta behind, which burned the
   // roster names one bout at a time until a "3v3" seated 1v3.
   for (const pid of active.botPids) ctx.removeDevBot(pid);
   active = null;
@@ -492,7 +491,7 @@ const MAGNET: Vec3 = { x: 0, y: 0, z: 0 };
 const DG_DASH_MAGNET_LEAD = 0.12;
 
 /** Is this body shepherding the Tidesow right now? Carrying is not a flag
- *  anybody sets — it is simply "the ball is on my chest", which is also what
+ *  anybody sets, it is simply "the ball is on my chest", which is also what
  *  slows the carrier down (DG_CARRY_MULT). */
 function isCarrying(m: DgMatch, e: Entity): boolean {
   const ball = m.ball;
@@ -572,7 +571,7 @@ function throwUpKickoff(m: DgMatch): void {
 }
 
 /** Sideways kick on the throw-up, yd/s. Small: the ball should go UP, not
- *  across — the lean is only there so it never comes back down its own line. */
+ *  across, the lean is only there so it never comes back down its own line. */
 const DG_KICKOFF_LEAN = 3.5;
 
 export function updateDeepglass(ctx: SimContext): void {
@@ -635,14 +634,14 @@ export function updateDeepglass(ctx: SimContext): void {
   // ---- the brains --------------------------------------------------------
   // Roles first, per side, so the whole side agrees on who is going for the ball
   // before any of them commits to a line. Every bot then perceives and flies on
-  // its own clock (./bots.ts) — nothing about the roster is synchronised, which
+  // its own clock (./bots.ts), nothing about the roster is synchronised, which
   // is what makes their reactions ragged rather than choral.
   driveBots(m, ctx, playing);
 
   // ---- bodies ------------------------------------------------------------
   // Where the Tidesow will be in a moment: what a dash thrown near it bends
   // onto (flight.ts DG_DASH_MAGNET_RANGE). LED rather than taken raw, because
-  // a dash is an impulse a body then FLIES down — aiming at where the ball is
+  // a dash is an impulse a body then FLIES down, aiming at where the ball is
   // now sends you through the space it just left.
   const magnet = playing && m.ball ? MAGNET : null;
   if (magnet && m.ball) {
@@ -698,7 +697,7 @@ export function updateDeepglass(ctx: SimContext): void {
       if (m.powerupCooldown[i] > 0) continue;
       const site = DG_POWERUP_SITES[i];
       // A bot leaves the Lance alone. It has no aim routine to spend it with,
-      // so it would sit on the orb denying it to a human — and a bot that DID
+      // so it would sit on the orb denying it to a human, and a bot that DID
       // fire it would demolish you with no counterplay, which is the "the bots
       // are too good" complaint coming back wearing a hat. Overburn it takes
       // and uses: that one only ever helps its owner.
@@ -750,7 +749,7 @@ export function updateDeepglass(ctx: SimContext): void {
     const consumed = resolveBallContacts(m, ctx, ball);
     currentAt(ball.x, ball.y, ball.z, m.clock, CURRENT);
     // The crown scatter (only a bounce off the top of the bell reads it), as a
-    // pure function of the bout salt and the tick — no rng on this path.
+    // pure function of the bout salt and the tick, no rng on this path.
     const scored = stepBallFluid(
       ball,
       CURRENT,
@@ -772,7 +771,7 @@ export function updateDeepglass(ctx: SimContext): void {
     // No prevPos snapshot here. The tick prologue (runDespawnDecay) already took
     // one, from the position the ball genuinely held last tick, and it is the
     // single owner of that field. Re-taking it HERE reads whatever any pass
-    // earlier in this tick happened to leave behind — which is how an immobile
+    // earlier in this tick happened to leave behind, which is how an immobile
     // mob being ground-snapped by the chase arm turned into the drawn ball
     // strobing between the slate and the bell every frame. Even with that
     // fixed (Sim.moveToward), a late second snapshot is a trap, not a safeguard.
@@ -784,7 +783,7 @@ export function updateDeepglass(ctx: SimContext): void {
 }
 
 // ---------------------------------------------------------------------------
-// Contact resolution. Scratch records, reused every tick — this runs 20 times a
+// Contact resolution. Scratch records, reused every tick, this runs 20 times a
 // second over every body in the bell.
 // ---------------------------------------------------------------------------
 const BALL_FROM: Vec3 = { x: 0, y: 0, z: 0 };
@@ -884,8 +883,7 @@ const EMPTY_INPUT: MoveInput = {
 const ZERO: Vec3 = { x: 0, y: 0, z: 0 };
 
 // ---------------------------------------------------------------------------
-// Bots. The brains live in ./bots.ts — belief, temperament, roles, mistakes —
-// and everything here is the plumbing that hands them a view of the bell and
+// Bots. The brains live in ./bots.ts, belief, temperament, roles, mistakes, // and everything here is the plumbing that hands them a view of the bell and
 // takes their strikes back. Nothing on this path uses rng: the brains are pure
 // in (pid, salt, tick), so a bout still replays to the tick.
 // ---------------------------------------------------------------------------
@@ -1017,7 +1015,7 @@ function driveBots(m: DgMatch, ctx: SimContext, playing: boolean): void {
  * The reach test here is against the REAL ball, and it is the whole point: the
  * brain decided to swing because its BELIEF said the ball was in front of it. If
  * the ball has moved on, the swing hits water and the strike cooldown is spent
- * anyway — a whiff, exactly like a player's mistimed Shot, and the most legible
+ * anyway, a whiff, exactly like a player's mistimed Shot, and the most legible
  * mistake in the roster's repertoire.
  */
 function botStrike(m: DgMatch, e: Entity, aim: Vec3, power: number): void {
@@ -1032,7 +1030,7 @@ function botStrike(m: DgMatch, e: Entity, aim: Vec3, power: number): void {
     return; // swung at water
   }
   // A bot's own motion across the shot line curls the ball, exactly as a
-  // player's does — so a fighter cutting across a clearance bends it, and the
+  // player's does, so a fighter cutting across a clearance bends it, and the
   // keeper on the far end is reading a straight line (./bots.ts).
   SWIPE.x = e.vx;
   SWIPE.y = e.vy;
@@ -1069,7 +1067,7 @@ function recordTouch(m: DgMatch, pid: number, team: 'A' | 'B', kind: DgTouchKind
  *
  * The last toucher scores it; if they were on the other side it is an own goal
  * and it is called one. An assist is the previous DIFFERENT touch by the scoring
- * side, and only if no opponent touched the ball in between — a ball won off a
+ * side, and only if no opponent touched the ball in between, a ball won off a
  * defender is not that defender's assist.
  */
 function creditGoal(m: DgMatch, scored: 'A' | 'B'): void {
@@ -1110,7 +1108,7 @@ const DG_BUMP_TUMBLE_TICKS = Math.round(0.45 / DT);
  * converge on the Tidesow and simply occupy the same yard of water, so a pack
  * had no shape, screening was impossible, and flying through an opponent cost
  * nothing. Equal masses, one impulse along the contact normal, and the overlap
- * split between them — the cheapest possible model, and the difference between a
+ * split between them, the cheapest possible model, and the difference between a
  * crowd and a hologram.
  */
 function resolveBodyBumps(m: DgMatch, ctx: SimContext): void {
@@ -1233,7 +1231,7 @@ function nearestEnemy(ctx: SimContext, m: DgMatch, caster: Entity, team: 'A' | '
 }
 
 /**
- * The direction a body is aiming: its yaw, pitched by the camera — the same
+ * The direction a body is aiming: its yaw, pitched by the camera, the same
  * vector the flight pass thrusts along, so you shoot where you fly.
  *
  * Continuous now. It used to read the latched dive/surface BANDS, so a shot could
@@ -1298,7 +1296,7 @@ export function deepglassLastBeam(): DgBeamShot | null {
 
 /** Forget the last beam. Called on every kickoff and teardown: the record is a
  *  module singleton keyed by MATCH tick, and a match starts its tick count over
- *  at zero — so a shot left over from the previous bout would flash across the
+ *  at zero, so a shot left over from the previous bout would flash across the
  *  bell the moment the next one started. */
 function clearLastBeam(): void {
   lastBeam = null;
@@ -1337,7 +1335,7 @@ function fireZapShot(ctx: SimContext, m: DgMatch, caster: Entity, team: 'A' | 'B
   }
   // Nobody in the cone: the Lance snaps to the CLOSEST opponent in range
   // instead of burning the orb on water. Same auto-target contract as the
-  // Check — the aim cone is a bonus for pointing well, not a tax for not.
+  // Check, the aim cone is a bonus for pointing well, not a tax for not.
   if (!best) {
     const near = nearestEnemy(ctx, m, caster, team);
     if (near) {
@@ -1401,7 +1399,7 @@ function respawnDemolished(ctx: SimContext, m: DgMatch, e: Entity, pid: number):
 }
 
 /** True when the caster is close enough to play the ball. Measured from the
- *  CHEST, not the entity origin at the soles — a ball level with your eyeline
+ *  CHEST, not the entity origin at the soles, a ball level with your eyeline
  *  used to read as a yard further away than it looked. */
 function withinReach(e: Entity, ball: DgBall): boolean {
   const d = Math.hypot(ball.x - e.pos.x, ball.y - (e.pos.y + DG_BODY_CENTRE_Y), ball.z - e.pos.z);
@@ -1448,7 +1446,7 @@ export function deepballMove(
 
   if (move === 'check') {
     // Auto-targeted: the victim is always the CLOSEST opponent, whatever the
-    // click-target happens to be — in a 3-axis scrum at 26 yd/s, selecting a
+    // click-target happens to be, in a 3-axis scrum at 26 yd/s, selecting a
     // body by hand is not a skill, it is a lottery. The passed `target` is
     // deliberately ignored.
     void target;
@@ -1472,7 +1470,7 @@ export function deepballMove(
 
   // shot / pass both strike the ball, and both need to be on it. A press with
   // the ball still inbound is BUFFERED rather than thrown away: the tick loop
-  // fires it the moment the ball is in reach (hit reg, half two — see
+  // fires it the moment the ball is in reach (hit reg, half two, see
   // DG_STRIKE_BUFFER_TICKS).
   const ball = m.ball;
   if (!ball || m.phase !== 'active') return null;
@@ -1539,7 +1537,7 @@ function performStrike(
 
   // Pace on the ball is pace you brought. A shot struck by a body flying at the
   // ball carries a slice of that speed, so the reward for a good run at it is a
-  // harder shot — which is the loop the whole sport is built on, and it used to
+  // harder shot, which is the loop the whole sport is built on, and it used to
   // pay exactly the same as tapping it from a standstill.
   SWIPE.x = caster.vx;
   SWIPE.y = caster.vy;

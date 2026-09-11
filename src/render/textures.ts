@@ -783,7 +783,7 @@ export function radialGlowTexture(): THREE.CanvasTexture {
 // stoneMaps() is the Rock Generator's masonry surface (src/render/rock_gen.ts,
 // a fork-only file). Upstream deleted it when the shipped world stopped using
 // it, so an upstream-wins merge of this file drops it and rock_gen fails to
-// resolve — restore this block, do not re-invent it. Like every generator in
+// resolve, restore this block, do not re-invent it. Like every generator in
 // this file it draws from the shared LCG, so keep it a lazily-called function:
 // generating at module scope would shift the look of everything drawn after.
 export function stoneMaps(): SurfaceMaps {

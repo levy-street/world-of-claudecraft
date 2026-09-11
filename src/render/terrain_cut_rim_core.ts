@@ -28,7 +28,7 @@ export interface CutRimInput {
   /** How far the band hangs below the rim, in yards. */
   depth: number;
   /** Per-segment depth override, sampled at the segment midpoint. A value of
-   *  0 (or less) SKIPS the segment — no lip, no wall. Carve cuts use that:
+   *  0 (or less) SKIPS the segment, no lip, no wall. Carve cuts use that:
    *  their cavity mesh IS the wall (clipped to the same surface), so the
    *  ground flows straight into the interior with no skirt band at all.
    *  Legacy holes keep the full curtain. */

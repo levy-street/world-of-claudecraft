@@ -1,5 +1,5 @@
 // The plot deed card: what a Tidehold housing-plot sign shows when read
-// (name, size, price, who holds it) with the one action that matters — buying
+// (name, size, price, who holds it) with the one action that matters, buying
 // it. Opened by the HUD's 'plotSign' event arm; the purchase goes back through
 // the world's buyPlot, whose reply is the same event with the SOLD state, so
 // the card repaints itself from that.
@@ -51,8 +51,10 @@ export class PlotSignPopup {
     const status = document.createElement('div');
     status.className = 'rb-hint';
     if (plot.ownedByYou) status.textContent = t('hudChrome.plotSign.yours');
-    else if (plot.ownerName) status.textContent = t('hudChrome.plotSign.sold', { name: plot.ownerName });
-    else status.textContent = t('hudChrome.plotSign.purse', { purse: formatMoney(plot.yourCopper) });
+    else if (plot.ownerName)
+      status.textContent = t('hudChrome.plotSign.sold', { name: plot.ownerName });
+    else
+      status.textContent = t('hudChrome.plotSign.purse', { purse: formatMoney(plot.yourCopper) });
     block.appendChild(status);
     root.appendChild(block);
 

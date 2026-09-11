@@ -6,11 +6,10 @@
 // (sim/colliders.ts) now answer to the same rule the ore veins and camp
 // braziers already do.
 import { describe, expect, it } from 'vitest';
+import { queryOpenWorldColliders } from '../src/sim/colliders';
 import { PORTALS, setActiveWorldContent } from '../src/sim/data';
-
 import { buildDeepglassWorld, DEEPGLASS_MAP_ENTRY } from '../src/sim/deepglass/world';
 import { usesOverworldSiteDressing } from '../src/sim/map_presentation';
-import { queryOpenWorldColliders } from '../src/sim/colliders';
 
 describe('no overworld cave mouths on an authored map', () => {
   it('the rule is off for an authored map and on for the shipped world', () => {

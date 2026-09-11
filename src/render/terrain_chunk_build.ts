@@ -27,6 +27,7 @@ import { forgefatherIsleRockWeight } from '../sim/content/ember_coast';
 import {
   COLUMN_ZONES,
   columnBlendAt,
+  isBuiltinWorldActive,
   STRIP_ZONES,
   WORLD_MAX_X,
   WORLD_MAX_Z,
@@ -37,8 +38,7 @@ import { fbm2 } from '../sim/rng';
 import { cutBounds, cutsInRect, cutsSdfAt, inTerrainCut } from '../sim/terrain_cuts';
 import type { TerrainCut } from '../sim/types';
 import { roadDistance, waterLevel, zoneBiomeAt } from '../sim/world';
-import { isBuiltinWorldActive } from '../sim/data';
-import { impactCraterTerrainBlend, type ImpactCraterTerrainBlend } from './impact_terrain';
+import { type ImpactCraterTerrainBlend, impactCraterTerrainBlend } from './impact_terrain';
 import { clamp01 } from './num_clamp';
 import { makeShoreProbe, type ShoreProbe, shoreWaterGate } from './shore_water_gate_core';
 import { buildCutClip, CUT_CELL_KEEP, type CutClipResult } from './terrain_cut_clip_core';
@@ -369,8 +369,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
       lerpSplat(w, 3, Math.min(1, strand));
     }
   }
-  // packed dirt at each hub settlement (same feather as the splat weight —
-  // a constant lerp stamped a clean-edged brown disc on the grass)
+  // packed dirt at each hub settlement (same feather as the splat weight,   // a constant lerp stamped a clean-edged brown disc on the grass)
   for (const zn of ZONES) {
     const dHub = Math.hypot(x - zn.hub.x, z - zn.hub.z);
     if (dHub < 14) {
@@ -551,7 +550,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   // natural rule above (dry patches, hub discs, even the snow line). Four
   // diagonal taps average the cell grid so a painted boundary feathers over
   // ~3 yards instead of pixelating at the paint cell size. Swatches resolve
-  // to a tint + a splat layer + the shader's snow channel — see
+  // to a tint + a splat layer + the shader's snow channel, see
   // terrain_paint_tint.ts for what this is (and is not) of the fork's full
   // custom-texture atlas.
   {
@@ -873,7 +872,7 @@ export function ensureCutClip(state: ChunkGeometryBuildState): ChunkGeometryBuil
   };
   // Carve cuts get NO skirt at all: their cavity mesh is the real wall,
   // clipped to the same surface, so the ground flows straight into the
-  // interior — a band here just hung inside the opening wearing streaked
+  // interior, a band here just hung inside the opening wearing streaked
   // surface-projected paint (and its dense sub-lattice quads read as a
   // "cursed" wireframe ring). A contour segment belongs to a carve when the
   // carve-only field is (near) zero at its midpoint; depth 0 skips it.

@@ -19,10 +19,10 @@ import {
   SWIM_PITCH_MAX,
   scanAnimRepair,
   shouldPlayLanding,
-  TURN_LEAN_MAX,
-  yawRateBetween,
   shouldPlayOutCastExit,
+  TURN_LEAN_MAX,
   weaponStowedOverlay,
+  yawRateBetween,
 } from '../src/render/characters/anim_state';
 
 // A three.js SkinnedMesh renders BIND POSE (arms out, the T-pose) whenever the

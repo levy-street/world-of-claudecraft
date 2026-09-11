@@ -38,7 +38,6 @@ import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import {
   activeGatherNodes,
   activeZoneAt,
-  dungeonAt,
   GATHER_NODES,
   getActiveWorldContent,
   isBgPos,
@@ -193,14 +192,7 @@ const PARTY_DISC_RADIUS_RANGE = 3;
  *  battleground (the same marker set over a cached wall raster; Hud routes it
  *  through paintOverworld, which branches to paintBattleground), or the
  *  overworld minimap (this core). */
-export type MinimapMode =
-  | 'rift'
-  | 'delve'
-  | 'infernalAbyss'
-  | 'yumiMaze'
-  | 'battleground'
-  | 'dungeon'
-  | 'overworld';
+export type MinimapMode = 'rift' | 'delve' | 'yumiMaze' | 'battleground' | 'dungeon' | 'overworld';
 
 /** The NPC quest glyph: turn-in ready ('?') wins over available ('!'), else neutral. */
 export type NpcGlyph = '?' | '!' | '•';
@@ -328,7 +320,6 @@ export function minimapMode(world: IWorld): MinimapMode {
   if (world.riftFloor) return 'rift';
   if (isYumiMazePos(world.player.pos.x)) return 'yumiMaze';
   if (isBgPos(world.player.pos.x)) return 'battleground';
-  if (dungeonAt(world.player.pos.x)?.id === 'infernal_abyss') return 'infernalAbyss';
   if (dungeonMapActive(world)) return 'dungeon';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }

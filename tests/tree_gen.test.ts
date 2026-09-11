@@ -40,7 +40,11 @@ describe('sanitizeTreeParams', () => {
   });
 
   it('rejects non-finite numbers rather than clamping them', () => {
-    const out = sanitizeTreeParams({ girth: Number.NaN, height: Number.POSITIVE_INFINITY, leaves: 100 });
+    const out = sanitizeTreeParams({
+      girth: Number.NaN,
+      height: Number.POSITIVE_INFINITY,
+      leaves: 100,
+    });
     expect(out).toEqual({ leaves: 100 });
   });
 
@@ -101,7 +105,13 @@ describe('resolvedTreeParams', () => {
 });
 
 describe('map document round trip', () => {
-  const ZONE = { id: 'z', name: 'Z', zMin: -10, zMax: 100, hub: { x: 0, z: 0, radius: 5, name: 'H' } };
+  const ZONE = {
+    id: 'z',
+    name: 'Z',
+    zMin: -10,
+    zMax: 100,
+    hub: { x: 0, z: 0, radius: 5, name: 'H' },
+  };
   const docWith = (tree: unknown) => ({
     version: 2,
     meta: { id: 'm1', name: 'Map', seed: 7 },

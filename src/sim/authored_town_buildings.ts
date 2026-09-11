@@ -1,5 +1,5 @@
 // Whether a ZonePropsDef building record IS one of the authored towns'
-// (Eastbrook Vale / Fenbridge) rebuild buildings — the sim-side twin of the
+// (Eastbrook Vale / Fenbridge) rebuild buildings, the sim-side twin of the
 // render predicates in eastbrook_town.ts / fenbridge_town.ts, so
 // colliders.ts (which must not import src/render) can stand a town
 // building's record collider down when the document owns that building as a

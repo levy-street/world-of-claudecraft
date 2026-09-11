@@ -1,14 +1,14 @@
 // Flooded flight: the three-axis thrustpack movement inside the bell.
 //
 // Modelled directly on swimVerticalPass (src/sim/player_motion.ts): the water
-// carries the body, so this pass owns X, Y and Z outright — no gravity, no fall
+// carries the body, so this pass owns X, Y and Z outright, no gravity, no fall
 // damage, and `onGround` stays true (the body is supported, just not by
 // terrain), which is what keeps the jump pose and the landing thud off a
 // swimmer and now off a flier.
 //
 // The control scheme, and it is worth reading before any of the numbers:
 //
-//   - WASD rides the LOOK frame — the entity's facing, pitched by the camera's
+//   - WASD rides the LOOK frame, the entity's facing, pitched by the camera's
 //     own pitch (`MoveInput.aimPitch`). You fly where you look, and a Shot leaves
 //     down the same vector (match.ts aimOf), so the two can never disagree.
 //   - SPACE and CTRL are ABSOLUTE vertical trim, deliberately outside the look
@@ -20,8 +20,8 @@
 //     asking for in the look frame, or straight down the look with the hands
 //     off; the back key with nothing else is an air brake (DG_BRAKE).
 //
-// The first pass had none of that: `dive` / `surface` are LATCHED swim bands — a
-// three-position switch — so the thrust was flat wherever the view pointed and a
+// The first pass had none of that: `dive` / `surface` are LATCHED swim bands, a
+// three-position switch, so the thrust was flat wherever the view pointed and a
 // ring above you was unreachable except by holding SPACE and hoping.
 
 import { DT, type Entity, type MoveInput } from '../types';
@@ -34,25 +34,25 @@ import { clampToBell, DEEPGLASS_CENTER, type Vec3 } from './layout';
 // Rocket League's proportions, scaled to the bell: a car covers about twelve
 // of its own lengths a second on the throttle and nineteen supersonic. The
 // first cut sat at 10.5 / 26, and the cruise was the number every complaint
-// about the bell feeling "restrictive" was really about — the ball's own cap
+// about the bell feeling "restrictive" was really about, the ball's own cap
 // is 34, so an unboosted flier could never keep up with a moving ball.
 export const DG_SWIM_SPEED = 13; // unboosted cruise: ~6s to cross the bell
 export const DG_BOOST_SPEED = 28; // boosted: ~3s to cross
 export const DG_BOOST_ACCEL = 36;
 export const DG_CARRY_MULT = 0.82; // carrying the Tidesow is slower
-export const DG_DRAG = 0.4; // /s, exponential — low, so a body GLIDES
+export const DG_DRAG = 0.4; // /s, exponential, low, so a body GLIDES
 
 /**
  * The spool: how flooded flight builds and sheds pace.
  *
  * The first pass gave the pack its full authority on the first tick, so a body
  * went from dead stop to cruise inside a fifth of a second and stopped just as
- * fast — the bell felt like a mouse cursor rather than something you fly. Now
+ * fast, the bell felt like a mouse cursor rather than something you fly. Now
  * both the thrust AND the speed ceiling ramp in over {@link DG_SPOOL_UP}: you
  * push off slowly, wind up to full pace, and when you let go the ceiling walks
  * back down instead of snapping, leaving a long coast.
  *
- * `dgSpool` (0..1) lives on the entity so the render can read it — the burner
+ * `dgSpool` (0..1) lives on the entity so the render can read it, the burner
  * cones are scaled by exactly this number, which is what makes the pack read as
  * the engine actually spinning up.
  */
@@ -70,7 +70,7 @@ export const DG_SPOOL_DOWN = 1.1; // s back to idle once the sticks are released
 export const DG_SPOOL_FLOOR = 0.86;
 
 /**
- * Turn authority — the Rocket League rule.
+ * Turn authority, the Rocket League rule.
  *
  * A car in that game accelerates in a straight line at a measured rate, but a
  * flick of the stick redirects it RIGHT NOW; the momentum is real and yet it
@@ -91,7 +91,7 @@ const DG_BOOST_KICK = 4.5;
  * Seconds for the thrust vector to catch up with the keys.
  *
  * Flying a sphere is three simultaneous axes, and raw key state made every
- * press a step change in the acceleration — at 20 Hz that reads as the body
+ * press a step change in the acceleration, at 20 Hz that reads as the body
  * twitching between headings rather than flying between them. The lag costs no
  * authority (turn authority above is what makes a hard change of direction
  * bite); it only rounds the corners off the input itself.
@@ -105,7 +105,7 @@ const DG_STEER_LAG = 0.07;
 const DG_VERTICAL_AUTHORITY = 1.15;
 
 /**
- * Altitude hold — now a WHISPER, not a hold.
+ * Altitude hold, now a WHISPER, not a hold.
  *
  * Hands off the vertical axis and the body's climb/sink bleeds away a little
  * faster than its horizontal drift does. The first cut damped it at 1.8/s,
@@ -128,8 +128,7 @@ const DG_HOLD_DEADZONE = 0.12;
 /**
  * Steepest aim the camera is allowed to pitch the thrust to, radians.
  *
- * This is the control the bell was missing. `dive`/`surface` are LATCHED BANDS —
- * a three-position switch — so before this the thrust was flat no matter where
+ * This is the control the bell was missing. `dive`/`surface` are LATCHED BANDS,  * a three-position switch, so before this the thrust was flat no matter where
  * the view pointed, and a ring 20 yards above you could only be reached by
  * holding Space and hoping. Now the camera's real pitch pitches the whole
  * forward axis: you fly, and shoot, exactly where you look. Space and Ctrl stay
@@ -157,16 +156,16 @@ const DG_BRAKE_MIN_SPEED = 4;
  * optional.
  *
  * The bell's momentum is long on purpose, which left a flier with no answer to
- * anything sudden — a ball deflected across your nose was simply gone. A dash is
+ * anything sudden, a ball deflected across your nose was simply gone. A dash is
  * the short-range answer. FREE on purpose: it used to cost charge, and a mobility tool that
- * competes with the burners for fuel is a mobility tool nobody uses — the
+ * competes with the burners for fuel is a mobility tool nobody uses, the
  * cooldown is the whole cost now, which is why it is a long one. At half a
  * second a dash was simply how you travelled; at two, spending one is a
  * decision and the ball magnet below is a reward for reading the play rather
  * than a button you mash at it.
  */
 export const DG_DASH_SPEED = 17; // yd/s of impulse
-export const DG_DASH_COST = 0; // free — the cooldown is the cost
+export const DG_DASH_COST = 0; // free, the cooldown is the cost
 export const DG_DASH_CD_TICKS = Math.round(2 / DT);
 const DG_DASH_FLARE_TICKS = Math.round(0.3 / DT);
 
@@ -174,7 +173,7 @@ const DG_DASH_FLARE_TICKS = Math.round(0.3 / DT);
  * The dash MAGNET: a dash thrown near the Tidesow bends onto it.
  *
  * Nothing in the bell is harder than the last yard. You read the ball, you
- * dash, and you miss it by half a body — because a 2.4 yd ball crossing your
+ * dash, and you miss it by half a body, because a 2.4 yd ball crossing your
  * nose at pace is a target a third-person chibi camera simply cannot place to
  * the inch. The magnet is the fix, and it is deliberately an ASSIST rather than
  * a homing move: it only bites inside {@link DG_DASH_MAGNET_RANGE}, it only
@@ -183,7 +182,7 @@ const DG_DASH_FLARE_TICKS = Math.round(0.3 / DT);
  * {@link DG_DASH_MAGNET_MAX} of the line even at point-blank. A good read gets
  * finished; a bad one still misses.
  *
- * The same rule for every body in the bout, human and bot alike — a movement
+ * The same rule for every body in the bout, human and bot alike, a movement
  * rule that only applies to one side is the kind of thing that reads as a bug.
  */
 export const DG_DASH_MAGNET_RANGE = 13; // yd, chest to ball centre
@@ -202,7 +201,7 @@ const DASH_LEFT = 4;
 const DASH_RIGHT = 8;
 /** Per-second decay of the ceiling while coasting above it. Together with the
  *  low drag this is the whole "slows down gradually" feel: a body off the
- *  throttle at boost speed takes a few seconds to settle back to cruise — the
+ *  throttle at boost speed takes a few seconds to settle back to cruise, the
  *  supersonic carry, in Rocket League terms. Loosened from 0.25 so a burn buys
  *  you a run, not a moment. */
 export const DG_COAST_DECAY = 0.18;
@@ -214,13 +213,13 @@ export const DG_CHARGE_BURN = 40; // /s -> 2.5s of continuous burn
  * The boost economy is Rocket League's: **the map is the fuel supply.**
  *
  * The first pass refilled the tank on its own at 17/s, which meant boost was a
- * cooldown rather than a resource — you never had to go anywhere for it, and
+ * cooldown rather than a resource, you never had to go anywhere for it, and
  * the twelve lit vents in the bell were a minor convenience nobody detoured
  * for. Passive regen is now a bare trickle that only exists so a stranded
  * fighter can still limp to the nearest pad; everything else comes off the
  * pads (./layout.ts DG_BOOST_PADS), and the big ones fill you outright.
  */
-export const DG_CHARGE_REGEN = 2.5; // /s — a limp home, not a refill
+export const DG_CHARGE_REGEN = 2.5; // /s, a limp home, not a refill
 export const DG_REGEN_DELAY = 1; // s off the throttle before the trickle starts
 export const DG_REGEN_HOLD_TICKS = Math.round(DG_REGEN_DELAY / DT);
 /** A small vent's top-up. The big ones pass DG_CHARGE_MAX instead. */
@@ -230,11 +229,11 @@ export const DG_PAD_REFILL = 34;
 const DG_FREEZE_DAMPING = 2.2;
 
 /** How much of the radial speed a body gets back off the glass. Small: the
- *  glass is a boundary, not a trampoline — but zero read as sticking. */
+ *  glass is a boundary, not a trampoline, but zero read as sticking. */
 const DG_WALL_BOUNCE = 0.28;
 
 /** Below this charge the pack is spent and will not relight until it recovers
- *  past DG_RELIGHT — a burnt-out pack must visibly stay out for a beat rather
+ *  past DG_RELIGHT, a burnt-out pack must visibly stay out for a beat rather
  *  than stuttering back on for one frame at a time. */
 const DG_SPENT = 0;
 const DG_RELIGHT = 12;
@@ -291,7 +290,7 @@ export function refillCharge(p: Entity, amount = DG_PAD_REFILL): boolean {
  * `carrying` slows a body that has the Tidesow. `speedScale` handicaps a body
  * outright (the bots fly at DG_BOT_SPEED_SCALE of a human's pace). `magnet` is
  * where the Tidesow will be in a moment (the match leads it): a dash thrown
- * near it bends onto it — see {@link DG_DASH_MAGNET_RANGE}. Pass null (or
+ * near it bends onto it, see {@link DG_DASH_MAGNET_RANGE}. Pass null (or
  * nothing) and dashes fly exactly where they were thrown.
  */
 export function deepglassFlightPass(
@@ -312,8 +311,7 @@ export function deepglassFlightPass(
 
   // ---- steering ----------------------------------------------------------
   // Two frames at once, and the split is the whole control scheme. W/S and the
-  // strafes ride the LOOK frame — the camera's yaw pitched by its actual pitch —
-  // so you fly where you point; Space and Ctrl are ABSOLUTE vertical trim, so
+  // strafes ride the LOOK frame, the camera's yaw pitched by its actual pitch,   // so you fly where you point; Space and Ctrl are ABSOLUTE vertical trim, so
   // you can hold a height while aiming somewhere else. F is the throttle on top
   // of whatever direction that produces, and F on its own means "where I look",
   // because a throttle that needs a second key held to do anything is not a
@@ -343,7 +341,7 @@ export function deepglassFlightPass(
   RAW.x = LOOK.x * mz + rx * mx;
   // The vertical axis gets its OWN authority rather than being one third of a
   // normalised 3-vector. Climbing while flying forward used to halve both, so
-  // the one thing a flier does constantly — change altitude on the move — was
+  // the one thing a flier does constantly, change altitude on the move, was
   // the softest input in the game.
   RAW.y = LOOK.y * mz + my * DG_VERTICAL_AUTHORITY;
   RAW.z = LOOK.z * mz + rz * mx;
@@ -422,7 +420,7 @@ export function deepglassFlightPass(
   // ---- the dash ----------------------------------------------------------
   // A left click throws the body along whatever the keys are asking for right
   // now (RAW: the look frame, so forward pitches with the camera and a strafe
-  // stays flat), or straight down the look when the hands are off — a click
+  // stays flat), or straight down the look when the hands are off, a click
   // always answers with motion. Free (see DG_DASH_COST): the cooldown is the
   // only gate.
   if (inp.dash === true && !noSay && (p.dgDashCd ?? 0) <= 0) {
@@ -447,7 +445,7 @@ export function deepglassFlightPass(
       dz = LOOK.z;
     }
     // The magnet: bend the (unit) dash line onto the ball when it is close and
-    // already roughly ahead. The flip kind is left alone — it comes off the key
+    // already roughly ahead. The flip kind is left alone, it comes off the key
     // you pressed, and a body that flips one way while sliding another reads as
     // broken however right the physics is.
     if (magnet) {
@@ -529,8 +527,8 @@ export function deepglassFlightPass(
     p.vy += WISH.y * accel * DT;
     p.vz += WISH.z * accel * DT;
   }
-  // Altitude hold: no vertical INTENT — neither the trim keys nor a pitched
-  // look — and the vertical component bleeds away, so you hold the height you
+  // Altitude hold: no vertical INTENT, neither the trim keys nor a pitched
+  // look, and the vertical component bleeds away, so you hold the height you
   // picked. Horizontal momentum is untouched.
   if (my === 0 && Math.abs(WISH.y) * wanted < DG_HOLD_DEADZONE) {
     p.vy *= Math.exp(-DG_ALTITUDE_HOLD * DT);
@@ -566,7 +564,7 @@ export function deepglassFlightPass(
 
   // Cap to the mode's top speed. Speed above the cap decays back down through
   // it rather than snapping, so releasing the throttle glides instead of
-  // braking — but only ever DOWNWARD from the speed already bought. Applied
+  // braking, but only ever DOWNWARD from the speed already bought. Applied
   // while burning too, which costs nothing there (a body at the boost cap has
   // `speedBefore` at the cap, so the coast term lands just under it) and is what
   // lets a dash overshoot the ceiling and bleed back instead of being clipped
@@ -588,7 +586,7 @@ export function deepglassFlightPass(
   if (clampToBell(p.pos)) {
     // Slide along the glass rather than sticking: strip the outward radial
     // component so a body pressed into the wall keeps its tangential speed. A
-    // body that arrives FAST also gets a little of it back inward — hitting the
+    // body that arrives FAST also gets a little of it back inward, hitting the
     // wall at boost pace and simply stopping dead reads as a bug, and the small
     // kick is what lets a wall be used as something to push off.
     const nx = p.pos.x - DEEPGLASS_CENTER.x;

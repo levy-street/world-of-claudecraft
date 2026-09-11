@@ -1,7 +1,7 @@
 // Dev/playtest "god loadout": the strongest item this class can wear in every
 // gear slot, ranked by the game's own itemScore. The editor Playtest uses it to
 // drop a maker straight into a maxed, best-in-slot character so they can test
-// their map — especially a world boss — without dying to it or grinding gear
+// their map, especially a world boss, without dying to it or grinding gear
 // first (see main.ts startOffline). Pure: reads the item tables, returns ids.
 
 import { ITEMS } from './data';

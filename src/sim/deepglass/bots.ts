@@ -4,14 +4,14 @@
 // The first roster was a tracker. It read the ball's true position and velocity
 // every single tick, aimed at the enemy ring with a wobble, and struck the
 // instant the ball was in range. It never lost a ball it had decided to chase,
-// never went the wrong way, never had to look for the ball at all — and the tell
+// never went the wrong way, never had to look for the ball at all, and the tell
 // was not that it was too good, because a handicap on the body fixed that in a
 // line. The tell was that it was never SURPRISED. A deflection off a shoulder
 // re-aimed the whole roster on the same tick, and there is no human in that.
 //
 // So the brain in this module never reads the ball. It reads its own BELIEF
 // about the ball (see {@link DgBotBelief}), refreshed on a glance every few
-// ticks and dead-reckoned forward in between — which is what a player looking at
+// ticks and dead-reckoned forward in between, which is what a player looking at
 // a 2.4-yard ball across 76 yards of water is actually doing. Every mistake
 // worth having falls out of that one decision:
 //
@@ -23,8 +23,7 @@
 //   - the roster reacts in a ragged stagger, because no two bots glance on the
 //     same tick.
 //
-// On top of that each fighter has a fixed temperament ({@link DgBotTraits}) —
-// touch, nerve, greed, discipline, flair — so the same situation gets a different
+// On top of that each fighter has a fixed temperament ({@link DgBotTraits}), // touch, nerve, greed, discipline, flair, so the same situation gets a different
 // answer from Hask than from Mira, and the answers stay consistent all bout.
 //
 // Determinism, as everywhere in deepball: no rng. Every "random" choice is a
@@ -85,7 +84,7 @@ export interface DgBotTraits {
  * How well suited a temperament is to keeping goal. Higher is better.
  *
  * A side PICKS its keeper rather than posting whoever happens to sit in the last
- * seat, which is what the first pass did — and with temperaments in play that
+ * seat, which is what the first pass did, and with temperaments in play that
  * meant a bout could open with a fearless 0.2-touch hothead in goal and be
  * effectively over. Sides field their steadiest, and the bout stops swinging on
  * a coin flip nobody saw.
@@ -282,7 +281,7 @@ export interface DgBotView {
   salt: number;
   ball: DgBotBall;
   /** The TRUE ball, only ever read to resolve a strike that has already been
-   *  committed — never to decide anything. */
+   *  committed, never to decide anything. */
   team: 'A' | 'B';
   /** Own side, in seat order, flying. */
   mates: Entity[];
@@ -311,8 +310,8 @@ const AIM: Vec3 = { x: 0, y: 0, z: 0 };
  * Advance a bot's belief about the ball: dead-reckon it forward, and glance at
  * the real thing when the head is due to come up.
  *
- * The reckoning carries buoyancy at half strength — a fighter knows the Tidesow
- * floats but does not integrate it — and nothing else. Every acceleration the
+ * The reckoning carries buoyancy at half strength, a fighter knows the Tidesow
+ * floats but does not integrate it, and nothing else. Every acceleration the
  * ball is actually under (currents, the radial return, Magnus off a curler) is
  * invisible to the bot until its next glance, which is exactly the ignorance
  * that makes a curling shot beat a keeper.
@@ -467,7 +466,7 @@ function separate(view: DgBotView, self: Entity, out: Vec3): void {
  * Interception, not tailing: a chaser aims at where it believes the ball will BE
  * when it can get there, solved from its own closing speed. That is the one place
  * a bot is allowed to be sharp, because it is also the place its belief is
- * wrongest — leading a ball you have misread takes you further from it, which is
+ * wrongest, leading a ball you have misread takes you further from it, which is
  * precisely the mistake a real player makes at pace.
  */
 function chooseTarget(view: DgBotView, brain: DgBotBrain, e: Entity): void {
@@ -486,7 +485,7 @@ function chooseTarget(view: DgBotView, brain: DgBotBrain, e: Entity): void {
     const dist = Math.hypot(bel.x - e.pos.x, bel.y - e.pos.y, bel.z - e.pos.z);
     // Rough time to arrive, from a cruise-ish closing speed. Better touch leads
     // further, which is what makes a good bot meet the ball and a poor one tail
-    // it — and both of them are working from the same wrong belief.
+    // it, and both of them are working from the same wrong belief.
     const eta = Math.min(1.4, dist / 18) * (0.4 + t.skill * 0.9);
     TARGET.x = bel.x + bel.vx * eta;
     TARGET.y = bel.y + bel.vy * eta;
@@ -527,8 +526,8 @@ function chooseTarget(view: DgBotView, brain: DgBotBrain, e: Entity): void {
  * off it, and pulled toward the ball's projected crossing point when a shot is
  * actually inbound.
  *
- * The projection uses the BELIEVED velocity, so a curling shot — whose Magnus
- * bend is invisible to the belief — is projected as a straight line and the
+ * The projection uses the BELIEVED velocity, so a curling shot, whose Magnus
+ * bend is invisible to the belief, is projected as a straight line and the
  * keeper stations itself where the ball is not going to be. That is a keeper
  * beaten by curve, and there is not a word about curve in it.
  */
@@ -571,8 +570,8 @@ function keeperStation(view: DgBotView, brain: DgBotBrain, out: Vec3): void {
 /**
  * One tick of one bot: perceive, position, fly, and maybe strike.
  *
- * The bot writes the SAME {@link MoveInput} a human sends — including the aim
- * pitch, the throttle and the click dash — so it is flown by exactly the
+ * The bot writes the SAME {@link MoveInput} a human sends, including the aim
+ * pitch, the throttle and the click dash, so it is flown by exactly the
  * physics the player is flown by. Nothing here touches velocity directly, which
  * is the rule that keeps "the bots feel different to play against" from being a
  * bug in the flight model.
@@ -638,7 +637,7 @@ export function driveBot(
   const speed = Math.hypot(e.vx, e.vy, e.vz);
   const closingOnTarget =
     dist > 1e-3 ? (e.vx * dx + e.vy * dy + e.vz * dz) / (dist * (speed || 1)) : 0;
-  // Brake rather than overrun a target you are nearly on top of — but only if
+  // Brake rather than overrun a target you are nearly on top of, but only if
   // you are the kind of fighter who thinks of it.
   const shouldBrake =
     dist < BRAKE_DIST && speed > 9 && closingOnTarget > 0.4 && t.skill > BRAKE_SKILL;

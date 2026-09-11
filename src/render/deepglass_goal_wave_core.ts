@@ -1,7 +1,7 @@
 // The goal celebration's timeline: everything about WHEN, none of the Three.
 //
 // A deepball goal is worth four seconds of the bout, and this is the curve
-// those four seconds ride. `deepglass_goal_wave.ts` is the painter — it asks
+// those four seconds ride. `deepglass_goal_wave.ts` is the painter, it asks
 // this module what the frame looks like at t seconds after the whistle and
 // draws exactly that, so the whole look can be retuned (and unit-tested)
 // without touching a shader.
@@ -34,14 +34,14 @@ const DESAT_PEAK = 0.88;
  * envelope as the chroma.
  *
  * Desaturation preserves luminance, and on the composer tiers the graded
- * arena is close to white — so draining it alone produced a near-white grey
+ * arena is close to white, so draining it alone produced a near-white grey
  * that an alpha-blended colour wave washed out to pastel over. The same
  * celebration read strongly on the low tier purely because its frame is
  * darker. Dimming is what makes the wave's colour land the same on every
  * tier, and "the lights go down" is the right beat for a goal anyway.
  */
 const DIM_PEAK = 0.45;
-/** How long the drain takes. Fast — this is a whistle, not a dissolve. */
+/** How long the drain takes. Fast, this is a whistle, not a dissolve. */
 const DESAT_IN = 0.16;
 /** When chroma starts coming back, and it is fully back at DG_GOAL_WAVE_SECS. */
 const DESAT_HOLD_UNTIL = 2.15;
@@ -77,7 +77,7 @@ export interface DgGoalShellSpec {
   readonly speed: number;
   /** Seconds from leaving to fully faded. */
   readonly life: number;
-  /** Master alpha ceiling — the trailing shells are quieter so three
+  /** Master alpha ceiling, the trailing shells are quieter so three
    *  overlapping fills never flatten the frame to a single flat colour. */
   readonly peak: number;
 }
@@ -86,7 +86,7 @@ export interface DgGoalShellSpec {
  *  and heavier ones behind it. Equal shells read as one thick shell.
  *
  *  The leader waits out the drain. Launched at 0 it was already over the
- *  camera by 0.18s — the frame went from full colour to full team colour with
+ *  camera by 0.18s, the frame went from full colour to full team colour with
  *  the grey never visible, which threw away the whole first beat. */
 export const DG_GOAL_SHELLS: readonly DgGoalShellSpec[] = [
   { delay: 0.1, speed: 124, life: 1.6, peak: 1 },
@@ -105,7 +105,7 @@ export interface DgGoalShellFrame {
 }
 
 export interface DgGoalWaveFrame {
-  /** False when there is nothing to draw — the painter's early-out. */
+  /** False when there is nothing to draw, the painter's early-out. */
   active: boolean;
   /** Chroma to pull out of the finished frame, 0..1. */
   desat: number;

@@ -54,12 +54,12 @@ export interface CollisionPrism {
  *  the collision resolution anyone can feel, and a cone tip would recurse
  *  forever chasing a section whose area goes to zero. */
 const MIN_BAND = 0.05;
-/** A band is also done once its prism's MEAN OVERHANG — excess volume spread
- *  over the band's wall area (perimeter x height) — is under this distance
+/** A band is also done once its prism's MEAN OVERHANG, excess volume spread
+ *  over the band's wall area (perimeter x height), is under this distance
  *  in WORLD yards. This is the system's ONE fidelity dial, and it is
  *  deliberately set to the felt threshold rather than the visible one: ~8cm
  *  of wall standoff on an organic taper is invisible in play, and every band
- *  under it is pure collider-count cost — collision cost is per shape, paid
+ *  under it is pure collider-count cost, collision cost is per shape, paid
  *  by every mover query near it and by the playtest boot that grids them
  *  all. A tree trunk is 1-2 bands under this rule; only shapes whose section
  *  genuinely jumps (a dome, a spread of roots) spend more.
@@ -88,9 +88,9 @@ const BAND_VOLUME_SLACK = 0.004;
 /** How many heights the filled volume of a band is sampled at (midpoint rule:
  *  never lands on the degenerate sections at the band's own planes). */
 const VOLUME_SAMPLES = 5;
-/** Per-mesh and per-asset prism budgets — HARD performance caps, not
+/** Per-mesh and per-asset prism budgets, HARD performance caps, not
  *  tolerances. Six bands covers a natural-scale organic taper; a LEANED
- *  authored volume (Collision Master lets the maker pitch a box — roof
+ *  authored volume (Collision Master lets the maker pitch a box, roof
  *  slopes, leaning roots) staircases under Y-banding and genuinely needs
  *  more bands to hug what was drawn, so the ceiling is higher and
  *  prismsForAssetId allocates the ASSET budget by NEED across the meshes
@@ -282,13 +282,13 @@ interface WorkBand {
   /** Volume the mesh actually fills across the band (midpoint rule). */
   filled: number;
   /** Perimeter of the band's hull (yards): with `excess` it gives the band's
-   *  MEAN OVERHANG — how far the prism wall actually stands off the mesh. */
+   *  MEAN OVERHANG, how far the prism wall actually stands off the mesh. */
   perimeter: number;
   /** The band's WORST overhang: the farthest any hull corner stands outside
    *  the mesh's own mid-band section. The mean misses this on a LEANED
    *  volume (a pitched Collision Master box, a tilted slab): the swept hull
    *  is thin, so excess-over-wall-area reads small while the corners stand
-   *  a full sweep off the drawn shape — exactly the "collision doesn't
+   *  a full sweep off the drawn shape, exactly the "collision doesn't
    *  match what I built" a maker sees in the wireframe. */
   maxOverhang: number;
   /** Mesh sections just inside the band's two planes, for the loft. */
@@ -297,7 +297,11 @@ interface WorkBand {
 }
 
 /** Distance from (px, pz) to a convex hull's boundary when outside it, 0 inside. */
-function distOutsideHull(px: number, pz: number, hull: readonly (readonly [number, number])[]): number {
+function distOutsideHull(
+  px: number,
+  pz: number,
+  hull: readonly (readonly [number, number])[],
+): number {
   if (hull.length < 3) return 0;
   let inside = true;
   let minD = Infinity;
@@ -307,7 +311,10 @@ function distOutsideHull(px: number, pz: number, hull: readonly (readonly [numbe
     if ((bx - ax) * (pz - az) - (bz - az) * (px - ax) < 0) inside = false;
     const vx = bx - ax;
     const vz = bz - az;
-    const t = Math.max(0, Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz || 1)));
+    const t = Math.max(
+      0,
+      Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz || 1)),
+    );
     minD = Math.min(minD, Math.hypot(px - (ax + vx * t), pz - (az + vz * t)));
   }
   return inside ? 0 : minD;
@@ -374,8 +381,7 @@ function makeBand(m: PrismSourceMesh, y0: number, y1: number): WorkBand {
     // a bulge's visual - barely felt, and the editor shows one volume there
     // anyway. Weighting both equally made every irregular lump (rocks!)
     // split to its cap "for no reason" a maker could see.
-    excess =
-      loftVolume > filled ? loftVolume - filled : (filled - loftVolume) / UNDER_COVER_SLACK;
+    excess = loftVolume > filled ? loftVolume - filled : (filled - loftVolume) / UNDER_COVER_SLACK;
     for (const pt of probeTs) {
       const sec = sliceOutline(m, y0 + h * pt);
       if (sec.length < 3) continue;
@@ -465,8 +471,7 @@ function bandIsDone(b: WorkBand, worldScale: number): boolean {
   // Distance criterion: excess spread over the band's wall area is how far the
   // collider actually stands off the mesh. A thin trunk's slivers save
   // millimetres nobody can feel; a fat dome's save decimetres. Splitting stops
-  // once the mean overhang is below feel, however large the volume numbers —
-  // measured in WORLD yards, so a placement scaled 10x keeps splitting until
+  // once the mean overhang is below feel, however large the volume numbers,   // measured in WORLD yards, so a placement scaled 10x keeps splitting until
   // the world-space wall is honest, not just the mesh-space one.
   const wall = b.perimeter * (b.y1 - b.y0);
   return wall > 0 && (b.excess / wall) * worldScale <= OVERHANG_TOL;

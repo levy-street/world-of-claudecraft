@@ -62,7 +62,7 @@ function cloneRecordsWithoutIds<T extends { id?: string }>(
  * for BUILTIN_WORLD, so a custom world carrying their records would render
  * nothing there. Studio is the case that breaks: its documents are copies of
  * the built-in world, and with the records gone the authored subtrees have
- * nothing to gate on and the generic kit stand-ins draw instead — the starting
+ * nothing to gate on and the generic kit stand-ins draw instead, the starting
  * village showed pre-rebuild brown houses while the live game showed the
  * white-and-blue town. Keeping the records lets authored_town_gate.ts resolve
  * true and the real art draw, exactly as the game does.
@@ -71,7 +71,7 @@ export function clonePropsKeepingAuthoredTowns(source: ZonePropsDef): ZonePropsD
   // ONLY the four categories props.ts has a matching skip for. Benches, walls
   // and the town graveyard are drawn by the authored subtree with NO skip on
   // the generic path, so restoring those would double them instead of fixing
-  // anything — they stay stripped exactly as the plain clone leaves them.
+  // anything, they stay stripped exactly as the plain clone leaves them.
   return {
     ...clonePropsWithoutEastbrookLayout(source),
     buildings: cloneRecords(source.buildings),

@@ -306,7 +306,7 @@ const CLIMB_HANDOFF_END = 0.72;
 /** Climb phase by which the top-out stands fully upright. */
 const CLIMB_TOPOUT_END = 0.98;
 
-// Lie_Idle already lays the rig flat — a touch of extra pitch reads as a
+// Lie_Idle already lays the rig flat, a touch of extra pitch reads as a
 // surface glide; clip-less rigs (creatures) get the full procedural prone.
 // The AUTHORED player strokes need neither: they were built prone, head
 // leading and face down, so any pitch here would over-rotate them (see
@@ -1241,7 +1241,7 @@ export class CharacterVisual {
     this.poseWrap.rotation.x =
       (proneAngle + swimPitch) * this.swimBlend + this.lean + CLIMB_BODY_PITCH * climb * climbLevel;
     // Bank into the turn. Already eased and already scaled for the medium by the
-    // renderer (advanceBankRoll), so it lands here as a finished angle — but the
+    // renderer (advanceBankRoll), so it lands here as a finished angle, but the
     // ledge climb owns the whole body while it runs, and a lean mid-haul reads
     // as the character falling off the wall.
     this.poseWrap.rotation.z = (s.bankRoll ?? 0) * (1 - climb);

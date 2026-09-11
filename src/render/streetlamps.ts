@@ -52,8 +52,8 @@ import { GFX } from './gfx';
 import { buildDrapedGlowGeometry, type GlowPatchSite } from './ground_glow_patch';
 import { hasNightLightField, registerStaticNightLights } from './night_light_field';
 import { STREETLAMP_ASSET_DEFS, streetlampAsset } from './streetlamp_assets';
-import { STREETLAMP_FIXTURE } from './streetlamp_fixture.generated';
 import { type StreetlampEmissiveState, updateStreetlampEmissive } from './streetlamp_emissive';
+import { STREETLAMP_FIXTURE } from './streetlamp_fixture.generated';
 import { radialGlowTexture } from './textures';
 
 export interface StreetlampsView {
@@ -171,7 +171,7 @@ function ironMaterial(): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial 
 /**
  * The road light for a world whose DOCUMENT owns the lamps as placements
  * (promotedScenery.streetlamps): the placed GLBs draw the fixtures, and this
- * re-anchors each night light on its placement's socket — position, yaw and
+ * re-anchors each night light on its placement's socket, position, yaw and
  * scale read off the placement, socket offsets off the build-time measurement
  * table, so a maker who moves a lamp moves its road light with it (rebound at
  * the next engine build).

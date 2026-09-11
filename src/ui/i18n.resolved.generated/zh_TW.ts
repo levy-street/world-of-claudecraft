@@ -1401,6 +1401,8 @@ export const zh_TW: EnTranslations = {
       "bgFlag": "戰場奪旗動作",
       "sheathe": "收起/拔出武器",
       "dive": "下潛",
+      "boost": "燃燒器（深球）",
+      "ballMarker": "球標記（深球）",
       "categoryPet": "寵物",
       "petAttack": "寵物：攻擊",
       "petStop": "寵物：停止",
@@ -3759,6 +3761,35 @@ export const zh_TW: EnTranslations = {
       "back": "返回",
       "popupTitle": "公會告示柱",
       "close": "關閉"
+    },
+    "deepglass": {
+      "gossip": "帶我下到深玻璃",
+      "gossipAria": "前往深玻璃並開始一場深球比賽",
+      "bout": "每方{n}人",
+      "boutAria": "開始一場深球比賽，每方{n}人"
+    },
+    "portalWizard": {
+      "gossipDeepglass": "為我打開通往深玻璃的路",
+      "gossipDeepglassAria": "請巴爾德馬開啟通往深玻璃的傳送門",
+      "gossipHome": "為我打開回家的路",
+      "gossipHomeAria": "請巴爾德馬開啟回到你所在城鎮的傳送門",
+      "portalOpen": "傳送門已開啟。走進去吧。"
+    },
+    "plotSign": {
+      "title": "待售住宅地塊",
+      "size": "{size}地塊，{w}乘{d}碼",
+      "sizes": {
+        "small": "小",
+        "medium": "中",
+        "large": "大"
+      },
+      "price": "售價 {price}",
+      "purse": "你身上有 {purse}。",
+      "yours": "你持有這份地契。",
+      "sold": "已售出。{name}持有這份地契。",
+      "buy": "以{price}購買",
+      "close": "關閉",
+      "boughtLog": "{name}的地契歸你所有。"
     },
     "realmBuilder": {
       "title": "本月王國建造者",
@@ -7825,6 +7856,8 @@ export const zh_TW: EnTranslations = {
     "docTitle": "地圖編輯器 - World of ClaudeCraft",
     "untitledMap": "未命名地圖",
     "playtestPlayerName": "製圖師",
+    "playtestBack": "返回編輯器",
+    "playtestBackTitle": "返回地圖編輯器（試玩開始時地圖已儲存）",
     "topbar": {
       "label": "編輯器操作",
       "mapNameLabel": "地圖名稱",
@@ -17302,6 +17335,386 @@ export const zh_TW: EnTranslations = {
         "name": "靈魂醫者",
         "title": "亡者的守護者",
         "greeting": "安息吧，靈魂。我可以讓你重返軀體，但歸途會讓你變得虛弱。"
+      },
+      "deepglass_marshal": {
+        "name": "元帥伊薇特·珊瑚醒",
+        "title": "哨令守護者",
+        "greeting": "鐘內水暖清澈，{className}。說出你要的賽制，我就吹哨開賽：單打讓你獨佔球，或是三對三讓你有人可以怪罪。"
+      },
+      "portal_wizard_eastbrook": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_fenbridge": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_highwatch": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_eldergleam": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_wyrmwatch": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_icemantle": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_lanternmere": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_bridgemere": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_moonrest": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_gallowmere": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_drifthaven": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_hedgewick": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_wickharbor": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_gullhaven": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "沒錯，頭頂是光的，也不，不是山風吹的。頭髮是錨，{className}：每一根髮絲都把靈魂繫在一方土地上。我把我的全都換成了通往世界各地的門。開口吧，我會為你開啟通往深玻璃的路。我的另一個自己已經在那裡了，正摩挲著他的頭討個好運。"
+      },
+      "portal_wizard_deepglass": {
+        "name": "光頭巴爾德馬",
+        "title": "光頭大法師",
+        "greeting": "早說了我會先到。禿頭走得輕快，{className}。好好享受鐘裡的樂趣，小心玻璃，等你想念家鄉的草地時，說一聲就好：回去的路，只差一個閃亮的念頭。"
+      },
+      "dg_spectator_pace1": {
+        "name": "梅莉·薩洛",
+        "title": "深玻璃觀眾",
+        "greeting": "聽說球被打得夠重時會唱歌。我是來聽的。"
+      },
+      "dg_spectator_pace2": {
+        "name": "喬森·布里爾",
+        "title": "深玻璃觀眾",
+        "greeting": "賽前我坐不住，從來都坐不住。問我老婆就知道，她在看台上頭。"
+      },
+      "dg_spectator_pace3": {
+        "name": "佩塔·浪峰",
+        "title": "深玻璃觀眾",
+        "greeting": "沿邊道走三趟來回，正好耗盡一場比賽的緊張。我算過了。"
+      },
+      "dg_spectator_pace4": {
+        "name": "譚姆·湧浪",
+        "title": "深玻璃觀眾",
+        "greeting": "沿邊道走，留意矮牆。露台邊緣踏出的第一步，可長得很。"
+      },
+      "dg_spectator_yard1": {
+        "name": "老鸕鶿",
+        "title": "深玻璃觀眾",
+        "greeting": "我年輕那會兒，水更冷，球門更小。除此之外，其他一切我都認可。"
+      },
+      "dg_spectator_yard2": {
+        "name": "哈羅·芬奇",
+        "title": "深玻璃觀眾",
+        "greeting": "我押了三銀幣在客隊身上。派餅是我撐下去的方法。"
+      },
+      "dg_spectator_yard3": {
+        "name": "科賓·艾許凡恩",
+        "title": "深玻璃觀眾",
+        "greeting": "一位光頭法師賣我一趟傳送門，直達這裡。這是我花過最值得的一枚銅幣。"
+      },
+      "dg_spectator_yard4": {
+        "name": "賽西·鹽滷",
+        "title": "深玻璃觀眾",
+        "greeting": "只有比賽日，裂谷的風裡才會飄著炸麵包的香氣。跟著鼻子走準沒錯。"
+      },
+      "dg_spectator_tier1": {
+        "name": "貝拉·霜璃",
+        "title": "深玻璃觀眾",
+        "greeting": "整座碗形賽場裡最好的座位。你能看到整座鐘被擊中時渾身顫抖。"
+      },
+      "dg_spectator_tier2": {
+        "name": "費林·鹽桶",
+        "title": "深玻璃觀眾",
+        "greeting": "我從破曉就佔著這一排，會一直守到終場哨聲。"
+      },
+      "dg_spectator_tier3": {
+        "name": "尼姆·珠戀",
+        "title": "深玻璃觀眾",
+        "greeting": "開球前水面靜止的那一刻，整座場館也跟著屏住呼吸。"
+      },
+      "dg_spectator_tier4": {
+        "name": "艾爾德大嬸",
+        "title": "深玻璃觀眾",
+        "greeting": "我丈夫以為我在神殿，神殿又以為我跟丈夫在一起。"
+      },
+      "dg_spectator_tier5": {
+        "name": "船長維爾",
+        "title": "深玻璃觀眾",
+        "greeting": "我航遍了天下所有的海，而我見過最奇怪的水，就懸在那上頭。"
+      },
+      "dg_spectator_tier6": {
+        "name": "伊沃·燈痕",
+        "title": "深玻璃觀眾",
+        "greeting": "看台愈高，空氣愈薄，視野愈好。爬上來也算門票的一部分。"
+      },
+      "dg_spectator_tier7": {
+        "name": "茉德·針線",
+        "title": "深玻璃觀眾",
+        "greeting": "球每次換手，我就織一排。上一場比賽下來，我織完了一整條圍巾。"
+      },
+      "dg_spectator_tier8": {
+        "name": "啞嗓佩洛",
+        "title": "深玻璃觀眾",
+        "greeting": "上次比賽把嗓子喊啞了。值得。今天還要再喊一次。"
+      },
+      "dg_spectator_tier9": {
+        "name": "莉娃·暗流",
+        "title": "深玻璃觀眾",
+        "greeting": "球門倒下時，別站在鐘的下面。至少第一句話你要相信我。"
+      },
+      "dg_spectator_tier10": {
+        "name": "丹娜·海藻辮",
+        "title": "深玻璃觀眾",
+        "greeting": "賽前那些塔柱會嗡嗡作響。把手放上去，你能感覺到賽事將至。"
+      },
+      "dg_spectator_tier11": {
+        "name": "馬洛·浪沫",
+        "title": "深玻璃觀眾",
+        "greeting": "十六盞燈，一隻飛蛾都沒有。我看這是全世界最高的燈了。"
+      },
+      "dg_spectator_tier12": {
+        "name": "溫娜·潮紗",
+        "title": "深玻璃觀眾",
+        "greeting": "我是為了看游泳來的。留下不走，是因為回程的堤道太長了。"
+      },
+      "dg_stallkeeper_pies": {
+        "name": "派餅匠羅爾多",
+        "title": "比賽日補給",
+        "greeting": "熱派餅、冷水，還有比排隊還耐放的肉乾。朋友，趁哨聲響起前吃完吧，下半場可不等你的肚子。"
+      },
+      "dg_stallkeeper_tonics": {
+        "name": "賽拉·藥瓶",
+        "title": "藥劑與烈酒",
+        "greeting": "瘀傷藥劑、鎮定藥劑，還有一小杯專治堤道墜落驚魂的烈酒。前兩樣是選手買的，第三樣是觀眾買的。"
+      },
+      "dg_stallkeeper_favors": {
+        "name": "旗婆溫恩",
+        "title": "紀念品與旗幟",
+        "greeting": "贏了裝錢用小袋，輸了裝愁緒用大袋。親愛的，買小袋吧，那才是樂觀的選擇。"
+      },
+      "th_gate_captain": {
+        "name": "城門隊長伊索德·布拉克",
+        "title": "潮門守衛",
+        "greeting": "潮堡守護著鐘，{className}，而我守護著潮堡。堤道暢通，市集熱鬧，守護官也在。回程下坡時，小心欄杆。"
+      },
+      "th_gate_watch_0": {
+        "name": "守衛薩伯·奎斯特",
+        "title": "城門守衛",
+        "greeting": "繼續走吧。結界很安靜，我希望它一直這樣。"
+      },
+      "th_gate_watch_1": {
+        "name": "守衛托馬斯·瑞爾",
+        "title": "城門守衛",
+        "greeting": "繼續走吧。結界很安靜，我希望它一直這樣。"
+      },
+      "th_lamplighter": {
+        "name": "點燈人昂德里",
+        "title": "水晶燈守護者",
+        "greeting": "從堤道到守護官座，每一盞燈都歸我管，天黑前都得照看一遍。想的話跟我上去看看，這是全城最好走的一段路。"
+      },
+      "th_stablemaster": {
+        "name": "馬廄總管科林·韋恩",
+        "title": "潮堡馬廄",
+        "greeting": "沒有長翅膀的，沒有噴火裝置的。只有從沒從堤道上摔下去過的老實馬匹。"
+      },
+      "th_market_pies": {
+        "name": "瑪拉·鹽湖",
+        "title": "麵包與鹽滷",
+        "greeting": "剛從守護官街爐灶出爐的，{className}。趁熱在這裡吃吧，帶出露台一半都會被風吹走。"
+      },
+      "th_market_tonics": {
+        "name": "藥劑師蕾恩·菲爾",
+        "title": "藥劑與烈酒",
+        "greeting": "瘀傷藥劑、鎮定藥劑，還有專治墜落的。深球選手是我最好的顧客。"
+      },
+      "th_market_bags": {
+        "name": "行囊師赫斯特",
+        "title": "背包與繩結",
+        "greeting": "玻璃市場的東西可不是用手捧得回家的，{className}。問我怎麼知道的就對了。"
+      },
+      "th_market_reagents": {
+        "name": "礦石商鄧恩",
+        "title": "礦、錠與花",
+        "greeting": "守護官街鍛造出來的一切，都是靠人背著堤道扛上來的。多半是我的背。"
+      },
+      "th_smith": {
+        "name": "鍛爐守衛耶拉·鹽水",
+        "title": "潮堡鍛造坊",
+        "greeting": "玻璃是守護官的事。鋼鐵才是我的，玻璃撐不住時，我的鋼鐵撐得住。"
+      },
+      "th_banker": {
+        "name": "錢庫守護者安塞爾·潮",
+        "title": "深玻璃寶庫",
+        "greeting": "與其讓錢幣留在你口袋裡冒五十碼高空墜落的風險，不如放進岩石裡更安全，{className}。"
+      },
+      "th_merchant": {
+        "name": "商務官伊瑟兒·珊瑚醒",
+        "title": "守護市場",
+        "greeting": "半個王國的貨物都為了賽事送上這裡來。買賣自便，排隊請守秩序。"
+      },
+      "th_innkeeper": {
+        "name": "客棧老闆多夫·馬羅",
+        "title": "鍍金海鷗",
+        "greeting": "床鋪、餐食，還有一扇面向鐘的窗。比賽夜你不會想睡，反正你也不想睡。若想找同伴，門邊的告示板上有消息。"
+      },
+      "th_market_folk_0": {
+        "name": "妮塔·哈洛威",
+        "title": "玻璃商",
+        "greeting": "比賽日，整個露台的人都跑上來採買。顧好你的錢包，也顧好你的手肘。"
+      },
+      "th_market_folk_1": {
+        "name": "布拉姆·卡洛克",
+        "title": "製繩匠",
+        "greeting": "比賽日，整個露台的人都跑上來採買。顧好你的錢包，也顧好你的手肘。"
+      },
+      "th_market_folk_2": {
+        "name": "修女伊沃·瑪恩",
+        "title": "潮境施賑者",
+        "greeting": "比賽日，整個露台的人都跑上來採買。顧好你的錢包，也顧好你的手肘。"
+      },
+      "th_market_folk_3": {
+        "name": "賽利斯·碼頭",
+        "title": "渡船代理商",
+        "greeting": "比賽日，整個露台的人都跑上來採買。顧好你的錢包，也顧好你的手肘。"
+      },
+      "th_market_folk_4": {
+        "name": "老佩林",
+        "title": "賽事掮客",
+        "greeting": "比賽日，整個露台的人都跑上來採買。顧好你的錢包，也顧好你的手肘。"
+      },
+      "th_market_folk_5": {
+        "name": "燕娜·科爾",
+        "title": "補網匠",
+        "greeting": "比賽日，整個露台的人都跑上來採買。顧好你的錢包，也顧好你的手肘。"
+      },
+      "th_dockhand_0": {
+        "name": "碼頭總管費羅·凱爾",
+        "title": "繫泊區",
+        "greeting": "船隻在這裡繫泊上岩，懸在冰面之上。你會習慣的，不然就得順著堤道回去。"
+      },
+      "th_dockhand_1": {
+        "name": "索具匠西娜·塔爾",
+        "title": "繫泊區",
+        "greeting": "船隻在這裡繫泊上岩，懸在冰面之上。你會習慣的，不然就得順著堤道回去。"
+      },
+      "th_clerk": {
+        "name": "書記官奧托琳·維克斯",
+        "title": "守護官廳",
+        "greeting": "陳情放左邊，賽程爭議放右邊，有關堤道欄杆的一切都放我桌上。"
+      },
+      "th_priest": {
+        "name": "潮語者哈洛倫",
+        "title": "靜水禮拜堂",
+        "greeting": "我們在祭壇上供著一碗鐘的自有活水，從未混濁過一次。"
+      },
+      "th_armourer": {
+        "name": "軍需官魯克·阿德林",
+        "title": "大軍械庫",
+        "greeting": "巡防隊所需的一切裝備，還有一些不該有的。守護官出錢，你付得更少。"
+      },
+      "th_row_folk_0": {
+        "name": "學士伊爾凡·多斯",
+        "title": "守護官家眷",
+        "greeting": "在這上頭，風一停就能聽見鐘聲。全城最好的地段。"
+      },
+      "th_row_folk_1": {
+        "name": "普瑞爾大嬸",
+        "title": "Of the Row",
+        "greeting": "在這上頭，風一停就能聽見鐘聲。全城最好的地段。"
+      },
+      "th_row_folk_2": {
+        "name": "安瑟姆·科伊",
+        "title": "玻璃匠",
+        "greeting": "在這上頭，風一停就能聽見鐘聲。全城最好的地段。"
+      },
+      "th_row_folk_3": {
+        "name": "小鷦鷯",
+        "title": "Of the Row",
+        "greeting": "在這上頭，風一停就能聽見鐘聲。全城最好的地段。"
+      },
+      "th_warden": {
+        "name": "守護官凱西亞·深玻璃",
+        "title": "鐘之守護官",
+        "greeting": "你爬了整條堤道就為了看我，{className}？鐘就在你身後，那才是這裡唯一值得你爬上來的東西。去裡面玩吧，我們留著它就是為了這個。"
+      },
+      "th_seneschal": {
+        "name": "家宰奧德里克·池",
+        "title": "守護官座",
+        "greeting": "守護官在沙漏轉動之際接見陳情者。而這座城市的沙漏，相當巨大。"
+      },
+      "th_keep_guard_0": {
+        "name": "衛兵奧塔",
+        "title": "守護官衛隊",
+        "greeting": "大門依守護官之令敞開。鐘聲若響，留意那道閘門。"
+      },
+      "th_keep_guard_1": {
+        "name": "衛兵麗絲貝特",
+        "title": "守護官衛隊",
+        "greeting": "朋友，待在庭院裡。大廳是守護官的，高塔才是我們的。"
+      },
+      "th_keep_guard_2": {
+        "name": "衛兵凡斯",
+        "title": "守護官衛隊",
+        "greeting": "守護官正在裡面理政。擦擦你的靴子，那塊地毯可是從金冠嶺運來的。"
+      },
+      "th_keep_guard_3": {
+        "name": "衛兵梅璘",
+        "title": "守護官衛隊",
+        "greeting": "陳情者去大廳，送貨的去廚房側翼。你是哪一種？"
+      },
+      "th_fountain_keeper": {
+        "name": "噴泉總管布林·卡多克",
+        "title": "守護官噴泉看守人",
+        "greeting": "噴泉裡流的是鐘的自有活水，{className}，若你相信守護官們所言，是從堤道底下引上來的。巴爾德馬喜歡讓水花噴在他頭上，他說這樣能讓禿頭保持閃亮。"
+      },
+      "th_bridge_watch_0": {
+        "name": "橋衛凱提爾·沃斯",
+        "title": "The West Span",
+        "greeting": "一百三十碼的石橋橫跨黑冰之上，我的職責就是那道欄杆。想往下看就看吧，每個人都會看一次。"
+      },
+      "th_bridge_watch_1": {
+        "name": "橋衛瑪拉·霜",
+        "title": "The East Span",
+        "greeting": "一百三十碼的石橋橫跨黑冰之上，我的職責就是那道欄杆。想往下看就看吧，每個人都會看一次。"
       },
       "chronicler_saul": {
         "name": "編年史者紹爾",

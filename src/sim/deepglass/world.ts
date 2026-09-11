@@ -1,12 +1,12 @@
 // The standalone Deepglass arena world.
 //
-// A sky-caldera carrying the bell and its stadium, and nothing else — no
+// A sky-caldera carrying the bell and its stadium, and nothing else, no
 // procedural trees, no camps, no shipped overworld content. Built
 // PROGRAMMATICALLY rather than published from Studio, because the arena is
 // pure geometry: a 13 MB serialized map doc would carry no information this
 // file does not state in a couple of hundred lines.
 //
-// The landscape is deliberately unlike anywhere else in the realm — see the
+// The landscape is deliberately unlike anywhere else in the realm, see the
 // terrain section below. The stadium standing on it is render-side
 // (src/render/deepglass_stadium.ts).
 //
@@ -25,18 +25,18 @@ import {
   TIDEHOLD_NPCS,
 } from './citadel';
 import {
+  ringLights as cityLights,
+  ringPlacements as cityPlacements,
+  RING_POI,
+  RING_WIZARD_POS,
   ringBiomePaint,
   ringBlockers,
   ringColliderVolumes,
   ringGrassClear,
   ringLakes,
-  ringLights as cityLights,
   ringLocations,
-  ringPlacements as cityPlacements,
   ringPointSounds,
   ringTerrain,
-  RING_POI,
-  RING_WIZARD_POS,
 } from './citadel_ring';
 import {
   DEEPGLASS_CENTER,
@@ -62,7 +62,7 @@ export const DG_WORLD_HALF_Z = 250;
 export const DG_WORLD_Z_NORTH = 1120;
 
 /** The icy sea. The bell holds its OWN water (a render volume) and the arena
- *  terrace sits at y 0, so the waterline lives well below both — but ABOVE the
+ *  terrace sits at y 0, so the waterline lives well below both, but ABOVE the
  *  chasm floor and the carved ocean bed (-46 / -55), which is what turns the
  *  ring chasm into a moat and every low place the city stamps carve into
  *  frozen sea. citadel.ts owns the carving AND the waterline (the bergs are
@@ -77,15 +77,15 @@ export const DG_ARRIVAL = { x: 0, z: DEEPGLASS_RADIUS + 20 };
  * The match marshal, and the reason she exists.
  *
  * Before her the only ways into a bout were a DEV chat command (`/deepglass N`,
- * dead in a production build) and a URL parameter — so a player who walked down
+ * dead in a production build) and a URL parameter, so a player who walked down
  * the causeway could look at the bell and had no way to start anything. She is
  * the in-world fixture desk: talk to her, pick a size, play.
  *
  * Placed on the near end of the causeway, four yards clear of the glass: inside
  * the seating bowl's north gap, outside the play sphere (radius 49.4), and
  * between the two rows of avenue lamps at x = +/-7. `facing: 0` looks north up
- * the processional — the sim's convention is that facing f points along
- * (sin f, cos f) — so she is looking at the arriving player rather than past
+ * the processional, the sim's convention is that facing f points along
+ * (sin f, cos f), so she is looking at the arriving player rather than past
  * them, since the walk in runs south from DG_ARRIVAL.
  */
 export const DEEPGLASS_MARSHAL_POS = { x: 0, z: DEEPGLASS_RADIUS + 4 };
@@ -123,10 +123,10 @@ export const DEEPGLASS_MARSHAL: NpcDef = {
 //
 // Read from the middle out:
 //
-//   the terrace — a dead-flat mesa carrying the bell and the whole stadium
-//   the fall    — a ring chasm dropping away from the terrace on every side,
+//   the terrace, a dead-flat mesa carrying the bell and the whole stadium
+//   the fall, a ring chasm dropping away from the terrace on every side,
 //                 so the arena reads as an island in the air
-//   the wall    — a jagged massif ringing the horizon, tall enough to close the
+//   the wall, a jagged massif ringing the horizon, tall enough to close the
 //                 sky off and irregular enough never to read as a wall
 //
 // The point of the silhouette is that from inside the bowl the only things
@@ -164,7 +164,7 @@ const DG_PARAPET_SEGMENTS = 40;
  *
  * The chasm is a fifty-five yard drop and the terrace runs right up to it, so
  * the first thing a player does after arriving is wander to the edge, fall in
- * and die of it — which is exactly what happened the first time this landscape
+ * and die of it, which is exactly what happened the first time this landscape
  * was walked. A ring of blockers along the lip turns the drop into scenery.
  * The matching stone balustrade is rendered by deepglass_stadium.ts; this is
  * the collision half, and the two share DG_PARAPET_R so they cannot drift.
@@ -189,7 +189,7 @@ function parapetBlockers(): NonNullable<WorldContent['blockers']> {
 
 /**
  * The stadium's own collision. The bowl, the causeway and the cradle were
- * renderer geometry with NO colliders at all — a body outside a bout walked
+ * renderer geometry with NO colliders at all, a body outside a bout walked
  * straight through the risers into the hollow of the stands, sank shin-deep
  * into the causeway deck, and passed through the cradle pylons. Every number
  * here is imported from layout.ts, the same module the stadium renders from,
@@ -201,13 +201,13 @@ function parapetBlockers(): NonNullable<WorldContent['blockers']> {
  */
 
 /**
- * An arc of `wall` collider volumes — chord after chord around the ring, with
+ * An arc of `wall` collider volumes, chord after chord around the ring, with
  * explicit endpoints so the arc stops EXACTLY at the entrance cut. Angles are
  * the cos/sin convention (north = pi/2).
  *
  * Wall VOLUMES rather than BlockerDef segments on purpose: the two bowl rings
  * take ninety-two of them, `sanitizeMapDoc` caps a document's blockers at
- * MAX_BLOCKERS (128), and the citadel + parapet already spend eighty — as
+ * MAX_BLOCKERS (128), and the citadel + parapet already spend eighty, as
  * blockers, a Studio republish of this venue would silently drop a third of
  * the bowl's collision at the cap. Collider volumes ride the placement
  * pipeline instead, which also makes each chord editable in Studio.
@@ -260,11 +260,11 @@ function stadiumColliderVolumes(): ColliderVolume[] {
 
   // The causeway deck is a RAISED floor, not a wall: one walkable plane at the
   // deck's top face, so a body stands on the stone instead of wading through
-  // it. The kerbs are two narrow strips a half-step higher — an honest curb.
+  // it. The kerbs are two narrow strips a half-step higher, an honest curb.
   // All the floor planes are DETACHED (anchored to absolute y 0, the slate the
   // stadium is drawn against), not terrain-following: a plane's base otherwise
   // reads the live terrain at its CENTRE, and the citadel's boulevard stamps
-  // raise that mid-causeway — which floated the whole deck collider a half
+  // raise that mid-causeway, which floated the whole deck collider a half
   // yard above the drawn stone.
   const causewayLen = DG_CAUSEWAY_Z_FAR - DG_CAUSEWAY_Z_NEAR;
   const causewayMidZ = cz + (DG_CAUSEWAY_Z_NEAR + DG_CAUSEWAY_Z_FAR) / 2;
@@ -354,7 +354,7 @@ function calderaTerrain(): WorldContent['terrainEdits'] {
   const out: NonNullable<WorldContent['terrainEdits']> = [];
 
   // 1. The terrace, dead flat. `mode: 'level'` with a hard disc drives the
-  //    heightfield to exactly 0 — the stadium needs a true plane to stand on,
+  //    heightfield to exactly 0, the stadium needs a true plane to stand on,
   //    and every collider under it assumes y = 0.
   out.push({
     x: DEEPGLASS_CENTER.x,
@@ -396,7 +396,7 @@ function calderaTerrain(): WorldContent['terrainEdits'] {
   }
 
   // 3. The wall. Peaks of varying height and reach, stepped around the horizon
-  //    and deliberately uneven — a ring of identical cones reads as a fence.
+  //    and deliberately uneven, a ring of identical cones reads as a fence.
   for (let i = 0; i < DG_MASSIF_PEAKS; i++) {
     const a = (i / DG_MASSIF_PEAKS) * Math.PI * 2;
     // North is Tidehold's: those peaks would be stamped straight through the
@@ -432,7 +432,7 @@ function calderaTerrain(): WorldContent['terrainEdits'] {
 // ---------------------------------------------------------------------------
 // Dressing. Everything below is authored through the SAME layers the Studio
 // editor writes (lighting, skybox, weather, placements, lights, point sounds,
-// grass clear) — this arena just fills them in code instead of through the GUI,
+// grass clear), this arena just fills them in code instead of through the GUI,
 // because every position is derived from the bell's radius rather than dragged.
 // ---------------------------------------------------------------------------
 
@@ -556,11 +556,11 @@ export function buildDeepglassWorld(): WorldContent {
     // She stays DYNAMIC here so the generic surface loop skips her: that loop
     // allocates ids as it goes, and one extra allocation shifts every id after
     // it (and with it the bout's rng). Sim spawns her from this entry at a
-    // reserved id instead — see spawnDeepglassMarshal.
+    // reserved id instead, see spawnDeepglassMarshal.
     npcs: {
       [DEEPGLASS_MARSHAL.id]: DEEPGLASS_MARSHAL,
       // Baldemar's Tidehold self, standing at the Wardens' Fountain in the
-      // middle of the Glass Market — the city's crossroads, where the boulevard
+      // middle of the Glass Market, the city's crossroads, where the boulevard
       // from the causeway meets the two bridge spans. A traveller portals in
       // and out from the heart of everything (main.ts lands portal arrivals
       // beside him). Same dynamic plus reserved-id treatment as the marshal;
@@ -604,7 +604,7 @@ export function buildDeepglassWorld(): WorldContent {
     // environment makes it glow like the lantern it is meant to be. The sun sits
     // low and warm purely to catch the fresnel rim.
     // Dusk, not night. The first pass ran this MUCH darker on the reasoning
-    // that a bright sky washed 76 yards of glass into a flat grey ball — true
+    // that a bright sky washed 76 yards of glass into a flat grey ball, true
     // when the bell was the only thing here, and wrong the moment a pale stone
     // arena went up around it: from outside, a dark bell against a dark sky in
     // a dark bowl read as an empty screen. The sun is low and warm so the
@@ -668,7 +668,7 @@ export function buildDeepglassWorld(): WorldContent {
     // and the rest, authored from built-in PBR sets so it opens (and repaints)
     // in Studio like any hand-painted map. See citadel.ts's paint section.
     biomePaint: ringBiomePaint(),
-    // The terrace stays a plain surface — the stadium's own stone is laid over
+    // The terrace stays a plain surface, the stadium's own stone is laid over
     // it and any repaint would fight that. The MASSIF is the opposite case:
     // once there are real peaks on the horizon, slope rock and snow caps are
     // exactly the rules that make them read as mountains rather than green

@@ -83,9 +83,8 @@ describe('authored ramp decks', () => {
 
   // REGRESSION (Troy, 2026-07-26): "the ramp collision from Collision Master
   // is not letting me walk up, the player just gets stuck". A stairs placement
-  // stamped with a SIMPLE footprint — 'basic' collision mode, which is what
-  // applyDefaultCollision gives an asset before anyone authors a ramp for it —
-  // was dropped by rampsFor's collideCustom gate. The placement kept its solid
+  // stamped with a SIMPLE footprint, 'basic' collision mode, which is what
+  // applyDefaultCollision gives an asset before anyone authors a ramp for it,   // was dropped by rampsFor's collideCustom gate. The placement kept its solid
   // circle/square and lost its deck, so the ramp became an invisible block.
   it('keeps the authored deck on a placement stamped with a simple footprint', () => {
     const content = contentWith('/models/props/test_ramp.glb');

@@ -2,7 +2,7 @@
 //
 // The model is the one the asset pipeline split into animatable parts
 // (scripts/build_brennoch_jetpack.mjs): `core` plus `cog`, `booster.l`/`.r` and
-// `fire.l`/`.r`. It carries no baked clips — every bit of motion here is
+// `fire.l`/`.r`. It carries no baked clips, every bit of motion here is
 // procedural, driven by the wearer's live boost state.
 //
 // The `fire.*` nodes are now SOCKETS rather than art: their authored cones are
@@ -17,12 +17,12 @@
 // from across the bell whether an opponent has a burn left.
 //
 // On top of that the pack must read as HARDWARE, which is two things:
-//   * the burners answer the SHOVE — ignition and hard corners bark
+//   * the burners answer the SHOVE, ignition and hard corners bark
 //   * the cog is a flywheel: it winds up and coasts down, it does not snap
 //
 // The nozzles DO NOT MOVE. An earlier pass gimballed them to point the exhaust
 // opposite the thrust, solved onto the fan the hardware could reach, driven by
-// spring servos — correct on paper, measured at 0.80-0.99 exhaust-against-thrust,
+// spring servos, correct on paper, measured at 0.80-0.99 exhaust-against-thrust,
 // and it never looked right from inside the bell. It is gone: the `fire.*`
 // sockets keep the pose the model was authored with, and the plume comes out of
 // them the way the asset says it should.
@@ -53,15 +53,15 @@ const MOUNT = { pos: [0, -0.02, -0.77] as const, rotY: Math.PI, scale: 0.9 };
 /**
  * The arena's lighting response, applied to the pack the moment it loads.
  *
- * THIS IS WHY THE PACKS WERE INVISIBLE. Brennoch ships at `metalness: 1` — a
- * pure metal — and the bell runs a low `environmentIntensity` with NO scene
+ * THIS IS WHY THE PACKS WERE INVISIBLE. Brennoch ships at `metalness: 1`, a
+ * pure metal, and the bell runs a low `environmentIntensity` with NO scene
  * environment map at all. A pure metal has no diffuse term by definition, so
  * with nothing to reflect it renders as a black silhouette against a dark
  * character: attached, in the scene, visible, and completely unreadable.
  *
  * The arena kit (deepglass_kit.ts) already had to solve exactly this for its
  * brass, and this is the same treatment: pull metalness down so the directional
- * and hemisphere lights — which ARE bright in here — get a diffuse term to work
+ * and hemisphere lights, which ARE bright in here, get a diffuse term to work
  * with, push the envMap boost back on top for the sheen, and lift the baked
  * albedo a touch against the low key. Every value SCALES the baked
  * metallicRoughness map rather than replacing it, so the brass/steel/rune split
@@ -141,11 +141,11 @@ export interface PackWearerState {
   speed: number;
   /** 0..1 thrust spool (Entity.dgSpool): how far the pack has wound up. Drives
    *  the idle pilot flame, so a fighter under way always has lit burners even
-   *  with the throttle off — the pack should never look switched off while its
+   *  with the throttle off, the pack should never look switched off while its
    *  wearer is flying. */
   spool: number;
   /**
-   * WORLD-SPACE THRUST INTENT — the single most important field here.
+   * WORLD-SPACE THRUST INTENT, the single most important field here.
    *
    * This is `Entity.dgWish`: the unit-ish direction the flight pass is actually
    * accelerating the body along, already lag-smoothed by the sim, magnitude
@@ -161,12 +161,12 @@ export interface PackWearerState {
    * A dash is flaring right now (Entity.dgDashTicks).
    *
    * The dash is an IMPULSE, not thrust: it does not show up in `wish` at all, so
-   * without this the most violent thing the pack ever does — throwing the body
-   * sideways in a fifth of a second — would be the one thing it never lit for.
+   * without this the most violent thing the pack ever does, throwing the body
+   * sideways in a fifth of a second, would be the one thing it never lit for.
    * Slams the throttle to full and jolts the gimbal, so a dash cracks.
    */
   dashing: boolean;
-  /** This is the camera's own body. Only they get the real point light — a
+  /** This is the camera's own body. Only they get the real point light, a
    *  dozen dynamic lights in one scene is a shader recompile per roster change
    *  and a measurable frame cost, and the light you actually read is the one
    *  washing the water around YOU. */
@@ -185,7 +185,7 @@ const BURN_LIGHT_RANGE = 14;
 /** Plume heat at full spool with the throttle off: a live pilot flame, small but
  *  unmistakably burning, against 1 for a burn. The contract (PRD 5.2) is that
  *  you can read a pack's state across the bell with no HUD, and that needs
- *  IDLE and SPENT to look different — a pilot flame you have to squint at is
+ *  IDLE and SPENT to look different, a pilot flame you have to squint at is
  *  the same silhouette as a dead pack. */
 const PACK_IDLE_HEAT = 0.33;
 
@@ -208,7 +208,7 @@ export class DeepglassPacks {
   private template: THREE.Object3D | null = null;
   private plumeTemplate: THREE.Object3D | null = null;
   private loading = false;
-  /** Settles when both loads above have resolved OR failed — the bench build
+  /** Settles when both loads above have resolved OR failed, the bench build
    *  rides it, and a missing plume degrades exactly like a live pack's does. */
   private loadSettled: Promise<void> | null = null;
   private readonly packs = new Map<number, Pack>();
@@ -263,16 +263,16 @@ export class DeepglassPacks {
   /**
    * Seat one burner's plume in a nozzle.
    *
-   * The `fire.*` node stays — it is the socket the gimbal already aims, sitting
-   * at the nozzle mouth with the exhaust running down its own -Y — but its
+   * The `fire.*` node stays, it is the socket the gimbal already aims, sitting
+   * at the nozzle mouth with the exhaust running down its own -Y, but its
    * authored cone mesh is switched off and the four plume parts hang under it
-   * instead — seated in the socket's authored pose, which is the direction the
+   * instead, seated in the socket's authored pose, which is the direction the
    * asset says the exhaust leaves in.
    */
   private dressNozzle(socket: THREE.Object3D, phase: number, out: Pack['burners']): void {
     // Switch the authored cone off through its MATERIAL, not through
     // `visible`. The socket is itself a Mesh, and Object3D visibility is
-    // inherited — hiding the node takes the plume about to be parented under it
+    // inherited, hiding the node takes the plume about to be parented under it
     // with it, silently and with every uniform still looking correct.
     socket.traverse((o) => {
       const mesh = o as THREE.Mesh;
@@ -338,7 +338,7 @@ export class DeepglassPacks {
       glows.push(glow);
     }
 
-    // Left in the pose the model was authored with — nothing rotates these.
+    // Left in the pose the model was authored with, nothing rotates these.
     const boosters = ['booster.l', 'booster.r']
       .map((n) => findNode(payload, n))
       .filter((n): n is THREE.Object3D => n !== null);
@@ -386,12 +386,11 @@ export class DeepglassPacks {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-      // NOZZLE_OFF is shared by every pack in the bout — disposing it here would
+      // NOZZLE_OFF is shared by every pack in the bout, disposing it here would
       // take the other wearers' sockets down with this one.
       for (const m of mats) if (m && m !== NOZZLE_OFF) m.dispose();
     });
-    // GLOW_GEO is shared across every pack, and so is every plume GEOMETRY —
-    // the parts are cloned off one template, so the buffers belong to it and
+    // GLOW_GEO is shared across every pack, and so is every plume GEOMETRY,     // the parts are cloned off one template, so the buffers belong to it and
     // not to this pack. Only the per-pack materials above are disposed, and the
     // traversal above already covers the plume's, since its meshes hang under
     // the payload.
@@ -432,7 +431,7 @@ export class DeepglassPacks {
    * Only the camera's own body gets one. Ten wearers with ten dynamic point
    * lights re-links every lit material's shader whenever the roster changes,
    * and the light a player actually reads is the one washing the water in
-   * front of THEM — the rest is glow sprites and bloom.
+   * front of THEM, the rest is glow sprites and bloom.
    */
   private syncLight(pack: Pack, state: PackWearerState, glowK: number): void {
     if (!state.isSelf) {
@@ -448,7 +447,7 @@ export class DeepglassPacks {
       pack.payload.add(pack.light);
     }
     // ALWAYS visible, throttled by intensity alone. three counts a light into
-    // numPointLights iff `visible` — intensity is irrelevant to the count — and
+    // numPointLights iff `visible`, intensity is irrelevant to the count, and
     // numPointLights is part of every lit material's program cache key, so a
     // visibility toggle here relinked the whole scene's programs on the frame
     // the burners crossed the threshold, mid-flight, both directions.
@@ -458,8 +457,8 @@ export class DeepglassPacks {
   private animate(pack: Pack, state: PackWearerState, dt: number): void {
     // ---- surge -------------------------------------------------------------
     // How hard the body was just shoved. The sim's turn authority means a hard
-    // change of direction is the pack's BIGGEST push — bigger than holding a
-    // straight line at top speed — and until now none of that reached the
+    // change of direction is the pack's BIGGEST push, bigger than holding a
+    // straight line at top speed, and until now none of that reached the
     // model. Spike on the shove, decay after it, so every corner and every
     // ignition barks out of the burners.
     const dv = Math.hypot(
@@ -501,7 +500,7 @@ export class DeepglassPacks {
     }
     pack.wasBoosting = state.boosting;
 
-    // The cog is a flywheel, so its RATE is what chases the throttle — it winds
+    // The cog is a flywheel, so its RATE is what chases the throttle, it winds
     // up over a beat and coasts back down, instead of changing speed in the
     // same instant the throttle does.
     if (pack.cog) {
@@ -511,7 +510,7 @@ export class DeepglassPacks {
     }
 
     // The boosters are NOT touched: they keep the pose the model was authored
-    // with. (The gimbal that used to aim them is gone — see the header.)
+    // with. (The gimbal that used to aim them is gone, see the header.)
 
     // ---- the plumes --------------------------------------------------------
     // The flames ARE the meter. Spent means genuinely dark, not merely small:
@@ -524,8 +523,7 @@ export class DeepglassPacks {
     const speedK = 0.9 + 0.1 * Math.min(1, state.speed / 26);
     const len = pack.heat * flare * speedK;
     // Every part of the plume stretches, fattens and brightens in the SHADER
-    // off these three numbers, each with its own response (jet_fire.ts PARTS) —
-    // which is why the collar can stay socketed in the nozzle while the tail
+    // off these three numbers, each with its own response (jet_fire.ts PARTS),     // which is why the collar can stay socketed in the nozzle while the tail
     // whips out four times its resting length. Scaling the socket node instead,
     // as the cones needed, moved all four together and skewed their normals.
     for (const b of pack.burners) {
@@ -542,7 +540,7 @@ export class DeepglassPacks {
     // just a brighter pixel.
     // Deliberately restrained. The nozzles swing onto the thrust, which means
     // the chase camera is looking straight INTO both of them whenever you fly
-    // forward — at the first pass's size and opacity that put a white ball over
+    // forward, at the first pass's size and opacity that put a white ball over
     // the player rather than a hot core in a nozzle.
     const glowK = spent ? 0 : Math.min(1, pack.heat * flare * (1 + pack.surge * 0.4));
     for (const g of pack.glows) {

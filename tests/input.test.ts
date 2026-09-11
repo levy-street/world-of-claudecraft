@@ -2243,7 +2243,7 @@ describe('Input mouse-button bindings', () => {
 describe('deepball aim', () => {
   it('reads the camera as an aim: negated, and measured from the resting pitch', () => {
     // camPitch is POSITIVE looking down and RESTS at 0.32, so a player who has
-    // touched nothing must be aimed level — not 18 degrees into the floor.
+    // touched nothing must be aimed level, not 18 degrees into the floor.
     expect(deepballAimFromPitch(0.32)).toBeCloseTo(0, 2);
     expect(deepballAimFromPitch(1.32)).toBeLessThan(-0.9); // looking down aims down
     expect(deepballAimFromPitch(-0.4)).toBeGreaterThan(0.6); // looking up aims up

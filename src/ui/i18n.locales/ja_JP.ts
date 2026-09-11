@@ -16838,4 +16838,329 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.farmgrow.label': '作物を成熟させる',
   'devCommand.fields.bed': '畝のID（任意）',
   'guide.profPages.oncePerDay': '1日1回',
+  'editor.playtestBack': 'エディターに戻る',
+  'editor.playtestBackTitle': 'マップエディターに戻る（プレイテスト開始時にマップは保存済みです）',
+  'hudChrome.deepglass.bout': '各チーム{n}人',
+  'hudChrome.deepglass.boutAria': 'ディープボールの試合を開始（各チーム{n}人）',
+  'hudChrome.deepglass.gossip': 'ディープグラスへ連れて行ってくれ',
+  'hudChrome.deepglass.gossipAria': 'ディープグラスへ移動してディープボールの試合を始める',
+  'hudChrome.keybinds.ballMarker': 'ボールマーカー（ディープボール）',
+  'hudChrome.keybinds.boost': 'バーナー（ディープボール）',
+  'hudChrome.plotSign.boughtLog': '{name}の権利書はあなたのものです。',
+  'hudChrome.plotSign.buy': '{price}で購入',
+  'hudChrome.plotSign.close': '閉じる',
+  'hudChrome.plotSign.price': '希望価格 {price}',
+  'hudChrome.plotSign.purse': '所持金：{purse}',
+  'hudChrome.plotSign.size': '{size}区画、{w}×{d}ヤード',
+  'hudChrome.plotSign.sizes.large': '大',
+  'hudChrome.plotSign.sizes.medium': '中',
+  'hudChrome.plotSign.sizes.small': '小',
+  'hudChrome.plotSign.sold': '売却済み。{name}がこの権利書を所有しています。',
+  'hudChrome.plotSign.title': '売り出し中の住宅区画',
+  'hudChrome.plotSign.yours': 'この権利書はあなたが所有しています。',
+  'hudChrome.portalWizard.gossipDeepglass': 'ディープグラスへの道を開いてくれ',
+  'hudChrome.portalWizard.gossipDeepglassAria':
+    'バルデマールにディープグラスへのポータルを開いてもらう',
+  'hudChrome.portalWizard.gossipHome': '帰り道を開いてくれ',
+  'hudChrome.portalWizard.gossipHomeAria': 'バルデマールに町へ戻るポータルを開いてもらう',
+  'hudChrome.portalWizard.portalOpen': 'ポータルが開いた。くぐって進もう。',
+  'entities.npcs.deepglass_marshal.greeting':
+    '鐘は温かく、水は澄んでいる、{className}。組み合わせを言えば笛を鳴らそう。ボールを独り占めしたいなら一対一、誰かのせいにしたいなら三対三の本戦だ。',
+  'entities.npcs.deepglass_marshal.name': '試合長イヴェット・コーラルウェイク',
+  'entities.npcs.deepglass_marshal.title': '笛の番人',
+  'entities.npcs.dg_stallkeeper_favors.greeting':
+    '勝ち分を入れる巾着に、迷いをしまう袋。買うなら巾着にしときな、そっちの方が縁起がいいよ。',
+  'entities.npcs.dg_stallkeeper_favors.name': '旗婆ウィン',
+  'entities.npcs.dg_stallkeeper_favors.title': 'お守りと旗',
+  'entities.npcs.dg_stallkeeper_pies.greeting':
+    '熱々のパイに冷たい水、行列より長持ちする干し肉もあるよ。笛が鳴る前に食べときな、友よ、後半はどんな腹の都合も待っちゃくれないからね。',
+  'entities.npcs.dg_stallkeeper_pies.name': 'パイ売りロルド',
+  'entities.npcs.dg_stallkeeper_pies.title': '試合の日の糧食',
+  'entities.npcs.dg_stallkeeper_tonics.greeting':
+    '打ち身の薬に、神経の薬、それと堤道から落ちた時のための一杯もあるよ。選手が買うのは最初の二つ、観客が買うのは三つ目さ。',
+  'entities.npcs.dg_stallkeeper_tonics.name': 'セラ・フィアル',
+  'entities.npcs.dg_stallkeeper_tonics.title': '薬と酒',
+  'entities.npcs.portal_wizard_bridgemere.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_bridgemere.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_bridgemere.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_drifthaven.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_drifthaven.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_drifthaven.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_eastbrook.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_eastbrook.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_eastbrook.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_eldergleam.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_eldergleam.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_eldergleam.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_fenbridge.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_fenbridge.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_fenbridge.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_gallowmere.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_gallowmere.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_gallowmere.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_gullhaven.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_gullhaven.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_gullhaven.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_hedgewick.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_hedgewick.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_hedgewick.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_highwatch.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_highwatch.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_highwatch.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_icemantle.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_icemantle.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_icemantle.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_lanternmere.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_lanternmere.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_lanternmere.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_moonrest.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_moonrest.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_moonrest.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_wickharbor.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_wickharbor.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_wickharbor.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_wyrmwatch.greeting':
+    'ああ、頭は禿げている。山の風のせいではない。髪とは錨なのだ、{className}：一本一本が魂をひとつの土地に繋ぎ止める。わしはそれを、髪をすべて、世界に通じる扉と引き換えた。頼めば、ディープグラスへの道を開いてやろう。もう一人のわしはすでに向こうにいて、幸運を祈って頭を磨いているところだ。',
+  'entities.npcs.portal_wizard_wyrmwatch.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_wyrmwatch.title': '輝く頭の大魔導師',
+  'entities.npcs.portal_wizard_deepglass.greeting':
+    '先に着いていると言っただろう。禿頭は身軽に旅ができるのでな、{className}。鐘を楽しみ、ガラスに気をつけて、故郷の草地が恋しくなったら一言言うがいい。帰り道は輝く思いひとつの先にある。',
+  'entities.npcs.portal_wizard_deepglass.name': '禿頭のバルデマール',
+  'entities.npcs.portal_wizard_deepglass.title': '輝く頭の大魔導師',
+  'entities.npcs.th_armourer.greeting':
+    '衛兵が持つもの一式と、本来持つべきものも少々。ウォーデンが金を出す分、お前の払いは安くなる。',
+  'entities.npcs.th_armourer.name': '需品官ルーク・アドリン',
+  'entities.npcs.th_armourer.title': '大武具庫',
+  'entities.npcs.th_banker.greeting':
+    'お前の懐より岩の中の方が安全だ、{className}。何しろ五十ヤードの崖っぷちだからな。',
+  'entities.npcs.th_banker.name': '金庫番アンセル・タイド',
+  'entities.npcs.th_banker.title': 'ディープグラス金庫',
+  'entities.npcs.th_clerk.greeting':
+    '陳情は左、試合の異議申し立ては右、堤道の欄干にまつわることは何でもこの机へ。',
+  'entities.npcs.th_clerk.name': '書記オットリン・ヴェックス',
+  'entities.npcs.th_clerk.title': 'ウォーデンの館',
+  'entities.npcs.th_fountain_keeper.greeting':
+    'この泉は鐘そのものの水で満ちている、{className}。ウォーデンたちの言葉を信じるなら、堤道の下を通して汲み上げているそうだ。バルデマールは頭に水しぶきを浴びるのがお気に入りでな。禿頭が輝き続けると言っている。',
+  'entities.npcs.th_fountain_keeper.name': '泉守ブリン・カドック',
+  'entities.npcs.th_fountain_keeper.title': 'ウォーデンたちの泉の番人',
+  'entities.npcs.th_gate_captain.greeting':
+    'タイドホールドは鐘を守り、{className}、わたしはタイドホールドを守る。堤道は開き、市場は賑やかで、ウォーデンもいる。帰りは欄干に気をつけな。',
+  'entities.npcs.th_gate_captain.name': '門衛隊長イゾルデ・ブラック',
+  'entities.npcs.th_gate_captain.title': '潮の門の番人',
+  'entities.npcs.th_innkeeper.greeting':
+    '寝台に食事、鐘を望む窓つきだ。試合の夜は眠れやしないが、眠りたいとも思わんだろうよ。連れが欲しいなら、掲示板が戸口のそばにある。',
+  'entities.npcs.th_innkeeper.name': '宿屋の主人ドヴ・マロウ',
+  'entities.npcs.th_innkeeper.title': '金色のカモメ亭',
+  'entities.npcs.th_lamplighter.greeting':
+    '堤道からウォーデンの座まで、灯りは残らずこの手にかかっている。日が落ちる前に、どれも世話をしてやらねばな。よければついておいで、この街いちばんの散歩道だよ。',
+  'entities.npcs.th_lamplighter.name': '点灯夫オンドリー',
+  'entities.npcs.th_lamplighter.title': '水晶灯の番人',
+  'entities.npcs.th_market_bags.greeting':
+    'ガラス市場の品を、素手で家まで運べるものか、{className}。どうしてそれを知っているか、聞いてみるといい。',
+  'entities.npcs.th_market_bags.name': '荷物頭ヘスト',
+  'entities.npcs.th_market_bags.title': '鞄と紐',
+  'entities.npcs.th_market_pies.greeting':
+    '通りの窯から出来立てだよ、{className}。ここで食べときな、外のテラスじゃ半分は風に飛ばされちまうから。',
+  'entities.npcs.th_market_pies.name': 'マーラ・ソルトミア',
+  'entities.npcs.th_market_pies.title': 'パンと塩水',
+  'entities.npcs.th_market_reagents.greeting':
+    '通りの鍛冶場で作られる物は何でも、誰かの背に担がれて堤道を上ってくる。たいていはわたしの背だがな。',
+  'entities.npcs.th_market_reagents.name': '鉱石商ダン',
+  'entities.npcs.th_market_reagents.title': '鉱石と延べ棒と鉄塊',
+  'entities.npcs.th_market_tonics.greeting':
+    '打ち身の薬に、神経の薬、それと落下した時の薬もある。ディープボールの選手が一番の得意客さ。',
+  'entities.npcs.th_market_tonics.name': '薬師レン・フェル',
+  'entities.npcs.th_market_tonics.title': '薬と酒',
+  'entities.npcs.th_merchant.greeting':
+    'この国の半分が、試合目当てに品物をここへ送ってくる。売り買いはご自由に、ただし行列には気をつけて。',
+  'entities.npcs.th_merchant.name': '仲買人イゼル・コーラルウェイク',
+  'entities.npcs.th_merchant.title': 'ウォーデン市場',
+  'entities.npcs.th_priest.greeting':
+    '祭壇には鐘そのものの水を湛えた鉢を置いている。一度たりとも濁ったことはない。',
+  'entities.npcs.th_priest.name': '潮語りハロラン',
+  'entities.npcs.th_priest.title': '静水の礼拝堂',
+  'entities.npcs.th_seneschal.greeting':
+    'ウォーデンは砂時計が返るごとに陳情人と会う。もっとも、この街の砂時計はずいぶん大きいがね。',
+  'entities.npcs.th_seneschal.name': '家宰アルドリック・プール',
+  'entities.npcs.th_seneschal.title': 'ウォーデンの座',
+  'entities.npcs.th_smith.greeting':
+    'ガラスはウォーデンの領分、鋼はわたしの領分だ。ガラスが持ちこたえぬ時も、わたしの鋼は持ちこたえる。',
+  'entities.npcs.th_smith.name': '鍛冶頭イェラ・ブライン',
+  'entities.npcs.th_smith.title': 'タイドホールド鍛冶場',
+  'entities.npcs.th_stablemaster.greeting':
+    '翼のあるものは断る、噴射装置つきも断る。堤道から落ちたことのない、まっとうな馬だけを扱っている。',
+  'entities.npcs.th_stablemaster.name': '厩舎長コリン・ヴェイン',
+  'entities.npcs.th_stablemaster.title': 'タイドホールド厩舎',
+  'entities.npcs.th_warden.greeting':
+    '堤道をまるまる登って、わたしを見に来たのか、{className}？鐘はお前の後ろにある、それがこの町で登る価値のある唯一のものだ。行って遊んでくるといい、そのために我々はあれを守っているのだからな。',
+  'entities.npcs.th_warden.name': 'ウォーデン・カッシア・ディープグラス',
+  'entities.npcs.th_warden.title': '鐘のウォーデン',
+  'entities.npcs.dg_spectator_pace1.greeting':
+    '強く打てばボールが歌うと言うじゃないか。それを聞きに来たのさ。',
+  'entities.npcs.dg_spectator_pace1.name': 'メリー・サロウ',
+  'entities.npcs.dg_spectator_pace1.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_pace2.greeting':
+    '試合の前はじっと座っていられないんだ。昔からそうさ。妻に聞いてみるといい、上の段にいるから。',
+  'entities.npcs.dg_spectator_pace2.name': 'ジョソン・ブリル',
+  'entities.npcs.dg_spectator_pace2.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_pace3.greeting':
+    '縁を三往復すれば、ちょうど一試合分の緊張が収まる。計ったことがあるんだ。',
+  'entities.npcs.dg_spectator_pace3.name': 'ペタ・ウェイブクレスト',
+  'entities.npcs.dg_spectator_pace3.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_pace4.greeting':
+    '縁の内側にいて、欄干に気をつけな。テラスから足を踏み外したら、長い落下になるぞ。',
+  'entities.npcs.dg_spectator_pace4.name': 'タム・グラウンズウェル',
+  'entities.npcs.dg_spectator_pace4.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier1.greeting':
+    '観客席の中でも一番の席だよ。一撃を受けるたびに鐘全体が震えるのが見えるんだ。',
+  'entities.npcs.dg_spectator_tier1.name': 'ベラ・ライムグラス',
+  'entities.npcs.dg_spectator_tier1.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier10.greeting':
+    '試合の前になると支柱がうなるんだ。手を当てれば、試合が近づいているのを感じられるよ。',
+  'entities.npcs.dg_spectator_tier10.name': 'ダナ・ケルプブレイド',
+  'entities.npcs.dg_spectator_tier10.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier11.greeting':
+    '灯りは十六個、なのに蛾は一匹もいない。世界一高い場所にある灯りだからだろうな。',
+  'entities.npcs.dg_spectator_tier11.name': 'マーロ・スピューム',
+  'entities.npcs.dg_spectator_tier11.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier12.greeting':
+    '泳ぎを見に来たんだが、居座っているのは堤道を下るのがあまりに長いからさ。',
+  'entities.npcs.dg_spectator_tier12.name': 'ウェナ・タイドレース',
+  'entities.npcs.dg_spectator_tier12.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier2.greeting':
+    '夜明けからこの列を守っている。笛が鳴るまで手放しはしないよ。',
+  'entities.npcs.dg_spectator_tier2.name': 'フェリン・ソルトカスク',
+  'entities.npcs.dg_spectator_tier2.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier3.greeting':
+    '試合開始の直前に水が静まる瞬間、競技場全体もそれと一緒に息を呑むんだ。',
+  'entities.npcs.dg_spectator_tier3.name': 'ニム・パールオーバー',
+  'entities.npcs.dg_spectator_tier3.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier4.greeting':
+    '夫はわたしが神殿にいると思っている。神殿はわたしが夫といると思っている。',
+  'entities.npcs.dg_spectator_tier4.name': '女房オルダー',
+  'entities.npcs.dg_spectator_tier4.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier5.greeting':
+    'あらゆる海を渡ってきたが、これまで見た中でいちばん奇妙な水は、あそこに浮かんでいるやつさ。',
+  'entities.npcs.dg_spectator_tier5.name': '船長ヴェル',
+  'entities.npcs.dg_spectator_tier5.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier6.greeting':
+    '段が高いほど空気は薄く、眺めは良くなる。この上りも入場料のうちさ。',
+  'entities.npcs.dg_spectator_tier6.name': 'イヴォ・ランタンウェイク',
+  'entities.npcs.dg_spectator_tier6.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier7.greeting':
+    'ボールが手を変えるたびに一段編むんだ。前の試合ではマフラーを丸ごと一本仕上げたよ。',
+  'entities.npcs.dg_spectator_tier7.name': 'モード・スレッドニードル',
+  'entities.npcs.dg_spectator_tier7.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier8.greeting':
+    '前の試合で声を潰しちまった。でも悔いはない。今日もまたやるさ。',
+  'entities.npcs.dg_spectator_tier8.name': 'しわがれ声のペロ',
+  'entities.npcs.dg_spectator_tier8.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_tier9.greeting':
+    'ゴールが崩れる時は鐘の真下に立つな。せめて最初の忠告だけは信じてくれ。',
+  'entities.npcs.dg_spectator_tier9.name': 'リヴァ・アンダートウ',
+  'entities.npcs.dg_spectator_tier9.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_yard1.greeting':
+    'わしの時代は水はもっと冷たく、ゴールはもっと小さかった。それ以外は、まあ認めてやろう。',
+  'entities.npcs.dg_spectator_yard1.name': '老いたコーモラント',
+  'entities.npcs.dg_spectator_yard1.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_yard2.greeting':
+    '銀貨三枚をアウェー側に賭けちまってね。パイでも食べて気を紛らわせてるところさ。',
+  'entities.npcs.dg_spectator_yard2.name': 'ハロウ・フィンチ',
+  'entities.npcs.dg_spectator_yard2.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_yard3.greeting':
+    '禿げた魔導師がここまでのポータルを売ってくれたのさ。あれほど使い出のある銅貨はなかったね。',
+  'entities.npcs.dg_spectator_yard3.name': 'コービン・アッシュヴェイン',
+  'entities.npcs.dg_spectator_yard3.title': 'ディープグラスの観客',
+  'entities.npcs.dg_spectator_yard4.greeting':
+    '試合の日だけは、裂け目の風が揚げパンの匂いになる。鼻を頼りについて行くといい。',
+  'entities.npcs.dg_spectator_yard4.name': 'セシ・ブライン',
+  'entities.npcs.dg_spectator_yard4.title': 'ディープグラスの観客',
+  'entities.npcs.th_bridge_watch_0.greeting':
+    '黒い氷の上に架かる百三十ヤードの石橋、わたしの仕事はその欄干を守ることだ。見下ろしたいなら見るといい、誰もが一度はそうするからな。',
+  'entities.npcs.th_bridge_watch_0.name': '橋番ケティル・ヴォス',
+  'entities.npcs.th_bridge_watch_1.greeting':
+    '黒い氷の上に架かる百三十ヤードの石橋、わたしの仕事はその欄干を守ることだ。見下ろしたいなら見るといい、誰もが一度はそうするからな。',
+  'entities.npcs.th_bridge_watch_1.name': '橋番マーラ・フロスト',
+  'entities.npcs.th_dockhand_0.greeting':
+    '船はここで岩に繋がれ、氷の上に浮かぶようにぶら下がる。慣れるか、さもなくば堤道を戻るしかない。',
+  'entities.npcs.th_dockhand_0.name': '波止場長フェロウ・ケル',
+  'entities.npcs.th_dockhand_0.title': '繋留場',
+  'entities.npcs.th_dockhand_1.greeting':
+    '船はここで岩に繋がれ、氷の上に浮かぶようにぶら下がる。慣れるか、さもなくば堤道を戻るしかない。',
+  'entities.npcs.th_dockhand_1.name': '索具師セナ・タル',
+  'entities.npcs.th_dockhand_1.title': '繋留場',
+  'entities.npcs.th_gate_watch_0.greeting':
+    '通り過ぎな。結界は静かだ、このまま静かでいてほしいのでね。',
+  'entities.npcs.th_gate_watch_0.name': 'ウォーデン・セーブル・クィスト',
+  'entities.npcs.th_gate_watch_0.title': '門衛',
+  'entities.npcs.th_gate_watch_1.greeting':
+    '通り過ぎな。結界は静かだ、このまま静かでいてほしいのでね。',
+  'entities.npcs.th_gate_watch_1.name': 'ウォーデン・トーマス・リール',
+  'entities.npcs.th_gate_watch_1.title': '門衛',
+  'entities.npcs.th_keep_guard_0.greeting':
+    'この門はウォーデンの言葉により開かれている。鐘が鳴ったら落とし格子に気をつけろ。',
+  'entities.npcs.th_keep_guard_0.name': '衛兵オッター',
+  'entities.npcs.th_keep_guard_0.title': 'ウォーデンの衛兵',
+  'entities.npcs.th_keep_guard_1.greeting':
+    '中庭にとどまってくれ、友よ。広間はウォーデンのもの、塔はわれらのものだ。',
+  'entities.npcs.th_keep_guard_1.name': '衛兵リズベット',
+  'entities.npcs.th_keep_guard_1.title': 'ウォーデンの衛兵',
+  'entities.npcs.th_keep_guard_2.greeting':
+    '中ではウォーデンが謁見を行っている。靴の泥を落とせ、その絨毯はゴールドクレストから来たものだ。',
+  'entities.npcs.th_keep_guard_2.name': '衛兵ヴァンス',
+  'entities.npcs.th_keep_guard_2.title': 'ウォーデンの衛兵',
+  'entities.npcs.th_keep_guard_3.greeting': '陳情人は広間へ、配達は厨房棟へ。お前はどちらだ？',
+  'entities.npcs.th_keep_guard_3.name': '衛兵メリン',
+  'entities.npcs.th_keep_guard_3.title': 'ウォーデンの衛兵',
+  'entities.npcs.th_market_folk_0.greeting':
+    '試合の日で、テラス中の人がここへ買い物に来ている。財布と肘に気をつけな。',
+  'entities.npcs.th_market_folk_0.name': 'ネッタ・ハロウェイ',
+  'entities.npcs.th_market_folk_0.title': 'ガラス商人',
+  'entities.npcs.th_market_folk_1.greeting':
+    '試合の日で、テラス中の人がここへ買い物に来ている。財布と肘に気をつけな。',
+  'entities.npcs.th_market_folk_1.name': 'ブラム・カロック',
+  'entities.npcs.th_market_folk_1.title': '縄職人',
+  'entities.npcs.th_market_folk_2.greeting':
+    '試合の日で、テラス中の人がここへ買い物に来ている。財布と肘に気をつけな。',
+  'entities.npcs.th_market_folk_2.name': 'シスター・アイヴォ・マーン',
+  'entities.npcs.th_market_folk_2.title': '潮の施し女',
+  'entities.npcs.th_market_folk_3.greeting':
+    '試合の日で、テラス中の人がここへ買い物に来ている。財布と肘に気をつけな。',
+  'entities.npcs.th_market_folk_3.name': 'サリス・クエイ',
+  'entities.npcs.th_market_folk_3.title': '渡し船差配人',
+  'entities.npcs.th_market_folk_4.greeting':
+    '試合の日で、テラス中の人がここへ買い物に来ている。財布と肘に気をつけな。',
+  'entities.npcs.th_market_folk_4.name': '老いたペリン',
+  'entities.npcs.th_market_folk_4.title': '試合の呼び込み屋',
+  'entities.npcs.th_market_folk_5.greeting':
+    '試合の日で、テラス中の人がここへ買い物に来ている。財布と肘に気をつけな。',
+  'entities.npcs.th_market_folk_5.name': 'イェナ・コル',
+  'entities.npcs.th_market_folk_5.title': '網繕い師',
+  'entities.npcs.th_row_folk_0.greeting':
+    'ここまで上がれば、風が止んだ時に鐘の音が聞こえる。街で一番の住まいだよ。',
+  'entities.npcs.th_row_folk_0.name': 'マギステル・イルヴェイン・ドス',
+  'entities.npcs.th_row_folk_0.title': 'ウォーデンの家中',
+  'entities.npcs.th_row_folk_1.greeting':
+    'ここまで上がれば、風が止んだ時に鐘の音が聞こえる。街で一番の住まいだよ。',
+  'entities.npcs.th_row_folk_1.name': '女房プレル',
+  'entities.npcs.th_row_folk_2.greeting':
+    'ここまで上がれば、風が止んだ時に鐘の音が聞こえる。街で一番の住まいだよ。',
+  'entities.npcs.th_row_folk_2.name': 'アンセルム・コイ',
+  'entities.npcs.th_row_folk_2.title': 'ガラス職人',
+  'entities.npcs.th_row_folk_3.greeting':
+    'ここまで上がれば、風が止んだ時に鐘の音が聞こえる。街で一番の住まいだよ。',
+  'entities.npcs.th_row_folk_3.name': '小さなレン',
 };

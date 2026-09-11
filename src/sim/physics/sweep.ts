@@ -54,7 +54,7 @@ const prismOverlap = { nx: 0, nz: 0, depth: 0 };
  *
  * This must be the OUTLINE, never the bounding box: placements bake their yaw
  * into the poly, so a rotated building's box is up to sqrt(2) larger than the
- * building — box-testing it planted an invisible axis-aligned wall yards off
+ * building, box-testing it planted an invisible axis-aligned wall yards off
  * every rotated Collision Master volume ("the collision doesn't match the
  * wireframe": the wireframe draws the outline, the box was what blocked).
  */
@@ -261,7 +261,7 @@ export function sweepCollider(
 
   // Collision Master prism: sweep the EXACT convex outline. It used to sweep
   // the prism's bounding box "conservatively", but a placement bakes its yaw
-  // into the poly — a building rotated 45 degrees had a box sqrt(2) its size,
+  // into the poly, a building rotated 45 degrees had a box sqrt(2) its size,
   // and the sweep stopped the body at that phantom axis-aligned wall yards
   // before the drawn face (depenetration and the debug wireframe both use the
   // outline, so nothing ever drew or pushed where the body stopped).

@@ -166,7 +166,7 @@ export const BIND_ACTIONS: BindAction[] = [
   },
   // Deepball ball tracker. A 2.4 yd ball inside a 76 yd sphere is gone the moment
   // it leaves the screen, and hunting for it with the mouse is the least
-  // interesting thing in the bell — so the HUD marks where it is, and points at
+  // interesting thing in the bell, so the HUD marks where it is, and points at
   // it when it is behind you.
   //
   // Deliberately a MARKER and not a tracking camera. In the bell the camera is
@@ -175,7 +175,7 @@ export const BIND_ACTIONS: BindAction[] = [
   // take the player's aim with it and there would be no way to place a shot at
   // all. On by default; the bind is for players who want the view clean. Every
   // bare letter is claimed by another default, so it sits on the shifted layer of
-  // V (Nameplates) — both are "what the HUD shows me".
+  // V (Nameplates), both are "what the HUD shows me".
   {
     id: 'ballMarker',
     label: 'Ball Marker (Deepball)',

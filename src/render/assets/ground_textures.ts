@@ -10,8 +10,8 @@
 // bundle (public/textures/terrain/), never from IndexedDB, so the default
 // texture set is available on every machine a map opens on.
 
-import { builtinKeyOf, terrainTexturePath } from '../terrain_texture_sets';
 import { registerPageTeardown } from '../context_release';
+import { builtinKeyOf, terrainTexturePath } from '../terrain_texture_sets';
 import { assetUrl } from './media';
 
 const DB_NAME = 'woc_editor_ground_textures';

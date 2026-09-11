@@ -1,5 +1,5 @@
-// The game's campfire flame: a two-part lathed fire — a soft orange body with a
-// hot yellow-white core inside it — that licks and breathes in the vertex
+// The game's campfire flame: a two-part lathed fire, a soft orange body with a
+// hot yellow-white core inside it, that licks and breathes in the vertex
 // shader.
 //
 // props.ts builds one of these at every world campfire and hands it to the
@@ -8,7 +8,7 @@
 //
 // It lives here because the EDITOR needs the same thing. A world campfire that
 // has been promoted to an editable placement carries the legacy `fire: true`
-// flag, and the placed-fire system answered that with its generic emitter — a
+// flag, and the placed-fire system answered that with its generic emitter, a
 // billboard tongue plane plus a hot-core sphere, sized for authored bonfires
 // and wildfires. On a knee-high campfire that reads as a pale cone standing
 // over a white blob, nothing like the fire beside it in game. Same recipe,
@@ -17,8 +17,8 @@
 // WHY THE MOTION IS IN THE SHADER. The old flame was one opaque lathe that a
 // CPU lane rescaled a few times a second: at any instant it is a flat
 // hard-edged teardrop, and a whole-object scale pulse reads as a balloon
-// inflating, not as fire. The licking now happens per vertex — higher rings
-// sway further, the waist pinches, the tip fades out — and the per-fire phase
+// inflating, not as fire. The licking now happens per vertex, higher rings
+// sway further, the waist pinches, the tip fades out, and the per-fire phase
 // comes from `modelMatrix[3].xz`, so every campfire in the world moves
 // differently while sharing ONE material recipe and therefore ONE linked
 // program. That last point is not incidental: this world litters campfires,
@@ -67,8 +67,8 @@ function lathe(
   );
 }
 
-/** Twenty radial segments. Not for roundness — the old seven were plenty for
- *  that — but for the three-lobe tongue wave the vertex shader rides around the
+/** Twenty radial segments. Not for roundness, the old seven were plenty for
+ *  that, but for the three-lobe tongue wave the vertex shader rides around the
  *  axis: at seven segments that wave ALIASES, and the flame came out covered in
  *  bright zigzag shards. The lathe is nine rings of cheap triangles either way. */
 export function campfireFlameGeometry(): THREE.LatheGeometry {
@@ -150,7 +150,7 @@ varying float vFlamePhase;
  *  - grazing angles soften, so the silhouette has no cut edge against the sky.
  */
 /**
- * The body's alpha and heat shaping — most of why the old flame read as a
+ * The body's alpha and heat shaping, most of why the old flame read as a
  * plastic blob:
  *  - the tip dissolves instead of ending in a hard point,
  *  - the base is solid so the fire has a seat in the embers,
@@ -166,7 +166,7 @@ const FLAME_FRAGMENT_BODY = /* glsl */ `
   float flameSeat = smoothstep(0.0, 0.1, vFlameH);
   float flameRim = abs(dot(normalize(vFlameNormal), normalize(vFlameView)));
   // Opaque through the middle, translucent only at the silhouette. A fire that
-  // is see-through everywhere shows whatever it stands in — a campfire in tall
+  // is see-through everywhere shows whatever it stands in, a campfire in tall
   // grass came out looking scratched, because every blade its own light had
   // blown out read straight through the flame.
   gl_FragColor.a *= flameTip * mix(0.7, 1.0, flameSeat) * mix(0.42, 1.0, smoothstep(0.0, 0.5, flameRim));
@@ -180,8 +180,8 @@ const FLAME_FRAGMENT_BODY = /* glsl */ `
 `;
 
 /**
- * The core's. It stays hot to its tip — the whole point of a second layer is
- * that the body's cooling gradient has something bright to cool AWAY from — so
+ * The core's. It stays hot to its tip, the whole point of a second layer is
+ * that the body's cooling gradient has something bright to cool AWAY from, so
  * it only fades out, and does it early enough to disappear inside the body
  * rather than poking through the top.
  */
@@ -201,7 +201,7 @@ function attachFlameMotion(
   const fragmentBody = kind === 'core' ? FLAME_FRAGMENT_CORE : FLAME_FRAGMENT_BODY;
   // MANDATORY, not tidiness. three's default program cache key IS
   // onBeforeCompile.toString(), and this hook's SOURCE is identical for both
-  // layers — only the captured height/sway/kind differ. Without an explicit key
+  // layers, only the captured height/sway/kind differ. Without an explicit key
   // the core would be handed the body's compiled program (or the reverse),
   // whichever linked first. The key is coarse on purpose: two programs for
   // every fire in the world.
@@ -241,7 +241,7 @@ export function campfireFlameMaterial(
     // FrontSide, and this one is load-bearing. A transparent DoubleSide mesh
     // draws its far wall and its near wall in geometry order with no sorting
     // between them, so once the vertex shader displaces the two differently the
-    // overlap breaks into bright tapering shards — the flame came out looking
+    // overlap breaks into bright tapering shards, the flame came out looking
     // scratched. The core is what gives the fire its depth instead.
     side: THREE.FrontSide,
   });
@@ -251,7 +251,7 @@ export function campfireFlameMaterial(
 
 /**
  * The hot core. Additive and unlit, so it blows past the body's orange into
- * yellow-white where the two overlap — the part of a real fire that carries the
+ * yellow-white where the two overlap, the part of a real fire that carries the
  * heat. Additive keeps it honest in daylight too: it adds to whatever is behind
  * it rather than pasting a pale shape over it.
  */
@@ -270,7 +270,7 @@ export function campfireFlameCoreMaterial(
     side: THREE.FrontSide,
   });
   // The core sways HARDER than the body it sits in, so the two never move as
-  // one rigid piece — the tell that gave the old single lathe away.
+  // one rigid piece, the tell that gave the old single lathe away.
   // Swaying a LITTLE harder than the body reads as heat rising through it;
   // much harder and the core punches out through the body's skin.
   attachFlameMotion(material, CAMPFIRE_FLAME_HEIGHT * 0.64, 1.2, 'core');

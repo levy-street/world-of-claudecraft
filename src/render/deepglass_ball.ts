@@ -3,7 +3,7 @@
 // A machined metal sphere with a caught lantern-wisp behind glass at each pole,
 // wrapped in an aura that reads its SPEED. At rest there is no aura at all; as
 // it is struck the shell blooms orange, cools through blue, and burns violet at
-// the cap. That ramp is the point — across a 76-yard bell you often cannot
+// the cap. That ramp is the point, across a 76-yard bell you often cannot
 // judge how hard a shot was struck from motion alone, and a keeper needs to
 // know at a glance whether what is coming is a lob or a rocket.
 //
@@ -52,7 +52,7 @@ function metalMaterial(): THREE.MeshStandardMaterial {
   });
   // Banded plating: latitude seams darkened into the metal, plus a faint
   // brushed grain, so the sphere reads as machined rather than as a chrome
-  // bauble — and so its SPIN is legible (an unmarked metal ball looks static
+  // bauble, and so its SPIN is legible (an unmarked metal ball looks static
   // however fast it rolls).
   mat.onBeforeCompile = (sh) => {
     sh.fragmentShader = sh.fragmentShader
@@ -133,7 +133,7 @@ export interface TidesowBuild {
    * Feed the live ball speed (yd/s) each frame.
    *
    * `camQuat` billboards the tracking reticle at the camera; `collapse` (0..1)
-   * drives the goal singularity — the ball implodes to a point under an
+   * drives the goal singularity, the ball implodes to a point under an
    * accretion swirl; `reticleOn` shows/hides the green tracking reticle.
    */
   update(
@@ -147,7 +147,7 @@ export interface TidesowBuild {
 }
 
 /** A dashed, spinning reticle ring: vUv.x runs around the torus, carved into
- *  travelling segments. Always drawn on top (depthTest off) — the reticle is
+ *  travelling segments. Always drawn on top (depthTest off), the reticle is
  *  HUD-in-world, and losing it behind a body defeats its purpose. */
 function reticleMaterial(spin: number): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
@@ -232,7 +232,7 @@ export function buildTidesow(): TidesowBuild {
   group.add(spinner);
 
   // The wisp lenses: a glass cap at each pole with a light inside. Parented to
-  // the spinner so they travel with the roll — they are part of the ball, and
+  // the spinner so they travel with the roll, they are part of the ball, and
   // watching them tumble is most of how you read its spin.
   const lensGeo = new THREE.SphereGeometry(DRAW_R * 0.3, 16, 12);
   const lensMat = new THREE.MeshBasicMaterial({

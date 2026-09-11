@@ -195,7 +195,7 @@ describe('decal streaming', () => {
     const out = decalViewRange(d.size, 1000) + d.size / 2;
     expect(keepDroppedDecal(d, 0, out + DECAL_DROP_MARGIN - 1, 1000, 1)).toBe(true);
     expect(keepDroppedDecal(d, 0, out + DECAL_DROP_MARGIN + 1, 1000, 1)).toBe(false);
-    // Over budget the margin does not apply — the budget is the harder rule.
+    // Over budget the margin does not apply, the budget is the harder rule.
     expect(keepDroppedDecal(d, 0, 0, 1000, 1_000, 10)).toBe(false);
   });
 });

@@ -27,6 +27,7 @@ import {
   instanceOrigin,
   isArenaPos,
   isBgPos,
+  isBuiltinWorldActive,
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
@@ -38,7 +39,6 @@ import {
   yumiMazeOrigin,
   ZONES,
   zoneAt,
-  isBuiltinWorldActive,
 } from '../sim/data';
 import { DEEPGLASS_BALL_TEMPLATE_ID } from '../sim/deepglass/abilities';
 import { DG_BALL_MAX_SPEED, DG_BALL_RADIUS } from '../sim/deepglass/ball';
@@ -51,8 +51,8 @@ import {
 } from '../sim/deepglass/flight';
 import {
   DEEPGLASS_CENTER,
-  DEEPGLASS_RADIUS,
   DEEPGLASS_PLAY_R,
+  DEEPGLASS_RADIUS,
   DG_BOWL_OUTER_R,
   insideBell,
   ringCentreFor,
@@ -161,9 +161,9 @@ import {
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { canvasDataUrlAsync } from './canvas_data_url';
-import { buildCaveMeshes, refreshCaveMeshes } from './cave_mesh';
 import { castVfxProgramUnits, createSceneCastVfxReadiness } from './cast_vfx_prewarm';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
+import { buildCaveMeshes, refreshCaveMeshes } from './cave_mesh';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import {
   CHARACTER_CULL_ALL,
@@ -225,8 +225,8 @@ import {
   shouldTriggerWaterImpact,
   TURN_LEAN_MAX,
   waterContactFrameMode,
-  yawRateBetween,
   weaponStowedOverlay,
+  yawRateBetween,
 } from './characters/anim_state';
 import { logAssetMissOnce } from './characters/asset_miss_log';
 import {
@@ -701,9 +701,9 @@ import {
 } from './raid_encounter_visuals';
 import { isOwnedPetHostile } from './reaction';
 import {
+  buildPlotSignPickBody,
   buildRealmBuilderMonumentFx,
   buildRealmBuilderMonumentPickBody,
-  buildPlotSignPickBody,
   type RealmBuilderMonumentFx,
 } from './realm_builder_monument_fx';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
@@ -897,8 +897,8 @@ import { createWeaponVfxPrewarmSkinStage, weaponVfxPrewarmUnits } from './weapon
 import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
-import { buildWizardPortal, type WizardPortalView } from './wizard_portal';
 import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_fallback';
+import { buildWizardPortal, type WizardPortalView } from './wizard_portal';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
@@ -938,12 +938,12 @@ import {
 } from './zone_streaming';
 
 /** How far a deepball cue carries. The bell is ~98 yd across and the shared
- *  cutoff is 46, so without this half the arena is silent — and hearing the ball
+ *  cutoff is 46, so without this half the arena is silent, and hearing the ball
  *  behind you is half of knowing where it is. */
 const DG_SOUND_RANGE = 120;
 /** Tidehold's curtain wall stands at v = 0 in the city frame, i.e. world
  *  z = TH_GATE_Z. The few yards of slack keep the wall run itself, the two
- *  gate towers on that line and the colossi just south of it — the pieces that
+ *  gate towers on that line and the colossi just south of it, the pieces that
  *  make the cut invisible from the water. */
 const DEEPGLASS_CITY_CULL: PlacedCullHalfPlane = { nx: 0, nz: 1, d: TH_GATE_Z + 6 };
 /** How close the Tidesow counts as CARRIED for the aura's pulse. Matches the
@@ -1110,7 +1110,7 @@ const SWIM_STRIDE = 2.4;
 const DG_PITCH_FULL_SPEED = 13;
 /** Steepest the flier's body noses over/up, radians. In the bell the pose
  *  follows the direction of TRAVEL (see the entity loop), so a pure climb on
- *  the trim key is drawn nose-up rather than level — this is its ceiling. */
+ *  the trim key is drawn nose-up rather than level, this is its ceiling. */
 const DG_PITCH_MAX = 1.25;
 /**
  * The Deepglass flight camera: Rocket League's FOV and camera lag, in the
@@ -1540,8 +1540,8 @@ export class Renderer {
    *  loop from Input; the HUD never reads Input directly. */
   showDeepglassBallMark = true;
   /** Edge-detection state for the deepball sound cues (syncDeepglassCues). The
-   *  sim has no event bus for these — a strike, a dash, a body meeting the
-   *  glass — so the render side watches the state it is already reading each
+   *  sim has no event bus for these, a strike, a dash, a body meeting the
+   *  glass, so the render side watches the state it is already reading each
    *  frame and fires on the transitions. */
   private dgCuePhase: string | null = null;
   private dgCueTouch = -1;
@@ -1552,7 +1552,7 @@ export class Renderer {
   private dgCueTumble = 0;
   // The ball's velocity as of LAST frame. A bounce has to be scaled by how hard
   // the ball was met, and by the time the renderer sees the touch the contact
-  // has already been resolved — the ball's post-contact speed is near zero for
+  // has already been resolved, the ball's post-contact speed is near zero for
   // exactly the hits that should be loudest (a rocket trapped dead on a chest).
   // Keeping the incoming vector is what makes a closing speed available at all.
   private dgCueBallV = { x: 0, y: 0, z: 0 };
@@ -2818,7 +2818,7 @@ export class Renderer {
     // Placement far-sprite mirrors (foliage_far_placements_core.ts): ACTIVE
     // on game boots. Re-validated with real frame captures (2026-08-30): the
     // authored default map drew 4.4M placed-asset triangles per frame at
-    // spawn against the shipped world's 1.8M foliage — real tree models out
+    // spawn against the shipped world's 1.8M foliage, real tree models out
     // to the 500yd asset range, where the game never draws a real tree. With
     // the mirrors on, foliage-family placements cull at the shipped
     // tree/rock handoff (see updateLod's speciesCap) and sprites carry the
@@ -2946,7 +2946,7 @@ export class Renderer {
         this.fireLights.push(light);
       }
       // The goal celebration draws AFTER the composer, so it owns no scene
-      // node here — the renderer hands it the canvas at the end of the frame.
+      // node here, the renderer hands it the canvas at the end of the frame.
       this.deepglassGoalWave = new DeepglassGoalWave();
       // Tidehold's monument: the honouree projection and lantern embers, seated
       // on the same point the city places the statue at.
@@ -2965,7 +2965,7 @@ export class Renderer {
       // program otherwise links at first sight mid-bout (the aura hull's three
       // variants, the Tidesow, the thrustpack's plumes). The bench is in the
       // scene before the entry prewarm's programs.compile pass, and compileAsync
-      // traverses hidden objects, so these link behind the loading screen — the
+      // traverses hidden objects, so these link behind the loading screen, the
       // pack lands async and goes through the live compile gate instead the
       // moment it arrives.
       const warmBench = new THREE.Group();
@@ -5177,7 +5177,7 @@ export class Renderer {
       m?.phase === 'goal' ? Math.min(1, this.dgBallCollapse + dt / DG_BALL_COLLAPSE_SECS) : 0;
     // The pace the aura and the pole wisps burn at, read from the MATCH's own
     // velocity. It used to be differenced out of the entity's position between
-    // render frames and divided by DT — a FRAME delta over a TICK step, which
+    // render frames and divided by DT, a FRAME delta over a TICK step, which
     // is only ever right when the two happen to be equal, and they never are.
     // The sim ticks at 20 Hz, so above 20 fps most frames find pos === prevPos
     // and report a stationary ball: `shown` eases down, `lit` falls under
@@ -5304,7 +5304,7 @@ export class Renderer {
           // helper remembers each material, so this is a WeakSet hit per body
           // per frame after the first sight of it.
           tuneCharacterMetalsForBell(view.visual.root);
-          // Carrying is not a flag anyone sets — it is "the ball is on my
+          // Carrying is not a flag anyone sets, it is "the ball is on my
           // chest", the same test the sim slows a carrier by.
           const carrying =
             ball !== null &&
@@ -5409,7 +5409,7 @@ export class Renderer {
    * The bell shipped silent, and silence is what made a 26 yd/s sport read as a
    * physics demo: no strike, no burners, no whistle. The sim has no event bus
    * for any of this, so the cues are edge-detected here off state the renderer
-   * is already reading every frame — the touch log for a strike, the pack flags
+   * is already reading every frame, the touch log for a strike, the pack flags
    * for a dash or a brake, the phase for the whistle and the goal. Every buffer
    * is synthesised at startup with no assets (game/deepglass_audio.ts).
    *
@@ -5514,7 +5514,7 @@ export class Renderer {
       this.dgCueAtGlass = false;
       return;
     }
-    // Spun out — a Check, or a heavy body arriving at pace. The one deepball
+    // Spun out, a Check, or a heavy body arriving at pace. The one deepball
     // moment where the player loses the controls, so it gets the biggest kick.
     const tumble = (me as { dgTumbleTicks?: number }).dgTumbleTicks ?? 0;
     if (tumble > this.dgCueTumble) {
@@ -5536,8 +5536,7 @@ export class Renderer {
     }
     this.dgCuePowerup = held;
 
-    // The glass. Rising edge only, and only when the body arrives with pace —
-    // resting against the wall must not chatter.
+    // The glass. Rising edge only, and only when the body arrives with pace,     // resting against the wall must not chatter.
     const r = Math.hypot(me.pos.x - c.x, me.pos.y - c.y, me.pos.z - c.z);
     const atGlass = r > DEEPGLASS_PLAY_R - 0.6;
     if (atGlass && !this.dgCueAtGlass) {
@@ -5571,14 +5570,14 @@ export class Renderer {
    *
    * Three layers rather than one clip at a volume (game/deepglass_audio.ts):
    * a light pock, the basketball proper, and a heavy shell layer stacked on top
-   * for real hits — mixed by how hard the ball was actually met, which is the
+   * for real hits, mixed by how hard the ball was actually met, which is the
    * whole point. A shoulder the ball rolls onto and a ball met head-on at boost
    * pace are the same EVENT and must not be the same sound.
    *
    * Hardness is the CLOSING speed (last frame's ball velocity against the
    * body's), not the ball's speed afterwards: the hardest contact in deepball
    * is a rocket trapped dead on a chest, which leaves the ball at nearly zero.
-   * The post-contact speed still gets a vote for the opposite case — a slow
+   * The post-contact speed still gets a vote for the opposite case, a slow
    * ball smashed away by a body arriving at pace.
    */
   private deepglassBounce(m: DgMatch, pid: number, postPace: number): void {
@@ -5608,7 +5607,7 @@ export class Renderer {
     if (mix.heavy > 0.01) {
       sfx.playAt('dg_bounce_hard', ball.x, ball.y, ball.z, { ...opts, gain: mix.heavy });
     }
-    // Felt as well as heard, and only off your own body — same rule as the
+    // Felt as well as heard, and only off your own body, same rule as the
     // strike, for the same reason.
     if (pid === this.sim.playerId && mix.heavy > 0.01) {
       this.addShake(0.05 + 0.14 * Math.min(1, impact / DG_BALL_MAX_SPEED));
@@ -5626,7 +5625,7 @@ export class Renderer {
    * are lit, under the ignition one-shot that starts it.
    *
    * Positional and per fighter, so a boost across the bell is a thing you hear
-   * go past — which in a sport played at 26 yd/s is information, not decoration.
+   * go past, which in a sport played at 26 yd/s is information, not decoration.
    * Gain and pitch both ride the body's actual speed: a bed at a fixed pitch
    * says only "lit", and the whole feel of the pack is the climb.
    */
@@ -8900,7 +8899,7 @@ export class Renderer {
   // fatter and brighter the harder it was struck, so a ball crossing a 76 yd
   // sphere at 34 yd/s stays readable. Lifted out of the retired boarball
   // renderer with the Vale Cup (see ball_trail.ts); the roll, contact shadow
-  // and ground dust went with the minigame — the Tidesow floats, spins under
+  // and ground dust went with the minigame, the Tidesow floats, spins under
   // its own view's update(), and casts no contact blob.
   private updateTidesowBall(e: Entity, v: EntityView, dt: number): void {
     v.group.rotation.y = 0; // the ball's own view owns orientation
@@ -10681,7 +10680,7 @@ export class Renderer {
         this.hemi.color.lerp(this.dnColorScratch.setHex(authored.skyColor), k);
         this.sun.intensity += (authored.sunIntensity - this.sun.intensity) * k;
         this.hemi.intensity += (authored.hemiIntensity - this.hemi.intensity) * k;
-        // Still the only outdoor writer of the rim uniform — an authored rig
+        // Still the only outdoor writer of the rim uniform, an authored rig
         // must not leave it at whatever the last interior transition wrote.
         sharedUniforms.uRimBoost.value = nightRimBoost(this.dnGlobalNight);
         return;
@@ -10772,7 +10771,7 @@ export class Renderer {
     const cam = this.camera.position;
     // The bell holds its OWN water: the arena world parks the global waterline
     // far below the slate, so submersion here is "inside the glass", not
-    // "under the line". Same effect, far lighter palette — see
+    // "under the line". Same effect, far lighter palette, see
     // DEEPGLASS_PALETTE for why murk is disqualifying in a 76-yard arena.
     const inBell = this.deepglassWorld && insideBell(cam.x, cam.y, cam.z);
     const palette = inBell ? DEEPGLASS_PALETTE : DEFAULT_PALETTE;
@@ -11397,7 +11396,7 @@ export class Renderer {
         e.vx !== 0 || e.vz !== 0,
       );
       // A body flying the Deepglass bell is exempt from BOTH crowd LOD levers
-      // below — the frozen far mesh and the pose-rate throttle.
+      // below, the frozen far mesh and the pose-rate throttle.
       //
       // That mesh is a baked IDLE pose, a figure standing upright: on land at
       // 80 yards it reads as a distant person, but in the bell it read as the
@@ -12067,7 +12066,7 @@ export class Renderer {
       // Deepball: the bell holds its own water, so the depth latch (which reads
       // the GLOBAL waterline, parked far below the arena slate) would never
       // fire. A body in flooded flight is unconditionally swimming and
-      // unconditionally under — that is what puts it on the authored strokes
+      // unconditionally under, that is what puts it on the authored strokes
       // instead of running on air.
       const dgFlying = (e as { dgFlight?: boolean }).dgFlight === true;
       const swimming = dgFlying || isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth);
@@ -12115,7 +12114,7 @@ export class Renderer {
       // to a vertical-speed ratio: a body climbing on the trim key alone was
       // rising at cruise and still drawn nose-forward, because vy over the
       // reference speed never reached the ceiling once forward motion shared
-      // the cap. The angle of travel does — a pure climb is nose straight up.
+      // the cap. The angle of travel does, a pure climb is nose straight up.
       // Expressed as the vertical speed advanceSwimPitch maps to that angle.
       let poseVy = vy;
       if (dgFlying && dt > 0) {
@@ -12131,8 +12130,7 @@ export class Renderer {
         // Flooded flight climbs and dives an order of magnitude faster than a
         // swimmer does (DG_BOOST_SPEED is 26 yd/s against the lake's 3.2), so
         // the swim reference saturates on the first tick of any vertical input
-        // and the nose-over becomes a two-position switch. Its own reference —
-        // and its own, steeper ceiling, because in the bell you genuinely do
+        // and the nose-over becomes a two-position switch. Its own reference,         // and its own, steeper ceiling, because in the bell you genuinely do
         // point where you are going.
         dgFlying ? DG_PITCH_FULL_SPEED : undefined,
         dgFlying ? DG_PITCH_MAX : undefined,
@@ -12185,7 +12183,7 @@ export class Renderer {
         const heurSeed = this.sim.cfg.seed;
         // groundHeightNear, not groundHeight: a player standing on a cave
         // tube's or carve cavity's floor is on solid ground BELOW the bare
-        // heightfield — the surface reference would read them as permanently
+        // heightfield, the surface reference would read them as permanently
         // falling (legs-tucked FALL pose while walking a tunnel).
         let effGround = groundHeightNear(ax, az, heurSeed, ay);
         if (inRift) {
@@ -12331,8 +12329,7 @@ export class Renderer {
       st.bankRoll = v.bankRoll;
       // The deepball dash FLIP: a full 360 about the dash's own axis, layered
       // onto the pose channels the swim rig already owns (pitch for a
-      // front/back flip, roll for the sides). Edge-detected off dgDashTicks —
-      // the sim's dash flare — and integrated here at frame rate so the spin
+      // front/back flip, roll for the sides). Edge-detected off dgDashTicks,       // the sim's dash flare, and integrated here at frame rate so the spin
       // is smooth at any fps.
       if (dgFlying) {
         const dashTicks = (e as { dgDashTicks?: number }).dgDashTicks ?? 0;
@@ -13315,7 +13312,7 @@ export class Renderer {
     // Placed-asset distance cull: far placements release their batch slots /
     // hide (LOD_RANGE_ASSETS, tightened by the maker's view distance and the
     // fog), budgeted per frame inside. This call was dropped in a merge and
-    // every placement drew at EVERY distance — on a 9k-placement document
+    // every placement drew at EVERY distance, on a 9k-placement document
     // that was most of the frame.
     this.placedAssetsView?.updateLod(
       this.camera.position.x,
@@ -13340,7 +13337,7 @@ export class Renderer {
     // Tidehold, while the player is down in the bell. The city stands behind
     // the Tide Gate's curtain wall AND behind a hundred yards of water (the
     // underwater fog closes at 210yd), so none of it can be seen from the
-    // arena — but 5,317 of this map's 6,127 placements are north of that wall
+    // arena, but 5,317 of this map's 6,127 placements are north of that wall
     // and every one of them was still being submitted every frame, through a
     // fog that had already swallowed them. The cut is the wall itself, so the
     // gate, its towers and the colossi all stay: what goes is only what the
@@ -13966,7 +13963,7 @@ export class Renderer {
   /**
    * Zone isolate (editor): restrict residency to zones intersecting `rect`,
    * or null to restore normal streaming. The caller follows with
-   * `rebuildTerrain()` — this only sets the policy; the rebuild is what drops
+   * `rebuildTerrain()`, this only sets the policy; the rebuild is what drops
    * already-built terrain outside the rect and re-prepares what remains.
    */
   setZoneResidencyFilter(
@@ -14131,7 +14128,7 @@ export class Renderer {
     const world = getActiveWorldContent();
     // The SHIPPED game on the built-in world authors no atmosphere at all, and
     // must not come through here: setEditorLighting(null) would restamp the
-    // boot rig — sun intensity, hue, and direction — on every zone crossing,
+    // boot rig, sun intensity, hue, and direction, on every zone crossing,
     // and v0.35's day/night easing would then visibly pull it back. The editor
     // and its playtest always run this (editorCam is set), as does any map that
     // actually authors something.
@@ -14168,8 +14165,7 @@ export class Renderer {
   }
 
   /**
-   * Editor studio mode (Collision Master): hide every worldly scene dressing —
-   * the sky dome, water and birds — so the backdrop gradient reads as a neutral
+   * Editor studio mode (Collision Master): hide every worldly scene dressing,    * the sky dome, water and birds, so the backdrop gradient reads as a neutral
    * void. The editor viewport pairs this with a hidden terrain group and its own
    * grid floor. Editor-only.
    */
@@ -14235,7 +14231,7 @@ export class Renderer {
   // shadow pass (shadowMap.autoUpdate = false) and re-render it only when the
   // sun target drifts, the key light swings (time of day), an edit poked
   // invalidateShadows, or the slow heartbeat elapses (animated NPCs/mobs).
-  // Everything else renders against the cached map — in a parked editor scene
+  // Everything else renders against the cached map, in a parked editor scene
   // that skips re-drawing every caster nearly every frame. Playtest and the
   // shipped game (editorCam null) keep the stock every-frame behavior.
   private updateShadowCache(dt: number): void {
@@ -14352,7 +14348,7 @@ export class Renderer {
     // In the bell the reference is the flooded-flight CRUISE, not the run: a
     // flier is always faster than a runner, so the land reference pinned the
     // widening at maximum and it stopped meaning anything. Against cruise it
-    // reads as what it should — the burners are lit.
+    // reads as what it should, the burners are lit.
     const feelRef = dgFlying ? DG_SWIM_SPEED : undefined;
     stepCameraFeel(this.camFeel, velX, velZ, dt, !reduce, feelRef);
 
@@ -14429,7 +14425,7 @@ export class Renderer {
     // massif, where the terrain clamp below read that ground and catapulted the
     // camera onto it ("the camera moves far away, not on my character").
     // Shorten the boom to the last point inside the glass instead, and skip the
-    // terrain and water clamps there — the sphere is the only floor that counts.
+    // terrain and water clamps there, the sphere is the only floor that counts.
     let camDist = pose.dist;
     if (dgFlying) camDist = Math.min(camDist, bellBoomLimit(px, eyeY, pz, pose.yaw, pose.pitch));
     let cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * camDist;
@@ -14447,7 +14443,7 @@ export class Renderer {
     }
     let groundY = groundHeight(cx, cz, seed) + 0.6;
     // A player standing on an under-sheet (tube/carve floor) needs the ground
-    // clamp to read THAT sheet, not the hillside overhead — and a void column
+    // clamp to read THAT sheet, not the hillside overhead, and a void column
     // (the wall-rise sentinel) must never catapult the camera skyward.
     if (onUnderSheet(px, pz, seed, py)) {
       const sheetRef = groundHeightNear(cx, cz, seed, eyeY - 2.0);
@@ -14532,7 +14528,7 @@ export class Renderer {
   /** The slab of the Deepglass map hidden while the camera is inside the bell:
    *  everything north of the Tide Gate. Null in every other world, and null
    *  the moment the camera breaks the surface, which is the same reading the
-   *  underwater wash uses — so the city comes back on exactly the frame the
+   *  underwater wash uses, so the city comes back on exactly the frame the
    *  water that was hiding it starts to lift. */
   private deepglassCityCull(): PlacedCullHalfPlane | null {
     if (!this.deepglassWorld) return null;
@@ -14546,7 +14542,7 @@ export class Renderer {
    *  is: a goal is the whole bowl, a running bout is a full house, an ordinary
    *  day is the quarter crowd that turns up to watch the water.
    *
-   *  Inside the bell there is no falloff — the stands ring the arena, so the
+   *  Inside the bell there is no falloff, the stands ring the arena, so the
    *  crowd is not a thing you walk toward. Outside it, the bed fades over the
    *  forty yards past the bowl wall and is gone well before the Tide Gate, so
    *  the stadium never follows the player up the causeway into Tidehold. */

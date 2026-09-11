@@ -1,10 +1,10 @@
 // Castle B on the crown (bl_castle_b.py, 2026-09-10): the walled keep that
-// replaced the first keep. Pins the seams a building asset has to get right —
-// where it stands, that its floors are decks the sim walks on, that the gate is
+// replaced the first keep. Pins the seams a building asset has to get right, // where it stands, that its floors are decks the sim walks on, that the gate is
 // open and its walls are not, that its guards stand inside it, and that its
 // collision fits the per-placement caps.
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { interiorSpecFor } from '../src/render/interior_reveal';
 import { queryOpenWorldColliders } from '../src/sim/colliders';
 import { setActiveWorldContent } from '../src/sim/data';
 import { TH_CASTLE_B_FLAMES, TIDEHOLD_RESIDENTS } from '../src/sim/deepglass/citadel';
@@ -13,7 +13,6 @@ import { pol, RING_CASTLE, RING_CROWN } from '../src/sim/deepglass/citadel_ring_
 import { buildDeepglassWorld, DEEPGLASS_MAP_ENTRY } from '../src/sim/deepglass/world';
 import { MAX_PLACEMENT_HITBOXES, MAX_PLACEMENT_RAMPS } from '../src/sim/map_doc';
 import { groundHeightNear } from '../src/sim/world';
-import { interiorSpecFor } from '../src/render/interior_reveal';
 
 const SEED = DEEPGLASS_MAP_ENTRY.seed;
 const S = 1.35;
@@ -35,13 +34,21 @@ describe('Castle B', () => {
   it('nothing else the generator builds stands inside its walls', () => {
     const all = ringPlacements() as { path: string; x: number; z: number }[];
     const inside = all.filter(
-      (p) => !p.path.endsWith('/castle_b.glb') && Math.abs(p.x - seat.x) < 33 && p.z > seat.z - 32 && p.z < seat.z + 26,
+      (p) =>
+        !p.path.endsWith('/castle_b.glb') &&
+        Math.abs(p.x - seat.x) < 33 &&
+        p.z > seat.z - 32 &&
+        p.z < seat.z + 26,
     );
-    expect(inside.map((p) => `${p.path.split('/').pop()} @${p.x.toFixed(0)},${p.z.toFixed(0)}`)).toEqual([]);
+    expect(
+      inside.map((p) => `${p.path.split('/').pop()} @${p.x.toFixed(0)},${p.z.toFixed(0)}`),
+    ).toEqual([]);
   });
 
   it('keeps its collision inside the per-placement caps', () => {
-    const o = JSON.parse(fs.readFileSync('data/asset_collision_overrides.json', 'utf8'))['tidehold/castle_b'];
+    const o = JSON.parse(fs.readFileSync('data/asset_collision_overrides.json', 'utf8'))[
+      'tidehold/castle_b'
+    ];
     expect(o.boxes.length).toBeLessThanOrEqual(MAX_PLACEMENT_HITBOXES);
     expect(o.ramps.length).toBeLessThanOrEqual(MAX_PLACEMENT_RAMPS);
   });
@@ -73,14 +80,14 @@ describe('Castle B', () => {
     // flight A up the west bay to the landing at the middle floor
     expect(over(-11.2, -3.4, 1)).toBeGreaterThan(0.3);
     expect(over(-11.2, -3.4, 1)).toBeLessThan(2.0);
-    const headA = over(-11.2, -12.37, 7.5);   // the last tread, at the landing's edge
+    const headA = over(-11.2, -12.37, 7.5); // the last tread, at the landing's edge
     expect(headA).toBeGreaterThan(6.5);
     const landing = over(-11.2, -13.9, 7.5);
     expect(landing).toBeGreaterThan(6.5);
     expect(landing).toBeLessThanOrEqual(headA + 0.01);
     // flight B east along the back wall to the Warden's floor
     expect(over(-9.5, -13.9, 7.5)).toBeGreaterThanOrEqual(landing - 0.05);
-    const headB = over(-3.02, -13.9, 14);   // the last tread of B, at the floor's edge
+    const headB = over(-3.02, -13.9, 14); // the last tread of B, at the floor's edge
     expect(headB).toBeGreaterThan(13.3);
     const floor = over(0, -9, 14.2);
     expect(floor).toBeGreaterThan(13.4);
@@ -100,7 +107,7 @@ describe('Castle B', () => {
       const foot = over(sx * 21.8, -9.6, 1);
       expect(foot, `wing ${sx} foot`).toBeGreaterThan(0.3);
       expect(foot, `wing ${sx} foot`).toBeLessThan(1.6);
-      const head = over(sx * 21.8, -3.22, 8);   // the last tread, at the landing
+      const head = over(sx * 21.8, -3.22, 8); // the last tread, at the landing
       expect(head, `wing ${sx} head`).toBeGreaterThan(6.4);
       const floor = over(sx * 17, -7, 8);
       expect(floor, `wing ${sx} floor`).toBeGreaterThan(6.4);
@@ -116,13 +123,13 @@ describe('Castle B', () => {
       const p = cb(xk, yk);
       return groundHeightNear(p.x, p.z, SEED, base + feet) - base;
     };
-    const mid = over(0, -9, 7.5);                 // the middle floor's box (5.08 kit)
+    const mid = over(0, -9, 7.5); // the middle floor's box (5.08 kit)
     expect(mid).toBeGreaterThan(6.6);
     expect(mid).toBeLessThan(7.3);
-    const flight = over(-11.2, -7.6, 7.5);        // flight A beside it, on its way up
+    const flight = over(-11.2, -7.6, 7.5); // flight A beside it, on its way up
     expect(flight).toBeGreaterThan(2.5);
     expect(flight).toBeLessThan(mid);
-    expect(over(0, -9, 1)).toBeLessThan(0.6);     // the hall floor is still the ground under it
+    expect(over(0, -9, 1)).toBeLessThan(0.6); // the hall floor is still the ground under it
     expect(over(0, -9, 14.2)).toBeGreaterThan(13.4); // and the Warden's floor above
   });
 
@@ -157,21 +164,25 @@ describe('Castle B', () => {
     const base = RING_CROWN.y;
     const at = (xk: number, yk: number) => {
       const p = cb(xk, yk);
-      return queryOpenWorldColliders(SEED, p.x - 0.3, p.z - 0.3, p.x + 0.3, p.z + 0.3, []).filter((c: any) => {
-        if (c.type !== 'obb') return false;
-        // point-in-OBB in the box's own frame (either handedness of `rot`)
-        const dx = p.x - c.x;
-        const dz = p.z - c.z;
-        const inFrame = (rot: number) => {
-          const cs = Math.cos(rot);
-          const sn = Math.sin(rot);
-          const lx = dx * cs + dz * sn;
-          const lz = -dx * sn + dz * cs;
-          return Math.abs(lx) < c.hw + 0.3 && Math.abs(lz) < c.hd + 0.3;
-        };
-        const hit = inFrame(c.rot ?? 0) || inFrame(-(c.rot ?? 0));
-        return hit && (c.baseY ?? 0) < base + 2.0 && (c.moveTopY ?? c.cameraTopY ?? 0) > base + 0.5;
-      });
+      return queryOpenWorldColliders(SEED, p.x - 0.3, p.z - 0.3, p.x + 0.3, p.z + 0.3, []).filter(
+        (c: any) => {
+          if (c.type !== 'obb') return false;
+          // point-in-OBB in the box's own frame (either handedness of `rot`)
+          const dx = p.x - c.x;
+          const dz = p.z - c.z;
+          const inFrame = (rot: number) => {
+            const cs = Math.cos(rot);
+            const sn = Math.sin(rot);
+            const lx = dx * cs + dz * sn;
+            const lz = -dx * sn + dz * cs;
+            return Math.abs(lx) < c.hw + 0.3 && Math.abs(lz) < c.hd + 0.3;
+          };
+          const hit = inFrame(c.rot ?? 0) || inFrame(-(c.rot ?? 0));
+          return (
+            hit && (c.baseY ?? 0) < base + 2.0 && (c.moveTopY ?? c.cameraTopY ?? 0) > base + 0.5
+          );
+        },
+      );
     };
     expect(at(0, 24), 'the gate tunnel').toHaveLength(0);
     expect(at(0, -2), 'the keep door').toHaveLength(0);

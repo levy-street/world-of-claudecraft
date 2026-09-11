@@ -4,7 +4,7 @@
 // so a hand-edited/merged JSON can be re-emitted without the editor:
 //   node scripts/gen_collision_overrides.mjs
 // Deterministic output: sorted asset ids, fixed number rounding, no
-// timestamps — two runs on the same JSON are byte-identical.
+// timestamps, two runs on the same JSON are byte-identical.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';

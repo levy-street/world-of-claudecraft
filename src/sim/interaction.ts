@@ -27,7 +27,6 @@ import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { currentRealmBuilder, pastRealmBuilders } from './content/realm_builders';
 import { corpseInteractionAvailability } from './corpse_interaction';
-import { inspectPlotSign } from './plots';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -49,6 +48,7 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
+import { inspectPlotSign } from './plots';
 import { startCorpseHarvest } from './professions/corpse_harvest_session';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { corpseHasDecayed } from './respawn_policy';

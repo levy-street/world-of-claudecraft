@@ -134,6 +134,7 @@ import {
   updateVeilboundMarchMovement,
   veilboundMarchBlocksAura,
 } from './combat/paladin_veilbound_march';
+import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { duskLingerOnStealthBreak } from './combat/rogue_talents';
@@ -421,7 +422,6 @@ import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
 import type { PetReturnSnapshot } from './pet/pet_return';
 import { SKIN_WIDTH } from './physics';
-import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { floorHeightAt } from './physics/character';
 import {
   isSwimming as isSwimmingImpl,
@@ -432,6 +432,7 @@ import {
   swimSurfaceY,
 } from './player_motion';
 import { livePlaytimeSeconds } from './playtime';
+import { buyPlot as buyPlotImpl, spawnPlotSigns } from './plots';
 import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,
@@ -640,7 +641,6 @@ import {
   spawnRealmBuilderMonument,
   spawnTideholdRealmBuilderMonument,
 } from './realm_builder_monument_spawn';
-import { buyPlot as buyPlotImpl, spawnPlotSigns } from './plots';
 import {
   catalogRankOwned,
   catalogRelicCompletion,
@@ -780,11 +780,11 @@ import { TIDEHOLD_RESIDENTS } from './deepglass/citadel';
 import { spawnTideholdResidents } from './deepglass/citadel_spawn';
 import { spawnDeepglassCrowd } from './deepglass/crowd';
 import * as deepglassMod from './deepglass/match';
-import { spawnDeepglassMarshal, spawnDeepglassSteward } from './deepglass/steward';
+import { spawnDeepglassMarshal } from './deepglass/steward';
 import { DEEPGLASS_MARSHAL } from './deepglass/world';
 import { updateNpcRoute } from './npc_routes';
 import { DEEPGLASS_PORTAL_WIZARD_NPC_ID } from './portal_wizard';
-import { spawnDeepglassPortalWizard, spawnTownPortalWizards } from './portal_wizard_spawn';
+import { spawnDeepglassPortalWizard } from './portal_wizard_spawn';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
 import { clearAfkOnMove } from './social/away';
@@ -2343,7 +2343,7 @@ export class Sim {
       // An authored patrol (map documents; sanitized by map_doc sanitizeNpc)
       // rides onto the entity. createNpc deliberately copies only identity
       // fields, so without this the route survived the document round-trip and
-      // then went nowhere — a maker's patrolling guard stood at his spawn.
+      // then went nowhere, a maker's patrolling guard stood at his spawn.
       if (npcDef.route) npc.route = npcDef.route;
       this.addEntity(npc);
       if (npcDef.market) this.market.merchantIds.push(npc.id); // every auctioneer anchors the shared World Market
@@ -2480,7 +2480,7 @@ export class Sim {
     // reserved ids, which is what keeps the bout's rng draw order stable. But a
     // Studio DOCUMENT of the same venue carries the roster as ordinary authored
     // content (editor/shipped_deepglass.ts drops `dynamic` so a maker can see
-    // and move them), and there the surface loop places them itself — so
+    // and move them), and there the surface loop places them itself, so
     // running the spawners as well stood a second marshal, a second crowd and a
     // second city beside the first. A def the world places itself is not ours
     // to spawn.
@@ -2515,20 +2515,8 @@ export class Sim {
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
 
-    // The Deepglass steward at her Goldcrest berth. Same reserved-id, same
-    // findSafePos: Goldcrest's ground only exists once the city map document is
-    // loaded, so without it she takes the nearest dry land rather than standing
-    // in open water.
-    {
-      const stewardDef = worldContent.npcs.deepglass_steward;
-      if (stewardDef) {
-        const safe = this.findSafePos(stewardDef.pos.x, stewardDef.pos.z, waterLevel() + 0.6);
-        spawnDeepglassSteward(this.ctx, stewardDef, safe);
-      }
-    }
-
     // The Deepglass marshal, on the causeway inside the arena. Only that world
-    // lists her, so the lookup is the gate — but the arena flag is asserted too,
+    // lists her, so the lookup is the gate, but the arena flag is asserted too,
     // because a map document that happened to name her must not put a fixture
     // desk in the middle of the overworld.
     {
@@ -2549,13 +2537,11 @@ export class Sim {
       }
     }
 
-    // Baldemar the Bald, one self per town square plus the one at the bell.
-    // Same reserved-id, rng-free treatment as every singleton above; see
-    // src/sim/portal_wizard.ts for why he is fifteen NPCs and one joke.
+    // Baldemar the Bald at the bell only. His town selves (the overworld entrance
+    // to the Deepglass) are deliberately not spawned on this branch: the city has
+    // no official entrance yet. Same reserved-id, rng-free treatment as every
+    // singleton above; see src/sim/portal_wizard.ts.
     {
-      spawnTownPortalWizards(this.ctx, worldContent.npcs, (x, z) =>
-        this.findSafePos(x, z, waterLevel() + 0.6),
-      );
       const bellSelf = worldContent.npcs[DEEPGLASS_PORTAL_WIZARD_NPC_ID];
       if (bellSelf && venueSpawns(DEEPGLASS_PORTAL_WIZARD_NPC_ID)) {
         spawnDeepglassPortalWizard(this.ctx, bellSelf);
@@ -2931,8 +2917,7 @@ export class Sim {
     const savedState = opts?.state
       ? sanitizeRemovedZone1Content(migrateCharacterTalentsV2(cls, opts.state)).state
       : undefined;
-    // Characters saved inside a dungeon instance rejoin at its entrance —
-    // their old instance is gone (or belongs to someone else) by now.
+    // Characters saved inside a dungeon instance rejoin at its entrance,     // their old instance is gone (or belongs to someone else) by now.
     let savedPos = savedState?.pos ?? null;
     // Delve must be checked BEFORE the dungeon branch: dungeonAt() returns null
     // for any x >= ARENA_X_MIN (which includes the delve band), so the dungeon
@@ -3815,8 +3800,8 @@ export class Sim {
     return pid;
   }
 
-  // The spawnDevBot counterpart: remove a dev bot ENTIRELY — entity and player
-  // meta — so its name returns to the pool. Deepball's final whistle calls this
+  // The spawnDevBot counterpart: remove a dev bot ENTIRELY, entity and player
+  // meta, so its name returns to the pool. Deepball's final whistle calls this
   // through the context seam; dropEntity alone leaked the meta and drained the
   // roster a seat per bout.
   removeDevBot(pid: number): void {
@@ -4375,7 +4360,9 @@ export class Sim {
       ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       // Absent until riding skill is purchased (back-compat).
       ...(meta.ridingTrained ? { ridingTrained: true } : {}),
-      ...(meta.ownedPlots && meta.ownedPlots.length > 0 ? { ownedPlots: [...meta.ownedPlots] } : {}),
+      ...(meta.ownedPlots && meta.ownedPlots.length > 0
+        ? { ownedPlots: [...meta.ownedPlots] }
+        : {}),
       // Absent outside the PBE (back-compat; server/pbe_boost.ts).
       ...(meta.pbeBoostKit !== undefined ? { pbeBoostKit: meta.pbeBoostKit } : {}),
       craftSkills: { ...meta.craftSkills },
@@ -6009,8 +5996,7 @@ export class Sim {
     }
   }
 
-  // Mark a player as a GM: invulnerable (see dealDamage). Server-side only —
-  // set at join time from the characters.is_gm column.
+  // Mark a player as a GM: invulnerable (see dealDamage). Server-side only,   // set at join time from the characters.is_gm column.
   setGm(pid?: number, enabled = true): void {
     const r = this.resolve(pid);
     if (r) r.e.gm = enabled;
@@ -6363,7 +6349,7 @@ export class Sim {
         // Authored patrols. npc_routes.ts's header has always said friendly
         // NPCs walk theirs every tick; this is that caller. Parity-safe by the
         // module's own contract (zero rng, fixed-DT steps), and a world with no
-        // routed NPCs — every shipped world today — takes one undefined check
+        // routed NPCs, every shipped world today, takes one undefined check
         // per NPC and changes nothing.
         if (e.route) updateNpcRoute(this.ctx, e);
       } else if (e.kind === 'object') {
@@ -6808,8 +6794,7 @@ export class Sim {
     // player in; slopes use the ridden surface (ride_height.ts) plus the shore
     // step-out, matching the movement kernel and the clamp findChargePath
     // already plans with, so a wading-depth ford never ends a charge.
-    // groundHeightNear: a charge runs along whatever sheet the body is on —
-    // tube floor, carve floor or the surface — and its own walls stop it.
+    // groundHeightNear: a charge runs along whatever sheet the body is on,     // tube floor, carve floor or the surface, and its own walls stop it.
     const h1 = groundHeightNear(nx, nz, this.cfg.seed, p.pos.y);
     if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return done(false);
     const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
@@ -6889,7 +6874,7 @@ export class Sim {
     if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return true; // don't trail into deep water
     // ridden-surface slopes plus the shore step-out (ride_height.ts), matching
     // the movement kernel: a follower crosses the same fords and climbs the
-    // same low banks its leader just walked — including through cave mouths
+    // same low banks its leader just walked, including through cave mouths
     // and carved tunnels (groundHeightNear + the sheet gates).
     const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
     const r0 = Math.max(groundHeightNear(p.pos.x, p.pos.z, this.cfg.seed, p.pos.y), wls);
@@ -8306,14 +8291,14 @@ export class Sim {
     e.facing = desired;
     // An immobile mob turns to face its destination and goes no further. It
     // must not fall through to the steps below, because every one of them ends
-    // by SNAPPING pos.y to the ground — and it does that even when the
+    // by SNAPPING pos.y to the ground, and it does that even when the
     // horizontal step is zero, which is what an immobile mob always takes.
     //
     // The Tidesow found this. It is an inert mob whose position is owned by the
     // deepball physics, and once a strike put it in combat the chase arm ran
     // this every tick and wrote the ball down onto the slate, a hundred feet
     // under where it was flying. The match restored pos immediately after, so
-    // the ball LOOKED right in the sim — but prevPos had already captured the
+    // the ball LOOKED right in the sim, but prevPos had already captured the
     // floor, and the renderer interpolates prevPos -> pos, so the drawn ball
     // swept between the slate and its true height every single frame.
     // The idle-wander arm (mob/locomotion.ts) already carries this exact rule;
@@ -8377,7 +8362,7 @@ export class Sim {
       }
       // Cave/carve sheets: a candidate that resolves onto ANOTHER layer (the
       // surface over the tunnel, or the tunnel under the field) is a teleport,
-      // not a step — and the rock walls are solid for mobs and pets too.
+      // not a step, and the rock walls are solid for mobs and pets too.
       if (sheetStepMismatch(this.cfg.seed, e.pos.x, e.pos.z, e.pos.y, nx, nz)) continue;
       if (sheetWallBlocksStep(this.cfg.seed, e.pos.x, e.pos.z, e.pos.y, nx, nz)) continue;
       // The Great Maze's hedge walls are hard for mobs too (the maze patrol

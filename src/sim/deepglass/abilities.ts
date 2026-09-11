@@ -4,7 +4,7 @@
 //
 // These lived in sim/content/vale_cup.ts alongside the boarball kit until
 // upstream v0.40 demolished the Sowfield and retired the Vale Cup. Nothing about
-// deepball was ever boarball's — it only borrowed the module — so the four moves
+// deepball was ever boarball's, it only borrowed the module, so the four moves
 // and the ball template moved HERE, next to the match driver that reads them.
 //
 // AbilityDef.class has no runtime consumer (casting gates purely on membership
@@ -12,8 +12,9 @@
 // is a type requirement only. All of them are school 'physical' so they resolve
 // on the cast tick (no projectile landing delay) and skip spell-resist rolls,
 // and they cost 0 so every class can fly the same bar.
-import type { AbilityDef, MobTemplate } from '../types';
+
 import type { KnownAbility } from '../content/classes';
+import type { AbilityDef, MobTemplate } from '../types';
 
 // ---------------------------------------------------------------------------
 // The Tidesow: a bell-pattern INERT mob entity (the tolling_bell precedent) so
@@ -47,8 +48,8 @@ export const DEEPGLASS_BALL_MOB: MobTemplate = {
 };
 
 // ---------------------------------------------------------------------------
-// The four moves. Every one aims from the caster's own thrust vector — you
-// shoot where you are flying — so none of them needs a ground reticle. All four
+// The four moves. Every one aims from the caster's own thrust vector, you
+// shoot where you are flying, so none of them needs a ground reticle. All four
 // route through ONE effect arm ({ type: 'deepball' }) into the match driver,
 // and silently no-op unless the caster is in a live bout.
 // ---------------------------------------------------------------------------
@@ -99,7 +100,7 @@ export const DEEPBALL_ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 7,
     // Auto-targeted: the sim rams the CLOSEST opponent (match.ts nearestEnemy,
-    // gated by DG_CHECK_RANGE), so no click-target is required — selecting a
+    // gated by DG_CHECK_RANGE), so no click-target is required, selecting a
     // body by hand in a three-axis scrum was a lottery, not a skill.
     range: 0,
     school: 'physical',
@@ -111,7 +112,7 @@ export const DEEPBALL_ABILITIES: Record<string, AbilityDef> = {
   },
   // ONE button for both powerups: which one fires is whichever orb you went and
   // fetched off the map, so the decision lives out in the bell rather than on
-  // the hotbar. The old permanent Overburn is gone with it — free infinite
+  // the hotbar. The old permanent Overburn is gone with it, free infinite
   // boost on a 16s cooldown made the boost economy (pads, and only pads) a
   // formality.
   dg_power: {
@@ -132,7 +133,7 @@ export const DEEPBALL_ABILITIES: Record<string, AbilityDef> = {
   },
 };
 
-/** The deepball kit, in bar order. Shot lands on key 1 — the bout remaps the
+/** The deepball kit, in bar order. Shot lands on key 1, the bout remaps the
  *  class Attack slot to it. */
 export const DEEPBALL_KIT: readonly string[] = ['dg_shot', 'dg_pass', 'dg_check', 'dg_power'];
 

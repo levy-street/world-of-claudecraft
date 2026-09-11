@@ -2,7 +2,7 @@
 // Built-in ground-decal library generator.
 //
 // Every decal in public/textures/decals/ is drawn HERE, from shape math and
-// hash noise — no third-party art, no attribution burden, and nothing to
+// hash noise, no third-party art, no attribution burden, and nothing to
 // re-license (same approach as the paint tool's brush alphas in
 // src/editor/brush_alphas.ts). Output is RGBA WebP: the RGB carries the
 // decal's own colour detail (blood reads red without tinting) and the ALPHA
@@ -137,7 +137,7 @@ function sdPolygon(x, y, pts) {
  * Radius multiplier that makes a circle edge ragged (burn / splat rims).
  *
  * The noise is sampled on a SMALL circle in noise space, which keeps it exactly
- * periodic in angle and — the part that matters — keeps the wobble LOW
+ * periodic in angle and, the part that matters, keeps the wobble LOW
  * frequency. Sampling on a wide circle (the obvious first try) puts several
  * noise cells inside one degree of sweep, and every splat comes out as a
  * radial sea-urchin instead of a blob with a torn edge. `lobes` is that
@@ -166,7 +166,7 @@ function warp(x, y, amount, salt) {
 // radius 1 is the decal's authored footprint edge. Return [r, g, b, a] in 0..1;
 // `a` is coverage and rgb is the decal's own colour.
 
-/** Arcane glyph strokes around a ring — the rune band shared by the circles. */
+/** Arcane glyph strokes around a ring, the rune band shared by the circles. */
 function runeBand(x, y, r0, r1, count, salt) {
   const ang = Math.atan2(y, x);
   const rad = Math.hypot(x, y);
@@ -456,7 +456,7 @@ const DECALS = [
     draw(x, y) {
       const r = Math.hypot(x, y);
       const ang = Math.atan2(y, x);
-      // Tongues of soot flung out from the centre — a handful of broad lobes
+      // Tongues of soot flung out from the centre, a handful of broad lobes
       // (low-frequency angular noise), each fading out into loose speckle.
       const streak = valueNoise(Math.cos(ang) * 2.6 + 4, Math.sin(ang) * 2.6 + 4, 173);
       const reach = 0.42 + streak * 0.58;
@@ -821,7 +821,7 @@ const DECALS = [
     tint: 0xffffff,
     draw(x, y) {
       // Four staggered prints walking toward -y. Each is a rounded forefoot
-      // and a separate heel with a gap between — the shape that reads as a
+      // and a separate heel with a gap between, the shape that reads as a
       // BOOT at a glance, where one blob just reads as a smudge.
       let s = 0;
       for (let i = 0; i < 4; i++) {

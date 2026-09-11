@@ -3,7 +3,7 @@
 // Same treatment as the arena marshal and the match-day crowd, and for the same
 // reason. The generic world-init loop allocates entity ids as it walks its
 // roster, so forty extra bodies placed that way would shift every id after them
-// — and with them the deepball bout's rng draw order, which
+//, and with them the deepball bout's rng draw order, which
 // tests/deepglass.test.ts pins to a pacing assertion. So every resident is
 // `dynamic: true` in the world's npcs table (registered, never surface-placed)
 // and spawned HERE at a reserved id instead.

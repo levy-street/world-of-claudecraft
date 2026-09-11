@@ -1,9 +1,8 @@
 // Tidehold, the ring city: the frame every ring-layout module shares.
 //
 // Troy's 2026-09-07 redesign: the peninsula city became a CIRCULAR island
-// north of the Deepglass, three tiers rising to the castle at the centre —
-// docks and the poor quarters on the outer ring, the trading hub on the
-// middle ring, the Warden's Seat on the crown — with the arena off to the
+// north of the Deepglass, three tiers rising to the castle at the centre, // docks and the poor quarters on the outer ring, the trading hub on the
+// middle ring, the Warden's Seat on the crown, with the arena off to the
 // south over a bridge and two more bridges out from the outer ring east and
 // west. 1.7x the old footprint (the old wards covered ~150k sq yd; the island
 // covers ~250k).
@@ -77,7 +76,7 @@ export const RING_MONUMENT = { r: 145, phi: Math.PI } as const;
 /** The Gilded Gull (tavern) and Tide's Coffer (bank): the two trading-ring
  *  landmarks with a keeper of their own. citadel.ts seats the innkeeper and
  *  the coffer-keeper RELATIVE to these (behind his own bar; at his own steps)
- *  so a building and its keeper can never part again — Troy's 2026-09-08
+ *  so a building and its keeper can never part again, Troy's 2026-09-08
  *  screenshot had the innkeeper greeting customers outside the bank, because
  *  the old (u, v) re-seat put him where the old plan's tavern stood. Both
  *  buildings face inward, toward the ring road: rotY = phi. */
@@ -89,7 +88,7 @@ export const RING_CASTLE = { r: 30, phi: 0 } as const;
 export const RING_BANK = { r: 172, phi: Math.PI / 2 + 0.44 } as const;
 
 /** World point at a MODEL-space offset (lx, lz) from a placement seated at
- *  `origin` with yaw `rotY` — three.js rotation.y, local +x -> (cos, -sin),
+ *  `origin` with yaw `rotY`, three.js rotation.y, local +x -> (cos, -sin),
  *  local +z -> (sin, cos), the frame colliders.ts rotates hitboxes in. */
 export function localOffset(
   origin: { x: number; z: number },
@@ -135,7 +134,7 @@ export function tierAtRadius(r: number): RingTier | null {
 }
 
 /** Placement yaw that turns a model's FRONT (its local -z) toward bearing
- *  `phi` — i.e. outward when `phi` is the bearing of the plot and the road
+ *  `phi`, i.e. outward when `phi` is the bearing of the plot and the road
  *  lies outside it. Pass `phi + PI` to face inward. */
 export function faceBearing(phi: number): number {
   // A placement rotated by rotY maps local (0, -1) to world (-sin rotY, -cos rotY),
@@ -148,7 +147,7 @@ export function faceBearing(phi: number): number {
  * see citadel.ts th()) onto the ring. The old wards were bands along v; the
  * ring's tiers are bands of radius. The lower and market wards wrap around
  * the SOUTH half of the outer and middle rings, the high ward around the
- * north half of the middle ring, and the keep onto the crown — so the forty
+ * north half of the middle ring, and the keep onto the crown, so the forty
  * residents keep their neighbours and their walks stay on their own tier.
  */
 export function ringSeat(u: number, v: number): { x: number; z: number } {

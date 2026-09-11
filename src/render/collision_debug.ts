@@ -1,9 +1,9 @@
 // Dev-cheat collision wireframe: draws the SIM'S OWN colliders (the exact
-// shapes resolvePosition blocks with — record colliders, placement boxes and
+// shapes resolvePosition blocks with, record colliders, placement boxes and
 // prisms, lamps, everything) as line geometry around a point. This is the
 // playtest twin of the editor's hitbox overlay, except it cannot lie: it
 // renders the resolved collider list itself, so "what you see IS how it
-// feels" — any disagreement with the editor overlay is a real pipeline bug
+// feels", any disagreement with the editor overlay is a real pipeline bug
 // made visible.
 //
 // The outlines are the RAW collider surfaces, matching the editor overlay
@@ -51,7 +51,15 @@ export function resetCollisionDebugCache(): void {
   cached = null;
 }
 
-function pushSeg(out: number[], x1: number, y1: number, z1: number, x2: number, y2: number, z2: number): void {
+function pushSeg(
+  out: number[],
+  x1: number,
+  y1: number,
+  z1: number,
+  x2: number,
+  y2: number,
+  z2: number,
+): void {
   out.push(x1, y1, z1, x2, y2, z2);
 }
 
@@ -59,7 +67,15 @@ function ring(out: number[], x: number, z: number, r: number, y: number): void {
   for (let i = 0; i < CIRCLE_SEGMENTS; i++) {
     const a0 = (i / CIRCLE_SEGMENTS) * Math.PI * 2;
     const a1 = ((i + 1) / CIRCLE_SEGMENTS) * Math.PI * 2;
-    pushSeg(out, x + Math.cos(a0) * r, y, z + Math.sin(a0) * r, x + Math.cos(a1) * r, y, z + Math.sin(a1) * r);
+    pushSeg(
+      out,
+      x + Math.cos(a0) * r,
+      y,
+      z + Math.sin(a0) * r,
+      x + Math.cos(a1) * r,
+      y,
+      z + Math.sin(a1) * r,
+    );
   }
 }
 
@@ -142,24 +158,36 @@ export function buildCollisionWireframe(
         const j = ((i + 1) % n) * 2;
         pushSeg(
           prism,
-          col.x + bot[i * 2], lo + 0.05, col.z + bot[i * 2 + 1],
-          col.x + bot[j], lo + 0.05, col.z + bot[j + 1],
+          col.x + bot[i * 2],
+          lo + 0.05,
+          col.z + bot[i * 2 + 1],
+          col.x + bot[j],
+          lo + 0.05,
+          col.z + bot[j + 1],
         );
         pushSeg(
           prism,
-          col.x + top[i * 2], hi, col.z + top[i * 2 + 1],
-          col.x + top[j], hi, col.z + top[j + 1],
+          col.x + top[i * 2],
+          hi,
+          col.z + top[i * 2 + 1],
+          col.x + top[j],
+          hi,
+          col.z + top[j + 1],
         );
         pushSeg(
           prism,
-          col.x + bot[i * 2], lo + 0.05, col.z + bot[i * 2 + 1],
-          col.x + top[i * 2], hi, col.z + top[i * 2 + 1],
+          col.x + bot[i * 2],
+          lo + 0.05,
+          col.z + bot[i * 2 + 1],
+          col.x + top[i * 2],
+          hi,
+          col.z + top[i * 2 + 1],
         );
       }
     }
   }
   // Steep-ground markers: the climb gate is part of how movement blocks but
-  // has no collider, so the wireframe shows it as an orange floor grid — an
+  // has no collider, so the wireframe shows it as an orange floor grid, an
   // "invisible wall" made visible. Sampled on a coarse step; only cells the
   // supplied predicate flags draw.
   const steep: number[] = [];
@@ -182,7 +210,12 @@ export function buildCollisionWireframe(
     if (positions.length === 0) return;
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    const mat = new THREE.LineBasicMaterial({ color, depthTest: false, transparent: true, opacity: 0.9 });
+    const mat = new THREE.LineBasicMaterial({
+      color,
+      depthTest: false,
+      transparent: true,
+      opacity: 0.9,
+    });
     const lines = new THREE.LineSegments(geo, mat);
     lines.renderOrder = 5;
     group.add(lines);
@@ -196,7 +229,7 @@ export function buildCollisionWireframe(
 
 /**
  * Human-readable list of the colliders whose shape comes within `reach` yards
- * of (x, z) at body height y — "what is blocking me HERE". Each line is the
+ * of (x, z) at body height y, "what is blocking me HERE". Each line is the
  * collider's src stamp (model path + lane) or, for built-in record colliders,
  * its bare shape. Dedup'd, nearest first.
  */
@@ -211,11 +244,7 @@ export function describeNearbyColliders(
   for (const col of worldColliders(seed)) {
     const d = Math.hypot(col.x - x, col.z - z);
     const extent =
-      col.type === 'circle'
-        ? col.r
-        : col.type === 'obb'
-          ? Math.hypot(col.hw, col.hd)
-          : col.br;
+      col.type === 'circle' ? col.r : col.type === 'obb' ? Math.hypot(col.hw, col.hd) : col.br;
     if (d > extent + reach) continue;
     const ground = terrainHeight(col.x, col.z, seed);
     const lo = col.baseY ?? ground;
@@ -272,7 +301,10 @@ function signedDistToDrawn(c: Collider, px: number, pz: number, feetY?: number):
     if ((bx - ax) * (pz - az) - (bz - az) * (px - ax) < 0) inside = false;
     const vx = bx - ax;
     const vz = bz - az;
-    const t = Math.max(0, Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz || 1)));
+    const t = Math.max(
+      0,
+      Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz || 1)),
+    );
     minD = Math.min(minD, Math.hypot(px - (ax + vx * t), pz - (az + vz * t)));
   }
   return inside ? -minD : minD;
@@ -282,7 +314,7 @@ function signedDistToDrawn(c: Collider, px: number, pz: number, feetY?: number):
  * Self-test: does the world actually BLOCK where the wireframe is DRAWN?
  *
  * Samples a grid around (x, z) at the body's own height and compares two
- * independent answers per cell — "is a body of `body` radius pushed out here"
+ * independent answers per cell, "is a body of `body` radius pushed out here"
  * (the sim's resolver, i.e. what the player feels) against "is this cell
  * within `body` of a drawn outline" (what the player sees). Any disagreement
  * is a real pipeline bug, named by the offending collider's `src` stamp.
@@ -300,7 +332,7 @@ export function auditCollisionAround(
   body = 0.5,
 ): string[] {
   // EXACTLY the set buildCollisionWireframe draws: every collider whose
-  // shape reaches the sweep, with NO height filter — the wireframe has none
+  // shape reaches the sweep, with NO height filter, the wireframe has none
   // either, and the resolver this audits is likewise height-agnostic, so
   // filtering one side and not the other invents mismatches that no player
   // can feel. (`y` is kept for callers/telemetry and future mover-aware runs.)
@@ -313,8 +345,8 @@ export function auditCollisionAround(
     if (Math.hypot(c.x - x, c.z - z) > radius + ext + body + 1) return false;
     // ...and only the ones that can block a body STANDING HERE. The resolver
     // this audits is mover-aware (it passes a body under an overhang and over
-    // a low top), so comparing it against every drawn line — including the
-    // upper bands of a tall authored volume — would report the overhang the
+    // a low top), so comparing it against every drawn line, including the
+    // upper bands of a tall authored volume, would report the overhang the
     // player correctly walks under as a defect.
     return blocksAtBodyHeight(c, seed, y);
   });
@@ -363,10 +395,12 @@ export function auditCollisionAround(
   }
   const out = [`${samples} cells checked, r=${radius}yd`];
   if (wallWorst > NOISE) {
-    out.push(`INVISIBLE WALL ${wallWorst.toFixed(2)}yd past the line — ${wallAt?.src ?? 'builtin'}`);
+    out.push(`INVISIBLE WALL ${wallWorst.toFixed(2)}yd past the line, ${wallAt?.src ?? 'builtin'}`);
   }
   if (ghostWorst > NOISE) {
-    out.push(`WALK-THROUGH ${ghostWorst.toFixed(2)}yd inside the line — ${ghostAt?.src ?? 'builtin'}`);
+    out.push(
+      `WALK-THROUGH ${ghostWorst.toFixed(2)}yd inside the line, ${ghostAt?.src ?? 'builtin'}`,
+    );
   }
   if (out.length === 1) out.push('MATCHES: blocking agrees with every drawn line');
   return out;

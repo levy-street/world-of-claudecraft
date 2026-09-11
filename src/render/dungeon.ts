@@ -64,14 +64,16 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import {
+  type DungeonPlacementRecord,
   type PendingArenaWall,
   type PendingArenaWalls,
-  type DungeonPlacementRecord,
   Placements,
   pendingArenaWallsFor,
 } from './dungeon_arena_walls';
+
 // Re-exported for the editor's shipped-map adapter, which reads the tape here.
 export type { DungeonPlacementRecord } from './dungeon_arena_walls';
+
 import { dungeonBannerKind, hangsKitBanners } from './dungeon_banner_core';
 import {
   dungeonFloorKind,
@@ -595,7 +597,7 @@ export class DungeonInteriors {
     // World-editor dungeon mode only: the RAW fire-light registry behind the
     // sink above, plus its rank-dirty hook. A KEYED build has to know which
     // lights it added and splice exactly those back out when the interior is
-    // rebuilt, and an append-only sink cannot express a release — the
+    // rebuilt, and an append-only sink cannot express a release, the
     // battleground field takes the raw registry for the same reason. Lights
     // still JOIN through the sink, so they are still hidden and ranked on the
     // way in; this is only how they leave.
@@ -963,7 +965,7 @@ export class DungeonInteriors {
   }
 
   /** Tear down a keyed interior build (world-editor live rebuild). Shared kit
-   *  geometries/materials are left alone — they are module or instance level
+   *  geometries/materials are left alone, they are module or instance level
    *  caches the next build reuses; only per-build GPU state goes (instance
    *  matrices and light shadow maps). */
   disposeInterior(key: string): void {

@@ -1,4 +1,4 @@
-// The deepball match strip: score, clock, phase, the boost meter — and the two
+// The deepball match strip: score, clock, phase, the boost meter, and the two
 // readouts a flier in a sphere cannot play without.
 //
 // A bout is unplayable without the first three facts: you cannot pace a burn you
@@ -46,7 +46,7 @@ const MARK_ON_Y = 0.94;
  * Turn a projected ball position into a marker.
  *
  * Pure, and separated from the projection on purpose: the renderer owns the
- * camera maths, and this — the part with the three cases and the sign trap — is
+ * camera maths, and this, the part with the three cases and the sign trap, is
  * the part worth testing. `nx`/`ny` are normalised device coords (-1..1, y up)
  * and `nz` is the projected depth, which is greater than 1 when the ball is
  * BEHIND the camera. In that case the projection's sign has flipped, so the raw
@@ -109,7 +109,7 @@ export interface DeepglassHudSnapshot {
   /** Who zapped them, for the card. */
   zappedBy: string | null;
   /** The local player's speed, yd/s, and the cruise/boost figures it reads
-   *  against — the dial is a fraction, and the fraction is what tells you
+   *  against, the dial is a fraction, and the fraction is what tells you
    *  whether a burn is still buying anything. */
   speed: number;
   cruise: number;
@@ -133,7 +133,7 @@ export interface DeepglassHudSnapshot {
  *
  * Injected rather than imported: the Keybinds instance is per character and
  * owned by main.ts. Read every frame (cheap, and only written to the DOM when
- * the composed line changes) so a rebind is reflected immediately — this strip
+ * the composed line changes) so a rebind is reflected immediately, this strip
  * has already shipped a lie once, telling everyone to press SPACE for the whole
  * of the first pass after the burners had moved to F.
  */
@@ -213,7 +213,7 @@ function css(): string {
    anywhere on the viewport. */
 /* FIXED, and positioned in PERCENTAGES. Both matter: fixed resolves the
    percentages against the viewport rather than against whatever height body
-   happens to have, and percentages avoid reading window.innerWidth — which an
+   happens to have, and percentages avoid reading window.innerWidth, which an
    offscreen/automated context reports as 0, parking the marker in the corner. */
 #${ROOT_ID}-ball{position:fixed;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;
  z-index:39;pointer-events:none;display:none;will-change:left,top}
@@ -289,15 +289,15 @@ function mount(): Nodes | null {
     '<div class="dg-power"></div>' +
     // Filled from the live bindings by syncHint() rather than written out here.
     // Hard-coding is what let this strip say SPACE for the whole of the first
-    // pass, long after the burners had moved to F — so the honest reading of
+    // pass, long after the burners had moved to F, so the honest reading of
     // "the jets do not fire" was that the HUD named the wrong key. Now it
     // cannot: it reads whatever the player actually has bound.
     '<div class="dg-hint"><span class="dg-keys"></span></div>';
   root.prepend(style);
   document.body.appendChild(root);
 
-  // The marker. One SVG with both faces — a ring while the ball is on screen, a
-  // pointer while it is not — so switching costs a class, not a rebuild.
+  // The marker. One SVG with both faces, a ring while the ball is on screen, a
+  // pointer while it is not, so switching costs a class, not a rebuild.
   const ball = document.createElement('div');
   ball.id = `${ROOT_ID}-ball`;
   ball.innerHTML =
@@ -348,10 +348,10 @@ function phaseLabel(s: DeepglassHudSnapshot): string {
     case 'countdown':
       return Math.ceil(s.timer) > 0 ? String(Math.ceil(s.timer)) : 'Dive!';
     case 'goal':
-      return s.lastGoalBy ? `Goal — ${DG_TEAM_NAME[s.lastGoalBy]}` : 'Goal';
+      return s.lastGoalBy ? `Goal, ${DG_TEAM_NAME[s.lastGoalBy]}` : 'Goal';
     case 'over': {
-      if (s.scoreA === s.scoreB) return 'Full time — drawn';
-      return `Full time — ${DG_TEAM_NAME[s.scoreA > s.scoreB ? 'A' : 'B']}`;
+      if (s.scoreA === s.scoreB) return 'Full time, drawn';
+      return `Full time, ${DG_TEAM_NAME[s.scoreA > s.scoreB ? 'A' : 'B']}`;
     }
     default:
       return s.overtime ? 'Sudden death' : '';
@@ -361,7 +361,7 @@ function phaseLabel(s: DeepglassHudSnapshot): string {
 /** The line under the phase: who scored, and who made it. */
 function creditLine(s: DeepglassHudSnapshot): string {
   if (s.phase !== 'goal' || !s.scorer) return '';
-  if (s.ownGoal) return `<b>${escapeHtml(s.scorer)}</b> — own goal`;
+  if (s.ownGoal) return `<b>${escapeHtml(s.scorer)}</b>, own goal`;
   if (s.assist) return `<b>${escapeHtml(s.scorer)}</b> &middot; assist ${escapeHtml(s.assist)}`;
   return `<b>${escapeHtml(s.scorer)}</b>`;
 }

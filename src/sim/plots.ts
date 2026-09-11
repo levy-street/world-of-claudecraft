@@ -11,7 +11,7 @@
 // geometry and prices are the ring city's (deepglass/citadel_ring.ts), so a
 // re-laid ring moves the signs and the deeds together.
 
-import { RING_PLOT_DEEDS, RING_PLOT_SIGNS, type PlotDeed } from './deepglass/citadel_ring';
+import { type PlotDeed, RING_PLOT_DEEDS, RING_PLOT_SIGNS } from './deepglass/citadel_ring';
 import { createGroundObject } from './entity';
 import type { RealmBuilderMonumentSpawnHost } from './realm_builder_monument_spawn';
 import type { SimContext } from './sim_context';
@@ -35,7 +35,10 @@ export function plotDeedForEntity(entityId: number): PlotDeed | null {
 }
 
 /** Spawn a sign object on every plot seat, in the Deepglass world only. */
-export function spawnPlotSigns(host: RealmBuilderMonumentSpawnHost, presentationMode: string | undefined): void {
+export function spawnPlotSigns(
+  host: RealmBuilderMonumentSpawnHost,
+  presentationMode: string | undefined,
+): void {
   if (presentationMode !== 'deepglass') return;
   RING_PLOT_SIGNS.forEach((seat, i) => {
     const id = plotSignEntityId(i);
@@ -56,8 +59,14 @@ function ownerKey(ctx: SimContext, meta: { characterId?: number; entityId: numbe
   return meta.characterId ?? meta.entityId;
 }
 
-function deedView(sign: Entity, deed: PlotDeed, meta: { copper: number; ownedPlots?: string[] }, you: number): PlotDeedView {
-  const ownedByYou = meta.ownedPlots?.includes(deed.id) === true || sign.plotOwner?.characterId === you;
+function deedView(
+  sign: Entity,
+  deed: PlotDeed,
+  meta: { copper: number; ownedPlots?: string[] },
+  you: number,
+): PlotDeedView {
+  const ownedByYou =
+    meta.ownedPlots?.includes(deed.id) === true || sign.plotOwner?.characterId === you;
   return {
     id: deed.id,
     name: deed.name,

@@ -15,6 +15,9 @@ export const editorStrings = {
   untitledMap: 'Untitled Map',
   // The offline character name a playtest boots with.
   playtestPlayerName: 'Mapmaker',
+  // The corner button shown in-game during a playtest (game/editor_playtest.ts).
+  playtestBack: 'Back to Editor',
+  playtestBackTitle: 'Return to the map editor (your map was saved when the playtest launched)',
 
   topbar: {
     label: 'Editor actions',

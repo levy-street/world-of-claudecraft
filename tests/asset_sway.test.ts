@@ -3,7 +3,7 @@
 // assets a maker has stilled.
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { customMapToWorldContent, newFlatCustomMap } from '../src/editor/custom_map';
+import { customMapToWorldContent, newCustomMap } from '../src/editor/custom_map';
 import { attachPlacedTreeSway, detachPlacedTreeSway } from '../src/render/placed_assets';
 import {
   naturalSwayKindForAssetPath,
@@ -54,7 +54,7 @@ describe('sway opt-out gate', () => {
 describe('assetSway document round-trip', () => {
   it('keeps the opt-outs and drops redundant on-by-default entries', () => {
     const doc = sanitizeMapDoc({
-      ...JSON.parse(JSON.stringify(newFlatCustomMap('Sway', 'map_sway', NOW))),
+      ...JSON.parse(JSON.stringify(newCustomMap('Sway', 'map_sway', NOW))),
       assetSway: {
         'nature/Ivy_01': false,
         // `true` is the default and carries no information; storing it would
@@ -68,7 +68,7 @@ describe('assetSway document round-trip', () => {
 
   it('omits the field entirely when nothing is stilled', () => {
     const doc = sanitizeMapDoc({
-      ...JSON.parse(JSON.stringify(newFlatCustomMap('Sway', 'map_sway', NOW))),
+      ...JSON.parse(JSON.stringify(newCustomMap('Sway', 'map_sway', NOW))),
       assetSway: { 'nature/Ivy_02': true },
     });
     expect(doc?.assetSway).toBeUndefined();
@@ -77,13 +77,13 @@ describe('assetSway document round-trip', () => {
 
 describe('projection into playtest', () => {
   it('carries the opt-outs onto the standalone world', () => {
-    const map = newFlatCustomMap('Sway', 'map_sway', NOW);
+    const map = newCustomMap('Sway', 'map_sway', NOW);
     map.assetSway = { 'nature/Ivy_01': false };
     expect(customMapToWorldContent(map).assetSway).toEqual({ 'nature/Ivy_01': false });
   });
 
   it('carries them onto a world-linked map as well', () => {
-    const map = newFlatCustomMap('Sway', 'map_sway', NOW);
+    const map = newCustomMap('Sway', 'map_sway', NOW);
     map.assetSway = { 'nature/Ivy_01': false };
     map.worldAnchor = { x: -200, z: 800 };
     // Unlike music areas, sway needs no offset: it is keyed by asset, not place.
@@ -91,7 +91,7 @@ describe('projection into playtest', () => {
   });
 
   it('leaves the field off a map that never touched sway', () => {
-    const map = newFlatCustomMap('Sway', 'map_sway', NOW);
+    const map = newCustomMap('Sway', 'map_sway', NOW);
     expect(customMapToWorldContent(map).assetSway).toBeUndefined();
   });
 });

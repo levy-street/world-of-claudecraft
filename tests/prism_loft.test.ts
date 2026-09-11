@@ -4,23 +4,50 @@
 // every height-aware consumer interpolates between them at the mover's own
 // feet height (prismPolyAt).
 import { describe, expect, it } from 'vitest';
-import { meshToPrisms, polyArea } from '../src/sim/mesh_prisms';
 import { type PrismCollider, prismPolyAt } from '../src/sim/colliders';
+import { meshToPrisms, polyArea } from '../src/sim/mesh_prisms';
 import { sweepCollider } from '../src/sim/physics/sweep';
 
 /** Square frustum: base half-extent b at y=0, top half-extent t at y=h. */
 function frustum(b: number, t: number, h: number): { verts: number[]; tris: number[] } {
-  const verts = [
-    -b, 0, -b,  b, 0, -b,  b, 0, b,  -b, 0, b,
-    -t, h, -t,  t, h, -t,  t, h, t,  -t, h, t,
-  ];
+  const verts = [-b, 0, -b, b, 0, -b, b, 0, b, -b, 0, b, -t, h, -t, t, h, -t, t, h, t, -t, h, t];
   const tris = [
-    0, 2, 1, 0, 3, 2, // bottom
-    4, 5, 6, 4, 6, 7, // top
-    0, 1, 5, 0, 5, 4,
-    1, 2, 6, 1, 6, 5,
-    2, 3, 7, 2, 7, 6,
-    3, 0, 4, 3, 4, 7,
+    0,
+    2,
+    1,
+    0,
+    3,
+    2, // bottom
+    4,
+    5,
+    6,
+    4,
+    6,
+    7, // top
+    0,
+    1,
+    5,
+    0,
+    5,
+    4,
+    1,
+    2,
+    6,
+    1,
+    6,
+    5,
+    2,
+    3,
+    7,
+    2,
+    7,
+    6,
+    3,
+    0,
+    4,
+    3,
+    4,
+    7,
   ];
   return { verts, tris };
 }

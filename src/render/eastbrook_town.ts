@@ -1193,7 +1193,7 @@ function buildFromTemplates(
   const roofHideTargets: RoofHideTarget[] = [];
   const buildingGroups: THREE.Object3D[] = [];
   // The document may own the town's BUILDINGS as placements (the
-  // promoted-scenery contract): only the building loop stands down — the
+  // promoted-scenery contract): only the building loop stands down, the
   // wells, stalls, fences, streets, wall and harbor stay town-drawn.
   const buildingsPromoted = activeWorldPromoted('authoredTowns');
   const buildingList = buildingsPromoted ? [] : EASTBROOK_LAYOUT.buildings;

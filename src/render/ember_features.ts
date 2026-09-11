@@ -130,8 +130,8 @@ export interface EmberDressingSpots {
 }
 
 /**
- * The Drakelands' den dressing spots — dragon hoards, egg clutches, the
- * ember-lily groves and the small crystal clusters — as ONE pure list shared
+ * The Drakelands' den dressing spots, dragon hoards, egg clutches, the
+ * ember-lily groves and the small crystal clusters, as ONE pure list shared
  * by the builder below and the editor's placement promotion, so the promoted
  * copies land exactly where the world drew them (the fen_willows contract).
  * Everything seat-height is ABSOLUTE (the flat-bed lowest-probe rule); the
@@ -313,7 +313,7 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
   }
 
   // --- the dragon dens: the drakes' treasure and their clutches, plus the
-  // lily groves and crystal clusters below — all from the ONE shared spot
+  // lily groves and crystal clusters below, all from the ONE shared spot
   // list (emberDressingSpots), and standing down together when the document
   // owns them as placements (the promoted-scenery contract). The den's gold
   // point light stands down with its hoard: a warm glow over an empty (or

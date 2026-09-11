@@ -1,7 +1,7 @@
 // The visible interior of every boolean CARVE: rooms, tunnels and pits meshed
 // from the same carve field the sim stands on (sim/terrain_cuts.ts
 // carveFieldAt), clipped to below the terrain surface. Legacy (non-carve)
-// holes draw nothing here — they keep their v1 look, a rim skirt over a void.
+// holes draw nothing here, they keep their v1 look, a rim skirt over a void.
 //
 // Layout: carve cuts cluster by overlapping padded bounds (a chain of blended
 // solids is one cave), each cluster meshes at ONE cell size, and the volume is
@@ -34,14 +34,14 @@ import { caveInteriorPaintLookup, caveInteriorTintAt, type PaintLookup } from '.
 import { buildCavityMesh, clusterCavityMesh } from './cut_cavity_core';
 import { meshTerrainHeight } from './terrain_mesh_height';
 import { MAX_PAINT_SLOTS, paintLayerRuntime, textureSlotSwatch } from './terrain_paint_layers';
-import { applyTriplanarMaps } from './triplanar_maps';
 import { terrainTexturePath, terrainTextureSet } from './terrain_texture_sets';
+import { applyTriplanarMaps } from './triplanar_maps';
 
 export const CAVITY_GROUP_NAME = 'cutCavities';
 
 // World-aligned tile edge (yards). Divisible by every cell step below.
 const TILE = 16;
-// Cell steps as divisors of TILE, finest first — the SAME power-of-two chain
+// Cell steps as divisors of TILE, finest first, the SAME power-of-two chain
 // the mixed-resolution stitching needs, so a base cell and a remesh region
 // always have an integer ratio. 0.25yd resolves a fist-sized bump; 2yd is the
 // coarse floor for huge caverns.
@@ -237,7 +237,7 @@ function buildClusters(
       }
     }
     // The BASE cell: the finest step whose volume fits the budget. Detail
-    // regions no longer touch it — they re-cell individual tiles instead.
+    // regions no longer touch it, they re-cell individual tiles instead.
     const ex2 = cl.bounds.maxX - cl.bounds.minX + PAD * 2;
     const ey2 = cl.maxY - cl.minY + PAD * 2;
     const ez2 = cl.bounds.maxZ - cl.bounds.minZ + PAD * 2;
@@ -257,11 +257,11 @@ function buildClusters(
 
 // The mixed-resolution cell chain: every step divides the next, so a border
 // between two of them always has an integer ratio for the face stitching.
-// Identical to CELL_STEPS on purpose — every base cell is already on it.
+// Identical to CELL_STEPS on purpose, every base cell is already on it.
 const CELL_CHAIN = CELL_STEPS;
 
 /** Nearest chain step, by log distance (0.4 -> 0.5, not 0.25): an off-chain
- *  region cell — the slider is continuous, and old documents carry 0.4 — must
+ *  region cell, the slider is continuous, and old documents carry 0.4, must
  *  not silently mesh a whole cluster at the finest step. */
 function chainSnapNearest(cell: number): number {
   let best: number = CELL_CHAIN[0];
@@ -281,7 +281,7 @@ function chainSnapNearest(cell: number): number {
 // The base tint (granite grey, or the painted swatch colour) rides the VERTEX
 // colours (caveInteriorTintAt times the depth shade), so the material colour
 // stays white and a re-textured or painted cavity needs no material rebuild.
-// Cache key: `<setKey>@<tilePeriod>` — the triplanar re-projection bakes the
+// Cache key: `<setKey>@<tilePeriod>`, the triplanar re-projection bakes the
 // tiling period into a per-material uniform, so two clusters tiling the same
 // set differently need distinct material instances (one shared program).
 const cavityMaterials = new Map<string, THREE.MeshStandardMaterial>();
@@ -295,8 +295,8 @@ const cavityMatReleases = new Map<string, (() => void)[]>();
 // material shares ONE uniform set, bound by reference, so a paint stroke
 // (field bytes rewritten in place), a grown grid or a new textured swatch
 // (refreshCavityPaint swaps the runtime) reach every interior with no
-// material rebuild. The path is always compiled in — carve interiors only
-// exist on authored maps — and stands down on `uPaintOn` while the map has
+// material rebuild. The path is always compiled in, carve interiors only
+// exist on authored maps, and stands down on `uPaintOn` while the map has
 // no textured paint; the placeholders keep the samplers bound meanwhile.
 const paintPlaceholderField = new THREE.DataTexture(new Uint8Array([255, 128, 128, 128]), 1, 1);
 paintPlaceholderField.needsUpdate = true;
@@ -447,8 +447,7 @@ function material(texKey: string | undefined, tilePeriod: number): THREE.MeshSta
     roughness: 0.96,
     metalness: 0,
     side: THREE.DoubleSide,
-    // A whisper of self-light so an unlit interior reads as rock, not void —
-    // a touch above the cave tubes' 0.55: carve rooms are wider, so their
+    // A whisper of self-light so an unlit interior reads as rock, not void,     // a touch above the cave tubes' 0.55: carve rooms are wider, so their
     // far walls sit further from any mouth light.
     emissive: 0x201c17,
     emissiveIntensity: 0.7,
@@ -485,7 +484,7 @@ function material(texKey: string | undefined, tilePeriod: number): THREE.MeshSta
         .catch(() => {});
     }
     // A glowing set (lava): its Emission map lights the molten veins. The
-    // emissive colour flips to white ONLY once the map lands — white with no
+    // emissive colour flips to white ONLY once the map lands, white with no
     // map would floodlight the whole interior. Emissive ignores the vertex
     // depth tint on purpose: lava glows hardest where the cave is darkest.
     const emissionPath = terrainTexturePath(set.key, 'emission');
@@ -543,7 +542,7 @@ interface TileJob {
 /**
  * Every tile the current document's carves need, keyed for reuse. The cell is
  * per COLUMN (tx, tz): the finest of every claiming cluster's base cell and
- * every Remesh detail region touching the column's rect — so the Remesh brush
+ * every Remesh detail region touching the column's rect, so the Remesh brush
  * refines exactly the tiles under its disc, and vertically stacked tiles can
  * never disagree (y-faces need no stitching). Face ratios against coarser
  * x/z neighbours drive the core's watertight face linearization.
@@ -568,7 +567,7 @@ function desiredTiles(
         const minX = tx * TILE;
         const minZ = tz * TILE;
         // The column's cell: any detail region whose disc reaches this
-        // column's rect SETS it — finer OR coarser than the cluster base, so
+        // column's rect SETS it, finer OR coarser than the cluster base, so
         // the Remesh brush turns detail down as well as up (snapped onto the
         // chain so a mixed border always has an integer ratio). Overlapping
         // regions resolve to the finest of them.
@@ -712,7 +711,7 @@ function buildTileMesh(job: TileJob, seed: number): THREE.Mesh | null {
   if (arrays.indices.length === 0) return null;
   // The base tint rides the vertex colours: neutral granite where unpainted,
   // the painted swatch's cave-dark colour where the Paint tool touched the
-  // ground above — the same rule the cave tubes follow, so paint works inside
+  // ground above, the same rule the cave tubes follow, so paint works inside
   // carves too. Where the cluster's texture CAME from the paint, the swatch's
   // colour is already in the texture: multiplying it in again would colourize
   // the texture with itself, so those vertices keep the plain depth shade.
@@ -764,7 +763,7 @@ export function buildCutCavityMeshes(seed: number): THREE.Group {
 /**
  * Region-scoped refresh: rebuild only the tiles whose box touches the edited
  * rect (null = everything), drop tiles the document no longer needs, add the
- * new ones. Mutates the group in place — same lifecycle as refreshCaveMeshes.
+ * new ones. Mutates the group in place, same lifecycle as refreshCaveMeshes.
  */
 export function refreshCutCavityMeshes(
   group: THREE.Group,
@@ -784,7 +783,7 @@ export function refreshCutCavityMeshes(
     const maxZ = (job.tz + 1) * TILE + PAD;
     return minX <= region.maxX && maxX >= region.minX && minZ <= region.maxZ && maxZ >= region.minZ;
   };
-  // Drop meshes the document no longer needs (or whose cell changed — the
+  // Drop meshes the document no longer needs (or whose cell changed, the
   // cell is in the key), plus every kept tile inside the edited region, which
   // the build loop below then re-extracts fresh.
   const coordOf = (key: string): string => key.slice(key.lastIndexOf(':') + 1);

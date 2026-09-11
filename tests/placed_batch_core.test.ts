@@ -144,7 +144,7 @@ describe('SlotTable', () => {
     t.alloc(11);
     // Removing document index 9 shifts 11 down to 10 and 10 down to 9. The
     // instances must keep their slots: only the ids they answer to change.
-    // Ascending order, like reindexAfterRemoval — renaming 11->10 first would
+    // Ascending order, like reindexAfterRemoval, renaming 11->10 first would
     // clobber the id 10 that is still live.
     t.rename(10, 9);
     t.rename(11, 10);

@@ -5,7 +5,12 @@
 // spawn clear zones, walkable path widths between cover, and the Fiesta hazard
 // ring covering the whole pit at bout start.
 import { describe, expect, it } from 'vitest';
-import { arenaCollidersForSlot, type LayoutCollider, lineOfSightClear } from '../src/sim/colliders';
+import {
+  arenaCollidersForSlot,
+  type Collider,
+  type LayoutCollider,
+  lineOfSightClear,
+} from '../src/sim/colliders';
 import { arenaOrigin } from '../src/sim/data';
 import {
   ARENA_LAYOUT,
@@ -369,8 +374,8 @@ describe('arena slot parity: per-slot colliders', () => {
     expect(arenaCollidersForSlot(3)).toEqual(layoutColliders(DROWNED_COURT_LAYOUT));
     // one representative per map: the Coliseum's centre-diamond post exists
     // only on even slots, the Drowned Court's colonnade only on odd ones
-    const diamond = (c: LayoutCollider) => c.type === 'circle' && c.x === 0 && c.z === -4;
-    const colonnade = (c: LayoutCollider) => c.type === 'circle' && c.x === 8 && c.z === -6;
+    const diamond = (c: Collider) => c.type === 'circle' && c.x === 0 && c.z === -4;
+    const colonnade = (c: Collider) => c.type === 'circle' && c.x === 8 && c.z === -6;
     expect(arenaCollidersForSlot(0).some(diamond)).toBe(true);
     expect(arenaCollidersForSlot(0).some(colonnade)).toBe(false);
     expect(arenaCollidersForSlot(1).some(diamond)).toBe(false);

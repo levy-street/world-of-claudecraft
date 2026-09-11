@@ -1,6 +1,6 @@
 // Game-side placement residency streaming (placed_assets.ts): a game host on
 // a big authored map materializes only the placements around the player and
-// reconciles as they travel — the editor's zone-stream discipline. Editor
+// reconciles as they travel, the editor's zone-stream discipline. Editor
 // hosts (rebuildAll) never stream.
 import { describe, expect, it } from 'vitest';
 import { PlacedAssetsView } from '../src/render/placed_assets';

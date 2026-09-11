@@ -9,7 +9,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
-import { type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
+import { type Collider, insidePrism, queryOpenWorldColliders } from '../src/sim/colliders';
 import { STATIONS } from '../src/sim/content/professions';
 import { FURY_ENTITY_ID, FURY_NPC, FURY_NPC_ID, FURY_STOCK } from '../src/sim/content/pvp_honor';
 import { ZONE3_NPCS, ZONE3_ZONE } from '../src/sim/content/zone3';
@@ -197,13 +197,15 @@ describe('Warmarshal Draven Kole: the placement clears all three suites', () => 
       const hit =
         c.type === 'circle'
           ? Math.hypot(KOLE.pos.x - c.x, KOLE.pos.z - c.z) < c.r - 0.05
-          : (() => {
-              const cos = Math.cos(-c.rot);
-              const sin = Math.sin(-c.rot);
-              const lx = (KOLE.pos.x - c.x) * cos + (KOLE.pos.z - c.z) * sin;
-              const lz = -(KOLE.pos.x - c.x) * sin + (KOLE.pos.z - c.z) * cos;
-              return Math.abs(lx) < c.hw - 0.05 && Math.abs(lz) < c.hd - 0.05;
-            })();
+          : c.type === 'obb'
+            ? (() => {
+                const cos = Math.cos(-c.rot);
+                const sin = Math.sin(-c.rot);
+                const lx = (KOLE.pos.x - c.x) * cos + (KOLE.pos.z - c.z) * sin;
+                const lz = -(KOLE.pos.x - c.x) * sin + (KOLE.pos.z - c.z) * cos;
+                return Math.abs(lx) < c.hw - 0.05 && Math.abs(lz) < c.hd - 0.05;
+              })()
+            : insidePrism(c, KOLE.pos.x, KOLE.pos.z);
       if (hit) hits.push(`(${c.x.toFixed(1)},${c.z.toFixed(1)})`);
     }
     expect(hits).toEqual([]);

@@ -1240,7 +1240,7 @@ export const SWIM_CLIP_SURFACE = 'Swim_Freestyle';
  *  (visual.ts SWIM_RISE_TREAD) instead of floating it like the prone strokes. */
 export const SWIM_CLIP_TREAD = 'Swim_Tread';
 /** The burner glide: hands thrust out ahead, elbows locked, legs together and
- *  toes pointed — a body being pushed rather than one swimming. Held as a pose;
+ *  toes pointed, a body being pushed rather than one swimming. Held as a pose;
  *  the clip carries only a slow flutter so it is not stone-still. */
 export const SWIM_CLIP_GLIDE = 'Swim_Glide';
 /** Walking through water too shallow to swim in: short, high-kneed, leaning. */

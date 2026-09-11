@@ -1,8 +1,13 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { roadDistance, setAuthoredRoads } from '../src/sim/world';
+import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { roadDistance } from '../src/sim/world';
 
-// Content-aware road override: setAuthoredRoads swaps the smoothed road set
-// roadDistance reads, and null restores the built-in world byte-identically.
+// Content-aware road override: setActiveWorldContent swaps the smoothed road
+// set roadDistance reads (via WorldContent.roads), and passing null restores
+// the built-in world byte-identically.
+function setAuthoredRoads(roads: { x: number; z: number }[][] | null): void {
+  setActiveWorldContent(roads ? { ...BUILTIN_WORLD, roads } : null);
+}
 
 // Scan a coarse grid for a point every built-in road ignores (Infinity) and a
 // few points a built-in road reaches (finite), so the test does not hardcode

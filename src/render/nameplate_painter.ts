@@ -579,7 +579,7 @@ export class NameplatePainter {
       // Inside a deepball bout the SIDE outranks everything else a plate could
       // say about a player. Every fighter wears the same chibi rig, so without
       // this the only thing telling ten identical bodies apart is a name you
-      // have to stop and read — and nobody reads at 26 yd/s. Same two colours as
+      // have to stop and read, and nobody reads at 26 yd/s. Same two colours as
       // the aura shell and the score strip (layout.ts DG_TEAM_COLOR).
       const dgTeam = deepglassTeamOf(entity.id);
       state.nameColor = dgTeam ? dgTeamCss(dgTeam) : (roleColor ?? '#7fb8ff');

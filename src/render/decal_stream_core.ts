@@ -1,6 +1,6 @@
 // Which ground decals are resident right now, and how far each has faded in.
-// Pure maths (no THREE, no DOM) so the streaming rules — the whole point of
-// the decal system's performance story — are testable directly; render/decals.ts
+// Pure maths (no THREE, no DOM) so the streaming rules, the whole point of
+// the decal system's performance story, are testable directly; render/decals.ts
 // turns the result into meshes.
 
 /** Footprint-relative view range, in yards. */
@@ -35,7 +35,7 @@ export interface DecalPick {
  * How far away a decal of this footprint stays visible: a floor plus a multiple
  * of its own size, so a boot print streams in only when you are close enough to
  * see it at all while a 60-yard summoning circle is there from across the
- * valley. Never past the fog — drawing what fog hides is pure waste.
+ * valley. Never past the fog, drawing what fog hides is pure waste.
  */
 export function decalViewRange(size: number, fogFar: number): number {
   const own = Math.min(DECAL_RANGE_MAX, DECAL_RANGE_BASE + size * DECAL_RANGE_PER_YARD);

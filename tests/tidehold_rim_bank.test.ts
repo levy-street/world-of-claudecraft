@@ -9,6 +9,7 @@
 // It also pins what must NOT change: the tiers are still tiers, and nothing
 // the generator builds stands on the new slope.
 import { describe, expect, it } from 'vitest';
+import { setActiveWorldContent } from '../src/sim/data';
 import { RIM_BANK, ringPlacements } from '../src/sim/deepglass/citadel_ring';
 import {
   pol,
@@ -19,7 +20,6 @@ import {
   RING_MIDDLE,
   RING_OUTER,
 } from '../src/sim/deepglass/citadel_ring_frame';
-import { setActiveWorldContent } from '../src/sim/data';
 import { buildDeepglassWorld, DEEPGLASS_MAP_ENTRY } from '../src/sim/deepglass/world';
 import { terrainHeight } from '../src/sim/world';
 
@@ -108,7 +108,11 @@ describe('the tier rims are banked', () => {
       // The stair flights step through the rims on purpose; a piece beside one
       // sits on its shoulder by design.
       const phi = Math.atan2(p.x - RING_CX, p.z - RING_CZ);
-      if (RING_AVENUES.some((av) => Math.abs(Math.atan2(Math.sin(phi - av), Math.cos(phi - av))) < 0.22))
+      if (
+        RING_AVENUES.some(
+          (av) => Math.abs(Math.atan2(Math.sin(phi - av), Math.cos(phi - av))) < 0.22,
+        )
+      )
         continue;
       if (flat(p.x, p.z) > 2.2) steep++;
     }

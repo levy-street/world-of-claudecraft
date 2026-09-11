@@ -35,7 +35,7 @@ const TINT_OPACITY = 0.46;
  *
  * The shipped wash is tuned for a murky lake: nearly half-opaque blue with fog
  * closing at 46 yd. The Deepglass is a 76-yard arena where reading the far ring
- * is the whole game, so it runs the same effect far lighter and clearer — the
+ * is the whole game, so it runs the same effect far lighter and clearer, the
  * cue comes from bubbles and motion, never from extinction
  * (docs/prd/deepglass.md section 6).
  */

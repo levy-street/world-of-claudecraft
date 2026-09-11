@@ -66,7 +66,7 @@ const POINT_SOUND_CULL = 6;
 const POINT_AMBIENCE_GAIN = 0.18;
 // Every open-air/dungeon bed ambience() can raise. Listed once so the
 // submerged branch can silence the lot without having to stay in step with the
-// biome ladder below it — a bed added there and forgotten here would keep
+// biome ladder below it, a bed added there and forgotten here would keep
 // blowing wind through the Deepglass.
 const SURFACE_BEDS = [
   'amb_dungeon',
@@ -203,7 +203,7 @@ export interface PlayOpts {
    *
    * Overridable because one venue breaks that assumption: the Deepglass bell is
    * ~98 yd across, so a strike at the far ring is further away than the shared
-   * cutoff and would be SILENT — in an arena where hearing the ball behind you
+   * cutoff and would be SILENT, in an arena where hearing the ball behind you
    * is half of knowing where it is.
    */
   maxDistance?: number;
@@ -504,7 +504,7 @@ class Sfx {
       }
       // Deepball at the Deepglass (game/deepglass_audio.ts). Baked here rather
       // than generated as clips because the arena is an offline event build and
-      // every cue it needs is a short percussive transient — and because the
+      // every cue it needs is a short percussive transient, and because the
       // bell shipped SILENT, which read as a physics demo rather than a match.
       for (const [key, cue] of Object.entries(DEEPGLASS_SFX_KEYS)) {
         const samples = deepglassSamples(cue, ctx.sampleRate);
@@ -1101,7 +1101,7 @@ class Sfx {
 
   /** Bend a live loop's playback rate, ramped rather than stepped.
    *
-   *  Ambience never needs this — a wind bed has no "harder". A THRUST bed does:
+   *  Ambience never needs this, a wind bed has no "harder". A THRUST bed does:
    *  the deepball burners have to climb with the body they are pushing, and a
    *  boost that sounds identical at cruise and at 26 yd/s tells the player
    *  nothing. Silently a no-op for a loop that is not playing yet (a bed can be
@@ -1115,7 +1115,7 @@ class Sfx {
     const param = slot.src.playbackRate;
     if (Math.abs(param.value - target) < 0.005) return;
     // Ramped where the platform offers it (a stepped playback rate on a live
-    // source is an audible zip), stepped where it does not — minimal
+    // source is an audible zip), stepped where it does not, minimal
     // AudioContext stubs implement playbackRate as a plain value.
     if (typeof param.setTargetAtTime === 'function') {
       param.setTargetAtTime(target, ctx.currentTime, 0.12);
@@ -1826,12 +1826,12 @@ class Sfx {
    *  `submerged` is the Deepglass: the player is inside the bell, and none of
    *  the beds above deal with being under a hundred yards of water. It is
    *  handled here rather than beside the deepball cues so that ONE function
-   *  still owns which bed is playing — two owners is how you get a ridge wind
+   *  still owns which bed is playing, two owners is how you get a ridge wind
    *  blowing through an underwater arena.
    *
    *  `crowd` (0..1) is how full and how loud the nearest stadium reads. It
    *  raises the open-air murmur below and, when submerged, the muffled bowl
-   *  bed instead — one number, and the bell picks which one you hear. */
+   *  bed instead, one number, and the bell picks which one you hear. */
   ambience(
     biome: BiomeId,
     inDungeon: boolean,
@@ -1967,7 +1967,6 @@ class Sfx {
     blast(196, 0, 0.5);
     blast(261.6, 0.42, 0.9);
   }
-
 
   /** Per-frame update of the map-authored point sounds (the editor's Sound
    *  tool). Each node is one positional loop whose panner falls off over the

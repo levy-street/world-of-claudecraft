@@ -8,7 +8,7 @@
  *  and footroom) used where the portrait is shown large, e.g. the Inspect
  *  window: a headshot crop blown up to that size reads as an over-zoomed
  *  helmet close-up instead of a character portrait. `card` is the whole
- *  figure with almost no margin — the deepglass crowd's cutout sprites,
+ *  figure with almost no margin, the deepglass crowd's cutout sprites,
  *  where the card's own quad is the frame and any footroom would float the
  *  fan above their seat. */
 export type PortraitFraming = 'headshot' | 'body' | 'card';

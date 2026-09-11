@@ -1,7 +1,7 @@
 // The ball comet trail (Rocket League style), lifted out of the retired
 // vale_cup_ball.ts when upstream v0.40 demolished the Sowfield. Nothing about
-// it was ever boarball-specific — it draws a fading additive streak behind
-// whatever ball you hand it — so it lives here as its own module and the
+// it was ever boarball-specific, it draws a fading additive streak behind
+// whatever ball you hand it, so it lives here as its own module and the
 // Deepglass Tidesow is now its only caller (src/render/renderer.ts).
 import * as THREE from 'three';
 

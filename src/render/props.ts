@@ -48,7 +48,6 @@ import {
   splitKitSurfacesByUv,
 } from './kit_uv_surface_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
-import { occluderFadesDisabled } from './occluder_fade_core';
 import {
   advanceOccluderFade,
   applyOccluderFade,
@@ -56,6 +55,7 @@ import {
   occluderFadeRecordFor,
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
+import { occluderFadesDisabled } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import {
   newPropCullPass,

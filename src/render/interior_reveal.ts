@@ -1,6 +1,6 @@
 // Interior reveal for the explorable Tidehold buildings (WoW-style): when the
-// player steps inside one, its roof group hides — and on the ground floor of a
-// two-storey building the upper storey hides too — so the camera can see the
+// player steps inside one, its roof group hides, and on the ground floor of a
+// two-storey building the upper storey hides too, so the camera can see the
 // room. The buildings are Blender-assembled GLBs whose scene graph carries the
 // convention: children of a node named G_H1 are the SECOND STOREY (floor,
 // walls, furniture), children of G_H2 are the ROOF. Everything else is the
@@ -62,7 +62,7 @@ export const INTERIOR_BUILDINGS: Readonly<Record<string, InteriorSpec>> = {
   },
   // NOT registered on purpose: tidehold/castle.glb. Its "roof" (G_H2) is the
   // walkable battlement TERRACE, so hiding it from inside would strip the great
-  // hall's ceiling and open the keep to the sky — a courtyard, not a keep. The
+  // hall's ceiling and open the keep to the sky, a courtyard, not a keep. The
   // hall is lit by its own braziers instead (fireEffects in citadel.ts).
   // Castle B: three storeys in the keep (hall, the middle floor = G_H1 at
   // 5 kit, the Warden's floor = G_H3 at 10 kit) and a room upstairs in each
@@ -73,7 +73,7 @@ export const INTERIOR_BUILDINGS: Readonly<Record<string, InteriorSpec>> = {
       { x0: 17.55, x1: 33.75, y0: 0, y1: 6.75, z0: 2.7, z1: 16.2 },
       { x0: -33.75, x1: -17.55, y0: 0, y1: 6.75, z0: 2.7, z1: 16.2 },
     ],
-    storeySplit: 6.3,       // a hair under the floors (6.86 / 13.6 model yd where the body stands)
+    storeySplit: 6.3, // a hair under the floors (6.86 / 13.6 model yd where the body stands)
     storeySplit2: 13.0,
   },
   '/models/tidehold/hall.glb': {

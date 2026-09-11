@@ -3,11 +3,11 @@
 // The cavity mesher bakes DOMINANT-AXIS planar UVs per vertex: wherever the
 // surface normal's biggest axis flips (all around a bowl's rim, and along the
 // 45-degree lines between walls), the projection changes and the texture
-// mirrors and kinks — a clean grid of seams etched across every large carve,
+// mirrors and kinks, a clean grid of seams etched across every large carve,
 // glaring on high-contrast art like lava. Re-projecting in the fragment
 // shader along all three world axes and blending by the normal removes the
 // seams entirely; the baked uv attribute stays on the mesh (the normal map
-// still rides it — its seam contribution is sub-noise next to the albedo's).
+// still rides it, its seam contribution is sub-noise next to the albedo's).
 //
 // The tiling period rides a uniform, so materials with different periods
 // still share one compiled program.

@@ -3,11 +3,11 @@ import { ITEMS } from '../src/sim/data';
 import { bestGodLoadout } from '../src/sim/dev_loadout';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { itemScore } from '../src/sim/item_level';
-import { ALL_CLASSES, EQUIP_SLOTS } from '../src/sim/types';
+import { ALL_CLASSES, ALL_EQUIP_SLOTS } from '../src/sim/types';
 
 // The nine non-ring gear slots an item can declare (ring1/ring2 are resolved at
 // equip time; items only ever declare 'ring').
-const GEAR_SLOTS = EQUIP_SLOTS.filter((s) => s !== 'ring1' && s !== 'ring2');
+const GEAR_SLOTS = ALL_EQUIP_SLOTS.filter((s) => s !== 'ring1' && s !== 'ring2');
 
 describe('bestGodLoadout', () => {
   it('fills every gear slot + both rings for every class', () => {

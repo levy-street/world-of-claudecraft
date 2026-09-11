@@ -6,18 +6,18 @@
 //     authored from y0 = 0.1895, so the bottom of the flight was a vertical
 //     lip rather than a slope meeting the ground.
 //  2. The movement gate treated that lip as a terrain cliff. Its authored-step
-//     bypass is capped at STEP_OVER_Y, which is the right reach for stepping
+//     bypass is capped at MAX_STEP_HEIGHT, which is the right reach for stepping
 //     ON TO A BOX but wrong for a ramp deck: the cap is in world yards while
 //     the lip scales with the placement, so one asset walked fine at scale 1
-//     and became a wall at scale 6 — the size makers actually build at.
+//     and became a wall at scale 6, the size makers actually build at.
 //
 // A ramp deck is authored walkable ground whose whole purpose is to be walked
 // onto, so its leading edge is never a wall now. Boxes keep the fixed reach.
 
 import { describe, expect, it } from 'vitest';
 import { ASSET_COLLISION_OVERRIDES } from '../src/sim/asset_collision_overrides.generated';
-import { STEP_OVER_Y } from '../src/sim/colliders';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
 import { placementRampFloorAt } from '../src/sim/placement_ramps';
 import type { WorldContent } from '../src/sim/types';
 
@@ -61,7 +61,7 @@ describe('authored ramp decks', () => {
       // the step up from bare ground is nothing at all rather than a lip that
       // grows with the placement.
       const lip = Math.min(ramp.y0, ramp.y1) * stairs.scale;
-      expect(lip).toBeLessThanOrEqual(STEP_OVER_Y);
+      expect(lip).toBeLessThanOrEqual(MAX_STEP_HEIGHT);
 
       // and the deck genuinely slopes across the flight rather than sitting
       // flat. Sample the deck's OWN two ends: it carries a yaw (ry) inside the

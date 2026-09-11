@@ -3,7 +3,7 @@
 // Two terms, both in the vertex shader, both gated on distance to the player:
 //
 //   LEAN    a slow whole-plant tilt on a dual-sine (half the frequency of the
-//           canopy wind in foliage.ts — a trunk moves slower than its leaves),
+//           canopy wind in foliage.ts, a trunk moves slower than its leaves),
 //           weighted quadratically up the plant's own height so roots stay
 //           planted and the crown carries the motion.
 //   SHIMMER a faster, small, FIXED-WORLD-SIZE flutter for leaf materials only,
@@ -13,15 +13,14 @@
 // Amplitude eases in as the player approaches and is exactly zero otherwise,
 // so the far field costs nothing visually and the effect reads as "the air is
 // alive right here". Applied to BOTH render paths: placed tree/bush/palm GLBs
-// (placed_assets.ts — the animation ships built into the asset, wherever it is
+// (placed_assets.ts, the animation ships built into the asset, wherever it is
 // placed) and the procedural pines/oaks (foliage.ts). Player gating happens
 // in-shader off the plant's WORLD base position, so globally shared materials
 // (the glTF template cache, the name-keyed foliage material cache, the
 // Palmreach strand's instanced palms) all ride one program and simply rest
 // when nobody is close.
 //
-// COST: no per-frame JS, no extra draw calls, no extra materials or programs —
-// one vec2 uniform written once per frame and a handful of ALU ops per vertex
+// COST: no per-frame JS, no extra draw calls, no extra materials or programs, // one vec2 uniform written once per frame and a handful of ALU ops per vertex
 // on programs that were being compiled anyway. Shadow/depth passes and
 // impostors deliberately do not sway (existing canopy-wind precedent), so the
 // shadow map never redraws because a leaf moved.
@@ -78,7 +77,7 @@ export function treeSwayWaveGlsl(): string {
  * `worldScaleExpr` is a GLSL float expression giving the object's world Y
  * scale. Shimmer is a fixed physical size (a leaf flutters a couple of inches
  * whether it hangs on a sapling or a great oak), so it is authored in yards
- * and divided back into local units here — unlike the lean, which is a
+ * and divided back into local units here, unlike the lean, which is a
  * fraction of the plant's own height and therefore scale-free.
  */
 export function treeSwayLeafGlsl(strength: number, worldScaleExpr: string): string {
@@ -153,7 +152,7 @@ const TREE_ASSET = /tree|palm|oak|pine|twisted|birch|willow|cedar|spruce|cypress
  *
  * Path-keyed rather than a fixed list so imported and maker-authored models
  * get the effect too: an asset named `my_big_tree.glb` sways without anyone
- * editing this file. `foliage/dead_*` counts as a tree — a bare dead trunk
+ * editing this file. `foliage/dead_*` counts as a tree, a bare dead trunk
  * still leans in wind, and with no leaf materials it gets no shimmer anyway.
  */
 export function swayKindForAssetPath(path: string): SwayKind | null {
@@ -162,13 +161,13 @@ export function swayKindForAssetPath(path: string): SwayKind | null {
 }
 
 /**
- * How this asset would move in wind IGNORING the maker's opt-out — the shape
+ * How this asset would move in wind IGNORING the maker's opt-out, the shape
  * of the thing, not its current setting.
  *
  * This is the question the editor's sway checkbox asks. Asking the gated
  * function above instead is the bug that shipped first: turning sway off made
  * it answer null, the inspector read that as "this asset is rigid", and the
- * checkbox vanished — so it could never be turned back on.
+ * checkbox vanished, so it could never be turned back on.
  */
 export function naturalSwayKindForAssetPath(path: string): SwayKind | null {
   if (RIGID_ASSET.test(path)) return null;
@@ -185,7 +184,7 @@ export function naturalSwayKindForAssetPath(path: string): SwayKind | null {
  * NAME. The shipped foliage kit names its materials `Leaves*` / `Bark*` /
  * `Flowers` / `Rocks` (the same names foliage.ts's MAT_POLICY keys off), so a
  * placed oak's trunk stays stiff while its canopy flutters, exactly as the
- * procedural path does. Unknown names — imported models, the village kit — get
+ * procedural path does. Unknown names, imported models, the village kit, get
  * a middling value: enough life to read, not enough to look liquid if the
  * material turns out to be a trunk.
  */

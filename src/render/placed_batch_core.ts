@@ -3,7 +3,7 @@
 // into [0, count). Pure: no three, no DOM, deterministic, Vitest-importable.
 //
 // Why this exists. The shipped game draws its own authored art instanced (one
-// InstancedMesh per (asset, sub-mesh) pair — see render/battleground_placements
+// InstancedMesh per (asset, sub-mesh) pair, see render/battleground_placements
 // and render/dungeon), but an editor map arrives as WorldContent.placements and
 // render/placed_assets cloned a whole GLB subtree per placement: N copies of one
 // crate cost N scene nodes and N draw calls, in the editor AND in the real game
@@ -14,7 +14,7 @@
 // The slot table's contract is what makes LOD and selection cheap: freeing a
 // slot swaps the LAST live instance into the hole and lowers the count, so the
 // backing instanceMatrix stays dense and `mesh.count` alone controls what draws.
-// The caller must rewrite the moved instance's matrix — `free` reports it.
+// The caller must rewrite the moved instance's matrix, `free` reports it.
 
 import type { PlacedAsset } from '../sim/types';
 
@@ -27,7 +27,7 @@ import type { PlacedAsset } from '../sim/types';
  * Authored FIRE is deliberately NOT disqualifying. The flame meshes, embers and
  * light live in their own group next to the model (placed_assets applyFireFx),
  * seated from the placement record rather than from the model's geometry, so a
- * bonfire instances its log pile and animates its flame all the same — and
+ * bonfire instances its log pile and animates its flame all the same, and
  * bonfires were by far the biggest remaining clone population on a real map.
  *
  * Skinned rigs and the procedural models (grass patches, waterfalls, generated

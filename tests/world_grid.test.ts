@@ -72,8 +72,8 @@ describe('the continent derives the right border set', () => {
     //
     // 12 h / 16 v -> 13 / 18 (2026-08): Goldcrest Harbor moved off the west
     // starter square (the Proving Shore claimed that rect) to the strip's new
-    // northern band, z 1960..2420. That is one new h-line — its south edge on
-    // the Frostveil — and two new v-edges, its flanks against the Amberfall
+    // northern band, z 1960..2420. That is one new h-line, its south edge on
+    // the Frostveil, and two new v-edges, its flanks against the Amberfall
     // and the Drakelands, which both run beside it for the whole band.
     expect(edges.filter((e) => e.kind === 'h').length).toBe(13);
     expect(edges.filter((e) => e.kind === 'v').length).toBe(18);

@@ -1,6 +1,6 @@
 // The interior surface a boolean carve leaves in the ground: an isosurface
 // mesh of the carve field, clipped to below the terrain surface. This is what
-// turns the Carve tool's solids into rooms — floor, walls, ceiling — instead
+// turns the Carve tool's solids into rooms, floor, walls, ceiling, instead
 // of a rim skirt over a void.
 //
 // Marching TETRAHEDRA over a uniform grid (six tets per cell), not marching
@@ -206,7 +206,7 @@ export function buildCavityMesh(input: CavityMeshInput): CavityMeshArrays | null
   // that fall outside this grid are sampled live from the field (a one-cell
   // halo): the old one-sided fallback at the borders gave two adjacent TILES
   // different normals along their shared face, which lit as a hairline seam
-  // grid across every large carve — worst on high-contrast interiors (lava).
+  // grid across every large carve, worst on high-contrast interiors (lava).
   // The vertex normal is MINUS the gradient: the viewer stands in the cavity,
   // where the field decreases.
   const sampleAt = (i: number, j: number, k: number): number => {
@@ -343,7 +343,7 @@ export function buildCavityMesh(input: CavityMeshInput): CavityMeshArrays | null
   // Clip against the terrain surface: keep the underground part. The signed
   // clip value s = surface - y is sampled bilinearly from the height grid and
   // lerped along split edges, which lands within a fraction of a cell of the
-  // true contour — under the rim skirt's lip by construction.
+  // true contour, under the rim skirt's lip by construction.
   const clipS = (vi: number): number => {
     const px = positions[vi * 3];
     const py = positions[vi * 3 + 1];

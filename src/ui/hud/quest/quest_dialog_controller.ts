@@ -593,7 +593,7 @@ export class QuestDialogController {
     this.bindRoute('[data-deepglass]', this.deps.travelToDeepglass);
     // Not bindRoute: that binds ONE element (querySelector) and hands the
     // opener to a successor window. These are three sibling rows and none of
-    // them opens a window — the bout starts in the world behind the dialog — so
+    // them opens a window, the bout starts in the world behind the dialog, so
     // each binds itself and the dialog closes normally, returning focus.
     this.deps.element.querySelectorAll<HTMLElement>('[data-dg-bout]').forEach((item) => {
       item.addEventListener('click', () => {

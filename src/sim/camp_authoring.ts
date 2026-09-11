@@ -41,7 +41,7 @@ export function campStatModsAreStock(mods: CampStatMods | undefined): boolean {
  * multipliers, the per-camp respawn delay, and a deep copy of the patrol route
  * (never an alias of the shared map document). Every arm is gated on an
  * authored field being present, so a stock camp's mobs come out of this
- * untouched — the parity contract for the shipped world's spawns.
+ * untouched, the parity contract for the shipped world's spawns.
  *
  * Shared by the live Sim spawn loop and the editor's frozen camp preview so
  * what the maker sees in the viewport is what playtest spawns.

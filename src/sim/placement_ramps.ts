@@ -72,8 +72,7 @@ function rampsFor(content: WorldContent, seed: number): WorldRamp[] {
     // Collision OFF is a real choice: no blocker and no raised floor.
     //
     // Note what is NOT gated here: `collideCustom` (the 'basic' simple-footprint
-    // mode). It used to be, and that was the "I can't walk up my own ramp" bug —
-    // a stairs placement stamped with a simple circle/square before anyone
+    // mode). It used to be, and that was the "I can't walk up my own ramp" bug,     // a stairs placement stamped with a simple circle/square before anyone
     // authored a ramp for the asset kept its solid footprint and silently lost
     // its deck, so the ramp became an invisible block. An asset with authored
     // walkable decks IS walkable; colliders.ts drops the derived footprint to

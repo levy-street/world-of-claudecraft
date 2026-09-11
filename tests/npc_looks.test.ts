@@ -22,7 +22,7 @@ import { NPCS } from '../src/sim/data';
 import { isTideholdTemplate } from '../src/sim/deepglass/citadel';
 
 // FORK: NPCs whose look is composed at RUNTIME rather than authored in
-// NPC_LOOKS — main.ts's look provider consults these before npcLookFor
+// NPC_LOOKS, main.ts's look provider consults these before npcLookFor
 // (render/characters/npc_looks.ts, FORK DECLARATIONS): Baldemar's selves, the
 // Deepglass crowd and marshal, and every Tidehold resident.
 function forkRuntimeComposed(id: string): boolean {
@@ -39,7 +39,7 @@ function forkRuntimeComposed(id: string): boolean {
 // for an upstream NPC.
 const FORK_FIXED_RIG_NPCS = new Set([
   // the Scorching Wastes ('scout_maren_wastes' composes via the scout_maren
-  // baseId alias now — the same person recurs there)
+  // baseId alias now, the same person recurs there)
   'caravan_master_saffa',
   'loremaster_caddis_wastes',
   'old_haruk',

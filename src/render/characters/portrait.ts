@@ -562,7 +562,7 @@ function renderPortraitFrame(
  *
  * The deepglass crowd atlas bakes dozens of one-off fans; a PNG data-URL per
  * fan (the capture path above) would cost an encode, a decode and an Image
- * round-trip each, and none of them are ever shown twice — so this path draws
+ * round-trip each, and none of them are ever shown twice, so this path draws
  * the rig's canvas directly and caches nothing. `yaw` turns the mount so one
  * look can serve several cells without reading as clones. Returns false until
  * the character assets are preloaded; callers retry on a later frame.
@@ -584,7 +584,7 @@ export function drawModularPortraitInto(
   try {
     const rig = ensureRig();
     visual = new CharacterVisual(visualKey, 0xffffff, 0, null, null, null, look);
-    // A spectator holds a pie, not a sword — and framing measures the mounted
+    // A spectator holds a pie, not a sword, and framing measures the mounted
     // object's bounds, so a blade hanging past the feet also shrinks the whole
     // figure and drags the crop off-centre. Hide every attached held prop
     // (they are tagged at attach time) BEFORE the frame is measured.

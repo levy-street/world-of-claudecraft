@@ -2,8 +2,7 @@
 //
 // The HUD's canvases shipped with their backing store equal to their CSS box
 // (a 162px minimap, a 560px map window), which means every one of them was
-// composited through a 2x upscale on a retina or fractionally-scaled display —
-// a blur applied to the terrain image, the marker dots, the facing arrow and
+// composited through a 2x upscale on a retina or fractionally-scaled display, // a blur applied to the terrain image, the marker dots, the facing arrow and
 // the disc edge alike, on top of whatever softness the source image already
 // had. These two helpers give a canvas a real device-pixel backing store; which
 // one to use depends on whether the painter's coordinates are hard-coded (the
@@ -25,7 +24,7 @@ export function canvasDpr(): number {
  * write their fonts, dot radii and line widths as fixed pixel constants, so a
  * raw backing-store bump would leave every label and marker at half its
  * apparent size against a map that had grown. It also means the painters need
- * no changes at all — and the delve / maze / abyss painters that share the
+ * no changes at all, and the delve / maze / abyss painters that share the
  * minimap's context inherit it, since the transform persists on the context.
  *
  * `pinCssSize` writes the CSS box inline as well, for a canvas whose display

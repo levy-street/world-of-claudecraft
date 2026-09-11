@@ -186,7 +186,7 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
   //
   // A BOSS fought in the bell outranks the match cue: a sport's music is wrong
   // under one. There is no encounter down there yet, so the rule is
-  // deliberately general rather than keyed to a mob id — the day a boss is
+  // deliberately general rather than keyed to a mob id, the day a boss is
   // placed in the arena it scores itself with no further wiring.
   const inDeepglass = input.deepglass?.inArena === true;
   const dgPhase = input.deepglass?.phase ?? null;

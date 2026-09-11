@@ -128,7 +128,6 @@ describe('remastered soundtrack catalog', () => {
       'town_eastbrook',
       'town_fenbridge',
       'town_highwatch',
-      'town_goldcrest',
       'vale',
       'vale_legacy',
       'marsh',
@@ -164,13 +163,9 @@ describe('remastered soundtrack catalog', () => {
     expect(Object.keys(ZONE_STREAM_URLS).sort()).toEqual([...zones].sort());
   });
 
-  // Goldcrest Harbor is the one zone shipping a pair of cues; every other zone
-  // resolves to the single stream so the common path stays untouched.
-  it('resolves the capital to both harbor remasters and everyone else to one', () => {
-    expect(zoneStreamUrls('town_goldcrest')).toEqual([
-      '/audio/music/town_goldcrest_1.mp3?v=0cf44456d0f5',
-      '/audio/music/town_goldcrest_2.mp3?v=c616612609d6',
-    ]);
+  // Every zone currently resolves to its single stream (no zone ships a pool
+  // right now); zoneStreamUrls falls back to ZONE_STREAM_URLS in that case.
+  it('resolves an unpooled zone to its single stream', () => {
     expect(zoneStreamUrls('town_highwatch')).toEqual([
       '/audio/music/town_highwatch.mp3?v=8daa06e91073',
     ]);
@@ -188,14 +183,6 @@ describe('remastered soundtrack catalog', () => {
         expect(requestedHash, `stale cache-bust hash for pooled ${url}`).toBe(assetHash(url));
       }
     }
-  });
-
-  // The one-url-per-zone map is still read directly (ensureZoneStream's
-  // fallback, tooling); a pooled zone must resolve there too, not to undefined.
-  it('keeps a pooled zone resolvable through the single-url map', () => {
-    expect(ZONE_STREAM_URLS.town_goldcrest).toBe(
-      '/audio/music/town_goldcrest_1.mp3?v=0cf44456d0f5',
-    );
   });
 });
 

@@ -36,7 +36,7 @@ import { shoreDepthAt, shoreDepthAttribute, shoreSlopeAt } from './water_core';
  * content-dependent term the mesher reaches through world.ts then silently
  * reverts: the height stamps an author sculpted (applyEditLayer), the zone
  * biome, the roads, the water level, the biome paint. On a custom map that
- * renders the UNEDITED world under correctly-placed props — a flat sea floor
+ * renders the UNEDITED world under correctly-placed props, a flat sea floor
  * with a town floating over it (the Goldcrest report). The pool sends this
  * before the first job and again whenever the content generation moves.
  */

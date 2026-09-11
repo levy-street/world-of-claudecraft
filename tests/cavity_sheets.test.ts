@@ -15,7 +15,7 @@ import {
 } from '../src/sim/world';
 
 // The Carve tool's cavities: boolean solids whose underground interior is a
-// real room — walkable floor, rock walls, a ceiling the jump arc respects.
+// real room, walkable floor, rock walls, a ceiling the jump arc respects.
 // Legacy (non-carve) holes stay pure sheet cutouts, pinned here too.
 
 const SEED = 20061;

@@ -2,7 +2,7 @@
 // team's colour bursts out of the net in ripples that wash the whole building.
 //
 // WHY THIS IS NOT IN deepglass.ts. Everything that module builds lives in the
-// main scene, which means the grade/tone chain runs over it — and this effect
+// main scene, which means the grade/tone chain runs over it, and this effect
 // desaturates that chain's own output. A colour wave drawn inside the scene
 // would be drained by the very pass that drains everything else, and come out
 // grey. So the celebration is drawn LAST, straight onto the canvas after
@@ -18,7 +18,7 @@
 // the shells are real spheres centred on the net that conceded, so they grow
 // through the bell, over the pylons and out past the parapet with correct
 // perspective, and the frame floods with team colour at the moment a front
-// actually reaches the camera. They draw with depthTest off — after post the
+// actually reaches the camera. They draw with depthTest off, after post the
 // canvas depth buffer no longer describes the scene (on composer tiers it
 // holds a fullscreen quad, not the world), and a wave that washes the whole
 // arena wants to pass over the architecture anyway.
@@ -166,7 +166,7 @@ function shellMaterial(): THREE.ShaderMaterial {
         // (tests/shader_pow_domain.test.ts carries the whole incident).
         band = pow(clamp(band, 0.0, 1.0), 3.5);
         // Grazing angles brighten, so the front has a hot rim wherever the
-        // sphere turns away — the same trick the bell's glass uses. This is
+        // sphere turns away, the same trick the bell's glass uses. This is
         // precisely the base that bites: two in-shader normalized vectors can
         // dot to 1.0 + 1ulp head-on, which lands 1.0 - abs(dot) at about -1e-7.
         float fres = pow(1.0 - clamp(abs(dot(n, normalize(vV))), 0.0, 1.0), 2.0);
@@ -176,8 +176,8 @@ function shellMaterial(): THREE.ShaderMaterial {
         // the moment the floor came down far enough to leave ripples the
         // whole wave went pastel (it read on the low tier only because that
         // tier's frame is darker). Adding light to a dimmed frame instead
-        // gives both at once — blazing colour on the bands, the drained grey
-        // untouched between them — and it is the truer idea anyway: the
+        // gives both at once, blazing colour on the bands, the drained grey
+        // untouched between them, and it is the truer idea anyway: the
         // building is being LIT in the scoring side's colour.
         float a = uFade * clamp(0.10 + 0.85 * band + 0.35 * fres, 0.0, 1.0);
         vec3 c = uTint * (0.90 + 0.70 * band + 0.50 * fres);
@@ -248,7 +248,7 @@ export class DeepglassGoalWave {
       const scorer = match.lastGoalBy;
       // 'A' scores in the EAST ring, which team B defends; ringCentreFor takes
       // the side that DEFENDS the ring, so the wave leaves the net that
-      // conceded — where everyone in the building is already looking.
+      // conceded, where everyone in the building is already looking.
       const conceded = ringCentreFor(scorer === 'A' ? 'B' : 'A');
       this.origin.set(conceded.x, conceded.y, conceded.z);
       const axis = Math.sign(conceded.x) || 1;
@@ -275,7 +275,7 @@ export class DeepglassGoalWave {
   /**
    * Draw over the finished frame. Call AFTER the composer (or the direct
    * render) has written the canvas, with the same camera the frame was drawn
-   * with — the shells are world-space and re-project every frame.
+   * with, the shells are world-space and re-project every frame.
    */
   draw(webgl: THREE.WebGLRenderer, camera: THREE.Camera): void {
     if (this.disposed) return;

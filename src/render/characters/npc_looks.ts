@@ -2186,7 +2186,7 @@ export function npcModularKeyFor(templateId: string): string {
 }
 
 // ===========================================================================
-// FORK DECLARATIONS — the Deepglass and Tidehold. Looks composed at runtime
+// FORK DECLARATIONS, the Deepglass and Tidehold. Looks composed at runtime
 // (seeded rolls for the crowd and the Warden City's forty residents, two
 // authored faces for Baldemar and the marshal) rather than authored rows in
 // NPC_LOOKS above; main.ts's look provider consults these before npcLookFor.
@@ -2381,7 +2381,7 @@ export function deepglassCrowdLook(templateId: string): ModularLook {
 // walk up the wards passes forty DIFFERENT people rather than forty copies of
 // the stock townsperson rig. The roll is seeded from the template id (no
 // Math.random anywhere), and the ROLE picks the kit and palette so the watch
-// reads as the watch and the Row reads as the Row — a market of citizens in
+// reads as the watch and the Row reads as the Row, a market of citizens in
 // full plate would say the wrong thing about a city at peace.
 
 /** What each role wears. The colourways lean tide-glass: azure and teal for
@@ -2414,8 +2414,7 @@ export function tideholdLook(templateId: string, role: string): ModularLook {
   app.outfit = spec.ways[Math.floor(rand() * spec.ways.length)];
   const kit = spec.kits[Math.floor(rand() * spec.kits.length)];
   const worn = fullSet(kit);
-  // Helms ON for the watch — a guard reads as a guard from across a ward —
-  // and OFF for everyone else, so the randomiser's hair is what a player
+  // Helms ON for the watch, a guard reads as a guard from across a ward,   // and OFF for everyone else, so the randomiser's hair is what a player
   // actually sees on the people they talk to.
   const helmed = role === 'watch' || role === 'captain';
   const look: ModularLook = { app, worn: helmed ? worn : { ...worn, head: null } };

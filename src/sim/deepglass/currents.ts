@@ -1,7 +1,7 @@
 // Deepglass currents: three toroidal bands that push the ball and the players.
 //
-// DETERMINISTIC BY CONSTRUCTION. The match clock is the only input — no rng, no
-// wall clock — so the offline Sim, the online server and a replay all compute
+// DETERMINISTIC BY CONSTRUCTION. The match clock is the only input, no rng, no
+// wall clock, so the offline Sim, the online server and a replay all compute
 // byte-identical currents. This is the same discipline the Vale Cup ball keeps
 // (zero shared-rng draws on the tick path).
 //

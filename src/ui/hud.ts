@@ -763,6 +763,7 @@ import {
   type PlayerTooltipModel,
   playerTooltipHtml,
 } from './player_tooltip_view';
+import { PlotSignPopup } from './plot_sign_popup';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import {
   type PreviewPrewarmHandle,
@@ -795,7 +796,6 @@ import { raidCalloutKey } from './raid_callout';
 import { formatLockoutDuration } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
-import { PlotSignPopup } from './plot_sign_popup';
 import {
   reliquaryIlluminationBroadcastLine,
   reliquaryIlluminationBroadcastRendered,
@@ -8943,8 +8943,7 @@ export class Hud {
         inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
         entities: sim.entities.values(),
         riftFloor: sim.riftFloor,
-        // The bell is a whole world, so presence there is the arming signal —
-        // there is no Sowfield-style footprint to stand in.
+        // The bell is a whole world, so presence there is the arming signal,         // there is no Sowfield-style footprint to stand in.
         deepglass:
           getActiveWorldContent().presentationMode === 'deepglass'
             ? { inArena: true, phase: deepglassMatch()?.phase ?? null }
@@ -12379,7 +12378,8 @@ export class Hud {
           break;
         case 'plotSign':
           this.plotSignPopup.show(ev.plot);
-          if (ev.plot.ownedByYou) this.log(t('hudChrome.plotSign.boughtLog', { name: ev.plot.name }), HUD_LOG.NEWS);
+          if (ev.plot.ownedByYou)
+            this.log(t('hudChrome.plotSign.boughtLog', { name: ev.plot.name }), HUD_LOG.NEWS);
           break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their
@@ -14165,8 +14165,7 @@ export class Hud {
   }
 
   // Prepend a dim bracketed wall-clock prefix to a chat line when the "Show
-  // Timestamps" option is on. No-op otherwise. Wall-clock time is fine here —
-  // the determinism ban is sim-only.
+  // Timestamps" option is on. No-op otherwise. Wall-clock time is fine here,   // the determinism ban is sim-only.
   private prependTimestamp(div: HTMLElement): void {
     if (!this.chatTimestamps) return;
     const ts = document.createElement('span');

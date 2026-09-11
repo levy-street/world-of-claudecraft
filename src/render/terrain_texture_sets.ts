@@ -147,16 +147,76 @@ export const TERRAIN_TEXTURE_SETS: readonly TerrainTextureSet[] = [
   // converted like the Yoge sets: 1024 JPEG q85, GL normals). Not paint
   // swatches: they exist for built models (stairs, walls, props) through the
   // material picker, with hue / saturation / light adjustable per object.
-  { key: 'Bricks076C', name: 'Mossy Brick', color: 0x53503c, maps: ALL4, material: { group: 'brick' } },
-  { key: 'Concrete034', name: 'Cast Concrete', color: 0xb9b9b9, maps: CNR, material: { group: 'stone' } },
-  { key: 'Marble012', name: 'Veined Marble', color: 0xadaeb6, maps: CNR, material: { group: 'stone' } },
-  { key: 'PavingStones131', name: 'Mossy Setts', color: 0x9f9b7a, maps: ALL4, material: { group: 'paving' } },
-  { key: 'Plaster001', name: 'Lime Plaster', color: 0xd7d3d0, maps: CNR, material: { group: 'plaster' } },
-  { key: 'Metal032', name: 'Brushed Steel', color: 0x7d8994, maps: CNR, material: { group: 'metal', metalness: 0.9 } },
-  { key: 'Metal034', name: 'Painted Steel', color: 0xe4b108, maps: CNR, material: { group: 'metal', metalness: 0.35 } },
-  { key: 'Rust004', name: 'Rusted Iron', color: 0x482210, maps: CNR, material: { group: 'metal', metalness: 0.55 } },
-  { key: 'Fabric030', name: 'Grey Weave', color: 0x5c5b5c, maps: ALL4, material: { group: 'cloth' } },
-  { key: 'Leather037', name: 'Oxblood Leather', color: 0x633828, maps: CNR, material: { group: 'cloth' } },
+  {
+    key: 'Bricks076C',
+    name: 'Mossy Brick',
+    color: 0x53503c,
+    maps: ALL4,
+    material: { group: 'brick' },
+  },
+  {
+    key: 'Concrete034',
+    name: 'Cast Concrete',
+    color: 0xb9b9b9,
+    maps: CNR,
+    material: { group: 'stone' },
+  },
+  {
+    key: 'Marble012',
+    name: 'Veined Marble',
+    color: 0xadaeb6,
+    maps: CNR,
+    material: { group: 'stone' },
+  },
+  {
+    key: 'PavingStones131',
+    name: 'Mossy Setts',
+    color: 0x9f9b7a,
+    maps: ALL4,
+    material: { group: 'paving' },
+  },
+  {
+    key: 'Plaster001',
+    name: 'Lime Plaster',
+    color: 0xd7d3d0,
+    maps: CNR,
+    material: { group: 'plaster' },
+  },
+  {
+    key: 'Metal032',
+    name: 'Brushed Steel',
+    color: 0x7d8994,
+    maps: CNR,
+    material: { group: 'metal', metalness: 0.9 },
+  },
+  {
+    key: 'Metal034',
+    name: 'Painted Steel',
+    color: 0xe4b108,
+    maps: CNR,
+    material: { group: 'metal', metalness: 0.35 },
+  },
+  {
+    key: 'Rust004',
+    name: 'Rusted Iron',
+    color: 0x482210,
+    maps: CNR,
+    material: { group: 'metal', metalness: 0.55 },
+  },
+  {
+    key: 'Fabric030',
+    name: 'Grey Weave',
+    color: 0x5c5b5c,
+    maps: ALL4,
+    material: { group: 'cloth' },
+  },
+  {
+    key: 'Leather037',
+    name: 'Oxblood Leather',
+    color: 0x633828,
+    maps: CNR,
+    material: { group: 'cloth' },
+  },
 ];
 
 const BY_KEY = new Map(TERRAIN_TEXTURE_SETS.map((s) => [s.key, s]));

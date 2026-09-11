@@ -2385,8 +2385,7 @@ export interface PreparedVisual {
    *  character's own body (vs. a baked-in weapon), the same distinction
    *  applyMaterials uses to gate the skin/emissive override */
   idleSrcIsBody: boolean[];
-  /** click-capsule radius in world units (from measured XZ body extents —
-   *  long/wide creatures like wolves need far more than a humanoid sliver) */
+  /** click-capsule radius in world units (from measured XZ body extents,    *  long/wide creatures like wolves need far more than a humanoid sliver) */
   clickRadius: number;
 }
 

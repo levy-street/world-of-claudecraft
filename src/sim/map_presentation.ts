@@ -24,7 +24,7 @@ export function usesProceduralOverworldFoliage(mode: MapPresentationMode | undef
  * Gathering veins and camp braziers are SITE dressing: fixed overworld
  * coordinates baked into the shipped content tables, not scenery derived from
  * the live map. An authored map therefore inherits whatever ore, timber and
- * campfires the built-in world happens to put in the same coordinates — inside
+ * campfires the built-in world happens to put in the same coordinates, inside
  * the building, if the building sits near the origin.
  *
  * minimap_markers.ts already refused to draw those veins on an authored map's

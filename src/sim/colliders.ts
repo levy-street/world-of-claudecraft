@@ -66,6 +66,7 @@ import { invalidatePlacementRamps } from './placement_ramps';
 // their './colliders' path.
 export { MAX_BODY_RADIUS } from './collider_cells';
 
+import { isAuthoredTownBuildingDef } from './authored_town_buildings';
 import {
   DAWNHOLD_PARAPET_HALF,
   DAWNHOLD_WALL_LEDGES,
@@ -91,7 +92,6 @@ import {
   layoutColliders,
 } from './dungeon_layout';
 import { emberLilySpots } from './ember_lilies';
-import { isAuthoredTownBuildingDef } from './authored_town_buildings';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
@@ -166,7 +166,7 @@ export interface CircleCollider {
   cameraTopY?: number;
   /**
    * Absolute world-space BASE (the ground the obstacle stands on). A mover
-   * whose head is below it passes underneath — cave tubes run under surface
+   * whose head is below it passes underneath, cave tubes run under surface
    * props, and an authored upper storey does not wall the floor below it.
    * Absent = height-agnostic (blocker walls, interior wall sets): blocks at
    * every depth, which is every collider the shipped world builds.
@@ -211,7 +211,7 @@ export interface CircleCollider {
   /**
    * Dev attribution: which source emitted this collider (a placement's model
    * path plus its lane, e.g. "/models/props/inn.glb#prism"). Never read by
-   * gameplay — the playtest Dev panel surfaces it so an invisible wall can
+   * gameplay, the playtest Dev panel surfaces it so an invisible wall can
    * name itself. Absent = a built-in record collider.
    */
   src?: string;
@@ -254,7 +254,7 @@ export interface ObbCollider {
  * A convex banded prism: the shape a Collision Master volume collides as.
  *
  * An OBB is a 4-gon prism, so this loses nothing and gains the sections a
- * rectangle could only approximate — hexagonal rocks, round towers, angled
+ * rectangle could only approximate, hexagonal rocks, round towers, angled
  * walls. It exists because the maker's authored volumes ARE the contract:
  * fitting rectangles to them put a large share of the collider outside the
  * drawn shape, which in game is an invisible wall short of the thing modelled.
@@ -269,7 +269,7 @@ export interface PrismCollider {
   /** Convex outline, counter-clockwise, in world yards RELATIVE to (x, z):
    *  flat u,v pairs. Relative so the anchor alone drives broad-phase bounds. */
   poly: readonly number[];
-  /** Bounding radius of `poly` about (x, z) — the O(1) narrow-phase reject, so
+  /** Bounding radius of `poly` about (x, z), the O(1) narrow-phase reject, so
    *  a prism costs less than an OBB for every mover that is not touching it. */
   br: number;
   /**
@@ -445,7 +445,7 @@ function passesOver(c: Collider, mover: MoverHeight | undefined, x: number, z: n
 }
 
 // Pass-under gate: a mover this tall (head height) fits beneath a collider
-// whose base is at least the margin above the head — cave tubes run under
+// whose base is at least the margin above the head, cave tubes run under
 // surface props/trees/fences without hitting their 2D footprints, and an
 // authored second storey does not wall the floor below. Colliders with no
 // baseY (everything the shipped world builds) block at every depth.
@@ -677,7 +677,7 @@ function emitPlacementPrisms(
 
 /**
  * Only a box that can actually be mounted is a support surface. A TALL sliver
- * (a wall panel, a fence picket) still BLOCKS — blocksAt reads moveTopY — but
+ * (a wall panel, a fence picket) still BLOCKS, blocksAt reads moveTopY, but
  * it leaves the standable set: supportFromCandidates and floorHeightAt walk
  * every standable candidate per query, and on a dressed map many baked boxes
  * are exactly this kind of never-stood-on shape. A LOW box stays standable
@@ -750,7 +750,7 @@ function emitPlacementBoxes(
   }
   // Tilted (the gizmo's X/Z rings): each box's 8 corners go through the model's
   // FULL rotation, then a yaw-OBB is fitted over their XZ shadow with the
-  // corners' Y span as the band — the closest shape this engine's yaw-banded
+  // corners' Y span as the band, the closest shape this engine's yaw-banded
   // colliders can represent.
   const m = eulerMatrix(tiltX, p.rotY, tiltZ);
   for (const b of baked) {
@@ -865,7 +865,7 @@ function staticWorldColliders(seed: number): Collider[] {
   // Render hideables still block movement while their render subsystem fades
   // whichever one crosses the eye-to-camera segment to 20% opacity.
   // A document that owns the authored towns' buildings as placements carries
-  // their (baked) collision itself — without this gate a moved town hall
+  // their (baked) collision itself, without this gate a moved town hall
   // leaves an invisible record collider standing on the square.
   const townBuildingsPromoted = content.promotedScenery?.authoredTowns === true;
   for (const b of PROPS.buildings) {
@@ -922,7 +922,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: b.d / 2,
       rot: b.rot,
       cameraTopY,
-      // FORK: ground anchor for pass-under — a mover deep in a tube or carve
+      // FORK: ground anchor for pass-under, a mover deep in a tube or carve
       // walks beneath surface props instead of hitting invisible walls.
       underY: topY(seed, b.x, b.z, 0),
     });
@@ -952,7 +952,7 @@ function staticWorldColliders(seed: number): Collider[] {
   //
   // Overworld-only, like the art. These circles sit on fixed world
   // coordinates, so an authored map inherited three invisible walls wherever
-  // those numbers landed on it — the exact failure invisible decoration
+  // those numbers landed on it, the exact failure invisible decoration
   // colliders have hit before, and it outlives hiding the mesh.
   for (const portal of usesOverworldSiteDressing(content.presentationMode) ? PORTALS : []) {
     for (const side of [portal.a, portal.b]) {
@@ -1060,7 +1060,7 @@ function staticWorldColliders(seed: number): Collider[] {
   // The Palmreach strand: a slim trunk collider at the base of every beach
   // palm, from the same deterministic list the renderer instances the models
   // from (world.ts). A document that owns a stand as placements carries its
-  // trunks itself — without the gate a moved palm leaves an invisible
+  // trunks itself, without the gate a moved palm leaves an invisible
   // blocker standing where the world had planted it.
   if (content.promotedScenery?.reachPalms !== true)
     for (const p of reachPalmSpots(seed))
@@ -1737,7 +1737,7 @@ function staticWorldColliders(seed: number): Collider[] {
   for (const p of content.placements ?? []) {
     // The opt-in gate, and it must stay FIRST. custom_map.ts only writes
     // collideRadius when the placement's collision mode is not 'none', so an
-    // absent radius IS the maker's "this one is decoration" — and every shape
+    // absent radius IS the maker's "this one is decoration", and every shape
     // below (baked boxes especially) would otherwise hand it collision anyway,
     // silently breaking the editor's collide toggle and decorationsMode.
     if (!p.collideRadius || p.collideRadius <= 0) continue;
@@ -1749,7 +1749,7 @@ function staticWorldColliders(seed: number): Collider[] {
       for (let i = srcMark; i < out.length; i++) out[i].src = src;
     };
     // Detached placements anchor at their frozen ground (they can sit INSIDE a
-    // cave); grounded ones stand on the TERRAIN — the same seat the renderer
+    // cave); grounded ones stand on the TERRAIN, the same seat the renderer
     // (placed_assets.ts) and the asset's own ramp decks (placement_ramps.ts)
     // use. Not groundHeight: that already includes this placement's own floor
     // deck, so a building with a walkable ground floor had every box lifted by
@@ -1778,9 +1778,9 @@ function staticWorldColliders(seed: number): Collider[] {
     // Collision Master VOLUMES come first, ahead of every derived shape: the
     // maker modelled them and the editor draws them as the collision outline,
     // so they ARE the contract. This takes exactly the placements the baked-box
-    // branch below would have taken (`derived`) — hand-edited hitboxes, a
+    // branch below would have taken (`derived`), hand-edited hitboxes, a
     // hand-picked simple footprint and live session ramps still outrank the
-    // asset default — and swaps the rectangle FITTED to each band for the
+    // asset default, and swaps the rectangle FITTED to each band for the
     // band's real outline.
     const derived = !(
       (p.hitboxes && p.hitboxes.length > 0) ||
@@ -1812,7 +1812,7 @@ function staticWorldColliders(seed: number): Collider[] {
     //
     // BOTH deck sources count. `p.ramps` is a live Collision Master session
     // (pre-Lock-In); `authoredRampsForPath` is the SAVED override, and it has to
-    // be checked here too — a stairs placement stamped with a simple footprint
+    // be checked here too, a stairs placement stamped with a simple footprint
     // before its ramp was authored reaches this line with `baked` null and used
     // to pick up a solid circle ("I can't walk up my own ramp, I get stuck").
     // Hand-edited `hitboxes` are deliberate blockers (a railing) and returned
@@ -2249,8 +2249,7 @@ const builtinLampPlanBySeed = new Map<number, PlacedStreetlamp[]>();
  * The builtin world's streetlamp plan for `seed`, for the editor's promotion
  * of lamps into editable placements. Cached the first time the pristine
  * builtin world plans (its grid build, or this call while it is active); null
- * when it has never planned and the builtin world is not active to plan now —
- * callers skip the promotion then and retry on a later boot.
+ * when it has never planned and the builtin world is not active to plan now,  * callers skip the promotion then and retry on a later boot.
  */
 export function builtinStreetlampPlan(seed: number): readonly PlacedStreetlamp[] | null {
   const cached = builtinLampPlanBySeed.get(seed);

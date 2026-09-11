@@ -58,10 +58,22 @@ function trs(node) {
   const wy = qw * y2;
   const wz = qw * z2;
   return [
-    (1 - (yy + zz)) * sx, (xy + wz) * sx, (xz - wy) * sx, 0,
-    (xy - wz) * sy, (1 - (xx + zz)) * sy, (yz + wx) * sy, 0,
-    (xz + wy) * sz, (yz - wx) * sz, (1 - (xx + yy)) * sz, 0,
-    tx, ty, tz, 1,
+    (1 - (yy + zz)) * sx,
+    (xy + wz) * sx,
+    (xz - wy) * sx,
+    0,
+    (xy - wz) * sy,
+    (1 - (xx + zz)) * sy,
+    (yz + wx) * sy,
+    0,
+    (xz + wy) * sz,
+    (yz - wx) * sz,
+    (1 - (xx + yy)) * sz,
+    0,
+    tx,
+    ty,
+    tz,
+    1,
   ];
 }
 

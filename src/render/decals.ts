@@ -1,5 +1,5 @@
 // Authored ground decals: images draped over the terrain (pentagrams, blast
-// scorch, blood pools, tracks). Render-only — a decal never collides, blocks,
+// scorch, blood pools, tracks). Render-only, a decal never collides, blocks,
 // or reaches the sim; it is paint that follows the ground.
 //
 // STREAMING is the whole design. A map may carry MAX_DECALS records, but only
@@ -9,12 +9,12 @@
 // stamps more than that into one spot. Range scales with footprint, so a
 // 60-yard summoning circle is visible from far off while boot prints appear
 // only when you are near enough to see them at all. Nothing about a decal is
-// touched — not its bytes, not its mesh — while it is out of range.
+// touched, not its bytes, not its mesh, while it is out of range.
 //
 // Conforming, not projecting: each decal is a small grid patch whose vertices
 // sample terrainHeight, lifted a hair and drawn with a polygon offset. That
 // costs nothing at rest, works on the low graphics tier, and needs no depth
-// prepass — at the price of a decal being cut off by a cliff it spans, which
+// prepass, at the price of a decal being cut off by a cliff it spans, which
 // is what a stamped-on-the-ground decal should do anyway.
 
 import * as THREE from 'three';
@@ -239,7 +239,7 @@ export class Decals {
       const lx = pos.getX(i);
       const lz = pos.getZ(i);
       // THREE's Y rotation maps local (x, z) to (x·cos + z·sin, -x·sin + z·cos)
-      // — the opposite handedness to the textbook 2D rotation. Sampling with
+      //, the opposite handedness to the textbook 2D rotation. Sampling with
       // the wrong one puts a rotated decal's height profile on the wrong side
       // of the slope: flat ground looks fine, a hillside does not.
       const wx = d.x + lx * cos + lz * sin;
@@ -252,7 +252,7 @@ export class Decals {
 
     const material = new THREE.MeshLambertMaterial({
       // The art's own ALPHA channel is the coverage mask (map.a rides straight
-      // into diffuseColor.a), so no separate alphaMap is needed — and using one
+      // into diffuseColor.a), so no separate alphaMap is needed, and using one
       // would read the GREEN channel, not the alpha.
       color: d.color ?? 0xffffff,
       transparent: true,

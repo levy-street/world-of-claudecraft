@@ -1,5 +1,5 @@
 // The Deepglass art kit: the four authored GLBs that replace what were plain
-// primitives in deepglass.ts — the cradle pylons, the goal gates, the powerup
+// primitives in deepglass.ts, the cradle pylons, the goal gates, the powerup
 // stations and the boost vents.
 //
 // Everything here is DRESSING. Every position comes from the one layout module
@@ -12,6 +12,7 @@
 // entry.
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { getActiveWorldContent } from '../sim/data';
 import {
   DEEPGLASS_CENTER,
   DEEPGLASS_CRADLE_R,
@@ -19,13 +20,12 @@ import {
   DG_GOAL_HOUSING_OFFSET,
   DG_POWERUP_SITES,
 } from '../sim/deepglass/layout';
-import { getActiveWorldContent } from '../sim/data';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { prepareRuneModel, RUNE_MODEL_DEFS, type RuneModelDef } from './battleground_rune_model';
 
 // boost_vent.glb and powerup_station.glb are no longer loaded: the pads and the
 // prizes are battleground rune bodies now (see the pickups below). The GLBs stay
-// in the repo — they are still what the Studio asset browser offers for dressing
+// in the repo, they are still what the Studio asset browser offers for dressing
 // a map by hand.
 const MODEL_PYLON = '/models/deepglass/cradle_pylon.glb';
 const MODEL_GATE = '/models/deepglass/goal_gate.glb';
@@ -36,7 +36,7 @@ const GATE_EAST = 0x49d6ff;
 /**
  * How much of its authored size the goal SURROUND keeps.
  *
- * The gate model is a 19.5 yd arch around a scoring ring of 6 — so the
+ * The gate model is a 19.5 yd arch around a scoring ring of 6, so the
  * architecture was promising an opening three times wider than the one that
  * actually scores, and a shot that sailed through the arch and missed the ring
  * read as a bug rather than as a miss. Shrinking the surround pulls the promise
@@ -49,15 +49,15 @@ const GATE_EAST = 0x49d6ff;
  * keeps the ring hanging INSIDE a frame rather than clipping through it.
  */
 export const GATE_SURROUND_SCALE = 0.62;
-/** The vent housing's rune inlay reads as fuel — the same green as the pads. */
+/** The vent housing's rune inlay reads as fuel, the same green as the pads. */
 const VENT_TINT = 0x8effc8;
 const STATION_FREEZE = 0x8ee8ff;
 const STATION_OVERBURN = 0xff9de2;
 
 // Lighting response, measured against the live arena rather than guessed.
 //
-// The bell runs `scene.environmentIntensity` at ~0.2 — deliberately, the water
-// is meant to feel enclosed — and a near-pure metal under that has neither a
+// The bell runs `scene.environmentIntensity` at ~0.2, deliberately, the water
+// is meant to feel enclosed, and a near-pure metal under that has neither a
 // diffuse term (metals have none) nor anything to reflect, so the authored
 // brass rendered as a black silhouette. Pulling metalness down hands the brass
 // back to the directional + hemisphere lights that ARE bright here, and the
@@ -74,7 +74,7 @@ const KIT_ALBEDO_GAIN = 1.25;
 
 /** Sixteen buttresses, standing on the plaza inside the base ring. */
 const PYLON_COUNT = 16;
-/** Where the plaza's top face is — the pylons stand ON it, not on the ring. */
+/** Where the plaza's top face is, the pylons stand ON it, not on the ring. */
 const PYLON_BASE_Y = 0.4;
 /** Lean, in radians, of a buttress toward the bell's axis. Small on purpose:
  *  past ~0.1 the claw stops reading as gripping and starts reading as falling. */
@@ -119,11 +119,11 @@ function tuneForBell(m: THREE.MeshStandardMaterial): void {
  * Tame a metallic CHARACTER material so it is not a black hole in the bell.
  *
  * The same trap the kit's brass fell into, arriving from a different direction.
- * A metal has no diffuse term by definition — all it can do is reflect — and the
+ * A metal has no diffuse term by definition, all it can do is reflect, and the
  * arena deliberately runs `scene.environmentIntensity` at ~0.2 because the water
  * is meant to feel enclosed. Character armour authored at `metalness: 1` (the
  * paladin's and the knight's plate, among others) therefore has 20% of a dim IBL
- * and nothing else, and renders as a BLACK PATCH welded to the body — the
+ * and nothing else, and renders as a BLACK PATCH welded to the body, the
  * "black squares on players" that only show up on the tiers that have an
  * environment at all.
  *
@@ -132,8 +132,7 @@ function tuneForBell(m: THREE.MeshStandardMaterial): void {
  * on top for the sheen. Metals only: touching the cloth and skin materials would
  * relight every character in the arena for no reason.
  *
- * Mutates in place and remembers what it has done. The bell is its OWN WORLD —
- * you cannot walk from here to anywhere else — so there is no outside for a
+ * Mutates in place and remembers what it has done. The bell is its OWN WORLD,  * you cannot walk from here to anywhere else, so there is no outside for a
  * shared material to leak into, and cloning ten characters' worth of materials
  * to avoid a leak that cannot happen would cost more than it saves.
  */
@@ -198,8 +197,8 @@ function dress(o: THREE.Object3D): void {
  *
  * A Studio document of this venue places the cradle pylons and goal gates as
  * ordinary placements so a maker can move them (editor/shipped_deepglass.ts).
- * The document also keeps presentationMode 'deepglass' — the bell, water and
- * stadium hang off it — so this builder still runs there, and without the gate
+ * The document also keeps presentationMode 'deepglass', the bell, water and
+ * stadium hang off it, so this builder still runs there, and without the gate
  * it drew a second pylon ring exactly inside the placed one: move a pylon and
  * its ghost stays behind. The Goldcrest palms bug, one venue over.
  */
@@ -245,7 +244,7 @@ export function buildDeepglassKit(): DeepglassKit {
    *
    * prepareRuneModel does the hard part (scale to a target height, anchor on
    * the spin axis, clone geometry and material off the immutable loader cache,
-   * tint the emissive) — this adds the arena's own lighting response on top,
+   * tint the emissive), this adds the arena's own lighting response on top,
    * because a body authored for a bright field is as dark in here as everything
    * else was (see tuneCharacterMetalsForBell).
    */
@@ -393,8 +392,7 @@ export function buildDeepglassKit(): DeepglassKit {
 
   // --- the pickups: boots and prizes ----------------------------------------
   // Both families are the BATTLEGROUND rune bodies (render/battleground_rune_model.ts),
-  // re-tinted for the bell. They already solve the problem this arena has —
-  // "a floating object you fly through to collect" — and reusing them means one
+  // re-tinted for the bell. They already solve the problem this arena has,   // "a floating object you fly through to collect", and reusing them means one
   // visual language across the two events instead of two dialects. The old
   // authored vent cowls and gimballed stations are gone with the swap; what a
   // pickup does is spin, bob, and go dark when it has been taken.
@@ -462,7 +460,7 @@ export function buildDeepglassKit(): DeepglassKit {
       for (const p of pickups) {
         const cooling =
           (p.kind === 'pad' ? state.padCooldown[p.index] : state.powerupCooldown[p.index]) > 0;
-        // A taken pickup does not stop dead — it sags to a slow drift, which
+        // A taken pickup does not stop dead, it sags to a slow drift, which
         // reads as "coming back" rather than as "broken".
         const rate = cooling ? p.spin * 0.12 : p.spin;
         p.root.rotation.y = (p.root.rotation.y + dt * rate) % (Math.PI * 2);

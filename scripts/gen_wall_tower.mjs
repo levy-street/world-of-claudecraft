@@ -1,4 +1,4 @@
-// Generate public/models/city/wall_tower.glb — the City Build castle wall
+// Generate public/models/city/wall_tower.glb, the City Build castle wall
 // tower with a WALK-THROUGH arcade top. The upper level is an open colonnade
 // (six pillars under an overhanging hex roof) whose floor the wall's rampart
 // deck aligns to (city_build_core.ts WALL_TOWER_SRC mirrors these numbers, and
@@ -62,7 +62,13 @@ function hexPoint(r, y, k) {
 function hexPrism(b, r0, r1, y0, y1, { capTop = false, capBottom = false } = {}) {
   for (let k = 0; k < 6; k++) {
     const k2 = (k + 1) % 6;
-    pushQuad(b, hexPoint(r0, y0, k), hexPoint(r0, y0, k2), hexPoint(r1, y1, k2), hexPoint(r1, y1, k));
+    pushQuad(
+      b,
+      hexPoint(r0, y0, k),
+      hexPoint(r0, y0, k2),
+      hexPoint(r1, y1, k2),
+      hexPoint(r1, y1, k),
+    );
   }
   if (capTop) {
     const c = [0, y1, 0];

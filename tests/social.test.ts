@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { computeTalentModifiers, TALENTS } from '../src/sim/content/talents';
 import {
   ABILITIES,
   abilitiesKnownAt,
@@ -10,7 +11,6 @@ import {
   instanceOrigin,
   MOBS,
 } from '../src/sim/data';
-import { computeTalentModifiers, TALENTS } from '../src/sim/content/talents';
 import { createMob } from '../src/sim/entity';
 import { type Party, Sim } from '../src/sim/sim';
 import {
@@ -208,7 +208,7 @@ describe('nine classes', () => {
     // Judgement's spell hit is an RNG roll (capped at 99%), so a single cast can
     // miss on some world seeds and deal no damage. Re-seal and retry until it
     // lands, so this checks the mechanic (judgement hits and consumes the seal)
-    // rather than a lucky roll — robust to RNG-stream shifts from new content.
+    // rather than a lucky roll, robust to RNG-stream shifts from new content.
     let landed = false;
     for (let attempt = 0; attempt < 25 && !landed; attempt++) {
       if (!p.auras.some((a) => a.kind === 'imbue')) {

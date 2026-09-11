@@ -192,7 +192,7 @@ if (!decalState.found || decalState.visible < 1) {
   failed = true;
 }
 if (decalState.resident > decalState.documented) {
-  console.error('\nMore decal meshes than documents — streaming leak.');
+  console.error('\nMore decal meshes than documents, streaming leak.');
   failed = true;
 }
 if (afterWalk.resident !== 0) {

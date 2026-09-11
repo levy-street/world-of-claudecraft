@@ -141,7 +141,7 @@ export function isZoneFeatureShadowCasting(
 /**
  * Does this footprint touch a world rect? The editor's zone-isolate mode asks
  * this so a feature belonging to another zone leaves the scene entirely, even
- * while it sits within the camera's draw distance — the distance test above
+ * while it sits within the camera's draw distance, the distance test above
  * cannot express "not this zone". A group with no measurable footprint stays
  * visible, same fail-open rule as the distance test.
  */

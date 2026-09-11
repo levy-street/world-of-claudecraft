@@ -1027,7 +1027,7 @@ export interface SimContextCallbacks {
   // IWORLD_MEMBERS guard pins is unchanged.
   spawnDevBot(name: string, cls?: PlayerClass): number;
   // Fully remove a dev bot spawned above: entity AND player meta. Deepball's
-  // final whistle uses it — dropEntity alone leaves the meta in ctx.players,
+  // final whistle uses it, dropEntity alone leaves the meta in ctx.players,
   // which permanently burns the bot's name and drains the roster a seat per
   // bout (the "3v3, 3v3, 1v3" bug). Backed by Sim.removePlayer.
   removeDevBot(pid: number): void;

@@ -1,14 +1,14 @@
 // The Deepglass stadium: the arena the bell hangs inside.
 //
 // The bell alone was a glass ball on a stone plaza in the dark. This is the
-// building around it — a Final Fantasy cathedral-arena, all pale stone, gold
+// building around it, a Final Fantasy cathedral-arena, all pale stone, gold
 // leaf and caught light, scaled to make a 76-yard sphere look like the small
 // bright thing at the middle of something enormous.
 //
 // Built the way vale_cup_stadium.ts builds the Sowfield: structural masonry
 // bakes a per-vertex colour into ONE merged vertex-coloured mesh (the whole
 // bowl, every pylon and every arch is a couple of draw calls), while the parts
-// that have to glow or move — crystal, banners, the crown ring — get their own
+// that have to glow or move, crystal, banners, the crown ring, get their own
 // small materials. Every radius is derived from the layout module's
 // DEEPGLASS_RADIUS, so the building can never drift away from the ball physics.
 //
@@ -38,7 +38,7 @@ import { GFX } from './gfx';
 
 // ---------------------------------------------------------------------------
 // Palette. Pale limestone and gold against the cold cyan the bell already
-// throws — the FF trick is that the architecture is nearly white, so all the
+// throws, the FF trick is that the architecture is nearly white, so all the
 // colour in frame comes from light.
 // ---------------------------------------------------------------------------
 const STONE_PALE = 0xe8e2d4;
@@ -89,7 +89,7 @@ const CAUSEWAY_HALF_W = DG_CAUSEWAY_HALF_W;
  * causeway's colonnade with room either side.
  */
 const BOWL_GAP = DG_BOWL_GAP;
-/** The terrace rail. MUST match world.ts DG_PARAPET_R — that module owns the
+/** The terrace rail. MUST match world.ts DG_PARAPET_R, that module owns the
  *  blockers, this one owns the stone you can see. */
 const PARAPET_R = 99;
 
@@ -102,7 +102,7 @@ export interface DeepglassStadiumView {
 }
 
 // ---------------------------------------------------------------------------
-// Geometry helpers — the vale_cup_stadium bag pattern.
+// Geometry helpers, the vale_cup_stadium bag pattern.
 // ---------------------------------------------------------------------------
 
 interface Bag {
@@ -126,7 +126,7 @@ function tint(geo: THREE.BufferGeometry, hex: number): THREE.BufferGeometry {
 // World-space UVs for the textured bags. The stadium's stone used to be flat
 // vertex colour only; the deck/wall/cobble bags carry a tiling PBR map now
 // (public/textures/deepglass), and since every part is merged into a couple of
-// big meshes the UVs must be derived from WORLD position — a per-part 0..1
+// big meshes the UVs must be derived from WORLD position, a per-part 0..1
 // island would tile at a different density on every ring.
 // ---------------------------------------------------------------------------
 
@@ -144,7 +144,7 @@ function planarUV(geo: THREE.BufferGeometry, s: number): void {
 /**
  * Ring walls: unroll around the bowl's axis, u along the arc, v up. The angle
  * is measured FROM NORTH and wrapped to [0, 2pi) so the branch cut falls
- * inside the entrance gap — measured anywhere else it crosses geometry and one
+ * inside the entrance gap, measured anywhere else it crosses geometry and one
  * column of triangles smears the whole texture across itself.
  */
 function cylUV(geo: THREE.BufferGeometry, s: number): void {
@@ -242,7 +242,7 @@ function addCyl(
  * `gap` cuts an opening centred on NORTH (+z) for the causeway to run through,
  * which is what stops the arrival point being walled inside the seating. Note
  * RingGeometry measures theta from +x turning toward -z once it is laid flat,
- * so north sits at -pi/2 — the cylinder convention below is a different one,
+ * so north sits at -pi/2, the cylinder convention below is a different one,
  * which is exactly the trap this comment exists to mark.
  */
 function addRing(
@@ -268,7 +268,7 @@ function addRing(
   return geo;
 }
 
-/** An open cylinder wall segment — a tier's riser, or the bowl's outer skin.
+/** An open cylinder wall segment, a tier's riser, or the bowl's outer skin.
  *  CylinderGeometry measures theta from +z, so a north gap starts at gap/2. */
 function addWall(
   bag: Bag,
@@ -295,7 +295,7 @@ function addWall(
 }
 
 /**
- * One arc of a torus, positioned and aimed — the flying buttresses and the
+ * One arc of a torus, positioned and aimed, the flying buttresses and the
  * concourse arcade both want this and nothing else in the codebase makes one.
  */
 function addArc(
@@ -336,7 +336,7 @@ function masonryMaterial(): THREE.Material {
 /**
  * Masonry with a tiling PBR set over the vertex tint (the hand-painted terrain
  * pack in public/textures/deepglass). The map multiplies the existing per-part
- * tints, so the pale decks stay pale and the shaded courses stay shaded — the
+ * tints, so the pale decks stay pale and the shaded courses stay shaded, the
  * texture adds the joints and weathering the flat colour never had. Maps
  * arrive async; until they land the material renders exactly as before.
  */
@@ -349,7 +349,7 @@ function texturedMasonry(colorFile: string, normalFile: string, gain: number): T
     // The arena runs a deliberately dim dusk key (world.ts lighting), tuned
     // when these surfaces were bare near-white vertex colour. A mid-tone
     // albedo map under the same tint reads close to black there, so each map
-    // arrives with a measured gain — the same move deepglass_kit.ts makes
+    // arrives with a measured gain, the same move deepglass_kit.ts makes
     // (KIT_ALBEDO_GAIN) rather than re-lighting the whole world. Per-set
     // values because the pack's sets differ a stop and a half in mean level.
     std.color.setRGB(gain, gain, gain);
@@ -449,8 +449,7 @@ export function buildDeepglassStadium(): DeepglassStadiumView {
   const crystal: Bag = { geos: [] };
   // The textured bags (see texturedMasonry): pale floor tiles for everything
   // walked on, stone brick for the risers and the outer skin, cobbles for the
-  // entrance apron. Pylons, arches, seats and trim stay pure vertex colour —
-  // the texture pass is for the big readable surfaces, not the jewellery.
+  // entrance apron. Pylons, arches, seats and trim stay pure vertex colour,   // the texture pass is for the big readable surfaces, not the jewellery.
   const deck: Bag = { geos: [] };
   const wall: Bag = { geos: [] };
   const cobble: Bag = { geos: [] };
@@ -516,7 +515,7 @@ export function buildDeepglassStadium(): DeepglassStadiumView {
   addRing(stone, BOWL_OUTER_R - 0.5, BOWL_OUTER_R + 2.4, FLOOR_Y + 1.2, STONE_DEEP, 72, BOWL_GAP);
   // The cornice and its gold edge carry the entrance gap too. They used to be
   // full circles, which left a ribbon of rim floating unsupported across the
-  // open north cut — the most visible of the entrance "gaps".
+  // open north cut, the most visible of the entrance "gaps".
   addRing(
     stone,
     BOWL_OUTER_R - 1.6,
@@ -539,7 +538,7 @@ export function buildDeepglassStadium(): DeepglassStadiumView {
   // ---- the entrance cut ----------------------------------------------------
   // The bowl is a ring with a slice missing, and a merged cylinder/ring bag
   // has no cross-section faces: the cut used to read as a hollow doll's house
-  // — open tier profiles, the backs of the far seats, daylight under the
+  //, open tier profiles, the backs of the far seats, daylight under the
   // decks. Each side of the north gap gets a CHEEK: a stepped stack of solid
   // masonry closing the profile, rising with the tiers to a full-height pier
   // where it meets the outer skin, the way a real stadium ends a stand at a
@@ -549,7 +548,7 @@ export function buildDeepglassStadium(): DeepglassStadiumView {
     const tierStepY2 = BOWL_TOP_Y / BOWL_TIERS;
     const CHEEK_T = 1.2; // wall thickness
     for (const side of [-1, 1]) {
-      // Cylinder convention: north is 0, the gap spans -gap/2..gap/2 — but the
+      // Cylinder convention: north is 0, the gap spans -gap/2..gap/2, but the
       // pylon/cos-sin convention used for placing boxes has north at pi/2.
       const aCut = Math.PI / 2 + side * (BOWL_GAP / 2);
       const ca = Math.cos(aCut);
@@ -621,7 +620,7 @@ export function buildDeepglassStadium(): DeepglassStadiumView {
   for (let i = 0; i < PYLON_COUNT; i++) {
     const a = (i / PYLON_COUNT) * Math.PI * 2;
     // Leave the north entrance clear. Here x = cos(a) and z = sin(a), so due
-    // north is a = pi/2 — a third convention, and the reason every angle in
+    // north is a = pi/2, a third convention, and the reason every angle in
     // this file says which one it means.
     if (Math.abs(angleDelta(a, Math.PI / 2)) < BOWL_GAP) continue;
     const ca = Math.cos(a);
@@ -679,7 +678,7 @@ export function buildDeepglassStadium(): DeepglassStadiumView {
       const light = new THREE.PointLight(i % 8 === 0 ? BANNER_B : BANNER_A, 3.4, 90, 2);
       light.position.set(hx, PYLON_TOP_Y + 3.2, hz);
       // The budget's flicker pass drives fireLights at userData.baseIntensity,
-      // defaulting to a campfire's 11 when unset — a full stop over the
+      // defaulting to a campfire's 11 when unset, a full stop over the
       // authored level. The authored intensity is the base.
       light.userData.baseIntensity = 3.4;
       lights.push(light);
@@ -711,8 +710,7 @@ export function buildDeepglassStadium(): DeepglassStadiumView {
   }
 
   // ---- the terrace rail ----------------------------------------------------
-  // The visible half of the parapet whose blockers live in the world module —
-  // the terrace ends in a fifty-five yard drop, and an unmarked killer edge is
+  // The visible half of the parapet whose blockers live in the world module,   // the terrace ends in a fifty-five yard drop, and an unmarked killer edge is
   // not scenery, it is a bug you walk into. Kept low and open (posts under a
   // coping rail) so it guards without walling the view of the caldera in.
   {
@@ -796,7 +794,7 @@ export function buildDeepglassStadium(): DeepglassStadiumView {
   goldMesh.name = 'deepglass-stadium-gold';
   group.add(goldMesh);
 
-  // The textured courses: floor tiles, wall brick, entrance cobbles — three
+  // The textured courses: floor tiles, wall brick, entrance cobbles, three
   // sets from the hand-painted terrain pack, world-space UVs, vertex tints
   // preserved underneath (texturedMasonry).
   const deckMat = texturedMasonry('deck_tiles_color.jpg', 'deck_tiles_normal.jpg', 2.2);

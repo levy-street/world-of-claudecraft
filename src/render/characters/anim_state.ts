@@ -262,13 +262,13 @@ export function advanceSwimPitch(
 // no wire traffic, and a lean can never contradict the turn under it).
 //
 // Two gains, because the same lean means different things in the two media. On
-// land it is a runner's inside lean — small, and only while actually running.
+// land it is a runner's inside lean, small, and only while actually running.
 // In water, and above all in the bell's flooded flight, it is a full airplane
 // bank: the body rolls onto its side to carve, which is most of what makes
 // three-axis flight feel slick instead of like driving a chair.
 // ---------------------------------------------------------------------------
 
-/** Land lean at a full-rate turn, radians. Deliberately small — a runner tips
+/** Land lean at a full-rate turn, radians. Deliberately small, a runner tips
  *  in, they do not bank. */
 export const TURN_LEAN_MAX = 0.17;
 /** Swim/flight bank at a full-rate turn, radians (~46 degrees). */
@@ -291,7 +291,7 @@ const BANK_RESPONSE = 5.5;
  * (the sim's facing grows counter-clockwise: forward is `(sin f, cos f)`, so
  * increasing `f` sweeps toward +X, which is the body's left). The result is the
  * radians written straight onto the pose wrap's Z, where positive raises the
- * body's left side — hence the negation: leaning INTO a left turn drops the
+ * body's left side, hence the negation: leaning INTO a left turn drops the
  * left side. Eases out to level whenever there is no turn to lean into, so
  * letting go of the stick unwinds instead of snapping.
  */
@@ -502,7 +502,7 @@ export function desiredBaseState(
   hasCombatIdleClip = false,
 ): BaseState {
   if (s.swimming) {
-    // Burners lit: the body stops stroking and streamlines — arms out front,
+    // Burners lit: the body stops stroking and streamlines, arms out front,
     // legs locked. It outranks every other water state, including the idle,
     // because a boosting body is under thrust whether or not it has picked up
     // any speed yet. Gated on the LOADED clip for the same reason as wade: a rig
@@ -550,7 +550,7 @@ export function locomotionTimeScale(
     return clamp(s.speed / DEFAULT_SWIM_REF, 0.55, 1.4);
   }
   // Treading is an idle: it holds its own tempo whatever the body drifts at.
-  // The glide is a held POSE — there is no cycle to speed up.
+  // The glide is a held POSE, there is no cycle to speed up.
   if (baseState === 'swimIdle' || baseState === 'glide') return null;
   let timeScale: number;
   if (baseState === 'walk' || baseState === 'walkBack') {

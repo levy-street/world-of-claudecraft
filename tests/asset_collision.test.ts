@@ -18,7 +18,10 @@ const SEED = 4242;
 const AT = ((): { x: number; z: number } => {
   for (let z = 900; z < 1400; z += 7) {
     for (let x = -450; x < 450; x += 11) {
-      const res = resolvePosition(SEED, x, z, 2, false, undefined, { y: groundHeight(x, z, SEED), lift: 0 });
+      const res = resolvePosition(SEED, x, z, 2, false, undefined, {
+        y: groundHeight(x, z, SEED),
+        lift: 0,
+      });
       if (res.x === x && res.z === z) return { x, z };
     }
   }
@@ -78,7 +81,10 @@ describe('baked placement collision in the sim', () => {
       expect(Math.hypot(center.x - AT.x, center.z - AT.z)).toBeGreaterThan(0.3);
       // 1.6yd to the side: inside the legacy circle-plus-radius reach but
       // clear of the crate's real ~1yd body - the invisible wall is gone.
-      const side = resolvePosition(SEED, AT.x + 1.6, AT.z, 0.25, false, undefined, { y: y, lift: 0 });
+      const side = resolvePosition(SEED, AT.x + 1.6, AT.z, 0.25, false, undefined, {
+        y: y,
+        lift: 0,
+      });
       expect(side.x).toBeCloseTo(AT.x + 1.6, 5);
       expect(side.z).toBeCloseTo(AT.z, 5);
     });
@@ -88,7 +94,10 @@ describe('baked placement collision in the sim', () => {
     withPlacements([crate({ scale: 3 })], () => {
       const y = groundHeight(AT.x, AT.z, SEED);
       // 1.6yd out is INSIDE the body once the crate is 3x.
-      const side = resolvePosition(SEED, AT.x + 1.6, AT.z, 0.25, false, undefined, { y: y, lift: 0 });
+      const side = resolvePosition(SEED, AT.x + 1.6, AT.z, 0.25, false, undefined, {
+        y: y,
+        lift: 0,
+      });
       expect(Math.hypot(side.x - (AT.x + 1.6), side.z - AT.z)).toBeGreaterThan(0.1);
     });
   });
@@ -112,7 +121,7 @@ describe('baked placement collision in the sim', () => {
       // The allowance is MANTLE_REACH, not 0: the engine carries the step-over
       // budget in the mover's `lift` (passesOver adds it for standable tops),
       // so a body asking with lift 0 is one that cannot step over anything at
-      // all — no real mover. Pinned to the same constant the movement kernel
+      // all, no real mover. Pinned to the same constant the movement kernel
       // passes, so this stays honest if that band ever moves.
       const center = resolvePosition(SEED, AT.x, AT.z, 0.4, false, undefined, {
         y,
@@ -129,7 +138,10 @@ describe('baked placement collision in the sim', () => {
     withPlacements([place('/models/biome/city_arch.glb', { scale: 3 })], () => {
       const y = groundHeight(AT.x, AT.z, SEED);
       for (const dz of [-1, 0, 1]) {
-        const mid = resolvePosition(SEED, AT.x, AT.z + dz, 0.5, false, undefined, { y: y, lift: 0 });
+        const mid = resolvePosition(SEED, AT.x, AT.z + dz, 0.5, false, undefined, {
+          y: y,
+          lift: 0,
+        });
         expect(mid.x).toBeCloseTo(AT.x, 5);
         expect(mid.z).toBeCloseTo(AT.z + dz, 5);
       }
@@ -162,7 +174,10 @@ describe('baked placement collision in the sim', () => {
     withPlacements([place('/models/biome/city_wagon.glb', { collideCustom: true })], () => {
       const y = groundHeight(AT.x, AT.z, SEED);
       // The same 1.2yd side point is blocked by the authored 1.4yd circle.
-      const side = resolvePosition(SEED, AT.x + 1.2, AT.z, 0.25, false, undefined, { y: y, lift: 0 });
+      const side = resolvePosition(SEED, AT.x + 1.2, AT.z, 0.25, false, undefined, {
+        y: y,
+        lift: 0,
+      });
       expect(Math.hypot(side.x - (AT.x + 1.2), side.z - AT.z)).toBeGreaterThan(0.1);
     });
   });
@@ -183,7 +198,10 @@ describe('baked placement collision in the sim', () => {
       expect(Math.hypot(trunk.x - AT.x, trunk.z - AT.z)).toBeGreaterThan(0.3);
       // Under the canopy, 2yd off the trunk (a 7.5yd oak spreads far wider
       // than its baked ~0.6yd trunk): walkable.
-      const canopy = resolvePosition(SEED, AT.x + 2, AT.z, 0.4, false, undefined, { y: y, lift: 0 });
+      const canopy = resolvePosition(SEED, AT.x + 2, AT.z, 0.4, false, undefined, {
+        y: y,
+        lift: 0,
+      });
       expect(canopy.x).toBeCloseTo(AT.x + 2, 5);
       expect(canopy.z).toBeCloseTo(AT.z, 5);
     });
@@ -227,8 +245,7 @@ describe('assetCollision doc round trip', () => {
 
 // REGRESSION (Troy, 2026-07-26): "fix the ramp collision from Collision Master,
 // it's not letting me walk up and the player just gets stuck." An asset with
-// authored walkable decks must not ALSO carry a derived blocking footprint —
-// a placement cannot be solid and walkable at the same time.
+// authored walkable decks must not ALSO carry a derived blocking footprint, // a placement cannot be solid and walkable at the same time.
 describe('assets with authored walkable ramps', () => {
   const RAMP_ID = 'props/test_authored_ramp';
   const RAMP_PATH = `/models/${RAMP_ID}.glb`;
@@ -253,7 +270,17 @@ describe('assets with authored walkable ramps', () => {
     // ramp for the asset. It used to keep that solid circle and lose its deck.
     withRampOverride(() => {
       withPlacements(
-        [{ path: RAMP_PATH, x: AT.x, z: AT.z, rotY: 0, scale: 1, collideRadius: 2, collideCustom: true }],
+        [
+          {
+            path: RAMP_PATH,
+            x: AT.x,
+            z: AT.z,
+            rotY: 0,
+            scale: 1,
+            collideRadius: 2,
+            collideCustom: true,
+          },
+        ],
         () => {
           const y = groundHeight(AT.x, AT.z, SEED);
           const mid = resolvePosition(SEED, AT.x, AT.z, 0.4, false, undefined, { y: y, lift: 0 });
@@ -266,12 +293,15 @@ describe('assets with authored walkable ramps', () => {
 
   it('does not wall it off on the derived footprint either', () => {
     withRampOverride(() => {
-      withPlacements([{ path: RAMP_PATH, x: AT.x, z: AT.z, rotY: 0, scale: 1, collideRadius: 2 }], () => {
-        const y = groundHeight(AT.x, AT.z, SEED);
-        const mid = resolvePosition(SEED, AT.x, AT.z, 0.4, false, undefined, { y: y, lift: 0 });
-        expect(mid.x).toBeCloseTo(AT.x, 5);
-        expect(mid.z).toBeCloseTo(AT.z, 5);
-      });
+      withPlacements(
+        [{ path: RAMP_PATH, x: AT.x, z: AT.z, rotY: 0, scale: 1, collideRadius: 2 }],
+        () => {
+          const y = groundHeight(AT.x, AT.z, SEED);
+          const mid = resolvePosition(SEED, AT.x, AT.z, 0.4, false, undefined, { y: y, lift: 0 });
+          expect(mid.x).toBeCloseTo(AT.x, 5);
+          expect(mid.z).toBeCloseTo(AT.z, 5);
+        },
+      );
     });
   });
 

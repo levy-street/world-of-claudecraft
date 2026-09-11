@@ -13,15 +13,15 @@
 // before returning. Defensive: malformed blobs still yield null and the normal
 // start screen runs instead.
 
-import { decodeBiomePaintIdsRle } from '../sim/map_doc';
-import type { PlayerClass, WorldContent } from '../sim/types';
-import { t } from '../ui/i18n';
 import {
   registerPageTeardown,
   retirePageAndClose,
   retirePageAndReplace,
 } from '../render/context_release';
+import { decodeBiomePaintIdsRle } from '../sim/map_doc';
+import type { PlayerClass, WorldContent } from '../sim/types';
 import { WORLD_SEED } from '../sim/world_seed';
+import { t } from '../ui/i18n';
 
 export const EDITOR_PLAYTEST_KEY = 'woc_editor_playtest';
 const PLAYTEST_TRANSFER_PREFIX = 'woc_editor_playtest_transfer:';

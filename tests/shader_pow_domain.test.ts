@@ -85,7 +85,7 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
     sites: 1,
     // flameH is the layer's normalized height, and it is CLAMPED to [0,1] on
     // the line above the pow(): transformed.y can go either side of the layer
-    // height on a swaying ring, so the clamp — not the geometry — is what keeps
+    // height on a swaying ring, so the clamp, not the geometry, is what keeps
     // the base non-negative. The anchor pins the clamp, so the row dies with it.
     anchor: /float flameH = clamp\(transformed\.y \/ \$\{height\.toFixed\(4\)\}, 0\.0, 1\.0\);/,
     why: 'flameH is a clamp(..., 0.0, 1.0) one line above the pow()',

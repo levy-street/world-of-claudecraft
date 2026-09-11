@@ -23,8 +23,8 @@ let gltfLoader: GLTFLoader | null = null;
 const gltfCache = new Map<string, Promise<GLTF>>();
 const texCache = new Map<string, Promise<THREE.Texture>>();
 // Reference-counted holds layered over texCache (see acquireTexture). A plain
-// loadTexture caller pins its key for the session — that is the shipped game's
-// behaviour and the base splat depends on it — so an evictable hold may only
+// loadTexture caller pins its key for the session, that is the shipped game's
+// behaviour and the base splat depends on it, so an evictable hold may only
 // dispose a texture nobody pinned.
 const texPinned = new Set<string>();
 const texRefs = new Map<string, number>();
@@ -303,7 +303,7 @@ export function releaseTexture(url: string, opts: { srgb?: boolean; repeat?: boo
 // ---- FORK DECLARATION (Studio) ---------------------------------------------
 // Upstream removed its Radiance arm at v0.39 (see the header note): the shipped
 // biome skies are KTX2 UASTC HDR now, so nothing in the GAME loads a .hdr. The
-// EDITOR still does — a maker can point the Skybox picker at any .hdr on disk,
+// EDITOR still does, a maker can point the Skybox picker at any .hdr on disk,
 // and that file is whatever they hand us, not a pipeline artefact we control.
 // So this is deliberately the small arm, not upstream's deleted one: no decode
 // worker (hdr_decode_worker.ts went with the upstream removal, and the editor

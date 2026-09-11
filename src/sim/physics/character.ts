@@ -42,8 +42,15 @@ import {
   supportHeightAt,
 } from '../colliders';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel, walkedSteepnessAt } from '../ride_height';
-import { groundHeight, terrainDownhill } from '../world';
-import { onUnderSheet, sheetGroundHeight, sheetMouthStepOk, sheetWallBlocksStep, terrainHeight } from '../world';
+import {
+  groundHeight,
+  onUnderSheet,
+  sheetGroundHeight,
+  sheetMouthStepOk,
+  sheetWallBlocksStep,
+  terrainDownhill,
+  terrainHeight,
+} from '../world';
 import { overlapCollider, SKIN_WIDTH, sweepCollider } from './sweep';
 
 /**
@@ -229,7 +236,7 @@ function blocksAt(
 ): boolean {
   if (params.ignoreFences && c.type === 'obb' && c.isFence) return false;
   // Pass-under, mirroring the legacy sweep's gate exactly: a collider whose
-  // BASE clears the head never blocks — an authored second storey does not
+  // BASE clears the head never blocks, an authored second storey does not
   // wall the room below it, and a door lintel does not wall its doorway.
   // Without this the kernel treated every y-banded box as a floor-to-sky
   // column, which is precisely how the explorable buildings' doorways and
@@ -484,7 +491,7 @@ export function moveCharacter(
   ) {
     const rise = groundEnd - groundStart;
     // Stepping onto an AUTHORED walkable surface (ramp deck, plane volume,
-    // box top — any floor that sits ABOVE the bare heightfield) by no more
+    // box top, any floor that sits ABOVE the bare heightfield) by no more
     // than one step height is a designed step, not a terrain cliff: the whole
     // terrain rule is skipped for it. A bridge over a chasm would otherwise
     // read as the chasm WALL and freeze the body at the deck's entry. Terrain

@@ -1,7 +1,7 @@
 // Water push: the wake a body drags through the bell.
 //
 // Flying underwater with nothing shedding off you reads as floating in fog. The
-// water has to visibly resist and part — so a moving body sheds a ribbon of
+// water has to visibly resist and part, so a moving body sheds a ribbon of
 // bubbles from its back, and a boosting one adds a cavitation cone of fine,
 // fast mist. Both scale off real speed, so the effect IS the speedometer.
 //
@@ -16,7 +16,7 @@ import * as THREE from 'three';
 const POOL = 140;
 /** Seconds a shed bubble lives. */
 const LIFE = 1.15;
-/** Below this speed nothing sheds — a hanging body should be still. */
+/** Below this speed nothing sheds, a hanging body should be still. */
 const MIN_SPEED = 3.5;
 /** Speed at which the wake is at full strength. */
 const FULL_SPEED = 24;
@@ -71,7 +71,7 @@ const FRAG = /* glsl */ `
 // churned bubbles rolling out behind a boosting fighter, which is what turns a
 // burn from a light on a model into a thing that happened in the water.
 //
-// This is exhaust UNDERWATER, so it is not smoke — it is froth. The first pass
+// This is exhaust UNDERWATER, so it is not smoke, it is froth. The first pass
 // drew soft opaque puffs and read as a blob of fog stuck to your back; these
 // are many small rimmed bubbles instead, and they live long enough (SMOKE_LIFE
 // seconds against the wake's 1.15) that at boost speed the trail runs the best
@@ -104,7 +104,7 @@ const SMOKE_VERT = /* glsl */ `
     p.x += sin(age * 2.7 + position.z * 1.7) * 0.18 * age;
     p.z += cos(age * 2.3 + position.x * 1.9) * 0.18 * age;
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
-    // Swells gently — froth expanding as the pressure comes off it, not a puff
+    // Swells gently, froth expanding as the pressure comes off it, not a puff
     // of smoke ballooning.
     float grow = aBirth.y * (0.7 + t * 0.9);
     // Long, flat fade: the far end of the trail thins out rather than ending.
@@ -314,7 +314,7 @@ export class DeepglassWake {
   /**
    * The burner exhaust: only a BOOSTING body lays it, and it is stamped behind
    * the shoulders rather than at the feet, because that is where the nozzles
-   * are. Slow, fat and rolling — the counterpart to the fine fast bubbles.
+   * are. Slow, fat and rolling, the counterpart to the fine fast bubbles.
    */
   private stampSmoke(pool: Pool, s: WakeSample, speed: number, dt: number): void {
     if (!s.boosting) {
@@ -330,7 +330,7 @@ export class DeepglassWake {
 
     // Out of the NOZZLES: down the reverse of the thrust intent, which is where
     // the plumes are pointing. A body burning to hold station has no travel to
-    // trail along but is very much throwing water — off velocity alone that
+    // trail along but is very much throwing water, off velocity alone that
     // case laid nothing, or laid it in the wrong place the moment the thrust
     // and the momentum disagreed. Falls back to the line of travel, then to
     // straight down, for a sample that carries no intent.

@@ -3,7 +3,7 @@
 // The bell is a sphere with fighters at every attitude, all wearing the same
 // chibi rig, at up to forty yards. Nameplates answer the question only if you
 // stop and read one, and in a sport played at 26 yd/s nobody reads. So every
-// fighter is HIGHLIGHTED in their side's colour (DG_TEAM_COLOR — the same two
+// fighter is HIGHLIGHTED in their side's colour (DG_TEAM_COLOR, the same two
 // the score strip and the nameplates use), and the answer becomes peripheral
 // rather than something you look up.
 //
@@ -11,7 +11,7 @@
 // hull twin: the same geometry, the same skeleton, drawn back-faces-only and
 // pushed a few millimetres out along its normals. That is the classic
 // inverted-hull outline, and it is the right shape for this job for two
-// reasons — it traces the actual silhouette of the actual pose (arms, cape,
+// reasons, it traces the actual silhouette of the actual pose (arms, cape,
 // hair, the pack on their back), and it costs nothing to keep in sync, because
 // sharing the skeleton means the twin skins itself on the GPU exactly the way
 // the body does. A sphere or a capsule around the body was the first attempt
@@ -22,7 +22,7 @@
 // rather than as a coloured sticker over it.
 //
 // Cost: one extra draw per source mesh (a chibi is a handful), and ONE shader
-// program for the whole roster — the source is identical for every wearer and
+// program for the whole roster, the source is identical for every wearer and
 // only the uniforms differ, so there is no per-body compile stall.
 
 import * as THREE from 'three';
@@ -39,7 +39,7 @@ const SHADOW_PROXY_NAME = 'character_shadow_proxy';
  *
  * Distance-scaled, not a fixed size, and that is the whole difference between an
  * outline and a decoration. A constant world-space rim is 5 cm on a 1.8 yd body:
- * legible at five yards and gone by twenty — while the bell is seventy-six
+ * legible at five yards and gone by twenty, while the bell is seventy-six
  * across and the fighter you most need to identify is the one furthest away.
  * Scaling with depth holds the rim at a constant WIDTH ON SCREEN, so it reads
  * the same at the far wall as it does in your face.
@@ -92,7 +92,7 @@ void main() {
   #include <morphtarget_vertex>
   #include <skinning_vertex>
   // The hull: out along the SKINNED normal, so it stays a constant rim through
-  // every pose instead of tearing open where the mesh bends — and scaled by the
+  // every pose instead of tearing open where the mesh bends, and scaled by the
   // body's DEPTH, so the rim holds its width on screen at any range.
   vec4 mv0 = modelViewMatrix * vec4(transformed, 1.0);
   float grow = max(uInflateMin, uInflate * max(1.0, -mv0.z));
@@ -106,7 +106,7 @@ void main() {
 
 // No `precision` line, deliberately: three prepends its own to both stages, and
 // a duplicate makes any uniform declared in both disagree so the program will
-// not LINK — while both shaders still compile clean, which is a silent nothing
+// not LINK, while both shaders still compile clean, which is a silent nothing
 // on screen (see render/jet_fire.ts, which lost an hour to exactly this).
 const FRAG = /* glsl */ `
 uniform vec3 uColor;
@@ -140,8 +140,7 @@ void main() {
  *    differently-shaped blob welded to the nozzle;
  *  - the additive nozzle GLOWS, which are billboarding light, not surface;
  *  - the jetpack's authored flame CONES, which are switched off through their
- *    material rather than through `visible` (deepglass_pack.ts explains why) —
- *    a twin carrying its own material would put them straight back on screen as
+ *    material rather than through `visible` (deepglass_pack.ts explains why),  *    a twin carrying its own material would put them straight back on screen as
  *    coloured cones.
  *
  * The last one is the reason this tests the MATERIAL and not just `visible`.
@@ -200,7 +199,7 @@ function hullMaterial(team: 'A' | 'B'): THREE.ShaderMaterial {
     // so all that survives is the fringe standing proud of the silhouette.
     side: THREE.BackSide,
     // SOLID, not additive. Additive was the first attempt and it disappears
-    // against a bright background — which in the bell is most of them, since
+    // against a bright background, which in the bell is most of them, since
     // the arena is a lit sphere under a pale sky. A highlight that only reads
     // against dark pixels is not a highlight.
     blending: THREE.NormalBlending,
@@ -209,8 +208,7 @@ function hullMaterial(team: 'A' | 'B'): THREE.ShaderMaterial {
 }
 
 /**
- * One hidden micro-mesh per program variant the hull shader can be asked for —
- * static, skinned, and skinned-with-morphs (the body meshes the twins actually
+ * One hidden micro-mesh per program variant the hull shader can be asked for,  * static, skinned, and skinned-with-morphs (the body meshes the twins actually
  * shadow carry both skinning and face morphs, and each combination is its own
  * entry in three's program cache). Parked in the renderer's warm bench so the
  * entry compile links all of them behind the loading screen; without this the

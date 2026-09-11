@@ -191,11 +191,33 @@ describe('the plane collision floor matches where the deck is drawn (Fix B)', ()
   it('folds in the gizmo Y-lift (offsetY) and the detached frozen ground', () => {
     // Lifted: floor = terrain + offsetY + sizeY, so collision tracks the raised
     // overlay instead of sitting down at the terrain (the "floating" gap).
-    setActiveWorldContent(flatWorld({ colliderVolumes: [{ kind: 'plane', x: CX, z: CZ, rotY: 0, sizeX: 20, sizeY: 1, sizeZ: 20, offsetY: 4 }] }));
+    setActiveWorldContent(
+      flatWorld({
+        colliderVolumes: [
+          { kind: 'plane', x: CX, z: CZ, rotY: 0, sizeX: 20, sizeY: 1, sizeZ: 20, offsetY: 4 },
+        ],
+      }),
+    );
     invalidateStaticColliders();
     expect(groundHeightNear(CX, CZ, SEED, FLAT_Y + 5)).toBeCloseTo(FLAT_Y + 5, 4); // 10 + 4 + 1
     // Detached: the frozen groundY replaces live terrain.
-    setActiveWorldContent(flatWorld({ colliderVolumes: [{ kind: 'plane', x: CX, z: CZ, rotY: 0, sizeX: 20, sizeY: 1, sizeZ: 20, detached: true, groundY: 30 }] }));
+    setActiveWorldContent(
+      flatWorld({
+        colliderVolumes: [
+          {
+            kind: 'plane',
+            x: CX,
+            z: CZ,
+            rotY: 0,
+            sizeX: 20,
+            sizeY: 1,
+            sizeZ: 20,
+            detached: true,
+            groundY: 30,
+          },
+        ],
+      }),
+    );
     invalidateStaticColliders();
     expect(groundHeightNear(CX, CZ, SEED, 31)).toBeCloseTo(31, 4); // 30 + 0 + 1
   });

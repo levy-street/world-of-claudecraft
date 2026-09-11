@@ -29,13 +29,13 @@ import {
   buildWaterSurfaceIndex,
   buildWaterSurfaceTileIndex,
   shoreDepthAt,
+  shoreDepthAttribute,
   shoreSlopeAt,
   WATER_FIELD_EDGE_FEATHER_UV,
   WATER_FOAM_WIDTH_YARDS,
   WATER_SEABED_CLAMP_YARDS,
   type WaterGridRegion,
   waterSheetTilePlan,
-  shoreDepthAttribute,
 } from './water_core';
 import {
   coveredByOtherSheet,

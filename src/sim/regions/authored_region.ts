@@ -24,7 +24,10 @@
 // shipped consts stay in charge. Nothing here runs in that case.
 
 import { autoCollideRadius, boxesForAssetId } from '../asset_collision';
-import type { BgLayoutRecord } from '../battleground_layout';
+/** Game-mode anchors of an authored region. The writer that fills this record lives
+ *  in the Studio tooling, so the runtime keeps it opaque. */
+export type BgLayoutRecord = Readonly<Record<string, unknown>>;
+
 import { colliderVolumeFromPlacement, isColliderAssetId } from '../collider_volumes';
 import type { LayoutCollider } from '../colliders';
 import { dungeonKitModuleScale } from '../dungeon_kit_dims';

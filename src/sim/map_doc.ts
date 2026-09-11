@@ -108,7 +108,7 @@ export const MAX_OBJECTS = 400;
 export const MAX_ZONES = 24;
 // 256, not 64: the SHIPPED world already carries 91 roads, so the old bound
 // silently truncated 27 of them out of every authored map the moment it was
-// sanitized — and roads flatten terrain and carve paths, so the map lost shape,
+// sanitized, and roads flatten terrain and carve paths, so the map lost shape,
 // not just decoration. The cap exists to bound a hostile document, and 256
 // still does that with room for the world to grow.
 export const MAX_ROADS = 256;
@@ -318,8 +318,7 @@ export interface MapHitbox {
  *  a rect centered (x, z) with half extents (hx, hz), optionally yawed by
  *  `ry`, whose walkable floor rises linearly along the rect's local +X from
  *  `y0` (at -hx) to `y1` (at +hx). Placements of the asset RAISE the walkable
- *  ground along the deck instead of blocking, so the player just walks up —
- *  exactly like the baked stairs decks (sim/placement_ramps.ts). */
+ *  ground along the deck instead of blocking, so the player just walks up,  *  exactly like the baked stairs decks (sim/placement_ramps.ts). */
 export interface AuthoredCollisionRamp {
   x: number;
   z: number;
@@ -550,7 +549,7 @@ export const MODEL_ASSET_ID = 'model/custom';
 export const MODEL_PATH = 'procedural://model';
 
 // Reserved placement id for the Tree tool's generated trees. Procedural like
-// the rock — no single GLB behind it — but it DOES stream one: the foundation
+// the rock, no single GLB behind it, but it DOES stream one: the foundation
 // trunk (public/models/foliage/trunks/<key>.glb, built in Blender). Everything
 // else (branches, canopy volumes, leaf cards) is grown from `tree` at build
 // time, so a saved map regenerates the identical tree. Collision is the
@@ -677,7 +676,7 @@ export interface MapDoc {
   // v3 optional: patch cuts restoring ground inside cutouts (Patch hole mode);
   // a patch beats every cut it overlaps. Absent = none.
   holePatches?: TerrainCut[];
-  // v3 optional: remesh detail regions (the Remesh brush) — finer carve
+  // v3 optional: remesh detail regions (the Remesh brush), finer carve
   // interior tessellation inside each disc. Absent = default detail.
   detailRegions?: DetailRegion[];
   // FORK: document-wide carve interior mesh cell (Remesh all caves).
@@ -698,7 +697,7 @@ export interface MapDoc {
   // [-worldHalfX, worldHalfX]); absent = the built-in WORLD_MAX_X. The z extent
   // is already per-map via the zone bands' zMin/zMax.
   worldHalfX?: number;
-  // v3 optional: LINK TO WORLD — the world-space point the map's origin (0,0)
+  // v3 optional: LINK TO WORLD, the world-space point the map's origin (0,0)
   // projects to. When set, playtest embeds this map's layers into the FULL
   // built-in world at that offset (base terrain, mobs, NPCs and quests keep
   // running around it) instead of booting the standalone authored slate.
@@ -706,13 +705,13 @@ export interface MapDoc {
   // projection (customMapToWorldContent) applies the offset. Absent = the map
   // is a standalone space.
   worldAnchor?: { x: number; z: number };
-  // v3 optional: GENERATED TERRAIN — the world-space point the map's origin
+  // v3 optional: GENERATED TERRAIN, the world-space point the map's origin
   // samples the shipped world's natural heightfield from (the editor's
   // Generate Terrain picker). The map's base terrain becomes that region of
   // the old world layout (raw baseHeight: hills, lakes, coasts); sculpt edits
   // apply on top. Absent = the flat slate.
   terrainBase?: { x: number; z: number };
-  // v4 optional: REGION MAP — this document is the editable form of a shipped
+  // v4 optional: REGION MAP, this document is the editable form of a shipped
   // region that lives outside the overworld (the Ravenrift battleground first;
   // dungeons, delves and the arena share the pattern). Its coordinates are the
   // REGION's own local space, so the export writes them straight back into the
@@ -2117,7 +2116,7 @@ export function sanitizeMapDoc(raw: unknown): MapDoc | null {
 }
 
 // Authored ground decals. The art reference is validated for SHAPE only (a
-// built-in library key or a content hash) — sim code cannot import the render
+// built-in library key or a content hash), sim code cannot import the render
 // layer's decal list, and the renderer simply skips an art id it cannot
 // resolve, so an unknown one round-trips instead of being destroyed.
 function sanitizeDecals(v: unknown): MapDecal[] {

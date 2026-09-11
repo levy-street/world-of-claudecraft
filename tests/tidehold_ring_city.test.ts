@@ -1,7 +1,14 @@
 // Tidehold as a ring city (src/sim/deepglass/citadel_ring.ts): the whole
 // layout checked against the sim it has to run in.
 import { describe, expect, it } from 'vitest';
-import { ASSET_PALETTE, plotFencePanels, RING_PLOTS, ringPlacements } from '../src/sim/deepglass/citadel_ring';
+import { setActiveWorldContent } from '../src/sim/data';
+import { TH_MONUMENT, TIDEHOLD_RESIDENTS } from '../src/sim/deepglass/citadel';
+import {
+  ASSET_PALETTE,
+  plotFencePanels,
+  RING_PLOTS,
+  ringPlacements,
+} from '../src/sim/deepglass/citadel_ring';
 import {
   pol,
   RING_AVENUES,
@@ -13,12 +20,15 @@ import {
   RING_R,
   RING_TIERS,
 } from '../src/sim/deepglass/citadel_ring_frame';
-import { TH_MONUMENT, TIDEHOLD_RESIDENTS } from '../src/sim/deepglass/citadel';
 import { buildDeepglassWorld, DEEPGLASS_MAP_ENTRY } from '../src/sim/deepglass/world';
-import { setActiveWorldContent } from '../src/sim/data';
 import { MODEL_PATH } from '../src/sim/map_doc';
 import { placementRampFloorAt } from '../src/sim/placement_ramps';
-import { groundHeightAtBody, groundHeightNear, terrainHeight, waterLevelAt } from '../src/sim/world';
+import {
+  groundHeightAtBody,
+  groundHeightNear,
+  terrainHeight,
+  waterLevelAt,
+} from '../src/sim/world';
 
 const SEED = DEEPGLASS_MAP_ENTRY.seed;
 const WATER = -2;
@@ -68,7 +78,10 @@ describe('Tidehold ring city', () => {
         for (let i = 0; i < 8; i++) {
           const phi = (i / 8) * Math.PI * 2 + 0.2;
           const p = pol(rMid, phi);
-          expect(terrainHeight(p.x, p.z, SEED), `${tier.id} @ ${phi.toFixed(2)}`).toBeCloseTo(tier.y, 0);
+          expect(terrainHeight(p.x, p.z, SEED), `${tier.id} @ ${phi.toFixed(2)}`).toBeCloseTo(
+            tier.y,
+            0,
+          );
         }
       }
       // the quay edge is land; just beyond it is water on a shallow shelf
@@ -113,17 +126,25 @@ describe('Tidehold ring city', () => {
           feet = h;
         }
         expect(prev).toBeCloseTo(RING_CROWN.y, 0);
-        expect(groundHeightAtBody(...Object.values(pol(150, phi)) as [number, number], SEED, 20)).toBeCloseTo(RING_MIDDLE.y, 0);
+        expect(
+          groundHeightAtBody(...(Object.values(pol(150, phi)) as [number, number]), SEED, 20),
+        ).toBeCloseTo(RING_MIDDLE.y, 0);
       }
       // the Tideway: deck level with the outer ring, over water
       for (let z = 116; z <= 212; z += 12) {
-        expect(placementRampFloorAt(world, SEED, 0, z), `tideway z=${z}`).toBeCloseTo(RING_OUTER.y, 1);
+        expect(placementRampFloorAt(world, SEED, 0, z), `tideway z=${z}`).toBeCloseTo(
+          RING_OUTER.y,
+          1,
+        );
         expect(terrainHeight(0, z, SEED)).toBeLessThan(WATER);
       }
       // the spans, out to the beacon terraces
       for (const side of [-1, 1]) {
         for (let x = 292; x <= 364; x += 12) {
-          expect(placementRampFloorAt(world, SEED, side * x, RING_CZ), `span x=${side * x}`).toBeCloseTo(RING_OUTER.y, 1);
+          expect(
+            placementRampFloorAt(world, SEED, side * x, RING_CZ),
+            `span x=${side * x}`,
+          ).toBeCloseTo(RING_OUTER.y, 1);
         }
         expect(terrainHeight(side * 400, RING_CZ, SEED)).toBeCloseTo(RING_OUTER.y, 0);
       }
@@ -190,7 +211,10 @@ describe('Tidehold ring city', () => {
       expect(box, name).toBeTruthy();
       expect(p, path).toBeTruthy();
       if (!box || !p) return;
-      expect(p.x >= box.minX && p.x <= box.maxX && p.z >= box.minZ && p.z <= box.maxZ, `${path} in ${name}`).toBe(true);
+      expect(
+        p.x >= box.minX && p.x <= box.maxX && p.z >= box.minZ && p.z <= box.maxZ,
+        `${path} in ${name}`,
+      ).toBe(true);
     };
     inside('Wardenhold', 'tidehold/castle_b');
     inside('Vigil Hall', 'tidehold/hall');
@@ -222,7 +246,10 @@ describe('plots, fences and the extra houses', () => {
     for (const h of houses) {
       for (const f of fences) {
         // a house footprint is >= 12 yd; a fence within 4 yd of its centre is on its plot
-        expect(Math.hypot(h.x - f.x, h.z - f.z), `house at ${h.x.toFixed(0)},${h.z.toFixed(0)} vs fence`).toBeGreaterThan(5.5);
+        expect(
+          Math.hypot(h.x - f.x, h.z - f.z),
+          `house at ${h.x.toFixed(0)},${h.z.toFixed(0)} vs fence`,
+        ).toBeGreaterThan(5.5);
       }
     }
     for (let i = 0; i < big.length; i++) {
@@ -262,7 +289,10 @@ describe('the curtain walls', () => {
       for (let j = i + 1; j < w.length; j++) {
         const d = Math.hypot(w[i].x - w[j].x, w[i].z - w[j].z);
         const need = ((width(w[i]) + width(w[j])) / 2) * 0.8;
-        expect(d, `wall modules overlap at ${w[i].x.toFixed(0)},${w[i].z.toFixed(0)}`).toBeGreaterThanOrEqual(need);
+        expect(
+          d,
+          `wall modules overlap at ${w[i].x.toFixed(0)},${w[i].z.toFixed(0)}`,
+        ).toBeGreaterThanOrEqual(need);
       }
     }
   });

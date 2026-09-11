@@ -65,7 +65,7 @@ describe('resolveCameraFov (the player-configured FOV slider)', () => {
 
   it('measures the speed widening against a REFERENCE, so a flier does not saturate it', () => {
     // The Deepglass bug, and the reason `ref` exists. Against the land
-    // reference the kick is already PINNED at maximum by about 10 yd/s — so
+    // reference the kick is already PINNED at maximum by about 10 yd/s, so
     // across the whole range a flier actually uses (cruise 9, boost 26) the FOV
     // is a constant and says nothing at all. Against cruise it separates them,
     // which is the one thing it should be saying: the burners are lit.

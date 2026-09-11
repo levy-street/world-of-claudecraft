@@ -116,14 +116,15 @@ describe('deepglass city event', () => {
   });
 
   it('never spawns the event or the town wizards outside their worlds', () => {
-    // Built-in overworld: town selves yes, bell self no, crowd no.
+    // Built-in overworld: no town selves (the city has no official entrance on this
+    // branch, so the overworld never spawns Baldemar), bell self no, crowd no.
     setActiveWorldContent(null);
     const overworld = new Sim({ seed: 42, playerClass: 'warrior' });
     for (let i = 0; i < PORTAL_WIZARD_STOPS.length; i++) {
       expect(
-        overworld.entities.get(PORTAL_WIZARD_BASE_ENTITY_ID + i)?.kind,
+        overworld.entities.get(PORTAL_WIZARD_BASE_ENTITY_ID + i),
         PORTAL_WIZARD_STOPS[i].npcId,
-      ).toBe('npc');
+      ).toBeUndefined();
     }
     expect(overworld.entities.has(DEEPGLASS_PORTAL_WIZARD_ENTITY_ID)).toBe(false);
     for (const id of crowdIds()) expect(overworld.entities.has(id)).toBe(false);

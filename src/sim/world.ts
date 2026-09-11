@@ -1,8 +1,8 @@
 import { bgFieldHeightLocal } from './battleground_field';
 import { BORDER_EDGES } from './border_edges';
-import { EMBER_BAYS, EMBER_LAND_LOBES, forgefatherScatterExcluded } from './content/ember_coast';
 import { caveCameraMaxDist, caveFloorAt, caveSampleAt } from './caves';
 import { supportHeightAt } from './colliders';
+import { EMBER_BAYS, EMBER_LAND_LOBES, forgefatherScatterExcluded } from './content/ember_coast';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
 import { VALE_BAYS, VALE_LAND_LOBES } from './content/vale_coast';
@@ -19,6 +19,7 @@ import {
   instanceOrigin,
   instanceSlotForZ,
   isBgPos,
+  isBuiltinWorldActive,
   STRIP_MAX_X,
   STRIP_MIN_X,
   STRIP_ZONES,
@@ -29,7 +30,6 @@ import {
   worldXBoundsAt,
   ZONES,
   zoneAt,
-  isBuiltinWorldActive,
 } from './data';
 import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockSurfaceHeight } from './deck_surfaces';
@@ -45,8 +45,8 @@ import {
 } from './ember_lava_layout';
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
 import { cavitySheetAt, effectiveTerrainCuts, resolveGroundSheet } from './ground_sheets';
-import { placementRampFloorAt, WALK_DECK_REACH } from './placement_ramps';
 import { KEEP_SITE, keepSitePadWeight } from './keep_site';
+import { placementRampFloorAt, WALK_DECK_REACH } from './placement_ramps';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import {
@@ -3965,7 +3965,7 @@ function groundHeightFor(x: number, z: number, seed: number, prevY: number | und
     const dx = x - v.x;
     const dz = z - v.z;
     // The floor at the plane centre: detached anchor or live terrain, plus the
-    // gizmo Y-lift, plus the size offset — matching the editor overlay
+    // gizmo Y-lift, plus the size offset, matching the editor overlay
     // (viewport colliderVolumeMesh) so a raised deck collides where it is drawn.
     const planeBase =
       (v.detached ? (v.groundY ?? 0) : terrainHeight(v.x, v.z, seed)) + (v.offsetY ?? 0) + v.sizeY;
@@ -4060,8 +4060,7 @@ export function terrainCutAtHeight(x: number, z: number, surfaceY: number): bool
 const SHEET_STEP_REACH = 0.9;
 
 /** The ground height for a mover whose previous height was `prevY`: the
- *  terrain sheet (with any standable collider top within a step folded in —
- *  a baked box top or authored volume is walkable floor in this fork), a cave
+ *  terrain sheet (with any standable collider top within a step folded in,  *  a baked box top or authored volume is walkable floor in this fork), a cave
  *  tube floor, a carve cavity floor, or the un-climbable rise that walls off
  *  a cut with nothing underneath. Equals groundHeight exactly on a map with
  *  no colliders standing proud and no caves or cuts. */
@@ -4079,7 +4078,7 @@ export function groundHeightNear(x: number, z: number, seed: number, prevY: numb
 }
 
 /** groundHeightNear WITHOUT the standable-top fold: the terrain plus the
- *  cave/carve sheet resolution only. The physics kernel uses this — it has
+ *  cave/carve sheet resolution only. The physics kernel uses this, it has
  *  its own collider step machinery, and folding tops in here would let its
  *  landing query admit tops past the cap it was asked to respect. */
 export function sheetGroundHeight(x: number, z: number, seed: number, prevY: number): number {
@@ -4110,7 +4109,7 @@ export function onCaveSheet(x: number, z: number, seed: number, prevY: number): 
 }
 
 /** True when the mover's sheet at (x, z) is a cave tube floor OR a carved
- *  cavity floor — any walkable ground UNDER the terrain surface. The steep-
+ *  cavity floor, any walkable ground UNDER the terrain surface. The steep-
  *  slope and climb gates read the SURFACE gradient, which is meaningless to a
  *  body walking a tunnel beneath it; they exempt themselves through this. */
 export function onUnderSheet(x: number, z: number, seed: number, prevY: number): boolean {
@@ -4203,8 +4202,7 @@ export function cameraSheetMaxDist(
     const x = ex + (dx / len) * tt;
     const y = ey + (dy / len) * tt;
     const z = ez + (dz / len) * tt;
-    // Risen above the local surface: out through a mouth or pit, open air —
-    // the normal camera rules take over from here.
+    // Risen above the local surface: out through a mouth or pit, open air,     // the normal camera rules take over from here.
     if (y >= terrainHeight(x, z, seed) - 0.1) return max;
     if (carveFieldAt(carves, content.holePatches, x, y, z) >= -pad) {
       return Math.min(max, Math.max(0, tt - STEP));
@@ -4240,7 +4238,7 @@ function solidRockAtBody(x: number, z: number, seed: number, feetY: number): boo
 
 // A tube's horseshoe wall band: inside the bore footprint where the arch
 // pinches below standing height. Only bites a mover whose sheet IS that tube
-// floor (or level with it — the flush-tube case, where the terrain outside
+// floor (or level with it, the flush-tube case, where the terrain outside
 // sits at exactly the floor height and no climb gate can help). Mouth aprons
 // are exempt: the opening must stay walkable.
 function caveWallAtBody(caves: readonly CaveDef[], x: number, z: number, prevY: number): boolean {
@@ -4290,7 +4288,7 @@ export function sheetWallBlocksStep(
  * True when a step lands where the nearest walkable sheet is a LAYER SWITCH
  * (more than a body-step from the mover's height) inside a cave or carve
  * footprint: the surface over the tunnel, or the tunnel under the field. The
- * mob fan skips such candidates — resolving them would teleport the mover
+ * mob fan skips such candidates, resolving them would teleport the mover
  * between layers. Points outside every footprint return false in a bounds
  * scan, so the open-world fan stays cheap.
  */
@@ -4322,7 +4320,7 @@ export function sheetStepMismatch(
 const SHEET_MOUTH_STEP_UP = 1.1;
 
 /** Allow a small upward step only when the move TRANSFERS between the surface
- *  sheet and an under-sheet (tube or cavity) — the mouth/lip crossing. Plain
+ *  sheet and an under-sheet (tube or cavity), the mouth/lip crossing. Plain
  *  terrain cliffs see no transfer and keep the full climb gate. */
 export function sheetMouthStepOk(
   seed: number,
@@ -5347,7 +5345,7 @@ export interface Decoration {
   variant: number;
   biome: BiomeId;
   /** Render-side marker: this record mirrors an editable PLACEMENT and feeds
-   *  ONLY the far-field sprite impostors — the near real model is the
+   *  ONLY the far-field sprite impostors, the near real model is the
    *  placement itself (placed_assets caps it at the same handoff plane), so
    *  a converted tree renders at distance exactly like a procedural one. */
   farOnly?: boolean;
@@ -5399,7 +5397,7 @@ export const BIOME_BY_ID: BiomeId[] = [
   'cave',
 ];
 
-// Every BiomeId, as a runtime list. A ZONE's biome may be any of these — the
+// Every BiomeId, as a runtime list. A ZONE's biome may be any of these, the
 // realm biomes (frost, dusk, ember, ...) drive palettes, sky features (the
 // Frostveil's aurora), and ambient weather, and a zone carrying one round-trips
 // through a saved map even though no brush paints it. Validating a zone against
@@ -5714,7 +5712,7 @@ export function generateDecorations(seed: number): Decoration[] {
   // field into editable placements and now owns it. Ground dressing has always
   // honoured that (ground_dressing.ts); the TREE and ROCK scatter did not, so a
   // fully converted map kept ~1000 procedural trees standing that no tool could
-  // select — "a few trees are still not editable". Gate both the same way.
+  // select, "a few trees are still not editable". Gate both the same way.
   if (getActiveWorldContent().decorationsMode === 'empty') return [];
   const out: Decoration[] = [];
   appendDecorationRange(

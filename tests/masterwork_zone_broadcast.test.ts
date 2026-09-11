@@ -75,15 +75,6 @@ const ITEM_ID = 'eastbrook_ritual_vestments';
 // rng stream; 18 procs the first craft with this exact setup order. Spare
 // hunted seeds on record: 26, 29.
 const PROC_SEED = 18;
-// pinned literal is committed), re-recorded after the Eastbrook camp respacing
-// thinned the zone-1 camp counts and shifted the camp-driven world-gen draw
-// sequence. With tailoring as the active archetype and skill 200 the single
-// output-side draw procs at 0.14; at this seed, with this exact setup order
-// (three extra players added, then the archetype accept, the skill poke, 3x
-// linen_scrap, 1x spider_leg, then the craft), the first craft procs. Position
-// pokes after setup draw nothing, so both placements below share the identical
-// stream. Spare hunted seeds on record: 21, 23, 27, 28.
-const PROC_SEED = 2;
 
 // One procced craft with an audience: a bystander in the crafter's zone, a
 // player parked in instance space, and a player moved to a different overworld

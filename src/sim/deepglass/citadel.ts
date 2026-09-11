@@ -1,4 +1,4 @@
-// TIDEHOLD — the Warden City above the Deepglass, at FULL scale.
+// TIDEHOLD, the Warden City above the Deepglass, at FULL scale.
 //
 // The bell sits on a mesa in the sky with a chasm all round it and nothing on
 // the far side. This is the far side: the city the Wardens keep, terraced up
@@ -9,7 +9,7 @@
 //
 // AUTHORED THROUGH THE STUDIO LAYERS, like the arena it serves: terrain stamps,
 // placements, lights, point sounds, grass clear, ground paint, locations,
-// blockers and routed NPCs — the same fields the editor writes. Nothing here
+// blockers and routed NPCs, the same fields the editor writes. Nothing here
 // needs bespoke render code, which is why the whole city is data and every
 // piece of it can be opened in Studio and dragged.
 //
@@ -24,8 +24,8 @@
 //     terrace, route and district triples without touching the layout math;
 //   - BUILDING heights triple with it (the H table), so a house is a real
 //     three-storey stone house and the keep is a hundred-yard castle;
-//   - HUMAN-SCALE furniture — market stalls, streetlamps, crates, barrels,
-//     rails, torches — deliberately KEEPS its old size. Scale reads by
+//   - HUMAN-SCALE furniture, market stalls, streetlamps, crates, barrels,
+//     rails, torches, deliberately KEEPS its old size. Scale reads by
 //     contrast: a lamp you know the height of makes the wall behind it tall.
 //
 // The land grew with it: the wards now stand on a broad peninsula between two
@@ -39,8 +39,8 @@
 // The caldera is built in polar coordinates because it IS a ring. A city is
 // not: it has streets, terrace walls and building rows, and laying those out on
 // an annulus sector means every row is a different length and nothing lines up.
-// So the city has its own frame — `u` across (east positive), `v` along the
-// axis (north, away from the bell) — with the origin at the Tide Gate, and one
+// So the city has its own frame, `u` across (east positive), `v` along the
+// axis (north, away from the bell), with the origin at the Tide Gate, and one
 // scaled translation puts it in the world.
 //
 // Terraces are stamped as overlapping `level`+`flat` discs. That mode drives
@@ -52,12 +52,11 @@
 // The climb between wards is a run of small discs whose delta steps by
 // TH_RAMP_STEP (0.375: small enough that a lip crossed within one tick-step
 // still reads under the walkable slope limit), and kcas stair modules laid
-// over the ramp carry the LOOK — steps to the eye, a smooth ramp to the
+// over the ramp carry the LOOK, steps to the eye, a smooth ramp to the
 // character controller, which is the classic stairs trick.
 // ---------------------------------------------------------------------------
 
 import { assetFirePreset } from '../fire_effects';
-import { localOffset, pol, RING_BANK, RING_CASTLE, RING_MONUMENT, RING_TAVERN, ringSeat } from './citadel_ring_frame';
 import type {
   AssetFireEmitter,
   AssetFireStyle,
@@ -69,12 +68,21 @@ import type {
   PlacedAsset,
   WorldContent,
 } from '../types';
+import {
+  localOffset,
+  pol,
+  RING_BANK,
+  RING_CASTLE,
+  RING_MONUMENT,
+  RING_TAVERN,
+  ringSeat,
+} from './citadel_ring_frame';
 
 // ---------------------------------------------------------------------------
 // The frame
 // ---------------------------------------------------------------------------
 
-/** World z of the Tide Gate — the city's v = 0. North of the chasm's far lip. */
+/** World z of the Tide Gate, the city's v = 0. North of the chasm's far lip. */
 // Ring city (citadel_ring.ts): the island's south quay. The renderer's city cull
 // half-plane keys off this; the old city frame (th) only seats the residents'
 // roster now, and ringSeat re-maps every (u, v) onto the ring.
@@ -82,11 +90,10 @@ export const TH_GATE_Z = 215;
 
 /** The city-frame scale. Layout is authored in "city units" and rendered at
  *  three times that, which is how the whole plan tripled in one place. Heights
- *  do NOT pass through this — they are retuned by hand in the H table, because
+ *  do NOT pass through this, they are retuned by hand in the H table, because
  *  a lamp must stay lamp-sized while the wall behind it triples. */
 // City frame scale. Tightened from the original 3 to 1.8 (a 40% shrink) because
-// the wards read as mostly empty ground, then opened back up 20% to 2.16 —
-// buildings keep their real size, only the distance between them moves. The
+// the wards read as mostly empty ground, then opened back up 20% to 2.16, // buildings keep their real size, only the distance between them moves. The
 // arena is laid out in world units by layout.ts and is deliberately unaffected.
 export const TH_S = 2.16;
 
@@ -133,7 +140,7 @@ export const TH_KEEP = ward('th_keep');
 
 /** Where the causeway meets the arena terrace (WORLD z), and its half width in
  *  WORLD yards. The causeway is the one piece of the city anchored in the
- *  arena's frame — it must land on the terrace whatever the city scale does. */
+ *  arena's frame, it must land on the terrace whatever the city scale does. */
 const TH_CAUSEWAY_Z0 = 94;
 const TH_CAUSEWAY_HALF_W = 13;
 /**
@@ -173,7 +180,7 @@ export const TH_MONUMENT = (() => {
 /** Rise per causeway/ramp disc. Under MAX_STEP_HEIGHT = 0.9, so every step of
  *  the climb is a stride to the character controller rather than a wall. */
 // Under 0.5, never 0.6: a lip is crossed inside ONE tick-step (~0.35 yd), so
-// the climb gate reads lip/step as the slope — 0.6 lips read 1.7, OVER the 1.5
+// the climb gate reads lip/step as the slope, 0.6 lips read 1.7, OVER the 1.5
 // walkable limit, and the old ramps stuttered and walled on the way up
 // ("slightly too steep"). At 0.375 every lip reads ~1.07 and the climb strides
 // smooth (and the body rides the flight's collider PLANE anyway, stairFloor);
@@ -206,7 +213,7 @@ export const TH_SEA_FLOOR = -55;
  *  at -16, well below the arena terrace (y 0); raised to just under the terrace
  *  so the moat and fjords read as a real sea lapping the island rather than a
  *  distant puddle at the bottom of a chasm. The bergs are stamped RELATIVE to
- *  this, so ice and water can never drift apart again — world.ts reads the same
+ *  this, so ice and water can never drift apart again, world.ts reads the same
  *  constant for the rendered surface, the swim volume and the underwater fog. */
 export const TH_WATER_Y = -2;
 const TH_BERG_FREEBOARD = 1.6;
@@ -233,13 +240,13 @@ const TH_BACK_RANGE_Z = 930;
 // The renderer normalizes every placed model to 2.2 yd tall at scale 1, so a
 // placement's rendered HEIGHT is 2.2 * scale whatever the model is, and its
 // footprint follows from the model's own aspect. `hi()` therefore asks for a
-// height in yards, and `foot()` answers what that costs in ground — which is
+// height in yards, and `foot()` answers what that costs in ground, which is
 // what a street layout actually needs to know.
 // ---------------------------------------------------------------------------
 
 const TARGET_H = 2.2;
 
-/** Raw GLB bounds in yards. Measured, not guessed — `tmp/_measure_glb.mjs`
+/** Raw GLB bounds in yards. Measured, not guessed, `tmp/_measure_glb.mjs`
  *  reads them straight out of the files (and cross-checks against the browser's
  *  own Box3), so a number here is never someone's recollection of a model. */
 const SIZE: Record<string, readonly [number, number, number]> = {
@@ -333,7 +340,7 @@ const SIZE: Record<string, readonly [number, number, number]> = {
   // (scripts/assets/build_deepglass_warden_pylon.py).
   'deepglass/warden_pylon': [3.05, 8.77, 3.05],
   // Tidehold's own two: built for this city (Blender, plain PBR, no textures).
-  // The beacon's bounds INCLUDE its light beam — placed at H.beacon the solid
+  // The beacon's bounds INCLUDE its light beam, placed at H.beacon the solid
   // tower is about two thirds and the beam carries the rest into the sky.
   'props/tidehold_fountain': [10.8, 6.15, 10.8],
   // The Realm Builder monument (scripts/assets/specs/realm_builder_monument.json):
@@ -348,12 +355,12 @@ const SIZE: Record<string, readonly [number, number, number]> = {
 
   // The explorable buildings (Blender-assembled from the medieval_village_v2
   // kit, tmp scratchpad bl_*.py): authored at WORLD scale in yards, so their
-  // placements pass maxDim as the height argument — scale = maxDim/2.2 exactly
+  // placements pass maxDim as the height argument, scale = maxDim/2.2 exactly
   // cancels the loader's normalization and the building renders at authored
   // size. Collision is authored per-asset (asset_collision_overrides), the
   // roof/upper-storey hide is render/interior_reveal.ts.
   'tidehold/tavern': [26.78, 22.21, 22.09],
-  'tidehold/tavern_b': [56.76, 33.70, 42.64], // bl_tavern_b.py, measured on install
+  'tidehold/tavern_b': [56.76, 33.7, 42.64], // bl_tavern_b.py, measured on install
   'props/plot_sign': [0.233, 2.48, 1.9], // dg_plot_sign.py sidecar
   'tidehold/bank': [25.91, 27.03, 22.11],
   'tidehold/market': [35.64, 13.96, 19.53],
@@ -424,7 +431,7 @@ interface PlaceOpts {
   scaleY?: number;
   scaleZ?: number;
   /** Seat the model at EXACTLY this world height instead of sampling the
-   *  terrain under its anchor — what lets a stair module sit flush on a
+   *  terrain under its anchor, what lets a stair module sit flush on a
    *  graded ramp whose height varies across the module's own footprint. */
   seatY?: number;
   /** Collision opt-in AND the fallback radius. Any value > 0 turns collision
@@ -434,7 +441,7 @@ interface PlaceOpts {
   collide?: number;
   square?: boolean;
   /** Keep the hand-authored circle/square INSTEAD of the baked boxes. The old
-   *  default; now the exception, because the city wants real hitboxes — walk
+   *  default; now the exception, because the city wants real hitboxes, walk
    *  through an archway, stand against a wall's actual face. */
   custom?: boolean;
   /** Authored flame/glow emitters (hearths, forges, chandeliers): the warm
@@ -527,7 +534,7 @@ export function wallRunW(
     gateAtMid?: boolean;
     torches?: boolean;
     /** Module index this run continues from, so a wall laid one module at a
-     *  time (an arc) still gets a pillar every `pillarEvery` — a fresh run per
+     *  time (an arc) still gets a pillar every `pillarEvery`, a fresh run per
      *  module made EVERY module a pillar and no plain panel ever appeared. */
     startIndex?: number;
   } = {},
@@ -577,7 +584,7 @@ function wallRun(
   wallRunW(out, a.x, a.z, b.x, b.z, heightYd, opts);
 }
 
-/** A balustrade run between two WORLD points — the low kcas barrier, for
+/** A balustrade run between two WORLD points, the low kcas barrier, for
  *  terrace lips, the causeway and the bridge decks. Human scale on purpose. */
 function barrierRunW(
   out: PlacedAsset[],
@@ -648,7 +655,7 @@ function lampRow(
  *
  * The centres are INSET by one radius. A disc centred on the boundary reaches a
  * full radius past it, and since the wards are stamped in climbing order that
- * bleed had each terrace eating a full disc off the one below it — the Tide
+ * bleed had each terrace eating a full disc off the one below it, the Tide
  * Gate's stables ended up standing on the market's shelf. Inset, the union's
  * edge lands on the boundary instead, give or take the scallop between
  * neighbouring arcs, which is what a terrace cut out of rock should look like
@@ -695,7 +702,7 @@ function wardShelf(out: HeightStamp[], w: Ward, marginU = 6): void {
 /** A graded climb along z from y0 to y1, as a run of small level discs. WORLD.
  *
  *  The discs are wide (they must cover the lane's full width), so each one
- *  reaches far past its own tread along z — and level stamps apply in array
+ *  reaches far past its own tread along z, and level stamps apply in array
  *  order, later wins. Stamped AT the tread line, the highest disc covering a
  *  point governed it, which slid the whole grade a disc-radius EARLY: the
  *  climb began and topped out ~discR before its authored span, and the stair
@@ -708,7 +715,7 @@ function wardShelf(out: HeightStamp[], w: Ward, marginU = 6): void {
  *  face at their rim (an embankment wall where the flank is lower, a trench
  *  wall where the flank is the upper terrace, up to 13 yd tall at a seam's
  *  head); a smooth-falloff disc centred ON that rim, stamped before the flat
- *  band, turns the face into a slope this wide — 14 keeps the steepest trench
+ *  band, turns the face into a slope this wide, 14 keeps the steepest trench
  *  wall near 45 degrees. The cost is that a disc spills the same distance
  *  past the flight's head and foot, where its plateau is a few risers off the
  *  plaza: a shallow saddle at the stair corners rather than a sharp edge. */
@@ -728,7 +735,7 @@ const TH_RAMP_DISC_MIN = 3;
  * centreline is reached by discs a full radius further along the climb, a
  * point at the rim only by discs a few yards along, so mid-flight the rim sat
  * 2.7 yd under the centreline and the stair block's side walls stood that
- * far proud of the ground — a wall down both edges of every flight. Small
+ * far proud of the ground, a wall down both edges of every flight. Small
  * discs reach only a tread or so ahead wherever they sit, so every plateau is
  * level from rim to rim and meets the block's treads at its edges.
  *
@@ -777,7 +784,7 @@ function rampW(
   for (let i = 0; i <= steps; i++) {
     for (let k = 0; k <= across; k++) {
       out.push({
-        x: xCentre - rimR + ((2 * rimR) * k) / across,
+        x: xCentre - rimR + (2 * rimR * k) / across,
         z: zAt(i),
         radius: r,
         delta: yAt(i),
@@ -814,9 +821,9 @@ function stripW(
 /**
  * The Tideway: the one causeway over the chasm.
  *
- * Real ground, not a bridge deck — a raised isthmus the level stamps carve out
+ * Real ground, not a bridge deck, a raised isthmus the level stamps carve out
  * of the drop, so it collides and pathfinds like any other floor. The chasm is
- * left open either side of it — open ICE WATER now — which is what makes it
+ * left open either side of it, open ICE WATER now, which is what makes it
  * read as a span.
  */
 function causewayTerrain(out: HeightStamp[]): void {
@@ -907,7 +914,7 @@ function seaFloor(out: HeightStamp[]): void {
  * Warden's Seat. Also the SEA FLOOR, which must come first in this same array
  * so the mountains rise out of the water rather than being flattened by it.
  *
- * (This function keeps its old name — world.ts spreads it between the caldera
+ * (This function keeps its old name, world.ts spreads it between the caldera
  * and the city terraces, which is exactly the order all of this needs.)
  */
 export function citadelBackingRange(): HeightStamp[] {
@@ -1047,7 +1054,7 @@ export function citadelTerrain(): HeightStamp[] {
   }
   // The back apron. Without it the ground fell off a cliff the instant it left
   // the Warden's Seat's rear wall and sat in a pit until the backing range
-  // caught it — a hole behind the castle that a player looking down from the
+  // caught it, a hole behind the castle that a player looking down from the
   // keep would see straight into. This carries the shelf north to meet the
   // mountains' skirt, and being a level stamp it also planes off the range's
   // toe so the two meet cleanly instead of interpenetrating.
@@ -1090,7 +1097,7 @@ export function citadelTerrain(): HeightStamp[] {
   }
   causewayTerrain(out);
   // The bergs, last: pillars of ice the sea stamps would otherwise flatten.
-  // Two stamps each — a smooth underwater shoulder, then a FLAT ice table, so
+  // Two stamps each, a smooth underwater shoulder, then a FLAT ice table, so
   // the whole cap stands proud of the waterline instead of only its very peak.
   for (const b of TH_BERGS) {
     out.push({
@@ -1118,7 +1125,7 @@ export function citadelTerrain(): HeightStamp[] {
  *
  * The stamps carve the basins, but carving alone makes no sea: waterLevelAt()
  * answers -Infinity outside a declared lake footprint or naturally-generated
- * open sea, and isOpenSeaAt() deliberately ignores the edit layer (#1518 — an
+ * open sea, and isOpenSeaAt() deliberately ignores the edit layer (#1518, an
  * author's crater must not flood). So a world whose every low is stamp-carved
  * gets NO water surface, no swim volume and no rendered sheet unless it also
  * declares the water. These circles trace the carved lows: the moat ring in
@@ -1209,7 +1216,7 @@ export function citadelBlockers(): NonNullable<WorldContent['blockers']> {
 //
 // Laid out ward by ward from the gate up. Every position is in the city frame
 // (u across, v along), every size is a HEIGHT in yards, and the footprints come
-// out of the measured table above — so a row of houses is spaced by what the
+// out of the measured table above, so a row of houses is spaced by what the
 // houses actually occupy rather than by a number that looked right once.
 // ---------------------------------------------------------------------------
 
@@ -1357,14 +1364,71 @@ export const TH_BANK_FLAMES: readonly AssetFireEmitter[] = [
  *  each end of the long bar, the three lamps hung over the open void, and the
  *  lantern in the belfry that makes the tower read at night. */
 export const TH_TAVERN_B_FLAMES: readonly AssetFireEmitter[] = [
-  flame('hearth', 'bonfire', -22.24, 0.78, 0.0, { scale: 0.8, glow: 3.0, glowRange: 20, smoke: 0.15 }),
-  flame('bar-w', 'torch', -3.7, 2.31, 9.44, { scale: 0.26, opacity: 0.5, glow: 1.7, glowRange: 10, smoke: 0 }),
-  flame('bar-e', 'torch', 8.14, 2.31, 9.44, { scale: 0.26, opacity: 0.5, glow: 1.7, glowRange: 10, smoke: 0 }),
-  flame('lamp-1', 'torch', -15.54, 5.03, 0.0, { scale: 0.24, width: 0.6, height: 0.55, opacity: 0.45, glow: 2.8, glowRange: 18, smoke: 0 }),
-  flame('lamp-2', 'torch', -5.55, 5.03, -1.11, { scale: 0.24, width: 0.6, height: 0.55, opacity: 0.45, glow: 2.8, glowRange: 18, smoke: 0 }),
-  flame('lamp-3', 'torch', 5.55, 5.03, -1.11, { scale: 0.24, width: 0.6, height: 0.55, opacity: 0.45, glow: 2.8, glowRange: 18, smoke: 0 }),
-  flame('lamp-4', 'torch', 15.54, 5.03, 0.0, { scale: 0.24, width: 0.6, height: 0.55, opacity: 0.45, glow: 2.8, glowRange: 18, smoke: 0 }),
-  flame('belfry', 'torch', 0.0, 26.99, 0.0, { scale: 0.28, width: 0.7, height: 0.6, opacity: 0.5, glow: 3.2, glowRange: 28, smoke: 0 }),
+  flame('hearth', 'bonfire', -22.24, 0.78, 0.0, {
+    scale: 0.8,
+    glow: 3.0,
+    glowRange: 20,
+    smoke: 0.15,
+  }),
+  flame('bar-w', 'torch', -3.7, 2.31, 9.44, {
+    scale: 0.26,
+    opacity: 0.5,
+    glow: 1.7,
+    glowRange: 10,
+    smoke: 0,
+  }),
+  flame('bar-e', 'torch', 8.14, 2.31, 9.44, {
+    scale: 0.26,
+    opacity: 0.5,
+    glow: 1.7,
+    glowRange: 10,
+    smoke: 0,
+  }),
+  flame('lamp-1', 'torch', -15.54, 5.03, 0.0, {
+    scale: 0.24,
+    width: 0.6,
+    height: 0.55,
+    opacity: 0.45,
+    glow: 2.8,
+    glowRange: 18,
+    smoke: 0,
+  }),
+  flame('lamp-2', 'torch', -5.55, 5.03, -1.11, {
+    scale: 0.24,
+    width: 0.6,
+    height: 0.55,
+    opacity: 0.45,
+    glow: 2.8,
+    glowRange: 18,
+    smoke: 0,
+  }),
+  flame('lamp-3', 'torch', 5.55, 5.03, -1.11, {
+    scale: 0.24,
+    width: 0.6,
+    height: 0.55,
+    opacity: 0.45,
+    glow: 2.8,
+    glowRange: 18,
+    smoke: 0,
+  }),
+  flame('lamp-4', 'torch', 15.54, 5.03, 0.0, {
+    scale: 0.24,
+    width: 0.6,
+    height: 0.55,
+    opacity: 0.45,
+    glow: 2.8,
+    glowRange: 18,
+    smoke: 0,
+  }),
+  flame('belfry', 'torch', 0.0, 26.99, 0.0, {
+    scale: 0.28,
+    width: 0.7,
+    height: 0.6,
+    opacity: 0.5,
+    glow: 3.2,
+    glowRange: 28,
+    smoke: 0,
+  }),
 ];
 
 export const TH_TAVERN_FLAMES: readonly AssetFireEmitter[] = [
@@ -1488,14 +1552,54 @@ export const TH_HALL_FLAMES: readonly AssetFireEmitter[] = [
 /** Castle B's fires, model yards (kit x 1.35; z = -kit y): four courtyard
  *  braziers, four down the great hall's aisle, two torches at the gate. */
 export const TH_CASTLE_B_FLAMES: readonly AssetFireEmitter[] = [
-  flame('yard-sw', 'bonfire', -21.6, 1.15, -5.4, { scale: 0.34, glow: 3.4, glowRange: 22, smoke: 0.1 }),
-  flame('yard-se', 'bonfire', 21.6, 1.15, -5.4, { scale: 0.34, glow: 3.4, glowRange: 22, smoke: 0.1 }),
-  flame('yard-nw', 'bonfire', -21.6, 1.15, -25.65, { scale: 0.34, glow: 3.4, glowRange: 22, smoke: 0.1 }),
-  flame('yard-ne', 'bonfire', 21.6, 1.15, -25.65, { scale: 0.34, glow: 3.4, glowRange: 22, smoke: 0.1 }),
-  flame('hall-fw', 'bonfire', -4.59, 1.05, 9.11, { scale: 0.34, glow: 3.4, glowRange: 22, smoke: 0.1 }),
-  flame('hall-fe', 'bonfire', 4.59, 1.05, 9.11, { scale: 0.34, glow: 3.4, glowRange: 22, smoke: 0.1 }),
-  flame('hall-bw', 'bonfire', -4.59, 1.05, 13.84, { scale: 0.34, glow: 3.4, glowRange: 22, smoke: 0.1 }),
-  flame('hall-be', 'bonfire', 4.59, 1.05, 13.84, { scale: 0.34, glow: 3.4, glowRange: 22, smoke: 0.1 }),
+  flame('yard-sw', 'bonfire', -21.6, 1.15, -5.4, {
+    scale: 0.34,
+    glow: 3.4,
+    glowRange: 22,
+    smoke: 0.1,
+  }),
+  flame('yard-se', 'bonfire', 21.6, 1.15, -5.4, {
+    scale: 0.34,
+    glow: 3.4,
+    glowRange: 22,
+    smoke: 0.1,
+  }),
+  flame('yard-nw', 'bonfire', -21.6, 1.15, -25.65, {
+    scale: 0.34,
+    glow: 3.4,
+    glowRange: 22,
+    smoke: 0.1,
+  }),
+  flame('yard-ne', 'bonfire', 21.6, 1.15, -25.65, {
+    scale: 0.34,
+    glow: 3.4,
+    glowRange: 22,
+    smoke: 0.1,
+  }),
+  flame('hall-fw', 'bonfire', -4.59, 1.05, 9.11, {
+    scale: 0.34,
+    glow: 3.4,
+    glowRange: 22,
+    smoke: 0.1,
+  }),
+  flame('hall-fe', 'bonfire', 4.59, 1.05, 9.11, {
+    scale: 0.34,
+    glow: 3.4,
+    glowRange: 22,
+    smoke: 0.1,
+  }),
+  flame('hall-bw', 'bonfire', -4.59, 1.05, 13.84, {
+    scale: 0.34,
+    glow: 3.4,
+    glowRange: 22,
+    smoke: 0.1,
+  }),
+  flame('hall-be', 'bonfire', 4.59, 1.05, 13.84, {
+    scale: 0.34,
+    glow: 3.4,
+    glowRange: 22,
+    smoke: 0.1,
+  }),
   flame('gate-w', 'torch', -3.2, 4.9, -33.0, { scale: 0.3, glow: 2.0, glowRange: 12, smoke: 0.15 }),
   flame('gate-e', 'torch', 3.2, 4.9, -33.0, { scale: 0.3, glow: 2.0, glowRange: 12, smoke: 0.15 }),
   // Troy (2026-09-10): "add some light sources to the braziers, candles and
@@ -1515,18 +1619,47 @@ export const TH_CASTLE_B_FLAMES: readonly AssetFireEmitter[] = [
   candle('mid-table', 4.05, 8.3, 10.8),
   candle('top-table', 5.94, 15.1, 10.26),
   candle('solar', -22.95, 8.4, 8.78),
-  flame('hearth', 'bonfire', 25.65, 1.0, 15.2, { scale: 0.28, glow: 2.4, glowRange: 14, smoke: 0.12 }),
+  flame('hearth', 'bonfire', 25.65, 1.0, 15.2, {
+    scale: 0.28,
+    glow: 2.4,
+    glowRange: 14,
+    smoke: 0.12,
+  }),
   // the hearths on the east wall of the library (z 5) and the Warden's floor (z 10)
-  flame('mid-hearth', 'bonfire', 16.1, 7.5, 14.2, { scale: 0.26, glow: 2.4, glowRange: 14, smoke: 0.1 }),
-  flame('top-hearth', 'bonfire', 16.1, 14.25, 16.2, { scale: 0.26, glow: 2.4, glowRange: 14, smoke: 0.1 }),
+  flame('mid-hearth', 'bonfire', 16.1, 7.5, 14.2, {
+    scale: 0.26,
+    glow: 2.4,
+    glowRange: 14,
+    smoke: 0.1,
+  }),
+  flame('top-hearth', 'bonfire', 16.1, 14.25, 16.2, {
+    scale: 0.26,
+    glow: 2.4,
+    glowRange: 14,
+    smoke: 0.1,
+  }),
 ];
 
 function chandelier(id: string, x: number, y: number, z: number): AssetFireEmitter {
-  return flame(id, 'torch', x, y, z, { scale: 0.2, width: 0.6, height: 0.55, opacity: 0.42, glow: 2.6, glowRange: 16, smoke: 0 });
+  return flame(id, 'torch', x, y, z, {
+    scale: 0.2,
+    width: 0.6,
+    height: 0.55,
+    opacity: 0.42,
+    glow: 2.6,
+    glowRange: 16,
+    smoke: 0,
+  });
 }
 
 function candle(id: string, x: number, y: number, z: number): AssetFireEmitter {
-  return flame(id, 'torch', x, y, z, { scale: 0.1, opacity: 0.5, glow: 1.2, glowRange: 6, smoke: 0 });
+  return flame(id, 'torch', x, y, z, {
+    scale: 0.1,
+    opacity: 0.5,
+    glow: 1.2,
+    glowRange: 6,
+    smoke: 0,
+  });
 }
 
 function marketWard(out: PlacedAsset[]): void {
@@ -1564,8 +1697,7 @@ function marketWard(out: PlacedAsset[]): void {
       custom: true,
     },
   );
-  // The stall ring: twelve stalls facing the water, HUMAN scale on purpose —
-  // the market crowd is what makes the monumental shell read as lived-in.
+  // The stall ring: twelve stalls facing the water, HUMAN scale on purpose,   // the market crowd is what makes the monumental shell read as lived-in.
   for (let i = 0; i < 12; i++) {
     const a = (i / 12) * Math.PI * 2;
     const su = Math.sin(a) * 8;
@@ -1765,7 +1897,7 @@ function keepWard(out: PlacedAsset[]): void {
     collide: 3,
     // Model yards: kit * S where S = 1.35, and model z = -kit y (the keep's
     // front faces +y in Blender, which exports to -z). Recomputed with the
-    // rebuild — the first cut was authored against S = 2.0.
+    // rebuild, the first cut was authored against S = 2.0.
     fireEffects: [
       // Four standing braziers down the hall aisle, between the pillars and
       // the runner. The hall has a real ceiling (the terrace floor), so these
@@ -1815,7 +1947,7 @@ function keepWard(out: PlacedAsset[]): void {
         smoke: 0,
       }),
       // The two gallery braziers were removed in the hand-edit pass, so their
-      // flames went with them — a flame with no brazier under it floats.
+      // flames went with them, a flame with no brazier under it floats.
       // Terrace braziers.
       flame('roof-w', 'torch', -5.06, 14.55, -3.38, {
         scale: 0.3,
@@ -2133,7 +2265,7 @@ function densify(out: PlacedAsset[]): void {
 
 /**
  * The flourish pass: banners, ramp-mouth lamps and street braziers. Pure
- * theatre — the pieces that make the monumental shell read as a city that is
+ * theatre, the pieces that make the monumental shell read as a city that is
  * proud of itself, and light the walk so no ward ever goes dark between pools.
  */
 function flourish(out: PlacedAsset[]): void {
@@ -2206,9 +2338,9 @@ function flourish(out: PlacedAsset[]): void {
 //   1. The TERRAIN under it is rampW's stepped plateaus (a level disc per
 //      tread): a heightfield, so between two plateaus the ground interpolates
 //      up toward the next one. The stone is one SOLID stepped block per
-//      flight — an inline built model (MODEL_PATH) whose box for tread i runs
+//      flight, an inline built model (MODEL_PATH) whose box for tread i runs
 //      from half a yard under the foot plaza up to that tread's top, the full
-//      lane width — so the ground is buried inside the masonry from foot to
+//      lane width, so the ground is buried inside the masonry from foot to
 //      head and can never show through a tread, and the flight's sides are
 //      flat walls sitting flush on whatever ground lies beside them (the old
 //      courses of loose slabs overhung the wedge under them by a riser each,
@@ -2469,7 +2601,7 @@ export const TH_HEARTH_COLOR = 0xffb46a;
 
 /**
  * Point lights. The cap is MAX_LIGHTS = 24 for a document and the arena already
- * spends 8, so this is a DELIBERATELY short list — 15 pools that matter (the
+ * spends 8, so this is a DELIBERATELY short list, 15 pools that matter (the
  * gate colossi, the fountain, the spans, the keep) rather than one per lamp
  * post. The streetlamp model carries its own emissive, which is what actually
  * reads at distance.
@@ -2616,7 +2748,7 @@ export function citadelGrassClear(): NonNullable<WorldContent['grassClear']> {
 // The texture painter's own layer, authored in code the way shipped_thornhollow
 // does it: built-in PBR sets (render/terrain_texture_sets.ts), so the ground
 // art resolves from the app bundle on every machine the map opens on. In
-// Studio these arrive as ordinary palette swatches — repaint away.
+// Studio these arrive as ordinary palette swatches, repaint away.
 // ---------------------------------------------------------------------------
 
 export const PAINT_PLAZA = 200; // CUSTOM_PAINT_ID_MIN
@@ -2705,8 +2837,7 @@ export const TH_SWATCHES: CustomPaintSwatch[] = [
   },
 ];
 
-/** Which swatch paints WORLD (x, z). 255 = unpainted (the biome's own ground —
- *  the arena terrace, the mountains, the sea floor). Mirrors the layout so the
+/** Which swatch paints WORLD (x, z). 255 = unpainted (the biome's own ground,  *  the arena terrace, the mountains, the sea floor). Mirrors the layout so the
  *  ground reads the city: paving under the plaza, cobbles up the boulevard,
  *  frost on every lip that overhangs the ice. */
 function paintAt(x: number, z: number): number {
@@ -2777,7 +2908,7 @@ function paintAt(x: number, z: number): number {
     }
   }
 
-  // The arena esplanade: the whole terrace reads as one built floor — pale
+  // The arena esplanade: the whole terrace reads as one built floor, pale
   // paving from the plaza out to the parapet, so no meadow grows between the
   // stadium and the drop. (The stadium's own stone rings draw over it; the
   // slope past ~103 falls to the moat and keeps the biome's rock rules.)
@@ -2788,7 +2919,7 @@ function paintAt(x: number, z: number): number {
     if (Math.hypot(x - b.x, z - b.z) <= b.r + 2) return PAINT_FROST;
   }
 
-  // The chasm walls keep the biome's own slope-rock rules — painting them
+  // The chasm walls keep the biome's own slope-rock rules, painting them
   // dark read as a stain ringing the arena rather than as stone.
   return 255;
 }
@@ -2822,7 +2953,7 @@ export function citadelBiomePaint(): BiomePaint {
 // citadel_spawn.ts after world init. That is not tidiness: the generic surface
 // loop allocates ids as it walks, so forty extra bodies would shift every id
 // after them, move the deepball bout's rng with them, and tip the pacing
-// assertion in tests/deepglass.test.ts — the exact trap the marshal taught.
+// assertion in tests/deepglass.test.ts, the exact trap the marshal taught.
 //
 // APPEND ONLY: entity id is TH_ENTITY_ID_BASE + roster index, so inserting a
 // resident in the middle would renumber everyone after them.
@@ -2856,7 +2987,7 @@ function resident(
   seatResident(rest, ringSeat(u, v), walk);
 }
 
-/** A resident seated at an explicit WORLD point — for the keepers whose seat
+/** A resident seated at an explicit WORLD point, for the keepers whose seat
  *  is a fixed model-space offset of their own building (the innkeeper behind
  *  his bar, the coffer-keeper at his steps), derived from the ring's landmark
  *  seats rather than re-mapped from the old plan. */
@@ -2877,9 +3008,9 @@ function seatResident(
 ): void {
   const full: NpcDef = { ...rest, pos: { x: p.x, z: p.z }, questIds: [], dynamic: true } as NpcDef;
   // The walk is baked into the DEF, not attached at spawn time. The def is the
-  // one record that reaches every world shape — the code-built arena's
+  // one record that reaches every world shape, the code-built arena's
   // reserved-id spawner, and a Studio document whose surface loop places the
-  // roster itself — and map_doc's sanitizeNpc round-trips `route`, so a def
+  // roster itself, and map_doc's sanitizeNpc round-trips `route`, so a def
   // that carries its patrol keeps it through export, import and re-save.
   if (walk) {
     full.route = {
@@ -3050,9 +3181,9 @@ resident({
     'Glass is the Warden’s business. Steel is mine, and mine holds when the glass does not.',
 });
 
-// Tide's Coffer's keeper stands at his own steps — model yards (4.3, -17.3)
+// Tide's Coffer's keeper stands at his own steps, model yards (4.3, -17.3)
 // of the bank, a stride off the shop window and beside the strongbox, as on
-// the old plan — facing the street. Seated off RING_BANK so he follows the
+// the old plan, facing the street. Seated off RING_BANK so he follows the
 // bank wherever the ring puts it.
 {
   const bankSeat = localOffset(pol(RING_BANK.r, RING_BANK.phi), RING_BANK.phi, 4.32, -17.28);
@@ -3368,15 +3499,72 @@ const CB_GUARDS: {
   greeting: string;
   walk?: [number, number][];
 }[] = [
-  { name: 'Guard Ottar', at: [-3.4, 21.2], look: [-3.4, 40], greeting: 'The gate stands open by the Warden’s word. Mind the portcullis if the bell rings.' },
-  { name: 'Guard Lisbet', at: [3.4, 21.2], look: [3.4, 40], greeting: 'Keep to the yard, friend. The hall is the Warden’s, and the towers are ours.' },
-  { name: 'Guard Vance', at: [-2.8, -0.4], look: [-2.8, 20], greeting: 'The Warden holds court within. Wipe your boots, that carpet came from Goldcrest.' },
-  { name: 'Guard Merrin', at: [2.8, -0.4], look: [2.8, 20], greeting: 'Petitioners to the hall, deliveries to the kitchen wing. Which are you?' },
-  { name: 'Guard Halvard', at: [-4.0, -11.2], look: [-4.0, 0], greeting: 'Eyes front. The Warden is listening even when she is not looking.' },
-  { name: 'Guard Sunniva', at: [4.0, -11.2], look: [4.0, 0], greeting: 'Stand where the carpet ends. No closer, unless she calls you.' },
-  { name: 'Guard Roderic', at: [-12, 5], look: [12, 5], greeting: 'Round and round the yard. Someone has to.', walk: [[-12, 5], [-12, 17], [12, 17], [12, 5]] },
-  { name: 'Guard Ansel', at: [12, 17], look: [-12, 17], greeting: 'A dry post, a full belly and a view of the fountain. There are worse watches.', walk: [[12, 17], [12, 5], [-12, 5], [-12, 17]] },
-  { name: 'Guard Tove', at: [-19, -7], look: [-13, -7], greeting: 'Barracks. Off-watch means asleep, so keep it down.' },
+  {
+    name: 'Guard Ottar',
+    at: [-3.4, 21.2],
+    look: [-3.4, 40],
+    greeting: 'The gate stands open by the Warden’s word. Mind the portcullis if the bell rings.',
+  },
+  {
+    name: 'Guard Lisbet',
+    at: [3.4, 21.2],
+    look: [3.4, 40],
+    greeting: 'Keep to the yard, friend. The hall is the Warden’s, and the towers are ours.',
+  },
+  {
+    name: 'Guard Vance',
+    at: [-2.8, -0.4],
+    look: [-2.8, 20],
+    greeting: 'The Warden holds court within. Wipe your boots, that carpet came from Goldcrest.',
+  },
+  {
+    name: 'Guard Merrin',
+    at: [2.8, -0.4],
+    look: [2.8, 20],
+    greeting: 'Petitioners to the hall, deliveries to the kitchen wing. Which are you?',
+  },
+  {
+    name: 'Guard Halvard',
+    at: [-4.0, -11.2],
+    look: [-4.0, 0],
+    greeting: 'Eyes front. The Warden is listening even when she is not looking.',
+  },
+  {
+    name: 'Guard Sunniva',
+    at: [4.0, -11.2],
+    look: [4.0, 0],
+    greeting: 'Stand where the carpet ends. No closer, unless she calls you.',
+  },
+  {
+    name: 'Guard Roderic',
+    at: [-12, 5],
+    look: [12, 5],
+    greeting: 'Round and round the yard. Someone has to.',
+    walk: [
+      [-12, 5],
+      [-12, 17],
+      [12, 17],
+      [12, 5],
+    ],
+  },
+  {
+    name: 'Guard Ansel',
+    at: [12, 17],
+    look: [-12, 17],
+    greeting: 'A dry post, a full belly and a view of the fountain. There are worse watches.',
+    walk: [
+      [12, 17],
+      [12, 5],
+      [-12, 5],
+      [-12, 17],
+    ],
+  },
+  {
+    name: 'Guard Tove',
+    at: [-19, -7],
+    look: [-13, -7],
+    greeting: 'Barracks. Off-watch means asleep, so keep it down.',
+  },
 ];
 CB_GUARDS.forEach((g, i) => {
   const seat = cb(g.at[0], g.at[1]);

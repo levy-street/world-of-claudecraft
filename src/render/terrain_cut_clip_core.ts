@@ -13,7 +13,7 @@
 //
 // Crossing interpolation reuses the rim core's own lerp (same SNAP_EPS, same
 // clamping), so the rim wall's top edge and the clipped surface edge are the
-// SAME point list — the wall meets the ground watertight.
+// SAME point list, the wall meets the ground watertight.
 
 import { buildCutRim, type CutRimArrays, lerpEdge } from './terrain_cut_rim_core';
 
@@ -44,7 +44,7 @@ export interface CutClipInput {
   fieldAt(x: number, y: number, z: number): number;
 }
 
-/** The clipped surface patch, positions only — the caller interpolates the
+/** The clipped surface patch, positions only, the caller interpolates the
  *  chunk's own vertex attributes over it. */
 export interface CutClipSurf {
   positions: Float32Array;
@@ -244,8 +244,7 @@ export function buildCutClip(input: CutClipInput): CutClipResult | null {
               }
               continue;
             }
-            // Walk the corners counter-clockwise seen from above —
-            // c0=(0,0) -> c1=(0,+z) -> c2=(+x,+z) -> c3=(+x,0) — keeping the
+            // Walk the corners counter-clockwise seen from above,             // c0=(0,0) -> c1=(0,+z) -> c2=(+x,+z) -> c3=(+x,0), keeping the
             // outside corners and inserting a crossing on every mixed edge.
             const poly: number[] = [];
             const corners = [

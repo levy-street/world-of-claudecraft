@@ -3,7 +3,6 @@
 // crown, and the sign's read/buy loop through the sim (Troy, 2026-09-08).
 import { describe, expect, it } from 'vitest';
 import { setActiveWorldContent } from '../src/sim/data';
-import { buildDeepglassWorld } from '../src/sim/deepglass/world';
 import {
   PLOT_DIMS,
   plotPrice,
@@ -12,6 +11,7 @@ import {
   RING_PLOTS,
   ringPlacements,
 } from '../src/sim/deepglass/citadel_ring';
+import { buildDeepglassWorld } from '../src/sim/deepglass/world';
 import { plotSignEntityId } from '../src/sim/plots';
 import { Sim } from '../src/sim/sim';
 import { PLOT_SIGN_TEMPLATE_ID } from '../src/sim/types';
@@ -42,7 +42,9 @@ describe('the plots and their signs', () => {
     const others = ringPlacements().filter((p) => p.path !== '/models/props/plot_sign.glb');
     for (const s of RING_PLOT_SIGNS) {
       for (const p of others) {
-        expect(Math.hypot(p.x - s.x, p.z - s.z), `${p.path} under a plot sign`).toBeGreaterThan(1.6);
+        expect(Math.hypot(p.x - s.x, p.z - s.z), `${p.path} under a plot sign`).toBeGreaterThan(
+          1.6,
+        );
       }
     }
   });
@@ -63,7 +65,12 @@ describe('the plots and their signs', () => {
 
   it('reads the deed at the sign and sells it once, saving the deed with the character', () => {
     setActiveWorldContent(buildDeepglassWorld());
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true, world: buildDeepglassWorld() });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: buildDeepglassWorld(),
+    });
     const signId = plotSignEntityId(0);
     const sign = sim.entities.get(signId);
     expect(sign?.templateId).toBe(PLOT_SIGN_TEMPLATE_ID);
@@ -90,7 +97,10 @@ describe('the plots and their signs', () => {
     expect(meta.copper).toBe(123);
     expect(meta.ownedPlots).toEqual([RING_PLOT_DEEDS[0].id]);
     const sold = sim.drainEvents().find((e) => e.type === 'plotSign');
-    expect(sold && sold.type === 'plotSign' ? sold.plot : null).toMatchObject({ ownedByYou: true, ownerName: p.name });
+    expect(sold && sold.type === 'plotSign' ? sold.plot : null).toMatchObject({
+      ownedByYou: true,
+      ownerName: p.name,
+    });
     // a second sale is refused, the deed rides the character save
     expect(sim.buyPlot(RING_PLOT_DEEDS[0].id)).toBe(false);
     expect(sim.serializeCharacter(sim.primaryId)?.ownedPlots).toEqual([RING_PLOT_DEEDS[0].id]);

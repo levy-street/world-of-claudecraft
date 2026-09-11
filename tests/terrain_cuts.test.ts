@@ -5,12 +5,12 @@ import { sanitizeMapDoc, serializeMapDoc } from '../src/sim/map_doc';
 import {
   CUT_MAX_BLEND,
   CUT_MAX_HALF,
-  HOLE_MAX_RADIUS,
   cutBounds,
   cutSdfAt,
   cutsInRect,
   cutsSdfAt,
   cutVerticalBounds,
+  HOLE_MAX_RADIUS,
   inTerrainCut,
   inTerrainHole,
   sanitizeTerrainCut,

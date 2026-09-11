@@ -244,7 +244,7 @@ function leafUvPatch(shader: THREE.WebGLProgramParametersWithUniforms): void {
  *
  * Deliberately the SAME shape as foliage.ts's addWind, because the shipped
  * trees are the thing a generated tree stands next to. The phase comes from the
- * TREE's world origin, not from each card's — one phase per tree makes the
+ * TREE's world origin, not from each card's, one phase per tree makes the
  * crown swing as one body, which is what reads as a tree moving in wind.
  * Phasing per leaf (an earlier version did) gives every card its own little
  * wobble and the canopy boils instead of sways.
@@ -295,7 +295,7 @@ function leafMaterialKey(o: LeafMaterialOpts): string {
  *  value and the same reasoning as foliage.ts's LEAF_UP_NORMAL_BLEND: raw card
  *  normals give every leaf a random N·L, so a canopy reads as noise with a
  *  crushed-black shaded side. Bending them outward from the canopy centre makes
- *  the crown shade like the volume it is — lit side, shade side. */
+ *  the crown shade like the volume it is, lit side, shade side. */
 const LEAF_VOLUME_NORMAL_BLEND = 0.7;
 
 /** Bend the leaf normals outward from the canopy centre. The cards are
@@ -452,8 +452,7 @@ function leafAtlas(setKey: string): Promise<THREE.Texture> {
   return p;
 }
 
-/** Depth material for the shadow pass, carrying the same atlas-cell UV patch —
- *  without it every leaf casts the shadow of atlas cell 0. Sway is deliberately
+/** Depth material for the shadow pass, carrying the same atlas-cell UV patch,  *  without it every leaf casts the shadow of atlas cell 0. Sway is deliberately
  *  NOT applied: the shipped foliage leaves shadows still too. */
 function leafDepthMaterial(o: LeafMaterialOpts): THREE.MeshDepthMaterial {
   const key = `${o.setKey}|${o.billboard ? 'b' : 'f'}`;
@@ -966,7 +965,7 @@ export function treeCollideRadius(params: TreeParams | undefined): number {
 }
 
 /**
- * The canopy volumes these params resolve to — the preset's layout, or the
+ * The canopy volumes these params resolve to, the preset's layout, or the
  * maker's own spheres once they have edited them. The Tree panel calls this to
  * turn "the shape preset" into editable spheres.
  */

@@ -12,6 +12,7 @@ import {
 import { resolvePosition } from '../src/sim/colliders';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { sanitizeMapDoc, serializeMapDoc } from '../src/sim/map_doc';
+import { HOLE_MAX_RADIUS } from '../src/sim/terrain_cuts';
 import type { CaveDef, WorldContent } from '../src/sim/types';
 import {
   groundHeight,
@@ -106,7 +107,7 @@ describe('cave tube geometry (sim/caves.ts)', () => {
   });
 
   it('sanitizeTerrainHole clamps radius and rejects junk', () => {
-    expect(sanitizeTerrainHole({ x: 1, y: 2, z: 3, radius: 999 })?.radius).toBe(40);
+    expect(sanitizeTerrainHole({ x: 1, y: 2, z: 3, radius: 999 })?.radius).toBe(HOLE_MAX_RADIUS);
     expect(sanitizeTerrainHole({ x: 1, y: 2, z: 3, radius: 0.01 })?.radius).toBe(1);
     expect(sanitizeTerrainHole({ x: 'junk', y: 2, z: 3, radius: 4 })).toBeNull();
   });

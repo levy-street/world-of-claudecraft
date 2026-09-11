@@ -69,7 +69,7 @@ const ease = (current: number, target: number, omega: number, dt: number): numbe
  * Advance the lead vector and FOV kicks. (vx, vz) is the horizontal DISPLAY
  * velocity in yd/s; `enabled` false (reduced-motion) eases everything home.
  *
- * `ref` is the speed the widening is measured AGAINST — the pace at which the
+ * `ref` is the speed the widening is measured AGAINST, the pace at which the
  * kick starts, with full kick about half again past it. It defaults to
  * {@link RUN_SPEED} because on land that is what "going fast" means.
  *
@@ -77,7 +77,7 @@ const ease = (current: number, target: number, omega: number, dt: number): numbe
  * travels faster than a run. Inside the Deepglass bell a body cruises at 9 yd/s
  * and boosts to 26, so against the run-speed reference the kick was pinned at
  * maximum from the first tick of every bout and the FOV therefore said nothing
- * at all — the same failure the swim pitch had against its own lake-speed
+ * at all, the same failure the swim pitch had against its own lake-speed
  * reference (docs/prd/deepglass.md §13). Pass the local cruise speed there and
  * the widening tracks the burners, which is the one thing it should be saying.
  */

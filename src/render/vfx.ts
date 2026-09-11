@@ -1686,8 +1686,7 @@ export class Vfx {
 
   /**
    * One beat of a surface swimmer's kick: a small churn of droplets thrown up
-   * and back off the feet. Deliberately a fraction of characterWaterSplash —
-   * this fires several times a second for as long as somebody is swimming, so
+   * and back off the feet. Deliberately a fraction of characterWaterSplash,    * this fires several times a second for as long as somebody is swimming, so
    * it stays at a handful of particles with no ring flash.
    *
    * Submerged swimmers never call this: under the surface there is no water

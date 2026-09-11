@@ -51,7 +51,7 @@ export function zonePrewarmTemplateIds(
   // FORK: the ACTIVE world's registries, not the built-in ones (the worldZones
   // precedent in prewarmInitialScene): an authored standalone map covers the
   // whole coordinate plane with its own zones, so every built-in camp would
-  // "belong" to one of them and its mob template join the prewarm — a rig
+  // "belong" to one of them and its mob template join the prewarm, a rig
   // whose assets are not in the map's preload manifest, which the archetype
   // build then reports as an error every session.
   world?: Pick<WorldContent, 'camps' | 'npcs'> | null,

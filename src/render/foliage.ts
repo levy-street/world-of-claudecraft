@@ -149,8 +149,7 @@ import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
 //   attributes are converted to float32 because the shipped GLBs are
 //   meshopt-quantized (writing world-space values back into normalized int16
 //   attributes would clip).
-// - Per-instance tints ride instanceColor but are softened toward white —
-//   the models are textured, and strong tints read as dirt.
+// - Per-instance tints ride instanceColor but are softened toward white, //   the models are textured, and strong tints read as dirt.
 // - High tier: leaf materials sway in the wind via onBeforeCompile on the
 //   shared uTime clock; trunks stay planted (sway weight ramps with local y).
 // - Shadow policy: canopies cast (alpha-cutout shadows; r165 depth material
@@ -552,8 +551,7 @@ const leafSoften = (biome: BiomeId): number =>
 const BARK_TINT_SOFTEN = 0.85;
 const ROCK_TINT_SOFTEN = 0.45;
 
-// rocks only pick up the snow-dust colorway above the terrain snowline —
-// low-altitude peaks-biome foothills stay mossy/bare (white rocks on green
+// rocks only pick up the snow-dust colorway above the terrain snowline, // low-altitude peaks-biome foothills stay mossy/bare (white rocks on green
 // grass read as scattered eggs)
 const ROCK_SNOWLINE_Y = 34; // terrain snow tint starts at h~34 (terrain.ts)
 // grass/dressing refuse cliff faces (mirrors ROCK_SLOPE_START in terrain.ts)
@@ -1522,7 +1520,7 @@ export function setFoliageFarPlacements(decos: Decoration[]): void {
   farPlacementDecos = decos;
 }
 /** Whether this host runs placement far-sprites (game boots do; the editor
- *  viewport deliberately does not) — placed_assets caps real foliage models
+ *  viewport deliberately does not), placed_assets caps real foliage models
  *  at the sprite handoff ONLY when a sprite actually takes over. */
 export function foliageFarPlacementsActive(): boolean {
   return farPlacementDecos.length > 0;

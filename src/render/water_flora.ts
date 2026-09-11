@@ -10,8 +10,8 @@ import * as THREE from 'three';
 import { hollowWillowSpots } from '../sim/fen_willows';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { activeWorldPromoted } from './promoted_scenery_gate';
 import { GFX } from './gfx';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import { type WaterFloraPlacement, waterFloraRegions } from './water_flora_core';
 import { reusePackedOrmSample } from './water_flora_shader_core';
 import { thinLeanDressing } from './zone_dressing_lod_core';
@@ -180,16 +180,16 @@ export function buildWaterFlora(seed: number): WaterFloraView {
   // Stands down when the document owns the lake flora as placements (the
   // promoted-scenery contract); a lean session draws a thinned band.
   if (!activeWorldPromoted('waterFlora'))
-  // The rafts and reeds are pure dressing (no collider, nothing to act on) and
-  // each copy is a 6,000 triangle Tripo model, so a lean session draws an
-  // evenly thinned band of them. The hollow willows below never thin: their
-  // trunks are the sim's own colliders.
-  for (const region of waterFloraRegions(seed)) {
-    addRegion(`water-flora:${region.zoneId}`, (regionGroup) => {
-      instanceProp(regionGroup, 'lilies', thinLeanDressing(region.lilies, GFX.leanFoliage));
-      instanceProp(regionGroup, 'reeds', thinLeanDressing(region.reeds, GFX.leanFoliage));
-    });
-  }
+    // The rafts and reeds are pure dressing (no collider, nothing to act on) and
+    // each copy is a 6,000 triangle Tripo model, so a lean session draws an
+    // evenly thinned band of them. The hollow willows below never thin: their
+    // trunks are the sim's own colliders.
+    for (const region of waterFloraRegions(seed)) {
+      addRegion(`water-flora:${region.zoneId}`, (regionGroup) => {
+        instanceProp(regionGroup, 'lilies', thinLeanDressing(region.lilies, GFX.leanFoliage));
+        instanceProp(regionGroup, 'reeds', thinLeanDressing(region.reeds, GFX.leanFoliage));
+      });
+    }
 
   // the Veiled Hollow's willows: drawn from the shared sim list so every
   // trunk the renderer shows is a trunk the colliders block. Stands down when

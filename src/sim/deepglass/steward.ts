@@ -2,7 +2,7 @@
 // down to the Deepglass (docs/prd/deepglass.md).
 //
 // The bell is its own world (?map=deepglass), so "teleport me there" is a world
-// change rather than a walk — the steward's dialog row hands the client a
+// change rather than a walk, the steward's dialog row hands the client a
 // destination and the client boots the arena with a bout already called. That
 // keeps the sim honest: nothing here moves a body between worlds, it only
 // answers "is there a steward, and is the player standing at her berth?".
@@ -47,7 +47,7 @@ export function spawnDeepglassSteward(
  * minute ended at 59.25s). 000/001/002 are Bram, FURY and the Warmarshal.
  *
  * No findSafePos: the arena's terrace is authored dead flat out to 104 yards,
- * so there is nothing to search for — and a search could only move her OFF the
+ * so there is nothing to search for, and a search could only move her OFF the
  * causeway she is meant to be standing on.
  */
 export const DEEPGLASS_MARSHAL_ID = 1_000_000_003;

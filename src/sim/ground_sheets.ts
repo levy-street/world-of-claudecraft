@@ -77,7 +77,7 @@ const scratchPatches: TerrainCut[] = [];
  * With several stacked cavities the one whose floor sits closest to `prevY`
  * wins, the same continuity rule resolveGroundSheet applies between sheets.
  * Floors with less than MIN_CAVITY_HEADROOM of ROCK ceiling are not sheets at
- * all — the wall band of a carve stays solid — but a cavity open to the sky
+ * all, the wall band of a carve stays solid, but a cavity open to the sky
  * (a walk-in pit) has no ceiling to duck under and is always standable.
  */
 export function cavitySheetAt(
@@ -89,13 +89,12 @@ export function cavitySheetAt(
   prevY: number,
   /** A cave tube's open interval at this column, when one runs here: its air
    *  is VOID to the scan, so a carve that breaks into a tube has no phantom
-   *  floor across the tube's mouth — the mover falls through into the tube,
+   *  floor across the tube's mouth, the mover falls through into the tube,
    *  whose own sheet then catches it. */
   tubeVoid?: { floor: number; ceiling: number } | null,
 ): CavitySheet | null {
   if (!cuts || cuts.length === 0) return null;
-  // Narrow to the CARVE solids whose padded footprint reaches this point —
-  // legacy holes are pure sheet cutouts with no interior of their own, and
+  // Narrow to the CARVE solids whose padded footprint reaches this point,   // legacy holes are pure sheet cutouts with no interior of their own, and
   // the bounds rule is the mesher's narrowCutSet rule: outside its own bounds
   // a cut's distance exceeds its blend radius, so the smooth union
   // degenerates to the other operand and dropping it changes nothing. This

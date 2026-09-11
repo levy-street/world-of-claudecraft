@@ -41,7 +41,7 @@ export const DEEPGLASS_CENTER: Vec3 = { x: 0, y: 0, z: 0 }; // y filled in below
  * The bell was 76 yd across and the field played tight: with ten bodies at
  * 26 yd/s the whole arena was two seconds wide, so there was no space to run
  * into and every loose ball became a scrum. A third bigger opens the midfield
- * without touching the sport's own numbers — the goal aperture, the ball, the
+ * without touching the sport's own numbers, the goal aperture, the ball, the
  * bodies and the speeds are all unchanged, so what grows is only the room.
  *
  * Deliberately expressed as a factor rather than folded into the constants: the
@@ -59,8 +59,7 @@ export const DEEPGLASS_PLAY_R = DEEPGLASS_RADIUS - 1.6;
 /** The stone cradle ring that carries the bell. The ONLY flat-ground need. */
 export const DEEPGLASS_CRADLE_R = 20 * DG_ARENA_SCALE;
 
-/** Bottom of the glass: the sphere rests this high above the slate. Fixed —
- *  the cradle does not move when the bell grows. */
+/** Bottom of the glass: the sphere rests this high above the slate. Fixed,  *  the cradle does not move when the bell grows. */
 export const DEEPGLASS_BASE_Y = 3;
 // The centre follows the base and the radius. (Assigned rather than declared
 // const-with-value so the radius above can be the knob.)
@@ -82,14 +81,14 @@ export function glassHeightAt(d: number): number | null {
 //
 // The goals live IN THE GLASS now: two circular holes cut through the bell on
 // the ±x axis, with the authored goal housing hanging just OUTSIDE each one.
-// Scoring is escape — the ball leaves the bell through a hole (ball.ts
+// Scoring is escape, the ball leaves the bell through a hole (ball.ts
 // escapedThroughHole) and settles in the housing's pocket. The rings used to
 // hang 10 yards inside the glass with an invisible "goal wall" across the
 // mouth; the holes replace both, and the wall rule with them.
 // ---------------------------------------------------------------------------
 
 /**
- * Radius of the hole cut through the glass — the physical goal mouth.
+ * Radius of the hole cut through the glass, the physical goal mouth.
  *
  * NOT scaled with the arena, on purpose. This is the sport's difficulty: a
  * bigger arena should mean more room to play, not a bigger target.
@@ -119,7 +118,7 @@ export const DG_RING_OFFSET = Math.sqrt(
 export const DG_RING_WEST_X = DEEPGLASS_CENTER.x - DG_RING_OFFSET;
 export const DG_RING_EAST_X = DEEPGLASS_CENTER.x + DG_RING_OFFSET;
 
-/** The bell's cross-section radius at a ring plane — the "mouth" the ring
+/** The bell's cross-section radius at a ring plane, the "mouth" the ring
  *  hangs inside. With the ring planes at the hole rims this IS the hole
  *  radius; kept as a derived export so render consumers cannot drift. */
 export const DG_RING_MOUTH_R = Math.sqrt(
@@ -219,7 +218,7 @@ function mirrorPads(half: readonly DgBoostPad[]): DgBoostPad[] {
 }
 
 export const DG_BOOST_PADS: readonly DgBoostPad[] = [
-  // dead centre — the contested one
+  // dead centre, the contested one
   { ...dgPoint(0, 0, 0), big: true },
   // the centre ring: four pads on the x = 0 plane, above/below/north/south
   { ...dgPoint(0, 22, 0), big: true },
@@ -246,7 +245,7 @@ export interface DgPowerupSite extends Vec3 {
   kind: DgPowerupKind;
 }
 
-/** Reach for taking a powerup. Wider than a boost vent — this is a prize, and
+/** Reach for taking a powerup. Wider than a boost vent, this is a prize, and
  *  missing it by half a yard at 26 yd/s is not interesting. */
 export const DG_POWERUP_RADIUS = 3.4;
 
@@ -283,7 +282,7 @@ export function insideBell(x: number, y: number, z: number): boolean {
   return distSqFromCentre(x, y, z) <= limit * limit;
 }
 
-/** Inside the bell's ground SHADOW — the footprint the overhang covers. Used by
+/** Inside the bell's ground SHADOW, the footprint the overhang covers. Used by
  *  the world build to keep the slate clear and by the render for the cradle. */
 export function inBellShadow(x: number, z: number): boolean {
   const dx = x - DEEPGLASS_CENTER.x;
@@ -293,8 +292,7 @@ export function inBellShadow(x: number, z: number): boolean {
 
 /**
  * Clamp a point back inside the bell, returning true when it had escaped. The
- * body is pushed along the radial normal to exactly `radius` from the centre —
- * the player counterpart to the ball's analytic reflection.
+ * body is pushed along the radial normal to exactly `radius` from the centre,  * the player counterpart to the ball's analytic reflection.
  */
 export function clampToBell(p: Vec3, radius = DEEPGLASS_PLAY_R): boolean {
   const dx = p.x - DEEPGLASS_CENTER.x;
@@ -346,10 +344,10 @@ export function targetRingFor(side: 'A' | 'B'): Vec3 {
 // them too (the bowl finally collides), so they graduate to the layout module
 // like every other number three consumers must agree on. The stadium draws
 // these, deepglass_crowd_cards seats fans on them, and world.ts stands blockers
-// on them — none of the three may restate a figure.
+// on them, none of the three may restate a figure.
 // ---------------------------------------------------------------------------
 
-/** Inner lip of the seating bowl — clear of the bell's shadow. */
+/** Inner lip of the seating bowl, clear of the bell's shadow. */
 export const DG_BOWL_INNER_R = DEEPGLASS_RADIUS + 14;
 /** Outer wall of the bowl. */
 export const DG_BOWL_OUTER_R = DEEPGLASS_RADIUS + 50;
@@ -376,8 +374,8 @@ export const DG_CAUSEWAY_DECK_TOP_Y = 0.55;
  * glance: the score strip (ui/deepglass_hud.ts), the aura shell around every
  * body (render/deepglass_aura.ts), and the nameplate text
  * (render/nameplate_painter.ts). It lives here for the same reason every other
- * shared number does — this module is the source of truth no consumer may
- * re-derive — even though a colour is otherwise a presentation concern.
+ * shared number does, this module is the source of truth no consumer may
+ * re-derive, even though a colour is otherwise a presentation concern.
  */
 export const DG_TEAM_COLOR: Readonly<Record<'A' | 'B', number>> = {
   A: 0xffc27a, // Amber

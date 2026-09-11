@@ -22,6 +22,7 @@ import {
   setBonusFlag,
 } from '../content/ignivar_set_bonuses';
 import { ABILITIES, isDelvePos, MOBS } from '../data';
+import { deepballMove } from '../deepglass/match';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
@@ -44,7 +45,6 @@ import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { scalePrimaryHealing } from '../primary_healing';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
-import { deepballMove } from '../deepglass/match';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import { summonSoulwell } from '../soulwell';

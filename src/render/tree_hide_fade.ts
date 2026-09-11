@@ -7,11 +7,11 @@ import type * as THREE from 'three';
 import type { InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import {
   occluderFadeSettled,
+  occluderFadesDisabled,
   occluderKeepsInstances,
   stepOccluderFade,
   withinOccluderFadePrefetch,
 } from './occluder_fade_core';
-import { occluderFadesDisabled } from './occluder_fade_core';
 
 export interface TreeHidePart {
   mesh: THREE.InstancedMesh;

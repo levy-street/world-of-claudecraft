@@ -7,12 +7,12 @@
 // stay solid (a rail you brush), the walkway itself never blocks.
 
 import { describe, expect, it } from 'vitest';
+import { targetHeightFor } from '../src/render/asset_scale';
 import { colliderInternalsForTest } from '../src/sim/colliders';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { placementRampFloorAt } from '../src/sim/placement_ramps';
-import { groundHeight, groundHeightAtBody, terrainHeight } from '../src/sim/world';
-import { targetHeightFor } from '../src/render/asset_scale';
 import type { WorldContent } from '../src/sim/types';
+import { groundHeight, groundHeightAtBody, terrainHeight } from '../src/sim/world';
 
 const SEED = 20061;
 const DECK_TOP = 70.0;
@@ -79,7 +79,12 @@ describe('Warden bridge kit', () => {
         .staticWorldColliders(SEED)
         .filter((c) => Math.abs((c as { x: number }).x - MODULE) < MODULE * 2);
       expect(near.length).toBeGreaterThan(0);
-      for (const c of near as unknown as { z: number; y?: number; hy?: number; halfHeight?: number }[]) {
+      for (const c of near as unknown as {
+        z: number;
+        y?: number;
+        hy?: number;
+        halfHeight?: number;
+      }[]) {
         const onWalkway = Math.abs(c.z) < 2.5;
         if (!onWalkway) continue;
         // Anything on the walkway line must clear the head (the lintel) or sit

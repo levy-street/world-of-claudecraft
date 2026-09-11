@@ -27,12 +27,13 @@ import { buildIgnivarRaidThemes } from './raid_music_themes';
 
 export type { MusicZone } from './music_zones';
 export {
+  ALL_MUSIC_ZONES,
   dungeonMusicZoneForDungeon,
+  MUSIC_ZONES,
   musicZoneForLocation,
   riftMusicZoneForTheme,
   shouldResetMusicForDungeonEntry,
 } from './music_zones';
-export { ALL_MUSIC_ZONES, MUSIC_ZONES } from './music_zones';
 
 type Inst =
   | 'strings'
@@ -3587,13 +3588,13 @@ const STORAGE_KEY = 'ev_music_on';
 /** The sports venues that bring their own soundtrack: a waiting cue for the
  *  grounds between games and a match cue that takes over at kickoff. Upstream
  *  v0.40 retired the Vale Cup and deleted the Sowfield's pair with it, so the
- *  Deepglass bell is the only venue left — the map shape stays because the
+ *  Deepglass bell is the only venue left, the map shape stays because the
  *  machinery is per-venue and the next arena is a row, not a rewrite. */
 export type MusicVenue = 'deepglass';
 
 /** The cues one venue can be playing. `boss` is the third of them: an arena
  *  that hosts an encounter as well as a game needs its own theme for it, and
- *  neither of the other two is right underneath a boss — the grounds cue is
+ *  neither of the other two is right underneath a boss, the grounds cue is
  *  too idle and the match cue is a sport. A venue that declares no boss file
  *  simply never arms this track (see applyVenue), so adding one to the next
  *  arena stays a row rather than a rewrite. */
@@ -5144,7 +5145,7 @@ export class MusicDirector {
    * the master was not enough on its own, twice over. The duck is applied on
    * the arming edge with a fade, so a zone theme already playing when the
    * player reached the arena stayed audible under the venue track for the
-   * length of the ramp — heard as the wrong music playing for a second or
+   * length of the ramp, heard as the wrong music playing for a second or
    * two. And the duck is skipped entirely when there is no AudioContext at
    * that edge, which is the common case: the HUD drives this from the first
    * frame and the context waits for a gesture. With the targets held at zero
@@ -5161,7 +5162,8 @@ export class MusicDirector {
     // below simply targets 0, which is exactly right.
     const zone = this.zone;
     const inCombat = this.combat;
-    if (zone !== null && !inCombat && !venued && !crucible) this.ensureZoneStream(zone, zoneChanging);
+    if (zone !== null && !inCombat && !venued && !crucible)
+      this.ensureZoneStream(zone, zoneChanging);
     for (const [name, stream] of Object.entries(this.zoneStreams) as [MusicZone, StreamTrack][]) {
       const target = !venued && !crucible && name === zone && !inCombat ? 1 : 0;
       this.setStreamTarget(stream, target, target > 0 ? FADE_SECONDS / 3 : 0.35);

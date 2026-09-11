@@ -1,7 +1,7 @@
 // The REAL painted ground textures, on the v0.35 splat pipeline.
 //
 // terrain_paint_tint.ts brought a map's paint layer back as vertex TINTS (the
-// swatch colour over the nearest builtin splat layer) — cobbles read as dark
+// swatch colour over the nearest builtin splat layer), cobbles read as dark
 // re-tinted rock, paving as pale rock, and none of the actual texture art the
 // maker picked ever reached the screen. This module is the other half: the
 // painted cells sample the swatch's ACTUAL texture in the splat fragment
@@ -13,7 +13,7 @@
 //     painted with a texture swatch), GBA = a tint ratio folding the swatch's
 //     hue shift (colour vs the set's canonical average) and light slider;
 //   - a TILE ARRAY (sampler2DArray, 512^2), one layer per distinct texture
-//     the map's swatches reference — the shipped JPEGs for `builtin:` shas,
+//     the map's swatches reference, the shipped JPEGs for `builtin:` shas,
 //     and the maker's own IMPORTED images (content-addressed sha256, stored
 //     in IndexedDB by assets/ground_textures.ts) for everything else;
 //   - the splat fragment takes four feathered taps of the field (the same
@@ -105,7 +105,7 @@ function byteRatio(v: number): number {
 }
 
 /** Per-swatch tint ratio: the swatch colour against the set's canonical
- *  average, times the light slider — identity (1,1,1) for an untouched
+ *  average, times the light slider, identity (1,1,1) for an untouched
  *  swatch, so the shipped art shows pure. An imported texture has no
  *  canonical average (its swatch colour IS the image's own mean), so only
  *  the light slider applies. */
@@ -221,7 +221,7 @@ function fillTileSizes(plan: SlotPlan, paint: BiomePaint, out: Float32Array): vo
 
 /** Flat-fill one tile layer with a swatch's colour: what an imported texture
  *  shows until its bytes decode, and forever when they are not in this
- *  browser — its own colour, never a foreign texture. */
+ *  browser, its own colour, never a foreign texture. */
 function fillLayerFlat(tileData: Uint8Array, slot: number, color: number): void {
   const layerBytes = TILE_SIZE * TILE_SIZE * 4;
   const r = (color >> 16) & 0xff;
@@ -250,14 +250,14 @@ function buildRuntime(paint: BiomePaint, plan: SlotPlan): PaintLayerRuntime {
   field.needsUpdate = true;
 
   // The tile array: each layer flat-filled with its swatch's colour until the
-  // real image decodes (builtin sets get neutral grey — their JPEG is bundled
+  // real image decodes (builtin sets get neutral grey, their JPEG is bundled
   // and WILL land, and grey avoids a colour flash under the tint ratio).
   const layerBytes = TILE_SIZE * TILE_SIZE * 4;
   const tileData = new Uint8Array(layerBytes * slotKeys.length);
   tileData.fill(140);
   // The tile ALPHA channel is the emission gain (lava glow), NOT coverage: 0
   // everywhere until a glowing set's Emission map decodes. Riding the albedo
-  // array keeps the splat material inside the fragment-sampler budget — a
+  // array keeps the splat material inside the fragment-sampler budget, a
   // dedicated emission array was one sampler too many on 16-unit GPUs.
   for (let i = 3; i < tileData.length; i += 4) tileData[i] = 0;
   slotKeys.forEach((key, slot) => {
@@ -274,8 +274,8 @@ function buildRuntime(paint: BiomePaint, plan: SlotPlan): PaintLayerRuntime {
   tiles.needsUpdate = true;
 
   // The matching tangent-space NormalGL layers: neutral (flat) until each
-  // set's map decodes. Linear data — a normal map through sRGB decode bends
-  // every slope — and mipped like the albedo so painted relief fades out
+  // set's map decodes. Linear data, a normal map through sRGB decode bends
+  // every slope, and mipped like the albedo so painted relief fades out
   // rather than shimmering.
   const normData = new Uint8Array(layerBytes * slotKeys.length);
   for (let o = 0; o < normData.length; o += 4) {
@@ -438,10 +438,10 @@ export function invalidatePaintLayerRuntime(): void {
  * tile-size drag. While the slot assignment is unchanged the field bytes and
  * tile sizes rewrite in place (the material holds references, so the change
  * is on screen next frame). Returns:
- *   'updated'  — done, nothing else to do;
- *   'rebuild'  — the slot set changed (or the material has no paint path yet):
+ *   'updated', done, nothing else to do;
+ *   'rebuild', the slot set changed (or the material has no paint path yet):
  *                only a full terrain rebuild can show it;
- *   'off'      — the map has no texture paint; nothing to refresh.
+ *   'off', the map has no texture paint; nothing to refresh.
  */
 export function refreshPaintFieldLive(): 'updated' | 'rebuild' | 'off' {
   const paint = getActiveWorldContent().biomePaint;
@@ -604,7 +604,7 @@ export const PAINT_LAYER_SAMPLE_GLSL = `
  * The painted texture's OWN relief, injected in the normal_fragment_maps
  * section (after `wocDetailN` is in scope). ONE centre tap of the field +
  * ONE of the normal array, gated by the SAME near-distance fade the splat's
- * own detail normals use — relief mips toward flat past that range anyway,
+ * own detail normals use, relief mips toward flat past that range anyway,
  * so paying 8 array taps per fragment at every distance (the first cut of
  * this feature) bought nothing visible and cost real frame time on a fully
  * auto-retextured map. Feathered boundaries stay an albedo concern; a

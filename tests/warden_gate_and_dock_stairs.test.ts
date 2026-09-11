@@ -9,8 +9,8 @@ import { targetHeightFor } from '../src/render/asset_scale';
 import { colliderInternalsForTest } from '../src/sim/colliders';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { placementRampFloorAt } from '../src/sim/placement_ramps';
-import { groundHeight } from '../src/sim/world';
 import type { WorldContent } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 const SEED = 20061;
 type Placement = NonNullable<WorldContent['placements']>[number];
@@ -29,7 +29,15 @@ const place = (assetId: string, x: number, z: number, scale: number, groundY: nu
     groundY,
   }) as unknown as Placement;
 
-interface Band { x: number; z: number; baseY?: number; hiY?: number; hw?: number; hd?: number; r?: number }
+interface Band {
+  x: number;
+  z: number;
+  baseY?: number;
+  hiY?: number;
+  hw?: number;
+  hd?: number;
+  r?: number;
+}
 const near = (x: number, z: number, r: number): Band[] =>
   (colliderInternalsForTest.staticWorldColliders(SEED) as unknown as Band[]).filter(
     (c) => Math.hypot(c.x - x, c.z - z) < r,
@@ -58,7 +66,10 @@ describe('Warden gate', () => {
     const SEAT = 500;
     const world: WorldContent = {
       ...BUILTIN_WORLD,
-      placements: [place('deepglass/warden_gate_closed', cx, 0, S, SEAT), place('deepglass/warden_gate_open', cx + 60, 0, S, SEAT)],
+      placements: [
+        place('deepglass/warden_gate_closed', cx, 0, S, SEAT),
+        place('deepglass/warden_gate_open', cx + 60, 0, S, SEAT),
+      ],
     };
     setActiveWorldContent(world);
     try {
@@ -78,7 +89,9 @@ describe('Warden gate', () => {
       expect(open.length).toBeGreaterThan(0);
       const onLine = open.filter((c) => covers(c, cx + 60, 0));
       for (const c of onLine) expect(c.baseY ?? 0).toBeGreaterThan(head);
-      const leaves = open.filter((c) => !covers(c, cx + 60, 0) && Math.abs(c.x - (cx + 60)) < 1.5 * S);
+      const leaves = open.filter(
+        (c) => !covers(c, cx + 60, 0) && Math.abs(c.x - (cx + 60)) < 1.5 * S,
+      );
       expect(leaves.length).toBeGreaterThanOrEqual(2);
     } finally {
       setActiveWorldContent(null);
@@ -90,7 +103,10 @@ describe('dock stairs', () => {
   it('walk up the flight on one rising deck onto a flat landing, rails beside', () => {
     const x = 400;
     const seat = 50; // well above the built-in terrain there, so the deck IS the ground
-    const world: WorldContent = { ...BUILTIN_WORLD, placements: [place('props/dock_stairs', x, 0, 1, seat)] };
+    const world: WorldContent = {
+      ...BUILTIN_WORLD,
+      placements: [place('props/dock_stairs', x, 0, 1, seat)],
+    };
     setActiveWorldContent(world);
     try {
       const maxDim = targetHeightFor('/models/props/dock_stairs.glb');

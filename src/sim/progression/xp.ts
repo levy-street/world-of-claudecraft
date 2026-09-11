@@ -64,8 +64,7 @@ export function isResting(
 }
 
 // Accrue rested XP while resting in an inn. Classic-era rate: 5% of the level's
-// XP-to-level per 8 in-game hours, clamped to 1.5 levels. Deterministic —
-// paced off DT, never wall-clock. No accrual at the cap (no level bar).
+// XP-to-level per 8 in-game hours, clamped to 1.5 levels. Deterministic, // paced off DT, never wall-clock. No accrual at the cap (no level bar).
 export function updateRested(
   p: Entity,
   meta: PlayerMeta,

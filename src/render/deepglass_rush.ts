@@ -3,14 +3,14 @@
 // Two effects, both driven purely by how fast you are actually going, so like
 // the wake they ARE the speedometer rather than a decoration bolted next to it:
 //
-//  1. AURA — a teardrop shell of compressed water sheathing the body, stretched
+//  1. AURA, a teardrop shell of compressed water sheathing the body, stretched
 //     along the line of travel. It is the pressure wave you are pushing.
-//  2. SPEED LINES — the Dragon Ball Z streaks: short bright dashes that spawn
+//  2. SPEED LINES, the Dragon Ball Z streaks: short bright dashes that spawn
 //     in a ring around you, aligned with your flight, streaming past and
 //     dying. Nothing sells "fast" in animation the way these do, and unlike a
 //     motion blur they cost one draw call and read at any frame rate.
 //
-// Local player only. These are a first-person read on your own speed — drawn on
+// Local player only. These are a first-person read on your own speed, drawn on
 // every fighter in the bell they would be a light show rather than information,
 // and the aura would sit between the camera and everyone else's body.
 
@@ -204,7 +204,8 @@ export class DeepglassRush {
     );
     // Fade in fast, out slow: hitting speed should feel like a snap, losing it
     // like a glide.
-    this.strength += (target - this.strength) * (1 - Math.exp(-dt * (target > this.strength ? 9 : 3.5)));
+    this.strength +=
+      (target - this.strength) * (1 - Math.exp(-dt * (target > this.strength ? 9 : 3.5)));
     this.auraMat.uniforms.uStrength.value = this.strength;
     this.lineMat.uniforms.uStrength.value = this.strength;
     this.group.visible = this.strength > 0.01;
@@ -222,7 +223,7 @@ export class DeepglassRush {
     // Hugging the body, and pushed FORWARD along the line of travel rather than
     // trailing back along it. The chase camera sits directly behind you, so a
     // sheath stretched backwards is a sheath you are always looking down the
-    // length of — which is how it kept turning into a white wall over the
+    // length of, which is how it kept turning into a white wall over the
     // player. The streaming half of the effect is the speed lines' job, and
     // the exhaust trail's; this is just the pressure wave on the nose.
     this.aura.scale.set(1.05, 1.05, 1.35 + this.strength * 0.4);

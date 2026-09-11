@@ -1,4 +1,4 @@
-// GENERATES src/render/streetlamp_fixture.generated.ts — per-style fixture
+// GENERATES src/render/streetlamp_fixture.generated.ts, per-style fixture
 // measurements in the SAME normalized space prepareStreetlampAsset
 // (src/render/streetlamp_assets.ts) builds at runtime: height scaled to
 // STREETLAMP_FIXTURE_HEIGHT, footprint clamped to MAX_FOOTPRINT, XZ centred on
@@ -7,7 +7,7 @@
 // Why a build-time table: promoting streetlamps to editable placements needs
 // each fixture's light AXIS (foot-of-post -> LIGHT_SOCKET, the direction
 // lampFixtureYaw swings over the road) at document-creation time, which is
-// synchronous — the runtime measurement only exists after the GLB loads. The
+// synchronous, the runtime measurement only exists after the GLB loads. The
 // socket and unitHeight ride along so the promoted night-light lane can anchor
 // the road light without loading fixtures either.
 //
@@ -56,8 +56,7 @@ function parseGlb(bytes) {
     const start = offset + 8;
     if (type === 0x4e4f534a)
       json = JSON.parse(Buffer.from(bytes.buffer, bytes.byteOffset + start, len).toString('utf8'));
-    if (type === 0x004e4942)
-      bin = new Uint8Array(bytes.buffer, bytes.byteOffset + start, len);
+    if (type === 0x004e4942) bin = new Uint8Array(bytes.buffer, bytes.byteOffset + start, len);
     offset = start + len + ((4 - (len % 4)) % 4);
   }
   if (!json || !bin) throw new Error('missing GLB chunk');
@@ -148,10 +147,7 @@ function bufferViewBytes(json, bin, viewIndex) {
     target,
     compressed.count,
     compressed.byteStride,
-    bin.subarray(
-      compressed.byteOffset ?? 0,
-      (compressed.byteOffset ?? 0) + compressed.byteLength,
-    ),
+    bin.subarray(compressed.byteOffset ?? 0, (compressed.byteOffset ?? 0) + compressed.byteLength),
     compressed.mode,
     compressed.filter,
   );
@@ -171,7 +167,11 @@ function readPositions(json, bin, accessorIndex) {
   const deq = (v) => (accessor.normalized ? Math.max(v / comp.divisor, -1) : v);
   for (let i = 0; i < accessor.count; i++) {
     const o = base + i * stride;
-    out[i] = [deq(comp.read(dv, o)), deq(comp.read(dv, o + comp.size)), deq(comp.read(dv, o + comp.size * 2))];
+    out[i] = [
+      deq(comp.read(dv, o)),
+      deq(comp.read(dv, o + comp.size)),
+      deq(comp.read(dv, o + comp.size * 2)),
+    ];
   }
   return out;
 }
@@ -236,12 +236,10 @@ function measure(json, bin) {
     if (pz > footMaxZ) footMaxZ = pz;
   }
   const foot =
-    footMinX > footMaxX
-      ? [0, 0]
-      : [(footMinX + footMaxX) * 0.5, (footMinZ + footMaxZ) * 0.5];
+    footMinX > footMaxX ? [0, 0] : [(footMinX + footMaxX) * 0.5, (footMinZ + footMaxZ) * 0.5];
 
   // The socket is consumed by the PROMOTED night-light lane, where the fixture
-  // is a plain placed GLB with no radial footprint clamp — so it lives in the
+  // is a plain placed GLB with no radial footprint clamp, so it lives in the
   // unclamped space (radial scales X and Z equally, so the axis DIRECTION the
   // clamped runtime resolves yaw from is identical either way).
   const socketFinal = socket

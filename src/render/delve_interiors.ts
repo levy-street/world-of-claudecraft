@@ -59,7 +59,7 @@ export function buildDelveModule(
   // The built group IS returned (the renderer tracks it per z-stacked position: a
   // slot's position is reused run to run with a DIFFERENT randomized module, so a
   // stale group there must be retirable, not just discarded). The spec above is
-  // the fork's shared record — sim/colliders.ts derives its collision set from
-  // the SAME one — so it is passed straight through rather than rebuilt here.
+  // the fork's shared record, sim/colliders.ts derives its collision set from
+  // the SAME one, so it is passed straight through rather than rebuilt here.
   return dungeons.buildInterior(spec.interior, ox, oz, spec);
 }

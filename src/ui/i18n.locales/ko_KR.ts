@@ -16803,4 +16803,329 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.farmgrow.label': '작물 익히기',
   'devCommand.fields.bed': '경작지 ID (선택 사항)',
   'guide.profPages.oncePerDay': '하루 한 번',
+  'editor.playtestBack': '에디터로 돌아가기',
+  'editor.playtestBackTitle': '맵 에디터로 돌아갑니다 (플레이테스트 시작 시 맵이 저장되었습니다)',
+  'hudChrome.deepglass.bout': '팀당 {n}명',
+  'hudChrome.deepglass.boutAria': '딥볼 경기 시작, 팀당 {n}명',
+  'hudChrome.deepglass.gossip': '딥글라스로 데려다 주게',
+  'hudChrome.deepglass.gossipAria': '딥글라스로 이동해 딥볼 경기를 시작합니다',
+  'hudChrome.keybinds.ballMarker': '공 표시 (딥볼)',
+  'hudChrome.keybinds.boost': '버너 (딥볼)',
+  'hudChrome.plotSign.boughtLog': '{name}의 권리증이 당신의 것이 되었습니다.',
+  'hudChrome.plotSign.buy': '{price}에 구매',
+  'hudChrome.plotSign.close': '닫기',
+  'hudChrome.plotSign.price': '희망가 {price}',
+  'hudChrome.plotSign.purse': '소지금: {purse}',
+  'hudChrome.plotSign.size': '{size} 부지, {w} x {d}야드',
+  'hudChrome.plotSign.sizes.large': '대형',
+  'hudChrome.plotSign.sizes.medium': '중형',
+  'hudChrome.plotSign.sizes.small': '소형',
+  'hudChrome.plotSign.sold': '판매 완료. {name}이(가) 이 권리증을 보유하고 있습니다.',
+  'hudChrome.plotSign.title': '주택 부지 판매 중',
+  'hudChrome.plotSign.yours': '당신이 이 권리증을 보유하고 있습니다.',
+  'hudChrome.portalWizard.gossipDeepglass': '딥글라스로 가는 길을 열어 주게',
+  'hudChrome.portalWizard.gossipDeepglassAria':
+    '발데마르에게 딥글라스로 가는 차원문을 열어 달라고 부탁합니다',
+  'hudChrome.portalWizard.gossipHome': '집으로 가는 길을 열어 주게',
+  'hudChrome.portalWizard.gossipHomeAria':
+    '발데마르에게 마을로 돌아가는 차원문을 열어 달라고 부탁합니다',
+  'hudChrome.portalWizard.portalOpen': '차원문이 열렸습니다. 안으로 들어가세요.',
+  'entities.npcs.deepglass_marshal.greeting':
+    '종은 따뜻하고 물은 맑답니다, {className}. 경기 방식만 정해 주시면 제가 호루라기를 불어 드릴게요. 공을 혼자 차지하고 싶으면 1대1로, 탓할 동료가 있는 편이 좋으면 3대3 정식전으로요.',
+  'entities.npcs.deepglass_marshal.name': '심판장 이베트 코럴웨이크',
+  'entities.npcs.deepglass_marshal.title': '호루라기지기',
+  'entities.npcs.dg_stallkeeper_favors.greeting':
+    '승리를 위한 복주머니와, 의심을 위한 자루예요. 복주머니를 사세요, 그게 희망적인 선택이니까요.',
+  'entities.npcs.dg_stallkeeper_favors.name': '깃발할멈 윈',
+  'entities.npcs.dg_stallkeeper_favors.title': '복주머니와 깃발',
+  'entities.npcs.dg_stallkeeper_pies.greeting':
+    '뜨거운 파이에 차가운 물, 그리고 줄 서는 시간보다 오래가는 육포예요. 호루라기 불기 전에 드세요, 친구. 후반전은 배 속 사정을 기다려주지 않거든요.',
+  'entities.npcs.dg_stallkeeper_pies.name': '파이장수 롤도',
+  'entities.npcs.dg_stallkeeper_pies.title': '경기 당일 먹거리',
+  'entities.npcs.dg_stallkeeper_tonics.greeting':
+    '타박상 물약, 신경 안정 물약, 그리고 둑길에서 떨어졌을 때를 위한 독주 한 잔이에요. 선수들은 앞의 둘을 사고, 구경꾼들은 세 번째를 사지요.',
+  'entities.npcs.dg_stallkeeper_tonics.name': '셀라 파이얼',
+  'entities.npcs.dg_stallkeeper_tonics.title': '강장제와 독주',
+  'entities.npcs.portal_wizard_bridgemere.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_bridgemere.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_bridgemere.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_deepglass.greeting':
+    '내가 먼저 와 있을 거라 했잖소. 대머리는 짐이 가벼운 법이라오, {className}. 종을 즐기고, 유리는 조심하시오. 그리고 고향의 풀밭이 그리워지거든 한마디만 하시오. 돌아가는 길은 반짝이는 생각 하나만큼 가까우니까.',
+  'entities.npcs.portal_wizard_deepglass.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_deepglass.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_drifthaven.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_drifthaven.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_drifthaven.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_eastbrook.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_eastbrook.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_eastbrook.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_eldergleam.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_eldergleam.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_eldergleam.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_fenbridge.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_fenbridge.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_fenbridge.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_gallowmere.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_gallowmere.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_gallowmere.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_gullhaven.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_gullhaven.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_gullhaven.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_hedgewick.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_hedgewick.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_hedgewick.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_highwatch.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_highwatch.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_highwatch.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_icemantle.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_icemantle.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_icemantle.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_lanternmere.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_lanternmere.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_lanternmere.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_moonrest.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_moonrest.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_moonrest.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_wickharbor.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_wickharbor.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_wickharbor.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.portal_wizard_wyrmwatch.greeting':
+    '그렇소, 정수리는 훤히 벗겨졌고, 아니오, 산바람 탓이 아니라오. 머리카락은 닻이라오, {className}. 한 올 한 올이 영혼을 땅 한 뙈기에 묶어 두는 법이니까. 나는 가진 머리카락을 전부, 하나도 남김없이, 세상의 문들과 맞바꾸었소. 부탁만 하면 딥글라스로 가는 길을 열어 드리겠소. 또 다른 나는 이미 그곳에서 행운을 빌며 머리를 문지르고 있다오.',
+  'entities.npcs.portal_wizard_wyrmwatch.name': '대머리 발데마르',
+  'entities.npcs.portal_wizard_wyrmwatch.title': '빛나는 정수리의 대마법사',
+  'entities.npcs.th_armourer.greeting':
+    '경비대가 갖춘 모든 것, 그리고 갖춰야 할 것도 조금 있소. 워든이 값을 치르니, 그대는 덜 낸다오.',
+  'entities.npcs.th_armourer.name': '병참관 룩 애들린',
+  'entities.npcs.th_armourer.title': '대무기고',
+  'entities.npcs.th_banker.greeting':
+    '그대의 돈은 오십 야드 낭떠러지 위 주머니 속보다 바위 속이 더 안전하다오, {className}.',
+  'entities.npcs.th_banker.name': '금고지기 안셀 타이드',
+  'entities.npcs.th_banker.title': '딥글라스 금고',
+  'entities.npcs.th_clerk.greeting':
+    '청원서는 왼쪽에, 경기 관련 분쟁은 오른쪽에, 그리고 둑길 난간에 관한 것은 뭐든 제 책상 위에 두십시오.',
+  'entities.npcs.th_clerk.name': '서기 오톨린 벡스',
+  'entities.npcs.th_clerk.title': '워든의 전당',
+  'entities.npcs.th_fountain_keeper.greeting':
+    '이 분수는 종 그 자체의 물로 흐른다오, {className}. 워든들의 말을 믿는다면, 둑길 아래로 관을 대어 끌어올린 물이라지. 발데마르는 그 물보라를 머리에 맞는 걸 좋아하오. 정수리가 빛나게 해 준다나.',
+  'entities.npcs.th_fountain_keeper.name': '우물지기 브린 캐독',
+  'entities.npcs.th_fountain_keeper.title': '워든의 분수지기',
+  'entities.npcs.th_gate_captain.greeting':
+    '타이드홀드는 종을 지키고, {className}, 나는 타이드홀드를 지킨다오. 둑길은 열려 있고, 시장은 시끌벅적하고, 워든도 계시오. 내려갈 땐 난간을 조심하시오.',
+  'entities.npcs.th_gate_captain.name': '관문대장 이졸데 브락',
+  'entities.npcs.th_gate_captain.title': '조수문지기',
+  'entities.npcs.th_innkeeper.greeting':
+    '잠자리와 식사, 그리고 종이 보이는 창문까지예요. 경기가 있는 밤엔 잠을 못 자겠지만, 애초에 자고 싶지도 않으실 거예요. 함께할 사람을 찾으신다면 문 옆 게시판을 보세요.',
+  'entities.npcs.th_innkeeper.name': '여관지기 도브 매로우',
+  'entities.npcs.th_innkeeper.title': '황금갈매기',
+  'entities.npcs.th_lamplighter.greeting':
+    '둑길에서 관저까지 모든 등불이 제 담당이고, 빛이 꺼지기 전에 하나하나 손봐야 하지요. 원하신다면 따라오세요, 이 도시에서 가장 멋진 산책길이거든요.',
+  'entities.npcs.th_lamplighter.name': '등불지기 온드리',
+  'entities.npcs.th_lamplighter.title': '수정 등불지기',
+  'entities.npcs.th_market_bags.greeting':
+    '유리 시장을 통째로 맨손에 쥐고 갈 수는 없는 법이죠, {className}. 제가 어떻게 아는지 궁금하시면 한번 물어보세요.',
+  'entities.npcs.th_market_bags.name': '짐꾼장 헤스트',
+  'entities.npcs.th_market_bags.title': '가방과 끈',
+  'entities.npcs.th_market_pies.greeting':
+    '워든가의 화덕에서 갓 나온 거예요, {className}. 여기서 드세요, 저 밖 테라스에서 드시면 절반은 바람에 날아가 버리거든요.',
+  'entities.npcs.th_market_pies.name': '말라 솔트미어',
+  'entities.npcs.th_market_pies.title': '빵과 소금물',
+  'entities.npcs.th_market_reagents.greeting':
+    '워든가의 대장간이 벼려내는 건 죄다 누군가의 등에 실려 둑길을 오르죠. 대개는 제 등이고요.',
+  'entities.npcs.th_market_reagents.name': '광석상 던',
+  'entities.npcs.th_market_reagents.title': '광석, 주괴, 괴철',
+  'entities.npcs.th_market_tonics.greeting':
+    '타박상 물약, 신경 안정 물약, 그리고 추락에 대비한 것도 있죠. 딥볼 선수들이 제 제일 좋은 손님이에요.',
+  'entities.npcs.th_market_tonics.name': '약제사 렌 펠',
+  'entities.npcs.th_market_tonics.title': '강장제와 독주',
+  'entities.npcs.th_merchant.greeting':
+    '왕국 절반이 경기가 열릴 때마다 물건을 이리로 실어 보내지요. 사고, 팔고, 줄은 지켜 주세요.',
+  'entities.npcs.th_merchant.name': '행수 이젤 코럴웨이크',
+  'entities.npcs.th_merchant.title': '워든 시장',
+  'entities.npcs.th_priest.greeting':
+    '우리는 제단에 종 그 자체의 물을 담은 그릇을 올려 둡니다. 단 한 번도 흐려진 적이 없지요.',
+  'entities.npcs.th_priest.name': '조수사제 할로란',
+  'entities.npcs.th_priest.title': '고요한 물의 예배당',
+  'entities.npcs.th_seneschal.greeting':
+    '워든께서는 모래시계가 돌 때마다 청원자를 만나십니다. 이 도시의 모래시계는 꽤 크지요.',
+  'entities.npcs.th_seneschal.name': '집사장 알드릭 풀',
+  'entities.npcs.th_seneschal.title': '워든의 관저',
+  'entities.npcs.th_smith.greeting':
+    '유리는 워든의 소관이오. 강철은 내 소관이고, 유리가 버티지 못할 때도 내 강철은 버틴다오.',
+  'entities.npcs.th_smith.name': '대장간지기 옐라 브라인',
+  'entities.npcs.th_smith.title': '타이드홀드 대장간',
+  'entities.npcs.th_stablemaster.greeting':
+    '날개 달린 것도, 버너 달린 것도 없어요. 둑길에서 떨어진 적 없는 정직한 말들뿐이죠.',
+  'entities.npcs.th_stablemaster.name': '마구간지기 코린 베인',
+  'entities.npcs.th_stablemaster.title': '타이드홀드 마구간',
+  'entities.npcs.th_warden.greeting':
+    '둑길을 전부 걸어 올라와서 겨우 나를 보려고 왔단 말이오, {className}? 종은 그대 등 뒤에 있고, 여기서 오를 가치가 있는 건 그것뿐이라오. 가서 즐기시오, 우리가 그걸 지키는 이유가 바로 그것이니.',
+  'entities.npcs.th_warden.name': '워든 카시아 딥글라스',
+  'entities.npcs.th_warden.title': '종의 워든',
+  'entities.npcs.dg_spectator_pace1.greeting':
+    '세게 맞히면 공이 노래한다더군요. 그 소리를 들으러 왔죠.',
+  'entities.npcs.dg_spectator_pace1.name': '메리 샐로우',
+  'entities.npcs.dg_spectator_pace1.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_pace2.greeting':
+    '경기 전엔 가만히 못 앉아 있어요. 한 번도 그런 적이 없죠. 제 아내한테 물어보세요, 저 위 관람석에 있을 테니까요.',
+  'entities.npcs.dg_spectator_pace2.name': '조슨 브릴',
+  'entities.npcs.dg_spectator_pace2.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_pace3.greeting':
+    '경기장 가장자리를 세 번 왕복하면 딱 긴장이 가라앉아요. 직접 재 봤거든요.',
+  'entities.npcs.dg_spectator_pace3.name': '페타 웨이브크레스트',
+  'entities.npcs.dg_spectator_pace3.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_pace4.greeting':
+    '가장자리 안쪽에 머물고 난간을 조심하세요. 테라스 밖으로 내딛는 첫걸음은 아주 길답니다.',
+  'entities.npcs.dg_spectator_pace4.name': '탐 그라운드스웰',
+  'entities.npcs.dg_spectator_pace4.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier1.greeting':
+    '경기장에서 가장 좋은 자리예요. 종이 타격을 받아 통째로 떨리는 게 다 보이거든요.',
+  'entities.npcs.dg_spectator_tier1.name': '벨라 림글라스',
+  'entities.npcs.dg_spectator_tier1.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier10.greeting':
+    '경기 전엔 기둥들이 웅웅거려요. 손을 대 보면 경기가 다가오는 게 느껴지죠.',
+  'entities.npcs.dg_spectator_tier10.name': '단나 켈프브레이드',
+  'entities.npcs.dg_spectator_tier10.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier11.greeting':
+    '등불이 열여섯 개인데 나방은 한 마리도 없어요. 세상에서 가장 높은 등불일 거예요, 제 생각엔.',
+  'entities.npcs.dg_spectator_tier11.name': '말로 스퓸',
+  'entities.npcs.dg_spectator_tier11.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier12.greeting':
+    '수영 구경하러 왔다가, 내려가는 둑길이 너무 길어서 눌러앉았죠.',
+  'entities.npcs.dg_spectator_tier12.name': '웬나 타이드레이스',
+  'entities.npcs.dg_spectator_tier12.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier2.greeting':
+    '새벽부터 이 줄을 지켰고, 호루라기가 울릴 때까지 지킬 겁니다.',
+  'entities.npcs.dg_spectator_tier2.name': '페린 솔트캐스크',
+  'entities.npcs.dg_spectator_tier2.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier3.greeting':
+    '경기 시작 직전 물이 잔잔해지면, 경기장 전체가 함께 숨을 죽이죠.',
+  'entities.npcs.dg_spectator_tier3.name': '님 펄로버',
+  'entities.npcs.dg_spectator_tier3.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier4.greeting':
+    '남편은 제가 신전에 있는 줄 알고, 신전은 제가 남편과 있는 줄 알죠.',
+  'entities.npcs.dg_spectator_tier4.name': '알더댁',
+  'entities.npcs.dg_spectator_tier4.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier5.greeting':
+    '세상의 모든 바다를 다 항해해 봤지만, 제가 아는 가장 이상한 물은 바로 저 위에 떠 있어요.',
+  'entities.npcs.dg_spectator_tier5.name': '선장 벨',
+  'entities.npcs.dg_spectator_tier5.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier6.greeting':
+    '높은 자리일수록 공기는 희박해지고 전망은 좋아지죠. 오르는 것도 표값에 포함이에요.',
+  'entities.npcs.dg_spectator_tier6.name': '이보 랜턴웨이크',
+  'entities.npcs.dg_spectator_tier6.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier7.greeting':
+    '공의 주인이 바뀔 때마다 한 단씩 떠요. 지난 경기 때는 목도리를 하나 다 완성했죠.',
+  'entities.npcs.dg_spectator_tier7.name': '모드 스레드니들',
+  'entities.npcs.dg_spectator_tier7.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier8.greeting':
+    '지난 경기에서 목이 다 쉬었어요. 그럴 가치가 있었죠. 오늘도 또 그럴 거예요.',
+  'entities.npcs.dg_spectator_tier8.name': '목쉰 펠로',
+  'entities.npcs.dg_spectator_tier8.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_tier9.greeting':
+    '골대가 무너질 때는 종 밑에 서 있지 마세요. 적어도 앞부분만은 믿으셔도 돼요.',
+  'entities.npcs.dg_spectator_tier9.name': '리바 언더토우',
+  'entities.npcs.dg_spectator_tier9.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_yard1.greeting':
+    '내가 젊었을 땐 물이 더 차가웠고 골대도 더 작았지. 그 외엔 다 마음에 든다네.',
+  'entities.npcs.dg_spectator_yard1.name': '늙은 가마우지',
+  'entities.npcs.dg_spectator_yard1.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_yard2.greeting':
+    '원정팀에 은화 세 닢을 걸었어요. 파이로 마음을 달래는 중이죠.',
+  'entities.npcs.dg_spectator_yard2.name': '해로우 핀치',
+  'entities.npcs.dg_spectator_yard2.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_yard3.greeting':
+    '대머리 마법사가 여기까지 오는 차원문을 팔더군요. 이제껏 쓴 동전 중 최고였어요.',
+  'entities.npcs.dg_spectator_yard3.name': '코빈 애쉬베인',
+  'entities.npcs.dg_spectator_yard3.title': '딥글라스 관중',
+  'entities.npcs.dg_spectator_yard4.greeting':
+    '경기 날에만 협곡 바람에서 튀긴 빵 냄새가 나요. 코를 따라가 보세요.',
+  'entities.npcs.dg_spectator_yard4.name': '세시 브라인',
+  'entities.npcs.dg_spectator_yard4.title': '딥글라스 관중',
+  'entities.npcs.th_bridge_watch_0.greeting':
+    '검은 얼음 위로 놓인 백서른 야드짜리 돌다리, 제 임무는 그 난간을 지키는 거죠. 내려다보고 싶으면 보세요, 다들 한 번은 그러거든요.',
+  'entities.npcs.th_bridge_watch_0.name': '다리지기 케틸 보스',
+  'entities.npcs.th_bridge_watch_1.greeting':
+    '검은 얼음 위로 놓인 백서른 야드짜리 돌다리, 제 임무는 그 난간을 지키는 거죠. 내려다보고 싶으면 보세요, 다들 한 번은 그러거든요.',
+  'entities.npcs.th_bridge_watch_1.name': '다리지기 마라 프로스트',
+  'entities.npcs.th_dockhand_0.greeting':
+    '배들은 이 바위에 정박해 얼음 위에 매달리듯 떠 있죠. 익숙해지거나, 아니면 둑길을 도로 내려가야죠.',
+  'entities.npcs.th_dockhand_0.name': '부두장 페로우 켈',
+  'entities.npcs.th_dockhand_0.title': '정박지',
+  'entities.npcs.th_dockhand_1.greeting':
+    '배들은 이 바위에 정박해 얼음 위에 매달리듯 떠 있죠. 익숙해지거나, 아니면 둑길을 도로 내려가야죠.',
+  'entities.npcs.th_dockhand_1.name': '삭구공 세나 툴',
+  'entities.npcs.th_dockhand_1.title': '정박지',
+  'entities.npcs.th_gate_watch_0.greeting': '지나가세요. 결계는 조용하고, 계속 그랬으면 좋겠네요.',
+  'entities.npcs.th_gate_watch_0.name': '워든 세이블 퀴스트',
+  'entities.npcs.th_gate_watch_0.title': '관문 경비대',
+  'entities.npcs.th_gate_watch_1.greeting': '지나가세요. 결계는 조용하고, 계속 그랬으면 좋겠네요.',
+  'entities.npcs.th_gate_watch_1.name': '워든 토마스 릴',
+  'entities.npcs.th_gate_watch_1.title': '관문 경비대',
+  'entities.npcs.th_keep_guard_0.greeting':
+    '워든의 명으로 문은 열려 있습니다. 종이 울리면 철문을 조심하세요.',
+  'entities.npcs.th_keep_guard_0.name': '경비병 오타르',
+  'entities.npcs.th_keep_guard_0.title': '워든의 경비대',
+  'entities.npcs.th_keep_guard_1.greeting':
+    '마당 안에 머무르시오, 친구. 회당은 워든의 것이고, 탑들은 우리 것이니.',
+  'entities.npcs.th_keep_guard_1.name': '경비병 리즈벳',
+  'entities.npcs.th_keep_guard_1.title': '워든의 경비대',
+  'entities.npcs.th_keep_guard_2.greeting':
+    '안에서는 워든께서 알현을 열고 계시오. 부츠는 닦고 들어가시오, 그 카펫은 골드크레스트산이라오.',
+  'entities.npcs.th_keep_guard_2.name': '경비병 밴스',
+  'entities.npcs.th_keep_guard_2.title': '워든의 경비대',
+  'entities.npcs.th_keep_guard_3.greeting':
+    '청원자는 회당으로, 배달은 주방동으로. 그대는 어느 쪽이오?',
+  'entities.npcs.th_keep_guard_3.name': '경비병 메린',
+  'entities.npcs.th_keep_guard_3.title': '워든의 경비대',
+  'entities.npcs.th_market_folk_0.greeting':
+    '경기 날이라 테라스 전체가 여기 올라와 물건을 사고 있죠. 지갑도 팔꿈치도 조심하세요.',
+  'entities.npcs.th_market_folk_0.name': '네타 할로웨이',
+  'entities.npcs.th_market_folk_0.title': '유리장수',
+  'entities.npcs.th_market_folk_1.greeting':
+    '경기 날이라 테라스 전체가 여기 올라와 물건을 사고 있죠. 지갑도 팔꿈치도 조심하세요.',
+  'entities.npcs.th_market_folk_1.name': '브램 컬록',
+  'entities.npcs.th_market_folk_1.title': '밧줄공',
+  'entities.npcs.th_market_folk_2.greeting':
+    '경기 날이라 테라스 전체가 여기 올라와 물건을 사고 있죠. 지갑도 팔꿈치도 조심하세요.',
+  'entities.npcs.th_market_folk_2.name': '수녀 이보 마른',
+  'entities.npcs.th_market_folk_2.title': '조수의 구휼자',
+  'entities.npcs.th_market_folk_3.greeting':
+    '경기 날이라 테라스 전체가 여기 올라와 물건을 사고 있죠. 지갑도 팔꿈치도 조심하세요.',
+  'entities.npcs.th_market_folk_3.name': '샐리스 퀘이',
+  'entities.npcs.th_market_folk_3.title': '나루터 거간꾼',
+  'entities.npcs.th_market_folk_4.greeting':
+    '경기 날이라 테라스 전체가 여기 올라와 물건을 사고 있죠. 지갑도 팔꿈치도 조심하세요.',
+  'entities.npcs.th_market_folk_4.name': '늙은 페린',
+  'entities.npcs.th_market_folk_4.title': '경기 암표상',
+  'entities.npcs.th_market_folk_5.greeting':
+    '경기 날이라 테라스 전체가 여기 올라와 물건을 사고 있죠. 지갑도 팔꿈치도 조심하세요.',
+  'entities.npcs.th_market_folk_5.name': '옌나 콜',
+  'entities.npcs.th_market_folk_5.title': '그물 수선공',
+  'entities.npcs.th_row_folk_0.greeting':
+    '여기 위쪽은 바람이 잦아들면 종소리가 들려요. 이 도시 최고의 주소죠.',
+  'entities.npcs.th_row_folk_0.name': '행정관 일베인 도스',
+  'entities.npcs.th_row_folk_0.title': '워든 가문',
+  'entities.npcs.th_row_folk_1.greeting':
+    '여기 위쪽은 바람이 잦아들면 종소리가 들려요. 이 도시 최고의 주소죠.',
+  'entities.npcs.th_row_folk_1.name': '프렐댁',
+  'entities.npcs.th_row_folk_2.greeting':
+    '여기 위쪽은 바람이 잦아들면 종소리가 들려요. 이 도시 최고의 주소죠.',
+  'entities.npcs.th_row_folk_2.name': '안셀름 코이',
+  'entities.npcs.th_row_folk_2.title': '유리공',
+  'entities.npcs.th_row_folk_3.greeting':
+    '여기 위쪽은 바람이 잦아들면 종소리가 들려요. 이 도시 최고의 주소죠.',
+  'entities.npcs.th_row_folk_3.name': '꼬마 렌',
 };

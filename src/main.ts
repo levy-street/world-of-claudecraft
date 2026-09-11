@@ -2144,7 +2144,7 @@ async function startGame(
   };
   // The marshal's fixture card. Straight into the match driver rather than
   // through `/deepglass N`: that command lives behind `ctx.devCommands`
-  // (import.meta.env.DEV), so in a shipped build it does nothing at all — which
+  // (import.meta.env.DEV), so in a shipped build it does nothing at all, which
   // is exactly why the steward's row boots a URL instead of typing it. The
   // arena is offline-only (it boots through startOffline), so offlineSim is
   // always there; the guard is for the type, not for a case that happens.
@@ -3521,7 +3521,7 @@ async function startGame(
       hud.confirmToolEffectUse(prompt, proceed),
   };
   function interactKey(preferNpcId?: number | null): void {
-    // Inside the Deepglass bell, F is the burner throttle — it is HELD for
+    // Inside the Deepglass bell, F is the burner throttle, it is HELD for
     // seconds at a time. Running the nearby-interaction scan off it popped
     // "there is nothing to interact with" over and over mid-flight. Nothing in
     // the bell is interactable anyway: the whole bout is the ball and the pack.
@@ -4401,7 +4401,7 @@ async function startGame(
    *
    * The offset itself is a step function (0 / +-45 degrees), so applying it raw
    * snapped the model between headings every time a strafe joined or left the
-   * run — most visible flicking between A and D. The state lives here because
+   * run, most visible flicking between A and D. The state lives here because
    * this is where the frame delta is; the easing itself is pure
    * (game/movement_visual.ts) and tested there.
    */
@@ -5393,20 +5393,18 @@ async function startOffline(
   const sim = loadSpan(
     'sim-build',
     () =>
-      new Sim(
-        {
-          ...offlineWorldConfig({
-            playerClass,
-            name,
-            world,
-            seedOverride,
-            devCommands: import.meta.env.DEV,
-          }),
-          // Baldemar's return trip lands at the departed town square rather than
-          // the world's own start (src/game/portal_travel.ts).
-          playerStartOverride,
-        },
-      ),
+      new Sim({
+        ...offlineWorldConfig({
+          playerClass,
+          name,
+          world,
+          seedOverride,
+          devCommands: import.meta.env.DEV,
+        }),
+        // Baldemar's return trip lands at the departed town square rather than
+        // the world's own start (src/game/portal_travel.ts).
+        playerStartOverride,
+      }),
   );
   sim.setPlayerSkin(sim.playerId, skin);
   // Offline has no account and no character row, so the local draft IS this
@@ -5473,10 +5471,10 @@ async function startOffline(
   // The steward's booking: ?bout=N alongside ?map=deepglass calls the whistle
   // the moment the arena is up, so her passage lands you IN a match rather than
   // on the plaza next to a chat hint. Deliberately NOT routed through the
-  // /deepglass dev command — that is gated on a DEV build, and the steward is
+  // /deepglass dev command, that is gated on a DEV build, and the steward is
   // shipped content.
   // The Deepglass keeps its own hour. It is an event venue with a stadium, a
-  // lit bell and sixteen crystal pylons — what it must never be is whatever the
+  // lit bell and sixteen crystal pylons, what it must never be is whatever the
   // real UTC clock happens to say, because half of that clock is a night that
   // renders the whole arena as a black shape against a black sky. Pinned to
   // late afternoon: the sun is low enough to rim the pylons and the cornice,
@@ -11556,7 +11554,7 @@ const publishedMap = !publishedMapSlug
  * click IS the gesture the AudioContext policy wants. The URL entry points have
  * no such click: `?map=<slug>` and the editor playtest boot straight into the
  * world on page load, so they never called init at all and the whole session ran
- * SILENT — no music, no footsteps, no combat, and (the way this was found) no
+ * SILENT, no music, no footsteps, no combat, and (the way this was found) no
  * deepball whistle. Creating a context here at load would be worse than useless:
  * Chrome refuses to start it and logs a warning for every attempt.
  *
@@ -11605,8 +11603,8 @@ if (editorPlaytest) {
   initAudioOnFirstGesture();
   const viaPortal = portalHandoff?.dest === 'deepglass' && handoffClass !== null;
   void publishedMap.load().then((world) => {
-    // A portal arrival lands beside Baldemar's self in THIS world — at the
-    // Wardens' Fountain in the middle of Tidehold — rather than at the arena
+    // A portal arrival lands beside Baldemar's self in THIS world, at the
+    // Wardens' Fountain in the middle of Tidehold, rather than at the arena
     // arrival point half a map away. Read from the world's own npcs table so
     // moving him in data moves the landing with him.
     const wizardPos = viaPortal ? world.npcs?.[DEEPGLASS_PORTAL_WIZARD_NPC_ID]?.pos : undefined;

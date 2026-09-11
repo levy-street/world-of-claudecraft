@@ -77,13 +77,6 @@ export const PORTAL_WIZARD_STOPS: readonly PortalWizardStop[] = [
   { npcId: 'portal_wizard_hedgewick', zoneId: 'evergarden', town: 'Hedgewick', x: 326, z: 816 },
   { npcId: 'portal_wizard_wickharbor', zoneId: 'galecrest', town: 'Wickharbor', x: 426, z: 366 },
   { npcId: 'portal_wizard_gullhaven', zoneId: 'farshore_isle', town: 'Gullhaven', x: 311, z: 76 },
-  {
-    npcId: 'portal_wizard_goldcrest',
-    zoneId: 'goldcrest_harbor',
-    town: 'Goldcrest',
-    x: -354,
-    z: 8,
-  },
 ] as const;
 
 /**
@@ -113,7 +106,6 @@ const TOWN_GAZE: Record<string, { x: number; z: number }> = {
   portal_wizard_hedgewick: { x: 320, z: 810 },
   portal_wizard_wickharbor: { x: 420, z: 360 },
   portal_wizard_gullhaven: { x: 305, z: 70 },
-  portal_wizard_goldcrest: { x: -2, z: 2190 },
 };
 
 /** Facing points along (sin f, cos f); aim each self at his own town square. */

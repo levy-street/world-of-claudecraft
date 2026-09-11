@@ -3,17 +3,15 @@
 // The minimap used to upscale a PAINTED plate: a 140px canvas covering the
 // whole 1080x2600 yard world (0.13 px/yard, blown up ~26x at zoom 1 and ~79x
 // at zoom 3), with a per-zone 480px plate blitted over it when one had been
-// rendered. In the editor's playtest that plate is never a baked asset —
-// bakedMapBgEligible() is false the moment the active world is maker content —
-// so it had to be re-painted procedurally on the idle lane, and until it
+// rendered. In the editor's playtest that plate is never a baked asset, // bakedMapBgEligible() is false the moment the active world is maker content, // so it had to be re-painted procedurally on the idle lane, and until it
 // landed the minimap was a green smudge.
 //
 // This renders the REAL scene instead: an orthographic camera straight down
 // over the player, into a small render target, read back asynchronously into a
 // canvas the 2D painter blits. That is sharp at every zoom (the captured yard
 // span follows the zoom, so pixels-per-yard is always matched to the display),
-// it always agrees with the world — a maker's painted terrain, their
-// placements, their water — and it needs no plates, no prewarm and no cache.
+// it always agrees with the world, a maker's painted terrain, their
+// placements, their water, and it needs no plates, no prewarm and no cache.
 //
 // COST CONTROL, in order of how much they matter:
 //   * the capture is a plain forward render of geometry that is ALREADY
@@ -73,7 +71,7 @@ export interface MinimapCaptureFrame {
 /**
  * Owns the render target, the ortho camera and the readback for the HUD
  * minimap. The caller (Renderer) is responsible for hiding what must not
- * appear and restoring it afterwards — this class only knows how to point a
+ * appear and restoring it afterwards, this class only knows how to point a
  * camera down and turn the result into a canvas.
  */
 export class MinimapCapture {
@@ -131,7 +129,7 @@ export class MinimapCapture {
   /**
    * Render the top-down view. `visibleHalfYards` is the half-extent the
    * minimap actually shows at the current zoom; the captured square is that
-   * plus the movement margin. Call only when `isDue` said so — the caller is
+   * plus the movement margin. Call only when `isDue` said so, the caller is
    * expected to have hidden what must not appear.
    */
   capture(
@@ -156,7 +154,7 @@ export class MinimapCapture {
     const previousTarget = webgl.getRenderTarget();
     // Re-running the shadow pass for this camera would double the frame's
     // shadow cost for a 384px thumbnail. The map rendered for the main camera
-    // is still bound and is the correct one — same light, same world.
+    // is still bound and is the correct one, same light, same world.
     const shadowAuto = webgl.shadowMap.autoUpdate;
     // The post-processing composer leaves autoClear off inside its own passes;
     // this runs after it, but pin the flag rather than inherit whatever the

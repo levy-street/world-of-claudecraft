@@ -315,8 +315,8 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Flooded flight owns this body outright. The deepball match driver runs
   // deepglassFlightPass for every participant on its own tick (it holds the
   // match clock, the currents and who is carrying the Tidesow), so the whole
-  // ground/swim pipeline below — gravity, terrain collision, the standoff, the
-  // ledge snap-down — must not also run. Turning still works above, because
+  // ground/swim pipeline below, gravity, terrain collision, the standoff, the
+  // ledge snap-down, must not also run. Turning still works above, because
   // yaw is how you aim the pack.
   if (p.dgFlight) return;
 
@@ -825,8 +825,7 @@ function verticalPass(
 // Buoyancy keys off INTENT, not depth. A body that chose to be down here (the
 // dive input has been held since it entered the water — `swimDiving`) is
 // neutrally buoyant, so exploring a lake bed is not a key you have to keep
-// held. A body that did NOT choose it — teleported in, knocked in, spawned in —
-// rides straight back up to the line, which is the rule the rest of the game
+// held. A body that did NOT choose it, teleported in, knocked in, spawned in, // rides straight back up to the line, which is the rule the rest of the game
 // leans on: nothing ever ends up parked on a lake bed. Surfacing is always one
 // held jump away either way, and the descent is floored a fixed clearance above
 // the bed so a diver never sinks into terrain.

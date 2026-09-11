@@ -5,7 +5,7 @@
 // This is the same arrangement the shipped game already uses for its own
 // authored art (render/battleground_placements, render/dungeon); placements
 // were the one content path still cloning per copy, which is why a map built in
-// the editor cost more than the identical map hand-authored in the engine — in
+// the editor cost more than the identical map hand-authored in the engine, in
 // the editor AND in the real game that loads the exported map.
 //
 // Ownership split: render/placed_batch_core owns the pure decisions (which
@@ -13,7 +13,7 @@
 // three objects, and render/placed_assets keeps every placement's transform on
 // a lightweight proxy Object3D whose matrixWorld feeds the instance matrix. The
 // proxy is what lets picking, seating, footprints and the gizmo keep working
-// against `entry.model` unchanged — it simply has no geometry under it.
+// against `entry.model` unchanged, it simply has no geometry under it.
 //
 // Growth: capacity doubles and the old instance buffer is copied, so a maker
 // can keep stamping without a rebuild. Removal is a swap-with-last inside the
@@ -149,7 +149,7 @@ export class PlacedBatches {
 
   /**
    * Remove `id` from every batch. The last live instance is copied down into
-   * the hole (raw buffer bytes — the moved instance's transform is already
+   * the hole (raw buffer bytes, the moved instance's transform is already
    * correct, it just lives at a different index now), then `count` drops, so
    * nothing stale is ever submitted.
    */

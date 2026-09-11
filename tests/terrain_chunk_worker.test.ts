@@ -208,8 +208,8 @@ function useFakeWorkers(): void {
 }
 
 // FORK: upstream refuses the pool under a custom world (a worker samples its own
-// built-in copy of the content). The fork SHIPS the content instead — see
-// setContent and 'the worker is told which world it is meshing' below — so an
+// built-in copy of the content). The fork SHIPS the content instead, see
+// setContent and 'the worker is told which world it is meshing' below, so an
 // authored map (the Deepglass, every Studio map) keeps off-thread meshing.
 describe('zoneBuildPool under a custom world (fork contract)', () => {
   useFakeWorkers();

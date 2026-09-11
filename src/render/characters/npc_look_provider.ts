@@ -2,8 +2,7 @@
 // main.ts so the Studio viewport composes NPCs exactly the way the game does
 // (the editor rendered every named NPC as a stock rig because it never
 // installed a look provider at all). npc_looks.ts stays free of sim imports
-// by contract, so the one branch that needs the sim — Tidehold's role table —
-// lives here instead.
+// by contract, so the one branch that needs the sim, Tidehold's role table, // lives here instead.
 import { isTideholdTemplate, tideholdRole } from '../../sim/deepglass/citadel';
 import type { Entity } from '../../sim/types';
 import type { ModularLook } from './modular';

@@ -1,7 +1,7 @@
 // The Deepglass crowd: thousands of animated cutout fans filling the bowl.
 //
 // Rocket League's trick, on WOC's stadium: the seated masses are 2D chibi
-// sprites on billboarded quads — one InstancedMesh, one draw call — while the
+// sprites on billboarded quads, one InstancedMesh, one draw call, while the
 // twenty-odd REAL composed characters (deepglass_event's sitters and pacers)
 // stand in the front rows and on the concourse so anywhere the player can walk
 // up to still holds full 3D people. The cards bob, sway, jump and run a
@@ -10,12 +10,12 @@
 //
 // Sprite variety is generated, not shipped: a 1024^2 canvas atlas of 64 fans,
 // split into amber rows, cyan rows and neutral rows so the bowl seats by
-// SECTION like a real derby — the same two house colours the pylon banners fly.
+// SECTION like a real derby, the same two house colours the pylon banners fly.
 //
 // The fans are CHARACTER-CREATOR PEOPLE, and ONLY them: every cell is an
 // offscreen render of a randomizeAppearance() roll wearing a civilian kit
 // dyed in its section's colourway (drawModularPortraitInto). The old painted
-// chibi set is gone — it clashed with the artstyle — so the atlas starts
+// chibi set is gone, it clashed with the artstyle, so the atlas starts
 // TRANSPARENT and the stands fill with real people as the renders bake in, a
 // few cells a frame over the first second.
 //
@@ -42,7 +42,7 @@ import {
 } from './characters/modular';
 import { drawModularPortraitInto } from './characters/portrait';
 
-// The bowl's geometry comes from layout.ts — the same constants the stadium
+// The bowl's geometry comes from layout.ts, the same constants the stadium
 // draws from and the world stands its blockers on.
 const BOWL_INNER_R = DG_BOWL_INNER_R;
 const BOWL_TIERS = DG_BOWL_TIERS;
@@ -59,8 +59,8 @@ const CELL = ATLAS_SIZE / ATLAS_GRID;
 const AMBER_ROWS = 3;
 const CYAN_ROWS = 3;
 
-// The card quad, world yards. 2.2 tall — the SAME height the renderer
-// normalizes every placed character to — because the crowd used to be chibi
+// The card quad, world yards. 2.2 tall, the SAME height the renderer
+// normalizes every placed character to, because the crowd used to be chibi
 // cards two-thirds of a body tall and read like a stadium of children next to
 // the players on the concourse. Aspect stays 0.7 (the bake pre-squeezes to
 // it, see bakeCardCell).
@@ -139,7 +139,7 @@ function buildAtlas(): { tex: THREE.CanvasTexture; ctx: CanvasRenderingContext2D
 
 /** Every atlas row is a composed-character render. */
 const CARD_RENDER_ROWS = ATLAS_GRID;
-/** Two atlas cells share one rolled character at different mount yaws — half
+/** Two atlas cells share one rolled character at different mount yaws, half
  *  the assembleModular variants for the same coverage, and a body seen from
  *  two angles never reads as a clone at stadium range. */
 const CELLS_PER_LOOK = 2;
@@ -153,7 +153,7 @@ const AMBER_WAYS: readonly OutfitColorway[] = ['gold', 'ember'];
 const CYAN_WAYS: readonly OutfitColorway[] = ['teal', 'azure'];
 const NEUTRAL_WAYS: readonly OutfitColorway[] = ['classic', 'forest', 'ivory', 'rose'];
 
-/** Roll the fan for an atlas cell — deterministic, so the crowd is the same
+/** Roll the fan for an atlas cell, deterministic, so the crowd is the same
  *  crowd every session. Cells in the same CELLS_PER_LOOK pair share the roll. */
 function cardLook(row: number, col: number): ModularLook {
   const rng = mulberry32((0xc0de + row * 131 + Math.floor(col / CELLS_PER_LOOK) * 17) >>> 0);
@@ -180,7 +180,7 @@ function bakeCardCell(ctx: CanvasRenderingContext2D, row: number, col: number): 
   const jitter = mulberry32((row * 8 + col + 1) >>> 0)() * 0.16;
   const yaw = (col % CELLS_PER_LOOK === 0 ? -0.3 : 0.34) + jitter;
   // Render FIRST (into the rig's own canvas), clear the painted fan only once
-  // that succeeded — a cleared cell with no render is an empty seat forever.
+  // that succeeded, a cleared cell with no render is an empty seat forever.
   const scratchOk = drawModularPortraitInto(
     scratchCell.ctx,
     modularVisualKey('warrior'),
@@ -447,7 +447,7 @@ export function buildDeepglassCrowdCards(): DeepglassCrowdView {
         if (tex.a < 0.45) discard;
         // The section wash: composed-character fans wear whatever colourway
         // they rolled, so the section identity the painted shirts used to
-        // carry comes from a light team-coloured grade instead — the bowl
+        // carry comes from a light team-coloured grade instead, the bowl
         // reads amber block / tide block the way the pylon banners do.
         vec3 houseCol = vHouse < 0.5 ? vec3(1.0, 0.76, 0.42)
                       : vHouse < 1.5 ? vec3(0.45, 0.83, 1.0)

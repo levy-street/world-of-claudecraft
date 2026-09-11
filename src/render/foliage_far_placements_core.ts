@@ -3,7 +3,7 @@
 // ones get: real model near, baked sprite impostor from the tree/rock handoff
 // plane to the fog wall. Without this, a map whose foliage was made editable
 // (decorationsMode 'empty') rendered a bare horizon past the placed-asset
-// cull while the shipped world showed treelines — and, worse, the placements
+// cull while the shipped world showed treelines, and, worse, the placements
 // drew REAL models out to the placed-asset range, far past where the game
 // ever draws a real tree.
 //

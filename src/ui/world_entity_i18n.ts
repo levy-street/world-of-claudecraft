@@ -278,7 +278,6 @@ const NPC_IDS = [
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
-  'deepglass_steward', // books passage down to the bell (docs/prd/deepglass.md)
   'deepglass_marshal', // runs the fixtures once you are at the bell (same doc)
   // Baldemar the Bald, the portal wizard: one self per town square plus the
   // one at the bell (src/sim/portal_wizard.ts).
@@ -296,7 +295,6 @@ const NPC_IDS = [
   'portal_wizard_hedgewick',
   'portal_wizard_wickharbor',
   'portal_wizard_gullhaven',
-  'portal_wizard_goldcrest',
   'portal_wizard_deepglass',
   // The Deepglass city event (src/sim/content/deepglass_event.ts): the
   // spectators and market stallkeepers outside the bell.
@@ -700,7 +698,6 @@ const ZONE_IDS = [
   'galecrest',
   'farshore_isle',
   // Appended last, matching the ZONES order in sim/data.ts.
-  'goldcrest_harbor',
   'proving_shore',
 ] as const;
 const DUNGEON_IDS = [

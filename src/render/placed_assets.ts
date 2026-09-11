@@ -36,10 +36,10 @@ import { targetHeightFor } from './asset_scale';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { buildCampfireFlame, CAMPFIRE_FLAME_HEIGHT, campfireFlameScale } from './campfire_flame';
-import { buildFoliageModel } from './foliage_gen';
-import { GFX, sharedUniforms } from './gfx';
 import { foliageFarPlacementsActive } from './foliage';
+import { buildFoliageModel } from './foliage_gen';
 import { lodDistsFor } from './foliage_lod';
+import { GFX, sharedUniforms } from './gfx';
 import {
   buildGrassPatchModel,
   DEFAULT_TUFTS_PER_PATCH,
@@ -88,8 +88,8 @@ const MIN_NATIVE_EMISSIVE_INTENSITY = 2.2;
 // Two terms, matching what the procedural foliage does so a placed oak and a
 // grown one move alike (the editor promotes foliage into placements, so most
 // of a maker's world takes THIS path): a whole-plant lean weighted
-// quadratically up the GLB's own vertical span — roots planted, crown carries
-// the motion — plus a leaf shimmer on the leaf materials only, sized in world
+// quadratically up the GLB's own vertical span, roots planted, crown carries
+// the motion, plus a leaf shimmer on the leaf materials only, sized in world
 // yards and divided back through the placement's world scale so it stays a
 // flutter on a great oak instead of a metre of thrash.
 export function attachPlacedTreeSway(
@@ -157,7 +157,7 @@ export function attachPlacedTreeSway(
       // yet and this is redundant, but on a RE-attach (the maker switching sway
       // back on, or undoing the switch-off) it is the whole fix: the material
       // is already compiled against the no-sway program from
-      // detachPlacedTreeSway, and without this it silently keeps it — sway
+      // detachPlacedTreeSway, and without this it silently keeps it, sway
       // never comes back.
       mat.needsUpdate = true;
     }
@@ -167,7 +167,7 @@ export function attachPlacedTreeSway(
 // Undo attachPlacedTreeSway. Needed because the sway hook is installed on the
 // SHARED parsed glTF (assets/loader caches one parse per URL for the whole
 // session), so a maker turning sway off for an asset cannot simply drop this
-// view's template and reload — the same materials would come back still
+// view's template and reload, the same materials would come back still
 // carrying the program. Clearing the hook and bumping needsUpdate recompiles
 // them without the sway block; the userData flag drops too, so switching sway
 // back on re-attaches cleanly.
@@ -203,7 +203,7 @@ const FOOTPRINT_RANGE = 100;
 /** Residency streaming (game hosts on big authored maps): resident radius,
  *  release band, reconcile stride, and the map size that turns it on. The
  *  radius clears every render range (LOD_RANGE_ASSETS + fog margin) so
- *  streaming is invisible — it changes what is MATERIALIZED, never what a
+ *  streaming is invisible, it changes what is MATERIALIZED, never what a
  *  standing player can see. */
 const STREAM_RADIUS = 650;
 const STREAM_HYSTERESIS = 96;
@@ -214,7 +214,7 @@ const STREAM_OPS_BUDGET = 24;
 
 /** Region residency (setCullBeyond's load/unload half): how many placements
  *  may be released or rebuilt in one frame. Restoring is the expensive
- *  direction — it clones a template, where releasing hands one back — so it
+ *  direction, it clones a template, where releasing hands one back, so it
  *  gets the smaller budget. At 48 a frame the Deepglass sheds its 5,317
  *  Tidehold placements in under two seconds of bout, and at 32 it rebuilds
  *  them over the ~100 yards of causeway between the bell and the city wall. */
@@ -225,8 +225,7 @@ const REGION_RESTORE_BUDGET = 32;
 // the real model ends at the same lodDists plane procedural foliage swaps at,
 // and the placement's far-sprite mirror (foliage_far_placements_core.ts,
 // injected into the impostor lane) carries it to the fog wall. Without the
-// cap a converted forest drew full tree models out to LOD_RANGE_ASSETS —
-// far past where the game ever draws a real tree — which is exactly the
+// cap a converted forest drew full tree models out to LOD_RANGE_ASSETS, // far past where the game ever draws a real tree, which is exactly the
 // frame-time gap between the shipped world and an editable-all map.
 const FAR_SPRITE_KIND = new Map<string, 'tree' | 'rock' | null>();
 function farSpriteKindFor(path: string | undefined): 'tree' | 'rock' | null {
@@ -254,7 +253,7 @@ const MAX_RENDERED_FIRE_EMITTERS = 64;
 // this count IS `numPointLights` in every lit material's program cache key and
 // must never change at runtime. It used to be a FIRST-COME cap, which in a city
 // with more than eight lit emitters handed every light to whichever building
-// streamed in first and left the rest — the Warden's Keep among them — pitch
+// streamed in first and left the rest, the Warden's Keep among them, pitch
 // dark inside. The eight lights are a POOL now: they are re-assigned to the
 // emitters nearest the player each frame (assignFireLights), so the count stays
 // pinned while the light always lands where somebody is standing.
@@ -275,8 +274,8 @@ interface FireLightSpec {
  * hidden when `nx * x + nz * z >= d`.
  *
  * Distance culling asks whether the player COULD see a placement from here.
- * This asks a different question — whether it is worth existing for them at
- * all right now — and it is the answer when a wall, not a range, is what hides
+ * This asks a different question, whether it is worth existing for them at
+ * all right now, and it is the answer when a wall, not a range, is what hides
  * something. The Deepglass is the case it was written for: from inside the
  * bell, Tidehold stands behind the Tide Gate's curtain wall and behind a
  * hundred yards of water, and 5,317 of that map's 6,127 placements are up
@@ -362,8 +361,7 @@ const bakedFootprintMat = new THREE.LineBasicMaterial({
   userData: { noWireframe: true },
 });
 // Collision Master authored mesh volumes draw in the SAME blue as the CM
-// studio, so the maker's modeled hitbox is what they see on placements —
-// never the red derived-box approximation.
+// studio, so the maker's modeled hitbox is what they see on placements, // never the red derived-box approximation.
 const authoredFootprintMat = new THREE.LineBasicMaterial({
   color: 0x37c5ff,
   transparent: true,
@@ -626,7 +624,7 @@ export class PlacedAssetsView {
     if (this.streamCenter && placements.length > STREAM_MIN_PLACEMENTS) {
       // Game host on a big authored map: materialize only the placements
       // around the spawn now (boot stops paying for the whole map) and let
-      // streamResidency() bring the rest in as the player travels — the same
+      // streamResidency() bring the rest in as the player travels, the same
       // discipline the editor's zone stream applies to its viewport.
       this.streamSource = placements;
       this.streamResidency(this.streamCenter.x, this.streamCenter.z, STREAM_RADIUS, true);
@@ -645,14 +643,13 @@ export class PlacedAssetsView {
   // (rebuildAll clears the source): the zone stream owns residency there.
   //
   // AMORTIZED: a per-frame cursor slice with a hard add/remove budget. The
-  // first cut reconciled the WHOLE map in one burst every 32yd of travel —
-  // a hundred-odd adds in one frame, each dirtying instance buffers and the
+  // first cut reconciled the WHOLE map in one burst every 32yd of travel,   // a hundred-odd adds in one frame, each dirtying instance buffers and the
   // parked sun-shadow cache, which read as a periodic stutter while moving.
   private streamSource: readonly (PlacedAsset | null)[] | null = null;
   private streamCenter: { x: number; z: number } | null = null;
   private streamCursor = 0;
 
-  /** Reconcile a slice of residency around (camX, camZ) — constant, tiny
+  /** Reconcile a slice of residency around (camX, camZ), constant, tiny
    *  per-frame work; a full pass completes every ~dozen frames. `force` runs
    *  the whole map in one pass (boot only). */
   streamResidency(camX: number, camZ: number, radius = STREAM_RADIUS, force = false): void {
@@ -711,8 +708,8 @@ export class PlacedAssetsView {
    *
    *  Ranking is by squared distance to the player, over the emitters that are
    *  visible and advertise a spec. Every pool light stays in the scene and
-   *  stays `visible` whatever happens — an unused one simply sits at intensity
-   *  0 — because the VISIBLE count is what three bakes into the program key. */
+   *  stays `visible` whatever happens, an unused one simply sits at intensity
+   *  0, because the VISIBLE count is what three bakes into the program key. */
   private assignFireLights(px: number, py: number, pz: number): void {
     const cands = this.fireLightCandidates;
     cands.length = 0;
@@ -763,7 +760,7 @@ export class PlacedAssetsView {
       if (state === r.state) continue;
       r.state = state;
       if (r.h1) r.h1.visible = state !== 1;
-      if (r.h3) r.h3.visible = state === 0 || state === 3;   // the third storey: hidden from both floors under it
+      if (r.h3) r.h3.visible = state === 0 || state === 3; // the third storey: hidden from both floors under it
       if (r.h2) r.h2.visible = state === 0;
       changed = true;
     }
@@ -1618,7 +1615,7 @@ export class PlacedAssetsView {
 
   /** Queue order for this path's GLB: squared distance from the last-seen
    * camera to the NEAREST placement still waiting on it. Before the first
-   * frame (no camera yet) everything is 0 — plain FIFO, the old behavior. */
+   * frame (no camera yet) everything is 0, plain FIFO, the old behavior. */
   private streamPriority(path: string): number {
     if (this.lodCamX === null) return 0;
     const waiting = this.waitingByPath.get(path);
@@ -2112,7 +2109,7 @@ export class PlacedAssetsView {
    * How the placement set is actually being drawn: how many entries became
    * instances, how many still clone, and which templates forced the fallback.
    * Diagnostics for the A/B harness (scripts/map_export_ab.mjs) and the editor
-   * perf overlay — a map that suddenly clones everything is the regression this
+   * perf overlay, a map that suddenly clones everything is the regression this
    * makes visible.
    */
   batchStats(): {
@@ -2181,7 +2178,7 @@ export class PlacedAssetsView {
     entry.model.rotation.set(p.rotX ?? 0, p.rotY, p.rotZ ?? 0);
     this.refreezeMatrices(entry);
     // refreezeMatrices has just cascaded the proxy's matrixWorld, so the
-    // instance can be composed straight off it — no duplicate seating math,
+    // instance can be composed straight off it, no duplicate seating math,
     // and a gizmo drag rewrites one instance matrix instead of moving a node.
     this.syncBatch(entry);
     if (entry.fireFx) this.placeFireFx(entry);
@@ -2206,7 +2203,7 @@ export class PlacedAssetsView {
     // `updateMatrix()` first, and then the refresh must go through
     // static_matrix.ts's helper rather than a bare updateMatrixWorld(). Under
     // three r185 `Object3D.updateMatrixWorld` composes the node's own
-    // matrixWorld only `if (this.matrixWorldAutoUpdate === true)` — and this
+    // matrixWorld only `if (this.matrixWorldAutoUpdate === true)`, and this
     // subtree turns that flag off at the end of its first pass. So every pass
     // after the first recomposed `matrix`, cleared the dirty bit, and left
     // matrixWorld frozen at whatever it held when the flag went down.
@@ -2214,7 +2211,7 @@ export class PlacedAssetsView {
     // Everything that draws reads matrixWorld: the instanced batch seats its
     // instance off it (syncBatch), and a non-batched clone's meshes cascade
     // from it. The DOCUMENT moved regardless, and the collider and hitbox
-    // overlay read the document — so a gizmo drag or a scale in Studio moved an
+    // overlay read the document, so a gizmo drag or a scale in Studio moved an
     // asset's hitbox and left its mesh standing where it was. That is the r185
     // note at the top of static_matrix.ts, and this was the one caller that
     // still had the pre-r185 assumption baked in.
@@ -2259,7 +2256,7 @@ export class PlacedAssetsView {
    * line outright, and rebuild them once it clears.
    *
    * The LOD sweep's region test stops them being DRAWN within a few frames,
-   * which is all the eye needs. This is what gives the memory back — the
+   * which is all the eye needs. This is what gives the memory back, the
    * clone, its instance slots, and the per-entry geometry a grass patch,
    * generated rock, built model or generated tree owns. Both directions are
    * budgeted per frame, because doing five thousand of either at once is
@@ -2349,7 +2346,7 @@ export class PlacedAssetsView {
       // (a placement must not render where the ground has fogged out).
       // Foliage-family placements tighten further to the shipped tree/rock
       // handoff plane, but ONLY on hosts whose far-sprite mirrors take over
-      // beyond it (game boots) — an editor viewport without sprites keeps
+      // beyond it (game boots), an editor viewport without sprites keeps
       // the full asset range rather than an empty 300-500yd band.
       const spriteKind = foliageFarPlacementsActive() ? farSpriteKindFor(p.path) : null;
       const speciesCap =
@@ -2461,7 +2458,7 @@ export class PlacedAssetsView {
     // then the baked catalogue/import set - matching the sim exactly.
     // Collision Master authored MESH volumes: when the asset's collision
     // comes from a CM override with meshes (no per-placement hand edits), the
-    // footprint IS the maker's blue modeled shape — the sim's boxes are
+    // footprint IS the maker's blue modeled shape, the sim's boxes are
     // derived from exactly these volumes.
     const overrideId =
       !p.collideCustom && (!p.hitboxes || p.hitboxes.length === 0) && p.path

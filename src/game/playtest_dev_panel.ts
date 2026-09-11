@@ -12,9 +12,6 @@
 //   takes effect immediately and unwraps cleanly).
 // - Dev badges: the renderer's built-in perf/debug badges.
 import type * as THREE from 'three';
-import { moverHeight, resolvePosition } from '../sim/colliders';
-import { PLAYER_MAX_CLIMB_SLOPE } from '../sim/pathfind';
-import { rideSteepnessAt } from '../sim/ride_height';
 import {
   auditCollisionAround,
   buildCollisionWireframe,
@@ -22,6 +19,9 @@ import {
   disposeCollisionWireframe,
   resetCollisionDebugCache,
 } from '../render/collision_debug';
+import { moverHeight, resolvePosition } from '../sim/colliders';
+import { PLAYER_MAX_CLIMB_SLOPE } from '../sim/pathfind';
+import { rideSteepnessAt } from '../sim/ride_height';
 
 interface DevGame {
   sim: {
@@ -100,8 +100,12 @@ export function mountPlaytestDevPanel(): void {
     wireLastZ = z;
     wireLastY = y;
     dropWire();
-    wireGroup = buildCollisionWireframe(g.sim.cfg.seed, x, z, WIREFRAME_RADIUS, (px, pz) =>
-      rideSteepnessAt(px, pz, g.sim.cfg.seed) > PLAYER_MAX_CLIMB_SLOPE,
+    wireGroup = buildCollisionWireframe(
+      g.sim.cfg.seed,
+      x,
+      z,
+      WIREFRAME_RADIUS,
+      (px, pz) => rideSteepnessAt(px, pz, g.sim.cfg.seed) > PLAYER_MAX_CLIMB_SLOPE,
     );
     g.renderer.scene.add(wireGroup);
   };

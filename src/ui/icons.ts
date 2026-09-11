@@ -5485,10 +5485,6 @@ export const ITEM_ART_PENDING = new Set<string>([
   ...IGNIVAR_ART_PENDING_ITEM_IDS,
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   ...NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
-  // FORK: the Scorching Wastes counter consumables ship without inventory art yet.
-  'cactus_pressed_water',
-  'lastwell_datewine',
-  'sunbaked_flatbread',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

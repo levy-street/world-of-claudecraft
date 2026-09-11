@@ -127,7 +127,7 @@ function material(texKey?: string): THREE.MeshStandardMaterial {
         })
         .catch(() => {});
     }
-    // A glowing set (lava): see cut_cavity_mesh — emissive turns white only
+    // A glowing set (lava): see cut_cavity_mesh, emissive turns white only
     // once the Emission map lands, and ignores the depth tint so molten veins
     // light the deepest stretch of a bore.
     const emissionPath = terrainTexturePath(set.key, 'emission');

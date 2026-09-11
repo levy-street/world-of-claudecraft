@@ -3,7 +3,7 @@
 // v0.39 draws Eastbrook Vale and Fenbridge from bespoke authored subtrees
 // (eastbrook_town.ts / fenbridge_town.ts) and skips the generic kit buildings
 // that stand for them in ZonePropsDef. Both halves of that swap were gated on
-// `getActiveWorldContent() === BUILTIN_WORLD` — an OBJECT IDENTITY check.
+// `getActiveWorldContent() === BUILTIN_WORLD`, an OBJECT IDENTITY check.
 //
 // Every editor document is a COPY of the built-in world, never that object, so
 // in Studio both halves flipped the wrong way at once: the authored town built

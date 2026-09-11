@@ -190,7 +190,7 @@ export function swimSteerFromPitch(pitch: number, from: number, to: number): num
 // leaves along the line you were looking down.
 //
 // Two conversions, and both matter. camPitch is positive looking DOWN and rests
-// at 0.32, so the aim is NEGATED and the rest offset removed — otherwise a
+// at 0.32, so the aim is NEGATED and the rest offset removed, otherwise a
 // player who has touched nothing is aimed 18 degrees into the floor. And it is
 // quantised for the same reason swimSteer is: the aim rides the change-detected
 // input frame, and a raw float would resend it on every mouse-move.
@@ -198,7 +198,7 @@ const DG_AIM_REST = 0.32;
 const DG_AIM_STEPS = 24;
 /** Steepest aim the wire carries, radians either way (flight.ts DG_AIM_MAX). */
 const DG_AIM_PITCH_MAX = 1.35;
-/** How long a bell-side left click stays armed as a dash request — must span at
+/** How long a bell-side left click stays armed as a dash request, must span at
  *  least one 20 Hz sim tick (50 ms) with margin for a slow frame. */
 const DASH_CLICK_LATCH_MS = 150;
 /** Clamp and quantise an aim pitch (radians, positive up) to the wire steps. */
@@ -229,8 +229,7 @@ export class Input {
    *
    * Set every frame by the game loop from `player.dgFlight`, and it changes two
    * things about how the move frame is read. The camera's pitch is sent as a
-   * continuous AIM rather than being latched into the swim dive/surface bands —
-   * in the bell those bands are the wrong control entirely, because Space and
+   * continuous AIM rather than being latched into the swim dive/surface bands,    * in the bell those bands are the wrong control entirely, because Space and
    * Ctrl are the absolute climb/sink trim and the camera is for pointing. And
    * the camera bands stop writing `dive`, so looking down while flying forward
    * no longer sinks you on top of pitching your thrust down: one input, one job.
@@ -350,7 +349,7 @@ export class Input {
   // body up or down through the water (the WoW rule).
   private swimAimPitch = 0.32;
   /** The deepball ball camera drives the view from the frame loop, and the aim
-   *  has to follow it — otherwise the body keeps pointing wherever the player
+   *  has to follow it, otherwise the body keeps pointing wherever the player
    *  last looked by hand while the camera looks somewhere else. */
   setSwimAimPitch(pitch: number): void {
     this.swimAimPitch = pitch;
@@ -1308,7 +1307,7 @@ export class Input {
     if (this.cb.isCameraLocked?.()) return;
     if (e.button === 0) this.leftDown = true;
     // In the bell, a left click IS the dash. Armed on the press (a drag that
-    // develops afterwards still dashes — click-then-steer is the whole move);
+    // develops afterwards still dashes, click-then-steer is the whole move);
     // the flight pass's dash cooldown makes the latch one dash per press.
     if (e.button === 0 && this.deepballFlight) {
       this.dashClickUntil = performance.now() + DASH_CLICK_LATCH_MS;
@@ -1510,7 +1509,7 @@ export class Input {
     if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
     const wasCameraDrag = this.cameraDragActive;
     // In the bell a left click is the DASH, and the ball cam keeps the action
-    // centred under the cursor — so a plain left click constantly landed on a
+    // centred under the cursor, so a plain left click constantly landed on a
     // bot or the ball and opened a target frame mid-play. No pick from the
     // dash button there; right-click picking (and every UI click) is untouched.
     const pickSuppressed = this.deepballFlight && e.button === 0;
@@ -1721,7 +1720,7 @@ export class Input {
     // Deepball burners. Read like jump, off the raw codes rather than
     // heldAction, because F is not a WASD key and must keep working in Attack
     // Move mode. This was MISSING outright: `boost` was declared on MoveInput,
-    // set by the bots, honoured by the flight pass — and never once written by
+    // set by the bots, honoured by the flight pass, and never once written by
     // the human's move frame, so a player's burners could not light no matter
     // what they pressed.
     const boost = this.keybinds.codesForAction('boost').some((c) => this.keys.has(comboCode(c)));

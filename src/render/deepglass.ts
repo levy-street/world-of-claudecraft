@@ -3,13 +3,13 @@
 // Modelled on vale_cup_stadium.ts / impact_site.ts: built once in the renderer
 // ctor, distance-culled by update(), every position read from the ONE layout
 // module (src/sim/deepglass/layout.ts) that the ball physics and the flight
-// clamp also read — so what you see is exactly what the ball banks off.
+// clamp also read, so what you see is exactly what the ball banks off.
 //
 // The water is deliberately CLEAR (PRD section 6). A 76-yard arena is
 // unplayable through murk: a player must read the far ring, a teammate's run
 // and a 55 yd/s shot across the whole bell. The underwater cue therefore comes
 // from a fresnel rim on the glass, a faint volume tint, drifting motes and
-// caustic banding — never from extinction.
+// caustic banding, never from extinction.
 import * as THREE from 'three';
 import {
   DEEPGLASS_CENTER,
@@ -18,9 +18,9 @@ import {
   DG_BOOST_PADS,
   DG_GOAL_HOUSING_OFFSET,
   DG_HOLE_R,
+  DG_POCKET_DEPTH,
   DG_POWERUP_SITES,
   DG_RING_EAST_X,
-  DG_POCKET_DEPTH,
   DG_RING_OFFSET,
   DG_RING_RADIUS,
   DG_RING_WEST_X,
@@ -28,11 +28,7 @@ import {
 } from '../sim/deepglass/layout';
 import { deepglassLastBeam, deepglassMatch } from '../sim/deepglass/match';
 import { loadTexture } from './assets/loader';
-import {
-  buildDeepglassKit,
-  GATE_SURROUND_SCALE,
-  type DeepglassKitState,
-} from './deepglass_kit';
+import { buildDeepglassKit, type DeepglassKitState, GATE_SURROUND_SCALE } from './deepglass_kit';
 
 export const DEEPGLASS_SITE = {
   x: DEEPGLASS_CENTER.x,
@@ -57,7 +53,7 @@ const PAD_GLOW = 0x8effc8;
 const POWERUP_FREEZE = 0x8ee8ff;
 const POWERUP_OVERBURN = 0xff9de2;
 /** The goal gate's mouth: radius and how far IN FRONT of the scoring plane it
- *  sits. Both mirror the authored model (scripts/assets/deepglass) — the halo
+ *  sits. Both mirror the authored model (scripts/assets/deepglass), the halo
  *  has to land on the funnel's lip, not float near it. */
 const GATE_MOUTH_R = 19.5;
 const GATE_MOUTH_INSET = 4.2;
@@ -79,7 +75,7 @@ export interface DeepglassView {
 // is self-contained and never races the renderer's shared uniform block.
 // ---------------------------------------------------------------------------
 
-/** The glass bell: near-invisible face, bright fresnel rim — with the two goal
+/** The glass bell: near-invisible face, bright fresnel rim, with the two goal
  *  HOLES cut through it on the ±x axis (layout.ts DG_HOLE_R), each wearing a
  *  pulsing team-tinted rim so the goal mouths read from anywhere in the bell. */
 function glassMaterial(): THREE.ShaderMaterial {
@@ -395,7 +391,7 @@ function stoneMesh(geo: THREE.BufferGeometry, color: number, rough = 0.85): THRE
 
 /** The stone cradle's GROUND: a base ring and a plaza disc. The sixteen
  *  buttresses that stand on it are authored models now and come in through
- *  deepglass_kit.ts — this is only the flatwork they sit on. */
+ *  deepglass_kit.ts, this is only the flatwork they sit on. */
 function buildCradle(): THREE.Group {
   const g = new THREE.Group();
 
@@ -482,7 +478,7 @@ export function buildDeepglass(): DeepglassView {
 
   // A brass cage on the inside of the glass: latitude rings and meridians.
   // From OUTSIDE the bell reads fine on its fresnel rim alone, but from INSIDE
-  // — where the whole match is played — the rim faces away and the volume is a
+  //, where the whole match is played, the rim faces away and the volume is a
   // featureless wash with no way to judge distance to the wall. The cage is the
   // spatial reference, and it doubles as the structure that plausibly holds
   // seventy-six yards of water up.
@@ -496,7 +492,7 @@ export function buildDeepglass(): DeepglassView {
   const CAGE_R = DEEPGLASS_RADIUS - 0.35;
   // Built as SEGMENTS rather than closed lines so the brass can break around
   // the two goal holes: a strut drawn across an open goal mouth reads as bars
-  // over the goal. Local coordinates — the cage is centred on the bell.
+  // over the goal. Local coordinates, the cage is centred on the bell.
   const cageSegs: number[] = [];
   const overHole = (ax: number, ay: number, az: number, bx: number, by: number, bz: number) => {
     const mx = (ax + bx) / 2;
@@ -556,8 +552,8 @@ export function buildDeepglass(): DeepglassView {
     [DG_RING_EAST_X, RING_EAST, -1.6],
   ] as const) {
     const ringSide = Math.sign(x - DEEPGLASS_CENTER.x) || 1;
-    // The drawn ring and its halo hang at the POCKET SEAT — the plane of the
-    // gate model's spoked backstop wheel — so ring and model read as ONE
+    // The drawn ring and its halo hang at the POCKET SEAT, the plane of the
+    // gate model's spoked backstop wheel, so ring and model read as ONE
     // assembly from every angle. They used to hang at the hole rim, 5+ yards
     // shy of the wheel, and any off-axis view split the two centres apart
     // ("the goal doesn't line up with the model"). From down the pitch the
@@ -603,8 +599,7 @@ export function buildDeepglass(): DeepglassView {
     // bell.
     const side = Math.sign(x - DEEPGLASS_CENTER.x) || 1;
     const lipX =
-      DEEPGLASS_CENTER.x +
-      side * (DG_GOAL_HOUSING_OFFSET - GATE_MOUTH_INSET * GATE_SURROUND_SCALE);
+      DEEPGLASS_CENTER.x + side * (DG_GOAL_HOUSING_OFFSET - GATE_MOUTH_INSET * GATE_SURROUND_SCALE);
     const mouth = new THREE.Mesh(
       new THREE.TorusGeometry(GATE_MOUTH_R * GATE_SURROUND_SCALE, 0.42, 8, 72),
       ringMaterial(color, spin * 0.35),
@@ -623,7 +618,7 @@ export function buildDeepglass(): DeepglassView {
     light.position.set(ringX, DEEPGLASS_CENTER.y, DEEPGLASS_CENTER.z);
     // Every light here rides the renderer's fireLights budget, whose flicker
     // pass drives intensity at userData.baseIntensity (defaulting to a
-    // campfire's 11 when unset — which overdrove the whole arena a full stop
+    // campfire's 11 when unset, which overdrove the whole arena a full stop
     // and lit the goal burst white at rest). Authored intensity IS the base.
     light.userData.baseIntensity = 1.5;
     lights.push(light);
@@ -684,14 +679,14 @@ export function buildDeepglass(): DeepglassView {
     // Held by direct reference for the cooldown dimming below. The old
     // arithmetic (`lights.length - powerupOrbs.length + i`) was written before
     // the goal burst light joined the END of this array, so it silently landed
-    // on orb1 and the BURST light — one orb never dimmed, and every powerup
+    // on orb1 and the BURST light, one orb never dimmed, and every powerup
     // edge toggled the celebration light instead.
     powerupOrbLights.push(orbLight);
   }
 
   // ---- the Tidewarden's beam ----------------------------------------------
   // One reusable segment: a unit cylinder along +Y, scaled and aimed at the
-  // shot it is drawing. Additive and short-lived — the point is a snap of light
+  // shot it is drawing. Additive and short-lived, the point is a snap of light
   // between two bodies, not a laser you can study.
   const beamMat = new THREE.MeshBasicMaterial({
     color: POWERUP_FREEZE,
@@ -751,7 +746,7 @@ export function buildDeepglass(): DeepglassView {
   // the whole scene's programs on the exact frame the goal landed.
   const burstLight = new THREE.PointLight(0xffffff, 0, 70, 2);
   // Resting base 0: without it the budget's flicker pass drove this at a
-  // campfire's default 11 — a white lamp hanging in the bell between goals.
+  // campfire's default 11, a white lamp hanging in the bell between goals.
   // The celebration's own intensity writes land after the flicker each frame.
   burstLight.userData.baseIntensity = 0;
   // It teleports to the ring that conceded on every goal, so the budget must
@@ -787,8 +782,7 @@ export function buildDeepglass(): DeepglassView {
       // The lights are deliberately NOT toggled with the group: they ride the
       // renderer's fireLights budget, which keeps a CONSTANT number of point
       // lights visible precisely so numPointLights (a program cache key) never
-      // changes. This loop used to overwrite the budget's pin every frame —
-      // running after budgetFireLights in the frame — and each flip relinked
+      // changes. This loop used to overwrite the budget's pin every frame,       // running after budgetFireLights in the frame, and each flip relinked
       // every lit material in view. Out of range they contribute intensity 0.
       if (!visible) return;
       time += dt;
@@ -842,8 +836,8 @@ export function buildDeepglass(): DeepglassView {
         const site = DG_POWERUP_SITES[i];
         // A taken orb's light goes dark through its BASE, never through
         // `.visible`: the budget's flicker pass reads baseIntensity every
-        // frame, and a visibility toggle here changed numPointLights — the
-        // program-cache key — which relinked every lit material in view on
+        // frame, and a visibility toggle here changed numPointLights, the
+        // program-cache key, which relinked every lit material in view on
         // the exact frame a powerup was taken or respawned (a measured
         // one-second freeze at gfx=high).
         powerupOrbLights[i].userData.baseIntensity = cooling ? 0 : 2.6;

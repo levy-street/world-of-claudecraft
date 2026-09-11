@@ -181,7 +181,7 @@ describe('the submerged ambience', () => {
     player.ambience('vale', false, 'rain', true, 1, [], true);
     expect(state.loops.has('dg_ambient')).toBe(true);
     // A loop is unlooped by fading and a deferred stop, but it leaves the map
-    // immediately — which is what decides whether it is audible.
+    // immediately, which is what decides whether it is audible.
     for (const key of ['amb_wind_vale', 'amb_rain', 'amb_water', 'amb_crowd']) {
       expect(state.loops.has(key)).toBe(false);
     }
@@ -203,7 +203,7 @@ describe('the submerged ambience', () => {
     expect(state.loops.has('dg_crowd')).toBe(false);
 
     // In the bell: the same crowd, now through the glass. Exactly one of the
-    // two beds carries it at any moment — both at once is two stadiums.
+    // two beds carries it at any moment, both at once is two stadiums.
     player.ambience('vale', false, null, false, 0.7, [], true);
     expect(state.loops.has('amb_crowd')).toBe(false);
     expect(state.loops.has('dg_crowd')).toBe(true);

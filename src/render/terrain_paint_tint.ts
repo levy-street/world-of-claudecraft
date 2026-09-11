@@ -11,7 +11,7 @@
 //     so the tint is what makes paving read pale and cobbles read slate);
 //   - a LAYER: the built-in splat layer (grass/dirt/rock/sand) nearest the
 //     swatch's referenced texture family, so a plaza is rocky underfoot and a
-//     drill yard is packed dirt — real texture change, not just colour;
+//     drill yard is packed dirt, real texture change, not just colour;
 //   - SNOW: swatches referencing the Snow family ride the shader's dedicated
 //     snow layer (vExtra.y) instead, which carries its own albedo + roughness.
 //
@@ -20,8 +20,8 @@
 // map is opened in the fork editor that still has it), the true textures take
 // over and this mapping simply stops being the closest available drawing.
 //
-// Used by BOTH terrain pipelines (near chunks — worker included, it bundles
-// this with the sim — and the far vista), and by the editor viewport, which
+// Used by BOTH terrain pipelines (near chunks, worker included, it bundles
+// this with the sim, and the far vista), and by the editor viewport, which
 // renders through the same chunk builder.
 
 import { getActiveWorldContent } from '../sim/data';
@@ -29,7 +29,7 @@ import type { BiomePaint } from '../sim/types';
 import { terrainTextureSet } from './terrain_texture_sets';
 
 export interface PaintTint {
-  /** Tint in LINEAR colour space, 0..1 — the working space both terrain
+  /** Tint in LINEAR colour space, 0..1, the working space both terrain
    *  pipelines blend vertex colours in (near chunks via THREE.Color's managed
    *  hex parse, the far vista via its own srgbHexToLinear). */
   r: number;
@@ -75,10 +75,10 @@ function shiftedColor(color: number, light: number | undefined): number {
 }
 
 /** sRGB channel to linear, the same transfer THREE.Color's managed hex parse
- *  applies — so a painted tint lands in exactly the space the biome palette
+ *  applies, so a painted tint lands in exactly the space the biome palette
  *  colours already occupy. */
 function s2l(c: number): number {
-  return c < 0.04045 ? c * 0.0773993808 : Math.pow((c + 0.055) / 1.055, 2.4);
+  return c < 0.04045 ? c * 0.0773993808 : ((c + 0.055) / 1.055) ** 2.4;
 }
 
 // Resolved swatches, cached per paint layer object (content identity: a new
@@ -125,7 +125,7 @@ function fxFor(bp: BiomePaint, id: number): PaintTint | null {
 /**
  * The paint at WORLD (x, z), or null where unpainted / painted with a
  * built-in biome id (those recolour through biomeAt's palette path already).
- * Grid lookup plus a cached swatch resolve — cheap enough for the chunk
+ * Grid lookup plus a cached swatch resolve, cheap enough for the chunk
  * builder's per-vertex loop.
  */
 export function paintTintAt(x: number, z: number): PaintTint | null {

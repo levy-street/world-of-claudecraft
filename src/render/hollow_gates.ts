@@ -86,8 +86,7 @@ export function buildHollowGates(seed: number): HollowGatesView {
   group.name = 'hollow-gates';
   const occluders: GateOccluder[] = [];
   // These two cave mouths stand on REALM_PORTALS' fixed OVERWORLD coordinates,
-  // so on an authored map they land wherever those numbers happen to fall —
-  // for Tidehold, the crystal mouth came up on the island's north quay beside
+  // so on an authored map they land wherever those numbers happen to fall,   // for Tidehold, the crystal mouth came up on the island's north quay beside
   // a warden tower, and Troy asked twice why a dungeon portal was on his city
   // map (2026-09-09). Site dressing keyed to world coordinates is never an
   // authored map's content; the same rule already keeps ore veins, camp

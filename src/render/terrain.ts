@@ -73,15 +73,15 @@ import {
   fillChunkVertexRow,
 } from './terrain_chunk_build';
 import { meshTerrainHeight } from './terrain_mesh_height';
-import { paintTexturedCellsIn } from './terrain_paint_tint';
 import {
   invalidatePaintLayerRuntime,
   PAINT_LAYER_SAMPLE_GLSL,
-  PAINT_NORMAL_GLSL,
   PAINT_LAYER_UNIFORMS_GLSL,
+  PAINT_NORMAL_GLSL,
   paintLayerRuntime,
   refreshPaintFieldLive,
 } from './terrain_paint_layers';
+import { paintTexturedCellsIn } from './terrain_paint_tint';
 import { TERRAIN_TONES } from './terrain_palette';
 import {
   chunkIntersectsRegion,
@@ -230,7 +230,7 @@ export function terrainSplatTexture(key: 'grassC' | 'grassN'): THREE.Texture | u
 
 /** Editor entry point: the editor renders the splat material on every tier, so
  *  it needs the layer textures fetched even when a low-tier boot skipped them.
- *  Idempotent — prepareTerrainTex dedupes by key. */
+ *  Idempotent, prepareTerrainTex dedupes by key. */
 export function ensureTerrainSplatAssetFetch(): void {
   void prepareTerrainProfileAssets({ ...GFX, terrainSplat: true });
 }
@@ -243,7 +243,7 @@ export function ensureTerrainSplatAssetFetch(): void {
 // resolve from the browser's ground-texture store. The material compiles its
 // paint path only when the map carries texture paint, so adding the FIRST
 // textured swatch (or one that claims a new slot) needs a full terrain
-// rebuild — the editor's swatch-add site runs one; everything after that
+// rebuild, the editor's swatch-add site runs one; everything after that
 // (strokes, hue/light, tile size) updates the field data in place.
 
 /** Palette capacity for imported/library ground textures (document cap; the
@@ -2206,8 +2206,8 @@ export interface TerrainView {
 
 export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
   // The ACTIVE world's zones, not the shipped const. Every zone-shaped decision
-  // below — which cells a zone owns, where the ridge walls run, LOD by hub
-  // distance — is keyed by zone IDENTITY, and an authored map's zones are its
+  // below, which cells a zone owns, where the ridge walls run, LOD by hub
+  // distance, is keyed by zone IDENTITY, and an authored map's zones are its
   // own objects with its own ids. Read statically, cellOwnerId answered with a
   // SHIPPED zone id that no authored zone could ever equal, so zoneCells()
   // returned empty and an authored map streamed in with ZERO ground chunks:

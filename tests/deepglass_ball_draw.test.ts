@@ -57,7 +57,7 @@ describe('Tidesow draw geometry matches the physics ball', () => {
 // between render frames.
 //
 // syncTidesow used to difference the ball entity's position across a frame and
-// divide by DT — a frame delta over a 20 Hz tick step, which is only ever right
+// divide by DT, a frame delta over a 20 Hz tick step, which is only ever right
 // when the two are equal. Above 20 fps most frames find pos === prevPos and
 // report a stationary ball; below it, a whole run of ticks is divided by one
 // tick's DT (measured 100x out: 1,114 yd/s drawn against 10.8 real). The first

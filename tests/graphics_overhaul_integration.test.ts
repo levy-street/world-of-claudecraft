@@ -51,7 +51,7 @@ describe('graphics-overhaul integration', () => {
     );
     // OBJECT obstruction stays opacity-only: no prop, tree or building may pull
     // the camera in. The ONE exception is a cave tube or carve cavity, whose
-    // rock the camera would otherwise sit outside of (opacity cannot help — the
+    // rock the camera would otherwise sit outside of (opacity cannot help, the
     // whole world is on the far side of it), so the distance may be clamped by
     // cameraSheetMaxDist and by nothing else. Assert exactly that shape: the
     // solve is written twice (the open-world pose, then the clamped one) and

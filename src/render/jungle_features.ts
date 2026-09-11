@@ -276,8 +276,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
 
   // --- the fallen coconuts: clusters dropped around the palm trunks ---
   // Stands down when the document owns the coconut clusters as placements.
-  if (!activeWorldPromoted('jungleCoconuts'))
-    instanceProp('coconuts', reachCoconutSpots(seed));
+  if (!activeWorldPromoted('jungleCoconuts')) instanceProp('coconuts', reachCoconutSpots(seed));
 
   // --- the still water dressing: lily rafts and reeds on the lakes ---
   {

@@ -5,7 +5,6 @@ export type MusicZone =
   | 'town_eastbrook'
   | 'town_fenbridge'
   | 'town_highwatch'
-  | 'town_goldcrest'
   | 'vale'
   | 'vale_legacy'
   | 'marsh'
@@ -104,7 +103,6 @@ export const MUSIC_ZONES: readonly MusicZone[] = [
   'town_eastbrook',
   'town_fenbridge',
   'town_highwatch',
-  'town_goldcrest',
   'vale',
   'vale_legacy',
   'marsh',
@@ -115,7 +113,7 @@ export const MUSIC_ZONES: readonly MusicZone[] = [
   'dungeon_gravewyrm_sanctum',
 ];
 
-// Every id the director can score — the maker-pickable list above plus the
+// Every id the director can score, the maker-pickable list above plus the
 // biome layers and the world-chosen realm/rift cues. A Record keyed on the
 // union so tsc fails the moment a new MusicZone is added without a row here.
 // Used to validate map-authored track ids at play time (an authored world may
@@ -125,7 +123,6 @@ const ALL_MUSIC_ZONE_FLAGS: Record<MusicZone, true> = {
   town_eastbrook: true,
   town_fenbridge: true,
   town_highwatch: true,
-  town_goldcrest: true,
   vale: true,
   vale_legacy: true,
   marsh: true,

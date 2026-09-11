@@ -760,7 +760,7 @@ export function farGroundColor(
   // The map's PAINT layer: the same authored ground the near chunks draw
   // (terrain_paint_tint.ts), so a painted plaza reads stone from a kilometre
   // out instead of popping from meadow-green when its detail chunks stream in.
-  // One tap — the far mesh's own vertex spacing is coarser than any feather.
+  // One tap, the far mesh's own vertex spacing is coarser than any feather.
   const paint = paintTintAt(x, z);
   if (paint) {
     const t = paint.strength;

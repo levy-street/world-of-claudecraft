@@ -8,8 +8,8 @@
 // The material is TRIPLANAR IN THE SHADER: every fragment samples the colour,
 // normal, roughness and AO maps through three world-axis projections and
 // blends them by the face normal, at a physical yards-per-repeat tile. A
-// texture therefore reads correctly on any face at any angle — a stair flight,
-// a cylinder, a wedge — with no seams where a face's dominant axis flips and
+// texture therefore reads correctly on any face at any angle, a stair flight,
+// a cylinder, a wedge, with no seams where a face's dominant axis flips and
 // no unwrapping by the maker. World-space projection also means two butted
 // models continue one another's pattern. (The geometry still carries a
 // per-face planar UV for anything that wants a plain map, e.g. picking
@@ -218,7 +218,7 @@ function modelMaterial(params: ModelParams): THREE.MeshStandardMaterial {
   const cached = modelMats.get(key);
   if (cached) return cached;
   const shading = modelMaterialShading(look.texId);
-  // DoubleSide: built models are architectural (cave interiors, rooms) — the
+  // DoubleSide: built models are architectural (cave interiors, rooms), the
   // maker stands INSIDE them and must see the inner walls; it also makes the
   // render winding-agnostic (the CM primitives are inward-wound).
   const mat = new THREE.MeshStandardMaterial({
@@ -263,7 +263,7 @@ function modelMaterial(params: ModelParams): THREE.MeshStandardMaterial {
 
 /**
  * Build the solid mesh for a built model's volume set. The geometry is
- * NON-INDEXED (each triangle owns its verts) so faces stay crisp/flat — the
+ * NON-INDEXED (each triangle owns its verts) so faces stay crisp/flat, the
  * right look for architectural boxes, ramps, and blocky cave walls. Ramp
  * volumes render as ordinary solid geometry; their walkability is a collision
  * concern handled at Lock In, not here.

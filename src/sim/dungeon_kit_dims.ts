@@ -10,7 +10,7 @@
 //                  targetHeightFor), so scale 1 is 2.2yd whatever the model is.
 //
 // Copying a module's scale straight onto a placement therefore shrinks a
-// 4yd wall to 2.2yd while leaving it on a 4yd grid — the gapped floor and
+// 4yd wall to 2.2yd while leaving it on a 4yd grid, the gapped floor and
 // undersized walls a region map showed before this existed. Both directions of
 // the region round trip (editor/shipped_maps.ts on the way in,
 // sim/regions/authored_region.ts on the way out) go through here.
@@ -26,7 +26,7 @@ import { DUNGEON_KIT_MAX_DIM } from './dungeon_kit_dims.generated';
 export const PLACED_TARGET_SIZE = 2.2;
 
 /**
- * Yards per unit of MODULE scale for one kit module — its native largest
+ * Yards per unit of MODULE scale for one kit module, its native largest
  * dimension. Unknown kinds fall back to the placed target, which makes the
  * conversion the identity: a module the build does not know about keeps
  * whatever scale it was given rather than being silently resized.

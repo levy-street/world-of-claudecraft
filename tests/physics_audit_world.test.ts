@@ -6,6 +6,7 @@ import {
   colliderTopAt,
   DOCK_HUT_ROOF_EAVE,
   DOCK_HUT_ROOF_TOP,
+  insidePrism,
   interiorColliderFrame,
   isBlocked,
   queryOpenWorldColliders,
@@ -595,13 +596,15 @@ describe('programmatic collider sanity sweeps', () => {
         const hit =
           c.type === 'circle'
             ? Math.hypot(pos.x - c.x, pos.z - c.z) < c.r - 0.05
-            : (() => {
-                const cos = Math.cos(-c.rot);
-                const sin = Math.sin(-c.rot);
-                const lx = (pos.x - c.x) * cos + (pos.z - c.z) * sin;
-                const lz = -(pos.x - c.x) * sin + (pos.z - c.z) * cos;
-                return Math.abs(lx) < c.hw - 0.05 && Math.abs(lz) < c.hd - 0.05;
-              })();
+            : c.type === 'obb'
+              ? (() => {
+                  const cos = Math.cos(-c.rot);
+                  const sin = Math.sin(-c.rot);
+                  const lx = (pos.x - c.x) * cos + (pos.z - c.z) * sin;
+                  const lz = -(pos.x - c.x) * sin + (pos.z - c.z) * cos;
+                  return Math.abs(lx) < c.hw - 0.05 && Math.abs(lz) < c.hd - 0.05;
+                })()
+              : insidePrism(c, pos.x, pos.z);
         if (hit)
           bad.push(
             `${(npc as { id?: string }).id} inside collider at (${c.x.toFixed(1)},${c.z.toFixed(1)})`,

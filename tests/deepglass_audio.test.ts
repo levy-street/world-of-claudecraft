@@ -2,7 +2,7 @@
 //
 // Synthesis has one failure mode that no type checker and no eyeball catches: a
 // filter sweep that goes unstable renders a buffer of NaN, which plays as
-// SILENCE with no error anywhere — the cue simply never sounds and nothing in
+// SILENCE with no error anywhere, the cue simply never sounds and nothing in
 // the log says so. Every assertion here exists to catch that class of bug at the
 // buffer, where it is cheap, rather than in a bout where it is invisible.
 
@@ -120,8 +120,8 @@ describe('the deepball sound bank', () => {
 
   it('makes the bounce layers three different sounds, not one at three sizes', () => {
     // A harder hit deforms the ball further, and a bigger deformation is a
-    // LOWER, heavier note. That weight — not level, which the mix supplies
-    // separately — is the property that makes the layering read as force, so
+    // LOWER, heavier note. That weight, not level, which the mix supplies
+    // separately, is the property that makes the layering read as force, so
     // it is the one worth pinning. Measured as the share of energy under a
     // one-pole at ~110 Hz.
     const weight = (cue: DeepglassCue): number => {
@@ -164,8 +164,8 @@ describe('the bounce mix', () => {
   });
 
   it('stays inside its headroom, because the layers stack on one transient', () => {
-    // Core and heavy both fire on the same instant — the ball meeting the
-    // body — so their peaks land on top of each other and their gains are one
+    // Core and heavy both fire on the same instant, the ball meeting the
+    // body, so their peaks land on top of each other and their gains are one
     // budget, not three. The first version spent about 1.8 of it.
     for (let speed = 0; speed <= 60; speed += 0.25) {
       const mix = bounceMixFor(speed);
@@ -231,7 +231,7 @@ describe('the sustained beds', () => {
 
   it('keeps the beds dark: they are pressure, not hiss', () => {
     // Most of a bed's energy has to sit under ~200 Hz. Deep water is a WEIGHT,
-    // and the first version of the ambient bed failed this — it carried a
+    // and the first version of the ambient bed failed this, it carried a
     // "whisper of air" layer that read instantly as a room recorded in air,
     // which is the single tell that undoes the whole illusion.
     const subShare = (buf: Float32Array): number => {

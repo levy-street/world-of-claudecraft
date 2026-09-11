@@ -1,7 +1,7 @@
 // The bell's voice: procedural audio for deepball at the Deepglass.
 //
-// Same approach as dragon_audio.ts and water_elemental_audio.ts — pure math,
-// no clip files, no generator run — because the arena shipped SILENT. A sport
+// Same approach as dragon_audio.ts and water_elemental_audio.ts, pure math,
+// no clip files, no generator run, because the arena shipped SILENT. A sport
 // played at 26 yd/s with no sound for the strike, the burners or the whistle
 // reads as a physics demo rather than a match, and every cue it needs is a
 // short percussive transient that synthesis is good at.
@@ -16,14 +16,14 @@
 //   SLOW      attacks are a few milliseconds rather than instant. A dense medium
 //             takes time to move.
 //   BUBBLED   most cues carry a short tail of small pitched blips (see
-//             {@link bubbles}) — cavitation off a fast body or a struck ball.
+//             {@link bubbles}), cavitation off a fast body or a struck ball.
 //             It is the cheapest "this is submerged" signal there is.
 //   WEIGHTED  a sub layer under the transient. Water couples to the body; you
 //             feel a deepball hit as much as hear it.
 //
 // Every cue is mono on purpose: the SFX engine pans these through a positional
 // panner (game/sfx.ts playAt), and a stereo source would be downmixed anyway.
-// Everything is deterministic — a seeded generator per cue, so no two cues are
+// Everything is deterministic, a seeded generator per cue, so no two cues are
 // correlated noise but each one is identical every session.
 
 export type DeepglassCue =
@@ -45,7 +45,7 @@ export type DeepglassCue =
 /** The two SUSTAINED sounds, which are a different kind of thing from the cues
  *  above: they are seamless beds the engine loops for as long as the state
  *  holds, so they are rendered by their own path ({@link deepglassLoopSamples})
- *  with no fade at either end — a fade on a loop is a gap once a second. */
+ *  with no fade at either end, a fade on a loop is a gap once a second. */
 export type DeepglassLoop = 'ambient' | 'boost' | 'crowd';
 
 /** The SFX key each cue is staged under. The engine bakes these into buffers at
@@ -163,7 +163,7 @@ function seededNoise(seed: number): () => number {
   };
 }
 
-/** Two-pole state-variable filter, stepped one sample at a time — cheap enough
+/** Two-pole state-variable filter, stepped one sample at a time, cheap enough
  *  to sweep per sample, which every moving-water cue here needs. Guarded below
  *  Nyquist: an unclamped sweep goes unstable and renders a buffer of NaN, which
  *  plays as silence with no error anywhere. */
@@ -187,7 +187,7 @@ function saturate(x: number, drive: number): number {
  * Fade the first sample or two up from zero.
  *
  * Every cue here starts on a transient, and a buffer whose FIRST sample is
- * already at 0.36 is a DC step — heard as a tick in front of the sound, which is
+ * already at 0.36 is a DC step, heard as a tick in front of the sound, which is
  * the one artefact that makes synthesised audio read as synthesised. A ramp this
  * short (about a millisecond and a half) is still an instant attack to the ear
  * and it removes the step completely.
@@ -221,7 +221,7 @@ function grain(t: number, at: number, width: number): number {
 /**
  * Cavitation: a scatter of tiny pitched blips over the cue's tail.
  *
- * Each bubble is a fast upward chirp under a short decay — that RISE is the
+ * Each bubble is a fast upward chirp under a short decay, that RISE is the
  * whole illusion, because a bubble shrinks as it rises and its resonance climbs
  * with it. A flat blip sounds like a synth click; a chirped one sounds wet.
  */
@@ -252,7 +252,7 @@ function bubbles(
 
 // ---------------------------------------------------------------------------
 // THE STRIKE. The sound of the sport: a heavy body of water shoved out of the
-// way by a ball leaving at speed. Three layers, and the order matters — the
+// way by a ball leaving at speed. Three layers, and the order matters, the
 // low THUMP is what carries across the bell, the mid BODY is what makes it
 // sound like a ball rather than a drum, and the bubbles are what put it under
 // water.
@@ -287,8 +287,8 @@ function renderStrike(out: Float32Array, sampleRate: number, seed: number): void
 }
 
 // ---------------------------------------------------------------------------
-// THE BUMP. Two bodies meeting. Duller and softer than the strike — flesh and
-// harness rather than a struck shell — and with no ring at all.
+// THE BUMP. Two bodies meeting. Duller and softer than the strike, flesh and
+// harness rather than a struck shell, and with no ring at all.
 // ---------------------------------------------------------------------------
 function renderBump(out: Float32Array, sampleRate: number, seed: number): void {
   const random = seededNoise(seed);
@@ -406,7 +406,7 @@ function renderVent(out: Float32Array, sampleRate: number, seed: number): void {
 
 // ---------------------------------------------------------------------------
 // THE POWERUP. The orb taken: a longer shimmer that climbs, deliberately more
-// ceremonial than a vent — you left the play to fetch this.
+// ceremonial than a vent, you left the play to fetch this.
 // ---------------------------------------------------------------------------
 function renderPowerup(out: Float32Array, sampleRate: number, seed: number): void {
   const random = seededNoise(seed);
@@ -507,7 +507,7 @@ function renderGoal(out: Float32Array, sampleRate: number, seed: number): void {
 // Everything above is a sound made IN the water. This one is not: it is made
 // out in the air by several thousand people, and it reaches the player through
 // the glass and a hundred yards of water. So it is muffled harder than any cue
-// here — there is no consonant left in it, only the shape of a shout — and it
+// here, there is no consonant left in it, only the shape of a shout, and it
 // is SLOW, because a crowd does not have a transient. It swells.
 //
 // Three layers. The voices are two lowpassed noise bands beaten against each
@@ -578,7 +578,7 @@ function renderWall(out: Float32Array, sampleRate: number, seed: number): void {
 
 // ---------------------------------------------------------------------------
 // THE BOUNCE. The ball coming off a body, and the one sound in the bank a
-// player hears a hundred times a bout — so it is the one that has to stay
+// player hears a hundred times a bout, so it is the one that has to stay
 // satisfying on the hundredth.
 //
 // The reference is a BASKETBALL, because a basketball bounce is the sound
@@ -589,7 +589,7 @@ function renderWall(out: Float32Array, sampleRate: number, seed: number): void {
 // shell), and the whole thing arrives wrapped in cavitation.
 //
 // Three separate recipes rather than one buffer at three volumes, because a
-// hard hit is not a loud soft hit — it is a DIFFERENT sound: more shell, more
+// hard hit is not a loud soft hit, it is a DIFFERENT sound: more shell, more
 // sub, a longer ring. The renderer mixes between them by impact speed
 // ({@link bounceMixFor}), so a ball rolled onto a shoulder and a ball met at
 // full boost sit at opposite ends of one continuous feel.
@@ -622,7 +622,7 @@ function renderBounceSoft(out: Float32Array, sampleRate: number, seed: number): 
   fadeOut(out, sampleRate);
 }
 
-/** The everyday bounce: slap, cavity, thump — the whole basketball. */
+/** The everyday bounce: slap, cavity, thump, the whole basketball. */
 function renderBounce(out: Float32Array, sampleRate: number, seed: number): void {
   const random = seededNoise(seed);
   const slap: Svf = { lp: 0, bp: 0 };
@@ -700,7 +700,7 @@ function renderBounceHard(out: Float32Array, sampleRate: number, seed: number): 
  * Impact is the CLOSING speed of ball and body, in yd/s. Everything about the
  * curve is about keeping the extremes far apart: a ball taken softly is the
  * small pock alone, a ball met at pace is all three layers at once, pitched
- * down — a bigger, slower, heavier object. `rate` falls with force for the
+ * down, a bigger, slower, heavier object. `rate` falls with force for the
  * same reason a big drum is a low drum.
  *
  * Pure and exported so it can be pinned by a test: verifying audio live in the
@@ -718,7 +718,7 @@ export interface BounceMix {
   rate: number;
 }
 
-/** Under this, a contact is a nudge — no strike energy at all. */
+/** Under this, a contact is a nudge, no strike energy at all. */
 const BOUNCE_FLOOR = 1.5;
 /** At this closing speed the mix is fully heavy. Below the ball's own ceiling
  *  (34 yd/s) on purpose: a bout should reach the top of the sound often. */
@@ -733,15 +733,14 @@ function ramp(x: number, a: number, b: number): number {
 /**
  * The layers STACK, so their gains have to be budgeted together: core and
  * heavy both peak on the same transient (both start on the ball meeting the
- * body), and the naive "each layer up to 1" version summed to about 1.8 —
- * which the engine's own trim and the distance panner usually hide, and which
+ * body), and the naive "each layer up to 1" version summed to about 1.8,  * which the engine's own trim and the distance panner usually hide, and which
  * a point-blank hit at full volume does not. Rendering the mix to a file and
  * counting clipped samples is what caught it; nothing in the bell would have.
  */
 // The budget also has to leave room for what the bounce lands ON: the room
 // tone and, on the hit that matters, a burner bed running under it. A ceiling
 // that only fits the bounce alone clips the moment a hard hit happens during a
-// boost — which is most hard hits.
+// boost, which is most hard hits.
 const BOUNCE_HEADROOM = 1.0;
 
 export function bounceMixFor(impactSpeed: number): BounceMix {
@@ -786,8 +785,7 @@ function wrapped(hz: number, seconds: number): number {
  * `work` is rendered `len + tail` samples long; the last `tail` of it is the
  * natural continuation of the loop past its end. Mixing that continuation into
  * the first `tail` samples (equal power, continuation fading out) means the
- * sample after `len - 1` is the sample that would have followed it anyway —
- * continuous, at the wrap, by construction.
+ * sample after `len - 1` is the sample that would have followed it anyway,  * continuous, at the wrap, by construction.
  *
  * This is NOT the same as crossfading the head over the tail, which is the
  * obvious version and is wrong: it leaves the buffer ENDING on head material
@@ -803,14 +801,14 @@ function foldWrap(work: Float32Array, len: number, tail: number): void {
 
 /**
  * THE BELL'S ROOM TONE. What the Deepglass sounds like when nothing is
- * happening — which is most of any given second, so it is what the arena
+ * happening, which is most of any given second, so it is what the arena
  * actually sounds LIKE.
  *
  * Four layers, in order of how much they matter: a pressure rumble that is
  * felt more than heard (deep water is a weight, not a noise), a slow band of
  * moving water over it, the enormous glass shell groaning as it flexes, and
  * bubble streams drifting up somewhere off in the dark. No top end at all
- * beyond a whisper — the one thing that would break the illusion instantly.
+ * beyond a whisper, the one thing that would break the illusion instantly.
  */
 function renderAmbient(out: Float32Array, sampleRate: number, seed: number): void {
   const random = seededNoise(seed);
@@ -827,7 +825,7 @@ function renderAmbient(out: Float32Array, sampleRate: number, seed: number): voi
     const t = i / sampleRate;
     const w = random();
     // Two one-poles, both LOW: ~90 Hz and ~380 Hz. There is deliberately no
-    // third, brighter band. At depth there is no top end to have — a "whisper
+    // third, brighter band. At depth there is no top end to have, a "whisper
     // of air" over this reads instantly as a room recorded in one, and the
     // bubbles below are all the detail the bed needs.
     deep += 0.012 * (w - deep);
@@ -841,7 +839,7 @@ function renderAmbient(out: Float32Array, sampleRate: number, seed: number): voi
   }
 
   // The shell. Five groans across the bed, each a pair of detuned partials
-  // under a slow swell — detuned because two close partials BEAT, and a beat
+  // under a slow swell, detuned because two close partials BEAT, and a beat
   // is what tells the ear the thing groaning is enormous.
   const groanAt = [0.9, 2.6, 4.1, 5.8, 7.6];
   for (let g = 0; g < groanAt.length; g++) {
@@ -869,7 +867,7 @@ function renderAmbient(out: Float32Array, sampleRate: number, seed: number): voi
 }
 
 /**
- * THE BURNERS UNDER LOAD. The sustained half of what the pack does — the
+ * THE BURNERS UNDER LOAD. The sustained half of what the pack does, the
  * ignition one-shot lights it, this is the thirty seconds after.
  *
  * A jet in water is not a jet in air: no whistle, no top end, just a broad
@@ -909,8 +907,8 @@ function renderBoost(out: Float32Array, sampleRate: number, seed: number): void 
  * THE BOWL, HEARD FROM INSIDE THE BELL. The stadium's room tone, the way the
  * ambient bed above is the water's.
  *
- * Same muffling as the roar and for the same reason — the crowd is out in the
- * air and the player is not — but where the roar is one event, this is the
+ * Same muffling as the roar and for the same reason, the crowd is out in the
+ * air and the player is not, but where the roar is one event, this is the
  * sound of a full bowl waiting. Two ideas carry it:
  *
  *   BABBLE   the voice band is modulated by FIVE slow independent rates rather

@@ -29,8 +29,8 @@ export function diagonalMovementVisualFacing(
  * presentation).
  *
  * Split out of {@link diagonalMovementVisualFacing} so the offset can be EASED.
- * Applied raw it is a step function — 0 running forward, -45 degrees the instant
- * a strafe joins it, 0 again the instant the forward key lifts — so a player
+ * Applied raw it is a step function, 0 running forward, -45 degrees the instant
+ * a strafe joins it, 0 again the instant the forward key lifts, so a player
  * rolling across A and D spun the model between three fixed headings with
  * nothing in between. It read as the character snapping rather than turning,
  * which is exactly what it was.
@@ -59,7 +59,7 @@ const VISUAL_TURN_TAU = 0.11;
  *
  * Wrap-aware on purpose: the offset lives in [-pi, pi], and a body going from
  * +170 to -170 degrees is a 20-degree flick, not a 340-degree spin the long way
- * round — which is what a plain lerp of the two numbers would animate.
+ * round, which is what a plain lerp of the two numbers would animate.
  */
 export function easeMovementVisualOffset(current: number, target: number, dt: number): number {
   const delta = normAngle(target - current);

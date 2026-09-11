@@ -1,4 +1,4 @@
-// Tidehold as a ring city — the 2026-09-07 redesign of the Warden City.
+// Tidehold as a ring city, the 2026-09-07 redesign of the Warden City.
 //
 // A circular island due north of the Deepglass, three tiers rising to the
 // castle at its crown:
@@ -15,8 +15,8 @@
 // Four avenues (south to the arena bridge, east, north, west) cut the tiers
 // and climb every tier edge on a flight of stairs; a ring road circles each
 // of the lower tiers; four diagonal lanes fill the quarters. The arena sits
-// off to the south in its caldera, reached by the Tideway — a Warden bridge
-// over the strait — and two more Warden bridges leave the outer ring east and
+// off to the south in its caldera, reached by the Tideway, a Warden bridge
+// over the strait, and two more Warden bridges leave the outer ring east and
 // west for the beacon terraces on the far shore.
 //
 // Same asset palette as the city Troy had placed on 2026-09-07 (his Studio
@@ -49,19 +49,19 @@ import {
   PAINT_YARD,
   placeW,
   stairBlock,
+  TH_BANK_FLAMES,
+  TH_CASTLE_B_FLAMES,
+  TH_HALL_FLAMES,
   TH_HEARTH_COLOR,
   TH_LAMP_COLOR,
   TH_MONUMENT,
   TH_RAMP_STEP,
   TH_SEA_FLOOR,
   TH_SWATCHES,
-  TH_WATER_Y,
-  wallRunW,
-  TH_BANK_FLAMES,
-  TH_CASTLE_B_FLAMES,
-  TH_HALL_FLAMES,
   TH_TAVERN_B_FLAMES,
   TH_TAVERN_FLAMES,
+  TH_WATER_Y,
+  wallRunW,
 } from './citadel';
 import {
   bearingDelta,
@@ -71,23 +71,23 @@ import {
   RING_AVENUE_HALF_W,
   RING_AVENUES,
   RING_BANK,
-  RING_TAVERN,
+  RING_CASTLE,
   RING_CROWN,
   RING_CX,
   RING_CZ,
   RING_LANE_HALF_W,
   RING_LANES,
   RING_MIDDLE,
+  RING_MONUMENT,
   RING_OUTER,
   RING_R,
-  RING_MONUMENT,
   RING_ROAD_HALF_W,
   RING_SQUARE,
   RING_STAIR_HALF_W,
   RING_STAIR_RUN,
+  RING_TAVERN,
   RING_TIERS,
   type RingTier,
-  RING_CASTLE,
 } from './citadel_ring_frame';
 import { DEEPGLASS_CENTER } from './layout';
 
@@ -122,7 +122,7 @@ const SEA_Y = TH_SEA_FLOOR;
 // Landmarks (bearings in radians from north, radii in yards)
 // ---------------------------------------------------------------------------
 const CASTLE = RING_CASTLE;
-// The Warden's Hall — Troy calls it the church — moved off the crown onto the
+// The Warden's Hall, Troy calls it the church, moved off the crown onto the
 // trading ring on 2026-09-09 ("move the church to the 2nd layer of the ring").
 // It sits in the widest free arc of the ring's outer face (between House E at
 // -0.6 and the row house at -1.35), facing the ring road like its neighbours.
@@ -191,7 +191,12 @@ const STALL_ROWS: readonly { r: number; phi: number; count: number; stand: boole
 ];
 const STABLES = { r: 212, phi: -Math.PI / 2 + 0.36 };
 const YARD = { r: 256, phi: -Math.PI / 2 + 0.2, radius: 15 };
-const WHARFS: readonly { phi: number }[] = [{ phi: 2.15 }, { phi: 2.5 }, { phi: -2.15 }, { phi: -2.5 }];
+const WHARFS: readonly { phi: number }[] = [
+  { phi: 2.15 },
+  { phi: 2.5 },
+  { phi: -2.15 },
+  { phi: -2.5 },
+];
 const WHARF_R = 284;
 const SHIPS: readonly { r: number; phi: number; twist: number; h: number }[] = [
   { r: 302, phi: 2.3, twist: 0.15, h: H.ship },
@@ -214,7 +219,7 @@ const SHIPS: readonly { r: number; phi: number; twist: number; h: number }[] = [
 const PLOT_SEG = 3.5;
 export type PlotSize = 'small' | 'medium' | 'large';
 export const PLOT_DIMS: Readonly<Record<PlotSize, { w: number; d: number }>> = {
-  // Troy, 2026-09-09: "make the land plots 2x the current size" — twice the
+  // Troy, 2026-09-09: "make the land plots 2x the current size", twice the
   // GROUND (63/30, 110/56, 160/80 panels squared, so 2.10x / 1.96x / 2.00x).
   // The growth is mostly along the ring on purpose: a tier only offers ~39 yd
   // of usable depth between its inner cliff and the ring road's kerb, so a plot
@@ -237,8 +242,7 @@ const PLOT_BANDS: readonly { r: number; cycle: readonly PlotSize[]; max: number 
   { r: 118, cycle: ['large', 'small'], max: 3 }, // trading ring, inside the road
   { r: 170, cycle: ['large', 'medium'], max: 5 }, // trading ring, outside the road (corners clear the rim crest at 190)
   { r: 213, cycle: ['medium', 'small', 'large'], max: 6 }, // low wards, inside the road (clears the bank's toe at 195)
-  // Toward the quay: smalls only now that the curtain wall stands at 274 —
-  // the band between the road kerb (241) and the wall is 33 yd, and a medium
+  // Toward the quay: smalls only now that the curtain wall stands at 274,   // the band between the road kerb (241) and the wall is 33 yd, and a medium
   // plot is 35 deep.
   { r: 258, cycle: ['small'], max: 4 },
 ];
@@ -267,12 +271,20 @@ function plotKeepOuts(): { x: number; z: number; rho: number }[] {
   out.push({ x: wiz.x, z: wiz.z, rho: 7 });
   return out;
 }
-function plotClear(plot: Plot, keepOuts: readonly { x: number; z: number; rho: number }[]): boolean {
+function plotClear(
+  plot: Plot,
+  keepOuts: readonly { x: number; z: number; rho: number }[],
+): boolean {
   for (const av of RING_AVENUES) {
-    if (Math.abs(bearingDelta(plot.phi, av)) * plot.r < plot.w / 2 + RING_AVENUE_HALF_W + RING_STAIR_HALF_W + 2) return false;
+    if (
+      Math.abs(bearingDelta(plot.phi, av)) * plot.r <
+      plot.w / 2 + RING_AVENUE_HALF_W + RING_STAIR_HALF_W + 2
+    )
+      return false;
   }
   for (const ln of RING_LANES) {
-    if (Math.abs(bearingDelta(plot.phi, ln)) * plot.r < plot.w / 2 + RING_LANE_HALF_W + 4) return false;
+    if (Math.abs(bearingDelta(plot.phi, ln)) * plot.r < plot.w / 2 + RING_LANE_HALF_W + 4)
+      return false;
   }
   const c = pol(plot.r, plot.phi);
   for (const k of keepOuts) {
@@ -308,7 +320,8 @@ function plotBand(
   if (found.length <= band.max) return found;
   // keep an even spread of the clear slots, not the first few from the west
   const keep: Plot[] = [];
-  for (let i = 0; i < band.max; i++) keep.push(found[Math.floor(((i + 0.5) * found.length) / band.max)]);
+  for (let i = 0; i < band.max; i++)
+    keep.push(found[Math.floor(((i + 0.5) * found.length) / band.max)]);
   return keep;
 }
 function buildPlots(): { middle: Plot[]; outer: Plot[] } {
@@ -334,7 +347,7 @@ function plotGateWidth(nT: number): number {
  *  and where the gap's centre sits along the ring (yards from the plot's
  *  centre). The gap is NOT centred when the panel count and the gate width
  *  have different parities, so the sign seats read this rather than assuming
- *  symmetry — a sign placed on the assumption stood in the fence. */
+ *  symmetry, a sign placed on the assumption stood in the fence. */
 export function plotGate(plot: Plot): { first: number; count: number; centre: number } {
   const nT = Math.round(plot.w / PLOT_SEG);
   const count = plotGateWidth(nT);
@@ -366,7 +379,8 @@ export function plotPrice(plot: Pick<Plot, 'r' | 'w' | 'd'>): number {
 function plotQuarter(plot: Plot): string {
   const north = Math.cos(plot.phi) >= 0;
   const east = Math.sin(plot.phi) >= 0;
-  if (plot.r < RING_OUTER.r0) return plot.r < RING_MIDDLE.roadR ? (north ? 'Wardens’ Row' : 'Glass Market') : 'Trading Ring';
+  if (plot.r < RING_OUTER.r0)
+    return plot.r < RING_MIDDLE.roadR ? (north ? 'Wardens’ Row' : 'Glass Market') : 'Trading Ring';
   return east ? 'Tidewharf' : 'Gullhaven';
 }
 export const RING_PLOT_DEEDS: readonly PlotDeed[] = (() => {
@@ -419,7 +433,7 @@ export const RING_PLOT_SIGNS: readonly PlotSignSeat[] = RING_PLOTS.map((plot, i)
   const roadSide = plotRoadSide(plot);
   // The post stands inside the gate opening; the arm reaches back across the
   // gap (model front = local -z, so rotY = faceBearing(arm bearing)), which
-  // points the board's faces radially — at the road, and at the plot. The
+  // points the board's faces radially, at the road, and at the plot. The
   // board's own centre lands on the gap's centre, so it reads through the gate
   // and every fence panel keeps its distance (the test asserts 1.6 yd).
   const gate = plotGate(plot);
@@ -468,7 +482,7 @@ function ringOfStamps(
  *   - SECTION. 'flat' falloff dropped all 14-16yd between two terrain samples,
  *     so the mesh had a single vertical quad per cell and sawtoothed along the
  *     edge. The drop is now a smootherstep cone laid as concentric discs
- *     RIM_BANK_STEP apart — well under the terrain grid, so it meshes as a
+ *     RIM_BANK_STEP apart, well under the terrain grid, so it meshes as a
  *     smooth bank with a rounded crest and toe while still reading as a step.
  */
 export const RIM_BANK: Readonly<Record<'crown' | 'middle', { in: number; out: number }>> = {
@@ -482,7 +496,7 @@ export const RIM_BANK: Readonly<Record<'crown' | 'middle', { in: number; out: nu
   middle: { in: 0, out: 5 },
 };
 /** Where the four skybeacons stand on the crown's shoulders. Inside the crown
- *  wall, which moved in to clear the rim bank — at the old 88 the wall grew
+ *  wall, which moved in to clear the rim bank, at the old 88 the wall grew
  *  straight through them (tests/tidehold_ring_city "never grows through
  *  another placement"). The light seats read this too, so the glow cannot
  *  drift away from the prop. */
@@ -494,7 +508,7 @@ const RIM_BANK_STEP = 0.3;
 
 /** The bank's own profile: a rounded lip, a straight face, a rounded toe.
  *
- *  Not smootherstep, which was the first cut — easing the WHOLE run makes the
+ *  Not smootherstep, which was the first cut, easing the WHOLE run makes the
  *  middle of the face 1.9x steeper than the average, and with only six yards to
  *  spend on the middle rim that put a 2.6yd step back into a half-yard sample.
  *  Easing just the ends holds the peak at 1/(1-e) of the average (1.4x at
@@ -511,7 +525,7 @@ function bankProfile(t: number): number {
 /** One tier as an exact circular plateau at `y` whose rim banks down to
  *  `yBelow`. Discs go OUTER FIRST: a level stamp sets everything inside its
  *  radius, so each smaller disc overwrites the middle of the last and the
- *  plateau — pushed last — wins inside the crest. */
+ *  plateau, pushed last, wins inside the crest. */
 function tierWithBank(
   out: HeightStamp[],
   r1: number,
@@ -545,7 +559,14 @@ function annulus(out: HeightStamp[], r0: number, r1: number, y: number, discR: n
   const inner = Math.max(0, r0 - discR * 0.5);
   while (r >= inner) {
     if (r <= discR * 0.6) {
-      out.push({ x: RING_CX, z: RING_CZ, radius: discR + r, delta: y, falloff: 'flat', mode: 'level' });
+      out.push({
+        x: RING_CX,
+        z: RING_CZ,
+        radius: discR + r,
+        delta: y,
+        falloff: 'flat',
+        mode: 'level',
+      });
       break;
     }
     ringOfStamps(out, r, discR, y, 'flat');
@@ -619,7 +640,14 @@ function tierFlights(): Flight[] {
       const hiT = RING_TIERS[i + 1];
       const edge = hiT.r1; // = lo.r0
       const f = pol(edge + 16, phi);
-      out.push({ fx: f.x, fz: f.z, dirPhi: phi + Math.PI, run: RING_STAIR_RUN, y0: lo.y, y1: hiT.y });
+      out.push({
+        fx: f.x,
+        fz: f.z,
+        dirPhi: phi + Math.PI,
+        run: RING_STAIR_RUN,
+        y0: lo.y,
+        y1: hiT.y,
+      });
     }
   }
   // The Tideway's arena end: from the terrace (0) up to the deck (6), climbing
@@ -677,9 +705,8 @@ export function ringTerrain(): HeightStamp[] {
   ringOfStamps(out, RING_R + 14, 26, SHORE_SHELF_Y, 'smooth');
   // ---- the tiers, outer first: each inner tier overrides the rim of the one
   // below it, so the tier edge is exactly its r1.
-  // The quay keeps a hard edge — it is a harbour wall standing in water, and
-  // the docks, the bridge landings and the curtain wall are all seated on it —
-  // but it is one disc now, so the edge is a true circle instead of scallops.
+  // The quay keeps a hard edge, it is a harbour wall standing in water, and
+  // the docks, the bridge landings and the curtain wall are all seated on it,   // but it is one disc now, so the edge is a true circle instead of scallops.
   out.push({
     x: RING_CX,
     z: RING_CZ,
@@ -884,7 +911,10 @@ function ringWall(out: Out, r: number, heightYd: number, gates: readonly WallGat
     .map((g) => ({ phi: normBearing(g.phi), half: g.widthYd / 2 / r }))
     .sort((a, b) => a.phi - b.phi);
   for (let i = 0; i < sorted.length; i++) {
-    const next = i + 1 < sorted.length ? sorted[i + 1] : { phi: sorted[0].phi + Math.PI * 2, half: sorted[0].half };
+    const next =
+      i + 1 < sorted.length
+        ? sorted[i + 1]
+        : { phi: sorted[0].phi + Math.PI * 2, half: sorted[0].half };
     const a = sorted[i].phi + sorted[i].half;
     const b = next.phi - next.half;
     if (b - a < heightYd / r) continue; // no room for even one module
@@ -903,7 +933,10 @@ function crownWalls(out: Out): void {
     out,
     r,
     H.innerCurtain,
-    RING_AVENUES.map((phi) => ({ phi, widthYd: Math.abs(normBearing(phi - Math.PI)) < 1e-6 ? 62 : gap * 2 * r })),
+    RING_AVENUES.map((phi) => ({
+      phi,
+      widthYd: Math.abs(normBearing(phi - Math.PI)) < 1e-6 ? 62 : gap * 2 * r,
+    })),
   );
   // Gate towers flank the south gate; the tower houses hold the east and west.
   for (const side of [-1, 1]) {
@@ -932,8 +965,8 @@ function crownWalls(out: Out): void {
  * replacing the two stubs that used to sit either side of the south bridgehead
  * (Troy, 2026-09-09: "evenly distribute the walls around the 3rd ring").
  *
- * It stands at 274, three yards inside the last solid ground — the shelf runs
- * flat to ~277 and the sea cliff starts at 279 — and opens at the four avenues
+ * It stands at 274, three yards inside the last solid ground, the shelf runs
+ * flat to ~277 and the sea cliff starts at 279, and opens at the four avenues
  * (the Tide Gate south, the two bridges east and west, the north road) plus
  * every wharf, so the quays stay reachable from inside.
  */
@@ -953,7 +986,7 @@ function outerWalls(out: Out): void {
 function crown(out: Out): void {
   const c = pol(CASTLE.r, CASTLE.phi);
   // Castle B (bl_castle_b.py): the WoW-style walled keep that replaced the
-  // first keep on 2026-09-10 — nine round towers, a gatehouse, a great hall
+  // first keep on 2026-09-10, nine round towers, a gatehouse, a great hall
   // with two wings. Same seat and facing, so nothing else on the crown moved.
   placeW(out, 'tidehold/castle_b', c.x, c.z, AUTHORED.castle_b, {
     rotY: 0,
@@ -985,7 +1018,10 @@ function crown(out: Out): void {
 
 function middle(out: Out): void {
   const m = pol(MARKET_PAVILION.r, MARKET_PAVILION.phi);
-  placeW(out, 'tidehold/market', m.x, m.z, AUTHORED.market, { rotY: MARKET_PAVILION.phi, collide: 2.5 });
+  placeW(out, 'tidehold/market', m.x, m.z, AUTHORED.market, {
+    rotY: MARKET_PAVILION.phi,
+    collide: 2.5,
+  });
   const bk = pol(BANK.r, BANK.phi);
   placeW(out, 'tidehold/bank', bk.x, bk.z, AUTHORED.bank, {
     rotY: BANK.phi,
@@ -993,7 +1029,10 @@ function middle(out: Out): void {
     fireEffects: TH_BANK_FLAMES,
   });
   const chest = pol(BANK.r - 14, BANK.phi + 0.06);
-  placeW(out, 'props/banker_chest', chest.x, chest.z, 1.9, { rotY: BANK.phi + Math.PI, collide: 1.1 });
+  placeW(out, 'props/banker_chest', chest.x, chest.z, 1.9, {
+    rotY: BANK.phi + Math.PI,
+    collide: 1.1,
+  });
   const tv = pol(TAVERN.r, TAVERN.phi);
   placeW(out, 'tidehold/tavern', tv.x, tv.z, AUTHORED.tavern, {
     rotY: TAVERN.phi,
@@ -1068,7 +1107,10 @@ function middle(out: Out): void {
   // smithy yard clutter
   for (let i = 0; i < 3; i++) {
     const p = pol(SMITHY.r - 16, SMITHY.phi + 0.02 + i * 0.03);
-    placeW(out, i === 1 ? 'props/barrel' : 'props/crate_wooden', p.x, p.z, 1.2, { rotY: i * 0.7, collide: 0.5 });
+    placeW(out, i === 1 ? 'props/barrel' : 'props/crate_wooden', p.x, p.z, 1.2, {
+      rotY: i * 0.7,
+      collide: 0.5,
+    });
   }
 }
 
@@ -1161,7 +1203,10 @@ function outer(out: Out): void {
   ];
   for (const [id, r, phi, h] of clutter) {
     const p = pol(r, phi);
-    placeW(out, id, p.x, p.z, h, { rotY: phi + (r % 2) * 0.4, collide: id.includes('anchor') ? 0 : 0.5 });
+    placeW(out, id, p.x, p.z, h, {
+      rotY: phi + (r % 2) * 0.4,
+      collide: id.includes('anchor') ? 0 : 0.5,
+    });
   }
   // Gullhaven's fish market: the small stalls of the poor quarter.
   const fish = pol(232, -2.32);
@@ -1207,7 +1252,8 @@ function plotFences(out: Out): void {
   const fence = (x: number, z: number, rotY: number): void => {
     placeW(out, 'props/garden_iron_fence', x, z, FENCE_H, { rotY, collide: 1.2 });
   };
-  const roadOf = (plot: Plot): number => (plot.r < RING_OUTER.r0 ? RING_MIDDLE.roadR : RING_OUTER.roadR);
+  const roadOf = (plot: Plot): number =>
+    plot.r < RING_OUTER.r0 ? RING_MIDDLE.roadR : RING_OUTER.roadR;
   for (const plot of RING_PLOTS) {
     const c = pol(plot.r, plot.phi);
     const tx = Math.cos(plot.phi);
@@ -1224,12 +1270,20 @@ function plotFences(out: Out): void {
       for (let k = 0; k < nT; k++) {
         if (gate && k >= gate0 && k < gate0 + gateN) continue;
         const a = -plot.w / 2 + SEG * (k + 0.5);
-        fence(c.x + nx * side * (plot.d / 2) + tx * a, c.z + nz * side * (plot.d / 2) + tz * a, plot.phi);
+        fence(
+          c.x + nx * side * (plot.d / 2) + tx * a,
+          c.z + nz * side * (plot.d / 2) + tz * a,
+          plot.phi,
+        );
       }
       // radial side at +-w/2 along the tangent, laid from the back corner
       for (let k = 0; k < nR; k++) {
         const a = -roadSide * (plot.d / 2) + roadSide * SEG * (k + 0.5);
-        fence(c.x + tx * side * (plot.w / 2) + nx * a, c.z + tz * side * (plot.w / 2) + nz * a, plot.phi + Math.PI / 2);
+        fence(
+          c.x + tx * side * (plot.w / 2) + nx * a,
+          c.z + tz * side * (plot.w / 2) + nz * a,
+          plot.phi + Math.PI / 2,
+        );
       }
     }
   }
@@ -1266,8 +1320,17 @@ function moreHouses(out: Out): void {
     for (let k = 0; k < row.count; k++) {
       const dphi = ((k - (row.count - 1) / 2) * 6.5) / row.r;
       const p = pol(row.r, row.phi + dphi);
-      const id = row.stand ? (k % 2 === 0 ? 'props/market_stand_1' : 'props/market_stand_2') : 'props/eastbrook_market_stall';
-      placeW(out, id, p.x, p.z, row.stand ? 2.6 : 4.2, { rotY: facing, collide: 1.6, custom: true, square: true });
+      const id = row.stand
+        ? k % 2 === 0
+          ? 'props/market_stand_1'
+          : 'props/market_stand_2'
+        : 'props/eastbrook_market_stall';
+      placeW(out, id, p.x, p.z, row.stand ? 2.6 : 4.2, {
+        rotY: facing,
+        collide: 1.6,
+        custom: true,
+        square: true,
+      });
     }
   }
 }
@@ -1286,7 +1349,11 @@ function lamps(out: Out): void {
     // keep is 67 yd wide now and the ring was laid for the old one.
     const keep = pol(CASTLE.r, CASTLE.phi);
     if (Math.abs(x - keep.x) < 34 && z > keep.z - 33 && z < keep.z + 27) return;
-    placeW(out, 'props/streetlamp_veiled_crystal', x, z, H.lamp, { rotY, collide: 0.6, custom: true });
+    placeW(out, 'props/streetlamp_veiled_crystal', x, z, H.lamp, {
+      rotY,
+      collide: 0.6,
+      custom: true,
+    });
   };
   for (const tier of [RING_OUTER, RING_MIDDLE]) {
     for (const side of [-1, 1]) {
@@ -1295,8 +1362,10 @@ function lamps(out: Out): void {
       for (let i = 0; i < n; i++) {
         const phi = (i / n) * Math.PI * 2;
         // leave the avenue mouths and lane mouths clear
-        if (RING_AVENUES.some((a) => Math.abs(bearingDelta(phi, a)) * r < RING_AVENUE_HALF_W + 3)) continue;
-        if (RING_LANES.some((a) => Math.abs(bearingDelta(phi, a)) * r < RING_LANE_HALF_W + 2)) continue;
+        if (RING_AVENUES.some((a) => Math.abs(bearingDelta(phi, a)) * r < RING_AVENUE_HALF_W + 3))
+          continue;
+        if (RING_LANES.some((a) => Math.abs(bearingDelta(phi, a)) * r < RING_LANE_HALF_W + 2))
+          continue;
         const p = pol(r, phi);
         lamp(p.x, p.z, side < 0 ? phi + Math.PI : phi);
       }
@@ -1306,12 +1375,17 @@ function lamps(out: Out): void {
     for (let r = 46; r <= RING_R - 8; r += 24) {
       // skip the stair lanes and the ring roads
       if (RING_TIERS.some((t) => t.r1 < RING_R && Math.abs(r - t.r1) < 22)) continue;
-      if ([RING_OUTER, RING_MIDDLE].some((t) => Math.abs(r - t.roadR) < RING_ROAD_HALF_W + 3)) continue;
+      if ([RING_OUTER, RING_MIDDLE].some((t) => Math.abs(r - t.roadR) < RING_ROAD_HALF_W + 3))
+        continue;
       for (const side of [-1, 1]) {
         const nx = Math.cos(phi);
         const nz = -Math.sin(phi);
         const c = pol(r, phi);
-        lamp(c.x + nx * side * (RING_AVENUE_HALF_W + 1.2), c.z + nz * side * (RING_AVENUE_HALF_W + 1.2), phi + (side < 0 ? Math.PI / 2 : -Math.PI / 2));
+        lamp(
+          c.x + nx * side * (RING_AVENUE_HALF_W + 1.2),
+          c.z + nz * side * (RING_AVENUE_HALF_W + 1.2),
+          phi + (side < 0 ? Math.PI / 2 : -Math.PI / 2),
+        );
       }
     }
   }
@@ -1332,7 +1406,18 @@ function lamps(out: Out): void {
 /** The three Warden bridges. Modules tile along their local X; every deck is
  *  level with the outer ring and the piers sink to the seabed. */
 function bridges(out: Out): void {
-  const pattern = ['lamp', 'deck', 'deck', 'pylon', 'deck', 'deck', 'pylon', 'deck', 'deck', 'lamp'];
+  const pattern = [
+    'lamp',
+    'deck',
+    'deck',
+    'pylon',
+    'deck',
+    'deck',
+    'pylon',
+    'deck',
+    'deck',
+    'lamp',
+  ];
   // The kit is authored in yards (asset_scale.ts BRIDGE_KIT_MAX_DIM keeps it
   // at scale 1), so these bypass hi(): a module IS a 12 yd square deck.
   const module = (kind: string, x: number, z: number, rotY: number): void => {
@@ -1349,7 +1434,12 @@ function bridges(out: Out): void {
   };
   // The Tideway, south: local X along world z.
   for (let k = 0; k < TIDEWAY_MODULES; k++) {
-    module(pattern[k % pattern.length], DEEPGLASS_CENTER.x, TIDEWAY_Z0 + k * BRIDGE_MODULE, -Math.PI / 2);
+    module(
+      pattern[k % pattern.length],
+      DEEPGLASS_CENTER.x,
+      TIDEWAY_Z0 + k * BRIDGE_MODULE,
+      -Math.PI / 2,
+    );
   }
   // The east and west spans.
   for (const side of [-1, 1]) {
@@ -1361,23 +1451,40 @@ function bridges(out: Out): void {
   // Ice on the strait and under the spans: the arena approach's dressing.
   for (const b of RING_BERGS) {
     const p = pol(b.r, b.phi);
-    placeW(out, 'props/frostveil_ice_spire', p.x, p.z, b.spireH, { rotY: b.phi * 1.7, seatY: TH_WATER_Y + 1.6 });
-    placeW(out, 'props/frostveil_ice_spire', p.x + 3, p.z - 2, b.spireH * 0.6, { rotY: b.phi * 2.3, seatY: TH_WATER_Y + 1.6 });
+    placeW(out, 'props/frostveil_ice_spire', p.x, p.z, b.spireH, {
+      rotY: b.phi * 1.7,
+      seatY: TH_WATER_Y + 1.6,
+    });
+    placeW(out, 'props/frostveil_ice_spire', p.x + 3, p.z - 2, b.spireH * 0.6, {
+      rotY: b.phi * 2.3,
+      seatY: TH_WATER_Y + 1.6,
+    });
   }
   for (let k = 0; k < 8; k++) {
     const side = k % 2 === 0 ? -1 : 1;
     const z = 120 + k * 12;
-    placeW(out, 'props/frostveil_ice_spire', side * 22, z, 8 + (k % 3) * 2, { rotY: k * 0.9, seatY: TH_WATER_Y - 1 });
+    placeW(out, 'props/frostveil_ice_spire', side * 22, z, 8 + (k % 3) * 2, {
+      rotY: k * 0.9,
+      seatY: TH_WATER_Y - 1,
+    });
     if (k % 2 === 0) {
-      placeW(out, 'props/crystal_amethyst_cluster', side * 30, z + 6, 6 + (k % 3), { seatY: TH_WATER_Y - 2 });
+      placeW(out, 'props/crystal_amethyst_cluster', side * 30, z + 6, 6 + (k % 3), {
+        seatY: TH_WATER_Y - 2,
+      });
     }
   }
   for (const side of [-1, 1]) {
     for (let k = 0; k < 5; k++) {
       const x = side * (SPAN_X0 + 12 + k * 18);
       const z = RING_CZ + (k % 2 === 0 ? -20 : 20);
-      placeW(out, 'props/frostveil_ice_spire', x, z, 7 + (k % 2) * 3, { rotY: k * 1.1, seatY: TH_WATER_Y - 1 });
-      if (k % 2 === 1) placeW(out, 'props/crystal_amethyst_cluster', x + 6, z + side * 8, 5 + k, { seatY: TH_WATER_Y - 2 });
+      placeW(out, 'props/frostveil_ice_spire', x, z, 7 + (k % 2) * 3, {
+        rotY: k * 1.1,
+        seatY: TH_WATER_Y - 1,
+      });
+      if (k % 2 === 1)
+        placeW(out, 'props/crystal_amethyst_cluster', x + 6, z + side * 8, 5 + k, {
+          seatY: TH_WATER_Y - 2,
+        });
     }
   }
   // Crystal clusters at every bridgehead and both beacon terraces.
@@ -1390,9 +1497,30 @@ function bridges(out: Out): void {
     placeW(out, 'props/crystal_amethyst_cluster', p.x, p.z, H.crystal * 0.8, { collide: 2 });
   }
   for (const side of [-1, 1]) {
-    placeW(out, 'props/crystal_amethyst_cluster', side * (BEACON_TERRACE_X + 10), RING_CZ, H.crystal, { collide: 2.4 });
-    placeW(out, 'props/frostveil_ice_spire', side * (BEACON_TERRACE_X + 14), RING_CZ + 10, H.spire, {});
-    placeW(out, 'props/frostveil_ice_spire', side * (BEACON_TERRACE_X + 14), RING_CZ - 10, H.spire * 0.8, {});
+    placeW(
+      out,
+      'props/crystal_amethyst_cluster',
+      side * (BEACON_TERRACE_X + 10),
+      RING_CZ,
+      H.crystal,
+      { collide: 2.4 },
+    );
+    placeW(
+      out,
+      'props/frostveil_ice_spire',
+      side * (BEACON_TERRACE_X + 14),
+      RING_CZ + 10,
+      H.spire,
+      {},
+    );
+    placeW(
+      out,
+      'props/frostveil_ice_spire',
+      side * (BEACON_TERRACE_X + 14),
+      RING_CZ - 10,
+      H.spire * 0.8,
+      {},
+    );
   }
 }
 
@@ -1468,7 +1596,8 @@ export function ringPlacements(): PlacedAsset[] {
   bridges(out);
   for (const p of out) {
     const id = p.path.replace(/^\/models\//, '').replace(/\.glb$/, '');
-    if (!ASSET_PALETTE.has(id)) throw new Error(`ring city: ${id} is not in the placed-asset palette`);
+    if (!ASSET_PALETTE.has(id))
+      throw new Error(`ring city: ${id} is not in the placed-asset palette`);
   }
   // the stair blocks (inline built models, MODEL_PATH) ride the same list
   for (const f of tierFlights()) out.push(flightPieces(f).block);
@@ -1480,7 +1609,13 @@ export function ringPlacements(): PlacedAsset[] {
 // ---------------------------------------------------------------------------
 export function ringLights(): NonNullable<WorldContent['lights']> {
   const spots: [number, number, number, number, number, number?][] = [];
-  const at = (p: { x: number; z: number }, y: number, color: number, range: number, intensity?: number): void => {
+  const at = (
+    p: { x: number; z: number },
+    y: number,
+    color: number,
+    range: number,
+    intensity?: number,
+  ): void => {
     spots.push([p.x, p.z, y, color, range, intensity]);
   };
   at(pol(0, 0), 12, TH_LAMP_COLOR, 60, 2.8); // the crown plaza
@@ -1592,8 +1727,20 @@ export function ringLocations(): NonNullable<WorldContent['locations']> {
     minZ: ARENA_TERRACE_R - 30,
     maxZ: RING_CZ - RING_R + 4,
   });
-  out.push({ name: 'The West Span', minX: -(SPAN_X0 + SPAN_MODULES * BRIDGE_MODULE), maxX: -RING_R + 2, minZ: RING_CZ - 8, maxZ: RING_CZ + 8 });
-  out.push({ name: 'The East Span', minX: RING_R - 2, maxX: SPAN_X0 + SPAN_MODULES * BRIDGE_MODULE, minZ: RING_CZ - 8, maxZ: RING_CZ + 8 });
+  out.push({
+    name: 'The West Span',
+    minX: -(SPAN_X0 + SPAN_MODULES * BRIDGE_MODULE),
+    maxX: -RING_R + 2,
+    minZ: RING_CZ - 8,
+    maxZ: RING_CZ + 8,
+  });
+  out.push({
+    name: 'The East Span',
+    minX: RING_R - 2,
+    maxX: SPAN_X0 + SPAN_MODULES * BRIDGE_MODULE,
+    minZ: RING_CZ - 8,
+    maxZ: RING_CZ + 8,
+  });
   for (const side of [-1, 1] as const) {
     out.push({
       name: side < 0 ? 'Westlight Terrace' : 'Eastlight Terrace',
@@ -1611,7 +1758,13 @@ export function ringLocations(): NonNullable<WorldContent['locations']> {
     minZ: DEEPGLASS_CENTER.z - ARENA_TERRACE_R,
     maxZ: DEEPGLASS_CENTER.z + ARENA_TERRACE_R,
   });
-  out.push({ name: 'The Bellwater', minX: -220, maxX: 220, minZ: -240, maxZ: RING_CZ - RING_R - 6 });
+  out.push({
+    name: 'The Bellwater',
+    minX: -220,
+    maxX: 220,
+    minZ: -240,
+    maxZ: RING_CZ - RING_R - 6,
+  });
   return out;
 }
 
@@ -1625,9 +1778,11 @@ export function ringGrassClear(): NonNullable<WorldContent['grassClear']> {
       out.push({ x: p.x, z: p.z, r: 26 });
     }
   }
-  for (let k = 0; k <= TIDEWAY_MODULES; k++) out.push({ x: 0, z: TIDEWAY_Z0 + k * BRIDGE_MODULE, r: 13 });
+  for (let k = 0; k <= TIDEWAY_MODULES; k++)
+    out.push({ x: 0, z: TIDEWAY_Z0 + k * BRIDGE_MODULE, r: 13 });
   for (const side of [-1, 1]) {
-    for (let k = 0; k <= SPAN_MODULES; k++) out.push({ x: side * (SPAN_X0 + k * BRIDGE_MODULE), z: RING_CZ, r: 13 });
+    for (let k = 0; k <= SPAN_MODULES; k++)
+      out.push({ x: side * (SPAN_X0 + k * BRIDGE_MODULE), z: RING_CZ, r: 13 });
     out.push({ x: side * BEACON_TERRACE_X, z: RING_CZ, r: BEACON_TERRACE_R });
   }
   return out;
@@ -1681,9 +1836,12 @@ function ringPaintAt(x: number, z: number): number {
   // The rim of every tier is a frost lip; the quay edge is sea cliff.
   if (r > RING_R - 5) return PAINT_CLIFF;
   const tier = RING_TIERS.find((t) => r >= t.r0 && r < t.r1) as RingTier;
-  const onAvenue = RING_AVENUES.some((a) => Math.abs(bearingDelta(phi, a)) * r <= RING_AVENUE_HALF_W);
+  const onAvenue = RING_AVENUES.some(
+    (a) => Math.abs(bearingDelta(phi, a)) * r <= RING_AVENUE_HALF_W,
+  );
   const onLane =
-    tier.id !== 'crown' && RING_LANES.some((a) => Math.abs(bearingDelta(phi, a)) * r <= RING_LANE_HALF_W);
+    tier.id !== 'crown' &&
+    RING_LANES.some((a) => Math.abs(bearingDelta(phi, a)) * r <= RING_LANE_HALF_W);
   const onRoad = tier.roadR > 0 && Math.abs(r - tier.roadR) <= RING_ROAD_HALF_W;
   if (onAvenue || onRoad || onLane) return PAINT_STREET;
   if (tier.id === 'crown') {
@@ -1701,7 +1859,10 @@ function ringPaintAt(x: number, z: number): number {
   if (nearPlot(x, z, tier.id === 'middle' ? MIDDLE_PLOTS : OUTER_PLOTS)) return PAINT_PLOT;
   if (tier.id === 'outer') {
     // the wharf quarters are gravel out to the quay
-    if (r >= 262 && (Math.abs(bearingDelta(phi, 2.32)) < 0.45 || Math.abs(bearingDelta(phi, -2.32)) < 0.45)) {
+    if (
+      r >= 262 &&
+      (Math.abs(bearingDelta(phi, 2.32)) < 0.45 || Math.abs(bearingDelta(phi, -2.32)) < 0.45)
+    ) {
       return PAINT_GRAVEL;
     }
   }
@@ -1723,7 +1884,15 @@ export function ringBiomePaint(): BiomePaint {
     const z = z0 + (row + 0.5) * RING_PAINT_CELL;
     for (let c = 0; c < cols; c++) ids.push(ringPaintAt(x0 + (c + 0.5) * RING_PAINT_CELL, z));
   }
-  return { cell: RING_PAINT_CELL, cols, rows, originX: x0, originZ: z0, ids, custom: RING_SWATCHES };
+  return {
+    cell: RING_PAINT_CELL,
+    cols,
+    rows,
+    originX: x0,
+    originZ: z0,
+    ids,
+    custom: RING_SWATCHES,
+  };
 }
 
 /** Where the city's own point of interest sits (the map pin), and where the

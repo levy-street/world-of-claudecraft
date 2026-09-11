@@ -17,8 +17,8 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { activeWorldPromoted } from './promoted_scenery_gate';
 import { GFX } from './gfx';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import { thinLeanDressing } from './zone_dressing_lod_core';
 
 export interface FenFeaturesView {
@@ -83,8 +83,8 @@ function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THR
   return parts;
 }
 
-/** The fen's modeled flora spots — lily rafts, shoreline reeds, mushroom
- *  clusters and their anchor logs — as ONE pure list shared by the builder
+/** The fen's modeled flora spots, lily rafts, shoreline reeds, mushroom
+ *  clusters and their anchor logs, as ONE pure list shared by the builder
  *  below and the editor's placement promotion (the fen_willows contract).
  *  `y` is ABSOLUTE (lilies float at the waterline, not on terrain); the
  *  promotion converts to terrain-relative offsets itself. */
@@ -277,13 +277,12 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
       fenWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
     );
 
-  // --- the modeled flora — lilies, reeds, mushroom patches and their logs —
-  // from the ONE shared spot list (fenFloraSpots), standing down together
+  // --- the modeled flora, lilies, reeds, mushroom patches and their logs,   // from the ONE shared spot list (fenFloraSpots), standing down together
   // when the document owns them as placements ---
   if (!activeWorldPromoted('fenFlora')) {
     const flora = fenFloraSpots(seed);
     // pure dressing (no collider, nothing to act on; 5-11k triangles each), so
-    // a lean session draws an evenly thinned band — upstream's lean policy
+    // a lean session draws an evenly thinned band, upstream's lean policy
     // (upstream's instanceDressing seam, pinned by tests/zone_dressing_lod_wiring).
     {
       const spots = flora.lilies;

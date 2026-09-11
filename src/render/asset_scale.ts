@@ -46,7 +46,6 @@ export function targetHeightFor(path: string): number {
   // The loader normalizes by the largest source dimension. This model is already
   // authored at 14 x 11 x 7.2 yards, so preserving its 14-yard width keeps the
   // full sidecar dimensions intact at placement scale 1.
-  if (/goldcrest_bank_reference/i.test(path)) return 14;
   // The City Build wall tower is authored in real yards (9.6 tall) so its
   // arcade-floor height matches the wall-tower blueprint at placement scale 1;
   // preserve that instead of squashing to TARGET_HEIGHT.
@@ -65,7 +64,8 @@ export function targetHeightFor(path: string): number {
   // same scale as a wall run stands its authored 1.6x height with matching
   // courses. Collision installs at that same norm (install_authored.mjs).
   const gate = /\/deepglass\/(warden_gate_[a-z]+)\.glb$/i.exec(path);
-  if (gate && WARDEN_GATE_MAX_DIM[gate[1]]) return WARDEN_GATE_MAX_DIM[gate[1]] * (TARGET_HEIGHT / 4);
+  if (gate && WARDEN_GATE_MAX_DIM[gate[1]])
+    return WARDEN_GATE_MAX_DIM[gate[1]] * (TARGET_HEIGHT / 4);
   // Dock stairs (dg_dock_stairs.py): authored in yards, scale 1 = as built.
   if (/\/props\/dock_stairs\.glb$/i.test(path)) return DOCK_STAIRS_MAX_DIM;
   // Plot sign (dg_plot_sign.py): authored yards, post foot at the origin; scale 1 = 2.58 yd tall.

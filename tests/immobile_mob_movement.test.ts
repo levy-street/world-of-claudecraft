@@ -1,5 +1,5 @@
-// An immobile mob must not be MOVED — and above all must not be dropped to the
-// ground — by the shared movement step.
+// An immobile mob must not be MOVED, and above all must not be dropped to the
+// ground, by the shared movement step.
 //
 // Sim.moveToward ends every one of its paths by snapping pos.y to the terrain,
 // and it did that even when the horizontal step was zero, which is the only
@@ -9,7 +9,7 @@
 // an inert mob whose position is owned by the deepball physics and whose
 // correct y is a hundred feet in the air. Once a strike put it in combat, the
 // chase arm ran this every tick and wrote the ball onto the slate. The match
-// restored pos immediately, so the sim looked right — but prevPos had already
+// restored pos immediately, so the sim looked right, but prevPos had already
 // captured the floor, and the renderer interpolates prevPos -> pos, so the
 // drawn ball strobed between the slate and the bell every single frame.
 //

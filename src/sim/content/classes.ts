@@ -1,5 +1,5 @@
-import { DEEPBALL_ABILITIES } from '../deepglass/abilities';
 import { type AbilityOutputScaling, buildAbilityOutputScaling } from '../ability_output_scaling';
+import { DEEPBALL_ABILITIES } from '../deepglass/abilities';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import {
   type AbilityDef,

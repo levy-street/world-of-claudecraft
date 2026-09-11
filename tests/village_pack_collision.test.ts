@@ -6,7 +6,7 @@
 // not walk through a doorway. TWO independent causes, both fixed:
 //
 //  1. sim/colliders.ts emitted `{type:'circle', r: collideRadius}` for EVERY
-//     placement — the baked-box arm had been dropped, so no asset's real shape
+//     placement, the baked-box arm had been dropped, so no asset's real shape
 //     ever reached movement.
 //  2. the pack had no bake at all (349 assets, 0 entries) because
 //     scripts/assets/bake_collision.mjs stopped being re-run after it landed.
@@ -106,7 +106,7 @@ describe('medieval_village_v2 collision', () => {
   it('blocks a wall at its body, not out at the legacy circle', () => {
     // CastleWall_01 bakes as one thin 2.25yd panel: 0.81yd across its face,
     // 0.08yd thick. At scale 3 that reaches ~1.2yd along its face and ~0.12yd
-    // through it — nothing like the 3yd disc the placement still carries.
+    // through it, nothing like the 3yd disc the placement still carries.
     const wall = place('medieval_village_v2/buildings/CastleWall_01', { scale: 3 });
     expect(blockedByPlacement(wall, 0)).toBe(true);
     // Through the panel's thin axis, past its face plus a body radius, and
@@ -116,7 +116,7 @@ describe('medieval_village_v2 collision', () => {
   });
 
   it('lets a foundation slab be stepped onto rather than walled', () => {
-    // HouseBase_01 bakes to a single 0.75yd course — under the step band, so a
+    // HouseBase_01 bakes to a single 0.75yd course, under the step band, so a
     // walking body rises onto it. That is the point of banding the boxes: the
     // same table gives a 2.25yd wall a wall and a doorstep a step.
     const slab = place('medieval_village_v2/buildings/HouseBase_01');

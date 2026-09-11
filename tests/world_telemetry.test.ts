@@ -6,8 +6,8 @@ import {
   DUNGEONS,
   delveOrigin,
   instanceOrigin,
-  riftInstanceOrigin,
   RIFT_BAND_X_MIN,
+  riftInstanceOrigin,
   YUMI_BAND_X_MAX,
   YUMI_BAND_X_MIN,
 } from '../src/sim/data';

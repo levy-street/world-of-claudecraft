@@ -1,5 +1,5 @@
-import { DEEPBALL_KIT } from '../../../sim/deepglass/abilities';
 import { ABILITIES, ITEMS } from '../../../sim/data';
+import { DEEPBALL_KIT } from '../../../sim/deepglass/abilities';
 import type { PlayerClass } from '../../../sim/types';
 import {
   ACTION_BAR_LAYOUT_LEGACY_PROFILE,

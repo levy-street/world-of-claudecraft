@@ -9,8 +9,7 @@ export const OCCLUDER_FADE_ALPHA = 0.2;
 // The editor viewport's free camera has no protagonist to keep readable, so
 // every eye-to-camera ghost fade stands down while it is set: a structure the
 // maker is orbiting must never turn transparent under the cursor. Module
-// state (the setSwayDisabledAssets idiom) checked by every segment hit test —
-// the core ones below and the bespoke prop/tree/roof/arena tests — so `hide`
+// state (the setSwayDisabledAssets idiom) checked by every segment hit test, // the core ones below and the bespoke prop/tree/roof/arena tests, so `hide`
 // resolves false everywhere and anything mid-fade eases back to opaque
 // through each consumer's normal restore path.
 let fadesDisabled = false;

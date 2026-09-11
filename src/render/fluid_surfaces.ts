@@ -206,7 +206,7 @@ export class FluidSurfaces {
     feat: THREE.Vector2,
   ): void {
     // We key the noise off vUv. three only emits that varying when a uv-mapped
-    // feature is defined, and the normalMap loads async — so force USE_UV on to
+    // feature is defined, and the normalMap loads async, so force USE_UV on to
     // guarantee vUv exists whether or not the normal map is present yet.
     material.defines = { ...(material.defines ?? {}), USE_UV: '' };
     // onBeforeCompile bypasses the default program cache key; give lava its own

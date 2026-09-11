@@ -23,13 +23,22 @@
 
 import * as THREE from 'three';
 import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
-import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import { grassClearedAt } from '../sim/grass_clear';
+import {
+  roadDistance,
+  terrainCutAtHeight,
+  terrainHeight,
+  WATER_LEVEL,
+  zoneBiomeAt,
+} from '../sim/world';
 import { clusterGeometry, clusterPlacementPad, mulberry32 } from './blade_grass';
+import {
+  activateDenseSlot,
+  type DenseSlotState,
+  deactivateDenseSlot,
+} from './blade_grass_dense_core';
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
-import { grassClearedAt } from '../sim/grass_clear';
-import { terrainCutAtHeight } from '../sim/world';
-import { activateDenseSlot, type DenseSlotState, deactivateDenseSlot } from './blade_grass_dense_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';

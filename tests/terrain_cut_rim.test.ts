@@ -240,8 +240,7 @@ describe('the chunk mesher honours the same cuts', () => {
       if (inTerrainCut([cut], cx, cz, cy)) expect(dropped).toBe(true);
       // A cell whose centre is further from the solid than a whole cell
       // diagonal cannot touch the contour and must survive.
-      const clear =
-        Math.hypot(cx - cut.x, cz - cut.z) > cut.radius + Math.SQRT2 * SPACING;
+      const clear = Math.hypot(cx - cut.x, cz - cut.z) > cut.radius + Math.SQRT2 * SPACING;
       if (clear) expect(dropped).toBe(false);
     }
     const fine = buildChunkCutFine(state);
@@ -259,7 +258,7 @@ describe('the chunk mesher honours the same cuts', () => {
       const pz = clip.positions[v * 3 + 2];
       const dist = Math.hypot(px - cut.x, py - cut.y, pz - cut.z);
       // Crossings are solved on the linearized field between fine samples, so
-      // a vertex can land a few millimetres inside the true sphere — against
+      // a vertex can land a few millimetres inside the true sphere, against
       // the WHOLE-CELL (half of 4yd) raggedness this replaces.
       expect(dist).toBeGreaterThanOrEqual(cut.radius - 0.05);
     }

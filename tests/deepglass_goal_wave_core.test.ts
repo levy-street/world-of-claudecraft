@@ -62,7 +62,7 @@ describe('deepglass goal wave timeline', () => {
 
   it('holds the colour back until the frame has drained', () => {
     // The whole first beat is the world going grey. If a front is already
-    // visible while chroma is still draining, the drain never reads — which
+    // visible while chroma is still draining, the drain never reads, which
     // is exactly what the first tuning pass got wrong.
     const firstVisible = DG_GOAL_SHELLS.reduce((acc, _spec, i) => {
       for (let t = 0; t < DG_GOAL_WAVE_SECS; t += 0.005) {

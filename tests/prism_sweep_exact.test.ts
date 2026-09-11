@@ -1,7 +1,7 @@
 // Regression: the swept solver must collide a Collision Master PRISM against
 // its EXACT convex outline, never its axis-aligned bounding box. A placement
 // bakes its yaw into the poly, so a building rotated 45 degrees had a box
-// sqrt(2) its size — the sweep stopped the body at a phantom axis-aligned
+// sqrt(2) its size, the sweep stopped the body at a phantom axis-aligned
 // wall yards before the drawn face ("invisible walls near the wireframe",
 // only on rotated buildings), while depenetration and the debug wireframe
 // both used the outline.

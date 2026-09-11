@@ -68,7 +68,7 @@ export function updateSceneryFlame(
   const projectedPixels = projectedPixelSize(state.referenceHeight, viewDepth, projectionPixels);
   const cadence = cadenceIntervalForProjectedPixels(projectedPixels);
   if (cadenceRefreshDue(time, state.lastFlickerAt, cadence)) {
-    // The SLOW breath only — a log catching, sampled at the perceptual-LOD
+    // The SLOW breath only, a log catching, sampled at the perceptual-LOD
     // cadence. The fast licking lives in the flame's vertex shader now
     // (campfire_flame.ts), where it runs per vertex and per frame; this used to
     // carry both and the whole flame pumped like a bellows. Kept byte-for-byte
