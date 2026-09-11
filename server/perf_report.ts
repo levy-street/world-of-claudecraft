@@ -176,6 +176,14 @@ function browserFamily(userAgent: string): string {
   return 'other';
 }
 
+// The desktop shell's user agent carries the Electron token (src/runtime.ts
+// isElectronRuntime; server/ cannot import it, so this is a deliberate copy,
+// the same pattern as browserFamily above). The fallback for a client older
+// than the desktopShell payload field.
+function isElectronUserAgent(userAgent: string): boolean {
+  return /\bElectron\//.test(userAgent);
+}
+
 function osFamily(userAgent: string): string {
   const ua = userAgent.toLowerCase();
   if (ua.includes('windows')) return 'windows';
@@ -890,6 +898,9 @@ export async function handlePerfReport(
     deviceMemory: nullableNumberIn(body.deviceMemory, 0, 1024),
     hardwareConcurrency: intIn(body.hardwareConcurrency, 0, 1024, 0),
     mobileTouch: Boolean(body.mobileTouch),
+    // Chromium shell, same bundle, same build id: browser_family stays
+    // 'chrome' for it, and this column is what tells the shell from a tab.
+    desktopShell: Boolean(body.desktopShell) || isElectronUserAgent(userAgent),
     browserFamily: choiceIn(
       body.browserFamily,
       ['chrome', 'safari', 'firefox', 'edge', 'other'],

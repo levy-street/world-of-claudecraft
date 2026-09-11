@@ -824,7 +824,10 @@ For off-box safety, sync the directory to S3 occasionally:
   heavy-jank counts, frame p95 / fps / worst-10s / long-task / render-scale
   histograms, context losses, and perf-doctor suggestion counts, labeled only
   by fixed vocabularies (graphics tier, device class, GPU family, OS family,
-  scene class, suggestion id). The whole family follows the exporter's
+  scene class, suggestion id, and on the reports counter and the frame p95
+  histogram the host `runtime`: `web` or `desktop-shell`, the Electron
+  client, which no other label can tell from a Chrome tab; its SQL twin is the
+  `desktop_shell` column). The whole family follows the exporter's
   zero-backfill design above: every counter cross product registers at zero and
   every histogram series is pre-seeded at boot (roughly 600 always-present
   samples), so the jank-share ratio reads 0% rather than "no data" for a

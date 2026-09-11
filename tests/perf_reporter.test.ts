@@ -1475,6 +1475,29 @@ describe('perf reporter suggestion ids', () => {
     expect(body.suggestionIds).toEqual(['hardware-acceleration']);
   });
 
+  it('carries the desktop shell flag as a top-level field, false for a browser tab', () => {
+    // The shell is Chromium loading the same bundle: browserFamily and buildId
+    // read identical to a Chrome tab, so this flag is the fleet's only
+    // desktop-versus-browser marker (stored as the desktop_shell column).
+    const settings = new Settings();
+    const shell = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      true,
+    )!;
+    expect(shell.desktopShell).toBe(true);
+    const tab = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+    expect(tab.desktopShell).toBe(false);
+  });
+
   it('emits integrated-gpu on a bad-frames iGPU session only outside the desktop shell', () => {
     (globalThis as any).location = { search: '' };
     const badSnap = (): PerfSnapshot => {

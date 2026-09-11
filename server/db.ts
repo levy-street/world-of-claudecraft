@@ -4153,6 +4153,7 @@ export interface ClientPerfReportInsert {
   deviceMemory: number | null;
   hardwareConcurrency: number;
   mobileTouch: boolean;
+  desktopShell: boolean;
   browserFamily: string;
   osFamily: string;
   glVendor: string;
@@ -4186,7 +4187,8 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
        suggestion_ids, raw_summary,
        gl_renderer_raw, gl_model, gl_laptop, gpu_hp_adapter,
-       shader_warm_worker_active, shader_warm_refusal
+       shader_warm_worker_active, shader_warm_refusal,
+       desktop_shell
      ) VALUES (
        $1, $2, $3, $4, $5, $6, $7,
        $8, $9, $10, $11, $12, $13,
@@ -4195,7 +4197,8 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        $23, $24, $25, $26,
        $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38,
        $39, $40, $41, $42, $43,
-       $44, $45, $46, $47, $48, $49, $50, $51
+       $44, $45, $46, $47, $48, $49, $50, $51,
+       $52
      )`,
     [
       row.schemaVersion,
@@ -4249,6 +4252,7 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
       row.gpuHpAdapter,
       row.shaderWarmWorkerActive,
       row.shaderWarmRefusal,
+      row.desktopShell,
     ],
   );
 }

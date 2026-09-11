@@ -75,6 +75,16 @@ export const CLIENT_PERF_GPU_FAMILIES = [
 ] as const;
 export type ClientPerfGpuFamily = (typeof CLIENT_PERF_GPU_FAMILIES)[number];
 
+/**
+ * The host runtime: a browser tab, or the Electron desktop shell. The shell is
+ * Chromium loading the same bundle, so no other label can tell the two apart,
+ * and "is the desktop client slower than Chrome on the same hardware" was an
+ * unanswerable fleet question until this. Derived from the stored
+ * desktop_shell boolean, so a beacon can never mint a third value.
+ */
+export const CLIENT_PERF_RUNTIMES = ['web', 'desktop-shell'] as const;
+export type ClientPerfRuntime = (typeof CLIENT_PERF_RUNTIMES)[number];
+
 /** The OS families the ingest allowlist admits (perf_report.ts osFamily). */
 export const CLIENT_PERF_OS_FAMILIES = [
   'windows',
@@ -215,6 +225,7 @@ export interface ClientPerfSample {
   source: string;
   gfxTier: string;
   mobileTouch: boolean;
+  desktopShell: boolean;
   osFamily: string;
   glRendererBucket: string;
   glBackend: string;
@@ -351,8 +362,8 @@ function observedOrZero(value: number): number {
 export function registerClientPerfMetrics(registry: Registry): ClientPerfMetricsSink {
   const reports = new Counter({
     name: WOC_CLIENT_REPORTS_TOTAL,
-    help: 'Stored gameplay perf reports, by graphics tier, device class, and GPU family.',
-    labelNames: ['gfx_tier', 'device', 'gpu_family'] as const,
+    help: 'Stored gameplay perf reports, by graphics tier, device class, GPU family, and host runtime.',
+    labelNames: ['gfx_tier', 'device', 'gpu_family', 'runtime'] as const,
     registers: [registry],
   });
   const jankReports = new Counter({
@@ -370,8 +381,8 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   // cross product for a denominator this histogram already exposes.
   const frameP95 = new Histogram({
     name: WOC_CLIENT_FRAME_P95_SECONDS,
-    help: 'Reported frame-time p95 per report window, by graphics tier, device class, and graphics backend.',
-    labelNames: ['gfx_tier', 'device', 'backend'] as const,
+    help: 'Reported frame-time p95 per report window, by graphics tier, device class, graphics backend, and host runtime.',
+    labelNames: ['gfx_tier', 'device', 'backend', 'runtime'] as const,
     buckets: [...CLIENT_PERF_FRAME_P95_BUCKETS_SECONDS],
     registers: [registry],
   });
@@ -435,21 +446,25 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   //
   // CARDINALITY, since pre-seeding means every cross product exists whether or
   // not a client ever reports it: the backend label multiplies exactly two
-  // series families and nothing else. frame_p95 is 5 tiers x 2 devices x 7
-  // backends = 70 series, and context_losses is 6 os x 7 backends = 42. Both
-  // vocabularies are closed and neither grows with fleet size, players, or
-  // hardware; adding a backend value is a source edit in gl_backend.ts, not a
-  // thing a beacon can mint.
+  // series families and the runtime label the same two plus the reports
+  // counter. frame_p95 is 5 tiers x 2 devices x 7 backends x 2 runtimes = 140
+  // series, reports is 5 x 2 x 6 families x 2 runtimes = 120, and
+  // context_losses is 6 os x 7 backends = 42. Every vocabulary is closed and
+  // none grows with fleet size, players, or hardware; adding a backend value
+  // is a source edit in gl_backend.ts, and the runtime is a stored boolean,
+  // never a thing a beacon can mint.
   for (const gfxTier of CLIENT_PERF_GFX_TIERS) {
     for (const device of CLIENT_PERF_DEVICE_CLASSES) {
       const tierDevice = { gfx_tier: gfxTier, device };
       jankReports.inc(tierDevice, 0);
       fpsAvg.zero(tierDevice);
-      for (const backend of GL_BACKEND_LABELS) {
-        frameP95.zero({ ...tierDevice, backend });
-      }
-      for (const gpuFamily of CLIENT_PERF_GPU_FAMILIES) {
-        reports.inc({ ...tierDevice, gpu_family: gpuFamily }, 0);
+      for (const runtime of CLIENT_PERF_RUNTIMES) {
+        for (const backend of GL_BACKEND_LABELS) {
+          frameP95.zero({ ...tierDevice, backend, runtime });
+        }
+        for (const gpuFamily of CLIENT_PERF_GPU_FAMILIES) {
+          reports.inc({ ...tierDevice, gpu_family: gpuFamily, runtime }, 0);
+        }
       }
     }
     longTask.zero({ gfx_tier: gfxTier });
@@ -480,17 +495,19 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         const device: ClientPerfDeviceClass = sample.mobileTouch ? 'mobile' : 'desktop';
         const tierDevice = { gfx_tier: gfxTier, device };
         const backend = backendIn(sample.glBackend);
+        const runtime: ClientPerfRuntime = sample.desktopShell ? 'desktop-shell' : 'web';
 
         reports.inc({
           ...tierDevice,
           gpu_family: classifyClientPerfGpuFamily(sample.glRendererBucket),
+          runtime,
         });
         shaderWarmReports.inc({
           shader_warm_active: sample.shaderWarmWorkerActive ? 'true' : 'false',
           shader_warm_refusal: shaderWarmRefusalLabel(sample.shaderWarmRefusal),
         });
         frameP95.observe(
-          { ...tierDevice, backend },
+          { ...tierDevice, backend, runtime },
           observedOrZero(sample.frameP95Ms) / MS_PER_SECOND,
         );
         fpsAvg.observe(tierDevice, observedOrZero(sample.fpsAvg));

@@ -111,4 +111,13 @@ ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gpu_hp_adapter TEXT NOT
 -- shaderWarmToken), and the per-session detail stays in raw_summary.shaderWarm.
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS shader_warm_worker_active BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS shader_warm_refusal TEXT NOT NULL DEFAULT '';
+-- Whether the report came from the Electron desktop shell. The shell is
+-- Chromium loading the SAME web bundle from the site origin, so browser_family
+-- reads 'chrome' and build_id is identical to a browser tab's; until this
+-- column no fleet question could tell the two hosts apart. Client-attested
+-- (the payload flag), with the Electron user-agent token as the ingest's
+-- fallback for older clients. Pre-column rows read FALSE, which is also the
+-- honest answer for every row older than the desktop shell itself. No index:
+-- the reads that split on it aggregate over a created_at window.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS desktop_shell BOOLEAN NOT NULL DEFAULT FALSE;
 `;

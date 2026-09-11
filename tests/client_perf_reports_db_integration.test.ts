@@ -89,6 +89,9 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       deviceMemory: 8.5,
       hardwareConcurrency: 12,
       mobileTouch: false,
+      // TRUE beside mobile_touch false and gl_laptop false, so a positional
+      // slip between the boolean columns flips an assertion.
+      desktopShell: true,
       browserFamily: 'safari',
       osFamily: 'macos',
       glVendor: 'RoundtripVendor',
@@ -171,6 +174,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(r.raw_summary).toEqual({ roundtrip: true, seconds: 77 });
     expect(r.shader_warm_worker_active).toBe(true);
     expect(r.shader_warm_refusal).toBe('extension-drift:ext_roundtrip');
+    expect(r.desktop_shell).toBe(true);
   });
 
   it('serves the row back through clientPerfRaw with the dimensions and suggestion ids mapped', async () => {
@@ -277,7 +281,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     const res = await db.pool.query(
       `SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
               suggestion_ids, gl_backend, gl_renderer_raw, gl_model, gl_laptop, gpu_hp_adapter,
-              shader_warm_worker_active, shader_warm_refusal
+              shader_warm_worker_active, shader_warm_refusal, desktop_shell
          FROM client_perf_reports WHERE session_id = $1`,
       [`${MARKER}-legacy`],
     );
@@ -298,6 +302,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       gpu_hp_adapter: '',
       shader_warm_worker_active: false,
       shader_warm_refusal: '',
+      desktop_shell: false,
     });
   });
 

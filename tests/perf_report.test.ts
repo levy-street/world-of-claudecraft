@@ -25,13 +25,14 @@ const VALID_TOKEN = 'b'.repeat(64);
 
 function fakeReq(
   body: unknown,
-  opts: { token?: string; method?: string; remoteAddress?: string } = {},
+  opts: { token?: string; method?: string; remoteAddress?: string; userAgent?: string } = {},
 ) {
   const req: any = new EventEmitter();
   req.method = opts.method ?? 'POST';
   req.url = '/api/perf-report';
   req.headers = {
     'user-agent':
+      opts.userAgent ??
       'Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15',
     ...(opts.token ? { authorization: `Bearer ${opts.token}` } : {}),
   };
@@ -2514,6 +2515,77 @@ describe('world-entry raw summary blocks', () => {
     expect(raw.dropped).toEqual(['unlisted']);
     expect(raw.postRevealLinks).toMatchObject({ programsGained: 41, closed: true });
     expect(raw.bootPhases).toMatchObject({ entryMs: 9000, prewarmInitialMs: 4000 });
+  });
+});
+
+describe('desktop shell marker', () => {
+  const ELECTRON_UA =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+    'WorldOfClaudecraft/0.43.0 Chrome/145.0.0.0 Electron/42.4.1 Safari/537.36';
+
+  it('stores the client flag beside a chrome browser family for the shell', async () => {
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'desktop-shell-flag', desktopShell: true },
+        { remoteAddress: '203.0.113.130', userAgent: ELECTRON_UA },
+      ),
+      res,
+    );
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect(stored.desktopShell).toBe(true);
+    // The shell is Chromium: browser_family keeps saying so, and the column is
+    // what tells it from a tab.
+    expect(stored.browserFamily).toBe('chrome');
+    expect(stored.osFamily).toBe('windows');
+  });
+
+  it('falls back on the Electron user-agent token for a client older than the flag', async () => {
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'desktop-shell-ua-only' },
+        { remoteAddress: '203.0.113.131', userAgent: ELECTRON_UA },
+      ),
+      res,
+    );
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect(stored.desktopShell).toBe(true);
+  });
+
+  it('reads a browser tab as not the shell, whatever the flag looks like', async () => {
+    const chromeUa =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+      'Chrome/145.0.0.0 Safari/537.36';
+    for (const [session, desktopShell] of [
+      ['desktop-shell-absent', undefined],
+      ['desktop-shell-false', false],
+      ['desktop-shell-zero', 0],
+      ['desktop-shell-empty', ''],
+    ] as const) {
+      const res = fakeRes();
+      await handlePerfReport(
+        fakeReq(
+          { sessionId: session, desktopShell },
+          { remoteAddress: '203.0.113.132', userAgent: chromeUa },
+        ),
+        res,
+      );
+      const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+      expect(stored.desktopShell, session).toBe(false);
+      expect(stored.browserFamily).toBe('chrome');
+    }
+    // A hostile truthy non-boolean coerces, like mobileTouch does.
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'desktop-shell-truthy', desktopShell: 'yes' },
+        { remoteAddress: '203.0.113.133', userAgent: chromeUa },
+      ),
+      res,
+    );
+    expect(vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].desktopShell).toBe(true);
   });
 });
 

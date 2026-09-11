@@ -618,6 +618,11 @@ function payloadFromSnapshot(
     deviceMemory: device.deviceMemory,
     hardwareConcurrency: device.hardwareConcurrency,
     mobileTouch: device.mobileTouch,
+    // The Electron shell is Chromium loading the same web bundle, so neither
+    // browserFamily nor buildId can tell it apart; this flag is the only
+    // fleet-visible desktop-versus-browser marker (the server also falls back
+    // on the Electron user-agent token).
+    desktopShell,
     browserFamily: browserFamily(device.userAgent),
     osFamily: osFamily(device.userAgent),
     glVendor: renderer.glVendor,
