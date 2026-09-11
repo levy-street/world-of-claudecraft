@@ -1,6 +1,6 @@
 // Delve module layout collision smoke tests (spatial band PR 4 partial).
 import { describe, expect, it } from 'vitest';
-import { isBlocked, resolvePosition } from '../src/sim/colliders';
+import { isBlocked, lineOfSightClear, resolvePosition } from '../src/sim/colliders';
 import { DELVE_MODULE_Z_START, delveModuleZOffset, delveOrigin } from '../src/sim/data';
 import {
   DELVE_MODULE_LAYOUTS,
@@ -93,5 +93,36 @@ describe('delve module colliders', () => {
     expect(isBlocked(SEED, insideX, exitZ, 0.5)).toBe(false);
     // Standing on the wall itself is blocked (delve wall at wallX=25)
     expect(isBlocked(SEED, origin.x + 25, exitZ, 0.5)).toBe(true);
+  });
+
+  describe('The Saintless Hall: casting over floor clutter', () => {
+    // Reproduces a reported bug entering The Collapsed Reliquary: a caster
+    // standing on open floor got "Line of sight." refused against a mob a
+    // few yards away with nothing visible between them. Root cause: aisle
+    // floor-clutter circles carried no cameraTopY, and the delve branch of
+    // lineOfSightClear used a movement-style resolveAgainst push-out with no
+    // height concept at all, so every scatter point blocked a cast like a
+    // full wall regardless of how short the debris actually is.
+    const modules: DelveModuleId[] = ['reliquary_saintless_hall'];
+    const layout = DELVE_MODULE_LAYOUTS.reliquary_saintless_hall;
+    const clutter = layout.clutter?.[0];
+    if (!clutter) throw new Error('expected reliquary_saintless_hall to carry aisle clutter');
+    const origin = delveOrigin(0, 0);
+    const zBase = delveModuleZOffset(modules, 0);
+    const clutterWorldZ = origin.z + zBase + clutter.z;
+
+    it('does not block a cast whose ray only crosses a clutter scatter point', () => {
+      // Caster and target straddle the clutter point on a dead-straight ray
+      // (same local x as the clutter), well clear of every pillar/tomb row.
+      const from = { x: origin.x + clutter.x, z: clutterWorldZ - 3 };
+      const to = { x: origin.x + clutter.x, z: clutterWorldZ + 3 };
+      expect(lineOfSightClear(SEED, from, to, 0.05, modules)).toBe(true);
+    });
+
+    it('still blocks movement through the same clutter point', () => {
+      // The fix is a LOS-only skip: floor clutter keeps colliding for
+      // movement (no moveTopY was ever set on it, and none was added here).
+      expect(isBlocked(SEED, origin.x + clutter.x, clutterWorldZ, 0.4)).toBe(true);
+    });
   });
 });

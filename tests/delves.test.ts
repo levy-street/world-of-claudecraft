@@ -1030,6 +1030,58 @@ describe('delve interactables and affixes', () => {
   });
 });
 
+describe('delve line of sight over floor clutter', () => {
+  // Reproduces a reported bug entering The Collapsed Reliquary: The Saintless
+  // Hall. A ranged cast against an open-ground trash mob was refused with
+  // "Line of sight." even though nothing visible stood between caster and
+  // target: aisle floor-clutter scatter points had no cameraTopY, and the
+  // delve arm of lineOfSightClear used a movement-style push-out with no
+  // height concept at all, so every scatter point blocked like a full wall.
+  it('lets a ranged cast complete across an aisle-clutter point in the Saintless Hall', () => {
+    const sim = makeSim('warlock');
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['reliquary_saintless_hall'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const origin = run.origin;
+    const zBase = (sim as any).delveModuleZOffset(run);
+    const clutter = DELVE_MODULE_LAYOUTS.reliquary_saintless_hall.clutter![0];
+    const player = sim.player;
+    player.pos = { x: origin.x + clutter.x, y: 0, z: origin.z + zBase + clutter.z - 3 };
+    player.prevPos = { ...player.pos };
+    (sim as any).rebucket(player);
+
+    const mob = createMob(920101, MOBS.reliquary_ledger_wraith, 7, {
+      x: origin.x + clutter.x,
+      y: 0,
+      z: origin.z + zBase + clutter.z + 3,
+    });
+    (sim as any).addEntity(mob);
+    run.mobIds.push(mob.id);
+
+    player.facing = Math.atan2(mob.pos.x - player.pos.x, mob.pos.z - player.pos.z);
+    sim.targetEntity(mob.id, sim.playerId);
+    player.resource = player.maxResource;
+    player.gcdRemaining = 0;
+    sim.drainEvents();
+
+    sim.castAbility('shadow_bolt');
+    const events = sim.drainEvents();
+
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'castStart',
+        entityId: sim.playerId,
+        ability: 'shadow_bolt',
+      }),
+    );
+    expect(events).not.toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'Line of sight.' }),
+    );
+  });
+});
+
 describe('delve reward chest + surface exit flow', () => {
   function enterFinale(sim: ReturnType<typeof makeSim>) {
     enterReliquary(sim);

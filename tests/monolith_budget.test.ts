@@ -1852,7 +1852,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the keep wall-ledge and parapet loops retired and the Wildheart static set moved beside its field data. Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 2548,
+    // Lowered with the Saintless Hall delve LOS fix: the procedural rift-region
+    // registry (RiftRegion, allocRiftCollisionToken/setRiftRegion/clearRiftRegion/
+    // riftRegionAt) extracted to rift_regions.ts, re-exported from here so every
+    // existing importer keeps its './colliders' path. Paid for the height-aware
+    // delve line-of-sight fix added in the same change. Exact count, zero slack.
+    ceiling: 2486,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
