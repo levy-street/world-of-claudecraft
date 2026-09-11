@@ -330,6 +330,54 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
     });
   });
 
+  it('a late close from the zombie AFTER the replacement connected is a no-op: no second drop, no duplicate socket', () => {
+    withDomStubs((doc, harness) => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.5);
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as {
+        connected: boolean;
+        reconnectAttempts: number;
+        sessionEnded: boolean;
+      };
+      let disconnected = '';
+      world.onDisconnect = (reason) => {
+        disconnected = reason;
+      };
+      const zombie = StubWebSocket.instances[0];
+      // Capture the handler the browser still holds a reference to, before the
+      // zombie branch detaches it: the late real close event fires THIS.
+      const lateClose = zombie.onclose;
+      w.connected = true;
+      zombie.readyState = StubWebSocket.CLOSED;
+
+      // Foreground: zombie branch, fast retry fires, replacement connects.
+      doc.setVisible(true);
+      harness.fire(harness.timers[0].id);
+      expect(StubWebSocket.instances.length).toBe(2);
+      const replacement = StubWebSocket.instances[1];
+      replacement.onopen?.();
+      replacement.onmessage?.({
+        data: JSON.stringify({ t: 'hello', pid: 7, seed: 1, realm: 'r' }),
+      });
+      expect(w.connected).toBe(true);
+      expect(w.reconnectAttempts).toBe(0);
+
+      // The zombie's real close lands late, after the fast retry already fired.
+      // Before the fix this counted a second drop against the LIVE replacement:
+      // a duplicate socket opened, the server refused it ('character already in
+      // world', the replacement being alive), each refusal re-scheduled another
+      // duplicate, and the bounded run ended the healthy session for good.
+      lateClose?.();
+      expect(w.connected).toBe(true);
+      expect(w.reconnectAttempts).toBe(0);
+      expect(harness.timers.length).toBe(0);
+      expect(StubWebSocket.instances.length).toBe(2);
+      expect(w.sessionEnded).toBe(false);
+      expect(disconnected).toBe('');
+      world.close();
+    });
+  });
+
   it('a late duplicate close at the attempt cap does not end the session while the final retry is pending', () => {
     withDomStubs((doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
