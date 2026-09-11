@@ -687,6 +687,7 @@ import { MapWindowPainter } from './map_window_painter';
 import { MAP_OPEN_ZOOM, type MapWindowMode, mapWindowMode } from './map_window_view';
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
+import { resolveMarketSearchTerm } from './market_search_core';
 import { masterwroughtTooltipLines } from './masterwrought_cap_view';
 import { closeMaterialSourcesDialog, openMaterialSourcesDialog } from './material_sources_dialog';
 import { Meters } from './meters';
@@ -5334,6 +5335,16 @@ export class Hud {
     },
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
+    resolveSearchTerm: (searchTerm: string) =>
+      resolveMarketSearchTerm({
+        query: searchTerm,
+        localeTag: languageTag(getLanguage()),
+        itemIds: Object.keys(ITEMS),
+        localizedNameOf: (id) => itemDisplayName(ITEMS[id]),
+        englishMatches: (id, search) =>
+          marketItemMatches(id, { ...defaultMarketQuery(), search }),
+        englishHaystackOf: (id) => `${id} ${ITEMS[id]?.name ?? ''}`,
+      }),
   });
   // Ravenpost mailbox window painter (mailbox_view.ts core + mailbox_window.ts
   // painter). It owns the mailbox view-state (tab, opened letter, staged

@@ -19,7 +19,6 @@
 // prompt itself is Hud's one #confirm-dialog, injected as a dep.
 
 import { audio } from '../game/audio';
-import { ITEMS } from '../sim/data';
 import type { ItemInstancePayload, ItemSlot } from '../sim/types';
 import {
   type IWorld,
@@ -70,7 +69,7 @@ import {
 } from './market_filters';
 import { marketNameColor } from './market_name_color';
 import { marketPriceHtml } from './market_price_view';
-import { localizedMarketSearch } from './market_search_localized_core';
+import { resolveMarketSearchTerm } from './market_search_core';
 import {
   buildMarketView,
   COPPER_PER_GOLD,
@@ -131,6 +130,10 @@ export interface MarketWindowDeps extends PainterHostPresentation {
     cancelText: string,
     onOk: () => void,
   ): void;
+  /** Resolve a typed search term to its canonical item name/ID. Implemented by the
+   *  host (which may consult item content) so this painter stays free of any
+   *  direct sim-data import; it renders resolved rows, it does not resolve them. */
+  resolveSearchTerm(searchTerm: string): string;
 }
 
 export class MarketWindow {
@@ -150,19 +153,6 @@ export class MarketWindow {
   private sellItemId: string | null = null;
   private sellInstance: ItemInstancePayload | null = null;
   private searchQuery = '';
-  // Memo for the typed-to-sent search translation (effectiveSearch): the
-  // resolution walks the whole item catalog, and currentQuery() is reachable
-  // from the per-frame reconnect check as well as from a keystroke.
-  //
-  // The LANGUAGE is part of the key, not just the typed text. The resolution
-  // reads localized item names, so the same typed string resolves to a
-  // different search per locale, and a text-only key served the previous
-  // locale's substitution after a switch: not the empty result the untranslated
-  // path gives, but a wrong one, which is the single thing this feature must
-  // never produce. This is the memo half of the language fan-out rule
-  // (src/ui/CLAUDE.md); keying it is what answers it, so no relocalize() arm is
-  // owed and none is registered.
-  private searchEcho: { typed: string; lang: string; sent: string } | null = null;
   private lastSig = '';
   // The Sell tab's price-reference echo signature (issue 3043), tracked SEPARATELY
   // from lastSig: the Sell tab is excluded from the general per-frame rebuild (it
@@ -250,32 +240,24 @@ export class MarketWindow {
     this.render();
   }
 
+  /** Convert the typed search to the English search the server will use.
+   *  Delegates to the host so this painter imports no sim/data. */
+  private convertSearchTerm(searchTerm: string): string {
+    return this.deps.resolveSearchTerm(searchTerm);
+  }
+
   /** The search string actually SENT, which is the typed text translated at the
    *  UI boundary when the player is not typing English (see
-   *  market_search_localized_core.ts; the box keeps showing what they typed).
-   *  Memoized on the typed text because currentQuery() is also reached from the
-   *  per-frame reconnect check, while the resolution walks the whole catalog. */
-  private effectiveSearch(): string {
-    const lang = getLanguage();
-    if (this.searchEcho?.typed === this.searchQuery && this.searchEcho.lang === lang) {
-      return this.searchEcho.sent;
-    }
-    const sent = localizedMarketSearch({
-      query: this.searchQuery,
-      localeTag: languageTag(lang),
-      itemIds: Object.keys(ITEMS),
-      localizedNameOf: (id) => itemDisplayName(ITEMS[id]),
-      englishMatches: (id, search) => marketItemMatches(id, { ...defaultMarketQuery(), search }),
-      englishHaystackOf: (id) => `${id} ${ITEMS[id]?.name ?? ''}`,
-    });
-    this.searchEcho = { typed: this.searchQuery, lang, sent };
-    return sent;
+   *  market_search_core.ts; the box keeps showing what they typed). */
+  effectiveSearch(): string {
+    return this.convertSearchTerm(this.searchQuery);
   }
 
   /** The current browse query (search + filters + page) the UI sends to the server. */
   private currentQuery(): MarketQuery {
+    const resolvedSearch = this.effectiveSearch();
     return {
-      search: this.effectiveSearch(),
+      search: resolvedSearch,
       itemType: this.itemTypeFilter,
       subtype: this.subtypeFilter,
       armorClass: this.armorClassFilter,

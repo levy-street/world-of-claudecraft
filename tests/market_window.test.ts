@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { ITEMS } from '../src/sim/data';
 import { itemDisplayName } from '../src/ui/entity_i18n';
-import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
-import { MARKET_ITEM_TYPE_FILTERS } from '../src/ui/market_filters';
+import { resolveMarketSearchTerm } from '../src/ui/market_search_core';
+import { ensureLocaleLoaded, getLanguage, languageTag, setLanguage } from '../src/ui/i18n';
+import { MARKET_ITEM_TYPE_FILTERS, marketItemMatches, defaultMarketQuery } from '../src/ui/market_filters';
 import { MarketWindow } from '../src/ui/market_window';
 
 // The market window painter is a DOM module; driving the live DOM + events is the
@@ -502,13 +503,12 @@ describe('market_window: the localized Browse search is resolved at the UI bound
     // The whole soundness argument is that a substituted search is proven to
     // select the same set the server will select. That proof is only worth
     // anything while the predicate doing the proving is the authority's.
-    expect(painterCode).toContain('localizedMarketSearch');
-    expect(painterCode).toContain('marketItemMatches');
-    // Over the WHOLE catalog and with every facet neutral: a narrower universe
-    // would prove set-equality only on a subset, which does not carry to the
-    // book the server actually searches.
-    expect(painterCode).toContain('itemIds: Object.keys(ITEMS)');
-    expect(painterCode).toContain('...defaultMarketQuery(), search');
+    // The painter delegates resolution to the host (deps.resolveSearchTerm),
+    // which wires into market_search_core with the server's own marketItemMatches.
+    expect(painterCode).toContain('resolveMarketSearchTerm');
+    expect(painterCode).toContain('deps.resolveSearchTerm');
+    // The painter must NOT import ITEMS directly (dependency-direction invariant).
+    expect(painterCode).not.toContain("from '../sim/data'");
   });
 
   it('re-resolves the sent search when the LANGUAGE moves under an unchanged query', async () => {
@@ -526,7 +526,22 @@ describe('market_window: the localized Browse search is resolved at the UI bound
     const jaName = itemDisplayName(ITEMS.worn_sword);
     setLanguage('en');
 
-    const win = new MarketWindow({} as never) as any;
+    const makeWin = () => {
+      const w = new MarketWindow({} as never) as any;
+      w.deps.resolveSearchTerm = (q: string) =>
+        resolveMarketSearchTerm({
+          query: q,
+          localeTag: languageTag(getLanguage()),
+          itemIds: Object.keys(ITEMS),
+          localizedNameOf: (id: string) => itemDisplayName(ITEMS[id]),
+          englishMatches: (id: string, s: string) =>
+            marketItemMatches(id, { ...defaultMarketQuery(), search: s }),
+          englishHaystackOf: (id: string) => `${id} ${ITEMS[id]?.name ?? ''}`,
+        });
+      return w;
+    };
+
+    const win = makeWin();
     win.searchQuery = jaName;
     // Under English the Japanese name matches no English name or id, so the
     // typed text is handed back untouched. That is the memo this arm poisons.
@@ -537,7 +552,7 @@ describe('market_window: the localized Browse search is resolved at the UI bound
     const afterSwitch = win.effectiveSearch() as string;
     // A window that never saw English resolves the same query fresh; the one
     // that did must agree with it.
-    const fresh = new MarketWindow({} as never) as any;
+    const fresh = makeWin();
     fresh.searchQuery = jaName;
     const expected = fresh.effectiveSearch() as string;
     setLanguage('en');
@@ -972,6 +987,14 @@ describe('market_window: live locale-aware case folding', () => {
     setLanguage('tr_TR');
     try {
       const win = new MarketWindow({} as never) as any;
+      win.deps.resolveSearchTerm = (q: string) => resolveMarketSearchTerm({
+        query: q,
+        localeTag: 'tr-TR',
+        itemIds: Object.keys(ITEMS),
+        localizedNameOf: (id: string) => itemDisplayName(ITEMS[id]),
+        englishMatches: (id: string, s: string) => marketItemMatches(id, { ...defaultMarketQuery(), search: s }),
+        englishHaystackOf: (id: string) => `${id} ${ITEMS[id]?.name ?? ''}`,
+      });
       win.searchQuery = 'ilik ucu';
       expect(win.effectiveSearch()).toBe('marrowpoint');
     } finally {
