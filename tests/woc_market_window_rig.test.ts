@@ -145,6 +145,10 @@ interface FakeClient {
     >;
     estimate: () => Promise<WocEstimateView | null>;
     history: () => Promise<{ ok: true; sales: WocSaleView[] } | { ok: false; code: string }>;
+    recentSales: () => Promise<
+      | { ok: true; hasMore: boolean; page: number; sales: WocSaleView[] }
+      | { ok: false; code: string }
+    >;
     sellerHistory: () => Promise<
       { ok: true; sales: WocSaleView[]; seller: WocSellerView | null } | { ok: false; code: string }
     >;
@@ -187,6 +191,7 @@ function fakeClient(rows: WocListingView[] = [listing(1)]): FakeClient {
       split: { sellerCents: 90, burnCents: 3, treasuryCents: 7 },
     }),
     history: async () => ({ ok: true, sales: [] }),
+    recentSales: async () => ({ ok: true, hasMore: false, page: 0, sales: [] }),
     sellerHistory: async () => ({
       ok: true,
       sales: [
@@ -221,6 +226,7 @@ function fakeClient(rows: WocListingView[] = [listing(1)]): FakeClient {
     detail: record('detail'),
     estimate: record('estimate'),
     history: record('history'),
+    recentSales: record('recentSales'),
     sellerHistory: record('sellerHistory'),
     me: record('me'),
     stepUpChallenge: record('stepUpChallenge'),
@@ -1776,5 +1782,154 @@ describe('WocMarketWindow live rig: the reconnect wallet card can be hidden', ()
     expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();
     // Browse itself is untouched: the filters still lead the panel.
     expect(r.root.querySelector('#woc-market-panel .wm-browse select')).not.toBeNull();
+  });
+});
+
+describe('WocMarketWindow: the Sales History tab', () => {
+  const SALE = (over: Partial<WocSaleView> = {}): WocSaleView => ({
+    id: 1,
+    itemId: EPIC,
+    priceCents: 2500,
+    sellerName: 'Aurelia',
+    buyerName: 'Borin',
+    atMs: NOW - 60_000,
+    saleType: 'auction',
+    quality: 'epic',
+    ...over,
+  });
+  const toHistory = (r: Rig) => q<HTMLButtonElement>(r.root, 'button[data-tab="history"]').click();
+  const recentSalesCalls = (r: Rig) => r.fake.calls.filter((c) => c.startsWith('recentSales:'));
+
+  it('fetches recentSales lazily on first entry (open never reads it) and paints the table', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    // open() loads status + browse + me, never the realm-wide sales read.
+    expect(recentSalesCalls(r)).toHaveLength(0);
+    r.fake.answers.recentSales = async () => ({
+      ok: true,
+      hasMore: false,
+      page: 0,
+      sales: [SALE({ id: 7 })],
+    });
+    toHistory(r);
+    await flush();
+    expect(recentSalesCalls(r)).toHaveLength(1);
+    const row = q(r.root, '.wm-history .wm-sales-table tr.wm-sale-row');
+    // Seller, buyer and the localized sale-type word all render on the row.
+    expect(row.textContent).toContain('Aurelia');
+    expect(row.textContent).toContain('Borin');
+    expect(row.textContent).toContain(t('hudChrome.wocMarket.saleTypeAuction'));
+  });
+
+  it('a filter change re-reads recentSales from the first page, carrying the filter', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    toHistory(r);
+    await flush();
+    const before = recentSalesCalls(r).length;
+    const quality = q<HTMLSelectElement>(r.root, '.wm-history select[data-field="filter-quality"]');
+    quality.value = 'legendary';
+    quality.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    const calls = recentSalesCalls(r);
+    expect(calls.length).toBe(before + 1);
+    // The shared filter rides the read, always from page 0 (a filter change
+    // resets the pager).
+    expect(calls[calls.length - 1]).toContain('"quality":"legendary"');
+    expect(calls[calls.length - 1]).toContain('"page":0');
+  });
+
+  it('a no-match item query paints the empty face and never asks the server', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    r.fake.answers.recentSales = async () => ({
+      ok: true,
+      hasMore: false,
+      page: 0,
+      sales: [SALE({ id: 7 })],
+    });
+    toHistory(r);
+    await flush();
+    expect(q(r.root, '.wm-history .wm-sales-table')).not.toBeNull();
+    const before = recentSalesCalls(r).length;
+    const input = q<HTMLInputElement>(r.root, '.wm-history input[data-field="filter-item"]');
+    input.value = 'zzz no such item zzz';
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    // The same short-circuit browse takes: an empty itemIds would read as no
+    // filter, so the empty list is painted locally and the server is not asked.
+    expect(recentSalesCalls(r)).toHaveLength(before);
+    expect(r.root.querySelector('.wm-history .wm-sales-table')).toBeNull();
+    expect(q(r.root, '.wm-history .wm-status').textContent).toContain(
+      t('hudChrome.wocMarket.historyEmpty'),
+    );
+  });
+
+  it('a failed read paints the error face', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    r.fake.answers.recentSales = async () => ({ ok: false, code: 'woc_market.unavailable' });
+    toHistory(r);
+    await flush();
+    expect(r.root.querySelector('.wm-history .wm-sales-table')).toBeNull();
+    expect(q(r.root, '.wm-history').textContent).toContain(t('hudChrome.wocMarket.historyError'));
+  });
+
+  it('the pager branches on the tab: page-next advances the history read, not browse', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    r.fake.answers.recentSales = async () => ({
+      ok: true,
+      hasMore: true,
+      page: 0,
+      sales: [SALE({ id: 7 })],
+    });
+    toHistory(r);
+    await flush();
+    const browseBefore = r.fake.calls.filter((c) => c.startsWith('browse:')).length;
+    q<HTMLButtonElement>(r.root, '.wm-history button[data-action="page-next"]').click();
+    await flush();
+    // History advances historyPage and re-reads recentSales; the browse read is
+    // untouched (the two tabs keep their own pagers over the shared filter).
+    expect(recentSalesCalls(r).some((c) => c.includes('"page":1'))).toBe(true);
+    expect(r.fake.calls.filter((c) => c.startsWith('browse:')).length).toBe(browseBefore);
+  });
+
+  it('the Seller and Buyer names both open "Recent trades by {name}"; Back returns to the tab', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    r.fake.answers.recentSales = async () => ({
+      ok: true,
+      hasMore: false,
+      page: 0,
+      sales: [SALE({ id: 7, sellerName: 'Aurelia', buyerName: 'Borin' })],
+    });
+    toHistory(r);
+    await flush();
+    // The Seller name is the seller-view click-through (same action as Browse).
+    q<HTMLButtonElement>(r.root, '.wm-history .wm-seller-link[data-seller="Aurelia"]').click();
+    await flush();
+    expect(r.fake.calls.some((c) => c.startsWith('sellerHistory:') && c.includes('Aurelia'))).toBe(
+      true,
+    );
+    expect(q(r.root, '.wm-seller-pane').textContent).toContain('Aurelia');
+    // Back drops the pane and returns to the Sales History table, not Browse.
+    q<HTMLButtonElement>(r.root, 'button[data-action="seller-back"]').click();
+    await flush();
+    expect(r.root.querySelector('.wm-seller-pane')).toBeNull();
+    expect(r.root.querySelector('.wm-history .wm-sales-table')).not.toBeNull();
+    // The Buyer name opens the same view for the buyer.
+    q<HTMLButtonElement>(r.root, '.wm-history .wm-seller-link[data-seller="Borin"]').click();
+    await flush();
+    expect(r.fake.calls.some((c) => c.startsWith('sellerHistory:') && c.includes('Borin'))).toBe(
+      true,
+    );
+    expect(q(r.root, '.wm-seller-pane').textContent).toContain('Borin');
   });
 });

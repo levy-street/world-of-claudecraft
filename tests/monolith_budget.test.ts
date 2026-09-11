@@ -99,7 +99,14 @@ const MONOLITHS: MonolithRow[] = [
     // wiring, the wallet re-arm, and the scroll-after-focus ordering. The
     // review round (the hold's lazy first-render attach, the no-rung scroll
     // carve-out) fits inside the same count. Exact count, zero slack.
-    ceiling: 2475,
+    // Down 2475 -> 2419 at the Sales History tab: the browse detail pane
+    // (detailPaneHtml/bidFormHtml/confirmFieldsHtml) moved to
+    // src/ui/woc_market_detail_html.ts (the activity-html precedent), and the
+    // new tab's own table markup lives in src/ui/woc_market_sales_html.ts, so
+    // the fourth tab's window glue landed under the old ceiling (net of the
+    // v0.43.0 sync merge, which trimmed overlapping browse markup). Exact
+    // count, zero slack.
+    ceiling: 2419,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -1215,7 +1222,8 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Compose the mount cosmetics and practice lesson extractions.
     // Measured combined size; retain zero headroom after the release merge.
-    ceiling: 11332,
+    // Weapon-coat amounts now share src/ui/ability_imbue_text.ts with live tooltips.
+    ceiling: 11327,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1790,7 +1798,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 3945,
+    // Down 3945 -> 3943 at the Sales History tab: the sale/query/seller read
+    // types moved to woc_market_sale_types.ts (the economy-types leaf
+    // pattern), which more than paid for the realmSalesHistory read added
+    // here. Measured on the v0.43.0-rebased tree. Exact count, zero slack.
+    ceiling: 3943,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

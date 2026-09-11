@@ -52,6 +52,8 @@ import type {
   WocMarketService,
   WocQuoteIntent,
   WocSaleRow,
+  WocSalesQuery,
+  WocSaleType,
   WocSettlementRow,
   WocStrikeRow,
 } from './woc_market';
@@ -498,6 +500,23 @@ function saleView(row: WocSaleRow): Record<string, unknown> {
   };
 }
 
+/** The Sales History tab's row: the saleView fields plus the two the tab
+ *  shows and the per-item/seller reads do not, the sale type and the item's
+ *  quality (which frames the icon). category/subcategory stay filter-only and
+ *  never reach the wire. saleType is null on a pre-feature row. */
+function realmSaleView(row: WocSaleRow): Record<string, unknown> {
+  return {
+    id: row.id,
+    itemId: row.itemId,
+    priceCents: row.priceCents,
+    sellerName: row.sellerName,
+    buyerName: row.buyerName,
+    atMs: row.atMs,
+    saleType: row.saleType,
+    quality: row.quality,
+  };
+}
+
 function strikeView(row: WocStrikeRow | null): Record<string, unknown> | null {
   if (!row) return null;
   return { strikes: row.strikes, suspendedUntilMs: row.suspendedUntilMs };
@@ -589,6 +608,11 @@ const BROWSE_SORTS = new Set(['ending', 'newest', 'price_asc', 'price_desc']);
 // re-allowing it a two-place change rather than one. Whatever a seller can make,
 // a buyer can filter for.
 const LISTING_FORMATS = new Set(['auction', 'buy_now', 'auction_buy_now']);
+// The Sales History `format` filter matches a row's stamped sale_type, whose
+// vocabulary is NOT the listing formats: 'auction_buy_now' is a listing shape no
+// sale ever carries, so it is rejected here instead of silently answering empty,
+// and 'directed' (a real sale_type the strip never offers) is a valid filter.
+const SALE_TYPES = new Set(['auction', 'buy_now', 'directed']);
 // uncommon and rare joined the vocabulary with the collectible categories:
 // mounts and chromas bypass the equipment quality floor (sellableRows' own
 // rule) and rank down to uncommon, so those listings genuinely exist. A
@@ -682,6 +706,55 @@ async function browseHandler(ctx: Ctx): Promise<void> {
     page,
     pageSize: q.pageSize,
     listings: rows.map((row) => listingView(row, viewer)),
+  });
+}
+
+async function salesHandler(ctx: Ctx): Promise<void> {
+  // The Sales History tab: realm-wide, most-recent-first, filtered by the
+  // Browse axes. Decoded exactly like browseHandler minus sort (sales are
+  // always newest-first); `format` matches the stamped sale_type.
+  const one = (v: string | string[] | undefined): string | null =>
+    typeof v === 'string' && v !== '' ? v : null;
+  const qualityRaw = one(ctx.query.quality);
+  const formatRaw = one(ctx.query.format);
+  const categoryRaw = one(ctx.query.category);
+  const subcategoryRaw = one(ctx.query.subcategory);
+  if (qualityRaw !== null && !QUALITIES.has(qualityRaw)) invalid();
+  if (formatRaw !== null && !SALE_TYPES.has(formatRaw)) invalid();
+  if (categoryRaw !== null && !BROWSE_CATEGORIES.has(categoryRaw)) invalid();
+  if (subcategoryRaw !== null && !BROWSE_SUBCATEGORIES.has(subcategoryRaw)) invalid();
+  const itemIdsRaw = one(ctx.query.itemIds);
+  const screened =
+    itemIdsRaw === null
+      ? []
+      : [
+          ...new Set(
+            itemIdsRaw
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s !== '')
+              .slice(0, 50)
+              .map((id) => itemIdField(id)),
+          ),
+        ].sort();
+  const itemIds = screened.length === 0 ? null : screened;
+  const pageRaw = one(ctx.query.page);
+  const page = pageRaw === null ? 0 : intField(Number(pageRaw), 0, MAX_BROWSE_PAGE);
+  const q: WocSalesQuery = {
+    page,
+    pageSize: 25,
+    quality: qualityRaw,
+    format: formatRaw as WocSaleType | null,
+    category: categoryRaw,
+    subcategory: subcategoryRaw,
+    itemIds,
+  };
+  const { sales, hasMore, pageSize } = await useService().realmSalesHistory(q);
+  json(ctx.res, 200, {
+    hasMore,
+    page,
+    pageSize,
+    sales: sales.map(realmSaleView),
   });
 }
 
@@ -1309,6 +1382,16 @@ export const routes: RouteDef[] = [
     middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
     meta: NO_OWNER,
     handler: listingDetailHandler,
+  },
+  {
+    // The Sales History tab: realm-wide completed sales, filters as query
+    // params (browse-style, so no :param and no NO_OWNER meta). Public-ish
+    // provenance already exposed per-item and per-seller, so the read guard.
+    method: 'GET',
+    path: '/api/woc-market/sales',
+    surface: 'api',
+    middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
+    handler: salesHandler,
   },
   {
     method: 'GET',

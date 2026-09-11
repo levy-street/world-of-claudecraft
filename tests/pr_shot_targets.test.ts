@@ -363,6 +363,7 @@ describe('classifyDiff', () => {
       'src/sim/combat/stealth_focus.ts',
       'src/sim/combat/auto_attack.ts',
       'src/sim/combat/poison_coating.ts',
+      'src/ui/ability_imbue_text.ts',
     ]) {
       const plan = classifyDiff([file]);
       expect(
@@ -377,6 +378,7 @@ describe('classifyDiff', () => {
       'melting-acid',
       'instant-poison',
       'deadly-poison',
+      'deadly-poison-mobile',
       'nightshade-coating',
       'sap',
       'eye-jab',

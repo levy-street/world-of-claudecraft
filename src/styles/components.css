@@ -18887,6 +18887,43 @@
   #woc-market-window .wm-table td {
     overflow-wrap: anywhere;
   }
+  /* The Sales History pane: the shared filter strip above a six-column table of
+     settled sales. A block column, not the browse grid (it has no detail side),
+     so the table sizes to content under the strip. */
+  #woc-market-window .wm-history {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 0;
+  }
+  /* Six columns, not the browse table's five: re-weight them here (item wide,
+     the two names and the date medium, price and type narrow) so a long list
+     stays scannable. table-layout:fixed and the cell rules come from .wm-table;
+     the .wm-table.wm-sales-table compound outranks the five-column widths above
+     however source order falls (the same specificity discipline the tab rules
+     keep). */
+  #woc-market-window .wm-table.wm-sales-table th:nth-child(1) {
+    width: 30%;
+  }
+  #woc-market-window .wm-table.wm-sales-table th:nth-child(2),
+  #woc-market-window .wm-table.wm-sales-table th:nth-child(3) {
+    width: 15%;
+  }
+  #woc-market-window .wm-table.wm-sales-table th:nth-child(4) {
+    width: 16%;
+  }
+  #woc-market-window .wm-table.wm-sales-table th:nth-child(5) {
+    width: 12%;
+  }
+  #woc-market-window .wm-table.wm-sales-table th:nth-child(6) {
+    width: 12%;
+  }
+  /* A sales row is read-only (no activator, no selection): it takes none of the
+     .wm-row cursor/hover/selected treatment, only a faint zebra so a wide row
+     tracks across its six cells without a pointer affordance it does not have. */
+  #woc-market-window .wm-sale-row:nth-child(even) td {
+    background: color-mix(in srgb, var(--color-accent) 4%, transparent);
+  }
   /* A row is one control (the activator button carries the keyboard reach), so
      it answers the pointer like one: the house cursor and a fill step on hover,
      and the selected row wears the accent as a left bar plus a tint (two

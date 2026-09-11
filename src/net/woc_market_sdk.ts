@@ -188,6 +188,9 @@ export interface WocSettlementView {
   createdAtMs: number;
 }
 
+/** How a sale closed, for the Sales History tab. */
+export type WocSaleType = 'auction' | 'buy_now' | 'directed';
+
 export interface WocSaleView {
   id: number;
   itemId: string;
@@ -195,6 +198,10 @@ export interface WocSaleView {
   sellerName: string;
   buyerName: string;
   atMs: number;
+  /** The Sales History tab's extra columns, absent from the per-item and
+   *  per-seller reads (which never rendered them) and from an older server. */
+  saleType?: WocSaleType | null;
+  quality?: string;
 }
 
 export interface WocActivityView {
@@ -293,6 +300,17 @@ export interface WocBrowseRequest {
   subcategory: string | null;
   itemIds: readonly string[] | null;
   sort: 'ending' | 'newest' | 'price_asc' | 'price_desc';
+}
+
+/** The Sales History request: the Browse filters minus sort (sales are always
+ *  most-recent-first). `format` filters on the row's sale type. */
+export interface WocRecentSalesRequest {
+  page: number;
+  quality: string | null;
+  format: string | null;
+  category: string | null;
+  subcategory: string | null;
+  itemIds: readonly string[] | null;
 }
 
 /** The seller pane's public profile line, or null when the seller's name no
@@ -506,6 +524,27 @@ export class WocMarketClient {
     const out = await this.request<{ sales: WocSaleView[] }>(
       'GET',
       `/api/woc-market/history/${encodeURIComponent(itemId)}`,
+    );
+    return out.ok ? { ok: true, ...out.data } : out;
+  }
+
+  /** The Sales History tab: every completed sale on the realm, most-recent
+   *  first, paged, with the same Browse filter params (minus sort). Mirrors
+   *  the browse() param idiom: falsy filters and an empty itemIds are omitted
+   *  so an empty list reads as no filter. */
+  async recentSales(
+    req: WocRecentSalesRequest,
+  ): Promise<{ ok: true; hasMore: boolean; page: number; sales: WocSaleView[] } | WocMarketFail> {
+    const params = new URLSearchParams();
+    params.set('page', String(req.page));
+    if (req.quality) params.set('quality', req.quality);
+    if (req.format) params.set('format', req.format);
+    if (req.category) params.set('category', req.category);
+    if (req.subcategory) params.set('subcategory', req.subcategory);
+    if (req.itemIds && req.itemIds.length > 0) params.set('itemIds', req.itemIds.join(','));
+    const out = await this.request<{ hasMore: boolean; page: number; sales: WocSaleView[] }>(
+      'GET',
+      `/api/woc-market/sales?${params.toString()}`,
     );
     return out.ok ? { ok: true, ...out.data } : out;
   }

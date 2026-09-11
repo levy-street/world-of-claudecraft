@@ -1,3 +1,4 @@
+import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
 // Game-client style barrel (declares the @layer order, loads tokens + base, etc.).
 // index.html and play.html both bootstrap through this module, so this one import
@@ -7314,13 +7315,7 @@ function renderClassDetails(
           } else if (secondaryEffect.type === 'absorb') {
             dmgText = formatClassDetailNumber(secondaryEffect.amount);
           } else if (secondaryEffect.type === 'imbue') {
-            // Same rule as ability_description's $d: a coat with a damage
-            // rider reads the rider, not its zero flat swing bonus.
-            dmgText = formatClassDetailNumber(
-              secondaryEffect.coat?.rider === 'stackDot'
-                ? Math.max(1, Math.round(secondaryEffect.coat.perTick))
-                : secondaryEffect.bonus,
-            );
+            dmgText = formatAbilityImbueDamage(secondaryEffect);
           }
         }
       }

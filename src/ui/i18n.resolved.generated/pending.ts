@@ -17,7 +17,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "es_ES": [
     "hudChrome.deeds.accountScopeHint",
@@ -27,7 +38,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "fr_FR": [
     "hudChrome.deeds.accountScopeHint",
@@ -37,7 +59,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "fr_CA": [
     "hudChrome.deeds.accountScopeHint",
@@ -47,7 +80,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "en_CA": [],
   "it_IT": [
@@ -58,7 +102,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "de_DE": [
     "hudChrome.deeds.accountScopeHint",
@@ -68,12 +123,39 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.saleTypeBuyNow"
+  ],
+  "zh_TW": [
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.saleTypeBuyNow"
+  ],
+  "ko_KR": [
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.saleTypeBuyNow"
+  ],
+  "ja_JP": [
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.saleTypeBuyNow"
+  ],
   "pt_BR": [
     "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
@@ -82,9 +164,24 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.saleTypeBuyNow"
+  ],
   "cs_CZ": [
     "hudChrome.deeds.accountScopeHint",
     "hudChrome.deeds.accountScopeNote",
@@ -93,7 +190,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "nl_NL": [
     "hudChrome.deeds.accountScopeHint",
@@ -103,7 +211,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "pl_PL": [
     "hudChrome.deeds.accountScopeHint",
@@ -113,7 +232,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "id_ID": [
     "hudChrome.deeds.accountScopeHint",
@@ -123,7 +253,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "tr_TR": [
     "hudChrome.deeds.accountScopeHint",
@@ -133,7 +274,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "sv_SE": [
     "hudChrome.deeds.accountScopeHint",
@@ -143,7 +295,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "vi_VN": [
     "hudChrome.deeds.accountScopeHint",
@@ -153,7 +316,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ],
   "da_DK": [
     "hudChrome.deeds.accountScopeHint",
@@ -163,6 +337,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.finderWithDate",
     "hudChrome.reliquary.foundBy",
     "hudChrome.reliquary.sharedScopeHint",
-    "hudChrome.reliquary.sharedScopeNote"
+    "hudChrome.reliquary.sharedScopeNote",
+    "hudChrome.wocMarket.colBuyer",
+    "hudChrome.wocMarket.colSalePrice",
+    "hudChrome.wocMarket.colSaleType",
+    "hudChrome.wocMarket.colSoldAt",
+    "hudChrome.wocMarket.historyEmpty",
+    "hudChrome.wocMarket.historyError",
+    "hudChrome.wocMarket.saleTypeAuction",
+    "hudChrome.wocMarket.saleTypeBuyNow",
+    "hudChrome.wocMarket.saleTypeDirected",
+    "hudChrome.wocMarket.saleTypeUnknown",
+    "hudChrome.wocMarket.tabHistory"
   ]
 };

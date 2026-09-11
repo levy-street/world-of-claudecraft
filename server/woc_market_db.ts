@@ -40,6 +40,7 @@ import type {
   WocListingRow,
   WocMarketDb,
   WocSaleRow,
+  WocSalesQuery,
   WocSellerProfile,
   WocSettlementRow,
   WocStrikeRow,
@@ -522,6 +523,18 @@ CREATE TABLE IF NOT EXISTS woc_market_sales (
   excluded BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- The Sales History tab's axes, stamped at the close-tail insert from the
+-- settled listing (which carries quality/category/subcategory) plus a derived
+-- sale_type ('auction' | 'buy_now' | 'directed'). Nullable and additive: rows
+-- written before this shipped carry NULLs and sit OUTSIDE the filtered results
+-- (no backfill, mirroring the pre-enable listing-category convention above;
+-- sale_type is not even derivable post-hoc once the listing prunes). The
+-- realm-wide read filters on these columns exactly as browseListings filters
+-- the listing columns. category/subcategory are filter-only, never on the wire.
+ALTER TABLE woc_market_sales ADD COLUMN IF NOT EXISTS sale_type TEXT;
+ALTER TABLE woc_market_sales ADD COLUMN IF NOT EXISTS quality TEXT;
+ALTER TABLE woc_market_sales ADD COLUMN IF NOT EXISTS category TEXT;
+ALTER TABLE woc_market_sales ADD COLUMN IF NOT EXISTS subcategory TEXT;
 CREATE INDEX IF NOT EXISTS woc_market_sales_item
   ON woc_market_sales(realm, item_id, created_at DESC);
 -- The seller click-through's read (salesForSeller) rides its own index,
@@ -1109,6 +1122,10 @@ function toSale(row: Row): WocSaleRow {
     buyerAccount: row.buyer_account,
     sellerName: row.seller_name,
     buyerName: row.buyer_name,
+    saleType: (row.sale_type as WocSaleRow['saleType']) ?? null,
+    quality: row.quality ?? null,
+    category: row.category ?? null,
+    subcategory: row.subcategory ?? null,
     excluded: row.excluded === true,
     atMs: ms(row.created_at),
   };
@@ -4436,8 +4453,9 @@ export class PgWocMarketDb implements WocMarketDb {
         await client.query(
           `INSERT INTO woc_market_sales (
              realm, listing_id, item_id, item, price_cents, amount_base,
-             seller_account, buyer_account, seller_name, buyer_name
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+             seller_account, buyer_account, seller_name, buyer_name,
+             sale_type, quality, category, subcategory
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
            ON CONFLICT (listing_id) WHERE excluded = false DO NOTHING`,
           [
             args.sale.realm,
@@ -4450,6 +4468,10 @@ export class PgWocMarketDb implements WocMarketDb {
             args.sale.buyerAccount,
             args.sale.sellerName,
             args.sale.buyerName,
+            args.sale.saleType ?? null,
+            args.sale.quality ?? null,
+            args.sale.category ?? null,
+            args.sale.subcategory ?? null,
           ],
         );
         // Close and dispose in ONE statement: two UPDATEs on the same row
@@ -4560,8 +4582,9 @@ export class PgWocMarketDb implements WocMarketDb {
     const res = await this.boundedWrite(
       `INSERT INTO woc_market_sales (
          realm, listing_id, item_id, item, price_cents, amount_base,
-         seller_account, buyer_account, seller_name, buyer_name
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         seller_account, buyer_account, seller_name, buyer_name,
+         sale_type, quality, category, subcategory
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING id`,
       [
         args.realm,
@@ -4574,6 +4597,10 @@ export class PgWocMarketDb implements WocMarketDb {
         args.buyerAccount,
         args.sellerName,
         args.buyerName,
+        args.saleType ?? null,
+        args.quality ?? null,
+        args.category ?? null,
+        args.subcategory ?? null,
       ],
     );
     return Number(res.rows[0].id);
@@ -4597,6 +4624,53 @@ export class PgWocMarketDb implements WocMarketDb {
       [realm, sellerName, limit],
     );
     return res.rows.map(toSale);
+  }
+
+  /** The Sales History tab's realm-wide read: most-recent-first over every
+   *  non-excluded sale, filtered by the Browse axes (over the stamped sale
+   *  columns; a NULL-stamped legacy row sits outside every filter, exactly as
+   *  browseListings' category filter treats an unstamped listing). The filter
+   *  arms mirror browseListings verbatim, `format` matching the stamped
+   *  sale_type. A has-more probe (LIMIT pageSize+1), never a COUNT. */
+  async salesForRealm(
+    realm: string,
+    q: WocSalesQuery,
+  ): Promise<{ rows: WocSaleRow[]; hasMore: boolean }> {
+    const where: string[] = ['realm = $1', 'excluded = false'];
+    const params: unknown[] = [realm];
+    if (q.quality) {
+      params.push(q.quality);
+      where.push(`quality = $${params.length}`);
+    }
+    if (q.format) {
+      params.push(q.format);
+      where.push(`sale_type = $${params.length}`);
+    }
+    if (q.category) {
+      params.push(q.category);
+      where.push(`category = $${params.length}`);
+    }
+    if (q.subcategory) {
+      params.push(q.subcategory);
+      where.push(`subcategory = $${params.length}`);
+    }
+    if (q.itemIds && q.itemIds.length > 0) {
+      params.push(q.itemIds.slice(0, 50));
+      where.push(`item_id = ANY($${params.length})`);
+    }
+    const pageSize = Math.min(Math.max(1, q.pageSize), 50);
+    const offset = Math.max(0, q.page) * pageSize;
+    params.push(pageSize + 1, offset);
+    const res = await this.pool.query(
+      `SELECT * FROM woc_market_sales
+        WHERE ${where.join(' AND ')}
+        ORDER BY created_at DESC, id DESC
+        LIMIT $${params.length - 1} OFFSET $${params.length}`,
+      params,
+    );
+    const hasMore = res.rows.length > pageSize;
+    const rows = (hasMore ? res.rows.slice(0, pageSize) : res.rows).map(toSale);
+    return { rows, hasMore };
   }
 
   async listingItemIdsMissingCategory(): Promise<string[]> {

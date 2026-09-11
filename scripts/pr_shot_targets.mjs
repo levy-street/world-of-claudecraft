@@ -9320,6 +9320,7 @@ export const TARGETS = [
       // Weapon coats decide the whole rogue-poison tooltip family: what the
       // coat does per swing, and whether the row asks for a target at all.
       'sim/combat/poison_coating',
+      'ui/ability_imbue_text',
     ],
     variants: [
       // Every variant enters as the class that OWNS the ability: the standalone
@@ -9345,6 +9346,20 @@ export const TARGETS = [
         charClass: 'rogue',
         charName: 'Nightsliver',
         abilityId: 'deadly_poison',
+        level: 14,
+        talentRow: {},
+        spec: 'assassination',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'deadly-poison-mobile',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'deadly_poison',
+        talentRow: {},
+        spec: 'assassination',
+        beforeLoad: lowGraphicsSeed,
+        mobile: true,
       },
       {
         key: 'nightshade-coating',
@@ -9393,7 +9408,10 @@ export const TARGETS = [
         const player = sim?.player;
         if (!sim || !player) return { known: false };
         sim.setPlayerLevel?.(20, player.id);
-        if (shot.talentRow) sim.applyTalents?.({ spec: null, rows: shot.talentRow }, player.id);
+        if (shot.level) sim.setPlayerLevel?.(shot.level, player.id);
+        if (shot.talentRow) {
+          sim.applyTalents?.({ spec: shot.spec ?? null, rows: shot.talentRow }, player.id);
+        }
         const resolved = sim.resolvedAbility?.(shot.abilityId);
         game.hud.toggleSpellbook?.();
         return { known: !!resolved, abilityName: resolved?.def.name ?? shot.abilityId };
@@ -9410,6 +9428,13 @@ export const TARGETS = [
         row?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
         row?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       }, variant);
+      if (variant.mobile) {
+        await triggerRowBreakdown(
+          page,
+          `.spell-row[data-ability-id="${variant.abilityId}"] .spell-icon`,
+          { key: 'mobile' },
+        );
+      }
       await wait(500);
       const shown = await page.evaluate((shot) => {
         const row = document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`);
@@ -9420,11 +9445,8 @@ export const TARGETS = [
         };
       }, variant);
       if (!shown.row) throw new Error(`no spellbook row for ${variant.abilityId}`);
-      // The hovered tooltip is a POINTER surface: a touch viewport has no hover,
-      // so the mobile variant is about the spellbook ROW reading correctly at
-      // phone width and deliberately makes no tooltip claim. Asserting one there
-      // would fail on a platform difference rather than on a regression.
-      if (!variant.mobile && !shown.tooltip) {
+      // A held touch reveals the same tooltip as a pointer hover.
+      if (!shown.tooltip) {
         throw new Error(`tooltip did not paint for ${variant.abilityId}`);
       }
       // Full frame on purpose: the shared #tooltip renders OUTSIDE #spellbook, so

@@ -1057,8 +1057,9 @@ describe('the :id parameter', () => {
 describe('the route table shape', () => {
   it('gates every route behind a guard, and every mutation behind a limiter too', () => {
     const api = routes.filter((r) => r.surface === 'api');
-    // 22 -> 23 with the seller-history read (the Browse click-through).
-    expect(api).toHaveLength(23);
+    // 22 -> 23 with the seller-history read (the Browse click-through);
+    // 23 -> 24 with the realm-wide sales read (the Sales History tab).
+    expect(api).toHaveLength(24);
     for (const route of api) {
       expect(route.middleware?.length ?? 0, `${route.method} ${route.path}`).toBeGreaterThan(0);
     }

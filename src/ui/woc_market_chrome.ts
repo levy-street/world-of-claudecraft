@@ -74,6 +74,9 @@ export function wocBrowseStripHtml(opts: {
   category: string | null;
   subcategory: string | null;
   itemQuery: string;
+  /** The Sales History tab reuses the whole strip but has no sort control
+   *  (sales are always most-recent-first); false omits it. Default true. */
+  showSort?: boolean;
 }): string {
   const option =
     (selected: string | null) =>
@@ -97,15 +100,19 @@ export function wocBrowseStripHtml(opts: {
           : BROWSE_ARMOR_SLOTS.map((s) => subcategoryOption(s, itemSlotLabel(s))).join('')) +
         `</select></label>`
       : '';
+  const sortSelect =
+    opts.showSort === false
+      ? ''
+      : `<label class="wm-sort">${esc(t('hudChrome.wocMarket.sortLabel'))}` +
+        `<select data-field="sort" ${FOCUS_KEY_ATTR}="wm-sort">` +
+        sortOption('ending', t('hudChrome.wocMarket.sortEnding')) +
+        sortOption('newest', t('hudChrome.wocMarket.sortNewest')) +
+        sortOption('price_asc', t('hudChrome.wocMarket.sortPriceAsc')) +
+        sortOption('price_desc', t('hudChrome.wocMarket.sortPriceDesc')) +
+        `</select></label>`;
   return (
     `<div class="wm-pager">` +
-    `<label class="wm-sort">${esc(t('hudChrome.wocMarket.sortLabel'))}` +
-    `<select data-field="sort" ${FOCUS_KEY_ATTR}="wm-sort">` +
-    sortOption('ending', t('hudChrome.wocMarket.sortEnding')) +
-    sortOption('newest', t('hudChrome.wocMarket.sortNewest')) +
-    sortOption('price_asc', t('hudChrome.wocMarket.sortPriceAsc')) +
-    sortOption('price_desc', t('hudChrome.wocMarket.sortPriceDesc')) +
-    `</select></label>` +
+    sortSelect +
     `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterCategory'))}` +
     `<select data-field="filter-category" ${FOCUS_KEY_ATTR}="wm-filter-category">` +
     categoryOption('', t('hudChrome.wocMarket.filterAny')) +

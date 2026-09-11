@@ -7804,6 +7804,8 @@ export const hudChromeStrings = {
     // "My", said outright: the tab is the viewer's own bids and listings, and
     // the bare "Activity" read as a market-wide feed (Zyzz's dev-test note).
     tabActivity: 'My Activities',
+    // The Sales History tab: every completed sale on the realm, newest first.
+    tabHistory: 'Sales History',
     // The tab strip's own accessible name (the store's 'WOC Store sections'
     // precedent), never the window title twice.
     tabsLabel: '$WOC Exchange sections',
@@ -7851,6 +7853,21 @@ export const hudChromeStrings = {
     colCurrentBid: 'Current bid',
     colBuyNow: 'Buy now',
     colTimeLeft: 'Time left',
+    // The Sales History table columns (Item and Seller reuse the two above).
+    colBuyer: 'Buyer',
+    colSoldAt: 'Sold',
+    colSalePrice: 'Sale price',
+    colSaleType: 'Type',
+    // The sale-type cell values (independent of the filter labels: a filter
+    // reads "Buy now", a completed sale reads its type the same but they
+    // translate separately). An unstamped pre-feature sale reads Unknown.
+    saleTypeAuction: 'Auction',
+    saleTypeBuyNow: 'Buy now',
+    saleTypeDirected: 'Directed',
+    saleTypeUnknown: 'Unknown',
+    // The Sales History faces.
+    historyEmpty: 'No sales recorded yet.',
+    historyError: 'Sales history could not be loaded.',
     reserveMet: 'Reserve met',
     reserveNotMet: 'Reserve not met',
     yourListing: 'Your listing',

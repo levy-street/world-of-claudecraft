@@ -574,6 +574,44 @@ describeDb('woc market realm scoping against real Postgres', () => {
       expect(await marketDb.salesForSeller(alpha, 'S', 10)).toEqual([]);
     }, 20_000);
 
+    it('salesForRealm reads only the realm ledger and drops a voided sale', async () => {
+      const { alpha, beta } = realmPair('sales-realm');
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const sale = async (realm: string): Promise<number> =>
+        marketDb.insertSale({
+          realm,
+          listingId: await seedListing(realm, seller, { status: 'closed', resolution: 'sold' }),
+          itemId: 'crown_of_embers',
+          item: { itemId: 'crown_of_embers', count: 1 },
+          priceCents: 1000,
+          amountBase: null,
+          sellerAccount: seller,
+          buyerAccount: buyer,
+          sellerName: 'S',
+          buyerName: 'B',
+        });
+      const a = await sale(alpha);
+      // Load-bearing by EXISTENCE: the realm-wide read must exclude the beta sale.
+      await sale(beta);
+      const q = {
+        page: 0,
+        pageSize: 10,
+        quality: null,
+        format: null,
+        category: null,
+        subcategory: null,
+        itemIds: null,
+      } as const;
+      const page = await marketDb.salesForRealm(alpha, q);
+      // The exact set is the whole pin: only the alpha sale, and no next page.
+      expect(ids(page.rows)).toEqual([a]);
+      expect(page.hasMore).toBe(false);
+      // The excluded=false arm: a voided sale drops out of the realm list too.
+      expect(await marketDb.setSaleExcluded(a, true)).toBe('ok');
+      expect((await marketDb.salesForRealm(alpha, q)).rows).toEqual([]);
+    }, 20_000);
+
     it('the category backfill stamps pre-round rows and the filter then reaches them', async () => {
       // The dev repro end to end: a row seeded WITHOUT stamps (this suite's
       // seedListing predates the columns, like the live pre-round listings)

@@ -1420,6 +1420,10 @@ const FINALIZE_ARGS = {
     buyerAccount: 2,
     sellerName: 'S',
     buyerName: 'B',
+    saleType: 'auction',
+    quality: 'epic',
+    category: 'weapon',
+    subcategory: 'sword',
   },
 } as const;
 

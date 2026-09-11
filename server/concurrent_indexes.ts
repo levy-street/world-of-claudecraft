@@ -72,6 +72,11 @@ import {
   WOC_MARKET_OPS_CLOSED_INVALID_INDEX_DROP_SQL,
 } from './woc_market_ops_listings_index';
 import {
+  WOC_MARKET_SALES_REALM_INDEX_SQL,
+  WOC_MARKET_SALES_REALM_INVALID_INDEX_CHECK_SQL,
+  WOC_MARKET_SALES_REALM_INVALID_INDEX_DROP_SQL,
+} from './woc_market_sales_realm_index';
+import {
   WOC_MARKET_SALES_SELLER_INDEX_SQL,
   WOC_MARKET_SALES_SELLER_INVALID_INDEX_CHECK_SQL,
   WOC_MARKET_SALES_SELLER_INVALID_INDEX_DROP_SQL,
@@ -202,5 +207,14 @@ export const CONCURRENT_INDEX_MIGRATIONS: readonly ConcurrentIndexMigration[] = 
     createSql: BANK_LEDGER_GUILD_MONEY_INDEX_SQL,
     checkSql: BANK_LEDGER_GUILD_MONEY_INVALID_INDEX_CHECK_SQL,
     dropSql: BANK_LEDGER_GUILD_MONEY_INVALID_INDEX_DROP_SQL,
+  },
+  // The Exchange's realm-wide Sales History read (woc_market_db.ts
+  // salesForRealm). Appended after every prior migration, never moved (the
+  // order is pinned). See woc_market_sales_realm_index.ts.
+  {
+    name: 'woc_market_sales_realm_created',
+    createSql: WOC_MARKET_SALES_REALM_INDEX_SQL,
+    checkSql: WOC_MARKET_SALES_REALM_INVALID_INDEX_CHECK_SQL,
+    dropSql: WOC_MARKET_SALES_REALM_INVALID_INDEX_DROP_SQL,
   },
 ];
