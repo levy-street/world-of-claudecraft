@@ -62,6 +62,7 @@ export const id_ID: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
+      "town": "Town",
       "difficulty": "Tingkat kesulitan",
       "name": "Nama",
       "spec": "Spesialisasi",
@@ -159,6 +160,10 @@ export const id_ID: EnTranslations = {
       "teleport": {
         "label": "Teleportasi",
         "description": "Pindah ke koordinat dunia yang tepat."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Masuk dungeon",

@@ -62,6 +62,7 @@ export const es_ES: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Mazmorra",
+      "town": "Town",
       "difficulty": "Dificultad",
       "name": "Nombre",
       "spec": "Especialización",
@@ -159,6 +160,10 @@ export const es_ES: EnTranslations = {
       "teleport": {
         "label": "Teletransportar",
         "description": "Traslada al jugador a unas coordenadas exactas del mundo."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Entrar en mazmorra",

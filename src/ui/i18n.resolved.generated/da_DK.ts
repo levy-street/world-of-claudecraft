@@ -62,6 +62,7 @@ export const da_DK: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Fangekælder",
+      "town": "Town",
       "difficulty": "Sværhedsgrad",
       "name": "Navn",
       "spec": "Specialisering",
@@ -159,6 +160,10 @@ export const da_DK: EnTranslations = {
       "teleport": {
         "label": "Teleportér",
         "description": "Flyt til præcise verdenskoordinater."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Gå ind i fangekælder",

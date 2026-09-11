@@ -62,6 +62,7 @@ export const it_IT: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
+      "town": "Town",
       "difficulty": "Difficoltà",
       "name": "Nome",
       "spec": "Specializzazione",
@@ -159,6 +160,10 @@ export const it_IT: EnTranslations = {
       "teleport": {
         "label": "Teletrasporta",
         "description": "Sposta il giocatore a coordinate esatte del mondo."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Entra nel dungeon",

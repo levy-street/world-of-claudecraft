@@ -1502,6 +1502,32 @@ export const TARGETS = [
     },
   },
   {
+    key: 'dev-command-travel',
+    label: 'Developer Command Center: the Travel tab (teleport, town hub, dungeon, raid cards)',
+    when: ['ui/dev_command_view.ts', 'ui/dev_command_window.ts', 'sim/dev/town_teleport.ts'],
+    variants: [{ key: 'desktop', beforeLoad: lowGraphicsSeed }],
+    async capture(page) {
+      // The dev GUI is gated on import.meta.env.DEV (the Vite dev client this
+      // rig drives), so toggling it offline is the real player path.
+      const opened = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.hud) return { ok: false, reason: 'offline world is unavailable' };
+        if (!game.hud.toggleDevCommandWindow?.()) {
+          return { ok: false, reason: 'dev commands are unavailable on this client' };
+        }
+        return { ok: true };
+      });
+      if (!opened.ok) return { skip: opened.reason };
+      const ready = await pollForSize(page, '#dev-command-window');
+      if (!ready) return { skip: 'the developer command window never became visible' };
+      await page.evaluate(() => {
+        document.querySelector('[data-dev-category="travel"]')?.click();
+      });
+      await wait(300);
+      return { clip: '#dev-command-window' };
+    },
+  },
+  {
     key: 'event-calendar',
     label: 'Event Calendar window: recurring system-event rows',
     when: ['ui/calendar_view.ts', 'ui/calendar_window.ts'],

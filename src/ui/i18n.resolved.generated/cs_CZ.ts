@@ -62,6 +62,7 @@ export const cs_CZ: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
+      "town": "Town",
       "difficulty": "Obtížnost",
       "name": "Jméno",
       "spec": "Specializace",
@@ -159,6 +160,10 @@ export const cs_CZ: EnTranslations = {
       "teleport": {
         "label": "Teleportovat",
         "description": "Přesuň se na přesné souřadnice světa."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Vstoupit do dungeonu",

@@ -62,6 +62,7 @@ export const zh_TW: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "地城",
+      "town": "Town",
       "difficulty": "難度",
       "name": "名稱",
       "spec": "專精",
@@ -159,6 +160,10 @@ export const zh_TW: EnTranslations = {
       "teleport": {
         "label": "傳送",
         "description": "移動到精確的世界座標。"
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "進入地城",

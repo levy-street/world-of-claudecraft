@@ -62,6 +62,7 @@ export const en_XA: EnTranslations = {
       "x": "[Ẋ]",
       "z": "[Ž]",
       "dungeon": "[Ðúñĝéóñ]",
+      "town": "[Ţóŵñ]",
       "difficulty": "[Ðíƒƒíçúļţý]",
       "name": "[Ñáɱé]",
       "spec": "[Šþéç]",
@@ -159,6 +160,10 @@ export const en_XA: EnTranslations = {
       "teleport": {
         "label": "[Ţéļéþóŕţ]",
         "description": "[Ɱóʋé ţó éẋáçţ ŵóŕļð çóóŕðíñáţéš.]"
+      },
+      "town": {
+        "label": "[Ţóŵñ ĥúƀ]",
+        "description": "[Ţéļéþóŕţ ţó á ţóŵñ ĥúƀ ƀý ñáɱé.]"
       },
       "dungeon": {
         "label": "[Éñţéŕ ðúñĝéóñ]",

@@ -62,6 +62,7 @@ export const sv_SE: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Fängelsehåla",
+      "town": "Town",
       "difficulty": "Svårighetsgrad",
       "name": "Namn",
       "spec": "Specialisering",
@@ -159,6 +160,10 @@ export const sv_SE: EnTranslations = {
       "teleport": {
         "label": "Teleportera",
         "description": "Flytta till exakta världskoordinater."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Gå in i fängelsehåla",

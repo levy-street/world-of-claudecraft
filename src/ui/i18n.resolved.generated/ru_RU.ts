@@ -62,6 +62,7 @@ export const ru_RU: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Подземелье",
+      "town": "Town",
       "difficulty": "Сложность",
       "name": "Имя",
       "spec": "Специализация",
@@ -159,6 +160,10 @@ export const ru_RU: EnTranslations = {
       "teleport": {
         "label": "Телепортироваться",
         "description": "Переместиться в точные координаты мира."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Войти в подземелье",
