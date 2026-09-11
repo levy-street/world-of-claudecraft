@@ -15800,7 +15800,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Spåra {count} tillverkningar av {name} som ditt samlarmål',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Dina träffande närstridsattacker kan ge 50 Styrka i 15 sekunder och hela dig för 200 hälsa. Läkningsmodifierare gäller. Varje träff har 1 % chans per 0,6 sekunder av den anfallande vapnets bashastighet. Ingen intern nedkylning. Varje hand har sin egen förstärkning, upprepade utlösningar förnyar den handen. Distansattacker utlöser inte effekten. Vargform använder sin bashastighet på 1 sekund.',
+    'Dina träffande närstridsattacker kan ge 50 Styrka i 15 sekunder och hela dig för 200 hälsa. Läkningsmodifierare gäller. Varje träff har 1 % chans per 0,6 sekunder av den anfallande vapnets bashastighet. Ingen intern nedkylning. Båda händerna delar en förstärkning; varje utlösning förnyar den och den staplas aldrig. Distansattacker utlöser inte effekten. Vargform använder sin bashastighet på 1 sekund.',
   'hudChrome.enchantName.enchant_chest_armor': 'Bröstetsning: Förstärkning',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Bröstetsning: Större uthållighet',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Bröstetsning: Lysande uthållighet',

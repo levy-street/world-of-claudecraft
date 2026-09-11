@@ -15700,7 +15700,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButton': 'Sledovat',
   'hudChrome.crafting.trackGoalButtonAria': 'Sledovat {count} výrob {name} jako cíl sběru',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Zásahy zblízka, které zasáhnou cíl, ti mohou dát 50 Síly na 15 s a vyléčit 200 zdraví. Platí modifikátory léčení. Každý zásah má šanci 1 % za 0,6 s základní rychlosti úderu použité zbraně. Neexistuje interní cooldown. Každá ruka má vlastní bonus a opakované spuštění obnoví jeho trvání. Útoky na dálku tento efekt nespouštějí. Vlčí forma místo toho používá základní rychlost úderu 1 s.',
+    'Zásahy zblízka, které zasáhnou cíl, ti mohou dát 50 Síly na 15 s a vyléčit 200 zdraví. Platí modifikátory léčení. Každý zásah má šanci 1 % za 0,6 s základní rychlosti úderu použité zbraně. Neexistuje interní cooldown. Obě ruce sdílejí jeden bonus; každé spuštění obnoví jeho trvání a bonus se nikdy nesčítá. Útoky na dálku tento efekt nespouštějí. Vlčí forma místo toho používá základní rychlost úderu 1 s.',
   'hudChrome.enchantName.enchant_chest_armor': 'Rytina na hrudi: Zpevnění',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Rytina na hrudi: Větší výdrž',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Rytina na hrudi: Zářivá výdrž',

@@ -4281,7 +4281,7 @@ export const id_ID: EnTranslations = {
       "enchant_lucent_infusion": "Infusi Bercahaya"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Serangan jarak dekatmu yang mengenai target dapat memberi 50 Kekuatan selama 15 dtk dan memulihkan 200 kesehatanmu. Pengubah penyembuhan berlaku. Setiap serangan memiliki peluang 1% per 0,6 dtk kecepatan dasar senjata yang menyerang. Tanpa cooldown internal. Setiap tangan memiliki buff sendiri; pemicu berulang menyegarkan buff tangan itu. Serangan jarak jauh tidak memicu efek ini. Bentuk Serigala menggunakan kecepatan ayunan dasar 1 dtk sebagai gantinya."
+      "enchant_weapon_lastflame_zeal": "Serangan jarak dekatmu yang mengenai target dapat memberi 50 Kekuatan selama 15 dtk dan memulihkan 200 kesehatanmu. Pengubah penyembuhan berlaku. Setiap serangan memiliki peluang 1% per 0,6 dtk kecepatan dasar senjata yang menyerang. Tanpa cooldown internal. Kedua tangan berbagi satu buff; setiap pemicu menyegarkannya dan buff ini tidak pernah bertumpuk. Serangan jarak jauh tidak memicu efek ini. Bentuk Serigala menggunakan kecepatan ayunan dasar 1 dtk sebagai gantinya."
     },
     "professions": {
       "title": "Profesi",

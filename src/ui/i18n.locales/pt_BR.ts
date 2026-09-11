@@ -13807,7 +13807,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Acompanhar {count} criações de {name} como meta de coleta',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Seus ataques corpo a corpo que acertarem podem conceder 50 de Força por 15 s e curar 200 de vida. Modificadores de cura se aplicam. Cada golpe tem 1% de chance por 0,6 s da velocidade-base da arma. Não há recarga interna. Cada mão tem seu próprio benefício; novos acionamentos renovam o benefício daquela mão. Ataques à distância não acionam este efeito. Forma de Lobo usa sua velocidade-base de ataque de 1 s.',
+    'Seus ataques corpo a corpo que acertarem podem conceder 50 de Força por 15 s e curar 200 de vida. Modificadores de cura se aplicam. Cada golpe tem 1% de chance por 0,6 s da velocidade-base da arma. Não há recarga interna. As duas mãos compartilham um único benefício; qualquer acionamento o renova e ele nunca acumula. Ataques à distância não acionam este efeito. Forma de Lobo usa sua velocidade-base de ataque de 1 s.',
   'hudChrome.enchantName.enchant_chest_armor': 'Gravura de peito: Reforço',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Gravura de peito: Vigor Maior',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Gravura de peito: Vigor Luminoso',

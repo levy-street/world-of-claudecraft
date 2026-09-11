@@ -4281,7 +4281,7 @@ export const de_DE: EnTranslations = {
       "enchant_lucent_infusion": "Leuchtende Infusion"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Deine erfolgreichen Nahkampfangriffe können 50 Stärke für 15 Sek. gewähren und dich um 200 Gesundheit heilen. Heilmodifikatoren gelten. Jeder Treffer würfelt 1 % pro 0,6 Sek. der Grundgeschwindigkeit der angreifenden Waffe. Keine interne Abklingzeit. Jede Hand hat ihre eigene Stärkung; wiederholte Auslösungen erneuern diese Hand. Fernkampfangriffe lösen diesen Effekt nicht aus. Wolfsform verwendet stattdessen ihre Grundschwunggeschwindigkeit von 1 Sek."
+      "enchant_weapon_lastflame_zeal": "Deine erfolgreichen Nahkampfangriffe können 50 Stärke für 15 Sek. gewähren und dich um 200 Gesundheit heilen. Heilmodifikatoren gelten. Jeder Treffer würfelt 1 % pro 0,6 Sek. der Grundgeschwindigkeit der angreifenden Waffe. Keine interne Abklingzeit. Beide Hände teilen sich eine Stärkung; jede Auslösung erneuert sie, und sie stapelt sich nie. Fernkampfangriffe lösen diesen Effekt nicht aus. Wolfsform verwendet stattdessen ihre Grundschwunggeschwindigkeit von 1 Sek."
     },
     "professions": {
       "title": "Berufe",

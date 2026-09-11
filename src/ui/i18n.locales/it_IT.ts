@@ -13886,7 +13886,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Segui {count} creazioni di {name} come obiettivo di raccolta',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'I tuoi attacchi in mischia che colpiscono possono concedere 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori di cura. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma. Nessun tempo di recupero interno. Ogni mano ha il proprio beneficio; i nuovi attivamenti lo rinnovano. Gli attacchi a distanza non attivano l’effetto. Forma di Lupo usa invece la sua velocità base di 1 s.',
+    'I tuoi attacchi in mischia che colpiscono possono concedere 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori di cura. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano l’effetto. Forma di Lupo usa invece la sua velocità base di 1 s.',
   'hudChrome.enchantName.enchant_chest_armor': 'Incisione del petto: Rinforzo',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Incisione del petto: Vigore superiore',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Incisione del petto: Vigore lucente',

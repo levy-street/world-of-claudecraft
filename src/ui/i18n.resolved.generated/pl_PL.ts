@@ -4281,7 +4281,7 @@ export const pl_PL: EnTranslations = {
       "enchant_lucent_infusion": "Świetlisty Wlew"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Twoje trafione ataki wręcz mogą dać 50 Siły na 15 sek. i uleczyć cię o 200 zdrowia. Stosują się modyfikatory leczenia. Każde trafienie ma 1% szansy na każde 0,6 sek. bazowej szybkości atakującej broni. Brak wewnętrznego czasu odnowienia. Każda ręka ma własne wzmocnienie, a kolejne uruchomienia odnawiają tę rękę. Ataki dystansowe nie uruchamiają tego efektu. Forma Wilka używa bazowej szybkości ataku 1 sek."
+      "enchant_weapon_lastflame_zeal": "Twoje trafione ataki wręcz mogą dać 50 Siły na 15 sek. i uleczyć cię o 200 zdrowia. Stosują się modyfikatory leczenia. Każde trafienie ma 1% szansy na każde 0,6 sek. bazowej szybkości atakującej broni. Brak wewnętrznego czasu odnowienia. Obie ręce dzielą jedno wzmocnienie; każde uruchomienie je odnawia i nigdy się nie kumuluje. Ataki dystansowe nie uruchamiają tego efektu. Forma Wilka używa bazowej szybkości ataku 1 sek."
     },
     "professions": {
       "title": "Zawody",

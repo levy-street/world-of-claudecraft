@@ -4281,7 +4281,7 @@ export const sv_SE: EnTranslations = {
       "enchant_lucent_infusion": "Lysande infusion"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Dina träffande närstridsattacker kan ge 50 Styrka i 15 sekunder och hela dig för 200 hälsa. Läkningsmodifierare gäller. Varje träff har 1 % chans per 0,6 sekunder av den anfallande vapnets bashastighet. Ingen intern nedkylning. Varje hand har sin egen förstärkning, upprepade utlösningar förnyar den handen. Distansattacker utlöser inte effekten. Vargform använder sin bashastighet på 1 sekund."
+      "enchant_weapon_lastflame_zeal": "Dina träffande närstridsattacker kan ge 50 Styrka i 15 sekunder och hela dig för 200 hälsa. Läkningsmodifierare gäller. Varje träff har 1 % chans per 0,6 sekunder av den anfallande vapnets bashastighet. Ingen intern nedkylning. Båda händerna delar en förstärkning; varje utlösning förnyar den och den staplas aldrig. Distansattacker utlöser inte effekten. Vargform använder sin bashastighet på 1 sekund."
     },
     "professions": {
       "title": "Yrken",
