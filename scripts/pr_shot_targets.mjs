@@ -15810,6 +15810,138 @@ export const TARGETS = [
     },
   },
   {
+    key: 'nythraxis-sigil-side',
+    label:
+      "Nythraxis arena: the Binding Sigil beside the boss on the raid's right, and a " +
+      'targeted ward spike whose health bar reads as hits remaining',
+    when: ['sim/nythraxis_binding_sigil', 'nythraxis_sigil_core', 'nythraxis_sigil_visual'],
+    // A live cast, not a staged fixture: the practice raid is pulled with a
+    // bot holding aggro, one spike wave is poked and one sigil, then the tick
+    // is frozen and the tester targets a spike so the target frame shows the
+    // hit-count pool. Lowest preset per the standing capture rule.
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      let staged = { ok: false, reason: 'world is unavailable' };
+      for (let i = 0; i < 20 && !staged.ok; i++) {
+        staged = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+          document.querySelector('#gpu-notice')?.remove();
+          document.querySelector('.camera-prompt-confirm')?.click();
+          const banner = document.querySelector('#banner');
+          if (banner) banner.style.opacity = '0';
+          document.querySelector('.tut-card')?.remove();
+          document.getElementById('tutorial-greeting')?.remove();
+          const loot = document.querySelector('#loot-settings-window');
+          if (loot) loot.style.display = 'none';
+          sim.chat('/dev nythraxisraid normal');
+          const player = sim.player;
+          const bossCandidates = [...sim.entities.values()].filter(
+            (e) => e.templateId === 'nythraxis_scourge_of_thornpeak' && !e.dead,
+          );
+          if (bossCandidates.length === 0) return { ok: false, reason: 'Nythraxis did not spawn' };
+          const boss = bossCandidates.reduce((closest, candidate) => {
+            const d = (a) => (a.pos.x - player.pos.x) ** 2 + (a.pos.z - player.pos.z) ** 2;
+            return d(candidate) < d(closest) ? candidate : closest;
+          });
+          const bots = [...sim.players.values()]
+            .filter((meta) => meta.isDevBot && /^NythraxisBot\d$/.test(meta.name))
+            .map((meta) => sim.entities.get(meta.entityId))
+            .filter((e) => e && !e.dead);
+          if (bots.length < 3) return { ok: false, reason: 'practice bots did not spawn' };
+          const bx = boss.pos.x;
+          const bz = boss.pos.z;
+          const [tankBot, ...lineBots] = bots;
+          tankBot.pos = { x: bx, y: tankBot.pos.y, z: bz - 5 };
+          tankBot.prevPos = { ...tankBot.pos };
+          sim.rebucket(tankBot);
+          lineBots.forEach((bot, index) => {
+            bot.pos = { x: bx + (index - 3.5) * 3, y: bot.pos.y, z: bz - 12 };
+            bot.prevPos = { ...bot.pos };
+            bot.facing = 0;
+            sim.rebucket(bot);
+          });
+          player.pos = { x: bx, y: player.pos.y, z: bz - 30 };
+          player.prevPos = { ...player.pos };
+          player.facing = 0;
+          sim.rebucket(player);
+          boss.inCombat = true;
+          boss.aiState = 'attack';
+          boss.aggroTargetId = tankBot.id;
+          boss.threat.set(tankBot.id, 100000);
+          return { ok: true };
+        });
+        if (!staged.ok) await wait(300);
+      }
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(1500);
+      await page.evaluate(() => {
+        window.__game.sim.chat('/dev nyx spike');
+        window.__game.sim.chat('/dev nyx sigil');
+      });
+      let ready = { ok: false, reason: 'no spike or sigil' };
+      for (let i = 0; i < 12 && !ready.ok; i++) {
+        await wait(400);
+        ready = await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+          const spikes = [...sim.entities.values()].filter(
+            (e) => e.templateId === 'nythraxis_bone_spike' && !e.dead,
+          );
+          const sigils = sim.activeNythraxisBindingSigils ?? [];
+          if (spikes.length < 2 || sigils.length < 1)
+            return { ok: false, reason: `spikes ${spikes.length} sigils ${sigils.length}` };
+          return { ok: true };
+        });
+      }
+      if (!ready.ok) throw new Error(ready.reason);
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game.sim;
+        sim.tick = () => [];
+        const player = sim.player;
+        const boss = [...sim.entities.values()].find(
+          (e) => e.templateId === 'nythraxis_scourge_of_thornpeak' && !e.dead,
+        );
+        const spike = [...sim.entities.values()].find(
+          (e) => e.templateId === 'nythraxis_bone_spike' && !e.dead,
+        );
+        // The tester targets a spike so the target frame shows the ward pool.
+        if (spike) player.targetId = spike.id;
+        const bx = boss.pos.x;
+        const bz = boss.pos.z;
+        // High and wide from behind the raid so the sigil (22 yd to the
+        // raid's right of the boss, world -x, which reads on the screen's
+        // right when looking up the hall), the spike line, and the boss
+        // share one frame.
+        player.pos = { x: bx - 6, y: player.pos.y, z: bz - 34 };
+        player.prevPos = { ...player.pos };
+        player.facing = Math.atan2(bx - player.pos.x, bz - player.pos.z);
+        sim.rebucket(player);
+        game.input.camYaw = player.facing;
+        game.input.camDist = 30;
+        game.input.camPitch = 0.55;
+      });
+      await awaitWorldPainted(page);
+      await wait(1500);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-card')?.remove();
+        document.getElementById('tutorial-greeting')?.remove();
+        const loot = document.querySelector('#loot-settings-window');
+        if (loot) loot.style.display = 'none';
+      });
+      await wait(300);
+      return {};
+    },
+  },
+  {
     key: 'rift-forge',
     label: 'Rift Forge: the Riftwright in Gullhaven and the forge window',
     when: ['ui/hud/rift_forge/', 'sim/rift/forge_gate', 'content/farshore.ts'],

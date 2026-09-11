@@ -209,11 +209,12 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
       nythraxis.updateNythraxisEncounter(ctx, boss);
       const sigil = st.sigil!;
       expect(sigil, difficulty).toBeTruthy();
-      // The first cast lands on the raid's right, the side offset out along
-      // the hall's x axis at the boss's own z (v0.42.2).
-      expect(sigil.x, difficulty).toBeCloseTo(boss.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+      // The first cast lands on the raid's right (world -x, see
+      // nythraxisSigilNextSide), the side offset out along the hall's x axis
+      // at the boss's own z (v0.42.2).
+      expect(sigil.x, difficulty).toBeCloseTo(boss.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
       expect(sigil.z, difficulty).toBeCloseTo(boss.pos.z, 6);
-      expect(st.sigilSide, difficulty).toBe(1);
+      expect(st.sigilSide, difficulty).toBe(-1);
       for (const ward of wards()) {
         expect(flat(ward.pos, sigil), difficulty).toBeGreaterThanOrEqual(
           NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE,
@@ -247,17 +248,17 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
 
   it('alternates sides across casts and routes around a wardstone through the real driver', () => {
     const { sim, ctx, boss, st, wards } = setup();
-    // Park the boss so the raid's-right primary spot sits ON a wardstone
-    // (the eastern stone at local (30, 74)): the pick walks the ladder on the
-    // same side instead of landing on the stone.
-    const east = wards().find((w) => w.pos.x > boss.spawnPos.x + 10)!;
-    teleport(sim, boss, east.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, east.pos.z, boss.pos.y);
+    // Park the boss so the raid's-right (world -x) primary spot sits ON a
+    // wardstone (the western stone at local (-30, 74)): the pick walks the
+    // ladder on the same side instead of landing on the stone.
+    const west = wards().find((w) => w.pos.x < boss.spawnPos.x - 10)!;
+    teleport(sim, boss, west.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, west.pos.z, boss.pos.y);
     st.sigilTimer = DT / 2;
     nythraxis.updateNythraxisEncounter(ctx, boss);
     const first = st.sigil!;
     expect(first).toBeTruthy();
-    expect(st.sigilSide).toBe(1);
-    expect(first.x).toBeCloseTo(boss.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(st.sigilSide).toBe(-1);
+    expect(first.x).toBeCloseTo(boss.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
     expect(first.z).not.toBeCloseTo(boss.pos.z, 3);
     for (const ward of wards()) expect(flat(ward.pos, first)).toBeGreaterThanOrEqual(6);
     // The next cast takes the other side.
@@ -266,8 +267,8 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     st.majorGapTimer = 0;
     nythraxis.updateNythraxisEncounter(ctx, boss);
     const second = st.sigil!;
-    expect(st.sigilSide).toBe(-1);
-    expect(second.x).toBeCloseTo(boss.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
+    expect(st.sigilSide).toBe(1);
+    expect(second.x).toBeCloseTo(boss.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET, 6);
   });
 
   it('places several driver casts on real open arena floor with two yard bounds clearance', () => {
@@ -308,7 +309,7 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     const flameAt = (boss: Entity) => ({
       seq: 0,
       kind: 'grave' as const,
-      x: boss.pos.x + NYTHRAXIS_SIGIL_SIDE_OFFSET,
+      x: boss.pos.x - NYTHRAXIS_SIGIL_SIDE_OFFSET,
       z: boss.pos.z,
       radius: 3,
       remaining: 10,

@@ -66,6 +66,7 @@ export const NYTHRAXIS_SIGIL_SIDE_OFFSET = 22;
 export const NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR = 16;
 /** Fallback nudges along the hall axis, tried in this order at each offset. */
 export const NYTHRAXIS_SIGIL_SIDE_NUDGES_Z: readonly number[] = [0, 6, -6, 12, -12, 18, -18];
+/** +1 = world +x (the raid's left facing the dais), -1 = world -x (its right). */
 export type NythraxisSigilSide = 1 | -1;
 export const NYTHRAXIS_SIGIL_RADIUS_NORMAL = 4;
 export const NYTHRAXIS_SIGIL_RADIUS_HEROIC = 3;
@@ -173,9 +174,14 @@ export function nythraxisSigilCandidate(
   return { x: boss.x + side * offset, z: boss.z + nudge };
 }
 
-/** The side the next cast lands on: the raid's right (+x) first, then alternating. */
+/**
+ * The side the next cast lands on, alternating from the raid's right. Side
+ * +1 is world +x and -1 is world -x; the raid enters facing the dais along
+ * +z, and a camera looking along +z has world +x on the LEFT of the screen,
+ * so the raid's right is -1. The first cast lands there.
+ */
 export function nythraxisSigilNextSide(previous: NythraxisSigilSide | null): NythraxisSigilSide {
-  return previous === null ? 1 : previous === 1 ? -1 : 1;
+  return previous === null ? -1 : previous === 1 ? -1 : 1;
 }
 
 /** True when a sigil of `radius` at `point` obeys every placement rule. */

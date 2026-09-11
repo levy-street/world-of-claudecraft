@@ -5766,8 +5766,9 @@ export interface NythraxisEncounterState {
   // gap timer that keeps the body-owning majors (Deathless Rage, the sigil
   // drag) from overlapping (nythraxis_binding_sigil.ts).
   sigilTimer?: number;
-  // The side the LAST sigil landed on (+1 the raid's right, -1 its left);
-  // null before the first cast. The next cast takes the other side.
+  // The side the LAST sigil landed on (+1 world +x, the raid's left facing
+  // the dais; -1 world -x, its right); null before the first cast. The next
+  // cast takes the other side.
   sigilSide?: 1 | -1 | null;
   sigil?: {
     castKey: number;

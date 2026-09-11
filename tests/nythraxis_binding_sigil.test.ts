@@ -88,10 +88,10 @@ describe('Nythraxis Binding Sigil', () => {
     );
   });
 
-  it("alternates sides every cast, starting on the raid's right", () => {
-    expect(nythraxisSigilNextSide(null)).toBe(1);
-    expect(nythraxisSigilNextSide(1)).toBe(-1);
+  it("alternates sides every cast, starting on the raid's right (world -x)", () => {
+    expect(nythraxisSigilNextSide(null)).toBe(-1);
     expect(nythraxisSigilNextSide(-1)).toBe(1);
+    expect(nythraxisSigilNextSide(1)).toBe(-1);
   });
 
   it('rejects blocked floor, wardstone clearance, and (on normal) live fire', () => {
