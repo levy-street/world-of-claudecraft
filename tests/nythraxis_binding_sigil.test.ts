@@ -80,12 +80,13 @@ describe('Nythraxis Binding Sigil', () => {
         ).toEqual({ x: BOSS.x + side * NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR, z: BOSS.z + nudge });
       });
     }
-    // No hash, no rng: the same inputs always give the same spot, and the two
-    // sides mirror each other across the boss.
-    expect(nythraxisSigilCandidate(3, BOSS, 1)).toEqual(nythraxisSigilCandidate(3, BOSS, 1));
-    expect(nythraxisSigilCandidate(3, BOSS, -1).x - BOSS.x).toBe(
-      -(nythraxisSigilCandidate(3, BOSS, 1).x - BOSS.x),
-    );
+    // The two sides mirror each other across the boss in x and share z.
+    for (let attempt = 0; attempt < NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.length * 2; attempt++) {
+      const right = nythraxisSigilCandidate(attempt, BOSS, -1);
+      const left = nythraxisSigilCandidate(attempt, BOSS, 1);
+      expect(right.x - BOSS.x).toBe(-(left.x - BOSS.x));
+      expect(right.z).toBe(left.z);
+    }
   });
 
   it("alternates sides every cast, starting on the raid's right (world -x)", () => {
@@ -143,6 +144,25 @@ describe('Nythraxis Binding Sigil', () => {
     expect(Math.hypot(nowhere.x - BOSS.x, nowhere.z - BOSS.z)).toBe(NYTHRAXIS_SIGIL_SIDE_OFFSET);
     // The other side mirrors.
     expect(nythraxisSigilPlacement(BOSS, -1, 4, OPEN, false)).toEqual(
+      nythraxisSigilCandidate(0, BOSS, -1),
+    );
+    // Every rung at the full offset blocked by a wardstone: the pick steps in
+    // to the near offset on the same side, at the boss's own z.
+    const outerBlocked = {
+      ...OPEN,
+      wardstones: NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.map((_, attempt) =>
+        nythraxisSigilCandidate(attempt, BOSS, 1),
+      ),
+    };
+    expect(nythraxisSigilPlacement(BOSS, 1, 4, outerBlocked, false)).toEqual({
+      x: BOSS.x + NYTHRAXIS_SIGIL_SIDE_OFFSET_NEAR,
+      z: BOSS.z,
+    });
+    // The whole asked side closed (the boss parked against that wall): the
+    // mirrored ladder on the other side lands the sigil instead of stranding
+    // the bind on an unreachable point.
+    const rightWall = { ...OPEN, openFloor: (p: { x: number }) => p.x < BOSS.x + 1 };
+    expect(nythraxisSigilPlacement(BOSS, 1, 4, rightWall, false)).toEqual(
       nythraxisSigilCandidate(0, BOSS, -1),
     );
   });

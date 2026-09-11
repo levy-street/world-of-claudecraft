@@ -15395,7 +15395,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Vazebná pečeť (přetáhni bosse na pečeť, jinak raid zaplatí)',
   'hudChrome.finder.mech.bone_spike':
-    'Kostěný bodec (nabodnutí raideři slábnou, dokud není bodec zničen)',
+    'Kostěný bodec (nabodnutí hráči ztrácejí zdraví, dokud někdo bodec pár zásahy neroztříští)',
   'hudChrome.finder.mech.bone_storm': 'Kostěná bouře (ignoruje hrozbu, víří a útočí na raid)',
   'hudChrome.finder.mech.crown_endures': 'Koruna vytrvá (tvrdé rozzuření v 6:00, heroic 5:00)',
   'hudChrome.finder.mech.deathless_court':

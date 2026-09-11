@@ -15526,7 +15526,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Bağlama Mührü (bossu mührün üzerine sürükle, yoksa akın bedel öder)',
   'hudChrome.finder.mech.bone_spike':
-    'Kemik Dikeni (saplanan akıncılar diken yok edilene kadar tükenir)',
+    'Kemik Dikeni (şişlenen oyuncular, biri dikeni birkaç vuruşla parçalayana dek can kaybeder)',
   'hudChrome.finder.mech.bone_storm':
     'Kemik Fırtınası (tehdidi yok sayar, döner ve akına hücum eder)',
   'hudChrome.finder.mech.crown_endures': 'Taç Dayanır (6:00’da sert öfke, heroic 5:00)',

@@ -15814,7 +15814,12 @@ export const TARGETS = [
     label:
       "Nythraxis arena: the Binding Sigil beside the boss on the raid's right, and a " +
       'targeted ward spike whose health bar reads as hits remaining',
-    when: ['sim/nythraxis_binding_sigil', 'nythraxis_sigil_core', 'nythraxis_sigil_visual'],
+    when: [
+      'sim/nythraxis_binding_sigil',
+      'nythraxis_sigil_core',
+      'nythraxis_sigil_visual',
+      'sim/nythraxis_bone_spike',
+    ],
     // A live cast, not a staged fixture: the practice raid is pulled with a
     // bot holding aggro, one spike wave is poked and one sigil, then the tick
     // is frozen and the tester targets a spike so the target frame shows the

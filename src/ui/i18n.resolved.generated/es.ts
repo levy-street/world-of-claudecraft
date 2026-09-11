@@ -4860,7 +4860,7 @@ export const es: EnTranslations = {
         "deathless_rage": "Furia Inmortal (se interrumpe en las piedras de guardia)",
         "wardstones": "Canalizacion de piedras de guardia (transicion de fase)",
         "dread_curse": "Maldición pavorosa (perjuicio acumulativo para cambiar de tanque, cambia con 2 acumulaciones)",
-        "bone_spike": "Púa ósea (los miembros empalados se desangran hasta que se destruye la púa)",
+        "bone_spike": "Púa ósea (los jugadores empalados pierden vida hasta que alguien rompe la púa con unos pocos golpes)",
         "grave_eruption": "Erupción sepulcral (círculos de aviso que dejan suelo ardiente)",
         "binding_sigil": "Sigilo vinculante (arrastra al jefe hasta el sigilo o la banda lo pagará)",
         "kings_wrath": "Ira del rey (30%: bonificación de daño permanente, peligros del suelo más rápidos)",

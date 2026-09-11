@@ -4860,7 +4860,7 @@ export const pt_BR: EnTranslations = {
         "deathless_rage": "Fúria Imortal (interrompida nas pedras de guarda)",
         "wardstones": "Canalizações das pedras de guarda (transição de fase)",
         "dread_curse": "Maldição do Pavor (penalidade cumulativa para troca de tanque; troque com 2 acúmulos)",
-        "bone_spike": "Espinho ósseo (raiders empalados drenam até o espinho ser destruído)",
+        "bone_spike": "Espinho ósseo (jogadores empalados perdem vida até que alguém despedace o espinho com alguns acertos)",
         "grave_eruption": "Erupção sepulcral (círculos de aviso que deixam chão ardente)",
         "binding_sigil": "Selo vinculante (arraste o chefe até o selo ou a raide paga o preço)",
         "kings_wrath": "Ira do rei (30%: bônus permanente de dano, perigos no chão mais rápidos)",

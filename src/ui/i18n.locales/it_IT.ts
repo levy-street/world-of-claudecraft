@@ -16406,7 +16406,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     "Sigillo vincolante (trascina il boss sul sigillo o l'incursione ne paga il prezzo)",
   'hudChrome.finder.mech.bone_spike':
-    'Spina ossea (i membri impalati si dissanguano finché la spina non viene distrutta)',
+    'Spina ossea (i giocatori impalati perdono salute finché qualcuno non frantuma la spina con pochi colpi)',
   'hudChrome.finder.mech.bone_storm':
     "Tempesta d'ossa (ignora la minaccia, vortica e carica l'incursione)",
   'hudChrome.finder.mech.crown_endures': 'La Corona perdura (enrage rigido a 6:00, 5:00 in eroica)',

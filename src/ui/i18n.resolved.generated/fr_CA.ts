@@ -4860,7 +4860,7 @@ export const fr_CA: EnTranslations = {
         "deathless_rage": "Fureur immortelle (interrompue aux pierres de garde)",
         "wardstones": "Canaux des pierres de garde (transition de phase)",
         "dread_curse": "Malédiction d’effroi (héroïque seulement, affaiblissement cumulatif pour échange de tank)",
-        "bone_spike": "Pointe d'os (les membres empalés se vident jusqu'à la destruction de la pointe)",
+        "bone_spike": "Pointe d'os (les joueurs empalés perdent de la vie jusqu'à ce que quelqu'un brise la pointe en quelques coups)",
         "grave_eruption": "Éruption sépulcrale (cercles d'avertissement qui laissent un sol brûlant)",
         "binding_sigil": "Sceau de lien (faites glisser le boss sur le sceau, sinon le raid le paie)",
         "kings_wrath": "Courroux du roi (30% : bonus de dégâts permanent, dangers au sol plus rapides)",

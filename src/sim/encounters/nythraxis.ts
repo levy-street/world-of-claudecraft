@@ -153,12 +153,10 @@ import {
   pointInNythraxisGraveCircle,
 } from '../nythraxis_grave_eruption';
 import {
-  igniteNythraxisGravefire,
   NYTHRAXIS_GRAVEFIRE_CAST_ID,
   NYTHRAXIS_GRAVEFIRE_FIRST_SECONDS,
   NYTHRAXIS_GRAVEFIRE_TICK_SECONDS,
   nythraxisGravefireBurnSeconds,
-  nythraxisGravefireCadence,
   nythraxisGravefireExtent,
   nythraxisGravefireTickMaxHp,
   pointInNythraxisGravefire,
@@ -172,7 +170,6 @@ import {
   nythraxisPhaseThreeReady,
   nythraxisWrathCadence,
   nythraxisWrathGraveEruptionEvery,
-  nythraxisWrathGravefireEvery,
 } from '../nythraxis_kings_wrath';
 import {
   hasInteractObjectCredit,
@@ -2051,13 +2048,13 @@ export function updateNythraxisBoneStorm(
     const target = ctx.entities.get(storm.chargeTargetId);
     if (!target || target.dead) {
       // The runner fell: he slams where he stands and looks for the next.
-      slamNythraxisBoneStorm(ctx, boss, st, room, boss.pos);
+      slamNythraxisBoneStorm(ctx, boss, st, room);
     } else {
       boss.aggroTargetId = target.id;
       boss.facing = angleTo(boss.pos, target.pos);
       ctx.moveToward(boss, target.pos, boss.moveSpeed * NYTHRAXIS_BONE_STORM_SPEED_MULT);
       if (nythraxisBoneStormReached(boss.pos, target.pos)) {
-        slamNythraxisBoneStorm(ctx, boss, st, room, target.pos);
+        slamNythraxisBoneStorm(ctx, boss, st, room);
       }
     }
   }
@@ -2076,7 +2073,6 @@ function slamNythraxisBoneStorm(
   boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
   room: readonly Entity[],
-  toward: Vec3,
 ): void {
   const ms = nythraxisMechanicState(st);
   const storm = ms.boneStorm;
@@ -2108,8 +2104,6 @@ function slamNythraxisBoneStorm(
     fx: 'nova',
     ability: NYTHRAXIS_BONE_SLAM_CAST_ID,
   });
-  // The slam used to run a Gravefire line on down the charge; retired with
-  // Gravefire in v0.42.2, so the slam is the burst alone.
 }
 
 /** The storm ends: threat table intact, the top-threat tank picks him up. */

@@ -15455,7 +15455,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Bindingssigil (træk bossen hen på sigillet, ellers betaler raidet)',
   'hudChrome.finder.mech.bone_spike':
-    'Knoglespyd (spiddede raiddeltagere drænes, indtil spyddet ødelægges)',
+    'Knoglespyd (spiddede spillere mister liv, indtil nogen splintrer spyddet med et par træffere)',
   'hudChrome.finder.mech.bone_storm':
     'Knoglestorm (han ignorerer trussel, hvirvler og stormer mod raidet)',
   'hudChrome.finder.mech.crown_endures': 'Kronen holder stand (hård rasen ved 6:00, heroic 5:00)',

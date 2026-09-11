@@ -4860,7 +4860,7 @@ export const de_DE: EnTranslations = {
         "deathless_rage": "Unsterbliche Raserei (an den Schutzsteinen unterbrochen)",
         "wardstones": "Schutzstein-Kanale (Phasenubergang)",
         "dread_curse": "Schreckensfluch (stapelnder Schwächungseffekt für Tankwechsel, bei 2 Stapeln wechseln)",
-        "bone_spike": "Knochenspieß (aufgespießte Schlachtzügler verlieren Leben, bis der Spieß zerstört ist)",
+        "bone_spike": "Knochenspieß (aufgespießte Spieler verlieren Leben, bis jemand den Spieß mit ein paar Treffern zerbricht)",
         "grave_eruption": "Graberuption (Warnkreise, die brennenden Boden hinterlassen)",
         "binding_sigil": "Bindungssiegel (zieht den Boss auf das Siegel, sonst bezahlt der Schlachtzug)",
         "kings_wrath": "Zorn des Königs (30%: dauerhafter Schadensbonus, schnellere Bodengefahren)",

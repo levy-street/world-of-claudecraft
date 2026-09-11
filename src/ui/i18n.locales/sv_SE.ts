@@ -15488,7 +15488,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Bindningssigill (dra bossen till sigillet, annars får raiden betala)',
   'hudChrome.finder.mech.bone_spike':
-    'Benspett (spetsade raiddeltagare dräneras tills spettet förstörs)',
+    'Benspett (spetsade spelare förlorar hälsa tills någon splittrar spettet med några träffar)',
   'hudChrome.finder.mech.bone_storm': 'Benstorm (han ignorerar hot, virvlar och rusar mot raiden)',
   'hudChrome.finder.mech.crown_endures': 'Kronan består (hård raseri vid 6:00, heroic 5:00)',
   'hudChrome.finder.mech.deathless_court':

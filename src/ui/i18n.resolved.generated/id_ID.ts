@@ -4860,7 +4860,7 @@ export const id_ID: EnTranslations = {
         "deathless_rage": "Murka Abadi (diputus di wardstone)",
         "wardstones": "Saluran Wardstone (transisi fase)",
         "dread_curse": "Kutukan Kengerian (debuff bertumpuk untuk pergantian tank, berganti pada 2 tumpukan)",
-        "bone_spike": "Pancang Tulang (raider yang tertusuk terkuras sampai pancang dihancurkan)",
+        "bone_spike": "Pancang Tulang (pemain yang terpancang kehilangan nyawa sampai seseorang menghancurkan pancang dengan beberapa serangan)",
         "grave_eruption": "Erupsi Makam (lingkaran peringatan yang meninggalkan tanah terbakar)",
         "binding_sigil": "Segel Pengikat (seret boss ke segel atau raid akan menanggung akibatnya)",
         "kings_wrath": "Murka Raja (30%: bonus kerusakan permanen, bahaya lantai lebih cepat)",

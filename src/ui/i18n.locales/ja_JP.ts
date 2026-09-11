@@ -11334,7 +11334,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.wardstones': 'ウォードストーンの詠唱（フェーズ移行）',
   'hudChrome.finder.mech.dread_curse':
     'ドレッドカース（タンク交代用の累積デバフ、2スタックで交代）',
-  'hudChrome.finder.mech.bone_spike': '骨の棘（串刺しにされた者は棘が壊れるまで体力を失う）',
+  'hudChrome.finder.mech.bone_spike':
+    '骨の棘（串刺しにされたプレイヤーは、誰かが数回の攻撃で棘を砕くまで体力を失い続ける）',
   'hudChrome.finder.mech.grave_eruption': '墓所の噴出（燃える地面を残す警告円）',
   'hudChrome.finder.mech.binding_sigil':
     '拘束の印（ボスを印の上へ引きずり込まないとレイドが代償を払う）',

@@ -2003,6 +2003,29 @@ export function releaseTintedMaterials(claims: Iterable<string>): void {
   for (const key of claims) matCache.release(key);
 }
 
+/** The click-capsule cap ordinary defs get: a footprint-derived radius never
+ *  grows past this, so a huge model cannot swallow its neighbours' clicks. */
+export const CLICK_RADIUS_CAP = 2.2;
+/** ...and the floor, so a sliver of a model still takes a click. */
+export const CLICK_RADIUS_FLOOR = 0.5;
+
+/**
+ * The click-capsule radius for a def: its explicit `clickRadius` override
+ * when set (uncapped, presentation-only targeting help), otherwise 0.9 of
+ * the normalized footprint clamped to [CLICK_RADIUS_FLOOR, CLICK_RADIUS_CAP].
+ * Pure, so the override arm is unit-tested without a loaded GLB.
+ */
+export function resolveClickRadius(
+  def: Pick<VisualDef, 'clickRadius'>,
+  footprintRadius: number,
+  normScale: number,
+): number {
+  return (
+    def.clickRadius ??
+    Math.min(CLICK_RADIUS_CAP, Math.max(CLICK_RADIUS_FLOOR, footprintRadius * normScale * 0.9))
+  );
+}
+
 /** Which mesh family mounts a tinted clone. The far LOD gets its OWN clone
  *  objects (same inputs, separate cache entry): three's compileAsync waits on
  *  a material's `currentProgram`, the variant its LAST draw or compile picked,
@@ -2496,15 +2519,11 @@ export function prepareVisual(key: string): PreparedVisual {
   const rawHeight = Math.max(1e-3, bounds.max.y - bounds.min.y);
   const normScale = def.height / rawHeight;
   const yOffset = (def.hover ?? 0) - bounds.min.y * normScale;
-  const clickRadius =
-    def.clickRadius ??
-    Math.min(
-      2.2,
-      Math.max(
-        0.5,
-        Math.max(bounds.max.x, -bounds.min.x, bounds.max.z, -bounds.min.z) * normScale * 0.9,
-      ),
-    );
+  const clickRadius = resolveClickRadius(
+    def,
+    Math.max(bounds.max.x, -bounds.min.x, bounds.max.z, -bounds.min.z),
+    normScale,
+  );
 
   const norm = new THREE.Matrix4()
     .makeTranslation(0, yOffset, 0)

@@ -4860,7 +4860,7 @@ export const tr_TR: EnTranslations = {
         "deathless_rage": "Ölümsüz Öfke (koruma taşlarında kesilir)",
         "wardstones": "Koruma taşı kanalları (faz geçişi)",
         "dread_curse": "Dehşet Laneti (biriken tank değişimi zayıflatması, 2 birikimde değiştirin)",
-        "bone_spike": "Kemik Dikeni (saplanan akıncılar diken yok edilene kadar tükenir)",
+        "bone_spike": "Kemik Dikeni (şişlenen oyuncular, biri dikeni birkaç vuruşla parçalayana dek can kaybeder)",
         "grave_eruption": "Mezar Patlaması (yanan zemin bırakan uyarı çemberleri)",
         "binding_sigil": "Bağlama Mührü (bossu mührün üzerine sürükle, yoksa akın bedel öder)",
         "kings_wrath": "Kralın Gazabı (30%: kalıcı hasar bonusu, daha hızlı zemin tehlikeleri)",

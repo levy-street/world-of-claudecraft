@@ -4860,7 +4860,7 @@ export const cs_CZ: EnTranslations = {
         "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
         "wardstones": "Kanály ochranných kamenů (přechod fáze)",
         "dread_curse": "Děsivá kletba (sčítající se oslabení pro střídání tanků, vystřídejte se při 2 stupních)",
-        "bone_spike": "Kostěný bodec (nabodnutí raideři slábnou, dokud není bodec zničen)",
+        "bone_spike": "Kostěný bodec (nabodnutí hráči ztrácejí zdraví, dokud někdo bodec pár zásahy neroztříští)",
         "grave_eruption": "Hrobová erupce (varovné kruhy, které zanechají hořící zem)",
         "binding_sigil": "Vazebná pečeť (přetáhni bosse na pečeť, jinak raid zaplatí)",
         "kings_wrath": "Králův hněv (30%: trvalý bonus k poškození, rychlejší nebezpečí na podlaze)",

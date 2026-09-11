@@ -15591,7 +15591,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Phù Ấn Trói Buộc (kéo boss lên phù ấn, nếu không raid sẽ trả giá)',
   'hudChrome.finder.mech.bone_spike':
-    'Cọc Xương (raider bị xuyên bị rút máu cho đến khi cọc bị phá)',
+    'Cọc Xương (người chơi bị đâm xuyên mất máu cho đến khi ai đó đánh vỡ cọc bằng vài đòn)',
   'hudChrome.finder.mech.bone_storm': 'Bão Xương (hắn bỏ qua thù hận, xoáy và lao vào raid)',
   'hudChrome.finder.mech.crown_endures':
     'Vương Miện Trường Tồn (cuồng nộ cứng ở 6:00, heroic 5:00)',

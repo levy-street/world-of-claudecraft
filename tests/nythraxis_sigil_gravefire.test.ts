@@ -327,7 +327,8 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     expect(heroicSigil).toBeTruthy();
     const normalFlame = normal.st.graveFlames[0];
     expect(normalSigil.x).toBeCloseTo(normalFlame.x, 6);
-    expect(Math.abs(normalSigil.z - normalFlame.z)).toBeCloseTo(12, 6);
+    // The ladder walks +6, -6, +12 in that order: +12 is the first clear rung.
+    expect(normalSigil.z - normalFlame.z).toBeCloseTo(12, 6);
     expect(flat(normalSigil, normalFlame)).toBeGreaterThanOrEqual(
       3 + nythraxisSigilRadius('normal'),
     );
@@ -581,8 +582,11 @@ describe('Nythraxis Gravefire never lands in play (retired in v0.42.2)', () => {
       teleport(sim, raiders[0], boss.pos.x + 20, boss.pos.z, boss.pos.y);
       const timer = 0.01;
       st.gravefireTimer = timer;
+      // Right after the due tick (a line would still be alive here), then
+      // ten seconds on: nothing ever lights, and nothing consumes the timer.
+      nythraxis.updateNythraxisEncounter(ctx, boss);
+      expect(st.gravefires).toEqual([]);
       tickDriver(ctx, boss, 10);
-      // Nothing consumes the timer any more: no cast path reads it.
       expect(st.gravefireTimer).toBe(timer);
       expect(st.gravefires).toEqual([]);
       expect(sim.activeNythraxisGravefires).toEqual([]);

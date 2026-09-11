@@ -4860,7 +4860,7 @@ export const it_IT: EnTranslations = {
         "deathless_rage": "Furia Immortale (interrotta alle pietre di guardia)",
         "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)",
         "dread_curse": "Maledizione del Terrore (debilitazione cumulativa per il cambio del tank, cambia a 2 cariche)",
-        "bone_spike": "Spina ossea (i membri impalati si dissanguano finché la spina non viene distrutta)",
+        "bone_spike": "Spina ossea (i giocatori impalati perdono salute finché qualcuno non frantuma la spina con pochi colpi)",
         "grave_eruption": "Eruzione sepolcrale (cerchi di avviso che lasciano terreno in fiamme)",
         "binding_sigil": "Sigillo vincolante (trascina il boss sul sigillo o l'incursione ne paga il prezzo)",
         "kings_wrath": "Ira del re (30%: bonus danni permanente, pericoli a terra più rapidi)",

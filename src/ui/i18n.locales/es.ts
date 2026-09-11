@@ -15798,7 +15798,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Sigilo vinculante (arrastra al jefe hasta el sigilo o la banda lo pagará)',
   'hudChrome.finder.mech.bone_spike':
-    'Púa ósea (los miembros empalados se desangran hasta que se destruye la púa)',
+    'Púa ósea (los jugadores empalados pierden vida hasta que alguien rompe la púa con unos pocos golpes)',
   'hudChrome.finder.mech.bone_storm':
     'Tormenta ósea (ignora la amenaza, gira y carga contra la banda)',
   'hudChrome.finder.mech.crown_endures':

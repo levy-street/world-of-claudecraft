@@ -15671,7 +15671,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Bindingszegel (sleep de baas naar het zegel of de raid betaalt ervoor)',
   'hudChrome.finder.mech.bone_spike':
-    'Beenderspies (gespietste raiders verliezen gezondheid tot de spies is vernietigd)',
+    'Beenderspies (gespietste spelers verliezen leven totdat iemand de spies met een paar treffers versplintert)',
   'hudChrome.finder.mech.bone_storm':
     'Beenderstorm (hij negeert dreiging, wervelt en bestormt de raid)',
   'hudChrome.finder.mech.crown_endures':

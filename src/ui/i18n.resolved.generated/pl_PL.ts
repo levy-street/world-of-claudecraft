@@ -4860,7 +4860,7 @@ export const pl_PL: EnTranslations = {
         "deathless_rage": "Nieśmiertelna Furia (przerywana przy kamieniach wardowych)",
         "wardstones": "Kanały kamieni wardowych (przejście fazy)",
         "dread_curse": "Klątwa Grozy (kumulujące się osłabienie do zmiany tanka, zmiana przy 2 ładunkach)",
-        "bone_spike": "Kościany kolec (nadziani rajderzy słabną, dopóki kolec nie zostanie zniszczony)",
+        "bone_spike": "Kościany kolec (nabici gracze tracą zdrowie, dopóki ktoś nie rozbije kolca kilkoma trafieniami)",
         "grave_eruption": "Grobowa Erupcja (kręgi ostrzegawcze zostawiające płonącą ziemię)",
         "binding_sigil": "Pieczęć Wiążąca (przeciągnij bossa na pieczęć albo rajd zapłaci)",
         "kings_wrath": "Gniew Króla (30%: stały bonus obrażeń, szybsze zagrożenia na podłodze)",

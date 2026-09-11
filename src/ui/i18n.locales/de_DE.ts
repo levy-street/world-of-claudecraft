@@ -15815,7 +15815,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Bindungssiegel (zieht den Boss auf das Siegel, sonst bezahlt der Schlachtzug)',
   'hudChrome.finder.mech.bone_spike':
-    'Knochenspieß (aufgespießte Schlachtzügler verlieren Leben, bis der Spieß zerstört ist)',
+    'Knochenspieß (aufgespießte Spieler verlieren Leben, bis jemand den Spieß mit ein paar Treffern zerbricht)',
   'hudChrome.finder.mech.bone_storm':
     'Knochensturm (er ignoriert Bedrohung, wirbelt und stürmt den Schlachtzug an)',
   'hudChrome.finder.mech.crown_endures':

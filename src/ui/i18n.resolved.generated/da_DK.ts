@@ -4860,7 +4860,7 @@ export const da_DK: EnTranslations = {
         "deathless_rage": "Udødelig Raseri (afbrydes ved vardstene)",
         "wardstones": "Vardstenskanaler (faseovergang)",
         "dread_curse": "Rædselsforbandelse (stablende svækkelse til tankskifte, skift ved 2 stakke)",
-        "bone_spike": "Knoglespyd (spiddede raiddeltagere drænes, indtil spyddet ødelægges)",
+        "bone_spike": "Knoglespyd (spiddede spillere mister liv, indtil nogen splintrer spyddet med et par træffere)",
         "grave_eruption": "Gravudbrud (advarselscirkler, der efterlader brændende jord)",
         "binding_sigil": "Bindingssigil (træk bossen hen på sigillet, ellers betaler raidet)",
         "kings_wrath": "Kongens vrede (30%: permanent skadebonus, hurtigere gulvfarer)",

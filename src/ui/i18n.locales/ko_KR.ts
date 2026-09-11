@@ -11303,7 +11303,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.deathless_rage': '불사의 격노(수호석에서 저지)',
   'hudChrome.finder.mech.wardstones': '수호석 정신집중(단계 전환)',
   'hudChrome.finder.mech.dread_curse': '공포의 저주(누적되는 탱커 교대 디버프, 2중첩에서 교대)',
-  'hudChrome.finder.mech.bone_spike': '뼈가시(꿰뚫린 대상은 가시가 파괴될 때까지 생명력 소모)',
+  'hudChrome.finder.mech.bone_spike':
+    '뼈가시(꿰뚫린 플레이어는 누군가 몇 번의 공격으로 가시를 부술 때까지 생명력을 잃음)',
   'hudChrome.finder.mech.grave_eruption': '무덤 분출(불타는 바닥을 남기는 경고 원)',
   'hudChrome.finder.mech.binding_sigil':
     '결속의 인장(나이트락시스를 인장 위로 끌지 못하면 공격대가 대가를 치름)',

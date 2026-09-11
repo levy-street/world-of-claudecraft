@@ -4860,7 +4860,7 @@ export const en_CA: EnTranslations = {
         "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
         "wardstones": "Wardstone channels (phase transition)",
         "dread_curse": "Dread Curse (stacking tank-swap debuff, swap at 2 stacks)",
-        "bone_spike": "Bone Spike (impaled raiders drain until the spike is destroyed)",
+        "bone_spike": "Bone Spike (impaled raiders drain until anyone shatters the spike with a few hits)",
         "grave_eruption": "Grave Eruption (warning circles that leave burning ground)",
         "binding_sigil": "Binding Sigil (drag the boss onto the sigil or the raid pays)",
         "kings_wrath": "King's Wrath (30%: permanent damage bonus, faster floor hazards)",

@@ -4860,7 +4860,7 @@ export const vi_VN: EnTranslations = {
         "deathless_rage": "Thịnh Nộ Bất Tử (bị gián đoạn tại các đá hộ mệnh)",
         "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)",
         "dread_curse": "Lời Nguyền Kinh Hoàng (hiệu ứng bất lợi cộng dồn để đổi tank, đổi ở 2 cộng dồn)",
-        "bone_spike": "Cọc Xương (raider bị xuyên bị rút máu cho đến khi cọc bị phá)",
+        "bone_spike": "Cọc Xương (người chơi bị đâm xuyên mất máu cho đến khi ai đó đánh vỡ cọc bằng vài đòn)",
         "grave_eruption": "Mộ Phần Phun Trào (vòng cảnh báo để lại mặt đất bốc cháy)",
         "binding_sigil": "Phù Ấn Trói Buộc (kéo boss lên phù ấn, nếu không raid sẽ trả giá)",
         "kings_wrath": "Cơn Thịnh Nộ Của Vua (30%: cộng sát thương vĩnh viễn, bẫy sàn nhanh hơn)",

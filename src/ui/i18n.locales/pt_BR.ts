@@ -16298,7 +16298,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Selo vinculante (arraste o chefe até o selo ou a raide paga o preço)',
   'hudChrome.finder.mech.bone_spike':
-    'Espinho ósseo (raiders empalados drenam até o espinho ser destruído)',
+    'Espinho ósseo (jogadores empalados perdem vida até que alguém despedace o espinho com alguns acertos)',
   'hudChrome.finder.mech.bone_storm':
     'Tempestade óssea (ele ignora ameaça, gira e avança contra a raide)',
   'hudChrome.finder.mech.crown_endures':

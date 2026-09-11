@@ -11499,7 +11499,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.dread_curse':
     'Проклятие ужаса (накапливающийся дебафф смены танка, смена при 2 зарядах)',
   'hudChrome.finder.mech.bone_spike':
-    'Костяной шип (пронзённые рейдеры теряют здоровье, пока шип не уничтожен)',
+    'Костяной шип (пронзённые игроки теряют здоровье, пока кто-нибудь не разобьёт шип несколькими попаданиями)',
   'hudChrome.finder.mech.grave_eruption':
     'Могильное извержение (предупреждающие круги оставляют горящую землю)',
   'hudChrome.finder.mech.binding_sigil':

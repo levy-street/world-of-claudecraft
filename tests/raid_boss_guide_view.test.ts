@@ -25,11 +25,14 @@ import {
   NYTHRAXIS_BOUND_VULNERABILITY,
   NYTHRAXIS_SIGIL_EVERY_HEROIC,
   NYTHRAXIS_SIGIL_EVERY_NORMAL,
+  NYTHRAXIS_SIGIL_SIDE_OFFSET,
   NYTHRAXIS_UNBOUND_HIT_MAX_HP_HEROIC,
   NYTHRAXIS_UNBOUND_HIT_MAX_HP_NORMAL,
 } from '../src/sim/nythraxis_binding_sigil';
 import {
   NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
+  NYTHRAXIS_BONE_SPIKE_HITS_HEROIC,
+  NYTHRAXIS_BONE_SPIKE_HITS_NORMAL,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_NORMAL,
 } from '../src/sim/nythraxis_bone_spike';
@@ -243,6 +246,18 @@ describe('raid boss guide view', () => {
       roles: ['tank', 'damage'],
       flags: ['deadly', 'important'],
       iconId: 'raid_nythraxis_binding_sigil',
+    });
+    // The tokens the reworded prose carries are bound to the sim constants: a
+    // dropped binding would render the literal {token} to the player.
+    expect(normalMechanics.find((mechanic) => mechanic.id === 'bone-spike')?.values).toMatchObject({
+      hitsNormal: NYTHRAXIS_BONE_SPIKE_HITS_NORMAL,
+      hitsHeroic: NYTHRAXIS_BONE_SPIKE_HITS_HEROIC,
+      cooldown: NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
+    });
+    expect(
+      normalMechanics.find((mechanic) => mechanic.id === 'binding-sigil')?.values,
+    ).toMatchObject({
+      sideOffset: NYTHRAXIS_SIGIL_SIDE_OFFSET,
     });
     // Gravefire left the fight in v0.42.2, so the guide has no row for it either.
     expect(normalMechanics.find((mechanic) => mechanic.id === 'gravefire')).toBeUndefined();

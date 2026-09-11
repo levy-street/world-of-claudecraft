@@ -215,10 +215,10 @@ export function dealDamage(
   // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
   // pet hit lands exactly one point, whatever it would have dealt, and the
   // spike's pool is its hit count. Resolved like an exact copy so no source
-  // mod, target amp, absorb, or crit multiplier can move it off one.
+  // mod, target amp, absorb, or crit multiplier can move it off one; the
+  // crit ROLL itself is kept, so crit procs and counters still fire.
   if (nythraxisBoneSpikeWardHit(source, target)) {
     amount = NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE;
-    crit = false;
     resolvedHpLoss = true;
     alreadyFinal = true;
   }

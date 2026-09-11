@@ -15936,7 +15936,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Sceau de lien (faites glisser le boss sur le sceau, sinon le raid le paie)',
   'hudChrome.finder.mech.bone_spike':
-    "Pointe d'os (les membres empalés se vident jusqu'à la destruction de la pointe)",
+    "Pointe d'os (les joueurs empalés perdent de la vie jusqu'à ce que quelqu'un brise la pointe en quelques coups)",
   'hudChrome.finder.mech.bone_storm':
     "Tempête d'os (il ignore la menace, tourbillonne et charge le raid)",
   'hudChrome.finder.mech.crown_endures':

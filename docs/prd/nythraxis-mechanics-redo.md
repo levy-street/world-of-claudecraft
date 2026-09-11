@@ -586,7 +586,11 @@ only the points named below.
   pool IS the hit count, so its health bar reads as hits remaining, and the
   rule lives at the one damage funnel (`combat/damage.ts` through
   `nythraxisBoneSpikeWardHit`). The 1,000 hp pool of v0.42.1 is gone; the
-  per-mob multiplier override stays as a no-op mirror of Normal's.
+  per-mob multiplier override stays as a no-op mirror of Normal's. Two
+  consequences by design: a spike hit yields the rage, mana, threat, and
+  meter rows of a one-point hit, and the crit roll is kept (procs and
+  counters still fire) while the amount is pinned. If the whole chosen sigil
+  side is closed, the placement mirrors to the other side before giving up.
 - **Bone Spikes are easier to click.** The spike's click capsule is about
   twice the footprint-derived default (`clickRadius` on the visual def, a
   presentation-only override), so a click near the spike lands on it and not

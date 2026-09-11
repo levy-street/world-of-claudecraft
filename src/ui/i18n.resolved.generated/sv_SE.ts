@@ -4860,7 +4860,7 @@ export const sv_SE: EnTranslations = {
         "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
         "wardstones": "Väktarstenarnas kanaler (fasövergång)",
         "dread_curse": "Skräckförbannelse (staplande försvagning för tankbyte, byt vid 2 staplar)",
-        "bone_spike": "Benspett (spetsade raiddeltagare dräneras tills spettet förstörs)",
+        "bone_spike": "Benspett (spetsade spelare förlorar hälsa tills någon splittrar spettet med några träffar)",
         "grave_eruption": "Gravutbrott (varningscirklar som lämnar brinnande mark)",
         "binding_sigil": "Bindningssigill (dra bossen till sigillet, annars får raiden betala)",
         "kings_wrath": "Kungens Vrede (30%: permanent skadebonus, snabbare golvfaror)",

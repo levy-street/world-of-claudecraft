@@ -15607,7 +15607,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Pieczęć Wiążąca (przeciągnij bossa na pieczęć albo rajd zapłaci)',
   'hudChrome.finder.mech.bone_spike':
-    'Kościany kolec (nadziani rajderzy słabną, dopóki kolec nie zostanie zniszczony)',
+    'Kościany kolec (nabici gracze tracą zdrowie, dopóki ktoś nie rozbije kolca kilkoma trafieniami)',
   'hudChrome.finder.mech.bone_storm':
     'Kościana Burza (ignoruje zagrożenie, wiruje i szarżuje na rajd)',
   'hudChrome.finder.mech.crown_endures': 'Korona Trwa (twardy enrage o 6:00, Heroic 5:00)',

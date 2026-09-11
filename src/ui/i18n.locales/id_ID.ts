@@ -15705,7 +15705,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Segel Pengikat (seret boss ke segel atau raid akan menanggung akibatnya)',
   'hudChrome.finder.mech.bone_spike':
-    'Pancang Tulang (raider yang tertusuk terkuras sampai pancang dihancurkan)',
+    'Pancang Tulang (pemain yang terpancang kehilangan nyawa sampai seseorang menghancurkan pancang dengan beberapa serangan)',
   'hudChrome.finder.mech.bone_storm':
     'Badai Tulang (dia mengabaikan ancaman, berputar, dan menerjang raid)',
   'hudChrome.finder.mech.crown_endures': 'Mahkota Bertahan (enrage keras pada 6:00, heroic 5:00)',

@@ -209,11 +209,17 @@ export function nythraxisSigilPlacement(
 ): NythraxisSigilPoint {
   let fallback: NythraxisSigilPoint | null = null;
   const candidates = NYTHRAXIS_SIGIL_SIDE_NUDGES_Z.length * 2;
-  for (let attempt = 0; attempt < candidates; attempt++) {
-    const candidate = nythraxisSigilCandidate(attempt, boss, side);
-    const open = floor.openFloor(candidate);
-    if (open && nythraxisSigilClearOfHazards(candidate, radius, floor, allowFire)) return candidate;
-    if (!fallback && open) fallback = candidate;
+  // The asked side's ladder first; if the whole side is closed (the boss
+  // held against a wall or a pillar row), the mirrored ladder on the other
+  // side, so a bind is never made impossible by where the tank parked him.
+  for (const trySide of [side, -side as NythraxisSigilSide]) {
+    for (let attempt = 0; attempt < candidates; attempt++) {
+      const candidate = nythraxisSigilCandidate(attempt, boss, trySide);
+      const open = floor.openFloor(candidate);
+      if (open && nythraxisSigilClearOfHazards(candidate, radius, floor, allowFire))
+        return candidate;
+      if (!fallback && open) fallback = candidate;
+    }
   }
   return fallback ?? nythraxisSigilCandidate(0, boss, side);
 }

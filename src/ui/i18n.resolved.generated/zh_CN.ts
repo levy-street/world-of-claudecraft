@@ -4860,7 +4860,7 @@ export const zh_CN: EnTranslations = {
         "deathless_rage": "不死之怒（需在护符石处打断）",
         "wardstones": "护符石引导（阶段转换）",
         "dread_curse": "恐惧诅咒（累加坦克轮换减益，2层后轮换）",
-        "bone_spike": "骨刺（被穿刺者会持续掉血，直到骨刺被摧毁）",
+        "bone_spike": "骨刺（被穿刺的玩家持续损失生命值，直到有人用几次攻击击碎骨刺）",
         "grave_eruption": "坟场爆裂（预警圆圈会留下燃烧地面）",
         "binding_sigil": "束缚法阵（把首领拖上法阵，否则全团遭殃）",
         "kings_wrath": "国王之怒（30%时触发：永久伤害加成，地面机制加快）",

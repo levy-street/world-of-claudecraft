@@ -4860,7 +4860,7 @@ export const nl_NL: EnTranslations = {
         "deathless_rage": "Doodloze Razernij (onderbroken bij de wardstones)",
         "wardstones": "Wardstone-kanalen (faseovergang)",
         "dread_curse": "Schrikvloek (alleen heroisch, stapelende verzwakking voor tankwissel)",
-        "bone_spike": "Beenderspies (gespietste raiders verliezen gezondheid tot de spies is vernietigd)",
+        "bone_spike": "Beenderspies (gespietste spelers verliezen leven totdat iemand de spies met een paar treffers versplintert)",
         "grave_eruption": "Grafuitbarsting (waarschuwingscirkels die brandende grond achterlaten)",
         "binding_sigil": "Bindingszegel (sleep de baas naar het zegel of de raid betaalt ervoor)",
         "kings_wrath": "Koningswoede (30%: permanente schadebonus, snellere vloergevaren)",

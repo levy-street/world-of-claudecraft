@@ -8,7 +8,9 @@ import {
   HEROIC_DUNGEON_TUNING,
   NORMAL_DUNGEON_TUNING,
 } from '../src/sim/content/dungeon_difficulty';
+import { MOBS } from '../src/sim/data';
 import * as nythraxis from '../src/sim/encounters/nythraxis';
+import { createMob } from '../src/sim/entity';
 import { NYTHRAXIS_BOUND_STUN_AURA_ID } from '../src/sim/nythraxis_binding_sigil';
 import {
   isNythraxisImpaled,
@@ -256,20 +258,35 @@ describe('Nythraxis Bone Spike', () => {
     expect(heroicArena.healthMultiplierByMob?.nythraxis_bone_spike).toBe(
       NORMAL_DUNGEON_TUNING.nythraxis_boss_arena.healthMultiplier,
     );
+    expect(NORMAL_DUNGEON_TUNING.nythraxis_boss_arena.healthMultiplier).toBe(2.0);
   });
 
   it('counts every player or pet hit as one, whatever it deals, and shatters on the last', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
-      const { ctx, boss, st, room, raiders, spikes } = setup({ difficulty });
+      const { sim, ctx, boss, st, room, raiders, spikes } = setup({ difficulty });
       const [victim] = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), difficulty);
       const spike = spikes()[0];
       const hits = nythraxisBoneSpikeHits(difficulty);
       const others = raiders.filter((r) => r.id !== victim.id);
-      // A 1-point poke and a 5,000-point crit each take exactly one hit off.
-      expect(ctx.dealDamage(others[0], spike, 1, false, 'physical', null, 'hit')).toBe(1);
+      // A zero-point hit still lands one: the rule FIXES the point, it does not
+      // cap it (a cap would let a 0 through as 0). Then a 5,000-point crit takes
+      // exactly one off too, and keeps its crit roll in the event stream (procs
+      // and counters still see a crit; only the amount is pinned).
+      const eventsBefore = (sim.events as SimEvent[]).length;
+      expect(ctx.dealDamage(others[0], spike, 0, false, 'physical', null, 'hit')).toBe(1);
       expect(spike.hp, difficulty).toBe(hits - 1);
       ctx.dealDamage(others[1], spike, 5000, true, 'fire', 'Fireball', 'hit');
       expect(spike.hp, difficulty).toBe(hits - 2);
+      const wardEvents = (sim.events as SimEvent[])
+        .slice(eventsBefore)
+        .filter(
+          (e): e is Extract<SimEvent, { type: 'damage' }> =>
+            e.type === 'damage' && e.targetId === spike.id,
+        );
+      expect(wardEvents.map((e) => [e.amount, e.crit])).toEqual([
+        [1, false],
+        [1, true],
+      ]);
       // A DoT tick (not direct) from a third raider counts too: hits from anyone.
       ctx.dealDamage(
         others[2],
@@ -297,17 +314,28 @@ describe('Nythraxis Bone Spike', () => {
 
   it('only a player or a player-owned pet lands a ward hit; the rule is scoped to live spikes', () => {
     const { ctx, boss, st, room, raiders, spikes } = setup();
-    const [victim] = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), 'normal');
-    const spike = spikes()[0];
-    const other = raiders.find((r) => r.id !== victim.id)!;
+    const victims = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), 'normal');
+    const [victim] = victims;
+    const [spike, otherSpike] = spikes();
+    const other = raiders.find((r) => !victims.includes(r))!;
     expect(nythraxisBoneSpikeWardHit(other, spike)).toBe(true);
-    const pet = { kind: 'mob', ownerId: other.id, dead: false } as unknown as Entity;
+    // A real player-owned pet through the funnel: one point, like its owner.
+    const pet = createMob(ctx.nextId++, MOBS.snowdrift_wolf, 20, { ...other.pos });
+    pet.ownerId = other.id;
+    ctx.addEntity(pet);
     expect(nythraxisBoneSpikeWardHit(pet, spike)).toBe(true);
-    // The boss (a wild mob) is not a ward hitter, and a raider is not a ward.
-    expect(nythraxisBoneSpikeWardHit(boss, spike)).toBe(false);
+    expect(ctx.dealDamage(pet, spike, 400, false, 'physical', null, 'hit')).toBe(1);
+    expect(spike.hp).toBe(nythraxisBoneSpikeHits('normal') - 1);
+    // The boss (a wild mob) is not a ward hitter: its hit lands at full
+    // weight, which on a 4-point pool is a one-hit shatter. Nothing in the
+    // fight makes him swing at a spike; this pins the blast radius if it did.
+    expect(nythraxisBoneSpikeWardHit(boss, otherSpike)).toBe(false);
+    const dealt = ctx.dealDamage(boss, otherSpike, 5000, false, 'shadow', null, 'hit');
+    expect(dealt).toBeGreaterThan(1);
+    expect(otherSpike.dead).toBe(true);
+    // A raider is not a ward, and a dead spike is no longer one.
     expect(nythraxisBoneSpikeWardHit(other, victim)).toBe(false);
     expect(nythraxisBoneSpikeWardHit(null, spike)).toBe(false);
-    // A dead spike is no longer a ward.
     spike.dead = true;
     expect(nythraxisBoneSpikeWardHit(other, spike)).toBe(false);
   });
