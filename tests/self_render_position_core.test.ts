@@ -3,6 +3,7 @@ import type { SelfMotionFrame, SelfMotionPredictor, Vec3Like } from '../src/rend
 import { SELF_MOTION_SNAP_DIST_SQ } from '../src/render/self_motion';
 import {
   createSelfRenderPositionState,
+  isTeleportGap,
   MAX_SELF_REWIND_YD_PER_SEC,
   noteSelfIdentity,
   type SelfRenderPositionState,
@@ -385,19 +386,62 @@ describe('updateSelfRenderPosition teleport rule', () => {
     expect(state.active).toBe(true);
   });
 
-  it('snaps an active predictor whose output jumps a teleport in one frame', () => {
+  it('clears a still-decaying handoff offset when the active predictor jumps a teleport', () => {
     const state = createSelfRenderPositionState();
-    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
-    let predicted: Vec3Like = { x: 1, y: 0, z: 0 };
+    const player = playerAt({ x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 0 });
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+    // Sub-threshold handoff: the predictor takes over two yards behind the
+    // drawn pose, so a real offset is in flight.
+    let predicted: Vec3Like = { x: 8, y: 0, z: 0 };
     state.predictor = stubPredictor(() => predicted);
     runPredicted(state, player);
-    predicted = { x: 1.2, y: 0, z: 0 };
-    runPredicted(state, player);
-    expect(state.position.x).toBeCloseTo(1.2, 10);
+    expect(state.offset.x).toBeGreaterThan(1);
+    expect(state.position.x).toBeGreaterThan(8);
+    // The predictor re-adopts a teleported anchor while that offset is still
+    // decaying: without the rule the stale offset rides along to the destination.
     predicted = { x: TELEPORT, y: 0, z: 0 };
     runPredicted(state, player);
-    expect(state.position.x).toBe(TELEPORT);
     expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual({ x: TELEPORT, y: 0, z: 0 });
+  });
+
+  it('snaps the plain fallback pose (no predictor ever active) across a teleport', () => {
+    // The offline / prediction-off shape: no offset in flight, smoothing on.
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+    const far = { x: TELEPORT, y: 5, z: -TELEPORT };
+    updateSelfRenderPosition(state, playerAt(far, far), SEED, 1, FRAME_DT, 0.2, null, false);
+    expect(state.position).toEqual(far);
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+  });
+
+  it('pins the six-yard boundary: just past it snaps, just inside it glides', () => {
+    const snapDist = Math.sqrt(SELF_MOTION_SNAP_DIST_SQ);
+    expect(snapDist).toBe(6);
+    expect(isTeleportGap(snapDist + 1e-6, 0, 0)).toBe(true);
+    expect(isTeleportGap(snapDist, 0, 0)).toBe(false);
+    expect(isTeleportGap(0, snapDist - 1e-6, 0)).toBe(false);
+    expect(isTeleportGap(3, 3, 4.5)).toBe(true);
+    const decay = Math.exp(-HANDOFF_RATE * FRAME_DT);
+    for (const [gap, snaps] of [
+      [snapDist + 0.01, true],
+      [snapDist - 0.01, false],
+    ] as const) {
+      const state = createSelfRenderPositionState();
+      const player = playerAt({ x: gap, y: 0, z: 0 }, { x: gap, y: 0, z: 0 });
+      updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+      state.predictor = stubPredictor(() => ({ x: 0, y: 0, z: 0 }));
+      runPredicted(state, player);
+      if (snaps) {
+        expect(state.offset.x).toBe(0);
+        expect(state.position.x).toBe(0);
+      } else {
+        expect(state.offset.x).toBeCloseTo(gap * decay, 10);
+        expect(state.position.x).toBeCloseTo(gap * decay, 10);
+      }
+    }
   });
 
   it('drops a teleport-sized v2 reconcile residual instead of decaying it', () => {
