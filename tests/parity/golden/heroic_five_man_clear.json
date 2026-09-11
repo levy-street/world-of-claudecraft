@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1007,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1033,
-      "state": "164f5284",
-      "events": "42cdc878",
+      "nextId": 1034,
+      "state": "8d383ca1",
+      "events": "d0d1e7b2",
       "rng": {
         "draws": 21,
         "digest": "7cbdb21a"
@@ -79,7 +79,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -108,83 +108,6 @@
           "talents": {
             "rows": {},
             "spec": "prot"
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "wyrmfallDaily": {}
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {
-              "partiesJoined": 1
-            },
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "spring_water"
-            ]
-          },
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1007,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "harvestPreference": {
-            "kind": "all"
-          },
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "lifetimeXp": 167200,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "talents": {
-            "rows": {}
           },
           "townFocus": {},
           "vault": {
@@ -422,6 +345,83 @@
             "stock": {}
           },
           "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "partiesJoined": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1011,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -436,7 +436,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -450,7 +450,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1062,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -501,7 +501,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 418,
-          "id": 1007,
+          "id": 1008,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -552,7 +552,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 418,
-          "id": 1008,
+          "id": 1009,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -603,7 +603,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 418,
-          "id": 1009,
+          "id": 1010,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -654,7 +654,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 418,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -706,7 +706,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 13138,
-          "id": 1029,
+          "id": 1030,
           "infernoTimer": 30,
           "kind": "mob",
           "level": 22,
@@ -745,9 +745,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1033,
-      "state": "b1ce9c79",
-      "events": "5fce258b",
+      "nextId": 1034,
+      "state": "fa7974e5",
+      "events": "89e35105",
       "rng": {
         "draws": 62,
         "digest": "86e69dc4"
@@ -871,7 +871,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1053,183 +1053,6 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "harvestPreference": {
-            "kind": "all"
-          },
-          "heroicDaily": {
-            "date": "reset:1",
-            "marked": [
-              "gravewyrm_sanctum"
-            ]
-          },
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
-            },
-            {
-              "count": 1,
-              "itemId": "wyrmfall_core",
-              "materialSources": [
-                {
-                  "count": 1,
-                  "source": {}
-                }
-              ]
-            }
-          ],
-          "lifetimeXp": 167298,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "raidLockouts": [
-            [
-              "gravewyrm_sanctum:heroic",
-              86400000
-            ]
-          ],
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 150,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "wyrmfallDaily": {
-            "sources": [
-              "gravewyrm_sanctum:heroic"
-            ]
-          }
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {
-            "xpGained": 98
-          },
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {
-              "dungeonFinalBossKills": 1,
-              "fullPartyDungeonClears": 1,
-              "kills": 1,
-              "partiesJoined": 1
-            },
-            "dungeonClears": {
-              "gravewyrm_sanctum:heroic": 1
-            },
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "heroic_mark",
-              "spring_water",
-              "wyrmfall_core"
-            ],
-            "visited": [
-              "quality:rare"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "cmb_first_blood",
-              ""
-            ],
-            [
-              "col_first_rare",
-              ""
-            ],
-            [
-              "dgn_gravewyrm_sanctum",
-              ""
-            ],
-            [
-              "dgn_gravewyrm_sanctum_heroic",
-              ""
-            ],
-            [
-              "dgn_korzul_flawless",
-              ""
-            ],
-            [
-              "dgn_sanctum_speed",
-              ""
-            ],
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ],
-            [
-              "soc_first_party",
-              ""
-            ],
-            [
-              "soc_full_house",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
           "entityId": 1008,
           "equipment": {
             "chest": "apprentice_robe",
@@ -1284,7 +1107,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 145,
+          "renown": 150,
           "talents": {
             "rows": {}
           },
@@ -1651,6 +1474,183 @@
               "gravewyrm_sanctum:heroic"
             ]
           }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "fullPartyDungeonClears": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "gravewyrm_sanctum:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_gravewyrm_sanctum",
+              ""
+            ],
+            [
+              "dgn_gravewyrm_sanctum_heroic",
+              ""
+            ],
+            [
+              "dgn_korzul_flawless",
+              ""
+            ],
+            [
+              "dgn_sanctum_speed",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ],
+            [
+              "soc_full_house",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1011,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "gravewyrm_sanctum"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "gravewyrm_sanctum:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 145,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "wyrmfallDaily": {
+            "sources": [
+              "gravewyrm_sanctum:heroic"
+            ]
+          }
         }
       ],
       "entities": [
@@ -1665,7 +1665,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -1679,7 +1679,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1006,
+          "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1729,7 +1729,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "id": 1007,
+          "id": 1008,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1779,7 +1779,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 418,
-          "id": 1008,
+          "id": 1009,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1828,7 +1828,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 418,
-          "id": 1009,
+          "id": 1010,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1877,7 +1877,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 418,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1922,11 +1922,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1006",
               "entity:1007",
               "entity:1008",
               "entity:1009",
-              "entity:1010"
+              "entity:1010",
+              "entity:1011"
             ],
             "token": {}
           },
@@ -1939,7 +1939,7 @@
           "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1029,
+          "id": 1030,
           "inCombat": true,
           "infernoTimer": 30,
           "kind": "mob",
@@ -1960,11 +1960,11 @@
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
-            1006,
             1007,
             1008,
             1009,
-            1010
+            1010,
+            1011
           ],
           "lootable": true,
           "maxHp": 13138,
@@ -1990,7 +1990,7 @@
           "stats": {
             "armor": 857
           },
-          "tappedById": 1006,
+          "tappedById": 1007,
           "templateId": "korzul_the_gravewyrm",
           "weapon": {
             "max": 2779,
@@ -2003,8 +2003,8 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1033,
-      "state": "b1ce9c79",
+      "nextId": 1034,
+      "state": "fa7974e5",
       "events": "741638a5",
       "rng": {
         "draws": 62,
@@ -2129,7 +2129,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2311,183 +2311,6 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "harvestPreference": {
-            "kind": "all"
-          },
-          "heroicDaily": {
-            "date": "reset:1",
-            "marked": [
-              "gravewyrm_sanctum"
-            ]
-          },
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
-            },
-            {
-              "count": 1,
-              "itemId": "wyrmfall_core",
-              "materialSources": [
-                {
-                  "count": 1,
-                  "source": {}
-                }
-              ]
-            }
-          ],
-          "lifetimeXp": 167298,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "raidLockouts": [
-            [
-              "gravewyrm_sanctum:heroic",
-              86400000
-            ]
-          ],
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 150,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "wyrmfallDaily": {
-            "sources": [
-              "gravewyrm_sanctum:heroic"
-            ]
-          }
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {
-            "xpGained": 98
-          },
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {
-              "dungeonFinalBossKills": 1,
-              "fullPartyDungeonClears": 1,
-              "kills": 1,
-              "partiesJoined": 1
-            },
-            "dungeonClears": {
-              "gravewyrm_sanctum:heroic": 1
-            },
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "heroic_mark",
-              "spring_water",
-              "wyrmfall_core"
-            ],
-            "visited": [
-              "quality:rare"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "cmb_first_blood",
-              ""
-            ],
-            [
-              "col_first_rare",
-              ""
-            ],
-            [
-              "dgn_gravewyrm_sanctum",
-              ""
-            ],
-            [
-              "dgn_gravewyrm_sanctum_heroic",
-              ""
-            ],
-            [
-              "dgn_korzul_flawless",
-              ""
-            ],
-            [
-              "dgn_sanctum_speed",
-              ""
-            ],
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ],
-            [
-              "soc_first_party",
-              ""
-            ],
-            [
-              "soc_full_house",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
           "entityId": 1008,
           "equipment": {
             "chest": "apprentice_robe",
@@ -2542,7 +2365,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 145,
+          "renown": 150,
           "talents": {
             "rows": {}
           },
@@ -2909,6 +2732,183 @@
               "gravewyrm_sanctum:heroic"
             ]
           }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "fullPartyDungeonClears": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "gravewyrm_sanctum:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_gravewyrm_sanctum",
+              ""
+            ],
+            [
+              "dgn_gravewyrm_sanctum_heroic",
+              ""
+            ],
+            [
+              "dgn_korzul_flawless",
+              ""
+            ],
+            [
+              "dgn_sanctum_speed",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ],
+            [
+              "soc_full_house",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1011,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "gravewyrm_sanctum"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "gravewyrm_sanctum:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 145,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "wyrmfallDaily": {
+            "sources": [
+              "gravewyrm_sanctum:heroic"
+            ]
+          }
         }
       ],
       "entities": [
@@ -2923,7 +2923,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -2937,7 +2937,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1006,
+          "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2987,7 +2987,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "id": 1007,
+          "id": 1008,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -3037,7 +3037,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 418,
-          "id": 1008,
+          "id": 1009,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3086,7 +3086,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 418,
-          "id": 1009,
+          "id": 1010,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3135,7 +3135,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 418,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3180,11 +3180,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1006",
               "entity:1007",
               "entity:1008",
               "entity:1009",
-              "entity:1010"
+              "entity:1010",
+              "entity:1011"
             ],
             "token": {}
           },
@@ -3197,7 +3197,7 @@
           "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1029,
+          "id": 1030,
           "inCombat": true,
           "infernoTimer": 30,
           "kind": "mob",
@@ -3218,11 +3218,11 @@
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
-            1006,
             1007,
             1008,
             1009,
-            1010
+            1010,
+            1011
           ],
           "lootable": true,
           "maxHp": 13138,
@@ -3248,7 +3248,7 @@
           "stats": {
             "armor": 857
           },
-          "tappedById": 1006,
+          "tappedById": 1007,
           "templateId": "korzul_the_gravewyrm",
           "weapon": {
             "max": 2779,

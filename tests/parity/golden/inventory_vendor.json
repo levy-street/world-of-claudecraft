@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1007,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "a318b091",
+      "nextId": 1008,
+      "state": "47226f62",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -81,7 +81,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -128,7 +128,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -142,7 +142,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -186,9 +186,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "c87955d0",
-      "events": "9fdd922b",
+      "nextId": 1008,
+      "state": "e67790cd",
+      "events": "9d6b1043",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -235,7 +235,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -290,7 +290,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -304,7 +304,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -348,9 +348,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "36d0c2ee",
-      "events": "2dd3ba8b",
+      "nextId": 1008,
+      "state": "77f8a20d",
+      "events": "a92dc935",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -399,7 +399,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
@@ -466,7 +466,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -480,7 +480,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 130,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -524,9 +524,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "9f792bbd",
-      "events": "476105b0",
+      "nextId": 1008,
+      "state": "afd7d706",
+      "events": "8717aff3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -575,7 +575,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
@@ -642,7 +642,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -656,7 +656,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 120,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -700,9 +700,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "54910af9",
-      "events": "7a6d00a9",
+      "nextId": 1008,
+      "state": "b4235e22",
+      "events": "9f47faca",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -751,7 +751,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -821,7 +821,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -835,7 +835,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -879,9 +879,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "5e428335",
-      "events": "de45e147",
+      "nextId": 1008,
+      "state": "dac6a95c",
+      "events": "f7611b17",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -930,7 +930,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1000,7 +1000,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -1026,7 +1026,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1071,9 +1071,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "34ca0394",
-      "events": "1c12ceec",
+      "nextId": 1008,
+      "state": "9c1e5005",
+      "events": "45d620c4",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1122,7 +1122,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1188,7 +1188,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -1214,7 +1214,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1259,9 +1259,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "4ab80fa4",
-      "events": "754cec5d",
+      "nextId": 1008,
+      "state": "e44744f4",
+      "events": "afaab11f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1311,7 +1311,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1377,7 +1377,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             },
             {
               "duration": 900,
@@ -1386,7 +1386,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1006,
+              "sourceId": 1007,
               "value": 12
             }
           ],
@@ -1413,7 +1413,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1458,9 +1458,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "8a1af533",
-      "events": "f6b4b9bb",
+      "nextId": 1008,
+      "state": "24471f0b",
+      "events": "76463acd",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1514,7 +1514,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1580,7 +1580,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             },
             {
               "duration": 900,
@@ -1589,7 +1589,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1006,
+              "sourceId": 1007,
               "value": 12
             }
           ],
@@ -1616,7 +1616,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1661,9 +1661,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "1f862717",
-      "events": "91ae776e",
+      "nextId": 1008,
+      "state": "1b00f33b",
+      "events": "1336d1e6",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1718,7 +1718,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1794,7 +1794,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             },
             {
               "duration": 900,
@@ -1803,7 +1803,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1006,
+              "sourceId": 1007,
               "value": 12
             }
           ],
@@ -1830,7 +1830,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1875,9 +1875,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "99bc2a3f",
-      "events": "34f6d1e0",
+      "nextId": 1008,
+      "state": "15b7505b",
+      "events": "a011aa8e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1932,7 +1932,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2020,7 +2020,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             },
             {
               "duration": 900,
@@ -2029,7 +2029,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1006,
+              "sourceId": 1007,
               "value": 12
             }
           ],
@@ -2056,7 +2056,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2101,9 +2101,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "00fe5545",
-      "events": "d3c51e88",
+      "nextId": 1008,
+      "state": "d07bc77f",
+      "events": "c2486d59",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2159,7 +2159,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2251,7 +2251,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             },
             {
               "duration": 900,
@@ -2260,7 +2260,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1006,
+              "sourceId": 1007,
               "value": 12
             }
           ],
@@ -2287,7 +2287,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2332,9 +2332,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "2a2d023f",
-      "events": "be61fd6d",
+      "nextId": 1008,
+      "state": "420d1cf1",
+      "events": "4973558b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2390,7 +2390,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2472,7 +2472,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             },
             {
               "duration": 900,
@@ -2481,7 +2481,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1006,
+              "sourceId": 1007,
               "value": 12
             }
           ],
@@ -2508,7 +2508,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2553,8 +2553,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "2a2d023f",
+      "nextId": 1008,
+      "state": "420d1cf1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2611,7 +2611,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2693,7 +2693,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1007
             },
             {
               "duration": 900,
@@ -2702,7 +2702,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1006,
+              "sourceId": 1007,
               "value": 12
             }
           ],
@@ -2729,7 +2729,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1006,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

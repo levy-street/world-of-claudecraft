@@ -72,6 +72,11 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // in this array's order, so a mid-array insert would renumber every later
   // healer's entity id for no reason (the camps append-last discipline).
   { id: 'gy_proving_shore', name: 'Dawnrest Graves', x: -324, z: 58 },
+  // The Last Keep churchyard (Drakelands). The rebuilt keep's headstone
+  // cluster south of its chapel (DRAKELANDS_PROPS.graveyards) had stones but no
+  // record, so every death at the keep released at the Wyrmwatch cairns,
+  // nearly 300 yd north across the zone. Appended last (see above).
+  { id: 'gy_last_keep', name: 'Last Keep Churchyard', x: 451, z: 2134 },
 ];
 
 // The Spirit Healer NPC id (one shared template; every spawned angel carries this
