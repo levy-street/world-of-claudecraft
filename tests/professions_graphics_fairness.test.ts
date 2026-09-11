@@ -21,7 +21,13 @@
 // COSMETIC, and allowed to vary: the low preset's shorter fog (LOW_FOG in
 // renderer.ts) sheds distant SCENERY, node props included, because the
 // actionable spotting surface at range is the minimap above, which does not
-// shorten; the water surface's splash richness around a bite, because the bite
+// shorten. The node props are shed per InstancedMesh batch at the scenery
+// reach (gather_nodes.ts update, its rule in gather_batch_reach_core.ts): at
+// or beyond the visible fog on the classic tiers, at the detail horizon on
+// the vista tiers, exactly where the props and foliage layers stop drawing;
+// a shed node is not a 3D click target (InstancedMesh.raycast walks count),
+// and the minimap is the spotting surface. Next, the water surface's splash
+// richness around a bite, because the bite
 // itself is carried by the bobber state, the cue, and the log line; and the
 // farm plant/harvest/wither flourishes, which emit through the shared Vfx
 // emitters, so the adaptive budget's scaledCount is their whole shed (the
@@ -43,6 +49,7 @@ import { ALWAYS_VISIBLE_AURA_IDS, selectShedSlots } from '../src/ui/aura_overflo
 import { type AuraSlotState, isShortDurationBuff } from '../src/ui/auras_view';
 import { HARVEST_JOURNAL_TICK_MS } from '../src/ui/hud/professions/harvest_journal_window';
 import type { FarmPlotView } from '../src/world_api/farming';
+import { PROFILE_TOKENS } from './helpers/profile_tokens';
 
 // Comments stripped before scanning (the architecture-test rule): prose that
 // NAMES the invariant ("nothing here reads ui_effects_profile") must never
@@ -52,18 +59,11 @@ const read = (rel: string): string =>
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-// The two spellings a profile/governor read would arrive through. Import
-// specifiers are enough: the per-file scan matches the architecture test's
-// scope (a module reaching for the profile does it by importing it). The
-// governor tokens name the REAL module and class (src/render/render_budget.ts
-// RenderBudgetGovernor): the phase 14 QA found the original pair matched
-// nothing in the repo, leaving the governor arm of this guard inert.
-const PROFILE_TOKENS = [
-  'ui_effects_profile',
-  'ui_tier_knobs',
-  'render_budget',
-  'RenderBudgetGovernor',
-];
+// The per-file scan matches the architecture test's scope (import
+// specifiers); the token set is shared with the startup graphics safety pins
+// (tests/helpers/profile_tokens.ts). The phase 14 QA found the original
+// governor pair matched nothing in the repo, leaving that arm inert, hence
+// the REAL module and class names there.
 
 function expectProfileFree(rel: string): void {
   const source = read(rel);
@@ -277,6 +277,25 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // surfaces above never import the renderer's fog state either.
     expect(read('src/render/fishing_bobber.ts').includes('LOW_FOG')).toBe(false);
     expect(read('src/ui/minimap_markers.ts').includes('LOW_FOG')).toBe(false);
+  });
+
+  it('the node props are shed at the scenery reach the props layer uses, never inside the fog', () => {
+    // Both gather-node frame sites (the prewarm frame and the live frame)
+    // hand the view Math.max(fogFar, lastRequestedFogFar): the eased cull far
+    // (the visible fog on the classic tiers, the detail horizon on the vista
+    // tiers) or the latched target, whichever is larger, so a batch is never
+    // hidden while the visible fog still shows it. Statement-terminated on
+    // the comment-stripped source, and pinned as the WHOLE statement: a
+    // wrapped or scaled reach (sceneryCullFar(...), * 0.5) would still
+    // contain the expression while shortening the reach inside the fog.
+    const renderer = read('src/render/renderer.ts');
+    const calls = renderer.match(/this\.gatherNodes\.update\([^;]*\);/g) ?? [];
+    expect(calls).toHaveLength(2);
+    for (const call of calls) {
+      expect(call).toBe(
+        'this.gatherNodes.update(this.camera, this.sun, Math.max(fogFar, this.lastRequestedFogFar));',
+      );
+    }
   });
 
   // The LOW preset's buff-icon cap (AURA_VISIBLE_CAP_LOW) and Well Fed.

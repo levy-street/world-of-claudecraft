@@ -840,7 +840,10 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Restored per-ability resurrection school lookup removes one line.
-    ceiling: 12851,
+    // Lowered again when the gather-node shadow shed and reach hide moved
+    // behind GatherNodesView.update (the two guard blocks collapsed to one
+    // call each and the shadowLightDirection scratch left the renderer).
+    ceiling: 12844,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

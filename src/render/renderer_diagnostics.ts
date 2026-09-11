@@ -210,7 +210,10 @@ export function collectRenderDiagnostics(
       const hasPoints = Boolean(renderable.isPoints);
       const hasSprite = Boolean(renderable.isSprite);
       const hasLine = Boolean(renderable.isLine || renderable.isLineSegments);
-      if (hasMesh || hasPoints || hasSprite || hasLine) {
+      // A count-0 InstancedMesh is skipped by three's render list before any
+      // program binds: neither a draw nor an object here.
+      const drawsNothing = Boolean(renderable.isInstancedMesh) && renderable.count === 0;
+      if (!drawsNothing && (hasMesh || hasPoints || hasSprite || hasLine)) {
         const geometry = renderable.geometry;
         const material = renderable.material;
         const stat = categoryStats(categories, category);

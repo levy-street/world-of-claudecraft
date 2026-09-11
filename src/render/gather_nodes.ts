@@ -4,8 +4,14 @@ import type { GatherNodeDef, GatherNodeType } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import {
+  type BatchReachState,
+  FOG_REACH_HYSTERESIS,
+  planBatchReach,
+} from './gather_batch_reach_core';
 import { NODE_COLOR, NODE_Y_OFFSET, nodeTierScale } from './gather_nodes_lookup';
 import { surfaceMat } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
 import { casterShadowMayReachCamera, type ScenerySphere } from './resident_scenery_core';
 
 // Visible markers for gatherable world nodes (ore/wood/herb). Content and
@@ -45,19 +51,35 @@ if (typeof window !== 'undefined') {
   }
 }
 
+/** Which batch key the instanced arm uses: one InstancedMesh per (zone, type)
+ *  with the per-batch reach hide (`'coarse'`, the default), or the older
+ *  (zone, type, 180 yd z-band) key with every batch drawn to the far plane
+ *  (`'band'`, the `?gathercoarse=off` A/B arm). */
+export type GatherBatchKeyMode = 'coarse' | 'band';
+
 export interface GatherNodesView {
   group: THREE.Group;
-  updateShadowVisibility(
-    camera: THREE.PerspectiveCamera,
-    lightDirection: THREE.Vector3,
-    shadowsEnabled: boolean,
-  ): void;
+  /** Per frame: the per-batch shadow shed while `sun.castShadow` is on, and
+   *  the per-batch reach hide on every tier. `reach` is the horizontal
+   *  distance beyond which a batch whose NEAREST node lies past it is hidden
+   *  (the renderer passes its scenery cull far, at or outside the visible fog;
+   *  indoors that max keeps the last OUTDOOR request, so the reach is the
+   *  stale outdoor value and nothing hides that an interior fog would show). */
+  update(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight, reach: number): void;
 }
 
-interface GatherNodeShadowEntry {
-  readonly bounds: ScenerySphere;
+// One entry per instanced batch (or per individual fallback node): the
+// shadow shed's verdict and the reach hide's state compose into the casters'
+// castShadow write, so a hidden batch never binds its depth program either.
+interface GatherNodeEntry extends BatchReachState {
+  readonly bounds: ScenerySphere | null;
   readonly casters: THREE.Mesh[];
+  readonly batches: THREE.InstancedMesh[];
+  readonly instanceCount: number;
+  readonly xs: Float64Array;
+  readonly zs: Float64Array;
   casts: boolean;
+  shown: boolean;
 }
 
 interface GatherNodeBatch {
@@ -65,6 +87,18 @@ interface GatherNodeBatch {
   zoneId: string;
   band: number;
   nodes: GatherNodeDef[];
+}
+
+const NO_NODES = new Float64Array(0);
+
+function sphereOf(box: THREE.Box3): ScenerySphere {
+  const sphere = box.getBoundingSphere(new THREE.Sphere());
+  return { x: sphere.center.x, y: sphere.center.y, z: sphere.center.z, radius: sphere.radius };
+}
+
+function writeCastShadow(entry: GatherNodeEntry): void {
+  const casts = entry.casts && entry.shown;
+  for (const mesh of entry.casters) mesh.castShadow = casts;
 }
 
 interface GatherNodeMeshPart {
@@ -143,19 +177,26 @@ function gatherNodeMeshParts(template: THREE.Object3D): GatherNodeMeshPart[] | n
   return supported && parts.length > 0 ? parts : null;
 }
 
-function gatherNodeBatches(nodes: readonly GatherNodeDef[]): GatherNodeBatch[] {
-  const byZoneTypeAndBand = new Map<string, GatherNodeBatch>();
+// Under the coarse key a batch's band is its first node's band (kept for the
+// mesh name and userData.gatherNodeBand). Map insertion order over the
+// content list keeps the batch order deterministic under both keys.
+function gatherNodeBatches(
+  nodes: readonly GatherNodeDef[],
+  mode: GatherBatchKeyMode,
+): GatherNodeBatch[] {
+  const byKey = new Map<string, GatherNodeBatch>();
   for (const node of nodes) {
     const band = Math.floor(node.pos.z / 180);
-    const key = `${node.zoneId}:${node.type}:${band}`;
-    let batch = byZoneTypeAndBand.get(key);
+    const key =
+      mode === 'band' ? `${node.zoneId}:${node.type}:${band}` : `${node.zoneId}:${node.type}`;
+    let batch = byKey.get(key);
     if (!batch) {
       batch = { type: node.type, zoneId: node.zoneId, band, nodes: [] };
-      byZoneTypeAndBand.set(key, batch);
+      byKey.set(key, batch);
     }
     batch.nodes.push(node);
   }
-  return [...byZoneTypeAndBand.values()];
+  return [...byKey.values()];
 }
 
 function copyMeshRenderState(source: THREE.Mesh, target: THREE.InstancedMesh): void {
@@ -183,7 +224,7 @@ function addInstancedBatch(
   batch: GatherNodeBatch,
   parts: GatherNodeMeshPart[],
   seed: number,
-  shadowEntries: GatherNodeShadowEntry[],
+  entries: GatherNodeEntry[],
 ): void {
   const placement = new THREE.Matrix4();
   const tierMatrix = new THREE.Matrix4();
@@ -211,6 +252,15 @@ function addInstancedBatch(
   // one castShadow decision conservatively covers the regional batch.
   const batchBounds = new THREE.Box3();
   const casters: THREE.Mesh[] = [];
+  const batches: THREE.InstancedMesh[] = [];
+  // The authored node.pos, exact: the placement below carries no horizontal
+  // offset, so the reach measures the instance's true footprint.
+  const xs = new Float64Array(batch.nodes.length);
+  const zs = new Float64Array(batch.nodes.length);
+  for (const [instanceId, node] of batch.nodes.entries()) {
+    xs[instanceId] = node.pos.x;
+    zs[instanceId] = node.pos.z;
+  }
   for (const [partIndex, part] of parts.entries()) {
     const mesh = new THREE.InstancedMesh(part.geometry, part.material, batch.nodes.length);
     mesh.name = `gatherNodes:${batch.zoneId}:${batch.type}:${batch.band}:${partIndex}`;
@@ -245,21 +295,19 @@ function addInstancedBatch(
     mesh.computeBoundingSphere();
     if (mesh.boundingBox) batchBounds.union(mesh.boundingBox);
     if (mesh.castShadow) casters.push(mesh);
+    batches.push(mesh);
     group.add(mesh);
   }
-  if (casters.length > 0 && !batchBounds.isEmpty()) {
-    const sphere = batchBounds.getBoundingSphere(new THREE.Sphere());
-    shadowEntries.push({
-      bounds: {
-        x: sphere.center.x,
-        y: sphere.center.y,
-        z: sphere.center.z,
-        radius: sphere.radius,
-      },
-      casters,
-      casts: true,
-    });
-  }
+  entries.push({
+    bounds: casters.length > 0 && !batchBounds.isEmpty() ? sphereOf(batchBounds) : null,
+    casters,
+    batches,
+    instanceCount: batch.nodes.length,
+    xs,
+    zs,
+    casts: true,
+    shown: true,
+  });
 }
 
 function addIndividualNode(
@@ -267,7 +315,7 @@ function addIndividualNode(
   template: THREE.Object3D,
   node: GatherNodeDef,
   seed: number,
-  shadowEntries: GatherNodeShadowEntry[],
+  entries: GatherNodeEntry[],
 ): void {
   const obj = template.clone(true);
   const y = terrainHeight(node.pos.x, node.pos.z, seed);
@@ -287,17 +335,18 @@ function addIndividualNode(
   obj.traverse((child) => {
     if (child instanceof THREE.Mesh && child.castShadow) casters.push(child);
   });
+  // An individual node has no instance count to hide through: shadow shed
+  // only, never on the reach list (an empty batch would measure Infinity).
   if (casters.length > 0) {
-    const sphere = new THREE.Box3().setFromObject(obj).getBoundingSphere(new THREE.Sphere());
-    shadowEntries.push({
-      bounds: {
-        x: sphere.center.x,
-        y: sphere.center.y,
-        z: sphere.center.z,
-        radius: sphere.radius,
-      },
+    entries.push({
+      bounds: sphereOf(new THREE.Box3().setFromObject(obj)),
       casters,
+      batches: [],
+      instanceCount: 0,
+      xs: NO_NODES,
+      zs: NO_NODES,
       casts: true,
+      shown: true,
     });
   }
 }
@@ -306,12 +355,13 @@ function buildGatherNodesFromTemplates(
   seed: number,
   templates: ReadonlyMap<GatherNodeType, THREE.Object3D>,
   nodes: readonly GatherNodeDef[],
+  mode: GatherBatchKeyMode,
 ): GatherNodesView {
   const group = new THREE.Group();
   group.name = 'gatherNodes';
-  const shadowEntries: GatherNodeShadowEntry[] = [];
+  const entries: GatherNodeEntry[] = [];
   const partsByType = new Map<GatherNodeType, GatherNodeMeshPart[] | null>();
-  for (const batch of gatherNodeBatches(nodes)) {
+  for (const batch of gatherNodeBatches(nodes, mode)) {
     const template = templates.get(batch.type);
     if (!template) throw new Error(`Missing gather node render template: ${batch.type}`);
     if (!partsByType.has(batch.type)) {
@@ -319,49 +369,80 @@ function buildGatherNodesFromTemplates(
     }
     const parts = partsByType.get(batch.type);
     if (parts) {
-      addInstancedBatch(group, batch, parts, seed, shadowEntries);
+      addInstancedBatch(group, batch, parts, seed, entries);
       continue;
     }
     // Preserve the authored hierarchy and draw order if a future asset uses
     // transparent, alpha-tested, skinned, morphed, line, point, or sprite
     // rendering. Those cases are not safe to consolidate.
     for (const node of batch.nodes) {
-      addIndividualNode(group, template, node, seed, shadowEntries);
+      addIndividualNode(group, template, node, seed, entries);
     }
   }
+  const shadowEntries = entries.filter((entry) => entry.bounds !== null);
+  // The band arm draws every batch to the far plane (today's behaviour), so
+  // its reach list is empty and update() is the shadow shed alone.
+  const reachEntries = mode === 'coarse' ? entries.filter((entry) => entry.batches.length > 0) : [];
   const cameraForward = new THREE.Vector3();
+  const lightDirection = new THREE.Vector3();
   const cameraState = {
     position: new THREE.Vector3(),
     forward: cameraForward,
     near: 0,
   };
+  const flips: number[] = [];
   return {
     group,
-    updateShadowVisibility(
-      camera: THREE.PerspectiveCamera,
-      lightDirection: THREE.Vector3,
-      shadowsEnabled: boolean,
-    ): void {
-      if (!shadowsEnabled) return;
-      camera.getWorldDirection(cameraForward);
-      cameraState.position.copy(camera.position);
-      cameraState.near = camera.near;
-      for (const entry of shadowEntries) {
-        const casts = casterShadowMayReachCamera(entry.bounds, cameraState, lightDirection);
-        if (casts === entry.casts) continue;
-        entry.casts = casts;
-        for (const mesh of entry.casters) mesh.castShadow = casts;
+    update(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight, reach: number): void {
+      if (sun.castShadow) {
+        lightDirection.subVectors(sun.position, sun.target.position).normalize();
+        camera.getWorldDirection(cameraForward);
+        cameraState.position.copy(camera.position);
+        cameraState.near = camera.near;
+        for (const entry of shadowEntries) {
+          if (!entry.bounds) continue;
+          const casts = casterShadowMayReachCamera(entry.bounds, cameraState, lightDirection);
+          if (casts === entry.casts) continue;
+          entry.casts = casts;
+          writeCastShadow(entry);
+        }
+      }
+      // The hide is `count`, never `visible` and never a bounds recompute: the
+      // mesh stays a compile-lane root with its build-time sphere, and three
+      // draws nothing for a count-0 InstancedMesh in the colour pass while the
+      // composed castShadow keeps it out of the shadow pass.
+      const flipped = planBatchReach(
+        reachEntries,
+        camera.position.x,
+        camera.position.z,
+        reach,
+        FOG_REACH_HYSTERESIS,
+        flips,
+      );
+      for (let i = 0; i < flipped; i++) {
+        const entry = reachEntries[flips[i]];
+        const count = entry.shown ? entry.instanceCount : 0;
+        for (const mesh of entry.batches) mesh.count = count;
+        writeCastShadow(entry);
       }
     },
   };
 }
 
-export function buildGatherNodes(seed: number): GatherNodesView {
+/** The session's batch key: the band arm only under `?gathercoarse=off`. */
+export function gatherBatchKeyMode(): GatherBatchKeyMode {
+  return renderLayerDisabled('gathercoarse') ? 'band' : 'coarse';
+}
+
+export function buildGatherNodes(
+  seed: number,
+  mode: GatherBatchKeyMode = gatherBatchKeyMode(),
+): GatherNodesView {
   const templates = new Map<GatherNodeType, THREE.Object3D>();
   for (const node of GATHER_NODES) {
     if (!templates.has(node.type)) templates.set(node.type, buildNodeTemplate(node.type));
   }
-  return buildGatherNodesFromTemplates(seed, templates, GATHER_NODES);
+  return buildGatherNodesFromTemplates(seed, templates, GATHER_NODES, mode);
 }
 
 export function gatherNodeIdFromIntersection(
