@@ -248,13 +248,13 @@ Unbound sigils (compounding boss damage against the clock).
 | Mechanic | Normal | Heroic |
 |---|---|---|
 | Dread Curse | 25% hit, +35% per stack, swap at 2 | 30% hit, +45% per stack, swap at 2 |
-| Bone Spike | every 20 s, 2 victims, 8%/s | every 16 s, 3 victims, 10%/s |
+| Bone Spike | every 24 s, 2 victims, 8%/s, 4 hits to shatter, 55 s per-raider cooldown (v0.42.2) | every 20 s, 3 victims, 10%/s, 6 hits to shatter, 55 s per-raider cooldown (v0.42.2) |
 | Grave Eruption | every 15 s, 4 circles, 45%, flame 12 s at 6%/s | every 12 s, 6 circles, 75%, flame never goes out (clears at the transition) at 9%/s |
-| Binding Sigil | every 45 s, 10 to 24 yd out, 4 yd, 15 s to bind, +4%/stack, Bound 10 s, Unbound 40%, keeps +20% | every 40 s, 3 yd, 12 s, +5%/stack, Bound 8 s, Unbound 60%, keeps +25%, may land in fire |
-| Soul Rend / Soulfire | 3 marks, 100% split, pools 15 s at 8%/s | 6 marks, 150% split, pools never go out at 12%/s |
+| Binding Sigil | every 45 s, on one of the two flanking platforms 30 yd to the raid's left or right of the spawn (alternating, v0.42.2), 4 yd, 15 s to bind, +4%/stack, Bound 10 s, Unbound 40%, keeps +20% | every 40 s, same placement, 3 yd, 12 s, +5%/stack, Bound 8 s, Unbound 60%, keeps +25%, may land in fire |
+| Soul Rend | 3 marks, 100% split, no pool since v0.42.2 | 6 marks, 150% split, no pool since v0.42.2 |
 | Deathless Rage | 82% on failure (unchanged) | 115% on failure, lethal, court rises (unchanged) |
-| Gravefire | every 12 s, burns 6 s at 10%/s | every 10 s, burns 8 s at 15%/s |
-| Phase 3 Wrath | +20% damage, eruptions every 10 s, Gravefire every 8 s | +25% damage, eruptions every 8 s, Gravefire every 6 s |
+| Gravefire | retired from play in v0.42.2 (no line, no slam line) | retired from play in v0.42.2 |
+| Phase 3 Wrath | +20% damage, eruptions every 10 s | +25% damage, eruptions every 8 s |
 | Bone Storm | every 50 s, whirl 10%/s, Bone Slam 35% | every 40 s, whirl 20%/s, Bone Slam 55% |
 | The Crown Endures | 6:00 (the clock pauses for the transition), +25% every 30 s | 5:00, +25% every 20 s |
 | Court (Aldren, Malric, Voss) | absent | after a failed Rage and after each interrupt stun |
@@ -534,3 +534,99 @@ record of how the fight got here.
   off the purple family.
 - **Unchanged by this pass:** Dread Curse (cadence, per-stack hit, duration,
   swap threshold) and every King's Wrath / Crown Endures phase buff.
+
+## 15. Hotfix v0.42.2 (2026-09-11): Soulfire retired, Bone Spike cooldown and recolour
+
+Supersedes only the points named below; sections 1-14 stand as the record.
+Live heroic runs still found the fight too hard after the v0.42.1 spike
+health change, and one raider could be spiked several waves running.
+
+- **Soulfire is retired from play.** A Soul Rend detonation still splits its
+  hit across the stacked marks exactly as before, but leaves NO pool behind on
+  either difficulty. The stack point no longer has to rotate. The `soul` flame
+  kind stays on the wire and in the renderer for now (nothing produces it);
+  removing it end to end is a normal-cycle cleanup. The Raid Boss Guide row,
+  the finder chip, and the guide prose that told the raid to rotate off the
+  fire are gone with it.
+- **Bone Spike per-raider cooldown: 55 s from the impale.** A raider who has
+  just been impaled cannot be picked by any Bone Spike cast (the cadence cast
+  or the mid-storm one) for 55 s, measured from the moment the spike rose,
+  not from the release, and counted on the encounter clock through every
+  script-locked window. Longer than two Normal cadences (48 s) and two Heroic
+  ones (40 s), so consecutive waves spread across the raid. With fewer
+  eligible raiders than the wave size the cast pins the ones it has; with
+  none it re-polls in 3 s as before. The ledger clears on an encounter reset.
+  (`NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS`, `src/sim/nythraxis_bone_spike.ts`.)
+- **Bone Spikes are ember orange.** The authored bone-and-flagstone atlas
+  read as the boss (a bone golem) and the floor under the hall's violet
+  torchlight. The spike now carries a strong ember-orange tint with a tinted
+  self-illumination lift, the one hue no other Nythraxis surface uses: not
+  the purple offensive palette, not the sigil's friendly blue, not Soul
+  Rend's red/green. The tint applies on every graphics tier; the lift is a
+  standard-tier polish. (`mob_nythraxis_bone_spike` in
+  `src/render/characters/manifest.ts`, pinned in
+  `tests/nythraxis_hazard_palette.test.ts`.)
+- **Cadence correction to section 5's table:** the live Bone Spike cadence
+  has been 24 s Normal / 20 s Heroic since the first playtest pass (the table
+  still said 20 / 16); the table now reads the live values.
+- **Unchanged by this pass:** victims per wave (2 / 3), the impale drain
+  (8% / 10% per second), spike health (1,000 on both difficulties since
+  v0.42.1), Grave Eruption, Grave Flame, Gravefire, Binding Sigil, Dread
+  Curse, Deathless Rage, Bone Storm, and every phase buff.
+
+## 16. Hotfix v0.42.2, second batch (2026-09-11): wards, no Gravefire, sigil sides
+
+Same day as section 15, after the first batch went up for review. Supersedes
+only the points named below.
+
+- **Bone Spikes are wards.** A spike takes HITS to clear, not damage: 4 hits
+  on Normal, 6 on Heroic, from anyone (any player or player-owned pet), each
+  hit counting one whatever it would have dealt (a poke, a crit, a DoT tick
+  all count one; a wild mob's damage does not count). The spike's health
+  pool IS the hit count, so its health bar reads as hits remaining, and the
+  rule lives at the one damage funnel (`combat/damage.ts` through
+  `nythraxisBoneSpikeWardHit`). The 1,000 hp pool of v0.42.1 is gone; the
+  per-mob multiplier override stays as a no-op mirror of Normal's. Two
+  consequences by design: a spike hit yields the rage, mana, threat, and
+  meter rows of a one-point hit, and the crit roll is kept (the hit still
+  reads as a crit, and proc accounting such as Crafted Momentum treats it
+  as the player's own attack, not a copy) while the amount is pinned.
+- **Bone Spikes are easier to click.** The spike's click capsule is about
+  twice the footprint-derived default (`clickRadius` on the visual def, a
+  presentation-only override), so a click near the spike lands on it and not
+  on the raider it pins. Healers reach the impaled raider through the raid
+  frames as before.
+- **Gravefire is retired from play.** Neither the cadence cast (phase 2 and
+  3, the King's Wrath tightening included) nor the Bone Slam's line down the
+  charge ignites any more. The line tick, readout, wire, renderer, callout
+  key, and the leaf constants stay as dormant plumbing, the same treatment as
+  Soulfire; the Raid Boss Guide row, the finder chip, and the `/dev nyx
+  gravefire` poke are gone. Bone Storm is now the whirl, the charges, and the
+  slam burst alone.
+- **The Binding Sigil lands on one of the two platforms flanking the throne.**
+  No more hash ring 12 to 30 yd out: the Abandoned Crypt's raised boss dais
+  (`CRYPT_LAYOUT.dais`, the `DAIS_HEIGHT` foundation-block disc with a
+  walkable floor lift and no obstacle collider) is reused twice in the raid
+  layout (`NYTHRAXIS_LAYOUT.platforms`), in line with where Nythraxis spawns
+  and `NYTHRAXIS_PLATFORM_SIDE_OFFSET` (30 yd) to the raid's left and right
+  of him. The sim lifts its floor on them (`daisLiftAt`) and the renderer
+  stacks the same blocks (`src/render/dais_blocks_core.ts`) with the ritual
+  glow pooled on top, so a sigil drawn at ground height sits on the blocks,
+  never under them. The sigil lands on the platform centre, alternating
+  sides every cast starting on the raid's right, anchored on the SPAWN
+  rather than the boss's current position, so the two stages are fixed
+  spots the raid can learn wherever he has been dragged. A blocked platform
+  (wardstone, Normal fire) sends the sigil to the other one; when both are
+  blocked it takes the asked one, never the anchor itself (on Normal that
+  last resort can sit in fire when both platforms burn: a cast must land
+  somewhere). The 22 yd open-floor placement and its same-side ladder from
+  the first cut of this pass are gone. Flat one-sample ground cues (the
+  flame patch, the sigil, the cage, the generic AoE ring) read the tallest
+  interior plateau under their footprint (`groundCueY` in
+  `src/render/dais_lift.ts`), so a ring straddling a platform rim draws on
+  the block tops instead of vanishing under them; per-vertex draped cues
+  (the eruption warning, the Soul Rend marker) needed nothing.
+- **Unchanged by this pass:** the spike cadence, victims per wave, the impale
+  drain, the 55 s per-raider cooldown, Grave Eruption and Grave Flame, Dread
+  Curse, Deathless Rage, the sigil's cadence, radius, bind window, Ascension
+  and Bound rules, and every phase buff.

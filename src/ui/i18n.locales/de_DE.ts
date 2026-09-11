@@ -3677,7 +3677,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Schattenpuls (pulsierender Flachenschaden)',
   'hudChrome.finder.mech.shuddering_stomp': 'Erschutternder Stampfer (Flachenbetaubung)',
   'hudChrome.finder.mech.soul_rend':
-    'Seelenzerfetzung (markierte Spieler sammeln sich und verlassen dann das Feuer)',
+    'Seelenzerfetzung (markierte Spieler sammeln sich, um den Schaden aufzuteilen)',
   'hudChrome.finder.mech.summons_adds': 'Beschwort Verstarkung',
   'hudChrome.finder.mech.wardstones': 'Schutzstein-Kanale (Phasenubergang)',
   'hudChrome.finder.needs': 'Benotigt {roles}',
@@ -15815,7 +15815,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Bindungssiegel (zieht den Boss auf das Siegel, sonst bezahlt der Schlachtzug)',
   'hudChrome.finder.mech.bone_spike':
-    'Knochenspieß (aufgespießte Schlachtzügler verlieren Leben, bis der Spieß zerstört ist)',
+    'Knochenspieß (aufgespießte Spieler verlieren Leben, bis jemand den Spieß mit ein paar Treffern zerbricht)',
   'hudChrome.finder.mech.bone_storm':
     'Knochensturm (er ignoriert Bedrohung, wirbelt und stürmt den Schlachtzug an)',
   'hudChrome.finder.mech.crown_endures':
@@ -15824,11 +15824,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Der Todlose Hof (nur heroisch, der Königshof erhebt sich nach Todloser Raserei)',
   'hudChrome.finder.mech.grave_eruption':
     'Graberuption (Warnkreise, die brennenden Boden hinterlassen)',
-  'hudChrome.finder.mech.gravefire': 'Grabfeuer (eine wandernde Feuerlinie zum Ausweichen)',
   'hudChrome.finder.mech.kings_wrath':
     'Zorn des Königs (30%: dauerhafter Schadensbonus, schnellere Bodengefahren)',
-  'hudChrome.finder.mech.soulfire':
-    'Seelenfeuer (Detonationen von Seelenriss hinterlassen brennende Flächen)',
   'hudChrome.fullTransfer.excluded':
     'Nie enthalten: Eure Anmeldung, Euer Konto, Eure Wallet oder Kaufdaten. Aktionsleistenlayouts werden in Eurem Konto gespeichert und reisen mit.',
   'hudChrome.fullTransfer.fullSettings': 'Vollständige Einstellungen',
@@ -15927,19 +15924,19 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Aus',
   'hudChrome.options.shaderWarmOn': 'An',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    'Alle {everyHeroic} Sek. flammt ein Siegel der alten Schutzzauber {minDist} bis {maxDist} yd von Nythraxis entfernt auf dem Boden auf, und er beginnt Todlose Erhebung, wodurch er alle {ascensionEvery} Sek. {ascensionHeroic} Schaden und Angriffstempo erhält. Steht er innerhalb von {bindHeroic} Sek. auf dem Siegel, wird er gebunden: Die Erhebung wird gebannt, er ist {stunHeroic} Sek. betäubt und er erleidet {boundHeroic} Sek. lang {vulnerability} mehr Schaden. Andernfalls erleidet jeder Schlachtzügler {unboundHitHeroic} der maximalen Gesundheit als Schattenschaden, und er behält bis zur nächsten Bindung {unboundBonusHeroic} mehr Schaden.',
+    'Alle {everyHeroic} Sek. flammt ein Siegel der alten Schutzzauber auf einer der beiden Plattformen neben dem Thron auf, {sideOffset} yd links oder rechts (aus Sicht des Schlachtzugs) von der Stelle, an der Nythraxis beim Pull stand, bei jedem Wirken auf der anderen Seite, und er beginnt Todlose Erhebung, wodurch er alle {ascensionEvery} Sek. {ascensionHeroic} Schaden und Angriffstempo erhält. Steht er innerhalb von {bindHeroic} Sek. auf dem Siegel, wird er gebunden: Die Erhebung wird gebannt, er ist {stunHeroic} Sek. betäubt und er erleidet {boundHeroic} Sek. lang {vulnerability} mehr Schaden. Andernfalls erleidet jeder Schlachtzügler {unboundHitHeroic} der maximalen Gesundheit als Schattenschaden, und er behält bis zur nächsten Bindung {unboundBonusHeroic} mehr Schaden.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Bindungssiegel',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'Der Tank zieht Nythraxis sofort auf das Siegel, auch durch jedes Feuer, das der Schlachtzug zurückgelassen hat. Nahkämpfer folgen dem Zug, Fernkämpfer bleiben aus dem neuen Grabbrecher-Kegel. Alle brennen ihn nieder, solange er gebunden ist.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    'Alle {everyNormal} Sek. flammt ein Siegel der alten Schutzzauber {minDist} bis {maxDist} yd von Nythraxis entfernt auf dem Boden auf, und er beginnt Todlose Erhebung, wodurch er alle {ascensionEvery} Sek. {ascensionNormal} Schaden und Angriffstempo erhält. Steht er innerhalb von {bindNormal} Sek. auf dem Siegel, wird er gebunden: Die Erhebung wird gebannt, er ist {stunNormal} Sek. betäubt und er erleidet {boundNormal} Sek. lang {vulnerability} mehr Schaden. Andernfalls erleidet jeder Schlachtzügler {unboundHitNormal} der maximalen Gesundheit als Schattenschaden, und er behält bis zur nächsten Bindung {unboundBonusNormal} mehr Schaden.',
+    'Alle {everyNormal} Sek. flammt ein Siegel der alten Schutzzauber auf einer der beiden Plattformen neben dem Thron auf, {sideOffset} yd links oder rechts (aus Sicht des Schlachtzugs) von der Stelle, an der Nythraxis beim Pull stand, bei jedem Wirken auf der anderen Seite, und er beginnt Todlose Erhebung, wodurch er alle {ascensionEvery} Sek. {ascensionNormal} Schaden und Angriffstempo erhält. Steht er innerhalb von {bindNormal} Sek. auf dem Siegel, wird er gebunden: Die Erhebung wird gebannt, er ist {stunNormal} Sek. betäubt und er erleidet {boundNormal} Sek. lang {vulnerability} mehr Schaden. Andernfalls erleidet jeder Schlachtzügler {unboundHitNormal} der maximalen Gesundheit als Schattenschaden, und er behält bis zur nächsten Bindung {unboundBonusNormal} mehr Schaden.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Alle {everyHeroic} Sek. spießt Nythraxis {victimsHeroic} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainHeroic} der maximalen Gesundheit, bis sein Spieß zerstört ist.',
+    'Alle {everyHeroic} Sek. spießt Nythraxis {victimsHeroic} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainHeroic} der maximalen Gesundheit, bis sein Spieß zerstört ist. Ein Spieß zerbricht nach {hitsHeroic} Treffern von irgendjemandem, egal wie viel Schaden sie anrichten. Ein bereits aufgespießter Schlachtzügler kann {cooldown} Sek. lang nicht erneut gewählt werden, sodass sich die Spieße über den ganzen Schlachtzug verteilen.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Knochenspieß',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'Schadensklassen wechseln sofort auf die Knochenspieße und zerstören sie, um die aufgespießten Schlachtzügler zu befreien. Heiler halten die Aufgespießten am Leben, während die Spieße fallen.',
+    'Wer am nächsten steht, schlägt auf den Knochenspieß: ein paar Treffer von irgendjemandem zerbrechen ihn, egal wie viel Schaden sie machen. Heiler halten die Aufgespießten am Leben, bis die Spieße fallen.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Alle {everyNormal} Sek. spießt Nythraxis {victimsNormal} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainNormal} der maximalen Gesundheit, bis sein Spieß zerstört ist.',
+    'Alle {everyNormal} Sek. spießt Nythraxis {victimsNormal} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainNormal} der maximalen Gesundheit, bis sein Spieß zerstört ist. Ein Spieß zerbricht nach {hitsNormal} Treffern von irgendjemandem, egal wie viel Schaden sie anrichten. Ein bereits aufgespießter Schlachtzügler kann {cooldown} Sek. lang nicht erneut gewählt werden, sodass sich die Spieße über den ganzen Schlachtzug verteilen.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyHeroic} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlHeroic} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamHeroic} der maximalen Gesundheit. Er wirkt {spikeAt} Sek. nach Beginn des Sturms Knochenspieß, dann wird Grabbrecher {rearm} Sek. nach seinem Ende wieder bereit.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Knochensturm',
@@ -15985,23 +15982,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Tanks halten Nythraxis vom Schlachtzug weggedreht. Alle anderen bleiben hinter oder neben ihm und kreuzen nie den Kegel.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     'Alle {seconds} Sek. lädt Nythraxis seinen nächsten gelandeten Schlag auf. Sein Ziel erleidet nur den Schlag selbst, aber alle anderen innerhalb von {range} yd im {arc}-Grad-Kegel vor ihm erleiden {splash} dieses Schlags als körperlichen Schaden, reduziert durch ihre eigene Rüstung.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    'Alle {everyHeroic} Sek. läuft eine Linie aus violettem Grabfeuer von Nythraxis auf einen Schlachtzügler zu und wächst jede Sekunde um {speed} yd bis auf {length} yd. Jeder Yard brennt {burnHeroic} Sek. lang und verursacht jede Sekunde {tickHeroic} der maximalen Gesundheit bei jedem, der darin steht.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Grabfeuer',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Weicht seitlich aus, wenn die Linie kommt: Sie ist schmal und dreht nie. Fernkämpfer bleiben in Bewegung, statt an einer Stelle stehen zu bleiben.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    'Alle {everyNormal} Sek. läuft eine Linie aus violettem Grabfeuer von Nythraxis auf einen Schlachtzügler zu und wächst jede Sekunde um {speed} yd bis auf {length} yd. Jeder Yard brennt {burnNormal} Sek. lang und verursacht jede Sekunde {tickNormal} der maximalen Gesundheit bei jedem, der darin steht.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Zorn des Königs',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Nutzt verbleibende defensive Abklingzeiten für unvermeidbaren Schaden. Haltet jede frühere Mechanik sauber, während der Schlachtzug den Kampf beendet.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis verursacht auf Normal {bonusNormal} mehr Schaden oder auf Heroisch {bonusHeroic} für den Rest des Kampfes. Graberuption tritt alle {eruptionEveryNormal} Sek. auf ({eruptionEveryHeroic} auf Heroisch) und Grabfeuer alle {gravefireEveryNormal} Sek. ({gravefireEveryHeroic} auf Heroisch).',
+    'Nythraxis verursacht auf Normal {bonusNormal} mehr Schaden oder auf Heroisch {bonusHeroic} für den Rest des Kampfes. Graberuption tritt alle {eruptionEveryNormal} Sek. auf ({eruptionEveryHeroic} auf Heroisch).',
   'hudChrome.raidBossGuide.nythraxis.overview':
     'Hohepriester Malric weigerte sich, seinen König sterben zu lassen, und der Ritus, der Nythraxis erhob, band den ganzen Hof an die Gruft. Die Begegnung prüft einen disziplinierten Tankwechsel, schnelle Wechsel auf Knochenspieße, Bewegung aus brennendem Boden und eine koordinierte Schutzstein-Kanalisierung, sobald der Thron fällt.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'Zorn des Königs',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    'Bei {health} Gesundheit brüllt Nythraxis im Zorn des Königs und erhält auf Normal {bonusNormal} Schaden oder auf Heroisch {bonusHeroic} für den Rest des Kampfes. Graberuption verkürzt sich auf alle {eruptionEveryNormal} Sek. ({eruptionEveryHeroic} auf Heroisch) und Grabfeuer auf alle {gravefireEveryNormal} Sek. ({gravefireEveryHeroic} auf Heroisch). Jede andere Mechanik behält ihren Rhythmus.',
+    'Bei {health} Gesundheit brüllt Nythraxis im Zorn des Königs und erhält auf Normal {bonusNormal} Schaden oder auf Heroisch {bonusHeroic} für den Rest des Kampfes. Graberuption verkürzt sich auf alle {eruptionEveryNormal} Sek. ({eruptionEveryHeroic} auf Heroisch). Jede andere Mechanik behält ihren Rhythmus.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'Der Thron',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     'Nythraxis hält seinen Thronsaal mit einem aufgeladenen frontalen Spaltangriff, dem Schreckensfluch-Tankwechsel, Knochenspießen, die Schlachtzügler aufspießen, und Graberuptionen, die brennenden Boden hinterlassen.',
@@ -16020,13 +16010,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Jeder markierte Schlachtzügler läuft zu einem Sammelpunkt und steht innerhalb von {range} yd der anderen Markierungen, bevor die {fuse} Sek. lange Zündzeit endet. Heiler bringen die Gruppe hoch, wenn die Markierungen auslösen.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis markiert {marksNormal} Schlachtzügler außer seinem aktuellen Ziel mit Seelenriss. Nach {fuse} Sek. verursacht jede Markierung die volle maximale Gesundheit ihres Trägers als Schattenschaden, geteilt durch die Anzahl markierter Schlachtzügler innerhalb von {range} yd um sie.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Jede Seelenriss-Detonation hinterlässt pro gestapelter Markierungsgruppe eine violette Feuerfläche mit {radius} yd Radius, die {secondsHeroic} Sek. lang brennt und jede Sekunde {tickHeroic} der maximalen Gesundheit verursacht. Wer dort steht, wo Flächen überlappen, erleidet nur einen Tick, nie gestapelte Kopien. Flächen entstehen nie innerhalb von {clearance} yd eines Schutzsteins.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Seelenfeuer',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Lauft aus der violetten Fläche, sobald die Markierungen detonieren. Haltet den nächsten Sammelpunkt frei von aktivem Feuer.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Jede Seelenriss-Detonation hinterlässt dort, wo jede Markierung stand, eine violette Feuerfläche mit {radius} yd Radius, die {seconds} Sek. lang brennt und jede Sekunde {tickNormal} der maximalen Gesundheit verursacht. Wer dort steht, wo Flächen überlappen, erleidet von jeder Fläche einen Tick. Flächen entstehen nie innerhalb von {clearance} yd eines Schutzsteins.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Eiszapfen',
 
   // Release fill: v0.31 farming, corpse harvest, aura tracks, and cosmetics.
@@ -16135,7 +16118,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Verfolge {count} Herstellungen von {name} als dein Sammelziel',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Deine erfolgreichen Nahkampfangriffe können 50 Stärke für 15 Sek. gewähren und dich um 200 Gesundheit heilen. Heilmodifikatoren gelten. Jeder Treffer würfelt 1 % pro 0,6 Sek. der Grundgeschwindigkeit der angreifenden Waffe. Keine interne Abklingzeit. Jede Hand hat ihre eigene Stärkung; wiederholte Auslösungen erneuern diese Hand. Fernkampfangriffe lösen diesen Effekt nicht aus. Wolfsform verwendet stattdessen ihre Grundschwunggeschwindigkeit von 1 Sek.',
+    'Deine erfolgreichen Nahkampfangriffe können 50 Stärke für 15 Sek. gewähren und dich um 200 Gesundheit heilen. Heilmodifikatoren gelten. Jeder Treffer würfelt 1 % pro 0,6 Sek. der Grundgeschwindigkeit der angreifenden Waffe. Keine interne Abklingzeit. Beide Hände teilen sich eine Stärkung; jede Auslösung erneuert sie, und sie stapelt sich nie. Fernkampfangriffe lösen diesen Effekt nicht aus. Wolfsform verwendet stattdessen ihre Grundschwunggeschwindigkeit von 1 Sek.',
   'hudChrome.enchantName.enchant_chest_armor': 'Brustgravur: Verstärkung',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Brustgravur: Große Ausdauer',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Brustgravur: Leuchtende Ausdauer',

@@ -668,8 +668,11 @@ interface AttributionTargetFixture {
 // v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
+// v0.42.2 Nythraxis platforms (PR3994): the renderer leaf moved for the
+// flanking-platform ground lift and the plateau-aware ground-cue height.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5ae21044dd1b636f9c293ec628a7d316f740bb92a5962f848c6e58c80218ebbc';
+  '429a5ebec09a5a2303745e334acd908eae9ec0b7c9cf04b3dbd54742d500e199';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

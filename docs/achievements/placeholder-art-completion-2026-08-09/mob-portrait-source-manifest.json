@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "a5570569a067278741f78c499fcb011ee35994966bb580d2e478660307dddb32",
+  "rendererFingerprint": "f208f49ca956f1d671f2a3b6b2e51ef9213a4a0b2258b1c43443cf118c5a32d1",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "linux",
-    "arch": "x64",
+    "platform": "darwin",
+    "arch": "arm64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "152",
-    "browserVersion": "Chrome/152.0.7977.82",
+    "browserVersion": "Chrome/152.0.7977.84",
     "requestedBackend": "swiftshader",
-    "fingerprint": "9b8a5174625ffd9f2dfa2d6d72599c3e5e71bbc0bef8e8831715f3141701ffa2"
+    "fingerprint": "538069c40c2b7b61ee2b450a871b7bdaa6fa79a2a3a8c4eea900e335ef25949d"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4864529,
-      "sha256": "1d10073657417c627d0bffdd39c3f58953aff57ef821dfa5a6ee70079369caed",
+      "bytes": 4892699,
+      "sha256": "ce057dbb3df55684df4f85015698ee615888cb53ff845756d2c258e698ede2e9",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -108,8 +108,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/acolyte_tessa.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -147,8 +147,8 @@
       "sourceFingerprint": "61c63943abb8771f49939d04bd843473169daaee2ddf436062bba4c326bdff6f",
       "output": {
         "path": "public/ui/mobs/ancient_guardian.webp",
-        "bytes": 2880,
-        "sha256": "82871c3674f7c382619d7efd093d487780aecf891422e26e32a6fdb69a79155a"
+        "bytes": 2842,
+        "sha256": "df0422fea6e701b337f2f6e12dd43051abd0ac1511373322b3850194dfe53130"
       }
     },
     {
@@ -181,8 +181,8 @@
       "sourceFingerprint": "be03c9531956fd8977de6cbebc617f0b1b8d40ca23ff354a3f5351f33a388c8e",
       "output": {
         "path": "public/ui/mobs/apprentice_wren.webp",
-        "bytes": 2754,
-        "sha256": "16fd8b765a43e0fd536b6c6cf1d8121acd89cff5d5f34a558519a6f6249a39a5"
+        "bytes": 2758,
+        "sha256": "f3a098000bee47793b197dae0d51c7ca9448f3c2a3459059d10f99595cf7b294"
       }
     },
     {
@@ -215,8 +215,8 @@
       "sourceFingerprint": "6312c51b16609b502839f36416fb533bb5f6dceb3395bdd6abe1485f9dc7f78c",
       "output": {
         "path": "public/ui/mobs/ashbone_raider.webp",
-        "bytes": 2870,
-        "sha256": "8d1d377a5c605a5721f888bbc1204ad184be4f817663545f6be4a551832246d0"
+        "bytes": 2840,
+        "sha256": "a94d3b039105bdf2f88e64026ac279d6076eeac3b08499d9700f8b341bc979ca"
       }
     },
     {
@@ -249,8 +249,8 @@
       "sourceFingerprint": "a24536a0635c75bbc3700ef06338a4420c1a5cfa5a96d5fc88233e3d98665089",
       "output": {
         "path": "public/ui/mobs/ashbone_warcaller.webp",
-        "bytes": 2836,
-        "sha256": "ce475d54ef9717cbab6c2e48165af79b250bc1aa24adcff067d7a0783e7c208c"
+        "bytes": 2828,
+        "sha256": "d2afcaf1ac9676eb446e4890480ad51def689e662c208f83c5250b095c416c83"
       }
     },
     {
@@ -317,8 +317,8 @@
       "sourceFingerprint": "594f44dfd5c475f6f0d80988683fc107d736a2462d75a57f7da67cbc23dee2cf",
       "output": {
         "path": "public/ui/mobs/barrow_king.webp",
-        "bytes": 2304,
-        "sha256": "04db44147bf88263a47b6b10084fb971531f463fff420c8637e42ed4a5dddfbc"
+        "bytes": 2292,
+        "sha256": "aff4b36f04663c2f263ab6d243fcef3e87c9758209815b47ebd29044813f8a66"
       }
     },
     {
@@ -351,8 +351,8 @@
       "sourceFingerprint": "06d23bcb1273c93990cdd3a3e8282e098835e02329e9202001882a06278e36f5",
       "output": {
         "path": "public/ui/mobs/barrow_wight.webp",
-        "bytes": 2748,
-        "sha256": "226f7e99d15ee185a16e151819c9494ad498be50158ae48e3d3560c148a54cb6"
+        "bytes": 2756,
+        "sha256": "464fc4c587c2b9ace7404a1d2e50d56839d7c16d1a28875fc37afb4b5d24e5e2"
       }
     },
     {
@@ -385,8 +385,8 @@
       "sourceFingerprint": "ca1c5b72eceff5cfb63731012d755711fd5a0ecbc793e4b6193b10ab10016421",
       "output": {
         "path": "public/ui/mobs/bastion_revenant.webp",
-        "bytes": 2352,
-        "sha256": "5463abcc350811e65e638b8693c6821bafe1ee3e0634914b8f63e99ac0d4948c"
+        "bytes": 2284,
+        "sha256": "05c3fdef7b904cb544ee03ee65dba16298e664f3f4ca7d57a0c4d89e77049def"
       }
     },
     {
@@ -521,8 +521,8 @@
       "sourceFingerprint": "f52bd345882351a8db3da547280175d1fa2e6dff56fa6c49294b3b517c1efaa8",
       "output": {
         "path": "public/ui/mobs/boneclad_revenant.webp",
-        "bytes": 2310,
-        "sha256": "9b0021bf377c98dc15ade7fb57b796161823687f6684f5f633ce5202c1d61499"
+        "bytes": 2292,
+        "sha256": "d5101faa1826ce2084f492d71780ddee1f1b63b685e7faa96bdcefca95f43808"
       }
     },
     {
@@ -555,8 +555,8 @@
       "sourceFingerprint": "ce635733b6fee3a9a0d3f869dc2cd9709138d221650da960471d62c22e332d99",
       "output": {
         "path": "public/ui/mobs/bound_guardian.webp",
-        "bytes": 2772,
-        "sha256": "325f83c1ba7cb95ecf50c6d42df8b9fae9e63a36c2878d9f7033a7a743e89688"
+        "bytes": 2762,
+        "sha256": "978ba0ea6706845031d0d62b20620db4309bff1f5818fd62cad607ef3e5496c0"
       }
     },
     {
@@ -589,8 +589,8 @@
       "sourceFingerprint": "17e6b188b1ac7d21245ff163efd5a4ca48590ebc561e22aae08db33388b9cda8",
       "output": {
         "path": "public/ui/mobs/brakka_wallbreaker.webp",
-        "bytes": 2430,
-        "sha256": "a5cea3cd85ab7b1307ab6f779b9b646652b0693a6ac76f007b11b1fd15e96c74"
+        "bytes": 2416,
+        "sha256": "7ccc25895c8aae2b5ea1e5e73d6db455c8cf05b084892bfa796794eb04b00fc6"
       }
     },
     {
@@ -657,8 +657,8 @@
       "sourceFingerprint": "b4bbcc775cb6ab33bfa1a51c1f347856fe16236cfea4391833875dddab7d7be4",
       "output": {
         "path": "public/ui/mobs/brutok_skullsmasher.webp",
-        "bytes": 2422,
-        "sha256": "ffb54ec9d2adeaa93d5d063c3529b8b6a3a0ba7550e3b395bdeb2139ab1ec8de"
+        "bytes": 2386,
+        "sha256": "6620acb712b1c7288db5f8d6dae250df203bbca75abcc4b6f77d66b491cf44d0"
       }
     },
     {
@@ -725,8 +725,8 @@
       "sourceFingerprint": "8699c2ce4df3d71f47fc5abdfea944a5776d3f1988aca44db6eff4d29e88f58a",
       "output": {
         "path": "public/ui/mobs/captain_verlan.webp",
-        "bytes": 2756,
-        "sha256": "a9690e86dbb90855d8e6ebd74c6c0a64bb1829e7562ac4ff4c2b4c3f1879dadb"
+        "bytes": 2722,
+        "sha256": "f5daef3496c879055a56f2514e5f908887fa3147f91fde72367131ebf1d6371f"
       }
     },
     {
@@ -760,7 +760,7 @@
       "output": {
         "path": "public/ui/mobs/castaway_navigator.webp",
         "bytes": 2628,
-        "sha256": "6711572931e5cfc6ed2d0aca599aa70c4ec92c6163b098bf3f222d90317cbe26"
+        "sha256": "d4f0bf6105904dd5ddaa573e09d8cdf6da1fc17db0ab2c4b9106f7052d1e0f78"
       }
     },
     {
@@ -852,8 +852,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/choirmother_selthe.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -886,8 +886,8 @@
       "sourceFingerprint": "fbb90a118c02d617d1fd6009448f7423f2a4603d31e95cf4a079568b2823e10c",
       "output": {
         "path": "public/ui/mobs/cindraleth_maw_matriarch.webp",
-        "bytes": 2462,
-        "sha256": "7d8d2dad0b160e147bb719fc48db4fe092bfc2a789cf0ee21993cfa683d72a65"
+        "bytes": 2436,
+        "sha256": "39bafb97c82172605678ebc755f420536c26b91c5f388d992f5359c4a877a15c"
       }
     },
     {
@@ -920,8 +920,8 @@
       "sourceFingerprint": "3f4197e07ec5856b43fb8dd24ba90af1548cbccfa426104ba5cf8aafde286489",
       "output": {
         "path": "public/ui/mobs/corrupted_priest_malric.webp",
-        "bytes": 2674,
-        "sha256": "b9bd7b389cbf4e50f5df401c29ad5c96ad293f602d6cf2b97f1fc1f22e7cc05a"
+        "bytes": 2686,
+        "sha256": "0d9dd5c44c8f50407589694f09d8927416d5103282c19611d3750e78945a0a66"
       }
     },
     {
@@ -989,7 +989,7 @@
       "output": {
         "path": "public/ui/mobs/crypt_shambler.webp",
         "bytes": 2546,
-        "sha256": "a0b0147c96404f367f541d199a32eaab554dcbc2c6eb53894a9d46a6e5673b61"
+        "sha256": "a26c3eed1e1df95fe9958c00c70b491beeeea46f6ddff31ace5f303204b596af"
       }
     },
     {
@@ -1035,8 +1035,8 @@
       "sourceFingerprint": "37f6ab61f9ae2572e9bcf8c2ccaeb89844bcad960582f549f97bc6ac4f3f10df",
       "output": {
         "path": "public/ui/mobs/deacon_varric.webp",
-        "bytes": 2190,
-        "sha256": "43349c76a023123ad91a13e9507bda56498058f15a13fc49d3c3cef796bcc775"
+        "bytes": 2200,
+        "sha256": "485e4310f19c8ee8257a041fa525fdd2f8d514a9947ce1b6254a64c8d23b3271"
       }
     },
     {
@@ -1084,8 +1084,8 @@
       "sourceFingerprint": "c5152e9c6abf5ced4589b1e2ee72050df1fa91febba28d98ced80ff4ff3f06e4",
       "output": {
         "path": "public/ui/mobs/deacon_voss.webp",
-        "bytes": 2122,
-        "sha256": "f3608948e3208c848b622a803345deb2368711f2ca615265d42ea6388c3e06c6"
+        "bytes": 2128,
+        "sha256": "f6f89ebf2b9521c966e915128e43d798e5407a3380f95712ae99f852f781d450"
       }
     },
     {
@@ -1118,8 +1118,8 @@
       "sourceFingerprint": "20713630b86285c3433670ccf42d891245ecd2f51c7cfa2730249116a0f0d99f",
       "output": {
         "path": "public/ui/mobs/deathstalker_voss.webp",
-        "bytes": 2542,
-        "sha256": "4436ebaafd219bc78e7548e18faf4209ab164cb33abcd3156caeeafb4fb5dd09"
+        "bytes": 2544,
+        "sha256": "792bb646b0266dd43c0b9f0dc4c36ebdb6016380477135a5c7f625f4bf8c111e"
       }
     },
     {
@@ -1254,8 +1254,8 @@
       "sourceFingerprint": "dee6974093bc5666f48727f9af4621e56948bbb473ee72301e5b0f41ea5b1316",
       "output": {
         "path": "public/ui/mobs/derelict_mech.webp",
-        "bytes": 1606,
-        "sha256": "4d9505f0a98dd042031f1b44d7b7ad5454c46a926f392f1ea231efc1c0b0a7f9"
+        "bytes": 1602,
+        "sha256": "02ad318a7ad6105ac7cb9d420da33daf089277e066856d59133d4430f0723c10"
       }
     },
     {
@@ -1322,8 +1322,8 @@
       "sourceFingerprint": "57830d8686808bd3ec10ec5e1f2dd004407bb058f25fc27601c74d135cd1682f",
       "output": {
         "path": "public/ui/mobs/dragonkin_broodguard.webp",
-        "bytes": 1962,
-        "sha256": "7f0d7c73ebf8f60ebe9b4f531b37b0b2149415cb6c8814adf854abc53ab32207"
+        "bytes": 2022,
+        "sha256": "aebe0a5383e08daefcd993057f60fee2defa4980e995135011fc6c4ecf4a6567"
       }
     },
     {
@@ -1356,8 +1356,8 @@
       "sourceFingerprint": "f0acdf88bc4605820abaef1e8cf2a7d517bbcd97a105d3cf419a1712193d6ed3",
       "output": {
         "path": "public/ui/mobs/dragonkin_egg.webp",
-        "bytes": 2102,
-        "sha256": "93a5cdea9be250d4884af7c25514201f7b94e5cd28079263d9991f452a858cb2"
+        "bytes": 2064,
+        "sha256": "6e04424dfdfda5123e00846927e7edededa62708e37d025adc2931de0445f34b"
       }
     },
     {
@@ -1390,8 +1390,8 @@
       "sourceFingerprint": "cb8582a78066c7c450927d23526f02ea7bd1b16817196715d74b5328bb8db19e",
       "output": {
         "path": "public/ui/mobs/dragonkin_whelp.webp",
-        "bytes": 2048,
-        "sha256": "2c38dde1163c05ffae1fdc552536efb150191b126652c18af7e250508354e30d"
+        "bytes": 2010,
+        "sha256": "e05fc647c5f82ce66801dd6bef75ebaf1657e2f309f0519411ae66fc3d2c9478"
       }
     },
     {
@@ -1424,8 +1424,8 @@
       "sourceFingerprint": "1df350045541bdf3b0fa4c66ef6bf555e265f7b1fe9652eacd7727e8e86354c8",
       "output": {
         "path": "public/ui/mobs/drakemaw_broodlord.webp",
-        "bytes": 2444,
-        "sha256": "c395c4bb0db2c2964fe0d3f0956b46966c581281363f9964637c1f798603579c"
+        "bytes": 2402,
+        "sha256": "3ccc1fb8288cd506dbfc2c5a5d42ac18240146e603ab4f9359ef0bdcac96b46c"
       }
     },
     {
@@ -1473,8 +1473,8 @@
       "sourceFingerprint": "cd7988ce628ef30ab2969f707515f05c70bec04a874403aea5eafb9e51598dac",
       "output": {
         "path": "public/ui/mobs/drowned_cantor.webp",
-        "bytes": 2092,
-        "sha256": "514cc82ec49c08aa928465c1fe2302bd90a0ea0389031ac5e22c3b589de6475c"
+        "bytes": 2084,
+        "sha256": "c153f8086945306e91e1355ab32769a303a967f541fd067c9958d950b9c64f41"
       }
     },
     {
@@ -1507,8 +1507,8 @@
       "sourceFingerprint": "6060337f7d2493f368665655645a66b5ef77111dcb9a75ef903e9f3b91a178a2",
       "output": {
         "path": "public/ui/mobs/drowned_dead.webp",
-        "bytes": 2740,
-        "sha256": "96cb9c48617599c1d0bac6928e6e4889c2214366dc5f30f1e9689cd9780a3b5b"
+        "bytes": 2772,
+        "sha256": "aca9181bb36d5f4c8c82aa05f392095678f5b4fc61c58d5d88add6a8783cad02"
       }
     },
     {
@@ -1541,8 +1541,8 @@
       "sourceFingerprint": "4e84901f5e2d641bb00995baa9d6f2f1fc645e5576e8ffd43ef56ac08f81d239",
       "output": {
         "path": "public/ui/mobs/drowned_deckhand.webp",
-        "bytes": 2766,
-        "sha256": "80f1677f5550f7786d5a0d0bdd8ba61ed4c789f47cc88c653d8a8ce5f71015b5"
+        "bytes": 2754,
+        "sha256": "5ba49e69aeff7b2b49abe0bd38971cfde403fde4b9c2b6b19214ffde92622270"
       }
     },
     {
@@ -1575,8 +1575,8 @@
       "sourceFingerprint": "02109bcdd7518c08bdaa953f3321a2edd8b33ad4b56ca8d35b843a2fa70fc9eb",
       "output": {
         "path": "public/ui/mobs/drowned_templeguard.webp",
-        "bytes": 2774,
-        "sha256": "e4c2d265951e6c0b3de493a387af66601718b598398e2d6aef402f16b1522d48"
+        "bytes": 2750,
+        "sha256": "95745e47abda4abe2202b40f57981ef2f3dbe5c8880f2e768eac86d167639049"
       }
     },
     {
@@ -1609,8 +1609,8 @@
       "sourceFingerprint": "a703d94d5380918333fd6598b3d3de067c6c7e93c8dad03b208412303b06c5cf",
       "output": {
         "path": "public/ui/mobs/drowned_thrall.webp",
-        "bytes": 2716,
-        "sha256": "bf0db92fbba11bae917acdcc265c06b073e55c74e7de5135459920a818f9f4fd"
+        "bytes": 2740,
+        "sha256": "f92ace671b3f612dd1eb29c491435062cc955dd48a8e836e996f8f97940970d2"
       }
     },
     {
@@ -1643,8 +1643,8 @@
       "sourceFingerprint": "90d70e8d52071559e127fe1d122e9cd88c0ae077f15edf3da9e7609a203f93e9",
       "output": {
         "path": "public/ui/mobs/drowned_votary.webp",
-        "bytes": 2750,
-        "sha256": "044a385e4eb6fe294eb313b914086fdbdc80c2bcef2f1453daf59d3c4c9f3a16"
+        "bytes": 2728,
+        "sha256": "2475a47a35e355fb7b99c5c6ad7eddfdb16a43d73ba5569e27e4888bfc2ad1f7"
       }
     },
     {
@@ -1677,8 +1677,8 @@
       "sourceFingerprint": "d6d315d94ba8c2810f3aeed5b81683778276eceae2c8cb87f5ba544e5adc49a3",
       "output": {
         "path": "public/ui/mobs/drowned_warlord.webp",
-        "bytes": 2712,
-        "sha256": "1915656df19d69bed4943942474fe5fe70faf21a77948e53d6f8ff348518abc9"
+        "bytes": 2772,
+        "sha256": "457d834ea5fd5217cfe893a25408dc381b3cfcc0fefecb04ca25f79c7ad56e81"
       }
     },
     {
@@ -1779,8 +1779,8 @@
       "sourceFingerprint": "9b720b2da2b25976b8794cbe0da0b48869a209fec6132e900c5ebf2a8167f3b9",
       "output": {
         "path": "public/ui/mobs/duskwisp.webp",
-        "bytes": 1874,
-        "sha256": "dc4e2e8269d91c7cb5653f298004a641830c70a593936578eef4ebfba73beaad"
+        "bytes": 1854,
+        "sha256": "b0c05c71d6b45fccfa2a76b64fb01a6298199eff78edd5d61e7603b5ba9f781b"
       }
     },
     {
@@ -1826,8 +1826,8 @@
       "sourceFingerprint": "f9b040c9557240d35709355f145fe3328de55a86cb06298d8e2284e6c02572de",
       "output": {
         "path": "public/ui/mobs/edda_reedhand.webp",
-        "bytes": 2418,
-        "sha256": "e799d6651a1ea586c5890ba12b5f4d39d42484e3333fe2e1a93697c9b61f138b"
+        "bytes": 2406,
+        "sha256": "e2f9df296161fb0cd955d00f157af383ad1c4b5884526d973d8840f575491c21"
       }
     },
     {
@@ -1860,8 +1860,8 @@
       "sourceFingerprint": "37514330c6a7f8f1ae956851b4050e050b1ee8b3f827b6cd7ae1e10e955ea1de",
       "output": {
         "path": "public/ui/mobs/emberkin.webp",
-        "bytes": 1828,
-        "sha256": "f06467f76460121e02fd7eca14d0a7e8f9ae19bbeb28929b78ce5c6c9b789ff6"
+        "bytes": 1864,
+        "sha256": "45f20a181a56acf4b17cb691a0accce2e89447454f2428fbb751d2de63b16c2b"
       }
     },
     {
@@ -1928,8 +1928,8 @@
       "sourceFingerprint": "cf8b560d359c0275a698c506228dbc73720ff589165e44474d4c06650c182038",
       "output": {
         "path": "public/ui/mobs/fallen_captain_aldren.webp",
-        "bytes": 2310,
-        "sha256": "5f5dc8984554559e02994ca4b9e16561d34d1ed981c39ff1187315ffc12a1209"
+        "bytes": 2306,
+        "sha256": "29bf20ac3026c49db43f583679d39a0e54405214a702f60ab4bb340f4f7de3d6"
       }
     },
     {
@@ -2030,8 +2030,8 @@
       "sourceFingerprint": "8f05317f1fd7602c48f1eec1c2e4e3d20befda55a1b8091bfeb208e273b8f66f",
       "output": {
         "path": "public/ui/mobs/fisher_bram.webp",
-        "bytes": 2618,
-        "sha256": "8f18935329142987a17c888b39dfd6bd30413fd0528933829e0b3e0f3c6f6fe5"
+        "bytes": 2602,
+        "sha256": "4e4961e7e5f7b1ee42892ebc11667ba3a3bc114680fad339d9fac56eb3c890fd"
       }
     },
     {
@@ -2064,8 +2064,8 @@
       "sourceFingerprint": "e033ddc7be001f0300ac90137fbe1b40ad0504158511205888c92c142df63264",
       "output": {
         "path": "public/ui/mobs/forest_wolf.webp",
-        "bytes": 1838,
-        "sha256": "dae92f669bf3b43fe6fa5a5fed2508268180fb5d508a6e201a532d3a4d96f9dd"
+        "bytes": 1836,
+        "sha256": "374a6cab5db80e8f008466795c7c4b853dfec8b8f2f46274439f387455bd6906"
       }
     },
     {
@@ -2098,8 +2098,8 @@
       "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
       "output": {
         "path": "public/ui/mobs/friendly_player_dummy.webp",
-        "bytes": 1766,
-        "sha256": "9676d78d37b8a04415f9f14dc0670f02baaff3a501cb724d4a5b451893b2119d"
+        "bytes": 1746,
+        "sha256": "f7f6203b7467ddbb8922a7fb9acc74caba136f389cd9d96098657bf699bb00f3"
       }
     },
     {
@@ -2336,8 +2336,8 @@
       "sourceFingerprint": "664655b90882d6a00c538c49f641294ebb440276b508eb2a21dd8e800ed9528f",
       "output": {
         "path": "public/ui/mobs/glimmerwisp.webp",
-        "bytes": 2160,
-        "sha256": "48f52a7a8920e4ce3a597702d043ae5b046ac9f785326b3756c95713a4924f98"
+        "bytes": 2158,
+        "sha256": "0a7e4489ac78effab081e3d3b6693f6b622eb4d6c7b9a1103f513f389647eef1"
       }
     },
     {
@@ -2438,8 +2438,8 @@
       "sourceFingerprint": "ca7dd27429b29be37459c4ea0b92ee4f2adfc4a8dbad1d3edab94506d69f2fc2",
       "output": {
         "path": "public/ui/mobs/gloomshade.webp",
-        "bytes": 2556,
-        "sha256": "dd0db11f3758ba7507131b8ed1928445ca87946f7e424027efe3505b09ad31be"
+        "bytes": 2626,
+        "sha256": "1f37073e23a54fac3996f8895753c26f6c2ff5d533bb978898e066aae186dad2"
       }
     },
     {
@@ -2487,8 +2487,8 @@
       "sourceFingerprint": "5680cd00806ae784399b25b7e9e99b42d9b51cac7049dad6d0c999e3fc1a3e81",
       "output": {
         "path": "public/ui/mobs/gorrak.webp",
-        "bytes": 2556,
-        "sha256": "f43fcd72019b7dd86b454368afe1911d5ec583978c5f1dc3dbf9f784d70d9b50"
+        "bytes": 2534,
+        "sha256": "5d542c5b921d67464ed98525e6d3f2d1d406fb034b8eebce488e7abbbaf87336"
       }
     },
     {
@@ -2536,8 +2536,8 @@
       "sourceFingerprint": "c5152e9c6abf5ced4589b1e2ee72050df1fa91febba28d98ced80ff4ff3f06e4",
       "output": {
         "path": "public/ui/mobs/grand_necromancer_velkhar.webp",
-        "bytes": 2122,
-        "sha256": "f3608948e3208c848b622a803345deb2368711f2ca615265d42ea6388c3e06c6"
+        "bytes": 2128,
+        "sha256": "f6f89ebf2b9521c966e915128e43d798e5407a3380f95712ae99f852f781d450"
       }
     },
     {
@@ -2570,8 +2570,8 @@
       "sourceFingerprint": "3d39a2ad5e8524e9a4030a11a2df8b71c66c69931180b7a6a436704862e69b49",
       "output": {
         "path": "public/ui/mobs/grave_silt_bulwark.webp",
-        "bytes": 2436,
-        "sha256": "ee660c515f266226a95649dfbc3ef2e79cc852d1c16e0258c8a5071e21248495"
+        "bytes": 2408,
+        "sha256": "3b9ddfcb214ff998dc50579218175a186c6fcaec248cb4d1d5aae0b45e0e8fb7"
       }
     },
     {
@@ -2619,8 +2619,8 @@
       "sourceFingerprint": "eaa3ea8b7a8e46d2ddc5b727c09429b47ab3969f33efb099c499e76dcb68212b",
       "output": {
         "path": "public/ui/mobs/gravecaller_cultist.webp",
-        "bytes": 2110,
-        "sha256": "6429dbcb39301658cbd279a157de183b5c3fcaf804963ffaa354b44c976c9310"
+        "bytes": 2120,
+        "sha256": "5b8e1f9be5447a9ad7f3705a6f4aaea2de0b154d7a791dd2034fefdc20239093"
       }
     },
     {
@@ -2678,8 +2678,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/gravecaller_mender.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -2727,8 +2727,8 @@
       "sourceFingerprint": "54855323730d6eee59c03becaa303b333404892141ad9ef9bdbbe14e8003ccab",
       "output": {
         "path": "public/ui/mobs/gravecaller_summoner.webp",
-        "bytes": 2140,
-        "sha256": "d497fff35c747be7a8ac24f8a05611ee965a8b73c809500ce1c7de96ee333900"
+        "bytes": 2158,
+        "sha256": "b29bf0a89f9b5d7cefcd102f85b556b0e847dbd91b3b763f4d863e5f37af2363"
       }
     },
     {
@@ -2761,8 +2761,8 @@
       "sourceFingerprint": "46fd70447b034cd4d00e066a456d2c44d5e41792b4dea8b83a1aca1fa693ab6c",
       "output": {
         "path": "public/ui/mobs/gravedigger_mosley.webp",
-        "bytes": 2716,
-        "sha256": "074e53c4715efc8139889b3232968c6ee54baefb984cb01ed571714b81b5d365"
+        "bytes": 2710,
+        "sha256": "ba0f0bcf7b9f33b6a0236087517b902f292964f0bca37cf1855da6ac9d71073b"
       }
     },
     {
@@ -2795,8 +2795,8 @@
       "sourceFingerprint": "76dc2103e032148d6aebcee7ef2af92aa70940ff6eacb5c70d4cb0e9405c9c3d",
       "output": {
         "path": "public/ui/mobs/graveguard.webp",
-        "bytes": 2278,
-        "sha256": "e25ef9efe9fa4d78c9657fd6ebe55c07e3e55e6302176bf1828df41dd6c0c9cd"
+        "bytes": 2340,
+        "sha256": "e6bc9577ba448eec5f780434cff45683feec177478fcba1d461692dd830bd027"
       }
     },
     {
@@ -2863,8 +2863,8 @@
       "sourceFingerprint": "567650aac78238ad2cab1193fe4b46a530e663aec185e3ca66c730639c7d6994",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
-        "bytes": 2822,
-        "sha256": "fa93bc907c2138b3ef3e2d03aaaaf07c09c573236e74e4e6442824e9e031c4e9"
+        "bytes": 2718,
+        "sha256": "3c1e0fc3fb4d21db02ed5a48953990d14f6561d8bee26c178611ba104d87713d"
       }
     },
     {
@@ -2897,8 +2897,8 @@
       "sourceFingerprint": "4fafc2b9a27054ffc9474187838ad4091de525a2be9ecad696a5f850b2de75c5",
       "output": {
         "path": "public/ui/mobs/grubjaw.webp",
-        "bytes": 2172,
-        "sha256": "cd9810cbb956c043fe6d1a514c20d3a941afa19910b5fc005c460e66d1a2d2b1"
+        "bytes": 2142,
+        "sha256": "de48a90c28d1fa473856186aba8119eb2458e4cc99cc0f3ebd5aedc606704a69"
       }
     },
     {
@@ -3015,8 +3015,8 @@
       "sourceFingerprint": "8fcc11ed0d016fd378776558bbf057b546172a78157a9af430679a7bb15cb0b5",
       "output": {
         "path": "public/ui/mobs/hedge_knight.webp",
-        "bytes": 2206,
-        "sha256": "c5450c7580b790970e9fc465b8fbb516bef1b1b6ffba44413bb5fed6030374ae"
+        "bytes": 2208,
+        "sha256": "47e4fac207641184e28af318aa7a46c1214d2fbb4886c1fcc8ca13477b1d4d86"
       }
     },
     {
@@ -3049,8 +3049,8 @@
       "sourceFingerprint": "da1c7342d9c1815c8b3d83b1b0098b141127797d4b324e9f74ce1db12c179892",
       "output": {
         "path": "public/ui/mobs/heroic_boss_dummy.webp",
-        "bytes": 1838,
-        "sha256": "3d55a0544e8b558f43fb4b673d8887f5891a31689241b941134053deba9fd235"
+        "bytes": 1814,
+        "sha256": "18d84e8902899716f6a8491515fb749a579e564a6fd1471b906195598b4700b3"
       }
     },
     {
@@ -3096,8 +3096,8 @@
       "sourceFingerprint": "555a4eb8b64adebc47a1c69ea4fcca16eb9406bb8499d24328f3752786d9c2be",
       "output": {
         "path": "public/ui/mobs/hollow_acolyte.webp",
-        "bytes": 2212,
-        "sha256": "9b83e91c6b011333430659f2efd128a09db28b0536a0cf35495d73935c66b31f"
+        "bytes": 2204,
+        "sha256": "cfa9c15c2a9badfe59972d046e67e403d5d0af4bbfcaa58291cd70d3d13c9213"
       }
     },
     {
@@ -3130,8 +3130,8 @@
       "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
       "output": {
         "path": "public/ui/mobs/hub_healing_dummy.webp",
-        "bytes": 1750,
-        "sha256": "ec5ee875012334ded214b00791b8332a109b64eda71352a0461d0fd4b40c15ff"
+        "bytes": 1746,
+        "sha256": "f7f6203b7467ddbb8922a7fb9acc74caba136f389cd9d96098657bf699bb00f3"
       }
     },
     {
@@ -3164,8 +3164,8 @@
       "sourceFingerprint": "2b45c3ab5c106f0bcda1101a6c31f56a61148e76d43ecec1fa0444b51ba64ac6",
       "output": {
         "path": "public/ui/mobs/hub_training_dummy.webp",
-        "bytes": 1788,
-        "sha256": "d5acd85d81045c7507277060fcfbe56e398e4cddbd4d5c4b3520efa30603504e"
+        "bytes": 1790,
+        "sha256": "ff36c52017c5e7361602e61e9c1ea224519ed2d90f77cc911cffe2b71e3914ba"
       }
     },
     {
@@ -3237,8 +3237,8 @@
       "sourceFingerprint": "a9f067ed819544d90b5bc5a4f463a464fb8edb6357611c80c779c3021d233ed7",
       "output": {
         "path": "public/ui/mobs/idol_guardian.webp",
-        "bytes": 2874,
-        "sha256": "db4c3aeca2ee36664c26627cd6007e02a6aa5f9d6acbf19e263516d1713b0a88"
+        "bytes": 2858,
+        "sha256": "1a40a62ff331090052d1d0ebb65a96e2661bab9b27d75b6643bfc85f74e8435a"
       }
     },
     {
@@ -3271,8 +3271,8 @@
       "sourceFingerprint": "ac182348126ac080c3bca146f16e4af96aed4558fb71ba3879efa4870a222902",
       "output": {
         "path": "public/ui/mobs/ignivar_cinder_artificer.webp",
-        "bytes": 2216,
-        "sha256": "d8f1f822569411ee598a744fd764fff0de0d14dc6dffa14ac978dd262cf08d73"
+        "bytes": 2160,
+        "sha256": "304079d0f23af56d1a0f5cde2028e40f75ad708bb150c73bfd2b0c5223cf33e2"
       }
     },
     {
@@ -3305,8 +3305,8 @@
       "sourceFingerprint": "905cf139af1f401835f37e3015c319cc93452f5af9675b1160a66ff1145d5369",
       "output": {
         "path": "public/ui/mobs/ignivar_crucible_warden.webp",
-        "bytes": 2804,
-        "sha256": "d261c38cec9ac7ce580ff430b8fd7bf614a6df95b2a7516bad50c1c16ed16c1f"
+        "bytes": 2738,
+        "sha256": "870c34fad67b8666c70fe0a27b8274927d88268e990af9e6a56d738cc3b577e1"
       }
     },
     {
@@ -3339,8 +3339,8 @@
       "sourceFingerprint": "deabc374783072a48e4836bc0b170dd50e49105b4112bec8814454e5a92fca50",
       "output": {
         "path": "public/ui/mobs/ignivar_ember_sentinel.webp",
-        "bytes": 2272,
-        "sha256": "95d8f6d2eddac93cb814d3a03c47bf9ce31fdb90ae2f513644f74859f4ecf412"
+        "bytes": 2268,
+        "sha256": "9c2330bfa46cd9a77a5b5eccc512a337c3466acba3dea0188050e4134f9b1bcc"
       }
     },
     {
@@ -3373,8 +3373,8 @@
       "sourceFingerprint": "ea3ad642b5bf35c1aec8ce14bcbc25954097dbf13d6db7b5653dcddfa014ec94",
       "output": {
         "path": "public/ui/mobs/ignivar_heart_of_the_end.webp",
-        "bytes": 2678,
-        "sha256": "43b3f88802b2e22ec9fbcf4eeb7f44d98d52fb63aa032b3a0774d5cb1eed8cfc"
+        "bytes": 2650,
+        "sha256": "a8201e1cb9f5e6d814d5dbd0548c50b3a67b6026e9eeda8913f33a0193c04c79"
       }
     },
     {
@@ -3407,8 +3407,8 @@
       "sourceFingerprint": "c108d109f45326ad6a09a91f13991b30927d84a3273d5454e52118f9cad4f44f",
       "output": {
         "path": "public/ui/mobs/ignivar_herald_of_the_last_flame.webp",
-        "bytes": 2396,
-        "sha256": "80ee4a4a99665cc3086c6aa510e158015c1d664428273a2ed457f28f5d92b289"
+        "bytes": 2384,
+        "sha256": "b5921522601f7764eac83723b82eade986a5b0f30e08a896118f9fe6caaeaee8"
       }
     },
     {
@@ -3509,8 +3509,8 @@
       "sourceFingerprint": "f5df3b7c1a4b21edb7b1e5088cfbafaef69d3b507b78abe7a17cdc37b23aa23f",
       "output": {
         "path": "public/ui/mobs/knight_commander_olen.webp",
-        "bytes": 2272,
-        "sha256": "78b26e4dbe553a277e753f3d4340b66de4ff94fc7f67b50644ddd0a324b9fff1"
+        "bytes": 2280,
+        "sha256": "7b0f6b32a67abc7d6ae434a7802a8569ad7c13c861d1950781c6ff1e0c1364e2"
       }
     },
     {
@@ -3543,8 +3543,8 @@
       "sourceFingerprint": "a0302554a6d323032808701d6cdbc14bd464ecefaf491ee50c9bf5ff5c207022",
       "output": {
         "path": "public/ui/mobs/korgath_the_bound.webp",
-        "bytes": 2432,
-        "sha256": "212b14445e4b138b9090a433279075fa532d24249f5c579492a20a65d7a24466"
+        "bytes": 2424,
+        "sha256": "4f1bfcbdd19b0d071075f6b1e047ed54a4485a807b3d6a823d84d8d5de5a1289"
       }
     },
     {
@@ -3645,8 +3645,8 @@
       "sourceFingerprint": "0eb028160ba1181f910e1254da5525112679fed19b6044b6aafb6179fd91b03f",
       "output": {
         "path": "public/ui/mobs/marrowlord_varkas.webp",
-        "bytes": 2316,
-        "sha256": "d95884920b478834a9f6bbc924eaa674c6d93450c717adf281ee1a7f0f007b26"
+        "bytes": 2344,
+        "sha256": "d826a49e75f7535da13a8f74ec57050b68f1dd2d28cf5af6ff43e48837df5a2b"
       }
     },
     {
@@ -3714,7 +3714,7 @@
       "output": {
         "path": "public/ui/mobs/mire_prowler.webp",
         "bytes": 1820,
-        "sha256": "8826fd74e9b219670c36577ab0f29b451eb77c94919bba6ed7df2ebde62d44b9"
+        "sha256": "77425e4d6906e9cbb684821b60f049cc3dabf52387e327ce774fceacd5e2c90e"
       }
     },
     {
@@ -3966,8 +3966,8 @@
       "sourceFingerprint": "54b9b8b14eae4864ae83ad629ef185c37ae34a19b234297e744d8f675b08a2bc",
       "output": {
         "path": "public/ui/mobs/mogger.webp",
-        "bytes": 2568,
-        "sha256": "e9e03973382f9c686b13edafae99a96e8a6899cd3d4e76f118603f0eded60d3e"
+        "bytes": 2546,
+        "sha256": "1eb8c8f5f2ba83cb483e6ecbcea3b785e5e50818c96b2c7025d7d4ece6a3c0a8"
       }
     },
     {
@@ -4025,8 +4025,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/mogger_lackey.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -4174,8 +4174,8 @@
       "sourceFingerprint": "cf20a028c0fcd49d6c62f6704fcbb9b933c6c3cb58ebcc6e54e8dcf3edd0848f",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
-        "bytes": 2212,
-        "sha256": "891d0d69384d5ac9323ff5171cd533c2302f7b8906b5f6e41e51706445f7c500"
+        "bytes": 2206,
+        "sha256": "0f1f31a372ec21e5b0d74364bd6400aed4e44b9ed3ed40fdf7bc72e6aaa59725"
       }
     },
     {
@@ -4242,8 +4242,8 @@
       "sourceFingerprint": "8ae67cb4021bc80265408b580d63195847f10f7e11af3f6a936cca89e101e870",
       "output": {
         "path": "public/ui/mobs/mushroom_pixie.webp",
-        "bytes": 2514,
-        "sha256": "1521856727d7c6783779c9f97fec8ac6946fd856b01c0cba5f122bfb04221550"
+        "bytes": 2462,
+        "sha256": "84dcab7437ba5fe2a0185c34fc16a2e47381b6b792926dbcb30e35b700222483"
       }
     },
     {
@@ -4289,8 +4289,8 @@
       "sourceFingerprint": "a871b80e65654961d1204757e6926ae3d6324f813222114304118479f7456d60",
       "output": {
         "path": "public/ui/mobs/necromancy_bone_mage.webp",
-        "bytes": 2228,
-        "sha256": "422740c87b2cc0edb61ae6c5ba82413d182d8c5d8d26c4f0a9d7055e48b9a951"
+        "bytes": 2230,
+        "sha256": "1d69fb50c81c3b6814e2e0f5f4c1b8b012636937b12768c62d13891f1f32070f"
       }
     },
     {
@@ -4323,8 +4323,8 @@
       "sourceFingerprint": "038b3f2553d81a4373e93733fff792cd056dca01d7fd09c00c000c8fa4caaf9d",
       "output": {
         "path": "public/ui/mobs/necromancy_gravewing.webp",
-        "bytes": 2630,
-        "sha256": "cca15fe07641e564b01640cb8b3af52301bfcf7aaf80f39a92e622f609b27955"
+        "bytes": 2576,
+        "sha256": "3425944ae3cb76e83aad6900d7aac022ab66b97d8d8255659031bd52854f89db"
       }
     },
     {
@@ -4357,8 +4357,8 @@
       "sourceFingerprint": "bf2198d09351b19170955448e1e8f63e12abf1449bc17dcca3c3750220e0f362",
       "output": {
         "path": "public/ui/mobs/necromancy_skeletal_warrior.webp",
-        "bytes": 2812,
-        "sha256": "c3f17e3459d5fccce6bcad6d8292b86e47ad9276994d6e32f41014a68b400b35"
+        "bytes": 2808,
+        "sha256": "d3be95b1b4f824cee47c764d44582bb2211092ca4fda039d7625422e8a02f99a"
       }
     },
     {
@@ -4416,8 +4416,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/nhalia_mourner.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -4484,8 +4484,8 @@
       "sourceFingerprint": "f812d654f4fbd72e10b9e81eea38e32c671c6a5be5d7df50e542050ac2d341e1",
       "output": {
         "path": "public/ui/mobs/normal_boss_dummy.webp",
-        "bytes": 1778,
-        "sha256": "2fa2483ed8531151b14bcdb5d6427fd3e87d9445b83d5e0545238f210b577cb3"
+        "bytes": 1738,
+        "sha256": "abdc23b06bfbc5d6bfe843919947ef358912e760c020bb2206da4ef3d310ab76"
       }
     },
     {
@@ -4507,19 +4507,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": null
+        "tintStrength": 1
       },
       "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
+        "source": "fixed",
+        "authored": "#ff7a1a",
+        "resolved": "#ff7a1a",
+        "strength": 1
       },
-      "sourceFingerprint": "c5d61b8664623cf2eb0bbb924a602a424909e843ca6f970996548768148819e3",
+      "sourceFingerprint": "03d1558d14ddcc771e567e959becbda5710dd1078a4145fd0bde7141531b688c",
       "output": {
         "path": "public/ui/mobs/nythraxis_bone_spike.webp",
-        "bytes": 1504,
-        "sha256": "c008e9692d97478f981866c792ba62a3a145dbc3a096eeb3d12a357440e5e7cc"
+        "bytes": 1570,
+        "sha256": "cc080d5512964aa5c021e7e987b4fd2debfd5e78e226c367a70dfbd60bc2a17b"
       }
     },
     {
@@ -4552,8 +4552,8 @@
       "sourceFingerprint": "9904ddfd327046a993e0ddc2049a082a569d9f5a85586fc4feae33c68d5a9875",
       "output": {
         "path": "public/ui/mobs/nythraxis_heroic_priest_add.webp",
-        "bytes": 2610,
-        "sha256": "acc071af7152908fd756631dc9080395cf950ab560cef8fe293f8563827cd7ad"
+        "bytes": 2624,
+        "sha256": "e52a530995af347f23d7baa75e38c508b6d012222e35d80f47896e09c508b616"
       }
     },
     {
@@ -4586,8 +4586,8 @@
       "sourceFingerprint": "79285356f8cb67bf9c79ba31a5c02de84c717211716bf7082c2a9e2a723b3a29",
       "output": {
         "path": "public/ui/mobs/nythraxis_heroic_rogue_add.webp",
-        "bytes": 2494,
-        "sha256": "043da42ef14a9a6d3ac2ce7fe42965ba7455ec8ec50fc9f916398611d92933cc"
+        "bytes": 2488,
+        "sha256": "3e3fa158ae81d44d3600252f0a40a9bc76b3872acc49466ab239699edee01087"
       }
     },
     {
@@ -4620,8 +4620,8 @@
       "sourceFingerprint": "15a9ba1994093dfd3d4471548d0949ccd93de4a0b8785e0ea37607a738cefd51",
       "output": {
         "path": "public/ui/mobs/nythraxis_heroic_warrior_add.webp",
-        "bytes": 2282,
-        "sha256": "745e6b3197cb70d4d26f97717235ded0540f345ac23793f77ca21353cd5f67ca"
+        "bytes": 2358,
+        "sha256": "b3f1b98c7bd9ff9b69393a9869115d62af794fc8b8ce550064cc5e0d68e2bf00"
       }
     },
     {
@@ -4659,8 +4659,8 @@
       "sourceFingerprint": "aa8b952f12c1e72852c11ea6ef2ef9e2f90dad36ad9649eb0f7e38542f9c3ca7",
       "output": {
         "path": "public/ui/mobs/nythraxis_scourge_of_thornpeak.webp",
-        "bytes": 2778,
-        "sha256": "c0a4d7bb6f567336d49dd294707bd7fff6a776aadb395252d3d430e92901c4f7"
+        "bytes": 2792,
+        "sha256": "8eec38d8bb1acb542ed704d8d4528d81f0975254ffeb4134ff383c3b884b6126"
       }
     },
     {
@@ -4693,8 +4693,8 @@
       "sourceFingerprint": "15a9ba1994093dfd3d4471548d0949ccd93de4a0b8785e0ea37607a738cefd51",
       "output": {
         "path": "public/ui/mobs/nythraxis_skeleton_warrior.webp",
-        "bytes": 2282,
-        "sha256": "745e6b3197cb70d4d26f97717235ded0540f345ac23793f77ca21353cd5f67ca"
+        "bytes": 2358,
+        "sha256": "b3f1b98c7bd9ff9b69393a9869115d62af794fc8b8ce550064cc5e0d68e2bf00"
       }
     },
     {
@@ -4727,8 +4727,8 @@
       "sourceFingerprint": "784b48f069f27d00cb74bef308cb2cb6ff0e59604c24018acdc8eb8233ab2cd8",
       "output": {
         "path": "public/ui/mobs/ogre_crusher.webp",
-        "bytes": 2394,
-        "sha256": "c26061d52b1a9ac0a4dd8f5eb11a73250ef8fea34d7593d9795e9cc233ee2ca2"
+        "bytes": 2426,
+        "sha256": "75bc0ed4687023ae690b6cfc330a5f33c28371a3fd4ab43bf12d831cca716cb6"
       }
     },
     {
@@ -4795,8 +4795,8 @@
       "sourceFingerprint": "72c1fdff96d0f6a368720e97d0a401e43e66d9b73e14abafae21741a4c725324",
       "output": {
         "path": "public/ui/mobs/old_greyjaw.webp",
-        "bytes": 2046,
-        "sha256": "a4df215ed61a7f58f526b168be66815be716c7d7edac604785a27b373ecc7b4d"
+        "bytes": 2026,
+        "sha256": "fad37ffdd2629d24c40f7817c28647baa48d70392fea7cbaa0eadce1a6fe67f1"
       }
     },
     {
@@ -4922,8 +4922,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/pale_choir_acolyte.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -4956,8 +4956,8 @@
       "sourceFingerprint": "71f823ff7d64b9b72328ab456a3e915abe694d7577dc59ec643917df6422e27a",
       "output": {
         "path": "public/ui/mobs/pale_huntsman.webp",
-        "bytes": 2566,
-        "sha256": "d20e83b9133cb7870646b0e1ffc8085a5e3d81240a43cb69ed11749a4368e116"
+        "bytes": 2564,
+        "sha256": "af34bb298e3508e62d035d4139857a21c219da0a76fe98eb23ec12cb6d410e08"
       }
     },
     {
@@ -5024,8 +5024,8 @@
       "sourceFingerprint": "9543027f2d0927ff688b05dcba243ff4d1701a4105384257a2bf613e82704783",
       "output": {
         "path": "public/ui/mobs/pyre_colossus.webp",
-        "bytes": 2252,
-        "sha256": "12a85cdb4f0481e3c0c0933a820d2008695af885307b4625ce65a3077d96358d"
+        "bytes": 2244,
+        "sha256": "ad52a8d897978152b3f89cea5aba5eb5a81d819bc04787332b42b4c38e2f5924"
       }
     },
     {
@@ -5058,8 +5058,8 @@
       "sourceFingerprint": "f03c004f0931165a6f4b3b58ee466ed2264d3f816446f55016fa5eb9b2155cdd",
       "output": {
         "path": "public/ui/mobs/raised_bonewalker.webp",
-        "bytes": 2792,
-        "sha256": "14772835aed34b4a6770ec78331672bd084186e6036ac34984b1e7d53ab7cdf8"
+        "bytes": 2800,
+        "sha256": "bba40e8255adc900269d2cd991c7ac7a8f786f9c7fdfc450593aea9776e5cff2"
       }
     },
     {
@@ -5092,8 +5092,8 @@
       "sourceFingerprint": "4667fee0fd2eee319adeac890d411780ed7f28524506732717e1bc1e5ad06126",
       "output": {
         "path": "public/ui/mobs/reedbound_acolyte.webp",
-        "bytes": 2122,
-        "sha256": "4d95aee7b2c6f762053a17f50474384ce11437753da86ce4213bde585100af04"
+        "bytes": 2150,
+        "sha256": "63e2f97773e8b1a497d4c85cb8b3512627ab9d39e6a0421b966ee623e7e04346"
       }
     },
     {
@@ -5126,8 +5126,8 @@
       "sourceFingerprint": "20d06d20a8ed31e84b277128dcbc551f1c9700a100c5699ce9ba895979c17b1b",
       "output": {
         "path": "public/ui/mobs/reliquary_bonewalker.webp",
-        "bytes": 2800,
-        "sha256": "73c0decabe5887140192131cf25907729d6ab4d60b6369245267c31253a2ec60"
+        "bytes": 2796,
+        "sha256": "dd88cb1e85ad01ad76ddecd8324aef4c86a482fe27d08627e97b8db20d50174c"
       }
     },
     {
@@ -5173,8 +5173,8 @@
       "sourceFingerprint": "5b12bb757a84f19cc9a444ec74b10a8c5eae522003d47a7d0cb358e43f40aa08",
       "output": {
         "path": "public/ui/mobs/reliquary_funeral_ringer.webp",
-        "bytes": 2252,
-        "sha256": "ee79de672e59879c209568135d0e6a2903169ab043f626ba13ffc60067377a2a"
+        "bytes": 2254,
+        "sha256": "9a1aaa427c36ec354f90d823c16d562253ed783755c0656a4352ff557ed12ddd"
       }
     },
     {
@@ -5222,8 +5222,8 @@
       "sourceFingerprint": "2df5a042979d1fa5ff1e0f9c7d44d0a07d0e31ec67b39a19248bfe12691ce1c7",
       "output": {
         "path": "public/ui/mobs/reliquary_gravecall_acolyte.webp",
-        "bytes": 2056,
-        "sha256": "80f92d1e5b6dc7cee2776a3b82e9c205173d26d1864d8b7020062eb6fd5efd12"
+        "bytes": 2086,
+        "sha256": "921ad7918dcdb86514f135771ff0ea4887afae8491a403497a47bd3f5ad8264e"
       }
     },
     {
@@ -5256,8 +5256,8 @@
       "sourceFingerprint": "d704a1bc447e36ddcd1af412b50f89653792444aff18b586030eb4fb33e850f7",
       "output": {
         "path": "public/ui/mobs/reliquary_ledger_wraith.webp",
-        "bytes": 2674,
-        "sha256": "c2a1f7b4c43d6a25458eb5be03902cfac02a4bdbfd636a7c82a4447fd6400a0d"
+        "bytes": 2656,
+        "sha256": "5c856306d093540fe7793f629ec8f88ca1ab1920620b0a56411baa6d76677f84"
       }
     },
     {
@@ -5315,8 +5315,8 @@
       "sourceFingerprint": "50c8e331648ce6237c79c7b8a3deee1dc94e979ea11c243d9bd86c055e87e369",
       "output": {
         "path": "public/ui/mobs/reliquary_saintless_effigy.webp",
-        "bytes": 2260,
-        "sha256": "47aa91fda501787866eb78b655a0a863bd109d242382b0e067e756d705cccde1"
+        "bytes": 2270,
+        "sha256": "3a1019f6c5677f2ef457531bcb711984957e80efb1685a5bf60aadfb852abe18"
       }
     },
     {
@@ -5349,8 +5349,8 @@
       "sourceFingerprint": "7545d7ee4dac26300ea916a4bde2f0900bcc44d16a408dd90085cfdc939e0fe3",
       "output": {
         "path": "public/ui/mobs/restless_bones.webp",
-        "bytes": 2826,
-        "sha256": "b7ee20bf6f0981e9579c5a2c5130bdb6f98e6cefc28c2dc7d167027883034c49"
+        "bytes": 2810,
+        "sha256": "305de95e559a9193dddba8f72148a3c75d0a9cb5bba085a8c357f0c3f0fe9a6b"
       }
     },
     {
@@ -5383,8 +5383,8 @@
       "sourceFingerprint": "8af1837aeff637d8122095d63ee7c7ce0b066a7b0ce29305fdb09a08d02e0902",
       "output": {
         "path": "public/ui/mobs/ridge_stalker.webp",
-        "bytes": 1944,
-        "sha256": "3300dd9c5f9c4f6e5448c7b2247c7b78faae762a9d8527dc6b832cf87d420416"
+        "bytes": 1844,
+        "sha256": "08a90636fa7e5d5d8b0d43fd99f81430998de195da484c1795fa1288e8c29228"
       }
     },
     {
@@ -5417,8 +5417,8 @@
       "sourceFingerprint": "ed7f8839622b51a2454443b9008a355399aebe460c937d5c3605a0ed2098f987",
       "output": {
         "path": "public/ui/mobs/rift_boneclad.webp",
-        "bytes": 2820,
-        "sha256": "02e409c0d3efacebc3280c0bdbc0cec41e0e59d03532a6713b006e8c7662c3a4"
+        "bytes": 2828,
+        "sha256": "1cfccaa8a31575d5956e130a076f23e56c1e7d761f8b7ef6178db906984d2224"
       }
     },
     {
@@ -5451,8 +5451,8 @@
       "sourceFingerprint": "f03c004f0931165a6f4b3b58ee466ed2264d3f816446f55016fa5eb9b2155cdd",
       "output": {
         "path": "public/ui/mobs/rift_bonewalker.webp",
-        "bytes": 2792,
-        "sha256": "14772835aed34b4a6770ec78331672bd084186e6036ac34984b1e7d53ab7cdf8"
+        "bytes": 2800,
+        "sha256": "bba40e8255adc900269d2cd991c7ac7a8f786f9c7fdfc450593aea9776e5cff2"
       }
     },
     {
@@ -5510,8 +5510,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/rift_boss_arcane.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -5544,8 +5544,8 @@
       "sourceFingerprint": "90af9202386f33e3b289a569088da3c4577286ec9e784d25e78456d1896ad3f0",
       "output": {
         "path": "public/ui/mobs/rift_boss_brute.webp",
-        "bytes": 2438,
-        "sha256": "0be36edf51469beeece5f064e6455533ebabc62ec46783468f860a0dfb4f1256"
+        "bytes": 2422,
+        "sha256": "944e01fc56189a4cfebe8a739f3b92d5ad83db6437887cbcc52f857f50ef52c1"
       }
     },
     {
@@ -5612,8 +5612,8 @@
       "sourceFingerprint": "ddaf678fbf30b1fe4ea30af022256def5f59e83b055f81d2d394439ac53aec44",
       "output": {
         "path": "public/ui/mobs/rift_boss_frost.webp",
-        "bytes": 2804,
-        "sha256": "0e4e14b35cfbdc9b9007899b33837ebf728849a1f4353cfeef864a0467d460d2"
+        "bytes": 2806,
+        "sha256": "8371139eaea7e21ff2a68781e1f89077dc2482e6150f1bef25ec793f8740641b"
       }
     },
     {
@@ -5646,8 +5646,8 @@
       "sourceFingerprint": "fc6a0eb898a41d5e178efe0e55b0b5c21c5a076ea53f1e13a4960f72d60a3a6c",
       "output": {
         "path": "public/ui/mobs/rift_boss_necro.webp",
-        "bytes": 2804,
-        "sha256": "1dce527e39b5b62ee44f4ede4cb2de2a81dfe53d1cde854e95753c6762b6d83a"
+        "bytes": 2794,
+        "sha256": "11e52cc6d4a0e446f3de09f5268d1bef25eeedb9f087fc2d5b42fd2099635f26"
       }
     },
     {
@@ -5714,8 +5714,8 @@
       "sourceFingerprint": "0f0bf297f22ef5bbbee367edafbba15ec20648bd82f0f9addd5ab59b41871bd6",
       "output": {
         "path": "public/ui/mobs/rift_boss_ritualist.webp",
-        "bytes": 2284,
-        "sha256": "5c3872e84d36a427b53cdbfeb538a575dffe51dbd1147467adb978fb1f2e15c0"
+        "bytes": 2336,
+        "sha256": "503907d2e2c06572e98bb95d9413a3e33daea0308474da4c51584b492053dc5c"
       }
     },
     {
@@ -5952,8 +5952,8 @@
       "sourceFingerprint": "26f49890790b5da18560d38f1f95d6693f9894a97705fb3ab0c7ae9225f50fe9",
       "output": {
         "path": "public/ui/mobs/rift_frost_revenant.webp",
-        "bytes": 2806,
-        "sha256": "2ef07bea9c0042f4030cda11150cceaded3d3c3d78b4d3715c0d3e76f495d3d7"
+        "bytes": 2782,
+        "sha256": "263382ec91250363799b5aeb66619e178e4b450cd1a07f2fa695f3c85f1e5c88"
       }
     },
     {
@@ -6104,7 +6104,7 @@
       "output": {
         "path": "public/ui/mobs/rift_pact_acolyte.webp",
         "bytes": 2124,
-        "sha256": "dfa4c54197de2e1282a551164924b8d334a2047e578ad79653cb389b7c104b3e"
+        "sha256": "4070b4b2353e6733218a59da70331a46f8276ac9507fb3c5b939f03f008de63c"
       }
     },
     {
@@ -6205,8 +6205,8 @@
       "sourceFingerprint": "0ba29760cd0032d555eae8cbc0865bf72c7e449915880cc1ab1ae1f82763c2de",
       "output": {
         "path": "public/ui/mobs/rift_stone_ogre.webp",
-        "bytes": 2444,
-        "sha256": "c21df9aa3e6500be236f4201c85738fb324f6e1c18123b3c4ec528e3da03d378"
+        "bytes": 2432,
+        "sha256": "5daf34a2380743a275deea54aff057d02c8cf2cb8cc922b3538956649ade765b"
       }
     },
     {
@@ -6307,8 +6307,8 @@
       "sourceFingerprint": "2f5d7e88dbc099b817d5918bf27372f499ec921e86ec0258cbcaa9f77206136e",
       "output": {
         "path": "public/ui/mobs/rift_thornback.webp",
-        "bytes": 1934,
-        "sha256": "e6b7a21af186dc13224caa10403405abd7cd96b0f87a8064f8f6139c56b3818e"
+        "bytes": 1846,
+        "sha256": "06cb7ad45bd93344e6a3c9088fc6fc6c5e85cc4078c5be4153317d5414b30db5"
       }
     },
     {
@@ -6434,8 +6434,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/rift_void_acolyte.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -6536,8 +6536,8 @@
       "sourceFingerprint": "00255d675d7766e83b6ea9863ad405840a8f21193e1f1bf337c21f22e6434661",
       "output": {
         "path": "public/ui/mobs/sanctum_boneguard.webp",
-        "bytes": 2296,
-        "sha256": "a648319be9f84419deeaf550fdf33e2c0d466fe6923a51852539f9ebeee4f8fb"
+        "bytes": 2380,
+        "sha256": "a24a15b8f0f666ba40d6d0099bbf3c6d0af8b16226557e2e9f59325447e2eb49"
       }
     },
     {
@@ -6651,8 +6651,8 @@
       "sourceFingerprint": "0c306427584ad5b6626decd29a01d9dd6673b0c4cd5d9c45e08e563f8fb31d72",
       "output": {
         "path": "public/ui/mobs/sexton_marrow.webp",
-        "bytes": 2230,
-        "sha256": "5525faac5e65cfb3efa64f34e7e7949bc40c3aca8c7caba292ac63ff7d68ca54"
+        "bytes": 2218,
+        "sha256": "2f4a59251df97b2d7248c65549c87e4c0efb09c62c28edf8dd1f08350449263d"
       }
     },
     {
@@ -6802,8 +6802,8 @@
       "sourceFingerprint": "d764570adfe68afcb8a75361808ae53ed5b7bb4f0570da94069314aa0ce4aacf",
       "output": {
         "path": "public/ui/mobs/sister_nhalia.webp",
-        "bytes": 2128,
-        "sha256": "c0bf92d2c3a85dbfa26e327b5d2ef10b74b723e5cd775a117ef336d325330afa"
+        "bytes": 2096,
+        "sha256": "6a9bc5c21d5b2be81330c383bcc4e83408dcc6611961294c7aa365a716eb244c"
       }
     },
     {
@@ -6851,8 +6851,8 @@
       "sourceFingerprint": "4fe5bc3750d4ad72e298d88f69954b289d09229f4199ea7a9905e64037876c81",
       "output": {
         "path": "public/ui/mobs/sister_nhalia_drowned_canticle.webp",
-        "bytes": 2126,
-        "sha256": "6f542f008133f2d802b7f4eae3dca2ee5f54c2e669e4e1f8aa59e90fae1de9f7"
+        "bytes": 2116,
+        "sha256": "e981116264fa4890d251a40022a1996ae327398585176f6e6753530f32bf6288"
       }
     },
     {
@@ -6919,8 +6919,8 @@
       "sourceFingerprint": "c9eebda31b0b3d2a4290e31160adf2985c52fc3a89ba2e03e98d71daad5f5f61",
       "output": {
         "path": "public/ui/mobs/snowdrift_wolf.webp",
-        "bytes": 1978,
-        "sha256": "0d534abcd5e3dadf9c45ae958eef4237ec898e2196096bca3f7018a66de39f07"
+        "bytes": 1952,
+        "sha256": "95d2adedcb70754fa6b11262760d32f55065b59391247d2d8473558fe8c201e7"
       }
     },
     {
@@ -6953,8 +6953,8 @@
       "sourceFingerprint": "d36ce145a86b1de13aaa44407e6f04f154de46ec20ff8ea917029e5bf5822ee7",
       "output": {
         "path": "public/ui/mobs/spider_egg.webp",
-        "bytes": 2268,
-        "sha256": "a9ff21db22a35a3b0f64fd34ad5eb2d1fcf95fc695c9a05c90f5a7c01de0af72"
+        "bytes": 2260,
+        "sha256": "3c836ecc31dddfa1906daca8ee973967e94fde38531a0baf21052a366a1d1685"
       }
     },
     {
@@ -6987,8 +6987,8 @@
       "sourceFingerprint": "1c79f13de45d4ee58aac797b2513ce219cc014d5b0b3d461d742fd189b31648a",
       "output": {
         "path": "public/ui/mobs/spider_egg_sac.webp",
-        "bytes": 2304,
-        "sha256": "62525f03f5b6bbda964d9fd97ec05eb00a848aa8484bca6ca8ab4d2288e8f666"
+        "bytes": 2244,
+        "sha256": "6bb484d65298ac640bed71958449a2d7ef89e94bc832816b0a091d984e269dee"
       }
     },
     {
@@ -7157,8 +7157,8 @@
       "sourceFingerprint": "bfd6a45fe0213b7d1ab4c7cbab84b66bb56d1b033e3c1ea1742df9d08a12daf2",
       "output": {
         "path": "public/ui/mobs/sundered_horror.webp",
-        "bytes": 2424,
-        "sha256": "f7a5f5d1395e0ff26d623e0bbf8d023483a37c0c35db0e2cef393c2e5e79d492"
+        "bytes": 2408,
+        "sha256": "eb020421881252b1f90e647dd880c6bd04c62df6853c81b5672cea92f692e49a"
       }
     },
     {
@@ -7191,8 +7191,8 @@
       "sourceFingerprint": "81e52142fbe236eb5b6d7572fe343c48eda5b4adfc7a7e0475a626192e06bdf8",
       "output": {
         "path": "public/ui/mobs/terrace_howler.webp",
-        "bytes": 1926,
-        "sha256": "3266ca7cb5d336e3ab2caf4d299b0c02087b4591040638afe6f3cc50fbe06768"
+        "bytes": 1940,
+        "sha256": "3a53583fd76a609fa07a3f03742080cc0e2e9d699393c4fc32b5aab2da4b627b"
       }
     },
     {
@@ -7308,8 +7308,8 @@
       "sourceFingerprint": "b15002baa899163f99ee3cef440038aa244445c16d23b172da3c903df364ddcb",
       "output": {
         "path": "public/ui/mobs/the_wreck_warden.webp",
-        "bytes": 2584,
-        "sha256": "e11030bfe58ca95bfa73670c6b35ae3004253f501352bac37c47152190b57006"
+        "bytes": 2562,
+        "sha256": "43aa6f55256d34afc6130b9497c2d9fb96fa20981dce1c433e741b9632e3766e"
       }
     },
     {
@@ -7342,8 +7342,8 @@
       "sourceFingerprint": "66f18f088572b2c9aba37e7a67ca0afb5db3351a29db17fdb0de09f0be5985da",
       "output": {
         "path": "public/ui/mobs/thicket_boar.webp",
-        "bytes": 2834,
-        "sha256": "14edc01112635c2af4b4a793790fdd83107d4de1fcd89630c8a768ec11e6959a"
+        "bytes": 2788,
+        "sha256": "1e7eb8929b764136d988a6fc3393aff24e7095f6a0120a373629a70ff2b06acd"
       }
     },
     {
@@ -7376,8 +7376,8 @@
       "sourceFingerprint": "bff7ca75c928b3dc7484d8a59f1525522d039d85b951c0309a9ff068e10adbec",
       "output": {
         "path": "public/ui/mobs/thornpeak_ogre.webp",
-        "bytes": 2430,
-        "sha256": "4b9c73884684431d2826facd3884ab31637a6740261094635c240cd0477550eb"
+        "bytes": 2412,
+        "sha256": "00949a9d2329c9db8e39f453064d64a5ee6b23dc1d994e618d116701b2fb2286"
       }
     },
     {
@@ -7435,8 +7435,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/threnos_first_voice.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -7596,8 +7596,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/tidebound_acolyte.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -7630,8 +7630,8 @@
       "sourceFingerprint": "f3d377ffdff58198a067aaff429cd0272732c2f3d13ee0b51c0bc54ee77e2433",
       "output": {
         "path": "public/ui/mobs/tolling_bell.webp",
-        "bytes": 1586,
-        "sha256": "ad194ea4c997967e3cbf53f46c7330d8b4a4715738d46d85669dd708e19f603c"
+        "bytes": 1546,
+        "sha256": "f8da384ba0e7066c37d424447b7295e80819373b5ecc8d03b15a0d5d4b248cc8"
       }
     },
     {
@@ -7698,8 +7698,8 @@
       "sourceFingerprint": "fceb8e7950b5d709ea39d5d7d0a74028701b26cd92ca06b754307ba22f379a43",
       "output": {
         "path": "public/ui/mobs/topiary_wolf.webp",
-        "bytes": 1902,
-        "sha256": "1af5b7959b934f3ee833472bc05c4bc7fbd12790d0c5918f8a7746bdf5edc637"
+        "bytes": 1830,
+        "sha256": "aa194cc43538cb5718a05c07c646da09e4ce7e8f2e4f0fd62b44b1aeb63a7953"
       }
     },
     {
@@ -7733,7 +7733,7 @@
       "output": {
         "path": "public/ui/mobs/training_dummy.webp",
         "bytes": 1790,
-        "sha256": "66efb4999739669201bd44e21aca2d6e222ba8dfeb410d018c1e5e7d156e0e65"
+        "sha256": "ff36c52017c5e7361602e61e9c1ea224519ed2d90f77cc911cffe2b71e3914ba"
       }
     },
     {
@@ -7766,8 +7766,8 @@
       "sourceFingerprint": "e1dccb172f7d36ec3c89bf242071bfb6b0c7d567ff86f9d5df691bc9389b86c7",
       "output": {
         "path": "public/ui/mobs/training_effigy.webp",
-        "bytes": 1800,
-        "sha256": "de693348234dd4a095c914c069e5ab70f557c43170d80a65f3b79a701a73b252"
+        "bytes": 1778,
+        "sha256": "beaf77ba2d558e975a320b75bd36e9be634d81c7c22cc3edc86a88b1dc0e150e"
       }
     },
     {
@@ -7834,8 +7834,8 @@
       "sourceFingerprint": "820c237cca9f63dfd62ee7459dd0a9c220558db87ee0d0cd5cde52b78e231610",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 2568,
-        "sha256": "e4e26dce7d3ec76ef551774bfbb0b3281ea69225abf82669ac7603a7ba9ee13e"
+        "bytes": 2486,
+        "sha256": "c87aa892fc7cc0903256a7281845322b45ec3af655ed7300f19a7b744170a448"
       }
     },
     {
@@ -7883,8 +7883,8 @@
       "sourceFingerprint": "028ead47c9935a5f769ac47203123bc1b6aa2098a0f2da755b8f0c6f435a9fc7",
       "output": {
         "path": "public/ui/mobs/vael_the_mistcaller.webp",
-        "bytes": 2178,
-        "sha256": "02ad27668bc041b60f76c7402ae391b539cec05b1c0d56adb763f12e19067cd0"
+        "bytes": 2184,
+        "sha256": "de9529ce9d9aafd6a0688e147f67dc6d066fd46712e02cfdf3843c2e3de06c56"
       }
     },
     {
@@ -7942,8 +7942,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/vale_bandit.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -7976,8 +7976,8 @@
       "sourceFingerprint": "b6c76e7ed755ae0b6548421763cac5deaf02c160a11e5bedf5a2bc85ff0d1ef4",
       "output": {
         "path": "public/ui/mobs/varkas_boneguard.webp",
-        "bytes": 2808,
-        "sha256": "e1a7d259f30a5f0e75e47a401a9bc034270f1d265612dd1ec00a858130b61e4d"
+        "bytes": 2812,
+        "sha256": "cba2167e8dbc5aef277d2a716ce36a752553e17a25eee9c9b4c23268b3bdd4b3"
       }
     },
     {
@@ -8010,8 +8010,8 @@
       "sourceFingerprint": "a1b01f3bd947684ddc20c92d46e4c7c96b25b7422ec0690f4cccb5bdafd27d3e",
       "output": {
         "path": "public/ui/mobs/varkhul_forgefather_of_the_last_flame.webp",
-        "bytes": 3518,
-        "sha256": "dbb650626d73cd0baa886df465819b139a9e67940379ded07a700b77b79da0b0"
+        "bytes": 3396,
+        "sha256": "72eee44de63e91996ef923842bebdaeb5c410568812c34d910590e3bb757ddf0"
       }
     },
     {
@@ -8140,8 +8140,8 @@
       "sourceFingerprint": "f55680aee104b7756292129b86a4034896c9e3ea3101d8156cf89efaff874f01",
       "output": {
         "path": "public/ui/mobs/vision_aldren_warrior.webp",
-        "bytes": 2220,
-        "sha256": "33659fec5d04e337bc1bd3af126706dd50c00f2974c656852f6797abbf062c08"
+        "bytes": 2210,
+        "sha256": "8cae5bc0bcc37ab41361a235cb0742ad2a8aaa20e9076277b4b669d7f6440c26"
       }
     },
     {
@@ -8201,8 +8201,8 @@
       "sourceFingerprint": "e62193520a3eda179301c0753d31a478cc388950553069b17553f843e26dcf8d",
       "output": {
         "path": "public/ui/mobs/vision_deathstalker_voss.webp",
-        "bytes": 2424,
-        "sha256": "e438b668d93232eb7693410d880462ebeda57081ed46ca2fa9dee0bac4a4cbd3"
+        "bytes": 2380,
+        "sha256": "4245d0837d55391a096187661f55c8e5ac70d67ab423d38380beee392ea79644"
       }
     },
     {
@@ -8262,8 +8262,8 @@
       "sourceFingerprint": "3cc09042c77622a7cbff2253e1039098d7e3911d01e8a7c659bd5d7f7e206554",
       "output": {
         "path": "public/ui/mobs/vision_malric_mage.webp",
-        "bytes": 2330,
-        "sha256": "a6b4833829865bd6625b8ed8fc45349083a6d8a17ce29e39cdb42bba78fcd92d"
+        "bytes": 2312,
+        "sha256": "fb24d2b1b1c90d34277a09444d412f51a69e03a1edfcf8581aca3fe2859187ec"
       }
     },
     {
@@ -8296,8 +8296,8 @@
       "sourceFingerprint": "0616ef7b82bae498a417f8ff03e723ebd214fd772bbf439b691b072de996675c",
       "output": {
         "path": "public/ui/mobs/void_stalker.webp",
-        "bytes": 1826,
-        "sha256": "fce6e26344e8fd80d2c348054821348d945a61290fc5cb2aef1fc274c5115750"
+        "bytes": 1806,
+        "sha256": "11efc080bffad7b9ddf6adea6339aa884eedfd3ee5ada17eecf3201e4e98eac1"
       }
     },
     {
@@ -8369,8 +8369,8 @@
       "sourceFingerprint": "dca980f6ee4d0dc0bcde6bdb8d85a9d71c9e6ca27355a3955a8096c3c3ab3b11",
       "output": {
         "path": "public/ui/mobs/waking_warden.webp",
-        "bytes": 2878,
-        "sha256": "66e604d07095f24c0105c467693f4dc502882c16f46fb59b22e081650c29d948"
+        "bytes": 2802,
+        "sha256": "3f969d8ae84b02b81b9a8f7c08521c14cef5b2d35beda236770597e0b81a29e3"
       }
     },
     {
@@ -8471,8 +8471,8 @@
       "sourceFingerprint": "b956face7162a619116a9e431a42b8c484bdde9173d071be2cb76d9d8978f20b",
       "output": {
         "path": "public/ui/mobs/warlord_drogmar.webp",
-        "bytes": 2384,
-        "sha256": "bfb73e0e4e3af879e195b74f2eb3c6d080238e74e8969b4b070da07bdd320933"
+        "bytes": 2350,
+        "sha256": "f9e1f13fa5120c0296364367899fb76f919070d930aa142ab45dc52805093016"
       }
     },
     {
@@ -8505,8 +8505,8 @@
       "sourceFingerprint": "2fb1fcf255a7121dfc23071eea85ef7178a54bbd0e7cae167e02284fafa873ab",
       "output": {
         "path": "public/ui/mobs/water_elemental.webp",
-        "bytes": 2166,
-        "sha256": "a64e8284f1e58f06a542202a3c7949affc587b9b4235f254bb838eec774a21ea"
+        "bytes": 2222,
+        "sha256": "87d5044d0a8e624660808a1acbfec1c4d5d359f9b8b4a45642c95636cbf9e921"
       }
     },
     {
@@ -8641,8 +8641,8 @@
       "sourceFingerprint": "951d84dc27cf080fa36f5f602f8728c9fe2da070b6beb5d4fb30a6da588bfc19",
       "output": {
         "path": "public/ui/mobs/wild_boar.webp",
-        "bytes": 2824,
-        "sha256": "c53fe2d306738e14aec1f08339b1a48a274e2a4e8de6bb28b3f694fcb7a87a21"
+        "bytes": 2790,
+        "sha256": "d8b3dd210dc734db3eaea7cd2d90599e8e62e505cf70497f013cfaf2dc6a4e54"
       }
     },
     {
@@ -8675,8 +8675,8 @@
       "sourceFingerprint": "3c3b9c0c15aa5b1061dd6ebccde693527bd9c86c45be51cd26da658de0e0ff7e",
       "output": {
         "path": "public/ui/mobs/wildheart_beastmaster.webp",
-        "bytes": 3316,
-        "sha256": "15f49f4edd97ddde548ee5fe9533357b75546c154ba6f6c7c4f1fd1915b7e41a"
+        "bytes": 3228,
+        "sha256": "bc40fa803ab1690d649e8bf3470a6a90003f0aeccecf94720fd5d533d55a63df"
       }
     },
     {
@@ -8709,8 +8709,8 @@
       "sourceFingerprint": "429116bbd70dc6c987264887d3677dd52cb3ed503d364ebc5da64e4b869e2360",
       "output": {
         "path": "public/ui/mobs/wildheart_hexcaller.webp",
-        "bytes": 3284,
-        "sha256": "a27aab09f2dc2048aee2c9dc294747c792c1b852e581adefb072acacd7d55e9d"
+        "bytes": 3246,
+        "sha256": "30a33ff1b8dbc0b8f180724f17880582d45861108241ec02d4f554eb36852885"
       }
     },
     {
@@ -8743,8 +8743,8 @@
       "sourceFingerprint": "119fe85f7e322bd33f8a8dfe2aa8447ca8ff6a9422ed7841d286bdda21cd85dd",
       "output": {
         "path": "public/ui/mobs/wildheart_high_priest.webp",
-        "bytes": 3542,
-        "sha256": "cb3553d0e55b2bc9371e3e815e01cd02c2484ef46ddbca0fb1bd7e26f932645c"
+        "bytes": 3528,
+        "sha256": "7c303aeb8232008a15d839a61a51de9f45f65c5a5e2b3e7c2ee64aa877ef17cc"
       }
     },
     {
@@ -8777,8 +8777,8 @@
       "sourceFingerprint": "157004661e66d007f69d190081688b8b4f8a2c5934b97905e5fd1280698c6bad",
       "output": {
         "path": "public/ui/mobs/wildheart_ravager.webp",
-        "bytes": 3438,
-        "sha256": "9eb1589e570269d11d70689eed37070c16c675cd4e5d1a6e83f2d1ee97ee40ad"
+        "bytes": 3430,
+        "sha256": "02cb1ba9dc9490f04c87ba41aa9d14845e03a874494a33fd8836eadcd206aab9"
       }
     },
     {
@@ -8811,8 +8811,8 @@
       "sourceFingerprint": "8566b5949a1b9a4f6cfe84d3f07a6d78a8bc35220e964b9080cbf5e797c1dbed",
       "output": {
         "path": "public/ui/mobs/wildheart_stalker.webp",
-        "bytes": 2162,
-        "sha256": "d10532b0172ae46b7a689cf3b986330e085f4cd5abfe5080a704076cabd403c0"
+        "bytes": 2124,
+        "sha256": "74cd3d7553f07790c7f964b6714445dfbe37e1bcdab1a8a338aca925c2314c52"
       }
     },
     {
@@ -8913,8 +8913,8 @@
       "sourceFingerprint": "3de4c55c6e71c1dd0d95893263b0a1ba261ef16736db495f6258d1a9fd1a2504",
       "output": {
         "path": "public/ui/mobs/wraithbinder_maldrec.webp",
-        "bytes": 2734,
-        "sha256": "724e8ae60cb3b8d9fd4ca34cd725dbc38b66e0a7937a922ea6698f22f1b297ee"
+        "bytes": 2730,
+        "sha256": "9d3e43581fcbbcde018b16d822fbc516af2efd1a5b62c40835bbc795078cc8f7"
       }
     },
     {
@@ -8996,8 +8996,8 @@
       "sourceFingerprint": "6214edd42be9419e66beb928d4e4b3d2f6fde163ac839cb41b7f62247a92ca37",
       "output": {
         "path": "public/ui/mobs/wyrmcult_necromancer.webp",
-        "bytes": 2108,
-        "sha256": "8ef5d1f039b4f5f6ced21868765c830db990bc414201d88d83bee3a64bf71a14"
+        "bytes": 2096,
+        "sha256": "35e2efa966584b1d05db6854f8f4ed3fea35bf092ef5971fb83572dd16d715c6"
       }
     },
     {
@@ -9055,8 +9055,8 @@
       "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
       "output": {
         "path": "public/ui/mobs/wyrmcult_zealot.webp",
-        "bytes": 2200,
-        "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
+        "bytes": 2208,
+        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
       }
     },
     {
@@ -9123,8 +9123,8 @@
       "sourceFingerprint": "7ac9443703bf832ca187499a6c8a6fcbee45e476903d4778faa80e7e7530ee36",
       "output": {
         "path": "public/ui/mobs/yumi_cat.webp",
-        "bytes": 2994,
-        "sha256": "ca3bfaaca470ee3a82d43d1c11c6c64916d1bf9f04e9d511c50400b0370024dd"
+        "bytes": 3052,
+        "sha256": "0daacfbdd4fb11e51e421eb1d0e1df57cf6522e3f58ce188b89f442e635ab8ef"
       }
     }
   ]

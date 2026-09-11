@@ -647,6 +647,7 @@ const RENDER_PURE_CORES = [
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/outdoor_light_rig_core.ts',
   'src/render/wall_backface_cull_core.ts',
+  'src/render/dais_blocks_core.ts',
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',

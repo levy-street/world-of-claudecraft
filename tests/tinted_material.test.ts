@@ -147,6 +147,88 @@ describe('tinted character materials', () => {
     }
   });
 
+  it('lifts a tinted body in its tinted colour, and an untinted one in white', () => {
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
+    try {
+      // The Bone Spike shape: a white-based authored atlas recoloured by a
+      // strong tint and lifted by selfIllumination so it reads in a dark hall.
+      const map = new THREE.Texture();
+      const src = new THREE.MeshStandardMaterial({ color: 0xffffff, map });
+      const mesh = new THREE.Mesh(new THREE.BufferGeometry(), src);
+      const root = new THREE.Group();
+      root.add(mesh);
+      applyMaterials(
+        root,
+        { tint: 0xff7a1a, tintStrength: 1, selfIllumination: 0.35 } as VisualDef,
+        0xffffff,
+      );
+      const lit = mesh.material as THREE.MeshStandardMaterial;
+      expect(lit).not.toBe(src);
+      expect(lit.emissiveMap).toBe(map);
+      expect(lit.emissiveIntensity).toBe(0.35);
+      // The glow is the tinted albedo, not the atlas's own (white) colour:
+      // otherwise the lift would wash the recolour back toward the texture.
+      expect(lit.color.getHex()).toBe(0xff7a1a);
+      expect(lit.emissive.getHex()).toBe(0xff7a1a);
+      // The source stays untouched for other defs sharing the GLB.
+      expect(src.color.getHex()).toBe(0xffffff);
+      expect(src.emissiveMap).toBeNull();
+
+      // An untinted self-illuminated def keeps the white, atlas-scaled lift.
+      const plain = tintedMaterial(
+        src,
+        null,
+        0,
+        null,
+        null,
+        'body',
+        null,
+        'rig',
+        '',
+        0.2,
+      ) as THREE.MeshStandardMaterial;
+      expect(plain.emissiveMap).toBe(map);
+      expect(plain.emissive.getHex()).toBe(0xffffff);
+      expect(plain.emissiveIntensity).toBe(0.2);
+    } finally {
+      restoreGfx();
+    }
+
+    // Low tier: the recolour is the actionable part (a spike must read as
+    // the thing to kill on every preset), so the Lambert rebuild carries the
+    // same ember hue; only the emissive lift is standard-tier polish.
+    const restoreLow = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
+    try {
+      const map = new THREE.Texture();
+      const src = new THREE.MeshStandardMaterial({ color: 0xffffff, map });
+      const mesh = new THREE.Mesh(new THREE.BufferGeometry(), src);
+      const root = new THREE.Group();
+      root.add(mesh);
+      applyMaterials(
+        root,
+        { tint: 0xff7a1a, tintStrength: 1, selfIllumination: 0.35 } as VisualDef,
+        0xffffff,
+      );
+      const low = mesh.material as unknown as THREE.MeshLambertMaterial;
+      expect(low.isMeshLambertMaterial).toBe(true);
+      expect(low.map).toBe(map);
+      // Still unmistakably ember after the low-tier readability lift (a
+      // small pull toward white): in sRGB terms red stays saturated, green
+      // stays in the orange band, blue stays near zero.
+      const hex = low.color.getHex();
+      const red = (hex >> 16) & 0xff;
+      const green = (hex >> 8) & 0xff;
+      const blue = hex & 0xff;
+      expect(red).toBe(0xff);
+      expect(green).toBeGreaterThanOrEqual(0x7a);
+      expect(green).toBeLessThanOrEqual(0x9a);
+      expect(blue).toBeLessThanOrEqual(0x60);
+      expect(src.color.getHex()).toBe(0xffffff);
+    } finally {
+      restoreLow();
+    }
+  });
+
   it('keeps an authored held model as shipped and still polishes every other weapon', () => {
     const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
     try {

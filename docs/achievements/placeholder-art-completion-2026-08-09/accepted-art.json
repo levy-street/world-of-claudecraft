@@ -366,8 +366,8 @@
   "sourceManifests": [
     {
       "path": "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
-      "acceptedSha256": "9b01a3b69715c77a9afabdcc722ce019dac7ded2e09ac0f664cb5a85e9c1fa0e",
-      "acceptedBytes": 281730
+      "acceptedSha256": "c62edcc4255e128f50e0b613e3718f13302065be2d004d08fba3598bd199b04f",
+      "acceptedBytes": 281742
     }
   ],
   "assets": [
@@ -2131,7 +2131,7 @@
       "kind": "mobPortrait",
       "id": "castaway_navigator",
       "runtimeUrl": "/ui/mobs/castaway_navigator.webp",
-      "acceptedSha256": "6711572931e5cfc6ed2d0aca599aa70c4ec92c6163b098bf3f222d90317cbe26",
+      "acceptedSha256": "d4f0bf6105904dd5ddaa573e09d8cdf6da1fc17db0ab2c4b9106f7052d1e0f78",
       "acceptedBytes": 2628,
       "origin": "deterministic-rerender"
     },
@@ -2139,8 +2139,8 @@
       "kind": "mobPortrait",
       "id": "cindraleth_maw_matriarch",
       "runtimeUrl": "/ui/mobs/cindraleth_maw_matriarch.webp",
-      "acceptedSha256": "7d8d2dad0b160e147bb719fc48db4fe092bfc2a789cf0ee21993cfa683d72a65",
-      "acceptedBytes": 2462,
+      "acceptedSha256": "39bafb97c82172605678ebc755f420536c26b91c5f388d992f5359c4a877a15c",
+      "acceptedBytes": 2436,
       "origin": "deterministic-rerender"
     },
     {
@@ -2171,24 +2171,24 @@
       "kind": "mobPortrait",
       "id": "fisher_bram",
       "runtimeUrl": "/ui/mobs/fisher_bram.webp",
-      "acceptedSha256": "8f18935329142987a17c888b39dfd6bd30413fd0528933829e0b3e0f3c6f6fe5",
-      "acceptedBytes": 2618,
+      "acceptedSha256": "4e4961e7e5f7b1ee42892ebc11667ba3a3bc114680fad339d9fac56eb3c890fd",
+      "acceptedBytes": 2602,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "gravedigger_mosley",
       "runtimeUrl": "/ui/mobs/gravedigger_mosley.webp",
-      "acceptedSha256": "074e53c4715efc8139889b3232968c6ee54baefb984cb01ed571714b81b5d365",
-      "acceptedBytes": 2716,
+      "acceptedSha256": "ba0f0bcf7b9f33b6a0236087517b902f292964f0bca37cf1855da6ac9d71073b",
+      "acceptedBytes": 2710,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "grubjaw",
       "runtimeUrl": "/ui/mobs/grubjaw.webp",
-      "acceptedSha256": "cd9810cbb956c043fe6d1a514c20d3a941afa19910b5fc005c460e66d1a2d2b1",
-      "acceptedBytes": 2172,
+      "acceptedSha256": "de48a90c28d1fa473856186aba8119eb2458e4cc99cc0f3ebd5aedc606704a69",
+      "acceptedBytes": 2142,
       "origin": "deterministic-rerender"
     },
     {
@@ -2227,15 +2227,15 @@
       "kind": "mobPortrait",
       "id": "the_wreck_warden",
       "runtimeUrl": "/ui/mobs/the_wreck_warden.webp",
-      "acceptedSha256": "e11030bfe58ca95bfa73670c6b35ae3004253f501352bac37c47152190b57006",
-      "acceptedBytes": 2584,
+      "acceptedSha256": "43aa6f55256d34afc6130b9497c2d9fb96fa20981dce1c433e741b9632e3766e",
+      "acceptedBytes": 2562,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "training_dummy",
       "runtimeUrl": "/ui/mobs/training_dummy.webp",
-      "acceptedSha256": "66efb4999739669201bd44e21aca2d6e222ba8dfeb410d018c1e5e7d156e0e65",
+      "acceptedSha256": "ff36c52017c5e7361602e61e9c1ea224519ed2d90f77cc911cffe2b71e3914ba",
       "acceptedBytes": 1790,
       "origin": "deterministic-rerender"
     },

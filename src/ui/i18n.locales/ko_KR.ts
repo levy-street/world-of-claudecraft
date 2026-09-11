@@ -113,7 +113,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.formula_lastflame_zeal.name': '공식: 마지막 불꽃의 열의',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '마지막 불꽃의 열의',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    '적중한 근접 공격은 일정 확률로 15초 동안 힘을 50 증가시키고 자신의 생명력을 200 회복합니다. 치유량 보정이 적용됩니다. 적중마다 공격한 무기의 기본 속도 0.6초당 1%의 확률로 발동합니다. 내부 재사용 대기시간이 없습니다. 양손에 각각 별도의 강화 효과가 있으며, 같은 손으로 다시 발동하면 해당 효과의 지속시간이 갱신됩니다. 원거리 공격은 이 효과를 발동시키지 않습니다. 늑대 형상에서는 대신 1초의 기본 공격 속도를 사용합니다.',
+    '적중한 근접 공격은 일정 확률로 15초 동안 힘을 50 증가시키고 자신의 생명력을 200 회복합니다. 치유량 보정이 적용됩니다. 적중마다 공격한 무기의 기본 속도 0.6초당 1%의 확률로 발동합니다. 내부 재사용 대기시간이 없습니다. 강화 효과는 양손이 하나를 공유하며, 어느 손으로 발동하든 지속시간이 갱신되고 중첩되지 않습니다. 원거리 공격은 이 효과를 발동시키지 않습니다. 늑대 형상에서는 대신 1초의 기본 공격 속도를 사용합니다.',
   'hudChrome.enchanting.recipeNotLearned': '이 마법부여를 적용하려면 먼저 공식을 배워야 합니다.',
   'hudChrome.pattern.teachesEnchant': '사용 효과: {enchant} 부여 방법을 배웁니다.',
   'hudChrome.barEditor.pageTab': '페이지 {page}',
@@ -8464,7 +8464,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '생명력이{health}가 되면 전율의 발구르기가 공격대를 그 자리에 묶어 두는 동안 알드릭 수사가 도착해 수호석에 불을 밝힙니다. 모든 가시가 부서지고 바닥의 불길이 꺼지며, 이후 영혼 가르기와 불사의 격노가 왕좌의 메커니즘에 더해집니다.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': '왕의 분노',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    '생명력이{health}가 되면 나이트락시스가 왕의 분노로 포효하며, 이후 전투가 끝날 때까지 일반 난이도에서 {bonusNormal}, 영웅 난이도에서 {bonusHeroic}의 피해를 추가로 입힙니다. 무덤 분출 주기가 {eruptionEveryNormal}초(영웅 {eruptionEveryHeroic}초)로, 무덤불길 주기가 {gravefireEveryNormal}초(영웅 {gravefireEveryHeroic}초)로 짧아집니다. 다른 모든 메커니즘의 주기는 그대로 유지됩니다.',
+    '생명력이{health}가 되면 나이트락시스가 왕의 분노로 포효하며, 이후 전투가 끝날 때까지 일반 난이도에서 {bonusNormal}, 영웅 난이도에서 {bonusHeroic}의 피해를 추가로 입힙니다. 무덤 분출 주기가 {eruptionEveryNormal}초(영웅 {eruptionEveryHeroic}초)로 짧아집니다. 다른 모든 메커니즘의 주기는 그대로 유지됩니다.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerName': '무덤파괴자',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     '{seconds}초마다 나이트락시스가 다음 공격을 충전합니다. 대상은 그 공격만 받지만, 그의 전방 {arc}도 부채꼴 안 {range}야드 이내에 있는 다른 모든 플레이어는 그 공격의 {splash}만큼을 각자의 방어도로 감소한 물리 피해로 받습니다.',
@@ -8479,11 +8479,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '방어 담당은 {stacks}중첩에서 교대합니다: 다른 방어 담당이 도발하고, 저주에 걸린 방어 담당은 중첩이 사라질 때까지 무덤파괴자의 부채꼴 밖에 머뭅니다. 치유 담당은 교대 전에 새로 들어올 방어 담당의 생명력을 채워 둡니다.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': '뼈가시',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    '{everyNormal}초마다 나이트락시스가 현재 대상을 제외한 플레이어 {victimsNormal}명을 뼈가시에 꿰뚫습니다. 꿰뚫린 플레이어는 행동할 수 없으며 자신의 가시가 파괴될 때까지 매초 최대 생명력의 {drainNormal}만큼 잃습니다.',
+    '{everyNormal}초마다 나이트락시스가 현재 대상을 제외한 플레이어 {victimsNormal}명을 뼈가시에 꿰뚫습니다. 꿰뚫린 플레이어는 행동할 수 없으며 자신의 가시가 파괴될 때까지 매초 최대 생명력의 {drainNormal}만큼 잃습니다. 뼈가시는 누구의 공격이든 {hitsNormal}회 맞으면 부서지며, 피해량은 상관없습니다. 이미 꿰뚫린 플레이어는 {cooldown}초 동안 다시 선택되지 않으므로 뼈가시가 공격대 전체에 고르게 분산됩니다.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    '{everyHeroic}초마다 나이트락시스가 현재 대상을 제외한 플레이어 {victimsHeroic}명을 뼈가시에 꿰뚫습니다. 꿰뚫린 플레이어는 행동할 수 없으며 자신의 가시가 파괴될 때까지 매초 최대 생명력의 {drainHeroic}만큼 잃습니다.',
+    '{everyHeroic}초마다 나이트락시스가 현재 대상을 제외한 플레이어 {victimsHeroic}명을 뼈가시에 꿰뚫습니다. 꿰뚫린 플레이어는 행동할 수 없으며 자신의 가시가 파괴될 때까지 매초 최대 생명력의 {drainHeroic}만큼 잃습니다. 뼈가시는 누구의 공격이든 {hitsHeroic}회 맞으면 부서지며, 피해량은 상관없습니다. 이미 꿰뚫린 플레이어는 {cooldown}초 동안 다시 선택되지 않으므로 뼈가시가 공격대 전체에 고르게 분산됩니다.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    '공격 담당은 즉시 뼈가시로 전환해 파괴하고 꿰뚫린 플레이어를 구합니다. 치유 담당은 가시가 파괴되는 동안 꿰뚫린 플레이어를 살려 둡니다.',
+    '가장 가까운 사람이 뼈가시를 공격합니다. 누구의 공격이든 몇 번만 맞으면 부서지며 피해량은 상관없습니다. 치유사는 가시가 부서질 때까지 꿰뚫린 아군을 살려 둡니다.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': '무덤 분출',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
     '{everyNormal}초마다 해골 손이 플레이어 발밑에 반경 {radius}야드의 원 {countNormal}개를 표시합니다. {warning}초 후 각 원이 폭발해 최대 생명력의 {burstNormal}만큼 암흑 피해를 입힌 뒤, {flameNormal}초 동안 무덤 화염으로 타올라 그 안에 서 있는 대상에게 매초 최대 생명력의 {tickNormal}만큼 피해를 입힙니다.',
@@ -8493,9 +8493,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '폭발하기 전에 모든 경고 원 밖으로 나가고 불타는 바닥을 피하세요. 방어 담당은 근접 딜러가 움직일 공간을 확보할 수 있도록 나이트락시스를 화염에서 멀리 끌어냅니다.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': '결속의 인장',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    '{everyNormal}초마다 나이트락시스로부터 {minDist}에서 {maxDist}야드 떨어진 바닥에 옛 결계의 인장이 타오르며, 그가 불사의 상승을 시작해 {ascensionEvery}초마다 피해량과 공격 속도가 {ascensionNormal}씩 증가합니다. {bindNormal}초 안에 그가 인장 위에 서면 결속됩니다: 상승 효과가 정화되고 {stunNormal}초 동안 기절하며, {boundNormal}초 동안 {vulnerability}만큼 더 큰 피해를 받습니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {unboundHitNormal}만큼 암흑 피해를 입고, 그는 다음 결속까지 {unboundBonusNormal}만큼 더 큰 피해를 유지합니다.',
+    '{everyNormal}초마다 왕좌 양옆의 두 발판 중 하나(전투 시작 시 나이트락시스가 서 있던 자리에서 공격대 기준 왼쪽 또는 오른쪽 {sideOffset}야드, 시전마다 좌우를 번갈아)에 옛 결계의 인장이 타오르며, 그가 불사의 상승을 시작해 {ascensionEvery}초마다 피해량과 공격 속도가 {ascensionNormal}씩 증가합니다. {bindNormal}초 안에 그가 인장 위에 서면 결속됩니다: 상승 효과가 정화되고 {stunNormal}초 동안 기절하며, {boundNormal}초 동안 {vulnerability}만큼 더 큰 피해를 받습니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {unboundHitNormal}만큼 암흑 피해를 입고, 그는 다음 결속까지 {unboundBonusNormal}만큼 더 큰 피해를 유지합니다.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    '{everyHeroic}초마다 나이트락시스로부터 {minDist}에서 {maxDist}야드 떨어진 바닥에 옛 결계의 인장이 타오르며, 그가 불사의 상승을 시작해 {ascensionEvery}초마다 피해량과 공격 속도가 {ascensionHeroic}씩 증가합니다. {bindHeroic}초 안에 그가 인장 위에 서면 결속됩니다: 상승 효과가 정화되고 {stunHeroic}초 동안 기절하며, {boundHeroic}초 동안 {vulnerability}만큼 더 큰 피해를 받습니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {unboundHitHeroic}만큼 암흑 피해를 입고, 그는 다음 결속까지 {unboundBonusHeroic}만큼 더 큰 피해를 유지합니다.',
+    '{everyHeroic}초마다 왕좌 양옆의 두 발판 중 하나(전투 시작 시 나이트락시스가 서 있던 자리에서 공격대 기준 왼쪽 또는 오른쪽 {sideOffset}야드, 시전마다 좌우를 번갈아)에 옛 결계의 인장이 타오르며, 그가 불사의 상승을 시작해 {ascensionEvery}초마다 피해량과 공격 속도가 {ascensionHeroic}씩 증가합니다. {bindHeroic}초 안에 그가 인장 위에 서면 결속됩니다: 상승 효과가 정화되고 {stunHeroic}초 동안 기절하며, {boundHeroic}초 동안 {vulnerability}만큼 더 큰 피해를 받습니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {unboundHitHeroic}만큼 암흑 피해를 입고, 그는 다음 결속까지 {unboundBonusHeroic}만큼 더 큰 피해를 유지합니다.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     '방어 담당은 공격대가 남긴 불길이 있더라도 즉시 나이트락시스를 인장 위로 끌고 갑니다. 근접 딜러는 끌려가는 경로를 따라가고 원거리 딜러는 새로 생긴 무덤파괴자의 부채꼴을 피합니다. 그가 결속된 동안 모두 화력을 집중합니다.',
   'hudChrome.raidBossGuide.nythraxis.raiseFallenName': '망자 소생',
@@ -8509,20 +8509,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '나이트락시스가 현재 대상을 제외한 플레이어 {marksHeroic}명에게 영혼 가르기 표식을 남깁니다. {fuse}초 후 각 표식은 대상자의 최대 생명력의 {damageHeroic}만큼 암흑 피해를 입히며, 이 피해는 그 대상자로부터 {range}야드 이내에 있는 표식 보유자 수만큼 나뉩니다. 표식이 혼자 터지면 치명적입니다.',
   'hudChrome.raidBossGuide.nythraxis.soulRendResponse':
     '표식을 받은 모든 플레이어는 {fuse}초의 시간이 끝나기 전에 한 집결 지점으로 달려가 다른 표식 보유자로부터 {range}야드 이내에 섭니다. 치유 담당은 표식이 터지는 동안 그룹의 생명력을 채웁니다.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': '영혼불길',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    '영혼 가르기가 터질 때마다 각 표식이 있던 자리에 반경 {radius}야드의 보라색 불웅덩이가 남아 {seconds}초 동안 타오르며 매초 최대 생명력의 {tickNormal}만큼 피해를 입힙니다. 웅덩이가 겹치는 곳에서는 각 웅덩이의 피해를 모두 받습니다. 웅덩이는 수호석 {clearance}야드 이내에는 절대 생기지 않습니다.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    '영혼 가르기가 터질 때마다 겹쳐진 표식 무리마다 반경 {radius}야드의 보라색 불웅덩이가 하나만 남아 {secondsHeroic}초 동안 타오르며 매초 최대 생명력의 {tickHeroic}만큼 피해를 입힙니다. 웅덩이가 겹쳐도 피해는 한 번만 적용되며 중첩되지 않습니다. 웅덩이는 수호석 {clearance}야드 이내에는 절대 생기지 않습니다.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    '표식이 터지면 곧바로 보라색 웅덩이에서 벗어나세요. 다음 집결 지점은 불타는 곳과 겹치지 않게 정하세요.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': '무덤불길',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    '{everyNormal}초마다 보랏빛 무덤불길이 나이트락시스에게서 플레이어 한 명을 향해 뻗어나가며, 매초 {speed}야드씩 자라 최대 {length}야드까지 이어집니다. 지나간 자리마다 {burnNormal}초 동안 타오르며 그 안에 서 있는 대상에게 매초 최대 생명력의 {tickNormal}만큼 피해를 입힙니다.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    '{everyHeroic}초마다 보랏빛 무덤불길이 나이트락시스에게서 플레이어 한 명을 향해 뻗어나가며, 매초 {speed}야드씩 자라 최대 {length}야드까지 이어집니다. 지나간 자리마다 {burnHeroic}초 동안 타오르며 그 안에 서 있는 대상에게 매초 최대 생명력의 {tickHeroic}만큼 피해를 입힙니다.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    '다가오는 줄기를 옆으로 피하세요: 폭이 좁고 절대 방향을 바꾸지 않습니다. 원거리 플레이어는 한 자리에 머물지 말고 계속 움직입니다.',
   'hudChrome.raidBossGuide.nythraxis.deathlessRageName': '불사의 격노',
   'hudChrome.raidBossGuide.nythraxis.deathlessRageSummary':
     '{every}초마다 나이트락시스가 {cast}초에 걸쳐 불사의 격노를 시전합니다. 시전하는 동안 불이 켜진 수호석마다 플레이어 한 명이 {channel}초 동안 정신을 집중할 수 있습니다. 시전이 끝나기 전에 서로 다른 플레이어 셋이 각자 수호석을 완료하면 격노가 차단되고 나이트락시스가 {stun}초 동안 기절합니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {damageNormal}만큼 암흑 피해를 입습니다.',
@@ -8537,7 +8523,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '방어 담당은 알드렌의 대상을 확보해 참격이 공격대 반대편을 향하게 합니다. 말릭의 치유가 시작되는 순간 말릭을 기절시키거나 침묵시켜 가장 먼저 처치하고, 도발이 통하지 않는 보스는 치유 담당에게서 떼어 내도록 속박하거나 기절시켜 그다음으로 처치합니다.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': '왕의 분노',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    '나이트락시스가 이후 전투가 끝날 때까지 일반 난이도에서 {bonusNormal}, 영웅 난이도에서 {bonusHeroic}의 피해를 추가로 입힙니다. 무덤 분출이 {eruptionEveryNormal}초(영웅 {eruptionEveryHeroic}초)마다, 무덤불길이 {gravefireEveryNormal}초(영웅 {gravefireEveryHeroic}초)마다 발생합니다.',
+    '나이트락시스가 이후 전투가 끝날 때까지 일반 난이도에서 {bonusNormal}, 영웅 난이도에서 {bonusHeroic}의 피해를 추가로 입힙니다. 무덤 분출이 {eruptionEveryNormal}초(영웅 {eruptionEveryHeroic}초)마다 발생합니다.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     '피할 수 없는 피해에 남은 방어 재사용 기술을 사용하세요. 공격대가 전투를 마무리하는 동안 앞선 모든 메커니즘을 깔끔하게 처리하세요.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': '뼈 폭풍',
@@ -11313,16 +11299,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.sealbreak_shockwave': '봉인 파괴 충격파(광역 폭발)',
   'hudChrome.finder.mech.gravebreaker': '무덤파괴자(전방 부채꼴, 공격대 반대편으로)',
   'hudChrome.finder.mech.raise_fallen': '망자 소생(주기적 증원)',
-  'hudChrome.finder.mech.soul_rend': '영혼 가르기(표식 대상은 뭉쳤다가 불을 벗어남)',
+  'hudChrome.finder.mech.soul_rend': '영혼 가르기(표식 대상은 뭉쳐서 피해를 나눔)',
   'hudChrome.finder.mech.deathless_rage': '불사의 격노(수호석에서 저지)',
   'hudChrome.finder.mech.wardstones': '수호석 정신집중(단계 전환)',
   'hudChrome.finder.mech.dread_curse': '공포의 저주(누적되는 탱커 교대 디버프, 2중첩에서 교대)',
-  'hudChrome.finder.mech.bone_spike': '뼈가시(꿰뚫린 대상은 가시가 파괴될 때까지 생명력 소모)',
+  'hudChrome.finder.mech.bone_spike':
+    '뼈가시(꿰뚫린 플레이어는 누군가 몇 번의 공격으로 가시를 부술 때까지 생명력을 잃음)',
   'hudChrome.finder.mech.grave_eruption': '무덤 분출(불타는 바닥을 남기는 경고 원)',
   'hudChrome.finder.mech.binding_sigil':
     '결속의 인장(나이트락시스를 인장 위로 끌지 못하면 공격대가 대가를 치름)',
-  'hudChrome.finder.mech.gravefire': '무덤불길(옆으로 피해야 하는 이동하는 불줄기)',
-  'hudChrome.finder.mech.soulfire': '영혼불길(영혼 가르기가 터지며 남기는 불웅덩이)',
   'hudChrome.finder.mech.kings_wrath': '왕의 분노(30%: 영구 피해 증가, 바닥 위험 요소 가속)',
   'hudChrome.finder.mech.bone_storm': '뼈 폭풍(위협 수준 무시, 회전 공격, 공격대에게 돌진)',
   'hudChrome.finder.mech.crown_endures': '굴하지 않는 왕관(6:00에 강제 격노, 영웅 5:00)',

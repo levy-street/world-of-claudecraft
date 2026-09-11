@@ -3670,7 +3670,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Schaduwpuls (pulserende gebiedsschade)',
   'hudChrome.finder.mech.shuddering_stomp': 'Huiverende Stamp (gebiedsverdoving)',
   'hudChrome.finder.mech.soul_rend':
-    'Zielenscheur (gemarkeerde spelers moeten spreiden en worden genezen)',
+    'Zielenscheur (gemarkeerde spelers groeperen zich om de schade te delen)',
   'hudChrome.finder.mech.summons_adds': 'Roept versterkingen op',
   'hudChrome.finder.mech.wardstones': 'Wardstone-kanalen (faseovergang)',
   'hudChrome.finder.needs': 'Heeft {roles} nodig',
@@ -15671,7 +15671,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Bindingszegel (sleep de baas naar het zegel of de raid betaalt ervoor)',
   'hudChrome.finder.mech.bone_spike':
-    'Beenderspies (gespietste raiders verliezen gezondheid tot de spies is vernietigd)',
+    'Beenderspies (gespietste spelers verliezen leven totdat iemand de spies met een paar treffers versplintert)',
   'hudChrome.finder.mech.bone_storm':
     'Beenderstorm (hij negeert dreiging, wervelt en bestormt de raid)',
   'hudChrome.finder.mech.crown_endures':
@@ -15680,11 +15680,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Het Doodloze Hof (alleen heroic, het koninklijk hof verrijst na Doodloze Razernij)',
   'hudChrome.finder.mech.grave_eruption':
     'Grafuitbarsting (waarschuwingscirkels die brandende grond achterlaten)',
-  'hudChrome.finder.mech.gravefire': 'Grafvuur (een bewegende vuurlijn om te ontwijken)',
   'hudChrome.finder.mech.kings_wrath':
     'Koningswoede (30%: permanente schadebonus, snellere vloergevaren)',
-  'hudChrome.finder.mech.soulfire':
-    'Zielenvuur (detonaties van Zielenscheur laten brandende poelen achter)',
   'hudChrome.fullTransfer.excluded':
     'Nooit inbegrepen: je login, account, wallet of aankoopgegevens. Actiebalkindelingen worden in je account opgeslagen en reizen mee.',
   'hudChrome.fullTransfer.fullSettings': 'Volledige instellingen',
@@ -15781,19 +15778,19 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Uit',
   'hudChrome.options.shaderWarmOn': 'Aan',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    'Elke {everyHeroic} sec licht een zegel van de oude schutspreuken op de vloer op, {minDist} tot {maxDist} yd van Nythraxis, en hij begint Doodloze Verheffing, waardoor hij elke {ascensionEvery} sec {ascensionHeroic} schade en aanvalssnelheid krijgt. Als hij binnen {bindHeroic} sec op het zegel staat, is hij Gebonden: de Verheffing wordt gezuiverd, hij is {stunHeroic} sec verdoofd en hij loopt {boundHeroic} sec lang {vulnerability} meer schade op. Anders loopt elke raider {unboundHitHeroic} van maximale gezondheid als Schaduwschade op en behoudt hij {unboundBonusHeroic} meer schade tot de volgende binding.',
+    'Elke {everyHeroic} sec licht een zegel van de oude schutspreuken op een van de twee platforms naast de troon op, {sideOffset} yd links of rechts (vanuit de raid gezien) van de plek waar Nythraxis bij de pull stond, elke keer aan de andere kant, en hij begint Doodloze Verheffing, waardoor hij elke {ascensionEvery} sec {ascensionHeroic} schade en aanvalssnelheid krijgt. Als hij binnen {bindHeroic} sec op het zegel staat, is hij Gebonden: de Verheffing wordt gezuiverd, hij is {stunHeroic} sec verdoofd en hij loopt {boundHeroic} sec lang {vulnerability} meer schade op. Anders loopt elke raider {unboundHitHeroic} van maximale gezondheid als Schaduwschade op en behoudt hij {unboundBonusHeroic} meer schade tot de volgende binding.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Bindingszegel',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'De tank sleept Nythraxis meteen naar het zegel, door elk vuur dat de raid heeft achtergelaten. Melee volgt de sleep en ranged blijft uit de nieuwe Grafbreker-kegel. Iedereen brandt hem neer terwijl hij Gebonden is.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    'Elke {everyNormal} sec licht een zegel van de oude schutspreuken op de vloer op, {minDist} tot {maxDist} yd van Nythraxis, en hij begint Doodloze Verheffing, waardoor hij elke {ascensionEvery} sec {ascensionNormal} schade en aanvalssnelheid krijgt. Als hij binnen {bindNormal} sec op het zegel staat, is hij Gebonden: de Verheffing wordt gezuiverd, hij is {stunNormal} sec verdoofd en hij loopt {boundNormal} sec lang {vulnerability} meer schade op. Anders loopt elke raider {unboundHitNormal} van maximale gezondheid als Schaduwschade op en behoudt hij {unboundBonusNormal} meer schade tot de volgende binding.',
+    'Elke {everyNormal} sec licht een zegel van de oude schutspreuken op een van de twee platforms naast de troon op, {sideOffset} yd links of rechts (vanuit de raid gezien) van de plek waar Nythraxis bij de pull stond, elke keer aan de andere kant, en hij begint Doodloze Verheffing, waardoor hij elke {ascensionEvery} sec {ascensionNormal} schade en aanvalssnelheid krijgt. Als hij binnen {bindNormal} sec op het zegel staat, is hij Gebonden: de Verheffing wordt gezuiverd, hij is {stunNormal} sec verdoofd en hij loopt {boundNormal} sec lang {vulnerability} meer schade op. Anders loopt elke raider {unboundHitNormal} van maximale gezondheid als Schaduwschade op en behoudt hij {unboundBonusNormal} meer schade tot de volgende binding.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Elke {everyHeroic} sec spietst Nythraxis {victimsHeroic} raiders behalve zijn huidige doelwit op Beenderspiezen. Een gespietste raider kan niet handelen en verliest elke seconde {drainHeroic} van maximale gezondheid totdat zijn spies is vernietigd.',
+    'Elke {everyHeroic} sec spietst Nythraxis {victimsHeroic} raiders behalve zijn huidige doelwit op Beenderspiezen. Een gespietste raider kan niet handelen en verliest elke seconde {drainHeroic} van maximale gezondheid totdat zijn spies is vernietigd. Een spies versplintert na {hitsHeroic} treffers van wie dan ook, ongeacht de schade. Een speler die al is gespietst, kan {cooldown} sec. lang niet opnieuw worden gekozen, zodat de spiesen over de hele raid worden verdeeld.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Beenderspies',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'Schadedealers wisselen meteen naar de Beenderspiezen en vernietigen ze om de gespietste raiders te bevrijden. Healers houden de gespietsten in leven terwijl de spiezen vallen.',
+    'Wie het dichtstbij staat slaat op de Beenderspies: een paar treffers van wie dan ook versplinteren hem, ongeacht de schade. Healers houden de gespietsten in leven terwijl de spiesen vallen.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Elke {everyNormal} sec spietst Nythraxis {victimsNormal} raiders behalve zijn huidige doelwit op Beenderspiezen. Een gespietste raider kan niet handelen en verliest elke seconde {drainNormal} van maximale gezondheid totdat zijn spies is vernietigd.',
+    'Elke {everyNormal} sec spietst Nythraxis {victimsNormal} raiders behalve zijn huidige doelwit op Beenderspiezen. Een gespietste raider kan niet handelen en verliest elke seconde {drainNormal} van maximale gezondheid totdat zijn spies is vernietigd. Een spies versplintert na {hitsNormal} treffers van wie dan ook, ongeacht de schade. Een speler die al is gespietst, kan {cooldown} sec. lang niet opnieuw worden gekozen, zodat de spiesen over de hele raid worden verdeeld.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Vanaf {first} sec in Koningswoede en daarna elke {everyHeroic} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlHeroic} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamHeroic} van maximale gezondheid. Hij cast Beenderspies {spikeAt} sec in de storm, daarna wordt Grafbreker {rearm} sec na het einde opnieuw geactiveerd.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Beenderstorm',
@@ -15839,23 +15836,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Tanks houden Nythraxis van de raid af gericht. Alle anderen blijven achter of naast hem en kruisen de kegel nooit.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     'Elke {seconds} sec laadt Nythraxis zijn volgende rake slag op. Zijn doelwit krijgt alleen de slag zelf, maar alle anderen binnen {range} yd in de {arc} graden brede kegel vóór hem krijgen {splash} van die slag als fysieke schade, verminderd door hun eigen pantser.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    'Elke {everyHeroic} sec loopt een lijn violet grafvuur van Nythraxis naar een raider, die elke seconde {speed} yd groeit tot {length} yd. Elke yard brandt {burnHeroic} sec en richt elke seconde {tickHeroic} van maximale gezondheid aan bij iedereen die erin staat.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Grafvuur',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Stap opzij wanneer de lijn komt: hij is smal en draait nooit. Ranged raiders blijven bewegen in plaats van op één plek te staan.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    'Elke {everyNormal} sec loopt een lijn violet grafvuur van Nythraxis naar een raider, die elke seconde {speed} yd groeit tot {length} yd. Elke yard brandt {burnNormal} sec en richt elke seconde {tickNormal} van maximale gezondheid aan bij iedereen die erin staat.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Koningswoede',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Gebruik resterende defensieve cooldowns voor onvermijdbare schade. Houd elke eerdere mechaniek schoon terwijl de raid het gevecht afrondt.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis richt op Normal {bonusNormal} meer schade aan of {bonusHeroic} op Heroic voor de rest van het gevecht. Grafuitbarsting gebeurt elke {eruptionEveryNormal} sec ({eruptionEveryHeroic} op Heroic) en Grafvuur elke {gravefireEveryNormal} sec ({gravefireEveryHeroic} op Heroic).',
+    'Nythraxis richt op Normal {bonusNormal} meer schade aan of {bonusHeroic} op Heroic voor de rest van het gevecht. Grafuitbarsting gebeurt elke {eruptionEveryNormal} sec ({eruptionEveryHeroic} op Heroic).',
   'hudChrome.raidBossGuide.nythraxis.overview':
     'Hogepriester Malric weigerde zijn koning te laten sterven, en de rite die Nythraxis verhief bond het hele hof aan de crypte. De ontmoeting test een gedisciplineerde tankwissel, snelle switches naar Beenderspiezen, beweging van brandende grond en een gecoördineerd wachtsteenkanaal zodra de Troon valt.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'Koningswoede',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    'Bij {health} gezondheid brult Nythraxis in Koningswoede en krijgt hij op Normal {bonusNormal} schade of op Heroic {bonusHeroic} voor de rest van het gevecht. Grafuitbarsting versnelt naar elke {eruptionEveryNormal} sec ({eruptionEveryHeroic} op Heroic) en Grafvuur naar elke {gravefireEveryNormal} sec ({gravefireEveryHeroic} op Heroic). Elke andere mechaniek behoudt zijn ritme.',
+    'Bij {health} gezondheid brult Nythraxis in Koningswoede en krijgt hij op Normal {bonusNormal} schade of op Heroic {bonusHeroic} voor de rest van het gevecht. Grafuitbarsting versnelt naar elke {eruptionEveryNormal} sec ({eruptionEveryHeroic} op Heroic). Elke andere mechaniek behoudt zijn ritme.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'De Troon',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     'Nythraxis houdt zijn troonzaal met een opgeladen frontale splijtaanval, de Schrikvloek-tankwissel, Beenderspiezen die raiders spietsen en Grafuitbarstingen die brandende grond achterlaten.',
@@ -15874,13 +15864,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Elke gemarkeerde raider rent naar één stapelpunt en staat binnen {range} yd van de andere markeringen voordat de lont van {fuse} sec eindigt. Healers vullen de groep aan wanneer de markeringen afgaan.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis markeert {marksNormal} raiders behalve zijn huidige doelwit met Zielenscheur. Na {fuse} sec richt elke markering de volledige maximale gezondheid van de drager als Schaduwschade aan, gedeeld door het aantal gemarkeerde raiders binnen {range} yd van hen.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Elke Zielenscheur-detonatie laat één poel paars vuur achter met een straal van {radius} yd per gestapelde groep markeringen, die {secondsHeroic} sec brandt voor {tickHeroic} van maximale gezondheid per seconde. Staan waar poelen overlappen geeft slechts één tik, nooit gestapelde kopieën. Poelen ontstaan nooit binnen {clearance} yd van een wachtsteen.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Zielenvuur',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Ga uit de paarse poel zodra de markeringen detoneren. Houd het volgende stapelpunt vrij van actief vuur.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Elke Zielenscheur-detonatie laat een poel paars vuur achter met een straal van {radius} yd waar elke markering stond, die {seconds} sec brandt voor {tickNormal} van maximale gezondheid per seconde. Staan waar poelen overlappen geeft een tik van elke poel. Poelen ontstaan nooit binnen {clearance} yd van een wachtsteen.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'IJskegels',
   'abilityUi.cast.farming': 'Planten',
   'abilityUi.cast.sundering': 'Splijten',
@@ -15986,7 +15969,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Volg {count} vervaardigingen van {name} als je verzameldoel',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Je rake melee-aanvallen kunnen 50 Kracht geven gedurende 15 sec en je 200 gezondheid genezen. Genezingsmodificatoren gelden. Elke treffer heeft een kans van 1% per 0,6 sec van de basissnelheid van het gebruikte wapen. Geen interne afkoeltijd. Elke hand heeft zijn eigen versterking; herhaalde activeringen vernieuwen die hand. Aanvallen op afstand activeren dit effect niet. Wolfs gedaante gebruikt in plaats daarvan zijn basisslagsnelheid van 1 sec.',
+    'Je rake melee-aanvallen kunnen 50 Kracht geven gedurende 15 sec en je 200 gezondheid genezen. Genezingsmodificatoren gelden. Elke treffer heeft een kans van 1% per 0,6 sec van de basissnelheid van het gebruikte wapen. Geen interne afkoeltijd. Beide handen delen één versterking; elke activering vernieuwt die en ze stapelt nooit. Aanvallen op afstand activeren dit effect niet. Wolfs gedaante gebruikt in plaats daarvan zijn basisslagsnelheid van 1 sec.',
   'hudChrome.enchantName.enchant_chest_armor': 'Borstinscriptie: Versterking',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Borstinscriptie: Grotere Uithouding',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Borstinscriptie: Lichtende Uithouding',

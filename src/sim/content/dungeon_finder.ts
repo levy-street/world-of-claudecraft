@@ -157,8 +157,6 @@ const NYTHRAXIS_RAID_MECHANICS: readonly string[] = [
   // encounter, so the finder never advertises adds the fight does not field.
   ...(NYTHRAXIS_ADDS_ENABLED ? ['raise_fallen'] : []),
   'soul_rend',
-  'soulfire',
-  'gravefire',
   'deathless_rage',
   'wardstones',
   'kings_wrath',

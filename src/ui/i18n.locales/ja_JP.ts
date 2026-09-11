@@ -113,7 +113,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.formula_lastflame_zeal.name': '製法書：最後の炎の熱情',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '最後の炎の熱情',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    '命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。左右の手にそれぞれ独立した強化があり、同じ手で再発動するとその持続時間が更新される。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。',
+    '命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。',
   'hudChrome.enchanting.recipeNotLearned': 'この付呪を施すには、先に製法書で習得してください。',
   'hudChrome.pattern.teachesEnchant': '使用：{enchant}の付与方法を習得する。',
   'hudChrome.barEditor.pageTab': 'ページ{page}',
@@ -8472,7 +8472,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '体力{health}で、身震いの踏みつけがレイドを足止めしている間にアルドリック修道士が到着し、ウォードストーンに火を灯す。すべての棘が砕け、床の炎も鎮まる。その後、ソウルレンドと不死の憤怒が玉座のメカニクスに加わる。',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': '王の怒り',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    '体力{health}で、ナイスラクシスは王の怒りとともに咆哮し、以後戦闘終了まで通常で{bonusNormal}、英雄で{bonusHeroic}のダメージを得る。墓所の噴出は{eruptionEveryNormal}秒ごと（英雄は{eruptionEveryHeroic}秒ごと）に、紫炎は{gravefireEveryNormal}秒ごと（英雄は{gravefireEveryHeroic}秒ごと）に短縮される。他のメカニクスの周期は変わらない。',
+    '体力{health}で、ナイスラクシスは王の怒りとともに咆哮し、以後戦闘終了まで通常で{bonusNormal}、英雄で{bonusHeroic}のダメージを得る。墓所の噴出は{eruptionEveryNormal}秒ごと（英雄は{eruptionEveryHeroic}秒ごと）に短縮される。他のメカニクスの周期は変わらない。',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerName': 'グレイブブレイカー',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     '{seconds}秒ごとに、ナイスラクシスは次の一撃を溜める。対象はその一撃のみを受けるが、彼の前方{arc}度・{range}ヤード以内にいる他の全員は、その一撃の{splash}を物理ダメージとして受ける（各自の防御力により軽減される）。',
@@ -8487,11 +8487,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'タンクは{stacks}スタックで交代する：もう一方のタンクが挑発し、呪われたタンクはスタックが消えるまでグレイブブレイカーの扇形範囲外に留まる。ヒーラーは交代前に次のタンクへ備える。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': '骨の棘',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    '{everyNormal}秒ごとに、ナイスラクシスは現在の対象以外のレイドメンバー{victimsNormal}人を骨の棘で串刺しにする。串刺しにされたレイドメンバーは行動不能になり、棘が破壊されるまで毎秒最大体力の{drainNormal}を失う。',
+    '{everyNormal}秒ごとに、ナイスラクシスは現在の対象以外のレイドメンバー{victimsNormal}人を骨の棘で串刺しにする。串刺しにされたレイドメンバーは行動不能になり、棘が破壊されるまで毎秒最大体力の{drainNormal}を失う。棘は誰の攻撃でも{hitsNormal}回当たれば砕け、ダメージ量は問わない。一度串刺しにされたレイドメンバーは{cooldown}秒間は再び選ばれないため、棘はレイド全体に分散する。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    '{everyHeroic}秒ごとに、ナイスラクシスは現在の対象以外のレイドメンバー{victimsHeroic}人を骨の棘で串刺しにする。串刺しにされたレイドメンバーは行動不能になり、棘が破壊されるまで毎秒最大体力の{drainHeroic}を失う。',
+    '{everyHeroic}秒ごとに、ナイスラクシスは現在の対象以外のレイドメンバー{victimsHeroic}人を骨の棘で串刺しにする。串刺しにされたレイドメンバーは行動不能になり、棘が破壊されるまで毎秒最大体力の{drainHeroic}を失う。棘は誰の攻撃でも{hitsHeroic}回当たれば砕け、ダメージ量は問わない。一度串刺しにされたレイドメンバーは{cooldown}秒間は再び選ばれないため、棘はレイド全体に分散する。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'ダメージディーラーは直ちに骨の棘へ切り替え、破壊して串刺しにされたレイドメンバーを解放する。ヒーラーは棘が壊されるまで串刺しにされた者を生かし続ける。',
+    '最も近い者が骨の棘を攻撃する。誰の攻撃でも数回当てれば砕け、ダメージ量は問わない。ヒーラーは棘が砕けるまで串刺しにされた味方を生かし続ける。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': '墓所の噴出',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
     '{everyNormal}秒ごとに、骸骨の手がレイドメンバーの足元に{radius}ヤードの円を{countNormal}個描く。{warning}秒後、各円は最大体力の{burstNormal}を闇ダメージとして噴出させ、その後{flameNormal}秒間墓炎として燃え続け、中に立つ者へ毎秒最大体力の{tickNormal}を与える。',
@@ -8501,9 +8501,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '噴出する前にすべての警告円から外へ出て、燃える地面を避け続ける。タンクはナイスラクシスを炎から引き離し、近接が動ける余地を確保する。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': '拘束の印',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    '{everyNormal}秒ごとに、旧き結界の印がナイスラクシスから{minDist}から{maxDist}ヤードの床に光り、彼は不死の高揚を開始し、{ascensionEvery}秒ごとにダメージと攻撃速度が{ascensionNormal}上昇していく。{bindNormal}秒以内に印の上に立てば拘束状態になる：高揚は解除され、{stunNormal}秒間スタンし、{boundNormal}秒間受けるダメージが{vulnerability}増加する。立たなければレイド全員が最大体力の{unboundHitNormal}を闇ダメージとして受け、彼は次の拘束まで{unboundBonusNormal}多いダメージを保つ。',
+    '{everyNormal}秒ごとに、旧き結界の印が、玉座の両脇にある2つの足場のどちらか（戦闘開始時にナイスラクシスが立っていた位置から、レイドから見て左右{sideOffset}ヤード）に、発動ごとに左右を入れ替えて光り、彼は不死の高揚を開始し、{ascensionEvery}秒ごとにダメージと攻撃速度が{ascensionNormal}上昇していく。{bindNormal}秒以内に印の上に立てば拘束状態になる：高揚は解除され、{stunNormal}秒間スタンし、{boundNormal}秒間受けるダメージが{vulnerability}増加する。立たなければレイド全員が最大体力の{unboundHitNormal}を闇ダメージとして受け、彼は次の拘束まで{unboundBonusNormal}多いダメージを保つ。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    '{everyHeroic}秒ごとに、旧き結界の印がナイスラクシスから{minDist}から{maxDist}ヤードの床に光り、彼は不死の高揚を開始し、{ascensionEvery}秒ごとにダメージと攻撃速度が{ascensionHeroic}上昇していく。{bindHeroic}秒以内に印の上に立てば拘束状態になる：高揚は解除され、{stunHeroic}秒間スタンし、{boundHeroic}秒間受けるダメージが{vulnerability}増加する。立たなければレイド全員が最大体力の{unboundHitHeroic}を闇ダメージとして受け、彼は次の拘束まで{unboundBonusHeroic}多いダメージを保つ。',
+    '{everyHeroic}秒ごとに、旧き結界の印が、玉座の両脇にある2つの足場のどちらか（戦闘開始時にナイスラクシスが立っていた位置から、レイドから見て左右{sideOffset}ヤード）に、発動ごとに左右を入れ替えて光り、彼は不死の高揚を開始し、{ascensionEvery}秒ごとにダメージと攻撃速度が{ascensionHeroic}上昇していく。{bindHeroic}秒以内に印の上に立てば拘束状態になる：高揚は解除され、{stunHeroic}秒間スタンし、{boundHeroic}秒間受けるダメージが{vulnerability}増加する。立たなければレイド全員が最大体力の{unboundHitHeroic}を闇ダメージとして受け、彼は次の拘束まで{unboundBonusHeroic}多いダメージを保つ。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'タンクはレイドが残した炎の中であっても、直ちにナイスラクシスを印の上へ引きずり込む。近接はその移動に追従し、遠隔は新しいグレイブブレイカーの扇形範囲を避ける。拘束されている間は全員で総攻撃を加える。',
   'hudChrome.raidBossGuide.nythraxis.raiseFallenName': '死者蘇生',
@@ -8517,20 +8517,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ナイスラクシスは現在の対象以外のレイドメンバー{marksHeroic}人にソウルレンドの印を付ける。{fuse}秒後、各印は対象者の最大体力の{damageHeroic}を闇ダメージとして与え、その者から{range}ヤード以内にいる印を受けたレイドメンバーの人数で分割される。単独で発動した印は致命的となる。',
   'hudChrome.raidBossGuide.nythraxis.soulRendResponse':
     '印を受けたレイドメンバーは全員、{fuse}秒の導火線が尽きる前に集合地点へ走り、他の印から{range}ヤード以内に立つ。ヒーラーは印が発動する際にグループの体力を満たしておく。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'ソウルファイア',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'ソウルレンドが発動するたびに、各印があった場所に半径{radius}ヤードの紫色の炎の水たまりが残り、{seconds}秒間、毎秒最大体力の{tickNormal}のダメージを与えながら燃え続ける。水たまりが重なる場所ではそれぞれから1回ずつダメージを受ける。水たまりはウォードストーンから{clearance}ヤード以内には出現しない。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'ソウルレンドが発動するたびに、重なり合った印の集団ごとに半径{radius}ヤードの紫色の炎の水たまりが1つだけ残り、{secondsHeroic}秒間、毎秒最大体力の{tickHeroic}のダメージを与えながら燃え続ける。水たまりが重なっても受けるダメージは1回分だけで、重複しない。水たまりはウォードストーンから{clearance}ヤード以内には出現しない。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    '印が発動したらすぐに紫色の水たまりから離れる。次の集合地点は燃えている炎から離れた場所を選ぶこと。',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': '紫炎',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    '{everyNormal}秒ごとに、ナイスラクシスからレイドメンバーへ向けて紫炎の線が伸びていき、毎秒{speed}ヤードずつ{length}ヤードまで伸びる。伸びた地点はそれぞれ{burnNormal}秒間燃え続け、中に立つ者へ毎秒最大体力の{tickNormal}を与える。',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    '{everyHeroic}秒ごとに、ナイスラクシスからレイドメンバーへ向けて紫炎の線が伸びていき、毎秒{speed}ヤードずつ{length}ヤードまで伸びる。伸びた地点はそれぞれ{burnHeroic}秒間燃え続け、中に立つ者へ毎秒最大体力の{tickHeroic}を与える。',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    '線が迫ってきたら横に避ける：幅は狭く、曲がることはない。遠隔レイドメンバーは一箇所に留まらず動き続ける。',
   'hudChrome.raidBossGuide.nythraxis.deathlessRageName': '不死の憤怒',
   'hudChrome.raidBossGuide.nythraxis.deathlessRageSummary':
     '{every}秒ごとに、ナイスラクシスは{cast}秒かけて不死の憤怒を詠唱する。詠唱中、点火された各ウォードストーンは1人のレイドメンバーが{channel}秒かけて詠唱できる。詠唱終了前に3人がそれぞれ別のウォードストーンを完了させれば、憤怒は中断され、ナイスラクシスは{stun}秒間スタンする。完了しなければレイド全員が最大体力の{damageNormal}を闇ダメージとして受ける。',
@@ -8545,7 +8531,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'タンクはオルドレンを確保し、斬撃をレイドから逸らす。マルリックの治癒が始まった瞬間にマルリックをスタンかサイレンスで止め、最優先で倒す。続いて、挑発が効かないヴォスをヒーラーから引き離すよう根縛りかスタンで止め、次に倒す。',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': '王の怒り',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'ナイスラクシスは以後戦闘終了まで、通常で{bonusNormal}、英雄で{bonusHeroic}多いダメージを与える。墓所の噴出は{eruptionEveryNormal}秒ごと（英雄は{eruptionEveryHeroic}秒ごと）、紫炎は{gravefireEveryNormal}秒ごと（英雄は{gravefireEveryHeroic}秒ごと）に発生する。',
+    'ナイスラクシスは以後戦闘終了まで、通常で{bonusNormal}、英雄で{bonusHeroic}多いダメージを与える。墓所の噴出は{eruptionEveryNormal}秒ごと（英雄は{eruptionEveryHeroic}秒ごと）に発生する。',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     '回避できないダメージには残っている防御クールダウンを使う。戦闘を終えるまで、それまでのメカニクスを引き続き丁寧に処理する。',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': '骨の嵐',
@@ -11343,17 +11329,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.sealbreak_shockwave': '封印破りの衝撃波（範囲バースト）',
   'hudChrome.finder.mech.gravebreaker': 'グレイブブレイカー（前方扇形、レイドに向けない）',
   'hudChrome.finder.mech.raise_fallen': '死者蘇生（周期的な増援ウェーブ）',
-  'hudChrome.finder.mech.soul_rend': 'ソウルレンド（対象は集合して炎から離れる）',
+  'hudChrome.finder.mech.soul_rend': 'ソウルレンド（対象は集合してダメージを分担する）',
   'hudChrome.finder.mech.deathless_rage': '不死の憤怒（ウォードストーンで妨害）',
   'hudChrome.finder.mech.wardstones': 'ウォードストーンの詠唱（フェーズ移行）',
   'hudChrome.finder.mech.dread_curse':
     'ドレッドカース（タンク交代用の累積デバフ、2スタックで交代）',
-  'hudChrome.finder.mech.bone_spike': '骨の棘（串刺しにされた者は棘が壊れるまで体力を失う）',
+  'hudChrome.finder.mech.bone_spike':
+    '骨の棘（串刺しにされたプレイヤーは、誰かが数回の攻撃で棘を砕くまで体力を失い続ける）',
   'hudChrome.finder.mech.grave_eruption': '墓所の噴出（燃える地面を残す警告円）',
   'hudChrome.finder.mech.binding_sigil':
     '拘束の印（ボスを印の上へ引きずり込まないとレイドが代償を払う）',
-  'hudChrome.finder.mech.gravefire': '紫炎（避けて進む炎の直線）',
-  'hudChrome.finder.mech.soulfire': 'ソウルファイア（ソウルレンドの爆発が燃える水たまりを残す）',
   'hudChrome.finder.mech.kings_wrath': '王の怒り（体力30%：永続ダメージ増加、床の脅威が加速）',
   'hudChrome.finder.mech.bone_storm': '骨の嵐（ヘイトを無視して旋風攻撃を行い、レイドに突進する）',
   'hudChrome.finder.mech.crown_endures': '王冠不滅（6:00でハードエンレイジ、英雄は5:00）',

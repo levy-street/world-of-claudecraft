@@ -55,7 +55,10 @@ import {
   rollLoot,
 } from '../../src/sim/loot/loot_roll';
 import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
-import { NYTHRAXIS_BONE_SPIKE_ID } from '../../src/sim/nythraxis_bone_spike';
+import {
+  NYTHRAXIS_BONE_SPIKE_HITS_NORMAL,
+  NYTHRAXIS_BONE_SPIKE_ID,
+} from '../../src/sim/nythraxis_bone_spike';
 import { NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS } from '../../src/sim/nythraxis_grave_eruption';
 import { PLAYER_BODY_RADIUS } from '../../src/sim/pathfind';
 import type { PlotState } from '../../src/sim/professions/farm_projection';
@@ -3372,8 +3375,13 @@ function nythraxisFullPull(): Scenario {
       rec.notes.spikeIds = spikes.map((s) => s.id);
       step(20 * 1); // one impale drain tick on each victim
       rec.snapshot('bone-spike');
-      for (const spike of spikes)
-        sim.dealDamage(tank, spike, spike.hp + 1, false, 'physical', null, 'hit', true);
+      // A spike is a ward (v0.42.2): every player hit lands one point of its
+      // hit-count pool, so it takes the full count to shatter.
+      for (const spike of spikes) {
+        for (let hit = 0; hit < NYTHRAXIS_BONE_SPIKE_HITS_NORMAL; hit++) {
+          sim.dealDamage(tank, spike, spike.hp + 1, false, 'physical', null, 'hit', true);
+        }
+      }
       step(1); // updateNythraxisBoneSpikes -> victims freed, spikeBroken callouts
       // Spikes and eruptions never overlap in the live fight (the spike wave
       // holds the next eruption for a settle window); this scenario sequences
@@ -3445,15 +3453,15 @@ function nythraxisFullPull(): Scenario {
       step(20 * 6); // the 5s self-stun expires
 
       // ----- Slice 2, each fired once: Gravefire, then the Binding Sigil (bound) -----
-      // The Soul Rend detonation above already left Soulfire under the stacked
-      // mages, who have been standing in it since (the Soulfire ticks are in
-      // the trace). Gravefire: the one rng.int target pick, then the line runs
-      // at the mages 20 yd out and burns whoever it reaches.
+      // The Soul Rend detonation above left nothing behind (Soulfire retired
+      // in v0.42.2, so the trace carries no Soulfire ticks). Gravefire is
+      // retired too (v0.42.2): a due timer lights nothing and draws nothing,
+      // which the snapshot below pins as the absence of any Gravefire tick.
       nyx().majorGapTimer = 0;
       nyx().gravefireTimer = DT;
-      step(1); // castNythraxisGravefire -> rng.int pick, line ignites at the boss's feet
-      step(20 * 4); // the head passes the mages; their first Gravefire ticks land
-      rec.snapshot('gravefire');
+      step(1);
+      step(20 * 4);
+      rec.snapshot('gravefire-retired');
       // Binding Sigil: hash-placed (no shared rng), Ascension climbs two stacks,
       // then the tank "drags" him onto it (the parity fixture teleports the boss)
       // and he is Bound: purge, stun, the burn window.

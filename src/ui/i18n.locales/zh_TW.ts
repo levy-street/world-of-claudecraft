@@ -113,7 +113,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.formula_lastflame_zeal.name': '配方：末焰熱忱',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '末焰熱忱',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    '命中的近戰攻擊有機率使你獲得50點力量，持續15秒，並為你恢復200點生命值。治療加成與減益生效。每次命中的觸發機率為攻擊武器基礎速度每0.6秒對應1%。沒有內置冷卻時間。雙手各有獨立增益；同一隻手再次觸發會刷新其增益。遠程攻擊不會觸發此效果。狼形態改用其1秒的基礎揮擊速度。',
+    '命中的近戰攻擊有機率使你獲得50點力量，持續15秒，並為你恢復200點生命值。治療加成與減益生效。每次命中的觸發機率為攻擊武器基礎速度每0.6秒對應1%。沒有內置冷卻時間。雙手共享同一個增益；任一隻手觸發都會刷新該增益，且永不疊加。遠程攻擊不會觸發此效果。狼形態改用其1秒的基礎揮擊速度。',
   'hudChrome.enchanting.recipeNotLearned': '施加此附魔前，請先學習配方。',
   'hudChrome.pattern.teachesEnchant': '使用：教你如何施加{enchant}。',
   'hudChrome.barEditor.pageTab': '第 {page} 頁',
@@ -8138,7 +8138,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '生命值降至{health}時，震顫踐踏會定住全團，此時奧德里克修士抵達並點燃護符石。所有尖刺隨即碎裂，地面停止燃燒，接著靈魂撕裂與不死之怒將加入王座階段的機制。',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': '國王之怒',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    '生命值降至{health}時，尼思拉克西斯咆哮著進入國王之怒，此後在普通難度獲得{bonusNormal}傷害，英雄難度則為{bonusHeroic}，直到戰鬥結束。墓穴爆發的間隔縮短至每{eruptionEveryNormal}秒一次（英雄難度{eruptionEveryHeroic}秒），墓火則縮短至每{gravefireEveryNormal}秒一次（英雄難度{gravefireEveryHeroic}秒）。其餘機制節奏不變。',
+    '生命值降至{health}時，尼思拉克西斯咆哮著進入國王之怒，此後在普通難度獲得{bonusNormal}傷害，英雄難度則為{bonusHeroic}，直到戰鬥結束。墓穴爆發的間隔縮短至每{eruptionEveryNormal}秒一次（英雄難度{eruptionEveryHeroic}秒）。其餘機制節奏不變。',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerName': '碎墓打擊',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     '每{seconds}秒，尼思拉克西斯會蓄力下一次命中的揮擊。他的目標只承受揮擊本身的傷害，但站在他正面{arc}度扇形範圍{range}碼內的其他人，都會承受該次揮擊{splash}的物理傷害，並依自身護甲減免。',
@@ -8153,11 +8153,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '坦克在{stacks}層時換坦：另一名坦克嘲諷仇恨，受詛咒的坦克則留在碎墓打擊扇形範圍外，直到層數消退。治療應在換坦前為即將接怪的坦克做好準備。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': '骨刺',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    '每{everyNormal}秒，尼思拉克西斯會將{victimsNormal}名非目前目標的團員穿刺在骨刺上。被穿刺的團員無法行動，並且每秒流失相當於最大生命值{drainNormal}的生命，直到該尖刺被摧毀。',
+    '每{everyNormal}秒，尼思拉克西斯會將{victimsNormal}名非目前目標的團員穿刺在骨刺上。被穿刺的團員無法行動，並且每秒流失相當於最大生命值{drainNormal}的生命，直到該尖刺被摧毀。任何人命中骨刺{hitsNormal}次即可將其擊碎，無論傷害多寡。已被穿刺過的團員在{cooldown}秒內不會再次被選中，因此骨刺會分散到整個團隊。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    '每{everyHeroic}秒，尼思拉克西斯會將{victimsHeroic}名非目前目標的團員穿刺在骨刺上。被穿刺的團員無法行動，並且每秒流失相當於最大生命值{drainHeroic}的生命，直到該尖刺被摧毀。',
+    '每{everyHeroic}秒，尼思拉克西斯會將{victimsHeroic}名非目前目標的團員穿刺在骨刺上。被穿刺的團員無法行動，並且每秒流失相當於最大生命值{drainHeroic}的生命，直到該尖刺被摧毀。任何人命中骨刺{hitsHeroic}次即可將其擊碎，無論傷害多寡。已被穿刺過的團員在{cooldown}秒內不會再次被選中，因此骨刺會分散到整個團隊。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    '輸出職業應立即轉火骨刺並將其摧毀，以解救被穿刺的團員。治療則在尖刺被擊破前維持被穿刺者的生命。',
+    '離得最近的人攻擊骨刺：任何人命中幾次即可擊碎，無論傷害多寡。治療者在骨刺被擊碎前保住被穿刺團員的性命。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': '墓穴爆發',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
     '每{everyNormal}秒，骸骨之手會在{countNormal}名團員腳下標記半徑{radius}碼的圓圈。{warning}秒後，每個圓圈都會爆發，造成相當於最大生命值{burstNormal}的暗影傷害，隨後化為墓焰燃燒{flameNormal}秒，對站在其中的人每秒造成相當於最大生命值{tickNormal}的傷害。',
@@ -8167,9 +8167,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在每個警示圈爆發前離開範圍，並遠離燃燒地面。坦克應將尼思拉克西斯拉離火場，讓近戰保有輸出空間。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': '束縛印記',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    '每{everyNormal}秒，一枚承載古老守印的印記會在尼思拉克西斯周圍{minDist}至{maxDist}碼的地面上浮現，同時他開始不死昇華，每{ascensionEvery}秒獲得{ascensionNormal}傷害與攻擊速度。若他在{bindNormal}秒內站上印記，便會被束縛：不死昇華遭淨化，他被暈眩{stunNormal}秒，並在{boundNormal}秒內多承受{vulnerability}傷害。否則每名團員都會承受相當於最大生命值{unboundHitNormal}的暗影傷害，且他會保有{unboundBonusNormal}傷害提升，直到下一次束縛為止。',
+    '每{everyNormal}秒，一枚承載古老守印的印記會在王座兩側的兩座平台之一浮現（以團隊視角，位於開戰時尼思拉克西斯所站位置左側或右側{sideOffset}碼處），每次施放交替換邊，同時他開始不死昇華，每{ascensionEvery}秒獲得{ascensionNormal}傷害與攻擊速度。若他在{bindNormal}秒內站上印記，便會被束縛：不死昇華遭淨化，他被暈眩{stunNormal}秒，並在{boundNormal}秒內多承受{vulnerability}傷害。否則每名團員都會承受相當於最大生命值{unboundHitNormal}的暗影傷害，且他會保有{unboundBonusNormal}傷害提升，直到下一次束縛為止。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    '每{everyHeroic}秒，一枚承載古老守印的印記會在尼思拉克西斯周圍{minDist}至{maxDist}碼的地面上浮現，同時他開始不死昇華，每{ascensionEvery}秒獲得{ascensionHeroic}傷害與攻擊速度。若他在{bindHeroic}秒內站上印記，便會被束縛：不死昇華遭淨化，他被暈眩{stunHeroic}秒，並在{boundHeroic}秒內多承受{vulnerability}傷害。否則每名團員都會承受相當於最大生命值{unboundHitHeroic}的暗影傷害，且他會保有{unboundBonusHeroic}傷害提升，直到下一次束縛為止。',
+    '每{everyHeroic}秒，一枚承載古老守印的印記會在王座兩側的兩座平台之一浮現（以團隊視角，位於開戰時尼思拉克西斯所站位置左側或右側{sideOffset}碼處），每次施放交替換邊，同時他開始不死昇華，每{ascensionEvery}秒獲得{ascensionHeroic}傷害與攻擊速度。若他在{bindHeroic}秒內站上印記，便會被束縛：不死昇華遭淨化，他被暈眩{stunHeroic}秒，並在{boundHeroic}秒內多承受{vulnerability}傷害。否則每名團員都會承受相當於最大生命值{unboundHitHeroic}的暗影傷害，且他會保有{unboundBonusHeroic}傷害提升，直到下一次束縛為止。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     '坦克應立即將尼思拉克西斯拖上印記，即使得穿過團隊留下的火焰也在所不惜。近戰跟隨拖行路線，遠程則避開新的碎墓打擊扇形範圍。他被束縛期間，全員集火。',
   'hudChrome.raidBossGuide.nythraxis.raiseFallenName': '亡者復生',
@@ -8183,20 +8183,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '尼思拉克西斯會為{marksHeroic}名非目前目標的團員標記靈魂撕裂。{fuse}秒後，每個標記都會對其承載者造成相當於其最大生命值{damageHeroic}的暗影傷害，並依{range}碼內被標記團員的人數分攤。若標記單獨引爆，將必定致命。',
   'hudChrome.raidBossGuide.nythraxis.soulRendResponse':
     '每名被標記的團員都應在{fuse}秒的引爆倒數結束前，跑到集合點並站在其他標記{range}碼內。治療應在標記引爆時將團隊生命補滿。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': '魂火',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    '每次靈魂撕裂引爆，都會在每個標記所在處留下一灘半徑{radius}碼的紫色烈焰，燃燒{seconds}秒，每秒造成相當於最大生命值{tickNormal}的傷害。火池重疊時，站在裡面會分別承受各灘火池的傷害。火池絕不會在護符石{clearance}碼內形成。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    '每次靈魂撕裂引爆，每一組聚集的標記只會留下一灘半徑{radius}碼的紫色烈焰，燃燒{secondsHeroic}秒，每秒造成相當於最大生命值{tickHeroic}的傷害。火池重疊時只會承受一次傷害，不會疊加。火池絕不會在護符石{clearance}碼內形成。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    '標記引爆後應立刻離開紫色火池。選擇下一個集合點時，務必避開仍在燃燒的火焰。',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': '墓火',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    '每{everyNormal}秒，一道紫色墓火會從尼思拉克西斯朝一名團員延伸，每秒延長{speed}碼，最長至{length}碼。每一碼都會燃燒{burnNormal}秒，對站在其中的人每秒造成相當於最大生命值{tickNormal}的傷害。',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    '每{everyHeroic}秒，一道紫色墓火會從尼思拉克西斯朝一名團員延伸，每秒延長{speed}碼，最長至{length}碼。每一碼都會燃燒{burnHeroic}秒，對站在其中的人每秒造成相當於最大生命值{tickHeroic}的傷害。',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    '看到火線逼近時側身閃避：它很窄且不會轉向。遠程團員應持續移動，而非停在原地。',
   'hudChrome.raidBossGuide.nythraxis.deathlessRageName': '不死之怒',
   'hudChrome.raidBossGuide.nythraxis.deathlessRageSummary':
     '每{every}秒，尼思拉克西斯會施展{cast}秒的不死之怒。施法期間，每座已點亮的護符石都能由一名團員引導{channel}秒。若在施法結束前，有三名不同的團員各自完成一座護符石的引導，此次狂怒便會被打斷，尼思拉克西斯將被暈眩{stun}秒。否則每名團員都會承受相當於最大生命值{damageNormal}的暗影傷害。',
@@ -8211,7 +8197,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '坦克應接下奧德倫，並讓他的順劈背對團隊。馬爾里克的修復一開始施放，就立即暈眩或沉默他，並優先將他擊殺；接著使用定身或暈眩把沃斯拉離治療，因為他無法被嘲諷，隨後將他解決。',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': '國王之怒',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    '尼思拉克西斯此後在普通難度造成{bonusNormal}更多傷害，英雄難度則為{bonusHeroic}，直到戰鬥結束。墓穴爆發每{eruptionEveryNormal}秒發生一次（英雄難度{eruptionEveryHeroic}秒），墓火每{gravefireEveryNormal}秒發生一次（英雄難度{gravefireEveryHeroic}秒）。',
+    '尼思拉克西斯此後在普通難度造成{bonusNormal}更多傷害，英雄難度則為{bonusHeroic}，直到戰鬥結束。墓穴爆發每{eruptionEveryNormal}秒發生一次（英雄難度{eruptionEveryHeroic}秒）。',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     '為無法避免的傷害使用剩餘的防禦技能冷卻。在團隊結束這場戰鬥前，持續乾淨地應對先前所有機制。',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': '骨風暴',
@@ -10791,15 +10777,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.sealbreak_shockwave': '破印衝擊波（範圍爆發）',
   'hudChrome.finder.mech.gravebreaker': '碎墓打擊（正面扇形，背對團隊）',
   'hudChrome.finder.mech.raise_fallen': '亡者復生（週期性召喚小怪）',
-  'hudChrome.finder.mech.soul_rend': '靈魂撕裂（被標記者應集合，然後離開火焰）',
+  'hudChrome.finder.mech.soul_rend': '靈魂撕裂（被標記者集合以分攤傷害）',
   'hudChrome.finder.mech.deathless_rage': '不死之怒（需在護符石處打斷）',
   'hudChrome.finder.mech.wardstones': '護符石引導（階段轉換）',
   'hudChrome.finder.mech.dread_curse': '恐懼詛咒（累加坦克輪換減益，2層後輪換）',
-  'hudChrome.finder.mech.bone_spike': '骨刺（被穿刺者持續流失生命，直到尖刺被摧毀）',
+  'hudChrome.finder.mech.bone_spike':
+    '骨刺（被穿刺的玩家持續流失生命值，直到有人用幾次攻擊擊碎骨刺）',
   'hudChrome.finder.mech.grave_eruption': '墓穴爆發（警示圈會留下燃燒地面）',
   'hudChrome.finder.mech.binding_sigil': '束縛印記（把首領拖上印記，否則團隊受懲）',
-  'hudChrome.finder.mech.gravefire': '墓火（需要側身閃避的移動火線）',
-  'hudChrome.finder.mech.soulfire': '魂火（靈魂撕裂引爆後留下的燃燒火池）',
   'hudChrome.finder.mech.kings_wrath': '國王之怒（30%：永久傷害加成，地面威脅加速）',
   'hudChrome.finder.mech.bone_storm': '骨風暴（無視仇恨，橫掃並衝撞團隊）',
   'hudChrome.finder.mech.crown_endures': '王冠永存（6:00 硬狂暴，英雄難度 5:00）',

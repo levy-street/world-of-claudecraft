@@ -50,8 +50,7 @@ import {
   NYTHRAXIS_SIGIL_BIND_SECONDS_NORMAL,
   NYTHRAXIS_SIGIL_EVERY_HEROIC,
   NYTHRAXIS_SIGIL_EVERY_NORMAL,
-  NYTHRAXIS_SIGIL_MAX_DIST,
-  NYTHRAXIS_SIGIL_MIN_DIST,
+  NYTHRAXIS_SIGIL_SIDE_OFFSET,
   NYTHRAXIS_UNBOUND_DAMAGE_BONUS_HEROIC,
   NYTHRAXIS_UNBOUND_DAMAGE_BONUS_NORMAL,
   NYTHRAXIS_UNBOUND_HIT_MAX_HP_HEROIC,
@@ -59,8 +58,11 @@ import {
   nythraxisBoundSeconds,
 } from '../sim/nythraxis_binding_sigil';
 import {
+  NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
   NYTHRAXIS_BONE_SPIKE_EVERY_HEROIC,
   NYTHRAXIS_BONE_SPIKE_EVERY_NORMAL,
+  NYTHRAXIS_BONE_SPIKE_HITS_HEROIC,
+  NYTHRAXIS_BONE_SPIKE_HITS_NORMAL,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_NORMAL,
   NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC,
@@ -111,29 +113,10 @@ import {
   NYTHRAXIS_GRAVE_FLAME_TICK_MAX_HP_NORMAL,
 } from '../sim/nythraxis_grave_eruption';
 import {
-  NYTHRAXIS_GRAVEFIRE_BURN_SECONDS_HEROIC,
-  NYTHRAXIS_GRAVEFIRE_BURN_SECONDS_NORMAL,
-  NYTHRAXIS_GRAVEFIRE_EVERY_HEROIC,
-  NYTHRAXIS_GRAVEFIRE_EVERY_NORMAL,
-  NYTHRAXIS_GRAVEFIRE_LENGTH,
-  NYTHRAXIS_GRAVEFIRE_SPEED,
-  NYTHRAXIS_GRAVEFIRE_TICK_MAX_HP_HEROIC,
-  NYTHRAXIS_GRAVEFIRE_TICK_MAX_HP_NORMAL,
-} from '../sim/nythraxis_gravefire';
-import {
   NYTHRAXIS_PHASE_THREE_HP,
   nythraxisKingsWrathDamageBonus,
   nythraxisWrathGraveEruptionEvery,
-  nythraxisWrathGravefireEvery,
 } from '../sim/nythraxis_kings_wrath';
-import {
-  NYTHRAXIS_SOULFIRE_RADIUS,
-  NYTHRAXIS_SOULFIRE_SECONDS_HEROIC,
-  NYTHRAXIS_SOULFIRE_SECONDS_NORMAL,
-  NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC,
-  NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL,
-  NYTHRAXIS_SOULFIRE_WARDSTONE_CLEARANCE,
-} from '../sim/nythraxis_soulfire';
 import { IGNIVAR_BOSS_ID, NYTHRAXIS_ADDS_ENABLED, NYTHRAXIS_BOSS_ID } from '../sim/types';
 import { VARKHUL_ANVILS_DECREE_STRIKES } from '../sim/varkhul_anvils_decree';
 import {
@@ -610,6 +593,9 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
           victimsHeroic: NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC,
           drainNormal: NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
           drainHeroic: NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC,
+          hitsNormal: NYTHRAXIS_BONE_SPIKE_HITS_NORMAL,
+          hitsHeroic: NYTHRAXIS_BONE_SPIKE_HITS_HEROIC,
+          cooldown: NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS,
         },
         percentValues: ['drainNormal', 'drainHeroic'],
       },
@@ -654,8 +640,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
         values: {
           everyNormal: NYTHRAXIS_SIGIL_EVERY_NORMAL,
           everyHeroic: NYTHRAXIS_SIGIL_EVERY_HEROIC,
-          minDist: NYTHRAXIS_SIGIL_MIN_DIST,
-          maxDist: NYTHRAXIS_SIGIL_MAX_DIST,
+          sideOffset: NYTHRAXIS_SIGIL_SIDE_OFFSET,
           ascensionNormal: NYTHRAXIS_ASCENSION_PER_STACK_NORMAL,
           ascensionHeroic: NYTHRAXIS_ASCENSION_PER_STACK_HEROIC,
           ascensionEvery: NYTHRAXIS_ASCENSION_EVERY,
@@ -722,50 +707,6 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
         percentValues: ['damageHeroic'],
       },
       {
-        id: 'soulfire',
-        iconId: 'raid_nythraxis_soulfire',
-        nameKey: key('nythraxis.soulfireName'),
-        summaryKey: {
-          normal: key('nythraxis.soulfireSummary'),
-          heroic: key('nythraxis.soulfireHeroicSummary'),
-        },
-        responseKey: key('nythraxis.soulfireResponse'),
-        roles: ['all'],
-        flags: ['important'],
-        values: {
-          radius: NYTHRAXIS_SOULFIRE_RADIUS,
-          seconds: NYTHRAXIS_SOULFIRE_SECONDS_NORMAL,
-          secondsHeroic: NYTHRAXIS_SOULFIRE_SECONDS_HEROIC,
-          tickNormal: NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL,
-          tickHeroic: NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC,
-          clearance: NYTHRAXIS_SOULFIRE_WARDSTONE_CLEARANCE,
-        },
-        percentValues: ['tickNormal', 'tickHeroic'],
-      },
-      {
-        id: 'gravefire',
-        iconId: 'raid_nythraxis_gravefire',
-        nameKey: key('nythraxis.gravefireName'),
-        summaryKey: {
-          normal: key('nythraxis.gravefireSummary'),
-          heroic: key('nythraxis.gravefireHeroicSummary'),
-        },
-        responseKey: key('nythraxis.gravefireResponse'),
-        roles: ['all'],
-        flags: ['deadly'],
-        values: {
-          everyNormal: NYTHRAXIS_GRAVEFIRE_EVERY_NORMAL,
-          everyHeroic: NYTHRAXIS_GRAVEFIRE_EVERY_HEROIC,
-          speed: NYTHRAXIS_GRAVEFIRE_SPEED,
-          length: NYTHRAXIS_GRAVEFIRE_LENGTH,
-          burnNormal: NYTHRAXIS_GRAVEFIRE_BURN_SECONDS_NORMAL,
-          burnHeroic: NYTHRAXIS_GRAVEFIRE_BURN_SECONDS_HEROIC,
-          tickNormal: NYTHRAXIS_GRAVEFIRE_TICK_MAX_HP_NORMAL,
-          tickHeroic: NYTHRAXIS_GRAVEFIRE_TICK_MAX_HP_HEROIC,
-        },
-        percentValues: ['tickNormal', 'tickHeroic'],
-      },
-      {
         id: 'deathless-rage',
         iconId: 'raid_nythraxis_deathless_rage',
         nameKey: key('nythraxis.deathlessRageName'),
@@ -809,8 +750,6 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       bonusHeroic: nythraxisKingsWrathDamageBonus('heroic'),
       eruptionEveryNormal: nythraxisWrathGraveEruptionEvery('normal'),
       eruptionEveryHeroic: nythraxisWrathGraveEruptionEvery('heroic'),
-      gravefireEveryNormal: nythraxisWrathGravefireEvery('normal'),
-      gravefireEveryHeroic: nythraxisWrathGravefireEvery('heroic'),
     },
     percentValues: ['health', 'bonusNormal', 'bonusHeroic'],
     mechanics: [
@@ -827,8 +766,6 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
           bonusHeroic: nythraxisKingsWrathDamageBonus('heroic'),
           eruptionEveryNormal: nythraxisWrathGraveEruptionEvery('normal'),
           eruptionEveryHeroic: nythraxisWrathGraveEruptionEvery('heroic'),
-          gravefireEveryNormal: nythraxisWrathGravefireEvery('normal'),
-          gravefireEveryHeroic: nythraxisWrathGravefireEvery('heroic'),
         },
         percentValues: ['bonusNormal', 'bonusHeroic'],
       },

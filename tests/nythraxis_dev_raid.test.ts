@@ -5,7 +5,12 @@
 
 import { describe, expect, it } from 'vitest';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
-import { NYTHRAXIS_ARENA_ID, NYTHRAXIS_DEV_FORMATION } from '../src/sim/nythraxis_dev_raid';
+import {
+  isNythraxisDevMechanic,
+  NYTHRAXIS_ARENA_ID,
+  NYTHRAXIS_DEV_FORMATION,
+  NYTHRAXIS_DEV_MECHANICS,
+} from '../src/sim/nythraxis_dev_raid';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, NYTHRAXIS_BOSS_ID } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -145,8 +150,16 @@ describe('/dev nythraxisraid', () => {
     sim.tick();
     expect(st.sigil).not.toBeNull();
     // A phase 2 mechanic is refused in phase 1 with a pointer to the phase jump.
-    say('/dev nyx gravefire');
+    say('/dev nyx rend');
     expect(errors().some((e) => /phase 2 mechanic/.test(e.text ?? ''))).toBe(true);
+    // Gravefire left the fight in v0.42.2: the verb is gone from the poke
+    // table (spike stays, the positive control) and saying it lights nothing.
+    expect(NYTHRAXIS_DEV_MECHANICS).not.toContain('gravefire');
+    expect(isNythraxisDevMechanic('gravefire')).toBe(false);
+    expect(isNythraxisDevMechanic('spike')).toBe(true);
+    say('/dev nyx gravefire');
+    sim.tick();
+    expect(st.gravefires).toEqual([]);
     // Phase jump: 69% health starts the transition, which then holds every poke.
     say('/dev nyx phase2');
     sim.tick();
@@ -156,9 +169,6 @@ describe('/dev nythraxisraid', () => {
     for (let i = 0; i < 20 * 26 && st.phase === 'transition'; i++) sim.tick();
     expect(st.phase).toBe(2);
     // Phase 2 mechanics on demand, and the wards completed by three bots.
-    say('/dev nyx gravefire');
-    sim.tick();
-    expect(st.gravefires!.length).toBe(1);
     say('/dev nyx rend');
     sim.tick();
     expect(st.soulRendMarks.length).toBe(3);

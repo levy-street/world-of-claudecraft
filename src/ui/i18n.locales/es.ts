@@ -3748,7 +3748,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Pulso de Sombra (dano de area pulsante)',
   'hudChrome.finder.mech.shuddering_stomp': 'Pisada Estremecedora (aturdimiento de area)',
   'hudChrome.finder.mech.soul_rend':
-    'Desgarro de alma (los jugadores marcados se agrupan y luego salen del fuego)',
+    'Desgarro de alma (los jugadores marcados se agrupan para repartir el daño)',
   'hudChrome.finder.mech.summons_adds': 'Invoca refuerzos',
   'hudChrome.finder.mech.wardstones': 'Canalizacion de piedras de guardia (transicion de fase)',
   'hudChrome.finder.needs': 'Necesita {roles}',
@@ -15798,7 +15798,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Sigilo vinculante (arrastra al jefe hasta el sigilo o la banda lo pagará)',
   'hudChrome.finder.mech.bone_spike':
-    'Púa ósea (los miembros empalados se desangran hasta que se destruye la púa)',
+    'Púa ósea (los jugadores empalados pierden vida hasta que alguien rompe la púa con unos pocos golpes)',
   'hudChrome.finder.mech.bone_storm':
     'Tormenta ósea (ignora la amenaza, gira y carga contra la banda)',
   'hudChrome.finder.mech.crown_endures':
@@ -15807,12 +15807,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'La Corte inmortal (solo heroico, la corte real se alza tras Rabia inmortal)',
   'hudChrome.finder.mech.grave_eruption':
     'Erupción sepulcral (círculos de aviso que dejan suelo ardiente)',
-  'hudChrome.finder.mech.gravefire':
-    'Fuego sepulcral (una línea de fuego móvil que hay que esquivar)',
   'hudChrome.finder.mech.kings_wrath':
     'Ira del rey (30%: bonificación de daño permanente, peligros del suelo más rápidos)',
-  'hudChrome.finder.mech.soulfire':
-    'Fuego de almas (las detonaciones de Desgarro de alma dejan charcos ardientes)',
   'hudChrome.fullTransfer.excluded':
     'Nunca se incluye: tu inicio de sesión, cuenta, cartera ni datos de compra. Los diseños de la barra de acción se guardan en tu cuenta y viajan con ella.',
   'hudChrome.fullTransfer.fullSettings': 'Configuración completa',
@@ -15910,19 +15906,19 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Desactivado',
   'hudChrome.options.shaderWarmOn': 'Activado',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    'Cada {everyHeroic} s, un sigilo de los antiguos resguardos brilla en el suelo de {minDist} a {maxDist} yd de Nythraxis y él inicia Ascensión inmortal, ganando {ascensionHeroic} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindHeroic} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunHeroic} s y recibe {vulnerability} más de daño durante {boundHeroic} s. Si no, cada miembro de la banda recibe {unboundHitHeroic} de la salud máxima como daño de las Sombras y él conserva {unboundBonusHeroic} más de daño hasta la siguiente vinculación.',
+    'Cada {everyHeroic} s, un sigilo de los antiguos resguardos brilla en una de las dos plataformas que flanquean el trono, a {sideOffset} yd a la izquierda o a la derecha (desde la banda) de donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento, y él inicia Ascensión inmortal, ganando {ascensionHeroic} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindHeroic} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunHeroic} s y recibe {vulnerability} más de daño durante {boundHeroic} s. Si no, cada miembro de la banda recibe {unboundHitHeroic} de la salud máxima como daño de las Sombras y él conserva {unboundBonusHeroic} más de daño hasta la siguiente vinculación.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Sigilo vinculante',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'El tanque arrastra a Nythraxis hasta el sigilo de inmediato, atravesando cualquier fuego que haya dejado la banda. Los cuerpo a cuerpo siguen el arrastre y los de distancia se mantienen fuera del nuevo cono de Quebrantatumbas. Todos lo queman mientras está Vinculado.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    'Cada {everyNormal} s, un sigilo de los antiguos resguardos brilla en el suelo de {minDist} a {maxDist} yd de Nythraxis y él inicia Ascensión inmortal, ganando {ascensionNormal} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindNormal} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunNormal} s y recibe {vulnerability} más de daño durante {boundNormal} s. Si no, cada miembro de la banda recibe {unboundHitNormal} de la salud máxima como daño de las Sombras y él conserva {unboundBonusNormal} más de daño hasta la siguiente vinculación.',
+    'Cada {everyNormal} s, un sigilo de los antiguos resguardos brilla en una de las dos plataformas que flanquean el trono, a {sideOffset} yd a la izquierda o a la derecha (desde la banda) de donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento, y él inicia Ascensión inmortal, ganando {ascensionNormal} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindNormal} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunNormal} s y recibe {vulnerability} más de daño durante {boundNormal} s. Si no, cada miembro de la banda recibe {unboundHitNormal} de la salud máxima como daño de las Sombras y él conserva {unboundBonusNormal} más de daño hasta la siguiente vinculación.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Cada {everyHeroic} s, Nythraxis empala en Púas óseas a {victimsHeroic} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainHeroic} de su salud máxima cada segundo hasta que se destruye su púa.',
+    'Cada {everyHeroic} s, Nythraxis empala en Púas óseas a {victimsHeroic} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainHeroic} de su salud máxima cada segundo hasta que se destruye su púa. Una púa se rompe tras {hitsHeroic} golpes de cualquiera, sin importar el daño que hagan. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Púa ósea',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'Los combatientes de daño cambian a las Púas óseas de inmediato y las destruyen para liberar a los empalados. Los sanadores mantienen vivos a los empalados mientras caen las púas.',
+    'Quien esté más cerca golpea la Púa ósea: unos pocos golpes de cualquiera la rompen, sin importar el daño. Los sanadores mantienen con vida a los empalados mientras caen las púas.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Cada {everyNormal} s, Nythraxis empala en Púas óseas a {victimsNormal} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainNormal} de su salud máxima cada segundo hasta que se destruye su púa.',
+    'Cada {everyNormal} s, Nythraxis empala en Púas óseas a {victimsNormal} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainNormal} de su salud máxima cada segundo hasta que se destruye su púa. Una púa se rompe tras {hitsNormal} golpes de cualquiera, sin importar el daño que hagan. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'A partir de {first} s tras la Ira del rey y cada {everyHeroic} s después, Nythraxis inicia Tormenta ósea durante {duration} s. Ignora la amenaza, se mueve a {speed} veces la velocidad normal y realiza {charges} cargas de {chargeSeconds} s cada una. Su remolino inflige {whirlHeroic} de la salud máxima cada segundo en un radio de {radius} yd. Cada carga termina con un Golpe óseo en el mismo radio que inflige {slamHeroic} de la salud máxima. Lanza Púa ósea {spikeAt} s después de empezar la tormenta, y luego Quebrantatumbas vuelve a activarse {rearm} s después de que termine.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Tormenta ósea',
@@ -15968,23 +15964,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Los tanques mantienen a Nythraxis mirando lejos de la banda. Todos los demás se quedan detrás o a su lado y nunca cruzan el cono.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     'Cada {seconds} s, Nythraxis carga su siguiente golpe que conecte. Su objetivo solo recibe el golpe, pero todos los demás dentro de {range} yd en el cono frontal de {arc} grados reciben {splash} de ese golpe como daño físico, reducido por su propia armadura.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    'Cada {everyHeroic} s, una línea de fuego sepulcral violeta avanza desde Nythraxis hacia un miembro de la banda, creciendo {speed} yd cada segundo hasta {length} yd. Cada yarda arde durante {burnHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo a cualquiera que permanezca dentro.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Fuego sepulcral',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Esquiva la línea cuando llegue: es estrecha y nunca gira. Los miembros a distancia siguen moviéndose en vez de quedarse quietos.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    'Cada {everyNormal} s, una línea de fuego sepulcral violeta avanza desde Nythraxis hacia un miembro de la banda, creciendo {speed} yd cada segundo hasta {length} yd. Cada yarda arde durante {burnNormal} s e inflige {tickNormal} de la salud máxima cada segundo a cualquiera que permanezca dentro.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Ira del rey',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Usa los tiempos de reutilización defensivos restantes para el daño inevitable. Mantén limpias todas las mecánicas anteriores mientras la banda termina el combate.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis inflige {bonusNormal} más de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral ocurre cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico) y Fuego sepulcral cada {gravefireEveryNormal} s ({gravefireEveryHeroic} en heroico).',
+    'Nythraxis inflige {bonusNormal} más de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral ocurre cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico).',
   'hudChrome.raidBossGuide.nythraxis.overview':
     'El sumo sacerdote Malric se negó a dejar morir a su rey, y el rito que alzó a Nythraxis vinculó a toda la corte a la cripta. El encuentro pone a prueba un cambio disciplinado de tanques, cambios rápidos a las Púas óseas, movimiento fuera del suelo ardiente y una canalización coordinada de piedras de resguardo cuando cae el Trono.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'La Ira del rey',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    'Al {health} de salud, Nythraxis ruge en la Ira del rey y gana {bonusNormal} de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral se acelera a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico) y Fuego sepulcral a cada {gravefireEveryNormal} s ({gravefireEveryHeroic} en heroico). Todas las demás mecánicas mantienen su ritmo.',
+    'Al {health} de salud, Nythraxis ruge en la Ira del rey y gana {bonusNormal} de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral se acelera a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico). Todas las demás mecánicas mantienen su ritmo.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'El Trono',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     'Nythraxis defiende su sala del trono con una hendidura frontal cargada, el cambio de tanques de Maldición pavorosa, Púas óseas que empalan a miembros de la banda y Erupciones sepulcrales que dejan suelo ardiente.',
@@ -16003,13 +15992,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cada miembro marcado corre a un punto de agrupamiento y se coloca a {range} yd o menos de las otras marcas antes de que termine la mecha de {fuse} s. Los sanadores completan la salud del grupo cuando las marcas se resuelven.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis marca con Desgarro de alma a {marksNormal} miembros de la banda que no sean su objetivo actual. Tras {fuse} s, cada marca inflige toda la salud máxima de su portador como daño de las Sombras, dividido entre el número de miembros marcados a {range} yd o menos de él.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Cada detonación de Desgarro de alma deja un charco de fuego morado con {radius} yd de radio por grupo de marcas agrupadas, que arde durante {secondsHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo. Estar donde los charcos se solapan solo aplica un pulso, nunca copias acumuladas. Los charcos nunca aparecen a menos de {clearance} yd de una piedra de resguardo.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Fuego de almas',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Sal del charco morado en cuanto detonen las marcas. Mantén el siguiente punto de agrupamiento libre de fuego activo.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Cada detonación de Desgarro de alma deja un charco de fuego morado con {radius} yd de radio donde estaba cada marca, que arde durante {seconds} s e inflige {tickNormal} de la salud máxima cada segundo. Estar donde los charcos se solapan aplica un pulso de cada uno. Los charcos nunca aparecen a menos de {clearance} yd de una piedra de resguardo.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Carámbanos',
   'abilityUi.cast.sundering': 'Quebrantar',
   'hud.core.mapMarkerLabels.farmPatch': 'Parcelas de cultivo',
@@ -16117,7 +16099,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Seguir {count} fabricaciones de {name} como objetivo de recolección',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Cada mano tiene su propio beneficio; los activadores repetidos renuevan el de esa mano. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.',
+    'Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Ambas manos comparten un solo beneficio; cualquier activación lo renueva y nunca se acumula. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.',
   'hudChrome.enchantName.enchant_chest_armor': 'Grabado de pecho: Refuerzo',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Grabado de pecho: Aguante superior',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Grabado de pecho: Aguante luminoso',

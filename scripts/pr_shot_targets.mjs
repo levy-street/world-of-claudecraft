@@ -8775,7 +8775,12 @@ export const TARGETS = [
     // variants then click Expand roster and clip the prompt stack (the price there
     // is the coin-icon readout with bare digits).
     variants: [
-      { key: 'desktop', charName: 'Rueweaver', charClass: 'paladin', beforeLoad: seedLowGraphicsPreset },
+      {
+        key: 'desktop',
+        charName: 'Rueweaver',
+        charClass: 'paladin',
+        beforeLoad: seedLowGraphicsPreset,
+      },
       {
         key: 'desktop-confirm',
         charName: 'Rueweaver',
@@ -15454,8 +15459,8 @@ export const TARGETS = [
   {
     key: 'nythraxis-hazards',
     label:
-      'Nythraxis arena: ground hazards (Grave Flame, Soulfire, Gravefire, Grave Eruption ' +
-      'warning), the blue Binding Sigil, and Soul Rend markers (red solo, green stacked)',
+      'Nythraxis arena: ground hazards (Grave Flame, Gravefire, Grave Eruption warning), ' +
+      'the blue Binding Sigil, and Soul Rend markers (red solo, green stacked)',
     when: [
       'nythraxis_soul_rend_marker',
       'nythraxis_grave_flame_visual',
@@ -15566,8 +15571,10 @@ export const TARGETS = [
           // Ground hazards, staged directly on the readout getters the
           // renderer consumes (IWorld combat facet), around the boss. Radius
           // and duration mirror the real heroic constants (grave flame radius 3
-          // / duration 8s, Soulfire radius 4 / duration 12s) so this staged
-          // fixture cannot be misread as a balance change.
+          // / duration 8s) so this staged fixture cannot be misread as a
+          // balance change. No Soulfire pool: Soul Rend leaves nothing behind
+          // since v0.42.2, so the fixture must not show a fire the fight
+          // never produces.
           Object.defineProperty(sim, 'activeNythraxisGraveFlames', {
             configurable: true,
             value: [
@@ -15580,16 +15587,6 @@ export const TARGETS = [
                 radius: 3,
                 duration: 8,
                 remaining: 5,
-              },
-              {
-                id: 'shot:soul-flame',
-                sourceId: boss.id,
-                kind: 'soul',
-                x: bx + 6,
-                z: bz - 4,
-                radius: 4,
-                duration: 12,
-                remaining: 8,
               },
             ],
           });
@@ -15665,6 +15662,279 @@ export const TARGETS = [
       // A second pass: becoming raid leader / the arena teleport can pop the
       // tutorial banner, the greeting NPC, or Loot Settings back up after the
       // staging above ran, and any of the three would obscure the hazards.
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-card')?.remove();
+        document.getElementById('tutorial-greeting')?.remove();
+        const loot = document.querySelector('#loot-settings-window');
+        if (loot) loot.style.display = 'none';
+      });
+      await wait(300);
+      return {};
+    },
+  },
+  {
+    key: 'nythraxis-bone-spike',
+    label:
+      'Nythraxis arena: a live heroic Bone Spike wave (three spikes with their impaled ' +
+      'raiders) in front of the boss on the flagstone floor',
+    when: ['sim/nythraxis_bone_spike', 'nythraxis_bone_spike.glb', 'mob_nythraxis_bone_spike'],
+    // A live cast, not a staged fixture: the practice raid is pulled with the
+    // tester holding aggro and every bot lined up in front of the dais, so
+    // whichever three the cast picks are in frame; then the tick is frozen so
+    // the spikes and the impaled poses survive to the shot. The lowest preset
+    // is deliberate (the standing capture rule): the spike's recolour has to
+    // read on the Lambert tier too, since the tint is the actionable part
+    // and the self-illumination lift is standard-tier polish only.
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      let staged = { ok: false, reason: 'world is unavailable' };
+      for (let i = 0; i < 20 && !staged.ok; i++) {
+        staged = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+          document.querySelector('#gpu-notice')?.remove();
+          document.querySelector('.camera-prompt-confirm')?.click();
+          const banner = document.querySelector('#banner');
+          if (banner) banner.style.opacity = '0';
+          document.querySelector('.tut-card')?.remove();
+          document.getElementById('tutorial-greeting')?.remove();
+          const loot = document.querySelector('#loot-settings-window');
+          if (loot) loot.style.display = 'none';
+          // Idempotent: setupNythraxisDevRaid reuses a matching roster.
+          sim.chat('/dev nythraxisraid heroic');
+          const player = sim.player;
+          const bossCandidates = [...sim.entities.values()].filter(
+            (e) => e.templateId === 'nythraxis_scourge_of_thornpeak' && !e.dead,
+          );
+          if (bossCandidates.length === 0) return { ok: false, reason: 'Nythraxis did not spawn' };
+          const boss = bossCandidates.reduce((closest, candidate) => {
+            const d = (a) => (a.pos.x - player.pos.x) ** 2 + (a.pos.z - player.pos.z) ** 2;
+            return d(candidate) < d(closest) ? candidate : closest;
+          });
+          const bots = [...sim.players.values()]
+            .filter((meta) => meta.isDevBot && /^NythraxisBot\d$/.test(meta.name))
+            .map((meta) => sim.entities.get(meta.entityId))
+            .filter((e) => e && !e.dead);
+          if (bots.length < 3) return { ok: false, reason: 'practice bots did not spawn' };
+          const bx = boss.pos.x;
+          const bz = boss.pos.z;
+          // An invulnerable bot in melee holds aggro (a spike never picks the
+          // aggro holder, and a fresh tester would die to the first swing);
+          // the other bots stand in a line 14 yd in front of the dais so the
+          // three victims, wherever the rng lands, share one frame with the
+          // boss and the floor. The tester watches from the back.
+          const [tankBot, ...lineBots] = bots;
+          tankBot.pos = { x: bx, y: tankBot.pos.y, z: bz - 5 };
+          tankBot.prevPos = { ...tankBot.pos };
+          sim.rebucket(tankBot);
+          lineBots.forEach((bot, index) => {
+            bot.pos = { x: bx + (index - 3.5) * 3.5, y: bot.pos.y, z: bz - 14 };
+            bot.prevPos = { ...bot.pos };
+            bot.facing = 0;
+            sim.rebucket(bot);
+          });
+          player.pos = { x: bx, y: player.pos.y, z: bz - 26 };
+          player.prevPos = { ...player.pos };
+          player.facing = 0;
+          sim.rebucket(player);
+          boss.inCombat = true;
+          boss.aiState = 'attack';
+          boss.aggroTargetId = tankBot.id;
+          boss.threat.set(tankBot.id, 100000);
+          return { ok: true };
+        });
+        if (!staged.ok) await wait(300);
+      }
+      if (!staged.ok) throw new Error(staged.reason);
+      // Let the encounter initialize on the live loop (intro), then force the
+      // spike cast and give the driver a few ticks to raise the spikes.
+      await wait(1500);
+      // ONE poke (a second would raise a second wave on other bots), then
+      // poll for the three spikes it raises.
+      await page.evaluate(() => window.__game.sim.chat('/dev nyx spike'));
+      let spiked = { ok: false, reason: 'no spikes rose' };
+      for (let i = 0; i < 12 && !spiked.ok; i++) {
+        await wait(400);
+        spiked = await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+          const spikes = [...sim.entities.values()].filter(
+            (e) => e.templateId === 'nythraxis_bone_spike' && !e.dead,
+          );
+          if (spikes.length < 3) return { ok: false, reason: `spikes: ${spikes.length}` };
+          return { ok: true };
+        });
+      }
+      if (!spiked.ok) throw new Error(spiked.reason);
+      // Freeze the driver so the spikes and the impaled poses survive to the
+      // shot, then pull the camera back behind the tester to frame boss,
+      // spikes, and floor together.
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game.sim;
+        sim.tick = () => [];
+        const player = sim.player;
+        const boss = [...sim.entities.values()].find(
+          (e) => e.templateId === 'nythraxis_scourge_of_thornpeak' && !e.dead,
+        );
+        const bx = boss.pos.x;
+        const bz = boss.pos.z;
+        // Close and low behind the spike line: the recolour is the subject,
+        // so the spikes fill the frame with the boss and the floor behind.
+        player.pos = { x: bx + 4, y: player.pos.y, z: bz - 21 };
+        player.prevPos = { ...player.pos };
+        player.facing = Math.atan2(bx - player.pos.x, bz - player.pos.z);
+        sim.rebucket(player);
+        game.input.camYaw = player.facing;
+        game.input.camDist = 13;
+        game.input.camPitch = 0.3;
+      });
+      await awaitWorldPainted(page);
+      await wait(1500);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-card')?.remove();
+        document.getElementById('tutorial-greeting')?.remove();
+        const loot = document.querySelector('#loot-settings-window');
+        if (loot) loot.style.display = 'none';
+      });
+      await wait(300);
+      return {};
+    },
+  },
+  {
+    key: 'nythraxis-sigil-side',
+    label:
+      "Nythraxis arena: the Binding Sigil on the flanking platform to the raid's right, and a " +
+      'targeted ward spike whose health bar reads as hits remaining',
+    when: [
+      'sim/nythraxis_binding_sigil',
+      'nythraxis_sigil_core',
+      'nythraxis_sigil_visual',
+      'sim/nythraxis_bone_spike',
+    ],
+    // A live cast, not a staged fixture: the practice raid is pulled with a
+    // bot holding aggro, one spike wave is poked and one sigil, then the tick
+    // is frozen and the tester targets a spike so the target frame shows the
+    // hit-count pool. Lowest preset per the standing capture rule.
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      let staged = { ok: false, reason: 'world is unavailable' };
+      for (let i = 0; i < 20 && !staged.ok; i++) {
+        staged = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+          document.querySelector('#gpu-notice')?.remove();
+          document.querySelector('.camera-prompt-confirm')?.click();
+          const banner = document.querySelector('#banner');
+          if (banner) banner.style.opacity = '0';
+          document.querySelector('.tut-card')?.remove();
+          document.getElementById('tutorial-greeting')?.remove();
+          const loot = document.querySelector('#loot-settings-window');
+          if (loot) loot.style.display = 'none';
+          sim.chat('/dev nythraxisraid normal');
+          const player = sim.player;
+          const bossCandidates = [...sim.entities.values()].filter(
+            (e) => e.templateId === 'nythraxis_scourge_of_thornpeak' && !e.dead,
+          );
+          if (bossCandidates.length === 0) return { ok: false, reason: 'Nythraxis did not spawn' };
+          const boss = bossCandidates.reduce((closest, candidate) => {
+            const d = (a) => (a.pos.x - player.pos.x) ** 2 + (a.pos.z - player.pos.z) ** 2;
+            return d(candidate) < d(closest) ? candidate : closest;
+          });
+          const bots = [...sim.players.values()]
+            .filter((meta) => meta.isDevBot && /^NythraxisBot\d$/.test(meta.name))
+            .map((meta) => sim.entities.get(meta.entityId))
+            .filter((e) => e && !e.dead);
+          if (bots.length < 3) return { ok: false, reason: 'practice bots did not spawn' };
+          const bx = boss.pos.x;
+          const bz = boss.pos.z;
+          const [tankBot, ...lineBots] = bots;
+          tankBot.pos = { x: bx, y: tankBot.pos.y, z: bz - 5 };
+          tankBot.prevPos = { ...tankBot.pos };
+          sim.rebucket(tankBot);
+          lineBots.forEach((bot, index) => {
+            bot.pos = { x: bx + (index - 3.5) * 3, y: bot.pos.y, z: bz - 12 };
+            bot.prevPos = { ...bot.pos };
+            bot.facing = 0;
+            sim.rebucket(bot);
+          });
+          player.pos = { x: bx, y: player.pos.y, z: bz - 30 };
+          player.prevPos = { ...player.pos };
+          player.facing = 0;
+          sim.rebucket(player);
+          boss.inCombat = true;
+          boss.aiState = 'attack';
+          boss.aggroTargetId = tankBot.id;
+          boss.threat.set(tankBot.id, 100000);
+          return { ok: true };
+        });
+        if (!staged.ok) await wait(300);
+      }
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(1500);
+      await page.evaluate(() => {
+        window.__game.sim.chat('/dev nyx spike');
+        window.__game.sim.chat('/dev nyx sigil');
+      });
+      let ready = { ok: false, reason: 'no spike or sigil' };
+      for (let i = 0; i < 12 && !ready.ok; i++) {
+        await wait(400);
+        ready = await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+          const spikes = [...sim.entities.values()].filter(
+            (e) => e.templateId === 'nythraxis_bone_spike' && !e.dead,
+          );
+          const sigils = sim.activeNythraxisBindingSigils ?? [];
+          if (spikes.length < 2 || sigils.length < 1)
+            return { ok: false, reason: `spikes ${spikes.length} sigils ${sigils.length}` };
+          return { ok: true };
+        });
+      }
+      if (!ready.ok) throw new Error(ready.reason);
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game.sim;
+        sim.tick = () => [];
+        const player = sim.player;
+        const boss = [...sim.entities.values()].find(
+          (e) => e.templateId === 'nythraxis_scourge_of_thornpeak' && !e.dead,
+        );
+        const spike = [...sim.entities.values()].find(
+          (e) => e.templateId === 'nythraxis_bone_spike' && !e.dead,
+        );
+        // The tester targets a spike so the target frame shows the ward pool.
+        if (spike) player.targetId = spike.id;
+        const bx = boss.pos.x;
+        const bz = boss.pos.z;
+        // High and wide from behind the raid so the sigil (on the flanking
+        // platform 30 yd to the raid's right of the spawn, world -x, which
+        // reads on the screen's right when looking up the hall), the spike
+        // line, and the boss share one frame.
+        player.pos = { x: bx - 10, y: player.pos.y, z: bz - 40 };
+        player.prevPos = { ...player.pos };
+        player.facing = Math.atan2(bx - player.pos.x, bz - player.pos.z);
+        sim.rebucket(player);
+        game.input.camYaw = player.facing;
+        game.input.camDist = 36;
+        game.input.camPitch = 0.6;
+      });
+      await awaitWorldPainted(page);
+      await wait(1500);
       await page.evaluate(() => {
         document.querySelector('.camera-prompt-confirm')?.click();
         document.querySelector('.tut-card')?.remove();

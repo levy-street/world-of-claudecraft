@@ -1,7 +1,7 @@
 // [dev] The solo Nythraxis practice raid and its mechanic pokes.
 //
-// A lone tester cannot see most of the redo: Bone Spike, Gravefire, and Soul
-// Rend never pick the aggro holder, the wardstones want three different
+// A lone tester cannot see most of the redo: Bone Spike and Soul Rend never
+// pick the aggro holder, the wardstones want three different
 // channelers, and Bone Storm wants a raid to charge. `/dev nythraxisraid`
 // builds the sanctioned ten-player practice roster (the Varkhul and Ignivar
 // idiom: nine anchored, invulnerable dev bots spread across the hall) and
@@ -36,8 +36,8 @@ const NYTHRAXIS_DEV_BOT_COUNT = 9;
 // z 16 to 116; the boss dais at (0, 96); wardstones at (0, 62) and (+/-30,
 // 74)). Every spot is at least 6 yd from a wardstone (the sigil and Soulfire
 // clearance) and 30 yd from the boss spawn, outside his 22 yd aggro radius, so
-// forming the raid never pulls; spread so a Grave Eruption, a Gravefire line,
-// and a Bone Storm charge each have real targets across the front half of the
+// forming the raid never pulls; spread so a Grave Eruption and a Bone Storm
+// charge each have real targets across the front half of the
 // floor.
 export const NYTHRAXIS_DEV_FORMATION = [
   { x: -40, z: 40 },
@@ -195,7 +195,6 @@ export const NYTHRAXIS_DEV_MECHANICS = [
   'spike',
   'eruption',
   'sigil',
-  'gravefire',
   'rend',
   'rage',
   'storm',
@@ -266,11 +265,6 @@ export function pokeNythraxisDevMechanic(
       st.sigilTimer = DT;
       st.majorGapTimer = 0;
       return { ok: true, message: 'Binding Sigil: next tick.' };
-    case 'gravefire':
-      if (!wardPhase)
-        return { ok: false, message: 'Gravefire is a phase 2 mechanic (/dev nyx phase2).' };
-      st.gravefireTimer = DT;
-      return { ok: true, message: 'Gravefire: next tick.' };
     case 'rend':
       if (!wardPhase)
         return { ok: false, message: 'Soul Rend is a phase 2 mechanic (/dev nyx phase2).' };

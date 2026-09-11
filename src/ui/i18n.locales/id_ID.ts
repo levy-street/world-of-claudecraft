@@ -3545,7 +3545,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Denyut Bayangan (kerusakan area berdenyut)',
   'hudChrome.finder.mech.shuddering_stomp': 'Hentakan Gemetar (stun area)',
   'hudChrome.finder.mech.soul_rend':
-    'Robek Jiwa (pemain yang ditandai berkumpul, lalu meninggalkan api)',
+    'Robek Jiwa (pemain yang ditandai berkumpul untuk membagi kerusakan)',
   'hudChrome.finder.mech.summons_adds': 'Memanggil bala bantuan',
   'hudChrome.finder.mech.wardstones': 'Saluran Wardstone (transisi fase)',
   'hudChrome.finder.needs': 'Membutuhkan {roles}',
@@ -15705,7 +15705,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Segel Pengikat (seret boss ke segel atau raid akan menanggung akibatnya)',
   'hudChrome.finder.mech.bone_spike':
-    'Pancang Tulang (raider yang tertusuk terkuras sampai pancang dihancurkan)',
+    'Pancang Tulang (pemain yang terpancang kehilangan nyawa sampai seseorang menghancurkan pancang dengan beberapa serangan)',
   'hudChrome.finder.mech.bone_storm':
     'Badai Tulang (dia mengabaikan ancaman, berputar, dan menerjang raid)',
   'hudChrome.finder.mech.crown_endures': 'Mahkota Bertahan (enrage keras pada 6:00, heroic 5:00)',
@@ -15713,10 +15713,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Istana Tanpa Kematian (khusus heroic, istana kerajaan bangkit setelah Amarah Tanpa Kematian)',
   'hudChrome.finder.mech.grave_eruption':
     'Erupsi Makam (lingkaran peringatan yang meninggalkan tanah terbakar)',
-  'hudChrome.finder.mech.gravefire': 'Api Makam (garis api bergerak yang harus disingkirkan)',
   'hudChrome.finder.mech.kings_wrath':
     'Murka Raja (30%: bonus kerusakan permanen, bahaya lantai lebih cepat)',
-  'hudChrome.finder.mech.soulfire': 'Api Jiwa (ledakan Robekan Jiwa meninggalkan kolam terbakar)',
   'hudChrome.fullTransfer.excluded':
     'Tidak pernah disertakan: data login, akun, dompet, atau pembelianmu. Tata letak bilah aksi disimpan ke akunmu dan ikut berpindah bersamanya.',
   'hudChrome.fullTransfer.fullSettings': 'Pengaturan Lengkap',
@@ -15813,19 +15811,19 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Nonaktif',
   'hudChrome.options.shaderWarmOn': 'Aktif',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    'Setiap {everyHeroic} dtk, segel pelindung lama menyala di lantai {minDist} sampai {maxDist} yd dari Nythraxis dan ia memulai Kenaikan Tanpa Kematian, mendapat {ascensionHeroic} kerusakan dan kecepatan serangan setiap {ascensionEvery} dtk. Jika ia berdiri di segel dalam {bindHeroic} dtk, ia Terikat: Kenaikan dipurnikan, ia terkena stun selama {stunHeroic} dtk, dan ia menerima {vulnerability} lebih banyak kerusakan selama {boundHeroic} dtk. Jika tidak, setiap raider menerima {unboundHitHeroic} kesehatan maksimum sebagai kerusakan Bayangan dan ia mempertahankan {unboundBonusHeroic} lebih banyak kerusakan sampai pengikatan berikutnya.',
+    'Setiap {everyHeroic} dtk, segel pelindung lama menyala di salah satu dari dua panggung yang mengapit takhta, {sideOffset} yd di kiri atau kanan (dari sisi raid) tempat Nythraxis berdiri saat pull, bergantian sisi setiap kali dan ia memulai Kenaikan Tanpa Kematian, mendapat {ascensionHeroic} kerusakan dan kecepatan serangan setiap {ascensionEvery} dtk. Jika ia berdiri di segel dalam {bindHeroic} dtk, ia Terikat: Kenaikan dipurnikan, ia terkena stun selama {stunHeroic} dtk, dan ia menerima {vulnerability} lebih banyak kerusakan selama {boundHeroic} dtk. Jika tidak, setiap raider menerima {unboundHitHeroic} kesehatan maksimum sebagai kerusakan Bayangan dan ia mempertahankan {unboundBonusHeroic} lebih banyak kerusakan sampai pengikatan berikutnya.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Segel Pengikat',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'Tank segera menyeret Nythraxis ke segel, melewati api apa pun yang ditinggalkan raid. Petarung jarak dekat mengikuti seretan dan pemain jarak jauh menjauh dari kerucut Penghancur Makam yang baru. Semua orang menghajarnya saat ia Terikat.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    'Setiap {everyNormal} dtk, segel pelindung lama menyala di lantai {minDist} sampai {maxDist} yd dari Nythraxis dan ia memulai Kenaikan Tanpa Kematian, mendapat {ascensionNormal} kerusakan dan kecepatan serangan setiap {ascensionEvery} dtk. Jika ia berdiri di segel dalam {bindNormal} dtk, ia Terikat: Kenaikan dipurnikan, ia terkena stun selama {stunNormal} dtk, dan ia menerima {vulnerability} lebih banyak kerusakan selama {boundNormal} dtk. Jika tidak, setiap raider menerima {unboundHitNormal} kesehatan maksimum sebagai kerusakan Bayangan dan ia mempertahankan {unboundBonusNormal} lebih banyak kerusakan sampai pengikatan berikutnya.',
+    'Setiap {everyNormal} dtk, segel pelindung lama menyala di salah satu dari dua panggung yang mengapit takhta, {sideOffset} yd di kiri atau kanan (dari sisi raid) tempat Nythraxis berdiri saat pull, bergantian sisi setiap kali dan ia memulai Kenaikan Tanpa Kematian, mendapat {ascensionNormal} kerusakan dan kecepatan serangan setiap {ascensionEvery} dtk. Jika ia berdiri di segel dalam {bindNormal} dtk, ia Terikat: Kenaikan dipurnikan, ia terkena stun selama {stunNormal} dtk, dan ia menerima {vulnerability} lebih banyak kerusakan selama {boundNormal} dtk. Jika tidak, setiap raider menerima {unboundHitNormal} kesehatan maksimum sebagai kerusakan Bayangan dan ia mempertahankan {unboundBonusNormal} lebih banyak kerusakan sampai pengikatan berikutnya.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Setiap {everyHeroic} dtk, Nythraxis menusuk {victimsHeroic} raider selain targetnya saat ini pada Pancang Tulang. Raider yang tertusuk tidak dapat bertindak dan kehilangan {drainHeroic} kesehatan maksimum setiap detik sampai pancangnya dihancurkan.',
+    'Setiap {everyHeroic} dtk, Nythraxis menusuk {victimsHeroic} raider selain targetnya saat ini pada Pancang Tulang. Raider yang tertusuk tidak dapat bertindak dan kehilangan {drainHeroic} kesehatan maksimum setiap detik sampai pancangnya dihancurkan. Pancang hancur setelah {hitsHeroic} serangan dari siapa pun, berapa pun kerusakannya. Pemain yang sudah pernah dipancang tidak dapat dipilih lagi selama {cooldown} detik, sehingga pancang tersebar ke seluruh raid.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Pancang Tulang',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'Para penyerang segera beralih ke Pancang Tulang dan menghancurkannya untuk membebaskan raider yang tertusuk. Penyembuh menjaga yang tertusuk tetap hidup sampai pancang runtuh.',
+    'Siapa pun yang terdekat menyerang Pancang Tulang: beberapa serangan dari siapa saja menghancurkannya, berapa pun kerusakannya. Penyembuh menjaga yang terpancang tetap hidup selagi pancang dihancurkan.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Setiap {everyNormal} dtk, Nythraxis menusuk {victimsNormal} raider selain targetnya saat ini pada Pancang Tulang. Raider yang tertusuk tidak dapat bertindak dan kehilangan {drainNormal} kesehatan maksimum setiap detik sampai pancangnya dihancurkan.',
+    'Setiap {everyNormal} dtk, Nythraxis menusuk {victimsNormal} raider selain targetnya saat ini pada Pancang Tulang. Raider yang tertusuk tidak dapat bertindak dan kehilangan {drainNormal} kesehatan maksimum setiap detik sampai pancangnya dihancurkan. Pancang hancur setelah {hitsNormal} serangan dari siapa pun, berapa pun kerusakannya. Pemain yang sudah pernah dipancang tidak dapat dipilih lagi selama {cooldown} detik, sehingga pancang tersebar ke seluruh raid.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
     'Mulai {first} dtk setelah Murka Raja dan setiap {everyHeroic} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlHeroic} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamHeroic} kesehatan maksimum. Ia merapal Pancang Tulang {spikeAt} dtk setelah badai dimulai, lalu Penghancur Makam siap lagi {rearm} dtk setelah berakhir.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Badai Tulang',
@@ -15871,23 +15869,16 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Tank menjaga Nythraxis menghadap menjauh dari raid. Semua orang lain tetap di belakang atau di sampingnya dan tidak pernah melintasi kerucut.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     'Setiap {seconds} dtk, Nythraxis mengisi ayunan berikutnya yang mendarat. Targetnya hanya menerima ayunan itu sendiri, tetapi semua orang lain dalam {range} yd di dalam kerucut {arc} derajat di depannya menerima {splash} dari ayunan itu sebagai kerusakan Fisik, dikurangi oleh armor mereka sendiri.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    'Setiap {everyHeroic} dtk, garis api makam ungu bergerak dari Nythraxis menuju seorang raider, memanjang {speed} yd setiap detik hingga {length} yd. Setiap yard terbakar selama {burnHeroic} dtk dan menghasilkan {tickHeroic} kesehatan maksimum setiap detik kepada siapa pun yang berdiri di dalamnya.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Api Makam',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Minggirilah saat garis itu datang: garisnya sempit dan tidak pernah berbelok. Raider jarak jauh terus bergerak, bukan berdiri di satu tempat.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    'Setiap {everyNormal} dtk, garis api makam ungu bergerak dari Nythraxis menuju seorang raider, memanjang {speed} yd setiap detik hingga {length} yd. Setiap yard terbakar selama {burnNormal} dtk dan menghasilkan {tickNormal} kesehatan maksimum setiap detik kepada siapa pun yang berdiri di dalamnya.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Murka Raja',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Gunakan cooldown defensif yang tersisa untuk kerusakan yang tidak bisa dihindari. Jaga semua mekanik sebelumnya tetap bersih sementara raid menyelesaikan pertarungan.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis menghasilkan {bonusNormal} lebih banyak kerusakan pada Normal atau {bonusHeroic} pada Heroic selama sisa pertarungan. Erupsi Makam terjadi setiap {eruptionEveryNormal} dtk ({eruptionEveryHeroic} pada Heroic) dan Api Makam setiap {gravefireEveryNormal} dtk ({gravefireEveryHeroic} pada Heroic).',
+    'Nythraxis menghasilkan {bonusNormal} lebih banyak kerusakan pada Normal atau {bonusHeroic} pada Heroic selama sisa pertarungan. Erupsi Makam terjadi setiap {eruptionEveryNormal} dtk ({eruptionEveryHeroic} pada Heroic).',
   'hudChrome.raidBossGuide.nythraxis.overview':
     'Imam Besar Malric menolak membiarkan rajanya mati, dan ritus yang membangkitkan Nythraxis mengikat seluruh istana ke kripta. Pertemuan ini menguji pertukaran tank yang disiplin, peralihan cepat ke Pancang Tulang, gerakan keluar dari tanah terbakar, dan channel batu pelindung yang terkoordinasi begitu Takhta tumbang.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'Murka Raja',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    'Pada {health} kesehatan, Nythraxis mengaum dalam Murka Raja dan mendapat {bonusNormal} kerusakan pada Normal atau {bonusHeroic} pada Heroic selama sisa pertarungan. Erupsi Makam menjadi setiap {eruptionEveryNormal} dtk ({eruptionEveryHeroic} pada Heroic) dan Api Makam menjadi setiap {gravefireEveryNormal} dtk ({gravefireEveryHeroic} pada Heroic). Setiap mekanik lain mempertahankan iramanya.',
+    'Pada {health} kesehatan, Nythraxis mengaum dalam Murka Raja dan mendapat {bonusNormal} kerusakan pada Normal atau {bonusHeroic} pada Heroic selama sisa pertarungan. Erupsi Makam menjadi setiap {eruptionEveryNormal} dtk ({eruptionEveryHeroic} pada Heroic). Setiap mekanik lain mempertahankan iramanya.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'Takhta',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     'Nythraxis mempertahankan ruang takhtanya dengan cleave depan yang terisi, pertukaran tank Kutukan Ngeri, Pancang Tulang yang menusuk raider, dan Erupsi Makam yang meninggalkan tanah terbakar.',
@@ -15906,13 +15897,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Setiap raider bertanda berlari ke satu titik tumpuk dan berdiri dalam {range} yd dari tanda lain sebelum sumbu {fuse} dtk berakhir. Penyembuh mengisi kesehatan grup saat tanda selesai.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis menandai {marksNormal} raider selain targetnya saat ini dengan Robekan Jiwa. Setelah {fuse} dtk, setiap tanda menghasilkan kesehatan maksimum penuh pembawanya sebagai kerusakan Bayangan, dibagi oleh jumlah raider bertanda dalam {range} yd dari mereka.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Setiap ledakan Robekan Jiwa meninggalkan satu kolam api ungu dengan radius {radius} yd per grup tanda yang bertumpuk, terbakar selama {secondsHeroic} dtk sebesar {tickHeroic} kesehatan maksimum setiap detik. Berdiri di tempat kolam bertumpang tindih hanya menerima satu tick, bukan salinan bertumpuk. Kolam tidak pernah muncul dalam {clearance} yd dari batu pelindung.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Api Jiwa',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Keluar dari kolam ungu segera setelah tanda meledak. Jaga titik tumpuk berikutnya bebas dari api aktif.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Setiap ledakan Robekan Jiwa meninggalkan kolam api ungu dengan radius {radius} yd di tempat setiap tanda berdiri, terbakar selama {seconds} dtk sebesar {tickNormal} kesehatan maksimum setiap detik. Berdiri di tempat kolam bertumpang tindih menerima tick dari masing-masing. Kolam tidak pernah muncul dalam {clearance} yd dari batu pelindung.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Es runcing',
   'abilityUi.cast.farming': 'Menanam',
   'abilityUi.cast.sundering': 'Membelah',
@@ -16018,7 +16002,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Lacak {count} pembuatan {name} sebagai target pengumpulanmu',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Serangan jarak dekatmu yang mengenai target dapat memberi 50 Kekuatan selama 15 dtk dan memulihkan 200 kesehatanmu. Pengubah penyembuhan berlaku. Setiap serangan memiliki peluang 1% per 0,6 dtk kecepatan dasar senjata yang menyerang. Tanpa cooldown internal. Setiap tangan memiliki buff sendiri; pemicu berulang menyegarkan buff tangan itu. Serangan jarak jauh tidak memicu efek ini. Bentuk Serigala menggunakan kecepatan ayunan dasar 1 dtk sebagai gantinya.',
+    'Serangan jarak dekatmu yang mengenai target dapat memberi 50 Kekuatan selama 15 dtk dan memulihkan 200 kesehatanmu. Pengubah penyembuhan berlaku. Setiap serangan memiliki peluang 1% per 0,6 dtk kecepatan dasar senjata yang menyerang. Tanpa cooldown internal. Kedua tangan berbagi satu buff; setiap pemicu menyegarkannya dan buff ini tidak pernah bertumpuk. Serangan jarak jauh tidak memicu efek ini. Bentuk Serigala menggunakan kecepatan ayunan dasar 1 dtk sebagai gantinya.',
   'hudChrome.enchantName.enchant_chest_armor': 'Ukiran Dada: Penguatan',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Ukiran Dada: Stamina Lebih Besar',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Ukiran Dada: Stamina Bercahaya',

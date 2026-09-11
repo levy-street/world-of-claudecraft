@@ -339,8 +339,21 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // impaled and freed when their spikes died, and the eruption burst then burned.
     expect(n.spikeIds.length).toBe(2);
     expect(auras.some((e) => e.name === 'Dread Curse')).toBe(true);
-    // Two from the forced slice 1 cast, two more from the mid-storm spike.
-    expect(auras.filter((e) => e.name === 'Impaled').length).toBe(4);
+    // Two from the forced slice 1 cast (t = 2.2 s). The mid-storm spike lands
+    // at t = 56.35 s: 2.2 + 55 = 57.2 > 56.35, so both first-wave victims are
+    // still inside the per-raider cooldown (v0.42.2) and may not be re-picked;
+    // with the current charge target holding aggro, the eligible raiders are
+    // the tank the storm freed from threat and the one uncooled mage (no
+    // slam Gravefire keeps him out since the line was retired): two more
+    // impales, and never a repeat. If a re-timed scenario ever moves the
+    // storm spike past 57.2 s, the first-wave victims become eligible again
+    // and the no-repeat pin below is what says so (re-derive from
+    // NYTHRAXIS_BONE_SPIKE_COOLDOWN_SECONDS, never just bump it).
+    const impaled = auras.filter((e) => e.name === 'Impaled') as Array<{ targetId: number }>;
+    expect(impaled.length).toBe(4);
+    const firstWave = new Set(impaled.slice(0, 2).map((e) => e.targetId));
+    expect(firstWave.size).toBe(2);
+    for (const later of impaled.slice(2)) expect(firstWave.has(later.targetId)).toBe(false);
     const callouts = ev.filter((e) => e.type === 'nythraxisCallout') as Array<{ call: string }>;
     expect(callouts.some((e) => e.call === 'youAreImpaled')).toBe(true);
     expect(callouts.some((e) => e.call === 'spikeBroken')).toBe(true);
@@ -348,11 +361,14 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(damage.some((e) => e.ability === 'Bone Spike')).toBe(true);
     expect(damage.some((e) => e.ability === 'Grave Eruption')).toBe(true);
     expect(damage.some((e) => e.ability === 'Grave Flame')).toBe(true);
-    // Slice 2: Soulfire burned the stacked mages after the Soul Rend detonation,
-    // Gravefire ran at the mages, and the sigil flared and was bound.
-    expect(damage.some((e) => e.ability === 'Soulfire')).toBe(true);
-    expect(damage.some((e) => e.ability === 'Gravefire')).toBe(true);
-    expect(callouts.some((e) => e.call === 'gravefireTarget')).toBe(true);
+    // Slice 2: the Soul Rend detonation left no fire (Soulfire retired in
+    // v0.42.2, so no Soulfire tick may appear in the trace), and the sigil
+    // flared beside the boss and was bound.
+    expect(damage.some((e) => e.ability === 'Soulfire')).toBe(false);
+    // Gravefire retired in v0.42.2: the due timer in the scenario lights no
+    // line, so no Gravefire tick and no target callout may appear.
+    expect(damage.some((e) => e.ability === 'Gravefire')).toBe(false);
+    expect(callouts.some((e) => e.call === 'gravefireTarget')).toBe(false);
     expect(callouts.some((e) => e.call === 'sigilAppears')).toBe(true);
     expect(callouts.some((e) => e.call === 'sigilBound')).toBe(true);
     expect(callouts.some((e) => e.call === 'kingsWrath')).toBe(true);
