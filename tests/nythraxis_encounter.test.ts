@@ -605,6 +605,50 @@ describe('Nythraxis encounter module (N1)', () => {
     }
   });
 
+  it('Dread Curse swap holds: a decoy taunt cannot hand the boss back to a still-cursed tank', () => {
+    const { sim, ctx, boss, tank, dps } = setup();
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 1;
+
+    // First application lands on the tank, who has held aggro from the start.
+    st.dreadCurseTimer = 0.01;
+    nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+    const tankCurse = tank.auras.find((a) => a.id === 'nythraxis_dread_curse');
+    expect(tankCurse?.stacks).toBe(1);
+    const tankRemaining = tankCurse?.remaining;
+
+    // A decoy (any taunt-capable raider, not the assigned off tank) actually
+    // takes the boss for a pass, then the tank immediately taunts back.
+    // Into melee reach first: setup() parks dps back at range, and a taunt
+    // does not by itself walk anyone in.
+    teleport(sim, dps[0], boss.pos.x, boss.pos.z - 4, boss.pos.y);
+    ctx.applyTaunt(dps[0], boss);
+    nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+    expect(boss.aggroTargetId).toBe(dps[0].id);
+    ctx.applyTaunt(tank, boss);
+    expect(boss.aggroTargetId).toBe(tank.id); // the taunt itself always lands...
+
+    // ...but the swap sticks: the tank still carries a live stack, so the
+    // very next Dread Curse pass refuses the re-taunt and settles the boss
+    // back on the decoy, who takes the next scheduled application instead.
+    st.dreadCurseTimer = 0.01;
+    nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+    expect(boss.aggroTargetId).toBe(dps[0].id);
+    expect(dps[0].auras.find((a) => a.id === 'nythraxis_dread_curse')?.stacks).toBe(1);
+
+    // The tank's original stack is left completely alone: nothing refreshed
+    // or reapplied it, so it is free to fall off on its own clock rather than
+    // reading to the raid as the debuff "resetting".
+    expect(tank.auras.find((a) => a.id === 'nythraxis_dread_curse')?.stacks).toBe(1);
+    expect(tank.auras.find((a) => a.id === 'nythraxis_dread_curse')?.remaining).toBe(tankRemaining);
+
+    // A second application on the decoy reaches the swap point in turn: the
+    // boss now genuinely depends on them, exactly like it did the tank.
+    st.dreadCurseTimer = 0.01;
+    nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+    expect(dps[0].auras.find((a) => a.id === 'nythraxis_dread_curse')?.stacks).toBe(2);
+  });
+
   it('Dread Curse holds while the aggro holder is out of melee reach', () => {
     const { sim, ctx, boss, tank } = setup();
     const st = nythraxis.initNythraxisEncounter(boss);

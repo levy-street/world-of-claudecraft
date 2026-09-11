@@ -5711,6 +5711,11 @@ export interface NythraxisEncounterState {
   // Dread Curse (the tank swap, both difficulties): only the cadence lives
   // here; the stacks live on the victim's aura (nythraxis_dread_curse.ts).
   dreadCurseTimer?: number;
+  // Who Dread Curse currently treats as the settled tank, tracked separately
+  // from the live boss.aggroTargetId so a taunt back onto a still-cursed
+  // player can be told apart from a genuine swap-in and refused (see
+  // enforceNythraxisDreadCurseSwap in encounters/nythraxis.ts).
+  dreadCurseHolderId?: number | null;
   // Bone Spike cadence and the live spike/victim pairs (nythraxis_bone_spike.ts).
   boneSpikeTimer?: number;
   boneSpikes?: NythraxisBoneSpike[];

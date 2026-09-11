@@ -112,6 +112,7 @@ import {
   castNythraxisDreadCurse,
   NYTHRAXIS_DREAD_CURSE_AURA_ID,
   NYTHRAXIS_DREAD_CURSE_EVERY,
+  nythraxisDreadCurseStacks,
 } from '../nythraxis_dread_curse';
 import {
   NYTHRAXIS_CROWN_ENDURES_AURA_ID,
@@ -211,6 +212,7 @@ type NythraxisCallout = Extract<SimEvent, { type: 'nythraxisCallout' }>['call'];
 type NythraxisState = NonNullable<Entity['nythraxis']>;
 type NythraxisMechanicField =
   | 'dreadCurseTimer'
+  | 'dreadCurseHolderId'
   | 'boneSpikeTimer'
   | 'boneSpikes'
   | 'eruptionSettleTimer'
@@ -246,6 +248,7 @@ const NYTHRAXIS_MAJOR_GAP_SECONDS = 6;
  */
 export function nythraxisMechanicState(st: NythraxisState): NythraxisMechanicState {
   st.dreadCurseTimer ??= NYTHRAXIS_DREAD_CURSE_EVERY;
+  st.dreadCurseHolderId ??= null;
   st.boneSpikeTimer ??= NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS;
   st.boneSpikes ??= [];
   st.eruptionSettleTimer ??= 0;
@@ -489,6 +492,7 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       dreadCurseTimer: NYTHRAXIS_DREAD_CURSE_EVERY,
+      dreadCurseHolderId: null,
       boneSpikeTimer: NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
       boneSpikes: [],
       eruptionSettleTimer: 0,
@@ -955,12 +959,49 @@ export function emitNythraxisCallout(
 
 // ----- Dread Curse: the tank swap (both difficulties) --------------------------
 
+/**
+ * The swap must hold: once the boss has settled onto a raider who does not
+ * carry a live Dread Curse stack, he must not be turned back onto whoever
+ * still does, even by their own taunt. Without this a momentary taunt (from
+ * anyone, tank-specced or not) intercepts a single scheduled application, and
+ * the old holder's own stack then lapses on its unrefreshed 20 s clock before
+ * the next one lands, which reads to the raid as the debuff "resetting"
+ * rather than forcing the real hold it exists for. Runs every tick, ahead of
+ * the cadence check, so a taunt-back is corrected the same tick it lands.
+ * Compares against the LAST settled holder rather than scanning the threat
+ * table, so it never second-guesses a tank who simply hasn't been swapped off
+ * yet: a threat-table scan would pick off the top DPS the instant the tank's
+ * own stack lands, since they always outrank a DPS's threat.
+ */
+export function enforceNythraxisDreadCurseSwap(
+  ctx: SimContext,
+  boss: Entity,
+  ms: NythraxisMechanicState,
+): void {
+  const held = boss.aggroTargetId !== null ? ctx.entities.get(boss.aggroTargetId) : null;
+  const prior = ms.dreadCurseHolderId !== null ? ctx.entities.get(ms.dreadCurseHolderId) : null;
+  if (
+    held &&
+    !held.dead &&
+    prior &&
+    !prior.dead &&
+    prior.id !== held.id &&
+    nythraxisDreadCurseStacks(prior, boss.id) === 0 &&
+    nythraxisDreadCurseStacks(held, boss.id) > 0
+  ) {
+    boss.aggroTargetId = prior.id;
+    return;
+  }
+  if (held && !held.dead) ms.dreadCurseHolderId = held.id;
+}
+
 export function updateNythraxisDreadCurse(
   ctx: SimContext,
   boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
 ): void {
   const ms = nythraxisMechanicState(st);
+  enforceNythraxisDreadCurseSwap(ctx, boss, ms);
   const target = boss.aggroTargetId !== null ? ctx.entities.get(boss.aggroTargetId) : null;
   if (!target || target.dead || target.kind !== 'player') return;
   ms.dreadCurseTimer -= DT;
