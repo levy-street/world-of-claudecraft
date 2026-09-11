@@ -151,7 +151,8 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
 7. **Can telemetry survive both local and fleet paths?** New fields must be finite, null-safe when
    the browser or source is unavailable, and bounded in count, depth, string length, and bytes.
    Trace producer -> `PerfSnapshot`/`perfStats()` -> `payloadFromSnapshot()` -> `rawSummary` ->
-   `server/perf_report.ts` sanitization and `compactRawSummary()` fallback. Keep local raw traces
+   `server/perf_report.ts` sanitization and the `perf_report_shed.ts` byte-cap shed ladder
+   (`raw_summary.dropped` names the shed rungs). Keep local raw traces
    (`?perf`, `window.__game.perf.report()`, raw scenario/capture JSON) distinct from fleet-visible
    fields. Loopback-only `devTrace` must not leak to ordinary reports. A compact or truncated
    report must preserve the diagnostic that motivated the field, or explicitly document that it

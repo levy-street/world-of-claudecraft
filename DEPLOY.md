@@ -845,6 +845,12 @@ For off-box safety, sync the directory to S3 occasionally:
   it (`shader_warm_worker_active`, `shader_warm_refusal`, both bounded at
   ingest), plus `raw_summary.shaderWarm` for the per-session detail (mode,
   setting, backend, and the warmed / held counts).
+  `raw_summary` itself is capped in bytes by a priority shed ladder
+  (`server/perf_report_shed.ts`): an oversized report loses its biggest,
+  least diagnostic blocks one rung at a time and records them under
+  `raw_summary.dropped`, so a key that is absent AND unlisted there was never
+  sent, and the small diagnostic keys (`windows`, `bootPhases`, `shaderWarm`,
+  `postRevealLinks`, `rendererDrawingBuffer`, `browser`) survive on every row.
 - **Multi-realm scraping**: one server process hosts exactly one realm, and no
   exported series carries a `realm` label (pinned by the exporter tests; the
   DB-backed business family filters on the realm in its queries instead). Give
