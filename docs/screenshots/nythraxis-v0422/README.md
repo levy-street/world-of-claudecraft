@@ -32,3 +32,31 @@ and prepare a diff that names the spike GLB (or any Bone Spike source path):
 printf 'diff --git a/public/models/props/nythraxis_bone_spike.glb b/public/models/props/nythraxis_bone_spike.glb\n--- a/public/models/props/nythraxis_bone_spike.glb\n+++ b/public/models/props/nythraxis_bone_spike.glb\n' > /tmp/spike.diff
 GAME_URL=http://localhost:5173 DIFF_FILE=/tmp/spike.diff SHOTS_DIR=/tmp/spike-shots node scripts/pr_screenshots.mjs
 ```
+
+# Second batch: ward spikes and the sigil beside the boss
+
+`before-sigil-side-ward-*.png` / `after-sigil-side-ward-*.png`, captured the
+same day with the `nythraxis-sigil-side` target (added by the second PR).
+
+| Capture | Source |
+| --- | --- |
+| Before | The branch worktree detached at the first PR's head `48468cee18` (its own dev server), with the second PR's target script copied over so the same rig drives both legs |
+| After | Second PR head |
+
+Same live offline Normal practice raid, lowest preset, same camera. The rig
+pulls the raid with a bot holding aggro, pokes one Bone Spike wave and one
+Binding Sigil, freezes the tick, and has the tester target a spike so the target
+frame shows its pool.
+
+What the images show: before, the target frame reads `1000 / 1000` (the spike's
+health pool) and the sigil sits wherever its hash spot fell (here far back near
+the wall to the raid's right); after, the target frame reads `4 / 4` (the ward's
+hit count on Normal) and the sigil flares 22 yd beside the boss on the raid's
+right (world -x, which is the screen's right looking up the hall). The images do
+not measure the click capsule (a picking radius, not a drawn thing), the hit rule
+itself, or the Gravefire retirement (an absence).
+
+```sh
+printf 'diff --git a/src/sim/nythraxis_binding_sigil.ts b/src/sim/nythraxis_binding_sigil.ts\n--- a/src/sim/nythraxis_binding_sigil.ts\n+++ b/src/sim/nythraxis_binding_sigil.ts\n' > /tmp/sigil.diff
+GAME_URL=http://localhost:5173 DIFF_FILE=/tmp/sigil.diff SHOTS_DIR=/tmp/sigil-shots node scripts/pr_screenshots.mjs
+```
