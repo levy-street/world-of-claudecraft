@@ -10852,7 +10852,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.earnedBy': '由 {names} 獲得',
   'hudChrome.deeds.earnerWithDate': '{name}（{date}）',
   'hudChrome.deeds.accountScopeNote': '帳號下所有角色共享',
-  'hudChrome.deeds.accountScopeHint': '帳號內任一角色完成的功業在此同樣算達成，且書中會記下是誰完成的。',
+  'hudChrome.deeds.accountScopeHint':
+    '帳號內任一角色完成的功業在此同樣算達成，且書中會記下是誰完成的。',
   'hudChrome.deeds.hiddenBadge': '隱藏',
   'hudChrome.deeds.titleChip': '頭銜獎勵',
   'hudChrome.deeds.borderChip': '邊框獎勵',

@@ -62,7 +62,6 @@ import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/se
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import {
-  accountReliquaryOwnership,
   catalogCharacterCompletion,
   curatorRankFromOwned,
   reliquaryWireJson,

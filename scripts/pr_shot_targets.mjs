@@ -1088,6 +1088,11 @@ export const TARGETS = [
       if (!seeded.ok) throw new Error(`account ledger deeds seeding failed: ${seeded.reason}`);
       const opened = await pollForSize(page, '#deeds-window');
       if (!opened) throw new Error('deeds window did not open');
+      // The Earned filter through the real chip, so the alt-earned cards (and
+      // their "Earned by" foot) lead the list instead of sitting below the clip.
+      await page.evaluate(() => {
+        document.querySelector('#deeds-window [data-filter="earned"]')?.click();
+      });
       await wait(400);
       return { clip: '#deeds-window' };
     },

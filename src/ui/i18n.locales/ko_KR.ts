@@ -11379,7 +11379,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.earnedBy': '{names} 획득',
   'hudChrome.deeds.earnerWithDate': '{name} ({date})',
   'hudChrome.deeds.accountScopeNote': '계정의 모든 캐릭터가 공유',
-  'hudChrome.deeds.accountScopeHint': '계정의 어떤 캐릭터가 이룬 업적이든 여기서도 달성으로 기록되며, 서에는 누가 달성했는지가 남습니다.',
+  'hudChrome.deeds.accountScopeHint':
+    '계정의 어떤 캐릭터가 이룬 업적이든 여기서도 달성으로 기록되며, 서에는 누가 달성했는지가 남습니다.',
   'hudChrome.deeds.hiddenBadge': '숨김',
   'hudChrome.deeds.titleChip': '칭호 보상',
   'hudChrome.deeds.borderChip': '테두리 보상',
@@ -12636,7 +12637,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.foundBy': '{names} 발견',
   'hudChrome.reliquary.finderWithDate': '{name} ({date})',
   'hudChrome.reliquary.sharedScopeNote': '계정의 모든 캐릭터가 공유',
-  'hudChrome.reliquary.sharedScopeHint': '계정의 어떤 캐릭터가 찾은 성유물이든 여기서도 페이지를 채웁니다.',
+  'hudChrome.reliquary.sharedScopeHint':
+    '계정의 어떤 캐릭터가 찾은 성유물이든 여기서도 페이지를 채웁니다.',
   'hudChrome.reliquary.unlockToast': '성물 수록: {name}',
   'hudChrome.reliquary.illuminateBanner': '페이지 조명됨: {name}',
   'hudChrome.reliquary.illuminateToast': '{name}의 모든 성물이 채워졌습니다.',

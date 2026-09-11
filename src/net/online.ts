@@ -67,7 +67,6 @@ import {
   curatorRankFromOwned,
   pageCompletion,
   RELIQUARY_PAGES_BY_ID,
-  reliquaryOwnershipOpts,
   restoreReliquaryState,
   type SavedReliquaryState,
 } from '../sim/reliquary';

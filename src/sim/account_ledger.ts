@@ -307,5 +307,5 @@ export function earnedByCharacter(
   earners: readonly AccountEarner[] | undefined,
   characterId: number,
 ): boolean {
-  return earners !== undefined && earners.some((e) => e.characterId === characterId);
+  return earners?.some((e) => e.characterId === characterId) ?? false;
 }

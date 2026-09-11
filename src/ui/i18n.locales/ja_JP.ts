@@ -11410,7 +11410,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.earnedBy': '{names} が獲得',
   'hudChrome.deeds.earnerWithDate': '{name}（{date}）',
   'hudChrome.deeds.accountScopeNote': 'アカウント内の全キャラクターで共有',
-  'hudChrome.deeds.accountScopeHint': 'アカウント内のどのキャラクターが成し遂げた功績もここで達成扱いになり、書は誰が達成したかを記します。',
+  'hudChrome.deeds.accountScopeHint':
+    'アカウント内のどのキャラクターが成し遂げた功績もここで達成扱いになり、書は誰が達成したかを記します。',
   'hudChrome.deeds.hiddenBadge': '隠し',
   'hudChrome.deeds.titleChip': '称号報酬',
   'hudChrome.deeds.borderChip': '枠飾り報酬',
@@ -12665,7 +12666,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.foundBy': '{names} が発見',
   'hudChrome.reliquary.finderWithDate': '{name}（{date}）',
   'hudChrome.reliquary.sharedScopeNote': 'アカウント内の全キャラクターで共有',
-  'hudChrome.reliquary.sharedScopeHint': 'アカウント内のどのキャラクターが見つけた聖遺物も、ここでページを埋めます。',
+  'hudChrome.reliquary.sharedScopeHint':
+    'アカウント内のどのキャラクターが見つけた聖遺物も、ここでページを埋めます。',
   'hudChrome.reliquary.unlockToast': '聖遺物を収蔵：{name}',
   'hudChrome.reliquary.illuminateBanner': 'ページが照耀されました：{name}',
   'hudChrome.reliquary.illuminateToast': '{name} の聖遺物がすべて埋まりました。',

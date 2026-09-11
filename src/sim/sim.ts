@@ -236,7 +236,6 @@ import {
   type DeedRuntime,
   deedStatsSaveFragment,
   freshDeedStats,
-  restoreDeedStats,
 } from './deeds';
 import { restoreBookOfDeeds, runBookOfDeedsJoinRetro } from './deeds_restore';
 import * as companionMod from './delves/companion';
