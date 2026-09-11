@@ -13,6 +13,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS,
   NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
   NYTHRAXIS_BONE_SPIKE_TINT,
   NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
@@ -36,6 +37,9 @@ describe('Nythraxis hazard palette acceptance pins', () => {
     expect(NYTHRAXIS_BONE_SPIKE_TINT).toBe(0xff7a1a);
     expect(NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH).toBe(1);
     expect(NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION).toBe(0.35);
+    // The click capsule is about twice the footprint-derived default (1.29),
+    // above the 2.2 cap ordinary defs get.
+    expect(NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS).toBe(2.6);
     expect(VISUALS.mob_nythraxis_bone_spike).toMatchObject({
       tint: 0xff7a1a,
       tintStrength: 1,

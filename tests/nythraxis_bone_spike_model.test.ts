@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import {
   manifestUrls,
+  NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS,
   NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
   NYTHRAXIS_BONE_SPIKE_TINT,
   NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
@@ -42,6 +43,9 @@ describe('Nythraxis Bone Spike model', () => {
       tint: NYTHRAXIS_BONE_SPIKE_TINT,
       tintStrength: NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
       selfIllumination: NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
+      // About twice the footprint-derived default, so a click near the spike
+      // lands on it rather than on the raider it pins (v0.42.2).
+      clickRadius: NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS,
       // STATIC_PROP: every action parks on the nominal 'Idle' the GLB lacks
       clips: {
         idle: 'Idle',

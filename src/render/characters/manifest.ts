@@ -207,6 +207,12 @@ export interface VisualDef {
    *  separate from `weaponSlots` so mainhand cosmetics cannot overwrite a live
    *  shield or second weapon. */
   offhandSlot?: number;
+  /** Click-capsule radius override (world units). The default derives from
+   *  the model footprint and is capped at 2.2 (assets.ts prepareVisual); a
+   *  def sets this when the thing has to be reliably clickable in a crowd
+   *  (the Nythraxis Bone Spike, which shares its footprint with the raider
+   *  it pins). Presentation-side targeting help only: the sim never reads it. */
+  clickRadius?: number;
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -1404,6 +1410,10 @@ const VELOCIRAPTOR: ClipMap = {
 export const NYTHRAXIS_BONE_SPIKE_TINT = 0xff7a1a;
 export const NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH = 1;
 export const NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION = 0.35;
+/** The spike's click capsule, about twice the footprint-derived default
+ *  (0.88 * 2.6/1.6 * 0.9 = 1.29): a click anywhere near the spike lands on
+ *  it, not on the raider it pins (owner call, 2026-09-11). */
+export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
 
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
@@ -3601,6 +3611,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: NYTHRAXIS_BONE_SPIKE_TINT,
     tintStrength: NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
     selfIllumination: NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
+    clickRadius: NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS,
   },
 };
 

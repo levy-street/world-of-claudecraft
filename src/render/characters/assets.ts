@@ -2496,13 +2496,15 @@ export function prepareVisual(key: string): PreparedVisual {
   const rawHeight = Math.max(1e-3, bounds.max.y - bounds.min.y);
   const normScale = def.height / rawHeight;
   const yOffset = (def.hover ?? 0) - bounds.min.y * normScale;
-  const clickRadius = Math.min(
-    2.2,
-    Math.max(
-      0.5,
-      Math.max(bounds.max.x, -bounds.min.x, bounds.max.z, -bounds.min.z) * normScale * 0.9,
-    ),
-  );
+  const clickRadius =
+    def.clickRadius ??
+    Math.min(
+      2.2,
+      Math.max(
+        0.5,
+        Math.max(bounds.max.x, -bounds.min.x, bounds.max.z, -bounds.min.z) * normScale * 0.9,
+      ),
+    );
 
   const norm = new THREE.Matrix4()
     .makeTranslation(0, yOffset, 0)
