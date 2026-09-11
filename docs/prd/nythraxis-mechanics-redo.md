@@ -248,13 +248,13 @@ Unbound sigils (compounding boss damage against the clock).
 | Mechanic | Normal | Heroic |
 |---|---|---|
 | Dread Curse | 25% hit, +35% per stack, swap at 2 | 30% hit, +45% per stack, swap at 2 |
-| Bone Spike | every 24 s, 2 victims, 8%/s, 55 s per-raider cooldown (v0.42.2) | every 20 s, 3 victims, 10%/s, 55 s per-raider cooldown (v0.42.2) |
+| Bone Spike | every 24 s, 2 victims, 8%/s, 4 hits to shatter, 55 s per-raider cooldown (v0.42.2) | every 20 s, 3 victims, 10%/s, 6 hits to shatter, 55 s per-raider cooldown (v0.42.2) |
 | Grave Eruption | every 15 s, 4 circles, 45%, flame 12 s at 6%/s | every 12 s, 6 circles, 75%, flame never goes out (clears at the transition) at 9%/s |
-| Binding Sigil | every 45 s, 10 to 24 yd out, 4 yd, 15 s to bind, +4%/stack, Bound 10 s, Unbound 40%, keeps +20% | every 40 s, 3 yd, 12 s, +5%/stack, Bound 8 s, Unbound 60%, keeps +25%, may land in fire |
+| Binding Sigil | every 45 s, 22 yd to the raid's left or right (alternating, v0.42.2), 4 yd, 15 s to bind, +4%/stack, Bound 10 s, Unbound 40%, keeps +20% | every 40 s, same placement, 3 yd, 12 s, +5%/stack, Bound 8 s, Unbound 60%, keeps +25%, may land in fire |
 | Soul Rend | 3 marks, 100% split, no pool since v0.42.2 | 6 marks, 150% split, no pool since v0.42.2 |
 | Deathless Rage | 82% on failure (unchanged) | 115% on failure, lethal, court rises (unchanged) |
-| Gravefire | every 12 s, burns 6 s at 10%/s | every 10 s, burns 8 s at 15%/s |
-| Phase 3 Wrath | +20% damage, eruptions every 10 s, Gravefire every 8 s | +25% damage, eruptions every 8 s, Gravefire every 6 s |
+| Gravefire | retired from play in v0.42.2 (no line, no slam line) | retired from play in v0.42.2 |
+| Phase 3 Wrath | +20% damage, eruptions every 10 s | +25% damage, eruptions every 8 s |
 | Bone Storm | every 50 s, whirl 10%/s, Bone Slam 35% | every 40 s, whirl 20%/s, Bone Slam 55% |
 | The Crown Endures | 6:00 (the clock pauses for the transition), +25% every 30 s | 5:00, +25% every 20 s |
 | Court (Aldren, Malric, Voss) | absent | after a failed Rage and after each interrupt stun |
@@ -573,3 +573,44 @@ health change, and one raider could be spiked several waves running.
   (8% / 10% per second), spike health (1,000 on both difficulties since
   v0.42.1), Grave Eruption, Grave Flame, Gravefire, Binding Sigil, Dread
   Curse, Deathless Rage, Bone Storm, and every phase buff.
+
+## 16. Hotfix v0.42.2, second batch (2026-09-11): wards, no Gravefire, sigil sides
+
+Same day as section 15, after the first batch went up for review. Supersedes
+only the points named below.
+
+- **Bone Spikes are wards.** A spike takes HITS to clear, not damage: 4 hits
+  on Normal, 6 on Heroic, from anyone (any player or player-owned pet), each
+  hit counting one whatever it would have dealt (a poke, a crit, a DoT tick
+  all count one; a wild mob's damage does not count). The spike's health
+  pool IS the hit count, so its health bar reads as hits remaining, and the
+  rule lives at the one damage funnel (`combat/damage.ts` through
+  `nythraxisBoneSpikeWardHit`). The 1,000 hp pool of v0.42.1 is gone; the
+  per-mob multiplier override stays as a no-op mirror of Normal's.
+- **Bone Spikes are easier to click.** The spike's click capsule is about
+  twice the footprint-derived default (`clickRadius` on the visual def, a
+  presentation-only override), so a click near the spike lands on it and not
+  on the raider it pins. Healers reach the impaled raider through the raid
+  frames as before.
+- **Gravefire is retired from play.** Neither the cadence cast (phase 2 and
+  3, the King's Wrath tightening included) nor the Bone Slam's line down the
+  charge ignites any more. The line tick, readout, wire, renderer, callout
+  key, and the leaf constants stay as dormant plumbing, the same treatment as
+  Soulfire; the Raid Boss Guide row, the finder chip, and the `/dev nyx
+  gravefire` poke are gone. Bone Storm is now the whirl, the charges, and the
+  slam burst alone.
+- **The Binding Sigil lands beside the boss on the raid's left or right.** No
+  more hash ring 12 to 30 yd out: the sigil lands 22 yd from the boss along
+  the hall's x axis (the open floor between the dais and the pillar rows),
+  at his own z, alternating sides every cast starting on the raid's right.
+  A blocked spot (pillar, tomb, wardstone, Normal fire) walks a fixed ladder
+  on the same side (z nudges of 6, 12, 18 yd, then the same at 16 yd out);
+  the last resort is the primary spot itself, never under the boss. The
+  arena has no raised platforms in the sim (a flat fighting floor by
+  design), so "on platforms" is read as this open floor; if the intent was
+  the tomb alcoves along the walls, `NYTHRAXIS_SIGIL_SIDE_OFFSET` is the one
+  constant to move.
+- **Unchanged by this pass:** the spike cadence, victims per wave, the impale
+  drain, the 55 s per-raider cooldown, Grave Eruption and Grave Flame, Dread
+  Curse, Deathless Rage, the sigil's cadence, radius, bind window, Ascension
+  and Bound rules, and every phase buff.
