@@ -377,3 +377,40 @@ export class RingOfFrostVisuals {
     for (const geometry of ring.ownedGeometries) geometry.dispose();
   }
 }
+
+/**
+ * The boot manifest's stand-in: one visual of its own, holding one ring that
+ * never expires, so the four material programs a live ring draws with (edge
+ * lines, band, shards, motes) are linked behind the loading cover and stay
+ * referenced for the session. The live instance mints its own materials, but
+ * a program is shared by cache key, and this ring's are never released: the
+ * first Ring of Frost in a fight used to link the shard program live
+ * (2026-09-12 hunt). Registered in ABILITY_MATERIAL_SOURCES.
+ */
+interface RingOfFrostStandIn {
+  root: THREE.Scene;
+  materials: THREE.Material[];
+}
+let ringOfFrostStandIn: RingOfFrostStandIn | null = null;
+
+export function ringOfFrostStandInMaterials(): readonly THREE.Material[] {
+  return buildRingOfFrostStandIn().materials;
+}
+
+export function buildRingOfFrostStandIn(): RingOfFrostStandIn {
+  if (!ringOfFrostStandIn) {
+    const root = new THREE.Scene();
+    root.name = 'ring-of-frost-stand-in';
+    const visuals = new RingOfFrostVisuals(root, () => 0);
+    visuals.spawn({ x: 0, z: 0, radius: 3, innerRadius: 1, duration: Number.MAX_SAFE_INTEGER });
+    const materials: THREE.Material[] = [];
+    root.traverse((object) => {
+      const material = (object as THREE.Mesh).material;
+      if (material && !Array.isArray(material) && !materials.includes(material)) {
+        materials.push(material);
+      }
+    });
+    ringOfFrostStandIn = { root, materials };
+  }
+  return ringOfFrostStandIn;
+}

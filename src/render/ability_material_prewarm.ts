@@ -32,6 +32,7 @@ import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visua
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
 import { IceBlockVisual, iceMaterials } from './ice_block_visual';
 import { buildGroundFireAoeStandIn, groundFireAoeMaterials } from './ignivar_fire_vfx';
+import { buildRingOfFrostStandIn, ringOfFrostStandInMaterials } from './ring_of_frost_visual';
 import { TemporalHourglassVisual, temporalHourglassMaterials } from './temporal_hourglass_visual';
 
 /** The reference rig height these visuals scale against; the scale reaches the
@@ -103,6 +104,16 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'ignivar_fire_vfx.ts',
     materials: () => Object.values(groundFireAoeMaterials()),
     build: () => buildGroundFireAoeStandIn(),
+  },
+  {
+    // Ring of Frost pools its materials per instance (class fields, not a
+    // module cache), so the first ring of a fight minted and linked every
+    // program live; one never-expiring ring on a stand-in of its own holds
+    // them for the session.
+    id: 'ring-of-frost',
+    module: 'ring_of_frost_visual.ts',
+    materials: () => [...ringOfFrostStandInMaterials()],
+    build: () => buildRingOfFrostStandIn().root,
   },
   {
     // Not a spell: the Proving Shore coach's guidance (ribbon, ring, aura,
