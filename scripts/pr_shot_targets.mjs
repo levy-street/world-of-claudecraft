@@ -6601,6 +6601,78 @@ export const TARGETS = [
     },
   },
   {
+    key: 'meters-pvp',
+    label: 'Damage meters: damage dealt to a player (duel) shows on the Damage tab',
+    // The Damage tab used to drop every hit whose target was a player, so a
+    // duel left the meter empty. The offline world has no second player to
+    // duel, so this drives MeterData directly (the same approach the HoT
+    // cooldown target above takes) against a world view carrying a stand-in
+    // opponent entity: the same script on the base commit shows the empty
+    // hint, on this branch it shows the duel damage.
+    when: ['ui/meters.ts'],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Rurik' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Rurik', mobile: true },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return;
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const meters = game?.hud?.meters;
+        if (!meters) return;
+        meters.dock?.('heal');
+        meters.dock?.('threat');
+        meters.resetFrames?.();
+        const rival = { id: 900_001, kind: 'player', name: 'Rival', templateId: 'rogue' };
+        const world = {
+          entities: new Map([
+            [player.id, player],
+            [rival.id, rival],
+          ]),
+          player,
+        };
+        const party = new Set([player.id]);
+        const dmg = (amount, ability, t) =>
+          meters.data.onEvent(
+            {
+              type: 'damage',
+              sourceId: player.id,
+              targetId: rival.id,
+              amount,
+              crit: false,
+              school: 'physical',
+              ability,
+              kind: 'hit',
+            },
+            world,
+            party,
+            t,
+          );
+        // Anchored to the live clock so the HUD's own update() sees an OPEN
+        // segment and the shot reads "Current", not a closed history entry.
+        const t0 = performance.now();
+        dmg(310, 'Mortal Strike', t0 - 2100);
+        dmg(140, 'Heroic Strike', t0 - 1300);
+        dmg(95, null, t0 - 700);
+        dmg(210, 'Whirlwind', t0);
+        meters.render(true);
+        const el = document.querySelector('#meters-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleMeters?.();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+      });
+      const open = await pollForSize(page, '#meters-window');
+      if (!open) return {};
+      await wait(600);
+      return { clip: '#meters-window' };
+    },
+  },
+  {
     key: 'meters',
     label: 'Damage meters: bars plus the per-ability hover breakdown',
     when: ['ui/meters', 'meters_breakdown'],

@@ -259,7 +259,26 @@ export class MeterData {
 
     if (ev.type === 'damage' && sourceInParty && ev.kind === 'hit' && ev.amount > 0) {
       const target = world.entities.get(ev.targetId);
-      if (target && target.kind === 'mob') {
+      // A hit on an OPPOSING player (duel, arena, battleground) is real party
+      // output and belongs on the Damage tab like any mob hit. The target must
+      // be outside the party: a self-sourced DoT (delve Bad Air, a Cauterize
+      // burn) also arrives as a player-target hit and is not output. It skips
+      // the mob-only bookkeeping below: threat tables, dmgByMob, and the threat
+      // subject, which have no meaning for a player target.
+      if (target && target.kind === 'player' && !partyPids.has(ev.targetId)) {
+        const who = this.attribute(world, ev.sourceId, partyPids);
+        for (const enc of [this.current, this.allTime]) {
+          const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
+          t.dmg += ev.amount;
+          addBreakdown(t.dmgByAbility, who.petName, ev.ability, ev.amount);
+        }
+        // Name the segment after the FIRST opponent hit (a battleground has
+        // many, and the label must not flip per hit) until a mob claims it; a
+        // player name is literal text, so it needs no entity localization.
+        if (this.current.biggestMobHp < 0 && this.current.label === 'Combat') {
+          this.current.label = target.name;
+        }
+      } else if (target && target.kind === 'mob') {
         const who = this.attribute(world, ev.sourceId, partyPids);
         for (const enc of [this.current, this.allTime]) {
           const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
@@ -723,7 +742,7 @@ export class MetersPanel {
         ? viewName
         : enc.mainMobTemplateId
           ? tEntity({ kind: 'mob', id: enc.mainMobTemplateId, field: 'name' })
-          : enc.mainMobName;
+          : enc.mainMobName || enc.label; // PvP segments carry the opponent's name as the label
     // Say plainly when the bars are the damage fallback rather than hate: the
     // numbers are honest, but under a "Threat" heading they read as hate and a
     // player acts on them. A FROZEN read is real hate too, just no longer
