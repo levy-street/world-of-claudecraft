@@ -430,15 +430,14 @@ describe('Renderer live shader compile rejection recovery', () => {
     );
   });
 
-  it('gates every buildInterior return path except the caldera light rig', () => {
+  it('gates every buildInterior return path, the Wildheart caldera included', () => {
     // The authored room-graph floors (Last Keep, Dawnhold, the Infernal
     // Citadel) returned early through a bare this.scene.add(group), so those
     // interiors linked their programs on their first visible frame. The
-    // Wildheart caldera arm stays a bare add on purpose: its rig adds a
-    // hemisphere and a directional light, which relinks every lit material in
-    // the scene at the reveal whatever the group's own gate compiled (a gate
-    // compiles the group at the OLD light census, so it would only add a hidden
-    // window); pre-linking a scene-wide light census is a backlog item.
+    // Wildheart caldera arm used to be a deliberate bare add because its rig
+    // added a hemisphere and a directional light (a gate compiles at the OLD
+    // light census); those lights now live in interior_light_rig.ts's
+    // wildheartField grade, so the arm gates like every other interior.
     const dungeonSource = readFileSync(
       new URL('../src/render/dungeon.ts', import.meta.url),
       'utf8',
@@ -450,12 +449,14 @@ describe('Renderer live shader compile rejection recovery', () => {
     const gated = body.split('await attachSceneGroupGated(').length - 1;
     const bareAdds = body.split('this.scene.add(group);').length - 1;
     expect(returns).toBeGreaterThanOrEqual(3);
-    expect(bareAdds).toBe(1);
-    expect(gated).toBe(returns - 1);
+    expect(bareAdds).toBe(0);
+    expect(gated).toBe(returns);
     const wildheart = body.indexOf("if (interior === 'wildheart')");
     expect(wildheart).toBeGreaterThan(-1);
     const wildheartArm = body.slice(wildheart, body.indexOf('return group;', wildheart));
-    expect(wildheartArm).toContain('this.scene.add(group);');
+    expect(wildheartArm).toContain(
+      'await attachSceneGroupGated(this.scene, group, this.compileGate);',
+    );
   });
 
   it('ignores a rejection after renderer shutdown starts', async () => {

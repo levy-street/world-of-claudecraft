@@ -125,6 +125,26 @@ describe('chunked DataTexture upload', () => {
     expect(initTexture).toHaveBeenCalledWith(texture);
   });
 
+  it('uses one full upload for a flipY DataTexture, whose rows cannot be ranged', async () => {
+    // The ranged path uploads one row per texSubImage2D at that row's own y;
+    // the flip only mirrors the rows inside each call, so the image would
+    // land upside down against its UVs (the Wildheart grass tuft card).
+    const texture = new THREE.DataTexture(new Uint8Array(8 * 5 * 4), 8, 5);
+    texture.flipY = true;
+    const initTexture = vi.fn();
+    const beforeChunk = vi.fn(async () => undefined);
+    const chunks = await uploadDataTextureInChunks({ initTexture }, texture, {
+      maxChunkBytes: 32,
+      beforeChunk,
+    });
+
+    expect(chunks).toBe(1);
+    expect(beforeChunk).toHaveBeenCalledOnce();
+    expect(initTexture).toHaveBeenCalledOnce();
+    expect(initTexture).toHaveBeenCalledWith(texture);
+    expect(texture.updateRanges).toEqual([]);
+  });
+
   it('falls back to one normal upload for non-data textures', async () => {
     const initTexture = vi.fn();
     const beforeChunk = vi.fn(async () => undefined);

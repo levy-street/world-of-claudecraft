@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
 import { formatNumber, getI18nRevision, t } from '../ui/i18n';
+import { attachSceneGroupGated } from './gated_scene_attach';
 
 const UP = new THREE.Vector3(0, 1, 0);
 const BEAM_HEIGHT = 4.8;
@@ -418,6 +419,12 @@ export class VarkhulForgeBeamVisuals {
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
+    // The renderer's live compile gate: Varkhul is already active when the
+    // player steps through the Crucible gate, so the forge meter's first
+    // sync lands before the interior's encounter prewarm has run; a gated
+    // attach links its programs hidden instead of on the arrival frame
+    // (2026-09-12 hunt: the heat segments, twice in two sessions).
+    private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>,
   ) {}
 
   sync(assemblies: readonly ActiveVarkhulAssembly[]): void {
@@ -428,7 +435,13 @@ export class VarkhulForgeBeamVisuals {
       if (!visual) {
         visual = createVisual(state.bossId);
         this.visuals.set(state.bossId, visual);
-        this.scene.add(visual.root);
+        const attached = visual;
+        void attachSceneGroupGated(
+          this.scene,
+          visual.root,
+          this.compileGate,
+          () => this.visuals.get(state.bossId) !== attached,
+        ).catch(() => undefined);
       }
       visual.root.userData.overheat = state.forgeOverheat;
       visual.root.userData.warmupRemaining = state.forgeBeamWarmupRemaining;

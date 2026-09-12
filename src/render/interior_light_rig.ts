@@ -8,7 +8,7 @@
 // the lowGfx guard, and the per-frame outdoor grading whose current values
 // arrive here as the outdoor fallbacks); this module owns WHAT each state
 // means in light.
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { sharedUniforms } from './gfx';
 import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
 import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
@@ -61,8 +61,20 @@ const YUMI_MAZE_SUN_INTENSITY = 1.32;
 const YUMI_MAZE_HEMI_INTENSITY = 0.38;
 const YUMI_MAZE_ENV_INTENSITY = 0.25;
 const YUMI_MAZE_RIM_BOOST = 1.7;
-const WILDHEART_SUN_INTENSITY = 1.75;
-const WILDHEART_HEMI_INTENSITY = 0.59;
+// Wildheart's sunlit caldera: the legs carry what used to be a second
+// directional (0.88) and hemisphere (0.9) fill pair added by wildheart_props.ts
+// on top of these, folded in here so the light census never changes. The
+// fill sun cast no shadow, so it lit the faces the shadowed world sun leaves
+// dark (the gate arch fronts, the ground under the totems); the unshadowed
+// hemisphere takes that share and the sun a little less than the plain sum
+// (ground band measured at 41 before, 45 after, headless at the gate).
+const WILDHEART_SUN_INTENSITY = 2.4;
+const WILDHEART_HEMI_INTENSITY = 1.8;
+// Where the caldera's sun stands: the direction the removed fill pair aimed
+// from (position (-45, 72, -35) at target (0, 2, 135)), so the gate arch and
+// the totems keep their lit faces. The renderer's per-frame key-light aim
+// takes it in place of the world sun while the field is the fog state.
+export const WILDHEART_KEY_LIGHT_DIRECTION = new THREE.Vector3(-45, 70, -170).normalize();
 const WILDHEART_ENV_INTENSITY = 0.28;
 const WILDHEART_RIM_BOOST = 1.5;
 const WILDHEART_SUN_COLOR = 0xffd48c;
@@ -109,6 +121,14 @@ export interface OutdoorLightLegs {
   sunIntensity: number;
   hemiIntensity: number;
   envIntensity: number;
+}
+
+/** Copy the state's own key-light direction into `out` when it has one; the
+ *  outdoor sun and moon keep theirs otherwise. Returns whether it did. */
+export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vector3): boolean {
+  if (state !== 'wildheartField') return false;
+  out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
+  return true;
 }
 
 /**

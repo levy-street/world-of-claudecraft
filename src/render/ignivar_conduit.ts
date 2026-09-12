@@ -20,8 +20,10 @@ export const IGNIVAR_CONDUIT_ACTIVE_BEACON_NAME = 'ignivarWaterActiveBeacon';
 const templates = new Map<IgnivarConduitState, THREE.Group>();
 let stableTemplate: THREE.Group | null = null;
 
-function sharedMaterial(options: Parameters<typeof surfaceMat>[0]): THREE.Material {
-  return markSharedMaterial(surfaceMat(options));
+function sharedMaterial(name: string, options: Parameters<typeof surfaceMat>[0]): THREE.Material {
+  const material = markSharedMaterial(surfaceMat(options));
+  material.name = `ignivarConduit:${name}`;
+  return material;
 }
 
 function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, y: number): THREE.Mesh {
@@ -33,11 +35,12 @@ function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, y: numbe
 }
 
 function waterGlowMaterial(
+  name: string,
   color: number,
   opacity: number,
   blending: THREE.Blending = THREE.AdditiveBlending,
 ): THREE.MeshBasicMaterial {
-  return markSharedMaterial(
+  const material = markSharedMaterial(
     new THREE.MeshBasicMaterial({
       color,
       transparent: true,
@@ -48,6 +51,8 @@ function waterGlowMaterial(
       toneMapped: false,
     }),
   );
+  material.name = `ignivarConduit:${name}`;
+  return material;
 }
 
 function horizontalMesh(
@@ -63,8 +68,8 @@ function horizontalMesh(
 }
 
 function addReadyVisual(group: THREE.Group): void {
-  const readyMaterial = waterGlowMaterial(0x5bdcf3, 0.78);
-  const coreMaterial = waterGlowMaterial(0x9af3ff, 0.92, THREE.NormalBlending);
+  const readyMaterial = waterGlowMaterial('readyPool', 0x5bdcf3, 0.78);
+  const coreMaterial = waterGlowMaterial('readyCore', 0x9af3ff, 0.92, THREE.NormalBlending);
   const marker = new THREE.Group();
   marker.name = 'ignivarWaterReadyMarker';
   marker.userData.ignivarConduitLayer = 'readyBeacon';
@@ -100,7 +105,7 @@ function addReadyVisual(group: THREE.Group): void {
 }
 
 function addCooldownVisual(group: THREE.Group, sealMaterial: THREE.Material): void {
-  const capMaterial = sharedMaterial({
+  const capMaterial = sharedMaterial('cooldownCap', {
     color: 0x202a2d,
     roughness: 0.98,
     metalness: 0.02,
@@ -125,7 +130,7 @@ function buildActivationRune(): THREE.Group {
   const rune = new THREE.Group();
   rune.name = IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME;
   rune.userData.ignivarConduitLayer = 'activationRune';
-  const runeMaterial = waterGlowMaterial(0x45dcff, 0.9);
+  const runeMaterial = waterGlowMaterial('activationRune', 0x45dcff, 0.9);
 
   const outer = horizontalMesh(new THREE.RingGeometry(2.5, 2.78, 8), runeMaterial, 0.055);
   outer.name = 'ignivarWaterActivationRuneGlow';
@@ -179,9 +184,9 @@ function buildActiveBeacon(): THREE.Group {
   const beacon = new THREE.Group();
   beacon.name = IGNIVAR_CONDUIT_ACTIVE_BEACON_NAME;
   beacon.userData.ignivarConduitLayer = 'activeBeacon';
-  const outerMaterial = waterGlowMaterial(0x3fdcff, 0.34);
-  const coreMaterial = waterGlowMaterial(0xd9fcff, 0.92);
-  const crownMaterial = waterGlowMaterial(0x8ff4ff, 0.9);
+  const outerMaterial = waterGlowMaterial('beaconOuter', 0x3fdcff, 0.34);
+  const coreMaterial = waterGlowMaterial('beaconCore', 0xd9fcff, 0.92);
+  const crownMaterial = waterGlowMaterial('beaconCrown', 0x8ff4ff, 0.9);
 
   const outer = mesh(new THREE.CylinderGeometry(0.72, 0.5, 6.2, 16, 1, true), outerMaterial, 3.55);
   outer.name = 'ignivarWaterActiveBeaconOuter';
@@ -203,11 +208,16 @@ function buildActiveBeacon(): THREE.Group {
 }
 
 function addActiveVisual(group: THREE.Group): void {
-  const footprintMaterial = waterGlowMaterial(0x269dcc, 0.14, THREE.NormalBlending);
-  const boundaryMaterial = waterGlowMaterial(0x55e6ff, 0.82);
-  const columnMaterial = waterGlowMaterial(0x4bdcf6, 0.48, THREE.NormalBlending);
-  const coreMaterial = waterGlowMaterial(0xb8f8ff, 0.78);
-  const steamMaterial = waterGlowMaterial(0xa8f5ff, 0.25, THREE.NormalBlending);
+  const footprintMaterial = waterGlowMaterial(
+    'cleanseFootprint',
+    0x269dcc,
+    0.14,
+    THREE.NormalBlending,
+  );
+  const boundaryMaterial = waterGlowMaterial('cleanseBoundary', 0x55e6ff, 0.82);
+  const columnMaterial = waterGlowMaterial('jetColumn', 0x4bdcf6, 0.48, THREE.NormalBlending);
+  const coreMaterial = waterGlowMaterial('jetCore', 0xb8f8ff, 0.78);
+  const steamMaterial = waterGlowMaterial('steam', 0xa8f5ff, 0.25, THREE.NormalBlending);
 
   const cleanseZone = new THREE.Group();
   cleanseZone.name = 'ignivarWaterCleanseZone';
@@ -267,7 +277,7 @@ function buildTemplate(state: IgnivarConduitState): THREE.Group {
   // view draws only the readable water-state layers (the cleanse pool, the
   // ready aim marker, the active jet, the cooldown seal), so they render on
   // the pump the player already sees rather than a second stone plinth.
-  const rim = sharedMaterial({
+  const rim = sharedMaterial('rim', {
     color: 0x62564e,
     roughness: 0.82,
     metalness: 0.08,

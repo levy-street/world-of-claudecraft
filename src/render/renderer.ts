@@ -405,6 +405,7 @@ import {
   applyInteriorLightRig,
   applyRiftLightRig,
   type FogSceneState,
+  interiorKeyLightDirection,
   isOpenAirFogState,
 } from './interior_light_rig';
 import { IslandGuidance } from './island_guidance';
@@ -2887,9 +2888,8 @@ export class Renderer {
       (x, z, meteor) =>
         meteorLandingBurst(this.abilityVfx, this.vfx, this.sim.cfg.seed, x, z, meteor),
     );
-    this.varkhulForgestormVisuals = new VarkhulForgestormVisuals(this.scene, (x, z) =>
-      groundHeight(x, z, this.sim.cfg.seed),
-    );
+    const gate = this.worldCompileGate();
+    this.varkhulForgestormVisuals = new VarkhulForgestormVisuals(this.scene, this.groundSample, gate);
     this.nythraxisMechanicVisuals = new NythraxisMechanicVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -9572,10 +9572,10 @@ export class Renderer {
       // Blend the two directions smoothly (rather than a hard switch) as the sun
       // sinks through the horizon, so the shadow direction glides instead of
       // popping; the swap happens at dusk/dawn when the light is dim anyway.
-      let t = (0.05 - this.sunDir.y) / 0.2; // sunDir.y 0.05 -> sun, -0.15 -> moon
-      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const t = THREE.MathUtils.clamp((0.05 - this.sunDir.y) / 0.2, 0, 1); // 0.05 sun, -0.15 moon
       const blend = t * t * (3 - 2 * t);
       this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
+      interiorKeyLightDirection(this.fogState, this.lightDir);
       if (this.sun.castShadow) snapShadowAnchor(this.lightDir, pp, this.shadowTexelWorld, anchor);
       this.sun.position.set(
         anchor.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,

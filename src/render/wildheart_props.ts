@@ -333,12 +333,12 @@ export function buildWildheartFieldInterior(deps: WildheartFieldInteriorDeps): T
   const group = new THREE.Group();
   group.name = 'wildheartField';
   group.add(buildWildheartTerrain(deps.lowGfx));
-
-  const fillHemi = new THREE.HemisphereLight(0xdff4da, 0x6d5131, deps.lowGfx ? 1.7 : 0.9);
-  const fillSun = new THREE.DirectionalLight(0xffe0a6, deps.lowGfx ? 1.4 : 0.88);
-  fillSun.position.set(-45, 72, -35);
-  fillSun.target.position.set(0, 2, 135);
-  group.add(fillHemi, fillSun, fillSun.target);
+  // No light of its own: the caldera's sunlit grade is the `wildheartField`
+  // state of interior_light_rig.ts, re-grading the constructor's one sun/hemi
+  // pair. The fill pair this rig used to add changed numDirLights and
+  // numHemiLights for the whole world scene and was never removed, so every
+  // material drawn after a Palm Reach visit relinked (2026-09-12 hunt: 132
+  // programs at the Veiled Hollow graveyard alone).
 
   for (const placement of WILDHEART_FIELD_PLACEMENTS) {
     const holder = new THREE.Group();
