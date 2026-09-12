@@ -6523,7 +6523,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_cat', value: 0.71, duration: 3600 }],
     description:
-      'Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form.',
+      'Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, you move 15% faster, and you generate 29% less threat. Cast again to return to caster form.',
   },
   prowl: {
     id: 'prowl',
@@ -6750,7 +6750,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_travel', value: 1.4, duration: 3600 }],
     description:
-      'Instantly shift into a swift travel form, increasing movement speed by 40%. You cannot use other abilities while shifted, but can shift in or out of combat, ideal for escaping.',
+      'Instantly shift into a swift fleet form, increasing movement speed by 40% and removing breakable roots and slows. You cannot use other abilities while shifted, but can shift in or out of combat, ideal for escaping.',
   },
   enrage: {
     id: 'enrage',
@@ -6816,7 +6816,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     tooltipOmitEffectLines: true,
     name: 'Dash',
     class: 'druid',
-    learnLevel: 18,
+    // Learned at 12 (was 18): Wolf Form is 4 and Fleet Form 11, and a sprint
+    // two levels before the cap arrived after most of the leveling PvP.
+    learnLevel: 12,
     cost: 0,
     castTime: 0,
     cooldown: 60,

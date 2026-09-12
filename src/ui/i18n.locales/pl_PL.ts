@@ -10168,7 +10168,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Broń nasycona: od {min} do {max} dodatkowych obrażeń przy Verdict',
   'hudChrome.auraEffect.stealth': 'Verborgen; Bewegungstempo um {pct}% verringert',
   'hudChrome.auraEffect.formBear': 'Postać Bruina: zwiększone zdrowie i pancerz',
-  'hudChrome.auraEffect.formCat': 'Katzengestalt: Nahkampfschaden und Energie',
   'hudChrome.auraEffect.formTravel': 'Postać Fleet: prędkość ruchu zwiększona o {pct}%',
   'hudChrome.auraEffect.defensiveStance':
     'Czujna postawa: mniej otrzymywanych obrażeń, większe zagrożenie',

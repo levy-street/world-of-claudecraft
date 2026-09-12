@@ -10676,7 +10676,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Silah güçlendirildi: Hukum ile {min} ila {max} bonus hasar',
   'hudChrome.auraEffect.stealth': 'Oculto; velocidad de movimiento reducida un {pct}%',
   'hudChrome.auraEffect.formBear': 'Bruin Formu: can ve zırh artışı',
-  'hudChrome.auraEffect.formCat': 'Forma felina: daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Fleet Formu: hareket hızı {pct}% artar',
   'hudChrome.auraEffect.defensiveStance': 'Korumali Durus: alınan hasar azalır, daha fazla tehdit',
   'hudChrome.auraEffect.righteousFury':

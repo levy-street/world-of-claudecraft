@@ -3150,7 +3150,7 @@ export const ja_JP: EnTranslations = {
       "elementalTrance": "受けるダメージが{pct}%軽減される。与えた全ダメージの{mana}%がマナに変換される",
       "stealth": "隠密状態。移動速度が{pct}%低下する",
       "formBear": "ブルーインフォーム: 体力と防御力が上昇",
-      "formCat": "キャットフォーム: 近接ダメージとエネルギー",
+      "wolfForm": "ウルフフォーム: 近接ダメージとエネルギー、移動速度が{pct}%上昇",
       "formTravel": "フリートフォーム: 移動速度が{pct}%上昇",
       "formFireball": "火球形態：移動速度が{pct}%上昇、攻撃と呪文は使用不可",
       "formMoonkin": "ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する",

@@ -99,6 +99,7 @@ import {
   FAERIE_FIRE_ARMOR_PCT,
   RECKLESSNESS_RAGE_GEN,
   SUNDER_ARMOR_PCT_PER_STACK,
+  WOLF_FORM_MOVE_MULT,
 } from '../sim/types';
 import { VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS } from '../sim/varkhul_assembly';
 import {
@@ -650,7 +651,9 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     case 'form_bear':
       return { key: `${KEY}.formBear` };
     case 'form_cat':
-      return { key: `${KEY}.formCat` };
+      // The aura value is the threat multiplier; the speed is the constant
+      // moveSpeedMult reads, so the buff line resolves it the same way.
+      return { key: `${KEY}.wolfForm`, nums: { pct: pctFromMult(WOLF_FORM_MOVE_MULT) } };
     case 'form_travel':
       return { key: `${KEY}.formTravel`, nums: { pct: pctFromMult(a.value) } };
     case 'battle_stance':

@@ -6429,7 +6429,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dodgeReduce': 'Snižuje šanci na vyhnutí o {pct} %',
   'hudChrome.auraEffect.dot': 'Způsobuje {value} {school} poškození každých {interval} s',
   'hudChrome.auraEffect.formBear': 'Medvědí podoba: zvýšené zdraví a brnění',
-  'hudChrome.auraEffect.formCat': 'Vlčí podoba: poškození na blízko a energie',
   'hudChrome.auraEffect.formTravel': 'Cestovní podoba: rychlost pohybu zvýšena o {pct} %',
   'hudChrome.auraEffect.haste': 'Zvyšuje rychlost útoku a sesílání o {pct} %',
   'hudChrome.auraEffect.healAbsorb': 'Absorbuje {value} příchozího léčení',

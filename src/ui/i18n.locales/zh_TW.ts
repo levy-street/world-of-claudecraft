@@ -8293,7 +8293,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': '武器附魔：裁決時造成 {min} 到 {max} 點額外傷害',
   'hudChrome.auraEffect.stealth': '隱蔽；移動速度降低 {pct}%',
   'hudChrome.auraEffect.formBear': '巨熊形態：生命值與護甲提高',
-  'hudChrome.auraEffect.formCat': '貓形態：近戰傷害與能量',
+  'hudChrome.auraEffect.wolfForm': '狼形態：近戰傷害與能量；移動速度提高 {pct}%',
   'hudChrome.auraEffect.formTravel': '迅捷形態：移動速度提高 {pct}%',
   'hudChrome.auraEffect.defensiveStance': '戒備姿態：受到的傷害降低，威脅值提高',
   'hudChrome.auraEffect.righteousFury': '燃燒誓言：神聖傷害產生的威脅值大幅提高',

@@ -110,12 +110,13 @@ describe('druid spell pack — definitions', () => {
 describe('druid spell pack — level gating', () => {
   it('gates each pack spell at its learn level and teaches everything by 20', () => {
     // The choice-row unlock guard moved travel_form (11), bash (8), and rip (14)
-    // earlier so the rows that modify them are live at unlock, and the feral
-    // enablement pass moved pounce to 8 so Stalk has an early payoff; the rest
-    // of the pack still lands 16 to 20.
+    // earlier so the rows that modify them are live at unlock, the feral
+    // enablement pass moved pounce to 8 so Stalk has an early payoff, and the
+    // Wolf Form mobility pass moved dash to 12 (docs/design/druid-wolf-mobility.md);
+    // the rest of the pack still lands 16 to 20.
     const known15 = abilitiesKnownAt('druid', 15).map((k) => k.def.id);
     const stillLate = NEW_DRUID.filter(
-      (id) => !['travel_form', 'bash', 'rip', 'pounce'].includes(id),
+      (id) => !['travel_form', 'bash', 'rip', 'pounce', 'dash'].includes(id),
     );
     for (const id of stillLate) expect(known15).not.toContain(id);
     for (const id of NEW_DRUID) {
@@ -387,7 +388,10 @@ describe('druid spell pack — casting applies effects', () => {
     sim.castAbility('prowl', pid);
     sim.tick();
     expect(e.auras.some((a) => a.id === 'prowl' && a.kind === 'stealth')).toBe(true);
-    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(0.95);
+    // Stalk's 5% penalty multiplies the Wolf Form passive (+15%,
+    // WOLF_FORM_MOVE_MULT): 0.95 x 1.15. The tooltip's "5% slower" is relative
+    // to Wolf Form, the form Stalk requires.
+    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(0.95 * 1.15);
     advanceTicks(sim, 40);
 
     e.resource = e.maxResource;

@@ -10737,7 +10737,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Vũ khí được phù chú: {min} đến {max} sát thương thêm khi dùng Verdict.',
   'hudChrome.auraEffect.stealth': 'Oculto; velocidad de movimiento reducida un {pct}%',
   'hudChrome.auraEffect.formBear': 'Bruin Form: tăng máu và giáp.',
-  'hudChrome.auraEffect.formCat': 'Forma felina: daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Fleet Form: tốc độ di chuyển tăng {pct}%.',
   'hudChrome.auraEffect.defensiveStance': 'Thế Thủ: giảm sát thương phải chịu, tăng đe dọa.',
   'hudChrome.auraEffect.righteousFury': 'Lời Thề Rực Cháy: tăng mạnh đe dọa từ sát thương Thánh.',

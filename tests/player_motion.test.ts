@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, moverHeight, resolveMovement } from '../src/sim/colliders';
+import { mountMoveSpeedPct } from '../src/sim/content/mounts';
 import { BUILTIN_WORLD, DUNGEON_FLOOR_Y } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
-import type { Entity, MoveInput, WorldContent } from '../src/sim/types';
+import {
+  type Aura,
+  type Entity,
+  type MoveInput,
+  WOLF_FORM_MOVE_MULT,
+  type WorldContent,
+} from '../src/sim/types';
 import {
   groundHeight,
   terrainHeight,
@@ -432,5 +439,60 @@ describe('stepPlayerMotion wall-standoff acceptance gate', () => {
     const steepEnd = terrainSteepnessAt(p.pos.x, p.pos.z, GATE_SEED);
     expect(steepEnd).toBeLessThan(steepStart);
     expect(steepEnd).toBeGreaterThan(GATE_SLOPE);
+  });
+});
+
+describe('moveSpeedMult: Wolf Form passive speed', () => {
+  function aura(e: Entity, kind: Aura['kind'], value: number): Aura {
+    return {
+      id: kind,
+      name: kind,
+      kind,
+      remaining: 3600,
+      duration: 3600,
+      value,
+      sourceId: e.id,
+      school: 'physical',
+    };
+  }
+  // The shipped form_cat aura carries the THREAT multiplier (0.71) as its
+  // value; the speed comes from the constant, never from a.value.
+  const wolf = (e: Entity) => aura(e, 'form_cat', 0.71);
+
+  it('form_cat alone yields the +15% constant, not the aura value', () => {
+    const p = makeSim().player;
+    expect(moveSpeedMult(p, 0)).toBe(1);
+    p.auras.push(wolf(p));
+    expect(WOLF_FORM_MOVE_MULT).toBe(1.15);
+    expect(moveSpeedMult(p, 0)).toBeCloseTo(1.15);
+  });
+
+  it('does not stack with Dash: form_cat plus buff_speed 1.5 yields 1.5, not 1.65', () => {
+    const p = makeSim().player;
+    p.auras.push(wolf(p), aura(p, 'buff_speed', 1.5));
+    expect(moveSpeedMult(p, 0)).toBeCloseTo(1.5);
+  });
+
+  it('slows still bite multiplicatively: form_cat plus a 0.5 slow yields 0.575', () => {
+    const p = makeSim().player;
+    p.auras.push(wolf(p), aura(p, 'slow', 0.5));
+    expect(moveSpeedMult(p, 0)).toBeCloseTo(0.575);
+  });
+
+  it('mount speed stays additive: form_cat plus a +60% mount yields 1.75', () => {
+    const p = makeSim().player;
+    expect(mountMoveSpeedPct('valorsteed')).toBe(0.6);
+    p.auras.push(wolf(p));
+    p.mountKey = 'valorsteed';
+    expect(moveSpeedMult(p, 0)).toBeCloseTo(1.75);
+  });
+
+  it('the client dep shape and the live Sim agree on Wolf speed', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    p.auras.push(wolf(p));
+    const live = (sim as unknown as { moveSpeedMult(e: Entity): number }).moveSpeedMult(p);
+    expect(clientDeps(SEED).moveSpeedMult(p)).toBe(live);
+    expect(live).toBeCloseTo(1.15);
   });
 });

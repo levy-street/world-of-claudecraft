@@ -10220,7 +10220,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Arma infusa: da {min} a {max} danni bonus su Verdict',
   'hudChrome.auraEffect.stealth': 'Nascosto; velocità di movimento ridotta del {pct}%',
   'hudChrome.auraEffect.formBear': 'Forma di Bruin: salute e armatura aumentate',
-  'hudChrome.auraEffect.formCat': 'Forma felina: danni in mischia ed energia',
   'hudChrome.auraEffect.formTravel': 'Forma di Fleet: velocità di movimento aumentata del {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Posizione Guardinga: danni subiti ridotti, più minaccia',
   'hudChrome.auraEffect.righteousFury':

@@ -9909,7 +9909,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Våben gennemsyret: {min} til {max} bonusskade ved Dom',
   'hudChrome.auraEffect.stealth': 'Verborgen; Bewegungstempo um {pct}% verringert',
   'hudChrome.auraEffect.formBear': 'Bruin-form: øget helbred og rustning',
-  'hudChrome.auraEffect.formCat': 'Katzengestalt: Nahkampfschaden und Energie',
   'hudChrome.auraEffect.formTravel': 'Fleet-form: bevægelseshastighed øget med {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Værgende Stilling: mindre modtaget skade, mere trussel',
   'hudChrome.auraEffect.righteousFury': 'Brændende Ed: stærkt øget trussel fra Hellig skade',

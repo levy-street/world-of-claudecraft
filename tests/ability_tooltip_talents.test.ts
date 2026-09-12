@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { ABILITIES } from '../src/sim/data';
+import { classAbilityNamesEn } from '../src/ui/i18n.catalog/abilities';
 
 // The ability/spell tooltip (hud.ts abilityTooltip over
 // ability_tooltip_lines.ts describeAbilitySummary) renders
@@ -92,5 +93,38 @@ describe('ability tooltip data reflects selected talents', () => {
       max: number;
     };
     expect(primary.max).toBeGreaterThan(basePrimary!.max);
+  });
+});
+
+describe('druid Wolf Form mobility pass (tooltip data)', () => {
+  const known = (level: number) =>
+    abilitiesKnownAt('druid', level, emptyModifiers()).map((k) => k.def.id);
+
+  it('Dash is learned at 12 (was 18) with every other number unchanged', () => {
+    expect(ABILITIES.dash.learnLevel).toBe(12);
+    expect(known(11)).not.toContain('dash');
+    expect(known(12)).toContain('dash');
+    expect(ABILITIES.dash.cooldown).toBe(60);
+    expect(ABILITIES.dash.offGcd).toBe(true);
+    expect(ABILITIES.dash.requiresForm).toBe('cat');
+    expect(ABILITIES.dash.effects).toEqual([
+      { type: 'selfBuff', kind: 'buff_speed', value: 1.5, duration: 15 },
+    ]);
+  });
+
+  it('Wolf Form and Fleet Form tooltips state the baseline mobility rules', () => {
+    expect(ABILITIES.cat_form.learnLevel).toBe(4);
+    expect(ABILITIES.cat_form.description).toContain('you move 15% faster');
+    expect(ABILITIES.travel_form.learnLevel).toBe(11);
+    expect(ABILITIES.travel_form.description).toContain(
+      'increasing movement speed by 40% and removing breakable roots and slows',
+    );
+  });
+
+  it('the English catalog carries the same prose as the sim defs (one wording, two files)', () => {
+    const en = classAbilityNamesEn.entities.abilities;
+    expect(en.cat_form.description).toBe(ABILITIES.cat_form.description);
+    expect(en.travel_form.description).toBe(ABILITIES.travel_form.description);
+    expect(en.dash.description).toBe(ABILITIES.dash.description);
   });
 });

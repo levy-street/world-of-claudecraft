@@ -10770,7 +10770,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Senjata terinfus: {min} hingga {max} kerusakan tambahan saat Vonis',
   'hudChrome.auraEffect.stealth': 'Oculto; velocidad de movimiento reducida un {pct}%',
   'hudChrome.auraEffect.formBear': 'Wujud Bruin: nyawa dan zirah meningkat',
-  'hudChrome.auraEffect.formCat': 'Forma felina: daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%',
   'hudChrome.auraEffect.defensiveStance':
     'Kuda-kuda Waspada: kerusakan yang diterima berkurang, ancaman bertambah',

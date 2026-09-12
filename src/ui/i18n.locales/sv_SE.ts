@@ -9961,7 +9961,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Vapen besjälat: {min} till {max} bonusskada vid Utslag',
   'hudChrome.auraEffect.stealth': 'Verborgen; Bewegungstempo um {pct}% verringert',
   'hudChrome.auraEffect.formBear': 'Bruinform: ökad hälsa och rustning',
-  'hudChrome.auraEffect.formCat': 'Katzengestalt: Nahkampfschaden und Energie',
   'hudChrome.auraEffect.formTravel': 'Fleetform: förflyttningshastighet ökad med {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Gardställning: minskad mottagen skada, mer hot',
   'hudChrome.auraEffect.righteousFury': 'Brinnande ed: kraftigt ökat hot från helig skada',

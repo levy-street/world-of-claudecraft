@@ -11,6 +11,7 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -69,6 +70,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -127,6 +129,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -185,6 +188,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -244,6 +248,7 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -302,6 +307,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -384,6 +390,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -448,6 +455,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -506,6 +514,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -564,6 +573,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -622,6 +632,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -680,6 +691,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -738,6 +750,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -796,6 +809,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",
@@ -854,6 +868,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "guide.interfacePage.framesGovernedTalkingHead",
+    "hudChrome.auraEffect.wolfForm",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
     "hudChrome.charSidebar.gathering",

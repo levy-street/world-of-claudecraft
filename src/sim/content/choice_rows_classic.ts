@@ -1801,7 +1801,8 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r5_improved_wrath',
           name: 'Wildshift',
-          description: 'Shapeshifting removes breakable roots and slows.',
+          description:
+            'Shapeshifting into Wolf, Bruin, or Moonwing Form removes breakable roots and slows.',
           icon: 'travel_form',
           effect: { intrinsic: { mechanic: 'druid_wildshift', metrics: {} } },
         },

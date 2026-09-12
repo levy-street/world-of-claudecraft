@@ -10047,7 +10047,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Waffe erfüllt: {min} bis {max} Bonusschaden bei Verdict',
   'hudChrome.auraEffect.stealth': 'Verborgen; Bewegungstempo um {pct}% verringert',
   'hudChrome.auraEffect.formBear': 'Bruin Form: Gesundheit und Rüstung erhöht',
-  'hudChrome.auraEffect.formCat': 'Katzengestalt: Nahkampfschaden und Energie',
   'hudChrome.auraEffect.formTravel': 'Fleet Form: Bewegungstempo um {pct}% erhöht',
   'hudChrome.auraEffect.defensiveStance':
     'Wehrhafte Haltung: weniger erlittener Schaden, mehr Bedrohung',

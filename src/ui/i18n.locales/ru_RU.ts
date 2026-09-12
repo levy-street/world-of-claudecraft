@@ -8808,7 +8808,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Оружие наделено: от {min} до {max} дополнительного урона при Приговоре',
   'hudChrome.auraEffect.stealth': 'Скрытность; скорость передвижения снижена на {pct}%',
   'hudChrome.auraEffect.formBear': 'Облик бурого: повышенное здоровье и броня',
-  'hudChrome.auraEffect.formCat': 'Облик кошки: урон в ближнем бою и энергия',
+  'hudChrome.auraEffect.wolfForm': 'Облик волка: урон в ближнем бою и энергия; скорость передвижения повышена на {pct}%',
   'hudChrome.auraEffect.formTravel': 'Форма скорохода: скорость передвижения повышена на {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Стойка стража: сниженный получаемый урон, больше угрозы',
   'hudChrome.auraEffect.righteousFury':

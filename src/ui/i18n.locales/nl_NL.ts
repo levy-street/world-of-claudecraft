@@ -10116,7 +10116,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Wapen doordrongen: {min} tot {max} bonusschade bij Verdict',
   'hudChrome.auraEffect.stealth': 'Verborgen; Bewegungstempo um {pct}% verringert',
   'hudChrome.auraEffect.formBear': 'Bruingedaante: verhoogde gezondheid en pantser',
-  'hudChrome.auraEffect.formCat': 'Katzengestalt: Nahkampfschaden und Energie',
   'hudChrome.auraEffect.formTravel': 'Fleetgedaante: bewegingssnelheid verhoogd met {pct}%',
   'hudChrome.auraEffect.defensiveStance':
     'Bewaakte Houding: minder ontvangen schade, meer dreiging',

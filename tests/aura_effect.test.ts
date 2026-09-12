@@ -52,6 +52,7 @@ import {
   NYTHRAXIS_ENRAGE_HASTE_BONUS,
 } from '../src/sim/nythraxis_enrage_clock';
 import { NYTHRAXIS_KINGS_WRATH_AURA_ID } from '../src/sim/nythraxis_kings_wrath';
+import { WOLF_FORM_MOVE_MULT } from '../src/sim/types';
 import {
   VARKHUL_SHARED_PYRE_AURA_ID,
   VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING,
@@ -795,5 +796,21 @@ describe('auraEffectDescriptor', () => {
     });
     // The kind alone describes nothing: the id is what earns the line.
     expect(desc({ id: 'some_other_marker', kind: 'flag_carried', value: 0 })).toBeNull();
+  });
+});
+
+describe('Wolf Form buff line (druid Wolf Form mobility pass)', () => {
+  it('states the passive move speed from WOLF_FORM_MOVE_MULT, not the aura value', () => {
+    // The form_cat aura value is the threat multiplier (0.71); the buff line
+    // resolves the speed the way moveSpeedMult does, so the buff bar and the
+    // Wolf Form ability tooltip cannot disagree about what the form does.
+    expect(desc({ kind: 'form_cat', value: 0.71 })).toEqual({
+      key: 'hudChrome.auraEffect.wolfForm',
+      nums: { pct: Math.round((WOLF_FORM_MOVE_MULT - 1) * 100) },
+    });
+    expect(desc({ kind: 'form_cat', value: 0.71 })?.nums).toEqual({ pct: 15 });
+    expect(hudChromeStrings.auraEffect.wolfForm).toContain('movement speed increased by {pct}%');
+    // Fleet Form keeps reading its own aura value (1.4 = +40%).
+    expect(desc({ kind: 'form_travel', value: 1.4 })?.nums).toEqual({ pct: 40 });
   });
 });

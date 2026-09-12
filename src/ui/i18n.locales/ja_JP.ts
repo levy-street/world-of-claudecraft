@@ -8629,7 +8629,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': '武器付与: ヴァーディクトで{min}から{max}の追加ダメージ',
   'hudChrome.auraEffect.stealth': '隠密状態。移動速度が{pct}%低下する',
   'hudChrome.auraEffect.formBear': 'ブルーインフォーム: 体力と防御力が上昇',
-  'hudChrome.auraEffect.formCat': 'キャットフォーム: 近接ダメージとエネルギー',
+  'hudChrome.auraEffect.wolfForm': 'ウルフフォーム: 近接ダメージとエネルギー、移動速度が{pct}%上昇',
   'hudChrome.auraEffect.formTravel': 'フリートフォーム: 移動速度が{pct}%上昇',
   'hudChrome.auraEffect.defensiveStance':
     'ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇',
