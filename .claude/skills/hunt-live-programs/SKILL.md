@@ -59,11 +59,12 @@ is always written), the WebSocket upgrade refused without `changeOrigin`.
 
 `report.md` has four parts:
 
-- **Live programs, first sighting.** One row per distinct label: time, zone, position,
-  material name (or `(unnamed)`), shortened key, `readyRoots/totalRoots`, count, and the
-  materials and objects the render diagnostics saw for the first time in the same poll. The
-  `firstVisibleObjects` column reads `category:objectName:materialLabel` and is the owner
-  when the material is unnamed.
+- **Live programs, first sighting.** One row per distinct label: time, zone, position, the
+  OWNER (`category:objectName:materialName`, resolved from the renderer's per-material
+  properties on the poll that saw the mint; `(not in scene at the poll)` for a material
+  already gone or a prewarm-lane program, whose compile path sets no current program),
+  material name, shortened key, `readyRoots/totalRoots`, count, and the materials and
+  objects the render diagnostics saw for the first time in the same poll.
 - **Bursts.** Runs of live programs within 50 ms: one burst is one frozen frame.
 - **Gate failures.** `attach-watchdog`, `gate-timeout`, `reveal-watchdog`: a gate that gave
   up reveals its group ungated, so live programs right after one are charged to the gate
@@ -94,6 +95,18 @@ Per owner, the CLAUDE.md choice:
   it without a hunt. A kit conversion must never produce an empty surface name.
 - **A burst right after a gate failure** is an admission problem, not a gating one; say so
   in the PR and do not add a gate for it.
+- **The same owner relinking on every cast or wave** (new vertex/fragment ids each time in the
+  key head, the same object name) is the dispose trap: three refcounts programs and shader
+  stages, so a material minted per effect and disposed at its end frees both, and the next
+  identical effect links again. Fix with a never-disposed anchor or pool staged through
+  `ABILITY_MATERIAL_SOURCES` (`groundFireAoeMaterials`, `buildRingOfFrostStandIn`); a pool
+  kept in class fields escapes the lazy-cache sweep and must be registered by hand.
+- **A light-count change in the key** (the numDir/numHemi fields going 1 to 2) is a light
+  added after boot: find it with `tests/render_light_census_pin.test.ts`; re-grade the rig
+  instead (the Wildheart fix).
+- **An owner linking on the arrival frame of an interior** whose boss is already active
+  (`/dev` teleport, reconnect mid fight, a gate room) attached before the encounter prewarm
+  ran: give its sync loop the compile gate and attach through `attachSceneGroupGated`.
 
 Do it test-first where a pure core exists (`materialProgramSignature` in
 `prewarm_policy.ts` has a dimension-by-dimension contract test; a new key dimension is

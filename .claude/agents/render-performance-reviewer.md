@@ -85,7 +85,16 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
    conversion whose `material.name` can come out empty (`props.ts` names `${kit}:${surface}`);
    a builder that returns a group of bare `new THREE.*Material(` meshes to a caller that
    `scene.add`s it after boot; a gate whose `attach-watchdog` or `gate-timeout` reveals the
-   group ungated, so the programs link at the reveal. Every new material must carry a
+   group ungated, so the programs link at the reveal; a material minted per cast or per wave
+   and disposed when the effect ends (three refcounts programs AND shader stages: the last
+   dispose frees both, so the next identical cast relinks; the fix is a never-disposed anchor
+   or pool staged by the manifest, `groundFireAoeMaterials` in `ignivar_fire_vfx.ts` is the
+   shape); a per-instance material pool kept in class fields, which the lazy-cache sweep
+   (`tests/ability_material_prewarm_sweep.test.ts`) cannot see, so it needs a stand-in
+   registered by hand (`buildRingOfFrostStandIn`); an encounter visual attached by a sync
+   loop when the boss is already active at arrival, before the interior's encounter prewarm
+   has run (the forge meter in `varkhul_forge_beam_visual.ts` takes the compile gate for
+   this). Every new material must carry a
    `name` (module and role): three names a program after `material.name`, and the fleet
    `live-program` label is that name or a raw cache key nobody can map back to a file. An
    unnamed new material is SHOULD-FIX. All of this is verified by READING the diff: trace
