@@ -1183,6 +1183,7 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
     polygonOffsetFactor: -1,
     polygonOffsetUnits: -1,
   });
+  discMat.name = 'groundFireAoe:disc';
   const disc = new THREE.Mesh(
     getAoeDiscGeo(opts.dynamicInnerRadius === true ? 0 : innerRadiusRatio),
     discMat,
@@ -1214,6 +1215,7 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
     side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
   });
+  flameMat.name = 'groundFireAoe:flames';
   const flames = new THREE.Mesh(getAoeFlameGeo(count), flameMat);
   flames.name = 'ground_fire_aoe__flames';
   flames.renderOrder = 2;

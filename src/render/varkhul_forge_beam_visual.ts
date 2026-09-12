@@ -435,7 +435,13 @@ export class VarkhulForgeBeamVisuals {
       if (!visual) {
         visual = createVisual(state.bossId);
         this.visuals.set(state.bossId, visual);
-        void attachSceneGroupGated(this.scene, visual.root, this.compileGate);
+        const attached = visual;
+        void attachSceneGroupGated(
+          this.scene,
+          visual.root,
+          this.compileGate,
+          () => this.visuals.get(state.bossId) !== attached,
+        ).catch(() => undefined);
       }
       visual.root.userData.overheat = state.forgeOverheat;
       visual.root.userData.warmupRemaining = state.forgeBeamWarmupRemaining;
