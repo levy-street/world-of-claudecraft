@@ -4125,6 +4125,7 @@ export const pt_BR: EnTranslations = {
           "farming": "Funciona na sua bolsa quando você planta num canteiro."
         },
         "speed": "Coleta mais rápido em nós abaixo do nível {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Necessária para pescar.",
         "rodBite": "Os peixes mordem a isca até {seconds}s mais cedo.",
         "rodReel": "Estende a janela de puxada em {seconds}s.",
@@ -7531,7 +7532,7 @@ export const pt_BR: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "O ritmo da agricultura",
-        "rhythmBody": "Plantar é um lançamento curto e visível: {plant} segundos exatos em todos os degraus, porque uma enxada abre terreno em vez de comprar velocidade. Retirar um cultivo maduro é instantâneo. Não há lançamento para interromper nem verificação de bolsa para recusá-lo, e um canteiro pronto espera enquanto você quiser, então uma bolsa cheia custa ao fazendeiro apenas a caminhada para esvaziá-la.\n\nO que uma colheita paga é produção e proficiência em Agricultura. Ao contrário de um veio, ela não concede experiência de personagem, então os canteiros são uma profissão para trabalhar, não uma forma de subir de nível.",
+        "rhythmBody": "Plantar é instantâneo, porque uma enxada abre terreno em vez de comprar velocidade: não há lançamento para esperar, então um fazendeiro que se afasta plantou do mesmo jeito. Retirar um cultivo maduro também é instantâneo. Não há lançamento para interromper nem verificação de bolsa para recusá-lo, e um canteiro pronto espera enquanto você quiser, então uma bolsa cheia custa ao fazendeiro apenas a caminhada para esvaziá-la.\n\nO que uma colheita paga é produção e proficiência em Agricultura. Ao contrário de um veio, ela não concede experiência de personagem, então os canteiros são uma profissão para trabalhar, não uma forma de subir de nível.",
         "gainHeading": "O que uma colheita ensina",
         "gainBody": "O ganho é determinístico e depende do seu próprio contador, não do cultivo: {g1} de proficiência em uma colheita abaixo de {p1}, {g2} abaixo de {p2}, {g3} abaixo de {p3} e {g4} no restante até o limite {cap}. Nunca é uma rolagem de aumento, então a subida dura exatamente o que a aritmética determina.\n\nO que o nível do cultivo decide é até onde um canteiro pode levar você. Um cultivo de nível 1 ensina até {c1} e fica cinza ali, um de nível 2 até {c2} e os de nível 3 em diante até o limite, então avançar pelos canteiros é o que mantém o contador em movimento.",
         "yieldsHeading": "O que uma colheita rende",
@@ -10607,7 +10608,6 @@ export const pt_BR: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
-      "farming": "Plantio",
       "gathering": "Coletando",
       "crafting": "Criando",
       "disenchanting": "Desencantando",

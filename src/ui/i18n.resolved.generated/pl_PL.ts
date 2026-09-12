@@ -4125,6 +4125,7 @@ export const pl_PL: EnTranslations = {
           "farming": "Działa z twoich toreb podczas sadzenia na grządce."
         },
         "speed": "Szybciej zbiera z węzłów poniżej poziomu {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Wymagana do łowienia ryb.",
         "rodBite": "Ryby biorą nawet o {seconds} s wcześniej.",
         "rodReel": "Wydłuża czas na wyciągnięcie ryby o {seconds} s.",
@@ -7531,7 +7532,7 @@ export const pl_PL: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Rytm rolnictwa",
-        "rhythmBody": "Sadzenie jest krótkim widocznym rzucaniem: dokładnie {plant} sekundy na każdym szczeblu, bo motyka otwiera ziemię, a nie kupuje szybkość. Wyciągnięcie dojrzałej uprawy jest natychmiastowe. Nie ma rzucania do przerwania ani kontroli torby, która mogłaby odmówić zbioru, a gotowa grządka czeka tak długo, jak ją zostawisz, więc pełna torba kosztuje farmera tylko spacer, by ją opróżnić.\n\nZbiór płaci plonem i biegłością Rolnictwa. W przeciwieństwie do żyły nie daje w ogóle doświadczenia postaci, więc grządki są profesją do pracy, nie sposobem na poziomy.",
+        "rhythmBody": "Sadzenie jest natychmiastowe, bo motyka otwiera ziemię, a nie kupuje szybkość: nie ma rzucania, na które trzeba czekać, więc farmer, który odejdzie, i tak zasadził. Wyciągnięcie dojrzałej uprawy też jest natychmiastowe. Nie ma rzucania do przerwania ani kontroli torby, która mogłaby odmówić zbioru, a gotowa grządka czeka tak długo, jak ją zostawisz, więc pełna torba kosztuje farmera tylko spacer, by ją opróżnić.\n\nZbiór płaci plonem i biegłością Rolnictwa. W przeciwieństwie do żyły nie daje w ogóle doświadczenia postaci, więc grządki są profesją do pracy, nie sposobem na poziomy.",
         "gainHeading": "Czego uczy zbiór",
         "gainBody": "Przyrost jest deterministyczny i zależy od własnego licznika, nie od uprawy: {g1} biegłości za zbiór poniżej {p1}, {g2} poniżej {p2}, {g3} poniżej {p3} i {g4} przez resztę drogi do limitu {cap}. Nigdy nie jest to rzut na rozwój, więc wspinaczka trwa dokładnie tyle, ile wynika z rachunku.\n\nPoziom uprawy decyduje, jak daleko grządka może cię prowadzić. Uprawa poziomu 1 uczy do {c1}, po czym szarzeje, uprawa poziomu 2 do {c2}, a poziom 3 i wyższe do limitu. To przechodzenie na wyższe grządki utrzymuje ruch licznika.",
         "yieldsHeading": "Co daje zbiór",
@@ -10607,7 +10608,6 @@ export const pl_PL: EnTranslations = {
     },
     "cast": {
       "fishing": "Wędkarstwo",
-      "farming": "Sadzenie",
       "gathering": "Zbieranie",
       "crafting": "Wytwarzanie",
       "disenchanting": "Rozbrajanie",

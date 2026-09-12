@@ -4125,6 +4125,7 @@ export const da_DK: EnTranslations = {
           "farming": "Virker fra dine tasker, når du planter i et havebed."
         },
         "speed": "Indsamler hurtigere ved ressourcekilder under niveau {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Kræves for at fiske.",
         "rodBite": "Fisk bider op til {seconds}s tidligere.",
         "rodReel": "Forlænger indhivningsvinduet med {seconds}s.",
@@ -7531,7 +7532,7 @@ export const da_DK: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Landbrugets rytme",
-        "rhythmBody": "Plantning er det korte synlige kast: {plant} sekunder fladt på hvert trin, fordi en hakke åbner jord i stedet for at købe hastighed. At trække en moden afgrøde op er øjeblikkeligt. Der er intet kast at afbryde og ingen taskekontrol til at afvise det, og et bed, der er blevet klar, venter så længe du lader det, så en fuld taske kun koster bonden turen til at tømme den.\n\nDet, en høst betaler, er udbytte og landbrugsfærdighed. I modsætning til en åre giver den slet ingen figur-XP, så bedene er et fag at arbejde i, ikke en måde at stige i niveau på.",
+        "rhythmBody": "Plantning sker øjeblikkeligt, fordi en hakke åbner jord i stedet for at købe hastighed: der er intet kast at vente på, så en bonde, der går sin vej, har plantet alligevel. At trække en moden afgrøde op er også øjeblikkeligt. Der er intet kast at afbryde og ingen taskekontrol til at afvise det, og et bed, der er blevet klar, venter så længe du lader det, så en fuld taske kun koster bonden turen til at tømme den.\n\nDet, en høst betaler, er udbytte og landbrugsfærdighed. I modsætning til en åre giver den slet ingen figur-XP, så bedene er et fag at arbejde i, ikke en måde at stige i niveau på.",
         "gainHeading": "Hvad en høst lærer",
         "gainBody": "Gevinsten er deterministisk og knyttet til din egen tæller i stedet for afgrøden: {g1} færdighed for en høst under {p1}, {g2} under {p2}, {g3} under {p3} og {g4} resten af vejen til loftet på {cap}. Det er aldrig et færdighedskast, så klatringen er præcis så lang, som regnestykket gør den.\n\nDet, afgrødens niveau bestemmer, er hvor langt et bed kan føre dig. En afgrøde på niveau 1 lærer til {c1} og bliver grå der, en afgrøde på niveau 2 til {c2}, og niveau 3 og derover til loftet, så det er at flytte op mellem bedene, der holder tælleren i gang overhovedet.",
         "yieldsHeading": "Hvad en høst giver",
@@ -10607,7 +10608,6 @@ export const da_DK: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiskeri",
-      "farming": "Plantning",
       "gathering": "Indsamling",
       "crafting": "Håndværk",
       "disenchanting": "Affortryllelse",

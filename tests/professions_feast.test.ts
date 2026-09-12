@@ -27,7 +27,7 @@ import { Sim } from '../src/sim/sim';
 import {
   type Aura,
   type Entity,
-  FARMING_CAST_ID,
+  FISHING_CAST_ID,
   INSTANCE_EMPTY_TIMEOUT,
   INTERACT_RANGE,
   type SimEvent,
@@ -509,7 +509,7 @@ describe('shared feast: placing', () => {
     giveFeast(sim, placer);
 
     // A running cast.
-    placer.p.castingAbility = FARMING_CAST_ID;
+    placer.p.castingAbility = FISHING_CAST_ID;
     let from = sim.events.length;
     sim.placeFeast(placer.pid);
     expect(eventsOf(sim, from, 'farmDenied')).toHaveLength(0);
@@ -706,7 +706,7 @@ describe('shared feast: the bite and the Well Fed mint', () => {
     const feastId = placeOk(sim, placer);
     const st = sim.ctx.feasts.get(feastId)!;
 
-    eater.p.castingAbility = FARMING_CAST_ID;
+    eater.p.castingAbility = FISHING_CAST_ID;
     const from = sim.events.length;
     sim.consumeFeast(feastId, eater.pid);
     expect(eventsOf(sim, from, 'farmDenied')).toHaveLength(0);

@@ -4125,6 +4125,7 @@ export const it_IT: EnTranslations = {
           "farming": "Funziona dalla borsa quando pianti un’aiuola."
         },
         "speed": "Raccoglie più in fretta sui nodi di livello inferiore a {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Necessaria per pescare.",
         "rodBite": "I pesci abboccano fino a {seconds} s prima.",
         "rodReel": "Allunga di {seconds} s la finestra per recuperare la lenza.",
@@ -7531,7 +7532,7 @@ export const it_IT: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Il ritmo dell’agricoltura",
-        "rhythmBody": "La semina è il lancio visibile breve: {plant} secondi netti a ogni gradino, perché una zappa apre il terreno invece di comprare velocità. Raccogliere una coltura matura è istantaneo. Non c’è lancio da interrompere né controllo delle borse che possa rifiutare l’azione, e un’aiuola pronta aspetta finché la lasci, quindi una borsa piena costa all’agricoltore solo la camminata per svuotarla.\n\nUn raccolto paga prodotti e competenza agricola. A differenza di un filone, non concede alcuna esperienza al personaggio, quindi le aiuole sono un mestiere da lavorare, non un modo per salire di livello.",
+        "rhythmBody": "La semina è istantanea, perché una zappa apre il terreno invece di comprare velocità: non c’è alcun lancio da attendere, quindi un agricoltore che si allontana ha comunque seminato. Anche raccogliere una coltura matura è istantaneo. Non c’è lancio da interrompere né controllo delle borse che possa rifiutare l’azione, e un’aiuola pronta aspetta finché la lasci, quindi una borsa piena costa all’agricoltore solo la camminata per svuotarla.\n\nUn raccolto paga prodotti e competenza agricola. A differenza di un filone, non concede alcuna esperienza al personaggio, quindi le aiuole sono un mestiere da lavorare, non un modo per salire di livello.",
         "gainHeading": "Guadagnare competenza",
         "gainBody": "Il guadagno è deterministico e dipende dal tuo contatore, non dal raccolto: {g1} di competenza per un raccolto sotto {p1}, {g2} sotto {p2}, {g3} sotto {p3} e {g4} fino al limite di {cap}. Non è mai un tiro di aumento, quindi la scalata dura esattamente quanto stabilisce l’aritmetica.\n\nIl grado del raccolto decide quanto lontano può portarti un’aiuola. Un raccolto di grado 1 insegna fino a {c1} e poi diventa grigio, un raccolto di grado 2 fino a {c2}, mentre il grado 3 e oltre arriva al limite: salire fra le aiuole è ciò che mantiene attivo il contatore.",
         "yieldsHeading": "Resa e qualità",
@@ -10607,7 +10608,6 @@ export const it_IT: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
-      "farming": "Piantare",
       "gathering": "Raccolta",
       "crafting": "Creazione",
       "disenchanting": "Disincantamento",

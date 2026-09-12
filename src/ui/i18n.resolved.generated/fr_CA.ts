@@ -4125,6 +4125,7 @@ export const fr_CA: EnTranslations = {
           "farming": "S’utilise depuis vos sacs lorsque vous plantez dans un carré."
         },
         "speed": "Collecte plus vite sur les nœuds de palier inférieur à {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Nécessaire pour pêcher.",
         "rodBite": "Le poisson mord jusqu'à {seconds}s plus tôt.",
         "rodReel": "Prolonge la fenêtre de remontée de {seconds}s.",
@@ -7531,7 +7532,7 @@ export const fr_CA: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Le rythme de l’agriculture",
-        "rhythmBody": "Planter est une courte incantation visible de {plant} secondes exactement à chaque palier, car une houe ouvre le terrain sans acheter de vitesse. Retirer une culture mûre est instantané. Il n’y a aucune incantation à interrompre ni vérification de sac qui puisse la refuser, et une parcelle prête attend aussi longtemps que vous la laissez ; un sac plein ne coûte donc au fermier que le trajet pour le vider.\n\nUne récolte rapporte des produits et de la compétence en Agriculture. Contrairement à un filon, elle ne donne aucune expérience de personnage : les parcelles sont un métier à travailler, pas un moyen de monter de niveau.",
+        "rhythmBody": "Planter est instantané, car une houe ouvre le terrain sans acheter de vitesse : il n’y a aucune incantation à attendre, et un fermier qui s’éloigne a tout de même planté. Retirer une culture mûre est instantané aussi. Il n’y a aucune incantation à interrompre ni vérification de sac qui puisse la refuser, et une parcelle prête attend aussi longtemps que vous la laissez ; un sac plein ne coûte donc au fermier que le trajet pour le vider.\n\nUne récolte rapporte des produits et de la compétence en Agriculture. Contrairement à un filon, elle ne donne aucune expérience de personnage : les parcelles sont un métier à travailler, pas un moyen de monter de niveau.",
         "gainHeading": "Ce qu’une récolte enseigne",
         "gainBody": "Le gain est déterministe et dépend de votre propre compteur plutôt que de la culture : {g1} de compétence pour une récolte sous {p1}, {g2} sous {p2}, {g3} sous {p3}, puis {g4} jusqu’au plafond de {cap}. Il ne s’agit jamais d’un jet de progression, si bien que la montée dure exactement ce que donne le calcul.\n\nLe palier de la culture décide jusqu’où une parcelle peut vous porter. Une culture de palier 1 enseigne jusqu’à {c1}, puis devient grise ; une culture de palier 2 enseigne jusqu’à {c2}, et les cultures de palier 3 et supérieur vont jusqu’au plafond. Monter vers les parcelles supérieures est donc ce qui permet au compteur de continuer à avancer.",
         "yieldsHeading": "Ce que donne une récolte",
@@ -10607,7 +10608,6 @@ export const fr_CA: EnTranslations = {
     },
     "cast": {
       "fishing": "Pêche",
-      "farming": "Plantation",
       "gathering": "Collecte",
       "crafting": "Fabrication",
       "disenchanting": "Désenchantement",

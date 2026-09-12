@@ -4125,6 +4125,7 @@ export const vi_VN: EnTranslations = {
           "farming": "Hoạt động từ túi khi bạn trồng ở luống."
         },
         "speed": "Thu hoạch nhanh hơn tại các điểm tài nguyên dưới bậc {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Cần thiết để câu cá.",
         "rodBite": "Cá cắn câu sớm hơn tới {seconds} giây.",
         "rodReel": "Kéo dài thời gian thu dây thêm {seconds} giây.",
@@ -7531,7 +7532,7 @@ export const vi_VN: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Nhịp điệu canh tác",
-        "rhythmBody": "Gieo là lượt đúc ngắn có thể thấy: đúng {plant} giây ở mọi bậc, vì cuốc mở đất chứ không mua tốc độ. Nhổ cây chín là tức thì. Không có lượt đúc để ngắt, không có kiểm tra túi để từ chối, và luống đã sẵn sàng chờ mãi nếu bạn để đó, nên túi đầy chỉ tốn một chuyến đi đổ đồ.\n\nThu hoạch trả nông sản và kỹ năng Nông Nghiệp. Không như mạch quặng, nó không cho XP nhân vật, nên luống là nghề để làm chứ không phải cách lên cấp.",
+        "rhythmBody": "Gieo là tức thì, vì cuốc mở đất chứ không mua tốc độ: không có lượt đúc nào phải chờ, nên nông dân bỏ đi ngay vẫn đã gieo xong. Nhổ cây chín cũng tức thì. Không có lượt đúc để ngắt, không có kiểm tra túi để từ chối, và luống đã sẵn sàng chờ mãi nếu bạn để đó, nên túi đầy chỉ tốn một chuyến đi đổ đồ.\n\nThu hoạch trả nông sản và kỹ năng Nông Nghiệp. Không như mạch quặng, nó không cho XP nhân vật, nên luống là nghề để làm chứ không phải cách lên cấp.",
         "gainHeading": "Thu hoạch dạy điều gì",
         "gainBody": "Điểm tăng là tất định và dựa vào bộ đếm của bạn, không dựa vào cây: {g1} kỹ năng cho lần thu hoạch dưới {p1}, {g2} dưới {p2}, {g3} dưới {p3}, rồi {g4} cho phần còn lại đến giới hạn {cap}. Đây không phải lượt gieo kỹ năng, nên độ dài chặng đường đúng theo phép tính.\n\nBậc cây quyết định luống đưa bạn đi xa đến đâu. Cây bậc 1 dạy tới {c1} rồi chuyển xám, cây bậc 2 tới {c2}, còn bậc 3 trở lên tới giới hạn, nên chuyển lên luống là cách duy nhất giữ bộ đếm chạy.",
         "yieldsHeading": "Thu hoạch cho gì",
@@ -10607,7 +10608,6 @@ export const vi_VN: EnTranslations = {
     },
     "cast": {
       "fishing": "Câu Cá",
-      "farming": "Trồng trọt",
       "gathering": "Thu Thập",
       "crafting": "Chế Tác",
       "disenchanting": "Hủy Pháp Khắc",

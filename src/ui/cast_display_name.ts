@@ -1,4 +1,4 @@
-// Localized cast-bar labels: the named system casts (fishing, farming,
+// Localized cast-bar labels: the named system casts (fishing,
 // gathering, crafting and friends), the rift boss mechanic wind-ups, then any
 // ability id, in that resolver order. Moved WHOLE from hud.ts at the v0.38.0
 // fourteenth absorb (the monolith ratchet heal); behavior unchanged.
@@ -9,7 +9,6 @@ import {
   CRAFT_CAST_ID,
   DISENCHANT_CAST_ID,
   ENCHANT_CAST_ID,
-  FARMING_CAST_ID,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   SALVAGE_CAST_ID,
@@ -42,7 +41,6 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
-  if (id === FARMING_CAST_ID) return t('abilityUi.cast.farming');
   if (id === GATHER_CAST_ID) return t('abilityUi.cast.gathering');
   // Corpse harvest (Intentional Gathering PR3) reuses the existing "Harvest"
   // label the corpse loot popup already ships, rather than a new cast key.
@@ -64,14 +62,3 @@ export const castDisplayName = (id: string): string => {
   const ability = ABILITIES[id];
   return ability ? abilityDisplayName(ability) : id;
 };
-
-/** The TARGET cast bar's label resolver (#tf-castbar) for the FARMING cast
- *  only. The target bar historically showed the raw cast id, byte-faithful to
- *  its old inline block, so a targeted player mid-trade-cast read "farming";
- *  Phase 14 localized exactly the FARMING cast here (the handoff row it
- *  discharges). Since the v0.41.0 Ignivar span (merged 2026-08-30) the hud
- *  routes every OTHER id through abilityDisplayNameFromSource, which passes
- *  an unknown id through unchanged, so this resolver's raw-id fallthrough is
- *  reached only for non-farming ids the hud has already handed elsewhere. */
-export const targetCastDisplayLabel = (id: string): string =>
-  id === FARMING_CAST_ID ? castDisplayName(id) : id;

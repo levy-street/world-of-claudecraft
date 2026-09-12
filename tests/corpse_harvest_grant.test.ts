@@ -26,7 +26,10 @@ import {
   snapshotCorpseHarvestGrantInputs,
 } from '../src/sim/professions/corpse_harvest_grant';
 import type { FocusAllocation } from '../src/sim/professions/focus';
-import { TIER3_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
+import {
+  TIER2_TOOL_WIELD_PROFICIENCY,
+  TIER3_TOOL_WIELD_PROFICIENCY,
+} from '../src/sim/professions/wield_gate';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -250,20 +253,24 @@ describe('snapshotCorpseHarvestGrantInputs: clones every field, draws no rng', (
   it('captures the wield-requirement denial hint at admission; a later tool change never reaches the emitted event', () => {
     // Seed 15 / hide, raised to material tier 2 (the same pin family as the
     // frozen-bestAnyToolTier suite below): a tool OWNED but not yet WIELDABLE
-    // (proficiency unmet) gives minWieldRequirementToWorkAny a real, useful
-    // answer (the R22 wield-split hint) while bestWieldableAnyGatherToolTier
-    // still floors the wield-filtered scan at 1, so the roll is still denied.
+    // above tier 1 (proficiency unmet) gives minWieldRequirementToWorkAny a
+    // real, useful answer (the R22 wield-split hint: under the degrade rule,
+    // the TARGET tier's own 40) while bestWieldableAnyGatherToolTier reads
+    // the degraded pick as 1, so the roll is still denied.
     const { sim, mob, a, ctx } = soloRig(15);
     const meta = mustPlayer(sim as unknown as SimInternals, a);
     // Owned but not wielded: no gatheringProficiency.mining set, so this pick
-    // does not clear the wield gate and bestAnyToolTier stays 1.
+    // works as tier 1 only and bestAnyToolTier stays 1.
     sim.addItem('mithril_mining_pick', 1, a);
-    const snapshot = snapshotCorpseHarvestGrantInputs(meta, ['hide'], ['hide']);
+    let snapshot = snapshotCorpseHarvestGrantInputs(meta, [], []);
+    withTier('hide', 2, () => {
+      snapshot = snapshotCorpseHarvestGrantInputs(meta, ['hide'], ['hide']);
+    });
     expect(snapshot.bestAnyToolTier).toBe(1);
-    expect(snapshot.wieldRequirementByComponent?.hide).toBe(TIER3_TOOL_WIELD_PROFICIENCY);
+    expect(snapshot.wieldRequirementByComponent?.hide).toBe(TIER2_TOOL_WIELD_PROFICIENCY);
     // Mutate the LIVE state AFTER the snapshot, in the direction a live scan
     // would answer DIFFERENTLY: strip the tool entirely, so a live rescan at
-    // grant time would find nothing (null) instead of the frozen 70.
+    // grant time would find nothing (null) instead of the frozen 40.
     meta.inventory.length = 0;
     sim.drainEvents();
     let granted = false;
@@ -274,9 +281,9 @@ describe('snapshotCorpseHarvestGrantInputs: clones every field, draws no rng', (
       .drainEvents()
       .filter((e): e is Extract<typeof e, { type: 'gatherDenied' }> => e.type === 'gatherDenied');
     expect(granted).toBe(true);
-    // The frozen hint survives the live removal: still 70, never absent.
+    // The frozen hint survives the live removal: still 40, never absent.
     expect(denied).toEqual([
-      { type: 'gatherDenied', pid: a, surface: 'corpse', requiredTier: 2, wieldProficiency: 70 },
+      { type: 'gatherDenied', pid: a, surface: 'corpse', requiredTier: 2, wieldProficiency: 40 },
     ]);
   });
 });

@@ -3,11 +3,10 @@ import { farmBedById } from '../src/sim/content/farm_patches';
 import { CRUCIBLE_VENDOR_ENTITY_ID, CRUCIBLE_VENDOR_NPC_ID } from '../src/sim/content/ignivar_loot';
 import { plantCrop } from '../src/sim/professions/farming';
 import { Sim } from '../src/sim/sim';
-import { FARMING_CAST_ID } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 describe('main hotfix integration with release features', () => {
-  it('clears the mouseover queue when the release farming cast starts', () => {
+  it('leaves the mouseover queue to the spell path: a release plant lands instantly, no cast', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'priest', autoEquip: false });
     const player = sim.player;
     const meta = sim.players.get(player.id);
@@ -24,10 +23,11 @@ describe('main hotfix integration with release features', () => {
     plantCrop(sim.ctx, player, meta, bed.id, 'vale_wheat');
 
     expect(meta.farmPlots.has(bed.id)).toBe(true);
-    expect(player.castingAbility).toBe(FARMING_CAST_ID);
-    expect(player.queuedCastAbility).toBeNull();
-    expect(player.queuedCastAim).toBeNull();
-    expect(player.queuedCastTargetId).toBeNull();
+    // Planting starts no cast (the farming-tools report retired the flavor
+    // cast), so there is no cast end path for a queued press to leak through
+    // and the queue is left exactly as the spell path owns it.
+    expect(player.castingAbility).toBeNull();
+    expect(player.queuedCastAbility).toBe('lesser_heal');
   });
 
   it('keeps exactly one quartermaster after the release practice raid is staged', () => {

@@ -16,7 +16,6 @@ import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/disenchant_reagents';
 import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
-  NO_TOOL_OWNED,
   normalizeToolEffectSlots,
   RECHARGE_CHARGES_PER_MATERIAL,
   rarityLadderIndex,
@@ -28,7 +27,7 @@ import {
 } from '../src/sim/professions/wield_gate';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
-import { completeRechargeCast, runRecharge } from './helpers/enchant_family_cast';
+import { runRecharge } from './helpers/enchant_family_cast';
 import { reagentUnitValue } from './helpers/reagent_unit_value';
 
 const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -316,10 +315,11 @@ describe('the recharge command: price, consume, refill', () => {
 
   it('R47/R30 read the best tool OWNED: an unwieldable pick still sets the price rung', () => {
     // The ruling boundary, stated: the wield gate (professions/wield_gate.ts)
-    // filters ACCESS, so a tier-4 pick under its 85 requirement works no node
-    // at all, while the R47/R30 price family reads the best tool OWNED. They
-    // price, they do not gate. A wieldability read here would answer no_tool
-    // and price nothing, which is why the rung below is the assertion.
+    // filters ACCESS, so a tier-4 pick under its 85 requirement works only
+    // the tier-1 ground it degrades to, while the R47/R30 price family reads
+    // the best tool OWNED. They price, they do not gate. A wieldability read
+    // here would answer the degraded tier 1 and price the common rung, which
+    // is why the rare rung below is the assertion.
     const run = (miningProficiency: number) => {
       const sim = makeSim();
       sim.addItem('copper_mining_pick', 1);
@@ -339,13 +339,14 @@ describe('the recharge command: price, consume, refill', () => {
       return { sim, slot, events: sim.tick() };
     };
     const { sim, slot, events } = run(0);
-    // POSITIVE CONTROL: the wield filter really refuses this pick at mining 0
-    // and really admits it at its requirement, so the recharge below is
-    // resolving off a tool the player genuinely cannot swing.
+    // POSITIVE CONTROL: the wield scan really degrades this pick to the
+    // entry tier at mining 0 and really admits its full tier at its
+    // requirement, so the recharge below is resolving off a tool the player
+    // genuinely cannot swing at its rung.
     expect(
       bestWieldableGatherToolTierOrNone(metaOf(sim).inventory, 'mining', 0, ITEMS),
-      'the fixture pick must be unwieldable at mining 0',
-    ).toBe(NO_TOOL_OWNED);
+      'the fixture pick must degrade to the entry tier at mining 0',
+    ).toBe(1);
     expect(
       bestWieldableGatherToolTierOrNone(
         metaOf(sim).inventory,

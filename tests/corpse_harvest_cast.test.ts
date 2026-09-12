@@ -35,6 +35,7 @@
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
+import { MONSTER_MATERIAL_TIERS } from '../src/sim/content/professions';
 import { ITEMS, MOBS, setActiveWorldContent } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { snapshotCorpseHarvestGrantInputs } from '../src/sim/professions/corpse_harvest_grant';
@@ -45,7 +46,10 @@ import {
   validateCorpseHarvestCast,
 } from '../src/sim/professions/corpse_harvest_session';
 import { HARVEST_CAST_SECONDS } from '../src/sim/professions/harvest_admission';
-import { TIER3_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
+import {
+  TIER2_TOOL_WIELD_PROFICIENCY,
+  TIER3_TOOL_WIELD_PROFICIENCY,
+} from '../src/sim/professions/wield_gate';
 import type { CharacterState, PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import {
@@ -58,6 +62,20 @@ import {
 import { expectDefined } from './helpers/defined';
 import { placeInDungeon } from './helpers/instanced_contexts';
 import { EMPTY_TEST_WORLD } from './sim_shared';
+
+/** Temporarily raise a monster material's tier (the corpse_harvest_grant
+ *  suite's own helper), restoring the table on exit. */
+function withTier(component: string, tier: number, body: () => void): void {
+  const tiers = MONSTER_MATERIAL_TIERS as Record<string, number>;
+  const prior = tiers[component];
+  tiers[component] = tier;
+  try {
+    body();
+  } finally {
+    if (prior === undefined) delete tiers[component];
+    else tiers[component] = prior;
+  }
+}
 
 const CORPSE_TEST_WORLD: WorldContent = { ...EMPTY_TEST_WORLD, roads: [] };
 
@@ -727,18 +745,23 @@ describe('REGRESSION: frozen grant inputs must be the real shared snapshot', () 
     }
   });
 
-  it('an owned-but-unwielded mithril_mining_pick freezes the real TIER3_TOOL_WIELD_PROFICIENCY threshold for hide, and it survives a mid-cast proficiency change or tool loss', () => {
+  it('an owned-but-unwielded mithril_mining_pick freezes the real TIER2_TOOL_WIELD_PROFICIENCY threshold for a tier-2 hide, and it survives a mid-cast proficiency change or tool loss', () => {
     // Same fixture shape as tests/corpse_harvest_grant.test.ts's own
     // "captures the wield-requirement denial hint" case: the pick is OWNED
-    // but not yet WIELDABLE (no gatheringProficiency.mining set), which is
-    // exactly what makes minWieldRequirementToWorkAny answer a real,
-    // non-null threshold instead of the plain no-tool null.
+    // but not yet WIELDABLE above tier 1 (no gatheringProficiency.mining
+    // set) against a tier-2 hide, which is exactly what makes
+    // minWieldRequirementToWorkAny answer a real, non-null threshold instead
+    // of the plain no-tool null. Under the degrade rule the hint names the
+    // TARGET tier's requirement (40 opens tier 2 for a carried tier-3 pick),
+    // not the pick's own 70.
     const { sim, a, mob } = setup();
     const meta = mustMeta(sim, a);
     sim.addItem('mithril_mining_pick', 1, a);
-    expect(startCorpseHarvest(sim.ctx, mob.id, a)).toBe(true);
+    withTier('hide', 2, () => {
+      expect(startCorpseHarvest(sim.ctx, mob.id, a)).toBe(true);
+    });
     const frozen = meta.corpseHarvestSession?.grant.inputs.wieldRequirementByComponent;
-    expect(frozen?.hide).toBe(TIER3_TOOL_WIELD_PROFICIENCY);
+    expect(frozen?.hide).toBe(TIER2_TOOL_WIELD_PROFICIENCY);
 
     // Mutate live state AFTER the freeze, in the direction a live rescan
     // would answer differently: raise mining proficiency (would clear the
@@ -746,11 +769,11 @@ describe('REGRESSION: frozen grant inputs must be the real shared snapshot', () 
     // answer null). The frozen hint must survive both, unchanged.
     meta.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     expect(meta.corpseHarvestSession?.grant.inputs.wieldRequirementByComponent?.hide).toBe(
-      TIER3_TOOL_WIELD_PROFICIENCY,
+      TIER2_TOOL_WIELD_PROFICIENCY,
     );
     sim.removeItem('mithril_mining_pick', 1, a);
     expect(meta.corpseHarvestSession?.grant.inputs.wieldRequirementByComponent?.hide).toBe(
-      TIER3_TOOL_WIELD_PROFICIENCY,
+      TIER2_TOOL_WIELD_PROFICIENCY,
     );
   });
 });

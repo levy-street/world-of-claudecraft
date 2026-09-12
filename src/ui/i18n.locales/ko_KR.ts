@@ -3015,7 +3015,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': '곰',
   'abilityUi.forms.cat': '늑대',
   'abilityUi.cast.fishing': '낚시',
-  'abilityUi.cast.farming': '파종',
   'abilityUi.cast.gathering': '채집',
   'abilityUi.cast.thunzharrStormcall': '폭풍의 부름',
   'abilityUi.cast.demonHeal': '악마 치유',
@@ -10460,6 +10459,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.use.herbalism': '사용: 근처의 약초 군락에서 채집합니다.',
   'hudChrome.gathering.toolTooltip.use.farming': '가방에 넣어 두면 작물밭에 심을 때 사용됩니다.',
   'hudChrome.gathering.toolTooltip.speed': '{tier}티어 미만 채집지에서 더 빠르게 채집합니다.',
+  'hudChrome.gathering.toolTooltip.wieldDegrade':
+    '그 숙련도에 못 미쳐도 낮은 티어 도구로는 계속 쓸 수 있습니다.',
   'hudChrome.gathering.toolTooltip.rodRequired': '낚시에 필요합니다.',
   'hudChrome.gathering.toolTooltip.rodBite': '물고기가 최대 {seconds}초 더 빨리 입질합니다.',
   'hudChrome.gathering.toolTooltip.rodReel': '릴 감기 시간이 {seconds}초 늘어납니다.',
@@ -13416,7 +13417,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주방은 한 철의 수확이 보답으로 돌아오는 곳이다. 일상적인 농가 요리 너머로, 작물의 단마다 더 풍성한 요리가 하나씩 있어 먹으면 잘 먹음 효과가 남는다. 식사를 마치면 오래가는 축복이 몸에 남으니, 일행이 던전 문 앞에서 먼저 챙겨 먹고 싶어 하는 바로 그 이점이다. 그 정점은 Harvest Feast로, 요리사가 세계 그 자체에 차려 내는 한 상이다. 곁에 있는 모두가 저마다 한 그릇씩, 한 사람당 한 번만 덜어 가고, 다 먹은 식사는 똑같은 잘 먹음 축복을 치러 주니, 농부 한 사람의 한 철이 일행 전체의 식탁을 차릴 수 있다. 그 사다리의 꼭대기, 가장 풍성한 두 요리와 잔치 그 자체는 산악과 화단의 작물에 기대고, 그 씨앗은 밭 곁의 농부들에게서 팔린다. 요리법은 다른 이야기다. 농사 사다리의 위쪽 단은 이제 어느 상점에서도 가르치지 않고, 다른 최종 요리법과 마찬가지로 최종 콘텐츠에서 찾거나 영웅 징표로 사야 한다.\n\n그 식탁에는 운의 자리도 있다. 거둬들이는 모든 수확은 다른 채집 기술과 같은 횡재 확률을 굴리고, 이따금 작물이 황금빛으로 여문다. 수확량은 평범한 수확을 훌쩍 넘고, 덤이 하나 더 딸려 나오며(지금 일구는 땅보다 한 단 위의 씨앗, 또는 이따금 그 최종 요리법 가운데 하나), 지역 전체가 그 발견을 이름과 함께 듣게 되고, Golden Harvest가 업적의 책에 기록된다.',
   'guide.profPages.farm.rhythmHeading': '농사의 리듬',
   'guide.profPages.farm.rhythmBody':
-    '씨를 심는 일이 눈에 보이는 짧은 시전이다. 어느 단에서나 {plant}초로 고정인데, 괭이는 속도를 사는 도구가 아니라 땅을 여는 도구이기 때문이다. 익은 작물을 뽑는 것은 즉시 끝난다. 끊길 시전도 없고 가방을 검사해 거절하는 일도 없으며, 다 자란 밭은 놔둔 만큼 기다리니, 가방이 가득 차도 농부가 치르는 값은 비우러 다녀오는 걸음뿐이다.\n\n수확이 치러 주는 것은 농작물과 농사 숙련도다. 광맥과 달리 캐릭터 경험치는 조금도 주지 않으니, 밭은 레벨을 올리는 수단이 아니라 손수 일구는 기술이다.',
+    '씨를 심는 일은 즉시 끝난다. 괭이는 속도를 사는 도구가 아니라 땅을 여는 도구이기 때문이다. 기다릴 시전이 없으니, 자리를 뜬 농부라도 심은 것은 그대로 심어진다. 익은 작물을 뽑는 것도 즉시 끝난다. 끊길 시전도 없고 가방을 검사해 거절하는 일도 없으며, 다 자란 밭은 놔둔 만큼 기다리니, 가방이 가득 차도 농부가 치르는 값은 비우러 다녀오는 걸음뿐이다.\n\n수확이 치러 주는 것은 농작물과 농사 숙련도다. 광맥과 달리 캐릭터 경험치는 조금도 주지 않으니, 밭은 레벨을 올리는 수단이 아니라 손수 일구는 기술이다.',
   'guide.profPages.farm.gainHeading': '수확이 가르치는 것',
   'guide.profPages.farm.gainBody':
     '숙련도 상승은 확정적이며, 작물이 아니라 자기 카운터를 기준으로 매겨진다. 숙련도 {p1} 미만은 수확당 {g1}점, {p2} 미만은 {g2}점, {p3} 미만은 {g3}점, 그 위로 상한 {cap}까지는 {g4}점이다. 기술 상승 판정 같은 것은 결코 없으니, 오르막의 길이는 산술이 정한 그대로다.\n\n작물의 단이 정하는 것은 그 밭이 당신을 어디까지 데려다주는가이다. 1단 작물은 {c1}까지 가르치고 거기서 회색이 되며, 2단 작물은 {c2}까지, 3단 이상의 작물은 상한까지 가르친다. 그러니 카운터를 계속 움직이게 하는 것은 더 높은 밭으로 올라서는 일이다.',

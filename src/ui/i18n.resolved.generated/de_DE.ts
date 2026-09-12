@@ -4125,6 +4125,7 @@ export const de_DE: EnTranslations = {
           "farming": "Wird beim Pflanzen eines Beets aus deinen Taschen verwendet."
         },
         "speed": "Sammelt schneller an Knoten unterhalb von Stufe {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Zum Angeln erforderlich.",
         "rodBite": "Fische beißen bis zu {seconds} Sek. früher an.",
         "rodReel": "Verlängert das Einholfenster um {seconds} Sek.",
@@ -7531,7 +7532,7 @@ export const de_DE: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Der Rhythmus der Landwirtschaft",
-        "rhythmBody": "Pflanzen ist der kurze sichtbare Zauber: auf jeder Stufe pauschal {plant} Sekunden, weil eine Hacke Boden öffnet und kein Tempo kauft. Das Herausnehmen einer reifen Ernte geschieht sofort. Es gibt keinen Zauber, den man unterbrechen könnte, und keine Taschenprüfung, die es ablehnt. Ein Beet, das bereit ist, wartet so lange, wie du es stehen lässt, daher kostet ein voller Rucksack den Bauern nichts außer dem Weg zum Leeren.\n\nWas eine Ernte zahlt, sind Erzeugnis und Landwirtschafts-Fertigkeit. Anders als eine Erzader gewährt sie überhaupt keine Charakter-EP, denn die Beete sind ein Beruf zum Arbeiten und kein Weg zum Stufenaufstieg.",
+        "rhythmBody": "Pflanzen geschieht sofort, weil eine Hacke Boden öffnet und kein Tempo kauft: Es gibt keinen Zauber, den man abwarten müsste, wer also weitergeht, hat trotzdem gepflanzt. Das Herausnehmen einer reifen Ernte geschieht ebenfalls sofort. Es gibt keinen Zauber, den man unterbrechen könnte, und keine Taschenprüfung, die es ablehnt. Ein Beet, das bereit ist, wartet so lange, wie du es stehen lässt, daher kostet ein voller Rucksack den Bauern nichts außer dem Weg zum Leeren.\n\nWas eine Ernte zahlt, sind Erzeugnis und Landwirtschafts-Fertigkeit. Anders als eine Erzader gewährt sie überhaupt keine Charakter-EP, denn die Beete sind ein Beruf zum Arbeiten und kein Weg zum Stufenaufstieg.",
         "gainHeading": "Was eine Ernte lehrt",
         "gainBody": "Der Gewinn ist deterministisch und an deinen eigenen Zähler statt an die Pflanze gebunden: {g1} Fertigkeit bei einer Ernte unter {p1}, {g2} unter {p2}, {g3} unter {p3} und {g4} für den Rest bis zur Obergrenze {cap}. Es gibt nie einen Fertigkeitswurf, daher ist der Aufstieg genau so lang, wie die Rechnung ihn macht.\n\nDie Pflanzenstufe entscheidet, wie weit ein Beet dich tragen kann. Eine Pflanze der Stufe 1 lehrt bis {c1} und wird dort grau, eine Pflanze der Stufe 2 bis {c2}, und Stufe 3 und höher bis zur Obergrenze. Nur wenn du zu höheren Beeten wechselst, bewegt sich der Zähler weiter.",
         "yieldsHeading": "Was eine Ernte bringt",
@@ -10607,7 +10608,6 @@ export const de_DE: EnTranslations = {
     },
     "cast": {
       "fishing": "Angeln",
-      "farming": "Pflanzen",
       "gathering": "Sammeln",
       "crafting": "Basteln",
       "disenchanting": "Entzaubern",

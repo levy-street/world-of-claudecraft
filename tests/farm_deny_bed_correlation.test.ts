@@ -31,7 +31,7 @@ import { farmBedById } from '../src/sim/content/farm_patches';
 import { setItemLocked } from '../src/sim/item_lock';
 import { canPlantCrop } from '../src/sim/professions/farming';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import { FISHING_CAST_ID, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { stripComments } from './helpers/strip_comments';
 
@@ -409,9 +409,10 @@ describe('the two arms that answer through ctx.error emit no farmDenied', () => 
   it('busy answers with an error line and no deny', () => {
     const h = makeHarness();
     h.sim.addItem(SEED_ID, 1, h.pid);
-    // The first plant starts the (flavor) plant cast; the second lands on the
-    // busy gate.
-    plant(h);
+    // Planting starts no cast (the farming-tools report retired the flavor
+    // cast), so a running fishing cast is what trips the busy gate here.
+    h.sim.player.castingAbility = FISHING_CAST_ID;
+    h.sim.player.castRemaining = 1;
     const from = h.sim.events.length;
     h.sim.plantCrop(BED, CROP_ID, {}, h.pid);
     expect(denies(h.sim, from)).toEqual([]);

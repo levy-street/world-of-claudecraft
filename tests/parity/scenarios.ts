@@ -54,12 +54,15 @@ import { NYTHRAXIS_BONE_SPIKE_ID } from '../../src/sim/nythraxis_bone_spike';
 import { NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS } from '../../src/sim/nythraxis_grave_eruption';
 import { PLAYER_BODY_RADIUS } from '../../src/sim/pathfind';
 import type { PlotState } from '../../src/sim/professions/farm_projection';
-import {
-  convertHusks,
-  FARM_PLANT_CAST_SEC,
-  harvestCrop,
-  plantCrop,
-} from '../../src/sim/professions/farming';
+import { convertHusks, harvestCrop, plantCrop } from '../../src/sim/professions/farming';
+
+// The 41-tick window the farming session used to spend riding out the plant
+// flavor cast (2 sec at DT plus one). The cast was retired by the farming-tools
+// report (planting is instant), but every "ride out the cast" beat below keeps
+// its window so the scenario's tick timeline, and every snapshot's tick, stays
+// exactly where the golden was minted.
+const FARM_PLANT_WINDOW_TICKS = 41;
+
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import {
@@ -5984,8 +5987,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       'class:warrior (farmer)',
       'plantCrop gate order passed: alive, range, bed free, crop known, skill, seed in bags',
       'plant pre-roll: exactly two contiguous rng draws per plant (survival, yield seed)',
-      'plant consumes the seed and starts the flavor cast (FARMING_CAST_ID)',
-      'busy gate: the second plant waits out the first plant cast',
+      'plant consumes the seed and starts NO cast (planting is instant; the flavor cast was retired)',
       'growth window: readyAtMs reached with ZERO rng draws and zero events',
       'harvestCrop survived path: TWO draws at tier 1 (the golden roll, a recorded loss, then the golden BONUS roll, spent and unread), produce granted from the stored yield seed',
       'harvestCrop withered path: TWO draws at tier 1 (the golden roll and the golden bonus roll, both spent and ignored), withered husks paid instead of produce',
@@ -6039,10 +6041,10 @@ function professionsFarmingSession(seed = 1): Scenario {
       // Plant one: the first two draws of the session.
       plantCrop(sim.ctx, p, meta, BED_READY, CROP);
       rec.snapshot('planted-first');
-      // Ride out the flavor cast. plantCrop's busy gate refuses a second plant
-      // while one runs, so this window is what makes the second plant land
-      // rather than emitting a busy error.
-      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // Planting is instant (the farming-tools report retired the flavor
+      // cast); the window the old cast rode out is kept so the scenario's
+      // timeline, and every later snapshot's tick, stays put.
+      rec.tick(FARM_PLANT_WINDOW_TICKS);
       // Plant two: two more draws, and the plot map stays in sorted bed order.
       plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
       rec.snapshot('planted');
@@ -6088,7 +6090,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       sim.addItem('vale_wheat', 2, pid);
       // Ride out the SECOND plant's flavor cast remainder (0.6 sec of its 2
       // sec still runs here), or the knobbed plant would deny busy.
-      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      rec.tick(FARM_PLANT_WINDOW_TICKS);
       plantCrop(sim.ctx, p, meta, BED_READY, CROP, { compost: true, watch: true, tonic: true });
       const knobbed = meta.farmPlots.get(BED_READY) as PlotState;
       // The stored knob flags, stashed for the coverage suite: farmPlanted is
@@ -6123,7 +6125,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // plant's own flavor cast first (its 2 sec are untouched here), which
       // also drains the toniced harvest's queued gain BEFORE the proficiency
       // write below, so the write is the last word.
-      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      rec.tick(FARM_PLANT_WINDOW_TICKS);
       teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
       meta.gatheringProficiency.farming = 75;
       sim.addItem('skysilver_hoe', 1, pid);
@@ -6155,10 +6157,10 @@ function professionsFarmingSession(seed = 1): Scenario {
       teleport(sim, p, -21.5, -84); // back to the freed Eastbrook bed (the pair's midpoint)
       // Ride out the t3 plant's flavor cast remainder (its harvest landed
       // mid-cast and tick(8) covers only 0.4 sec), or this plant denies busy.
-      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      rec.tick(FARM_PLANT_WINDOW_TICKS);
       // Two draws (the plant pre-roll), the extension's only randomness.
       plantCrop(sim.ctx, p, meta, BED_READY, CROP);
-      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      rec.tick(FARM_PLANT_WINDOW_TICKS);
       // The /dev farmgrow equivalence again: ripen in place, survived arm.
       const noticed = meta.farmPlots.get(BED_READY) as PlotState;
       noticed.readyAtMs = sim.ctx.lockoutNowMs();
@@ -6208,7 +6210,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       for (let cycle = 0; cycle < FARM_GOLDEN_PADDING_CYCLES; cycle++) {
         sim.addItem('vale_wheat_seed', 1, pid);
         // Clear the previous plant's flavor-cast busy gate (draw-free).
-        rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+        rec.tick(FARM_PLANT_WINDOW_TICKS);
         plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
         const pad = meta.farmPlots.get(BED_WITHERED) as PlotState;
         pad.readyAtMs = sim.ctx.lockoutNowMs();
@@ -6227,7 +6229,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // a golden digest for the first time.
       meta.gatheringProficiency.farming = 75; // the probed expansion's skill
       sim.addItem('vale_wheat_seed', 1, pid);
-      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      rec.tick(FARM_PLANT_WINDOW_TICKS);
       plantCrop(sim.ctx, p, meta, BED_READY, CROP);
       rec.snapshot('planted-golden');
       const goldenPlot = meta.farmPlots.get(BED_READY) as PlotState;
@@ -6247,7 +6249,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // roll is a recorded loss, so no bonus rides this beat.
       meta.gatheringProficiency.farming = 0; // the padding wither window again
       sim.addItem('vale_wheat_seed', 1, pid);
-      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      rec.tick(FARM_PLANT_WINDOW_TICKS);
       plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
       const padFinal = meta.farmPlots.get(BED_WITHERED) as PlotState;
       padFinal.readyAtMs = sim.ctx.lockoutNowMs();
@@ -6256,7 +6258,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       meta.gatheringProficiency.farming = 75; // restore for the tier-3 beat
       teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
       sim.addItem('highland_barley_seed', 1, pid);
-      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      rec.tick(FARM_PLANT_WINDOW_TICKS);
       plantCrop(sim.ctx, p, meta, BED_T3, 'highland_barley');
       rec.snapshot('planted-t3-paying');
       const barleyPaying = meta.farmPlots.get(BED_T3) as PlotState;
@@ -6279,7 +6281,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // Wait out the tier-3 beat's still-running plant flavor cast first
       // (the drive's own busy-gate idiom): useItem refuses during a
       // non-spell cast, and rec.tick(8) above is shorter than the cast.
-      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      rec.tick(FARM_PLANT_WINDOW_TICKS);
       sim.addItem('evergarden_braised_greens', 1, pid);
       sim.useItem('evergarden_braised_greens', pid);
       rec.snapshot('wellfed-eating');

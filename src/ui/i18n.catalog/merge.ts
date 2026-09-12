@@ -513,10 +513,6 @@ const mergeStringsEn = {
     ...abilityStrings.en.abilityUi,
     cast: {
       fishing: 'Fishing',
-      // The plant cast (Farming, the growth-engine phase). Same gerund style
-      // as its neighbours; the cast is pure flavor (plantCrop already resolved
-      // the plant), so the label names the activity and nothing more.
-      farming: 'Planting',
       gathering: 'Gathering',
       crafting: 'Crafting',
       disenchanting: 'Disenchanting',

@@ -265,7 +265,6 @@ export interface GuideProfCurve {
   rareEvent: { oneIn: number; yieldMult: number; flavors: { ore: string; wood: string; herb: string } };
   specimenChancePct: number;
   farm: {
-    plantCastSec: number;
     lifeFloor: number;
     keepChancePctAtZero: number;
     keepChancePctAtCap: number;
@@ -18332,7 +18331,6 @@ export const GUIDE_PROF_CURVE: GuideProfCurve = {
   },
   "specimenChancePct": 16,
   "farm": {
-    "plantCastSec": 2,
     "lifeFloor": 3,
     "keepChancePctAtZero": 15,
     "keepChancePctAtCap": 50,

@@ -13,7 +13,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
-  'abilityUi.cast.farming': 'Plantar',
   'hudChrome.barEditor.armed': 'Toca una ranura para colocar {name}.',
   'hudChrome.barEditor.buttonHeader': 'Botón {button}',
   'hudChrome.barEditor.cellAria': 'Botón {button}, {direction}: {action}',
@@ -17165,9 +17164,8 @@ La ganancia de habilidad se desvanece como en fabricación: una veta se vuelve g
 
 Lo que decide el nivel del cultivo es hasta dónde puede llevarte un bancal. Un cultivo de nivel 1 enseña hasta {c1} y se vuelve gris allí; uno de nivel 2 hasta {c2}; y el nivel 3 o superior llega hasta el límite. Subir a bancales mejores es lo que mantiene avanzando el contador.`,
   'guide.profPages.farm.gainHeading': 'Qué enseña una cosecha',
-  'guide.profPages.farm.rhythmBody': `Plantar es el lanzamiento visible y corto: dura exactamente {plant} segundos en todos los peldaños, porque la azada abre la tierra en vez de comprar velocidad. Extraer un cultivo maduro es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.
-
-Una cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.`,
+  'guide.profPages.farm.rhythmBody':
+    'Plantar es instantáneo, porque la azada abre la tierra en vez de comprar velocidad: no hay lanzamiento que esperar, así que un agricultor que se aleja ha plantado igualmente. Extraer un cultivo maduro también es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.\n\nUna cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.',
   'guide.profPages.farm.rhythmHeading': 'El ritmo de la agricultura',
   'guide.profPages.farm.tableBodyOneMeal': `Las cocinas son donde una temporada da sus frutos. Además de los platos cotidianos de la granja, cada nivel de cultivo tiene un plato más rico que deja el beneficio Bien alimentado: terminas la comida y una mejora duradera permanece contigo, justo la ventaja que un grupo quiere consumir antes de la puerta de la mazmorra. Solo puede haber un efecto Bien alimentado; una comida nueva reemplaza al anterior. El broche de la colección es el Festín de la Cosecha, una bandeja que el cocinero coloca en el propio mundo: cada persona cercana recibe su propia ración, una por persona, y cada comida terminada concede el mismo beneficio Bien alimentado. Así, la temporada de un agricultor puede poner la mesa para todo un grupo. La cima, con los dos platos más ricos y el festín, usa cultivos de montaña y de parterre, cuyas semillas venden los agricultores junto a esos bancales. Las recetas son otra cuestión: los peldaños superiores de la escala agrícola ya no se enseñan en ningún mostrador, sino que se encuentran en el contenido final o se compran con Marcas Heroicas como cualquier otra receta final. La escala de platos pertenece a Cocina; la página de Cocina contiene todos sus peldaños.
 

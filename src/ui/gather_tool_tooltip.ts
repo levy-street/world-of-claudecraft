@@ -35,7 +35,7 @@ import {
 } from '../sim/professions/fishing';
 import { FISHING_CATCH_BAND_THRESHOLDS } from '../sim/professions/fishing_bands';
 import { isGatherToolUse } from '../sim/professions/tools';
-import { wieldRequirementForTier } from '../sim/professions/wield_gate';
+import { wieldRequirementFor } from '../sim/professions/wield_gate';
 import type { ItemDef } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
@@ -162,10 +162,12 @@ export function gatherToolTooltipLines(item: ItemDef): string {
   if (useKey) html += tooltipLine('tt-desc', t(useKey));
   // The R22 wield requirement, on the item that carries it: the same
   // "Requires {craft} {skill}" line the vendor's advisory sub-line renders,
-  // with the number read from the one wield table the harvest gate enforces
-  // (professions/wield_gate.ts). Land tools only by construction: rods are
-  // R22-exempt and their branch returned above, and tier 1 reads 0.
-  const wieldReq = wieldRequirementForTier(use.tier);
+  // with the number read from the profession's own wield ladder, the one the
+  // harvest and plant gates enforce (professions/wield_gate.ts: farming's
+  // hoes read the crop bands, the node trades the land table). Land tools
+  // only by construction: rods are R22-exempt and their branch returned
+  // above, and tier 1 reads 0.
+  const wieldReq = wieldRequirementFor(use.professionId, use.tier);
   const professionNameKey = gatheringProfessionNameKey(use.professionId);
   // No printable profession name means no line, matching requirementText in
   // the vendor painter: a fallback through the KIND keys would render
@@ -178,6 +180,11 @@ export function gatherToolTooltipLines(item: ItemDef): string {
         skill: formatNumber(wieldReq, { maximumFractionDigits: 0 }),
       }),
     );
+    // The degrade rule beside the requirement it softens: under the skill the
+    // tool is not a brick, it works as the best tier the counter allows
+    // (wield_gate.ts effectiveWieldableTier), so a crafted upgrade never
+    // loses the function of the tool it consumed.
+    html += tooltipLine('tt-desc', t('hudChrome.gathering.toolTooltip.wieldDegrade'));
   }
   if (use.tier > 1) {
     html += tooltipLine('tt-desc', t('hudChrome.gathering.toolTooltip.speed', { tier }));

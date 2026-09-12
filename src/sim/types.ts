@@ -185,15 +185,6 @@ export const SUNDER_CAST_ID = 'sundering';
 // activity-marker shape as craft/enchant-family. Separate id keeps cast-bar
 // labels and audio routing clean.
 export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
-// The planting cast sentinel (Farming, the growth-engine phase): same
-// activity-marker shape as the craft/gather family. UNLIKE every other
-// sentinel here, this cast decides NOTHING: plantCrop resolves the whole
-// plant at command time and the cast is pure flavor, so its completion arm in
-// combat/casting_lifecycle.ts dispatches no work (see the comment there).
-// Membership in isNonSpellCast below is what buys it the shared bundle
-// (silence exemption, no spell queue, damage cancels instead of pushing back,
-// item use blocked while it runs).
-export const FARMING_CAST_ID = 'farming';
 // The corpse-harvest cast (Intentional Gathering, PR3): same activity-marker
 // shape as gather/craft/fishing. HARVEST_CAST_SECONDS (professions/
 // harvest_admission.ts) is the frozen duration; professions/
@@ -216,7 +207,6 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === SALVAGE_CAST_ID ||
     castId === SUNDER_CAST_ID ||
     castId === TOOL_RECHARGE_CAST_ID ||
-    castId === FARMING_CAST_ID ||
     castId === CORPSE_HARVEST_CAST_ID
   );
 }

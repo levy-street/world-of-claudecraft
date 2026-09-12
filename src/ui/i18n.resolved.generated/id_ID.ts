@@ -4125,6 +4125,7 @@ export const id_ID: EnTranslations = {
           "farming": "Bekerja dari tasmu saat kamu menanam di bedeng."
         },
         "speed": "Mengumpulkan lebih cepat di simpul di bawah tingkat {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Diperlukan untuk memancing.",
         "rodBite": "Ikan menggigit hingga {seconds} dtk lebih cepat.",
         "rodReel": "Memperpanjang jendela penarikan sebesar {seconds} dtk.",
@@ -7531,7 +7532,7 @@ export const id_ID: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Irama pertanian",
-        "rhythmBody": "Menanam adalah rapal singkat yang terlihat: tepat {plant} detik pada setiap anak tangga, karena cangkul membuka tanah, bukan membeli kecepatan. Menarik tanaman matang berlangsung seketika. Tidak ada rapal yang bisa disela dan tidak ada pemeriksaan tas untuk menolaknya, dan petak yang sudah siap menunggu selama kamu membiarkannya, sehingga tas penuh hanya menghabiskan langkah petani untuk mengosongkannya.\n\nYang dibayar panen adalah hasil dan keahlian Pertanian. Berbeda dari urat bijih, panen sama sekali tidak memberi XP karakter, jadi petak adalah perdagangan untuk dikerjakan, bukan cara menaikkan level.",
+        "rhythmBody": "Menanam berlangsung seketika, karena cangkul membuka tanah, bukan membeli kecepatan: tidak ada rapal yang harus ditunggu, jadi petani yang berjalan pergi tetap sudah menanam. Menarik tanaman matang juga seketika. Tidak ada rapal yang bisa disela dan tidak ada pemeriksaan tas untuk menolaknya, dan petak yang sudah siap menunggu selama kamu membiarkannya, sehingga tas penuh hanya menghabiskan langkah petani untuk mengosongkannya.\n\nYang dibayar panen adalah hasil dan keahlian Pertanian. Berbeda dari urat bijih, panen sama sekali tidak memberi XP karakter, jadi petak adalah perdagangan untuk dikerjakan, bukan cara menaikkan level.",
         "gainHeading": "Yang diajarkan panen",
         "gainBody": "Perolehan bersifat deterministik dan mengikuti penghitungmu sendiri, bukan tanaman: keahlian {g1} untuk panen di bawah {p1}, {g2} di bawah {p2}, {g3} di bawah {p3}, dan {g4} untuk sisa perjalanan menuju batas {cap}. Ini bukan lemparan kenaikan keahlian, jadi pendakiannya tepat sepanjang yang ditentukan aritmetika.\n\nYang ditentukan tingkat tanaman adalah sejauh apa petak dapat membawamu. Tanaman tingkat 1 mengajar sampai {c1} lalu menjadi abu-abu, tanaman tingkat 2 sampai {c2}, dan tingkat 3 ke atas sampai batas, sehingga berpindah ke petak yang lebih tinggi adalah satu-satunya cara penghitung terus bergerak.",
         "yieldsHeading": "Hasil sebuah panen",
@@ -10607,7 +10608,6 @@ export const id_ID: EnTranslations = {
     },
     "cast": {
       "fishing": "Memancing",
-      "farming": "Menanam",
       "gathering": "Mengumpulkan",
       "crafting": "Membuat",
       "disenchanting": "Menghancurkan Pemantraan",

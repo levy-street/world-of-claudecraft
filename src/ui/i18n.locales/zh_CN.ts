@@ -2908,7 +2908,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '钓鱼',
-  'abilityUi.cast.farming': '播种',
   'abilityUi.cast.gathering': '采集',
   'abilityUi.cast.thunzharrStormcall': '风暴召唤',
   'abilityUi.cast.demonHeal': '恶魔治疗',
@@ -9970,6 +9969,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.use.herbalism': '使用：采集附近的草药丛。',
   'hudChrome.gathering.toolTooltip.use.farming': '放在背包里即可，在田畦种植作物时自动生效。',
   'hudChrome.gathering.toolTooltip.speed': '在低于{tier}阶的节点采集速度更快。',
+  'hudChrome.gathering.toolTooltip.wieldDegrade': '技能不足时，它仍可当作较低阶的工具使用。',
   'hudChrome.gathering.toolTooltip.rodRequired': '钓鱼所需。',
   'hudChrome.gathering.toolTooltip.rodBite': '鱼上钩最多可提前{seconds}秒。',
   'hudChrome.gathering.toolTooltip.rodReel': '收线时限延长{seconds}秒。',
@@ -12799,7 +12799,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '厨房是一季收成得到回报的地方。在日常农家菜之外，每一阶作物都有一道更丰盛的菜肴，吃了能获得精神饱满：吃完这一餐，一份持久的恩泽便留在你身上，正是队伍在地下城门前想先吃下的那份底气。压轴的是Harvest Feast，厨师直接摆进世界里的一桌盛宴：在场的每个人各取一份，每人一次，而每一顿吃完的餐食都给出同样的精神饱满恩泽，于是一位农夫的一季收成能让整支队伍坐上餐桌。这架梯子的顶端，两道最丰盛的菜肴与盛宴本身，倚仗的是山地与花圃的作物，它们的种子就在那些田畦旁的农夫处出售。菜谱则是另一回事：耕作阶梯的高阶层级已不再由任何柜台传授，而是像其他终局菜谱一样，在终局内容中寻得，或用英雄纹章购买。\n\n这张餐桌上也留着运气的位置。你收进的每一次收成都掷出与其他采集行业相同的横财几率，作物偶尔会结出金色的一茬：产量远超寻常，还会额外收获一样东西（一粒适用于比你手上更肥沃田地的种子，偶尔则是那些终局菜谱之一），整个区域都会听到这项发现连着你的名字一同宣告，Golden Harvest也会记入你的功业之书。',
   'guide.profPages.farm.rhythmHeading': '耕作节奏',
   'guide.profPages.farm.rhythmBody':
-    '播种才是那段短暂而看得见的施法：每一级都固定是{plant}秒，因为锄头开放的是土地，而不是买来速度。拔起成熟的作物则是瞬发。没有可打断的施法，也没有背包检查会把它挡回来，而一畦成熟的作物你放多久它等多久，所以背包装满对农夫的代价，不过是走一趟把它腾空。\n\n一次收成付给你的是农产品和耕作熟练度。与一处矿脉不同，它完全不给角色经验，所以田畦是一门去经营的手艺，而不是一条升级的路。',
+    '播种是瞬发的，因为锄头开放的是土地，而不是买来速度：没有需要等待的施法，所以转身走开的农夫也一样已经种下了。拔起成熟的作物同样是瞬发。没有可打断的施法，也没有背包检查会把它挡回来，而一畦成熟的作物你放多久它等多久，所以背包装满对农夫的代价，不过是走一趟把它腾空。\n\n一次收成付给你的是农产品和耕作熟练度。与一处矿脉不同，它完全不给角色经验，所以田畦是一门去经营的手艺，而不是一条升级的路。',
   'guide.profPages.farm.gainHeading': '一次收成教会什么',
   'guide.profPages.farm.gainBody':
     '技能成长是确定的，而且只看你自己的计数，不看作物：熟练度在{p1}以下时，一次收成给{g1}点，在{p2}以下给{g2}点，在{p3}以下给{g3}点，此后直到{cap}的上限一律{g4}点。它从不掷技能提升的骰子，所以这段攀登有多长，全由这笔算术说了算。\n\n作物的阶决定的是一畦田能把你带到多远。第1阶作物教到{c1}便在那里变灰，第2阶作物教到{c2}，第3阶及以上一路教到上限，所以只有往上换田畦，计数才会继续往前走。',

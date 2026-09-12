@@ -55,7 +55,6 @@ import {
   FARM_HARVEST_PICK_CAP,
   FARM_HUSKS_PER_COMPOST,
   FARM_KEEP_CHANCE_BASE,
-  FARM_PLANT_CAST_SEC,
   FARM_SEED_BACK_MIN_TIER,
   FARM_SEED_BACK_ONE_CHANCE,
   FARM_SEED_BACK_TWO_CHANCE,
@@ -90,13 +89,13 @@ import {
   slotToolEffectRefused,
   startingDurabilityFor,
 } from '../src/sim/professions/tools';
-import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
+import { wieldRequirementFor } from '../src/sim/professions/wield_gate';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import {
   DT,
   dist2d,
   type Entity,
-  FARMING_CAST_ID,
+  FISHING_CAST_ID,
   INTERACT_RANGE,
   isNonSpellCast,
   type SimEvent,
@@ -295,13 +294,6 @@ function denyReason(sim: Sim, from: number): string | null {
   return denies.length === 1 ? denies[0].reason : null;
 }
 
-/** Clear the plant cast so the busy gate does not eat the NEXT plant. Real
- *  play lets the cast tick out; these arms are about the command body. */
-function clearCast(sim: Sim): void {
-  sim.player.castingAbility = null;
-  sim.player.castRemaining = 0;
-}
-
 function plant(h: Harness, bedId = BED, cropId = CROP_ID): void {
   plantCrop(h.sim.ctx, h.sim.player, h.meta, bedId, cropId);
 }
@@ -313,12 +305,11 @@ function harvest(h: Harness, bedId = BED): void {
 // ---------------------------------------------------------------------------
 
 describe('the crop catalog and the cast sentinel', () => {
-  it('pins the cast id to its wire token and its isNonSpellCast membership', () => {
-    // A literal, not a comparison against the constant itself: renaming the
-    // constant must not leave the wire token, the cast-bar label and the
-    // readout silently green.
-    expect(FARMING_CAST_ID).toBe('farming');
-    expect(isNonSpellCast(FARMING_CAST_ID)).toBe(true);
+  it('has no cast sentinel: the old plant-cast wire token is an unknown id now', () => {
+    // The farming-tools report retired the flavor cast (planting is instant
+    // like harvesting), so 'farming' left the non-spell family; a literal so
+    // a resurrected constant cannot slip back in silently.
+    expect(isNonSpellCast('farming')).toBe(false);
     expect(isNonSpellCast('fireball')).toBe(false);
   });
 
@@ -437,13 +428,6 @@ describe('the crop catalog and the cast sentinel', () => {
       .filter((c) => c.tier === 3)
       .map((c) => CLASS_OF[c.id]);
     expect(tier3.filter((k) => k === 'leaf')).toHaveLength(1);
-  });
-
-  it('pins the plant cast length to its wire-visible literal', () => {
-    // castTotal/castRemaining ride the wire off this constant, and every other
-    // assertion reaches it through the import, which is a self-comparison (the
-    // wire-name-constant rule). One literal pin, here.
-    expect(FARM_PLANT_CAST_SEC).toBe(2);
   });
 
   it('binds the catalog band math to the survival ramp span (two independent 25s)', () => {
@@ -883,18 +867,21 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     expect(planted).toEqual([{ type: 'farmPlanted', pid: h.pid, bedId: BED, cropId: CROP_ID }]);
   });
 
-  it('starts the flavor cast, which carries no hidden information', () => {
+  it('starts no cast: planting is instant, and the plot is the whole outcome', () => {
+    // The farming-tools report: the old two-second flavor cast decided
+    // nothing (the plot was already written), so cancelling it by walking
+    // off read as a broken cast that had eaten the seed. No cast, no bar to
+    // cancel, and a second plant on another bed lands with no busy window.
     giveSeeds(h);
+    const from = h.sim.events.length;
     plant(h);
-    expect(h.sim.player.castingAbility).toBe(FARMING_CAST_ID);
-    expect(h.sim.player.castTotal).toBe(FARM_PLANT_CAST_SEC);
-    expect(h.sim.player.castRemaining).toBe(FARM_PLANT_CAST_SEC);
-    // A CONSTANT, not a function of the crop or the hidden roll: the cast
-    // fields broadcast, so a per-plot duration would leak growth state.
-    const h2 = makeHarness(99);
-    giveSeeds(h2);
-    plant(h2);
-    expect(h2.sim.player.castTotal).toBe(h.sim.player.castTotal);
+    expect(h.sim.player.castingAbility).toBeNull();
+    expect(h.sim.player.castRemaining).toBe(0);
+    expect(eventsOf(h.sim, from, 'castStart')).toHaveLength(0);
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    plant(h, BED2);
+    expect(h.meta.farmPlots.has(BED)).toBe(true);
+    expect(h.meta.farmPlots.has(BED2)).toBe(true);
   });
 
   it('resolves at COMMAND time, so cancelling the cast leaves the plant standing', () => {
@@ -921,8 +908,12 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
   });
 
   it('refuses a busy farmer', () => {
-    giveSeeds(h, 2);
-    plant(h); // leaves the plant cast running
+    // Planting itself starts no cast any more, so "busy" is some OTHER cast
+    // running (a fishing session here): the gate is about the shared busy
+    // state, not about a plant blocking a plant.
+    giveSeeds(h, 1);
+    h.sim.player.castingAbility = FISHING_CAST_ID;
+    h.sim.player.castRemaining = 1;
     const from = h.sim.events.length;
     const draws = countDraws(h.sim, () => plant(h, BED2));
     expect(draws).toBe(0);
@@ -945,7 +936,6 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     expect(h.meta.farmPlots.size).toBe(0);
     expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
     // Anti-vacuous: the same id family, with a REAL bed, plants.
-    clearCast(h.sim);
     plant(h);
     expect(h.meta.farmPlots.has(BED)).toBe(true);
   });
@@ -963,7 +953,6 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
   it('refuses a bed this farmer has already planted, and only this farmer', () => {
     giveSeeds(h, 2);
     plant(h);
-    clearCast(h.sim);
     const from = h.sim.events.length;
     const draws = countDraws(h.sim, () => plant(h));
     expect(draws).toBe(0);
@@ -1018,8 +1007,9 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     expect(h.sim.countItem('marsh_rice_seed', h.pid)).toBe(1);
     expect(h.meta.farmPlots.size).toBe(0);
     // Anti-vacuous: past the band with a covering hoe, the SAME command
-    // plants (and spends the ordinary two draws).
-    h.meta.gatheringProficiency.farming = 40;
+    // plants (and spends the ordinary two draws). 25 is both the seed's band
+    // and the bronze hoe's wield requirement.
+    h.meta.gatheringProficiency.farming = 25;
     h.sim.addItem('bronze_hoe', 1, h.pid);
     expect(countDraws(h.sim, () => plant(h, BED, 'marsh_rice'))).toBe(2);
     expect(h.meta.farmPlots.get(BED)?.cropId).toBe('marsh_rice');
@@ -1069,7 +1059,6 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     // told the bed is taken, not to buy seeds.
     giveSeeds(h);
     plant(h); // takes BED with the only seed
-    clearCast(h.sim);
     expect(h.sim.countItem(SEED_ID, h.pid)).toBe(0);
     const from = h.sim.events.length;
     expect(countDraws(h.sim, () => plant(h))).toBe(0);
@@ -1082,7 +1071,6 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     // relog and any future walker that draws would fork the stream.
     giveSeeds(h, 2);
     plant(h, BED2);
-    clearCast(h.sim);
     plant(h, BED);
     expect([...h.meta.farmPlots.keys()]).toEqual([BED, BED2]);
   });
@@ -1174,7 +1162,6 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     giveSeeds(h, 3);
     const beds = [BED, BED2, 'bed_eastbrook_3'];
     for (const bedId of beds) {
-      clearCast(h.sim);
       expect(countDraws(h.sim, () => plant(h, bedId))).toBe(2);
     }
     expect(h.meta.farmPlots.size).toBe(3);
@@ -1195,14 +1182,16 @@ describe('plantCrop gate 12: the hoe gate (the crop-ladder tool half)', () => {
     // lower crop can teach further) and this reds.
     for (const tier of [2, 3, 4] as const) {
       expect(
-        wieldRequirementForTier(tier),
+        wieldRequirementFor('farming', tier),
         `the tier ${tier} hoe must be wieldable off tier ${tier - 1} crops`,
       ).toBeLessThanOrEqual(farmingTeachingCeilingFor(tier - 1));
     }
     // The shipped ladder literals, so the inequality above is never
-    // vacuously loose: wield gates 0/40/70/85 layered over the crop
-    // thresholds 0/25/50/75.
-    expect([1, 2, 3, 4].map((t) => wieldRequirementForTier(t))).toEqual([0, 40, 70, 85]);
+    // vacuously loose. Since the farming-tools report the hoe requirements
+    // ARE the crop thresholds (0/25/50/75): a hoe wields on exactly the
+    // proficiency that opens its tier of seed, so a seed can never say 25
+    // while its hoe says 40 again.
+    expect([1, 2, 3, 4].map((t) => wieldRequirementFor('farming', t))).toEqual([0, 25, 50, 75]);
     expect([1, 2, 3, 4].map((t) => farmCropSkillThreshold(t))).toEqual([0, 25, 50, 75]);
   });
 
@@ -1221,26 +1210,48 @@ describe('plantCrop gate 12: the hoe gate (the crop-ladder tool half)', () => {
     expect(h.meta.farmPlots.has(BED)).toBe(true);
   });
 
-  it('gates the WIELD, not ownership: bronze_hoe at 39 refuses a tier-2 crop, at 40 it plants', () => {
-    // marsh_rice is tier 2 (skill threshold 25; the R22 wield requirement for
-    // a tier-2 land tool is 40): at proficiency 39 the skill gate passes, the
-    // wield filter drops the OWNED bronze_hoe from the scan, the harness
-    // garden_hoe (tier 1) cannot cover tier 2, and the plant denies 'tool'.
-    // The SAME inventory at 40 plants: both directions, or the filter pin is
-    // vacuous.
+  it('gates the TIER, not ownership: the tier-1 hoe at 25 refuses a tier-2 crop, a bronze_hoe plants', () => {
+    // marsh_rice is tier 2 (skill threshold 25, which is ALSO the bronze
+    // hoe's wield requirement now): at proficiency 25 the skill gate passes,
+    // the harness garden_hoe (tier 1) cannot cover tier 2, and the plant
+    // denies 'tool'. The SAME command with a bronze_hoe in bags plants: both
+    // directions, or the gate pin is vacuous.
     h.sim.addItem('marsh_rice_seed', 2, h.pid);
-    h.sim.addItem('bronze_hoe', 1, h.pid);
-    h.meta.gatheringProficiency.farming = 39;
+    h.meta.gatheringProficiency.farming = 25;
     const from = h.sim.events.length;
     expect(countDraws(h.sim, () => plant(h, BED, 'marsh_rice'))).toBe(0);
     expect(denyReason(h.sim, from)).toBe('tool');
     expect(h.meta.farmPlots.size).toBe(0);
     expect(h.sim.countItem('marsh_rice_seed', h.pid)).toBe(2);
 
-    h.meta.gatheringProficiency.farming = 40;
+    h.sim.addItem('bronze_hoe', 1, h.pid);
     expect(countDraws(h.sim, () => plant(h, BED, 'marsh_rice'))).toBe(2);
     expect(h.meta.farmPlots.get(BED)?.cropId).toBe('marsh_rice');
     expect(h.sim.countItem('marsh_rice_seed', h.pid)).toBe(1);
+  });
+
+  it('the report: a bronze_hoe ALONE at farming 0 still plants a tier-1 crop (degrade, never brick)', () => {
+    // The hoe upgrade recipe consumes the garden hoe, so this is exactly the
+    // bag a farmer who crafted early was left with. The unwieldable tier-2
+    // hoe works as a tier-1 hoe (wield_gate.ts effectiveWieldableTier)
+    // instead of dropping out of the scan and refusing every plant.
+    giveSeeds(h);
+    h.sim.removeItem(HOE_ID, 1, h.pid);
+    h.sim.addItem('bronze_hoe', 1, h.pid);
+    expect(h.meta.gatheringProficiency.farming).toBe(0);
+    expect(countDraws(h.sim, () => plant(h))).toBe(2);
+    expect(h.meta.farmPlots.get(BED)?.cropId).toBe(CROP_ID);
+    // What it still cannot do is plant ABOVE the counter: a tier-2 seed is
+    // refused at 24, and at 25 the SAME hoe wields in full (25 is both the
+    // seed band and the hoe's requirement) and the tier-2 plant lands.
+    h.meta.gatheringProficiency.farming = 24;
+    h.sim.addItem('marsh_rice_seed', 1, h.pid);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plant(h, BED2, 'marsh_rice'))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('skill');
+    h.meta.gatheringProficiency.farming = 25;
+    expect(countDraws(h.sim, () => plant(h, BED2, 'marsh_rice'))).toBe(2);
+    expect(h.meta.farmPlots.get(BED2)?.cropId).toBe('marsh_rice');
   });
 
   it('preserves stealth, sitting and mount on the tool refusal (the trio stays below gate 12)', () => {
@@ -1475,7 +1486,6 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     // and neither the stored flags nor the retry's would-be payments move.
     giveAllSupplies();
     plantK({ compost: true });
-    clearCast(h.sim);
     const compostBefore = h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid);
     const tonicBefore = h.sim.countItem(FARM_GROWTH_TONIC_ITEM_ID, h.pid);
     const produceBefore = h.sim.countItem(PRODUCE_ID, h.pid);
@@ -1524,7 +1534,6 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
       hx.sim.addItem(SEED_ID, 1, hx.pid);
       hx.sim.addItem(FARM_COMPOST_ITEM_ID, 1, hx.pid);
       plantCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED, CROP_ID, knobs);
-      clearCast(hx.sim);
       (hx.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.9;
       hx.advance(CROP.durationMs);
     }
@@ -1542,7 +1551,6 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     h.sim.addItem(SEED_ID, 1, h.pid);
     h.sim.addItem(PRODUCE_ID, 2, h.pid);
     plantK({ watch: true });
-    clearCast(h.sim);
     (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.9;
     h.advance(CROP.durationMs);
     const from = h.sim.events.length;
@@ -1571,7 +1579,6 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     h.sim.addItem(FARM_COMPOST_ITEM_ID, 1, h.pid);
     h.sim.addItem(PRODUCE_ID, 2, h.pid);
     plantK({ compost: true, watch: true });
-    clearCast(h.sim);
     (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.9999;
     h.advance(CROP.durationMs);
     const from = h.sim.events.length;
@@ -1603,7 +1610,6 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     h = makeHarness(TONIC_WIN_SEED);
     giveAllSupplies();
     plantK({ compost: true, watch: true, tonic: true });
-    clearCast(h.sim);
     // A roll that withers unknobbed at skill 0 (chance 0.85) but survives
     // with both survival knobs (capped at 1), so the post-reload harvest
     // outcome proves the FLAGS, not just the row shape.
@@ -1721,7 +1727,6 @@ describe('the tonic yield arm: seed expansion, never a draw', () => {
     h.sim.addItem(SEED_ID, 1, h.pid);
     h.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, h.pid);
     plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { tonic: true });
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0; // survival forced, so this arm is about yield only
@@ -1772,7 +1777,6 @@ describe('the tonic yield arm: seed expansion, never a draw', () => {
       hx.sim.addItem(SEED_ID, 1, hx.pid);
       hx.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, hx.pid);
       plantCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED, CROP_ID, { tonic: true });
-      clearCast(hx.sim);
     }
     onTime.advance(CROP.durationMs);
     late.advance(CROP.durationMs + 12 * 60 * 60_000);
@@ -1805,7 +1809,6 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
   /** Plant, ripen, and force the survival win: these arms are about yield. */
   function ripen(bedId = BED): PlotState {
     plant(h, bedId);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     const plot = h.meta.farmPlots.get(bedId) as PlotState;
     plot.survivalRoll = 0;
@@ -2115,7 +2118,6 @@ describe('harvestCrop TIER 1/2: two draws (golden roll, golden bonus) on every o
   /** Plant, jump the clock past the deadline, and clear the flavor cast. */
   function plantAndRipen(bedId = BED): void {
     plant(h, bedId);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
   }
 
@@ -2273,7 +2275,6 @@ describe('harvestCrop TIER 1/2: two draws (golden roll, golden bonus) on every o
     // And the withered payout, where an unflagged hub line would be worse than
     // duplication: it announces a crop FAILURE in the words of a reward.
     plant(h, BED2);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     (h.meta.farmPlots.get(BED2) as PlotState).survivalRoll = 0.99;
     h.meta.gatheringProficiency.farming = 0;
@@ -2406,7 +2407,6 @@ describe('harvestCrop TIER 1/2: two draws (golden roll, golden bonus) on every o
 
   it('refuses a plot that has not finished growing, one ms before the deadline', () => {
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs - 1);
     let from = h.sim.events.length;
     expect(countDraws(h.sim, () => harvest(h))).toBe(0);
@@ -2423,8 +2423,8 @@ describe('harvestCrop TIER 1/2: two draws (golden roll, golden bonus) on every o
     // Deliberate: harvesting is instant and is the SECOND of the two visits a
     // crop cycle ever gets, so a running cast must not turn it into a third.
     plantAndRipen();
-    plant(h, BED2); // starts a fresh plant cast
-    expect(h.sim.player.castingAbility).toBe(FARMING_CAST_ID);
+    h.sim.player.castingAbility = FISHING_CAST_ID; // some other cast running
+    h.sim.player.castRemaining = 1;
     const from = h.sim.events.length;
     harvest(h);
     expect(eventsOf(h.sim, from, 'farmHarvested')).toHaveLength(1);
@@ -2524,7 +2524,6 @@ describe('the seed-back roll (tier 3/4): the FIRST of the two harvest draws, ban
     h.sim.addItem(hoeId, 1, h.pid);
     h.sim.addItem(crop.seedItemId, 1, h.pid);
     plantCrop(h.sim.ctx, h.sim.player, h.meta, bedId, cropId);
-    clearCast(h.sim);
     h.advance(crop.durationMs);
     return h.meta.farmPlots.get(bedId) as PlotState;
   }
@@ -2828,7 +2827,6 @@ describe('the seed-back roll (tier 3/4): the FIRST of the two harvest draws, ban
     h.sim.addItem(T3_HOE, 1, h.pid);
     h.sim.addItem(T3_SEED, 1, h.pid);
     plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, T3_CROP);
-    clearCast(h.sim);
 
     // not_ready, one ms short of the deadline.
     h.advance(crop.durationMs - 1);
@@ -2905,7 +2903,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     const h = makeHarness();
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0;
@@ -2926,7 +2923,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     const h = makeHarness(GOLDEN_WIN_SEED);
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0;
@@ -3019,7 +3015,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     const h = makeHarness(1);
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0;
@@ -3053,7 +3048,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     const h = makeHarness(GOLDEN_WIN_SEED);
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0;
@@ -3083,7 +3077,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     const h = makeHarness(GOLDEN_WIN_SEED);
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.99;
     const from = h.sim.events.length;
@@ -3102,7 +3095,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     const h = makeHarness(GOLDEN_WIN_SEED);
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs - 1);
     let from = h.sim.events.length;
     expect(countDraws(h.sim, () => harvest(h))).toBe(0);
@@ -3142,7 +3134,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
       const h = makeHarness(GOLDEN_WIN_SEED);
       giveSeeds(h);
       plant(h);
-      clearCast(h.sim);
       h.advance(CROP.durationMs);
       (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
       const from = h.sim.events.length;
@@ -3176,7 +3167,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
   function ripenWinner(h: Harness): { count: number; fine: number } {
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0;
@@ -3342,7 +3332,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     const h = makeHarness(GOLDEN_WIN_SEED);
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0;
@@ -3375,7 +3364,6 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     standAtBed(h.sim, 'bed_thornpeak_1');
     giveSeeds(h);
     plant(h, 'bed_thornpeak_1');
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     (h.meta.farmPlots.get('bed_thornpeak_1') as PlotState).survivalRoll = 0;
     const from = h.sim.events.length;
@@ -3442,7 +3430,6 @@ describe('the celebration marks: farm:planted and the farm:<zone> chronicle', ()
     expect(h.meta.deedStats.visited.has('farm:planted')).toBe(true);
     // Idempotent: a second successful plant re-marks without issue (visited
     // is a set; no duplicate entry, no error).
-    clearCast(h.sim);
     giveSeeds(h);
     plant(h, BED2);
     expect(h.meta.deedStats.visited.has('farm:planted')).toBe(true);
@@ -3459,7 +3446,6 @@ describe('the celebration marks: farm:planted and the farm:<zone> chronicle', ()
       standAtBed(h.sim, bedId);
       giveSeeds(h);
       plantCrop(h.sim.ctx, h.sim.player, h.meta, bedId, CROP_ID);
-      clearCast(h.sim);
       h.advance(CROP.durationMs);
       (h.meta.farmPlots.get(bedId) as PlotState).survivalRoll = 0;
       harvestCrop(h.sim.ctx, h.sim.player, h.meta, bedId);
@@ -3480,7 +3466,6 @@ describe('the celebration marks: farm:planted and the farm:<zone> chronicle', ()
       const h = makeHarness();
       h.sim.addItem(crop.seedItemId, 1, h.pid);
       plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, cropId);
-      clearCast(h.sim);
       h.advance(crop.durationMs);
       (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
       harvestCrop(h.sim.ctx, h.sim.player, h.meta, BED);
@@ -3498,7 +3483,6 @@ describe('the celebration marks: farm:planted and the farm:<zone> chronicle', ()
     const h = makeHarness();
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.99;
     harvest(h);
@@ -3509,7 +3493,6 @@ describe('the celebration marks: farm:planted and the farm:<zone> chronicle', ()
     const h = makeHarness();
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.99;
     harvest(h);
@@ -3527,7 +3510,6 @@ describe('the celebration marks: farm:planted and the farm:<zone> chronicle', ()
     const h = makeHarness();
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
     harvest(h);
@@ -3553,7 +3535,6 @@ describe('the celebration deeds end to end (the merged catalog over the live pro
     const h = makeHarness();
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     h.sim.tick();
     expect(h.meta.deedsEarned.has('prog_first_planting')).toBe(true);
     expect(h.meta.deedsEarned.has('chr_vale_first_harvest')).toBe(false);
@@ -3572,7 +3553,6 @@ describe('the celebration deeds end to end (the merged catalog over the live pro
     const win = makeHarness(GOLDEN_WIN_SEED);
     giveSeeds(win);
     plant(win);
-    clearCast(win.sim);
     win.advance(CROP.durationMs);
     (win.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
     harvest(win);
@@ -3582,7 +3562,6 @@ describe('the celebration deeds end to end (the merged catalog over the live pro
     const loss = makeHarness();
     giveSeeds(loss);
     plant(loss);
-    clearCast(loss.sim);
     loss.advance(CROP.durationMs);
     (loss.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
     harvest(loss);
@@ -3690,7 +3669,7 @@ describe('convertHusks: the husk trade, draw-free on every path', () => {
     // into the range describe below.
     giveSeeds(h);
     h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
-    h.sim.player.castingAbility = FARMING_CAST_ID;
+    h.sim.player.castingAbility = FISHING_CAST_ID;
     h.sim.player.castRemaining = 1;
     for (const bedId of FARM_BED_IDS) {
       const bed = farmBedById(bedId);
@@ -3907,7 +3886,6 @@ describe('THE ANTI-CHORE INVARIANT: nothing rots', () => {
     for (const h of [onTime, late]) {
       giveSeeds(h);
       plant(h);
-      clearCast(h.sim);
     }
     // Identical seeds and identical command scripts, so the plots are equal
     // before the clocks diverge. This is what makes the comparison below about
@@ -3986,7 +3964,6 @@ describe('the draw contract, clause by clause', () => {
     const h = makeHarness();
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     const before = h.sim.farmPlotsFor(h.pid)[0]?.status;
     // Cross the deadline INSIDE the counted window: nothing fires at expiry,
     // because there is no timer, only a comparison the projection makes.
@@ -4003,7 +3980,6 @@ describe('the draw contract, clause by clause', () => {
     const h = makeHarness();
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     const saved = h.sim.serializeCharacter(h.pid) as CharacterState;
     expect(saved.farmPlots).toBeDefined();
 
@@ -4027,7 +4003,6 @@ describe('the draw contract, clause by clause', () => {
     const h = makeHarness();
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     for (const tickCount of [0, 1, 19, 20, 40]) {
       h.sim.tickCount = tickCount;
       expect(countDraws(h.sim, () => updateFarming(h.sim.ctx))).toBe(0);
@@ -4046,10 +4021,8 @@ describe('the draw contract, clause by clause', () => {
     h.sim.addItem('skysilver_hoe', 1, h.pid);
     h.sim.addItem('highland_barley_seed', 1, h.pid);
     plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, 'highland_barley');
-    clearCast(h.sim);
     giveSeeds(h);
     plant(h, BED2); // vale_wheat, tier 1
-    clearCast(h.sim);
     h.advance((FARM_CROPS.highland_barley as FarmCropDef).durationMs);
     for (const bedId of [BED, BED2]) {
       (h.meta.farmPlots.get(bedId) as PlotState).survivalRoll = 0;
@@ -4071,9 +4044,7 @@ describe('the draw contract, clause by clause', () => {
     const h = makeHarness(2024);
     giveSeeds(h, 2);
     plant(h, BED);
-    clearCast(h.sim);
     plant(h, BED2);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
     (h.meta.farmPlots.get(BED2) as PlotState).survivalRoll = 0.99;
@@ -4092,9 +4063,7 @@ describe('determinism across hosts', () => {
     for (const h of [a, b]) {
       giveSeeds(h, 2);
       plant(h, BED);
-      clearCast(h.sim);
       plant(h, BED2);
-      clearCast(h.sim);
       h.advance(CROP.durationMs);
       harvest(h, BED);
       harvest(h, BED2);
@@ -4128,9 +4097,7 @@ describe('determinism across hosts', () => {
         watch: true,
         tonic: true,
       });
-      clearCast(hx.sim);
       plantCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED2, CROP_ID, {});
-      clearCast(hx.sim);
       hx.advance(CROP.durationMs);
       harvestCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED);
       harvestCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED2);
@@ -4157,7 +4124,6 @@ describe('determinism across hosts', () => {
     const h = makeHarness(555);
     giveSeeds(h);
     plant(h);
-    clearCast(h.sim);
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     h.advance(CROP.durationMs / 3);
     const saved = h.sim.serializeCharacter(h.pid) as CharacterState;
@@ -4202,7 +4168,6 @@ describe('the Sim delegates', () => {
     giveSeeds(h);
     h.sim.plantCrop(BED, CROP_ID, undefined, h.pid);
     expect(h.meta.farmPlots.has(BED)).toBe(true);
-    clearCast(h.sim);
     h.advance(CROP.durationMs);
     h.sim.harvestCrop(BED, h.pid);
     expect(h.meta.farmPlots.has(BED)).toBe(false);

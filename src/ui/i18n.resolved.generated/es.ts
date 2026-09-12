@@ -4125,6 +4125,7 @@ export const es: EnTranslations = {
           "farming": "Funciona desde tus bolsas al plantar en una parcela."
         },
         "speed": "Recolecta más rápido en nodos por debajo del nivel {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Necesaria para pescar.",
         "rodBite": "Los peces pican hasta {seconds} s antes.",
         "rodReel": "Amplía la ventana de recogida en {seconds} s.",
@@ -7531,7 +7532,7 @@ export const es: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "El ritmo de la agricultura",
-        "rhythmBody": "Plantar es el lanzamiento visible y corto: dura exactamente {plant} segundos en todos los peldaños, porque la azada abre la tierra en vez de comprar velocidad. Extraer un cultivo maduro es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.\n\nUna cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.",
+        "rhythmBody": "Plantar es instantáneo, porque la azada abre la tierra en vez de comprar velocidad: no hay lanzamiento que esperar, así que un agricultor que se aleja ha plantado igualmente. Extraer un cultivo maduro también es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.\n\nUna cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.",
         "gainHeading": "Qué enseña una cosecha",
         "gainBody": "La ganancia es determinista y depende de tu propio contador, no del cultivo: {g1} de competencia por una cosecha inferior a {p1}, {g2} por debajo de {p2}, {g3} por debajo de {p3} y {g4} durante el resto del camino hasta el límite de {cap}. Nunca hay una tirada de subida, así que la duración de la progresión es exactamente la que dicta la aritmética.\n\nLo que decide el nivel del cultivo es hasta dónde puede llevarte un bancal. Un cultivo de nivel 1 enseña hasta {c1} y se vuelve gris allí; uno de nivel 2 hasta {c2}; y el nivel 3 o superior llega hasta el límite. Subir a bancales mejores es lo que mantiene avanzando el contador.",
         "yieldsHeading": "Qué produce una cosecha",
@@ -10607,7 +10608,6 @@ export const es: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
-      "farming": "Plantar",
       "gathering": "Recolectando",
       "crafting": "Elaborando",
       "disenchanting": "Desencantando",

@@ -170,9 +170,10 @@ describe('tool-tier lock dimension', () => {
     const world = makeWorld({ inventory: PICK, proficiency: MINING_40 });
     expect(viewerUsableToolTier(world, 'mining')).toBe(2);
     expect(viewerUsableToolTier(world, 'logging')).toBe(0);
-    // The R22 arm: the same pick with the counter short is unusable, so the
-    // scan reports nothing rather than the owned tier.
-    expect(viewerUsableToolTier(makeWorld({ inventory: PICK }), 'mining')).toBe(0);
+    // The R22 arm under the degrade rule: the same pick with the counter
+    // short works as the entry tier, so the scan reports 1, never the owned
+    // tier 2 and never nothing (a tool is never a brick).
+    expect(viewerUsableToolTier(makeWorld({ inventory: PICK }), 'mining')).toBe(1);
     // The tier-1 entry tool never carries a requirement.
     expect(viewerUsableToolTier(makeWorld({ inventory: T1_PICK }), 'mining')).toBe(1);
   });
@@ -184,9 +185,9 @@ describe('tool-tier lock dimension', () => {
     // byte. The pairing contract (same world, same synchronous pass) lives
     // at the signature; this pins the mechanics either side of it.
     const world = makeWorld({ inventory: PICK, proficiency: {} });
-    expect(viewerUsableToolTier(world, 'mining')).toBe(0); // read-through: counter short
+    expect(viewerUsableToolTier(world, 'mining')).toBe(1); // read-through: counter short, degraded
     expect(viewerUsableToolTier(world, 'mining', MINING_40)).toBe(2); // explicit map wins
-    expect(viewerUsableToolTier(world, 'mining', undefined)).toBe(0); // explicit undefined = default
+    expect(viewerUsableToolTier(world, 'mining', undefined)).toBe(1); // explicit undefined = default
   });
 
   it('isNodeToolLockedFor: tier-2 locks toolless AND unwieldable viewers, unlocks with the earned pick', () => {
@@ -228,7 +229,10 @@ describe('tool-tier lock dimension', () => {
     };
     expect('gatheringProficiency' in partial).toBe(false);
     const world = partial as unknown as IWorld;
-    expect(viewerUsableToolTier(world, 'mining')).toBe(0);
+    // The absent map reads 0, which degrades the tier-2 pick to the entry
+    // tier (1): the tier-2 vein stays LOCKED, which is the fail-closed half
+    // that matters.
+    expect(viewerUsableToolTier(world, 'mining')).toBe(1);
     expect(isNodeToolLockedFor(world, { type: 'ore', tier: 2 })).toBe(true);
     expect(buildNearbyGatherNodes(world, 5).find((n) => n.id === T2.id)).toMatchObject({
       tier: 2,
@@ -327,9 +331,11 @@ describe('tool-tier lock dimension', () => {
     expect(
       buildGatherNodeTooltip(makeWorld({ inventory: PICK, proficiency: MINING_40 }), NODE.id),
     ).toMatchObject({ locked: false, fineUpgrade: true });
-    // Owned-but-unwieldable mints no fine grade, so it previews none either.
+    // Owned-but-unwieldable degrades to tier 1: the tier-1 vein is open to
+    // it, but a tool AT the material tier mints no fine grade, so no preview.
     expect(buildGatherNodeTooltip(makeWorld({ inventory: PICK }), NODE.id)).toMatchObject({
-      locked: true,
+      locked: false,
+      fineUpgrade: false,
     });
     // Locked: absent, the red requirement line owns that state.
     expect('fineUpgrade' in (buildGatherNodeTooltip(makeWorld({}), NODE.id) ?? {})).toBe(false);
