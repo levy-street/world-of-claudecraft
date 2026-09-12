@@ -77,6 +77,22 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
    pins in `tests/ability_material_prewarm_sweep.test.ts`,
    `tests/renderer_compile_gate.test.ts`, `tests/prewarm_policy.test.ts`, and
    `tests/entity_gate_stand_in.test.ts`.
+   The escape shapes a fleet capture has already caught, each one named because the rule
+   above was on the page and still missed them: a module-scope material cache (a
+   `Map<string, Material>` filled on first call) that no manifest entry registers; a
+   `customProgramCacheKey` with a runtime-varying segment (a distance cap, a tier), where
+   every value is a distinct program and only the first one was prewarmed; a kit or loader
+   conversion whose `material.name` can come out empty (`props.ts` names `${kit}:${surface}`);
+   a builder that returns a group of bare `new THREE.*Material(` meshes to a caller that
+   `scene.add`s it after boot; a gate whose `attach-watchdog` or `gate-timeout` reveals the
+   group ungated, so the programs link at the reveal. Every new material must carry a
+   `name` (module and role): three names a program after `material.name`, and the fleet
+   `live-program` label is that name or a raw cache key nobody can map back to a file. An
+   unnamed new material is SHOULD-FIX. All of this is verified by READING the diff: trace
+   each new material to its manifest twin or gate in the code and name both. Never require a
+   measurement run from the author; the `hunt-live-programs` skill and its
+   `scripts/live_program_hunt.mjs` report are the tool for a fleet capture that already shows
+   live programs, not a PR entry bar.
 2. **Are lights, contexts, queues, and frame work safe?** A post-boot directional, hemisphere,
    spot, or rect-area light can invalidate visible programs; re-grading the constructor's one
    sun/hemi pair through `interior_light_rig.ts` is the sanctioned shape. Point lights ride the
