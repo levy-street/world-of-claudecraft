@@ -31,6 +31,7 @@ import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_mater
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
 import { IceBlockVisual, iceMaterials } from './ice_block_visual';
+import { buildGroundFireAoeStandIn, groundFireAoeMaterials } from './ignivar_fire_vfx';
 import { TemporalHourglassVisual, temporalHourglassMaterials } from './temporal_hourglass_visual';
 
 /** The reference rig height these visuals scale against; the scale reaches the
@@ -92,6 +93,16 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'fireball_travel_visual.ts',
     materials: () => Object.values(fireballMaterials()),
     build: () => new FireballTravelVisual().group,
+  },
+  {
+    // The ground fire AoE (Ignivar's waves, the mage meteor's burn, Varkhul's
+    // worldfire): each wave mints and disposes its own ShaderMaterial pair, and
+    // three drops a shader stage with its last material, so without a
+    // never-disposed anchor every wave linked two programs live.
+    id: 'ground-fire-aoe',
+    module: 'ignivar_fire_vfx.ts',
+    materials: () => Object.values(groundFireAoeMaterials()),
+    build: () => buildGroundFireAoeStandIn(),
   },
   {
     // Not a spell: the Proving Shore coach's guidance (ribbon, ring, aura,
