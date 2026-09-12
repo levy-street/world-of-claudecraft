@@ -1223,7 +1223,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-measured at the release/v0.43.0 sync that brought PR 3778 in: the
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
-    ceiling: 11321,
+    // LOWERED 11321 -> 11313 when the pet-bar routing (keyboard onPet and
+    // the five controller pet cases) moved into src/game/pet_commands.ts,
+    // which also paid for the Hide Interface wiring (interface_visibility_*).
+    ceiling: 11313,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

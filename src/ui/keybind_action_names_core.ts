@@ -54,6 +54,7 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   discord: 'hudChrome.keybinds.discord',
   bgFlag: 'hudChrome.keybinds.bgFlag',
   sheathe: 'hudChrome.keybinds.sheathe',
+  hideInterface: 'hudChrome.keybinds.hideInterface',
   petAttack: 'hudChrome.keybinds.petAttack',
   petStop: 'hudChrome.keybinds.petStop',
   petTaunt: 'hudChrome.keybinds.petTaunt',

@@ -12545,4 +12545,28 @@
   body.xhb-mode.pad-active:not(.mobile-touch) #side-buttons .keybind {
     display: none;
   }
+
+  /* ---------- Hide Interface (Alt+Z, interface_visibility_core.ts) ---------- */
+  /* One body class hides every HUD surface for a clean screenshot or video:
+     each #ui child except the visually-hidden a11y live regions (screen readers
+     keep their combat/target/chat announcements), plus the body-level siblings
+     of #ui: the nameplate layer, the Discord panel and banner, the touch
+     controls, and the pad cursor. The developer perf overlay is a #ui child, so
+     it hides with the rest. Three properties on purpose: `visibility` drops the
+     frames from the focus order and the accessibility tree, `opacity` closes
+     the hole a descendant that re-declares `visibility: visible` would open
+     (the raid boss guide's model hint, the Minimal-preset cross-hotbar rail),
+     and `pointer-events` hands every click to the game canvas. Not `display`,
+     so no HUD measurement (minimap canvas sizing, frame layout, tooltip anchors)
+     changes underneath a hidden frame. */
+  body.interface-hidden #ui > :not(.visually-hidden),
+  body.interface-hidden #nameplates,
+  body.interface-hidden #discord-window,
+  body.interface-hidden #discord-cta-banner,
+  body.interface-hidden #mobile-controls,
+  body.interface-hidden #pad-mouse-cursor {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
 }

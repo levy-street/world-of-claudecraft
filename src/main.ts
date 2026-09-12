@@ -1,5 +1,7 @@
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
+import { createInterfaceVisibility } from './ui/interface_visibility';
+import { dispatchInterfaceVisibilityAction } from './ui/interface_visibility_core';
 // Game-client style barrel (declares the @layer order, loads tokens + base, etc.).
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
@@ -175,6 +177,7 @@ import { createPadTargetPick } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
+import { dispatchPetAction, runPetCommand } from './game/pet_commands';
 import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { startRealmBuilderRollLoad } from './game/realm_builder_boot';
@@ -1378,6 +1381,8 @@ async function startGame(
   const nameplates = $('#nameplates') as HTMLDivElement;
 
   const keybinds = new Keybinds(keybindScope);
+  // The Hide Interface toggle (Alt+Z by default): body.interface-hidden.
+  const interfaceVisibility = createInterfaceVisibility(document.body);
   // UI theming: apply the persisted theme's CSS variables to :root, then keep a
   // hook so the Options panel can switch preset / override colours live.
   const themeStore = new ThemeStore();
@@ -1774,13 +1779,8 @@ async function startGame(
       onTabPrev: () => world.tabTargetPrev(),
       onTargetFriendly: () => world.targetNearestFriendly(),
       onCycleFriendly: () => world.friendlyTabTarget(),
-      // Pet bar (Ctrl+1..5 by default): drive the existing IWorld pet commands.
-      onPet: (action) => {
-        if (action === 'attack') world.petAttack();
-        else if (action === 'taunt') world.petTaunt();
-        else if (action === 'stop') world.setPetMode('passive');
-        else world.setPetMode(action); // 'defensive' | 'aggressive'
-      },
+      // Pet bar (Ctrl+1..5 by default): the shared routing in pet_commands.ts.
+      onPet: (action) => runPetCommand(world, action),
       // Ctrl+6 by default: select your own pet, the keyboard route to what clicking
       // the pet frame does (one implementation, on the Hud, which owns the roster
       // scan that resolves the pet).
@@ -1794,6 +1794,7 @@ async function startGame(
       onUiKey: (key) => {
         if (key !== 'escape') hud.cancelGroundAim();
         if (dispatchCollectionAction(key, hud)) return;
+        if (dispatchInterfaceVisibilityAction(key, interfaceVisibility)) return;
         switch (key) {
           case 'interact':
             interactKey();
@@ -1864,6 +1865,9 @@ async function startGame(
             openChat();
             break;
           case 'escape':
+            // A hidden interface comes back first: Escape is the one key that
+            // can never be rebound away, so it is the guaranteed way out.
+            if (interfaceVisibility.show()) break;
             if (hud.cancelGroundAim()) break;
             // close the topmost panel; if nothing was open, open the game menu
             if (!hud.closeAll()) hud.toggleOptionsMenu();
@@ -2072,11 +2076,18 @@ async function startGame(
       return;
     }
     if (id === 'escape') {
+      if (interfaceVisibility.show()) return;
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
       return;
     }
     if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
+    // The pet edges and the interface toggle share their routing with the
+    // keyboard arm (pet_commands.ts, interface_visibility_core.ts), so the
+    // controller panel (which lists every edge keybind action) can never
+    // offer a bind the pad dispatch drops.
+    if (dispatchPetAction(id, world)) return;
+    if (dispatchInterfaceVisibilityAction(id, interfaceVisibility)) return;
     if (id.startsWith('slot')) {
       hud.pressSlot(Number(id.slice(4)));
       return;
@@ -2186,25 +2197,6 @@ async function startGame(
         // The controller panel has always OFFERED this bind (it lists every
         // edge keybind action); the dispatch dropped it silently.
         hud.toggleCrafting();
-        break;
-      case 'petStop':
-        // The pet edges, the dungeon finder, and the sheathe toggle: the
-        // same offered-but-dropped sweep that found Crafting (the controller
-        // panel lists every edge keybind action), each wired to its exact
-        // keyboard handler.
-        world.setPetMode('passive');
-        break;
-      case 'petTaunt':
-        world.petTaunt();
-        break;
-      case 'petAttack':
-        world.petAttack();
-        break;
-      case 'petDefensive':
-        world.setPetMode('defensive');
-        break;
-      case 'petAggressive':
-        world.setPetMode('aggressive');
         break;
       case 'targetPet':
         hud.targetOwnPet();

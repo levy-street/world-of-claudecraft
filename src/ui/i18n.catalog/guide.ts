@@ -347,6 +347,7 @@ export const guideStrings = {
     deeds: 'Book of Deeds',
     reliquary: 'The Reliquary',
     sheathe: 'Sheathe/Unsheathe Weapon',
+    hideInterface: 'Hide the interface (screenshots and videos)',
     crafting: 'Crafting',
     mount: 'Mount / Dismount',
     calendar: 'Event Calendar',

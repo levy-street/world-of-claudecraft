@@ -104,6 +104,14 @@ describe('classifyDiff', () => {
     }
   });
 
+  it('maps the Hide Interface core to its shown/hidden desktop legs', () => {
+    const plan = classifyDiff(['src/ui/interface_visibility_core.ts']);
+    expect(plan.isVisual).toBe(true);
+    const target = plan.specific.find((t: { key: string }) => t.key === 'hide-interface');
+    expect(target?.variants.map((v: { key: string }) => v.key)).toEqual(['shown', 'hidden']);
+    expect(plan.generic).toHaveLength(0);
+  });
+
   it('maps a bags change to the inventory window target', () => {
     const plan = classifyDiff(['src/ui/bags.ts']);
     expect(plan.isVisual).toBe(true);

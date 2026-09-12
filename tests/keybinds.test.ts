@@ -135,6 +135,13 @@ describe('registry', () => {
     expect(sheathe?.category).toBe('Interface');
     expect(sheathe?.kind).toBe('edge');
     expect(sheathe?.defaults).toEqual(['KeyZ']);
+    // Hide Interface is a rebindable Interface toggle on the ALT layer of the
+    // same key (the classic Alt+Z): bare Z sheathes, Shift+Z opens the deeds,
+    // Alt+Z hides the HUD, so the three never collide.
+    const hideUi = BIND_ACTIONS.find((a) => a.id === 'hideInterface');
+    expect(hideUi?.category).toBe('Interface');
+    expect(hideUi?.kind).toBe('edge');
+    expect(hideUi?.defaults).toEqual(['Alt+KeyZ']);
     // The Harvest Journal is a rebindable Interface toggle on the shifted layer
     // of KeyK (Shift+H and Shift+J, its own initials, are Damage Meters and
     // Target Buffs/Debuffs); bare KeyK stays the Leaderboard, so the two share

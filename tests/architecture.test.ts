@@ -293,6 +293,7 @@ const UI_PURE_CORES = [
   'src/ui/target_flair_line_view.ts',
   'src/ui/meters_breakdown_view.ts',
   'src/ui/interface_unlock_core.ts',
+  'src/ui/interface_visibility_core.ts',
   'src/ui/interface_unlock_menu_core.ts',
   'src/ui/keybind_transfer_core.ts',
   'src/ui/keyboard_map_core.ts',

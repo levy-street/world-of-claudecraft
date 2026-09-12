@@ -58,6 +58,7 @@ const GROUPS: Group[] = [
       { keys: ['B'], label: 'controls.bags' },
       { keys: ['N'], label: 'guide.controls.talents' },
       { keys: ['Z'], label: 'guide.controls.sheathe' },
+      { keys: ['Alt+Z'], label: 'guide.controls.hideInterface' },
       { keys: ['Shift+Z'], label: 'guide.controls.deeds' },
       { keys: ['Shift+X'], label: 'guide.controls.reliquary' },
       { keys: ['Shift+Y'], label: 'hudChrome.cosmetics.title' },
