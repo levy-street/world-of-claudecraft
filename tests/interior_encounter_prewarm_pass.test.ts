@@ -240,6 +240,16 @@ describe('interior encounter prewarm pass (driven)', () => {
     expect(host.compiled).toHaveLength(afterFirst);
   });
 
+  it('compiles the Ignivar mechanic visuals in the Crucible arena and nothing of Varkhul', async () => {
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('ignivar', host);
+    await drain();
+    expect(host.compiled).toContain('ignivar-encounter-prewarm-entity');
+    expect(host.compiled).toContain('ignivar-rotating-rays-prewarm');
+    expect(host.compiled).toContain('ignivar-forge-judgment-prewarm');
+    expect(host.compiled.filter((name) => name.startsWith('varkhul-'))).toEqual([]);
+  });
+
   it('retries an interior whose first prewarm pass failed', async () => {
     // The interior key is claimed BEFORE the work runs, so without the failure
     // arm giving it back a pass that rejected (a compile that threw, a queue
