@@ -53,6 +53,7 @@ export function aggregateLivePrograms(samples) {
           zone: sample.zone ?? '',
           pos: samplePosition(sample),
           materialName: program?.name ?? (label.includes(',') ? '' : label),
+          owner: program?.owner ?? '',
           keyShort: shortKey(program?.cacheKey ?? (label.includes(',') ? label : '')),
           newMaterials: [...(sample.diag?.newMaterials ?? [])],
           firstVisibleObjects: [...(sample.diag?.firstVisibleObjects ?? [])],
@@ -153,12 +154,12 @@ export function renderReport(samples, meta = {}) {
     lines.push('None. Every program the session drew had a prewarm twin or a gate.');
   } else {
     lines.push(
-      '| at | zone | pos | material name | key | roots | n | new materials in that poll | first visible objects in that poll |',
+      '| at | zone | pos | owner (category:object:material) | material name | key | roots | n | new materials in that poll | first visible objects in that poll |',
     );
-    lines.push('|---|---|---|---|---|---|---|---|---|');
+    lines.push('|---|---|---|---|---|---|---|---|---|---|');
     for (const p of programs) {
       lines.push(
-        `| ${ms(p.firstAtMs)} | ${cell(p.zone)} | ${cell(p.pos)} | ${cell(p.materialName || '(unnamed)')} | \`${cell(p.keyShort)}\` | ${p.readyRoots} | ${p.count} | ${cell(p.newMaterials.join('; '))} | ${cell(p.firstVisibleObjects.join('; '))} |`,
+        `| ${ms(p.firstAtMs)} | ${cell(p.zone)} | ${cell(p.pos)} | ${cell(p.owner || '(not in scene at the poll)')} | ${cell(p.materialName || '(unnamed)')} | \`${cell(p.keyShort)}\` | ${p.readyRoots} | ${p.count} | ${cell(p.newMaterials.join('; '))} | ${cell(p.firstVisibleObjects.join('; '))} |`,
       );
     }
   }

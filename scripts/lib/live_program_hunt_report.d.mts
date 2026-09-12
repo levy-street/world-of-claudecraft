@@ -2,6 +2,7 @@ export interface HuntProgram {
   id: number;
   name: string;
   cacheKey: string;
+  owner?: string;
 }
 
 export interface HuntEvent {
@@ -34,6 +35,7 @@ export interface LiveProgramRow {
   zone: string;
   pos: string;
   materialName: string;
+  owner: string;
   keyShort: string;
   newMaterials: string[];
   firstVisibleObjects: string[];

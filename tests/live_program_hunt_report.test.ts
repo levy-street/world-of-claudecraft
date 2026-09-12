@@ -33,7 +33,7 @@ describe('live_program_hunt_report', () => {
   it('groups live-program events by label with the first sighting context', () => {
     const rows = aggregateLivePrograms([
       sample({
-        programs: [{ id: 7, name: '', cacheKey: KEY }],
+        programs: [{ id: 7, name: '', cacheKey: KEY, owner: 'props:ruin:MeshBasicMaterial' }],
         events: [{ kind: 'live-program', key: KEY, atMs: 95737, readyRoots: 0, totalRoots: 0 }],
         diag: {
           newMaterials: ['MeshBasicMaterial:ab12cd34'],
@@ -55,6 +55,8 @@ describe('live_program_hunt_report', () => {
     expect(basic.zone).toBe('thornpeak_heights');
     expect(basic.pos).toBe('(-23, 696)');
     expect(basic.materialName).toBe('');
+    expect(basic.owner).toBe('props:ruin:MeshBasicMaterial');
+    expect(named.owner).toBe('');
     expect(basic.firstVisibleObjects).toEqual(['props:ruin:MeshBasicMaterial:ab12cd34']);
     expect(basic.readyRoots).toBe('0/0');
     expect(named.materialName).toBe('dungeon:');
@@ -109,7 +111,9 @@ describe('live_program_hunt_report', () => {
         audit: { enabled: false },
       },
     );
-    expect(report).toContain('| 95.7 s | thornpeak_heights | (-23, 696) | (unnamed) |');
+    expect(report).toContain(
+      '| 95.7 s | thornpeak_heights | (-23, 696) | (not in scene at the poll) | (unnamed) |',
+    );
     expect(report).toContain('props:ruin:MeshBasicMaterial:ab12cd34');
     expect(report).toContain('Live programs: 1 events, 1 distinct');
     expect(report).toContain('Audit off');

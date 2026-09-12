@@ -17,6 +17,9 @@
 //
 // Flags: --target <origin> (default https://worldofclaudecraft.com), --port
 // <n> (default 5173), --offline (no realm proxy; play the offline world),
+// --auto-offline (offline, and the script enters the world itself as a warrior
+// at the spawn: an unattended smoke of the tooling, never a tour),
+// --duration <ms> (stop by itself after that long in the world),
 // --out <dir>, --headless, --angle <backend>,
 // --profile <dir> (persistent Chrome profile, so the login survives sessions;
 // default tmp/live-program-hunt-profile), --allow-dirty.
@@ -37,6 +40,7 @@ import readline from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { findBrowserPath } from './browser_path_resolve.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
 import { renderReport } from './lib/live_program_hunt_report.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
@@ -61,6 +65,8 @@ function parseArgs(argv) {
     profile: path.join(ROOT, 'tmp', 'live-program-hunt-profile'),
     allowDirty: false,
     offline: false,
+    autoOffline: false,
+    durationMs: 0,
     report: null,
   };
   for (let i = 0; i < argv.length; i++) {
@@ -74,6 +80,10 @@ function parseArgs(argv) {
     else if (a === '--profile') args.profile = next();
     else if (a === '--allow-dirty') args.allowDirty = true;
     else if (a === '--offline') args.offline = true;
+    else if (a === '--auto-offline') {
+      args.offline = true;
+      args.autoOffline = true;
+    } else if (a === '--duration') args.durationMs = Number(next());
     else if (a === '--report') args.report = next();
     else throw new Error(`unknown flag ${a}`);
   }
@@ -203,6 +213,30 @@ function pollOnce() {
     programs.push({ id: p.id, name: p.name ?? '', cacheKey: p.cacheKey ?? '' });
   }
   if (programs.length) state.lastProgramId = Math.max(...programs.map((p) => p.id));
+  // The owner of each new program: three keeps the program a material
+  // currently uses in its per-material properties, so one scene traversal on
+  // the polls that saw a mint names the material, its object and its category
+  // root without guessing from names. Never on a quiet poll.
+  if (programs.length && renderer.scene && renderer.webgl?.properties) {
+    const wanted = new Map(programs.map((p) => [p.id, p]));
+    const props = renderer.webgl.properties;
+    renderer.scene.traverse((obj) => {
+      const mats = Array.isArray(obj.material) ? obj.material : obj.material ? [obj.material] : [];
+      for (const mat of mats) {
+        const program = props.get(mat)?.currentProgram;
+        const entry = program ? wanted.get(program.id) : null;
+        if (!entry || entry.owner) continue;
+        let category = '';
+        for (let node = obj; node; node = node.parent) {
+          if (node.userData?.renderCategory) {
+            category = node.userData.renderCategory;
+            break;
+          }
+        }
+        entry.owner = `${category || '?'}:${obj.name || obj.type}:${mat.name || mat.type}`;
+      }
+    });
+  }
   const events = [];
   for (const e of stats.gpuPrep?.events?.events ?? []) {
     const id = `${e.kind}|${e.key}|${e.atMs}`;
@@ -366,7 +400,13 @@ export async function hunt(args) {
     process.stdout.write(
       `\nBrowser open on ${url}. Log in and play. Stop with Enter here, Ctrl-C, or by closing the browser.\n\n`,
     );
-    const stop = waitForStop(browser);
+    if (args.autoOffline) {
+      await enterOfflineGame(page, { charClass: 'warrior', charName: 'HuntProbe' });
+      process.stdout.write('entered the offline world automatically\n');
+    }
+    const stop = args.durationMs
+      ? Promise.race([waitForStop(browser), sleep(args.durationMs).then(() => 'duration')])
+      : waitForStop(browser);
     let stopped = false;
     void stop.then(() => {
       stopped = true;
