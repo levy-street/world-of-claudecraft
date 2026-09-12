@@ -6,7 +6,7 @@
 // on that text, so this equality is what makes a worker's warm-up a hit.
 
 import * as THREE from 'three';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DryCompileRenderer, DryProgramSource } from '../../src/render/program_sources';
 
 type PatchedRenderer = THREE.WebGLRenderer & Required<DryCompileRenderer>;
@@ -152,5 +152,55 @@ describe('the dry compile against the real link', () => {
     fresh.add(new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshPhongMaterial()));
     world.add(fresh);
     expect(renderer.collectProgramSources(fresh, camera, world).length).toBe(1);
+  });
+
+  it('keeps the shader diagnostic alive: a failing link renders without throwing and reports both prefixes', () => {
+    // three builds program.diagnostics inside WebGLProgram's onFirstUse (a
+    // failed link or a non-empty log, under debug.checkShaderErrors, which is
+    // three's default and the ?shaderdebug tool). The lifted assembly in the
+    // patch owns the prefixes, so a lift that keeps them local throws
+    // ReferenceError out of renderer.render() right after three has logged the
+    // real shader error. Rendering a shader that cannot compile is the only
+    // path that reaches the diagnostic.
+    expect(renderer.debug.checkShaderErrors).toBe(true);
+    const { scene: world, camera } = scene();
+    const broken = new THREE.ShaderMaterial({
+      vertexShader: 'void main() { gl_Position = flat; }',
+      fragmentShader: 'void main() { gl_FragColor = vec4( 1.0 ); }',
+    });
+    world.add(new THREE.Mesh(new THREE.BoxGeometry(), broken));
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      expect(() => renderer.render(world, camera)).not.toThrow();
+      expect(
+        error.mock.calls.some((call) => String(call[0]).includes('WebGLProgram: Shader Error')),
+      ).toBe(true);
+    } finally {
+      error.mockRestore();
+      broken.dispose();
+    }
+    // Selected by identity, not by "has a diagnostic": a driver that emits a
+    // benign info log for a healthy material also earns one, and the
+    // runnable assertion below must stay about the broken program.
+    const program = (renderer.info.programs ?? []).find(
+      (entry) => (entry as { type?: string }).type === 'ShaderMaterial',
+    ) as
+      | {
+          diagnostics: {
+            runnable: boolean;
+            vertexShader: { prefix: string };
+            fragmentShader: { prefix: string };
+          };
+        }
+      | undefined;
+    expect(program, 'the broken ShaderMaterial minted no program').toBeDefined();
+    expect(program?.diagnostics, 'the failed link built no diagnostic').toBeDefined();
+    expect(program?.diagnostics.runnable).toBe(false);
+    // Each stage's own prefix, not one prefix reported twice: the vertex
+    // attribute block is in the vertex prefix and absent from the fragment one.
+    expect(program?.diagnostics.vertexShader.prefix).toContain('precision');
+    expect(program?.diagnostics.vertexShader.prefix).toContain('attribute vec3 position;');
+    expect(program?.diagnostics.fragmentShader.prefix).toContain('precision');
+    expect(program?.diagnostics.fragmentShader.prefix).not.toContain('attribute vec3 position;');
   });
 });

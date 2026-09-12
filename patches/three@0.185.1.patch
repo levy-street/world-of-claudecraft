@@ -1,5 +1,5 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index ad13abf7d1..24eae6a19f 100644
+index ad13abf7d128bee607a7672646ca543327e258d3..a5cb0ee0dbc9b5bdb8c8ae1b13b1af328d368633 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
 @@ -438,7 +438,7 @@ var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\t#ifndef USE_INSTANCING
@@ -53,7 +53,7 @@ index ad13abf7d1..24eae6a19f 100644
  
  	const vertexGlsl = versionString + prefixVertex + vertexShader;
  	const fragmentGlsl = versionString + prefixFragment + fragmentShader;
-+	return { vertexGlsl: vertexGlsl, fragmentGlsl: fragmentGlsl };
++	return { vertexGlsl: vertexGlsl, fragmentGlsl: fragmentGlsl, prefixVertex: prefixVertex, prefixFragment: prefixFragment };
 +
 +}
 +
@@ -66,7 +66,7 @@ index ad13abf7d1..24eae6a19f 100644
 +
 +	const program = gl.createProgram();
 +
-+	const { vertexGlsl, fragmentGlsl } = assembleProgramGlsl( parameters );
++	const { vertexGlsl, fragmentGlsl, prefixVertex, prefixFragment } = assembleProgramGlsl( parameters );
 +
  
  	// log( '*VERTEX*', vertexGlsl );

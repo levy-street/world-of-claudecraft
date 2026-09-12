@@ -177,7 +177,13 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   the prewarm depth twins in `src/render/prewarm_depth_material.ts` have to
   follow), and the GLSL assembly seam (the lifted `assembleProgramGlsl`,
   `WebGLPrograms.hasProgram` and `renderer.collectProgramSources`, which hand
-  an off-thread warm-up the exact sources three would link) alike
+  an off-thread warm-up the exact sources three would link; the lift must also
+  hand `prefixVertex` and `prefixFragment` back to the `WebGLProgram`
+  constructor, whose `onFirstUse` shader diagnostic still closes over them, or
+  any renderer that keeps `debug.checkShaderErrors` on (the world renderer
+  under `?shaderdebug`, the editor thumbnailer and the dev outfit audit, which
+  never set the flag) throws a `ReferenceError` from `renderer.render()` on
+  the first failed link) alike
   (`tests/three_compile_async_patch.test.ts` pins them all), before dropping or
   re-rolling it.
   One scope limit worth stating for every hunk, not just this one: the patch covers
