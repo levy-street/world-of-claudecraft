@@ -93,7 +93,14 @@ export async function uploadDataTextureInChunks(
   // Every three from the 0.185 train onward exposes texture update ranges
   // natively (r165, pinned through v0.35, predated them); keep the one valid
   // full upload for any texture or host without the range API.
-  if (!supportsUpdateRanges(dataTexture)) {
+  //
+  // A flipY texture takes the full upload too: three's ranged path issues one
+  // texSubImage2D per ROW at that row's own y, and UNPACK_FLIP_Y_WEBGL only
+  // mirrors the rows inside each call, so a row-by-row upload lands the image
+  // unflipped, upside down against the UVs the full upload serves (the grass
+  // tuft card in the Wildheart Basin, the first flipY DataTexture to reach a
+  // gate's upload lane, drew every blade hanging from its root).
+  if (!supportsUpdateRanges(dataTexture) || dataTexture.flipY) {
     await options.beforeChunk?.();
     await uploadChunk(dataTexture);
     return 1;
