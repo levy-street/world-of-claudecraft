@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { CharacterVisual } from '../src/render/characters';
 import type { AnimState } from '../src/render/characters/anim_state';
 import {
+  borrowRiderLocomotion,
   type MountPresentationHost,
   type MountPresentationInputs,
   updateMountPresentation,
@@ -160,5 +161,57 @@ describe('updateMountPresentation: mountCompilePending safeguard', () => {
     v.mountCompilePending = false;
     updateMountPresentation(v, inputs(fakeVfx()));
     expect(rider.position.y).toBeCloseTo(1.2);
+  });
+});
+
+describe('borrowRiderLocomotion', () => {
+  it('copies the shared gait facts, the REAL airborne flag, and no rider-only state', () => {
+    const rider: AnimState = {
+      speed: 6.5,
+      moving: true,
+      running: true,
+      airborne: false, // suppressed while seated
+      falling: true,
+      backwards: true,
+      reverseBackpedal: true,
+      dead: true,
+      casting: true,
+      spinning: true,
+      swimming: true,
+      submerged: true,
+      swimPitch: 0.3,
+      wading: true,
+      sitting: true,
+    };
+    const mount: AnimState = {
+      speed: 0,
+      moving: false,
+      running: false,
+      airborne: false,
+      falling: false,
+      backwards: false,
+      reverseBackpedal: false,
+      dead: false,
+      casting: false,
+      swimming: false,
+      submerged: false,
+      swimPitch: 0,
+      wading: false,
+      sitting: false,
+    };
+    borrowRiderLocomotion(mount, rider, true);
+    expect(mount).toMatchObject({
+      speed: 6.5,
+      moving: true,
+      running: true,
+      airborne: true,
+      backwards: true,
+      swimming: true,
+    });
+    // Rider-only facts never reach the mount's gait clips.
+    expect(mount.dead).toBe(false);
+    expect(mount.casting).toBe(false);
+    expect(mount.sitting).toBe(false);
+    expect(mount.falling).toBe(false);
   });
 });

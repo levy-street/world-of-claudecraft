@@ -449,7 +449,7 @@ import {
   syncMountTransitionFx,
   syncMountVisual,
 } from './mount_lifecycle';
-import { updateMountPresentation } from './mount_presentation';
+import { borrowRiderLocomotion, updateMountPresentation } from './mount_presentation';
 import {
   mountPrewarmKeysFor,
   stageMountPrewarmVisual,
@@ -661,6 +661,7 @@ import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import { type RickshawMountViewState, updateRollingMountLoop } from './rickshaw_mount';
 import { FOOT_RUN_SPEED, updateRiddenMountAudio } from './ridden_mount_audio';
+import { createRiderAnchor, syncRiderAnchor } from './rider_anchor';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
@@ -761,7 +762,7 @@ import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
 import type { VehicleSuspensionRig } from './vehicle_suspension_fx';
 import { SCHOOL_COLORS, Vfx } from './vfx';
-import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
+import { createOffsetVfxAnchor, createVfxAnchor } from './vfx_anchor';
 import { buildCastVfxBasicStandIns } from './vfx_basic_materials';
 import {
   finishViewCandidates,
@@ -775,6 +776,7 @@ import {
   type ViewCreateBudgetState,
 } from './view_create_budget_core';
 import { ViewCreateRetryGate } from './view_create_retry';
+import { createViewVfxPoseFill } from './view_vfx_pose';
 import {
   routeWarlockMeteorSpellfxAt,
   WarlockMeteorFx,
@@ -1097,6 +1099,8 @@ export interface EntityView extends RickshawMountViewState {
   inDrawRange: boolean;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
+  /** body-attached aura parent: follows the rider root's seat lift (rider_anchor.ts) */
+  riderAnchor: THREE.Group;
   visualKey: string | null;
   visualPoolKey: string | null;
   sheepVisual: CharacterVisual | null; // polymorph form, built lazily
@@ -2961,21 +2965,9 @@ export class Renderer {
     this.paladinConsecrationVisuals = new PaladinConsecrationVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
-    const fillVfxPose = (id: number, pose: VfxAnchorPose) => {
-      const v = this.views.get(id);
-      if (!v) return false;
-      const e = this.sim.entities.get(id);
-      const entityScale = e?.scale ?? 1;
-      pose.x = v.group.position.x;
-      pose.y = v.group.position.y;
-      pose.z = v.group.position.z;
-      pose.height = v.height * entityScale;
-      // For local-offset resolves (the drain beams' familiar-side end): the
-      // DISPLAYED yaw, so the offset tracks the body actually on screen.
-      pose.yaw = v.group.rotation.y;
-      pose.scale = entityScale;
-      return true;
-    };
+    // The displayed pose every pooled ability VFX anchors on: the view group
+    // lifted by the rider anchor, so a mounted player's shell wraps the rider.
+    const fillVfxPose = createViewVfxPoseFill(this.views, this.sim.entities);
     const vfxAnchor = createVfxAnchor(fillVfxPose);
     const offsetVfxAnchor = createOffsetVfxAnchor(fillVfxPose);
     bd('scene-misc');
@@ -7871,6 +7863,8 @@ export class Renderer {
     const group = new THREE.Group();
     setRenderCategory(group, `entity:${e.kind}`);
     let visual: CharacterVisual | null = null;
+    const riderAnchor = createRiderAnchor();
+    group.add(riderAnchor);
     let body: THREE.Group | null = null; // object views build meshes into this
     let height = 1.2;
     let sparkle: THREE.Sprite | undefined;
@@ -8202,6 +8196,7 @@ export class Renderer {
       mountPullerVisual: null,
       mountLift: 0,
       mountJumpPitch: 0,
+      riderAnchor,
       metamorphVisual: null,
       fireballTravelVisual: null,
       iceBlockVisual: null,
@@ -10328,7 +10323,7 @@ export class Renderer {
       );
       v.paladinSunVerdictVisual = syncPaladinSunVerdictVisual(
         v.paladinSunVerdictVisual,
-        v.group,
+        v.riderAnchor,
         v.height,
         sunVerdictPlan,
         dt,
@@ -10374,10 +10369,16 @@ export class Renderer {
 
       let iceBlockActivated = false;
       if (runCharacterPresentation) {
-        v.iceBlockVisual = syncIceBlockVisual(v.iceBlockVisual, v.group, v.height, hasIceBlock, dt);
+        v.iceBlockVisual = syncIceBlockVisual(
+          v.iceBlockVisual,
+          v.riderAnchor,
+          v.height,
+          hasIceBlock,
+          dt,
+        );
         v.temporalHourglassVisual = syncTemporalHourglassVisual(
           v.temporalHourglassVisual,
-          v.group,
+          v.riderAnchor,
           temporalHourglassMode,
           dt,
           v.height,
@@ -10391,14 +10392,14 @@ export class Renderer {
         );
         v.mageBarrierVisual = syncMageBarrierVisual(
           v.mageBarrierVisual,
-          v.group,
+          v.riderAnchor,
           v.height,
           mageBarrierState,
           dt,
         );
         v.priestMarkersVisual = syncPriestMarkersVisual(
           v.priestMarkersVisual,
-          v.group,
+          v.riderAnchor,
           v.height,
           priestMarkerStateForAuras(e.auras, this.priestMarkerStateScratch),
         );
@@ -10406,6 +10407,7 @@ export class Renderer {
         v.paladinAscensionVisual = syncPaladinAscensionVisual(
           v.paladinAscensionVisual,
           v.group,
+          v.riderAnchor,
           v.height,
           ascensionPlan,
           dt,
@@ -10414,7 +10416,7 @@ export class Renderer {
         );
         v.paladinAvengingWrathVisual = syncPaladinAvengingWrathVisual(
           v.paladinAvengingWrathVisual,
-          v.group,
+          v.riderAnchor,
           v.height,
           !e.dead && hasPaladinWings,
           dt,
@@ -11266,12 +11268,7 @@ export class Renderer {
       // griffin canters, the snail glides flat). `airborne` here is the real
       // flag, not the rider's suppressed one: the mount carries the jump.
       const mst = this.mountAnimScratch;
-      mst.speed = st.speed;
-      mst.moving = st.moving;
-      mst.running = st.running;
-      mst.airborne = airborne;
-      mst.backwards = st.backwards;
-      mst.swimming = st.swimming;
+      borrowRiderLocomotion(mst, st, airborne);
       updateMountPresentation(v, {
         spec: mountSpec,
         shown: mountShown,
@@ -11290,6 +11287,8 @@ export class Renderer {
         groundSample: this.groundSample,
         dt,
       });
+      // The rider is placed: carry the body-attached auras to the saddle.
+      syncRiderAnchor(v.riderAnchor, v.visual.root);
       v.goblinRocketSledFx?.update(
         dt,
         this.time,
@@ -11359,7 +11358,7 @@ export class Renderer {
         if (hasRecklessness) {
           this.vfx.recklessFlame(e.id, dt);
           if (spawnRecklessnessSkulls) {
-            this.recklessSkulls.spawn(v.group, active.height * e.scale);
+            this.recklessSkulls.spawn(v.riderAnchor, active.height * e.scale);
           }
         }
         // Shapeshift-form particle auras riding the tints above: metamorph fire,
