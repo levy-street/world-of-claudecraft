@@ -6,7 +6,11 @@
 // (2026-09-12 hunt: 132 live programs at the Veiled Hollow graveyard).
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { applyInteriorLightRig } from '../src/render/interior_light_rig';
+import {
+  applyInteriorLightRig,
+  interiorKeyLightDirection,
+  WILDHEART_KEY_LIGHT_DIRECTION,
+} from '../src/render/interior_light_rig';
 
 describe('the Wildheart caldera interior and the light census', () => {
   // That wildheart_props.ts constructs no census-keyed light is pinned by
@@ -27,13 +31,25 @@ describe('the Wildheart caldera interior and the light census', () => {
     applyInteriorLightRig('wildheartField', targets, outdoor);
     // The former fill pair (0.88 sun, 0.9 hemi) is folded into these legs, so
     // the field reads brighter than the outdoor legs it replaces.
-    expect(sun.intensity).toBe(2.6);
-    expect(hemi.intensity).toBe(1.5);
+    expect(sun.intensity).toBe(2.4);
+    expect(hemi.intensity).toBe(1.8);
     expect(sun.color.getHex()).toBe(0xffd48c);
     expect(hemi.color.getHex()).toBe(0xd8ebca);
     expect(hemi.groundColor.getHex()).toBe(0x5b4a2d);
     applyInteriorLightRig('outdoor', targets, outdoor);
     expect(sun.intensity).toBe(outdoor.sunIntensity);
     expect(hemi.intensity).toBe(outdoor.hemiIntensity);
+  });
+
+  it('aims the key light the way the removed fill pair did, in the field only', () => {
+    const out = new THREE.Vector3(0, 1, 0);
+    expect(interiorKeyLightDirection('outdoor', out)).toBe(false);
+    expect(out.toArray()).toEqual([0, 1, 0]);
+    expect(interiorKeyLightDirection('wildheartField', out)).toBe(true);
+    expect(out.equals(WILDHEART_KEY_LIGHT_DIRECTION)).toBe(true);
+    // From behind the gate looking into the field: high, and travelling +z.
+    expect(WILDHEART_KEY_LIGHT_DIRECTION.length()).toBeCloseTo(1, 6);
+    expect(WILDHEART_KEY_LIGHT_DIRECTION.y).toBeGreaterThan(0.3);
+    expect(WILDHEART_KEY_LIGHT_DIRECTION.z).toBeLessThan(-0.8);
   });
 });
