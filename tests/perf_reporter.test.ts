@@ -1544,6 +1544,13 @@ describe('perf reporter worst-window drain', () => {
       expect(fetchImpl).not.toHaveBeenCalled();
       await vi.advanceTimersByTimeAsync(1);
       expect(fetchImpl).toHaveBeenCalledTimes(1);
+      // The URL, not only the count and the body: this harness drives the real
+      // startPerfReporter, and the beacon posting to the wrong origin is what
+      // kept every desktop session out of the fleet (tests/client_api_origin.test.ts).
+      expect(fetchImpl).toHaveBeenCalledWith(
+        '/api/perf-report',
+        expect.objectContaining({ method: 'POST' }),
+      );
       await Promise.resolve();
       await Promise.resolve();
     } finally {
