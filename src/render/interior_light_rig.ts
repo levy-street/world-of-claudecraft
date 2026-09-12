@@ -61,8 +61,11 @@ const YUMI_MAZE_SUN_INTENSITY = 1.32;
 const YUMI_MAZE_HEMI_INTENSITY = 0.38;
 const YUMI_MAZE_ENV_INTENSITY = 0.25;
 const YUMI_MAZE_RIM_BOOST = 1.7;
-const WILDHEART_SUN_INTENSITY = 1.75;
-const WILDHEART_HEMI_INTENSITY = 0.59;
+// Wildheart's sunlit caldera: the legs carry what used to be a second
+// directional (0.88) and hemisphere (0.9) fill pair added by wildheart_props.ts
+// on top of these, folded in here so the light census never changes.
+const WILDHEART_SUN_INTENSITY = 2.6;
+const WILDHEART_HEMI_INTENSITY = 1.5;
 const WILDHEART_ENV_INTENSITY = 0.28;
 const WILDHEART_RIM_BOOST = 1.5;
 const WILDHEART_SUN_COLOR = 0xffd48c;
