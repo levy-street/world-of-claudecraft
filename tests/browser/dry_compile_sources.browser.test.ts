@@ -4,15 +4,35 @@
 // hands the driver, under the same cache keys, and a second collection after
 // the link reports none of them. The browser's shared program cache is keyed
 // on that text, so this equality is what makes a worker's warm-up a hit.
+//
+// The scene also carries ONE real game shader, the monument impostor's
+// hand-written ShaderMaterial, and the link assertion below covers it. Two
+// reasons, and the second is why it rides here rather than in a file of its
+// own. First, the mirror has to hold for a hand-written ShaderMaterial too,
+// which reaches the assembly by a different path than three's stock materials.
+// Second, several browser files link shipped shaders, but none of them ASSERTS
+// the link succeeded, and nothing else does either: renderer.ts keeps three's
+// link diagnostic off outside ?shaderdebug (a synchronous info-log roundtrip
+// per link, a quarter of main-thread time on a streaming walk), so a shader
+// that never compiles ships silently and is drawn with on every frame. That is
+// exactly what the impostor did for all of v0.42. Adding it to this scene
+// costs one program link on a context this file already builds; a separate
+// browser file would have cost a whole context, measured at 0.65 s of the
+// 0.98 s this file takes.
 
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { DryCompileRenderer, DryProgramSource } from '../../src/render/program_sources';
+import {
+  MONUMENT_IMPOSTOR_FRAGMENT,
+  MONUMENT_IMPOSTOR_VERTEX,
+} from '../../src/render/realm_builder_monument_impostor_glsl';
 
 type PatchedRenderer = THREE.WebGLRenderer & Required<DryCompileRenderer>;
 
 interface MintedProgram {
   cacheKey: string;
+  program: WebGLProgram;
   vertexShader: WebGLShader;
   fragmentShader: WebGLShader;
 }
@@ -44,6 +64,23 @@ function scene(): { scene: THREE.Scene; camera: THREE.PerspectiveCamera; root: T
       new THREE.PlaneGeometry(),
       new THREE.MeshBasicMaterial({ transparent: true, side: THREE.DoubleSide }),
     ),
+    // The shipped monument impostor GLSL, uniforms shaped as buildImpostor
+    // shapes them (the atlas sampler may be null: a link needs the declaration,
+    // not the texture). See the header for why it rides in this scene.
+    new THREE.Mesh(
+      new THREE.PlaneGeometry(),
+      new THREE.ShaderMaterial({
+        vertexShader: MONUMENT_IMPOSTOR_VERTEX,
+        fragmentShader: MONUMENT_IMPOSTOR_FRAGMENT,
+        fog: true,
+        uniforms: {
+          ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
+          uAtlas: { value: null },
+          uCell: { value: new THREE.Vector2(0, 0) },
+          uCellSize: { value: new THREE.Vector2(1, 1) },
+        },
+      }),
+    ),
   );
   world.add(root);
   return { scene: world, camera, root };
@@ -74,6 +111,18 @@ describe('the dry compile against the real link', () => {
     const linked = minted().filter((program) => !before.has(program.cacheKey));
     expect(linked.length).toBe(dry.length);
     for (const program of linked) {
+      // First: it linked at all. Three reports a failed link only under
+      // debug.checkShaderErrors, which production keeps off, so without this
+      // the driver's verdict is read by nobody and an uncompilable shader
+      // reaches players. The info logs name the line when it fails.
+      expect(
+        gl.getProgramParameter(program.program, gl.LINK_STATUS),
+        `link failed for ${program.cacheKey.slice(0, 40)}: program ${gl.getProgramInfoLog(
+          program.program,
+        )} vertex ${gl.getShaderInfoLog(program.vertexShader)} fragment ${gl.getShaderInfoLog(
+          program.fragmentShader,
+        )}`,
+      ).toBe(true);
       const entry = dryByKey.get(program.cacheKey);
       expect(entry, `announced key for ${program.cacheKey.slice(0, 40)}`).toBeDefined();
       if (!entry) continue;
