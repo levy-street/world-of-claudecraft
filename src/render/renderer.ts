@@ -2887,9 +2887,8 @@ export class Renderer {
       (x, z, meteor) =>
         meteorLandingBurst(this.abilityVfx, this.vfx, this.sim.cfg.seed, x, z, meteor),
     );
-    this.varkhulForgestormVisuals = new VarkhulForgestormVisuals(this.scene, (x, z) =>
-      groundHeight(x, z, this.sim.cfg.seed),
-    );
+    const gate = this.worldCompileGate();
+    this.varkhulForgestormVisuals = new VarkhulForgestormVisuals(this.scene, this.groundSample, gate);
     this.nythraxisMechanicVisuals = new NythraxisMechanicVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
