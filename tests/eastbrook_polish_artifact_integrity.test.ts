@@ -1363,9 +1363,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e3a555a9db84a550c92bf8443df1a20a64a96748dc7bd3159490b4ab93272770';
+  '609d8219adb88cb65096d3c521e2de620a0c93ae45273f48d748215ba4ebb785';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '5ae21044dd1b636f9c293ec628a7d316f740bb92a5962f848c6e58c80218ebbc';
+  '6d7aeaf33c339ecbb999c03d07ee9ffed2720ea99c8ba768715cb31f2a3d50b5';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2724,7 +2724,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // canonical re-sealed evidence files. Capture pixels and scores did not change.
       // v0.42.0 dependency-floor bump: recomputed LAST over the swept evidence
       // after the lockfile-driven GLB re-mint. No capture was retaken.
-    ).toBe('eea4d7acbd5b80de9fcf51e9a24ba8218566cee1928111ef3723278b7036125b');
+    ).toBe('cfd9269c6cddd97844cd8db6c572846e27b398f2102206e99f735255afc5d07f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
