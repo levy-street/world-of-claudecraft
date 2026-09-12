@@ -3047,6 +3047,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.farming': '種まき',
   'abilityUi.cast.gathering': '採集',
   'abilityUi.cast.thunzharrStormcall': '嵐の呼び声',
+  'abilityUi.cast.nythraxisWardChannel': '石柱の守護',
   'abilityUi.cast.demonHeal': '悪魔の治癒',
   'abilityUi.cast.rift_arcane_execution': '虚空の裂け目',
   'abilityUi.cast.rift_arcane_strike': '秘術の殲滅',

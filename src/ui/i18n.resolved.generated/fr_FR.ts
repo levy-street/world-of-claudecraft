@@ -10617,6 +10617,7 @@ export const fr_FR: EnTranslations = {
       "tool_recharge": "Recharge",
       "demonHeal": "Soin démoniaque",
       "thunzharrStormcall": "Appel de la tempête",
+      "nythraxisWardChannel": "Warding the Pillar",
       "rift_frost_execution": "Tombe glaciale",
       "rift_frost_strike": "Zéro absolu",
       "rift_ember_execution": "Puits de magma",

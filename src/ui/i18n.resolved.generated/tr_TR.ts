@@ -10617,6 +10617,7 @@ export const tr_TR: EnTranslations = {
       "tool_recharge": "Şarj Etme",
       "demonHeal": "Şeytan İyileştirmesi",
       "thunzharrStormcall": "Fırtına Çağrısı",
+      "nythraxisWardChannel": "Warding the Pillar",
       "rift_frost_execution": "Buzul Mezarı",
       "rift_frost_strike": "Mutlak Sıfır",
       "rift_ember_execution": "Magma Kuyusu",

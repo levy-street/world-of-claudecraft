@@ -3018,6 +3018,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.farming': '파종',
   'abilityUi.cast.gathering': '채집',
   'abilityUi.cast.thunzharrStormcall': '폭풍의 부름',
+  'abilityUi.cast.nythraxisWardChannel': '기둥 수호',
   'abilityUi.cast.demonHeal': '악마 치유',
   'abilityUi.cast.rift_arcane_execution': '공허 균열',
   'abilityUi.cast.rift_arcane_strike': '비전 소멸',

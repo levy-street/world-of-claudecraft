@@ -31,6 +31,21 @@ describe('castDisplayName', () => {
     expect(castDisplayName('rift_frost_execution')).toBe(t('abilityUi.cast.rift_frost_execution'));
   });
 
+  it('resolves the nythraxis wardstone channel through its dedicated key', () => {
+    // The encounter sets p.castingAbility to this mechanic id (not an ABILITIES
+    // key); the cast bar must show the friendly label, never the raw id.
+    expect(castDisplayName('nythraxis_ward_channel')).toBe(
+      t('abilityUi.cast.nythraxisWardChannel'),
+    );
+  });
+
+  it('no longer falls through to the raw wardstone channel id', () => {
+    // Regression pin for #3749: before the dedicated arm, castDisplayName
+    // returned the mechanic id unchanged, so the HUD showed "NYTHRAXIS_WARD_CHANNEL".
+    expect(castDisplayName('nythraxis_ward_channel')).not.toBe('nythraxis_ward_channel');
+    expect(castDisplayName('nythraxis_ward_channel')).not.toMatch(/^NYTHRAXIS_WARD_CHANNEL/i);
+  });
+
   it('falls through to the ability catalog, then to the raw id', () => {
     const abilityId = Object.keys(ABILITIES)[0];
     expect(abilityId).toBeTruthy();

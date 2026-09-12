@@ -10617,6 +10617,7 @@ export const ko_KR: EnTranslations = {
       "tool_recharge": "충전",
       "demonHeal": "악마 치유",
       "thunzharrStormcall": "폭풍의 부름",
+      "nythraxisWardChannel": "기둥 수호",
       "rift_frost_execution": "빙하의 무덤",
       "rift_frost_strike": "절대 영도",
       "rift_ember_execution": "마그마 우물",
