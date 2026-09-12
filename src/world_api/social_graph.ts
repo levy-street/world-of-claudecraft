@@ -110,6 +110,30 @@ export interface SocialInfo {
   myPledge: MyPledgeInfo | null;
 }
 
+// The realm's online roster as the Social window's Who tab mirrors it (the
+// `who` frame, answered per request by the `who` command). `rows` is the
+// server-filtered, name-ordered slice capped at `limit`; `total` is the
+// uncapped match count so the tab can say "showing N of M" and invite a
+// narrower filter. Carries NO positions: the realm-wide roster is public
+// presence, and live x/z stay friend/guild-gated on the socialpos frame.
+export interface WhoRosterEntry {
+  name: string;
+  cls: string;
+  level: number;
+  zone: string;
+  status: PresenceStatus;
+  /** Guild name, '' when unguilded. */
+  guild: string;
+}
+
+export interface WhoRosterInfo {
+  /** The sanitized filter the server applied (echoed so a stale answer is recognizable). */
+  filter: string;
+  rows: WhoRosterEntry[];
+  total: number;
+  limit: number;
+}
+
 export interface CharacterSearchResult {
   name: string;
   cls: string;
@@ -172,6 +196,13 @@ export interface IWorldSocialGraph {
   // refuses everyone else (socialInfo.guild.nextRosterPrice is the UX price,
   // never the charged one). Inert offline.
   guildBuyRosterPage(): void;
+  // The Who tab's roster mirror: null until the first `who` answer lands (and
+  // forever offline, the socialInfo idiom). whoRequest asks the server for the
+  // roster narrowed by a name / zone / guild substring ('' for everyone); the
+  // answer replaces whoInfo. Sorting and class filtering are client-side over
+  // the delivered rows (src/ui/who_tab_view.ts).
+  whoInfo: WhoRosterInfo | null;
+  whoRequest(filter: string): void;
   // realm-scoped username typeahead for friend/ignore/guild search
   searchCharacters(query: string): Promise<CharacterSearchResult[]>;
   // public profile for any character on the realm, by name. Lets the player menu

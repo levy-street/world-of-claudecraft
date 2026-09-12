@@ -455,7 +455,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
     // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
     // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
-    ceiling: 18350,
+    // LOWERED 18350 -> 18348 with the Who tab: the private questNumber wrapper
+    // was the bank family's formatCount (src/ui/count_format.ts), so the
+    // coordinator consumes that leaf and pays the one-line openWhoTab dep.
+    ceiling: 18348,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1024,7 +1027,10 @@ const MONOLITHS: MonolithRow[] = [
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 11879,
+    // LOWERED 11879 -> 11872 with the Who tab: abilityNeedsLineOfSight moved
+    // to src/sim/ability_line_of_sight.ts (a pure rule), paying the two-line
+    // inert whoInfo / whoRequest offline arm.
+    ceiling: 11872,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1438,7 +1444,10 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 10095,
+    // LOWERED 10095 -> 10060 with the Who tab: the /who visibility rule, the
+    // filter and both projections moved to server/who_roster.ts, paying the
+    // new `who` dispatch case.
+    ceiling: 10060,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1581,7 +1590,9 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // LOWERED 5540 -> 5537 with the Who tab: the social frame's version-skew
+    // normalization moved to net/social_frame_wire.ts, paying the who mirror.
+    ceiling: 5537,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

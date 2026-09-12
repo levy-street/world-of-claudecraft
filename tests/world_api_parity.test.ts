@@ -258,6 +258,8 @@ export const IWORLD_MEMBERS = [
   { name: 'accountAdmin', kind: 'data' },
   { name: 'spectating', kind: 'data' },
   { name: 'socialInfo', kind: 'data' },
+  { name: 'whoInfo', kind: 'data' },
+  { name: 'whoRequest', kind: 'method' },
   // --- social graph commands + async search ---
   { name: 'friendAdd', kind: 'method' },
   { name: 'friendRemove', kind: 'method' },
@@ -855,9 +857,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet-file exhaustiveness checks (AssertNever) also pass on the fully
     // resolved production tree.
-    expect(IWORLD_MEMBERS.length).toBe(371);
-    expect(DATA_MEMBERS.length).toBe(103);
-    expect(METHOD_MEMBERS.length).toBe(268);
+    expect(IWORLD_MEMBERS.length).toBe(373);
+    expect(DATA_MEMBERS.length).toBe(104);
+    expect(METHOD_MEMBERS.length).toBe(269);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1238,6 +1240,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vaultInfo',
       'vaultWithdraw',
       'vendorBuyback',
+      'whoInfo',
+      'whoRequest',
       'xp',
     ]);
   });
@@ -1346,6 +1350,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unlockedMilestones',
       'vaultInfo',
       'vendorBuyback',
+      'whoInfo',
       'xp',
     ]);
   });
@@ -1620,6 +1625,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vaultDeposit',
       'vaultDepositAll',
       'vaultWithdraw',
+      'whoRequest',
     ]);
   });
 });
@@ -1969,6 +1975,8 @@ type _ExhaustCardMinigame = AssertNever<
 
 const FACET_SOCIAL_GRAPH = [
   'socialInfo',
+  'whoInfo',
+  'whoRequest',
   'friendAdd',
   'friendRemove',
   'blockAdd',
@@ -2367,8 +2375,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet arrays actually reconstruct IWORLD_MEMBERS with no gaps or
     // collisions; this pin and the one above must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(371);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(371);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(373);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(373);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

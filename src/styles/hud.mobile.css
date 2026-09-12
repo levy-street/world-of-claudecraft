@@ -5598,6 +5598,54 @@
   body.mobile-touch .raid-groups {
     grid-template-columns: 1fr;
   }
+  /* Who tab on a touch-narrow window: three tracks (dot, name, level), and
+     the class / zone / guild trio (.soc-who-meta, display: contents on the
+     desktop grid) becomes ONE wrapped line under the name, so no column is
+     hidden and nothing scrolls sideways. The row's divider moves to that
+     second line; the header's three extra sort buttons wrap the same way. */
+  body.mobile-touch .soc-who-list {
+    grid-template-columns: auto 1fr 3em;
+  }
+  body.mobile-touch .soc-who-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 12px;
+    grid-column: 2 / -1;
+    min-width: 0;
+    padding: 0 2px 6px;
+    border-bottom: 1px solid var(--color-border-showcase);
+  }
+  body.mobile-touch .soc-who-header .soc-who-meta {
+    padding-bottom: 4px;
+    border-bottom-color: var(--gold-dim);
+  }
+  body.mobile-touch .soc-who-meta .soc-who-cell {
+    padding: 0;
+    border-bottom: 0;
+    font-size: 12px;
+  }
+  /* The five sort buttons and the class chip are the tab's only interactive
+     controls outside the shared .btn / .soc-tab floor: hold them at the 40px
+     touch target like the rest of the social chrome. */
+  body.mobile-touch .soc-who-sort,
+  body.mobile-touch .soc-who-cls {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch .soc-who-cell.who-dot,
+  body.mobile-touch .soc-who-cell.who-name,
+  body.mobile-touch .soc-who-cell.who-level {
+    border-bottom: 0;
+    padding-bottom: 2px;
+  }
+  /* Each row is now two grid rows (name line + meta line): the dot spans both
+     so auto-placement keeps every dot beside its own name rather than sliding
+     into the previous row's meta line. */
+  body.mobile-touch .soc-who-cell.who-dot {
+    grid-row: span 2;
+    align-self: center;
+  }
   body.mobile-touch .raid-group {
     border-top: 1px solid var(--color-border-showcase);
     padding-top: 6px;

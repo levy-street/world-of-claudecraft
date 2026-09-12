@@ -309,6 +309,7 @@ const UI_PURE_CORES = [
   'src/ui/preview_prewarm_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
+  'src/ui/who_tab_view.ts',
   'src/ui/tab_strip_view.ts',
   'src/ui/bag_filter.ts',
   'src/ui/bank_filter.ts',

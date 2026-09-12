@@ -387,6 +387,8 @@ export type {
   MyPledgeInfo,
   PresenceStatus,
   SocialInfo,
+  WhoRosterEntry,
+  WhoRosterInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
 
@@ -831,6 +833,9 @@ export const COMMAND_NAMES = [
   'swap_perfecting_ranks',
   // Wear or take off an owned account mount skin on this character.
   'change_mount_skin',
+  // The Social window's Who tab: ask for the realm roster (answered by the
+  // `who` frame, mirrored as IWorldSocialGraph.whoInfo).
+  'who',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1073,6 +1078,7 @@ export const COMMAND_FACETS = {
   guild_event_remove: 'IWorldSocialGraph',
   guild_set_motd: 'IWorldSocialGraph',
   guild_buy_roster_page: 'IWorldSocialGraph',
+  who: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',

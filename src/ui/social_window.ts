@@ -23,7 +23,8 @@
 import { CLASSES } from '../sim/data';
 import { GUILD_ROSTER_PAGE_SEATS } from '../sim/guild_roster';
 import type { PlayerClass } from '../sim/types';
-import type { IWorld } from '../world_api';
+import type { IWorld, WhoRosterInfo } from '../world_api';
+import { formatCount } from './count_format';
 import { deedTitleText } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
@@ -55,6 +56,17 @@ import {
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
+import {
+  DEFAULT_WHO_TAB_STATE,
+  toggleWhoSort,
+  WHO_SORT_KEYS,
+  type WhoSortKey,
+  type WhoTabState,
+  whoClassOptions,
+  whoCountView,
+  whoTabRows,
+  whoTabSig,
+} from './who_tab_view';
 
 // Typeahead timings (named, not bare literals): debounce a keystroke
 // before searching, and clear the suggestion list shortly after blur so a pending
@@ -82,6 +94,12 @@ const GUILD_MOTD_MAX = 240;
 const PLEDGE_NOTE_MAX = 90;
 const PLEDGE_MIN_LEVEL_FLOOR = 1;
 const PLEDGE_MIN_LEVEL_CEIL = 60;
+
+// Who tab search cap; mirrors WHO_FILTER_MAX in server/who_roster.ts (the
+// server clamps authoritatively, this is UX only).
+const WHO_SEARCH_MAX = 32;
+// Slow-HUD ticks between re-asks while the Who tab still has no answer.
+const WHO_RETRY_SLOW_TICKS = 4;
 
 /**
  * Hud-supplied glue. The social window renders no item rows (it uses CSS-classed
@@ -261,6 +279,17 @@ export class SocialWindow {
   // every structural repaint; applyGuildCreateLock re-stamps the fresh button.
   private guildCreateLocked = false;
   private guildCreateTimer: number | undefined;
+  // Who tab: the local sort / class chip plus the last server-side search
+  // (who_tab_view.ts owns the decisions). Window-local like the tab itself.
+  private who: WhoTabState = { ...DEFAULT_WHO_TAB_STATE };
+  private whoRetryTicks = 0;
+  // Answer identity for the content signature: ClientWorld builds a fresh
+  // whoInfo object per `who` frame, so a reference change is exactly "a new
+  // answer landed", even when the filter, row count, and total all match the
+  // previous one (a re-submitted search after someone logged off and someone
+  // else logged on, or the same names with new levels or zones).
+  private whoSeen: WhoRosterInfo | null = null;
+  private whoAnswerSeq = 0;
 
   constructor(private readonly deps: SocialWindowDeps) {}
 
@@ -281,6 +310,65 @@ export class SocialWindow {
     this.lastStruct = this.structSig();
     this.lastContent = this.contentSig();
     this.render();
+    if (this.tab === 'who') this.requestWho();
+  }
+
+  // The chat `/who [filter]` command lands here online: open the window on the
+  // Who tab with the filter applied and ask the server. Returns false offline,
+  // so the caller falls through to the normal send path (the offline Sim
+  // answers the classic "online play only" line itself).
+  openWhoTab(filter: string): boolean {
+    const w = this.deps.world();
+    // Spectating drops every command but chat before the socket, so the
+    // classic chat dump (which chat still delivers) is the honest answer there.
+    if (w.socialInfo === null || w.spectating !== null) return false;
+    this.who = { ...this.who, search: filter.slice(0, WHO_SEARCH_MAX) };
+    this.tab = 'who';
+    this.notice = null;
+    if (this.isOpen) {
+      this.lastStruct = this.structSig();
+      this.render();
+      this.requestWho();
+    } else {
+      this.toggle();
+    }
+    return true;
+  }
+
+  // Ask the server for the roster under the current search. Online only (the
+  // offline Sim's whoRequest is inert anyway); the answer lands as whoInfo and
+  // the content signature repaints the list on the next slow tick.
+  private requestWho(): void {
+    const w = this.deps.world();
+    if (w.socialInfo === null || w.spectating !== null) return;
+    this.whoRetryTicks = 0;
+    w.whoRequest(this.who.search);
+  }
+
+  // While the tab shows the pending state (no answer yet: the viewer's block
+  // list was still loading server-side, a shed request, or a transport that
+  // reset the mirror), re-ask every few slow ticks. Bounded by the server's
+  // list-read guard and by the tab being open; stops on the first answer.
+  private retryWhoIfPending(): void {
+    const w = this.deps.world();
+    if (this.tab !== 'who' || w.whoInfo !== null || w.spectating !== null) return;
+    if (++this.whoRetryTicks < WHO_RETRY_SLOW_TICKS) return;
+    this.requestWho();
+  }
+
+  // A local who-state change (sort, chip, search) repaints the list itself, so
+  // the content signature is re-latched here: otherwise the next slow tick sees
+  // the moved whoTabSig and rebuilds the body a second time, dropping the focus
+  // the handler just restored (the file's "re-latch, never clear" rule).
+  private refreshWhoList(): void {
+    this.refreshList();
+    this.lastContent = this.contentSig();
+  }
+
+  private searchWho(filter: string): void {
+    this.who = { ...this.who, search: filter.slice(0, WHO_SEARCH_MAX) };
+    this.requestWho();
+    this.refreshWhoList();
   }
 
   // Close path (toggle close + the window-manager's closeManagedWindow case): drop
@@ -305,6 +393,7 @@ export class SocialWindow {
   // change, else an in-place list refresh on a content change.
   refreshIfChanged(): void {
     if (!this.isOpen) return;
+    this.retryWhoIfPending();
     const struct = this.structSig();
     if (struct !== this.lastStruct) {
       this.lastStruct = struct;
@@ -364,9 +453,27 @@ export class SocialWindow {
     return socialStructSig(this.tab, w.socialInfo, w.partyInfo);
   }
 
+  private whoAnswerId(info: WhoRosterInfo | null): number {
+    if (info !== this.whoSeen) {
+      this.whoSeen = info;
+      this.whoAnswerSeq++;
+    }
+    return this.whoAnswerSeq;
+  }
+
   private contentSig(): string {
     const w = this.deps.world();
-    return JSON.stringify({ social: w.socialInfo, party: w.partyInfo });
+    return JSON.stringify({
+      social: w.socialInfo,
+      // The Who tab paints nothing from the party mirror, whose members carry
+      // live hp/resource; keeping it in would rebuild the tab every slow tick
+      // while partied in combat (and drop a focused header or chip each time).
+      party: this.tab === 'who' ? null : w.partyInfo,
+      // A cheap digest of the roster answer (never the 200 rows themselves):
+      // the answer's identity, so a same-count answer still repaints.
+      who: this.whoAnswerId(w.whoInfo),
+      whoTab: whoTabSig(this.who),
+    });
   }
 
   // Full rebuild: title, tabs, body, notice, and the tab's footer (with its
@@ -406,6 +513,7 @@ export class SocialWindow {
           tabs: [
             { id: 'friends', label: t('hud.social.friendsTab') },
             { id: 'guild', label: t('hud.social.guildTab') },
+            { id: 'who', label: t('hudChrome.social.who.tab') },
             // Officer-plus only: the pledge dashboard. The label carries the
             // live open-pledge count (the count is in the structural
             // signature, so a new pledge rebuilds the strip).
@@ -455,6 +563,17 @@ export class SocialWindow {
           ke.preventDefault();
           this.savePledgeSettings();
         }
+      });
+      // The Who tab's class chip is a native select inside the body (rebuilt
+      // by every refreshList swap), so its change is delegated like the clicks.
+      body.addEventListener('change', (e) => {
+        const target = e.target as HTMLSelectElement;
+        if (!target.matches?.('select[data-field="who-cls"]')) return;
+        this.who = { ...this.who, cls: target.value };
+        this.refreshWhoList();
+        (
+          this.deps.root().querySelector('select[data-field="who-cls"]') as HTMLElement | null
+        )?.focus();
       });
     }
     this.refreshList();
@@ -507,6 +626,18 @@ export class SocialWindow {
         selEnd: isCheckbox ? null : prev.selectionEnd,
       });
     }
+    // The Who tab's focusable controls outside the draft inputs: a sort header
+    // (by column key) or the class chip. Both are re-emitted from `this.who`,
+    // so focus can be handed back to the freshly rendered element.
+    const active = document.activeElement as HTMLElement | null;
+    const whoFocus =
+      active && body.contains(active)
+        ? active.dataset.act === 'who-sort'
+          ? `[data-act="who-sort"][data-key="${active.dataset.key}"]`
+          : active.dataset.field === 'who-cls'
+            ? 'select[data-field="who-cls"]'
+            : null
+        : null;
     const online = this.deps.world().socialInfo !== null;
     body.innerHTML =
       this.tab === 'raid'
@@ -515,13 +646,15 @@ export class SocialWindow {
           ? `<div class="soc-empty">${esc(t('hud.social.offlineEmpty'))}</div>`
           : this.tab === 'friends'
             ? this.friendsHtml()
-            : this.tab === 'guild'
-              ? this.guildHtml()
-              : this.tab === 'pledges'
-                ? this.pledgesHtml()
-                : this.tab === 'block'
-                  ? this.blockHtml()
-                  : this.ignoreHtml();
+            : this.tab === 'who'
+              ? this.whoHtml()
+              : this.tab === 'guild'
+                ? this.guildHtml()
+                : this.tab === 'pledges'
+                  ? this.pledgesHtml()
+                  : this.tab === 'block'
+                    ? this.blockHtml()
+                    : this.ignoreHtml();
     for (const draft of drafts) {
       const next = body.querySelector(
         `input[data-field="${draft.field}"]`,
@@ -539,6 +672,7 @@ export class SocialWindow {
           next.setSelectionRange(draft.selStart, draft.selEnd);
       }
     }
+    if (whoFocus) (body.querySelector(whoFocus) as HTMLElement | null)?.focus();
   }
 
   // The single delegated row handler (click + whisper). Resolves the nearest
@@ -563,6 +697,20 @@ export class SocialWindow {
       // keyboard presses keep working (WCAG 2.2 AA focus management).
       (
         this.deps.root().querySelector('[data-act="toggle-hide-offline"]') as HTMLElement | null
+      )?.focus();
+      return;
+    }
+    // Who tab column header: re-sort the delivered rows locally (no round-trip),
+    // then hand focus back to the freshly rendered header button.
+    if (node.dataset.act === 'who-sort') {
+      const key = node.dataset.key as WhoSortKey | undefined;
+      if (!key || !WHO_SORT_KEYS.includes(key)) return;
+      this.who = toggleWhoSort(this.who, key);
+      this.refreshWhoList();
+      (
+        this.deps
+          .root()
+          .querySelector(`[data-act="who-sort"][data-key="${key}"]`) as HTMLElement | null
       )?.focus();
       return;
     }
@@ -715,7 +863,7 @@ export class SocialWindow {
     const w = this.deps.world();
     const view = guildView(w.socialInfo, w.player.name);
     if (!view.guild)
-      return `<div class="soc-empty">${esc(t('hud.social.noGuild'))}</div>` + this.myPledgeHtml();
+      return `<div class="soc-empty">${esc(t('hud.social.noGuild'))}</div>${this.myPledgeHtml()}`;
     const g = view.guild;
     const guildCount = formatNumber(g.memberCount, { maximumFractionDigits: 0 });
     // The guild name carries its lifetime-XP colour tier (the nameplate ladder,
@@ -826,7 +974,7 @@ export class SocialWindow {
       `<button type="button" class="btn ui-btn" data-act="pledge-settings-save">${esc(t('hudChrome.pledge.save'))}</button>` +
       `</div></div>`;
     if (panel.rows.length === 0)
-      return settings + `<div class="soc-empty">${esc(t('hudChrome.pledge.empty'))}</div>`;
+      return `${settings}<div class="soc-empty">${esc(t('hudChrome.pledge.empty'))}</div>`;
     const rows = panel.rows
       .map((p) => {
         const since = formatDateTime(new Date(p.sinceMs), { dateStyle: 'medium' });
@@ -877,9 +1025,90 @@ export class SocialWindow {
     return `<div class="raid-groups">${groupHtml(g1)}${groupHtml(g2)}</div>${footer}`;
   }
 
+  // The Who tab body: the count line + class chip, then a sortable table of the
+  // delivered rows (who_tab_view.ts decides the order and the chip options).
+  private whoHtml(): string {
+    const w = this.deps.world();
+    // Spectating drops every command but chat before the socket, so the tab
+    // can never be answered there: show the same online-only empty state the
+    // offline window shows rather than a loading line that never resolves.
+    if (w.spectating !== null)
+      return `<div class="soc-empty">${esc(t('hud.social.offlineEmpty'))}</div>`;
+    const info = w.whoInfo;
+    if (!info) return `<div class="soc-empty">${esc(t('hudChrome.social.who.loading'))}</div>`;
+    const labels = { cls: playerClassDisplayName, zone: localizeZone };
+    const rows = whoTabRows(info, this.who, w.player.name, labels);
+    const count = whoCountView(info, rows.length);
+    const n = formatCount;
+    const countText =
+      count.shown === count.total
+        ? t('hudChrome.social.who.count', { total: n(count.total) })
+        : t('hudChrome.social.who.countFiltered', { shown: n(count.shown), total: n(count.total) });
+    const capped = count.capped
+      ? ` <span class="soc-who-capped">${esc(t('hudChrome.social.who.capped', { delivered: n(count.delivered) }))}</span>`
+      : '';
+    const options = whoClassOptions(info, labels)
+      .map(
+        (cls) =>
+          `<option value="${esc(cls)}"${cls === this.who.cls ? ' selected' : ''}>${esc(playerClassDisplayName(cls))}</option>`,
+      )
+      .join('');
+    const chip =
+      `<select class="ui-input soc-who-cls" data-field="who-cls" aria-label="${esc(t('hudChrome.social.who.classFilter'))}">` +
+      `<option value=""${this.who.cls === '' ? ' selected' : ''}>${esc(t('hudChrome.social.who.allClasses'))}</option>${options}</select>`;
+    const head = `<div class="soc-who-head"><span class="soc-who-count">${esc(countText)}${capped}</span>${chip}</div>`;
+    const columns: { key: WhoSortKey; label: string }[] = [
+      { key: 'name', label: t('hudChrome.social.who.colName') },
+      { key: 'level', label: t('hudChrome.social.who.colLevel') },
+      { key: 'cls', label: t('hudChrome.social.who.colClass') },
+      { key: 'zone', label: t('hudChrome.social.who.colZone') },
+      { key: 'guild', label: t('hudChrome.social.who.colGuild') },
+    ];
+    const headerCell = (c: { key: WhoSortKey; label: string }): string => {
+      const active = this.who.sort === c.key;
+      const ariaSort = active ? (this.who.desc ? 'descending' : 'ascending') : 'none';
+      return `<span class="soc-who-cell who-${c.key}" role="columnheader" aria-sort="${ariaSort}"><button type="button" class="soc-who-sort${active ? ' on' : ''}" data-act="who-sort" data-key="${c.key}" title="${esc(t('hudChrome.social.who.sortTitle', { column: c.label }))}">${esc(c.label)}${active ? `<span class="soc-who-dir">${this.who.desc ? svgIcon('demote') : svgIcon('promote')}</span>` : ''}</button></span>`;
+    };
+    // The class / zone / guild trio is grouped (.soc-who-meta: display contents
+    // on the desktop grid, one wrapped line under the name on a touch window).
+    const header =
+      `<div class="soc-who-row soc-who-header" role="row"><span class="soc-who-cell who-dot" role="columnheader" aria-label="${esc(t('hudChrome.social.who.colStatus'))}"></span>` +
+      columns.slice(0, 2).map(headerCell).join('') +
+      `<span class="soc-who-meta" role="presentation">${columns.slice(2).map(headerCell).join('')}</span>` +
+      `</div>`;
+    if (rows.length === 0)
+      return `${head}<div class="soc-empty">${esc(t('hudChrome.social.who.empty'))}</div>`;
+    const body = rows
+      .map((r) => {
+        const tip = esc(dotTitle(true, r.status, r.zone));
+        const name = r.self
+          ? `<span class="soc-name" style="--class-color:${classColorCss(r.cls)}">${esc(r.name)}</span>`
+          : `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(r.cls)}" data-whisper="${esc(r.name)}" title="${esc(t('hud.social.whisperTitle', { name: r.name }))}">${esc(r.name)}</button>`;
+        return (
+          `<div class="soc-row soc-who-row" role="row">` +
+          `<span class="soc-who-cell who-dot" role="cell"><span class="soc-dot ${r.dot}" title="${tip}"></span></span>` +
+          `<span class="soc-who-cell who-name" role="cell">${name}</span>` +
+          `<span class="soc-who-cell who-level" role="cell">${n(r.level)}</span>` +
+          `<span class="soc-who-meta" role="presentation">` +
+          `<span class="soc-who-cell who-cls" role="cell">${esc(playerClassDisplayName(r.cls))}</span>` +
+          `<span class="soc-who-cell who-zone" role="cell" title="${tip}">${esc(localizeZone(r.zone))}</span>` +
+          `<span class="soc-who-cell who-guild" role="cell">${esc(r.guild)}</span>` +
+          `</span></div>`
+        );
+      })
+      .join('');
+    return `${head}<div class="soc-who-list" role="table" aria-label="${esc(t('hudChrome.social.who.tab'))}">${header}${body}</div>`;
+  }
+
   // The add/action row changes with the tab (and guild membership). Inputs
   // tagged data-suggest get the username typeahead.
   private footer(): string {
+    if (this.tab === 'who')
+      return (
+        `<div class="soc-add">` +
+        `<input class="ui-input" maxlength="${WHO_SEARCH_MAX}" aria-label="${esc(t('hudChrome.social.who.searchPlaceholder'))}" placeholder="${esc(t('hudChrome.social.who.searchPlaceholder'))}" data-field="who" value="${esc(this.who.search)}" autocomplete="off" spellcheck="false"/>` +
+        `<button class="btn ui-btn" data-act="who-search">${esc(t('hudChrome.social.who.search'))}</button></div>`
+      );
     if (this.tab === 'friends')
       return this.addRow(
         'friend',
@@ -992,6 +1221,7 @@ export class SocialWindow {
       this.notice = null;
       this.lastStruct = this.structSig();
       this.render();
+      if (this.tab === 'who') this.requestWho();
       if (focusFollow) focusActiveTab(el, 'soc-tab', 'on');
     });
     const w = this.deps.world();
@@ -999,7 +1229,8 @@ export class SocialWindow {
       (el.querySelector(`input[data-field="${sel}"]`) as HTMLInputElement | null)?.value.trim() ??
       '';
     const submit = (act: string | undefined): void => {
-      if (act === 'friend-add') void this.resolveAndAct('friend', field('friend'));
+      if (act === 'who-search') this.searchWho(field('who'));
+      else if (act === 'friend-add') void this.resolveAndAct('friend', field('friend'));
       else if (act === 'ignore-add') void this.resolveAndAct('ignore', field('ignore'));
       else if (act === 'block-add') void this.resolveAndAct('block', field('block'));
       else if (act === 'guild-invite') void this.resolveAndAct('ginvite', field('ginvite'));

@@ -111,6 +111,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.lifetimeHonor = 0;
   c.cardMinigameInfo = { queued: false, available: true, match: null };
   c.socialInfo = null;
+  c.whoInfo = null;
   c.marketInfo = null;
   c.marketCollectPending = false;
   c.mailInfo = null;
