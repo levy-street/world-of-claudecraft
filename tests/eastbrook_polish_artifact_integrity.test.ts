@@ -1363,9 +1363,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e3a555a9db84a550c92bf8443df1a20a64a96748dc7bd3159490b4ab93272770';
+  '844a08ea52b8a47d61c0e4c0bbdce0881d57540898ef74af232789bd5e2740c5';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '5ae21044dd1b636f9c293ec628a7d316f740bb92a5962f848c6e58c80218ebbc';
+  '64a25c5b42ea1af3f0eada4c2043c15ea50ba91d31d1a4cc4f390fd68545aa4d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2724,7 +2724,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // canonical re-sealed evidence files. Capture pixels and scores did not change.
       // v0.42.0 dependency-floor bump: recomputed LAST over the swept evidence
       // after the lockfile-driven GLB re-mint. No capture was retaken.
-    ).toBe('eea4d7acbd5b80de9fcf51e9a24ba8218566cee1928111ef3723278b7036125b');
+      // Ungated live programs lot: recomputed LAST over the swept evidence after
+      // the Eastbrook monument joined the town reveal roots (eastbrook_town.ts)
+      // and the Varkhul forge meter took the compile gate (renderer.ts). No
+      // capture was retaken.
+    ).toBe('d1e984cf1b18e6c6b2fbf3963800c4ffcb983de22e57a38c2a4d8aa45ab963e9');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
