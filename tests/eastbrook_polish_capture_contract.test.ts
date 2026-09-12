@@ -671,8 +671,10 @@ interface AttributionTargetFixture {
 // Re-minted for the ungated live programs lot: the Eastbrook monument joined
 // the town reveal roots (runtimeRender.town leaf) and the Varkhul forge meter
 // took the compile gate (runtimeRender.renderer leaf). No capture was retaken.
+// Re-minted again in the same lot after the caldera key-light aim landed in
+// renderer.ts (updateKeyLight). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '64a25c5b42ea1af3f0eada4c2043c15ea50ba91d31d1a4cc4f390fd68545aa4d';
+  '4dfb642dd147c148d4598ca60ddcad3b7f51e7cac8ee61e1d5a679598f0fa50c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
