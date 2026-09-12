@@ -1024,7 +1024,9 @@ const MONOLITHS: MonolithRow[] = [
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 11879,
+    // Lowered 11879 -> 11849: the saved-position instance-exit rule moved to
+    // src/sim/saved_pos_exit.ts (shared with the server character list).
+    ceiling: 11849,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1223,7 +1225,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-measured at the release/v0.43.0 sync that brought PR 3778 in: the
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
-    ceiling: 11321,
+    // Lowered 11321 -> 11318: the roster hint lines (zone + in-world) moved to
+    // src/ui/charselect_hints.ts; exact count, zero headroom.
+    ceiling: 11318,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1581,7 +1585,9 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // Lowered 5540 -> 5509: the CharacterSummary wire type moved to
+    // src/net/character_summary.ts (re-exported here); exact count, zero headroom.
+    ceiling: 5509,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

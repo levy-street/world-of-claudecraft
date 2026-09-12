@@ -276,40 +276,9 @@ interface PendingTransientInput {
 // REST
 // ---------------------------------------------------------------------------
 
-export interface CharacterSummary {
-  id: number;
-  name: string;
-  class: PlayerClass;
-  level: number;
-  skin: number;
-  online: boolean;
-  forceRename: boolean;
-  lastPlayed?: string | null;
-  playtimeSeconds?: number;
-  // Real, in-world appearance so the char-select preview matches the game. Both
-  // optional for back-compat with an older server that omits them: absent
-  // skinCatalog defaults to the class rig, absent hand fields show no item.
-  skinCatalog?: 'class' | 'mech';
-  mainhandItemId?: string | null;
-  offhandItemId?: string | null;
-  /** The account's active Armory weapon skin for this character (server-resolved
-   *  per class + mainhand). Optional for back-compat like the fields above. */
-  weaponSkinId?: string | null;
-  /** THIS character's authored modular look (characters.appearance). Untrusted
-   *  wire JSON: consumers normalize (normalizeAppearance) before composing.
-   *  Null/absent = pre-creator character; the legacy class rig renders. */
-  appearance?: Record<string, unknown> | null;
-  /** Mirror of the character's saved helm-visibility preference, so the roster
-   *  preview wears (or bares) the kit helm exactly as the world last saw them. */
-  helmHidden?: boolean;
-  /** ISO creation timestamp (server clock), for display; eligibility for the
-   *  redesign token is decided server-side (appearanceRerollAvailable). */
-  createdAt?: string | null;
-  /** Server-decided: this character still holds its one-shot appearance
-   *  redesign (created before the modular creator shipped, token unspent).
-   *  Drives the roster's reroll button; flips false after a successful spend. */
-  appearanceRerollAvailable?: boolean;
-}
+export type { CharacterSummary } from './character_summary';
+
+import type { CharacterSummary } from './character_summary';
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
   return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
