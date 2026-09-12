@@ -31,6 +31,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.cast.farming'
   | 'abilityUi.cast.fishing'
   | 'abilityUi.cast.gathering'
+  | 'abilityUi.cast.nythraxisWardChannel'
   | 'abilityUi.cast.rift_arcane_execution'
   | 'abilityUi.cast.rift_arcane_strike'
   | 'abilityUi.cast.rift_brute_execution'

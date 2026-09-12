@@ -10617,6 +10617,7 @@ export const id_ID: EnTranslations = {
       "tool_recharge": "Mengisi Ulang",
       "demonHeal": "Penyembuhan Iblis",
       "thunzharrStormcall": "Panggilan Badai",
+      "nythraxisWardChannel": "Warding the Pillar",
       "rift_frost_execution": "Makam Glasial",
       "rift_frost_strike": "Nol Mutlak",
       "rift_ember_execution": "Sumur Magma",

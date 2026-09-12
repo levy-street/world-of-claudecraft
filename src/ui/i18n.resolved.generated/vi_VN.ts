@@ -10617,6 +10617,7 @@ export const vi_VN: EnTranslations = {
       "tool_recharge": "Nạp Lại",
       "demonHeal": "Quỷ Trị Liệu",
       "thunzharrStormcall": "Tiếng Gọi Bão",
+      "nythraxisWardChannel": "Warding the Pillar",
       "rift_frost_execution": "Nấm Mồ Băng Hà",
       "rift_frost_strike": "Độ Không Tuyệt Đối",
       "rift_ember_execution": "Giếng Dung Nham",

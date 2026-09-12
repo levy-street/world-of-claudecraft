@@ -10617,6 +10617,7 @@ export const ru_RU: EnTranslations = {
       "tool_recharge": "Перезарядка",
       "demonHeal": "Исцеление демона",
       "thunzharrStormcall": "Зов бури",
+      "nythraxisWardChannel": "Защита столпа",
       "rift_frost_execution": "Ледяная могила",
       "rift_frost_strike": "Абсолютный ноль",
       "rift_ember_execution": "Магматический колодец",

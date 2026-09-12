@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -68,6 +69,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "es_ES": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -126,6 +128,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "fr_FR": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -184,6 +187,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "fr_CA": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -243,6 +247,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -301,6 +306,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "de_DE": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -383,6 +389,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow"
   ],
   "pt_BR": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -447,6 +454,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow"
   ],
   "cs_CZ": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -505,6 +513,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "nl_NL": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -563,6 +572,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "pl_PL": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -621,6 +631,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "id_ID": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -679,6 +690,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "tr_TR": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -737,6 +749,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "sv_SE": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -795,6 +808,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "vi_VN": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -853,6 +867,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "da_DK": [
+    "abilityUi.cast.nythraxisWardChannel",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",

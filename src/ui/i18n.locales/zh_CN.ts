@@ -2911,6 +2911,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.farming': '播种',
   'abilityUi.cast.gathering': '采集',
   'abilityUi.cast.thunzharrStormcall': '风暴召唤',
+  'abilityUi.cast.nythraxisWardChannel': '守护石柱',
   'abilityUi.cast.demonHeal': '恶魔治疗',
   'abilityUi.cast.rift_arcane_execution': '虚空裂隙',
   'abilityUi.cast.rift_arcane_strike': '奥术湮灭',
