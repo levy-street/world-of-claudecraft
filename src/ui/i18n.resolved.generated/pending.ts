@@ -24,6 +24,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -65,7 +67,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "es_ES": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -82,6 +89,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -123,7 +132,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "fr_FR": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -140,6 +154,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -181,7 +197,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "fr_CA": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -198,6 +219,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -239,7 +262,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "en_CA": [],
   "it_IT": [
@@ -257,6 +285,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -298,7 +328,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "de_DE": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -315,6 +350,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -356,7 +393,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "zh_CN": [
     "hudChrome.questTracker.objectiveValue",
@@ -397,6 +439,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -438,7 +482,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "ru_RU": [
     "hudChrome.questTracker.objectiveValue",
@@ -461,6 +510,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -502,7 +553,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "nl_NL": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -519,6 +575,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -560,7 +618,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "pl_PL": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -577,6 +640,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -618,7 +683,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "id_ID": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -635,6 +705,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -676,7 +748,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "tr_TR": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -693,6 +770,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -734,7 +813,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "sv_SE": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -751,6 +835,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -792,7 +878,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "vi_VN": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -809,6 +900,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -850,7 +943,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ],
   "da_DK": [
     "guide.interfacePage.framesGovernedTalkingHead",
@@ -867,6 +965,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.device",
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
+    "hudChrome.cosmetics.preview",
+    "hudChrome.cosmetics.previewAria",
     "hudChrome.crafting.materialsFooter",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
@@ -908,6 +1008,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow",
     "hudChrome.wocMarket.saleTypeDirected",
     "hudChrome.wocMarket.saleTypeUnknown",
-    "hudChrome.wocMarket.tabHistory"
+    "hudChrome.wocMarket.tabHistory",
+    "hudChrome.wocStore.mountBuy",
+    "hudChrome.wocStore.mountInspectAria",
+    "hudChrome.wocStore.mountOnly",
+    "hudChrome.wocStore.mountRideIt",
+    "hudChrome.wocStore.mountScopeLine"
   ]
 };

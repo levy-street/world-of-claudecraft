@@ -11,6 +11,19 @@ vi.mock('../src/ui/armory_inspect', () => ({
   rarityLabel: () => '',
   weaponTypeLabel: () => '',
 }));
+// The mount inspect panel drags src/render/mount_preview (and through it the
+// whole character asset pipeline) into this file's graph; nothing here opens
+// it, and a real render import under a DOM-ish environment is how a GLB load
+// outlives the run (see tests/talking_head.test.ts). Stub it like the Armory.
+vi.mock('../src/ui/mount_inspect_controller', () => ({
+  MountInspect: class {
+    close(): void {}
+    destroy(): void {}
+    open(): void {}
+    refresh(): void {}
+    relocalize(): void {}
+  },
+}));
 vi.mock('../src/ui/portrait_chip', () => ({ portraitChipHtml: () => '' }));
 
 import { DailyRewardsWindow } from '../src/ui/daily_rewards_window';

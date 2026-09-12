@@ -376,6 +376,8 @@ const UI_PURE_CORES = [
   // The Machine Stable's section / card markup (the store-mount strip), the
   // armory_card_view twin for the account-mount SKUs.
   'src/ui/store_mount_card_view.ts',
+  'src/ui/mount_inspect_view.ts',
+  'src/ui/daily_rewards_reason_view.ts',
   // The daily-rewards spin wheel's markup and its landing geometry (Bank Storage
   // phase 17). The overlay ELEMENT lives in the thin painter beside it.
   'src/ui/daily_rewards_spin_view.ts',
@@ -695,6 +697,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/live_program_watch_core.ts',
+  'src/render/mount_preview_framing_core.ts',
   'src/render/post_reveal_links_core.ts',
   'src/render/program_key_ledger_core.ts',
   'src/render/renderer_extensions.ts',
@@ -2415,6 +2418,7 @@ const UI_DOM_MODULES = [
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
+  'src/ui/mount_inspect_controller.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
   'src/ui/bank_buy_prompt.ts',

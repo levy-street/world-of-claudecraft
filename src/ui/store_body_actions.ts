@@ -7,12 +7,12 @@
 // src/ui/charter_card_view.ts), read back verbatim so a renamed attribute
 // fails the binding test rather than going silently inert.
 
-import { STORE_MOUNT_BUY_ATTR } from './store_mount_card_view';
+import { STORE_MOUNT_INSPECT_ATTR } from './store_mount_card_view';
 
 export interface StoreBodyActions {
   buyClaudium(): void;
   inspectArmorySkin(skinId: string): void;
-  buyStoreMount(itemId: string): void;
+  inspectStoreMount(itemId: string): void;
   buyCharter(itemId: string): void;
 }
 
@@ -25,7 +25,7 @@ export function bindStoreBodyActions(body: HTMLElement, actions: StoreBodyAction
     .querySelector<HTMLButtonElement>(STORE_BUY_CLAUDIUM_SELECTOR)
     ?.addEventListener('click', () => actions.buyClaudium());
   bindEach(body, ARMORY_SKIN_ATTR, (id) => actions.inspectArmorySkin(id));
-  bindEach(body, STORE_MOUNT_BUY_ATTR, (id) => actions.buyStoreMount(id));
+  bindEach(body, STORE_MOUNT_INSPECT_ATTR, (id) => actions.inspectStoreMount(id));
   bindEach(body, CHARTER_BUY_ATTR, (id) => actions.buyCharter(id));
 }
 
@@ -39,7 +39,7 @@ function bindEach(body: HTMLElement, attr: string, action: (id: string) => void)
   });
 }
 
-/** `data-store-mount-buy` reads back as `dataset.storeMountBuy`. */
+/** `data-store-mount-inspect` reads back as `dataset.storeMountInspect`. */
 function datasetKey(attr: string): string {
   return attr.replace(/^data-/, '').replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 }

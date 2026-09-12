@@ -455,7 +455,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
     // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
     // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
-    ceiling: 18350,
+    // LOWERED 18350 -> 18347 by the mount-skin preview (feature/store-mount-preview):
+    // the two tracker headers' compact-touch chip test moved to
+    // src/ui/mobile_hud_layout.ts isCompactTouchHud and touchBagsShown, paying for the Cosmetics
+    // window's store seam line and the store window's relocalize arm.
+    ceiling: 18347,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1990,7 +1994,14 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/store_mount_purchase.ts (the spend controller), the store body's
     // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
     // controllers now build over one seam object (store_spend_controllers.ts).
-    ceiling: 1262,
+    //
+    // LOWERED 1262 -> 1258 by the mount-skin preview (feature/store-mount-preview):
+    // the two inspect overlays' deps moved to src/ui/store_inspect_deps.ts and
+    // the eligibility text to src/ui/daily_rewards_reason_view.ts, which paid for
+    // the mount inspect's own lifecycle lines with room to spare (the review
+    // round's close / relocalize / graphics-restore seams for the mount panel
+    // spent part of that room).
+    ceiling: 1258,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

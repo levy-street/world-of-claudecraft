@@ -15,9 +15,11 @@
 // class sits on the SECTION, one section per rarity present), the same
 // whole-card `<button>` with `.armory-card-art` and `.armory-card-copy`, and
 // the same `.armory-cost` / `.armory-state` slot. The one difference is what
-// the card button DOES: a weapon-skin card opens the inspect overlay, a mount
-// skin card goes straight to the purchase prompt, so the button is disabled
-// once there is nothing to buy (owned, or no service price).
+// the card button DOES NOT differ any more: a weapon-skin card opens the
+// Armory inspect overlay, and a mount skin card opens the mount inspect
+// overlay (src/ui/mount_inspect_controller.ts), where the player sees the skin on their
+// own character before Buy, or wears an owned one. The button therefore stays
+// enabled whatever the row's state; the overlay decides the action.
 
 import { MOUNT_SKINS, mountSkinDef } from '../sim/content/mount_skins';
 import type { MountRarity } from '../sim/content/mounts';
@@ -27,9 +29,9 @@ import { formatNumber, t } from './i18n';
 import { mountSkinDisplayName } from './mount_labels';
 import { mountSkinArt, type StoreMountRow } from './woc_store_view';
 
-/** The buy button's data attribute; the store body binding reads the skin id
- *  back off it (src/ui/store_body_actions.ts). */
-export const STORE_MOUNT_BUY_ATTR = 'data-store-mount-buy';
+/** The card button's data attribute; the store body binding reads the skin id
+ *  back off it (src/ui/store_body_actions.ts) and opens the inspect overlay. */
+export const STORE_MOUNT_INSPECT_ATTR = 'data-store-mount-inspect';
 
 /** The skin's display name, for the card and the confirm dialog. Falls back
  *  to the id only for a row whose skin the catalog does not declare, which
@@ -43,7 +45,6 @@ export function storeMountCardHtml(row: StoreMountRow): string {
   const skin = mountSkinDef(row.itemId);
   if (!skin) return '';
   const name = storeMountName(row.itemId);
-  const purchasable = !row.owned && row.costClaudium !== null;
   // The skin art through the store art seam (mountSkinArt), never a path
   // built by hand; a skin without shipped art draws the art slot empty.
   const art = mountSkinArt(skin.id);
@@ -54,9 +55,9 @@ export function storeMountCardHtml(row: StoreMountRow): string {
       : `<span class="armory-cost"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><strong>${formatNumber(row.costClaudium, { maximumFractionDigits: 0 })}</strong></span>`;
   return (
     `<article class="armory-card rarity-${esc(skin.rarity)}${row.owned ? ' owned' : ''}">` +
-    `<button type="button" ${STORE_MOUNT_BUY_ATTR}="${esc(row.itemId)}"` +
-    `${focusKeyAttr(`store-mount-${row.itemId}`)}${purchasable ? '' : ' disabled'} ` +
-    `aria-label="${esc(t('hudChrome.wocStore.mountBuyAria', { item: name }))}">` +
+    `<button type="button" ${STORE_MOUNT_INSPECT_ATTR}="${esc(row.itemId)}"` +
+    `${focusKeyAttr(`store-mount-${row.itemId}`)} ` +
+    `aria-label="${esc(t('hudChrome.wocStore.mountInspectAria', { item: name }))}">` +
     `<span class="armory-card-art"><img src="${esc(art)}" alt="" loading="lazy" decoding="async"></span>` +
     `<span class="armory-card-copy"><span class="armory-card-type">${esc(t('hudChrome.wocStore.mountSkinType'))}</span>` +
     `<h4>${esc(name)}</h4>${state}</span>` +

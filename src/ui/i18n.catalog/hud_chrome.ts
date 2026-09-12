@@ -388,6 +388,14 @@ export const hudChromeStrings = {
     mountsTitle: 'Machine Stable',
     mountBuyAria: 'Purchase {item}',
     mountSkinType: 'Mount skin',
+    // The mount skin inspect panel (src/ui/mount_inspect_controller.ts): a live preview of
+    // the player's own character riding the skin, opened from a store card or
+    // the Cosmetics window, so nobody buys a look they have not seen.
+    mountInspectAria: 'Preview {item}',
+    mountRideIt: 'Ride it',
+    mountOnly: 'Mount only',
+    mountBuy: 'Purchase Mount Skin',
+    mountScopeLine: 'Account-wide skin. Worn by one character at a time.',
     loading: 'Loading WOC Store...',
     error: 'The WOC Store is unavailable right now. Please try again shortly.',
     balance: 'Claudium Balance',

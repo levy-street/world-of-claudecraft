@@ -17071,6 +17071,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.legend.passage': 'Проход',
 
   'hudChrome.wocStore.mountSkinType': 'Облик ездового животного',
+  'hudChrome.wocStore.mountInspectAria': 'Предпросмотр: {item}',
+  'hudChrome.wocStore.mountRideIt': 'Оседлать',
+  'hudChrome.wocStore.mountOnly': 'Только ездовое животное',
+  'hudChrome.wocStore.mountBuy': 'Купить облик ездового животного',
+  'hudChrome.wocStore.mountScopeLine': 'Облик для всей учётной записи. Надет может быть только одним персонажем за раз.',
   'hudChrome.cosmetics.title': 'Косметика',
   'hudChrome.cosmetics.close': 'Закрыть косметику',
   'hudChrome.cosmetics.tabsLabel': 'Разделы косметики',
@@ -17089,6 +17094,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.applied': 'Применено',
   'hudChrome.cosmetics.owned': 'В коллекции',
   'hudChrome.cosmetics.storeOnly': 'Доступно в магазине WOC',
+  'hudChrome.cosmetics.preview': 'Предпросмотр',
+  'hudChrome.cosmetics.previewAria': 'Предпросмотр: {name}',
   'hudChrome.cosmetics.cardAria': '{name}, {rarity}',
   'hudChrome.cosmetics.mountsNoMount':
     'Сначала получите ездовое животное: облику нужно, на что садиться.',

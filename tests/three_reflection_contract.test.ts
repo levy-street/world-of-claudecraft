@@ -134,6 +134,7 @@ describe('three r185 program reflection contract', () => {
       ['../src/render/characters/preview.ts', 'this.renderer.debug.checkShaderErrors'],
       ['../src/render/characters/portrait.ts', 'newRenderer.debug.checkShaderErrors'],
       ['../src/render/armory_preview.ts', 'renderer.debug.checkShaderErrors'],
+      ['../src/render/mount_preview.ts', 'renderer.debug.checkShaderErrors'],
     ] as const) {
       const source = readFileSync(new URL(path, import.meta.url), 'utf8');
       expect(

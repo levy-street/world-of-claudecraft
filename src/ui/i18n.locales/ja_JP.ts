@@ -16783,6 +16783,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.legend.passage': '通路',
 
   'hudChrome.wocStore.mountSkinType': 'マウントスキン',
+  'hudChrome.wocStore.mountInspectAria': '{item}をプレビュー',
+  'hudChrome.wocStore.mountRideIt': '騎乗する',
+  'hudChrome.wocStore.mountOnly': 'マウントのみ',
+  'hudChrome.wocStore.mountBuy': 'マウントスキンを購入',
+  'hudChrome.wocStore.mountScopeLine':
+    'アカウント共通のスキン。同時に装着できるのは1キャラクターのみです。',
   'hudChrome.cosmetics.title': 'コスメティック',
   'hudChrome.cosmetics.close': 'コスメティックを閉じる',
   'hudChrome.cosmetics.tabsLabel': 'コスメティックの区分',
@@ -16801,6 +16807,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.applied': '適用中',
   'hudChrome.cosmetics.owned': '所持',
   'hudChrome.cosmetics.storeOnly': 'WOCストアで入手可能',
+  'hudChrome.cosmetics.preview': 'プレビュー',
+  'hudChrome.cosmetics.previewAria': '{name}をプレビュー',
   'hudChrome.cosmetics.cardAria': '{name}、{rarity}',
   'hudChrome.cosmetics.mountsNoMount':
     'まずマウントを入手してください。スキンには乗るものが必要です。',

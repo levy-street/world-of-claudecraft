@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   COMPACT_MAX_HEIGHT_PX,
   COMPACT_MAX_WIDTH_PX,
+  isCompactTouchHud,
   type MobileHudLayoutInput,
   resolveMobileHudLayout,
   TABLET_MIN_DIMENSION_PX,
   TABLET_MIN_WIDTH_PX,
+  touchBagsShown,
 } from '../src/ui/mobile_hud_layout';
 
 function input(overrides: Partial<MobileHudLayoutInput> = {}): MobileHudLayoutInput {
@@ -175,5 +177,25 @@ describe('resolveMobileHudLayout: threshold boundaries', () => {
         input({ width: TABLET_MIN_WIDTH_PX - 1, height: TABLET_MIN_DIMENSION_PX }),
       ).tier,
     ).not.toBe('tablet');
+  });
+});
+
+describe('the body-class predicates the HUD folds onto', () => {
+  // Both take the class list (and the bags display), never the DOM, so the
+  // hud.ts sites that used to spell the two tests inline share one answer.
+  const classes = (...list: string[]) => ({ contains: (cls: string) => list.includes(cls) });
+
+  it('isCompactTouchHud needs BOTH the touch mode and the compact tier class', () => {
+    expect(isCompactTouchHud(classes('mobile-touch', 'hud-mobile-compact'))).toBe(true);
+    expect(isCompactTouchHud(classes('mobile-touch', 'hud-mobile-standard'))).toBe(false);
+    expect(isCompactTouchHud(classes('hud-mobile-compact'))).toBe(false);
+    expect(isCompactTouchHud(classes())).toBe(false);
+  });
+
+  it('touchBagsShown needs the touch mode and a bags sheet that is not display none', () => {
+    expect(touchBagsShown(classes('mobile-touch'), 'block')).toBe(true);
+    expect(touchBagsShown(classes('mobile-touch'), '')).toBe(true);
+    expect(touchBagsShown(classes('mobile-touch'), 'none')).toBe(false);
+    expect(touchBagsShown(classes(), 'block')).toBe(false);
   });
 });

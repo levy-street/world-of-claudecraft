@@ -9877,6 +9877,7 @@
   }
   .cos-card-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-sm);
@@ -9889,7 +9890,8 @@
   .cos-state.worn {
     color: var(--gold);
   }
-  .cos-action {
+  .cos-action,
+  .cos-preview {
     min-height: 40px;
     min-width: 40px;
     padding: 0 var(--spacing-md);
@@ -9900,13 +9902,16 @@
     font: inherit;
     cursor: pointer;
   }
-  .cos-action:hover {
+  .cos-action:hover,
+  .cos-preview:hover {
     border-color: var(--gold);
   }
-  .cos-action:active {
+  .cos-action:active,
+  .cos-preview:active {
     transform: translateY(1px);
   }
-  .cos-action:focus-visible {
+  .cos-action:focus-visible,
+  .cos-preview:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
