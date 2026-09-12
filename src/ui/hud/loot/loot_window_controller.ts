@@ -231,7 +231,11 @@ export class LootWindowController {
     this.lastHarvestQueryAtMs = Number.NEGATIVE_INFINITY;
     this.renderCorpseBody(mob, availability);
     this.deps.element.style.display = 'block';
-    if (this.deps.document.body.classList.contains('mobile-touch')) {
+    // A pointer-less open (the interact key, a pad press, the mobile interact
+    // button: HARVEST_CHOICE_NO_POINTER for both coordinates) has no cursor to
+    // anchor to, so it centers exactly like the Professions entry and touch.
+    const pointerless = !Number.isFinite(screenX) || !Number.isFinite(screenY);
+    if (pointerless || this.deps.document.body.classList.contains('mobile-touch')) {
       this.deps.centerPopup(this.deps.element);
     } else {
       this.deps.placePopup(this.deps.element, screenX - 115, screenY - 30, 260, 280, 10, 10);

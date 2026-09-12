@@ -31,6 +31,7 @@ import {
   corpseLootAvailability,
   corpseLootAvailabilityInWorld,
 } from '../src/game/corpse_loot_availability';
+import { HARVEST_CHOICE_NO_POINTER } from '../src/game/harvest_body_pick';
 import { CorpseHarvestInfoRequest } from '../src/net/corpse_harvest_info_request';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { isHarvestableCorpse } from '../src/sim/professions/gathering';
@@ -400,6 +401,20 @@ describe('LootWindowController', () => {
     expect(test.hideTooltip).toHaveBeenCalledTimes(1);
   });
 
+  it('centers the popup when opened with no pointer position (the interact-key route)', () => {
+    const mob = entity(10, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      loot: { copper: 25, items: [] },
+    });
+    const test = harness([mob]);
+
+    test.controller.openCorpse(10, HARVEST_CHOICE_NO_POINTER, HARVEST_CHOICE_NO_POINTER);
+
+    expect(test.element.style.display).toBe('block');
+    expect(test.centerPopup).toHaveBeenCalledWith(test.element);
+    expect(test.placePopup).not.toHaveBeenCalled();
+  });
   it('warns once via the shared confirm before taking loot that contains a soulbound item', () => {
     const mob = entity(10, {
       kind: 'mob',

@@ -32,7 +32,11 @@ function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entit
   } as Entity;
 }
 
-function scan(targets: Entity[] = [], farmPatches: readonly FarmPatchDef[] = []) {
+function scan(
+  targets: Entity[] = [],
+  farmPatches: readonly FarmPatchDef[] = [],
+  inventory?: readonly { itemId: string; count: number }[],
+) {
   const player = entity({ id: 1, kind: 'player', name: 'Adventurer' });
   return {
     world: {
@@ -44,9 +48,12 @@ function scan(targets: Entity[] = [], farmPatches: readonly FarmPatchDef[] = [])
       ]),
       questLog: new Map<string, QuestProgress>(),
       farmPatches,
+      ...(inventory ? { inventory } : {}),
     },
   };
 }
+
+const FIELD_KIT = [{ itemId: 'field_kit', count: 1 }];
 
 describe('resolveNearbyInteractionCandidate', () => {
   // The ladder IS the press ladder in nearby_interaction.ts, arm for arm. Note
@@ -142,6 +149,67 @@ describe('resolveNearbyInteractionCandidate', () => {
     expect(resolveNearbyInteractionCandidate(scan([corpse, banker]).world)).toMatchObject({
       kind: 'npc',
       id: 3,
+    });
+    // The harvest-choice arm is the LAST rung, so a Field Kit never promotes
+    // the corpse above the npc behind it either.
+    expect(
+      resolveNearbyInteractionCandidate(scan([corpse, banker], [], FIELD_KIT).world),
+    ).toMatchObject({ kind: 'npc', id: 3 });
+  });
+
+  describe('the corpse harvest-choice arm (the keyboard, pad and touch route)', () => {
+    function harvestOnlyCorpse(overrides: Partial<Entity> = {}): Entity {
+      return entity({
+        id: 2,
+        kind: 'mob',
+        templateId: 'forest_wolf',
+        name: 'Forest Wolf',
+        dead: true,
+        lootable: true,
+        loot: null,
+        corpseTimer: 60,
+        ...overrides,
+      });
+    }
+
+    it('resolves a harvest-only corpse for a Field Kit carrier when nothing else is in reach', () => {
+      expect(
+        resolveNearbyInteractionCandidate(scan([harvestOnlyCorpse()], [], FIELD_KIT).world),
+      ).toEqual({ kind: 'harvest', id: 2, entity: expect.objectContaining({ id: 2 }) });
+    });
+
+    it('is no candidate without a carried Field Kit, exactly as before', () => {
+      expect(resolveNearbyInteractionCandidate(scan([harvestOnlyCorpse()]).world)).toBeNull();
+      expect(
+        resolveNearbyInteractionCandidate(scan([harvestOnlyCorpse()], [], []).world),
+      ).toBeNull();
+      expect(
+        resolveNearbyInteractionCandidate(
+          scan([harvestOnlyCorpse()], [], [{ itemId: 'field_kit', count: 0 }]).world,
+        ),
+      ).toBeNull();
+    });
+
+    it('is no candidate once the harvest claim is spent, out of reach, or for a dead viewer', () => {
+      expect(
+        resolveNearbyInteractionCandidate(
+          scan([harvestOnlyCorpse({ harvestClaimedBy: 9 })], [], FIELD_KIT).world,
+        ),
+      ).toBeNull();
+      expect(
+        resolveNearbyInteractionCandidate(
+          scan([harvestOnlyCorpse({ pos: { x: 6, y: 0, z: 0 } })], [], FIELD_KIT).world,
+        ),
+      ).toBeNull();
+      const dead = scan([harvestOnlyCorpse()], [], FIELD_KIT);
+      dead.world.player.dead = true;
+      expect(resolveNearbyInteractionCandidate(dead.world)).toBeNull();
+    });
+
+    it('sits below the garden bed and above the escort-away line', () => {
+      expect(
+        resolveNearbyInteractionCandidate(scan([harvestOnlyCorpse()], BED_PATCH, FIELD_KIT).world),
+      ).toEqual({ kind: 'bed', id: 'bed_test_1' });
     });
   });
 });

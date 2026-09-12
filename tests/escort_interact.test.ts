@@ -311,6 +311,8 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
       requestSpiritHealerResurrect: () => {},
       // Phase 9b bed-arm seam member: inert here (lane A's arms exercise it).
       openPlantSheet: (bedId: string) => calls.push(`plantSheet:${bedId}`),
+      // The corpse harvest-choice arm's popup open: inert here.
+      openLoot: (mobId: number) => calls.push(`openCorpse:${mobId}`),
     };
     const press = () => tryNearbyInteraction(world, hud, AWAY_TEXT, 'nothing');
     return { press, calls };

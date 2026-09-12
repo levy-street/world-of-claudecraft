@@ -4395,6 +4395,14 @@ export const TARGETS = [
       // one template swapped, rather than a bespoke script.
       { key: 'picker-mixed', picker: true, templateId: 'wild_boar' },
       { key: 'picker-mixed-mobile', picker: true, templateId: 'wild_boar', mobile: true },
+      // The real Interact key on a HARVEST-ONLY body (ordinary loot already
+      // gone) with a Field Kit in the bags: the keyboard, pad and mobile-button
+      // route to the corpse choice. The baseline answers with the
+      // nothing-to-interact toast; the current revision opens the centered
+      // corpse popup with its own Harvest control. Whole HUD, so the toast
+      // and the popup both show where the player sees them.
+      { key: 'harvest-choice-press', harvestOnlyPress: true },
+      { key: 'harvest-choice-press-mobile', harvestOnlyPress: true, mobile: true },
     ],
     async capture(page, variant) {
       await page.evaluate(() => {
@@ -4440,6 +4448,29 @@ export const TARGETS = [
       // One auto-attack swing at 1 hp kills the wolf; the live 20 Hz loop needs
       // real time for the swing timer and the death resolution.
       await wait(3000);
+      if (variant?.harvestOnlyPress) {
+        // The kill above can re-arm the loading veil; the press and the shot
+        // must both land on a painted world (see awaitVeilSettled).
+        await awaitVeilSettled(page);
+        await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          const wolf = sim?.entities.get(window.__p12dShotWolfId);
+          if (!wolf) return;
+          // Ordinary loot taken already: the body is harvest-only, exactly the
+          // state a player reaches after one Interact press.
+          wolf.loot = null;
+          wolf.corpseTimer = 9999;
+          game.hud?.closeLoot?.();
+          const down = new KeyboardEvent('keydown', { code: 'KeyF', key: 'f', bubbles: true });
+          const up = new KeyboardEvent('keyup', { code: 'KeyF', key: 'f', bubbles: true });
+          window.dispatchEvent(down);
+          window.dispatchEvent(up);
+        });
+        await wait(900);
+        await awaitVeilSettled(page);
+        return { clip: '#ui' };
+      }
       if (variant?.picker) {
         await page.evaluate(() => {
           const game = window.__game;

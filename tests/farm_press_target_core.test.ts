@@ -179,6 +179,8 @@ describe('the claim is the dispatcher own order, not a second copy of it', () =>
       showError: (text: string) => calls.push(`error:${text}`),
       requestSpiritHealerResurrect: () => {},
       openPlantSheet: (bedId: string) => calls.push(`plantSheet:${bedId}`),
+      // The corpse harvest-choice arm's popup open: inert here.
+      openLoot: (mobId: number) => calls.push(`openCorpse:${mobId}`),
     };
     return { world, hud, calls };
   }

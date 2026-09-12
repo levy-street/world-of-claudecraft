@@ -1,11 +1,18 @@
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
-import { dist2d, type Entity, INTERACT_RANGE, type QuestProgress } from '../sim/types';
+import {
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  type QuestProgress,
+} from '../sim/types';
 import type { FarmPatchDef } from '../world_api/farming';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress } from './escort_interact';
 import { nearestInteractableBed } from './farm_bed_interact';
 import { nearestInteractableFeast } from './feast_interact';
+import { pickHarvestBody } from './harvest_body_pick';
 import { objectInteractionRange } from './interactions';
 
 export interface NearbyInteractionScanWorld {
@@ -15,10 +22,19 @@ export interface NearbyInteractionScanWorld {
   entities: ReadonlyMap<number, Entity>;
   questLog: ReadonlyMap<string, QuestProgress>;
   farmPatches: readonly FarmPatchDef[];
+  /** The viewer's bags, read ONLY by the last-resort corpse harvest-choice arm
+   *  (a carried Field Kit is what makes a harvest-only body openable at all,
+   *  `harvest_body_pick.ts`). Optional so a scan slice that carries no bags (a
+   *  bare fixture, a host with no inventory mirror) simply has no such arm;
+   *  IWorld satisfies it structurally. */
+  inventory?: readonly Pick<InvSlot, 'itemId' | 'count'>[];
 }
 
 export type NearbyInteractionCandidate =
   | { kind: 'corpse'; id: number; entity: Entity }
+  /** A harvest-only body the press OPENS the corpse choice for (never harvests):
+   *  the keyboard, pad and touch route to the popup's own Harvest control. */
+  | { kind: 'harvest'; id: number; entity: Entity }
   | { kind: 'delve'; id: number; entity: Entity }
   | { kind: 'object'; id: number; entity: Entity }
   | { kind: 'npc'; id: number; entity: Entity }
@@ -31,11 +47,18 @@ export type NearbyInteractionCandidate =
  *  running it. This is dispatch's shared candidate resolution: the ladder IS
  *  the press ladder in nearby_interaction.ts, arm for arm, so the two can never
  *  read a different world: corpse (ordinary loot only), delve, ground object,
- *  npc, escort start, placed feast, garden bed, then the escort-away last
- *  resort. Intentional gathering made the generic press ORDINARY INTERACTION
- *  ONLY, so there is deliberately no gather or corpse-harvest arm here: those
- *  are explicit actions with their own entry points (node/tool/crop click, the
- *  corpse picker, the bed sheet's own Harvest control). */
+ *  npc, escort start, placed feast, garden bed, the corpse harvest CHOICE, then
+ *  the escort-away last resort. Intentional gathering made the generic press
+ *  ORDINARY INTERACTION ONLY, so there is deliberately no gather or
+ *  corpse-harvest arm here: those are explicit actions with their own entry
+ *  points (node/tool/crop click, the corpse picker, the bed sheet's own
+ *  Harvest control). The harvest-choice arm is the bed arm's shape applied
+ *  to a body: it OPENS the corpse popup (whose Harvest control is the only
+ *  thing that ever sends harvestCorpse) for a Field Kit carrier, and it sits
+ *  last so a harvest-only body still never swallows an eligible ordinary
+ *  interaction standing behind it. Before v0.42 the press harvested on the
+ *  spot; without this rung a keyboard, pad or mobile-button player had no
+ *  natural way to reach the popup at all. */
 export function resolveNearbyInteractionCandidate(
   world: NearbyInteractionScanWorld,
   harvestStateReliable = true,
@@ -167,6 +190,29 @@ export function resolveNearbyInteractionCandidate(
       return {
         kind: 'bed',
         id: bedId,
+      };
+    }
+  }
+  // The corpse harvest CHOICE, last among real actions: only a Field Kit
+  // carrier, only a body whose harvest is still open and within harvest
+  // reach (pickHarvestBody: the viewer's target first, else the nearest, the
+  // Professions entry's own pick). A body that still has ordinary loot for
+  // this viewer was already taken by the corpse arm above, so this rung only
+  // ever names a harvest-only body. It opens a window; nothing here harvests.
+  if (!player.dead) {
+    const bodyId = pickHarvestBody({
+      player,
+      inventory: world.inventory ?? [],
+      playerId: world.playerId,
+      partyInfo: world.partyInfo,
+      entities: world.entities,
+    });
+    const body = bodyId === null ? undefined : world.entities.get(bodyId);
+    if (body) {
+      return {
+        kind: 'harvest',
+        id: body.id,
+        entity: body,
       };
     }
   }
