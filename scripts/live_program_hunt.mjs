@@ -376,14 +376,18 @@ export async function hunt(args) {
       executablePath: browserPath,
       headless: args.headless ? 'new' : false,
       userDataDir: args.profile,
-      defaultViewport: VIEWPORT,
+      // A null viewport lets the page follow the window (resize, fullscreen);
+      // headless keeps the fixed size so an unattended run is reproducible.
+      defaultViewport: args.headless ? VIEWPORT : null,
       // puppeteer's own signal handlers exit the process before the report is
       // written; the stop promise below owns every exit path instead.
       handleSIGINT: false,
       handleSIGTERM: false,
       handleSIGHUP: false,
       args: [
-        `--window-size=${VIEWPORT.width + 20},${VIEWPORT.height + 60}`,
+        ...(args.headless
+          ? [`--window-size=${VIEWPORT.width + 20},${VIEWPORT.height + 60}`]
+          : ['--start-maximized']),
         '--ignore-gpu-blocklist',
         '--enable-gpu',
         '--disable-backgrounding-occluded-windows',
