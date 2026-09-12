@@ -1409,7 +1409,11 @@ export const pl_PL: EnTranslations = {
       "petAggressive": "Zwierzę: Agresywne",
       "targetPet": "Zwierzę: Obierz",
       "mount": "Dosiądź / Zsiądź",
-      "mouseHint": "Przyciski myszy też działają: podczas przypisywania naciśnij środkowy przycisk (M3) lub boczny przycisk (M4, M5). Lewy i prawy przycisk pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania obiektów w świecie."
+      "mouseHint": "Przyciski myszy też działają: podczas przypisywania naciśnij środkowy przycisk (M3) lub boczny przycisk (M4, M5). Lewy i prawy przycisk pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania obiektów w świecie.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Edytuj klawisze paska akcji",
@@ -6073,7 +6077,8 @@ export const pl_PL: EnTranslations = {
       "ifLockBars": "Blokuje twoje paski, żebyś przypadkiem nie wyciągnął umiejętności z pola.",
       "keybindsHeading": "Panel Przypisań Klawiszy",
       "keybindsBody": "Lista klawiszy to tylko połowa tego panelu. Nad nią siedzą przełączniki, które decydują, jak twoja mysz prowadzi grę: kamera myszy, czy kursor blokuje się podczas obracania, ruch kliknięciem i to, który przycisk myszy go wywołuje, ruch z atakiem, układ leworęczny dla sterowania dotykowego oraz filtr wulgaryzmów na czacie.",
-      "keybindsMouseBody": "Dwie rzeczy łatwo tam przeoczyć. Przyciski myszy przypisuje się jak klawisze, więc kliknięcie kółkiem i boczne przyciski mogą nosić umiejętności, podczas gdy lewy i prawy przycisk pozostają zarezerwowane dla kamery i klikania w świecie. Możesz też przypisywać klawisze bezpośrednio z paska akcji: włącz tu tryb przypisywania na pasku, kliknij pole i naciśnij klawisz, który chcesz przypisać."
+      "keybindsMouseBody": "Dwie rzeczy łatwo tam przeoczyć. Przyciski myszy przypisuje się jak klawisze, więc kliknięcie kółkiem i boczne przyciski mogą nosić umiejętności, podczas gdy lewy i prawy przycisk pozostają zarezerwowane dla kamery i klikania w świecie. Możesz też przypisywać klawisze bezpośrednio z paska akcji: włącz tu tryb przypisywania na pasku, kliknij pole i naciśnij klawisz, który chcesz przypisać.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Walka rządzi się znajomymi zasadami klasycznych MMO. Nigdy nie musisz tego zgłębiać, by dobrze grać, to tylko zarys tego, jak działają starcia.",

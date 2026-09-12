@@ -1409,7 +1409,11 @@ export const nl_NL: EnTranslations = {
       "petAggressive": "Huisdier: Agressief",
       "targetPet": "Huisdier: Aanwijzen",
       "mount": "Opstijgen / Afstijgen",
-      "mouseHint": "Muisknoppen werken ook: druk tijdens het toewijzen op de middelste knop (M3) of een duimknop (M4, M5). Links en rechts blijven gereserveerd voor de camera, klik om te bewegen en het aanklikken van dingen in de wereld."
+      "mouseHint": "Muisknoppen werken ook: druk tijdens het toewijzen op de middelste knop (M3) of een duimknop (M4, M5). Links en rechts blijven gereserveerd voor de camera, klik om te bewegen en het aanklikken van dingen in de wereld.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Actiebalktoetsen bewerken",
@@ -6073,7 +6077,8 @@ export const nl_NL: EnTranslations = {
       "ifLockBars": "Vergrendelt je balken zodat je niet per ongeluk een vaardigheid uit een vak sleept.",
       "keybindsHeading": "Het paneel Toetsbindingen",
       "keybindsBody": "De toetsenlijst is maar de helft van dat paneel. Erboven staan de schakelaars die bepalen hoe je muis het spel bestuurt: muiscamera, of de cursor vergrendelt terwijl je draait, klik om te bewegen en welke muisknop dat activeert, aanvalsbeweging, de linkshandige aanraakindeling, en het filter voor grof taalgebruik in de chat.",
-      "keybindsMouseBody": "Twee dingen daar zijn makkelijk over het hoofd te zien. Muisknoppen binden als toetsen, dus de wielklik en de duimknoppen kunnen vaardigheden dragen, terwijl links- en rechtsklikken gereserveerd blijven voor de camera en voor klikken in de wereld. En je kunt rechtstreeks vanaf de actiebalk binden: zet hier de bindmodus op de actiebalk aan, klik dan op een vak en druk op de gewenste toets."
+      "keybindsMouseBody": "Twee dingen daar zijn makkelijk over het hoofd te zien. Muisknoppen binden als toetsen, dus de wielklik en de duimknoppen kunnen vaardigheden dragen, terwijl links- en rechtsklikken gereserveerd blijven voor de camera en voor klikken in de wereld. En je kunt rechtstreeks vanaf de actiebalk binden: zet hier de bindmodus op de actiebalk aan, klik dan op een vak en druk op de gewenste toets.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Gevechten volgen vertrouwde klassieke MMO-regels. Je hoeft er niets van te bestuderen om goed te spelen, dit is gewoon de vorm van hoe gevechten werken.",

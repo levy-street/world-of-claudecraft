@@ -1409,7 +1409,11 @@ export const fr_FR: EnTranslations = {
       "petAggressive": "Familier : agressif",
       "targetPet": "Familier : cibler",
       "mount": "Monter / Descendre",
-      "mouseHint": "Les boutons de la souris fonctionnent aussi: appuyez sur le bouton central (M3) ou un bouton de pouce (M4, M5) pendant l'assignation. Les boutons gauche et droit restent réservés à la caméra, au clic pour se déplacer et au clic sur les éléments du monde."
+      "mouseHint": "Les boutons de la souris fonctionnent aussi: appuyez sur le bouton central (M3) ou un bouton de pouce (M4, M5) pendant l'assignation. Les boutons gauche et droit restent réservés à la caméra, au clic pour se déplacer et au clic sur les éléments du monde.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Modifier les touches de la barre d'action",
@@ -6073,7 +6077,8 @@ export const fr_FR: EnTranslations = {
       "ifLockBars": "Verrouille vos barres pour éviter de glisser une capacité hors d'un emplacement par accident.",
       "keybindsHeading": "Le panneau Raccourcis clavier",
       "keybindsBody": "La liste des touches n'est que la moitié de ce panneau. Au-dessus se trouvent les interrupteurs qui décident comment votre souris pilote le jeu : la Caméra à la souris, si le curseur se verrouille pendant la rotation, Cliquer pour se déplacer et le bouton de souris qui le déclenche, le Déplacement d'attaque, la disposition pour gaucher tactile, et le filtre de langage pour la discussion.",
-      "keybindsMouseBody": "Deux détails sont faciles à manquer. Les boutons de la souris s'assignent comme des touches, si bien que le clic molette et les boutons latéraux peuvent porter des capacités, tandis que le clic gauche et le clic droit restent réservés à la caméra et au clic dans le monde. Et vous pouvez aussi assigner directement depuis la barre d'action : activez ici le mode Modifier les touches de la barre d'action, puis cliquez sur un emplacement et appuyez sur la touche voulue."
+      "keybindsMouseBody": "Deux détails sont faciles à manquer. Les boutons de la souris s'assignent comme des touches, si bien que le clic molette et les boutons latéraux peuvent porter des capacités, tandis que le clic gauche et le clic droit restent réservés à la caméra et au clic dans le monde. Et vous pouvez aussi assigner directement depuis la barre d'action : activez ici le mode Modifier les touches de la barre d'action, puis cliquez sur un emplacement et appuyez sur la touche voulue.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Le combat suit les règles familières des MMO classiques. Vous n'avez jamais besoin d'en étudier le moindre détail pour bien jouer, ce n'est que la forme que prennent les affrontements.",

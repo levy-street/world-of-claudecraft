@@ -59,7 +59,7 @@ import {
 import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
-  isReservedCode,
+  bindRefusalReason,
   type Keybinds,
   keyLabel,
 } from '../game/keybinds';
@@ -95,6 +95,7 @@ import {
 import type { TranslationKey } from './i18n.catalog';
 import { BIND_CATEGORY_LABEL_KEYS, bindActionDisplayName } from './keybind_action_names_core';
 import { keybindConflictPrompt } from './keybind_conflict_prompt_core';
+import { keybindDeviceNoteKeys, keybindRefusalNote } from './keybind_device_notes_core';
 import { buildKeybindCode, parseKeybindCode } from './keybind_transfer_core';
 import {
   type KeyboardMapHandle,
@@ -2625,15 +2626,13 @@ export class OptionsWindow {
     note.className = 'kb-note';
     note.textContent = this.keybindNote || t('hud.options.keybindHelpMouseCamera');
     scroll.appendChild(note);
-    // Mouse buttons bind like keys (src/game/mouse_binds.ts); say so once here
-    // rather than rewording every capture prompt. Pointless on touch, which has
-    // no mouse, so it follows the same useTouchInterface() gate the rest of the
-    // desktop-only rows use.
-    if (!useTouchInterface()) {
-      const mouseNote = document.createElement('div');
-      mouseNote.className = 'kb-note';
-      mouseNote.textContent = t('hudChrome.keybinds.mouseHint');
-      scroll.appendChild(mouseNote);
+    // Mouse buttons and the wheel bind like keys; say so once here rather than
+    // rewording every capture prompt (keybind_device_notes_core.ts owns the list).
+    for (const key of keybindDeviceNoteKeys(useTouchInterface())) {
+      const deviceNote = document.createElement('div');
+      deviceNote.className = 'kb-note';
+      deviceNote.textContent = t(key);
+      scroll.appendChild(deviceNote);
     }
     // The Attack Move key is only meaningful (and only rebindable) while its mode
     // is on; otherwise hide its row so it can't shadow Turn Left's A in the list.
@@ -2833,8 +2832,9 @@ export class OptionsWindow {
       });
       this.deps.refreshKeybindLabels();
       this.keyboardWindow.repaint();
-    } else if (isReservedCode(code)) {
-      this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
+    } else {
+      const refusal = keybindRefusalNote(bindRefusalReason(actionId, code), keyLabel(code));
+      if (refusal) this.keybindNote = t(refusal.key, refusal.params);
     }
   }
 }

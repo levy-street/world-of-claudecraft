@@ -1409,7 +1409,11 @@ export const tr_TR: EnTranslations = {
       "petAggressive": "Yoldaş: Saldırgan",
       "targetPet": "Yoldaş: Hedefle",
       "mount": "Bin / İn",
-      "mouseHint": "Fare düğmeleri de işe yarar: atama yaparken orta düğmeye (M3) veya bir yan düğmeye (M4, M5) bas. Sol ve sağ düğmeler kamera, tıklayarak hareket ve dünyadaki nesnelere tıklamak için ayrılmıştır."
+      "mouseHint": "Fare düğmeleri de işe yarar: atama yaparken orta düğmeye (M3) veya bir yan düğmeye (M4, M5) bas. Sol ve sağ düğmeler kamera, tıklayarak hareket ve dünyadaki nesnelere tıklamak için ayrılmıştır.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Eylem çubuğu tuşlarını düzenle",
@@ -6073,7 +6077,8 @@ export const tr_TR: EnTranslations = {
       "ifLockBars": "Çubukları kilitler, böylece bir yetenek yanlışlıkla bir yuvadan sürüklenip çıkarılamaz.",
       "keybindsHeading": "Tuş Atamaları paneli",
       "keybindsBody": "Tuş listesi o panelin yalnızca yarısıdır. Üstünde, farenizin oyunu nasıl yönettiğine karar veren anahtarlar bulunur: fare kamerası, döndürürken imlecin kilitlenip kilitlenmeyeceği, tıklayarak hareket ve bunu hangi fare düğmesinin tetiklediği, saldırı hareketi, solaklar için dokunmatik yerleşim ve sohbet için küfür filtresi.",
-      "keybindsMouseBody": "Orada gözden kaçması kolay iki şey var. Fare düğmeleri tuşlar gibi atanır, bu yüzden tekerlek tıklaması ve baş parmak düğmeleri yetenek taşıyabilir; sol ve sağ tık ise kamera ve dünyaya tıklamak için ayrılmış kalır. Ayrıca doğrudan eylem çubuğundan da atama yapabilirsiniz: buradan çubuk üzerinden atama kipini açın, ardından bir yuvaya tıklayıp istediğiniz tuşa basın."
+      "keybindsMouseBody": "Orada gözden kaçması kolay iki şey var. Fare düğmeleri tuşlar gibi atanır, bu yüzden tekerlek tıklaması ve baş parmak düğmeleri yetenek taşıyabilir; sol ve sağ tık ise kamera ve dünyaya tıklamak için ayrılmış kalır. Ayrıca doğrudan eylem çubuğundan da atama yapabilirsiniz: buradan çubuk üzerinden atama kipini açın, ardından bir yuvaya tıklayıp istediğiniz tuşa basın.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Dövüş, tanıdık klasik MMO kurallarını izler. İyi oynamak için bunların hiçbirini incelemen gerekmez, bu yalnızca dövüşlerin nasıl işlediğinin şeklidir.",

@@ -1409,7 +1409,11 @@ export const de_DE: EnTranslations = {
       "petAggressive": "Begleiter: Aggressiv",
       "targetPet": "Begleiter: Anvisieren",
       "mount": "Aufsitzen / Absitzen",
-      "mouseHint": "Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten."
+      "mouseHint": "Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Aktionsleisten-Tasten bearbeiten",
@@ -6073,7 +6077,8 @@ export const de_DE: EnTranslations = {
       "ifLockBars": "Sperrt Ihre Leisten, damit Sie eine Fähigkeit nicht versehentlich aus einem Feld ziehen.",
       "keybindsHeading": "Das Bedienfeld Tastenbelegung",
       "keybindsBody": "Die Tastenliste ist nur die Hälfte dieses Bedienfelds. Darüber sitzen die Schalter, die bestimmen, wie deine Maus das Spiel steuert: Mauskamera, ob der Cursor beim Drehen gesperrt wird, Klicken zum Bewegen und welche Maustaste es auslöst, Angriffsbewegung und das Linkshänder-Touch-Layout.",
-      "keybindsMouseBody": "Zwei Dinge dort übersieht man leicht. Maustasten lassen sich wie Tasten belegen, sodass der Mausradklick und die Daumentasten Fähigkeiten tragen können, während Links- und Rechtsklick der Kamera und dem Klicken in der Welt vorbehalten bleiben. Und Sie können direkt von der Aktionsleiste aus belegen: Schalten Sie hier den Belegungsmodus auf der Leiste ein, klicken Sie dann ein Feld an und drücken Sie die gewünschte Taste."
+      "keybindsMouseBody": "Zwei Dinge dort übersieht man leicht. Maustasten lassen sich wie Tasten belegen, sodass der Mausradklick und die Daumentasten Fähigkeiten tragen können, während Links- und Rechtsklick der Kamera und dem Klicken in der Welt vorbehalten bleiben. Und Sie können direkt von der Aktionsleiste aus belegen: Schalten Sie hier den Belegungsmodus auf der Leiste ein, klicken Sie dann ein Feld an und drücken Sie die gewünschte Taste.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Der Kampf folgt vertrauten Regeln aus klassischen MMOs. Du musst nichts davon studieren, um gut zu spielen, dies ist nur der grobe Aufbau, wie Kämpfe funktionieren.",

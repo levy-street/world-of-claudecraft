@@ -20,6 +20,7 @@ import {
 import { normalizePointerLookDelta } from './pointer_look_delta';
 import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
 import { isStaleChromeButton } from './stale_chrome_focus';
+import { wheelCodeForDelta, zoomStepForAction } from './wheel_binds';
 
 function detectPointerLockNeedsSyncGesture(): boolean {
   try {
@@ -396,16 +397,17 @@ export class Input {
     // See releaseMouseActivatedFocus: sheds a HUD button's lingering focus
     // after a real mouse click so it cannot hijack the next Space/Enter.
     window.addEventListener('click', (e) => this.releaseMouseActivatedFocus(e));
-    canvas.addEventListener(
-      'wheel',
-      (e) => {
-        e.preventDefault();
-        if (document.body.classList.contains('mobile-touch')) return;
-        this.zoomBy(Math.sign(e.deltaY) * 1.4);
-        this.noteIntent('zoom');
-      },
-      { passive: false },
-    );
+    // A wheel notch over the game world is a bindable pseudo-key (WheelUp /
+    // WheelDown, see wheel_binds.ts) that drives camera zoom by default. Only the
+    // canvas dispatches it: a notch over the HUD must keep scrolling that list.
+    canvas.addEventListener('wheel', (e) => this.onWheel(e), { passive: false });
+    // The rebind CAPTURE listens on the window in the capture phase instead: the
+    // player rolls the wheel over the Key Bindings panel, never over the canvas,
+    // and the panel's own scroll must not swallow the notch first.
+    window.addEventListener('wheel', (e) => this.onCaptureWheel(e), {
+      passive: false,
+      capture: true,
+    });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     canvas.addEventListener('mouseenter', () => {
       this.hoverActive = true;
@@ -966,6 +968,43 @@ export class Input {
     return Math.max(0, performance.now() - this.downAt);
   }
 
+  // The rebind capture half of a wheel notch, anywhere in the window: the same
+  // one-shot delivery a key or a mouse button gets, chord included (Ctrl+wheel).
+  private onCaptureWheel(e: WheelEvent): void {
+    if (!this.captureCb) return;
+    const code = wheelCodeForDelta(e.deltaY);
+    if (code === null) return;
+    e.preventDefault?.();
+    e.stopPropagation?.();
+    const cb = this.captureCb;
+    this.captureCb = null;
+    cb(makeCombo(code, { ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, meta: e.metaKey }));
+  }
+
+  // A wheel notch over the canvas dispatches like a key tap: the full chord is
+  // looked up as an edge action (a zoom step, a slot tap, a window toggle) and
+  // honors the same guards as a bound key. A notch has no release, so a slot
+  // bound to it fires as a complete tap, never a charge. An unbound notch does
+  // nothing: zoom is only ever the zoomIn / zoomOut actions, wherever they sit.
+  private onWheel(e: WheelEvent): void {
+    e.preventDefault();
+    if (document.body.classList.contains('mobile-touch')) return;
+    if (this.captureCb) return; // onCaptureWheel already consumed this notch
+    const code = wheelCodeForDelta(e.deltaY);
+    if (code === null) return;
+    const tag = (document.activeElement?.tagName ?? '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return;
+    const combo = makeCombo(code, {
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      meta: e.metaKey,
+    });
+    const edge = this.keybinds.edgeActionForCombo(combo);
+    if (edge !== null) this.dispatchEdge(edge);
+  }
+
   private onKeyDown(e: KeyboardEvent): void {
     if (e.repeat) return;
     if (this.captureCb) {
@@ -1115,6 +1154,13 @@ export class Input {
   private dispatchEdge(action: string): void {
     if (action.startsWith('slot')) {
       this.cb.onAbility(Number(action.slice(4)));
+      return;
+    }
+    // Camera zoom: one step per notch or key tap, from whatever code carries it.
+    const zoom = zoomStepForAction(action);
+    if (zoom !== null) {
+      this.zoomBy(zoom);
+      this.noteIntent('zoom');
       return;
     }
     switch (action) {

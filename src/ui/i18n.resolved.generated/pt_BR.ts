@@ -1409,7 +1409,11 @@ export const pt_BR: EnTranslations = {
       "petAggressive": "Mascote: agressivo",
       "targetPet": "Mascote: selecionar",
       "mount": "Montar / Desmontar",
-      "mouseHint": "Os botões do mouse também funcionam: pressione o botão do meio (M3) ou um botão lateral (M4, M5) ao atribuir a tecla. Os botões esquerdo e direito continuam reservados para a câmera, o clique para mover e cliques em objetos no mundo."
+      "mouseHint": "Os botões do mouse também funcionam: pressione o botão do meio (M3) ou um botão lateral (M4, M5) ao atribuir a tecla. Os botões esquerdo e direito continuam reservados para a câmera, o clique para mover e cliques em objetos no mundo.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Editar teclas da barra de ação",
@@ -6073,7 +6077,8 @@ export const pt_BR: EnTranslations = {
       "ifLockBars": "Trava suas barras para que você não arraste uma habilidade para fora de um espaço sem querer.",
       "keybindsHeading": "O painel Teclas de Atalho",
       "keybindsBody": "A lista de teclas é só metade desse painel. Acima dela ficam os interruptores que decidem como o seu mouse comanda o jogo: Câmera pelo mouse, se o cursor trava enquanto você gira, Clique para mover e qual botão do mouse o aciona, Mover e atacar, o layout para canhotos no toque, e o filtro de palavrões do chat.",
-      "keybindsMouseBody": "Duas coisas ali são fáceis de passar despercebidas. Botões do mouse se atribuem como teclas, então o clique da rodinha e os botões laterais podem carregar habilidades, enquanto o clique esquerdo e o direito ficam reservados para a câmera e para clicar no mundo. E você pode atribuir direto pela barra de ação: ative aqui o modo Editar teclas da barra de ação, depois clique em um espaço e pressione a tecla que você quiser."
+      "keybindsMouseBody": "Duas coisas ali são fáceis de passar despercebidas. Botões do mouse se atribuem como teclas, então o clique da rodinha e os botões laterais podem carregar habilidades, enquanto o clique esquerdo e o direito ficam reservados para a câmera e para clicar no mundo. E você pode atribuir direto pela barra de ação: ative aqui o modo Editar teclas da barra de ação, depois clique em um espaço e pressione a tecla que você quiser.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "O combate segue as regras familiares dos MMOs clássicos. Você nunca precisa estudar nada disso para jogar bem, isto é apenas o formato de como as lutas funcionam.",

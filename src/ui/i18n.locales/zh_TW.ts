@@ -10916,6 +10916,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.tips.reliquary': '提示：聖物庫逐架記錄你收集的獨特戰利品。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乘 / 下騎',
+  // Wheel pseudo-keys + the zoom rows that hold them by default. M16 wordy fills.
+  'hudChrome.keybinds.zoomIn': '拉近鏡頭',
+  'hudChrome.keybinds.zoomOut': '拉遠鏡頭',
+  'hudChrome.keybinds.wheelHint':
+    '滑鼠滾輪也可以綁定：綁定時向上或向下滾動滾輪，也可以同時按住 Ctrl、Alt 或 Shift。拉近鏡頭和拉遠鏡頭預設佔用裸滾輪，把它們移到 Ctrl+滾輪之類的組合上，就能把滾輪留給技能使用。',
+  'hudChrome.keybinds.wheelHeldRefused':
+    '滾輪的一格無法驅動移動這類需要按住的操作。請為它選擇一個按鍵或滑鼠按鈕。',
   // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
   'hudChrome.keybinds.mouseHint':
     '滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。',
@@ -14453,6 +14460,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.keybindsHeading': '「按鍵設定」面板',
   'guide.settingsPage.keybindsMouseBody':
     '那裡有兩件事很容易錯過。滑鼠鍵和一般按鍵一樣可以綁定，因此滾輪按下與拇指鍵都能承載技能，而左鍵與右鍵則保留給鏡頭以及點擊世界。另外，你也可以直接從動作列綁定：在這裡開啟列上綁定模式，然後點一個格子，再按下你想要的按鍵。',
+  'guide.settingsPage.keybindsWheelBody':
+    '滾輪本身也可以綁定。拉近鏡頭和拉遠鏡頭是普通綁定，預設佔用裸滾輪，因此你可以把它們移到 Ctrl+滾輪或按鍵上，再用空出來的滾輪觸發動作列格位。滾輪的一格沒有放開動作，所以無法驅動向前移動這類需要按住的操作。',
   'guide.settingsPage.panelsMoreBody':
     '本頁沒有列成表格的那兩個面板，還是值得看一眼。「光環」是你調整那些大型畫面警示的地方，它們會在你的職業觸發效果亮起時跳出來：哪些會顯示、它們的大小、顏色、不透明度，以及擺在畫面上的哪個位置。「效能監視器」則是你在調整本頁設定時打開、調完再收起來的那個數據面板。',
   'guide.settingsPage.rowAmbientOcclusion':

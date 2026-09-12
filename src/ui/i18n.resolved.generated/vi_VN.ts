@@ -1409,7 +1409,11 @@ export const vi_VN: EnTranslations = {
       "petAggressive": "Thú Cưng: Hung Hăng",
       "targetPet": "Thú Cưng: Chọn",
       "mount": "Cưỡi Thú / Xuống Thú",
-      "mouseHint": "Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới."
+      "mouseHint": "Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Sửa phím thanh hành động",
@@ -6073,7 +6077,8 @@ export const vi_VN: EnTranslations = {
       "ifLockBars": "Khóa các thanh của bạn để bạn không vô tình kéo một kỹ năng ra khỏi ô.",
       "keybindsHeading": "Bảng Gán Phím",
       "keybindsBody": "Danh sách phím chỉ là một nửa của bảng đó. Phía trên nó là các công tắc quyết định cách con chuột của bạn điều khiển trò chơi: Camera Chuột, con trỏ có khóa lại khi bạn xoay hay không, Bấm Để Di Chuyển và nút chuột nào kích hoạt nó, Di Chuyển Tấn Công, bố cục cảm ứng thuận tay trái, và bộ lọc lời tục tĩu cho khung chat.",
-      "keybindsMouseBody": "Có hai điều dễ bị bỏ sót ở đó. Nút chuột được gán như phím thường, nên nút cuộn và các nút ngón cái có thể mang kỹ năng, trong khi chuột trái và chuột phải vẫn được dành riêng cho camera và cho việc nhấp vào thế giới. Và bạn cũng có thể gán phím ngay từ thanh hành động: bật chế độ gán phím trên thanh tại đây, sau đó nhấp vào một ô và nhấn phím bạn muốn."
+      "keybindsMouseBody": "Có hai điều dễ bị bỏ sót ở đó. Nút chuột được gán như phím thường, nên nút cuộn và các nút ngón cái có thể mang kỹ năng, trong khi chuột trái và chuột phải vẫn được dành riêng cho camera và cho việc nhấp vào thế giới. Và bạn cũng có thể gán phím ngay từ thanh hành động: bật chế độ gán phím trên thanh tại đây, sau đó nhấp vào một ô và nhấn phím bạn muốn.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Chiến đấu tuân theo những quy tắc MMO cổ điển quen thuộc. Bạn không bao giờ cần nghiên cứu bất kỳ điều gì để chơi tốt, đây chỉ là hình dáng cách các trận đấu vận hành.",

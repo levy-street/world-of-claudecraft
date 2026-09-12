@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { keybindDeviceNoteKeys } from '../src/ui/keybind_device_notes_core';
 import { OptionsWindow } from '../src/ui/options_window';
 
 // Source-level guards for the options painter. The pure control descriptors +
@@ -619,17 +620,23 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
     expect(painter).toContain('this.deps.refreshKeybindLabels()');
   });
 
-  it('notes the bindable mouse buttons through t(), on pointer devices only', () => {
-    // The hint is the one place the panel tells the player a mouse button binds
-    // like a key; it must be localized and hidden on touch, which has no mouse.
+  it('notes the bindable mouse buttons and wheel through t(), on pointer devices only', () => {
+    // The notes are the one place the panel tells the player a mouse button or a
+    // wheel notch binds like a key; keybind_device_notes_core.ts owns the list
+    // (localized keys, none on touch, which has no mouse) and the painter loops
+    // it through t() under the same touch gate the desktop-only rows use.
     const keybinds = painter.slice(
       painter.indexOf('private renderKeybinds(): void {'),
       painter.indexOf('private beginCapture('),
     );
-    expect(keybinds).toContain("t('hudChrome.keybinds.mouseHint')");
-    const hintIdx = keybinds.indexOf("t('hudChrome.keybinds.mouseHint')");
-    const gateIdx = keybinds.lastIndexOf('if (!useTouchInterface()) {', hintIdx);
-    expect(gateIdx).toBeGreaterThan(-1);
+    expect(keybinds).toContain('keybindDeviceNoteKeys(useTouchInterface())');
+    const loopIdx = keybinds.indexOf('keybindDeviceNoteKeys(useTouchInterface())');
+    expect(keybinds.indexOf('deviceNote.textContent = t(key)', loopIdx)).toBeGreaterThan(loopIdx);
+    expect(keybindDeviceNoteKeys(false)).toEqual([
+      'hudChrome.keybinds.mouseHint',
+      'hudChrome.keybinds.wheelHint',
+    ]);
+    expect(keybindDeviceNoteKeys(true)).toEqual([]);
   });
 
   it('removes dead slot choices from controller remaps while the cross hotbar is on', () => {

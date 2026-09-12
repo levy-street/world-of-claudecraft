@@ -11448,6 +11448,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'loading.tips.reliquary': '팁: 성물고는 수집한 고유 전리품을 선반별로 기록합니다.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '탑승 / 하차',
+  // Wheel pseudo-keys + the zoom rows that hold them by default. M16 wordy fills.
+  'hudChrome.keybinds.zoomIn': '카메라 확대',
+  'hudChrome.keybinds.zoomOut': '카메라 축소',
+  'hudChrome.keybinds.wheelHint':
+    '마우스 휠도 지정할 수 있습니다. 지정 중에 휠을 위나 아래로 굴리세요. Ctrl, Alt, Shift를 누른 채로도 됩니다. 카메라 확대와 카메라 축소는 기본적으로 휠 단독에 놓여 있습니다. Ctrl+휠 같은 조합으로 옮기면 휠을 기술에 쓸 수 있습니다.',
+  'hudChrome.keybinds.wheelHeldRefused':
+    '휠 한 칸으로는 이동처럼 누르고 있어야 하는 동작을 실행할 수 없습니다. 키나 마우스 버튼을 선택하세요.',
   // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
   'hudChrome.keybinds.mouseHint':
     '마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다.',
@@ -15142,6 +15149,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.keybindsHeading': '키 설정 패널',
   'guide.settingsPage.keybindsMouseBody':
     '그중 놓치기 쉬운 것이 둘 있습니다. 마우스 버튼도 키처럼 지정할 수 있어 휠 클릭과 엄지 버튼에 능력을 올릴 수 있으며, 왼쪽과 오른쪽 클릭은 카메라와 세계 클릭용으로 남습니다. 그리고 행동 단축바에서 곧바로 지정할 수도 있습니다. 여기서 단축바 지정 모드를 켠 뒤, 슬롯을 클릭하고 원하는 키를 누르면 됩니다.',
+  'guide.settingsPage.keybindsWheelBody':
+    '휠 자체도 지정할 수 있습니다. 카메라 확대와 카메라 축소는 일반 지정으로, 기본적으로 휠 단독에 놓여 있습니다. Ctrl+휠이나 키로 옮긴 뒤 비어 있는 휠을 굴려 행동 단축바 칸을 발동할 수 있습니다. 휠 한 칸에는 놓는 동작이 없어서 앞으로 이동 같은 누르고 있는 동작에는 쓸 수 없습니다.',
   'guide.settingsPage.panelsMoreBody':
     '이 페이지에서 표로 다루지 않는 두 패널도 한 번쯤 볼 값어치가 있습니다. 오라는 직업의 발동 효과가 떴을 때 화면에 크게 뜨는 알림을 다듬는 곳입니다. 어떤 것을 표시할지, 크기와 색과 불투명도, 그리고 화면 어디에 놓을지까지 정합니다. 성능 오버레이는 이 페이지를 보며 설정을 조정하는 동안 켜 두었다가 다시 숨기는 표시기입니다.',
   'guide.settingsPage.rowAmbientOcclusion':

@@ -1640,6 +1640,16 @@ export const hudChromeStrings = {
     // this same change.
     mouseHint:
       'Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world.',
+    // The wheel is a pair of bindable pseudo-keys too (src/game/wheel_binds.ts):
+    // the two zoom rows below hold it by default. Wordy (M16): the five
+    // non-Latin fills land in this same change.
+    zoomIn: 'Zoom Camera In',
+    zoomOut: 'Zoom Camera Out',
+    wheelHint:
+      'The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.',
+    // A wheel notch has no release, so bind() refuses it on a held action.
+    wheelHeldRefused:
+      'A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it.',
   },
   // On-bar action-bar key-binding mode (issue #1238): the Key Bindings menu's
   // single "Edit action bar keys" entry (replacing the wall of per-slot rebind

@@ -29,6 +29,9 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   // English-only chrome key, like every keybind row added since the `hud`
   // domain was tsc-locked to inline per-locale blocks.
   dive: 'hudChrome.keybinds.dive',
+  // Camera zoom rows (the bare wheel by default; src/game/wheel_binds.ts).
+  zoomIn: 'hudChrome.keybinds.zoomIn',
+  zoomOut: 'hudChrome.keybinds.zoomOut',
   autorun: 'hud.keybinds.actions.autorun',
   target: 'hud.keybinds.actions.target',
   attackMove: 'hud.keybinds.actions.attackMove',

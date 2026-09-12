@@ -1409,7 +1409,11 @@ export const da_DK: EnTranslations = {
       "petAggressive": "Kæledyr: Aggressiv",
       "targetPet": "Kæledyr: Sigt",
       "mount": "Stig op / Stig af",
-      "mouseHint": "Museknapper virker også: tryk på midterknappen (M3) eller en tommelfingerknap (M4, M5), mens du binder. Venstre og højre er fortsat forbeholdt kameraet, klik for at flytte og at klikke på ting i verden."
+      "mouseHint": "Museknapper virker også: tryk på midterknappen (M3) eller en tommelfingerknap (M4, M5), mens du binder. Venstre og højre er fortsat forbeholdt kameraet, klik for at flytte og at klikke på ting i verden.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Rediger handlingslinjens taster",
@@ -6073,7 +6077,8 @@ export const da_DK: EnTranslations = {
       "ifLockBars": "Låser dine bjælker, så du ikke ved et uheld kan trække en evne ud af et felt.",
       "keybindsHeading": "Tastebindings-panelet",
       "keybindsBody": "Tastelisten er kun halvdelen af det panel. Over den sidder de kontakter, der afgør, hvordan din mus styrer spillet: musekamera, hvorvidt markøren låses, mens du drejer, klik for at flytte og hvilken museknap der udløser det, angrebsbevægelse, det venstrehåndede touch-layout og bandeordsfilteret til chatten.",
-      "keybindsMouseBody": "To ting der er lette at overse. Museknapper bindes som taster, så hjulklikket og tommelfingerknapperne kan bære evner, mens venstre- og højreklik forbliver reserveret til kameraet og til at klikke på verden. Og du kan binde direkte fra handlingsbjælken: slå bindingstilstanden på bjælken til her, klik derefter på et felt, og tryk på den tast, du ønsker."
+      "keybindsMouseBody": "To ting der er lette at overse. Museknapper bindes som taster, så hjulklikket og tommelfingerknapperne kan bære evner, mens venstre- og højreklik forbliver reserveret til kameraet og til at klikke på verden. Og du kan binde direkte fra handlingsbjælken: slå bindingstilstanden på bjælken til her, klik derefter på et felt, og tryk på den tast, du ønsker.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Kamp følger velkendte klassiske MMO-regler. Du behøver aldrig at studere noget af det for at spille godt, dette er bare formen på hvordan kampe fungerer.",

@@ -6,9 +6,11 @@ import {
   actionKind,
   BIND_ACTIONS,
   BIND_CATEGORIES,
+  bindRefusalReason,
   comboCode,
   comboMods,
   isModifierCode,
+  isRefusedCodeFor,
   isReservedCode,
   Keybinds,
   keyCapLabel,
@@ -992,6 +994,71 @@ describe('modifiers and held (movement) actions', () => {
     expect(kb.heldActionForCode('Space')).toBe('jump');
     // edge keys are not held
     expect(kb.heldActionForCode('Digit1')).toBe(null);
+  });
+});
+
+// The wheel notches are bindable pseudo-keys too (src/game/wheel_binds.ts);
+// camera zoom is the zoomIn / zoomOut edge-action pair that holds them by default.
+describe('wheel notches as bindable keys', () => {
+  it('defaults camera zoom to the bare wheel, as edge actions under Movement', () => {
+    const zoomIn = BIND_ACTIONS.find((a) => a.id === 'zoomIn');
+    const zoomOut = BIND_ACTIONS.find((a) => a.id === 'zoomOut');
+    expect(zoomIn).toMatchObject({ category: 'Movement', kind: 'edge', defaults: ['WheelUp'] });
+    expect(zoomOut).toMatchObject({ category: 'Movement', kind: 'edge', defaults: ['WheelDown'] });
+    const kb = new Keybinds();
+    expect(kb.edgeActionForCombo('WheelUp')).toBe('zoomIn');
+    expect(kb.edgeActionForCombo('WheelDown')).toBe('zoomOut');
+    expect(kb.primaryLabel('zoomIn')).toBe('Wh↑');
+    expect(kb.primaryLabel('zoomOut')).toBe('Wh↓');
+  });
+
+  it('moves zoom to a Ctrl chord and hands the freed notch to a slot', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('zoomOut', 0, 'Ctrl+WheelDown')).toBe(true);
+    expect(kb.bind('slot3', 0, 'WheelDown')).toBe(true);
+    expect(kb.edgeActionForCombo('Ctrl+WheelDown')).toBe('zoomOut');
+    expect(kb.edgeActionForCombo('WheelDown')).toBe('slot3');
+    expect(kb.primaryLabel('zoomOut')).toBe('Ctrl+Wh↓');
+    expect(kb.primaryLabel('slot3')).toBe('Wh↓');
+  });
+
+  it('binding a slot straight onto the bare notch evicts the zoom default, one code per action', () => {
+    const kb = new Keybinds();
+    expect(kb.findBindConflict('slot3', 0, 'WheelUp')).toEqual({
+      id: 'zoomIn',
+      index: 0,
+      code: 'WheelUp',
+    });
+    expect(kb.bind('slot3', 0, 'WheelUp')).toBe(true);
+    expect(kb.codeAt('zoomIn', 0)).toBeNull();
+    expect(kb.edgeActionForCombo('WheelUp')).toBe('slot3');
+  });
+
+  it('refuses a notch on a held (movement) action, which has no release to end it', () => {
+    const kb = new Keybinds();
+    expect(isRefusedCodeFor('forward', 'WheelUp')).toBe(true);
+    expect(isRefusedCodeFor('slot3', 'WheelUp')).toBe(false);
+    expect(isRefusedCodeFor('forward', 'Mouse4')).toBe(false); // a button does release
+    expect(bindRefusalReason('forward', 'WheelUp')).toBe('wheelHeld');
+    expect(bindRefusalReason('slot3', 'Mouse1')).toBe('reserved');
+    expect(bindRefusalReason('slot3', 'WheelUp')).toBeNull();
+    expect(kb.bind('forward', 0, 'WheelUp')).toBe(false);
+    expect(kb.bind('forward', 0, 'Shift+WheelDown')).toBe(false);
+    // The refusal is not a conflict either, so the UI never asks to steal zoom.
+    expect(kb.findBindConflict('forward', 0, 'WheelUp')).toBeNull();
+    // and it left both sides untouched
+    expect(kb.codeAt('forward', 0)).toBe('KeyW');
+    expect(kb.edgeActionForCombo('WheelUp')).toBe('zoomIn');
+  });
+
+  it('drops a hand-imported notch from a held action at load without letting it evict anything', () => {
+    localStorage.setItem(
+      'woc_keybinds',
+      JSON.stringify({ __repaired: true, forward: ['WheelUp', null] }),
+    );
+    const kb = new Keybinds();
+    expect(kb.codeAt('forward', 0)).toBeNull(); // the stored value was refused
+    expect(kb.edgeActionForCombo('WheelUp')).toBe('zoomIn'); // and did not claim the notch
   });
 });
 
