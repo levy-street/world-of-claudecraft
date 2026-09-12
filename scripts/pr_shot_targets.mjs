@@ -4767,6 +4767,32 @@ export const TARGETS = [
       return open ? { clip: '#map-window' } : {};
     },
   })),
+  // The zoom-out gesture on the instance plan (map_pinch_zoom_core.ts
+  // zoomOutLevelExit): the minus button, a wheel-down, and a pinch all funnel
+  // through Hud.zoomMap, so one press of the button stands for all three. On a
+  // build that predates the rule the zoom cluster is hidden on the plan and the
+  // press is swallowed, so the BEFORE frame is the unchanged instance plan.
+  {
+    key: 'instance-map-zoom-out',
+    label: 'World map inside a dungeon: one zoom-out, the zone map',
+    when: ['map_pinch_zoom_core', 'map_pan_core'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => window.__game?.sim?.enterDungeon?.('hollow_crypt'));
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      await wait(600);
+      await page.evaluate(() => document.querySelector('#map-zoom-out')?.click());
+      await wait(600);
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      return open ? { clip: '#map-window' } : {};
+    },
+  },
   {
     key: 'party-dungeon-map-outside',
     label: "World map outside: the party member's dungeon plan (two presses from the zone map)",

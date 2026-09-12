@@ -660,12 +660,9 @@ import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { createMapMarkerArt } from './map_marker_icon_loader';
 import { mapMarkerProfileForFlags } from './map_marker_profile_core';
+import { mapDragPanCenter } from './map_pan_core';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
-import {
-  MAP_TAP_MOVE_TOLERANCE_PX,
-  nextMapZoom,
-  zoomOutExitsZoneLevel,
-} from './map_pinch_zoom_core';
+import { MAP_TAP_MOVE_TOLERANCE_PX, nextMapZoom, zoomOutLevelExit } from './map_pinch_zoom_core';
 import { shouldResetMapPanOnZoneCross, showOnMapPanState } from './map_show_on_map_core';
 import { MapSidebarController } from './map_sidebar_controller';
 import {
@@ -2938,7 +2935,6 @@ export class Hud {
       'wheel',
       (ev) => {
         ev.preventDefault();
-        if (this.mapLevel !== 'zone') return; // no per-zone zoom on the overview
         this.zoomMap((ev as WheelEvent).deltaY < 0 ? 1.2 : 1 / 1.2);
       },
       { passive: false },
@@ -2967,16 +2963,8 @@ export class Hud {
     mapCanvas.addEventListener('pointermove', (ev) => {
       if (mapPinch.isPinching() || !this.mapDrag || !this.mapView) return;
       const rect = mapCanvas.getBoundingClientRect();
-      // "grab the paper" pan: the world point under the cursor stays under it.
-      // toMap draws +X to the left and +Z up (mx = (maxX-x)/span, my = (maxZ-z)/
-      // span), so a cursor delta of (dx, dy) px shifts the centre by (+dx, +dy)
-      // world units on each axis.
-      const wppx = this.mapView.spanX / rect.width;
-      const wppy = this.mapView.spanZ / rect.height;
-      this.mapCenter = {
-        x: this.mapDrag.cx + (ev.clientX - this.mapDrag.px) * wppx,
-        z: this.mapDrag.cz + (ev.clientY - this.mapDrag.py) * wppy,
-      };
+      // "grab the paper" pan (map_pan_core.ts): the grabbed world point stays under the cursor.
+      this.mapCenter = mapDragPanCenter(this.mapDrag, this.mapView, rect, ev.clientX, ev.clientY);
       this.updateMapWindow();
     });
     const endDrag = () => {
@@ -10769,14 +10757,16 @@ export class Hud {
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
-    if (this.mapLevel !== 'zone' && this.mapLevel !== 'continent') return;
-    // One more zoom-out at the zone map's full extent leaves the zone and opens
-    // the continent overview (the level toggle's other half), instead of clamping
-    // at the minimum and doing nothing. A delve has no overview to go to.
-    if (this.mapLevel === 'zone' && zoomOutExitsZoneLevel(this.mapZoom, factor)) {
-      this.setMapLevel('continent');
+    // A zoom-out past a level's floor climbs one level: the instance plan has no
+    // zoom of its own, so any zoom-out there opens the zone map, and the zone
+    // map at full extent opens the continent overview. Only the zone map zooms
+    // within its level (map_pinch_zoom_core.ts owns the rule).
+    const exit = zoomOutLevelExit(this.mapLevel, this.mapZoom, factor);
+    if (exit) {
+      this.setMapLevel(exit);
       return;
     }
+    if (this.mapLevel !== 'zone') return;
     const prev = this.mapZoom;
     this.mapZoom = nextMapZoom(this.mapZoom, factor);
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
@@ -10842,7 +10832,10 @@ export class Hud {
     this.mapLevel = resolveMapSurface(mapMode, this.mapLevel, remote !== null);
     const schematic = this.mapLevel === 'instance';
     this.setText($('#map-level-toggle'), t(mapLevelToggleKey(mapMode, this.mapLevel, !!remote)));
-    this.setDisplay($('#map-zoom'), this.mapLevel === 'zone' ? 'flex' : 'none');
+    // The zoom cluster shows on the zone map and on an instance plan; the plan
+    // has no zoom-in, so only its minus button is live (it leaves for the zone map).
+    this.setDisplay($('#map-zoom'), this.mapLevel === 'continent' ? 'none' : 'flex');
+    $('#map-zoom-in')?.toggleAttribute('disabled', schematic);
     if (schematic && mapMode === 'rift') {
       this.clearMapHitState(canvas);
       const model = this.riftPainter.paintWorldMap(ctx, this.sim, S);
