@@ -13,7 +13,13 @@ import {
 import { colliderTopAt, moverHeight, resolvePosition } from '../src/sim/colliders';
 import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
-import { battlegroundOrigin, DUNGEON_X_THRESHOLD, instanceOrigin, isBgPos } from '../src/sim/data';
+import {
+  battlegroundOrigin,
+  DUNGEON_X_THRESHOLD,
+  instanceOrigin,
+  isBgPos,
+  MOBS,
+} from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { summonMountItem, toggleMount } from '../src/sim/mounts';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
@@ -4547,6 +4553,116 @@ describe('Thornhollow Fields: talents are the fighter own to change', () => {
     expect(sim.setSpec('arms', a)).toBe(false);
     expect(sim.respec(a)).toBe(false);
     expect(must(sim.ctx.players.get(a), 'player meta').talents.spec).toBe('fury');
+  });
+});
+
+describe('a boss encounter locks talents the way combat does (issue #3372)', () => {
+  // During Nythraxis's intermission the raiders drop out of combat while the
+  // boss stays engaged and holds the slot, so a mage could swap to Arcane,
+  // cast Time Warp, then swap back: a fight-winning loadout mid-boss. The lock
+  // is keyed on the BOSS's engaged state (the module header, engaged_combat.ts),
+  // not the player's, so the spec stays frozen for the whole encounter — but a
+  // pre-pull respec at a not-yet-engaged boss still goes through.
+  const bossArena = (): { sim: Sim; pid: number; boss: Entity } => {
+    const sim = makeWorld();
+    // Force the boot world-boss scheduler to fire on the next tick, then tick
+    // once: sim.ts spawns one live boss per WORLD_BOSSES slot the instant the
+    // slot comes due, no dungeon claim required. An open-world `worldBoss`
+    // template is an encounter boss under isEncounterBoss.
+    (sim as unknown as { worldBossNextAt: number[] }).worldBossNextAt = (
+      sim as unknown as { worldBossNextAt: number[] }
+    ).worldBossNextAt.map(() => 0);
+    sim.tick();
+    const boss = must(
+      [...sim.entities.values()].find(
+        (e) =>
+          e.kind === 'mob' &&
+          !e.dead &&
+          (MOBS[e.templateId]?.boss === true || MOBS[e.templateId]?.worldBoss === true),
+      ),
+      'spawned boss',
+    );
+    const pid = sim.addPlayer('mage', 'BossMage') as number;
+    const p = must(sim.entities.get(pid), 'player');
+    p.level = 20;
+    // Park the player on the boss so the open-world encounter reach holds.
+    p.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z };
+    p.prevPos = { ...p.pos };
+    return { sim, pid, boss };
+  };
+
+  // The same engagement shape the nythraxis suites use (boss engaged on the
+  // player: hostile, in combat, attacking, holding them on the threat table).
+  const engage = (boss: Entity, pid: number): void => {
+    boss.hostile = true;
+    boss.inCombat = true;
+    boss.aiState = 'attack';
+    boss.aggroTargetId = pid;
+    boss.threat.set(pid, 1000);
+  };
+
+  // Shallow-but-wide: pin the whole permission surface of talentLockReason in
+  // one table rather than one deep fixture per state. Each row is the minimal
+  // state that isolates one arm of the guard (player combat / arena / engaged
+  // boss / loose boss / none). The spec must freeze exactly when a lock is set
+  // and re-spec must remain possible at every not-locked state.
+  const lockStates: Array<{
+    name: string;
+    src?: 'combat' | 'arena' | 'engage' | 'looseBoss' | 'none';
+    setSpec: boolean;
+    respec: boolean;
+  }> = [
+    { name: 'in combat', src: 'combat', setSpec: false, respec: false },
+    { name: 'in an arena match', src: 'arena', setSpec: false, respec: false },
+    {
+      name: 'engaged boss (intermission, player out of combat)',
+      src: 'engage',
+      setSpec: false,
+      respec: false,
+    },
+    {
+      name: 'a loose, not-yet-engaged boss (pre-pull)',
+      src: 'looseBoss',
+      setSpec: true,
+      respec: true,
+    },
+    { name: 'nothing (baseline)', src: 'none', setSpec: true, respec: true },
+  ];
+  it.each(lockStates)('$name: setSpec=$setSpec, respec=$respec', ({ src, setSpec, respec }) => {
+    const { sim, pid, boss } = bossArena();
+    const p = must(sim.entities.get(pid), 'player');
+    p.inCombat = false;
+
+    switch (src) {
+      case 'combat':
+        p.inCombat = true;
+        break;
+      case 'arena':
+        sim.ctx.arenaMatches.set(pid, {} as never);
+        break;
+      case 'engage':
+        // Intermission: player out of combat, boss still engaged and holding.
+        engage(boss, pid);
+        break;
+      case 'looseBoss':
+        break; // boss present but loose — the fixture's default
+      case 'none':
+        for (const e of [...sim.entities.values()]) {
+          if (e.kind === 'mob' && !e.dead) e.dead = true;
+        }
+        break;
+      default:
+        break;
+    }
+
+    const before = must(sim.ctx.players.get(pid), 'player meta').talents.spec;
+    const wantFreeze = !setSpec;
+    expect(sim.setSpec(wantFreeze ? 'frost' : 'fire', pid)).toBe(setSpec);
+    expect(sim.respec(pid)).toBe(respec);
+    // A frozen spec stays as it was; a permitted set goes through to the target.
+    const after = must(sim.ctx.players.get(pid), 'player meta').talents.spec;
+    if (setSpec) expect(after).toBe('fire');
+    else expect(after).toBe(before);
   });
 });
 
