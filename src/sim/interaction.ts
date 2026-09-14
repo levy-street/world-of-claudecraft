@@ -64,6 +64,7 @@ import {
   REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
   REALM_BUILDER_MONUMENT_TEMPLATE_ID,
 } from './types';
+import { talkToWeeklyKeeper } from './weekly_rewards';
 import { markWorldBossLooted } from './world_boss';
 
 const LOCKPICK_OFFER_COOLDOWN = 4; // seconds between repeated rift_locked_chest offer emits per player
@@ -478,10 +479,14 @@ export function interact(
         pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
         return;
       }
+      if (talkToWeeklyKeeper(ctx, target, p)) return;
       if (target.kind === 'npc' && ctx.bankerIds.includes(target.id)) {
         // Opening the bank window counts as banker business for the NPC ledger.
         deedsMod.onBankerBusinessForDeeds(ctx, r.meta, target.templateId);
-        ctx.emit({ type: 'bank', pid: p.id });
+        ctx.emit({
+          type: 'bank',
+          pid: p.id,
+        });
         return;
       }
       if (target.kind === 'npc' && isRiftForgeNpc(target)) {
@@ -589,10 +594,14 @@ export function interact(
     pickUpObject(ctx, obj.id, p.id, noticeboardDefinitions);
     return;
   }
+  if (questEntity && talkToWeeklyKeeper(ctx, questEntity, p)) return;
   if (questEntity && ctx.bankerIds.includes(questEntity.id)) {
     // Opening the bank window counts as banker business for the NPC ledger.
     deedsMod.onBankerBusinessForDeeds(ctx, r.meta, questEntity.templateId);
-    ctx.emit({ type: 'bank', pid: p.id });
+    ctx.emit({
+      type: 'bank',
+      pid: p.id,
+    });
     return;
   }
   if (questEntity && isRiftForgeNpc(questEntity)) {

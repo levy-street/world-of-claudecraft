@@ -6449,7 +6449,7 @@ export type SimEvent = { pid?: number } & (
   // Asks the client to open the bank window (the interact path at a banker NPC).
   // Structured data only (pid supplied by the union intersection); the client
   // builds every visible string, the mailbox precedent.
-  | { type: 'bank' }
+  | { type: 'bank' | 'weekly_rewards' }
   // Asks the client to open the Rift Forge window (the interact path at a
   // riftForge NPC). Structured only, the bank precedent above.
   | { type: 'riftForge' }

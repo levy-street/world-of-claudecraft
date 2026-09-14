@@ -1412,6 +1412,17 @@ export const EASTBROOK_LAYOUT = deepFreeze({
   id: 'eastbrook_civic_layout_v2',
   preservedBuildings: [] as readonly PreservedBuildingPlacement[],
   buildings: BUILDINGS,
+  weeklyVault: {
+    id: 'eastbrook_weekly_vault',
+    kind: 'house',
+    x: 21,
+    z: -119,
+    w: 14,
+    d: 12,
+    rot: -Math.PI / 2,
+    height: 13,
+    keeper: { x: 12, z: -119 },
+  },
   civic: {
     center: CIVIC_CENTER,
     ring: { radius: 4.75, pathHalfWidth: 1.5 },

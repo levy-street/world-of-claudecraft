@@ -140,7 +140,7 @@ import {
   createBankVaultLedgerGuardCoordinator,
   resolveBankVaultLedgerMaxAccountStates,
 } from './bank_vault_ledger_guard';
-import { dispatchBankCommand, emitBankSelfKeys } from './bank_wire';
+import { dispatchBankCommand, emitBankSelfKeys, emitGuildAndWeeklySelfKeys } from './bank_wire';
 import { reportBgOutcomes } from './battleground_telemetry';
 import type {
   BotDetector,
@@ -7731,6 +7731,10 @@ export class GameServer {
         }
         break;
       // Materials Vault uses the same row-aware retained-ledger admission.
+      case 'weekly_reward_claim':
+        if (typeof msg.choice === 'string' && typeof msg.token === 'string')
+          this.sim.claimWeeklyReward(msg.choice, pid, msg.token);
+        break;
       case 'vault_deposit':
       case 'vault_withdraw':
       case 'vault_deposit_all':
@@ -8790,14 +8794,7 @@ export class GameServer {
     // DIFFERENT sessions are all documented at the emission in bank_wire.ts.
     emitBankSelfKeys(maybe, this.sim, session, anchorSession);
     emitVaultSelfKeys(maybe, this.sim, session, anchorSession.pid);
-    // guild bank info follows the same pattern with a stricter gate: null
-    // unless the player is alive, at a banker, AND stamped into a guild whose
-    // book is loaded (sim guildBankInfoFor; ANY rank sees it, the snapshot's
-    // canEdit flag marks officer-plus), so the guildless and walked-away/dead/
-    // departed members all read null. Not heavy-gated for the same reason as
-    // bank: it can change from OTHER members' deposits, not just this
-    // session's own commands.
-    maybe('guildBank', this.sim.guildBankInfoFor(anchorSession.pid));
+    emitGuildAndWeeklySelfKeys(maybe, this.sim, session.pid, anchorSession.pid);
     selfLap?.('self.bank');
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays

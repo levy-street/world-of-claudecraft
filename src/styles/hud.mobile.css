@@ -6228,6 +6228,24 @@
     overflow: hidden;
     z-index: 95;
   }
+  body.mobile-touch.weekly-vault-open #bank-window {
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--window-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--window-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--window-scale, 1));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1));
+    width: auto;
+    height: auto;
+    transform: none;
+  }
+  body.mobile-touch.weekly-vault-open .weekly-rewards {
+    padding: 10px;
+  }
+  body.mobile-touch.weekly-vault-open .weekly-rewards h2 {
+    font-size: 20px;
+  }
+  body.mobile-touch.weekly-vault-open .weekly-reset {
+    padding: 8px 12px;
+  }
   /* The paired-geometry box the bank AND market clusters share on touch (the
      market copied the bank's desktop dock, body.market-open in components.css,
      so it needs the same mobile neutralizer): full height above the 72px tray

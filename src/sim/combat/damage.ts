@@ -72,6 +72,7 @@ import {
   virtualLevel,
   xpForLevel,
 } from '../types';
+import { recordWeeklyBossKill } from '../weekly_rewards';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import {
   afflictionOnDeath,
@@ -1806,6 +1807,7 @@ export function handleDeath(
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
+    recordWeeklyBossKill(ctx, e, heroicRewardRecipients, claimedInst);
     ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
     // Intentional Gathering PR3: the kill-credit priority snapshot for a
     // future corpse-harvest cast, taken from the exact same eligible list the

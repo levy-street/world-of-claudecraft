@@ -267,7 +267,8 @@ const NPC_IDS = [
   'warmarshal_draven_kole', // Master of the Warfare Stores, the WARFARE vendor (Highwatch, zone 3)
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
-  'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
+  'bursar_fernando',
+  'eastbrook_vault_keeper', // Gilded Strongbox banker (Eastbrook, zone 1)
   'card_master', // Card Duel minigame queue desk (Eastbrook, zone 1)
   'bursar_petra_vell', // Gilded Strongbox banker (Fenbridge, zone 2)
   'bursar_aldous_crane', // Gilded Strongbox banker (Highwatch, zone 3)

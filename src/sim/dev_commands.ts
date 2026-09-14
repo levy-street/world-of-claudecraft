@@ -5,6 +5,7 @@ import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
+import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
 import {
@@ -146,6 +147,10 @@ export function handleDevChat(
   raw: string,
   pid: number,
 ): SentChat | null | undefined {
+  if (/^\/dev\s+weeklyvault\s*$/i.test(raw)) {
+    prepareWeeklyVaultPlaytest(ctx, pid);
+    return null;
+  }
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
     const level = Number(levelMatch[1]);

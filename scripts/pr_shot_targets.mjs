@@ -1069,6 +1069,103 @@ async function triggerRowBreakdown(page, rowSelector, variant) {
 }
 
 export const TARGETS = [
+  {
+    key: 'weekly-vault',
+    label: 'Eastbrook stone vault and weekly reward choices',
+    when: ['weekly_rewards', 'eastbrook_weekly_vault'],
+    variants: [
+      { key: 'desktop' },
+      { key: 'mobile', mobile: true },
+      { key: 'frontage', frontage: true },
+    ].map((variant) => ({
+      ...variant,
+      navigationWaitUntil: 'domcontentloaded',
+      async beforeLoad(page) {
+        await page.evaluateOnNewDocument(() =>
+          localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 })),
+        );
+      },
+    })),
+    async capture(page, variant) {
+      await page.evaluate(async () => {
+        const game = window.__game;
+        const sim = game.sim;
+        const keeper = [...sim.entities.values()].find(
+          (e) => e.templateId === 'eastbrook_vault_keeper',
+        );
+        if (!keeper) throw new Error('Weekly Vault keeper is missing');
+        sim.player.pos = { ...keeper.pos, x: keeper.pos.x - 1, z: keeper.pos.z - 1 };
+        sim.player.prevPos = { ...sim.player.pos };
+        sim.rebucket(sim.player);
+        const { prepareWeeklyVaultPlaytest } = await import(
+          '/src/sim/dev/weekly_vault_playtest.ts'
+        );
+        prepareWeeklyVaultPlaytest(sim.ctx, sim.playerId);
+      });
+      await awaitWorldPainted(page);
+      // Consume the fixture's opening first, then independently exercise Talk.
+      await page.evaluate(() => {
+        const game = window.__game;
+        const keeper = [...game.sim.entities.values()].find(
+          (e) => e.templateId === 'eastbrook_vault_keeper',
+        );
+        game.hud.closeBank();
+        if (getComputedStyle(document.querySelector('#bags')).display === 'none')
+          game.hud.toggleBags();
+        game.sim.talkToNpc(keeper.id);
+      });
+      await awaitWorldPainted(page);
+      if (!(await pollForSize(page, '#weekly-rewards-panel')))
+        throw new Error('Weekly reward panel did not open');
+      const headings = await page.$$eval('.weekly-track h3', (nodes) =>
+        nodes.map((n) => n.textContent),
+      );
+      if (headings.join('|') !== 'Raids|Dungeons|World Quests|PvP')
+        throw new Error(`Missing reward tracks: ${headings}`);
+      await dismissEntryOverlays(page);
+      // Dismiss the stock tutorial strip and GPU notice through their existing buttons.
+      await page.evaluate(() => {
+        for (const button of document.querySelectorAll('button')) {
+          if (button.textContent?.trim() === 'Dismiss' || button.classList.contains('tut-skip'))
+            button.click();
+        }
+      });
+      if (variant?.frontage) {
+        await page.evaluate(() => {
+          const game = window.__game;
+          game.hud.closeBank();
+          game.sim.player.pos = game.sim.ctx.groundPos(9, -121);
+          game.sim.player.prevPos = { ...game.sim.player.pos };
+          game.sim.rebucket(game.sim.player);
+          game.input.camYaw = Math.PI / 2 - 0.22;
+          game.input.camPitch = 0.26;
+          game.input.camDist = 18;
+        });
+        await awaitWorldPainted(page);
+        await wait(1200);
+        return;
+      }
+      if (await page.$('.bank-tab')) throw new Error('Weekly vault exposed banking tabs');
+      await page.waitForFunction(() => {
+        const rect = document.querySelector('#bank-window').getBoundingClientRect();
+        return (
+          getComputedStyle(document.querySelector('#bags')).display === 'none' &&
+          rect.width >= innerWidth * 0.85 &&
+          rect.height >= innerHeight * 0.85
+        );
+      });
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll('.weekly-choice img')].every(
+          (img) => img.complete && img.naturalWidth > 0,
+        ),
+      );
+      await page.click('.weekly-choice');
+      // Capture the fixed candidates before collection, then separately verify the claim.
+      await page.evaluate(() => (document.querySelector('#weekly-rewards-panel').scrollTop = 0));
+      await wait(300);
+      await awaitWorldPainted(page);
+    },
+  },
   ...masterwroughtReviewTargets({
     beforeLoad: lowGraphicsSeed,
     dismissOverlays: dismissEntryOverlays,

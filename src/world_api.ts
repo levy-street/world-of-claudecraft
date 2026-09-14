@@ -831,6 +831,7 @@ export const COMMAND_NAMES = [
   'swap_perfecting_ranks',
   // Wear or take off an owned account mount skin on this character.
   'change_mount_skin',
+  'weekly_reward_claim',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -922,6 +923,7 @@ export type WorldFacet =
   | 'IWorldFarming';
 
 export const COMMAND_FACETS = {
+  weekly_reward_claim: 'IWorldBank',
   // IWorldCombat: ability casts, auto-attack, spirit release.
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',

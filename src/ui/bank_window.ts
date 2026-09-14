@@ -51,6 +51,7 @@ import {
 } from './bank_rung_view';
 import { captureSearchCaret, restoreSearchCaret } from './bank_search_focus';
 import { BankSocketPurchaseController } from './bank_socket_purchase_controller';
+import { type BankTabId, bankTabsHtml, bankWindowTitle } from './bank_tabs_view';
 import {
   type BankBuySlotsModel,
   type BankClaudiumInput,
@@ -93,11 +94,11 @@ import {
 import { durableIntents, type PurchaseIntentLedger } from './purchase_intent_durability';
 import { storageRungRefusalTargets } from './storage_rung_echo_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
-import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import { hasVaultDepositable, vaultSpecialContentKey } from './vault_view';
 import { VAULT_PANEL_ID, VAULT_TAB_ID, VaultTab } from './vault_window';
+import { WeeklyRewardsTab } from './weekly_rewards_window';
 
 // Grace before a null bankInfo closes the window: online the bank mirror rides the
 // proximity snapshot, so it can lag the open by about a tick (copies the mailbox's
@@ -216,11 +217,12 @@ export interface BankWindowDeps extends PainterHostPresentation, Partial<Claudiu
  *  non-null (any guild member at a banker, online with the book loaded;
  *  canEdit gates the actions); the Vault tab exists only while vaultInfo is
  *  non-null (standing at a banker, both hosts). */
-export type BankTabId = 'personal' | 'vault' | 'guild';
+export type { BankTabId } from './bank_tabs_view';
 
 export class BankWindow {
   private opened = false;
   private lastSig = '';
+  private readonly weeklyPane: WeeklyRewardsTab;
   private openerFocus: HTMLElement | null = null;
   private openedAt = 0;
 
@@ -356,6 +358,12 @@ export class BankWindow {
   private rungAnnounceSeq = 0;
 
   constructor(private readonly deps: BankWindowDeps) {
+    this.weeklyPane = new WeeklyRewardsTab({
+      world: () => this.deps.world(),
+      presentation: this.deps,
+      onInventoryChanged: () => this.deps.onInventoryChanged(),
+    });
+
     this.guildPane = new GuildBankTab({
       root: () => this.deps.root(),
       world: () => this.deps.world(),
@@ -462,8 +470,15 @@ export class BankWindow {
   // bookkeeping: re-capturing openerFocus could record a node INSIDE this window
   // (returned-to after close, i.e. destroyed), and a fresh render would tear an
   // open prompt down for no reason. Data changes ride refreshIfChanged.
-  open(): void {
-    if (this.opened) return;
+  open(initialTab?: 'rewards'): void {
+    if (this.opened) {
+      if ((this.tab === 'rewards') !== (initialTab === 'rewards')) {
+        this.tab = initialTab ?? 'personal';
+        this.render();
+      }
+      return;
+    }
+    if (initialTab) this.tab = initialTab;
     this.deps.closeOthers();
     this.openerFocus = this.deps.captureFocus();
     this.opened = true;
@@ -586,7 +601,7 @@ export class BankWindow {
       el.inert = false;
     }
     this.deps.hideTooltip();
-    markDialogRoot(el, { label: t('hudChrome.bank.title') });
+    markDialogRoot(el, { label: bankWindowTitle(this.tab) });
     // WHICH element scrolls depends on the viewport (bank_chrome_layout_core.ts):
     // the .bank-scroll region normally, the window itself in the short-phone
     // compact regime. Both are recreated or clamped by a rebuild, so both are
@@ -628,42 +643,16 @@ export class BankWindow {
     const vaultAvailable = this.deps.world().vaultInfo != null;
     if (!vaultAvailable && this.tab === 'vault') this.tab = 'personal';
     el.innerHTML =
-      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle ui-win-sub">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(bankWindowTitle(this.tab))} <span class="panel-subtitle ui-win-sub">${this.tab === 'rewards' ? '' : esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    if (guildAvailable || vaultAvailable) {
-      // The shared WAI-ARIA tab strip (tab_strip_view core + wireTabStrip),
-      // the social/talents idiom. The PERSONAL pane's sections still mount
-      // directly on the window root (wrapping them would disturb the flex
-      // column the bank CSS sizes), so the strip carries no blanket `panelId`;
-      // the GUILD and VAULT panes do build a real role=tabpanel (the guild one
-      // holds a nested tab list of its own, and a lone unwrapped peer would
-      // read as a second unrelated top level to a screen reader). Their
-      // aria-controls are stamped below, once each panel exists.
+    if (this.tab !== 'rewards' && (guildAvailable || vaultAvailable)) {
       el.insertAdjacentHTML(
         'beforeend',
-        tabStripHtml(
-          tabStripModel({
-            ariaLabel: t('hudChrome.bank.tabsAria'),
-            stripClass: 'bank-tabs ui-tabs',
-            tabClass: 'bank-tab ui-tab',
-            selectedClass: 'on is-on',
-            tabs: [
-              { id: 'personal', label: t('hudChrome.bank.personalTab') },
-              // The two conditional tabs carry stable button ids so their
-              // panels can point aria-labelledby back at them. The vault sits
-              // between Personal and Guild: both personal stores first, the
-              // shared one last.
-              ...(vaultAvailable
-                ? [{ id: 'vault', label: t('hudChrome.bank.vaultTab'), buttonId: VAULT_TAB_ID }]
-                : []),
-              ...(guildAvailable
-                ? [{ id: 'guild', label: t('hudChrome.bank.guildTab'), buttonId: GUILD_TAB_ID }]
-                : []),
-            ],
-            selected: this.tab,
-          }),
-        ),
+        bankTabsHtml(this.tab, {
+          guild: guildAvailable,
+          vault: vaultAvailable,
+        }),
       );
       wireTabStrip(el, 'bank-tab', (id, focusFollow) => {
         if (id !== 'personal' && id !== 'guild' && id !== 'vault') return;
@@ -682,6 +671,12 @@ export class BankWindow {
     // the pane onto another tab, where its firing would rebuild the whole
     // window for a line nobody can see.
     if (this.tab !== 'vault') this.vaultPane.pauseStatusTimer();
+    if (this.tab === 'rewards') {
+      this.weeklyPane.renderInto(el);
+      this.restoreScroll(el, prevScroll);
+      if (hadFocus) this.restoreControlFocus(el, focusKey);
+      return;
+    }
     if (this.tab === 'vault') {
       this.vaultPane.renderInto(el, this.vaultPane.model());
       // Close the tab/panel relationship now that the panel exists (the guild
@@ -813,6 +808,14 @@ export class BankWindow {
   // player walks away from the banker (the mirror goes null past BANKER_RANGE).
   refreshIfChanged(): void {
     if (!this.opened) return;
+    if (this.tab === 'rewards') {
+      if (
+        !this.weeklyPane.refreshIfChanged(() => this.render()) &&
+        performance.now() - this.openedAt > BANK_INFO_GRACE_MS
+      )
+        this.close();
+      return;
+    }
     const info = this.deps.world().bankInfo;
     if (!info) {
       if (performance.now() - this.openedAt > BANK_INFO_GRACE_MS) this.close();

@@ -179,6 +179,7 @@ import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu
 import { bagSlotsLineKey, bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
+import { makeBankWindowFocus } from './bank_window_focus';
 import {
   type BannerClass,
   type BannerEnqueueOutcome,
@@ -3374,10 +3375,8 @@ export class Hud {
       (el.id === 'vendor-window' || el.id === 'bags')
     )
       return;
-    // The bank docks its bags companion the same way the vendor does (a fixed
-    // side-by-side cluster driven by body.bank-open, mobile-paired 50/50); baking a
-    // cascade-offset inline position onto either half would defeat that layout (the
-    // inline inset beats the docking CSS), so skip the cascade for the bank cluster.
+    // Fixed vault and bank layouts must not inherit cascaded window positions.
+    if (el.id === 'bank-window' && document.body.classList.contains('weekly-vault-open')) return;
     if (
       document.body.classList.contains('bank-open') &&
       (el.id === 'bank-window' || el.id === 'bags')
@@ -5383,15 +5382,9 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows(['#bank-window', '#bags']),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
-    // Non-trapping focus capture/return (bank is a non-modal companion of bags):
-    // NOT windowFocus('#bank-window'), which would install a Tab trap.
-    captureFocus: () => this.focusManager.activeFocusable(),
-    restoreFocus: (target) => this.focusManager.restore(target),
+    ...makeBankWindowFocus(this.focusManager, () => $('#bank-window')),
     onClosed: () => this.onBankClosed(),
-    // A bank op (withdraw / deposit-all / buy-slots) moved inventory or coin: repaint
-    // the bags companion (and vendor/char if open) through the same coordinator the
-    // online inventory-delta path calls. Offline this is the ONLY repaint; online the
-    // snapshot echo repaints again authoritatively.
+    // Repaint inventory through the same coordinator as authoritative snapshots.
     onInventoryChanged: () => this.onInventoryChanged(),
   });
   // Book of Deeds window painter (deeds_view.ts core + deeds_window.ts
@@ -12315,8 +12308,8 @@ export class Hud {
           this.openMailbox();
           break;
         case 'bank':
-          // Keyboard/sim interact at a banker NPC: open the bank window.
-          this.openBank();
+        case 'weekly_rewards':
+          this.openBank(ev.type === 'weekly_rewards' ? 'rewards' : undefined);
           break;
         case 'riftForge':
           // Interact at the Riftwright: open the Rift Forge window (which
@@ -15874,17 +15867,20 @@ export class Hud {
   // class drives the side-by-side desktop layout, and the bags window is force-opened
   // so items can be withdrawn into it. closeBank routes through the painter (which
   // fires onClosed) so focus returns to the opener (WCAG 2.4.3).
-  openBank(): void {
-    // The bags companion is exclusive: every hub has a vendor within simultaneous
-    // interact range of its banker, and vendor-open + bank-open together overlap
-    // the two windows on the same side of #bags (and on mobile the cluster-close
-    // precedence would strand the bank at half-width with its x-btn hidden).
+  openBank(tab?: 'rewards'): void {
+    // Weekly rewards own the screen; ordinary bank storage keeps its bags companion.
     if (this.vendorOpen) this.closeVendor();
-    // The heroic marks shop is a second tenant of #vendor-window that nulls
-    // openVendorNpcId, so the vendorOpen guard above never sees it.
     if (this.openHeroicVendorNpcId !== null) this.closeHeroicVendor();
-    document.body.classList.add('bank-open');
-    this.bankWindow.open();
+    if (
+      this.bankWindow.isOpen &&
+      document.body.classList.contains('weekly-vault-open') !== (tab === 'rewards')
+    )
+      this.closeBank();
+    if (tab === 'rewards') this.bagsWindow.close();
+    document.body.classList.toggle('weekly-vault-open', tab === 'rewards');
+    document.body.classList.toggle('bank-open', tab !== 'rewards');
+    this.bankWindow.open(tab);
+    if (tab === 'rewards') return;
     this.renderBags();
     $('#bags').style.display = 'flex';
   }
@@ -15896,7 +15892,7 @@ export class Hud {
   private onBankClosed(): void {
     const closeMobileBags =
       document.body.classList.contains('mobile-touch') && $('#bags').style.display !== 'none';
-    document.body.classList.remove('bank-open'); // bags (if still open) re-centres
+    document.body.classList.remove('bank-open', 'weekly-vault-open');
     if (closeMobileBags) {
       // Mirror closeVendor's teardown backstop: a discard/sell/deposit prompt may hold
       // #bags inert (installPromptDialog) and this mobile path hides the grid without
@@ -16144,6 +16140,7 @@ export class Hud {
       this.syncCharBagsPairing();
       return;
     }
+    if (document.body.classList.contains('weekly-vault-open')) this.closeBank();
     this.closeOtherWindows('#bags');
     // Record the opener (the minimap bag button / keybind focus) for the focus return.
     this.bagsWindow.noteOpener();

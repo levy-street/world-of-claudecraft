@@ -118,6 +118,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.bankInfo = null;
   c.bankPurchasedSlots = null;
   c.vaultInfo = null;
+  c.weeklyRewardInfo = null;
   c.craftVaultStock = null;
   c.deedsEarned = new Map();
   c.deedStats = freshDeedStats();

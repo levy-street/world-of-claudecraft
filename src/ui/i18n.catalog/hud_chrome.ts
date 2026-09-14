@@ -9,8 +9,10 @@
 
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 import { cosmeticsStrings } from './cosmetics';
+import { weeklyRewardStrings } from './weekly_rewards';
 
 export const hudChromeStrings = {
+  weeklyRewards: weeklyRewardStrings,
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
   warlock: {
     doomLabel: 'Condemnation',

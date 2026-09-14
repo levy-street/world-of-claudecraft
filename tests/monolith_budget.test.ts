@@ -1024,7 +1024,8 @@ const MONOLITHS: MonolithRow[] = [
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 11879,
+    // Lowered after extracting character storage / bank wire boundaries for Weekly Vault.
+    ceiling: 11870,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1438,7 +1439,8 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 10095,
+    // Lowered by the guild/weekly bank snapshot emitter extraction.
+    ceiling: 10092,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1581,7 +1583,8 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // Lowered after extracting character storage / bank wire boundaries for Weekly Vault.
+    ceiling: 5531,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2082,6 +2085,7 @@ const MONOLITHS: MonolithRow[] = [
     // exact `wc -l < src/ui/bank_window.ts` measurement on the resolved tree.
     // RE-CONFIRMED at the final line-budget reconciliation: still 1810,
     // below both parent pins. Exact merged count, zero slack.
+    // Held by extracting the pane tab model and markup to bank_tabs_view.
     ceiling: 1810,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },

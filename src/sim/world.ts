@@ -33,6 +33,7 @@ import { dockSurfaceHeight } from './deck_surfaces';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import { eastbrookDeckSurface } from './eastbrook_harbor';
+import { applyEastbrookVaultPad } from './eastbrook_vault_terrain';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -41,7 +42,7 @@ import {
   emberNearestOnLink,
 } from './ember_lava_layout';
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
-import { KEEP_SITE, keepSitePadWeight } from './keep_site';
+import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import {
@@ -2537,15 +2538,6 @@ function applyEmberLavaBasins(x: number, z: number, h: number): number {
   return out;
 }
 
-// The Last Keep's SITE pad on the Trollmoot rise: one level build floor
-// with a gentle skirt back onto the rise (the castle that held the old
-// terraced grounds is gone; the plan lives in keep_site.ts).
-function applyKeepSitePad(x: number, z: number, h: number): number {
-  const w = keepSitePadWeight(x, z);
-  if (w <= 0) return h;
-  return h + (KEEP_SITE.pad.h - h) * w;
-}
-
 // (The Last Spring's authored shore bank retired with the castle pad: the
 // steep face it graded was the hollow the pad's own pool yield opened, and
 // the natural apron the pool keeps without a pad behind it never had one.
@@ -3927,6 +3919,7 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
   // the rise sits near the west shore shelf; the build floor must win
   // everywhere inside its rect).
   h = applyKeepSitePad(x, z, h);
+  h = applyEastbrookVaultPad(x, z, seed, h, terrainHeightUnpadded, calmForce === null);
   // The Palmreach jungle-pool walkway's bed, over the FINISHED height: the
   // deck surfaces the movement kernel walks are anchored to this function, so
   // the rim the planks cover and the sand they land on have to be shaped here,

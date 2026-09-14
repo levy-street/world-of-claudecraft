@@ -19448,4 +19448,206 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  /* ---------- weekly rewards ---------- */
+  body.weekly-vault-open #bank-window {
+    left: calc(var(--app-vw, 100vw) * 0.04 / var(--window-scale));
+    top: calc(var(--app-vh, 100vh) * 0.04 / var(--window-scale));
+    right: auto;
+    bottom: auto;
+    width: calc(var(--app-vw, 100vw) * 0.92 / var(--window-scale));
+    height: calc(var(--app-vh, 100vh) * 0.9 / var(--window-scale));
+    max-width: none;
+    max-height: none;
+    transform: none;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-color: var(--color-border-focus);
+  }
+  .weekly-tracks {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: 12px;
+    flex: none;
+  }
+  @media (max-width: 1100px) {
+    .weekly-tracks {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 600px) {
+    .weekly-tracks {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .weekly-choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 8px;
+    flex: none;
+  }
+  .weekly-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px;
+    white-space: normal;
+    min-height: 140px;
+    height: auto;
+  }
+  .weekly-choice img {
+    width: 40px;
+    height: 40px;
+  }
+  .weekly-choice span {
+    font-size: 12px;
+  }
+  .weekly-choice[aria-pressed="true"] {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  .weekly-choice.quality-epic {
+    border-top: 3px solid var(--color-quality-epic);
+  }
+  .weekly-choice.quality-rare {
+    border-top: 3px solid var(--color-quality-rare);
+  }
+  .weekly-confirm {
+    min-height: 44px;
+    flex: none;
+  }
+  .weekly-rewards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+    padding: 12px;
+    overflow: auto;
+  }
+  .weekly-rewards-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .weekly-rewards-header > div:first-child {
+    flex: 1 1 360px;
+  }
+  .weekly-rewards h2,
+  .weekly-rewards h3,
+  .weekly-rewards p {
+    margin: 0;
+  }
+  .weekly-rewards h2 {
+    font-size: 26px;
+    color: var(--gold);
+  }
+  .weekly-rewards p {
+    line-height: 1.5;
+    color: var(--color-text-light);
+  }
+  .weekly-reset {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    border: 1px solid var(--color-border-focus);
+    text-align: center;
+  }
+  .weekly-reset strong {
+    font-size: 21px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-on-tab-on);
+  }
+  .weekly-track {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    flex: none;
+  }
+  .weekly-track-heading,
+  .weekly-milestones,
+  .weekly-pool-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .weekly-track-heading h3 {
+    font-size: 17px;
+  }
+  .weekly-milestones {
+    justify-content: flex-start;
+  }
+  .weekly-earned {
+    color: var(--color-text-success);
+    border-color: var(--color-text-success);
+  }
+  .weekly-pool {
+    border-top: 1px solid var(--color-border-default);
+    padding-top: 8px;
+  }
+  .weekly-pool summary {
+    cursor: pointer;
+    min-height: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+  }
+  .weekly-pool summary strong {
+    flex: 1 1 100%;
+  }
+  .weekly-pool summary:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .weekly-pool-actions .ui-btn {
+    min-height: 40px;
+  }
+  .weekly-loot-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .weekly-loot {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    text-align: left;
+    min-height: 44px;
+    white-space: normal;
+  }
+  .weekly-loot img {
+    width: 32px;
+    height: 32px;
+    flex: none;
+  }
+  .weekly-loot.quality-rare {
+    border-left: 3px solid var(--color-quality-rare);
+  }
+  .weekly-loot.quality-epic {
+    border-left: 3px solid var(--color-quality-epic);
+  }
+  .weekly-unavailable {
+    font-style: italic;
+  }
+  .weekly-progress,
+  .weekly-milestone {
+    padding: 4px 7px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .weekly-loot .item-icon {
+    width: 32px;
+    height: 32px;
+    flex: none;
+  }
 }

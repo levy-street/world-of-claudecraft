@@ -134,6 +134,7 @@ const CORPUS_SECTIONS = new Set(sectionNames(CORPUS));
 // tooltip is shared via hud.css and the windows via components.css / layout.css, all of
 // which play loads). play's set is a subset of index's, so this is the union.
 const INDEX_SECTIONS = [
+  'weekly rewards',
   'UI chrome icons (inline SVG from ui_icons.ts, tinted via currentColor)',
   'nameplates',
   'chat bubbles (/say, /yell)',
@@ -225,11 +226,11 @@ const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
   it('pins a non-vacuous manifest: 71 index + 69 play sections, no duplicate names', () => {
-    expect(INDEX_SECTIONS.length).toBe(71);
-    expect(PLAY_SECTIONS.length).toBe(69);
-    expect(MANIFEST.length).toBe(71);
-    expect(new Set(INDEX_SECTIONS).size).toBe(71);
-    expect(new Set(PLAY_SECTIONS).size).toBe(69);
+    expect(INDEX_SECTIONS.length).toBe(72);
+    expect(PLAY_SECTIONS.length).toBe(70);
+    expect(MANIFEST.length).toBe(72);
+    expect(new Set(INDEX_SECTIONS).size).toBe(72);
+    expect(new Set(PLAY_SECTIONS).size).toBe(70);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

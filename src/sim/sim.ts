@@ -35,17 +35,12 @@ import {
   migrationBagsFor,
 } from './bags';
 import * as bankMod from './bank';
-import {
-  applyBankBonusStamp,
-  type BankState,
-  emptyBankState,
-  sanitizeBankState,
-  savedBankState,
-} from './bank';
+import { applyBankBonusStamp, type BankState, emptyBankState } from './bank';
 import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
+import { restoreCharacterStorage, savedCharacterStorage } from './character_storage';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 
 export type { CharacterState, PetState } from './character_state';
@@ -685,6 +680,7 @@ import { updateAbilityDrill } from './tutorial/ability_drill';
 import { updateGauntletRuns } from './tutorial/gauntlet_run';
 import { updateTutorialGreeting } from './tutorial/greeting';
 import * as unstuckMod from './unstuck';
+import * as weeklyMod from './weekly_rewards';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
   scaleWorldBossHp,
@@ -1429,6 +1425,7 @@ export interface PlayerMeta {
   // The per-character Materials Vault: a count per material id with a gold-bought
   // per-material ceiling. Capacity and move math live in materials_vault.ts.
   // Persisted (inside the character save, exactly like inventory/bags/bank).
+  weeklyRewards?: weeklyMod.WeeklyRewardState;
   vault: MaterialsVaultState;
   // Runtime-only change signals for the owner-only bank/vault wires (bumped by
   // every write to meta.bank state / vault state respectively); never persisted.
@@ -2456,6 +2453,7 @@ export class Sim {
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
 
+    weeklyMod.spawnWeeklyKeeper(this.ctx, worldContent.npcs[weeklyMod.WEEKLY_KEEPER_ID]);
     // FURY uses a reserved id and spawns after the rng-driven world roster, so
     // the Honor Quartermaster cannot perturb existing entity ids or replay RNG.
     {
@@ -3270,15 +3268,7 @@ export class Sim {
           slot.count = 1;
         return normalizeLoadedMaterialSlot(slot);
       });
-      // Bank sanitizes on load (never destroys items; a pre-bank save sanitizes to
-      // an empty bank; see bank.ts sanitizeBankState). Deliberately NO wire-rev bump
-      // here, unlike the vault install below: bankInfoWireRevFor is banker-gated and
-      // a load always pairs with an empty lastSent, so a fresh session resends anyway.
-      meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
-      // The Materials Vault sanitizes on load too (never destroys stock; a pre-vault
-      // save sanitizes to the empty locked vault): restoreVaultStateOnLoad owns the
-      // whole-record replacement AND its vaultWireRev bump (the rationale sits there).
-      vaultMod.restoreVaultStateOnLoad(meta, s.vault, droppedInstanceJunk, player.id);
+      restoreCharacterStorage(meta, s, droppedInstanceJunk, player.id);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       let questRevReset = false;
       for (const q of s.questLog) {
@@ -4144,12 +4134,7 @@ export class Sim {
           cloneItemInstancePayload(inst),
         ]),
       ),
-      inventory: meta.inventory.map(cloneInvSlot),
-      bags: [...meta.bags],
-      bank: savedBankState(meta.bank),
-      // Hand-enumerated clone: tsc forces a new REQUIRED MaterialsVaultState field
-      // to appear here, but an optional one would compile unpersisted; add it by hand.
-      vault: vaultMod.savedVaultState(meta.vault),
+      ...savedCharacterStorage(meta),
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
@@ -9195,8 +9180,8 @@ export class Sim {
       this.error(meta.entityId, "You can't do that while dead.");
       return;
     }
-    // Book of Deeds: chronicler talks feed their visited mark; talking to any
-    // other NPC resets the Saul consecutive-talk counter.
+    if (weeklyMod.talkToWeeklyKeeper(this.ctx, npc, p)) return;
+    // NPC conversations feed the deeds ledger.
     deedsMod.onNpcTalkedForDeeds(this.ctx, meta, npc.templateId);
     if (this.interactNpcForQuests(npc, meta)) return;
     for (const qid of npc.questIds) {
@@ -10965,6 +10950,12 @@ export class Sim {
     return this.primaryId === -1 ? null : this.bankInfoFor(this.primaryId);
   }
 
+  get weeklyRewardInfo(): weeklyMod.WeeklyRewardInfo | null {
+    return weeklyMod.weeklyRewardInfoFor(this.ctx, this.primaryId);
+  }
+  claimWeeklyReward(pool: string, pid?: number, token?: string): void {
+    weeklyMod.claimWeeklyReward(this.ctx, pool, pid, token);
+  }
   get vaultInfo(): import('../world_api').VaultInfo | null {
     return this.primaryId === -1 ? null : this.vaultInfoFor(this.primaryId);
   }

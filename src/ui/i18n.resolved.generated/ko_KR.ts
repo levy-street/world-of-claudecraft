@@ -326,6 +326,49 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "weeklyRewards": {
+      "title": "The Weekly Vault",
+      "tab": "Weekly Rewards",
+      "intro": "Unlock choices this week. After the Crucible reset, choose one item across all activities. Unclaimed weeks stay available.",
+      "approachKeeper": "Stand near the Vault Keeper to view your weekly rewards.",
+      "nextReset": "Crucible weekly reset",
+      "countdown": "{days}d {hours}h {minutes}m {seconds}s",
+      "progress": "{count} / {max}",
+      "milestone": "{count} completed: {choices} choices",
+      "earned": "Next reset: {count} choices",
+      "readyWeeks": "Unclaimed weeks: {count}. Oldest choices shown below.",
+      "waiting": "No rewards ready yet. This week's choices unlock at the next reset.",
+      "chooseOne": "Choose carefully: taking one item gives up every other choice for that week.",
+      "itemLevel": "Item level {level}",
+      "backlogFull": "Your saved weeks are full. Collect rewards to make room for future weeks.",
+      "claim": "Take selected item",
+      "poolSize": "View {count} items",
+      "poolRule": "Every listed item has an equal chance. Items match your class restrictions. Defeated raids unlock their loot at that difficulty. Legendary items are excluded.",
+      "rare": "Rare",
+      "epic": "Epic",
+      "unavailable": "Not yet available",
+      "worldUnavailable": "World quest rewards will become available when rotating world quests arrive.",
+      "category": {
+        "raid": "Raids",
+        "dungeon": "Dungeons",
+        "world": "World Quests",
+        "pvp": "PvP"
+      },
+      "task": {
+        "raid": "Defeat different raid encounters. Each encounter counts once; a Heroic clear upgrades its credit.",
+        "dungeon": "Complete dungeons. Your best clears determine the reward difficulty at each milestone.",
+        "world": "Complete rotating world quests. Story quests do not count.",
+        "pvp": "Win ranked arena or rated battleground matches. Practice matches and forfeits do not count."
+      },
+      "pool": {
+        "raid": "Normal raid loot",
+        "raid_heroic": "Heroic raid loot",
+        "dungeon": "Normal dungeon loot",
+        "dungeon_heroic": "Heroic dungeon loot",
+        "world": "World quest loot",
+        "pvp": "WARFARE equipment"
+      }
+    },
     "materialStackSelectionUnavailable": "해당 재료 선택을 더 이상 사용할 수 없습니다.",
     "warlock": {
       "doomLabel": "단죄",
@@ -17252,6 +17295,11 @@ export const ko_KR: EnTranslations = {
         "name": "출납관 페르난도",
         "title": "도금 금고",
         "greeting": "도금 금고에 오신 것을 환영합니다. 당신의 물건은 우리의 자물쇠 뒤에서 안전하게 보관됩니다."
+      },
+      "eastbrook_vault_keeper": {
+        "name": "Vault Keeper",
+        "title": "Weekly Rewards",
+        "greeting": "Your weekly rewards await. Choose one item from your earned choices after the Crucible reset."
       },
       "card_master": {
         "name": "카드 마스터",
