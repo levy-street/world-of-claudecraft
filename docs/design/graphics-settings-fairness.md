@@ -489,6 +489,44 @@ player acts on, but the tree one deserves its reasoning written down rather than
   surviving leaf fragment, 0 below ultra, 3 on ultra (the AO half), 6 on insane. Fragment shading
   only, no displacement and no silhouette change, so it cannot move what a canopy occludes.
 
+### The Render Quality slider boots lower on weak integrated GPUs (2026-09-14)
+
+On the LOW preset, a machine whose adapter string the one shared classifier
+(`classifyGpuRenderer` in `src/render/gfx.ts`) names `weak` (the named Intel HD 5xx / 6xx,
+Iris Plus 6xx and UHD 6xx parts plus its old-integrated arm, the HD 4xxx generation) boots with
+the Render Quality slider at
+`WEAK_GPU_LOW_RENDER_SCALE` (`src/game/render_scale_default_core.ts`) instead of 1.0, when the
+player has never moved that slider. The knob is the pixel count of the drawing buffer, which is
+cosmetic sharpness only: nothing a player acts on is hidden, delayed, or drawn coarser in
+INFORMATION (nameplates, cast bars, HP, positions all render at the same logical size), so it
+sits on the same side of the line as the DPR cap and MSAA the constrained profile already sheds.
+
+The shape matters for fairness as much as the value:
+
+- It is a DEFAULT of the existing slider, never a runtime lever. The value is decided once at
+  boot (`src/game/boot_graphics_defaults.ts`) from the static adapter class and the stored
+  preset; the FPS governor is never read (the core is a registered `UI_PURE_CORE` and imports
+  nothing). On this GPU class a render-scale reallocation is a 20 to 160 ms stall every time,
+  priced per reallocation rather than per pixel, so a runtime rung would trade fill for hitches.
+- The value is the low preset's own desktop governor floor (`GFX_BUDGETS.low.minRenderScaleDesktop`),
+  a number the preset already declared acceptable to render at. One number, not two. It spends
+  no lever the governor could have used: on low the governor's resolution rung is already closed
+  (low renders direct to the drawing buffer, and `dynamicResolutionGovernorRange` in
+  `src/render/dynamic_resolution_core.ts` collapses the rung when no composer target backs it),
+  so the density rungs it does own behave exactly as before.
+- The fleet can tell the cohort apart by version: the perf report carries `graphicsConfigVersion`
+  (22 from this change) beside `render_scale`, but not the touched flag, so a v22 low-tier report
+  at this value on a weak family is the default or a slider set to it, while every earlier
+  low-tier report below 1.0 was the slider.
+- The player's choice always wins. The slider commit stamps `renderScaleTouched`
+  (`src/game/settings.ts`), and a touched slider is never re-defaulted in either direction. An
+  install that predates the flag infers it once from the stored value (a non-stock value can only
+  have come from the slider); a stored 1.0 is treated as untouched exactly once, and one commit
+  makes it a choice for good. Reset to Defaults clears the flag with the value, so the device
+  default returns at the next boot, the same shape as `graphicsDefaultApplied`.
+- Nothing changes for any other machine or preset: the mid integrated class (Iris Xe, the Radeon
+  iGPUs), discrete GPUs, software rasterizers and masked adapters keep the stock 1.0.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -502,6 +540,14 @@ player acts on, but the tree one deserves its reasoning written down rather than
   governor; a source-scan pins that party frames are not tiered.
 - `tests/architecture.test.ts`: `ui_tier_knobs.ts` is a registered UI_PURE_CORE (no governor,
   DOM, or render import).
+- `tests/render_scale_default.test.ts`: the weak-GPU Render Quality default. The value is
+  literal-pinned, equal to the low preset's desktop governor floor and inside the slider range;
+  the decision table applies ONLY to weak class + LOW + an untouched slider and never overrides
+  a touched one; the pre-flag migration counts only a non-stock stored value as touched; the
+  applier keys on the one shared adapter classifier; the core imports nothing and reads no
+  governor or clock; the slider commit stamps the flag and main.ts applies the default once the
+  preset is final. `tests/architecture.test.ts` registers `render_scale_default_core.ts` as a
+  UI_PURE_CORE.
 - `tests/tinted_material.test.ts`: an active outfit colorway renders as a genuinely different
   colour on low tier too (never the atlas's undyed default), the low-tier fallback is
   value-normalized so it cannot crush the whole armour toward black the way a naive multiply

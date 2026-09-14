@@ -993,6 +993,13 @@ describe('graphics tier resolution', () => {
     expect(classifyGpuRenderer('Mali-G52')).toBe('weak');
     // older Intel UHD desktop iGPU stays weak; the modern UHD 7xx desktop part is mid
     expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11)')).toBe('weak');
+    // the Skylake HD 530 the low-preset render-scale default was measured on (the
+    // named weak-integrated list) and the Haswell HD 4xxx generation below it (the
+    // old-integrated arm, a fleet family of its own) both land on the weak class
+    // the boot render-scale default keys on (src/game/boot_graphics_defaults.ts)
+    expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) HD Graphics 530 Direct3D11)')).toBe('weak');
+    expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) HD Graphics 4400 Direct3D11)')).toBe('weak');
+    expect(classifyGpuRenderer('Intel(R) HD Graphics 4000')).toBe('weak');
     expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) UHD Graphics 770)')).toBe('midIntegrated');
     // newer integrated + mid mobile -> their own buckets (the MEDIUM path)
     expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) Iris(R) Xe Graphics)')).toBe(

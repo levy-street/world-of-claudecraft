@@ -211,13 +211,17 @@ describe('gfx override application', () => {
     // (the post-processing shed, post_shed_core.ts): every profile gains the
     // band record in bucketBands and its baseline of 1 in bucketBaselines;
     // no pre-existing value moves.
+    // Regenerated across the board for GFX_CONFIG_VERSION 21 -> 22 (the
+    // weak-GPU Render Quality boot default, render_scale_default_core.ts):
+    // only the serialized graphicsConfigVersion VALUE moves on every row, so
+    // the fleet can tell a defaulted low-tier render_scale from the slider.
     expect(hashes).toEqual({
-      low: '7dc57596b0820d548a826592de1bffd69d9ba2ce0af78048c524f4ac663c3686',
-      medium: 'fb9c5c7cdd877d7fba34c05e99823e8e7af0bb128a88e1544ed29965565fcbe4',
-      high: '6e28cce36902fa461b0d459a95a1fd13763d838beb31887f3c15a8557b0e5e31',
-      ultra: '596161ef604ac83a31cb6ebc71c35146ff84d766255798de5079a204b35d712b',
-      insane: '498703d3245f7069597541e4f957c8005c3b28c5dd12a169be903808be4dea0a',
-      advanced: '4e785a654eac0e113bdb8b52a4e08964186011b5b3fe40cde235b7d0cd0af9ac',
+      low: '62ceb4524c000284f888d8d6b87b87261d4f516882c0149ec00762e22cb68603',
+      medium: 'fa61002587b60ecef3268ab6aedd84366d13722ef8c3f523da61337f654d5dd1',
+      high: '9ff194227d01537b9503a5581d2c01f35a4175f807b1afe9a97ec4d43439db09',
+      ultra: '9030ab2664b84c62990322ace49393e03346b8758c95a5de6ec8ae43fa99a735',
+      insane: 'c1bdc70c28dbbb9b0b481ef1951962205425aa6b2269309a41444749b3344561',
+      advanced: '11b8188f765e2ee81924a4f275cc2ee6c1e00828c2dca205e2f2ae6e7acf8b24',
     });
   });
 

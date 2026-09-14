@@ -72,7 +72,13 @@ export function gfxTierAtLeast(tier: GfxTier, floor: GfxTier): boolean {
 // water / character detail) join the derived profile: vistaTier and waterTier
 // become explicit settings fields and the post-chain per-effect flags follow
 // the dials rather than the effectsQuality bundle alone.
-export const GFX_CONFIG_VERSION = 21;
+// v22: the Render Quality slider boots at WEAK_GPU_LOW_RENDER_SCALE on a
+// recognised weak integrated GPU at LOW when the player never moved it
+// (src/game/render_scale_default_core.ts). The report does not carry the
+// touched flag, so a v22 low-tier row at that scale on a weak family is the
+// default or a slider set to it; on v21 and earlier every low-tier
+// render_scale below 1.0 was the slider.
+export const GFX_CONFIG_VERSION = 22;
 
 export const GFX_BUCKET_IDS = [
   'resolution',

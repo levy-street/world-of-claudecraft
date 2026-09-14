@@ -23,6 +23,10 @@ import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
 import { shouldRouteInteractToBgFlag } from './game/bg_flag_interact';
 import {
+  applyBootRenderScaleDefault,
+  applyFirstRunGraphicsPreset,
+} from './game/boot_graphics_defaults';
+import {
   BROWSER_BODY_CLASSES,
   browserBodyClasses,
   cssEffectsTier,
@@ -354,7 +358,6 @@ import { installWebGLContextRelease } from './render/context_release';
 import {
   activateGfxProfile,
   captureGfxCapabilities,
-  firstRunGraphicsPreset,
   GFX,
   getActiveGfxProfile,
   graphicsPresetLabel,
@@ -1183,22 +1186,10 @@ async function startGame(
   // sim, so a stored player preference must be re-pushed on every world entry
   // (offline sim or online server), not just when the Options toggle changes.
   world.setStopAutoAttackOnTargetSwitch(settings.get('stopAutoAttackOnTargetSwitch'));
-  // First-run graphics default: until a device default has been applied (the dedicated
-  // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
-  // any unrelated setting is stored), probe the device (GPU name, memory, cores, touch) and
-  // PERSIST a device-appropriate preset over the medium default, BEFORE the effects applier and
-  // renderer read it, so the 3D tier, the data-fx-level cadence (nameplates), and the options UI
-  // all agree. A static one-shot probe (resolveDefaultGraphicsPreset), never the FPS governor.
-  // A masked/inconclusive device resolves to medium and returns null, so it stays on
-  // the medium default and re-detects next boot; only a CONCLUSIVE result is persisted + marked.
-  // An explicit player choice is never overridden: a recognized device is marked applied on its
-  // first boot so it never re-detects, and an inconclusive device returns null so it never
-  // overwrites a stored preset.
-  const autoPreset = firstRunGraphicsPreset(settings.get('graphicsDefaultApplied'));
-  if (autoPreset !== null) {
-    settings.set('graphicsPreset', autoPreset);
-    settings.set('graphicsDefaultApplied', true);
-  }
+  // First-run graphics default (game/boot_graphics_defaults.ts): a static one-shot
+  // device probe persisted BEFORE the effects applier and renderer read the preset,
+  // so the 3D tier, the data-fx-level cadence and the options UI all agree.
+  applyFirstRunGraphicsPreset(settings);
   // iOS WebKit can terminate the tab's WebContent process during Ultra world
   // startup on recent phones (native app shell AND iOS Safari alike, same
   // engine/process limits), reloading back to the start screen before the
@@ -1215,6 +1206,8 @@ async function startGame(
   if (safePreset !== settings.get('graphicsPreset')) {
     settings.set('graphicsPreset', safePreset);
   }
+  // The Render Quality slider's boot default, once the preset is final for this boot.
+  applyBootRenderScaleDefault(settings);
   let renderer!: Renderer;
   let rendererReady = false;
   // The world and socket stay live, but every client-frame owner pauses while

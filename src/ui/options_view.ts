@@ -85,6 +85,11 @@ export interface SliderControl {
    *  mid-drag (issue 1558); dragging updates only the readout, not the setting.
    *  Other sliders keep their intended live preview (volume, fov, frame scale). */
   commitOnChange?: boolean;
+  /** A bool setting stamped true on every player commit of this slider, so a
+   *  boot-time default can tell a value the player chose from the stock value
+   *  nothing ever moved (renderScale -> renderScaleTouched; the painter narrows
+   *  it to the live settings store). */
+  touchedFlag?: string;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -593,7 +598,9 @@ export function buildGraphicsSections(
   if (env.touch) camera.push(slider(s, 'touchLookSpeed', 'hud.options.touchLookSpeed'));
 
   const display: OptionsControl[] = [
-    slider(s, 'renderScale', 'hud.options.renderQuality'),
+    // The touched stamp lets the weak-GPU boot default (game/boot_graphics_defaults.ts)
+    // re-default only a slider the player never committed.
+    { ...slider(s, 'renderScale', 'hud.options.renderQuality'), touchedFlag: 'renderScaleTouched' },
     slider(s, 'brightness', 'hud.options.brightness'),
     slider(s, 'cameraFov', 'hud.options.fieldOfView', 'degrees', 1),
     // One row, two meanings by host. A desktop shell that owns the window gets

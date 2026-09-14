@@ -3,6 +3,7 @@
 // value to the live subsystem (Input / GameAudio / MusicDirector / Renderer).
 
 import { parseStoredJson } from './local_storage_json';
+import { inferRenderScaleTouched } from './render_scale_default_core';
 
 /** The unit frame's whole-row stock width, mirroring --unit-frame-w in tokens.css. */
 export const UNIT_FRAME_STOCK_WIDTH = 278;
@@ -603,6 +604,16 @@ export const BOOL_SETTINGS = {
   // non-false def would fake "applied" and defeat detection. reset() clears it back to false,
   // so Reset to Defaults re-detects the device default on the next reload.
   graphicsDefaultApplied: { def: false },
+  // internal, never shown in the options UI: set true by the Render Quality slider's
+  // commit (options_window.ts settingSlider), so the boot-time render-scale default
+  // (game/boot_graphics_defaults.ts, render_scale_default_core.ts) can tell a value the
+  // player chose from the stock value nothing ever moved: only an untouched slider is
+  // re-defaulted, and a touched one is never overridden. Absent from storage on an
+  // install that predates the flag: load() infers it ONCE from the stored value
+  // (inferRenderScaleTouched) and save() persists the answer. Resetting renderScale
+  // (any Reset to Defaults that names it) clears the flag with it, so the device default
+  // returns at the next boot, the same shape as graphicsDefaultApplied above.
+  renderScaleTouched: { def: false },
 } as const;
 
 export type NumericSettingKey = keyof typeof SETTING_RANGES;
@@ -635,6 +646,32 @@ function clampNumeric(key: NumericSettingKey, v: number): number {
 function migrateStoredNumeric(key: NumericSettingKey, v: number): number {
   return LEGACY_STOCK_FRAME_WIDTHS[key] === v ? SETTING_RANGES[key].def : v;
 }
+
+/**
+ * Bool keys whose MISSING stored value (a pre-flag install) is inferred from the
+ * rest of the blob rather than a constant; load-time only, and exactly once,
+ * because save() persists the inferred answer with the next write. Each rule
+ * sees the raw blob (to tell absent from present) and the already-loaded numeric
+ * values (clamped and migrated, so an out-of-range stored number that loads as
+ * the stock value reads as the stock value here too).
+ */
+const INFERRED_BOOL_DEFAULTS: Partial<
+  Record<
+    BoolSettingKey,
+    (raw: Record<string, unknown>, loaded: { [K in NumericSettingKey]: number }) => boolean
+  >
+> = {
+  renderScaleTouched: (raw, loaded) =>
+    inferRenderScaleTouched(
+      typeof raw.renderScale === 'number' ? loaded.renderScale : undefined,
+      SETTING_RANGES.renderScale.def,
+    ),
+};
+
+/** Bool flags that describe a numeric key and reset with it (see renderScaleTouched). */
+const LINKED_RESET_FLAGS: Partial<Record<NumericSettingKey, BoolSettingKey>> = {
+  renderScale: 'renderScaleTouched',
+};
 
 function defaultTouchInterface(): boolean {
   try {
@@ -694,7 +731,10 @@ export class Settings {
     }
     for (const key of BOOL_KEYS) {
       const v = raw[key];
-      out[key] = typeof v === 'boolean' ? v : defaultBoolSetting(key, out);
+      out[key] =
+        typeof v === 'boolean'
+          ? v
+          : (INFERRED_BOOL_DEFAULTS[key]?.(raw, out) ?? defaultBoolSetting(key, out));
     }
     return out;
   }
@@ -794,7 +834,10 @@ export class Settings {
         const boolKey = key as BoolSettingKey;
         this.values[boolKey] = defaultBoolSetting(boolKey, this.values);
       } else if ((NUMERIC_KEYS as readonly string[]).includes(key as string)) {
-        this.values[key as NumericSettingKey] = SETTING_RANGES[key as NumericSettingKey].def;
+        const numericKey = key as NumericSettingKey;
+        this.values[numericKey] = SETTING_RANGES[numericKey].def;
+        const linkedFlag = LINKED_RESET_FLAGS[numericKey];
+        if (linkedFlag) this.values[linkedFlag] = BOOL_SETTINGS[linkedFlag].def;
       }
     }
     this.save();

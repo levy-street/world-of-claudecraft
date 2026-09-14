@@ -809,6 +809,8 @@ export class OptionsWindow {
     paintFill();
     // Commit the setting (from the raw slider value), then sync the readout + fill.
     const commit = () => {
+      // The player, not a boot apply or a reset, moved this slider (options_view touchedFlag).
+      if (c.touchedFlag) hooks.settings.set(c.touchedFlag as BoolSettingKey, true);
       hooks.onSettingChange(key, sliderDispatchValue(slider.value));
       syncReadout();
       paintFill();
