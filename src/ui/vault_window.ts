@@ -1,3 +1,4 @@
+import { lootQualityBadgeHtml } from './loot_quality_view';
 // The Materials Vault tab of the bank window: the third pane BankWindow
 // composes, the GuildBankTab shape (a pane class with model() + renderInto(),
 // never mounted on its own and never owning a repaint decision: BankWindow's
@@ -381,6 +382,7 @@ export class VaultTab {
         : '';
     row.innerHTML =
       `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(itemId)}` +
+      lootQualityBadgeHtml(model.kind === 'special' ? model.instance : undefined) +
       cornerMarkHtml(cornerMark) +
       lockMarkHtml(locked) +
       `<span class="vault-row-name">${esc(name)}</span>` +

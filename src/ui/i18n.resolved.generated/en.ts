@@ -3433,6 +3433,15 @@ export const en: EnTranslations = {
         "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
       }
     },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+    },
     "itemTooltip": {
       "requiresLevel": "Requires Level {level}",
       "riftTier": "{tier}-rank Rift item",

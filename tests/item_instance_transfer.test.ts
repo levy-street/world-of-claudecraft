@@ -96,9 +96,20 @@ describe('publicInstanceView: the display trim', () => {
     // pin) and assert this module projects the identical key set. `name`
     // joined both sites together (Masterwrought phase 13); the ban list below
     // still holds every non-cosmetic field out by name.
-    const game = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    const game = readFileSync(
+      new URL('../server/equipped_instance_wire.ts', import.meta.url),
+      'utf8',
+    );
     const projected = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)].map((m) => m[1]);
-    expect(projected.sort()).toEqual(['enchant', 'name', 'perfected', 'rift', 'rolled', 'signer']);
+    expect(projected.sort()).toEqual([
+      'enchant',
+      'lootQuality',
+      'name',
+      'perfected',
+      'rift',
+      'rolled',
+      'signer',
+    ]);
     const transfer = readFileSync(
       new URL('../src/sim/item_instance_transfer.ts', import.meta.url),
       'utf8',
@@ -106,6 +117,7 @@ describe('publicInstanceView: the display trim', () => {
     const trimmed = [...transfer.matchAll(/pub\.(\w+) = /g)].map((m) => m[1]);
     expect([...new Set(trimmed)].sort()).toEqual([
       'enchant',
+      'lootQuality',
       'name',
       'perfected',
       'rift',

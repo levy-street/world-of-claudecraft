@@ -12,13 +12,16 @@ import {
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
 import { selectedInventorySlot } from '../item_copy_ref';
+import { isEligibleEnemyQualitySource } from '../loot/enemy_quality';
+import { createLootQuality, isEligibleLootQualityItem } from '../loot_quality/core';
+import { cloneLootQuality } from '../loot_quality/types';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload, PlayerClass, RiftTier } from '../types';
 import {
   RIFT_BAND_GEM_SLOTS,
   RIFT_BAND_MAX_UPGRADE,
-  type RiftBandShell,
+  RIFT_BAND_SHELLS,
   riftBandRolledStats,
 } from './band_ladder';
 import { nearRiftForge, RIFT_FORGE_TOO_FAR_TEXT } from './forge_gate';
@@ -65,11 +68,7 @@ export interface RiftForgeResult {
 /** The three class shells, each a stat-free ItemDef; the copy's rift record
  *  prices the ring (band_ladder.ts). Bands are forge-only: the enchanting
  *  profession refuses them by id (professions/enchanting.ts). */
-const SHELL_STATS: Readonly<Record<string, RiftBandShell>> = {
-  riftbound_band_of_might: { primary: 'str', secondary: 'sta' },
-  riftbound_band_of_insight: { primary: 'int', secondary: 'spi' },
-  riftbound_band_of_guile: { primary: 'agi', secondary: 'sta' },
-};
+const SHELL_STATS = RIFT_BAND_SHELLS;
 
 function shellItemIdForClass(cls: PlayerClass): string {
   if (MELEE_CLASSES.has(cls)) return 'riftbound_band_of_might';
@@ -138,6 +137,8 @@ export function sanitizeRiftGearInstance(
       gems,
     },
   };
+  const lootQuality = cloneLootQuality(input.lootQuality);
+  if (lootQuality) clean.lootQuality = lootQuality;
   rebuildRolledStats(itemId, clean);
   return clean;
 }
@@ -313,12 +314,14 @@ export const FARM_RIFT_DROP_CHANCE = RIFT_PATTERN_CHANCE;
 export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: number): void {
   const rank = riftRankForBaseLevel(baseLevel);
   const loot = boss.loot ?? { copper: 0, items: [] };
+  const firstNewSlot = loot.items.length;
 
   // --- Draw 0: C-rank guaranteed normal-dungeon drop + coin (exits here) ---
   if (rank === 'C') {
     const pool = riftNormalClearPool();
     loot.items.push({ itemId: pool[ctx.rng.int(0, pool.length - 1)], count: 1 });
     loot.copper = (loot.copper ?? 0) + RIFT_COIN_BONUS_C;
+    if (isEligibleEnemyQualitySource(boss)) rollRiftClearQualities(ctx, loot.items, firstNewSlot);
     boss.loot = loot;
     boss.lootable = true;
     return;
@@ -389,9 +392,25 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
   const coinBonus =
     rank === 'B' ? RIFT_COIN_BONUS_B : rank === 'A' ? RIFT_COIN_BONUS_A : RIFT_COIN_BONUS_S;
   loot.copper = (loot.copper ?? 0) + coinBonus;
+  if (isEligibleEnemyQualitySource(boss)) rollRiftClearQualities(ctx, loot.items, firstNewSlot);
 
   boss.loot = loot;
   if (loot.items.length > 0 || loot.copper > 0) boss.lootable = true;
+}
+
+/** Only newly selected clear rewards draw quality; static corpse gear is already rolled. */
+function rollRiftClearQualities(
+  ctx: SimContext,
+  items: NonNullable<Entity['loot']>['items'],
+  start: number,
+): void {
+  for (let index = start; index < items.length; index++) {
+    const slot = items[index];
+    const item = ITEMS[slot.itemId];
+    if (!item || !isEligibleLootQualityItem(item)) continue;
+    const lootQuality = createLootQuality(ctx.rng);
+    if (lootQuality) items[index] = { ...slot, instance: { ...slot.instance, lootQuality } };
+  }
 }
 
 /** First-clear personal loot. Every winner gets a class-appropriate non-fungible
@@ -416,6 +435,8 @@ export function addRiftProgressionLoot(
     const meta = ctx.players.get(pid);
     if (!meta) continue;
     const gear = createRiftGearInstance(eventId, tier, meta.cls, pid);
+    const lootQuality = isEligibleEnemyQualitySource(boss) ? createLootQuality(ctx.rng) : undefined;
+    if (lootQuality) gear.instance.lootQuality = lootQuality;
     loot.items.push({
       itemId: gear.itemId,
       count: 1,

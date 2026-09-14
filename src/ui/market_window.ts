@@ -869,7 +869,7 @@ export class MarketWindow {
         esc(formatLocalizedMoney(l.price, 'long')),
       );
       row.innerHTML =
-        `<span class="mkt-ico ui-socket ui-socket--bag">${this.deps.itemIcon(item, effQuality)}${badge}${heroicStar}${patternMark}</span>` +
+        `<span class="mkt-ico ui-socket ui-socket--bag">${this.deps.itemIcon(item, effQuality)}${parts.qualityBadge}${badge}${heroicStar}${patternMark}</span>` +
         `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>${heroicLabel}` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
         `<span class="mkt-price ui-money">${priceHtml}${each}</span>`;
@@ -879,7 +879,7 @@ export class MarketWindow {
       btn.setAttribute(
         'aria-label',
         t(l.mine ? 'itemUi.market.reclaimAria' : 'itemUi.market.buyAria', {
-          item: itemName,
+          item: parts.ariaName,
           price: formatLocalizedMoney(l.price),
         }),
       );
@@ -889,7 +889,7 @@ export class MarketWindow {
         // click; a buyout spends coin outright, so it asks first (the bank
         // slot-purchase precedent).
         if (l.mine) this.deps.world().marketCancel(l.id);
-        else this.promptBuy(l, itemName);
+        else this.promptBuy(l, parts.ariaName);
       });
       row.appendChild(btn);
       // A bulk material listing states WHOSE units are in it: the buyer is
@@ -1032,7 +1032,7 @@ export class MarketWindow {
     const qColor = marketNameColor(stagedQuality);
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick ui-card';
-    pick.innerHTML = `${this.deps.itemIcon(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(staged.name)}</span>`;
+    pick.innerHTML = `${this.deps.itemIcon(item, stagedQuality)}${staged.qualityBadge}<span class="ps-name" style="color:${qColor}">${esc(staged.name)}</span>`;
     // The staged copy's tooltip carries its payload, so a player holding plain
     // AND special copies can see WHICH one is staged (the mail chip precedent).
     this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item, view.form.instance));
@@ -1143,7 +1143,7 @@ export class MarketWindow {
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item, returnedQuality)}<span class="mkt-collect-name" style="color:${qColor}">${esc(returned.name)}${esc(stack)}</span></span>`;
+      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item, returnedQuality)}${returned.qualityBadge}<span class="mkt-collect-name" style="color:${qColor}">${esc(returned.name)}${esc(stack)}</span></span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }

@@ -3433,6 +3433,15 @@ export const it_IT: EnTranslations = {
         "socketReplaced": "Incastonata una gemma in {name}; {gem} è stato distrutto."
       }
     },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+    },
     "itemTooltip": {
       "requiresLevel": "Richiede livello {level}",
       "riftTier": "Oggetto dello Squarcio di rango {tier}",

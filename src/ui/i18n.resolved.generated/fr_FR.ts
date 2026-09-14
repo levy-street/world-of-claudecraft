@@ -3433,6 +3433,15 @@ export const fr_FR: EnTranslations = {
         "socketReplaced": "Enchâssé une gemme dans {name}; {gem} a été détruit."
       }
     },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+    },
     "itemTooltip": {
       "requiresLevel": "Niveau requis : {level}",
       "riftTier": "Objet de faille de rang {tier}",

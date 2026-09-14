@@ -106,7 +106,9 @@ const MONOLITHS: MonolithRow[] = [
     // the fourth tab's window glue landed under the old ceiling (net of the
     // v0.43.0 sync merge, which trimmed overlapping browse markup). Exact
     // count, zero slack.
-    ceiling: 2419,
+    // LOWERED for permanent loot quality: item-cell markup moved into
+    // woc_market_chrome.ts, keeping tooltip registration in the window.
+    ceiling: 2414,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -1024,7 +1026,8 @@ const MONOLITHS: MonolithRow[] = [
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 11879,
+    // Loot identity receipts/projection extracted to dedicated siblings.
+    ceiling: 11837,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1438,7 +1441,8 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 10095,
+    // Loot identity receipts/projection extracted to dedicated siblings.
+    ceiling: 10081,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

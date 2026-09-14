@@ -18,6 +18,7 @@
 
 import { sanitizeItemInstancePayloadOnLoad } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
+import { cloneLootQuality } from './loot_quality/types';
 import { isMaterialItemId, materialItemIds } from './material_ids';
 import { countMaterialInventoryForHub } from './material_inventory_hub';
 import { applyMaterialInventoryTake, planMaterialInventoryTake } from './material_inventory_take';
@@ -73,6 +74,9 @@ export function publicInstanceView(instance: ItemInstancePayload): ItemInstanceP
   }
   if (instance.name !== undefined) pub.name = instance.name;
   if (instance.perfected === true) pub.perfected = instance.perfected;
+  if (instance.lootQuality !== undefined) {
+    pub.lootQuality = cloneLootQuality(instance.lootQuality);
+  }
   if (instance.rift !== undefined) {
     pub.rift = {
       ...instance.rift,

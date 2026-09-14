@@ -3433,6 +3433,15 @@ export const en_XA: EnTranslations = {
         "socketReplaced": "[Šóçķéţéð á ĝéɱ íñţó {name}; {gem} ŵáš ðéšţŕóýéð.]"
       }
     },
+    "lootQuality": {
+      "ordinary": "[Óŕðíñáŕý]",
+      "superior": "[Šúþéŕíóŕ]",
+      "exceptional": "[Éẋçéþţíóñáļ]",
+      "magnificent": "[Ɱáĝñíƒíçéñţ]",
+      "transcendent": "[Ţŕáñšçéñðéñţ]",
+      "itemName": "[{item}, {quality}]",
+      "tooltip": "[{quality}: +{levels} íţéɱ ļéʋéļš. Ŕéţáíñéð ţĥŕóúĝĥ úþĝŕáðéš.]"
+    },
     "itemTooltip": {
       "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",
       "riftTier": "[{tier}-ŕáñķ Ŕíƒţ íţéɱ]",

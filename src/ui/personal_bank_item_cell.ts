@@ -76,7 +76,7 @@ export function buildPersonalBankItemCell(
             : glyphKind
               ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
               : 'itemUi.bags.itemAria',
-          { item: parts.name, count: countLabel },
+          { item: parts.ariaName, count: countLabel },
         )
       : t(glyphKind ? UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.unknownItemAria', {
           id: slot.itemId,
@@ -85,7 +85,7 @@ export function buildPersonalBankItemCell(
   );
   cell.innerHTML =
     `${item && parts ? deps.itemIcon(item, parts.quality) : unknownItemIconHtml(slot.itemId)}` +
-    `${cornerMarkHtml(cornerMark)}${lockMarkHtml(locked)}` +
+    `${parts?.qualityBadge ?? ''}${cornerMarkHtml(cornerMark)}${lockMarkHtml(locked)}` +
     `<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
   cell.addEventListener('click', (event) => {
     if (deps.consumePeek()) {

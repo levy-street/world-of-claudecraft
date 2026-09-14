@@ -3433,6 +3433,15 @@ export const ru_RU: EnTranslations = {
         "socketReplaced": "Самоцвет вставлен в {name}; {gem} уничтожен."
       }
     },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+    },
     "itemTooltip": {
       "requiresLevel": "Требуется уровень {level}",
       "riftTier": "Предмет разлома ранга {tier}",

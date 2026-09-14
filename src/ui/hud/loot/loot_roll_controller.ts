@@ -1,11 +1,12 @@
 import { ITEMS } from '../../../sim/data';
-import type { ItemDef, LootRollChoice, SimEvent } from '../../../sim/types';
+import type { ItemDef, ItemInstancePayload, LootRollChoice, SimEvent } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
+import { lootQualityAriaName, lootQualityBadgeHtml } from '../../loot_quality_view';
 import type { PainterHostPresentation, PainterHostWriters } from '../../painter_host';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { reconcileLootRolls } from './loot_roll_reconcile';
@@ -56,7 +57,7 @@ export interface LootRollControllerDeps {
    *  rather than re-typed; the quality parameter is shape uniformity only
    *  here, since no copy payload reaches this surface, and is never passed. */
   itemIcon: PainterHostPresentation['itemIcon'];
-  itemTooltip(item: ItemDef): string;
+  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   // Dismisses the shared #tooltip box immediately. render() tears down and
   // rebuilds the whole loot-roll subtree on every repaint, so an element the
@@ -137,7 +138,14 @@ export class LootRollController {
     this.updateTimers(now);
   }
 
-  closeForItem(text: string): void {
+  closeForItem(text: string, exactRollId?: number): void {
+    if (exactRollId !== undefined) {
+      this.activeRolls.delete(exactRollId);
+      this.activeMasterRolls.delete(exactRollId);
+      this.statusRows = this.statusRows.filter((row) => row.rollId !== exactRollId);
+      this.render();
+      return;
+    }
     const match =
       /^.+ wins \[\[i:([A-Za-z0-9_]+)\]\] \(\d+\)$/.exec(text) ??
       /^Everyone passed on \[\[i:([A-Za-z0-9_]+)\]\]\.$/.exec(text) ??
@@ -490,6 +498,7 @@ export class LootRollController {
           <div class="loot-roll-copy">
             <div class="loot-roll-title ui-cin ui-muted">${esc(t('itemUi.lootRoll.title'))}</div>
             <div class="loot-roll-name ui-outline ${nameClass}" style="color:${nameColor}">${esc(itemName)}</div>
+            ${lootQualityBadgeHtml(event.instance)}
             ${bindsOnPickupNoteHtml(item)}
           </div>
         </div>
@@ -502,11 +511,16 @@ export class LootRollController {
         </div>`;
       const itemElement = row.querySelector<HTMLElement>('.loot-roll-item');
       if (item && itemElement) {
-        this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item));
+        this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item, event.instance));
       }
       row.querySelectorAll<HTMLButtonElement>('[data-choice]').forEach((button) => {
         const choice = button.dataset.choice as LootRollChoice;
-        button.setAttribute('aria-label', t(`itemUi.lootRoll.${choice}Aria`, { item: itemName }));
+        button.setAttribute(
+          'aria-label',
+          t(`itemUi.lootRoll.${choice}Aria`, {
+            item: lootQualityAriaName(itemName, event.instance),
+          }),
+        );
         button.addEventListener('click', () => this.submit(rollId, choice));
       });
       root.appendChild(row);
@@ -530,13 +544,14 @@ export class LootRollController {
           <div class="loot-roll-copy">
             <div class="loot-roll-title ui-cin ui-muted">${esc(t('itemUi.lootRoll.title'))}</div>
             <div class="loot-roll-name ui-outline ${nameClass}" style="color:${nameColor}">${esc(itemName)}</div>
+            ${lootQualityBadgeHtml(status.instance)}
           </div>
         </div>
         <div class="loot-roll-timer ui-bar" aria-hidden="true"><span class="ui-bar-fill"></span></div>
         ${this.votesHtml(status)}`;
       const itemElement = row.querySelector<HTMLElement>('.loot-roll-item');
       if (item && itemElement) {
-        this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item));
+        this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item, status.instance));
       }
       root.appendChild(row);
     }
@@ -570,7 +585,8 @@ export class LootRollController {
         <div class="loot-roll-copy">
           <div class="loot-roll-title ui-cin ui-muted">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
           <div class="loot-roll-name ui-outline ${nameClass}" style="color:${nameColor}">${esc(itemName)}</div>
-          ${bindsOnPickupNoteHtml(item)}
+          ${lootQualityBadgeHtml(event.instance)}
+            ${bindsOnPickupNoteHtml(item)}
         </div>
       </div>
       <div class="loot-roll-timer ui-bar" aria-hidden="true"><span class="ui-bar-fill"></span></div>
@@ -581,7 +597,7 @@ export class LootRollController {
       <div class="loot-roll-actions"><button type="button" class="loot-roll-btn assign ml-roll ui-btn ui-btn--red" disabled>${esc(t('hudChrome.masterLoot.rollButton'))}</button></div>`;
     const itemElement = row.querySelector<HTMLElement>('.loot-roll-item');
     if (item && itemElement) {
-      this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item));
+      this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item, event.instance));
     }
     const selectAll = row.querySelector<HTMLInputElement>('.ml-all');
     const pickElements = [...row.querySelectorAll<HTMLInputElement>('.ml-pick')];

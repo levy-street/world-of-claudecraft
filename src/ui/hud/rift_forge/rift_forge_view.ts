@@ -1,3 +1,4 @@
+import { lootQualityItemLevelBonus } from '../../../sim/loot_quality';
 // The Rift Forge window's pure view-core: the player's bags and worn slots in,
 // one row per Riftbound band out, with every affordance already decided (the
 // band's item level now and after the next essence upgrade, whether that
@@ -110,8 +111,11 @@ function row(
     tier: rift.tier,
     upgradeLevel: rift.upgradeLevel,
     maxUpgradeLevel: rift.maxUpgradeLevel,
-    itemLevel: riftBandItemLevel(rift.tier, rift.upgradeLevel),
-    nextItemLevel: atMax ? null : riftBandItemLevel(rift.tier, rift.upgradeLevel + 1),
+    itemLevel:
+      riftBandItemLevel(rift.tier, rift.upgradeLevel) + lootQualityItemLevelBonus(instance),
+    nextItemLevel: atMax
+      ? null
+      : riftBandItemLevel(rift.tier, rift.upgradeLevel + 1) + lootQualityItemLevelBonus(instance),
     nextUpgradeCost,
     canUpgrade: !worn && nextUpgradeCost !== null && essence >= nextUpgradeCost,
     gems,

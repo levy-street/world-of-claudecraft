@@ -1454,7 +1454,7 @@ export class WocTradeController {
           item && parts
             ? itemNameColor({ kind: item.kind, quality: parts.quality ?? 'common' })
             : QUALITY_DEFAULT_COLOR;
-        const inner = `<span class="ui-socket ui-socket--bag">${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}</span><span style="color:${qColor}">${esc(label)}</span>`;
+        const inner = `<span class="ui-socket ui-socket--bag">${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}${parts?.qualityBadge ?? ''}</span><span style="color:${qColor}">${esc(label)}</span>`;
         return mine
           ? `<button type="button" class="trade-item mine ui-card" data-item="${esc(s.itemId)}">${inner}</button>`
           : `<div class="trade-item ui-card">${inner}</div>`;

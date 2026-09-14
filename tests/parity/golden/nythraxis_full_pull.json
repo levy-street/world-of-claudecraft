@@ -16,8 +16,8 @@
     "Grave Eruption hash-placed warning + impact damage + Grave Flame residue tick",
     "class:warrior"
   ],
-  "draws": 11455,
-  "drawDigest": "e4daefb2",
+  "draws": 11463,
+  "drawDigest": "177735a5",
   "frames": [
     {
       "tick": 0,
@@ -17190,11 +17190,11 @@
       "tick": 1248,
       "time": 62.4,
       "nextId": 1021,
-      "state": "b9f0caca",
-      "events": "8135da7e",
+      "state": "97cdbb2c",
+      "events": "57450d4c",
       "rng": {
-        "draws": 10956,
-        "digest": "29a6e190"
+        "draws": 10958,
+        "digest": "e3fa66cd"
       },
       "label": "death",
       "players": [
@@ -17330,11 +17330,11 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -17505,11 +17505,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -17676,11 +17676,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -17847,11 +17847,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -18018,11 +18018,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -18651,77 +18651,77 @@
       "tick": 1250,
       "time": 62.5,
       "nextId": 1021,
-      "state": "fb64428d",
+      "state": "09aa535f",
       "events": "741638a5",
       "rng": {
-        "draws": 10967,
-        "digest": "de84665c"
+        "draws": 10969,
+        "digest": "efed352f"
       }
     },
     {
       "tick": 1260,
       "time": 63,
       "nextId": 1021,
-      "state": "412b685c",
+      "state": "79a32436",
       "events": "741638a5",
       "rng": {
-        "draws": 11061,
-        "digest": "83ff17e8"
+        "draws": 11063,
+        "digest": "225ac137"
       }
     },
     {
       "tick": 1270,
       "time": 63.5,
       "nextId": 1021,
-      "state": "5e51792e",
+      "state": "8d98e5a0",
       "events": "741638a5",
       "rng": {
-        "draws": 11144,
-        "digest": "7046da5a"
+        "draws": 11148,
+        "digest": "0b66025e"
       }
     },
     {
       "tick": 1280,
       "time": 64,
       "nextId": 1021,
-      "state": "3267d2be",
+      "state": "e21b8970",
       "events": "741638a5",
       "rng": {
-        "draws": 11228,
-        "digest": "81d3c97c"
+        "draws": 11238,
+        "digest": "93fa08e9"
       }
     },
     {
       "tick": 1290,
       "time": 64.5,
       "nextId": 1021,
-      "state": "4e95e534",
+      "state": "1582bdce",
       "events": "741638a5",
       "rng": {
-        "draws": 11321,
-        "digest": "61424e32"
+        "draws": 11329,
+        "digest": "b1b6f84c"
       }
     },
     {
       "tick": 1300,
       "time": 65,
       "nextId": 1021,
-      "state": "cf8394dc",
+      "state": "07fb50b6",
       "events": "741638a5",
       "rng": {
-        "draws": 11404,
-        "digest": "8c5720d9"
+        "draws": 11413,
+        "digest": "ea881639"
       }
     },
     {
       "tick": 1308,
       "time": 65.4,
       "nextId": 1021,
-      "state": "390a4e3b",
+      "state": "b97015ad",
       "events": "6e96776a",
       "rng": {
-        "draws": 11455,
-        "digest": "e4daefb2"
+        "draws": 11463,
+        "digest": "177735a5"
       },
       "label": "final",
       "players": [
@@ -18857,11 +18857,11 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -19032,11 +19032,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -19203,11 +19203,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -19374,11 +19374,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -19545,11 +19545,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 2,
+                  "count": 1,
                   "source": {}
                 }
               ]

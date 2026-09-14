@@ -1,3 +1,5 @@
+import { itemNameColor } from './item_name_color';
+import { lootQualityBadgeHtml } from './loot_quality_view';
 // The Exchange window's small status chrome, as pure builders.
 //
 // A spinner, a loading line, a failed-reach line, the browse faces' control
@@ -11,7 +13,7 @@
 // (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import type { ItemWeaponType } from '../sim/content/weapon_skin_rules';
-import type { ItemSlot } from '../sim/types';
+import type { ItemInstancePayload, ItemSlot } from '../sim/types';
 import { weaponTypeLabel } from './armory_labels';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
@@ -620,4 +622,24 @@ export function wocSalesHistoryHtml(
         )}</li>`,
     )
     .join('')}</ul>`;
+}
+
+/** Stateless item cell shared by every Exchange face. The window registers the
+ * tooltip key separately; all external strings are escaped at their HTML sink. */
+export function wocItemCellHtml(
+  name: string,
+  icon: string,
+  quality: string,
+  key: string,
+  instance?: ItemInstancePayload,
+): string {
+  const color = itemNameColor({ quality });
+  const rung = /^[a-z]+$/.test(quality) ? quality : 'common';
+  const tag = ` data-tt-key="${esc(key)}"`;
+  return (
+    '<span class="wm-item">' +
+    `<img class="wm-icon item-icon q-${rung}"${tag} src="${esc(icon)}" alt="" draggable="false" />` +
+    `${lootQualityBadgeHtml(instance)}<span class="wm-name"${tag} style="color: ${color}">${esc(name)}</span>` +
+    '</span>'
+  );
 }

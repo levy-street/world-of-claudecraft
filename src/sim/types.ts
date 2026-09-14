@@ -1,3 +1,4 @@
+import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/types';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
 import type { MaterialComposition } from './material_sources';
@@ -1561,6 +1562,8 @@ export type ItemDef =
 // time, see market.ts marketList); #1146 wires real market handling for
 // instanced items later.
 export interface ItemInstancePayload {
+  /** Permanent enemy-drop quality, independent of rarity, enchants and upgrades. */
+  lootQuality?: LootQualityDescriptor;
   /** Player name that signed/crafted this specific copy, if any. */
   signer?: string;
   /** Remaining charges for a per-effect-limited item, keyed by effect id. */
@@ -1688,6 +1691,10 @@ export interface ItemInstancePayload {
 // piece's, src/sim/rift/progression.ts), so all copy through the exact same rules.
 export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
   const instance: ItemInstancePayload = { ...src };
+  // Invalid descriptors remain untouched until the atomic load-bound arm drops
+  // them. Never iterate or clone an unbounded corrupt weights subtree here.
+  const lootQuality = cloneLootQuality(src.lootQuality);
+  if (lootQuality) instance.lootQuality = lootQuality;
   if (src.charges) instance.charges = { ...src.charges };
   if (
     src.perfectingBonus &&
@@ -1814,6 +1821,7 @@ export type ItemLootStrategy = 'looter-takes-all' | 'need-greed' | 'round-robin'
 export interface LootRollPrompt {
   rollId: number;
   itemId: string;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
@@ -1835,6 +1843,7 @@ export interface LootRollStatusEntry {
 export interface LootRollGroupStatus {
   rollId: number;
   itemId: string;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
@@ -1863,6 +1872,7 @@ export interface MasterLootSettings {
 export interface MasterLootPrompt {
   rollId: number;
   itemId: string;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
@@ -6306,11 +6316,21 @@ export type SimEvent = { pid?: number } & (
   //   link) off its own result event. Without it a profession action printed
   //   two lines for one grant (#2430). Everything else the client does on a
   //   loot event (bag refresh, loot-roll close) still runs.
-  | { type: 'loot'; text: string; silent?: boolean; callerLogs?: boolean }
+  | {
+      type: 'loot';
+      text: string;
+      rollId?: number;
+      silent?: boolean;
+      callerLogs?: boolean;
+      itemId?: string;
+      instance?: ItemInstancePayload;
+      count?: number;
+    }
   | {
       type: 'lootRoll';
       rollId: number;
       itemId: string;
+      instance?: ItemInstancePayload;
       itemName: string;
       quality: ItemDef['quality'];
       expiresAt: number;
@@ -6320,6 +6340,7 @@ export type SimEvent = { pid?: number } & (
       type: 'masterLoot';
       rollId: number;
       itemId: string;
+      instance?: ItemInstancePayload;
       itemName: string;
       quality: ItemDef['quality'];
       expiresAt: number;

@@ -66,7 +66,9 @@ import {
   TWOHAND_STAT_MULT,
   WORN_OFFHAND_STAT_MULT,
 } from './item_budget';
+import { lootQualityItemLevelBonus } from './loot_quality/core';
 import { COLLECTION_PERFECTING_SOURCE_INCREASE } from './professions/perfecting_bonus';
+import { RIFT_BAND_SHELLS, riftBandItemLevel } from './rift/band_ladder';
 import type { ItemDef, ItemInstancePayload } from './types';
 
 export {
@@ -396,10 +398,16 @@ export function itemInstanceLevel(
   item: ItemDef,
   instance?: ItemInstancePayload,
 ): number | undefined {
-  const level = itemLevel(item);
-  return level !== undefined && instance?.perfected === true && crucibleCollectionForItem(item.id)
-    ? level + COLLECTION_PERFECTING_SOURCE_INCREASE
-    : level;
+  const level =
+    instance?.rift && RIFT_BAND_SHELLS[item.id]
+      ? riftBandItemLevel(instance.rift.tier, instance.rift.upgradeLevel)
+      : itemLevel(item);
+  if (level === undefined) return undefined;
+  const perfected =
+    instance?.perfected === true && crucibleCollectionForItem(item.id)
+      ? COLLECTION_PERFECTING_SOURCE_INCREASE
+      : 0;
+  return level + perfected + lootQualityItemLevelBonus(instance);
 }
 
 // The offense-and-resource LINE an item is expected to spend on its identity

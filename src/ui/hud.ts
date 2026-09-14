@@ -620,21 +620,19 @@ import {
 } from './interface_unlock_menu_core';
 import { InterfaceUnlockPreview } from './interface_unlock_preview';
 import { InteriorMapController } from './interior_map_controller';
-import { itemAffixTooltipLines, itemRatingTooltipLines } from './item_affix_tooltip';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
+import { itemCombatTooltipLines } from './item_combat_tooltip_view';
 import { itemCompareBlocksHtml } from './item_compare_view';
 import { ItemDragState } from './item_drag_state';
 import {
   instanceBadgeLines,
   instanceBindingLines,
-  instanceBonusStatLines,
   instanceLockLine,
   instancePartyTradeLine,
   instanceTitleHtml,
   itemNumber,
   itemRequiredLevelLine,
-  itemStatName,
   materialMakersMarkLines,
   tooltipEffectiveQuality,
   vendorSellTooltipLine,
@@ -652,6 +650,8 @@ import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
+import { lootQualityReceiptNodes, lootQualityReceiptText } from './loot_quality_receipt';
+import { lootQualityAriaName } from './loot_quality_view';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
@@ -831,7 +831,7 @@ import {
   MOTD_RESULT_FALLBACK_KEY,
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
-import { itemLevelReadout, riftBandTooltipLines, riftGemTooltipLines } from './rift_band_tooltip';
+import { itemLevelReadout } from './rift_band_tooltip';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import {
@@ -6560,9 +6560,12 @@ export class Hud {
     // stat-free ItemDef shell), so its level/score come from itemLevelReadout
     // (rift_band_tooltip.ts) instead of itemInstanceLevel/itemScore, which stay
     // the source for every other piece so Crucible Perfecting's bonus level holds.
-    if (isItemLevelEligible(item) && this.optionsHooks?.settings.get('showItemLevel')) {
+    if (
+      isItemLevelEligible(item) &&
+      (instance?.lootQuality || this.optionsHooks?.settings.get('showItemLevel'))
+    ) {
       let readout: { level: number; score: number } | undefined;
-      if (instance?.rift) {
+      if (instance?.rift || instance?.lootQuality) {
         readout = itemLevelReadout(item, instance);
       } else {
         const level = itemInstanceLevel(item, instance);
@@ -6600,40 +6603,7 @@ export class Hud {
     // seal and the enchanted marker (item_instance_tooltip.ts owns the copy
     // rules, incl. never claiming a quality-rank upgrade).
     html += instanceBadgeLines(instance);
-    if (item.weapon) {
-      const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
-      html += `<div class="tt-stat">${esc(
-        t('itemUi.tooltip.damageSpeed', {
-          min: itemNumber(item.weapon.min),
-          max: itemNumber(item.weapon.max),
-          speed: itemNumber(item.weapon.speed, 1),
-        }),
-      )}</div>`;
-      html += `<div class="tt-stat">${esc(t('itemUi.tooltip.dps', { dps: itemNumber(dps, 1) }))}</div>`;
-      // The weapon type (incl. Dagger) now appears on the slot line above like
-      // every other weapon, so the old standalone "Dagger" sub-line is gone. The
-      // item.weapon.dagger DATA field still drives Backstab; only this line went.
-    }
-    if (item.stats) {
-      for (const [k, v] of Object.entries(item.stats)) {
-        if (v === undefined) continue;
-        if (k === 'armor') {
-          html += `<div class="tt-stat">${esc(t('itemUi.tooltip.armorStat', { value: itemNumber(v) }))}</div>`;
-        } else {
-          html += `<div class="tt-green">${esc(
-            t('itemUi.tooltip.stat', {
-              value: itemNumber(v),
-              stat: itemStatName(k),
-            }),
-          )}</div>`;
-        }
-      }
-    }
-    html += instanceBonusStatLines(instance);
-    html += riftBandTooltipLines(instance);
-    html += itemAffixTooltipLines(item);
-    html += riftGemTooltipLines(item);
-    html += itemRatingTooltipLines(item);
+    html += itemCombatTooltipLines(item, instance);
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -11736,14 +11706,28 @@ export class Hud {
           // (#2430). Everything else in this arm still runs for those grants:
           // the loot-roll close below, the bag refresh, and the independent
           // audio guard.
-          if (!ev.callerLogs) this.log(this.localizeLootText(ev.text), HUD_LOG.GOOD);
+          if (!ev.callerLogs) {
+            const text = lootQualityReceiptText(ev, (value) => this.localizeLootText(value));
+            if (ev.itemId && ev.instance?.lootQuality)
+              this.logNodes(
+                lootQualityReceiptNodes(
+                  document,
+                  text,
+                  ev.itemId,
+                  ev.instance,
+                  (parent, id, copy) => this.appendChatItemLink(parent, id, copy),
+                ),
+                HUD_LOG.GOOD,
+              );
+            else this.log(text, HUD_LOG.GOOD);
+          }
           if (
             / wins .+ \(\d+\)$/.test(ev.text) ||
             /^Everyone passed on .+\.$/.test(ev.text) ||
             / assigned .+ to .+\.$/.test(ev.text) ||
             /^.+ was not assigned and is free for all\.$/.test(ev.text)
           )
-            this.lootRolls.closeForItem(ev.text);
+            this.lootRolls.closeForItem(ev.text, ev.rollId);
           // silent: the audio half of the same idea, and independent of it (a
           // caller can own the cue without owning the line). A professions
           // grant sets this when it owns the cue for the same grant: it has a
@@ -14276,7 +14260,11 @@ export class Hud {
   // bag / tooltip / loot name language. Hover/focus shows the same item tooltip
   // the bags window uses; an unknown id (e.g. content drift between players)
   // degrades to a plain [?].
-  private appendChatItemLink(parent: HTMLElement, itemId: string): void {
+  private appendChatItemLink(
+    parent: HTMLElement,
+    itemId: string,
+    instance?: ItemInstancePayload,
+  ): void {
     // knownItemDef, not bare truthiness: the token charset admits prototype
     // keys ([[i:constructor]] is peer-typed text), and the bare read sent
     // them down the known arm to throw inside the event batch.
@@ -14288,9 +14276,9 @@ export class Hud {
     const link = document.createElement('span');
     link.className = 'chat-item-link';
     link.style.color = itemNameColor(item);
-    link.textContent = `[${itemDisplayName(item)}]`;
+    link.textContent = `[${lootQualityAriaName(itemDisplayName(item), instance)}]`;
     link.tabIndex = 0;
-    this.attachTooltip(link, () => this.itemTooltip(item));
+    this.attachTooltip(link, () => this.itemTooltip(item, true, instance));
     parent.append(link);
   }
 

@@ -7,6 +7,7 @@ import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { canDualWield, isShieldItem } from './equipment_rules';
 import { activeItemInstanceStats } from './item_instance_stats';
 import { meetsLevelRequirement } from './item_level_req';
+import { lootQualityWeapon } from './loot_quality';
 import { pvpFractionsFromRatings } from './pvp';
 import type {
   Entity,
@@ -366,7 +367,7 @@ export function recalcPlayerStats(
     // rolled.stats as its authoritative aggregate). The equip path carries the
     // consumed inventory instance into equipmentInstance, so every source applies.
     // A plain piece has no entry here, so this is a no-op for the common case.
-    const rolled = activeItemInstanceStats(equipmentInstance?.[slot]);
+    const rolled = activeItemInstanceStats(equipmentInstance?.[slot], item);
     if (rolled) {
       s.str += Number.isFinite(rolled.str) ? rolled.str : 0;
       s.agi += Number.isFinite(rolled.agi) ? rolled.agi : 0;
@@ -375,6 +376,13 @@ export function recalcPlayerStats(
       s.spi += Number.isFinite(rolled.spi) ? rolled.spi : 0;
       s.armor += Number.isFinite(rolled.armor) ? rolled.armor : 0;
       bonusSp += Number.isFinite(rolled.spellPower) ? rolled.spellPower : 0;
+      bonusHealPower += Number.isFinite(rolled.healingPower) ? rolled.healingPower : 0;
+      bonusPvpOffenseRating += Number.isFinite(rolled.pvpOffenseRating)
+        ? rolled.pvpOffenseRating
+        : 0;
+      bonusPvpDefenseRating += Number.isFinite(rolled.pvpDefenseRating)
+        ? rolled.pvpDefenseRating
+        : 0;
       bonusCritRating += Number.isFinite(rolled.critRating) ? rolled.critRating : 0;
       bonusHasteRating += Number.isFinite(rolled.hasteRating) ? rolled.hasteRating : 0;
       // A Riftbound band's verdant gem line (rift/band_ladder.ts); no other
@@ -562,7 +570,7 @@ export function recalcPlayerStats(
   const mainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
   const weapon =
     mainhand?.weapon && meetsLevelRequirement(lvl, mainhand)
-      ? mainhand.weapon
+      ? lootQualityWeapon(mainhand, equipmentInstance?.mainhand)!
       : { min: 1, max: 2, speed: 2 };
   e.weapon = weapon;
   const offhand = equipment.offhand ? ITEMS[equipment.offhand] : undefined;
@@ -570,7 +578,7 @@ export function recalcPlayerStats(
     canDualWield(cls, mods?.spec) &&
     offhand?.kind === 'weapon' &&
     meetsLevelRequirement(lvl, offhand)
-      ? offhand.weapon
+      ? lootQualityWeapon(offhand, equipmentInstance?.offhand)!
       : null;
   e.offhandWeapon = offhandWeapon;
   e.dualWielding = offhandWeapon !== null;

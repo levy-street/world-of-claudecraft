@@ -10,8 +10,8 @@
     "awardHeroicMarks on a heroic raid kill (instances/dungeons) plus the raid lockout, neither of which a normal claim grants",
     "class:warrior"
   ],
-  "draws": 12,
-  "drawDigest": "e512a40d",
+  "draws": 14,
+  "drawDigest": "31372acd",
   "frames": [
     {
       "tick": 0,
@@ -735,11 +735,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1016,
-      "state": "0f6c98ff",
-      "events": "a3304149",
+      "state": "a4e54acd",
+      "events": "b81eb6d0",
       "rng": {
-        "draws": 12,
-        "digest": "e512a40d"
+        "draws": 14,
+        "digest": "31372acd"
       },
       "label": "death",
       "players": [
@@ -886,11 +886,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1066,11 +1066,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1242,11 +1242,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1418,11 +1418,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1594,11 +1594,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1981,11 +1981,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1016,
-      "state": "0f6c98ff",
+      "state": "a4e54acd",
       "events": "741638a5",
       "rng": {
-        "draws": 12,
-        "digest": "e512a40d"
+        "draws": 14,
+        "digest": "31372acd"
       },
       "label": "final",
       "players": [
@@ -2132,11 +2132,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2312,11 +2312,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2488,11 +2488,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2664,11 +2664,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2840,11 +2840,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]

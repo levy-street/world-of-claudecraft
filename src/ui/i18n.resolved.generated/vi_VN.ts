@@ -3433,6 +3433,15 @@ export const vi_VN: EnTranslations = {
         "socketReplaced": "Gắn một viên đá quý vào {name}; {gem} đã bị phá hủy."
       }
     },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+    },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}",
       "riftTier": "Vật phẩm Rạn Nứt hạng {tier}",

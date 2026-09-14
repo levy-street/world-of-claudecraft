@@ -140,18 +140,19 @@ export function lootCorpse(
   for (const s of [...mob.loot.items]) {
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
-      while (s.count > 0 && ctx.canAddItem(s.itemId, 1, meta.entityId)) {
-        if (s.instance) {
-          ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
-        } else {
-          // Through the shared award grant, NOT a bare addItem: an openToAll
-          // slot is how an everyone-passed (or winner-offline) roll returns a
-          // drop to the corpse, and a soulbound item picked up from it must
-          // carry the same bind-on-pickup party trade window a roll win
-          // would; a bare add minted a permanently untradeable copy from the
-          // most common raid outcome (everyone passes to sort it out later).
-          grantAwardedLootItem(ctx, s.itemId, meta.entityId, killSnapshotEligibility(ctx, mob));
-        }
+      while (
+        s.count > 0 &&
+        (s.instance
+          ? canGrantItemInstance(meta.inventory, bagPools(meta.bags), s.itemId, s.instance)
+          : ctx.canAddItem(s.itemId, 1, meta.entityId))
+      ) {
+        grantAwardedLootItem(
+          ctx,
+          s.itemId,
+          meta.entityId,
+          killSnapshotEligibility(ctx, mob),
+          s.instance,
+        );
         s.count--;
         didLoot = true;
       }
@@ -161,16 +162,22 @@ export function lootCorpse(
     if (s.personalFor) {
       if (
         s.instance
-          ? !canGrantItemInstance(meta.inventory, bagPools(meta.bags), s.itemId, s.instance)
-          : !ctx.canAddItem(s.itemId, 1, meta.entityId)
+          ? !canGrantItemInstance(
+              meta.inventory,
+              bagPools(meta.bags),
+              s.itemId,
+              s.instance,
+              s.count,
+            )
+          : !ctx.canAddItem(s.itemId, s.count, meta.entityId)
       ) {
         bagsFull = true;
         continue;
       }
       if (s.instance) {
-        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId, s.count);
       } else {
-        ctx.addItem(s.itemId, 1, meta.entityId);
+        ctx.addItem(s.itemId, s.count, meta.entityId);
       }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
@@ -179,15 +186,8 @@ export function lootCorpse(
     }
     if (!rights.shared) continue;
     while (s.count > 0) {
-      if (s.instance) {
-        if (!canGrantItemInstance(meta.inventory, bagPools(meta.bags), s.itemId, s.instance)) break;
-        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
-        s.count--;
-      } else if (awardSharedLootItem(ctx, s.itemId, mob, meta, ffaUnlocked)) {
-        s.count--;
-      } else {
-        break;
-      }
+      if (!awardSharedLootItem(ctx, s.itemId, mob, meta, ffaUnlocked, s.instance)) break;
+      s.count--;
       didLoot = true;
     }
     if (s.count > 0) bagsFull = true;

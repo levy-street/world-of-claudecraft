@@ -17,6 +17,8 @@ describe('wornItemCellParts', () => {
     for (const instance of [undefined, null, {}]) {
       expect(wornItemCellParts(def, instance)).toEqual({
         name: itemDisplayName(def),
+        ariaName: itemDisplayName(def),
+        qualityBadge: '',
         quality: 'epic',
         color: QUALITY_COLOR.epic,
       });
@@ -32,6 +34,8 @@ describe('wornItemCellParts', () => {
     });
     expect(parts).toEqual({
       name: "Vel'tara's Oath",
+      ariaName: "Vel'tara's Oath",
+      qualityBadge: '',
       quality: 'legendary',
       color: QUALITY_COLOR.legendary,
     });
@@ -43,6 +47,8 @@ describe('wornItemCellParts', () => {
     const def = ITEMS[APEX_NECK];
     expect(wornItemCellParts(def, { rolled: { quality: 'legendary' } })).toEqual({
       name: itemDisplayName(def),
+      ariaName: itemDisplayName(def),
+      qualityBadge: '',
       quality: 'legendary',
       color: QUALITY_COLOR.legendary,
     });

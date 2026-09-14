@@ -59,6 +59,25 @@ describe('RiftForgeWindow', () => {
     };
   }
 
+  it('identifies an enhanced same-shell copy before spending Essence', () => {
+    const enhanced = {
+      ...gear.instance,
+      lootQuality: {
+        version: 1 as const,
+        tier: 4 as const,
+        weights: [900, 100, 250, 750, 500] as [number, number, number, number, number],
+      },
+    };
+    inventory.push({ itemId: gear.itemId, count: 1, instance: enhanced });
+    win.open();
+    const rows = root.querySelectorAll('.rf-ring');
+    expect(rows).toHaveLength(2);
+    expect(rows[0].querySelector('.loot-quality-badge')).toBeNull();
+    expect(rows[1].textContent).toContain('Transcendent');
+    expect(rows[1].textContent).toContain('Item Level 37');
+    expect(rows[1].querySelector('[data-upgrade]')?.textContent).toContain('38');
+  });
+
   beforeEach(() => {
     document.body.innerHTML =
       '<button id="opener"></button><div id="rift-forge-window" class="window panel"></div>';

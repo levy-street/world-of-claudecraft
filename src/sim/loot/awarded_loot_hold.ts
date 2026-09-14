@@ -20,7 +20,7 @@
 import { bagPools, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { SimContext } from '../sim_context';
-import type { ItemInstancePayload, LootSlot } from '../types';
+import { cloneItemInstancePayload, type ItemInstancePayload, type LootSlot } from '../types';
 import { bopPartyTradeInstance } from './bop_trade_window';
 
 // Sim-seconds a corpse keeps at least once an award is held on it: the same
@@ -38,16 +38,21 @@ export interface AwardEligibility {
 
 // The instance payload a loot award carries: a soulbound item gets the
 // bind-on-pickup party trade window over the kill-time eligible roster, a
-// plain item none. The ONE statement of that rule, shared by the direct
+// plain item no new window. Existing quality and previously stamped windows
+// survive unchanged. The ONE statement of that rule, shared by the direct
 // grant below, the hold, and the openToAll corpse pickup in interaction.ts.
 function awardInstanceFor(
   ctx: SimContext,
   itemId: string,
   eligibility: AwardEligibility,
+  sourceInstance?: ItemInstancePayload,
 ): ItemInstancePayload | undefined {
-  return ITEMS[itemId]?.soulbound
+  const instance = sourceInstance ? cloneItemInstancePayload(sourceInstance) : undefined;
+  if (instance?.partyTrade) return instance;
+  const window = ITEMS[itemId]?.soulbound
     ? bopPartyTradeInstance(ctx.lockoutNowMs(), eligibility.names, eligibility.characterIds)
     : undefined;
+  return window ? { ...instance, ...window } : instance;
 }
 
 // The one shared grant for a loot award (a roll win, a master-loot assignment,
@@ -59,8 +64,9 @@ export function grantAwardedLootItem(
   itemId: string,
   pid: number,
   eligibility: AwardEligibility,
+  sourceInstance?: ItemInstancePayload,
 ): void {
-  const instance = awardInstanceFor(ctx, itemId, eligibility);
+  const instance = awardInstanceFor(ctx, itemId, eligibility, sourceInstance);
   if (instance) ctx.addItemInstance(itemId, instance, pid, 1);
   else ctx.addItem(itemId, 1, pid);
 }
@@ -77,16 +83,17 @@ export function grantOrHoldAwardedLoot(
   itemId: string,
   pid: number,
   eligibility: AwardEligibility,
+  sourceInstance?: ItemInstancePayload,
 ): void {
   const mob = ctx.entities.get(mobId);
   const meta = ctx.players.get(pid);
-  const instance = awardInstanceFor(ctx, itemId, eligibility);
+  const instance = awardInstanceFor(ctx, itemId, eligibility, sourceInstance);
   if (
     !mob?.dead ||
     !meta ||
     countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance) >= 1
   ) {
-    grantAwardedLootItem(ctx, itemId, pid, eligibility);
+    grantAwardedLootItem(ctx, itemId, pid, eligibility, instance);
     return;
   }
   const slot: LootSlot = {
@@ -101,6 +108,8 @@ export function grantOrHoldAwardedLoot(
   mob.corpseTimer = Math.max(mob.corpseTimer, HELD_LOOT_CORPSE_SECONDS);
   ctx.emit({
     type: 'loot',
+    itemId,
+    ...(instance ? { instance: cloneItemInstancePayload(instance) } : {}),
     text: `Your bags are full; [[i:${itemId}]] is waiting on the corpse for you.`,
     pid,
   });

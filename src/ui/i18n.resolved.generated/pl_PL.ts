@@ -3433,6 +3433,15 @@ export const pl_PL: EnTranslations = {
         "socketReplaced": "Włożono klejnot do {name}; {gem} został zniszczony."
       }
     },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+    },
     "itemTooltip": {
       "requiresLevel": "Wymaga poziomu {level}",
       "riftTier": "Przedmiot Szczeliny rangi {tier}",

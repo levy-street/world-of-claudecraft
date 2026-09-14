@@ -3,6 +3,7 @@
 // these deltas into coloured tooltip lines; see Hud.itemCompareBlock.
 
 import { activeItemInstanceStats } from '../sim/item_instance_stats';
+import { lootQualityWeapon } from '../sim/loot_quality';
 import type { CoreStats, ItemDef, ItemInstancePayload } from '../sim/types';
 
 // Stable stat identifier; the HUD maps it to a localized label via t().
@@ -28,6 +29,7 @@ export type CompareStat =
 export function sameItemCopy(a?: ItemInstancePayload, b?: ItemInstancePayload): boolean {
   if (!a || !b) return a === b;
   return (
+    JSON.stringify(a.lootQuality ?? null) === JSON.stringify(b.lootQuality ?? null) &&
     JSON.stringify(a.rift ?? null) === JSON.stringify(b.rift ?? null) &&
     JSON.stringify(a.rolled ?? null) === JSON.stringify(b.rolled ?? null)
   );
@@ -45,7 +47,10 @@ export function shouldCompareCopies(
   worn?: ItemInstancePayload,
 ): boolean {
   if (hoveredId !== equippedId) return true;
-  return !!hovered?.rift && !sameItemCopy(hovered, worn);
+  return (
+    !!(hovered?.rift || worn?.rift || hovered?.lootQuality || worn?.lootQuality) &&
+    !sameItemCopy(hovered, worn)
+  );
 }
 
 export interface StatDelta {
@@ -75,7 +80,9 @@ function effectiveStat(
   instance: ItemInstancePayload | undefined,
   key: CopyStat,
 ): number {
-  const rolled = activeItemInstanceStats(instance)?.[key];
+  const rolled = activeItemInstanceStats(instance, def)?.[
+    key === 'healPower' ? 'healingPower' : key
+  ];
   const bonus = Number.isFinite(rolled) ? (rolled as number) : 0;
   const base =
     key === 'armor' ||
@@ -104,7 +111,9 @@ export function itemStatDeltas(
   equippedInstance?: ItemInstancePayload,
 ): StatDelta[] {
   const out: StatDelta[] = [];
-  const dpsDelta = weaponDps(item.weapon) - weaponDps(equipped.weapon);
+  const dpsDelta =
+    weaponDps(lootQualityWeapon(item, itemInstance)) -
+    weaponDps(lootQualityWeapon(equipped, equippedInstance));
   if (Math.abs(dpsDelta) >= 0.05) out.push({ stat: 'dps', delta: dpsDelta, decimals: 1 });
 
   const stats: Array<keyof CoreStats & CompareStat> = ['armor', 'str', 'agi', 'sta', 'int', 'spi'];

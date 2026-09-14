@@ -7421,6 +7421,49 @@
      specificity, and the bag reset is above while the bank reset is far
      below. Order against the cell focus rings is not load-bearing (they are
      outline-based). */
+  .loot-quality-badge {
+    color: var(--gold);
+    border: 1px solid currentColor;
+    background: var(--color-bg-dark);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 2px 3px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+  .bag-item > .loot-quality-badge,
+  .bank-item > .loot-quality-badge,
+  .mkt-ico > .loot-quality-badge,
+  .ui-socket > .loot-quality-badge {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+  }
+  .equip-quality-socket {
+    display: inline-flex;
+    position: relative;
+    flex: 0 0 auto;
+  }
+  .equip-quality-socket > .loot-quality-badge {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+  }
+  .equip-col-right .equip-quality-socket > .loot-quality-badge {
+    right: auto;
+    left: 1px;
+  }
+  .loot-quality-line {
+    color: var(--gold);
+  }
+  @media (forced-colors: active) {
+    .loot-quality-badge {
+      color: CanvasText;
+      background: Canvas;
+      border-color: CanvasText;
+    }
+  }
   .bag-item .bi-count {
     position: absolute;
     right: 2px;

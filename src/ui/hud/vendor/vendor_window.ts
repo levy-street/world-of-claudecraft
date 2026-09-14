@@ -376,8 +376,8 @@ export function renderVendorWindow(
     // reachable, the phase 13 QA round-2 frontend finding).
     const parts = wornItemCellParts(item, instance);
     const itemName = parts.name;
-    row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: itemName, price }));
-    row.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item, parts.quality)}</span><span class="vi-name" style="color:${itemNameColor({ kind: item.kind, quality: parts.quality })}">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price ui-money">${deps.moneyHtml(priceCopper)}</span>`;
+    row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: parts.ariaName, price }));
+    row.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item, parts.quality)}${parts.qualityBadge}</span><span class="vi-name" style="color:${itemNameColor({ kind: item.kind, quality: parts.quality })}">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price ui-money">${deps.moneyHtml(priceCopper)}</span>`;
     // POSITIONAL by design, unlike the identity-keyed goods rows: after a
     // buyback the list shifts and focus stays at the same SLOT (the next
     // item to reclaim), which is the useful landing for repeated buybacks.

@@ -1,3 +1,4 @@
+import { lootQualityAriaName, lootQualityBadgeHtml } from '../../loot_quality_view';
 // The Rift Forge window: the Riftwright's service (upgrade / socket a
 // Riftbound band) as a thin cold painter over rift_forge_view.ts. Opened by
 // the sim's riftForge interaction event, never a menu button: the forge lives
@@ -225,14 +226,14 @@ export class RiftForgeWindow {
 
   private rowHtml(r: RiftForgeRingRow, index: number): string {
     const item = ITEMS[r.itemId];
-    const name = item ? itemDisplayName(item) : r.itemId;
+    const name = lootQualityAriaName(item ? itemDisplayName(item) : r.itemId, r.instance);
     const color = item ? ` style="color:${itemNameColor(item)}"` : '';
     const tier = esc(t('hudChrome.itemTooltip.riftTier', { tier: r.tier }));
     const gemsNow = r.gems.length
       ? r.gems.map((g) => this.iconHtml(ITEMS[g])).join('')
       : esc(t('hudChrome.riftForge.socketsNone'));
     const head =
-      `<div class="rf-ring-head"><span class="rf-ring-name" data-ring-tip="${index}"${color}>${this.iconHtml(item)}${esc(name)}</span>` +
+      `<div class="rf-ring-head"><span class="rf-ring-name" data-ring-tip="${index}"${color}>${this.iconHtml(item)}${lootQualityBadgeHtml(r.instance)}${esc(name)}</span>` +
       `<span class="rf-ring-tier">${tier}</span></div>`;
     if (r.worn) {
       return `<div class="rf-ring rf-ring-worn">${head}<div class="rf-hint">${esc(t('hudChrome.riftForge.wornHint'))}</div></div>`;
