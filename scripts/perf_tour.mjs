@@ -495,6 +495,9 @@ async function runViewport(browser, viewport) {
         const key = 'woc_settings';
         const cur = JSON.parse(localStorage.getItem(key) ?? '{}');
         cur.graphicsPreset = value;
+        // The tour measures the stored render scale as a choice, so the weak-GPU
+        // boot default (game/boot_graphics_defaults.ts) cannot move it between runs.
+        cur.renderScaleTouched = true;
         localStorage.setItem(key, JSON.stringify(cur));
       } catch {
         /* storage unavailable */

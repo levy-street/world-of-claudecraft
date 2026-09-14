@@ -173,6 +173,8 @@ const SETTINGS_SEED = () => {
       effectsQuality: 1,
       shadowQuality: 1,
       renderScale: 1,
+      // A rig's explicit scale is a choice: keeps the weak-GPU boot default off it.
+      renderScaleTouched: true,
       browserEffects: 1,
       showFps: true,
     }),
