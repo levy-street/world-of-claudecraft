@@ -1619,6 +1619,30 @@ describe('createWsAuth: attachUpgrade', () => {
     expect(socket.destroy).toHaveBeenCalledTimes(1);
     expect(wss.handleUpgrade).not.toHaveBeenCalled();
   });
+
+  it('sets TCP_NODELAY and keepalive on the raw upgrade socket for low latency', () => {
+    const { deps } = setup();
+    const { attachUpgrade } = createWsAuth(deps);
+    const server = new EventEmitter();
+    const upgraded = new FakeWs();
+    const wss = {
+      handleUpgrade: vi.fn(
+        (_req: unknown, _socket: unknown, _head: unknown, cb: (ws: WebSocket) => void) =>
+          cb(asWs(upgraded)),
+      ),
+    };
+    attachUpgrade(server as unknown as http.Server, wss as unknown as WebSocketServer);
+
+    const socket = {
+      destroy: vi.fn(),
+      setNoDelay: vi.fn(),
+      setKeepAlive: vi.fn(),
+    };
+    server.emit('upgrade', { url: '/ws' }, socket, Buffer.alloc(0));
+
+    expect(socket.setNoDelay).toHaveBeenCalledWith(true);
+    expect(socket.setKeepAlive).toHaveBeenCalledWith(true, 10000);
+  });
 });
 
 describe('mid-handshake socket death cannot mint a permanent zombie session', () => {
