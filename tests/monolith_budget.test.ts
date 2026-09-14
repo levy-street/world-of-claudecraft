@@ -471,7 +471,10 @@ const MONOLITHS: MonolithRow[] = [
     // bespoke rows (the chat timestamp pair, the chat-window reset, the Unlock
     // Interface action) moved to src/ui/options_interface_rows.ts. Exact count,
     // zero slack.
-    ceiling: 2840,
+    // LOWERED 2840 -> 2828 at the weak-GPU render-scale default: the slider
+    // gold-fill formula moved to settings_controls.ts paintRangeFill (it was
+    // written twice), paying for the one-line touched-flag stamp on commit.
+    ceiling: 2828,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {

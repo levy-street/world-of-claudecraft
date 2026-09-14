@@ -76,7 +76,10 @@ describe('options_window: no magic values', () => {
   });
 
   it('names its numeric thresholds instead of bare literals', () => {
-    expect(painter).toContain('RANGE_FILL_FULL_PCT');
+    // The slider gold-fill formula (and its RANGE_FILL_FULL_PCT) lives in the
+    // shared settings_controls.ts painter; the window only calls it.
+    expect(painter).toContain('paintRangeFill(slider)');
+    expect(painter).not.toMatch(/--range-fill/);
     // the bare 2000 literal appears ONLY on the BUG_DESC_MAX_LEN definition line, so
     // a future stray 2000 elsewhere (or a dropped constant) trips the guard.
     expect(painter).toContain('const BUG_DESC_MAX_LEN = 2000;');
