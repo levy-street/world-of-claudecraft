@@ -640,6 +640,11 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
   }
 
   async function onConnection(ws: WebSocket, req: http.IncomingMessage): Promise<void> {
+    const rawSocket = (ws as unknown as { _socket?: { setNoDelay?: (noDelay?: boolean) => void } })
+      ._socket;
+    if (rawSocket && typeof rawSocket.setNoDelay === 'function') {
+      rawSocket.setNoDelay(true);
+    }
     const authTimer = setTimeout(() => {
       rejectHandshake(ws, WS_AUTH_ERROR.authTimedOut);
     }, AUTH_TIMEOUT_MS);
@@ -719,6 +724,13 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       if (url.pathname !== WS_UPGRADE_PATH) {
         socket.destroy();
         return;
+      }
+      // Disable Nagle algorithm immediately to eliminate TCP buffering and minimize input-echo latency
+      if ('setNoDelay' in socket && typeof socket.setNoDelay === 'function') {
+        socket.setNoDelay(true);
+      }
+      if ('setKeepAlive' in socket && typeof socket.setKeepAlive === 'function') {
+        socket.setKeepAlive(true, 10000);
       }
       wss.handleUpgrade(req, socket, head, (ws) => {
         void onConnection(ws, req);

@@ -3785,7 +3785,11 @@ export async function startServer(): Promise<http.Server> {
   // cap frame size: the largest legitimate client message is a small JSON
   // command; without this the ws default (~100 MiB) lets one socket force a
   // huge allocation + parse before any field-level validation runs
-  const wss = new WebSocketServer({ noServer: true, maxPayload: WS_MAX_PAYLOAD_BYTES });
+  const wss = new WebSocketServer({
+    noServer: true,
+    maxPayload: WS_MAX_PAYLOAD_BYTES,
+    perMessageDeflate: false,
+  });
   const wsAuth = createWsAuth({
     game,
     accountAndScopeForToken,
