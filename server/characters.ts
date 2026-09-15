@@ -44,6 +44,7 @@
 import type * as http from 'node:http';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
+import { savedZoneId } from '../src/sim/saved_pos_exit';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 // The shared, host-agnostic bounds check for an untrusted look (the
@@ -413,6 +414,11 @@ export function buildCharacterList(
       // Server-decided (cutoff + unspent token): the roster's one-shot
       // redesign button renders exactly when this is true.
       appearanceRerollAvailable: appearanceRerollAvailable(c),
+      // The zone this character stands in on login (the same rejoin rule
+      // addPlayer applies, so an instance save reads as its door's zone; null
+      // for a mid-match battleground save that resumes at the world start).
+      // Character select labels the roster row with it.
+      zoneId: savedZoneId(c.state?.pos),
     })),
   };
 }

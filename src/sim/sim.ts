@@ -209,18 +209,14 @@ import {
   DELVE_LIST,
   DELVE_SLOT_COUNT,
   DUNGEON_LIST,
-  DUNGEON_X_THRESHOLD,
-  delveAt,
   delveOrigin,
   dungeonAt,
   getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   ITEMS,
   isArenaPos,
-  isBgPos,
   isDelvePos,
   MOBS,
-  migrateLegacyInstancePos,
   QUESTS,
   RIFT_SLOT_COUNT,
   riftInstanceOrigin,
@@ -652,6 +648,7 @@ import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { freshCounters, type RewardCounters } from './reward_counters';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
+import { resolveSavedPosExit } from './saved_pos_exit';
 import { persistedResource } from './serialize_resource';
 import { computeCharacterModifiers } from './set_bonus_mods';
 import {
@@ -2813,39 +2810,12 @@ export class Sim {
     const savedState = opts?.state
       ? sanitizeRemovedZone1Content(migrateCharacterTalentsV2(cls, opts.state)).state
       : undefined;
-    // Characters saved inside a dungeon instance rejoin at its entrance —
-    // their old instance is gone (or belongs to someone else) by now.
-    let savedPos = savedState?.pos ?? null;
-    // Delve must be checked BEFORE the dungeon branch: dungeonAt() returns null
-    // for any x >= ARENA_X_MIN (which includes the delve band), so the dungeon
-    // branch's `?? DUNGEON_LIST[0]` fallback would otherwise swallow a delve
-    // position and eject the player to a dungeon door instead of the board door
-    // (FR-1.6). The two bands are disjoint, so `else if` keeps dungeon handling intact.
-    // Saves from before the instance plane moved east (see data.ts). This
-    // resolves a legacy instance position all the way to its door, so it IS an
-    // instance exit and takes the same exemption the two branches below do:
-    // the collision migration must not walk it off a door the content author
-    // placed, exactly as it does not walk a current-band exit off one.
-    let legacyInstanceExit = false;
-    if (savedPos) {
-      const migrated = migrateLegacyInstancePos(savedPos);
-      if (migrated) {
-        savedPos = migrated;
-        legacyInstanceExit = true;
-      }
-    }
-    if (savedPos && isBgPos(savedPos.x)) {
-      // A save inside the Thornhollow Fields band (a crash mid-match) has no match to
-      // rejoin: resume at the world start (dungeonAt() knows nothing about
-      // this band, so the dungeon-door fallback below must never see it).
-      savedPos = null;
-    } else if (savedPos && isDelvePos(savedPos.x)) {
-      const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
-      savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
-    } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
-      const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
-      savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
-    } else if (savedPos && !legacyInstanceExit) {
+    // Characters saved inside a dungeon instance rejoin at its entrance (the
+    // shared rule in saved_pos_exit.ts, which the character list reads too so
+    // the roster's zone label matches where the character actually lands).
+    const savedExit = resolveSavedPosExit(savedState?.pos);
+    let savedPos = savedExit.pos;
+    if (savedPos && !savedExit.instanceExit) {
       // Authored towns can grow across release boundaries. A living character
       // saved on what used to be open overworld ground must not resume trapped
       // inside a newly added solid prop. Preserve valid shoreline and swimming

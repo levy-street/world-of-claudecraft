@@ -439,6 +439,7 @@ import { assembleBugReportMeta } from './ui/bug_report';
 import { cameraPromptOpen, dismissCameraPrompt } from './ui/camera_prompt';
 import { deleteCharButtonHtml, normalizeDeleteConfirmation } from './ui/char_delete_button';
 import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
+import { charselectHintsHtml } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -6708,13 +6709,9 @@ async function refreshCharacters(): Promise<void> {
       row.dataset.class = c.class;
       row.dataset.skin = String(c.skin ?? 0);
       const className = classDisplayName(c.class);
-      // Online characters explain themselves on their own hint line (below the
-      // class) instead of the terse "(in world)" suffix, so the reason for the
-      // Take Over button is unmissable.
       const statusText = c.online ? '' : c.forceRename ? ` (${t('character.renameRequired')})` : '';
-      const inWorldHint = c.online
-        ? `<span class="char-inworld-hint">${esc(t('character.inWorldHint'))}</span>`
-        : '';
+      // Zone line plus the in-world notice (src/ui/charselect_hints.ts).
+      const hintsHtml = charselectHintsHtml(c);
       // One-shot redesign token (server-decided: pre-creator character, token
       // unspent). Rendered on every action arm; gone for good once spent.
       const rerollBtn = c.appearanceRerollAvailable
@@ -6739,7 +6736,7 @@ async function refreshCharacters(): Promise<void> {
         <div class="char-id">
           <span class="char-name">${esc(c.name)}</span>
           <span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(statusText)}</span>
-          ${inWorldHint}
+          ${hintsHtml}
         </div>
         ${
           c.forceRename
