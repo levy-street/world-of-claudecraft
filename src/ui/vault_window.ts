@@ -51,6 +51,7 @@ import {
   appendMaterialSourcesActionAfter,
   attachMaterialSourcesContextMenu,
   type MaterialSourcesDialogOptions,
+  materialSourcesButtonShown,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
 import { StorageRungEchoLatch } from './storage_rung_echo_core';
@@ -419,21 +420,32 @@ export class VaultTab {
         : '';
       return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
     });
-    attachMaterialSourcesContextMenu(row, name, displayedSources, this.deps.openMaterialSources);
-    if (displayedSources) wrap.classList.add('material-source-item');
-    wrap.appendChild(row);
-    appendMaterialSourcesActionAfter(
-      row,
-      name,
-      displayedSources,
-      this.deps.openMaterialSources,
+    // The exact-source withdraw session rides both doors into the dialog:
+    // desktop right-click and the touch-only Sources button.
+    const withdrawSelection =
       model.kind === 'special'
         ? vaultMaterialWithdrawSelection(this.deps.world(), itemId, model.specialRef.index, () => {
             this.deps.hideTooltip();
             this.deps.onInventoryChanged();
             this.deps.requestRender();
           })
-        : undefined,
+        : undefined;
+    attachMaterialSourcesContextMenu(
+      row,
+      name,
+      displayedSources,
+      this.deps.openMaterialSources,
+      withdrawSelection,
+    );
+    if (displayedSources && materialSourcesButtonShown())
+      wrap.classList.add('material-source-item');
+    wrap.appendChild(row);
+    appendMaterialSourcesActionAfter(
+      row,
+      name,
+      displayedSources,
+      this.deps.openMaterialSources,
+      withdrawSelection,
     );
     if (model.canChooseQuantity && model.partialMax !== null) {
       // A visible sibling action gives touch and switch users the same partial
