@@ -599,10 +599,15 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
 
   it('pins the shipped constants so a one-sided retune cannot drift silently', () => {
     for (const recipe of TOOL_EFFECT_RECIPES) {
-      // 5 shards (55) + 4 essence (18) + 6 dust (6) = 383 copper listed,
-      // 4 + 3 + 4 = 298 for a specialized enchanter.
-      expect(mintValue(recipe, {})).toBe(383);
-      expect(mintValue(recipe, { enchanting: 125 })).toBe(298);
+      // 1 shard (55) + 14 essence (18) + 10 dust (6) = 367 copper listed,
+      // 1 + 11 + 8 = 301 for a specialized enchanter.
+      expect(mintValue(recipe, {})).toBe(367);
+      expect(mintValue(recipe, { enchanting: 125 })).toBe(301);
+      // The scarce-material cap: a charm asks for at most ONE shard (one
+      // epic disenchant), never the five-shard bill the original mint
+      // carried, which priced a charm far above what its recharges cost.
+      const shard = recipe.reagents.find((reagent) => reagent.itemId === 'arcane_shard');
+      expect(shard?.count).toBe(1);
     }
     // The worst generic recharge a shipped tool can price: an epic tool's
     // 50-charge fill at 5 shards.
@@ -612,16 +617,20 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
       275,
     );
     // The self-signed reduction (crafting.ts, one unit off before the
-    // multiplier) would drop the specialized mint to 225 and break the bound,
-    // and it is unreachable ONLY because no path mints a signed arcane
+    // multiplier) is unreachable today because no path mints a signed arcane
     // material: the disenchant primary grants plain, and node yields are
-    // never arcane. Pinned so a future signed-material source has to face
-    // this bound rather than quietly slipping under it.
+    // never arcane. Under the original five-shard bill it would have dropped
+    // the specialized mint to 225 and broken the bound; the essence-heavy
+    // bill clears it even on that arm (277), by a margin of two copper.
+    // Pinned as a literal so a future signed-material source, or a retune of
+    // either side, has to face this bound rather than quietly slipping
+    // under it.
     const selfSigned = TOOL_EFFECT_RECIPES[0].reagents.reduce((total, reagent) => {
       const { count } = requiredReagentCountFor(true, reagent, { enchanting: 125 }, 'enchanting');
       return total + count * unitValue(reagent.itemId);
     }, 0);
-    expect(selfSigned).toBeLessThan(275);
+    expect(selfSigned).toBe(277);
+    expect(selfSigned).toBeGreaterThan(275);
     for (const reagent of TOOL_EFFECT_RECIPES[0].reagents) {
       expect(
         Object.values(ITEMS).some(

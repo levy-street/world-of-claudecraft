@@ -5400,6 +5400,12 @@ export const TARGETS = [
         selectTab: 'weaponcrafting',
       },
       { key: 'mobile-vault-note', vaultNote: 'after', mobile: true, selectTab: 'weaponcrafting' },
+      // The charm-bill retune (five Chime Shards to one): the two charm
+      // recipes on the enchanting tab, with the FULL old bill in the bags
+      // (five shards, fourteen essence, ten dust) so both arms read
+      // craftable and the reagent line, not affordability, is the subject.
+      { key: 'desktop-charm-bill', charmBill: true, selectTab: 'enchanting' },
+      { key: 'mobile-charm-bill', charmBill: true, mobile: true, selectTab: 'enchanting' },
       { key: 'desktop-identity-attuned', identity: true, selectTab: 'alchemy' },
       { key: 'mobile-identity-attuned', identity: true, mobile: true, selectTab: 'alchemy' },
       {
@@ -5495,6 +5501,23 @@ export const TARGETS = [
               } catch {}
             }
           }
+          if (staging.charmBill) {
+            for (const [id, n] of [
+              ['arcane_shard', 5],
+              ['arcane_essence', 14],
+              ['arcane_dust', 10],
+            ]) {
+              try {
+                sim?.addItem(id, n);
+              } catch {}
+            }
+            const meta = sim?.players?.get(sim.primaryId);
+            if (meta) {
+              meta.craftSkills = { ...meta.craftSkills, enchanting: 30 };
+              meta.knownRecipes.add('recipe_gatherers_cache');
+              meta.knownRecipes.add('recipe_artisans_eye');
+            }
+          }
           if (staging.identity) {
             // The identity-card framings (phase 22): stub the IWorld read with
             // the professions target's cap-legal attuned Smith, so the card
@@ -5553,6 +5576,7 @@ export const TARGETS = [
           // contract: an unnamed variant flag is silently dropped (the
           // recorded first-capture gotcha).
           vaultNote: variant?.vaultNote ?? null,
+          charmBill: Boolean(variant?.charmBill),
         },
       );
       // A first-open crafting window with several icon-bearing recipe rows takes
@@ -5560,7 +5584,7 @@ export const TARGETS = [
       // bags/map windows do (getBoundingClientRect can report 0x0 for 2-4s), so
       // poll for a real size instead of guessing a fixed wait.
       const open = await pollForSize(page, '#crafting-window');
-      if (open && (variant?.fourStates || variant?.discount)) {
+      if (open && (variant?.fourStates || variant?.discount || variant?.charmBill)) {
         // Staging mid-tier craft skills trips the once-ever first-tier
         // explainer modal over the window, on a drain-window delay rather
         // than synchronously; poll-dismiss it so the shot frames the recipe
@@ -5621,6 +5645,16 @@ export const TARGETS = [
         // Field casts run 1.75s: 900ms in, the strip reads about half full.
         await wait(900);
       }
+      if (open && variant?.charmBill) {
+        // Frame the Gatherer's Cache row (the retuned bill) at the top of
+        // the pane; the Artisan's Eye row follows it.
+        await page.evaluate(() => {
+          document
+            .querySelector('#crafting-window [data-focus-key="craft:recipe_gatherers_cache"]')
+            ?.scrollIntoView({ block: 'start' });
+        });
+        await wait(300);
+      }
       if (open && variant?.identity && variant?.mobile) {
         // The stacked mobile card caps its height and scrolls internally
         // (hud.mobile.css), which leaves the skill rows below the fold; the
@@ -5636,6 +5670,7 @@ export const TARGETS = [
       if (
         open &&
         !variant?.identity &&
+        !variant?.charmBill &&
         (variant?.mobile || variant?.fourStates || variant?.discount || variant?.bagFreshness)
       ) {
         // The identity card fills the top of the window (all of it on the short
