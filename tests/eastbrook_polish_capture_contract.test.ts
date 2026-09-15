@@ -668,8 +668,10 @@ interface AttributionTargetFixture {
 // v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
+// Re-minted for the monument impostor shader fix: renaming the illegal "flat"
+// variable moved the civicShader leaf. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5ae21044dd1b636f9c293ec628a7d316f740bb92a5962f848c6e58c80218ebbc';
+  '9bac21494e4596b381a7e17363997ad5abee62078a7bb2b7ae63685100212d15';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

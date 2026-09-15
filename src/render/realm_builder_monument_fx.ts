@@ -48,6 +48,10 @@ import {
   monumentPointWorld,
   monumentScale,
 } from './realm_builder_monument_fx_core';
+import {
+  MONUMENT_IMPOSTOR_FRAGMENT,
+  MONUMENT_IMPOSTOR_VERTEX,
+} from './realm_builder_monument_impostor_glsl';
 
 const GROUP_NAME = 'eastbrookRealmBuilderMonumentFx';
 const NAME_CANVAS_WIDTH = 1024;
@@ -386,49 +390,6 @@ interface MonumentImpostor {
   cell: number;
 }
 
-const IMPOSTOR_VERTEX = /* glsl */ `
-  #include <fog_pars_vertex>
-  uniform vec2 uCell;
-  uniform vec2 uCellSize;
-  varying vec2 vUv;
-  void main() {
-    vUv = uCell + uv * uCellSize;
-    // Billboard about the vertical axis ONLY: a statue that tips to face the
-    // camera reads as a card the moment you look down at it from a rise.
-    vec3 right = vec3(modelViewMatrix[0][0], modelViewMatrix[1][0], modelViewMatrix[2][0]);
-    vec3 flat = normalize(vec3(right.x, 0.0, right.z));
-    vec3 world = vec3(
-      flat.x * position.x,
-      position.y,
-      flat.z * position.x
-    );
-    vec4 mvPosition = modelViewMatrix * vec4(world, 1.0);
-    gl_Position = projectionMatrix * mvPosition;
-    #include <fog_vertex>
-  }
-`;
-
-// The atlas is sRGB-tagged, so the sample is linear like every lit surface,
-// and the tail is the one MeshStandardMaterial ends with (tonemapping,
-// colorspace, fog): a card that skipped it would stand un-fogged and
-// un-toned at the fog wall while every building around it fades, and would
-// shift colour against the body on the frame the two swap.
-const IMPOSTOR_FRAGMENT = /* glsl */ `
-  #include <fog_pars_fragment>
-  uniform sampler2D uAtlas;
-  varying vec2 vUv;
-  void main() {
-    vec4 texel = texture2D(uAtlas, vUv);
-    // Alpha-TEST, not blend: at this range the billboard has to sort against
-    // the town like the solid it stands in for, and a blended quad does not.
-    if (texel.a < 0.5) discard;
-    gl_FragColor = vec4(texel.rgb, 1.0);
-    #include <tonemapping_fragment>
-    #include <colorspace_fragment>
-    #include <fog_fragment>
-  }
-`;
-
 /**
  * The billboard that stands in for the statue past MONUMENT_IMPOSTOR_RANGE.
  *
@@ -443,8 +404,8 @@ function buildImpostor(placement: MonumentPlacement): MonumentImpostor | null {
   geometry.translate(0, size / 2, 0);
   const uvOffset = { value: new THREE.Vector2(0, 0) };
   const material = new THREE.ShaderMaterial({
-    vertexShader: IMPOSTOR_VERTEX,
-    fragmentShader: IMPOSTOR_FRAGMENT,
+    vertexShader: MONUMENT_IMPOSTOR_VERTEX,
+    fragmentShader: MONUMENT_IMPOSTOR_FRAGMENT,
     // Scene fog reaches a ShaderMaterial only when asked for, and only through
     // these uniforms (foliage_impostor.ts gets both from MeshStandardMaterial).
     // Cloned rather than merged so uCell stays the caller's own Vector2.

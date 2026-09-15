@@ -510,6 +510,26 @@ export const EASTBROOK_POLISH_BASELINE_REVISION = '3ab740db453bd8b5858a52c304edc
 // covers the renderer's own call sites. Add the module as a leaf at the next
 // legitimate re-mint only if a future capture's claims come to depend on
 // prewarm behavior.
+// SECOND DELIBERATE EXCLUSION (2026-09-12): the monument impostor's GLSL,
+// extracted out of the civicShader module into
+// src/render/realm_builder_monument_impostor_glsl.ts, is NOT a leaf here, and
+// this is the same shape as the exclusion above rather than a new judgement.
+// The extraction bought a real-context link of the shipped strings: importing
+// the fx module into a browser test cost +1.2 s of import time on a file whose
+// own assertions cost 110 ms, while a dependency-free source module costs
+// nothing. Applying the exclusion note's own test, do the polish evidence's
+// claims depend on these bytes: no. MONUMENT_IMPOSTOR_RANGE is 72
+// (realm_builder_monument_fx_core.ts) and the monument sits at (-14.75, -102)
+// (CIVIC_FEATURE_CENTER); every polish view that can contain it is within
+// 51 yd, the farthest being apothecary-lin at 50.6, so the captures show the
+// statue BODY and can never show the impostor card. The one polish view beyond
+// that range (camera (34, 15, 25), target (12.5, 4, -5.5)) is aimed at another
+// district, away from the monument. The civicShader leaf still seals the
+// wiring (which strings, which uniforms, fog: true), and the bytes themselves
+// now carry a stronger guard than a sha256: a real driver links them in
+// tests/browser/dry_compile_sources.browser.test.ts. Add the module as a leaf
+// at the next legitimate re-mint only if a future capture is retaken from
+// beyond 72 yd with the monument in frame.
 export const EASTBROOK_POLISH_PROVENANCE_INPUTS = Object.freeze({
   townAssetSourceFingerprint: 'scripts/assets/eastbrook_town/source_fingerprint.mjs',
   authoritativeLayout: 'src/sim/eastbrook_layout.ts',
