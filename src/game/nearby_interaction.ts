@@ -1,5 +1,6 @@
 import type { FarmPlotView } from '../world_api/farming';
 import { handleEscortPress } from './escort_interact';
+import { HARVEST_CHOICE_NO_POINTER } from './harvest_body_pick';
 import type { InteractionOutcome } from './interaction_autorun';
 import {
   type NearbyInteractionScanWorld,
@@ -10,6 +11,9 @@ import {
 // only. It never sends harvestCorpse, harvestNode, or harvestCrop; those are
 // explicit actions (node/tool/crop click, the corpse picker) with their own
 // entry points. The world slice below therefore names no gathering command.
+// The one corpse-harvest thing the press does is OPEN the corpse picker (the
+// last rung of the ladder, for a Field Kit carrier on a harvest-only body),
+// exactly as the bed press opens the bed sheet: a window, never a harvest.
 // The scan half (player, party roster, entities, quest log, garden beds) is
 // the shared candidate-resolver slice, so the prompt and the press can never
 // read a different world.
@@ -45,6 +49,12 @@ export interface NearbyInteractionHud {
   // ordinary interaction; the sheet's own explicit Harvest control is the
   // ONLY thing that ever sends harvestCrop.
   openPlantSheet(bedId: string): void;
+  // The corpse popup (Hud.openLoot): the harvest-choice arm opens it with
+  // HARVEST_CHOICE_NO_POINTER for both screen coordinates, so it centers
+  // instead of anchoring to a cursor the press never had. Opening it is
+  // ordinary interaction; the popup's own Harvest control is the ONLY thing
+  // that ever sends harvestCorpse.
+  openLoot(mobId: number, screenX: number, screenY: number): void;
 }
 
 /** Find and dispatch one eligible nearby interaction in stable priority order.
@@ -69,6 +79,11 @@ export function tryNearbyInteraction(
     // Ordinary loot only. Harvesting a corpse is an explicit action with its
     // own entry point (the corpse picker), never a side effect of this press.
     return world.lootCorpse(candidate.id);
+  }
+  if (candidate?.kind === 'harvest') {
+    // Opens the choice only: the popup's Harvest control sends the cast.
+    hud.openLoot(candidate.id, HARVEST_CHOICE_NO_POINTER, HARVEST_CHOICE_NO_POINTER);
+    return true;
   }
   if (candidate?.kind === 'delve') {
     return world.delveInteract(candidate.id);

@@ -96,6 +96,10 @@ function rig(targets: Entity[] = []) {
     requestSpiritHealerResurrect: () => calls.push('requestResurrect'),
     // Phase 9b bed-arm seam member: inert here (lane A's arms exercise it).
     openPlantSheet: (bedId: string) => calls.push(`plantSheet:${bedId}`),
+    // The corpse harvest-choice arm opens the loot popup with NO pointer
+    // position (the keyboard, pad and touch route): record whether one rode.
+    openLoot: (mobId: number, screenX: number, screenY: number) =>
+      calls.push(`openCorpse:${mobId}:${Number.isFinite(screenX) || Number.isFinite(screenY)}`),
   };
   return { world, hud, calls, player };
 }
@@ -357,10 +361,28 @@ describe('tryNearbyInteraction corpse press is ordinary loot only', () => {
     expect(r.calls).toEqual(['loot:2']);
   });
 
-  it('a harvest-only corpse is no target: no harvest, no loot, the nothing line', () => {
+  it('a harvest-only corpse is no target without a Field Kit: the nothing line', () => {
     const r = rig([wolfCorpse({ loot: null })]);
     expect(interact(r)).toBe(false);
     expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('a harvest-only corpse opens the corpse choice for a Field Kit carrier, sending no harvest', () => {
+    // The pre-v0.42 press harvested on the spot; intentional gathering made
+    // the harvest an explicit cast behind the popup's own Harvest control.
+    // The press now OPENS that choice (as the bed press opens the bed sheet),
+    // pointer-less so the popup centers, and still sends no gathering command.
+    const r = rig([wolfCorpse({ loot: null })]);
+    (r.world as { inventory?: unknown }).inventory = [{ itemId: 'field_kit', count: 1 }];
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['openCorpse:2:false']);
+  });
+
+  it('a corpse with loot still sends loot alone even with a Field Kit carried', () => {
+    const r = rig([wolfCorpse()]);
+    (r.world as { inventory?: unknown }).inventory = [{ itemId: 'field_kit', count: 1 }];
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['loot:2']);
   });
 
   it('a harvest-only corpse never swallows an eligible ordinary interaction behind it', () => {
@@ -375,10 +397,14 @@ describe('tryNearbyInteraction corpse press is ordinary loot only', () => {
     expect(r.calls).toEqual(['quest:3']);
   });
 
-  it('dispatches nothing on a claimed lootless corpse', () => {
+  it('dispatches nothing on a claimed lootless corpse, Field Kit or not', () => {
     const r = rig([wolfCorpse({ loot: null, harvestClaimedBy: 9 })]);
     expect(interact(r)).toBe(false);
     expect(r.calls).toEqual(['error:nothing']);
+    const kit = rig([wolfCorpse({ loot: null, harvestClaimedBy: 9 })]);
+    (kit.world as { inventory?: unknown }).inventory = [{ itemId: 'field_kit', count: 1 }];
+    expect(interact(kit)).toBe(false);
+    expect(kit.calls).toEqual(['error:nothing']);
   });
 
   it('normal material and quest loot on a corpse still opens', () => {
