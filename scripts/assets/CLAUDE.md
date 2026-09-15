@@ -108,9 +108,14 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   (declares the packed ORM red channel as `occlusionTexture` on shipped GLBs so three.js
   builds an aoMap, zero new texture bytes), `foliage_vertex_pipeline.mjs` /
   `optimize_foliage_vertices.mjs` (deterministic finalization of the shipped foliage GLBs;
-  input/output sha256 tables live in the module), and `ravenrift_blueprint.mjs` (run via
-  `tsx`: renders the battleground blueprint diagram FROM the authoritative layout records,
-  so the docs image cannot drift from what players collide with).
+  input/output sha256 tables live in the module), `decimated_prop_swap.mjs` (lands a
+  Blender decimation pass over shipped scatter props: transplants only the export's
+  primitive geometry onto the shipped GLB so names, materials and bounds stay what
+  consumers key on, downsizes maps above `--cap` with the codec each map shipped with,
+  re-applies the original's meshopt/quantization, and verifies before writing; the
+  export dir is maintainer-local, the recipe is the header), and `ravenrift_blueprint.mjs`
+  (run via `tsx`: renders the battleground blueprint diagram FROM the authoritative layout
+  records, so the docs image cannot drift from what players collide with).
 
 ## Relationship to the rest
 - **Output to `public/`** (the GLB/texture/HDRI tree the game loads at runtime).
