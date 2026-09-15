@@ -6,7 +6,11 @@
 // hydrates: while the character GLBs are still preloading the chip shows the
 // class crest as a placeholder and upgrades to the real portrait once ready.
 
-import { modularVisualKey } from '../render/characters/manifest';
+import {
+  FULL_BODY_SKIN_VISUAL_KEY_SET,
+  FULL_BODY_SKIN_VISUAL_KEYS,
+  modularVisualKey,
+} from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
 import {
   modularPortraitDataUrl,
@@ -64,7 +68,9 @@ export interface PortraitChipOpts {
   /** Which skin catalog `skin` indexes. Under `'mech'` the chip draws the
    *  Combat Mech body in that chroma, `skin` is a chroma index there, not a
    *  class-atlas index, and any `look` is ignored (the world shows the mech,
-   *  so the chip must too). */
+   *  so the chip must too). Under any other replacement-body catalog the chip
+   *  draws that fixed body instead (`skin` is unused there: no chroma), same
+   *  reasoning. */
   catalog?: SkinCatalog;
 }
 
@@ -90,12 +96,12 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
     look = null,
     catalog = 'class',
   } = opts;
-  const mech = catalog === 'mech';
+  const bodyKey = FULL_BODY_SKIN_VISUAL_KEYS[catalog];
   // A composed chip is never `deferSource`: that path re-derives the URL in
   // hydratePortraits from data attributes alone, and a look does not fit in
   // one. It is only used for dense repeated grids of OTHER players anyway.
-  const portrait = mech
-    ? visualPortraitDataUrl('player_mech', skin, framing)
+  const portrait = bodyKey
+    ? visualPortraitDataUrl(bodyKey, skin, framing)
     : look
       ? modularPortraitDataUrl(modularVisualKey(cls), look, framing)
       : deferSource
@@ -118,7 +124,7 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
   // hydratePortraits must NOT upgrade it (it would re-derive the LEGACY
   // portrait from the data attributes: a look does not fit in one). The
   // builder re-renders such chips itself via onPortraitsReady.
-  const composed = !mech && look && !portrait ? ' data-portrait-composed="1"' : '';
+  const composed = !bodyKey && look && !portrait ? ' data-portrait-composed="1"' : '';
   const alt = esc(t('character.portraitAlt', { name }));
   const badgeHtml = badge
     ? `<img class="portrait-badge" src="${crestUrl(cls)}" ${fallbackAttrs} alt="" aria-hidden="true" draggable="false">`
@@ -149,10 +155,10 @@ export function hydratePortraits(
     const skin = Number(chip.dataset.skin ?? 0) || 0;
     if (onlyClass && (cls !== onlyClass || skin !== onlySkin)) return;
     const framing = (chip.dataset.framing as PortraitFraming | undefined) ?? 'headshot';
-    const url =
-      chip.dataset.catalog === 'mech'
-        ? visualPortraitDataUrl('player_mech', skin, framing)
-        : playerPortraitDataUrl(cls, skin, framing);
+    const chipBodyKey = FULL_BODY_SKIN_VISUAL_KEYS[chip.dataset.catalog as SkinCatalog];
+    const url = chipBodyKey
+      ? visualPortraitDataUrl(chipBodyKey, skin, framing)
+      : playerPortraitDataUrl(cls, skin, framing);
     if (!url) return;
     const img = chip.querySelector<HTMLImageElement>('.portrait-img');
     if (img) {
@@ -170,9 +176,10 @@ export function hydratePortraits(
 onPortraitsReady(() => hydratePortraits(document));
 onPortraitUpdate((visualKey, skin) => {
   if (!visualKey.startsWith('player_')) return;
-  // A mech chip carries the WEARER's class in data-cls and the chroma in
-  // data-skin, so no class filter can name it: rehydrate the whole page.
-  if (visualKey === 'player_mech') {
+  // A replacement-body chip (mech or a fixed full-body skin) carries the
+  // WEARER's class in data-cls and its own chroma/index in data-skin, so no
+  // class filter can name it: rehydrate the whole page.
+  if (FULL_BODY_SKIN_VISUAL_KEY_SET.has(visualKey)) {
     hydratePortraits(document);
     return;
   }

@@ -1017,6 +1017,10 @@ export interface SimContextCallbacks {
   // emits. Both stay on Sim. (hasPendingSocialInvite is already declared above; isRooted/
   // moveSpeedMult/swingIntervalMult are M2 decls above -> all deduped.)
   setPlayerLevel(level: number, pid?: number): void;
+  // Backs the /dev skin cheat (handleDevChat): the ONLY way to wear a fixed
+  // full-body skin today (FULL_BODY_SKIN_CATALOGS are dev/admin-granted only,
+  // no unlock item, no picker). Stays on Sim, same as setPlayerLevel above.
+  setPlayerSkin(pid: number, skin: number, catalog?: SkinCatalog): boolean;
   notice(pid: number, text: string, color?: string): void;
   // Dev-only test-dummy spawner backing "/dev bot <name>" (handleDevChat, gated by
   // devCommands). Adds a stationary whisperable player near the primary; returns the
@@ -1723,6 +1727,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     syncPetAspect: host.syncPetAspect,
     // G2 social plumbing passthroughs (hasPendingSocialInvite already bound above; deduped).
     setPlayerLevel: host.setPlayerLevel,
+    setPlayerSkin: host.setPlayerSkin,
     notice: host.notice,
     spawnDevBot: host.spawnDevBot,
     spawnDevVendor: host.spawnDevVendor,

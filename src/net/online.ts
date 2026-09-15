@@ -81,6 +81,7 @@ import {
   emptyMoveInput,
   type InvSlot,
   type ItemInstancePayload,
+  isSkinCatalog,
   type LootRollChoice,
   type LootRollGroupStatus,
   type LootRollPrompt,
@@ -2752,7 +2753,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
             ([slot, inst]) => [slot, cloneItemInstancePayload(inst)],
           ),
         );
-        e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
+        e.skinCatalog = isSkinCatalog(w.cat) ? w.cat : 'class';
         // The authored modular look (identity-only: set at join, immutable for
         // the session). Untrusted wire JSON on purpose: every consumer runs
         // it through normalizeAppearance before composing, so a hostile peer

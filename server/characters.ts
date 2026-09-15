@@ -45,7 +45,7 @@ import type * as http from 'node:http';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
 import type { CharacterState } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
+import { isSkinCatalog, type PlayerClass } from '../src/sim/types';
 // The shared, host-agnostic bounds check for an untrusted look (the
 // action_bar.ts pattern). The renderer owns what the values MEAN; the server
 // only guarantees the stored document is small and well shaped.
@@ -384,7 +384,7 @@ export function buildCharacterList(
       playtimeSeconds: Number(c.playtime_seconds ?? 0),
       // Keep the migrated RouteDef byte-identical with the retained legacy arm:
       // character select renders the same body and held items as the live world.
-      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
+      skinCatalog: isSkinCatalog(c.state?.skinCatalog) ? c.state.skinCatalog : 'class',
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
       offhandItemId: c.state?.equipment?.offhand ?? null,
       // The account's active Armory weapon skin for THIS character's class and
@@ -395,7 +395,7 @@ export function buildCharacterList(
         c.class,
         c.state?.equipment?.mainhand ?? null,
         weaponSkinLoadout,
-        c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
+        isSkinCatalog(c.state?.skinCatalog) ? c.state.skinCatalog : 'class',
       ),
       // The authored modular look (null = pre-creator character, legacy rig).
       // Re-validated here the same way the join path does (ws_auth.ts

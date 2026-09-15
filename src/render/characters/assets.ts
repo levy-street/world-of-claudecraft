@@ -939,6 +939,33 @@ export function mountAssetsReady(visualKey: string): boolean {
   return !!def && gltfByUrl.has(assetUrl(def.url));
 }
 
+// Lazy fetch for a fixed full-body skin (FULL_BODY_SKIN_VISUAL_KEYS): the
+// mount pattern again, keyed per visual key. No skin/emissive atlases (a
+// fixed body has one baked appearance) and no animUrls donor (each ships its
+// own complete clip vocabulary), so the GLB is the whole job, same as a mount.
+const fullBodySkinAssetPromises = new Map<string, Promise<void>>();
+export function preloadFullBodySkinAssets(visualKey: string): Promise<void> {
+  const existing = fullBodySkinAssetPromises.get(visualKey);
+  if (existing) return existing;
+  const def = VISUALS[visualKey];
+  if (!def) return Promise.resolve();
+  const job = loadGltf(def.url)
+    .then((g) => {
+      gltfByUrl.set(def.url, g);
+    })
+    .catch((err) => {
+      fullBodySkinAssetPromises.delete(visualKey);
+      throw err;
+    });
+  fullBodySkinAssetPromises.set(visualKey, job);
+  return job;
+}
+
+export function fullBodySkinAssetsReady(visualKey: string): boolean {
+  const def = VISUALS[visualKey];
+  return !!def && gltfByUrl.has(assetUrl(def.url));
+}
+
 /** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
 export function characterResidencySources(): { parsedScenes: THREE.Object3D[] } {
   return { parsedScenes: [...gltfByUrl.values()].map((g) => g.scene) };

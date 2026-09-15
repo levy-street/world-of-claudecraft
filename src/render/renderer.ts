@@ -37,8 +37,8 @@ import type { BiomeId, ZoneDef } from '../sim/types';
 import {
   ALL_CLASSES,
   type Entity,
+  hasReplacementBody,
   IGNIVAR_BOSS_ID,
-  isMechWearer,
   type SimEvent,
 } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
@@ -10454,10 +10454,11 @@ export class Renderer {
       // fixed class rig has no kit helm to take off.
       if (e.helmHidden !== v.helmHidden) {
         v.helmHidden = e.helmHidden;
-        // Mech wearers keep the mech body (index.ts skips their look), so a
-        // helm toggle must not force a pointless dispose/rebuild of it. Asked
-        // through isMechWearer, the one definition of the rule.
-        if (!isMechWearer(e) && modularLookFor(e)) v.visualKey = null;
+        // Replacement-body wearers keep their cosmetic body (index.ts skips
+        // their look), so a helm toggle must not force a pointless
+        // dispose/rebuild of it. Asked through hasReplacementBody, the one
+        // definition of the rule.
+        if (!hasReplacementBody(e) && modularLookFor(e)) v.visualKey = null;
       }
 
       // live redesign: the server pushed a changed authored look onto this
@@ -10479,7 +10480,7 @@ export class Renderer {
       if (e.modularAppearance !== v.modularAppearance) {
         if (modularLookChanged(v.modularAppearance, e.modularAppearance)) {
           const composedBefore = v.modularAppearance != null;
-          if (!isMechWearer(e) && (modularLookFor(e) || composedBefore)) v.visualKey = null;
+          if (!hasReplacementBody(e) && (modularLookFor(e) || composedBefore)) v.visualKey = null;
         }
         v.modularAppearance = e.modularAppearance;
       }

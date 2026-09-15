@@ -187,14 +187,15 @@ export function weaponTypeForItem(itemId: string | null | undefined): ItemWeapon
  * decides what the hand actually shows. The hunter rig displays a fixed ranged
  * attach and never the equipped item (`player_hunter` carries no `weaponSlots`,
  * so only a bow/crossbow skin can replace it), which is why hunters take the
- * ranged types rather than their weapon's. The Combat Mech is a separate body
- * that DOES swap in the equipped mainhand, so a mech hunter can additionally
+ * ranged types rather than their weapon's. Every other replacement body (the
+ * Combat Mech and the fixed full-body skins, `skinCatalog !== 'class'`) DOES
+ * swap in the equipped mainhand, so a hunter wearing one can additionally
  * skin the weapon they are really holding.
  *
- * Ranged stays first for a mech hunter: it preserves the look a hunter already
- * had before putting the suit on, and a player who prefers the weapon skin
- * clears the ranged one (`Sim.setWeaponSkin(pid, null, type)`), so nothing is
- * locked out either way.
+ * Ranged stays first for a hunter on a replacement body: it preserves the
+ * look a hunter already had before putting the body on, and a player who
+ * prefers the weapon skin clears the ranged one (`Sim.setWeaponSkin(pid,
+ * null, type)`), so nothing is locked out either way.
  */
 export function skinnableWeaponTypesFor(
   cls: string,
@@ -207,7 +208,7 @@ export function skinnableWeaponTypesFor(
   // Crossbow before bow: they share the one ranged display slot, so with both
   // in the loadout the crossbow skin wins resolution deterministically.
   if (cls !== 'hunter') return item;
-  return skinCatalog === 'mech' ? ['crossbow', 'bow', ...item] : ['crossbow', 'bow'];
+  return skinCatalog !== 'class' ? ['crossbow', 'bow', ...item] : ['crossbow', 'bow'];
 }
 
 /**

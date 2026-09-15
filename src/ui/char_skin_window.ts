@@ -1,7 +1,7 @@
 import { audio } from '../game/audio';
 import { MECH_CHROMAS } from '../sim/content/skins';
 import { CLASSES } from '../sim/data';
-import type { PlayerClass } from '../sim/types';
+import type { PlayerClass, SkinCatalog } from '../sim/types';
 import {
   activeCharacterAppearancePreview,
   characterAppearanceOptions,
@@ -24,7 +24,7 @@ const classCss = (cls: string): string =>
 export interface CharSkinPainterHost {
   readonly sim: {
     cfg: { playerClass: PlayerClass };
-    player: { skin?: number; skinCatalog?: 'class' | 'mech' };
+    player: { skin?: number; skinCatalog?: SkinCatalog };
     accountCosmetics: { mechChromaIds: string[] };
     changeSkin(skin: number, catalog: 'class' | 'mech'): void;
     unequipMechChroma(id: string): void;

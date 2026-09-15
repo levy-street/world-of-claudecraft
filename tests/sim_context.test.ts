@@ -581,6 +581,7 @@ function makeFakeHost() {
     syncPetAspect: vi.fn(),
     // G2 social plumbing (hasPendingSocialInvite already stubbed above; deduped).
     setPlayerLevel: vi.fn(),
+    setPlayerSkin: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
     spawnDevVendor: vi.fn(),

@@ -1,3 +1,4 @@
+import { FULL_BODY_SKIN_VISUAL_KEYS } from '../render/characters/manifest';
 import { MECH_CHROMAS, SKIN_COUNTS } from '../sim/content/skins';
 import type { PlayerClass, SkinCatalog } from '../sim/types';
 
@@ -40,6 +41,6 @@ export function activeCharacterAppearancePreview(
 ): ActiveCharacterAppearancePreview {
   return {
     skin: Math.max(0, Math.floor(skin)),
-    visualKey: catalog === 'mech' ? 'player_mech' : `player_${cls}`,
+    visualKey: FULL_BODY_SKIN_VISUAL_KEYS[catalog] ?? `player_${cls}`,
   };
 }

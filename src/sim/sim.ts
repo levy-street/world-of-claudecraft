@@ -839,6 +839,7 @@ import {
   type EscortRunState,
   emptyMoveInput,
   FAERIE_FIRE_ARMOR_PCT,
+  FULL_BODY_SKIN_CATALOGS,
   GCD,
   type HonorArenaDailyState,
   type InventoryUnit,
@@ -851,6 +852,7 @@ import {
   isNonSpellCast,
   isPetClass,
   isQuestTurnInNpc,
+  isSkinCatalog,
   type LootRollChoice,
   type LootRollGroupStatus,
   type LootRollPrompt,
@@ -2895,7 +2897,7 @@ export class Sim {
       cls,
       name,
       skin: savedState?.skin ?? 0,
-      skinCatalog: savedState?.skinCatalog === 'mech' ? 'mech' : 'class',
+      skinCatalog: isSkinCatalog(savedState?.skinCatalog) ? savedState.skinCatalog : 'class',
       mountSkinId: normalizeMountSkinId(savedState?.mountSkinId),
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
@@ -4339,7 +4341,12 @@ export class Sim {
     const meta = this.players.get(pid);
     const e = this.entities.get(pid);
     if (!meta || !e) return false;
-    const maxSkin = catalog === 'mech' ? MECH_CHROMAS.length - 1 : 7;
+    const maxSkin =
+      catalog === 'mech'
+        ? MECH_CHROMAS.length - 1
+        : (FULL_BODY_SKIN_CATALOGS as readonly string[]).includes(catalog)
+          ? 0
+          : 7;
     const idx = Math.max(0, Math.min(maxSkin, Math.floor(skin)));
     meta.skin = idx;
     meta.skinCatalog = catalog;
@@ -5773,6 +5780,8 @@ export class Sim {
       // notice is the /join /leave chat-log line. Both stay on Sim. (hasPendingSocialInvite
       // already bound above; isRooted/moveSpeedMult/swingIntervalMult are M2 bindings above.)
       setPlayerLevel: sim.setPlayerLevel.bind(sim),
+      // Backs the /dev skin cheat in dev_commands.ts.
+      setPlayerSkin: sim.setPlayerSkin.bind(sim),
       notice: sim.notice.bind(sim),
       // Dev-only test-dummy spawner backing "/dev bot <name>" in social/chat.ts.
       spawnDevBot: sim.spawnDevBot.bind(sim),

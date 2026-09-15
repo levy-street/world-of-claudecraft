@@ -1,15 +1,16 @@
-import type { PlayerClass } from '../../sim/types';
+import type { PlayerClass, SkinCatalog } from '../../sim/types';
 import type { WeaponLayoutOverride } from './manifest';
-import { mechHeldWeaponOverride } from './manifest';
+import { FULL_BODY_SKIN_VISUAL_KEYS, mechHeldWeaponOverride } from './manifest';
 
 /** A character's real, in-world appearance for the char-select / char-sheet
- *  turntable: body class, appearance skin, whether it is the class rig or the
- *  class-agnostic Combat Mech cosmetic, and the equipped mainhand (null when
- *  unarmed, so the preview shows no weapon rather than a class default). */
+ *  turntable: body class, appearance skin, whether it is the class rig or a
+ *  class-agnostic replacement body (the Combat Mech or a fixed full-body
+ *  skin), and the equipped mainhand (null when unarmed, so the preview shows
+ *  no weapon rather than a class default). */
 export interface PreviewAppearance {
   cls: PlayerClass;
   skin: number;
-  skinCatalog: 'class' | 'mech';
+  skinCatalog: SkinCatalog;
   mainhandItemId: string | null;
   /** The active Armory weapon-skin cosmetic, or null/absent for none. */
   weaponSkinId?: string | null;
@@ -26,16 +27,17 @@ export interface PreviewVisual {
 }
 
 /** Resolve an appearance to its concrete visual, mirroring createCharacterVisual
- *  (index.ts): the Mech is a separate body (`player_mech`) that adopts the wearer
- *  class's hand layout (a rogue mech dual-wields), while the class rig uses
- *  `player_<class>` with no override. Kept DOM/Three-free so it is unit-tested. */
+ *  (index.ts): a replacement body (the Mech, or a fixed full-body skin) is its
+ *  own model that adopts the wearer class's hand layout (a rogue mech
+ *  dual-wields), while the class rig uses `player_<class>` with no override.
+ *  Kept DOM/Three-free so it is unit-tested. */
 export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
-  const mech = a.skinCatalog === 'mech';
+  const bodyKey = FULL_BODY_SKIN_VISUAL_KEYS[a.skinCatalog];
   return {
-    visualKey: mech ? 'player_mech' : `player_${a.cls}`,
+    visualKey: bodyKey ?? `player_${a.cls}`,
     weaponItemId: a.mainhandItemId ?? null,
     offhandItemId: a.offhandItemId ?? null,
-    weaponOverride: mech ? mechHeldWeaponOverride(a.cls) : null,
+    weaponOverride: bodyKey ? mechHeldWeaponOverride(a.cls) : null,
   };
 }
 

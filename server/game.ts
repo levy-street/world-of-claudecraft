@@ -1250,7 +1250,7 @@ type RememberedChat =
 // changes. The client treats their absence in a record as "unchanged".
 function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
-  if (e.skinCatalog === 'mech') out.cat = 'mech';
+  if (e.skinCatalog !== 'class') out.cat = e.skinCatalog;
   if (e.skin) out.sk = e.skin;
   // Active rideable mount ('' omitted). This identity field is intentionally
   // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both

@@ -916,17 +916,57 @@ export function isEquipSlot(value: string): value is EquipSlot {
 // equipment slot directly. Items never carry 'ring1'/'ring2'.
 export type ItemSlot = EquipSlot | 'ring';
 
-export type SkinCatalog = 'class' | 'mech';
+// 'class' is the ordinary per-class texture-swap catalog (SKIN_COUNTS below).
+// 'mech' is the class-agnostic Combat Mech cosmetic body (multi-chroma, see
+// src/sim/content/skins.ts MECH_CHROMAS). Every id from 'altherion' on is a
+// FULL_BODY_SKIN: a fixed, single-appearance, class-agnostic cosmetic body of
+// its own (src/render/characters/manifest.ts FULL_BODY_SKIN_VISUAL_KEYS),
+// dev/admin-granted only for now (see the "/dev skin <id>" chat cheat in
+// sim/dev_commands.ts), with no chroma variants and no unlock item.
+export type SkinCatalog =
+  | 'class'
+  | 'mech'
+  | 'altherion'
+  | 'boneforged'
+  | 'bonehunter'
+  | 'eclipse_wildheart'
+  | 'frostfire'
+  | 'dawnbreaker'
+  | 'plaguebringer'
+  | 'shinobi';
+
+/** Every full-body skin catalog id (excludes 'class' and 'mech', which have
+ *  their own dedicated handling: class atlases and mech chroma respectively). */
+export const FULL_BODY_SKIN_CATALOGS: readonly SkinCatalog[] = [
+  'altherion',
+  'boneforged',
+  'bonehunter',
+  'eclipse_wildheart',
+  'frostfire',
+  'dawnbreaker',
+  'plaguebringer',
+  'shinobi',
+] as const;
+
+const ALL_SKIN_CATALOGS: readonly SkinCatalog[] = [
+  'class',
+  'mech',
+  ...FULL_BODY_SKIN_CATALOGS,
+] as const;
+
+/** Narrow an untrusted value (wire JSON, a persisted save field) to a real
+ *  SkinCatalog. Use before trusting a peer/save-supplied catalog string. */
+export function isSkinCatalog(value: unknown): value is SkinCatalog {
+  return typeof value === 'string' && (ALL_SKIN_CATALOGS as readonly string[]).includes(value);
+}
 
 /**
- * Is this entity wearing the Combat Mech cosmetic?
+ * Is this entity wearing the Combat Mech cosmetic specifically?
  *
- * The ONE definition of the rule. The mech is a whole replacement body, not a
- * layer: nothing of the wearer's composed character may render with it, or the
- * two bodies occupy the same space and intersect. Every site that has to know
- * (visual construction, the character-sheet preview, the frame portrait, the
- * title chip) asks this rather than re-deriving `skinCatalog === 'mech'`, so a
- * new site cannot quietly get it wrong.
+ * Mech-only: mech chroma indexing (MECH_CHROMAS), the hunter ranged-slot
+ * ordering (weapon_skin_rules.ts) and the mech chroma picker UI all ask this
+ * one. For "is this entity wearing ANY whole replacement body" (mech or a
+ * fixed full-body skin), use {@link hasReplacementBody} instead.
  *
  * Lives here, beside the catalog type, rather than in the render layer: the UI
  * panels need it too and they are barred from importing `src/render/*`
@@ -936,6 +976,23 @@ export function isMechWearer(
   e: { kind?: string; skinCatalog?: SkinCatalog } | null | undefined,
 ): boolean {
   return !!e && e.kind === 'player' && e.skinCatalog === 'mech';
+}
+
+/**
+ * Is this entity wearing ANY whole-replacement cosmetic body (the Combat Mech
+ * or one of the fixed full-body skins)?
+ *
+ * The ONE definition of the general rule. A replacement body is not a layer:
+ * nothing of the wearer's composed character may render with it, or the two
+ * bodies occupy the same space and intersect. Every site that has to know
+ * (visual construction, the character-sheet preview, the frame portrait, the
+ * title chip, the paperdoll helm toggle) asks this rather than re-deriving
+ * `skinCatalog !== 'class'`, so a new catalog id cannot quietly get missed.
+ */
+export function hasReplacementBody(
+  e: { kind?: string; skinCatalog?: SkinCatalog } | null | undefined,
+): boolean {
+  return !!e && e.kind === 'player' && !!e.skinCatalog && e.skinCatalog !== 'class';
 }
 
 // Season 1 Armory weapon-skin cosmetics (src/sim/content/weapon_skins.ts). The

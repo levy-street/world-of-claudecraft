@@ -16,7 +16,7 @@
 // it, and would silently dress every peer in whatever set this machine last
 // picked.
 
-import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
+import { type Entity, hasReplacementBody, type PlayerClass } from '../../sim/types';
 import { sameAppearance } from '../../world_api/appearance';
 import {
   type ArmorSetId,
@@ -154,9 +154,10 @@ export function modularLookChanged(
  * Whether the paperdoll's helm-visibility eye could ever change anything for
  * a `cls` character. False for a class kit whose set ships no helm geometry
  * at all (druid, the hunter's ranger kit, rogue; see ARMOR_BY_SET in
- * modular.ts) and false for a Combat Mech wearer, whose replacement body
- * never composes the kit either (the `isMechWearer` guard the renderer's live
- * helm-toggle diff already applies). Toggling `helmHidden` when this is false
+ * modular.ts) and false for any replacement-body wearer (mech or a fixed
+ * full-body skin), whose replacement body never composes the kit either (the
+ * `hasReplacementBody` guard the renderer's live helm-toggle diff already
+ * applies). Toggling `helmHidden` when this is false
  * still flips the flag, but nothing about the drawn body ever changes, so the
  * eye must not be offered at all (issue: "hide helmet does nothing").
  */
@@ -173,7 +174,7 @@ export function helmSlotAvailableForEntity(
   e: Entity | null | undefined,
   lookFor: (e: Entity) => ModularLook | null,
 ): boolean {
-  if (!e || isMechWearer(e)) return false;
+  if (!e || hasReplacementBody(e)) return false;
   return helmSlotAvailableForLook(
     lookFor(e.helmHidden ? ({ ...e, helmHidden: false } as Entity) : e),
   );

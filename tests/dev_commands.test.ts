@@ -731,3 +731,55 @@ describe('/dev farmgrow (farming grow-now)', () => {
     expect(plotOf(sim, 'bed_eastbrook_1')?.readyAtMs).toBe(FAR);
   });
 });
+
+describe('/dev skin (fixed full-body skins)', () => {
+  it('wears a full-body skin, mirrored onto both meta and the entity', () => {
+    const sim = devSim();
+
+    sim.chat('/dev skin altherion');
+
+    expect(sim.meta(sim.playerId)?.skinCatalog).toBe('altherion');
+    expect(sim.meta(sim.playerId)?.skin).toBe(0);
+    expect(sim.player.skinCatalog).toBe('altherion');
+    expect(sim.player.skin).toBe(0);
+  });
+
+  it('clears back to the class body via class/default/none', () => {
+    for (const clear of ['class', 'default', 'none']) {
+      const sim = devSim();
+      sim.chat('/dev skin shinobi');
+      expect(sim.meta(sim.playerId)?.skinCatalog).toBe('shinobi');
+
+      sim.chat(`/dev skin ${clear}`);
+
+      expect(sim.meta(sim.playerId)?.skinCatalog, clear).toBe('class');
+      expect(sim.player.skinCatalog, clear).toBe('class');
+    }
+  });
+
+  it('rejects an unknown skin id and changes nothing', () => {
+    const sim = devSim();
+
+    sim.chat('/dev skin nonexistent_body');
+
+    expect(sim.meta(sim.playerId)?.skinCatalog).toBe('class');
+    expect(
+      sim
+        .drainEvents()
+        .some((event) => event.type === 'error' && event.text.includes("Unknown skin 'nonexistent_body'")),
+    ).toBe(true);
+  });
+
+  it('is inert when dev commands are disabled', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
+
+    sim.chat('/dev skin altherion');
+
+    expect(sim.meta(sim.playerId)?.skinCatalog).toBe('class');
+  });
+});

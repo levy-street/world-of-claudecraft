@@ -15,8 +15,18 @@ import {
   uploadTexturesInSlices,
   yieldToMainThread,
 } from '../texture_prewarm';
-import { mechAssetsReady, preloadMechAssets } from './assets';
-import { modularVisualKey, VISUALS, type WeaponLayoutOverride } from './manifest';
+import {
+  fullBodySkinAssetsReady,
+  mechAssetsReady,
+  preloadFullBodySkinAssets,
+  preloadMechAssets,
+} from './assets';
+import {
+  FULL_BODY_SKIN_VISUAL_KEYS,
+  modularVisualKey,
+  VISUALS,
+  type WeaponLayoutOverride,
+} from './manifest';
 import {
   type ArmorLoadout,
   type ModularAppearance,
@@ -218,22 +228,32 @@ export class CharacterPreview {
     this.setVisualKey(`player_${cls}`, weapon, null, offhand);
   }
 
-  /** Show a character's real, in-world appearance: the class rig or the Combat Mech
-   *  cosmetic body, its appearance skin, and the actually-equipped hands. Mirrors
-   *  createCharacterVisual so the char-select roster and character sheet match the
-   *  world. The mech's cosmetic assets load
-   *  lazily; while they are not ready this shows the class body and re-applies once
-   *  loaded, unless a newer selection has superseded this one. */
+  /** Show a character's real, in-world appearance: the class rig or a
+   *  class-agnostic replacement body (the Combat Mech or a fixed full-body
+   *  skin), its appearance skin, and the actually-equipped hands. Mirrors
+   *  createCharacterVisual so the char-select roster and character sheet match
+   *  the world. A replacement body's cosmetic assets load lazily; while they
+   *  are not ready this shows the class body and re-applies once loaded,
+   *  unless a newer selection has superseded this one. */
   setAppearance(a: PreviewAppearance): void {
     if (this.destroyed) return;
     this.currentSkin = a.skin;
     this.currentWeaponSkinId = a.weaponSkinId ?? null;
     const sig = appearanceSignature(a);
     this.appearanceSig = sig;
-    if (a.skinCatalog === 'mech' && !mechAssetsReady()) {
+    const bodyKey = FULL_BODY_SKIN_VISUAL_KEYS[a.skinCatalog];
+    if (bodyKey && a.skinCatalog === 'mech' && !mechAssetsReady()) {
       this.setVisualKey(`player_${a.cls}`, a.mainhandItemId ?? null, null, a.offhandItemId ?? null);
       this.currentVisual?.setSkin(a.skin);
       void preloadMechAssets().then(() => {
+        if (!this.destroyed && this.appearanceSig === sig) this.setAppearance(a);
+      });
+      return;
+    }
+    if (bodyKey && a.skinCatalog !== 'mech' && !fullBodySkinAssetsReady(bodyKey)) {
+      this.setVisualKey(`player_${a.cls}`, a.mainhandItemId ?? null, null, a.offhandItemId ?? null);
+      this.currentVisual?.setSkin(a.skin);
+      void preloadFullBodySkinAssets(bodyKey).then(() => {
         if (!this.destroyed && this.appearanceSig === sig) this.setAppearance(a);
       });
       return;

@@ -2,7 +2,7 @@
 // rigs. Asset fetches start at module import (see assets.ts) and register
 // with the preload gate, so createCharacterVisual is synchronous by the time
 // the Renderer constructs views.
-import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
+import { type Entity, hasReplacementBody, type PlayerClass } from '../../sim/types';
 import { logAssetMissOnce } from './asset_miss_log';
 import { type AssembleOptions, modularHeadFor } from './assets';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
@@ -69,7 +69,7 @@ export function modularKeyFor(e: Entity): string {
  *  forms are separate lazy slots over this base), or null when the entity
  *  keeps a fixed rig. */
 function composedLookOf(e: Entity): { def: VisualDef; look: ModularLook } | null {
-  if (isMechWearer(e)) return null;
+  if (hasReplacementBody(e)) return null;
   const look = modularLookProvider?.(e) ?? null;
   if (!look) return null;
   return { def: VISUALS[modularKeyFor(e)], look };
@@ -110,15 +110,16 @@ export function createCharacterVisual(
   // Forms are their own models. Skins and held weapons
   // only apply to the base body
   // Shapeshift forms are their own model and never compose, and neither does a
-  // Combat Mech wearer: the mech is a whole replacement body, so the cosmetic
-  // must win over the authored look (composing over it hid a purchased skin).
-  const look = formKey || isMechWearer(e) ? null : (modularLookProvider?.(e) ?? null);
+  // replacement-body wearer (mech or a fixed full-body skin): it is a whole
+  // replacement body, so the cosmetic must win over the authored look
+  // (composing over it hid a purchased skin).
+  const look = formKey || hasReplacementBody(e) ? null : (modularLookProvider?.(e) ?? null);
   const key = formKey ?? (look ? modularKeyFor(e) : visualKeyFor(e));
-  // The class-agnostic Combat Mech adopts the wearer's independent mainhand and
-  // offhand layout. e.templateId is the player's class on every host, so this
-  // matches offline and online.
+  // Every class-agnostic replacement body adopts the wearer's independent
+  // mainhand and offhand layout. e.templateId is the player's class on every
+  // host, so this matches offline and online.
   const weaponOverride =
-    !formKey && key === 'player_mech' && e.kind === 'player'
+    !formKey && hasReplacementBody(e) && e.kind === 'player'
       ? mechHeldWeaponOverride(e.templateId as PlayerClass)
       : null;
   try {

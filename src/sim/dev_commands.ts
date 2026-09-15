@@ -32,7 +32,7 @@ import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
 import { revivePlayerAt } from './spirit';
-import { MAX_LEVEL, type RiftTier } from './types';
+import { FULL_BODY_SKIN_CATALOGS, MAX_LEVEL, type RiftTier, type SkinCatalog } from './types';
 import { setupVarkhulDevRaid } from './varkhul_dev_raid';
 
 const MAX_DEV_SPAWNS = 20;
@@ -247,6 +247,30 @@ export function handleDevChat(
     const count = clampInteger(Number(giveMatch[2] ?? 1), 1, 20);
     if (!ITEMS[itemId]) ctx.error(pid, `[dev] Unknown item '${itemId}'.`);
     else ctx.addItem(itemId, count, pid);
+    return null;
+  }
+
+  // /dev skin <id>: wear a fixed full-body skin (FULL_BODY_SKIN_CATALOGS),
+  // or /dev skin class (or 'default'/'none') to take it back off. The ONLY
+  // way to wear one today: no unlock item, no picker, dev/admin-only by
+  // design (see sim/types.ts FULL_BODY_SKIN_CATALOGS).
+  const skinMatch = /^\/(?:dev\s+skin|devskin)\s+(\S+)\s*$/i.exec(raw);
+  if (skinMatch) {
+    const requested = skinMatch[1].toLowerCase();
+    if (requested === 'class' || requested === 'default' || requested === 'none') {
+      ctx.setPlayerSkin(pid, 0, 'class');
+      emitDevLog(ctx, pid, '[dev] Cleared full-body skin, back to the class body.');
+      return null;
+    }
+    if (!(FULL_BODY_SKIN_CATALOGS as readonly string[]).includes(requested)) {
+      ctx.error(
+        pid,
+        `[dev] Unknown skin '${requested}'. Options: ${FULL_BODY_SKIN_CATALOGS.join(', ')}, class.`,
+      );
+      return null;
+    }
+    ctx.setPlayerSkin(pid, 0, requested as SkinCatalog);
+    emitDevLog(ctx, pid, `[dev] Wearing the '${requested}' full-body skin.`);
     return null;
   }
 

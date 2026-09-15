@@ -1048,7 +1048,7 @@ const FLAGS: Record<DeedFlagId, (meta: PlayerMeta, e: Entity) => boolean> = {
   // Slot list PINNED as of v1 (LAUNCH_PAPERDOLL_SLOTS); a future twelfth slot
   // does not grow this deed, so already-earned rows keep their meaning.
   allEquipSlotsFilled: (m) => LAUNCH_PAPERDOLL_SLOTS.every((slot) => !!m.equipment[slot]),
-  nonDefaultSkin: (m) => m.skinCatalog === 'mech' || m.skin > 0,
+  nonDefaultSkin: (m) => m.skinCatalog !== 'class' || m.skin > 0,
   // The marked set resets whenever the authoritative reward window advances,
   // so containment of all four ids already means one complete circuit.
   heroicMarkCircuit: (m) => MARK_CIRCUIT_DUNGEONS.every((d) => m.heroicDaily.marked.has(d)),

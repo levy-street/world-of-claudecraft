@@ -25,8 +25,8 @@ import {
   ALL_CLASSES,
   type Entity,
   IGNIVAR_BOSS_ID,
-  isMechWearer,
   type PlayerClass,
+  type SkinCatalog,
 } from '../../sim/types';
 import {
   VARKHUL_CINDER_REPAIR_END_ANIMATION_ID,
@@ -1415,6 +1415,31 @@ export const NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION = 0.35;
  *  it, not on the raider it pins (owner call, 2026-09-11). */
 export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
 
+// Fixed full-body skins (class-agnostic, single appearance, no chroma; see
+// FULL_BODY_SKIN_VISUAL_KEYS and sim/types.ts FULL_BODY_SKIN_CATALOGS/
+// hasReplacementBody). Each is rigged to the same KayKit Rig_Medium skeleton
+// as the mech above and every class body, and ships the full baked clip
+// vocabulary itself (a Tripo body auto-rigged to that skeleton), so no
+// animUrls donor is needed and the mech's own weapon-override mechanism
+// (mechHeldWeaponOverride, generic over any replacement body) plugs in
+// unchanged: the wearer's own class decides what the hand actually shows. The
+// attach here is only the no-weapon default, same as the mech's.
+// Dev/admin-granted only for now (the "/dev skin <id>" chat cheat,
+// sim/dev_commands.ts, gated by ALLOW_DEV_COMMANDS): kept lazyPreload so the
+// ~14 MB of bodies never weigh on every client's boot; the generic on-demand
+// fetch (assets.ts resolvedGltf -> ensureCharacterUrl) loads one the first
+// time a dev actually wears it.
+function fullBodySkinDef(url: string): VisualDef {
+  return swims({
+    url,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
+    lazyPreload: true,
+  });
+}
+
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
   player_warrior: swims({
@@ -1973,6 +1998,15 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0],
     lazyPreload: true,
   }),
+
+  player_altherion: fullBodySkinDef(`${PLAYERS}/FP/Altherion_rigged_ktx2_1024.glb`),
+  player_boneforged: fullBodySkinDef(`${PLAYERS}/FP/Boneforged_rigged_fixed_ktx2_1024.glb`),
+  player_bonehunter: fullBodySkinDef(`${PLAYERS}/FP/Bonehunter_rigged_ktx2_1024.glb`),
+  player_eclipse_wildheart: fullBodySkinDef(`${PLAYERS}/FP/EclipseWildheart_rigged_ktx2_1024.glb`),
+  player_frostfire: fullBodySkinDef(`${PLAYERS}/FP/Frostfire_rigged_ktx2_1024.glb`),
+  player_dawnbreaker: fullBodySkinDef(`${PLAYERS}/FP/Paladin_rigged_ktx2_1024.glb`),
+  player_plaguebringer: fullBodySkinDef(`${PLAYERS}/FP/Plaguebringer_rigged_ktx2_1024.glb`),
+  player_shinobi: fullBodySkinDef(`${PLAYERS}/FP/Shinobi_rigged_ktx2_1024.glb`),
 
   // -- forms ---------------------------------------------------------------
   form_sheep: {
@@ -4004,9 +4038,31 @@ const NPC_KEYS: Record<string, string> = {
   huntsman_deral: 'npc_scout',
 };
 
+// Every replacement-body catalog's visual key, keyed by SkinCatalog id (see
+// sim/types.ts hasReplacementBody). 'class' carries no entry on purpose: a
+// class-catalog player always resolves through its templateId below instead.
+export const FULL_BODY_SKIN_VISUAL_KEYS: Partial<Record<SkinCatalog, string>> = {
+  mech: 'player_mech',
+  altherion: 'player_altherion',
+  boneforged: 'player_boneforged',
+  bonehunter: 'player_bonehunter',
+  eclipse_wildheart: 'player_eclipse_wildheart',
+  frostfire: 'player_frostfire',
+  dawnbreaker: 'player_dawnbreaker',
+  plaguebringer: 'player_plaguebringer',
+  shinobi: 'player_shinobi',
+};
+
+/** The set of `FULL_BODY_SKIN_VISUAL_KEYS` values, for a cheap "is this
+ *  visual key a replacement body" membership test without re-deriving it. */
+export const FULL_BODY_SKIN_VISUAL_KEY_SET: ReadonlySet<string> = new Set(
+  Object.values(FULL_BODY_SKIN_VISUAL_KEYS),
+);
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
-    if (isMechWearer(e)) return 'player_mech';
+    const bodyKey = e.skinCatalog && FULL_BODY_SKIN_VISUAL_KEYS[e.skinCatalog];
+    if (bodyKey) return bodyKey;
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
   if (e.kind === 'mob') {
@@ -4020,12 +4076,14 @@ export function visualKeyFor(e: Entity): string {
   return NPC_KEYS[e.templateId] ?? 'npc_villager';
 }
 
-/** Held-weapon layout override for the class-agnostic Combat Mech body. The mech
- *  keeps its own model and clips but adopts the WEARER class's hand layout, so a
- *  dual-wield class (the rogue) shows the equipped weapon in BOTH hands on the mech
- *  (it shares the KayKit handslot.r/.l bones). Non-dual classes return null and keep
- *  the mech's own single-mainhand default. Host-agnostic: the wearer's class arrives
- *  as a player entity's templateId, so this applies the same offline and online. */
+/** Held-weapon layout override for any class-agnostic replacement body (the
+ *  Combat Mech and every fixed full-body skin). The body keeps its own model
+ *  and clips but adopts the WEARER class's hand layout, so a dual-wield class
+ *  (the rogue) shows the equipped weapon in BOTH hands (every replacement body
+ *  shares the KayKit handslot.r/.l bones). Non-dual classes return null and
+ *  keep the body's own single-mainhand default. Host-agnostic: the wearer's
+ *  class arrives as a player entity's templateId, so this applies the same
+ *  offline and online. */
 export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride | null {
   const classDef = VISUALS[`player_${cls}`];
   if (!classDef || ((classDef.weaponSlots?.length ?? 0) < 2 && classDef.offhandSlot === undefined))

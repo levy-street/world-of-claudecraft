@@ -37,8 +37,16 @@ import {
   modularLookFor,
   type PreviewFramingName,
 } from '../render/characters';
-import { preloadMechAssets } from '../render/characters/assets';
-import { mechHeldWeaponOverride } from '../render/characters/manifest';
+import {
+  fullBodySkinAssetsReady,
+  mechAssetsReady,
+  preloadFullBodySkinAssets,
+  preloadMechAssets,
+} from '../render/characters/assets';
+import {
+  FULL_BODY_SKIN_VISUAL_KEY_SET,
+  mechHeldWeaponOverride,
+} from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
 import { helmSlotAvailableForEntity } from '../render/characters/player_look_core';
 import {
@@ -2094,6 +2102,23 @@ export class Hud {
   private readonly skinEvent: SkinEventController;
   // Pending lazy-load of the mech GLB + chromas; the reveal waits on it.
   private mechAssetsPromise: Promise<void> | null = null;
+
+  /** Whether `visualKey`'s replacement-body assets (mech or a fixed full-body
+   *  skin) are resident, so a preview may mount it directly. */
+  private replacementBodyAssetsReady(visualKey: string): boolean {
+    return visualKey === 'player_mech' ? mechAssetsReady() : fullBodySkinAssetsReady(visualKey);
+  }
+
+  /** Kick (or reuse) the lazy fetch for `visualKey`'s replacement-body assets.
+   *  The mech promise is cached on the Hud (it also carries chroma textures);
+   *  every other full-body skin is memoized inside assets.ts itself. */
+  private preloadReplacementBodyAssets(visualKey: string): Promise<void> {
+    if (visualKey === 'player_mech') {
+      if (!this.mechAssetsPromise) this.mechAssetsPromise = preloadMechAssets();
+      return this.mechAssetsPromise;
+    }
+    return preloadFullBodySkinAssets(visualKey);
+  }
   private readonly playerCard: PlayerCardController;
   // Shared by the confirm + input modals (one #confirm-dialog id; they never coexist).
   private confirmTrap: FocusTrapHandle | null = null;
@@ -16536,13 +16561,14 @@ export class Hud {
       this.sim.player.skin ?? 0,
       this.sim.player.skinCatalog ?? 'class',
     );
-    if (preview.visualKey !== 'player_mech') {
+    if (
+      !FULL_BODY_SKIN_VISUAL_KEY_SET.has(preview.visualKey) ||
+      this.replacementBodyAssetsReady(preview.visualKey)
+    ) {
       this.mountCharPreview(container, this.sim.cfg.playerClass, preview.skin, preview.visualKey);
       return;
     }
-    if (!this.mechAssetsPromise) this.mechAssetsPromise = preloadMechAssets();
-    const mechAssets = this.mechAssetsPromise;
-    void mechAssets
+    void this.preloadReplacementBodyAssets(preview.visualKey)
       .then(() => {
         const charWindow = $('#char-window') as HTMLElement | null;
         if (charWindow?.style.display !== 'block') return;
@@ -16551,7 +16577,7 @@ export class Hud {
           this.sim.player.skin ?? 0,
           this.sim.player.skinCatalog ?? 'class',
         );
-        if (currentPreview.visualKey === 'player_mech') {
+        if (currentPreview.visualKey === preview.visualKey) {
           this.mountCharPreview(
             container,
             this.sim.cfg.playerClass,
@@ -16560,7 +16586,7 @@ export class Hud {
           );
         }
       })
-      .catch((err) => console.error('failed to load mech cosmetic preview:', err));
+      .catch((err) => console.error('failed to load replacement-body cosmetic preview:', err));
   }
 
   /** Mount the shared character turntable into `container`. The single
@@ -16605,9 +16631,10 @@ export class Hud {
         opts.offhand,
       );
     } else if (opts.previewKey) {
-      // Mech is class-agnostic; mirror the wearer class's hand layout so the
+      // Every replacement body (mech or a fixed full-body skin) is
+      // class-agnostic; mirror the wearer class's hand layout so the
       // paperdoll matches the in-world render.
-      const override = opts.previewKey === 'player_mech' ? mechHeldWeaponOverride(opts.cls) : null;
+      const override = mechHeldWeaponOverride(opts.cls);
       this.charPreview.setVisualKey(opts.previewKey, opts.mainhand, override, opts.offhand);
     } else {
       this.charPreview.setClass(opts.cls, opts.mainhand, opts.offhand);
@@ -16630,10 +16657,14 @@ export class Hud {
     const mainhand = this.sim.equipment.mainhand ?? null;
     // The sheet shows the body the WORLD draws, read through the same look
     // seam the portrait uses: the player's own face, hair and kit, including
-    // the helmet-visibility choice. A Combat Mech is a whole replacement body
-    // and wins over the authored look, matching createCharacterVisual's own
-    // precedence in-world (composing over it hid a purchased cosmetic).
-    const look = previewKey === 'player_mech' ? null : modularLookFor(this.sim.player);
+    // the helmet-visibility choice. Any replacement body (the Combat Mech or a
+    // fixed full-body skin) is a whole replacement body and wins over the
+    // authored look, matching createCharacterVisual's own precedence in-world
+    // (composing over it hid a purchased cosmetic).
+    const look =
+      previewKey && FULL_BODY_SKIN_VISUAL_KEY_SET.has(previewKey)
+        ? null
+        : modularLookFor(this.sim.player);
     this.mountSharedPreview(container, {
       cls,
       skin,
@@ -16656,8 +16687,9 @@ export class Hud {
   /** Mount the shared turntable into the inspect stage showing the INSPECTED
    *  player's appearance and worn hands, with the pulled-back inspect framing.
    *  The skin CATALOG picks the rig exactly as renderCharPreview does for self:
-   *  a mech-cosmetic player mounts after the lazy mech-asset preload resolves,
-   *  and only while this stage is still the live inspect target. */
+   *  a replacement-body player (mech or a fixed full-body skin) mounts after
+   *  its lazy asset preload resolves, and only while this stage is still the
+   *  live inspect target. */
   private mountInspectPreview(
     container: HTMLElement,
     params: {
@@ -16671,22 +16703,22 @@ export class Hud {
     },
   ): void {
     const preview = activeCharacterAppearancePreview(params.cls, params.skin, params.skinCatalog);
+    const isReplacementBody = FULL_BODY_SKIN_VISUAL_KEY_SET.has(preview.visualKey);
     const mount = (): void =>
       this.mountSharedPreview(container, {
         cls: params.cls,
         skin: preview.skin,
-        previewKey: preview.visualKey === 'player_mech' ? preview.visualKey : undefined,
+        previewKey: isReplacementBody ? preview.visualKey : undefined,
         mainhand: params.mainhand,
         offhand: params.offhand,
         weaponSkinId: params.weaponSkinId,
         framing: 'inspect',
       });
-    if (preview.visualKey !== 'player_mech') {
+    if (!isReplacementBody || this.replacementBodyAssetsReady(preview.visualKey)) {
       mount();
       return;
     }
-    if (!this.mechAssetsPromise) this.mechAssetsPromise = preloadMechAssets();
-    void this.mechAssetsPromise
+    void this.preloadReplacementBodyAssets(preview.visualKey)
       .then(() => {
         // Mount only while the inspect window is still open AND this stage is still
         // the painted one (a reopen replaces the innerHTML, disconnecting it), so a
@@ -16695,7 +16727,7 @@ export class Hud {
         if (inspectWindow?.style.display !== 'block' || !container.isConnected) return;
         mount();
       })
-      .catch((err) => console.error('failed to load mech cosmetic preview:', err));
+      .catch((err) => console.error('failed to load replacement-body cosmetic preview:', err));
   }
 
   private renderCharSkinPicker(): void {
