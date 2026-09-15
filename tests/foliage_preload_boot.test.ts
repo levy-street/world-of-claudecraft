@@ -65,15 +65,15 @@ describe('foliage boot preload fetches every model regardless of the import-time
     // skipping pine_2/4/5 entirely, so a live tier that later wanted them threw
     // "foliage model not preloaded" instead of finding them already resident.
     for (const highOnlyPine of [
-      'models/foliage/pine_2.glb',
-      'models/foliage/pine_4.glb',
+      'models/foliage/pine_2_field.glb',
+      'models/foliage/pine_4_field.glb',
       'models/foliage/pine_5.glb',
     ]) {
       expect(fetchedUrls.has(highOnlyPine), highOnlyPine).toBe(true);
     }
     // And the LOW variant every tier needs is still fetched too, so the low-tier
     // player themselves is never left short.
-    expect(fetchedUrls.has('models/foliage/pine_1.glb')).toBe(true);
+    expect(fetchedUrls.has('models/foliage/pine_1_field.glb')).toBe(true);
     // The unused-but-shipped pine_3 stays correctly excluded on every tier (see
     // foliage.ts: "pine_3 is shipped but unused").
     expect(fetchedUrls.has('models/foliage/pine_3.glb')).toBe(false);

@@ -1837,7 +1837,8 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered after extracting the world trees' camera-occluder fade (the
     // hideable records, the trunk hit test, the gated instance/ghost swap)
     // into src/render/tree_hide_fade.ts.
-    ceiling: 3996,
+    // Lowered after moving the field tree URL table into src/render/foliage_field_models.ts.
+    ceiling: 3969,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

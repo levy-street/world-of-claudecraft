@@ -45,6 +45,7 @@ import {
   insideGrassHubExclusion,
 } from './foliage_core';
 import { survivesLeanDecimation } from './foliage_decimation_core';
+import { FOLIAGE_MODEL_DIR as MODEL_DIR, treeUrl } from './foliage_field_models';
 import {
   createFoliageFrameWindows,
   type FoliageFrameInput,
@@ -208,12 +209,11 @@ const LEAF_UP_NORMAL_BLEND = 0.7;
 // foliage draw budget — see the perBucket caps in the species specs
 const BUCKET_DEPTH = 240;
 
-const MODEL_DIR = 'models/foliage/';
 const FOLIAGE_MODEL_URLS_HIGH = {
   // pine_3 is shipped but unused: its 462-tri canopy reads as a dead pole
-  pine: [1, 2, 4, 5].map((i) => `${MODEL_DIR}pine_${i}.glb`),
-  oak: [1, 2, 3, 4, 5].map((i) => `${MODEL_DIR}oak_${i}.glb`),
-  twisted: [1, 2, 3].map((i) => `${MODEL_DIR}twisted_${i}.glb`),
+  pine: [1, 2, 4, 5].map((i) => treeUrl('pine', i)),
+  oak: [1, 2, 3, 4, 5].map((i) => treeUrl('oak', i)),
+  twisted: [1, 2, 3].map((i) => treeUrl('twisted', i)),
   dead: [1, 2, 3].map((i) => `${MODEL_DIR}dead_${i}.glb`),
   rock: [1, 2, 3].map((i) => `${MODEL_DIR}rock_${i}.glb`),
   bush: [`${MODEL_DIR}bush.glb`],
@@ -222,9 +222,9 @@ const FOLIAGE_MODEL_URLS_HIGH = {
   mushroom: [`${MODEL_DIR}mushroom.glb`],
 };
 const FOLIAGE_MODEL_URLS_LOW = {
-  pine: [1].map((i) => `${MODEL_DIR}pine_${i}.glb`),
-  oak: [1].map((i) => `${MODEL_DIR}oak_${i}.glb`),
-  twisted: [1].map((i) => `${MODEL_DIR}twisted_${i}.glb`),
+  pine: [1].map((i) => treeUrl('pine', i)),
+  oak: [1].map((i) => treeUrl('oak', i)),
+  twisted: [1].map((i) => treeUrl('twisted', i)),
   dead: [1].map((i) => `${MODEL_DIR}dead_${i}.glb`),
   rock: [1].map((i) => `${MODEL_DIR}rock_${i}.glb`),
   bush: [`${MODEL_DIR}bush.glb`],

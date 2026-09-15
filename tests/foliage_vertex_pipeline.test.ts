@@ -8,6 +8,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import {
   FOLIAGE_TOWN_TREE_ASSETS,
   optimizeFoliageVertexDocument,
+  primitiveTriangleAttributeFingerprint,
   triangleAttributeFingerprint,
 } from '../scripts/assets/foliage_vertex_pipeline.mjs';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
@@ -152,6 +153,49 @@ describe('foliage vertex pipeline', () => {
     expect(triangleAttributeFingerprint(document)).toBe(before);
     expect(primitive.getAttribute('POSITION')?.getCount()).toBe(4);
     expect(primitive.getIndices()?.getArray()).toBeInstanceOf(Uint16Array);
+  });
+
+  it('fingerprints one primitive by its winding and corner bytes, not by corner rotation', async () => {
+    const document = await io.read(path.join(ROOT, 'public', 'models/foliage/pine_1.glb'));
+    const leaves = document
+      .getRoot()
+      .listMeshes()
+      .flatMap((mesh) => mesh.listPrimitives())
+      .filter((primitive) => primitive.getMaterial()?.getName() === 'Leaves_Pine');
+    expect(leaves).toHaveLength(1);
+    const [leaf] = leaves;
+    const pinned = '86806ac7e1b8d5678cbd34de5c462c9dacf7d16dce5718f5efacd75b4e2ffbad';
+    expect(primitiveTriangleAttributeFingerprint(leaf)).toBe(pinned);
+
+    const indices = leaf.getIndices();
+    const original = indices?.getArray()?.slice();
+    if (!indices || !original) throw new Error('Leaves_Pine is not indexed');
+    const [a, b, c] = original;
+    expect(new Set([a, b, c]).size).toBe(3);
+    const withFirstTriangle = (corners: readonly number[]) => {
+      const edited = original.slice();
+      edited.set(corners);
+      indices.setArray(edited);
+      return primitiveTriangleAttributeFingerprint(leaf);
+    };
+    expect(withFirstTriangle([b, c, a])).toBe(pinned);
+    expect(withFirstTriangle([c, a, b])).toBe(pinned);
+    expect(withFirstTriangle([a, c, b])).not.toBe(pinned);
+    indices.setArray(original);
+    expect(primitiveTriangleAttributeFingerprint(leaf)).toBe(pinned);
+
+    for (const semantic of leaf.listSemantics()) {
+      const accessor = leaf.getAttribute(semantic);
+      const array = accessor?.getArray();
+      if (!accessor || !array) throw new Error(`missing ${semantic}`);
+      const edited = array.slice();
+      const byteOffset = a * accessor.getElementSize() * edited.BYTES_PER_ELEMENT;
+      new Uint8Array(edited.buffer, edited.byteOffset + byteOffset, 1)[0] ^= 1;
+      accessor.setArray(edited);
+      expect(primitiveTriangleAttributeFingerprint(leaf), semantic).not.toBe(pinned);
+      accessor.setArray(array);
+    }
+    expect(primitiveTriangleAttributeFingerprint(leaf)).toBe(pinned);
   });
 
   it('keeps the migration inventory complete and independently pinned', () => {

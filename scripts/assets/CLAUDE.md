@@ -108,9 +108,22 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   (declares the packed ORM red channel as `occlusionTexture` on shipped GLBs so three.js
   builds an aoMap, zero new texture bytes), `foliage_vertex_pipeline.mjs` /
   `optimize_foliage_vertices.mjs` (deterministic finalization of the shipped foliage GLBs;
-  input/output sha256 tables live in the module), and `ravenrift_blueprint.mjs` (run via
-  `tsx`: renders the battleground blueprint diagram FROM the authoritative layout records,
-  so the docs image cannot drift from what players collide with).
+  input/output sha256 tables live in the module), `foliage_bark_decimation.mjs` /
+  `decimate_foliage_bark.mjs` (the world foliage field's `<model>_field.glb` tree copies, bark
+  simplified to a species triangle budget while the source GLBs stay byte-identical for their
+  other consumers; the table, the stage invariants and the catalog skip rule
+  (`isFoliageFieldCopyCatalogId`, read by `gen_asset_catalog.mjs`) live in the module;
+  `tests/foliage_field_bark_decimation.test.ts` pins every source and output sha256 and the
+  media manifest rows, rebuilds each copy from its source through the stage and compares the
+  bytes, checks each committed copy against its source (bark counts and material, leaves,
+  textures, extensions, bounds), triggers the stage guards on small built documents, and
+  scans `src/` so only the field model table and the media manifest name a copy; after an
+  intended change run `--write-pins`, paste the printed pins into the table and the test's
+  `EXPECTED` with the printed bark counts, then `node scripts/build_media_manifest.mjs
+  generate`, the steps the script prints), and
+  `ravenrift_blueprint.mjs` (run via `tsx`: renders the battleground blueprint diagram FROM
+  the authoritative layout records, so the docs image cannot drift from what players
+  collide with).
 
 ## Relationship to the rest
 - **Output to `public/`** (the GLB/texture/HDRI tree the game loads at runtime).
