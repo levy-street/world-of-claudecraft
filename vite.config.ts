@@ -558,7 +558,15 @@ export default defineConfig({
     // Runs per test file (unlike globalSetup, which runs once outside any
     // DOM environment). Needed on Node 22+ for jsdom and happy-dom files;
     // no-op when `window` is absent (default node env). See the file.
-    setupFiles: ['./tests/svelte_testing_setup.ts', './tests/jsdom_local_storage_setup.ts'],
+    // progress_event_setup gives the plain node environment the DOM
+    // ProgressEvent three's FileLoader constructs on every streamed fetch
+    // chunk; without it a loader that outlives its test file fails the whole
+    // shard as an unhandled ReferenceError with every test green. See the file.
+    setupFiles: [
+      './tests/svelte_testing_setup.ts',
+      './tests/jsdom_local_storage_setup.ts',
+      './tests/progress_event_setup.ts',
+    ],
     // Two kinds of exclusion, kept together:
     // - agent-runtime directories may contain local worktree copies, and their tracked
     //   config or instruction files are not product test sources. Excluding them keeps a
