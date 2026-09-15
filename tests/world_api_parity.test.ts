@@ -303,6 +303,8 @@ export const IWORLD_MEMBERS = [
   { name: 'marketList', kind: 'method' },
   { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
+  { name: 'marketSweepQuote', kind: 'method' },
+  { name: 'marketSweep', kind: 'method' },
   { name: 'marketCancel', kind: 'method' },
   { name: 'marketCollect', kind: 'method' },
   // --- Ravenpost mail reads + commands ---
@@ -854,10 +856,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // reconciled by arithmetic in the diff. Run `npx vitest run
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet-file exhaustiveness checks (AssertNever) also pass on the fully
-    // resolved production tree.
-    expect(IWORLD_MEMBERS.length).toBe(371);
+    // resolved production tree. The Market Sweep adds marketSweepQuote and
+    // marketSweep (IWorldMarket, both methods), leaving 373 (103 data + 270).
+    expect(IWORLD_MEMBERS.length).toBe(373);
     expect(DATA_MEMBERS.length).toBe(103);
-    expect(METHOD_MEMBERS.length).toBe(268);
+    expect(METHOD_MEMBERS.length).toBe(270);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1088,6 +1091,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketListInstance',
       'marketSearch',
       'marketSellPriceCheck',
+      'marketSweep',
+      'marketSweepQuote',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -1503,6 +1508,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketListInstance',
       'marketSearch',
       'marketSellPriceCheck',
+      'marketSweep',
+      'marketSweepQuote',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -2009,6 +2016,8 @@ const FACET_MARKET = [
   'marketList',
   'marketListInstance',
   'marketBuy',
+  'marketSweepQuote',
+  'marketSweep',
   'marketCancel',
   'marketCollect',
 ] as const satisfies readonly (keyof IWorldMarket)[];
@@ -2367,8 +2376,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet arrays actually reconstruct IWORLD_MEMBERS with no gaps or
     // collisions; this pin and the one above must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(371);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(371);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(373);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(373);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -107,6 +107,10 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   'market_list',
   'market_list_instance',
   'market_buy',
+  // The Market Sweep: ARM-MARKED (HEAVY_SELF_ARM_MARKED_CMDS below), the
+  // perfect_item shape: a frame the dispatch's own guards refuse never marks,
+  // and only a frame that reaches sim.marketSweep buys a heavy re-serialize.
+  'market_sweep',
   'market_cancel',
   'market_collect',
   'mail_send',
@@ -169,6 +173,7 @@ export const HEAVY_SELF_ARM_MARKED_CMDS = new Set<string>([
   'harvest_crop',
   'convert_husks',
   'place_feast',
+  'market_sweep',
 ]);
 
 /** Whether `cmd` marks the heavy self dirty at RECEIPT (the pre-switch line):

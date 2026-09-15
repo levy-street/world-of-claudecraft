@@ -5885,6 +5885,83 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-sweep',
+    label: 'World Market Browse Market Sweep card (buy N units across sellers)',
+    when: ['ui/market_sweep', 'sim/market_sweep', 'ui/market_window', 'sim/market'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Seed three other-seller ore stacks at different unit prices (the
+    // market-collapse-toggle precedent: offline there is one player, so other
+    // sellers can only be staged by writing the book), give the player the gold,
+    // open Browse, then press the row's Sweep button and ask for 6 units. On the
+    // base commit the Sweep button does not exist, so the shot is the plain
+    // browse list; on this branch the card heads the list with the live quote.
+    // Stands on the Merchant ENTITY rather than a remembered stall point: the
+    // proximity gate closes the window a frame later when the point is stale.
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        const merchant = [...(sim?.entities?.values?.() ?? [])].find(
+          (e) => e.templateId === 'the_merchant',
+        );
+        if (p?.pos && merchant?.pos) {
+          p.pos.x = merchant.pos.x;
+          p.pos.z = merchant.pos.z;
+          p.pos.y = merchant.pos.y;
+        }
+      });
+      // The stall can sit in another zone than the spawn: let the streamed-in
+      // world paint and the veil stay down before the window is opened over it.
+      await awaitVeilSettled(page);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const book = sim?.market?.marketListings;
+        if (book) {
+          book.length = 0;
+          const rows = [
+            ['Bramblefoot', 1, 9],
+            ['Rhaelin', 5, 25],
+            ['Torvald', 2, 12],
+          ];
+          rows.forEach(([name, count, price], i) => {
+            book.push({
+              id: i + 1,
+              sellerKey: name,
+              sellerName: name,
+              itemId: 'copper_ore',
+              count,
+              price,
+              expiresAt: (sim?.time ?? 0) + 1000,
+              house: false,
+            });
+          });
+        }
+        const meta = sim?.players?.get?.(sim?.playerId);
+        if (meta) meta.copper = 50000;
+        const el = document.querySelector('#market-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openMarket?.();
+        const bags = document.querySelector('#bags');
+        if (bags) bags.style.display = 'none';
+      });
+      if (!(await pollForSize(page, '#market-window'))) return {};
+      // Present only on this branch.
+      await page.evaluate(() => {
+        const btn = document.querySelector('.mkt-sweep-btn');
+        if (btn instanceof HTMLButtonElement) btn.click();
+        const qty = document.querySelector('#mkt-sweep-qty');
+        if (qty instanceof HTMLInputElement) {
+          qty.value = '6';
+          qty.dispatchEvent(new Event('input'));
+          qty.blur();
+        }
+      });
+      await awaitVeilSettled(page);
+      await wait(600);
+      return { clip: '#market-window' };
+    },
+  },
+  {
     key: 'market-sell-price-ref',
     label: 'World Market Sell tab (current lowest listing price reference, issue 3043)',
     when: ['ui/market_window', 'ui/market_view', 'sim/market'],

@@ -13,11 +13,12 @@ import {
 } from '../server/heavy_self';
 
 describe('the arm-marked subset', () => {
-  it('is exactly the Perfecting and farming command family', () => {
+  it('is exactly the Perfecting, farming, and market sweep command family', () => {
     expect([...HEAVY_SELF_ARM_MARKED_CMDS].sort()).toEqual(
       [
         'convert_husks',
         'harvest_crop',
+        'market_sweep',
         'perfect_item',
         'place_feast',
         'plant_crop',

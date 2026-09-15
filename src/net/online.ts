@@ -191,6 +191,7 @@ import type {
 import { buildClientAbilityPresentation } from './ability_presentation';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { ActionBarLayoutUploader } from './action_bar_upload';
+import { anchorFields } from './anchor_fields';
 import { apiErrorFromBody } from './api_error';
 import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
@@ -1232,16 +1233,6 @@ const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
 // snapshot COUNT rather than wall-clock keeps the valve deterministic in tests
 // (and needs no clock at all in the decode path).
 const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
-
-// The two wire fields a per-copy selection's ANCHOR rides on (`ord`/`n`), or
-// nothing at all when the caller named no anchor. Spread into the frame so an
-// unanchored command is byte-identical to what it always sent, which is what
-// keeps the golden traces still and an older server working unchanged; the
-// server re-derives the anchor against its own bags and refuses a mismatch
-// (src/sim/item_copy_anchor.ts).
-function anchorFields(target: NamedSlotTarget): { ord?: number; n?: number } {
-  return target.anchor ? { ord: target.anchor.ordinal, n: target.anchor.count } : {};
-}
 
 export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
@@ -4745,6 +4736,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   marketBuy(listingId: number): void {
     this.cmd({ cmd: 'market_buy', id: listingId });
+  }
+  marketSweepQuote(itemId: string, count: number): void {
+    this.cmd({ cmd: 'market_sweep_quote', item: itemId, count });
+  }
+  marketSweep(itemId: string, count: number, maxCopper: number): void {
+    // `max` is the quoted total the player agreed to; the server re-plans on the
+    // live book and refuses past it, so nothing here can fix a price.
+    this.cmd({ cmd: 'market_sweep', item: itemId, count, max: maxCopper });
   }
   marketCancel(listingId: number): void {
     this.cmd({ cmd: 'market_cancel', id: listingId });

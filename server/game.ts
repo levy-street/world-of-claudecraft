@@ -46,7 +46,7 @@ import {
 } from '../src/sim/jail';
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
-import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
+import type { MarketQuery } from '../src/sim/market_query';
 import { unequipWornMechChroma } from '../src/sim/mech_chroma_ownership';
 import {
   partyFrameAbsorb,
@@ -326,7 +326,7 @@ import {
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
 import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
-import { buyWithSoldVolume } from './market_sold_volume';
+import { dispatchMarketCommand } from './market_commands';
 import { readMaterialSourceTransferWire } from './material_source_transfer_wire';
 import { dispatchInventoryGroupingCommand } from './material_stack_wire';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
@@ -685,6 +685,8 @@ const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
   'market_list',
   'market_list_instance',
   'market_buy',
+  'market_sweep_quote',
+  'market_sweep',
   'market_cancel',
   'market_collect',
 ]);
@@ -999,6 +1001,9 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   // marketQuery precedent: a primitive, so a plain !== value compare is its own
   // change signal (no identity trick needed).
   lastSellPriceItemIdRef: string | null;
+  // The Market Sweep quote request last built for, the marketQuery precedent: the
+  // sim replaces the object on every marketSweepQuote, so identity is the signal.
+  lastSweepQuoteRef: PlayerMeta['sweepQuote'];
   lastMarketRebuildTick: number;
   // Commission order board readout, same recipe at its own cadence
   // (CORDER_WIRE_HZ): the board revision last built for plus the backstop
@@ -2101,6 +2106,7 @@ export class GameServer {
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
     moderator.lastSellPriceItemIdRef = null;
+    moderator.lastSweepQuoteRef = null;
     moderator.lastMarketRebuildTick = 0;
     moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
     moderator.lastCorderBoardRev = null;
@@ -3549,6 +3555,7 @@ export class GameServer {
       lastMarketBrowseRev: null,
       lastMarketQueryRef: null,
       lastSellPriceItemIdRef: null,
+      lastSweepQuoteRef: null,
       lastMarketRebuildTick: 0,
       lastCorderWireTick: -CORDER_WIRE_INTERVAL_TICKS,
       lastCorderBoardRev: null,
@@ -7535,60 +7542,24 @@ export class GameServer {
         if (index !== null) sim.deleteLoadout(index, pid);
         break;
       }
-      // World Market (the Merchant's auction house)
+      // World Market (the Merchant's auction house). The command bodies live
+      // whole in server/market_commands.ts (the farming_commands precedent);
+      // the labels stay HERE because the command-schema suite scans this
+      // switch for the dispatch universe.
       case 'market_search':
-        sim.marketSearch(
-          sanitizeMarketQuery({
-            search: typeof msg.q === 'string' ? msg.q : '',
-            itemType: msg.itemType,
-            subtype: msg.subtype,
-            armorClass: msg.armorClass,
-            primaryStat: msg.primaryStat,
-            rarity: msg.rarity,
-            sort: msg.sort,
-            page: typeof msg.page === 'number' ? msg.page : 0,
-            collapseLowest: msg.collapseLowest,
-          }),
-          pid,
-        );
-        break;
       case 'market_sell_price_check':
-        sim.marketSellPriceCheck(typeof msg.item === 'string' ? msg.item : null, pid);
-        break;
       case 'market_list':
-        if (
-          typeof msg.item === 'string' &&
-          typeof msg.count === 'number' &&
-          Number.isFinite(msg.count) &&
-          typeof msg.price === 'number' &&
-          Number.isFinite(msg.price)
-        ) {
-          sim.marketList(msg.item, msg.count, msg.price, pid);
-        }
-        break;
       case 'market_list_instance':
-        // The instance object is only an equality needle: the sim re-resolves
-        // it against the sender's own bags and escrows the actual held copy's
-        // payload, so no wire-supplied field ever enters the book directly.
-        if (
-          typeof msg.item === 'string' &&
-          typeof msg.price === 'number' &&
-          Number.isFinite(msg.price) &&
-          typeof msg.instance === 'object' &&
-          msg.instance !== null &&
-          !Array.isArray(msg.instance)
-        ) {
-          sim.marketListInstance(msg.item, msg.price, msg.instance as ItemInstancePayload, pid);
-        }
-        break;
       case 'market_buy':
-        if (typeof msg.id === 'number') buyWithSoldVolume(sim, msg.id, pid);
-        break;
+      case 'market_sweep_quote':
+      case 'market_sweep':
       case 'market_cancel':
-        if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid);
-        break;
       case 'market_collect':
-        sim.marketCollect(pid);
+        // Arm-marked heavy-self members (market_sweep) mark only when the frame
+        // reached the sim, the farming precedent above.
+        if (dispatchMarketCommand(sim, msg, pid) && heavySelfMarkOnAccept(command)) {
+          session.selfHeavyDirty = true;
+        }
         break;
       case 'mail_send': {
         if (
@@ -8740,10 +8711,12 @@ export class GameServer {
         browseRev !== session.lastMarketBrowseRev ||
         meta.marketQuery !== session.lastMarketQueryRef ||
         meta.sellPriceItemId !== session.lastSellPriceItemIdRef ||
+        meta.sweepQuote !== session.lastSweepQuoteRef ||
         this.sim.tickCount - session.lastMarketRebuildTick >= MARKET_BROWSE_REFRESH_TICKS
       ) {
         session.lastMarketQueryRef = meta.marketQuery;
         session.lastSellPriceItemIdRef = meta.sellPriceItemId;
+        session.lastSweepQuoteRef = meta.sweepQuote;
         session.lastMarketRebuildTick = this.sim.tickCount;
         maybe('market', this.sim.marketInfoFor(anchorSession.pid));
         // Stamp AFTER the rebuild: marketInfoFor can advance the revision as a

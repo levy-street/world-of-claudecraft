@@ -1024,7 +1024,11 @@ const MONOLITHS: MonolithRow[] = [
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 11879,
+    // LOWERED 11879 -> 11871 at the Market Sweep (feature/ah-market-sweep): the flee-eligibility
+    // predicate and FLEEING_FAMILIES moved to src/sim/mob/flee_rules.ts and the delve
+    // companion predicate to src/sim/delves/companion.ts, paying for the two market
+    // sweep delegates. Exact count, zero slack.
+    ceiling: 11871,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1438,7 +1442,12 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 10095,
+    // LOWERED 10095 -> 10068 at the Market Sweep (feature/ah-market-sweep): the World
+    // Market command bodies moved whole to server/market_commands.ts (the
+    // farming_commands shape; labels stay here), paying for the sweep quote gate
+    // field, the two new case labels, and the arm-marked heavy-self line. Exact
+    // count, zero slack.
+    ceiling: 10068,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1581,7 +1590,10 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // LOWERED 5540 -> 5539 at the Market Sweep (feature/ah-market-sweep): anchorFields
+    // moved to src/net/anchor_fields.ts, paying for the two market sweep sends.
+    // Exact count, zero slack.
+    ceiling: 5539,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

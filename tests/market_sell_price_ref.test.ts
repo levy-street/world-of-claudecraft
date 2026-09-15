@@ -39,6 +39,7 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     myListingCount: 0,
     sellPriceItemId: null,
     sellLowestPrice: null,
+    sweepQuote: null,
     ...over,
   };
 }

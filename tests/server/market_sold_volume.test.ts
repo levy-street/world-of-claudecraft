@@ -346,9 +346,17 @@ const WIRED_SEAMS = [
   },
   {
     what: 'buyWithSoldVolume called at the market_buy dispatch arm',
-    file: 'server/game.ts',
+    // The market command bodies moved whole to server/market_commands.ts with
+    // the Market Sweep (game.ts keeps only the case labels).
+    file: 'server/market_commands.ts',
     anchor: 'sim.marketCancel(msg.id, pid);',
     present: 'buyWithSoldVolume(sim, msg.id, pid)',
+  },
+  {
+    what: 'sweepWithSoldVolume called at the market_sweep dispatch arm',
+    file: 'server/market_commands.ts',
+    anchor: 'sim.marketCancel(msg.id, pid);',
+    present: 'sweepWithSoldVolume(sim, msg.item, msg.count, msg.max, pid)',
   },
   {
     what: 'configureMarketSoldVolume called at boot',
@@ -401,11 +409,12 @@ describe('the sold-volume cluster is wired, and the four seams stay present', ()
 
   it('only the three wired seam files reach for the cluster, no other module', () => {
     // The seams now live in exactly three files: db.ts (schema), main.ts
-    // (retention + both configure calls) and game.ts (the dispatch call). Every
+    // (retention + both configure calls) and market_commands.ts (the dispatch
+    // calls, the market arms game.ts delegates to). Every
     // OTHER server module must stay clear, so a NEW reach from a fresh boot
     // module or a domain route reds here instead of shipping.
     const needles = Object.keys(NEEDLE_HOMES);
-    const WIRED_FILES = new Set(['db.ts', 'main.ts', 'game.ts']);
+    const WIRED_FILES = new Set(['db.ts', 'main.ts', 'market_commands.ts']);
     const scanned = tsFilesUnder(join(REPO_ROOT, 'server')).filter((f) => {
       const base = f.file.split('/').pop() ?? '';
       return !CLUSTER_MODULES.has(base) && !WIRED_FILES.has(base);

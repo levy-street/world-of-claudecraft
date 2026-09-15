@@ -3405,6 +3405,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.cannotAfford': '購入するお金が足りません。',
   'itemUi.errors.notYourListing': 'それはあなたの出品ではありません。',
   'itemUi.errors.nothingToCollect': '受け取るものはありません。',
+  'itemUi.market.sweep': '一括購入',
+  'itemUi.market.sweepAria': '{item}を市場から一括購入',
+  'itemUi.market.sweepTitle': '一括購入: {item}',
+  'itemUi.market.sweepClose': '閉じる',
+  'itemUi.market.sweepNote':
+    '他の出品者の出品を単価の安い順にまるごと購入し、指定数に達するまで続けます。指定数より少し多く受け取ることがあります。',
+  'itemUi.market.sweepQuantity': '希望数量',
+  'itemUi.market.sweepQuoteNone': 'このアイテムに一括購入できる出品はありません。',
+  'itemUi.market.sweepQuoteLine': '{listings}件の出品から{units}個、合計{total}（各{each}）',
+  'itemUi.market.sweepQuoteShort':
+    '入手可能なのは{listings}件の出品から{units}個のみ、合計{total}（各{each}）',
+  'itemUi.market.sweepButton': '一括購入',
+  'itemUi.market.sweepConfirmTitle': '一括購入の確認',
+  'itemUi.market.sweepConfirmBody':
+    '{listings}件の出品から{item} x{units}を合計{total}（各{each}）で購入しますか？',
+  'itemUi.market.sweepChanged':
+    '確認前に一括購入の見積もりが変わりました。合計を確認してもう一度お試しください。',
+  'itemUi.errors.sweepNoListings': 'このアイテムに一括購入できる出品はありません。',
+  'itemUi.errors.sweepPriceChanged':
+    '一括購入が届く前に価格が変わりました。見積もりを確認してもう一度お試しください。',
   'itemUi.loot.takeAll': 'すべて取る',
   'itemUi.loot.close': '戦利品を閉じる',
   'itemUi.lootRoll.title': '戦利品ロール',

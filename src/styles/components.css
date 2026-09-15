@@ -14410,6 +14410,54 @@
     text-align: center;
   }
   /* The staged item uses the shared card surface so Sell matches Browse. */
+  /* The Market Sweep card (market_sweep_panel.ts) heads the Browse list while a
+     sweep is staged. It spans the whole grid like the range note, reuses the Sell
+     tab's .mkt-price-row field shape for the count, and keeps the quote line
+     muted like the Sell tab's price reference so the number the player is about
+     to agree to (in the confirm prompt) stays the emphasis. */
+  .mkt-sweep {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+  .mkt-sweep-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .mkt-sweep-title {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .mkt-sweep-note,
+  .mkt-sweep-quote {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+  }
+  .mkt-sweep-quote:empty {
+    display: none;
+  }
+  .mkt-sweep-go {
+    align-self: flex-start;
+    padding: 4px 14px;
+  }
+  .mkt-sweep-btn {
+    cursor: var(--cursor-point);
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  /* A row that offers Sweep carries a fifth cell; without it the button wraps
+     under the icon on a second grid row. */
+  .mkt-row:has(.mkt-sweep-btn) {
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
+  }
   .mkt-sell-pick {
     display: flex;
     gap: 10px;

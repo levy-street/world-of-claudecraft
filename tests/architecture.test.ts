@@ -472,6 +472,7 @@ const UI_PURE_CORES = [
   'src/ui/market_search_localized_core.ts',
   'src/ui/bank_item_name_core.ts',
   'src/ui/market_buy_confirm_core.ts',
+  'src/ui/market_sweep_core.ts',
   'src/ui/usd_text.ts',
   'src/ui/woc_tokens_text.ts',
   'src/ui/woc_log_tones.ts',
@@ -2525,6 +2526,7 @@ const UI_DOM_MODULES = [
   // on the injected root plus an innerHTML swap) and reads document.activeElement
   // so the focused chip or quest row survives that swap.
   'src/ui/map_sidebar_controller.ts',
+  'src/ui/market_sweep_panel.ts',
   'src/ui/market_window.ts',
   'src/ui/woc_market_window.ts',
   'src/ui/material_sources_dialog.ts',

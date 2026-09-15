@@ -528,3 +528,30 @@ describe('command facet tags (farming)', () => {
     }
   });
 });
+
+// Market Sweep: append the two sweep commands' tags (the W10 market cluster's
+// shape). The quote is a display/query narrowing and the buy is the batched
+// buyout; both ride IWorldMarket. Append-only: never edit a tag.
+const MARKET_SWEEP_TAGS: Readonly<Record<string, string>> = {
+  market_sweep_quote: 'IWorldMarket',
+  market_sweep: 'IWorldMarket',
+};
+
+describe('command facet tags (market sweep)', () => {
+  const tags: Readonly<Record<string, string>> = COMMAND_FACETS;
+
+  it('tags market_sweep_quote and market_sweep as IWorldMarket', () => {
+    for (const [cmd, facet] of Object.entries(MARKET_SWEEP_TAGS)) {
+      expect(tags[cmd], cmd).toBe(facet);
+    }
+  });
+
+  it('keys the tags on the snake_case wire strings, never the camelCase methods', () => {
+    expect('marketSweepQuote' in tags).toBe(false);
+    expect('marketSweep' in tags).toBe(false);
+  });
+
+  it('does not tag the sweepQuote read (a marketInfo field, no wire command)', () => {
+    expect('sweepQuote' in tags).toBe(false);
+  });
+});

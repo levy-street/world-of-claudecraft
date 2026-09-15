@@ -172,6 +172,9 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'You cannot afford that.': 'itemUi.errors.cannotAfford',
     'That is not your listing.': 'itemUi.errors.notYourListing',
     'You have nothing to collect.': 'itemUi.errors.nothingToCollect',
+    'No listings of that item are available to sweep.': 'itemUi.errors.sweepNoListings',
+    'Prices changed before your sweep landed. Check the quote and try again.':
+      'itemUi.errors.sweepPriceChanged',
     "You can't assist yourself.": 'hud.errors.assistSelf',
     'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
     'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',

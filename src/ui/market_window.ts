@@ -71,6 +71,8 @@ import {
 import { marketNameColor } from './market_name_color';
 import { marketPriceHtml } from './market_price_view';
 import { localizedMarketSearch } from './market_search_localized_core';
+import { sweepEligibleRow } from './market_sweep_core';
+import { MarketSweepPanel } from './market_sweep_panel';
 import {
   buildMarketView,
   COPPER_PER_GOLD,
@@ -182,6 +184,16 @@ export class MarketWindow {
   // next snapshot lets it see the real post-reconnect echo instead.
   private pendingReconnectResync = false;
 
+  // The Market Sweep card (market_sweep_panel.ts): staged by a browse row's Sweep
+  // button, mounted at the head of the Browse list, its quote patched per frame.
+  private readonly sweep = new MarketSweepPanel({
+    world: () => this.deps.world(),
+    showError: (text) => this.deps.showError(text),
+    confirmDialog: (title, body, ok, cancel, onOk) =>
+      this.deps.confirmDialog(title, body, ok, cancel, onOk),
+    repaint: () => this.renderContent(),
+  });
+
   constructor(private readonly deps: MarketWindowDeps) {}
 
   get isOpen(): boolean {
@@ -232,6 +244,7 @@ export class MarketWindow {
     this.sellItemId = null;
     this.sellInstance = null;
     this.pushSellPriceCheck();
+    this.sweep.clear(false);
     root.style.display = 'none';
     this.deps.hideTooltip();
     document.body.classList.remove('market-open');
@@ -356,6 +369,7 @@ export class MarketWindow {
       this.refreshSellPriceRef(info);
       return;
     }
+    if (this.tab === 'browse') this.sweep.refresh(this.deps.root());
     const sig = JSON.stringify([
       this.tab,
       this.itemTypeFilter,
@@ -517,6 +531,9 @@ export class MarketWindow {
       node.addEventListener('click', () => {
         const next = (node as HTMLElement).dataset.tab as MarketTab;
         if (next === this.tab) return;
+        // Leaving Browse drops the staged sweep: nothing paints it elsewhere, and
+        // a quote nobody reads must not stay staged server-side.
+        if (next !== 'browse') this.sweep.clear(false);
         this.tab = next;
         this.browsePage = 0;
         this.lastSig = '';
@@ -774,6 +791,7 @@ export class MarketWindow {
       search.value = this.searchQuery;
     }
     list.innerHTML = '';
+    this.sweep.mount(list);
     if (view.state === 'empty') {
       if (view.reason === 'filtered') this.browsePage = 0;
       const empty = document.createElement('div');
@@ -892,6 +910,20 @@ export class MarketWindow {
         else this.promptBuy(l, itemName);
       });
       row.appendChild(btn);
+      if (sweepEligibleRow(l)) {
+        // Market Sweep: buy this item across many sellers' listings at once. Only
+        // a plain, fungible, someone-else's row can stage one (the sim planner's
+        // own exclusions); the card it opens quotes and confirms before sending.
+        const sweepBtn = document.createElement('button');
+        sweepBtn.className = 'mkt-sweep-btn ui-btn';
+        sweepBtn.textContent = t('itemUi.market.sweep');
+        sweepBtn.setAttribute('aria-label', t('itemUi.market.sweepAria', { item: itemName }));
+        sweepBtn.addEventListener('click', () => {
+          audio.click();
+          this.sweep.stage(l.itemId, itemName);
+        });
+        row.appendChild(sweepBtn);
+      }
       // A bulk material listing states WHOSE units are in it: the buyer is
       // agreeing to those exact contributors, and the listing carries them
       // (world_api/market.ts MarketListingView.materialSources).

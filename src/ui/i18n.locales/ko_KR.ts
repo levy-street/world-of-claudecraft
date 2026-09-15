@@ -3376,6 +3376,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.cannotAfford': '그것을 살 돈이 부족합니다.',
   'itemUi.errors.notYourListing': '당신의 등록이 아닙니다.',
   'itemUi.errors.nothingToCollect': '수령할 것이 없습니다.',
+  'itemUi.market.sweep': '일괄 구매',
+  'itemUi.market.sweepAria': '{item} 시장 일괄 구매',
+  'itemUi.market.sweepTitle': '일괄 구매: {item}',
+  'itemUi.market.sweepClose': '닫기',
+  'itemUi.market.sweepNote':
+    '다른 판매자의 등록 물품을 단가가 낮은 순으로 통째로 구매하여 원하는 수량을 채웁니다. 요청한 것보다 조금 더 받을 수 있습니다.',
+  'itemUi.market.sweepQuantity': '원하는 수량',
+  'itemUi.market.sweepQuoteNone': '이 아이템에 일괄 구매할 등록 물품이 없습니다.',
+  'itemUi.market.sweepQuoteLine': '등록 {listings}건에서 {units}개, 총 {total} (개당 {each})',
+  'itemUi.market.sweepQuoteShort':
+    '등록 {listings}건에서 {units}개만 구매 가능, 총 {total} (개당 {each})',
+  'itemUi.market.sweepButton': '일괄 구매',
+  'itemUi.market.sweepConfirmTitle': '일괄 구매 확인',
+  'itemUi.market.sweepConfirmBody':
+    '등록 {listings}건에서 {item} x{units}을(를) 총 {total} (개당 {each})에 구매하시겠습니까?',
+  'itemUi.market.sweepChanged':
+    '확인하기 전에 일괄 구매 견적이 변경되었습니다. 총액을 확인하고 다시 시도하세요.',
+  'itemUi.errors.sweepNoListings': '이 아이템에 일괄 구매할 등록 물품이 없습니다.',
+  'itemUi.errors.sweepPriceChanged':
+    '일괄 구매가 처리되기 전에 가격이 변경되었습니다. 견적을 확인하고 다시 시도하세요.',
   'itemUi.loot.takeAll': '모두 가져가기',
   'itemUi.loot.close': '전리품 닫기',
   'itemUi.lootRoll.title': '전리품 주사위',

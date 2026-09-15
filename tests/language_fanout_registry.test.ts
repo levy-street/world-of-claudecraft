@@ -465,6 +465,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the tab, the open letter id and the mail mirror (#2529)',
   },
   {
+    file: 'market_sweep_panel.ts',
+    memos: ['lastQuoteSig'],
+    answer: 'this.marketWindow.render',
+    why: 'the Market Sweep card is rebuilt by the Browse list repaint (MarketSweepPanel.mount, reached from the market window render via renderContent), which resets lastQuoteSig and paints the quote line with the CURRENT language; the memo only elides same-language re-paints of an unchanged quote between list repaints',
+  },
+  {
     file: 'market_window.ts',
     memos: ['lastSig', 'lastSellPriceRefSig', 'searchEcho'],
     answer: 'this.marketWindow.render',
