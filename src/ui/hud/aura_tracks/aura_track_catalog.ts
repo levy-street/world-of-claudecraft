@@ -36,6 +36,12 @@
 // what this family is not for.
 
 import { absorbAuraId, buffTargetAuraId, selfBuffAuraId } from '../../../sim/combat/aura_ids';
+import {
+  PERFECT_MOMENT_DURATION,
+  PERFECT_MOMENT_ID,
+  TEMPORAL_ECHO_ID,
+} from '../../../sim/combat/chronomancy';
+import { TEMPORAL_HOURGLASS_ID } from '../../../sim/combat/temporal_hourglass';
 import { ABILITIES } from '../../../sim/data';
 import type { AbilityDef, AuraKind } from '../../../sim/types';
 import { isToggleAuraKind } from '../../auras_view';
@@ -64,6 +70,9 @@ export interface AuraTrackEntry {
   /** The ability's cooldown in seconds, 0 for none. Separates the emergency
    *  buttons from the rotational mitigation (see DEFENSIVE_COOLDOWN_SEC). */
   cooldown: number;
+  /** One cast lands an identical copy on every group member in radius, so only
+   *  the copy on the LOCAL player is worth a row (see BespokeEffectAura). */
+  groupWide?: true;
 }
 
 /** Nothing longer than this is a maintained effect; see the header. */
@@ -125,6 +134,9 @@ const POWER_KINDS: ReadonlySet<string> = new Set([
   'form_lich',
   'hunter_cold_focus',
   'hunter_bloodtrail',
+  // The Chronomancer's offensive window: it freezes four Arcane Charges so Aether
+  // Darts fires its full barrage without spending them (combat/chronomancy.ts).
+  'perfect_moment',
 ]);
 
 // Movement and concealment. `ice_floes` is here rather than in POWER because
@@ -144,6 +156,83 @@ const UTILITY_KINDS: ReadonlySet<string> = new Set([
 // what is happening to you. Enemy debuff kinds (`mortal_wound`, `melting_acid`,
 // `resource_sap`, `paladin_debt_of_light`) are out for the plainer reason that
 // this family is the helpful side; the enemy side is src/ui/hud/target_dots/.
+
+/** The aura a bespoke effect type leaves. Always names the KIND. It names the
+ *  ID too whenever the sim module applies a FIXED one whichever ability cast the
+ *  effect, which is the only way the catalog can avoid minting a key no live
+ *  aura carries; `auraId: null` is for the effects that genuinely take the
+ *  ordinary rule (the effect's own `auraId`, else the ability id). */
+interface BespokeEffectAura {
+  auraId: string | null;
+  kind: AuraKind;
+  /** Only for an effect whose content record authors no duration of its own: the
+   *  sim module holds it as a constant, so the row IMPORTS that constant rather
+   *  than copying its number and letting the two drift. */
+  duration?: number;
+  /** One cast, one identical copy on every group member in radius. Their rows
+   *  carry no information the caster's own row does not, so the track shows the
+   *  caster's alone; see the Offensive Cooldowns descriptor. */
+  groupWide?: true;
+}
+
+// Effect types whose helpful aura NO rule below can see, because the content
+// models them with a bespoke effect type that spells out no `kind` for the kind
+// sets to read. Each names the id and the kind the aura actually LANDS under, so
+// the ordinary rules then classify it like any other spell rather than needing a
+// second derivation of their own.
+//
+// Every miss this table fixes was Chronomancy, the mage healer, and all of them
+// were invisible in the same way: the spell simply appeared in no track and nothing
+// failed, which is the exact failure mode a DERIVED catalog exists to prevent
+// and the reason a new bespoke effect type belongs here rather than in FORCED.
+//  - Temporal Echo marks an ally and converts a fraction of the mage's Arcane
+//    damage into healing on them (combat/chronomancy.ts) rather than ticking a
+//    stored total, so it is authored as its own effect type and never matched
+//    `type === 'hot'` the way Wildbloom and Renew do.
+//  - Hourglass of Suspension grants a short stasis to the caster or a group ally.
+//    `stasis` is already a GUARD_KIND (it is what puts Cold Coffin in a track),
+//    but the effect record never spells it out, so the kind sets never saw it.
+//  - Temporal Acceleration is the Chronomancer's group haste burst, and the same
+//    `aoeAllyHaste` effect carries the shaman and rogue versions, so naming the
+//    type once covers all three (the hunter's 300s aura stays out on the ceiling,
+//    as it should). It is the one row here that takes the ordinary id rule, and
+//    genuinely so: applyGroupHaste writes the aura under the CASTING ability's id
+//    (combat/haste_burst.ts), unlike the two Chronomancy modules beside it. It is
+//    also `groupWide`, for the reason that field names. Its `_spell` companion is
+//    a second aura of the same name and duration, deliberately left unnamed: it
+//    would be a duplicate row per unit. That is the one asymmetry with the
+//    kind-suffixed companions that DO get rows (Aether Surge's haste half): those
+//    differ from their primary in kind AND duration, so a reader learns something
+//    from the second row.
+//  - Perfect Moment is the Chronomancer's offensive window, and the only one here
+//    whose content record authors NO duration, so its row carries the sim's own
+//    constant. Its `arcane_charge` companion stays out for the reason the
+//    next-cast family does: a resource counter is not a window running down.
+//
+// TEMPORAL ECHO'S TWO CASTS SHARE ONE ROW. The individual mark and Temporal
+// Cascade's group mark both apply one `temporal_echo` aura, differing only in the
+// conversion rate they store, so both effect types name that id and the catalog's
+// existing dedupe keeps a single row. Naming the id also stops Temporal Cascade
+// minting a `temporal_cascade` row, which would be a key no live aura can match.
+const BESPOKE_EFFECT_AURAS: ReadonlyMap<string, BespokeEffectAura> = new Map<
+  string,
+  BespokeEffectAura
+>([
+  ['temporalEcho', { auraId: TEMPORAL_ECHO_ID, kind: 'temporal_echo' }],
+  ['massTemporalEcho', { auraId: TEMPORAL_ECHO_ID, kind: 'temporal_echo' }],
+  ['temporalHourglass', { auraId: TEMPORAL_HOURGLASS_ID, kind: 'stasis' }],
+  ['aoeAllyHaste', { auraId: null, kind: 'buff_haste', groupWide: true }],
+  [
+    'perfectMoment',
+    { auraId: PERFECT_MOMENT_ID, kind: 'perfect_moment', duration: PERFECT_MOMENT_DURATION },
+  ],
+]);
+
+// Aura kinds that read as a maintained HEAL on the unit carrying them. The plain
+// `hot` effect spells out no kind and is matched by TYPE below; this set is for
+// the healing effects the content gives a kind of their own, which is why it is
+// a set rather than a second literal waiting to be widened again.
+const HOT_KINDS: ReadonlySet<string> = new Set(['temporal_echo']);
 
 // Effect shapes that leave an absorb, across the several spellings the content
 // uses (a plain `absorb` effect, a `shield`, the percentage-of-max variants, and
@@ -193,7 +282,7 @@ type EffectRecord = {
 };
 
 function categoryOf(type: string, kind: string): AuraTrackCategory | null {
-  if (type === 'hot') return 'hot';
+  if (type === 'hot' || HOT_KINDS.has(kind)) return 'hot';
   if (ABSORB_TYPES.has(type)) return 'absorb';
   if (GUARD_KINDS.has(kind)) return 'guard';
   if (UTILITY_KINDS.has(kind)) return 'utility';
@@ -211,6 +300,8 @@ function auraIdOf(def: AbilityDef, eff: EffectRecord, type: string, buffTargetIn
   if (type === 'selfBuff') return selfBuffAuraId(def, idEff);
   if (type === 'absorb') return absorbAuraId(def, idEff);
   if (type === 'buffTarget') return buffTargetAuraId(def, idEff, buffTargetIndex);
+  const bespoke = BESPOKE_EFFECT_AURAS.get(type);
+  if (bespoke !== undefined && bespoke.auraId !== null) return bespoke.auraId;
   return idEff.auraId ?? def.id;
 }
 
@@ -247,13 +338,15 @@ function buildCatalog(): ReadonlyMap<string, AuraTrackEntry> {
       let buffTargetIndex = 0;
       for (const eff of effects) {
         const type = String(eff.type ?? '');
-        const kind = String(eff.kind ?? '');
+        // The effect's own kind, else the one its bespoke type is known to land,
+        // so every rule below reads the kind the LIVE aura will carry.
+        const kind = String(eff.kind ?? '') || (BESPOKE_EFFECT_AURAS.get(type)?.kind ?? '');
         const auraId = auraIdOf(def, eff, type, buffTargetIndex);
         if (type === 'buffTarget') buffTargetIndex++;
         if (EXCLUDED_IDS.has(auraId) || out.has(auraId)) continue;
         const category = categoryOf(type, kind);
         if (!category) continue;
-        const duration = Number(eff.duration ?? 0);
+        const duration = Number(eff.duration ?? BESPOKE_EFFECT_AURAS.get(type)?.duration ?? 0);
         if (duration <= 0) continue;
         // ONE toggle classifier, shared with the aura strips: the shape a row
         // takes and the pass it gets through the ceiling come from the same
@@ -270,6 +363,7 @@ function buildCatalog(): ReadonlyMap<string, AuraTrackEntry> {
           category,
           shape: mode ? 'mode' : category === 'absorb' ? 'points' : 'timer',
           cooldown,
+          ...(BESPOKE_EFFECT_AURAS.get(type)?.groupWide === true ? { groupWide: true } : {}),
         });
       }
     }
