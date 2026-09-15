@@ -2,10 +2,13 @@ import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   checkpointEntryProbe,
+  ENTRY_ALIVE_WINDOW_MS,
   ENTRY_CRASH_WINDOW_MS,
+  ENTRY_HEARTBEAT_MS,
   ENTRY_PRESET_MIN,
   ENTRY_PROBE_KEY,
   ENTRY_RECOVERY_LOG_KEY,
+  heartbeatEntryProbe,
   parseEntryRecoveryLog,
   parseProbe,
   persistEntryRecoveryLog,
@@ -13,6 +16,7 @@ import {
   serializeEntryRecoveryLog,
   serializeProbe,
   stampEntryCheckpoint,
+  stampEntryHeartbeat,
   stampEntryProbe,
   stepDownPreset,
 } from '../src/game/entry_crash_guard';
@@ -203,6 +207,76 @@ describe('entry crash guard: diagnostic checkpoints', () => {
   });
 });
 
+describe('entry crash guard: liveness heartbeat', () => {
+  it('pins the cadence inside the alive window with room for a slow phone boot', () => {
+    expect(ENTRY_ALIVE_WINDOW_MS).toBeGreaterThanOrEqual(ENTRY_HEARTBEAT_MS * 3);
+    expect(ENTRY_ALIVE_WINDOW_MS).toBeLessThan(ENTRY_CRASH_WINDOW_MS);
+  });
+
+  it('round-trips aliveAt and drops an invalid one without losing the probe', () => {
+    expect(parseProbe(serializeProbe({ preset: 2, at: NOW, aliveAt: NOW + 5 }))).toEqual({
+      preset: 2,
+      at: NOW,
+      aliveAt: NOW + 5,
+    });
+    expect(parseProbe(JSON.stringify({ preset: 2, at: NOW, aliveAt: 'soon' }))).toEqual({
+      preset: 2,
+      at: NOW,
+    });
+  });
+
+  it('refreshes only aliveAt and keeps every breadcrumb', () => {
+    const raw = checkpointEntryProbe(
+      serializeProbe({ preset: 2, at: NOW }),
+      'first-frame',
+      NOW + 10,
+      {
+        frame: 1,
+      },
+    );
+    expect(parseProbe(heartbeatEntryProbe(raw, NOW + 20))).toEqual({
+      preset: 2,
+      at: NOW,
+      checkpoint: 'first-frame',
+      checkpointAt: NOW + 10,
+      diagnostics: { frame: 1 },
+      aliveAt: NOW + 20,
+    });
+    // A later checkpoint keeps the heartbeat it does not own.
+    expect(
+      parseProbe(checkpointEntryProbe(heartbeatEntryProbe(raw, NOW + 20), 'rendering', NOW + 30)),
+    ).toMatchObject({
+      checkpoint: 'rendering',
+      aliveAt: NOW + 20,
+    });
+    expect(heartbeatEntryProbe(null, NOW)).toBeNull();
+    expect(heartbeatEntryProbe(raw, Number.NaN)).toBeNull();
+  });
+
+  it('stamps the heartbeat into storage only while a probe is armed', () => {
+    const store = new Map<string, string>();
+    const prev = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem: (k: string) => store.get(k) ?? null,
+        setItem: (k: string, v: string) => store.set(k, v),
+        removeItem: (k: string) => store.delete(k),
+      },
+    });
+    try {
+      stampEntryHeartbeat(NOW);
+      expect(store.has(ENTRY_PROBE_KEY)).toBe(false);
+      store.set(ENTRY_PROBE_KEY, serializeProbe({ preset: 2, at: NOW }));
+      stampEntryHeartbeat(NOW + 5_000);
+      expect(parseProbe(store.get(ENTRY_PROBE_KEY) ?? null)?.aliveAt).toBe(NOW + 5_000);
+    } finally {
+      if (prev) Object.defineProperty(globalThis, 'localStorage', prev);
+      else Reflect.deleteProperty(globalThis, 'localStorage');
+    }
+  });
+});
+
 describe('entry crash guard: stepDownPreset', () => {
   it('steps each tier down one', () => {
     expect(stepDownPreset(5)).toBe(4);
@@ -293,6 +367,71 @@ describe('entry crash guard: planEntryCrashRecovery', () => {
       checkpointAgeMs: 750,
       diagnostics: { calls: 411, triangles: 2_872_588 },
     });
+  });
+
+  it('recovers when the heartbeat ran until the last seconds before the reload (foreground kill)', () => {
+    const raw = serializeProbe({
+      preset: 2,
+      at: NOW - ENTRY_CRASH_WINDOW_MS * 3,
+      checkpoint: 'runtime-stable',
+      checkpointAt: NOW - ENTRY_CRASH_WINDOW_MS * 3 + 20_000,
+      aliveAt: NOW - 8_000,
+    });
+    expect(planEntryCrashRecovery(raw, NOW)).toEqual({
+      from: 2,
+      to: 1,
+      ageMs: ENTRY_CRASH_WINDOW_MS * 3,
+      checkpoint: 'runtime-stable',
+      checkpointAgeMs: ENTRY_CRASH_WINDOW_MS * 3 - 20_000,
+      aliveAgeMs: 8_000,
+    });
+  });
+
+  it('ignores a probe whose heartbeat stopped before the reload: the page was backgrounded, not killed', () => {
+    // The reported iOS case: the player backgrounded the app (heartbeat stops), the
+    // hidden-lifecycle probe removal never reached disk, iOS reclaimed the WebView
+    // minutes later and the foreground reload found a probe with a recent dialog
+    // checkpoint inside the 10-minute window. Before the heartbeat this read as an
+    // entry crash and cost the player the resume marker on every such cycle.
+    const raw = serializeProbe({
+      preset: 1,
+      at: NOW - 30 * 60_000,
+      checkpoint: 'mobile-more-closed',
+      checkpointAt: NOW - 4 * 60_000,
+      aliveAt: NOW - ENTRY_ALIVE_WINDOW_MS - 1,
+    });
+    expect(planEntryCrashRecovery(raw, NOW)).toBeNull();
+  });
+
+  it('honors a heartbeat exactly at the alive window edge', () => {
+    const raw = serializeProbe({
+      preset: 3,
+      at: NOW - 60_000,
+      aliveAt: NOW - ENTRY_ALIVE_WINDOW_MS,
+    });
+    expect(planEntryCrashRecovery(raw, NOW)).toEqual({
+      from: 3,
+      to: 2,
+      ageMs: 60_000,
+      aliveAgeMs: ENTRY_ALIVE_WINDOW_MS,
+    });
+  });
+
+  it('keeps the wide entry window for a probe that never reached the frame loop', () => {
+    // No heartbeat means the synchronous scene build (which cannot heartbeat) was
+    // still running: the original crash-at-entry rule stands unchanged.
+    const raw = serializeProbe({
+      preset: 3,
+      at: NOW - ENTRY_CRASH_WINDOW_MS + 1_000,
+      checkpoint: 'renderer-built',
+      checkpointAt: NOW - ENTRY_CRASH_WINDOW_MS + 1_000,
+    });
+    expect(planEntryCrashRecovery(raw, NOW)).not.toBeNull();
+  });
+
+  it('ignores a heartbeat from the future (clock went backwards)', () => {
+    const raw = serializeProbe({ preset: 3, at: NOW - 5_000, aliveAt: NOW + 1 });
+    expect(planEntryCrashRecovery(raw, NOW)).toBeNull();
   });
 
   it('ignores a probe from the future (clock went backwards)', () => {

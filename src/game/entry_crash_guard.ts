@@ -18,6 +18,19 @@
 // - Once entry is stable the probe stays armed for explicit high-risk runtime UI
 //   checkpoints. Normal lifecycle transitions clear it, so a silent foreground
 //   WebContent termination remains distinguishable from backgrounding or navigation.
+// - stampEntryHeartbeat() refreshes a liveness stamp (aliveAt) from the frame loop
+//   every ENTRY_HEARTBEAT_MS while the page is armed and foregrounded. Once a probe
+//   carries that stamp, a crash verdict also needs it to be younger than
+//   ENTRY_ALIVE_WINDOW_MS: a page that was provably running the frame loop right up
+//   to the reload was killed in the foreground; one whose heartbeat stopped long
+//   before the reload was backgrounded first, and a reload after that is the OS
+//   reclaiming a background WebView (or an OTA bundle switch), never an entry crash.
+//   This is what makes the verdict robust when the hidden-lifecycle clear below is
+//   lost (WebKit persists localStorage asynchronously, so a probe removal written
+//   in the last instant before a background purge may never reach disk) and when a
+//   boot starts hidden (the controller then arms without persisting until the first
+//   foreground). Before the first frame there is no heartbeat, and the synchronous
+//   scene build cannot produce one, so that phase keeps the wider window below.
 // - On the NEXT boot, a probe that is still present and fresh means the previous entry
 //   died mid-build: planEntryCrashRecovery() names the preset that crashed and the next
 //   tier down to retry with. The caller persists the lowered preset, drops the resume
@@ -40,6 +53,19 @@ export const ENTRY_RECOVERY_LOG_KEY = 'woc_entry_last_recovery';
 // world entry the player is attempting NOW - e.g. a phone that died mid-entry and was
 // booted again days later should not silently lose a graphics tier.
 export const ENTRY_CRASH_WINDOW_MS = 10 * 60 * 1000;
+
+// Liveness heartbeat cadence (frame loop, foreground only) and the longest a probe's
+// heartbeat may lag this boot for the previous session to count as killed in the
+// foreground. The window covers the heartbeat gap plus the crash-to-reload and
+// reload-to-check latency of a slow phone boot; anything longer means the page
+// stopped running BEFORE the reload, i.e. it was backgrounded, not crashed.
+// The window is a two-sided trade, deliberately: a background reclaim that reloads
+// within it still reads as a crash (narrowed from the 10 minute window, not gone),
+// and a real foreground kill whose frame loop had already stalled for longer than
+// it (a memory death spiral that hangs the main thread before the OS kills the
+// process) now reads as backgrounded. Widen it only with both sides in view.
+export const ENTRY_HEARTBEAT_MS = 5 * 1000;
+export const ENTRY_ALIVE_WINDOW_MS = 45 * 1000;
 
 // How long after the synchronous scene build the entry is considered stable. The
 // controller then stops periodic render writes but keeps the probe armed for named
@@ -98,6 +124,8 @@ export interface EntryProbe {
   checkpointAt?: number;
   /** bounded, non-sensitive render and device evidence for the checkpoint */
   diagnostics?: EntryDiagnostics;
+  /** wall-clock ms of the last frame-loop liveness heartbeat (absent before the first frame) */
+  aliveAt?: number;
 }
 
 export interface EntryCrashRecovery {
@@ -113,6 +141,8 @@ export interface EntryCrashRecovery {
   checkpointAgeMs?: number;
   /** render/device evidence captured at the last checkpoint */
   diagnostics?: EntryDiagnostics;
+  /** ms between the last liveness heartbeat and this boot (absent before the first frame) */
+  aliveAgeMs?: number;
 }
 
 export interface EntryRecoveryLog extends EntryCrashRecovery {
@@ -181,6 +211,9 @@ export function parseEntryRecoveryLog(raw: string | null): EntryRecoveryLog | nu
       const diagnostics = sanitizeDiagnostics(value.diagnostics);
       if (diagnostics) log.diagnostics = diagnostics;
     }
+    if (typeof value.aliveAgeMs === 'number' && Number.isFinite(value.aliveAgeMs)) {
+      log.aliveAgeMs = value.aliveAgeMs;
+    }
     return log;
   } catch {
     return null;
@@ -212,6 +245,9 @@ export function parseProbe(raw: string | null): EntryProbe | null {
       const diagnostics = sanitizeDiagnostics(value.diagnostics);
       if (diagnostics) probe.diagnostics = diagnostics;
     }
+    if (typeof value.aliveAt === 'number' && Number.isFinite(value.aliveAt)) {
+      probe.aliveAt = value.aliveAt;
+    }
     return probe;
   } catch {
     return null;
@@ -234,7 +270,15 @@ export function checkpointEntryProbe(
     checkpoint,
     checkpointAt: now,
     ...(sanitized ? { diagnostics: sanitized } : {}),
+    ...(probe.aliveAt !== undefined ? { aliveAt: probe.aliveAt } : {}),
   });
+}
+
+/** Pure heartbeat transition: refresh aliveAt, keep every breadcrumb as it is. */
+export function heartbeatEntryProbe(raw: string | null, now: number): string | null {
+  const probe = parseProbe(raw);
+  if (!probe || !Number.isFinite(now)) return null;
+  return serializeProbe({ ...probe, aliveAt: now });
 }
 
 /** One tier down, clamped to the settings range; the floor retries at the floor. */
@@ -253,13 +297,24 @@ export function planEntryCrashRecovery(raw: string | null, now: number): EntryCr
   const probe = parseProbe(raw);
   if (!probe) return null;
   const ageMs = now - probe.at;
-  const evidenceAgeMs = now - (probe.checkpointAt ?? probe.at);
+  // The heartbeat is evidence of life like any checkpoint: a long quiet session with
+  // a fresh heartbeat is still inside the window even when its last named
+  // checkpoint is hours old.
+  const evidenceAt = Math.max(probe.checkpointAt ?? probe.at, probe.aliveAt ?? probe.at);
+  const evidenceAgeMs = now - evidenceAt;
   if (ageMs < 0 || evidenceAgeMs < 0 || evidenceAgeMs > ENTRY_CRASH_WINDOW_MS) return null;
+  // A page that reached the frame loop proves it was still running right before a
+  // foreground kill; a heartbeat that stopped earlier than the alive window means
+  // the page was backgrounded before the reload (see the module header).
+  // (A heartbeat from the future already failed the evidence guard above.)
+  const aliveAgeMs = probe.aliveAt === undefined ? undefined : now - probe.aliveAt;
+  if (aliveAgeMs !== undefined && aliveAgeMs > ENTRY_ALIVE_WINDOW_MS) return null;
   const recovery: EntryCrashRecovery = {
     from: probe.preset,
     to: stepDownPreset(probe.preset),
     ageMs,
   };
+  if (aliveAgeMs !== undefined) recovery.aliveAgeMs = aliveAgeMs;
   if (probe.checkpoint && probe.checkpointAt !== undefined) {
     const checkpointAgeMs = now - probe.checkpointAt;
     if (checkpointAgeMs >= 0) {
@@ -296,6 +351,16 @@ export function stampEntryCheckpoint(
     if (next !== null) localStorage.setItem(ENTRY_PROBE_KEY, next);
   } catch {
     // Blocked storage only loses diagnostic detail; crash recovery still fails soft.
+  }
+}
+
+export function stampEntryHeartbeat(now: number): void {
+  try {
+    const next = heartbeatEntryProbe(localStorage.getItem(ENTRY_PROBE_KEY), now);
+    if (next !== null) localStorage.setItem(ENTRY_PROBE_KEY, next);
+  } catch {
+    // Blocked storage only loses the liveness stamp; the verdict falls back to the
+    // wider entry window, exactly as before the heartbeat existed.
   }
 }
 
