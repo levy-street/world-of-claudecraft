@@ -222,6 +222,7 @@ const UI_PURE_CORES = [
   'src/ui/map_marker_semantics_core.ts',
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/map_surface_core.ts',
+  'src/ui/map_pan_core.ts',
   'src/ui/mouseover_cast_core.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',

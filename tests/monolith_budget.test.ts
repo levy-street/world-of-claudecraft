@@ -455,7 +455,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
     // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
     // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
-    ceiling: 18350,
+    // LOWERED 18350 -> 18343 with the instance-plan zoom-out: the world-map
+    // "grab the paper" pan math moved to mapDragPanCenter in map_pan_core.ts.
+    ceiling: 18343,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
