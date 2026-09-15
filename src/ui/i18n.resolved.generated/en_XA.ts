@@ -4831,6 +4831,8 @@ export const en_XA: EnTranslations = {
       "lootMaybe": "[Áţ ɱóšţ óñé óƒ ţĥéšé ɱáý ðŕóþ:]",
       "lootChance": "[Áððíţíóñáļ çĥáñçé ðŕóþš:]",
       "lootHeroic": "[Ĥéŕóíç ƀóñúš, óñé óƒ ţĥéšé áļŵáýš ðŕóþš:]",
+      "lootHeroicMaybe": "[Ĥéŕóíç ƀóñúš, áţ ɱóšţ óñé óƒ ţĥéšé ɱáý ðŕóþ:]",
+      "lootHeroicChance": "[Ĥéŕóíç ƀóñúš, áððíţíóñáļ çĥáñçé ðŕóþš:]",
       "pct": "[{pct}%]",
       "blockedLevel": "[Ļéʋéļš {min} ţó {max} óñļý]",
       "blockedSpec": "[Ŕéɋúíŕéš á šþéçíáļížáţíóñ]",

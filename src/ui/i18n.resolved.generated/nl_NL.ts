@@ -4831,6 +4831,8 @@ export const nl_NL: EnTranslations = {
       "lootMaybe": "Maximaal een van deze kan vallen:",
       "lootChance": "Extra kansen op buit:",
       "lootHeroic": "Heroïsche bonus, een van deze valt altijd:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct}%",
       "blockedLevel": "Alleen niveaus {min} tot {max}",
       "blockedSpec": "Vereist een specialisatie",

@@ -4831,6 +4831,8 @@ export const ru_RU: EnTranslations = {
       "lootMaybe": "Выпадает не более одного из:",
       "lootChance": "Дополнительно с шансом:",
       "lootHeroic": "Героическая награда, всегда один из:",
+      "lootHeroicMaybe": "Героическая награда, не более одного из:",
+      "lootHeroicChance": "Героическая награда, дополнительно с шансом:",
       "pct": "{pct}%",
       "blockedLevel": "Только уровни {min}-{max}",
       "blockedSpec": "Требуется специализация",

@@ -4831,6 +4831,8 @@ export const zh_CN: EnTranslations = {
       "lootMaybe": "以下物品至多掉落其一：",
       "lootChance": "额外概率掉落：",
       "lootHeroic": "英雄奖励，以下物品必掉其一：",
+      "lootHeroicMaybe": "英雄奖励，以下物品至多掉落其一：",
+      "lootHeroicChance": "英雄奖励，额外概率掉落：",
       "pct": "{pct}%",
       "blockedLevel": "仅限等级 {min} 至 {max}",
       "blockedSpec": "需要选择专精",

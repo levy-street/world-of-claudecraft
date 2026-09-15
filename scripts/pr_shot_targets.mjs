@@ -15912,6 +15912,61 @@ export const TARGETS = [
       return { clip: '#ui' };
     },
   },
+  {
+    key: 'dungeon-finder-heroic-loot',
+    label:
+      'Dungeon Finder heroic loot preview: the heroic-only mount rolls read as chance drops, not a guaranteed slot',
+    // The heroic-only append had two shapes sharing one "always drops" header:
+    // a real guaranteed equipment slot (a rollGroup whose chances sum to 1) and
+    // the ungrouped low-chance singles (mount reins, 0.1% to 0.5% per clear).
+    // Heroic Nythraxis's raid loot is the clearest repro: its heroic weapon
+    // group IS guaranteed, but the four mount rows right below it are not, and
+    // both used to render under the identical "Heroic bonus, one of these
+    // always drops:" banner.
+    when: ['ui/dungeon_finder_window', 'ui/dungeon_finder_view', 'content/heroic_loot'],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      const opened = await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return { ok: false, reason: 'hud is unavailable' };
+        const el = document.querySelector('#dungeon-finder-window');
+        if (el) el.style.display = 'none';
+        hud.toggleDungeonFinder?.();
+        return { ok: true };
+      });
+      if (!opened.ok) return { skip: opened.reason };
+      if (!(await pollForSize(page, '#dungeon-finder-window', 10, 300))) {
+        return { skip: 'the Dungeon Finder window never opened' };
+      }
+      const selected = await page.evaluate(() => {
+        const row = document.querySelector('[data-row="nythraxis_boss_arena_heroic"]');
+        if (!(row instanceof HTMLElement)) {
+          return { ok: false, reason: 'the Heroic Nythraxis raid row is unavailable' };
+        }
+        row.click();
+        return { ok: true };
+      });
+      if (!selected.ok) return { skip: selected.reason };
+      await wait(400);
+      // The heroic-only rows (the guaranteed weapon group, then the mount
+      // singles) sit at the END of the loot list, after the encounter's normal
+      // groups/singles. `scrollIntoView` (not a hand-picked scrollTop) walks up
+      // to whichever ancestor actually clips: `.df-detail` scrolls internally on
+      // desktop, but the mobile layout flattens it to `overflow: visible` and
+      // scrolls the `#dungeon-finder-window` root itself instead (`.window`'s
+      // base `overflow-y: auto`), so one fixed selector cannot serve both.
+      await page.evaluate(() => {
+        const rows = document.querySelectorAll('#dungeon-finder-window .df-loot-row');
+        rows[rows.length - 1]?.scrollIntoView({ block: 'end' });
+      });
+      await wait(200);
+      return { clip: '#dungeon-finder-window' };
+    },
+  },
 ];
 
 // Shared staging for the farming Phase 8 shots: stand in the Eastbrook patch,

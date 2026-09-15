@@ -4831,6 +4831,8 @@ export const cs_CZ: EnTranslations = {
       "lootMaybe": "Může vypadnout nejvýše jeden z těchto předmětů:",
       "lootChance": "Dodatečné šance na kořist:",
       "lootHeroic": "Hrdinský bonus, vždy vypadne jedno z těchto:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct} %",
       "blockedLevel": "Pouze úrovně {min} až {max}",
       "blockedSpec": "Vyžaduje specializaci",

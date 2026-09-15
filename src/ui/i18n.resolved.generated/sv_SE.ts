@@ -4831,6 +4831,8 @@ export const sv_SE: EnTranslations = {
       "lootMaybe": "Högst ett av dessa kan falla:",
       "lootChance": "Extra chans till föremål:",
       "lootHeroic": "Heroisk bonus, ett av dessa faller alltid:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct}%",
       "blockedLevel": "Endast nivåerna {min} till {max}",
       "blockedSpec": "Kräver en specialisering",

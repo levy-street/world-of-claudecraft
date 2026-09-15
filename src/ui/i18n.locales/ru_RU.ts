@@ -11440,6 +11440,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': 'Выпадает не более одного из:',
   'hudChrome.finder.lootChance': 'Дополнительно с шансом:',
   'hudChrome.finder.lootHeroic': 'Героическая награда, всегда один из:',
+  'hudChrome.finder.lootHeroicMaybe': 'Героическая награда, не более одного из:',
+  'hudChrome.finder.lootHeroicChance': 'Героическая награда, дополнительно с шансом:',
   'hudChrome.finder.pct': '{pct}%',
   'hudChrome.finder.blockedLevel': 'Только уровни {min}-{max}',
   'hudChrome.finder.blockedSpec': 'Требуется специализация',

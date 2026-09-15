@@ -11278,6 +11278,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': '以下のうち最大 1 つがドロップ：',
   'hudChrome.finder.lootChance': '追加の低確率ドロップ：',
   'hudChrome.finder.lootHeroic': 'ヒロイック報酬、以下のいずれかが必ずドロップ：',
+  'hudChrome.finder.lootHeroicMaybe': 'ヒロイック報酬、以下のうち最大 1 つがドロップ：',
+  'hudChrome.finder.lootHeroicChance': 'ヒロイック報酬、追加の低確率ドロップ：',
   'hudChrome.finder.pct': '{pct}%',
   'hudChrome.finder.blockedLevel': 'レベル {min} ～ {max} 限定',
   'hudChrome.finder.blockedSpec': '特性の選択が必要',

@@ -10726,6 +10726,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': '以下物品至多掉落其一：',
   'hudChrome.finder.lootChance': '额外概率掉落：',
   'hudChrome.finder.lootHeroic': '英雄奖励，以下物品必掉其一：',
+  'hudChrome.finder.lootHeroicMaybe': '英雄奖励，以下物品至多掉落其一：',
+  'hudChrome.finder.lootHeroicChance': '英雄奖励，额外概率掉落：',
   'hudChrome.finder.pct': '{pct}%',
   'hudChrome.finder.blockedLevel': '仅限等级 {min} 至 {max}',
   'hudChrome.finder.blockedSpec': '需要选择专精',

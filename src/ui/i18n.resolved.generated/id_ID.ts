@@ -4831,6 +4831,8 @@ export const id_ID: EnTranslations = {
       "lootMaybe": "Paling banyak salah satu dari ini mungkin jatuh:",
       "lootChance": "Peluang jatuhan tambahan:",
       "lootHeroic": "Bonus heroik, salah satu dari ini selalu jatuh:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct} persen",
       "blockedLevel": "Khusus level {min} hingga {max}",
       "blockedSpec": "Memerlukan spesialisasi",

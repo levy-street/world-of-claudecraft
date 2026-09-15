@@ -4831,6 +4831,8 @@ export const tr_TR: EnTranslations = {
       "lootMaybe": "En fazla bunlardan biri düşebilir:",
       "lootChance": "Ek düşme şansı:",
       "lootHeroic": "Heroik bonusu, bunlardan biri her zaman düşer:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct}%",
       "blockedLevel": "Yalnızca {min} ile {max} arasındaki seviyeler",
       "blockedSpec": "Uzmanlaşma gerektirir",

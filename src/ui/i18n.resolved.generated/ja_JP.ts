@@ -4831,6 +4831,8 @@ export const ja_JP: EnTranslations = {
       "lootMaybe": "以下のうち最大 1 つがドロップ：",
       "lootChance": "追加の低確率ドロップ：",
       "lootHeroic": "ヒロイック報酬、以下のいずれかが必ずドロップ：",
+      "lootHeroicMaybe": "ヒロイック報酬、以下のうち最大 1 つがドロップ：",
+      "lootHeroicChance": "ヒロイック報酬、追加の低確率ドロップ：",
       "pct": "{pct}%",
       "blockedLevel": "レベル {min} ～ {max} 限定",
       "blockedSpec": "特性の選択が必要",

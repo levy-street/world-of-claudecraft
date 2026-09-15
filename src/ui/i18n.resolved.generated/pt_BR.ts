@@ -4831,6 +4831,8 @@ export const pt_BR: EnTranslations = {
       "lootMaybe": "No máximo um destes pode cair:",
       "lootChance": "Chance adicional de drops:",
       "lootHeroic": "Bônus heroico, um destes cai sempre:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct}%",
       "blockedLevel": "Apenas níveis {min} a {max}",
       "blockedSpec": "Requer uma especialização",

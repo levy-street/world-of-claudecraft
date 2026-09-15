@@ -4831,6 +4831,8 @@ export const ko_KR: EnTranslations = {
       "lootMaybe": "다음 중 최대 하나가 드롭:",
       "lootChance": "추가 확률 드롭:",
       "lootHeroic": "영웅 보상, 다음 중 하나가 반드시 드롭:",
+      "lootHeroicMaybe": "영웅 보상, 다음 중 최대 하나가 드롭:",
+      "lootHeroicChance": "영웅 보상, 추가 확률 드롭:",
       "pct": "{pct}%",
       "blockedLevel": "레벨 {min} ~ {max} 전용",
       "blockedSpec": "전문화 선택 필요",

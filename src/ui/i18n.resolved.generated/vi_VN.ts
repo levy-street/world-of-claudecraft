@@ -4831,6 +4831,8 @@ export const vi_VN: EnTranslations = {
       "lootMaybe": "Tối đa một trong số này có thể rơi:",
       "lootChance": "Cơ hội rơi thêm:",
       "lootHeroic": "Thưởng anh hùng, luôn rơi một trong số này:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct}%",
       "blockedLevel": "Chỉ dành cho cấp độ {min} đến {max}",
       "blockedSpec": "Yêu cầu chuyên môn hóa",

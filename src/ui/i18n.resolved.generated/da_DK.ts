@@ -4831,6 +4831,8 @@ export const da_DK: EnTranslations = {
       "lootMaybe": "Højst et af disse kan falde:",
       "lootChance": "Chancedråb ekstra:",
       "lootHeroic": "Heroisk bonus, et af disse falder altid:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct} pct.",
       "blockedLevel": "Kun niveau {min} til {max}",
       "blockedSpec": "Kræver en specialisering",
