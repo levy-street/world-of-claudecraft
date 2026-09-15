@@ -31,8 +31,10 @@ import {
   CLIENT_PERF_LONG_TASK_BUCKETS_SECONDS,
   CLIENT_PERF_OS_FAMILIES,
   CLIENT_PERF_RENDER_SCALE_BUCKETS,
+  CLIENT_PERF_RUNTIMES,
   CLIENT_PERF_SCENE_CLASSES,
   CLIENT_PERF_SHADER_WARM_REFUSALS,
+  CLIENT_PERF_SHED_RUNGS,
   CLIENT_PERF_SUGGESTION_IDS,
   CLIENT_PERF_WORST10S_BUCKETS_SECONDS,
   type ClientPerfSample,
@@ -43,9 +45,11 @@ import {
   registerClientPerfMetrics,
   setClientPerfMetricsSink,
   shaderWarmRefusalLabel,
+  WOC_CLIENT_RAW_SUMMARY_SHED_TOTAL,
   WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
 } from '../../../server/http/client_perf_metrics';
 import { handlePerfReport, perfReportInternalsForTest } from '../../../server/perf_report';
+import { RAW_SUMMARY_SHED_RUNG_IDS } from '../../../server/perf_report_shed';
 
 function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
   return {
@@ -65,6 +69,8 @@ function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
     suggestionIds: [],
     shaderWarmWorkerActive: true,
     shaderWarmRefusal: '',
+    desktopShell: false,
+    rawSummary: {},
     ...overrides,
   };
 }
@@ -132,6 +138,11 @@ describe('vocabulary pins', () => {
   it('pins the label vocabularies as literals', () => {
     expect([...CLIENT_PERF_GFX_TIERS]).toEqual(['low', 'medium', 'high', 'ultra', 'insane']);
     expect([...CLIENT_PERF_DEVICE_CLASSES]).toEqual(['desktop', 'mobile']);
+    expect([...CLIENT_PERF_RUNTIMES]).toEqual(['web', 'desktop-shell']);
+    // The shed vocabulary is the ladder's own rung list, bracketed.
+    expect([...CLIENT_PERF_SHED_RUNGS]).toEqual(['none', ...RAW_SUMMARY_SHED_RUNG_IDS, 'other']);
+    expect(CLIENT_PERF_SHED_RUNGS).toContain('rendererPrewarmSummary.lists');
+    expect(WOC_CLIENT_RAW_SUMMARY_SHED_TOTAL).toBe('woc_client_raw_summary_shed_total');
     expect([...CLIENT_PERF_GPU_FAMILIES]).toEqual([
       'nvidia',
       'amd',
@@ -225,13 +236,13 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_reports_total\{gfx_tier="high",device="desktop",gpu_family="nvidia"\} (\d+)$/m,
+        /^woc_client_reports_total\{gfx_tier="high",device="desktop",gpu_family="nvidia",runtime="web"\} (\d+)$/m,
       ),
     ).toBe(1);
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop",backend="d3d11"\} ([\d.]+)$/m,
+        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop",backend="d3d11",runtime="web"\} ([\d.]+)$/m,
       ),
     ).toBeCloseTo(0.0334, 5);
     expect(
@@ -309,7 +320,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop",backend="d3d11"\} ([\d.]+)$/m,
+        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop",backend="d3d11",runtime="web"\} ([\d.]+)$/m,
       ),
     ).toBe(0);
     // Neither a NaN nor an Infinity worst-10s satisfies the jank threshold
@@ -345,7 +356,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_reports_total\{gfx_tier="insane",device="mobile",gpu_family="software"\} (\d+)$/m,
+        /^woc_client_reports_total\{gfx_tier="insane",device="mobile",gpu_family="software",runtime="web"\} (\d+)$/m,
       ),
     ).toBe(0);
     expect(
@@ -354,7 +365,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_count\{gfx_tier="ultra",device="desktop",backend="vulkan"\} (\d+)$/m,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="ultra",device="desktop",backend="vulkan",runtime="web"\} (\d+)$/m,
       ),
     ).toBe(0);
     expect(
@@ -382,15 +393,97 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_reports_total\{gfx_tier="high",device="desktop",gpu_family="nvidia"\} (\d+)$/m,
+        /^woc_client_reports_total\{gfx_tier="high",device="desktop",gpu_family="nvidia",runtime="web"\} (\d+)$/m,
       ),
     ).toBe(0);
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop",backend="d3d11"\} (\d+)$/m,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop",backend="d3d11",runtime="web"\} (\d+)$/m,
       ),
     ).toBe(0);
+  });
+
+  it('labels the reports counter and the frame p95 histogram with the host runtime', async () => {
+    // The desktop shell is Chromium on the same bundle: without this label no
+    // series could answer "is the desktop client slower than a Chrome tab on
+    // the same hardware". The label rides exactly two families; the rest of
+    // the family stays runtime-blind so its cross products do not double.
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+    sink.perfReportStored(sample({ desktopShell: true }));
+    sink.perfReportStored(sample({ desktopShell: false }));
+    sink.perfReportStored(sample({ desktopShell: false }));
+
+    const text = await registry.metrics();
+    expect(
+      value(
+        text,
+        /^woc_client_reports_total\{gfx_tier="high",device="desktop",gpu_family="nvidia",runtime="desktop-shell"\} (\d+)$/m,
+      ),
+    ).toBe(1);
+    expect(
+      value(
+        text,
+        /^woc_client_reports_total\{gfx_tier="high",device="desktop",gpu_family="nvidia",runtime="web"\} (\d+)$/m,
+      ),
+    ).toBe(2);
+    expect(
+      value(
+        text,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop",backend="d3d11",runtime="desktop-shell"\} (\d+)$/m,
+      ),
+    ).toBe(1);
+    expect(
+      value(
+        text,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop",backend="d3d11",runtime="web"\} (\d+)$/m,
+      ),
+    ).toBe(2);
+    // Exactly two families carry the label: the bound over the whole
+    // exposition, so a runtime label added to any other family reds here.
+    const labeled = new Set(
+      text
+        .split('\n')
+        .filter((line) => line.includes('runtime="'))
+        .map((line) => line.slice(0, line.indexOf('{'))),
+    );
+    expect([...labeled].sort()).toEqual([
+      'woc_client_frame_p95_seconds_bucket',
+      'woc_client_frame_p95_seconds_count',
+      'woc_client_frame_p95_seconds_sum',
+      'woc_client_reports_total',
+    ]);
+  });
+
+  it('counts stored reports by the deepest raw summary shed rung, folded to the vocabulary', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+    sink.perfReportStored(sample({ rawSummary: { seconds: 1 } }));
+    sink.perfReportStored(
+      sample({
+        rawSummary: {
+          truncated: true,
+          dropped: ['rendererPrewarmSummary.lists', 'rendererFoliage'],
+        },
+      }),
+    );
+    sink.perfReportStored(sample({ rawSummary: { truncated: true, dropped: ['not-a-rung'] } }));
+    sink.perfReportStored(sample({ rawSummary: { truncated: true, dropped: [] } }));
+
+    const text = await registry.metrics();
+    const count = (rung: string): number =>
+      value(
+        text,
+        new RegExp(`^woc_client_raw_summary_shed_total\\{rung="${rung}"\\} (\\d+)$`, 'm'),
+      );
+    expect(count('none')).toBe(2);
+    expect(count('rendererFoliage')).toBe(1);
+    expect(count('rendererPrewarmSummary.lists')).toBe(0);
+    expect(count('other')).toBe(1);
+    // Pre-seeded for every rung, so a healthy fleet reads zeros, not gaps.
+    for (const rung of CLIENT_PERF_SHED_RUNGS) expect(count(rung)).toBeGreaterThanOrEqual(0);
+    expect(text).not.toMatch(/rung="not-a-rung"/);
   });
 
   it('bounds the backend label: the series count is fixed and no report can grow it', async () => {
@@ -403,11 +496,16 @@ describe('registerClientPerfMetrics', () => {
       text.split('\n').filter((line) => line.startsWith(`${name}{`)).length;
 
     const atRegistration = await registry.metrics();
-    // 5 tiers x 2 device classes x 7 backends.
+    // 5 tiers x 2 device classes x 7 backends x 2 runtimes.
     expect(countSeries(atRegistration, 'woc_client_frame_p95_seconds_count')).toBe(
-      CLIENT_PERF_GFX_TIERS.length * CLIENT_PERF_DEVICE_CLASSES.length * GL_BACKEND_LABELS.length,
+      CLIENT_PERF_GFX_TIERS.length *
+        CLIENT_PERF_DEVICE_CLASSES.length *
+        GL_BACKEND_LABELS.length *
+        CLIENT_PERF_RUNTIMES.length,
     );
-    expect(countSeries(atRegistration, 'woc_client_frame_p95_seconds_count')).toBe(70);
+    expect(countSeries(atRegistration, 'woc_client_frame_p95_seconds_count')).toBe(140);
+    // 5 tiers x 2 device classes x 6 GPU families x 2 runtimes.
+    expect(countSeries(atRegistration, 'woc_client_reports_total')).toBe(120);
     // 6 OS families x 7 backends.
     expect(countSeries(atRegistration, 'woc_client_context_losses_total')).toBe(
       CLIENT_PERF_OS_FAMILIES.length * GL_BACKEND_LABELS.length,
@@ -429,7 +527,8 @@ describe('registerClientPerfMetrics', () => {
     }
 
     const afterTraffic = await registry.metrics();
-    expect(countSeries(afterTraffic, 'woc_client_frame_p95_seconds_count')).toBe(70);
+    expect(countSeries(afterTraffic, 'woc_client_frame_p95_seconds_count')).toBe(140);
+    expect(countSeries(afterTraffic, 'woc_client_reports_total')).toBe(120);
     expect(countSeries(afterTraffic, 'woc_client_context_losses_total')).toBe(42);
     // The unrecognised spellings all landed on 'unknown', never on a new label.
     expect(afterTraffic).not.toMatch(/backend="(directx-42|D3D11|d3d11 |opengl-es-3\.2|xxxx|)"/);
@@ -459,7 +558,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_reports_total\{gfx_tier="low",device="mobile",gpu_family="other"\} (\d+)$/m,
+        /^woc_client_reports_total\{gfx_tier="low",device="mobile",gpu_family="other",runtime="web"\} (\d+)$/m,
       ),
     ).toBe(1);
     // An invented backend falls back to 'unknown', the same way the tier and

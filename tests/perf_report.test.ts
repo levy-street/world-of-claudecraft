@@ -25,13 +25,14 @@ const VALID_TOKEN = 'b'.repeat(64);
 
 function fakeReq(
   body: unknown,
-  opts: { token?: string; method?: string; remoteAddress?: string } = {},
+  opts: { token?: string; method?: string; remoteAddress?: string; userAgent?: string } = {},
 ) {
   const req: any = new EventEmitter();
   req.method = opts.method ?? 'POST';
   req.url = '/api/perf-report';
   req.headers = {
     'user-agent':
+      opts.userAgent ??
       'Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15',
     ...(opts.token ? { authorization: `Bearer ${opts.token}` } : {}),
   };
@@ -143,7 +144,7 @@ describe('perf report ingestion', () => {
         activeViews: 57,
         visibleViews: 31,
         worst10sFrameP95Ms: 180.5,
-        rawSummary: { truncated: true },
+        rawSummary: { truncated: true, dropped: ['unlisted'] },
       }),
     );
   });
@@ -790,7 +791,7 @@ describe('perf report ingestion', () => {
     );
   });
 
-  it('preserves compact prewarm data when public raw summaries are truncated', async () => {
+  it('keeps the prewarm summary when an unknown key pushes a raw summary over the cap', async () => {
     const res = fakeRes();
 
     await handlePerfReport(
@@ -834,6 +835,7 @@ describe('perf report ingestion', () => {
       expect.objectContaining({
         rawSummary: expect.objectContaining({
           truncated: true,
+          dropped: ['unlisted'],
           seconds: 30,
           rendererPrewarmSummary: expect.objectContaining({
             elapsedMs: 3200,
@@ -874,6 +876,8 @@ describe('perf report ingestion', () => {
             failedEntryIds: 'not-an-array',
             entries: [],
           },
+          // Shed first by the ladder ('unlisted'), so the prewarm block itself
+          // rides the VERBATIM path: the id-list bounds must hold there too.
           oversized: 'x'.repeat(40_000),
         },
       }),
@@ -885,6 +889,7 @@ describe('perf report ingestion', () => {
       expect.objectContaining({
         rawSummary: expect.objectContaining({
           truncated: true,
+          dropped: ['unlisted'],
           rendererPrewarmSummary: expect.objectContaining({
             manifestPartial: 25,
             partialEntryIds: Array.from({ length: 24 }, (_, i) => `partial-${i}`),
@@ -1017,7 +1022,7 @@ describe('perf report ingestion', () => {
 
   it('keeps a full client-capped prewarm snapshot under the raw summary byte cap', async () => {
     // The three new lists are large enough that a LEGITIMATE report can cross
-    // RAW_SUMMARY_MAX_BYTES and get routed into compactRawSummary, whose
+    // RAW_SUMMARY_MAX_BYTES and get routed into the shed ladder, whose
     // compactPrewarmSummary carries none of them: the diagnostic that motivated
     // the fields would be the first thing dropped. This pins that a snapshot at
     // exactly the client caps still rides the verbatim path.
@@ -1098,7 +1103,7 @@ describe('perf report ingestion', () => {
     const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
     const raw = stored.rawSummary as Record<string, unknown>;
     // Not truncated: the whole point. A red here means the caps and the byte
-    // budget have drifted apart and the compact path is now silently eating
+    // budget have drifted apart and the shed ladder is now silently eating
     // the streamed-prewarm diagnostic.
     expect(raw.truncated).toBeUndefined();
     const prewarm = raw.rendererPrewarmSummary as Record<string, unknown>;
@@ -1302,7 +1307,7 @@ describe('perf report ingestion', () => {
     expect(totalBytes).toBeLessThan(15_500);
   });
 
-  it('carries the streamed-prewarm diagnostic across truncation into the compact path', async () => {
+  it('carries the streamed-prewarm diagnostic through the compact rung of the shed ladder', async () => {
     // The other half of the byte story: when a report DOES overflow, the
     // compact rebuild must still say which unit stalled and whether the pacer
     // backed off. Before this, compactPrewarmSummary knew none of these fields,
@@ -1355,8 +1360,10 @@ describe('perf report ingestion', () => {
               },
             },
           },
-          // Forces the compact path.
-          oversized: 'x'.repeat(40_000),
+          // A known key on a LATER rung than the prewarm compaction, so the
+          // ladder reaches that rung and keeps going (an unknown key would be
+          // shed first and leave the prewarm block verbatim).
+          rendererFoliage: { filler: 'x'.repeat(40_000) },
         },
       }),
       res,
@@ -1366,8 +1373,9 @@ describe('perf report ingestion', () => {
     const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
     const raw = stored.rawSummary as Record<string, unknown>;
     expect(raw.truncated).toBe(true);
+    expect(raw.dropped).toEqual(['rendererPrewarmSummary.lists', 'rendererFoliage']);
     const prewarm = raw.rendererPrewarmSummary as Record<string, unknown>;
-    // Present, and on the compact path's own tighter sample.
+    // Present, and on the compact rung's own tighter sample.
     const units = prewarm.compileUnits as Record<string, unknown>[];
     expect(units).toHaveLength(6);
     // The SLOWEST five plus the failure, not the first six. Taking the first
@@ -1383,7 +1391,7 @@ describe('perf report ingestion', () => {
       'weapon-skins:compile:skin_38',
       'weapon-skins:compile:skin_39',
     ]);
-    // Every retained member is field-shaped by the compact path, never copied
+    // Every retained member is field-shaped by the compact rung, never copied
     // verbatim.
     expect(units[0]).toEqual({
       id: 'weapon-skins:compile:skin_failed',
@@ -1406,6 +1414,189 @@ describe('perf report ingestion', () => {
     expect(adaptive.transitions as unknown[]).toHaveLength(6);
     // And the whole compacted report still fits, which is the point of the path.
     expect(Buffer.byteLength(JSON.stringify(raw))).toBeLessThan(16 * 1024);
+  });
+
+  it('sheds a real-shaped oversized report one rung at a time and keeps every core key', async () => {
+    // The production failure mode: a heavy first beacon, no filler key, over
+    // the cap through its own known blocks. Before the ladder, 57% of these
+    // stored as a bare {truncated: true}; now the small diagnostic keys ride
+    // every row and `dropped` says which big blocks went.
+    const res = fakeRes();
+    const detail = `uploaded=12 pending=8 ${'x'.repeat(130)}`;
+    const frameMs = { avg: 16.7, p50: 16.6, p95: 33.4, p99: 50.2, max: 120, long50: 3 };
+    const windows = {
+      last10s: { seconds: 10, frames: 600, fps: 60, frameMs },
+      last30s: { seconds: 30, frames: 1800, fps: 60, frameMs },
+      worst10s: { atMs: 120_000, seconds: 10, frames: 300, fps: 30, frameMs },
+    };
+    const bootPhases = {
+      entryMs: 6120,
+      rendererCtorMs: 813,
+      prepareZoneMs: 2000,
+      prepareNeighborsMs: 0,
+      prewarmInitialMs: 4000,
+    };
+    const drawingBuffer = {
+      width: 2560,
+      height: 1440,
+      cssWidth: 2560,
+      cssHeight: 1440,
+      dynamicResolution: false,
+    };
+    const entryReveal = {
+      waitedMs: 1200,
+      boundMs: 4000,
+      waits: [{ key: 'terrain', waitedMs: 800 }],
+    };
+
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'real-shaped-oversized',
+          rawSummary: {
+            graphicsConfigVersion: 16,
+            seconds: 300,
+            visibleSeconds: 240,
+            frames: 14_400,
+            hiddenPresentSkips: 12,
+            windows,
+            mainMs: {
+              sim: { count: 6000, avg: 1.2, p95: 3.1, max: 14 },
+              render: { count: 6000, avg: 8.1, p95: 14.2, max: 60 },
+            },
+            rendererPhaseMs: { cull: 0.4, views: 1.1, submit: 6.2, post: 0.9 },
+            rendererBudget: { targetFps: 60, level: 3 },
+            rendererDrawingBuffer: drawingBuffer,
+            browser: { longTasks: { totalMs: 200, avg: 66.7, max: 150, lastAge: 900 } },
+            heapSawtooth: { samples: 300, minMb: 210, maxMb: 480 },
+            postRevealLinks: {
+              reveals: 1,
+              revealsInWindow: 1,
+              windowMs: 20_000,
+              programsAtReveal: 200,
+              programsGained: 41,
+              samples: 1180,
+              unsampledMs: 250,
+              closed: true,
+              baselineLost: false,
+            },
+            bootPhases,
+            shaderWarm: {
+              active: true,
+              worker: 'ready',
+              refusal: '',
+              mode: 'all',
+              setting: 'auto',
+              backend: 'd3d11',
+              warmed: 120,
+              held: 0,
+              heldTimedOut: 0,
+            },
+            entryReveal,
+            rendererPrewarmSummary: {
+              elapsedMs: 3200,
+              maxMs: 5000,
+              manifestPlanned: 24,
+              manifestCompleted: 21,
+              manifestPartial: 3,
+              partialEntryIds: ['textures.scene_0', 'textures.scene_8', 'textures.scene_16'],
+              compileUnits: Array.from({ length: 12 }, (_, i) => ({
+                id: `weapon-skins:compile:skin_${i}`,
+                lane: 'programs.compile',
+                syncMs: i * 3,
+                settledDurationMs: i * 6,
+                failedAtMs: null,
+                programDelta: 2,
+                statusAtReveal: 'settled',
+              })),
+              prewarmPacing: {
+                mode: 'adaptive',
+                source: 'knobs',
+                adaptive: {
+                  state: 'steady',
+                  backoffCount: 1,
+                  noProgressCount: 0,
+                  transitions: Array.from({ length: 12 }, (_, i) => ({
+                    atMs: i * 100,
+                    from: 'steady',
+                    to: 'backoff',
+                    reason: 'no-progress',
+                  })),
+                },
+              },
+              entries: Array.from({ length: 24 }, (_, i) => ({
+                id: `textures.scene_${i}`,
+                category: 'world',
+                required: i < 8,
+                status: i % 8 === 0 ? 'partial' : 'completed',
+                elapsedMs: 120 + i,
+                remainingMsAfter: 4200 - i,
+                programDelta: 1,
+                textureDelta: 12,
+                workDone: 12,
+                workPlanned: 20,
+                detail,
+              })),
+            },
+            rendererQualityBuckets: {
+              version: 16,
+              bands: { foliage: 'b'.repeat(1500), shadows: 'b'.repeat(1500) },
+              baseline: { foliage: 'b'.repeat(500), shadows: 'b'.repeat(500) },
+              levels: { foliage: 3, shadows: 2 },
+              features: { composer: true, ao: false, shadowMap: 2048 },
+            },
+            rendererFoliage: { residency: 'f'.repeat(900), buckets: [1, 2, 3] },
+            input: { latency: { p50: 4, p95: 12, max: 60 }, debug: 'i'.repeat(700) },
+          },
+        },
+        { remoteAddress: '203.0.113.120' },
+      ),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const raw = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].rawSummary as Record<
+      string,
+      unknown
+    >;
+    expect(Buffer.byteLength(JSON.stringify(raw))).toBeLessThanOrEqual(16 * 1024);
+    expect(raw.truncated).toBe(true);
+    const dropped = raw.dropped as string[];
+    // The prewarm compaction is the first rung a real report reaches, and
+    // the ladder stops well before the core.
+    expect(dropped[0]).toBe('rendererPrewarmSummary.lists');
+    for (const core of [
+      'windows',
+      'rendererPhaseMs',
+      'browser',
+      'rendererDrawingBuffer',
+      'postRevealLinks',
+      'bootPhases',
+      'shaderWarm',
+      'entryReveal',
+      'scalars',
+      'unlisted',
+    ]) {
+      expect(dropped).not.toContain(core);
+    }
+    // The readers' SQL paths keep their values.
+    expect(raw.windows).toEqual(windows);
+    expect(raw.bootPhases).toEqual(bootPhases);
+    expect(raw.rendererDrawingBuffer).toEqual(drawingBuffer);
+    expect(raw.entryReveal).toEqual(entryReveal);
+    expect(raw.hiddenPresentSkips).toBe(12);
+    expect(raw.visibleSeconds).toBe(240);
+    expect(raw.shaderWarm).toMatchObject({ active: true, backend: 'd3d11' });
+    expect(raw.postRevealLinks).toMatchObject({ programsGained: 41, closed: true });
+    // The prewarm summary survives compacted: scalars and the bounded lists.
+    const prewarm = raw.rendererPrewarmSummary as Record<string, unknown>;
+    expect(prewarm.manifestPlanned).toBe(24);
+    expect(prewarm.partialEntryIds).toEqual([
+      'textures.scene_0',
+      'textures.scene_8',
+      'textures.scene_16',
+    ]);
+    expect((prewarm.compileUnits as unknown[]).length).toBe(6);
   });
 
   it('stores the four browser longtask fields inside raw summary, bounded (#2479)', async () => {
@@ -1535,6 +1726,7 @@ describe('perf report ingestion', () => {
       expect.objectContaining({
         rawSummary: expect.objectContaining({
           truncated: true,
+          dropped: ['unlisted'],
           seconds: 30,
           browser: { longTasks: { totalMs: 200, avg: 66.7, max: 150, lastAge: 900 } },
         }),
@@ -1570,7 +1762,7 @@ describe('perf report ingestion', () => {
 
     // The block is what says at what resolution a fleet actually plays, and an
     // oversized report is exactly the session whose resolution is worth reading,
-    // so the compact path names it too.
+    // so the shed ladder keeps it too.
     const truncated = fakeRes();
     await handlePerfReport(
       fakeReq({
@@ -1589,6 +1781,7 @@ describe('perf report ingestion', () => {
       unknown
     >;
     expect(compacted.truncated).toBe(true);
+    expect(compacted.dropped).toEqual(['unlisted']);
     expect(compacted.rendererDrawingBuffer).toEqual(drawingBuffer);
     expect(compacted.oversized).toBeUndefined();
   });
@@ -1596,7 +1789,7 @@ describe('perf report ingestion', () => {
   it('field-shapes the drawing buffer rather than storing what was posted', () => {
     const { rawSummary, DRAWING_BUFFER_RAW_PIXELS_MAX } = perfReportInternalsForTest;
 
-    // Every retained key of the compact path is copied verbatim, so "four
+    // The shed ladder keeps this key verbatim as part of the core, so "four
     // scalars" has to be enforced at the ingest, not trusted. A hostile block
     // keeps exactly four clamped integers and loses its extra members.
     const hostile = rawSummary({
@@ -1970,7 +2163,7 @@ describe('perf report ingestion', () => {
       expect.objectContaining({ rawSummary: { seconds: 12 } }),
     );
 
-    // The compact path keeps it: a wedge is exactly what an oversized report
+    // The shed ladder keeps it: a wedge is exactly what an oversized report
     // must still carry.
     vi.mocked(insertClientPerfReport).mockClear();
     const truncated = fakeRes();
@@ -1984,7 +2177,11 @@ describe('perf report ingestion', () => {
     expect(truncated.statusCode).toBe(200);
     expect(insertClientPerfReport).toHaveBeenCalledWith(
       expect.objectContaining({
-        rawSummary: expect.objectContaining({ truncated: true, rendererGpuQueue: wedged }),
+        rawSummary: expect.objectContaining({
+          truncated: true,
+          dropped: ['unlisted'],
+          rendererGpuQueue: wedged,
+        }),
       }),
     );
 
@@ -2075,6 +2272,7 @@ describe('perf report ingestion', () => {
       expect.objectContaining({
         rawSummary: expect.objectContaining({
           truncated: true,
+          dropped: ['unlisted'],
           seconds: 30,
           netPipeline,
           heapSawtooth,
@@ -2275,7 +2473,7 @@ describe('world-entry raw summary blocks', () => {
     expect('bootPhases' in raw).toBe(false);
   });
 
-  it('carries both blocks across truncation into the compact path', async () => {
+  it('carries both blocks across the shed ladder', async () => {
     const res = fakeRes();
 
     await handlePerfReport(
@@ -2314,8 +2512,103 @@ describe('world-entry raw summary blocks', () => {
     const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
     const raw = stored.rawSummary as Record<string, unknown>;
     expect(raw.truncated).toBe(true);
+    expect(raw.dropped).toEqual(['unlisted']);
     expect(raw.postRevealLinks).toMatchObject({ programsGained: 41, closed: true });
     expect(raw.bootPhases).toMatchObject({ entryMs: 9000, prewarmInitialMs: 4000 });
+  });
+});
+
+describe('raw summary markers are server-authored', () => {
+  it('strips a client-posted truncated or dropped marker from an under-cap report', async () => {
+    // A row that READS as shed must have been shed here: otherwise a beacon
+    // could post `{truncated: true, dropped: ['windows']}` and every fleet
+    // query on `dropped` would count it.
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'posted-markers',
+          rawSummary: { truncated: true, dropped: ['windows'], seconds: 5 },
+        },
+        { remoteAddress: '203.0.113.140' },
+      ),
+      res,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].rawSummary).toEqual({
+      seconds: 5,
+    });
+  });
+});
+
+describe('desktop shell marker', () => {
+  const ELECTRON_UA =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+    'WorldOfClaudecraft/0.43.0 Chrome/145.0.0.0 Electron/42.4.1 Safari/537.36';
+
+  it('stores the client flag beside a chrome browser family for the shell', async () => {
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'desktop-shell-flag', desktopShell: true },
+        { remoteAddress: '203.0.113.130', userAgent: ELECTRON_UA },
+      ),
+      res,
+    );
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect(stored.desktopShell).toBe(true);
+    // The shell is Chromium: browser_family keeps saying so, and the column is
+    // what tells it from a tab.
+    expect(stored.browserFamily).toBe('chrome');
+    expect(stored.osFamily).toBe('windows');
+  });
+
+  it('falls back on the Electron user-agent token for a client older than the flag', async () => {
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'desktop-shell-ua-only' },
+        { remoteAddress: '203.0.113.131', userAgent: ELECTRON_UA },
+      ),
+      res,
+    );
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect(stored.desktopShell).toBe(true);
+  });
+
+  it('reads a browser tab as not the shell, whatever the flag looks like', async () => {
+    const chromeUa =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+      'Chrome/145.0.0.0 Safari/537.36';
+    for (const [session, desktopShell] of [
+      ['desktop-shell-absent', undefined],
+      ['desktop-shell-false', false],
+      ['desktop-shell-zero', 0],
+      ['desktop-shell-empty', ''],
+    ] as const) {
+      const res = fakeRes();
+      await handlePerfReport(
+        fakeReq(
+          { sessionId: session, desktopShell },
+          { remoteAddress: '203.0.113.132', userAgent: chromeUa },
+        ),
+        res,
+      );
+      const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+      expect(stored.desktopShell, session).toBe(false);
+      expect(stored.browserFamily).toBe('chrome');
+    }
+    // A hostile truthy non-boolean coerces, like mobileTouch does.
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'desktop-shell-truthy', desktopShell: 'yes' },
+        { remoteAddress: '203.0.113.133', userAgent: chromeUa },
+      ),
+      res,
+    );
+    expect(vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].desktopShell).toBe(true);
   });
 });
 
@@ -2466,7 +2759,7 @@ describe('shader warm-up report fields', () => {
     expect('shaderWarm' in malformed).toBe(false);
   });
 
-  it('carries the block across truncation into the compact path', async () => {
+  it('carries the block across the shed ladder', async () => {
     const res = fakeRes();
 
     await handlePerfReport(
@@ -2489,6 +2782,7 @@ describe('shader warm-up report fields', () => {
       unknown
     >;
     expect(raw.truncated).toBe(true);
+    expect(raw.dropped).toEqual(['unlisted']);
     expect(raw.shaderWarm).toMatchObject({ mode: 'off', refusal: 'ready-timeout', held: 7 });
   });
 });

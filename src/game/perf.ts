@@ -26,11 +26,16 @@ import {
   type HitchForensicsState,
 } from './hitch_forensics';
 import type { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
+import { bindPerfPageVisibility } from './perf_page_visibility';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
 export interface PerfSnapshot {
   seconds: number;
+  // Wall seconds minus the hidden-time ledger (desktop window minimized, or a
+  // browser tab in the background): the fps denominator, shipped so a reader
+  // can tell a discounted session from a diluted one.
+  visibleSeconds: number;
   frames: number;
   // Frames the desktop shell skipped because the window was hidden. These are
   // deliberately NOT counted in `frames` or sampled into frameMs (a renderless
@@ -529,6 +534,15 @@ export class PerfMonitor {
       this.skipNextFrameSample = false;
       return;
     }
+    // A frame that arrives while the ledger has the page hidden (a captured
+    // or screen-shared background tab keeps its rAF alive) must not count:
+    // the denominator is frozen for that span, so counting the numerator
+    // would inflate the session fps. Same shape as the desktop shell's
+    // presentation skip, which main.ts routes here instead of frame().
+    if (!this.frameSampling) {
+      this.hiddenPresentSkips++;
+      return;
+    }
     this.frames++;
     const ms = Math.min(250, Math.max(0, dt * 1000));
     this.lastFrameMs = ms;
@@ -608,7 +622,27 @@ export class PerfMonitor {
   private hiddenAccumMs = 0;
   private hiddenSince: number | null = null;
 
+  // The two hidden sources, composed: the presentation gate (the desktop
+  // shell's push, written every frame by main.ts) and the page's own
+  // visibility (a browser tab in the background, bound by
+  // perf_page_visibility.ts). Web rAF pauses in a hidden tab, so frames stop
+  // while wall seconds keep counting; without the page arm the session fps
+  // was permanently diluted after every background stint. The page flag MASKS
+  // the gate's per-frame true, so a stray frame cannot close the span early.
+  private gateSampling = true;
+  private pageHidden = false;
+
   setFrameSampling(on: boolean, now = performance.now()): void {
+    this.gateSampling = on;
+    this.applySampling(on && !this.pageHidden, now);
+  }
+
+  setPageHidden(hidden: boolean, now = performance.now()): void {
+    this.pageHidden = hidden;
+    this.applySampling(this.gateSampling && !hidden, now);
+  }
+
+  private applySampling(on: boolean, now: number): void {
     if (on === this.frameSampling) return;
     this.frameSampling = on;
     if (!on) {
@@ -1051,6 +1085,7 @@ export class PerfMonitor {
     const inputDebug = this.readInputDebug();
     const snapshot: PerfSnapshot = {
       seconds: round(seconds),
+      visibleSeconds: round(visibleSeconds),
       frames: this.frames,
       hiddenPresentSkips: this.hiddenPresentSkips,
       fps: round(this.frames / visibleSeconds),
@@ -1291,5 +1326,17 @@ export class PerfMonitor {
 }
 
 export function createPerfMonitor(renderer: Renderer | null, desktopShell = false): PerfMonitor {
-  return new PerfMonitor(renderer, null, desktopShell);
+  const perf = new PerfMonitor(renderer, null, desktopShell);
+  // The browser arm of the hidden-time ledger. Inert in the desktop shell,
+  // whose document stays 'visible' while minimized (the shell push drives the
+  // gate arm instead), and absent under plain Node.
+  if (typeof document !== 'undefined') {
+    try {
+      bindPerfPageVisibility(perf, document);
+    } catch {
+      // A document without event listeners (a stub): the ledger keeps its
+      // gate arm only.
+    }
+  }
+  return perf;
 }

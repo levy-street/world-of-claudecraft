@@ -618,6 +618,11 @@ function payloadFromSnapshot(
     deviceMemory: device.deviceMemory,
     hardwareConcurrency: device.hardwareConcurrency,
     mobileTouch: device.mobileTouch,
+    // The Electron shell is Chromium loading the same web bundle, so neither
+    // browserFamily nor buildId can tell it apart; this flag is the only
+    // fleet-visible desktop-versus-browser marker (the server also falls back
+    // on the Electron user-agent token).
+    desktopShell,
     browserFamily: browserFamily(device.userAgent),
     osFamily: osFamily(device.userAgent),
     glVendor: renderer.glVendor,
@@ -646,6 +651,10 @@ function payloadFromSnapshot(
       // the only fleet-visible proof the skip is working. Rides in rawSummary
       // (the no-DDL home, like the longtask block below), not as a column.
       hiddenPresentSkips: snapshot.hiddenPresentSkips,
+      // The fps denominator itself (wall seconds minus hidden time, both
+      // arms): beside `seconds` it says how much of the session the
+      // cumulative fps actually covers.
+      visibleSeconds: snapshot.visibleSeconds,
       windows: snapshot.windows,
       mainMs: snapshot.mainMs,
       rendererPhaseMs: renderer.phaseMs,

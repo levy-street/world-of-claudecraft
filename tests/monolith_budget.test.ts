@@ -1730,7 +1730,12 @@ const MONOLITHS: MonolithRow[] = [
     // reach it directly), unlike createCharacterCapped's pure re-export.
     // Exact count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
-    ceiling: 4744,
+    // LOWERED 4744 -> 4598 at the perf-report fidelity change: the
+    // client_perf_reports insert and retention prune moved whole to
+    // server/client_perf_reports_db.ts (pure re-export kept in db.ts, the
+    // createCharacterCapped shape) after the desktop_shell column's four
+    // lines tripped the zero-slack pin. Exact count, zero slack.
+    ceiling: 4598,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
