@@ -2608,6 +2608,92 @@ export const TARGETS = [
     },
   },
   {
+    key: 'buff-vfx-mounted',
+    // The body-attached buff visuals (the pooled absorb shell, the Ascension
+    // crown) must ride the saddle with a mounted player instead of staying at
+    // the dismounted body (src/render/rider_anchor.ts, view_vfx_pose.ts).
+    label: 'Mounted rider: absorb shell and Ascension crown ride the saddle',
+    when: [
+      'src/render/rider_anchor.ts',
+      'src/render/view_vfx_pose.ts',
+      'src/render/paladin_ascension_visual.ts',
+      'buff-vfx-mounted',
+    ],
+    variants: [
+      { key: 'desktop', charClass: 'paladin', charName: 'Dawnrise' },
+      { key: 'mobile', charClass: 'paladin', charName: 'Dawnrise', mobile: true },
+    ],
+    async capture(page, variant) {
+      const armed = await page.evaluate(() => {
+        const game = window.__game;
+        const p = game?.sim?.player;
+        const devotion = p?.paladinDevotion;
+        if (!game || !p || !devotion) return false;
+        // The crown: Divine Ascension up with its charges.
+        devotion.value = 0;
+        devotion.ascensionCharges = 7;
+        devotion.ascensionRemaining = 45;
+        // The shell: a worn absorb whose spec authors the barrier shell.
+        p.auras.push({
+          id: 'ice_barrier',
+          name: 'Ice Barrier',
+          kind: 'absorb',
+          remaining: 40,
+          duration: 60,
+          value: 300,
+          sourceId: p.id,
+          school: 'frost',
+        });
+        // Seated on the starter steed: the tick re-validates ownership, so the
+        // rider must be trained and hold the reins before the key is set.
+        const meta = game.sim.players.get(p.id);
+        if (!meta) return false;
+        meta.ridingTrained = true;
+        game.sim.addItem('reins_valorsteed', 1, p.id);
+        p.mountKey = 'valorsteed';
+        p.mountCastRemaining = 0;
+        p.mountCastKey = '';
+        // Face the camera and pull it in so the rider fills the frame.
+        game.input.camDist = 9;
+        game.input.camYaw = Math.PI;
+        p.facing = 0;
+        return true;
+      });
+      if (!armed) throw new Error('player has no paladinDevotion state');
+      // The mount rig links in asynchronously: wait until the rider is lifted.
+      await page.waitForFunction(
+        () => {
+          const game = window.__game;
+          const view = game?.renderer?.views?.get?.(game?.sim?.playerId);
+          return !!view && view.mountLift > 0 && view.mountVisual !== null;
+        },
+        { timeout: 20000, polling: 250 },
+      );
+      await wait(2500);
+      // Ferryman Odo's arrival line rides the talking-head panel (bootcamp.ts
+      // showCaption) a few beats after the spawn and lands over the rider on
+      // the mobile layout; it carries no player control, so clear the panel.
+      await page.evaluate(() => {
+        for (const el of document.querySelectorAll('.talking-head')) el.remove();
+        document.getElementById('tutorial-greeting')?.remove();
+      });
+      await wait(300);
+      const vp = page.viewport() ?? { width: 1600, height: 900 };
+      const width = Math.min(vp.width, 900);
+      const height = Math.min(vp.height, 760);
+      await page.screenshot({
+        path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/buff-vfx-mounted-${variant.key}.png`,
+        clip: {
+          x: Math.floor((vp.width - width) / 2),
+          y: Math.max(0, Math.floor((vp.height - height) / 2) - 20),
+          width,
+          height,
+        },
+      });
+      return {};
+    },
+  },
+  {
     key: 'paladin-ascension-charges',
     // Extended Dawn (pal_r17_extended_dawn) raises Divine Ascension from 5 to 7
     // charges; the HUD medallion must light all 7 pips, not just the base 5.

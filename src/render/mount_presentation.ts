@@ -113,6 +113,21 @@ export interface MountPresentationInputs {
   dt: number;
 }
 
+/**
+ * The mount's locomotion, borrowed from its rider: the shared gait facts copied
+ * into the mount's own scratch, with the REAL airborne flag (the rider's is
+ * suppressed while seated; the mount carries the jump) and none of the
+ * rider-only facts (casting, sitting, dead never reach a gait clip).
+ */
+export function borrowRiderLocomotion(mount: AnimState, rider: AnimState, airborne: boolean): void {
+  mount.speed = rider.speed;
+  mount.moving = rider.moving;
+  mount.running = rider.running;
+  mount.airborne = airborne;
+  mount.backwards = rider.backwards;
+  mount.swimming = rider.swimming;
+}
+
 function rallycartExhaustPhase(input: MountPresentationInputs): ExhaustPhase {
   const phase = input.enginePhase;
   if (!phase) return 'idle';
