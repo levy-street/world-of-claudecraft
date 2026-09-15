@@ -586,10 +586,11 @@ GPU work signs. Each rule names its seam and its guard.
   Point lights ride the pad budget
   (`point_light_budget.ts`). Guards: `tests/render_light_census_pin.test.ts` (the
   allowlist of every non-point light constructed under `src/render`) and
-  `tests/point_light_budget.test.ts`. The Wildheart caldera rig
-  (`wildheart_props.ts`) is the ONE named exception, pinned as such in
-  `tests/renderer_compile_gate.test.ts`; pre-linking a scene-wide light census is
-  a backlog item, not a precedent.
+  `tests/point_light_budget.test.ts`. There is no exception: the Wildheart
+  caldera rig used to add a fill pair to the world scene at interior build, and
+  because interiors are never removed, every material drawn after a Palm Reach
+  visit relinked under the new census (132 programs at one graveyard in the
+  2026-09-12 hunt). Its grade is the `wildheartField` state of the rig now.
 - **Every new secondary GL context links (`compileAsync`) and uploads
   (`uploadTexturesInSlices`, `texture_prewarm.ts`) before its first draw, and sets
   `debug.checkShaderErrors = shaderDebugRequested()` on the renderer it just built,

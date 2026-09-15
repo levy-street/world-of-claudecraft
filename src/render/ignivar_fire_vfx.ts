@@ -1101,6 +1101,50 @@ export interface GroundFireAoeHandle {
  *   aoe.stop();                 // wave over
  *   setTimeout(() => { scene.remove(aoe.group); aoe.dispose(); }, 1000);
  */
+/**
+ * The ground fire AoE's program anchor. Every AoE mints its own disc and flame
+ * ShaderMaterial (per-instance uniforms) and dispose() releases them when the
+ * wave ends; three then drops the shader stage whose last material went
+ * (WebGLShaderCache.remove: usedTimes reaches 0, the stage leaves the cache),
+ * so the NEXT wave's identical source gets a fresh stage id, a fresh cache
+ * key and a fresh link (2026-09-12 hunt: two programs every 17 s, one per
+ * Ignivar wave). One handle built once and never disposed keeps both stages
+ * and both programs referenced for the session; the boot manifest stages it
+ * hidden through ABILITY_MATERIAL_SOURCES, so the first wave links nothing.
+ */
+interface GroundFireAoeAnchor {
+  disc: THREE.ShaderMaterial;
+  flames: THREE.ShaderMaterial;
+}
+let groundFireAoeAnchor: GroundFireAoeAnchor | null = null;
+let groundFireAoeAnchorGroup: THREE.Group | null = null;
+
+/** The anchor's two materials (built on first ask, never disposed). */
+export function groundFireAoeMaterials(): {
+  disc: THREE.ShaderMaterial;
+  flames: THREE.ShaderMaterial;
+} {
+  if (!groundFireAoeAnchor) buildGroundFireAoeStandIn();
+  return groundFireAoeAnchor as { disc: THREE.ShaderMaterial; flames: THREE.ShaderMaterial };
+}
+
+/** A hidden AoE drawing both anchor materials the way a live wave does. */
+export function buildGroundFireAoeStandIn(): THREE.Group {
+  if (!groundFireAoeAnchorGroup) {
+    const handle = createGroundFireAoe();
+    handle.group.name = 'ground_fire_aoe__anchor';
+    handle.group.visible = false;
+    const disc = handle.group.getObjectByName('ground_fire_aoe__disc') as THREE.Mesh;
+    const flames = handle.group.getObjectByName('ground_fire_aoe__flames') as THREE.Mesh;
+    groundFireAoeAnchor = {
+      disc: disc.material as THREE.ShaderMaterial,
+      flames: flames.material as THREE.ShaderMaterial,
+    };
+    groundFireAoeAnchorGroup = handle.group;
+  }
+  return groundFireAoeAnchorGroup;
+}
+
 export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFireAoeHandle {
   const radius = Math.max(0.01, opts.radius ?? 1.2);
   let innerRadius = Math.max(0, Math.min(radius * 0.98, opts.innerRadius ?? 0));
@@ -1139,6 +1183,7 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
     polygonOffsetFactor: -1,
     polygonOffsetUnits: -1,
   });
+  discMat.name = 'groundFireAoe:disc';
   const disc = new THREE.Mesh(
     getAoeDiscGeo(opts.dynamicInnerRadius === true ? 0 : innerRadiusRatio),
     discMat,
@@ -1170,6 +1215,7 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
     side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
   });
+  flameMat.name = 'groundFireAoe:flames';
   const flames = new THREE.Mesh(getAoeFlameGeo(count), flameMat);
   flames.name = 'ground_fire_aoe__flames';
   flames.renderOrder = 2;

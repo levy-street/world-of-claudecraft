@@ -584,7 +584,7 @@ before reporting readiness.
 | Privacy and security | `privacy-security-review` | `woc_security` |
 | Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
 | Frontend and graphics | `frontend-seam-reviewer` | `woc_frontend` |
-| GPU preparation | `render-performance-reviewer` | (not yet mirrored) |
+| GPU preparation (code-read; the `hunt-live-programs` skill is the capture-driven tool, not a PR bar) | `render-performance-reviewer` | (not yet mirrored) |
 | Release malware | `release-malware-audit` | `woc_release_malware` |
 | Content same-change obligations | `content-obligations-reviewer` | (not yet mirrored) |
 | Gate/CI selection integrity | `gate-integrity-reviewer` | (not yet mirrored) |

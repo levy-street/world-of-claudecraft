@@ -668,8 +668,13 @@ interface AttributionTargetFixture {
 // v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
+// Re-minted for the ungated live programs lot: the Eastbrook monument joined
+// the town reveal roots (runtimeRender.town leaf) and the Varkhul forge meter
+// took the compile gate (runtimeRender.renderer leaf). No capture was retaken.
+// Re-minted again in the same lot after the caldera key-light aim landed in
+// renderer.ts (updateKeyLight). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5ae21044dd1b636f9c293ec628a7d316f740bb92a5962f848c6e58c80218ebbc';
+  '4dfb642dd147c148d4598ca60ddcad3b7f51e7cac8ee61e1d5a679598f0fa50c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

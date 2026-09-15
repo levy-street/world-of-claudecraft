@@ -4723,6 +4723,50 @@ export const TARGETS = [
       return open ? { clip: '#map-window' } : {};
     },
   },
+  // The Wildheart Basin's light grade: the caldera used to add its own fill
+  // pair to the world scene (a light census change that relinked every
+  // material for the rest of the session); the grade now lives in
+  // interior_light_rig.ts's wildheartField state. A lighting comparison, so
+  // the shot keeps the app's default preset rather than the standing lowest.
+  {
+    key: 'wildheart-basin-light-rig',
+    label: 'Wildheart Basin: the caldera grade through the one sun/hemi pair',
+    when: ['render/wildheart_props', 'render/interior_light_rig'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      const entered = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        return typeof sim?.enterDungeon === 'function'
+          ? sim.enterDungeon('wildheart_basin')
+          : false;
+      });
+      if (!entered) return { skip: 'offline world could not enter the Wildheart Basin' };
+      await wait(1500);
+      // The entry pad sits under the gate arch, which fills the frame; step
+      // into the open field so the shot shows the grade on the caldera.
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!player?.pos) return;
+        // Tour god mode (visual_tour.mjs): the 20+ camp mobs at the gate
+        // otherwise kill the level-one photographer before the shot.
+        player.maxHp = 99999;
+        player.hp = 99999;
+        player.pos.z += 16;
+        player.prevPos = { ...player.pos };
+      });
+      // The interior attaches through the compile gate (10 s watchdog at
+      // worst) and the rig settles on the fog state; give both their time.
+      await wait(12000);
+      await awaitWorldPainted(page);
+      await dismissTutorialGreetingUntilSettled(page);
+      // The tutorial step card (.tut-card behind button.tut-skip) sits centre
+      // screen; the greeter helper above cannot see it.
+      await page.evaluate(() => document.querySelector('button.tut-skip')?.click());
+      await wait(400);
+      return {};
+    },
+  },
   // The world-map level cycle inside an instance and the party plan from
   // outside (map_surface_core.ts). Each target is one press further along the
   // cycle: on a build that predates the cycle the toggle is hidden / inert, so

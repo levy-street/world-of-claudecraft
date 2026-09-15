@@ -42,6 +42,18 @@ describe('interior encounter prewarm spec', () => {
     ).toEqual({ playerClasses: [], weaponSkinIds: [] });
   });
 
+  it('warms the Ignivar mechanic visuals in the Crucible arena, without the Varkhul set', () => {
+    const spec = INTERIOR_ENCOUNTER_PREWARM.ignivar;
+    expect(spec).toEqual({
+      soulRendPlayerClasses: false,
+      soulRendVfxWeaponSkins: false,
+      soulRendLivePlayerVisuals: false,
+      ignivarVisuals: true,
+    });
+    expect(encounterPrewarmForInterior('ignivar')).toEqual(spec);
+    expect(spec.varkhulVisuals).toBeUndefined();
+  });
+
   it('warms Soul Rend overlays at arena entry, not boot, and warms no encounter NPC', () => {
     const spec = INTERIOR_ENCOUNTER_PREWARM.nythraxis;
     expect(spec).toBeDefined();
