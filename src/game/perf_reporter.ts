@@ -1,3 +1,4 @@
+import { apiUrl } from '../client_origin';
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
@@ -806,7 +807,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
         `final post too large for keepalive: ${status.lastBodyBytes} bytes`,
       );
     }
-    void fetch('/api/perf-report', {
+    void fetch(apiUrl('/api/perf-report'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
