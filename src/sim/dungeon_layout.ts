@@ -39,6 +39,11 @@ export const DUNGEON_END_WALL_HW = 24; // front/back wall half width
 export const PILLAR_COLLIDER_R = 1.0; // centre-aisle pillar obstacle radius
 export const TOMB_HW = 1.1; // wall-side obstacle (sarcophagus/cargo) half extents
 export const TOMB_HD = 2.1;
+// Floor-clutter debris is short enough to see and cast over: a `cameraTopY`
+// below SIGHT_HEIGHT (colliders.ts) lets the LOS low-obstacle skip clear it,
+// matching the crate/campfire precedent, while movement collision (moveTopY
+// unset) stays untouched.
+export const CLUTTER_CAMERA_TOP = 0.9;
 export const DUNGEON_WALL_HEIGHT = 8; // visual module height (2x KayKit 4u walls)
 /**
  * Boss dais height (yards): the foundation blocks the renderer stacks are 2u
@@ -1242,6 +1247,13 @@ export function layoutColliders(
     }
   }
   // floor clutter props (small circle per scatter point; renderer places matching props)
-  for (const c of layout.clutter ?? []) out.push({ type: 'circle', x: c.x, z: c.z, r: 0.8 });
+  for (const c of layout.clutter ?? [])
+    out.push({
+      type: 'circle',
+      x: c.x,
+      z: c.z,
+      r: 0.8,
+      cameraTopY: floorY + CLUTTER_CAMERA_TOP,
+    });
   return out;
 }
