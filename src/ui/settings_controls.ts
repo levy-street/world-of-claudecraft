@@ -9,6 +9,18 @@
 
 const RANGE_FILL_FULL_PCT = 100;
 
+/** Paint the gold fill up to a range input's current value on every engine (CSS
+ *  alone cannot read the value; --range-fill drives the webkit track gradient and
+ *  Firefox's native progress is recolored to match). Reads min/max/value off the
+ *  element, so any slider painter shares one formula. Call initially and on input. */
+export function paintRangeFill(slider: HTMLInputElement): void {
+  const min = Number(slider.min);
+  const max = Number(slider.max);
+  const value = Number(slider.value);
+  const pct = max > min ? ((value - min) / (max - min)) * RANGE_FILL_FULL_PCT : 0;
+  slider.style.setProperty('--range-fill', `${Math.max(0, Math.min(RANGE_FILL_FULL_PCT, pct))}%`);
+}
+
 /** Build a labelled `.set-row` shell. Returns the row plus its name span so the
  *  caller (or the builders below) can append the control(s) into column 2+. */
 export function settingRow(label: string): { row: HTMLDivElement; name: HTMLSpanElement } {
@@ -119,12 +131,7 @@ export function sliderControl(o: SliderOpts): {
   slider.setAttribute('aria-label', o.label);
   const val = document.createElement('span');
   val.className = 'set-val';
-  const paintFill = (): void => {
-    const value = Number(slider.value);
-    const span = o.max - o.min;
-    const pct = span > 0 ? ((value - o.min) / span) * RANGE_FILL_FULL_PCT : 0;
-    slider.style.setProperty('--range-fill', `${Math.max(0, Math.min(RANGE_FILL_FULL_PCT, pct))}%`);
-  };
+  const paintFill = (): void => paintRangeFill(slider);
   const readout = (): void => {
     val.textContent = o.format(o.get());
   };

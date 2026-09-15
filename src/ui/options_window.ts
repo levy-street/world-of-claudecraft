@@ -142,7 +142,7 @@ import { mountViewShell } from './options_window_shell';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
 import { type RestartRequestPhase, restartStripState } from './restart_strip_core';
 import { buildRestartStrip, paintRestartStrip } from './restart_strip_painter';
-import { settingsCard, subhead } from './settings_controls';
+import { paintRangeFill, settingsCard, subhead } from './settings_controls';
 import { exportTransferCode, importTransferCode } from './settings_transfer';
 import type { TransferKind } from './settings_transfer_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
@@ -162,9 +162,6 @@ type OptionsView = 'main' | OptionsPanelId;
 // Maximum characters for the bug-report description (a named
 // threshold, not a bare literal). Matches the inline textarea maxLength.
 const BUG_DESC_MAX_LEN = 2000;
-// Full-scale percent for the slider gold-fill gradient (the --range-fill custom
-// property is 0%..100%). Named so the fill math carries no bare literal.
-const RANGE_FILL_FULL_PCT = 100;
 const GRAPHICS_REBUILD_KEY_SET: ReadonlySet<string> = new Set(GRAPHICS_REBUILD_KEYS);
 
 interface NumericChoiceBinding {
@@ -807,22 +804,13 @@ export class OptionsWindow {
     // slider (the store is not written until release, so syncReadout would be stale).
     const readoutFromSlider = () => applyReadout(fmt(Number(slider.value)));
     syncReadout();
-    // Paint a gold fill up to the current value on every engine (CSS alone can't
-    // read the value; --range-fill drives the webkit track gradient and Firefox's
-    // native progress is recolored to match). Set initially + on every input.
-    const paintFill = () => {
-      const min = Number(slider.min),
-        max = Number(slider.max),
-        v = Number(slider.value);
-      const pct = max > min ? ((v - min) / (max - min)) * RANGE_FILL_FULL_PCT : 0;
-      slider.style.setProperty(
-        '--range-fill',
-        `${Math.max(0, Math.min(RANGE_FILL_FULL_PCT, pct))}%`,
-      );
-    };
+    // The gold fill up to the current value (settings_controls.ts): initially + on every input.
+    const paintFill = () => paintRangeFill(slider);
     paintFill();
     // Commit the setting (from the raw slider value), then sync the readout + fill.
     const commit = () => {
+      // The player, not a boot apply or a reset, moved this slider (options_view touchedFlag).
+      if (c.touchedFlag) hooks.settings.set(c.touchedFlag as BoolSettingKey, true);
       hooks.onSettingChange(key, sliderDispatchValue(slider.value));
       syncReadout();
       paintFill();

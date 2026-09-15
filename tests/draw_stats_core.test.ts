@@ -249,8 +249,10 @@ describe('draw_stats_core', () => {
 
   it('pins the config version that segments the expanded graphics profiles', () => {
     // v21 separates the staged per-system graphics controls and expanded
-    // profile bytes from v20 fleet comparisons.
-    expect(GFX_CONFIG_VERSION).toBe(21);
+    // profile bytes from v20 fleet comparisons; v22 marks the reports whose
+    // low-tier render_scale may be the weak-GPU boot default rather than the
+    // slider (src/game/render_scale_default_core.ts).
+    expect(GFX_CONFIG_VERSION).toBe(22);
   });
 
   it('clamps a backward counter jump at zero, per field, and recovers', () => {

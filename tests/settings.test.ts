@@ -155,6 +155,54 @@ describe('Settings', () => {
     expect(s.get('graphicsDefaultApplied')).toBe(false);
   });
 
+  it('infers renderScaleTouched once for a pre-flag blob, then persists and honours the stored flag', () => {
+    // A stored non-stock value can only have come from the slider: touched.
+    localStorage.setItem('woc_settings', JSON.stringify({ renderScale: 0.75 }));
+    expect(new Settings().get('renderScaleTouched')).toBe(true);
+    // The stock value, or no value at all, is indistinguishable from never moved: untouched.
+    localStorage.setItem('woc_settings', JSON.stringify({ renderScale: 1 }));
+    expect(new Settings().get('renderScaleTouched')).toBe(false);
+    localStorage.setItem('woc_settings', JSON.stringify({ cameraSpeed: 0.5 }));
+    expect(new Settings().get('renderScaleTouched')).toBe(false);
+    // The inference reads the CLAMPED value: a corrupt 1.5 loads as the stock 1.0 and
+    // must not opt the install out of the device default as if it were a choice.
+    localStorage.setItem('woc_settings', JSON.stringify({ renderScale: 1.5 }));
+    expect(new Settings().get('renderScale')).toBe(1);
+    expect(new Settings().get('renderScaleTouched')).toBe(false);
+    // A persisted flag wins over the inference in both directions.
+    localStorage.setItem(
+      'woc_settings',
+      JSON.stringify({ renderScale: 0.75, renderScaleTouched: false }),
+    );
+    expect(new Settings().get('renderScaleTouched')).toBe(false);
+    localStorage.setItem(
+      'woc_settings',
+      JSON.stringify({ renderScale: 1, renderScaleTouched: true }),
+    );
+    expect(new Settings().get('renderScaleTouched')).toBe(true);
+    // The inference runs exactly once: the first save writes the answer into the blob.
+    localStorage.setItem('woc_settings', JSON.stringify({ renderScale: 0.75 }));
+    const s = new Settings();
+    s.set('cameraSpeed', 0.5);
+    expect(JSON.parse(localStorage.getItem('woc_settings') ?? '{}').renderScaleTouched).toBe(true);
+    expect(new Settings().get('renderScaleTouched')).toBe(true);
+  });
+
+  it('resets renderScaleTouched with renderScale, keyed or full, and leaves it alone otherwise', () => {
+    const s = new Settings();
+    s.set('renderScaleTouched', true);
+    s.set('renderScale', 0.8);
+    s.reset(['cameraSpeed']);
+    expect(s.get('renderScaleTouched')).toBe(true);
+    expect(s.get('renderScale')).toBe(0.8);
+    s.reset(['renderScale']);
+    expect(s.get('renderScaleTouched')).toBe(false);
+    expect(s.get('renderScale')).toBe(SETTING_RANGES.renderScale.def);
+    s.set('renderScaleTouched', true);
+    s.reset();
+    expect(s.get('renderScaleTouched')).toBe(false);
+  });
+
   it('starts at the documented defaults (camera calmer than the old 1.0)', () => {
     const s = new Settings();
     expect(s.get('cameraSpeed')).toBe(SETTING_RANGES.cameraSpeed.def);

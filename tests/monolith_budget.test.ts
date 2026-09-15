@@ -475,7 +475,10 @@ const MONOLITHS: MonolithRow[] = [
     // bespoke rows (the chat timestamp pair, the chat-window reset, the Unlock
     // Interface action) moved to src/ui/options_interface_rows.ts. Exact count,
     // zero slack.
-    ceiling: 2840,
+    // LOWERED 2840 -> 2828 at the weak-GPU render-scale default: the slider
+    // gold-fill formula moved to settings_controls.ts paintRangeFill (it was
+    // written twice), paying for the one-line touched-flag stamp on commit.
+    ceiling: 2828,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1237,7 +1240,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-measured at the release/v0.43.0 sync that brought PR 3778 in: the
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
-    ceiling: 11321,
+    // LOWERED 11321 -> 11314 at the weak-GPU render-scale default: the
+    // first-run preset block moved to src/game/boot_graphics_defaults.ts,
+    // which also hosts the new boot-time render-scale default (exact count).
+    ceiling: 11314,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

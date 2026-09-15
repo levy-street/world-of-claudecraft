@@ -620,6 +620,9 @@ const UI_PURE_CORES = [
   'src/game/perf_shader_warm_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  // The Render Quality slider's boot default: a pure decision table over the
+  // static adapter class (never the governor), the fairness-sensitive knob.
+  'src/game/render_scale_default_core.ts',
   'src/game/nearby_interaction_core.ts',
   'src/ui/trade_view.ts',
   'src/ui/trade_woc_view.ts',
