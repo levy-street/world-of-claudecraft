@@ -7,6 +7,9 @@ import {
 } from '../sim/ignivar_forge_chains';
 
 export const IGNIVAR_FORGE_CHAIN_VISUAL_NAME = 'ignivarForgeChain';
+/** userData mark on an owner group that has attached a chain visual, cleared
+ *  when the visual is disposed. */
+const IGNIVAR_FORGE_CHAIN_ATTACHED_KEY = 'ignivarForgeChainAttached';
 
 const MAX_CHAIN_LINKS = 20;
 const CHAIN_FLAME_COUNT = 10;
@@ -115,6 +118,7 @@ export function disposeIgnivarForgeChainVisual(root: THREE.Object3D): void {
   });
   for (const geometry of geometries) geometry.dispose();
   for (const material of materials) material.dispose();
+  if (root.parent) delete root.parent.userData[IGNIVAR_FORGE_CHAIN_ATTACHED_KEY];
   root.removeFromParent();
 }
 
@@ -128,7 +132,13 @@ export function syncIgnivarForgeChainVisual(
 ): void {
   const aura = entity.auras.find((entry) => entry.id === IGNIVAR_FORGE_CHAINS_AURA_ID);
   const partnerId = aura?.value2;
-  let root = owner.getObjectByName(IGNIVAR_FORGE_CHAIN_VISUAL_NAME) as THREE.Group | undefined;
+  // This runs for every player rig on every frame, and the name lookup is a
+  // recursive walk of the whole rig: only an owner that ever attached a chain
+  // pays it (the mark is set at the attach below).
+  let root =
+    owner.userData[IGNIVAR_FORGE_CHAIN_ATTACHED_KEY] === true
+      ? (owner.getObjectByName(IGNIVAR_FORGE_CHAIN_VISUAL_NAME) as THREE.Group | undefined)
+      : undefined;
   if (!aura || partnerId === undefined || entity.id > partnerId) {
     if (root) root.visible = false;
     return;
@@ -142,6 +152,7 @@ export function syncIgnivarForgeChainVisual(
   if (!root) {
     root = buildIgnivarForgeChainVisual();
     owner.add(root);
+    owner.userData[IGNIVAR_FORGE_CHAIN_ATTACHED_KEY] = true;
   }
 
   const inverseScale = 1 / Math.max(0.01, entity.scale ?? 1);
