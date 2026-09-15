@@ -204,8 +204,7 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
       item.kind === 'scroll'
     );
   if (filter === 'bag') return item.kind === 'bag';
-  if (filter === 'material')
-    return !isCosmeticItem(item) && (item.kind === 'junk' || item.kind === 'tool');
+  if (filter === 'material') return !isCosmeticItem(item) && item.kind === 'junk';
   if (filter === 'cosmetic') return isCosmeticItem(item);
   if (filter === 'pattern') return item.kind === 'recipe';
   // The catch-all for catalog kinds with no browse category of their own. Mount
@@ -214,9 +213,20 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   // Recipe patterns parked here through phase 02 for the same fewness reason;
   // phase 11 shipped the apex pattern content and gave the kind its own chip
   // (the 'pattern' arm above), so quest and mount are the whole bucket again.
+  // Gathering tools (kind 'tool': fishing rods, picks, sickles, axes) also land
+  // here — they are not reagents, so they must not show under 'material'
+  // (issue #3757), and 'other' is the catalog's catch-all browse bucket. The
+  // cosmetic guard mirrors the 'material' arm: decorative mech-chroma plates
+  // are kind 'tool' too, and must stay under 'cosmetic' only (exclusivity
+  // sweep).
   // Neither may be left reachable through 'All' alone (pinned by the sweep in
   // tests/market_filters.test.ts, which sees only the live catalog).
-  if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
+  if (filter === 'other')
+    return (
+      item.kind === 'quest' ||
+      item.kind === 'mount' ||
+      (!isCosmeticItem(item) && item.kind === 'tool')
+    );
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.
