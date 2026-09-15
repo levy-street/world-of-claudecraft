@@ -172,10 +172,15 @@ Breakpoints are 2, 4 and 7 of the seven armor pieces, the same in every family:
 | 4 pieces | +40 Warfare Offense Rating, and crowd control cast on you by hostile players lasts 15 percent less |
 | 7 pieces | +80 Warfare Offense and Defense Rating, plus the family signature |
 
-The 4-piece wording is deliberate. Crowd control applied by a player's **pet** is
-entity kind `mob` and takes the non-hostile-pair early return in
-`Sim.diminishedCrowdControlDuration`, so it is not reduced: "cast on you by
-hostile players" is true where "from hostile players" would not be.
+The 4-piece reduction covers crowd control from a hostile player's **pets and
+summons** as well: the DR funnel resolves any player-owned entity to its owner
+(`resolveCrowdControlSource` in `src/sim/stun_dr.ts`), so minion control counts
+as cast by that player, is reduced by this bonus, and diminishes on the owner's
+PvP DR chain. (Historically pet control was entity kind `mob`, took the
+non-hostile-pair early return in `Sim.diminishedCrowdControlDuration`, and was
+neither reduced nor diminished; the ownership resolution closed that loophole,
+which is why older notes said "cast on you by hostile players" was the only
+true wording.)
 
 Signatures, all `pvpOnly` and therefore inert in PvE by construction (the gate in
 `src/sim/combat/set_procs.ts` sits before the chance roll, so a signature draws

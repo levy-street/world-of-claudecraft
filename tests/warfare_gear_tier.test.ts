@@ -330,11 +330,12 @@ describe('the five WARFARE sets', () => {
   });
 
   it('says crowd control is "cast on you by hostile players", not "from" them', () => {
-    // Pet-applied control takes the non-hostile-pair early return in
-    // Sim.diminishedCrowdControlDuration and is NOT reduced, so the looser
-    // wording would be a false tooltip. This is a t() source string: rewording
-    // it later costs every locale, which is why it is pinned character for
-    // character rather than described.
+    // The DR funnel resolves a player-owned minion to its owner
+    // (resolveCrowdControlSource in stun_dr.ts), so pet-applied control counts
+    // as cast by the hostile player and IS reduced: the pinned wording stays
+    // true, minions included. This is a t() source string: rewording it later
+    // costs every locale, which is why it is pinned character for character
+    // rather than described.
     //
     // "Warfare" is sentence case here on purpose. The all-caps spelling is the
     // internal name for the currency and the set family; the shouted form read
