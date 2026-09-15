@@ -1362,10 +1362,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
+// Re-minted for the v0.43.0 merge of the gather coarse key: the merged
+// runtimeRender.renderer leaf matches neither parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e3a555a9db84a550c92bf8443df1a20a64a96748dc7bd3159490b4ab93272770';
+  '86ed0427194e2db51e826251073d54288e60fffeadd3d29f3df4663404181f14';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '5ae21044dd1b636f9c293ec628a7d316f740bb92a5962f848c6e58c80218ebbc';
+  '59da3f202d616eaaec6497ce3d13bee09beb9dd3e6c834a2b55cec7e31f5804f';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2724,7 +2726,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // canonical re-sealed evidence files. Capture pixels and scores did not change.
       // v0.42.0 dependency-floor bump: recomputed LAST over the swept evidence
       // after the lockfile-driven GLB re-mint. No capture was retaken.
-    ).toBe('eea4d7acbd5b80de9fcf51e9a24ba8218566cee1928111ef3723278b7036125b');
+      // Re-minted for the v0.43.0 merge of the gather coarse key, recomputed
+      // LAST over the swept evidence. No capture was retaken.
+    ).toBe('250c78aa9a7dcc2b7ef4a6aa5f30124ff9d6fb495d19958c2c8650f76df3dc50');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

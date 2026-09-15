@@ -33,6 +33,10 @@
 //   postshed    - the render budget's post shed (post_shed_core.ts): off
 //                 builds no FXAA grade twin and pins the governor's `post`
 //                 level at 1, so a bench reads the tier-static chain
+//   gathercoarse - the gather nodes' (zone, type) InstancedMesh key plus the
+//                  per-batch reach hide (gather_nodes.ts); off restores the
+//                  (zone, type, z-band) key with every batch drawn to the far
+//                  plane, the A/B arm for pricing the coarser key
 
 // Beside the ?<name>=off layer switches, knobs and modes with their own accessors:
 //   ?bladesectors=<n> - how many ways each blade-grass pool's slot grid is split

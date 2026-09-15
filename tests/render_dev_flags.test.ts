@@ -75,6 +75,28 @@ describe('render dev flags: the character cull A/B arm', () => {
   });
 });
 
+describe('render dev flags: the gather-node coarse key A/B arm', () => {
+  // ?gathercoarse=off restores the (zone, type, z-band) InstancedMesh key and
+  // draws every batch to the far plane; gather_nodes.ts resolves the mode
+  // once at build through gatherBatchKeyMode.
+  it('names the flag the gather-node build reads', async () => {
+    const { renderLayerDisabled } = await loadFlags('?gathercoarse=off');
+    expect(renderLayerDisabled('gathercoarse')).toBe(true);
+  });
+
+  it('resolves the band key under the flag and the coarse key otherwise', async () => {
+    await loadFlags('?gathercoarse=off');
+    expect((await import('../src/render/gather_nodes')).gatherBatchKeyMode()).toBe('band');
+    await loadFlags('');
+    expect((await import('../src/render/gather_nodes')).gatherBatchKeyMode()).toBe('coarse');
+  });
+
+  it('keeps the coarse key in a headless host with no location', async () => {
+    await loadFlags(null);
+    expect((await import('../src/render/gather_nodes')).gatherBatchKeyMode()).toBe('coarse');
+  });
+});
+
 describe('render dev flags: the GPU-preparation mode switch', () => {
   it('runs the adaptive scheduler by default', async () => {
     const { gpuPrepMode } = await loadFlags('');
