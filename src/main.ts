@@ -1,5 +1,7 @@
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
+import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
+import { MOBILE_CHAT_REPLY_CLASS, START_SCREEN_OPEN_CLASS } from './ui/root_state_classes';
 // Game-client style barrel (declares the @layer order, loads tokens + base, etc.).
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
@@ -46,6 +48,7 @@ import {
   resolveClickMoveAction,
   stepAngleToward,
 } from './game/click_move';
+import { paintClickMoveMarker } from './game/click_move_marker';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
 import { buildContextRecoveryCallbacks } from './game/context_loss_diagnostics';
@@ -1099,6 +1102,7 @@ function beginWorldEntry(): boolean {
 function enterLoadingState(statusText: string): void {
   hideMobilePreflightPrompt();
   showLoadingScreen(statusText);
+  document.body.classList.remove(START_SCREEN_OPEN_CLASS);
   $('#start-screen').style.display = 'none';
   releaseStartScreenPreview();
   // Landing-only advisory: never let it survive into the world on top of
@@ -1635,7 +1639,7 @@ async function startGame(
     chatInput.blur();
     // Leave mobile reply mode when the composer closes (issue 1577 round 2 (8)),
     // so the in-log reply button reappears for the read state.
-    document.body.classList.remove('mobile-chat-reply');
+    resetChatComposer(document.body, document.getElementById('chatlog-wrap'));
     hud.clearPendingChatLinks();
     recoverFromMobileKeyboard();
   };
@@ -1666,7 +1670,7 @@ async function startGame(
     ensureMobileComposerInPanel();
     hud.applyChatInputPresentation();
     chatInput.style.display = 'block';
-    document.body.classList.remove('mobile-chat-reply');
+    document.body.classList.remove(MOBILE_CHAT_REPLY_CLASS);
     autosizeChat();
   }
   // Fired for every open path (keybind, whisper context menu, mobile toggle)
@@ -1676,16 +1680,13 @@ async function startGame(
     autosizeChat();
     anchorChatInput();
   });
-  chatInput.addEventListener('focus', () => {
-    // Actively replying (issue 1577 round 2 (7)/(8)): the composer is focused, so
-    // expand it and fade the chat window behind it. Class is mirror-tied to focus
-    // so it clears the moment the composer loses focus.
-    document.body.classList.add('mobile-chat-reply');
-    anchorChatInput();
-    autosizeChat();
-  });
-  chatInput.addEventListener('blur', () => {
-    document.body.classList.remove('mobile-chat-reply');
+  bindChatComposerFocusState(chatInput, {
+    body: document.body,
+    wrap: document.getElementById('chatlog-wrap'),
+    onFocus: () => {
+      anchorChatInput();
+      autosizeChat();
+    },
   });
   chatInput.addEventListener('input', () => {
     autosizeChat();
@@ -3695,7 +3696,7 @@ async function startGame(
       !world.player.dead &&
       (!!input.clickMoveTarget || nowMs < clickMoveMarkerHideAt);
     if (!show) {
-      clickMoveMarker.classList.remove('active', 'entity', 'pulse', 'blocked');
+      paintClickMoveMarker(clickMoveMarker, 'hidden');
       return;
     }
     const screen = renderer.worldToScreen(target.x, world.player.pos.y + 0.05, target.z);
@@ -3706,21 +3707,19 @@ async function startGame(
       screen.y < -80 ||
       screen.y > window.innerHeight + 80;
     if (offscreen) {
-      clickMoveMarker.classList.remove('active', 'pulse', 'blocked');
+      paintClickMoveMarker(clickMoveMarker, 'offscreen');
       return;
     }
-    clickMoveMarker.style.transform = `translate(${screen.x.toFixed(0)}px, ${screen.y.toFixed(0)}px) translate(-50%, -50%)`;
-    clickMoveMarker.classList.toggle('entity', input.clickMoveEntityId !== null);
-    // Only meaningful for a live destination you're still trying to reach (not the
-    // brief post-arrival fade), so gate on an active target.
-    clickMoveMarker.classList.toggle('blocked', !!input.clickMoveTarget && playerImmobilized());
-    clickMoveMarker.classList.add('active');
-    if (pulseChanged || clickMoveMarker.dataset.pulse !== String(input.clickMovePulse)) {
-      clickMoveMarker.dataset.pulse = String(input.clickMovePulse);
-      clickMoveMarker.classList.remove('pulse');
-      void clickMoveMarker.offsetWidth;
-      clickMoveMarker.classList.add('pulse');
-    }
+    paintClickMoveMarker(clickMoveMarker, {
+      x: screen.x,
+      y: screen.y,
+      entity: input.clickMoveEntityId !== null,
+      // Only meaningful for a live destination you're still trying to reach (not the
+      // brief post-arrival fade), so gate on an active target.
+      blocked: !!input.clickMoveTarget && playerImmobilized(),
+      pulse: input.clickMovePulse,
+      pulseChanged,
+    });
   }
 
   let last = performance.now();

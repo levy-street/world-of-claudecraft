@@ -123,7 +123,9 @@ export class StanceBarController {
   private clearRow(): void {
     const { bar } = this.deps;
     bar.style.display = 'none';
-    document.body.classList.remove(SHOWN_BODY_CLASS);
+    // toggle with a force flag: add/remove rewrite the class attribute even when
+    // the token is already in the requested state, a MutationRecord per frame.
+    document.body.classList.toggle(SHOWN_BODY_CLASS, false);
     if (this.lastRowSig !== '') {
       bar.querySelector(`.${GROUP_CLASS}`)?.remove();
       this.lastRowSig = '';
@@ -137,7 +139,7 @@ export class StanceBarController {
       return;
     }
     bar.style.display = 'flex';
-    document.body.classList.add(SHOWN_BODY_CLASS);
+    document.body.classList.toggle(SHOWN_BODY_CLASS, true);
     if (model.sig === this.lastRowSig) return;
     this.lastRowSig = model.sig;
     bar.querySelector(`.${GROUP_CLASS}`)?.remove();

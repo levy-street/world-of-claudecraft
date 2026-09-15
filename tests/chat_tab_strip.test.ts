@@ -52,8 +52,13 @@ describe('chat tab strip layout (issue #1365)', () => {
     expect(hud).toContain('var(--chat-opacity, 1) * var(--chat-soft, 0.74)');
     expect(hud).toMatch(/#chatlog-wrap:hover #chatlog-frame,/);
     expect(hud).toMatch(/#chatlog-wrap:focus-within #chatlog-frame,/);
-    expect(hud).toMatch(/body:has\(#chat-input:hover\) #chatlog-frame,/);
-    expect(hud).toMatch(/body:has\(#chat-input:focus\) #chatlog-frame\s*{[^}]*--chat-soft:\s*1/s);
+    // The desktop composer's hover and focus reach the frame as classes on the
+    // wrap (src/ui/chat_composer_focus_controller.ts), never as a body :has() over
+    // #chat-input, which re-styled the whole HUD on every inline write.
+    expect(hud).toMatch(/#chatlog-wrap\.chat-composer-hover #chatlog-frame,/);
+    expect(hud).toMatch(
+      /#chatlog-wrap\.chat-composer-focus #chatlog-frame\s*{[^}]*--chat-soft:\s*1/s,
+    );
   });
 
   it('keeps chat numerals tabular and gives the focused composer a strong fill', () => {

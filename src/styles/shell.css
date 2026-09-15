@@ -7360,11 +7360,11 @@
      header has reliable one-row clearance; web and windowed shells retain the
      ordinary layout because their exit control remains hidden. */
   @media (min-width: 1121px) and (max-width: 1440px) {
-    body.desktop-app:has(.desktop-login-exit:not([hidden])) .homepage-header {
+    body.desktop-app.desktop-login-exit-shown .homepage-header {
       grid-template-rows: auto auto;
       row-gap: var(--spacing-xs);
     }
-    body.desktop-app:has(.desktop-login-exit:not([hidden])) .header-actions {
+    body.desktop-app.desktop-login-exit-shown .header-actions {
       grid-column: 1 / -1;
       grid-row: 2;
       justify-self: center;

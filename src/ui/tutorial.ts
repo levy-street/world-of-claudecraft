@@ -109,6 +109,8 @@ export class TutorialOverlay {
   private tipsEl!: HTMLElement;
   private skipBtn!: HTMLButtonElement;
   private arrow: HTMLElement | null = null;
+  private arrowShown = false;
+  private arrowTransform = '';
 
   constructor() {
     this.completed = readDone();
@@ -394,14 +396,24 @@ export class TutorialOverlay {
     sx = Math.max(margin, Math.min(w - margin, sx));
     sy = Math.max(margin, Math.min(h - margin, sy));
 
-    this.arrow.style.display = 'block';
-    this.arrow.style.left = `${sx}px`;
-    this.arrow.style.top = `${sy}px`;
-    this.arrow.style.transform = `translate(-50%, -50%) rotate(${angle}rad)`;
+    // One transform carries the position too (the sheet pins left/top at 0), and
+    // it is written only when it changes: the arrow moves every frame the camera
+    // turns, but a still frame writes nothing.
+    const transform = `translate(${sx}px, ${sy}px) translate(-50%, -50%) rotate(${angle}rad)`;
+    if (!this.arrowShown) {
+      this.arrowShown = true;
+      this.arrow.style.display = 'block';
+    }
+    if (transform !== this.arrowTransform) {
+      this.arrowTransform = transform;
+      this.arrow.style.transform = transform;
+    }
   }
 
   private hideArrow(): void {
-    if (this.arrow) this.arrow.style.display = 'none';
+    if (!this.arrow || !this.arrowShown) return;
+    this.arrowShown = false;
+    this.arrow.style.display = 'none';
   }
 
   private finish(): void {
@@ -410,6 +422,8 @@ export class TutorialOverlay {
     writeDone();
     this.root?.remove();
     this.arrow?.remove();
+    this.arrowShown = false;
+    this.arrowTransform = '';
     this.root = null;
     this.arrow = null;
   }

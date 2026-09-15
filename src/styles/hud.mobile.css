@@ -2104,7 +2104,7 @@
     text-shadow: 0 1px var(--text-outline-color);
     box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--color-primary-glow-heavy);
   }
-  body.mobile-touch:has(.paladin-devotion.last-charge) #mobile-action-ring button.empowered {
+  body.mobile-touch.devotion-last-charge #mobile-action-ring button.empowered {
     animation-duration: 0.55s;
     filter: brightness(1.18);
   }
@@ -5482,11 +5482,14 @@
      Keyed on the open marker the Hud stamps on every visible window (no new
      wiring): while BOTH are open they split the sheet like the vendor and
      bank docks (trade left, bags right), and a bags close returns the trade
-     sheet to full width on its own. */
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-  #trade-window,
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-    #bags {
+     sheet to full width on its own. body.trade-and-bags-open is stamped by
+     the window-open mirror (src/ui/window_open_state.ts) from those markers;
+     it replaced a body-anchored :has() pair (src/ui/root_state_classes.ts).
+     The #ui hop is specificity, not reach: (2,2,1) keeps the split above the
+     later (1,2,1) char-bags-paired / vendor-open / bank-open / market-open
+     #bags pins, as the old double-:has() form did. */
+  body.mobile-touch.trade-and-bags-open #ui #trade-window,
+  body.mobile-touch.trade-and-bags-open #ui #bags {
     position: fixed;
     /* Divided by the UI scale like the un-split pins above: authored inside
        #ui's zoom, a raw inset shrinks with the scale and stops clearing the
@@ -5501,21 +5504,17 @@
     box-sizing: border-box;
     z-index: 95 !important;
   }
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-    #trade-window {
+  body.mobile-touch.trade-and-bags-open #ui #trade-window {
     left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
     right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
     overflow-y: auto;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-    #trade-window
-    .trade-cols {
+  body.mobile-touch.trade-and-bags-open #ui #trade-window .trade-cols {
     flex-direction: column;
   }
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-    #bags {
+  body.mobile-touch.trade-and-bags-open #ui #bags {
     left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
     right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
     overflow: hidden;

@@ -14823,8 +14823,10 @@
     pointer-events: none;
     background: var(--color-options-scrim);
   }
-  #ui:has(> #options-menu[style*="display: block"])::before,
-  #ui:has(> #options-menu[style*="display: flex"])::before {
+  /* Stamped by the window-open mirror (src/ui/window_open_state.ts) while
+     #options-menu is visible; a :has() on #ui over the menu's inline style
+     re-styled the whole HUD on every inline write. */
+  #ui.options-open::before {
     display: block;
   }
   #options-menu {

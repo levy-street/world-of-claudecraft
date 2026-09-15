@@ -4357,7 +4357,9 @@
       box-shadow: none;
     }
   }
-  body:has(.paladin-devotion.last-charge) .action-btn.empowered {
+  /* body.devotion-last-charge is stamped by PaladinDevotionPainter beside the
+     medallion's own last-charge class (src/ui/root_state_classes.ts). */
+  body.devotion-last-charge .action-btn.empowered {
     animation-duration: 0.55s;
     filter: brightness(1.18);
   }
@@ -7339,10 +7341,13 @@
         100%
     );
   }
+  /* The desktop composer is a body-level sibling of #ui, so its hover and focus
+     reach the frame as classes on the wrap (src/ui/chat_composer_focus_controller.ts),
+     never through a body :has() (src/ui/root_state_classes.ts). */
   #chatlog-wrap:hover #chatlog-frame,
   #chatlog-wrap:focus-within #chatlog-frame,
-  body:has(#chat-input:hover) #chatlog-frame,
-  body:has(#chat-input:focus) #chatlog-frame {
+  #chatlog-wrap.chat-composer-hover #chatlog-frame,
+  #chatlog-wrap.chat-composer-focus #chatlog-frame {
     --chat-soft: 1;
   }
   /* HUD Opacity (--hud-opacity), fades frames/windows as a whole. */

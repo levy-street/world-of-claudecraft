@@ -75,6 +75,24 @@ the throw (#2499, #2502).
   `translateX(-50%)` drags the window half offscreen; `tests/mobile_window_transform.test.ts`).
   Literal mobile layout values are pinned by `tests/mobile_window_layout.test.ts` and
   `tests/fct_mobile_css.test.ts`.
+- **Never anchor `:has()` on `body`, `:root`, `html` or `#ui`, and never key one of those
+  root compounds on an inline `style` attribute (`#ui[style*=...]`).** Blink's invalidation
+  set for a `:has()` on a root is the whole HUD subtree, so any per-frame leaf write (a
+  compass mark's `left`, the tutorial arrow's `transform`, a coordinates `textContent`)
+  re-resolves style for EVERY visible element under it: measured 2026-09-14 at about 580
+  elements per frame, 6.5 ms on a 4-core Intel HD 530 (31 percent of the frame), from five
+  such rules keyed on `[style*="display: ..."]` and `#chat-input:hover`. State that belongs
+  to code becomes a state class toggled by the code that owns the state, on the anchor the
+  rule needs (`src/ui/root_state_classes.ts` lists them: `body.start-screen-open`,
+  `#ui.options-open`, `body.devotion-last-charge`, `body.trade-and-bags-open`,
+  `#chatlog-wrap.chat-composer-hover|focus`, `body.desktop-app.desktop-login-exit-shown`).
+  A `:has()` anchored on a WINDOW (`#bank-window:has(.bank-footer)`) only invalidates
+  inside that window and stays allowed. Guarded by `tests/css_root_anchored_has.test.ts`
+  (every sheet at any depth; the anchor is the compound the `:has(` is attached to, so
+  `body.mobile-touch #bank-window:has(...)` passes and `body.mobile-touch:has(...)` fails).
+  The guard's edge is this directory: the admin, guide and editor sheets and an entry's
+  inline `<style>` are out of its reach (they do not share the HUD's per-frame inline-write
+  contract), so the rule is yours to keep there.
 - **Bug fixes are test-first** (root `CLAUDE.md` owns the workflow); the guard tests above
   are where the new pins land.
 - **A `var(--name)` read must name something that DECLARES it.** `tests/css_token_resolution.test.ts`

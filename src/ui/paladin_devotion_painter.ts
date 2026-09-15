@@ -1,5 +1,6 @@
 import type { PainterHostWriters } from './painter_host';
 import type { PaladinDevotionState } from './paladin_devotion_view';
+import { DEVOTION_LAST_CHARGE_CLASS } from './root_state_classes';
 
 const READY_CLASS = 'ready';
 const ASCENDED_CLASS = 'ascended';
@@ -20,9 +21,13 @@ export class PaladinDevotionPainter {
     private readonly status: HTMLElement,
   ) {
     this.host = frame.parentElement ?? frame;
+    this.body = frame.ownerDocument.body;
   }
 
   private readonly host: HTMLElement;
+  /** The action bar's empowered buttons read the last-charge state off body
+   *  (they sit outside the medallion), so the painter stamps it there too. */
+  private readonly body: HTMLElement;
 
   paint(state: PaladinDevotionState): void {
     this.writers.setDisplay(this.frame, state.visible ? 'flex' : 'none');
@@ -42,5 +47,6 @@ export class PaladinDevotionPainter {
       );
     }
     this.writers.toggleClass(this.host, HOST_LIVE_CLASS, state.visible);
+    this.writers.toggleClass(this.body, DEVOTION_LAST_CHARGE_CLASS, state.lastCharge);
   }
 }

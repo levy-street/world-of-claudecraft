@@ -3,6 +3,7 @@
 // narrow capabilities and reports the stored borderless display mode.
 
 import type { DesktopBridge } from '../runtime';
+import { DESKTOP_LOGIN_EXIT_SHOWN_CLASS } from '../ui/root_state_classes';
 
 interface DesktopLoginExitButton {
   hidden: boolean;
@@ -12,6 +13,9 @@ interface DesktopLoginExitButton {
 
 interface DesktopLoginExitRoot {
   querySelector(selector: '#desktop-login-exit'): DesktopLoginExitButton | null;
+  /** The homepage header re-flows around the revealed button through a body
+   *  class (shell.css), stamped here with the reveal. */
+  readonly body?: { classList: { toggle(token: string, force: boolean): boolean } } | null;
 }
 
 export function initDesktopLoginExit(
@@ -20,7 +24,11 @@ export function initDesktopLoginExit(
 ): () => void {
   const button = root.querySelector('#desktop-login-exit');
   if (!button) return () => {};
-  button.hidden = true;
+  const setShown = (shown: boolean): void => {
+    button.hidden = !shown;
+    root.body?.classList.toggle(DESKTOP_LOGIN_EXIT_SHOWN_CLASS, shown);
+  };
+  setShown(false);
 
   const getDisplayMode = bridge.getDisplayMode;
   const quitApp = bridge.quitApp;
@@ -37,7 +45,7 @@ export function initDesktopLoginExit(
   try {
     Promise.resolve(getDisplayMode.call(bridge)).then(
       (mode) => {
-        if (!disposed && mode === 'borderless') button.hidden = false;
+        if (!disposed && mode === 'borderless') setShown(true);
       },
       () => {},
     );
@@ -46,6 +54,6 @@ export function initDesktopLoginExit(
   return () => {
     disposed = true;
     button.removeEventListener('click', onClick);
-    button.hidden = true;
+    setShown(false);
   };
 }
