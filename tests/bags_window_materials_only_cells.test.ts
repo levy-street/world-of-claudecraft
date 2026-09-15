@@ -53,7 +53,7 @@ function render(
     isPersonalBankTab: () => false,
     isGuildBankTab: () => false,
     isVaultBankTab: () => false,
-    confirmVendorSell: () => true,
+    sellConfirmPolicy: () => ({ enabled: true, minQualityRank: 1 }),
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,

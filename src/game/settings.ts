@@ -235,6 +235,13 @@ export const SETTING_RANGES = {
   partyFrameSpacing: { min: 0, max: 12, def: 4 },
   partyFrameColumns: { min: 1, max: 5, def: 1 },
   partyFrameHealthText: { min: 0, max: 4, def: 1 },
+  // The lowest item quality a vendor sale still confirms for, as a
+  // QUALITY_RANK value (1 common ... 5 legendary; see
+  // src/ui/vendor_sell_confirm_policy.ts). Anything below sells instantly, a
+  // mis-sold item being recoverable from Buyback. def 1 keeps today's
+  // behavior (everything beyond true junk confirms). Only read while the
+  // confirmVendorSell master switch below is on.
+  confirmVendorSellMinQuality: { min: 1, max: 5, def: 1 },
   partyFrameSort: { min: 0, max: 2, def: 0 },
 } as const;
 

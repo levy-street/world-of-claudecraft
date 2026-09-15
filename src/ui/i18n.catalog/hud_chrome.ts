@@ -2117,6 +2117,12 @@ export const hudChromeStrings = {
     confirmVendorSell: 'Confirm Before Selling',
     confirmVendorSellNote:
       'Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.',
+    // Interface panel choice row under the toggle: the lowest item quality a
+    // vendor sale still confirms for; anything below sells instantly (wordy,
+    // M16: the five non-Latin fills land in the same change).
+    confirmVendorSellMinQuality: 'Confirm Sales From Quality',
+    confirmVendorSellMinQualityNote:
+      'Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
     // Interface panel toggle that reveals the optional second action bar row (off

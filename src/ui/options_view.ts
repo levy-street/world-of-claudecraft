@@ -15,7 +15,9 @@
 // narrows them against the real GameSettings), label keys are t() keys the
 // painter resolves. Registered in tests/architecture.test.ts UI_PURE_CORES.
 
+import { QUALITY_RANK } from '../sim/loot_master';
 import type { TranslationKey } from './i18n.catalog';
+import { VENDOR_SELL_CONFIRM_QUALITIES } from './vendor_sell_confirm_policy';
 
 /** Copy at the ownership boundary so a caller can never mutate the applied
  *  renderer snapshot while editing its local options draft. */
@@ -313,6 +315,16 @@ const HEALTH_TEXT_CHOICES: ChoiceOption[] = [
   { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
   { value: 4, labelKey: 'hudChrome.partyFrames.healthCurrentMaxPercent' },
 ];
+
+/** The vendor sell-confirm quality ladder (vendor_sell_confirm_policy.ts): the
+ *  choice values ARE the stored QUALITY_RANK values, labeled by the item
+ *  quality names the tooltips already use. */
+const SELL_CONFIRM_QUALITY_CHOICES: ChoiceOption[] = VENDOR_SELL_CONFIRM_QUALITIES.map(
+  (quality) => ({
+    value: QUALITY_RANK[quality],
+    labelKey: `itemUi.quality.${quality}` as TranslationKey,
+  }),
+);
 
 const choice = (
   s: OptionsSettingsSource,
@@ -852,6 +864,13 @@ export function buildInterfaceControls(
     boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
     boolToggle(s, 'confirmVendorSell', 'hudChrome.options.confirmVendorSell'),
     note('hudChrome.options.confirmVendorSellNote'),
+    choice(
+      s,
+      'confirmVendorSellMinQuality',
+      'hudChrome.options.confirmVendorSellMinQuality',
+      SELL_CONFIRM_QUALITY_CHOICES,
+    ),
+    note('hudChrome.options.confirmVendorSellMinQualityNote'),
   ];
   // The desktop shell's GPU preference, last in the tab so the web arm's row
   // order is untouched. Gated on the bridge CAPABILITY, so it renders only in a

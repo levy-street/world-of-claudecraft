@@ -76,7 +76,7 @@ function renderBagsHarness(
     isPersonalBankTab: () => false,
     isGuildBankTab: () => false,
     isVaultBankTab: () => false,
-    confirmVendorSell: () => true,
+    sellConfirmPolicy: () => ({ enabled: true, minQualityRank: 1 }),
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,
@@ -665,17 +665,17 @@ describe('bags_window: a vendor click confirms before selling anything but true 
   // tests/bags_vendor_sell_confirm.test.ts against the real BagsWindow; these
   // source pins are the no-magic-values-file's own idiom for anchoring the
   // wiring text they exercise.
-  it('imports vendorSellIsInstant from bags_view and gates the plain-click arm on it', () => {
-    expect(painter).toContain('vendorSellIsInstant');
+  it('gates the plain-click arm on the sell-confirm policy (vendor_sell_confirm_policy.ts)', () => {
+    expect(painter).toContain('vendorSaleNeedsConfirm');
     const body = painter.slice(
       painter.indexOf('private sellBagItem('),
       painter.indexOf('private showSellConfirmPrompt('),
     );
-    // The confirmVendorSell setting (a player opt-out) folds into the same
-    // instant gate: off treats every item as instant, restoring the classic
-    // one-click sale.
-    expect(body).toContain('!this.deps.confirmVendorSell()');
-    expect(body).toContain('vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);');
+    // The sell-confirm policy (the confirmVendorSell opt-out plus the quality
+    // threshold) folds into the same instant gate: a sale the policy does not
+    // confirm is instant, restoring the classic one-click sale.
+    expect(body).toContain('this.deps.sellConfirmPolicy()');
+    expect(body).toContain('const instant = !vendorSaleNeedsConfirm(');
     expect(body).toContain('!instant');
     expect(body).toContain('this.showSellConfirmPrompt(item, slot)');
     // Ctrl/meta and shift both still confirm a non-instant sale (the review-round

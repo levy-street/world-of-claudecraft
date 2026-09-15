@@ -69,7 +69,6 @@ import {
   carriedPools,
   materialsOnlyEmptyCells,
   resolveDepositSubmit,
-  vendorSellIsInstant,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { hasOpenBankSocket } from './bank_view';
@@ -117,6 +116,7 @@ import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
+import { type VendorSellConfirmPolicy, vendorSaleNeedsConfirm } from './vendor_sell_confirm_policy';
 import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 import { wornItemCellParts } from './worn_item_cell_view';
@@ -290,10 +290,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   dragState: ItemDragState;
   /** True on the touch HUD: the pointer drag replaces HTML5 drag-and-drop there. */
   isTouchHud(): boolean;
-  /** The confirmVendorSell setting (on by default): whether a vendor sale of
-   *  anything beyond true junk (vendorSellIsInstant) should confirm first.
-   *  False restores the classic one-click instant sale for every item. */
-  confirmVendorSell(): boolean;
+  /** The vendor sell-confirm policy (vendor_sell_confirm_policy.ts): the
+   *  confirmVendorSell master switch plus the lowest quality that confirms.
+   *  Read per click, never cached, so an Options change applies at once. */
+  sellConfirmPolicy(): VendorSellConfirmPolicy;
   /** Light up (or clear) the paperdoll sockets that accept the stack in flight, so
    *  the drag advertises where it can land. Cleared on every drag teardown.
    *  `slotIndex` names the drag source's bag cell, so the lit set judges the
@@ -2192,15 +2192,18 @@ export class BagsWindow {
 
   private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
-    // The confirmVendorSell setting folds into the same instant gate
-    // vendorSellIsInstant already uses: turning it off (a player accepting the
-    // risk in exchange for speed) treats every item as instant for
-    // CONFIRMATION purposes, restoring the classic one-click sale. HOW MUCH
-    // sells is still decided below exactly as it already is for true junk
-    // (one unit on a plain click, the whole stack on ctrl/meta).
-    const instant =
-      !this.deps.confirmVendorSell() ||
-      vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
+    // The sell-confirm policy (the confirmVendorSell switch and the quality
+    // threshold) folds into the same instant gate vendorSellIsInstant already
+    // draws around true junk: a sale the policy does not confirm is instant for
+    // CONFIRMATION purposes, the classic one-click sale. HOW MUCH sells is
+    // still decided below exactly as it already is for true junk (one unit on
+    // a plain click, the whole stack on ctrl/meta).
+    const instant = !vendorSaleNeedsConfirm(
+      item,
+      slot.instance,
+      slot.craftedRecipeId,
+      this.deps.sellConfirmPolicy(),
+    );
     if (ev.ctrlKey || ev.metaKey) {
       if (instant) {
         this.deps.world().sellItem(slot.itemId, count);
@@ -2264,7 +2267,15 @@ export class BagsWindow {
     for (const slot of this.deps.world().inventory) {
       if (slot.itemId !== itemId) continue;
       matched = true;
-      if (!vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId)) return false;
+      if (
+        vendorSaleNeedsConfirm(
+          item,
+          slot.instance,
+          slot.craftedRecipeId,
+          this.deps.sellConfirmPolicy(),
+        )
+      )
+        return false;
     }
     return matched;
   }

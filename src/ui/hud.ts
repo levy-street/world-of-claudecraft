@@ -335,6 +335,7 @@ import {
   handleShiftClearKeydown,
 } from './hud/action_bar/action_bar_clear';
 import { ActionBarController } from './hud/action_bar/action_bar_controller';
+import { actionBarIconBg } from './hud/action_bar/action_bar_icon_bg';
 import {
   ACTION_BAR_ABILITY_SLOTS,
   ACTION_BAR_ABILITY_SLOTS_PER_ROW,
@@ -348,14 +349,10 @@ import {
   installActionBarToggle,
 } from './hud/action_bar/action_bar_toggle_controller';
 import {
-  ABILITY_ICON_PREFIX,
   type ActionBarView,
   type ActionBarWorldInput,
-  ATTACK_ICON_KEY,
   actionBarCooldownRemaining,
   createActionBarView,
-  EMPTY_ICON_KEY,
-  ITEM_ICON_PREFIX,
 } from './hud/action_bar/action_bar_view';
 import type { ActionBarVisibility } from './hud/action_bar/action_bar_visibility_core';
 import {
@@ -897,6 +894,7 @@ import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { knownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
+import { vendorSellConfirmPolicyFrom } from './vendor_sell_confirm_policy';
 import { visibleVendorStock } from './vendor_stock_gate_core';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
@@ -5264,7 +5262,7 @@ export class Hud {
     resetPetBarSig: () => {
       this.lastPetBarSig = '';
     },
-    confirmVendorSell: () => this.optionsHooks?.settings.get('confirmVendorSell') ?? true,
+    sellConfirmPolicy: () => vendorSellConfirmPolicyFrom((k) => this.optionsHooks?.settings.get(k)),
     isHotbarItemId: (itemId) => this.isHotbarItemId(itemId),
     useGatherTool: (item) => this.gatherToolUseHook?.(item) ?? false,
     setDragAction: (action) => {
@@ -8091,7 +8089,7 @@ export class Hud {
           rechargeOverlay: ab.rechargeOverlay,
         })),
       },
-      (iconKey) => this.actionBarIconBg(iconKey),
+      actionBarIconBg,
     );
 
     // The chevron optional-row toggle rides the end of the primary bar. Its
@@ -8115,7 +8113,7 @@ export class Hud {
 
     this.crossHotbar = CrossHotbarController.create(
       this.writerFacet,
-      (k) => this.actionBarIconBg(k),
+      actionBarIconBg,
       crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName, () =>
         this.groundAim.activeAbilityId(),
       ),
@@ -8162,7 +8160,7 @@ export class Hud {
   private buildMobileActionRing(): void {
     const ring = buildMobileActionRing({
       writers: this.writerFacet,
-      iconBackground: (iconKey) => this.actionBarIconBg(iconKey),
+      iconBackground: actionBarIconBg,
       sourceSlot: (i, direction) => this.mobileSourceSlotForButton(i, direction),
       hasSourceSlot: (i, direction) =>
         mobileButtonHasSourceSlot(
@@ -8223,7 +8221,7 @@ export class Hud {
     this.mobileConsumableSeat =
       buildMobileConsumableSeat({
         writers: this.writerFacet,
-        iconBackground: (iconKey) => this.actionBarIconBg(iconKey),
+        iconBackground: actionBarIconBg,
         lookupItem: (id) => ITEMS[id],
         useItem: (id) => {
           if (this.tradeOpen) return false;
@@ -8237,18 +8235,6 @@ export class Hud {
         hideTooltip: () => this.hideTooltip(),
         consumePeekGuard: () => this.peekGuard.consume(),
       }) ?? undefined;
-  }
-
-  // Resolve a core icon key to the slot label's background-image value. Kept on the
-  // Hud (not the painter) so the painter holds no icon table or literal URL; the
-  // painter calls this only when a slot's icon key changes.
-  private actionBarIconBg(iconKey: string): string {
-    if (iconKey === EMPTY_ICON_KEY) return '';
-    if (iconKey === ATTACK_ICON_KEY) return `url(${iconDataUrl('ability', 'attack')})`;
-    if (iconKey.startsWith(ITEM_ICON_PREFIX)) {
-      return `url(${iconDataUrl('item', iconKey.slice(ITEM_ICON_PREFIX.length))})`;
-    }
-    return `url(${iconDataUrl('ability', iconKey.slice(ABILITY_ICON_PREFIX.length))})`;
   }
 
   private clearActionDropTargets(): void {

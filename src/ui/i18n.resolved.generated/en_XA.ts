@@ -1680,6 +1680,8 @@ export const en_XA: EnTranslations = {
       "showReliquaryTracker": "[Šĥóŵ Ŕéļíɋúáŕý Ţŕáçķéŕ]",
       "confirmVendorSell": "[Çóñƒíŕɱ Ɓéƒóŕé Šéļļíñĝ]",
       "confirmVendorSellNote": "[Ţúŕñíñĝ ţĥíš óƒƒ šéļļš íţéɱš ŵíţĥ á šíñĝļé çļíçķ áñð ñó çóñƒíŕɱáţíóñ, šó á šĥíƒţéð ƀáĝ šļóţ çóúļð ʋéñðóŕ ţĥé ŵŕóñĝ íţéɱ.]",
+      "confirmVendorSellMinQuality": "[Çóñƒíŕɱ Šáļéš Ƒŕóɱ Ɋúáļíţý]",
+      "confirmVendorSellMinQualityNote": "[Íţéɱš ƀéļóŵ ţĥíš ɋúáļíţý šéļļ ŵíţĥ á šíñĝļé çļíçķ; á ɱíš-šóļð íţéɱ çáñ šţíļļ ƀé ƀóúĝĥţ ƀáçķ ƒŕóɱ ţĥé ʋéñðóŕ.]",
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",

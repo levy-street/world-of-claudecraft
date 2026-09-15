@@ -1718,6 +1718,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSell': '出售前確認',
   'hudChrome.options.confirmVendorSellNote':
     '關閉後，出售物品只需單擊即可完成，不再確認；如果背包格位發生變化，可能會賣錯物品。',
+  'hudChrome.options.confirmVendorSellMinQuality': '確認出售的最低品質',
+  'hudChrome.options.confirmVendorSellMinQualityNote':
+    '低於此品質的物品單擊即可出售；誤售的物品仍可從商人處買回。',
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',
   'hudChrome.options.showThirdActionBar': '顯示第三動作列',
   'hudChrome.options.hideUnusedActionSlots': '隱藏未使用的動作欄位',

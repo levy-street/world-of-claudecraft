@@ -1318,6 +1318,45 @@ describe('Input mouse-click focus guard (issue: clicked HUD buttons hijack Space
     expect(blur).not.toHaveBeenCalled();
   });
 
+  it('leaves the OK button focused when the click handler opened a modal confirm (Enter to confirm)', () => {
+    // A context-menu row click (Disenchant) opens the confirm dialog and focuses
+    // its OK button synchronously, in the SAME click. The post-click drop must
+    // not blur that OK button, or Enter confirms nothing.
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const modal = { hasAttribute: () => false, focus: vi.fn() };
+    const ok = {
+      tagName: 'BUTTON',
+      blur,
+      closest: (selector: string) =>
+        selector === '[role="dialog"][aria-modal="true"]' ? modal : null,
+    };
+    const row = { closest: () => null };
+    (globalThis as any).document.activeElement = ok;
+
+    windowListeners.get('click')!({ type: 'click', detail: 1, target: row });
+
+    expect(blur).not.toHaveBeenCalled();
+    expect(modal.focus).not.toHaveBeenCalled();
+  });
+
+  it('still drops focus from a button the mouse clicked INSIDE that modal', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const modal = { hasAttribute: () => false, focus: vi.fn() };
+    const ok = {
+      tagName: 'BUTTON',
+      blur,
+      closest: (selector: string) =>
+        selector === '[role="dialog"][aria-modal="true"]' ? modal : null,
+    };
+    (globalThis as any).document.activeElement = ok;
+
+    windowListeners.get('click')!({ type: 'click', detail: 1, target: ok });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
   it('blurs a focused HUD button on a right-click release (equip-via-right-click has no click event)', () => {
     const { windowListeners } = makeInput();
     const blur = vi.fn();

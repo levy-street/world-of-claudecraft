@@ -1680,6 +1680,8 @@ export const ru_RU: EnTranslations = {
       "showReliquaryTracker": "Показывать список Реликвария",
       "confirmVendorSell": "Подтверждать продажу",
       "confirmVendorSellNote": "Если отключить, предметы будут продаваться одним кликом без подтверждения, и при смещении ячейки сумки можно продать не тот предмет.",
+      "confirmVendorSellMinQuality": "Подтверждать продажу от качества",
+      "confirmVendorSellMinQualityNote": "Предметы ниже этого качества продаются одним щелчком; ошибочно проданный предмет можно выкупить у торговца.",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",

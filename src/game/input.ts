@@ -7,6 +7,7 @@
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
+import { clickClaimedModalFocus } from './click_claimed_focus';
 import { cursorForHover, type HoverCursorKind } from './cursors';
 import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
@@ -1385,7 +1386,12 @@ export class Input {
   // drag-to-equip/drag-to-hotbar stay untouched. A non-primary release
   // (right/middle-click) has no keyboard equivalent in this game, so
   // onMouseUp always treats it as mouse-driven.
-  private releaseMouseActivatedFocus(e: { type: string; detail?: number }): void {
+  //
+  // One exception: the click's own handler may have opened a modal confirm
+  // (Disenchant, Salvage, the vendor sell confirm) and focused its OK button
+  // in this same click. That focus is keyboard-owned (Enter confirms it), so
+  // it is left alone; src/game/click_claimed_focus.ts owns the rule.
+  private releaseMouseActivatedFocus(e: { type: string; detail?: number; target?: unknown }): void {
     if (e.type === 'click' && e.detail === 0) return;
     const active = document.activeElement as {
       tagName?: string;
@@ -1395,7 +1401,9 @@ export class Input {
       hasAttribute?: (name: string) => boolean;
       blur?: () => void;
     } | null;
-    if (active && this.isMouseActivatableFocusTarget(active)) this.dropMouseActivatedFocus(active);
+    if (!active || !this.isMouseActivatableFocusTarget(active)) return;
+    if (clickClaimedModalFocus(active, e.target)) return;
+    this.dropMouseActivatedFocus(active);
   }
 
   private dropMouseActivatedFocus(active: {

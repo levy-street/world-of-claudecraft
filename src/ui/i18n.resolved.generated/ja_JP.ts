@@ -1680,6 +1680,8 @@ export const ja_JP: EnTranslations = {
       "showReliquaryTracker": "聖遺物庫トラッカーを表示",
       "confirmVendorSell": "売却前に確認する",
       "confirmVendorSellNote": "オフにすると確認なしでワンクリックでアイテムを売却します。カバンのスロットがずれていると、誤ったアイテムを売却する可能性があります。",
+      "confirmVendorSellMinQuality": "確認する売却品質の下限",
+      "confirmVendorSellMinQualityNote": "この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せます。",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",

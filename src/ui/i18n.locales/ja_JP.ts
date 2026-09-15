@@ -1784,6 +1784,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSell': '売却前に確認する',
   'hudChrome.options.confirmVendorSellNote':
     'オフにすると確認なしでワンクリックでアイテムを売却します。カバンのスロットがずれていると、誤ったアイテムを売却する可能性があります。',
+  'hudChrome.options.confirmVendorSellMinQuality': '確認する売却品質の下限',
+  'hudChrome.options.confirmVendorSellMinQualityNote':
+    'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せます。',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
   'hudChrome.options.hideUnusedActionSlots': '未使用のアクションスロットを非表示',
