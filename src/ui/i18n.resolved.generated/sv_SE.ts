@@ -10259,6 +10259,7 @@ export const sv_SE: EnTranslations = {
       "stunned": "Du är bedövad!",
       "silenced": "Du är tystad!",
       "busy": "Du är upptagen.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Den förmågan är inte redo än.",
       "notEnoughRage": "Inte tillräckligt med raseri!",
       "notEnoughEnergy": "Inte tillräckligt med energi!",

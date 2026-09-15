@@ -2642,6 +2642,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.system.arenaDefeatLog': '{name} 在灰烬斗技场击败了你。评级 {rating}（{delta}）。',
   'hud.errors.stunned': '你被击晕了！',
   'hud.errors.busy': '你正忙。',
+  'hud.errors.cannotCastWhileMoving': '你无法在移动时施法。',
   'hud.errors.abilityNotReady': '该技能尚未准备好。',
   'hud.errors.notEnoughRage': '怒气不足！',
   'hud.errors.notEnoughEnergy': '能量不足！',

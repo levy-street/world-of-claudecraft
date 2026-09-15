@@ -7823,6 +7823,7 @@ export type TranslationKeyFlat =
   | 'hud.errors.bear'
   | 'hud.errors.behindTarget'
   | 'hud.errors.busy'
+  | 'hud.errors.cannotCastWhileMoving'
   | 'hud.errors.cannotTaunt'
   | 'hud.errors.cantInForm'
   | 'hud.errors.cat'

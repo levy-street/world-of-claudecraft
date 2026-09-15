@@ -10259,6 +10259,7 @@ export const fr_CA: EnTranslations = {
       "stunned": "Vous êtes étourdi !",
       "silenced": "Vous êtes réduit au silence !",
       "busy": "Vous êtes occupé.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Cette technique n'est pas encore prête.",
       "notEnoughRage": "Pas assez de rage !",
       "notEnoughEnergy": "Pas assez d'énergie !",

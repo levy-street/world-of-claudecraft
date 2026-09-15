@@ -10259,6 +10259,7 @@ export const es_ES: EnTranslations = {
       "stunned": "¡Estás aturdido!",
       "silenced": "¡Estás silenciado!",
       "busy": "Estás ocupado.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Esa habilidad aún no está lista.",
       "notEnoughRage": "¡No tienes suficiente ira!",
       "notEnoughEnergy": "¡No tienes suficiente energía!",

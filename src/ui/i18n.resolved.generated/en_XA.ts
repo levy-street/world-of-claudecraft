@@ -10259,6 +10259,7 @@ export const en_XA: EnTranslations = {
       "stunned": "[Ýóú áŕé šţúññéð!]",
       "silenced": "[Ýóú áŕé šíļéñçéð!]",
       "busy": "[Ýóú áŕé ƀúšý.]",
+      "cannotCastWhileMoving": "[Ýóú çáñ'ţ çášţ ŵĥíļé ɱóʋíñĝ.]",
       "abilityNotReady": "[Ţĥáţ áƀíļíţý íš ñóţ ŕéáðý ýéţ.]",
       "notEnoughRage": "[Ñóţ éñóúĝĥ ŕáĝé!]",
       "notEnoughEnergy": "[Ñóţ éñóúĝĥ éñéŕĝý!]",

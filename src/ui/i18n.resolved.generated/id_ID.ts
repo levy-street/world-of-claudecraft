@@ -10259,6 +10259,7 @@ export const id_ID: EnTranslations = {
       "stunned": "Kamu terhuyung!",
       "silenced": "Kamu dibungkam!",
       "busy": "Kamu sedang sibuk.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Kemampuan itu belum siap.",
       "notEnoughRage": "Amarah tidak cukup!",
       "notEnoughEnergy": "Energi tidak cukup!",

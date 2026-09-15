@@ -92,6 +92,7 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     // translation ask for no player-visible gain.
     "Can't move!": 'hud.combat.cannotMove',
     'You are busy.': 'hud.errors.busy',
+    "You can't cast while moving.": 'hud.errors.cannotCastWhileMoving',
     'That ability is not ready yet.': 'hud.errors.abilityNotReady',
     'Not enough rage!': 'hud.errors.notEnoughRage',
     'Not enough energy!': 'hud.errors.notEnoughEnergy',

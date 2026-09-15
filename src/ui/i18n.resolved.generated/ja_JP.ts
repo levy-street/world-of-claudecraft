@@ -10259,6 +10259,7 @@ export const ja_JP: EnTranslations = {
       "stunned": "スタン中です！",
       "silenced": "沈黙状態です！",
       "busy": "現在行動中です。",
+      "cannotCastWhileMoving": "移動中は詠唱できません。",
       "abilityNotReady": "その能力はまだ準備できていません。",
       "notEnoughRage": "怒りが足りません！",
       "notEnoughEnergy": "エネルギーが足りません！",

@@ -2798,6 +2798,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '{name} победил вас в Пепельном Колизее. Рейтинг {rating} ({delta}).',
   'hud.errors.stunned': 'Вы оглушены!',
   'hud.errors.busy': 'Вы заняты.',
+  'hud.errors.cannotCastWhileMoving': 'Вы не можете применять заклинания в движении.',
   'hud.errors.abilityNotReady': 'Эта способность еще не готова.',
   'hud.errors.notEnoughRage': 'Недостаточно ярости!',
   'hud.errors.notEnoughEnergy': 'Недостаточно энергии!',

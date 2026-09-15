@@ -100,6 +100,7 @@ import {
   gainDoom,
 } from './affliction';
 import { shouldPreserveQueuedSentence } from './affliction_sentence_queue';
+import { abilityCastSurvivesMovement, hasMovementInput } from './cast_move_gate';
 import {
   hasUnbreakableMovementLock,
   isInStasis,
@@ -1800,6 +1801,23 @@ export function castAbility(
     afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
     destructionCastTimeMult(p, ability.id) *
     ashenFocusCastTimeMult(ctx, p, meta, ability.id);
+  // A press that cannot survive movement (abilityCastSurvivesMovement) is denied
+  // OUTRIGHT here, before the GCD arms or any cost/proc is spent, when the player is
+  // already holding movement input: without this, the cast would start (channel or
+  // timed-cast branch below), then player_motion's own move-to-cancel check would kill
+  // it on the very next tick, since the SAME held keys are still down. That wasted a
+  // full GCD (and, for a channel, a next-cast-free/cheap charge below) on a cast that
+  // never had a chance to complete. A press while STATIONARY that only starts moving
+  // mid-cast is unaffected: that interrupt still costs the GCD, same as ever
+  // (player_motion.ts's move-to-cancel check, cancelCast).
+  if (
+    (ability.channel || (castTime > 0 && !togglingOff)) &&
+    hasMovementInput(meta.moveInput) &&
+    !abilityCastSurvivesMovement(p, ability.id, res)
+  ) {
+    ctx.error(p.id, "You can't cast while moving.");
+    return;
+  }
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the

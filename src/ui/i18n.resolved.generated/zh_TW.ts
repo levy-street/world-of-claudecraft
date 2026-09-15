@@ -10259,6 +10259,7 @@ export const zh_TW: EnTranslations = {
       "stunned": "你被擊暈了！",
       "silenced": "你已被沉默！",
       "busy": "你正忙。",
+      "cannotCastWhileMoving": "你無法在移動時施法。",
       "abilityNotReady": "該技能尚未準備好。",
       "notEnoughRage": "怒氣不足！",
       "notEnoughEnergy": "能量不足！",

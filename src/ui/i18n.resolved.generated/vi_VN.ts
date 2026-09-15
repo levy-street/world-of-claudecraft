@@ -10259,6 +10259,7 @@ export const vi_VN: EnTranslations = {
       "stunned": "Bạn đang bị choáng!",
       "silenced": "Bạn đang bị câm lặng!",
       "busy": "Bạn đang bận.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Kỹ năng đó chưa sẵn sàng.",
       "notEnoughRage": "Không đủ nộ khí!",
       "notEnoughEnergy": "Không đủ năng lượng!",

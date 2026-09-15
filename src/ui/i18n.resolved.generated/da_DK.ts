@@ -10259,6 +10259,7 @@ export const da_DK: EnTranslations = {
       "stunned": "Du er lammet!",
       "silenced": "Du er bragt til tavshed!",
       "busy": "Du er optaget.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Den evne er ikke klar endnu.",
       "notEnoughRage": "Ikke nok raseri!",
       "notEnoughEnergy": "Ikke nok energi!",

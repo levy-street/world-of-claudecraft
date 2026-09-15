@@ -10259,6 +10259,7 @@ export const nl_NL: EnTranslations = {
       "stunned": "Je bent verdoofd!",
       "silenced": "Je bent het zwijgen opgelegd!",
       "busy": "Je bent bezig.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Die vaardigheid is nog niet gereed.",
       "notEnoughRage": "Niet genoeg woede!",
       "notEnoughEnergy": "Niet genoeg energie!",

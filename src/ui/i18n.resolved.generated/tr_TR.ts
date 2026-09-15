@@ -10259,6 +10259,7 @@ export const tr_TR: EnTranslations = {
       "stunned": "Sersemledin!",
       "silenced": "Susturuldun!",
       "busy": "Meşgulsün.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "O yetenek henüz hazır değil.",
       "notEnoughRage": "Yeterli öfke yok!",
       "notEnoughEnergy": "Yeterli enerji yok!",

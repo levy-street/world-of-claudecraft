@@ -10259,6 +10259,7 @@ export const ko_KR: EnTranslations = {
       "stunned": "기절했습니다!",
       "silenced": "침묵 상태입니다!",
       "busy": "현재 다른 행동 중입니다.",
+      "cannotCastWhileMoving": "이동 중에는 시전할 수 없습니다.",
       "abilityNotReady": "그 능력은 아직 준비되지 않았습니다.",
       "notEnoughRage": "분노가 부족합니다!",
       "notEnoughEnergy": "기력이 부족합니다!",

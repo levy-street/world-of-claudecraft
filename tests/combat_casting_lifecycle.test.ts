@@ -610,6 +610,80 @@ describe('casting_lifecycle: interrupt (cancelCast)', () => {
   });
 });
 
+// A press already moving used to start the cast anyway, arming the GCD, only for
+// player_motion's own move-to-cancel check to kill it on the very next tick (the same
+// held movement keys never went away): a full GCD spent for a cast that never had a
+// chance to complete. These pin the fix: the press is denied outright while movement
+// input is held, before the GCD or any cost/proc is touched.
+describe('casting_lifecycle: a movement-sensitive press denies outright while already moving', () => {
+  it('denies a normal timed cast press and never arms the GCD', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    meta.moveInput.forward = true;
+    sim.drainEvents();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBeNull();
+    expect(p.gcdRemaining).toBe(0);
+    const events = sim.drainEvents();
+    expect(
+      events.some(
+        (e: any) =>
+          e.type === 'error' && e.pid === p.id && e.text === "You can't cast while moving.",
+      ),
+    ).toBe(true);
+  });
+
+  it('denies a channel press and never arms the GCD', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    expect(sim.setSpec('arcane')).toBe(true);
+    spawnTarget(sim, p);
+    meta.moveInput.strafeLeft = true;
+    castAbility(sim.ctx, 'arcane_missiles', p.id);
+    expect(p.castingAbility).toBeNull();
+    expect(p.channeling).toBe(false);
+    expect(p.gcdRemaining).toBe(0);
+  });
+
+  it('starts the cast normally once movement input is released', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    meta.moveInput.forward = true;
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBeNull(); // denied while moving
+    meta.moveInput.forward = false;
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.gcdRemaining).toBeGreaterThan(0);
+  });
+
+  it('still starts a def-level castWhileMoving ability while moving (mobility is unaffected)', () => {
+    ABILITIES.fireball.castWhileMoving = true;
+    try {
+      const { sim, p, meta } = makeSim('mage', 12);
+      spawnTarget(sim, p);
+      meta.moveInput.forward = true;
+      castAbility(sim.ctx, 'fireball', p.id);
+      expect(p.castingAbility).toBe('fireball');
+      expect(p.gcdRemaining).toBeGreaterThan(0);
+    } finally {
+      delete ABILITIES.fireball.castWhileMoving;
+    }
+  });
+
+  it('a press while stationary that only starts moving mid-cast still costs the GCD (unchanged)', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+    const gcdAtCastStart = p.gcdRemaining;
+    expect(gcdAtCastStart).toBeGreaterThan(0);
+    meta.moveInput.forward = true;
+    sim.tick();
+    expect(p.castingAbility).toBeNull(); // interrupted by movement
+    expect(p.gcdRemaining).toBeGreaterThan(0); // still costs the GCD it already armed
+  });
+});
+
 describe('casting_lifecycle: pushbackCast', () => {
   it('delays a timed cast by CAST_PUSHBACK_SEC (does not cancel)', () => {
     const { sim, p } = makeSim('mage', 12);

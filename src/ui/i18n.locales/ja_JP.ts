@@ -2770,6 +2770,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{name}が灰の闘技場であなたを破りました。レート {rating}（{delta}）。',
   'hud.errors.stunned': 'スタン中です！',
   'hud.errors.busy': '現在行動中です。',
+  'hud.errors.cannotCastWhileMoving': '移動中は詠唱できません。',
   'hud.errors.abilityNotReady': 'その能力はまだ準備できていません。',
   'hud.errors.notEnoughRage': '怒りが足りません！',
   'hud.errors.notEnoughEnergy': 'エネルギーが足りません！',

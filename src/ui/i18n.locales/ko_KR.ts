@@ -2743,6 +2743,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{name}님이 잿빛 원형경기장에서 당신을 이겼습니다. 평점 {rating} ({delta}).',
   'hud.errors.stunned': '기절했습니다!',
   'hud.errors.busy': '현재 다른 행동 중입니다.',
+  'hud.errors.cannotCastWhileMoving': '이동 중에는 시전할 수 없습니다.',
   'hud.errors.abilityNotReady': '그 능력은 아직 준비되지 않았습니다.',
   'hud.errors.notEnoughRage': '분노가 부족합니다!',
   'hud.errors.notEnoughEnergy': '기력이 부족합니다!',

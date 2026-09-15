@@ -2644,6 +2644,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.system.arenaDefeatLog': '{name} 在灰燼競技場擊敗了你。評級 {rating}（{delta}）。',
   'hud.errors.stunned': '你被擊暈了！',
   'hud.errors.busy': '你正忙。',
+  'hud.errors.cannotCastWhileMoving': '你無法在移動時施法。',
   'hud.errors.abilityNotReady': '該技能尚未準備好。',
   'hud.errors.notEnoughRage': '怒氣不足！',
   'hud.errors.notEnoughEnergy': '能量不足！',
