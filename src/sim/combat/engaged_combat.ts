@@ -210,3 +210,29 @@ export function collectEngagedPids(ctx: SimContext, out: Set<number>): void {
 export function isHeldInCombat(ctx: SimContext, playerId: number): boolean {
   return ctx.engagedPids.has(playerId);
 }
+
+/**
+ * Whether this player is inside an ACTIVE boss encounter: an encounter boss
+ * (dungeon/raid `boss`, or open-world `worldBoss`) that is currently engaged
+ * is fighting them, per the same held-in-encounter reach the engaged pass uses
+ * (the boss's own claimed slot, or the open-world encounter radius).
+ * Deliberately reads the ENEMY's engaged state, not the player's: a scripted
+ * boss parked at 'idle' for an intermission stays inCombat and keeps holding
+ * everyone through it (see the module header), so a player who drops out of
+ * combat in the breather cannot slot a fight-winning loadout mid-boss
+ * (issue #3372) while a pre-pull respec at a not-yet-engaged boss still goes
+ * through. Command-path only (talent-change refusals), never tick-path.
+ */
+export function playerInEngagedBossFight(ctx: SimContext, playerId: number): boolean {
+  const p = ctx.entities.get(playerId);
+  if (p?.kind !== 'player' || p.dead) return false;
+  for (const e of ctx.entities.values()) {
+    if (e.kind !== 'mob' || e.dead || e.ownerId !== null) continue;
+    const template = MOBS[e.templateId];
+    if (!isEncounterBoss(template)) continue;
+    if (!mobEngaged(e)) continue;
+    const bossSlot = claimedSlotOf(ctx, e);
+    if (memberInEncounter(e, bossSlot, p)) return true;
+  }
+  return false;
+}
