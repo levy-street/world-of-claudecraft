@@ -79,6 +79,9 @@ export interface AdaptiveLinkBudgetSnapshot {
   submittedUnits: number;
   settledUnits: number;
   failedUnits: number;
+  /** Units the context refused (a text that does not link), released with no
+   *  verdict: a refusal says nothing about how loaded the driver is. */
+  rejectedUnits: number;
   backoffCount: number;
   noProgressCount: number;
   lastSettlementMs: number | null;
@@ -93,6 +96,9 @@ export interface AdaptiveLinkBudget {
   markSyncEnd(id: string, chargedLinks: number): void;
   markSettled(id: string): void;
   markFailed(id: string): void;
+  /** The context refused the unit's program. Frees its slot and counts as
+   *  progress, but gives no verdict, so the window stays where it is. */
+  markRejected(id: string): void;
   markReveal(): void;
   snapshot(): AdaptiveLinkBudgetSnapshot;
 }
@@ -186,6 +192,7 @@ export function createAdaptiveLinkBudget(
   let submittedUnits = 0;
   let settledUnits = 0;
   let failedUnits = 0;
+  let rejectedUnits = 0;
   let backoffCount = 0;
   let noProgressCount = 0;
   let lastProgressAtMs = clock.now();
@@ -336,6 +343,14 @@ export function createAdaptiveLinkBudget(
     markFailed(id) {
       finish(id, true);
     },
+    markRejected(id) {
+      if (!inFlight.delete(id)) return;
+      lastProgressAtMs = clock.now();
+      rejectedUnits++;
+      // Past a stall the answer is late whatever it says, and lateness is what
+      // a stalled lane reopens halved on (the settle arm in finish).
+      if (state === 'stalled') backoff('failed');
+    },
     markReveal() {
       transition('revealed', 'reveal');
     },
@@ -353,6 +368,7 @@ export function createAdaptiveLinkBudget(
         submittedUnits,
         settledUnits,
         failedUnits,
+        rejectedUnits,
         backoffCount,
         noProgressCount,
         lastSettlementMs,

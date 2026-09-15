@@ -2423,6 +2423,10 @@ describe('shader warm-up report fields', () => {
               warmed: 1e9,
               held: 42.7,
               heldTimedOut: -1,
+              holdMs: 5_000.4,
+              holdWallMs: 1_200,
+              releases: 2,
+              abArm: 'off',
               planted: 'x'.repeat(200),
             },
           },
@@ -2447,6 +2451,10 @@ describe('shader warm-up report fields', () => {
       warmed: 100_000,
       held: 42,
       heldTimedOut: 0,
+      holdMs: 5_000,
+      holdWallMs: 1_200,
+      releases: 2,
+      abArm: 'off',
     });
 
     await handlePerfReport(

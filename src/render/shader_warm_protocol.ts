@@ -87,7 +87,14 @@ export interface ShaderWarmWarmedMessage {
 export interface ShaderWarmFailedMessage {
   kind: 'failed';
   id: number;
-  reason: 'link-failed' | 'context-lost' | 'cancelled' | 'not-ready';
+  /** `link-deadline` is the worker giving up on a link still pending at its
+   *  own no-progress bound: not a text the context rejected, a link that ran
+   *  at least that long. `link-failed` is a link the context refused. */
+  reason: 'link-failed' | 'link-deadline' | 'context-lost' | 'cancelled' | 'not-ready';
+  /** With `link-deadline` only: submission to the give-up, on the worker's
+   *  clock. A LOWER BOUND on the link's wall, which the client's cannot-serve
+   *  rule reads as a censored sample where no link ever settles. */
+  linkMs?: number;
 }
 
 export interface ShaderWarmLostMessage {

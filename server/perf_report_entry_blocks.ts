@@ -20,6 +20,10 @@ const REVEALS_MAX = 10_000;
 // A phone-class entry can legitimately hold the curtain for minutes; the
 // ceiling matches the other "span of a session" bounds in perf_report.ts.
 const PHASE_MS_MAX = 30 * 60_000;
+// The shader warm hold times accumulate over a whole renderer's life, and the
+// summed one counts simultaneous holds once each, so a long session can pass
+// the phase bound legitimately; a day is past any real tab.
+const SESSION_MS_MAX = 24 * 60 * 60_000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
@@ -136,6 +140,11 @@ export interface ShaderWarmBlock {
   warmed: number;
   held: number;
   heldTimedOut: number;
+  holdMs: number;
+  holdWallMs: number;
+  releases: number;
+  /** The A/B arm: 'on', 'off', or '' when no draw ran or the value is not one. */
+  abArm: string;
 }
 
 /** Undefined without a `mode` token: the client resolves a mode ('off',
@@ -157,5 +166,14 @@ export function sanitizeShaderWarm(value: unknown): ShaderWarmBlock | undefined 
     warmed: boundedInt(value.warmed, PROGRAMS_MAX),
     held: boundedInt(value.held, PROGRAMS_MAX),
     heldTimedOut: boundedInt(value.heldTimedOut, PROGRAMS_MAX),
+    holdMs: boundedInt(value.holdMs, SESSION_MS_MAX),
+    holdWallMs: boundedInt(value.holdWallMs, SESSION_MS_MAX),
+    releases: boundedInt(value.releases, PROGRAMS_MAX),
+    abArm: shaderWarmArm(value.abArm),
   };
+}
+
+function shaderWarmArm(value: unknown): string {
+  const arm = shaderWarmToken(value);
+  return arm === 'on' || arm === 'off' ? arm : '';
 }

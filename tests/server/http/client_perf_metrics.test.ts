@@ -46,6 +46,7 @@ import {
   WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
 } from '../../../server/http/client_perf_metrics';
 import { handlePerfReport, perfReportInternalsForTest } from '../../../server/perf_report';
+import { SHADER_WARM_AB_REFUSAL } from '../../../src/render/shader_warm_client_core';
 
 function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
   return {
@@ -170,10 +171,13 @@ describe('vocabulary pins', () => {
     ]);
     expect([...CLIENT_PERF_SHADER_WARM_REFUSALS]).toEqual([
       'none',
+      'ab:off',
       'cannot-serve:hold-cap',
+      'cannot-serve:hold-cap:censored',
       'context-lost',
       'extension-drift',
       'extension-mismatch',
+      'hold-failures:wedged',
       'hold-timeouts:expired-share',
       'hold-timeouts:wedged',
       'ios-webkit',
@@ -182,6 +186,7 @@ describe('vocabulary pins', () => {
       'no-worker',
       'pagehide',
       'ready-timeout',
+      'standing-down:silent',
       'worker-error',
       'other',
     ]);
@@ -539,12 +544,22 @@ describe('perf-report ingest emission', () => {
 });
 
 describe('shaderWarmRefusalLabel', () => {
+  it('keeps the token the client mints for the A/B off arm as a label of its own', () => {
+    // Folded into other, the arm split the experiment reads would vanish.
+    expect(CLIENT_PERF_SHADER_WARM_REFUSALS).toContain(SHADER_WARM_AB_REFUSAL);
+    expect(shaderWarmRefusalLabel(SHADER_WARM_AB_REFUSAL)).toBe(SHADER_WARM_AB_REFUSAL);
+  });
+
   it('maps the empty refusal to none and keeps the known causes whole', () => {
     expect(shaderWarmRefusalLabel('')).toBe('none');
     for (const cause of [
+      'ab:off',
+      'standing-down:silent',
       'hold-timeouts:expired-share',
       'hold-timeouts:wedged',
+      'hold-failures:wedged',
       'cannot-serve:hold-cap',
+      'cannot-serve:hold-cap:censored',
       'ready-timeout',
       'ios-webkit',
       'pagehide',

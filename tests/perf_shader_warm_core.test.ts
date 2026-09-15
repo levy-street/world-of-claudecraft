@@ -19,6 +19,10 @@ const READY: ShaderWarmBeaconInput = {
   warmed: 12,
   held: 5,
   heldTimedOut: 1,
+  holdMs: 5_400,
+  holdWallMs: 1_900,
+  releases: 1,
+  abArm: 'on',
 };
 
 describe('the shader warm beacon block', () => {
@@ -72,6 +76,37 @@ describe('the shader warm beacon block', () => {
     });
     expect(summary).toMatchObject({ warmed: 0, held: 0, heldTimedOut: 3 });
     expect(shaderWarmBeaconSummary({ ...READY, warmed: Number.POSITIVE_INFINITY }).warmed).toBe(0);
+  });
+
+  it('ships the A/B cost fields: hold time summed and on the wall, releases, the arm', () => {
+    // The checkpoint weighs the hold's wall time against the long tasks the
+    // worker saves; the sum counts simultaneous holds once each, so both ride.
+    expect(shaderWarmBeaconSummary(READY)).toMatchObject({
+      holdMs: 5_400,
+      holdWallMs: 1_900,
+      releases: 1,
+      abArm: 'on',
+    });
+    expect(shaderWarmBeaconSummary({ ...READY, abArm: 'off' }).abArm).toBe('off');
+    expect(shaderWarmBeaconSummary({ ...READY, abArm: null }).abArm).toBeNull();
+  });
+
+  it('rounds the hold milliseconds, floors them at zero, and reads a bad arm as no draw', () => {
+    const summary = shaderWarmBeaconSummary({
+      ...READY,
+      holdMs: 1234.6,
+      holdWallMs: -40,
+      releases: 2.9,
+      abArm: 'maybe' as unknown as 'on',
+    });
+    expect(summary).toMatchObject({ holdMs: 1235, holdWallMs: 0, releases: 2, abArm: null });
+    const garbage = shaderWarmBeaconSummary({
+      ...READY,
+      holdMs: Number.NaN,
+      holdWallMs: Number.POSITIVE_INFINITY,
+      releases: Number.NaN,
+    });
+    expect(garbage).toMatchObject({ holdMs: 0, holdWallMs: 0, releases: 0 });
   });
 
   it('pins the text bound to the token bound the server accepts', () => {

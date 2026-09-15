@@ -132,6 +132,7 @@ describe('shaderWarmToken', () => {
       'hold-timeouts:expired-share',
       'cannot-serve:hold-cap',
       'extension-drift:ext_color_buffer_float',
+      'ab:off',
     ]) {
       expect(shaderWarmToken(token)).toBe(token);
     }
@@ -212,6 +213,10 @@ describe('sanitizeShaderWarm', () => {
         warmed: 137,
         held: 42,
         heldTimedOut: 3,
+        holdMs: 18_250,
+        holdWallMs: 4_100,
+        releases: 1,
+        abArm: 'on',
         planted: 'x'.repeat(4000),
         links: [1, 2, 3],
       }),
@@ -225,6 +230,10 @@ describe('sanitizeShaderWarm', () => {
       warmed: 137,
       held: 42,
       heldTimedOut: 3,
+      holdMs: 18_250,
+      holdWallMs: 4_100,
+      releases: 1,
+      abArm: 'on',
     });
   });
 
@@ -240,6 +249,10 @@ describe('sanitizeShaderWarm', () => {
         warmed: 1e9,
         held: -5,
         heldTimedOut: 2.9,
+        holdMs: 1e12,
+        holdWallMs: -3,
+        releases: 1e9,
+        abArm: 'ON',
       }),
     ).toEqual({
       active: false,
@@ -251,6 +264,33 @@ describe('sanitizeShaderWarm', () => {
       warmed: 100_000,
       held: 0,
       heldTimedOut: 2,
+      holdMs: 24 * 60 * 60_000,
+      holdWallMs: 0,
+      releases: 100_000,
+      abArm: 'on',
+    });
+  });
+
+  it('bounds each hold field on its own, by the session and not the phase', () => {
+    const SESSION = 24 * 60 * 60_000;
+    expect(sanitizeShaderWarm({ mode: 'all', holdWallMs: 1e12 })?.holdWallMs).toBe(SESSION);
+    expect(sanitizeShaderWarm({ mode: 'all', holdMs: -40 })?.holdMs).toBe(0);
+    // An hour is past a phase bound and well inside a session.
+    expect(sanitizeShaderWarm({ mode: 'all', holdMs: 3_600_000 })?.holdMs).toBe(3_600_000);
+    expect(sanitizeShaderWarm({ mode: 'all', holdWallMs: 3_600_000 })?.holdWallMs).toBe(3_600_000);
+  });
+
+  it('keeps the A/B arm only as on or off, and zeroes hold fields that are missing', () => {
+    for (const hostile of ['maybe', 'off-ish', 'ab:off', 7, null, { arm: 'on' }]) {
+      expect(sanitizeShaderWarm({ mode: 'all', abArm: hostile })?.abArm).toBe('');
+    }
+    expect(sanitizeShaderWarm({ mode: 'off', abArm: 'off' })?.abArm).toBe('off');
+    // A block from a client that predates the A/B fields still sanitizes.
+    expect(sanitizeShaderWarm({ mode: 'all' })).toMatchObject({
+      holdMs: 0,
+      holdWallMs: 0,
+      releases: 0,
+      abArm: '',
     });
   });
 });

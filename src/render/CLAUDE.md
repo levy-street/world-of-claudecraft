@@ -708,17 +708,27 @@ GPU work signs. Each rule names its seam and its guard.
   must never keep the shader object it was handed), posts them to the worker, and
   holds the gate's link piece until the worker answers or `SHADER_WARM_LANE_HOLD_CAP_MS`
   passes (`shader_warm_lane.ts`; a hold that expires abandons its request so the worker
-  drops what nobody else waits for; three breaker rules retire it for the session:
-  `SHADER_WARM_TIMEOUT_BREAKER` expiries in a row during which the worker settled NOTHING
-  (wedged), or `SHADER_WARM_EXPIRED_SHARE_BREAKER` of the last `SHADER_WARM_HOLD_WINDOW`
+  drops what nobody else waits for; three breaker rules end it:
+  `SHADER_WARM_TIMEOUT_BREAKER` holds in a row during which the worker settled NOTHING
+  (wedged: whether each hold expired on its cap, refusal `hold-timeouts:wedged`, or
+  ended on the worker's own link deadline, refusal `hold-failures:wedged`; the deadline
+  is shorter than the cap, so a single-program hold on a machine whose links never
+  settle always ends the second way, and a rule that counted expiries alone never
+  fired there), or `SHADER_WARM_EXPIRED_SHARE_BREAKER` of the last `SHADER_WARM_HOLD_WINDOW`
   holds expired whatever it answered meanwhile (too slow for the demand); a slow worker
   that keeps most holds served is kept). The third rule fires FIRST, on the worker's own
   evidence and before any hold has paid: once it has settled `SHADER_WARM_EVIDENCE_LINKS`
-  links AND its first stats message has landed (the window is the divisor, and the
-  verdict is final), the queue ahead of the OLDEST outstanding hold, at the mean wall
+  links AND its first stats message has landed (the window is the divisor), the queue
+  ahead of the OLDEST outstanding hold, at the mean wall
   this worker's links have actually cost, spread over the window that message reported,
   is measured against what is left of the cap that hold's caller passed in
-  (`shaderWarmCannotServe`, refusal `cannot-serve:hold-cap`). Ahead is the worker's own
+  (`shaderWarmCannotServe`, refusal `cannot-serve:hold-cap`). Where NO link has settled
+  at all, the links the worker gave up on at `SHADER_WARM_LINK_DEADLINE_MS` stand in as
+  the evidence (the `link-deadline` failure carries the wall the link had run, a lower
+  bound the client keeps apart as `censoredLinks`), at the same floor, under its own
+  refusal `cannot-serve:hold-cap:censored` so the fleet can tell that arm from the
+  baseline; one settled link puts the rule back on the settled evidence, so a tab
+  throttled early on a healthy machine is never judged on its deadlines. Ahead is the worker's own
   order, PRIORITY first and arrival only within one priority, so a live view held behind
   a catalog's backlog is not charged for what the worker serves after it; the caller
   also stamps when its cap clock started (`holdShaderPrograms`' `startedAtMs`), since a
@@ -726,13 +736,26 @@ GPU work signs. Each rule names its seam and its guard.
   construction and carries no machine constant, the caller owning the cap and the worker
   supplying the wall: on the laptop whose links cost about half a second it retires
   seconds early with nothing expired, and where links are ten times shorter it never
-  fires at all. The worker paces its links with the AIMD budget
+  fires at all. That verdict prices ONE burst, so it RELEASES the burst's held gates
+  (they link on the game context at once) and gives their requests back like an expiry
+  does (the worker drops what nobody else waits for: a second link of the same text in its
+  context would only compete for the busy driver); no gate holds again until the worker
+  owes nothing, in practice the links already in flight (bypass `standing-down`, and a hold
+  asked after the release is refused on the spot; a worker silent for two link deadlines
+  while the gates stand down is not ticking and retires as `standing-down:silent`), so the next
+  verdict can only come from a later burst, and the `SHADER_WARM_RELEASE_BREAKER`th
+  retires it. A released hold feeds neither expiry rule (a release with a link deadline
+  inside it would otherwise retire the worker the release kept). Read off a window that
+  had just halved, a final verdict retired a worker that warmed 174 programs on the next
+  launch (RTX 3060, 2026-09-12). The worker paces its links with the AIMD budget
   under a RELATIVE judge (`shader_warm_settle_judge_core.ts`): a settle is read against
   what this driver costs for a link of COMPARABLE size it has to itself, per thousand
   GLSL characters, never against a millisecond bound (the absolute 150/400 ms bounds
   pinned a cold Windows D3D11 at one link for a whole session, on the one backend that
   overlaps links, 2026-08-30); solo evidence opens the window to two and no further,
-  a cache hit teaches nothing, and a halving is followed by a cooldown. The boot lane
+  a cache hit teaches nothing, and a halving is followed by a cooldown. A program the
+  worker's context REJECTS is not congestion and never halves the window (`markRejected`);
+  a link past its deadline still does. The boot lane
   (`link_rate_budget.ts`) still runs the absolute bounds; the seam
   (`AdaptiveLinkBudgetConfig.judgeSettlement`) is how it adopts the same rule later,
   and a unit that linked nothing reaches the judge flagged `cheap` and teaches it
@@ -747,9 +770,15 @@ GPU work signs. Each rule names its seam and its guard.
   bypasses the gates shows up by key; `perfStats().shaderWarm` and
   `perfStats().shaderWarmAudit` are the local readout, and of the worker's half only the
   bounded projection `shaderWarmBeaconSummary` builds (`src/game/perf_shader_warm_core.ts`:
-  worker state, refusal, mode, setting, backend and three counts) rides the perf beacon,
-  as `rawSummary.shaderWarm` plus the typed `shaderWarmWorkerActive` and
-  `shaderWarmRefusal` fields; the audit and the adapter string ride none of it.
+  worker state, refusal, mode, setting, backend, counts, hold time summed and as wall
+  time, releases, and the A/B arm) rides the perf beacon, as `rawSummary.shaderWarm`
+  plus the typed `shaderWarmWorkerActive` and `shaderWarmRefusal` fields; the audit and
+  the adapter string ride none of it. FOR ONE RELEASE `auto` on D3D11 is an A/B
+  experiment (`shaderWarmAbArmFor`, `SHADER_WARM_AB_ACTIVE`): a browser profile draws an
+  arm once (localStorage) and the `off` arm runs the pre-worker path with the refusal
+  token `ab:off`, which is NOT a refusal and a refusal-share reading must exclude; an
+  explicit On or Off is never drawn. The decision PR removes the arm whatever it shows.
+  The readout also names the first programs the worker failed (`failedPrograms`).
   A capture taken under `?diagnostics` also runs the scene census, whose
   bucket-visibility diffs link programs no live frame asks for: those are charged to
   `outOfBand` at the same host hooks that discard the burst's draws

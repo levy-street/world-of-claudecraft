@@ -303,6 +303,76 @@ describe('adaptive link budget core', () => {
     expect(budget.snapshot()).toMatchObject({ state: 'backoff', backoffCount: 3 });
   });
 
+  it('leaves the window where a rejected unit found it, where a failed one halves it', () => {
+    // A program the context refused to link says nothing about how loaded the
+    // driver is: same unit, same moment, the two answers must not agree.
+    const rejected = createAdaptiveLinkBudget(
+      { ...CONFIG, initialWindowLinks: 24 },
+      virtualClock(),
+    );
+    rejected.markSubmitted('unit');
+    rejected.markSyncEnd('unit', 8);
+    rejected.markRejected('unit');
+    expect(rejected.snapshot()).toMatchObject({
+      state: 'ramp',
+      windowLinks: 24,
+      backoffCount: 0,
+      failedUnits: 0,
+      rejectedUnits: 1,
+      settledUnits: 0,
+      inFlightUnits: 0,
+    });
+    expect(rejected.snapshot().transitions).toEqual([]);
+
+    const failed = createAdaptiveLinkBudget({ ...CONFIG, initialWindowLinks: 24 }, virtualClock());
+    failed.markSubmitted('unit');
+    failed.markSyncEnd('unit', 8);
+    failed.markFailed('unit');
+    expect(failed.snapshot()).toMatchObject({
+      state: 'backoff',
+      windowLinks: 12,
+      backoffCount: 1,
+      failedUnits: 1,
+      rejectedUnits: 0,
+    });
+  });
+
+  it('counts a rejection as progress, so the no-progress bound reopens behind it', () => {
+    // Two units in flight past the bound: admission is closed. The context
+    // answering one of them, even with a refusal, is the driver moving.
+    const clock = virtualClock();
+    const budget = createAdaptiveLinkBudget(CONFIG, clock);
+    budget.markSubmitted('a');
+    budget.markSyncEnd('a', 8);
+    budget.markSubmitted('b');
+    budget.markSyncEnd('b', 8);
+    clock.advance(CONFIG.noProgressMs);
+    expect(budget.canSubmit()).toBe(false);
+    budget.markRejected('a');
+    expect(budget.canSubmit()).toBe(true);
+    // An id it is not carrying changes nothing.
+    budget.markRejected('a');
+    budget.markRejected('404');
+    expect(budget.snapshot()).toMatchObject({ rejectedUnits: 1, inFlightUnits: 1 });
+  });
+
+  it('reopens a stalled lane on a late rejection the way a late settle does', async () => {
+    // Past the stall the answer is late whatever it says, and lateness is the
+    // evidence the halving encodes: the lane reopens on the halved window.
+    const clock = virtualClock();
+    const budget = createAdaptiveLinkBudget(CONFIG, clock);
+    budget.markSubmitted('slow:0');
+    budget.markSyncEnd('slow:0', 12);
+    expect(await budget.awaitSlot(() => false)).toBe(false);
+    expect(budget.snapshot().state).toBe('stalled');
+    clock.advance(500);
+    budget.markRejected('slow:0');
+    expect(budget.snapshot()).toMatchObject({ state: 'backoff', windowLinks: 8, rejectedUnits: 1 });
+    // Logged as the failure it stands for, not as a slow settle.
+    expect(budget.snapshot().transitions.at(-1)?.reason).toBe('failed');
+    expect(budget.canSubmit()).toBe(true);
+  });
+
   it('reopens a stalled lane on the next settle, halved, and grows it again after', async () => {
     const clock = virtualClock();
     const budget = createAdaptiveLinkBudget(CONFIG, clock);
