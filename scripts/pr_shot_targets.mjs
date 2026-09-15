@@ -2118,6 +2118,107 @@ export const TARGETS = [
     },
   },
   {
+    key: 'stonebound-shell',
+    label: 'Stonebound weapon shell: wireframe on an antialiased tier, solid sheath with no AA',
+    when: ['characters/stonebound_shell_core', 'render/characters/visual.ts'],
+    variants: [
+      // The bug arm: Low runs with no antialiasing pass at all, so the wireframe
+      // shell crawled over the weapon. This is a graphics COMPARISON, the one
+      // sanctioned reason a shot keeps a preset other than the lowest.
+      {
+        key: 'low-desktop',
+        charClass: 'shaman',
+        charName: 'Ashka',
+        beforeLoad: lowGraphicsSeed,
+      },
+      // The control arm: Medium carries the fused FXAA grade pass, so the
+      // wireframe stays and the pair must be IDENTICAL before and after.
+      {
+        key: 'medium-desktop',
+        charClass: 'shaman',
+        charName: 'Ashka',
+        beforeLoad: async (page) => {
+          await page.evaluateOnNewDocument(
+            `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 2; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+          );
+        },
+      },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await awaitVeilSettled(page);
+      // The shell is a DISPLAY derivation of the worn aura ids
+      // (character_effects.ts characterWeaponAuraMode), so the recipe seeds the
+      // Stonebound Weapon aura directly: the claim is about how the shell is
+      // drawn, never about how the buff came to exist.
+      const staged = await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p || !Array.isArray(p.auras)) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        if (!p.auras.some((a) => a.id === 'rockbiter_weapon')) {
+          p.auras.push({
+            id: 'rockbiter_weapon',
+            name: 'Stonebound Weapon',
+            kind: 'buff_ap',
+            remaining: 1800,
+            duration: 1800,
+            value: 0,
+            sourceId: p.id,
+            school: 'nature',
+          });
+        }
+        // Face the camera so the held weapon reads, and pull the camera in.
+        p.facing = Math.PI;
+        p.prevFacing = p.facing;
+        game.input.camDist = 4.5;
+        return { ok: true, id: p.id };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Hold until the rig has actually built the shell meshes: the aura mode
+      // rides the per-frame view sync and the held weapon its own GLB load.
+      await page.waitForFunction(
+        (id) =>
+          (window.__game?.renderer?.views?.get(id)?.visual?.weaponAuraMeshes?.length ?? 0) > 0,
+        { timeout: 45000, polling: 250 },
+        staged.id,
+      );
+      await wait(1500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      const spot = await page.evaluate((id) => {
+        const r = window.__game?.renderer;
+        const v = r?.views?.get?.(id);
+        if (!r || !v) return null;
+        const p = v.group.position.clone();
+        p.y += (v.height ?? 1.8) * 0.55;
+        p.project(r.camera);
+        return {
+          x: (p.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-p.y * 0.5 + 0.5) * window.innerHeight,
+          w: window.innerWidth,
+          h: window.innerHeight,
+        };
+      }, staged.id);
+      if (spot) {
+        const width = Math.min(640, spot.w);
+        const height = Math.min(640, spot.h);
+        const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
+        const y = Math.max(0, Math.min(spot.h - height, spot.y - height / 2));
+        await page.screenshot({
+          path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/stonebound-shell-${variant.key}-closeup.png`,
+          clip: { x, y, width, height },
+        });
+      }
+      return {};
+    },
+  },
+  {
     key: 'target-auras',
     label: 'Target aura window with offensive and healing-over-time effects',
     when: ['target_auras'],

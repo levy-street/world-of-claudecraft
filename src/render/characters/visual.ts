@@ -100,6 +100,11 @@ import { configureTightBoneTextures } from './skin_gpu_layout';
 import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
+import {
+  STONEBOUND_SHARD_TINT,
+  STONEBOUND_SHELL_TINT,
+  stoneboundShellStyle,
+} from './stonebound_shell_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
@@ -2795,10 +2800,13 @@ export class CharacterVisual {
       if (o.userData.swapWeaponHolder) weaponHolders.push(o);
     });
 
-    // Structural channel: Stonebound sheathes EVERY held weapon in a wireframe
-    // stone shell and plates the body with shards. Independent of the imbue
-    // color below, which only ever soaks the mainhand.
+    // Structural channel: Stonebound sheathes EVERY held weapon in a stone
+    // shell and plates the body with shards. Independent of the imbue color
+    // below, which only ever soaks the mainhand. The shell is a wireframe on
+    // an antialiased frame and a solid translucent sheath when no AA pass runs
+    // (stonebound_shell_core.ts: a one-pixel wireframe crawls without AA).
     if (stonebound) {
+      const style = stoneboundShellStyle(GFX);
       for (const holder of weaponHolders) {
         holder?.traverse((o) => {
           const mesh = o as THREE.Mesh;
@@ -2806,13 +2814,13 @@ export class CharacterVisual {
           const aura = new THREE.Mesh(
             mesh.geometry,
             new THREE.MeshBasicMaterial({
-              color: 0x9a9384,
+              color: STONEBOUND_SHELL_TINT,
               transparent: true,
-              opacity: 0.72,
+              opacity: style.shellOpacity,
               depthWrite: false,
               blending: THREE.NormalBlending,
               side: THREE.DoubleSide,
-              wireframe: true,
+              wireframe: style.wireframe,
             }),
           );
           aura.position.copy(mesh.position);
@@ -2824,7 +2832,7 @@ export class CharacterVisual {
           this.weaponAuraMeshes.push(aura);
         });
       }
-      this.buildStoneboundArmorShards();
+      this.buildStoneboundArmorShards(style.wireframe, style.shardOpacity);
     }
 
     if (this.weaponAuraColor === null) return;
@@ -2861,7 +2869,7 @@ export class CharacterVisual {
     });
   }
 
-  private buildStoneboundArmorShards(): void {
+  private buildStoneboundArmorShards(wireframe: boolean, opacity: number): void {
     const placements = [
       { x: -0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: -0.35 },
       { x: 0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: 0.35 },
@@ -2871,10 +2879,10 @@ export class CharacterVisual {
       const shard = new THREE.Mesh(
         STONEBOUND_SHARD_GEOMETRY,
         new THREE.MeshBasicMaterial({
-          color: 0x777065,
+          color: STONEBOUND_SHARD_TINT,
           transparent: true,
-          opacity: 0.82,
-          wireframe: true,
+          opacity,
+          wireframe,
           depthWrite: false,
         }),
       );
