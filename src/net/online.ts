@@ -169,6 +169,7 @@ import {
   type ToolEffectSlotView,
   type TradeInfo,
   type VaultInfo,
+  type WhoRosterInfo,
 } from '../world_api';
 import {
   type ActionBarLayout,
@@ -249,8 +250,10 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import { socialInfoFromFrame } from './social_frame_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
+import { whoRosterFromFrame } from './who_frame_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
 
@@ -1330,6 +1333,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
   // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
   socialInfo: SocialInfo | null = null;
+  // The Who tab's roster, set ONLY by the `who` frame (answer to `whoRequest`).
+  whoInfo: WhoRosterInfo | null = null;
   // Operator-set account flair (cosmetic), keyed by LOWERCASED character name and
   // read back by `accountFlair`. Fed from BOTH wire sources: the entity identity
   // record (players inside the ~120yd interest scope) and the `flair` on a chat
@@ -2335,6 +2340,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.pendingDungeonEntryFacing = null;
         this.missingSince.clear();
         this.lastSnapAt = 0;
+        this.whoInfo = null; // the old transport's roster is stale; the tab re-asks
         // any in-flight target echo died with the old transport; the resent
         // world's value must apply from the first snapshot
         this.pendingTargetEcho = null;
@@ -2468,26 +2474,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     if (msg.t === 'social') {
-      // The pledge-board fields are normalized with defaults so an older
-      // server's frame (no pledge board) still yields a fully-shaped mirror:
-      // settings read as accepting (the feature's default), no open pledges,
-      // tier 0, no standing pledge.
-      const guild = msg.guild
-        ? {
-            ...msg.guild,
-            pledgeSettings: msg.guild.pledgeSettings ?? { enabled: true, minLevel: 1, note: '' },
-            pledges: msg.guild.pledges ?? [],
-            tier: msg.guild.tier ?? 0,
-          }
-        : null;
-      this.socialInfo = {
-        friends: msg.friends ?? [],
-        blocks: msg.blocks ?? [],
-        ignores: msg.ignores ?? [],
-        guild,
-        myPledge: msg.myPledge ?? null,
-      };
+      this.socialInfo = socialInfoFromFrame(msg);
       this.socialDirty = true;
+      return;
+    }
+    if (msg.t === 'who') {
+      // The Who tab's roster answer; a frame with no usable roster keeps the last.
+      const roster = whoRosterFromFrame(msg);
+      if (roster) this.whoInfo = roster;
       return;
     }
     if (msg.t === 'socialpos') {
@@ -4613,6 +4607,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   guildBuyRosterPage(): void {
     this.cmd({ cmd: 'guild_buy_roster_page' });
+  }
+  whoRequest(filter: string): void {
+    this.cmd({ cmd: 'who', filter });
   }
   async searchCharacters(query: string): Promise<CharacterSearchResult[]> {
     const q = query.trim();

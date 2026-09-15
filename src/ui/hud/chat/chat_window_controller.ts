@@ -3,6 +3,7 @@ import { esc } from '../../esc';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { blurIfPointerClick } from '../../pointer_blur';
 import { rovingTarget } from '../../roving_index';
+import { parseWhoCommand } from '../../who_tab_view';
 import { tryEncodeItemLink, tryEncodeQuestLink } from '../quest/quest_link';
 import {
   CHANNEL_LABEL_KEYS,
@@ -60,6 +61,8 @@ export interface ChatWindowControllerDeps {
   selectedQuestId(): string | null;
   hasQuest(questId: string): boolean;
   showError(text: string): void;
+  /** Open the Social window's Who tab with a server-side filter; false offline. */
+  openWhoTab(filter: string): boolean;
   afterTabShown?(pane: HTMLElement): void;
 }
 
@@ -183,6 +186,16 @@ export class ChatWindowController {
 
   clearPendingLinks(): void {
     this.pendingLinks = [];
+  }
+
+  // The chat commands the CLIENT answers before a line reaches the world:
+  // `/who [filter]` opens the Social window's Who tab online (offline it falls
+  // through, and the Sim prints its classic "online play only" line), and
+  // `/share` links the selected quest. Returns true when the line was consumed.
+  maybeHandleLocalChatCommand(raw: string): boolean {
+    const whoFilter = parseWhoCommand(raw);
+    if (whoFilter !== null && this.deps.openWhoTab(whoFilter)) return true;
+    return this.maybeHandleQuestShareCommand(raw);
   }
 
   maybeHandleQuestShareCommand(raw: string): boolean {

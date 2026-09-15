@@ -12230,6 +12230,104 @@
   .soc-group-head:first-of-type {
     border-top: 0;
   }
+  /* Who tab: the count line + class chip band, then a sortable table. Both
+     escape the responsive two-column .soc-body grid (grid-column: 1 / -1) and
+     the table keeps its own column tracks so the header buttons and every
+     row's cells line up; rows use display: contents so the cells are the grid
+     items. The dot and name cells reuse the friend-row look. */
+  .soc-who-head {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 4px 6px;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .soc-who-count {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .soc-who-capped {
+    color: var(--color-text-muted);
+  }
+  .soc-who-cls {
+    flex: 0 0 auto;
+    max-width: 12em;
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+  .soc-who-list {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto minmax(7em, 1.4fr) 3em minmax(5em, 1fr) minmax(6em, 1.4fr) minmax(
+        5em,
+        1fr
+      );
+    align-items: center;
+    column-gap: 8px;
+  }
+  .soc-who-row,
+  .soc-who-meta {
+    display: contents;
+  }
+  .soc-who-cell {
+    min-width: 0;
+    padding: 6px 2px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+  .soc-who-cell.who-level {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .soc-who-cell.who-cls,
+  .soc-who-cell.who-zone,
+  .soc-who-cell.who-guild {
+    color: var(--color-text-muted);
+  }
+  .soc-who-cell .soc-name {
+    display: inline;
+  }
+  /* The dot is a flex item in the friend rows; here it sits in an inline cell,
+     so it needs an inline-block box to keep its width and height. */
+  .soc-who-cell .soc-dot {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .soc-who-header .soc-who-cell {
+    padding: 2px 2px 4px;
+    border-bottom: 1px solid var(--gold-dim);
+  }
+  .soc-who-sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+  }
+  .soc-who-sort:hover,
+  .soc-who-sort.on {
+    color: var(--gold);
+  }
+  .soc-who-sort:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .soc-who-dir svg {
+    width: 10px;
+    height: 10px;
+    fill: currentColor;
+  }
   /* Raid tab: the two groups sit side by side in the landscape window (falling
      back to stacked on mobile-touch). It escapes the `.soc-body` grid flow
      above with `grid-column: 1 / -1` so it keeps its own explicit grid instead

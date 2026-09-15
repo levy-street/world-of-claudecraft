@@ -14,7 +14,6 @@ import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
-import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
@@ -443,6 +442,16 @@ import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
 import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
+import {
+  buildWhoRosterEntries,
+  canShowInWho,
+  normalizeWhoFilter,
+  visibleWhoRows,
+  type WhoRosterEntry,
+  type WhoRosterRow,
+  whoChatLines,
+  whoFrame,
+} from './who_roster';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { isBackpressureExceeded } from './ws_backpressure';
@@ -488,7 +497,6 @@ const CHAT_RATE_REFILL_PER_SECOND = 1 / 3; // sustained 20 messages/minute
 const CHAT_RATE_ERROR_COOLDOWN_SECONDS = 4;
 const CHAT_COOLDOWN_SECONDS = 20;
 const CHAT_RATE_VIOLATIONS_FOR_COOLDOWN = 3;
-const WHO_RESULT_LIMIT = 50;
 // One live session per account: Ravenpost mail (v0.20.0) moves coin and goods
 // between an account's characters, so the old allowance of a second online
 // character (self-trade by dual-boxing) is no longer needed. GMs are exempt.
@@ -1222,14 +1230,6 @@ export interface RestartCountdownStatus {
   remainingSeconds: number;
 }
 
-interface WhoRosterRow {
-  name: string;
-  cls: string;
-  level: number;
-  zone: string;
-  status: PresenceStatus;
-}
-
 type RememberedChat =
   | {
       channel:
@@ -1643,6 +1643,8 @@ export class GameServer {
   // rules call a defect. Built once per broadcast pass and handed to every
   // bgInfoFor call in that pass instead.
   private readonly bgLadderReadout = createRealmReadoutMemo<BgLadderEntry[]>();
+  // The /who roster (chat command and the Who tab), rebuilt at most once per tick.
+  private readonly whoRosterReadout = createRealmReadoutMemo<WhoRosterEntry<ClientSession>[]>();
   // When the realm-wide Vale Cup readout is next due, tracked realm-global (not
   // per session) so every viewer still gates together in one pass and the memo
   // above builds once. `>=` against this, never `tickCount % interval`:
@@ -2580,7 +2582,7 @@ export class GameServer {
         // membership), so this tracked id can stay in socialTrackedIds long
         // after a block either way. Refuse to leak live position across it,
         // the same bidirectional rule canShowInWho already applies to /who.
-        if (!this.canShowInWho(session, other)) continue;
+        if (!canShowInWho(session, other)) continue;
         const loc = this.presenceOf(other);
         if (loc.x === undefined || loc.z === undefined) continue;
         // The live Book of Deeds title (sim meta, no DB read); the `social`
@@ -6968,17 +6970,10 @@ export class GameServer {
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
         if (whoMatch) {
-          // Optional filter: "/who Mr" lists only players whose name OR zone
-          // contains "Mr" (case-insensitive). Zone names carry spaces
-          // ("Thornpeak Heights"), so keep spaces: strip only double-quotes
-          // and control chars, collapse internal whitespace, and cap the
-          // length, so the echoed query stays a clean, single-line token.
-          const filter = (whoMatch[1] ?? '')
-            .replace(/[\p{Cc}"]/gu, '')
-            .trim()
-            .replace(/\s+/g, ' ')
-            .slice(0, 32);
-          this.sendWhoRoster(session, filter || undefined);
+          // Optional filter: "/who Mr" lists only players whose name, zone, or
+          // guild contains "Mr" (case-insensitive); server/who_roster.ts owns
+          // the sanitizer and the projection.
+          this.sendWhoRoster(session, normalizeWhoFilter(whoMatch[1]) || undefined);
           break;
         }
         // Hard-word + mute enforcement gate, applied to every channel before the
@@ -7202,6 +7197,15 @@ export class GameServer {
         break;
       case 'duel_decline':
         sim.duelDecline(pid);
+        break;
+      // The Social window's Who tab: the /who roster as a structured frame
+      // (server/who_roster.ts), metered on the list-read guard (a readout, never
+      // the chat lane). Silent while the viewer's own block list is still
+      // loading: the client re-asks on its slow tick.
+      case 'who':
+        if (!this.consumeListRead(session, receivedAtMs / 1000)) break;
+        if (!session.blockListLoaded) break;
+        this.send(session, whoFrame(this.whoRosterFor(session), normalizeWhoFilter(msg.filter)));
         break;
       // social: friends / ignore / guild (persistent, account-scoped)
       case 'friend_add':
@@ -9968,71 +9972,32 @@ export class GameServer {
       });
       return;
     }
-    let rows = this.whoRosterFor(session);
-    if (filter) {
-      const q = filter.toLowerCase();
-      rows = rows.filter(
-        (row) => row.name.toLowerCase().includes(q) || row.zone.toLowerCase().includes(q),
-      );
-    }
-    const total = rows.length;
-    const header = filter
-      ? `Who: ${total} ${total === 1 ? 'player' : 'players'} matching "${filter}" on ${REALM}.`
-      : `Who: ${total} ${total === 1 ? 'player' : 'players'} online on ${REALM}.`;
-    const list: { type: 'log'; text: string; color: string }[] = [
-      {
-        type: 'log',
-        text: header,
-        color: '#7fd4ff',
-      },
-    ];
-    for (const row of rows.slice(0, WHO_RESULT_LIMIT)) {
-      const status = row.status === 'online' ? '' : ` (${row.status})`;
-      list.push({
-        type: 'log',
-        text: `${row.name} - level ${row.level} ${row.cls} - ${row.zone}${status}`,
-        color: '#c9b27a',
-      });
-    }
-    if (total > WHO_RESULT_LIMIT) {
-      list.push({
-        type: 'log',
-        text: `...and ${total - WHO_RESULT_LIMIT} more.`,
-        color: '#998d6a',
-      });
-    }
-    this.send(session, { t: 'events', list });
+    this.send(session, {
+      t: 'events',
+      list: whoChatLines(this.whoRosterFor(session), filter ?? '', REALM),
+    });
   }
 
+  // The realm-wide roster, built and name-sorted at most ONCE per sim tick for
+  // every viewer (the realm-readout memo seam), each entry keeping a live
+  // session handle for the per-viewer visibility rule. Zone + status only:
+  // presenceOf also carries the live x/z, which the Who tab's frame must never
+  // ship realm-wide (positions stay friend/guild-gated on the socialpos frame).
+  private whoRosterEntries(): readonly WhoRosterEntry<ClientSession>[] {
+    return realmReadoutObject(this.whoRosterReadout, this.sim.tickCount, () =>
+      buildWhoRosterEntries(this.clients.values(), (session) => {
+        const e = this.sim.entities.get(session.pid);
+        const meta = this.sim.meta(session.pid);
+        if (!e || !meta) return null;
+        const { zone, status } = this.presenceOf(session);
+        return { name: session.name, cls: meta.cls, level: e.level, guild: e.guild, zone, status };
+      }),
+    );
+  }
+
+  // The rows THIS viewer may see (canShowInWho: bidirectional blocks, fail-closed).
   private whoRosterFor(viewer: ClientSession): WhoRosterRow[] {
-    const rows: WhoRosterRow[] = [];
-    for (const session of this.clients.values()) {
-      if (!this.canShowInWho(viewer, session)) continue;
-      const e = this.sim.entities.get(session.pid);
-      const meta = this.sim.meta(session.pid);
-      if (!e || !meta) continue;
-      rows.push({
-        name: session.name,
-        cls: meta.cls,
-        level: e.level,
-        ...this.presenceOf(session),
-      });
-    }
-    return rows.sort((a, b) => a.name.localeCompare(b.name));
-  }
-
-  private canShowInWho(viewer: ClientSession, candidate: ClientSession): boolean {
-    // Fail closed while the candidate's block list is still loading: showing
-    // them in /who before we know their blocks could leak presence to
-    // someone they've blocked.
-    if (!candidate.blockListLoaded) return false;
-    if (viewer.blockedIds.has(candidate.characterId)) return false;
-    if (
-      candidate.characterId !== viewer.characterId &&
-      candidate.blockedIds.has(viewer.characterId)
-    )
-      return false;
-    return true;
+    return visibleWhoRows(this.whoRosterEntries(), viewer);
   }
 
   private broadcastSystem(text: string): void {

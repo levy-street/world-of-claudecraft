@@ -5722,6 +5722,31 @@ export const hudChromeStrings = {
     // Blocked also stops whispers, invites and mail. (Neither is the admin mute.)
     ignoredTab: 'Ignored',
     blockedTab: 'Blocked',
+    // The Who tab: the realm's online roster as a searchable, sortable table
+    // (the classic /who command's home in the UI; typing /who opens it). The
+    // search runs server-side over name, zone, and guild; the class chip and
+    // the column sort are local. {total} is the uncapped match count, {shown}
+    // the rows on screen after the class chip, {delivered} the server's cap.
+    // Wordy, M16: the five non-Latin fills land in this same change.
+    who: {
+      tab: 'Who',
+      searchPlaceholder: 'Name, zone, or guild',
+      search: 'Search',
+      loading: 'Asking the realm who is online...',
+      empty: 'No players match.',
+      count: '{total} online',
+      countFiltered: '{shown} of {total} online',
+      capped: 'Showing the first {delivered}. Narrow the search to see the rest.',
+      classFilter: 'Filter by class',
+      allClasses: 'All classes',
+      colStatus: 'Status',
+      colName: 'Name',
+      colLevel: 'Level',
+      colClass: 'Class',
+      colZone: 'Zone',
+      colGuild: 'Guild',
+      sortTitle: 'Sort by {column}',
+    },
     ignoredEmpty: 'You are not ignoring anyone.',
     blockedEmpty: 'You have not blocked anyone.',
     blockSearchPlaceholder: 'Player name',

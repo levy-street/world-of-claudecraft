@@ -22,6 +22,7 @@ import type {
   ToolEffectSlotView,
 } from '../world_api';
 import type { GroundAimPointXZ } from '../world_api/combat';
+import { abilityNeedsLineOfSight } from './ability_line_of_sight';
 import type { AbilityOutputScaling } from './ability_output_scaling';
 import { autoEquipFamilyConflict } from './auto_equip_gate';
 import * as bagsMod from './bags';
@@ -6959,17 +6960,6 @@ export class Sim {
     cancelCastImpl(this.ctx, p);
   }
 
-  private abilityNeedsLineOfSight(ability: AbilityDef, source?: Entity): boolean {
-    if (!ability.requiresTarget) return false;
-    if (ability.school !== 'physical' || ability.range > MELEE_RANGE) return true;
-    // Melee/auto-attack skips line of sight everywhere else (it is always at
-    // point-blank range), but the arena's thin enclosing walls sit well within
-    // MELEE_RANGE: without this, a combatant pressed against a wall can swing
-    // through it at an opponent on the far side. Ranked fairness requires every
-    // attack to respect the same walls movement does inside the pit.
-    return source !== undefined && isArenaPos(source.pos.x);
-  }
-
   private hasLineOfSight(source: Entity, target: Entity): boolean {
     // The delve-run lookup is O(active runs x mobs per run) and allocates a
     // party key per call, and this method sits on every ranged auto-attack,
@@ -6995,7 +6985,7 @@ export class Sim {
   }
 
   private lineOfSightBlocked(source: Entity, target: Entity, ability: AbilityDef): boolean {
-    return this.abilityNeedsLineOfSight(ability, source) && !this.hasLineOfSight(source, target);
+    return abilityNeedsLineOfSight(ability, source) && !this.hasLineOfSight(source, target);
   }
 
   private pushbackCast(p: Entity): void {
@@ -9786,6 +9776,9 @@ export class Sim {
     return OFFLINE_GUILD_BANK_LOG;
   }
   guildBankLogOlder(): void {}
+  // The Who roster is a realm read, so offline it is null and the request inert.
+  whoInfo: null = null;
+  whoRequest(_filter: string): void {}
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
   }

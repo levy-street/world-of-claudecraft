@@ -107,6 +107,7 @@ function makeHarness(
     selectedQuestId: () => selectedQuest,
     hasQuest: (questId) => questId === 'q_wolves' || questId === ODD_QUEST_ID,
     showError: (text) => errors.push(text),
+    openWhoTab: () => false,
     afterTabShown: (pane) => shownPanes.push(pane),
   });
   return {
@@ -260,18 +261,41 @@ describe('ChatWindowController', () => {
     expect(harness.controller.composeSend('[Thin the Pack]')).toBe('/say [Thin the Pack]');
   });
 
+  it('routes /who to the Social window Who tab online, and falls through offline', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+    // offline: openWhoTab declines (the harness default), so the line is NOT
+    // consumed and reaches the world, where the Sim prints its classic line
+    expect(harness.controller.maybeHandleLocalChatCommand('/who Thornpeak')).toBe(false);
+    expect(harness.sent).toEqual([]);
+    // online: the tab takes the trimmed filter and the line never reaches chat
+    const online = makeHarness();
+    const opened: string[] = [];
+    (online.controller as unknown as { deps: { openWhoTab(f: string): boolean } }).deps.openWhoTab =
+      (f) => {
+        opened.push(f);
+        return true;
+      };
+    online.controller.init();
+    expect(online.controller.maybeHandleLocalChatCommand('/who  Thornpeak ')).toBe(true);
+    expect(online.controller.maybeHandleLocalChatCommand('/WHO')).toBe(true);
+    expect(online.controller.maybeHandleLocalChatCommand('/whoa')).toBe(false);
+    expect(opened).toEqual(['Thornpeak', '']);
+    expect(online.sent).toEqual([]);
+  });
+
   it('handles quest sharing through the injected authoritative quest state', () => {
     const missing = makeHarness();
     missing.controller.init();
-    expect(missing.controller.maybeHandleQuestShareCommand('/share')).toBe(true);
+    expect(missing.controller.maybeHandleLocalChatCommand('/share')).toBe(true);
     expect(missing.sent).toEqual([]);
     expect(missing.errors).toHaveLength(1);
 
     const selected = makeHarness({}, 'q_wolves');
     selected.controller.init();
-    expect(selected.controller.maybeHandleQuestShareCommand('/share now')).toBe(true);
+    expect(selected.controller.maybeHandleLocalChatCommand('/share now')).toBe(true);
     expect(selected.sent).toEqual(['/p [[q:q_wolves]]']);
-    expect(selected.controller.maybeHandleQuestShareCommand('/party hello')).toBe(false);
+    expect(selected.controller.maybeHandleLocalChatCommand('/party hello')).toBe(false);
   });
 
   // #2459: three encode sites used to mint a token from an id the chat parser
@@ -324,7 +348,7 @@ describe('ChatWindowController', () => {
     harness.controller.init();
 
     // The command is still consumed (it is a /share), but nothing goes out.
-    expect(harness.controller.maybeHandleQuestShareCommand('/share')).toBe(true);
+    expect(harness.controller.maybeHandleLocalChatCommand('/share')).toBe(true);
     expect(harness.sent).toEqual([]);
     // Which string, spelled out: "can't be shared" is the truthful outcome, and
     // the sibling "select a quest" copy would be a lie here (one IS selected and

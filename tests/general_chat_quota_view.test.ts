@@ -167,6 +167,7 @@ function makeChatWindow(activeTab: 'world' | 'general', chatLog: HTMLElement) {
     selectedQuestId: () => null,
     hasQuest: () => false,
     showError: () => {},
+    openWhoTab: () => false,
   });
   Object.assign(chatWindow as unknown as Record<string, unknown>, { activeChatTab: activeTab });
   return chatWindow;

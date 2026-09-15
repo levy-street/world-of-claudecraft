@@ -515,7 +515,7 @@ const ANSWERED: readonly AnsweredSurface[] = [
     file: 'social_window.ts',
     memos: ['lastContent', 'lastStruct'],
     answer: 'this.socialWindow.relocalize',
-    why: 'the tab plus the friend/guild/raid rosters, split structural and content (#2529)',
+    why: 'the tab plus the friend/guild/who/raid rosters, split structural and content (#2529)',
   },
   {
     file: 'spellbook_window.ts',
