@@ -61,6 +61,18 @@ export const GFX_TIER_RANK: Record<GfxTier, number> = {
   insane: 4,
 };
 
+/** XZ cell size (yd) the zone-feature dressing is split into for the
+ *  per-group cull (zone_feature_cells_core.ts), on both arms: the classic
+ *  arm's fog sheds the cells, the far-vista arm's apparent-size reach does
+ *  (which arm a session runs is farFieldPolicy's decision, far_terrain_core
+ *  .ts, read by the consumer, never restated here). 180 yd on the
+ *  Willowfen: 6 cells and 26 meshes, one cell inside
+ *  the 340 yd low fog from Eastbrook (34 of 324 placements). 130 yd isolated
+ *  fewer placements (13) but cost 46 meshes, measured at up to 27 fen draws
+ *  at the Bridgemere hub against 5 whole; 180 halves that growth for a town
+ *  gain still above 90 percent. */
+export const ZONE_FEATURE_CELL_SIZE = 180;
+
 /** True when `tier` sits at or above `floor` on the quality ladder. */
 export function gfxTierAtLeast(tier: GfxTier, floor: GfxTier): boolean {
   return GFX_TIER_RANK[tier] >= GFX_TIER_RANK[floor];

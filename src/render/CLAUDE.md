@@ -56,6 +56,17 @@ Everything else is a sibling module in one of these families:
   crowd knee, the per-tier `GFX.farCharacterAnimScale` ceiling, and live budget
   pressure; cosmetic-only, and `showsStaticFarMesh` keeps anything a player
   reacts to out of the frozen mesh inside the uncrowded base range).
+- **Zone-feature cull:** `zone_feature_sweep.ts` is the per-frame sweep the renderer
+  drives over every attached feature cull group, a thin consumer of
+  `zone_feature_visibility_core.ts` (the fog or detail-horizon rule on the group's
+  XZ footprint, the apparent-size reach, the sun-shadow range with hysteresis). A
+  feature module registers sub-groups through `cullGroups` (the water flora's
+  per-region groups, the Willowfen's per-(family, cell) groups) and may set
+  `ZONE_FEATURE_EXTENT_KEY` on a DRESSING group to opt into the reach: the group is
+  shed once its largest instance is under `ZONE_FEATURE_MIN_APPARENT_PX` at the fixed
+  reference view, so a one-off giant keeps its whole group to the horizon with nothing
+  to write anywhere. Never on a collider-backed family (the distance rule alone), never
+  a per-family distance table.
 - **Zone streaming + residency:** `zone_streaming.ts` (pure policy: WHICH
   zones to materialize and in what order, feeding the renderer's background
   prepare queue), `chunk_residency_core.ts` (chunk-level "how far can the
@@ -224,7 +235,12 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
 - `prewarm_pass.ts` sequences the BACKGROUND zone prewarm (live frames keep
   rendering, so its groups MUST stay invisible; hidden objects still link
   their programs because compile traverses via `scene.traverse`, not
-  `traverseVisible`).
+  `traverseVisible`). One documented exception in `withHiddenPrewarmGroups`:
+  a reveal that lands INSIDE its window is kept, because the only other
+  writer of a feature group's visibility there is its own gated attach, whose
+  reveal follows the gate's colour, shadow, settle, upload and touch arms, so
+  it draws linked programs only; restoring the captured "hidden" over it left
+  a lazily built feature invisible for good (the Willowfen dressing).
 - Shared machinery: `compile_gate.ts` (fail-soft async shader-compile gating
   that also BOUNDS in-flight driver links during snapshot bursts, plus the
   `SerialGateLane` for gates that arrive in a burst), `linked_program_touch.ts`
