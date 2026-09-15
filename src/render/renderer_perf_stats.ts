@@ -14,6 +14,7 @@ import type { FoliagePerfStats } from './foliage';
 import type { GfxBucketBands, GfxBucketLevels, GfxRuntimeBudget } from './gfx';
 import type { GpuPrepBudgetSnapshot } from './gpu_prep_budget_core';
 import type { GpuPrepEventsSnapshot } from './gpu_prep_events';
+import type { GpuTimerSnapshot } from './gpu_timer_probe_core';
 import type { PostShedRung } from './post_shed_core';
 import type { RendererPrewarmStats } from './prewarm_compile_lifecycle';
 import type { RenderBudgetState } from './render_budget';
@@ -175,6 +176,10 @@ export interface RendererPerfStats {
   entryDetailHorizon: EntryDetailHorizonSnapshot;
   gpuQueue: BackgroundGpuQueueStats;
   gpuPrep: RendererGpuPrepStats;
+  /** GPU-side time per bracket (gpu_timer_probe_core.ts): `available` only
+   *  under `?gputimer=1` on a context with EXT_disjoint_timer_query_webgl2.
+   *  Dev diagnostic: the perf beacon never ships it. */
+  gpuTimer: GpuTimerSnapshot;
   /** Main-thread construction ms by kind (view builds by class, zone feature
    *  builders), the worst frame and the slowest single builds. */
   buildLedger: BuildLedgerSnapshot;

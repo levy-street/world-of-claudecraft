@@ -67,6 +67,13 @@
 //                  screenshot reads a known rung instead of racing the
 //                  governor's cooldowns. The same parameter's `off` value is
 //                  the layer kill switch above.
+//   ?gputimer=1 - the GPU timer probe (gpu_timer_probe.ts): per-bracket GPU
+//                  time from EXT_disjoint_timer_query_webgl2 (shadow, scene,
+//                  and each composer pass) into perfStats().gpuTimer and the
+//                  ?perf overlay. Never on for players: the extension has a
+//                  per-query cost and is fingerprint-grade, and it joins the
+//                  context's enabled extension set, so a session under this
+//                  flag is not a warm-cache twin of one without it.
 
 /**
  * Sectors per axis each blade-grass pool splits its slot grid into. Four is
@@ -155,4 +162,14 @@ const postShedPin = ((): number | null => {
  *  otherwise not a number. */
 export function postShedLevelPin(): number | null {
   return postShedPin;
+}
+
+const gpuTimer = ((): boolean => {
+  if (typeof location === 'undefined') return false;
+  return new URLSearchParams(location.search).get('gputimer') === '1';
+})();
+
+/** True under `?gputimer=1`: run the GPU timer probe (dev only, never a player default). */
+export function gpuTimerRequested(): boolean {
+  return gpuTimer;
 }

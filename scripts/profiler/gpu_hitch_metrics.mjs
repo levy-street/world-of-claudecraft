@@ -103,6 +103,10 @@ const MEASUREMENT_KEYS = Object.freeze([
   'modular',
   'modularpeers',
   'gfx',
+  // The GPU timer probe (src/render/gpu_timer_probe.ts): an extra enabled
+  // extension, a query per bracket, and the shader-warm worker retired, so a
+  // leg under it is never the control of one without it.
+  'gputimer',
 ]);
 
 /**
@@ -140,6 +144,7 @@ export const COMPARABILITY_KEYS = Object.freeze([
   'requested.prewarmdeadline',
   'requested.modular',
   'requested.modularpeers',
+  'requested.gputimer',
   'effective.prewarmPacing',
   'effective.modular',
   'rendererTier',
@@ -825,6 +830,7 @@ function comparableValue(capture, key, varying = new Set()) {
     case 'requested.prewarmdeadline':
     case 'requested.modular':
     case 'requested.modularpeers':
+    case 'requested.gputimer':
       return requested[key.slice('requested.'.length)] ?? null;
     case 'effective.prewarmPacing':
       return effectivePacingForComparison(capture?.effective?.prewarmPacing, requested, varying);

@@ -109,7 +109,6 @@ import {
 } from './camera_feel_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
-import { canvasDataUrlAsync } from './canvas_data_url';
 import { castVfxProgramUnits, createSceneCastVfxReadiness } from './cast_vfx_prewarm';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
@@ -366,6 +365,8 @@ import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
 import { createGpuPrepAdmission } from './gpu_prep_admission';
 import { createGpuPrepBudget } from './gpu_prep_budget_core';
 import { gpuPrepEventsSnapshot } from './gpu_prep_events';
+import { createGpuTimerProbe, type GpuTimerProbe } from './gpu_timer_probe';
+import { GPU_TIMER_UNAVAILABLE } from './gpu_timer_probe_core';
 import { bakeGrassGroundTexture, setGrassGroundBake } from './grass_ground_bake';
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
@@ -675,7 +676,7 @@ import {
   sceneCensusChild,
 } from './scene_census_core';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
-import { downscaleDims } from './screenshot';
+import { captureRendererScreenshot } from './screenshot_capture';
 import { drapeRingLocalY } from './selection_ring';
 import {
   createSelfRenderPositionState,
@@ -1934,6 +1935,7 @@ export class Renderer {
 
   private lowGfx: boolean;
   private post: PostPipeline | null = null;
+  private gpuTimerProbe: GpuTimerProbe | null = null;
   private godRays: THREE.Sprite[] = [];
   // Eased per-biome god-ray strength (BIOME_GOD_RAYS via updateAmbience): the
   // shafts are "sun through bright air" and read as detached glowing streaks
@@ -2134,6 +2136,10 @@ export class Renderer {
     this.webgl.shadowMap.type = THREE.PCFShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
     this.webgl.toneMappingExposure = this.baseExposure;
+    // ?gputimer=1 only: fetched ahead of the sweep so the enabled set is one
+    // set for the whole session (gpu_timer_probe.ts).
+    this.gpuTimerProbe = createGpuTimerProbe(this.webgl.getContext() as WebGL2RenderingContext);
+    this.gpuTimerProbe?.installShadowSplit(this.webgl.shadowMap);
     // The context's whole extension set, enabled before the first program links
     // (renderer_extensions.ts); view draws gate on compileAsync only off-thread.
     try {
@@ -3161,6 +3167,7 @@ export class Renderer {
         this.viewport.height,
         { gradeOnly: !GFX.composer },
       );
+    if (this.post) this.post.composer.passTimer = this.gpuTimerProbe;
     this.renderBudgetGovernor.setPostShedChain(this.post?.shedChain ?? null);
 
     // Ghost tint: the grade pass on composer/grade tiers, the base.css filter on
@@ -3226,6 +3233,7 @@ export class Renderer {
       }
       this.devProbeBindings = null;
     }
+    this.gpuTimerProbe?.dispose();
     this.unregisterWebGLContext?.();
     this.unregisterWebGLContext = null;
     this.unsubscribeCharacterAssetReady?.();
@@ -4453,6 +4461,7 @@ export class Renderer {
       entryDetailHorizon: this.entryDetailHorizon.snapshot(),
       gpuQueue: this.backgroundGpuWork.stats(),
       gpuPrep: { budget: this.gpuPrepBudget.snapshot(), events: gpuPrepEventsSnapshot() },
+      gpuTimer: this.gpuTimerProbe?.snapshot() ?? GPU_TIMER_UNAVAILABLE,
       buildLedger: this.buildLedger.snapshot(),
       lookPieces: lookPiecesStats(),
       zoneStreaming: this.zoneStreamingStats(),
@@ -11963,6 +11972,7 @@ export class Renderer {
     host.webgl = this.webgl;
     host.scene = this.scene;
     host.camera = this.camera;
+    host.gpuTimer = this.gpuTimerProbe;
     if (presentFrame(host, dt, present)) this.presentedFrameCount++;
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
@@ -12044,37 +12054,24 @@ export class Renderer {
     return this.reduceMotionSetting || (this.reduceMotionMql?.matches ?? false);
   }
 
-  // Grab a JPEG screenshot of the live scene for a bug report. The main
-  // WebGLRenderer is created WITHOUT preserveDrawingBuffer (that costs memory on
-  // the hot path), so the colour buffer is valid only until control returns to
-  // the browser and it composites. We therefore render one fresh frame and read
-  // it back synchronously in the SAME call, before yielding, then downscale onto
-  // a 2D canvas. JPEG compression is deliberately asynchronous: toDataURL took
-  // ~18ms at 1280x720 and blocked the bug-report menu. Returns null on any failure
-  // (lost context, tainted canvas) so the caller can degrade gracefully.
+  // Grab a JPEG screenshot of the live scene for a bug report
+  // (screenshot_capture.ts owns the readback and its timing rules).
   async captureScreenshot(maxEdge = 1280, quality = 0.7): Promise<string | null> {
     if (this.shutdownStarted) return null;
-    try {
-      refreshFrozenWorldMatrix(this.camera);
-      this.vfx.prepareDraw(this.camera);
-      if (this.post) this.post.render();
-      else this.webgl.render(this.scene, this.camera);
-      const gl = this.webgl.domElement;
-      const dims = downscaleDims(gl.width, gl.height, maxEdge);
-      const out = document.createElement('canvas');
-      out.width = dims.w;
-      out.height = dims.h;
-      const ctx = out.getContext('2d');
-      if (!ctx) return null;
-      ctx.drawImage(gl, 0, 0, dims.w, dims.h);
-      return await canvasDataUrlAsync(out, 'image/jpeg', quality);
-    } catch {
-      return null;
-    } finally {
-      // The extra render above must not count toward the next frame's draw
-      // stats on composer tiers (covers the throw path too).
-      this.discardOutOfBandDraws();
-    }
+    return captureRendererScreenshot(
+      {
+        domElement: this.webgl.domElement,
+        draw: () => {
+          refreshFrozenWorldMatrix(this.camera);
+          this.vfx.prepareDraw(this.camera);
+          if (this.post) this.post.render();
+          else this.webgl.render(this.scene, this.camera);
+        },
+        discardDraw: () => this.discardOutOfBandDraws(),
+      },
+      maxEdge,
+      quality,
+    );
   }
 
   // The registration seam for a point light an fx mints mid-session (the

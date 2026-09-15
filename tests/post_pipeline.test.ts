@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { dynamicResolutionRect } from '../src/render/dynamic_resolution_core';
+import { gpuTimerPassName } from '../src/render/gpu_timer_probe_core';
 
 const disabledLayers = new Set<string>();
 const gfxSettings = vi.hoisted(() => ({
@@ -91,6 +92,16 @@ describe('live post pipeline', () => {
       'ByteTargetSMAAPass',
     ]);
     expect(post.grade.fxaa).toBe(false);
+    // The GPU timer probe's per-pass bracket names (gpu_timer_probe_core.ts):
+    // the AO pass draws the scene itself, so it carries the scene+ao label.
+    expect(post.composer.passes.map((pass) => gpuTimerPassName(pass))).toEqual([
+      'scene+ao',
+      'bloom',
+      'grade',
+      'grade-fxaa',
+      'screen-fx',
+      'smaa',
+    ]);
     expect(post.composer.passes.map((pass) => pass.enabled)).toEqual([
       true,
       true,

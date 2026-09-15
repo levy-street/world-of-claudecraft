@@ -1,5 +1,6 @@
 import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
+import { gpuTimerOverlayLines } from '../render/gpu_timer_probe_core';
 import { postRevealLinksSnapshot } from '../render/live_program_watch';
 import type { PostRevealLinksSnapshot } from '../render/post_reveal_links_core';
 import type { Renderer } from '../render/renderer';
@@ -1284,6 +1285,7 @@ export class PerfMonitor {
         ? `net ${net.connected ? 'up' : 'down'} snap ${net.snapInterval}ms age ${net.lastSnapAge}ms a ${net.alpha}`
         : 'net offline',
       ...(hitchLine ? [hitchLine] : []),
+      ...gpuTimerOverlayLines(r?.gpuTimer),
       ...censusLines,
       'click: copy json',
     ].join('\n');

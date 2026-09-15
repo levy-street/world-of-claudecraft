@@ -668,8 +668,11 @@ interface AttributionTargetFixture {
 // v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
+// Re-minted for the GPU timer probe: the renderer's probe hooks and the
+// screenshot-readback extraction move the runtimeRender.renderer leaf. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5ae21044dd1b636f9c293ec628a7d316f740bb92a5962f848c6e58c80218ebbc';
+  '3e70b9c2aadbaa4bdae5d9e74ac23b748a1128e4cad8824a30f61fb4662f6278';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

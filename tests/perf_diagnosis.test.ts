@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { PerfSnapshot } from '../src/game/perf';
 import { diagnosePerfSnapshot, formatPerfDiagnosisMarkdown } from '../src/game/perf_diagnosis_core';
+import { GPU_TIMER_UNAVAILABLE } from '../src/render/gpu_timer_probe_core';
 import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
 import { shaderWarmSnapshot } from '../src/render/shader_warm_client';
 
@@ -173,6 +174,7 @@ function baseSnapshot(): PerfSnapshot {
           lanes: [],
         },
       },
+      gpuTimer: GPU_TIMER_UNAVAILABLE,
       gpuPrep: {
         budget: {
           frameEmaMs: 16.7,

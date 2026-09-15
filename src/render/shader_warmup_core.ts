@@ -131,6 +131,7 @@ export interface ShaderCorpusRecord {
 
 export type WarmupSkipReason =
   | 'disabled'
+  | 'gpu-timer'
   | 'ios-webkit'
   | 'no-corpus'
   | 'extension-mismatch'
@@ -139,6 +140,10 @@ export type WarmupSkipReason =
 
 export interface WarmupAppliesInputs {
   enabled: boolean;
+  /** The GPU timer probe (`?gputimer=1`, src/render/gpu_timer_probe.ts) adds
+   *  its extension to the world context's enabled set, so a corpus replayed
+   *  here would be keyed for a set the game will not have: nothing to warm. */
+  gpuTimer: boolean;
   /** Phone-class WebKit, where the worker is refused for the same reason
    *  (shaderWarmModeFor): a second WebGL2 context beside the world's is a
    *  per-process memory ceiling risk there, whatever the setting says. */
@@ -301,6 +306,7 @@ export function warmupExtensionsMatch(
 /** The one gate the host consults before it spends a single frame. */
 export function warmupApplies(inputs: WarmupAppliesInputs): WarmupAppliesDecision {
   if (!inputs.enabled) return { applies: false, reason: 'disabled' };
+  if (inputs.gpuTimer) return { applies: false, reason: 'gpu-timer' };
   if (inputs.iosWebKit) return { applies: false, reason: 'ios-webkit' };
   if (!inputs.hasCorpus) return { applies: false, reason: 'no-corpus' };
   // Ahead of the identity, which folds the same list into one string: the
@@ -324,6 +330,14 @@ export function warmupApplies(inputs: WarmupAppliesInputs): WarmupAppliesDecisio
  *  the world exists and was measured on exactly those OpenGL desktops. No
  *  stored option at all (a test, another entry) is ON, the arm's original
  *  default. */
+/** Whether the URL asks for the GPU timer probe, read from the same `search`
+ *  the warm-up reads its own pin from (the probe's own accessor reads
+ *  `location` once at module load, which a host handing in a search string
+ *  cannot drive). */
+export function warmupGpuTimerPinned(search: string): boolean {
+  return new URLSearchParams(search).get('gputimer') === '1';
+}
+
 export function readWarmupQuery(
   search: string,
   stored: string | null | undefined = null,

@@ -851,7 +851,10 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Restored per-ability resurrection school lookup removes one line.
-    ceiling: 12851,
+    // GPU timer probe: the bug-report screenshot readback moved to
+    // src/render/screenshot_capture.ts, which paid for the probe's one-line
+    // hooks; ratcheted down to the measured size.
+    ceiling: 12848,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

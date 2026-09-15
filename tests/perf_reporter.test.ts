@@ -6,6 +6,7 @@ import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
 import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/perf_reporter';
 import { SHADER_WARM_BEACON_TEXT_MAX } from '../src/game/perf_shader_warm_core';
 import { Settings } from '../src/game/settings';
+import { GPU_TIMER_UNAVAILABLE } from '../src/render/gpu_timer_probe_core';
 import { POST_REVEAL_LINK_WINDOW_MS } from '../src/render/post_reveal_links_core';
 import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
 import { shaderWarmSnapshot } from '../src/render/shader_warm_client';
@@ -475,6 +476,7 @@ function snapshot(): PerfSnapshot {
         },
       },
       nightAmount: 0,
+      gpuTimer: GPU_TIMER_UNAVAILABLE,
       gpuPrep: {
         budget: {
           frameEmaMs: 16.7,
@@ -725,6 +727,10 @@ describe('perf reporter payload', () => {
     expect(body.source).toBe('benchmark');
     expect(body.zoneOrScenario).toBe('bench_dense_foliage');
     expect(JSON.stringify(body.rawSummary)).not.toContain('Safari/605');
+    // The GPU timer probe's table (perfStats().gpuTimer) is a dev diagnostic
+    // that never leaves the machine: the snapshot above carries the field, so
+    // a reporter that started spreading renderer stats would ship it here.
+    expect(JSON.stringify(body)).not.toContain('gpuTimer');
     // hiddenPresentSkips ships in rawSummary (review reversal of the phase 4
     // decision): sends are skipped while hidden, but an after-restore session
     // still beacons cumulative numbers whose spans included minimized time,

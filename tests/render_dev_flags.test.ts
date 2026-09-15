@@ -36,6 +36,15 @@ describe('render dev flags: layer kill switches', () => {
   });
 });
 
+describe('render dev flags: the GPU timer probe gate', () => {
+  it('is off by default, off in a headless host, and only on under ?gputimer=1', async () => {
+    expect((await loadFlags('?perf')).gpuTimerRequested()).toBe(false);
+    expect((await loadFlags(null)).gpuTimerRequested()).toBe(false);
+    expect((await loadFlags('?gputimer=on')).gpuTimerRequested()).toBe(false);
+    expect((await loadFlags('?perf&gputimer=1')).gpuTimerRequested()).toBe(true);
+  });
+});
+
 describe('render dev flags: the character cull A/B arm', () => {
   // ?charcull=off has to restore the WHOLE pre-cull submission, not just the
   // renderer's group cull: a skinned caster that keeps three's frustum test on
