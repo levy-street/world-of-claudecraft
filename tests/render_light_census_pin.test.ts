@@ -98,6 +98,11 @@ const ALLOWED: Readonly<Record<string, CensusEntry>> = {
     reason:
       "the armory store preview's own secondary GL context: key/fill/rim in its own scene, built once at mount and only re-aimed per preset",
   },
+  'mount_preview.ts': {
+    kinds: ['DirectionalLight'],
+    reason:
+      "the mount skin store preview's own secondary GL context: key/fill/rim in its own scene, built once at mount and only re-aimed per preset",
+  },
   'wildheart_props.ts': {
     kinds: ['HemisphereLight', 'DirectionalLight'],
     reason:
@@ -177,6 +182,7 @@ describe('the src/render light census', () => {
       'characters/portrait.ts',
       'characters/preview.ts',
       'foliage_impostor.ts',
+      'mount_preview.ts',
       'renderer.ts',
       'wildheart_props.ts',
     ]);
@@ -230,7 +236,12 @@ describe('the src/render light census', () => {
     // constructor, to a context that is not the world, or to the one arm that
     // is already documented as a defect with a backlog item.
     expect(ALLOWED['renderer.ts'].reason).toContain('constructor');
-    for (const context of ['characters/preview.ts', 'characters/portrait.ts', 'armory_preview.ts'])
+    for (const context of [
+      'characters/preview.ts',
+      'characters/portrait.ts',
+      'armory_preview.ts',
+      'mount_preview.ts',
+    ])
       expect(ALLOWED[context].reason).toContain('secondary GL context');
     expect(ALLOWED['wildheart_props.ts'].reason).toContain('NAMED EXCEPTION');
     expect(ALLOWED['wildheart_props.ts'].reason).toContain('backlog');

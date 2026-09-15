@@ -228,6 +228,10 @@ const FANOUT_ARMS: readonly string[] = [
   'this.mailboxWindow.relocalize|',
   'this.socialWindow.relocalize|',
   'this.cosmeticsWindow.relocalize|',
+  // the WOC Store's mount-skin preview overlay: its codex side (name, rarity,
+  // scope line, mode and scene toggles, the action row) is painted once per
+  // open, so the store window forwards the switch to the open panel.
+  'this.dailyRewardsWindow.relocalize|',
   'this.cardDuelWindow.relocalize|',
   'this.spellbookWindow.relocalize|',
   'this.barEditorWindow.relocalize|',

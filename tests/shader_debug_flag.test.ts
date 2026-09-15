@@ -72,6 +72,11 @@ const SECONDARY_CONTEXTS: ReadonlyArray<[string, string, string]> = [
     '../src/render/armory_preview.ts',
     'renderer.debug.checkShaderErrors = shaderDebugRequested();',
   ],
+  [
+    'the mount preview',
+    '../src/render/mount_preview.ts',
+    'renderer.debug.checkShaderErrors = shaderDebugRequested();',
+  ],
 ];
 
 describe('secondary WebGL contexts disable checkShaderErrors', () => {

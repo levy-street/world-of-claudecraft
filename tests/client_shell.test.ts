@@ -3440,8 +3440,10 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain(
       "if (this.vendorOpen && document.body.classList.contains('mobile-touch')) this.closeVendor();",
     );
-    expect(hudTs).toMatch(
-      /const closeMobileBags =\s*document\.body\.classList\.contains\('mobile-touch'\) &&\s*\$\('#bags'\)\.style\.display !== 'none';/,
+    // The predicate itself lives in src/ui/mobile_hud_layout.ts (touchBagsShown):
+    // the vendor close reads the touch mode and the bags sheet's display through it.
+    expect(hudTs).toContain(
+      "const closeMobileBags = touchBagsShown(document.body.classList, $('#bags').style.display);",
     );
   });
 

@@ -16750,6 +16750,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.legend.passage': '통로',
 
   'hudChrome.wocStore.mountSkinType': '탈것 스킨',
+  'hudChrome.wocStore.mountInspectAria': '{item} 미리 보기',
+  'hudChrome.wocStore.mountRideIt': '타 보기',
+  'hudChrome.wocStore.mountOnly': '탈것만 보기',
+  'hudChrome.wocStore.mountBuy': '탈것 스킨 구매',
+  'hudChrome.wocStore.mountScopeLine':
+    '계정 공용 스킨입니다. 한 번에 한 캐릭터만 착용할 수 있습니다.',
   'hudChrome.cosmetics.title': '외형',
   'hudChrome.cosmetics.close': '외형 닫기',
   'hudChrome.cosmetics.tabsLabel': '외형 구역',
@@ -16767,6 +16773,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.applied': '적용됨',
   'hudChrome.cosmetics.owned': '보유 중',
   'hudChrome.cosmetics.storeOnly': 'WOC 상점에서 구매 가능',
+  'hudChrome.cosmetics.preview': '미리 보기',
+  'hudChrome.cosmetics.previewAria': '{name} 미리 보기',
   'hudChrome.cosmetics.cardAria': '{name}, {rarity}',
   'hudChrome.cosmetics.mountsNoMount': '먼저 탈것을 얻으세요. 스킨에는 탈 대상이 필요합니다.',
   'hudChrome.cosmetics.skinsEmpty': '아직 보유한 무기 스킨이 없습니다. WOC 상점을 방문하세요.',

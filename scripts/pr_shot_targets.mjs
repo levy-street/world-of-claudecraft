@@ -1519,6 +1519,73 @@ export const TARGETS = [
     },
   },
   {
+    key: 'mount-inspect',
+    label: 'WOC Store mount skin preview: the player riding the skin before Buy',
+    when: [
+      'ui/mount_inspect_controller',
+      'ui/store_mount_card_view',
+      'ui/store_inspect_deps',
+      'render/mount_preview',
+      'ui/daily_rewards_window',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      // A stub Claudium service pricing the mount skins (kind 'skin'), so the
+      // Machine Stable strip paints priced cards and the overlay offers Buy.
+      // An owned mount keeps the "needs a ride" hint away once a skin is owned.
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.hud || !game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+        game.sim.addItem('reins_valorsteed', 1);
+        const storeItems = [
+          'mech_bird',
+          'chimeglass_tortoise',
+          'rickshaw_mount',
+          'goblin_rocket_sled',
+        ].map((itemId, i) => ({
+          itemId,
+          name: itemId,
+          kind: 'skin',
+          costClaudium: 1200 + i * 100,
+          owned: false,
+        }));
+        game.hud.attachClaudium({
+          balance: async () => 5000,
+          storeSnapshot: async () => ({ available: true, balance: 5000, storeItems }),
+          snapshot: async () => ({ available: false, packs: [], rails: [] }),
+          buy: async () => {},
+          spend: async () => ({
+            granted: false,
+            balance: 5000,
+            costClaudium: null,
+            reason: 'unavailable',
+          }),
+        });
+        game.hud.toggleDailyRewards();
+        return { ok: true };
+      });
+      if (!staged.ok) return { skip: staged.reason };
+      const card = await pollForSize(page, '[data-store-mount-inspect="mech_bird"]');
+      if (!card) return { skip: 'the Machine Stable card never painted' };
+      await page.evaluate(() => {
+        document.querySelector('[data-store-mount-inspect="mech_bird"]')?.click();
+      });
+      const overlay = await pollForSize(
+        page,
+        '.mount-inspect-overlay .armory-inspect-stage canvas',
+      );
+      if (!overlay) return { skip: 'the mount inspect overlay never opened' };
+      // The mount GLB is lazy: give the fetch, the rig build and the first
+      // frames time to land so the shot shows the rider on the saddle.
+      await wait(6000);
+      return { clip: '.mount-inspect-overlay .armory-inspect' };
+    },
+  },
+  {
     key: 'event-calendar',
     label: 'Event Calendar window: recurring system-event rows',
     when: ['ui/calendar_view.ts', 'ui/calendar_window.ts'],
