@@ -478,8 +478,16 @@ describe('three empty instanced draw skip patch', () => {
       'the lifted GLSL assembly is missing from patches/three@0.185.1.patch',
     ).toBe(true);
     expect(
-      patch.includes('+\tconst { vertexGlsl, fragmentGlsl } = assembleProgramGlsl( parameters );'),
+      patch.includes(
+        '+\tconst { vertexGlsl, fragmentGlsl, prefixVertex, prefixFragment } = assembleProgramGlsl( parameters );',
+      ),
       'the constructor call into the lifted assembly is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes(
+        '+\treturn { vertexGlsl: vertexGlsl, fragmentGlsl: fragmentGlsl, prefixVertex: prefixVertex, prefixFragment: prefixFragment };',
+      ),
+      'the lifted assembly no longer returns the prefixes in patches/three@0.185.1.patch',
     ).toBe(true);
     expect(
       patch.includes('+\t\thasProgram: hasProgram,'),
@@ -521,7 +529,7 @@ describe('three GLSL assembly seam patch', () => {
     // bytes warm the cache under a key nothing ever asks for.
     expect(
       source.includes(
-        'const gl = renderer.getContext();\n\n\tconst program = gl.createProgram();\n\n\tconst { vertexGlsl, fragmentGlsl } = assembleProgramGlsl( parameters );',
+        'const gl = renderer.getContext();\n\n\tconst program = gl.createProgram();\n\n\tconst { vertexGlsl, fragmentGlsl, prefixVertex, prefixFragment } = assembleProgramGlsl( parameters );',
       ),
       'the WebGLProgram constructor no longer reads the lifted assembly; re-run pnpm install',
     ).toBe(true);
@@ -554,12 +562,12 @@ describe('three GLSL assembly seam patch', () => {
     const start = source.indexOf('function assembleProgramGlsl( parameters ) {');
     expect(start, 'assembleProgramGlsl is missing; re-run pnpm install').toBeGreaterThan(-1);
     const end = source.indexOf(
-      'return { vertexGlsl: vertexGlsl, fragmentGlsl: fragmentGlsl };',
+      'return { vertexGlsl: vertexGlsl, fragmentGlsl: fragmentGlsl, prefixVertex: prefixVertex, prefixFragment: prefixFragment };',
       start,
     );
     expect(
       end,
-      'assembleProgramGlsl does not return both sources; re-run pnpm install',
+      'assembleProgramGlsl does not return both sources and both prefixes; re-run pnpm install',
     ).toBeGreaterThan(start);
     const body = source.slice(start, end);
     expect(
@@ -602,6 +610,67 @@ describe('three GLSL assembly seam patch', () => {
     expect(
       body.includes('const fragmentGlsl = versionString + prefixFragment + fragmentShader;'),
       'the lifted assembly no longer builds the fragment source; re-run pnpm install',
+    ).toBe(true);
+  });
+
+  it('hands the shader prefixes back to the constructor, where the diagnostic reads them', () => {
+    // The lift moved "let prefixVertex, prefixFragment" out of the constructor,
+    // but three's onFirstUse diagnostic (built on a failed link or a non-empty
+    // log, under debug.checkShaderErrors) still reads both names from the
+    // constructor scope. A lift that keeps them local throws
+    // ReferenceError from renderer.render() at the exact moment a shader
+    // author has turned the diagnostic on, so the prefixes must travel with
+    // the sources and be destructured back into the constructor.
+    const diagVertex = 'prefix: prefixVertex';
+    const diagFragment = 'prefix: prefixFragment';
+    const ctorStart = source.indexOf(
+      'function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {',
+    );
+    expect(
+      ctorStart,
+      'the WebGLProgram constructor is missing; re-run pnpm install',
+    ).toBeGreaterThan(-1);
+    const ctorEnd = source.indexOf('class WebGLShaderCache {', ctorStart);
+    expect(ctorEnd, 'the constructor end anchor is missing; re-run pnpm install').toBeGreaterThan(
+      ctorStart,
+    );
+    const ctor = source.slice(ctorStart, ctorEnd);
+    expect(
+      ctor.includes(diagVertex) && ctor.includes(diagFragment),
+      'the onFirstUse diagnostic no longer reads the prefixes; the pin below proves nothing',
+    ).toBe(true);
+    expect(
+      ctor.includes(
+        'const { vertexGlsl, fragmentGlsl, prefixVertex, prefixFragment } = assembleProgramGlsl( parameters );',
+      ),
+      'the constructor does not bring prefixVertex/prefixFragment back into scope; the shader diagnostic throws ReferenceError',
+    ).toBe(true);
+    expect(
+      ctor.includes('let prefixVertex, prefixFragment;'),
+      'the constructor declares the prefixes a second time; the diagnostic would read the undefined copy',
+    ).toBe(false);
+    // Positive control: the unpatched sibling keeps the upstream shape, one
+    // scope where the declaration and the diagnostic read live together, so
+    // both needles are matchable and the negative above is a property of the
+    // lift.
+    const sibStart = unpatchedSibling.indexOf(
+      'function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {',
+    );
+    expect(
+      sibStart,
+      'the unpatched three.cjs control lost the WebGLProgram constructor; the pins above may be vacuous',
+    ).toBeGreaterThan(-1);
+    const sibEnd = unpatchedSibling.indexOf('class WebGLShaderCache {', sibStart);
+    expect(
+      sibEnd,
+      'the unpatched three.cjs control lost the constructor end anchor; the control would widen to the whole file',
+    ).toBeGreaterThan(sibStart);
+    const sib = unpatchedSibling.slice(sibStart, sibEnd);
+    expect(
+      sib.includes('let prefixVertex, prefixFragment;') &&
+        sib.includes(diagVertex) &&
+        sib.includes(diagFragment),
+      'the unpatched three.cjs control no longer declares and reads the prefixes in one scope; the pins above may be vacuous',
     ).toBe(true);
   });
 
