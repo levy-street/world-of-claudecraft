@@ -891,3 +891,9 @@ collision/movement.
   The shed's rungs are the reason the composer tiers now have a lever below the density
   floors; when a chain sheds its full-frame passes, `post_plan_core.ts`'s region contract
   is where dynamic resolution could re-open for it (not done).
+  Its external-frame-cap reading (`externalFrameCap`, a 30 Hz panel or a throttled tab)
+  is built from CPU-side numbers that cannot tell a display cap from a GPU-bound frame
+  under vsync, so it is never asserted on sight: the candidate opens a probe that sheds
+  every rung, dwells, restores and dwells again, and only an unmoved cadence latches the
+  cap; a moved one is refused and the session sheds under the normal rules, ending in
+  the `floored` reason once nothing is left (`tests/render_budget_frame_cap.test.ts`).

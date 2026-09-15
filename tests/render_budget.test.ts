@@ -176,7 +176,12 @@ describe('render budget governor', () => {
     });
   });
 
-  it('does not degrade when frame cadence is capped but render work is cheap', () => {
+  it('holds a capped cadence with cheap render work at or above baseline once proven', () => {
+    // A capped cadence is only believed after the ladder was spent on it and
+    // the cadence did not move (tests/render_budget_frame_cap.test.ts pins the
+    // shed-first half); from then on the cap suppresses frame pressure and
+    // measured headroom restores every bucket, so the session settles at or
+    // above the band baselines instead of at the floors.
     const governor = new RenderBudgetGovernor({
       tier: 'low',
       budget: GFX_BUDGETS.low,
@@ -186,7 +191,7 @@ describe('render budget governor', () => {
     governor.update(sample({ dt: 0.6 }));
 
     let state = governor.state();
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < 30 * 90; i++) {
       state = governor.update(
         sample({
           dt: 1 / 30,
@@ -204,15 +209,11 @@ describe('render budget governor', () => {
     expect(state.mode).toBe('stable');
     expect(state.reason).toBe('frame-cap');
     expect(state.pressure).toBeLessThan(1);
-    expect(state.levels).toEqual({
-      grass: 0.74,
-      foliage: 0.7,
-      vfx: 0.76,
-      lighting: 0.68,
-      resolution: 1,
-      detail: 1,
-      post: 1,
-    });
+    expect(state.levels.grass).toBeGreaterThanOrEqual(0.74);
+    expect(state.levels.foliage).toBeGreaterThanOrEqual(0.7);
+    expect(state.levels.vfx).toBeGreaterThanOrEqual(0.76);
+    expect(state.levels.lighting).toBeGreaterThanOrEqual(0.68);
+    expect(state.levels.resolution).toBe(1);
   });
 
   it('recovers quality under capped frame cadence when render work has headroom', () => {
@@ -236,7 +237,9 @@ describe('render budget governor', () => {
     );
     const degradedGrass = state.levels.grass;
 
-    for (let i = 0; i < 260; i++) {
+    // Long enough for the cap to be proven (the remaining rungs shed on the
+    // steady cadence first) and for one recover step to fire after it.
+    for (let i = 0; i < 900; i++) {
       state = governor.update(
         sample({
           dt: 1 / 30,
