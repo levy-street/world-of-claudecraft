@@ -851,7 +851,13 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Restored per-ability resurrection school lookup removes one line.
-    ceiling: 12851,
+    // LOWERED after extracting the remote-body standing-surface sample (the
+    // terrain, rift-lift and prop-top read behind the airborne heuristic) into
+    // src/render/entity_ground_sample.ts over the entity_ground_sample_core.ts
+    // cadence, together with the terrain-lean gradient stencil, so a standing
+    // body no longer samples the terrain on every frame or every interval.
+    // Exact count, zero slack: any further growth reds again.
+    ceiling: 12834,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

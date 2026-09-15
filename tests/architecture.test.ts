@@ -671,6 +671,7 @@ const RENDER_PURE_CORES = [
   'src/render/varkhul_assembly_focus_core.ts',
   'src/render/delve_interior_cache_core.ts',
   'src/render/entity_gate_stand_in_core.ts',
+  'src/render/entity_ground_sample_core.ts',
   'src/render/entity_view_policy_core.ts',
   'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',

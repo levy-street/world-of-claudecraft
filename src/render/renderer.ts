@@ -270,6 +270,8 @@ import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
 import { applyCharacterFormVisibility } from './entity_gate_stand_in_core';
+import { sampleGroundTilt, sampleStandingSurface } from './entity_ground_sample';
+import { createEntityGroundSample, type EntityGroundSample } from './entity_ground_sample_core';
 import {
   entityViewCandidatePriority,
   entityViewDistanceSq,
@@ -980,7 +982,6 @@ const AIRBORNE_EPS = 0.4;
  */
 const SOFT_LANDING_SPEED = 4.5;
 const TILT_SAMPLE_INTERVAL = 0.06;
-const TILT_SAMPLE_SPAN = 0.55;
 // Beyond this (squared) an entity's footsteps/movement are inaudible, so we skip
 // the surface sample + dispatch entirely. Kept under the engine's own cutoff (46u).
 const SFX_MOVE_RANGE_SQ = 42 * 42;
@@ -1238,6 +1239,8 @@ export interface EntityView extends RickshawMountViewState {
   tiltOnProp: boolean;
   /** Countdown to the next gradient resample (seconds). */
   tiltSampleT: number;
+  tiltSample: EntityGroundSample;
+  groundSample: EntityGroundSample;
 }
 
 function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
@@ -8283,6 +8286,8 @@ export class Renderer {
       tiltGradX: 0,
       tiltGradZ: 0,
       tiltOnProp: false,
+      tiltSample: createEntityGroundSample(),
+      groundSample: createEntityGroundSample(),
     });
     const view = this.views.get(e.id);
     if (visual && view) encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, view, e.kind);
@@ -10812,19 +10817,9 @@ export class Renderer {
       // ground, so it would still report airborne on the platform).
       const inRift = isRiftPos(ax) && this.sim.riftFloor !== null;
       if (e.kind === 'player' && e.onGround && !swimming) {
-        const heurSeed = this.sim.cfg.seed;
-        let effGround = groundHeight(ax, az, heurSeed);
-        if (inRift) {
-          const rf = this.sim.riftFloor;
-          if (!rf) return;
-          const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
-          effGround += riftLiftAt(floor, ax - rf.origin.x, az - rf.origin.z);
-        }
-        // The standing surface is that ground reference OR a standable prop top
-        // under the feet (parkour: crates/rocks are walkable), else a player
-        // perched on a crate would read as permanently airborne and loop the
-        // jump pose.
-        const standY = Math.max(effGround, supportHeightAt(heurSeed, ax, az, 0.5, ay + 0.01));
+        // Cached per remote body and resampled on entity_ground_sample_core's
+        // cadence; the local player samples every frame as before.
+        const standY = sampleStandingSurface(v.groundSample, this.sim, ax, ay, az, dt, isSelf);
         if (ay - standY > AIRBORNE_EPS) v.airborneHeurFrames++;
         else v.airborneHeurFrames = 0;
       } else {
@@ -10885,24 +10880,12 @@ export class Renderer {
         );
       }
       // Terrain lean: near bodies tip toward the surface they stand on. The
-      // gradient is resampled on a cadence (four terrain samples) and damped
-      // in between, so a crowd costs a handful of samples per frame, and a
+      // gradient is resampled on a cadence (four terrain samples, and only
+      // once the body has moved: entity_ground_sample.ts) and damped in
+      // between, so a crowd costs a handful of samples per frame, and a
       // body standing on a flat prop top stays upright.
       if (runCharacterPresentation && v.visual && !v.isFar) {
-        v.tiltSampleT -= dt;
-        if (v.tiltSampleT <= 0) {
-          v.tiltSampleT = TILT_SAMPLE_INTERVAL;
-          const ts = this.sim.cfg.seed;
-          const hx0 = groundHeight(ax - TILT_SAMPLE_SPAN, az, ts);
-          const hx1 = groundHeight(ax + TILT_SAMPLE_SPAN, az, ts);
-          const hz0 = groundHeight(ax, az - TILT_SAMPLE_SPAN, ts);
-          const hz1 = groundHeight(ax, az + TILT_SAMPLE_SPAN, ts);
-          v.tiltGradX = (hx1 - hx0) / (2 * TILT_SAMPLE_SPAN);
-          v.tiltGradZ = (hz1 - hz0) / (2 * TILT_SAMPLE_SPAN);
-          // Standing well above the local terrain means a prop top, which is
-          // flat whatever the ground below it does.
-          v.tiltOnProp = ay - (hx0 + hx1 + hz0 + hz1) / 4 > 0.2;
-        }
+        sampleGroundTilt(v, this.sim.cfg.seed, ax, ay, az, dt, TILT_SAMPLE_INTERVAL);
         stepGroundTilt(
           v.groundTilt,
           v.tiltGradX,
