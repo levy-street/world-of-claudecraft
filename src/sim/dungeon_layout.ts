@@ -39,6 +39,9 @@ export const DUNGEON_END_WALL_HW = 24; // front/back wall half width
 export const PILLAR_COLLIDER_R = 1.0; // centre-aisle pillar obstacle radius
 export const TOMB_HW = 1.1; // wall-side obstacle (sarcophagus/cargo) half extents
 export const TOMB_HD = 2.1;
+// Floor-debris top, well under colliders.ts SIGHT_HEIGHT (1.6): scattered
+// rubble a caster can plainly see and cast over, unlike a wall or pillar.
+export const CLUTTER_TOP = 0.9;
 export const DUNGEON_WALL_HEIGHT = 8; // visual module height (2x KayKit 4u walls)
 /**
  * Boss dais height (yards): the foundation blocks the renderer stacks are 2u
@@ -1241,7 +1244,10 @@ export function layoutColliders(
       out.push({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 });
     }
   }
-  // floor clutter props (small circle per scatter point; renderer places matching props)
-  for (const c of layout.clutter ?? []) out.push({ type: 'circle', x: c.x, z: c.z, r: 0.8 });
+  // floor clutter props (small circle per scatter point; renderer places matching props).
+  // Low ground debris, not a wall: carries cameraTopY so a clear line of sight
+  // can skip it (see the sightBlockedAt low-obstacle allowance in colliders.ts).
+  for (const c of layout.clutter ?? [])
+    out.push({ type: 'circle', x: c.x, z: c.z, r: 0.8, cameraTopY: CLUTTER_TOP });
   return out;
 }

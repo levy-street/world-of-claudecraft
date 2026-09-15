@@ -2479,9 +2479,9 @@ function sightBlockedAt(
     // Cell read per 0.5 yd sight sample: r is lineOfSightClear's 0.05, an
     // order of magnitude inside the MAX_BODY_RADIUS registration pad, so the
     // single cell is complete (the battleground arm above documents the same
-    // R-BOUND ASSUMPTION).
+    // R-BOUND ASSUMPTION). skipLow true: only clutter carries cameraTopY.
     const list = colliderCellAt(region.cells, x - region.ox, z - region.oz);
-    return list ? overlapsAny(list, x - region.ox, z - region.oz, false) : false;
+    return list ? overlapsAny(list, x - region.ox, z - region.oz, true) : false;
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
