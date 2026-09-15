@@ -4,6 +4,7 @@ import { type AbilityEffect, type Aura, CAST_COMPLETE_EPS, DT, type Entity } fro
 import { isUnbreakableControlAura } from './cc';
 import { relocateSwept } from './heroic_leap';
 import { isVeilboundMarchActive, VEILBOUND_MARCH_ID } from './paladin_veilbound_state';
+import { isPullEligible } from './pull_eligibility';
 
 export const VEILBOUND_MARK_ID = 'veilbound_mark';
 export const VEILBOUND_MARK_NAME = 'Veil Mark';
@@ -136,6 +137,10 @@ export function updateVeilboundMarchMovement(ctx: SimContext, caster: Entity): v
 }
 
 function pullMarkedEnemy(ctx: SimContext, caster: Entity, target: Entity, distance: number): void {
+  // Bosses and practice dummies are fixed combat anchors: any effect that
+  // physically relocates its target must skip them (pull_eligibility.ts), the
+  // same rule Oath Chain and Abyssal Rift already follow.
+  if (!isPullEligible(target)) return;
   if (isVeilboundMarchActive(target)) return;
   const dx = target.pos.x - caster.pos.x;
   const dz = target.pos.z - caster.pos.z;

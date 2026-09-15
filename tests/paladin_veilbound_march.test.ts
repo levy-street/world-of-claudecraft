@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isRooted } from '../src/sim/combat/cc';
+import { NORMAL_BOSS_DUMMY_ID } from '../src/sim/content/practice_dummies';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { grantDevotion } from '../src/sim/paladin_devotion';
@@ -282,5 +283,37 @@ describe('Veilbound March', () => {
       Math.hypot(marked.pos.x - sim.player.pos.x, marked.pos.z - sim.player.pos.z),
     ).toBeCloseTo(beforeDistance - 2, 1);
     expect(sim.player.paladinDevotion?.value).toBe(0);
+  });
+
+  // Practice dummies (and every boss) are fixed combat anchors: any effect that
+  // physically relocates its target must skip them (src/sim/combat/
+  // pull_eligibility.ts). Oath Chain and Abyssal Rift both route through
+  // isPullEligible; Ascension's Veilbound March pull did not, so a Protection
+  // paladin marching through the Highwatch practice row could drag the boss
+  // dummies together off their authored marks.
+  it('does not pull a boss practice dummy during an Ascension-empowered final wave', () => {
+    const sim = makeProtection();
+    const template = MOBS[NORMAL_BOSS_DUMMY_ID];
+    const dummy = createMob(sim.nextId++, template, template.maxLevel, {
+      x: 0,
+      y: sim.player.pos.y,
+      z: -39.4,
+    });
+    sim.addEntity(dummy);
+    grantDevotion(sim.player, 20);
+    sim.castAbility('divine_ascension');
+    sim.castAbility('veilbound_march');
+    walkInto(sim, [dummy]);
+    dummy.pos.z = sim.player.pos.z + 6;
+    sim.grid.update(dummy);
+    const before = { x: dummy.pos.x, z: dummy.pos.z };
+
+    for (let tick = 0; tick < 4 * 20; tick++) sim.tick();
+
+    // The final wave still lands (a real, damageable practice target)...
+    expect(dummy.hp).toBeLessThan(dummy.maxHp);
+    // ...but Ascension's pull must leave it exactly on its mark.
+    expect(dummy.pos.x).toBe(before.x);
+    expect(dummy.pos.z).toBe(before.z);
   });
 });
